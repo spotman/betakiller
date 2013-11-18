@@ -6,9 +6,9 @@ return array(
 
     'sites' =>  array(
 
-        'kohana.local'  =>  array(
-            'urls'      =>  array('kohana.local', '*.kohana.local')
-        ),
+#        'kohana.local'  =>  array(
+#            'urls'      =>  array('kohana.local', '*.kohana.local')
+#        ),
 
     ),
 
