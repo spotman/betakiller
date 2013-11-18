@@ -1,0 +1,12 @@
+[submodule "modules/twig"]
+	path = modules/twig
+	url = https://github.com/spotman/kohana-twig.git
+[submodule "modules/api"]
+	path = modules/api
+	url = https://github.com/spotman/kohana-simple-api.git
+[submodule "modules/multi-site"]
+	path = modules/multi-site
+	url = https://github.com/spotman/kohana-multi-site.git
+[submodule "modules/ulogin"]
+	path = modules/ulogin
+	url = https://github.com/spotman/kohana-ulogin.git

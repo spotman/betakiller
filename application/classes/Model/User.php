@@ -1,0 +1,168 @@
+<?php defined('SYSPATH') OR die('No direct script access.');
+
+class Model_User extends Model_Auth_User //implements ACL_Role_Interface
+{
+    protected $_reload_on_wakeup = FALSE;
+
+    protected $_belongs_to = array(
+        'language' => array(
+            'model' => 'Language',
+            'foreign_key' => 'language_id',
+        ),
+    );
+
+    protected $_has_many = array(
+        'user_tokens' => array('model' => 'User_Token'),
+        'roles'       => array('model' => 'Role', 'through' => 'roles_users'),
+        'ulogins' => array(),
+    );
+
+    // TODO
+    public function complete_login()
+    {
+        parent::complete_login();
+
+        if ( $this->loaded() )
+        {
+//        $this->date_login = date('Y-m-d H:i:s');
+//        $this->ip = sprintf("%u", ip2long(Request::$client_ip));
+//        $this->session_id = Session::instance()->id();
+//
+//        $this->save();
+
+        }
+    }
+
+
+    public function get_username()
+    {
+        return $this->username;
+    }
+
+    public function get_password()
+    {
+        return $this->password;
+    }
+
+    public function is_developer()
+    {
+        return $this->has_role('developer');
+    }
+
+    /**
+     * @param Model_Role|string $role
+     * @return bool
+     */
+    public function has_role($role)
+    {
+        if ( ! ($role instanceof Model_Role) )
+        {
+            /** @var Model_Role $orm */
+            $orm = ORM::factory('Role');
+            $role = $orm->get_by_name($role);
+        }
+
+        return $this->has('roles', $role);
+    }
+
+    /**
+     * Возвращает имя языка, назначенного пользователю
+     * @return string
+     */
+    public function get_language_name()
+    {
+        $lang_model = $this->get_language();
+
+        $lang = ( $this->loaded() AND $lang_model->loaded() )
+            ? $lang_model->get_name()
+            : NULL;
+
+        return $lang ?: "ru";
+    }
+
+    /**
+     * @return NULL|Model_Language
+     */
+    public function get_language()
+    {
+        return $this->language;
+    }
+
+    /**
+     * @todo сделать проверку соответствия ip-адреса тому, на который был выдан токен
+     * @return bool
+     */
+    public function check_ip()
+    {
+        $ip = Request::client_ip();
+//        $client_ip = ip2long($this->get_real_ip_address());
+//
+//        if ( ! (($client_ip >= ip2long('10.0.0.0') AND $client_ip < ip2long('10.255.255.255')) OR
+//            ($client_ip >= ip2long('172.16.0.0') AND $client_ip < ip2long('172.31.255.255')) OR
+//            ($client_ip >= ip2long('192.168.0.0') AND $client_ip < ip2long('192.168.255.255')) OR
+//            $_SERVER['REMOTE_ADDR'] == '127.0.0.1'))
+//        {
+//            return FALSE;
+//        }
+//
+        return TRUE;
+    }
+
+    /**
+     * Search for user by username or e-mail
+     * @param $username_or_email
+     * @throws HTTP_Exception_403
+     */
+    public function search($username_or_email)
+    {
+        $this->where($this->unique_key($username_or_email), '=', $username_or_email)->find();
+    }
+
+    public function before_sign_in()
+    {
+        // Проверяем активен ли аккаунт
+        if ( ! $this->is_active() )
+            throw new Auth_Exception_Inactive;
+    }
+
+    public function after_auto_login()
+    {
+        // Проверяем IP-адрес
+        if ( ! $this->check_ip() )
+            throw new Auth_Exception_WrongIP;
+    }
+
+    public function before_sign_out()
+    {
+        // TODO
+    }
+
+    /**
+     * Возвращает TRUE, если аккаунт пользователя включён
+     * @return bool
+     */
+    public function is_active()
+    {
+        return ( $this->loaded() AND $this->is_active );
+    }
+
+    public function get_full_name()
+    {
+        return $this->get_first_name() .' '. $this->get_last_name();
+    }
+
+    public function get_first_name()
+    {
+        return $this->get('first_name');
+    }
+
+    public function get_last_name()
+    {
+        return $this->get('last_name');
+    }
+
+    public function get_email()
+    {
+        return $this->get('email');
+    }
+}
