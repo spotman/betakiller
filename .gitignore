@@ -1,3 +1,4 @@
 .idea
 application/logs/*
 application/cache/*
+public/!
