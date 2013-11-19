@@ -67,7 +67,7 @@ Cookie::$salt = 'hd398gfhk75403lnvrfe8d10gg';
 /**
  * Set the default language
  */
-I18n::lang('ru');
+I18n::lang('en');
 
 /**
  * Set Kohana::$environment if a 'KOHANA_ENV' environment variable has been supplied.

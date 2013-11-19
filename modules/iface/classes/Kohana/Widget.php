@@ -1,7 +1,7 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
 
-class Kohana_Widget {
+class Kohana_Widget extends Controller {
 
     const DEFAULT_STATE = 'index';
 
@@ -10,27 +10,52 @@ class Kohana_Widget {
      */
     protected $name;
 
+    /**
+     * @var string Current widget state (for Finite State Machine)
+     */
     protected $current_state = self::DEFAULT_STATE;
 
     /**
-     * @param $name
-     * @return Widget
+     * @param $name Widget name
+     * @param Request $request
+     * @param Response $response
+     * @return static
      */
-    public static function factory($name)
+    public static function factory($name, Request $request = NULL, Response $response = NULL)
     {
         $class_name = static::get_class_prefix() . $name;
 
-        return new $class_name($name);
+        // Getting current request if none provided
+        $request = $request ?: Request::current();
+
+        // Creating empty response if none provided
+        $response = $response ?: Response::factory();
+
+        /** @var Widget $widget */
+        $widget = new $class_name($request, $response);
+
+        $widget->name($name);
+
+        return $widget;
     }
 
-    function __construct($name)
+    /**
+     * Getter/setter for widget name
+     * @param string|null $value
+     * @return $this|string
+     */
+    public function name($value = NULL)
     {
-        $this->name = $name;
+        if ( $value === NULL )
+            return $this->name;
+
+        $this->name = $value;
+        return $this;
     }
 
     public function render()
     {
-        $view = $this->get_view();
+        $view = $this->view();
         return $view;
     }
 
@@ -39,39 +64,26 @@ class Kohana_Widget {
         return (string) $this->render();
     }
 
-    protected function & request()
+    protected function url($action = NULL, $protocol = TRUE)
     {
-        return Request::current();
+        $widget = str_replace($this->get_class_prefix(), '', get_class($this));
+
+        return Route::url('widget-controller', array('widget' => $widget, 'action' => $action), $protocol);
     }
 
-    protected function & response()
+    protected function view($state = NULL)
     {
-        return Response::current();
+        return $this->state_view($state ?: $this->current_state);
     }
 
-    protected function param($key = NULL, $default = NULL)
-    {
-        return $this->request()->param($key, $default);
-    }
-
-    protected function get_view($state = NULL)
-    {
-        return $this->get_state_view($state ?: $this->current_state);
-    }
-
-    private function get_state_view($state)
+    private function state_view($state)
     {
         $view_path = 'widget'. DIRECTORY_SEPARATOR . str_replace('_', DIRECTORY_SEPARATOR, $this->name) . DIRECTORY_SEPARATOR . $state;
 
         return $this->view_factory($view_path);
     }
 
-    private function view_factory($path)
-    {
-        return View::factory($path);
-    }
-
-    private static function get_class_prefix()
+    protected static function get_class_prefix()
     {
         return 'Widget_';
     }

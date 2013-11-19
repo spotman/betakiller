@@ -1,17 +1,15 @@
 <? defined('SYSPATH') OR die('No direct script access.');
 
-class JS
-{
+class JS {
+
     /**
      * Хелпер к добавлению локально размещённого скрипта
-     * (чтобы в будущем перенести все файлы в static-files и поменять здесь add_public на add_static)
      * @param $filename
      * @return string Код для вставки скрипта на страницу
-     * @todo переписать весь клиентский код и переключить на self::add_static()
      */
     public static function add($filename)
     {
-        return self::add_public($filename);
+        return self::add_static($filename);
     }
 
     /**

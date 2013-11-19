@@ -17,9 +17,9 @@
  */
 
 return array(
-    'base_url'   => '/',
+    'base_url'   => '/', // TODO test with NULL value
     'index_file' => '',
-    'errors'     => FALSE,
+    'errors'     => ! Kohana::in_production(),
     'profile'    => FALSE,
     'caching'    => Kohana::in_production(),
 );

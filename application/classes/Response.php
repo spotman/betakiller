@@ -144,6 +144,11 @@ class Response extends Kohana_Response {
         return $this;
     }
 
+    /**
+     * Sends plain text to stdout without wrapping it by template
+     * @param string $string Plain text for output
+     * @param int $content_type Content type constant like Response::HTML
+     */
     public function send_string($string, $content_type = self::HTML)
     {
         $this->content_type($content_type);

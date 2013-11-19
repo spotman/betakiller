@@ -20,4 +20,12 @@ class Kohana extends Kohana_Core {
         return Kohana::$config->load($key);
     }
 
+    public static function load_if_exists($file)
+    {
+        if ( ! file_exists($file) )
+            return NULL;
+
+        return parent::load($file);
+    }
+
 }

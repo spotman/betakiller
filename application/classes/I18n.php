@@ -22,6 +22,26 @@ class I18n extends Kohana_I18n {
     protected static $_cache_missing = array();
 
     /**
+     * @var array List of app languages
+     */
+    protected static $_lang_list = array();
+
+    /**
+     * Getter/setter for list of allowed languages
+     * @param array $list
+     * @return array
+     */
+    public static function lang_list(array $list = NULL)
+    {
+        if ( $list )
+        {
+            static::$_lang_list = $list;
+        }
+
+        return static::$_lang_list;
+    }
+
+    /**
      * Returns translation of a string. If no translation exists, the original
      * string will be returned. No parameters are replaced.
      *

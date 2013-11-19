@@ -4,13 +4,12 @@ class CSS {
 
     /**
      * Хелпер к добавлению локально размещённого стиля
-     * (чтобы в будущем перенести все файлы в static-files и поменять здесь add_public на add_static)
      * @param $filename
      * @return string Код для вставки стиля на страницу
      */
     public static function add($filename)
     {
-        return self::add_public($filename);
+        return self::add_static($filename);
     }
 
     /**

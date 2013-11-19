@@ -6,9 +6,13 @@ return array(
 
     'sites' =>  array(
 
-#        'kohana.local'  =>  array(
-#            'urls'      =>  array('kohana.local', '*.kohana.local')
-#        ),
+        'app-test'  =>  array(
+            'urls'      =>  array('kohana.local', 'kohana.test.spotman.ru')
+        ),
+
+        'sub-domain-app-test'  =>  array(
+            'urls'      =>  array('*.kohana.local', '*.kohana.test.spotman.ru')
+        ),
 
     ),
 

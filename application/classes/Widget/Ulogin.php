@@ -4,23 +4,39 @@ class Widget_Ulogin extends Widget {
 
     public function action_show()
     {
-        if ( Env::user(TRUE) )
-            return 'logged in';
-
-        $uLogin = Ulogin::factory();
-
-        if ( $uLogin->mode() )
+        // TODO
+        if ( ! Env::user(TRUE) )
         {
-            $uLogin->login();
+            $uLogin = $this->ulogin_factory();
 
-            throw new Kohana_Exception('ulogin login');
+            $this->send_string( $uLogin->render() );
         }
         else
         {
-            $this->response()->send_string($uLogin);
+            $this->send_string('Logged in');
         }
+    }
 
-        //$this->response()->send_json(Response::JSON_SUCCESS, $result);
+    public function action_login()
+    {
+        $uLogin = $this->ulogin_factory();
+
+        try
+        {
+            $uLogin->login();
+        }
+        catch ( Exception $e )
+        {
+            throw $e;
+            // TODO
+            //throw new HTTP_Exception_401;
+        }
+    }
+
+    protected function ulogin_factory()
+    {
+        return Ulogin::factory()
+            ->set_redirect_uri($this->url('login'));
     }
 
 }
