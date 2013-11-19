@@ -26,13 +26,16 @@ return array
 	
 	// Эти поля используются для поля username в таблице users
 	'username' 		=> array (
-		'first_name',
-		'last_name',
+        'email',
+//		'first_name',
+//		'last_name',
 	),
 	
 	// Обязательные поля
 	'fields' 		=> array(
 		'email',
+		'first_name',
+		'last_name',
 	),
 	
 	// Необязательные поля
