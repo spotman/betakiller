@@ -1,7 +1,7 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
 
-class Kohana_Widget extends Controller {
+abstract class Kohana_Widget extends Controller {
 
     const DEFAULT_STATE = 'index';
 
@@ -53,16 +53,22 @@ class Kohana_Widget extends Controller {
         return $this;
     }
 
-    public function render()
-    {
-        $view = $this->view();
-        return $view;
-    }
-
+    /**
+     * Renders widget and returns its representation
+     * @return string
+     */
     public function __toString()
     {
-        return (string) $this->render();
+        $this->render();
+        return (string) $this->response();
     }
+
+    /**
+     * Generates HTML/CSS/JS representation of the widget
+     * Implement this method in your widget
+     * Use $this->send_string() / $this->send_json() / $this->send_jsonp() methods to populate output
+     */
+    abstract protected function render();
 
     protected function url($action = NULL, $protocol = TRUE)
     {

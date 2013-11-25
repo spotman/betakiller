@@ -2,19 +2,10 @@
 
 class Widget_Ulogin extends Widget {
 
-    public function action_show()
+    protected function render()
     {
-        // TODO
-        if ( ! Env::user(TRUE) )
-        {
-            $uLogin = $this->ulogin_factory();
-
-            $this->send_string( $uLogin->render() );
-        }
-        else
-        {
-            $this->send_string('Logged in');
-        }
+        $instance = $this->ulogin_factory();
+        $this->send_string($instance->render());
     }
 
     public function action_login()
@@ -25,11 +16,15 @@ class Widget_Ulogin extends Widget {
         {
             $uLogin->login();
         }
-        catch ( Exception $e )
+        catch ( Ulogin_Exception $e )
         {
             throw $e;
             // TODO
             //throw new HTTP_Exception_401;
+        }
+        catch ( Exception $e )
+        {
+            throw $e;
         }
     }
 

@@ -51,7 +51,8 @@ class Kohana_IFace {
 
     public function action_index()
     {
-        return $this->render();
+        // TODO
+        //return $this->render();
     }
 
     public function render()

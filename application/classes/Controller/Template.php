@@ -73,7 +73,8 @@ class Controller_Template extends Controller {
     {
         if ( $this->template )
         {
-            $this->template->set_content($view);
+            // Render view for adding js/css files, described in it
+            $this->template->set_content((string) $view);
         }
         else
         {

@@ -6,7 +6,9 @@
  * @author     Kohana Team
  * @package    Betakiller
  */
-class Locator extends Singleton {
+class Locator {
+
+    use Singleton;
 
     /**
      * Initialize Kohana routes from locations

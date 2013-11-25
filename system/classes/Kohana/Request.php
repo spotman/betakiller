@@ -800,7 +800,7 @@ class Kohana_Request implements HTTP_Request {
 	 * Sets and gets the route from the request.
 	 *
 	 * @param   string $route
-	 * @return  mixed
+	 * @return  Request|Route
 	 */
 	public function route(Route $route = NULL)
 	{

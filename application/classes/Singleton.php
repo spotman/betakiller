@@ -1,16 +1,29 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
 /**
- * Class Singleton
+ * Trait Singleton
  *
- * Extend this class if you need Singleton object.
- * Use protected constructor if needed.
+ * Use this trait if you need Singleton object.
+ * Override protected constructor if needed.
  *
  * Usage (client-code): CLASS::instance();
  */
-abstract class Singleton {
+trait Singleton {
 
     protected static $instance;
+
+    /**
+     * @return static
+     */
+    public static function instance()
+    {
+        if ( ! static::$instance )
+        {
+            $class = __CLASS__;
+            static::$instance = new $class;
+        }
+        return static::$instance;
+    }
 
     /**
      * You can`t create Singleton objects directly, use CLASS::instance() instead
@@ -18,15 +31,6 @@ abstract class Singleton {
      */
     protected function __construct() {}
 
-    private final function __clone() {}
-
-    final public static function instance()
-    {
-        if ( ! self::$instance )
-        {
-            self::$instance = new static;
-        }
-        return self::$instance;
-    }
+    protected function __clone() {}
 
 }

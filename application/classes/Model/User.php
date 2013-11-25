@@ -36,12 +36,12 @@ class Model_User extends Model_Auth_User //implements ACL_Role_Interface
 
     public function get_username()
     {
-        return $this->username;
+        return $this->get('username');
     }
 
     public function get_password()
     {
-        return $this->password;
+        return $this->get('password');
     }
 
     public function is_developer()
@@ -85,7 +85,7 @@ class Model_User extends Model_Auth_User //implements ACL_Role_Interface
      */
     public function get_language()
     {
-        return $this->language;
+        return $this->get('language');
     }
 
     /**
@@ -94,7 +94,7 @@ class Model_User extends Model_Auth_User //implements ACL_Role_Interface
      */
     public function check_ip()
     {
-        $ip = Request::client_ip();
+//        $ip = Request::client_ip();
 //        $client_ip = ip2long($this->get_real_ip_address());
 //
 //        if ( ! (($client_ip >= ip2long('10.0.0.0') AND $client_ip < ip2long('10.255.255.255')) OR

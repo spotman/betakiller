@@ -38,7 +38,7 @@ class Env
 
     /**
      * Хелпер для получения инстанса Auth
-     * @return Auth
+     * @return Auth_ORM
      */
     public static function auth()
     {

@@ -1,6 +1,8 @@
-<?php
+<?php defined('SYSPATH') OR die('No direct script access.');
 
 class CSS {
+
+    use Singleton;
 
     /**
      * Хелпер к добавлению локально размещённого стиля
@@ -47,14 +49,6 @@ class CSS {
         StaticCss::instance()->addCssInline($string);
     }
 
-    /**
-     * Добавляет стиль для CRM (файл используется в нескольких разных модулях, поэтому создан этот хелпер)
-     */
-    public static function add_crm_style()
-    {
-        self::add_static("crm/crm.css");
-    }
-
     public static function get_files()
     {
         return StaticCss::instance()->getCss();
@@ -93,18 +87,20 @@ class CSS {
         self::add_static("jquery/qtip/jquery.qtip.css");
     }
 
-    public static function jquery_pnotify()
+    public function jquery_pnotify()
     {
         self::add_static("jquery/pnotify/jquery.pnotify.default.css");
+        return $this;
     }
 
     /**
      * Хелпер для добавления плагина выбора времени
      * @link http://jonthornton.github.io/jquery-timepicker/
      */
-    public static function jquery_timepicker()
+    public function jquery_timepicker()
     {
         self::add_static("jquery/timepicker/jquery.timepicker.css");
+        return $this;
     }
 
     public static function bootstrap()

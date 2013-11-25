@@ -2,6 +2,8 @@
 
 class JS {
 
+    use Singleton;
+
     /**
      * Хелпер к добавлению локально размещённого скрипта
      * @param $filename

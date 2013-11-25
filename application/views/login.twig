@@ -1,3 +1,6 @@
+
+{{ static('jquery', 'bootstrap') }}
+
 <style type="text/css">#login-window { margin-top: 150px; }</style>
 
 <div class="container">
@@ -5,15 +8,16 @@
         <div id="login-window" class="span4 offset4 well">
             <legend>{{ __('Sign in') }}</legend>
             <div class="alert alert-error hide"></div>
-            <form method="POST" action="/login/" id="login-form" accept-charset="UTF-8">
+            <form method="POST" action="/login" id="login-form" accept-charset="UTF-8">
                 <input type="text" id="user-login" name="user-login" class="span4" placeholder="{{ __('Your username or email') }}" value="{{ username }}" />
                 <input type="password" id="user-password" name="user-password" class="span4" placeholder="{{ __('Your password') }}" />
-                <button id="login-btn" class="btn btn-info btn-block"><i class="icon-user icon-white"></i> {{ __('Sign in')|raw }}</button>
+                <button id="login-btn" class="btn btn-info btn-block"><i class="icon-user icon-white"></i> {{ __('Sign in') }}</button>
             </form>
         </div>
     </div>
 </div>
 
+<h2>TODO: move to widget</h2>
 
 <script type="text/javascript">
 

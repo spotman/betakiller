@@ -84,10 +84,7 @@ class Controller_Auth extends Controller_Template {
 
     protected function show_login_form($username = NULL)
     {
-        $this->jquery();
-        $this->bootstrap();
-
-        $content = View::factory('login');
+        $content = Twig::factory('login');
         $content->set('username', HTML::chars($username));
         $content->set('redirect_url', $this->redirect_url);
 

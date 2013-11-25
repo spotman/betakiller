@@ -3,10 +3,11 @@
     <head>
         <meta http-equiv="Content-type" content="text/html; charset=UTF-8" />
         <title><?php echo $title;?></title>
-        <?= CSS::get_all(); ?>
-        <?= JS::get_all(); ?>
+        <?= CSS::instance()->get_all(); ?>
+        <?= JS::instance()->get_all(); ?>
     </head>
     <body>
+        <h1>TODO: move template to Twig</h1>
         <div id="wrapper">
             <?php echo $content;?>
         </div>
