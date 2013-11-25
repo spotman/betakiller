@@ -10,3 +10,6 @@
 [submodule "modules/ulogin"]
 	path = modules/ulogin
 	url = https://github.com/spotman/kohana-ulogin.git
+[submodule "sites/art-for-sale"]
+	path = sites/art-for-sale
+	url = https://spotman@bitbucket.org/spotman/artforsale.git
