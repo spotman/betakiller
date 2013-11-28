@@ -10,6 +10,18 @@ class Kohana extends Kohana_Core {
         array_unshift(static::$_paths, $path);
     }
 
+    public static function modules(array $modules = NULL)
+    {
+        $result = parent::modules($modules);
+
+        if ( $modules !== NULL )
+        {
+            MultiSite::instance()->init_site();
+        }
+
+        return $result;
+    }
+
     public static function in_production()
     {
         return in_array(Kohana::$environment, array(Kohana::PRODUCTION, Kohana::STAGING));
