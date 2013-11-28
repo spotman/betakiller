@@ -56,6 +56,7 @@ return array
 		'driver'             => 'xcache',
 		'default_expire'     => 3600,
 	),
+*/
 	'file'    => array(
 		'driver'             => 'file',
 		'cache_dir'          => APPPATH.'cache',
@@ -66,5 +67,4 @@ return array
 			'.svn'
 		)
 	)
-*/
 );

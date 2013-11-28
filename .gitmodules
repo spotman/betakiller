@@ -13,3 +13,6 @@
 [submodule "sites/art-for-sale"]
 	path = sites/art-for-sale
 	url = https://spotman@bitbucket.org/spotman/artforsale.git
+[submodule "modules/cache"]
+	path = modules/cache
+	url = https://github.com/spotman/kohana-cache.git

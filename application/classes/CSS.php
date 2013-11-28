@@ -9,9 +9,9 @@ class CSS {
      * @param $filename
      * @return string Код для вставки стиля на страницу
      */
-    public static function add($filename)
+    public function add($filename)
     {
-        return self::add_static($filename);
+        return $this->add_static($filename);
     }
 
     /**
@@ -19,7 +19,7 @@ class CSS {
      * @param $url
      * @return string Код для вставки стиля на страницу
      */
-    public static function add_public($url)
+    public function add_public($url)
     {
         // Добавляем слеш в начале, если его нет
         if ( mb_substr($url, 0, 4) != 'http' AND mb_substr($url, 0, 1) != "/" )
@@ -35,7 +35,7 @@ class CSS {
      * @param $filename
      * @return string Код для вставки стиля на страницу
      */
-    public static function add_static($filename)
+    public function add_static($filename)
     {
         return StaticCss::instance()->addCssStatic($filename);
     }
@@ -44,53 +44,52 @@ class CSS {
      * Добавляет инлайн стиль в документ
      * @param $string
      */
-    public static function add_inline($string)
+    public function add_inline($string)
     {
         StaticCss::instance()->addCssInline($string);
     }
 
-    public static function get_files()
+    public function get_files()
     {
         return StaticCss::instance()->getCss();
     }
 
-    public static function get_inline()
+    public function get_inline()
     {
         return StaticCss::instance()->getCssInline();
     }
 
-    public static function get_all()
+    public function get_all()
     {
-        return self::get_files() . self::get_inline();
+        return $this->get_files() . $this->get_inline();
     }
 
 
-    public static function jquery_ui()
+    public function jquery_ui()
     {
-        self::add_static("jquery/ui/css/smoothness/jquery-ui-1.9.2.custom.css");
+        return $this->add_static("jquery/ui/css/smoothness/jquery-ui-1.9.2.custom.css");
     }
 
-    public static function jquery_validation() {}
+    public function jquery_validation() {}
 
-    public static function jquery_fileupload()
+    public function jquery_fileupload()
     {
-        self::add_static("jquery/fileupload/jquery.fileupload-ui.css");
+        return $this->add_static("jquery/fileupload/jquery.fileupload-ui.css");
     }
 
-    public static function jquery_chosen()
+    public function jquery_chosen()
     {
-        self::add_static("jquery/chosen/chosen.css");
+        return $this->add_static("jquery/chosen/chosen.css");
     }
 
-    public static function jquery_qtip()
+    public function jquery_qtip()
     {
-        self::add_static("jquery/qtip/jquery.qtip.css");
+        return $this->add_static("jquery/qtip/jquery.qtip.css");
     }
 
     public function jquery_pnotify()
     {
-        self::add_static("jquery/pnotify/jquery.pnotify.default.css");
-        return $this;
+        return $this->add_static("jquery/pnotify/jquery.pnotify.default.css");
     }
 
     /**
@@ -99,12 +98,11 @@ class CSS {
      */
     public function jquery_timepicker()
     {
-        self::add_static("jquery/timepicker/jquery.timepicker.css");
-        return $this;
+        return $this->add_static("jquery/timepicker/jquery.timepicker.css");
     }
 
-    public static function bootstrap()
+    public function bootstrap()
     {
-        return self::add_static("bootstrap/css/bootstrap.css");
+        return $this->add_static("bootstrap/css/bootstrap.css");
     }
 }

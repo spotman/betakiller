@@ -3,7 +3,8 @@
 <head>
     <meta http-equiv="Content-type" content="text/html; charset=<?= Kohana::$charset ?>" />
     <title><?= __("Ошибка ") . ( isset($error->code) ? $error->code : NULL ) ?></title>
-    <?= CSS::bootstrap() ?>
+    <?= CSS::instance()->bootstrap() ?>
+    <?= JS::instance()->bootstrap() ?>
 </head>
 <body>
     <?= $error ?>

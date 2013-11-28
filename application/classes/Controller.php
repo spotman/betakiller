@@ -117,7 +117,7 @@ abstract class Controller extends Controller_Proxy {
 
         $file = $file ?: $this->request->action();
 
-        $view = $this->view_factory( strtolower($path . DIRECTORY_SEPARATOR . $file) );
+        $view = $this->view_factory($path . DIRECTORY_SEPARATOR . $file);
 
         return $view;
     }
@@ -208,70 +208,73 @@ abstract class Controller extends Controller_Proxy {
     }
 
 
-    /**
-     * Хелпер для добавления на страницу файла скрипта из директории static-files
-     * @param $filename
-     * @return $this
-     */
-    protected function add_script($filename)
-    {
-        $this->add_static_script($filename);
-        return $this;
-    }
+// Все подключения стилей и скриптов теперь делается из вьюшек и шаблонов
+// Код оставлен на будущее
 
-    /**
-     * Хелпер для добавления на страницу файла стиля из директории static-files
-     * @param $filename
-     * @return $this
-     */
-    protected function add_style($filename)
-    {
-        $this->add_static_style($filename);
-        return $this;
-    }
-
-    /**
-     * Хелпер для добавления на страницу файла скрипта по URL
-     * @param $filename
-     * @return $this
-     */
-    protected function add_public_script($filename)
-    {
-        JS::add_public($filename);
-        return $this;
-    }
-
-    /**
-     * Хелпер для добавления на страницу файла стиля по URL
-     * @param $filename
-     * @return $this
-     */
-    protected function add_public_style($filename)
-    {
-        CSS::add_public($filename);
-        return $this;
-    }
-
-    /**
-     * Хелпер для добавления на страницу файла скрипта, размещённого в одной из директорий static-files
-     * @param $filename
-     * @return $this
-     */
-    protected function add_static_script($filename)
-    {
-        JS::add_static($filename);
-        return $this;
-    }
-
-    /**
-     * Хелпер для добавления на страницу файла стиля, размещённого в одной из директорий static-files
-     * @param $filename
-     * @return $this
-     */
-    protected function add_static_style($filename)
-    {
-        CSS::add_static($filename);
-        return $this;
-    }
+//    /**
+//     * Хелпер для добавления на страницу файла скрипта из директории static-files
+//     * @param $filename
+//     * @return $this
+//     */
+//    protected function add_script($filename)
+//    {
+//        $this->add_static_script($filename);
+//        return $this;
+//    }
+//
+//    /**
+//     * Хелпер для добавления на страницу файла стиля из директории static-files
+//     * @param $filename
+//     * @return $this
+//     */
+//    protected function add_style($filename)
+//    {
+//        $this->add_static_style($filename);
+//        return $this;
+//    }
+//
+//    /**
+//     * Хелпер для добавления на страницу файла скрипта по URL
+//     * @param $filename
+//     * @return $this
+//     */
+//    protected function add_public_script($filename)
+//    {
+//        JS::add_public($filename);
+//        return $this;
+//    }
+//
+//    /**
+//     * Хелпер для добавления на страницу файла стиля по URL
+//     * @param $filename
+//     * @return $this
+//     */
+//    protected function add_public_style($filename)
+//    {
+//        CSS::add_public($filename);
+//        return $this;
+//    }
+//
+//    /**
+//     * Хелпер для добавления на страницу файла скрипта, размещённого в одной из директорий static-files
+//     * @param $filename
+//     * @return $this
+//     */
+//    protected function add_static_script($filename)
+//    {
+//        JS::add_static($filename);
+//        return $this;
+//    }
+//
+//    /**
+//     * Хелпер для добавления на страницу файла стиля, размещённого в одной из директорий static-files
+//     * @param $filename
+//     * @return $this
+//     */
+//    protected function add_static_style($filename)
+//    {
+//        CSS::add_static($filename);
+//        return $this;
+//    }
 
 }

@@ -8,8 +8,6 @@
     </head>
     <body>
         <h1>TODO: move template to Twig</h1>
-        <div id="wrapper">
-            <?php echo $content;?>
-        </div>
+        <?php echo $content;?>
     </body>
 </html>
