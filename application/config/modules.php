@@ -8,7 +8,6 @@ return array(
     'api'                   => MODPATH.'api',                   // API subsystem
     'auth'                  => MODPATH.'auth',                  // Basic authentication
     'cache'                 => MODPATH.'cache',                 // Caching with multiple backends
-//    'codebench'             => MODPATH.'codebench',             // Benchmarking tool
     'database'              => MODPATH.'database',              // Database access
     'email'                 => MODPATH.'email',                 // Mailing module
     'error'                 => MODPATH.'error',                 // Модуль отлова и логирования ошибок
@@ -19,9 +18,7 @@ return array(
     'mangodb'               => MODPATH.'mangodb',               // ODM обёртка для mongodb
     'minion'                => MODPATH.'minion',                // CLI Tasks
     'orm'                   => MODPATH.'orm',                   // Object Relationship Mapping
-    // 'unittest'   => MODPATH.'unittest',   // Unit testing
-    // 'userguide'  => MODPATH.'userguide',  // User guide and API documentation
     'twig'                  => MODPATH.'twig',                  // Twig template engine
     'ulogin'                => MODPATH.'ulogin',                // Universal login via ulogin.ru
-    'xmpp'                  => MODPATH.'xmpp',                  // Обёртка для взаимодействия по протоколу XMPP (Jabber)
+//    'xmpp'                  => MODPATH.'xmpp',                  // Обёртка для взаимодействия по протоколу XMPP (Jabber)
 );
