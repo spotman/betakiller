@@ -1,9 +1,6 @@
 [submodule "modules/twig"]
 	path = modules/twig
 	url = https://spotman@github.com/spotman/kohana-twig.git
-[submodule "modules/api"]
-	path = modules/api
-	url = https://spotman@github.com/spotman/kohana-simple-api.git
 [submodule "modules/multi-site"]
 	path = modules/multi-site
 	url = https://spotman@github.com/spotman/kohana-multi-site.git
@@ -12,4 +9,7 @@
 	url = https://spotman@github.com/spotman/kohana-ulogin.git
 [submodule "modules/cache"]
 	path = modules/cache
-	url = https://spotman@github.com/spotman/kohana-cache.git
+	url = https://github.com/spotman/kohana-cache.git
+[submodule "modules/api"]
+	path = modules/api
+	url = https://spotman@github.com/spotman/kohana-simple-api.git
