@@ -2,6 +2,8 @@
 
 return array(
 
+    'error'                 => MODPATH.'error',                 // Модуль отлова и логирования ошибок
+
     // Place it first for correct initialization of per-site classes and configs
     'multi-site'            => MODPATH.'multi-site',            // Multiple apps on top of single engine
 
@@ -10,7 +12,6 @@ return array(
     'cache'                 => MODPATH.'cache',                 // Caching with multiple backends
     'database'              => MODPATH.'database',              // Database access
     'email'                 => MODPATH.'email',                 // Mailing module
-    'error'                 => MODPATH.'error',                 // Модуль отлова и логирования ошибок
     'iface'                 => MODPATH.'iface',                 // Dynamic user interfaces
     'image'                 => MODPATH.'image',                 // Image manipulation
     'kohana-static-files'   => MODPATH.'kohana-static-files',   // Static Files (JS/CSS/pictures)
