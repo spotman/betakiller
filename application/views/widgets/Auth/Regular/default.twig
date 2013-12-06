@@ -1,0 +1,12 @@
+{{ static('jquery', 'bootstrap') }}
+
+<div class="span4 offset4 well">
+    <legend>{{ __('Sign in') }}</legend>
+    <div class="alert alert-error hide"></div>
+    <form method="POST" action="{{ login_url }}" id="login-form" accept-charset="UTF-8">
+        <input type="text" id="user-login" name="user-login" class="span4" placeholder="{{ __('Your username or email') }}" value="{{ username|default() }}" />
+        <input type="password" id="user-password" name="user-password" class="span4" placeholder="{{ __('Your password') }}" />
+        <button id="login-btn" class="btn btn-info btn-block"><i class="icon-user icon-white"></i> {{ __('Sign in') }}</button>
+    </form>
+    <a href="{{ reset_password_url }}" class="pull-right">{{ __("Forgot password?") }}</a>
+</div>

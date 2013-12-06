@@ -3,7 +3,7 @@
 
 abstract class Kohana_Widget extends Controller {
 
-    const DEFAULT_STATE = 'index';
+    const DEFAULT_STATE = 'default';
 
     /**
      * @var string
@@ -59,8 +59,28 @@ abstract class Kohana_Widget extends Controller {
      */
     public function __toString()
     {
+        try
+        {
+            $response = $this->render();
+        }
+        catch ( Exception $e )
+        {
+            $response = Kohana_Exception::_handler($e);
+        }
+
+        return (string) $response;
+    }
+
+    public function action_render()
+    {
         $this->render();
-        return (string) $this->response();
+    }
+
+    public function render()
+    {
+        // TODO call_user_func_array
+        $this->_render();
+        return $this->response();
     }
 
     /**
@@ -68,7 +88,7 @@ abstract class Kohana_Widget extends Controller {
      * Implement this method in your widget
      * Use $this->send_string() / $this->send_json() / $this->send_jsonp() methods to populate output
      */
-    abstract protected function render();
+    abstract protected function _render();
 
     protected function url($action = NULL, $protocol = TRUE)
     {
@@ -84,7 +104,7 @@ abstract class Kohana_Widget extends Controller {
 
     private function state_view($state)
     {
-        $view_path = 'widget'. DIRECTORY_SEPARATOR . str_replace('_', DIRECTORY_SEPARATOR, $this->name) . DIRECTORY_SEPARATOR . $state;
+        $view_path = 'widgets'. DIRECTORY_SEPARATOR . str_replace('_', DIRECTORY_SEPARATOR, $this->name) . DIRECTORY_SEPARATOR . $state;
 
         return $this->view_factory($view_path);
     }

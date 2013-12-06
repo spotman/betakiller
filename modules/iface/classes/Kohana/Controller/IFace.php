@@ -1,6 +1,6 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
-class Kohana_Controller_IFace extends Controller_Template {
+class Kohana_Controller_IFace extends Controller_Basic {
 
     /**
      * @var IFace
@@ -25,36 +25,6 @@ class Kohana_Controller_IFace extends Controller_Template {
         parent::before();
     }
 
-    // TODO
-    public function after()
-    {
-        if ( $this->_proxy_result )
-        {
-            $content_type = $this->iface->content_type();
-
-            switch ( $content_type )
-            {
-                case IFace::CONTENT_TYPE_HTML:
-                    $response = $this->_proxy_result;
-                break;
-
-                case IFace::CONTENT_TYPE_JSON:
-                    $response = json_encode($this->_proxy_result);
-                break;
-
-                default:
-                    throw new HTTP_Exception_500('Unknown IFace content type: :type', array(':type' => $content_type));
-            }
-
-
-            $this->template->set_content($response);
-        }
-        else
-        {
-            $this->template = NULL;
-        }
-    }
-
     public function get_proxy_object()
     {
         $object = $this->get_iface();
@@ -74,7 +44,7 @@ class Kohana_Controller_IFace extends Controller_Template {
     {
         if ( ! $this->iface )
         {
-            $this->iface = IFace::factory($this->get_location());
+            $this->iface = IFace::factory($this->get_location()->get_codename());
         }
 
         return $this->iface;

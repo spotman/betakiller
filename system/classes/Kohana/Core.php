@@ -15,7 +15,7 @@
  */
 class Kohana_Core {
 
-	// Release version and codename
+	// Release version and _codename
 	const VERSION  = '3.3.0';
 	const CODENAME = 'badius';
 

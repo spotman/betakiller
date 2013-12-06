@@ -4,7 +4,7 @@
  * Class Controller_Template
  */
 
-class Controller_Template extends Controller {
+class Controller_Basic extends Controller {
 
     /**
      * @var string|View_Template
@@ -21,8 +21,13 @@ class Controller_Template extends Controller {
         // Init template
         if ( $this->template )
         {
-            $this->template = View_Template::factory($this->template);
+            $this->template = $this->template_factory($this->template);
         }
+    }
+
+    protected function template_factory($template_name)
+    {
+        return View_Template::factory($template_name);
     }
 
     public function after()

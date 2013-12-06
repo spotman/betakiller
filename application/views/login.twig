@@ -1,4 +1,4 @@
-{{ static('jquery', 'bootstrap') }}
+{% static('jquery', 'bootstrap') %}
 
 <style type="text/css">#login-window { margin-top: 150px; }</style>
 
@@ -12,6 +12,7 @@
                 <input type="password" id="user-password" name="user-password" class="span4" placeholder="{{ __('Your password') }}" />
                 <button id="login-btn" class="btn btn-info btn-block"><i class="icon-user icon-white"></i> {{ __('Sign in') }}</button>
             </form>
+            <a href="/reset-password" class="pull-right">{{ __("Forgot password?") }}</a>
         </div>
     </div>
 </div>

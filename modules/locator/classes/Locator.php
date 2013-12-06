@@ -65,7 +65,7 @@ class Locator {
         // Removing starting slash
         $full_url = ltrim($full_url, '/');
 
-        // Making route name (it must be unique and relate to location codename)
+        // Making route name (it must be unique and relate to location _codename)
         $route_name = ( $full_url == '' ) ? 'index' : $location->get_codename();
 
         // Adding route

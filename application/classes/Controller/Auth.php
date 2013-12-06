@@ -4,7 +4,7 @@
  * TODO convert to the widget
  * Class Controller_Auth
  */
-class Controller_Auth extends Controller_Template {
+class Controller_Auth extends Controller_Basic {
 
     /**
      * @var string Default url for relocate after login
@@ -84,7 +84,7 @@ class Controller_Auth extends Controller_Template {
 
     protected function show_login_form($username = NULL)
     {
-        $content = Twig::factory('login');
+        $content = $this->view('login');
         $content->set('username', HTML::chars($username));
         $content->set('redirect_url', $this->redirect_url);
 

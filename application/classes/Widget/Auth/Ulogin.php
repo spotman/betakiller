@@ -1,8 +1,8 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
-class Widget_Ulogin extends Widget {
+class Widget_Auth_Ulogin extends Widget {
 
-    protected function render()
+    protected function _render()
     {
         $instance = $this->ulogin_factory();
         $this->send_string($instance->render());
