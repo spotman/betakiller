@@ -6,3 +6,10 @@ Route::set('widget-controller', 'w/<widget>(/<action>)',
         'controller'    => 'Widget',
         'action'        => 'render',
     ));
+
+Route::set('default-iface-controller', '(<uri>)', array('uri' => '.+'))
+    ->defaults(array(
+        'controller'    => 'IFace',
+        'action'        => 'render',
+    ));
+

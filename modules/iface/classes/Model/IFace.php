@@ -3,10 +3,10 @@
 /**
  * Class Model_IFace
  * @category   Models
- * @author     Kohana Team
+ * @author     Spotman
  * @package    Betakiller
  */
-class Model_IFace extends ORM {
+class Model_IFace extends ORM implements IFace_Model {
 
     public $_table_name = "ifaces";
 
@@ -21,17 +21,15 @@ class Model_IFace extends ORM {
         )
     );
 
-    public static function find_by_codename($codename)
-    {
-        $model = static::factory('IFace')
-            ->where('codename', '=', $codename)
-            ->find();
-
-        if ( ! $model->loaded() )
-            throw new IFace_Exception('Can not find model for codename :codename', array(':codename' => $codename));
-
-        return $model;
-    }
+//    /**
+//     * Provider factory (for current model type)
+//     *
+//     * @return IFace_Provider
+//     */
+//    protected function get_provider()
+//    {
+//        return IFace_Provider_Source::factory('DB');
+//    }
 
     public function get_id()
     {
@@ -43,31 +41,59 @@ class Model_IFace extends ORM {
         return (int) $this->get('parent_id');
     }
 
-    public function get_codename()
+    /**
+     * Returns list of child iface models
+     *
+     * @return IFace_Model[]
+     */
+    function get_children()
     {
-        return $this->get('_codename');
+        ORM::factory($this->_object_name)
+            ->where('parent_id', '=', $this->pk())
+            ->find_all()
+            ->as_array();
     }
 
-    public function get_url()
+    /**
+     * Return parent iface model or NULL
+     *
+     * @return IFace_Model[]
+     */
+    public function get_parent()
     {
-        return $this->get('url');
+        /** @var Model_IFace $parent */
+        $parent = $this->get('parent');
+        return $parent->loaded() ? $parent : NULL;
     }
 
+    /**
+     * Returns TRUE if iface is marked as "default"
+     *
+     * @return bool
+     */
     public function is_default()
     {
         return (bool) $this->get('is_default');
     }
 
     /**
-     * Returns parent iface`s model
-     * @return Model_IFace|null
+     * Returns iface codename
+     *
+     * @return string
      */
-    public function get_parent()
+    public function get_codename()
     {
-        /** @var Model_IFace $parent */
-        $parent = $this->get('parent');
+        return $this->get('codename');
+    }
 
-        return $parent->loaded() ? $parent : NULL;
+    /**
+     * Returns iface url part
+     *
+     * @return string
+     */
+    public function get_url()
+    {
+        return $this->get('url');
     }
 
 }

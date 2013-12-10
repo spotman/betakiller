@@ -8,7 +8,7 @@
  *
  * Usage (client-code): CLASS::instance();
  */
-trait Singleton {
+trait Util_Singleton {
 
     protected static $instance;
 

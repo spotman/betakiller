@@ -2,7 +2,7 @@
 
 class Statics {
 
-    use Singleton;
+    use Util_Singleton;
 
     protected function css()
     {

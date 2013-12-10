@@ -9,7 +9,7 @@ class Controller_Basic extends Controller {
     /**
      * @var string|View_Template
      */
-    public  $template = 'frontend';
+    public  $template = NULL;
 
     private $show_profiler = FALSE;
 

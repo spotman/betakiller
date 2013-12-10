@@ -10,7 +10,7 @@ abstract class Kohana_IFace {
     protected $_codename;
 
     /**
-     * @var Model_IFace
+     * @var IFace_Model
      */
     protected $_model;
 
@@ -25,16 +25,16 @@ abstract class Kohana_IFace {
     protected static $_instance_cache = array();
 
     /**
-     * @param string|null $codename IFace _codename
+     * @param string $codename IFace codename
      * @throws IFace_Exception
      * @return static
      */
-    public static function factory($codename = NULL)
+    public static function factory($codename, IFace_Model $model = NULL) // $codename = NULL
     {
-        if ( ! $codename )
-        {
-            $codename = str_replace(static::get_class_prefix(), '', get_called_class());
-        }
+//        if ( ! $codename )
+//        {
+//            $codename = str_replace(static::get_class_prefix(), '', get_called_class());
+//        }
 
         if ( ! $codename )
             throw new IFace_Exception('Can not create IFace from empty codename');
@@ -42,14 +42,23 @@ abstract class Kohana_IFace {
         // Caching iface instances
         if ( ! isset(static::$_instance_cache[$codename]) )
         {
-            static::$_instance_cache[$codename] = static::instance_factory($codename);
+            static::$_instance_cache[$codename] = static::instance_factory($codename, $model);
         }
 
         return static::$_instance_cache[$codename];
     }
 
-    protected static function instance_factory($codename)
+    protected static function instance_factory($codename, IFace_Model $model = NULL)
     {
+        if ( ! $model )
+        {
+            $model = IFace_Provider::instance()->by_codename($codename);
+        }
+
+//        var_dump($codename);
+//        var_dump($model->as_array());
+//        die();
+
         $class_name = static::get_class_prefix().$codename;
 
         if ( ! class_exists($class_name) )
@@ -61,8 +70,22 @@ abstract class Kohana_IFace {
         $object = new $class_name;
 
         $object->codename($codename);
+        $object->model($model);
 
         return $object;
+    }
+
+    /**
+     * Creates instance of IFace from model
+     *
+     * @param IFace_Model $model
+     * @return static
+     */
+    public static function from_model(IFace_Model $model)
+    {
+        $codename = $model->get_codename();
+
+        return static::factory($codename, $model);
     }
 
     /**
@@ -74,11 +97,10 @@ abstract class Kohana_IFace {
         return $this->getter_and_setter_method('_codename', $codename);
     }
 
-    public function action_index()
-    {
-        // TODO
-        //return $this->render();
-    }
+//    public function action_index()
+//    {
+//        return $this->render();
+//    }
 
     public function render()
     {
@@ -103,25 +125,22 @@ abstract class Kohana_IFace {
         if ( ! $parent_model )
             return NULL;
 
-        $codename = $parent_model->get_codename();
-
-        return static::factory($codename);
+        return static::from_model($parent_model);
     }
 
     /**
      * Getter/setter for current iface model
-     * @param Model_IFace $model
-     * @return Model_IFace
+     * @param IFace_Model $model
+     * @return IFace_Model
      */
-    public function model(Model_IFace $model = NULL)
+    public function model(IFace_Model $model = NULL)
     {
         return $this->getter_and_setter_method('_model', $model, 'model_factory');
     }
 
     protected function model_factory()
     {
-        // TODO make it abstract and realize it in child classes-providers
-        return Model_IFace::find_by_codename($this->_codename);
+        return IFace_Provider::instance()->by_codename($this->_codename);
     }
 
     public function url()

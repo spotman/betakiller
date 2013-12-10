@@ -33,7 +33,7 @@ class Widget_Auth_Regular extends Widget {
 
     protected function get_reset_password_url()
     {
-        return IFace_Auth_ResetPassword::factory()->url();
+        return IFace::factory('Auth_Password_Reset')->url();
     }
 
 }

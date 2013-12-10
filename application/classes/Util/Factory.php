@@ -2,6 +2,11 @@
 
 trait Util_Factory {
 
+    /**
+     * @param $name
+     * @return static
+     * @throws HTTP_Exception_500
+     */
     public static function factory($name)
     {
         $class_name = __CLASS__.'_'.$name;
