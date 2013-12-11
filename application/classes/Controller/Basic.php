@@ -9,7 +9,7 @@ class Controller_Basic extends Controller {
     /**
      * @var string|View_Template
      */
-    public  $template = NULL;
+    public  $template = 'frontend';
 
     private $show_profiler = FALSE;
 
@@ -83,7 +83,7 @@ class Controller_Basic extends Controller {
         }
         else
         {
-            $this->send_view($view);
+            parent::send_view($view);
         }
     }
 

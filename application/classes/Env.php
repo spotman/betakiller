@@ -56,7 +56,7 @@ class Env
         $user = self::get('user');
 
         if ( $user === NULL AND ! $allow_guest )
-            throw new HTTP_Exception_401('Необходима авторизация!');
+            throw new HTTP_Exception_401('Authorization required!');
 
         return $user;
     }

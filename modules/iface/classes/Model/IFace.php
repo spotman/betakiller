@@ -91,9 +91,9 @@ class Model_IFace extends ORM implements IFace_Model {
      *
      * @return string
      */
-    public function get_url()
+    public function get_uri()
     {
-        return $this->get('url');
+        return $this->get('uri');
     }
 
 }

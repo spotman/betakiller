@@ -35,7 +35,7 @@ interface IFace_Model {
      *
      * @return string
      */
-    public function get_url();
+    public function get_uri();
 
     /**
      * Returns TRUE if iface is marked as "default"

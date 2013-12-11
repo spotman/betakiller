@@ -2,12 +2,11 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru" lang="ru">
     <head>
         <meta http-equiv="Content-type" content="text/html; charset=UTF-8" />
-        <title><?php echo $title;?></title>
-        <?= CSS::instance()->get_all(); ?>
-        <?= JS::instance()->get_all(); ?>
+        <title>{{ title }}</title>
+        {{ css.get_all|raw }}
+        {{ js.get_all|raw }}
     </head>
     <body>
-        <h1>TODO: move template to Twig</h1>
-        <?php echo $content;?>
+        {{ content|raw }}
     </body>
 </html>

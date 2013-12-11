@@ -4,6 +4,12 @@
  * Automatically generated from previous translation file.
  */
 return array (
+  'Not found' => 'Not found',
+  'Unknown url part :part' => 'Unknown url part :part',
+  'System error' => 'System error',
+  'Duplicate of codename :codename' => 'Duplicate of codename :codename',
+  'Duplicate of codename' => 'Duplicate of codename',
+  'Missing admin config file' => 'Missing admin config file',
   'No IFace found by codename :codename' => 'No IFace found by codename :codename',
   'Can not find model for codename :codename' => 'Can not find model for codename :codename',
   'The requested view :file could not be found' => 'The requested view :file could not be found',

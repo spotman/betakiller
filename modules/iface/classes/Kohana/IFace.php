@@ -2,7 +2,10 @@
 
 abstract class Kohana_IFace {
 
-    use Util_GetterAndSetterMethod;
+    use Util_GetterAndSetterMethod, Util_Factory_Cached
+    {
+        Util_Factory_Cached::factory as protected _factory;
+    }
 
     /**
      * @var string
@@ -26,8 +29,9 @@ abstract class Kohana_IFace {
 
     /**
      * @param string $codename IFace codename
-     * @throws IFace_Exception
+     * @param IFace_Model $model
      * @return static
+     * @throws IFace_Exception
      */
     public static function factory($codename, IFace_Model $model = NULL) // $codename = NULL
     {
@@ -39,13 +43,7 @@ abstract class Kohana_IFace {
         if ( ! $codename )
             throw new IFace_Exception('Can not create IFace from empty codename');
 
-        // Caching iface instances
-        if ( ! isset(static::$_instance_cache[$codename]) )
-        {
-            static::$_instance_cache[$codename] = static::instance_factory($codename, $model);
-        }
-
-        return static::$_instance_cache[$codename];
+        return static::_factory($codename, $model);
     }
 
     protected static function instance_factory($codename, IFace_Model $model = NULL)
@@ -54,10 +52,6 @@ abstract class Kohana_IFace {
         {
             $model = IFace_Provider::instance()->by_codename($codename);
         }
-
-//        var_dump($codename);
-//        var_dump($model->as_array());
-//        die();
 
         $class_name = static::get_class_prefix().$codename;
 
@@ -88,6 +82,11 @@ abstract class Kohana_IFace {
         return static::factory($codename, $model);
     }
 
+    public function __construct()
+    {
+        // Empty by default
+    }
+
     /**
      * @param string|null $codename
      * @return $this|string
@@ -102,10 +101,34 @@ abstract class Kohana_IFace {
 //        return $this->render();
 //    }
 
+    /**
+     * @return View
+     */
     public function render()
     {
+        $data = $this->get_data();
+
         $view = $this->get_view();
+        $view->set($data);
+
         return $view;
+    }
+
+    /**
+     * Returns data for View
+     * Override this method in child classes
+     *
+     * @return array
+     */
+    public function get_data()
+    {
+        // Empty by default
+        return array();
+    }
+
+    public function __toString()
+    {
+        return (string) $this->render();
     }
 
     /**
@@ -143,6 +166,11 @@ abstract class Kohana_IFace {
         return IFace_Provider::instance()->by_codename($this->_codename);
     }
 
+    public function is_default()
+    {
+        return $this->model()->is_default();
+    }
+
     public function url()
     {
         $url = '/'.$this->get_url();
@@ -159,7 +187,7 @@ abstract class Kohana_IFace {
 
     protected function get_url()
     {
-        $url = $this->model()->get_url();
+        $url = $this->model()->get_uri();
 
         // TODO replace dynamic locations with their actual values
 
@@ -168,12 +196,12 @@ abstract class Kohana_IFace {
 
     protected function get_view()
     {
-        $view_path = 'iface'. DIRECTORY_SEPARATOR . str_replace('_', DIRECTORY_SEPARATOR, $this->_codename);
+        $view_path = 'ifaces'. DIRECTORY_SEPARATOR . str_replace('_', DIRECTORY_SEPARATOR, $this->_codename);
 
         return $this->view_factory($view_path);
     }
 
-    private function view_factory($path)
+    protected function view_factory($path)
     {
         return View::factory($path);
     }

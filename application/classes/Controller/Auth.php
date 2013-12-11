@@ -97,7 +97,7 @@ class Controller_Auth extends Controller_Basic {
         Env::auth()->logout(TRUE);
 
         // Redirect to the user account and then the signin page if logout worked as expected
-        throw (new HTTP_Exception_401())->remove_redirect_url();
+        throw new HTTP_Exception_401();
     }
 
 }

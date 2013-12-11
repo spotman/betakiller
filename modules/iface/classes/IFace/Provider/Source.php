@@ -2,7 +2,7 @@
 
 abstract class IFace_Provider_Source implements IFace_Provider_Interface {
 
-    use Util_Factory;
+    use Util_Factory_Cached;
 
     /**
      * @param string $uri

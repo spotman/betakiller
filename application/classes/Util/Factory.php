@@ -9,6 +9,11 @@ trait Util_Factory {
      */
     public static function factory($name)
     {
+        return forward_static_call_array(array('static', 'instance_factory'), func_get_args());
+    }
+
+    protected static function instance_factory($name)
+    {
         $class_name = __CLASS__.'_'.$name;
 
         if ( ! class_exists($class_name) )

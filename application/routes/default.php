@@ -5,36 +5,31 @@
  * defaults for the URI.
  */
 
-// TODO
-
-Route::set('login', 'login')
+Route::set('widget-controller', 'w/<widget>(/<action>)',
+    array('widget' => '[A-Za-z_]+', 'action' => '[A-Za-z_]+'))
     ->defaults(array(
-        'module'        => 'auth',
-//        'directory'     => 'Planet',
-        'controller'    => 'Auth',
-        'action'        => 'login',
+        'controller'    => 'Widget',
+        'action'        => 'render',
     ));
 
-Route::set('logout', 'logout')
+// Make it last
+Route::set('default-iface-controller', '(<uri>)', array('uri' => '.+'))
     ->defaults(array(
-        'module'        => 'auth',
-//        'directory'     => 'Planet',
-        'controller'    => 'Auth',
-        'action'        => 'logout',
+        'controller'    => 'IFace',
+        'action'        => 'render',
     ));
 
-//Route::set('file-actions', 'file/<action>/<id>)', array('id' => '[0-9]+'))
+//Route::set('login', 'login')
 //    ->defaults(array(
-//        'controller' => 'File',
-//));
-
-//Route::set('media', 'media(/<file>)', array('file' => '.+'))
-//    ->defaults(array(
-//    'file' => NULL,
-//));
-
-//Route::set('default', '(<controller>(/<action>(/<id>)))')
-//    ->defaults(array(
-//        'controller' => 'default',
-//        'action'     => 'index',
+//        'module'        => 'auth',
+//        'controller'    => 'Auth',
+//        'action'        => 'login',
 //    ));
+//
+//Route::set('logout', 'logout')
+//    ->defaults(array(
+//        'module'        => 'auth',
+//        'controller'    => 'Auth',
+//        'action'        => 'logout',
+//    ));
+//

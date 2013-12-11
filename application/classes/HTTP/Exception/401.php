@@ -13,46 +13,24 @@ class HTTP_Exception_401 extends Kohana_HTTP_Exception_401 {
      */
     protected $_send_notification = FALSE;
 
-    protected $_use_redirect_url = TRUE;
-
     /**
      * Generate a Response for the 401 Exception.
-     *
-     * The user should be redirect to a login page.
+     * The user should see the login page.
      *
      * @return Response
      */
     public function get_response()
     {
-        // Relocating user to login page (if this is not AJAX request)
-        if ( ! Request::current()->is_ajax() )
-        {
-            $this->_response->headers('Location', $this->get_login_page_url());
-        }
+        /** @var IFace_Auth_Login $login_iface */
+        $login_iface = Iface::factory('Auth_Login');
+
+        // Redirect to current page after successful login
+        $login_iface->redirect_to_current_page();
+
+        // Show login page
+        $this->_response->send_string($login_iface);
 
         return $this->_response;
     }
 
-    protected function get_login_page_url()
-    {
-        $url = Route::url('login');
-
-        $redirect_url = Request::current()->detect_uri();
-
-        if ( $redirect_url AND $this->_use_redirect_url )
-        {
-            $url .= '?return='. $redirect_url;
-        }
-
-        return $url;
-    }
-
-    /**
-     * Remove redirect url from login form
-     */
-    public function remove_redirect_url()
-    {
-        $this->_use_redirect_url = FALSE;
-        return $this;
-    }
 }

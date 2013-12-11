@@ -70,7 +70,7 @@ class IFace_Provider implements IFace_Provider_Interface {
         foreach ( $layer as $child )
         {
             // Find iface by concrete uri
-            if ( $child->get_url() == $uri )
+            if ( $child->get_uri() == $uri )
                 return $child;
         }
 

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<root>
+    <iface uri="login" codename="Auth_Login" />
+    <iface uri="logout" codename="Auth_Logout" />
+
+    <iface uri="password-reset" codename="Auth_Password_Reset" />
+
+    <iface uri="admin" codename="Admin_Index">
+        <iface uri="user" codename="Admin_User">
+        </iface>
+    </iface>
+</root>

@@ -12,34 +12,23 @@ class Kohana_Controller_IFace extends Controller_Basic {
      */
     protected $_model = NULL;
 
-    protected function get_proxy_method()
+    public function action_render()
     {
-//        return parent::get_proxy_method();
-        return 'render';
-    }
+        // Getting current IFace
+        $iface = $this->get_iface();
 
-
-    public function before()
-    {
-        $uri = $this->get_request_uri();
-
-        // If this is default location and client requested non-slash uri, redirect client to /
-        if ( $this->get_model()->is_default() AND $uri != '' )
-        {
-            $this->redirect('/');
-        }
-
-        parent::before();
-    }
-
-    public function get_proxy_object()
-    {
-        $object = $this->get_iface();
-
-        if ( ! ($object instanceof IFace) )
+        if ( ! ($iface instanceof IFace) )
             throw new Kohana_Exception('IFace controller can not serve objects which are not instance of class IFace');
 
-        return $object;
+        // If this is default IFace and client requested non-slash uri, redirect client to /
+        if ( $iface->is_default() AND $this->get_request_uri() != '' )
+        {
+            HTTP::redirect('/');
+        }
+
+        $view = $iface->render();
+
+        $this->send_view($view);
     }
 
     /**
@@ -76,19 +65,16 @@ class Kohana_Controller_IFace extends Controller_Basic {
     /**
      * @param string $uri
      * @return IFace_Model
+     * @throws IFace_Exception_MissingURL
      */
     protected function parse_uri($uri)
     {
-        $uri_layers = $uri ? explode('/', $uri) : NULL;
-
-//        var_dump($uri);
-//        var_dump($uri_layers);
-//        die();
+        $uri_parts = $uri ? explode('/', $uri) : NULL;
 
         $provider = IFace_Provider::instance();
 
         // Root requested - search for default IFace
-        if ( ! $uri_layers )
+        if ( ! $uri_parts )
         {
             return $provider->get_default();
         }
@@ -97,15 +83,14 @@ class Kohana_Controller_IFace extends Controller_Basic {
         $parent_iface_model = NULL;
 
         // Dispatch childs
-        foreach ( $uri_layers as $uri_part )
+        foreach ( $uri_parts as $uri_part )
         {
-            // Loop through every element and initialize it`s iface
+            // Loop through every uri part and initialize it`s iface
             $iface_model = $provider->by_uri($uri_part, $parent_iface_model);
 
-            // @TODO throw new IFace_Missing_URL($uri_part, $parent_iface_model) so we can forward user to parent iface
-            // @TODO custom 404 handlers for IFaces with childs (category can show friendly message if unknown staff was requested)
+            // Throw IFace_Exception_MissingURL so we can forward user to parent iface or custom 404 page
             if ( ! $iface_model )
-                throw new HTTP_Exception_404('Unknown url part :part', array(':part' => $uri_part));
+                throw new IFace_Exception_MissingURL($uri_part, $parent_iface_model);
 
             $parent_iface_model = $iface_model;
         }
