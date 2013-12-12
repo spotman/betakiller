@@ -2,14 +2,24 @@
 
 class Widget_Auth_Ulogin extends Widget {
 
-    protected function _render()
+    public function get_data()
     {
         $instance = $this->ulogin_factory();
-        $this->send_string($instance->render());
+
+        $auth_callback = $instance->get_widget_id().'_auth_callback';
+        $instance->set_javascript_callback($auth_callback);
+
+        return array(
+            'token_login_url'   =>  $instance->get_redirect_uri(),
+            'auth_callback'     =>  $auth_callback,
+            'ulogin_view'       =>  $instance->render(),
+        );
     }
 
-    public function action_login()
+    public function action_auth()
     {
+        $this->content_type_json();
+
         $uLogin = $this->ulogin_factory();
 
         try
@@ -25,13 +35,15 @@ class Widget_Auth_Ulogin extends Widget {
         catch ( Exception $e )
         {
             throw $e;
+//            Kohana_Exception::_handler($e);
+//            $this->send_json(self::JSON_ERROR);
         }
     }
 
     protected function ulogin_factory()
     {
         return Ulogin::factory()
-            ->set_redirect_uri($this->url('login'));
+            ->set_redirect_uri($this->url('auth'));
     }
 
 }

@@ -4,18 +4,17 @@
  * Automatically generated from previous translation file.
  */
 return array (
-  'Not found' => 'Not found',
-  'Unknown url part :part' => 'Unknown url part :part',
-  'System error' => 'System error',
-  'Duplicate of codename :codename' => 'Duplicate of codename :codename',
-  'Duplicate of codename' => 'Duplicate of codename',
-  'Missing admin config file' => 'Missing admin config file',
-  'No IFace found by codename :codename' => 'No IFace found by codename :codename',
-  'Can not find model for codename :codename' => 'Can not find model for codename :codename',
-  'The requested view :file could not be found' => 'The requested view :file could not be found',
+  'Auth failed, please, try again later' => 'Auth failed, please, try again later',
   'arguments' => 'arguments',
   'PHP internal call' => 'PHP internal call',
   'Environment' => 'Environment',
   'Included files' => 'Included files',
   'Loaded extensions' => 'Loaded extensions',
+  'User does not exists' => 'User does not exists',
+  'Your credentials are invalid' => 'Your credentials are invalid',
+  'Sign in' => 'Sign in',
+  'Your username or email' => 'Your username or email',
+  'Your password' => 'Your password',
+  'Forgot password?' => 'Forgot password?',
+  'System error' => 'System error',
 );

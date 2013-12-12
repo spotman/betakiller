@@ -3,17 +3,24 @@
 
 abstract class Kohana_Widget extends Controller {
 
+    use Util_GetterAndSetterMethod;
+
     const DEFAULT_STATE = 'default';
 
     /**
      * @var string
      */
-    protected $name;
+    protected $_name;
 
     /**
      * @var string Current widget state (for Finite State Machine)
      */
-    protected $current_state = self::DEFAULT_STATE;
+    protected $_current_state = self::DEFAULT_STATE;
+
+    /**
+     * @var array Context for widget rendering
+     */
+    protected $_context = array();
 
     /**
      * @param $name Widget name
@@ -41,16 +48,23 @@ abstract class Kohana_Widget extends Controller {
 
     /**
      * Getter/setter for widget name
+     *
      * @param string|null $value
      * @return $this|string
      */
     public function name($value = NULL)
     {
-        if ( $value === NULL )
-            return $this->name;
+        return $this->getter_and_setter_method('_name', $value);
+    }
 
-        $this->name = $value;
-        return $this;
+    /**
+     * Getter/setter for widget context (additional data for rendering)
+     * @param array|null $value
+     * @return mixed
+     */
+    public function context(array $value = NULL)
+    {
+        return $this->getter_and_setter_method('_context', $value);
     }
 
     /**
@@ -71,24 +85,56 @@ abstract class Kohana_Widget extends Controller {
         return (string) $response;
     }
 
+    /**
+     * Default action for Controller_Widget
+     */
     public function action_render()
     {
-        $this->render();
+        $this->_render();
     }
 
+    /**
+     * Renders widget View
+     *
+     * @return Response
+     */
     public function render()
     {
-        // TODO call_user_func_array
         $this->_render();
         return $this->response();
     }
 
     /**
      * Generates HTML/CSS/JS representation of the widget
-     * Implement this method in your widget
      * Use $this->send_string() / $this->send_json() / $this->send_jsonp() methods to populate output
+     * Override this method in your widget if default behaviour is not enough for you
      */
-    abstract protected function _render();
+    protected function _render()
+    {
+        // Collecting data
+        $data = $this->get_data();
+
+        // Creating View instance
+        $view = $this->view();
+
+        // Assigning data
+        $view->set($data);
+
+        // Sending View to output
+        $this->send_view($view);
+    }
+
+    /**
+     * Returns data for View rendering
+     * You may set $_current_state here and do custom initialization
+     *
+     * @return array
+     */
+    public function get_data()
+    {
+        // Empty by default
+        return array();
+    }
 
     protected function url($action = NULL, $protocol = TRUE)
     {
@@ -99,14 +145,14 @@ abstract class Kohana_Widget extends Controller {
 
     protected function view($state = NULL)
     {
-        return $this->state_view($state ?: $this->current_state);
+        return $this->state_view($state ?: $this->_current_state);
     }
 
     private function state_view($state)
     {
-        $view_path = 'widgets'. DIRECTORY_SEPARATOR . str_replace('_', DIRECTORY_SEPARATOR, $this->name) . DIRECTORY_SEPARATOR . $state;
+        $view_path = 'widgets'. DIRECTORY_SEPARATOR . str_replace('_', DIRECTORY_SEPARATOR, $this->_name) . DIRECTORY_SEPARATOR . $state;
 
-        return $this->view_factory($view_path);
+        return $this->view_factory($view_path, $this->_context);
     }
 
     protected static function get_class_prefix()

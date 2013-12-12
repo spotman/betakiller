@@ -6,8 +6,12 @@
  */
 abstract class Controller extends Controller_Proxy {
 
+    const JSON_SUCCESS = Response::JSON_SUCCESS;
+    const JSON_ERROR = Response::JSON_ERROR;
+
     /**
      * Getter/setter for request
+     *
      * @param Request $request
      * @return $this|Request
      */
@@ -22,6 +26,7 @@ abstract class Controller extends Controller_Proxy {
 
     /**
      * Getter/setter for response
+     *
      * @param Response $response
      * @return $this|Response
      */
@@ -43,6 +48,7 @@ abstract class Controller extends Controller_Proxy {
 
     /**
      * I18n initialization
+     *
      * @throws HTTP_Exception_500
      */
     protected function init_i18n()
@@ -94,6 +100,7 @@ abstract class Controller extends Controller_Proxy {
 
     /**
      * Helper for Request::param()
+     *
      * @param string|null $key
      * @param string|null $default
      * @return mixed
@@ -103,9 +110,29 @@ abstract class Controller extends Controller_Proxy {
         return $this->request->param($key, $default);
     }
 
+    /**
+     * Getter/setter for Response content-type
+     * Use this method for better uncaught exception handling
+     *
+     * @param int|null $type
+     * @return int|Response
+     */
+    private function content_type($type = NULL)
+    {
+        return $this->response->content_type($type);
+    }
+
+    /**
+     * Helper for better encapsulation of Response
+     */
+    protected function content_type_json()
+    {
+        $this->content_type(Response::JSON);
+    }
 
     /**
      * View Factory for current request (directory/controller/action)
+     *
      * @param string|null $file View file path (relative to directory/controller)
      * @return View
      */
@@ -124,6 +151,7 @@ abstract class Controller extends Controller_Proxy {
 
     /**
      * Helper for View::factory()
+     *
      * @param string $file
      * @param array $data
      * @return View
@@ -135,6 +163,7 @@ abstract class Controller extends Controller_Proxy {
 
     /**
      * Sends plain text to stdout without wrapping it by template
+     *
      * @param string $string Plain text for output
      * @param int $content_type Content type constant like Response::HTML
      */
@@ -145,6 +174,7 @@ abstract class Controller extends Controller_Proxy {
 
     /**
      * Helper for sending view to Response
+     *
      * @param View $view
      */
     protected function send_view(View $view)
@@ -154,6 +184,7 @@ abstract class Controller extends Controller_Proxy {
 
     /**
      * Sends JSON response to stdout
+     *
      * @param integer $result JSON result constant or raw data
      * @param mixed $data Raw data to send, if the first argument is constant
      */
@@ -164,6 +195,7 @@ abstract class Controller extends Controller_Proxy {
 
     /**
      * Sends response for JSONP request
+     *
      * @param array $data Raw data
      * @param string|null $callback_key JavaScript callback function key
      */
@@ -172,9 +204,9 @@ abstract class Controller extends Controller_Proxy {
         $this->response->send_jsonp($data, $callback_key);
     }
 
-
     /**
      * Отправляет файл в stdout для скачивания, с правильными заголовками
+     *
      * @param string $path Директория, в которой лежит файл
      * @param string $filename Имя файла в файловой системе
      * @param string $mime_type Тип файла, который будет отправлен в stdout

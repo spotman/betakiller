@@ -2,29 +2,42 @@
 
 class Widget_Auth_Regular extends Widget {
 
+    /**
+     * Action for logging in
+     */
     public function action_login()
     {
+        if ( ! $this->request->is_ajax() )
+        {
+            throw new HTTP_Exception_400;
+        }
 
+        // Magic call for better exception handling
+        $this->content_type_json();
+
+        $user_login     = $this->request()->post("user-login");
+        $user_password  = $this->request()->post("user-password");
+
+        if ( ! $user_login OR ! $user_password )
+        {
+            throw new HTTP_Exception_400;
+        }
+
+        // TODO валидация данных перед проверкой
+
+        Env::auth()->login($user_login, $user_password);
+
+        // Возвращаем соответствующий ответ
+        $this->send_json(Response::JSON_SUCCESS);
     }
 
-    /**
-     * Generates HTML/CSS/JS representation of the widget
-     * Implement this method in your widget
-     * Use $this->send_string() / $this->send_json() / $this->send_jsonp() methods to populate output
-     */
-    protected function _render()
+    public function get_data()
     {
-        // TODO: Implement render() method.
-
-        $view = $this->view();
-
-        $view->set('login_url', $this->get_login_url());
-
-        $view->set('reset_password_url', $this->get_reset_password_url());
-
-        $this->send_view($view);
+        return array(
+            'login_url'             =>  $this->get_login_url(),
+            'reset_password_url'    =>  $this->get_reset_password_url(),
+        );
     }
-
 
     protected function get_login_url()
     {

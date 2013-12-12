@@ -1,0 +1,21 @@
+{{ static('jquery', 'jquery_pnotify') }}
+
+{{ ulogin_view|raw }}
+
+<script type="text/javascript">
+
+    function {{ auth_callback }}(token)
+    {
+        $.JSON("{{ token_login_url }}", { token: token },
+                function()
+                {
+                    location.href = "{{ redirect_url }}";
+                },
+                function(message)
+                {
+                    $.notify.error(message || "{{ __('Auth failed, please, try again later') }}");
+                }
+        );
+    }
+
+</script>

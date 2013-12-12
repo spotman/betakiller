@@ -48,7 +48,6 @@ class Kohana_Exception extends Kohana_Kohana_Exception {
         parent::__construct($message, $variables, $code, $previous);
     }
 
-
     static public function _handler(Exception $original_exception, $notify = TRUE)
     {
         // Регистрируем ошибку и выводим оригинальный стектрейс, если мы в режиме разработки или тестирования
@@ -280,7 +279,7 @@ class Kohana_Exception extends Kohana_Kohana_Exception {
         $view = $e->get_view();
 
         // Чтобы не было XSS, преобразуем спецсимволы
-        $view->message = HTML::chars($e->get_user_message());
+        $view->set('message', HTML::chars($e->get_user_message()));
 
         // Определяем HTTP status code
         $http_code = ( $e instanceof HTTP_Exception ) ? $e->getCode() : 500;

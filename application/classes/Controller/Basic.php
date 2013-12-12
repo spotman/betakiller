@@ -69,11 +69,6 @@ class Controller_Basic extends Controller {
         parent::after();
     }
 
-//    protected function content_type($type = NULL)
-//    {
-//        return $this->response->content_type($type);
-//    }
-
     protected function send_view(View $view)
     {
         if ( $this->template )
