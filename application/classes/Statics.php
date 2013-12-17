@@ -2,6 +2,9 @@
 
 class Statics {
 
+    const BOOTSTRAP_V2 = 'v2';
+    const BOOTSTRAP_V3 = 'v3';
+
     use Util_Singleton;
 
     protected function css()
@@ -116,13 +119,15 @@ class Statics {
     }
 
     /**
-     * Хелпер для добавления twitter bootstrap на страницу
+     * Helper for adding Twitter Bootstrap JS/CSS
+     *
+     * @param string $version
      * @return $this
      */
-    public function bootstrap()
+    public function bootstrap($version = Statics::BOOTSTRAP_V3)
     {
-        $this->js()->bootstrap();
-        $this->css()->bootstrap();
+        $this->js()->bootstrap($version);
+        $this->css()->bootstrap($version);
         return $this;
     }
 

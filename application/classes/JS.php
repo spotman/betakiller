@@ -22,9 +22,9 @@ class JS {
     public function add_public($url)
     {
         // Добавляем слеш в начале, если его нет
-        if ( mb_substr($url, 0, 4) != 'http' AND mb_substr($url, 0, 1) != "/" )
+        if ( mb_substr($url, 0, 4) != 'http' AND mb_substr($url, 0, 1) != '/' )
         {
-            $url = "/". $url;
+            $url = '/'. $url;
         }
 
         return StaticJs::instance()->addJs($url);
@@ -75,7 +75,7 @@ class JS {
 
     public function jquery()
     {
-        $this->add_static("jquery/jquery-1.8.3.js");
+        $this->add_static('jquery/jquery-1.8.3.js');
 
         // Добавляем наши маленькие плагины и утилиты
         $this->jquery_utils();
@@ -83,14 +83,14 @@ class JS {
 
     public function jquery_ui()
     {
-        $this->add_static("jquery/ui/jquery-ui-1.9.2.custom.js");
+        $this->add_static('jquery/ui/jquery-ui-1.9.2.custom.js');
 
         $lang_name = i18n::lang();
 
         // Локализация datepicker
-        if ( $lang_name != "en" )
+        if ( $lang_name != 'en' )
         {
-            $this->add_static("jquery/ui/jquery.ui.datepicker-$lang_name.js");
+            $this->add_static('jquery/ui/jquery.ui.datepicker-'.$lang_name.'.js');
         }
 
         $this->add_inline('$.datepicker.setDefaults({ dateFormat: "dd.mm.yy" });');
@@ -98,31 +98,31 @@ class JS {
 
     public function jquery_validation()
     {
-        $this->add_static("jquery/validate/jquery.validate.min.js");
+        $this->add_static('jquery/validate/jquery.validate.min.js');
 
         $lang_name = i18n::lang();
 
         // локализация jquery.validate
-        if ( $lang_name != "en" )
+        if ( $lang_name != 'en' )
         {
-            $this->add_static("jquery/validate/messages_$lang_name.js");
+            $this->add_static('jquery/validate/messages_'.$lang_name.'.js');
         }
     }
 
     public function jquery_fileupload()
     {
-        $this->add_static("jquery/fileupload/jquery.fileupload.js");
-        $this->add_static("jquery/fileupload/jquery.iframe-transport.js");
+        $this->add_static('jquery/fileupload/jquery.fileupload.js');
+        $this->add_static('jquery/fileupload/jquery.iframe-transport.js');
     }
 
     public function jquery_chosen()
     {
-        $this->add_static("jquery/chosen/chosen.jquery.min.js");
+        $this->add_static('jquery/chosen/chosen.jquery.min.js');
     }
 
     public function jquery_cookie()
     {
-        $this->add_static("jquery/jquery.cookie.js");
+        $this->add_static('jquery/jquery.cookie.js');
     }
 
     /**
@@ -131,7 +131,7 @@ class JS {
      */
     public function jquery_qtip()
     {
-        $this->add_static("jquery/qtip/jquery.qtip.js");
+        $this->add_static('jquery/qtip/jquery.qtip.js');
     }
 
     /**
@@ -140,7 +140,7 @@ class JS {
      */
     public function jquery_pnotify()
     {
-        $this->add_static("jquery/pnotify/jquery.pnotify.js");
+        $this->add_static('jquery/pnotify/jquery.pnotify.js');
     }
 
     /**
@@ -148,7 +148,7 @@ class JS {
      */
     public function jquery_jeditable()
     {
-        $this->add_static("jquery/jeditable/jquery.jeditable.js");
+        $this->add_static('jquery/jeditable/jquery.jeditable.js');
     }
 
     /**
@@ -156,7 +156,7 @@ class JS {
      */
     public function jquery_utils()
     {
-        $this->add_static("jquery/utils.js");
+        $this->add_static('jquery/utils.js');
     }
 
     /**
@@ -165,17 +165,17 @@ class JS {
      */
     public function jquery_timepicker()
     {
-        $this->add_static("jquery/timepicker/jquery.timepicker.js");
+        $this->add_static('jquery/timepicker/jquery.timepicker.js');
     }
 
-    public function bootstrap()
+    public function bootstrap($version_path = Statics::BOOTSTRAP_V3)
     {
-        return $this->add_static("bootstrap/js/bootstrap.js");
+        return $this->add_static('bootstrap/'.$version_path.'/js/bootstrap.js');
     }
 
     public function bootstrap_bootbox()
     {
-        return $this->add_static("bootstrap/bootbox/bootbox.min.js");
+        return $this->add_static('bootstrap/bootbox/bootbox.min.js');
     }
 
     /**
@@ -184,7 +184,7 @@ class JS {
      */
     public function underscore()
     {
-        return $this->add_static("underscore/underscore.js");
+        return $this->add_static('underscore/underscore.js');
     }
 
     /**
@@ -193,13 +193,18 @@ class JS {
      */
     public function tinyMCE()
     {
-        $this->add_static("tiny_mce/tiny_mce.js");
+        $this->add_static('tiny_mce/tiny_mce.js');
         $this->add_inline('tinyMCE.baseURL = "{static_url}tiny_mce"');
     }
 
-    public function js_error_catcher()
+    /**
+     * Helper for Masonry brick layout plugin
+     *
+     * @link http://masonry.desandro.com/
+     */
+    public function masonry()
     {
-        return $this->add_static("js-error-catcher.js");
+        $this->add_static('masonry/masonry.pkgd.js');
     }
 
     /**

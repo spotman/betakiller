@@ -29,30 +29,35 @@ abstract class Kohana_IFace {
 
     /**
      * @param string $codename IFace codename
-     * @param IFace_Model $model
+//     * @param IFace_Model $model
      * @return static
      * @throws IFace_Exception
      */
-    public static function factory($codename, IFace_Model $model = NULL) // $codename = NULL
+    public static function by_codename($codename)
     {
-//        if ( ! $codename )
-//        {
-//            $codename = str_replace(static::get_class_prefix(), '', get_called_class());
-//        }
-
         if ( ! $codename )
             throw new IFace_Exception('Can not create IFace from empty codename');
+
+        $model = IFace_Provider::instance()->by_codename($codename);
+
+        return static::factory($model);
+    }
+
+    /**
+     * Creates instance of IFace from model
+     *
+     * @param IFace_Model $model
+     * @return static
+     */
+    public static function factory(IFace_Model $model)
+    {
+        $codename = $model->get_codename();
 
         return static::_factory($codename, $model);
     }
 
-    protected static function instance_factory($codename, IFace_Model $model = NULL)
+    protected static function instance_factory($codename, IFace_Model $model)
     {
-        if ( ! $model )
-        {
-            $model = IFace_Provider::instance()->by_codename($codename);
-        }
-
         $class_name = static::get_class_prefix().$codename;
 
         if ( ! class_exists($class_name) )
@@ -63,23 +68,13 @@ abstract class Kohana_IFace {
         /** @var IFace $object */
         $object = new $class_name;
 
+        if ( ! ($object instanceof IFace) )
+            throw new IFace_Exception('Class :class must be instance of class IFace', array(':class' => $class_name));
+
         $object->codename($codename);
         $object->model($model);
 
         return $object;
-    }
-
-    /**
-     * Creates instance of IFace from model
-     *
-     * @param IFace_Model $model
-     * @return static
-     */
-    public static function from_model(IFace_Model $model)
-    {
-        $codename = $model->get_codename();
-
-        return static::factory($codename, $model);
     }
 
     public function __construct()
@@ -148,7 +143,7 @@ abstract class Kohana_IFace {
         if ( ! $parent_model )
             return NULL;
 
-        return static::from_model($parent_model);
+        return static::factory($parent_model);
     }
 
     /**

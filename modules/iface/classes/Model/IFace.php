@@ -14,22 +14,12 @@ class Model_IFace extends ORM implements IFace_Model {
      * "Has one" relationships
      * @var array
      */
-    protected $_has_one = array(
+    protected $_belongs_to = array(
         'parent'            =>  array(
             'model'         =>  'IFace',
             'foreign_key'   =>  'parent_id'
         )
     );
-
-//    /**
-//     * Provider factory (for current model type)
-//     *
-//     * @return IFace_Provider
-//     */
-//    protected function get_provider()
-//    {
-//        return IFace_Provider_Source::factory('DB');
-//    }
 
     public function get_id()
     {
@@ -48,7 +38,7 @@ class Model_IFace extends ORM implements IFace_Model {
      */
     function get_children()
     {
-        ORM::factory($this->_object_name)
+        return ORM::factory($this->object_name())
             ->where('parent_id', '=', $this->pk())
             ->find_all()
             ->as_array();

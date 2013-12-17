@@ -22,7 +22,7 @@ class HTTP_Exception_401 extends Kohana_HTTP_Exception_401 {
     public function get_response()
     {
         /** @var IFace_Auth_Login $login_iface */
-        $login_iface = Iface::factory('Auth_Login');
+        $login_iface = Iface::by_codename('Auth_Login');
 
         // Redirect to current page after successful login
         $login_iface->redirect_to_current_page();

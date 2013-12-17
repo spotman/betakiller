@@ -17,6 +17,8 @@ class BetaKiller_Twig_Extension extends Twig_Extension {
         return array(
             'js'    => JS::instance(),
             'css'   => CSS::instance(),
+
+            'profiler'   => Profiler::instance(),
         );
     }
 

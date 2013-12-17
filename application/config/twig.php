@@ -34,8 +34,8 @@ return array(
 	 * http://twig.sensiolabs.org/doc/api.html#environment-options
 	 */
 	'environment' => array(
-		'auto_reload'         => (Kohana::$environment == Kohana::DEVELOPMENT),
-		'debug'               => (Kohana::$environment == Kohana::DEVELOPMENT),
+		'auto_reload'         => (Kohana::$environment != Kohana::PRODUCTION),
+		'debug'               => (Kohana::$environment != Kohana::PRODUCTION),
 		'autoescape'          => TRUE,
 		'base_template_class' => 'Twig_Template',
 		'cache'               => TWIGPATH.'cache',

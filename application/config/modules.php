@@ -14,7 +14,7 @@ return array(
     'email'                 => MODPATH.'email',                 // Mailing module
     'iface'                 => MODPATH.'iface',                 // Dynamic user interfaces
     'image'                 => MODPATH.'image',                 // Image manipulation
-    'kohana-static-files'   => MODPATH.'kohana-static-files',   // Static Files (JS/CSS/pictures)
+    'static-files'          => MODPATH.'static-files',          // Static Files (JS/CSS/pictures)
     'locator'               => MODPATH.'locator',               // URL mapping to interfaces
     'mangodb'               => MODPATH.'mangodb',               // ODM обёртка для mongodb
     'minion'                => MODPATH.'minion',                // CLI Tasks

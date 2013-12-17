@@ -1,24 +1,13 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
-class Kohana_Controller_IFace extends Controller_Basic {
-
-    /**
-     * @var IFace
-     */
-    protected $_iface = NULL;
-
-    /**
-     * @var IFace_Model
-     */
-    protected $_model = NULL;
+class Kohana_Controller_IFace extends Controller {
 
     public function action_render()
     {
         // Getting current IFace
-        $iface = $this->get_iface();
+        $iface_model = $this->parse_uri();
 
-        if ( ! ($iface instanceof IFace) )
-            throw new Kohana_Exception('IFace controller can not serve objects which are not instance of class IFace');
+        $iface = IFace::factory($iface_model);
 
         // If this is default IFace and client requested non-slash uri, redirect client to /
         if ( $iface->is_default() AND $this->get_request_uri() != '' )
@@ -32,43 +21,13 @@ class Kohana_Controller_IFace extends Controller_Basic {
     }
 
     /**
-     * Returns interface linked to current route
-     * @TODO move to Env or another factory
-     * @return IFace|null
-     */
-    protected function get_iface()
-    {
-        if ( ! $this->_iface )
-        {
-            $this->_iface = IFace::from_model($this->get_model());
-        }
-
-        return $this->_iface;
-    }
-
-    /**
-     * @return IFace_Model
-     */
-    protected function get_model()
-    {
-        if ( ! $this->_model )
-        {
-            $uri = $this->get_request_uri();
-
-            // Parse uri and find IFace model
-            $this->_model = $this->parse_uri($uri);
-        }
-
-        return $this->_model;
-    }
-
-    /**
-     * @param string $uri
      * @return IFace_Model
      * @throws IFace_Exception_MissingURL
      */
-    protected function parse_uri($uri)
+    protected function parse_uri()
     {
+        $uri = $this->get_request_uri();
+
         $uri_parts = $uri ? explode('/', $uri) : NULL;
 
         $provider = IFace_Provider::instance();
@@ -80,6 +39,7 @@ class Kohana_Controller_IFace extends Controller_Basic {
         }
 
         $iface_model = NULL;
+        $iface_instance = NULL;
         $parent_iface_model = NULL;
 
         // Dispatch childs
@@ -92,10 +52,13 @@ class Kohana_Controller_IFace extends Controller_Basic {
             if ( ! $iface_model )
                 throw new IFace_Exception_MissingURL($uri_part, $parent_iface_model);
 
+            // Creating instance of IFace (for future usage)
+            IFace::factory($iface_model);
+
             $parent_iface_model = $iface_model;
         }
 
-        // Return last model
+        // Return last IFace
         return $iface_model;
     }
 

@@ -46,7 +46,7 @@ class Widget_Auth_Regular extends Widget {
 
     protected function get_reset_password_url()
     {
-        return IFace::factory('Auth_Password_Reset')->url();
+        return IFace::by_codename('Auth_Password_Reset')->url();
     }
 
 }

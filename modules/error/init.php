@@ -9,7 +9,7 @@
 // Отлавливаем возникающие в продакшне JavaScript ошибки
 if ( Kohana::$environment == Kohana::PRODUCTION )
 {
-    JS::js_error_catcher();
+    JS::instance()->add_static('error/js-error-catcher.js');
 }
 
 Route::set('catch-js-error', 'catch-js-error')
