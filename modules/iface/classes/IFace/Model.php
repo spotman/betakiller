@@ -44,4 +44,11 @@ interface IFace_Model {
      */
     public function as_array();
 
+    /**
+     * Returns iface layout object
+     *
+     * @return IFace_Layout
+     */
+    public function get_layout_codename();
+
 }

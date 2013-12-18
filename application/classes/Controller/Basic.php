@@ -7,7 +7,7 @@
 class Controller_Basic extends Controller {
 
     /**
-     * @var string|View_Template
+     * @var string|View_Layout
      */
     public  $template = 'frontend';
 
@@ -27,7 +27,7 @@ class Controller_Basic extends Controller {
 
     protected function template_factory($template_name)
     {
-        return View_Template::factory($template_name);
+        return View_Layout::factory($template_name);
     }
 
     public function after()

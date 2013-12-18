@@ -1,15 +1,23 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
 /**
- * Class View_Template
+ * Class View_Layout
  *
- * Template wrapper with set_title() / get_title() helpers
+ * Layout wrapper with set_title() / get_title() helpers
+ *
+ * @package BetaKiller
+ * @author Spotman
  */
-class View_Template extends Twig {
+class View_Layout extends Twig {
 
+    /**
+     * @param null $file
+     * @param array $data
+     * @return static
+     */
     public static function factory($file = NULL, array $data = NULL)
     {
-        return parent::factory('@templates/'.$file, $data);
+        return parent::factory('@layouts/'.$file, $data);
     }
 
     public function __construct($file = NULL, array $data = NULL)

@@ -9,6 +9,8 @@ abstract class Controller extends Controller_Proxy {
     const JSON_SUCCESS = Response::JSON_SUCCESS;
     const JSON_ERROR = Response::JSON_ERROR;
 
+    protected static $_after_callbacks = array();
+
     /**
      * Getter/setter for request
      *
@@ -95,6 +97,16 @@ abstract class Controller extends Controller_Proxy {
         {
             // Сохраняем все непереведённые строки из пользовательского интерфейса
             register_shutdown_function(array("I18n", "write"));
+        }
+    }
+
+    public function after()
+    {
+        parent::after();
+
+        foreach ( static::$_after_callbacks as $callback )
+        {
+            call_user_func($callback, $this);
         }
     }
 
@@ -237,6 +249,11 @@ abstract class Controller extends Controller_Proxy {
         $this->response->headers("Content-Disposition", "attachment; filename=$alias");
 
         $this->send_string($content);
+    }
+
+    public static function bind_after(callable $callback)
+    {
+        static::$_after_callbacks[] = $callback;
     }
 
 

@@ -168,7 +168,7 @@ class JS {
         $this->add_static('jquery/timepicker/jquery.timepicker.js');
     }
 
-    public function bootstrap($version_path = Statics::BOOTSTRAP_V3)
+    public function bootstrap($version_path = Assets::BOOTSTRAP_V3)
     {
         return $this->add_static('bootstrap/'.$version_path.'/js/bootstrap.js');
     }

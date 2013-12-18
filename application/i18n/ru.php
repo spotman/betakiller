@@ -4,6 +4,7 @@
  * Automatically generated from previous translation file.
  */
 return array (
+  'File [:file] not found' => 'File [:file] not found',
   'Auth failed, please, try again later' => 'Auth failed, please, try again later',
   'arguments' => 'arguments',
   'PHP internal call' => 'PHP internal call',

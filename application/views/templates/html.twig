@@ -1,0 +1,16 @@
+{% block doctype %}<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">{% endblock %}
+
+{% block html_tag %}<html>{% endblock %}
+
+    <head>
+        {% block head %}
+        <title>{% block title title %}</title>
+        <meta http-equiv="Content-type" content="text/html; charset=UTF-8" />
+        {{ css.get_all|raw }}
+        {{ js.get_all|raw }}
+        {% endblock head %}
+    </head>
+    <body>
+    {% block body %}{% endblock %}
+    </body>
+</html>

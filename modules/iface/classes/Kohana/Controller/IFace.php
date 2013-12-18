@@ -15,9 +15,9 @@ class Kohana_Controller_IFace extends Controller {
             HTTP::redirect('/');
         }
 
-        $view = $iface->render();
+        $output = $iface->render();
 
-        $this->send_view($view);
+        $this->send_string($output);
     }
 
     /**

@@ -1,6 +1,6 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
-class Statics {
+class Assets {
 
     const BOOTSTRAP_V2 = 'v2';
     const BOOTSTRAP_V3 = 'v3';
@@ -124,7 +124,7 @@ class Statics {
      * @param string $version
      * @return $this
      */
-    public function bootstrap($version = Statics::BOOTSTRAP_V3)
+    public function bootstrap($version = Assets::BOOTSTRAP_V3)
     {
         $this->js()->bootstrap($version);
         $this->css()->bootstrap($version);
@@ -160,6 +160,12 @@ class Statics {
     public function tinyMCE()
     {
         $this->js()->tinyMCE();
+        return $this;
+    }
+
+    public function masonry()
+    {
+        $this->js()->masonry();
         return $this;
     }
 

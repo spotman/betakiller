@@ -62,7 +62,7 @@ class Controller_Staticfiles extends Controller {
 		else
 		{
 			// Return a 404 status
-            throw new HTTP_Exception_404("Файл по адресу [". $file ."] не найден");
+            throw new HTTP_Exception_404("File [:file] not found", array(':file' => $file));
 		}
 	}
 

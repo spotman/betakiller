@@ -97,16 +97,35 @@ abstract class Kohana_IFace {
 //    }
 
     /**
-     * @return View
+     * @return string
      */
     public function render()
+    {
+        $layout_codename = $this->get_layout_codename();
+
+        $content = $this->_render();
+
+        return IFace_Layout::by_codename($layout_codename)
+            ->set_content($content)
+            ->render();
+    }
+
+    public function get_layout_codename()
+    {
+        return $this->model()->get_layout_codename();
+    }
+
+    /**
+     * @return string
+     */
+    protected function _render()
     {
         $data = $this->get_data();
 
         $view = $this->get_view();
         $view->set($data);
 
-        return $view;
+        return $view->render();
     }
 
     /**
@@ -166,6 +185,7 @@ abstract class Kohana_IFace {
         return $this->model()->is_default();
     }
 
+    // TODO
     public function url()
     {
         $url = '/'.$this->get_url();

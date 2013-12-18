@@ -27,7 +27,9 @@ class BetaKiller_Twig_Extension extends Twig_Extension {
         return array(
 //            new Twig_SimpleFunction('js', array($this, 'js'), array('is_safe' => array('html'))),
 //            new Twig_SimpleFunction('css', array($this, 'css'), array('is_safe' => array('html'))),
-            new Twig_SimpleFunction('static', array($this, 'statics')),
+            new Twig_SimpleFunction('static', array($this, 'get_static_file'), array('is_safe' => array('html'))),
+
+            new Twig_SimpleFunction('assets', array($this, 'load_assets')),
 
             new Twig_SimpleFunction(
                 'widget',
@@ -44,19 +46,14 @@ class BetaKiller_Twig_Extension extends Twig_Extension {
         return $widget->render();
     }
 
-//    public function css()
-//    {
-//        $this->statics(CSS::instance(), func_get_args());
-//    }
-//
-//    public function js()
-//    {
-//        $this->statics(JS::instance(), func_get_args());
-//    }
-//
-    public function statics()
+    public function get_static_file($filename)
     {
-        $this->include_static_files(Statics::instance(), func_get_args());
+        return StaticFile::instance()->getLink($filename);
+    }
+
+    public function load_assets()
+    {
+        $this->include_static_files(Assets::instance(), func_get_args());
     }
 
     protected function include_static_files($object, $files)

@@ -94,6 +94,16 @@ class IFace_Provider_Source_Admin_Model implements IFace_Model {
         );
     }
 
+    /**
+     * Returns layout codename
+     *
+     * @return string
+     */
+    public function get_layout_codename()
+    {
+        // Admin IFaces always have "admin" layout
+        return 'admin';
+    }
 
     public function from_array(array $data)
     {
