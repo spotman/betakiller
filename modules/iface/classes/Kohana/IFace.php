@@ -96,6 +96,9 @@ abstract class Kohana_IFace {
      */
     public function render()
     {
+        // Setting page title
+        Meta::instance()->title( $this->get_title() );
+
         // Getting IFace View instance and rendering
         return $this->get_view()->render();
     }
@@ -103,6 +106,11 @@ abstract class Kohana_IFace {
     public function get_layout_codename()
     {
         return $this->model()->get_layout_codename();
+    }
+
+    public function get_title()
+    {
+        return $this->model()->get_title();
     }
 
     /**

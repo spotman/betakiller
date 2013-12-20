@@ -4,6 +4,7 @@
  * Automatically generated from previous translation file.
  */
 return array (
+  'Not found' => 'Not found',
   'Kohana' => 'Kohana',
   'Benchmark' => 'Benchmark',
   'Min' => 'Min',

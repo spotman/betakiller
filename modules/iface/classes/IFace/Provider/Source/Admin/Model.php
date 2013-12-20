@@ -8,6 +8,8 @@ class IFace_Provider_Source_Admin_Model implements IFace_Model {
 
     protected $_uri;
 
+    protected $_title;
+
     public static function factory($data)
     {
         /** @var self $instance */
@@ -71,6 +73,17 @@ class IFace_Provider_Source_Admin_Model implements IFace_Model {
     }
 
     /**
+     * Returns title for using in page <title> tag
+     *
+     * @return string
+     */
+    public function get_title()
+    {
+        // TODO: Implement get_title() method.
+    }
+
+
+    /**
      * Returns list of child iface models
      *
      * @return IFace_Model[]
@@ -91,6 +104,7 @@ class IFace_Provider_Source_Admin_Model implements IFace_Model {
             'codename'  => $this->get_codename(),
             'uri'       => $this->get_uri(),
             'parent'    => $this->get_parent_codename(),
+            'title'     => $this->get_title(),
         );
     }
 
@@ -109,6 +123,8 @@ class IFace_Provider_Source_Admin_Model implements IFace_Model {
     {
         $this->_codename = $data['codename'];
         $this->_uri = $data['uri'];
+
+        $this->_title = $data['title'];
 
         if ( isset($data['parent_codename']) )
         {

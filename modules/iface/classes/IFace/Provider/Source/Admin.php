@@ -51,6 +51,7 @@ class IFace_Provider_Source_Admin extends IFace_Provider_Source {
 
         $config = array(
             'codename'          => (string) $attr['codename'],
+            'title'             => (string) $attr['title'],
             'uri'               => (string) $attr['uri'],
         );
 

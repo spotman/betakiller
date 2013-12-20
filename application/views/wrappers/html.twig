@@ -4,6 +4,7 @@
 
     <head>
         {{ meta.content_type("text/html") }}
+        <title>{{ meta.title|join(" - ") }}</title>
         {% block head %}
         {{ meta.render|raw }}
         {{ css.get_all|raw }}

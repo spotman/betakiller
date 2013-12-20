@@ -86,6 +86,17 @@ class Model_IFace extends ORM implements IFace_Model {
     }
 
     /**
+     * Returns title for using in page <title> tag
+     *
+     * @return string
+     */
+    public function get_title()
+    {
+        return $this->get('title');
+    }
+
+
+    /**
      * Returns iface url part
      *
      * @return string

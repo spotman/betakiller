@@ -47,8 +47,14 @@ interface IFace_Model {
     /**
      * Returns iface layout object
      *
-     * @return IFace_Layout
+     * @return string
      */
     public function get_layout_codename();
 
+    /**
+     * Returns title for using in page <title> tag
+     *
+     * @return string
+     */
+    public function get_title();
 }
