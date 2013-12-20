@@ -62,7 +62,7 @@ abstract class Kohana_IFace {
 
         if ( ! class_exists($class_name) )
         {
-            $class_name = 'IFace_Default';
+            $class_name = static::get_class_prefix().'Default';
         }
 
         /** @var IFace $object */
@@ -91,41 +91,18 @@ abstract class Kohana_IFace {
         return $this->getter_and_setter_method('_codename', $codename);
     }
 
-//    public function action_index()
-//    {
-//        return $this->render();
-//    }
-
     /**
      * @return string
      */
     public function render()
     {
-        $layout_codename = $this->get_layout_codename();
-
-        $content = $this->_render();
-
-        return IFace_Layout::by_codename($layout_codename)
-            ->set_content($content)
-            ->render();
+        // Getting IFace View instance and rendering
+        return $this->get_view()->render();
     }
 
     public function get_layout_codename()
     {
         return $this->model()->get_layout_codename();
-    }
-
-    /**
-     * @return string
-     */
-    protected function _render()
-    {
-        $data = $this->get_data();
-
-        $view = $this->get_view();
-        $view->set($data);
-
-        return $view->render();
     }
 
     /**
@@ -211,17 +188,10 @@ abstract class Kohana_IFace {
 
     protected function get_view()
     {
-        $view_path = 'ifaces'. DIRECTORY_SEPARATOR . str_replace('_', DIRECTORY_SEPARATOR, $this->_codename);
-
-        return $this->view_factory($view_path);
+        return View_IFace::factory($this);
     }
 
-    protected function view_factory($path)
-    {
-        return View::factory($path);
-    }
-
-    private static function get_class_prefix()
+    protected static function get_class_prefix()
     {
         return 'IFace_';
     }

@@ -3,14 +3,14 @@
 {% block html_tag %}<html>{% endblock %}
 
     <head>
+        {{ meta.content_type("text/html") }}
         {% block head %}
-        <title>{% block title title %}</title>
-        <meta http-equiv="Content-type" content="text/html; charset=UTF-8" />
+        {{ meta.render|raw }}
         {{ css.get_all|raw }}
         {{ js.get_all|raw }}
         {% endblock head %}
     </head>
     <body>
-    {% block body %}{% endblock %}
+    {{ content|raw }}
     </body>
 </html>

@@ -24,7 +24,7 @@ return array(
          */
         'namespaces'    =>  array(
             'layouts'   =>  'layouts',
-            'templates' =>  'templates',
+            'wrappers'  =>  'wrappers',
         ),
 	),
 

@@ -13,3 +13,6 @@
 [submodule "modules/api"]
 	path = modules/api
 	url = https://spotman@github.com/spotman/kohana-simple-api.git
+[submodule "modules/meta-tags"]
+	path = modules/meta-tags
+	url = https://github.com/spotman/kohana-meta-tags.git

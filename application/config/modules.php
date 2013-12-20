@@ -17,6 +17,7 @@ return array(
     'static-files'          => MODPATH.'static-files',          // Static Files (JS/CSS/pictures)
     'locator'               => MODPATH.'locator',               // URL mapping to interfaces
     'mangodb'               => MODPATH.'mangodb',               // ODM обёртка для mongodb
+    'meta-tags'             => MODPATH.'meta-tags',             // HTML meta tags helper
     'minion'                => MODPATH.'minion',                // CLI Tasks
     'orm'                   => MODPATH.'orm',                   // Object Relationship Mapping
     'twig'                  => MODPATH.'twig',                  // Twig template engine

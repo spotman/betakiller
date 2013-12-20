@@ -4,6 +4,16 @@
  * Automatically generated from previous translation file.
  */
 return array (
+  'Kohana' => 'Kohana',
+  'Benchmark' => 'Benchmark',
+  'Min' => 'Min',
+  'Max' => 'Max',
+  'Average' => 'Average',
+  'Total' => 'Total',
+  'Requests' => 'Requests',
+  'Database (default)' => 'Database (default)',
+  'Kohana_static' => 'Kohana_static',
+  'Application Execution' => 'Application Execution',
   'File [:file] not found' => 'File [:file] not found',
   'Auth failed, please, try again later' => 'Auth failed, please, try again later',
   'arguments' => 'arguments',
