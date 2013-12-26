@@ -16,3 +16,6 @@
 [submodule "modules/meta-tags"]
 	path = modules/meta-tags
 	url = https://spotman@github.com/spotman/kohana-meta-tags.git
+[submodule "modules/hashids"]
+	path = modules/hashids
+	url = https://github.com/pocesar/hashids-kohana.git

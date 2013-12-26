@@ -200,7 +200,7 @@ abstract class Controller extends Controller_Proxy {
      * @param integer $result JSON result constant or raw data
      * @param mixed $data Raw data to send, if the first argument is constant
      */
-    protected function send_json($result = Response::JSON_SUCCESS, $data = NULL)
+    protected function send_json($result = self::JSON_SUCCESS, $data = NULL)
     {
         $this->response->send_json($result, $data);
     }

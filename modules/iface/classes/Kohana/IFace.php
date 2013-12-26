@@ -23,13 +23,9 @@ abstract class Kohana_IFace {
     protected $_parent;
 
     /**
-     * @var array
-     */
-    protected static $_instance_cache = array();
-
-    /**
+     * Creates IFace instance from it`s codename
+     *
      * @param string $codename IFace codename
-//     * @param IFace_Model $model
      * @return static
      * @throws IFace_Exception
      */
@@ -96,9 +92,6 @@ abstract class Kohana_IFace {
      */
     public function render()
     {
-        // Setting page title
-        Meta::instance()->title( $this->get_title() );
-
         // Getting IFace View instance and rendering
         return $this->get_view()->render();
     }

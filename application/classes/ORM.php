@@ -1,7 +1,7 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
 
-abstract class ORM extends Kohana_ORM implements API_Model_Result {
+abstract class ORM extends Kohana_ORM implements API_Model_Result, DataSource_Interface {
 
     public function belongs_to(array $config = NULL)
     {

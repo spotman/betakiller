@@ -25,15 +25,16 @@ class Widget_Auth_Ulogin extends Widget {
         try
         {
             $uLogin->login();
+            $this->send_json();
         }
         catch ( Ulogin_Exception $e )
         {
+//            $this->send_json(self::JSON_ERROR, $e->getMessage());
             throw $e;
-            // TODO
-            //throw new HTTP_Exception_401;
         }
         catch ( Exception $e )
         {
+//            $this->send_json(self::JSON_ERROR, $e->getMessage());
             throw $e;
 //            Kohana_Exception::_handler($e);
 //            $this->send_json(self::JSON_ERROR);

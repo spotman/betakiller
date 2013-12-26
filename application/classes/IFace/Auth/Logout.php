@@ -2,7 +2,7 @@
 
 class IFace_Auth_Logout extends IFace {
 
-    public function __construct()
+    public function render()
     {
         // Sign out the user
         Env::auth()->logout(TRUE);

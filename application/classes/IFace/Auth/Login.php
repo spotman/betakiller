@@ -26,7 +26,7 @@ class IFace_Auth_Login extends IFace {
 
     public function redirect_to_current_page()
     {
-        $this->_redirect_url = Request::current()->uri();
+        $this->_redirect_url = '/'.Request::current()->uri();
     }
 
 }

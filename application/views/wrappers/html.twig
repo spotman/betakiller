@@ -4,12 +4,10 @@
 
     <head>
         {{ meta.content_type("text/html") }}
-        <title>{{ meta.title|join(" - ") }}</title>
-        {% block head %}
+        <title>{% block title meta.title|join(" - ") %}</title>
         {{ meta.render|raw }}
         {{ css.get_all|raw }}
         {{ js.get_all|raw }}
-        {% endblock head %}
     </head>
     <body>
     {{ content|raw }}

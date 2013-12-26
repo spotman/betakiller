@@ -32,6 +32,8 @@ class BetaKiller_Twig_Extension extends Twig_Extension {
 
             new Twig_SimpleFunction('assets', array($this, 'load_assets')),
 
+            new Twig_SimpleFunction('iface_url', array($this, 'iface_url')),
+
             new Twig_SimpleFunction(
                 'widget',
                 array($this, 'widget'),
@@ -63,6 +65,18 @@ class BetaKiller_Twig_Extension extends Twig_Extension {
         {
             call_user_func(array($object, $file));
         }
+    }
+
+    /**
+     * @todo генерация динамических url
+     * @param $codename
+     * @return string
+     */
+    public function iface_url($codename)
+    {
+        $iface = IFace::by_codename($codename);
+
+        return $iface->url();
     }
 
 }

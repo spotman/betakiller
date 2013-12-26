@@ -30,21 +30,16 @@ abstract class Kohana_View_IFace {
     protected function __construct(IFace $iface)
     {
         $this->_iface = $iface;
-        $this->_iface_codename = $iface->codename();
-        $this->_layout = $iface->get_layout_codename();
-        $this->_data = $iface->get_data();
     }
 
     /**
      * Helper for changing wrapper from view
      *
      * @param string $wrapper
-     * @return $this
      */
     public function wrapper($wrapper)
     {
         $this->_wrapper = $wrapper;
-        return $this;
     }
 
     public function render()
@@ -53,10 +48,19 @@ abstract class Kohana_View_IFace {
 
         $iface_view = $this->view_factory($view_path);
 
+        // Getting IFace data
+        $this->_data = $this->_iface->get_data();
+
         // For changing wrapper from view via $_this->wrapper('html')
         $this->_data['_this'] = $this;
 
         $iface_view->set($this->_data);
+
+        // Setting page title
+        Meta::instance()->title( $this->_iface->get_title() );
+
+        // Getting IFace layout
+        $this->_layout = $this->_iface->get_layout_codename();
 
         $layout = $this->process_layout($iface_view);
 
