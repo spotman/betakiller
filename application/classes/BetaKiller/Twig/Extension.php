@@ -19,6 +19,8 @@ class BetaKiller_Twig_Extension extends Twig_Extension {
             'css'   => CSS::instance(),
             'meta'  => Meta::instance(),
 
+            'device'  => Device::factory(),
+
             'profiler'   => Profiler::instance(),
         );
     }

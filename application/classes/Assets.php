@@ -169,4 +169,11 @@ class Assets {
         return $this;
     }
 
+    public function jquery_mmenu()
+    {
+        $this->js()->jquery_mmenu();
+        $this->css()->jquery_mmenu();
+        return $this;
+    }
+
 }

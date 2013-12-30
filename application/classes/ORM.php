@@ -1,7 +1,7 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
 
-abstract class ORM extends Kohana_ORM implements API_Model_Result, DataSource_Interface {
+abstract class ORM extends Kohana_ORM implements API_Model_Response_Item, DataSource_Interface {
 
     public function belongs_to(array $config = NULL)
     {
@@ -50,7 +50,7 @@ abstract class ORM extends Kohana_ORM implements API_Model_Result, DataSource_In
      *
      * @return array
      */
-    public function get_api_result_data()
+    public function get_api_response_data()
     {
         return $this->as_array();
     }

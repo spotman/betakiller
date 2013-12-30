@@ -19,3 +19,6 @@
 [submodule "modules/hashids"]
 	path = modules/hashids
 	url = https://github.com/pocesar/hashids-kohana.git
+[submodule "modules/device"]
+	path = modules/device
+	url = https://github.com/badsyntax/kohana-device.git

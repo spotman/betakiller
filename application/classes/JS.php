@@ -208,6 +208,16 @@ class JS {
     }
 
     /**
+     * Helper for JQuery mobile menu plugin
+     *
+     * @link http://mmenu.frebsite.nl/
+     */
+    public function jquery_mmenu()
+    {
+        $this->add_static('jquery/mmenu/jquery.mmenu.all.min.js');
+    }
+
+    /**
      * Устанавливает document.domain на текущей странице
      * @param null|string $domain
      */

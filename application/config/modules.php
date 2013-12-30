@@ -11,6 +11,7 @@ return array(
     'auth'                  => MODPATH.'auth',                  // Basic authentication
     'cache'                 => MODPATH.'cache',                 // Caching with multiple backends
     'database'              => MODPATH.'database',              // Database access
+    'device'                => MODPATH.'device',                // Device detection
     'email'                 => MODPATH.'email',                 // Mailing module
     'iface'                 => MODPATH.'iface',                 // Dynamic user interfaces
     'image'                 => MODPATH.'image',                 // Image manipulation
