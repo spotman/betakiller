@@ -23,6 +23,11 @@ abstract class Kohana_IFace {
     protected $_parent;
 
     /**
+     * @var DateTime
+     */
+    protected $_last_modified;
+
+    /**
      * Creates IFace instance from it`s codename
      *
      * @param string $codename IFace codename
@@ -116,6 +121,22 @@ abstract class Kohana_IFace {
     {
         // Empty by default
         return array();
+    }
+
+    /**
+     * @param \DateTime|NULL $last_modified
+     */
+    public function set_last_modified(DateTime $last_modified)
+    {
+        $this->_last_modified = $last_modified;
+    }
+
+    /**
+     * @return \DateTime
+     */
+    public function get_last_modified()
+    {
+        return $this->_last_modified;
     }
 
     public function __toString()

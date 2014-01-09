@@ -6,6 +6,10 @@ trait Util_Factory_Cached {
 
     protected static $_factory_instances = array();
 
+    /**
+     * @param $name
+     * @return static
+     */
     public static function factory($name)
     {
         // Caching instances

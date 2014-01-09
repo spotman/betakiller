@@ -1,7 +1,7 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
 
-class ORM extends Kohana_ORM implements API_Model_Response_Item, DataSource_Interface {
+class ORM extends Kohana_ORM implements API_Response_Item /* , DataSource_Interface */ {
 
     public function belongs_to(array $config = NULL)
     {
@@ -22,7 +22,6 @@ class ORM extends Kohana_ORM implements API_Model_Response_Item, DataSource_Inte
 
         return parent::has_one();
     }
-
 
     public function has_many(array $config = NULL)
     {
@@ -53,6 +52,23 @@ class ORM extends Kohana_ORM implements API_Model_Response_Item, DataSource_Inte
     public function get_api_response_data()
     {
         return $this->as_array();
+    }
+
+    /**
+     * @return NULL
+     */
+    public function get_last_modified()
+    {
+        // Empty by default
+        return NULL;
+    }
+
+    /**
+     * @return $this
+     */
+    public function randomize()
+    {
+        return $this->order_by(DB::expr('RAND()'));
     }
 
 }
