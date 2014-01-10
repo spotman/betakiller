@@ -120,6 +120,7 @@ abstract class Kohana_Widget extends Controller {
     public function render()
     {
         $this->_render();
+        // TODO reset data and context for next render
         return $this->response();
     }
 
@@ -153,7 +154,7 @@ abstract class Kohana_Widget extends Controller {
         return $this->_data;
     }
 
-    public function set_data($key, $value)
+    public function set_data($key, $value = NULL)
     {
         if ( is_array($key) )
         {
@@ -163,6 +164,22 @@ abstract class Kohana_Widget extends Controller {
         {
             $this->_data[$key] = $value;
         }
+    }
+
+    /**
+     * @param string $current_state
+     */
+    public function set_current_state($current_state)
+    {
+        $this->_current_state = $current_state;
+    }
+
+    /**
+     * @return string
+     */
+    public function get_current_state()
+    {
+        return $this->_current_state;
     }
 
     protected function url($action = NULL, $protocol = TRUE)

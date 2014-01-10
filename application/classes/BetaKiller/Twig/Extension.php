@@ -37,6 +37,12 @@ class BetaKiller_Twig_Extension extends Twig_Extension {
             new Twig_SimpleFunction('iface_url', array($this, 'iface_url')),
 
             new Twig_SimpleFunction(
+                'profiler',
+                array($this, 'show_profiler'),
+                array('is_safe' => array('html'))
+            ),
+
+            new Twig_SimpleFunction(
                 'widget',
                 array($this, 'widget'),
                 array('is_safe' => array('html'), 'needs_context' => true)
@@ -81,4 +87,8 @@ class BetaKiller_Twig_Extension extends Twig_Extension {
         return $iface->url();
     }
 
+    public function show_profiler()
+    {
+        return Profiler::render();
+    }
 }

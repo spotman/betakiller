@@ -25,6 +25,7 @@ return array(
         'namespaces'    =>  array(
             'layouts'   =>  'layouts',
             'wrappers'  =>  'wrappers',
+            'widgets'   =>  'widgets',
         ),
 	),
 
