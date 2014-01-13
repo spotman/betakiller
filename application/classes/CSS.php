@@ -65,55 +65,55 @@ class CSS {
     }
 
 
-    public function jquery_ui()
+//    public function jquery_ui()
+//    {
+//        return $this->add_static('jquery/ui/css/smoothness/jquery-ui-1.9.2.custom.css');
+//    }
+
+//    public function jquery_validation() {}
+
+//    public function jquery_fileupload()
+//    {
+//        return $this->add_static('jquery/fileupload/jquery.fileupload-ui.css');
+//    }
+
+//    public function jquery_chosen()
+//    {
+//        return $this->add_static('jquery/chosen/chosen.css');
+//    }
+//
+//    public function jquery_qtip()
+//    {
+//        return $this->add_static('jquery/qtip/jquery.qtip.css');
+//    }
+//
+//    public function jquery_pnotify()
+//    {
+//        return $this->add_static('jquery/pnotify/jquery.pnotify.default.css');
+//    }
+
+//    /**
+//     * Хелпер для добавления плагина выбора времени
+//     * @link http://jonthornton.github.io/jquery-timepicker/
+//     */
+//    public function jquery_timepicker()
+//    {
+//        return $this->add_static('jquery/timepicker/jquery.timepicker.css');
+//    }
+//
+//    /**
+//     * Helper for JQuery mobile menu plugin
+//     *
+//     * @link http://mmenu.frebsite.nl/
+//     */
+//    public function jquery_mmenu()
+//    {
+//        $this->add_static('jquery/mmenu/jquery.mmenu.all.css');
+//    }
+
+
+    public function bootstrap()
     {
-        return $this->add_static('jquery/ui/css/smoothness/jquery-ui-1.9.2.custom.css');
-    }
-
-    public function jquery_validation() {}
-
-    public function jquery_fileupload()
-    {
-        return $this->add_static('jquery/fileupload/jquery.fileupload-ui.css');
-    }
-
-    public function jquery_chosen()
-    {
-        return $this->add_static('jquery/chosen/chosen.css');
-    }
-
-    public function jquery_qtip()
-    {
-        return $this->add_static('jquery/qtip/jquery.qtip.css');
-    }
-
-    public function jquery_pnotify()
-    {
-        return $this->add_static('jquery/pnotify/jquery.pnotify.default.css');
-    }
-
-    /**
-     * Хелпер для добавления плагина выбора времени
-     * @link http://jonthornton.github.io/jquery-timepicker/
-     */
-    public function jquery_timepicker()
-    {
-        return $this->add_static('jquery/timepicker/jquery.timepicker.css');
-    }
-
-    /**
-     * Helper for JQuery mobile menu plugin
-     *
-     * @link http://mmenu.frebsite.nl/
-     */
-    public function jquery_mmenu()
-    {
-        $this->add_static('jquery/mmenu/jquery.mmenu.all.css');
-    }
-
-
-    public function bootstrap($version_path = Assets::BOOTSTRAP_V3)
-    {
-        return $this->add_static('bootstrap/'.$version_path.'/css/bootstrap.css');
+        return $this->add_static('bootstrap/v3/css/bootstrap.css');
     }
 }

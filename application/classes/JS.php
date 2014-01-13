@@ -73,13 +73,13 @@ class JS {
         return $this->get_files() . $this->get_inline();
     }
 
-    public function jquery()
-    {
-        $this->add_static('jquery/jquery-1.8.3.js');
-
-        // Добавляем наши маленькие плагины и утилиты
-        $this->jquery_utils();
-    }
+//    public function jquery()
+//    {
+//        $this->add_static('jquery/jquery-1.8.3.js');
+//
+//        // Добавляем наши маленькие плагины и утилиты
+//        $this->jquery_utils();
+//    }
 
     public function jquery_ui()
     {
@@ -109,83 +109,84 @@ class JS {
         }
     }
 
-    public function jquery_fileupload()
+//    public function jquery_fileupload()
+//    {
+//        $this->add_static('jquery/fileupload/jquery.fileupload.js');
+//        $this->add_static('jquery/fileupload/jquery.iframe-transport.js');
+//    }
+
+//    public function jquery_chosen()
+//    {
+//        $this->add_static('jquery/chosen/chosen.jquery.min.js');
+//    }
+
+//    public function jquery_cookie()
+//    {
+//        $this->add_static('jquery/jquery.cookie.js');
+//    }
+
+//    /**
+//     * Хелпер для добавления jquery.qtip на страницу
+//     * @link http://craigsworks.com/projects/qtip2/
+//     */
+//    public function jquery_qtip()
+//    {
+//        $this->add_static('jquery/qtip/jquery.qtip.js');
+//    }
+//
+//    /**
+//     * Хелпер для добавления jquery.pnotify на страницу
+//     * @link http://pinesframework.org/pnotify/
+//     */
+//    public function jquery_pnotify()
+//    {
+//        $this->add_static('jquery/pnotify/jquery.pnotify.js');
+//    }
+//
+//    /**
+//     * @link http://www.appelsiini.net/projects/jeditable
+//     */
+//    public function jquery_jeditable()
+//    {
+//        $this->add_static('jquery/jeditable/jquery.jeditable.js');
+//    }
+
+//    /**
+//     * Наши утилиты
+//     */
+//    public function jquery_utils()
+//    {
+//        $this->add_static('jquery/utils.js');
+//    }
+
+//    /**
+//     * Хелпер для добавления плагина выбора времени
+//     * @link http://jonthornton.github.io/jquery-timepicker/
+//     */
+//    public function jquery_timepicker()
+//    {
+//        $this->add_static('jquery/timepicker/jquery.timepicker.js');
+//    }
+
+    public function bootstrap()
     {
-        $this->add_static('jquery/fileupload/jquery.fileupload.js');
-        $this->add_static('jquery/fileupload/jquery.iframe-transport.js');
+        return $this->add_static('bootstrap/v3/js/bootstrap.js');
     }
 
-    public function jquery_chosen()
-    {
-        $this->add_static('jquery/chosen/chosen.jquery.min.js');
-    }
+//    public function bootstrap_bootbox()
+//    {
+//        return $this->add_static('bootstrap/bootbox/bootbox.min.js');
+//    }
 
-    public function jquery_cookie()
-    {
-        $this->add_static('jquery/jquery.cookie.js');
-    }
 
-    /**
-     * Хелпер для добавления jquery.qtip на страницу
-     * @link http://craigsworks.com/projects/qtip2/
-     */
-    public function jquery_qtip()
-    {
-        $this->add_static('jquery/qtip/jquery.qtip.js');
-    }
-
-    /**
-     * Хелпер для добавления jquery.pnotify на страницу
-     * @link http://pinesframework.org/pnotify/
-     */
-    public function jquery_pnotify()
-    {
-        $this->add_static('jquery/pnotify/jquery.pnotify.js');
-    }
-
-    /**
-     * @link http://www.appelsiini.net/projects/jeditable
-     */
-    public function jquery_jeditable()
-    {
-        $this->add_static('jquery/jeditable/jquery.jeditable.js');
-    }
-
-    /**
-     * Наши утилиты
-     */
-    public function jquery_utils()
-    {
-        $this->add_static('jquery/utils.js');
-    }
-
-    /**
-     * Хелпер для добавления плагина выбора времени
-     * @link http://jonthornton.github.io/jquery-timepicker/
-     */
-    public function jquery_timepicker()
-    {
-        $this->add_static('jquery/timepicker/jquery.timepicker.js');
-    }
-
-    public function bootstrap($version_path = Assets::BOOTSTRAP_V3)
-    {
-        return $this->add_static('bootstrap/'.$version_path.'/js/bootstrap.js');
-    }
-
-    public function bootstrap_bootbox()
-    {
-        return $this->add_static('bootstrap/bootbox/bootbox.min.js');
-    }
-
-    /**
-     * Хелпер для добавления библиотеки underscore
-     * @link http://underscorejs.org/
-     */
-    public function underscore()
-    {
-        return $this->add_static('underscore/underscore.js');
-    }
+//    /**
+//     * Хелпер для добавления библиотеки underscore
+//     * @link http://underscorejs.org/
+//     */
+//    public function underscore()
+//    {
+//        return $this->add_static('underscore/underscore.js');
+//    }
 
     /**
      * Хелпер для добавления редактора tinyMCE
@@ -197,37 +198,37 @@ class JS {
         $this->add_inline('tinyMCE.baseURL = "{static_url}tiny_mce"');
     }
 
-    /**
-     * Helper for Masonry brick layout plugin
-     *
-     * @link http://masonry.desandro.com/
-     */
-    public function masonry()
-    {
-        $this->add_static('masonry/masonry.pkgd.js');
-    }
+//    /**
+//     * Helper for Masonry brick layout plugin
+//     *
+//     * @link http://masonry.desandro.com/
+//     */
+//    public function masonry()
+//    {
+//        $this->add_static('masonry/masonry.pkgd.js');
+//    }
 
-    /**
-     * Helper for JQuery mobile menu plugin
-     *
-     * @link http://mmenu.frebsite.nl/
-     */
-    public function jquery_mmenu()
-    {
-        $this->add_static('jquery/mmenu/jquery.mmenu.all.min.js');
-    }
+//    /**
+//     * Helper for JQuery mobile menu plugin
+//     *
+//     * @link http://mmenu.frebsite.nl/
+//     */
+//    public function jquery_mmenu()
+//    {
+//        $this->add_static('jquery/mmenu/jquery.mmenu.all.min.js');
+//    }
 
-    /**
-     * Устанавливает document.domain на текущей странице
-     * @param null|string $domain
-     */
-    public function set_document_domain($domain = NULL)
-    {
-        if ( ! $domain )
-        {
-            $domain = Cookie::$domain;
-        }
-
-        $this->add_inline('document.domain = "'.$domain.'"');
-    }
+//    /**
+//     * Устанавливает document.domain на текущей странице
+//     * @param null|string $domain
+//     */
+//    public function set_document_domain($domain = NULL)
+//    {
+//        if ( ! $domain )
+//        {
+//            $domain = Cookie::$domain;
+//        }
+//
+//        $this->add_inline('document.domain = "'.$domain.'"');
+//    }
 }

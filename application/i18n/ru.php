@@ -4,6 +4,7 @@
  * Automatically generated from previous translation file.
  */
 return array (
+  'Unknown asset :name' => 'Unknown asset :name',
   'The :property property does not exist in the :class class' => 'The :property property does not exist in the :class class',
   'Unknown codename :codename' => 'Unknown codename :codename',
   'No IFace found by codename :codename' => 'No IFace found by codename :codename',

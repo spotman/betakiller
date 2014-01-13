@@ -64,14 +64,11 @@ class BetaKiller_Twig_Extension extends Twig_Extension {
 
     public function load_assets()
     {
-        $this->include_static_files(Assets::instance(), func_get_args());
-    }
+        $instance = Assets::instance();
 
-    protected function include_static_files($object, $files)
-    {
-        foreach ( $files as $file )
+        foreach ( func_get_args() as $asset )
         {
-            call_user_func(array($object, $file));
+            $instance->add($asset);
         }
     }
 
