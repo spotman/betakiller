@@ -24,4 +24,4 @@
 	url = https://github.com/badsyntax/kohana-device.git
 [submodule "modules/dbv"]
 	path = modules/dbv
-	url = https://github.com/spotman/kohana-dbv.git
+	url = https://spotman@github.com/spotman/kohana-dbv.git
