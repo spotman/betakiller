@@ -14,7 +14,7 @@ class Controller_Error_Widget extends Controller_Developer {
 
         $this->jquery()->jquery_pnotify();
 
-        $this->template->content = $content;
+        $this->_layout->content = $content;
     }
 
     protected function get_php_errors_count()

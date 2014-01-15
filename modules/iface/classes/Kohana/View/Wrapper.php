@@ -19,7 +19,7 @@ abstract class Kohana_View_Wrapper {
      */
     protected $_content;
 
-    public static function factory($codename)
+    public static function factory($codename = self::HTML5)
     {
         return new static($codename);
     }
@@ -46,8 +46,19 @@ abstract class Kohana_View_Wrapper {
 
         return $this
             ->view_factory($path)
+            ->set($this->get_data())
             ->set('content', $this->_content)
             ->render();
+    }
+
+    /**
+     * Hook for providing custom data to wrapper
+     *
+     * @return array
+     */
+    protected function get_data()
+    {
+        return array();
     }
 
     /**

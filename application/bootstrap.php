@@ -63,12 +63,6 @@ ini_set('unserialize_callback_func', 'spl_autoload_call');
  */
 Cookie::$salt = 'hd398gfhk75403lnvrfe8d10gg';
 
-
-/**
- * Set the default language
- */
-I18n::lang('en');
-
 /**
  * Set Kohana::$environment if a 'KOHANA_ENV' environment variable has been supplied.
  *
@@ -118,6 +112,10 @@ Kohana::$log->attach(new Log_File(APPPATH.'logs'));
  */
 Kohana::modules(Kohana::$config->load('modules')->as_array());
 
+/**
+ * Set the default language
+ */
+I18n::lang('en');
 
 /**
  * Include default routes. Default routes are located in application/routes/default.php

@@ -22,4 +22,15 @@ class View_Wrapper extends Kohana_View_Wrapper {
         return '@'.parent::get_view_path($codename);
     }
 
+    // TODO move to BetaKiller_Twig_Extension
+    protected function get_data()
+    {
+        return array(
+            'meta_tags' =>  Meta::instance()->render(),
+            'js_all'    =>  JS::instance()->get_all(),
+            'css_all'   =>  CSS::instance()->get_all(),
+        );
+    }
+
+
 }

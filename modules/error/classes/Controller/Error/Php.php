@@ -2,8 +2,6 @@
 
 class Controller_Error_Php extends Controller_Developer {
 
-    // public  $template = 'templates/frontend';
-
     const   SHOW_RESOLVED_COOKIE_NAME = "errors:show_resolved_errors";
     const   SORT_BY_COOKIE_NAME = "errors:sort_by";
     const   SORT_DIRECTION_COOKIE_NAME = "errors:sort_direction";
@@ -79,7 +77,9 @@ class Controller_Error_Php extends Controller_Developer {
         $content->sort_by = $sort_by;
         $content->sort_direction = $sort_direction;
 
-        $this->jquery()->bootstrap();
+        Assets::instance()
+            ->add('jquery')
+            ->add('bootstrap');
 
         $this->send_view($content);
     }

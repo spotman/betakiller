@@ -45,6 +45,14 @@ abstract class Kohana_View_Layout {
         return $this;
     }
 
+    /**
+     * @return string
+     */
+    public function get_content()
+    {
+        return $this->_content;
+    }
+
     public function get_view_path()
     {
         return 'layouts'. DIRECTORY_SEPARATOR . $this->_path;

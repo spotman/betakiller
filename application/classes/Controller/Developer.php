@@ -4,7 +4,7 @@
  * Class Controller_Developer
  * Базовый класс для создания интерфейсов, доступных только разработчикам системы
  */
-class Controller_Developer extends Controller_Template {
+class Controller_Developer extends Controller_Basic {
 
     public function before()
     {

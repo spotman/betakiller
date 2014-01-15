@@ -169,4 +169,12 @@ class BetaKiller_Model_User extends Model_Auth_User //implements ACL_Role_Interf
     {
         return $this->get('email');
     }
+
+    public function get_developers_list()
+    {
+        /** @var Model_Role $roles_orm */
+        $roles_orm = ORM::factory('Role');
+
+        return $roles_orm->developers()->get_users();
+    }
 }

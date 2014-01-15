@@ -9,7 +9,7 @@ class Controller_Basic extends Controller {
     /**
      * @var string|View_Layout
      */
-    public  $template = 'frontend';
+    protected $_layout = 'default';
 
     private $show_profiler = FALSE;
 
@@ -19,13 +19,19 @@ class Controller_Basic extends Controller {
         parent::before();
 
         // Init template
-        if ( $this->template )
+        if ( $this->_layout )
         {
-            $this->template = $this->template_factory($this->template);
+            $this->_layout = $this->layout_factory($this->_layout);
         }
     }
 
-    protected function template_factory($template_name)
+    /**
+     * Twig layout factory
+     *
+     * @param $template_name
+     * @return View_Layout
+     */
+    protected function layout_factory($template_name)
     {
         return View_Layout::factory($template_name);
     }
@@ -33,26 +39,28 @@ class Controller_Basic extends Controller {
     public function after()
     {
         // If template is disabled
-        if ( $this->template === NULL )
+        if ( $this->_layout === NULL )
         {
             // Getting clean output
-            // TODO $output = $this->response->get_body(FALSE);
             $output = $this->response->body();
         }
         // If there is template, but current request is AJAX or HVMC
         elseif ( $this->request->is_ajax() OR ! $this->request->is_initial() )
         {
             // Getting content from template
-            $output = $this->template->get_content();
+            $output = $this->_layout->get_content();
         }
         // This is the regular request
         else
         {
             // Render template with its content
-            $output = $this->template->render();
+            $output = $this->_layout->render();
+
+            $output = View_Wrapper::factory()
+                ->set_content($output)
+                ->render();
         }
 
-        // TODO Request_Processor + Request_Processor_StaticFiles + adding processor to request
 //        // Заменяем во всех ссылках указание на статические файлы
 //        $this->response->body(
 //            str_replace('{staticfiles_url}', STATICFILES_URL, $this->response->body())
@@ -71,10 +79,10 @@ class Controller_Basic extends Controller {
 
     protected function send_view(View $view)
     {
-        if ( $this->template )
+        if ( $this->_layout )
         {
             // Render view for adding js/css files, described in it
-            $this->template->set_content((string) $view);
+            $this->_layout->set_content((string) $view);
         }
         else
         {
@@ -84,34 +92,37 @@ class Controller_Basic extends Controller {
 
     /**
      * Sends plain text to stdout without wrapping it by template
+     *
      * @param string $string Plain text for output
      * @param int $content_type Content type constant like Response::HTML
      */
     protected function send_string($string, $content_type = Response::HTML)
     {
-        $this->template = NULL;
+        $this->_layout = NULL;
         parent::send_string($string, $content_type);
     }
 
     /**
      * Sends JSON response to stdout
+     *
      * @param integer $result JSON result constant or raw data
      * @param mixed $data Raw data to send, if the first argument is constant
      */
     protected function send_json($result = Response::JSON_SUCCESS, $data = NULL)
     {
-        $this->template = NULL;
+        $this->_layout = NULL;
         parent::send_json($result, $data);
     }
 
     /**
      * Sends response for JSONP request
+     *
      * @param array $data Raw data
      * @param string|null $callback_key JavaScript callback function key
      */
     protected function send_jsonp(array $data, $callback_key = NULL)
     {
-        $this->template = NULL;
+        $this->_layout = NULL;
         parent::send_jsonp($data, $callback_key);
     }
 
@@ -133,5 +144,18 @@ class Controller_Basic extends Controller {
         return ( $this->request->is_initial() AND ! $this->request->is_ajax()
             AND Env::user(TRUE) AND Env::user()->is_developer() AND Profiler::is_enabled() );
     }
+
+    /**
+     * Helper for Twig::factory()
+     *
+     * @param string $file
+     * @param array $data
+     * @return Twig
+     * @todo
+     */
+//    protected function view_factory($file = NULL, array $data = NULL)
+//    {
+//        return Twig::factory($file, $data);
+//    }
 
 }

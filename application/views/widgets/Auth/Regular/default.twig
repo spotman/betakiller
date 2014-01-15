@@ -1,4 +1,4 @@
-{{ assets('jquery', 'jquery_pnotify', 'bootstrap') }}
+{{ assets('jquery', 'bootstrap') }}
 
 {% set unique_dom_id = random(1000000) %}
 
@@ -19,12 +19,6 @@
     {
         var widget_id = "{{ unique_dom_id }}";
         var widget = $("#" + widget_id);
-
-//        // Позиционирование окошка строго посередине
-//        var window_height = $(window).height();
-//        var login_window = $("#login-window");
-//        var login_height = login_window.outerHeight();
-//        login_window.css({ "margin-top": ( (window_height - login_height) / 2 ) });
 
         var submit_button = $("#login-btn");
         var alert = widget.find(".alert");

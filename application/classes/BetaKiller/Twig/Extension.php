@@ -12,29 +12,53 @@ class BetaKiller_Twig_Extension extends Twig_Extension {
         return 'BetaKiller';
     }
 
-    public function getGlobals()
-    {
-        return array(
-            'js'    => JS::instance(),
-            'css'   => CSS::instance(),
-            'meta'  => Meta::instance(),
-
-            'device'  => Device::factory(),
-
-            'profiler'   => Profiler::instance(),
-        );
-    }
+//    public function getGlobals()
+//    {
+//        return array(
+////            'js'    => JS::instance(),
+////            'css'   => CSS::instance(),
+////            'meta'  => Meta::instance(),
+//
+////            'device'  => Device::factory(),
+//
+////            'profiler'   => Profiler::instance(),
+//        );
+//    }
 
     public function getFunctions()
     {
         return array(
-//            new Twig_SimpleFunction('js', array($this, 'js'), array('is_safe' => array('html'))),
-//            new Twig_SimpleFunction('css', array($this, 'css'), array('is_safe' => array('html'))),
-            new Twig_SimpleFunction('static', array($this, 'get_static_file'), array('is_safe' => array('html'))),
 
-            new Twig_SimpleFunction('assets', array($this, 'load_assets')),
+            new Twig_SimpleFunction(
+                'js',
+                array($this, 'js'),
+                array('is_safe' => array('html'))
+            ),
 
-            new Twig_SimpleFunction('iface_url', array($this, 'iface_url')),
+            new Twig_SimpleFunction(
+                'css',
+                array($this, 'css'),
+                array('is_safe' => array('html'))
+            ),
+
+            new Twig_SimpleFunction(
+                'static',
+                array($this, 'get_link_to_static_file'),
+                array('is_safe' => array('html'))
+            ),
+
+            new Twig_SimpleFunction(
+                'assets',
+                array($this, 'assets')
+            ),
+
+            new Twig_SimpleFunction(
+                'meta',
+                array($this, 'meta')
+            ),
+
+            // View must not have any backend-related logic
+            // new Twig_SimpleFunction('iface_url', array($this, 'iface_url')),
 
             new Twig_SimpleFunction(
                 'profiler',
@@ -50,19 +74,47 @@ class BetaKiller_Twig_Extension extends Twig_Extension {
         );
     }
 
-    public function widget(array $context, $name)
+    /**
+     * Helper for adding JS files
+     */
+    public function js()
     {
-        $widget = Widget::factory($name);
-        $widget->context($context);
-        return $widget->render();
+        $instance = JS::instance();
+
+        foreach ( func_get_args() as $js )
+        {
+            $instance->add($js);
+        }
     }
 
-    public function get_static_file($filename)
+    /**
+     * Helper for adding CSS files
+     */
+    public function css()
+    {
+        $instance = CSS::instance();
+
+        foreach ( func_get_args() as $js )
+        {
+            $instance->add($js);
+        }
+    }
+
+    /**
+     * Helper for getting link for custom static file
+     *
+     * @param string $filename
+     * @return string
+     */
+    public function get_link_to_static_file($filename)
     {
         return StaticFile::instance()->getLink($filename);
     }
 
-    public function load_assets()
+    /**
+     * Helper for adding assets
+     */
+    public function assets()
     {
         $instance = Assets::instance();
 
@@ -73,19 +125,48 @@ class BetaKiller_Twig_Extension extends Twig_Extension {
     }
 
     /**
-     * @todo генерация динамических url
-     * @param $codename
-     * @return string
+     * Helper for adding HTML meta-headers in output
+     *
+     * @param string $name
+     * @param null $value
+     * @return string|null
      */
-    public function iface_url($codename)
+    public function meta($name = NULL, $value = NULL)
     {
-        $iface = IFace::by_codename($codename);
+        $instance = Meta::instance();
 
-        return $iface->url();
+        if ( $value === NULL AND ! is_array($name) )
+        {
+            return $instance->get($name);
+        }
+        else
+        {
+            $instance->set($name, $value);
+        }
     }
+
+//    /**
+//     * @todo генерация динамических url
+//     * @param $codename
+//     * @return string
+//     */
+//    public function iface_url($codename)
+//    {
+//        $iface = IFace::by_codename($codename);
+//
+//        return $iface->url();
+//    }
 
     public function show_profiler()
     {
         return Profiler::render();
     }
+
+    public function widget(array $context, $name)
+    {
+        $widget = Widget::factory($name);
+        $widget->context($context);
+        return $widget->render();
+    }
+
 }
