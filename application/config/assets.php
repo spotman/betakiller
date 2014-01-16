@@ -68,6 +68,13 @@ return array(
         'css'       =>  'jquery/mmenu/jquery.mmenu.all.css'
     ),
 
+//    /**
+//     * @link http://www.wookmark.com/jquery-plugin
+//     */
+//    'jquery.wookmark'   => array(
+//        'js'        =>  'jquery/jquery.wookmark.min.js',
+//    ),
+//
     /**
      * @link http://getbootstrap.com/
      */
@@ -93,19 +100,33 @@ return array(
     /**
      * @link http://underscorejs.org/
      */
-    'underscore'     => array(
+    'underscore'    => array(
         'js'        =>  'underscore/underscore.js',
     ),
 
     /**
      * @link http://www.tinymce.com/
      */
-    'tinyMCE'     => array(
+    'tinyMCE'       => array(
         'js'        =>  TRUE,   // Use custom method
     ),
 
     'font.awesome'  =>  array(
         'css'       =>  'fonts/font-awesome/css/font-awesome.css'
-    )
+    ),
+
+    /**
+     * @link http://masonry.desandro.com/
+     */
+    'masonry'       => array(
+        'js'        =>  'jquery/masonry/masonry.pkgd.js',
+    ),
+
+    /**
+     * @link http://imagesloaded.desandro.com/
+     */
+    'imagesLoaded'  => array(
+        'js'        =>  'imagesLoaded/imagesloaded.pkgd.js',
+    ),
 
 );
