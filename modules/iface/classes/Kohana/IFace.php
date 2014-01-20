@@ -174,10 +174,10 @@ abstract class Kohana_IFace {
         return $this->getter_and_setter_method('_model', $model, 'model_factory');
     }
 
-    protected function model_factory()
-    {
-        return IFace_Provider::instance()->by_codename($this->_codename);
-    }
+//    protected function model_factory()
+//    {
+//        return IFace_Provider::instance()->by_codename($this->_codename);
+//    }
 
     public function is_default()
     {

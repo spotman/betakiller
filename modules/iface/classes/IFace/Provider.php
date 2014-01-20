@@ -9,6 +9,11 @@ class IFace_Provider implements IFace_Provider_Interface {
      */
     protected $_sources;
 
+    /**
+     * @var IFace_Model[]
+     */
+    protected $_model_instances = array();
+
     protected function __construct()
     {
         // TODO get actual sources from config
@@ -38,19 +43,24 @@ class IFace_Provider implements IFace_Provider_Interface {
     /**
      * Returns iface model by codename or NULL if none was found
      *
-     * @todo cache results and return (clone) $model
      * @param $codename
      * @return IFace_Model|null
      * @throws IFace_Exception
      */
     public function by_codename($codename)
     {
-        $iface_model = $this->source_exec('by_codename', $codename);
+        // Caching models
+        if ( ! isset($this->_model_instances[$codename]) )
+        {
+            $iface_model = $this->source_exec('by_codename', $codename);
 
-        if ( ! $iface_model )
-            throw new IFace_Exception('No IFace found by codename :codename', array(':codename' => $codename));
+            if ( ! $iface_model )
+                throw new IFace_Exception('No IFace found by codename :codename', array(':codename' => $codename));
 
-        return $iface_model;
+            $this->_model_instances[$codename] = $iface_model;
+        }
+
+        return $this->_model_instances[$codename];
     }
 
     /**
