@@ -109,6 +109,19 @@ class JS {
         }
     }
 
+    public function jquery_select2()
+    {
+        $this->add_static('jquery/select2/select2.js');
+
+        $lang_name = i18n::lang();
+
+        // Localize
+        if ( $lang_name != 'en' )
+        {
+            $this->add_static('jquery/select2/select2_locale_'.$lang_name.'.js');
+        }
+    }
+
 //    public function jquery_fileupload()
 //    {
 //        $this->add_static('jquery/fileupload/jquery.fileupload.js');

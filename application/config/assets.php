@@ -68,6 +68,14 @@ return array(
         'css'       =>  'jquery/mmenu/jquery.mmenu.all.css'
     ),
 
+    /**
+     * @link http://ivaynberg.github.com/select2/
+     */
+    'jquery.select2'     => array(
+        'js'        =>  TRUE,
+        'css'       =>  array('jquery/select2/select2.css', 'jquery/select2/select2-bootstrap.css')
+    ),
+
 //    /**
 //     * @link http://www.wookmark.com/jquery-plugin
 //     */
