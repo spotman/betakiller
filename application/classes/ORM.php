@@ -76,13 +76,11 @@ class ORM extends Kohana_ORM implements API_Response_Item /* , DataSource_Interf
         $pk_column = $this->primary_key();
 
         /** @var Database_Result $query */
-        $query = DB::select(array($pk_column, $search_column))
+        $query = DB::select($pk_column, $search_column)
             ->from($this->table_name())
             ->where($search_column, 'LIKE', $query.'%')
-            ->compile();
-//            ->execute();
-
-        die($query);
+//            ->compile();
+            ->execute();
 
         return $query->as_array($pk_column, $search_column);
     }

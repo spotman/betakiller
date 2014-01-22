@@ -6,7 +6,7 @@ class JSONRPC_Server extends Kohana_JSONRPC_Server {
     {
         /** @var API_Proxy $proxy_object */
 
-        return parent::prepare_named_params($proxy_object->model(), $method_name, $args);
+        return parent::prepare_params($proxy_object->model(), $method_name, $args);
     }
 
     protected function process_result($result)
