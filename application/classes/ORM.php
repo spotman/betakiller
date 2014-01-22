@@ -71,4 +71,20 @@ class ORM extends Kohana_ORM implements API_Response_Item /* , DataSource_Interf
         return $this->order_by(DB::expr('RAND()'));
     }
 
+    public function autocomplete($query, $search_column)
+    {
+        $pk_column = $this->primary_key();
+
+        /** @var Database_Result $query */
+        $query = DB::select(array($pk_column, $search_column))
+            ->from($this->table_name())
+            ->where($search_column, 'LIKE', $query.'%')
+            ->compile();
+//            ->execute();
+
+        die($query);
+
+        return $query->as_array($pk_column, $search_column);
+    }
+
 }

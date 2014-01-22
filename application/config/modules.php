@@ -14,6 +14,7 @@ return array(
 //    'dbv'                   => MODPATH.'dbv',                   // Database Version Control
     'device'                => MODPATH.'device',                // Device detection
     'email'                 => MODPATH.'email',                 // Mailing module
+    'jsonrpc'               => MODPATH.'jsonrpc',               // JSON-RPC server
     'image'                 => MODPATH.'image',                 // Image manipulation
     'static-files'          => MODPATH.'static-files',          // Static Files (JS/CSS/pictures)
     'locator'               => MODPATH.'locator',               // URL mapping to interfaces

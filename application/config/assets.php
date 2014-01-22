@@ -76,6 +76,13 @@ return array(
         'css'       =>  array('jquery/select2/select2.css', 'jquery/select2/select2-bootstrap.css')
     ),
 
+    /**
+     * @link http://github.com/slashingweapon/jsonTools
+     */
+    'jquery.jsonRPC'     => array(
+        'js'        =>  'jquery/jsonTools.js',
+    ),
+
 //    /**
 //     * @link http://www.wookmark.com/jquery-plugin
 //     */

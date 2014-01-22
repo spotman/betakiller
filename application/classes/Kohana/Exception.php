@@ -325,11 +325,13 @@ class Kohana_Exception extends Kohana_Kohana_Exception {
      * Returns text which would be shown to user on uncaught exception
      * For most of exception classes it returns NULL (we do not want to inform user about our problems)
      * For populating original message to user set up protected property $_show_original_message_to_user of your custom exception class
+     *
+     * @param bool $force_show Show original message
      * @return null|string
      */
-    public function get_user_message()
+    public function get_user_message($force_show = FALSE)
     {
-        return $this->_show_original_message_to_user
+        return $force_show OR $this->_show_original_message_to_user
             ?  $this->getMessage()
             : NULL;
     }

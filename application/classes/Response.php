@@ -144,6 +144,11 @@ class Response extends Kohana_Response {
         return $this;
     }
 
+    public function last_modified($timestamp)
+    {
+        $this->headers('last-modified', gmdate("D, d M Y H:i:s \G\M\T", $timestamp));
+    }
+
     /**
      * Sends plain text to stdout without wrapping it by template
      * @param string $string Plain text for output
