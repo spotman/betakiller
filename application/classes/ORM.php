@@ -71,18 +71,41 @@ class ORM extends Kohana_ORM implements API_Response_Item /* , DataSource_Interf
         return $this->order_by(DB::expr('RAND()'));
     }
 
-    public function autocomplete($query, $search_column)
+    /**
+     * @param string $term String to search for
+     * @param array $search_columns Columns to search where
+     * @return ORM[]
+     */
+    protected function search($term, array $search_columns)
     {
-        $pk_column = $this->primary_key();
+        $this->and_where_open();
 
-        /** @var Database_Result $query */
-        $query = DB::select($pk_column, $search_column)
-            ->from($this->table_name())
-            ->where($search_column, 'LIKE', $query.'%')
-//            ->compile();
-            ->execute();
+        foreach ( $search_columns as $search_column )
+        {
+            $this->or_where($search_column, 'LIKE', '%'.$term.'%');
+        }
 
-        return $query->as_array($pk_column, $search_column);
+        return $this->and_where_close()->find_all();
     }
 
+    protected function _autocomplete($query, array $search_fields)
+    {
+        /** @var static[] $results */
+        $results = $this->search($query, $search_fields);
+
+        $output = array();
+
+        foreach ( $results as $item )
+        {
+            $output[] = $item->autocomplete_formatter();
+        }
+
+        return $output;
+    }
+
+    protected function autocomplete_formatter()
+    {
+        throw new Kohana_Exception('Implement autocomplete_formatter for class :class_name',
+            array(':class_name' => get_class($this)));
+    }
 }

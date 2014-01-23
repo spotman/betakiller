@@ -19,7 +19,7 @@ class Auth_ORM extends Kohana_Auth_ORM {
 
             /** @var Model_User $user */
             $user = ORM::factory('User');
-            $user->search($username);
+            $user->search_by($username);
 
             if ( ! $user->loaded() )
                 throw new Auth_Exception_UserDoesNotExists;

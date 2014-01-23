@@ -117,7 +117,7 @@ class BetaKiller_Model_User extends Model_Auth_User //implements ACL_Role_Interf
      * @param $username_or_email
      * @throws HTTP_Exception_403
      */
-    public function search($username_or_email)
+    public function search_by($username_or_email)
     {
         $this->where($this->unique_key($username_or_email), '=', $username_or_email)->find();
     }
