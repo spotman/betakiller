@@ -23,12 +23,12 @@ class HTTP_Exception extends Kohana_HTTP_Exception {
             // Обнуляем view_path, чтобы оно не влияло на поиск вьюшки
             // View::reset_view_path();
 
-            // Попробуем получить вьюшку для текущего статуса ошибки
             $code = $this->getCode();
-            $view = View::factory($this->get_view_path($code));
-            $view->set('code', $code);
-            $view->set('message', HTML::chars($this->getMessage()));
-            return $view;
+
+            // Попробуем получить вьюшку для текущего статуса ошибки
+            return View::factory($this->get_view_path($code))
+                ->set('code', $code)
+                ->set('message', HTML::chars($this->getMessage()));
         }
         catch ( Exception $e )
         {

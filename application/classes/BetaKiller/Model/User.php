@@ -147,7 +147,7 @@ class BetaKiller_Model_User extends Model_Auth_User //implements ACL_Role_Interf
      */
     public function is_active()
     {
-        return ( $this->loaded() AND $this->is_active );
+        return ( $this->loaded() AND $this->get('is_active') );
     }
 
     public function get_full_name()
@@ -168,6 +168,15 @@ class BetaKiller_Model_User extends Model_Auth_User //implements ACL_Role_Interf
     public function get_email()
     {
         return $this->get('email');
+    }
+
+    /**
+     * @todo
+     * @return string
+     */
+    public function get_phone()
+    {
+        return '888888888';
     }
 
     public function get_developers_list()

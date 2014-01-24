@@ -90,7 +90,7 @@ class ORM extends Kohana_ORM implements API_Response_Item /* , DataSource_Interf
 
     protected function _autocomplete($query, array $search_fields)
     {
-        /** @var static[] $results */
+        /** @var ORM[] $results */
         $results = $this->search($query, $search_fields);
 
         $output = array();
@@ -103,6 +103,10 @@ class ORM extends Kohana_ORM implements API_Response_Item /* , DataSource_Interf
         return $output;
     }
 
+    /**
+     * @throws Kohana_Exception
+     * @return array
+     */
     protected function autocomplete_formatter()
     {
         throw new Kohana_Exception('Implement autocomplete_formatter for class :class_name',

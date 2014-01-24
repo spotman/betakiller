@@ -4,6 +4,7 @@
  * Automatically generated from previous translation file.
  */
 return array (
+  'Not implemented yet' => 'Not implemented yet',
   'Error reading session data.' => 'Error reading session data.',
   'Unknown asset :name' => 'Unknown asset :name',
   'The :property property does not exist in the :class class' => 'The :property property does not exist in the :class class',

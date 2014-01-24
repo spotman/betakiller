@@ -2,16 +2,6 @@
 
 class Model_File extends ORM
 {
-    protected $_table_name = 'files';
-
-    protected $_has_many = array(
-//        'sales_projects' => array(
-//            'model' => 'order_sales',
-//            'through' => 'orders_sales_projects_files',
-//            'far_key' => 'file_id',
-//        )
-    );
-
     public function uploads_dir()
     {
         return DOCROOT.'uploads'.DIRECTORY_SEPARATOR;

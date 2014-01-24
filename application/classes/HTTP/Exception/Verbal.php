@@ -17,29 +17,6 @@ class HTTP_Exception_Verbal extends HTTP_Exception_500 {
      */
     protected $_send_notification = FALSE;
 
-    /**
-     * Возвращает объект вьюшки
-     * @return View
-     */
-    public function get_view()
-    {
-        try
-        {
-//            // Обнуляем view_path, чтобы оно не влияло на поиск вьюшки
-//            View::reset_view_path();
-
-            // Выводим сообщение с текстом ошибки
-            $view = View::factory('errors/verbal');
-            $view->message = $this->getMessage();
-            return $view;
-        }
-        catch ( Exception $e )
-        {
-            // Иначе показываем базовое сообщение
-            return parent::get_view();
-        }
-    }
-
     protected function get_view_path($file = NULL)
     {
         return parent::get_view_path('verbal');
