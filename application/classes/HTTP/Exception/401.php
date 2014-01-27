@@ -24,9 +24,6 @@ class HTTP_Exception_401 extends Kohana_HTTP_Exception_401 {
         /** @var IFace_Auth_Login $login_iface */
         $login_iface = IFace::by_codename('Auth_Login');
 
-        // Redirect to current page after successful login
-        $login_iface->redirect_to_current_page();
-
         // Show login page
         $this->_response->send_string($login_iface);
 

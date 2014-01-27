@@ -1,6 +1,6 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
-class Model_File extends ORM
+class Model_FileOld extends ORM
 {
     public function uploads_dir()
     {

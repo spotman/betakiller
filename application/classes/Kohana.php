@@ -27,9 +27,9 @@ class Kohana extends Kohana_Core {
         return in_array(Kohana::$environment, array(Kohana::PRODUCTION, Kohana::STAGING));
     }
 
-    public static function config($key)
+    public static function config($file)
     {
-        return Kohana::$config->load($key);
+        return Kohana::$config->load($file);
     }
 
     public static function load_if_exists($file)

@@ -1,6 +1,3 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
-// TODO
-interface File_Model_Interface {
-
-}
+class Model_File extends Kohana_Model_File {}

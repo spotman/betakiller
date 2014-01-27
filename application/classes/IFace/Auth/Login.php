@@ -5,10 +5,17 @@ class IFace_Auth_Login extends IFace {
     /**
      * @var string Default url for relocate after successful login
      */
-    protected $_redirect_url = "/";
+    protected $_redirect_url = NULL;
+
+    protected $_redirect_url_query_param = 'redirect_url';
 
     public function __construct()
     {
+        $request = Request::current();
+
+        // Initialize redirect url
+        $this->_redirect_url = $request->query($this->_redirect_url_query_param) ?: $request->uri();
+
         // If user already authorized
         if ( Env::user(TRUE) )
         {
@@ -24,9 +31,18 @@ class IFace_Auth_Login extends IFace {
         );
     }
 
-    public function redirect_to_current_page()
+    public function redirect_to($redirect_url)
     {
-        $this->_redirect_url = '/'.Request::current()->uri();
+        $this->_redirect_url = $redirect_url;
+    }
+
+    public function url()
+    {
+        $redirect_query = $this->_redirect_url
+            ? '?'.$this->_redirect_url_query_param.'='.$this->_redirect_url
+            : NULL;
+
+        return parent::url().$redirect_query;
     }
 
 }
