@@ -2,20 +2,31 @@
 
 class File_Provider_Database extends File_Provider {
 
+    /**
+     * @param File_Model_Database $model
+     * @return File_Model
+     */
     public function by_model(File_Model_Database $model)
     {
-        // Getting path from model (or default path)
-        $path = $model->loaded()
-            ? $model->get_path()
+        // Getting filename from model (or default filename)
+        $filename = $model->loaded()
+            ? $model->get_filename()
             : $this->get_default();
+
+        // Getting base path for current provider
+        $base_path = $this->get_path();
+
+        // Making full path of requested file
+        $full_path = $base_path.DIRECTORY_SEPARATOR.$filename;
 
         // TODO
         $storage_codename = '';
 
         // Getting storage
-        $storage = File_Storage::factory($storage_codename);
+        $storage = $this->storage_factory($storage_codename);
 
-        // Getting File_Model from storage by path
+        // Getting File_Model from storage by full path
+        $storage->get();
     }
 
 

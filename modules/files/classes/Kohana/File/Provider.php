@@ -61,6 +61,22 @@ abstract class Kohana_File_Provider {
             : Arr::path($config, $key, $default_value);
     }
 
+    // TODO
+    public function get_path()
+    {
+        return '';
+    }
+
+    public function storage_factory($storage_codename)
+    {
+        return File_Storage::factory($storage_codename);
+    }
+
+    public function get_public_url(File_Model $model)
+    {
+        // Надо ли?
+    }
+
 //    /**
 //     * @todo
 //     * @param File_Model_Interface $file

@@ -15,5 +15,5 @@ interface File_Model_Database {
      *
      * @return string
      */
-    public function get_path();
+    public function get_filename();
 }
