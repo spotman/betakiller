@@ -38,6 +38,13 @@ interface IFace_Model {
     public function is_default();
 
     /**
+     * Returns TRUE if iface provides dynamic url mapping
+     *
+     * @return bool
+     */
+    public function has_dynamic_url();
+
+    /**
      * Returns array representation of the model data
      *
      * @return array

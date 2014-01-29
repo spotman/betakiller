@@ -1,128 +1,122 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
-class IFace_Provider implements IFace_Provider_Interface {
+class IFace_Provider {
 
     use Util_Singleton;
 
     /**
-     * @var IFace_Provider_Source[]
-     */
-    protected $_sources;
-
-    /**
-     * @var IFace_Model[]
-     */
-    protected $_model_instances = array();
-
-    protected function __construct()
-    {
-        // TODO get actual sources from config
-
-        $this->_sources = array(
-            IFace_Provider_Source::factory('DB'),
-            IFace_Provider_Source::factory('Admin'),
-        );
-    }
-
-    /**
-     * Returns default iface model in current provider
+     * Performs parsing of requested url
+     * Returns IFace
      *
-     * @return IFace_Model|null
-     * @throws IFace_Exception
+     * @param $uri
+     * @return IFace|null
+     * @throws IFace_Exception_MissingURL
      */
-    public function get_default()
+    public function parse_uri($uri)
     {
-        $default_iface = $this->source_exec('get_default');
+        $uri_parts = $uri ? explode('/', $uri) : NULL;
 
-        if ( ! $default_iface )
-            throw new IFace_Exception('No default IFace found');
-
-        return $default_iface;
-    }
-
-    /**
-     * Returns iface model by codename or NULL if none was found
-     *
-     * @param $codename
-     * @return IFace_Model|null
-     * @throws IFace_Exception
-     */
-    public function by_codename($codename)
-    {
-        // Caching models
-        if ( ! isset($this->_model_instances[$codename]) )
+        // Root requested - search for default IFace
+        if ( ! $uri_parts )
         {
-            $iface_model = $this->source_exec('by_codename', $codename);
-
-            if ( ! $iface_model )
-                throw new IFace_Exception('No IFace found by codename :codename', array(':codename' => $codename));
-
-            $this->_model_instances[$codename] = $iface_model;
+            return $this->get_default();
         }
 
-        return $this->_model_instances[$codename];
+        $parent_iface = NULL;
+        $iface_instance = NULL;
+
+        // Dispatch childs
+        // Loop through every uri part and initialize it`s iface
+        foreach ( $uri_parts as $uri_part )
+        {
+            $iface_instance = $this->by_uri($uri_part, $parent_iface);
+
+            // Throw IFace_Exception_MissingURL so we can forward user to parent iface or custom 404 page
+            if ( ! $iface_instance )
+                throw new IFace_Exception_MissingURL($uri_part, $parent_iface);
+
+            $parent_iface = $iface_instance;
+        }
+
+        // Return last IFace
+        return $iface_instance;
     }
 
     /**
-     * Performs iface model search by uri (and optional parent iface model)
+     * Performs iface search by uri (and optional parent iface model)
      *
      * @param string $uri
-     * @param IFace_Model|null $parent_model
-     * @return IFace_Model
+     * @param IFace|NULL $parent_iface
+     * @return IFace
+     * @throws IFace_Exception
      */
-    public function by_uri($uri, IFace_Model $parent_model = NULL)
+    public function by_uri($uri, IFace $parent_iface = NULL)
     {
-        $layer = $parent_model
-            ? $parent_model->get_children()
-            : $this->get_root();
+        $model_provider = $this->model_provider();
+
+        $parent_iface_model = $parent_iface ? $parent_iface->model() : NULL;
+
+        $layer = $model_provider->get_layer($parent_iface_model);
+
+        if ( ! $layer )
+            throw new IFace_Exception('Empty layer for :codename IFace',
+                array(':codename' => $parent_iface->codename())
+            );
+
+        $iface_model = NULL;
+        $dynamic_model = NULL;
 
         // First iteration through static urls
-        foreach ( $layer as $child )
+        foreach ( $layer as $iface_model )
         {
-            // Find iface by concrete uri
-            if ( $child->get_uri() == $uri )
-                return $child;
+            // Skip ifaces with dynamic urls
+            if ( $iface_model->has_dynamic_url() )
+            {
+                if ( $dynamic_model )
+                    throw new IFace_Exception('Layer must have only one IFace with dynamic dispatching');
+
+                $dynamic_model = $iface_model;
+                continue;
+            }
+
+            // IFace found by concrete uri
+            if ( $iface_model->get_uri() == $uri )
+                return $this->iface_factory($iface_model);
         }
 
-        // @TODO iteration through dynamic urls like "<category_url>"
+        // Second iteration for dynamic urls
+        if ( $dynamic_model )
+        {
+            /** @var IFace_Dispatchable $iface_instance */
+            $iface_instance = $this->iface_factory($dynamic_model);
+
+            $iface_instance->parse_uri($uri);
+
+            return $iface_instance;
+        }
 
         // Nothing found
         return NULL;
     }
 
-    /**
-     * Returns list of root elements
-     *
-     * @return IFace_Model[]
-     */
-    public function get_root()
+    public function get_default()
     {
-        $models = array();
+        $default_model = $this->model_provider()->get_default();
 
-        foreach ( $this->_sources as $source )
-        {
-            $models = array_merge($models, $source->get_root());
-        }
-
-        return $models;
+        return $this->iface_factory($default_model);
     }
 
-    protected function source_exec($method)
+    protected function iface_factory(IFace_Model $model)
     {
-        $value = NULL;
+        return IFace::factory($model);
+    }
 
-        $call_args = func_get_args();
-        array_shift($call_args);
-
-        foreach ( $this->_sources as $source )
-        {
-            $value = call_user_func_array(array($source, $method), $call_args);
-
-            if ( $value )
-                break;
-        }
-
-        return $value;
+    /**
+     * @return IFace_Model_Provider
+     */
+    protected function model_provider()
+    {
+        return IFace_Model_Provider::instance();
     }
 
 }

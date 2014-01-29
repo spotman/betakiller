@@ -1,10 +1,10 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
 
-class IFace_Provider_Source_Admin extends IFace_Provider_Source {
+class IFace_Model_Provider_Admin extends IFace_Model_Provider {
 
     /**
-     * @var IFace_Provider_Source_Admin_Model[]
+     * @var IFace_Model_Provider_Admin_Model[]
      */
     protected $_models;
 
@@ -65,7 +65,7 @@ class IFace_Provider_Source_Admin extends IFace_Provider_Source {
 
     protected function model_factory(array $config)
     {
-        return IFace_Provider_Source_Admin_Model::factory($config);
+        return IFace_Model_Provider_Admin_Model::factory($config);
     }
 
     protected function set_model(IFace_Model $model)
@@ -128,10 +128,10 @@ class IFace_Provider_Source_Admin extends IFace_Provider_Source {
     /**
      * Returns list of child nodes of $parent_model (or root nodes if none provided)
      *
-     * @param IFace_Provider_Source_Admin_Model $parent_model
+     * @param IFace_Model_Provider_Admin_Model $parent_model
      * @return array
      */
-    public function get_children(IFace_Provider_Source_Admin_Model $parent_model = NULL)
+    public function get_children(IFace_Model_Provider_Admin_Model $parent_model = NULL)
     {
         $parent_codename = $parent_model ? $parent_model->get_codename() : NULL;
 

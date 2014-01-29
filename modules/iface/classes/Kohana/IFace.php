@@ -39,7 +39,7 @@ abstract class Kohana_IFace {
         if ( ! $codename )
             throw new IFace_Exception('Can not create IFace from empty codename');
 
-        $model = IFace_Provider::instance()->by_codename($codename);
+        $model = IFace_Model_Provider::instance()->by_codename($codename);
 
         return static::factory($model);
     }
@@ -71,6 +71,12 @@ abstract class Kohana_IFace {
 
         if ( ! ($object instanceof IFace) )
             throw new IFace_Exception('Class :class must be instance of class IFace', array(':class' => $class_name));
+
+        // Check for dynamic url implementation
+        if ( $model->has_dynamic_url() AND ! ($object instanceof IFace_Dispatchable) )
+            throw new IFace_Exception('IFace :class_name has dynamic url but does not implementing IFace_Dispatchable',
+                array(':class_name' => $class_name)
+            );
 
         $object->codename($codename);
         $object->model($model);
@@ -176,7 +182,7 @@ abstract class Kohana_IFace {
 
 //    protected function model_factory()
 //    {
-//        return IFace_Provider::instance()->by_codename($this->_codename);
+//        return IFace_Model_Provider::instance()->by_codename($this->_codename);
 //    }
 
     public function is_default()
@@ -187,7 +193,7 @@ abstract class Kohana_IFace {
     // TODO
     public function url()
     {
-        $url = '/'.$this->get_url();
+        $url = '/'.$this->get_uri();
 
         $parent = $this->parent();
 
@@ -199,13 +205,15 @@ abstract class Kohana_IFace {
         return $url;
     }
 
-    protected function get_url()
+    protected function get_uri()
     {
-        $url = $this->model()->get_uri();
+        $uri = ( $this instanceof IFace_Dispatchable )
+            ? $this->make_uri()
+            : $this->model()->get_uri();
 
         // TODO replace dynamic locations with their actual values
 
-        return $url;
+        return $uri;
     }
 
     protected function get_view()
@@ -216,5 +224,13 @@ abstract class Kohana_IFace {
     protected static function get_class_prefix()
     {
         return 'IFace_';
+    }
+
+    protected function check_parent_instanceof($parent_iface_class_name)
+    {
+        if ( ! ($this->parent() instanceof $parent_iface_class_name) )
+            throw new IFace_Exception('IFace :codename must be child of :parent',
+                array(':codename' => $this->codename(), ':parent' => $parent_iface_class_name)
+            );
     }
 }

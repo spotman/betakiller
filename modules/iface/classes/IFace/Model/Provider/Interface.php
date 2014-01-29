@@ -1,6 +1,6 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
-interface IFace_Provider_Interface {
+interface IFace_Model_Provider_Interface {
 
     /**
      * Returns list of root elements
@@ -24,13 +24,14 @@ interface IFace_Provider_Interface {
      */
     public function by_codename($codename);
 
-    /**
-     * Performs iface model search by uri (and optional parent iface model)
-     *
-     * @param string $uri
-     * @param IFace_Model|null $parent_model
-     * @return IFace_Model
-     */
-    public function by_uri($uri, IFace_Model $parent_model = NULL);
+// Moved to IFace_Provider::by_uri
+//    /**
+//     * Performs iface model search by uri (and optional parent iface model)
+//     *
+//     * @param string $uri
+//     * @param IFace_Model|null $parent_model
+//     * @return IFace_Model
+//     */
+//    public function by_uri($uri, IFace_Model $parent_model = NULL);
 
 }

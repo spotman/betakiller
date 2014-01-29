@@ -134,4 +134,15 @@ class Model_IFace extends ORM implements IFace_Model {
         return $layout->get_codename();
     }
 
+    /**
+     * Returns TRUE if iface provides dynamic url mapping
+     *
+     * @return bool
+     */
+    public function has_dynamic_url()
+    {
+        return ( $this->get_uri() === NULL );
+    }
+
+
 }

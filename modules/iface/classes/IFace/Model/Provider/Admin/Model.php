@@ -1,6 +1,6 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
-class IFace_Provider_Source_Admin_Model implements IFace_Model {
+class IFace_Model_Provider_Admin_Model implements IFace_Model {
 
     protected $_codename;
 
@@ -9,6 +9,11 @@ class IFace_Provider_Source_Admin_Model implements IFace_Model {
     protected $_uri;
 
     protected $_title;
+
+    /**
+     * @var bool
+     */
+    protected $_has_dynamic_url;
 
     public static function factory($data)
     {
@@ -101,10 +106,11 @@ class IFace_Provider_Source_Admin_Model implements IFace_Model {
     public function as_array()
     {
         return array(
-            'codename'  => $this->get_codename(),
-            'uri'       => $this->get_uri(),
-            'parent'    => $this->get_parent_codename(),
-            'title'     => $this->get_title(),
+            'codename'          => $this->get_codename(),
+            'uri'               => $this->get_uri(),
+            'parent'            => $this->get_parent_codename(),
+            'title'             => $this->get_title(),
+            'has_dynamic_url'   => $this->has_dynamic_url(),
         );
     }
 
@@ -130,14 +136,29 @@ class IFace_Provider_Source_Admin_Model implements IFace_Model {
         {
             $this->_parent_codename = $data['parent_codename'];
         }
+
+        if ( isset($data['has_dynamic_url']) )
+        {
+            $this->_has_dynamic_url = TRUE;
+        }
     }
 
     /**
-     * @return IFace_Provider_Source_Admin
+     * Returns TRUE if iface provides dynamic url mapping
+     *
+     * @return bool
+     */
+    public function has_dynamic_url()
+    {
+        return (bool) $this->_has_dynamic_url;
+    }
+
+    /**
+     * @return IFace_Model_Provider_Admin
      */
     protected function get_provider()
     {
-        return IFace_Provider_Source::factory('Admin');
+        return IFace_Model_Provider::factory('Admin');
     }
 
 }
