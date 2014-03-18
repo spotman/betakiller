@@ -1,6 +1,6 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
-class Kohana_Controller_Widget extends Controller {
+class Core_Controller_Widget extends Controller {
 
     /**
      * @return static

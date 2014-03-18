@@ -1,6 +1,6 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
-abstract class Kohana_View_IFace {
+abstract class Core_View_IFace {
 
     /**
      * @var IFace

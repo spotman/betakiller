@@ -1,6 +1,6 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
-abstract class Kohana_IFace {
+abstract class Core_IFace {
 
     use Util_GetterAndSetterMethod, Util_Factory_Cached
     {

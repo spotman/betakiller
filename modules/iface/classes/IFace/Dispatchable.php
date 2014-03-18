@@ -5,7 +5,7 @@ interface IFace_Dispatchable {
     /**
      * Parses provided uri part
      *
-     * @param $uri
+     * @param string $uri
      */
     public function parse_uri($uri);
 

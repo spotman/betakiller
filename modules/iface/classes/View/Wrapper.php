@@ -8,4 +8,4 @@
  * @package BetaKiller
  * @author Spotman
  */
-class View_Wrapper extends Kohana_View_Wrapper {}
+class View_Wrapper extends Core_View_Wrapper {}

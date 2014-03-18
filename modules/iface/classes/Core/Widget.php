@@ -1,7 +1,7 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
 
-abstract class Kohana_Widget extends Controller {
+abstract class Core_Widget extends Controller {
 
     use Util_GetterAndSetterMethod;
 

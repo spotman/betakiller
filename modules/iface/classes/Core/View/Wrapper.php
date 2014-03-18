@@ -1,14 +1,14 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
 /**
- * Class Kohana_View_Wrapper
+ * Class Core_View_Wrapper
  *
  * View wrapper
  *
  * @package BetaKiller
  * @author Spotman
  */
-abstract class Kohana_View_Wrapper {
+abstract class Core_View_Wrapper {
 
     const HTML5 = 'html5';
 

@@ -43,6 +43,11 @@ class ORM extends Kohana_ORM implements API_Response_Item /* , DataSource_Interf
         return parent::load_with();
     }
 
+    public function get_id()
+    {
+        return $this->pk();
+    }
+
     /**
      * Default implementation for ORM objects
      * Override this method in child classes

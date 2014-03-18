@@ -3,7 +3,7 @@
 return array(
 
     'jquery'    =>  array(
-        'js'    =>  array('jquery/jquery-1.10.2.js', 'jquery/utils.js')
+        'js'    =>  array('jquery/jquery-1.11.0.js', 'jquery/jquery-migrate-1.2.1.js', 'jquery/utils.js')
     ),
 
     'jquery.ui'     => array(
@@ -142,6 +142,10 @@ return array(
      */
     'imagesLoaded'  => array(
         'js'        =>  'imagesLoaded/imagesloaded.pkgd.js',
+    ),
+
+    'require.js'     =>  array(
+        'js'        =>  array('require.js/require.js', 'require.js/config.js'),
     ),
 
 );
