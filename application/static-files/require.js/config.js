@@ -13,9 +13,11 @@ require.config({
         'jquery':           '../jquery/jquery-1.10.2',
         'jquery.utils':     '../jquery/utils',
 
-        'underscore':         '../underscore/underscore',
-        'backbone':           '../backbone/backbone',
-        'backbone.rpc':       '../backbone/backbone.rpc'
+        'underscore':       '../underscore/underscore',
+        'backbone':         '../backbone/backbone',
+        'backbone.rpc':     '../backbone/backbone.rpc',
+
+        'twig':             '../twig.js/twig'
     } //,
 
     //Remember: only use shim config for non-AMD scripts,
