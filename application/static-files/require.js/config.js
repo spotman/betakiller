@@ -17,7 +17,12 @@ require.config({
         'backbone':         '../backbone/backbone',
         'backbone.rpc':     '../backbone/backbone.rpc',
 
-        'twig':             '../twig.js/twig'
+        'twig':             '../twig.js/twig',
+
+        /**
+         * Кастомные контролы
+         */
+        'comboBox':         './views/comboBox'
     } //,
 
     //Remember: only use shim config for non-AMD scripts,
