@@ -27,7 +27,7 @@ IN THE SOFTWARE.*/
 // Backbone.Rpc
 // Plugin for using the backbone js library with a remote json-rpc handler
 // instead of the default REST one
-(function (root, define, require, exports, module, factory, undef) {
+(function (root, factory, undef) {
     'use strict';
     if (typeof exports === 'object') {
         // Node. Does not work with strict CommonJS, but
@@ -36,7 +36,7 @@ IN THE SOFTWARE.*/
         module.exports = factory(require('underscore'), require('backbone'), require('jquery'));
     } else if (typeof define === 'function' && define.amd) {
         // AMD. Register as an anonymous module.
-        define(['underscore', 'backbone', 'jquery'], function (_, Backbone, $) {
+        define(['underscore', 'backbone', 'jquery', 'jquery.xmlrpc'], function (_, Backbone, $) {
             // Check if
             _ = _ === undef ? root._ : _;
             Backbone = Backbone === undef ? root.Backbone : Backbone;
@@ -47,7 +47,7 @@ IN THE SOFTWARE.*/
         // Browser globals
         root.returnExportsGlobal = factory(root._, root.Backbone, root.$);
     }
-}(this, this.define, this.require, this.exports, this.module, function (_, Backbone, $, undef) {
+}(this, function (_, Backbone, $, undef) {
     'use strict';
     var Rpc = function (options) {
             // merge the users options
@@ -55,9 +55,13 @@ IN THE SOFTWARE.*/
             // check if we have a non std. namespace delimter
             this.namespaceDelimiter = options !== undef && options.namespaceDelimiter !== undef ? options.namespaceDelimiter : this.namespaceDelimiter;
             // check if we have a non std. content-type
-            this.contentType = options !== undef && options.contentType !== undef ? options.contentType : this.contentType;
+            if (options && options.isXmlRpc)
+              this.contentType = 'text/xml';
+            else
+              this.contentType = options !== undef && options.contentType !== undef ? options.contentType : this.contentType;
             // fix issue with the loss of this
-            _.bindAll(this);
+            _.bindAll(this, 'onSuccess', 'onError', 'query', 'checkMethods',
+              'invoke', 'handleExceptions');
         },
         // store the old Backbone.Model constructor for later use
         oldConst = Backbone.Model.prototype.constructor,
@@ -113,12 +117,12 @@ IN THE SOFTWARE.*/
                 }
 
                 // always only one parameter has value and second is null
-                if (data !== null && id !== String(data.id)) {
+                if (!this.options.isXmlRpc && data !== null && id !== String(data.id)) {
                     this.handleExceptions(this.exceptions.badResponseId);
                 }
 
                 // call the callback function with the result data
-                callback.apply(this, [data.result, data.error]);
+                callback.apply(this, this.options.isXmlRpc ? data : [data.result, data.error]);
             } else {
                 // fire an error
                 this.onError(data);
@@ -150,17 +154,7 @@ IN THE SOFTWARE.*/
             // check if params and the function name are ok, then...
             if ((_.isArray(params) || _.isObject(params)) && _.isString(fn)) {
                 // send query
-                ret = $.ajax({
-                    contentType : this.contentType + '; charset=' + this.charset,
-                    type        : 'POST',
-                    dataType    : 'json',
-                    url         : this.url,
-                    data        : JSON.stringify({
-                        jsonrpc : '2.0',
-                        method  : this.namespace + this.namespaceDelimiter + fn,
-                        id      : id,
-                        params  : params
-                    }),
+                var handlers = {
                     statusCode  : {
                         404: _.bind(function () { this.handleExceptions(this.exceptions['404']); }, this),
                         500: _.bind(function () { this.handleExceptions(this.exceptions['500']); }, this)
@@ -177,7 +171,37 @@ IN THE SOFTWARE.*/
                             this.onError(callback, jXhr, status, response);
                         }
                     }, this)
-                });
+                }
+
+                if (this.options.authentication) {
+                    _.extend(handlers, {
+                        beforeSend: function(xhr) {
+                            xhr.setRequestHeader("Authorization", "Basic " +
+                                btoa(this.options.authentication.username + ":"
+                                    + this.options.authentication.password));
+                        }
+                    });
+                }
+                if (this.options.isXmlRpc) {
+                    ret = $.xmlrpc(_.extend(handlers, {
+                        url: this.url,
+                        methodName: fn,
+                        params: params,
+                        context: this
+                    }));
+                } else {
+                  ret = $.ajax(_.extend(handlers, {
+                      contentType : this.contentType + '; charset=' + this.charset,
+                      type        : 'POST',
+                      dataType    : 'json',
+                      url         : this.url,
+                      data        : JSON.stringify({
+                          jsonrpc : '2.0',
+                          method  : this.namespace + this.namespaceDelimiter + fn,
+                          id      : id,
+                          params  : params
+                      })}));
+                }
             } else {
                 ret = this.handleExceptions(this.exceptions.typeMissmatch);
             }
@@ -393,9 +417,20 @@ IN THE SOFTWARE.*/
                                     storage[item._rpcId] = item;
                                 });
                             } else {
+                                if (_.isString(data))
+                                    data = JSON.parse(data);
+
+                                if (this.options.dataKeyPath &&
+                                    data[this.options.dataKeyPath]) {
+                                    data = data[this.options.dataKeyPath]
+                                }
                                 _.each(data, function (item, key) {
-                                    storage[key] = item;
-                                });
+                                    if (this.options.idKeyPath) {
+                                        storage[item[this.options.idKeyPath]] =
+                                            item;
+                                    } else
+                                        storage[key] = item;
+                                }, this);
                             }
                         }
                     }
@@ -420,10 +455,10 @@ IN THE SOFTWARE.*/
                     options.success(data);
                 },
 
-                    // define a local error callback that will hand over the data to the backbone error handler
-                    errorCb = function (data) {
-                        options.error(model, data);
-                    };
+                // define a local error callback that will hand over the data to the backbone error handler
+                errorCb = function (data) {
+                    options.error(model, data);
+                };
 
                 // check if we have a correct (e.g. Backbone.Rpc) model instance
                 if (model.rpc instanceof Rpc) {

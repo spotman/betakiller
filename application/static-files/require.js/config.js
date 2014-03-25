@@ -16,8 +16,14 @@ require.config({
         'underscore':       '../underscore/underscore',
         'backbone':         '../backbone/backbone',
         'backbone.rpc':     '../backbone/backbone.rpc',
+        'geppetto':         '../backbone/backbone.geppetto',
+        'backbone.subroute':'../backbone/backbone.subroute',
 
-        'twig':             '../twig.js/twig',
+        'twig':             '../twig.js/twig.wrapper',
+        'twig.original':    '../twig.js/twig',
+
+        'api.rpc':          '../api/rpc.definition',
+        'jquery.jsonRPC':   '../api/jquery.jsonRPC',
 
         /**
          * Кастомные контролы
