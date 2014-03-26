@@ -60,6 +60,9 @@ class ORM extends Kohana_ORM implements API_Response_Item /* , DataSource_Interf
     }
 
     /**
+     * Default implementation for ORM objects
+     * Override this method in child classes
+     *
      * @return NULL
      */
     public function get_last_modified()

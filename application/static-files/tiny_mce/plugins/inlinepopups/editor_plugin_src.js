@@ -551,7 +551,7 @@
 			}
 
 			if (w = t.windows[id]) {
-				t.onClose.dispatch(t);
+				t.onCloseCallback.dispatch(t);
 				Event.remove(d, 'mousedown', w.mousedownFunc);
 				Event.remove(d, 'click', w.clickFunc);
 				Event.clear(id);

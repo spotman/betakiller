@@ -16277,7 +16277,7 @@ tinymce.ForceBlocks = function(editor) {
 
 			t.editor = ed;
 			t.onOpen = new Dispatcher(t);
-			t.onClose = new Dispatcher(t);
+			t.onCloseCallback = new Dispatcher(t);
 			t.params = {};
 			t.features = {};
 		},
@@ -16347,7 +16347,7 @@ tinymce.ForceBlocks = function(editor) {
 
 		close : function(w) {
 			w.close();
-			this.onClose.dispatch(this);
+			this.onCloseCallback.dispatch(this);
 		},
 
 		createInstance : function(cl, a, b, c, d, e) {
