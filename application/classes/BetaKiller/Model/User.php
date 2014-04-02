@@ -48,12 +48,25 @@ class BetaKiller_Model_User extends Model_Auth_User //implements ACL_Role_Interf
         return $this->get('password');
     }
 
+    /**
+     * @return bool
+     */
     public function is_developer()
     {
         return $this->has_role('developer');
     }
 
     /**
+     * @return bool
+     */
+    public function is_moderator()
+    {
+        return $this->has_role('moderator');
+    }
+
+    /**
+     * TODO Переписать на кешированный ACL ибо слишком затратно делать запрос в БД на проверку роли
+     *
      * @param Model_Role|string $role
      * @return bool
      */
@@ -171,12 +184,18 @@ class BetaKiller_Model_User extends Model_Auth_User //implements ACL_Role_Interf
     }
 
     /**
-     * @todo
+     * Возвращает основной номер телефона
+     *
      * @return string
      */
     public function get_phone()
     {
-        return '888888888';
+        return $this->get('phone');
+    }
+
+    public function set_phone($number)
+    {
+        return $this->set('phone', $number);
     }
 
     public function get_developers_list()

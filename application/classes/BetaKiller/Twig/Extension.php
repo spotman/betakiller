@@ -142,6 +142,7 @@ class BetaKiller_Twig_Extension extends Twig_Extension {
         else
         {
             $instance->set($name, $value);
+            return NULL;
         }
     }
 
