@@ -8,13 +8,14 @@ return array(
     'multi-site'            => MODPATH.'multi-site',            // Multiple apps on top of single engine
 
     'api'                   => MODPATH.'api',                   // API subsystem
+    'assets'                => MODPATH.'assets',                // Asset management subsystem
     'auth'                  => MODPATH.'auth',                  // Basic authentication
     'cache'                 => MODPATH.'cache',                 // Caching with multiple backends
     'database'              => MODPATH.'database',              // Database access
 //    'dbv'                   => MODPATH.'dbv',                   // Database Version Control
     'device'                => MODPATH.'device',                // Device detection
     'email'                 => MODPATH.'email',                 // Mailing module
-    'files'                 => MODPATH.'files',                 // Files managing (assets, public deploy, etc)
+//    'files'                 => MODPATH.'files',                 // Files managing (assets, public deploy, etc)
     'jsonrpc'               => MODPATH.'jsonrpc',               // JSON-RPC server
     'image'                 => MODPATH.'image',                 // Image manipulation
     'static-files'          => MODPATH.'static-files',          // Static Files (JS/CSS/pictures)

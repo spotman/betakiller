@@ -14,11 +14,23 @@ trait Util_Factory {
 
     protected static function instance_factory($name)
     {
-        $class_name = __CLASS__.'_'.$name;
+        $class_name = static::make_instance_class_name($name);
 
         if ( ! class_exists($class_name) )
             throw new HTTP_Exception_500('Class :class is absent');
 
+        $args = array_merge(array($class_name), func_get_args());
+
+        return forward_static_call_array(array('static', 'make_instance'), $args);
+    }
+
+    protected static function make_instance_class_name($name)
+    {
+        return __CLASS__.'_'.$name;
+    }
+
+    protected static function make_instance($class_name)
+    {
         return new $class_name;
     }
 

@@ -1,3 +1,3 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
-abstract class File_Provider extends Kohana_File_Provider {}
+class Assets_Provider_Exception extends Assets_Exception {}
