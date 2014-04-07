@@ -1,3 +1,6 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
-class File_Storage_Exception extends File_Exception {}
+
+class Assets_Storage_CFS extends Assets_Storage {
+
+}

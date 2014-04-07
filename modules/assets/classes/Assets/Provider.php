@@ -30,8 +30,33 @@ abstract class Assets_Provider {
     }
 
     /**
+     * @param array $_file Item from $_FILES
+     * @return Assets_File_Model
+     * @throws Assets_Provider_Exception
+     */
+    public function upload(array $_file)
+    {
+        // Check permissions
+        if ( ! $this->check_upload_permissions() )
+            throw new Assets_Provider_Exception("Upload is not allowed");
+
+        // TODO Get file content
+        $content = '';
+
+
+        $model = $this->file_model_factory();
+
+        // TODO Put data into model
+
+        // Place file into storage
+        $this->get_storage()->put($model, $content);
+
+        // Save model
+        $model->save();
+    }
+
+    /**
      * @param Assets_File_Model $model
-     * @return bool
      * @throws Assets_Provider_Exception
      */
     public function delete(Assets_File_Model $model)
@@ -40,16 +65,30 @@ abstract class Assets_Provider {
         if ( ! $this->check_delete_permissions($model) )
             throw new Assets_Provider_Exception("Delete is not allowed");
 
-        // TODO Remove file from storage
+        // Remove file from storage
+        $this->get_storage()->delete($model);
 
-        // TODO Remove model
+        // Remove model
         $model->delete();
-
-        return TRUE;
     }
 
-    // TODO
-    abstract protected function get_storage(Assets_File_Model $model);
+    /**
+     * @return Assets_Storage
+     */
+    abstract protected function get_storage();
+
+    /**
+     * Creates empty file model
+     *
+     * @return Assets_File_Model
+     */
+    abstract protected function file_model_factory();
+
+    /**
+     * TODO
+     * @return bool
+     */
+    abstract protected function check_upload_permissions();
 
     /**
      * @param Assets_File_Model $model

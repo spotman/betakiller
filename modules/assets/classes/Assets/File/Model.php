@@ -12,7 +12,7 @@ interface Assets_File_Model {
      *
      * @return string
      */
-    public function get_filename();
+    public function get_full_path();
 
     /**
      * Returns User model, who uploaded the file
