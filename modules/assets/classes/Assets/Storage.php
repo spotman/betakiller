@@ -1,7 +1,7 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
 /**
- * TODO Class Assets_Storage
+ * Class Assets_Storage
  * Abstract storage for assets
  */
 abstract class Assets_Storage {
@@ -18,11 +18,7 @@ abstract class Assets_Storage {
         if ( ! class_exists($class_name) )
             throw new Assets_Storage_Exception('Unknown storage :class', array(':class' => $class_name));
 
-        $instance = new $class_name($codename);
-
-        // TODO
-
-        return $instance;
+        return new $class_name;
     }
 
     /**
@@ -60,7 +56,6 @@ abstract class Assets_Storage {
 
         $this->_delete($file_path);
     }
-
 
     /**
      * Returns content of the file

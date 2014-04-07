@@ -4,26 +4,41 @@ class Controller_Assets extends Controller {
 
     public function action_upload()
     {
-        $provider_codename = $this->param('provider');
+        // This method responds via JSON (all exceptions will be caught automatically)
+        $this->content_type_json();
 
-        /** @var Assets_Provider $provider */
-        $provider = Assets_Provider::factory($provider_codename);
+        // Restrict multiple files at once
+        if (count($_FILES) > 1)
+            throw new Assets_Exception('Only one file can be uploaded at once');
 
-        foreach ( $_FILES as $_file )
-        {
-            if ( $this->check_uploaded_file($_file) )
-            {
-                $provider->upload($_file);
-            }
+        $provider = $this->provider_factory();
 
-            var_dump($_file);
-        }
+        // Getting first uploaded file
+        $_file = array_shift($_FILES);
+
+        // Uploading via provider
+        $model = $provider->upload($_file);
+
+        // Returns
+        $this->send_json(self::JSON_SUCCESS, $model->as_array());
     }
 
-    protected function check_uploaded_file($_file)
+    public function action_download()
     {
-        // TODO Security checks
-        return TRUE;
+        $provider = $this->provider_factory();
+
+        // TODO
+    }
+
+    protected function provider_factory()
+    {
+        $provider_codename = $this->param('provider');
+
+        if ( ! $provider_codename )
+            throw new Assets_Exception('You must specify provider codename');
+
+        /** @var Assets_Provider $provider */
+        return Assets_Provider::factory($provider_codename);
     }
 
 }
