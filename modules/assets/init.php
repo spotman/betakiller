@@ -1,12 +1,12 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
 /**
- * Uploading/downloading files to concrete provider
+ * Uploading/downloading/deleting files via concrete provider
  *
- * "assets/<provider>/upload"
- * "assets/<provider>/download"
+ * "assets/upload/<provider>"
+ * "assets/public/<provider>/<hash>"
  */
-Route::set('assets-provider-action', 'assets/<provider>/<action>', array('action' => '(upload|download)'))
+Route::set('assets-provider-action', 'assets/<action>/<provider>(/<hash>)', array('action' => '(upload|public|delete)'))
     ->defaults(array(
         'module'        => 'assets',
         'controller'    => 'Assets',

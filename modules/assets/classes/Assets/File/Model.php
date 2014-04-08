@@ -107,4 +107,12 @@ interface Assets_File_Model {
      */
     public function as_array();
 
+    /**
+     * Performs file model search by hash
+     *
+     * @param string $hash
+     * @return Assets_File_Model|NULL
+     */
+    public function by_hash($hash);
+
 }

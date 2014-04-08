@@ -44,7 +44,6 @@ abstract class Assets_File_Model_ORM extends ORM implements Assets_File_Model {
      */
     public function make_hash()
     {
-        var_dump($this->get_original_name());
         $hash = md5(microtime() . $this->get_original_name());
         return $this->set('hash', $hash);
     }
@@ -123,16 +122,15 @@ abstract class Assets_File_Model_ORM extends ORM implements Assets_File_Model {
     }
 
     /**
-     * Returns array representation of the model
+     * Performs file model search by hash
      *
-     * @return array
+     * @param string $hash
+     * @return Assets_File_Model|NULL
      */
-    public function as_array()
+    public function by_hash($hash)
     {
-        return array(
-            'id'    =>  $this->pk(),
-        );
+        $model = $this->where('hash', '=', $hash)->find();
+        return $model->loaded() ? $model : NULL;
     }
-
 
 }

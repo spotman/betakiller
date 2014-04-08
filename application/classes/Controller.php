@@ -219,36 +219,28 @@ abstract class Controller extends Controller_Proxy {
     /**
      * Отправляет файл в stdout для скачивания, с правильными заголовками
      *
-     * @param string $path Директория, в которой лежит файл
-     * @param string $filename Имя файла в файловой системе
-     * @param string $mime_type Тип файла, который будет отправлен в stdout
+     * @param string $content String content of the file
+     * @param string $mime_type MIME-type
      * @param string $alias Имя файла, под которым файл появится у пользователя в браузере
-     * @throws HTTP_Exception_404
-     * @todo refactor to Request::send_file
+     * @param bool $force_download
+     * @throws HTTP_Exception_500
      */
-    protected function send_file($path, $filename, $mime_type = NULL, $alias = NULL)
+    protected function send_file($content, $mime_type = NULL, $alias = NULL, $force_download = FALSE)
     {
-        $fullpath = rtrim($path, '/') .DIRECTORY_SEPARATOR . $filename;
-
-        $content = @ file_get_contents($fullpath);
-
         if ( ! $content )
-            throw new HTTP_Exception_404();
+            throw new HTTP_Exception_500('Content is empty');
 
-        if ( ! $mime_type )
+        $response = $this->response();
+
+        $response->body($content);
+
+        $response->headers('Content-Type', $mime_type ?: 'application/octet-stream');
+        $response->headers('Content-Length', strlen($content) );
+
+        if ( $force_download )
         {
-            $mime_type = "application/octet-stream";
+            $response->headers('Content-Disposition', 'attachment; filename='.$alias);
         }
-
-        if ( ! $alias )
-        {
-            $alias = $filename;
-        }
-
-        $this->response->headers('Content-Type', $mime_type);
-        $this->response->headers("Content-Disposition", "attachment; filename=$alias");
-
-        $this->send_string($content);
     }
 
     public static function bind_after(callable $callback)

@@ -31,10 +31,44 @@ abstract class Assets_Provider {
      */
     public function get_upload_url()
     {
-        return Route::url('assets-provider-action', array(
+        return $this->get_url('upload');
+    }
+
+    /**
+     * Returns public URL for provided model
+     *
+     * @param Assets_File_Model $model
+     * @return string
+     */
+    public function get_public_url(Assets_File_Model $model)
+    {
+        return $this->get_url('public', $model);
+    }
+
+    /**
+     * Returns URL for deleting provided file
+     *
+     * @param Assets_File_Model $model
+     * @return string
+     */
+    public function get_delete_url(Assets_File_Model $model)
+    {
+        return $this->get_url('delete', $model);
+    }
+
+    protected function get_url($action, Assets_File_Model $model = NULL)
+    {
+        $options = array(
             'provider'  =>  $this->_codename,
-            'action'    =>  'upload'
-        ));
+            'action'    =>  $action,
+        );
+
+        if ( $model )
+        {
+            $options['hash'] = $model->get_hash();
+        }
+
+        return Route::url('assets-provider-action', $options);
     }
 
     /**
@@ -52,11 +86,12 @@ abstract class Assets_Provider {
         if ( ! $this->check_upload_permissions() )
             throw new Assets_Provider_Exception("Upload is not allowed");
 
-        $full_path =    $_file['tmp_name'];
+        $full_path = $_file['tmp_name'];
+        $safe_name = strip_tags($_file['name']);
 
         // Put data into model
         $model = $this->file_model_factory()
-            ->set_original_name($_file['name'])
+            ->set_original_name($safe_name)
             ->make_hash()
             ->set_size(filesize($full_path))
             ->set_mime($_file['type'])  // TODO Get type from file analysis, not from request
@@ -78,6 +113,16 @@ abstract class Assets_Provider {
     }
 
     /**
+     * Additional upload processing
+     *
+     * @param Assets_File_Model $model
+     */
+    protected function _upload($model)
+    {
+        // Empty by default
+    }
+
+    /**
      * @param Assets_File_Model $model
      * @throws Assets_Provider_Exception
      */
@@ -87,11 +132,65 @@ abstract class Assets_Provider {
         if ( ! $this->check_delete_permissions($model) )
             throw new Assets_Provider_Exception("Delete is not allowed");
 
+        // Custom delete processing
+        $this->_delete($model);
+
         // Remove file from storage
         $this->get_storage()->delete($model);
 
         // Remove model
         $model->delete();
+    }
+
+    /**
+     * Additional delete processing
+     *
+     * @param Assets_File_Model $model
+     */
+    protected function _delete($model)
+    {
+        // Empty by default
+    }
+
+    /**
+     * Returns asset file model with provided hash
+     *
+     * @param $hash
+     * @return Assets_File_Model|NULL
+     * @throws Assets_Provider_Exception
+     */
+    public function get_model_by_hash($hash)
+    {
+        // Find model by hash
+        $model = $this->file_model_factory()->by_hash($hash);
+
+        if ( ! $model )
+            throw new Assets_Provider_Exception('Can not find file with hash = :hash', array(':hash' => $hash));
+
+        return $model;
+    }
+
+    /**
+     * Returns content of the file
+     *
+     * @param Assets_File_Model $model
+     * @return string
+     */
+    public function get_content(Assets_File_Model $model)
+    {
+        // Get file from storage
+        return $this->get_storage()->get($model);
+    }
+
+    /**
+     * Update content of the file
+     *
+     * @param Assets_File_Model $model
+     * @param string $content
+     */
+    public function set_content(Assets_File_Model $model, $content)
+    {
+        $this->get_storage()->put($model, $content);
     }
 
     /**
@@ -139,18 +238,11 @@ abstract class Assets_Provider {
     abstract protected function check_upload_permissions();
 
     /**
-     * Additional upload processing
-     *
-     * @param Assets_File_Model $model
-     */
-    abstract protected function _upload(Assets_File_Model $model);
-
-    /**
      * Returns TRUE if delete operation granted
      *
      * @param Assets_File_Model $model
      * @return bool
      */
-    abstract protected function check_delete_permissions(Assets_File_Model $model);
+    abstract protected function check_delete_permissions($model);
 
 }
