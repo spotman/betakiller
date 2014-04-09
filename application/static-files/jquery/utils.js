@@ -1,58 +1,108 @@
 (function( $ ){
 
-    $.JSON = function(type, url, data, success_callback, error_callback, options)
+    $.JSON = new function()
     {
-        if ( typeof(data) == "function" )
+        this.handler = function(r, success_callback, error_callback)
         {
-            options = error_callback;
-            error_callback = success_callback;
-            success_callback = data;
-        }
-
-        options = options || {};
-
-        var config = {
-            url: url,
-            data: data,
-            // dataType: "json",
-            type: type,
-            success: function(r)
+            if ( ! r || ! r.response )
             {
-                if ( ! r || ! r.response )
-                {
-                    console.error("Empty response from " + url, r, data);
-                    error_callback && error_callback(null);
-                    return;
-                }
-
-                switch ( r.response )
-                {
-                    case "ok":
-                        success_callback && success_callback(r.message);
-                        break;
-
-                    case "error":
-                        error_callback && error_callback(r.message);
-                        break;
-
-                    case "auth":
-                        window.top.location.href = '/logout';
-                        break;
-
-                    case "refresh":
-                        window.top.location.href = '/';
-                        break;
-
-                    default:
-                        console.error("Unknown response [" + r.response + "] in " + url, data);
-                        error_callback && error_callback(null);
-                }
+                error_callback && error_callback(null);
+                throw new Error("Empty response");
             }
+
+            switch ( r.response )
+            {
+                case "ok":
+                    success_callback && success_callback(r.message);
+                    break;
+
+                case "error":
+                    error_callback && error_callback(r.message);
+                    break;
+
+                case "auth":
+                    window.top.location.href = '/logout';
+                    break;
+
+                case "refresh":
+                    window.top.location.href = '/';
+                    break;
+
+                default:
+                    error_callback && error_callback(null);
+                    throw new Error("Unknown response [" + r.response + "]");
+            }
+
         };
 
-        return this.ajax( $.extend(config, options))
-            .fail(function(){ error_callback && error_callback(null) });
+        this.request = function(type, url, data, success_callback, error_callback, options)
+        {
+            if ( typeof(data) == "function" )
+            {
+                options = error_callback;
+                error_callback = success_callback;
+                success_callback = data;
+            }
+
+            options = options || {};
+
+            var _handler = this.handler;
+
+            var config = {
+                url: url,
+                data: data,
+                // dataType: "json",
+                type: type,
+                success: function(data)
+                {
+                    try
+                    {
+                        _handler(data, success_callback, error_callback);
+                    }
+                    catch(e)
+                    {
+                        console.error(e.message, url, r, data);
+                    }
+                }
+            };
+
+            return this.ajax( $.extend(config, options))
+                .fail(function(){ error_callback && error_callback(null) });
+        };
+
+
+        /**
+         * POST-request to universal JSON gateway
+         *
+         * @param url
+         * @param data
+         * @param success_callback
+         * @param error_callback
+         * @param options
+         * @returns {deferred}
+         */
+        this.post = function(url, data, success_callback, error_callback, options)
+        {
+            return this.request("post", url, data, success_callback, error_callback, options);
+        };
+
+        /**
+         * GET-request to universal JSON gateway
+         *
+         * @param url
+         * @param data
+         * @param success_callback
+         * @param error_callback
+         * @param options
+         * @returns {*}
+         */
+        this.get = function(url, data, success_callback, error_callback, options)
+        {
+            return this.request("get", url, data, success_callback, error_callback, options);
+        };
+
     };
+
 
     // Хелперы к jquery.pnotify
     $.notify = {

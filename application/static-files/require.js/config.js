@@ -10,6 +10,8 @@ require.config({
         'jquery.iframe-transport':  '../jquery/fileupload/jquery.iframe-transport',
         'jquery.fileupload.bundle': '../jquery/fileupload/jquery.fileupload.bundle',
 
+        'load-image':               '../load-image/load-image',
+
 
         'underscore':               '../underscore/underscore',
         'backbone':                 '../backbone/backbone',

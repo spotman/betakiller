@@ -4,7 +4,7 @@
 
     function {{ auth_callback }}(token)
     {
-        $.JSON("post", "{{ token_login_url }}", { token: token },
+        $.JSON.post("{{ token_login_url }}", { token: token },
                 function()
                 {
                     location.href = "{{ redirect_url }}";

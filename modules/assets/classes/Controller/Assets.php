@@ -25,7 +25,7 @@ class Controller_Assets extends Controller {
         $model = $provider->upload($_file);
 
         // Returns
-        $this->send_json(self::JSON_SUCCESS, $model->as_array());
+        $this->send_json(self::JSON_SUCCESS, $model->to_json());
     }
 
     public function action_public()

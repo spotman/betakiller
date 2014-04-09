@@ -105,7 +105,7 @@ interface Assets_File_Model {
      *
      * @return array
      */
-    public function as_array();
+    public function to_json();
 
     /**
      * Performs file model search by hash

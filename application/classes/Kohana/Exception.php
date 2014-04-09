@@ -331,7 +331,7 @@ class Kohana_Exception extends Kohana_Kohana_Exception {
      */
     public function get_user_message($force_show = FALSE)
     {
-        return $force_show OR $this->_show_original_message_to_user
+        return ( $force_show OR $this->_show_original_message_to_user )
             ?  $this->getMessage()
             : NULL;
     }

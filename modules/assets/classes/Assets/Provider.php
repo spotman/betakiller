@@ -78,13 +78,22 @@ abstract class Assets_Provider {
      */
     public function upload(array $_file)
     {
-        // Security checks
-        if ( ! Upload::not_empty($_file) OR ! Upload::valid($_file) )
-            throw new Assets_Provider_Exception('Incorrect file, upload rejected');
-
         // Check permissions
         if ( ! $this->check_upload_permissions() )
             throw new Assets_Provider_Exception("Upload is not allowed");
+
+        // Security checks
+        if ( ! Upload::not_empty($_file) OR ! Upload::valid($_file) )
+        {
+            // TODO Разные сообщения об ошибках в тексте исключения (файл слишком большой, итд)
+            throw new Assets_Exception_Upload('Incorrect file, upload rejected');
+        }
+
+        // TODO Get type from file analysis, not from request
+        $mime_type = HTML::chars( strip_tags($_file['type']) );
+
+        // MIME-type check
+        $this->check_allowed_mime_types($mime_type);
 
         $full_path = $_file['tmp_name'];
         $safe_name = strip_tags($_file['name']);
@@ -94,7 +103,7 @@ abstract class Assets_Provider {
             ->set_original_name($safe_name)
             ->make_hash()
             ->set_size(filesize($full_path))
-            ->set_mime($_file['type'])  // TODO Get type from file analysis, not from request
+            ->set_mime($mime_type)
             ->set_uploaded_by($this->_get_current_user());
 
         // Custom processing
@@ -137,6 +146,8 @@ abstract class Assets_Provider {
 
         // Remove file from storage
         $this->get_storage()->delete($model);
+
+        // TODO Cleanup deploy folder
 
         // Remove model
         $model->delete();
@@ -215,6 +226,51 @@ abstract class Assets_Provider {
 
         return $this->_storage_instance;
     }
+
+    /**
+     * Returns TRUE if MIME-type is allowed in current provider
+     *
+     * @param string $mime MIME-type
+     * @throws Assets_Provider_Exception
+     */
+    protected function check_allowed_mime_types($mime)
+    {
+        $allowed_mimes = $this->get_allowed_mime_types();
+
+        // All MIMEs are allowed
+        if ( $allowed_mimes === TRUE )
+            return;
+
+        if ( ! is_array($allowed_mimes) )
+            throw new Assets_Provider_Exception('Allowed MIME-types in :codename provider must be an array() or TRUE',
+                array(':codename' => $this->_codename)
+            );
+
+        // Check allowed MIMEs
+        foreach ( $allowed_mimes as $allowed )
+        {
+            if ( $mime == $allowed )
+                return;
+        }
+
+        $allowed_extensions = array();
+
+        foreach ( $allowed_mimes as $allowed_mime )
+        {
+            $allowed_extensions = array_merge($allowed_extensions, File::exts_by_mime($allowed_mime));
+        }
+
+        throw new Assets_Exception_Upload('You may upload files with :ext extensions only',
+            array(':ext' => implode(', ', $allowed_extensions))
+        );
+    }
+
+    /**
+     * Returns list of allowed MIME-types (or TRUE if all MIMEs are allowed)
+     *
+     * @return array|TRUE
+     */
+    abstract protected function get_allowed_mime_types();
 
     /**
      * Returns concrete storage for current provider

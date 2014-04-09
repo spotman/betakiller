@@ -3,7 +3,7 @@
 {% set unique_dom_id = random(1000000) %}
 
 <div id="{{ unique_dom_id }}" class="span4 offset4 well">
-    <legend>{{ __('Sign in') }}</legend>
+    <h1>{{ __('Sign in') }}</h1>
     <div class="alert alert-error hide"></div>
     <form method="POST" data-action="{{ login_url }}" id="login-form" accept-charset="UTF-8">
         <input type="text" id="user-login" name="user-login" class="span4" placeholder="{{ __('Your username or email') }}" value="{{ username|default() }}" />
@@ -35,7 +35,7 @@
 
             if (login == '' || password == '')
             {
-                return false;
+                return;
             }
 
             // Прячем уведомление об ошибке и выключаем кнопку
@@ -44,7 +44,7 @@
 
             var form = $('#login-form');
 
-            $.JSON("post", form.data('action'), { "user-login": login, "user-password": password },
+            $.JSON.post(form.data('action'), { "user-login": login, "user-password": password },
                     function()
                     {
                         // Всё в порядке, перенаправляем пользователя
