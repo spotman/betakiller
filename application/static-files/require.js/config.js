@@ -12,7 +12,6 @@ require.config({
 
         'load-image':               '../load-image/load-image',
 
-
         'underscore':               '../underscore/underscore',
         'backbone':                 '../backbone/backbone',
         'backbone.rpc':             '../backbone/backbone.rpc',
