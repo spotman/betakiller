@@ -66,7 +66,7 @@
                 }
             };
 
-            return this.ajax( $.extend(config, options))
+            return $.ajax( $.extend(config, options))
                 .fail(function(){ error_callback && error_callback(null) });
         };
 
