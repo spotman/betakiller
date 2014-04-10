@@ -102,11 +102,7 @@ class Controller_Staticfiles extends Controller {
 
     protected function replace_url($text)
     {
-        return str_replace(
-            array('{staticfiles_url}', '{# assets_base_url #}'),
-            STATICFILES_URL,
-            $text
-        );
+        return StaticFile::replace_keys($text);
     }
 
     static public function get_config()

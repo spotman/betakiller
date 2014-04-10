@@ -122,7 +122,7 @@ class Kohana_StaticCss extends StaticFile {
 	 */
 	protected function prepareCss($style, $url)
 	{
-		$style = str_replace('{staticfiles_url}', STATICFILES_URL, $style);
+        $style = static::replace_keys($style);
 
 		if ($this->_config->css['min'])
 		{

@@ -1,6 +1,6 @@
 require.config({
 
-    baseUrl: '{staticfiles_url}require.js',
+    baseUrl: '{# assets_base_url #}require.js',
     paths: {
         'jquery':                   '../jquery/jquery-1.10.2',
         'jquery.utils':             '../jquery/utils',

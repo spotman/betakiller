@@ -15,6 +15,7 @@ class Controller_Error_PhpMessage extends Controller_Developer {
 
         $hash = $this->request->param("hash");
 
+        /** @var Model_Error_Message_Php model */
         $this->model = Mango::factory("Error_Message_Php");
 
         // Пробуем найти ошибку по её хешу
@@ -29,7 +30,7 @@ class Controller_Error_PhpMessage extends Controller_Developer {
      */
     public function action_show()
     {
-        $this->jquery()->bootstrap();
+        // $this->jquery()->bootstrap();
 
         $content = $this->view('message');
 

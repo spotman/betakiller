@@ -43,6 +43,8 @@ class Kohana_StaticFile {
 		fwrite($f, $data);
 
 		fclose($f);
+
+        chmod($file, 0775);
 	}
 
 	/**
@@ -112,7 +114,7 @@ class Kohana_StaticFile {
 
 		if ( ! file_exists(dirname($cache_file)))
 		{
-			mkdir(dirname($cache_file), 0755, TRUE);
+			mkdir(dirname($cache_file), 0775, TRUE);
 		}
 
 		return $cache_file;
@@ -161,9 +163,19 @@ class Kohana_StaticFile {
 
 		foreach($cache_paths as $path)
 		{
+            // TODO correct docroot
 			$path = DOCROOT . trim(preg_replace('/\//', DIRECTORY_SEPARATOR, $path), '\\');
 			File::rmdir($path, TRUE);
 		}
 	}
+
+    public static function replace_keys($str)
+    {
+        return str_replace(
+            array('{staticfiles_url}', '{# assets_base_url #}'),
+            STATICFILES_URL,
+            $str
+        );
+    }
 
 } // END Kohana_StaticFile

@@ -6,8 +6,9 @@ $host = ( isset($_SERVER['HTTP_HOST']) ) ? $_SERVER['HTTP_HOST'] : '';
 // Turn on the minimization and building in production environment
 $in_production = in_array( Kohana::$environment, array(Kohana::PRODUCTION, Kohana::STAGING) );
 
-$build = $in_production;
-$minimize = TRUE;
+// TODO
+$build = FALSE && $in_production;
+$minimize = FALSE;
 
 return array(
 
@@ -35,7 +36,7 @@ return array(
     ),
 
     // Full path to site DOCROOT
-    'path' => realpath(DOCROOT). DIRECTORY_SEPARATOR,
+    'path' => realpath($_SERVER['DOCUMENT_ROOT']). DIRECTORY_SEPARATOR,
 
     // Path to copy static files that are not build in one file
     'url' => '/!/static/',

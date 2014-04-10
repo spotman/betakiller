@@ -288,7 +288,7 @@ class Kohana_StaticJs extends StaticFile {
 	 */
 	public function prepare($js_code)
 	{
-		return str_replace('{staticfiles_url}', STATICFILES_URL, $js_code);
+        return static::replace_keys($js_code);
 	}
 
 	/**
