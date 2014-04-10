@@ -226,7 +226,7 @@ class Kohana_Exception extends Kohana_Kohana_Exception {
 
     static public function make_email(Model_Error_Message_Php $model)
     {
-        $host = isset($_SERVER["HTTP_HOST"]) ? $_SERVER["HTTP_HOST"] : "k.planet.web";
+        $host = isset($_SERVER["HTTP_HOST"]) ? $_SERVER["HTTP_HOST"] : "localhost";
 
         ob_start();
 ?>
@@ -318,7 +318,7 @@ class Kohana_Exception extends Kohana_Kohana_Exception {
      */
     protected function get_view_path($file = NULL)
     {
-        return 'error/error-pages/'. ($file ?: 500);
+        return 'error-pages/'. ($file ?: 500);
     }
 
     /**
