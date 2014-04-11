@@ -14,7 +14,7 @@ class IFace_Auth_Login extends IFace {
         $request = Request::current();
 
         // Initialize redirect url
-        $this->_redirect_url = $request->query($this->_redirect_url_query_param) ?: $request->uri();
+        $this->_redirect_url = $request->query($this->_redirect_url_query_param) ?: '/'.$request->uri();
 
         // If user already authorized
         if ( Env::user(TRUE) )
