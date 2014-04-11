@@ -6,6 +6,8 @@ require.config({
         'jquery.utils':             '../jquery/utils',
         'jquery.ui.widget':         '../jquery/ui/jquery.ui.widget',
 
+        'jquery.waypoints':         '../jquery/waypoints/waypoints',
+
         'jquery.fileupload':        '../jquery/fileupload/jquery.fileupload',
         'jquery.iframe-transport':  '../jquery/fileupload/jquery.iframe-transport',
         'jquery.fileupload.bundle': '../jquery/fileupload/jquery.fileupload.bundle',
