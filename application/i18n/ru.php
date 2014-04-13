@@ -4,6 +4,7 @@
  * Automatically generated from previous translation file.
  */
 return array (
+  ':error' => ':error',
   'Empty layer for :codename IFace' => 'Empty layer for :codename IFace',
   'Not implemented yet' => 'Not implemented yet',
   'Error reading session data.' => 'Error reading session data.',

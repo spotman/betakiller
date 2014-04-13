@@ -4,11 +4,12 @@
 $host = ( isset($_SERVER['HTTP_HOST']) ) ? $_SERVER['HTTP_HOST'] : '';
 
 // Turn on the minimization and building in production environment
-$in_production = in_array( Kohana::$environment, array(Kohana::PRODUCTION, Kohana::STAGING) );
-
 // TODO
-$build = FALSE && $in_production;
-$minimize = FALSE;
+// $in_production = in_array( Kohana::$environment, array(Kohana::PRODUCTION, Kohana::STAGING) );
+$in_production = in_array( Kohana::$environment, array(Kohana::PRODUCTION) );
+
+$build = $in_production;
+$minimize = $in_production;
 
 return array(
 
