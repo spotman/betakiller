@@ -1,0 +1,2152 @@
+<style type="text/css">
+#kohana_error { background: #ddd; font-size: 1em; font-family:sans-serif; text-align: left; color: #111; }
+#kohana_error h1,
+#kohana_error h2 { margin: 0; padding: 1em; font-size: 1em; font-weight: normal; background: #911; color: #fff; }
+	#kohana_error h1 a,
+	#kohana_error h2 a { color: #fff; }
+#kohana_error h2 { background: #222; }
+#kohana_error h3 { margin: 0; padding: 0.4em 0 0; font-size: 1em; font-weight: normal; }
+#kohana_error p { margin: 0; padding: 0.2em 0; }
+#kohana_error a { color: #1b323b; }
+#kohana_error pre { overflow: auto; white-space: pre-wrap; }
+#kohana_error table { width: 100%; display: block; margin: 0 0 0.4em; padding: 0; border-collapse: collapse; background: #fff; }
+	#kohana_error table td { border: solid 1px #ddd; text-align: left; vertical-align: top; padding: 0.4em; }
+#kohana_error div.content { padding: 0.4em 1em 1em; overflow: hidden; }
+#kohana_error pre.source { margin: 0 0 1em; padding: 0.4em; background: #fff; border: dotted 1px #b7c680; line-height: 1.2em; }
+	#kohana_error pre.source span.line { display: block; }
+	#kohana_error pre.source span.highlight { background: #f0eb96; }
+		#kohana_error pre.source span.line span.number { color: #666; }
+#kohana_error ol.trace { display: block; margin: 0 0 0 2em; padding: 0; list-style: decimal; }
+	#kohana_error ol.trace li { margin: 0; padding: 0; }
+.js .collapsed { display: none; }
+</style>
+<script type="text/javascript">
+document.documentElement.className = document.documentElement.className + ' js';
+function koggle(elem)
+{
+	elem = document.getElementById(elem);
+
+	if (elem.style && elem.style['display'])
+		// Only works with the "style" attr
+		var disp = elem.style['display'];
+	else if (elem.currentStyle)
+		// For MSIE, naturally
+		var disp = elem.currentStyle['display'];
+	else if (window.getComputedStyle)
+		// For most other browsers
+		var disp = document.defaultView.getComputedStyle(elem, null).getPropertyValue('display');
+
+	// Toggle the state of the "display" style
+	elem.style.display = disp == 'block' ? 'none' : 'block';
+	return false;
+}
+</script>
+<div id="kohana_error">
+	<h1><span class="type">View_Exception [ 0 ]:</span> <span class="message">The requested view Error/PhpMessage/message could not be found</span></h1>
+	<div id="error5346a6cc6a73b" class="content">
+		<p><span class="file">SYSPATH/classes/Kohana/View.php [ 257 ]</span></p>
+		<pre class="source"><code><span class="line"><span class="number">252</span> 	 */
+</span><span class="line"><span class="number">253</span> 	public function set_filename($file)
+</span><span class="line"><span class="number">254</span> 	{
+</span><span class="line"><span class="number">255</span> 		if (($path = Kohana::find_file('views', $file)) === FALSE)
+</span><span class="line"><span class="number">256</span> 		{
+</span><span class="line highlight"><span class="number">257</span> 			throw new View_Exception('The requested view :file could not be found', array(
+</span><span class="line"><span class="number">258</span> 				':file' =&gt; $file,
+</span><span class="line"><span class="number">259</span> 			));
+</span><span class="line"><span class="number">260</span> 		}
+</span><span class="line"><span class="number">261</span> 
+</span><span class="line"><span class="number">262</span> 		// Store the file path locally
+</span></code></pre>		<ol class="trace">
+					<li>
+				<p>
+					<span class="file">
+													<a href="#error5346a6cc6a73bsource0" onclick="return koggle('error5346a6cc6a73bsource0')">SYSPATH/classes/Kohana/View.php [ 137 ]</a>
+											</span>
+					&raquo;
+					Kohana_View->set_filename(<a href="#error5346a6cc6a73bargs0" onclick="return koggle('error5346a6cc6a73bargs0')">arguments</a>)
+				</p>
+								<div id="error5346a6cc6a73bargs0" class="collapsed">
+					<table cellspacing="0">
+											<tr>
+							<td><code>0</code></td>
+							<td><pre><small>string</small><span>(24)</span> "Error/PhpMessage/message"</pre></td>
+						</tr>
+										</table>
+				</div>
+													<pre id="error5346a6cc6a73bsource0" class="source collapsed"><code><pre class="source"><code><span class="line"><span class="number">132</span> 	 */
+</span><span class="line"><span class="number">133</span> 	public function __construct($file = NULL, array $data = NULL)
+</span><span class="line"><span class="number">134</span> 	{
+</span><span class="line"><span class="number">135</span> 		if ($file !== NULL)
+</span><span class="line"><span class="number">136</span> 		{
+</span><span class="line highlight"><span class="number">137</span> 			$this-&gt;set_filename($file);
+</span><span class="line"><span class="number">138</span> 		}
+</span><span class="line"><span class="number">139</span> 
+</span><span class="line"><span class="number">140</span> 		if ($data !== NULL)
+</span><span class="line"><span class="number">141</span> 		{
+</span><span class="line"><span class="number">142</span> 			// Add the values to the current data
+</span></code></pre></code></pre>
+							</li>
+								<li>
+				<p>
+					<span class="file">
+													<a href="#error5346a6cc6a73bsource1" onclick="return koggle('error5346a6cc6a73bsource1')">SYSPATH/classes/Kohana/View.php [ 30 ]</a>
+											</span>
+					&raquo;
+					Kohana_View->__construct(<a href="#error5346a6cc6a73bargs1" onclick="return koggle('error5346a6cc6a73bargs1')">arguments</a>)
+				</p>
+								<div id="error5346a6cc6a73bargs1" class="collapsed">
+					<table cellspacing="0">
+											<tr>
+							<td><code>0</code></td>
+							<td><pre><small>string</small><span>(24)</span> "Error/PhpMessage/message"</pre></td>
+						</tr>
+											<tr>
+							<td><code>1</code></td>
+							<td><pre><small>NULL</small></pre></td>
+						</tr>
+										</table>
+				</div>
+													<pre id="error5346a6cc6a73bsource1" class="source collapsed"><code><pre class="source"><code><span class="line"><span class="number">25</span> 	 * @param   array   $data   array of values
+</span><span class="line"><span class="number">26</span> 	 * @return  static
+</span><span class="line"><span class="number">27</span> 	 */
+</span><span class="line"><span class="number">28</span> 	public static function factory($file = NULL, array $data = NULL)
+</span><span class="line"><span class="number">29</span> 	{
+</span><span class="line highlight"><span class="number">30</span> 		return new static($file, $data);
+</span><span class="line"><span class="number">31</span> 	}
+</span><span class="line"><span class="number">32</span> 
+</span><span class="line"><span class="number">33</span> 	/**
+</span><span class="line"><span class="number">34</span> 	 * Captures the output that is generated when a view is included.
+</span><span class="line"><span class="number">35</span> 	 * The view data will be extracted to make local variables. This method
+</span></code></pre></code></pre>
+							</li>
+								<li>
+				<p>
+					<span class="file">
+													<a href="#error5346a6cc6a73bsource2" onclick="return koggle('error5346a6cc6a73bsource2')">APPPATH/classes/Controller.php [ 173 ]</a>
+											</span>
+					&raquo;
+					Kohana_View::factory(<a href="#error5346a6cc6a73bargs2" onclick="return koggle('error5346a6cc6a73bargs2')">arguments</a>)
+				</p>
+								<div id="error5346a6cc6a73bargs2" class="collapsed">
+					<table cellspacing="0">
+											<tr>
+							<td><code>0</code></td>
+							<td><pre><small>string</small><span>(24)</span> "Error/PhpMessage/message"</pre></td>
+						</tr>
+											<tr>
+							<td><code>1</code></td>
+							<td><pre><small>NULL</small></pre></td>
+						</tr>
+										</table>
+				</div>
+													<pre id="error5346a6cc6a73bsource2" class="source collapsed"><code><pre class="source"><code><span class="line"><span class="number">168</span>      * @param array $data
+</span><span class="line"><span class="number">169</span>      * @return View
+</span><span class="line"><span class="number">170</span>      */
+</span><span class="line"><span class="number">171</span>     protected function view_factory($file = NULL, array $data = NULL)
+</span><span class="line"><span class="number">172</span>     {
+</span><span class="line highlight"><span class="number">173</span>         return View::factory($file, $data);
+</span><span class="line"><span class="number">174</span>     }
+</span><span class="line"><span class="number">175</span> 
+</span><span class="line"><span class="number">176</span>     /**
+</span><span class="line"><span class="number">177</span>      * Sends plain text to stdout without wrapping it by template
+</span><span class="line"><span class="number">178</span>      *
+</span></code></pre></code></pre>
+							</li>
+								<li>
+				<p>
+					<span class="file">
+													<a href="#error5346a6cc6a73bsource3" onclick="return koggle('error5346a6cc6a73bsource3')">APPPATH/classes/Controller.php [ 159 ]</a>
+											</span>
+					&raquo;
+					Controller->view_factory(<a href="#error5346a6cc6a73bargs3" onclick="return koggle('error5346a6cc6a73bargs3')">arguments</a>)
+				</p>
+								<div id="error5346a6cc6a73bargs3" class="collapsed">
+					<table cellspacing="0">
+											<tr>
+							<td><code>0</code></td>
+							<td><pre><small>string</small><span>(24)</span> "Error/PhpMessage/message"</pre></td>
+						</tr>
+										</table>
+				</div>
+													<pre id="error5346a6cc6a73bsource3" class="source collapsed"><code><pre class="source"><code><span class="line"><span class="number">154</span>             ? $this-&gt;request-&gt;directory() . DIRECTORY_SEPARATOR . $this-&gt;request-&gt;controller()
+</span><span class="line"><span class="number">155</span>             : $this-&gt;request-&gt;controller();
+</span><span class="line"><span class="number">156</span> 
+</span><span class="line"><span class="number">157</span>         $file = $file ?: $this-&gt;request-&gt;action();
+</span><span class="line"><span class="number">158</span> 
+</span><span class="line highlight"><span class="number">159</span>         $view = $this-&gt;view_factory($path . DIRECTORY_SEPARATOR . $file);
+</span><span class="line"><span class="number">160</span> 
+</span><span class="line"><span class="number">161</span>         return $view;
+</span><span class="line"><span class="number">162</span>     }
+</span><span class="line"><span class="number">163</span> 
+</span><span class="line"><span class="number">164</span>     /**
+</span></code></pre></code></pre>
+							</li>
+								<li>
+				<p>
+					<span class="file">
+													<a href="#error5346a6cc6a73bsource4" onclick="return koggle('error5346a6cc6a73bsource4')">MODPATH/error/classes/Controller/Error/PhpMessage.php [ 35 ]</a>
+											</span>
+					&raquo;
+					Controller->view(<a href="#error5346a6cc6a73bargs4" onclick="return koggle('error5346a6cc6a73bargs4')">arguments</a>)
+				</p>
+								<div id="error5346a6cc6a73bargs4" class="collapsed">
+					<table cellspacing="0">
+											<tr>
+							<td><code>0</code></td>
+							<td><pre><small>string</small><span>(7)</span> "message"</pre></td>
+						</tr>
+										</table>
+				</div>
+													<pre id="error5346a6cc6a73bsource4" class="source collapsed"><code><pre class="source"><code><span class="line"><span class="number">30</span>      */
+</span><span class="line"><span class="number">31</span>     public function action_show()
+</span><span class="line"><span class="number">32</span>     {
+</span><span class="line"><span class="number">33</span>         // $this-&gt;jquery()-&gt;bootstrap();
+</span><span class="line"><span class="number">34</span> 
+</span><span class="line highlight"><span class="number">35</span>         $content = $this-&gt;view('message');
+</span><span class="line"><span class="number">36</span> 
+</span><span class="line"><span class="number">37</span> //        $content = View::factory("error/php/message");
+</span><span class="line"><span class="number">38</span>         $content-&gt;hash = $this-&gt;model-&gt;get_hash();
+</span><span class="line"><span class="number">39</span>         $content-&gt;trace = $this-&gt;model-&gt;get_trace();
+</span><span class="line"><span class="number">40</span> 
+</span></code></pre></code></pre>
+							</li>
+								<li>
+				<p>
+					<span class="file">
+													<a href="#error5346a6cc6a73bsource5" onclick="return koggle('error5346a6cc6a73bsource5')">APPPATH/classes/Controller/Proxy.php [ 67 ]</a>
+											</span>
+					&raquo;
+					Controller_Error_PhpMessage->action_show(<a href="#error5346a6cc6a73bargs5" onclick="return koggle('error5346a6cc6a73bargs5')">arguments</a>)
+				</p>
+								<div id="error5346a6cc6a73bargs5" class="collapsed">
+					<table cellspacing="0">
+											<tr>
+							<td><code>0</code></td>
+							<td><pre><small>object</small> <span>Controller_Error_PhpMessage(8)</span> <code>{
+    <small>protected</small> model => <small>object</small> <span>Model_Error_Message_Php(12)</span> <code>{
+        <small>protected</small> _collection => <small>string</small><span>(9)</span> "phpErrors"
+        <small>protected</small> _fields => <small>array</small><span>(12)</span> <span>(
+            "hash" => <small>array</small><span>(1)</span> <span>(
+                "type" => <small>string</small><span>(6)</span> "string"
+            )</span>
+            "time" => <small>array</small><span>(1)</span> <span>(
+                "type" => <small>string</small><span>(7)</span> "integer"
+            )</span>
+            "last_notification_time" => <small>array</small><span>(1)</span> <span>(
+                "type" => <small>string</small><span>(7)</span> "integer"
+            )</span>
+            "message" => <small>array</small><span>(1)</span> <span>(
+                "type" => <small>string</small><span>(6)</span> "string"
+            )</span>
+            "module" => <small>array</small><span>(1)</span> <span>(
+                "type" => <small>string</small><span>(6)</span> "string"
+            )</span>
+            "urls" => <small>array</small><span>(1)</span> <span>(
+                "type" => <small>string</small><span>(5)</span> "array"
+            )</span>
+            "paths" => <small>array</small><span>(1)</span> <span>(
+                "type" => <small>string</small><span>(5)</span> "array"
+            )</span>
+            "total" => <small>array</small><span>(1)</span> <span>(
+                "type" => <small>string</small><span>(7)</span> "counter"
+            )</span>
+            "is_resolved" => <small>array</small><span>(1)</span> <span>(
+                "type" => <small>string</small><span>(7)</span> "boolean"
+            )</span>
+            "resolved_by" => <small>array</small><span>(1)</span> <span>(
+                "type" => <small>string</small><span>(7)</span> "integer"
+            )</span>
+            "history" => <small>array</small><span>(1)</span> <span>(
+                "type" => <small>string</small><span>(5)</span> "array"
+            )</span>
+            "_id" => <small>array</small><span>(1)</span> <span>(
+                "type" => <small>string</small><span>(7)</span> "MongoId"
+            )</span>
+        )</span>
+        <small>protected</small> _db => <small>object</small> <span>MangoDB(5)</span> <code>{
+            <small>protected</small> _name => <small>string</small><span>(11)</span> "development"
+            <small>protected</small> _connected => <small>bool</small> TRUE
+            <small>protected</small> _connection => <small>object</small> <span>Mongo(4)</span> <code>{
+                <small>public</small> connected => <small>bool</small> FALSE
+                <small>public</small> status => <small>NULL</small>
+                <small>protected</small> server => <small>NULL</small>
+                <small>protected</small> persistent => <small>NULL</small>
+            }</code>
+            <small>protected</small> _db => <small>object</small> <span>MongoDB(2)</span> <code>{
+                <small>public</small> w => <small>integer</small> 0
+                <small>public</small> wtimeout => <small>integer</small> 10000
+            }</code>
+            <small>protected</small> _config => <small>array</small><span>(2)</span> <span>(
+                "connection" => <small>array</small><span>(2)</span> <span>(
+                    "hostnames" => <small>string</small><span>(15)</span> "localhost:27017"
+                    "options" => <small>array</small><span>(3)</span> <span>(
+                        "db" => <small>string</small><span>(11)</span> "development"
+                        "connectTimeoutMS" => <small>integer</small> 2000
+                        "connect" => <small>bool</small> FALSE
+                    )</span>
+                )</span>
+                "profiling" => <small>bool</small> FALSE
+            )</span>
+        }</code>
+        <small>protected</small> _model => <small>string</small><span>(17)</span> "error_message_php"
+        <small>protected</small> _embedded => <small>bool</small> FALSE
+        <small>protected</small> _parent => <small>NULL</small>
+        <small>protected</small> _relations => <small>array</small><span>(0)</span> 
+        <small>protected</small> _object => <small>array</small><span>(0)</span> 
+        <small>protected</small> _clean => <small>array</small><span>(10)</span> <span>(
+            "_id" => <small>object</small> <span>MongoId(1)</span> <code>{
+                <small>public</small> $id => <small>string</small><span>(24)</span> "5346a5922a02f4ab0170a99c"
+            }</code>
+            "hash" => <small>string</small><span>(40)</span> "72f8d0504699f4924c7f65d9511febeec85d38a5"
+            "history" => <small>array</small><span>(1)</span> <span>(
+                0 => <small>array</small><span>(3)</span> <span>(
+                    "who" => <small>integer</small> 1
+                    "when" => <small>integer</small> 1397138834
+                    "what" => <small>string</small><span>(3)</span> "New"
+                )</span>
+            )</span>
+            "is_resolved" => <small>bool</small> FALSE
+            "last_notification_time" => <small>integer</small> 1397138834
+            "message" => <small>string</small><span>(145)</span> "Twig_Error_Runtime [0]: Key &amp;quot;name&amp;quot; for array with keys &amp;quot;id, label, url&amp;quot; does not exist in &amp;quot;ifaces/Index&nbsp;&hellip;"
+            "paths" => <small>array</small><span>(1)</span> <span>(
+                0 => <small>string</small><span>(92)</span> "/spotman/www/projects/dev/betakiller/core/modules/twig/vendor/twig/lib/Twig/Template.php:377"
+            )</span>
+            "time" => <small>integer</small> 1397138834
+            "total" => <small>integer</small> 1
+            "urls" => <small>array</small><span>(0)</span> 
+        )</span>
+        <small>protected</small> _related => <small>array</small><span>(0)</span> 
+        <small>protected</small> _changed => <small>array</small><span>(0)</span> 
+        <small>protected</small> _init => <small>bool</small> TRUE
+    }</code>
+    <small>protected</small> _layout => <small>object</small> <span>View_Layout(2)</span> <code>{
+        <small>protected</small> _content => <small>NULL</small>
+        <small>protected</small> _path => <small>string</small><span>(7)</span> "default"
+    }</code>
+    <small>private</small> show_profiler => <small>bool</small> FALSE
+    <small>protected</small> _proxy_object => <small>object</small> <span>Controller_Error_PhpMessage(8)</span> {
+        *RECURSION*
+    }
+    <small>protected</small> _proxy_method => <small>string</small><span>(11)</span> "action_show"
+    <small>protected</small> _proxy_result => <small>NULL</small>
+    <small>public</small> request => <small>object</small> <span>Request(19)</span> <code>{
+        <small>protected</small> _requested_with => <small>NULL</small>
+        <small>protected</small> _method => <small>string</small><span>(3)</span> "GET"
+        <small>protected</small> _protocol => <small>string</small><span>(8)</span> "HTTP/1.0"
+        <small>protected</small> _secure => <small>bool</small> FALSE
+        <small>protected</small> _referrer => <small>string</small><span>(34)</span> "http://test.afs.gallery/errors/php"
+        <small>protected</small> _route => <small>object</small> <span>Route(5)</span> <code>{
+            <small>protected</small> _filters => <small>array</small><span>(0)</span> 
+            <small>protected</small> _uri => <small>string</small><span>(28)</span> "errors/php/&lt;hash&gt;(/&lt;action&gt;)"
+            <small>protected</small> _regex => <small>array</small><span>(0)</span> 
+            <small>protected</small> _defaults => <small>array</small><span>(4)</span> <span>(
+                "module" => <small>string</small><span>(5)</span> "error"
+                "directory" => <small>string</small><span>(5)</span> "Error"
+                "controller" => <small>string</small><span>(10)</span> "PhpMessage"
+                "action" => <small>string</small><span>(4)</span> "show"
+            )</span>
+            <small>protected</small> _route_regex => <small>string</small><span>(69)</span> "#^errors/php/(?P&lt;hash&gt;[^/.,;?\n]++)(?:/(?P&lt;action&gt;[^/.,;?\n]++))?$#uD"
+        }</code>
+        <small>protected</small> _routes => <small>array</small><span>(0)</span> 
+        <small>protected</small> _header => <small>object</small> <span>HTTP_Header(0)</span> <code>{
+        }</code>
+        <small>protected</small> _body => <small>NULL</small>
+        <small>protected</small> _directory => <small>string</small><span>(5)</span> "Error"
+        <small>protected</small> _controller => <small>string</small><span>(10)</span> "PhpMessage"
+        <small>protected</small> _action => <small>string</small><span>(4)</span> "show"
+        <small>protected</small> _uri => <small>string</small><span>(51)</span> "errors/php/72f8d0504699f4924c7f65d9511febeec85d38a5"
+        <small>protected</small> _external => <small>bool</small> FALSE
+        <small>protected</small> _params => <small>array</small><span>(2)</span> <span>(
+            "hash" => <small>string</small><span>(40)</span> "72f8d0504699f4924c7f65d9511febeec85d38a5"
+            "module" => <small>string</small><span>(5)</span> "error"
+        )</span>
+        <small>protected</small> _get => <small>array</small><span>(0)</span> 
+        <small>protected</small> _post => <small>array</small><span>(0)</span> 
+        <small>protected</small> _cookies => <small>array</small><span>(2)</span> <span>(
+            "session" => <small>NULL</small>
+            "lang" => <small>string</small><span>(2)</span> "ru"
+        )</span>
+        <small>protected</small> _client => <small>object</small> <span>Request_Client_Internal(9)</span> <code>{
+            <small>protected</small> _previous_environment => <small>NULL</small>
+            <small>protected</small> _cache => <small>NULL</small>
+            <small>protected</small> _follow => <small>bool</small> FALSE
+            <small>protected</small> _follow_headers => <small>array</small><span>(1)</span> <span>(
+                0 => <small>string</small><span>(13)</span> "Authorization"
+            )</span>
+            <small>protected</small> _strict_redirect => <small>bool</small> TRUE
+            <small>protected</small> _header_callbacks => <small>array</small><span>(1)</span> <span>(
+                "Location" => <small>string</small><span>(34)</span> "Request_Client::on_header_location"
+            )</span>
+            <small>protected</small> _max_callback_depth => <small>integer</small> 5
+            <small>protected</small> _callback_depth => <small>integer</small> 1
+            <small>protected</small> _callback_params => <small>array</small><span>(0)</span> 
+        }</code>
+    }</code>
+    <small>public</small> response => <small>object</small> <span>Response(8)</span> <code>{
+        <small>protected</small> _content_type => <small>integer</small> 1
+        <small>protected</small> _wrapper => <small>NULL</small>
+        <small>protected</small> _request => <small>object</small> <span>Request(19)</span> <code>{
+            <small>protected</small> _requested_with => <small>NULL</small>
+            <small>protected</small> _method => <small>string</small><span>(3)</span> "GET"
+            <small>protected</small> _protocol => <small>string</small><span>(8)</span> "HTTP/1.0"
+            <small>protected</small> _secure => <small>bool</small> FALSE
+            <small>protected</small> _referrer => <small>string</small><span>(34)</span> "http://test.afs.gallery/errors/php"
+            <small>protected</small> _route => <small>object</small> <span>Route(5)</span> <code>{
+                <small>protected</small> _filters => <small>array</small><span>(0)</span> 
+                <small>protected</small> _uri => <small>string</small><span>(28)</span> "errors/php/&lt;hash&gt;(/&lt;action&gt;)"
+                <small>protected</small> _regex => <small>array</small><span>(0)</span> 
+                <small>protected</small> _defaults => <small>array</small><span>(4)</span> <span>(
+                    "module" => <small>string</small><span>(5)</span> "error"
+                    "directory" => <small>string</small><span>(5)</span> "Error"
+                    "controller" => <small>string</small><span>(10)</span> "PhpMessage"
+                    "action" => <small>string</small><span>(4)</span> "show"
+                )</span>
+                <small>protected</small> _route_regex => <small>string</small><span>(69)</span> "#^errors/php/(?P&lt;hash&gt;[^/.,;?\n]++)(?:/(?P&lt;action&gt;[^/.,;?\n]++))?$#uD"
+            }</code>
+            <small>protected</small> _routes => <small>array</small><span>(0)</span> 
+            <small>protected</small> _header => <small>object</small> <span>HTTP_Header(0)</span> <code>{
+            }</code>
+            <small>protected</small> _body => <small>NULL</small>
+            <small>protected</small> _directory => <small>string</small><span>(5)</span> "Error"
+            <small>protected</small> _controller => <small>string</small><span>(10)</span> "PhpMessage"
+            <small>protected</small> _action => <small>string</small><span>(4)</span> "show"
+            <small>protected</small> _uri => <small>string</small><span>(51)</span> "errors/php/72f8d0504699f4924c7f65d9511febeec85d38a5"
+            <small>protected</small> _external => <small>bool</small> FALSE
+            <small>protected</small> _params => <small>array</small><span>(2)</span> <span>(
+                "hash" => <small>string</small><span>(40)</span> "72f8d0504699f4924c7f65d9511febeec85d38a5"
+                "module" => <small>string</small><span>(5)</span> "error"
+            )</span>
+            <small>protected</small> _get => <small>array</small><span>(0)</span> 
+            <small>protected</small> _post => <small>array</small><span>(0)</span> 
+            <small>protected</small> _cookies => <small>array</small><span>(2)</span> <span>(
+                "session" => <small>NULL</small>
+                "lang" => <small>string</small><span>(2)</span> "ru"
+            )</span>
+            <small>protected</small> _client => <small>object</small> <span>Request_Client_Internal(9)</span> <code>{
+                <small>protected</small> _previous_environment => <small>NULL</small>
+                <small>protected</small> _cache => <small>NULL</small>
+                <small>protected</small> _follow => <small>bool</small> FALSE
+                <small>protected</small> _follow_headers => <small>array</small><span>(1)</span> <span>(
+                    0 => <small>string</small><span>(13)</span> "Authorization"
+                )</span>
+                <small>protected</small> _strict_redirect => <small>bool</small> TRUE
+                <small>protected</small> _header_callbacks => <small>array</small><span>(1)</span> <span>(
+                    "Location" => <small>string</small><span>(34)</span> "Request_Client::on_header_location"
+                )</span>
+                <small>protected</small> _max_callback_depth => <small>integer</small> 5
+                <small>protected</small> _callback_depth => <small>integer</small> 1
+                <small>protected</small> _callback_params => <small>array</small><span>(0)</span> 
+            }</code>
+        }</code>
+        <small>protected</small> _status => <small>integer</small> 200
+        <small>protected</small> _header => <small>object</small> <span>HTTP_Header(0)</span> <code>{
+        }</code>
+        <small>protected</small> _body => <small>string</small><span>(0)</span> ""
+        <small>protected</small> _cookies => <small>array</small><span>(0)</span> 
+        <small>protected</small> _protocol => <small>NULL</small>
+    }</code>
+}</code></pre></td>
+						</tr>
+										</table>
+				</div>
+													<pre id="error5346a6cc6a73bsource5" class="source collapsed"><code><pre class="source"><code><span class="line"><span class="number">62</span>     }
+</span><span class="line"><span class="number">63</span> 
+</span><span class="line"><span class="number">64</span>     protected function _execute_proxy()
+</span><span class="line"><span class="number">65</span>     {
+</span><span class="line"><span class="number">66</span>         // Execute the action itself
+</span><span class="line highlight"><span class="number">67</span>         return $this-&gt;_proxy_object-&gt;{$this-&gt;_proxy_method}($this);
+</span><span class="line"><span class="number">68</span>     }
+</span><span class="line"><span class="number">69</span> 
+</span><span class="line"><span class="number">70</span>     protected function get_proxy_object()
+</span><span class="line"><span class="number">71</span>     {
+</span><span class="line"><span class="number">72</span>         return $this;
+</span></code></pre></code></pre>
+							</li>
+								<li>
+				<p>
+					<span class="file">
+													<a href="#error5346a6cc6a73bsource6" onclick="return koggle('error5346a6cc6a73bsource6')">APPPATH/classes/Controller/Proxy.php [ 58 ]</a>
+											</span>
+					&raquo;
+					Controller_Proxy->_execute_proxy()
+				</p>
+													<pre id="error5346a6cc6a73bsource6" class="source collapsed"><code><pre class="source"><code><span class="line"><span class="number">53</span>     {
+</span><span class="line"><span class="number">54</span>         // Controller "before" method
+</span><span class="line"><span class="number">55</span>         $this-&gt;before();
+</span><span class="line"><span class="number">56</span> 
+</span><span class="line"><span class="number">57</span>         // Proxy request
+</span><span class="line highlight"><span class="number">58</span>         $this-&gt;_proxy_result = $this-&gt;_execute_proxy();
+</span><span class="line"><span class="number">59</span> 
+</span><span class="line"><span class="number">60</span>         // Controller "after" method
+</span><span class="line"><span class="number">61</span>         $this-&gt;after();
+</span><span class="line"><span class="number">62</span>     }
+</span><span class="line"><span class="number">63</span> 
+</span></code></pre></code></pre>
+							</li>
+								<li>
+				<p>
+					<span class="file">
+													<a href="#error5346a6cc6a73bsource7" onclick="return koggle('error5346a6cc6a73bsource7')">APPPATH/classes/Controller/Proxy.php [ 36 ]</a>
+											</span>
+					&raquo;
+					Controller_Proxy->_execute()
+				</p>
+													<pre id="error5346a6cc6a73bsource7" class="source collapsed"><code><pre class="source"><code><span class="line"><span class="number">31</span>         // Adding response to stack
+</span><span class="line"><span class="number">32</span>         Response::push($this-&gt;response, $this-&gt;request);
+</span><span class="line"><span class="number">33</span> 
+</span><span class="line"><span class="number">34</span>         try
+</span><span class="line"><span class="number">35</span>         {
+</span><span class="line highlight"><span class="number">36</span>             $this-&gt;_execute();
+</span><span class="line"><span class="number">37</span>         }
+</span><span class="line"><span class="number">38</span>         catch ( Kohana_Exception $e )
+</span><span class="line"><span class="number">39</span>         {
+</span><span class="line"><span class="number">40</span>             Response::handle_exception($e);
+</span><span class="line"><span class="number">41</span>         }
+</span></code></pre></code></pre>
+							</li>
+								<li>
+				<p>
+					<span class="file">
+													{PHP internal call}
+											</span>
+					&raquo;
+					Controller_Proxy->execute()
+				</p>
+											</li>
+								<li>
+				<p>
+					<span class="file">
+													<a href="#error5346a6cc6a73bsource9" onclick="return koggle('error5346a6cc6a73bsource9')">SYSPATH/classes/Kohana/Request/Client/Internal.php [ 97 ]</a>
+											</span>
+					&raquo;
+					ReflectionMethod->invoke(<a href="#error5346a6cc6a73bargs9" onclick="return koggle('error5346a6cc6a73bargs9')">arguments</a>)
+				</p>
+								<div id="error5346a6cc6a73bargs9" class="collapsed">
+					<table cellspacing="0">
+											<tr>
+							<td><code>0</code></td>
+							<td><pre><small>object</small> <span>Controller_Error_PhpMessage(8)</span> <code>{
+    <small>protected</small> model => <small>object</small> <span>Model_Error_Message_Php(12)</span> <code>{
+        <small>protected</small> _collection => <small>string</small><span>(9)</span> "phpErrors"
+        <small>protected</small> _fields => <small>array</small><span>(12)</span> <span>(
+            "hash" => <small>array</small><span>(1)</span> <span>(
+                "type" => <small>string</small><span>(6)</span> "string"
+            )</span>
+            "time" => <small>array</small><span>(1)</span> <span>(
+                "type" => <small>string</small><span>(7)</span> "integer"
+            )</span>
+            "last_notification_time" => <small>array</small><span>(1)</span> <span>(
+                "type" => <small>string</small><span>(7)</span> "integer"
+            )</span>
+            "message" => <small>array</small><span>(1)</span> <span>(
+                "type" => <small>string</small><span>(6)</span> "string"
+            )</span>
+            "module" => <small>array</small><span>(1)</span> <span>(
+                "type" => <small>string</small><span>(6)</span> "string"
+            )</span>
+            "urls" => <small>array</small><span>(1)</span> <span>(
+                "type" => <small>string</small><span>(5)</span> "array"
+            )</span>
+            "paths" => <small>array</small><span>(1)</span> <span>(
+                "type" => <small>string</small><span>(5)</span> "array"
+            )</span>
+            "total" => <small>array</small><span>(1)</span> <span>(
+                "type" => <small>string</small><span>(7)</span> "counter"
+            )</span>
+            "is_resolved" => <small>array</small><span>(1)</span> <span>(
+                "type" => <small>string</small><span>(7)</span> "boolean"
+            )</span>
+            "resolved_by" => <small>array</small><span>(1)</span> <span>(
+                "type" => <small>string</small><span>(7)</span> "integer"
+            )</span>
+            "history" => <small>array</small><span>(1)</span> <span>(
+                "type" => <small>string</small><span>(5)</span> "array"
+            )</span>
+            "_id" => <small>array</small><span>(1)</span> <span>(
+                "type" => <small>string</small><span>(7)</span> "MongoId"
+            )</span>
+        )</span>
+        <small>protected</small> _db => <small>object</small> <span>MangoDB(5)</span> <code>{
+            <small>protected</small> _name => <small>string</small><span>(11)</span> "development"
+            <small>protected</small> _connected => <small>bool</small> TRUE
+            <small>protected</small> _connection => <small>object</small> <span>Mongo(4)</span> <code>{
+                <small>public</small> connected => <small>bool</small> FALSE
+                <small>public</small> status => <small>NULL</small>
+                <small>protected</small> server => <small>NULL</small>
+                <small>protected</small> persistent => <small>NULL</small>
+            }</code>
+            <small>protected</small> _db => <small>object</small> <span>MongoDB(2)</span> <code>{
+                <small>public</small> w => <small>integer</small> 0
+                <small>public</small> wtimeout => <small>integer</small> 10000
+            }</code>
+            <small>protected</small> _config => <small>array</small><span>(2)</span> <span>(
+                "connection" => <small>array</small><span>(2)</span> <span>(
+                    "hostnames" => <small>string</small><span>(15)</span> "localhost:27017"
+                    "options" => <small>array</small><span>(3)</span> <span>(
+                        "db" => <small>string</small><span>(11)</span> "development"
+                        "connectTimeoutMS" => <small>integer</small> 2000
+                        "connect" => <small>bool</small> FALSE
+                    )</span>
+                )</span>
+                "profiling" => <small>bool</small> FALSE
+            )</span>
+        }</code>
+        <small>protected</small> _model => <small>string</small><span>(17)</span> "error_message_php"
+        <small>protected</small> _embedded => <small>bool</small> FALSE
+        <small>protected</small> _parent => <small>NULL</small>
+        <small>protected</small> _relations => <small>array</small><span>(0)</span> 
+        <small>protected</small> _object => <small>array</small><span>(0)</span> 
+        <small>protected</small> _clean => <small>array</small><span>(10)</span> <span>(
+            "_id" => <small>object</small> <span>MongoId(1)</span> <code>{
+                <small>public</small> $id => <small>string</small><span>(24)</span> "5346a5922a02f4ab0170a99c"
+            }</code>
+            "hash" => <small>string</small><span>(40)</span> "72f8d0504699f4924c7f65d9511febeec85d38a5"
+            "history" => <small>array</small><span>(1)</span> <span>(
+                0 => <small>array</small><span>(3)</span> <span>(
+                    "who" => <small>integer</small> 1
+                    "when" => <small>integer</small> 1397138834
+                    "what" => <small>string</small><span>(3)</span> "New"
+                )</span>
+            )</span>
+            "is_resolved" => <small>bool</small> FALSE
+            "last_notification_time" => <small>integer</small> 1397138834
+            "message" => <small>string</small><span>(145)</span> "Twig_Error_Runtime [0]: Key &amp;quot;name&amp;quot; for array with keys &amp;quot;id, label, url&amp;quot; does not exist in &amp;quot;ifaces/Index&nbsp;&hellip;"
+            "paths" => <small>array</small><span>(1)</span> <span>(
+                0 => <small>string</small><span>(92)</span> "/spotman/www/projects/dev/betakiller/core/modules/twig/vendor/twig/lib/Twig/Template.php:377"
+            )</span>
+            "time" => <small>integer</small> 1397138834
+            "total" => <small>integer</small> 1
+            "urls" => <small>array</small><span>(0)</span> 
+        )</span>
+        <small>protected</small> _related => <small>array</small><span>(0)</span> 
+        <small>protected</small> _changed => <small>array</small><span>(0)</span> 
+        <small>protected</small> _init => <small>bool</small> TRUE
+    }</code>
+    <small>protected</small> _layout => <small>object</small> <span>View_Layout(2)</span> <code>{
+        <small>protected</small> _content => <small>NULL</small>
+        <small>protected</small> _path => <small>string</small><span>(7)</span> "default"
+    }</code>
+    <small>private</small> show_profiler => <small>bool</small> FALSE
+    <small>protected</small> _proxy_object => <small>object</small> <span>Controller_Error_PhpMessage(8)</span> {
+        *RECURSION*
+    }
+    <small>protected</small> _proxy_method => <small>string</small><span>(11)</span> "action_show"
+    <small>protected</small> _proxy_result => <small>NULL</small>
+    <small>public</small> request => <small>object</small> <span>Request(19)</span> <code>{
+        <small>protected</small> _requested_with => <small>NULL</small>
+        <small>protected</small> _method => <small>string</small><span>(3)</span> "GET"
+        <small>protected</small> _protocol => <small>string</small><span>(8)</span> "HTTP/1.0"
+        <small>protected</small> _secure => <small>bool</small> FALSE
+        <small>protected</small> _referrer => <small>string</small><span>(34)</span> "http://test.afs.gallery/errors/php"
+        <small>protected</small> _route => <small>object</small> <span>Route(5)</span> <code>{
+            <small>protected</small> _filters => <small>array</small><span>(0)</span> 
+            <small>protected</small> _uri => <small>string</small><span>(28)</span> "errors/php/&lt;hash&gt;(/&lt;action&gt;)"
+            <small>protected</small> _regex => <small>array</small><span>(0)</span> 
+            <small>protected</small> _defaults => <small>array</small><span>(4)</span> <span>(
+                "module" => <small>string</small><span>(5)</span> "error"
+                "directory" => <small>string</small><span>(5)</span> "Error"
+                "controller" => <small>string</small><span>(10)</span> "PhpMessage"
+                "action" => <small>string</small><span>(4)</span> "show"
+            )</span>
+            <small>protected</small> _route_regex => <small>string</small><span>(69)</span> "#^errors/php/(?P&lt;hash&gt;[^/.,;?\n]++)(?:/(?P&lt;action&gt;[^/.,;?\n]++))?$#uD"
+        }</code>
+        <small>protected</small> _routes => <small>array</small><span>(0)</span> 
+        <small>protected</small> _header => <small>object</small> <span>HTTP_Header(0)</span> <code>{
+        }</code>
+        <small>protected</small> _body => <small>NULL</small>
+        <small>protected</small> _directory => <small>string</small><span>(5)</span> "Error"
+        <small>protected</small> _controller => <small>string</small><span>(10)</span> "PhpMessage"
+        <small>protected</small> _action => <small>string</small><span>(4)</span> "show"
+        <small>protected</small> _uri => <small>string</small><span>(51)</span> "errors/php/72f8d0504699f4924c7f65d9511febeec85d38a5"
+        <small>protected</small> _external => <small>bool</small> FALSE
+        <small>protected</small> _params => <small>array</small><span>(2)</span> <span>(
+            "hash" => <small>string</small><span>(40)</span> "72f8d0504699f4924c7f65d9511febeec85d38a5"
+            "module" => <small>string</small><span>(5)</span> "error"
+        )</span>
+        <small>protected</small> _get => <small>array</small><span>(0)</span> 
+        <small>protected</small> _post => <small>array</small><span>(0)</span> 
+        <small>protected</small> _cookies => <small>array</small><span>(2)</span> <span>(
+            "session" => <small>NULL</small>
+            "lang" => <small>string</small><span>(2)</span> "ru"
+        )</span>
+        <small>protected</small> _client => <small>object</small> <span>Request_Client_Internal(9)</span> <code>{
+            <small>protected</small> _previous_environment => <small>NULL</small>
+            <small>protected</small> _cache => <small>NULL</small>
+            <small>protected</small> _follow => <small>bool</small> FALSE
+            <small>protected</small> _follow_headers => <small>array</small><span>(1)</span> <span>(
+                0 => <small>string</small><span>(13)</span> "Authorization"
+            )</span>
+            <small>protected</small> _strict_redirect => <small>bool</small> TRUE
+            <small>protected</small> _header_callbacks => <small>array</small><span>(1)</span> <span>(
+                "Location" => <small>string</small><span>(34)</span> "Request_Client::on_header_location"
+            )</span>
+            <small>protected</small> _max_callback_depth => <small>integer</small> 5
+            <small>protected</small> _callback_depth => <small>integer</small> 1
+            <small>protected</small> _callback_params => <small>array</small><span>(0)</span> 
+        }</code>
+    }</code>
+    <small>public</small> response => <small>object</small> <span>Response(8)</span> <code>{
+        <small>protected</small> _content_type => <small>integer</small> 1
+        <small>protected</small> _wrapper => <small>NULL</small>
+        <small>protected</small> _request => <small>object</small> <span>Request(19)</span> <code>{
+            <small>protected</small> _requested_with => <small>NULL</small>
+            <small>protected</small> _method => <small>string</small><span>(3)</span> "GET"
+            <small>protected</small> _protocol => <small>string</small><span>(8)</span> "HTTP/1.0"
+            <small>protected</small> _secure => <small>bool</small> FALSE
+            <small>protected</small> _referrer => <small>string</small><span>(34)</span> "http://test.afs.gallery/errors/php"
+            <small>protected</small> _route => <small>object</small> <span>Route(5)</span> <code>{
+                <small>protected</small> _filters => <small>array</small><span>(0)</span> 
+                <small>protected</small> _uri => <small>string</small><span>(28)</span> "errors/php/&lt;hash&gt;(/&lt;action&gt;)"
+                <small>protected</small> _regex => <small>array</small><span>(0)</span> 
+                <small>protected</small> _defaults => <small>array</small><span>(4)</span> <span>(
+                    "module" => <small>string</small><span>(5)</span> "error"
+                    "directory" => <small>string</small><span>(5)</span> "Error"
+                    "controller" => <small>string</small><span>(10)</span> "PhpMessage"
+                    "action" => <small>string</small><span>(4)</span> "show"
+                )</span>
+                <small>protected</small> _route_regex => <small>string</small><span>(69)</span> "#^errors/php/(?P&lt;hash&gt;[^/.,;?\n]++)(?:/(?P&lt;action&gt;[^/.,;?\n]++))?$#uD"
+            }</code>
+            <small>protected</small> _routes => <small>array</small><span>(0)</span> 
+            <small>protected</small> _header => <small>object</small> <span>HTTP_Header(0)</span> <code>{
+            }</code>
+            <small>protected</small> _body => <small>NULL</small>
+            <small>protected</small> _directory => <small>string</small><span>(5)</span> "Error"
+            <small>protected</small> _controller => <small>string</small><span>(10)</span> "PhpMessage"
+            <small>protected</small> _action => <small>string</small><span>(4)</span> "show"
+            <small>protected</small> _uri => <small>string</small><span>(51)</span> "errors/php/72f8d0504699f4924c7f65d9511febeec85d38a5"
+            <small>protected</small> _external => <small>bool</small> FALSE
+            <small>protected</small> _params => <small>array</small><span>(2)</span> <span>(
+                "hash" => <small>string</small><span>(40)</span> "72f8d0504699f4924c7f65d9511febeec85d38a5"
+                "module" => <small>string</small><span>(5)</span> "error"
+            )</span>
+            <small>protected</small> _get => <small>array</small><span>(0)</span> 
+            <small>protected</small> _post => <small>array</small><span>(0)</span> 
+            <small>protected</small> _cookies => <small>array</small><span>(2)</span> <span>(
+                "session" => <small>NULL</small>
+                "lang" => <small>string</small><span>(2)</span> "ru"
+            )</span>
+            <small>protected</small> _client => <small>object</small> <span>Request_Client_Internal(9)</span> <code>{
+                <small>protected</small> _previous_environment => <small>NULL</small>
+                <small>protected</small> _cache => <small>NULL</small>
+                <small>protected</small> _follow => <small>bool</small> FALSE
+                <small>protected</small> _follow_headers => <small>array</small><span>(1)</span> <span>(
+                    0 => <small>string</small><span>(13)</span> "Authorization"
+                )</span>
+                <small>protected</small> _strict_redirect => <small>bool</small> TRUE
+                <small>protected</small> _header_callbacks => <small>array</small><span>(1)</span> <span>(
+                    "Location" => <small>string</small><span>(34)</span> "Request_Client::on_header_location"
+                )</span>
+                <small>protected</small> _max_callback_depth => <small>integer</small> 5
+                <small>protected</small> _callback_depth => <small>integer</small> 1
+                <small>protected</small> _callback_params => <small>array</small><span>(0)</span> 
+            }</code>
+        }</code>
+        <small>protected</small> _status => <small>integer</small> 200
+        <small>protected</small> _header => <small>object</small> <span>HTTP_Header(0)</span> <code>{
+        }</code>
+        <small>protected</small> _body => <small>string</small><span>(0)</span> ""
+        <small>protected</small> _cookies => <small>array</small><span>(0)</span> 
+        <small>protected</small> _protocol => <small>NULL</small>
+    }</code>
+}</code></pre></td>
+						</tr>
+										</table>
+				</div>
+													<pre id="error5346a6cc6a73bsource9" class="source collapsed"><code><pre class="source"><code><span class="line"><span class="number"> 92</span> 
+</span><span class="line"><span class="number"> 93</span> 			// Create a new instance of the controller
+</span><span class="line"><span class="number"> 94</span> 			$controller = $class-&gt;newInstance($request, $response);
+</span><span class="line"><span class="number"> 95</span> 
+</span><span class="line"><span class="number"> 96</span> 			// Run the controller's execute() method
+</span><span class="line highlight"><span class="number"> 97</span> 			$response = $class-&gt;getMethod('execute')-&gt;invoke($controller);
+</span><span class="line"><span class="number"> 98</span> 
+</span><span class="line"><span class="number"> 99</span> 			if ( ! $response instanceof Response)
+</span><span class="line"><span class="number">100</span> 			{
+</span><span class="line"><span class="number">101</span> 				// Controller failed to return a Response.
+</span><span class="line"><span class="number">102</span> 				throw new Kohana_Exception('Controller failed to return a Response');
+</span></code></pre></code></pre>
+							</li>
+								<li>
+				<p>
+					<span class="file">
+													<a href="#error5346a6cc6a73bsource10" onclick="return koggle('error5346a6cc6a73bsource10')">SYSPATH/classes/Kohana/Request/Client.php [ 114 ]</a>
+											</span>
+					&raquo;
+					Kohana_Request_Client_Internal->execute_request(<a href="#error5346a6cc6a73bargs10" onclick="return koggle('error5346a6cc6a73bargs10')">arguments</a>)
+				</p>
+								<div id="error5346a6cc6a73bargs10" class="collapsed">
+					<table cellspacing="0">
+											<tr>
+							<td><code>0</code></td>
+							<td><pre><small>object</small> <span>Request(19)</span> <code>{
+    <small>protected</small> _requested_with => <small>NULL</small>
+    <small>protected</small> _method => <small>string</small><span>(3)</span> "GET"
+    <small>protected</small> _protocol => <small>string</small><span>(8)</span> "HTTP/1.0"
+    <small>protected</small> _secure => <small>bool</small> FALSE
+    <small>protected</small> _referrer => <small>string</small><span>(34)</span> "http://test.afs.gallery/errors/php"
+    <small>protected</small> _route => <small>object</small> <span>Route(5)</span> <code>{
+        <small>protected</small> _filters => <small>array</small><span>(0)</span> 
+        <small>protected</small> _uri => <small>string</small><span>(28)</span> "errors/php/&lt;hash&gt;(/&lt;action&gt;)"
+        <small>protected</small> _regex => <small>array</small><span>(0)</span> 
+        <small>protected</small> _defaults => <small>array</small><span>(4)</span> <span>(
+            "module" => <small>string</small><span>(5)</span> "error"
+            "directory" => <small>string</small><span>(5)</span> "Error"
+            "controller" => <small>string</small><span>(10)</span> "PhpMessage"
+            "action" => <small>string</small><span>(4)</span> "show"
+        )</span>
+        <small>protected</small> _route_regex => <small>string</small><span>(69)</span> "#^errors/php/(?P&lt;hash&gt;[^/.,;?\n]++)(?:/(?P&lt;action&gt;[^/.,;?\n]++))?$#uD"
+    }</code>
+    <small>protected</small> _routes => <small>array</small><span>(0)</span> 
+    <small>protected</small> _header => <small>object</small> <span>HTTP_Header(0)</span> <code>{
+    }</code>
+    <small>protected</small> _body => <small>NULL</small>
+    <small>protected</small> _directory => <small>string</small><span>(5)</span> "Error"
+    <small>protected</small> _controller => <small>string</small><span>(10)</span> "PhpMessage"
+    <small>protected</small> _action => <small>string</small><span>(4)</span> "show"
+    <small>protected</small> _uri => <small>string</small><span>(51)</span> "errors/php/72f8d0504699f4924c7f65d9511febeec85d38a5"
+    <small>protected</small> _external => <small>bool</small> FALSE
+    <small>protected</small> _params => <small>array</small><span>(2)</span> <span>(
+        "hash" => <small>string</small><span>(40)</span> "72f8d0504699f4924c7f65d9511febeec85d38a5"
+        "module" => <small>string</small><span>(5)</span> "error"
+    )</span>
+    <small>protected</small> _get => <small>array</small><span>(0)</span> 
+    <small>protected</small> _post => <small>array</small><span>(0)</span> 
+    <small>protected</small> _cookies => <small>array</small><span>(2)</span> <span>(
+        "session" => <small>NULL</small>
+        "lang" => <small>string</small><span>(2)</span> "ru"
+    )</span>
+    <small>protected</small> _client => <small>object</small> <span>Request_Client_Internal(9)</span> <code>{
+        <small>protected</small> _previous_environment => <small>NULL</small>
+        <small>protected</small> _cache => <small>NULL</small>
+        <small>protected</small> _follow => <small>bool</small> FALSE
+        <small>protected</small> _follow_headers => <small>array</small><span>(1)</span> <span>(
+            0 => <small>string</small><span>(13)</span> "Authorization"
+        )</span>
+        <small>protected</small> _strict_redirect => <small>bool</small> TRUE
+        <small>protected</small> _header_callbacks => <small>array</small><span>(1)</span> <span>(
+            "Location" => <small>string</small><span>(34)</span> "Request_Client::on_header_location"
+        )</span>
+        <small>protected</small> _max_callback_depth => <small>integer</small> 5
+        <small>protected</small> _callback_depth => <small>integer</small> 1
+        <small>protected</small> _callback_params => <small>array</small><span>(0)</span> 
+    }</code>
+}</code></pre></td>
+						</tr>
+											<tr>
+							<td><code>1</code></td>
+							<td><pre><small>object</small> <span>Response(8)</span> <code>{
+    <small>protected</small> _content_type => <small>integer</small> 1
+    <small>protected</small> _wrapper => <small>NULL</small>
+    <small>protected</small> _request => <small>object</small> <span>Request(19)</span> <code>{
+        <small>protected</small> _requested_with => <small>NULL</small>
+        <small>protected</small> _method => <small>string</small><span>(3)</span> "GET"
+        <small>protected</small> _protocol => <small>string</small><span>(8)</span> "HTTP/1.0"
+        <small>protected</small> _secure => <small>bool</small> FALSE
+        <small>protected</small> _referrer => <small>string</small><span>(34)</span> "http://test.afs.gallery/errors/php"
+        <small>protected</small> _route => <small>object</small> <span>Route(5)</span> <code>{
+            <small>protected</small> _filters => <small>array</small><span>(0)</span> 
+            <small>protected</small> _uri => <small>string</small><span>(28)</span> "errors/php/&lt;hash&gt;(/&lt;action&gt;)"
+            <small>protected</small> _regex => <small>array</small><span>(0)</span> 
+            <small>protected</small> _defaults => <small>array</small><span>(4)</span> <span>(
+                "module" => <small>string</small><span>(5)</span> "error"
+                "directory" => <small>string</small><span>(5)</span> "Error"
+                "controller" => <small>string</small><span>(10)</span> "PhpMessage"
+                "action" => <small>string</small><span>(4)</span> "show"
+            )</span>
+            <small>protected</small> _route_regex => <small>string</small><span>(69)</span> "#^errors/php/(?P&lt;hash&gt;[^/.,;?\n]++)(?:/(?P&lt;action&gt;[^/.,;?\n]++))?$#uD"
+        }</code>
+        <small>protected</small> _routes => <small>array</small><span>(0)</span> 
+        <small>protected</small> _header => <small>object</small> <span>HTTP_Header(0)</span> <code>{
+        }</code>
+        <small>protected</small> _body => <small>NULL</small>
+        <small>protected</small> _directory => <small>string</small><span>(5)</span> "Error"
+        <small>protected</small> _controller => <small>string</small><span>(10)</span> "PhpMessage"
+        <small>protected</small> _action => <small>string</small><span>(4)</span> "show"
+        <small>protected</small> _uri => <small>string</small><span>(51)</span> "errors/php/72f8d0504699f4924c7f65d9511febeec85d38a5"
+        <small>protected</small> _external => <small>bool</small> FALSE
+        <small>protected</small> _params => <small>array</small><span>(2)</span> <span>(
+            "hash" => <small>string</small><span>(40)</span> "72f8d0504699f4924c7f65d9511febeec85d38a5"
+            "module" => <small>string</small><span>(5)</span> "error"
+        )</span>
+        <small>protected</small> _get => <small>array</small><span>(0)</span> 
+        <small>protected</small> _post => <small>array</small><span>(0)</span> 
+        <small>protected</small> _cookies => <small>array</small><span>(2)</span> <span>(
+            "session" => <small>NULL</small>
+            "lang" => <small>string</small><span>(2)</span> "ru"
+        )</span>
+        <small>protected</small> _client => <small>object</small> <span>Request_Client_Internal(9)</span> <code>{
+            <small>protected</small> _previous_environment => <small>NULL</small>
+            <small>protected</small> _cache => <small>NULL</small>
+            <small>protected</small> _follow => <small>bool</small> FALSE
+            <small>protected</small> _follow_headers => <small>array</small><span>(1)</span> <span>(
+                0 => <small>string</small><span>(13)</span> "Authorization"
+            )</span>
+            <small>protected</small> _strict_redirect => <small>bool</small> TRUE
+            <small>protected</small> _header_callbacks => <small>array</small><span>(1)</span> <span>(
+                "Location" => <small>string</small><span>(34)</span> "Request_Client::on_header_location"
+            )</span>
+            <small>protected</small> _max_callback_depth => <small>integer</small> 5
+            <small>protected</small> _callback_depth => <small>integer</small> 1
+            <small>protected</small> _callback_params => <small>array</small><span>(0)</span> 
+        }</code>
+    }</code>
+    <small>protected</small> _status => <small>integer</small> 200
+    <small>protected</small> _header => <small>object</small> <span>HTTP_Header(0)</span> <code>{
+    }</code>
+    <small>protected</small> _body => <small>string</small><span>(0)</span> ""
+    <small>protected</small> _cookies => <small>array</small><span>(0)</span> 
+    <small>protected</small> _protocol => <small>NULL</small>
+}</code></pre></td>
+						</tr>
+										</table>
+				</div>
+													<pre id="error5346a6cc6a73bsource10" class="source collapsed"><code><pre class="source"><code><span class="line"><span class="number">109</span> 		$orig_response = $response = Response::factory();
+</span><span class="line"><span class="number">110</span> 
+</span><span class="line"><span class="number">111</span> 		if (($cache = $this-&gt;cache()) instanceof HTTP_Cache)
+</span><span class="line"><span class="number">112</span> 			return $cache-&gt;execute($this, $request, $response);
+</span><span class="line"><span class="number">113</span> 
+</span><span class="line highlight"><span class="number">114</span> 		$response = $this-&gt;execute_request($request, $response);
+</span><span class="line"><span class="number">115</span> 
+</span><span class="line"><span class="number">116</span> 		// Execute response callbacks
+</span><span class="line"><span class="number">117</span> 		foreach ($this-&gt;header_callbacks() as $header =&gt; $callback)
+</span><span class="line"><span class="number">118</span> 		{
+</span><span class="line"><span class="number">119</span> 			if ($response-&gt;headers($header))
+</span></code></pre></code></pre>
+							</li>
+								<li>
+				<p>
+					<span class="file">
+													<a href="#error5346a6cc6a73bsource11" onclick="return koggle('error5346a6cc6a73bsource11')">SYSPATH/classes/Kohana/Request.php [ 990 ]</a>
+											</span>
+					&raquo;
+					Kohana_Request_Client->execute(<a href="#error5346a6cc6a73bargs11" onclick="return koggle('error5346a6cc6a73bargs11')">arguments</a>)
+				</p>
+								<div id="error5346a6cc6a73bargs11" class="collapsed">
+					<table cellspacing="0">
+											<tr>
+							<td><code>0</code></td>
+							<td><pre><small>object</small> <span>Request(19)</span> <code>{
+    <small>protected</small> _requested_with => <small>NULL</small>
+    <small>protected</small> _method => <small>string</small><span>(3)</span> "GET"
+    <small>protected</small> _protocol => <small>string</small><span>(8)</span> "HTTP/1.0"
+    <small>protected</small> _secure => <small>bool</small> FALSE
+    <small>protected</small> _referrer => <small>string</small><span>(34)</span> "http://test.afs.gallery/errors/php"
+    <small>protected</small> _route => <small>object</small> <span>Route(5)</span> <code>{
+        <small>protected</small> _filters => <small>array</small><span>(0)</span> 
+        <small>protected</small> _uri => <small>string</small><span>(28)</span> "errors/php/&lt;hash&gt;(/&lt;action&gt;)"
+        <small>protected</small> _regex => <small>array</small><span>(0)</span> 
+        <small>protected</small> _defaults => <small>array</small><span>(4)</span> <span>(
+            "module" => <small>string</small><span>(5)</span> "error"
+            "directory" => <small>string</small><span>(5)</span> "Error"
+            "controller" => <small>string</small><span>(10)</span> "PhpMessage"
+            "action" => <small>string</small><span>(4)</span> "show"
+        )</span>
+        <small>protected</small> _route_regex => <small>string</small><span>(69)</span> "#^errors/php/(?P&lt;hash&gt;[^/.,;?\n]++)(?:/(?P&lt;action&gt;[^/.,;?\n]++))?$#uD"
+    }</code>
+    <small>protected</small> _routes => <small>array</small><span>(0)</span> 
+    <small>protected</small> _header => <small>object</small> <span>HTTP_Header(0)</span> <code>{
+    }</code>
+    <small>protected</small> _body => <small>NULL</small>
+    <small>protected</small> _directory => <small>string</small><span>(5)</span> "Error"
+    <small>protected</small> _controller => <small>string</small><span>(10)</span> "PhpMessage"
+    <small>protected</small> _action => <small>string</small><span>(4)</span> "show"
+    <small>protected</small> _uri => <small>string</small><span>(51)</span> "errors/php/72f8d0504699f4924c7f65d9511febeec85d38a5"
+    <small>protected</small> _external => <small>bool</small> FALSE
+    <small>protected</small> _params => <small>array</small><span>(2)</span> <span>(
+        "hash" => <small>string</small><span>(40)</span> "72f8d0504699f4924c7f65d9511febeec85d38a5"
+        "module" => <small>string</small><span>(5)</span> "error"
+    )</span>
+    <small>protected</small> _get => <small>array</small><span>(0)</span> 
+    <small>protected</small> _post => <small>array</small><span>(0)</span> 
+    <small>protected</small> _cookies => <small>array</small><span>(2)</span> <span>(
+        "session" => <small>NULL</small>
+        "lang" => <small>string</small><span>(2)</span> "ru"
+    )</span>
+    <small>protected</small> _client => <small>object</small> <span>Request_Client_Internal(9)</span> <code>{
+        <small>protected</small> _previous_environment => <small>NULL</small>
+        <small>protected</small> _cache => <small>NULL</small>
+        <small>protected</small> _follow => <small>bool</small> FALSE
+        <small>protected</small> _follow_headers => <small>array</small><span>(1)</span> <span>(
+            0 => <small>string</small><span>(13)</span> "Authorization"
+        )</span>
+        <small>protected</small> _strict_redirect => <small>bool</small> TRUE
+        <small>protected</small> _header_callbacks => <small>array</small><span>(1)</span> <span>(
+            "Location" => <small>string</small><span>(34)</span> "Request_Client::on_header_location"
+        )</span>
+        <small>protected</small> _max_callback_depth => <small>integer</small> 5
+        <small>protected</small> _callback_depth => <small>integer</small> 1
+        <small>protected</small> _callback_params => <small>array</small><span>(0)</span> 
+    }</code>
+}</code></pre></td>
+						</tr>
+										</table>
+				</div>
+													<pre id="error5346a6cc6a73bsource11" class="source collapsed"><code><pre class="source"><code><span class="line"><span class="number">985</span> 			throw new Request_Exception('Unable to execute :uri without a Kohana_Request_Client', array(
+</span><span class="line"><span class="number">986</span> 				':uri' =&gt; $this-&gt;_uri,
+</span><span class="line"><span class="number">987</span> 			));
+</span><span class="line"><span class="number">988</span> 		}
+</span><span class="line"><span class="number">989</span> 
+</span><span class="line highlight"><span class="number">990</span> 		return $this-&gt;_client-&gt;execute($this);
+</span><span class="line"><span class="number">991</span> 	}
+</span><span class="line"><span class="number">992</span> 
+</span><span class="line"><span class="number">993</span> 	/**
+</span><span class="line"><span class="number">994</span> 	 * Returns whether this request is the initial request Kohana received.
+</span><span class="line"><span class="number">995</span> 	 * Can be used to test for sub requests.
+</span></code></pre></code></pre>
+							</li>
+								<li>
+				<p>
+					<span class="file">
+													<a href="#error5346a6cc6a73bsource12" onclick="return koggle('error5346a6cc6a73bsource12')">DOCROOT/index.php [ 118 ]</a>
+											</span>
+					&raquo;
+					Kohana_Request->execute()
+				</p>
+													<pre id="error5346a6cc6a73bsource12" class="source collapsed"><code><pre class="source"><code><span class="line"><span class="number">113</span>     /**
+</span><span class="line"><span class="number">114</span>      * Execute the main request. A source of the URI can be passed, eg: $_SERVER['PATH_INFO'].
+</span><span class="line"><span class="number">115</span>      * If no source is specified, the URI will be automatically detected.
+</span><span class="line"><span class="number">116</span>      */
+</span><span class="line"><span class="number">117</span>     echo Request::factory(TRUE, array(), FALSE)
+</span><span class="line highlight"><span class="number">118</span>         -&gt;execute()
+</span><span class="line"><span class="number">119</span>         -&gt;send_headers(TRUE)
+</span><span class="line"><span class="number">120</span>         -&gt;body();
+</span><span class="line"><span class="number">121</span> }
+</span></code></pre></code></pre>
+							</li>
+								<li>
+				<p>
+					<span class="file">
+													<a href="#error5346a6cc6a73bsource13" onclick="return koggle('error5346a6cc6a73bsource13')">/spotman/www/projects/dev/betakiller/sites/art-for-sale/public/index.php [ 3 ]</a>
+											</span>
+					&raquo;
+					include(<a href="#error5346a6cc6a73bargs13" onclick="return koggle('error5346a6cc6a73bargs13')">arguments</a>)
+				</p>
+								<div id="error5346a6cc6a73bargs13" class="collapsed">
+					<table cellspacing="0">
+											<tr>
+							<td><code>0</code></td>
+							<td><pre><small>string</small><span>(51)</span> "/spotman/www/projects/dev/betakiller/core/index.php"</pre></td>
+						</tr>
+										</table>
+				</div>
+													<pre id="error5346a6cc6a73bsource13" class="source collapsed"><code><pre class="source"><code><span class="line"><span class="number">1</span> &lt;?php
+</span><span class="line"><span class="number">2</span> 
+</span><span class="line highlight"><span class="number">3</span> include "../../../core/index.php";</span></code></pre></code></pre>
+							</li>
+							</ol>
+	</div>
+	<h2><a href="#error5346a6cc6a73benvironment" onclick="return koggle('error5346a6cc6a73benvironment')">Environment</a></h2>
+	<div id="error5346a6cc6a73benvironment" class="content collapsed">
+				<h3><a href="#error5346a6cc6a73benvironment_included" onclick="return koggle('error5346a6cc6a73benvironment_included')">Included files</a> (153)</h3>
+		<div id="error5346a6cc6a73benvironment_included" class="collapsed">
+			<table cellspacing="0">
+								<tr>
+					<td><code>/spotman/www/projects/dev/betakiller/sites/art-for-sale/public/index.php</code></td>
+				</tr>
+								<tr>
+					<td><code>DOCROOT/index.php</code></td>
+				</tr>
+								<tr>
+					<td><code>APPPATH/bootstrap.php</code></td>
+				</tr>
+								<tr>
+					<td><code>SYSPATH/classes/Kohana/Core.php</code></td>
+				</tr>
+								<tr>
+					<td><code>APPPATH/classes/Kohana.php</code></td>
+				</tr>
+								<tr>
+					<td><code>SYSPATH/classes/Cookie.php</code></td>
+				</tr>
+								<tr>
+					<td><code>SYSPATH/classes/Kohana/Cookie.php</code></td>
+				</tr>
+								<tr>
+					<td><code>SYSPATH/classes/Config.php</code></td>
+				</tr>
+								<tr>
+					<td><code>SYSPATH/classes/Kohana/Config.php</code></td>
+				</tr>
+								<tr>
+					<td><code>SYSPATH/classes/Config/File.php</code></td>
+				</tr>
+								<tr>
+					<td><code>SYSPATH/classes/Kohana/Config/File.php</code></td>
+				</tr>
+								<tr>
+					<td><code>SYSPATH/classes/Kohana/Config/File/Reader.php</code></td>
+				</tr>
+								<tr>
+					<td><code>SYSPATH/classes/Kohana/Config/Reader.php</code></td>
+				</tr>
+								<tr>
+					<td><code>SYSPATH/classes/Kohana/Config/Source.php</code></td>
+				</tr>
+								<tr>
+					<td><code>APPPATH/classes/I18n.php</code></td>
+				</tr>
+								<tr>
+					<td><code>SYSPATH/classes/Kohana/I18n.php</code></td>
+				</tr>
+								<tr>
+					<td><code>SYSPATH/classes/Arr.php</code></td>
+				</tr>
+								<tr>
+					<td><code>SYSPATH/classes/Kohana/Arr.php</code></td>
+				</tr>
+								<tr>
+					<td><code>APPPATH/config/init.php</code></td>
+				</tr>
+								<tr>
+					<td><code>SYSPATH/classes/Config/Group.php</code></td>
+				</tr>
+								<tr>
+					<td><code>SYSPATH/classes/Kohana/Config/Group.php</code></td>
+				</tr>
+								<tr>
+					<td><code>SYSPATH/classes/Log.php</code></td>
+				</tr>
+								<tr>
+					<td><code>SYSPATH/classes/Kohana/Log.php</code></td>
+				</tr>
+								<tr>
+					<td><code>SYSPATH/classes/Log/File.php</code></td>
+				</tr>
+								<tr>
+					<td><code>SYSPATH/classes/Kohana/Log/File.php</code></td>
+				</tr>
+								<tr>
+					<td><code>SYSPATH/classes/Log/Writer.php</code></td>
+				</tr>
+								<tr>
+					<td><code>SYSPATH/classes/Kohana/Log/Writer.php</code></td>
+				</tr>
+								<tr>
+					<td><code>APPPATH/config/modules.php</code></td>
+				</tr>
+								<tr>
+					<td><code>MODPATH/error/init.php</code></td>
+				</tr>
+								<tr>
+					<td><code>APPPATH/classes/Route.php</code></td>
+				</tr>
+								<tr>
+					<td><code>SYSPATH/classes/Kohana/Route.php</code></td>
+				</tr>
+								<tr>
+					<td><code>SYSPATH/classes/HTTP/Exception/500.php</code></td>
+				</tr>
+								<tr>
+					<td><code>SYSPATH/classes/Kohana/HTTP/Exception/500.php</code></td>
+				</tr>
+								<tr>
+					<td><code>APPPATH/classes/HTTP/Exception.php</code></td>
+				</tr>
+								<tr>
+					<td><code>SYSPATH/classes/Kohana/HTTP/Exception.php</code></td>
+				</tr>
+								<tr>
+					<td><code>APPPATH/classes/Kohana/Exception.php</code></td>
+				</tr>
+								<tr>
+					<td><code>SYSPATH/classes/Kohana/Kohana/Exception.php</code></td>
+				</tr>
+								<tr>
+					<td><code>MODPATH/multi-site/init.php</code></td>
+				</tr>
+								<tr>
+					<td><code>MODPATH/multi-site/classes/MultiSite.php</code></td>
+				</tr>
+								<tr>
+					<td><code>MODPATH/multi-site/classes/Kohana/MultiSite.php</code></td>
+				</tr>
+								<tr>
+					<td><code>MODPATH/multi-site/config/sites.php</code></td>
+				</tr>
+								<tr>
+					<td><code>APPPATH/config/sites.php</code></td>
+				</tr>
+								<tr>
+					<td><code>/spotman/www/projects/dev/betakiller/sites/art-for-sale/config.php</code></td>
+				</tr>
+								<tr>
+					<td><code>MODPATH/api/init.php</code></td>
+				</tr>
+								<tr>
+					<td><code>MODPATH/assets/init.php</code></td>
+				</tr>
+								<tr>
+					<td><code>MODPATH/static-files/init.php</code></td>
+				</tr>
+								<tr>
+					<td><code>MODPATH/static-files/config/staticfiles.php</code></td>
+				</tr>
+								<tr>
+					<td><code>MODPATH/static-files/vendor/jsmin.php</code></td>
+				</tr>
+								<tr>
+					<td><code>MODPATH/locator/init.php</code></td>
+				</tr>
+								<tr>
+					<td><code>MODPATH/twig/init.php</code></td>
+				</tr>
+								<tr>
+					<td><code>MODPATH/twig/classes/Twig.php</code></td>
+				</tr>
+								<tr>
+					<td><code>MODPATH/twig/classes/Kohana/Twig.php</code></td>
+				</tr>
+								<tr>
+					<td><code>APPPATH/classes/View.php</code></td>
+				</tr>
+								<tr>
+					<td><code>SYSPATH/classes/Kohana/View.php</code></td>
+				</tr>
+								<tr>
+					<td><code>MODPATH/twig/vendor/twig/lib/Twig/Autoloader.php</code></td>
+				</tr>
+								<tr>
+					<td><code>MODPATH/twig/config/twig.php</code></td>
+				</tr>
+								<tr>
+					<td><code>APPPATH/config/twig.php</code></td>
+				</tr>
+								<tr>
+					<td><code>/spotman/www/projects/dev/betakiller/sites/art-for-sale/init.php</code></td>
+				</tr>
+								<tr>
+					<td><code>APPPATH/routes/default.php</code></td>
+				</tr>
+								<tr>
+					<td><code>APPPATH/classes/Request.php</code></td>
+				</tr>
+								<tr>
+					<td><code>SYSPATH/classes/Kohana/Request.php</code></td>
+				</tr>
+								<tr>
+					<td><code>SYSPATH/classes/HTTP/Request.php</code></td>
+				</tr>
+								<tr>
+					<td><code>SYSPATH/classes/Kohana/HTTP/Request.php</code></td>
+				</tr>
+								<tr>
+					<td><code>SYSPATH/classes/HTTP/Message.php</code></td>
+				</tr>
+								<tr>
+					<td><code>SYSPATH/classes/Kohana/HTTP/Message.php</code></td>
+				</tr>
+								<tr>
+					<td><code>SYSPATH/classes/HTTP/Header.php</code></td>
+				</tr>
+								<tr>
+					<td><code>SYSPATH/classes/Kohana/HTTP/Header.php</code></td>
+				</tr>
+								<tr>
+					<td><code>SYSPATH/classes/Request/Client/Internal.php</code></td>
+				</tr>
+								<tr>
+					<td><code>SYSPATH/classes/Kohana/Request/Client/Internal.php</code></td>
+				</tr>
+								<tr>
+					<td><code>SYSPATH/classes/Request/Client.php</code></td>
+				</tr>
+								<tr>
+					<td><code>SYSPATH/classes/Kohana/Request/Client.php</code></td>
+				</tr>
+								<tr>
+					<td><code>APPPATH/classes/Response.php</code></td>
+				</tr>
+								<tr>
+					<td><code>SYSPATH/classes/Kohana/Response.php</code></td>
+				</tr>
+								<tr>
+					<td><code>SYSPATH/classes/HTTP/Response.php</code></td>
+				</tr>
+								<tr>
+					<td><code>SYSPATH/classes/Kohana/HTTP/Response.php</code></td>
+				</tr>
+								<tr>
+					<td><code>MODPATH/error/classes/Controller/Error/PhpMessage.php</code></td>
+				</tr>
+								<tr>
+					<td><code>APPPATH/classes/Controller/Developer.php</code></td>
+				</tr>
+								<tr>
+					<td><code>APPPATH/classes/Controller/Basic.php</code></td>
+				</tr>
+								<tr>
+					<td><code>APPPATH/classes/Controller.php</code></td>
+				</tr>
+								<tr>
+					<td><code>APPPATH/classes/Controller/Proxy.php</code></td>
+				</tr>
+								<tr>
+					<td><code>SYSPATH/classes/Kohana/Controller.php</code></td>
+				</tr>
+								<tr>
+					<td><code>APPPATH/classes/View/Layout.php</code></td>
+				</tr>
+								<tr>
+					<td><code>MODPATH/iface/classes/Core/View/Layout.php</code></td>
+				</tr>
+								<tr>
+					<td><code>APPPATH/classes/Env.php</code></td>
+				</tr>
+								<tr>
+					<td><code>APPPATH/classes/Environment.php</code></td>
+				</tr>
+								<tr>
+					<td><code>APPPATH/classes/Registry.php</code></td>
+				</tr>
+								<tr>
+					<td><code>MODPATH/auth/classes/Auth.php</code></td>
+				</tr>
+								<tr>
+					<td><code>MODPATH/auth/classes/Kohana/Auth.php</code></td>
+				</tr>
+								<tr>
+					<td><code>MODPATH/auth/config/auth.php</code></td>
+				</tr>
+								<tr>
+					<td><code>SYSPATH/classes/Session.php</code></td>
+				</tr>
+								<tr>
+					<td><code>SYSPATH/classes/Kohana/Session.php</code></td>
+				</tr>
+								<tr>
+					<td><code>APPPATH/config/auth.php</code></td>
+				</tr>
+								<tr>
+					<td><code>APPPATH/classes/Auth/ORM.php</code></td>
+				</tr>
+								<tr>
+					<td><code>MODPATH/orm/classes/Kohana/Auth/ORM.php</code></td>
+				</tr>
+								<tr>
+					<td><code>SYSPATH/config/session.php</code></td>
+				</tr>
+								<tr>
+					<td><code>MODPATH/database/config/session.php</code></td>
+				</tr>
+								<tr>
+					<td><code>SYSPATH/classes/Session/Native.php</code></td>
+				</tr>
+								<tr>
+					<td><code>SYSPATH/classes/Kohana/Session/Native.php</code></td>
+				</tr>
+								<tr>
+					<td><code>/spotman/www/projects/dev/betakiller/sites/art-for-sale/classes/Model/User.php</code></td>
+				</tr>
+								<tr>
+					<td><code>APPPATH/classes/BetaKiller/Model/User.php</code></td>
+				</tr>
+								<tr>
+					<td><code>MODPATH/orm/classes/Model/Auth/User.php</code></td>
+				</tr>
+								<tr>
+					<td><code>APPPATH/classes/ORM.php</code></td>
+				</tr>
+								<tr>
+					<td><code>MODPATH/orm/classes/Kohana/ORM.php</code></td>
+				</tr>
+								<tr>
+					<td><code>SYSPATH/classes/Model.php</code></td>
+				</tr>
+								<tr>
+					<td><code>SYSPATH/classes/Kohana/Model.php</code></td>
+				</tr>
+								<tr>
+					<td><code>MODPATH/api/classes/API/Response/Item.php</code></td>
+				</tr>
+								<tr>
+					<td><code>SYSPATH/classes/Inflector.php</code></td>
+				</tr>
+								<tr>
+					<td><code>SYSPATH/classes/Kohana/Inflector.php</code></td>
+				</tr>
+								<tr>
+					<td><code>SYSPATH/config/inflector.php</code></td>
+				</tr>
+								<tr>
+					<td><code>MODPATH/database/classes/Database.php</code></td>
+				</tr>
+								<tr>
+					<td><code>MODPATH/database/classes/Kohana/Database.php</code></td>
+				</tr>
+								<tr>
+					<td><code>MODPATH/database/config/database.php</code></td>
+				</tr>
+								<tr>
+					<td><code>/spotman/www/projects/dev/betakiller/sites/art-for-sale/config/environments/staging/database.php</code></td>
+				</tr>
+								<tr>
+					<td><code>MODPATH/database/classes/Database/MySQL.php</code></td>
+				</tr>
+								<tr>
+					<td><code>MODPATH/database/classes/Kohana/Database/MySQL.php</code></td>
+				</tr>
+								<tr>
+					<td><code>MODPATH/database/classes/Database/MySQL/Result.php</code></td>
+				</tr>
+								<tr>
+					<td><code>MODPATH/database/classes/Kohana/Database/MySQL/Result.php</code></td>
+				</tr>
+								<tr>
+					<td><code>MODPATH/database/classes/Database/Result.php</code></td>
+				</tr>
+								<tr>
+					<td><code>MODPATH/database/classes/Kohana/Database/Result.php</code></td>
+				</tr>
+								<tr>
+					<td><code>MODPATH/database/classes/Database/Expression.php</code></td>
+				</tr>
+								<tr>
+					<td><code>MODPATH/database/classes/Kohana/Database/Expression.php</code></td>
+				</tr>
+								<tr>
+					<td><code>APPPATH/classes/Model/Role.php</code></td>
+				</tr>
+								<tr>
+					<td><code>MODPATH/orm/classes/Model/Auth/Role.php</code></td>
+				</tr>
+								<tr>
+					<td><code>MODPATH/database/classes/DB.php</code></td>
+				</tr>
+								<tr>
+					<td><code>MODPATH/database/classes/Kohana/DB.php</code></td>
+				</tr>
+								<tr>
+					<td><code>MODPATH/database/classes/Database/Query/Builder/Select.php</code></td>
+				</tr>
+								<tr>
+					<td><code>MODPATH/database/classes/Kohana/Database/Query/Builder/Select.php</code></td>
+				</tr>
+								<tr>
+					<td><code>MODPATH/database/classes/Database/Query/Builder/Where.php</code></td>
+				</tr>
+								<tr>
+					<td><code>MODPATH/database/classes/Kohana/Database/Query/Builder/Where.php</code></td>
+				</tr>
+								<tr>
+					<td><code>MODPATH/database/classes/Database/Query/Builder.php</code></td>
+				</tr>
+								<tr>
+					<td><code>MODPATH/database/classes/Kohana/Database/Query/Builder.php</code></td>
+				</tr>
+								<tr>
+					<td><code>MODPATH/database/classes/Database/Query.php</code></td>
+				</tr>
+								<tr>
+					<td><code>MODPATH/database/classes/Kohana/Database/Query.php</code></td>
+				</tr>
+								<tr>
+					<td><code>APPPATH/classes/Mango.php</code></td>
+				</tr>
+								<tr>
+					<td><code>MODPATH/mangodb/classes/Mango/Core.php</code></td>
+				</tr>
+								<tr>
+					<td><code>MODPATH/mangodb/classes/Mango/Interface.php</code></td>
+				</tr>
+								<tr>
+					<td><code>MODPATH/error/classes/Model/Error/Message/Php.php</code></td>
+				</tr>
+								<tr>
+					<td><code>MODPATH/error/classes/Model/Error/Message/Base.php</code></td>
+				</tr>
+								<tr>
+					<td><code>SYSPATH/classes/UTF8.php</code></td>
+				</tr>
+								<tr>
+					<td><code>SYSPATH/classes/Kohana/UTF8.php</code></td>
+				</tr>
+								<tr>
+					<td><code>MODPATH/mangodb/classes/MangoDB.php</code></td>
+				</tr>
+								<tr>
+					<td><code>MODPATH/mangodb/config/mangoDB.php</code></td>
+				</tr>
+								<tr>
+					<td><code>/spotman/www/projects/dev/betakiller/sites/art-for-sale/config/environments/staging/mangoDB.php</code></td>
+				</tr>
+								<tr>
+					<td><code>MODPATH/mangodb/config/mangoCTI.php</code></td>
+				</tr>
+								<tr>
+					<td><code>SYSPATH/classes/View/Exception.php</code></td>
+				</tr>
+								<tr>
+					<td><code>SYSPATH/classes/Kohana/View/Exception.php</code></td>
+				</tr>
+								<tr>
+					<td><code>MODPATH/assets/i18n/ru.php</code></td>
+				</tr>
+								<tr>
+					<td><code>APPPATH/i18n/ru.php</code></td>
+				</tr>
+								<tr>
+					<td><code>SYSPATH/views/kohana/error.php</code></td>
+				</tr>
+								<tr>
+					<td><code>SYSPATH/classes/HTML.php</code></td>
+				</tr>
+								<tr>
+					<td><code>SYSPATH/classes/Kohana/HTML.php</code></td>
+				</tr>
+								<tr>
+					<td><code>SYSPATH/classes/Debug.php</code></td>
+				</tr>
+								<tr>
+					<td><code>SYSPATH/classes/Kohana/Debug.php</code></td>
+				</tr>
+							</table>
+		</div>
+				<h3><a href="#error5346a6cc6a73benvironment_loaded" onclick="return koggle('error5346a6cc6a73benvironment_loaded')">Loaded extensions</a> (53)</h3>
+		<div id="error5346a6cc6a73benvironment_loaded" class="collapsed">
+			<table cellspacing="0">
+								<tr>
+					<td><code>Core</code></td>
+				</tr>
+								<tr>
+					<td><code>date</code></td>
+				</tr>
+								<tr>
+					<td><code>ereg</code></td>
+				</tr>
+								<tr>
+					<td><code>libxml</code></td>
+				</tr>
+								<tr>
+					<td><code>openssl</code></td>
+				</tr>
+								<tr>
+					<td><code>pcre</code></td>
+				</tr>
+								<tr>
+					<td><code>zlib</code></td>
+				</tr>
+								<tr>
+					<td><code>bz2</code></td>
+				</tr>
+								<tr>
+					<td><code>calendar</code></td>
+				</tr>
+								<tr>
+					<td><code>ctype</code></td>
+				</tr>
+								<tr>
+					<td><code>hash</code></td>
+				</tr>
+								<tr>
+					<td><code>filter</code></td>
+				</tr>
+								<tr>
+					<td><code>ftp</code></td>
+				</tr>
+								<tr>
+					<td><code>gettext</code></td>
+				</tr>
+								<tr>
+					<td><code>gmp</code></td>
+				</tr>
+								<tr>
+					<td><code>SPL</code></td>
+				</tr>
+								<tr>
+					<td><code>iconv</code></td>
+				</tr>
+								<tr>
+					<td><code>Reflection</code></td>
+				</tr>
+								<tr>
+					<td><code>session</code></td>
+				</tr>
+								<tr>
+					<td><code>standard</code></td>
+				</tr>
+								<tr>
+					<td><code>shmop</code></td>
+				</tr>
+								<tr>
+					<td><code>SimpleXML</code></td>
+				</tr>
+								<tr>
+					<td><code>sockets</code></td>
+				</tr>
+								<tr>
+					<td><code>mbstring</code></td>
+				</tr>
+								<tr>
+					<td><code>tokenizer</code></td>
+				</tr>
+								<tr>
+					<td><code>xml</code></td>
+				</tr>
+								<tr>
+					<td><code>apache2handler</code></td>
+				</tr>
+								<tr>
+					<td><code>http</code></td>
+				</tr>
+								<tr>
+					<td><code>curl</code></td>
+				</tr>
+								<tr>
+					<td><code>dom</code></td>
+				</tr>
+								<tr>
+					<td><code>fileinfo</code></td>
+				</tr>
+								<tr>
+					<td><code>gd</code></td>
+				</tr>
+								<tr>
+					<td><code>json</code></td>
+				</tr>
+								<tr>
+					<td><code>exif</code></td>
+				</tr>
+								<tr>
+					<td><code>mcrypt</code></td>
+				</tr>
+								<tr>
+					<td><code>mongo</code></td>
+				</tr>
+								<tr>
+					<td><code>mysql</code></td>
+				</tr>
+								<tr>
+					<td><code>mysqli</code></td>
+				</tr>
+								<tr>
+					<td><code>PDO</code></td>
+				</tr>
+								<tr>
+					<td><code>pdo_mysql</code></td>
+				</tr>
+								<tr>
+					<td><code>pdo_sqlite</code></td>
+				</tr>
+								<tr>
+					<td><code>Phar</code></td>
+				</tr>
+								<tr>
+					<td><code>posix</code></td>
+				</tr>
+								<tr>
+					<td><code>sqlite3</code></td>
+				</tr>
+								<tr>
+					<td><code>sysvmsg</code></td>
+				</tr>
+								<tr>
+					<td><code>sysvsem</code></td>
+				</tr>
+								<tr>
+					<td><code>sysvshm</code></td>
+				</tr>
+								<tr>
+					<td><code>wddx</code></td>
+				</tr>
+								<tr>
+					<td><code>xmlreader</code></td>
+				</tr>
+								<tr>
+					<td><code>xmlwriter</code></td>
+				</tr>
+								<tr>
+					<td><code>xsl</code></td>
+				</tr>
+								<tr>
+					<td><code>zip</code></td>
+				</tr>
+								<tr>
+					<td><code>mhash</code></td>
+				</tr>
+							</table>
+		</div>
+						<h3><a href="#error5346a6cc6a73benvironment_session" onclick="return koggle('error5346a6cc6a73benvironment_session')">$_SESSION</a></h3>
+		<div id="error5346a6cc6a73benvironment_session" class="collapsed">
+			<table cellspacing="0">
+								<tr>
+					<td><code>last_active</code></td>
+					<td><pre><small>integer</small> 1397139053</pre></td>
+				</tr>
+								<tr>
+					<td><code>auth_user</code></td>
+					<td><pre><small>object</small> <span>Model_User(34)</span> <code>{
+    <small>protected</small> _reload_on_wakeup => <small>bool</small> FALSE
+    <small>protected</small> _has_many => <small>array</small><span>(4)</span> <span>(
+        "user_tokens" => <small>array</small><span>(4)</span> <span>(
+            "foreign_key" => <small>string</small><span>(7)</span> "user_id"
+            "through" => <small>NULL</small>
+            "far_key" => <small>string</small><span>(13)</span> "user_token_id"
+            "model" => <small>string</small><span>(10)</span> "User_Token"
+        )</span>
+        "roles" => <small>array</small><span>(4)</span> <span>(
+            "foreign_key" => <small>string</small><span>(7)</span> "user_id"
+            "through" => <small>string</small><span>(11)</span> "roles_users"
+            "far_key" => <small>string</small><span>(7)</span> "role_id"
+            "model" => <small>string</small><span>(4)</span> "Role"
+        )</span>
+        "favorite_lots" => <small>array</small><span>(4)</span> <span>(
+            "foreign_key" => <small>string</small><span>(7)</span> "user_id"
+            "through" => <small>string</small><span>(13)</span> "favorite_lots"
+            "far_key" => <small>string</small><span>(6)</span> "lot_id"
+            "model" => <small>string</small><span>(3)</span> "Lot"
+        )</span>
+        "ulogins" => <small>array</small><span>(4)</span> <span>(
+            "foreign_key" => <small>string</small><span>(7)</span> "user_id"
+            "through" => <small>NULL</small>
+            "far_key" => <small>string</small><span>(9)</span> "ulogin_id"
+            "model" => <small>string</small><span>(6)</span> "Ulogin"
+        )</span>
+    )</span>
+    <small>protected</small> _has_one => <small>array</small><span>(0)</span> 
+    <small>protected</small> _belongs_to => <small>array</small><span>(2)</span> <span>(
+        "profile_images" => <small>array</small><span>(4)</span> <span>(
+            "foreign_key" => <small>string</small><span>(17)</span> "profile_images_id"
+            "model" => <small>string</small><span>(4)</span> "File"
+            "through" => <small>string</small><span>(11)</span> "user_images"
+            "far_key" => <small>string</small><span>(7)</span> "file_id"
+        )</span>
+        "language" => <small>array</small><span>(2)</span> <span>(
+            "foreign_key" => <small>string</small><span>(11)</span> "language_id"
+            "model" => <small>string</small><span>(8)</span> "Language"
+        )</span>
+    )</span>
+    <small>protected</small> _load_with => <small>array</small><span>(0)</span> 
+    <small>protected</small> _validation => <small>NULL</small>
+    <small>protected</small> _object => <small>array</small><span>(12)</span> <span>(
+        "id" => <small>string</small><span>(1)</span> "1"
+        "email" => <small>string</small><span>(15)</span> "i.am@spotman.ru"
+        "username" => <small>string</small><span>(7)</span> "spotman"
+        "password" => <small>string</small><span>(64)</span> "d9574370952a292d14fdf2bcb71ab3ece75f2cc4b0b192d1810f3f631d7a1cad"
+        "first_name" => <small>string</small><span>(10)</span> "Денис"
+        "last_name" => <small>string</small><span>(14)</span> "Терехов"
+        "is_active" => <small>string</small><span>(1)</span> "1"
+        "logins" => <small>object</small> <span>Database_Expression(2)</span> <code>{
+            <small>protected</small> _parameters => <small>array</small><span>(0)</span> 
+            <small>protected</small> _value => <small>string</small><span>(10)</span> "logins + 1"
+        }</code>
+        "last_login" => <small>integer</small> 1397137739
+        "language_id" => <small>string</small><span>(1)</span> "1"
+        "profile_image_id" => <small>NULL</small>
+        "phone" => <small>string</small><span>(11)</span> "79657994859"
+    )</span>
+    <small>protected</small> _changed => <small>array</small><span>(0)</span> 
+    <small>protected</small> _original_values => <small>array</small><span>(12)</span> <span>(
+        "id" => <small>string</small><span>(1)</span> "1"
+        "email" => <small>string</small><span>(15)</span> "i.am@spotman.ru"
+        "username" => <small>string</small><span>(7)</span> "spotman"
+        "password" => <small>string</small><span>(64)</span> "d9574370952a292d14fdf2bcb71ab3ece75f2cc4b0b192d1810f3f631d7a1cad"
+        "first_name" => <small>string</small><span>(10)</span> "Денис"
+        "last_name" => <small>string</small><span>(14)</span> "Терехов"
+        "is_active" => <small>string</small><span>(1)</span> "1"
+        "logins" => <small>object</small> <span>Database_Expression(2)</span> <code>{
+            <small>protected</small> _parameters => <small>array</small><span>(0)</span> 
+            <small>protected</small> _value => <small>string</small><span>(10)</span> "logins + 1"
+        }</code>
+        "last_login" => <small>integer</small> 1397137739
+        "language_id" => <small>string</small><span>(1)</span> "1"
+        "profile_image_id" => <small>NULL</small>
+        "phone" => <small>string</small><span>(11)</span> "79657994859"
+    )</span>
+    <small>protected</small> _related => <small>array</small><span>(0)</span> 
+    <small>protected</small> _valid => <small>bool</small> FALSE
+    <small>protected</small> _loaded => <small>bool</small> TRUE
+    <small>protected</small> _saved => <small>bool</small> TRUE
+    <small>protected</small> _sorting => <small>NULL</small>
+    <small>protected</small> _foreign_key_suffix => <small>string</small><span>(3)</span> "_id"
+    <small>protected</small> _object_name => <small>string</small><span>(4)</span> "user"
+    <small>protected</small> _object_plural => <small>string</small><span>(5)</span> "users"
+    <small>protected</small> _table_name => <small>string</small><span>(5)</span> "users"
+    <small>protected</small> _table_columns => <small>array</small><span>(12)</span> <span>(
+        "id" => <small>array</small><span>(13)</span> <span>(
+            "type" => <small>string</small><span>(3)</span> "int"
+            "min" => <small>string</small><span>(1)</span> "0"
+            "max" => <small>string</small><span>(10)</span> "4294967295"
+            "column_name" => <small>string</small><span>(2)</span> "id"
+            "column_default" => <small>NULL</small>
+            "data_type" => <small>string</small><span>(12)</span> "int unsigned"
+            "is_nullable" => <small>bool</small> FALSE
+            "ordinal_position" => <small>integer</small> 1
+            "display" => <small>string</small><span>(2)</span> "11"
+            "comment" => <small>string</small><span>(0)</span> ""
+            "extra" => <small>string</small><span>(14)</span> "auto_increment"
+            "key" => <small>string</small><span>(3)</span> "PRI"
+            "privileges" => <small>string</small><span>(31)</span> "select,insert,update,references"
+        )</span>
+        "email" => <small>array</small><span>(12)</span> <span>(
+            "type" => <small>string</small><span>(6)</span> "string"
+            "column_name" => <small>string</small><span>(5)</span> "email"
+            "column_default" => <small>NULL</small>
+            "data_type" => <small>string</small><span>(7)</span> "varchar"
+            "is_nullable" => <small>bool</small> FALSE
+            "ordinal_position" => <small>integer</small> 2
+            "character_maximum_length" => <small>string</small><span>(3)</span> "127"
+            "collation_name" => <small>string</small><span>(15)</span> "utf8_general_ci"
+            "comment" => <small>string</small><span>(0)</span> ""
+            "extra" => <small>string</small><span>(0)</span> ""
+            "key" => <small>string</small><span>(3)</span> "UNI"
+            "privileges" => <small>string</small><span>(31)</span> "select,insert,update,references"
+        )</span>
+        "username" => <small>array</small><span>(12)</span> <span>(
+            "type" => <small>string</small><span>(6)</span> "string"
+            "column_name" => <small>string</small><span>(8)</span> "username"
+            "column_default" => <small>string</small><span>(0)</span> ""
+            "data_type" => <small>string</small><span>(7)</span> "varchar"
+            "is_nullable" => <small>bool</small> FALSE
+            "ordinal_position" => <small>integer</small> 3
+            "character_maximum_length" => <small>string</small><span>(2)</span> "32"
+            "collation_name" => <small>string</small><span>(15)</span> "utf8_general_ci"
+            "comment" => <small>string</small><span>(0)</span> ""
+            "extra" => <small>string</small><span>(0)</span> ""
+            "key" => <small>string</small><span>(3)</span> "UNI"
+            "privileges" => <small>string</small><span>(31)</span> "select,insert,update,references"
+        )</span>
+        "password" => <small>array</small><span>(12)</span> <span>(
+            "type" => <small>string</small><span>(6)</span> "string"
+            "column_name" => <small>string</small><span>(8)</span> "password"
+            "column_default" => <small>NULL</small>
+            "data_type" => <small>string</small><span>(7)</span> "varchar"
+            "is_nullable" => <small>bool</small> FALSE
+            "ordinal_position" => <small>integer</small> 4
+            "character_maximum_length" => <small>string</small><span>(2)</span> "64"
+            "collation_name" => <small>string</small><span>(15)</span> "utf8_general_ci"
+            "comment" => <small>string</small><span>(0)</span> ""
+            "extra" => <small>string</small><span>(0)</span> ""
+            "key" => <small>string</small><span>(0)</span> ""
+            "privileges" => <small>string</small><span>(31)</span> "select,insert,update,references"
+        )</span>
+        "first_name" => <small>array</small><span>(12)</span> <span>(
+            "type" => <small>string</small><span>(6)</span> "string"
+            "column_name" => <small>string</small><span>(10)</span> "first_name"
+            "column_default" => <small>NULL</small>
+            "data_type" => <small>string</small><span>(7)</span> "varchar"
+            "is_nullable" => <small>bool</small> TRUE
+            "ordinal_position" => <small>integer</small> 5
+            "character_maximum_length" => <small>string</small><span>(2)</span> "32"
+            "collation_name" => <small>string</small><span>(15)</span> "utf8_unicode_ci"
+            "comment" => <small>string</small><span>(6)</span> "Имя"
+            "extra" => <small>string</small><span>(0)</span> ""
+            "key" => <small>string</small><span>(0)</span> ""
+            "privileges" => <small>string</small><span>(31)</span> "select,insert,update,references"
+        )</span>
+        "last_name" => <small>array</small><span>(12)</span> <span>(
+            "type" => <small>string</small><span>(6)</span> "string"
+            "column_name" => <small>string</small><span>(9)</span> "last_name"
+            "column_default" => <small>NULL</small>
+            "data_type" => <small>string</small><span>(7)</span> "varchar"
+            "is_nullable" => <small>bool</small> TRUE
+            "ordinal_position" => <small>integer</small> 6
+            "character_maximum_length" => <small>string</small><span>(2)</span> "32"
+            "collation_name" => <small>string</small><span>(15)</span> "utf8_unicode_ci"
+            "comment" => <small>string</small><span>(14)</span> "Фамилия"
+            "extra" => <small>string</small><span>(0)</span> ""
+            "key" => <small>string</small><span>(0)</span> ""
+            "privileges" => <small>string</small><span>(31)</span> "select,insert,update,references"
+        )</span>
+        "is_active" => <small>array</small><span>(13)</span> <span>(
+            "type" => <small>string</small><span>(3)</span> "int"
+            "min" => <small>string</small><span>(4)</span> "-128"
+            "max" => <small>string</small><span>(3)</span> "127"
+            "column_name" => <small>string</small><span>(9)</span> "is_active"
+            "column_default" => <small>string</small><span>(1)</span> "1"
+            "data_type" => <small>string</small><span>(7)</span> "tinyint"
+            "is_nullable" => <small>bool</small> FALSE
+            "ordinal_position" => <small>integer</small> 7
+            "display" => <small>string</small><span>(1)</span> "1"
+            "comment" => <small>string</small><span>(0)</span> ""
+            "extra" => <small>string</small><span>(0)</span> ""
+            "key" => <small>string</small><span>(0)</span> ""
+            "privileges" => <small>string</small><span>(31)</span> "select,insert,update,references"
+        )</span>
+        "logins" => <small>array</small><span>(13)</span> <span>(
+            "type" => <small>string</small><span>(3)</span> "int"
+            "min" => <small>string</small><span>(1)</span> "0"
+            "max" => <small>string</small><span>(10)</span> "4294967295"
+            "column_name" => <small>string</small><span>(6)</span> "logins"
+            "column_default" => <small>string</small><span>(1)</span> "0"
+            "data_type" => <small>string</small><span>(12)</span> "int unsigned"
+            "is_nullable" => <small>bool</small> FALSE
+            "ordinal_position" => <small>integer</small> 8
+            "display" => <small>string</small><span>(2)</span> "10"
+            "comment" => <small>string</small><span>(0)</span> ""
+            "extra" => <small>string</small><span>(0)</span> ""
+            "key" => <small>string</small><span>(0)</span> ""
+            "privileges" => <small>string</small><span>(31)</span> "select,insert,update,references"
+        )</span>
+        "last_login" => <small>array</small><span>(13)</span> <span>(
+            "type" => <small>string</small><span>(3)</span> "int"
+            "min" => <small>string</small><span>(1)</span> "0"
+            "max" => <small>string</small><span>(10)</span> "4294967295"
+            "column_name" => <small>string</small><span>(10)</span> "last_login"
+            "column_default" => <small>NULL</small>
+            "data_type" => <small>string</small><span>(12)</span> "int unsigned"
+            "is_nullable" => <small>bool</small> TRUE
+            "ordinal_position" => <small>integer</small> 9
+            "display" => <small>string</small><span>(2)</span> "10"
+            "comment" => <small>string</small><span>(0)</span> ""
+            "extra" => <small>string</small><span>(0)</span> ""
+            "key" => <small>string</small><span>(0)</span> ""
+            "privileges" => <small>string</small><span>(31)</span> "select,insert,update,references"
+        )</span>
+        "language_id" => <small>array</small><span>(13)</span> <span>(
+            "type" => <small>string</small><span>(3)</span> "int"
+            "min" => <small>string</small><span>(1)</span> "0"
+            "max" => <small>string</small><span>(10)</span> "4294967295"
+            "column_name" => <small>string</small><span>(11)</span> "language_id"
+            "column_default" => <small>NULL</small>
+            "data_type" => <small>string</small><span>(12)</span> "int unsigned"
+            "is_nullable" => <small>bool</small> TRUE
+            "ordinal_position" => <small>integer</small> 10
+            "display" => <small>string</small><span>(2)</span> "11"
+            "comment" => <small>string</small><span>(0)</span> ""
+            "extra" => <small>string</small><span>(0)</span> ""
+            "key" => <small>string</small><span>(3)</span> "MUL"
+            "privileges" => <small>string</small><span>(31)</span> "select,insert,update,references"
+        )</span>
+        "profile_image_id" => <small>array</small><span>(13)</span> <span>(
+            "type" => <small>string</small><span>(3)</span> "int"
+            "min" => <small>string</small><span>(1)</span> "0"
+            "max" => <small>string</small><span>(10)</span> "4294967295"
+            "column_name" => <small>string</small><span>(16)</span> "profile_image_id"
+            "column_default" => <small>NULL</small>
+            "data_type" => <small>string</small><span>(12)</span> "int unsigned"
+            "is_nullable" => <small>bool</small> TRUE
+            "ordinal_position" => <small>integer</small> 11
+            "display" => <small>string</small><span>(2)</span> "11"
+            "comment" => <small>string</small><span>(0)</span> ""
+            "extra" => <small>string</small><span>(0)</span> ""
+            "key" => <small>string</small><span>(3)</span> "MUL"
+            "privileges" => <small>string</small><span>(31)</span> "select,insert,update,references"
+        )</span>
+        "phone" => <small>array</small><span>(12)</span> <span>(
+            "type" => <small>string</small><span>(6)</span> "string"
+            "column_name" => <small>string</small><span>(5)</span> "phone"
+            "column_default" => <small>NULL</small>
+            "data_type" => <small>string</small><span>(7)</span> "varchar"
+            "is_nullable" => <small>bool</small> TRUE
+            "ordinal_position" => <small>integer</small> 12
+            "character_maximum_length" => <small>string</small><span>(2)</span> "32"
+            "collation_name" => <small>string</small><span>(15)</span> "utf8_unicode_ci"
+            "comment" => <small>string</small><span>(0)</span> ""
+            "extra" => <small>string</small><span>(0)</span> ""
+            "key" => <small>string</small><span>(0)</span> ""
+            "privileges" => <small>string</small><span>(31)</span> "select,insert,update,references"
+        )</span>
+    )</span>
+    <small>protected</small> _updated_column => <small>NULL</small>
+    <small>protected</small> _created_column => <small>NULL</small>
+    <small>protected</small> _serialize_columns => <small>array</small><span>(0)</span> 
+    <small>protected</small> _primary_key => <small>string</small><span>(2)</span> "id"
+    <small>protected</small> _primary_key_value => <small>string</small><span>(1)</span> "1"
+    <small>protected</small> _table_names_plural => <small>bool</small> TRUE
+    <small>protected</small> _db => <small>object</small> <span>Database_MySQL(6)</span> <code>{
+        <small>protected</small> _connection_id => <small>string</small><span>(40)</span> "dd20b3b4b106505a9e7ee4afe594d0da1f425047"
+        <small>protected</small> _identifier => <small>string</small><span>(1)</span> "`"
+        <small>public</small> last_query => <small>string</small><span>(98)</span> "SELECT COUNT(*) AS `records_found` FROM `roles_users` WHERE `user_id` = '1' AND `role_id` IN ('3')"
+        <small>protected</small> _instance => <small>string</small><span>(7)</span> "default"
+        <small>protected</small> _connection => <small>resource</small><span>(mysql link)</span>
+        <small>protected</small> _config => <small>array</small><span>(6)</span> <span>(
+            "type" => <small>string</small><span>(5)</span> "MySQL"
+            "connection" => <small>array</small><span>(3)</span> <span>(
+                "hostname" => <small>string</small><span>(9)</span> "localhost"
+                "database" => <small>string</small><span>(12)</span> "art_for_sale"
+                "persistent" => <small>bool</small> FALSE
+            )</span>
+            "table_prefix" => <small>string</small><span>(0)</span> ""
+            "charset" => <small>string</small><span>(4)</span> "utf8"
+            "caching" => <small>bool</small> FALSE
+            "profiling" => <small>bool</small> TRUE
+        )</span>
+    }</code>
+    <small>protected</small> _db_group => <small>NULL</small>
+    <small>protected</small> _db_applied => <small>array</small><span>(0)</span> 
+    <small>protected</small> _db_pending => <small>array</small><span>(0)</span> 
+    <small>protected</small> _db_reset => <small>bool</small> TRUE
+    <small>protected</small> _db_builder => <small>NULL</small>
+    <small>protected</small> _with_applied => <small>array</small><span>(0)</span> 
+    <small>protected</small> _cast_data => <small>array</small><span>(0)</span> 
+    <small>protected</small> _errors_filename => <small>string</small><span>(4)</span> "user"
+}</code></pre></td>
+				</tr>
+							</table>
+		</div>
+												<h3><a href="#error5346a6cc6a73benvironment_cookie" onclick="return koggle('error5346a6cc6a73benvironment_cookie')">$_COOKIE</a></h3>
+		<div id="error5346a6cc6a73benvironment_cookie" class="collapsed">
+			<table cellspacing="0">
+								<tr>
+					<td><code>session</code></td>
+					<td><pre><small>string</small><span>(26)</span> "13ece4q3v1kcvah3u90jucvc43"</pre></td>
+				</tr>
+								<tr>
+					<td><code>lang</code></td>
+					<td><pre><small>string</small><span>(43)</span> "bd97f2dbeadceea1d02bd60997909c7ca44afa9d~ru"</pre></td>
+				</tr>
+							</table>
+		</div>
+						<h3><a href="#error5346a6cc6a73benvironment_server" onclick="return koggle('error5346a6cc6a73benvironment_server')">$_SERVER</a></h3>
+		<div id="error5346a6cc6a73benvironment_server" class="collapsed">
+			<table cellspacing="0">
+								<tr>
+					<td><code>REDIRECT_KOHANA_ENV</code></td>
+					<td><pre><small>string</small><span>(7)</span> "staging"</pre></td>
+				</tr>
+								<tr>
+					<td><code>REDIRECT_STATUS</code></td>
+					<td><pre><small>string</small><span>(3)</span> "200"</pre></td>
+				</tr>
+								<tr>
+					<td><code>KOHANA_ENV</code></td>
+					<td><pre><small>string</small><span>(7)</span> "staging"</pre></td>
+				</tr>
+								<tr>
+					<td><code>HTTP_HOST</code></td>
+					<td><pre><small>string</small><span>(16)</span> "test.afs.gallery"</pre></td>
+				</tr>
+								<tr>
+					<td><code>HTTP_X_REAL_IP</code></td>
+					<td><pre><small>string</small><span>(14)</span> "188.162.65.111"</pre></td>
+				</tr>
+								<tr>
+					<td><code>HTTP_X_FORWARDED_FOR</code></td>
+					<td><pre><small>string</small><span>(14)</span> "188.162.65.111"</pre></td>
+				</tr>
+								<tr>
+					<td><code>HTTP_CONNECTION</code></td>
+					<td><pre><small>string</small><span>(5)</span> "close"</pre></td>
+				</tr>
+								<tr>
+					<td><code>HTTP_CACHE_CONTROL</code></td>
+					<td><pre><small>string</small><span>(8)</span> "no-cache"</pre></td>
+				</tr>
+								<tr>
+					<td><code>HTTP_ACCEPT</code></td>
+					<td><pre><small>string</small><span>(74)</span> "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"</pre></td>
+				</tr>
+								<tr>
+					<td><code>HTTP_PRAGMA</code></td>
+					<td><pre><small>string</small><span>(8)</span> "no-cache"</pre></td>
+				</tr>
+								<tr>
+					<td><code>HTTP_USER_AGENT</code></td>
+					<td><pre><small>string</small><span>(105)</span> "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/33.0.1750.152 Safari/537.36"</pre></td>
+				</tr>
+								<tr>
+					<td><code>HTTP_DNT</code></td>
+					<td><pre><small>string</small><span>(1)</span> "1"</pre></td>
+				</tr>
+								<tr>
+					<td><code>HTTP_REFERER</code></td>
+					<td><pre><small>string</small><span>(34)</span> "http://test.afs.gallery/errors/php"</pre></td>
+				</tr>
+								<tr>
+					<td><code>HTTP_ACCEPT_ENCODING</code></td>
+					<td><pre><small>string</small><span>(17)</span> "gzip,deflate,sdch"</pre></td>
+				</tr>
+								<tr>
+					<td><code>HTTP_ACCEPT_LANGUAGE</code></td>
+					<td><pre><small>string</small><span>(23)</span> "ru,en-US;q=0.8,en;q=0.6"</pre></td>
+				</tr>
+								<tr>
+					<td><code>HTTP_COOKIE</code></td>
+					<td><pre><small>string</small><span>(86)</span> "session=13ece4q3v1kcvah3u90jucvc43; lang=bd97f2dbeadceea1d02bd60997909c7ca44afa9d%7Eru"</pre></td>
+				</tr>
+								<tr>
+					<td><code>PATH</code></td>
+					<td><pre><small>string</small><span>(29)</span> "/sbin:/usr/sbin:/bin:/usr/bin"</pre></td>
+				</tr>
+								<tr>
+					<td><code>SERVER_SIGNATURE</code></td>
+					<td><pre><small>string</small><span>(77)</span> "&lt;address&gt;Apache/2.2.15 (CentOS) Server at test.afs.gallery Port 80&lt;/address&gt;
+"</pre></td>
+				</tr>
+								<tr>
+					<td><code>SERVER_SOFTWARE</code></td>
+					<td><pre><small>string</small><span>(22)</span> "Apache/2.2.15 (CentOS)"</pre></td>
+				</tr>
+								<tr>
+					<td><code>SERVER_NAME</code></td>
+					<td><pre><small>string</small><span>(16)</span> "test.afs.gallery"</pre></td>
+				</tr>
+								<tr>
+					<td><code>SERVER_ADDR</code></td>
+					<td><pre><small>string</small><span>(9)</span> "127.0.0.1"</pre></td>
+				</tr>
+								<tr>
+					<td><code>SERVER_PORT</code></td>
+					<td><pre><small>string</small><span>(2)</span> "80"</pre></td>
+				</tr>
+								<tr>
+					<td><code>REMOTE_ADDR</code></td>
+					<td><pre><small>string</small><span>(9)</span> "127.0.0.1"</pre></td>
+				</tr>
+								<tr>
+					<td><code>DOCUMENT_ROOT</code></td>
+					<td><pre><small>string</small><span>(62)</span> "/spotman/www/projects/dev/betakiller/sites/art-for-sale/public"</pre></td>
+				</tr>
+								<tr>
+					<td><code>SERVER_ADMIN</code></td>
+					<td><pre><small>string</small><span>(14)</span> "root@localhost"</pre></td>
+				</tr>
+								<tr>
+					<td><code>SCRIPT_FILENAME</code></td>
+					<td><pre><small>string</small><span>(72)</span> "/spotman/www/projects/dev/betakiller/sites/art-for-sale/public/index.php"</pre></td>
+				</tr>
+								<tr>
+					<td><code>REMOTE_PORT</code></td>
+					<td><pre><small>string</small><span>(5)</span> "50990"</pre></td>
+				</tr>
+								<tr>
+					<td><code>REDIRECT_URL</code></td>
+					<td><pre><small>string</small><span>(52)</span> "/errors/php/72f8d0504699f4924c7f65d9511febeec85d38a5"</pre></td>
+				</tr>
+								<tr>
+					<td><code>GATEWAY_INTERFACE</code></td>
+					<td><pre><small>string</small><span>(7)</span> "CGI/1.1"</pre></td>
+				</tr>
+								<tr>
+					<td><code>SERVER_PROTOCOL</code></td>
+					<td><pre><small>string</small><span>(8)</span> "HTTP/1.0"</pre></td>
+				</tr>
+								<tr>
+					<td><code>REQUEST_METHOD</code></td>
+					<td><pre><small>string</small><span>(3)</span> "GET"</pre></td>
+				</tr>
+								<tr>
+					<td><code>QUERY_STRING</code></td>
+					<td><pre><small>string</small><span>(0)</span> ""</pre></td>
+				</tr>
+								<tr>
+					<td><code>REQUEST_URI</code></td>
+					<td><pre><small>string</small><span>(52)</span> "/errors/php/72f8d0504699f4924c7f65d9511febeec85d38a5"</pre></td>
+				</tr>
+								<tr>
+					<td><code>SCRIPT_NAME</code></td>
+					<td><pre><small>string</small><span>(10)</span> "/index.php"</pre></td>
+				</tr>
+								<tr>
+					<td><code>PATH_INFO</code></td>
+					<td><pre><small>string</small><span>(52)</span> "/errors/php/72f8d0504699f4924c7f65d9511febeec85d38a5"</pre></td>
+				</tr>
+								<tr>
+					<td><code>PATH_TRANSLATED</code></td>
+					<td><pre><small>string</small><span>(116)</span> "redirect:/index.php/errors/php/72f8d0504699f4924c7f65d9511febeec85d38a5/php/72f8d0504699f4924c7f65d9511febeec85d38a5"</pre></td>
+				</tr>
+								<tr>
+					<td><code>PHP_SELF</code></td>
+					<td><pre><small>string</small><span>(62)</span> "/index.php/errors/php/72f8d0504699f4924c7f65d9511febeec85d38a5"</pre></td>
+				</tr>
+								<tr>
+					<td><code>REQUEST_TIME_FLOAT</code></td>
+					<td><pre><small>float</small> 1397139148,296</pre></td>
+				</tr>
+								<tr>
+					<td><code>REQUEST_TIME</code></td>
+					<td><pre><small>integer</small> 1397139148</pre></td>
+				</tr>
+							</table>
+		</div>
+			</div>
+</div>

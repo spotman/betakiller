@@ -79,6 +79,44 @@ class ORM extends Kohana_ORM implements API_Response_Item /* , DataSource_Interf
         return $this->order_by(DB::expr('RAND()'));
     }
 
+    public function add($alias, $far_keys)
+    {
+        if ( $this->_has_many[$alias]['through'] )
+            return parent::add($alias, $far_keys);
+
+        /** @var ORM $relation */
+        $relation = $this->get($alias);
+
+        $far_keys = ($far_keys instanceof ORM) ? $far_keys->pk() : $far_keys;
+        $foreign_key = $this->pk();
+
+        $query = DB::update($relation->table_name())
+            ->set(array($this->_has_many[$alias]['foreign_key'] => $foreign_key))
+            ->where($relation->primary_key(), "IN", (array) $far_keys);
+
+        $query->execute($this->_db);
+
+        return $this;
+    }
+
+    public function remove($alias, $far_keys = NULL)
+    {
+        if ( $this->_has_many[$alias]['through'] )
+            return parent::remove($alias, $far_keys);
+
+        /** @var ORM $relation */
+        $relation = $this->get($alias);
+
+        foreach ( $relation->find_all() as $model )
+        {
+            /** @var $model ORM */
+            $model->delete();
+        }
+
+        return $this;
+    }
+
+
     /**
      * @param string $term String to search for
      * @param array $search_columns Columns to search where
