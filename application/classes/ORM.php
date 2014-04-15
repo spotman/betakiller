@@ -79,41 +79,64 @@ class ORM extends Kohana_ORM implements API_Response_Item /* , DataSource_Interf
         return $this->order_by(DB::expr('RAND()'));
     }
 
-    public function add($alias, $far_keys)
+    /**
+     * Связывает элементы аласа (с указанными первичными ключами) с текущей моделью
+     *
+     * @param string $alias
+     * @param array $far_keys
+     * @return $this
+     */
+    public function link_related($alias, array $far_keys)
     {
-        if ( $this->_has_many[$alias]['through'] )
-            return parent::add($alias, $far_keys);
+        return $this->_update_related_alias_foreign_key_field($alias, $far_keys, $this->pk());
+    }
 
-        /** @var ORM $relation */
-        $relation = $this->get($alias);
+    /**
+     * Отвязывает элементы алиаса (с указанными первичными ключами) с текущей моделью
+     * @param string $alias
+     * @param array|NULL $far_keys
+     * @return $this
+     */
+    public function unlink_related($alias, array $far_keys = NULL)
+    {
+        if ( ! $far_keys )
+        {
+            $relation = $this->_get_relation($alias);
+            $relation_data = $relation->find_all()->as_array($relation->primary_key());
+            $far_keys = array_keys($relation_data);
+        }
 
-        $far_keys = ($far_keys instanceof ORM) ? $far_keys->pk() : $far_keys;
-        $foreign_key = $this->pk();
+        return $this->_update_related_alias_foreign_key_field($alias, $far_keys, NULL);
+    }
+
+    /**
+     * Проставляет полю внешнего ключа у алиаса значение первичного ключа текущей модели
+     *
+     * @param string $alias
+     * @param array $far_keys
+     * @param int|NULL $value
+     * @return $this
+     */
+    protected function _update_related_alias_foreign_key_field($alias, array $far_keys, $value)
+    {
+        $relation = $this->_get_relation($alias);
 
         $query = DB::update($relation->table_name())
-            ->set(array($this->_has_many[$alias]['foreign_key'] => $foreign_key))
-            ->where($relation->primary_key(), "IN", (array) $far_keys);
+            ->set(array($this->_has_many[$alias]['foreign_key'] => $value))
+            ->where($relation->primary_key(), "IN", $far_keys);
 
         $query->execute($this->_db);
 
         return $this;
     }
 
-    public function remove($alias, $far_keys = NULL)
+    /**
+     * @param string $alias
+     * @return ORM
+     */
+    protected function _get_relation($alias)
     {
-        if ( $this->_has_many[$alias]['through'] )
-            return parent::remove($alias, $far_keys);
-
-        /** @var ORM $relation */
-        $relation = $this->get($alias);
-
-        foreach ( $relation->find_all() as $model )
-        {
-            /** @var $model ORM */
-            $model->delete();
-        }
-
-        return $this;
+        return $this->get($alias);
     }
 
 
