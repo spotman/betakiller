@@ -65,7 +65,12 @@ abstract class Assets_Provider {
 
         if ( $model )
         {
-            $options['hash'] = $model->get_hash();
+            $hash = $model->get_hash();
+
+            if ( ! $hash )
+                throw new Assets_Provider_Exception('Model must have hash');
+
+            $options['hash'] = $hash;
         }
 
         return Route::url('assets-provider-action', $options);

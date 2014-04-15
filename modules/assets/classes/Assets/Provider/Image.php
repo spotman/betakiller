@@ -14,8 +14,8 @@ abstract class Assets_Provider_Image extends Assets_Provider {
     public function get_preview_url(Assets_File_Model $model)
     {
         // TODO Implement
-        return StaticFile::instance()->getLink("temp/devjaty-val-ajvazovsky.jpg");
-
+        return $this->get_public_url($model);
+//        return StaticFile::instance()->getLink("temp/devjaty-val-ajvazovsky.jpg");
     }
 
     abstract protected function get_preview_max_height();
