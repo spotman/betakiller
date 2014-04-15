@@ -47,12 +47,76 @@ class Controller_Assets extends Controller {
         $this->send_file($content, $model->get_mime());
     }
 
+    public function action_preview()
+    {
+        /** @var Assets_Provider_Image $provider */
+        $provider = $this->provider_factory();
+
+        if ( !($provider instanceof Assets_Provider_Image) )
+            throw new Assets_Exception('Preview can be served only by instances of Assets_Provider_Image');
+
+        $model = $this->by_hash($provider);
+
+        // Creating temporary file
+        $temp_file_name = tempnam('/tmp', 'image-resize');
+
+        if ( ! $temp_file_name )
+            throw new Assets_Provider_Exception('Can not create temporary file for image resizing');
+
+        // Getting original file content
+        $original_content = $provider->get_content($model);
+
+        // Putting content into it
+        file_put_contents($temp_file_name, $original_content);
+
+        // Creating resizing instance
+        $image = Image::factory($temp_file_name);
+
+        $resized_content = $image
+            ->resize($provider->get_preview_max_width(), $provider->get_preview_max_height())
+            ->render(NULL /* auto */, $provider->get_preview_quality());
+
+        // Deleting temp file
+        unlink($temp_file_name);
+
+        // Deploy if needed
+        if ( Kohana::in_production() ) // TODO Move to config
+        {
+            $this->_deploy($resized_content);
+        }
+
+        // Send file content + headers
+        $this->send_file($resized_content, $model->get_mime());
+    }
+
+    public function action_delete()
+    {
+        // This method responds via JSON (all exceptions will be caught automatically)
+        $this->content_type_json();
+
+        $provider = $this->provider_factory();
+
+        // Get file model by hash value
+        $model = $this->by_hash($provider);
+
+        // Delete file through provider
+        $provider->delete($model);
+
+        $this->send_json(self::JSON_SUCCESS);
+    }
+
     protected function _deploy($content)
     {
-        $full_path = DOCROOT . ltrim($this->request()->url(), '/');
+        // TODO assets upload url conflicts with real directory
+        return;
+
+        $doc_root = $_SERVER['DOCUMENT_ROOT'] . DIRECTORY_SEPARATOR;
+
+        // TODO Security
+        $full_path = $doc_root . ltrim($this->request()->url(), '/');
         $path = pathinfo($full_path, PATHINFO_DIRNAME);
 
-        $mask = 0644; // TODO Move to config
+        $mask = 0775; // TODO Move to config
 
         if ( ! file_exists($path) )
         {
@@ -92,22 +156,6 @@ class Controller_Assets extends Controller {
         }
 
         return $model;
-    }
-
-    public function action_delete()
-    {
-        // This method responds via JSON (all exceptions will be caught automatically)
-        $this->content_type_json();
-
-        $provider = $this->provider_factory();
-
-        // Get file model by hash value
-        $model = $this->by_hash($provider);
-
-        // Delete file through provider
-        $provider->delete($model);
-
-        $this->send_json(self::JSON_SUCCESS);
     }
 
 }

@@ -6,8 +6,9 @@
  * "assets/upload/<provider>"
  * "assets/public/<provider>/<hash>"
  */
-Route::set('assets-provider-action', 'assets/<action>/<provider>(/<hash>)', array('action' => '(upload|public|delete)'))
+Route::set('assets-provider-action', 'assets/<provider>(/<hash>/<action>)', array('action' => '(upload|public|delete|preview)'))
     ->defaults(array(
         'module'        => 'assets',
         'controller'    => 'Assets',
+        'action'        => 'upload',
     ));

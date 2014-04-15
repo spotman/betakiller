@@ -99,12 +99,18 @@ class ORM extends Kohana_ORM implements API_Response_Item /* , DataSource_Interf
      */
     public function unlink_related($alias, array $far_keys = NULL)
     {
+        // Если элементы не указаны
         if ( ! $far_keys )
         {
+            // Попробуем достать их из алиаса
             $relation = $this->_get_relation($alias);
             $relation_data = $relation->find_all()->as_array($relation->primary_key());
             $far_keys = array_keys($relation_data);
         }
+
+        // Если нет связанных элементов, то и делать нечего
+        if ( ! $far_keys )
+            return $this;
 
         return $this->_update_related_alias_foreign_key_field($alias, $far_keys, NULL);
     }

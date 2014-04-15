@@ -13,11 +13,21 @@ abstract class Assets_Provider_Image extends Assets_Provider {
      */
     public function get_preview_url(Assets_File_Model $model)
     {
-        // TODO Implement
-        return $this->get_public_url($model);
-//        return StaticFile::instance()->getLink("temp/devjaty-val-ajvazovsky.jpg");
+        return $this->get_url('preview', $model);
     }
 
-    abstract protected function get_preview_max_height();
-    abstract protected function get_preview_max_width();
+    /**
+     * @return int
+     */
+    abstract public function get_preview_max_height();
+
+    /**
+     * @return int
+     */
+    abstract public function get_preview_max_width();
+
+    /**
+     * @return int
+     */
+    abstract public function get_preview_quality();
 }

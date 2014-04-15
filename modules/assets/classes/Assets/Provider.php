@@ -56,12 +56,16 @@ abstract class Assets_Provider {
         return $this->get_url('delete', $model);
     }
 
-    protected function get_url($action, Assets_File_Model $model = NULL)
+    protected function get_url($action = NULL, Assets_File_Model $model = NULL)
     {
         $options = array(
-            'provider'  =>  $this->_codename,
-            'action'    =>  $action,
+            'provider'  =>  $this->_codename
         );
+
+        if ( $action )
+        {
+            $options['action'] = $action;
+        }
 
         if ( $model )
         {
@@ -152,7 +156,8 @@ abstract class Assets_Provider {
         // Remove file from storage
         $this->get_storage()->delete($model);
 
-        // TODO Cleanup deploy folder
+        // Drop deployed cache for current asset
+        $this->_drop_deploy_cache($model);
 
         // Remove model
         $model->delete();
@@ -207,6 +212,9 @@ abstract class Assets_Provider {
     public function set_content(Assets_File_Model $model, $content)
     {
         $this->get_storage()->put($model, $content);
+
+        // Drop deployed cache for current asset
+        $this->_drop_deploy_cache($model);
     }
 
     /**
@@ -268,6 +276,11 @@ abstract class Assets_Provider {
         throw new Assets_Exception_Upload('You may upload files with :ext extensions only',
             array(':ext' => implode(', ', $allowed_extensions))
         );
+    }
+
+    protected function _drop_deploy_cache(Assets_File_Model $model)
+    {
+        // TODO Implement
     }
 
     /**
