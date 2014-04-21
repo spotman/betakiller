@@ -30,6 +30,8 @@ require.config({
          * Кастомные контролы
          */
         'comboBox':                 './views/comboBox'
-    }
+    },
+
+    waitSeconds: 30
 
 });
