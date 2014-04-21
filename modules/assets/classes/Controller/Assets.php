@@ -107,9 +107,6 @@ class Controller_Assets extends Controller {
 
     protected function _deploy($content)
     {
-        // TODO assets upload url conflicts with real directory
-        return;
-
         $doc_root = $_SERVER['DOCUMENT_ROOT'] . DIRECTORY_SEPARATOR;
 
         // TODO Security
