@@ -31,7 +31,7 @@ abstract class Assets_Provider {
      */
     public function get_upload_url()
     {
-        return $this->get_url('upload');
+        return Route::url('assets-provider-upload');
     }
 
     /**
@@ -42,7 +42,7 @@ abstract class Assets_Provider {
      */
     public function get_public_url(Assets_File_Model $model)
     {
-        return $this->get_url('public', $model);
+        return $this->_get_item_url('public', $model);
     }
 
     /**
@@ -53,31 +53,23 @@ abstract class Assets_Provider {
      */
     public function get_delete_url(Assets_File_Model $model)
     {
-        return $this->get_url('delete', $model);
+        return $this->_get_item_url('delete', $model);
     }
 
-    protected function get_url($action = NULL, Assets_File_Model $model = NULL)
+    protected function _get_item_url($action, Assets_File_Model $model)
     {
+        $hash = $model->get_hash();
+
+        if ( ! $hash )
+            throw new Assets_Provider_Exception('Model must have hash');
+
         $options = array(
-            'provider'  =>  $this->_codename
+            'provider'  =>  $this->_codename,
+            'action'    =>  $action,
+            'hash'      =>  $hash,
         );
 
-        if ( $action )
-        {
-            $options['action'] = $action;
-        }
-
-        if ( $model )
-        {
-            $hash = $model->get_hash();
-
-            if ( ! $hash )
-                throw new Assets_Provider_Exception('Model must have hash');
-
-            $options['hash'] = $hash;
-        }
-
-        return Route::url('assets-provider-action', $options);
+        return Route::url('assets-provider-item', $options);
     }
 
     /**

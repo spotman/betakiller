@@ -13,7 +13,7 @@ abstract class Assets_Provider_Image extends Assets_Provider {
      */
     public function get_preview_url(Assets_File_Model $model)
     {
-        return $this->get_url('preview', $model);
+        return $this->_get_item_url('preview', $model);
     }
 
     /**
