@@ -92,7 +92,8 @@ class ORM extends Kohana_ORM implements API_Response_Item /* , DataSource_Interf
     }
 
     /**
-     * Отвязывает элементы алиаса (с указанными первичными ключами) с текущей моделью
+     * Отвязывает элементы алиаса (с указанными первичными ключами) от текущей модели
+     *
      * @param string $alias
      * @param array|NULL $far_keys
      * @return $this

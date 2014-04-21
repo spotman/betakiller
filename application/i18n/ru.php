@@ -4,6 +4,7 @@
  * Automatically generated from previous translation file.
  */
 return array (
+  'Default value:' => 'Default value:',
   ':error' => ':error',
   'Empty layer for :codename IFace' => 'Empty layer for :codename IFace',
   'Not implemented yet' => 'Not implemented yet',
