@@ -31,7 +31,11 @@ abstract class Assets_Provider {
      */
     public function get_upload_url()
     {
-        return Route::url('assets-provider-upload');
+        $options = array(
+            'provider'  =>  $this->_codename,
+        );
+
+        return Route::url('assets-provider-upload', $options);
     }
 
     /**
