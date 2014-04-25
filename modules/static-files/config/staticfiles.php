@@ -1,7 +1,6 @@
 <?php defined('SYSPATH') or die('No direct script access.');
 
-// TODO
-$host = ( isset($_SERVER['HTTP_HOST']) ) ? $_SERVER['HTTP_HOST'] : '';
+$host = getenv('htp_post') ?: getenv('server_name');
 
 // Turn on the minimization and building in production environment
 // TODO
@@ -40,13 +39,13 @@ return array(
     'path' => realpath($_SERVER['DOCUMENT_ROOT']). DIRECTORY_SEPARATOR,
 
     // Path to copy static files that are not build in one file
-    'url' => '/!/static/',
+    'url' => '/assets/static/',
 
     // url for cache reset
-    'clear_cache_url' => '/!/clear',
+    'clear_cache_url' => '/assets/static/clear',
 
     // Path to styles and scripts builds
-    'cache' => '/!/cache/',
+    'cache' => '/assets/static-cache/',
 
     'chmod' => 0777,
 
