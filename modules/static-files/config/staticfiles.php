@@ -1,6 +1,6 @@
 <?php defined('SYSPATH') or die('No direct script access.');
 
-$host = getenv('htp_post') ?: getenv('server_name');
+$host = getenv('HTTP_HOST') ?: getenv('SERVER_NAME');
 
 // Turn on the minimization and building in production environment
 // TODO
@@ -36,7 +36,7 @@ return array(
     ),
 
     // Full path to site DOCROOT
-    'path' => realpath($_SERVER['DOCUMENT_ROOT']). DIRECTORY_SEPARATOR,
+    'path' => realpath(getenv('DOCUMENT_ROOT')). DIRECTORY_SEPARATOR,
 
     // Path to copy static files that are not build in one file
     'url' => '/assets/static/',
