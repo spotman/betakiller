@@ -7,6 +7,9 @@ $host = getenv('HTTP_HOST') ?: getenv('SERVER_NAME');
 // $in_production = in_array( Kohana::$environment, array(Kohana::PRODUCTION, Kohana::STAGING) );
 $in_production = in_array( Kohana::$environment, array(Kohana::PRODUCTION) );
 
+// TODO
+$in_production = FALSE;
+
 $build = $in_production;
 $minimize = $in_production;
 
