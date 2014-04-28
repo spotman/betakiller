@@ -5,12 +5,12 @@ class Kohana_Exception extends Kohana_Kohana_Exception {
     /**
      * Адрес электронной почты, на который отправляются уведомления об ошибках
      */
-    const NOTIFICATION_EMAIL = "root@localhost";
+    const NOTIFICATION_EMAIL = "i.am@spotman.ru";
 
     /**
      * Источник, от чьего имени отправляются уведомления об ошибках
      */
-    const NOTIFICATION_EMAIL_FROM = "root@localhost";
+    const NOTIFICATION_EMAIL_FROM = "i.am@spotman.ru";
 
     /**
      * Уведомления будут отсылаться при повторном появлении ошибки в N-ный раз
