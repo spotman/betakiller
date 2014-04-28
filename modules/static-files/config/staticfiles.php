@@ -3,15 +3,13 @@
 $host = getenv('HTTP_HOST') ?: getenv('SERVER_NAME');
 
 // Turn on the minimization and building in production environment
-// TODO
-// $in_production = in_array( Kohana::$environment, array(Kohana::PRODUCTION, Kohana::STAGING) );
-$in_production = in_array( Kohana::$environment, array(Kohana::PRODUCTION) );
+$in_production = in_array( Kohana::$environment, array(Kohana::PRODUCTION, Kohana::STAGING) );
 
 // TODO
-$in_production = FALSE;
+$build = FALSE;
 
-$build = $in_production;
-$minimize = $in_production;
+// TODO
+$minimize = FALSE;
 
 return array(
 
@@ -44,11 +42,11 @@ return array(
     // Path to copy static files that are not build in one file
     'url' => '/assets/static/',
 
-    // url for cache reset
-    'clear_cache_url' => '/assets/static/clear',
-
     // Path to styles and scripts builds
     'cache' => '/assets/static-cache/',
+
+    // url for cache reset
+    'clear_cache_url' => '/assets/static/clear',
 
     'chmod' => 0777,
 
