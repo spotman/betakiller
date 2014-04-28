@@ -169,7 +169,7 @@ class Kohana_StaticCss extends StaticFile {
 		}
 
 		$css_code = '';
-		// Not need to build one js file
+		// Not need to build one css file
 		if ( ! $this->_config->css['build'])
 		{
 			foreach ($this->_css as $condition => $css_array)
@@ -243,7 +243,10 @@ class Kohana_StaticCss extends StaticFile {
 
 		$css_inline = implode("\n", $this->_css_inline);
 
-		if ($this->_config->css['min'])
+        // Replace keys
+        static::replace_keys($css_inline);
+
+        if ($this->_config->css['min'])
 		{
 			$css_inline = $this->minify($css_inline);
 		}

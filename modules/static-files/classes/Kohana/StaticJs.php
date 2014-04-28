@@ -91,7 +91,7 @@ class Kohana_StaticJs extends StaticFile {
 	 */
 	public function addJsInline($js, $id = NULL)
 	{
-		$js = str_replace('{static_url}', STATICFILES_URL, $js);
+//		$js = str_replace('{static_url}', STATICFILES_URL, $js);
 
 		if ($id !== NULL)
 		{
@@ -112,7 +112,7 @@ class Kohana_StaticJs extends StaticFile {
 	 */
 	public function addJsOnload($js, $id = NULL)
 	{
-		$js = str_replace('{static_url}', STATICFILES_URL, $js);
+//		$js = str_replace('{static_url}', STATICFILES_URL, $js);
 
 		$this->needJquery();
 		if($id)
@@ -224,6 +224,8 @@ class Kohana_StaticJs extends StaticFile {
 
                         $build .= $_js;
                     }
+
+                    $build = $this->prepare($build);
 
                     $this->save($this->cache_file($build_name), $build);
                 }

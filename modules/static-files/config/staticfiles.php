@@ -5,10 +5,9 @@ $host = getenv('HTTP_HOST') ?: getenv('SERVER_NAME');
 // Turn on the minimization and building in production environment
 $in_production = in_array( Kohana::$environment, array(Kohana::PRODUCTION, Kohana::STAGING) );
 
-// TODO
-$build = FALSE;
+$build = $in_production;
 
-// TODO
+// TODO Найти нормальный движок для компрессии JS/CSS файлов
 $minimize = FALSE;
 
 return array(
