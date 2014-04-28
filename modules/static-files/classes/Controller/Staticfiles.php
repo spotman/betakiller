@@ -53,11 +53,11 @@ class Controller_Staticfiles extends Controller {
             $mtime = filemtime($orig);
 
 			// А пока отдадим файл руками
-			$this->check_cache(sha1($this->request->uri()) . $mtime, $this->request);
+//			$this->check_cache(sha1($this->request->uri()) . $mtime, $this->request);
 			$this->response->body( $str );
 			$this->response->headers('Content-Type', File::mime_by_ext($info['extension']) );
 			$this->response->headers('Content-Length', strlen($str) );
-			$this->response->headers('Last-Modified', date('r', $mtime) );
+			$this->response->headers('Last-Modified', gmdate("D, d M Y H:i:s \G\M\T", $mtime) );
 		}
 		else
 		{
