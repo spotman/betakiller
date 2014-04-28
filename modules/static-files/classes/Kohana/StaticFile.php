@@ -152,23 +152,6 @@ class Kohana_StaticFile {
 			 . $file_name . '.' . $type;
 	}
 
-	/**
-	 * Clearing cache folders
-	 *
-	 * @return void
-	 */
-	protected function _cache_reset()
-	{
-		$cache_paths = array($this->_config->cache, $this->_config->url);
-
-		foreach($cache_paths as $path)
-		{
-            // TODO correct docroot
-			$path = DOCROOT . trim(preg_replace('/\//', DIRECTORY_SEPARATOR, $path), '\\');
-			File::rmdir($path, TRUE);
-		}
-	}
-
     public static function replace_keys($str)
     {
         return str_replace(

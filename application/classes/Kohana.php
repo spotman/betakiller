@@ -4,6 +4,24 @@ class Kohana extends Kohana_Core {
 
     public static $environment_string = 'development';
 
+    public static function in_production()
+    {
+        return in_array(Kohana::$environment, array(Kohana::PRODUCTION, Kohana::STAGING));
+    }
+
+    public static function config($file)
+    {
+        return Kohana::$config->load($file);
+    }
+
+    public static function load_if_exists($file)
+    {
+        if ( ! file_exists($file) )
+            return NULL;
+
+        return parent::load($file);
+    }
+
     public static function prepend_path($path)
     {
         $path = rtrim($path, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
@@ -22,22 +40,21 @@ class Kohana extends Kohana_Core {
         return $result;
     }
 
-    public static function in_production()
+    public static function doc_root()
     {
-        return in_array(Kohana::$environment, array(Kohana::PRODUCTION, Kohana::STAGING));
-    }
+        static $path;
 
-    public static function config($file)
-    {
-        return Kohana::$config->load($file);
-    }
+        if ( ! $path )
+        {
+            $path = ( php_sapi_name() == 'cli' )
+                ? dirname(realpath($_SERVER['argv'][0]))
+                : getenv('DOCUMENT_ROOT');
+        }
 
-    public static function load_if_exists($file)
-    {
-        if ( ! file_exists($file) )
-            return NULL;
+        if ( ! $path )
+            throw new Kohana_Exception('Can not detect document root');
 
-        return parent::load($file);
+        return $path;
     }
 
 }
