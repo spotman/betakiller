@@ -7,10 +7,11 @@ class Task_Assets_Static_Clear extends Minion_Task {
         try
         {
             StaticFile::instance()->cache_reset();
+            Minion_CLI::write('Static assets cache was successfully cleared');
         }
         catch ( Kohana_Exception $e )
         {
-            die('Error: '.$e->getMessage());
+            Minion_CLI::write('Error: '.$e->getMessage());
         }
     }
 
