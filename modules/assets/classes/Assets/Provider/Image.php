@@ -7,11 +7,11 @@
 abstract class Assets_Provider_Image extends Assets_Provider {
 
     /**
-     * @param Assets_File_Model $model
+     * @param Assets_Model $model
      * @return string
      * @throws HTTP_Exception_501
      */
-    public function get_preview_url(Assets_File_Model $model)
+    public function get_preview_url(Assets_Model $model)
     {
         return $this->_get_item_url('preview', $model);
     }

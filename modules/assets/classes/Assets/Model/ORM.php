@@ -1,11 +1,11 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
 /**
- * Class Assets_File_Model_ORM
+ * Class Assets_Model_ORM
  *
  * Abstract class for all ORM-based asset models
  */
-abstract class Assets_File_Model_ORM extends ORM implements Assets_File_Model {
+abstract class Assets_Model_ORM extends ORM implements Assets_Model {
 
     /**
      * Returns original file name (user-defined filename of uploaded file)
@@ -42,7 +42,7 @@ abstract class Assets_File_Model_ORM extends ORM implements Assets_File_Model {
      * Creates unique hash from original filename and stores it in `hash` property
      * @return $this
      */
-    public function make_hash()
+    protected function make_hash()
     {
         $hash = md5(microtime() . $this->get_original_name());
         return $this->set('hash', $hash);
@@ -116,21 +116,39 @@ abstract class Assets_File_Model_ORM extends ORM implements Assets_File_Model {
      *
      * @return string
      */
-    public function get_full_path()
+    public function get_storage_file_name()
     {
-        return $this->get_hash();
+        $hash = $this->get_hash();
+        return Text::limit_chars($hash, 2).DIRECTORY_SEPARATOR.$hash;
+    }
+
+    /**
+     * Returns file model url (for deploy url and deploy path)
+     *
+     * @return string
+     */
+    public function get_url()
+    {
+        return $this->get_storage_file_name();
     }
 
     /**
      * Performs file model search by hash
      *
-     * @param string $hash
-     * @return Assets_File_Model|NULL
+     * @param string $url
+     * @return Assets_Model|NULL
      */
-    public function by_hash($hash)
+    public function by_url($url)
     {
-        $model = $this->where('hash', '=', $hash)->find();
+        $hash = basename($url);
+        $model = ORM::factory($this->object_name())->where('hash', '=', $hash)->find();
         return $model->loaded() ? $model : NULL;
+    }
+
+    public function create(Validation $validation = NULL)
+    {
+        $this->make_hash();
+        return parent::create($validation);
     }
 
 }

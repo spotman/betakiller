@@ -4,12 +4,30 @@ abstract class Assets_Provider {
 
     use Util_Factory;
 
+    /**
+     * @var string
+     */
     protected $_codename;
 
     /**
      * @var Assets_Storage
      */
     protected $_storage_instance;
+
+    /**
+     * @var Array
+     */
+    protected static $_config;
+
+    public static function config($key, $default_value = NULL)
+    {
+        if ( static::$_config === NULL )
+        {
+            static::$_config = Kohana::config('api')->as_array();
+        }
+
+        return Arr::path(static::$_config, $key, $default_value);
+    }
 
     protected static function make_instance($class_name, $codename)
     {
@@ -41,44 +59,49 @@ abstract class Assets_Provider {
     /**
      * Returns public URL for provided model
      *
-     * @param Assets_File_Model $model
+     * @param Assets_Model $model
      * @return string
      */
-    public function get_public_url(Assets_File_Model $model)
+    public function get_original_url(Assets_Model $model)
     {
-        return $this->_get_item_url('public', $model);
+        return $this->_get_item_url('original', $model);
     }
 
     /**
      * Returns URL for deleting provided file
      *
-     * @param Assets_File_Model $model
+     * @param Assets_Model $model
      * @return string
      */
-    public function get_delete_url(Assets_File_Model $model)
+    public function get_delete_url(Assets_Model $model)
     {
         return $this->_get_item_url('delete', $model);
     }
 
-    protected function _get_item_url($action, Assets_File_Model $model)
+    protected function _get_item_url($action, Assets_Model $model)
     {
-        $hash = $model->get_hash();
+        $url = $model->get_url();
 
-        if ( ! $hash )
-            throw new Assets_Provider_Exception('Model must have hash');
+        if ( ! $url )
+            throw new Assets_Provider_Exception('Model must have url');
 
         $options = array(
             'provider'  =>  $this->_codename,
             'action'    =>  $action,
-            'hash'      =>  $hash,
+            'item_url'  =>  $url,
         );
 
         return Route::url('assets-provider-item', $options);
     }
 
+    protected function _get_hash_ab($hash)
+    {
+        return Text::limit_chars($hash, 2);
+    }
+
     /**
      * @param array $_file Item from $_FILES
-     * @return Assets_File_Model
+     * @return Assets_Model
      * @throws Assets_Provider_Exception
      */
     public function upload(array $_file)
@@ -106,7 +129,6 @@ abstract class Assets_Provider {
         // Put data into model
         $model = $this->file_model_factory()
             ->set_original_name($safe_name)
-            ->make_hash()
             ->set_size(filesize($full_path))
             ->set_mime($mime_type)
             ->set_uploaded_by($this->_get_current_user());
@@ -129,18 +151,47 @@ abstract class Assets_Provider {
     /**
      * Additional upload processing
      *
-     * @param Assets_File_Model $model
+     * @param Assets_Model $model
      */
     protected function _upload($model)
     {
         // Empty by default
     }
 
+    public function deploy(Assets_Model $model, $action, $content)
+    {
+        // TODO Move to config
+        $deploy_allowed = Kohana::in_production();
+
+        // No deployment in testing and developing environments
+        if ( ! $deploy_allowed )
+            return;
+
+        // Check permissions
+        if ( ! $this->check_delete_permissions($model) )
+            return;
+
+        // Get item base deploy path
+        $path = $this->_get_item_deploy_path($model);
+
+        // Create deploy path if not exists
+        if ( ! file_exists($path) )
+        {
+            $mask = 0775; // TODO Move to config
+            mkdir($path, $mask, true);
+        }
+
+        // Make deploy filename
+        $filename = $path.DIRECTORY_SEPARATOR.$action;
+
+        file_put_contents($filename, $content);
+    }
+
     /**
-     * @param Assets_File_Model $model
+     * @param Assets_Model $model
      * @throws Assets_Provider_Exception
      */
-    public function delete(Assets_File_Model $model)
+    public function delete(Assets_Model $model)
     {
         // Check permissions
         if ( ! $this->check_delete_permissions($model) )
@@ -162,7 +213,7 @@ abstract class Assets_Provider {
     /**
      * Additional delete processing
      *
-     * @param Assets_File_Model $model
+     * @param Assets_Model $model
      */
     protected function _delete($model)
     {
@@ -172,17 +223,17 @@ abstract class Assets_Provider {
     /**
      * Returns asset file model with provided hash
      *
-     * @param $hash
-     * @return Assets_File_Model|NULL
+     * @param $url
+     * @return Assets_Model|NULL
      * @throws Assets_Provider_Exception
      */
-    public function get_model_by_hash($hash)
+    public function get_model_by_deploy_url($url)
     {
         // Find model by hash
-        $model = $this->file_model_factory()->by_hash($hash);
+        $model = $this->file_model_factory()->by_url($url);
 
         if ( ! $model )
-            throw new Assets_Provider_Exception('Can not find file with hash = :hash', array(':hash' => $hash));
+            throw new Assets_Provider_Exception('Can not find file with hash = :hash', array(':hash' => $url));
 
         return $model;
     }
@@ -190,10 +241,10 @@ abstract class Assets_Provider {
     /**
      * Returns content of the file
      *
-     * @param Assets_File_Model $model
+     * @param Assets_Model $model
      * @return string
      */
-    public function get_content(Assets_File_Model $model)
+    public function get_content(Assets_Model $model)
     {
         // Get file from storage
         return $this->get_storage()->get($model);
@@ -202,10 +253,10 @@ abstract class Assets_Provider {
     /**
      * Update content of the file
      *
-     * @param Assets_File_Model $model
+     * @param Assets_Model $model
      * @param string $content
      */
-    public function set_content(Assets_File_Model $model, $content)
+    public function set_content(Assets_Model $model, $content)
     {
         $this->get_storage()->put($model, $content);
 
@@ -274,9 +325,50 @@ abstract class Assets_Provider {
         );
     }
 
-    protected function _drop_deploy_cache(Assets_File_Model $model)
+    /**
+     * Returns asset`s base deploy directory
+     *
+     * @param Assets_Model $model
+     * @return string
+     * @throws Assets_Provider_Exception
+     */
+    protected function _get_item_deploy_path(Assets_Model $model)
     {
-        // TODO Implement
+        $model_url = $model->get_url();
+
+        if ( ! $model_url )
+            throw new Assets_Provider_Exception('Model must have url');
+
+        $options = array(
+            'provider'  =>  $this->_codename,
+            'item_url'  =>  $model_url,
+        );
+
+        $url = Route::url('assets-provider-item-deploy-directory', $options);
+
+        // TODO Security
+        $doc_root = $_SERVER['DOCUMENT_ROOT'] . DIRECTORY_SEPARATOR;
+
+        return $doc_root . ltrim($url, '/');
+    }
+
+    /**
+     * Removes all deployed versions of provided asset
+     *
+     * @param Assets_Model $model
+     */
+    protected function _drop_deploy_cache(Assets_Model $model)
+    {
+        $path = $this->_get_item_deploy_path($model);
+
+        // Remove all versions of file
+        foreach ( glob("{$path}/*") as $file )
+        {
+            unlink($file);
+        }
+
+        // Remove directory itself
+        rmdir($path);
     }
 
     /**
@@ -296,7 +388,7 @@ abstract class Assets_Provider {
     /**
      * Creates empty file model
      *
-     * @return Assets_File_Model
+     * @return Assets_Model
      */
     abstract protected function file_model_factory();
 
@@ -308,9 +400,16 @@ abstract class Assets_Provider {
     abstract protected function check_upload_permissions();
 
     /**
+     * Returns TRUE if deploy is granted
+     *
+     * @return bool
+     */
+    abstract protected function check_deploy_permissions();
+
+    /**
      * Returns TRUE if delete operation granted
      *
-     * @param Assets_File_Model $model
+     * @param Assets_Model $model
      * @return bool
      */
     abstract protected function check_delete_permissions($model);

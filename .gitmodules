@@ -25,3 +25,6 @@
 [submodule "modules/jsonrpc"]
 	path = modules/jsonrpc
 	url = git@github.com:spotman/kohana-jsonrpc.git
+[submodule "modules/paginate"]
+	path = modules/paginate
+	url = git@github.com:morgan/kohana-paginate.git

@@ -72,5 +72,4 @@ class Assets_Storage_Local extends Assets_Storage {
         return $this->_base_path . DIRECTORY_SEPARATOR . $relative_path;
     }
 
-
 }

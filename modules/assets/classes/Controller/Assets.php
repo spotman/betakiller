@@ -3,6 +3,11 @@
 class Controller_Assets extends Controller {
 
     /**
+     * @var Assets_Provider
+     */
+    protected $_provider;
+
+    /**
      * Common action for uploading files through provider
      *
      * @throws Assets_Exception
@@ -16,32 +21,29 @@ class Controller_Assets extends Controller {
         if (count($_FILES) > 1)
             throw new Assets_Exception('Only one file can be uploaded at once');
 
-        $provider = $this->provider_factory();
+        $this->provider_factory();
 
         // Getting first uploaded file
         $_file = array_shift($_FILES);
 
         // Uploading via provider
-        $model = $provider->upload($_file);
+        $model = $this->_provider->upload($_file);
 
         // Returns
         $this->send_json(self::JSON_SUCCESS, $model->to_json());
     }
 
-    public function action_public()
+    public function action_original()
     {
-        $provider = $this->provider_factory();
+        $this->provider_factory();
 
-        $model = $this->by_hash($provider);
+        $model = $this->from_item_deploy_url();
 
         // Get file content
-        $content = $provider->get_content($model);
+        $content = $this->_provider->get_content($model);
 
-        // Deploy if needed
-        if ( Kohana::in_production() ) // TODO Move to config
-        {
-            $this->_deploy($content);
-        }
+        // Deploy to cache
+        $this->deploy($model, $content);
 
         // Send file content + headers
         $this->send_file($content, $model->get_mime());
@@ -49,13 +51,12 @@ class Controller_Assets extends Controller {
 
     public function action_preview()
     {
-        /** @var Assets_Provider_Image $provider */
-        $provider = $this->provider_factory();
+        $this->provider_factory();
 
-        if ( !($provider instanceof Assets_Provider_Image) )
+        if ( !($this->_provider instanceof Assets_Provider_Image) )
             throw new Assets_Exception('Preview can be served only by instances of Assets_Provider_Image');
 
-        $model = $this->by_hash($provider);
+        $model = $this->from_item_deploy_url();
 
         // Creating temporary file
         $temp_file_name = tempnam('/tmp', 'image-resize');
@@ -64,7 +65,7 @@ class Controller_Assets extends Controller {
             throw new Assets_Provider_Exception('Can not create temporary file for image resizing');
 
         // Getting original file content
-        $original_content = $provider->get_content($model);
+        $original_content = $this->_provider->get_content($model);
 
         // Putting content into it
         file_put_contents($temp_file_name, $original_content);
@@ -73,17 +74,14 @@ class Controller_Assets extends Controller {
         $image = Image::factory($temp_file_name);
 
         $resized_content = $image
-            ->resize($provider->get_preview_max_width(), $provider->get_preview_max_height())
-            ->render(NULL /* auto */, $provider->get_preview_quality());
+            ->resize($this->_provider->get_preview_max_width(), $this->_provider->get_preview_max_height())
+            ->render(NULL /* auto */, $this->_provider->get_preview_quality());
 
         // Deleting temp file
         unlink($temp_file_name);
 
-        // Deploy if needed
-        if ( Kohana::in_production() ) // TODO Move to config
-        {
-            $this->_deploy($resized_content);
-        }
+        // Deploy to cache
+        $this->deploy($model, $resized_content);
 
         // Send file content + headers
         $this->send_file($resized_content, $model->get_mime());
@@ -94,57 +92,38 @@ class Controller_Assets extends Controller {
         // This method responds via JSON (all exceptions will be caught automatically)
         $this->content_type_json();
 
-        $provider = $this->provider_factory();
+        $this->provider_factory();
 
         // Get file model by hash value
-        $model = $this->by_hash($provider);
+        $model = $this->from_item_deploy_url();
 
         // Delete file through provider
-        $provider->delete($model);
+        $this->_provider->delete($model);
 
         $this->send_json(self::JSON_SUCCESS);
     }
 
-    protected function _deploy($content)
-    {
-        $doc_root = $_SERVER['DOCUMENT_ROOT'] . DIRECTORY_SEPARATOR;
-
-        // TODO Security
-        $full_path = $doc_root . ltrim($this->request()->url(), '/');
-        $path = pathinfo($full_path, PATHINFO_DIRNAME);
-
-        $mask = 0775; // TODO Move to config
-
-        if ( ! file_exists($path) )
-        {
-            mkdir($path, $mask, true);
-        }
-
-        file_put_contents($full_path, $content);
-    }
-
     protected function provider_factory()
     {
-        $provider_codename = $this->param('provider');
+        $provider_key = $this->param('provider');
 
-        if ( ! $provider_codename )
+        if ( ! $provider_key )
             throw new Assets_Exception('You must specify provider codename');
 
-        /** @var Assets_Provider $provider */
-        return Assets_Provider::factory($provider_codename);
+        $this->_provider = Assets_Provider::factory($provider_key);
     }
 
-    protected function by_hash(Assets_Provider $provider)
+    protected function from_item_deploy_url()
     {
-        $hash = $this->param('hash');
+        $url = $this->param('item_url');
 
-        if ( ! $hash )
-            throw new Assets_Exception('You must specify hash');
+        if ( ! $url )
+            throw new Assets_Exception('You must specify item url');
 
         try
         {
-            // Find asset model by hash
-            $model = $provider->get_model_by_hash($hash);
+            // Find asset model by url
+            $model = $this->_provider->get_model_by_deploy_url($url);
         }
         catch ( Assets_Exception $e )
         {
@@ -153,6 +132,11 @@ class Controller_Assets extends Controller {
         }
 
         return $model;
+    }
+
+    protected function deploy(Assets_Model $model, $content)
+    {
+        $this->_provider->deploy($model, $this->request->action(), $content);
     }
 
 }

@@ -15,15 +15,15 @@ return array(
 //    'dbv'                   => MODPATH.'dbv',                   // Database Version Control
     'device'                => MODPATH.'device',                // Device detection
     'email'                 => MODPATH.'email',                 // Mailing module
-//    'files'                 => MODPATH.'files',                 // Files managing (assets, public deploy, etc)
     'jsonrpc'               => MODPATH.'jsonrpc',               // JSON-RPC server
     'image'                 => MODPATH.'image',                 // Image manipulation
     'static-files'          => MODPATH.'static-files',          // Static Files (JS/CSS/pictures)
-    'locator'               => MODPATH.'locator',               // URL mapping to interfaces
+//    'locator'               => MODPATH.'locator',               // URL mapping to interfaces
     'mangodb'               => MODPATH.'mangodb',               // ODM обёртка для mongodb
     'meta-tags'             => MODPATH.'meta-tags',             // HTML meta tags helper
     'minion'                => MODPATH.'minion',                // CLI Tasks
     'orm'                   => MODPATH.'orm',                   // Object Relationship Mapping
+    'paginate'              => MODPATH.'paginate',              // Paginate abstraction for ORM, ORM-REST and others
     'twig'                  => MODPATH.'twig',                  // Twig template engine
     'ulogin'                => MODPATH.'ulogin',                // Universal login via ulogin.ru
 //    'xmpp'                  => MODPATH.'xmpp',                  // Обёртка для взаимодействия по протоколу XMPP (Jabber)
