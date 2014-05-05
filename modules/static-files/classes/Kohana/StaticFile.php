@@ -112,9 +112,18 @@ class Kohana_StaticFile {
 	{
 		$cache_file = $this->_config->path . substr($this->_config->cache, 1) . $file_name;
 
-		if ( ! file_exists(dirname($cache_file)))
+        $dir = dirname($cache_file);
+
+		if ( ! file_exists($dir))
 		{
-			mkdir(dirname($cache_file), 0775, TRUE);
+            try
+            {
+                mkdir($dir, 0775, TRUE);
+            }
+            catch ( Exception $e)
+            {
+                throw new Kohana_Exception('Can not create cache dir :dir', array(':dir' => $dir));
+            }
 		}
 
 		return $cache_file;

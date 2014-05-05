@@ -50,6 +50,7 @@ abstract class Core_Widget extends Controller {
      * @param Request $request
      * @param Response $response
      * @return static
+     * @throws Widget_Exception
      */
     public static function factory($name, Request $request = NULL, Response $response = NULL)
     {
@@ -60,6 +61,9 @@ abstract class Core_Widget extends Controller {
 
         // Creating empty response if none provided
         $response = $response ?: Response::factory();
+
+        if ( ! class_exists($class_name) )
+            throw new Widget_Exception('Can not find widget :class', array(':class' => $class_name));
 
         /** @var Widget $widget */
         return new $class_name($name, $request, $response);
