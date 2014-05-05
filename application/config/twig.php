@@ -26,6 +26,7 @@ return array(
             'layouts'   =>  'layouts',
             'wrappers'  =>  'wrappers',
             'widgets'   =>  'widgets',
+            'statics'   =>  '../static-files',
         ),
 	),
 
