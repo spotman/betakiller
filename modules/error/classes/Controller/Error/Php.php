@@ -145,4 +145,9 @@ class Controller_Error_Php extends Controller_Developer {
         $this->set_sort_by($key);
         $this->redirect("/errors/php/");
     }
+
+    public function action_throw()
+    {
+        throw new HTTP_Exception_500('This is a test');
+    }
 }
