@@ -189,10 +189,4 @@ abstract class Assets_Model_ORM extends ORM implements Assets_Model {
         return $model->loaded() ? $model : NULL;
     }
 
-    public function create(Validation $validation = NULL)
-    {
-        $this->make_hash();
-        return parent::create($validation);
-    }
-
 }

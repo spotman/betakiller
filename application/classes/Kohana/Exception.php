@@ -17,16 +17,22 @@ class Kohana_Exception extends Kohana_Kohana_Exception {
      */
     const NOTIFICATION_REPEAT_COUNT = 50;
 
-    /**
-     * Exception counter for preventing recursion
-     */
-    protected static $_counter = 0;
 
     /**
      * Уведомления будут отсылаться не чаще чем T секунд
      */
     const NOTIFICATION_REPEAT_DELAY = 30;
 
+    /**
+     * Exception counter for preventing recursion
+     */
+    protected static $_counter = 0;
+
+    /**
+     * @todo refactoring to method
+     * Показывать ли пользователю оригинальный текст исключения в красивых обёртках и в JSON-ответе
+     */
+    protected $_show_original_message_to_user = FALSE;
 
     /**
      * Установите в FALSE в дочерних классах, если нет смысла сообщать разработчикам о данном типе исключений
@@ -35,17 +41,23 @@ class Kohana_Exception extends Kohana_Kohana_Exception {
      */
     protected $_send_notification = TRUE;
 
-    /**
-     * Показывать ли пользователю оригинальный текст исключения в красивых обёртках и в JSON-ответе
-     */
-    protected $_show_original_message_to_user = FALSE;
-
     public function __construct($message = "", array $variables = NULL, $code = 0, Exception $previous = NULL)
     {
         // Set up default message text if it was not set
         $message = $message ?: $this->get_default_message();
 
         parent::__construct($message, $variables, $code, $previous);
+    }
+
+    /**
+     * Sending additional headers for better debugging
+     * @param Exception $exception
+     * @param Response $response
+     */
+    public static function add_debug_headers(Exception $exception, Response $response)
+    {
+        $response->headers('X-Exception-Class', get_class($exception));
+        $response->headers('X-Exception-Message', $exception->getMessage());
     }
 
     static public function _handler(Exception $original_exception, $notify = TRUE)
@@ -96,17 +108,6 @@ class Kohana_Exception extends Kohana_Kohana_Exception {
         static::$_counter--;
 
         return $response;
-    }
-
-    /**
-     * Sending additional headers for better debugging
-     * @param Exception $exception
-     * @param Response $response
-     */
-    public static function add_debug_headers(Exception $exception, Response $response)
-    {
-        $response->headers('X-Exception-Class', get_class($exception));
-        $response->headers('X-Exception-Message', $exception->getMessage());
     }
 
     /**
@@ -322,6 +323,15 @@ class Kohana_Exception extends Kohana_Kohana_Exception {
     }
 
     /**
+     * Returns TRUE if someone must be notified about current exception type
+     * @return bool
+     */
+    public function is_notification_enabled()
+    {
+        return $this->_send_notification;
+    }
+
+    /**
      * Returns text which would be shown to user on uncaught exception
      * For most of exception classes it returns NULL (we do not want to inform user about our problems)
      * For populating original message to user set up protected property $_show_original_message_to_user of your custom exception class
@@ -336,13 +346,9 @@ class Kohana_Exception extends Kohana_Kohana_Exception {
             : NULL;
     }
 
-    /**
-     * Returns TRUE if someone must be notified about current exception type
-     * @return bool
-     */
-    public function is_notification_enabled()
+    protected function get_default_message()
     {
-        return $this->_send_notification;
+        return __('System error');
     }
 
     // TODO cross platform
@@ -360,10 +366,5 @@ class Kohana_Exception extends Kohana_Kohana_Exception {
         }
 
         return $cores;
-    }
-
-    protected function get_default_message()
-    {
-        return __('System error');
     }
 }

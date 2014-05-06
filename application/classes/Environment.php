@@ -1,6 +1,6 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
-class Environment extends Registry
+class Environment extends Util_Registry
 {
     /**
      * Defined variables by modules ( '<module_name>' => array('<key1>', '<key2>') )
