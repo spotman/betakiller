@@ -25,7 +25,8 @@ abstract class Assets_Model_ORM extends ORM implements Assets_Model {
      */
     public function set_original_name($name)
     {
-        return $this->set('original_name', $name);
+        $this->set('original_name', $name);
+        return $this->make_hash();
     }
 
     /**
@@ -44,7 +45,7 @@ abstract class Assets_Model_ORM extends ORM implements Assets_Model {
      */
     protected function make_hash()
     {
-        $hash = md5(microtime() . $this->get_original_name());
+        $hash = $this->get_hash() ?: (md5(microtime() . $this->get_original_name()));
         return $this->set('hash', $hash);
     }
 
@@ -118,8 +119,7 @@ abstract class Assets_Model_ORM extends ORM implements Assets_Model {
      */
     public function get_storage_file_name()
     {
-        $hash = $this->get_hash();
-        return Text::limit_chars($hash, 2).DIRECTORY_SEPARATOR.$hash;
+        return $this->get_ab_path();
     }
 
     /**
@@ -129,7 +129,51 @@ abstract class Assets_Model_ORM extends ORM implements Assets_Model {
      */
     public function get_url()
     {
-        return $this->get_storage_file_name();
+        return $this->get_ab_path('/');
+    }
+
+    /**
+     * Returns deep path for current model (f0/a4/f0a435a89cc65a93d341)
+     *
+     * @param string $delimiter
+     * @return string
+     */
+    protected function get_ab_path($delimiter = DIRECTORY_SEPARATOR)
+    {
+        $hash = $this->get_hash();
+        $depth = $this->get_ab_depth();
+        $length = $this->get_ab_part_length();
+
+        $parts = array();
+
+        for ( $i = 0; $i < $depth; $i++ )
+        {
+            $parts[] = substr($hash, $i*$length, $length);
+        }
+
+        $parts[] = $hash;
+
+        return implode($delimiter, $parts);
+    }
+
+    /**
+     * How many layers in path
+     *
+     * @return int
+     */
+    protected function get_ab_depth()
+    {
+        return 2;
+    }
+
+    /**
+     * How many letters are in path part
+     *
+     * @return int
+     */
+    protected function get_ab_part_length()
+    {
+        return 2;
     }
 
     /**

@@ -233,7 +233,7 @@ abstract class Assets_Provider {
         $model = $this->file_model_factory()->by_url($url);
 
         if ( ! $model )
-            throw new Assets_Provider_Exception('Can not find file with hash = :hash', array(':hash' => $url));
+            throw new Assets_Provider_Exception('Can not find file with url = :url', array(':url' => $url));
 
         return $model;
     }
@@ -360,6 +360,9 @@ abstract class Assets_Provider {
     protected function _drop_deploy_cache(Assets_Model $model)
     {
         $path = $this->_get_item_deploy_path($model);
+
+        if ( ! file_exists($path) )
+            return;
 
         // Remove all versions of file
         foreach ( glob("{$path}/*") as $file )

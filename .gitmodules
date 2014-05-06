@@ -28,3 +28,6 @@
 [submodule "modules/paginate"]
 	path = modules/paginate
 	url = git@github.com:morgan/kohana-paginate.git
+[submodule "modules/utils"]
+	path = modules/utils
+	url = git@github.com:spotman/kohana-utils.git

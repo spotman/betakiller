@@ -4,6 +4,7 @@
  * Automatically generated from previous translation file.
  */
 return array (
+  'Can not create path :dir' => 'Can not create path :dir',
   'You may upload files with :ext extensions only' => 'You may upload files with :ext extensions only',
   'Incorrect file, upload rejected' => 'Incorrect file, upload rejected',
   'Upload is not allowed' => 'Upload is not allowed',

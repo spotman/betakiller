@@ -26,6 +26,7 @@ return array(
     'paginate'              => MODPATH.'paginate',              // Paginate abstraction for ORM, ORM-REST and others
     'twig'                  => MODPATH.'twig',                  // Twig template engine
     'ulogin'                => MODPATH.'ulogin',                // Universal login via ulogin.ru
+    'utils'                 => MODPATH.'utils',                 // Useful classes
 //    'xmpp'                  => MODPATH.'xmpp',                  // Обёртка для взаимодействия по протоколу XMPP (Jabber)
 
     // Allow another modules to set routes

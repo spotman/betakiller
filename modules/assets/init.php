@@ -15,7 +15,8 @@ Route::set('assets-provider-upload', 'assets/<provider>/upload')
 /**
  * Deploy/delete/preview files via concrete provider
  */
-Route::set('assets-provider-item', 'assets/<provider>/<item_url>/<action>')
+Route::set('assets-provider-item', 'assets/<provider>/<item_url>/<action>',
+    array('item_url' => '[A-Za-z0-9\/]+', 'action' => '(original|preview|delete)'))
     ->defaults(array(
         'module'        => 'assets',
         'controller'    => 'Assets',
@@ -25,8 +26,7 @@ Route::set('assets-provider-item', 'assets/<provider>/<item_url>/<action>')
  * Fake route for getting asset`s deployment directory
  * It`ll newer triggered because of existing real deployment directory (and default .htaccess policy also)
  */
-Route::set('assets-provider-item-deploy-directory', 'assets/<provider>/<item_url>',
-    array('ab' => '[A-Za-z0-9]{2}'))
+Route::set('assets-provider-item-deploy-directory', 'assets/<provider>/<item_url>')
     ->defaults(array(
         'module'        => 'assets',
         'controller'    => 'Assets',

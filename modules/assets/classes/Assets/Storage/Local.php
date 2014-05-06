@@ -6,7 +6,10 @@ class Assets_Storage_Local extends Assets_Storage {
     protected $_base_path;
 
     // TODO move mask to config
-    protected $_put_mask = 0664;
+    protected $_dir_mask = 0775;
+
+    // TODO move mask to config
+    protected $_file_mask = 0664;
 
     /**
      * @param string $base_path
@@ -49,10 +52,19 @@ class Assets_Storage_Local extends Assets_Storage {
 
         if ( ! file_exists($base_path) )
         {
-            mkdir($base_path, $this->_put_mask, TRUE);
+            try
+            {
+                mkdir($base_path, $this->_dir_mask, TRUE);
+            }
+            catch ( Exception $e)
+            {
+                throw new Assets_Storage_Exception('Can not create path :dir', array(':dir' => $base_path));
+            }
         }
 
         file_put_contents($full_path, $content);
+
+        chmod($full_path, $this->_file_mask);
     }
 
     /**
