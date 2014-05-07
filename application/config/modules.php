@@ -2,6 +2,8 @@
 
 return array(
 
+    'utils'                 => MODPATH.'utils',                 // Useful classes
+
     'error'                 => MODPATH.'error',                 // Модуль отлова и логирования ошибок
 
     // Place it first for correct initialization of per-site classes and configs
@@ -26,7 +28,6 @@ return array(
     'paginate'              => MODPATH.'paginate',              // Paginate abstraction for ORM, ORM-REST and others
     'twig'                  => MODPATH.'twig',                  // Twig template engine
     'ulogin'                => MODPATH.'ulogin',                // Universal login via ulogin.ru
-    'utils'                 => MODPATH.'utils',                 // Useful classes
 //    'xmpp'                  => MODPATH.'xmpp',                  // Обёртка для взаимодействия по протоколу XMPP (Jabber)
 
     // Allow another modules to set routes
