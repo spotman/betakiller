@@ -24,6 +24,7 @@ return array(
     'mangodb'               => MODPATH.'mangodb',               // ODM обёртка для mongodb
     'meta-tags'             => MODPATH.'meta-tags',             // HTML meta tags helper
     'minion'                => MODPATH.'minion',                // CLI Tasks
+    'mysqli'                => MODPATH.'mysqli',                // Driver for MySQLi
     'orm'                   => MODPATH.'orm',                   // Object Relationship Mapping
     'paginate'              => MODPATH.'paginate',              // Paginate abstraction for ORM, ORM-REST and others
     'twig'                  => MODPATH.'twig',                  // Twig template engine
