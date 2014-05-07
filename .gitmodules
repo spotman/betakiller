@@ -33,4 +33,4 @@
 	url = git@github.com:spotman/kohana-utils.git
 [submodule "modules/mysqli"]
 	path = modules/mysqli
-	url = git@github.com:tomlankhorst/kohana-3.3-mysqli.git
+	url = git@github.com:spotman/kohana-3.3-mysqli.git
