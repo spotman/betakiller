@@ -10,12 +10,19 @@ class HTTP_Exception_Verbal extends HTTP_Exception_500 {
     /**
      * Показываем пользователю оригинальный текст исключения в красивых обёртках и в JSON-ответе
      */
-    protected $_show_original_message_to_user = TRUE;
+    protected function show_original_message_to_user()
+    {
+        return TRUE;
+    }
 
     /**
-     * Отключаем уведомление разработчиков о данном типе эксепшнов
+     * Отключаем уведомление о текущем типе исключений
+     * @return bool
      */
-    protected $_send_notification = FALSE;
+    public function is_notification_enabled()
+    {
+        return FALSE;
+    }
 
     protected function get_view_path($file = NULL)
     {

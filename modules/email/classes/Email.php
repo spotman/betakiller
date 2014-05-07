@@ -2,10 +2,15 @@
 
 class Email extends Kohana_Email {
 
-    public static function send($to, $from = null, $subject, $message, $html = FALSE, $attach = FALSE)
-    {
-        if ($from === null) $from = 'inform@sentra.ru';
+    protected static $_default_from;
 
-        return parent::send($to, $from, $subject, $message, $html, $attach);
+    public static function send($from, $to, $subject, $message, $html = FALSE, $attach = FALSE)
+    {
+        if ($from === NULL)
+        {
+            $from = static::$_default_from ?: static::$_default_from = static::config()->get('from');
+        }
+
+        return parent::send($from, $to, $subject, $message, $html, $attach);
     }
 }

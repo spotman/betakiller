@@ -5,13 +5,19 @@ class HTTP_Exception_401 extends Kohana_HTTP_Exception_401 {
     /**
      * Показываем пользователю оригинальный текст исключения в красивых обёртках и в JSON-ответе
      */
-    protected $_show_original_message_to_user = TRUE;
+    protected function show_original_message_to_user()
+    {
+        return TRUE;
+    }
 
     /**
      * Отключаем уведомление о текущем типе исключений
-     * @var bool
+     * @return bool
      */
-    protected $_send_notification = FALSE;
+    public function is_notification_enabled()
+    {
+        return FALSE;
+    }
 
     /**
      * Generate a Response for the 401 Exception.

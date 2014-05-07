@@ -13,16 +13,25 @@
  */
 class Kohana_Email {
 
-	// SwiftMailer instance
-	protected static $mail;
+	//  instance
 
-	/**
-	 * Creates a SwiftMailer instance.
-	 *
-	 * @param   string  DSN connection string
-	 * @return  object  Swift object
-	 */
-	public static function connect($config = NULL)
+    /**
+     * @var Swift_Mailer
+     */
+    protected static $mail;
+
+    /**
+     * @var Kohana_Config_Group
+     */
+    protected static $_config;
+
+    /**
+     * Creates a SwiftMailer instance.
+     *
+     * @param null|array $config DSN connection string
+     * @return Swift_Mailer
+     */
+    public static function connect($config = NULL)
 	{
 		if ( ! class_exists('Swift_Mailer', FALSE))
 		{
@@ -31,7 +40,7 @@ class Kohana_Email {
 		}
 
 		// Load default configuration
-		($config === NULL) and $config = Kohana::$config->load('email');
+		($config === NULL) and $config = static::config();
 		
 		switch ($config['driver'])
 		{
@@ -67,24 +76,29 @@ class Kohana_Email {
 		}
 
 		// Create the SwiftMailer instance
-		return Email::$mail = Swift_Mailer::newInstance($transport);
+		return static::$mail = Swift_Mailer::newInstance($transport);
 	}
 
-	/**
-	 * Send an email message.
-	 *
-	 * @param   string|array  recipient email (and name), or an array of To, Cc, Bcc names
-	 * @param   string|array  sender email (and name)
-	 * @param   string        message subject
-	 * @param   string        message body
-	 * @param   boolean       send email as HTML
-	 * @param   string        attach filename
-	 * @return  integer       number of emails sent
-	 */
-	public static function send($to, $from, $subject, $message, $html = FALSE, $attach = FALSE)
+    public static function config()
+    {
+        return static::$_config ?: static::$_config = Kohana::$config->load('email');
+    }
+
+    /**
+     * Send an email message.
+     *
+     * @param string|array $from sender email (and name)
+     * @param string|array $to recipient email (and name), or an array of To, Cc, Bcc names
+     * @param string $subject message subject
+     * @param string $message message body
+     * @param bool $html send email as HTML
+     * @param bool $attach attach filename
+     * @return int                      number of emails sent
+     */
+    public static function send($from, $to, $subject, $message, $html = FALSE, $attach = FALSE)
 	{
 		// Connect to SwiftMailer
-		(Email::$mail === NULL) and email::connect();
+		(static::$mail === NULL) and email::connect();
 
 		// Determine the message type
 		$html = ($html === TRUE) ? 'text/html' : 'text/plain';
@@ -145,7 +159,7 @@ class Kohana_Email {
             $message->attach(Swift_Attachment::fromPath($attach));
         }
 
-		return Email::$mail->send($message);
+		return static::$mail->send($message);
 	}
 
 } // End email

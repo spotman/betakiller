@@ -8,15 +8,9 @@ class Kohana_Exception extends Kohana_Kohana_Exception {
     const NOTIFICATION_EMAIL = "i.am@spotman.ru";
 
     /**
-     * Источник, от чьего имени отправляются уведомления об ошибках
-     */
-    const NOTIFICATION_EMAIL_FROM = "i.am@spotman.ru";
-
-    /**
      * Уведомления будут отсылаться при повторном появлении ошибки в N-ный раз
      */
     const NOTIFICATION_REPEAT_COUNT = 50;
-
 
     /**
      * Уведомления будут отсылаться не чаще чем T секунд
@@ -27,19 +21,6 @@ class Kohana_Exception extends Kohana_Kohana_Exception {
      * Exception counter for preventing recursion
      */
     protected static $_counter = 0;
-
-    /**
-     * @todo refactoring to method
-     * Показывать ли пользователю оригинальный текст исключения в красивых обёртках и в JSON-ответе
-     */
-    protected $_show_original_message_to_user = FALSE;
-
-    /**
-     * Установите в FALSE в дочерних классах, если нет смысла сообщать разработчикам о данном типе исключений
-     * Пример: класс HTTP_Exception_Verbal
-     * @var bool
-     */
-    protected $_send_notification = TRUE;
 
     public function __construct($message = "", array $variables = NULL, $code = 0, Exception $previous = NULL)
     {
@@ -75,7 +56,7 @@ class Kohana_Exception extends Kohana_Kohana_Exception {
         if ( static::$_counter > 10 )
         {
             static::log($original_exception);
-            die('Too much recursion');
+            die('Too much exceptions (recursion)');
         }
 
         // Получаем оригинальный стектрейс
@@ -203,11 +184,11 @@ class Kohana_Exception extends Kohana_Kohana_Exception {
             {
                 // Уведомляем разработчиков
                 Email::send(
-                    static::NOTIFICATION_EMAIL,         // to
-                    static::NOTIFICATION_EMAIL_FROM,    // from
-                    "Kohana exception",                 // subj
-                    static::make_email($odm),           // body
-                    TRUE                                // is html
+                    NULL,
+                    static::NOTIFICATION_EMAIL,
+                    "Kohana exception",
+                    static::make_email($odm),
+                    TRUE // is html
                 );
 
                 // Сохраняем время последнего уведомления об ошибке
@@ -324,11 +305,14 @@ class Kohana_Exception extends Kohana_Kohana_Exception {
 
     /**
      * Returns TRUE if someone must be notified about current exception type
+     * Override this method with FALSE return if notification about exceptions of concrete class is not needed
+     *
+     * @example HTTP_Exception_Verbal
      * @return bool
      */
     public function is_notification_enabled()
     {
-        return $this->_send_notification;
+        return TRUE;
     }
 
     /**
@@ -341,7 +325,7 @@ class Kohana_Exception extends Kohana_Kohana_Exception {
      */
     public function get_user_message($force_show = FALSE)
     {
-        return ( $force_show OR $this->_show_original_message_to_user )
+        return ( $force_show OR $this->show_original_message_to_user() )
             ?  $this->getMessage()
             : NULL;
     }
@@ -366,5 +350,14 @@ class Kohana_Exception extends Kohana_Kohana_Exception {
         }
 
         return $cores;
+    }
+
+    /**
+     * Показывать ли пользователю оригинальный текст исключения в красивых обёртках и в JSON-ответе
+     * @return bool
+     */
+    protected function show_original_message_to_user()
+    {
+        return FALSE;
     }
 }

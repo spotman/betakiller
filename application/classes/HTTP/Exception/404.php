@@ -4,9 +4,12 @@ class HTTP_Exception_404 extends Kohana_HTTP_Exception_404 {
 
     /**
      * Отключаем уведомление о текущем типе исключений
-     * @var bool
+     * @return bool
      */
-    protected $_send_notification = FALSE;
+    public function is_notification_enabled()
+    {
+        return FALSE;
+    }
 
     protected function get_default_message()
     {
