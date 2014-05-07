@@ -40,7 +40,7 @@ class Kohana_Email {
 		}
 
 		// Load default configuration
-		($config === NULL) and $config = static::config();
+		($config === NULL) and ($config = static::config());
 		
 		switch ($config['driver'])
 		{

@@ -150,4 +150,9 @@ class Controller_Error_Php extends Controller_Developer {
     {
         throw new HTTP_Exception_500('This is a test');
     }
+
+    public function action_email()
+    {
+        Email::send(NULL, 'i.am@spotman.ru', 'This is a test', 'Message test');
+    }
 }
