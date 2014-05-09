@@ -4,6 +4,17 @@
  * Automatically generated from previous translation file.
  */
 return array (
+  'Response with 401 status from http://afs.local/api/v1/json-rpc -> Lot.my' => 'Response with 401 status from http://afs.local/api/v1/json-rpc -> Lot.my',
+  'Response with :status status from :url -> :method' => 'Response with :status status from :url -> :method',
+  'Response with 404 status from http://api.afs.local/api/v1/json-rpc -> Lot_Category.all' => 'Response with 404 status from http://api.afs.local/api/v1/json-rpc -> Lot_Category.all',
+  ':status status for :url -> :method' => ':status status for :url -> :method',
+  '404 status for http://api.afs.local/api/v1/json-rpc -> Lot_Category.all' => '404 status for http://api.afs.local/api/v1/json-rpc -> Lot_Category.all',
+  ':status status for :url' => ':status status for :url',
+  '404 status for http://api.afs.local/api/v1/json-rpc' => '404 status for http://api.afs.local/api/v1/json-rpc',
+  'Response with 404 status' => 'Response with 404 status',
+  'fopen(http://afs.local/api/v1/json-rpc): failed to open stream: HTTP wrapper does not support writeable connections' => 'fopen(http://afs.local/api/v1/json-rpc): failed to open stream: HTTP wrapper does not support writeable connections',
+  'Default value:' => 'Default value:',
+  'Can not find widget :class' => 'Can not find widget :class',
   'Empty layer for :codename IFace' => 'Empty layer for :codename IFace',
   'Not implemented yet' => 'Not implemented yet',
   'Error reading session data.' => 'Error reading session data.',

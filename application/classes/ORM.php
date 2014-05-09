@@ -18,7 +18,7 @@ class ORM extends Util_ORM implements API_Response_Item /* , DataSource_Interfac
      * Default implementation for ORM objects
      * Override this method in child classes
      *
-     * @return NULL
+     * @return DateTime|NULL
      */
     public function get_last_modified()
     {
