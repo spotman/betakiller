@@ -25,6 +25,7 @@ return array(
         'namespaces'    =>  array(
             'layouts'   =>  'layouts',
             'wrappers'  =>  'wrappers',
+            'ifaces'    =>  'ifaces',
             'widgets'   =>  'widgets',
             'statics'   =>  '../static-files',
         ),
