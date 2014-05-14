@@ -7,12 +7,11 @@ class BetaKiller_Env
      * Now you are able to call Env::get('property').
      * @static
      * @param string $key
-     * @param string $act_as lets you to act as any module
      * @return mixed
      */
-    public static function get($key, $act_as = NULL)
+    public static function get($key)
     {
-        return Environment::instance()->get($key, $act_as);
+        return Environment::instance()->get($key);
     }
 
     /**
@@ -33,7 +32,7 @@ class BetaKiller_Env
      */
     public static function acl()
     {
-        return self::get('acl');
+        return static::get('acl');
     }
 
     /**
@@ -42,7 +41,7 @@ class BetaKiller_Env
      */
     public static function auth()
     {
-        return self::get('auth');
+        return static::get('auth');
     }
 
     /**
@@ -53,7 +52,7 @@ class BetaKiller_Env
      */
     public static function user($allow_guest = FALSE)
     {
-        $user = self::get('user');
+        $user = static::get('user');
 
         if ( $user === NULL AND ! $allow_guest )
             throw new HTTP_Exception_401('Authorization required!');
@@ -68,7 +67,7 @@ class BetaKiller_Env
      */
     public static function role()
     {
-        return self::get('role');
+        return static::get('role');
     }
 
 }
