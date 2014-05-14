@@ -7,7 +7,7 @@
  */
 abstract class Assets_Model_ORM extends ORM implements Assets_Model {
 
-    public function __construct()
+    protected function _initialize()
     {
         $this->belongs_to(array(
             'uploaded_by_user'  =>  array(
@@ -15,6 +15,8 @@ abstract class Assets_Model_ORM extends ORM implements Assets_Model {
                 'foreign_key'   =>  'uploaded_by',
             )
         ));
+
+        parent::_initialize();
     }
 
     /**
