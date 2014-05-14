@@ -7,6 +7,16 @@
  */
 abstract class Assets_Model_ORM extends ORM implements Assets_Model {
 
+    public function __construct()
+    {
+        $this->belongs_to(array(
+            'uploaded_by_user'  =>  array(
+                'model'         =>  'User',
+                'foreign_key'   =>  'uploaded_by',
+            )
+        ));
+    }
+
     /**
      * Returns original file name (user-defined filename of uploaded file)
      *
@@ -77,7 +87,7 @@ abstract class Assets_Model_ORM extends ORM implements Assets_Model {
      */
     public function get_uploaded_by()
     {
-        return $this->get('uploaded_by');
+        return $this->get('uploaded_by_user');
     }
 
     /**
@@ -88,7 +98,7 @@ abstract class Assets_Model_ORM extends ORM implements Assets_Model {
      */
     public function set_uploaded_by(Model_User $user)
     {
-        return $this->set('uploaded_by', $user);
+        return $this->set('uploaded_by_user', $user);
     }
 
     /**
