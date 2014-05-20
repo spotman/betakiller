@@ -82,7 +82,7 @@ class Kohana_Exception extends Kohana_Kohana_Exception {
         {
             // Или уведомляем разработчиков о нештатной ситуации
             static::log($original_exception);
-            static::log($e);
+            static::notify($e);
             $response = Response::factory()->status(500);
         }
 
@@ -254,17 +254,19 @@ class Kohana_Exception extends Kohana_Kohana_Exception {
         // Если это не наследник Kohana_Exception, оборачиваем его, чтобы показать базовое сообщение об ошибке
         if ( ! ( $e instanceof Kohana_Exception ) )
         {
-            $e = new Kohana_Exception($e->getMessage());
+            $e = new Kohana_Exception($e->getMessage(), NULL, $e->getCode(), $e);
         }
 
         // Получаем вьюшку для текущего исключения
         $view = $e->get_view();
+        $code = $e->getCode();
 
         // Чтобы не было XSS, преобразуем спецсимволы
         $view->set('message', HTML::chars($e->get_user_message()));
+        $view->set('code', (int) $code);
 
         // Определяем HTTP status code
-        $http_code = ( $e instanceof HTTP_Exception ) ? $e->getCode() : 500;
+        $http_code = ( $e instanceof HTTP_Exception ) ? $code : 500;
 
         return Response::factory()
             ->status($http_code)
