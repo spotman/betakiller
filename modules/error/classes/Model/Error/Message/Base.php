@@ -230,7 +230,7 @@ class Model_Error_Message_Base extends Mango {
             }
             else
             {
-                $data->who = __("Неизвестно");
+                $data->who = __("Unknown");
             }
 
             $data->when = date("d.m.Y в H:i:s", $data->when);
@@ -246,7 +246,7 @@ class Model_Error_Message_Base extends Mango {
                     break;
 
                 default:
-                    $css_class = "label-info";
+                    $css_class = "label-primary";
             }
 
             $data->what = '<span class="label '. $css_class .'">'. $data->what .'</span>';

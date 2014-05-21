@@ -2,7 +2,7 @@
 
 <div class="navbar navbar-inner navbar-form form-inline">
 
-    <a class="btn" href="/errors/php/action/toggle_show_resolved_errors">
+    <a class="btn btn-default" href="/errors/php/action/toggle_show_resolved_errors">
         <?= $show_resolved_errors ? "Показать только открытые ошибки" : "Показать исправленные ошибки" ?>
     </a>
 
@@ -46,7 +46,7 @@
             $icon = $sort_direction ? "icon-arrow-up" : "icon-arrow-down";
             ?>
 
-        <a tabindex="-1" href="<?= $link ?>" title="<?= $title ?>" class="btn <?= $is_current ? "active" : "" ?>">
+        <a tabindex="-1" href="<?= $link ?>" title="<?= $title ?>" class="btn btn-default <?= $is_current ? "active" : "" ?>">
             <? if ( $is_current ): ?><i class="<?= $icon ?>"></i><? endif; ?> <?= $sort_label ?>
         </a>
 
@@ -96,7 +96,7 @@
             $link = "/errors/php/". $error->get_hash();
             $paths = $error->get_paths();
             $base_path = dirname(APPPATH);
-            $message = mb_strimwidth($error->get_message(), 0, 120, "...");
+            $message = Text::limit_chars($error->get_message(), 120, '...', FALSE);
             $time = $error->get_time();
             $module = $error->get_module();
             $is_resolved = $error->is_resolved();
@@ -120,13 +120,15 @@
 
             <tr class="item <?= $css_class ?>">
                 <td>
-                    <small class="pull-right label label-info"><?= $module ?></small>
-                    <small class="label label-info"><?= date("H:i:s d.m.Y", $time) ?></small>
+                    <div class="pull-right">
+                        <small class="label label-primary"><?= $module ?></small>
+                        <small class="label label-primary"><?= date("H:i:s d.m.Y", $time) ?></small>
+                    </div>
                     <a href="<?= $link ?>">
                         <strong><?= $message ?></strong>
                     </a><br />
 
-                    <ul class="unstyled">
+                    <ul class="list-unstyled">
                         <? foreach ( $paths as $path ): ?>
                             <li><?= str_replace( $base_path, "", $path ) ?></li>
                         <? endforeach ?>
@@ -137,7 +139,7 @@
                     <? if ( $is_resolved ): ?>
                         <a class="btn btn-danger" href="<?= $link ?>/delete"><i class="icon-remove"></i> Удалить</a>
                     <? else: ?>
-                        <a class="btn" href="<?= $link ?>/resolved"><i class="icon-ok"></i> Уже исправлена</a>
+                        <a class="btn btn-success" href="<?= $link ?>/resolved"><i class="icon-ok"></i> Уже исправлена</a>
                     <? endif; ?>
                 </td>
             </tr>

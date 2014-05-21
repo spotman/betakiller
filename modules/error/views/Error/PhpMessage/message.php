@@ -1,7 +1,7 @@
 <?php defined('SYSPATH') or die('No direct script access.'); ?>
 
 <div class="navbar navbar-inner">
-    <a class="btn btn-info" href="/errors/php"><i class="icon-chevron-left"></i> Назад к списку</a>
+    <a class="btn btn-primary" href="/errors/php"><i class="icon-chevron-left"></i> Назад к списку</a>
 
     <? if ( $is_resolved): ?>
         <a class="btn btn-danger pull-right" href="/errors/php/<?= $hash ?>/delete"><i class="icon-remove"></i> Удалить ошибку</a>
@@ -12,7 +12,7 @@
 
 <div>
 
-    Ошибка встречается <span class="label label-important"><?= $counter ?></span> раз (последний раз <span class="label label-info"><?= date("d.m.Y в H:i:s", $time) ?></span>) по следующим адресам:<br />
+    Ошибка встречается <span class="label label-warning"><?= $counter ?></span> раз (последний раз <span class="label label-primary"><?= date("d.m.Y в H:i:s", $time) ?></span>) по следующим адресам:<br />
 
     <ul>
         <? foreach ( $urls as $url ): ?>
