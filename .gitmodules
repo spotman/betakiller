@@ -10,9 +10,6 @@
 [submodule "modules/cache"]
 	path = modules/cache
 	url = git@github.com:spotman/kohana-cache.git
-[submodule "modules/api"]
-	path = modules/api
-	url = git@github.com:spotman/kohana-simple-api.git
 [submodule "modules/meta-tags"]
 	path = modules/meta-tags
 	url = git@github.com:spotman/kohana-meta-tags.git
@@ -34,3 +31,6 @@
 [submodule "modules/mysqli"]
 	path = modules/mysqli
 	url = git@github.com:spotman/kohana-3.3-mysqli.git
+[submodule "modules/api"]
+	path = modules/api
+	url = git@github.com:spotman/kohana-simple-api.git
