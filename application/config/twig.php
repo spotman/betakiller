@@ -27,6 +27,8 @@ return array(
             'wrappers'  =>  'wrappers',
             'ifaces'    =>  'ifaces',
             'widgets'   =>  'widgets',
+            'templates' =>  'templates',
+
             'statics'   =>  '../static-files',
         ),
 	),
