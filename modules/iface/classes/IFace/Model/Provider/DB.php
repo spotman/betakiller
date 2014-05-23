@@ -12,6 +12,7 @@ class IFace_Model_Provider_DB extends IFace_Model_Provider {
     {
         return $this->orm_factory()
             ->where('parent_id', 'IS', NULL)
+            ->cached()
             ->find_all()->as_array();
     }
 
@@ -24,6 +25,7 @@ class IFace_Model_Provider_DB extends IFace_Model_Provider {
     {
         $iface = $this->orm_factory()
             ->where('is_default', '=', TRUE)
+            ->cached()
             ->find();
 
         return $iface->loaded() ? $iface : NULL;
@@ -39,6 +41,7 @@ class IFace_Model_Provider_DB extends IFace_Model_Provider {
     {
         $iface = $this->orm_factory()
             ->where('codename', '=', $codename)
+            ->cached()
             ->find();
 
         return $iface->loaded() ? $iface : NULL;
