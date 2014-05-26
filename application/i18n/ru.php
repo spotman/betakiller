@@ -4,6 +4,7 @@
  * Automatically generated from previous translation file.
  */
 return array (
+  ':field must not be empty' => 'Поле :field должно быть заполнено',
   'Can not get value for :key' => 'Can not get value for :key',
   'Class :class is absent' => 'Class :class is absent',
   'Default value:' => 'Default value:',

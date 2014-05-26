@@ -97,20 +97,25 @@ class I18n extends Kohana_I18n {
 
     protected static function put_data($module, $data)
     {
-        // Если указан конкретный модуль, пишем найденную строку в языковой файл соответствующего модуля
-        // Иначе пишем в общий файл в /application
-        $savepath = ( $module == 'application' ? APPPATH  : MODPATH.$module.'/' ).'i18n/';
+        // Если указан конкретный модуль
+        $base_path = ( $module != 'application' )
+            // Пишем найденную строку в языковой файл соответствующего модуля
+            ? MODPATH.$module.'/'
+            // Иначе пишем в общий файл в /application (или в директорию текущего сайта)
+            : Kohana::include_paths()[0];
+
+        $save_path = $base_path.'i18n/';
 
         // check that the path exists
-        if ( ! file_exists($savepath) )
+        if ( ! file_exists($save_path) )
         {
             // if not, create directory
-            mkdir($savepath, 0777, true);
+            mkdir($save_path, 0777, true);
         }
 
         // Формируем имя файла
         $filename = static::$lang.'.php';
-        $full_file_path = $savepath . $filename;
+        $full_file_path = $save_path . $filename;
 
         // Получаем текущее содержимое языкового файла, если он есть
         $current_app_lang_data = file_exists($full_file_path) ? include $full_file_path : array();
@@ -126,7 +131,7 @@ class I18n extends Kohana_I18n {
         {
             // Backing up current config
             $old_content = file_get_contents($full_file_path);
-            $backup_name = $savepath.static::$lang.'_'.date('Y_m_d__H_i_s').'.php';
+            $backup_name = $save_path.static::$lang.'_'.date('Y_m_d__H_i_s').'.php';
             $result = file_put_contents($backup_name, $old_content);
 
             // Backup failed! Don't write the file.

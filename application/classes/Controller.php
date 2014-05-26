@@ -122,6 +122,11 @@ abstract class Controller extends Controller_Proxy {
         return $this->request->param($key, $default);
     }
 
+    protected function post($key = NULL, $value = NULL)
+    {
+        return $this->request->post($key, $value);
+    }
+
     /**
      * Getter/setter for Response content-type
      * Use this method for better uncaught exception handling

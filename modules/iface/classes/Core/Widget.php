@@ -193,14 +193,11 @@ abstract class Core_Widget extends Controller {
         return Route::url('widget-controller', array('widget' => $widget, 'action' => $action), $protocol);
     }
 
-    protected function view($state = NULL)
+    protected function view($file = NULL)
     {
-        return $this->state_view($state ?: $this->_current_state);
-    }
+        $file = $file ?: $this->_current_state;
 
-    private function state_view($state)
-    {
-        $view_path = 'widgets'. DIRECTORY_SEPARATOR . str_replace('_', DIRECTORY_SEPARATOR, $this->_name) . DIRECTORY_SEPARATOR . $state;
+        $view_path = 'widgets'. DIRECTORY_SEPARATOR . str_replace('_', DIRECTORY_SEPARATOR, $this->_name) . DIRECTORY_SEPARATOR . $file;
 
         return $this->view_factory($view_path, $this->_context);
     }
@@ -213,6 +210,16 @@ abstract class Core_Widget extends Controller {
     protected function _execute()
     {
         throw new HTTP_Exception_500('Direct call is not allowed');
+    }
+
+    protected function get_validation_errors(Validation $validation)
+    {
+        return $validation->errors($this->get_validation_messages_path());
+    }
+
+    private function get_validation_messages_path()
+    {
+        return 'widgets'. DIRECTORY_SEPARATOR . str_replace('_', DIRECTORY_SEPARATOR, $this->_name);
     }
 
 }

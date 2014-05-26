@@ -1,3 +1,3 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
-class Model_Role extends BetaKiller_Model_Role {}
+class Notification extends Kohana_Notification {}

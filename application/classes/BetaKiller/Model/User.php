@@ -1,6 +1,6 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
-class BetaKiller_Model_User extends Model_Auth_User //implements ACL_Role_Interface
+class BetaKiller_Model_User extends Model_Auth_User implements Notification_User_Interface //implements ACL_Role_Interface
 {
     protected $_reload_on_wakeup = FALSE;
 
@@ -203,6 +203,30 @@ class BetaKiller_Model_User extends Model_Auth_User //implements ACL_Role_Interf
         /** @var Model_Role $roles_orm */
         $roles_orm = ORM::factory('Role');
 
-        return $roles_orm->developers()->get_users();
+        return $roles_orm->developers()->get_users()->find_all();
     }
+
+    public function get_moderators_list()
+    {
+        /** @var Model_Role $roles_orm */
+        $roles_orm = ORM::factory('Role');
+
+        return $roles_orm->moderators()->get_users()->find_all();
+    }
+
+    public function is_online()
+    {
+        return FALSE;
+    }
+
+    public function is_email_notification_allowed()
+    {
+        return TRUE;
+    }
+
+    public function is_online_notification_allowed()
+    {
+        return FALSE;
+    }
+
 }
