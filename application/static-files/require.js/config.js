@@ -8,10 +8,13 @@ require.config({
 
         'waypoints':                '../jquery/waypoints/waypoints',
 
+        'wookmark':                 '../jquery/jquery.wookmark.min',
+
         'jquery.fileupload':        '../jquery/fileupload/jquery.fileupload',
         'jquery.iframe-transport':  '../jquery/fileupload/jquery.iframe-transport',
         'jquery.fileupload.bundle': '../jquery/fileupload/jquery.fileupload.bundle',
 
+        'imagesLoaded':             '../imagesLoaded/imagesloaded.pkgd',
         'load-image':               '../load-image/load-image',
 
         'underscore':               '../underscore/underscore',
