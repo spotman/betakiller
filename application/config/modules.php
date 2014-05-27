@@ -27,6 +27,7 @@ return array(
     'mysqli'                => MODPATH.'mysqli',                // Driver for MySQLi
     'orm'                   => MODPATH.'orm',                   // Object Relationship Mapping
     'paginate'              => MODPATH.'paginate',              // Paginate abstraction for ORM, ORM-REST and others
+    'robots-txt'            => MODPATH.'robots-txt',            // Serving /robots.txt
     'twig'                  => MODPATH.'twig',                  // Twig template engine
     'ulogin'                => MODPATH.'ulogin',                // Universal login via ulogin.ru
 //    'xmpp'                  => MODPATH.'xmpp',                  // Обёртка для взаимодействия по протоколу XMPP (Jabber)
