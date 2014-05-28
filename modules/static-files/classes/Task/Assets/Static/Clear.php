@@ -6,7 +6,14 @@ class Task_Assets_Static_Clear extends Minion_Task {
     {
         try
         {
-            StaticFile::instance()->cache_reset();
+            $paths = StaticFile::instance()->get_cache_folders();
+
+            foreach ($paths as $path)
+            {
+                Minion_CLI::write('Erasing '.$path);
+                File::rmdir($path);
+            }
+
             Minion_CLI::write('Static assets cache was successfully cleared');
         }
         catch ( Kohana_Exception $e )
