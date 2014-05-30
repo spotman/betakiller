@@ -2,7 +2,7 @@ require.config({
 
     baseUrl: '{# assets_base_url #}require.js',
     paths: {
-        'jquery':                   '../jquery/jquery-1.10.2',
+        'jquery':                   '../jquery/jquery-1.11.1.min',
         'jquery.utils':             '../jquery/utils',
         'jquery.ui.widget':         '../jquery/ui/jquery.ui.widget',
 

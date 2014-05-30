@@ -4,10 +4,6 @@
  * Automatically generated from previous translation file.
  */
 return array (
-  ':field must not be empty' => 'Поле :field должно быть заполнено',
-  'Can not get value for :key' => 'Can not get value for :key',
-  'Class :class is absent' => 'Class :class is absent',
-  'Default value:' => 'Default value:',
   'Can not find widget :class' => 'Can not find widget :class',
   'Empty layer for :codename IFace' => 'Empty layer for :codename IFace',
   'Not implemented yet' => 'Not implemented yet',

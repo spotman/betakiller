@@ -3,7 +3,7 @@
 return array(
 
     'jquery'    =>  array(
-        'js'    =>  array('jquery/jquery-1.11.0.js', 'jquery/jquery-migrate-1.2.1.js', 'jquery/utils.js')
+        'js'    =>  array('jquery/jquery-1.11.1.min.js', 'jquery/jquery-migrate-1.2.1.js', 'jquery/utils.js')
     ),
 
     'jquery.ui'     => array(
