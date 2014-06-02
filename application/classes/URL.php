@@ -18,11 +18,17 @@ class URL extends Kohana_URL {
             "с"=>"s","т"=>"t","у"=>"u","ф"=>"f","х"=>"h",
             "ц"=>"ts","ч"=>"ch","ш"=>"sh","щ"=>"sch","ъ"=>"y",
             "ы"=>"yi","ь"=>"","э"=>"e","ю"=>"yu","я"=>"ya",
-            " "=> "-", "."=> "", "/"=> "_"
+            " "=> "-", "."=> "-", "/"=> "-"
         );
 
-        $clean = strtolower(trim(strtr($string, $tr), '-'));
-        $clean = preg_replace("/[\/_|+ -]+/", $delimiter, $clean);
+        // Replace by table
+        $clean = strtr($string, $tr);
+
+        // Replace all incorrect symbols
+        $clean = preg_replace("/[^A-Za-z-_]+/", $delimiter, $clean);
+
+        // Final cleanup
+        $clean = strtolower(trim($clean, '-'));
 
         return $clean;
     }
