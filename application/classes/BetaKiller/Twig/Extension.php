@@ -57,8 +57,7 @@ class BetaKiller_Twig_Extension extends Twig_Extension {
                 array($this, 'meta')
             ),
 
-            // View must not have any backend-related logic
-            // new Twig_SimpleFunction('iface_url', array($this, 'iface_url')),
+            new Twig_SimpleFunction('iface_url', array($this, 'iface_url')),
 
             new Twig_SimpleFunction(
                 'profiler',
@@ -146,17 +145,18 @@ class BetaKiller_Twig_Extension extends Twig_Extension {
         }
     }
 
-//    /**
-//     * @todo генерация динамических url
-//     * @param $codename
-//     * @return string
-//     */
-//    public function iface_url($codename)
-//    {
-//        $iface = IFace::by_codename($codename);
-//
-//        return $iface->url();
-//    }
+    /**
+     * Только для статических ссылок!
+     * Динамические нужно генерировать на бэкенде
+     * @param $codename
+     * @return string
+     */
+    public function iface_url($codename)
+    {
+        $iface = IFace::by_codename($codename);
+
+        return $iface->url();
+    }
 
     public function show_profiler()
     {
