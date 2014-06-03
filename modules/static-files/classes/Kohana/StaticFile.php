@@ -84,7 +84,7 @@ class Kohana_StaticFile {
 			// ie 'module-name/style.css'
 			if (mb_strpos($url, $this->_config->url) === 0)
 			{
-				$orig = Controller_Staticfiles::static_original(str_replace($this->_config->url, '', $url));
+				$orig = Controller_StaticFiles::static_original(str_replace($this->_config->url, '', $url));
 			}
 			else
 			{
