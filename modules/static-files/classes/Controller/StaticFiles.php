@@ -9,7 +9,7 @@
  * @package Kohana-static-files
  * @author Berdnikov Alexey <aberdnikov@gmail.com>
  */
-class Controller_Staticfiles extends Controller {
+class Controller_StaticFiles extends Controller {
 
     protected $config;
 
@@ -151,6 +151,11 @@ class Controller_Staticfiles extends Controller {
             }
         }
         @ rmdir($dir);
+    }
+
+    public function action_missing()
+    {
+        throw new HTTP_Exception_404;
     }
 
 }

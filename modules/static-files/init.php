@@ -6,18 +6,25 @@
 
 $ksf_config = Kohana::$config->load("staticfiles");
 $static_url = trim($ksf_config['url'], '/');
+$static_cache_url = trim($ksf_config['cache'], '/');
 $cc_url = trim($ksf_config['clear_cache_url'], '/');
 
 Route::set( 'kohana-static-files', $static_url.'/<file>', array('file'=>'.*') )
     ->defaults(array(
-	'controller' => 'staticfiles',
+	'controller' => 'StaticFiles',
 	'action' => 'index'
 	));
 
 Route::set( 'kohana-static-files-clear', $cc_url )
     ->defaults(array(
-    'controller' => 'staticfiles',
+    'controller' => 'StaticFiles',
     'action' => 'clear'
+));
+
+Route::set( 'kohana-static-files-missing-cache', $static_cache_url.'/<file>', array('file'=>'.*') )
+    ->defaults(array(
+    'controller' => 'StaticFiles',
+    'action' => 'missing'
 ));
 
 require_once Kohana::find_file('vendor', 'jsmin');
