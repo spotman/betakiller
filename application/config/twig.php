@@ -12,7 +12,7 @@ return array(
         /**
          * Enable caching of directories list
          */
-        'cache' =>  (Kohana::$environment == Kohana::PRODUCTION),
+        'cache' =>  Kohana::in_production(),
 
         /**
          * Namespaces to add
