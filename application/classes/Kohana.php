@@ -4,6 +4,11 @@ class Kohana extends Kohana_Core {
 
     public static $environment_string = 'development';
 
+    /**
+     * @var Cache
+     */
+    protected static $_custom_cache;
+
     public static function in_production()
     {
         return in_array(Kohana::$environment, array(Kohana::PRODUCTION, Kohana::STAGING));
@@ -55,6 +60,30 @@ class Kohana extends Kohana_Core {
             throw new Kohana_Exception('Can not detect document root');
 
         return $path;
+    }
+
+    public static function cache($name, $data = NULL, $lifetime = NULL)
+    {
+        return static::$_custom_cache
+            ? static::custom_cache($name, $data, $lifetime)
+            : parent::cache($name, $data, $lifetime);
+    }
+
+    protected static function custom_cache($name, $data = NULL, $lifetime = NULL)
+    {
+        if ( is_null($data) )
+        {
+            return static::$_custom_cache->get($name);
+        }
+        else
+        {
+            return static::$_custom_cache->set($name, $data, $lifetime);
+        }
+    }
+
+    public static function set_custom_cache(Cache $instance)
+    {
+        static::$_custom_cache = $instance;
     }
 
 }

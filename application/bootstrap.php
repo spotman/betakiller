@@ -131,4 +131,4 @@ if ($routes = Kohana::find_file('routes', Kohana::$environment_string))
     include $routes;
 }
 
-gc_enable();
+//gc_enable();
