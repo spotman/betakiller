@@ -6,7 +6,8 @@ require.config({
         'jquery.utils':             '../jquery/utils',
         'jquery.ui.widget':         '../jquery/ui/jquery.ui.widget',
 
-        'waypoints':                '../jquery/waypoints/waypoints',
+        'waypoints':                '../jquery/waypoints/waypoints.min',
+        'waypoints.sticky':         '../jquery/waypoints/waypoints-sticky.min',
 
         'wookmark':                 '../jquery/jquery.wookmark.min',
 
@@ -14,10 +15,10 @@ require.config({
         'jquery.iframe-transport':  '../jquery/fileupload/jquery.iframe-transport',
         'jquery.fileupload.bundle': '../jquery/fileupload/jquery.fileupload.bundle',
 
-        'imagesLoaded':             '../imagesLoaded/imagesloaded.pkgd',
+        'imagesLoaded':             '../imagesLoaded/imagesloaded.pkgd.min',
         'load-image':               '../load-image/load-image',
 
-        'underscore':               '../underscore/underscore',
+        'underscore':               '../underscore/underscore-min',
         'backbone':                 '../backbone/backbone',
         'backbone.rpc':             '../backbone/backbone.rpc',
         'geppetto':                 '../backbone/backbone.geppetto',
