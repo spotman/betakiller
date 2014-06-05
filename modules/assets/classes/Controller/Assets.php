@@ -58,33 +58,13 @@ class Controller_Assets extends Controller {
 
         $model = $this->from_item_deploy_url();
 
-        // Creating temporary file
-        $temp_file_name = tempnam('/tmp', 'image-resize');
-
-        if ( ! $temp_file_name )
-            throw new Assets_Provider_Exception('Can not create temporary file for image resizing');
-
-        // Getting original file content
-        $original_content = $this->_provider->get_content($model);
-
-        // Putting content into it
-        file_put_contents($temp_file_name, $original_content);
-
-        // Creating resizing instance
-        $image = Image::factory($temp_file_name);
-
-        $resized_content = $image
-            ->resize($this->_provider->get_preview_max_width(), $this->_provider->get_preview_max_height())
-            ->render(NULL /* auto */, $this->_provider->get_preview_quality());
-
-        // Deleting temp file
-        unlink($temp_file_name);
+        $preview_content = $this->_provider->prepare_preview($model);
 
         // Deploy to cache
-        $this->deploy($model, $resized_content);
+        $this->deploy($model, $preview_content);
 
         // Send file content + headers
-        $this->send_file($resized_content, $model->get_mime());
+        $this->send_file($preview_content, $model->get_mime());
     }
 
     public function action_delete()

@@ -62,22 +62,37 @@ class Kohana extends Kohana_Core {
         return $path;
     }
 
-    public static function cache($name, $data = NULL, $lifetime = NULL)
+    public static function cache($name, $data = NULL, $lifetime = 3600)
     {
         return static::$_custom_cache
             ? static::custom_cache($name, $data, $lifetime)
             : parent::cache($name, $data, $lifetime);
     }
 
-    protected static function custom_cache($name, $data = NULL, $lifetime = NULL)
+    protected static function custom_cache($name, $data = NULL, $lifetime = 3600)
     {
+        $key = sha1($name);
+
         if ( is_null($data) )
         {
-            return static::$_custom_cache->get($name);
+            $value = static::$_custom_cache->get($key);
+            static::log_with_headers('Read-Cache-Key-'.$key, '['.gettype($value).']');
+            return $value;
         }
         else
         {
-            return static::$_custom_cache->set($name, $data, $lifetime);
+            static::log_with_headers('Write-Cache-Key-'.$key, '['.gettype($data).'] for '. $lifetime);
+            return static::$_custom_cache->set($key, $data, $lifetime);
+        }
+    }
+
+    protected static function log_with_headers($key, $value)
+    {
+        $response = Response::current();
+
+        if ( $response )
+        {
+            $response->headers($key, $value);
         }
     }
 

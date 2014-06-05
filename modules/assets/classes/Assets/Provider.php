@@ -126,18 +126,22 @@ abstract class Assets_Provider {
         $full_path = $_file['tmp_name'];
         $safe_name = strip_tags($_file['name']);
 
-        // Put data into model
-        $model = $this->file_model_factory()
-            ->set_original_name($safe_name)
-            ->set_size(filesize($full_path))
-            ->set_mime($mime_type)
-            ->set_uploaded_by($this->_get_current_user());
-
-        // Custom processing
-        $this->_upload($model);
+        // Init model
+        $model = $this->file_model_factory();
 
         // Get file content
         $content = file_get_contents($full_path);
+
+        // Custom processing
+        $content = $this->_upload($model, $content);
+
+        // Put data into model
+        $model
+            ->set_original_name($safe_name)
+            ->set_size(strlen($content))
+            ->set_mime($mime_type)
+            ->set_uploaded_by($this->_get_current_user());
+
 
         // Place file into storage
         $this->get_storage()->put($model, $content);
@@ -152,10 +156,13 @@ abstract class Assets_Provider {
      * Additional upload processing
      *
      * @param Assets_Model $model
+     * @param string $content
+     * @return string
      */
-    protected function _upload($model)
+    protected function _upload($model, $content)
     {
         // Empty by default
+        return $content;
     }
 
     public function deploy(Assets_Model $model, $action, $content)
