@@ -15,6 +15,8 @@ require.config({
         'jquery.iframe-transport':  '../jquery/fileupload/jquery.iframe-transport',
         'jquery.fileupload.bundle': '../jquery/fileupload/jquery.fileupload.bundle',
 
+        'jquery.scrollTo':          '../jquery/scrollTo/jquery.scrollTo.min',
+
         'imagesLoaded':             '../imagesLoaded/imagesloaded.pkgd.min',
         'load-image':               '../load-image/load-image',
 
