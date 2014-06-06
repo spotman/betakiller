@@ -3,7 +3,7 @@
 return array(
 
     'jquery'    =>  array(
-        'js'    =>  array('jquery/jquery-1.11.1.min.js', 'jquery/jquery-migrate-1.2.1.js', 'jquery/utils.js')
+        'js'    =>  array('jquery/jquery-1.11.1.min.js', /* 'jquery/jquery-migrate-1.2.1.js', */ 'jquery/utils.js')
     ),
 
     'jquery.ui'     => array(
@@ -83,6 +83,14 @@ return array(
         'js'        =>  'jquery/jsonTools.js',
     ),
 
+    /**
+     * @link https://github.com/adchsm/Slidebars
+     */
+    'jquery.slidebars'  => array(
+        'js'            =>  'jquery/slidebars/slidebars.js',
+        'css'           =>  'jquery/slidebars/slidebars.css',
+    ),
+
 //    /**
 //     * @link http://www.wookmark.com/jquery-plugin
 //     */
@@ -94,8 +102,8 @@ return array(
      * @link http://getbootstrap.com/
      */
     'bootstrap'     => array(
-        'js'        =>  'bootstrap/v3/js/bootstrap.js',
-        'css'       =>  'bootstrap/v3/css/bootstrap.css'
+        'js'        =>  'bootstrap/v3/js/bootstrap.min.js',
+        'css'       =>  'bootstrap/v3/css/bootstrap.min.css'
     ),
 
     /**
@@ -109,7 +117,7 @@ return array(
      * @link https://github.com/CWSpear/bootstrap-hover-dropdown
      */
     'bootstrap.hover_dropdown'     => array(
-        'js'        =>  'bootstrap/hover-dropdown/bootstrap-hover-dropdown.js',
+        'js'        =>  'bootstrap/hover-dropdown/bootstrap-hover-dropdown.min.js',
     ),
 
     /**

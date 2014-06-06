@@ -62,14 +62,17 @@ class Kohana extends Kohana_Core {
         return $path;
     }
 
-    public static function cache($name, $data = NULL, $lifetime = 3600)
+    public static function cache($name, $data = NULL, $lifetime = 60)
     {
+        if ( ! static::$caching )
+            return NULL;
+
         return static::$_custom_cache
             ? static::custom_cache($name, $data, $lifetime)
             : parent::cache($name, $data, $lifetime);
     }
 
-    protected static function custom_cache($name, $data = NULL, $lifetime = 3600)
+    protected static function custom_cache($name, $data = NULL, $lifetime = 60)
     {
         $key = sha1($name);
 
