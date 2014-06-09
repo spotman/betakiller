@@ -4,10 +4,10 @@ abstract class Kohana_Notification_Message {
 
     use Util_Factory_Simple;
 
-//    /**
-//     * @var Notification_User_Interface
-//     */
-//    protected $_from;
+    /**
+     * @var Notification_User_Interface
+     */
+    protected $_from;
 
     /**
      * @var Notification_User_Interface[]
@@ -19,28 +19,42 @@ abstract class Kohana_Notification_Message {
      */
     protected $_subj;
 
+//    /**
+//     * @var string
+//     */
+//    protected $_text;
+
     /**
+     * Template codename
+     *
      * @var string
      */
-    protected $_text;
+    protected $_template_name;
 
-//    /**
-//     * @return Notification_User_Interface
-//     */
-//    public function get_from()
-//    {
-//        return $this->_from;
-//    }
-//
-//    /**
-//     * @param Notification_User_Interface $value
-//     * @return $this
-//     */
-//    public function set_from(Notification_User_Interface $value)
-//    {
-//        $this->_from = $value;
-//        return $this;
-//    }
+    /**
+     * Key => value bindings for template
+     *
+     * @var array
+     */
+    protected $_template_data;
+
+    /**
+     * @return Notification_User_Interface
+     */
+    public function get_from()
+    {
+        return $this->_from;
+    }
+
+    /**
+     * @param Notification_User_Interface $value
+     * @return $this
+     */
+    public function set_from(Notification_User_Interface $value)
+    {
+        $this->_from = $value;
+        return $this;
+    }
 
     /**
      * @return Notification_User_Interface[]
@@ -75,20 +89,20 @@ abstract class Kohana_Notification_Message {
         return $this;
     }
 
-    public function get_text()
-    {
-        return $this->_text;
-    }
+//    public function get_text()
+//    {
+//        return $this->_text;
+//    }
 
-    /**
-     * @param string $value
-     * @return $this
-     */
-    public function set_text($value)
-    {
-        $this->_text = $value;
-        return $this;
-    }
+//    /**
+//     * @param string $value
+//     * @return $this
+//     */
+//    public function set_text($value)
+//    {
+//        $this->_text = $value;
+//        return $this;
+//    }
 
 //    /**
 //     * @param $email
@@ -104,6 +118,53 @@ abstract class Kohana_Notification_Message {
     public function send()
     {
         Notification::instance()->send($this);
+    }
+
+    public function set_template_name($template_name)
+    {
+        $this->_template_name = $template_name;
+        return $this;
+    }
+
+    public function set_template_data(array $data)
+    {
+        $this->_template_data = $data;
+        return $this;
+    }
+
+//    public function get_template_name()
+//    {
+//        return $this->_template_name;
+//    }
+
+    protected function template_factory()
+    {
+        return View::factory();
+    }
+
+    protected function get_template_path()
+    {
+        return 'templates'.DIRECTORY_SEPARATOR.'notification';
+    }
+
+    public function render($transport_name)
+    {
+//        if ( ! $this->_template_name )
+//            return $this->_text;
+
+        $view = $this->template_factory();
+
+        $data = array_merge($this->_template_data, array(
+            'to'        =>  $this->_to,
+            'subject'   =>  $this->_subj,
+//            'text'      =>  $this->_text,
+        ));
+
+        $view->set($data);
+
+        return $view->render(
+            $this->get_template_path().DIRECTORY_SEPARATOR.$this->_template_name.DIRECTORY_SEPARATOR.$transport_name
+        );
     }
 
 }

@@ -4,26 +4,27 @@ abstract class Kohana_Notification {
 
     use Util_Singleton;
 
+    const TRANSPORT_EMAIL = 'email';
+
+    /**
+     * @return Notification_Message
+     */
     public function message()
     {
-        return new Notification_Message;
+        return Notification_Message::factory();
     }
 
     public function send(Kohana_Notification_Message $message)
     {
-//        $from = $message->get_from();
+        $from = $message->get_from();
         $to = $message->get_to();
         $subj = $message->get_subj();
-        $text = $message->get_text();
 
 //        if ( ! $from )
 //            throw new Exception('Message source must be specified');
 
         if ( ! $to )
             throw new Exception('Message target must be specified');
-
-        if ( ! $text )
-            throw new Exception('Message text must be specified');
 
         foreach ( $to as $target )
         {
@@ -34,16 +35,30 @@ abstract class Kohana_Notification {
             }
             else if ( $target->is_email_notification_allowed() )
             {
+                $body = $this->render_message($message, static::TRANSPORT_EMAIL);
+
+                $from = $message->get_from();
+
+                if ( $from )
+                {
+                    // TODO Добавление заголовков об отправке от имени отправляющего "через" дефолтный почтовый ящик
+                }
+
                 // Email notification
                 Email::send(
-                    NULL, // $from->get_email(),
+                    NULL,
                     $target->get_email(),
                     $subj,
-                    $text,
+                    $body,
                     TRUE
                 );
             }
         }
+    }
+
+    protected function render_message(Kohana_Notification_Message $message, $transport)
+    {
+        return $message->render($transport);
     }
 
 }

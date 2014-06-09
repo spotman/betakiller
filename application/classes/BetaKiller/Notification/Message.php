@@ -32,4 +32,9 @@ class BetaKiller_Notification_Message extends Kohana_Notification_Message {
         return $this;
     }
 
+    protected function template_factory()
+    {
+        return Twig::factory();
+    }
+
 }
