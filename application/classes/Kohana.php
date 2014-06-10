@@ -79,12 +79,12 @@ class Kohana extends Kohana_Core {
         if ( is_null($data) )
         {
             $value = static::$_custom_cache->get($key);
-            static::log_with_headers('Read-Cache-Key-'.$key, '['.gettype($value).']');
+//            static::log_with_headers('Read-Cache-Key-'.$key, '['.gettype($value).']');
             return $value;
         }
         else
         {
-            static::log_with_headers('Write-Cache-Key-'.$key, '['.gettype($data).'] for '. $lifetime);
+//            static::log_with_headers('Write-Cache-Key-'.$key, '['.gettype($data).'] for '. $lifetime);
             return static::$_custom_cache->set($key, $data, $lifetime);
         }
     }
