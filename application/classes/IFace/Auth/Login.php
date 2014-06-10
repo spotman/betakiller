@@ -13,13 +13,21 @@ class IFace_Auth_Login extends IFace {
     {
         $request = Request::current();
 
+        $redirect_self_url = '/'.ltrim($request->uri(), '/');
+
         // Initialize redirect url
-        $this->_redirect_url = $request->query($this->_redirect_url_query_param) ?: '/'.ltrim($request->uri(), '/');
+        $this->_redirect_url = $request->query($this->_redirect_url_query_param) ?: $redirect_self_url;
 
         // If user already authorized
         if ( Env::user(TRUE) )
         {
-            // Redirect him to index page
+            if ( $this->_redirect_url == $redirect_self_url )
+            {
+                // Prevent infinite loops
+                $this->_redirect_url = '/';
+            }
+
+            // Redirect him
             HTTP::redirect($this->_redirect_url);
         }
     }
@@ -36,13 +44,13 @@ class IFace_Auth_Login extends IFace {
         $this->_redirect_url = $redirect_url;
     }
 
-    public function url()
+    public function url($parameters = NULL)
     {
         $redirect_query = $this->_redirect_url
             ? '?'.$this->_redirect_url_query_param.'='.$this->_redirect_url
             : NULL;
 
-        return parent::url().$redirect_query;
+        return parent::url($parameters).$redirect_query;
     }
 
 }

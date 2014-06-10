@@ -190,22 +190,26 @@ abstract class Core_IFace {
         return $this->model()->is_default();
     }
 
-    // TODO
-    public function url()
+    public function url($parameters = NULL)
     {
-        $url = '/'.$this->get_uri();
+        $parts = array();
+        $current = $this;
 
-        $parent = $this->parent();
+        /** @var IFace $parent */
+        $parent = NULL;
 
-        if ( $parent )
+        do
         {
-            $url = $parent->url().$url;
+            $parts[] = $current->get_uri($parameters);
+            $parent = $current->parent();
+            $current = $parent;
         }
+        while ( $parent );
 
-        return $url;
+        return URL::site('/'.implode('/', array_reverse($parts)), TRUE);
     }
 
-    protected function get_uri()
+    protected function get_uri($parameters = NULL)
     {
         $uri = ( $this instanceof IFace_Dispatchable )
             ? $this->make_uri()
