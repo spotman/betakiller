@@ -16,7 +16,7 @@ abstract class Kohana_Notification {
 
     public function send(Kohana_Notification_Message $message)
     {
-        $from = $message->get_from();
+//        $from = $message->get_from();
         $to = $message->get_to();
         $subj = $message->get_subj();
 

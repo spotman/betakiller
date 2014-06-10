@@ -132,11 +132,6 @@ abstract class Kohana_Notification_Message {
         return $this;
     }
 
-//    public function get_template_name()
-//    {
-//        return $this->_template_name;
-//    }
-
     protected function template_factory()
     {
         return View::factory();
@@ -149,15 +144,11 @@ abstract class Kohana_Notification_Message {
 
     public function render($transport_name)
     {
-//        if ( ! $this->_template_name )
-//            return $this->_text;
-
         $view = $this->template_factory();
 
         $data = array_merge($this->_template_data, array(
             'to'        =>  $this->_to,
             'subject'   =>  $this->_subj,
-//            'text'      =>  $this->_text,
         ));
 
         $view->set($data);

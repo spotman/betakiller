@@ -195,9 +195,16 @@ abstract class Core_Widget extends Controller {
 
     protected function view($file = NULL)
     {
-        $file = $file ?: $this->_current_state;
+        if ( ! $file )
+        {
+            $suffix = $this->_current_state != static::DEFAULT_STATE
+                ? '-'.$this->_current_state
+                : '';
 
-        $view_path = 'widgets'. DIRECTORY_SEPARATOR . str_replace('_', DIRECTORY_SEPARATOR, $this->_name) . DIRECTORY_SEPARATOR . $file;
+            $file = str_replace('_', DIRECTORY_SEPARATOR, $this->_name).$suffix;
+        }
+
+        $view_path = strtolower('widgets'.DIRECTORY_SEPARATOR.$file);
 
         return $this->view_factory($view_path, $this->_context);
     }

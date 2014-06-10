@@ -103,7 +103,7 @@ return array(
      */
     'bootstrap'     => array(
         'js'        =>  'bootstrap/v3/js/bootstrap.min.js',
-        'css'       =>  'bootstrap/v3/css/bootstrap.min.css'
+        'css'       =>  array('bootstrap/v3/css/bootstrap.min.css', 'bootstrap/v3/css/equal-height-columns.css' )
     ),
 
     /**
