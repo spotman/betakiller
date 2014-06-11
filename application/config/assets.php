@@ -87,8 +87,8 @@ return array(
      * @link https://github.com/adchsm/Slidebars
      */
     'jquery.slidebars'  => array(
-        'js'            =>  'jquery/slidebars/slidebars.js',
-        'css'           =>  'jquery/slidebars/slidebars.css',
+        'js'            =>  'jquery/slidebars/slidebars.min.js',
+        'css'           =>  'jquery/slidebars/slidebars.min.css',
     ),
 
 //    /**

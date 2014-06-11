@@ -70,7 +70,17 @@ class BetaKiller_Twig_Extension extends Twig_Extension {
                 array($this, 'widget'),
                 array('is_safe' => array('html'), 'needs_context' => true)
             ),
+
+            new Twig_SimpleFunction(
+                'in_production',
+                array($this, 'in_production')
+            ),
         );
+    }
+
+    public function in_production()
+    {
+        return Kohana::in_production();
     }
 
     /**

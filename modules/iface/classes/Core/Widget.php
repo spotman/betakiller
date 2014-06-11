@@ -204,7 +204,7 @@ abstract class Core_Widget extends Controller {
             $file = str_replace('_', DIRECTORY_SEPARATOR, $this->_name).$suffix;
         }
 
-        $view_path = strtolower('widgets'.DIRECTORY_SEPARATOR.$file);
+        $view_path = 'widgets'.DIRECTORY_SEPARATOR.$file;
 
         return $this->view_factory($view_path, $this->_context);
     }
