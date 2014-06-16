@@ -220,7 +220,7 @@ abstract class Core_IFace {
         return $uri;
     }
 
-    protected function get_view()
+    public function get_view()
     {
         return View_IFace::factory($this);
     }

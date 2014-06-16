@@ -1,11 +1,6 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
-class IFace_Exception_MissingURL extends IFace_Exception {
-
-    /**
-    * @var   integer    HTTP 404 Not found
-    */
-    protected $_code = 404;
+class IFace_Exception_MissingURL extends HTTP_Exception_404 {
 
     /**
      * @param string $url_part
