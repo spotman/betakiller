@@ -34,3 +34,6 @@
 [submodule "modules/api"]
 	path = modules/api
 	url = git@github.com:spotman/kohana-simple-api.git
+[submodule "modules/robots-txt"]
+	path = modules/robots-txt
+	url = git@github.com:spotman/kohana-robots.txt.git
