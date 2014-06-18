@@ -15,10 +15,10 @@
 	url = git@github.com:spotman/kohana-meta-tags.git
 [submodule "modules/hashids"]
 	path = modules/hashids
-	url = git@github.com:pocesar/hashids-kohana.git
+	url = git@github.com:spotman/hashids-kohana.git
 [submodule "modules/device"]
 	path = modules/device
-	url = git@github.com:badsyntax/kohana-device.git
+	url = git@github.com:spotman/kohana-device.git
 [submodule "modules/jsonrpc"]
 	path = modules/jsonrpc
 	url = git@github.com:spotman/kohana-jsonrpc.git
