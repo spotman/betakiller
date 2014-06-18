@@ -173,10 +173,10 @@ class BetaKiller_Twig_Extension extends Twig_Extension {
         return Profiler::render();
     }
 
-    public function widget(array $context, $name)
+    public function widget(array $context, $name, array $data = array())
     {
         $widget = Widget::factory($name);
-        $widget->context($context);
+        $widget->context(array_merge($context, $data));
         return $widget->render();
     }
 
