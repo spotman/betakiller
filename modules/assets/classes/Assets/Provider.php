@@ -23,7 +23,7 @@ abstract class Assets_Provider {
     {
         if ( static::$_config === NULL )
         {
-            static::$_config = Kohana::config('api')->as_array();
+            static::$_config = Kohana::config('assets')->as_array();
         }
 
         return Arr::path(static::$_config, $key, $default_value);
@@ -92,11 +92,6 @@ abstract class Assets_Provider {
         );
 
         return Route::url('assets-provider-item', $options);
-    }
-
-    protected function _get_hash_ab($hash)
-    {
-        return Text::limit_chars($hash, 2);
     }
 
     /**
@@ -175,7 +170,7 @@ abstract class Assets_Provider {
             return;
 
         // Check permissions
-        if ( ! $this->check_delete_permissions($model) )
+        if ( ! $this->check_deploy_permissions($model) )
             return;
 
         // Get item base deploy path
@@ -412,9 +407,10 @@ abstract class Assets_Provider {
     /**
      * Returns TRUE if deploy is granted
      *
+     * @param Assets_Model $model
      * @return bool
      */
-    abstract protected function check_deploy_permissions();
+    abstract protected function check_deploy_permissions($model);
 
     /**
      * Returns TRUE if delete operation granted
