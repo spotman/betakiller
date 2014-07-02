@@ -141,7 +141,7 @@ class Model_IFace extends ORM implements IFace_Model {
      */
     public function has_dynamic_url()
     {
-        return ( $this->get_uri() === NULL );
+        return (bool) $this->get('is_dynamic');
     }
 
 

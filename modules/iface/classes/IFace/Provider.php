@@ -29,6 +29,9 @@ class IFace_Provider {
         // Loop through every uri part and initialize it`s iface
         foreach ( $uri_parts as $uri_part )
         {
+            // Prevent XSS via URL
+            $uri_part = HTML::chars($uri_part);
+
             $iface_instance = $this->by_uri($uri_part, $parent_iface);
 
             // Throw IFace_Exception_MissingURL so we can forward user to parent iface or custom 404 page
@@ -87,9 +90,12 @@ class IFace_Provider {
         // Second iteration for dynamic urls
         if ( $dynamic_model )
         {
+            URL_Dispatcher::instance()->parse_uri($dynamic_model->get_uri(), $uri);
+
             /** @var IFace_Dispatchable $iface_instance */
             $iface_instance = $this->iface_factory($dynamic_model);
 
+            // TODO Remove after refactoring
             $iface_instance->parse_uri($uri);
 
             return $iface_instance;

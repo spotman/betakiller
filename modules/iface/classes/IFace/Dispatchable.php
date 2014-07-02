@@ -1,5 +1,9 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
+/**
+ * Interface IFace_Dispatchable
+ * @deprecated
+ */
 interface IFace_Dispatchable {
 
     /**
