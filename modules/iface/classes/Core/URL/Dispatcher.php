@@ -26,7 +26,7 @@ abstract class Core_URL_Dispatcher {
         $model_key = $prototype->get_model_key();
 
         // Search for model item
-        $model = $this->model_factory($model_name)->find_by_url_key($model_key, $uri_value);
+        $model = $this->model_factory($model_name)->find_by_url_key($model_key, $uri_value, $this->parameters());
 
         if ( ! $model )
             throw new Kohana_Exception('Can not find [:prototype] item by [:value]',
@@ -37,7 +37,7 @@ abstract class Core_URL_Dispatcher {
         $this->parameters()->set($model_name, $model);
     }
 
-    public function make_uri($prototype_string, URL_Parameters $parameters)
+    public function make_uri($prototype_string, URL_Parameters $parameters = NULL)
     {
         $prototype = $this->parse_prototype($prototype_string);
 
@@ -45,7 +45,10 @@ abstract class Core_URL_Dispatcher {
         $model_key = $prototype->get_model_key();
 
         /** @var URL_DataSource $model */
-        $model = $parameters->get($model_name) ?: $this->parameters()->get($model_name);
+        $model = $parameters ? $parameters->get($model_name) : NULL;
+
+        // Inherit model from current request url parameters
+        $model = $model ?: $this->parameters()->get($model_name);
 
         if ( ! $model )
             throw new Kohana_Exception('Can not find :name model in parameters', array(':name' => $model_name));

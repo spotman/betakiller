@@ -22,9 +22,10 @@ class Model_IFace extends ORM implements IFace_Model {
             ),
         ));
 
-//        $this->load_with(array(
-//            'layout'
-//        ));
+        $this->load_with(array(
+            'layout',
+            'parent',
+        ));
 
         parent::_initialize();
     }
@@ -48,7 +49,8 @@ class Model_IFace extends ORM implements IFace_Model {
     function get_children()
     {
         return ORM::factory($this->object_name())
-            ->where('parent_id', '=', $this->pk())
+            ->where($this->object_name().'.parent_id', '=', $this->pk())
+            ->cached()
             ->find_all()
             ->as_array();
     }
@@ -113,7 +115,6 @@ class Model_IFace extends ORM implements IFace_Model {
      */
     public function get_layout()
     {
-        /** @var Model_Layout $layout */
         return $this->get('layout');
     }
 

@@ -38,6 +38,10 @@ class IFace_Provider {
             if ( ! $iface_instance )
                 throw new IFace_Exception_MissingURL($uri_part, $parent_iface);
 
+            // Store link to parent IFace if exists
+            if ( $parent_iface)
+                $iface_instance->parent($parent_iface);
+
             $parent_iface = $iface_instance;
         }
 
@@ -94,9 +98,6 @@ class IFace_Provider {
 
             /** @var IFace_Dispatchable $iface_instance */
             $iface_instance = $this->iface_factory($dynamic_model);
-
-            // TODO Remove after refactoring
-            $iface_instance->parse_uri($uri);
 
             return $iface_instance;
         }

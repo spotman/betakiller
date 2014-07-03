@@ -44,13 +44,14 @@ class IFace_Auth_Login extends IFace {
         $this->_redirect_url = $redirect_url;
     }
 
-    public function url($parameters = NULL)
+    protected function get_uri()
     {
         $redirect_query = $this->_redirect_url
             ? '?'.$this->_redirect_url_query_param.'='.$this->_redirect_url
             : NULL;
 
-        return parent::url($parameters).$redirect_query;
+        return parent::get_uri().$redirect_query;
     }
+
 
 }

@@ -17,5 +17,6 @@
  */
 
 return array(
-    'profile'    => TRUE,
+    'profile'   =>  TRUE,
+//    'caching'   =>  TRUE,
 );

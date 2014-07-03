@@ -7,9 +7,10 @@ interface URL_DataSource {
      *
      * @param string $key
      * @param string $value
+     * @param URL_Parameters $parameters
      * @return URL_DataSource
      */
-    public function find_by_url_key($key, $value);
+    public function find_by_url_key($key, $value, URL_Parameters $parameters);
 
     /**
      * Returns value of the $key property

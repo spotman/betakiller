@@ -15,7 +15,7 @@ class Model_Layout extends ORM {
      */
     public function get_default()
     {
-        $default = $this->where('is_default', '=', TRUE)->find();
+        $default = $this->where('is_default', '=', TRUE)->cached()->find();
 
         if ( ! $default->loaded() )
             throw new Kohana_Exception('No default layout found; set it, please');

@@ -70,4 +70,12 @@ class BetaKiller_Env
         return static::get('role');
     }
 
+    /**
+     * @return URL_Parameters
+     */
+    public static function url_parameters()
+    {
+        return static::get('url_parameters');
+    }
+
 }

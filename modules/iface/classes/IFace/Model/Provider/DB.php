@@ -10,10 +10,13 @@ class IFace_Model_Provider_DB extends IFace_Model_Provider {
      */
     public function get_root()
     {
-        return $this->orm_factory()
-            ->where('parent_id', 'IS', NULL)
+        $orm = $this->orm_factory();
+
+        return $orm
+            ->where($orm->object_name().'.parent_id', 'IS', NULL)
             ->cached()
-            ->find_all()->as_array();
+            ->find_all()
+            ->as_array();
     }
 
     /**
@@ -23,8 +26,10 @@ class IFace_Model_Provider_DB extends IFace_Model_Provider {
      */
     public function get_default()
     {
-        $iface = $this->orm_factory()
-            ->where('is_default', '=', TRUE)
+        $orm = $this->orm_factory();
+
+        $iface = $orm
+            ->where($orm->object_name().'.is_default', '=', TRUE)
             ->cached()
             ->find();
 
@@ -39,8 +44,10 @@ class IFace_Model_Provider_DB extends IFace_Model_Provider {
      */
     public function by_codename($codename)
     {
-        $iface = $this->orm_factory()
-            ->where('codename', '=', $codename)
+        $orm = $this->orm_factory();
+
+        $iface = $orm
+            ->where($orm->object_name().'.codename', '=', $codename)
             ->cached()
             ->find();
 

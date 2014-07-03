@@ -72,11 +72,11 @@ abstract class Core_IFace {
         if ( ! ($object instanceof IFace) )
             throw new IFace_Exception('Class :class must be instance of class IFace', array(':class' => $class_name));
 
-        // Check for dynamic url implementation
-        if ( $model->has_dynamic_url() AND ! ($object instanceof IFace_Dispatchable) )
-            throw new IFace_Exception('IFace :class_name has dynamic url but does not implementing IFace_Dispatchable',
-                array(':class_name' => $class_name)
-            );
+//        // Check for dynamic url implementation
+//        if ( $model->has_dynamic_url() AND ! ($object instanceof IFace_Dispatchable) )
+//            throw new IFace_Exception('IFace :class_name has dynamic url but does not implementing IFace_Dispatchable',
+//                array(':class_name' => $class_name)
+//            );
 
         $object->codename($codename);
         $object->model($model);
@@ -177,7 +177,7 @@ abstract class Core_IFace {
      */
     public function model(IFace_Model $model = NULL)
     {
-        return $this->getter_and_setter_method('_model', $model, 'model_factory');
+        return $this->getter_and_setter_method('_model', $model); // , 'model_factory'
     }
 
 //    protected function model_factory()
@@ -190,7 +190,7 @@ abstract class Core_IFace {
         return $this->model()->is_default();
     }
 
-    public function url($parameters = NULL)
+    public function url(URL_Parameters $parameters = NULL)
     {
         $parts = array();
         $current = $this;
@@ -200,7 +200,7 @@ abstract class Core_IFace {
 
         do
         {
-            $parts[] = $current->get_uri($parameters);
+            $parts[] = $current->make_uri($parameters);
             $parent = $current->parent();
             $current = $parent;
         }
@@ -209,15 +209,16 @@ abstract class Core_IFace {
         return URL::site('/'.implode('/', array_reverse($parts)), TRUE);
     }
 
-    protected function get_uri($parameters = NULL)
+    protected function make_uri(URL_Parameters $parameters = NULL)
     {
-        $uri = ( $this instanceof IFace_Dispatchable )
-            ? $this->make_uri()
-            : $this->model()->get_uri();
+        return $this->model()->has_dynamic_url()
+            ? URL_Dispatcher::instance()->make_uri($this->get_uri(), $parameters)
+            : $this->get_uri();
+    }
 
-        // TODO replace dynamic locations with their actual values
-
-        return $uri;
+    protected function get_uri()
+    {
+        return $this->model()->get_uri();
     }
 
     public function get_view()
@@ -230,11 +231,11 @@ abstract class Core_IFace {
         return 'IFace_';
     }
 
-    protected function check_parent_instanceof($parent_iface_class_name)
-    {
-        if ( ! ($this->parent() instanceof $parent_iface_class_name) )
-            throw new IFace_Exception('IFace :codename must be child of :parent',
-                array(':codename' => $this->codename(), ':parent' => $parent_iface_class_name)
-            );
-    }
+//    protected function check_parent_instanceof($parent_iface_class_name)
+//    {
+//        if ( ! ($this->parent() instanceof $parent_iface_class_name) )
+//            throw new IFace_Exception('IFace :codename must be child of :parent',
+//                array(':codename' => $this->codename(), ':parent' => $parent_iface_class_name)
+//            );
+//    }
 }
