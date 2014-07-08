@@ -2,6 +2,6 @@
 
 return array(
 
-    'path'  =>  APPPATH.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'sites',
+    'path'  =>  APPPATH.'..'.DIRECTORY_SEPARATOR.'..',
 
 );

@@ -4,6 +4,11 @@
  * Automatically generated from previous translation file.
  */
 return array (
+  'Error' => 'Ошибка',
+  'Nothing found...' => 'По запрашиваемому адресу ничего не удалось найти...',
+  'The requested view :file could not be found' => 'Запрашиваемый view-файл :file не найден',
+  'Default value:' => 'Значение по умолчанию:',
+  'Permission denied' => 'Доступ запрещён',
   'Can not find widget :class' => 'Can not find widget :class',
   'Empty layer for :codename IFace' => 'Empty layer for :codename IFace',
   'Not implemented yet' => 'Not implemented yet',

@@ -53,5 +53,4 @@ class IFace_Auth_Login extends IFace {
         return parent::get_uri().$redirect_query;
     }
 
-
 }
