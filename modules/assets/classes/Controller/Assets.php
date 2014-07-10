@@ -56,9 +56,16 @@ class Controller_Assets extends Controller {
         if ( !($this->_provider instanceof Assets_Provider_Image) )
             throw new Assets_Exception('Preview can be served only by instances of Assets_Provider_Image');
 
+        $size = $this->param('size');
+
+        $allowed_sizes = $this->_provider->get_allowed_preview_sizes();
+
+        if ( ! $allowed_sizes OR ! in_array($size, $allowed_sizes) )
+            throw new Assets_Provider_Exception('Preview is not allowed');
+
         $model = $this->from_item_deploy_url();
 
-        $preview_content = $this->_provider->prepare_preview($model);
+        $preview_content = $this->_provider->prepare_preview($model, $size);
 
         // Deploy to cache
         $this->deploy($model, $preview_content);

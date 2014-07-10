@@ -36,10 +36,14 @@ class ORM extends Util_ORM implements API_Response_Item, URL_DataSource /* , Dat
      */
     public function find_by_url_key($key, $value, URL_Parameters $parameters)
     {
-        $model = $this
-            ->custom_find_by_url_filter($parameters)
-            ->where($this->object_name().'.'.$key, '=', $value)
-            ->find();
+        // Additional filtering for non-pk keys
+        if ( $key != $this->primary_key() )
+        {
+            $this->custom_find_by_url_filter($parameters);
+        }
+
+        $model = $this->where($this->object_name().'.'.$key, '=', $value)->find();
+
         return $model->loaded() ? $model : NULL;
     }
 

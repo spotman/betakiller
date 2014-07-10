@@ -8,6 +8,9 @@ abstract class Core_URL_Dispatcher {
 
     protected $_url_parameters;
 
+    /**
+     * @return URL_Parameters
+     */
     public function parameters()
     {
         if ( ! $this->_url_parameters )

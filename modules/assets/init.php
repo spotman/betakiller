@@ -23,6 +23,16 @@ Route::set('assets-provider-item', 'assets/<provider>/<item_url>/<action>',
     ));
 
 /**
+ * Make preview
+ */
+Route::set('assets-provider-item-preview', 'assets/<provider>/<item_url>/<action>/<size>',
+    array('item_url' => '[A-Za-z0-9\/]+', 'action' => 'preview', 'size' => '[0-9]*x[0-9]*'))
+    ->defaults(array(
+        'module'        => 'assets',
+        'controller'    => 'Assets',
+    ));
+
+/**
  * Fake route for getting asset`s deployment directory
  * It`ll newer triggered because of existing real deployment directory (and default .htaccess policy also)
  */

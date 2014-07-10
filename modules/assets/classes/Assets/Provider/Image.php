@@ -8,22 +8,39 @@ abstract class Assets_Provider_Image extends Assets_Provider {
 
     /**
      * @param Assets_Model $model
+     * @param string $size    300x200
      * @return string
-     * @throws HTTP_Exception_501
+     * @throws Assets_Provider_Exception
      */
-    public function get_preview_url(Assets_Model $model)
+    public function get_preview_url(Assets_Model $model, $size)
     {
-        return $this->_get_item_url('preview', $model);
+        $url = $model->get_url();
+
+        if ( ! $url )
+            throw new Assets_Provider_Exception('Model must have url');
+
+        $options = array(
+            'provider'  =>  $this->_codename,
+            'action'    =>  'preview',
+            'item_url'  =>  $url,
+            'size'      =>  $size,
+        );
+
+        return Route::url('assets-provider-item-preview', $options);
     }
 
-    public function prepare_preview(Assets_Model $model)
+    public function prepare_preview(Assets_Model $model, $size)
     {
         $content = $this->get_content($model);
 
+        $dimensions = explode('x', $size);
+        $width = $dimensions[0] ?: NULL;
+        $height = $dimensions[1] ?: NULL;
+
         return $this->resize(
             $content,
-            $this->get_preview_max_width(),
-            $this->get_preview_max_height(),
+            $width,
+            $height,
             $this->get_preview_quality()
         );
     }
@@ -72,14 +89,14 @@ abstract class Assets_Provider_Image extends Assets_Provider {
     abstract public function get_upload_max_width();
 
     /**
-     * @return int
+     * Defines allowed sizes for previews
+     * Returns array of strings like this
+     *
+     * array('300x200', '75x75')
+     *
+     * @return array
      */
-    abstract public function get_preview_max_height();
-
-    /**
-     * @return int
-     */
-    abstract public function get_preview_max_width();
+    abstract public function get_allowed_preview_sizes();
 
     /**
      * @return int
