@@ -37,6 +37,9 @@ abstract class Assets_Provider_Image extends Assets_Provider {
         $width = $dimensions[0] ?: NULL;
         $height = $dimensions[1] ?: NULL;
 
+        if ( ! $width AND ! $height )
+            throw new Assets_Provider_Exception('Preview size must have width or height defined');
+
         return $this->resize(
             $content,
             $width,
