@@ -1,4 +1,1 @@
-.idea
-application/logs/*
-application/cache/*
 modules/error/media/php_traces/*
