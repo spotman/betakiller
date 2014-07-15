@@ -1,5 +1,9 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
+/**
+ * Class Model_FileOld
+ * @deprecated
+ */
 class Model_FileOld extends ORM
 {
     public function uploads_dir()
