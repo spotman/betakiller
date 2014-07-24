@@ -193,18 +193,22 @@ abstract class Core_IFace {
     public function url(URL_Parameters $parameters = NULL)
     {
         $parts = array();
-        $current = $this;
 
-        /** @var IFace $parent */
-        $parent = NULL;
-
-        do
+        if ( ! $this->is_default() )
         {
-            $parts[] = $current->make_uri($parameters);
-            $parent = $current->parent();
-            $current = $parent;
+            $current = $this;
+
+            /** @var IFace $parent */
+            $parent = NULL;
+
+            do
+            {
+                $parts[] = $current->make_uri($parameters);
+                $parent = $current->parent();
+                $current = $parent;
+            }
+            while ( $parent );
         }
-        while ( $parent );
 
         return URL::site('/'.implode('/', array_reverse($parts)), TRUE);
     }
