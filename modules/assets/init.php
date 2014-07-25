@@ -23,13 +23,14 @@ Route::set('assets-provider-item', 'assets/<provider>/<item_url>/<action>',
     ));
 
 /**
- * Make preview
+ * Make image preview
  */
-Route::set('assets-provider-item-preview', 'assets/<provider>/<item_url>/<action>/<size>',
-    array('item_url' => '[A-Za-z0-9\/]+', 'action' => 'preview', 'size' => '[0-9]*x[0-9]*'))
+Route::set('assets-provider-item-preview', 'assets/<provider>/<item_url>/preview-<size>',
+    array('item_url' => '[A-Za-z0-9\/]+', 'size' => '[0-9]*x[0-9]*'))
     ->defaults(array(
         'module'        => 'assets',
         'controller'    => 'Assets',
+        'action' => 'preview',
     ));
 
 /**

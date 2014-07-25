@@ -160,7 +160,7 @@ abstract class Assets_Provider {
         return $content;
     }
 
-    public function deploy(Assets_Model $model, $action, $content)
+    public function deploy(Request $request, Assets_Model $model, $content)
     {
         // TODO Move to config
         $deploy_allowed = Kohana::in_production();
@@ -183,10 +183,17 @@ abstract class Assets_Provider {
             mkdir($path, $mask, true);
         }
 
-        // Make deploy filename
-        $filename = $path.DIRECTORY_SEPARATOR.$action;
+        $filename = $this->_get_item_deploy_filename($request);
 
-        file_put_contents($filename, $content);
+        // Make deploy filename
+        $full_path = $path.DIRECTORY_SEPARATOR.$filename;
+
+        file_put_contents($full_path, $content);
+    }
+
+    protected function _get_item_deploy_filename(Request $request)
+    {
+        return $request->action();
     }
 
     /**

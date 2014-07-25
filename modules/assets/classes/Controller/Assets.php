@@ -123,7 +123,7 @@ class Controller_Assets extends Controller {
 
     protected function deploy(Assets_Model $model, $content)
     {
-        $this->_provider->deploy($model, $this->request->action(), $content);
+        $this->_provider->deploy($this->request, $model, $content);
     }
 
 }
