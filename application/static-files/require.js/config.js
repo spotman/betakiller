@@ -35,6 +35,8 @@ require.config({
         'api.rpc':                  '../api/rpc.definition',
         'jquery.jsonRPC':           '../api/jquery.jsonRPC',
 
+        'ansi_up':                  '../ansi_up/ansi_up',
+
         /**
          * Кастомные контролы
          */
