@@ -7,7 +7,7 @@ Route::set('deployer', 'deployer')
         'action'        => 'index'
 	));
 
-Route::set('deployer-execute-command', 'deployer/<command>', array('command' => '[a-z- ]+'))
+Route::set('deployer-execute-command', 'deployer/<command>', array('command' => '[a-z- :]+'))
     ->defaults(array(
         'module'        => 'deployer',
         'controller'    => 'Deployer',

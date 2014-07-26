@@ -15,10 +15,10 @@
 
     #processing-indicator {
         position: absolute;
-        top: 10px;
-        right: 10px;
+        top: 15px;
+        right: 15px;
         font-size: 16px;
-        display: none;
+        /*display: none;*/
         opacity: 0.8;
     }
 
@@ -56,6 +56,7 @@
                 <pre id="data-container"></pre>
                 <span id="processing-indicator" class="alert alert-info">
                     <span class="glyphicon glyphicon-refresh"></span> Processing command...
+                    <button id="cancel-button" class="btn btn-primary">Cancel</button>
                 </span>
             </div>
         </div>
@@ -81,24 +82,32 @@
         $(function() {
 
             var $container = $("#data-container"),
-                $buttons = $(".btn"),
+                $execButtons = $(".command-button, #send-command-button"),
+                $cancelButton = $("#cancel-button"),
                 $commandButtons = $(".command-button"),
                 $commandField = $("#command-field"),
                 $sendButton = $("#send-command-button"),
                 $processingIndicator = $("#processing-indicator");
 
+            var xhr;
+
             function processingOn() {
                 // Lock buttons
-                $buttons.attr("disabled", true);
+                $execButtons.attr("disabled", true);
 
                 $processingIndicator.show();
             }
 
             function processingOff() {
                 // Unlock buttons
-                $buttons.attr("disabled", false);
+                $execButtons.attr("disabled", false);
 
                 $processingIndicator.hide();
+            }
+
+            function stopProcessing()
+            {
+                xhr && xhr.abort() && processingOff();
             }
 
             /**
@@ -117,7 +126,7 @@
 
                 try
                 {
-                    var xhr = new XMLHttpRequest();
+                    xhr = new XMLHttpRequest();
 
                     xhr.onerror = function() {
                         processingOff();
@@ -129,11 +138,16 @@
                         try
                         {
                             if (xhr.readyState > 2) {
-//                                console.log(xhr.responseText);
-                                var html = ansi_up.ansi_to_html(xhr.responseText);
-                                $container.html(html);
 
-                                $container.scrollTop($container.height());
+                                var response = xhr.responseText;
+
+                                if ( response )
+                                {
+                                    $container
+                                        .html(ansi_up.ansi_to_html(response))
+                                        .scrollTop($container.height());
+                                }
+
                             }
 
                             if ( xhr.readyState == 4 )
@@ -157,6 +171,7 @@
             }
 
             function runCommand(command) {
+                console.log("running command:" + command);
                 $container.empty();
 
                 var url = "/deployer/" + command;
@@ -167,6 +182,11 @@
             $commandButtons.click(function(e) {
                 e.preventDefault();
                 runCommand($(this).data("command"));
+            });
+
+            $cancelButton.click(function(e) {
+                e.preventDefault();
+                stopProcessing();
             });
 
             $commandField.keyup(function(e) {

@@ -39,10 +39,8 @@ class Controller_Deployer extends Controller_Developer {
     {
         $this->_layout = NULL;
 
-
         // Recommended to prevent caching of event data
         header('Cache-Control: no-cache');
-//        header('Content-Type: text/html');
         header('Content-Type: text/octet-stream');
 
         // Implicitly flush the buffer(s)
@@ -50,12 +48,12 @@ class Controller_Deployer extends Controller_Developer {
         ob_implicit_flush(true);
         ob_end_flush();
 
-        $this->execute_command($name, TRUE);
+        $this->execute_command($name);
 
         exit();
     }
 
-    protected function execute_command($name, $delay = FALSE)
+    protected function execute_command($name, $delay = TRUE)
     {
         $path = MultiSite::instance()->site_path();
 
@@ -65,6 +63,7 @@ class Controller_Deployer extends Controller_Developer {
 //        flush();
 
         set_time_limit(0);
+        ignore_user_abort(TRUE);
 
         $handler = popen($cmd.' 2>&1', 'r');
 
@@ -76,7 +75,14 @@ class Controller_Deployer extends Controller_Developer {
             flush();
 
             if ( $delay )
-                usleep(50000);
+                usleep(25000);
+
+            if ( connection_aborted() )
+            {
+                // TODO Уничтожение дочернего процесса
+                pclose($handler);
+                exit();
+            }
         }
 
         pclose($handler);
