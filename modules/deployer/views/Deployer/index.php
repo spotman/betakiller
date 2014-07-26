@@ -8,15 +8,33 @@
         margin-bottom: 0;
     }
 
-    pre {
+    #result-screen {
+        position: relative;
+        margin-top: 15px;
+    }
+
+    #processing-indicator {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        font-size: 16px;
+        display: none;
+        opacity: 0.8;
+    }
+
+    #result-screen pre {
         padding: 10px;
+        font-size: 16px;
     }
 
     #data-container {
         display: block;
-        margin-top: 15px;
         width: 100%;
         height: 500px;
+    }
+
+    #command-field {
+        font-size: 20px;
     }
 
 </style>
@@ -24,24 +42,27 @@
 <div class="container-fluid">
     <div class="row">
         <div id="pane" class="col-xs-12">
-            <a href="deploy" class="command-button btn btn-lg btn-success pull-left">Deploy</a>
-            <a href="rollback" class="command-button btn btn-lg btn-danger pull-right">Rollback</a>
+            <button data-command="deploy" class="command-button btn btn-lg btn-success pull-left">Deploy</button>
+            <button data-command="rollback" class="command-button btn btn-lg btn-danger pull-right">Rollback</button>
 
             <div class="center-block text-center">
-                <a href="list" class="command-button btn btn-lg btn-primary">List commands</a>
-                <a href="self-update" class="command-button btn btn-lg btn-primary">Update binary</a>
+                <button data-command="list" class="command-button btn btn-lg btn-primary">List commands</button>
+                <button data-command="self-update" class="command-button btn btn-lg btn-primary">Update binary</button>
             </div>
-
-<!--            <hr />-->
         </div>
 
         <div class="col-xs-12">
-            <pre id="data-container"></pre>
+            <div id="result-screen">
+                <pre id="data-container"></pre>
+                <span id="processing-indicator" class="alert alert-info">
+                    <span class="glyphicon glyphicon-refresh"></span> Processing command...
+                </span>
+            </div>
         </div>
 
-        <div class="col-xs-12">
-            <div class="input-group">
-                <input id="command-field" type="text" class="form-control">
+        <div id="command-form" class="col-xs-12">
+            <div class="input-group input-group-lg">
+                <input id="command-field" type="text" class="form-control" autocomplete="on"/>
                 <span class="input-group-btn">
                     <button id="send-command-button" class="btn btn-default" type="submit">Send</button>
                 </span>
@@ -59,11 +80,26 @@
 
         $(function() {
 
-            var $container = $("#data-container");
-            var $buttons = $(".btn");
-            var $commandButtons = $("a.command-button");
-            var $commandField = $("#command-field");
-            var $sendButton = $("#send-command-button");
+            var $container = $("#data-container"),
+                $buttons = $(".btn"),
+                $commandButtons = $(".command-button"),
+                $commandField = $("#command-field"),
+                $sendButton = $("#send-command-button"),
+                $processingIndicator = $("#processing-indicator");
+
+            function processingOn() {
+                // Lock buttons
+                $buttons.attr("disabled", true);
+
+                $processingIndicator.show();
+            }
+
+            function processingOff() {
+                // Unlock buttons
+                $buttons.attr("disabled", false);
+
+                $processingIndicator.hide();
+            }
 
             /**
              * @url http://www.binarytides.com/ajax-based-streaming-without-polling/
@@ -77,14 +113,14 @@
                     return;
                 }
 
-                // Lock buttons
-                $buttons.attr("disabled", true);
+                processingOn();
 
                 try
                 {
                     var xhr = new XMLHttpRequest();
 
                     xhr.onerror = function() {
+                        processingOff();
                         console.error("[XHR] Fatal Error.");
                     };
 
@@ -100,13 +136,12 @@
                                 $container.scrollTop($container.height());
                             }
 
-                            if ( xhr.readyState == 4 ) {
-                                // Unlock buttons
-                                $buttons.attr("disabled", false);
-                            }
+                            if ( xhr.readyState == 4 )
+                                processingOff();
                         }
                         catch (e)
                         {
+                            processingOff();
                             console.error(e);
                         }
                     };
@@ -116,12 +151,13 @@
                 }
                 catch (e)
                 {
+                    processingOff();
                     console.error(e);
                 }
             }
 
             function runCommand(command) {
-                $container.html();
+                $container.empty();
 
                 var url = "/deployer/" + command;
 
@@ -129,10 +165,8 @@
             }
 
             $commandButtons.click(function(e) {
-
                 e.preventDefault();
-
-                runCommand($(this).attr("href"));
+                runCommand($(this).data("command"));
             });
 
             $commandField.keyup(function(e) {
@@ -142,8 +176,7 @@
                 }
             });
 
-            $sendButton.click(function(e)
-            {
+            $sendButton.click(function(e) {
                 e.preventDefault();
 
                 var command = $.trim($commandField.val());
@@ -157,6 +190,5 @@
         });
 
     });
-
 
 </script>

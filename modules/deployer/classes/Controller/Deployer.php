@@ -6,20 +6,39 @@ class Controller_Deployer extends Controller_Developer {
     {
         $view = $this->view('index');
 
+//        $view->set('commands', json_encode($this->get_commands_list()));
+
         $this->send_view($view);
     }
 
     public function action_execute()
     {
-        $command = $this->request()->param('command');
-        $this->execute_command($command);
+        $command_name = $this->request()->param('command');
+        $this->stream_command($command_name);
     }
 
-    protected function execute_command($action)
+//    protected function get_commands_list()
+//    {
+//        ob_start();
+//        $this->execute_command('list --xml');
+//        $raw = ob_get_clean();
+//
+//        $xml = simplexml_load_string($raw);
+//
+//        $data = [];
+//
+//        foreach ( $xml->commands->children() as $command )
+//        {
+//            $data[] = (string) $command->attributes()->name;
+//        }
+//
+//        return $data;
+//    }
+
+    protected function stream_command($name)
     {
         $this->_layout = NULL;
 
-        set_time_limit(0);
 
         // Recommended to prevent caching of event data
         header('Cache-Control: no-cache');
@@ -31,14 +50,23 @@ class Controller_Deployer extends Controller_Developer {
         ob_implicit_flush(true);
         ob_end_flush();
 
+        $this->execute_command($name, TRUE);
+
+        exit();
+    }
+
+    protected function execute_command($name, $delay = FALSE)
+    {
         $path = MultiSite::instance()->site_path();
 
-        $command = "cd $path && dep $action --no-interaction --ansi";
+        $cmd = "cd $path && dep $name --no-interaction --ansi";
 
-//        echo 'running command: '.$command."\r\n\r\n";
+//        echo 'running command: '.$cmd."\r\n\r\n";
 //        flush();
 
-        $handler = popen($command.' 2>&1', 'r');
+        set_time_limit(0);
+
+        $handler = popen($cmd.' 2>&1', 'r');
 
         while ( !feof($handler) )
         {
@@ -47,12 +75,11 @@ class Controller_Deployer extends Controller_Developer {
             echo $buffer;
             flush();
 
-            usleep(50000);
+            if ( $delay )
+                usleep(50000);
         }
 
         pclose($handler);
-
-        exit();
     }
 
 }

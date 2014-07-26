@@ -1,10 +1,20 @@
 require.config({
 
     baseUrl: '{# assets_base_url #}require.js',
+
+    shim: {
+        'jquery.typeahead': {
+            deps:                   ['jquery'],
+            exports:                '$.fn.typeahead'
+        }
+    },
+
     paths: {
         'jquery':                   '../jquery/jquery-1.11.1.min',
         'jquery.utils':             '../jquery/utils',
         'jquery.ui.widget':         '../jquery/ui/jquery.ui.widget',
+
+        'jquery.typeahead':         '../jquery/typeahead/typeahead.bundle.min',
 
         'waypoints':                '../jquery/waypoints/waypoints.min',
         'waypoints.sticky':         '../jquery/waypoints/waypoints-sticky.min',
