@@ -18,7 +18,7 @@
         top: 15px;
         right: 15px;
         font-size: 16px;
-        /*display: none;*/
+        display: none;
         opacity: 0.8;
     }
 
@@ -42,12 +42,12 @@
 <div class="container-fluid">
     <div class="row">
         <div id="pane" class="col-xs-12">
-            <button data-command="deploy" class="command-button btn btn-lg btn-success pull-left">Deploy</button>
-            <button data-command="rollback" class="command-button btn btn-lg btn-danger pull-right">Rollback</button>
+            <button data-command="deploy" title="deploy" class="command-button btn btn-lg btn-success pull-left">Deploy</button>
+            <button data-command="rollback" title="rollback"class="command-button btn btn-lg btn-danger pull-right">Rollback</button>
 
             <div class="center-block text-center">
-                <button data-command="list" class="command-button btn btn-lg btn-primary">List commands</button>
-                <button data-command="self-update" class="command-button btn btn-lg btn-primary">Update binary</button>
+                <button data-command="list" title="list" class="command-button btn btn-lg btn-primary">List commands</button>
+                <button data-command="self-update" title="self-update" class="command-button btn btn-lg btn-primary">Update binary</button>
             </div>
         </div>
 
