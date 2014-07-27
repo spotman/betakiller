@@ -4,6 +4,7 @@
  * Automatically generated from previous translation file.
  */
 return array (
+  'Incorrect path provided' => 'Incorrect path provided',
   'Preview is not allowed' => 'Preview is not allowed',
   'Can not create path :dir' => 'Can not create path :dir',
   'You may upload files with :ext extensions only' => 'You may upload files with :ext extensions only',
