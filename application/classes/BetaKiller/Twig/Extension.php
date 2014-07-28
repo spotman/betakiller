@@ -75,6 +75,12 @@ class BetaKiller_Twig_Extension extends Twig_Extension {
                 'in_production',
                 array($this, 'in_production')
             ),
+
+            new Twig_SimpleFunction(
+                'user_is_moderator',
+                array($this, 'user_is_moderator')
+            ),
+
         );
     }
 
@@ -178,6 +184,13 @@ class BetaKiller_Twig_Extension extends Twig_Extension {
         $widget = Widget::factory($name);
         $widget->context(array_merge($context, $data));
         return $widget->render();
+    }
+
+    public function user_is_moderator()
+    {
+        $user = Env::user(TRUE);
+
+        return $user AND $user->is_moderator();
     }
 
 }
