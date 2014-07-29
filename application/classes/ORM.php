@@ -65,4 +65,12 @@ class ORM extends Util_ORM implements API_Response_Item, URL_DataSource /* , Dat
         return (string) $this->get($key);
     }
 
+    /**
+     * @return ORM
+     */
+    protected function model_factory()
+    {
+        return ORM::factory($this->object_name());
+    }
+
 }

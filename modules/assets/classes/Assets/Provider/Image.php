@@ -81,6 +81,11 @@ abstract class Assets_Provider_Image extends Assets_Provider {
         return $resized_content;
     }
 
+    protected function _get_item_deploy_filename(Request $request)
+    {
+        return parent::_get_item_deploy_filename($request).'-'.$request->param('size');
+    }
+
     /**
      * @return int
      */
