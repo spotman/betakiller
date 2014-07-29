@@ -6,7 +6,7 @@ class IFace_Exception_MissingURL extends HTTP_Exception_404 {
      * @param string $url_part
      * @param IFace_Model $parent_iface_model
      */
-    public function __construct($url_part, IFace_Model $parent_iface_model = NULL)
+    public function __construct($url_part, IFace $parent_iface_model = NULL)
     {
         // @TODO custom 404 handlers for IFaces with childs (category can show friendly message if unknown staff was requested)
 

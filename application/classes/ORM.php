@@ -49,11 +49,10 @@ class ORM extends Util_ORM implements API_Response_Item, URL_DataSource /* , Dat
 
     /**
      * @param URL_Parameters $parameters
-     * @return ORM
      */
     protected function custom_find_by_url_filter(URL_Parameters $parameters)
     {
-        return $this;
+        // Empty by default
     }
 
     /**

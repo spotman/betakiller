@@ -30,7 +30,7 @@ class IFace_Provider {
         foreach ( $uri_parts as $uri_part )
         {
             // Prevent XSS via URL
-            $uri_part = HTML::chars($uri_part);
+            $uri_part = HTML::chars(strip_tags($uri_part));
 
             $iface_instance = $this->by_uri($uri_part, $parent_iface);
 
