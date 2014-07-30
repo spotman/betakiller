@@ -7,7 +7,7 @@ class Core_Controller_IFace extends Controller {
         $uri = $this->get_request_uri();
 
         // Getting current IFace
-        $iface = IFace_Provider::instance()->parse_uri($uri);
+        $iface = URL_Dispatcher::instance()->parse_uri($uri);
 
         // If this is default IFace and client requested non-slash uri, redirect client to /
         if ( $iface->is_default() AND $this->get_request_uri() != '' )

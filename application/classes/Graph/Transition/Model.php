@@ -25,6 +25,40 @@ abstract class Graph_Transition_Model extends ORM {
     }
 
     /**
+     * @return string
+     */
+    public function get_codename()
+    {
+        return $this->get('codename');
+    }
+
+    /**
+     * @param string $value
+     * @return $this
+     */
+    public function set_codename($value)
+    {
+        return $this->set('codename', $value);
+    }
+
+    /**
+     * @return string
+     */
+    public function get_label()
+    {
+        return $this->get('label');
+    }
+
+    /**
+     * @param string $value
+     * @return $this
+     */
+    public function set_label($value)
+    {
+        return $this->set('label', $value);
+    }
+
+    /**
      * @param Graph_Node_Model $node
      * @return Graph_Node_Model[]
      */
@@ -32,6 +66,7 @@ abstract class Graph_Transition_Model extends ORM {
     {
         return $this
             ->filter_target_node($node)
+            ->cached()
             ->find_all()
             ->as_array(NULL, $this->get_source_node_relation_key());
     }
@@ -44,18 +79,25 @@ abstract class Graph_Transition_Model extends ORM {
     {
         return $this
             ->filter_source_node($node)
+            ->cached()
             ->find_all()
             ->as_array(NULL, $this->get_target_node_relation_key());
     }
 
     /**
-     * @param Graph_Node_Model $source
-     * @param Graph_Node_Model $target
+     * @param Graph_Node_Model|NULL $source
+     * @param Graph_Node_Model|NULL $target
      * @return Graph_Transition_Model[]|Database_Result
      */
-    public function get_transitions(Graph_Node_Model $source, Graph_Node_Model $target)
+    public function get_transitions(Graph_Node_Model $source = NULL, Graph_Node_Model $target = NULL)
     {
-        return $this->filter_source_node($source)->filter_target_node($target)->find_all();
+        if ( $source )
+            $this->filter_source_node($source);
+
+        if ( $target )
+            $this->filter_target_node($target);
+
+        return $this->cached()->find_all();
     }
 
     /**

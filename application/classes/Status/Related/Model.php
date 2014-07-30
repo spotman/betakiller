@@ -13,6 +13,8 @@ abstract class Status_Related_Model extends ORM {
             ]
         ]);
 
+        $this->load_with([$status_relation_key]);
+
         parent::_initialize();
     }
 
@@ -40,6 +42,16 @@ abstract class Status_Related_Model extends ORM {
     public function get_allowed_statuses()
     {
         return $this->get_current_status()->get_target_nodes();
+    }
+
+    public function get_source_transitions()
+    {
+        return $this->get_current_status()->get_source_transitions();
+    }
+
+    public function get_target_transitions()
+    {
+        return $this->get_current_status()->get_target_transitions();
     }
 
     /**

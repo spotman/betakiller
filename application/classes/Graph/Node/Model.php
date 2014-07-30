@@ -7,7 +7,7 @@ abstract class Graph_Node_Model extends ORM {
      */
     public function get_start_node()
     {
-        $node = $this->node_model_factory()->filter_start()->find();
+        $node = $this->node_model_factory()->filter_start()->cached()->find();
 
         return $node->loaded() ? $node : NULL;
     }
@@ -17,7 +17,7 @@ abstract class Graph_Node_Model extends ORM {
      */
     public function get_finish_node()
     {
-        $node = $this->node_model_factory()->filter_finish()->find();
+        $node = $this->node_model_factory()->filter_finish()->cached()->find();
 
         return $node->loaded() ? $node : NULL;
     }
@@ -58,19 +58,19 @@ abstract class Graph_Node_Model extends ORM {
         return $this->transition_model_factory()->get_target_nodes($this);
     }
 
-    public function get_transitions(Graph_Node_Model $source, Graph_Node_Model $target)
+    public function get_transitions(Graph_Node_Model $source = NULL, Graph_Node_Model $target = NULL)
     {
         return $this->transition_model_factory()->get_transitions($source, $target);
     }
 
-    public function get_source_transitions(Graph_Node_Model $source)
+    public function get_source_transitions()
     {
-        return $this->get_transitions($source, $this);
+        return $this->get_transitions(NULL, $this);
     }
 
-    public function get_target_transitions(Graph_Node_Model $target)
+    public function get_target_transitions()
     {
-        return $this->get_transitions($this, $target);
+        return $this->get_transitions($this, NULL);
     }
 
     public function transition_exists(Graph_Node_Model $source, Graph_Node_Model $target)

@@ -190,6 +190,11 @@ abstract class Core_IFace {
         return $this->model()->is_default();
     }
 
+    public function is_in_stack()
+    {
+        return URL_Dispatcher::instance()->in_stack($this);
+    }
+
     public function url(URL_Parameters $parameters = NULL)
     {
         $parts = array();
@@ -216,7 +221,7 @@ abstract class Core_IFace {
     protected function make_uri(URL_Parameters $parameters = NULL)
     {
         return $this->model()->has_dynamic_url()
-            ? URL_Dispatcher::instance()->make_uri($this->get_uri(), $parameters)
+            ? URL_Dispatcher::instance()->make_dynamic_uri_part($this->get_uri(), $parameters)
             : $this->get_uri();
     }
 

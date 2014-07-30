@@ -43,4 +43,9 @@ class BetaKiller_Environment extends Util_Registry_Class
         return URL_Dispatcher::instance()->parameters();
     }
 
+    private function get_url_dispatcher()
+    {
+        return URL_Dispatcher::instance();
+    }
+
 }

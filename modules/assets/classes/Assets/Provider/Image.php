@@ -12,12 +12,19 @@ abstract class Assets_Provider_Image extends Assets_Provider {
      * @return string
      * @throws Assets_Provider_Exception
      */
-    public function get_preview_url(Assets_Model $model, $size)
+    public function get_preview_url(Assets_Model $model, $size = NULL)
     {
         $url = $model->get_url();
 
         if ( ! $url )
             throw new Assets_Provider_Exception('Model must have url');
+
+        $allowed_sizes = $this->get_allowed_preview_sizes();
+
+        if ( $size === NULL AND count($allowed_sizes) == 1 )
+        {
+            $size = $allowed_sizes[0];
+        }
 
         $options = array(
             'provider'  =>  $this->_codename,
@@ -31,6 +38,11 @@ abstract class Assets_Provider_Image extends Assets_Provider {
 
     public function prepare_preview(Assets_Model $model, $size)
     {
+        $allowed_sizes = $this->get_allowed_preview_sizes();
+
+        if ( ! $allowed_sizes OR ! in_array($size, $allowed_sizes) )
+            throw new Assets_Provider_Exception('Preview is not allowed');
+
         $content = $this->get_content($model);
 
         $dimensions = explode('x', $size);
@@ -109,5 +121,9 @@ abstract class Assets_Provider_Image extends Assets_Provider {
     /**
      * @return int
      */
-    abstract public function get_preview_quality();
+    public function get_preview_quality()
+    {
+        // This is optimal for JPEG
+        return 80;
+    }
 }

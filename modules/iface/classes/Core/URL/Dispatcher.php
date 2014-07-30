@@ -6,7 +6,20 @@ abstract class Core_URL_Dispatcher {
 
     const PROTOTYPE_PCRE = '({([A-Za-z_]+)\.([A-Za-z_]+)})';
 
+    /**
+     * @var URL_Parameters
+     */
     protected $_url_parameters;
+
+    /**
+     * @var IFace_Provider
+     */
+    protected $_iface_provider;
+
+    /**
+     * @var array
+     */
+    protected $_iface_stack = [];
 
     /**
      * @return URL_Parameters
@@ -21,7 +34,124 @@ abstract class Core_URL_Dispatcher {
         return $this->_url_parameters;
     }
 
-    public function parse_uri($prototype_string, $uri_value)
+    public function iface_provider()
+    {
+        if ( ! $this->_iface_provider )
+        {
+            $this->_iface_provider = IFace_Provider::instance();
+        }
+
+        return $this->_iface_provider;
+    }
+
+    /**
+     * Performs parsing of requested url
+     * Returns IFace
+     *
+     * @param $uri
+     * @return IFace|null
+     * @throws IFace_Exception_MissingURL
+     */
+    public function parse_uri($uri)
+    {
+        $uri_parts = $uri ? explode('/', $uri) : NULL;
+
+        // Root requested - search for default IFace
+        if ( ! $uri_parts )
+        {
+            return $this->iface_provider()->get_default();
+        }
+
+        $parent_iface = NULL;
+        $iface_instance = NULL;
+
+        // Dispatch childs
+        // Loop through every uri part and initialize it`s iface
+        foreach ( $uri_parts as $uri_part )
+        {
+            // Prevent XSS via URL
+            $uri_part = HTML::chars(strip_tags($uri_part));
+
+            $iface_instance = $this->by_uri($uri_part, $parent_iface);
+
+            // Throw IFace_Exception_MissingURL so we can forward user to parent iface or custom 404 page
+            if ( ! $iface_instance )
+                throw new IFace_Exception_MissingURL($uri_part, $parent_iface);
+
+            // Store link to parent IFace if exists
+            if ( $parent_iface)
+                $iface_instance->parent($parent_iface);
+
+            $parent_iface = $iface_instance;
+
+            $this->_iface_stack[ $iface_instance->codename() ] = $iface_instance;
+        }
+
+        // Return last IFace
+        return $iface_instance;
+    }
+
+    /**
+     * Performs iface search by uri (and optional parent iface model)
+     *
+     * @param string $uri
+     * @param IFace|NULL $parent_iface
+     * @return IFace
+     * @throws IFace_Exception
+     */
+    public function by_uri($uri, IFace $parent_iface = NULL)
+    {
+        $layer = $this->iface_provider()->get_models_layer($parent_iface);
+
+        $iface_model = NULL;
+        $dynamic_model = NULL;
+
+        // First iteration through static urls
+        foreach ( $layer as $iface_model )
+        {
+            // Skip ifaces with dynamic urls
+            if ( $iface_model->has_dynamic_url() )
+            {
+                if ( $dynamic_model )
+                    throw new IFace_Exception('Layer must have only one IFace with dynamic dispatching');
+
+                $dynamic_model = $iface_model;
+                continue;
+            }
+
+            // IFace found by concrete uri
+            if ( $iface_model->get_uri() == $uri )
+                return $this->iface_provider()->iface_factory($iface_model);
+        }
+
+        // Second iteration for dynamic urls
+        if ( $dynamic_model )
+        {
+            URL_Dispatcher::instance()->parse_dynamic_uri_part($dynamic_model->get_uri(), $uri);
+            return $this->iface_provider()->iface_factory($dynamic_model);
+        }
+
+        // Nothing found
+        return NULL;
+    }
+
+    /**
+     * Returns TRUE if provided IFace was initialized through url parsing
+     *
+     * @param Core_IFace $iface
+     * @return bool
+     */
+    public function in_stack(Core_IFace $iface)
+    {
+        return isset($this->_iface_stack[ $iface->codename() ]);
+    }
+
+    public function stack()
+    {
+        return $this->_iface_stack;
+    }
+
+    public function parse_dynamic_uri_part($prototype_string, $uri_value)
     {
         $prototype = $this->parse_prototype($prototype_string);
 
@@ -40,7 +170,7 @@ abstract class Core_URL_Dispatcher {
         $this->parameters()->set($model_name, $model);
     }
 
-    public function make_uri($prototype_string, URL_Parameters $parameters = NULL)
+    public function make_dynamic_uri_part($prototype_string, URL_Parameters $parameters = NULL)
     {
         $prototype = $this->parse_prototype($prototype_string);
 

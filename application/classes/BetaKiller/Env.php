@@ -78,4 +78,12 @@ class BetaKiller_Env
         return static::get('url_parameters');
     }
 
+    /**
+     * @return URL_Dispatcher
+     */
+    public static function url_dispatcher()
+    {
+        return static::get('url_dispatcher');
+    }
+
 }
