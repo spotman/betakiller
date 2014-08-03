@@ -71,26 +71,36 @@ abstract class Assets_Provider_Image extends Assets_Provider {
 
     protected function resize($original_content, $width, $height, $quality = 100)
     {
+        if ( ! $original_content )
+            throw new Assets_Provider_Exception('No content for resizing');
+
         // Creating temporary file
         $temp_file_name = tempnam(sys_get_temp_dir(), 'image-resize');
 
         if ( ! $temp_file_name )
             throw new Assets_Provider_Exception('Can not create temporary file for image resizing');
 
-        // Putting content into it
-        file_put_contents($temp_file_name, $original_content);
+        try
+        {
+            // Putting content into it
+            file_put_contents($temp_file_name, $original_content);
 
-        // Creating resizing instance
-        $image = Image::factory($temp_file_name);
+            // Creating resizing instance
+            $image = Image::factory($temp_file_name);
 
-        $resized_content = $image
-            ->resize($width, $height)
-            ->render(NULL /* auto */, $quality);
+            $resized_content = $image
+                ->resize($width, $height)
+                ->render(NULL /* auto */, $quality);
 
-        // Deleting temp file
-        unlink($temp_file_name);
+            // Deleting temp file
+            unlink($temp_file_name);
 
-        return $resized_content;
+            return $resized_content;
+        }
+        catch ( Exception $e )
+        {
+            throw new Assets_Provider_Exception('Can not resize image');
+        }
     }
 
     protected function _get_item_deploy_filename(Request $request)

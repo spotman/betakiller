@@ -2,6 +2,11 @@
 
 abstract class Status_Related_Model extends ORM {
 
+    /**
+     * @var Status_Workflow
+     */
+    protected $_workflow_instance;
+
     protected function _initialize()
     {
         $status_relation_key = $this->get_status_relation_key();
@@ -88,6 +93,22 @@ abstract class Status_Related_Model extends ORM {
         return ORM::factory($this->get_status_relation_model_name(), $id);
     }
 
+    protected function workflow()
+    {
+        if ( ! $this->_workflow_instance )
+            $this->_workflow_instance = $this->workflow_factory();
+
+        return $this->_workflow_instance;
+    }
+
+    /**
+     * @return Status_Workflow
+     */
+    protected function workflow_factory()
+    {
+        return Status_Workflow::factory($this->object_name(), $this);
+    }
+
     /**
      * @return Status_Model
      */
@@ -104,7 +125,6 @@ abstract class Status_Related_Model extends ORM {
     {
         return $this->set($this->get_status_relation_key(), $target);
     }
-
 
     protected function get_status_relation_key()
     {
