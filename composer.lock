@@ -4,24 +4,70 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "4934a0de67a351b2b9463b451643c38e",
+    "hash": "eaf294a8e309dbfe93bc7640470a584d",
     "packages": [
         {
-            "name": "elfet/deployer",
-            "version": "v1.1.0",
+            "name": "anahkiasen/underscore-php",
+            "version": "dev-master",
             "source": {
                 "type": "git",
-                "url": "https://github.com/elfet/deployer.git",
-                "reference": "431fbe307d7457a8bfd8617ad996ba834e4c3fe1"
+                "url": "https://github.com/Anahkiasen/underscore-php.git",
+                "reference": "8dc86f6630eb345b7d042b69f7db21482af7b79c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/elfet/deployer/zipball/431fbe307d7457a8bfd8617ad996ba834e4c3fe1",
-                "reference": "431fbe307d7457a8bfd8617ad996ba834e4c3fe1",
+                "url": "https://api.github.com/repos/Anahkiasen/underscore-php/zipball/8dc86f6630eb345b7d042b69f7db21482af7b79c",
+                "reference": "8dc86f6630eb345b7d042b69f7db21482af7b79c",
                 "shasum": ""
             },
             "require": {
-                "herzult/php-ssh": "~1.0",
+                "illuminate/support": "~4",
+                "patchwork/utf8": "1.1.*",
+                "php": ">=5.3.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Underscore\\": [
+                        "src",
+                        "tests"
+                    ]
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Maxime Fabre",
+                    "email": "ehtnam6@gmail.com"
+                }
+            ],
+            "description": "A redacted port of Underscore.js for PHP",
+            "keywords": [
+                "internals",
+                "laravel",
+                "toolkit"
+            ],
+            "time": "2014-06-11 15:06:50"
+        },
+        {
+            "name": "elfet/deployer",
+            "version": "v1.1.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/elfet/deployer.git",
+                "reference": "55d5ca0527861b7bf46b980e03ae314927564416"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/elfet/deployer/zipball/55d5ca0527861b7bf46b980e03ae314927564416",
+                "reference": "55d5ca0527861b7bf46b980e03ae314927564416",
+                "shasum": ""
+            },
+            "require": {
+                "elfet/php-ssh": "~1.0",
                 "kherge/amend": "~3.0",
                 "php": ">=5.4.0",
                 "phpseclib/phpseclib": "0.3.*@dev",
@@ -49,12 +95,66 @@
             ],
             "authors": [
                 {
-                    "name": "Anton Medvedev",
+                    "name": "Elfet",
                     "email": "anton@elfet.ru"
                 }
             ],
             "description": "Deployment Tool",
-            "time": "2014-07-12 10:44:09"
+            "time": "2014-07-31 18:22:00"
+        },
+        {
+            "name": "elfet/php-ssh",
+            "version": "v1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/elfet/php-ssh.git",
+                "reference": "864de1e0f815087155acfb8ffee8f3e3f29ca256"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/elfet/php-ssh/zipball/864de1e0f815087155acfb8ffee8f3e3f29ca256",
+                "reference": "864de1e0f815087155acfb8ffee8f3e3f29ca256",
+                "shasum": ""
+            },
+            "require": {
+                "ext-ssh2": "*",
+                "php": ">=5.3.2"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "3.7.*",
+                "symfony/filesystem": "~2.4"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-0": {
+                    "Ssh": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "The contributors",
+                    "homepage": "http://github.com/Herzult/php-ssh/contributors"
+                },
+                {
+                    "name": "Antoine Hérault",
+                    "homepage": "https://github.com/Herzult"
+                }
+            ],
+            "description": "Provides an object-oriented wrapper for the php ssh2 extension.",
+            "keywords": [
+                "ssh",
+                "ssh2"
+            ],
+            "time": "2014-06-15 09:18:18"
         },
         {
             "name": "herrera-io/json",
@@ -228,37 +328,40 @@
             "time": "2014-05-27 05:29:25"
         },
         {
-            "name": "herzult/php-ssh",
-            "version": "v1.0.0",
+            "name": "illuminate/support",
+            "version": "v4.2.7",
+            "target-dir": "Illuminate/Support",
             "source": {
                 "type": "git",
-                "url": "https://github.com/Herzult/php-ssh.git",
-                "reference": "864de1e0f815087155acfb8ffee8f3e3f29ca256"
+                "url": "https://github.com/illuminate/support.git",
+                "reference": "b3d84fa93aa3f2081a935158f860de8308d62d5a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Herzult/php-ssh/zipball/864de1e0f815087155acfb8ffee8f3e3f29ca256",
-                "reference": "864de1e0f815087155acfb8ffee8f3e3f29ca256",
+                "url": "https://api.github.com/repos/illuminate/support/zipball/b3d84fa93aa3f2081a935158f860de8308d62d5a",
+                "reference": "b3d84fa93aa3f2081a935158f860de8308d62d5a",
                 "shasum": ""
             },
             "require": {
-                "ext-ssh2": "*",
-                "php": ">=5.3.2"
+                "php": ">=5.4.0"
             },
             "require-dev": {
-                "phpunit/phpunit": "3.7.*",
-                "symfony/filesystem": "~2.4"
+                "jeremeamia/superclosure": "~1.0",
+                "patchwork/utf8": "1.1.*"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.x-dev"
+                    "dev-master": "4.2-dev"
                 }
             },
             "autoload": {
                 "psr-0": {
-                    "Ssh": "src/"
-                }
+                    "Illuminate\\Support": ""
+                },
+                "files": [
+                    "Illuminate/Support/helpers.php"
+                ]
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
@@ -266,21 +369,11 @@
             ],
             "authors": [
                 {
-                    "name": "Antoine Hérault",
-                    "email": "antoine.herault@gmail.com",
-                    "homepage": "https://github.com/Herzult"
-                },
-                {
-                    "name": "The contributors",
-                    "homepage": "http://github.com/Herzult/php-ssh/contributors"
+                    "name": "Taylor Otwell",
+                    "email": "taylorotwell@gmail.com"
                 }
             ],
-            "description": "Provides an object-oriented wrapper for the php ssh2 extension.",
-            "keywords": [
-                "ssh",
-                "ssh2"
-            ],
-            "time": "2014-06-15 09:18:18"
+            "time": "2014-07-21 21:14:59"
         },
         {
             "name": "justinrainbow/json-schema",
@@ -405,6 +498,57 @@
                 "update"
             ],
             "time": "2013-11-09 17:50:41"
+        },
+        {
+            "name": "patchwork/utf8",
+            "version": "v1.1.24",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/nicolas-grekas/Patchwork-UTF8.git",
+                "reference": "40f552c019956f446553b19f7de2da2f9c74d730"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/nicolas-grekas/Patchwork-UTF8/zipball/40f552c019956f446553b19f7de2da2f9c74d730",
+                "reference": "40f552c019956f446553b19f7de2da2f9c74d730",
+                "shasum": ""
+            },
+            "require": {
+                "lib-pcre": ">=7.3",
+                "php": ">=5.3.0"
+            },
+            "suggest": {
+                "ext-iconv": "Use iconv for best performance",
+                "ext-intl": "Use Intl for best performance",
+                "ext-mbstring": "Use Mbstring for best performance"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "Patchwork": "class/",
+                    "Normalizer": "class/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "(Apache-2.0 or GPL-2.0)"
+            ],
+            "authors": [
+                {
+                    "name": "Nicolas Grekas",
+                    "email": "p@tchwork.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Extensive, portable and performant handling of UTF-8 and grapheme clusters for PHP",
+            "homepage": "https://github.com/nicolas-grekas/Patchwork-UTF8",
+            "keywords": [
+                "i18n",
+                "unicode",
+                "utf-8",
+                "utf8"
+            ],
+            "time": "2014-06-17 08:23:06"
         },
         {
             "name": "phpseclib/phpseclib",
@@ -1078,9 +1222,9 @@
 
     ],
     "minimum-stability": "stable",
-    "stability-flags": [
-
-    ],
+    "stability-flags": {
+        "anahkiasen/underscore-php": 20
+    },
     "prefer-stable": false,
     "platform": [
 

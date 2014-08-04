@@ -3,6 +3,40 @@
 abstract class Graph_Node_Model extends ORM {
 
     /**
+     * @return string
+     */
+    public function get_codename()
+    {
+        return $this->get('codename');
+    }
+
+    /**
+     * @param string $value
+     * @return $this
+     */
+    public function set_codename($value)
+    {
+        return $this->set('codename', $value);
+    }
+
+    /**
+     * @return string
+     */
+    public function get_label()
+    {
+        return $this->get('label');
+    }
+
+    /**
+     * @param string $value
+     * @return $this
+     */
+    public function set_label($value)
+    {
+        return $this->set('label', $value);
+    }
+
+    /**
      * @return NULL|Graph_Node_Model
      */
     public function get_start_node()
@@ -89,6 +123,8 @@ abstract class Graph_Node_Model extends ORM {
     }
 
     /**
+     * Override this method if you need custom transition filtering
+     *
      * @param int|array|NULL $id
      * @return Graph_Transition_Model
      */

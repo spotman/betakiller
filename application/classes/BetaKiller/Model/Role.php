@@ -31,6 +31,17 @@ class BetaKiller_Model_Role extends Model_Auth_Role
     }
 
     /**
+     * Returns list of all roles IDs
+     * Useful for getting all user`s roles IDs
+     *
+     * @return array
+     */
+    public function find_all_ids()
+    {
+        return $this->cached()->find_all()->as_array(NULL, $this->primary_key());
+    }
+
+    /**
      * Returns "Developers" role object
      *
      * @return Model_Role

@@ -20,23 +20,28 @@ class BetaKiller_Model_User extends Model_Auth_User implements Notification_User
         parent::_initialize();
     }
 
-
-    // TODO
-    public function complete_login()
+    /**
+     * @return Model_Role
+     */
+    protected function get_roles_relation()
     {
-        parent::complete_login();
+        return $this->get('roles');
+    }
 
-        if ( $this->loaded() )
-        {
+//    public function complete_login()
+//    {
+//        parent::complete_login();
+//
+//        if ( $this->loaded() )
+//        {
 //        $this->date_login = date('Y-m-d H:i:s');
 //        $this->ip = sprintf("%u", ip2long(Request::$client_ip));
 //        $this->session_id = Session::instance()->id();
 //
 //        $this->save();
-
-        }
-    }
-
+//
+//        }
+//    }
 
     public function get_username()
     {
@@ -65,7 +70,7 @@ class BetaKiller_Model_User extends Model_Auth_User implements Notification_User
     }
 
     /**
-     * TODO Переписать на кешированный ACL ибо слишком затратно делать запрос в БД на проверку роли
+     * @todo Переписать на кешированный ACL ибо слишком затратно делать запрос в БД на проверку роли
      *
      * @param Model_Role|string $role
      * @return bool
@@ -80,6 +85,17 @@ class BetaKiller_Model_User extends Model_Auth_User implements Notification_User
         }
 
         return $this->has('roles', $role);
+    }
+
+    /**
+     * Get all user`s roles IDs
+     *
+     * @todo Store this data in session
+     * @return array
+     */
+    public function get_roles_ids()
+    {
+        return $this->get_roles_relation()->find_all_ids();
     }
 
     /**
@@ -151,7 +167,7 @@ class BetaKiller_Model_User extends Model_Auth_User implements Notification_User
 
     public function before_sign_out()
     {
-        // TODO
+        // Empty by default
     }
 
     /**
@@ -198,6 +214,9 @@ class BetaKiller_Model_User extends Model_Auth_User implements Notification_User
         return $this->set('phone', $number);
     }
 
+    /**
+     * @return Database_Result|Model_User[]
+     */
     public function get_developers_list()
     {
         /** @var Model_Role $roles_orm */
@@ -206,6 +225,9 @@ class BetaKiller_Model_User extends Model_Auth_User implements Notification_User
         return $roles_orm->developers()->get_users()->find_all();
     }
 
+    /**
+     * @return Database_Result|Model_User[]
+     */
     public function get_moderators_list()
     {
         /** @var Model_Role $roles_orm */

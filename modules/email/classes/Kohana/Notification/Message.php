@@ -154,7 +154,7 @@ abstract class Kohana_Notification_Message {
         $view->set($data);
 
         return $view->render(
-            $this->get_template_path().DIRECTORY_SEPARATOR.$this->_template_name.DIRECTORY_SEPARATOR.$transport_name
+            $this->get_template_path().DIRECTORY_SEPARATOR.$this->_template_name.'-'.$transport_name
         );
     }
 

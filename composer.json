@@ -1,6 +1,7 @@
 {
 	"require": {
 		"phpunit/phpunit": "3.7.*",
-		"elfet/deployer": "v1.1.0"
+		"elfet/deployer": "~1.1",
+        "anahkiasen/underscore-php" : "dev-master"
 	}
 }

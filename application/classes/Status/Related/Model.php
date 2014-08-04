@@ -41,6 +41,17 @@ abstract class Status_Related_Model extends ORM {
         return $this->set_current_status($target);
     }
 
+    public function do_status_transition(Status_Transition_Model $transition)
+    {
+        if ( $transition->get_source_node()->pk() != $this->get_current_status()->pk() )
+            throw new Status_Exception('Only transitions from current status are allowed');
+
+        /** @var Status_Model $target_status */
+        $target_status = $transition->get_target_node();
+
+        return $this->set_current_status($target_status);
+    }
+
     /**
      * @return Status_Model[]|NULL
      */
@@ -49,14 +60,36 @@ abstract class Status_Related_Model extends ORM {
         return $this->get_current_status()->get_target_nodes();
     }
 
+    /**
+     * @return Database_Result|Status_Transition_Model[]
+     */
     public function get_source_transitions()
     {
         return $this->get_current_status()->get_source_transitions();
     }
 
+    /**
+     * @return Database_Result|Status_Transition_Model[]
+     */
     public function get_target_transitions()
     {
         return $this->get_current_status()->get_target_transitions();
+    }
+
+    /**
+     * @return Database_Result|Status_Transition_Model[]
+     */
+    public function get_allowed_source_transitions()
+    {
+        return $this->get_current_status()->get_allowed_source_transitions();
+    }
+
+    /**
+     * @return Database_Result|Status_Transition_Model[]
+     */
+    public function get_allowed_target_transitions()
+    {
+        return $this->get_current_status()->get_allowed_target_transitions();
     }
 
     /**
@@ -106,8 +139,15 @@ abstract class Status_Related_Model extends ORM {
      */
     protected function workflow_factory()
     {
-        return Status_Workflow::factory($this->object_name(), $this);
+        return Status_Workflow::factory($this->get_workflow_name(), $this);
     }
+
+    /**
+     * Returns key for workflow factory
+     *
+     * @return string
+     */
+    abstract protected function get_workflow_name();
 
     /**
      * @return Status_Model

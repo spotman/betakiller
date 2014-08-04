@@ -7,7 +7,7 @@ abstract class Graph_Transition_Model extends ORM {
         $source_node_key        =   $this->get_source_node_relation_key();
         $target_node_key        =   $this->get_target_node_relation_key();
 
-        $this->has_many([
+        $this->belongs_to([
 
             $source_node_key    =>  [
                 'model'         =>  $this->get_node_model_name(),
@@ -20,6 +20,8 @@ abstract class Graph_Transition_Model extends ORM {
             ],
 
         ]);
+
+        $this->load_with([$source_node_key, $target_node_key]);
 
         parent::_initialize();
     }
@@ -56,6 +58,32 @@ abstract class Graph_Transition_Model extends ORM {
     public function set_label($value)
     {
         return $this->set('label', $value);
+    }
+
+    /**
+     * @return Graph_Node_Model
+     */
+    protected function get_source_node_relation()
+    {
+        return $this->get($this->get_source_node_relation_key());
+    }
+
+    /**
+     * @return Graph_Node_Model
+     */
+    protected function get_target_node_relation()
+    {
+        return $this->get($this->get_target_node_relation_key());
+    }
+
+    public function get_source_node()
+    {
+        return $this->get_source_node_relation();
+    }
+
+    public function get_target_node()
+    {
+        return $this->get_target_node_relation();
     }
 
     /**
