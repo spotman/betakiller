@@ -2,16 +2,6 @@
 
 abstract class Core_IFace {
 
-    use Util_GetterAndSetterMethod, Util_Factory_Cached
-    {
-        Util_Factory_Cached::factory as protected _factory;
-    }
-
-    /**
-     * @var string
-     */
-    protected $_codename;
-
     /**
      * @var IFace_Model
      */
@@ -36,12 +26,7 @@ abstract class Core_IFace {
      */
     public static function by_codename($codename)
     {
-        if ( ! $codename )
-            throw new IFace_Exception('Can not create IFace from empty codename');
-
-        $model = IFace_Model_Provider::instance()->by_codename($codename);
-
-        return static::factory($model);
+        return static::provider()->by_codename($codename);
     }
 
     /**
@@ -52,36 +37,12 @@ abstract class Core_IFace {
      */
     public static function factory(IFace_Model $model)
     {
-        $codename = $model->get_codename();
-
-        return static::_factory($codename, $model);
+        return static::provider()->from_model($model);
     }
 
-    protected static function instance_factory($codename, IFace_Model $model)
+    protected static function provider()
     {
-        $class_name = static::get_class_prefix().$codename;
-
-        if ( ! class_exists($class_name) )
-        {
-            $class_name = static::get_class_prefix().'Default';
-        }
-
-        /** @var IFace $object */
-        $object = new $class_name;
-
-        if ( ! ($object instanceof IFace) )
-            throw new IFace_Exception('Class :class must be instance of class IFace', array(':class' => $class_name));
-
-//        // Check for dynamic url implementation
-//        if ( $model->has_dynamic_url() AND ! ($object instanceof IFace_Dispatchable) )
-//            throw new IFace_Exception('IFace :class_name has dynamic url but does not implementing IFace_Dispatchable',
-//                array(':class_name' => $class_name)
-//            );
-
-        $object->codename($codename);
-        $object->model($model);
-
-        return $object;
+        return IFace_Provider::instance();
     }
 
     public function __construct()
@@ -90,12 +51,11 @@ abstract class Core_IFace {
     }
 
     /**
-     * @param string|null $codename
      * @return $this|string
      */
-    public function codename($codename = NULL)
+    public function get_codename()
     {
-        return $this->getter_and_setter_method('_codename', $codename);
+        return $this->get_model()->get_codename();
     }
 
     /**
@@ -109,12 +69,12 @@ abstract class Core_IFace {
 
     public function get_layout_codename()
     {
-        return $this->model()->get_layout_codename();
+        return $this->get_model()->get_layout_codename();
     }
 
     public function get_title()
     {
-        return $this->model()->get_title();
+        return $this->get_model()->get_title();
     }
 
     /**
@@ -150,44 +110,47 @@ abstract class Core_IFace {
         return (string) $this->render();
     }
 
-    /**
-     * Getter/setter for current iface parent
-     * @param IFace|null $parent
-     * @return IFace|null
-     */
-    public function parent(IFace $parent = NULL)
+    public function get_parent()
     {
-        return $this->getter_and_setter_method('_parent', $parent, 'get_parent');
+        if ( ! $this->_parent )
+        {
+            $this->_parent = $this->provider()->get_parent($this);
+        }
+
+        return $this->_parent;
     }
 
-    protected function get_parent()
+    function set_parent(IFace $parent)
     {
-        $parent_model = $this->model()->get_parent();
-
-        if ( ! $parent_model )
-            return NULL;
-
-        return static::factory($parent_model);
+        $this->_parent = $parent;
+        return $this;
     }
 
     /**
-     * Getter/setter for current iface model
-     * @param IFace_Model $model
+     * Getter for current iface model
+     *
      * @return IFace_Model
      */
-    public function model(IFace_Model $model = NULL)
+    public function get_model()
     {
-        return $this->getter_and_setter_method('_model', $model); // , 'model_factory'
+        return $this->_model;
     }
 
-//    protected function model_factory()
-//    {
-//        return IFace_Model_Provider::instance()->by_codename($this->_codename);
-//    }
+    /**
+     * Setter for current iface model
+     *
+     * @param IFace_Model $model
+     * @return $this
+     */
+    public function set_model(IFace_Model $model)
+    {
+        $this->_model = $model;
+        return $this;
+    }
 
     public function is_default()
     {
-        return $this->model()->is_default();
+        return $this->get_model()->is_default();
     }
 
     public function is_in_stack()
@@ -209,7 +172,7 @@ abstract class Core_IFace {
             do
             {
                 $parts[] = $current->make_uri($parameters);
-                $parent = $current->parent();
+                $parent = $current->get_parent();
                 $current = $parent;
             }
             while ( $parent );
@@ -220,14 +183,14 @@ abstract class Core_IFace {
 
     protected function make_uri(URL_Parameters $parameters = NULL)
     {
-        return $this->model()->has_dynamic_url()
+        return $this->get_model()->has_dynamic_url()
             ? URL_Dispatcher::instance()->make_dynamic_uri_part($this->get_uri(), $parameters)
             : $this->get_uri();
     }
 
     protected function get_uri()
     {
-        return $this->model()->get_uri();
+        return $this->get_model()->get_uri();
     }
 
     public function get_view()
@@ -235,16 +198,4 @@ abstract class Core_IFace {
         return View_IFace::factory($this);
     }
 
-    protected static function get_class_prefix()
-    {
-        return 'IFace_';
-    }
-
-//    protected function check_parent_instanceof($parent_iface_class_name)
-//    {
-//        if ( ! ($this->parent() instanceof $parent_iface_class_name) )
-//            throw new IFace_Exception('IFace :codename must be child of :parent',
-//                array(':codename' => $this->codename(), ':parent' => $parent_iface_class_name)
-//            );
-//    }
 }

@@ -43,9 +43,12 @@ require.config({
         'twig.original':            '../twig.js/twig',
 
         'api.rpc':                  '../api/rpc.definition',
+        'api.rpc.factory':          '../api/rpc.factory',
         'jquery.jsonRPC':           '../api/jquery.jsonRPC',
 
         'ansi_up':                  '../ansi_up/ansi_up',
+
+        'auth.modal':               'auth/modal/view',
 
         /**
          * Кастомные контролы

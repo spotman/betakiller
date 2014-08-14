@@ -2,6 +2,11 @@
 
 class IFace_Model_Provider_Admin_Model implements IFace_Model {
 
+    /**
+     * @var IFace_Model_Provider_Admin
+     */
+    protected $_provider;
+
     protected $_codename;
 
     protected $_parent_codename;
@@ -15,11 +20,12 @@ class IFace_Model_Provider_Admin_Model implements IFace_Model {
      */
     protected $_has_dynamic_url;
 
-    public static function factory($data)
+    public static function factory($data, IFace_Model_Provider_Admin $provider)
     {
         /** @var self $instance */
         $instance = new static;
         $instance->from_array($data);
+        $instance->set_provider($provider);
         return $instance;
     }
 
@@ -68,6 +74,16 @@ class IFace_Model_Provider_Admin_Model implements IFace_Model {
     }
 
     /**
+     * Returns list of child iface models
+     *
+     * @return IFace_Model[]
+     */
+    public function get_children()
+    {
+        return $this->get_provider()->get_childs($this);
+    }
+
+    /**
      * Returns iface codename
      *
      * @return string
@@ -84,18 +100,7 @@ class IFace_Model_Provider_Admin_Model implements IFace_Model {
      */
     public function get_title()
     {
-        // TODO: Implement get_title() method.
-    }
-
-
-    /**
-     * Returns list of child iface models
-     *
-     * @return IFace_Model[]
-     */
-    public function get_children()
-    {
-        return $this->get_provider()->get_children($this);
+        return $this->_title;
     }
 
     /**
@@ -158,7 +163,13 @@ class IFace_Model_Provider_Admin_Model implements IFace_Model {
      */
     protected function get_provider()
     {
-        return IFace_Model_Provider::factory('Admin');
+        return $this->_provider;
+    }
+
+    public function set_provider(IFace_Model_Provider_Admin $provider)
+    {
+        $this->_provider = $provider;
+        return $this;
     }
 
 }

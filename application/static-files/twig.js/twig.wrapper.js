@@ -2,28 +2,32 @@ define([
     "twig.original"
 ], function(Twig){
 
-    // Factory
-    return function()
+    // Prototype
+    var p = function()
     {
-        // Prototype
-        var p = function()
+        var template;
+
+        this.fromHTML = function(html)
         {
-            var template;
-
-            this.fromHTML = function(html)
-            {
-                template = Twig.twig({ data: html });
-                return this;
-            };
-
-            this.render = function(data)
-            {
-                return template.render(data);
-            };
+            template = Twig.twig({ data: html });
+            return this;
         };
 
-        // New instance
-        return new p;
+        this.render = function(data)
+        {
+            return template.render(data);
+        };
+    };
+
+    return {
+
+        factory: function(template)
+        {
+            var instance = new p();
+
+            return instance.fromHTML(template);
+        }
+
     };
 
 });

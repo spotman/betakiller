@@ -12,7 +12,7 @@ interface IFace_Model {
     /**
      * Return parent iface model or NULL
      *
-     * @return IFace_Model
+     * @return IFace_Model|NULL
      */
     public function get_parent();
 

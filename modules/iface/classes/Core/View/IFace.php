@@ -92,7 +92,7 @@ abstract class Core_View_IFace {
 
     protected function get_view_path()
     {
-        return 'ifaces'. DIRECTORY_SEPARATOR . str_replace('_', DIRECTORY_SEPARATOR, $this->_iface->codename());
+        return 'ifaces'. DIRECTORY_SEPARATOR . str_replace('_', DIRECTORY_SEPARATOR, $this->_iface->get_codename());
     }
 
 }

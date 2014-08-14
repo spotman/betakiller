@@ -24,14 +24,4 @@ interface IFace_Model_Provider_Interface {
      */
     public function by_codename($codename);
 
-// Moved to IFace_Provider::by_uri
-//    /**
-//     * Performs iface model search by uri (and optional parent iface model)
-//     *
-//     * @param string $uri
-//     * @param IFace_Model|null $parent_model
-//     * @return IFace_Model
-//     */
-//    public function by_uri($uri, IFace_Model $parent_model = NULL);
-
 }

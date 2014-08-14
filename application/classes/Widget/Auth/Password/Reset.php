@@ -1,5 +1,5 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
-class Widget_Auth_Regular extends Widget {
+class Widget_Auth_Password_Reset extends Widget {
 
 }

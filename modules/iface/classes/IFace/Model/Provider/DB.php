@@ -1,7 +1,7 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
 
-class IFace_Model_Provider_DB extends IFace_Model_Provider {
+class IFace_Model_Provider_DB extends IFace_Model_Provider_Abstract {
 
     /**
      * Returns list of root elements

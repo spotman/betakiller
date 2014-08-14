@@ -2,7 +2,7 @@
 
 abstract class Assets_Provider {
 
-    use Util_Factory;
+    use Util_Factory_Cached;
 
     /**
      * @var string

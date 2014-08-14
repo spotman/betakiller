@@ -80,11 +80,11 @@ abstract class Core_URL_Dispatcher {
 
             // Store link to parent IFace if exists
             if ( $parent_iface)
-                $iface_instance->parent($parent_iface);
+                $iface_instance->set_parent($parent_iface);
 
             $parent_iface = $iface_instance;
 
-            $this->_iface_stack[ $iface_instance->codename() ] = $iface_instance;
+            $this->_iface_stack[ $iface_instance->get_codename() ] = $iface_instance;
         }
 
         // Return last IFace
@@ -143,7 +143,7 @@ abstract class Core_URL_Dispatcher {
      */
     public function in_stack(Core_IFace $iface)
     {
-        return isset($this->_iface_stack[ $iface->codename() ]);
+        return isset($this->_iface_stack[ $iface->get_codename() ]);
     }
 
     public function stack()
