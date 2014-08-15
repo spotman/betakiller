@@ -1,3 +1,23 @@
-{{ widget('Auth_Regular') }}
+<div id="auth-widget-container">
+    {{ widget("Auth") }}
+</div>
 
-{{ widget('Auth_Ulogin') }}
+<script type="application/javascript">
+
+    require([
+        "jquery",
+        "auth.login"
+    ], function($, login) {
+
+        $(function(){
+
+            login.initialize(
+                $("#auth-widget-container"),
+                "{{ redirect_url }}"
+            );
+
+        });
+
+    });
+
+</script>

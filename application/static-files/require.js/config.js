@@ -48,7 +48,11 @@ require.config({
 
         'ansi_up':                  '../ansi_up/ansi_up',
 
-        'auth.modal':               'auth/modal/view',
+        'auth.login':               'views/auth/login',
+        'auth.widget':              'views/auth/widget',
+        'auth.modal':               'views/auth/modal',
+        'auth.provider.regular':    'views/auth/providers/regular',
+        'auth.provider.uLogin':     'views/auth/providers/uLogin',
 
         /**
          * Кастомные контролы

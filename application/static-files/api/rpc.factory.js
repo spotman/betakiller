@@ -36,31 +36,33 @@ define([
             return deferred;
         }
 
-        function processQueue() {
+        function resolveQueue() {
+            processQueue("resolve");
+        }
 
-            console.log("processing queue:");
-            console.log(requestQueue);
+        function rejectQueue() {
+            processQueue("reject");
+        }
+
+        function processQueue(method) {
+
+            console.log("processing queue with [" + method + "] method");
+//            console.log(requestQueue);
 
             // Walk through queue and resolve each deferred
             while (requestQueue.length)
             {
-                requestQueue.shift().resolve();
+                var deferred = requestQueue.shift();
+                deferred[method]();
             }
 
-//            $.each(requestQueue, function(index, deferred) {
-//                console.log(arguments);
-//                deferred.resolve();
-//            });
-
-            // Cleanup queue
-            clearQueue();
-
             console.log("queue processed");
-            console.log("queue length = " + requestQueue.length);
+//            console.log("queue length = " + requestQueue.length);
         }
 
         function clearQueue() {
             requestQueue = [];
+            console.log("queue cleared");
         }
 
         function lock() {
@@ -110,10 +112,20 @@ define([
                 unlock();
 
                 // Process all queued requests
-                processQueue();
+                resolveQueue();
+
+                // Cleanup queue
+                clearQueue();
             };
 
             var errorCallback = function() {
+
+                // Reject all queued request
+                rejectQueue();
+
+                // Cleanup queue
+                clearQueue();
+
                 // Allow repeat of the auth
                 unlock();
             };

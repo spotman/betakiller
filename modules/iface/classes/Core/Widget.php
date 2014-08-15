@@ -63,7 +63,9 @@ abstract class Core_Widget extends Controller {
         $response = $response ?: Response::factory();
 
         if ( ! class_exists($class_name) )
-            throw new Widget_Exception('Can not find widget :class', array(':class' => $class_name));
+        {
+            $class_name = 'Widget_Default';
+        }
 
         /** @var Widget $widget */
         return new $class_name($name, $request, $response);
