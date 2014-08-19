@@ -1,5 +1,6 @@
 define([
-    "jquery"
+    "jquery",
+    "jquery.utils"
 ], function($) {
 
     return {

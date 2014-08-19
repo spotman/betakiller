@@ -1,23 +1,29 @@
-<div id="auth-widget-container">
-    {{ widget("Auth") }}
-</div>
+{{ assets("require.js", "jquery") }}
 
-<script type="application/javascript">
+{% block content %}
 
-    require([
-        "jquery",
-        "auth.login"
-    ], function($, login) {
+    <div id="auth-widget-container">
+        {{ widget("Auth") }}
+    </div>
 
-        $(function(){
+    <script type="application/javascript">
 
-            login.initialize(
-                $("#auth-widget-container"),
-                "{{ redirect_url }}"
-            );
+        require([
+            "jquery",
+            "auth.login"
+        ], function($, login) {
+
+            $(function(){
+
+                login.initialize(
+                    $("#auth-widget-container"),
+                    "{{ redirect_url }}"
+                );
+
+            });
 
         });
 
-    });
+    </script>
 
-</script>
+{% endblock %}

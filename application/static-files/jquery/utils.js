@@ -20,13 +20,13 @@
                     error_callback && error_callback(r.message);
                     break;
 
-                case "auth":
-                    window.top.location.href = '/logout';
-                    break;
-
-                case "refresh":
-                    window.top.location.href = '/';
-                    break;
+//                case "auth":
+//                    window.top.location.href = '/logout';
+//                    break;
+//
+//                case "refresh":
+//                    window.top.location.href = '/';
+//                    break;
 
                 default:
                     error_callback && error_callback(null);
