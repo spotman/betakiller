@@ -158,7 +158,7 @@ abstract class Core_IFace {
         return URL_Dispatcher::instance()->in_stack($this);
     }
 
-    public function url(URL_Parameters $parameters = NULL)
+    public function url(URL_Parameters $parameters = NULL, $with_domain = TRUE)
     {
         $parts = array();
 
@@ -178,7 +178,9 @@ abstract class Core_IFace {
             while ( $parent );
         }
 
-        return URL::site('/'.implode('/', array_reverse($parts)), TRUE);
+        $path = '/'.implode('/', array_reverse($parts));
+
+        return $with_domain ? URL::site($path, TRUE) : $path;
     }
 
     protected function make_uri(URL_Parameters $parameters = NULL)
