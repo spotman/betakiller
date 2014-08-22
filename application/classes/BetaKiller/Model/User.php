@@ -189,14 +189,29 @@ class BetaKiller_Model_User extends Model_Auth_User implements Notification_User
         return $this->get('first_name');
     }
 
+    public function set_first_name($value)
+    {
+        return $this->set('first_name', $value);
+    }
+
     public function get_last_name()
     {
         return $this->get('last_name');
     }
 
+    public function set_last_name($value)
+    {
+        return $this->set('last_name', $value);
+    }
+
     public function get_email()
     {
         return $this->get('email');
+    }
+
+    public function set_email($value)
+    {
+        return $this->set('email', $value);
     }
 
     /**

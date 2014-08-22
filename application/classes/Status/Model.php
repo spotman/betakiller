@@ -2,6 +2,26 @@
 
 abstract class Status_Model extends Graph_Node_Model {
 
+    protected function _initialize()
+    {
+        $this->has_many([
+            $this->get_related_model_key()  =>  [
+                'model'         =>  $this->get_related_model_name(),
+                'foreign_key'   =>  $this->get_related_model_fk(),
+            ]
+        ]);
+
+        parent::_initialize();
+    }
+
+    /**
+     * @return int
+     */
+    public function get_related_count()
+    {
+        return $this->get_related_model_relation()->count_all();
+    }
+
     /**
      * @param null $id
      * @return Status_Transition_Model
@@ -42,5 +62,36 @@ abstract class Status_Model extends Graph_Node_Model {
     {
         return $this->get_allowed_transitions($this, NULL);
     }
+
+    /**
+     * @return array
+     */
+    public function get_allowed_target_transitions_codename_array()
+    {
+        return $this->get_allowed_target_transitions()->as_array(NULL, 'codename');
+    }
+
+    /**
+     * @return Status_Related_Model
+     */
+    protected function get_related_model_relation()
+    {
+        return $this->get($this->get_related_model_key());
+    }
+
+    /**
+     * @return string
+     */
+    abstract protected function get_related_model_key();
+
+    /**
+     * @return string
+     */
+    abstract protected function get_related_model_name();
+
+    /**
+     * @return string
+     */
+    abstract protected function get_related_model_fk();
 
 }
