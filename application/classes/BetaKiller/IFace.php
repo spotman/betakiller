@@ -2,11 +2,16 @@
 
 abstract class BetaKiller_IFace extends Core_IFace {
 
-    protected function process_api_response(API_Response $response)
+    final protected function process_api_response(API_Response $response)
     {
         $this->set_last_modified( $response->get_last_modified() );
 
         return $response->get_data();
+    }
+
+    final protected function current_user($allow_guest = FALSE)
+    {
+        return Env::user($allow_guest);
     }
 
 }
