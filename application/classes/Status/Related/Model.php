@@ -113,6 +113,16 @@ abstract class Status_Related_Model extends ORM {
         return $this->where($this->get_status_relation_foreign_key(), $not_equal ? '<>' : '=', $status_id);
     }
 
+    /**
+     * @param array $status_ids
+     * @param bool $not_equal
+     * @return $this
+     */
+    public function filter_statuses(array $status_ids, $not_equal = FALSE)
+    {
+        return $this->where($this->get_status_relation_foreign_key(), $not_equal ? 'NOT IN' : 'IN', $status_ids);
+    }
+
     public function get_status_id()
     {
         return $this->get($this->get_status_relation_foreign_key());
