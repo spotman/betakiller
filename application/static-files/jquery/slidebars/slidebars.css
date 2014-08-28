@@ -1,6 +1,6 @@
 /* -----------------------------------
  * Slidebars
- * Version 0.9.4
+ * Version 0.10.2
  * http://plugins.adchsm.me/slidebars/
  *
  * Written by Adam Smith
@@ -22,7 +22,8 @@
  * 001 - Box Model, Html & Body
  */
 
-html, body, #sb-site, .sb-slidebar {
+html, body, #sb-site, .sb-site-container, .sb-slidebar {
+	/* Set box model to prevent any user added margins or paddings from altering the widths or heights. */
 	margin: 0;
 	padding: 0;
 	-webkit-box-sizing: border-box;
@@ -36,23 +37,30 @@ html, body {
 }
 
 html {
-	height: 100%;
+	height: 100%; /* Site is as tall as device. */
 }
 
 body {
 	min-height: 100%;
-	position: relative;
+	height: auto;
+	position: relative; /* Required for static Slidebars to function properly. */
+}
+
+/* Site scroll locking - prevent site from scrolling when a Slidebar is open, except when static Slidebars are only available. */
+html.sb-scroll-lock.sb-active:not(.sb-static) {
+	overflow: hidden;
 }
 
 /* ----------
  * 002 - Site
  */
 
-#sb-site {
+#sb-site, .sb-site-container {
+	/* You may now use class .sb-site-container instead of #sb-site and use your own id. However please make sure you don't set any of the following styles any differently on your id. */
 	width: 100%;
 	position: relative;
 	z-index: 1; /* Site sits above Slidebars */
-	background-color: #ffffff; /* Default background colour, overwrite this with your own css. */
+	background-color: #ffffff; /* Default background colour, overwrite this with your own css. I suggest moving your html or body background styling here. Making this transparent will allow the Slidebars beneath to be visible. */
 }
 
 /* ---------------
@@ -65,8 +73,9 @@ body {
 	position: fixed;
 	top: 0;
 	z-index: 0; /* Slidebars sit behind sb-site. */
-	visibility: hidden; /* Initially hide the Slidebars. */
+	display: none; /* Initially hide the Slidebars. Changed from visibility to display to allow -webkit-overflow-scrolling. */
 	background-color: #222222; /* Default Slidebars background colour, overwrite this with your own css. */
+	-webkit-transform: translate(0px); /* Fixes issues with translated and z-indexed elements on iOS 7. */
 }
 
 .sb-left {
@@ -83,14 +92,18 @@ html.sb-static .sb-slidebar,
 }
 
 .sb-slidebar.sb-active {
-	visibility: visible; /* Makes Slidebars visibile when open. */
+	display: block; /* Makes Slidebars visibile when open. Changed from visibility to display to allow -webkit-overflow-scrolling. */
 }
 
-.sb-slidebar.sb-style-overlay {
+.sb-style-overlay {
 	z-index: 9999; /* Set z-index high to ensure it overlays any other site elements. */
 }
 
-/* Slidebar widths for devices that don't support media queries. */
+.sb-momentum-scrolling {
+	-webkit-overflow-scrolling: touch; /* Adds native momentum scrolling for iOS & Android devices. */
+}
+
+/* Slidebar widths for browsers/devices that don't support media queries. */
 	.sb-slidebar {
 		width: 30%;
 	}
@@ -103,7 +116,7 @@ html.sb-static .sb-slidebar,
 		width: 45%;
 	}
 
-@media (max-width: 480px) { /* Slidebar width on extra small screens. */
+@media (max-width: 480px) { /* Slidebar widths on extra small screens. */
 	.sb-slidebar {
 		width: 70%;
 	}
@@ -117,7 +130,7 @@ html.sb-static .sb-slidebar,
 	}
 }
 
-@media (min-width: 481px) { /* Slidebar width on small screens. */
+@media (min-width: 481px) { /* Slidebar widths on small screens. */
 	.sb-slidebar {
 		width: 55%;
 	}
@@ -131,7 +144,7 @@ html.sb-static .sb-slidebar,
 	}
 }
 
-@media (min-width: 768px) { /* Slidebar width on small screens. */
+@media (min-width: 768px) { /* Slidebar widths on medium screens. */
 	.sb-slidebar {
 		width: 40%;
 	}
@@ -145,7 +158,7 @@ html.sb-static .sb-slidebar,
 	}
 }
 
-@media (min-width: 992px) { /* Slidebar width on medium screens. */
+@media (min-width: 992px) { /* Slidebar widths on large screens. */
 	.sb-slidebar {
 		width: 30%;
 	}
@@ -159,7 +172,7 @@ html.sb-static .sb-slidebar,
 	}
 }
 
-@media (min-width: 1200px) { /* Slidebar width on large screens. */
+@media (min-width: 1200px) { /* Slidebar widths on extra large screens. */
 	.sb-slidebar {
 		width: 20%;
 	}
@@ -177,7 +190,7 @@ html.sb-static .sb-slidebar,
  * 004 - Animation
  */
 
-.sb-slide, #sb-site, .sb-slidebar {
+.sb-slide, #sb-site, .sb-site-container, .sb-slidebar {
 	-webkit-transition: -webkit-transform 400ms ease;
 	   -moz-transition: -moz-transform 400ms ease;
 	     -o-transition: -o-transform 400ms ease;
@@ -191,5 +204,5 @@ html.sb-static .sb-slidebar,
  */
  
 .sb-hide { 
-	display: none; /* May be applied to control classes when Slidebars is disabled over a certain width. */
+	display: none; /* Optionally applied to control classes when Slidebars is disabled over a certain width. */
 }
