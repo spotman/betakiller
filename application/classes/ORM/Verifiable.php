@@ -81,9 +81,9 @@ class ORM_Verifiable extends ORM {
             ->set('created_at', DB::expr('CURRENT_TIMESTAMP'));
     }
 
-    public function filter_approved(Model_User $current_user)
+    public function filter_approved_with_acl(Model_User $current_user = NULL)
     {
-        $is_moderator = $current_user->is_moderator();
+        $is_moderator = $current_user AND $current_user->is_moderator();
 
         // Модератору показываем без фильтрации
         $all_allowed = $is_moderator;
@@ -91,14 +91,21 @@ class ORM_Verifiable extends ORM {
         if ( ! $all_allowed )
         {
             // Фильтруем неподтверждённые варианты выбора
-            $this
-                ->and_where_open()
-                ->where("approved_by", "IS NOT", NULL)
-                ->or_where("created_by", "=", $current_user->get_id())
-                ->and_where_close();
+            $this->and_where_open()->filter_approved();
+
+            // Если указан пользователь, показываем созданные им варианты
+            if ( $current_user )
+                $this->or_where("created_by", "=", $current_user->get_id());
+
+            $this->and_where_close();
         }
 
         return $this;
+    }
+
+    public function filter_approved()
+    {
+        return $this->where("approved_by", "IS NOT", NULL);
     }
 
     protected function _autocomplete($query, array $search_fields)
@@ -106,7 +113,7 @@ class ORM_Verifiable extends ORM {
         $current_user = Env::user();
 
         // Фильтруем неподтверждённые варианты выбора, если это нужно
-        $this->filter_approved($current_user);
+        $this->filter_approved_with_acl($current_user);
 
         return parent::_autocomplete($query, $search_fields);
     }
