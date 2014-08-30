@@ -171,12 +171,23 @@ class BetaKiller_Model_User extends Model_Auth_User implements Notification_User
     }
 
     /**
-     * Возвращает TRUE, если аккаунт пользователя включён
+     * Returns TRUE, user account is switched on
+     *
      * @return bool
      */
     public function is_active()
     {
         return ( $this->loaded() AND $this->get('is_active') );
+    }
+
+    /**
+     * Filters only active users
+     *
+     * @return $this
+     */
+    public function filter_active()
+    {
+        return $this->where('is_active', '=', TRUE);
     }
 
     public function get_full_name()

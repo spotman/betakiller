@@ -21,11 +21,27 @@ class BetaKiller_Model_Role extends Model_Auth_Role
     }
 
     /**
+     * Returns filtered users relation
+     *
+     * @param bool $include_not_active
+     * @return Model_User
+     */
+    public function get_users($include_not_active = FALSE)
+    {
+        $users = $this->get_users_relation();
+
+        if ( ! $include_not_active )
+            $users->filter_active();
+
+        return $users;
+    }
+
+    /**
      * Returns relation for users with current role
      *
      * @return Model_User
      */
-    public function get_users()
+    protected function get_users_relation()
     {
         return $this->get('users');
     }

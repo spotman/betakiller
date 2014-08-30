@@ -38,10 +38,7 @@ abstract class Assets_Provider_Image extends Assets_Provider {
 
     public function prepare_preview(Assets_Model $model, $size)
     {
-        $allowed_sizes = $this->get_allowed_preview_sizes();
-
-        if ( ! $allowed_sizes OR ! in_array($size, $allowed_sizes) )
-            throw new Assets_Provider_Exception('Preview is not allowed');
+        $this->check_size($size);
 
         $content = $this->get_content($model);
 
@@ -58,6 +55,14 @@ abstract class Assets_Provider_Image extends Assets_Provider {
             $height,
             $this->get_preview_quality()
         );
+    }
+
+    public function check_size($size)
+    {
+        $allowed_sizes = $this->get_allowed_preview_sizes();
+
+        if ( ! $allowed_sizes OR ! in_array($size, $allowed_sizes) )
+            throw new Assets_Provider_Exception('Preview size :size is not allowed', [':size' => $size]);
     }
 
     protected function _upload($model, $content)
