@@ -81,6 +81,12 @@ class BetaKiller_Twig_Extension extends Twig_Extension {
                 array($this, 'user_is_moderator')
             ),
 
+            new Twig_SimpleFunction(
+                'json_encode',
+                'json_encode',
+                array('is_safe' => array('html'))
+            ),
+
         );
     }
 
