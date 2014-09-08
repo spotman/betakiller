@@ -81,6 +81,17 @@ class ORM_Verifiable extends ORM {
             ->set('created_at', DB::expr('CURRENT_TIMESTAMP'));
     }
 
+    /**
+     * Returns TRUE if provided user created current record
+     *
+     * @param Model_User $user
+     * @return bool
+     */
+    public function is_creator(Model_User $user)
+    {
+        return ( $user->pk() == $this->get_creator_relation()->pk() );
+    }
+
     public function filter_approved_with_acl(Model_User $current_user = NULL)
     {
         $is_moderator = $current_user AND $current_user->is_moderator();
