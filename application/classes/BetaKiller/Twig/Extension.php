@@ -36,6 +36,12 @@ class BetaKiller_Twig_Extension extends Twig_Extension {
             ),
 
             new Twig_SimpleFunction(
+                'js_build',
+                array($this, 'js_build'),
+                array('is_safe' => array('html'))
+            ),
+
+            new Twig_SimpleFunction(
                 'css',
                 array($this, 'css'),
                 array('is_safe' => array('html'))
@@ -100,6 +106,22 @@ class BetaKiller_Twig_Extension extends Twig_Extension {
      */
     public function js()
     {
+        $instance = JS::instance();
+
+        foreach ( func_get_args() as $js )
+        {
+            $instance->add($js);
+        }
+    }
+
+    /**
+     * Helper for adding JS builds (Require.JS, etc) in production environment
+     */
+    public function js_build()
+    {
+        if ( ! Kohana::in_production() )
+            return;
+
         $instance = JS::instance();
 
         foreach ( func_get_args() as $js )
