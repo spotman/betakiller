@@ -96,6 +96,17 @@ class BetaKiller_Twig_Extension extends Twig_Extension {
         );
     }
 
+    public function getFilters()
+    {
+        return [
+
+            new Twig_SimpleFilter('bool', function ($value) {
+                return $value ? 'true' : 'false';
+            }),
+
+        ];
+    }
+
     public function in_production()
     {
         return Kohana::in_production();

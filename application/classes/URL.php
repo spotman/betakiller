@@ -25,7 +25,7 @@ class URL extends Kohana_URL {
         $clean = strtr($string, $tr);
 
         // Replace all incorrect symbols
-        $clean = preg_replace("/[^A-Za-z-_]+/", $delimiter, $clean);
+        $clean = preg_replace("/[^0-9A-Za-z-_]+/", $delimiter, $clean);
 
         // Final cleanup
         $clean = strtolower(trim($clean, '-'));
