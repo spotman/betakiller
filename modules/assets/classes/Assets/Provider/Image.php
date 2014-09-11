@@ -65,7 +65,7 @@ abstract class Assets_Provider_Image extends Assets_Provider {
             throw new Assets_Provider_Exception('Preview size :size is not allowed', [':size' => $size]);
     }
 
-    protected function _upload($model, $content)
+    protected function _upload($model, $content, array $_post_data)
     {
         return $this->resize(
             $content,

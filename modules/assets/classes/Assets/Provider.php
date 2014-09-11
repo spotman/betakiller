@@ -96,10 +96,11 @@ abstract class Assets_Provider {
 
     /**
      * @param array $_file Item from $_FILES
+     * @param array $_post_data Array with items from $_POST
      * @return Assets_Model
      * @throws Assets_Provider_Exception
      */
-    public function upload(array $_file)
+    public function upload(array $_file, array $_post_data)
     {
         // Check permissions
         if ( ! $this->check_upload_permissions() )
@@ -128,7 +129,7 @@ abstract class Assets_Provider {
         $content = file_get_contents($full_path);
 
         // Custom processing
-        $content = $this->_upload($model, $content);
+        $content = $this->_upload($model, $content, $_post_data);
 
         // Put data into model
         $model
@@ -152,9 +153,10 @@ abstract class Assets_Provider {
      *
      * @param Assets_Model $model
      * @param string $content
+     * @param array $_post_data
      * @return string
      */
-    protected function _upload($model, $content)
+    protected function _upload($model, $content, array $_post_data)
     {
         // Empty by default
         return $content;

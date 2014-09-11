@@ -26,8 +26,11 @@ class Controller_Assets extends Controller {
         // Getting first uploaded file
         $_file = array_shift($_FILES);
 
+        // Getting additional POST data
+        $_post_data = $this->request->post();
+
         // Uploading via provider
-        $model = $this->_provider->upload($_file);
+        $model = $this->_provider->upload($_file, $_post_data);
 
         // Returns
         $this->send_json(self::JSON_SUCCESS, $model->to_json());
