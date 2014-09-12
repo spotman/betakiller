@@ -59,7 +59,9 @@ abstract class Core_URL_Dispatcher {
         // Root requested - search for default IFace
         if ( ! $uri_parts )
         {
-            return $this->iface_provider()->get_default();
+            $default_iface = $this->iface_provider()->get_default();
+            $this->push_to_stack($default_iface);
+            return $default_iface;
         }
 
         $parent_iface = NULL;
@@ -84,7 +86,7 @@ abstract class Core_URL_Dispatcher {
 
             $parent_iface = $iface_instance;
 
-            $this->_iface_stack[ $iface_instance->get_codename() ] = $iface_instance;
+            $this->push_to_stack($iface_instance);
         }
 
         // Return last IFace
@@ -149,6 +151,11 @@ abstract class Core_URL_Dispatcher {
     public function stack()
     {
         return $this->_iface_stack;
+    }
+
+    protected function push_to_stack(IFace $iface)
+    {
+        $this->_iface_stack[ $iface->get_codename() ] = $iface;
     }
 
     public function parse_dynamic_uri_part($prototype_string, $uri_value)
