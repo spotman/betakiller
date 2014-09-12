@@ -140,7 +140,7 @@ class BetaKiller_Twig_Extension extends Twig_Extension {
      */
     public function js_build()
     {
-        if ( ! Kohana::in_production() )
+        if ( Kohana::$environment != Kohana::PRODUCTION )
             return;
 
         $instance = JS::instance();
