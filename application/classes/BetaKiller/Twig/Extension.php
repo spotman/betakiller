@@ -93,6 +93,16 @@ class BetaKiller_Twig_Extension extends Twig_Extension {
                 array('is_safe' => array('html'))
             ),
 
+            /**
+             * Добавляет элемент в тег <title> (автоматически срендерится при обработке шаблона)
+             */
+            new Twig_SimpleFunction(
+                'title',
+                function($value) {
+                    Meta::instance()->title($value, Meta::TITLE_APPEND);
+                }
+            ),
+
         );
     }
 

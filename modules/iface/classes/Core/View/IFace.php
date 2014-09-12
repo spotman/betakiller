@@ -52,7 +52,7 @@ abstract class Core_View_IFace {
         $this->_data = $this->_iface->get_data();
 
         // For changing wrapper from view via $_this->wrapper('html')
-        $this->_data['_this'] = $this;
+        $this->_data['_iface'] = $this;
 
         $iface_view->set($this->_data);
 
