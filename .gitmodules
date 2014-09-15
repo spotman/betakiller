@@ -37,3 +37,6 @@
 [submodule "modules/robots-txt"]
 	path = modules/robots-txt
 	url = git@github.com:spotman/kohana-robots.txt.git
+[submodule "modules/i18n-plural"]
+	path = modules/i18n-plural
+	url = git@github.com:spotman/kohana-i18n-plural.git

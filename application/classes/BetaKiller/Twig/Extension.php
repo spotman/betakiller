@@ -110,8 +110,20 @@ class BetaKiller_Twig_Extension extends Twig_Extension {
     {
         return [
 
+            /**
+             * Converts boolean value to JavaScript string representation
+             */
             new Twig_SimpleFilter('bool', function ($value) {
                 return $value ? 'true' : 'false';
+            }),
+
+            /**
+             * International pluralization via translation strings
+             * The first key-value pair would be used if no context provided
+             * @example ":count lots"|plural({ ":count": lotsCount })
+             */
+            new Twig_SimpleFilter('plural', function ($text, array $values, $context = NULL) {
+                return ___($text, $context ?: current($values), $values);
             }),
 
         ];
@@ -140,7 +152,8 @@ class BetaKiller_Twig_Extension extends Twig_Extension {
      */
     public function js_build()
     {
-        if ( Kohana::$environment != Kohana::PRODUCTION )
+        // TODO Временно отключаем пока не сделаны билды
+        if ( TRUE OR ! Kohana::in_production() )
             return;
 
         $instance = JS::instance();

@@ -19,6 +19,7 @@ return array(
     'email'                 => MODPATH.'email',                 // Mailing module
     'jsonrpc'               => MODPATH.'jsonrpc',               // JSON-RPC server
     'image'                 => MODPATH.'image',                 // Image manipulation
+    'i18n-plural'           => MODPATH.'i18n-plural',           // International pluralization
     'static-files'          => MODPATH.'static-files',          // Static Files (JS/CSS/pictures)
 //    'locator'               => MODPATH.'locator',               // URL mapping to interfaces
     'mangodb'               => MODPATH.'mangodb',               // ODM обёртка для mongodb
