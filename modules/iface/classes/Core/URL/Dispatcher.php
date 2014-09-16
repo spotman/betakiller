@@ -22,6 +22,11 @@ abstract class Core_URL_Dispatcher {
     protected $_iface_stack = [];
 
     /**
+     * @var IFace
+     */
+    protected $_current_iface;
+
+    /**
      * @return URL_Parameters
      */
     public function parameters()
@@ -153,9 +158,16 @@ abstract class Core_URL_Dispatcher {
         return $this->_iface_stack;
     }
 
+    public function current_iface()
+    {
+        return $this->_current_iface;
+    }
+
     protected function push_to_stack(IFace $iface)
     {
         $this->_iface_stack[ $iface->get_codename() ] = $iface;
+        $this->_current_iface = $iface;
+        return $this;
     }
 
     public function parse_dynamic_uri_part($prototype_string, $uri_value)

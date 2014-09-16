@@ -26,6 +26,11 @@ class Kohana_Email {
     protected static $_config;
 
     /**
+     * @var string Default From header value
+     */
+    protected static $_sender;
+
+    /**
      * Creates a SwiftMailer instance.
      *
      * @param null|array $config DSN connection string
@@ -75,6 +80,9 @@ class Kohana_Email {
 			break;
 		}
 
+        // Getting Sender
+        static::$_sender = static::config()->get('sender');
+
 		// Create the SwiftMailer instance
 		return static::$mail = Swift_Mailer::newInstance($transport);
 	}
@@ -90,12 +98,12 @@ class Kohana_Email {
      * @param string|array $from sender email (and name)
      * @param string|array $to recipient email (and name), or an array of To, Cc, Bcc names
      * @param string $subject message subject
-     * @param string $message message body
+     * @param string $body message body
      * @param bool $html send email as HTML
      * @param bool $attach attach filename
      * @return int                      number of emails sent
      */
-    public static function send($from, $to, $subject, $message, $html = FALSE, $attach = FALSE)
+    public static function send($from, $to, $subject, $body, $html = FALSE, $attach = FALSE)
 	{
 		// Connect to SwiftMailer
 		(static::$mail === NULL) and email::connect();
@@ -104,12 +112,12 @@ class Kohana_Email {
 		$html = ($html === TRUE) ? 'text/html' : 'text/plain';
 
 		// Create the message
-		$message = Swift_Message::newInstance($subject, $message, $html, 'utf-8');
+		$msg = Swift_Message::newInstance($subject, $body, $html, 'utf-8');
 
 		if (is_string($to))
 		{
 			// Single recipient
-			$message->setTo($to);
+			$msg->setTo($to);
 		}
 		elseif (is_array($to))
 		{
@@ -133,33 +141,59 @@ class Kohana_Email {
 				if (is_array($set))
 				{
 					// Add a recipient with name
-					$message->$method($set[0], $set[1]);
+					$msg->$method($set[0], $set[1]);
 				}
 				else
 				{
 					// Add a recipient without name
-					$message->$method($set);
+					$msg->$method($set);
 				}
 			}
 		}
 
-		if (is_string($from))
-		{
-			// From without a name
-			$message->setFrom($from);
-		}
-		elseif (is_array($from))
-		{
-			// From with a name
-			$message->setFrom($from[0], $from[1]);
-		}
+        $sender = static::$_sender;
 
-        if( $attach )
+        // Use Sender email if no From email specified
+        if ( !$from )
+            $from = $sender;
+
+        // From
+        if (is_string($from))
         {
-            $message->attach(Swift_Attachment::fromPath($attach));
+            // From without a name
+            $msg->setFrom($from);
+
+            // Set Reply-To header email only
+            $msg->setReplyTo($from);
+        }
+        elseif (is_array($from))
+        {
+            // From with a name
+            $msg->setFrom($from[0], $from[1]);
+
+            // Set Reply-To header email with name
+            $msg->setReplyTo($from[0], $from[1]);
         }
 
-		return static::$mail->send($message);
+        // Sender
+        if (is_string($sender))
+        {
+            // From without a name
+            $msg->setSender($sender);
+        }
+        elseif (is_array($sender))
+        {
+            // Set Reply-To header email with name
+            $msg->setSender($sender[0], $sender[1]);
+        }
+
+        // Attachments
+        if( $attach )
+        {
+            $msg->attach(Swift_Attachment::fromPath($attach));
+        }
+
+		return static::$mail->send($msg);
 	}
 
 } // End email

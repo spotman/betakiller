@@ -77,7 +77,7 @@ class IFace_Model_Provider implements IFace_Model_Provider_Interface {
             : $this->get_root();
     }
 
-    public function get_children(IFace_Model $parent_model = NULL)
+    public function get_children(IFace_Model $parent_model)
     {
         $models = $parent_model->get_children();
 
@@ -110,7 +110,7 @@ class IFace_Model_Provider implements IFace_Model_Provider_Interface {
     {
         $models = array();
 
-        foreach ( $this->get_sources() as $source )
+        foreach ( $this->get_sources(TRUE) as $source )
         {
             $models = array_merge($models, $source->get_root());
         }
@@ -120,7 +120,7 @@ class IFace_Model_Provider implements IFace_Model_Provider_Interface {
         return $models;
     }
 
-    protected function get_sources()
+    protected function get_sources($reverse = FALSE)
     {
         if ( ! $this->_sources )
         {
@@ -130,7 +130,7 @@ class IFace_Model_Provider implements IFace_Model_Provider_Interface {
             );
         }
 
-        return $this->_sources;
+        return $reverse ? array_reverse($this->_sources) : $this->_sources;
     }
 
 //    protected function source_exec($method)

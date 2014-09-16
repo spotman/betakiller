@@ -21,17 +21,14 @@ define([
          */
         function addToQueue(args) {
 
-            var fullMethod = args[1] + "." + args[2];
+            var deferred = $.Deferred();
 
-            var deferred = $.Deferred()
-                .done(function() {
-                    console.log(fullMethod + " processed from queue");
-                    return doRequest(args);
-                });
+            requestQueue.push({
+                args: args,
+                deferred: deferred
+            });
 
-            requestQueue.push(deferred);
-
-            console.log(fullMethod + " is queued");
+//            console.log(args[1] + "." + args[2] + " is queued");
 
             return deferred;
         }
@@ -46,33 +43,52 @@ define([
 
         function processQueue(method) {
 
-            console.log("processing queue with [" + method + "] method");
+//            console.log("processing queue with [" + method + "] method");
 //            console.log(requestQueue);
 
             // Walk through queue and resolve each deferred
             while (requestQueue.length)
             {
-                var deferred = requestQueue.shift();
-                deferred[method]();
+                var queuedRequest   = requestQueue.shift(),
+                    queuedArgs      = queuedRequest.args,
+                    queuedDeferred  = queuedRequest.deferred;
+
+//                console.log(method + " queued " + queuedArgs[0] + "." + queuedArgs[0]);
+
+                if (method == "resolve") {
+                    doRequest(queuedArgs)
+                        .done(function() {
+//                            console.log(method + " queued " + queuedArgs[0] + "." + queuedArgs[0] + " done!");
+                            queuedDeferred.resolveWith({}, arguments);
+                        })
+                        .fail(function() {
+//                            console.log(method + " queued " + queuedArgs[0] + "." + queuedArgs[0] + " failed!");
+                            queuedDeferred.rejectWith({}, arguments);
+                        });
+                } else if (method == "reject") {
+                    queuedDeferred.reject();
+                } else {
+                    throw new Error("Unknown method " + method);
+                }
             }
 
-            console.log("queue processed");
+//            console.log("queue processed");
 //            console.log("queue length = " + requestQueue.length);
         }
 
         function clearQueue() {
             requestQueue = [];
-            console.log("queue cleared");
+//            console.log("queue cleared");
         }
 
         function lock() {
             authLock = true;
-            console.log("API locked");
+//            console.log("API locked");
         }
 
         function unlock() {
             authLock = false;
-            console.log("API unlocked");
+//            console.log("API unlocked");
         }
 
         function doRequest(requestArguments) {

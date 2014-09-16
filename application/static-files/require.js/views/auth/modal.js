@@ -55,9 +55,9 @@ define([
             };
 
             var widgetSuccessCallback = function() {
-                parentSuccessCallback();
                 success = true;
                 $modal.modal("hide");
+                parentSuccessCallback();
             };
 
             authWidget.initialize(

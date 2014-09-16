@@ -61,7 +61,7 @@
                     }
                     catch(e)
                     {
-                        console.error(e.message, url, r, data);
+                        console.error(e.message, url, data);
                     }
                 }
             };

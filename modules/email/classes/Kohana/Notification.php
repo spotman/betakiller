@@ -37,16 +37,11 @@ abstract class Kohana_Notification {
             {
                 $body = $this->render_message($message, static::TRANSPORT_EMAIL);
 
-                $from = $message->get_from();
-
-                if ( $from )
-                {
-                    // TODO Добавление заголовков об отправке от имени отправляющего "через" дефолтный почтовый ящик
-                }
+                $fromUser = $message->get_from();
 
                 // Email notification
                 Email::send(
-                    NULL,
+                    $fromUser ? $fromUser->get_email() : NULL,
                     $target->get_email(),
                     $subj,
                     $body,
