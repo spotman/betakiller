@@ -4,6 +4,9 @@
  * Automatically generated from previous translation file.
  */
 return array (
+  'Crop size :size is not allowed' => 'Crop size :size is not allowed',
+  'Crop size must have width AND height defined' => 'Crop size must have width AND height defined',
+  'Preview size :size is not allowed' => 'Preview size :size is not allowed',
   'Incorrect path provided' => 'Incorrect path provided',
   'Preview is not allowed' => 'Preview is not allowed',
   'Can not create path :dir' => 'Can not create path :dir',

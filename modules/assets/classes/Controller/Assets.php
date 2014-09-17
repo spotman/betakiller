@@ -71,6 +71,25 @@ class Controller_Assets extends Controller {
         $this->send_file($preview_content, $model->get_mime());
     }
 
+    public function action_crop()
+    {
+        $this->provider_factory();
+
+        if ( !($this->_provider instanceof Assets_Provider_Image) )
+            throw new Assets_Exception('Cropping can be processed only by instances of Assets_Provider_Image');
+
+        $size = $this->param('size');
+        $model = $this->from_item_deploy_url();
+
+        $cropped_content = $this->_provider->crop($model, $size);
+
+        // Deploy to cache
+        $this->deploy($model, $cropped_content);
+
+        // Send file content + headers
+        $this->send_file($cropped_content, $model->get_mime());
+    }
+
     public function action_delete()
     {
         // This method responds via JSON (all exceptions will be caught automatically)
