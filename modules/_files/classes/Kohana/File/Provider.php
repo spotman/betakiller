@@ -61,7 +61,6 @@ abstract class Kohana_File_Provider {
             : Arr::path($config, $key, $default_value);
     }
 
-    // TODO
     public function get_path()
     {
         return '';
@@ -78,13 +77,11 @@ abstract class Kohana_File_Provider {
     }
 
 //    /**
-//     * @todo
 //     * @param File_Model_Interface $file
 //     * @return File
 //     */
 //    public function get(File_Model_Interface $file);
 //
-//    // @todo
 //    public function put(File_Model_Interface $file);
 
 }

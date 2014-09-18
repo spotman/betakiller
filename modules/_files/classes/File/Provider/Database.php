@@ -19,7 +19,6 @@ class File_Provider_Database extends File_Provider {
         // Making full path of requested file
         $full_path = $base_path.DIRECTORY_SEPARATOR.$filename;
 
-        // TODO
         $storage_codename = '';
 
         // Getting storage

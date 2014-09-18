@@ -41,7 +41,6 @@ class Assets_Storage_CFS extends Assets_Storage_Local {
         throw new Assets_Storage_Exception('Implement me!');
 
 //        $found = Kohana::find_file($path)
-        // TODO: Implement _get() method.
     }
 
 }
