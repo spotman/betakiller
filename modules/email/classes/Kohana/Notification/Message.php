@@ -120,12 +120,20 @@ abstract class Kohana_Notification_Message {
         Notification::instance()->send($this);
     }
 
+    /**
+     * @param $template_name
+     * @return $this|Notification_Message
+     */
     public function set_template_name($template_name)
     {
         $this->_template_name = $template_name;
         return $this;
     }
 
+    /**
+     * @param array $data
+     * @return $this|Notification_Message
+     */
     public function set_template_data(array $data)
     {
         $this->_template_data = $data;
