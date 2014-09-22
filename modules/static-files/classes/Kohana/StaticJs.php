@@ -186,16 +186,26 @@ class Kohana_StaticJs extends StaticFile {
 		}
 		else
 		{
+            $js_code = '';
 			$build = array();
+
             foreach ($this->_js as $condition => $js_array)
 			{
 				foreach($js_array as $js => $condition)
                 {
-                    $build[$condition][] = $js;
+                    if (mb_substr($js, 0, 4) == 'http')
+                    {
+                        // External file, process without building
+                        $js_code .= $this->getLink($js, $condition);
+                    }
+                    else
+                    {
+                        // Internal file, build it
+                        $build[$condition][] = $js;
+                    }
                 }
 			}
 
-			$js_code = '';
             foreach ($build as $condition => $js)
             {
                 $build_name = $this->makeFileName($js, $condition, 'js');
