@@ -63,7 +63,9 @@ class BetaKiller_Twig_Extension extends Twig_Extension {
                 array($this, 'meta')
             ),
 
-            new Twig_SimpleFunction('iface_url', array($this, 'iface_url')),
+//            new Twig_SimpleFunction('iface_url', array($this, 'iface_url')),
+
+            new Twig_SimpleFunction('is_device', array($this, 'is_device')),
 
             new Twig_SimpleFunction(
                 'profiler',
@@ -160,7 +162,10 @@ class BetaKiller_Twig_Extension extends Twig_Extension {
 
         foreach ( func_get_args() as $js )
         {
-            $instance->add($js);
+            if ( mb_substr($js, 0, 4) == 'http' )
+                $instance->add_public($js);
+            else
+                $instance->add_static($js);
         }
     }
 
@@ -171,9 +176,12 @@ class BetaKiller_Twig_Extension extends Twig_Extension {
     {
         $instance = CSS::instance();
 
-        foreach ( func_get_args() as $js )
+        foreach ( func_get_args() as $css )
         {
-            $instance->add($js);
+            if ( mb_substr($css, 0, 4) == 'http' )
+                $instance->add_public($css);
+            else
+                $instance->add_static($css);
         }
     }
 
@@ -223,22 +231,27 @@ class BetaKiller_Twig_Extension extends Twig_Extension {
         }
     }
 
-    /**
-     * Только для статических ссылок!
-     * Динамические нужно генерировать на бэкенде
-     * @param $codename
-     * @return string
-     */
-    public function iface_url($codename)
-    {
-        $iface = IFace::by_codename($codename);
-
-        return $iface->url();
-    }
+//    /**
+//     * Только для статических ссылок!
+//     * Динамические нужно генерировать на бэкенде
+//     * @param $codename
+//     * @return string
+//     */
+//    public function iface_url($codename)
+//    {
+//        $iface = IFace::by_codename($codename);
+//
+//        return $iface->url();
+//    }
 
     public function show_profiler()
     {
         return Profiler::render();
+    }
+
+    public function is_device()
+    {
+        return Device::factory()->is_portable();
     }
 
     public function widget(array $context, $name, array $data = array())
