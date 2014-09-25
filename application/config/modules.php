@@ -17,6 +17,7 @@ return array(
 //    'dbv'                   => MODPATH.'dbv',                   // Database Version Control
     'device'                => MODPATH.'device',                // Device detection
     'email'                 => MODPATH.'email',                 // Mailing module
+    'geocode'               => MODPATH.'geocode',               // Geocoder-php wrapper
     'jsonrpc'               => MODPATH.'jsonrpc',               // JSON-RPC server
     'image'                 => MODPATH.'image',                 // Image manipulation
     'i18n-plural'           => MODPATH.'i18n-plural',           // International pluralization

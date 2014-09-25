@@ -45,23 +45,6 @@ class Kohana extends Kohana_Core {
         return $result;
     }
 
-    public static function doc_root()
-    {
-        static $path;
-
-        if ( ! $path )
-        {
-            $path = ( php_sapi_name() == 'cli' )
-                ? dirname(realpath($_SERVER['argv'][0]))
-                : getenv('DOCUMENT_ROOT');
-        }
-
-        if ( ! $path )
-            throw new Kohana_Exception('Can not detect document root');
-
-        return $path;
-    }
-
     public static function cache($name, $data = NULL, $lifetime = 60)
     {
         if ( ! static::$caching )

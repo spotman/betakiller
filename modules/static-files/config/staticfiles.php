@@ -36,7 +36,7 @@ return array(
     ),
 
     // Full path to site DOCROOT
-    'path' => realpath(Kohana::doc_root()). DIRECTORY_SEPARATOR,
+    'path' => MultiSite::instance()->doc_root().DIRECTORY_SEPARATOR,
 
     // Path to copy static files that are not build in one file
     'url' => '/assets/static/',

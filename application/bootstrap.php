@@ -40,6 +40,18 @@ setlocale(LC_ALL, 'ru_RU.utf-8', 'ru');
  */
 spl_autoload_register(array('Kohana', 'auto_load'));
 
+
+/**
+ * Enable autoloading of vendor libs
+ */
+
+$vendor_autoload = DOCROOT.'vendor/autoload.php';
+
+if ( ! file_exists($vendor_autoload) )
+    die("Init Composer first");
+
+require_once $vendor_autoload;
+
 /**
  * Optionally, you can enable a compatibility auto-loader for use with
  * older modules that have not been updated for PSR-0.
