@@ -40,3 +40,6 @@
 [submodule "modules/i18n-plural"]
 	path = modules/i18n-plural
 	url = git@github.com:spotman/kohana-i18n-plural.git
+[submodule "modules/geocode"]
+	path = modules/geocode
+	url = git@github.com:spotman/kohana-geocode.git

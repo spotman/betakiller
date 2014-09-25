@@ -1,7 +1,8 @@
 {
 	"require": {
-		"phpunit/phpunit": "3.7.*",
-		"elfet/deployer": "~1.1",
-        "anahkiasen/underscore-php" : "dev-master"
-	}
+        "phpunit/phpunit": "3.7.*",
+        "elfet/deployer": "~1.1",
+        "anahkiasen/underscore-php": "dev-master",
+        "willdurand/geocoder": "2.7.x"
+    }
 }
