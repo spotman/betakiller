@@ -105,6 +105,19 @@ class BetaKiller_Twig_Extension extends Twig_Extension {
                 }
             ),
 
+            /**
+             * Возвращает ссылку на родительский IFace
+             */
+            new Twig_SimpleFunction(
+                'parent_iface_url',
+                function() {
+                    return Env::url_dispatcher()
+                        ->current_iface()
+                        ->get_parent()
+                        ->url(Env::url_parameters());
+                }
+            ),
+
         );
     }
 
