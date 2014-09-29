@@ -1,16 +1,15 @@
 <?php defined('SYSPATH') or die('No direct script access.');
 
 /**
- * @author Spotman denis.terehov@tsap-spb.ru
+ * @author Spotman i.am@spotman.ru
  *
- * Сервис для автоматизированного сбора ошибок во фронтенде)
+ * Error`s console
  */
 
-// Отлавливаем возникающие в продакшне JavaScript ошибки
-if ( Kohana::$environment == Kohana::PRODUCTION )
-{
-    // JS::instance()->add_static('error/js-error-catcher.js');
-}
+/**
+ * Attach the MongoDB log-service to logging. Multiple writers are supported.
+ */
+// TODO Kohana::$log->attach(new Log_MongoDB);
 
 Route::set('catch-js-error', 'catch-js-error')
     ->defaults(array(

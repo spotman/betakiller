@@ -145,7 +145,7 @@ class I18n extends Kohana_I18n {
 
     protected static function make_content(array $data)
     {
-        return '<?php defined("SYSPATH") OR die("No direct script access.");
+        return Kohana::FILE_SECURITY.'
 /**
  * Translation file in language: '.static::$lang.'
  * Automatically generated from previous translation file.

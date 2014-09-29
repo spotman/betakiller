@@ -15,14 +15,12 @@ class HTTP_Exception extends Kohana_HTTP_Exception {
      * Возвращает объект вьюшки для текущего статуса ошибки
      * Переопредели этот метод в HTTP_Exception_xxx, если нужно взять вьюшку из другого места и с другим именем
      * @return View
+     * @deprecated
      */
     public function get_view()
     {
         try
         {
-            // Обнуляем view_path, чтобы оно не влияло на поиск вьюшки
-            // View::reset_view_path();
-
             $code = $this->getCode();
 
             // Попробуем получить вьюшку для текущего статуса ошибки
@@ -32,10 +30,7 @@ class HTTP_Exception extends Kohana_HTTP_Exception {
         }
         catch ( Exception $e )
         {
-            self::log($e);
-
-            // Добавляем ошибку в консоль
-            static::notify($e, parent::response($e));
+            static::log($e);
 
             // Иначе показываем базовое сообщение
             return parent::get_view();

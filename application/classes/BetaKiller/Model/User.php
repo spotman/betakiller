@@ -17,6 +17,8 @@ class BetaKiller_Model_User extends Model_Auth_User implements Notification_User
             'ulogins' => array(),
         ));
 
+        $this->load_with(['language']);
+
         parent::_initialize();
     }
 
@@ -275,6 +277,18 @@ class BetaKiller_Model_User extends Model_Auth_User implements Notification_User
     public function is_online_notification_allowed()
     {
         return FALSE;
+    }
+
+    public function as_array()
+    {
+        return [
+            'id'        =>  $this->get_id(),
+            'username'  =>  $this->get_username(),
+            'email'     =>  $this->get_email(),
+            'firstName' =>  $this->get_first_name(),
+            'lastName'  =>  $this->get_last_name(),
+            'phone'     =>  $this->get_phone(),
+        ];
     }
 
 }

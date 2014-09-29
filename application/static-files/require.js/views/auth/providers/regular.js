@@ -21,7 +21,8 @@ define([
 
             var providerFailCallback = function(message) {
                 // Показываем сообщение об ошибке и включаем кнопку
-                alert.html(message).show();
+                alert.html(message).removeClass("hide").show();
+                console.log(message || "error");
                 submit_button.removeAttr("disabled");
             };
 

@@ -14,6 +14,12 @@ class Model_Error_Message_Base extends Mango {
         return $this->hash;
     }
 
+    public function set_hash($value)
+    {
+        $this->hash = $value;
+        return $this;
+    }
+
     public function find_by_hash($hash)
     {
         $this->values(array("hash" => $hash));
@@ -54,14 +60,32 @@ class Model_Error_Message_Base extends Mango {
         return $this->loaded() ? $this->message : NULL;
     }
 
+    public function set_message($value)
+    {
+        $this->message = $value;
+        return $this;
+    }
+
     public function get_paths()
     {
         return $this->loaded() ? (array) $this->paths->as_array() : array();
     }
 
+    public function set_paths(array $value = array())
+    {
+        $this->paths = $value;
+        return $this;
+    }
+
     public function get_urls()
     {
         return $this->loaded() ? (array) $this->urls->as_array() : array();
+    }
+
+    public function set_urls(array $value = array())
+    {
+        $this->urls = $value;
+        return $this;
     }
 
     public function has_path($path)

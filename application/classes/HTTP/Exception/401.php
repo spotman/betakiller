@@ -19,21 +19,28 @@ class HTTP_Exception_401 extends Kohana_HTTP_Exception_401 {
         return FALSE;
     }
 
+    protected function always_show_nice_message()
+    {
+        return TRUE;
+    }
+
     /**
-     * Generate a Response for the 401 Exception.
-     * The user should see the login page.
+     * @param $code
+     * @return IFace_Auth_Login
+     */
+    protected function get_iface($code)
+    {
+        return $this->iface_factory('Auth_Login');
+    }
+
+    /**
+     * Force custom message
      *
      * @return Response
      */
     public function get_response()
     {
-        /** @var IFace_Auth_Login $login_iface */
-        $login_iface = IFace::by_codename('Auth_Login');
-
-        // Show login page
-        $this->_response->send_string($login_iface);
-
-        return $this->_response;
+        return Kohana_Exception::_handler($this);
     }
 
 }

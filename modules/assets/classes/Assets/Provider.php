@@ -145,11 +145,13 @@ abstract class Assets_Provider {
         // Save model
         $model->save();
 
+        $this->_post_upload($model, $_post_data);
+
         return $model;
     }
 
     /**
-     * Additional upload processing
+     * Custom upload processing
      *
      * @param Assets_Model $model
      * @param string $content
@@ -160,6 +162,18 @@ abstract class Assets_Provider {
     {
         // Empty by default
         return $content;
+    }
+
+    /**
+     * After upload processing
+     *
+     * @param Assets_Model $model
+     * @param array $_post_data
+     * @return string
+     */
+    protected function _post_upload($model, array $_post_data)
+    {
+        // Empty by default
     }
 
     public function deploy(Request $request, Assets_Model $model, $content)
