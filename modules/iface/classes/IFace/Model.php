@@ -59,6 +59,13 @@ interface IFace_Model {
     public function get_layout_codename();
 
     /**
+     * Returns label for using in breadcrumbs and etc
+     *
+     * @return string
+     */
+    public function get_label();
+
+    /**
      * Returns title for using in page <title> tag
      *
      * @return string

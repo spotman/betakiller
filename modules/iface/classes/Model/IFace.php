@@ -88,6 +88,16 @@ class Model_IFace extends ORM implements IFace_Model {
     }
 
     /**
+     * Returns label for using in breadcrumbs and etc
+     *
+     * @return string
+     */
+    public function get_label()
+    {
+        return $this->get('label');
+    }
+
+    /**
      * Returns title for using in page <title> tag
      *
      * @return string

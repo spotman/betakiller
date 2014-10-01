@@ -4,7 +4,7 @@ abstract class Core_URL_Dispatcher {
 
     use Util_Singleton;
 
-    const PROTOTYPE_PCRE = '({([A-Za-z_]+)\.([A-Za-z_]+)})';
+    const PROTOTYPE_PCRE = '(\{([A-Za-z_]+)\.([A-Za-z_]+)\})';
 
     /**
      * @var URL_Parameters
@@ -134,7 +134,7 @@ abstract class Core_URL_Dispatcher {
         // Second iteration for dynamic urls
         if ( $dynamic_model )
         {
-            URL_Dispatcher::instance()->parse_dynamic_uri_part($dynamic_model->get_uri(), $uri);
+            URL_Dispatcher::instance()->parse_uri_parameter_part($dynamic_model->get_uri(), $uri);
             return $this->iface_provider()->iface_factory($dynamic_model);
         }
 
@@ -153,9 +153,13 @@ abstract class Core_URL_Dispatcher {
         return isset($this->_iface_stack[ $iface->get_codename() ]);
     }
 
+    /**
+     * Returns COPY of the IFace stack
+     * @return array
+     */
     public function stack()
     {
-        return $this->_iface_stack;
+        return array_values($this->_iface_stack);
     }
 
     public function current_iface()
@@ -170,7 +174,32 @@ abstract class Core_URL_Dispatcher {
         return $this;
     }
 
-    public function parse_dynamic_uri_part($prototype_string, $uri_value)
+    public function replace_url_parameters_parts($source_uri_string, URL_Parameters $parameters = NULL)
+    {
+        return preg_replace_callback(
+            self::PROTOTYPE_PCRE,
+            function($matches) use ($parameters)
+            {
+                return $this->make_url_parameter_part($matches[0], $parameters);
+            },
+            $source_uri_string
+        );
+    }
+
+    public function parse_url_parameters_parts($source_string)
+    {
+        preg_match_all(self::PROTOTYPE_PCRE, $source_string, $matches, PREG_SET_ORDER);
+
+        // TODO Подготовить регулярку, которая выловит значения ключей из $source_string
+        // Сделать это через замену всех прототипов ключей на регулярку (\S+) + экранирование остальных символов, не входящих в прототип
+
+//        foreach ( $matches as $match )
+//        {
+//        }
+    }
+
+
+    public function parse_uri_parameter_part($prototype_string, $uri_value)
     {
         $prototype = $this->parse_prototype($prototype_string);
 
@@ -189,7 +218,7 @@ abstract class Core_URL_Dispatcher {
         $this->parameters()->set($model_name, $model);
     }
 
-    public function make_dynamic_uri_part($prototype_string, URL_Parameters $parameters = NULL)
+    public function make_url_parameter_part($prototype_string, URL_Parameters $parameters = NULL)
     {
         $prototype = $this->parse_prototype($prototype_string);
 

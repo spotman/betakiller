@@ -13,6 +13,8 @@ class IFace_Model_Provider_Admin_Model implements IFace_Model {
 
     protected $_uri;
 
+    protected $_label;
+
     protected $_title;
 
     /**
@@ -94,6 +96,16 @@ class IFace_Model_Provider_Admin_Model implements IFace_Model {
     }
 
     /**
+     * Returns label for using in breadcrumbs and etc
+     *
+     * @return string
+     */
+    public function get_label()
+    {
+        return $this->_label;
+    }
+
+    /**
      * Returns title for using in page <title> tag
      *
      * @return string
@@ -114,6 +126,7 @@ class IFace_Model_Provider_Admin_Model implements IFace_Model {
             'codename'          => $this->get_codename(),
             'uri'               => $this->get_uri(),
             'parent'            => $this->get_parent_codename(),
+            'title'             => $this->get_label(),
             'title'             => $this->get_title(),
             'has_dynamic_url'   => $this->has_dynamic_url(),
         );
@@ -135,7 +148,8 @@ class IFace_Model_Provider_Admin_Model implements IFace_Model {
         $this->_codename = $data['codename'];
         $this->_uri = $data['uri'];
 
-        $this->_title = $data['title'];
+        $this->_label = isset($data['label']) ? $data['label'] : NULL;
+        $this->_title = isset($data['title']) ? $data['title'] : NULL;
 
         if ( isset($data['parent_codename']) )
         {

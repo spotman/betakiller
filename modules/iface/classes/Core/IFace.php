@@ -72,7 +72,22 @@ abstract class Core_IFace {
         return $this->get_model()->get_layout_codename();
     }
 
+    public function get_label()
+    {
+        return Env::url_dispatcher()->replace_url_parameters_parts($this->get_label_source());
+    }
+
     public function get_title()
+    {
+        return Env::url_dispatcher()->replace_url_parameters_parts($this->get_title_source());
+    }
+
+    public function get_label_source()
+    {
+        return $this->get_model()->get_label();
+    }
+
+    public function get_title_source()
     {
         return $this->get_model()->get_title();
     }
@@ -186,7 +201,7 @@ abstract class Core_IFace {
     protected function make_uri(URL_Parameters $parameters = NULL)
     {
         return $this->get_model()->has_dynamic_url()
-            ? URL_Dispatcher::instance()->make_dynamic_uri_part($this->get_uri(), $parameters)
+            ? URL_Dispatcher::instance()->make_url_parameter_part($this->get_uri(), $parameters)
             : $this->get_uri();
     }
 
