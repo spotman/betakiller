@@ -117,7 +117,7 @@ define([
                         return newPromise;
                     }
 
-                    return null;
+                    return JSONRPCError;
                 });
         }
 
