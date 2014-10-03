@@ -109,4 +109,11 @@ interface Assets_Model {
      */
     public function to_json();
 
+    /**
+     * Returns TRUE if model is found and loaded
+     *
+     * @return bool
+     */
+    public function loaded();
+
 }

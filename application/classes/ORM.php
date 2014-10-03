@@ -66,7 +66,7 @@ class ORM extends Util_ORM implements API_Response_Item, URL_DataSource /* , Dat
     }
 
     /**
-     * @return ORM
+     * @return static
      */
     protected function model_factory()
     {

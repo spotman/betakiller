@@ -201,4 +201,33 @@ abstract class Assets_Model_ORM extends ORM implements Assets_Model {
         return $model->loaded() ? $model : NULL;
     }
 
+    /**
+     * Returns URL for uploading new assets
+     *
+     * @return string
+     */
+    public function get_upload_url()
+    {
+        return $this->get_provider()->get_upload_url();
+    }
+
+    /**
+     * Returns URL to original file/image
+     *
+     * @return null|string
+     */
+    public function get_original_url()
+    {
+        return $this->loaded()
+            ? $this->get_provider()->get_original_url($this)
+            : NULL;
+    }
+
+    /**
+     * Returns assets provider associated with current model
+     *
+     * @return Assets_Provider|Assets_Provider_Image
+     */
+    abstract protected function get_provider();
+
 }
