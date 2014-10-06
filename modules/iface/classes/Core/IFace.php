@@ -186,7 +186,12 @@ abstract class Core_IFace {
 
             do
             {
-                $parts[] = $current->make_uri($parameters);
+                $uri = $current->make_uri($parameters);
+
+                if ( !$uri )
+                    return NULL;
+
+                $parts[] = $uri;
                 $parent = $current->get_parent();
                 $current = $parent;
             }
@@ -200,9 +205,14 @@ abstract class Core_IFace {
 
     protected function make_uri(URL_Parameters $parameters = NULL)
     {
+        $uri = $this->get_uri();
+
+        if ( !$uri )
+            throw new IFace_Exception('IFace :codename must have uri');
+
         return $this->get_model()->has_dynamic_url()
-            ? URL_Dispatcher::instance()->make_url_parameter_part($this->get_uri(), $parameters)
-            : $this->get_uri();
+            ? URL_Dispatcher::instance()->make_url_parameter_part($uri, $parameters)
+            : $uri;
     }
 
     protected function get_uri()
