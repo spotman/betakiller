@@ -14,4 +14,14 @@ abstract class BetaKiller_IFace extends Core_IFace {
         return Env::user($allow_guest);
     }
 
+    final protected function url_parameters()
+    {
+        return Env::url_parameters();
+    }
+
+    final protected function url_dispatcher()
+    {
+        return Env::url_dispatcher();
+    }
+
 }
