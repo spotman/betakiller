@@ -223,6 +223,14 @@ abstract class Assets_Model_ORM extends ORM implements Assets_Model {
             : NULL;
     }
 
+    public function delete()
+    {
+        // Removing file from storage
+        $this->get_provider()->delete($this);
+
+        return parent::delete();
+    }
+
     /**
      * Returns assets provider associated with current model
      *

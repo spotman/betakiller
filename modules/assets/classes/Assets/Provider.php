@@ -230,9 +230,6 @@ abstract class Assets_Provider {
 
         // Drop deployed cache for current asset
         $this->_drop_deploy_cache($model);
-
-        // Remove model
-        $model->delete();
     }
 
     /**

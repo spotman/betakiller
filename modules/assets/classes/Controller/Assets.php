@@ -101,7 +101,7 @@ class Controller_Assets extends Controller {
         $model = $this->from_item_deploy_url();
 
         // Delete file through provider
-        $this->_provider->delete($model);
+        $model->delete();
 
         $this->send_json(self::JSON_SUCCESS);
     }
