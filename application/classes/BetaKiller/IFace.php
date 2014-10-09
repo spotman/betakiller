@@ -24,4 +24,9 @@ abstract class BetaKiller_IFace extends Core_IFace {
         return Env::url_dispatcher();
     }
 
+    final protected function iface_factory($codename)
+    {
+        return IFace::by_codename($codename);
+    }
+
 }
