@@ -9,7 +9,10 @@
 /**
  * Attach the MongoDB log-service to logging. Multiple writers are supported.
  */
-// TODO Kohana::$log->attach(new Log_MongoDB);
+if ( Kohana::in_production() )
+{
+    Kohana::$log->attach(new Log_MongoDB);
+}
 
 Route::set('catch-js-error', 'catch-js-error')
     ->defaults(array(
@@ -50,3 +53,4 @@ Route::set('error-widget', 'errors/widget(/<action>)')
         'controller'    => 'Widget',
         'action'        => 'index',
     ));
+

@@ -38,6 +38,7 @@ require.config({
         'backbone.rpc':             '../backbone/backbone.rpc',
         'geppetto':                 '../backbone/backbone.geppetto',
         'backbone.subroute':        '../backbone/backbone.subroute',
+        'backbone.localStorage':    '../backbone/backbone.localStorage-min',
 
         'twig':                     '../twig.js/twig.wrapper',
         'twig.original':            '../twig.js/twig',
