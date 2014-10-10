@@ -1,7 +1,7 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
 
-class Task_Assets_Merge extends Minion_Task {
+class Task_Assets_Build extends Minion_Task {
 
     /**
      * The list of options this task accepts and their default values.

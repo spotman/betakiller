@@ -16,4 +16,14 @@ abstract class Assets_Model_ORM_Image extends Assets_Model_ORM {
             : NULL;
     }
 
+    public function get_upload_max_width()
+    {
+        return $this->get_provider()->get_upload_max_width();
+    }
+
+    public function get_upload_max_height()
+    {
+        return $this->get_provider()->get_upload_max_height();
+    }
+
 }
