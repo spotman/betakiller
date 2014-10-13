@@ -30,6 +30,8 @@ require.config({
         'jquery.x-editable':        '../jquery/bootstrap3-editable/jquery.x-editable.bundle',
         'jquery.select2.bootstrap': '../jquery/select2/jquery.select2.bootstrap',
 
+        'jquery.spectrum':          '../jquery/spectrum/spectrum.bundle',
+
         'imagesLoaded':             '../imagesLoaded/imagesloaded.pkgd.min',
         'load-image':               '../load-image/load-image',
 
