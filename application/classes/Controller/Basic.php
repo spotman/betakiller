@@ -61,11 +61,6 @@ class Controller_Basic extends Controller {
                 ->render();
         }
 
-//        // Заменяем во всех ссылках указание на статические файлы
-//        $this->response->body(
-//            str_replace('{staticfiles_url}', STATICFILES_URL, $this->response->body())
-//        );
-
         // Показываем профайлер, если он включён из консоли разработчика или принудительно из самого экшна
         if ( $this->show_profiler OR $this->is_profiler_enabled() )
         {
