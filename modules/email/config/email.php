@@ -7,6 +7,11 @@ return array(
 	 * Valid drivers are: native, sendmail, smtp
 	 */
 	'driver' => 'native',
+
+    /**
+     * Sender email address (string or array(email, name))
+     */
+    'sender' => 'root@localhost',
 	
 	/**
 	 * To use secure connections with SMTP, set "port" to 465 instead of 25.

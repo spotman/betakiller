@@ -28,10 +28,6 @@ class Log_MongoDB extends Log_Writer {
      */
     public function write(array $messages)
     {
-        // Prevent logging in PRODUCTION mode
-        if ( Kohana::in_production() )
-            return;
-
         foreach ($messages as $message)
         {
             try

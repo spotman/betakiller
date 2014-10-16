@@ -148,11 +148,14 @@ class Controller_Error_Php extends Controller_Developer {
 
     public function action_throw()
     {
-        throw new HTTP_Exception_500('This is a test');
+        $code = $this->request->param("param");
+        throw HTTP_Exception::factory((int) $code ?: 500, 'This is a test');
     }
 
     public function action_email()
     {
-        Email::send(NULL, 'i.am@spotman.ru', 'This is a test', 'Message test');
+        $emails_sent = (int) Email::send(NULL, 'i.am@spotman.ru', 'This is a test', 'Message test');
+
+        echo 'Email sent: '.$emails_sent;
     }
 }
