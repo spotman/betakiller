@@ -79,7 +79,16 @@ abstract class Core_URL_Dispatcher {
             // Prevent XSS via URL
             $uri_part = HTML::chars(strip_tags($uri_part));
 
-            $iface_instance = $this->by_uri($uri_part, $parent_iface);
+            try
+            {
+                $iface_instance = NULL;
+                $iface_instance = $this->by_uri($uri_part, $parent_iface);
+            }
+            catch ( URL_Dispatcher_Exception $e )
+            {
+//                throw $e;
+                // Do nothing
+            }
 
             // Throw IFace_Exception_MissingURL so we can forward user to parent iface or custom 404 page
             if ( ! $iface_instance )
@@ -104,7 +113,7 @@ abstract class Core_URL_Dispatcher {
      * @param string $uri
      * @param IFace|NULL $parent_iface
      * @return IFace
-     * @throws IFace_Exception
+     * @throws URL_Dispatcher_Exception
      */
     public function by_uri($uri, IFace $parent_iface = NULL)
     {
@@ -120,7 +129,7 @@ abstract class Core_URL_Dispatcher {
             if ( $iface_model->has_dynamic_url() )
             {
                 if ( $dynamic_model )
-                    throw new IFace_Exception('Layer must have only one IFace with dynamic dispatching');
+                    throw new URL_Dispatcher_Exception('Layer must have only one IFace with dynamic dispatching');
 
                 $dynamic_model = $iface_model;
                 continue;
@@ -167,6 +176,11 @@ abstract class Core_URL_Dispatcher {
         return $this->_current_iface;
     }
 
+    public function is_current_iface(IFace $iface)
+    {
+        return ( $this->_current_iface->get_codename() == $iface->get_codename() );
+    }
+
     protected function push_to_stack(IFace $iface)
     {
         $this->_iface_stack[ $iface->get_codename() ] = $iface;
@@ -210,7 +224,7 @@ abstract class Core_URL_Dispatcher {
         $model = $this->model_factory($model_name)->find_by_url_key($model_key, $uri_value, $this->parameters());
 
         if ( ! $model )
-            throw new Kohana_Exception('Can not find [:prototype] item by [:value]',
+            throw new URL_Dispatcher_Exception('Can not find [:prototype] item by [:value]',
                 array(':prototype' => $prototype_string, ':value' => $uri_value)
             );
 
@@ -232,7 +246,7 @@ abstract class Core_URL_Dispatcher {
         $model = $model ?: $this->parameters()->get($model_name);
 
         if ( ! $model )
-            throw new Kohana_Exception('Can not find :name model in parameters', array(':name' => $model_name));
+            throw new URL_Dispatcher_Exception('Can not find :name model in parameters', array(':name' => $model_name));
 
         // Get url prototype value
         return $model->get_url_key_value($model_key);
@@ -246,7 +260,7 @@ abstract class Core_URL_Dispatcher {
     /**
      * @param $model_name
      * @return URL_DataSource
-     * @throws Kohana_Exception
+     * @throws URL_Dispatcher_Exception
      */
     protected function model_factory($model_name)
     {
@@ -254,7 +268,7 @@ abstract class Core_URL_Dispatcher {
         $object = Model::factory($model_name);
 
         if ( ! ($object instanceof URL_DataSource) )
-            throw new Kohana_Exception('The model :name must implement URL_DataSource', array(':name' => $model_name));
+            throw new URL_Dispatcher_Exception('The model :name must implement URL_DataSource', array(':name' => $model_name));
 
         return $object;
     }
