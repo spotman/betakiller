@@ -75,27 +75,4 @@ class Model_Waiting extends ORM {
         return ($duplicate->loaded() AND $duplicate->pk());
     }
 
-//
-//    public function autocomplete($query)
-//    {
-//        return $this->_autocomplete($query, array('label'));
-//    }
-//
-//    protected function autocomplete_formatter()
-//    {
-//        return array(
-//            'id'    =>  $this->get_id(),
-//            'text'  =>  $this->get_label(),
-//        );
-//    }
-//
-//    public function get_api_response_data()
-//    {
-//        return array(
-//            'id'    =>  $this->get_id(),
-//            'label' =>  $this->get_label(),
-//        );
-//    }
-
-
 }
