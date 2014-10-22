@@ -65,6 +65,11 @@ class ORM extends Util_ORM implements API_Response_Item, URL_DataSource /* , Dat
         return (string) $this->get($key);
     }
 
+    public function get_validation_exception_errors(ORM_Validation_Exception $e)
+    {
+        return $e->errors('models');
+    }
+
     /**
      * @return static
      */
