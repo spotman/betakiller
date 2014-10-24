@@ -188,7 +188,16 @@ class Kohana_StaticCss extends StaticFile {
 			{
 				foreach($css_array as $css => $condition)
 				{
-					$build[$condition][] = $css;
+                    if (mb_substr($css, 0, 4) == 'http')
+                    {
+                        // External file, process without building
+                        $css_code .= $this->getLink($css, $condition);
+                    }
+                    else
+                    {
+                        // Internal file, build it
+                        $build[$condition][] = $css;
+                    }
 				}
 			}
 
