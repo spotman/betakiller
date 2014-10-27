@@ -6,6 +6,11 @@ require.config({
         'jquery.typeahead': {
             deps:                   ['jquery'],
             exports:                '$.fn.typeahead'
+        },
+
+        'jquery.lazyload': {
+            deps:                   ['jquery'],
+            exports:                '$.fn.lazyload'
         }
     },
 
@@ -15,6 +20,7 @@ require.config({
         'jquery.ui.widget':         '../jquery/ui/jquery.ui.widget',
 
         'jquery.typeahead':         '../jquery/typeahead/typeahead.bundle.min',
+        'jquery.lazyload':          '../jquery/lazyload/jquery.lazyload.min',
 
         'waypoints':                '../jquery/waypoints/waypoints.min',
         'waypoints.sticky':         '../jquery/waypoints/waypoints-sticky.min',
