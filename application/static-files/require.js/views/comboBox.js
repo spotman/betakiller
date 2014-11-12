@@ -12,10 +12,11 @@ define([
             self = this;
 
         function initUserValues(options) {
-            options.createSearchChoice = function (term)
-            {
-                node.data("text", term);
-                return { id: 0, text: term + " (ваш вариант)", label: term };
+            options.createSearchChoice = function (term, data) {
+                if ( $(data).filter(function() { return this.text.localeCompare(term) === 0; }).length === 0 ) {
+                    node.data("text", term);
+                    return { id: 0, text: term + " (ваш вариант)", label: term };
+                }
             };
 
             options.createSearchChoicePosition = 'bottom';
