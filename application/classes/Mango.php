@@ -1,6 +1,6 @@
 <?php defined('SYSPATH') OR die('No direct access allowed.');
 
-class Mango extends Mango_Core {
+class Mango extends Kohana_Mango {
 
     /**
      * Возвращает количество элементов в коллекции, представленной текущей моделью

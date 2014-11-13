@@ -43,3 +43,6 @@
 [submodule "modules/geocode"]
 	path = modules/geocode
 	url = git@github.com:spotman/kohana-geocode.git
+[submodule "modules/mangodb"]
+	path = modules/mangodb
+	url = git@github.com:spotman/mangodb.git
