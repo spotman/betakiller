@@ -15,7 +15,7 @@ abstract class BetaKiller_IFace_Admin extends IFace {
         // Force authorization
         $user = Env::user();
 
-        return $user->is_moderator();
+        return $user->is_moderator() OR $user->is_developer();
     }
 
 }

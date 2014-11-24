@@ -3,12 +3,12 @@
 class IFace_Exception_MissingURL extends Core_IFace_Exception_MissingURL {
 
     /**
-     * Enable notification (we need to be notified about missing and incorrect URLs)
+     * Disable notification (we do not need to be notified about missing and incorrect URLs)
      * @return bool
      */
     public function is_notification_enabled()
     {
-        return TRUE;
+        return FALSE;
     }
 
 }
