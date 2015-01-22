@@ -23,7 +23,7 @@ class JSONRPC_Server extends Kohana_JSONRPC_Server {
      */
     protected function process_result($result)
     {
-        $this->_response->last_modified( $result->get_last_modified()->getTimestamp() );
+        $this->_response->last_modified( $result->get_last_modified() );
 
         return $result->get_data();
     }

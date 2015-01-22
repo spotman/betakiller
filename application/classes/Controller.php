@@ -108,6 +108,8 @@ abstract class Controller extends Controller_Proxy {
         {
             call_user_func($callback, $this);
         }
+
+        $this->response->check_if_not_modified_since();
     }
 
     /**
@@ -145,6 +147,24 @@ abstract class Controller extends Controller_Proxy {
     protected function content_type_json()
     {
         $this->content_type(Response::JSON);
+    }
+
+    /**
+     * Helper for setting "Last-Modified" header
+     * @param DateTime $dateTime
+     */
+    protected function last_modified(DateTime $dateTime)
+    {
+        $this->response->last_modified($dateTime);
+    }
+
+    /**
+     * Helper for setting "Expires" header
+     * @param DateTime $dateTime
+     */
+    protected function expires(DateTime $dateTime)
+    {
+        $this->response->expires($dateTime);
     }
 
     /**

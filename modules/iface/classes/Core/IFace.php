@@ -18,6 +18,11 @@ abstract class Core_IFace {
     protected $_last_modified;
 
     /**
+     * @var DateTime
+     */
+    protected $_expires;
+
+    /**
      * Creates IFace instance from it`s codename
      *
      * @param string $codename IFace codename
@@ -118,6 +123,22 @@ abstract class Core_IFace {
     public function get_last_modified()
     {
         return $this->_last_modified;
+    }
+
+    /**
+     * @param \DateTime|NULL $expires
+     */
+    public function set_expires(DateTime $expires)
+    {
+        $this->_expires = $expires;
+    }
+
+    /**
+     * @return \DateTime
+     */
+    public function get_expires()
+    {
+        return $this->_expires;
     }
 
     public function __toString()
