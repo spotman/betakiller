@@ -18,7 +18,7 @@ abstract class Core_IFace {
     protected $_last_modified;
 
     /**
-     * @var DateTime
+     * @var DateInterval
      */
     protected $_expires;
 
@@ -126,17 +126,33 @@ abstract class Core_IFace {
     }
 
     /**
-     * @param \DateTime|NULL $expires
+     * @return \DateTime
      */
-    public function set_expires(DateTime $expires)
+    public function get_default_last_modified()
+    {
+        return new \DateTime();
+    }
+
+    /**
+     * @return DateInterval
+     */
+    public function get_default_expires_interval()
+    {
+        return new \DateInterval('PT1H');
+    }
+
+    /**
+     * @param \DateInterval|NULL $expires
+     */
+    public function set_expires_interval(DateInterval $expires)
     {
         $this->_expires = $expires;
     }
 
     /**
-     * @return \DateTime
+     * @return \DateInterval
      */
-    public function get_expires()
+    public function get_expires_interval()
     {
         return $this->_expires;
     }

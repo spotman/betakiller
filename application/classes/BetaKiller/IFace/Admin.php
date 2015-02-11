@@ -18,4 +18,11 @@ abstract class BetaKiller_IFace_Admin extends IFace {
         return $user->is_moderator() OR $user->is_developer();
     }
 
+    public function get_default_expires_interval()
+    {
+        $interval = new DateInterval('PT1H');
+        $interval->invert = 1;
+        return $interval;
+    }
+
 }

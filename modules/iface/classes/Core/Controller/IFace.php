@@ -17,10 +17,10 @@ class Core_Controller_IFace extends Controller {
 
         $output = $iface->render();
 
-        $current_date = date('Y-m-d');
+        $last_modified = $iface->get_last_modified() ?: $iface->get_default_last_modified();
+        $expires_interval = $iface->get_expires_interval() ?: $iface->get_default_expires_interval();
 
-        $last_modified = $iface->get_last_modified() ?: new DateTime($current_date);
-        $expires = $iface->get_expires() ?: (new DateTime($current_date))->add(new DateInterval('P1D'));
+        $expires = (new DateTime())->add($expires_interval);
 
         $this->last_modified($last_modified);
         $this->expires($expires);
