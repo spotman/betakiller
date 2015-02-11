@@ -221,7 +221,8 @@ abstract class Assets_Provider_Image extends Assets_Provider {
 
     protected function _get_item_deploy_filename(Request $request)
     {
-        return parent::_get_item_deploy_filename($request).'-'.$request->param('size');
+        $size = $request->param('size');
+        return parent::_get_item_deploy_filename($request).( $size ? '-'.$size : '');
     }
 
     /**
