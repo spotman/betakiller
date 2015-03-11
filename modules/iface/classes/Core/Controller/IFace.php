@@ -12,7 +12,7 @@ class Core_Controller_IFace extends Controller {
         // If this is default IFace and client requested non-slash uri, redirect client to /
         if ( $iface->is_default() AND $this->get_request_uri() != '' )
         {
-            HTTP::redirect('/');
+            $this->redirect('/');
         }
 
         $output = $iface->render();

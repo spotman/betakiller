@@ -25,6 +25,12 @@ abstract class BetaKiller_API_Model extends Core_API_Model {
         return Env::user($allow_guest);
     }
 
+    protected function trim(& $value)
+    {
+        $value = trim($value);
+        return $value;
+    }
+
 //    protected function search_by_uri($uri)
 //    {
 //        $model_result = $this->model()->filter_uri($uri)->find();
