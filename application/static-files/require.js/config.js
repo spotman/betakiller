@@ -18,6 +18,8 @@ require.config({
         'jquery':                   '../jquery/jquery-1.11.1.min',
         'jquery.utils':             '../jquery/utils',
         'jquery.ui.widget':         '../jquery/ui/jquery.ui.widget',
+        'jquery.ui':                '../jquery/ui/jquery-ui-1.9.2.custom.min',
+        'jquery.ui.punch':          '../jquery/ui/jquery.ui.touch-punch.min',
 
         'jquery.typeahead':         '../jquery/typeahead/typeahead.bundle.min',
         'jquery.lazyload':          '../jquery/lazyload/jquery.lazyload.min',
