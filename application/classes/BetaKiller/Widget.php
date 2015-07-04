@@ -29,6 +29,10 @@ abstract class BetaKiller_Widget extends Core_Widget {
         return Env::url_dispatcher();
     }
 
+    /**
+     * @param $codename
+     * @return IFace
+     */
     final protected function iface_factory($codename)
     {
         return IFace::by_codename($codename);
