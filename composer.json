@@ -3,7 +3,16 @@
     "phpunit/phpunit": "3.7.*",
     "anahkiasen/underscore-php": "dev-master",
     "willdurand/geocoder": "2.7.x",
-		"phpoffice/phpexcel": "^1.8",
-    "deployer/deployer": "~3.0"
-  }
+    "phpoffice/phpexcel": "^1.8",
+    "deployer/deployer": "~3.0",
+    "Foreword/phpMorphy": "*"
+  },
+
+  "repositories": [
+    {
+      "type": "git",
+      "url": "https://github.com/Foreword/phpMorphy.git",
+      "branch": "master"
+    }
+  ]
 }
