@@ -125,7 +125,7 @@ class Import_Excel_Doc {
                         // получаем значение ячейки с заголовком
                         $value = $this->get_cell_value($column, $current_row_index, false); // no auto_format
                         if( $value != $title )
-                            throw new Import_Excel_Doc_Exception('Формат загруженного отчёта не соответствует образцу: в заголовке столбца ['. $column .'] ожидается строка "'. $title .'", а в отчёте "'. $value .'"');
+                            throw new Import_Excel_Doc_Exception('Формат загруженного документа не соответствует образцу: в заголовке столбца ['. $column .'] ожидается строка "'. $title .'", а в документе "'. $value .'"');
                     }
 
                     // всё хорошо - переходим к импорту
