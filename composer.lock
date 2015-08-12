@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "dd2fb2727cd8b0ee164f9cd0c4486de6",
+    "hash": "acdbe47affaa3e902dc9b45bb85abffa",
     "packages": [
         {
             "name": "Foreword/phpMorphy",
@@ -766,6 +766,44 @@
                 "update"
             ],
             "time": "2014-11-05 15:29:01"
+        },
+        {
+            "name": "mk-j/php_xlsxwriter",
+            "version": "0.21",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mk-j/PHP_XLSXWriter.git",
+                "reference": "930a0f37914da6d1efe5a9b19d52e417c6952b68"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mk-j/PHP_XLSXWriter/zipball/930a0f37914da6d1efe5a9b19d52e417c6952b68",
+                "reference": "930a0f37914da6d1efe5a9b19d52e417c6952b68",
+                "shasum": ""
+            },
+            "require-dev": {
+                "phpunit/phpunit": "4.3.*"
+            },
+            "type": "project",
+            "autoload": {
+                "classmap": [
+                    "xlsxwriter.class.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "PHP Library to write XLSX files",
+            "homepage": "https://github.com/mk-j/PHP_XLSXWriter",
+            "keywords": [
+                "excel",
+                "library",
+                "php",
+                "xls",
+                "xlsx"
+            ],
+            "time": "2014-11-18 20:44:25"
         },
         {
             "name": "patchwork/utf8",

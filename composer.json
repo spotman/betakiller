@@ -5,7 +5,8 @@
     "willdurand/geocoder": "2.7.x",
     "phpoffice/phpexcel": "^1.8",
     "deployer/deployer": "~3.0",
-    "Foreword/phpMorphy": "*"
+    "Foreword/phpMorphy": "*",
+    "mk-j/php_xlsxwriter": "^0.21.0"
   },
 
   "repositories": [

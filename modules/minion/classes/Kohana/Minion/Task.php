@@ -19,7 +19,7 @@ abstract class Kohana_Minion_Task {
 	/**
 	 * Converts a task (e.g. db:migrate to a class name)
 	 *
-	 * @param string  Task name
+	 * @param string $task Task name
 	 * @return string Class name
 	 */
 	public static function convert_task_to_class_name($task)
@@ -158,7 +158,7 @@ abstract class Kohana_Minion_Task {
 	 * Sets options for this task
 	 *
 	 * $param  array  the array of options to set
-	 * @return this
+	 * @return $this
 	 */
 	public function set_options(array $options)
 	{
@@ -332,8 +332,8 @@ abstract class Kohana_Minion_Task {
 	/**
 	 * Compiles a list of available tasks from a directory structure
 	 *
-	 * @param  array Directory structure of tasks
-	 * @param  string prefix
+	 * @param  array $files Directory structure of tasks
+	 * @param  string $prefix
 	 * @return array Compiled tasks
 	 */
 	protected function _compile_task_list(array $files, $prefix = '')
