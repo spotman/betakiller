@@ -8,6 +8,14 @@ abstract class Task_Worker_Gearman extends Minion_Task {
      */
     abstract protected function get_worker_methods();
 
+    /**
+     * @return bool
+     */
+    protected function restart_after_method_call()
+    {
+        return FALSE;
+    }
+
     protected function _execute(array $params)
     {
         $worker= new GearmanWorker();
@@ -25,25 +33,36 @@ abstract class Task_Worker_Gearman extends Minion_Task {
         // Register methods
         foreach ( $methods as $key => $method )
         {
-            $this->write('Binding method ['.$method.'] to key ['.$key.']');
+            $this->info('Binding method ['.$method.'] to key ['.$key.']');
 
             // Add methods
             $worker->addFunction($key, function(GearmanJob $job) use ($task, $method) {
                 try
                 {
                     $result = $task->$method($job);
+
+                    // Force "complete" state coz no exception was thrown
+                    $job->sendComplete( (string)$result );
                 }
                 catch ( Exception $e )
                 {
-                    $task->log_exception($e);
-                    $result = GEARMAN_WORK_FAIL;
+                    // Log exception
+                    Log::exception($e);
+
+                    // Notify client
+                    $job->sendData($e->getMessage());
+                    $job->sendFail();
                 }
 
-                return $result;
+                if ( $task->restart_after_method_call() )
+                {
+                    $this->info('Restarting worker after method call');
+                    exit(0);
+                }
             });
         }
 
-        $this->write('Worker started!');
+        $this->info('Worker started!');
 
         // Loop
         while($worker->work())

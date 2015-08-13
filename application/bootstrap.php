@@ -121,9 +121,9 @@ I18n::lang('en');
 Kohana::init(Kohana::$config->load('init')->as_array());
 
 /**
- * Attach the file write to logging. Multiple writers are supported.
+ * Attach the file write to logging errors. Multiple writers are supported.
  */
-Kohana::$log->attach(new Log_File(APPPATH.'logs'));
+Kohana::$log->attach(new Log_File(APPPATH.'logs'), Log::NOTICE);
 
 /**
  * Enable modules. Modules are referenced by a relative or absolute path.

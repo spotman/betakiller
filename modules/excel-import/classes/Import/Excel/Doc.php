@@ -1,6 +1,7 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
-class Import_Excel_Doc {
+
+abstract class Import_Excel_Doc {
 
     /** @var PHPExcel_Reader_IReader|PHPExcel_Reader_Excel5 */
     public $reader;
@@ -151,9 +152,8 @@ class Import_Excel_Doc {
                 }
 
                 // пропускаем пустые строки
-                if ( count($row_data) == 0 ) continue;
-
-                $result = FALSE;
+                if ( count($row_data) == 0 )
+                    continue;
 
                 // вызвываем обработчик строки
                 try
@@ -161,13 +161,14 @@ class Import_Excel_Doc {
                     // передаём данные обработчику строки
                     $result = $sheet->process_row($row_data);
                 }
-                catch(Import_Excel_Sheet_Exception $e)
+                catch(Exception $e)
                 {
-                    $this->debug_row($e, $row_data, $sheet::DEBUG);
+                    $result = $this->process_row_exception($e, $row_data);
                 }
 
                 // останавливаем обработку, если возвращено false
-                if ( $result === FALSE ) break;
+                if ( $result === FALSE )
+                    break;
 
                 // $sheet->processed_rows_counter++;
             }
@@ -274,16 +275,12 @@ class Import_Excel_Doc {
         return $index;
     }
 
-    protected function debug_row($e, $row_data, $debug = TRUE)
-    {
-        if ( $debug )
-        {
-            echo '<pre>';
-            print_r($row_data);
-            echo '</pre>';
-        }
-        throw $e;
-    }
+    /**
+     * @param $e
+     * @param $row_data
+     * @return bool Return TRUE for ignoring this exception and processing next row or FALSE for exception re-throw
+     */
+    abstract protected function process_row_exception($e, $row_data);
 
     public function prepare_date($date, $output_format = NULL, $input_format = NULL)
     {
@@ -297,7 +294,7 @@ class Import_Excel_Doc {
         }
 
         // преобразуем дату в объект
-        $time = DateTime::createFromFormat( $input_format, $date);
+        $time = DateTime::createFromFormat($input_format, $date);
 
         if ( !$time )
             throw new Import_Excel_Doc_Exception(

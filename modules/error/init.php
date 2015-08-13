@@ -11,7 +11,7 @@
  */
 if ( Kohana::in_production() )
 {
-    Kohana::$log->attach(new Log_MongoDB);
+    Kohana::$log->attach(new Log_MongoDB, Log::NOTICE, Log::EMERGENCY);
 }
 
 Route::set('catch-js-error', 'catch-js-error')
