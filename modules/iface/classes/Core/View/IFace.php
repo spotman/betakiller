@@ -59,6 +59,9 @@ abstract class Core_View_IFace {
         // Setting page title
         Meta::instance()->title( $this->_iface->get_title() );
 
+        // Setting page description
+        Meta::instance()->description( $this->_iface->get_description() );
+
         // Getting IFace layout
         $this->_layout = $this->_iface->get_layout_codename();
 

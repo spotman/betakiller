@@ -71,4 +71,12 @@ interface IFace_Model {
      * @return string
      */
     public function get_title();
+
+    /**
+     * Returns description for using in <meta> tag
+     *
+     * @return string
+     */
+    public function get_description();
+
 }

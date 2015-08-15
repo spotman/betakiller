@@ -56,7 +56,7 @@ abstract class Core_IFace {
     }
 
     /**
-     * @return $this|string
+     * @return string
      */
     public function get_codename()
     {
@@ -77,24 +77,135 @@ abstract class Core_IFace {
         return $this->get_model()->get_layout_codename();
     }
 
+    /**
+     * Returns processed label
+     *
+     * @return mixed
+     */
     public function get_label()
     {
-        return Env::url_dispatcher()->replace_url_parameters_parts($this->get_label_source());
+        return $this->process_string_pattern($this->get_label_source());
     }
 
+    /**
+     * Returns processed title
+     *
+     * @return string
+     */
     public function get_title()
     {
-        return Env::url_dispatcher()->replace_url_parameters_parts($this->get_title_source());
+        return $this->process_string_pattern($this->get_title_source(), 80); // Limit to 80 chars
     }
 
+    /**
+     * Returns processed description
+     *
+     * @return string
+     */
+    public function get_description()
+    {
+        return $this->process_string_pattern($this->get_description_source());
+    }
+
+    /**
+     * Pattern consists of tags like [N[Text]] where N is tag priority
+     *
+     * @param string $source
+     * @param int|NULL $limit
+     * @return string
+     */
+    private function process_string_pattern($source, $limit = NULL)
+    {
+        // Replace url parameters
+        $source = Env::url_dispatcher()->replace_url_parameters_parts($source);
+
+        // Parse [N[...]] tags
+        $pcre_pattern = '/\[([0-9]{1,2})\[([^\]]+)\]\]/';
+
+        preg_match_all($pcre_pattern, $source, $matches, PREG_SET_ORDER);
+
+        $tags = array();
+
+        foreach ( $matches as $match )
+        {
+            $key = $match[0];
+            $priority = $match[1];
+            $value = $match[2];
+            $tags[$priority] = array(
+                'key'   =>  $key,
+                'value' =>  $value,
+            );
+        }
+
+        $output = $source;
+
+        if ( $tags )
+        {
+            // Sort tags via keys in straight order
+            ksort($tags);
+
+            // Iteration counter
+            $i = 0;
+            $max_loops = count($tags);
+
+            while ( $i < $max_loops AND $output != '' )
+            {
+                $output = $source;
+
+                // Replace tags
+                foreach ($tags as $tag)
+                {
+                    $output = str_replace($tag['key'], $tag['value'], $output);
+                }
+
+                if ( $limit AND mb_strlen($output) > $limit )
+                {
+                    $drop = array_pop($tags);
+                    $source = trim(str_replace($drop['key'], '', $source));
+                    $i++;
+                }
+                else
+                    break;
+            }
+        }
+
+        if ( $limit AND mb_strlen($output) > $limit )
+        {
+            // Dirty limit
+            Text::limit_chars($output, $limit, NULL, TRUE);
+        }
+
+        return $output;
+    }
+
+    /**
+     * Returns label source/pattern
+     *
+     * @return string
+     */
     public function get_label_source()
     {
         return $this->get_model()->get_label();
     }
 
+    /**
+     * Returns title source/pattern
+     *
+     * @return string
+     */
     public function get_title_source()
     {
         return $this->get_model()->get_title();
+    }
+
+    /**
+     * Returns description source/pattern
+     *
+     * @return string
+     */
+    public function get_description_source()
+    {
+        return $this->get_model()->get_description();
     }
 
     /**

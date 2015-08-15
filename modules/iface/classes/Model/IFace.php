@@ -107,6 +107,15 @@ class Model_IFace extends ORM implements IFace_Model {
         return $this->get('title');
     }
 
+    /**
+     * Returns description for using in <meta> tag
+     *
+     * @return string
+     */
+    public function get_description()
+    {
+        return $this->get('description');
+    }
 
     /**
      * Returns iface url part

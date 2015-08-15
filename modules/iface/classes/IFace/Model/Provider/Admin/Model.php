@@ -116,6 +116,17 @@ class IFace_Model_Provider_Admin_Model implements IFace_Model {
     }
 
     /**
+     * Returns description for using in <meta> tag
+     *
+     * @return string
+     */
+    public function get_description()
+    {
+        // Admin IFace does not need description
+        return NULL;
+    }
+
+    /**
      * Returns array representation of the model data
      *
      * @return array
@@ -126,7 +137,7 @@ class IFace_Model_Provider_Admin_Model implements IFace_Model {
             'codename'          => $this->get_codename(),
             'uri'               => $this->get_uri(),
             'parent'            => $this->get_parent_codename(),
-            'title'             => $this->get_label(),
+            'label'             => $this->get_label(),
             'title'             => $this->get_title(),
             'has_dynamic_url'   => $this->has_dynamic_url(),
         );

@@ -81,8 +81,11 @@ class Minion_Log extends Log_Writer
         // Add exception info if in debug mode
         if ( $this->_log_level == Log::DEBUG AND isset($message['additional']['exception']))
         {
+            /** @var Exception $exception */
+            $exception = $message['additional']['exception'];
+
             // Re-use as much as possible, just resetting the body to the trace
-            $message['body'] = $message['additional']['exception']->getTraceAsString();
+            $message['body'] = $exception->getTraceAsString();
             $message['level'] = $this->_log_levels[Log_Writer::$strace_level];
 
             $string .= PHP_EOL.strtr($format, array_filter($message, 'is_scalar'));
