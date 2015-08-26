@@ -40,6 +40,7 @@ abstract class Minion_Task extends Kohana_Minion_Task {
     /**
      * @param $text
      * @param null $color
+     * @return $this
      */
     protected function write($text, $color = NULL)
     {
@@ -47,14 +48,24 @@ abstract class Minion_Task extends Kohana_Minion_Task {
             $text = $this->colorize($text, $color);
 
         Minion_CLI::write($text);
+
+        return $this;
     }
 
+    /**
+     * @param $text
+     * @param bool $eol
+     * @param string $color
+     * @return $this
+     */
     protected function write_replace($text, $eol = FALSE, $color = NULL)
     {
         if ($color)
             $text = $this->colorize($text, $color);
 
         Minion_CLI::write_replace($text, $eol);
+
+        return $this;
     }
 
     protected function colorize($text, $fore, $back = NULL)

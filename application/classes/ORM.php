@@ -90,13 +90,4 @@ class ORM extends Util_ORM implements API_Response_Item, URL_DataSource /* , Dat
         return parent::cached($lifetime);
     }
 
-    /**
-     * @param $pk
-     * @return $this
-     */
-    protected function model_factory($pk = NULL)
-    {
-        return ORM::factory($this->object_name(), $pk);
-    }
-
 }
