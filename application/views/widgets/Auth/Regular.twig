@@ -3,9 +3,9 @@
 <div id="widget-auth-regular" class="span4 offset4 well">
     <h1>{{ __('Sign in') }}</h1>
     <div class="alert alert-error hide"></div>
-    <form method="POST" data-action="{{ login_url }}" id="widget-auth-regular-login-form" accept-charset="UTF-8" name="regular-login-form">
-        <input type="text" id="widget-auth-regular-user-login" name="user-login" class="span4" placeholder="{{ __('Your username or email') }}" value="{{ username|default() }}" />
-        <input type="password" id="widget-auth-regular-user-password" name="user-password" class="span4" placeholder="{{ __('Your password') }}" />
+    <form method="POST" data-action="{{ login_url }}" id="widget-auth-regular-login-form" accept-charset="UTF-8" name="regular-login-form" class="form-horizontal">
+        <input type="text" id="widget-auth-regular-user-login" name="user-login" class="span4 form-control" placeholder="{{ __('Your username or email') }}" value="{{ username|default() }}" />
+        <input type="password" id="widget-auth-regular-user-password" name="user-password" class="span4 form-control" placeholder="{{ __('Your password') }}" />
         <button id="widget-auth-regular-login-button" class="btn btn-info btn-block"><i class="icon-user icon-white"></i> {{ __('Sign in') }}</button>
     </form>
     <a href="{{ reset_password_url }}" class="pull-right">{{ __("Forgot password?") }}</a>

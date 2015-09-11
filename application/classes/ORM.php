@@ -42,7 +42,7 @@ class ORM extends Util_ORM implements API_Response_Item, URL_DataSource /* , Dat
             $this->custom_find_by_url_filter($parameters);
         }
 
-        $model = $this->where($this->object_name().'.'.$key, '=', $value)->find();
+        $model = $this->where($this->object_column($key), '=', $value)->find();
 
         return $model->loaded() ? $model : NULL;
     }

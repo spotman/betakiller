@@ -73,6 +73,28 @@ abstract class Minion_Task extends Kohana_Minion_Task {
         return Minion_CLI::color($text, $fore, $back);
     }
 
+    /**
+     * Get user input from CLI
+     *
+     * @param $message
+     * @return string
+     */
+    protected function read($message)
+    {
+        return Minion_CLI::read($message);
+    }
+
+    /**
+     * Get password user input from CLI
+     *
+     * @param $message
+     * @return string
+     */
+    protected function password($message)
+    {
+        return Minion_CLI::password($message);
+    }
+
     protected function debug($message)
     {
         Log::debug($message);
