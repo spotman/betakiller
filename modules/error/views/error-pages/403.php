@@ -26,15 +26,15 @@
 
 <div class="error-overlay"></div>
 <div class="well center">
-    <h2><?= $message ?: __("У Вас недостаточно прав для просмотра данной страницы") ?></h2>
+    <h2><?= $message ?: __("You have no enough privileges for viewing current page.") ?></h2>
 
     <? if ( ! @ Env::get('user') ): ?>
-    <p><strong><?= __("Для продолжения работы необходимо авторизоваться") ?></strong></p><br />
-    <a href="/login<?= Request::current() ? "?return=". Request::current()->detect_uri() : NULL; ?>" class="btn btn-large btn-info"><i class="icon-lock icon-white"></i> <?= __("Войти") ?></a>
+    <p><strong><?= __("Authorize, please") ?></strong></p><br />
+    <a href="/login<?= Request::current() ? "?return=". Request::current()->detect_uri() : NULL; ?>" class="btn btn-large btn-info"><i class="icon-lock icon-white"></i> <?= __("Sign in") ?></a>
     <? else: ?>
 <!--    <a href="/logout" class="btn btn-large btn-info"><i class="icon-lock icon-white"></i> --><?//= __("Выйти") ?><!--</a>-->
         <a  href="#" class="btn btn-large btn-info" onclick="window.history.back(-1);return false;">
-            <i class="icon-lock icon-white"></i> <?= __("Назад") ?>
+            <i class="icon-lock icon-white"></i> <?= __("Back") ?>
         </a>
     <? endif; ?>
 </div>

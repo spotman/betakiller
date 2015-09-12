@@ -14,8 +14,8 @@
 </style>
 
 <div class="well center">
-    <h2><span class="label label-danger"><?= __("Системная ошибка") ?></span></h2>
-    <h4><?= __("Не беспокойтесь, мы уже в курсе и скоро всё исправим") ?>.</h4>
+    <h2><span class="label label-danger"><?= __("System error") ?></span></h2>
+    <h4><?= __("Do not worry, we are already fixing that") ?>.</h4>
     <!--
     <?= isset($message) ? $message : NULL ?>
     -->
