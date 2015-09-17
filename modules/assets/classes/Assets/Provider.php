@@ -89,9 +89,21 @@ abstract class Assets_Provider {
             'provider'  =>  $this->_codename,
             'action'    =>  $action,
             'item_url'  =>  $url,
+            'ext'       =>  $this->get_model_extension($model),
         );
 
         return Route::url('assets-provider-item', $options);
+    }
+
+    public function get_model_extension(Assets_Model $model)
+    {
+        $mime = $model->get_mime();
+        $extensions = File::exts_by_mime($mime);
+
+        if ( !$extensions )
+            throw new Assets_Exception('MIME :mime has no defined extension', array(':mime' => $mime));
+
+        return array_pop($extensions);
     }
 
     /**
@@ -209,7 +221,7 @@ abstract class Assets_Provider {
 
     protected function _get_item_deploy_filename(Request $request)
     {
-        return $request->action();
+        return $request->action().'.'.$request->param('ext');
     }
 
     /**

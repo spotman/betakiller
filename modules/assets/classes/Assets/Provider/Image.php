@@ -31,6 +31,7 @@ abstract class Assets_Provider_Image extends Assets_Provider {
             'action'    =>  'preview',
             'item_url'  =>  $url,
             'size'      =>  $size,
+            'ext'       =>  $this->get_model_extension($model),
         );
 
         return Route::url('assets-provider-item-preview', $options);
@@ -61,6 +62,7 @@ abstract class Assets_Provider_Image extends Assets_Provider {
             'action'    =>  'crop',
             'item_url'  =>  $url,
             'size'      =>  $size,
+            'ext'       =>  $this->get_model_extension($model),
         );
 
         return Route::url('assets-provider-item-crop', $options);
@@ -222,7 +224,7 @@ abstract class Assets_Provider_Image extends Assets_Provider {
     protected function _get_item_deploy_filename(Request $request)
     {
         $size = $request->param('size');
-        return parent::_get_item_deploy_filename($request).( $size ? '-'.$size : '');
+        return $request->action().( $size ? '-'.$size : '').'.'.$request->param('ext');
     }
 
     /**

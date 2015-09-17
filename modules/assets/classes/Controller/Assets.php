@@ -42,6 +42,8 @@ class Controller_Assets extends Controller {
 
         $model = $this->from_item_deploy_url();
 
+        $this->check_extension($model);
+
         // Get file content
         $content = $this->_provider->get_content($model);
 
@@ -62,6 +64,8 @@ class Controller_Assets extends Controller {
         $size = $this->param('size');
         $model = $this->from_item_deploy_url();
 
+        $this->check_extension($model);
+
         $preview_content = $this->_provider->prepare_preview($model, $size);
 
         // Deploy to cache
@@ -80,6 +84,8 @@ class Controller_Assets extends Controller {
 
         $size = $this->param('size');
         $model = $this->from_item_deploy_url();
+
+        $this->check_extension($model);
 
         $cropped_content = $this->_provider->crop($model, $size);
 
@@ -140,6 +146,16 @@ class Controller_Assets extends Controller {
     protected function deploy(Assets_Model $model, $content)
     {
         $this->_provider->deploy($this->request, $model, $content);
+    }
+
+    protected function check_extension(Assets_Model $model)
+    {
+        if ( ! $this->request->param('ext') )
+        {
+            $ext = $this->_provider->get_model_extension($model);
+
+            $this->redirect($this->request->detect_uri().'.'.$ext);
+        }
     }
 
 }

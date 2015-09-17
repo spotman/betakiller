@@ -1,9 +1,10 @@
-<?php defined("SYSPATH") OR die("No direct script access.");
+<?php defined('SYSPATH') OR die('No direct script access.');
 /**
  * Translation file in language: ru
  * Automatically generated from previous translation file.
  */
 return array (
+  'Can not find file with url = :url' => 'Can not find file with url = :url',
   'Crop size :size is not allowed' => 'Размер :size не разрешён',
   'Crop size must have width AND height defined' => 'Размер должен иметь высоту И ширину',
   'Preview size :size is not allowed' => 'Размер :size не разрешён',
