@@ -2,7 +2,7 @@
   "require": {
     "phpunit/phpunit": "3.7.*",
     "anahkiasen/underscore-php": "dev-master",
-    "willdurand/geocoder": "2.7.x",
+    "willdurand/geocoder": "3.1.*",
     "phpoffice/phpexcel": "^1.8",
     "deployer/deployer": "~3.0",
     "Foreword/phpMorphy": "*",
