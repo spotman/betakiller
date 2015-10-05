@@ -14,9 +14,19 @@ interface URL_DataSource {
 
     /**
      * Returns value of the $key property
+     *
      * @param string $key
      * @return string
      */
     public function get_url_key_value($key);
+
+    /**
+     * Returns list of available items (model records) by $key property
+     *
+     * @param string $key
+     * @param URL_Parameters $parameters
+     * @return URL_DataSource[]
+     */
+    public function get_available_items_by_url_key($key, URL_Parameters $parameters);
 
 }

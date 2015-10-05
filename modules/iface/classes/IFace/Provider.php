@@ -97,7 +97,7 @@ class IFace_Provider {
         return $object;
     }
 
-    public function get_parent(IFace $iface)
+    public function get_parent(Core_IFace $iface)
     {
         $model = $iface->get_model();
         $parent_model = $this->model_provider()->get_parent($model);

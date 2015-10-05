@@ -22,6 +22,11 @@ class IFace_Model_Provider_Admin_Model implements IFace_Model {
      */
     protected $_has_dynamic_url;
 
+    /**
+     * @var bool
+     */
+    protected $_hide_in_site_map;
+
     public static function factory($data, IFace_Model_Provider_Admin $provider)
     {
         /** @var self $instance */
@@ -167,9 +172,14 @@ class IFace_Model_Provider_Admin_Model implements IFace_Model {
             $this->_parent_codename = $data['parent_codename'];
         }
 
-        if ( isset($data['has_dynamic_url']) )
+        if ( isset($data['has-dynamic-url']) )
         {
             $this->_has_dynamic_url = TRUE;
+        }
+
+        if ( isset($data['hide-in-site-map']) )
+        {
+            $this->_hide_in_site_map = TRUE;
         }
     }
 
@@ -181,6 +191,14 @@ class IFace_Model_Provider_Admin_Model implements IFace_Model {
     public function has_dynamic_url()
     {
         return (bool) $this->_has_dynamic_url;
+    }
+
+    /**
+     * @return bool
+     */
+    public function hide_in_site_map()
+    {
+        return (bool) $this->_hide_in_site_map;
     }
 
     /**

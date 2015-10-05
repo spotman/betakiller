@@ -22,7 +22,7 @@ abstract class Core_View_IFace {
      */
     protected $_data = array();
 
-    public static function factory(IFace $iface)
+    public static function factory(Core_IFace $iface)
     {
         return new static($iface);
     }

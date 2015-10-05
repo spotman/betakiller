@@ -65,6 +65,28 @@ class ORM extends Util_ORM implements API_Response_Item, URL_DataSource /* , Dat
         return (string) $this->get($key);
     }
 
+    /**
+     * Returns list of available items (model records) by $key property
+     *
+     * @param string $key
+     * @param URL_Parameters $parameters
+     * @return URL_DataSource[]
+     */
+    public function get_available_items_by_url_key($key, URL_Parameters $parameters)
+    {
+        // Additional filtering for non-pk keys
+        if ( $key != $this->primary_key() )
+        {
+            $this->custom_find_by_url_filter($parameters);
+        }
+
+        $key_column = $this->object_column($key);
+
+        $models = $this->where($key_column, 'IS NOT', NULL)->group_by($key_column)->find_all();
+
+        return $models->count() ? $models->as_array() : NULL;
+    }
+
     public function get_validation_exception_errors(ORM_Validation_Exception $e)
     {
         return $e->errors('models');

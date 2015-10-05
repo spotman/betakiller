@@ -164,5 +164,12 @@ class Model_IFace extends ORM implements IFace_Model {
         return (bool) $this->get('is_dynamic');
     }
 
+    /**
+     * @return bool
+     */
+    public function hide_in_site_map()
+    {
+        return (bool) $this->get('hide_in_site_map');
+    }
 
 }

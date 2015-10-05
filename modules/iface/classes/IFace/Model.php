@@ -79,4 +79,11 @@ interface IFace_Model {
      */
     public function get_description();
 
+    /**
+     * Returns TRUE if current IFace is hidden in sitemap
+     *
+     * @return bool
+     */
+    public function hide_in_site_map();
+
 }

@@ -6,7 +6,8 @@
     "phpoffice/phpexcel": "^1.8",
     "deployer/deployer": "~3.0",
     "Foreword/phpMorphy": "*",
-    "mk-j/php_xlsxwriter": "^0.21.0"
+    "mk-j/php_xlsxwriter": "^0.21.0",
+    "samdark/sitemap": "^2.0"
   },
 
   "repositories": [

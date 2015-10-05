@@ -15,10 +15,13 @@ class IFace_Auth_Login extends IFace {
     {
         $request = Request::current();
 
-        $this->_self_url = '/'.ltrim($request->uri(), '/');
+        if ( $request )
+        {
+            $this->_self_url = '/'.ltrim($request->uri(), '/');
 
-        // Initialize redirect url
-        $this->_redirect_url = $request->query($this->_redirect_url_query_param) ?: $this->_self_url;
+            // Initialize redirect url
+            $this->_redirect_url = $request->query($this->_redirect_url_query_param) ?: $this->_self_url;
+        }
     }
 
     public function render()

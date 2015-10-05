@@ -47,13 +47,8 @@ class IFace_Model_Provider_Admin extends IFace_Model_Provider_Abstract {
 
     protected function parse_xml_item(SimpleXMLElement $branch, IFace_Model $parent_model = NULL)
     {
-        $attr = $branch->attributes();
-
-        $config = array(
-            'codename'          => (string) $attr['codename'],
-            'title'             => (string) $attr['title'],
-            'uri'               => (string) $attr['uri'],
-        );
+        $attr = (array) $branch->attributes();
+        $config = $attr['@attributes'];
 
         if ( $parent_model )
         {

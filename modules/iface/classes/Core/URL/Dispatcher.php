@@ -17,6 +17,11 @@ abstract class Core_URL_Dispatcher {
     protected $_iface_provider;
 
     /**
+     * @var URL_Processor
+     */
+    protected $_url_processor;
+
+    /**
      * @var array
      */
     protected $_iface_stack = [];
@@ -47,6 +52,16 @@ abstract class Core_URL_Dispatcher {
         }
 
         return $this->_iface_provider;
+    }
+
+    public function url_processor()
+    {
+        if ( ! $this->_url_processor )
+        {
+            $this->_url_processor = URL_Processor::factory();
+        }
+
+        return $this->_url_processor;
     }
 
     /**
@@ -143,7 +158,7 @@ abstract class Core_URL_Dispatcher {
         // Second iteration for dynamic urls
         if ( $dynamic_model )
         {
-            URL_Dispatcher::instance()->parse_uri_parameter_part($dynamic_model->get_uri(), $uri);
+            $this->parse_uri_parameter_part($dynamic_model->get_uri(), $uri);
             return $this->iface_provider()->iface_factory($dynamic_model);
         }
 
@@ -262,7 +277,7 @@ abstract class Core_URL_Dispatcher {
      * @return URL_DataSource
      * @throws URL_Dispatcher_Exception
      */
-    protected function model_factory($model_name)
+    public function model_factory($model_name)
     {
         /** @var URL_DataSource $object */
         $object = Model::factory($model_name);
