@@ -50,10 +50,14 @@ class Minion_Log extends Log_Writer
                 break;
 
             case Log::NOTICE:
+                $color = Minion_CLI::BROWN;
+                $format = 'level: body in file:line';
+                break;
+
+            case Log::INFO:
                 $color = Minion_CLI::GREEN;
                 break;
 
-//            case Log::INFO:
 //            case Log::DEBUG:
         }
 

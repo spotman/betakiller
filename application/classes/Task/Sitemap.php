@@ -63,7 +63,7 @@ class Task_Sitemap extends Minion_Task {
             $index->write();
         }
 
-        $this->notice($this->_links_counter.' links have been written');
+        $this->info($this->_links_counter.' links have been written');
     }
 
     protected function iterate_layer(IFace_Model $parent = NULL)
