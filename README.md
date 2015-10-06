@@ -1,6 +1,6 @@
 # Betakiller platform
 
-Based on [Kohana](http://kohanaframework.org/).
+Based on [Kohana](http://kohanaframework.org/) framework (migration to Laravel planned).
 
 Released under a [BSD license](LICENSE.md), Betakiller can be used legally for any open source, commercial, or personal project.
 
