@@ -32,6 +32,12 @@ class BetaKiller_Notification_Message extends Kohana_Notification_Message {
         return $this;
     }
 
+    public function to_current_user()
+    {
+        $this->set_to(Env::user());
+        return $this;
+    }
+
     protected function template_factory()
     {
         return Twig::factory();

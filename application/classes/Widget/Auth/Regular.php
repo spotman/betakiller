@@ -9,7 +9,7 @@ class Widget_Auth_Regular extends Widget {
     {
         if ( ! $this->request->is_ajax() )
         {
-            throw new HTTP_Exception_400;
+            throw new HTTP_Exception_400('AJAX only gateway');
         }
 
         // Magic call for better exception handling
@@ -20,7 +20,7 @@ class Widget_Auth_Regular extends Widget {
 
         if ( ! $user_login OR ! $user_password )
         {
-            throw new HTTP_Exception_400;
+            throw new HTTP_Exception_400('No username or password sent');
         }
 
         // TODO валидация данных перед проверкой
