@@ -22,10 +22,10 @@ class Controller_Error_Php extends Controller_Developer {
 
         if ( $show_resolved_errors )
         {
-            $content->developers_list = $this->get_developers_list();
+            $content->set('developersList', $this->get_developers_list());
 
-            // Покажем все ошибки
-            $where["is_resolved"] = array('$in' => array(TRUE, FALSE, NULL));
+            // Покажем только обработанные ошибки
+            $where["is_resolved"] = array('$in' => array(TRUE));
 
             $user_id_filter = (int) $this->request->query("user_id");
 
@@ -35,7 +35,7 @@ class Controller_Error_Php extends Controller_Developer {
             }
 
             // Текущий выбранный пользователь
-            $content->user_id_filter = $user_id_filter;
+            $content->set('userIdFilter', $user_id_filter);
         }
         else
         {
@@ -44,7 +44,7 @@ class Controller_Error_Php extends Controller_Developer {
         }
 
         // Маркер показа только новых ошибок
-        $content->show_resolved_errors = $show_resolved_errors;
+        $content->set('showResolvedErrors', $show_resolved_errors);
 
         // Определяем критерий сортировки
         $sort_by = $this->get_sort_by();
@@ -73,9 +73,33 @@ class Controller_Error_Php extends Controller_Developer {
             "criteria"  => $where
         );
 
-        $content->errors = $model->load($params);
-        $content->sort_by = $sort_by;
-        $content->sort_direction = $sort_direction;
+        $errors = array();
+
+        foreach ( $model->load($params) as $error ) /** @var Model_Error_Message_Php $error */
+        {
+            $showURL = "/errors/php/".$error->get_hash();
+
+            $errors[] = array(
+                'showURL'       =>  $showURL,
+                'deleteURL'     =>  $showURL.'/delete',
+                'resolveURL'    =>  $showURL.'/resolve',
+                'paths'         =>  $error->get_paths(),
+                'message'       =>  Text::limit_chars($error->get_message(), 120, '...', FALSE),
+                'time'          =>  date("H:i:s d.m.Y", $error->get_time()),
+                'module'        =>  $error->get_module(),
+                'isResolved'    =>  $error->is_resolved(),
+                'resolvedBy'    =>  $error->get_resolved_by(),
+            );
+        }
+
+        $content->set('errors', $errors);
+        $content->set('sortBy', $sort_by);
+        $content->set('sortDirection', $sort_direction);
+        $content->set('basePath', dirname(APPPATH));
+
+        $content->set('sortByURL', '/errors/php/action/set_sort_by/');
+        $content->set('toggleSortDirectionURL', '/errors/php/action/toggle_sort_direction');
+        $content->set('toggleShowResolvedErrorsURL', '/errors/php/action/toggle_show_resolved_errors');
 
         Assets::instance()
             ->add('jquery')

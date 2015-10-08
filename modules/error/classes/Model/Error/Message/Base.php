@@ -22,7 +22,7 @@ class Model_Error_Message_Base extends Mango {
 
     public function find_by_hash($hash)
     {
-        $this->values(array("hash" => $hash));
+        $this->set_hash($hash);
         $this->load();
     }
 
@@ -180,11 +180,11 @@ class Model_Error_Message_Base extends Mango {
 
     /**
      * Возвращает TRUE, если ошибка исправлена
-     * @return mixed
+     * @return bool
      */
     public function is_resolved()
     {
-        return $this->is_resolved;
+        return (bool) $this->is_resolved;
     }
 
     /**
@@ -193,7 +193,7 @@ class Model_Error_Message_Base extends Mango {
      */
     public function get_resolved_by()
     {
-        return $this->resolved_by;
+        return (int) $this->resolved_by;
     }
 
     /**
