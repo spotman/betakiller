@@ -5,6 +5,4 @@
  */
 return array (
   'Unknown' => 'Неизвестно',
-  ':what :who :when' => ':what :who :when',
-  'This is a test' => 'This is a test',
 );
