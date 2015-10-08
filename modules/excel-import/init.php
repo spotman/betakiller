@@ -1,11 +1,9 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
-
-
 /**
- * @author Spotman denis.terehov@tsap-spb.ru
+ * @author Spotman i.am@spotman.ru
  *
- * excel import into k.planet.web
+ * excel import
  */
 
 Route::set('excel-import-index', 'excel-import')

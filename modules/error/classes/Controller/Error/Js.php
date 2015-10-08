@@ -1,11 +1,12 @@
 <?php
 
 /**
- * @author Spotman denis.terehov@tsap-spb.ru
+ * @author Spotman i.am@spotman.ru
  *
  * Сервис для автоматизированного сбора ошибок во фронтенде
+ *
+ * @todo move to API or widget or delete
  */
-
 class Controller_Error_Js extends Controller_Template {
 
     /**
@@ -24,7 +25,7 @@ class Controller_Error_Js extends Controller_Template {
         $data = $this->request->post("data");
 
         if ( ! $data )
-            throw new HTTP_Exception_500("Нечего обрабатывать");
+            throw new HTTP_Exception_500("Nothing to process");
 
         try
         {
@@ -120,7 +121,7 @@ class Controller_Error_Js extends Controller_Template {
                 {
                     // Уведомляем о ней разработчиков
                     XMPP::simple(
-                        array("denis.terehov@tsap-spb.ru", "ivan.shalin@sentra.ru", "dmitriy.borbotko@tsap-spb.ru"),
+                        array("i.am@spotman.ru"),
 
                         "\r\n". $message .
                         "\r\n\r\n".

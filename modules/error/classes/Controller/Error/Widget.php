@@ -1,5 +1,9 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
+/**
+ * Class Controller_Error_Widget
+ * TODO rewrite to Twig widget or delete
+ */
 class Controller_Error_Widget extends Controller_Developer {
 
     public function action_index()
@@ -12,7 +16,7 @@ class Controller_Error_Widget extends Controller_Developer {
         // Включен ли профайлер?
         $content->is_profiler_enabled = Profiler::is_enabled();
 
-        $this->jquery()->jquery_pnotify();
+        //$this->jquery()->jquery_pnotify();
 
         $this->_layout->content = $content;
     }

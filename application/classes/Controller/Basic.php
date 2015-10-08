@@ -141,16 +141,15 @@ class Controller_Basic extends Controller {
     }
 
     /**
-     * Helper for Twig::factory()
+     * Helper for Twig::factory(), replaces all php views with twig ones
      *
      * @param string $file
      * @param array $data
      * @return Twig
-     * @todo
      */
-//    protected function view_factory($file = NULL, array $data = NULL)
-//    {
-//        return Twig::factory($file, $data);
-//    }
+    protected function view_factory($file = NULL, array $data = NULL)
+    {
+        return Twig::factory($file, $data);
+    }
 
 }
