@@ -35,26 +35,31 @@ class Controller_Error_PhpMessage extends Controller_Developer {
         $content = $this->view('message');
 
 //        $content = View::factory("error/php/message");
-        $content->hash = $this->model->get_hash();
-        $content->trace = $this->model->get_trace();
+        $hash = $this->model->get_hash();
+        $content->set('hash', $hash);
+        $content->set('trace', $this->model->get_trace());
 
         // Адреса ресурсов, по которым возникла ошибка
-        $content->urls = $this->model->get_urls();
+        $content->set('urls', $this->model->get_urls());
 
         // Пути к файлам, в которых возникла ошибка
-        $content->paths = $this->model->get_paths();
+        $content->set('paths', $this->model->get_paths());
 
         // Счётчик общего кол-ва появлений ошибки
-        $content->counter = $this->model->get_counter();
+        $content->set('counter', $this->model->get_counter());
 
-        // Timestamp времени последнего упоминания об ошибке
-        $content->time = $this->model->get_time();
+        // Время последнего упоминания об ошибке
+        $content->set('time', date("d.m.Y в H:i:s", $this->model->get_time()));
 
         // История изменений
-        $content->history = $this->model->get_formatted_history();
+        $content->set('history', $this->model->get_formatted_history());
 
         // Ошибка исправлена?
-        $content->is_resolved = $this->model->is_resolved();
+        $content->set('isResolved', $this->model->is_resolved());
+
+        $content->set("backURL", '/errors/php');
+        $content->set("deleteURL", '/errors/php/'.$hash.'/delete');
+        $content->set("resolveURL", '/errors/php/'.$hash.'/resolve');
 
         $this->send_view($content);
     }
@@ -71,7 +76,7 @@ class Controller_Error_PhpMessage extends Controller_Developer {
     /**
      * Отмечает ошибку как исправленную
      */
-    public function action_resolved()
+    public function action_resolve()
     {
         $this->model->mark_resolved();
         $this->model->update();

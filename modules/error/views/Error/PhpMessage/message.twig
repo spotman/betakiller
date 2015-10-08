@@ -1,0 +1,51 @@
+
+<div class="container-fluid">
+
+    <div class="navbar navbar-inner">
+        <a class="btn btn-primary" href="{{ backURL }}"><i class="icon-chevron-left"></i> Назад к списку</a>
+
+        {% if isResolved %}
+            <a class="btn btn-danger pull-right" href="{{ deleteURL }}"><i class="icon-remove"></i> Удалить ошибку</a>
+        {% else %}
+            <a class="btn btn-success pull-right" href="{{ resolveURL }}"><i class="icon-ok"></i> Ошибка исправлена</a>
+        {% endif %}
+    </div>
+
+    <div class="col-xs-12">
+
+        Ошибка встречается <span class="label label-warning">{{ counter }}</span> раз (последний раз <span class="label label-primary">{{ time }}</span>) по следующим адресам:<br />
+
+        <ul>
+            {% for url in urls %}
+                <li>{{ url }}</li>
+            {% endfor %}
+        </ul><br />
+
+        в следующих файлах:<br />
+
+        <ul>
+            {% for path in paths %}
+                <li>{{ path }}</li>
+            {% endfor %}
+        </ul><br />
+
+        История изменений:
+        <ul>
+            {% for item in history %}
+                <li>{{ (item.what ~ " " ~ item.who ~ " " ~ item.when)|raw }}</li>
+            {% endfor %}
+        </ul><br />
+
+        {% if trace %}
+            <div>
+                <legend>Оригинальный стектрейс</legend>
+                {{ trace }}
+            </div>
+        {% else %}
+            <div class="alert alert-warning" role="alert">Файл стектрейса отсутствует</div>
+        {% endif %}
+
+    </div>
+</div>
+
+

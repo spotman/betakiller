@@ -1,0 +1,164 @@
+<style type="text/css">
+
+    ul.unstyled {
+        margin-bottom: 0;
+    }
+
+</style>
+
+<div class="navbar navbar-inner navbar-form form-inline">
+
+    <a class="btn btn-default" href="{{ toggleShowResolvedErrorsURL }}">
+        {{ showResolvedErrors ? "Показать только открытые ошибки" : "Показать исправленные ошибки" }}
+    </a>
+
+    {% if ( showResolvedErrors ) %}
+        <label for="user-filter"></label>
+        <select name="user-filter" id="user-filter" class="form-control">
+            <option value="0">Все разработчики</option>
+            {% for id, label in developersList %}
+            <option value="id" {{ (userIdFilter == id) ? "selected" : "" }}>{{ label }}</option>
+            {% endfor %}
+        </select>
+    {% endif %}
+
+    {% set sortKeys = { "time":  "По времени", "module": "По модулю", "message": "По типу ошибки" } %}
+
+    <div class="btn-group pull-right">
+
+    {% for sortKey, sortLabel in sortKeys %}
+
+        {% set isCurrent = (sortKey == sortBy) %}
+        {% set link = isCurrent ? toggleSortDirectionURL : (sortByURL ~ sortKey) %}
+        {% set title = isCurrent ? "Изменить направление сортировки" : "Выбрать другой критерий сортировки" %}
+        {% set icon = sortDirection ? "glyphicon glyphicon-arrow-up" : "glyphicon glyphicon-arrow-down" %}
+
+        <a tabindex="-1" href="{{ link }}" title="{{ title }}" class="btn btn-default {{ isCurrent ? "active" : "" }}">
+            {% if ( isCurrent ) %}<span class="{{ icon }}"></span>{% endif %} {{ sortLabel }}
+        </a>
+
+    {% endfor %}
+    </div>
+
+</div>
+
+<script type="text/javascript">
+
+    require([
+        'jquery'
+    ], function($) {
+
+        $(function() {
+            var user_select = $("#user-filter");
+
+            user_select.change(function()
+            {
+                var user_id = user_select.val();
+                location.href = user_id ? "?user_id=" + user_id : "/errors/php/";
+            });
+        });
+
+    });
+
+</script>
+
+{% if errors|length %}
+
+    <table class="table table-hover">
+
+        <thead>
+        <tr>
+            <th>Сообщение</th>
+            <th>Действия</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        {% for error in errors %}
+
+            {# Если ошибка сейчас исправлена, отмечаем её зелёным#}
+            {% if ( error.isResolved ) %}
+                {% set css_class = "success" %}
+                {# Если ошибка сейчас не исправлена, но её раньше кто-то исправлял, отмечаем жёлтым #}
+            {% elseif ( error.resolvedBy > 0 ) %}
+                {% set css_class = "warning" %}
+            {% else %}
+                {% set css_class = "" %}
+            {% endif %}
+
+            <tr class="item {{ css_class }}">
+                <td>
+                    <div class="pull-right">
+                        <small class="label label-warning">{{ error.module }}</small>
+                        <small class="label label-primary">{{ error.time }}</small>
+                    </div>
+                    <a href="{{ error.showURL }}">
+                        <strong>{{ error.message }}</strong>
+                    </a><br />
+
+                    <ul class="list-unstyled">
+                        {% for path in error.paths %}
+                            <li>{{ path|replace(basePath, "") }}</li>
+                        {% endfor %}
+                    </ul>
+
+                </td>
+                <td>
+                    {% if error.isResolved %}
+                        <a class="btn btn-danger" href="{{ error.deleteURL }}"><span class="glyphicon glyphicon-remove"></span>&nbsp;Удалить</a>
+                    {% else %}
+                        <a class="btn btn-success" href="{{ error.resolveURL }}"><span class="glyphicon glyphicon-ok"></span>&nbsp;Уже исправлена</a>
+                    {% endif %}
+                </td>
+            </tr>
+
+        {% endfor %}
+        </tbody>
+
+    </table>
+
+    <script type="text/javascript">
+
+        require([
+            'jquery'
+        ], function($) {
+
+            $(function() {
+                var items = $(".item");
+
+                $(".item a.btn").click(function(e)
+                {
+                    e.preventDefault();
+
+                    var btn = $(this),
+                        url = btn.attr("href");
+
+                    function disableButton() {
+                        btn.attr("disabled", "disabled");
+                    }
+
+                    function enableButton() {
+                        btn.removeAttr("disabled");
+                    }
+
+                    disableButton();
+
+                    $.post(url).done(function() {
+                        btn.closest(".item").hide(750, function() {
+                            $(this).remove();
+                        });
+                    }).fail(function() {
+                        enableButton();
+                    });
+                });
+            });
+
+        });
+
+    </script>
+
+{% else %}
+
+    <div class="alert alert-info">Ошибок не найдено</div>
+
+{% endif %}
