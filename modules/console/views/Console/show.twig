@@ -12,6 +12,10 @@
         height:100%;
     }
 
+    .terminal, .cmd {
+        color: #eee;
+    }
+
 </style>
 
 <script type="application/javascript">
@@ -52,7 +56,20 @@
                 }
 
             },{
-                greetings: "Hi there!"
+                greetings: "Hi there!",
+                completion: function(term, string, callback) {
+                    console.log(term.get_command());
+
+                    var cmd = $.terminal.parseCommand(term.get_command());
+
+                    if ( cmd.name == string ) {
+                        console.log("command [" + string + "] autocomplete");
+
+                        callback(["api", "dep"]);
+                    } else {
+                        console.log("command [" + cmd.name + "] argument [" + string + "] autocomplete");
+                    }
+                }
             });
         });
 

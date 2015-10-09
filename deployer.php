@@ -1,0 +1,153 @@
+<?php
+
+// For php-ssh extension
+require dirname(__FILE__).'/vendor/autoload.php';
+
+require 'recipe/common.php';
+
+
+/**
+ * Override this in app-related recipe
+ */
+env('app_path', 'app');
+
+env('core_path', 'core');
+
+// Use PHP SSH2 extension
+set('ssh_type', 'ext-ssh2');
+
+// Prepare app env
+task('deploy:repository:prepare:app', function() {
+    env('repository', env('app_repository'));
+    env('repository_path', env('app_path'));
+});
+
+// Prepare BetaKiller env
+task('deploy:repository:prepare:betakiller', function() {
+    env('repository', 'git@github.com:spotman/betakiller.git');
+    env('repository_path', env('core_path'));
+});
+
+function cd_repository_path_cmd() {
+    return 'cd {{release_path}}/{{repository_path}}';
+};
+
+// Clone repo task
+task('deploy:repository:clone', function() {
+    cd('{{release_path}}');
+    run('git clone {{repository}} {{repository_path}}');
+})->desc('Fetching repository'); //.env()->parse('{{repository_path}}')
+
+// Update repo task
+task('deploy:repository:update', function() {
+    run(cd_repository_path_cmd().' && git pull && git submodule update --init --recursive');
+})->desc('Updating repository');    // .env()->parse('{{repository_path}}')
+
+task('deploy:betakiller:vendors', function() {
+    if (commandExist('composer')) {
+        $composer = 'composer';
+    } else {
+        run(cd_repository_path_cmd()." && curl -sS https://getcomposer.org/installer | php");
+        $composer = 'php composer.phar';
+    }
+    run(cd_repository_path_cmd()." && $composer {{composer_options}}");
+})->desc('Processing Composer');    // .env()->parse('{{repository_path}}')
+
+//// Complex task for fetching repo
+//task('deploy:repository', [
+//    'deploy:repository:clone',
+//    'deploy:repository:update',
+//]);
+
+// Deploy app
+task('deploy:app', [
+    'deploy:repository:prepare:app',
+    'deploy:repository:clone',
+//    'deploy:repository:update',
+])->desc('Deploying app');
+
+// Deploy BetaKiller
+task('deploy:betakiller', [
+    'deploy:repository:prepare:betakiller',
+    'deploy:repository:clone',
+    'deploy:repository:update',
+    'deploy:betakiller:vendors',
+])->desc('Deploying BetaKiller');
+
+
+// TODO Сборка статики перед деплоем (build:require.js)
+// TODO Перенести всю статику в публичную директорию (cache:warmup)
+
+//task('deploy:git-update', function() {
+//    cd(env()->getReleasePath());
+//    run('git pull && git submodule update --init --recursive');
+//})->desc('Updating git submodules');;
+
+/**
+ * BetaKiller shared dirs
+ */
+env('betakiller_shared_dirs', [
+    '{{core_path}}/modules/error/media/php_traces',
+]);
+
+task('deploy:betakiller:shared', function() {
+    set('shared_dirs', env('betakiller_shared_dirs'));
+});
+
+after('deploy:betakiller:shared', 'deploy:shared');
+
+
+/**
+ * BetaKiller writable dirs
+ */
+env('betakiller_writable_dirs', [
+    '{{core_path}}/application/logs',
+    '{{core_path}}/application/cache',
+    '{{core_path}}/modules/twig/cache',
+
+    '{{app_path}}/logs',
+    '{{app_path}}/cache',
+    '{{app_path}}/public/assets',
+    '{{app_path}}/assets',
+]);
+
+task('deploy:betakiller:writable', function() {
+    set('writable_dirs', env('betakiller_writable_dirs'));
+});
+
+after('deploy:betakiller:writable', 'deploy:writable');
+
+
+/**
+ * Apache tasks
+ */
+task('httpd:reload', function () {
+    run('sudo service httpd reload');
+})->desc('Reloading Apache config');
+
+task('httpd:restart', function () {
+    run('sudo service httpd restart');
+})->desc('Restarting Apache');
+
+
+task('deploy', [
+    // Prepare directories
+    'deploy:prepare',
+    'deploy:release',
+
+    // Deploy code
+    'deploy:betakiller',
+    'deploy:app',
+
+    // app shared and writable dirs
+    'deploy:shared',
+    'deploy:writable',
+
+    // BetaKiller shared and writable dirs
+    'deploy:betakiller:shared',
+    'deploy:betakiller:writable',
+
+    // Finalize
+    'deploy:symlink',
+    'cleanup',
+]);
