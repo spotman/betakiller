@@ -14,7 +14,7 @@ env('app_path', 'app');
 env('core_path', 'core');
 
 // Use PHP SSH2 extension
-set('ssh_type', 'ext-ssh2');
+//set('ssh_type', 'ext-ssh2');
 
 // Prepare app env
 task('deploy:repository:prepare:app', function() {
