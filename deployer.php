@@ -32,13 +32,13 @@ task('check', function() {
 task('deploy:repository:prepare:app', function() {
     env('repository', get('app_repository'));
     env('repository_path', get('app_path'));
-});
+})->desc('Prepare app repository');
 
 // Prepare BetaKiller env
 task('deploy:repository:prepare:betakiller', function() {
     env('repository', 'git@github.com:spotman/betakiller.git');
     env('repository_path', env('core_path'));
-});
+})->desc('Prepare BetaKiller repository');
 
 function cd_repository_path_cmd() {
     return 'cd {{release_path}}/{{repository_path}}';
@@ -48,12 +48,12 @@ function cd_repository_path_cmd() {
 task('deploy:repository:clone', function() {
     cd('{{release_path}}');
     run('git clone {{repository}} {{repository_path}}');
-})->desc('Fetching repository'); //.env()->parse('{{repository_path}}')
+})->desc('Fetch repository'); //.env()->parse('{{repository_path}}')
 
 // Update repo task
 task('deploy:repository:update', function() {
     run(cd_repository_path_cmd().' && git pull && git submodule update --init --recursive');
-})->desc('Updating repository');    // .env()->parse('{{repository_path}}')
+})->desc('Update repository');    // .env()->parse('{{repository_path}}')
 
 task('deploy:betakiller:vendors', function() {
     if (commandExist('composer')) {
@@ -63,7 +63,7 @@ task('deploy:betakiller:vendors', function() {
         $composer = 'php composer.phar';
     }
     run(cd_repository_path_cmd()." && $composer {{composer_options}}");
-})->desc('Processing Composer');    // .env()->parse('{{repository_path}}')
+})->desc('Process Composer inside repository');    // .env()->parse('{{repository_path}}')
 
 //// Complex task for fetching repo
 //task('deploy:repository', [
@@ -76,7 +76,7 @@ task('deploy:app', [
     'deploy:repository:prepare:app',
     'deploy:repository:clone',
     'deploy:repository:update',
-])->desc('Deploying app');
+])->desc('Deploy app repository');
 
 // Deploy BetaKiller
 task('deploy:betakiller', [
@@ -84,7 +84,7 @@ task('deploy:betakiller', [
     'deploy:repository:clone',
     'deploy:repository:update',
     'deploy:betakiller:vendors',
-])->desc('Deploying BetaKiller');
+])->desc('Deploy BetaKiller repository');
 
 
 // TODO Сборка статики перед деплоем (build:require.js)
@@ -104,7 +104,7 @@ env('betakiller_shared_dirs', [
 
 task('deploy:betakiller:shared', function() {
     set('shared_dirs', env('betakiller_shared_dirs'));
-});
+})->desc('Process BetaKiller shared files and dirs');
 
 after('deploy:betakiller:shared', 'deploy:shared');
 
@@ -125,7 +125,7 @@ env('betakiller_writable_dirs', [
 
 task('deploy:betakiller:writable', function() {
     set('writable_dirs', env('betakiller_writable_dirs'));
-});
+})->desc('Process BetaKiller writable dirs');
 
 after('deploy:betakiller:writable', 'deploy:writable');
 
@@ -135,11 +135,11 @@ after('deploy:betakiller:writable', 'deploy:writable');
  */
 task('httpd:reload', function () {
     run('sudo service httpd reload');
-})->desc('Reloading Apache config');
+})->desc('Reload Apache config');
 
 task('httpd:restart', function () {
     run('sudo service httpd restart');
-})->desc('Restarting Apache');
+})->desc('Restart Apache');
 
 
 task('deploy', [
@@ -165,4 +165,4 @@ task('deploy', [
     // Finalize
     'deploy:symlink',
     'cleanup',
-]);
+])->desc('Deploy app bundle');
