@@ -8,8 +8,7 @@
     "Foreword/phpMorphy": "*",
     "mk-j/php_xlsxwriter": "^0.21.0",
     "samdark/sitemap": "^2.0",
-    "hashids/hashids": "^1.0",
-    "herzult/php-ssh": "^1.1"
+    "hashids/hashids": "^1.0"
   },
 
   "repositories": [
