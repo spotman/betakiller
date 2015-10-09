@@ -6,20 +6,32 @@
 require 'recipe/common.php';
 
 
-/**
- * Override this in app-related recipe
- */
-env('app_path', 'app');
-
 env('core_path', 'core');
 
 // Use PHP SSH2 extension
 //set('ssh_type', 'ext-ssh2');
 
+// Process server list
+serverList('servers.yml');
+
+task('check', function() {
+    if ( !has('app_repository') )
+        throw new \Symfony\Component\Process\Exception\RuntimeException('Please, set up GIT repo via env("app_repository")');
+
+    if ( !has('app_path') )
+        throw new \Symfony\Component\Process\Exception\RuntimeException('Please, set up site path via env("app_path")');
+
+    // Store these parameters to env for using them in shared and writable dirs
+    env('app_repository', get('app_repository'));
+    env('app_path', get('app_path'));
+
+//    writeln('Deploying to '.implode(', ', env('server.stages')));
+});
+
 // Prepare app env
 task('deploy:repository:prepare:app', function() {
-    env('repository', env('app_repository'));
-    env('repository_path', env('app_path'));
+    env('repository', get('app_repository'));
+    env('repository_path', get('app_path'));
 });
 
 // Prepare BetaKiller env
@@ -63,7 +75,7 @@ task('deploy:betakiller:vendors', function() {
 task('deploy:app', [
     'deploy:repository:prepare:app',
     'deploy:repository:clone',
-//    'deploy:repository:update',
+    'deploy:repository:update',
 ])->desc('Deploying app');
 
 // Deploy BetaKiller
@@ -131,6 +143,9 @@ task('httpd:restart', function () {
 
 
 task('deploy', [
+    // Check app configuration
+    'check',
+
     // Prepare directories
     'deploy:prepare',
     'deploy:release',
