@@ -98,14 +98,16 @@ task('deploy:betakiller', [
 /**
  * BetaKiller shared dirs
  */
-env('betakiller_shared_dirs', [
+set('betakiller_shared_dirs', [
     '{{core_path}}/modules/error/media/php_traces',
-    '{{core_path}}/application/logs',
-    '{{app_path}}/logs',
+
+// TODO deal with shared logs (exception is thrown if these two lines are uncommented)
+//    '{{core_path}}/application/logs',
+//    '{{app_path}}/logs',
 ]);
 
 task('deploy:betakiller:shared', function() {
-    set('shared_dirs', env('betakiller_shared_dirs'));
+    set('shared_dirs', get('betakiller_shared_dirs'));
 })->desc('Process BetaKiller shared files and dirs');
 
 after('deploy:betakiller:shared', 'deploy:shared');
@@ -114,7 +116,7 @@ after('deploy:betakiller:shared', 'deploy:shared');
 /**
  * BetaKiller writable dirs
  */
-env('betakiller_writable_dirs', [
+set('betakiller_writable_dirs', [
     '{{core_path}}/application/logs',
     '{{core_path}}/application/cache',
     '{{core_path}}/modules/twig/cache',
@@ -126,7 +128,7 @@ env('betakiller_writable_dirs', [
 ]);
 
 task('deploy:betakiller:writable', function() {
-    set('writable_dirs', env('betakiller_writable_dirs'));
+    set('writable_dirs', get('betakiller_writable_dirs'));
 })->desc('Process BetaKiller writable dirs');
 
 after('deploy:betakiller:writable', 'deploy:writable');
