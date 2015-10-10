@@ -380,10 +380,15 @@ abstract class Assets_Provider {
 
         $url = Route::url('assets-provider-item-deploy-directory', $options);
 
-        // TODO Security
-        $doc_root = $_SERVER['DOCUMENT_ROOT'] . DIRECTORY_SEPARATOR;
+        $path = parse_url($url, PHP_URL_PATH);
 
-        return $doc_root . ltrim($url, '/');
+        return $this->get_doc_root().DIRECTORY_SEPARATOR.ltrim($path, '/');
+    }
+
+    protected function get_doc_root()
+    {
+        // TODO Security
+        return $_SERVER['DOCUMENT_ROOT'];
     }
 
     /**
