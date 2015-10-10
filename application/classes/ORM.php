@@ -112,4 +112,9 @@ class ORM extends Util_ORM implements API_Response_Item, URL_DataSource /* , Dat
         return parent::cached($lifetime);
     }
 
+    public function get_all()
+    {
+        return $this->find_all();
+    }
+
 }
