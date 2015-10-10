@@ -100,7 +100,7 @@ task('deploy:betakiller', [
  */
 env('betakiller_shared_dirs', [
     '{{core_path}}/modules/error/media/php_traces',
-    '{{core_path}}/logs',
+    '{{core_path}}/application/logs',
     '{{app_path}}/logs',
 ]);
 
