@@ -102,7 +102,6 @@ env('betakiller_shared_dirs', [
     '{{core_path}}/modules/error/media/php_traces',
     '{{core_path}}/logs',
     '{{app_path}}/logs',
-    '{{app_path}}/assets',
 ]);
 
 task('deploy:betakiller:shared', function() {
