@@ -26,6 +26,11 @@ abstract class Status_Workflow {
         }
     }
 
+    public function is_transition_allowed($codename)
+    {
+        return $this->model->is_status_transition_allowed($codename);
+    }
+
     /**
      * Override this in child class if you need status transition history
      * @return bool

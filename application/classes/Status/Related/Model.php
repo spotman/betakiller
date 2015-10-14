@@ -52,6 +52,11 @@ abstract class Status_Related_Model extends ORM {
         return $this->set_current_status($target_status);
     }
 
+    public function is_status_transition_allowed($codename)
+    {
+        return $this->get_current_status()->is_target_transition_allowed($codename);
+    }
+
     /**
      * @return Status_Model[]|NULL
      */

@@ -72,6 +72,19 @@ abstract class Status_Model extends Graph_Node_Model {
     }
 
     /**
+     * Returns TRUE if target transition is allowed
+     *
+     * @param string $codename
+     * @return bool
+     */
+    public function is_target_transition_allowed($codename)
+    {
+        $allowed = $this->get_allowed_target_transitions_codename_array();
+
+        return in_array($codename, $allowed);
+    }
+
+    /**
      * @return Status_Related_Model
      */
     protected function get_related_model_relation()
