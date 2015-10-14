@@ -17,6 +17,10 @@ abstract class Status_Workflow {
         // Find allowed target transition by provided codename
         $target_transition = $this->find_target_transition($codename);
 
+        // Make custom check
+        $this->custom_target_transition_check($target_transition);
+
+        // Process transition
         $this->model->do_status_transition($target_transition);
 
         if ( $this->is_history_enabled() )
@@ -24,6 +28,11 @@ abstract class Status_Workflow {
             // TODO Model_Status_Workflow_History + tables in selected projects
             // TODO Store user, transition, related model_id (auto timestamp in mysql column)
         }
+    }
+
+    protected function custom_target_transition_check(Status_Transition_Model $transition)
+    {
+        // Empty by default
     }
 
     public function is_transition_allowed($codename)
