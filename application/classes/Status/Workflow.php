@@ -18,6 +18,21 @@ abstract class Status_Workflow {
         $target_transition = $this->find_target_transition($codename);
 
         $this->model->do_status_transition($target_transition);
+
+        if ( $this->is_history_enabled() )
+        {
+            // TODO Model_Status_Workflow_History + tables in selected projects
+            // TODO Store user, transition, related model_id (auto timestamp in mysql column)
+        }
+    }
+
+    /**
+     * Override this in child class if you need status transition history
+     * @return bool
+     */
+    protected function is_history_enabled()
+    {
+        return FALSE;
     }
 
     protected function find_target_transition($codename)

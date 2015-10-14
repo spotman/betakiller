@@ -3,16 +3,23 @@
 class Status_Workflow_Factory {
 
     use \Util_Factory,
-        \Util_Instance_Singleton;
+        \Util_Instance_Singleton {
+        \Util_Factory::create as protected _create;
+    }
 
     /**
      * @param $name
      * @param Status_Related_Model $model
      * @return static
      */
-    public static function create($name, Status_Related_Model $model)
+    public function create($name, Status_Related_Model $model)
     {
-        return static::instance_factory($name, $model);
+        return $this->_create($name, $model);
+    }
+
+    protected function make_instance_class_name($name)
+    {
+        return 'Status_Workflow_'.$name;
     }
 
     protected function make_instance($class_name, $name, Status_Related_Model $model)
