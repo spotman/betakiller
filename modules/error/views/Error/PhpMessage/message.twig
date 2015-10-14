@@ -39,7 +39,7 @@
         {% if trace %}
             <div>
                 <legend>Оригинальный стектрейс</legend>
-                {{ trace }}
+                {{ trace|raw }}
             </div>
         {% else %}
             <div class="alert alert-warning" role="alert">Файл стектрейса отсутствует</div>
