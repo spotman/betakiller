@@ -103,7 +103,7 @@ class ORM extends Util_ORM implements API_Response_Item, URL_DataSource /* , Dat
     public function cached($lifetime = NULL)
     {
         // Do nothing if not in production
-        if ( ! Kohana::in_production() )
+        if ( ! Kohana::in_production(TRUE) )
             return $this;
 
         if ( ! $lifetime )

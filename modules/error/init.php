@@ -9,7 +9,7 @@
 /**
  * Attach the MongoDB log-service to logging. Multiple writers are supported.
  */
-if ( Kohana::in_production() )
+if ( Kohana::in_production(TRUE) )
 {
     Kohana::$log->attach(new Log_MongoDB, Log::NOTICE, Log::EMERGENCY);
 }

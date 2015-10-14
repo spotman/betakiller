@@ -9,17 +9,13 @@ class Kohana extends Kohana_Core {
      */
     protected static $_custom_cache;
 
-    /**
-     * @var boolean
-     */
-    protected static $_in_production;
-
-    public static function in_production()
+    public static function in_production($use_staging = FALSE)
     {
-        if (self::$_in_production === NULL)
-            self::$_in_production = in_array(Kohana::$environment, array(Kohana::PRODUCTION, Kohana::STAGING));
+        $values = $use_staging
+            ? array(Kohana::PRODUCTION, Kohana::STAGING)
+            : array(Kohana::PRODUCTION);
 
-        return self::$_in_production;
+        return in_array(Kohana::$environment, $values);
     }
 
     public static function config($file)

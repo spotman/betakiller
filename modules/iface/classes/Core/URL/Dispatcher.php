@@ -4,7 +4,7 @@ abstract class Core_URL_Dispatcher {
 
     use Util_Instance_Singleton;
 
-    const PROTOTYPE_PCRE = '(\{([A-Za-z_]+)\.([A-Za-z_]+)\})';
+    const PROTOTYPE_PCRE = '(\{([A-Za-z_]+)\.([A-Za-z_]+)(\(\))*\})';
 
     /**
      * @var URL_Parameters
@@ -244,7 +244,13 @@ abstract class Core_URL_Dispatcher {
             );
 
         // Store model into registry
-        $this->parameters()->set($model_name, $model);
+        $setter = mb_strtolower('set_'.$model_name);
+        $registry = $this->parameters();
+
+        if (method_exists($registry, $setter))
+            $registry->$setter($model);
+        else
+            $registry->set($model_name, $model);
     }
 
     public function make_url_parameter_part($prototype_string, URL_Parameters $parameters = NULL)
@@ -262,6 +268,18 @@ abstract class Core_URL_Dispatcher {
 
         if ( ! $model )
             throw new URL_Dispatcher_Exception('Can not find :name model in parameters', array(':name' => $model_name));
+
+        if( $prototype->is_method_call() )
+        {
+            $method = $model_key;
+
+            if ( ! method_exists($model, $method) )
+                throw new URL_Dispatcher_Exception('Method :method does not exists in model :model',
+                    array(':method' => $method, ':model' => $model_name));
+
+            return $model->$method();
+        }
+        else
 
         // Get url prototype value
         return $model->get_url_key_value($model_key);

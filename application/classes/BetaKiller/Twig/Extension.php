@@ -146,7 +146,7 @@ class BetaKiller_Twig_Extension extends Twig_Extension {
 
     public function in_production()
     {
-        return Kohana::in_production();
+        return Kohana::in_production(TRUE);
     }
 
     /**

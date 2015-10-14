@@ -6,6 +6,7 @@ abstract class Core_URL_Prototype {
 
     protected $_model_name;
     protected $_model_key;
+    protected $_is_method_call = FALSE;
 
     /**
      * @param mixed $model_key
@@ -39,6 +40,22 @@ abstract class Core_URL_Prototype {
         return $this->_model_name;
     }
 
+    /**
+     * @return bool
+     */
+    public function is_method_call()
+    {
+        return $this->_is_method_call;
+    }
+
+//    /**
+//     * @param bool $is_method_call
+//     */
+//    public function set_is_method_call($is_method_call)
+//    {
+//        $this->_is_method_call = (bool) $is_method_call;
+//    }
+
     public function parse($string)
     {
         if ( ! $string )
@@ -46,10 +63,18 @@ abstract class Core_URL_Prototype {
 
         $string = trim($string, '{}');
 
-        $split = explode('.', $string);
+        $model = explode('.', $string);
+        $name = $model[0];
+        $key = $model[1];
 
-        $this->set_model_name($split[0]);
-        $this->set_model_key($split[1]);
+        if ( strpos($key, '()') !== FALSE )
+        {
+            $this->_is_method_call = TRUE;
+            $key = str_replace('()', '', $key);
+        }
+
+        $this->set_model_name($name);
+        $this->set_model_key($key);
 
         return $this;
     }

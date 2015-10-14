@@ -181,7 +181,7 @@ abstract class Assets_Provider {
     public function deploy(Request $request, Assets_Model $model, $content)
     {
         // TODO Move to config
-        $deploy_allowed = Kohana::in_production();
+        $deploy_allowed = Kohana::in_production(TRUE);
 
         // No deployment in testing and developing environments
         if ( ! $deploy_allowed )

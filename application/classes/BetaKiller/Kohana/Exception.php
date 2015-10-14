@@ -48,7 +48,7 @@ class BetaKiller_Kohana_Exception extends Kohana_Kohana_Exception {
             ? $exception->always_show_nice_message()
             : FALSE;
 
-        if ( Kohana::in_production() OR $always_show_nice_message )
+        if ( Kohana::in_production(TRUE) OR $always_show_nice_message )
         {
             $response = self::make_nice_message($exception);
         }

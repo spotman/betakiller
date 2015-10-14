@@ -93,7 +93,7 @@ abstract class Controller extends Controller_Proxy {
         I18n::lang($user_lang);
 
         // Если мы в режиме разработки
-        if ( ! Kohana::in_production() )
+        if ( ! Kohana::in_production(TRUE) )
         {
             // Сохраняем все непереведённые строки из пользовательского интерфейса
             register_shutdown_function(array("I18n", "write"));
