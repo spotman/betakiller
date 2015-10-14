@@ -119,7 +119,7 @@ class Controller_Assets extends Controller {
         if ( ! $provider_key )
             throw new Assets_Exception('You must specify provider codename');
 
-        $this->_provider = Assets_Provider::factory($provider_key);
+        $this->_provider = Assets_Provider_Factory::instance()->create($provider_key);
     }
 
     protected function from_item_deploy_url()

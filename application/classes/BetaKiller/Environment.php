@@ -2,7 +2,7 @@
 
 class BetaKiller_Environment extends Util_Registry_Class
 {
-    use Util_Singleton;
+    use Util_Instance_Singleton;
 
     public function get($key)
     {

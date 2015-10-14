@@ -2,7 +2,7 @@
 
 class StaticFile extends Kohana_StaticFile {
 
-    use Util_Singleton;
+    use Util_Instance_Singleton;
 
     public function __construct()
     {

@@ -2,7 +2,7 @@
 
 abstract class Core_URL_Parameters {
 
-    use Util_Registry_Trait,
-        Util_Factory_Simple;
+    use \Util_Registry_Trait,
+        \Util_Instance_Simple;
 
 }

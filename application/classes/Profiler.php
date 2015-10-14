@@ -2,7 +2,7 @@
 
 class Profiler extends Kohana_Profiler {
 
-    use Util_Singleton;
+    use Util_Instance_Singleton;
 
     /**
      * Перманентно включает профайлер для всех экшнов / контроллеров

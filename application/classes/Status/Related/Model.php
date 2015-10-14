@@ -150,7 +150,7 @@ abstract class Status_Related_Model extends ORM {
      */
     protected function workflow_factory()
     {
-        return Status_Workflow::factory($this->get_workflow_name(), $this);
+        return Status_Workflow_Factory::instance()->create($this->get_workflow_name(), $this);
     }
 
     /**

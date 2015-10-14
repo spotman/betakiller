@@ -27,7 +27,7 @@ class Task_Sitemap extends Minion_Task {
 
     protected function _execute(array $params)
     {
-        $this->_url_parameters = URL_Parameters::factory();
+        $this->_url_parameters = URL_Parameters::instance();
         $this->_url_dispatcher = URL_Dispatcher::instance();
 
         $doc_root = MultiSite::instance()->doc_root();

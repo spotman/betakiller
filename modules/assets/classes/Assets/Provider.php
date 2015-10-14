@@ -2,8 +2,6 @@
 
 abstract class Assets_Provider {
 
-    use Util_Factory_Cached;
-
     /**
      * @var string
      */
@@ -19,23 +17,15 @@ abstract class Assets_Provider {
      */
     protected static $_config;
 
-    public static function config($key, $default_value = NULL)
-    {
-        if ( static::$_config === NULL )
-        {
-            static::$_config = Kohana::config('assets')->as_array();
-        }
-
-        return Arr::path(static::$_config, $key, $default_value);
-    }
-
-    protected static function make_instance($class_name, $codename)
-    {
-        /** @var Assets_Provider $instance */
-        $instance = new $class_name;
-        $instance->set_codename($codename);
-        return $instance;
-    }
+//    public static function config($key, $default_value = NULL)
+//    {
+//        if ( static::$_config === NULL )
+//        {
+//            static::$_config = Kohana::config('assets')->as_array();
+//        }
+//
+//        return Arr::path(static::$_config, $key, $default_value);
+//    }
 
     public function set_codename($codename)
     {

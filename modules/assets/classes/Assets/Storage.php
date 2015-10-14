@@ -7,21 +7,6 @@
 abstract class Assets_Storage {
 
     /**
-     * @param string $codename
-     * @return static
-     * @throws Assets_Storage_Exception
-     */
-    public static function factory($codename)
-    {
-        $class_name = 'Assets_Storage_'.$codename;
-
-        if ( ! class_exists($class_name) )
-            throw new Assets_Storage_Exception('Unknown storage :class', array(':class' => $class_name));
-
-        return new $class_name;
-    }
-
-    /**
      * @param Assets_Model $model
      * @return string
      */

@@ -2,7 +2,7 @@
 
 abstract class Kohana_Notification {
 
-    use Util_Singleton;
+    use Util_Instance_Singleton;
 
     const TRANSPORT_EMAIL = 'email';
 

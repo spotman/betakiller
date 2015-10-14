@@ -2,7 +2,7 @@
 
 abstract class Core_URL_Dispatcher {
 
-    use Util_Singleton;
+    use Util_Instance_Singleton;
 
     const PROTOTYPE_PCRE = '(\{([A-Za-z_]+)\.([A-Za-z_]+)\})';
 
@@ -38,7 +38,7 @@ abstract class Core_URL_Dispatcher {
     {
         if ( ! $this->_url_parameters )
         {
-            $this->_url_parameters = URL_Parameters::factory();
+            $this->_url_parameters = URL_Parameters::instance();
         }
 
         return $this->_url_parameters;

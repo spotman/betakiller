@@ -2,27 +2,10 @@
 
 abstract class Status_Workflow {
 
-    use Util_Factory;
-
     /**
      * @var Status_Related_Model
      */
     protected $model;
-
-    /**
-     * @param $name
-     * @param Status_Related_Model $model
-     * @return static
-     */
-    public static function factory($name, Status_Related_Model $model)
-    {
-        return static::instance_factory($name, $model);
-    }
-
-    protected static function make_instance($class_name, $name, Status_Related_Model $model)
-    {
-        return new $class_name($model);
-    }
 
     public function __construct(Status_Related_Model $model)
     {

@@ -1,9 +1,13 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
+/**
+ * Class DataSource
+ * @deprecated
+ */
 abstract class DataSource implements DataSource_Interface {
 
-    use Util_Factory,
-        Util_GetterAndSetterMethod;
+//    use Util_Factory,
+//        Util_GetterAndSetterMethod;
 
     /**
      * @var string

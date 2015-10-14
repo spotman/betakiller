@@ -2,7 +2,7 @@
 
 class CSS {
 
-    use Util_Singleton;
+    use Util_Instance_Singleton;
 
     /**
      * Хелпер к добавлению локально размещённого стиля
