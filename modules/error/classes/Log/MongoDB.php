@@ -160,7 +160,10 @@ class Log_MongoDB extends Log_Writer {
 
     protected function make_email(Model_Error_Message_Php $model)
     {
-        $host = isset($_SERVER["HTTP_HOST"]) ? $_SERVER["HTTP_HOST"] : $_SERVER["SERVER_NAME"];
+        $host = isset($_SERVER["HTTP_HOST"]) ? $_SERVER["HTTP_HOST"] : NULL;
+
+        if ( !$host )
+            $host = isset($_SERVER["SERVER_NAME"]) ? $_SERVER["SERVER_NAME"] : 'localhost';
 
         ob_start();
         ?>

@@ -2,17 +2,6 @@
 
 return array(
 
-    /**
-     * YandexDisk
-
-    'service'   =>  'YandexDisk',
-    'login'     =>  'test@yandex.ru',
-    'password'  =>  'test',
-    'type'      =>  YandexBackup::ZIP,
-
-     *
-     */
-
     'database'  =>  'default',
     'folder'    =>  MultiSite::instance()->site_path(),
 
