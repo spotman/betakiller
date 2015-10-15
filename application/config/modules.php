@@ -12,6 +12,7 @@ return array(
     'api'                   => MODPATH.'api',                   // API subsystem
     'assets'                => MODPATH.'assets',                // Asset management subsystem
     'auth'                  => MODPATH.'auth',                  // Basic authentication
+    'backup'                => MODPATH.'backup',                // Complex backup (files + database)
     'cache'                 => MODPATH.'cache',                 // Caching with multiple backends
     'database'              => MODPATH.'database',              // Database access
 //    'dbv'                   => MODPATH.'dbv',                   // Database Version Control

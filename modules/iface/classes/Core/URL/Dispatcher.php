@@ -280,9 +280,10 @@ abstract class Core_URL_Dispatcher {
             return $model->$method();
         }
         else
-
-        // Get url prototype value
-        return $model->get_url_key_value($model_key);
+        {
+            // Get url prototype value
+            return $model->get_url_key_value($model_key);
+        }
     }
 
     protected function parse_prototype($prototype)

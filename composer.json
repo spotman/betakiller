@@ -9,7 +9,8 @@
     "mk-j/php_xlsxwriter": "^0.21.0",
     "samdark/sitemap": "^2.0",
     "hashids/hashids": "^1.0",
-    "twig/twig": "^1.22"
+    "twig/twig": "^1.22",
+    "dmamontov/davbackup": "~1.0.1"
   },
 
   "repositories": [

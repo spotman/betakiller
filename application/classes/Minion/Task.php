@@ -27,6 +27,11 @@ abstract class Minion_Task extends Kohana_Minion_Task {
         parent::execute();
     }
 
+    protected function config($key, $default = NULL)
+    {
+        return Kohana::config($key) ?: $default;
+    }
+
     /**
      *
      * Constant like Log::INFO

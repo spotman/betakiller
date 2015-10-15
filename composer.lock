@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "40ed1e6277b400a2ba9c89dd39c7103b",
+    "hash": "b4468b4938f22fc8882a8f14d0fd930b",
     "packages": [
         {
             "name": "Foreword/phpMorphy",
@@ -124,6 +124,53 @@
             "description": "Deployment Tool",
             "homepage": "http://deployer.org",
             "time": "2015-09-02 06:44:10"
+        },
+        {
+            "name": "dmamontov/davbackup",
+            "version": "1.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/dmamontov/davbackup.git",
+                "reference": "2c219d761c1aa5833b2a0a4c0050efd22364542d"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/dmamontov/davbackup/zipball/2c219d761c1aa5833b2a0a4c0050efd22364542d",
+                "reference": "2c219d761c1aa5833b2a0a4c0050efd22364542d",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0.0.x-dev"
+                }
+            },
+            "autoload": {
+                "files": [
+                    "DavBackup.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Dmitry Mamontov",
+                    "email": "hello@slobel.ru",
+                    "role": "lead"
+                }
+            ],
+            "description": "Creating backup sites in the clouds through WebDav",
+            "homepage": "http://www.slobel.ru/",
+            "keywords": [
+                "WebDAV",
+                "backup"
+            ],
+            "time": "2015-05-29 11:45:00"
         },
         {
             "name": "doctrine/inflector",
