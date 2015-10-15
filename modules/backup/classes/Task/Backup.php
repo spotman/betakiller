@@ -37,6 +37,13 @@ class Task_Backup extends Minion_Task {
 
         $this->info('Backing up database '.$dbName);
 
+        /**
+         * Force utf8 charset for mysql
+         * @url http://stackoverflow.com/questions/4475548/pdo-mysql-and-broken-utf-8-encoding
+         */
+        if ( $dbDriver == 'mysql' )
+            $dbName .= ';charset=utf8';
+
         $instance->db(
             $dbUser, // user
             $dbPass, // pass
@@ -52,7 +59,7 @@ class Task_Backup extends Minion_Task {
         $instance->folder($folder);
 
         if ( $instance->backup() )
-            $this->info('Done!');
+            $this->info('Backup done, see file '.$instance->getName().'.'.$instance->getType());
         else
             $this->warning('Backup was not created!');
     }
