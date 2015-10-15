@@ -45,7 +45,7 @@ class Task_Backup extends Minion_Task {
             $dbDriver // driver
         );
 
-        $folder = $this->config('backup.folder');
+        $folder = realpath($this->config('backup.folder'));
 
         $this->info('Backing up folder '.$folder);
 
