@@ -129,6 +129,11 @@ abstract class Controller extends Controller_Proxy {
         return $this->request->post($key, $value);
     }
 
+    protected function query($key = NULL, $value = NULL)
+    {
+        return $this->request->query($key, $value);
+    }
+
     /**
      * Getter/setter for Response content-type
      * Use this method for better uncaught exception handling

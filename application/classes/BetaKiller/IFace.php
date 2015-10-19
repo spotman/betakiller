@@ -1,6 +1,6 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
-abstract class BetaKiller_IFace extends Core_IFace {
+abstract class BetaKiller_IFace extends Kohana_IFace {
 
     final protected function process_api_response(API_Response $response)
     {
@@ -26,7 +26,7 @@ abstract class BetaKiller_IFace extends Core_IFace {
 
     final protected function iface_factory($codename)
     {
-        return IFace::by_codename($codename);
+        return self::by_codename($codename);
     }
 
 }

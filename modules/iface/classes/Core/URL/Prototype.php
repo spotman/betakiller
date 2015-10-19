@@ -1,8 +1,10 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
+use BetaKiller\Utils;
+
 abstract class Core_URL_Prototype {
 
-    use Util_Factory_Simple;
+    use Utils\Instance\Simple;
 
     protected $_model_name;
     protected $_model_key;

@@ -161,7 +161,7 @@ class Kohana_StaticFile {
 			 . $file_name . '.' . $type;
 	}
 
-    public static function replace_keys($str)
+    public function replace_keys($str)
     {
         return str_replace(
             array('{staticfiles_url}', '{# assets_base_url #}'),

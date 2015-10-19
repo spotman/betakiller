@@ -27,7 +27,7 @@ abstract class Core_View_IFace {
         return new static($iface);
     }
 
-    protected function __construct(IFace $iface)
+    protected function __construct(Core_IFace $iface)
     {
         $this->_iface = $iface;
     }

@@ -23,6 +23,14 @@ abstract class Core_IFace {
     protected $_expires;
 
     /**
+     * Returns URL query parts array for current HTTP request
+     *
+     * @param $key
+     * @return array
+     */
+    abstract protected function getUrlQuery($key = NULL);
+
+    /**
      * Creates IFace instance from it`s codename
      *
      * @param string $codename IFace codename

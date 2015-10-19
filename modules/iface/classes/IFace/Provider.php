@@ -2,7 +2,7 @@
 
 class IFace_Provider {
 
-    use Util_Instance_Singleton;
+    use \BetaKiller\Utils\Instance\Singleton;
 
     protected $_iface_instances;
 

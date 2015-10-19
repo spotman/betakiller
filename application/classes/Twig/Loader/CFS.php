@@ -10,7 +10,7 @@ class Twig_Loader_CFS extends Kohana_Twig_Loader_CFS {
         $str = parent::getSource($name);
 
         // Replace static url`s keys
-        $str = StaticFile::replace_keys($str);
+        $str = StaticFile::instance()->replace_keys($str);
 
         return $str;
     }

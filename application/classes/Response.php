@@ -1,3 +1,5 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
-class Response extends Util_Response {}
+use \BetaKiller\Utils;
+
+class Response extends Utils\Kohana\Response {}

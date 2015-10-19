@@ -122,7 +122,7 @@ class Kohana_StaticCss extends StaticFile {
 	 */
 	protected function prepareCss($style, $url)
 	{
-        $style = static::replace_keys($style);
+        $style = $this->replace_keys($style);
 
 		if ($this->_config->css['min'])
 		{
@@ -253,7 +253,7 @@ class Kohana_StaticCss extends StaticFile {
 		$css_inline = implode("\n", $this->_css_inline);
 
         // Replace keys
-        static::replace_keys($css_inline);
+        $this->replace_keys($css_inline);
 
         if ($this->_config->css['min'])
 		{

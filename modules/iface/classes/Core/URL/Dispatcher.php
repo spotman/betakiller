@@ -2,7 +2,7 @@
 
 abstract class Core_URL_Dispatcher {
 
-    use Util_Instance_Singleton;
+    use \BetaKiller\Utils\Instance\Singleton;
 
     const PROTOTYPE_PCRE = '(\{([A-Za-z_]+)\.([A-Za-z_]+)(\(\))*\})';
 
@@ -58,7 +58,7 @@ abstract class Core_URL_Dispatcher {
     {
         if ( ! $this->_url_processor )
         {
-            $this->_url_processor = URL_Processor::factory();
+            $this->_url_processor = URL_Processor::instance();
         }
 
         return $this->_url_processor;
@@ -288,7 +288,7 @@ abstract class Core_URL_Dispatcher {
 
     protected function parse_prototype($prototype)
     {
-        return URL_Prototype::factory()->parse($prototype);
+        return URL_Prototype::instance()->parse($prototype);
     }
 
     /**

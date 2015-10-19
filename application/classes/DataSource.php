@@ -6,7 +6,7 @@
  */
 abstract class DataSource implements DataSource_Interface {
 
-//    use Util_Factory,
+//    use BetaKiller_Util_Factory_Base,
 //        Util_GetterAndSetterMethod;
 
     /**

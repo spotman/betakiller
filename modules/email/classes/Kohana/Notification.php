@@ -2,7 +2,7 @@
 
 abstract class Kohana_Notification {
 
-    use Util_Instance_Singleton;
+    use \BetaKiller\Utils\Instance\Simple;
 
     const TRANSPORT_EMAIL = 'email';
 
@@ -11,7 +11,7 @@ abstract class Kohana_Notification {
      */
     public function message()
     {
-        return Notification_Message::factory();
+        return Notification_Message::instance();
     }
 
     public function send(Kohana_Notification_Message $message)

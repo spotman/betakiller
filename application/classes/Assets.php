@@ -6,7 +6,7 @@
 
 class Assets {
 
-    use Util_Instance_Singleton;
+    use \BetaKiller\Utils\Instance\Singleton;
 
     protected $_config;
 

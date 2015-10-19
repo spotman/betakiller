@@ -2,7 +2,7 @@
 
 class IFace_Model_Provider implements IFace_Model_Provider_Interface {
 
-    use Util_Instance_Singleton;
+    use \BetaKiller\Utils\Instance\Singleton;
 
     /**
      * @var IFace_Model_Provider_DB[]|IFace_Model_Provider_Admin[]
@@ -125,8 +125,8 @@ class IFace_Model_Provider implements IFace_Model_Provider_Interface {
         if ( ! $this->_sources )
         {
             $this->_sources = array(
-                IFace_Model_Provider_DB::factory(),
-                IFace_Model_Provider_Admin::factory(),
+                IFace_Model_Provider_DB::instance(),
+                IFace_Model_Provider_Admin::instance(),
             );
         }
 

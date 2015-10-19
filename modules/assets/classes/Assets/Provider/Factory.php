@@ -1,9 +1,22 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
+use \BetaKiller\Utils;
+
 class Assets_Provider_Factory {
 
-    use \Util_Instance_Singleton,
-        \Util_Factory_Cached;
+    use Utils\Instance\Singleton,
+        Utils\Factory\Cached;
+
+    /**
+     * Factory method
+     *
+     * @param $name
+     * @return static
+     */
+    public function create($name)
+    {
+        return $this->_create($name);
+    }
 
     protected function make_instance($class_name, $codename)
     {
@@ -15,7 +28,7 @@ class Assets_Provider_Factory {
 
     protected function make_instance_class_name($name)
     {
-        return 'Assets_Provider_'.$name;
+        return '\\Assets_Provider_'.$name;
     }
 
 }

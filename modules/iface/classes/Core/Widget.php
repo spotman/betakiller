@@ -3,7 +3,7 @@
 
 abstract class Core_Widget extends Controller {
 
-    use Util_GetterAndSetterMethod;
+    use \BetaKiller\Utils\GetterAndSetterMethod;
 
     const DEFAULT_STATE = 'default';
 
@@ -51,6 +51,8 @@ abstract class Core_Widget extends Controller {
      * @param Response $response
      * @return static
      * @throws Widget_Exception
+     * @deprecated
+     * @todo create standalone factory class
      */
     public static function factory($name, Request $request = NULL, Response $response = NULL)
     {
@@ -102,7 +104,7 @@ abstract class Core_Widget extends Controller {
         {
             $response = $this->render();
         }
-        catch ( Exception $e )
+        catch ( \Exception $e )
         {
             $response = Kohana_Exception::_handler($e);
         }

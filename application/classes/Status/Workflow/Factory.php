@@ -2,10 +2,8 @@
 
 class Status_Workflow_Factory {
 
-    use \Util_Factory,
-        \Util_Instance_Singleton {
-        \Util_Factory::create as protected _create;
-    }
+    use \BetaKiller\Utils\Factory\Base,
+        \BetaKiller\Utils\Instance\Singleton;
 
     /**
      * @param $name
@@ -19,7 +17,7 @@ class Status_Workflow_Factory {
 
     protected function make_instance_class_name($name)
     {
-        return 'Status_Workflow_'.$name;
+        return '\\Status_Workflow_'.$name;
     }
 
     protected function make_instance($class_name, $name, Status_Related_Model $model)

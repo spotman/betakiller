@@ -2,7 +2,7 @@
 
 class Device extends Kohana_Device {
 
-    use Util_Factory_Simple;
+    use \BetaKiller\Utils\Instance\Simple;
 
     public function is_portable($http_headers = NULL, $http_headers = NULL)
     {

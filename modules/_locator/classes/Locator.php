@@ -8,7 +8,7 @@
  */
 class Locator {
 
-    use Util_Instance_Singleton;
+    use \BetaKiller\Utils\Instance\Singleton;
 
     /**
      * Initialize Kohana routes from locations

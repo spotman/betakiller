@@ -300,7 +300,7 @@ class Kohana_StaticJs extends StaticFile {
 	 */
 	public function prepare($js_code)
 	{
-        return static::replace_keys($js_code);
+        return $this->replace_keys($js_code);
 	}
 
 	/**

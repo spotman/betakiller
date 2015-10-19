@@ -2,7 +2,7 @@
 
 abstract class Kohana_Notification_Message {
 
-    use Util_Factory_Simple;
+    use \BetaKiller\Utils\Instance\Simple;
 
     /**
      * @var Notification_User_Interface

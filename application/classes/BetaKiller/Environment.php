@@ -1,8 +1,10 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
-class BetaKiller_Environment extends Util_Registry_Class
+use BetaKiller\Utils;
+
+class BetaKiller_Environment extends Utils\Registry\Base
 {
-    use Util_Instance_Singleton;
+    use Utils\Instance\Singleton;
 
     public function get($key)
     {

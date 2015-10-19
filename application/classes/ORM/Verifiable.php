@@ -116,7 +116,7 @@ class ORM_Verifiable extends ORM {
 
     public function filter_approved()
     {
-        return $this->where("approved_by", "IS NOT", NULL);
+        return $this->where($this->object_column("approved_by"), "IS NOT", NULL);
     }
 
     protected function _autocomplete($query, array $search_fields)

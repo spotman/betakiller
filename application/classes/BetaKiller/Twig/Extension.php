@@ -264,7 +264,7 @@ class BetaKiller_Twig_Extension extends Twig_Extension {
 
     public function is_device()
     {
-        return Device::factory()->is_portable();
+        return Device::instance()->is_portable();
     }
 
     public function widget(array $context, $name, array $data = array())

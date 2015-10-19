@@ -80,7 +80,7 @@ class Task_Sitemap extends Minion_Task {
 
             if ( $iface_model->has_dynamic_url()  )
             {
-                $prototype = URL_Prototype::factory()->parse($iface_model->get_uri());
+                $prototype = URL_Prototype::instance()->parse($iface_model->get_uri());
 
                 $model_name = $prototype->get_model_name();
                 $model_key = $prototype->get_model_key();

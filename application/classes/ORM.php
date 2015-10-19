@@ -1,7 +1,8 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
+use BetaKiller\Utils;
 
-class ORM extends Util_ORM implements API_Response_Item, URL_DataSource /* , DataSource_Interface */ {
+class ORM extends Utils\Kohana\ORM implements API_Response_Item, URL_DataSource /* , DataSource_Interface */ {
 
     /**
      * Default implementation for ORM objects

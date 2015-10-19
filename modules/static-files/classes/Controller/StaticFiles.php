@@ -102,7 +102,7 @@ class Controller_StaticFiles extends Controller {
 
     protected function replace_url($text)
     {
-        return StaticFile::replace_keys($text);
+        return StaticFile::instance()->replace_keys($text);
     }
 
     static public function get_config()
