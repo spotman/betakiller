@@ -20,7 +20,7 @@ class Status_Workflow_Factory {
         return '\\Status_Workflow_'.$name;
     }
 
-    protected function make_instance($class_name, $name, Status_Related_Model $model)
+    protected function make_instance($class_name, Status_Related_Model $model)
     {
         return new $class_name($model);
     }

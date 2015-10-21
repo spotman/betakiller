@@ -18,12 +18,13 @@ class Assets_Provider_Factory {
         return $this->_create($name);
     }
 
-    protected function make_instance($class_name, $codename)
+    /**
+     * @param \Assets_Provider $instance
+     * @param $codename
+     */
+    protected function store_codename($instance, $codename)
     {
-        /** @var Assets_Provider $instance */
-        $instance = new $class_name;
         $instance->set_codename($codename);
-        return $instance;
     }
 
     protected function make_instance_class_name($name)

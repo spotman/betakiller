@@ -1,6 +1,7 @@
-<?php defined('SYSPATH') OR die('No direct script access.');
+<?php
+namespace BetaKiller\Model;
 
-class BetaKiller_Model_User extends Model_Auth_User implements Notification_User_Interface //implements ACL_Role_Interface
+class User extends \Model_Auth_User implements \Notification_User_Interface //implements ACL_Role_Interface
 {
     protected $_reload_on_wakeup = FALSE;
 
@@ -23,7 +24,7 @@ class BetaKiller_Model_User extends Model_Auth_User implements Notification_User
     }
 
     /**
-     * @return Model_Role
+     * @return \Model_Role
      */
     protected function get_roles_relation()
     {
@@ -74,15 +75,15 @@ class BetaKiller_Model_User extends Model_Auth_User implements Notification_User
     /**
      * @todo Переписать на кешированный ACL ибо слишком затратно делать запрос в БД на проверку роли
      *
-     * @param Model_Role|string $role
+     * @param \Model_Role|string $role
      * @return bool
      */
     public function has_role($role)
     {
-        if ( ! ($role instanceof Model_Role) )
+        if ( ! ($role instanceof \Model_Role) )
         {
-            /** @var Model_Role $orm */
-            $orm = ORM::factory('Role');
+            /** @var \Model_Role $orm */
+            $orm = \ORM::factory('Role');
             $role = $orm->get_by_name($role);
         }
 
@@ -116,7 +117,7 @@ class BetaKiller_Model_User extends Model_Auth_User implements Notification_User
     }
 
     /**
-     * @return NULL|Model_Language
+     * @return NULL|\Model_Language
      */
     public function get_language()
     {
@@ -146,7 +147,7 @@ class BetaKiller_Model_User extends Model_Auth_User implements Notification_User
     /**
      * Search for user by username or e-mail
      * @param $username_or_email
-     * @throws HTTP_Exception_403
+     * @throws \HTTP_Exception_403
      */
     public function search_by($username_or_email)
     {
@@ -157,14 +158,14 @@ class BetaKiller_Model_User extends Model_Auth_User implements Notification_User
     {
         // Проверяем активен ли аккаунт
         if ( ! $this->is_active() )
-            throw new Auth_Exception_Inactive;
+            throw new \Auth_Exception_Inactive;
     }
 
     public function after_auto_login()
     {
         // Проверяем IP-адрес
         if ( ! $this->check_ip() )
-            throw new Auth_Exception_WrongIP;
+            throw new \Auth_Exception_WrongIP;
     }
 
     public function before_sign_out()
@@ -243,23 +244,23 @@ class BetaKiller_Model_User extends Model_Auth_User implements Notification_User
     }
 
     /**
-     * @return Database_Result|Model_User[]
+     * @return \Database_Result|\Model_User[]
      */
     public function get_developers_list()
     {
-        /** @var Model_Role $roles_orm */
-        $roles_orm = ORM::factory('Role');
+        /** @var \Model_Role $roles_orm */
+        $roles_orm = \ORM::factory('Role');
 
         return $roles_orm->developers()->get_users()->find_all();
     }
 
     /**
-     * @return Database_Result|Model_User[]
+     * @return \Database_Result|\Model_User[]
      */
     public function get_moderators_list()
     {
-        /** @var Model_Role $roles_orm */
-        $roles_orm = ORM::factory('Role');
+        /** @var \Model_Role $roles_orm */
+        $roles_orm = \ORM::factory('Role');
 
         return $roles_orm->moderators()->get_users()->find_all();
     }
