@@ -113,6 +113,10 @@ class ORM extends Utils\Kohana\ORM implements API_Response_Item, URL_DataSource 
         return parent::cached($lifetime);
     }
 
+    /**
+     * @return \Database_Result|\ORM[]
+     * @throws Kohana_Exception
+     */
     public function get_all()
     {
         return $this->find_all();
