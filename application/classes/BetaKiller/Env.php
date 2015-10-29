@@ -1,5 +1,9 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
+/**
+ * Class BetaKiller_Env
+ * @deprecated
+ */
 class BetaKiller_Env
 {
     /**

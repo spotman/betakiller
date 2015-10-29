@@ -10,7 +10,9 @@
     "samdark/sitemap": "^2.0",
     "hashids/hashids": "^1.0",
     "twig/twig": "^1.22",
-    "dmamontov/davbackup": "~1.0.1"
+    "dmamontov/davbackup": "~1.0.1",
+    "php-di/php-di": "^5.1",
+    "doctrine/cache": "^1.5"
   },
 
   "repositories": [

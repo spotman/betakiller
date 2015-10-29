@@ -2,13 +2,17 @@
 
 use BetaKiller\Utils;
 
+/**
+ * Class BetaKiller_Environment
+ * @deprecated
+ */
 class BetaKiller_Environment extends Utils\Registry\Base
 {
     use Utils\Instance\Singleton;
 
     public function get($key)
     {
-        if ( ! $this->__isset($key) )
+        if ( ! $this->has($key) )
         {
             // Use custom function to get value
             $method = 'get_'.$key;
