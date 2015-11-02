@@ -50,7 +50,6 @@ abstract class Core_Widget extends Controller {
      * @param Request $request
      * @param Response $response
      * @return static
-     * @throws Widget_Exception
      * @deprecated
      * @todo create standalone factory class
      */

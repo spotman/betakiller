@@ -1,5 +1,7 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
+use BetaKiller\Widget;
+
 abstract class BetaKiller_Widget extends Core_Widget {
 
     /**
@@ -38,4 +40,13 @@ abstract class BetaKiller_Widget extends Core_Widget {
         return IFace::by_codename($codename);
     }
 
+    /**
+     * @param string    $message
+     * @param array     $variables
+     * @throws \BetaKiller\Widget\Exception
+     */
+    protected function exception($message, array $variables = [])
+    {
+        throw new Widget\Exception($message, $variables);
+    }
 }

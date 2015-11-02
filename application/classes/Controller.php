@@ -124,14 +124,14 @@ abstract class Controller extends Controller_Proxy {
         return $this->request->param($key, $default);
     }
 
-    protected function post($key = NULL, $value = NULL)
+    protected function post($key = NULL)
     {
-        return $this->request->post($key, $value);
+        return $this->request->post($key);
     }
 
-    protected function query($key = NULL, $value = NULL)
+    protected function query($key = NULL)
     {
-        return $this->request->query($key, $value);
+        return $this->request->query($key);
     }
 
     /**
@@ -233,6 +233,16 @@ abstract class Controller extends Controller_Proxy {
     protected function send_json($result = self::JSON_SUCCESS, $data = NULL)
     {
         $this->response->send_json($result, $data);
+    }
+
+    protected function send_success_json($data)
+    {
+        $this->send_json(self::JSON_SUCCESS, $data);
+    }
+
+    protected function send_error_json($data)
+    {
+        $this->send_json(self::JSON_ERROR, $data);
     }
 
     /**

@@ -121,7 +121,7 @@ class ORM_Verifiable extends ORM {
 
     protected function _autocomplete($query, array $search_fields, $as_key_label_pairs = false)
     {
-        $current_user = Env::user();
+        $current_user = Env::user(TRUE);
 
         // Фильтруем неподтверждённые варианты выбора, если это нужно
         $this->filter_approved_with_acl($current_user);
