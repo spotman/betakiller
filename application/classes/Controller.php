@@ -134,6 +134,11 @@ abstract class Controller extends Controller_Proxy {
         return $this->request->query($key);
     }
 
+    protected function is_ajax()
+    {
+        return $this->request->is_ajax();
+    }
+
     /**
      * Getter/setter for Response content-type
      * Use this method for better uncaught exception handling

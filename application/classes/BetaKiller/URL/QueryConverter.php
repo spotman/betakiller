@@ -18,12 +18,22 @@ class QueryConverter
     use Utils\Instance\Simple;
 
     protected $_valuesSeparator = ',';
+    protected $_nsSeparator = '-';
 
     public function fromQueryArray(array $query, Convertible $obj)
     {
-        foreach ($query as $key => $concatValues) {
-            $item = $obj->createItemFromQueryKey($key);
+        $allowedKeys = $obj->getAllowedUrlQueryKeys();
+        $ns = $obj->getUrlQueryKeysNamespace();
 
+        foreach ($query as $key => $concatValues) {
+            // Remove namespace from key
+            $key = str_replace($ns.$this->_nsSeparator, '', $key);
+
+            // Skip unknown keys
+            if (!in_array($key, $allowedKeys))
+                continue;
+
+            // Convert values string to array
             $values = explode($this->_valuesSeparator, $concatValues);
 
             if (!count($values))
@@ -31,6 +41,9 @@ class QueryConverter
 
             // Process values
             $values = array_map(array($this, 'parseValue'), $values);
+
+            // Make item
+            $item = $obj->createItemFromQueryKey($key);
 
             // Store key and values
             $item->setUrlQueryKey($key);
@@ -41,6 +54,8 @@ class QueryConverter
     public function toQueryArray(Convertible $obj)
     {
         $result = [];
+
+        $ns = $obj->getUrlQueryKeysNamespace();
 
         foreach ($obj as $item) { /** @var $item ConvertibleItem */
             $key = $item->getUrlQueryKey();
@@ -54,6 +69,10 @@ class QueryConverter
             $values = array_map(array($this, 'makeValue'), $values);
 
             if ($values) {
+                // Add namespace to url key
+                $key = $ns.$this->_nsSeparator.$key;
+
+                // Store values
                 $result[$key] = implode($this->_valuesSeparator, $values);
             }
         }

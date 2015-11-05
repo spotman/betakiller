@@ -126,6 +126,6 @@ class Task_Sitemap extends Minion_Task {
 
     protected function model_factory($name)
     {
-        return URL_Dispatcher::instance()->model_factory($name);
+        return $this->_url_dispatcher->model_factory($name);
     }
 }
