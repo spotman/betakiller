@@ -38,4 +38,10 @@ interface ConvertibleItem
      * @param array $values
      */
     public function setUrlQueryValues(array $values);
+
+    /**
+     * Returns true if current item is usable for url converting
+     * @return bool
+     */
+    public function isUrlConversionAllowed();
 }

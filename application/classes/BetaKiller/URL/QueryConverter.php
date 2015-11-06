@@ -20,14 +20,19 @@ class QueryConverter
     protected $_valuesSeparator = ',';
     protected $_nsSeparator = '-';
 
-    public function fromQueryArray(array $query, Convertible $obj)
+    public function fromQueryArray(array $query, Convertible $obj, array $allowedKeys = null)
     {
-        $allowedKeys = $obj->getAllowedUrlQueryKeys();
+        if (!$allowedKeys) {
+            $allowedKeys = $this->getAllowedUrlQueryKeys($obj);
+        }
+
         $ns = $obj->getUrlQueryKeysNamespace();
 
         foreach ($query as $key => $concatValues) {
             // Remove namespace from key
-            $key = str_replace($ns.$this->_nsSeparator, '', $key);
+            if ($ns) {
+                $key = str_replace($ns.$this->_nsSeparator, '', $key);
+            }
 
             // Skip unknown keys
             if (!in_array($key, $allowedKeys))
@@ -43,12 +48,26 @@ class QueryConverter
             $values = array_map(array($this, 'parseValue'), $values);
 
             // Make item
-            $item = $obj->createItemFromQueryKey($key);
+            $item = $obj->getItemByQueryKey($key);
 
             // Store key and values
             $item->setUrlQueryKey($key);
             $item->setUrlQueryValues($values);
         }
+    }
+
+    protected function getAllowedUrlQueryKeys(Convertible $obj)
+    {
+        $keys = [];
+
+        foreach ($obj as $item) { /** @var $item ConvertibleItem */
+            if (!$item->isUrlConversionAllowed())
+                continue;
+
+            $keys[] = $item->getUrlQueryKey();
+        }
+
+        return $keys;
     }
 
     public function toQueryArray(Convertible $obj)
@@ -58,8 +77,17 @@ class QueryConverter
         $ns = $obj->getUrlQueryKeysNamespace();
 
         foreach ($obj as $item) { /** @var $item ConvertibleItem */
+
+            // Skip non-convertible items
+            if (!$item->isUrlConversionAllowed())
+                continue;
+
             $key = $item->getUrlQueryKey();
             $values = $item->getUrlQueryValues();
+
+            // Skip empty values
+            if ($values === null)
+                continue;
 
             if (!is_array($values)) {
                 $values = [$values];
@@ -70,7 +98,9 @@ class QueryConverter
 
             if ($values) {
                 // Add namespace to url key
-                $key = $ns.$this->_nsSeparator.$key;
+                if ($ns) {
+                    $key = $ns.$this->_nsSeparator.$key;
+                }
 
                 // Store values
                 $result[$key] = implode($this->_valuesSeparator, $values);
@@ -78,6 +108,13 @@ class QueryConverter
         }
 
         return $result;
+    }
+
+    public function toQueryString(Convertible $obj)
+    {
+        $arr = $this->toQueryArray($obj);
+
+        return http_build_query($arr);
     }
 
     protected function parseValue($string)
@@ -95,15 +132,14 @@ class QueryConverter
 
     protected function makeValue($value)
     {
-        if (!is_scalar($value))
-            throw new Exception('Only scalar values allowed');
-
         if (is_bool($value)) {
             return $value ? 'true' : 'false';
         } elseif (is_null($value)) {
             return 'null';
-        } else {
+        } elseif (is_scalar($value)) {
             return (string) $value;
+        } else {
+            throw new Exception('Only scalar values allowed');
         }
     }
 

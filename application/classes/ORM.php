@@ -94,26 +94,6 @@ class ORM extends Utils\Kohana\ORM implements API_Response_Item, URL_DataSource 
     }
 
     /**
-     * Enables the query to be cached for a specified amount of time.
-     * Cache lifetime is taken from config file called "clt.php" with structure <table name> => <seconds>
-     *
-     * @param integer $lifetime number of seconds to cache
-     * @return  $this
-     * @uses    Kohana::$cache_life
-     */
-    public function cached($lifetime = NULL)
-    {
-        // Do nothing if not in production
-        if ( ! Kohana::in_production(TRUE) )
-            return $this;
-
-        if ( ! $lifetime )
-            $lifetime = Kohana::config('clt')->get($this->table_name(), 60);
-
-        return parent::cached($lifetime);
-    }
-
-    /**
      * @return \Database_Result|\ORM[]
      * @throws Kohana_Exception
      */

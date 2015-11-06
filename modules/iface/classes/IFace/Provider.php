@@ -86,6 +86,7 @@ class IFace_Provider {
             $class_name = 'IFace_Default';
         }
 
+        // TODO DI
         /** @var IFace $object */
         $object = new $class_name;
 

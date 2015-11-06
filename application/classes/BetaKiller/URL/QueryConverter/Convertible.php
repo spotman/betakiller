@@ -11,16 +11,10 @@ namespace BetaKiller\URL\QueryConverter;
 interface Convertible extends \IteratorAggregate
 {
     /**
-     * Returns array of allowed keys
-     * @return array
-     */
-    public function getAllowedUrlQueryKeys();
-
-    /**
      * @param string $key
      * @return ConvertibleItem
      */
-    public function createItemFromQueryKey($key);
+    public function getItemByQueryKey($key);
 
     /**
      * @return string
