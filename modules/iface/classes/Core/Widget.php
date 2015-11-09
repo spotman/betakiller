@@ -3,8 +3,6 @@
 
 abstract class Core_Widget extends Controller {
 
-    use \BetaKiller\Utils\GetterAndSetterMethod;
-
     const DEFAULT_STATE = 'default';
 
     /**
@@ -31,7 +29,7 @@ abstract class Core_Widget extends Controller {
     {
         parent::__construct($request, $response);
 
-        $this->name($name);
+        $this->setName($name);
 
         $this->_init();
     }
@@ -73,24 +71,47 @@ abstract class Core_Widget extends Controller {
     }
 
     /**
-     * Getter/setter for widget name
+     * Setter for widget name
      *
-     * @param string|null $value
-     * @return $this|string
+     * @param string $value
+     * @return $this
      */
-    public function name($value = NULL)
+    public function setName($value)
     {
-        return $this->getter_and_setter_method('_name', $value);
+        $this->_name = $value;
+        return $this;
     }
 
     /**
-     * Getter/setter for widget context (additional data for rendering)
-     * @param array|null $value
-     * @return mixed
+     * Getter for widget name
+     *
+     * @return string
      */
-    public function context(array $value = NULL)
+    public function getName()
     {
-        return $this->getter_and_setter_method('_context', $value);
+        return $this->_name;
+    }
+
+    /**
+     * Setter for widget context (additional data for rendering)
+     *
+     * @param array $value
+     * @return $this
+     */
+    public function setContext(array $value)
+    {
+        $this->_context = $value;
+        return $this;
+    }
+
+    /**
+     * Getter for widget context (additional data for rendering)
+     *
+     * @return array
+     */
+    public function getContext()
+    {
+        return $this->_context;
     }
 
     /**
@@ -127,6 +148,7 @@ abstract class Core_Widget extends Controller {
     public function render()
     {
         $this->_render();
+
         // TODO reset data and context for next render
         return $this->response();
     }
@@ -144,7 +166,7 @@ abstract class Core_Widget extends Controller {
         // Creating View instance
         $view = $this->view();
 
-        // Assigning data
+        // Assigning data (override context keys)
         $view->set($data);
 
         // Sending View to output
@@ -209,7 +231,7 @@ abstract class Core_Widget extends Controller {
 
         $view_path = 'widgets'.DIRECTORY_SEPARATOR.$file;
 
-        return $this->view_factory($view_path, $this->_context);
+        return $this->view_factory($view_path, $this->getContext());
     }
 
     protected static function get_class_prefix()

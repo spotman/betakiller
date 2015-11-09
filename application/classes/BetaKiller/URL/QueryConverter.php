@@ -20,6 +20,15 @@ class QueryConverter
     protected $_valuesSeparator = ',';
     protected $_nsSeparator = '-';
 
+    /**
+     * Apply url query parts array to Convertible object
+     *
+     * @param array                                      $query
+     * @param \BetaKiller\URL\QueryConverter\Convertible $obj
+     * @param array|null                                 $allowedKeys Optional allowed keys array
+     * @return \BetaKiller\URL\QueryConverter\Convertible
+     * @throws \BetaKiller\URL\QueryConverter\Exception
+     */
     public function fromQueryArray(array $query, Convertible $obj, array $allowedKeys = null)
     {
         if (!$allowedKeys) {
@@ -54,8 +63,16 @@ class QueryConverter
             $item->setUrlQueryKey($key);
             $item->setUrlQueryValues($values);
         }
+
+        return $obj;
     }
 
+    /**
+     * Returns array of keys allowed for url conversion
+     *
+     * @param \BetaKiller\URL\QueryConverter\Convertible $obj
+     * @return array
+     */
     protected function getAllowedUrlQueryKeys(Convertible $obj)
     {
         $keys = [];
@@ -70,6 +87,12 @@ class QueryConverter
         return $keys;
     }
 
+    /**
+     * Converts Convertible object to URL query parts array
+     *
+     * @param \BetaKiller\URL\QueryConverter\Convertible $obj
+     * @return array
+     */
     public function toQueryArray(Convertible $obj)
     {
         $result = [];
@@ -110,6 +133,12 @@ class QueryConverter
         return $result;
     }
 
+    /**
+     * Converts Convertible object to fully qualified URL query string
+     *
+     * @param \BetaKiller\URL\QueryConverter\Convertible $obj
+     * @return string
+     */
     public function toQueryString(Convertible $obj)
     {
         $arr = $this->toQueryArray($obj);
@@ -117,6 +146,12 @@ class QueryConverter
         return http_build_query($arr);
     }
 
+    /**
+     * Converts string value representation to its actual value
+     *
+     * @param $string
+     * @return bool|null
+     */
     protected function parseValue($string)
     {
         if ($string == 'true') {
@@ -130,6 +165,13 @@ class QueryConverter
         }
     }
 
+    /**
+     * Converts value to its string representation
+     *
+     * @param $value
+     * @return string
+     * @throws \BetaKiller\URL\QueryConverter\Exception
+     */
     protected function makeValue($value)
     {
         if (is_bool($value)) {

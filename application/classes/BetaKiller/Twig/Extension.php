@@ -270,7 +270,7 @@ class BetaKiller_Twig_Extension extends Twig_Extension {
     public function widget(array $context, $name, array $data = array())
     {
         $widget = Widget::factory($name);
-        $widget->context(array_merge($context, $data));
+        $widget->setContext(array_merge($context, $data));
         return $widget->render();
     }
 
