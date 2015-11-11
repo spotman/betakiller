@@ -222,11 +222,7 @@ abstract class Core_IFace {
      *
      * @return array
      */
-    public function get_data()
-    {
-        // Empty by default
-        return array();
-    }
+    abstract public function get_data();
 
     /**
      * @param \DateTime|NULL $last_modified

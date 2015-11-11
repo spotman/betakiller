@@ -3,16 +3,20 @@
 /**
  * Base IFace class for Kohana framework
  */
-class Kohana_IFace extends Core_IFace {
+abstract class Kohana_IFace extends Core_IFace {
 
     /**
      * Returns URL query parts array for current HTTP request
      * @param $key
      * @return array
      */
-    protected function getUrlQuery($key = NULL)
+    protected function getUrlQuery($key = NULL, $default = null)
     {
-        return Request::$current->query($key);
+        $value = Request::$current->query($key);
+
+        return ($key AND !$value)
+            ? $default
+            : $value;
     }
 
 }
