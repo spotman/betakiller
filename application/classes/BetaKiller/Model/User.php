@@ -280,6 +280,15 @@ class User extends \Model_Auth_User implements \Notification_User_Interface //im
         return FALSE;
     }
 
+    /**
+     * Возвращает true если пользователю разрешено использовать админку
+     * @return bool
+     */
+    public function is_admin_allowed()
+    {
+        return ($this->is_moderator() OR $this->is_developer());
+    }
+
     public function as_array()
     {
         return [

@@ -2,7 +2,11 @@
 
 use BetaKiller\Utils;
 
-class ORM extends Utils\Kohana\ORM implements API_Response_Item, URL_DataSource /* , DataSource_Interface */ {
+class ORM extends Utils\Kohana\ORM
+    implements API_Response_Item, URL_DataSource,
+    \BetaKiller\Search\Model\Applicable,
+    \BetaKiller\Search\Model\ResultsItem
+    /* , DataSource_Interface */ {
 
     /**
      * Default implementation for ORM objects
@@ -100,6 +104,56 @@ class ORM extends Utils\Kohana\ORM implements API_Response_Item, URL_DataSource 
     public function get_all()
     {
         return $this->find_all();
+    }
+
+    /**
+     * @param $page
+     * @param $itemsPerPage
+     * @return \BetaKiller\Search\Model\Results
+     */
+    public function getSearchResults($page, $itemsPerPage = null)
+    {
+        // Оборачиваем в пэйджинатор
+        $pager = $this->paginateHelper($page, $itemsPerPage);
+
+        // Получаем результаты поиска
+        $items = $pager->getResults();
+
+        // Оборачиваем в контейнер
+        $results = \BetaKiller\Search\Results::factory(
+            $pager->getTotalItems(),
+            $pager->getTotalPages(),
+            $pager->hasNextPage()
+        );
+
+        // Добавляем элементы
+        foreach ($items as $item) {
+            $results->addItem($item);
+        }
+
+        return $results;
+    }
+
+    /**
+     * @return array
+     */
+    public function getSearchResultsItemData()
+    {
+        return $this->get_api_response_data();
+    }
+
+    /**
+     * @param int       $currentPage
+     * @param int|null  $itemsPerPage
+     * @return \ORM\PaginateHelper
+     */
+    public function paginateHelper($currentPage, $itemsPerPage = null)
+    {
+        return \ORM\PaginateHelper::factory(
+            $this,
+            $currentPage,
+            $itemsPerPage ?: 25
+        );
     }
 
 }

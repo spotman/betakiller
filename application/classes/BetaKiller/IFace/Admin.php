@@ -15,7 +15,7 @@ abstract class BetaKiller_IFace_Admin extends IFace {
         // Force authorization
         $user = Env::user();
 
-        return $user->is_moderator() OR $user->is_developer();
+        return $user->is_admin_allowed();
     }
 
     public function get_default_expires_interval()
