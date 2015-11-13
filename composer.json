@@ -12,7 +12,8 @@
     "twig/twig": "^1.22",
     "dmamontov/davbackup": "~1.0.1",
     "php-di/php-di": "^5.1",
-    "doctrine/cache": "^1.5"
+    "doctrine/cache": "^1.5",
+    "jakeasmith/http_build_url": "^1"
   },
 
   "repositories": [

@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "ba9796c21b5a3744228c15d655186ff8",
-    "content-hash": "d6d9b04ead01ac9d17ba10ff357a42d9",
+    "hash": "725230255a99de150bf7ced8689ed3bf",
+    "content-hash": "cc1f8023b48d3bed0db4a710dee3feef",
     "packages": [
         {
             "name": "Foreword/phpMorphy",
@@ -35,7 +35,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Anahkiasen/underscore-php/zipball/d253511f634dd1fffd0a4d2d91f441cb2906e027",
+                "url": "https://api.github.com/repos/Anahkiasen/underscore-php/zipball/21aefb7dc8c69162d2a738d5fc84dd6ac9026fc5",
                 "reference": "d253511f634dd1fffd0a4d2d91f441cb2906e027",
                 "shasum": ""
             },
@@ -838,6 +838,42 @@
                 "hash-map"
             ],
             "time": "2014-12-15 23:03:51"
+        },
+        {
+            "name": "jakeasmith/http_build_url",
+            "version": "1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/jakeasmith/http_build_url.git",
+                "reference": "15bdd686e5178ddfa3e88de60fa585adffb292bb"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/jakeasmith/http_build_url/zipball/15bdd686e5178ddfa3e88de60fa585adffb292bb",
+                "reference": "15bdd686e5178ddfa3e88de60fa585adffb292bb",
+                "shasum": ""
+            },
+            "require-dev": {
+                "phpunit/phpunit": "~3.7"
+            },
+            "type": "library",
+            "autoload": {
+                "files": [
+                    "src/http_build_url.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jake A. Smith",
+                    "email": "theman@jakeasmith.com"
+                }
+            ],
+            "description": "Provides functionality for http_build_url() to environments without pecl_http.",
+            "time": "2015-05-06 12:27:20"
         },
         {
             "name": "justinrainbow/json-schema",
