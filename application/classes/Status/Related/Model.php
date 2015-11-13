@@ -115,7 +115,8 @@ abstract class Status_Related_Model extends ORM {
      */
     public function filter_status($status_id, $not_equal = FALSE)
     {
-        return $this->where($this->get_status_relation_foreign_key(), $not_equal ? '<>' : '=', $status_id);
+        $col = $this->object_column($this->get_status_relation_foreign_key());
+        return $this->where($col, $not_equal ? '<>' : '=', $status_id);
     }
 
     /**
@@ -125,7 +126,8 @@ abstract class Status_Related_Model extends ORM {
      */
     public function filter_statuses(array $status_ids, $not_equal = FALSE)
     {
-        return $this->where($this->get_status_relation_foreign_key(), $not_equal ? 'NOT IN' : 'IN', $status_ids);
+        $col = $this->object_column($this->get_status_relation_foreign_key());
+        return $this->where($col, $not_equal ? 'NOT IN' : 'IN', $status_ids);
     }
 
     public function get_status_id()
