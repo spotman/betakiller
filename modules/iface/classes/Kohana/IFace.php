@@ -19,4 +19,9 @@ abstract class Kohana_IFace extends Core_IFace {
             : $value;
     }
 
+    protected function redirect($url)
+    {
+        HTTP::redirect($url);
+    }
+
 }
