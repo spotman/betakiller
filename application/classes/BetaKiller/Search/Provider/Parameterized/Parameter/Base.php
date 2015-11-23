@@ -94,7 +94,7 @@ abstract class Base implements Parameter
      *
      * @param string|null $filterHaving
      * @return \BetaKiller\Filter\Model\ValuesGroup[]
-     * @throws Exception
+     * @throws \BetaKiller\Search\Provider\Parameterized\Parameter\Exception
      */
     public function getAvailableValues($filterHaving = null)
     {
@@ -102,6 +102,20 @@ abstract class Base implements Parameter
             return [];
 
         return $this->getFilter()->getAvailableValues($filterHaving);
+    }
+
+    /**
+     * @param string|null $filterHaving
+     * @param bool        $filterSelected
+     * @return \BetaKiller\Filter\Model\Value|null
+     * @throws \BetaKiller\Search\Provider\Parameterized\Parameter\Exception
+     */
+    public function getRandomAvailableValue($filterHaving = null, $filterSelected = false)
+    {
+        if (!$this->isValuesPopulationAllowed())
+            return null;
+
+        return $this->getFilter()->getRandomAvailableValue($filterHaving);
     }
 
     /**

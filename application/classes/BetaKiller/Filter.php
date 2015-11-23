@@ -1,6 +1,7 @@
 <?php
 namespace BetaKiller;
 
+use BetaKiller\Filter\Model\Value;
 use \BetaKiller\URL\QueryConverter;
 
 interface Filter extends QueryConverter\ConvertibleItem
@@ -31,9 +32,16 @@ interface Filter extends QueryConverter\ConvertibleItem
      * Returns array of values (<value> => <label>)
      *
      * @param string|null $filterHaving
-     * @return Filter\Model\Value[]|Filter\Model\ValuesGroup[]
+     * @return \BetaKiller\Filter\Model\ValuesGroup[]
      */
     public function getAvailableValues($filterHaving = null);
+
+    /**
+     * @param null $filterHaving
+     * @param bool $filterSelected
+     * @return \BetaKiller\Filter\Model\Value
+     */
+    public function getRandomAvailableValue($filterHaving = null, $filterSelected = false);
 
     /**
      * Returns array of selected values groups

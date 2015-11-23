@@ -202,6 +202,10 @@ abstract class Registry implements \IteratorAggregate, QueryConverter\Convertibl
         foreach ($groups as $group) {
             if (!$group->getCodename())
                 $group->setCodename($codename);
+
+            foreach ($group->getValues() as $value) {
+                $value->setKeyNamespace($codename);
+            }
         }
     }
 

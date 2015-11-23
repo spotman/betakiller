@@ -64,11 +64,11 @@ class ValuesGroup
     }
 
     /**
-     * @param string    $keyPrefix
-     * @param bool      $selectedOnly
+     * @param string $nsSeparator
+     * @param bool   $selectedOnly
      * @return array
      */
-    public function asValuesArray($keyPrefix = '', $selectedOnly = false)
+    public function asValuesArray($nsSeparator = '-', $selectedOnly = false)
     {
         $output = [];
 
@@ -76,7 +76,11 @@ class ValuesGroup
             if ($selectedOnly AND !$value->isSelected())
                 continue;
 
-            $key = $keyPrefix.$value->getKey();
+            $keyPrefix = $value->getKeyNamespace();
+            $key = $keyPrefix
+                ? $keyPrefix.$nsSeparator.$value->getKey()
+                : $value->getKey();
+
             $output[$key] = $value->getLabel();
         }
 

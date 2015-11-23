@@ -38,9 +38,16 @@ interface Parameter extends QueryConverter\ConvertibleItem
      * Returns array of values groups (optional filtering by value for autocomplete)
      *
      * @param string|null $filterHaving
-     * @return Filter\Model\ValuesGroup[]
+     * @return \BetaKiller\Filter\Model\ValuesGroup[]
      */
-    public function getAvailableValues($filterHaving = NULL);
+    public function getAvailableValues($filterHaving = null);
+
+    /**
+     * @param string|null $filterHaving
+     * @param bool        $filterSelected
+     * @return \BetaKiller\Filter\Model\Value
+     */
+    public function getRandomAvailableValue($filterHaving = null, $filterSelected = false);
 
     /**
      * Returns array of selected values groups

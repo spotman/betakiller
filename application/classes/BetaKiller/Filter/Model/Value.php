@@ -3,10 +3,10 @@ namespace BetaKiller\Filter\Model;
 
 class Value
 {
-//    /**
-//     * @var string
-//     */
-//    protected $_parameterCodename;
+    /**
+     * @var string
+     */
+    protected $_keyNamespace;
 
     /**
      * @var string
@@ -37,19 +37,29 @@ class Value
      */
     public function __construct($_key, $_label, $_selected = FALSE)
     {
-//        $this->_parameterCodename   = $_parameter;
         $this->_key                 = $_key;
         $this->_label               = $_label;
         $this->_selected            = $_selected;
     }
 
-//    /**
-//     * @return string
-//     */
-//    public function getParameterCodename()
-//    {
-//        return $this->_parameterCodename;
-//    }
+
+    /**
+     * @param string $value
+     * @return $this
+     */
+    public function setKeyNamespace($value)
+    {
+        $this->_keyNamespace = $value;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getKeyNamespace()
+    {
+        return $this->_keyNamespace;
+    }
 
     /**
      * @return string

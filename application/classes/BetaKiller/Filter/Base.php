@@ -2,6 +2,7 @@
 namespace BetaKiller\Filter;
 
 use \BetaKiller\Filter;
+use BetaKiller\Filter\Model\Value;
 use BetaKiller\Model\User;
 
 abstract class Base implements Filter
@@ -56,7 +57,7 @@ abstract class Base implements Filter
      * Returns array of values or grouped values
      *
      * @param string|null $filterHaving
-     * @return Model\ValuesGroup[]
+     * @return \BetaKiller\Filter\Model\ValuesGroup[]
      */
     public function getAvailableValues($filterHaving = null)
     {
@@ -66,6 +67,33 @@ abstract class Base implements Filter
         $pairs = $this->getAvailableValuesPairs($filterHaving);
 
         return $this->processValuesPairs($pairs);
+    }
+
+    /**
+     * @param null $filterHaving
+     * @param bool $filterSelected
+     * @return \BetaKiller\Filter\Model\Value[]|null
+     */
+    public function getRandomAvailableValue($filterHaving = null, $filterSelected = false)
+    {
+        $valuesGroups = $this->getAvailableValues($filterHaving);
+
+        if (!$valuesGroups)
+            return null;
+
+        $groupIndex = array_rand($valuesGroups);
+
+        /** @var Filter\Model\ValuesGroup $group */
+        $group = $valuesGroups[$groupIndex];
+
+        $values = $group->getValues();
+
+        if (!$values)
+            return null;
+
+        $valueIndex = array_rand($values);
+
+        return $values[$valueIndex];
     }
 
     private function processValuesPairs(array $pairs)
