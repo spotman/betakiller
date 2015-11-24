@@ -17,7 +17,12 @@ class IFace_Auth_Login extends IFace {
 
         if ( $request )
         {
+            $queryString = http_build_query($request->query());
             $this->_self_url = '/'.ltrim($request->uri(), '/');
+
+            if ($queryString) {
+                $this->_self_url .= '?'.$queryString;
+            }
 
             // Initialize redirect url
             $this->_redirect_url = $request->query($this->_redirect_url_query_param) ?: $this->_self_url;
