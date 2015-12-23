@@ -23,6 +23,7 @@ require.config({
 
         'jquery.typeahead':         '../jquery/typeahead/typeahead.bundle.min',
         'jquery.lazyload':          '../jquery/lazyload/jquery.lazyload.min',
+        'jquery.actual':            '../jquery/actual/jquery.actual.min',
 
         'waypoints':                '../jquery/waypoints/waypoints.min',
         'waypoints.sticky':         '../jquery/waypoints/waypoints-sticky.min',
