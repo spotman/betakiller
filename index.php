@@ -98,8 +98,17 @@ if ( ! defined('KOHANA_START_MEMORY'))
     define('KOHANA_START_MEMORY', memory_get_usage());
 }
 
-// Bootstrap the application
-require APPPATH.'bootstrap'.EXT;
+try
+{
+    // Bootstrap the application
+    require APPPATH.'bootstrap'.EXT;
+}
+catch (Exception $e)
+{
+    print_r($e->getMessage());
+    die();
+}
+
 
 if (PHP_SAPI == 'cli') // Try and load minion
 {
