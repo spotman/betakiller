@@ -105,7 +105,18 @@ try
 }
 catch (Exception $e)
 {
-    print_r($e->getMessage());
+    $message = $e->getMessage().PHP_EOL.PHP_EOL.$e->getTraceAsString();
+    if (in_array(Kohana::$environment, [Kohana::DEVELOPMENT, Kohana::TESTING]))
+    {
+        // Show to dev
+        print_r(nl2br($message));
+    }
+    else
+    {
+        // Write to default log
+        error_log($message);
+    }
+
     die();
 }
 
