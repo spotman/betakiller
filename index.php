@@ -117,6 +117,7 @@ catch (Exception $e)
         error_log($message);
     }
 
+    http_response_code(500);
     die();
 }
 
