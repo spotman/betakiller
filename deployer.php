@@ -7,7 +7,8 @@ require 'recipe/common.php';
 
 use \Symfony\Component\Console\Input\InputOption;
 
-env('core_path', 'core');
+set('core_path', 'core');
+set('core_repository', 'git@github.com:spotman/betakiller.git');
 
 // Use PHP SSH2 extension
 //set('ssh_type', 'ext-ssh2');
@@ -19,7 +20,7 @@ serverList('servers.yml');
 // Option for GIT management
 option('repo', null, InputOption::VALUE_OPTIONAL, 'Tag to deploy.', 'app');
 
-function init_check() {
+task('check', function() {
     if ( !has('app_repository') )
         throw new \Symfony\Component\Process\Exception\RuntimeException('Please, set up GIT repo via env("app_repository")');
 
@@ -30,11 +31,10 @@ function init_check() {
     env('app_repository', get('app_repository'));
     env('app_path', get('app_path'));
 
-//    writeln('Deploying to '.implode(', ', env('server.stages')));
-}
+    env('core_repository', get('core_repository'));
+    env('core_path', get('core_path'));
 
-task('check', function() {
-    init_check();
+//    writeln('Deploying to '.implode(', ', env('server.stages')));
 });
 
 // Prepare app env
@@ -45,8 +45,8 @@ task('deploy:repository:prepare:app', function() {
 
 // Prepare BetaKiller env
 task('deploy:repository:prepare:betakiller', function() {
-    env('repository', 'git@github.com:spotman/betakiller.git');
-    env('repository_path', env('core_path'));
+    env('repository', get('core_repository'));
+    env('repository_path', get('core_path'));
 })->desc('Prepare BetaKiller repository');
 
 function cd_repository_path_cmd() {
@@ -168,30 +168,65 @@ function run_git_command($gitCmd) {
 
     $cmd = 'cd {{current}}/'.$path.' && git '.$gitCmd;
 
-//    writeln($cmd);
-    write(run($cmd));
+    $result = run($cmd);
+    write($result);
+
+    return $result;
+}
+
+function git_status() {
+    return run_git_command('status');
+}
+
+function git_commit_all() {
+    $message = ask('Enter commit message:', 'Commit from production');
+    return run_git_command('commit -am "'.$message.'"');
+}
+
+function git_push() {
+    return run_git_command('push');
+}
+
+function git_pull() {
+    return run_git_command('pull');
 }
 
 task('git:status', function () {
-    run_git_command('status');
+    git_status();
 })->desc('git status');
 
 task('git:commit:all', function () {
-    $message = ask('Commit message', 'Commit from production');
-    run_git_command('commit -am "'.$message.'"');
+    git_commit_all();
 })->desc('git commit -a');
 
 task('git:push', function () {
-    run_git_command('push');
+    git_push();
 })->desc('git push');
 
 task('git:pull', function () {
-    run_git_command('pull');
+    git_pull();
 })->desc('git pull');
+
+task('git:check', function () {
+    $out = git_status();
+
+    if (strpos($out, 'nothing to commit (working directory clean)') !== FALSE)
+        return;
+
+    if (askConfirmation('Commit changes?', false)) {
+        git_commit_all();
+        git_push();
+    } else {
+        writeln('Exiting...');
+    }
+})->desc('Checks for new files that not in GIT and commits them');
 
 task('deploy', [
     // Check app configuration
     'check',
+
+    // Check for new untracked files and commit them
+    'git:check',
 
     // Prepare directories
     'deploy:prepare',
