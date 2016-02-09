@@ -5,6 +5,7 @@
 
 require 'recipe/common.php';
 
+use \Symfony\Component\Console\Input\InputOption;
 
 env('core_path', 'core');
 
@@ -14,7 +15,11 @@ env('core_path', 'core');
 // Process server list
 serverList('servers.yml');
 
-task('check', function() {
+
+// Option for GIT management
+option('repo', null, InputOption::VALUE_OPTIONAL, 'Tag to deploy.', 'app');
+
+function init_check() {
     if ( !has('app_repository') )
         throw new \Symfony\Component\Process\Exception\RuntimeException('Please, set up GIT repo via env("app_repository")');
 
@@ -26,6 +31,10 @@ task('check', function() {
     env('app_path', get('app_path'));
 
 //    writeln('Deploying to '.implode(', ', env('server.stages')));
+}
+
+task('check', function() {
+    init_check();
 });
 
 // Prepare app env
@@ -145,6 +154,40 @@ task('httpd:restart', function () {
     run('sudo service httpd restart');
 })->desc('Restart Apache');
 
+
+function run_git_command($gitCmd) {
+    $allowed = ['core', 'app'];
+
+    $repo = input()->getOption('repo');
+
+    if (!in_array($repo, $allowed))
+        throw new Exception('Unknown git repo '.$repo);
+
+    $key = $repo.'_path';
+    $path = get($key);
+
+    $cmd = 'cd {{current}}/'.$path.' && git '.$gitCmd;
+
+//    writeln($cmd);
+    write(run($cmd));
+}
+
+task('git:status', function () {
+    run_git_command('status');
+})->desc('git status');
+
+task('git:commit:all', function () {
+    $message = ask('Commit message', 'Commit from production');
+    run_git_command('commit -am "'.$message.'"');
+})->desc('git commit -a');
+
+task('git:push', function () {
+    run_git_command('push');
+})->desc('git push');
+
+task('git:pull', function () {
+    run_git_command('pull');
+})->desc('git pull');
 
 task('deploy', [
     // Check app configuration
