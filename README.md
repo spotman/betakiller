@@ -4,6 +4,8 @@ Based on [Kohana](http://kohanaframework.org/) framework (migration to Laravel p
 
 Released under a [BSD license](LICENSE.md), Betakiller can be used legally for any open source, commercial, or personal project.
 
+[![SensioLabsInsight](https://insight.sensiolabs.com/projects/cae4439a-8a2e-4e0c-9169-f9d1c7e25366/big.png)](https://insight.sensiolabs.com/projects/cae4439a-8a2e-4e0c-9169-f9d1c7e25366)
+
 <!--## Documentation-->
 <!--Kohana's documentation can be found at <http://kohanaframework.org/documentation> which also contains an API browser.-->
 
