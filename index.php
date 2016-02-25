@@ -109,7 +109,7 @@ catch (Exception $e)
     if (in_array(Kohana::$environment, [Kohana::DEVELOPMENT, Kohana::TESTING]))
     {
         // Show to dev
-        print_r(nl2br($message));
+        echo nl2br($message);
     }
     else
     {
