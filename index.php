@@ -105,11 +105,13 @@ try
 }
 catch (Exception $e)
 {
+    @ ob_end_clean();
+
     $message = $e->getMessage().PHP_EOL.PHP_EOL.$e->getTraceAsString();
     if (in_array(Kohana::$environment, [Kohana::DEVELOPMENT, Kohana::TESTING]))
     {
         // Show to dev
-        print_r(nl2br($message));
+        echo nl2br($message);
     }
     else
     {
