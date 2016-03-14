@@ -38,6 +38,8 @@ return array(
     'ulogin'                => MODPATH.'ulogin',                // Universal login via ulogin.ru
 //    'xmpp'                  => MODPATH.'xmpp',                  // Wrapper for XMPP (Jabber) protocol
 
+    'sitemap'               => MODPATH.'sitemap',               // Generating sitemap.xml
+
     // Allow another modules to set routes
     'iface'                 => MODPATH.'iface',                 // Dynamic user interfaces
 );

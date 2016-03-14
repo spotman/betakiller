@@ -101,14 +101,23 @@ if ( ! defined('KOHANA_START_MEMORY'))
 try
 {
     // Bootstrap the application
-    require APPPATH.'bootstrap'.EXT;
+    require APPPATH.'bootstrap.php';
 }
 catch (Exception $e)
 {
     @ ob_end_clean();
 
+    if (class_exists('Kohana'))
+    {
+        $in_dev = in_array(Kohana::$environment, [Kohana::DEVELOPMENT, Kohana::TESTING]);
+    }
+    else
+    {
+        $in_dev = FALSE;
+    }
+
     $message = $e->getMessage().PHP_EOL.PHP_EOL.$e->getTraceAsString();
-    if (in_array(Kohana::$environment, [Kohana::DEVELOPMENT, Kohana::TESTING]))
+    if ($in_dev)
     {
         // Show to dev
         echo nl2br($message);

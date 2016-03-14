@@ -43,7 +43,7 @@ return array(
 		'debug'               => ! Kohana::in_production(),
 		'autoescape'          => TRUE,
 		'base_template_class' => 'Twig_Template',
-        'cache'               => MultiSite::instance()->site_path().'/cache',
+        'cache'               => MultiSite::instance()->site_path().'/twig-cache',
 //        'cache'               => TWIGPATH.'cache',
 		'charset'             => 'utf-8',
 		'optimizations'       => -1,

@@ -27,6 +27,7 @@ class Task_Sitemap extends Minion_Task {
 
     protected function _execute(array $params)
     {
+        // TODO refactoring to service
         $this->_url_parameters = URL_Parameters::instance();
         $this->_url_dispatcher = URL_Dispatcher::instance();
 
