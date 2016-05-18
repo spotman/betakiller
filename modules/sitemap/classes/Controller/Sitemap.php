@@ -4,6 +4,8 @@ class Controller_Sitemap extends Controller
 {
     public function action_index()
     {
-        // TODO this method + route
+        Service_Sitemap::instance()
+            ->generate()
+            ->serve($this->response());
     }
 }

@@ -13,7 +13,7 @@ abstract class Assets_Provider {
     protected $_storage_instance;
 
     /**
-     * @var Array
+     * @var array
      */
     protected static $_config;
 

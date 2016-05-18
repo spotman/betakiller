@@ -3,7 +3,9 @@
 /**
  * Interface that all minion tasks must implement
  */
-abstract class Minion_Task extends Kohana_Minion_Task {
+abstract class Minion_Task extends Kohana_Minion_Task
+{
+    use BetaKiller\Helper;
 
     const RED           = Minion_CLI::RED;
     const GREEN         = Minion_CLI::GREEN;
@@ -25,11 +27,6 @@ abstract class Minion_Task extends Kohana_Minion_Task {
         Log::instance()->attach(new Minion_Log(), $log_level);
 
         parent::execute();
-    }
-
-    protected function config($key, $default = NULL)
-    {
-        return Kohana::config($key) ?: $default;
     }
 
     /**
@@ -99,55 +96,4 @@ abstract class Minion_Task extends Kohana_Minion_Task {
     {
         return Minion_CLI::password($message);
     }
-
-    /**
-     * @param $message
-     * @return $this
-     */
-    protected function debug($message)
-    {
-        Log::debug($message);
-        return $this;
-    }
-
-    /**
-     * @param $message
-     * @return $this
-     */
-    protected function info($message)
-    {
-        Log::info($message);
-        return $this;
-    }
-
-    /**
-     * @param $message
-     * @return $this
-     */
-    protected function notice($message)
-    {
-        Log::notice($message);
-        return $this;
-    }
-
-    /**
-     * @param $message
-     * @return $this
-     */
-    protected function warning($message)
-    {
-        Log::warning($message);
-        return $this;
-    }
-
-    /**
-     * @param Exception $e
-     * @return $this
-     */
-    protected function exception(Exception $e)
-    {
-        Log::exception($e);
-        return $this;
-    }
-
 }

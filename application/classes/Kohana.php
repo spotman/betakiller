@@ -49,6 +49,17 @@ class Kohana extends Kohana_Core {
         return $result;
     }
 
+    public static function reinit()
+    {
+        self::$_init = FALSE;
+
+        // Drop cache because of init file
+        self::$config->drop_cache();
+
+        $config = self::config('init')->as_array();
+        parent::init($config);
+    }
+
     public static function cache($name, $data = NULL, $lifetime = 60)
     {
         if ( ! static::$caching )

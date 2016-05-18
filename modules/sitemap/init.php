@@ -6,4 +6,10 @@
  * Time: 19:48
  */
 
-// TODO route for sitemap.xml => Controller_Sitemap::index
+// Route for sitemap.xml generator => Controller_Sitemap::index
+Route::set('sitemap-xml', 'sitemap.xml')
+    ->defaults(array(
+        'controller' => 'Sitemap',
+        'action'     => 'index',
+        'module'     => 'sitemap',
+    ));

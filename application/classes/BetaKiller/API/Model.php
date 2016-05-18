@@ -3,6 +3,8 @@
 
 abstract class BetaKiller_API_Model extends Core_API_Model {
 
+    use BetaKiller\Helper;
+
     /**
      * @param string $name
      * @param int|NULL $id
@@ -18,11 +20,6 @@ abstract class BetaKiller_API_Model extends Core_API_Model {
                 array(':id' => $id, ':model' => $name));
 
         return $model;
-    }
-
-    protected function current_user($allow_guest = FALSE)
-    {
-        return Env::user($allow_guest);
     }
 
     protected function trim(& $value)
