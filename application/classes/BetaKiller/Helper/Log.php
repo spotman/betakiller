@@ -9,7 +9,7 @@ trait Log
      */
     protected function debug($message)
     {
-        Log::debug($message);
+        \Log::debug($message);
         return $this;
     }
 
@@ -19,7 +19,7 @@ trait Log
      */
     protected function info($message)
     {
-        Log::info($message);
+        \Log::info($message);
         return $this;
     }
 
@@ -29,7 +29,7 @@ trait Log
      */
     protected function notice($message)
     {
-        Log::notice($message);
+        \Log::notice($message);
         return $this;
     }
 
@@ -39,7 +39,7 @@ trait Log
      */
     protected function warning($message)
     {
-        Log::warning($message);
+        \Log::warning($message);
         return $this;
     }
 
@@ -49,7 +49,7 @@ trait Log
      */
     protected function exception(\Exception $e)
     {
-        Log::exception($e);
+        \Log::exception($e);
         return $this;
     }
 }
