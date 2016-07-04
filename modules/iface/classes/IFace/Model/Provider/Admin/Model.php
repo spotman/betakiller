@@ -186,6 +186,7 @@ class IFace_Model_Provider_Admin_Model implements IFace_Model {
     /**
      * Returns TRUE if iface provides dynamic url mapping
      *
+     * @todo вынести в класс IFace_Model и определять динамические URL по наличию символов {}
      * @return bool
      */
     public function has_dynamic_url()

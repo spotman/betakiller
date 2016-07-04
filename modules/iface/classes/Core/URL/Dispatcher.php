@@ -17,11 +17,6 @@ abstract class Core_URL_Dispatcher {
     protected $_iface_provider;
 
     /**
-     * @var URL_Processor
-     */
-    protected $_url_processor;
-
-    /**
      * @var array
      */
     protected $_iface_stack = [];
@@ -52,16 +47,6 @@ abstract class Core_URL_Dispatcher {
         }
 
         return $this->_iface_provider;
-    }
-
-    public function url_processor()
-    {
-        if ( ! $this->_url_processor )
-        {
-            $this->_url_processor = URL_Processor::instance();
-        }
-
-        return $this->_url_processor;
     }
 
     /**

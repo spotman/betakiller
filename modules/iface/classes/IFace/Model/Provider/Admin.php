@@ -58,6 +58,10 @@ class IFace_Model_Provider_Admin extends IFace_Model_Provider_Abstract {
         return $this->model_factory($config);
     }
 
+    /**
+     * @param array $config
+     * @return IFace_Model_Provider_Admin_Model
+     */
     protected function model_factory(array $config)
     {
         return IFace_Model_Provider_Admin_Model::factory($config, $this);
