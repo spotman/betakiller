@@ -46,3 +46,6 @@
 [submodule "modules/mangodb"]
 	path = modules/mangodb
 	url = git@github.com:Wouterrr/MangoDB.git
+[submodule "modules/article"]
+	path = modules/article
+	url = git@github.com:spotman/betakiller-article.git
