@@ -7,7 +7,7 @@ use Interop\Container\Exception\NotFoundException;
 
 use BetaKiller\Utils;
 
-abstract class Base
+abstract class Base implements ContainerInterface
 {
     use Utils\Instance\Singleton;
 
@@ -60,5 +60,4 @@ abstract class Base
     {
         return $this->getContainer()->has($id);
     }
-
 }

@@ -14,16 +14,29 @@ abstract class BetaKiller_IFace extends Kohana_IFace {
         return Env::user($allow_guest);
     }
 
+    /**
+     * @todo move to base iface
+     * @return URL_Parameters
+     */
     final protected function url_parameters()
     {
         return Env::url_parameters();
     }
 
+    /**
+     * @todo move to base iface
+     * @return URL_Dispatcher
+     */
     final protected function url_dispatcher()
     {
         return Env::url_dispatcher();
     }
 
+    /**
+     * @todo move to base iface
+     * @param $codename
+     * @return static
+     */
     final protected function iface_factory($codename)
     {
         return self::by_codename($codename);
