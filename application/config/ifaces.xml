@@ -4,7 +4,7 @@
     <!--<iface uri="logout" codename="Auth_Logout" title="Sign out" />-->
     <!--<iface uri="change-account" codename="Auth_ReLogin" title="Change account" />-->
 
-    <iface uri="password-reset" codename="Auth_Password_Reset" title="Reset password" hide-in-site-map="true" />
+    <iface uri="password-reset" codename="Auth_Password_Reset" title="Reset password" hideInSiteMap="true" />
 
     <!--<iface uri="admin" codename="Admin_Index" title="Admin zone">-->
         <!--<iface uri="users" codename="Admin_User" title="User management"></iface>-->

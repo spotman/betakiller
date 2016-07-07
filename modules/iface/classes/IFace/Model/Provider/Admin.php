@@ -50,9 +50,9 @@ class IFace_Model_Provider_Admin extends IFace_Model_Provider_Abstract {
         $attr = (array) $branch->attributes();
         $config = $attr['@attributes'];
 
-        if ( (!isset($config['parent_codename']) OR !$config['parent_codename']) AND $parent_model )
+        if ( (!isset($config['parentCodename']) OR !$config['parentCodename']) AND $parent_model )
         {
-            $config['parent_codename'] = $parent_model->get_codename();
+            $config['parentCodename'] = $parent_model->get_codename();
         }
 
         return $this->model_factory($config);

@@ -42,4 +42,6 @@ return array(
 
     // Allow another modules to set routes
     'iface'                 => MODPATH.'iface',                 // Dynamic user interfaces
+
+    'article'               =>  MODPATH.'article',              // Articles based on IFaces
 );

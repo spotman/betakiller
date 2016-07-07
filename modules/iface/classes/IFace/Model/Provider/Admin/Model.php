@@ -141,10 +141,11 @@ class IFace_Model_Provider_Admin_Model implements IFace_Model {
         return array(
             'codename'          => $this->get_codename(),
             'uri'               => $this->get_uri(),
-            'parent'            => $this->get_parent_codename(),
+            'parentCodename'    => $this->get_parent_codename(),
             'label'             => $this->get_label(),
             'title'             => $this->get_title(),
-            'has_dynamic_url'   => $this->has_dynamic_url(),
+            'hasDynamicUrl'     => $this->has_dynamic_url(),
+            'hideInSiteMap'     => $this->hide_in_site_map(),
         );
     }
 
@@ -167,17 +168,17 @@ class IFace_Model_Provider_Admin_Model implements IFace_Model {
         $this->_label = isset($data['label']) ? $data['label'] : NULL;
         $this->_title = isset($data['title']) ? $data['title'] : NULL;
 
-        if ( isset($data['parent_codename']) )
+        if ( isset($data['parentCodename']) )
         {
-            $this->_parent_codename = $data['parent_codename'];
+            $this->_parent_codename = $data['parentCodename'];
         }
 
-        if ( isset($data['has-dynamic-url']) )
+        if ( isset($data['hasDynamicUrl']) )
         {
             $this->_has_dynamic_url = TRUE;
         }
 
-        if ( isset($data['hide-in-site-map']) )
+        if ( isset($data['hideInSiteMap']) )
         {
             $this->_hide_in_site_map = TRUE;
         }
