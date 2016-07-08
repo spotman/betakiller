@@ -72,8 +72,9 @@ return array(
      *      )
      */
     'extensions'    =>  array(
-        'Twig_Extension_Debug',
-        'BetaKiller_Twig_Extension'
+        Twig_Extension_Debug::class,
+        BetaKiller_Twig_Extension::class,
+        Twig_CacheExtension::class,
     ),
 
 );

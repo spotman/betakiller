@@ -226,10 +226,12 @@ abstract class Core_IFace {
 
     /**
      * @param \DateTime|NULL $last_modified
+     * @return $this
      */
     public function set_last_modified(DateTime $last_modified)
     {
         $this->_last_modified = $last_modified;
+        return $this;
     }
 
     /**
@@ -258,10 +260,12 @@ abstract class Core_IFace {
 
     /**
      * @param \DateInterval|NULL $expires
+     * @return $this
      */
     public function set_expires_interval(DateInterval $expires)
     {
         $this->_expires = $expires;
+        return $this;
     }
 
     /**

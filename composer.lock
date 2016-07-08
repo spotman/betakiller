@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "725230255a99de150bf7ced8689ed3bf",
-    "content-hash": "cc1f8023b48d3bed0db4a710dee3feef",
+    "hash": "c0dd738665fa1dc9b4251eadddac9f6c",
+    "content-hash": "a3d482b0ee068db92cdcebda02891b07",
     "packages": [
         {
             "name": "Foreword/phpMorphy",
@@ -71,6 +71,57 @@
                 "toolkit"
             ],
             "time": "2015-12-21 09:20:38"
+        },
+        {
+            "name": "asm89/twig-cache-extension",
+            "version": "1.2.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/asm89/twig-cache-extension.git",
+                "reference": "76a801d6da8e1a1015af974d93df4ade0dda7267"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/asm89/twig-cache-extension/zipball/76a801d6da8e1a1015af974d93df4ade0dda7267",
+                "reference": "76a801d6da8e1a1015af974d93df4ade0dda7267",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.2",
+                "twig/twig": "~1.0"
+            },
+            "require-dev": {
+                "doctrine/cache": "~1.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.1-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "": "lib/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Alexander",
+                    "email": "iam.asm89@gmail.com"
+                }
+            ],
+            "description": "Cache fragments of templates directly within Twig.",
+            "homepage": "https://github.com/asm89/twig-cache-extension",
+            "keywords": [
+                "cache",
+                "extension",
+                "twig"
+            ],
+            "time": "2016-02-14 13:52:38"
         },
         {
             "name": "container-interop/container-interop",
@@ -2310,20 +2361,20 @@
         },
         {
             "name": "samdark/sitemap",
-            "version": "2.0.3",
+            "version": "2.0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/samdark/sitemap.git",
-                "reference": "4cd7b6d7c1bf4031fee381f96db8fc48a0cb23cc"
+                "reference": "458c383d110f40ea6277421a57b63fde4ab47227"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/samdark/sitemap/zipball/4cd7b6d7c1bf4031fee381f96db8fc48a0cb23cc",
-                "reference": "4cd7b6d7c1bf4031fee381f96db8fc48a0cb23cc",
+                "url": "https://api.github.com/repos/samdark/sitemap/zipball/458c383d110f40ea6277421a57b63fde4ab47227",
+                "reference": "458c383d110f40ea6277421a57b63fde4ab47227",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.4.0"
+                "php": ">=5.3.0"
             },
             "type": "library",
             "autoload": {
@@ -2347,7 +2398,7 @@
             "keywords": [
                 "Sitemap"
             ],
-            "time": "2016-04-28 23:16:42"
+            "time": "2016-07-05 14:11:35"
         },
         {
             "name": "seld/jsonlint",
