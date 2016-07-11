@@ -225,11 +225,12 @@ task('deploy', [
     // Check app configuration
     'check',
 
-    // Check for new untracked files and commit them
-    'git:check',
-
     // Prepare directories
     'deploy:prepare',
+
+    // Check for new untracked files and commit them
+    //'git:check',
+
     'deploy:release',
 
     // Deploy code

@@ -4,42 +4,46 @@ namespace BetaKiller\Helper;
 trait Log
 {
     /**
-     * @param $message
+     * @param string $message
+     * @param array $variables
      * @return $this
      */
-    protected function debug($message)
+    protected function debug($message, array $variables = NULL)
     {
-        \Log::debug($message);
+        Log::debug($message, $variables);
         return $this;
     }
 
     /**
-     * @param $message
+     * @param string $message
+     * @param array $variables
      * @return $this
      */
-    protected function info($message)
+    protected function info($message, array $variables = NULL)
     {
-        \Log::info($message);
+        Log::info($message, $variables);
         return $this;
     }
 
     /**
-     * @param $message
+     * @param string $message
+     * @param array $variables
      * @return $this
      */
-    protected function notice($message)
+    protected function notice($message, array $variables = NULL)
     {
-        \Log::notice($message);
+        Log::notice($message, $variables);
         return $this;
     }
 
     /**
-     * @param $message
+     * @param string $message
+     * @param array $variables
      * @return $this
      */
-    protected function warning($message)
+    protected function warning($message, array $variables = NULL)
     {
-        \Log::warning($message);
+        Log::warning($message, $variables);
         return $this;
     }
 

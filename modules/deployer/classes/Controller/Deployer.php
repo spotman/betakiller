@@ -69,23 +69,26 @@ class Controller_Deployer extends Controller_Developer {
 
         while ( !feof($handler) )
         {
+//            $buffer = fread($handler, 4096);
             $buffer = fgets($handler);
 
             echo $buffer;
             flush();
 
             if ( $delay )
+            {
                 usleep(25000);
+            }
 
             if ( connection_aborted() )
             {
                 // TODO Уничтожение дочернего процесса
-                pclose($handler);
-                exit();
+                break;
             }
         }
 
         pclose($handler);
+        exit();
     }
 
 }
