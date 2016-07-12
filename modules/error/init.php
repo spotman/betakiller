@@ -9,7 +9,7 @@
 /**
  * Attach the MongoDB log-service to logging. Multiple writers are supported.
  */
-if ( Kohana::in_production(TRUE) AND class_exists('MongoClient', FALSE) )
+if ( Kohana::in_production(TRUE) AND class_exists('MongoClient', FALSE) ) // TODO notification for absent mongodb driver
 {
     Kohana::$log->attach(new Log_MongoDB, Log::NOTICE, Log::EMERGENCY);
 }
