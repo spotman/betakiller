@@ -4,6 +4,8 @@ use BetaKiller\Widget;
 
 abstract class BetaKiller_Widget extends Core_Widget {
 
+    use BetaKiller\Helper\Base;
+
     /**
      * Returns Twig view instance
      *
@@ -16,36 +18,12 @@ abstract class BetaKiller_Widget extends Core_Widget {
         return Twig::factory($file, $data);
     }
 
-    final protected function current_user($allow_guest = FALSE)
-    {
-        return Env::user($allow_guest);
-    }
-
-    final protected function url_parameters()
-    {
-        return Env::url_parameters();
-    }
-
-    final protected function url_dispatcher()
-    {
-        return Env::url_dispatcher();
-    }
-
-    /**
-     * @param $codename
-     * @return IFace
-     */
-    final protected function iface_factory($codename)
-    {
-        return IFace::by_codename($codename);
-    }
-
     /**
      * @param string    $message
      * @param array     $variables
      * @throws \BetaKiller\Widget\Exception
      */
-    protected function exception($message, array $variables = [])
+    protected function throw_exception($message, array $variables = [])
     {
         throw new Widget\Exception($message, $variables);
     }

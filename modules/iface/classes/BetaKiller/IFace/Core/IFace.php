@@ -1,7 +1,20 @@
-<?php defined('SYSPATH') OR die('No direct script access.');
+<?php
+namespace BetaKiller\IFace\Core;
 
-abstract class Core_IFace {
+use DateInterval;
+use DateTime;
+use Env;
+use IFace_Exception;
+use IFace_Model;
+use IFace_Provider;
+use Text;
+use URL;
+use URL_Dispatcher;
+use URL_Parameters;
+use View_IFace;
 
+abstract class IFace
+{
     /**
      * @var IFace_Model
      */
@@ -125,7 +138,7 @@ abstract class Core_IFace {
     private function process_string_pattern($source, $limit = NULL)
     {
         // Replace url parameters
-        $source = Env::url_dispatcher()->replace_url_parameters_parts($source);
+        $source = $this->url_dispatcher()->replace_url_parameters_parts($source);
 
         // Parse [N[...]] tags
         $pcre_pattern = '/\[([0-9]{1,2})\[([^\]]+)\]\]/';
@@ -134,51 +147,44 @@ abstract class Core_IFace {
 
         $tags = array();
 
-        foreach ( $matches as $match )
-        {
-            $key = $match[0];
-            $priority = $match[1];
-            $value = $match[2];
+        foreach ($matches as $match) {
+            $key             = $match[0];
+            $priority        = $match[1];
+            $value           = $match[2];
             $tags[$priority] = array(
-                'key'   =>  $key,
-                'value' =>  $value,
+                'key'   => $key,
+                'value' => $value,
             );
         }
 
         $output = $source;
 
-        if ( $tags )
-        {
+        if ($tags) {
             // Sort tags via keys in straight order
             ksort($tags);
 
             // Iteration counter
-            $i = 0;
+            $i         = 0;
             $max_loops = count($tags);
 
-            while ( $i < $max_loops AND $output != '' )
-            {
+            while ($i < $max_loops AND $output != '') {
                 $output = $source;
 
                 // Replace tags
-                foreach ($tags as $tag)
-                {
+                foreach ($tags as $tag) {
                     $output = str_replace($tag['key'], $tag['value'], $output);
                 }
 
-                if ( $limit AND mb_strlen($output) > $limit )
-                {
-                    $drop = array_pop($tags);
+                if ($limit AND mb_strlen($output) > $limit) {
+                    $drop   = array_pop($tags);
                     $source = trim(str_replace($drop['key'], '', $source));
                     $i++;
-                }
-                else
+                } else
                     break;
             }
         }
 
-        if ( $limit AND mb_strlen($output) > $limit )
-        {
+        if ($limit AND mb_strlen($output) > $limit) {
             // Dirty limit
             Text::limit_chars($output, $limit, NULL, TRUE);
         }
@@ -231,6 +237,7 @@ abstract class Core_IFace {
     public function set_last_modified(DateTime $last_modified)
     {
         $this->_last_modified = $last_modified;
+
         return $this;
     }
 
@@ -265,6 +272,7 @@ abstract class Core_IFace {
     public function set_expires_interval(DateInterval $expires)
     {
         $this->_expires = $expires;
+
         return $this;
     }
 
@@ -278,13 +286,12 @@ abstract class Core_IFace {
 
     public function __toString()
     {
-        return (string) $this->render();
+        return (string)$this->render();
     }
 
     public function get_parent()
     {
-        if ( ! $this->_parent )
-        {
+        if (!$this->_parent) {
             $this->_parent = $this->provider()->get_parent($this);
         }
 
@@ -294,6 +301,7 @@ abstract class Core_IFace {
     function set_parent(IFace $parent)
     {
         $this->_parent = $parent;
+
         return $this;
     }
 
@@ -316,6 +324,7 @@ abstract class Core_IFace {
     public function set_model(IFace_Model $model)
     {
         $this->_model = $model;
+
         return $this;
     }
 
@@ -326,35 +335,32 @@ abstract class Core_IFace {
 
     public function is_in_stack()
     {
-        return URL_Dispatcher::instance()->in_stack($this);
+        return $this->url_dispatcher()->in_stack($this);
     }
 
     public function url(URL_Parameters $parameters = NULL, $with_domain = TRUE)
     {
         $parts = array();
 
-        if ( ! $this->is_default() )
-        {
+        if (!$this->is_default()) {
             $current = $this;
 
             /** @var IFace $parent */
             $parent = NULL;
 
-            do
-            {
+            do {
                 $uri = $current->make_uri($parameters);
 
-                if ( !$uri )
+                if (!$uri)
                     return NULL;
 
                 $parts[] = $uri;
-                $parent = $current->get_parent();
+                $parent  = $current->get_parent();
                 $current = $parent;
-            }
-            while ( $parent );
+            } while ($parent);
         }
 
-        $path = '/'.implode('/', array_reverse($parts));
+        $path = '/' . implode('/', array_reverse($parts));
 
         return $with_domain ? URL::site($path, TRUE) : $path;
     }
@@ -363,11 +369,11 @@ abstract class Core_IFace {
     {
         $uri = $this->get_uri();
 
-        if ( !$uri )
+        if (!$uri)
             throw new IFace_Exception('IFace :codename must have uri');
 
         return $this->get_model()->has_dynamic_url()
-            ? URL_Dispatcher::instance()->make_url_parameter_part($uri, $parameters)
+            ? $this->url_dispatcher()->make_url_parameter_part($uri, $parameters)
             : $uri;
     }
 
@@ -381,4 +387,19 @@ abstract class Core_IFace {
         return View_IFace::factory($this);
     }
 
+    /**
+     * @return URL_Dispatcher
+     */
+    protected function url_dispatcher()
+    {
+        return URL_Dispatcher::instance();
+    }
+
+    /**
+     * @return \URL_Parameters
+     */
+    protected function url_parameters()
+    {
+        return $this->url_dispatcher()->parameters();
+    }
 }

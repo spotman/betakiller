@@ -1,6 +1,8 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
-class BetaKiller_Kohana_Exception extends Kohana_Kohana_Exception {
+class BetaKiller_Kohana_Exception extends Kohana_Kohana_Exception
+{
+    use BetaKiller\Helper\Base;
 
     /**
      * Exception counter for preventing recursion
@@ -115,22 +117,13 @@ class BetaKiller_Kohana_Exception extends Kohana_Kohana_Exception {
     }
 
     /**
-     * @return IFace
+     * @param int $code
+     * @return \BetaKiller\IFace\IFace
      */
     protected function get_iface($code)
     {
-        return $this->iface_factory('Error_'.$code);
+        return $this->iface_by_codename('Error_'.$code);
     }
-
-    /**
-     * @param $codename
-     * @return IFace
-     */
-    protected function iface_factory($codename)
-    {
-        return IFace::by_codename($codename);
-    }
-
 
     /**
      * Overwrite this method with "return TRUE" to show custom message in all cases

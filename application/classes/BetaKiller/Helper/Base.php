@@ -1,9 +1,10 @@
 <?php
-namespace BetaKiller;
+namespace BetaKiller\Helper;
 
-trait Helper
+trait Base
 {
-    use Helper\Log;
+    use Log;
+    use IFace;
 
     protected function current_lang()
     {

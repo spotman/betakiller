@@ -1,5 +1,7 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
+use \BetaKiller\IFace\IFace;
+
 class IFace_Auth_Logout extends IFace {
 
     public function render()
@@ -8,7 +10,7 @@ class IFace_Auth_Logout extends IFace {
         Env::auth()->logout(TRUE);
 
         // Redirect to site index
-        HTTP::redirect();
+        $this->redirect('/');
     }
 
     /**

@@ -1,4 +1,6 @@
-<?php defined('SYSPATH') OR die('No direct script access.');
+<?php
+
+use BetaKiller\IFace\IFace;
 
 class IFace_Auth_Login extends IFace {
 
@@ -32,7 +34,7 @@ class IFace_Auth_Login extends IFace {
     public function render()
     {
         // If user already authorized
-        if ( Env::user(TRUE) )
+        if ( $this->current_user(TRUE) )
         {
             if ( $this->_redirect_url == $this->_self_url )
             {
@@ -41,7 +43,7 @@ class IFace_Auth_Login extends IFace {
             }
 
             // Redirect him
-            HTTP::redirect($this->_redirect_url);
+            $this->redirect($this->_redirect_url);
         }
 
         return parent::render();

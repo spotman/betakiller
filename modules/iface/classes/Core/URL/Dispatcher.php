@@ -1,4 +1,6 @@
-<?php defined('SYSPATH') OR die('No direct script access.');
+<?php
+
+use BetaKiller\IFace\Core\IFace;
 
 abstract class Core_URL_Dispatcher {
 
@@ -154,10 +156,10 @@ abstract class Core_URL_Dispatcher {
     /**
      * Returns TRUE if provided IFace was initialized through url parsing
      *
-     * @param Core_IFace $iface
+     * @param IFace $iface
      * @return bool
      */
-    public function in_stack(Core_IFace $iface)
+    public function in_stack(IFace $iface)
     {
         return isset($this->_iface_stack[ $iface->get_codename() ]);
     }

@@ -3,7 +3,7 @@
 
 abstract class BetaKiller_API_Model extends Core_API_Model {
 
-    use BetaKiller\Helper;
+    use BetaKiller\Helper\Base;
 
     /**
      * @param string $name

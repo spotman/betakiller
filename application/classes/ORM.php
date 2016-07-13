@@ -8,6 +8,8 @@ class ORM extends Utils\Kohana\ORM
     \BetaKiller\Search\Model\ResultsItem
     /* , DataSource_Interface */ {
 
+    use Betakiller\Helper\Base;
+
     /**
      * Default implementation for ORM objects
      * Override this method in child classes

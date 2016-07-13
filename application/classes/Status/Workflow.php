@@ -2,6 +2,8 @@
 
 abstract class Status_Workflow {
 
+    use BetaKiller\Helper\Base;
+
     /**
      * @var Status_Related_Model
      */

@@ -1,4 +1,6 @@
-<?php defined('SYSPATH') OR die('No direct script access.');
+<?php
+
+use BetaKiller\IFace\Core\IFace;
 
 class IFace_Provider {
 
@@ -98,7 +100,7 @@ class IFace_Provider {
         return $object;
     }
 
-    public function get_parent(Core_IFace $iface)
+    public function get_parent(IFace $iface)
     {
         $model = $iface->get_model();
         $parent_model = $this->model_provider()->get_parent($model);

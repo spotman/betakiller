@@ -1,4 +1,6 @@
-<?php defined('SYSPATH') OR die('No direct script access.');
+<?php use BetaKiller\IFace\Core\IFace;
+
+defined('SYSPATH') OR die('No direct script access.');
 
 abstract class Core_View_IFace {
 
@@ -22,12 +24,12 @@ abstract class Core_View_IFace {
      */
     protected $_data = array();
 
-    public static function factory(Core_IFace $iface)
+    public static function factory(IFace $iface)
     {
         return new static($iface);
     }
 
-    protected function __construct(Core_IFace $iface)
+    protected function __construct(IFace $iface)
     {
         $this->_iface = $iface;
     }

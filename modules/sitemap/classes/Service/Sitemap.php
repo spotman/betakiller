@@ -1,12 +1,11 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
+use BetaKiller\Service;
 use samdark\sitemap\Sitemap;
 use samdark\sitemap\Index;
 
 class Service_Sitemap extends Service
 {
-    use Helper_Log;
-
     /**
      * @var URL_Parameters
      */
@@ -110,11 +109,12 @@ class Service_Sitemap extends Service
 
     protected function process_iface_model(IFace_Model $model)
     {
-        $iface = IFace::factory($model);
+        $iface = $this->iface_factory($model);
 
         // Get current item full URL
         $url = $iface->url($this->_url_parameters, TRUE);
 
+        // TODO Force calculation of the last_modified
         $last_modified = $iface->get_last_modified();
         $timestamp = $last_modified ? $last_modified->getTimestamp() : NULL;
 
@@ -134,7 +134,8 @@ class Service_Sitemap extends Service
 
     public function serve(Response $response)
     {
-        $response->send_string(file_get_contents($this->get_sitemap_file_path()), $response::XML);
+        $content = file_get_contents($this->get_sitemap_file_path());
+        $response->send_string($content, $response::XML);
     }
 
     protected function get_sitemap_file_path()

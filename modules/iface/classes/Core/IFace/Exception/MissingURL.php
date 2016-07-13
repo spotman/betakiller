@@ -1,5 +1,7 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
+use BetaKiller\IFace\IFace;
+
 class Core_IFace_Exception_MissingURL extends HTTP_Exception_404 {
 
     /**
