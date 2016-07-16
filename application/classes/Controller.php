@@ -4,7 +4,9 @@
  * Class Controller
  * Basic controller with common helpers
  */
-abstract class Controller extends Controller_Proxy {
+abstract class Controller extends Controller_Proxy
+{
+    use BetaKiller\Helper\Base;
 
     const JSON_SUCCESS = Response::JSON_SUCCESS;
     const JSON_ERROR = Response::JSON_ERROR;
@@ -56,9 +58,9 @@ abstract class Controller extends Controller_Proxy {
     protected function init_i18n()
     {
         // Смотрим, ести ли текущий язык в куке
-        $user_lang = Cookie::get(i18n::COOKIE_NAME);
+        $user_lang = Cookie::get(I18n::COOKIE_NAME);
 
-        $allowed_languages = i18n::lang_list();
+        $allowed_languages = I18n::lang_list();
 
         if ($user_lang AND ! in_array($user_lang, $allowed_languages) )
             throw new HTTP_Exception_500(
@@ -69,7 +71,7 @@ abstract class Controller extends Controller_Proxy {
         // Если нет, получаем язык пользователя
         if ( ! $user_lang )
         {
-            $user = Env::user(TRUE);
+            $user = $this->current_user(TRUE);
 
             // Если пользователь авторизован
             if ( $user )
@@ -78,7 +80,7 @@ abstract class Controller extends Controller_Proxy {
                 $user_lang = $user->get_language_name();
 
                 // И устанавливаем куку
-                Cookie::set(i18n::COOKIE_NAME, $user_lang);
+                Cookie::set(I18n::COOKIE_NAME, $user_lang);
             }
             // Иначе выбираем наиболее подходящий язык
             else

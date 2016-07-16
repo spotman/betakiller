@@ -1,6 +1,8 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
-class BetaKiller_Twig_Extension extends Twig_Extension {
+class BetaKiller_Twig_Extension extends Twig_Extension
+{
+    use BetaKiller\Helper\Base;
 
     /**
      * Returns the name of the extension.
@@ -111,10 +113,10 @@ class BetaKiller_Twig_Extension extends Twig_Extension {
             new Twig_SimpleFunction(
                 'parent_iface_url',
                 function() {
-                    return Env::url_dispatcher()
+                    return $this->url_dispatcher()
                         ->current_iface()
                         ->get_parent()
-                        ->url(Env::url_parameters());
+                        ->url($this->url_parameters());
                 }
             ),
 
@@ -269,16 +271,15 @@ class BetaKiller_Twig_Extension extends Twig_Extension {
 
     public function widget(array $context, $name, array $data = array())
     {
-        $widget = Widget::factory($name);
+        $widget = $this->widget_factory($name);
         $widget->setContext(array_merge($context, $data));
         return $widget->render();
     }
 
     public function user_is_moderator()
     {
-        $user = Env::user(TRUE);
+        $user = $this->current_user(TRUE);
 
         return $user AND $user->is_moderator();
     }
-
 }

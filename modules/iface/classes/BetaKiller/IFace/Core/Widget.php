@@ -1,8 +1,18 @@
-<?php defined('SYSPATH') OR die('No direct script access.');
+<?php
+namespace BetaKiller\IFace\Core;
 
+use Controller;
+use HTTP_Exception_500;
+use Kohana_Exception;
+use Request;
+use Response;
+use Route;
+use Validation;
 
-abstract class Core_Widget extends Controller {
+use BetaKiller\IFace\Widget\Exception;
 
+abstract class Widget extends \Controller // TODO Remove extension and replace it via Helper\Controller
+{
     const DEFAULT_STATE = 'default';
 
     /**
@@ -61,8 +71,7 @@ abstract class Core_Widget extends Controller {
         // Creating empty response if none provided
         $response = $response ?: Response::factory();
 
-        if ( ! class_exists($class_name) )
-        {
+        if (!class_exists($class_name)) {
             $class_name = 'Widget_Default';
         }
 
@@ -79,6 +88,7 @@ abstract class Core_Widget extends Controller {
     public function setName($value)
     {
         $this->_name = $value;
+
         return $this;
     }
 
@@ -101,6 +111,7 @@ abstract class Core_Widget extends Controller {
     public function setContext(array $value)
     {
         $this->_context = $value;
+
         return $this;
     }
 
@@ -120,16 +131,13 @@ abstract class Core_Widget extends Controller {
      */
     public function __toString()
     {
-        try
-        {
+        try {
             $response = $this->render();
-        }
-        catch ( \Exception $e )
-        {
+        } catch (\Exception $e) {
             $response = Kohana_Exception::_handler($e);
         }
 
-        return (string) $response;
+        return (string)$response;
     }
 
     /**
@@ -185,12 +193,9 @@ abstract class Core_Widget extends Controller {
 
     public function set_data($key, $value = NULL)
     {
-        if ( is_array($key) )
-        {
+        if (is_array($key)) {
             $this->_data = array_merge($this->_data, $key);
-        }
-        else
-        {
+        } else {
             $this->_data[$key] = $value;
         }
     }
@@ -220,16 +225,15 @@ abstract class Core_Widget extends Controller {
 
     protected function view($file = NULL)
     {
-        if ( ! $file )
-        {
+        if (!$file) {
             $suffix = $this->_current_state != static::DEFAULT_STATE
-                ? '-'.$this->_current_state
+                ? '-' . $this->_current_state
                 : '';
 
-            $file = str_replace('_', DIRECTORY_SEPARATOR, $this->_name).$suffix;
+            $file = str_replace('_', DIRECTORY_SEPARATOR, $this->_name) . $suffix;
         }
 
-        $view_path = 'widgets'.DIRECTORY_SEPARATOR.$file;
+        $view_path = 'widgets' . DIRECTORY_SEPARATOR . $file;
 
         return $this->view_factory($view_path, $this->getContext());
     }
@@ -251,7 +255,16 @@ abstract class Core_Widget extends Controller {
 
     private function get_validation_messages_path()
     {
-        return 'widgets'. DIRECTORY_SEPARATOR . str_replace('_', DIRECTORY_SEPARATOR, $this->_name);
+        return 'widgets' . DIRECTORY_SEPARATOR . str_replace('_', DIRECTORY_SEPARATOR, $this->_name);
     }
 
+    /**
+     * @param string $message
+     * @param array $variables
+     * @throws \BetaKiller\IFace\Widget\Exception
+     */
+    protected function throw_exception($message, array $variables = [])
+    {
+        throw new Exception($message, $variables);
+    }
 }

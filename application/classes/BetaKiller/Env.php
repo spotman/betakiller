@@ -32,6 +32,7 @@ class BetaKiller_Env
 
     /**
      * Хелпер для получения инстанса ACL
+     * @deprecated
      * @return ACL
      */
     public static function acl()
@@ -41,6 +42,7 @@ class BetaKiller_Env
 
     /**
      * Хелпер для получения инстанса Auth
+     * @deprecated
      * @return Auth_ORM
      */
     public static function auth()
@@ -50,6 +52,7 @@ class BetaKiller_Env
 
     /**
      * Хелпер для получения текущего пользователя
+     * @deprecated
      * @param bool $allow_guest
      * @return Model_User|NULL
      * @throws HTTP_Exception_401
@@ -67,6 +70,7 @@ class BetaKiller_Env
     /**
      * @todo выпилить вместе с кривыми ролями
      * Хелпер для получения роли текущего пользователя
+     * @deprecated
      * @return mixed
      */
     public static function role()
@@ -75,6 +79,7 @@ class BetaKiller_Env
     }
 
     /**
+     * @deprecated
      * @return URL_Parameters
      */
     public static function url_parameters()
@@ -83,6 +88,7 @@ class BetaKiller_Env
     }
 
     /**
+     * @deprecated
      * @return URL_Dispatcher
      */
     public static function url_dispatcher()

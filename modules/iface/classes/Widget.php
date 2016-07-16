@@ -1,3 +1,11 @@
-<?php defined('SYSPATH') OR die('No direct script access.');
+<?php
 
-abstract class Widget extends Core_Widget {}
+use BetaKiller\IFace;
+
+/**
+ * Class Widget
+ *
+ * Use \BetaKiller\Widget\Widget instead
+ * @deprecated
+ */
+abstract class Widget extends IFace\Widget {}

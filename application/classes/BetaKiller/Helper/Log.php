@@ -51,7 +51,7 @@ trait Log
      * @param \Exception $e
      * @return $this
      */
-    protected function throw_exception(\Exception $e)
+    protected function exception(\Exception $e)
     {
         \Log::exception($e);
         return $this;

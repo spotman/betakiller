@@ -1,5 +1,7 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
+use \BetaKiller\IFace\Widget;
+
 class Widget_Auth_Ulogin extends Widget {
 
     public function get_data()
@@ -41,6 +43,9 @@ class Widget_Auth_Ulogin extends Widget {
         }
     }
 
+    /**
+     * @return Ulogin
+     */
     protected function ulogin_factory()
     {
         return Ulogin::factory()

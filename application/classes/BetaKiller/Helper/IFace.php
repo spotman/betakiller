@@ -6,7 +6,7 @@ trait IFace
     /**
      * @return \URL_Dispatcher
      */
-    final protected function url_dispatcher()
+    protected function url_dispatcher()
     {
         return \URL_Dispatcher::instance();
     }
@@ -14,7 +14,7 @@ trait IFace
     /**
      * @return \URL_Parameters
      */
-    final protected function url_parameters()
+    protected function url_parameters()
     {
         return $this->url_dispatcher()->parameters();
     }
@@ -35,5 +35,14 @@ trait IFace
     protected function iface_factory(\IFace_Model $model)
     {
         return \BetaKiller\IFace\IFace::factory($model);
+    }
+
+    /**
+     * @param $name
+     * @return \BetaKiller\IFace\Widget
+     */
+    protected function widget_factory($name)
+    {
+        return \BetaKiller\IFace\Widget::factory($name);
     }
 }

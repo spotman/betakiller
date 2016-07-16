@@ -1,10 +1,12 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
+use BetaKiller\IFace\Widget;
+
 class Core_Controller_Widget extends Controller {
 
     /**
      * @return static
-     * @throws Kohana_Exception
+     * @throws Widget\Exception
      */
     protected function get_proxy_object()
     {
@@ -13,7 +15,7 @@ class Core_Controller_Widget extends Controller {
         $object = Widget::factory($widget_name, $this->request(), $this->response());
 
         if ( ! ($object instanceof Widget) )
-            throw new Kohana_Exception('Widget controller can not serve objects which are not instance of class Widget');
+            throw new Widget\Exception('Widget controller can not serve objects which are not instance of class Widget');
 
         return $object;
     }
