@@ -115,14 +115,23 @@ abstract class Assets_Provider {
             throw new Assets_Exception_Upload('Incorrect file, upload rejected');
         }
 
-        // TODO Get type from file analysis, not from request
-        $mime_type = HTML::chars( strip_tags($_file['type']) );
+        $full_path = $_file['tmp_name'];
+        $safe_name = strip_tags($_file['name']);
+
+        return $this->store($full_path, $safe_name, $_post_data);
+    }
+
+    public function store($full_path, $original_name, array $_post_data = array())
+    {
+        // Check permissions
+        if ( ! $this->check_store_permissions() )
+            throw new Assets_Provider_Exception('Store is not allowed');
+
+        // Get type from file analysis
+        $mime_type = $this->get_mime_type($full_path);
 
         // MIME-type check
         $this->check_allowed_mime_types($mime_type);
-
-        $full_path = $_file['tmp_name'];
-        $safe_name = strip_tags($_file['name']);
 
         // Init model
         $model = $this->file_model_factory();
@@ -135,11 +144,10 @@ abstract class Assets_Provider {
 
         // Put data into model
         $model
-            ->set_original_name($safe_name)
+            ->set_original_name($original_name)
             ->set_size(strlen($content))
             ->set_mime($mime_type)
             ->set_uploaded_by($this->_get_current_user());
-
 
         // Place file into storage
         $this->get_storage()->put($model, $content);
@@ -150,6 +158,11 @@ abstract class Assets_Provider {
         $this->_post_upload($model, $_post_data);
 
         return $model;
+    }
+
+    protected function get_mime_type($file_path)
+    {
+        return File::mime($file_path);
     }
 
     /**
@@ -447,4 +460,13 @@ abstract class Assets_Provider {
      */
     abstract protected function check_delete_permissions($model);
 
+    /**
+     * Returns TRUE if store is granted
+     *
+     * @return bool
+     */
+    protected function check_store_permissions()
+    {
+        return $this->check_upload_permissions();
+    }
 }

@@ -3,7 +3,6 @@ namespace BetaKiller\IFace\Core;
 
 use DateInterval;
 use DateTime;
-use Env;
 use IFace_Exception;
 use IFace_Model;
 use IFace_Provider;
@@ -15,6 +14,8 @@ use View_IFace;
 
 abstract class IFace
 {
+    const CONFIG_KEY_IS_TRAILING_SLASH_ENABLED = 'url.is_trailing_slash_enabled';
+
     /**
      * @var IFace_Model
      */
@@ -34,6 +35,11 @@ abstract class IFace
      * @var DateInterval
      */
     protected $_expires;
+
+    /**
+     * @var array
+     */
+    protected static $_config;
 
     /**
      * Returns URL query parts array for current HTTP request
@@ -362,6 +368,11 @@ abstract class IFace
 
         $path = '/' . implode('/', array_reverse($parts));
 
+        if ($this->is_trailing_slash_enabled())
+        {
+            $path .= '/';
+        }
+
         return $with_domain ? URL::site($path, TRUE) : $path;
     }
 
@@ -380,6 +391,16 @@ abstract class IFace
     protected function get_uri()
     {
         return $this->get_model()->get_uri();
+    }
+
+    /**
+     * Returns TRUE if trailing slash is needed in url
+     *
+     * @return bool
+     */
+    public function is_trailing_slash_enabled()
+    {
+        return (bool) \Kohana::config('iface.'.self::CONFIG_KEY_IS_TRAILING_SLASH_ENABLED);
     }
 
     public function get_view()

@@ -8,8 +8,8 @@
  * @package BetaKiller
  * @author Spotman
  */
-class View_Wrapper extends Core_View_Wrapper {
-
+class View_Wrapper extends Core_View_Wrapper
+{
     protected function view_factory($view_path)
     {
         // Using Twig instead of View
@@ -29,8 +29,7 @@ class View_Wrapper extends Core_View_Wrapper {
             'meta_tags' =>  Meta::instance()->render(),
             'js_all'    =>  JS::instance()->get_all(),
             'css_all'   =>  CSS::instance()->get_all(),
+            'links_all' =>  Link::instance()->render(),
         );
     }
-
-
 }

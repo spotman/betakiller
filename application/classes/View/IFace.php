@@ -14,7 +14,7 @@ class View_IFace extends Core_View_IFace {
 
     /**
      * @param View $iface_view
-     * @return Twig
+     * @return View
      */
     protected function process_layout(View $iface_view)
     {

@@ -1,13 +1,26 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
-class Core_Controller_IFace extends Controller {
-
+class Core_Controller_IFace extends Controller
+{
     public function action_render()
     {
         $uri = $this->get_request_uri();
 
         // Getting current IFace
         $iface = URL_Dispatcher::instance()->parse_uri($uri);
+
+        $has_trailing_slash = (substr($uri, -1, 1) == '/');
+
+        $is_trailing_slash_enabled = $iface->is_trailing_slash_enabled();
+
+        if ($has_trailing_slash AND !$is_trailing_slash_enabled)
+        {
+            $this->redirect(rtrim($uri, '/'), 301); // Permanent redirect
+        }
+        elseif (!$has_trailing_slash AND $is_trailing_slash_enabled)
+        {
+            $this->redirect($uri.'/', 301); // Permanent redirect
+        }
 
         // If this is default IFace and client requested non-slash uri, redirect client to /
         if ( $iface->is_default() AND $this->get_request_uri() != '' )
@@ -33,7 +46,6 @@ class Core_Controller_IFace extends Controller {
      */
     protected function get_request_uri()
     {
-        return trim(Request::current()->detect_uri(), '/');
+        return Request::current()->detect_uri();
     }
-
 }

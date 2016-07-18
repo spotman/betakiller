@@ -78,12 +78,13 @@ abstract class Minion_Task extends Kohana_Minion_Task
     /**
      * Get user input from CLI
      *
-     * @param $message
+     * @param string $message
+     * @param array $options
      * @return string
      */
-    protected function read($message)
+    protected function read($message, array $options = NULL)
     {
-        return Minion_CLI::read($message);
+        return Minion_CLI::read($message, $options);
     }
 
     /**

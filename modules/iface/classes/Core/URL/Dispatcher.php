@@ -61,6 +61,8 @@ abstract class Core_URL_Dispatcher {
      */
     public function parse_uri($uri)
     {
+        $uri = trim($uri, '/');
+
         $uri_parts = $uri ? explode('/', $uri) : NULL;
 
         // Root requested - search for default IFace

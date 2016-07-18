@@ -15,29 +15,29 @@ class Log extends Kohana_Log
         }
     }
 
-    public static function debug($message)
+    public static function debug($message, array $values = NULL)
     {
-        static::_add(self::DEBUG, $message);
+        static::_add(self::DEBUG, $message, $values);
     }
 
-    public static function info($message)
+    public static function info($message, array $values = NULL)
     {
-        static::_add(self::INFO, $message);
+        static::_add(self::INFO, $message, $values);
     }
 
-    public static function notice($message)
+    public static function notice($message, array $values = NULL)
     {
-        static::_add(self::NOTICE, $message);
+        static::_add(self::NOTICE, $message, $values);
     }
 
-    public static function warning($message)
+    public static function warning($message, array $values = NULL)
     {
-        static::_add(self::WARNING, $message);
+        static::_add(self::WARNING, $message, $values);
     }
 
-    public static function error($message)
+    public static function error($message, array $values = NULL)
     {
-        static::_add(self::ERROR, $message);
+        static::_add(self::ERROR, $message, $values);
     }
 
     public static function exception(Exception $e)

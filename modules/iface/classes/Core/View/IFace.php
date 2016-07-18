@@ -58,11 +58,18 @@ abstract class Core_View_IFace {
 
         $iface_view->set($this->_data);
 
+        $meta = Meta::instance();
+
         // Setting page title
-        Meta::instance()->title( $this->_iface->get_title() );
+        $meta->title( $this->_iface->get_title() );
 
         // Setting page description
-        Meta::instance()->description( $this->_iface->get_description() );
+        $meta->description( $this->_iface->get_description() );
+
+        Link::instance()
+            ->canonical($this->_iface->url());
+
+        // TODO move calls for Meta and Link to overrided methods in Wrapper
 
         // Getting IFace layout
         $this->_layout = $this->_iface->get_layout_codename();
