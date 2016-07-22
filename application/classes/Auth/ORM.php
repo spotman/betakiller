@@ -5,7 +5,7 @@ class Auth_ORM extends Kohana_Auth_ORM {
     /**
      * Logs a user in.
      *
-     * @param   string   $user
+     * @param   string|Model_User   $user
      * @param   string   $password
      * @param   boolean  $remember  enable autologin
      * @return  boolean
@@ -17,9 +17,9 @@ class Auth_ORM extends Kohana_Auth_ORM {
         {
             $username = $user;
 
-            /** @var Model_User $user */
-            $user = ORM::factory('User');
-            $user->search_by($username);
+            /** @var Model_User $orm */
+            $orm = ORM::factory('User');
+            $user = $orm->search_by($username);
 
             if ( ! $user->loaded() )
                 throw new Auth_Exception_UserDoesNotExists;

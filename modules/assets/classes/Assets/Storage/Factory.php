@@ -17,7 +17,7 @@ class Assets_Storage_Factory {
 
     /**
      * @param string $codename
-     * @return static
+     * @return Assets_Storage_Local|Assets_Storage_CFS
      * @throws Assets_Storage_Exception
      */
     public function create($codename)

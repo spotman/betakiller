@@ -1,6 +1,6 @@
 <?php defined('SYSPATH') or die('No direct script access.');
 /**
- * Minipn exception
+ * Minion exception
  *
  * @package    Kohana
  * @category   Minion
@@ -25,7 +25,12 @@ class Kohana_Minion_Exception extends Kohana_Exception {
 	{
 		try
 		{
-			if ($e instanceof Minion_Exception)
+		    if (class_exists('ORM_Validation_Exception') AND $e instanceof ORM_Validation_Exception)
+            {
+                echo Kohana_Exception::text($e);
+                print_r($e->errors('orm'));
+            }
+			elseif ($e instanceof Minion_Exception)
 			{
 				echo $e->format_for_cli();
 			}
@@ -33,7 +38,10 @@ class Kohana_Minion_Exception extends Kohana_Exception {
 			{
 				echo Kohana_Exception::text($e);
 			}
-			
+
+			echo PHP_EOL;
+			echo $e->getTraceAsString().PHP_EOL;
+
 			$exit_code = $e->getCode();
 
 			// Never exit "0" after an exception.

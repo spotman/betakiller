@@ -26,7 +26,41 @@ abstract class Minion_Task extends Kohana_Minion_Task
 
         Log::instance()->attach(new Minion_Log(), $log_level);
 
+        // Auth for CLI
+        $user = $this->get_cli_user_model();
+        Auth::instance()->force_login($user);
+
         parent::execute();
+    }
+
+    protected function get_cli_user_model()
+    {
+        $username = 'minion';
+
+        /** @var Model_User $orm */
+        $orm = \ORM::factory('User');
+
+        $user = $orm->search_by($username);
+
+        if (!$user->loaded())
+        {
+            $password = microtime();
+
+            $host = parse_url(Kohana::$base_url, PHP_URL_HOST);
+            $email = $username.'@'.$host;
+
+            /** @var Model_User $user */
+            $user = $orm
+                ->set_username($username)
+                ->set_password($password)
+                ->set_email($email)
+                ->create();
+
+            // Allowing everything (admin may remove some roles later if needed)
+            $user->add_all_available_roles();
+        }
+
+        return $user;
     }
 
     /**

@@ -184,7 +184,6 @@ abstract class Assets_Provider {
      *
      * @param Assets_Model $model
      * @param array $_post_data
-     * @return string
      */
     protected function _post_upload($model, array $_post_data)
     {
@@ -304,7 +303,7 @@ abstract class Assets_Provider {
     /**
      * Returns User model
      *
-     * @return Model_User|NULL
+     * @return Model_User
      */
     protected function _get_current_user()
     {
@@ -421,7 +420,7 @@ abstract class Assets_Provider {
      *
      * @return array|TRUE
      */
-    abstract protected function get_allowed_mime_types();
+    abstract public function get_allowed_mime_types();
 
     /**
      * Returns concrete storage for current provider

@@ -217,7 +217,7 @@ abstract class Assets_Provider_Image extends Assets_Provider {
         }
         catch ( Exception $e )
         {
-            throw new Assets_Provider_Exception('Can not resize image');
+            throw new Assets_Provider_Exception('Can not resize image: :message', [':message' => $e->getMessage()]);
         }
     }
 

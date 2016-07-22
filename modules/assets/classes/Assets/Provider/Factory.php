@@ -11,7 +11,7 @@ class Assets_Provider_Factory {
      * Factory method
      *
      * @param $name
-     * @return static
+     * @return Assets_Provider|Assets_Provider_Image
      */
     public function create($name)
     {

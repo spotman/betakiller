@@ -46,11 +46,35 @@ class User extends \Model_Auth_User implements \Notification_User_Interface //im
 //        }
 //    }
 
+    /**
+     * @param string $value
+     * @return $this
+     */
+    public function set_username($value)
+    {
+        return $this->set('username', $value);
+    }
+
+    /**
+     * @return string
+     */
     public function get_username()
     {
         return $this->get('username');
     }
 
+    /**
+     * @param string $value
+     * @return $this
+     */
+    public function set_password($value)
+    {
+        return $this->set('password', $value);
+    }
+
+    /**
+     * @return string
+     */
     public function get_password()
     {
         return $this->get('password');
@@ -61,7 +85,7 @@ class User extends \Model_Auth_User implements \Notification_User_Interface //im
      */
     public function is_developer()
     {
-        return $this->has_role('developer');
+        return $this->has_role(\Model_Role::DEVELOPERS_ROLE_NAME);
     }
 
     /**
@@ -69,7 +93,7 @@ class User extends \Model_Auth_User implements \Notification_User_Interface //im
      */
     public function is_moderator()
     {
-        return $this->has_role('moderator');
+        return $this->has_role(\Model_Role::MODERATORS_ROLE_NAME);
     }
 
     /**
@@ -88,6 +112,37 @@ class User extends \Model_Auth_User implements \Notification_User_Interface //im
         }
 
         return $this->has('roles', $role);
+    }
+
+    public function add_developers_role()
+    {
+        return $this->add_role(\Model_Role::DEVELOPERS_ROLE_NAME);
+    }
+
+    public function add_role($role)
+    {
+        if ( ! ($role instanceof \Model_Role) )
+        {
+            /** @var \Model_Role $orm */
+            $orm = \ORM::factory('Role');
+            $role = $orm->get_by_name($role);
+        }
+
+        return $this->add('roles', $role);
+    }
+
+    public function add_all_available_roles()
+    {
+        /** @var \Model_Role $orm */
+        $orm = \ORM::factory('Role');
+        $roles = $orm->find_all();
+
+        foreach ($roles as $role)
+        {
+            $this->add_role($role);
+        }
+
+        return $this;
     }
 
     /**
@@ -148,10 +203,11 @@ class User extends \Model_Auth_User implements \Notification_User_Interface //im
      * Search for user by username or e-mail
      * @param $username_or_email
      * @throws \HTTP_Exception_403
+     * @return \ORM
      */
     public function search_by($username_or_email)
     {
-        $this->where($this->unique_key($username_or_email), '=', $username_or_email)->find();
+        return $this->where($this->unique_key($username_or_email), '=', $username_or_email)->find();
     }
 
     public function before_sign_in()
