@@ -83,7 +83,8 @@ abstract class Service_Admin_Content extends \BetaKiller\Service
             'height'    =>  $target_height,
         ];
 
-        return $this->render_custom_html_tag($this->get_html_custom_tag_name(), $image->get_id(), $attributes);
+        return $this->custom_tag_instance()
+            ->generate($this->get_html_custom_tag_name(), $image->get_id(), $attributes);
     }
 
     public function get_entity_items(Model_AdminContentEntity $entity)
@@ -142,6 +143,11 @@ abstract class Service_Admin_Content extends \BetaKiller\Service
         ];
 
         return $provider->store($full_path, $original_name, $post_data);
+    }
+
+    public function get_allowed_mime_types()
+    {
+        return $this->get_assets_provider()->get_allowed_mime_types();
     }
 
     /**

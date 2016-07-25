@@ -13,6 +13,15 @@ abstract class Minion_Task extends Kohana_Minion_Task
 
     const LIGHT_BLUE    = Minion_CLI::LIGHT_BLUE;
 
+    public function __construct()
+    {
+        $this->_options = array_merge([
+            'debug' => FALSE,
+        ], $this->_options);
+
+        parent::__construct();
+    }
+
     /**
      * Execute the task with the specified set of options
      *
@@ -20,7 +29,7 @@ abstract class Minion_Task extends Kohana_Minion_Task
      */
     public function execute()
     {
-        $log_level = ( isset($this->_options['debug']) )
+        $log_level = ( $this->_options['debug'] !== FALSE )
             ? Log::DEBUG
             : $this->get_max_log_level();
 

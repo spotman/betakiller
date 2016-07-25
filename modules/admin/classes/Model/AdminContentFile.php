@@ -1,5 +1,8 @@
 <?php
 
+// TODO refactoring to interface + trait
+// Model_AdminImageFile extends Assets_Model_ORM_Image
+// Model_AdminAttachmentFile extends Assets_Model_ORM
 abstract class Model_AdminContentFile extends Assets_Model_ORM_Image
 {
     abstract protected function get_file_table_name();
@@ -84,11 +87,28 @@ abstract class Model_AdminContentFile extends Assets_Model_ORM_Image
     }
 
     /**
-     * @return int
+     * @return int|null
      */
     public function get_wp_id()
     {
         return $this->get('wp_id');
+    }
+
+    /**
+     * @param string $value
+     * @return $this|ORM
+     */
+    public function set_wp_path($value)
+    {
+        return $this->set('wp_path', $value);
+    }
+
+    /**
+     * @return string|null
+     */
+    public function get_wp_path()
+    {
+        return $this->get('wp_path');
     }
 
     /**
@@ -113,6 +133,13 @@ abstract class Model_AdminContentFile extends Assets_Model_ORM_Image
     public function find_by_wp_id($id)
     {
         $model = $this->filter_wp_id($id)->find();
+
+        return $model->loaded() ? $model : NULL;
+    }
+
+    public function find_by_wp_path($wp_path)
+    {
+        $model = $this->filter_wp_path($wp_path)->find();
 
         return $model->loaded() ? $model : NULL;
     }
@@ -146,6 +173,11 @@ abstract class Model_AdminContentFile extends Assets_Model_ORM_Image
         return $this->where('wp_id', '=', $wp_id);
     }
 
+    public function filter_wp_path($wp_path)
+    {
+        return $this->where('wp_path', '=', $wp_path);
+    }
+
     public function group_by_entity_item_id()
     {
         return $this->group_by('entity_item_id');
@@ -159,5 +191,28 @@ abstract class Model_AdminContentFile extends Assets_Model_ORM_Image
     public function to_json()
     {
         return $this->as_array();
+    }
+
+    /**
+     * Returns array of image IDs by their WP IDs
+     *
+     * @param int|array $wp_ids
+     * @return array
+     */
+    public function find_ids_by_wp_ids($wp_ids)
+    {
+        /** @var $this $model */
+        $model = $this->model_factory();
+
+        return $model
+            ->where($this->object_column('wp_id'), 'IN', (array) $wp_ids)
+            ->order_by_wp_ids($wp_ids)
+            ->find_all()
+            ->as_array(NULL, 'id');
+    }
+
+    protected function order_by_wp_ids(array $wp_ids)
+    {
+        return $this->order_by(DB::expr('FIELD('.$this->object_column('wp_id').', '.implode(', ', $wp_ids).')'), 'ASC');
     }
 }

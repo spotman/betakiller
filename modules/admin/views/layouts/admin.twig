@@ -1,0 +1,41 @@
+{% include "@layouts/bootstrap/v3" %}
+
+{#{{ css("css/layout-admin.css")}}#}
+
+<div class="container-fluid">
+
+    <header>
+        <nav class="navbar navbar-default"></nav>
+    </header>
+
+    {#<nav id="admin-top-menu" class="navbar navbar-default">#}
+        {#{% include "@templates/layout/logo" with { logoURL: "/admin" } %}#}
+
+        {#<a id="top-menu-button" class="icon-font-button overlay-opener pull-right hidden-xl hidden-lg hidden-md">#}
+            {#<i class="icon-new-menu"></i>#}
+        {#</a>#}
+        {#<a href="/" class="admin-top-menu-link pull-right hidden-sm hidden-xs" target="_blank">Открыть сайт в новой вкладке</a>#}
+        {#<a href="/logout" class="admin-top-menu-link pull-right hidden-sm hidden-xs">Выйти</a>#}
+    {#</nav>#}
+
+    <div class="row">
+
+        <div class="hidden-xs hidden-sm col-md-3 col-lg-2">
+            {#{{ widget("Menu_Admin_Left") }}#}
+        </div>
+
+        <div class="col-xs-12 col-sm-8 col-md-6 col-lg-8">
+            {% block page_content "" %}
+        </div>
+
+        <div class="col-xs-12 col-sm-4 col-md-3 col-lg-2">
+            {#sdf#}
+        </div>
+
+    </div>
+
+    <footer>
+        <div class="well text-center">no footer yet</div>
+    </footer>
+
+</div>

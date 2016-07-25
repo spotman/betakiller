@@ -10,11 +10,38 @@ class Model_AdminImageFile extends Model_AdminContentFile
     /**
      * Returns assets provider associated with current model
      *
-     * @return Assets_Provider|Assets_Provider_Image
+     * @return Assets_Provider_AdminImage
      */
     protected function get_provider()
     {
-        return Assets_Provider_Factory::instance()->create('AdminAttachment');
+        return Assets_Provider_Factory::instance()->create('AdminImage');
+    }
+
+    public function get_img_tag_with_srcset()
+    {
+        $sizes = $this->get_provider()->get_allowed_preview_sizes();
+
+        $src = $this->get_original_url();
+
+        $attributes = [
+            'alt'       =>  $this->get_alt(),
+            'title'     =>  $this->get_title(),
+        ];
+
+        if ($sizes)
+        {
+            $srcset = [];
+
+            foreach ($sizes as $size)
+            {
+                $width = intval($size);
+                $srcset[] = $this->get_preview_url($size).' '.$width.'w';
+            }
+
+            $attributes['srcset'] = implode(', ', $srcset);
+        }
+
+        return HTML::image($src, array_filter($attributes));
     }
 
 //    /**

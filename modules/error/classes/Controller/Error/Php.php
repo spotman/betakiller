@@ -110,7 +110,7 @@ class Controller_Error_Php extends Controller_Developer {
 
     protected function get_developers_list()
     {
-        $list = Env::user()->get_developers_list();
+        $list = $this->current_user()->get_developers_list();
         $return = array();
 
         foreach ( $list as $user )
@@ -165,14 +165,14 @@ class Controller_Error_Php extends Controller_Developer {
 
     public function action_set_sort_by()
     {
-        $key = $this->request->param("param");
+        $key = $this->param("param");
         $this->set_sort_by($key);
         $this->redirect("/errors/php/");
     }
 
     public function action_throw()
     {
-        $code = $this->request->param("param");
+        $code = $this->param("param");
         throw HTTP_Exception::factory((int) $code ?: 500, 'This is a test');
     }
 

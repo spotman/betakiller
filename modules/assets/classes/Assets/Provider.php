@@ -328,14 +328,15 @@ abstract class Assets_Provider {
      *
      * @param string $mime MIME-type
      * @throws Assets_Provider_Exception
+     * @return bool
      */
-    protected function check_allowed_mime_types($mime)
+    public function check_allowed_mime_types($mime)
     {
         $allowed_mimes = $this->get_allowed_mime_types();
 
         // All MIMEs are allowed
         if ( $allowed_mimes === TRUE )
-            return;
+            return TRUE;
 
         if ( ! is_array($allowed_mimes) )
             throw new Assets_Provider_Exception('Allowed MIME-types in :codename provider must be an array() or TRUE',
@@ -346,7 +347,7 @@ abstract class Assets_Provider {
         foreach ( $allowed_mimes as $allowed )
         {
             if ( $mime == $allowed )
-                return;
+                return TRUE;
         }
 
         $allowed_extensions = array();

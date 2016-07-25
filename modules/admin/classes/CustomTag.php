@@ -1,0 +1,91 @@
+<?php
+/**
+ * Created by PhpStorm.
+ * User: spotman
+ * Date: 25.07.16
+ * Time: 18:49
+ */
+
+class CustomTag
+{
+    use \BetaKiller\Utils\Instance\Simple;
+
+    const CAPTION = 'caption';
+    const ADMIN_IMAGE = 'adminImage';
+
+    public function generate($name, $id, array $attributes = [], $content = NULL)
+    {
+        $attributes = ['id' => $id] + $attributes;
+
+        // Generating HTML-tag
+        $node = '<'.$name;
+
+        $node .= \HTML::attributes(array_filter($attributes));
+
+        if ($content)
+        {
+            $node .= '>'.$content.'</'.$name.'>';
+        }
+        else
+        {
+            $node .= ' />';
+        }
+
+        return $node;
+    }
+
+    /**
+    * @param string $text
+    * @param string|string[] $filter_tags
+    * @param callable $callback
+    * @return string
+    * @throws \Kohana_Exception
+    */
+    public function parse($text, $filter_tags, callable $callback)
+    {
+        if (!is_array($filter_tags)) {
+            $filter_tags = [$filter_tags];
+        }
+
+        /** @url https://regex101.com/r/yF1bL4/3 */
+        $pattern = '/<(' . implode('|', $filter_tags) . ')[^\/>]*\/>/';
+
+        if (!preg_match_all($pattern, $text, $matches, PREG_SET_ORDER))
+            return $text;
+
+        // Обходим каждый тег
+        foreach ($matches as $match) {
+            $tag_string = $match[0];
+            $tag_name   = $match[1];
+
+            // Парсим тег
+            $sx = simplexml_load_string($tag_string);
+
+            if ($sx === FALSE)
+                throw new \Kohana_Exception('Custom tag parsing failed on :string', [':string' => $tag_string]);
+
+            // Получаем атрибуты
+            $attributes = [];
+
+            foreach ($sx->attributes() as $attr) /** @var $attr \SimpleXMLElement */ {
+                $name  = $attr->getName();
+                $value = (string)$attr;
+
+                $attributes[$name] = $value;
+            }
+
+            $output = call_user_func($callback, $tag_name, $attributes);
+
+            if ($output !== NULL) {
+                $text = str_replace(
+                    $tag_string,
+                    $output,
+                    $text
+                );
+            }
+        }
+
+        return $text;
+    }
+
+}
