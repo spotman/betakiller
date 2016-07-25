@@ -14,7 +14,8 @@
     "php-di/php-di": "^5.1",
     "doctrine/cache": "^1.5",
     "jakeasmith/http_build_url": "^1",
-    "asm89/twig-cache-extension": "^1.2"
+    "asm89/twig-cache-extension": "^1.2",
+    "thunderer/shortcode": "^0.5"
   },
 
   "repositories": [
