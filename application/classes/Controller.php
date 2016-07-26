@@ -17,7 +17,7 @@ abstract class Controller extends Controller_Proxy
      * Getter/setter for request
      *
      * @param Request $request
-     * @return $this|Request
+     * @return Request|Controller
      */
     public function request(Request $request = NULL)
     {
@@ -32,7 +32,7 @@ abstract class Controller extends Controller_Proxy
      * Getter/setter for response
      *
      * @param Response $response
-     * @return $this|Response
+     * @return Response|Controller
      */
     public function response(Response $response = NULL)
     {

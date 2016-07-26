@@ -143,6 +143,10 @@ class BetaKiller_Twig_Extension extends Twig_Extension
                 return ___($text, $context ?: current($values), $values);
             }),
 
+            new Twig_SimpleFilter('custom_tags', function($text) {
+                return CustomTag::instance()->process($text);
+            }, array('is_safe' => array('html'))),
+
         ];
     }
 

@@ -6,16 +6,32 @@
  * Time: 18:49
  */
 
+use\BetaKiller\IFace\Widget;
+
+
 class CustomTag
 {
     use \BetaKiller\Utils\Instance\Simple;
 
     const CAPTION = 'caption';
+    const GALLERY = 'gallery';
     const ADMIN_IMAGE = 'adminImage';
 
-    public function generate($name, $id, array $attributes = [], $content = NULL)
+    public function get_allowed_tags()
     {
-        $attributes = ['id' => $id] + $attributes;
+        return [
+            self::CAPTION,
+            self::GALLERY,
+            self::ADMIN_IMAGE,
+        ];
+    }
+
+    public function generate($name, $id = NULL, array $attributes = [], $content = NULL)
+    {
+        if ($id)
+        {
+            $attributes = $attributes + ['id' => $id];
+        }
 
         // Generating HTML-tag
         $node = '<'.$name;
@@ -43,6 +59,11 @@ class CustomTag
     */
     public function parse($text, $filter_tags, callable $callback)
     {
+        if ($filter_tags === TRUE)
+        {
+            $filter_tags = $this->get_allowed_tags();
+        }
+
         if (!is_array($filter_tags)) {
             $filter_tags = [$filter_tags];
         }
@@ -88,4 +109,21 @@ class CustomTag
         return $text;
     }
 
+    public function render($name, array $attributes = [])
+    {
+        $widget_name = 'CustomTag_'.ucfirst($name);
+
+        $widget = Widget::factory($widget_name);
+
+        $widget->setContext($attributes);
+
+        return $widget->render();
+    }
+
+    public function process($text)
+    {
+        return $this->parse($text, TRUE, function($name, array $attributes) {
+            return $this->render($name, $attributes);
+        });
+    }
 }
