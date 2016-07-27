@@ -19,6 +19,11 @@ abstract class Kohana_Notification_Message {
      */
     protected $_subj;
 
+    /**
+     * @var array
+     */
+    protected $_attachments = [];
+
 //    /**
 //     * @var string
 //     */
@@ -36,7 +41,7 @@ abstract class Kohana_Notification_Message {
      *
      * @var array
      */
-    protected $_template_data;
+    protected $_template_data = [];
 
     /**
      * @return Notification_User_Interface
@@ -86,6 +91,24 @@ abstract class Kohana_Notification_Message {
     public function set_subj($value)
     {
         $this->_subj = $value;
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function get_attachments()
+    {
+        return $this->_attachments;
+    }
+
+    /**
+     * @param string $path
+     * @return $this
+     */
+    public function add_attachment($path)
+    {
+        $this->_attachments[] = $path;
         return $this;
     }
 

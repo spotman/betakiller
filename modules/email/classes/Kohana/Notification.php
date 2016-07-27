@@ -28,6 +28,8 @@ abstract class Kohana_Notification {
 
         foreach ( $to as $target )
         {
+            $attachments = $message->get_attachments();
+
             if ( $target->is_online() AND $target->is_online_notification_allowed() )
             {
                 // Online notification
@@ -45,7 +47,8 @@ abstract class Kohana_Notification {
                     $target->get_email(),
                     $subj,
                     $body,
-                    TRUE
+                    TRUE,
+                    $attachments
                 );
             }
         }

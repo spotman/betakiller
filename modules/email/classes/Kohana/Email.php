@@ -100,18 +100,20 @@ class Kohana_Email {
      * @param string $subject message subject
      * @param string $body message body
      * @param bool $html send email as HTML
-     * @param bool $attach attach filename
+     * @param string|array $attach attach filename
      * @return int                      number of emails sent
      */
-    public static function send($from, $to, $subject, $body, $html = FALSE, $attach = FALSE)
+    public static function send($from, $to, $subject, $body, $html = FALSE, $attach = NULL)
 	{
 		// Connect to SwiftMailer
-		(static::$mail === NULL) and email::connect();
+		(static::$mail === NULL) and Email::connect();
 
 		// Determine the message type
 		$html = ($html === TRUE) ? 'text/html' : 'text/plain';
 
 		// Create the message
+
+        /** @var Swift_Message $msg */
 		$msg = Swift_Message::newInstance($subject, $body, $html, 'utf-8');
 
 		if (is_string($to))
@@ -188,9 +190,14 @@ class Kohana_Email {
         }
 
         // Attachments
-        if( $attach )
+        if ($attach)
         {
-            $msg->attach(Swift_Attachment::fromPath($attach));
+            $attach = (array) $attach;
+
+            foreach ($attach as $item)
+            {
+                $msg->attach(Swift_Attachment::fromPath($item));
+            }
         }
 
 		return static::$mail->send($msg);
