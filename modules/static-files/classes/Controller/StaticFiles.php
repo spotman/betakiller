@@ -52,6 +52,12 @@ class Controller_StaticFiles extends Controller {
             // Получаем время модификации оригинала
             $mtime = filemtime($orig);
 
+            if (!$this->in_production())
+            {
+                $this->response->headers('Pragma', 'no-cache');
+                $this->response->headers('Expires', gmdate("D, d M Y H:i:s \G\M\T", time() - 3600));
+            }
+
 			// А пока отдадим файл руками
 //			$this->check_cache(sha1($this->request->uri()) . $mtime, $this->request);
 			$this->response->body( $str );
