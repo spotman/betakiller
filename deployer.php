@@ -20,6 +20,11 @@ serverList('servers.yml');
 // Option for GIT management
 option('repo', null, InputOption::VALUE_OPTIONAL, 'Tag to deploy.', 'app');
 
+// Option --branch
+define('DEFAULT_BRANCH', 'master');
+option('branch', 'b', InputOption::VALUE_OPTIONAL, 'GIT branch to checkout', DEFAULT_BRANCH);
+
+
 task('check', function() {
     if ( !has('app_repository') )
         throw new \Symfony\Component\Process\Exception\RuntimeException('Please, set up GIT repo via env("app_repository")');
@@ -183,6 +188,11 @@ function git_commit_all() {
     return run_git_command('add .') . run_git_command('commit -am "'.$message.'"');
 }
 
+function git_checkout() {
+    $branch = input()->getOption('branch');
+    return run_git_command('checkout '.$branch);
+}
+
 function git_push() {
     return run_git_command('push');
 }
@@ -220,6 +230,10 @@ task('git:check', function () {
         writeln('Exiting...');
     }
 })->desc('Checks for new files that not in GIT and commits them');
+
+task('git:checkout', function () {
+    git_checkout();
+})->desc('git checkout _branch_ (use --branch option)');
 
 task('deploy', [
     // Check app configuration
