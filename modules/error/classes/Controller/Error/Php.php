@@ -178,7 +178,8 @@ class Controller_Error_Php extends Controller_Developer {
 
     public function action_email()
     {
-        $emails_sent = (int) Email::send(NULL, 'i.am@spotman.ru', 'This is a test', 'Message test');
+        $email = $this->current_user()->get_email();
+        $emails_sent = (int) Email::send(NULL, $email, 'This is a test', 'Message test');
 
         echo 'Email sent: '.$emails_sent;
     }
