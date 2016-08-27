@@ -180,7 +180,7 @@ function git_status() {
 
 function git_commit_all() {
     $message = ask('Enter commit message:', 'Commit from production');
-    return run_git_command('commit -am "'.$message.'"');
+    return run_git_command('add .') . run_git_command('commit -am "'.$message.'"');
 }
 
 function git_push() {
