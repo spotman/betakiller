@@ -201,6 +201,27 @@ function git_pull() {
     return run_git_command('pull');
 }
 
+function git_config($key, $value) {
+    return run_git_command("config --global $key \"$value\"");
+}
+
+function stage() {
+    return input()->hasArgument('stage')
+        ? input()->getArgument('stage')
+        : 'production';
+}
+
+task('git:config:user', function () {
+
+    $name = ask('Enter git name:', stage());
+    git_config('user.name', $name);
+
+    $email = ask('Enter git email:', 'no-reply@betakiller.ru');
+    git_config('user.email', $email);
+
+})->desc('set global git properties like user.email');
+
+
 task('git:status', function () {
     git_status();
 })->desc('git status');
