@@ -107,6 +107,8 @@ catch (Exception $e)
 {
     @ ob_end_clean();
 
+    http_response_code(500);
+
     if (class_exists('Kohana'))
     {
         $in_dev = in_array(Kohana::$environment, [Kohana::DEVELOPMENT, Kohana::TESTING]);
@@ -128,8 +130,7 @@ catch (Exception $e)
         error_log($message);
     }
 
-    http_response_code(500);
-    die();
+    return;
 }
 
 

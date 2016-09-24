@@ -13,10 +13,6 @@ set('core_repository', 'git@github.com:spotman/betakiller.git');
 // Use PHP SSH2 extension
 //set('ssh_type', 'ext-ssh2');
 
-// Process server list
-serverList('servers.yml');
-
-
 // Option for GIT management
 option('repo', null, InputOption::VALUE_OPTIONAL, 'Tag to deploy.', 'app');
 
@@ -24,8 +20,38 @@ option('repo', null, InputOption::VALUE_OPTIONAL, 'Tag to deploy.', 'app');
 define('DEFAULT_BRANCH', 'master');
 option('branch', 'b', InputOption::VALUE_OPTIONAL, 'GIT branch to checkout', DEFAULT_BRANCH);
 
+// Option --to
+option('to', 't', InputOption::VALUE_OPTIONAL, 'Target migration', null);
 
+
+define('DEPLOYER_LOCAL_STAGE',      'local');
+define('DEPLOYER_TESTING_STAGE',    'testing');
+define('DEPLOYER_STAGING_STAGE',    'staging');
+define('DEPLOYER_PRODUCTION_STAGE', 'production');
+
+set('default_stage', DEPLOYER_LOCAL_STAGE);
+
+// Local server for creating migrations, git actions, etc
+localServer('local')
+    ->env('deploy_path', sys_get_temp_dir().DIRECTORY_SEPARATOR.'deployer-local')
+    ->stage(DEPLOYER_LOCAL_STAGE);
+
+// Local server for testing deployment tasks in dev environment
+localServer('testing')
+    ->env('deploy_path', sys_get_temp_dir().DIRECTORY_SEPARATOR.'deployer-testing')
+    ->stage(DEPLOYER_TESTING_STAGE);
+
+// Process app servers list
+serverList('servers.yml');
+
+
+/**
+ * Check environment before real deployment starts
+ */
 task('check', function() {
+    if (stage() == DEPLOYER_LOCAL_STAGE)
+        throw new \Symfony\Component\Process\Exception\RuntimeException('Can not deploy to a local stage');
+
     if ( !has('app_repository') )
         throw new \Symfony\Component\Process\Exception\RuntimeException('Please, set up GIT repo via env("app_repository")');
 
@@ -102,7 +128,7 @@ task('deploy:betakiller', [
 
 
 // TODO Сборка статики перед деплоем (build:require.js)
-// TODO Перенести всю статику в публичную директорию (cache:warmup)
+// TODO Make HTTP-requests to every IFace for template/js/css caching (cache:warmup)
 
 //task('deploy:git-update', function() {
 //    cd(env()->getReleasePath());
@@ -160,6 +186,151 @@ task('httpd:restart', function () {
 })->desc('Restart Apache');
 
 
+/**
+ * GIT tasks
+ */
+task('git:config:user', function () {
+
+    $name = ask('Enter git name:', stage());
+    git_config('user.name', $name);
+
+    $email = ask('Enter git email:', 'no-reply@betakiller.ru');
+    git_config('user.email', $email);
+
+})->desc('set global git properties like user.email');
+
+
+task('git:status', function () {
+    git_status();
+})->desc('git status');
+
+task('git:commit:all', function () {
+    git_commit_all();
+})->desc('git commit -a');
+
+task('git:push', function () {
+    git_push();
+})->desc('git push');
+
+task('git:pull', function () {
+    git_pull();
+})->desc('git pull');
+
+task('git:check', function () {
+    $out = git_status();
+
+    if (stripos($out, 'nothing to commit (working directory clean)') !== FALSE)
+        return;
+
+    if (askConfirmation('Commit changes?', false)) {
+        git_commit_all();
+        git_push();
+    } else {
+        writeln('Exiting...');
+    }
+})->desc('Checks for new files that not in GIT and commits them');
+
+task('git:checkout', function () {
+    git_checkout();
+})->desc('git checkout _branch_ (use --branch option)');
+
+
+/**
+ * Create table with migrations
+ */
+task('migrations:install', function () {
+    run_minion_task('migrations:install');
+});
+
+/**
+ * Create new migration
+ */
+task('migrations:create', function () {
+    run_minion_task('migrations:create');
+})->onlyForStage(DEPLOYER_LOCAL_STAGE);
+
+/**
+ * Apply migrations
+ */
+task('migrations:up', function () {
+    run_minion_task('migrations:up');
+});
+
+/**
+ * Rollback migrations
+ */
+task('migrations:down', function () {
+    $to = input()->getOption('to');
+
+    run_minion_task('migrations:down --to='.$to);
+});
+
+/**
+ * Show migrations history
+ */
+task('migrations:history', function () {
+    run_minion_task('migrations:history');
+});
+
+
+task('deploy', [
+    // Check app configuration
+    'check',
+
+    // Prepare directories
+    'deploy:prepare',
+
+    // Check for new untracked files and commit them
+    //'git:check',
+
+    'deploy:release',
+
+    // Deploy code
+    'deploy:betakiller',
+    'deploy:app',
+
+    // app shared and writable dirs
+    'deploy:shared',
+    'deploy:writable',
+
+    // BetaKiller shared and writable dirs
+    'deploy:betakiller:shared',
+    'deploy:betakiller:writable',
+
+    'migrations:up',
+    //'cache:warmup',
+
+    // Finalize
+    'deploy:symlink',
+    'cleanup',
+])->desc('Deploy app bundle')->onlyForStage(DEPLOYER_PRODUCTION_STAGE);
+
+
+/**
+ * Run minion-task and echo result to console
+ *
+ * @param string $name
+ * @return \Deployer\Type\Result
+ * @throws Exception
+ */
+function run_minion_task($name) {
+    $path = get_app_path();
+
+    $command = env()->parse("cd $path/public && php index.php --task=$name");
+
+    $output = run($command);
+    write($output);
+
+    return $output;
+}
+
+/**
+ * Run git command and echo result to console
+ *
+ * @param string $gitCmd
+ * @return \Deployer\Type\Result
+ * @throws Exception
+ */
 function run_git_command($gitCmd) {
     $allowed = ['core', 'app'];
 
@@ -205,82 +376,23 @@ function git_config($key, $value) {
     return run_git_command("config --global $key \"$value\"");
 }
 
+/**
+ * Get current stage
+ *
+ * @return string
+ */
 function stage() {
-    return input()->hasArgument('stage')
-        ? input()->getArgument('stage')
-        : 'production';
+    return input()->getArgument('stage') ?: get('default_stage');
 }
 
-task('git:config:user', function () {
+function get_latest_release_path() {
+    $list = env('releases_list');
+    $release = $list[0];
+    return env()->parse('{{deploy_path}}/releases/'.$release);
+}
 
-    $name = ask('Enter git name:', stage());
-    git_config('user.name', $name);
-
-    $email = ask('Enter git email:', 'no-reply@betakiller.ru');
-    git_config('user.email', $email);
-
-})->desc('set global git properties like user.email');
-
-
-task('git:status', function () {
-    git_status();
-})->desc('git status');
-
-task('git:commit:all', function () {
-    git_commit_all();
-})->desc('git commit -a');
-
-task('git:push', function () {
-    git_push();
-})->desc('git push');
-
-task('git:pull', function () {
-    git_pull();
-})->desc('git pull');
-
-task('git:check', function () {
-    $out = git_status();
-
-    if (strpos($out, 'nothing to commit (working directory clean)') !== FALSE)
-        return;
-
-    if (askConfirmation('Commit changes?', false)) {
-        git_commit_all();
-        git_push();
-    } else {
-        writeln('Exiting...');
-    }
-})->desc('Checks for new files that not in GIT and commits them');
-
-task('git:checkout', function () {
-    git_checkout();
-})->desc('git checkout _branch_ (use --branch option)');
-
-task('deploy', [
-    // Check app configuration
-    'check',
-
-    // Prepare directories
-    'deploy:prepare',
-
-    // Check for new untracked files and commit them
-    //'git:check',
-
-    'deploy:release',
-
-    // Deploy code
-    'deploy:betakiller',
-    'deploy:app',
-
-    // app shared and writable dirs
-    'deploy:shared',
-    'deploy:writable',
-
-    // BetaKiller shared and writable dirs
-    'deploy:betakiller:shared',
-    'deploy:betakiller:writable',
-
-    // Finalize
-    'deploy:symlink',
-    'cleanup',
-])->desc('Deploy app bundle');
+function get_app_path() {
+    return (stage() == DEPLOYER_LOCAL_STAGE)
+        ? getcwd()
+        : get_latest_release_path();
+}

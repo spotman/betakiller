@@ -49,3 +49,6 @@
 [submodule "modules/article"]
 	path = modules/article
 	url = git@github.com:spotman/betakiller-article.git
+[submodule "modules/migrations"]
+	path = modules/migrations
+	url = git@github.com:spotman/kohana-minion-migrations.git

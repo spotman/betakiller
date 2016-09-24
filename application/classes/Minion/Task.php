@@ -39,7 +39,7 @@ abstract class Minion_Task extends Kohana_Minion_Task
         $user = $this->get_cli_user_model();
         Auth::instance()->force_login($user);
 
-        parent::execute();
+        return parent::execute();
     }
 
     protected function get_cli_user_model()
