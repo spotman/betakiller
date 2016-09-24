@@ -2,7 +2,7 @@
 
 abstract class Migration extends Kohana_Migration
 {
-//    use BetaKiller\Helper\Base;
+    use BetaKiller\Helper\Base;
 
     protected function run_sql($sql, $type = Database::UPDATE, $db = NULL)
     {
