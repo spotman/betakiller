@@ -7,7 +7,9 @@ require 'recipe/common.php';
 
 use \Symfony\Component\Console\Input\InputOption;
 
-set('core_path', 'core');
+define('BETAKILLER_CORE_PATH', 'core');
+
+set('core_path', BETAKILLER_CORE_PATH);
 set('core_repository', 'git@github.com:spotman/betakiller.git');
 
 // Use PHP SSH2 extension
@@ -33,7 +35,7 @@ set('default_stage', DEPLOYER_LOCAL_STAGE);
 
 // Local server for creating migrations, git actions, etc
 localServer('local')
-    ->env('deploy_path', sys_get_temp_dir().DIRECTORY_SEPARATOR.'deployer-local')
+//    ->env('deploy_path', sys_get_temp_dir().DIRECTORY_SEPARATOR.'deployer-local')
     ->stage(DEPLOYER_LOCAL_STAGE);
 
 // Local server for testing deployment tasks in dev environment
@@ -41,9 +43,10 @@ localServer('testing')
     ->env('deploy_path', sys_get_temp_dir().DIRECTORY_SEPARATOR.'deployer-testing')
     ->stage(DEPLOYER_TESTING_STAGE);
 
-// Process app servers list
-serverList('servers.yml');
-
+if (file_exists(getcwd().'/servers.yml')) {
+    // Process app servers list
+    serverList('servers.yml');
+}
 
 /**
  * Check environment before real deployment starts
@@ -240,21 +243,21 @@ task('git:checkout', function () {
  */
 task('migrations:install', function () {
     run_minion_task('migrations:install');
-});
+})->desc('Install migrations table');
 
 /**
  * Create new migration
  */
 task('migrations:create', function () {
     run_minion_task('migrations:create');
-})->onlyForStage(DEPLOYER_LOCAL_STAGE);
+})->onlyForStage(DEPLOYER_LOCAL_STAGE)->desc('Create migration');
 
 /**
  * Apply migrations
  */
 task('migrations:up', function () {
     run_minion_task('migrations:up');
-});
+})->desc('Apply migrations');
 
 /**
  * Rollback migrations
@@ -263,14 +266,14 @@ task('migrations:down', function () {
     $to = input()->getOption('to');
 
     run_minion_task('migrations:down --to='.$to);
-});
+})->desc('Rollback migrations; use "--to" option to set new migration base');
 
 /**
  * Show migrations history
  */
 task('migrations:history', function () {
     run_minion_task('migrations:history');
-});
+})->desc('Show migrations list');
 
 
 task('deploy', [
@@ -303,7 +306,7 @@ task('deploy', [
     // Finalize
     'deploy:symlink',
     'cleanup',
-])->desc('Deploy app bundle')->onlyForStage(DEPLOYER_PRODUCTION_STAGE);
+])->desc('Deploy app bundle')->onlyForStage([DEPLOYER_STAGING_STAGE, DEPLOYER_PRODUCTION_STAGE, DEPLOYER_TESTING_STAGE]);
 
 
 /**
@@ -314,9 +317,14 @@ task('deploy', [
  * @throws Exception
  */
 function run_minion_task($name) {
-    $path = get_app_path();
+    $current_path = getcwd();
+    $path = get_working_path();
 
-    $command = env()->parse("cd $path/public && php index.php --task=$name");
+    if (strpos($current_path, BETAKILLER_CORE_PATH) === FALSE) {
+        $path .= '/public';
+    }
+
+    $command = env()->parse("cd $path && php index.php --task=$name");
 
     $output = run($command);
     write($output);
@@ -332,17 +340,9 @@ function run_minion_task($name) {
  * @throws Exception
  */
 function run_git_command($gitCmd) {
-    $allowed = ['core', 'app'];
+    $path = get_working_path();
 
-    $repo = input()->getOption('repo');
-
-    if (!in_array($repo, $allowed))
-        throw new Exception('Unknown git repo '.$repo);
-
-    $key = $repo.'_path';
-    $path = get($key);
-
-    $cmd = 'cd {{current}}/'.$path.' && git '.$gitCmd;
+    $cmd = 'cd '.$path.' && git '.$gitCmd;
 
     $result = run($cmd);
     write($result);
@@ -391,8 +391,17 @@ function get_latest_release_path() {
     return env()->parse('{{deploy_path}}/releases/'.$release);
 }
 
-function get_app_path() {
+function get_working_path($repo = NULL) {
+    $allowed = ['core', 'app'];
+
+    if (!$repo) {
+        $repo = input()->getOption('repo') ?: BETAKILLER_CORE_PATH;
+    }
+
+    if (!in_array($repo, $allowed))
+        throw new Exception('Unknown repo '.$repo);
+
     return (stage() == DEPLOYER_LOCAL_STAGE)
         ? getcwd()
-        : get_latest_release_path();
+        : get_latest_release_path().'/'.$repo;
 }
