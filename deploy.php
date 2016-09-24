@@ -26,17 +26,17 @@ option('branch', 'b', InputOption::VALUE_OPTIONAL, 'GIT branch to checkout', DEF
 option('to', 't', InputOption::VALUE_OPTIONAL, 'Target migration', null);
 
 
-define('DEPLOYER_LOCAL_STAGE',      'local');
+define('DEPLOYER_DEV_STAGE',        'development');
 define('DEPLOYER_TESTING_STAGE',    'testing');
 define('DEPLOYER_STAGING_STAGE',    'staging');
 define('DEPLOYER_PRODUCTION_STAGE', 'production');
 
-set('default_stage', DEPLOYER_LOCAL_STAGE);
+set('default_stage', DEPLOYER_DEV_STAGE);
 
 // Local server for creating migrations, git actions, etc
-localServer('local')
+localServer('dev')
 //    ->env('deploy_path', sys_get_temp_dir().DIRECTORY_SEPARATOR.'deployer-local')
-    ->stage(DEPLOYER_LOCAL_STAGE);
+    ->stage(DEPLOYER_DEV_STAGE);
 
 // Local server for testing deployment tasks in dev environment
 localServer('testing')
@@ -52,7 +52,7 @@ if (file_exists(getcwd().'/servers.yml')) {
  * Check environment before real deployment starts
  */
 task('check', function() {
-    if (stage() == DEPLOYER_LOCAL_STAGE)
+    if (stage() == DEPLOYER_DEV_STAGE)
         throw new \Symfony\Component\Process\Exception\RuntimeException('Can not deploy to a local stage');
 
     if ( !has('app_repository') )
@@ -250,7 +250,7 @@ task('migrations:install', function () {
  */
 task('migrations:create', function () {
     run_minion_task('migrations:create');
-})->onlyForStage(DEPLOYER_LOCAL_STAGE)->desc('Create migration');
+})->onlyForStage(DEPLOYER_DEV_STAGE)->desc('Create migration');
 
 /**
  * Apply migrations
@@ -324,9 +324,9 @@ function run_minion_task($name) {
         $path .= '/public';
     }
 
-    $command = env()->parse("cd $path && php index.php --task=$name");
+    $stage = stage();
 
-    $output = run($command);
+    $output = run("cd $path && php index.php --task=$name --stage=$stage");
     write($output);
 
     return $output;
@@ -342,9 +342,7 @@ function run_minion_task($name) {
 function run_git_command($gitCmd) {
     $path = get_working_path();
 
-    $cmd = 'cd '.$path.' && git '.$gitCmd;
-
-    $result = run($cmd);
+    $result = run("cd $path && git $gitCmd");
     write($result);
 
     return $result;
@@ -401,7 +399,7 @@ function get_working_path($repo = NULL) {
     if (!in_array($repo, $allowed))
         throw new Exception('Unknown repo '.$repo);
 
-    return (stage() == DEPLOYER_LOCAL_STAGE)
+    return (stage() == DEPLOYER_DEV_STAGE)
         ? getcwd()
         : get_latest_release_path().'/'.$repo;
 }

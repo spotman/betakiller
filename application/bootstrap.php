@@ -70,6 +70,25 @@ ini_set('unserialize_callback_func', 'spl_autoload_call');
 
 // -- Configuration and initialization -----------------------------------------
 
+// Import arguments in CLI mode
+if (PHP_SAPI == 'cli')
+{
+    // No short options
+    $short_options = '';
+
+    $long_options  = array(
+        'stage::',    // Language
+    );
+
+    $cli_options = getopt($short_options, $long_options);
+
+    if (isset($cli_options['stage']))
+    {
+        // Store requested stage in environment var
+        putenv('KOHANA_ENV='.$cli_options['stage']);
+    }
+}
+
 /**
  * Cookie salt is used to make sure cookies haven't been modified by the client
  */
