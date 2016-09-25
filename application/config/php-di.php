@@ -1,21 +1,25 @@
 <?php
 
+use \Doctrine\Common\Cache\ArrayCache;
+
 return [
 
-    // Helpers
-    'User'  =>  DI\factory(function() {
-        $auth = Auth::instance();
-        return $auth->get_user();
-    }),
+    'cache'         =>  new ArrayCache(),
 
-    'Auth'  =>  DI\factory(function() {
-        return Auth::instance();
-    }),
+    'definitions'   =>  [
 
-    \URL_Dispatcher::class  =>  DI\factory(function() {
-        return URL_Dispatcher::instance();
-    }),
+        Auth::class  =>  DI\factory(function() {
+            return Auth::instance();
+        }),
 
-    \BetaKiller\Model\User::class   => DI\get('User'),
+        // Helpers
+        'User'  =>  DI\factory(function() {
+            $auth = Auth::instance();
+            return $auth->get_user();
+        }),
+
+        \BetaKiller\Model\User::class   => DI\get('User'),
+
+    ],
 
 ];

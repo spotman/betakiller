@@ -1,10 +1,13 @@
 <?php
 namespace BetaKiller\Helper;
 
+//use BetaKiller\DI;
+
 trait Base
 {
     use Log;
     use IFace;
+//    use DI\Mixin;
 
     protected function in_production($use_staging = FALSE)
     {
@@ -20,6 +23,14 @@ trait Base
     {
         return \Env::user($allow_guest);
     }
+
+//    /**
+//     * @return \BetaKiller\Model\User
+//     */
+//    protected function getCurrentUser()
+//    {
+//        return $this->getContainer()->get('User');
+//    }
 
     /**
      * @param string $group

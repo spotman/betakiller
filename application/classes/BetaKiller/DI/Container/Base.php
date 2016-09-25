@@ -1,20 +1,31 @@
 <?php
 namespace BetaKiller\DI\Container;
 
+use BetaKiller\DI\Container;
 use Interop\Container\ContainerInterface;
 use Interop\Container\Exception\ContainerException;
 use Interop\Container\Exception\NotFoundException;
 
-use BetaKiller\Utils;
+use BetaKiller\Utils\Instance\Singleton;
 
 abstract class Base implements ContainerInterface
 {
-    use Utils\Instance\Singleton;
+    use Singleton {
+        instance as protected _instance;
+    }
 
     /**
      * @var ContainerInterface
      */
     protected $_container;
+
+    /**
+     * @return Container
+     */
+    public static function instance()
+    {
+        return self::_instance();
+    }
 
     /**
      * @return ContainerInterface

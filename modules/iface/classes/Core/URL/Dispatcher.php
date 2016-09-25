@@ -1,6 +1,7 @@
 <?php
 
 use BetaKiller\IFace\Core\IFace;
+use BetaKiller\DI\Container;
 
 abstract class Core_URL_Dispatcher {
 
@@ -29,13 +30,13 @@ abstract class Core_URL_Dispatcher {
     protected $_current_iface;
 
     /**
-     * @return URL_Parameters
+     * @return \URL_Parameters
      */
     public function parameters()
     {
         if ( ! $this->_url_parameters )
         {
-            $this->_url_parameters = URL_Parameters::instance();
+            $this->_url_parameters = Container::instance()->get(\URL_Parameters::class);
         }
 
         return $this->_url_parameters;

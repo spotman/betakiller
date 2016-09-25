@@ -16,7 +16,7 @@ return array(
     'backup'                => MODPATH.'backup',                // Complex backup (files + database)
     'cache'                 => MODPATH.'cache',                 // Caching with multiple backends
     'database'              => MODPATH.'database',              // Database access
-    'di'                    => MODPATH.'di',                    // Dependency Injection
+//    'di'                    => MODPATH.'di',                    // Dependency Injection
 //    'dbv'                   => MODPATH.'dbv',                   // Database Version Control
     'device'                => MODPATH.'device',                // Device detection
     'email'                 => MODPATH.'email',                 // Mailing module

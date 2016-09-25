@@ -2131,7 +2131,7 @@ class Kohana_ORM extends Model implements serializable {
 	 * @param   mixed   $column  column name or array($column, $alias) or object
 	 * @param   string  $op      logic operator
 	 * @param   mixed   $value   column value
-	 * @return  $this
+	 * @return  $this|ORM|Kohana_ORM
 	 */
 	public function having($column, $op, $value = NULL)
 	{

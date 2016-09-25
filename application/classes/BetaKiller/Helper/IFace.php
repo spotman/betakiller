@@ -1,14 +1,18 @@
 <?php
 namespace BetaKiller\Helper;
 
+use BetaKiller\DI;
+
 trait IFace
 {
+    use DI\Mixin;
+
     /**
      * @return \URL_Dispatcher
      */
     protected function url_dispatcher()
     {
-        return \URL_Dispatcher::instance();
+        return $this->getContainer()->get(\URL_Dispatcher::class);
     }
 
     /**
@@ -17,6 +21,14 @@ trait IFace
     protected function url_parameters()
     {
         return $this->url_dispatcher()->parameters();
+    }
+
+    /**
+     * @return \URL_Parameters
+     */
+    protected function url_parameters_instance()
+    {
+        return $this->getContainer()->get(\URL_Parameters::class);
     }
 
     /**

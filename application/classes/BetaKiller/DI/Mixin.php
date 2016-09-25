@@ -7,12 +7,8 @@ use BetaKiller\DI\Container;
 trait Mixin
 {
     /**
-     * @return \BetaKiller\Model\User
+     * Override this trait in your application directory and place helpers in it
      */
-    protected function getCurrentUser()
-    {
-        return $this->getContainer()->get('User');
-    }
 
     /**
      * Use this method for creating DI helpers inside of root classes (Controller, API model, etc)
@@ -23,7 +19,7 @@ trait Mixin
      * @url http://php-di.org/doc/best-practices.html
      * @return ContainerInterface
      */
-    final protected function getContainer()
+    private function getContainer()
     {
         return Container::instance();
     }
