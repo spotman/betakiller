@@ -1,7 +1,7 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
-class Auth_Exception_Inactive extends Auth_Exception {
-
+class Auth_Exception_Inactive extends Auth_Exception
+{
     /**
      * @return string
      */
@@ -9,5 +9,4 @@ class Auth_Exception_Inactive extends Auth_Exception {
     {
         return __('Your account was switched off');
     }
-
 }

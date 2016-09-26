@@ -178,24 +178,24 @@ class Log_MongoDB extends Log_Writer {
             Встречается по следующим адресам:
 
         <ul>
-            <? foreach ( $model->get_urls() as $url ): ?>
+            <?php foreach ( $model->get_urls() as $url ): ?>
                 <li><a href="http://<?= $host . $url ?>"><?= $host . $url ?></a></li>
-            <? endforeach ?>
+            <?php endforeach ?>
         </ul><br />
 
         в следующих файлах:
 
         <ul>
-            <? foreach ( $model->get_paths() as $path ): ?>
+            <?php foreach ( $model->get_paths() as $path ): ?>
                 <li><?= $path ?></li>
-            <? endforeach ?>
+            <?php endforeach ?>
         </ul><br />
         </p>
 
         <p><a href="http://<?= $host ?>/errors/php/<?= $model->get_hash() ?>"><strong>Стектрейс и другая информация здесь</strong></a></p>
         </body>
         </html>
-        <?
+        <?php
         return ob_get_clean();
     }
 

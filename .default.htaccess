@@ -10,20 +10,6 @@ RewriteBase /
 	Deny From All
 </Files>
 
-# Add trailing slash to virtual files and paths
-#RewriteCond     %{REQUEST_FILENAME}   !-f
-#RewriteCond     %{REQUEST_FILENAME}   !-d
-#RewriteCond     %{REQUEST_URI}        !(.*)/$
-#RewriteCond     %{REQUEST_URI}        !(\.)
-#RewriteRule     ^(.*)$                $1/         [R=301,L,QSA]
-
-# Remove trailing slash from virtual files and paths
-RewriteCond     %{REQUEST_URI}        (.*)/$
-RewriteCond     %{REQUEST_FILENAME}   !(admin.*)
-RewriteCond     %{REQUEST_FILENAME}   !-f
-RewriteCond     %{REQUEST_FILENAME}   !-d
-RewriteRule     ^(.*)/$               $1         [R=301,L,QSA]
-
 # Allow any files or directories that exist to be displayed directly
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d

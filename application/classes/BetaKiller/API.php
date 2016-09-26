@@ -1,7 +1,7 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
-class BetaKiller_API extends Core_API {
-
+class BetaKiller_API extends Core_API
+{
     // uncomment when ve go through version 2
 //    const VERSION = 1;
 
@@ -14,5 +14,4 @@ class BetaKiller_API extends Core_API {
     {
         return static::get('User');
     }
-
 }

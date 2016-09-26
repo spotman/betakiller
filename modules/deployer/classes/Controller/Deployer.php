@@ -44,7 +44,6 @@ class Controller_Deployer extends Controller_Developer {
         header('Content-Type: text/octet-stream');
 
         // Implicitly flush the buffer(s)
-        ini_set('implicit_flush', true);
         ob_implicit_flush(true);
         ob_end_flush();
 

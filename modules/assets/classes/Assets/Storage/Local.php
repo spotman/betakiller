@@ -76,7 +76,7 @@ class Assets_Storage_Local extends Assets_Storage {
      */
     protected function _delete($path)
     {
-        unlink( $this->_make_full_path($path) );
+        return unlink( $this->_make_full_path($path) );
     }
 
     protected function _make_full_path($relative_path)

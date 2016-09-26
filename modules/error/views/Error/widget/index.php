@@ -11,15 +11,15 @@ $profiler_button_text = $is_profiler_enabled ? $disable_profiler_text : $enable_
         <div class="btn-toolbar">
 
             <!-- кол-во ошибок -->
-            <? if ( $error_count ): ?>
+            <?php if ( $error_count ): ?>
                 <a class="btn btn-link" href="http://k.planet.web/errors/php" target="_blank">
                     Есть ошибки в PHP <span class="label label-important"><?= $error_count ?></span>
                 </a>
-            <? else: ?>
+            <?php else: ?>
                 <button class="btn btn-link" disabled="disabled">
                     <?= ( $error_count === NULL ) ? "Консоль ошибок недоступна" : "Ошибок в PHP нет" ?>
                 </button>
-            <? endif; ?>
+            <?php endif; ?>
 
             <!-- профайлер -->
             <button class="btn pull-right toggle-profiler <?= $is_profiler_enabled ? "profiler-enabled btn-primary" : "" ?>"

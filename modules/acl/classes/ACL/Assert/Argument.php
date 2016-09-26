@@ -1,4 +1,4 @@
-<? defined('SYSPATH') OR die('No direct script access.');
+<?php defined('SYSPATH') OR die('No direct script access.');
 
 /*
  * Argument Assertion - check if certain keys of role and resource are the same

@@ -28,7 +28,7 @@ class Kohana_Minion_Exception extends Kohana_Exception {
 		    if (class_exists('ORM_Validation_Exception') AND $e instanceof ORM_Validation_Exception)
             {
                 echo Kohana_Exception::text($e);
-                print_r($e->errors('orm'));
+                echo Debug::dump($e->errors('orm'));
             }
 			elseif ($e instanceof Minion_Exception)
 			{

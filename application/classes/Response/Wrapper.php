@@ -18,7 +18,7 @@ abstract class Response_Wrapper {
         return new $class_name($type);
     }
 
-    function __construct($type)
+    public function __construct($type)
     {
         $this->_type = $type;
     }

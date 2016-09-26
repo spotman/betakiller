@@ -4,8 +4,8 @@
  * Class Controller_Proxy
  * Allows to proxy system calls to another class
  */
-abstract class Controller_Proxy extends Kohana_Controller {
-
+abstract class Controller_Proxy extends Kohana_Controller
+{
     protected $_proxy_object;
     protected $_proxy_method;
     protected $_proxy_result;
@@ -79,5 +79,4 @@ abstract class Controller_Proxy extends Kohana_Controller {
     {
         return 'action_'.$this->request->action();
     }
-
 }

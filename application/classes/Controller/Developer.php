@@ -4,8 +4,8 @@
  * Class Controller_Developer
  * Базовый класс для создания интерфейсов, доступных только разработчикам системы
  */
-class Controller_Developer extends Controller_Basic {
-
+class Controller_Developer extends Controller_Basic
+{
     public function before()
     {
         parent::before();
@@ -14,5 +14,4 @@ class Controller_Developer extends Controller_Basic {
         if ( ! Env::user()->is_developer() )
             throw new HTTP_Exception_403();
     }
-
 }

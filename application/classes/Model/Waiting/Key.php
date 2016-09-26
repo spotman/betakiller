@@ -1,7 +1,7 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
-class Model_Waiting_Key extends ORM {
-
+class Model_Waiting_Key extends ORM
+{
     public function rules()
     {
         return array(
@@ -24,5 +24,4 @@ class Model_Waiting_Key extends ORM {
     {
         return $this->set('name', $value);
     }
-
 }
