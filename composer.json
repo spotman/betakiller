@@ -1,5 +1,5 @@
 {
-  "name": "betakiller",
+  "name": "spotman/betakiller",
   "description": "BetaKiller development platform based on Kohana framework",
   "require": {
     "phpunit/phpunit": "3.7.*",
