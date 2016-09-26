@@ -17,6 +17,7 @@ abstract class Minion_Task extends Kohana_Minion_Task
     {
         $this->_options = array_merge([
             'debug' => FALSE,
+            'stage' => 'development',
         ], $this->_options);
 
         parent::__construct();

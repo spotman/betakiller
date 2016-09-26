@@ -249,7 +249,14 @@ task('migrations:install', function () {
  * Create new migration
  */
 task('migrations:create', function () {
-    run_minion_task('migrations:create');
+    $name = ask('Enter migration short name (3-128 characters, [A-Za-z0-9-_]+)');
+
+    if (!$name)
+        throw new Exception('Migration name is required');
+
+    $desc = ask('Enter migration description', '');
+
+    run_minion_task("migrations:create --name=$name --description=$desc");
 })->onlyForStage(DEPLOYER_DEV_STAGE)->desc('Create migration');
 
 /**
