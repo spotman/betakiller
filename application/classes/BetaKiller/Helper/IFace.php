@@ -2,10 +2,11 @@
 namespace BetaKiller\Helper;
 
 use BetaKiller\DI;
+use BetaKiller\IFace\IFaceFactory;
 
 trait IFace
 {
-    use DI\Mixin;
+    use DI\ContainerTrait;
 
     /**
      * @return \URL_Dispatcher
@@ -35,18 +36,18 @@ trait IFace
      * @param $codename
      * @return \BetaKiller\IFace\IFace
      */
-    protected function iface_by_codename($codename)
+    protected function iface_from_codename($codename)
     {
-        return \BetaKiller\IFace\IFace::by_codename($codename);
+        return IFaceFactory::instance()->from_codename($codename);
     }
 
     /**
      * @param $model \IFace_Model
      * @return \BetaKiller\IFace\IFace
      */
-    protected function iface_factory(\IFace_Model $model)
+    protected function iface_from_model(\IFace_Model $model)
     {
-        return \BetaKiller\IFace\IFace::factory($model);
+        return IFaceFactory::instance()->from_model($model);
     }
 
     /**

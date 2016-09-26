@@ -6,8 +6,10 @@ class Core_Controller_IFace extends Controller
     {
         $uri = $this->get_request_uri();
 
+        $dispatcher = \BetaKiller\DI\Container::instance()->get(\URL_Dispatcher::class);
+
         // Getting current IFace
-        $iface = URL_Dispatcher::instance()->parse_uri($uri);
+        $iface = $dispatcher->parse_uri($uri);
 
         $has_trailing_slash = (substr($uri, -1, 1) == '/');
 

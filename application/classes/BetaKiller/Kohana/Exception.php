@@ -17,16 +17,17 @@ class BetaKiller_Kohana_Exception extends Kohana_Kohana_Exception
         parent::__construct($message, $variables, $code, $previous);
     }
 
-    /**
-     * Sending additional headers for better debugging
-     * @param Exception $exception
-     * @param Response $response
-     */
-    public static function add_debug_headers(Exception $exception, Response $response)
-    {
-        $response->headers('X-Exception-Class', get_class($exception));
-        $response->headers('X-Exception-Message', $exception->getMessage());
-    }
+//    /**
+//     * Sending additional headers for better debugging
+//     * @param Exception $exception
+//     * @param Response $response
+//     * @deprecated
+//     */
+//    public static function add_debug_headers(Exception $exception, Response $response)
+//    {
+//        $response->headers('X-Exception-Class', get_class($exception));
+//        $response->headers('X-Exception-Message', $exception->getMessage());
+//    }
 
     /**
      * @param Exception $exception
@@ -58,7 +59,7 @@ class BetaKiller_Kohana_Exception extends Kohana_Kohana_Exception
         {
             // Use default Kohana response
             $response = parent::response($exception);
-            static::add_debug_headers($exception, $response);
+//            static::add_debug_headers($exception, $response);
         }
 
         static::$_counter--;
@@ -122,7 +123,7 @@ class BetaKiller_Kohana_Exception extends Kohana_Kohana_Exception
      */
     protected function get_iface($code)
     {
-        return $this->iface_by_codename('Error_'.$code);
+        return $this->iface_from_codename('Error_'.$code);
     }
 
     /**

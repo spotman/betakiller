@@ -58,7 +58,7 @@ class Model_IFace extends ORM implements IFace_Model {
     /**
      * Return parent iface model or NULL
      *
-     * @return IFace_Model[]
+     * @return IFace_Model
      */
     public function get_parent()
     {
@@ -162,6 +162,16 @@ class Model_IFace extends ORM implements IFace_Model {
     public function has_dynamic_url()
     {
         return (bool) $this->get('is_dynamic');
+    }
+
+    /**
+     * Returns TRUE if iface has multi-level tree-behavior url mapping
+     *
+     * @return bool
+     */
+    public function is_tree_url()
+    {
+        return (bool) $this->get('is_tree');
     }
 
     /**

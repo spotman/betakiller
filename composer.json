@@ -17,7 +17,8 @@
     "doctrine/cache": "^1.5",
     "jakeasmith/http_build_url": "^1",
     "asm89/twig-cache-extension": "^1.2",
-    "thunderer/shortcode": "^0.5"
+    "thunderer/shortcode": "^0.5",
+    "doctrine/annotations": "^1.2"
   },
 
   "repositories": [
@@ -26,5 +27,7 @@
       "url": "https://github.com/Foreword/phpMorphy.git",
       "branch": "master"
     }
-  ]
+  ],
+  "require-dev": {
+  }
 }

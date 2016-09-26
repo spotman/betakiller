@@ -5,7 +5,6 @@ use DateInterval;
 use DateTime;
 use IFace_Exception;
 use IFace_Model;
-use IFace_Provider;
 use Text;
 use URL;
 use URL_Dispatcher;
@@ -42,40 +41,34 @@ abstract class IFace
     protected static $_config;
 
     /**
+     * @Inject
+     * @var \URL_Dispatcher
+     */
+    private $_url_dispatcher;
+
+    /**
+     * @Inject
+     * @var \IFace_Provider
+     */
+    private $_iface_provider;
+
+    /**
+     * @var \View_IFace
+     */
+
+    /**
+     * @Inject
+     * @var View_IFace
+     */
+    private $_view_iface;
+
+    /**
      * Returns URL query parts array for current HTTP request
      *
      * @param $key
      * @return array
      */
     abstract protected function getUrlQuery($key = NULL);
-
-    /**
-     * Creates IFace instance from it`s codename
-     *
-     * @param string $codename IFace codename
-     * @return static
-     * @throws IFace_Exception
-     */
-    public static function by_codename($codename)
-    {
-        return static::provider()->by_codename($codename);
-    }
-
-    /**
-     * Creates instance of IFace from model
-     *
-     * @param IFace_Model $model
-     * @return static
-     */
-    public static function factory(IFace_Model $model)
-    {
-        return static::provider()->from_model($model);
-    }
-
-    protected static function provider()
-    {
-        return IFace_Provider::instance();
-    }
 
     public function __construct()
     {
@@ -96,7 +89,7 @@ abstract class IFace
     public function render()
     {
         // Getting IFace View instance and rendering
-        return $this->get_view()->render();
+        return $this->_view_iface->render($this);
     }
 
     public function get_layout_codename()
@@ -298,7 +291,7 @@ abstract class IFace
     public function get_parent()
     {
         if (!$this->_parent) {
-            $this->_parent = $this->provider()->get_parent($this);
+            $this->_parent = $this->_iface_provider->get_parent($this);
         }
 
         return $this->_parent;
@@ -405,7 +398,8 @@ abstract class IFace
 
     public function get_view()
     {
-        return View_IFace::factory($this);
+        // TODO DI
+        return View_IFace::factory();
     }
 
     /**
@@ -413,7 +407,7 @@ abstract class IFace
      */
     protected function url_dispatcher()
     {
-        return URL_Dispatcher::instance();
+        return $this->_url_dispatcher;
     }
 
     /**

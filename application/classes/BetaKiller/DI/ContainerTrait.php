@@ -1,10 +1,10 @@
 <?php
 namespace BetaKiller\DI;
 
-use Interop\Container\ContainerInterface;
 use BetaKiller\DI\Container;
+use BetaKiller\DI\ContainerInterface;
 
-trait Mixin
+trait ContainerTrait
 {
     /**
      * Override this trait in your application directory and place helpers in it

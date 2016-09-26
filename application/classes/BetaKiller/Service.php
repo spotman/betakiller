@@ -5,6 +5,6 @@ use BetaKiller\Helper\Base;
 
 abstract class Service
 {
-    use Utils\Instance\Cached;
+//    use Utils\Instance\Simple;
     use Base;
 }

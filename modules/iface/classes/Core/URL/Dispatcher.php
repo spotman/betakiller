@@ -1,11 +1,10 @@
 <?php
 
 use BetaKiller\IFace\Core\IFace;
-use BetaKiller\DI\Container;
 
 abstract class Core_URL_Dispatcher {
 
-    use \BetaKiller\Utils\Instance\Singleton;
+//    use \BetaKiller\Utils\Instance\Simple;
 
     const PROTOTYPE_PCRE = '(\{([A-Za-z_]+)\.([A-Za-z_]+)(\(\))*\})';
 
@@ -30,24 +29,34 @@ abstract class Core_URL_Dispatcher {
     protected $_current_iface;
 
     /**
+     * @param URL_Parameters $_url_parameters
+     * @param IFace_Provider $_iface_provider
+     */
+    public function __construct(URL_Parameters $_url_parameters, IFace_Provider $_iface_provider)
+    {
+        $this->_url_parameters = $_url_parameters;
+        $this->_iface_provider = $_iface_provider;
+    }
+
+    /**
      * @return \URL_Parameters
      */
     public function parameters()
     {
-        if ( ! $this->_url_parameters )
-        {
-            $this->_url_parameters = Container::instance()->get(\URL_Parameters::class);
-        }
+//        if ( ! $this->_url_parameters )
+//        {
+//            $this->_url_parameters = Container::instance()->get(\URL_Parameters::class);
+//        }
 
         return $this->_url_parameters;
     }
 
     public function iface_provider()
     {
-        if ( ! $this->_iface_provider )
-        {
-            $this->_iface_provider = IFace_Provider::instance();
-        }
+//        if ( ! $this->_iface_provider )
+//        {
+//            $this->_iface_provider = IFace_Provider::instance();
+//        }
 
         return $this->_iface_provider;
     }
@@ -76,6 +85,8 @@ abstract class Core_URL_Dispatcher {
 
         $parent_iface = NULL;
         $iface_instance = NULL;
+
+        // TODO URL parts iterator + tree iface processing
 
         // Dispatch childs
         // Loop through every uri part and initialize it`s iface
@@ -142,14 +153,14 @@ abstract class Core_URL_Dispatcher {
 
             // IFace found by concrete uri
             if ( $iface_model->get_uri() == $uri )
-                return $this->iface_provider()->iface_factory($iface_model);
+                return $this->iface_provider()->from_model($iface_model);
         }
 
         // Second iteration for dynamic urls
         if ( $dynamic_model )
         {
             $this->parse_uri_parameter_part($dynamic_model->get_uri(), $uri);
-            return $this->iface_provider()->iface_factory($dynamic_model);
+            return $this->iface_provider()->from_model($dynamic_model);
         }
 
         // Nothing found

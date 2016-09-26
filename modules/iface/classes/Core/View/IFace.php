@@ -1,13 +1,8 @@
-<?php use BetaKiller\IFace\Core\IFace;
+<?php
 
-defined('SYSPATH') OR die('No direct script access.');
+use BetaKiller\IFace\Core\IFace;
 
 abstract class Core_View_IFace {
-
-    /**
-     * @var IFace
-     */
-    protected $_iface;
 
     /**
      * @var string
@@ -17,22 +12,12 @@ abstract class Core_View_IFace {
     /**
      * @var string
      */
-    protected $_wrapper = View_Wrapper::HTML5;
+    protected $_wrapper = \View_Wrapper::HTML5;
 
     /**
      * @var array
      */
     protected $_data = array();
-
-    public static function factory(IFace $iface)
-    {
-        return new static($iface);
-    }
-
-    protected function __construct(IFace $iface)
-    {
-        $this->_iface = $iface;
-    }
 
     /**
      * Helper for changing wrapper from view
@@ -44,14 +29,13 @@ abstract class Core_View_IFace {
         $this->_wrapper = $wrapper;
     }
 
-    public function render()
+    public function render(IFace $iface)
     {
-        $view_path = $this->get_view_path();
-
+        $view_path = $this->get_view_path($iface);
         $iface_view = $this->view_factory($view_path);
 
         // Getting IFace data
-        $this->_data = $this->_iface->get_data();
+        $this->_data = $iface->get_data();
 
 //        // For changing wrapper from view via $_this->wrapper('html')
 //        $this->_data['_iface'] = $this;
@@ -61,18 +45,18 @@ abstract class Core_View_IFace {
         $meta = Meta::instance();
 
         // Setting page title
-        $meta->title( $this->_iface->get_title() );
+        $meta->title( $iface->get_title() );
 
         // Setting page description
-        $meta->description( $this->_iface->get_description() );
+        $meta->description( $iface->get_description() );
 
         Link::instance()
-            ->canonical($this->_iface->url());
+            ->canonical($iface->url());
 
         // TODO move calls for Meta and Link to overrided methods in Wrapper
 
         // Getting IFace layout
-        $this->_layout = $this->_iface->get_layout_codename();
+        $this->_layout = $iface->get_layout_codename();
 
         $layout = $this->process_layout($iface_view);
 
@@ -81,6 +65,7 @@ abstract class Core_View_IFace {
 
     protected function process_layout(View $iface_view)
     {
+        // TODO DI
         return View_Layout::factory($this->_layout)
             ->set_content($iface_view)
             ->render();
@@ -88,6 +73,7 @@ abstract class Core_View_IFace {
 
     protected function process_wrapper($layout)
     {
+        // TODO DI
         return View_Wrapper::factory($this->_wrapper)
             ->set_content($layout)
             ->render();
@@ -102,9 +88,9 @@ abstract class Core_View_IFace {
         return View::factory($path);
     }
 
-    protected function get_view_path()
+    protected function get_view_path(IFace $iface)
     {
-        return 'ifaces'. DIRECTORY_SEPARATOR . str_replace('_', DIRECTORY_SEPARATOR, $this->_iface->get_codename());
+        return 'ifaces'. DIRECTORY_SEPARATOR . str_replace('_', DIRECTORY_SEPARATOR, $iface->get_codename());
     }
 
 }

@@ -17,6 +17,11 @@ class Service_Sitemap extends Service
     protected $_url_dispatcher;
 
     /**
+     * @var IFace_Model_Provider
+     */
+    protected $_iface_model_provider;
+
+    /**
      * @var \samdark\sitemap\Sitemap
      */
     protected $_sitemap;
@@ -26,10 +31,23 @@ class Service_Sitemap extends Service
      */
     protected $_links_counter;
 
+    /**
+     * Service_Sitemap constructor.
+     * @param URL_Parameters $_url_parameters
+     * @param URL_Dispatcher $_url_dispatcher
+     * @param IFace_Model_Provider $_iface_model_provider
+     */
+    public function __construct(URL_Parameters $_url_parameters, URL_Dispatcher $_url_dispatcher, IFace_Model_Provider $_iface_model_provider)
+    {
+        $this->_url_parameters       = $_url_parameters;
+        $this->_url_dispatcher       = $_url_dispatcher;
+        $this->_iface_model_provider = $_iface_model_provider;
+    }
+
     public function generate()
     {
-        $this->_url_parameters = URL_Parameters::instance();
-        $this->_url_dispatcher = URL_Dispatcher::instance();
+//        $this->_url_parameters = URL_Parameters::instance();
+//        $this->_url_dispatcher = URL_Dispatcher::instance();
 
         $base_url = Kohana::$base_url;
 
@@ -71,7 +89,7 @@ class Service_Sitemap extends Service
     protected function iterate_layer(IFace_Model $parent = NULL)
     {
         // Get all available IFaces in layer
-        $iface_models = IFace_Model_Provider::instance()->get_layer($parent);
+        $iface_models = $this->_iface_model_provider->get_layer($parent);
 
         // Iterate over all IFaces
         foreach ($iface_models as $iface_model)
@@ -109,7 +127,7 @@ class Service_Sitemap extends Service
 
     protected function process_iface_model(IFace_Model $model)
     {
-        $iface = $this->iface_factory($model);
+        $iface = $this->iface_from_model($model);
 
         // Get current item full URL
         $url = $iface->url($this->_url_parameters, TRUE);

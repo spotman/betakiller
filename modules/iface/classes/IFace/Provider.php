@@ -4,9 +4,22 @@ use BetaKiller\IFace\Core\IFace;
 
 class IFace_Provider {
 
-    use \BetaKiller\Utils\Instance\Singleton;
-
     protected $_iface_instances;
+
+    /**
+     * @var IFace_Model_Provider
+     */
+    protected $_model_provider;
+
+    /**
+     * IFace_Provider constructor
+     *
+     * @param IFace_Model_Provider $_model_provider
+     */
+    public function __construct(IFace_Model_Provider $_model_provider)
+    {
+        $this->_model_provider = $_model_provider;
+    }
 
     public function by_codename($codename)
     {
@@ -77,7 +90,7 @@ class IFace_Provider {
         return $this->iface_factory($default_model);
     }
 
-    public function iface_factory(IFace_Model $model)
+    protected function iface_factory(IFace_Model $model)
     {
         $codename = $model->get_codename();
 
@@ -88,9 +101,10 @@ class IFace_Provider {
             $class_name = 'IFace_Default';
         }
 
-        // TODO DI
+        $container = \BetaKiller\DI\Container::instance();
+
         /** @var IFace $object */
-        $object = new $class_name;
+        $object = $container->get($class_name);
 
         if ( ! ($object instanceof IFace) )
             throw new IFace_Exception('Class :class must be instance of class IFace', array(':class' => $class_name));
@@ -115,7 +129,7 @@ class IFace_Provider {
      */
     protected function model_provider()
     {
-        return IFace_Model_Provider::instance();
+        return $this->_model_provider;
     }
 
 }

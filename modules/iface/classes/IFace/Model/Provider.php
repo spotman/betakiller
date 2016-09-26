@@ -2,7 +2,7 @@
 
 class IFace_Model_Provider implements IFace_Model_Provider_Interface {
 
-    use \BetaKiller\Utils\Instance\Singleton;
+//    use \BetaKiller\Utils\Instance\Singleton;
 
     /**
      * @var IFace_Model_Provider_DB[]|IFace_Model_Provider_Admin[]

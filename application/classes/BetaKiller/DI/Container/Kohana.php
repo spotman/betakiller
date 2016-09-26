@@ -28,6 +28,7 @@ class Kohana extends Base
 //            $builder->writeProxiesToFile(true, 'tmp/proxies');
         }
 
-        return $builder->useAutowiring(true)->useAnnotations(false)->build();
+        // TODO move co config
+        return $builder->useAutowiring(true)->useAnnotations(true)->build();
     }
 }

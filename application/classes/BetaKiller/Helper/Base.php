@@ -7,7 +7,7 @@ trait Base
 {
     use Log;
     use IFace;
-//    use DI\Mixin;
+//    use DI\ContainerTrait;
 
     protected function in_production($use_staging = FALSE)
     {

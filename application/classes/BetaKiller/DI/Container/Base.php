@@ -1,8 +1,7 @@
 <?php
 namespace BetaKiller\DI\Container;
 
-use BetaKiller\DI\Container;
-use Interop\Container\ContainerInterface;
+use BetaKiller\DI\ContainerInterface;
 use Interop\Container\Exception\ContainerException;
 use Interop\Container\Exception\NotFoundException;
 
@@ -20,7 +19,7 @@ abstract class Base implements ContainerInterface
     protected $_container;
 
     /**
-     * @return Container
+     * @return ContainerInterface
      */
     public static function instance()
     {
