@@ -249,6 +249,12 @@ task('migrations:install', function () {
  * Create new migration
  */
 task('migrations:create', function () {
+    $path = getcwd().'/../'.BETAKILLER_CORE_PATH.'/application/migrations';
+    $realPath = realpath($path);
+
+    if (!$realPath)
+        throw new Exception('Migration path is not exists');
+
     $name = ask('Enter migration short name (3-128 characters, [A-Za-z0-9-_]+)');
 
     if (!$name)
@@ -257,6 +263,8 @@ task('migrations:create', function () {
     $desc = ask('Enter migration description', '');
 
     run_minion_task("migrations:create --name=$name --description=$desc");
+
+    run_git_command('add .', $realPath);
 })->onlyForStage(DEPLOYER_DEV_STAGE)->desc('Create migration');
 
 /**
@@ -343,11 +351,14 @@ function run_minion_task($name) {
  * Run git command and echo result to console
  *
  * @param string $gitCmd
+ * @param string $path
  * @return \Deployer\Type\Result
  * @throws Exception
  */
-function run_git_command($gitCmd) {
-    $path = get_working_path();
+function run_git_command($gitCmd, $path = null) {
+    if (!$path) {
+        $path = get_working_path();
+    }
 
     $result = run("cd $path && git $gitCmd");
     write($result);
