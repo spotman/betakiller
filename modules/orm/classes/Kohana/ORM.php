@@ -13,7 +13,7 @@
  * @copyright  (c) 2007-2012 Kohana Team
  * @license    http://kohanaframework.org/license
  */
-class Kohana_ORM extends Model implements serializable {
+class Kohana_ORM extends Model implements Serializable {
 
 	/**
 	 * Stores column information for ORM models
