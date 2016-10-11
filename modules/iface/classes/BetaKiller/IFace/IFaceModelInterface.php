@@ -1,18 +1,19 @@
-<?php defined('SYSPATH') OR die('No direct script access.');
+<?php
+namespace BetaKiller\IFace;
 
-interface IFace_Model {
-
+interface IFaceModelInterface
+{
     /**
      * Returns list of child iface models
      *
-     * @return IFace_Model[]
+     * @return IFaceModelInterface[]
      */
     public function get_children();
 
     /**
      * Return parent iface model or NULL
      *
-     * @return IFace_Model|NULL
+     * @return IFaceModelInterface|NULL
      */
     public function get_parent();
 
@@ -43,6 +44,13 @@ interface IFace_Model {
      * @return bool
      */
     public function has_dynamic_url();
+
+    /**
+     * Returns TRUE if iface provides tree-like url mapping
+     *
+     * @return bool
+     */
+    public function has_tree_behaviour();
 
     /**
      * Returns array representation of the model data
@@ -85,5 +93,4 @@ interface IFace_Model {
      * @return bool
      */
     public function hide_in_site_map();
-
 }

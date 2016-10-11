@@ -4,7 +4,7 @@ namespace BetaKiller\IFace\Core;
 use DateInterval;
 use DateTime;
 use IFace_Exception;
-use IFace_Model;
+use BetaKiller\IFace\IFaceModelInterface;
 use Text;
 use URL;
 use URL_Dispatcher;
@@ -16,7 +16,7 @@ abstract class IFace
     const CONFIG_KEY_IS_TRAILING_SLASH_ENABLED = 'url.is_trailing_slash_enabled';
 
     /**
-     * @var IFace_Model
+     * @var IFaceModelInterface
      */
     protected $_model;
 
@@ -307,7 +307,7 @@ abstract class IFace
     /**
      * Getter for current iface model
      *
-     * @return IFace_Model
+     * @return IFaceModelInterface
      */
     public function get_model()
     {
@@ -317,10 +317,10 @@ abstract class IFace
     /**
      * Setter for current iface model
      *
-     * @param IFace_Model $model
+     * @param IFaceModelInterface $model
      * @return $this
      */
-    public function set_model(IFace_Model $model)
+    public function set_model(IFaceModelInterface $model)
     {
         $this->_model = $model;
 

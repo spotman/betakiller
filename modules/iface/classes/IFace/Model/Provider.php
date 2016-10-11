@@ -1,4 +1,6 @@
-<?php defined('SYSPATH') OR die('No direct script access.');
+<?php use BetaKiller\IFace\IFaceModelInterface;
+
+defined('SYSPATH') OR die('No direct script access.');
 
 class IFace_Model_Provider implements IFace_Model_Provider_Interface {
 
@@ -10,14 +12,14 @@ class IFace_Model_Provider implements IFace_Model_Provider_Interface {
     protected $_sources;
 
     /**
-     * @var IFace_Model[]
+     * @var IFaceModelInterface[]
      */
     protected $_model_instances = array();
 
     /**
      * Returns default iface model in current provider
      *
-     * @return IFace_Model|null
+     * @return IFaceModelInterface|null
      * @throws IFace_Exception
      */
     public function get_default()
@@ -42,7 +44,7 @@ class IFace_Model_Provider implements IFace_Model_Provider_Interface {
      * Returns iface model by codename or NULL if none was found
      *
      * @param $codename
-     * @return IFace_Model|null
+     * @return IFaceModelInterface|null
      * @throws IFace_Exception
      */
     public function by_codename($codename)
@@ -67,17 +69,17 @@ class IFace_Model_Provider implements IFace_Model_Provider_Interface {
     }
 
     /**
-     * @param IFace_Model $parent_model
-     * @return IFace_Model[]
+     * @param IFaceModelInterface $parent_model
+     * @return IFaceModelInterface[]
      */
-    public function get_layer(IFace_Model $parent_model = NULL)
+    public function get_layer(IFaceModelInterface $parent_model = NULL)
     {
         return $parent_model
             ? $this->get_children($parent_model)
             : $this->get_root();
     }
 
-    public function get_children(IFace_Model $parent_model)
+    public function get_children(IFaceModelInterface $parent_model)
     {
         $models = $parent_model->get_children();
 
@@ -87,10 +89,10 @@ class IFace_Model_Provider implements IFace_Model_Provider_Interface {
     }
 
     /**
-     * @param IFace_Model $model
-     * @return IFace_Model|NULL
+     * @param IFaceModelInterface $model
+     * @return IFaceModelInterface|NULL
      */
-    public function get_parent(IFace_Model $model)
+    public function get_parent(IFaceModelInterface $model)
     {
         $parent = $model->get_parent();
 
@@ -103,7 +105,7 @@ class IFace_Model_Provider implements IFace_Model_Provider_Interface {
     /**
      * Returns list of root elements
      *
-     * @return IFace_Model[]
+     * @return IFaceModelInterface[]
      * @throws IFace_Exception
      */
     public function get_root()
@@ -152,7 +154,7 @@ class IFace_Model_Provider implements IFace_Model_Provider_Interface {
 //    }
 
     /**
-     * @param IFace_Model[] $models
+     * @param IFaceModelInterface[] $models
      */
     protected function cache_models(array $models)
     {
@@ -164,7 +166,7 @@ class IFace_Model_Provider implements IFace_Model_Provider_Interface {
 
     /**
      * @param string $codename
-     * @return IFace_Model|NULL
+     * @return IFaceModelInterface|NULL
      */
     protected function get_cache($codename)
     {
@@ -173,7 +175,7 @@ class IFace_Model_Provider implements IFace_Model_Provider_Interface {
             : NULL;
     }
 
-    protected function set_cache(IFace_Model $model)
+    protected function set_cache(IFaceModelInterface $model)
     {
         $this->_model_instances[ $model->get_codename() ] = $model;
     }

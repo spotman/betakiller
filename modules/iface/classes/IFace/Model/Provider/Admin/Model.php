@@ -1,6 +1,8 @@
-<?php defined('SYSPATH') OR die('No direct script access.');
+<?php
 
-class IFace_Model_Provider_Admin_Model implements IFace_Model {
+use BetaKiller\IFace\IFaceModelInterface;
+
+class IFace_Model_Provider_Admin_Model implements IFaceModelInterface {
 
     /**
      * @var IFace_Model_Provider_Admin
@@ -21,6 +23,11 @@ class IFace_Model_Provider_Admin_Model implements IFace_Model {
      * @var bool
      */
     protected $_has_dynamic_url;
+
+    /**
+     * @var bool
+     */
+    protected $_has_tree_behaviour;
 
     /**
      * @var bool
@@ -60,7 +67,7 @@ class IFace_Model_Provider_Admin_Model implements IFace_Model {
     /**
      * Return parent iface model or NULL
      *
-     * @return IFace_Model
+     * @return IFaceModelInterface
      */
     public function get_parent()
     {
@@ -83,7 +90,7 @@ class IFace_Model_Provider_Admin_Model implements IFace_Model {
     /**
      * Returns list of child iface models
      *
-     * @return IFace_Model[]
+     * @return IFaceModelInterface[]
      */
     public function get_children()
     {
@@ -178,6 +185,11 @@ class IFace_Model_Provider_Admin_Model implements IFace_Model {
             $this->_has_dynamic_url = TRUE;
         }
 
+        if ( isset($data['hasTreeBehaviour']) )
+        {
+            $this->_has_tree_behaviour = TRUE;
+        }
+
         if ( isset($data['hideInSiteMap']) )
         {
             $this->_hide_in_site_map = TRUE;
@@ -187,12 +199,21 @@ class IFace_Model_Provider_Admin_Model implements IFace_Model {
     /**
      * Returns TRUE if iface provides dynamic url mapping
      *
-     * @todo вынести в класс IFace_Model и определять динамические URL по наличию символов {}
      * @return bool
      */
     public function has_dynamic_url()
     {
         return (bool) $this->_has_dynamic_url;
+    }
+
+    /**
+     * Returns TRUE if iface provides tree-like url mapping
+     *
+     * @return bool
+     */
+    public function has_tree_behaviour()
+    {
+        return (bool) $this->_has_tree_behaviour;
     }
 
     /**

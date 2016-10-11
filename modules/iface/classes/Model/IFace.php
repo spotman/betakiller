@@ -1,4 +1,7 @@
-<?php defined('SYSPATH') OR die('No direct script access.');
+<?php
+
+use BetaKiller\IFace\IFaceModelInterface;
+use BetaKiller\Utils\Kohana\TreeModel;
 
 /**
  * Class Model_IFace
@@ -6,16 +9,11 @@
  * @author     Spotman
  * @package    Betakiller
  */
-class Model_IFace extends ORM implements IFace_Model {
-
+class Model_IFace extends TreeModel implements IFaceModelInterface
+{
     protected function _initialize()
     {
         $this->belongs_to(array(
-            'parent'            =>  array(
-                'model'         =>  'IFace',
-                'foreign_key'   =>  'parent_id'
-            ),
-
             'layout'            =>  array(
                 'model'         =>  'Layout',
                 'foreign_key'   =>  'layout_id'
@@ -24,47 +22,29 @@ class Model_IFace extends ORM implements IFace_Model {
 
         $this->load_with(array(
             'layout',
-            'parent',
         ));
 
         parent::_initialize();
     }
 
-
-    public function get_id()
-    {
-        return (int) $this->pk();
-    }
-
-    public function get_parent_id()
-    {
-        return (int) $this->get('parent_id');
-    }
-
     /**
      * Returns list of child iface models
      *
-     * @return IFace_Model[]
+     * @return IFaceModelInterface[]|\BetaKiller\Utils\Kohana\TreeModel[]
      */
     function get_children()
     {
-        return ORM::factory($this->object_name())
-            ->where($this->object_name().'.parent_id', '=', $this->pk())
-            ->cached()
-            ->find_all()
-            ->as_array();
+        return parent::get_children();
     }
 
     /**
      * Return parent iface model or NULL
      *
-     * @return IFace_Model
+     * @return IFaceModelInterface|\BetaKiller\Utils\Kohana\TreeModel
      */
     public function get_parent()
     {
-        /** @var Model_IFace $parent */
-        $parent = $this->get('parent');
-        return $parent->loaded() ? $parent : NULL;
+        return parent::get_parent();
     }
 
     /**
@@ -169,7 +149,7 @@ class Model_IFace extends ORM implements IFace_Model {
      *
      * @return bool
      */
-    public function is_tree_url()
+    public function has_tree_behaviour()
     {
         return (bool) $this->get('is_tree');
     }
@@ -181,5 +161,4 @@ class Model_IFace extends ORM implements IFace_Model {
     {
         return (bool) $this->get('hide_in_site_map');
     }
-
 }

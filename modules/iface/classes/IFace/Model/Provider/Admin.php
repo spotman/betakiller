@@ -1,4 +1,6 @@
-<?php defined('SYSPATH') OR die('No direct script access.');
+<?php use BetaKiller\IFace\IFaceModelInterface;
+
+defined('SYSPATH') OR die('No direct script access.');
 
 
 class IFace_Model_Provider_Admin extends IFace_Model_Provider_Abstract {
@@ -29,7 +31,7 @@ class IFace_Model_Provider_Admin extends IFace_Model_Provider_Abstract {
         $this->parse_xml_branch($sxo);
     }
 
-    protected function parse_xml_branch(SimpleXMLElement $branch, IFace_Model $parent_model = NULL)
+    protected function parse_xml_branch(SimpleXMLElement $branch, IFaceModelInterface $parent_model = NULL)
     {
         // Parse branch childs
         foreach ( $branch->children() as $child_node )
@@ -45,7 +47,7 @@ class IFace_Model_Provider_Admin extends IFace_Model_Provider_Abstract {
         }
     }
 
-    protected function parse_xml_item(SimpleXMLElement $branch, IFace_Model $parent_model = NULL)
+    protected function parse_xml_item(SimpleXMLElement $branch, IFaceModelInterface $parent_model = NULL)
     {
         $attr = (array) $branch->attributes();
         $config = $attr['@attributes'];
@@ -67,7 +69,7 @@ class IFace_Model_Provider_Admin extends IFace_Model_Provider_Abstract {
         return IFace_Model_Provider_Admin_Model::factory($config, $this);
     }
 
-    protected function set_model(IFace_Model $model)
+    protected function set_model(IFaceModelInterface $model)
     {
         $codename = $model->get_codename();
 
@@ -88,7 +90,7 @@ class IFace_Model_Provider_Admin extends IFace_Model_Provider_Abstract {
     /**
      * Returns list of root elements
      *
-     * @return IFace_Model[]
+     * @return IFaceModelInterface[]
      */
     public function get_root()
     {
@@ -98,7 +100,7 @@ class IFace_Model_Provider_Admin extends IFace_Model_Provider_Abstract {
     /**
      * Returns default iface model in current provider
      *
-     * @return IFace_Model
+     * @return IFaceModelInterface
      */
     public function get_default()
     {
@@ -110,7 +112,7 @@ class IFace_Model_Provider_Admin extends IFace_Model_Provider_Abstract {
      * Returns iface model by codename or NULL if none was found
      *
      * @param $codename
-     * @return IFace_Model
+     * @return IFaceModelInterface
      */
     public function by_codename($codename)
     {

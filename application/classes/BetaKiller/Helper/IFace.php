@@ -42,10 +42,10 @@ trait IFace
     }
 
     /**
-     * @param $model \IFace_Model
+     * @param $model \BetaKiller\IFace\IFaceModelInterface
      * @return \BetaKiller\IFace\IFace
      */
-    protected function iface_from_model(\IFace_Model $model)
+    protected function iface_from_model(\BetaKiller\IFace\IFaceModelInterface $model)
     {
         return IFaceFactory::instance()->from_model($model);
     }

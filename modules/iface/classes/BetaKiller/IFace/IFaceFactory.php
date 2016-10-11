@@ -11,10 +11,10 @@ class IFaceFactory
     /**
      * Creates instance of IFace from model
      *
-     * @param \IFace_Model $model
+     * @param \BetaKiller\IFace\IFaceModelInterface $model
      * @return IFace
      */
-    public function from_model(\IFace_Model $model)
+    public function from_model(\BetaKiller\IFace\IFaceModelInterface $model)
     {
         return $this->get_provider()->from_model($model);
     }

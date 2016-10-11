@@ -1,6 +1,7 @@
 <?php
 
 use BetaKiller\IFace\Core\IFace;
+use BetaKiller\IFace\IFaceModelInterface;
 
 class IFace_Provider {
 
@@ -36,7 +37,7 @@ class IFace_Provider {
         return $iface;
     }
 
-    public function from_model(IFace_Model $model)
+    public function from_model(IFaceModelInterface $model)
     {
         $codename = $model->get_codename();
 
@@ -66,7 +67,7 @@ class IFace_Provider {
 
     /**
      * @param IFace $parent_iface
-     * @return IFace_Model[]
+     * @return IFaceModelInterface[]
      * @throws IFace_Exception
      */
     public function get_models_layer(IFace $parent_iface = NULL)
@@ -90,7 +91,7 @@ class IFace_Provider {
         return $this->iface_factory($default_model);
     }
 
-    protected function iface_factory(IFace_Model $model)
+    protected function iface_factory(IFaceModelInterface $model)
     {
         $codename = $model->get_codename();
 

@@ -1,5 +1,6 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
+use BetaKiller\IFace\IFaceModelInterface;
 use BetaKiller\Service;
 use samdark\sitemap\Sitemap;
 use samdark\sitemap\Index;
@@ -46,9 +47,6 @@ class Service_Sitemap extends Service
 
     public function generate()
     {
-//        $this->_url_parameters = URL_Parameters::instance();
-//        $this->_url_dispatcher = URL_Dispatcher::instance();
-
         $base_url = Kohana::$base_url;
 
         if ( strpos($base_url, 'http') === FALSE )
@@ -86,7 +84,7 @@ class Service_Sitemap extends Service
         return $this;
     }
 
-    protected function iterate_layer(IFace_Model $parent = NULL)
+    protected function iterate_layer(IFaceModelInterface $parent = NULL)
     {
         // Get all available IFaces in layer
         $iface_models = $this->_iface_model_provider->get_layer($parent);
@@ -125,7 +123,7 @@ class Service_Sitemap extends Service
         }
     }
 
-    protected function process_iface_model(IFace_Model $model)
+    protected function process_iface_model(IFaceModelInterface $model)
     {
         $iface = $this->iface_from_model($model);
 
