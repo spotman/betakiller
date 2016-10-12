@@ -835,7 +835,7 @@ class Kohana_ORM extends Model implements Serializable {
 	 * can be nested using 'object1:object2' syntax
 	 *
 	 * @param  string $target_path Target model to bind to
-	 * @return ORM
+	 * @return $this
 	 */
 	public function with($target_path)
 	{
@@ -918,7 +918,7 @@ class Kohana_ORM extends Model implements Serializable {
 	 * Initializes the Database Builder to given query type
 	 *
 	 * @param  integer $type Type of Database query
-	 * @return ORM
+	 * @return $this
 	 */
 	protected function _build($type)
 	{
@@ -955,7 +955,7 @@ class Kohana_ORM extends Model implements Serializable {
 	 *
 	 * @chainable
 	 * @throws Kohana_Exception
-	 * @return ORM
+	 * @return $this
 	 */
 	public function find()
 	{
@@ -1555,7 +1555,7 @@ class Kohana_ORM extends Model implements Serializable {
 	 *
 	 * @param  string  $alias    Alias of the has_many "through" relationship
 	 * @param  mixed   $far_keys Related model, primary key, or an array of primary keys
-	 * @return ORM
+	 * @return $this
 	 */
 	public function add($alias, $far_keys)
 	{

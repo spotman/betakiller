@@ -315,7 +315,6 @@ abstract class Core_URL_Dispatcher {
 
     protected function make_url_parameter_part($prototype_string, URL_Parameters $parameters = null, $is_tree = false)
     {
-        // TODO Implement tree behaviour
         $prototype = $this->parse_prototype($prototype_string);
 
         $model_name = $prototype->get_model_name();
@@ -337,7 +336,6 @@ abstract class Core_URL_Dispatcher {
             ]);
 
         $parts = [];
-        $parent = null;
 
         do
         {
