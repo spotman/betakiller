@@ -2,6 +2,7 @@
 
 use BetaKiller\IFace\Core\IFace;
 use BetaKiller\IFace\UrlPathIterator;
+use BetaKiller\Utils\Kohana\TreeModel;
 
 abstract class Core_URL_Dispatcher {
 
@@ -119,7 +120,7 @@ abstract class Core_URL_Dispatcher {
         return $iface_instance;
     }
 
-    protected function throw_missing_url_exception(UrlPathIterator $it, IFace $parent_iface)
+    protected function throw_missing_url_exception(UrlPathIterator $it, IFace $parent_iface = null)
     {
         throw new IFace_Exception_MissingURL($it->current(), $parent_iface);
     }
@@ -150,6 +151,7 @@ abstract class Core_URL_Dispatcher {
 //            $this->throw_missing_url_exception($it, $parent_iface);
         }
 
+        /** @var \BetaKiller\IFace\IFaceModelInterface $iface_model */
         $iface_model = NULL;
         $dynamic_model = NULL;
 
@@ -295,8 +297,25 @@ abstract class Core_URL_Dispatcher {
             $registry->set($model_name, $model, true); // Allow tree url behaviour to set value multiple times
     }
 
-    public function make_url_parameter_part($prototype_string, URL_Parameters $parameters = NULL)
+    public function make_iface_uri(IFace $iface, URL_Parameters $parameters = NULL)
     {
+        $uri = $iface->get_uri();
+
+        if (!$uri)
+            throw new IFace_Exception('IFace :codename must have uri');
+
+        $model = $iface->get_model();
+
+        if ($model->has_dynamic_url()) {
+            return $this->make_url_parameter_part($uri, $parameters, $model->has_tree_behaviour());
+        } else {
+            return $uri;
+        }
+    }
+
+    protected function make_url_parameter_part($prototype_string, URL_Parameters $parameters = null, $is_tree = false)
+    {
+        // TODO Implement tree behaviour
         $prototype = $this->parse_prototype($prototype_string);
 
         $model_name = $prototype->get_model_name();
@@ -311,20 +330,40 @@ abstract class Core_URL_Dispatcher {
         if ( ! $model )
             throw new URL_Dispatcher_Exception('Can not find :name model in parameters', array(':name' => $model_name));
 
-        if( $prototype->is_method_call() )
+        if ($is_tree AND !($model instanceof TreeModel))
+            throw new URL_Dispatcher_Exception('Model :model must be instance of :object for tree traversing', [
+                ':model'    =>  get_class($model),
+                ':object'   =>  TreeModel::class,
+            ]);
+
+        $parts = [];
+        $parent = null;
+
+        do
         {
-            $method = $model_key;
+            $parts[] = $this->calculate_model_key_value($model, $model_key, $prototype->is_method_call());
+        }
+        while ($is_tree AND ($model = $model->get_parent()));
+
+        return implode('/', array_reverse($parts));
+    }
+
+    protected function calculate_model_key_value(URL_DataSource $model, $key, $is_method_call)
+    {
+        if( $is_method_call )
+        {
+            $method = $key;
 
             if ( ! method_exists($model, $method) )
                 throw new URL_Dispatcher_Exception('Method :method does not exists in model :model',
-                    array(':method' => $method, ':model' => $model_name));
+                    array(':method' => $method, ':model' => get_class($model)));
 
             return $model->$method();
         }
         else
         {
             // Get url prototype value
-            return $model->get_url_key_value($model_key);
+            return $model->get_url_key_value($key);
         }
     }
 

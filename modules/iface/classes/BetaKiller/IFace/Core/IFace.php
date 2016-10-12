@@ -371,17 +371,10 @@ abstract class IFace
 
     protected function make_uri(URL_Parameters $parameters = NULL)
     {
-        $uri = $this->get_uri();
-
-        if (!$uri)
-            throw new IFace_Exception('IFace :codename must have uri');
-
-        return $this->get_model()->has_dynamic_url()
-            ? $this->url_dispatcher()->make_url_parameter_part($uri, $parameters)
-            : $uri;
+        return $this->url_dispatcher()->make_iface_uri($this, $parameters);
     }
 
-    protected function get_uri()
+    public function get_uri()
     {
         return $this->get_model()->get_uri();
     }
