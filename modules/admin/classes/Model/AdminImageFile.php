@@ -17,16 +17,16 @@ class Model_AdminImageFile extends Model_AdminContentFile
         return Assets_Provider_Factory::instance()->create('AdminImage');
     }
 
-    public function get_img_tag_with_srcset()
+    public function get_img_tag_with_srcset(array $attributes = [])
     {
         $sizes = $this->get_provider()->get_allowed_preview_sizes();
 
         $src = $this->get_original_url();
 
-        $attributes = [
+        $attributes = array_merge($attributes, [
             'alt'       =>  $this->get_alt(),
             'title'     =>  $this->get_title(),
-        ];
+        ]);
 
         if ($sizes)
         {
