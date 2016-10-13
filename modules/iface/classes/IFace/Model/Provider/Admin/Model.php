@@ -2,8 +2,8 @@
 
 use BetaKiller\IFace\IFaceModelInterface;
 
-class IFace_Model_Provider_Admin_Model implements IFaceModelInterface {
-
+class IFace_Model_Provider_Admin_Model implements IFaceModelInterface
+{
     /**
      * @var IFace_Model_Provider_Admin
      */
@@ -55,6 +55,15 @@ class IFace_Model_Provider_Admin_Model implements IFaceModelInterface {
     }
 
     /**
+     * @return int
+     * @throws HTTP_Exception_501
+     */
+    public function get_id()
+    {
+        throw new HTTP_Exception_501('Admin IFace model have no ID');
+    }
+
+    /**
      * Returns iface url part
      *
      * @return string
@@ -67,7 +76,7 @@ class IFace_Model_Provider_Admin_Model implements IFaceModelInterface {
     /**
      * Return parent iface model or NULL
      *
-     * @return IFaceModelInterface
+     * @return IFaceModelInterface|null
      */
     public function get_parent()
     {
@@ -95,6 +104,26 @@ class IFace_Model_Provider_Admin_Model implements IFaceModelInterface {
     public function get_children()
     {
         return $this->get_provider()->get_childs($this);
+    }
+
+    /**
+     * @param string|null $column
+     * @return int[]
+     * @throws HTTP_Exception_501
+     */
+    public function get_all_children($column = NULL)
+    {
+        throw new HTTP_Exception_501('Not implemented yet');
+    }
+
+    /**
+     * @param \BetaKiller\Utils\Kohana\TreeModelInterface|null $parent
+     * @return $this
+     * @throws HTTP_Exception_501
+     */
+    public function set_parent(\BetaKiller\Utils\Kohana\TreeModelInterface $parent = NULL)
+    {
+        throw new HTTP_Exception_501('Admin model can not change parent');
     }
 
     /**

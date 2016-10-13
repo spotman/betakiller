@@ -1,22 +1,10 @@
 <?php
 namespace BetaKiller\IFace;
 
-interface IFaceModelInterface
+use BetaKiller\Utils\Kohana\TreeModelInterface;
+
+interface IFaceModelInterface extends TreeModelInterface
 {
-    /**
-     * Returns list of child iface models
-     *
-     * @return IFaceModelInterface[]
-     */
-    public function get_children();
-
-    /**
-     * Return parent iface model or NULL
-     *
-     * @return IFaceModelInterface|NULL
-     */
-    public function get_parent();
-
     /**
      * Returns iface codename
      *
