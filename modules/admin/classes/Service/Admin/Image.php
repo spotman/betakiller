@@ -1,6 +1,6 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
-class Service_Admin_Image extends Service_Admin_Content
+class Service_Admin_Image extends Service_Admin_ContentWithAssets
 {
     /**
      * Имя кастомного HTML-тега для вставки контента

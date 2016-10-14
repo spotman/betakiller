@@ -17,31 +17,33 @@ class Model_AdminImageFile extends Model_AdminContentFile
         return Assets_Provider_Factory::instance()->create('AdminImage');
     }
 
-    public function get_img_tag_with_srcset(array $attributes = [])
+    public function get_img_tag_arguments_with_srcset(array $attributes = [])
     {
-        $sizes = $this->get_provider()->get_allowed_preview_sizes();
-
-        $src = $this->get_original_url();
-
-        $attributes = array_merge($attributes, [
+        $attributes = array_merge([
+            'src'       =>  $this->get_original_url(),
             'alt'       =>  $this->get_alt(),
             'title'     =>  $this->get_title(),
-        ]);
+            'srcset'    =>  $this->get_srcset(),
+        ], $attributes);
+
+        return $attributes;
+    }
+
+    public function get_srcset()
+    {
+        $sizes = $this->get_provider()->get_allowed_preview_sizes();
+        $srcset = [];
 
         if ($sizes)
         {
-            $srcset = [];
-
             foreach ($sizes as $size)
             {
                 $width = intval($size);
                 $srcset[] = $this->get_preview_url($size).' '.$width.'w';
             }
-
-            $attributes['srcset'] = implode(', ', $srcset);
         }
 
-        return HTML::image($src, array_filter($attributes));
+        return implode(', ', $srcset);
     }
 
 //    /**

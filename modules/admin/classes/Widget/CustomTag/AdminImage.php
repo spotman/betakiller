@@ -44,7 +44,7 @@ class Widget_CustomTag_AdminImage extends Widget
         }
 
         return [
-            'image'     =>  $model->get_img_tag_with_srcset($attributes),
+            'image'     =>  $model->get_img_tag_arguments_with_srcset($attributes),
         ];
     }
 }

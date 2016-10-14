@@ -16,6 +16,7 @@ class CustomTag
     const CAPTION = 'caption';
     const GALLERY = 'gallery';
     const ADMIN_IMAGE = 'adminImage';
+    const YOUTUBE = 'youtube';
 
     public function get_allowed_tags()
     {
@@ -23,6 +24,7 @@ class CustomTag
             self::CAPTION,
             self::GALLERY,
             self::ADMIN_IMAGE,
+            self::YOUTUBE,
         ];
     }
 

@@ -5,7 +5,7 @@ abstract class Service_Admin_Content extends \BetaKiller\Service
     use BetaKiller\Helper\Admin;
 
     /**
-     * Имя кастомного HTML-тега для вставки контента
+     * Custom HTML-tag name related to current service
      * 
      * @return string
      */
@@ -16,29 +16,6 @@ abstract class Service_Admin_Content extends \BetaKiller\Service
      * @return Model_AdminContentFile
      */
     abstract protected function file_model_factory();
-
-    /**
-     * @param $mime
-     * @return Service_Admin_Content
-     */
-    public static function service_instance_by_mime($mime)
-    {
-        /** @var Service_Admin_Content[] $mime_services */
-        $mime_services = [
-            Service_Admin_Image::instance(),
-        ];
-
-        foreach ($mime_services as $service)
-        {
-            $allowed_mimes = $service->get_assets_provider()->get_allowed_mime_types();
-
-            if ($allowed_mimes AND is_array($allowed_mimes) AND in_array($mime, $allowed_mimes))
-                return $service;
-        }
-
-        // Default way
-        return Service_Admin_Attachment::instance();
-    }
 
     /**
      * @return Model_AdminContentEntity
@@ -76,7 +53,7 @@ abstract class Service_Admin_Content extends \BetaKiller\Service
         return $this->file_model_factory()->get_entity_items_ids($entity);
     }
 
-    public function make_custom_html_tag(Model_AdminImageFile $image, $target_width = NULL, $target_height = NULL, array $attributes = [])
+    public function make_custom_html_tag(Model_AdminContentFile $content, $target_width = NULL, $target_height = NULL, array $attributes = [])
     {
         $attributes += [
             'width'     =>  $target_width,
@@ -84,7 +61,7 @@ abstract class Service_Admin_Content extends \BetaKiller\Service
         ];
 
         return $this->custom_tag_instance()
-            ->generate($this->get_html_custom_tag_name(), $image->get_id(), $attributes);
+            ->generate($this->get_html_custom_tag_name(), $content->get_id(), $attributes);
     }
 
     public function get_entity_items(Model_AdminContentEntity $entity)
@@ -125,33 +102,4 @@ abstract class Service_Admin_Content extends \BetaKiller\Service
     {
         return $this->file_model_factory()->find_by_wp_id($id);
     }
-
-    /**
-     * @param $full_path
-     * @param $original_name
-     * @param Model_AdminContentEntity $entity
-     * @param null $entity_item_id
-     * @return Model_AdminContentFile
-     */
-    public function store_file($full_path, $original_name, Model_AdminContentEntity $entity, $entity_item_id = NULL)
-    {
-        $provider = $this->get_assets_provider();
-
-        $post_data = [
-            'entityID'      =>  $entity->get_id(),
-            'entityItemID'  =>  $entity_item_id,
-        ];
-
-        return $provider->store($full_path, $original_name, $post_data);
-    }
-
-    public function get_allowed_mime_types()
-    {
-        return $this->get_assets_provider()->get_allowed_mime_types();
-    }
-
-    /**
-     * @return Assets_Provider_AdminImage|Assets_Provider_AdminAttachment
-     */
-    abstract protected function get_assets_provider();
 }

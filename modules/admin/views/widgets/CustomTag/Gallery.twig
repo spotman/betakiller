@@ -1,5 +1,5 @@
 {% for image in images %}
-    {{ image|raw }}
+    <img src="{{ image.src }}" alt="{{ image.alt }}" title="{{ image.title }}" srcset="{{ image.srcset }}" class="img-responsive" />
 {% else %}
     no images
 {% endfor %}

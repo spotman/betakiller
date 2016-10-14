@@ -1,14 +1,15 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
-class Service_Admin_Attachment extends Service_Admin_Content
+class Service_Admin_Attachment extends Service_Admin_ContentWithAssets
 {
     /**
-     * Имя кастомного HTML-тега для вставки контента
+     * Custom HTML-tag name
      *
      * @return string
      */
     public function get_html_custom_tag_name()
     {
+        // TODO Move to const on CustomTag
         return 'admin_attachment';
     }
 

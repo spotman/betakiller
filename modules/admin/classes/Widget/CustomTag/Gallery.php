@@ -38,7 +38,7 @@ class Widget_CustomTag_Gallery extends Widget
         {
             $model = $this->model_factory_admin_image_file($id);
 
-            $images[] = $model->get_img_tag_with_srcset();
+            $images[] = $model->get_img_tag_arguments_with_srcset();
         }
 
         return [

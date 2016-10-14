@@ -29,7 +29,7 @@ class Widget_CustomTag_Caption extends Widget
         $model = $this->model_factory_admin_image_file()->get_by_id($image_id);
 
         return [
-            'image'     =>  $model->get_img_tag_with_srcset(),
+            'image'     =>  $model->get_img_tag_arguments_with_srcset(),
             'caption'   =>  $title,
             'align'     =>  $align,
             'class'     =>  $class,
