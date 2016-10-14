@@ -18,6 +18,12 @@ class Model_AdminYoutubeRecord extends Model_AdminContentFile
 //        ];
 //    }
 
+    public function get_youtube_embed_url()
+    {
+        // TODO make youtube full url
+        return 'https://www.youtube.com/embed/'.$this->get_youtube_id();
+    }
+
     /**
      * @param int $value
      * @return $this|ORM

@@ -47,6 +47,9 @@ class Widget_CustomTag_Youtube extends Widget
         return [
             'video' => [
                 // TODO
+                'src'       =>  $model->get_youtube_embed_url(),
+                'width'     =>  $width,
+                'height'    =>  $height,
             ],
         ];
     }
