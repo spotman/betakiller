@@ -100,7 +100,7 @@ class ORM extends Utils\Kohana\ORM
     }
 
     /**
-     * @return \Database_Result|\ORM[]
+     * @return \Database_Result|\$this[]
      * @throws Kohana_Exception
      */
     public function get_all()

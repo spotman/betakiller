@@ -30,11 +30,6 @@ abstract class Widget extends \Controller // TODO Remove extension and replace i
      */
     protected $_context = array();
 
-    /**
-     * @var array Additional data for rendering
-     */
-    protected $_data = array();
-
     public function __construct($name, Request $request, Response $response)
     {
         parent::__construct($request, $response);
@@ -72,7 +67,7 @@ abstract class Widget extends \Controller // TODO Remove extension and replace i
         $response = $response ?: Response::factory();
 
         if (!class_exists($class_name)) {
-            $class_name = 'Widget_Default';
+            $class_name = \Widget_Default::class;
         }
 
         /** @var Widget $widget */
@@ -123,6 +118,11 @@ abstract class Widget extends \Controller // TODO Remove extension and replace i
     public function getContext()
     {
         return $this->_context;
+    }
+
+    public function getContextParam($name, $default = null)
+    {
+        return isset($this->_context[$name]) ? $this->_context[$name] : $default;
     }
 
     /**
@@ -188,16 +188,7 @@ abstract class Widget extends \Controller // TODO Remove extension and replace i
      */
     public function get_data()
     {
-        return $this->_data;
-    }
-
-    public function set_data($key, $value = NULL)
-    {
-        if (is_array($key)) {
-            $this->_data = array_merge($this->_data, $key);
-        } else {
-            $this->_data[$key] = $value;
-        }
+        return [];
     }
 
     /**
