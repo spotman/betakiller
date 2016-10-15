@@ -1,7 +1,7 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
-abstract class Assets_Model_ORM_Image extends Assets_Model_ORM {
-
+abstract class Assets_Model_ORM_Image extends Assets_Model_ORM
+{
     public function get_preview_url($size = NULL)
     {
         return $this->loaded()
@@ -25,5 +25,4 @@ abstract class Assets_Model_ORM_Image extends Assets_Model_ORM {
     {
         return $this->get_provider()->get_upload_max_height();
     }
-
 }

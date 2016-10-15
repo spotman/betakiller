@@ -39,6 +39,7 @@ trait Assets_Provider_AdminContentTrait
      */
     protected function storage_factory()
     {
+        // TODO move MultiSite dependency to Assets_Storage_Local config
         $assets_path = MultiSite::instance()->site_path().DIRECTORY_SEPARATOR.'assets'.DIRECTORY_SEPARATOR;
 
         /** @var \Assets_Storage_Local $storage */

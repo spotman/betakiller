@@ -197,7 +197,10 @@ abstract class Assets_Model_ORM extends ORM implements Assets_Model {
     public function by_url($url)
     {
         $hash = basename($url);
+
+        /** @var Assets_Model_ORM $model */
         $model = ORM::factory($this->object_name())->where('hash', '=', $hash)->find();
+
         return $model->loaded() ? $model : NULL;
     }
 

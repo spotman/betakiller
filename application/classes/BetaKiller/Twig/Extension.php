@@ -56,6 +56,12 @@ class BetaKiller_Twig_Extension extends Twig_Extension
             ),
 
             new Twig_SimpleFunction(
+                'image',
+                array($this, 'image'),
+                array('is_safe' => array('html'))
+            ),
+
+            new Twig_SimpleFunction(
                 'assets',
                 array($this, 'assets')
             ),
@@ -202,6 +208,15 @@ class BetaKiller_Twig_Extension extends Twig_Extension
             else
                 $instance->add_static($css);
         }
+    }
+
+    public function image(array $attributes, array $data = [])
+    {
+        $attributes = array_merge($attributes, $data);
+
+        $src = $attributes['src'];
+
+        return HTML::image($src, array_filter($attributes));
     }
 
     /**

@@ -24,6 +24,8 @@ class Model_AdminImageFile extends Model_AdminContentFile
             'alt'       =>  $this->get_alt(),
             'title'     =>  $this->get_title(),
             'srcset'    =>  $this->get_srcset(),
+            'width'     =>  $this->get_width(),
+            'height'    =>  $this->get_height(),
         ], $attributes);
 
         return $attributes;
@@ -60,43 +62,43 @@ class Model_AdminImageFile extends Model_AdminContentFile
 //        ];
 //    }
 
-//    /**
-//     * @param int $value
-//     * @return $this|ORM
-//     * @throws Kohana_Exception
-//     */
-//    public function set_width($value)
-//    {
-//        return $this->set('width', (int) $value);
-//    }
-//
-//    /**
-//     * @return string
-//     * @throws Kohana_Exception
-//     */
-//    public function get_width()
-//    {
-//        return $this->get('width');
-//    }
-//
-//    /**
-//     * @param int $value
-//     * @return $this|ORM
-//     * @throws Kohana_Exception
-//     */
-//    public function set_height($value)
-//    {
-//        return $this->set('height', (int) $value);
-//    }
-//
-//    /**
-//     * @return string
-//     * @throws Kohana_Exception
-//     */
-//    public function get_height()
-//    {
-//        return $this->get('height');
-//    }
+    /**
+     * @param int $value
+     * @return $this|ORM
+     * @throws Kohana_Exception
+     */
+    public function set_width($value)
+    {
+        return $this->set('width', (int) $value);
+    }
+
+    /**
+     * @return string
+     * @throws Kohana_Exception
+     */
+    public function get_width()
+    {
+        return $this->get('width');
+    }
+
+    /**
+     * @param int $value
+     * @return $this|ORM
+     * @throws Kohana_Exception
+     */
+    public function set_height($value)
+    {
+        return $this->set('height', (int) $value);
+    }
+
+    /**
+     * @return string
+     * @throws Kohana_Exception
+     */
+    public function get_height()
+    {
+        return $this->get('height');
+    }
 
     /**
      * @param string $value

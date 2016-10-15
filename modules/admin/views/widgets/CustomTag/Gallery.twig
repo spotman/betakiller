@@ -8,7 +8,7 @@
         {% for image in images %}
         <a class="carousel-item amber white-text" href="#image-{{ loop.index }}">
             {#<h2>First Panel</h2>#}
-            <img src="{{ image.src }}" alt="{{ image.alt }}" title="{{ image.title }}" srcset="{{ image.srcset }}" class="img-responsive" />
+            {{ image(image, { "class": "responsive-img" }) }}
             {#<p class="white-text">This is your first panel</p>#}
         </a>
         {% endfor %}
