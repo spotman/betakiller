@@ -6,13 +6,16 @@
  */
 abstract class Assets_Provider_Image extends Assets_Provider {
 
+    // Dimensions values delimiter
+    const SIZE_X = 'x';
+
     /**
-     * @param Assets_Model $model
+     * @param Assets_ModelInterface $model
      * @param string $size    300x200
      * @return string
      * @throws Assets_Provider_Exception
      */
-    public function get_preview_url(Assets_Model $model, $size = NULL)
+    public function get_preview_url(Assets_ModelInterface $model, $size = NULL)
     {
         $url = $model->get_url();
 
@@ -21,7 +24,7 @@ abstract class Assets_Provider_Image extends Assets_Provider {
 
         $allowed_sizes = $this->get_allowed_preview_sizes();
 
-        if ( $size === NULL AND count($allowed_sizes) == 1 )
+        if ( $size === NULL AND count($allowed_sizes) > 0 )
         {
             $size = $allowed_sizes[0];
         }
@@ -38,12 +41,12 @@ abstract class Assets_Provider_Image extends Assets_Provider {
     }
 
     /**
-     * @param Assets_Model $model
+     * @param Assets_Model_ImageInterface $model
      * @param string $size    300x200
      * @return string
      * @throws Assets_Provider_Exception
      */
-    public function get_crop_url(Assets_Model $model, $size = NULL)
+    public function get_crop_url(Assets_Model_ImageInterface $model, $size = NULL)
     {
         $url = $model->get_url();
 
@@ -68,13 +71,13 @@ abstract class Assets_Provider_Image extends Assets_Provider {
         return Route::url('assets-provider-item-crop', $options);
     }
 
-    public function prepare_preview(Assets_Model $model, $size)
+    public function prepare_preview(Assets_Model_ImageInterface $model, $size)
     {
         $this->check_preview_size($size);
 
         $content = $this->get_content($model);
 
-        $dimensions = explode('x', $size);
+        $dimensions = explode(self::SIZE_X, $size);
         $width = $dimensions[0] ? (int) $dimensions[0] : NULL;
         $height = $dimensions[1] ? (int) $dimensions[1] : NULL;
 
@@ -89,13 +92,13 @@ abstract class Assets_Provider_Image extends Assets_Provider {
         );
     }
 
-    public function crop(Assets_Model $model, $size)
+    public function crop(Assets_Model_ImageInterface $model, $size)
     {
         $this->check_crop_size($size);
 
         $content = $this->get_content($model);
 
-        $dimensions = explode('x', $size);
+        $dimensions = explode(self::SIZE_X, $size);
         $width = $dimensions[0] ? (int) $dimensions[0] : NULL;
         $height = $dimensions[1] ? (int) $dimensions[1] : NULL;
 
@@ -170,13 +173,51 @@ abstract class Assets_Provider_Image extends Assets_Provider {
             throw new Assets_Provider_Exception('Crop size :size is not allowed', [':size' => $size]);
     }
 
-    protected function _upload($model, $content, array $_post_data)
+    public function get_original_size(Assets_Model_ImageInterface $image)
     {
+        return $image->get_width().self::SIZE_X.$image->get_height();
+    }
+
+    /**
+     * @param Assets_Model_ImageInterface $model
+     * @param string $content
+     * @param array $_post_data
+     * @param string $file_path
+     * @return string
+     */
+    protected function _upload($model, $content, array $_post_data, $file_path)
+    {
+        $this->detect_width_and_height($model, $file_path);
+
         return $this->resize(
             $content,
             $this->get_upload_max_width(),
             $this->get_upload_max_height()
         );
+    }
+
+    /**
+     * Detects image dimensions from provided file
+     *
+     * @param Assets_Model_ImageInterface $model
+     * @param string $file_path
+     * @throws Assets_Provider_Exception
+     */
+    protected function detect_width_and_height(Assets_Model_ImageInterface $model, $file_path)
+    {
+        try
+        {
+            // Creating image instance
+            $image = Image::factory($file_path);
+
+            $model
+                ->set_width($image->width)
+                ->set_height($image->height);
+        }
+        catch ( Exception $e )
+        {
+            throw new Assets_Provider_Exception('Can not detect image width and height: :message', [':message' => $e->getMessage()]);
+        }
     }
 
     /**

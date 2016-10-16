@@ -230,13 +230,24 @@ class User extends \Model_Auth_User implements \Notification_User_Interface //im
     }
 
     /**
-     * Returns TRUE, user account is switched on
+     * Returns TRUE, if user account is switched on
      *
      * @return bool
      */
     public function is_active()
     {
         return ( $this->loaded() AND $this->get('is_active') );
+    }
+
+    /**
+     * Returns TRUE if user is logged in now
+     *
+     * @return bool
+     * @throws \HTTP_Exception_501
+     */
+    public function is_logged_in()
+    {
+        throw new \HTTP_Exception_501('Not implemented yet');
     }
 
     /**

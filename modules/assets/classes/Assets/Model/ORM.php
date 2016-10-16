@@ -5,7 +5,7 @@
  *
  * Abstract class for all ORM-based asset models
  */
-abstract class Assets_Model_ORM extends ORM implements Assets_Model {
+abstract class Assets_Model_ORM extends ORM implements Assets_ModelInterface {
 
     protected function _initialize()
     {
@@ -192,7 +192,7 @@ abstract class Assets_Model_ORM extends ORM implements Assets_Model {
      * Performs file model search by hash
      *
      * @param string $url
-     * @return Assets_Model|NULL
+     * @return Assets_ModelInterface|NULL
      */
     public function by_url($url)
     {

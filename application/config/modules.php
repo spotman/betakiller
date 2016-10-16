@@ -15,6 +15,7 @@ return array(
     'auth'                  => MODPATH.'auth',                  // Basic authentication
     'backup'                => MODPATH.'backup',                // Complex backup (files + database)
     'cache'                 => MODPATH.'cache',                 // Caching with multiple backends
+    'content'               => MODPATH.'content',               // Content elements (images, attachments, videos, etc)
     'database'              => MODPATH.'database',              // Database access
 //    'di'                    => MODPATH.'di',                    // Dependency Injection
 //    'dbv'                   => MODPATH.'dbv',                   // Database Version Control

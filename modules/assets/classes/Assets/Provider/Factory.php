@@ -1,11 +1,10 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
-use \BetaKiller\Utils;
-
-class Assets_Provider_Factory {
-
-    use Utils\Instance\Singleton,
-        Utils\Factory\Cached;
+class Assets_Provider_Factory
+{
+    use BetaKiller\Utils\Instance\Singleton,
+        BetaKiller\Utils\Factory\Base,
+        BetaKiller\DI\ContainerTrait;
 
     /**
      * Factory method
@@ -32,4 +31,8 @@ class Assets_Provider_Factory {
         return '\\Assets_Provider_'.$name;
     }
 
+    protected function make_instance($class_name, ...$parameters)
+    {
+        return $this->getContainer()->make($class_name, $parameters);
+    }
 }

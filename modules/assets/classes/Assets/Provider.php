@@ -1,6 +1,10 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
+use BetaKiller\Config\ConfigInterface;
+
 abstract class Assets_Provider {
+
+    const CONFIG_KEY = 'assets';
 
     /**
      * @var string
@@ -13,18 +17,37 @@ abstract class Assets_Provider {
     protected $_storage_instance;
 
     /**
-     * @var array
+     * @var ConfigInterface
      */
-    protected static $_config;
+    protected $_config;
 
-//    public static function config($key, $default_value = NULL)
+    /**
+     * @var \Model_User
+     */
+    protected $_user;
+
+
+    public function __construct(ConfigInterface $config, \Model_User $user)
+    {
+        $this->_config = $config;
+        $this->_user = $user;
+    }
+
+    public function get_assets_config_value($key)
+    {
+        return $this->_config->load(self::CONFIG_KEY.'.'.$key);
+    }
+
+    public function get_assets_provider_config_value($key, $codename = null)
+    {
+        $codename = $codename ?: $this->_codename;
+
+        return $this->get_assets_config_value('providers.'.$codename.'.'.$key);
+    }
+
+//    protected function get_permissions_config_value($type)
 //    {
-//        if ( static::$_config === NULL )
-//        {
-//            static::$_config = Kohana::config('assets')->as_array();
-//        }
-//
-//        return Arr::path(static::$_config, $key, $default_value);
+//        return $this->get_assets_provider_config_value('permissions.'.$type);
 //    }
 
     public function set_codename($codename)
@@ -49,10 +72,10 @@ abstract class Assets_Provider {
     /**
      * Returns public URL for provided model
      *
-     * @param Assets_Model $model
+     * @param Assets_ModelInterface $model
      * @return string
      */
-    public function get_original_url(Assets_Model $model)
+    public function get_original_url(Assets_ModelInterface $model)
     {
         return $this->_get_item_url('original', $model);
     }
@@ -60,15 +83,15 @@ abstract class Assets_Provider {
     /**
      * Returns URL for deleting provided file
      *
-     * @param Assets_Model $model
+     * @param Assets_ModelInterface $model
      * @return string
      */
-    public function get_delete_url(Assets_Model $model)
+    public function get_delete_url(Assets_ModelInterface $model)
     {
         return $this->_get_item_url('delete', $model);
     }
 
-    protected function _get_item_url($action, Assets_Model $model)
+    protected function _get_item_url($action, Assets_ModelInterface $model)
     {
         $url = $model->get_url();
 
@@ -85,7 +108,7 @@ abstract class Assets_Provider {
         return Route::url('assets-provider-item', $options);
     }
 
-    public function get_model_extension(Assets_Model $model)
+    public function get_model_extension(Assets_ModelInterface $model)
     {
         $mime = $model->get_mime();
         $extensions = File::exts_by_mime($mime);
@@ -99,7 +122,7 @@ abstract class Assets_Provider {
     /**
      * @param array $_file Item from $_FILES
      * @param array $_post_data Array with items from $_POST
-     * @return Assets_Model
+     * @return Assets_ModelInterface
      * @throws Assets_Provider_Exception
      */
     public function upload(array $_file, array $_post_data)
@@ -140,14 +163,14 @@ abstract class Assets_Provider {
         $content = file_get_contents($full_path);
 
         // Custom processing
-        $content = $this->_upload($model, $content, $_post_data);
+        $content = $this->_upload($model, $content, $_post_data, $full_path);
 
         // Put data into model
         $model
             ->set_original_name($original_name)
             ->set_size(strlen($content))
             ->set_mime($mime_type)
-            ->set_uploaded_by($this->_get_current_user());
+            ->set_uploaded_by($this->_user);
 
         // Place file into storage
         $this->get_storage()->put($model, $content);
@@ -168,13 +191,17 @@ abstract class Assets_Provider {
     /**
      * Custom upload processing
      *
-     * @param Assets_Model $model
+     * @param Assets_ModelInterface $model
      * @param string $content
      * @param array $_post_data
+     * @param string $file_path Full path to source file
      * @return string
      */
-    protected function _upload($model, $content, array $_post_data)
+    protected function _upload($model, $content, array $_post_data, $file_path)
     {
+        // Dummy operation for CS check
+        unset($model, $_post_data, $file_path);
+
         // Empty by default
         return $content;
     }
@@ -182,7 +209,7 @@ abstract class Assets_Provider {
     /**
      * After upload processing
      *
-     * @param Assets_Model $model
+     * @param Assets_ModelInterface $model
      * @param array $_post_data
      */
     protected function _post_upload($model, array $_post_data)
@@ -190,10 +217,9 @@ abstract class Assets_Provider {
         // Empty by default
     }
 
-    public function deploy(Request $request, Assets_Model $model, $content)
+    public function deploy(Request $request, Assets_ModelInterface $model, $content)
     {
-        // TODO Move to config
-        $deploy_allowed = Kohana::in_production(TRUE);
+        $deploy_allowed = (bool) $this->get_assets_config_value('deploy.enabled');
 
         // No deployment in testing and developing environments
         if ( ! $deploy_allowed )
@@ -209,7 +235,7 @@ abstract class Assets_Provider {
         // Create deploy path if not exists
         if ( ! file_exists($path) )
         {
-            $mask = 0775; // TODO Move to config
+            $mask = $this->get_assets_config_value('deploy.directory_mask');
             mkdir($path, $mask, true);
         }
 
@@ -227,10 +253,10 @@ abstract class Assets_Provider {
     }
 
     /**
-     * @param Assets_Model $model
+     * @param Assets_ModelInterface $model
      * @throws Assets_Provider_Exception
      */
-    public function delete(Assets_Model $model)
+    public function delete(Assets_ModelInterface $model)
     {
         // Check permissions
         if ( ! $this->check_delete_permissions($model) )
@@ -249,7 +275,7 @@ abstract class Assets_Provider {
     /**
      * Additional delete processing
      *
-     * @param Assets_Model $model
+     * @param Assets_ModelInterface $model
      */
     protected function _delete($model)
     {
@@ -260,7 +286,7 @@ abstract class Assets_Provider {
      * Returns asset file model with provided hash
      *
      * @param $url
-     * @return Assets_Model|NULL
+     * @return Assets_ModelInterface|NULL
      * @throws Assets_Provider_Exception
      */
     public function get_model_by_deploy_url($url)
@@ -277,10 +303,10 @@ abstract class Assets_Provider {
     /**
      * Returns content of the file
      *
-     * @param Assets_Model $model
+     * @param Assets_ModelInterface $model
      * @return string
      */
-    public function get_content(Assets_Model $model)
+    public function get_content(Assets_ModelInterface $model)
     {
         // Get file from storage
         return $this->get_storage()->get($model);
@@ -289,25 +315,15 @@ abstract class Assets_Provider {
     /**
      * Update content of the file
      *
-     * @param Assets_Model $model
+     * @param Assets_ModelInterface $model
      * @param string $content
      */
-    public function set_content(Assets_Model $model, $content)
+    public function set_content(Assets_ModelInterface $model, $content)
     {
         $this->get_storage()->put($model, $content);
 
         // Drop deployed cache for current asset
         $this->_drop_deploy_cache($model);
-    }
-
-    /**
-     * Returns User model
-     *
-     * @return Model_User
-     */
-    protected function _get_current_user()
-    {
-        return Auth::instance()->get_user();
     }
 
     /**
@@ -365,11 +381,11 @@ abstract class Assets_Provider {
     /**
      * Returns asset`s base deploy directory
      *
-     * @param Assets_Model $model
+     * @param Assets_ModelInterface $model
      * @return string
      * @throws Assets_Provider_Exception
      */
-    protected function _get_item_deploy_path(Assets_Model $model)
+    protected function _get_item_deploy_path(Assets_ModelInterface $model)
     {
         $model_url = $model->get_url();
 
@@ -390,16 +406,15 @@ abstract class Assets_Provider {
 
     protected function get_doc_root()
     {
-        // TODO Security
         return $_SERVER['DOCUMENT_ROOT'];
     }
 
     /**
      * Removes all deployed versions of provided asset
      *
-     * @param Assets_Model $model
+     * @param Assets_ModelInterface $model
      */
-    protected function _drop_deploy_cache(Assets_Model $model)
+    protected function _drop_deploy_cache(Assets_ModelInterface $model)
     {
         $path = $this->_get_item_deploy_path($model);
 
@@ -433,7 +448,7 @@ abstract class Assets_Provider {
     /**
      * Creates empty file model
      *
-     * @return Assets_Model
+     * @return Assets_ModelInterface
      */
     abstract protected function file_model_factory();
 
@@ -447,7 +462,7 @@ abstract class Assets_Provider {
     /**
      * Returns TRUE if deploy is granted
      *
-     * @param Assets_Model $model
+     * @param Assets_ModelInterface $model
      * @return bool
      */
     abstract protected function check_deploy_permissions($model);
@@ -455,7 +470,7 @@ abstract class Assets_Provider {
     /**
      * Returns TRUE if delete operation granted
      *
-     * @param Assets_Model $model
+     * @param Assets_ModelInterface $model
      * @return bool
      */
     abstract protected function check_delete_permissions($model);

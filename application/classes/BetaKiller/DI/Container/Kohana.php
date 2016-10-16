@@ -15,6 +15,9 @@ class Kohana extends Base
         $definitions = $config->get('definitions');
         $builder->addDefinitions($definitions);
 
+        $useAutowiring = $config->get('autowiring', true);
+        $useAnnotations = $config->get('annotations', true);
+
         /** @url http://php-di.org/doc/performances.html */
         $cache = $config->get('cache');
 
@@ -28,7 +31,9 @@ class Kohana extends Base
 //            $builder->writeProxiesToFile(true, 'tmp/proxies');
         }
 
-        // TODO move co config
-        return $builder->useAutowiring(true)->useAnnotations(true)->build();
+        return $builder
+            ->useAutowiring($useAutowiring)
+            ->useAnnotations($useAnnotations)
+            ->build();
     }
 }

@@ -7,10 +7,10 @@
 abstract class Assets_Storage {
 
     /**
-     * @param Assets_Model $model
+     * @param Assets_ModelInterface $model
      * @return string
      */
-    public function get(Assets_Model $model)
+    public function get(Assets_ModelInterface $model)
     {
         $file_path = $model->get_storage_file_name();
 
@@ -20,10 +20,10 @@ abstract class Assets_Storage {
     /**
      * Stores file
      *
-     * @param Assets_Model $model
+     * @param Assets_ModelInterface $model
      * @param string $content
      */
-    public function put(Assets_Model $model, $content)
+    public function put(Assets_ModelInterface $model, $content)
     {
         $file_path = $model->get_storage_file_name();
 
@@ -33,9 +33,9 @@ abstract class Assets_Storage {
     /**
      * Deletes the file
      *
-     * @param Assets_Model $model
+     * @param Assets_ModelInterface $model
      */
-    public function delete(Assets_Model $model)
+    public function delete(Assets_ModelInterface $model)
     {
         $file_path = $model->get_storage_file_name();
 

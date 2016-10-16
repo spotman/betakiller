@@ -143,12 +143,12 @@ class Controller_Assets extends Controller {
         return $model;
     }
 
-    protected function deploy(Assets_Model $model, $content)
+    protected function deploy(Assets_ModelInterface $model, $content)
     {
         $this->_provider->deploy($this->request, $model, $content);
     }
 
-    protected function check_extension(Assets_Model $model)
+    protected function check_extension(Assets_ModelInterface $model)
     {
         if ( ! $this->request->param('ext') )
         {

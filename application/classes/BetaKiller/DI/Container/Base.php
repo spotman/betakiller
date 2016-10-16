@@ -2,6 +2,7 @@
 namespace BetaKiller\DI\Container;
 
 use BetaKiller\DI\ContainerInterface;
+use DI\DependencyException;
 use Interop\Container\Exception\ContainerException;
 use Interop\Container\Exception\NotFoundException;
 
@@ -69,5 +70,23 @@ abstract class Base implements ContainerInterface
     public function has($id)
     {
         return $this->getContainer()->has($id);
+    }
+
+    /**
+     * Resolves an entry by its name. If given a class name, it will return a new instance of that class.
+     *
+     * @param string $name Entry name or a class name.
+     * @param array $parameters Optional parameters to use to build the entry. Use this to force specific
+     *                           parameters to specific values. Parameters not defined in this array will
+     *                           be automatically resolved.
+     *
+     * @throws \InvalidArgumentException The name parameter must be of type string.
+     * @throws DependencyException       Error while resolving the entry.
+     * @throws \DI\NotFoundException         No entry or class found for the given name.
+     * @return mixed
+     */
+    public function make($name, array $parameters = [])
+    {
+        return $this->getContainer()->make($name, $parameters);
     }
 }

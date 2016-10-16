@@ -2,7 +2,11 @@
 
 return array(
 
-// TODO Describe
+    'deploy'    =>  [
+        'enabled'           =>  (Kohana::$environment == Kohana::PRODUCTION),
+        'directory_mask'    =>  0775,
+    ],
+
 //    'providers' => array(
 //        'provider-key'  =>  array(
 //            'codename'  =>  ''

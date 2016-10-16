@@ -6,6 +6,9 @@ return [
 
     'cache'         =>  new ArrayCache(),
 
+    'annotations'   =>  true,
+    'autowiring'    =>  true,
+
     'definitions'   =>  [
 
         Auth::class  =>  DI\factory(function() {
@@ -15,10 +18,22 @@ return [
         // Helpers
         'User'  =>  DI\factory(function() {
             $auth = Auth::instance();
-            return $auth->get_user();
+            $user = $auth->get_user();
+
+            if (!$user) {
+                $user = ORM::factory('User');
+            }
+
+            return $user;
         }),
 
+        \Model_User::class   => DI\get('User'),
+
         \BetaKiller\Model\User::class   => DI\get('User'),
+
+        \BetaKiller\Config\ConfigInterface::class =>  DI\factory(function() {
+            return new \BetaKiller\Config\Config();
+        }),
 
     ],
 
