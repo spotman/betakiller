@@ -141,11 +141,11 @@ class Kohana_Log {
 				$trace = array_map(function ($item) {
 					unset($item['args']);
 					return $item;
-				}, array_slice(debug_backtrace(FALSE), 1));
+				}, array_slice(debug_backtrace(FALSE), 2));
 			}
 			else
 			{
-				$trace = array_slice(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS), 1);
+				$trace = array_slice(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS), 2);
 			}
 		}
 

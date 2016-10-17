@@ -210,9 +210,14 @@ class BetaKiller_Twig_Extension extends Twig_Extension
         }
     }
 
-    public function image(array $attributes, array $data = [])
+    public function image(array $attributes, array $data = [], $force_size = false)
     {
         $attributes = array_merge($attributes, $data);
+
+        if (!$force_size)
+        {
+            unset($attributes['width'], $attributes['height']);
+        }
 
         $src = $attributes['src'];
 

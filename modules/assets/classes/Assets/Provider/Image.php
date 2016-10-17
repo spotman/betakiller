@@ -184,10 +184,17 @@ abstract class Assets_Provider_Image extends Assets_Provider {
      * @param array $_post_data
      * @param string $file_path
      * @return string
+     * @throws Assets_Provider_Exception
      */
     protected function _upload($model, $content, array $_post_data, $file_path)
     {
         $this->detect_width_and_height($model, $file_path);
+
+        $max_width = $this->get_upload_max_width();
+        $max_height = $this->get_upload_max_height();
+
+        if (!$max_width && !$max_height)
+            throw new Assets_Provider_Exception('Upload max dimensions must be set for provider :name', [':name' => $this->_codename]);
 
         return $this->resize(
             $content,

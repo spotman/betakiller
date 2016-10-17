@@ -17,6 +17,13 @@ class Model_ContentYoutubeRecord extends ORM implements Model_ContentElementInte
 
         $this->initialize_entity_relation();
 
+        $this->belongs_to(array(
+            'uploaded_by_user'  =>  array(
+                'model'         =>  'User',
+                'foreign_key'   =>  'uploaded_by',
+            )
+        ));
+
         parent::_initialize();
     }
 
@@ -95,6 +102,27 @@ class Model_ContentYoutubeRecord extends ORM implements Model_ContentElementInte
     public function get_height()
     {
         return $this->get('height');
+    }
+
+    /**
+     * Returns User model, who uploaded the file
+     *
+     * @return Model_User
+     */
+    public function get_uploaded_by()
+    {
+        return $this->get('uploaded_by_user');
+    }
+
+    /**
+     * Sets user, who uploaded the file
+     *
+     * @param Model_User $user
+     * @return $this
+     */
+    public function set_uploaded_by(Model_User $user)
+    {
+        return $this->set('uploaded_by_user', $user);
     }
 
     /**
