@@ -63,7 +63,7 @@ class IFace_Auth_Login extends IFace {
         return $this;
     }
 
-    protected function get_uri()
+    public function get_uri()
     {
         $redirect_query = $this->_redirect_url
             ? '?'.$this->_redirect_url_query_param.'='.$this->_redirect_url
