@@ -25,8 +25,11 @@ option('repo', null, InputOption::VALUE_OPTIONAL, 'Tag to deploy.', 'app');
 define('DEFAULT_BRANCH', 'master');
 option('branch', 'b', InputOption::VALUE_OPTIONAL, 'GIT branch to checkout', DEFAULT_BRANCH);
 
-// Option --to
+// Option --to for migrations:down
 option('to', 't', InputOption::VALUE_OPTIONAL, 'Target migration', null);
+
+// Option for Minion tasks direct calls
+option('task', null, InputOption::VALUE_OPTIONAL, 'Minion task name');
 
 
 define('DEPLOYER_DEV_STAGE',        'development');
@@ -243,6 +246,18 @@ task('git:check', function () {
 task('git:checkout', function () {
     git_checkout();
 })->desc('git checkout _branch_ (use --branch option)');
+
+/**
+ * Custom Minion tasks
+ */
+task('minion', function () {
+    if (!input()->hasOption('task'))
+        throw new Exception('Specify task name via --task option');
+
+    $name = input()->getOption('task');
+
+    run_minion_task($name);
+})->desc('Run Minion task by its name');
 
 
 /**
