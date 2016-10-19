@@ -12,6 +12,9 @@ define('BETAKILLER_CORE_PATH', 'core');
 set('core_path', BETAKILLER_CORE_PATH);
 set('core_repository', 'git@github.com:spotman/betakiller.git');
 
+// Default application path
+set('app_path', 'app');
+
 // Use PHP SSH2 extension
 //set('ssh_type', 'ext-ssh2');
 
@@ -419,5 +422,5 @@ function get_working_path($repo = NULL) {
 
     return (stage() == DEPLOYER_DEV_STAGE)
         ? getcwd()
-        : get_latest_release_path().'/'.env($repo.'_path');
+        : get_latest_release_path().'/'.get($repo.'_path');
 }
