@@ -90,7 +90,7 @@ class Kohana_StaticFile {
 			{
 				// Real existing file
 				// ie '/css/style.css'
-				$orig = realpath($this->_config->get('path')) . preg_replace('/\//', DIRECTORY_SEPARATOR, $url);
+				$orig = realpath($this->_config->get('path').$url) . preg_replace('/\//', DIRECTORY_SEPARATOR, $url);
 			}
 
             // Если файл реально лежит на диске, возвращаем его содержимое;
