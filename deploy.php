@@ -411,7 +411,7 @@ function get_working_path($repo = NULL) {
     $allowed = ['core', 'app'];
 
     if (!$repo) {
-        $repo = input()->getOption('repo') ?: BETAKILLER_CORE_PATH;
+        $repo = input()->getOption('repo') ?: 'core';
     }
 
     if (!in_array($repo, $allowed))
@@ -419,5 +419,5 @@ function get_working_path($repo = NULL) {
 
     return (stage() == DEPLOYER_DEV_STAGE)
         ? getcwd()
-        : get_latest_release_path().'/'.$repo;
+        : get_latest_release_path().'/'.env($repo.'_path');
 }
