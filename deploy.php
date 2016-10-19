@@ -222,6 +222,10 @@ task('git:pull', function () {
     git_pull();
 })->desc('git pull');
 
+task('git:pull:all', function () {
+    git_pull_all();
+})->desc('git pull for all repositories');
+
 task('git:check', function () {
     $out = git_status();
 
@@ -389,6 +393,10 @@ function git_push() {
 
 function git_pull() {
     return run_git_command('pull');
+}
+
+function git_pull_all() {
+    return run_git_command('pull', get_working_path('core')).run_git_command('pull', get_working_path('app'));
 }
 
 function git_config($key, $value) {
