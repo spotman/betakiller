@@ -38,6 +38,9 @@ class Widget_CustomTag_Gallery extends Widget
         {
             $model = $this->model_factory_content_image_element($id);
 
+            if (!$model->loaded())
+                continue;
+
             $images[] = $model->get_arguments_for_img_tag($model->get_original_url());
         }
 

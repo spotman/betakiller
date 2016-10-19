@@ -97,6 +97,10 @@ class I18n extends Kohana_I18n {
 
     protected static function put_data($module, $data)
     {
+        // Skip empty records
+        if (!$data)
+            return;
+
         // Если указан конкретный модуль
         $base_path = ( $module != 'application' )
             // Пишем найденную строку в языковой файл соответствующего модуля

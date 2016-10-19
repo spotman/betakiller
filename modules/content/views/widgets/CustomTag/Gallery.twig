@@ -1,21 +1,20 @@
 {% if images|length %}
 
-    <div class="carousel carousel-slider center" data-indicators="true">
-        {#<div class="carousel-fixed-item center">#}
-            {#<a class="btn waves-effect white grey-text darken-text-2">button</a>#}
-        {#</div>#}
+    <div class="carousel content-gallery is-hidden">
 
         {% for image in images %}
-        <a class="carousel-item amber white-text" href="#image-{{ loop.index }}">
-            {#<h2>First Panel</h2>#}
-            {{ image(image, { "class": "responsive-img" }) }}
-            {#<p class="white-text">This is your first panel</p>#}
-        </a>
+        {#<a class="carousel-item" href="#carousel-image-{{ loop.index }}">#}
+            {{ image(image, { class: "responsive-img carousel-cell" }, true) }}
+        {#</a>#}
         {% endfor %}
     </div>
 
 {% else %}
-    no images
+    <br>
+    <br>
+    <p>no images</p>
+    <br>
+    <br>
 {% endif %}
 
 {# TODO type-related blocks #}
