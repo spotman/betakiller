@@ -1,1 +1,3 @@
-{{ image(image, { "class": "responsive-img" }) }}
+<a href="{{ image.url|default(image.src) }}" title="{{ image.title|default(image.alt) }}" class="swipebox" rel="content-images">
+    {{ image(image, { "class": "responsive-img" }) }}
+</a>

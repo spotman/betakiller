@@ -61,7 +61,7 @@ abstract class Service_Content extends \BetaKiller\Service
         ];
 
         return $this->custom_tag_instance()
-            ->generate($this->get_html_custom_tag_name(), $content->get_id(), $attributes);
+            ->generate_html($this->get_html_custom_tag_name(), $content->get_id(), $attributes);
     }
 
     public function get_entity_items(Model_ContentEntity $entity)

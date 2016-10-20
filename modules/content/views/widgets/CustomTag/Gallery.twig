@@ -2,13 +2,21 @@
 
     {% if type == "masonry" %}
 
-        {# TODO type-related block #}
+        {% set column_class = "s" ~ (12 / columns)|round(0, 'floor') %}
+
+        <div class="content-gallery masonry row">
+            {% for image in images %}
+                <a href="{{ image.url }}" class="col {{ column_class }} swipebox" rel="content-images">
+                    {{ image(image, { class: "responsive-img" }, true) }}
+                </a>
+            {% endfor %}
+        </div>
 
     {% elseif type == "slider" %}
 
-    <div class="carousel content-gallery is-hidden">
+    <div class="content-gallery carousel is-hidden">
         {% for image in images %}
-            {{ image(image, { class: "responsive-img carousel-cell" }, true) }}
+            {{ image(image, { class: "responsive-img carousel-cell swipebox", rel: "content-images" }, true) }}
         {% endfor %}
     </div>
 

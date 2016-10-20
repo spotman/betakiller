@@ -29,7 +29,7 @@ class CustomTag
         ];
     }
 
-    public function generate($name, $id = NULL, array $attributes = [], $content = NULL)
+    public function generate_html($name, $id = NULL, array $attributes = [], $content = NULL)
     {
         if ($id)
         {
@@ -48,6 +48,23 @@ class CustomTag
         else
         {
             $node .= ' />';
+        }
+
+        return $node;
+    }
+
+    public function generate_dom_node(DOMDocument $document, $name, $id = NULL, array $attributes = [])
+    {
+        $node = $document->createElement($name);
+
+        if ($id)
+        {
+            $attributes = $attributes + ['id' => $id];
+        }
+
+        foreach ($attributes as $attr_name => $attr_value)
+        {
+            $node->setAttribute($attr_name, $attr_value);
         }
 
         return $node;

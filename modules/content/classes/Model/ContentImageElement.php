@@ -121,13 +121,13 @@ class Model_ContentImageElement extends Assets_Model_ORM_Image implements Model_
         return $this->get('title');
     }
 
-    public function get_arguments_for_img_tag($url, array $attributes = [])
+    public function get_arguments_for_img_tag($size, array $attributes = [])
     {
         $attributes = array_merge([
             'alt'       =>  $this->get_alt(),
             'title'     =>  $this->get_title(),
         ], $attributes);
 
-        return parent::get_arguments_for_img_tag($url, $attributes);
+        return parent::get_arguments_for_img_tag($size, $attributes);
     }
 }

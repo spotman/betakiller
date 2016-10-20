@@ -2,11 +2,19 @@
 
 abstract class Assets_Model_ORM_Image extends Assets_Model_ORM implements Assets_Model_ImageInterface
 {
+    const SIZE_ORIGINAL = 'original';
+    const SIZE_PREVIEW = 'preview';
+
     public function get_preview_url($size = NULL)
     {
         return $this->loaded()
             ? $this->get_provider()->get_preview_url($this, $size)
             : NULL;
+    }
+
+    public function get_preview_dimensions($size = NULL)
+    {
+        return $this->get_provider()->get_preview_dimensions($size);
     }
 
     public function get_crop_url($size = NULL)
@@ -60,14 +68,35 @@ abstract class Assets_Model_ORM_Image extends Assets_Model_ORM implements Assets
         return $this->set('height', (int) $value);
     }
 
-    public function get_arguments_for_img_tag($url, array $attributes = [])
+    public function get_arguments_for_img_tag($size, array $attributes = [])
     {
+        if ($size == self::SIZE_ORIGINAL)
+        {
+            $data = [
+                'src'       =>  $this->get_original_url(),
+                'width'     =>  $this->get_width(),
+                'height'    =>  $this->get_height(),
+            ];
+        }
+        else
+        {
+            $size = ($size != self::SIZE_PREVIEW) ? $size : null;
+
+            $dimensions = $this->get_preview_dimensions($size);
+
+            $data = [
+                'src'       =>  $this->get_preview_url(),
+                'url'       =>  $this->get_original_url(),
+                'width'     =>  $dimensions[0],
+                'height'    =>  $dimensions[1],
+            ];
+        }
+
+        // TODO recalculate dimensions if $attributes['width'] or 'height' exists
+
         $attributes = array_merge([
-            'src'       =>  $url,
             'srcset'    =>  $this->get_srcset(),
-            'width'     =>  $this->get_width(),
-            'height'    =>  $this->get_height(),
-        ], $attributes);
+        ], $data, $attributes);
 
         return $attributes;
     }

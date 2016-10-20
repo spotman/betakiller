@@ -32,6 +32,8 @@ class Widget_CustomTag_Gallery extends Widget
         if (!in_array($type, $allowed_types))
             throw new Widget\Exception('Unknown gallery type :value', [':value' => $type]);
 
+        $columns = (int) Arr::get($context, 'columns', 3);
+
         $images = [];
 
         foreach ($image_ids as $id)
@@ -41,7 +43,7 @@ class Widget_CustomTag_Gallery extends Widget
             if (!$model->loaded())
                 continue;
 
-            $images[] = $model->get_arguments_for_img_tag($model->get_original_url());
+            $images[] = $model->get_arguments_for_img_tag($model::SIZE_PREVIEW);
         }
 
         if (!$images)
@@ -52,6 +54,7 @@ class Widget_CustomTag_Gallery extends Widget
         return [
             'images'    =>  $images,
             'type'      =>  $type,
+            'columns'   =>  $columns,
         ];
     }
 }

@@ -33,7 +33,7 @@ class Widget_CustomTag_Image extends Widget
         $classes['align'] = $align;
 
         $attributes = [
-            'id'        =>  'admin-image-'.$model->get_id(),
+            'id'    =>  'content-image-'.$model->get_id(),
             'title' =>  $title ?: $model->get_title(),
             'alt'   =>  $alt ?: $model->get_alt(),
             'class' =>  implode(' ', array_unique($classes)),
@@ -44,7 +44,7 @@ class Widget_CustomTag_Image extends Widget
         }
 
         return [
-            'image'     =>  $model->get_arguments_for_img_tag($model->get_original_url(), $attributes),
+            'image'     =>  $model->get_arguments_for_img_tag($model::SIZE_ORIGINAL, $attributes),
         ];
     }
 }

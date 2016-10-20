@@ -22,12 +22,7 @@ abstract class Assets_Provider_Image extends Assets_Provider {
         if ( ! $url )
             throw new Assets_Provider_Exception('Model must have url');
 
-        $allowed_sizes = $this->get_allowed_preview_sizes();
-
-        if ( $size === NULL AND count($allowed_sizes) > 0 )
-        {
-            $size = $allowed_sizes[0];
-        }
+        $size = $this->determine_size($size, $this->get_allowed_preview_sizes());
 
         $options = array(
             'provider'  =>  $this->_codename,
@@ -53,12 +48,7 @@ abstract class Assets_Provider_Image extends Assets_Provider {
         if ( ! $url )
             throw new Assets_Provider_Exception('Model must have url');
 
-        $allowed_sizes = $this->get_allowed_crop_sizes();
-
-        if ( $size === NULL AND count($allowed_sizes) == 1 )
-        {
-            $size = $allowed_sizes[0];
-        }
+        $size = $this->determine_size($size, $this->get_allowed_crop_sizes());
 
         $options = array(
             'provider'  =>  $this->_codename,
@@ -71,15 +61,40 @@ abstract class Assets_Provider_Image extends Assets_Provider {
         return Route::url('assets-provider-item-crop', $options);
     }
 
+    public function get_preview_dimensions($size = null)
+    {
+        $size = $this->determine_size($size, $this->get_allowed_preview_sizes());
+
+        $dimensions = explode(self::SIZE_X, $size);
+        $width = $dimensions[0] ? (int) $dimensions[0] : NULL;
+        $height = $dimensions[1] ? (int) $dimensions[1] : NULL;
+
+        return [$width, $height];
+    }
+
+    protected function determine_size($size, array $allowed_sizes)
+    {
+        if ( $size === NULL && count($allowed_sizes) > 0 )
+        {
+            $size = $allowed_sizes[0];
+        }
+
+        if (!$size)
+            throw new Assets_Provider_Exception('Can not determine image size');
+
+        return $size;
+    }
+
     public function prepare_preview(Assets_Model_ImageInterface $model, $size)
     {
         $this->check_preview_size($size);
 
         $content = $this->get_content($model);
 
-        $dimensions = explode(self::SIZE_X, $size);
-        $width = $dimensions[0] ? (int) $dimensions[0] : NULL;
-        $height = $dimensions[1] ? (int) $dimensions[1] : NULL;
+        $dimensions = $this->get_preview_dimensions($size);
+
+        $width = $dimensions[0];
+        $height = $dimensions[1];
 
         if ( ! $width AND ! $height )
             throw new Assets_Provider_Exception('Preview size must have width or height defined');
