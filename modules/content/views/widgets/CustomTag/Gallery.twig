@@ -1,20 +1,21 @@
 {% if images|length %}
 
-    <div class="carousel content-gallery is-hidden">
+    {% if type == "masonry" %}
 
+        {# TODO type-related block #}
+
+    {% elseif type == "slider" %}
+
+    <div class="carousel content-gallery is-hidden">
         {% for image in images %}
-        {#<a class="carousel-item" href="#carousel-image-{{ loop.index }}">#}
             {{ image(image, { class: "responsive-img carousel-cell" }, true) }}
-        {#</a>#}
         {% endfor %}
     </div>
 
-{% else %}
-    <br>
-    <br>
-    <p>no images</p>
-    <br>
-    <br>
-{% endif %}
+    {% else %}
+        {# Unknown gallery type #}
+    {% endif %}
 
-{# TODO type-related blocks #}
+{% else %}
+    {# No images #}
+{% endif %}

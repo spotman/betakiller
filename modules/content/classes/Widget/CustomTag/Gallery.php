@@ -44,6 +44,11 @@ class Widget_CustomTag_Gallery extends Widget
             $images[] = $model->get_arguments_for_img_tag($model->get_original_url());
         }
 
+        if (!$images)
+        {
+            $this->warning('Gallery has no images for ids [:ids]', [':ids' => implode(', ', $image_ids)]);
+        }
+
         return [
             'images'    =>  $images,
             'type'      =>  $type,
