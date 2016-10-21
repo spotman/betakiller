@@ -70,10 +70,12 @@ abstract class Assets_Model_ORM_Image extends Assets_Model_ORM implements Assets
 
     public function get_arguments_for_img_tag($size, array $attributes = [])
     {
+        $original_url = $this->get_original_url();
+
         if ($size == self::SIZE_ORIGINAL)
         {
             $data = [
-                'src'       =>  $this->get_original_url(),
+                'src'       =>  $original_url,
                 'width'     =>  $this->get_width(),
                 'height'    =>  $this->get_height(),
             ];
@@ -86,7 +88,6 @@ abstract class Assets_Model_ORM_Image extends Assets_Model_ORM implements Assets
 
             $data = [
                 'src'       =>  $this->get_preview_url(),
-                'url'       =>  $this->get_original_url(),
                 'width'     =>  $dimensions[0],
                 'height'    =>  $dimensions[1],
             ];
@@ -95,6 +96,7 @@ abstract class Assets_Model_ORM_Image extends Assets_Model_ORM implements Assets
         // TODO recalculate dimensions if $attributes['width'] or 'height' exists
 
         $attributes = array_merge([
+            'url'       =>  $original_url,
             'srcset'    =>  $this->get_srcset(),
         ], $data, $attributes);
 
