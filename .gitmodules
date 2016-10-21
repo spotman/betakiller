@@ -13,9 +13,6 @@
 [submodule "modules/meta-tags"]
 	path = modules/meta-tags
 	url = git@github.com:spotman/kohana-meta-tags.git
-[submodule "modules/hashids"]
-	path = modules/hashids
-	url = git@github.com:spotman/hashids-kohana.git
 [submodule "modules/device"]
 	path = modules/device
 	url = git@github.com:spotman/kohana-device.git
