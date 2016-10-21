@@ -4,7 +4,7 @@
 
         {% set column_class = "s" ~ (12 / columns)|round(0, 'floor') %}
 
-        <div class="content-gallery masonry row">
+        <div class="content-gallery content-gallery-masonry row">
             {% for image in images %}
                 <a href="{{ image.url }}" class="col {{ column_class }} swipebox" rel="content-images">
                     {{ image(image, { class: "responsive-img" }, true) }}
@@ -14,9 +14,9 @@
 
     {% elseif type == "slider" %}
 
-    <div class="content-gallery carousel is-hidden">
+    <div class="content-gallery content-gallery-slider is-hidden">
         {% for image in images %}
-            {{ image(image, { class: "responsive-img carousel-cell swipebox", rel: "content-images" }, true) }}
+            {{ image(image, { class: "responsive-img carousel-cell swipebox", rel: "content-images", href: image.url }, true) }}
         {% endfor %}
     </div>
 
