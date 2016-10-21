@@ -6,7 +6,7 @@
 
         <div class="content-gallery content-gallery-masonry row">
             {% for image in images %}
-                <a href="{{ image.url }}" class="col {{ column_class }} swipebox" rel="content-images">
+                <a href="{{ image["data-original-url"] }}" class="col {{ column_class }} swipebox" rel="content-images">
                     {{ image(image, { class: "responsive-img" }, true) }}
                 </a>
             {% endfor %}
@@ -16,12 +16,10 @@
 
     <div class="content-gallery content-gallery-slider is-hidden">
         {% for image in images %}
-            {{ image(image, { class: "responsive-img carousel-cell swipebox", rel: "content-images", href: image.url }, true) }}
+            {{ image(image, { class: "responsive-img carousel-cell swipebox", rel: "content-images", href: image["data-original-url"] }, true) }}
         {% endfor %}
     </div>
 
-    {% else %}
-        {# Unknown gallery type #}
     {% endif %}
 
 {% else %}

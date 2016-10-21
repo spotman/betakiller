@@ -87,7 +87,7 @@ abstract class Assets_Model_ORM_Image extends Assets_Model_ORM implements Assets
             $dimensions = $this->get_preview_dimensions($size);
 
             $data = [
-                'src'       =>  $this->get_preview_url(),
+                'src'       =>  $this->get_preview_url($size),
                 'width'     =>  $dimensions[0],
                 'height'    =>  $dimensions[1],
             ];
@@ -96,8 +96,8 @@ abstract class Assets_Model_ORM_Image extends Assets_Model_ORM implements Assets
         // TODO recalculate dimensions if $attributes['width'] or 'height' exists
 
         $attributes = array_merge([
-            'url'       =>  $original_url,
-            'srcset'    =>  $this->get_srcset(),
+            'data-original-url' =>  $original_url,
+            'srcset'            =>  $this->get_srcset(),
         ], $data, $attributes);
 
         return $attributes;

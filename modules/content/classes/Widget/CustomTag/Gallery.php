@@ -43,7 +43,7 @@ class Widget_CustomTag_Gallery extends Widget
             if (!$model->loaded())
                 continue;
 
-            $images[] = $model->get_arguments_for_img_tag($model::SIZE_ORIGINAL);
+            $images[] = $model->get_arguments_for_img_tag($model::SIZE_PREVIEW);
         }
 
         if (!$images)
