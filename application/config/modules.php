@@ -23,7 +23,7 @@ return array(
     'email'                 => MODPATH.'email',                 // Mailing module
 //    'excel-import'          => MODPATH.'excel-import',          // Import Excel documents
     'geocode'               => MODPATH.'geocode',               // Geocoder-php wrapper
-    'hashids'               => MODPATH.'hashids',               // youtu.be like hash id generator and parser
+//    'hashids'               => MODPATH.'hashids',               // youtu.be like hash id generator and parser
     'jsonrpc'               => MODPATH.'jsonrpc',               // JSON-RPC server
     'image'                 => MODPATH.'image',                 // Image manipulation
     'i18n-plural'           => MODPATH.'i18n-plural',           // International pluralization
