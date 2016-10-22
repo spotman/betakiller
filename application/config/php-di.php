@@ -35,6 +35,10 @@ return [
             return new \BetaKiller\Config\Config();
         }),
 
+        \BetaKiller\DI\ContainerInterface::class =>  DI\factory(function() {
+            return \BetaKiller\DI\Container::instance();
+        }),
+
     ],
 
 ];

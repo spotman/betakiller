@@ -297,7 +297,7 @@ abstract class IFace
         return $this->_parent;
     }
 
-    function set_parent(IFace $parent)
+    public function set_parent(IFace $parent)
     {
         $this->_parent = $parent;
 
@@ -388,6 +388,28 @@ abstract class IFace
     {
         return (bool) \Kohana::config('iface.'.self::CONFIG_KEY_IS_TRAILING_SLASH_ENABLED);
     }
+//
+//    /**
+//     * Returns array of IFaces for breadcrumbs rendering
+//     * Override this method if your IFace tree is not equal to real semantic
+//     *
+//     * @return \BetaKiller\IFace\Core\IFace[]
+//     */
+//    public function get_breadcrumbs_iface_stack()
+//    {
+//        return $this->url_dispatcher()->stack();
+//    }
+//
+//    /**
+//     * Returns url parameters prepared for breadcrumbs rendering
+//     * Override this method if your IFace tree is not equal to real semantic
+//     *
+//     * @return URL_Parameters
+//     */
+//    public function get_breadcrumbs_url_parameters()
+//    {
+//        return $this->url_parameters();
+//    }
 
     public function get_view()
     {

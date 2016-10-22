@@ -30,7 +30,7 @@ class Model_IFace extends TreeModel implements IFaceModelInterface
     /**
      * Returns list of child iface models
      *
-     * @return IFaceModelInterface[]|\BetaKiller\Utils\Kohana\TreeModel[]
+     * @return IFaceModelInterface[]|$this[]
      */
     function get_children()
     {
@@ -161,4 +161,17 @@ class Model_IFace extends TreeModel implements IFaceModelInterface
     {
         return (bool) $this->get('hide_in_site_map');
     }
+
+    /**
+     * Place here additional query params
+     *
+     * @return $this
+     */
+    protected function additional_tree_model_filtering()
+    {
+        // No filtering needed
+        return $this;
+    }
+
+
 }

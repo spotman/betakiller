@@ -1,11 +1,11 @@
 <?php
 namespace BetaKiller\IFace;
 
-use BetaKiller\Helper;
+use BetaKiller\Helper\Base;
 
 abstract class IFace extends Kohana\IFace
 {
-    use Helper\Base;
+    use Base;
 
     final protected function process_api_response(\API_Response $response)
     {

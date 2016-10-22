@@ -2,6 +2,8 @@
 
 use BetaKiller\IFace\Core\IFace;
 use BetaKiller\IFace\IFaceModelInterface;
+use BetaKiller\Config\ConfigInterface;
+use BetaKiller\DI\ContainerInterface;
 
 class IFace_Provider {
 
@@ -13,13 +15,27 @@ class IFace_Provider {
     protected $_model_provider;
 
     /**
+     * @var ConfigInterface
+     */
+    protected $_config;
+
+    /**
+     * @var ContainerInterface
+     */
+    protected $_container;
+
+    /**
      * IFace_Provider constructor
      *
-     * @param IFace_Model_Provider $_model_provider
+     * @param IFace_Model_Provider $model_provider
+     * @param ConfigInterface $config
+     * @param ContainerInterface $container
      */
-    public function __construct(IFace_Model_Provider $_model_provider)
+    public function __construct(IFace_Model_Provider $model_provider, ConfigInterface $config, ContainerInterface $container)
     {
-        $this->_model_provider = $_model_provider;
+        $this->_model_provider = $model_provider;
+        $this->_config = $config;
+        $this->_container = $container;
     }
 
     public function by_codename($codename)
@@ -91,21 +107,25 @@ class IFace_Provider {
         return $this->iface_factory($default_model);
     }
 
+    // TODO Move to IFaceFactory
     protected function iface_factory(IFaceModelInterface $model)
     {
+        // TODO move to class AppConfig and inject it as dependency
+        $ns = $this->_config->load('app.namespace');
+
         $codename = $model->get_codename();
 
-        $class_name = 'IFace_'.$codename;
+        $class_name = $ns
+            ? implode('\\', [$ns, 'IFace', $codename])
+            : 'IFace_'.$codename;
 
-        if ( ! class_exists($class_name) )
-        {
-            $class_name = 'IFace_Default';
-        }
-
-        $container = \BetaKiller\DI\Container::instance();
+//        if ( ! class_exists($class_name) )
+//        {
+//            $class_name = 'IFace_Default';
+//        }
 
         /** @var IFace $object */
-        $object = $container->get($class_name);
+        $object = $this->_container->get($class_name);
 
         if ( ! ($object instanceof IFace) )
             throw new IFace_Exception('Class :class must be instance of class IFace', array(':class' => $class_name));

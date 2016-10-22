@@ -224,23 +224,34 @@ abstract class Core_URL_Dispatcher {
 
     /**
      * Returns COPY of the IFace stack
-     * @return array
+     * @return IFace[]
      */
     public function stack()
     {
         return array_values($this->_iface_stack);
     }
 
+    /**
+     * @return IFace
+     */
     public function current_iface()
     {
         return $this->_current_iface;
     }
 
+    /**
+     * @param IFace $iface
+     * @return bool
+     */
     public function is_current_iface(IFace $iface)
     {
         return ( $this->_current_iface->get_codename() == $iface->get_codename() );
     }
 
+    /**
+     * @param IFace $iface
+     * @return $this
+     */
     protected function push_to_stack(IFace $iface)
     {
         $this->_iface_stack[ $iface->get_codename() ] = $iface;
@@ -381,7 +392,10 @@ abstract class Core_URL_Dispatcher {
         $object = Model::factory($model_name);
 
         if ( ! ($object instanceof URL_DataSource) )
-            throw new URL_Dispatcher_Exception('The model :name must implement URL_DataSource', array(':name' => $model_name));
+            throw new URL_Dispatcher_Exception('The model :name must implement :proto', [
+                ':name' => $model_name,
+                ':proto' => URL_DataSource::class
+            ]);
 
         return $object;
     }

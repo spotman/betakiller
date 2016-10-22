@@ -97,9 +97,17 @@ class IFace_Model_Provider_Admin_Model implements IFaceModelInterface
     }
 
     /**
+     * @return \BetaKiller\IFace\IFaceModelInterface[]
+     */
+    public function get_root()
+    {
+        return $this->get_provider()->get_root();
+    }
+
+    /**
      * Returns list of child iface models
      *
-     * @return IFaceModelInterface[]
+     * @return \BetaKiller\IFace\IFaceModelInterface[]
      */
     public function get_children()
     {
