@@ -298,6 +298,9 @@ abstract class Core_URL_Dispatcher {
                 array(':prototype' => $prototype_string, ':value' => $uri_value)
             );
 
+        // Allow current model to preset "belongs to" models
+        $model->preset_linked_models($this->parameters());
+
         // Store model into registry
         $setter = mb_strtolower('set_'.$model_name);
         $registry = $this->parameters();

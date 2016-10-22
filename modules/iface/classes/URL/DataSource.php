@@ -29,4 +29,13 @@ interface URL_DataSource {
      */
     public function get_available_items_by_url_key($key, URL_Parameters $parameters);
 
+    /**
+     *
+     * This method allows inheritor to preset linked model in URL parameters
+     * It is executed after successful url dispatching
+     *
+     * @param URL_Parameters $parameters
+     * @return void
+     */
+    public function preset_linked_models(URL_Parameters $parameters);
 }

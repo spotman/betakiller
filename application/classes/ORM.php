@@ -100,6 +100,20 @@ class ORM extends Utils\Kohana\ORM
     }
 
     /**
+     *
+     * This method allows inheritor to preset linked model in URL parameters
+     * It is executed after successful url dispatching
+     *
+     * @param URL_Parameters $parameters
+     *
+     * @return void
+     */
+    public function preset_linked_models(URL_Parameters $parameters)
+    {
+        // Nothing by default
+    }
+
+    /**
      * @return \Database_Result|\$this[]
      * @throws Kohana_Exception
      */
