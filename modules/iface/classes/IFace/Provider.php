@@ -115,9 +115,25 @@ class IFace_Provider {
 
         $codename = $model->get_codename();
 
-        $class_name = $ns
-            ? implode('\\', [$ns, 'IFace', $codename])
-            : 'IFace_'.$codename;
+        $codename_array = explode('_', $codename);
+
+        // Add IFace prefix
+        array_unshift($codename_array, 'IFace');
+
+        $separator = '\\';
+
+        if ($ns)
+        {
+            // Add namespace prefix
+            array_unshift($codename_array, $ns);
+        }
+        else
+        {
+            // Legacy separator
+            $separator = '_';
+        }
+
+        $class_name = implode($separator, $codename_array);
 
 //        if ( ! class_exists($class_name) )
 //        {

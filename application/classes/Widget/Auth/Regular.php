@@ -27,7 +27,8 @@ class Widget_Auth_Regular extends Widget {
 
         // TODO валидация данных перед проверкой
 
-        Env::auth()->login($user_login, $user_password);
+        // TODO DI
+        Auth::instance()->login($user_login, $user_password);
 
         // Возвращаем соответствующий ответ
         $this->send_json(Response::JSON_SUCCESS);

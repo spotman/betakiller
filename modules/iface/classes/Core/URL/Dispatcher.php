@@ -114,7 +114,7 @@ abstract class Core_URL_Dispatcher {
             $url_iterator->next();
         }
 
-        // TODO Cache stack for current URL
+        // TODO Cache stack (between HTTP requests) for current URL
 
         // Return last IFace
         return $iface_instance;

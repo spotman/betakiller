@@ -38,16 +38,23 @@ class BetaKiller_Kohana_Exception extends Kohana_Kohana_Exception
     {
         static::$_counter++;
 
-        // Logging exception
-        static::log($exception);
-
         if ( static::$_counter > 10 )
         {
-            static::log(new static('Too much exceptions (recursion)'));
+            static::log(new static('Too much exceptions (recursion) for :msg', [':msg' => self::text($exception)]));
             die();
         }
 
-        $always_show_nice_message = ($exception instanceof Kohana_Exception)
+        $notify = ($exception instanceof self)
+            ? $exception->is_notification_enabled()
+            : TRUE;
+
+        if ($notify)
+        {
+            // Logging exception
+            static::log($exception);
+        }
+
+        $always_show_nice_message = ($exception instanceof self)
             ? $exception->always_show_nice_message()
             : FALSE;
 
