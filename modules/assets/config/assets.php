@@ -3,7 +3,7 @@
 return array(
 
     'deploy'    =>  [
-        'enabled'           =>  (Kohana::$environment == Kohana::PRODUCTION),
+        'enabled'           =>  (in_array(Kohana::$environment, [Kohana::STAGING, Kohana::PRODUCTION])),
         'directory_mask'    =>  0775,
     ],
 
