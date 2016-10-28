@@ -243,9 +243,33 @@ abstract class Core_URL_Dispatcher {
      * @param IFace $iface
      * @return bool
      */
-    public function is_current_iface(IFace $iface)
+    public function is_current_iface(IFace $iface, URL_Parameters $parameters = NULL)
     {
-        return ( $this->_current_iface->get_codename() == $iface->get_codename() );
+        if (!$this->_current_iface || $this->_current_iface->get_codename() != $iface->get_codename()) {
+            return FALSE;
+        }
+
+        if (!$parameters) {
+            return TRUE;
+        }
+
+        $current_params = $this->parameters();
+
+        foreach ( $parameters->getAll() as $key => $param_model) {   /** @var URL_DataSource $param_model */
+
+            if ( !$current_params->has($key) ) {
+                return FALSE;
+            }
+
+            /** @var URL_DataSource $current_model */
+            $current_model = $current_params->get($key);
+
+            if ($param_model->get_url_item_id() != $current_model->get_url_item_id()) {
+                return FALSE;
+            }
+        }
+
+        return TRUE;
     }
 
     /**

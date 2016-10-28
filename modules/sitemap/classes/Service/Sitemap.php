@@ -128,7 +128,7 @@ class Service_Sitemap extends Service
         $iface = $this->iface_from_model($model);
 
         // Get current item full URL
-        $url = $iface->url($this->_url_parameters, TRUE);
+        $url = $iface->url($this->_url_parameters);
 
         // TODO Force calculation of the last_modified
         $last_modified = $iface->get_last_modified();

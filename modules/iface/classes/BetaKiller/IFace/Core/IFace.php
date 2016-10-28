@@ -337,9 +337,21 @@ abstract class IFace
         return $this->url_dispatcher()->in_stack($this);
     }
 
-    public function url(URL_Parameters $parameters = NULL, $with_domain = TRUE)
+    public function is_current(URL_Parameters $parameters = NULL)
     {
+        return $this->url_dispatcher()->is_current_iface($this, $parameters);
+    }
+
+    public function url(URL_Parameters $parameters = NULL, $remove_cycling_links = TRUE)
+    {
+        if ($remove_cycling_links && $this->is_current($parameters))
+        {
+            // TODO Implement AppConfig and get default url value from it
+            return '#';
+        }
+
         $parts = array();
+        $with_domain = TRUE;
 
         if (!$this->is_default()) {
             $current = $this;

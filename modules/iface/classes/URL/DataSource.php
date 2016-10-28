@@ -1,7 +1,7 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
-interface URL_DataSource {
-
+interface URL_DataSource
+{
     /**
      * Performs search for model item where the $key property value is equal to $value
      *
@@ -38,4 +38,11 @@ interface URL_DataSource {
      * @return void
      */
     public function preset_linked_models(URL_Parameters $parameters);
+
+    /**
+     * Returns string identifier of current DataSource item
+     *
+     * @return string
+     */
+    public function get_url_item_id();
 }

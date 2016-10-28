@@ -114,6 +114,16 @@ class ORM extends Utils\Kohana\ORM
     }
 
     /**
+     * Returns string identifier of current DataSource item
+     *
+     * @return string
+     */
+    public function get_url_item_id()
+    {
+        return $this->get_id();
+    }
+
+    /**
      * @return \Database_Result|\$this[]
      * @throws Kohana_Exception
      */

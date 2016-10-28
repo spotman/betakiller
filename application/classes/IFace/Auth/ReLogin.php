@@ -4,6 +4,8 @@ class IFace_Auth_ReLogin extends IFace_Auth_Login {
 
     public function render()
     {
+        // TODO DI
+
         // If user is logged in
         if ( Env::user(TRUE) )
         {

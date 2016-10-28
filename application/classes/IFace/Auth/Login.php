@@ -27,7 +27,7 @@ class IFace_Auth_Login extends IFace {
             }
 
             // Initialize redirect url
-            $this->_redirect_url = $request->query($this->_redirect_url_query_param) ?: $this->_self_url;
+            $this->_redirect_url = urldecode($request->query($this->_redirect_url_query_param)) ?: $this->_self_url;
         }
     }
 
@@ -63,10 +63,17 @@ class IFace_Auth_Login extends IFace {
         return $this;
     }
 
+    public function redirect_to_current_iface()
+    {
+        $url = $this->url_dispatcher()->current_iface()->url(NULL, FALSE);
+
+        return $this->redirect_to($url);
+    }
+
     public function get_uri()
     {
         $redirect_query = $this->_redirect_url
-            ? '?'.$this->_redirect_url_query_param.'='.$this->_redirect_url
+            ? '?'.$this->_redirect_url_query_param.'='.urlencode($this->_redirect_url)
             : NULL;
 
         return parent::get_uri().$redirect_query;
