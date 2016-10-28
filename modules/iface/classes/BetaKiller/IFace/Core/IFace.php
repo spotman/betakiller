@@ -1,6 +1,7 @@
 <?php
 namespace BetaKiller\IFace\Core;
 
+use BetaKiller\Config\AppConfigInterface;
 use DateInterval;
 use DateTime;
 use IFace_Exception;
@@ -13,7 +14,6 @@ use View_IFace;
 
 abstract class IFace
 {
-    const CONFIG_KEY_IS_TRAILING_SLASH_ENABLED = 'url.is_trailing_slash_enabled';
 
     /**
      * @var IFaceModelInterface
@@ -36,9 +36,10 @@ abstract class IFace
     protected $_expires;
 
     /**
-     * @var array
+     * @Inject
+     * @var AppConfigInterface
      */
-    protected static $_config;
+    private $_app_config;
 
     /**
      * @Inject
@@ -346,8 +347,7 @@ abstract class IFace
     {
         if ($remove_cycling_links && $this->is_current($parameters))
         {
-            // TODO Implement AppConfig and get default url value from it
-            return '#';
+            return $this->_app_config->get_circular_link_href();
         }
 
         $parts = array();
@@ -398,9 +398,9 @@ abstract class IFace
      */
     public function is_trailing_slash_enabled()
     {
-        return (bool) \Kohana::config('iface.'.self::CONFIG_KEY_IS_TRAILING_SLASH_ENABLED);
+        return $this->_app_config->is_trailing_slash_enabled();
     }
-//
+
 //    /**
 //     * Returns array of IFaces for breadcrumbs rendering
 //     * Override this method if your IFace tree is not equal to real semantic

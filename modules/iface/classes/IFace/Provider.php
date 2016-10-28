@@ -2,10 +2,12 @@
 
 use BetaKiller\IFace\Core\IFace;
 use BetaKiller\IFace\IFaceModelInterface;
-use BetaKiller\Config\ConfigInterface;
+use BetaKiller\Config\AppConfigInterface;
 use BetaKiller\DI\ContainerInterface;
 
-class IFace_Provider {
+class IFace_Provider
+{
+
 
     protected $_iface_instances;
 
@@ -15,9 +17,9 @@ class IFace_Provider {
     protected $_model_provider;
 
     /**
-     * @var ConfigInterface
+     * @var AppConfigInterface
      */
-    protected $_config;
+    protected $_app_config;
 
     /**
      * @var ContainerInterface
@@ -27,15 +29,15 @@ class IFace_Provider {
     /**
      * IFace_Provider constructor
      *
-     * @param IFace_Model_Provider $model_provider
-     * @param ConfigInterface $config
-     * @param ContainerInterface $container
+     * @param IFace_Model_Provider                  $model_provider
+     * @param \BetaKiller\Config\AppConfigInterface $app_config
+     * @param ContainerInterface                    $container
      */
-    public function __construct(IFace_Model_Provider $model_provider, ConfigInterface $config, ContainerInterface $container)
+    public function __construct(IFace_Model_Provider $model_provider, AppConfigInterface $app_config, ContainerInterface $container)
     {
         $this->_model_provider = $model_provider;
-        $this->_config = $config;
-        $this->_container = $container;
+        $this->_app_config     = $app_config;
+        $this->_container      = $container;
     }
 
     public function by_codename($codename)
@@ -110,8 +112,7 @@ class IFace_Provider {
     // TODO Move to IFaceFactory
     protected function iface_factory(IFaceModelInterface $model)
     {
-        // TODO move to class AppConfig and inject it as dependency
-        $ns = $this->_config->load('app.namespace');
+        $ns = $this->_app_config->get_namespace();
 
         $codename = $model->get_codename();
 

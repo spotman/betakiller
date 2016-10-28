@@ -33,16 +33,16 @@ abstract class Assets_Provider {
         $this->_user = $user;
     }
 
-    public function get_assets_config_value($key)
+    public function get_assets_config_value(array $path)
     {
-        return $this->_config->load(self::CONFIG_KEY.'.'.$key);
+        return $this->_config->load(array_merge([self::CONFIG_KEY], $path));
     }
 
-    public function get_assets_provider_config_value($key, $codename = null)
+    public function get_assets_provider_config_value(array $path, $codename = null)
     {
         $codename = $codename ?: $this->_codename;
 
-        return $this->get_assets_config_value('providers.'.$codename.'.'.$key);
+        return $this->get_assets_config_value(array_merge(['providers', $codename], $path));
     }
 
 //    protected function get_permissions_config_value($type)
@@ -219,7 +219,7 @@ abstract class Assets_Provider {
 
     public function deploy(Request $request, Assets_ModelInterface $model, $content)
     {
-        $deploy_allowed = (bool) $this->get_assets_config_value('deploy.enabled');
+        $deploy_allowed = (bool) $this->get_assets_config_value(['deploy', 'enabled']);
 
         // No deployment in testing and developing environments
         if ( ! $deploy_allowed )
@@ -235,7 +235,7 @@ abstract class Assets_Provider {
         // Create deploy path if not exists
         if ( ! file_exists($path) )
         {
-            $mask = $this->get_assets_config_value('deploy.directory_mask');
+            $mask = $this->get_assets_config_value(['deploy', 'directory_mask']);
             mkdir($path, $mask, true);
         }
 

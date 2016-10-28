@@ -30,7 +30,7 @@ class Assets_Provider_ContentImage extends \Assets_Provider_Image
      */
     public function get_upload_max_height()
     {
-        return $this->get_assets_provider_config_value('upload.max-height');
+        return $this->get_assets_provider_config_value(['upload', 'max-height']);
     }
 
     /**
@@ -38,7 +38,7 @@ class Assets_Provider_ContentImage extends \Assets_Provider_Image
      */
     public function get_upload_max_width()
     {
-        return $this->get_assets_provider_config_value('upload.max-width');
+        return $this->get_assets_provider_config_value(['upload', 'max-width']);
     }
 
     /**
@@ -51,7 +51,7 @@ class Assets_Provider_ContentImage extends \Assets_Provider_Image
      */
     public function get_allowed_preview_sizes()
     {
-        return $this->get_assets_provider_config_value('sizes.preview');
+        return $this->get_assets_provider_config_value(['sizes', 'preview']);
     }
 
     /**
@@ -64,7 +64,7 @@ class Assets_Provider_ContentImage extends \Assets_Provider_Image
      */
     public function get_allowed_crop_sizes()
     {
-        return $this->get_assets_provider_config_value('sizes.crop');
+        return $this->get_assets_provider_config_value(['sizes', 'crop']);
     }
 
     /**

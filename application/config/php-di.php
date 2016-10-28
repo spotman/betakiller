@@ -39,6 +39,8 @@ return [
             return \BetaKiller\DI\Container::instance();
         }),
 
+        \BetaKiller\Config\AppConfigInterface::class => DI\get(\BetaKiller\Config\AppConfig::class),
+
     ],
 
 ];
