@@ -48,7 +48,7 @@ class AppConfig implements AppConfigInterface
      */
     public function get_circular_link_href()
     {
-        return $this->get(self::CONFIG_PATH_CIRCULAR_LINK_HREF, '#');
+        return $this->get(self::CONFIG_PATH_CIRCULAR_LINK_HREF);
     }
 
     /**

@@ -17,6 +17,7 @@ abstract class Assets_Provider {
     protected $_storage_instance;
 
     /**
+     * @Inject
      * @var ConfigInterface
      */
     protected $_config;
