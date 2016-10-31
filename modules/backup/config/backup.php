@@ -17,6 +17,6 @@ return array(
     'folder'    =>  realpath(DOCROOT.'..'.DIRECTORY_SEPARATOR),
 
     'useTimestampedPrefix' => false,
-    'prefix'    =>  'Y-M-l',
+    'prefix'    =>  date('Y-M-l'),
 
 );
