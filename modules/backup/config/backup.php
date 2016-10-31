@@ -16,4 +16,7 @@ return array(
     'database'  =>  'default',
     'folder'    =>  realpath(DOCROOT.'..'.DIRECTORY_SEPARATOR),
 
+    'useTimestampedPrefix' => false,
+    'prefix'    =>  'Y-M-l',
+
 );

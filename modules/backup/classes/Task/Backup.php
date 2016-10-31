@@ -20,7 +20,6 @@ class Task_Backup extends Minion_Task {
 
         $this->debug('Service '.$service.' selected');
 
-        $instance->setName('MyBackup');
         $instance->setType($this->config('backup.type'));
 
         $dbKey = 'database.'.$this->config('backup.database').'.';
@@ -44,7 +43,7 @@ class Task_Backup extends Minion_Task {
         if ( $dbDriver == 'mysql' )
             $dbName .= ';charset=utf8';
 
-        $instance->db(
+        $instance->setConnection(
             $dbUser, // user
             $dbPass, // pass
             $dbName, // db name
@@ -56,10 +55,15 @@ class Task_Backup extends Minion_Task {
 
         $this->info('Backing up folder '.$folder);
 
-        $instance->folder($folder);
+        $prefix = $this->config('backup.prefix');
+        $timestampedPrefix = $this->config('backup.useTimestampedPrefix');
 
-        if ( $instance->backup() )
-            $this->info('Backup done, see file '.$instance->getName().'.'.$instance->getType());
+        $instance
+            ->setPath($folder)
+            ->setPrefix($prefix, $timestampedPrefix);
+
+        if ( $instance->execute() )
+            $this->info('Backup done, see file '.$instance->getRealName());
         else
             $this->warning('Backup was not created!');
     }
@@ -71,5 +75,4 @@ class Task_Backup extends Minion_Task {
 
         throw new Task_Exception('Unknown database driver :name', array(':name' => $driver));
     }
-
 }

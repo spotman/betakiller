@@ -3,16 +3,14 @@
   "description": "BetaKiller development platform based on Kohana framework",
   "require": {
     "phpunit/phpunit": "3.7.*",
-    "anahkiasen/underscore-php": "dev-master",
     "willdurand/geocoder": "3.1.*",
     "phpoffice/phpexcel": "^1.8",
     "deployer/deployer": "^3.0",
-    "Foreword/phpMorphy": "*",
     "mk-j/php_xlsxwriter": "^0.21.0",
     "samdark/sitemap": "^2.0",
     "hashids/hashids": "^1.0",
     "twig/twig": "^1.22",
-    "dmamontov/davbackup": "~1.0.1",
+    "spotman/davbackup": "dev-master",
     "php-di/php-di": "^5.1",
     "doctrine/cache": "^1.5",
     "jakeasmith/http_build_url": "^1",
@@ -20,14 +18,5 @@
     "thunderer/shortcode": "^0.5",
     "doctrine/annotations": "^1.2"
   },
-
-  "repositories": [
-    {
-      "type": "git",
-      "url": "https://github.com/Foreword/phpMorphy.git",
-      "branch": "master"
-    }
-  ],
-  "require-dev": {
-  }
+  "require-dev": {}
 }
