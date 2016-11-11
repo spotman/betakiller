@@ -104,27 +104,31 @@ task('deploy:repository:update', function() {
     run(cd_repository_path_cmd().' && git pull && git submodule update --init --recursive');
 })->desc('Update repository');    // .env()->parse('{{repository_path}}')
 
-task('deploy:betakiller:vendors', function() {
-    if (commandExist('composer')) {
-        $composer = 'composer';
-    } else {
-        run(cd_repository_path_cmd()." && curl -sS https://getcomposer.org/installer | php");
-        $composer = 'php composer.phar';
-    }
-    run(cd_repository_path_cmd()." && $composer {{composer_options}}");
-})->desc('Process Composer inside repository');    // .env()->parse('{{repository_path}}')
+// Installing vendors in BetaKiller
+task('deploy:vendors:betakiller', function() {
+    echo process_vendors('core');
+})->desc('Process Composer inside BetaKiller repository');
 
-//// Complex task for fetching repo
-//task('deploy:repository', [
-//    'deploy:repository:clone',
-//    'deploy:repository:update',
-//]);
+// Installing vendors in app
+task('deploy:vendors:app', function () {
+    echo process_vendors('app');
+})->desc('Process Composer inside app repository');
+
+function process_vendors($repo) {
+    $composer = env('bin/composer');
+    $envVars = env('env_vars') ? 'export ' . env('env_vars') . ' &&' : '';
+
+    $path = get_working_path($repo);
+
+    return run("cd $path && $envVars $composer {{composer_options}}");
+}
 
 // Deploy app
 task('deploy:app', [
     'deploy:repository:prepare:app',
     'deploy:repository:clone',
     'deploy:repository:update',
+    'deploy:vendors:app',
 ])->desc('Deploy app repository');
 
 // Deploy BetaKiller
@@ -132,7 +136,7 @@ task('deploy:betakiller', [
     'deploy:repository:prepare:betakiller',
     'deploy:repository:clone',
     'deploy:repository:update',
-    'deploy:betakiller:vendors',
+    'deploy:vendors:betakiller',
 ])->desc('Deploy BetaKiller repository');
 
 
