@@ -106,12 +106,12 @@ task('deploy:repository:update', function() {
 
 // Installing vendors in BetaKiller
 task('deploy:vendors:betakiller', function() {
-    echo process_vendors('core');
+    process_vendors('core');
 })->desc('Process Composer inside BetaKiller repository');
 
 // Installing vendors in app
 task('deploy:vendors:app', function () {
-    echo process_vendors('app');
+    process_vendors('app');
 })->desc('Process Composer inside app repository');
 
 function process_vendors($repo) {
@@ -120,7 +120,13 @@ function process_vendors($repo) {
 
     $path = get_working_path($repo);
 
-    return run("cd $path && $envVars $composer {{composer_options}}");
+    $result = run("cd $path && $envVars $composer {{composer_options}}");
+
+    if (isVerbose()) {
+        write($result);
+    }
+
+    return $result;
 }
 
 // Deploy app
