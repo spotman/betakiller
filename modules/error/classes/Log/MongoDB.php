@@ -17,6 +17,15 @@ class Log_MongoDB extends Log_Writer {
      */
     const NOTIFICATION_REPEAT_DELAY = 30;
 
+    /**
+     * Log_MongoDB constructor.
+     */
+    public function __construct()
+    {
+        // Notification for absent mongodb driver
+        if (!class_exists(MongoClient::class, FALSE))
+            throw new \BetaKiller\Exception('Class MongoClient is missing, install MongoDB driver for PHP');
+    }
 
     /**
      * Write an array of messages.
