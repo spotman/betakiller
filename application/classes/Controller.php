@@ -47,7 +47,27 @@ abstract class Controller extends Controller_Proxy
     {
         parent::before();
 
+        $this->check_connection_protocol();
+
         $this->init_i18n();
+    }
+
+    /**
+     * Checks for current protocol and makes redirect if it`s not equal to the base protocol
+     */
+    protected function check_connection_protocol()
+    {
+        $base_protocol = parse_url(Kohana::$base_url, PHP_URL_SCHEME);
+
+        $is_secure_needed = ($base_protocol == 'https');
+
+        $is_secure = $this->request->secure();
+
+        if ( ($is_secure_needed && !$is_secure) || ($is_secure && !$is_secure_needed))
+        {
+            $url = $this->request->url($base_protocol);
+            $this->redirect($url);
+        }
     }
 
     /**
@@ -57,7 +77,7 @@ abstract class Controller extends Controller_Proxy
      */
     protected function init_i18n()
     {
-        // Смотрим, ести ли текущий язык в куке
+        // Get lang from cookie
         $user_lang = Cookie::get(I18n::COOKIE_NAME);
 
         $allowed_languages = I18n::lang_list();
@@ -68,21 +88,19 @@ abstract class Controller extends Controller_Proxy
                 array(':lang' => $user_lang, ':allowed' => implode(', ', $allowed_languages))
             );
 
-        // Если нет, получаем язык пользователя
+        // If current lang is not set
         if ( ! $user_lang )
         {
+            // Get current user
             $user = $this->current_user(TRUE);
 
-            // Если пользователь авторизован
+            // If user is authorized
             if ( $user )
             {
-                // Получаем его язык
+                // Get its lang
                 $user_lang = $user->get_language_name();
-
-                // И устанавливаем куку
-                Cookie::set(I18n::COOKIE_NAME, $user_lang);
             }
-            // Иначе выбираем наиболее подходящий язык
+            // Else detect the preferred lang
             else
             {
                 /** @var HTTP_Header $headers */
@@ -91,13 +109,15 @@ abstract class Controller extends Controller_Proxy
             }
         }
 
-        // Устанавливаем язык для перевода
+        // Store lang in cookie
+        Cookie::set(I18n::COOKIE_NAME, $user_lang);
+
+        // Set I18n lang
         I18n::lang($user_lang);
 
-        // Если мы в режиме разработки
+        // Save all absent keys if in development env
         if ( ! Kohana::in_production(TRUE) )
         {
-            // Сохраняем все непереведённые строки из пользовательского интерфейса
             register_shutdown_function(array("I18n", "write"));
         }
     }
@@ -264,11 +284,11 @@ abstract class Controller extends Controller_Proxy
     }
 
     /**
-     * Отправляет файл в stdout для скачивания, с правильными заголовками
+     * Sends file to STDOUT for viewing or downloading
      *
      * @param string $content String content of the file
      * @param string $mime_type MIME-type
-     * @param string $alias Имя файла, под которым файл появится у пользователя в браузере
+     * @param string $alias File name for browser`s "Save as" dialog
      * @param bool $force_download
      * @throws HTTP_Exception_500
      */
@@ -289,80 +309,9 @@ abstract class Controller extends Controller_Proxy
             $response->headers('Content-Disposition', 'attachment; filename='.$alias);
         }
     }
-
-    public static function bind_after(callable $callback)
-    {
-        static::$_after_callbacks[] = $callback;
-    }
-
-
-// Все подключения стилей и скриптов теперь делается из вьюшек и шаблонов
-// Код оставлен на будущее
-
-//    /**
-//     * Хелпер для добавления на страницу файла скрипта из директории static-files
-//     * @param $filename
-//     * @return $this
-//     */
-//    protected function add_script($filename)
-//    {
-//        $this->add_static_script($filename);
-//        return $this;
-//    }
 //
-//    /**
-//     * Хелпер для добавления на страницу файла стиля из директории static-files
-//     * @param $filename
-//     * @return $this
-//     */
-//    protected function add_style($filename)
+//    public static function bind_after(callable $callback)
 //    {
-//        $this->add_static_style($filename);
-//        return $this;
+//        static::$_after_callbacks[] = $callback;
 //    }
-//
-//    /**
-//     * Хелпер для добавления на страницу файла скрипта по URL
-//     * @param $filename
-//     * @return $this
-//     */
-//    protected function add_public_script($filename)
-//    {
-//        JS::add_public($filename);
-//        return $this;
-//    }
-//
-//    /**
-//     * Хелпер для добавления на страницу файла стиля по URL
-//     * @param $filename
-//     * @return $this
-//     */
-//    protected function add_public_style($filename)
-//    {
-//        CSS::add_public($filename);
-//        return $this;
-//    }
-//
-//    /**
-//     * Хелпер для добавления на страницу файла скрипта, размещённого в одной из директорий static-files
-//     * @param $filename
-//     * @return $this
-//     */
-//    protected function add_static_script($filename)
-//    {
-//        JS::add_static($filename);
-//        return $this;
-//    }
-//
-//    /**
-//     * Хелпер для добавления на страницу файла стиля, размещённого в одной из директорий static-files
-//     * @param $filename
-//     * @return $this
-//     */
-//    protected function add_static_style($filename)
-//    {
-//        CSS::add_static($filename);
-//        return $this;
-//    }
-
 }
