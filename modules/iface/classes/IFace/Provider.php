@@ -136,13 +136,19 @@ class IFace_Provider
 
         $class_name = implode($separator, $codename_array);
 
-//        if ( ! class_exists($class_name) )
-//        {
-//            $class_name = 'IFace_Default';
-//        }
-
-        /** @var IFace $object */
-        $object = $this->_container->get($class_name);
+        try
+        {
+            /** @var IFace $object */
+            $object = $this->_container->get($class_name);
+        }
+        catch (Exception $e)
+        {
+            throw new IFace_Exception('Can not instantiate :class class for codename :codename, error is: :msg', [
+                ':class'    =>  $class_name,
+                ':codename' =>  $codename,
+                ':msg'      =>  $e->getMessage(),
+            ]);
+        }
 
         if ( ! ($object instanceof IFace) )
             throw new IFace_Exception('Class :class must be instance of class IFace', array(':class' => $class_name));

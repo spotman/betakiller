@@ -44,7 +44,6 @@ return array(
 		'autoescape'          => TRUE,
 		'base_template_class' => 'Twig_Template',
         'cache'               => MultiSite::instance()->site_path().'/twig-cache',
-//        'cache'               => TWIGPATH.'cache',
 		'charset'             => 'utf-8',
 		'optimizations'       => -1,
 		'strict_variables'    => TRUE,

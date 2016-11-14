@@ -36,7 +36,7 @@ return array(
     ),
 
     // Full path to site DOCROOT
-    'path' => MultiSite::instance()->doc_root().DIRECTORY_SEPARATOR,
+    'path' => DOCROOT,
 
     // Path to copy static files that are not build in one file
     'url' => '/assets/static/',
@@ -61,7 +61,6 @@ return array(
         'css',
         'js',
         'html',
-        'twig',
     ),
 
     'jquery_url' => 'https://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js',

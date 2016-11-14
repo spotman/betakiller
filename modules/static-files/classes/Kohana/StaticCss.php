@@ -79,8 +79,10 @@ class Kohana_StaticCss extends StaticFile {
 	 */
 	public function addCssInline($css_inline)
 	{
-		$css_inline = str_replace('{staticfiles_url}', STATICFILES_URL, $css_inline);
+        $css_inline = $this->replace_keys($css_inline);
 		$this->_css_inline[$css_inline] = $css_inline;
+
+        return $this;
 	}
 
 	/**

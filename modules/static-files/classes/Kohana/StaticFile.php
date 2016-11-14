@@ -23,6 +23,7 @@ class Kohana_StaticFile {
 	 * @param  string $file
 	 * @param  string $data
 	 * @return void
+     * @throws \Kohana_Exception
 	 */
 	function save($file, $data)
 	{
@@ -107,6 +108,7 @@ class Kohana_StaticFile {
 	 *
 	 * @param  string $file_name
 	 * @return string
+     * @throws \Kohana_Exception
 	 */
 	public function cache_file($file_name)
 	{
@@ -163,11 +165,40 @@ class Kohana_StaticFile {
 
     public function replace_keys($str)
     {
+        $base_url = $this->get_base_url(TRUE);
+
         return str_replace(
-            array('{staticfiles_url}', '{# assets_base_url #}'),
-            STATICFILES_URL,
+            ['{staticfiles_url}', '{# assets_base_url #}'],
+            $base_url,
             $str
         );
+    }
+
+    public function get_base_url($include_host = FALSE)
+    {
+        $url = $this->_config->get('url');
+
+        if ($include_host)
+        {
+            $url = trim($this->get_host(), '/').'/'.$url;
+        }
+
+        return $url;
+    }
+
+    public function get_host()
+    {
+        return $this->_config->get('host');
+    }
+
+    public function get_cache_base_url()
+    {
+        return $this->_config->get('cache');
+    }
+
+    public function get_clear_cache_url()
+    {
+        return $this->_config->get('clear_cache_url');
     }
 
 } // END Kohana_StaticFile

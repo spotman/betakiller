@@ -1,13 +1,10 @@
 <?php defined('SYSPATH') or die('No direct script access.');
 
-// получаем настройки
-// $config_file = Kohana::$config->load($this->config_name);
-// $this->config += $config_file->$config_key;
+$ksf = StaticFile::instance();
 
-$ksf_config = Kohana::$config->load("staticfiles");
-$static_url = trim($ksf_config['url'], '/');
-$static_cache_url = trim($ksf_config['cache'], '/');
-$cc_url = trim($ksf_config['clear_cache_url'], '/');
+$static_url = trim($ksf->get_base_url(), '/');
+$static_cache_url = trim($ksf->get_cache_base_url(), '/');
+$clear_static_cache_url = trim($ksf->get_clear_cache_url(), '/');
 
 Route::set( 'kohana-static-files', $static_url.'/<file>', array('file'=>'.*') )
     ->defaults(array(
@@ -15,7 +12,7 @@ Route::set( 'kohana-static-files', $static_url.'/<file>', array('file'=>'.*') )
 	'action' => 'index'
 	));
 
-Route::set( 'kohana-static-files-clear', $cc_url )
+Route::set( 'kohana-static-files-clear', $clear_static_cache_url )
     ->defaults(array(
     'controller' => 'StaticFiles',
     'action' => 'clear'
@@ -29,7 +26,4 @@ Route::set( 'kohana-static-files-missing-cache', $static_cache_url.'/<file>', ar
 
 require_once Kohana::find_file('vendor', 'jsmin');
 
-define('STATICFILES_HOST', $ksf_config['host']);
-define('STATICFILES_PATH', $ksf_config['url']);
-// define('STATICFILES_URL', $ksf_config['host'].$ksf_config['url']);
-define('STATICFILES_URL', trim($ksf_config['host'], '/') . $ksf_config['url']);
+unset($ksf, $static_url, $static_cache_url, $clear_static_cache_url);

@@ -1,6 +1,6 @@
 require.config({
 
-    baseUrl: '{# assets_base_url #}require.js',
+    baseUrl: '/assets/static/require.js',
 
     shim: {
         'jquery.typeahead': {
