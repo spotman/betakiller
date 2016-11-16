@@ -17,17 +17,11 @@ return array(
     'cache'                 => MODPATH.'cache',                 // Caching with multiple backends
     'content'               => MODPATH.'content',               // Content elements (images, attachments, videos, etc)
     'database'              => MODPATH.'database',              // Database access
-//    'di'                    => MODPATH.'di',                    // Dependency Injection
-//    'dbv'                   => MODPATH.'dbv',                   // Database Version Control
     'device'                => MODPATH.'device',                // Device detection
     'email'                 => MODPATH.'email',                 // Mailing module
-//    'excel-import'          => MODPATH.'excel-import',          // Import Excel documents
-    'geocode'               => MODPATH.'geocode',               // Geocoder-php wrapper
-//    'hashids'               => MODPATH.'hashids',               // youtu.be like hash id generator and parser
     'jsonrpc'               => MODPATH.'jsonrpc',               // JSON-RPC server
     'image'                 => MODPATH.'image',                 // Image manipulation
     'i18n-plural'           => MODPATH.'i18n-plural',           // International pluralization
-//    'locator'               => MODPATH.'locator',               // URL mapping to interfaces
     'mangodb'               => MODPATH.'mangodb',               // ODM wrapper for mongodb
     'meta-tags'             => MODPATH.'meta-tags',             // HTML meta tags helper
     'migrations'            => MODPATH.'migrations',            // Migrations toolkit
@@ -39,7 +33,6 @@ return array(
     'static-files'          => MODPATH.'static-files',          // Static Files (JS/CSS/pictures)
     'twig'                  => MODPATH.'twig',                  // Twig template engine
     'ulogin'                => MODPATH.'ulogin',                // Universal login via ulogin.ru
-//    'xmpp'                  => MODPATH.'xmpp',                  // Wrapper for XMPP (Jabber) protocol
 
     'sitemap'               => MODPATH.'sitemap',               // Generating sitemap.xml
 
