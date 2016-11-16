@@ -301,7 +301,8 @@ task('migrations:create', function () {
         $file_path = trim($out_arr[1]);
 
         if (file_exists($file_path)) {
-            run_git_command('add .', $file_path);
+            $dir = dirname($file_path);
+            run_git_command('add .', $dir);
         } else {
             writeln('Can not parse output, add migration file to git by yourself');
         }
