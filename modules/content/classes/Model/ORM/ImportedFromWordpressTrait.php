@@ -25,7 +25,7 @@ trait Model_ORM_ImportedFromWordpressTrait
      */
     public function filter_wp_id($wp_id)
     {
-        return $this->where('wp_id', '=', $wp_id);
+        return $this->where($this->object_column('wp_id'), '=', $wp_id);
     }
 
     /**
@@ -41,7 +41,7 @@ trait Model_ORM_ImportedFromWordpressTrait
     }
 
     /**
-     * Returns array of image IDs by their WP IDs
+     * Returns array of records IDs by their WP IDs
      *
      * @param int|array $wp_ids
      * @return array
@@ -55,7 +55,7 @@ trait Model_ORM_ImportedFromWordpressTrait
             ->order_by_wp_ids($wp_ids)
             ->where($this->object_column('wp_id'), 'IN', (array) $wp_ids)
             ->find_all()
-            ->as_array(NULL, 'id');
+            ->as_array(NULL, $this->primary_key());
     }
 
     /**
