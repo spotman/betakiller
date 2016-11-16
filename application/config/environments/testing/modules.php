@@ -2,7 +2,7 @@
 
 return array(
 //    'codebench'     => MODPATH.'codebench',     // Benchmarking tool
-    'unittest'      => MODPATH.'unittest',      // Unit testing
-    'userguide'     => MODPATH.'userguide',     // User guide and API documentation
-    'logviewer'     => MODPATH.'logviewer',     // Display logs
+//    'unittest'      => MODPATH.'unittest',      // Unit testing
+//    'userguide'     => MODPATH.'userguide',     // User guide and API documentation
+//    'logviewer'     => MODPATH.'logviewer',     // Display logs
 );
