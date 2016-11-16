@@ -26,6 +26,7 @@ class CustomTag
             self::GALLERY,
             self::IMAGE,
             self::YOUTUBE,
+            self::ATTACHMENT,
         ];
     }
 
