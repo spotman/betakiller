@@ -281,11 +281,10 @@ task('migrations:install', function () {
  * Create new migration
  */
 task('migrations:create', function () {
-    $path = getcwd().'/../'.BETAKILLER_CORE_PATH.'/application/migrations';
-    $realPath = realpath($path);
+    $scope = ask('Enter scope (app, core, app:modules:module_name or core:modules:module_name)', 'app');
 
-    if (!$realPath)
-        throw new Exception('Migration path is not exists');
+    if (!$scope)
+        throw new Exception('Migration scope is required');
 
     $name = ask('Enter migration short name (3-128 characters, [A-Za-z0-9-_]+)');
 
@@ -294,9 +293,21 @@ task('migrations:create', function () {
 
     $desc = ask('Enter migration description', '');
 
-    run_minion_task("migrations:create --name=$name --description=$desc");
+    $output = run_minion_task("migrations:create --name=$name --description=$desc --scope=$scope");
 
-    run_git_command('add .', $realPath);
+    $out_arr = explode('Done! Check ', $output);
+
+    if (count($out_arr) == 2) {
+        $file_path = trim($out_arr[1]);
+
+        if (file_exists($file_path)) {
+            run_git_command('add .', $file_path);
+        } else {
+            writeln('Can not parse output, add migration file to git by yourself');
+        }
+    } else {
+        writeln('Can not parse output, add migration file to git by yourself');
+    }
 })->onlyForStage(DEPLOYER_DEV_STAGE)->desc('Create migration');
 
 /**
