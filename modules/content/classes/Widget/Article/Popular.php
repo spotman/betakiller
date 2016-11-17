@@ -13,11 +13,11 @@ class Widget_Article_Popular extends Widget
      */
     public function get_data()
     {
-        $orm = $this->model_factory_article();
+        $orm = $this->model_factory_content_article();
 
         $limit = $this->getContextParam('limit', 5);
 
-        $articles = $orm->get_popular_articles($limit);
+        $articles = $orm->get_popular_content($limit);
 
         $data = [];
 

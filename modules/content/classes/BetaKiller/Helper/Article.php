@@ -8,9 +8,19 @@ trait Article
      *
      * @return \Model_ContentArticle
      */
-    public function model_factory_article($id = null)
+    public function model_factory_content_article($id = null)
     {
         return \ORM::factory('ContentArticle', $id);
+    }
+
+    /**
+     * @param int|null $id
+     *
+     * @return \Model_ContentPage
+     */
+    public function model_factory_content_page($id = null)
+    {
+        return \ORM::factory('ContentPage', $id);
     }
 
     /**
@@ -25,8 +35,16 @@ trait Article
     /**
      * @return \Model_ContentArticle
      */
-    public function url_parameter_article()
+    public function url_parameter_content_article()
     {
         return $this->url_parameters()->get(\Model_ContentArticle::URL_PARAM);
+    }
+
+    /**
+     * @return \Model_ContentPage
+     */
+    public function url_parameter_content_page()
+    {
+        return $this->url_parameters()->get(\Model_ContentPage::URL_PARAM);
     }
 }

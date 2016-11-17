@@ -1,49 +1,18 @@
 <?php
 use BetaKiller\Content\IFace\Article\Item;
 
-class Model_ContentArticle extends Model_ORM_ContentBase
+class Model_ContentPage extends Model_ORM_ContentBase
 {
     use Model_ORM_ImportedFromWordpressTrait;
 
-    const URL_PARAM = 'ContentArticle';
+    const URL_PARAM = 'ContentPage';
 
-    protected $_table_name = 'content_articles';
-
-    /**
-     * Prepares the model database connection, determines the table name,
-     * and loads column information.
-     *
-     * @return void
-     */
-    protected function _initialize()
-    {
-        $this->belongs_to([
-            'category'          =>  [
-                'model'         =>  'ContentCategory',
-                'foreign_key'   =>  'category_id',
-            ],
-        ]);
-
-        $this->has_many([
-            'thumbnails'        =>  [
-                'model'         =>  'ContentImageElement',
-                'foreign_key'   =>  'article_id',
-                'far_key'       =>  'content_image_id',
-                'through'       =>  'articles_thumbnails',
-            ]
-        ]);
-
-        $this->load_with([
-            'category',
-        ]);
-
-        parent::_initialize();
-    }
+    protected $_table_name = 'content_pages';
 
     public function get_public_url()
     {
         /** @var Item $iface */
-        $iface = $this->iface_from_codename('Article\\Item');
+        $iface = $this->iface_from_codename('Page\\Item');
 
         $params = $this->url_parameters_instance()->set(self::URL_PARAM, $this);
 
@@ -68,6 +37,35 @@ class Model_ContentArticle extends Model_ORM_ContentBase
     public function get_category()
     {
         return $this->get('category');
+    }
+
+    /**
+     * @return $this
+     */
+    public function increment_views_count()
+    {
+        $current = $this->get_views_count();
+
+        return $this->set_views_count(++$current);
+    }
+
+    /**
+     * @return int
+     * @throws Kohana_Exception
+     */
+    public function get_views_count()
+    {
+        return (int) $this->get('views_count');
+    }
+
+    /**
+     * @param int $value
+     * @return $this
+     * @throws Kohana_Exception
+     */
+    protected function set_views_count($value)
+    {
+        return $this->set('views_count', (int) $value);
     }
 
     /**
@@ -136,6 +134,11 @@ class Model_ContentArticle extends Model_ORM_ContentBase
         }
     }
 
+    public function order_by_views_count($asc = false)
+    {
+        return $this->order_by('views_count', $asc ? 'ASC' : 'DESC');
+    }
+
     /**
      * @return Model_ContentImageElement[]|Database_Result
      */
@@ -158,6 +161,16 @@ class Model_ContentArticle extends Model_ORM_ContentBase
     protected function get_thumbnails_query()
     {
         return $this->get_thumbnails_relation()->order_by('place', 'ASC');
+    }
+
+    /**
+     * @param int $limit
+     *
+     * @return \Database_Result|\Model_ContentArticle[]
+     */
+    public function get_popular_articles($limit = 5)
+    {
+        return $this->model_factory()->order_by_views_count()->limit($limit)->get_all();
     }
 
     /**

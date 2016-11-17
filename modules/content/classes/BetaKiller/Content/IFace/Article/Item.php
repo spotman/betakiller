@@ -2,11 +2,9 @@
 
 namespace BetaKiller\Content\IFace\Article;
 
-use BetaKiller\Content\IFace\Base;
-use DateInterval;
-use Model_ContentArticle;
+use BetaKiller\Content\IFace\ContentItemBase;
 
-class Item extends Base
+class Item extends ContentItemBase
 {
     /**
      * Returns data for View
@@ -16,63 +14,39 @@ class Item extends Base
      */
     public function get_data()
     {
-        $article = $this->get_article_model();
+        /** @var \Model_ContentArticle $model */
+        $model = $this->get_content_model();
 
-        $this
-            ->set_last_modified($article->get_last_modified())
-            ->set_expires_interval(new DateInterval('P1D'));    // One day
-
-        $user = $this->current_user(TRUE);
-
-        // Count guest views only
-        if (!$user) {
-            $article->increment_views_count()->save();
-        }
+        $data = $this->get_content_data();
 
         $thumbnails = [];
 
-        foreach ($article->get_thumbnails() as $thumb) {
+        foreach ($model->get_thumbnails() as $thumb) {
             $thumbnails[] = $thumb->get_arguments_for_img_tag($thumb::SIZE_ORIGINAL);
 
             // TODO get image last_modified and set it to iface
         }
 
+        $data['thumbnails'] = $thumbnails;
+
         return [
-            'article' => [
-                'id'            =>  $article->get_id(),
-                'label'         =>  $article->get_label(),
-                'content'       =>  $article->get_content(),
-                'created_at'    =>  $article->get_created_at(),
-                'updated_at'    =>  $article->get_updated_at(),
-                'thumbnails'    =>  $thumbnails,
-            ],
+            'article' => $data,
         ];
     }
 
-    protected function get_article_model()
+    /**
+     * @return \Model_ORM_ContentBase
+     */
+    protected function content_model_factory()
     {
-        if ( $this->is_default() )
-        {
-            $uri = $this->get_index_article_uri();
-
-            /** @var Model_ContentArticle $model */
-            $model = $this->model_factory_article()->filter_uri($uri)->find();
-
-            if (!$model->loaded())
-                throw new \IFace_Exception('Can not find default article with uri :value', [':value' => $uri]);
-
-            $this->url_parameters()->set($model::URL_PARAM, $model);
-        }
-        else
-        {
-            $model = $this->url_parameter_article();
-        }
-
-        return $model;
+        return $this->model_factory_content_article();
     }
 
-    protected function get_index_article_uri()
+    /**
+     * @return string
+     */
+    protected function get_content_model_url_key()
     {
-        return 'index';
+        return \Model_ContentArticle::URL_PARAM;
     }
 }

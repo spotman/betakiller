@@ -2,6 +2,8 @@
 
 class Model_ContentCategory extends \BetaKiller\Utils\Kohana\TreeModel
 {
+    use Model_ORM_ImportedFromWordpressTrait;
+
     const URL_PARAM = 'ContentCategory';
 
     // TODO title and description per category
@@ -16,25 +18,6 @@ class Model_ContentCategory extends \BetaKiller\Utils\Kohana\TreeModel
         ]);
 
         parent::_initialize();
-    }
-
-    /**
-     * @param int $id
-     * @return $this
-     * @throws Kohana_Exception
-     */
-    public function set_wp_id($id)
-    {
-        return $this->set('wp_id', (int) $id);
-    }
-
-    /**
-     * @return int|NULL
-     * @throws Kohana_Exception
-     */
-    public function get_wp_id()
-    {
-        return $this->get('wp_id');
     }
 
     /**
@@ -111,7 +94,7 @@ class Model_ContentCategory extends \BetaKiller\Utils\Kohana\TreeModel
     {
         $model = $this
             ->model_factory()
-            ->where($this->object_column('wp_id'), '=', $wp_id)
+            ->find_by_wp_id($wp_id)
             ->find();
 
         if (!$model->loaded())
