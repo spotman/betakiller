@@ -15,7 +15,6 @@ return array(
     'auth'                  => MODPATH.'auth',                  // Basic authentication
     'backup'                => MODPATH.'backup',                // Complex backup (files + database)
     'cache'                 => MODPATH.'cache',                 // Caching with multiple backends
-    'content'               => MODPATH.'content',               // Content elements (images, attachments, videos, etc)
     'database'              => MODPATH.'database',              // Database access
     'device'                => MODPATH.'device',                // Device detection
     'email'                 => MODPATH.'email',                 // Mailing module
@@ -39,5 +38,5 @@ return array(
     // Allow another modules to set routes
     'iface'                 => MODPATH.'iface',                 // Dynamic user interfaces
 
-    'article'               =>  MODPATH.'article',              // Articles based on IFaces
+    'content'               => MODPATH.'content',               // Content elements (images, attachments, videos, etc)
 );

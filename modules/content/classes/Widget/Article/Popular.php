@@ -15,9 +15,14 @@ class Widget_Article_Popular extends Widget
     {
         $orm = $this->model_factory_content_article();
 
-        $limit = $this->getContextParam('limit', 5);
+        $limit = (int) $this->getContextParam('limit', 5);
 
-        $articles = $orm->get_popular_content($limit);
+        $current_article = $this->url_parameter_content_article();
+
+        $exclude_id = $current_article ? $current_article->get_id() : NULL;
+
+        /** @var Model_ContentArticle[] $articles */
+        $articles = $orm->get_popular_content($limit, $exclude_id);
 
         $data = [];
 

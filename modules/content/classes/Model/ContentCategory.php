@@ -1,18 +1,19 @@
 <?php
 
-class Model_ContentCategory extends \BetaKiller\Utils\Kohana\TreeModel
+class Model_ContentCategory extends \BetaKiller\Utils\Kohana\TreeModel implements \BetaKiller\Content\SeoContentInterface
 {
-    use Model_ORM_ImportedFromWordpressTrait;
+    use Model_ORM_ImportedFromWordpressTrait,
+        Model_ORM_SeoContentTrait;
 
     const URL_PARAM = 'ContentCategory';
 
-    // TODO title and description per category
+    protected $_table_name = 'content_categories';
 
     protected function _initialize()
     {
         $this->has_many([
             'articles'          =>  [
-                'model'         =>  'Article',
+                'model'         =>  'ContentArticle',
                 'foreign_key'   =>  'category_id',
             ]
         ]);

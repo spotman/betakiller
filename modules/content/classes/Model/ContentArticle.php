@@ -29,7 +29,7 @@ class Model_ContentArticle extends Model_ORM_ContentBase
                 'model'         =>  'ContentImageElement',
                 'foreign_key'   =>  'article_id',
                 'far_key'       =>  'content_image_id',
-                'through'       =>  'articles_thumbnails',
+                'through'       =>  'content_articles_thumbnails',
             ]
         ]);
 

@@ -3,8 +3,6 @@
 namespace BetaKiller\Content\IFace;
 
 use BetaKiller\Content\IFace\Base;
-use DateInterval;
-use Model_ContentArticle;
 
 abstract class ContentItemBase extends Base
 {
@@ -58,7 +56,7 @@ abstract class ContentItemBase extends Base
             $model = $this->content_model_factory()->filter_uri($uri)->find();
 
             if (!$model->loaded())
-                throw new \IFace_Exception('Can not find default article with uri :value', [':value' => $uri]);
+                throw new \IFace_Exception('Can not find default content with uri :value', [':value' => $uri]);
 
             $this->url_parameters()->set($model_url_key, $model);
         }

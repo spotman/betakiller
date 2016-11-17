@@ -10,7 +10,7 @@ trait UrlParametersTrait
     /**
      * @return \Model_ContentArticle
      */
-    public function get_article()
+    public function get_content_article()
     {
         return $this->get(Model_ContentArticle::URL_PARAM);
     }
@@ -20,7 +20,7 @@ trait UrlParametersTrait
      *
      * @return static
      */
-    public function set_article(\Model_ContentArticle $model)
+    public function set_content_article(\Model_ContentArticle $model)
     {
         return $this->set(Model_ContentArticle::URL_PARAM, $model);
     }
@@ -28,7 +28,7 @@ trait UrlParametersTrait
     /**
      * @return \Model_ContentCategory
      */
-    public function get_article_category()
+    public function get_content_category()
     {
         return $this->get(Model_ContentCategory::URL_PARAM);
     }
@@ -38,7 +38,7 @@ trait UrlParametersTrait
      *
      * @return static
      */
-    public function set_article_category(Model_ContentCategory $model)
+    public function set_content_category(Model_ContentCategory $model)
     {
         return $this->set(Model_ContentCategory::URL_PARAM, $model, TRUE);
     }

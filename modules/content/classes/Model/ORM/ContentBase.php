@@ -159,12 +159,20 @@ abstract class Model_ORM_ContentBase extends ORM implements \BetaKiller\Content\
 
     /**
      * @param int $limit
+     * @param int|null $exclude_id
      *
      * @return \Database_Result|\Model_ORM_ContentBase[]
      */
-    public function get_popular_content($limit = 5)
+    public function get_popular_content($limit = 5, $exclude_id = NULL)
     {
-        return $this->model_factory()->order_by_views_count()->limit($limit)->get_all();
+        $model = $this->model_factory();
+
+        if ($exclude_id)
+        {
+            $model->filter_ids((array) $exclude_id, TRUE);
+        }
+
+        return $model->order_by_views_count()->limit($limit)->get_all();
     }
 
     /**
