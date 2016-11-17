@@ -281,7 +281,7 @@ task('migrations:install', function () {
  * Create new migration
  */
 task('migrations:create', function () {
-    $scope = ask('Enter scope (app, core, app:modules:module_name or core:modules:module_name)', 'app');
+    $scope = ask('Enter scope (app, core, app:module:module_name or core:module:module_name)', 'app');
 
     if (!$scope)
         throw new Exception('Migration scope is required');
