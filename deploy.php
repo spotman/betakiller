@@ -385,10 +385,20 @@ function run_minion_task($name) {
 
     $stage = stage();
 
-    $output = run("cd $path && php index.php --task=$name --stage=$stage");
-    write($output);
+    $cmd = "cd $path && php index.php --task=$name --stage=$stage";
 
-    return $output;
+    if (isVerbose()) {
+        $cmd .= ' --debug';
+    }
+
+    $response = run($cmd);
+    $text = $response->toString();
+
+    if ($text) {
+        write($text);
+    }
+
+    return $response;
 }
 
 /**
