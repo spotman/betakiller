@@ -69,6 +69,18 @@ abstract class Kohana_Notification_Message {
         return $this->_to;
     }
 
+    public function get_to_emails()
+    {
+        $emails = [];
+
+        foreach ($this->get_to() as $to)
+        {
+            $emails[] = $to->get_email();
+        }
+
+        return $emails;
+    }
+
     /**
      * @param Notification_User_Interface $value
      * @return $this
