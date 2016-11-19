@@ -7,6 +7,8 @@ abstract class Migration extends Kohana_Migration
     protected function run_sql($sql, $type = Database::UPDATE, $db = NULL)
     {
         DB::query($type, $sql)->execute($db);
+
+        $this->debug('SQL done: :query', [':query' => $sql]);
     }
 
     protected function table_exists($table_name, $db = NULL)
