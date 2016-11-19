@@ -37,6 +37,4 @@ return array(
 
     // Allow another modules to set routes
     'iface'                 => MODPATH.'iface',                 // Dynamic user interfaces
-
-    'content'               => MODPATH.'content',               // Content elements (images, attachments, videos, etc)
 );
