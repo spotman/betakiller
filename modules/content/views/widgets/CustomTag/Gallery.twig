@@ -14,7 +14,7 @@
 
     {% elseif type == "slider" %}
 
-    <div class="content-gallery content-gallery-slider is-hidden">
+    <div class="content-gallery content-gallery-slider">
         {% for image in images %}
             {{ image(image, { class: "responsive-img carousel-cell swipebox", rel: "content-images", href: image["data-original-url"] }, true) }}
         {% endfor %}
