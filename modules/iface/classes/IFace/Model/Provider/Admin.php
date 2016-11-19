@@ -73,7 +73,7 @@ class IFace_Model_Provider_Admin extends IFace_Model_Provider_Abstract {
     {
         $codename = $model->get_codename();
 
-        if ( isset($this->_models[$codename]) )
+        if ( $this->has_model($codename) )
             throw new IFace_Exception('Duplicate of codename :codename', array(':codename' => $codename));
 
         $this->_models[$codename] = $model;
@@ -81,10 +81,15 @@ class IFace_Model_Provider_Admin extends IFace_Model_Provider_Abstract {
 
     protected function get_model($codename)
     {
-        if ( ! isset($this->_models[$codename]) )
+        if ( ! $this->has_model($codename) )
             throw new IFace_Exception('Unknown codename :codename', array(':codename' => $codename));
 
         return $this->_models[$codename];
+    }
+
+    protected function has_model($codename)
+    {
+        return isset($this->_models[$codename]);
     }
 
     /**

@@ -1,6 +1,5 @@
-<?php use BetaKiller\IFace\IFaceModelInterface;
-
-defined('SYSPATH') OR die('No direct script access.');
+<?php
+use BetaKiller\IFace\IFaceModelInterface;
 
 class IFace_Model_Provider implements IFace_Model_Provider_Interface {
 
