@@ -151,60 +151,99 @@ abstract class Core_URL_Dispatcher {
 //            $this->throw_missing_url_exception($it, $parent_iface);
         }
 
-        /** @var \BetaKiller\IFace\IFaceModelInterface $iface_model */
-        $iface_model = NULL;
-        $dynamic_model = NULL;
+        $model = $this->detect_iface_model($layer, $it);
 
-        // First iteration through static urls
-        foreach ( $layer as $iface_model )
+        return $model ? $this->iface_provider()->from_model($model) : NULL;
+    }
+
+    /**
+     * @param \BetaKiller\IFace\IFaceModelInterface[] $models
+     * @return \BetaKiller\IFace\IFaceModelInterface[]
+     * @throws URL_Dispatcher_Exception
+     */
+    protected function sort_models_layer(array $models)
+    {
+        $fixed = [];
+        $dynamic = [];
+
+        foreach ($models as $model)
         {
-            // Skip ifaces with dynamic urls
-            if ( $iface_model->has_dynamic_url() )
+            if ($model->has_dynamic_url() || $model->has_tree_behaviour())
             {
-                if ( $dynamic_model )
-                    throw new URL_Dispatcher_Exception('Layer must have only one IFace with dynamic dispatching');
-
-                $dynamic_model = $iface_model;
-                continue;
+                $dynamic[] = $model;
             }
-
-            // IFace found by concrete uri
-            if ( $iface_model->get_uri() == $it->current() )
-                return $this->iface_provider()->from_model($iface_model);
+            else
+            {
+                $fixed[] = $model;
+            }
         }
 
-        // Second iteration for dynamic urls
-        if ( $dynamic_model )
+        if ( count($dynamic) > 1 )
+            throw new URL_Dispatcher_Exception('Layer must have only one IFace with dynamic dispatching');
+
+        // Fixed URLs first, dynamic URLs last
+        return array_merge($fixed, $dynamic);
+    }
+
+    /**
+     * @param \BetaKiller\IFace\IFaceModelInterface[] $models
+     * @param UrlPathIterator $it
+     *
+     * @return \BetaKiller\IFace\IFaceModelInterface|NULL
+     */
+    protected function detect_iface_model(array $models, UrlPathIterator $it)
+    {
+        // Put fixed urls first
+        $models = $this->sort_models_layer($models);
+
+        foreach ($models as $model)
         {
-            // Tree iface processing
-            if ($iface_model->has_tree_behaviour()) {
+            $uri = $model->get_uri();
 
-                $absent_found = false;
-                $step = 1;
-
-                do
+            if ($model->has_dynamic_url())
+            {
+                if ($model->has_tree_behaviour())
                 {
-                    try
-                    {
-                        $this->parse_uri_parameter_part($dynamic_model->get_uri(), $it->current());
-                        $it->next();
-                        $step++;
-                    }
-                    catch (URL_Dispatcher_Exception $e)
-                    {
-                        $absent_found = true;
+                    // Tree behaviour in URL
+                    $absent_found = false;
+                    $step = 1;
 
-                        // Move one step back so current uri part will be processed by the next iface
-                        $it->prev();
+                    do
+                    {
+                        try
+                        {
+                            $this->parse_uri_parameter_part($uri, $it->current());
+                            $it->next();
+                            $step++;
+                        }
+                        catch (URL_Dispatcher_Exception $e)
+                        {
+                            $absent_found = true;
+
+                            // Move one step back so current uri part will be processed by the next iface
+                            $it->prev();
+                        }
                     }
+                    while (!$absent_found AND $it->valid());
+                    // End tree behaviour
+
+                    return $model;
                 }
-                while (!$absent_found AND $it->valid());
-
-            } else {
-                $this->parse_uri_parameter_part($dynamic_model->get_uri(), $it->current());
+                else
+                {
+                    // Regular dynamic URL
+                    $this->parse_uri_parameter_part($uri, $it->current());
+                    return $model;
+                }
             }
-
-            return $this->iface_provider()->from_model($dynamic_model);
+            else
+            {
+                // Fixed URL
+                if ( $uri == $it->current() )
+                {
+                    return $model;
+                }
+            }
         }
 
         // Nothing found
