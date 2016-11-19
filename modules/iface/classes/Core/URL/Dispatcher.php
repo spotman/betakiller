@@ -143,7 +143,7 @@ abstract class Core_URL_Dispatcher {
         }
         catch (IFace_Exception $e)
         {
-            $parent_url = $parent_iface->url($this->parameters());
+            $parent_url = $parent_iface ? $parent_iface->url($this->parameters()) : NULL;
 
             // TODO Create interface for redirect() method, use it in Response and send Response instance to $this via DI
             HTTP::redirect($parent_url);
@@ -241,6 +241,7 @@ abstract class Core_URL_Dispatcher {
 
     /**
      * @param IFace $iface
+     * @param URL_Parameters|NULL $parameters
      * @return bool
      */
     public function is_current_iface(IFace $iface, URL_Parameters $parameters = NULL)
