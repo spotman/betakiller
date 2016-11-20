@@ -17,7 +17,7 @@ class Widget_Article_Popular extends Widget
 
         $limit = (int) $this->getContextParam('limit', 5);
 
-        $current_article = $this->url_parameter_content_article();
+        $current_article = $this->url_parameter_content_item();
 
         $exclude_id = $current_article ? $current_article->get_id() : NULL;
 

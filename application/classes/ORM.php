@@ -114,6 +114,18 @@ class ORM extends Utils\Kohana\ORM
     }
 
     /**
+     * Returns custom key which may be used for storing model in URL_Parameters registry.
+     * Default policy applies if NULL returned.
+     *
+     * @return string|null
+     */
+    public function get_custom_url_parameters_key()
+    {
+        // Nothing by default
+        return NULL;
+    }
+
+    /**
      * Returns string identifier of current DataSource item
      *
      * @return string

@@ -1,10 +1,10 @@
 <?php
-namespace BetaKiller\Content\IFace\Article\Category;
+namespace BetaKiller\Content\IFace;
 
-use BetaKiller\IFace\IFace;
+use BetaKiller\Content\IFace\Base;
 use Model_ContentCategory;
 
-class Item extends IFace
+class ContentCategoryItem extends Base
 {
     /**
      * Returns data for View
@@ -14,22 +14,21 @@ class Item extends IFace
      */
     public function get_data()
     {
-        /** @var Model_ContentCategory $category */
-        $category = $this->url_parameters()->get(Model_ContentCategory::URL_PARAM);
+        $category = $this->url_parameter_content_category();
 
         return [
             'category'  =>  [
                'label'  =>  $category->get_label(),
             ],
-            'articles'  => $this->get_articles($category),
+            'posts'     => $this->get_category_posts($category),
         ];
     }
 
-    protected function get_articles(Model_ContentCategory $category)
+    protected function get_category_posts(Model_ContentCategory $category)
     {
         $data = [];
 
-        foreach ($category->get_all_related_articles() as $article) {
+        foreach ($category->get_all_related_posts() as $article) {
             $data[] = [
                 'url'   =>  $article->get_public_url(),
                 'label' =>  $article->get_label(),

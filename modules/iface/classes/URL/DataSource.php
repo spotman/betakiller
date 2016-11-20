@@ -40,6 +40,14 @@ interface URL_DataSource
     public function preset_linked_models(URL_Parameters $parameters);
 
     /**
+     * Returns custom key which may be used for storing model in URL_Parameters registry.
+     * Default policy applies if NULL returned.
+     *
+     * @return string|null
+     */
+    public function get_custom_url_parameters_key();
+
+    /**
      * Returns string identifier of current DataSource item
      *
      * @return string

@@ -46,44 +46,6 @@ class Model_ContentImageElement extends Assets_Model_ORM_Image implements Model_
 //    }
 
     /**
-     * @param int $value
-     * @return $this|ORM
-     * @throws Kohana_Exception
-     */
-    public function set_width($value)
-    {
-        return $this->set('width', (int) $value);
-    }
-
-    /**
-     * @return string
-     * @throws Kohana_Exception
-     */
-    public function get_width()
-    {
-        return $this->get('width');
-    }
-
-    /**
-     * @param int $value
-     * @return $this|ORM
-     * @throws Kohana_Exception
-     */
-    public function set_height($value)
-    {
-        return $this->set('height', (int) $value);
-    }
-
-    /**
-     * @return string
-     * @throws Kohana_Exception
-     */
-    public function get_height()
-    {
-        return $this->get('height');
-    }
-
-    /**
      * @param string $value
      * @return $this|ORM
      * @throws Kohana_Exception

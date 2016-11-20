@@ -54,6 +54,15 @@ class CustomTag
         return $node;
     }
 
+    /**
+     * @param \DOMDocument $document
+     * @param              $name
+     * @param null         $id
+     * @param array        $attributes
+     *
+     * @deprecated
+     * @return \DOMElement
+     */
     public function generate_dom_node(DOMDocument $document, $name, $id = NULL, array $attributes = [])
     {
         $node = $document->createElement($name);

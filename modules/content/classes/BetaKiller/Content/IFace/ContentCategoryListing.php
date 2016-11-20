@@ -1,9 +1,9 @@
 <?php
-namespace BetaKiller\Content\IFace\Article\Category;
+namespace BetaKiller\Content\IFace;
 
 use BetaKiller\IFace\IFace;
 
-class Listing extends IFace
+class ContentCategoryListing extends IFace
 {
     /**
      * Returns data for View

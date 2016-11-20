@@ -6,6 +6,16 @@ trait Article
     /**
      * @param int|null $id
      *
+     * @return \Model_ContentItem
+     */
+    public function model_factory_content_item($id = null)
+    {
+        return \ORM::factory('ContentItem', $id);
+    }
+
+    /**
+     * @param int|null $id
+     *
      * @return \Model_ContentArticle
      */
     public function model_factory_content_article($id = null)
@@ -33,18 +43,18 @@ trait Article
     }
 
     /**
-     * @return \Model_ContentArticle
+     * @return \Model_ContentItem
      */
-    public function url_parameter_content_article()
+    public function url_parameter_content_item()
     {
-        return $this->url_parameters()->get(\Model_ContentArticle::URL_PARAM);
+        return $this->url_parameters()->get(\Model_ContentItem::URL_PARAM);
     }
 
     /**
-     * @return \Model_ContentPage
+     * @return \Model_ContentCategory
      */
-    public function url_parameter_content_page()
+    public function url_parameter_content_category()
     {
-        return $this->url_parameters()->get(\Model_ContentPage::URL_PARAM);
+        return $this->url_parameters()->get(\Model_ContentCategory::URL_PARAM);
     }
 }

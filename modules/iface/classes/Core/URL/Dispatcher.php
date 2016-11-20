@@ -3,6 +3,8 @@
 use BetaKiller\IFace\Core\IFace;
 use BetaKiller\IFace\UrlPathIterator;
 use BetaKiller\Utils\Kohana\TreeModel;
+use BetaKiller\IFace\HasCustomUrlBehaviour;
+use BetaKiller\IFace\IFaceModelInterface;
 
 abstract class Core_URL_Dispatcher {
 
@@ -66,31 +68,34 @@ abstract class Core_URL_Dispatcher {
         // Prevent XSS via URL
         $uri = htmlspecialchars(strip_tags($uri), ENT_QUOTES);
 
-        // TODO Check stack cache for current URL
+        // TODO Check stack cache and url params for current URL
 
 
         // Creating URL iterator
         $url_iterator = new UrlPathIterator($uri);
-
-        // Root requested - search for default IFace
-        if ( ! $url_iterator->count() )
-        {
-            $default_iface = $this->iface_provider()->get_default();
-            $this->push_to_stack($default_iface);
-            return $default_iface;
-        }
 
         $parent_iface = NULL;
         $iface_instance = NULL;
 
         // Dispatch childs
         // Loop through every uri part and initialize it`s iface
-        while ($url_iterator->valid()) {
+        do {
+            $iface_instance = NULL;
 
             try
             {
-                $iface_instance = NULL;
-                $iface_instance = $this->parse_uri_layer($url_iterator, $parent_iface);
+                $root_requested = !$url_iterator->count();
+
+                if ($root_requested)
+                {
+                    $iface_instance = $this->iface_provider()->get_default();
+
+                    $this->process_iface_url_behaviour($iface_instance->get_model(), $url_iterator);
+                }
+                else
+                {
+                    $iface_instance = $this->parse_uri_layer($url_iterator, $parent_iface);
+                }
             }
             catch ( URL_Dispatcher_Exception $e )
             {
@@ -112,9 +117,9 @@ abstract class Core_URL_Dispatcher {
             $this->push_to_stack($iface_instance);
 
             $url_iterator->next();
-        }
+        } while ($url_iterator->valid());
 
-        // TODO Cache stack (between HTTP requests) for current URL
+        // TODO Cache stack + url parameters (between HTTP requests) for current URL
 
         // Return last IFace
         return $iface_instance;
@@ -151,15 +156,15 @@ abstract class Core_URL_Dispatcher {
 //            $this->throw_missing_url_exception($it, $parent_iface);
         }
 
-        $model = $this->detect_iface_model($layer, $it);
+        $model = $this->select_iface_model($layer, $it);
 
-        return $model ? $this->iface_provider()->from_model($model) : NULL;
+        return $model ? $this->iface_from_model_factory($model) : NULL;
     }
 
     /**
      * @param \BetaKiller\IFace\IFaceModelInterface[] $models
      * @return \BetaKiller\IFace\IFaceModelInterface[]
-     * @throws URL_Dispatcher_Exception
+     * @throws IFace_Exception
      */
     protected function sort_models_layer(array $models)
     {
@@ -179,7 +184,7 @@ abstract class Core_URL_Dispatcher {
         }
 
         if ( count($dynamic) > 1 )
-            throw new URL_Dispatcher_Exception('Layer must have only one IFace with dynamic dispatching');
+            throw new IFace_Exception('Layer must have only one IFace with dynamic dispatching');
 
         // Fixed URLs first, dynamic URLs last
         return array_merge($fixed, $dynamic);
@@ -191,63 +196,97 @@ abstract class Core_URL_Dispatcher {
      *
      * @return \BetaKiller\IFace\IFaceModelInterface|NULL
      */
-    protected function detect_iface_model(array $models, UrlPathIterator $it)
+    protected function select_iface_model(array $models, UrlPathIterator $it)
     {
         // Put fixed urls first
         $models = $this->sort_models_layer($models);
 
         foreach ($models as $model)
         {
-            $uri = $model->get_uri();
-
-            if ($model->has_dynamic_url())
+            if ($this->process_iface_url_behaviour($model, $it))
             {
-                if ($model->has_tree_behaviour())
-                {
-                    // Tree behaviour in URL
-                    $absent_found = false;
-                    $step = 1;
-
-                    do
-                    {
-                        try
-                        {
-                            $this->parse_uri_parameter_part($uri, $it->current());
-                            $it->next();
-                            $step++;
-                        }
-                        catch (URL_Dispatcher_Exception $e)
-                        {
-                            $absent_found = true;
-
-                            // Move one step back so current uri part will be processed by the next iface
-                            $it->prev();
-                        }
-                    }
-                    while (!$absent_found AND $it->valid());
-                    // End tree behaviour
-
-                    return $model;
-                }
-                else
-                {
-                    // Regular dynamic URL
-                    $this->parse_uri_parameter_part($uri, $it->current());
-                    return $model;
-                }
-            }
-            else
-            {
-                // Fixed URL
-                if ( $uri == $it->current() )
-                {
-                    return $model;
-                }
+                return $model;
             }
         }
 
         // Nothing found
         return NULL;
+    }
+
+    public function process_iface_url_behaviour(IFaceModelInterface $model, UrlPathIterator $it)
+    {
+        $model_uri = $model->get_uri();
+
+        if ($it->count() && $model->has_tree_behaviour())
+        {
+            // Tree behaviour in URL
+            $absent_found = false;
+            $step = 1;
+
+            do
+            {
+                try
+                {
+                    $this->parse_uri_parameter_part($model_uri, $it->current());
+                    $it->next();
+                    $step++;
+                }
+                catch (URL_Dispatcher_Exception $e)
+                {
+                    $absent_found = true;
+
+                    // Move one step back so current uri part will be processed by the next iface
+                    $it->prev();
+                }
+            }
+            while (!$absent_found AND $it->valid());
+            // End tree behaviour
+
+            return TRUE;
+        }
+//        elseif ($model->has_custom_url_behaviour())
+//        {
+//            $this->process_custom_url_behaviour($model, $it);
+//            return $model;
+//        }
+        elseif ($model->has_dynamic_url())
+        {
+            // Regular dynamic URL, parse uri
+            $this->parse_uri_parameter_part($model_uri, $it->current());
+            return TRUE;
+        }
+        elseif ($model_uri == $it->current())
+        {
+            // Fixed URL found, simply exit
+            return TRUE;
+        }
+
+        // No processing done
+        return FALSE;
+    }
+
+//    protected function process_custom_url_behaviour(IFaceModelInterface $iface_model, UrlPathIterator $it)
+//    {
+//        // Create instance of starter IFace
+//        $starter_iface = $this->iface_from_model_factory($iface_model);
+//
+//        // Check instance implements interface
+//        if (!($starter_iface  instanceof HasCustomUrlBehaviour))
+//            throw new URL_Dispatcher_Exception('IFace :codename must implement :base', [
+//                ':codename' =>  $starter_iface->get_codename(),
+//                ':base'     =>  HasCustomUrlBehaviour::class,
+//            ]);
+//
+//        // Getting custom behaviour instance
+//        $behaviour = $starter_iface->get_custom_url_behaviour();
+//
+//        // Pairs "iface codename" => "uri scheme"
+//        $behaviour->process_custom_url_behaviour($it, $this->parameters());
+//    }
+
+    protected function iface_from_model_factory(IFaceModelInterface $model)
+    {
+        return $this->iface_provider()->from_model($model);
     }
 
     /**
@@ -354,6 +393,12 @@ abstract class Core_URL_Dispatcher {
         $model_name = $prototype->get_model_name();
         $model_key = $prototype->get_model_key();
 
+        if (!$uri_value)
+        {
+            // Allow processing of root element
+            $uri_value = 'index';
+        }
+
         // Search for model item
         $model = $this->model_factory($model_name)->find_by_url_key($model_key, $uri_value, $this->parameters());
 
@@ -370,9 +415,13 @@ abstract class Core_URL_Dispatcher {
         $registry = $this->parameters();
 
         if (method_exists($registry, $setter))
+        {
             $registry->$setter($model);
+        }
         else
+        {
             $registry->set($model_name, $model, true); // Allow tree url behaviour to set value multiple times
+        }
     }
 
     public function make_iface_uri(IFace $iface, URL_Parameters $parameters = NULL)

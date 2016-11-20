@@ -1,6 +1,8 @@
 <?php
 
-class Task_Article_Import_Wordpress extends Minion_Task
+use PHPHtmlParser\Dom;
+
+class Task_Content_Import_Wordpress extends Minion_Task
 {
     use \BetaKiller\Helper\Content;
 
@@ -247,8 +249,8 @@ class Task_Article_Import_Wordpress extends Minion_Task
 
         $posts = $wp->get_posts_and_pages();
 
-        /** @var Model_ContentArticle $article_orm */
-        $article_orm = ORM::factory('Article');
+        $total = $posts->count();
+        $current = 1;
 
         foreach ($posts as $post)
         {
@@ -264,11 +266,23 @@ class Task_Article_Import_Wordpress extends Minion_Task
             $title = isset($meta['_aioseop_title']) ? $meta['_aioseop_title'] : NULL;
             $description = isset($meta['_aioseop_description']) ? $meta['_aioseop_description'] : NULL;
 
-            $this->info('Processing article :uri', [':uri' => $uri]);
+            $this->info('[:current/:total] Processing article :uri', [
+                ':uri'      => $uri,
+                ':current'  => $current,
+                ':total'    => $total,
+            ]);
 
-            $article = $article_orm->find_by_wp_id($id);
+            /** @var Model_ContentItem $item_orm */
+            $item_orm = ORM::factory('ContentItem');
 
-            $article
+            $item = $item_orm->find_by_wp_id($id);
+
+            if ($type == $wp::POST_TYPE_PAGE)
+            {
+                $item->mark_as_page();
+            }
+
+            $item
                 ->set_wp_id($id)
                 ->set_uri($uri)
                 ->set_label($name)
@@ -278,106 +292,105 @@ class Task_Article_Import_Wordpress extends Minion_Task
                 ->set_created_at($created_at)
                 ->set_updated_at($updated_at);
 
-            if ($type == $wp::POST_TYPE_PAGE)
-            {
-                $article->mark_as_plain_page();
-            }
-
-            $article->save();
+            $item->save();
 
             // Parsing all images first to get @alt and @title values
-            $this->process_content_images($article);
+            $this->process_content_images($item);
 
             // Parsing custom tags next
-            $this->process_custom_tags($article);
+            $this->process_custom_tags($item);
 
             // Processing YouTube <iframe> embeds
-            $this->process_content_youtube_iframes($article);
+            $this->process_content_youtube_iframes($item);
 
-            $this->post_process_article_text($article);
+            $this->post_process_article_text($item);
 
             // Saving model and getting its ID for further processing
-            $article->save();
+            $item->save();
 
             // Link thumbnail images to post
-            $this->process_thumbnails($article, $meta);
+            $this->process_thumbnails($item, $meta);
 
 //            print_r($article->as_array());
 //            print_r($meta);
 //            die();
+
+            $current++;
         }
     }
 
-    protected function post_process_article_text(Model_ContentArticle $article)
+    protected function post_process_article_text(Model_ContentItem $item)
     {
-        $text = $article->get_content();
+        $text = $item->get_content();
 
         $text = $this->wp()->autop($text, false);
 
         $text = $this->update_links_on_content_elements($text);
 
-        $article->set_content($text);
+        $item->set_content($text);
     }
 
     protected function update_links_on_content_elements($text)
     {
-        //TODO drop out DOM processing and replace it with regexp (it is utf-8 friendly)
-        // Wrap with <article>
-        $text = '<article>'.$text.'</article>';
+        $dom = new Dom;
 
-        // Convert to DOM
-        $dom = new DOMDocument('1.0', 'UTF-8');
+        $dom->load($text);
 
-        libxml_use_internal_errors(true);
-        $dom->loadXML($text); // use loadHTML if it's invalid XHTML
-        libxml_clear_errors();
-        libxml_use_internal_errors(false);
+        $this->remove_links_on_content_images($dom->root);
+        $this->update_links_on_attachments($dom->root);
 
-        // Search for links to attachments
-        $xp = new DOMXPath($dom);
-
-        $this->remove_links_on_content_images($xp);
-
-        $this->update_links_on_attachments($xp);
-
-        $text = $dom->saveXML();
-
-        // Unwrap <article>
-        $text = str_replace(['<article>', '</article>'], ['', ''], $text);
-
-        return $text;
+        return $dom->root->outerHtml();
     }
 
-    protected function remove_links_on_content_images(DOMXPath $xp)
+    protected function remove_links_on_content_images(Dom\HtmlNode $root)
     {
-        $images = $xp->query('//a/'.CustomTag::IMAGE); // [matches(@href, "\s\/wp-content\/\s")]
+        $tag = CustomTag::IMAGE;
 
-        if (!$images->length)
-            return;
+        /** @var Dom\Collection $images */
+        $images = $root->find('a > '.$tag);
 
-        for ($i = 0; $i < $images->length; $i++)
+        foreach ($images->getIterator() as $image) /** @var Dom\HtmlNode $image */
         {
-            $img = $images->item($i);
-            $link = $img->parentNode;
+            /** @var Dom\HtmlNode $link */
+            $link = $image->getParent();
 
-            // Replace link with <image />
-            $link->parentNode->replaceChild($img, $link);
+            /** @var Dom\HtmlNode $link_parent */
+            $link_parent = $link->getParent();
+
+            $image->setParent($link_parent);
+            $link->delete();
+
+            unset($link);
         }
+
+//        $pattern = '/\<a[\s]+[^>]+\>(\<'.$tag.'\s[^>]*\>)\<\/a>/i';
+//
+//        // Searching for links on content images
+//        preg_match_all($pattern, $text, $matches, PREG_SET_ORDER);
+//
+//        // Exit if none found
+//        if (!$matches)
+//            return $text;
+//
+//        foreach ($matches as $match)
+//        {
+//            // Original <a> tag
+//            $original_tag = $match[0];
+//            $image_tag    = $match[1];
+//
+//            $text = str_replace($original_tag, $image_tag, $text);
+//        }
+//
+//        return $text;
     }
 
-    protected function update_links_on_attachments(DOMXPath $xp)
+    protected function update_links_on_attachments(Dom\HtmlNode $root)
     {
-        $document = $xp->document;
+        /** @var Dom\Collection $links */
+        $links = $root->find('a');
 
-        $links = $xp->query('//a');
-
-        if (!$links->length)
-            return;
-
-        for ($i = 0; $i < $links->length; $i++)
+        foreach ($links->getIterator() as $link)  /** @var Dom\HtmlNode $link */
         {
-            /** @var DOMElement $link */
-            $link = $links->item($i);
             $href = $link->getAttribute('href');
 
             // Skip non-attachment links
@@ -391,28 +404,15 @@ class Task_Article_Import_Wordpress extends Minion_Task
             if (!$model)
                 throw new Task_Exception('Unknown attachment href :url', [':url' => $path]);
 
+            // Update link URL
             $link->setAttribute('href', $model->get_original_url());
-
-            $ct = $this->custom_tag_instance();
-
-            // TODO save anchor text/html
-            $anchor_text = $link->hasChildNodes() ? $link->firstChild->textContent : $link->textContent;
-
-            $attributes = [
-                'text'  =>  $anchor_text,
-            ];
-
-            $attach = $ct->generate_dom_node($document, $ct::ATTACHMENT, $model->get_id(), $attributes);
-
-            // Replace link with <attachment /> custom tag
-            $link->parentNode->replaceChild($attach, $link);
         }
     }
 
-    protected function process_thumbnails(Model_ContentArticle $article, array $meta)
+    protected function process_thumbnails(Model_ContentItem $item, array $meta)
     {
         $wp = $this->wp();
-        $wp_id = $article->get_wp_id();
+        $wp_id = $item->get_wp_id();
 
         $images_wp_ids = [];
 
@@ -432,7 +432,7 @@ class Task_Article_Import_Wordpress extends Minion_Task
             $images_wp_ids = [$meta['_thumbnail_id']];
         }
 
-        if (!$images_wp_ids && $article->is_plain_page())
+        if (!$images_wp_ids && $item->is_page())
         {
             // Allow plain pages without thumbnails
             return;
@@ -443,7 +443,7 @@ class Task_Article_Import_Wordpress extends Minion_Task
 
         if ($images_ids)
         {
-            $article->reset_thumbnails($images_ids);
+            $item->reset_thumbnails($images_ids);
         }
         else if ($images_wp_ids)
         {
@@ -455,12 +455,12 @@ class Task_Article_Import_Wordpress extends Minion_Task
         else
         {
             $this->warning('Article with uri [:uri] has no thumbnail', [
-                ':uri' => $article->get_uri(),
+                ':uri' => $item->get_uri(),
             ]);
         }
     }
 
-    protected function process_custom_tags(Model_ContentArticle $article)
+    protected function process_custom_tags(Model_ContentItem $item)
     {
         $handlers = new \Thunder\Shortcode\HandlerContainer\HandlerContainer;
 
@@ -475,14 +475,14 @@ class Task_Article_Import_Wordpress extends Minion_Task
 
         $facade = \Thunder\Shortcode\ShortcodeFacade::create($handlers, new Thunder\Shortcode\Syntax\CommonSyntax());
 
-        $content = $article->get_content();
+        $content = $item->get_content();
 
         // Thunder does not understand lo-dash in tag name
         $content = str_replace('[wonderplugin_slider', '[wonderplugin-slider', $content);
 
         $content = $facade->process($content);
 
-        $article->set_content($content);
+        $item->set_content($content);
 
     }
 
@@ -583,11 +583,11 @@ class Task_Article_Import_Wordpress extends Minion_Task
         return $this->custom_tag_instance()->generate_html(CustomTag::GALLERY, NULL, $attributes);
     }
 
-    protected function process_content_images(Model_ContentArticle $article)
+    protected function process_content_images(Model_ContentItem $item)
     {
-        $text = $this->process_images_in_text($article->get_content(), $article->get_id());
+        $text = $this->process_images_in_text($item->get_content(), $item->get_id());
 
-        $article->set_content($text);
+        $item->set_content($text);
     }
 
     protected function process_images_in_text($text, $entity_item_id)
@@ -607,7 +607,7 @@ class Task_Article_Import_Wordpress extends Minion_Task
 
             try
             {
-                // Создаём новый тег <admin_image /> на замену <img />
+                // Создаём новый тег <image /> на замену <img />
                 $target_tag = $this->process_img_tag($original_tag, $entity_item_id);
             }
             catch (Exception $e)
@@ -692,11 +692,11 @@ class Task_Article_Import_Wordpress extends Minion_Task
         return $this->custom_tag_instance()->generate_html(CustomTag::IMAGE, $image->get_id(), $attributes);
     }
 
-    protected function process_content_youtube_iframes(Model_ContentArticle $article)
+    protected function process_content_youtube_iframes(Model_ContentItem $item)
     {
-        $text = $this->process_youtube_videos_in_text($article->get_content(), $article->get_id());
+        $text = $this->process_youtube_videos_in_text($item->get_content(), $item->get_id());
 
-        $article->set_content($text);
+        $item->set_content($text);
     }
 
     protected function process_youtube_videos_in_text($text, $entity_item_id)
@@ -802,16 +802,25 @@ class Task_Article_Import_Wordpress extends Minion_Task
         $categories = $this->wp()->get_categories_with_posts();
 
         /** @var Model_ContentCategory $categories_orm */
-        $categories_orm = ORM::factory('Article_Category');
+        $categories_orm = ORM::factory('ContentCategory');
 
-        /** @var Model_ContentArticle $articles_orm */
-        $articles_orm = ORM::factory('Article');
+        /** @var Model_ContentItem $items_orm */
+        $items_orm = ORM::factory('ContentItem');
+
+        $total = count($categories);
+        $current = 1;
 
         foreach ($categories as $term)
         {
             $wp_id = $term['term_id'];
             $uri = $term['slug'];
             $label = $term['name'];
+
+            $this->info('[:current/:total] Processing category :uri', [
+                ':uri'      => $uri,
+                ':current'  => $current,
+                ':total'    => $total,
+            ]);
 
             $category = $categories_orm->find_by_wp_id($wp_id);
 
@@ -828,18 +837,17 @@ class Task_Article_Import_Wordpress extends Minion_Task
             if ($posts_wp_ids)
             {
                 // Get real article IDs
-                $articles_ids = $articles_orm->find_ids_by_wp_ids($posts_wp_ids);
+                $articles_ids = $items_orm->find_ids_by_wp_ids($posts_wp_ids);
 
                 // Does articles exist?
                 if ($articles_ids)
                 {
-//                    print_r($posts_wp_ids);
-//                    print_r($articles_ids);
-
                     // Link articles to category
-                    $category->link_articles($articles_ids);
+                    $category->link_posts($articles_ids);
                 }
             }
+
+            $current++;
         }
 
         foreach ($categories as $term)

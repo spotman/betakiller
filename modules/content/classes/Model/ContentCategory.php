@@ -12,8 +12,8 @@ class Model_ContentCategory extends \BetaKiller\Utils\Kohana\TreeModel implement
     protected function _initialize()
     {
         $this->has_many([
-            'articles'          =>  [
-                'model'         =>  'ContentArticle',
+            'posts'             =>  [
+                'model'         =>  'ContentItem',
                 'foreign_key'   =>  'category_id',
             ]
         ]);
@@ -61,8 +61,8 @@ class Model_ContentCategory extends \BetaKiller\Utils\Kohana\TreeModel implement
 
     public function get_public_url()
     {
-        /** @var \V2017\IFace\Article\Category\Item $iface */
-        $iface = $this->iface_from_codename('Article\\Category\\Item');
+        /** @var \V2017\IFace\ContentCategoryItem $iface */
+        $iface = $this->iface_from_codename('ContentCategoryItem');
 
         $params = $this->url_parameters_instance()
             ->set($this::URL_PARAM, $this);
@@ -71,9 +71,9 @@ class Model_ContentCategory extends \BetaKiller\Utils\Kohana\TreeModel implement
     }
 
     /**
-     * @return Database_Result|Model_ContentArticle[]
+     * @return Database_Result|Model_ContentItem[]
      */
-    public function get_all_related_articles()
+    public function get_all_related_posts()
     {
         // Collect all children categories
         $ids = $this->get_all_children($this->primary_key());
@@ -82,7 +82,7 @@ class Model_ContentCategory extends \BetaKiller\Utils\Kohana\TreeModel implement
         $ids[] = $this->get_id();
 
         return $ids
-            ? $this->get_articles_relation()->model_factory()->filter_category_ids($ids)->get_all()
+            ? $this->get_posts_relation()->model_factory()->filter_category_ids($ids)->get_all()
             : [];
     }
 
@@ -95,7 +95,7 @@ class Model_ContentCategory extends \BetaKiller\Utils\Kohana\TreeModel implement
     {
         $model = $this
             ->model_factory()
-            ->find_by_wp_id($wp_id)
+            ->filter_wp_id($wp_id)
             ->find();
 
         if (!$model->loaded())
@@ -126,17 +126,17 @@ class Model_ContentCategory extends \BetaKiller\Utils\Kohana\TreeModel implement
         return $this->filter_is_active()->order_by_place();
     }
 
-    public function link_articles(array $articles_ids)
+    public function link_posts(array $item_ids)
     {
-        return $this->link_related('articles', $articles_ids);
+        return $this->link_related('posts', $item_ids);
     }
 
     /**
      * @return Model_ContentArticle
      */
-    protected function get_articles_relation()
+    protected function get_posts_relation()
     {
-        return $this->get('articles');
+        return $this->get('posts');
     }
 
     /**
