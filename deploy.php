@@ -118,7 +118,7 @@ function process_vendors($repo) {
     $composer = env('bin/composer');
     $envVars = env('env_vars') ? 'export ' . env('env_vars') . ' &&' : '';
 
-    $path = get_working_path($repo);
+    $path = get_repo_path($repo);
 
     $result = run("cd $path && $envVars $composer {{composer_options}}");
 
@@ -239,15 +239,19 @@ task('git:pull:all', function () {
     git_pull_all();
 })->desc('git pull for all repositories');
 
+// // Makes git:check inside of {current} directory
 task('git:check', function () {
-    $out = git_status();
+    $current_revision_path = env('current');
+    $path = get_repo_path(NULL, $current_revision_path);
+
+    $out = git_status($path);
 
     if (stripos($out, 'nothing to commit (working directory clean)') !== FALSE)
         return;
 
     if (askConfirmation('Commit changes?', false)) {
-        git_commit_all();
-        git_push();
+        git_commit_all($path);
+        git_push($path);
     } else {
         writeln('Exiting...');
     }
@@ -377,7 +381,7 @@ task('deploy', [
  */
 function run_minion_task($name) {
     $current_path = getcwd();
-    $path = get_working_path();
+    $path = get_repo_path();
 
     if (strpos($current_path, BETAKILLER_CORE_PATH) === FALSE) {
         $path .= '/public';
@@ -411,7 +415,7 @@ function run_minion_task($name) {
  */
 function run_git_command($gitCmd, $path = null) {
     if (!$path) {
-        $path = get_working_path();
+        $path = get_repo_path();
     }
 
     $result = run("cd $path && git $gitCmd");
@@ -420,30 +424,30 @@ function run_git_command($gitCmd, $path = null) {
     return $result;
 }
 
-function git_status() {
-    return run_git_command('status');
+function git_status($path = NULL) {
+    return run_git_command('status', $path);
 }
 
-function git_commit_all() {
+function git_commit_all($path = NULL) {
     $message = ask('Enter commit message:', 'Commit from production');
-    return run_git_command('add .') . run_git_command('commit -am "'.$message.'"');
+    return run_git_command('add .', $path) . run_git_command('commit -am "'.$message.'"', $path);
 }
 
-function git_checkout() {
+function git_checkout($path = NULL) {
     $branch = input()->getOption('branch');
-    return run_git_command('checkout '.$branch);
+    return run_git_command('checkout '.$branch, $path);
 }
 
-function git_push() {
-    return run_git_command('push');
+function git_push($path = NULL) {
+    return run_git_command('push', $path);
 }
 
-function git_pull() {
-    return run_git_command('pull');
+function git_pull($path = NULL) {
+    return run_git_command('pull', $path);
 }
 
 function git_pull_all() {
-    return run_git_command('pull', get_working_path('core')).run_git_command('pull', get_working_path('app'));
+    return git_pull(get_repo_path('core')).git_pull(get_repo_path('app'));
 }
 
 function git_config($key, $value) {
@@ -462,10 +466,25 @@ function stage() {
 function get_latest_release_path() {
     $list = env('releases_list');
     $release = $list[0];
+
+    if (output()->isVerbose()) {
+        output()->writeln(PHP_EOL.'Releases are:'.PHP_EOL);
+
+        foreach ($list as $key => $item) {
+            output()->writeln($key.' => '.$item);
+        }
+
+        output()->writeln('');
+    }
+
     return env()->parse('{{deploy_path}}/releases/'.$release);
 }
 
-function get_working_path($repo = NULL) {
+function get_repo_path($repo = NULL, $base_path = NULL) {
+    if (stage() == DEPLOYER_DEV_STAGE) {
+        return getcwd();
+    }
+
     $allowed = ['core', 'app'];
 
     if (!$repo) {
@@ -475,7 +494,9 @@ function get_working_path($repo = NULL) {
     if (!in_array($repo, $allowed))
         throw new Exception('Unknown repo '.$repo);
 
-    return (stage() == DEPLOYER_DEV_STAGE)
-        ? getcwd()
-        : get_latest_release_path().'/'.get($repo.'_path');
+    if (!$base_path) {
+        $base_path = get_latest_release_path();
+    }
+
+    return $base_path.'/'.get($repo.'_path');
 }
