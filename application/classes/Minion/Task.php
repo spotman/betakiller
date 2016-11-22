@@ -30,11 +30,13 @@ abstract class Minion_Task extends Kohana_Minion_Task
      */
     public function execute()
     {
-        $log_level = ( $this->_options['debug'] !== FALSE )
+        $max_log_level = ( $this->_options['debug'] !== FALSE )
             ? Log::DEBUG
             : $this->get_max_log_level();
 
-        Log::instance()->attach(new Minion_Log(), $log_level);
+        $min_log_level = $this->get_min_log_level();
+
+        Log::instance()->attach(new Minion_Log($max_log_level), $max_log_level, $min_log_level);
 
         // Auth for CLI
         $user = $this->get_cli_user_model();
@@ -81,6 +83,17 @@ abstract class Minion_Task extends Kohana_Minion_Task
     protected function get_max_log_level()
     {
         return Log::INFO;
+    }
+
+    /**
+     * Constant like Log::ALERT
+     *
+     * @return int
+     */
+    protected function get_min_log_level()
+    {
+//        return Log::ALERT;
+        return Log::EMERGENCY;
     }
 
     /**

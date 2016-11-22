@@ -77,7 +77,7 @@ if (PHP_SAPI == 'cli')
     $short_options = '';
 
     $long_options  = array(
-        'stage::',    // Language
+        'stage::',    // Run CLI script in concrete stage
     );
 
     $cli_options = getopt($short_options, $long_options);

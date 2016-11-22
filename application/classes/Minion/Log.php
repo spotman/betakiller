@@ -11,6 +11,9 @@ class Minion_Log extends Log_Writer
     public function __construct($log_level = Log::INFO)
     {
         $this->_log_level = $log_level;
+
+        // Disable original error messages
+        ini_set('error_reporting', 'off');
     }
 
     /**
@@ -84,6 +87,7 @@ class Minion_Log extends Log_Writer
 
         // Add exception info if in debug mode
         if ( $this->_log_level == Log::DEBUG AND isset($message['additional']['exception']))
+//        if ( isset($message['additional']['exception']))
         {
             /** @var Exception $exception */
             $exception = $message['additional']['exception'];

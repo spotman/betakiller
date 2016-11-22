@@ -54,6 +54,12 @@ class BetaKiller_Kohana_Exception extends Kohana_Kohana_Exception
             static::log($exception);
         }
 
+        if (PHP_SAPI == 'cli')
+        {
+            // Exception already processed via Minion_Log
+            exit(1);
+        }
+
         $always_show_nice_message = ($exception instanceof self)
             ? $exception->always_show_nice_message()
             : FALSE;
