@@ -86,8 +86,8 @@ class Minion_Log extends Log_Writer
         $string = strtr($format, array_filter($message, 'is_scalar'));
 
         // Add exception info if in debug mode
-        if ( $this->_log_level == Log::DEBUG AND isset($message['additional']['exception']))
-//        if ( isset($message['additional']['exception']))
+//        if ( $this->_log_level == Log::DEBUG AND isset($message['additional']['exception']))
+        if ( isset($message['additional']['exception']))
         {
             /** @var Exception $exception */
             $exception = $message['additional']['exception'];
