@@ -34,9 +34,6 @@ class Minion_Log extends Log_Writer
 
     protected function write_message(array $message)
     {
-        $color = Minion_CLI::LIGHT_GREY;
-        $format = 'level: body';
-
         switch( $message['level'])
         {
             case Log::EMERGENCY:
@@ -44,24 +41,27 @@ class Minion_Log extends Log_Writer
             case Log::CRITICAL:
             case Log::ERROR:
                 $color = Minion_CLI::RED;
-                $format = 'level: body in file:line';
+                $format = 'body in file:line';
                 break;
 
             case Log::WARNING:
                 $color = Minion_CLI::YELLOW;
-                $format = 'level: body in file:line';
+                $format = 'body in file:line';
                 break;
 
             case Log::NOTICE:
                 $color = Minion_CLI::BROWN;
-                $format = 'level: body in file:line';
+                $format = 'body in file:line';
                 break;
 
             case Log::INFO:
                 $color = Minion_CLI::GREEN;
+                $format = 'body'; // level: body
                 break;
 
-//            case Log::DEBUG:
+            default:
+                $color = Minion_CLI::LIGHT_GREY;
+                $format = 'body'; // level: body
         }
 
         $text = $this->format_message($message, $format);
