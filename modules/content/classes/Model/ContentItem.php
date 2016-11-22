@@ -353,6 +353,11 @@ class Model_ContentItem extends ORM implements \BetaKiller\Content\SeoContentInt
         }
     }
 
+    public function is_default()
+    {
+        return ($this->get_uri() == $this->get_default_url_value());
+    }
+
     /**
      * @param array $ids
      * @return $this
@@ -367,9 +372,21 @@ class Model_ContentItem extends ORM implements \BetaKiller\Content\SeoContentInt
      *
      * @return $this
      */
-    public function filter_category(Model_ContentCategory $category)
+    public function filter_category(Model_ContentCategory $category = NULL)
     {
-        return $this->where($this->object_column('category_id'), '=', $category->get_id());
+        $column = $this->object_column('category_id');
+
+        return $category
+            ? $this->where($column, '=', $category->get_id())
+            : $this->where($column, 'IS', NULL);
+    }
+
+    /**
+     * @return $this
+     */
+    public function filter_with_category()
+    {
+        return $this->where($this->object_column('category_id'), 'IS NOT', NULL);
     }
 
     /**
@@ -433,18 +450,43 @@ class Model_ContentItem extends ORM implements \BetaKiller\Content\SeoContentInt
      */
     protected function custom_find_by_url_filter(URL_Parameters $parameters)
     {
+        // Load pages first
+        $this->prioritize_by_post_types();
+
         $category = $parameters->get(Model_ContentCategory::URL_PARAM);
 
-        if ($category) {
+        $this->and_where_open();
+
+        // Plain pages
+        $this->or_where_open()
+            ->filter_type(self::TYPE_PAGE)
+            ->filter_category(NULL) // Pages have no category
+            ->or_where_close();
+
+        // Articles
+        $this->or_where_open()->filter_type(self::TYPE_ARTICLE);
+
+        if ($category)
+        {
+            // Concrete category
             $this->filter_category($category);
         }
+        else
+        {
+            // Any category (articles must have category)
+            $this->filter_with_category();
+        }
+
+        $this->or_where_close();
+
+        $this->and_where_close();
     }
 
     public function get_public_url()
     {
         $codename = $this->get_public_url_iface_codename();
 
-        /** @var \BetaKiller\Content\IFace\ContentPostBase $iface */
+        /** @var \BetaKiller\Content\IFace\ContentItem $iface */
         $iface = $this->iface_from_codename($codename);
 
         $params = $this->url_parameters_instance()->set(self::URL_PARAM, $this);
@@ -457,9 +499,10 @@ class Model_ContentItem extends ORM implements \BetaKiller\Content\SeoContentInt
     /**
      * @return string
      * @throws \Kohana_Exception
+     * @uses \BetaKiller\Content\IFace\ContentItem
      */
     public function get_public_url_iface_codename()
     {
-        throw new \Kohana_Exception('Implement :method method', [':method' => __METHOD__]);
+        return 'ContentItem';
     }
 }

@@ -393,14 +393,16 @@ abstract class Core_URL_Dispatcher {
         $model_name = $prototype->get_model_name();
         $model_key = $prototype->get_model_key();
 
+        $dataSource = $this->model_factory($model_name);
+
         if (!$uri_value)
         {
             // Allow processing of root element
-            $uri_value = 'index';
+            $uri_value = $dataSource->get_default_url_value();
         }
 
         // Search for model item
-        $model = $this->model_factory($model_name)->find_by_url_key($model_key, $uri_value, $this->parameters());
+        $model = $dataSource->find_by_url_key($model_key, $uri_value, $this->parameters());
 
         if ( ! $model )
             throw new URL_Dispatcher_Exception('Can not find [:prototype] item by [:value]',

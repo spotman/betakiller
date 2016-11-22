@@ -13,7 +13,7 @@ class Widget_Article_Popular extends Widget
      */
     public function get_data()
     {
-        $orm = $this->model_factory_content_article();
+        $orm = $this->model_factory_content_item();
 
         $limit = (int) $this->getContextParam('limit', 5);
 
@@ -21,7 +21,7 @@ class Widget_Article_Popular extends Widget
 
         $exclude_id = $current_article ? $current_article->get_id() : NULL;
 
-        /** @var Model_ContentArticle[] $articles */
+        /** @var Model_ContentItem[] $articles */
         $articles = $orm->get_popular_content($limit, $exclude_id);
 
         $data = [];

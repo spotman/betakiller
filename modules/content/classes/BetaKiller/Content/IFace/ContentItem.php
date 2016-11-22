@@ -2,7 +2,7 @@
 
 namespace BetaKiller\Content\IFace;
 
-abstract class ContentPostBase extends Base
+class ContentItem extends Base
 {
     /**
      * @var \Model_ContentItem
@@ -17,17 +17,23 @@ abstract class ContentPostBase extends Base
      */
     public function get_data()
     {
+        $model = $this->get_content_model();
+
+//        if ($model->is_default())
+//        {
+//            $parent = $this->get_parent();
+//            $url = $parent ? $parent->url() : '/';
+//
+//            $this->redirect($url);
+//        }
+
         return [
-            'post' =>  $this->get_post_data(),
+            'post' =>  $this->get_post_data($model),
         ];
     }
 
-    protected function get_post_data()
+    protected function get_post_data(\Model_ContentItem $model)
     {
-//        echo \Debug::vars($this->url_dispatcher()->parameters());
-
-        $model = $this->get_content_model();
-
         $this->set_last_modified($model->get_last_modified());
 
         $user = $this->current_user(TRUE);
@@ -67,26 +73,19 @@ abstract class ContentPostBase extends Base
      * @return \Model_ContentItem
      * @throws \IFace_Exception
      */
-    protected function detect_content_model()
+    private function detect_content_model()
     {
-        $model_url_key = $this->get_content_model_url_key();
-//
-//        if ( $this->is_default() )
-//        {
-//            $uri = $this->get_index_uri();
-//
-//            $model = $this->content_model_factory()->filter_uri($uri)->find();
-//
-//            if (!$model->loaded())
-//                throw new \IFace_Exception('Can not find default content with uri :value', [':value' => $uri]);
-//
-//            $this->url_parameters()->set($model_url_key, $model);
-//        }
-//        else
-//        {
-//        }
+        $key = $this->get_content_model_url_param_key();
 
-        return $this->url_parameters()->get($model_url_key);
+        return $this->url_parameters()->get($key);
+    }
+
+    /**
+     * @return string
+     */
+    protected function get_content_model_url_param_key()
+    {
+        return \Model_ContentItem::URL_PARAM;
     }
 
     /**
@@ -101,14 +100,4 @@ abstract class ContentPostBase extends Base
 
         return $this->content_model;
     }
-
-//    /**
-//     * @return \Model_ContentItem
-//     */
-//    abstract protected function content_model_factory();
-
-    /**
-     * @return string
-     */
-    abstract protected function get_content_model_url_key();
 }

@@ -13,6 +13,13 @@ interface URL_DataSource
     public function find_by_url_key($key, $value, URL_Parameters $parameters);
 
     /**
+     * Returns default uri for index element (this used if root IFace has dynamic url behaviour)
+     *
+     * @return string
+     */
+    public function get_default_url_value();
+
+    /**
      * Returns value of the $key property
      *
      * @param string $key

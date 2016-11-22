@@ -62,6 +62,11 @@ class ORM extends Utils\Kohana\ORM
         // Empty by default
     }
 
+    public function get_default_url_value()
+    {
+        return 'index';
+    }
+
     /**
      * Returns value of the $key property
      * @param string $key
