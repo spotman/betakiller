@@ -5,6 +5,18 @@
 interface Model_ContentElementInterface
 {
     /**
+     * @return int
+     */
+    public function get_id();
+
+    /**
+     * @param int
+     *
+     * @return Model_ContentElementInterface|NULL
+     */
+    public function get_by_id($id);
+
+    /**
      * @param Model_ContentEntity $entity
      * @return $this|ORM
      * @throws Kohana_Exception

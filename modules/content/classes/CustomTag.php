@@ -30,6 +30,11 @@ class CustomTag
         ];
     }
 
+    public function get_self_closing_tags()
+    {
+        return $this->get_allowed_tags();
+    }
+
     public function generate_html($name, $id = NULL, array $attributes = [], $content = NULL)
     {
         if ($id)
@@ -55,32 +60,6 @@ class CustomTag
     }
 
     /**
-     * @param \DOMDocument $document
-     * @param              $name
-     * @param null         $id
-     * @param array        $attributes
-     *
-     * @deprecated
-     * @return \DOMElement
-     */
-    public function generate_dom_node(DOMDocument $document, $name, $id = NULL, array $attributes = [])
-    {
-        $node = $document->createElement($name);
-
-        if ($id)
-        {
-            $attributes = $attributes + ['id' => $id];
-        }
-
-        foreach ($attributes as $attr_name => $attr_value)
-        {
-            $node->setAttribute($attr_name, $attr_value);
-        }
-
-        return $node;
-    }
-
-    /**
     * @param string $text
     * @param string|string[] $filter_tags
     * @param callable $callback
@@ -99,10 +78,12 @@ class CustomTag
         }
 
         /** @url https://regex101.com/r/yF1bL4/3 */
-        $pattern = '/<(' . implode('|', $filter_tags) . ')[^\/>]*\/>/';
+        $pattern = '/<(' . implode('|', $filter_tags) . ')[^\/>]*\/>/i';
 
         if (!preg_match_all($pattern, $text, $matches, PREG_SET_ORDER))
+        {
             return $text;
+        }
 
         // Обходим каждый тег
         foreach ($matches as $match) {

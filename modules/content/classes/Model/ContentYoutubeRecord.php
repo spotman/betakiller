@@ -1,6 +1,6 @@
 <?php
 
-class Model_ContentYoutubeRecord extends ORM implements Model_ContentElementInterface
+class Model_ContentYoutubeRecord extends ORM
 {
     use Model_ORM_ContentElementTrait,
         Model_ORM_ImportedFromWordpressTrait;
@@ -43,7 +43,6 @@ class Model_ContentYoutubeRecord extends ORM implements Model_ContentElementInte
 
     public function get_youtube_embed_url()
     {
-        // TODO make youtube full url
         return 'https://www.youtube.com/embed/'.$this->get_youtube_id();
     }
 

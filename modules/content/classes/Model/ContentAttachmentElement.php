@@ -24,7 +24,7 @@ class Model_ContentAttachmentElement extends Assets_Model_ORM implements Model_C
     /**
      * Returns assets provider associated with current model
      *
-     * @return Assets_Provider|Assets_Provider_Image
+     * @return Assets_Provider_ContentAttachment
      */
     protected function get_provider()
     {

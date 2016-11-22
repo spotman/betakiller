@@ -334,7 +334,9 @@ class Task_Content_Import_Wordpress extends Minion_Task
     {
         $dom = new Dom;
 
-        $dom->load($text);
+        $dom
+            ->load($text)
+            ->addSelfClosingTag(CustomTag::instance()->get_self_closing_tags());
 
         $this->remove_links_on_content_images($dom->root);
         $this->update_links_on_attachments($dom->root);
@@ -362,26 +364,6 @@ class Task_Content_Import_Wordpress extends Minion_Task
 
             unset($link);
         }
-
-//        $pattern = '/\<a[\s]+[^>]+\>(\<'.$tag.'\s[^>]*\>)\<\/a>/i';
-//
-//        // Searching for links on content images
-//        preg_match_all($pattern, $text, $matches, PREG_SET_ORDER);
-//
-//        // Exit if none found
-//        if (!$matches)
-//            return $text;
-//
-//        foreach ($matches as $match)
-//        {
-//            // Original <a> tag
-//            $original_tag = $match[0];
-//            $image_tag    = $match[1];
-//
-//            $text = str_replace($original_tag, $image_tag, $text);
-//        }
-//
-//        return $text;
     }
 
     protected function update_links_on_attachments(Dom\HtmlNode $root)
@@ -404,8 +386,12 @@ class Task_Content_Import_Wordpress extends Minion_Task
             if (!$model)
                 throw new Task_Exception('Unknown attachment href :url', [':url' => $path]);
 
+            $new_url = $model->get_original_url();
+
             // Update link URL
-            $link->setAttribute('href', $model->get_original_url());
+            $link->setAttribute('href', $new_url);
+
+            $this->debug('Link for :old was changed to :new', [':old' => $href, ':new' => $new_url]);
         }
     }
 
@@ -483,7 +469,6 @@ class Task_Content_Import_Wordpress extends Minion_Task
         $content = $facade->process($content);
 
         $item->set_content($content);
-
     }
 
     public function thunder_handler_caption(\Thunder\Shortcode\Shortcode\ShortcodeInterface $s)
@@ -659,13 +644,13 @@ class Task_Content_Import_Wordpress extends Minion_Task
         $alt = trim(Arr::get($attributes, 'alt'));
         $title = trim(Arr::get($attributes, 'title'));
 
-        // Save alt and title in image model if they not set
-        if ($alt AND !$image->get_alt())
+        // Save alt and title in image model
+        if ($alt)
         {
             $image->set_alt($alt);
         }
 
-        if ($title AND !$image->get_title())
+        if ($title)
         {
             $image->set_title($title);
         }
@@ -677,7 +662,9 @@ class Task_Content_Import_Wordpress extends Minion_Task
         // Removing unnecessary attributes
         unset(
             $attributes['id'],
-            $attributes['src']
+            $attributes['src'],
+            $attributes['alt'],
+            $attributes['title']
         );
 
         // Convert old full-size images to responsive images
