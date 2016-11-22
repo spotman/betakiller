@@ -41,7 +41,6 @@ set('default_stage', DEPLOYER_DEV_STAGE);
 
 // Local server for creating migrations, git actions, etc
 localServer('dev')
-//    ->env('deploy_path', sys_get_temp_dir().DIRECTORY_SEPARATOR.'deployer-local')
     ->stage(DEPLOYER_DEV_STAGE);
 
 // Local server for testing deployment tasks in dev environment
@@ -73,8 +72,6 @@ task('check', function() {
 
     env('core_repository', get('core_repository'));
     env('core_path', get('core_path'));
-
-//    writeln('Deploying to '.implode(', ', env('server.stages')));
 });
 
 // Prepare app env
@@ -147,12 +144,6 @@ task('deploy:betakiller', [
 
 
 // TODO Сборка статики перед деплоем (build:require.js)
-// TODO Make HTTP-requests to every IFace for template/js/css caching (cache:warmup)
-
-//task('deploy:git-update', function() {
-//    cd(env()->getReleasePath());
-//    run('git pull && git submodule update --init --recursive');
-//})->desc('Updating git submodules');;
 
 /**
  * BetaKiller shared dirs
@@ -160,9 +151,9 @@ task('deploy:betakiller', [
 set('betakiller_shared_dirs', [
     '{{core_path}}/modules/error/media/php_traces',
 
-// TODO deal with shared logs (exception is thrown if these two lines are uncommented)
-//    '{{core_path}}/application/logs',
-//    '{{app_path}}/logs',
+    // On some servers exception is thrown if these two lines are uncommented
+    '{{core_path}}/application/logs',
+    '{{app_path}}/logs',
 ]);
 
 task('deploy:betakiller:shared', function() {
@@ -239,7 +230,9 @@ task('git:pull:all', function () {
     git_pull_all();
 })->desc('git pull for all repositories');
 
-// // Makes git:check inside of {current} directory
+/**
+ * Makes git:check inside of {current} directory
+ */
 task('git:check', function () {
     $current_revision_path = env('current');
     $path = get_repo_path(NULL, $current_revision_path);
