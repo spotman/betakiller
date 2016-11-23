@@ -219,6 +219,11 @@ class BetaKiller_Twig_Extension extends Twig_Extension
             unset($attributes['width'], $attributes['height']);
         }
 
+        $title = $attributes['title'];
+        $alt = $attributes['alt'];
+
+        $attributes['title'] = $title ?: $alt;
+
         $src = $attributes['src'];
 
         return HTML::image($src, array_filter($attributes));

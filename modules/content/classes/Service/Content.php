@@ -13,7 +13,7 @@ abstract class Service_Content extends \BetaKiller\Service
 
 
     /**
-     * @return Model_ContentElementInterface
+     * @return Model_ContentElementInterface|Model_ORM_ImportedFromWordpressTrait
      */
     abstract protected function file_model_factory();
 

@@ -2,7 +2,7 @@
 
 use BetaKiller\IFace\Widget;
 
-class Widget_Article_Popular extends Widget
+class Widget_Content_Popular_Article extends Widget
 {
     use \BetaKiller\Helper\Article;
 
@@ -22,7 +22,7 @@ class Widget_Article_Popular extends Widget
         $exclude_id = $current_article ? $current_article->get_id() : NULL;
 
         /** @var Model_ContentItem[] $articles */
-        $articles = $orm->get_popular_content($limit, $exclude_id);
+        $articles = $orm->get_popular_articles($limit, $exclude_id);
 
         $data = [];
 

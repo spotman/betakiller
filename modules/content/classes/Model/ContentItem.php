@@ -257,13 +257,19 @@ class Model_ContentItem extends ORM implements \BetaKiller\Content\SeoContentInt
         return $this->order_by('views_count', $asc ? 'ASC' : 'DESC');
     }
 
+    public function get_popular_articles($limit = 5, $exclude_id = NULL)
+    {
+        return $this->get_popular_content(self::TYPE_ARTICLE, $limit, $exclude_id);
+    }
+
     /**
+     * @param int|int[]|null $filter_type
      * @param int $limit
-     * @param int|null $exclude_id
+     * @param int|int[]|null $exclude_id
      *
      * @return \Database_Result|\Model_ContentItem[]
      */
-    public function get_popular_content($limit = 5, $exclude_id = NULL)
+    protected function get_popular_content($filter_type, $limit = 5, $exclude_id = NULL)
     {
         $model = $this->model_factory();
 
@@ -271,6 +277,8 @@ class Model_ContentItem extends ORM implements \BetaKiller\Content\SeoContentInt
         {
             $model->filter_ids((array) $exclude_id, TRUE);
         }
+
+        $model->filter_types((array) $filter_type);
 
         return $model->order_by_views_count()->limit($limit)->get_all();
     }
@@ -443,6 +451,11 @@ class Model_ContentItem extends ORM implements \BetaKiller\Content\SeoContentInt
     public function filter_type($value)
     {
         return $this->where('type', '=', $value);
+    }
+
+    public function filter_types(array $values)
+    {
+        return $this->where('type', 'IN', $values);
     }
 
     /**

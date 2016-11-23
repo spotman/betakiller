@@ -35,6 +35,11 @@ class CustomTag
         return $this->get_allowed_tags();
     }
 
+    public function is_self_closing_tag($name)
+    {
+        return in_array($name, $this->get_self_closing_tags());
+    }
+
     public function generate_html($name, $id = NULL, array $attributes = [], $content = NULL)
     {
         if ($id)
@@ -47,7 +52,7 @@ class CustomTag
 
         $node .= \HTML::attributes(array_filter($attributes));
 
-        if ($content)
+        if (!$this->is_self_closing_tag($name) && $content)
         {
             $node .= '>'.$content.'</'.$name.'>';
         }

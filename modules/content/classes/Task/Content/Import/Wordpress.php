@@ -335,8 +335,8 @@ class Task_Content_Import_Wordpress extends Minion_Task
         $dom = new Dom;
 
         $dom
-            ->load($text)
-            ->addSelfClosingTag(CustomTag::instance()->get_self_closing_tags());
+            ->addSelfClosingTag(CustomTag::instance()->get_self_closing_tags())
+            ->load($text);
 
         $this->remove_links_on_content_images($dom->root);
         $this->update_links_on_attachments($dom->root);
