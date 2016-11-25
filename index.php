@@ -139,6 +139,8 @@ if (PHP_SAPI == 'cli') // Try and load minion
     class_exists('Minion_Task') OR die('Please enable the Minion module for CLI support.');
     set_exception_handler(array('Minion_Exception', 'handler'));
 
+    Log::debug('Running :name env', [':name' => Kohana::$environment_string]);
+
     Minion_Task::factory(Minion_CLI::options())->execute();
 }
 else
