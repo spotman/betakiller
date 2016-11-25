@@ -29,8 +29,12 @@ class Widget_CustomTag_Image extends Widget
         $class  = Arr::get($context, 'class');
         $width  = (int) Arr::get($context, 'width');
 
+        if (strpos($class, 'align') === FALSE)
+        {
+            $classes[] = $align;
+        }
+
         $classes = array_filter(explode(' ', $class));
-        $classes['align'] = $align;
 
         $attributes = [
             'id'    =>  'content-image-'.$model->get_id(),

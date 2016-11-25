@@ -26,6 +26,11 @@ class Widget_CustomTag_Caption extends Widget
         $class = Arr::get($context, 'class');
         $width = (int) Arr::get($context, 'width');
 
+        if (strpos($class, 'align') === FALSE)
+        {
+            $class .= ' '.$align;
+        }
+
         $model = $this->model_factory_content_image_element()->get_by_id($image_id);
 
         return [
