@@ -57,21 +57,27 @@ error_reporting(E_ALL | E_STRICT);
 define('DOCROOT', realpath(dirname(__FILE__)).DIRECTORY_SEPARATOR);
 
 // Make the application relative to the docroot, for symlink'd index.php
-if ( ! is_dir($application) AND is_dir(DOCROOT.$application))
-    $application = DOCROOT.$application;
+$application = realpath(DOCROOT.$application);
+
+if (!is_dir($application))
+    die('Application directory is not exists');
 
 // Make the modules relative to the docroot, for symlink'd index.php
-if ( ! is_dir($modules) AND is_dir(DOCROOT.$modules))
-    $modules = DOCROOT.$modules;
+$modules = realpath(DOCROOT.$modules);
+
+if (!is_dir($modules))
+    die('Core modules directory is not exists');
 
 // Make the system relative to the docroot, for symlink'd index.php
-if ( ! is_dir($system) AND is_dir(DOCROOT.$system))
-    $system = DOCROOT.$system;
+$system = realpath(DOCROOT.$system);
+
+if (!is_dir($system))
+    die('System directory is not exists');
 
 // Define the absolute paths for configured directories
-define('APPPATH', realpath($application).DIRECTORY_SEPARATOR);
-define('MODPATH', realpath($modules).DIRECTORY_SEPARATOR);
-define('SYSPATH', realpath($system).DIRECTORY_SEPARATOR);
+define('APPPATH', $application.DIRECTORY_SEPARATOR);
+define('MODPATH', $modules.DIRECTORY_SEPARATOR);
+define('SYSPATH', $system.DIRECTORY_SEPARATOR);
 
 // Clean up the configuration vars
 unset($application, $modules, $system);
@@ -122,7 +128,7 @@ catch (Exception $e)
     if ($in_dev)
     {
         // Show to dev
-        echo nl2br($message);
+        echo (PHP_SAPI == 'cli') ? $message : nl2br($message);
     }
     else
     {

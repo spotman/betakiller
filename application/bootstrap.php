@@ -147,7 +147,8 @@ Kohana::$log->attach(new Log_File(APPPATH.'logs'), Log::NOTICE);
 /**
  * Enable modules. Modules are referenced by a relative or absolute path.
  */
-Kohana::modules(Kohana::$config->load('modules')->as_array());
+$modules = Kohana::$config->load('modules')->as_array();
+Kohana::modules($modules);
 
 /**
  * Include default routes. Default routes are located in application/routes/default.php
