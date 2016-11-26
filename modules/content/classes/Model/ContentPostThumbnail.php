@@ -1,6 +1,6 @@
 <?php
 
-class Model_ContentImageElement extends Assets_Model_ORM_Image implements Model_ContentElementInterface
+class Model_ContentPostThumbnail extends Assets_Model_ORM_Image
 {
     use Model_ORM_ContentImageElementTrait,
         Model_ORM_ImportedFromWordpressTrait,
@@ -14,9 +14,7 @@ class Model_ContentImageElement extends Assets_Model_ORM_Image implements Model_
      */
     protected function _initialize()
     {
-        $this->_table_name = 'content_images';
-
-        $this->initialize_entity_relation();
+        $this->_table_name = 'content_post_thumbnails';
 
         parent::_initialize();
     }
@@ -24,11 +22,11 @@ class Model_ContentImageElement extends Assets_Model_ORM_Image implements Model_
     /**
      * Returns assets provider associated with current model
      *
-     * @return Assets_Provider_ContentImage
+     * @return Assets_Provider_ContentThumbnail
      */
     protected function get_provider()
     {
-        return Assets_Provider_Factory::instance()->create('ContentImage');
+        return Assets_Provider_Factory::instance()->create('ContentThumbnail');
     }
 
 //    /**

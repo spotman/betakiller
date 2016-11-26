@@ -2,7 +2,7 @@
 
 class Model_ContentEntity extends ORM
 {
-    const ARTICLES_ENTITY_ID = 1;
+    const POSTS_ENTITY_ID = 1;
 
     protected $_table_name = 'content_entities';
 
@@ -18,6 +18,16 @@ class Model_ContentEntity extends ORM
     }
 
     /**
+     * @param string $value
+     *
+     * @return $this
+     */
+    public function set_slug($value)
+    {
+        return $this->set('slug', $value);
+    }
+
+    /**
      * Возвращает имя модели, с которой связана текущая entity
      *
      * @return string
@@ -26,6 +36,16 @@ class Model_ContentEntity extends ORM
     public function get_related_model_name()
     {
         return $this->get('model_name');
+    }
+
+    /**
+     * @param string $value
+     *
+     * @return $this
+     */
+    public function set_related_model_name($value)
+    {
+        return $this->set('model_name', $value);
     }
 
     /**

@@ -5,7 +5,7 @@ namespace BetaKiller\Content\IFace;
 class ContentItem extends Base
 {
     /**
-     * @var \Model_ContentItem
+     * @var \Model_ContentPost
      */
     private $content_model;
 
@@ -32,7 +32,7 @@ class ContentItem extends Base
         ];
     }
 
-    protected function get_post_data(\Model_ContentItem $model)
+    protected function get_post_data(\Model_ContentPost $model)
     {
         $this->set_last_modified($model->get_last_modified());
 
@@ -70,7 +70,7 @@ class ContentItem extends Base
     }
 
     /**
-     * @return \Model_ContentItem
+     * @return \Model_ContentPost
      * @throws \IFace_Exception
      */
     private function detect_content_model()
@@ -85,11 +85,11 @@ class ContentItem extends Base
      */
     protected function get_content_model_url_param_key()
     {
-        return \Model_ContentItem::URL_PARAM;
+        return \Model_ContentPost::URL_PARAM;
     }
 
     /**
-     * @return \Model_ContentItem
+     * @return \Model_ContentPost
      */
     protected function get_content_model()
     {

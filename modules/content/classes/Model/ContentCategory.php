@@ -13,7 +13,7 @@ class Model_ContentCategory extends \BetaKiller\Utils\Kohana\TreeModel implement
     {
         $this->has_many([
             'posts'             =>  [
-                'model'         =>  'ContentItem',
+                'model'         =>  'ContentPost',
                 'foreign_key'   =>  'category_id',
             ]
         ]);
@@ -71,7 +71,7 @@ class Model_ContentCategory extends \BetaKiller\Utils\Kohana\TreeModel implement
     }
 
     /**
-     * @return Database_Result|Model_ContentItem[]
+     * @return Database_Result|Model_ContentPost[]
      */
     public function get_all_related_posts()
     {

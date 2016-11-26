@@ -35,11 +35,11 @@ trait ContentTrait
     /**
      * @param int|null $id
      *
-     * @return \Model_ContentItem
+     * @return \Model_ContentPost
      */
-    public function model_factory_content_item($id = null)
+    public function model_factory_content_post($id = null)
     {
-        return \ORM::factory('ContentItem', $id);
+        return \ORM::factory('ContentPost', $id);
     }
 
     /**
@@ -71,6 +71,15 @@ trait ContentTrait
 
     /**
      * @param int|null $id
+     * @return \Model_ContentPostThumbnail
+     */
+    protected function model_factory_content_post_thumbnail($id = NULL)
+    {
+        return \ORM::factory('ContentPostThumbnail', $id);
+    }
+
+    /**
+     * @param int|null $id
      * @return \Model_ContentAttachmentElement
      */
     protected function model_factory_content_attachment_element($id = NULL)
@@ -96,11 +105,11 @@ trait ContentTrait
     }
 
     /**
-     * @return \Model_ContentItem
+     * @return \Model_ContentPost
      */
     public function url_parameter_content_item()
     {
-        return $this->url_parameters()->get(\Model_ContentItem::URL_PARAM);
+        return $this->url_parameters()->get(\Model_ContentPost::URL_PARAM);
     }
 
     /**

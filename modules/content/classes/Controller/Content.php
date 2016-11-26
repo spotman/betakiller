@@ -34,6 +34,7 @@ class Controller_Content extends Controller
         /** @var Model_ORM_HasWordpressPathTrait[] $models */
         $models = [
             $this->model_factory_content_image_element(),
+            $this->model_factory_content_post_thumbnail(),
             $this->model_factory_content_attachment_element(),
         ];
 

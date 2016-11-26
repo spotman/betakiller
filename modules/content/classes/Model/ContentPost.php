@@ -1,11 +1,11 @@
 <?php
 
-class Model_ContentItem extends ORM implements \BetaKiller\Content\SeoContentInterface
+class Model_ContentPost extends ORM implements \BetaKiller\Content\SeoContentInterface
 {
     use Model_ORM_SeoContentTrait,
         Model_ORM_ImportedFromWordpressTrait;
 
-    const URL_PARAM = 'ContentItem';
+    const URL_PARAM = 'ContentPost';
 
     const TYPE_ARTICLE = 1;
     const TYPE_PAGE = 2;
@@ -42,10 +42,10 @@ class Model_ContentItem extends ORM implements \BetaKiller\Content\SeoContentInt
 
         $this->has_many([
             'thumbnails'        =>  [
-                'model'         =>  'ContentImageElement',
+                'model'         =>  'ContentPostThumbnail',
                 'foreign_key'   =>  'post_id',
-                'far_key'       =>  'content_image_id',
-                'through'       =>  'content_posts_thumbnails',
+//                'far_key'       =>  'content_image_id',
+//                'through'       =>  'content_posts_thumbnails',
             ]
         ]);
 
@@ -267,7 +267,7 @@ class Model_ContentItem extends ORM implements \BetaKiller\Content\SeoContentInt
      * @param int $limit
      * @param int|int[]|null $exclude_id
      *
-     * @return \Database_Result|\Model_ContentItem[]
+     * @return \Database_Result|\Model_ContentPost[]
      */
     protected function get_popular_content($filter_type, $limit = 5, $exclude_id = NULL)
     {

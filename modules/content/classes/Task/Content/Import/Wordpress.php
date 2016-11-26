@@ -12,7 +12,7 @@ class Task_Content_Import_Wordpress extends Minion_Task
     const WP_OPTION_PARSING_MODE = 'betakiller_parsing_mode';
     const WP_OPTION_PARSING_PATH = 'betakiller_parsing_path';
 
-    const CONTENT_ENTITY_ID = Model_ContentEntity::ARTICLES_ENTITY_ID;
+    const CONTENT_ENTITY_ID = Model_ContentEntity::POSTS_ENTITY_ID;
 
     protected $attach_parsing_mode;
     protected $attach_parsing_path;
@@ -272,10 +272,9 @@ class Task_Content_Import_Wordpress extends Minion_Task
                 ':total'    => $total,
             ]);
 
-            /** @var Model_ContentItem $item_orm */
-            $item_orm = ORM::factory('ContentItem');
+            $content_post_orm = $this->model_factory_content_post();
 
-            $item = $item_orm->find_by_wp_id($id);
+            $item = $content_post_orm->find_by_wp_id($id);
 
             if ($type == $wp::POST_TYPE_PAGE)
             {
@@ -319,7 +318,7 @@ class Task_Content_Import_Wordpress extends Minion_Task
         }
     }
 
-    protected function post_process_article_text(Model_ContentItem $item)
+    protected function post_process_article_text(Model_ContentPost $item)
     {
         $text = $item->get_content();
 
@@ -395,7 +394,7 @@ class Task_Content_Import_Wordpress extends Minion_Task
         }
     }
 
-    protected function process_thumbnails(Model_ContentItem $item, array $meta)
+    protected function process_thumbnails(Model_ContentPost $item, array $meta)
     {
         $wp = $this->wp();
         $wp_id = $item->get_wp_id();
@@ -446,7 +445,7 @@ class Task_Content_Import_Wordpress extends Minion_Task
         }
     }
 
-    protected function process_custom_tags(Model_ContentItem $item)
+    protected function process_custom_tags(Model_ContentPost $item)
     {
         $handlers = new \Thunder\Shortcode\HandlerContainer\HandlerContainer;
 
@@ -568,7 +567,7 @@ class Task_Content_Import_Wordpress extends Minion_Task
         return $this->custom_tag_instance()->generate_html(CustomTag::GALLERY, NULL, $attributes);
     }
 
-    protected function process_content_images(Model_ContentItem $item)
+    protected function process_content_images(Model_ContentPost $item)
     {
         $text = $this->process_images_in_text($item->get_content(), $item->get_id());
 
@@ -679,7 +678,7 @@ class Task_Content_Import_Wordpress extends Minion_Task
         return $this->custom_tag_instance()->generate_html(CustomTag::IMAGE, $image->get_id(), $attributes);
     }
 
-    protected function process_content_youtube_iframes(Model_ContentItem $item)
+    protected function process_content_youtube_iframes(Model_ContentPost $item)
     {
         $text = $this->process_youtube_videos_in_text($item->get_content(), $item->get_id());
 
@@ -788,11 +787,9 @@ class Task_Content_Import_Wordpress extends Minion_Task
     {
         $categories = $this->wp()->get_categories_with_posts();
 
-        /** @var Model_ContentCategory $categories_orm */
-        $categories_orm = ORM::factory('ContentCategory');
+        $categories_orm = $this->model_factory_content_category();
 
-        /** @var Model_ContentItem $items_orm */
-        $items_orm = ORM::factory('ContentItem');
+        $items_orm = $this->model_factory_content_post();
 
         $total = count($categories);
         $current = 1;
