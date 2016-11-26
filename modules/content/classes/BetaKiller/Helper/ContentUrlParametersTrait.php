@@ -1,8 +1,6 @@
 <?php
 namespace BetaKiller\Helper;
 
-use BetaKiller\Helper\IFace;
-use Model_ContentArticle;
 use Model_ContentCategory;
 
 trait ContentUrlParametersTrait
