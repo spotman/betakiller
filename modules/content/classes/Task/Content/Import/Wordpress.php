@@ -4,7 +4,7 @@ use PHPHtmlParser\Dom;
 
 class Task_Content_Import_Wordpress extends Minion_Task
 {
-    use \BetaKiller\Helper\Content;
+    use \BetaKiller\Helper\ContentTrait;
 
     const ATTACH_PARSING_MODE_HTTP = 'http';
     const ATTACH_PARSING_MODE_LOCAL = 'local';

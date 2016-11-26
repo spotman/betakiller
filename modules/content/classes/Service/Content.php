@@ -2,7 +2,7 @@
 
 abstract class Service_Content extends \BetaKiller\Service
 {
-    use BetaKiller\Helper\Content;
+    use BetaKiller\Helper\ContentTrait;
 
     /**
      * Custom HTML-tag name related to current service

@@ -2,7 +2,7 @@
 
 trait Assets_Provider_ContentTrait
 {
-    use \BetaKiller\Helper\Content;
+    use \BetaKiller\Helper\ContentTrait;
 
 
     /**

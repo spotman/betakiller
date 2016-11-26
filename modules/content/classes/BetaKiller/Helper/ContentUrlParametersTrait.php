@@ -1,30 +1,12 @@
 <?php
-namespace BetaKiller\Helper\Article;
+namespace BetaKiller\Helper;
 
 use BetaKiller\Helper\IFace;
 use Model_ContentArticle;
 use Model_ContentCategory;
 
-trait UrlParametersTrait
+trait ContentUrlParametersTrait
 {
-    /**
-     * @return \Model_ContentArticle
-     */
-    public function get_content_article()
-    {
-        return $this->get(Model_ContentArticle::URL_PARAM);
-    }
-
-    /**
-     * @param \Model_ContentArticle $model
-     *
-     * @return static
-     */
-    public function set_content_article(\Model_ContentArticle $model)
-    {
-        return $this->set(Model_ContentArticle::URL_PARAM, $model);
-    }
-
     /**
      * @return \Model_ContentCategory
      */

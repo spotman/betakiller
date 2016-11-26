@@ -116,4 +116,18 @@ interface Assets_ModelInterface {
      */
     public function loaded();
 
+    /**
+     * Returns URL for uploading new assets
+     *
+     * @return string
+     */
+    public function get_upload_url();
+
+    /**
+     * Returns URL to original file/image
+     *
+     * @return null|string
+     */
+    public function get_original_url();
+
 }

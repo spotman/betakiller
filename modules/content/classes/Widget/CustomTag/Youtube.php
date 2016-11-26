@@ -4,7 +4,7 @@ use BetaKiller\IFace\Widget;
 
 class Widget_CustomTag_Youtube extends Widget
 {
-    use BetaKiller\Helper\Content;
+    use BetaKiller\Helper\ContentTrait;
 
     /**
      * Returns data for View rendering

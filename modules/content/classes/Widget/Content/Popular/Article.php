@@ -4,7 +4,7 @@ use BetaKiller\IFace\Widget;
 
 class Widget_Content_Popular_Article extends Widget
 {
-    use \BetaKiller\Helper\Article;
+    use \BetaKiller\Helper\ContentTrait;
 
     /**
      * Returns data for View rendering
