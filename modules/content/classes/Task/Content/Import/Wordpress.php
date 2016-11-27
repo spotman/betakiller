@@ -124,14 +124,19 @@ class Task_Content_Import_Wordpress extends Minion_Task
         $wp_id = $attach['ID'];
         $url = $attach['guid'];
 
+        if (!$wp_id || !$url)
+            throw new Task_Exception('Empty attach data');
+
         $this->debug('Found attach with guid = :url', [':url' => $url]);
 
         if (!$provider)
         {
             $mime = $attach['post_mime_type'];
 
+            $this->debug('Creating assets provider by MIME-type :mime', [':mime' => $mime]);
+
             // Detect and instantiate assets provider by file MIME-type
-            $provider = $this->service_content()->assets_provider_factory_from_mime($mime);
+            $provider = $this->service_content_facade()->assets_provider_factory_from_mime($mime);
         }
 
         $model = $this->store_attachment($provider, $url, $wp_id);
@@ -330,9 +335,6 @@ class Task_Content_Import_Wordpress extends Minion_Task
             // Link thumbnail images to post
             $this->process_thumbnails($model, $meta);
 
-            // Parsing all images first to get @alt and @title values
-            $this->process_content_images($model);
-
             // Parsing custom tags next
             $this->process_custom_tags($model);
 
@@ -358,23 +360,21 @@ class Task_Content_Import_Wordpress extends Minion_Task
 
         $text = $this->wp()->autop($text, false);
 
-        $text = $this->update_links_on_content_elements($text);
-
-        $item->set_content($text);
-    }
-
-    protected function update_links_on_content_elements($text)
-    {
         $dom = new Dom;
 
         $dom
             ->addSelfClosingTag(CustomTag::instance()->get_self_closing_tags())
             ->load($text);
 
+        // Parsing all images first to get @alt and @title values
+        $this->process_images_in_text($dom->root, $item->get_id());
+
         $this->remove_links_on_content_images($dom->root);
         $this->update_links_on_attachments($dom->root);
 
-        return $dom->root->outerHtml();
+        $text = $dom->root->outerHtml();
+
+        $item->set_content($text);
     }
 
     protected function remove_links_on_content_images(Dom\HtmlNode $root)
@@ -556,6 +556,12 @@ class Task_Content_Import_Wordpress extends Minion_Task
 //        $provider = $this->assets_provider_content_image();
         $wp_images = $this->wp()->get_attachments(NULL, $wp_ids);
 
+        if (!$wp_images)
+        {
+            $this->warning('No images found for gallery with WP IDs :ids', [':ids' => implode(', ', $wp_ids)]);
+            return NULL;
+        }
+
         $images_ids = [];
 
         // Process every image in set
@@ -563,12 +569,6 @@ class Task_Content_Import_Wordpress extends Minion_Task
         {
             $model = $this->process_attachment($wp_image_data);
             $images_ids[] = $model->get_id();
-        }
-
-        if (!$images_ids)
-        {
-            $this->warning('No images found for gallery with WP IDs :ids', [':ids' => implode(', ', $wp_ids)]);
-            return null;
         }
 
         $attributes = [
@@ -625,21 +625,42 @@ class Task_Content_Import_Wordpress extends Minion_Task
         return $this->custom_tag_instance()->generate_html(CustomTag::GALLERY, NULL, $attributes);
     }
 
-    protected function process_content_images(Model_ContentPost $item)
+    protected function process_images_in_text(Dom\HtmlNode $root, $entity_item_id)
     {
-        $text = $this->process_images_in_text($item->get_content(), $item->get_id());
+        /** @var Dom\Collection $images */
+        $images = $root->find('img');
 
-        $item->set_content($text);
-    }
+        foreach ($images->getIterator() as $image) /** @var Dom\HtmlNode $image */
+        {
+            $new_tag = new Dom\HtmlNode(CustomTag::IMAGE);
 
-    protected function process_images_in_text($text, $entity_item_id)
-    {
-        // Ищем упоминания о файлах
-        preg_match_all('/<img[^>]+>/i', $text, $matches, PREG_SET_ORDER);
+            /** @var Dom\HtmlNode $parent */
+            $parent = $image->getParent();
 
-        // Выходим, если ничего не нашли
-        if (!$matches)
-            return $text;
+            $parent->replaceChild($image->id(), $new_tag);
+//            $new_tag->setParent($parent);
+
+//            $image->delete();
+//            unset($image);
+
+//            /** @var Dom\HtmlNode $link_parent */
+//            $link_parent = $link->getParent();
+//
+//            $image->setParent($link_parent);
+//            $image->delete();
+//
+//            unset($image);
+        }
+        die('TODO');
+
+        return NULL;
+
+//        // Ищем упоминания о файлах
+//        preg_match_all('/<img[^>]+>/i', $text, $matches, PREG_SET_ORDER);
+//
+//        // Выходим, если ничего не нашли
+//        if (!$images)
+//            return $text;
 
         foreach ($matches as $match)
         {
@@ -670,11 +691,11 @@ class Task_Content_Import_Wordpress extends Minion_Task
 
     protected function process_img_tag($tag_string, $entity_item_id)
     {
-        // Closing tag
-        if (strpos($tag_string, '/>') === FALSE)
-        {
-            $tag_string = str_replace('>', '/>', $tag_string);
-        }
+//        // Closing tag
+//        if (strpos($tag_string, '/>') === FALSE)
+//        {
+//            $tag_string = str_replace('>', '/>', $tag_string);
+//        }
 
         // Parsing
         $sx = simplexml_load_string($tag_string);
@@ -690,17 +711,10 @@ class Task_Content_Import_Wordpress extends Minion_Task
 
         $this->debug('Found inline image :tag', [':tag' => $tag_string]);
 
-        $wp_id = intval( @explode('wp-image-', $attributes['class'])[1] );
-
-        if (!$wp_id)
-            throw new Task_Exception('Can not determine WP ID from :str', [':str' => $tag_string]);
-
         $wp_image = $this->wp()->get_attachment_by_path($original_url);
 
-        if ($wp_image['ID'] != $wp_id)
-            throw new Task_Exception('WP ID does not match for :str', [':str' => $tag_string]);
-
-//        $provider = $this->assets_provider_content_image();
+        if (!$wp_image)
+            throw new Task_Exception('Incorrect image src :value', [':value' => $original_url]);
 
         /** @var Model_ContentImageElement $image */
         $image = $this->process_attachment($wp_image);
@@ -829,13 +843,16 @@ class Task_Content_Import_Wordpress extends Minion_Task
             $video->set_height($height);
         }
 
+        if ($video->changed())
+        {
+            $this->info('Youtube video :id processed', [':id' => $youtube_id]);
+        }
+
         $video
             ->set_uploaded_by($this->current_user())
             ->set_entity($this->get_content_entity())
             ->set_entity_item_id($entity_item_id)
             ->save();
-
-        $this->info('Youtube video :id processed', [':id' => $youtube_id]);
 
         $attributes = [
             'width'     =>  $width,

@@ -1,6 +1,6 @@
 <?php
 
-class Service_Content extends \BetaKiller\Service
+class Service_ContentFacade extends \BetaKiller\Service
 {
     use BetaKiller\Helper\ContentTrait;
 
@@ -15,7 +15,7 @@ class Service_Content extends \BetaKiller\Service
         {
             $allowed_mimes = $provider->get_allowed_mime_types();
 
-            if ($allowed_mimes AND is_array($allowed_mimes) AND in_array($mime, $allowed_mimes))
+            if ($allowed_mimes && is_array($allowed_mimes) && in_array($mime, $allowed_mimes))
                 return $provider;
         }
 

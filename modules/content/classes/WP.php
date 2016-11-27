@@ -57,12 +57,14 @@ class WP
     {
         $query = DB::select()
             ->from('posts')
-            ->and_where('post_status', '=', 'publish')
             ->and_where('post_type', '=', self::POST_TYPE_ATTACHMENT)
             ->and_where('guid', '=', $path)
             ->limit(1);
 
-        return $query->execute('wp');
+        /** @var Database_Result $result */
+        $result = $query->execute('wp');
+
+        return $result->current();
     }
 
     public function get_post_meta($post_id)

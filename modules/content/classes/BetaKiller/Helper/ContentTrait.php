@@ -15,11 +15,11 @@ trait ContentTrait
     }
 
     /**
-     * @return \Service_Content
+     * @return \Service_ContentFacade
      */
-    protected function service_content()
+    protected function service_content_facade()
     {
-        return \Service_Content::instance();
+        return \Service_ContentFacade::instance();
     }
 
     /**

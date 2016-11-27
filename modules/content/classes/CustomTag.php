@@ -96,7 +96,7 @@ class CustomTag
             $tag_name   = $match[1];
 
             // Парсим тег
-            $sx = simplexml_load_string($tag_string);
+            $sx = @simplexml_load_string($tag_string);
 
             if ($sx === FALSE)
                 throw new \Kohana_Exception('Custom tag parsing failed on :string', [':string' => $tag_string]);
