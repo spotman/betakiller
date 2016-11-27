@@ -45,6 +45,38 @@ interface Assets_ModelInterface {
     public function set_uploaded_by(Model_User $user);
 
     /**
+     * Returns the date and time when asset was uploaded
+     *
+     * @return DateTime
+     */
+    public function get_uploaded_at();
+
+    /**
+     * Sets the date and time when asset was uploaded
+     *
+     * @param \DateTime $time
+     *
+     * @return mixed
+     */
+    public function set_uploaded_at(DateTime $time);
+
+    /**
+     * Returns the date and time when asset was last modified
+     *
+     * @return DateTime
+     */
+    public function get_last_modified_at();
+
+    /**
+     * Sets the date and time when asset was last modified
+     *
+     * @param \DateTime $time
+     *
+     * @return mixed
+     */
+    public function set_last_modified_at(DateTime $time);
+
+    /**
      * Returns original file name (user-defined filename of uploaded file)
      *
      * @return string

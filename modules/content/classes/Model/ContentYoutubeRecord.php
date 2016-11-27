@@ -1,6 +1,9 @@
 <?php
 
-class Model_ContentYoutubeRecord extends ORM
+use BetaKiller\Content\ImportedFromWordpressInterface;
+use BetaKiller\Content\ContentElementInterface;
+
+class Model_ContentYoutubeRecord extends ORM implements ContentElementInterface, ImportedFromWordpressInterface
 {
     use Model_ORM_ContentElementTrait,
         Model_ORM_ImportedFromWordpressTrait;

@@ -451,7 +451,7 @@ abstract class Assets_Provider {
      *
      * @return Assets_ModelInterface
      */
-    abstract protected function file_model_factory();
+    abstract public function file_model_factory();
 
     /**
      * Returns TRUE if upload is granted

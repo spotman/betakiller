@@ -12,11 +12,6 @@ class Service_Content_Attachment extends Service_Content_WithAssets
         return CustomTag::ATTACHMENT;
     }
 
-    protected function file_model_factory()
-    {
-        return $this->model_factory_content_attachment_element();
-    }
-
     /**
      * @return Assets_Provider_ContentAttachment
      */

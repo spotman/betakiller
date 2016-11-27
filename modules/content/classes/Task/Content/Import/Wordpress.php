@@ -1,6 +1,9 @@
 <?php
 
 use PHPHtmlParser\Dom;
+use BetaKiller\Content\ImportedFromWordpressInterface;
+use BetaKiller\Content\HasWordpressPathInterface;
+use BetaKiller\Content\ContentElementInterface;
 
 class Task_Content_Import_Wordpress extends Minion_Task
 {
@@ -22,7 +25,7 @@ class Task_Content_Import_Wordpress extends Minion_Task
         $this->configure_dialog();
 
         // Attachments
-        $this->import_attachments();
+//        $this->process_attachments();
 
         // Posts
         $this->import_posts_and_pages();
@@ -81,19 +84,15 @@ class Task_Content_Import_Wordpress extends Minion_Task
         $wp->set_option(self::WP_OPTION_PARSING_PATH, $parsing_path);
     }
 
-    protected function import_attachments()
+    protected function process_attachments(array $attachments, Assets_Provider $provider = NULL)
     {
-        $wp = $this->wp();
-
-        $attachments = $wp->get_attachments();
-
         $this->info('Processing attachments');
 
         foreach ($attachments as $attach)
         {
             try
             {
-                $this->process_attachment($attach);
+                $this->process_attachment($attach, $provider);
             }
             catch (Exception $e)
             {
@@ -120,35 +119,52 @@ class Task_Content_Import_Wordpress extends Minion_Task
         return $content_entity;
     }
 
-    protected function process_attachment(array $attach)
+    protected function process_attachment(array $attach, Assets_Provider $provider = NULL)
     {
         $wp_id = $attach['ID'];
-        $mime = $attach['post_mime_type'];
         $url = $attach['guid'];
 
         $this->debug('Found attach with guid = :url', [':url' => $url]);
 
-        /** @var Service_Content_WithAssets $service */
-        $service = $this->service_content_from_mime($mime);
+        if (!$provider)
+        {
+            $mime = $attach['post_mime_type'];
 
-        /* $model = */ $this->store_attachment($service, $url, $wp_id);
+            // Detect and instantiate assets provider by file MIME-type
+            $provider = $this->service_content()->assets_provider_factory_from_mime($mime);
+        }
 
-        // TODO Save created_at + updated_at
-//        $created_at = new DateTime($attach['post_date']);
-//        $updated_at = new DateTime($attach['post_modified']);
+        $model = $this->store_attachment($provider, $url, $wp_id);
+
+        // Save created_at + updated_at
+        $created_at = new DateTime($attach['post_date']);
+        $updated_at = new DateTime($attach['post_modified']);
+
+        $model
+            ->set_uploaded_at($created_at)
+            ->set_last_modified_at($updated_at)
+            ->save();
+
+        return $model;
     }
 
     /**
-     * @param Service_Content_WithAssets $service
-     * @param $url
-     * @param $wp_id
-     * @return Model_ContentElementInterface|Model_ORM_ContentElementTrait|Model_ORM_HasWordpressPathTrait|Model_ORM_ImportedFromWordpressTrait
+     * @param Assets_Provider   $provider
+     * @param string            $url
+     * @param int               $wp_id
+     * @param int|null          $entity_item_id
+     * @return Model_ContentAttachmentElement
      * @throws Task_Exception
      */
-    protected function store_attachment(Service_Content_WithAssets $service, $url, $wp_id)
+    protected function store_attachment(Assets_Provider $provider, $url, $wp_id, $entity_item_id = NULL)
     {
+        $orm = $provider->file_model_factory();
+
+        if (!$orm instanceof ImportedFromWordpressInterface)
+            throw new Task_Exception('Attachment model must be instance of :class', [':class' => ImportedFromWordpressInterface::class]);
+
         // Search for such file already exists
-        $model = $service->find_file_by_wp_id($wp_id);
+        $model = $orm->find_by_wp_id($wp_id);
 
         if (!$model)
         {
@@ -156,17 +172,35 @@ class Task_Content_Import_Wordpress extends Minion_Task
             $original_filename = basename($url);
 
             // Getting path for local file with attachment content
-            $path = $this->get_attachment_path($url_path, $service->get_allowed_mime_types());
+            $path = $this->get_attachment_path($url_path, $provider->get_allowed_mime_types());
 
             if (!$path)
                 throw new Task_Exception('Can not get path for guid = :url', [':url' => $url]);
 
             /** @var Model_ContentAttachmentElement $model */
-            $model = $service->store_file($path, $original_filename, $this->get_content_entity());
+            $model = $provider->store($path, $original_filename);
 
+            if ($model instanceof ContentElementInterface)
+            {
+                // Storing entity
+                $model->set_entity($this->get_content_entity());
+
+                // Storing entity item ID
+                if ($entity_item_id)
+                {
+                    $model->set_entity_item_id($entity_item_id);
+                }
+            }
+
+            if ($model instanceof HasWordpressPathInterface)
+            {
+                // Storing WP ID
+                $model->set_wp_path($url_path);
+            }
+
+            // Storing WP ID
             $model
-                ->set_wp_id($wp_id) // Storing ID for text processing
-                ->set_wp_path($url_path)
+                ->set_wp_id($wp_id)
                 ->save();
 
             // Cleanup temp files
@@ -274,14 +308,14 @@ class Task_Content_Import_Wordpress extends Minion_Task
 
             $content_post_orm = $this->model_factory_content_post();
 
-            $item = $content_post_orm->find_by_wp_id($id);
+            $model = $content_post_orm->find_by_wp_id($id);
 
             if ($type == $wp::POST_TYPE_PAGE)
             {
-                $item->mark_as_page();
+                $model->mark_as_page();
             }
 
-            $item
+            $model
                 ->set_wp_id($id)
                 ->set_uri($uri)
                 ->set_label($name)
@@ -291,24 +325,24 @@ class Task_Content_Import_Wordpress extends Minion_Task
                 ->set_created_at($created_at)
                 ->set_updated_at($updated_at);
 
-            $item->save();
-
-            // Parsing all images first to get @alt and @title values
-            $this->process_content_images($item);
-
-            // Parsing custom tags next
-            $this->process_custom_tags($item);
-
-            // Processing YouTube <iframe> embeds
-            $this->process_content_youtube_iframes($item);
-
-            $this->post_process_article_text($item);
-
-            // Saving model and getting its ID for further processing
-            $item->save();
+            $model->save();
 
             // Link thumbnail images to post
-            $this->process_thumbnails($item, $meta);
+            $this->process_thumbnails($model, $meta);
+
+            // Parsing all images first to get @alt and @title values
+            $this->process_content_images($model);
+
+            // Parsing custom tags next
+            $this->process_custom_tags($model);
+
+            // Processing YouTube <iframe> embeds
+            $this->process_content_youtube_iframes($model);
+
+            $this->post_process_article_text($model);
+
+            // Saving model and getting its ID for further processing
+            $model->save();
 
 //            print_r($article->as_array());
 //            print_r($meta);
@@ -378,12 +412,12 @@ class Task_Content_Import_Wordpress extends Minion_Task
             if (strpos($href, '/wp-content/') === FALSE)
                 continue;
 
-            $path = parse_url($href, PHP_URL_PATH);
+            $attach = $this->wp()->get_attachment_by_path($href);
 
-            $model = $this->model_factory_content_attachment_element()->find_by_wp_path($path);
+            if (!$attach)
+                throw new Task_Exception('Unknown attachment href :url', [':url' => $href]);
 
-            if (!$model)
-                throw new Task_Exception('Unknown attachment href :url', [':url' => $path]);
+            $model = $this->process_attachment($attach);
 
             $new_url = $model->get_original_url();
 
@@ -394,54 +428,63 @@ class Task_Content_Import_Wordpress extends Minion_Task
         }
     }
 
-    protected function process_thumbnails(Model_ContentPost $item, array $meta)
+    protected function process_thumbnails(Model_ContentPost $post, array $meta)
     {
         $wp = $this->wp();
-        $wp_id = $item->get_wp_id();
+        $wp_id = $post->get_wp_id();
 
-        $images_wp_ids = [];
+        $wp_images_ids = [];
 
         if ($wp->post_has_post_format($wp_id, 'gallery'))
         {
             $this->debug('Getting thumbnail images from from _format_gallery_images');
 
             // Getting images from meta._format_gallery_images
-            $images_wp_ids += (array) unserialize($meta['_format_gallery_images']);
+            $wp_images_ids += (array) unserialize($meta['_format_gallery_images']);
         }
 
-        if (!$images_wp_ids && isset($meta['_thumbnail_id']))
+        if (!$wp_images_ids && isset($meta['_thumbnail_id']))
         {
             $this->debug('Getting thumbnail image from from _thumbnail_id');
 
             // Getting thumbnail image from meta._thumbnail_id
-            $images_wp_ids = [$meta['_thumbnail_id']];
+            $wp_images_ids = [$meta['_thumbnail_id']];
         }
 
-        if (!$images_wp_ids && $item->is_page())
+        if (!$wp_images_ids)
         {
             // Allow plain pages without thumbnails
+            if ($post->is_article())
+            {
+                $this->warning('Article with uri [:uri] has no thumbnail', [
+                    ':uri' => $post->get_uri(),
+                ]);
+            }
+
             return;
         }
 
-        // Getting real IDs
-        $images_ids = $this->model_factory_content_image_element()->find_ids_by_wp_ids($images_wp_ids);
+        // Getting data for each thumbnail
+        $images_wp_data = $wp->get_attachments(NULL, $wp_images_ids);
 
-        if ($images_ids)
+        if (!$images_wp_data)
         {
-            $item->reset_thumbnails($images_ids);
-        }
-        else if ($images_wp_ids)
-        {
-//            print_r($meta);
             $this->warning('Some images can not be found with WP ids :ids', [
-                ':ids' => implode(', ', $images_wp_ids)
+                ':ids' => implode(', ', $wp_images_ids)
             ]);
+
+            return;
         }
-        else
+
+        $provider = $this->assets_provider_content_post_thumbnail();
+
+        foreach ($images_wp_data as $image_data)
         {
-            $this->warning('Article with uri [:uri] has no thumbnail', [
-                ':uri' => $item->get_uri(),
-            ]);
+            /** @var Model_ContentPostThumbnail $image_model */
+            $image_model = $this->process_attachment($image_data, $provider);
+
+            // Linking image to post
+            $image_model->set_post($post)->save();
         }
     }
 
@@ -510,16 +553,26 @@ class Task_Content_Import_Wordpress extends Minion_Task
         $wp_ids_string = str_replace(' ', '', $wp_ids_string);
         $wp_ids = explode(',', $wp_ids_string);
 
-        $ids = $this->model_factory_content_image_element()->find_ids_by_wp_ids($wp_ids);
+//        $provider = $this->assets_provider_content_image();
+        $wp_images = $this->wp()->get_attachments(NULL, $wp_ids);
 
-        if (!$ids)
+        $images_ids = [];
+
+        // Process every image in set
+        foreach ($wp_images as $wp_image_data)
+        {
+            $model = $this->process_attachment($wp_image_data);
+            $images_ids[] = $model->get_id();
+        }
+
+        if (!$images_ids)
         {
             $this->warning('No images found for gallery with WP IDs :ids', [':ids' => implode(', ', $wp_ids)]);
             return null;
         }
 
         $attributes = [
-            'ids'       =>  implode(',', $ids),
+            'ids'       =>  implode(',', $images_ids),
             'type'      =>  $type,
             'columns'   =>  $columns,
         ];
@@ -541,13 +594,18 @@ class Task_Content_Import_Wordpress extends Minion_Task
         foreach ($config['slides'] as $slide)
         {
             $url = $slide['image'];
-            $url_path = parse_url($url, PHP_URL_PATH);
+//            $url_path = parse_url($url, PHP_URL_PATH);
 
-            // Converting url to image ID
-            $image = $this->model_factory_content_image_element()->find_by_wp_path($url_path);
+            // Searching for image
+            $wp_image = $this->wp()->get_attachment_by_path($url);
 
-            if (!$image)
+            if (!$wp_image)
                 throw new Task_Exception('Unknown image in wonderplugin: :url', [':url' => $url]);
+
+            // Processing image
+
+            /** @var Model_ContentImageElement $image */
+            $image = $this->process_attachment($wp_image);
 
             $caption = $slide['alt'] ?: $slide['title'];
 
@@ -637,8 +695,15 @@ class Task_Content_Import_Wordpress extends Minion_Task
         if (!$wp_id)
             throw new Task_Exception('Can not determine WP ID from :str', [':str' => $tag_string]);
 
+        $wp_image = $this->wp()->get_attachment_by_path($original_url);
+
+        if ($wp_image['ID'] != $wp_id)
+            throw new Task_Exception('WP ID does not match for :str', [':str' => $tag_string]);
+
+//        $provider = $this->assets_provider_content_image();
+
         /** @var Model_ContentImageElement $image */
-        $image = $this->store_attachment($this->service_admin_image(), $original_url, $wp_id);
+        $image = $this->process_attachment($wp_image);
         
         $alt = trim(Arr::get($attributes, 'alt'));
         $title = trim(Arr::get($attributes, 'title'));

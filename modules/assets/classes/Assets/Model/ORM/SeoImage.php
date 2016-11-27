@@ -1,9 +1,8 @@
 <?php
 
-trait Model_ORM_ContentImageElementTrait
-{
-    use Model_ORM_ContentElementTrait;
 
+abstract class Assets_Model_ORM_SeoImage extends Assets_Model_ORM_Image
+{
     /**
      * @param string $value
      * @return $this|ORM

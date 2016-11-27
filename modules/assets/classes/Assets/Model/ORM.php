@@ -104,6 +104,50 @@ abstract class Assets_Model_ORM extends ORM implements Assets_ModelInterface {
     }
 
     /**
+     * Returns the date and time when asset was uploaded
+     *
+     * @return DateTime|NULL
+     */
+    public function get_uploaded_at()
+    {
+        return $this->get_datetime_column_value('uploaded_at');
+    }
+
+    /**
+     * Sets the date and time when asset was uploaded
+     *
+     * @param \DateTime $time
+     *
+     * @return $this
+     */
+    public function set_uploaded_at(DateTime $time)
+    {
+        return $this->set_datetime_column_value('uploaded_at', $time);
+    }
+
+    /**
+     * Returns the date and time when asset was modified
+     *
+     * @return DateTime|NULL
+     */
+    public function get_last_modified_at()
+    {
+        return $this->get_datetime_column_value('last_modified_at');
+    }
+
+    /**
+     * Sets the date and time when asset was modified
+     *
+     * @param \DateTime $time
+     *
+     * @return $this
+     */
+    public function set_last_modified_at(DateTime $time)
+    {
+        return $this->set_datetime_column_value('last_modified_at', $time);
+    }
+
+    /**
      * Returns file size in bytes
      *
      * @return integer
@@ -232,6 +276,16 @@ abstract class Assets_Model_ORM extends ORM implements Assets_ModelInterface {
         $this->get_provider()->delete($this);
 
         return parent::delete();
+    }
+
+    /**
+     * Returns array representation of the model
+     *
+     * @return array
+     */
+    public function to_json()
+    {
+        return $this->as_array();
     }
 
     /**

@@ -1,8 +1,10 @@
 <?php
 
-class Model_ContentImageElement extends Assets_Model_ORM_Image implements Model_ContentElementInterface
+use BetaKiller\Content\ContentElementFromWordpressWithPathInterface;
+
+class Model_ContentImageElement extends Assets_Model_ORM_SeoImage implements ContentElementFromWordpressWithPathInterface
 {
-    use Model_ORM_ContentImageElementTrait,
+    use Model_ORM_ContentElementTrait,
         Model_ORM_ImportedFromWordpressTrait,
         Model_ORM_HasWordpressPathTrait;
 

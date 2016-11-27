@@ -19,7 +19,7 @@ class Assets_Storage_Local extends Assets_Storage {
     public function set_base_path($base_path)
     {
         if ( ! file_exists($base_path) OR ! is_dir($base_path) )
-            throw new Assets_Storage_Exception('Incorrect path provided');
+            throw new Assets_Storage_Exception('Incorrect path provided :value', [':value' => $base_path]);
 
         $this->_base_path = $base_path;
         return $this;

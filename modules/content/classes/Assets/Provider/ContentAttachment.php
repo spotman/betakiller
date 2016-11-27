@@ -1,5 +1,7 @@
 <?php
 
+use BetaKiller\Content\ContentElementInterface;
+
 class Assets_Provider_ContentAttachment extends \Assets_Provider
 {
     use \Assets_Provider_ContentTrait;
@@ -7,10 +9,10 @@ class Assets_Provider_ContentAttachment extends \Assets_Provider
     /**
      * Custom upload processing
      *
-     * @param Model_ContentElementInterface $model
-     * @param string $content
-     * @param array $_post_data
-     * @param string $file_path Full path to source file
+     * @param ContentElementInterface $model
+     * @param string                  $content
+     * @param array                   $_post_data
+     * @param string                  $file_path Full path to source file
      * @return string
      */
     protected function _upload($model, $content, array $_post_data, $file_path)
@@ -35,7 +37,7 @@ class Assets_Provider_ContentAttachment extends \Assets_Provider
      *
      * @return \Assets_ModelInterface
      */
-    protected function file_model_factory()
+    public function file_model_factory()
     {
         return $this->model_factory_content_attachment_element();
     }

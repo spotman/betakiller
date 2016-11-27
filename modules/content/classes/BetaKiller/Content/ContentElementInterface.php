@@ -1,8 +1,14 @@
 <?php
+namespace BetaKiller\Content;
 
 // Model_ContentImageElement extends Assets_Model_ORM_Image
 // Model_ContentAttachmentElement extends Assets_Model_ORM
-interface Model_ContentElementInterface
+use Database_Result;
+use Kohana_Exception;
+use Model_ContentEntity;
+use ORM;
+
+interface ContentElementInterface
 {
     /**
      * @return int
@@ -12,12 +18,13 @@ interface Model_ContentElementInterface
     /**
      * @param int
      *
-     * @return Model_ContentElementInterface|NULL
+     * @return ContentElementInterface|NULL
      */
     public function get_by_id($id);
 
     /**
      * @param Model_ContentEntity $entity
+     *
      * @return $this|ORM
      * @throws Kohana_Exception
      */
@@ -38,6 +45,7 @@ interface Model_ContentElementInterface
      * Устанавливает ссылку на ID записи из таблицы, к которой привязана entity
      *
      * @param int $id
+     *
      * @return $this|ORM
      * @throws Kohana_Exception
      */
@@ -50,31 +58,35 @@ interface Model_ContentElementInterface
     public function get_entity_item_id();
 
     /**
-     * @return Database_Result|Model_ContentElementInterface[]
+     * @return Database_Result|ContentElementInterface[]
      * @throws Kohana_Exception
      */
     public function get_all_files();
 
     /**
      * @param Model_ContentEntity $entity
+     *
      * @return int[]
      */
     public function get_entity_items_ids(Model_ContentEntity $entity);
 
     /**
      * @param $item_id
+     *
      * @return $this
      */
     public function filter_entity_item_id($item_id);
 
     /**
      * @param array $item_ids
+     *
      * @return $this
      */
     public function filter_entity_item_ids(array $item_ids);
 
     /**
      * @param int $entity_id
+     *
      * @return $this
      */
     public function filter_entity_id($entity_id);
@@ -83,12 +95,4 @@ interface Model_ContentElementInterface
      * @return $this
      */
     public function group_by_entity_item_id();
-
-    /**
-     * Returns array representation of the model
-     *
-     * @return array
-     */
-    public function to_json();
-
 }

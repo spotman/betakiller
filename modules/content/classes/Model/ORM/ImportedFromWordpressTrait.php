@@ -30,11 +30,11 @@ trait Model_ORM_ImportedFromWordpressTrait
 
     /**
      * @param int $id
-     * @return Model_ORM_ImportedFromWordpressTrait|ORM|null
+     * @return \BetaKiller\Content\ImportedFromWordpressInterface|\ORM|null
      */
     public function find_by_wp_id($id)
     {
-        /** @var \ORM|$this $model */
+        /** @var \ORM|\BetaKiller\Content\ImportedFromWordpressInterface $model */
         $model = $this->filter_wp_id($id)->find();
 
         return $model->loaded() ? $model : NULL;

@@ -1,6 +1,6 @@
 <?php
 
-class Service_Content_Youtube extends Service_Content
+class Service_Content_Youtube extends Service_Content_Base
 {
     /**
      * Custom HTML-tag name related to current service

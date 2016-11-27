@@ -1,5 +1,7 @@
 <?php
 
+use BetaKiller\Content\ContentElementInterface;
+
 abstract class Model_ContentEntityRelated extends Model_ContentEntity
 {
     /**
@@ -42,7 +44,7 @@ abstract class Model_ContentEntityRelated extends Model_ContentEntity
     }
 
     /**
-     * @return Model_ContentElementInterface
+     * @return ContentElementInterface
      * @throws Kohana_Exception
      */
     protected function get_files_relation()
@@ -51,7 +53,7 @@ abstract class Model_ContentEntityRelated extends Model_ContentEntity
     }
 
     /**
-     * @return Model_ContentElementInterface
+     * @return ContentElementInterface
      * @throws Kohana_Exception
      */
     protected function content_file_factory()
@@ -59,7 +61,7 @@ abstract class Model_ContentEntityRelated extends Model_ContentEntity
         $name = $this->get_file_model_name();
         $model = ORM::factory($name);
 
-        $base = Model_ContentElementInterface::class;
+        $base = ContentElementInterface::class;
 
         if (!($model instanceof $base))
             throw new Kohana_Exception('Content file model must extend :base', [':base' => $base]);
@@ -71,7 +73,8 @@ abstract class Model_ContentEntityRelated extends Model_ContentEntity
      * @param int $entity_item_id
      * @param Model_User $user
      * @param bool $save_in_db
-     * @return Model_ContentElementInterface
+     *
+*@return ContentElementInterface
      */
     public function create_file($entity_item_id, Model_User $user, $save_in_db = TRUE)
     {
@@ -93,7 +96,8 @@ abstract class Model_ContentEntityRelated extends Model_ContentEntity
      * Опционально можно отфильтровать по ID записи из таблицы сущности
      *
      * @param int|null $item_id
-     * @return Database_Result|Model_ContentElementInterface[]
+     *
+*@return Database_Result|ContentElementInterface[]
      * @throws Kohana_Exception
      */
     public function get_files($item_id = NULL)
@@ -103,7 +107,8 @@ abstract class Model_ContentEntityRelated extends Model_ContentEntity
 
     /**
      * @param array $items_ids
-     * @return Model_ContentElementInterface[]
+     *
+*@return ContentElementInterface[]
      * @throws Kohana_Exception
      */
     public function get_files_for_items_ids(array $items_ids)
@@ -120,7 +125,8 @@ abstract class Model_ContentEntityRelated extends Model_ContentEntity
 
     /**
      * @param int|null $item_id
-     * @return Model_ContentElementInterface
+     *
+*@return ContentElementInterface
      */
     protected function get_files_query($item_id = NULL)
     {

@@ -1,5 +1,7 @@
 <?php
 
+use BetaKiller\Content\ContentElementInterface;
+
 trait Assets_Provider_ContentTrait
 {
     use \BetaKiller\Helper\ContentTrait;
@@ -8,8 +10,8 @@ trait Assets_Provider_ContentTrait
     /**
      * Custom upload processing
      *
-     * @param Model_ContentElementInterface $model
-     * @param array $_post_data
+     * @param ContentElementInterface $model
+     * @param array                   $_post_data
      */
     protected function upload_preprocessor($model, array $_post_data)
     {

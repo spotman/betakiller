@@ -33,7 +33,7 @@ class WP
         return $this->get_posts_by_types([self::POST_TYPE_PAGE, self::POST_TYPE_POST]);
     }
 
-    public function get_attachments(array $mime_types = NULL)
+    public function get_attachments(array $mime_types = NULL, array $filter_ids = NULL)
     {
         $query = DB::select()
             ->from('posts')
@@ -44,6 +44,23 @@ class WP
         {
             $query->and_where('post_mime_type', 'IN', $mime_types);
         }
+
+        if ($filter_ids)
+        {
+            $query->where('ID', 'IN', $filter_ids);
+        }
+
+        return $query->execute('wp');
+    }
+
+    public function get_attachment_by_path($path)
+    {
+        $query = DB::select()
+            ->from('posts')
+            ->and_where('post_status', '=', 'publish')
+            ->and_where('post_type', '=', self::POST_TYPE_ATTACHMENT)
+            ->and_where('guid', '=', $path)
+            ->limit(1);
 
         return $query->execute('wp');
     }
@@ -384,7 +401,7 @@ class WP
         // Optimize when searching for one item.
         if ( 1 === count( $replace_pairs ) ) {
             // Extract $needle and $replace.
-            foreach ( $replace_pairs as $needle => $replace );
+            list($needle, $replace) = array_pop($replace_pairs);
 
             // Loop through delimiters (elements) only.
             for ( $i = 1, $c = count( $textarr ); $i < $c; $i += 2 ) {

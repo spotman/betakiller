@@ -31,7 +31,7 @@ class Controller_Content extends Controller
      */
     protected function find_content_model_by_wp_path($path)
     {
-        /** @var Model_ORM_HasWordpressPathTrait[] $models */
+        /** @var \BetaKiller\Content\HasWordpressPathInterface[] $models */
         $models = [
             $this->model_factory_content_image_element(),
             $this->model_factory_content_post_thumbnail(),

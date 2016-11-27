@@ -126,7 +126,7 @@ class Results implements Model\Results, \API_Response_Item
     /**
      * @return DateTime|NULL
      */
-    public function get_last_modified()
+    public function get_api_last_modified()
     {
         // Not done yet
         return null;

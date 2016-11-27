@@ -12,11 +12,6 @@ class Service_Content_Image extends Service_Content_WithAssets
         return CustomTag::IMAGE;
     }
 
-    protected function file_model_factory()
-    {
-        return $this->model_factory_content_image_element();
-    }
-
     /**
      * @return Assets_Provider_ContentImage
      */

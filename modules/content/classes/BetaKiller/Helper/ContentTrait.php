@@ -3,25 +3,23 @@ namespace BetaKiller\Helper;
 
 trait ContentTrait
 {
-    protected function service_content_from_mime($mime)
+    /**
+     * @param $mime
+     *
+     * @return \Service_Content_WithAssets
+     * @deprecated
+     */
+    protected function service_content_assets($mime)
     {
         return \Service_Content_WithAssets::service_instance_by_mime($mime);
     }
 
     /**
-     * @return \Service_Content_Image
+     * @return \Service_Content
      */
-    protected function service_admin_image()
+    protected function service_content()
     {
-        return \Service_Content_Image::instance();
-    }
-
-    /**
-     * @return \Service_Content_Attachment
-     */
-    protected function service_content_attachment()
-    {
-        return \Service_Content_Attachment::instance();
+        return \Service_Content::instance();
     }
 
     /**
@@ -30,6 +28,30 @@ trait ContentTrait
     protected function service_content_youtube()
     {
         return \Service_Content_Youtube::instance();
+    }
+
+    /**
+     * @return \Assets_Provider_ContentImage
+     */
+    protected function assets_provider_content_image()
+    {
+        return \Assets_Provider_Factory::instance()->create('ContentImage');
+    }
+
+    /**
+     * @return \Assets_Provider_ContentAttachment
+     */
+    protected function assets_provider_content_attachment()
+    {
+        return \Assets_Provider_Factory::instance()->create('ContentAttachment');
+    }
+
+    /**
+     * @return \Assets_Provider_ContentPostThumbnail
+     */
+    protected function assets_provider_content_post_thumbnail()
+    {
+        return \Assets_Provider_Factory::instance()->create('ContentPostThumbnail');
     }
 
     /**

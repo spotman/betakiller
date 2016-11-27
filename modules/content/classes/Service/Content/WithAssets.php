@@ -1,10 +1,18 @@
 <?php
 
-abstract class Service_Content_WithAssets extends Service_Content
+use BetaKiller\Content\ContentElementInterface;
+
+/**
+ * Class Service_Content_WithAssets
+ * @deprecated
+ */
+abstract class Service_Content_WithAssets extends Service_Content_Base
 {
     /**
      * @param string $mime
+     *
      * @return Service_Content_WithAssets
+     * @deprecated
      */
     public static function service_instance_by_mime($mime)
     {
@@ -30,7 +38,7 @@ abstract class Service_Content_WithAssets extends Service_Content
      * @param $original_name
      * @param Model_ContentEntity $entity
      * @param null $entity_item_id
-     * @return Model_ContentElementInterface
+     * @return ContentElementInterface
      */
     public function store_file($full_path, $original_name, Model_ContentEntity $entity, $entity_item_id = NULL)
     {
@@ -47,6 +55,14 @@ abstract class Service_Content_WithAssets extends Service_Content
     public function get_allowed_mime_types()
     {
         return $this->get_assets_provider()->get_allowed_mime_types();
+    }
+
+    /**
+     * @return ContentElementInterface|\BetaKiller\Content\ImportedFromWordpressInterface|Assets_ModelInterface
+     */
+    protected function file_model_factory()
+    {
+        return $this->get_assets_provider()->file_model_factory();
     }
 
     /**

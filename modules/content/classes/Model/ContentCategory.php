@@ -1,6 +1,10 @@
 <?php
 
-class Model_ContentCategory extends \BetaKiller\Utils\Kohana\TreeModel implements \BetaKiller\Content\SeoContentInterface
+use \BetaKiller\Utils\Kohana\TreeModel;
+use \BetaKiller\Content\ImportedFromWordpressInterface;
+use \BetaKiller\Content\SeoContentInterface;
+
+class Model_ContentCategory extends TreeModel implements SeoContentInterface, ImportedFromWordpressInterface
 {
     use Model_ORM_ImportedFromWordpressTrait,
         Model_ORM_SeoContentTrait;

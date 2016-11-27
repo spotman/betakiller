@@ -1,28 +1,12 @@
 <?php
 
-class Assets_Provider_ContentThumbnail extends \Assets_Provider_Image
+class Assets_Provider_ContentPostThumbnail extends \Assets_Provider_Image
 {
     use \Assets_Provider_ContentTrait;
 
-    /**
-     * Custom upload processing
-     *
-     * @param Model_ContentImageElement $model
-     * @param string $content
-     * @param array $_post_data
-     * @param string $file_path Full path to source file
-     * @return string
-     */
-    protected function _upload($model, $content, array $_post_data, $file_path)
-    {
-        $this->upload_preprocessor($model, $_post_data);
-
-        return parent::_upload($model, $content, $_post_data, $file_path);
-    }
-
     protected function get_storage_path_name()
     {
-        return 'thumbnails';
+        return 'post-thumbnails';
     }
 
     /**
@@ -86,7 +70,7 @@ class Assets_Provider_ContentThumbnail extends \Assets_Provider_Image
      *
      * @return Assets_ModelInterface
      */
-    protected function file_model_factory()
+    public function file_model_factory()
     {
         return $this->model_factory_content_post_thumbnail();
     }

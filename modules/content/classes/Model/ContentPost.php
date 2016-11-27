@@ -1,6 +1,9 @@
 <?php
 
-class Model_ContentPost extends ORM implements \BetaKiller\Content\SeoContentInterface
+use BetaKiller\Content\ImportedFromWordpressInterface;
+use BetaKiller\Content\SeoContentInterface;
+
+class Model_ContentPost extends ORM implements SeoContentInterface, ImportedFromWordpressInterface
 {
     use Model_ORM_SeoContentTrait,
         Model_ORM_ImportedFromWordpressTrait;
@@ -43,7 +46,7 @@ class Model_ContentPost extends ORM implements \BetaKiller\Content\SeoContentInt
         $this->has_many([
             'thumbnails'        =>  [
                 'model'         =>  'ContentPostThumbnail',
-                'foreign_key'   =>  'post_id',
+                'foreign_key'   =>  'content_post_id',
 //                'far_key'       =>  'content_image_id',
 //                'through'       =>  'content_posts_thumbnails',
             ]
@@ -92,6 +95,11 @@ class Model_ContentPost extends ORM implements \BetaKiller\Content\SeoContentInt
     public function is_page()
     {
         return ($this->get_type() == self::TYPE_PAGE);
+    }
+
+    public function is_article()
+    {
+        return ($this->get_type() == self::TYPE_ARTICLE);
     }
 
     /**
@@ -178,7 +186,7 @@ class Model_ContentPost extends ORM implements \BetaKiller\Content\SeoContentInt
      */
     public function set_created_at(DateTime $value)
     {
-        return $this->set('created_at', $value->format('Y-m-d H:i:s'));
+        return $this->set_datetime_column_value('created_at', $value);
     }
 
     /**
@@ -187,9 +195,7 @@ class Model_ContentPost extends ORM implements \BetaKiller\Content\SeoContentInt
      */
     public function get_created_at()
     {
-        $value = $this->get('created_at');
-
-        return $value ? new DateTime($value) : NULL;
+        return $this->get_datetime_column_value('created_at');
     }
 
     /**
@@ -199,9 +205,7 @@ class Model_ContentPost extends ORM implements \BetaKiller\Content\SeoContentInt
      */
     public function set_updated_at(DateTime $value)
     {
-        $this->updated_at_was_set = TRUE;
-
-        return $this->set('updated_at', $value->format('Y-m-d H:i:s'));
+        return $this->set_datetime_column_value('updated_at', $value);
     }
 
     /**
@@ -210,15 +214,13 @@ class Model_ContentPost extends ORM implements \BetaKiller\Content\SeoContentInt
      */
     public function get_updated_at()
     {
-        $value = $this->get('updated_at');
-
-        return $value ? new DateTime($value) : NULL;
+        return $this->get_datetime_column_value('updated_at');
     }
 
     /**
      * @return DateTime
      */
-    public function get_last_modified()
+    public function get_api_last_modified()
     {
         return $this->get_updated_at() ?: $this->get_created_at();
     }
@@ -311,15 +313,8 @@ class Model_ContentPost extends ORM implements \BetaKiller\Content\SeoContentInt
         return $this->get('thumbnails');
     }
 
-    public function reset_thumbnails(array $images_ids)
-    {
-        return $this
-            ->remove('thumbnails')
-            ->add('thumbnails', $images_ids);
-    }
-
     /**
-     * @return Model_ContentImageElement[]|Database_Result
+     * @return Model_ContentPostThumbnail[]|Database_Result
      */
     public function get_thumbnails()
     {
@@ -327,7 +322,7 @@ class Model_ContentPost extends ORM implements \BetaKiller\Content\SeoContentInt
     }
 
     /**
-     * @return Model_ContentImageElement
+     * @return Model_ContentPostThumbnail
      */
     public function get_first_thumbnail()
     {
@@ -335,7 +330,7 @@ class Model_ContentPost extends ORM implements \BetaKiller\Content\SeoContentInt
     }
 
     /**
-     * @return Model_ContentImageElement|\ORM|Database_Query_Builder_Select
+     * @return Model_ContentPostThumbnail|\ORM|Database_Query_Builder_Select
      */
     protected function get_thumbnails_query()
     {

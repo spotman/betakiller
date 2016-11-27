@@ -1,6 +1,8 @@
 <?php
 
-class Model_ContentAttachmentElement extends Assets_Model_ORM implements Model_ContentElementInterface
+use BetaKiller\Content\ContentElementFromWordpressWithPathInterface;
+
+class Model_ContentAttachmentElement extends Assets_Model_ORM implements ContentElementFromWordpressWithPathInterface
 {
     use Model_ORM_ContentElementTrait,
         Model_ORM_ImportedFromWordpressTrait,

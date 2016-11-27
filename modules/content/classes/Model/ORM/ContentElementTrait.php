@@ -1,5 +1,7 @@
 <?php
 
+use BetaKiller\Content\ContentElementInterface;
+
 trait Model_ORM_ContentElementTrait
 {
     protected function initialize_entity_relation()
@@ -42,7 +44,7 @@ trait Model_ORM_ContentElementTrait
     }
 
     /**
-     * Устанавливает ссылку на ID записи из таблицы, к которой привязана entity
+     * Set link to linked record ID
      *
      * @param int $id
      * @return $this|ORM
@@ -63,7 +65,7 @@ trait Model_ORM_ContentElementTrait
     }
 
     /**
-     * @return Database_Result|Model_ContentElementInterface[]
+     * @return Database_Result|ContentElementInterface[]
      * @throws Kohana_Exception
      */
     public function get_all_files()
@@ -79,7 +81,7 @@ trait Model_ORM_ContentElementTrait
 
     public function get_entity_items_ids(Model_ContentEntity $entity)
     {
-        /** @var Model_ContentElementInterface $model */
+        /** @var ContentElementInterface $model */
         $model = $this->model_factory();
 
         return $model
@@ -91,7 +93,8 @@ trait Model_ORM_ContentElementTrait
 
     /**
      * @param int $item_id
-     * @return Model_ContentElementInterface
+     *
+     * @return ContentElementInterface
      */
     public function filter_entity_item_id($item_id)
     {
@@ -100,7 +103,8 @@ trait Model_ORM_ContentElementTrait
 
     /**
      * @param array $item_ids
-     * @return Model_ContentElementInterface
+     *
+     * @return ContentElementInterface
      */
     public function filter_entity_item_ids(array $item_ids)
     {
@@ -109,7 +113,8 @@ trait Model_ORM_ContentElementTrait
 
     /**
      * @param $entity_id
-     * @return Model_ContentElementInterface
+     *
+     * @return ContentElementInterface
      */
     public function filter_entity_id($entity_id)
     {
@@ -117,20 +122,10 @@ trait Model_ORM_ContentElementTrait
     }
 
     /**
-     * @return Model_ContentElementInterface
+     * @return ContentElementInterface
      */
     public function group_by_entity_item_id()
     {
         return $this->group_by('entity_item_id');
-    }
-
-    /**
-     * Returns array representation of the model
-     *
-     * @return array
-     */
-    public function to_json()
-    {
-        return $this->as_array();
     }
 }

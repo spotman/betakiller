@@ -86,7 +86,7 @@ class Assets_Provider_ContentImage extends \Assets_Provider_Image
      *
      * @return Assets_ModelInterface
      */
-    protected function file_model_factory()
+    public function file_model_factory()
     {
         return $this->model_factory_content_image_element();
     }

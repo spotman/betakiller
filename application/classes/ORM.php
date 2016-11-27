@@ -27,7 +27,7 @@ class ORM extends Utils\Kohana\ORM
      *
      * @return DateTime|NULL
      */
-    public function get_last_modified()
+    public function get_api_last_modified()
     {
         // Empty by default
         return NULL;
