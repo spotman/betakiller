@@ -377,7 +377,7 @@ class Task_Content_Import_Wordpress extends Minion_Task
 
     protected function remove_links_on_content_images(Document $root)
     {
-        $tag = CustomTag::IMAGE;
+        $tag = CustomTag::PHOTO;
 
         $images = $root->find('a > '.$tag);
 
@@ -485,26 +485,19 @@ class Task_Content_Import_Wordpress extends Minion_Task
 
     protected function process_custom_tags(Model_ContentPost $item)
     {
-        $handlers = new \Thunder\Shortcode\HandlerContainer\HandlerContainer;
+        $facade = new \Thunder\Shortcode\ShortcodeFacade;
 
         // [caption id="attachment_571" align="alignnone" width="780"]
-        $handlers->add('caption', [$this, 'thunder_handler_caption']);
+        $facade->addHandler('caption', [$this, 'thunder_handler_caption']);
 
         // [gallery ids="253,261.260"]
-        $handlers->add('gallery', [$this, 'thunder_handler_gallery']);
+        $facade->addHandler('gallery', [$this, 'thunder_handler_gallery']);
 
         // [wonderplugin_slider id="1"]
-        $handlers->add('wonderplugin-slider', [$this, 'thunder_handler_wonderplugin']);
-
-        $facade = \Thunder\Shortcode\ShortcodeFacade::create($handlers, new Thunder\Shortcode\Syntax\CommonSyntax());
+        $facade->addHandler('wonderplugin-slider', [$this, 'thunder_handler_wonderplugin']);
 
         $content = $item->get_content();
-
-        // Thunder does not understand lo-dash in tag name
-        $content = str_replace('[wonderplugin_slider', '[wonderplugin-slider', $content);
-
         $content = $facade->process($content);
-
         $item->set_content($content);
     }
 
@@ -727,7 +720,7 @@ class Task_Content_Import_Wordpress extends Minion_Task
             );
         }
 
-        return $this->custom_tag_instance()->generate_html(CustomTag::IMAGE, $image->get_id(), $attributes);
+        return $this->custom_tag_instance()->generate_html(CustomTag::PHOTO, $image->get_id(), $attributes);
     }
 
     protected function process_content_youtube_iframes(Model_ContentPost $item)

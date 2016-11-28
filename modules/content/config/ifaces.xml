@@ -5,8 +5,12 @@
     <!--<iface uri="change-account" codename="Auth_ReLogin" title="Change account" />-->
 
     <!-- TODO вынести это всё в файл config/ifaces.php, который добавляет элементы в IFaceModelTree::admin() -->
-    <iface uri="articles" codename="Admin_Article_Index" parentCodename="Admin_Index" title="Articles">
-        <iface uri="{Article.id}" codename="Admin_Article_Item" title="Article {Article.id}" hasDynamicUrl="true" />
+    <iface uri="articles" codename="Admin_Content_ArticleIndex" parentCodename="Admin_Index" title="Articles">
+        <iface uri="{ContentPost.id}" codename="Admin_Content_ArticleItem" title="Admin | Article | {ContentPost.label}" hasDynamicUrl="true" />
+    </iface>
+
+    <iface uri="pages" codename="Admin_Content_PageIndex" parentCodename="Admin_Index" title="Pages">
+        <iface uri="{ContentPost.id}" codename="Admin_Content_PageItem" title="Admin | Page | {ContentPost.label}" hasDynamicUrl="true" />
     </iface>
 
     <!--<iface uri="admin" codename="Admin_Index" title="Admin zone">-->

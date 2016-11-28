@@ -1,0 +1,102 @@
+{% extends layout %}
+
+{% block page_content %}
+
+    {#{{ js('tiny_mce/tinymce.min.js') }}#}
+    {#{{ js('tiny_mce/jquery.tinymce.min.js') }}#}
+
+    {{ js("ckeditor/ckeditor.js") }}
+    {{ js("ckeditor/adapters/jquery.js") }}
+    {{ js("ckeditor/config.js") }}
+
+    {{ js('jquery/word-and-character-counter/jquery.word-and-character-counter.min.js') }}
+
+    <form action="">
+        <div class="form-group">
+            <label for="article-label">Label</label>
+            <input type="text" name="label" id="article-label" class="form-control" value="{{ article.label }}" />
+        </div>
+
+        <div class="form-group">
+            <label for="article-uri">URI</label>
+            <input type="text" name="uri" id="article-uri" class="form-control" value="{{ article.uri }}" readonly />
+        </div>
+
+        <div class="form-group">
+            <label for="article-content">Content</label>
+            <textarea name="content" id="article-content" class="form-control" rows="25">{{ article.content }}</textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="article-title">HTML &lt;title&gt;</label>
+            <input type="text" name="title" id="article-title" class="form-control" value="{{ article.title }}" />
+            <span id="article-title-remaining" class="help-block"></span>
+        </div>
+
+        <div class="form-group">
+            <label for="article-description">HTML &lt;description&gt;</label>
+            <textarea name="description" id="article-description" class="form-control" rows="3">{{ article.description }}</textarea>
+            <span id="article-description-remaining" class="help-block"></span>
+        </div>
+
+    </form>
+
+    {# TODO thumbnails edit #}
+
+    {# TODO https://www.tinymce.com/docs/configure/content-appearance/ #}
+
+    <script type="application/javascript">
+
+        $(function() {
+
+            var $content = $('#article-content'),
+                $title = $('#article-title'),
+                $description = $('#article-description');
+
+            var customTagsRules = {{ custom_tags_rules|json_encode|raw }};
+            var customTagsRulesString = "{{ custom_tags_rules|join("; ") }}";
+
+            $.each(customTagsRules, function(name) {
+                console.log(name);
+                CKEDITOR.dtd[name] = { id : 1 };
+                CKEDITOR.dtd.$empty[name] = 1;
+                CKEDITOR.dtd.body[name] = 0;
+                CKEDITOR.dtd.$inline[name] = 1;
+            });
+
+            $content.ckeditor({
+              allowedContent: "p; strong; i; em; span[style]; table[class]; thead; tbody; tr; th[style]; td[style]; ul[class]; ol[class]; li; a[href,title]; h2; h3; h4; " + customTagsRulesString
+            });
+
+
+
+            {#tinymce.init({#}
+                {#selector: "textarea#article-content",#}
+                {#plugins: "code table contextmenu paste link advlist noneditable",#}
+                {#theme: "modern",#}
+                {#menubar: false,#}
+                {#valid_children: "p[{{ custom_tags_list|join(",") }}",#}
+                {#extended_valid_elements: "{{ custom_tags_list|join("[id|class|align|alt|title|width|height],") }}",#}
+                {#custom_elements: "{{ custom_tags_list|join(",") }}",#}
+                {#toolbar: "undo redo | paste pastetext | styleselect blockquote | bold italic strikethrough underline | alignleft aligncenter alignright alignjustify | numlist bulllist | indent outdent | link image | table code"#}
+            {#});#}
+
+            var counterConfig = {
+                count: 'down',
+                msg: 'символов осталось'
+            };
+
+            $title.counter($.extend({}, counterConfig, {
+                goal: 60,
+                target: '#article-title-remaining'
+            }));
+
+            $description.counter($.extend({}, counterConfig, {
+                goal: 160,
+                target: '#article-description-remaining'
+            }));
+        });
+
+    </script>
+
+{% endblock %}

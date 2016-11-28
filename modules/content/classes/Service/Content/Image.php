@@ -9,7 +9,7 @@ class Service_Content_Image extends Service_Content_WithAssets
      */
     public function get_html_custom_tag_name()
     {
-        return CustomTag::IMAGE;
+        return CustomTag::PHOTO;
     }
 
     /**

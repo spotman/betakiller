@@ -265,6 +265,14 @@ class Model_ContentPost extends ORM implements SeoContentInterface, ImportedFrom
     }
 
     /**
+     * @return $this[]|\Database_Result
+     */
+    public function get_all_articles()
+    {
+        return $this->filter_articles()->get_all();
+    }
+
+    /**
      * @param int|int[]|null $filter_type
      * @param int $limit
      * @param int|int[]|null $exclude_id
@@ -453,6 +461,11 @@ class Model_ContentPost extends ORM implements SeoContentInterface, ImportedFrom
         return $this->where('type', 'IN', $values);
     }
 
+    public function filter_articles()
+    {
+        return $this->filter_type(self::TYPE_ARTICLE);
+    }
+
     /**
      * @param URL_Parameters $parameters
      */
@@ -492,10 +505,8 @@ class Model_ContentPost extends ORM implements SeoContentInterface, ImportedFrom
 
     public function get_public_url()
     {
-        $codename = $this->get_public_url_iface_codename();
-
         /** @var \BetaKiller\Content\IFace\ContentItem $iface */
-        $iface = $this->iface_from_codename($codename);
+        $iface = $this->iface_from_codename('ContentItem');
 
         $params = $this->url_parameters_instance()->set(self::URL_PARAM, $this);
 
@@ -504,13 +515,16 @@ class Model_ContentPost extends ORM implements SeoContentInterface, ImportedFrom
         return $iface->url($params);
     }
 
-    /**
-     * @return string
-     * @throws \Kohana_Exception
-     * @uses \BetaKiller\Content\IFace\ContentItem
-     */
-    public function get_public_url_iface_codename()
+    // TODO Move this method to base class and detect IFace via model-iface linking
+    public function get_admin_url()
     {
-        return 'ContentItem';
+        /** @var \BetaKiller\Content\IFace\Admin\ArticleItem $iface */
+        $iface = $this->iface_from_codename('Admin_Content_ArticleItem');
+
+        $params = $this->url_parameters_instance()->set(self::URL_PARAM, $this);
+
+        $this->preset_linked_models($params);
+
+        return $iface->url($params);
     }
 }

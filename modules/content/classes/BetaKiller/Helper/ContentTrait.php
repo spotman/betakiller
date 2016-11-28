@@ -127,9 +127,9 @@ trait ContentTrait
     }
 
     /**
-     * @return \Model_ContentPost
+     * @return \Model_ContentPost|NULL
      */
-    public function url_parameter_content_item()
+    public function url_parameter_content_post()
     {
         return $this->url_parameters()->get(\Model_ContentPost::URL_PARAM);
     }

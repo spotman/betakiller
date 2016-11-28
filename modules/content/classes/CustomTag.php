@@ -15,7 +15,7 @@ class CustomTag
 
     const CAPTION       = 'caption';
     const GALLERY       = 'gallery';
-    const IMAGE         = 'image';
+    const PHOTO         = 'photo';
     const YOUTUBE       = 'youtube';
     const ATTACHMENT    = 'attachment';
 
@@ -24,7 +24,7 @@ class CustomTag
         return [
             self::CAPTION,
             self::GALLERY,
-            self::IMAGE,
+            self::PHOTO,
             self::YOUTUBE,
             self::ATTACHMENT,
         ];
