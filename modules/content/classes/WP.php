@@ -403,7 +403,7 @@ class WP
         // Optimize when searching for one item.
         if ( 1 === count( $replace_pairs ) ) {
             // Extract $needle and $replace.
-            list($needle, $replace) = array_pop($replace_pairs);
+            foreach ( $replace_pairs as $needle => $replace );
 
             // Loop through delimiters (elements) only.
             for ( $i = 1, $c = count( $textarr ); $i < $c; $i += 2 ) {

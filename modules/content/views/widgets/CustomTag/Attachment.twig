@@ -1,0 +1,5 @@
+{% set download_button_src = static("images/download-button.png") %}
+
+<a href="{{ attachment.url }}" title="{{ attachment.title }}" class="{{ attachment.class ~ " download-button" }}">
+    <img src="{{ download_button_src }}" alt="{{ attachment.alt }}" />
+</a>
