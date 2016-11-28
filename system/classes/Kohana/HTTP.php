@@ -37,7 +37,9 @@ abstract class Kohana_HTTP {
 				':code' => $code
 			));
 
-		throw $e->location($uri);
+        $e->location($uri);
+
+		throw $e;
 	}
 
 	/**
