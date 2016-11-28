@@ -150,10 +150,15 @@ abstract class Core_URL_Dispatcher {
         {
             $parent_url = $parent_iface ? $parent_iface->url($this->parameters()) : NULL;
 
-            // TODO Create interface for redirect() method, use it in Response and send Response instance to $this via DI
-            HTTP::redirect($parent_url);
-
-//            $this->throw_missing_url_exception($it, $parent_iface);
+            if ($parent_url)
+            {
+                // TODO Create interface for redirect() method, use it in Response and send Response instance to $this via DI
+                HTTP::redirect($parent_url);
+            }
+            else
+            {
+                $this->throw_missing_url_exception($it, $parent_iface);
+            }
         }
 
         $model = $this->select_iface_model($layer, $it);
