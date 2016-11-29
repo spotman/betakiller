@@ -136,7 +136,7 @@ class BetaKiller_Kohana_Exception extends Kohana_Kohana_Exception
      */
     protected function get_iface($code)
     {
-        return $this->iface_from_codename('Error_'.$code);
+        return $this->iface_from_codename('Error'.$code);
     }
 
     /**
