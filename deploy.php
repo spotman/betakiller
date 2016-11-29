@@ -339,6 +339,13 @@ task('migrations:history', function () {
     run_minion_task('migrations:history');
 })->desc('Show migrations list');
 
+/**
+ * Warm up cache by making internal HTTP request to every IFace
+ */
+task('cache:warmup', function () {
+    run_minion_task('cache:warmup');
+})->desc('Warm up cache by making internal HTTP request to every IFace');
+
 
 task('deploy', [
     // Check app configuration
@@ -365,7 +372,7 @@ task('deploy', [
     'deploy:betakiller:writable',
 
     'migrations:up',
-    //'cache:warmup',
+    'cache:warmup',
 
     // Finalize
     'deploy:symlink',
