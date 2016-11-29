@@ -23,6 +23,11 @@ abstract class Minion_Task extends Kohana_Minion_Task
         parent::__construct();
     }
 
+    protected static function _make_task_class_instance($class_name)
+    {
+        return \BetaKiller\DI\Container::instance()->get($class_name);
+    }
+
     /**
      * Execute the task with the specified set of options
      *
