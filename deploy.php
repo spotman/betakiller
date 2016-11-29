@@ -214,9 +214,17 @@ task('git:status', function () {
     git_status();
 })->desc('git status');
 
+task('git:add', function () {
+    git_add();
+})->desc('git add');
+
+task('git:commit', function () {
+    git_commit();
+})->desc('git commit -m "Commit message"');
+
 task('git:commit:all', function () {
     git_commit_all();
-})->desc('git commit -a');
+})->desc('git add . && git commit -m "Commit message"');
 
 task('git:push', function () {
     git_push();
@@ -421,9 +429,18 @@ function git_status($path = NULL) {
     return run_git_command('status', $path);
 }
 
-function git_commit_all($path = NULL) {
+function git_add($base_path = NULL) {
+    $add_path = ask('Path to add files:', '.');
+    return run_git_command('add '.$add_path, $base_path);
+}
+
+function git_commit($path = NULL) {
     $message = ask('Enter commit message:', 'Commit from production');
-    return run_git_command('add .', $path) . run_git_command('commit -am "'.$message.'"', $path);
+    return run_git_command('commit -m "'.$message.'"', $path);
+}
+
+function git_commit_all($path = NULL) {
+    return git_add($path).git_commit($path);
 }
 
 function git_checkout($path = NULL) {
