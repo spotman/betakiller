@@ -54,6 +54,8 @@ class Task_Cache_Warmup extends Minion_Task
 
         if ($status == 200)
         {
+            // TODO Grab page content, parse it and make request to every image/css/js file
+
             $this->info('Cache was warmed up for :url', [':url' => $url]);
         }
         elseif ($status < 400)
