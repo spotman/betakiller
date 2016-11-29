@@ -3,7 +3,7 @@
 use BetaKiller\IFace\Core\IFace;
 use BetaKiller\IFace\UrlPathIterator;
 use BetaKiller\Utils\Kohana\TreeModel;
-use BetaKiller\IFace\HasCustomUrlBehaviour;
+//use BetaKiller\IFace\HasCustomUrlBehaviour;
 use BetaKiller\IFace\IFaceModelInterface;
 
 abstract class Core_URL_Dispatcher {
@@ -268,6 +268,52 @@ abstract class Core_URL_Dispatcher {
 
         // No processing done
         return FALSE;
+    }
+
+    public function get_iface_model_available_urls(IFaceModelInterface $model, URL_Parameters $params, $limit = NULL)
+    {
+        if ( $model->has_dynamic_url()  )
+        {
+            return $this->get_dynamic_model_available_urls($model, $params, $limit);
+        }
+        else
+        {
+            // Make static URL
+            $iface = $this->iface_from_model_factory($model);
+            return [$iface->url($params)];
+        }
+    }
+
+    protected function get_dynamic_model_available_urls(IFaceModelInterface $iface_model, URL_Parameters $params, $limit = NULL)
+    {
+        $urls = [];
+        $iface = $this->iface_from_model_factory($iface_model);
+
+        $prototype = URL_Prototype::instance()->parse($iface_model->get_uri());
+
+        $model_name = $prototype->get_model_name();
+        $model_key = $prototype->get_model_key();
+
+        $model = $this->model_factory($model_name);
+
+        $items = $model->get_available_items_by_url_key($model_key, $params, $limit);
+
+        foreach ($items as $item)
+        {
+            // Save current item to parameters registry
+            $params->set($model_name, $item, TRUE);
+
+            // Make dynamic URL + recursion
+            $urls[] = $iface->url($params);
+
+            if ($iface_model->has_tree_behaviour())
+            {
+                // Recursion for tree behaviour
+                $urls = array_merge($urls, $this->get_dynamic_model_available_urls($model, $params, $limit));
+            }
+        }
+
+        return $urls;
     }
 
 //    protected function process_custom_url_behaviour(IFaceModelInterface $iface_model, UrlPathIterator $it)

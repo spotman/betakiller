@@ -30,11 +30,13 @@ interface URL_DataSource
     /**
      * Returns list of available items (model records) by $key property
      *
-     * @param string $key
+     * @param string         $key
      * @param URL_Parameters $parameters
-     * @return URL_DataSource[]
+     * @param null           $limit
+     *
+     * @return \URL_DataSource[]
      */
-    public function get_available_items_by_url_key($key, URL_Parameters $parameters);
+    public function get_available_items_by_url_key($key, URL_Parameters $parameters, $limit = NULL);
 
     /**
      *

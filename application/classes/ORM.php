@@ -80,11 +80,13 @@ class ORM extends Utils\Kohana\ORM
     /**
      * Returns list of available items (model records) by $key property
      *
-     * @param string $key
+     * @param string         $key
      * @param URL_Parameters $parameters
-     * @return URL_DataSource[]
+     * @param int|null       $limit
+     *
+     * @return \URL_DataSource[]
      */
-    public function get_available_items_by_url_key($key, URL_Parameters $parameters)
+    public function get_available_items_by_url_key($key, URL_Parameters $parameters, $limit = NULL)
     {
         // Additional filtering for non-pk keys
         if ( $key != $this->primary_key() )
@@ -92,11 +94,16 @@ class ORM extends Utils\Kohana\ORM
             $this->custom_find_by_url_filter($parameters);
         }
 
+        if ($limit)
+        {
+            $this->limit($limit);
+        }
+
         $key_column = $this->object_column($key);
 
         $models = $this->where($key_column, 'IS NOT', NULL)->group_by($key_column)->find_all();
 
-        return $models->count() ? $models->as_array() : NULL;
+        return $models->count() ? $models->as_array() : [];
     }
 
     public function get_validation_exception_errors(ORM_Validation_Exception $e)

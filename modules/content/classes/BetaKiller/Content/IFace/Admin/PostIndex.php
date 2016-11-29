@@ -3,7 +3,7 @@ namespace BetaKiller\Content\IFace\Admin;
 
 use BetaKiller\Content\IFace\Admin;
 
-class ArticleIndex extends Admin
+class PostIndex extends Admin
 {
     /**
      * Returns data for View
@@ -27,7 +27,7 @@ class ArticleIndex extends Admin
         }
 
         return [
-            'articles' => $data,
+            'posts' => $data,
         ];
     }
 }

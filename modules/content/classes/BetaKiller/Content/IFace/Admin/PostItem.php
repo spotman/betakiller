@@ -4,7 +4,7 @@ namespace BetaKiller\Content\IFace\Admin;
 use Model_ContentArticle;
 use BetaKiller\Content\IFace\Admin;
 
-class ArticleItem extends Admin
+class PostItem extends Admin
 {
     /**
      * Returns data for View
@@ -32,7 +32,7 @@ class ArticleItem extends Admin
         }
 
         return [
-            'article' => [
+            'post' => [
                 'id'          => $article->get_id(),
                 'uri'         => $article->get_uri(),
                 'label'       => $article->get_label(),

@@ -7,35 +7,35 @@
 
     {{ js("ckeditor/ckeditor.js") }}
     {{ js("ckeditor/adapters/jquery.js") }}
-    {{ js("ckeditor/config.js") }}
+    {#{{ js("ckeditor/config.js") }}#}
 
     {{ js('jquery/word-and-character-counter/jquery.word-and-character-counter.min.js') }}
 
     <form action="">
         <div class="form-group">
             <label for="article-label">Label</label>
-            <input type="text" name="label" id="article-label" class="form-control" value="{{ article.label }}" />
+            <input type="text" name="label" id="article-label" class="form-control" value="{{ post.label }}" />
         </div>
 
         <div class="form-group">
             <label for="article-uri">URI</label>
-            <input type="text" name="uri" id="article-uri" class="form-control" value="{{ article.uri }}" readonly />
+            <input type="text" name="uri" id="article-uri" class="form-control" value="{{ post.uri }}" readonly />
         </div>
 
         <div class="form-group">
             <label for="article-content">Content</label>
-            <textarea name="content" id="article-content" class="form-control" rows="25">{{ article.content }}</textarea>
+            <textarea name="content" id="article-content" class="form-control" rows="25">{{ post.content }}</textarea>
         </div>
 
         <div class="form-group">
             <label for="article-title">HTML &lt;title&gt;</label>
-            <input type="text" name="title" id="article-title" class="form-control" value="{{ article.title }}" />
+            <input type="text" name="title" id="article-title" class="form-control" value="{{ post.title }}" />
             <span id="article-title-remaining" class="help-block"></span>
         </div>
 
         <div class="form-group">
             <label for="article-description">HTML &lt;description&gt;</label>
-            <textarea name="description" id="article-description" class="form-control" rows="3">{{ article.description }}</textarea>
+            <textarea name="description" id="article-description" class="form-control" rows="3">{{ post.description }}</textarea>
             <span id="article-description-remaining" class="help-block"></span>
         </div>
 
@@ -57,7 +57,7 @@
             var customTagsRulesString = "{{ custom_tags_rules|join("; ") }}";
 
             $.each(customTagsRules, function(name) {
-                console.log(name);
+//                console.log(name);
                 CKEDITOR.dtd[name] = { id : 1 };
                 CKEDITOR.dtd.$empty[name] = 1;
                 CKEDITOR.dtd.body[name] = 0;
@@ -65,6 +65,7 @@
             });
 
             $content.ckeditor({
+              autosave_SaveKey: '{{ "betakiller-post-" ~ post.id }}',
               allowedContent: "p; strong; i; em; span[style]; table[class]; thead; tbody; tr; th[style]; td[style]; ul[class]; ol[class]; li; a[href,title]; h2; h3; h4; " + customTagsRulesString
             });
 

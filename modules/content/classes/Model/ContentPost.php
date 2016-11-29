@@ -518,7 +518,7 @@ class Model_ContentPost extends ORM implements SeoContentInterface, ImportedFrom
     // TODO Move this method to base class and detect IFace via model-iface linking
     public function get_admin_url()
     {
-        /** @var \BetaKiller\Content\IFace\Admin\ArticleItem $iface */
+        /** @var \BetaKiller\Content\IFace\Admin\PostItem $iface */
         $iface = $this->iface_from_codename('Admin_Content_ArticleItem');
 
         $params = $this->url_parameters_instance()->set(self::URL_PARAM, $this);

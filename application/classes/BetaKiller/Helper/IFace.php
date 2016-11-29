@@ -1,12 +1,12 @@
 <?php
 namespace BetaKiller\Helper;
 
-use BetaKiller\DI;
+use BetaKiller\DI\ContainerTrait;
 use BetaKiller\IFace\IFaceFactory;
 
 trait IFace
 {
-    use DI\ContainerTrait;
+    use ContainerTrait;
 
     /**
      * @return \URL_Dispatcher
