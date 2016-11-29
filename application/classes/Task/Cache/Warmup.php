@@ -29,19 +29,13 @@ class Task_Cache_Warmup extends Minion_Task
         $params = $this->url_parameters_instance();
 
         // Get all ifaces recursively
-        $iterator = $tree->getRecursiveIteratorIterator();
+        $iterator = $tree->getRecursivePublicIterator();
 
         // For each IFace
         foreach ($iterator as $iface_model)
         {
             $this->debug('Found IFace :codename', [':codename' => $iface_model->get_codename()]);
 
-            if ($iface_model->get_uri() == 'admin')
-            {
-//                $iterator->nextElement();
-                $iterator->endIteration();
-                continue;
-            }
 
             $urls = $this->_dispatcher->get_iface_model_available_urls($iface_model, $params, 1);
             $this->debug(implode(PHP_EOL, $urls).PHP_EOL);
@@ -50,8 +44,6 @@ class Task_Cache_Warmup extends Minion_Task
 
             // Make HMVC request and check response status
             $this->make_http_request($url);
-
-            $this->info('Cache was warmed up for :url', [':url' => $url]);
         }
     }
 
@@ -60,7 +52,21 @@ class Task_Cache_Warmup extends Minion_Task
         $response = Request::factory($url)->execute();
         $status = $response->status();
 
-        if ($status < 200 || $status >= 400)
-            throw new Task_Exception('Resource status is :status for URL :url', [':url' => $url, ':status' => $status]);
+        if ($status == 200)
+        {
+            $this->info('Cache was warmed up for :url', [':url' => $url]);
+        }
+        elseif ($status < 400)
+        {
+            $this->info('Redirect :status received for :url', [':url' => $url, ':status' => $status]);
+        }
+        elseif (in_array($status, [401, 403]))
+        {
+            $this->info('Access denied with :status status for :url', [':url' => $url, ':status' => $status]);
+        }
+        else
+        {
+            $this->warning('Got :status status for URL :url', [':url' => $url, ':status' => $status]);
+        }
     }
 }

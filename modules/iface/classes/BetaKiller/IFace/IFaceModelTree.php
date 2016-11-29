@@ -30,8 +30,22 @@ class IFaceModelTree
      *
      * @return \RecursiveIteratorIterator|IFaceModelInterface[]
      */
-    public function getRecursiveIteratorIterator(IFaceModelInterface $parent = NULL)
+    public function getRecursivePublicIterator(IFaceModelInterface $parent = NULL)
     {
-        return new \RecursiveIteratorIterator($this->getRecursiveIterator($parent), \RecursiveIteratorIterator::SELF_FIRST);
+        $iterator = $this->getRecursiveIterator($parent);
+
+        $filter = new \RecursiveCallbackFilterIterator($iterator, function (IFaceModelInterface $model) {
+            if ($this->is_admin_model($model))
+                return FALSE;
+
+            return TRUE;
+        });
+
+        return new \RecursiveIteratorIterator($filter, \RecursiveIteratorIterator::SELF_FIRST);
+    }
+
+    public function is_admin_model(IFaceModelInterface $model)
+    {
+        return $model->get_uri() == 'admin' || ($model instanceof \IFace_Model_Provider_Admin_Model);
     }
 }
