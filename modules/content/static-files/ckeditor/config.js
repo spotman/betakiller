@@ -10,6 +10,8 @@ CKEDITOR.editorConfig = function( config ) {
 
   config.language = 'ru';
 
+  config.removePlugins = "autogrow";
+
   config.toolbar = [
     { name: 'document', items: [ 'Sourcedialog', '-', 'Save', 'NewPage', 'Preview', 'Print', '-', 'Templates' ] },
     { name: 'clipboard', items: [ 'Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord', '-', 'Undo', 'Redo' ] },
