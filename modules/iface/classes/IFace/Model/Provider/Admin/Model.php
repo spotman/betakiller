@@ -4,6 +4,8 @@ use BetaKiller\IFace\IFaceModelInterface;
 
 class IFace_Model_Provider_Admin_Model implements IFaceModelInterface
 {
+    use \BetaKiller\Utils\Kohana\TreeModelTrait;
+
     /**
      * @var IFace_Model_Provider_Admin
      */
