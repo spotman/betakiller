@@ -1,12 +1,12 @@
 <?php
 namespace BetaKiller\IFace;
 
-use BetaKiller\Helper;
+use BetaKiller\Helper\Base;
 use Twig;
 
 abstract class Widget extends Core\Widget
 {
-    use Helper\Base;
+    use Base;
 
     /**
      * Returns Twig view instance
