@@ -4,6 +4,11 @@ use DiDom\Document;
 use BetaKiller\Content\ImportedFromWordpressInterface;
 use BetaKiller\Content\HasWordpressPathInterface;
 use BetaKiller\Content\ContentElementInterface;
+use Thunder\Shortcode\Shortcode\ShortcodeInterface;
+use Thunder\Shortcode\Serializer\TextSerializer;
+use Thunder\Shortcode\Shortcode\Shortcode;
+use Thunder\Shortcode\Processor\Processor;
+use Thunder\Shortcode\Parser\RegularParser;
 
 class Task_Content_Import_Wordpress extends Minion_Task
 {
@@ -330,25 +335,26 @@ class Task_Content_Import_Wordpress extends Minion_Task
                 ->set_created_at($created_at)
                 ->set_updated_at($updated_at);
 
+            // Saving model and getting its ID for further processing
             $model->save();
 
             // Link thumbnail images to post
             $this->process_thumbnails($model, $meta);
 
-            // Parsing custom tags next
-            $this->process_custom_tags($model);
+            if ($model->get_content()) {
+                // Parsing custom tags next
+                $this->process_custom_tags($model);
 
-            // Processing YouTube <iframe> embeds
-            $this->process_content_youtube_iframes($model);
+                // Processing YouTube <iframe> embeds
+                $this->process_content_youtube_iframes($model);
 
-            $this->post_process_article_text($model);
+                $this->post_process_article_text($model);
 
-            // Saving model and getting its ID for further processing
-            $model->save();
-
-//            print_r($article->as_array());
-//            print_r($meta);
-//            die();
+                // Saving model content
+                $model->save();
+            } else {
+                $this->warning('Post has no content at :uri', [':uri' => $uri]);
+            }
 
             $current++;
         }
@@ -363,16 +369,24 @@ class Task_Content_Import_Wordpress extends Minion_Task
         // Parsing all images first to get @alt and @title values
         $text = $this->process_images_in_text($text, $item->get_id());
 
-        $document = new Document($text);
-//        $self_closing_tags = CustomTag::instance()->get_self_closing_tags();
+        $document = new Document();
 
-        // Process attachments first coz they are images inside links
-        $this->update_links_on_attachments($document);
-        $this->remove_links_on_content_images($document);
+        // TODO Make custom tags self-closing
 
-        $text = $document->format()->html(LIBXML_HTML_NOIMPLIED);
+        $document->loadHtml($text); //, LIBXML_NOEMPTYTAG
 
-        $item->set_content($text);
+        $body = $document->find('body')[0];
+
+        if ($body) {
+            // Process attachments first coz they are images inside links
+            $this->update_links_on_attachments($document);
+            $this->remove_links_on_content_images($document);
+
+            $text = $body->innerHtml();
+            $item->set_content($text);
+        } else {
+            $this->warning('Post parsing error for :url', [':url' => $item->get_uri()]);
+        }
     }
 
     protected function remove_links_on_content_images(Document $root)
@@ -485,19 +499,40 @@ class Task_Content_Import_Wordpress extends Minion_Task
 
     protected function process_custom_tags(Model_ContentPost $item)
     {
-        $facade = new \Thunder\Shortcode\ShortcodeFacade;
+        $handlers = new \Thunder\Shortcode\HandlerContainer\HandlerContainer();
 
         // [caption id="attachment_571" align="alignnone" width="780"]
-        $facade->addHandler('caption', [$this, 'thunder_handler_caption']);
+        $handlers->add('caption', [$this, 'thunder_handler_caption']);
 
         // [gallery ids="253,261.260"]
-        $facade->addHandler('gallery', [$this, 'thunder_handler_gallery']);
+        $handlers->add('gallery', [$this, 'thunder_handler_gallery']);
 
         // [wonderplugin_slider id="1"]
-        $facade->addHandler('wonderplugin-slider', [$this, 'thunder_handler_wonderplugin']);
+        $handlers->add('wonderplugin-slider', [$this, 'thunder_handler_wonderplugin']);
+
+//        // [adsense-content-top] and similar
+//        $handlers->add('adsense', [$this, 'thunder_handler_adsense']);
+//
+//        $aliases = [
+//            'adsense-content-top',
+//            'adsense-content-bottom',
+//        ];
+//
+//        foreach ($aliases as $alias) {
+//            $facade->addHandlerAlias($alias, 'adsense');
+//        }
+
+        $handlers->setDefault(function(ShortcodeInterface $s) {
+            $serializer = new TextSerializer();
+
+            $this->warning('Unknown BB-code found [:name], keep it', [':name' => $s->getName()]);
+            return $serializer->serialize($s);
+        });
+
+        $processor = new Processor(new RegularParser(), $handlers);
 
         $content = $item->get_content();
-        $content = $facade->process($content);
+        $content = $processor->process($content);
         $item->set_content($content);
     }
 
