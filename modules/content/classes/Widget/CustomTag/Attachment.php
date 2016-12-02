@@ -26,11 +26,15 @@ class Widget_CustomTag_Attachment extends Widget
         $title  = HTML::chars(Arr::get($context, 'title'));
         $class  = Arr::get($context, 'class');
 
+        $i18n_params = [
+            ':name' =>  $model->get_original_name(),
+        ];
+
         return [
             'attachment'    =>  [
                 'url'       =>  $model->get_original_url(),
-                'title'     =>  $title ?: __('custom_tag.attachment.title'),
-                'alt'       =>  __('custom_tag.attachment.alt'),
+                'title'     =>  $title ?: __('custom_tag.attachment.title', $i18n_params),
+                'alt'       =>  __('custom_tag.attachment.alt', $i18n_params),
                 'class'     =>  $class,
             ],
         ];

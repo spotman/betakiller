@@ -83,7 +83,7 @@ class CustomTag
         }
 
         /** @url https://regex101.com/r/yF1bL4/3 */
-        $pattern = '/<(' . implode('|', $filter_tags) . ')[^\/>]*\/>/i';
+        $pattern = '/<('.implode('|', $filter_tags).')[^\/>]*\/>/i';
 
         if (!preg_match_all($pattern, $text, $matches, PREG_SET_ORDER))
         {
