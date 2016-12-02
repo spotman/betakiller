@@ -7,42 +7,41 @@ class Log extends Kohana_Log
      */
     public static $write_on_add = TRUE;
 
-    protected static function _add($level, $message, array $values = NULL, array $additional = NULL)
+    protected static function _add($level, $message, array $values = NULL, array $additional = NULL, $trace_level = 0)
     {
         if ( is_object(Kohana::$log) )
         {
-            Kohana::$log->add($level, $message, $values, $additional);
+            Kohana::$log->add($level, $message, $values, $additional, ++$trace_level);
         }
     }
 
-    public static function debug($message, array $values = NULL)
+    public static function debug($message, array $values = NULL, array $additional = NULL, $trace_level = 0)
     {
-        static::_add(self::DEBUG, $message, $values);
+        static::_add(self::DEBUG, $message, $values, $additional, ++$trace_level);
     }
 
-    public static function info($message, array $values = NULL)
+    public static function info($message, array $values = NULL, array $additional = NULL, $trace_level = 0)
     {
-        static::_add(self::INFO, $message, $values);
+        static::_add(self::INFO, $message, $values, $additional, ++$trace_level);
     }
 
-    public static function notice($message, array $values = NULL)
+    public static function notice($message, array $values = NULL, array $additional = NULL, $trace_level = 0)
     {
-        static::_add(self::NOTICE, $message, $values);
+        static::_add(self::NOTICE, $message, $values, $additional, ++$trace_level);
     }
 
-    public static function warning($message, array $values = NULL)
+    public static function warning($message, array $values = NULL, array $additional = NULL, $trace_level = 0)
     {
-        static::_add(self::WARNING, $message, $values);
+        static::_add(self::WARNING, $message, $values, $additional, ++$trace_level);
     }
 
-    public static function error($message, array $values = NULL)
+    public static function error($message, array $values = NULL, array $additional = NULL, $trace_level = 0)
     {
-        static::_add(self::ERROR, $message, $values);
+        static::_add(self::ERROR, $message, $values, $additional, ++$trace_level);
     }
 
     public static function exception(Exception $e)
     {
         Kohana_Exception::log($e);
     }
-
 }

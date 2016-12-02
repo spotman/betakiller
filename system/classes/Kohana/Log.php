@@ -118,9 +118,10 @@ class Kohana_Log {
 	 * @param   string  $message     message body
 	 * @param   array   $values      values to replace in the message
 	 * @param   array   $additional  additional custom parameters to supply to the log writer
+	 * @param   int     $trace_level nesting level of originate function call
 	 * @return  Log
 	 */
-	public function add($level, $message, array $values = NULL, array $additional = NULL)
+	public function add($level, $message, array $values = NULL, array $additional = NULL, $trace_level = 1)
 	{
 		if ($values)
 		{
@@ -141,11 +142,11 @@ class Kohana_Log {
 				$trace = array_map(function ($item) {
 					unset($item['args']);
 					return $item;
-				}, array_slice(debug_backtrace(FALSE), 2));
+				}, array_slice(debug_backtrace(FALSE), $trace_level));
 			}
 			else
 			{
-				$trace = array_slice(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS), 2);
+				$trace = array_slice(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS), $trace_level);
 			}
 		}
 

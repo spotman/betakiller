@@ -10,7 +10,7 @@ trait Log
      */
     protected function debug($message, array $variables = NULL)
     {
-        \Log::debug($message, $variables);
+        \Log::debug($message, $variables, NULL, 1);
         return $this;
     }
 
@@ -21,7 +21,7 @@ trait Log
      */
     protected function info($message, array $variables = NULL)
     {
-        \Log::info($message, $variables);
+        \Log::info($message, $variables, NULL, 1);
         return $this;
     }
 
@@ -32,7 +32,7 @@ trait Log
      */
     protected function notice($message, array $variables = NULL)
     {
-        \Log::notice($message, $variables);
+        \Log::notice($message, $variables, NULL, 1);
         return $this;
     }
 
@@ -43,7 +43,7 @@ trait Log
      */
     protected function warning($message, array $variables = NULL)
     {
-        \Log::warning($message, $variables);
+        \Log::warning($message, $variables, NULL, 1);
         return $this;
     }
 
