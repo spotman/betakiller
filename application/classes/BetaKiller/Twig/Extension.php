@@ -153,7 +153,7 @@ class BetaKiller_Twig_Extension extends Twig_Extension
 
         foreach ( func_get_args() as $js )
         {
-            if ( mb_substr($js, 0, 4) == 'http' )
+            if ( mb_substr($js, 0, 4) == 'http' || mb_substr($js, 0, 2) == '//' )
                 $instance->add_public($js);
             else
                 $instance->add_static($js);
@@ -186,7 +186,7 @@ class BetaKiller_Twig_Extension extends Twig_Extension
 
         foreach ( func_get_args() as $css )
         {
-            if ( mb_substr($css, 0, 4) == 'http' )
+            if ( mb_substr($css, 0, 4) == 'http' || mb_substr($css, 0, 2) == '//')
                 $instance->add_public($css);
             else
                 $instance->add_static($css);
