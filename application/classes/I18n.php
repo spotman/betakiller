@@ -87,11 +87,12 @@ class I18n extends Kohana_I18n {
         if ( empty(static::$_cache_missing) )
             return;
 
-        // echo "<h1>missing</h1>";
-
-        foreach ( static::$_cache_missing as $module => $data )
-        {
-            self::put_data($module, $data[static::$lang]);
+        foreach ( static::$_cache_missing as $module => $data ) {
+            try {
+                self::put_data($module, $data[static::$lang]);
+            } catch (Exception $e) {
+                Log::exception($e);
+            }
         }
     }
 
