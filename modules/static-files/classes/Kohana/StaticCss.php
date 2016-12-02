@@ -143,10 +143,10 @@ class Kohana_StaticCss extends StaticFile {
 	 */
 	public function getLink($css, $condition = NULL)
 	{
-		$css = trim($css, '/');
-		if (mb_substr($css, 0, 4) != 'http')
+		if (mb_substr($css, 0, 4) != 'http' && mb_substr($css, 0, 2) != '//')
 		{
-			$css = ($this->_config->host == '/') ? $css : $this->_config->host . $css;
+            $css = trim($css, '/');
+            $css = ($this->_config->host == '/') ? $css : $this->_config->host . $css;
 		}
 
 		return ''

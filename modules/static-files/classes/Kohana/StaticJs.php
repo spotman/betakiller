@@ -143,9 +143,9 @@ class Kohana_StaticJs extends StaticFile {
 	 */
 	public function getLink($js, $condition = NULL)
 	{
-		$js = trim($js, '/');
-		if (mb_substr($js, 0, 4) != 'http')
+		if (mb_substr($js, 0, 4) != 'http' && mb_substr($js, 0, 2) != '//')
 		{
+            $js = trim($js, '/');
 			$js = ($this->_config->host == '/') ? $js : $this->_config->host . $js;
 		}
 
