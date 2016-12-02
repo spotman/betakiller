@@ -1,8 +1,8 @@
 <?php
 namespace BetaKiller\IFace\Core;
 
+use BetaKiller\IFace\WidgetFactory;
 use Controller;
-use HTTP_Exception_500;
 use Kohana_Exception;
 use Request;
 use Response;
@@ -54,24 +54,10 @@ abstract class Widget extends \Controller // TODO Remove extension and replace i
      * @param Response $response
      * @return static
      * @deprecated
-     * @todo create standalone factory class
      */
     public static function factory($name, Request $request = NULL, Response $response = NULL)
     {
-        $class_name = static::get_class_prefix() . $name;
-
-        // Getting current request if none provided
-        $request = $request ?: Request::current();
-
-        // Creating empty response if none provided
-        $response = $response ?: Response::factory();
-
-        if (!class_exists($class_name)) {
-            $class_name = \Widget_Default::class;
-        }
-
-        /** @var Widget $widget */
-        return new $class_name($name, $request, $response);
+        return WidgetFactory::instance()->create($name, $request, $response);
     }
 
     /**
@@ -209,9 +195,7 @@ abstract class Widget extends \Controller // TODO Remove extension and replace i
 
     protected function url($action = NULL, $protocol = TRUE)
     {
-        $widget = str_replace($this->get_class_prefix(), '', get_class($this));
-
-        return Route::url('widget-controller', array('widget' => $widget, 'action' => $action), $protocol);
+        return Route::url('widget-controller', array('widget' => $this->getName(), 'action' => $action), $protocol);
     }
 
     protected function view($file = NULL)
@@ -229,14 +213,9 @@ abstract class Widget extends \Controller // TODO Remove extension and replace i
         return $this->view_factory($view_path, $this->getContext());
     }
 
-    protected static function get_class_prefix()
-    {
-        return 'Widget_';
-    }
-
     protected function _execute()
     {
-        throw new HTTP_Exception_500('Direct call is not allowed');
+        throw new Exception('Direct call is not allowed');
     }
 
     protected function get_validation_errors(Validation $validation)
