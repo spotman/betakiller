@@ -14,19 +14,6 @@ class BetaKiller_Twig_Extension extends Twig_Extension
         return 'BetaKiller';
     }
 
-//    public function getGlobals()
-//    {
-//        return array(
-////            'js'    => JS::instance(),
-////            'css'   => CSS::instance(),
-////            'meta'  => Meta::instance(),
-//
-////            'device'  => Device::factory(),
-//
-////            'profiler'   => Profiler::instance(),
-//        );
-//    }
-
     public function getFunctions()
     {
         return array(
@@ -149,10 +136,6 @@ class BetaKiller_Twig_Extension extends Twig_Extension
                 return ___($text, $context ?: current($values), $values);
             }),
 
-            new Twig_SimpleFilter('custom_tags', function($text) {
-                return CustomTag::instance()->process($text);
-            }, array('is_safe' => array('html'))),
-
         ];
     }
 
@@ -274,19 +257,6 @@ class BetaKiller_Twig_Extension extends Twig_Extension
             return NULL;
         }
     }
-
-//    /**
-//     * Только для статических ссылок!
-//     * Динамические нужно генерировать на бэкенде
-//     * @param $codename
-//     * @return string
-//     */
-//    public function iface_url($codename)
-//    {
-//        $iface = IFace::by_codename($codename);
-//
-//        return $iface->url();
-//    }
 
     public function show_profiler()
     {
