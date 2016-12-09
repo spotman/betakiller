@@ -38,12 +38,6 @@ class Kohana_Email {
      */
     public static function connect($config = NULL)
 	{
-		if ( ! class_exists('Swift_Mailer', FALSE))
-		{
-			// Load SwiftMailer
-			require Kohana::find_file('vendor', 'swiftmailer/lib/swift_required');
-		}
-
 		// Load default configuration
 		($config === NULL) and ($config = static::config());
 		

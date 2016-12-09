@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "af880cd46fa77e06a908999392ad17fa",
-    "content-hash": "a77564c6e734ff4ef6a1e7adbe6111ff",
+    "hash": "79bd247eaeb9fbf29cdfa0b27c11fbff",
+    "content-hash": "cd756c6c246cf936b7201407f2e6e482",
     "packages": [
         {
             "name": "asm89/twig-cache-extension",
@@ -594,6 +594,59 @@
                 "backup"
             ],
             "time": "2016-11-14 08:04:03"
+        },
+        {
+            "name": "swiftmailer/swiftmailer",
+            "version": "v5.4.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/swiftmailer/swiftmailer.git",
+                "reference": "545ce9136690cea74f98f86fbb9c92dd9ab1a756"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/swiftmailer/swiftmailer/zipball/545ce9136690cea74f98f86fbb9c92dd9ab1a756",
+                "reference": "545ce9136690cea74f98f86fbb9c92dd9ab1a756",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.3"
+            },
+            "require-dev": {
+                "mockery/mockery": "~0.9.1"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "5.4-dev"
+                }
+            },
+            "autoload": {
+                "files": [
+                    "lib/swift_required.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Chris Corbyn"
+                },
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
+                }
+            ],
+            "description": "Swiftmailer, free feature-rich PHP mailer",
+            "homepage": "http://swiftmailer.org",
+            "keywords": [
+                "email",
+                "mail",
+                "mailer"
+            ],
+            "time": "2016-11-24 01:01:23"
         },
         {
             "name": "thunderer/shortcode",
@@ -1662,6 +1715,52 @@
             "time": "2013-01-13 10:24:48"
         },
         {
+            "name": "psr/cache",
+            "version": "1.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/php-fig/cache.git",
+                "reference": "d11b50ad223250cf17b86e38383413f5a6764bf8"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/php-fig/cache/zipball/d11b50ad223250cf17b86e38383413f5a6764bf8",
+                "reference": "d11b50ad223250cf17b86e38383413f5a6764bf8",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Psr\\Cache\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "PHP-FIG",
+                    "homepage": "http://www.php-fig.org/"
+                }
+            ],
+            "description": "Common interface for caching libraries",
+            "keywords": [
+                "cache",
+                "psr",
+                "psr-6"
+            ],
+            "time": "2016-08-06 20:24:11"
+        },
+        {
             "name": "psr/http-message",
             "version": "1.0.1",
             "source": {
@@ -1951,16 +2050,16 @@
         },
         {
             "name": "react/http-client",
-            "version": "v0.4.14",
+            "version": "v0.4.15",
             "source": {
                 "type": "git",
                 "url": "https://github.com/reactphp/http-client.git",
-                "reference": "24104ddd30a2a76d0697c05950ba2ae43b51de3f"
+                "reference": "01e919008363622334f91419a9908b3a51754ccd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/reactphp/http-client/zipball/24104ddd30a2a76d0697c05950ba2ae43b51de3f",
-                "reference": "24104ddd30a2a76d0697c05950ba2ae43b51de3f",
+                "url": "https://api.github.com/repos/reactphp/http-client/zipball/01e919008363622334f91419a9908b3a51754ccd",
+                "reference": "01e919008363622334f91419a9908b3a51754ccd",
                 "shasum": ""
             },
             "require": {
@@ -1987,7 +2086,7 @@
             "keywords": [
                 "http"
             ],
-            "time": "2016-10-28 18:03:41"
+            "time": "2016-12-02 10:17:42"
         },
         {
             "name": "react/promise",
@@ -2129,16 +2228,16 @@
         },
         {
             "name": "react/socket-client",
-            "version": "v0.4.5",
+            "version": "v0.4.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/reactphp/socket-client.git",
-                "reference": "a25539f2cd30b4be56e35de9f96f6aa744246cc2"
+                "reference": "49e730523b73d912e56f7a41f53ed3fc083ae167"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/reactphp/socket-client/zipball/a25539f2cd30b4be56e35de9f96f6aa744246cc2",
-                "reference": "a25539f2cd30b4be56e35de9f96f6aa744246cc2",
+                "url": "https://api.github.com/repos/reactphp/socket-client/zipball/49e730523b73d912e56f7a41f53ed3fc083ae167",
+                "reference": "49e730523b73d912e56f7a41f53ed3fc083ae167",
                 "shasum": ""
             },
             "require": {
@@ -2167,7 +2266,7 @@
             "keywords": [
                 "Socket"
             ],
-            "time": "2016-03-27 18:31:39"
+            "time": "2016-12-06 10:54:49"
         },
         {
             "name": "react/stream",
@@ -2260,17 +2359,84 @@
             "time": "2016-11-14 17:59:58"
         },
         {
-            "name": "symfony/console",
-            "version": "v3.1.7",
+            "name": "symfony/cache",
+            "version": "v3.2.0",
             "source": {
                 "type": "git",
-                "url": "https://github.com/symfony/console.git",
-                "reference": "5be36e1f3ac7ecbe7e34fb641480ad8497b83aa6"
+                "url": "https://github.com/symfony/cache.git",
+                "reference": "1e5b048afac6bb08454feb99f4a434ccb92c706d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/console/zipball/5be36e1f3ac7ecbe7e34fb641480ad8497b83aa6",
-                "reference": "5be36e1f3ac7ecbe7e34fb641480ad8497b83aa6",
+                "url": "https://api.github.com/repos/symfony/cache/zipball/1e5b048afac6bb08454feb99f4a434ccb92c706d",
+                "reference": "1e5b048afac6bb08454feb99f4a434ccb92c706d",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.5.9",
+                "psr/cache": "~1.0",
+                "psr/log": "~1.0"
+            },
+            "provide": {
+                "psr/cache-implementation": "1.0"
+            },
+            "require-dev": {
+                "cache/integration-tests": "dev-master",
+                "doctrine/cache": "~1.6",
+                "doctrine/dbal": "~2.4",
+                "predis/predis": "~1.0"
+            },
+            "suggest": {
+                "symfony/polyfill-apcu": "For using ApcuAdapter on HHVM"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "3.2-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Symfony\\Component\\Cache\\": ""
+                },
+                "exclude-from-classmap": [
+                    "/Tests/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Nicolas Grekas",
+                    "email": "p@tchwork.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "Symfony implementation of PSR-6",
+            "homepage": "https://symfony.com",
+            "keywords": [
+                "caching",
+                "psr6"
+            ],
+            "time": "2016-11-25 20:20:19"
+        },
+        {
+            "name": "symfony/console",
+            "version": "v3.2.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/console.git",
+                "reference": "09d0fd33560e3573185a2ea17614e37ba38716c5"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/console/zipball/09d0fd33560e3573185a2ea17614e37ba38716c5",
+                "reference": "09d0fd33560e3573185a2ea17614e37ba38716c5",
                 "shasum": ""
             },
             "require": {
@@ -2281,17 +2447,19 @@
             "require-dev": {
                 "psr/log": "~1.0",
                 "symfony/event-dispatcher": "~2.8|~3.0",
+                "symfony/filesystem": "~2.8|~3.0",
                 "symfony/process": "~2.8|~3.0"
             },
             "suggest": {
                 "psr/log": "For using the console logger",
                 "symfony/event-dispatcher": "",
+                "symfony/filesystem": "",
                 "symfony/process": ""
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "3.1-dev"
+                    "dev-master": "3.2-dev"
                 }
             },
             "autoload": {
@@ -2318,20 +2486,20 @@
             ],
             "description": "Symfony Console Component",
             "homepage": "https://symfony.com",
-            "time": "2016-11-16 22:17:09"
+            "time": "2016-11-16 22:18:16"
         },
         {
             "name": "symfony/debug",
-            "version": "v3.1.7",
+            "version": "v3.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/debug.git",
-                "reference": "c058661c32f5b462722e36d120905940089cbd9a"
+                "reference": "9f923e68d524a3095c5a2ae5fc7220c7cbc12231"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/debug/zipball/c058661c32f5b462722e36d120905940089cbd9a",
-                "reference": "c058661c32f5b462722e36d120905940089cbd9a",
+                "url": "https://api.github.com/repos/symfony/debug/zipball/9f923e68d524a3095c5a2ae5fc7220c7cbc12231",
+                "reference": "9f923e68d524a3095c5a2ae5fc7220c7cbc12231",
                 "shasum": ""
             },
             "require": {
@@ -2348,7 +2516,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "3.1-dev"
+                    "dev-master": "3.2-dev"
                 }
             },
             "autoload": {
@@ -2375,29 +2543,30 @@
             ],
             "description": "Symfony Debug Component",
             "homepage": "https://symfony.com",
-            "time": "2016-11-15 12:55:20"
+            "time": "2016-11-16 22:18:16"
         },
         {
             "name": "symfony/expression-language",
-            "version": "v3.1.7",
+            "version": "v3.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/expression-language.git",
-                "reference": "b39826dc179f4d45c6c9a3bd4b51912726c344a3"
+                "reference": "6ffbad90ac26e3aebc90798872a8b81979cf4fbd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/expression-language/zipball/b39826dc179f4d45c6c9a3bd4b51912726c344a3",
-                "reference": "b39826dc179f4d45c6c9a3bd4b51912726c344a3",
+                "url": "https://api.github.com/repos/symfony/expression-language/zipball/6ffbad90ac26e3aebc90798872a8b81979cf4fbd",
+                "reference": "6ffbad90ac26e3aebc90798872a8b81979cf4fbd",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.5.9"
+                "php": ">=5.5.9",
+                "symfony/cache": "~3.1"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "3.1-dev"
+                    "dev-master": "3.2-dev"
                 }
             },
             "autoload": {
@@ -2424,20 +2593,20 @@
             ],
             "description": "Symfony ExpressionLanguage Component",
             "homepage": "https://symfony.com",
-            "time": "2016-11-03 08:04:31"
+            "time": "2016-11-03 08:11:03"
         },
         {
             "name": "symfony/finder",
-            "version": "v3.1.7",
+            "version": "v3.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/finder.git",
-                "reference": "9925935bf7144f9e4d2b976905881b4face036fb"
+                "reference": "4263e35a1e342a0f195c9349c0dee38148f8a14f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/finder/zipball/9925935bf7144f9e4d2b976905881b4face036fb",
-                "reference": "9925935bf7144f9e4d2b976905881b4face036fb",
+                "url": "https://api.github.com/repos/symfony/finder/zipball/4263e35a1e342a0f195c9349c0dee38148f8a14f",
+                "reference": "4263e35a1e342a0f195c9349c0dee38148f8a14f",
                 "shasum": ""
             },
             "require": {
@@ -2446,7 +2615,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "3.1-dev"
+                    "dev-master": "3.2-dev"
                 }
             },
             "autoload": {
@@ -2473,7 +2642,7 @@
             ],
             "description": "Symfony Finder Component",
             "homepage": "https://symfony.com",
-            "time": "2016-11-03 08:04:31"
+            "time": "2016-11-03 08:11:03"
         },
         {
             "name": "symfony/polyfill-mbstring",
@@ -2536,16 +2705,16 @@
         },
         {
             "name": "symfony/process",
-            "version": "v3.1.7",
+            "version": "v3.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/process.git",
-                "reference": "66de154ae86b1a07001da9fbffd620206e4faf94"
+                "reference": "02ea84847aad71be7e32056408bb19f3a616cdd3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/process/zipball/66de154ae86b1a07001da9fbffd620206e4faf94",
-                "reference": "66de154ae86b1a07001da9fbffd620206e4faf94",
+                "url": "https://api.github.com/repos/symfony/process/zipball/02ea84847aad71be7e32056408bb19f3a616cdd3",
+                "reference": "02ea84847aad71be7e32056408bb19f3a616cdd3",
                 "shasum": ""
             },
             "require": {
@@ -2554,7 +2723,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "3.1-dev"
+                    "dev-master": "3.2-dev"
                 }
             },
             "autoload": {
@@ -2581,7 +2750,7 @@
             ],
             "description": "Symfony Process Component",
             "homepage": "https://symfony.com",
-            "time": "2016-09-29 14:13:09"
+            "time": "2016-11-24 10:40:28"
         },
         {
             "name": "symfony/yaml",
