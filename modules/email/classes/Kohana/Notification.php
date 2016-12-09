@@ -16,7 +16,9 @@ abstract class Kohana_Notification {
 
     public function send(Kohana_Notification_Message $message)
     {
-//        $from = $message->get_from();
+        $counter = 0;
+
+        //        $from = $message->get_from();
         $to = $message->get_to();
         $subj = $message->get_subj();
 
@@ -42,7 +44,7 @@ abstract class Kohana_Notification {
                 $fromUser = $message->get_from();
 
                 // Email notification
-                Email::send(
+                $counter += Email::send(
                     $fromUser ? $fromUser->get_email() : NULL,
                     $target->get_email(),
                     $subj,
@@ -52,6 +54,8 @@ abstract class Kohana_Notification {
                 );
             }
         }
+
+        return $counter;
     }
 
     protected function render_message(Kohana_Notification_Message $message, $transport)

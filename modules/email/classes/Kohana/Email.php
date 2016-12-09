@@ -103,12 +103,12 @@ class Kohana_Email {
 		(static::$mail === NULL) and Email::connect();
 
 		// Determine the message type
-		$html = ($html === TRUE) ? 'text/html' : 'text/plain';
+		$content_type = ($html === TRUE) ? 'text/html' : 'text/plain';
 
 		// Create the message
 
         /** @var Swift_Message $msg */
-		$msg = Swift_Message::newInstance($subject, $body, $html, 'utf-8');
+		$msg = Swift_Message::newInstance($subject, $body, $content_type, 'utf-8');
 
 		if (is_string($to))
 		{

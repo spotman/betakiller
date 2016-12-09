@@ -152,7 +152,7 @@ abstract class Kohana_Notification_Message {
 
     public function send()
     {
-        Notification::instance()->send($this);
+        return Notification::instance()->send($this);
     }
 
     /**
