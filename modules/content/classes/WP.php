@@ -207,6 +207,21 @@ class WP
         }
     }
 
+    public function get_quotes_collection_quotes()
+    {
+        /** @var Database_Result $query */
+        $query = DB::select_array([
+            ['quote_id', 'id'],
+            ['quote', 'text'],
+            'author',
+            ['time_added', 'created_at'],
+        ])
+            ->from('quotescollection')
+            ->execute('wp');
+
+        return $query->as_array();
+    }
+
     public function get_wonderplugin_slider_config($id)
     {
         /** @var Database_Result $query */

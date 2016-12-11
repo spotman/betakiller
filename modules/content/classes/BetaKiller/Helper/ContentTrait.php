@@ -4,17 +4,6 @@ namespace BetaKiller\Helper;
 trait ContentTrait
 {
     /**
-     * @param $mime
-     *
-     * @return \Service_Content_WithAssets
-     * @deprecated
-     */
-    protected function service_content_assets($mime)
-    {
-        return \Service_Content_WithAssets::service_instance_by_mime($mime);
-    }
-
-    /**
      * @return \Service_ContentFacade
      */
     protected function service_content_facade()
@@ -31,7 +20,7 @@ trait ContentTrait
     }
 
     /**
-     * @return \Assets_Provider_ContentImage
+     * @return \Assets_Provider_ContentImage|\Assets_Provider_Image
      */
     protected function assets_provider_content_image()
     {
@@ -39,7 +28,7 @@ trait ContentTrait
     }
 
     /**
-     * @return \Assets_Provider_ContentAttachment
+     * @return \Assets_Provider_ContentAttachment|\Assets_Provider
      */
     protected function assets_provider_content_attachment()
     {
@@ -47,7 +36,7 @@ trait ContentTrait
     }
 
     /**
-     * @return \Assets_Provider_ContentPostThumbnail
+     * @return \Assets_Provider_ContentPostThumbnail|\Assets_Provider_Image
      */
     protected function assets_provider_content_post_thumbnail()
     {
@@ -57,7 +46,7 @@ trait ContentTrait
     /**
      * @param int|null $id
      *
-     * @return \Model_ContentPost
+     * @return \Model_ContentPost|\ORM
      */
     public function model_factory_content_post($id = null)
     {
@@ -66,7 +55,7 @@ trait ContentTrait
 
     /**
      * @param int|null $id
-     * @return \Model_ContentCategory
+     * @return \Model_ContentCategory|\ORM
      */
     public function model_factory_content_category($id = null)
     {
@@ -75,7 +64,7 @@ trait ContentTrait
 
     /**
      * @param int|null $id
-     * @return \Model_ContentEntity
+     * @return \Model_ContentEntity|\ORM
      */
     protected function model_factory_content_entity($id = NULL)
     {
@@ -84,7 +73,7 @@ trait ContentTrait
 
     /**
      * @param int|null $id
-     * @return \Model_ContentImageElement
+     * @return \Model_ContentImageElement|\ORM
      */
     protected function model_factory_content_image_element($id = NULL)
     {
@@ -93,7 +82,7 @@ trait ContentTrait
 
     /**
      * @param int|null $id
-     * @return \Model_ContentPostThumbnail
+     * @return \Model_ContentPostThumbnail|\ORM
      */
     protected function model_factory_content_post_thumbnail($id = NULL)
     {
@@ -102,7 +91,7 @@ trait ContentTrait
 
     /**
      * @param int|null $id
-     * @return \Model_ContentAttachmentElement
+     * @return \Model_ContentAttachmentElement|\ORM
      */
     protected function model_factory_content_attachment_element($id = NULL)
     {
@@ -111,11 +100,20 @@ trait ContentTrait
 
     /**
      * @param int|null $id
-     * @return \Model_ContentYoutubeRecord
+     * @return \Model_ContentYoutubeRecord|\ORM
      */
     protected function model_factory_content_youtube_record($id = NULL)
     {
         return \ORM::factory('ContentYoutubeRecord', $id);
+    }
+
+    /**
+     * @param int|null $id
+     * @return \Model_Quote|\ORM
+     */
+    protected function model_factory_quote($id = NULL)
+    {
+        return \ORM::factory('Quote', $id);
     }
 
     /**

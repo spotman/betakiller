@@ -6,7 +6,6 @@ use BetaKiller\Content\HasWordpressPathInterface;
 use BetaKiller\Content\ContentElementInterface;
 use Thunder\Shortcode\Shortcode\ShortcodeInterface;
 use Thunder\Shortcode\Serializer\TextSerializer;
-use Thunder\Shortcode\Shortcode\Shortcode;
 use Thunder\Shortcode\Processor\Processor;
 use Thunder\Shortcode\Parser\RegularParser;
 
@@ -25,18 +24,20 @@ class Task_Content_Import_Wordpress extends Minion_Task
     protected $attach_parsing_mode;
     protected $attach_parsing_path;
 
+    protected $known_bb_tags = [];
+    protected $unknown_bb_tags = [];
+
     protected function _execute(array $params)
     {
         $this->configure_dialog();
-
-        // Attachments
-//        $this->process_attachments();
 
         // Posts
         $this->import_posts_and_pages();
 
         // Categories
         $this->import_categories();
+
+        $this->import_quotes();
     }
 
     protected function configure_dialog()
@@ -358,6 +359,10 @@ class Task_Content_Import_Wordpress extends Minion_Task
 
             $current++;
         }
+
+        if ($this->unknown_bb_tags) {
+            $this->warning('Found unknown BB tags: :list', [':list' => PHP_EOL.implode(PHP_EOL, $this->unknown_bb_tags).PHP_EOL]);
+        }
     }
 
     protected function post_process_article_text(Model_ContentPost $item)
@@ -524,8 +529,13 @@ class Task_Content_Import_Wordpress extends Minion_Task
 
         $handlers->setDefault(function(ShortcodeInterface $s) {
             $serializer = new TextSerializer();
+            $name = $s->getName();
 
-            $this->warning('Unknown BB-code found [:name], keep it', [':name' => $s->getName()]);
+            if (!in_array($name, $this->unknown_bb_tags)) {
+                $this->unknown_bb_tags[] = $name;
+                $this->debug('Unknown BB-code found [:name], keep it', [':name' => $name]);
+            }
+
             return $serializer->serialize($s);
         });
 
@@ -927,6 +937,27 @@ class Task_Content_Import_Wordpress extends Minion_Task
 
             $category
                 ->set_parent($parent)
+                ->save();
+        }
+    }
+
+    protected function import_quotes()
+    {
+        $quotes_data = $this->wp()->get_quotes_collection_quotes();
+
+        foreach ($quotes_data as $data) {
+            $id = $data['id'];
+            $text = $data['text'];
+            $author = $data['author'];
+            $created_at = new DateTime($data['created_at']);
+
+            $model = $this->model_factory_quote($id);
+
+            $model
+                ->set_id($id)
+                ->set_created_at($created_at)
+                ->set_author($author)
+                ->set_text($text)
                 ->save();
         }
     }
