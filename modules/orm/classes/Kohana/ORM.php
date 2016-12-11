@@ -706,7 +706,7 @@ class Kohana_ORM extends Model implements Serializable {
 	 * @param  string $column Column name
 	 * @param  mixed  $value  Column value
 	 * @throws Kohana_Exception
-	 * @return ORM
+	 * @return $this
 	 */
 	public function set($column, $value)
 	{
@@ -767,7 +767,7 @@ class Kohana_ORM extends Model implements Serializable {
 	 *
 	 * @param  array $values   Array of column => val
 	 * @param  array $expected Array of keys to take from $values
-	 * @return ORM
+	 * @return $this
 	 */
 	public function values(array $values, array $expected = NULL)
 	{
