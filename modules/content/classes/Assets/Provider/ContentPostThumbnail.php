@@ -35,20 +35,7 @@ class Assets_Provider_ContentPostThumbnail extends \Assets_Provider_Image
      */
     public function get_allowed_preview_sizes()
     {
-        return $this->get_assets_provider_config_value(['sizes', 'preview']);
-    }
-
-    /**
-     * Defines allowed sizes for cropping
-     * Returns array of strings like this
-     *
-     * array('300x200', '75x75')
-     *
-     * @return array|NULL
-     */
-    public function get_allowed_crop_sizes()
-    {
-        return $this->get_assets_provider_config_value(['sizes', 'crop']);
+        return $this->get_assets_provider_config_value(['sizes']);
     }
 
     /**
@@ -82,8 +69,10 @@ class Assets_Provider_ContentPostThumbnail extends \Assets_Provider_Image
      */
     protected function check_upload_permissions()
     {
+        $user = $this->get_user();
+
         // TODO Move to ACL
-        return $this->_user AND $this->_user->is_admin_allowed();
+        return $user AND $user->is_admin_allowed();
     }
 
     /**
@@ -106,7 +95,9 @@ class Assets_Provider_ContentPostThumbnail extends \Assets_Provider_Image
      */
     protected function check_delete_permissions($model)
     {
+        $user = $this->get_user();
+
         // TODO Move to ACL
-        return $this->_user AND $this->_user->is_admin_allowed();
+        return $user AND $user->is_admin_allowed();
     }
 }

@@ -13,6 +13,7 @@ Route::set('assets-provider-upload', 'assets/<provider>/upload')
     ));
 
 $assets_extension_regexp = '[a-z]{2,4}'; // (jpg|jpeg|gif|png)
+$assets_size_regexp = '[0-9]*'.Assets_Provider_Image::SIZE_DELIMITER.'[0-9]*';
 
 /**
  * Deploy/delete/preview files via concrete provider
@@ -28,7 +29,7 @@ Route::set('assets-provider-item', 'assets/<provider>/<item_url>/<action>(.<ext>
  * Make image preview
  */
 Route::set('assets-provider-item-preview', 'assets/<provider>/<item_url>/preview-<size>(.<ext>)',
-    array('item_url' => '[A-Za-z0-9\/]+', 'size' => '[0-9]*x[0-9]*', 'ext' => $assets_extension_regexp))
+    array('item_url' => '[A-Za-z0-9\/]+', 'size' => $assets_size_regexp, 'ext' => $assets_extension_regexp))
     ->defaults(array(
         'module'        => 'assets',
         'controller'    => 'Assets',
@@ -39,7 +40,7 @@ Route::set('assets-provider-item-preview', 'assets/<provider>/<item_url>/preview
  * Crop an image
  */
 Route::set('assets-provider-item-crop', 'assets/<provider>/<item_url>/crop-<size>(.<ext>)',
-    array('item_url' => '[A-Za-z0-9\/]+', 'size' => '[0-9]*x[0-9]*', 'ext' => $assets_extension_regexp))
+    array('item_url' => '[A-Za-z0-9\/]+', 'size' => $assets_size_regexp, 'ext' => $assets_extension_regexp))
     ->defaults(array(
         'module'        => 'assets',
         'controller'    => 'Assets',
@@ -56,4 +57,4 @@ Route::set('assets-provider-item-deploy-directory', 'assets/<provider>/<item_url
         'controller'    => 'Assets',
     ));
 
-unset($assets_extension_regexp);
+unset($assets_extension_regexp, $assets_size_regexp);

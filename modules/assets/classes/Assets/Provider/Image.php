@@ -7,7 +7,10 @@
 abstract class Assets_Provider_Image extends Assets_Provider {
 
     // Dimensions values delimiter
-    const SIZE_X = 'x';
+    const SIZE_DELIMITER = 'x';
+
+    const SIZE_ORIGINAL = 'original';
+    const SIZE_PREVIEW = 'preview';
 
     /**
      * @param Assets_ModelInterface $model
@@ -22,7 +25,7 @@ abstract class Assets_Provider_Image extends Assets_Provider {
         if ( ! $url )
             throw new Assets_Provider_Exception('Model must have url');
 
-        $size = $this->determine_size($size, $this->get_allowed_preview_sizes());
+        $size = $this->determine_size($size);
 
         $options = array(
             'provider'  =>  $this->_codename,
@@ -36,44 +39,23 @@ abstract class Assets_Provider_Image extends Assets_Provider {
     }
 
     /**
-     * @param Assets_Model_ImageInterface $model
-     * @param string $size    300x200
-     * @return string
-     * @throws Assets_Provider_Exception
+     * @param string $size
+     *
+     * @return int[]
      */
-    public function get_crop_url(Assets_Model_ImageInterface $model, $size = NULL)
+    protected function parse_size_dimensions($size)
     {
-        $url = $model->get_url();
-
-        if ( ! $url )
-            throw new Assets_Provider_Exception('Model must have url');
-
-        $size = $this->determine_size($size, $this->get_allowed_crop_sizes());
-
-        $options = array(
-            'provider'  =>  $this->_codename,
-            'action'    =>  'crop',
-            'item_url'  =>  $url,
-            'size'      =>  $size,
-            'ext'       =>  $this->get_model_extension($model),
-        );
-
-        return Route::url('assets-provider-item-crop', $options);
-    }
-
-    public function get_preview_dimensions($size = null)
-    {
-        $size = $this->determine_size($size, $this->get_allowed_preview_sizes());
-
-        $dimensions = explode(self::SIZE_X, $size);
+        $dimensions = explode(self::SIZE_DELIMITER, $size);
         $width = $dimensions[0] ? (int) $dimensions[0] : NULL;
         $height = $dimensions[1] ? (int) $dimensions[1] : NULL;
 
         return [$width, $height];
     }
 
-    protected function determine_size($size, array $allowed_sizes)
+    protected function determine_size($size)
     {
+        $allowed_sizes = $this->get_allowed_preview_sizes();
+
         if ( $size === NULL && count($allowed_sizes) > 0 )
         {
             $size = $allowed_sizes[0];
@@ -85,18 +67,23 @@ abstract class Assets_Provider_Image extends Assets_Provider {
         return $size;
     }
 
-    public function prepare_preview(Assets_Model_ImageInterface $model, $size)
+    protected function calculate_dimensions_ratio($width, $height)
+    {
+        return $width / $height;
+    }
+
+    public function make_preview(Assets_Model_ImageInterface $model, $size)
     {
         $this->check_preview_size($size);
 
         $content = $this->get_content($model);
 
-        $dimensions = $this->get_preview_dimensions($size);
+        $dimensions = $this->parse_size_dimensions($size);
 
         $width = $dimensions[0];
         $height = $dimensions[1];
 
-        if ( ! $width AND ! $height )
+        if ( !$width AND !$height )
             throw new Assets_Provider_Exception('Preview size must have width or height defined');
 
         return $this->resize(
@@ -107,90 +94,12 @@ abstract class Assets_Provider_Image extends Assets_Provider {
         );
     }
 
-    public function crop(Assets_Model_ImageInterface $model, $size)
-    {
-        $this->check_crop_size($size);
-
-        $content = $this->get_content($model);
-
-        $dimensions = explode(self::SIZE_X, $size);
-        $width = $dimensions[0] ? (int) $dimensions[0] : NULL;
-        $height = $dimensions[1] ? (int) $dimensions[1] : NULL;
-
-        if ( ! $width AND $height )
-            $width = $height;
-
-        if ( ! $height AND $width )
-            $height = $width;
-
-        if ( ! $width OR ! $height )
-            throw new Assets_Provider_Exception('Crop size must have width AND height defined');
-
-        return $this->_crop_resize_and_center($content, $width, $height, $this->get_preview_quality());
-    }
-
-    /**
-     * @param string $original_content
-     * @param int $width
-     * @param int $height
-     * @param int $quality
-     * @returns string Cropped image content
-     * @throws Assets_Provider_Exception
-     */
-    protected function _crop_resize_and_center($original_content, $width, $height, $quality)
-    {
-        if ( ! $original_content )
-            throw new Assets_Provider_Exception('No content for resizing');
-
-        // Creating temporary file
-        $temp_file_name = tempnam(sys_get_temp_dir(), 'image-crop');
-
-        if ( ! $temp_file_name )
-            throw new Assets_Provider_Exception('Can not create temporary file for image cropping');
-
-        try
-        {
-            // Putting content into it
-            file_put_contents($temp_file_name, $original_content);
-
-            // Creating resizing instance
-            $image = Image::factory($temp_file_name);
-
-            $cropped_content = $image
-                ->resize($width, $height, Image::INVERSE)
-                ->crop($width, $height)
-                ->render(NULL /* auto */, $quality);
-
-            // Deleting temp file
-            unlink($temp_file_name);
-
-            return $cropped_content;
-        }
-        catch ( Exception $e )
-        {
-            throw new Assets_Provider_Exception('Can not crop image');
-        }
-    }
-
-    public function check_preview_size($size)
+    protected function check_preview_size($size)
     {
         $allowed_sizes = $this->get_allowed_preview_sizes();
 
         if ( ! $allowed_sizes OR ! in_array($size, $allowed_sizes) )
             throw new Assets_Provider_Exception('Preview size :size is not allowed', [':size' => $size]);
-    }
-
-    public function check_crop_size($size)
-    {
-        $allowed_sizes = $this->get_allowed_crop_sizes();
-
-        if ( ! $allowed_sizes OR ! in_array($size, $allowed_sizes) )
-            throw new Assets_Provider_Exception('Crop size :size is not allowed', [':size' => $size]);
-    }
-
-    public function get_original_size(Assets_Model_ImageInterface $image)
-    {
-        return $image->get_width().self::SIZE_X.$image->get_height();
     }
 
     /**
@@ -203,7 +112,7 @@ abstract class Assets_Provider_Image extends Assets_Provider {
      */
     protected function _upload($model, $content, array $_post_data, $file_path)
     {
-        $this->detect_width_and_height($model, $file_path);
+        $this->preset_width_and_height($model, $file_path);
 
         $max_width = $this->get_upload_max_width();
         $max_height = $this->get_upload_max_height();
@@ -229,7 +138,7 @@ abstract class Assets_Provider_Image extends Assets_Provider {
      * @param string $file_path
      * @throws Assets_Provider_Exception
      */
-    protected function detect_width_and_height(Assets_Model_ImageInterface $model, $file_path)
+    protected function preset_width_and_height(Assets_Model_ImageInterface $model, $file_path)
     {
         try
         {
@@ -260,38 +169,152 @@ abstract class Assets_Provider_Image extends Assets_Provider {
             throw new Assets_Provider_Exception('No content for resizing');
 
         // Creating temporary file
-        $temp_file_name = tempnam(sys_get_temp_dir(), 'image-resize');
+        $temp_file_name = tempnam(sys_get_temp_dir(), 'image-resize-temp');
 
         if ( ! $temp_file_name )
             throw new Assets_Provider_Exception('Can not create temporary file for image resizing');
 
-        try
-        {
+        try {
             // Putting content into it
             file_put_contents($temp_file_name, $original_content);
 
             // Creating resizing instance
             $image = Image::factory($temp_file_name);
 
-            $resized_content = $image
-                ->resize($width, $height)
-                ->render(NULL /* auto */, $quality);
+            // Detect original dimensions and ratio
+            $original_width = $image->width;
+            $original_height = $image->height;
+            $original_ratio = $this->calculate_dimensions_ratio($original_width, $original_height);
 
-            // Deleting temp file
-            unlink($temp_file_name);
+            // Fill omitted dimensions
+            if (!$width) {
+                $width = $height * $original_ratio;
+            } elseif (!$height) {
+                $height = $width / $original_ratio;
+            }
 
-            return $resized_content;
+            $resize_ratio = $this->calculate_dimensions_ratio($width, $height);
+
+            if ($original_ratio == $resize_ratio) {
+                $image->resize($width, $height);
+            } else {
+
+                $image->resize($width, $height, Image::INVERSE)->crop($width, $height);
+            }
+
+            $resized_content = $image->render(NULL /* auto */, $quality);
+        } catch ( Exception $e ) {
+            throw new Assets_Provider_Exception('Can not resize image, reason: :message', [':message' => $e->getMessage()]);
         }
-        catch ( Exception $e )
-        {
-            throw new Assets_Provider_Exception('Can not resize image: :message', [':message' => $e->getMessage()]);
-        }
+
+        // Deleting temp file
+        unlink($temp_file_name);
+
+        return $resized_content;
     }
 
     protected function _get_item_deploy_filename(Request $request)
     {
         $size = $request->param('size');
         return $request->action().( $size ? '-'.$size : '').'.'.$request->param('ext');
+    }
+
+    public function get_arguments_for_img_tag(Assets_Model_ImageInterface $model, $size, array $attributes = [])
+    {
+        $original_url = $this->get_original_url($model);
+
+        if ($size == self::SIZE_ORIGINAL)
+        {
+            $src = $original_url;
+            $width = $model->get_width();
+            $height = $model->get_height();
+        }
+        else
+        {
+            $size = ($size != self::SIZE_PREVIEW) ? $size : null;
+
+            $size = $this->determine_size($size);
+
+            $dimensions = $this->parse_size_dimensions($size);
+
+            $src = $this->get_preview_url($model, $size);
+            $width = $dimensions[0];
+            $height = $dimensions[1];
+        }
+
+        // TODO recalculate dimensions if $attributes['width'] or 'height' exists
+
+        $image_ratio = $this->calculate_dimensions_ratio($width, $height);
+
+        $attributes = array_merge([
+            'src'               =>  $src,
+            'width'             =>  $width,
+            'height'            =>  $height,
+            'srcset'            =>  $this->get_srcset_attribute_value($model, $image_ratio),
+            'data-original-url' =>  $original_url,
+        ], $attributes);
+
+        return $attributes;
+    }
+
+    protected function get_srcset_attribute_value(Assets_Model_ImageInterface $model, $ratio = NULL)
+    {
+        $sizes = $this->get_srcset_sizes($ratio);
+        $srcset = [];
+
+        if ($sizes)
+        {
+            foreach ($sizes as $size)
+            {
+                $width = intval($size);
+                $url = $this->get_preview_url($model, $size);
+                $srcset[] = $this->make_srcset_width_option($url, $width);
+            }
+
+            // Add srcset for original image
+            $url = $this->get_original_url($model);
+            $srcset[] = $this->make_srcset_width_option($url, $model->get_width());
+        }
+
+        return implode(', ', $srcset);
+    }
+
+    protected function get_srcset_sizes($ratio = NULL)
+    {
+        $allowed_sizes = $this->get_allowed_preview_sizes();
+
+        // Return all sizes if no ratio filter was set
+        if (!$ratio) {
+            return $allowed_sizes;
+        }
+
+        $sizes = [];
+
+        // Filtering sizes by ratio
+        foreach ($allowed_sizes as $size) {
+            $size_ratio = $this->get_size_ratio($size);
+
+            // Skip sizes with another ratio
+            if ($ratio != $size_ratio) {
+                continue;
+            }
+
+            $sizes[] = $size;
+        }
+
+        return $sizes;
+    }
+
+    protected function get_size_ratio($size)
+    {
+        $dimensions = $this->parse_size_dimensions($size);
+
+        return $this->calculate_dimensions_ratio($dimensions[0], $dimensions[1]);
+    }
+
+    protected function make_srcset_width_option($url, $width)
+    {
+        return $url.' '.$width.'w';
     }
 
     /**
@@ -313,16 +336,6 @@ abstract class Assets_Provider_Image extends Assets_Provider {
      * @return array
      */
     abstract public function get_allowed_preview_sizes();
-
-    /**
-     * Defines allowed sizes for cropping
-     * Returns array of strings like this
-     *
-     * array('300x200', '75x75')
-     *
-     * @return array|NULL
-     */
-    abstract public function get_allowed_crop_sizes();
 
     /**
      * @return int

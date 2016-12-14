@@ -20,12 +20,12 @@ abstract class Assets_Provider {
      * @Inject
      * @var ConfigInterface
      */
-    protected $_config;
+    private $_config;
 
     /**
      * @var \Model_User
      */
-    protected $_user;
+    private $_user;
 
 
     public function __construct(ConfigInterface $config, \Model_User $user)
@@ -45,11 +45,6 @@ abstract class Assets_Provider {
 
         return $this->get_assets_config_value(array_merge(['providers', $codename], $path));
     }
-
-//    protected function get_permissions_config_value($type)
-//    {
-//        return $this->get_assets_provider_config_value('permissions.'.$type);
-//    }
 
     public function set_codename($codename)
     {
@@ -430,6 +425,11 @@ abstract class Assets_Provider {
 
         // Remove directory itself
         rmdir($path);
+    }
+
+    protected function get_user()
+    {
+        return $this->_user;
     }
 
     /**

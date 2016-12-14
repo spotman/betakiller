@@ -9,12 +9,6 @@ interface Assets_Model_ImageInterface extends Assets_ModelInterface
     public function get_preview_url($size = NULL);
 
     /**
-     * @param string|null $size
-     * @return string|null
-     */
-    public function get_crop_url($size = NULL);
-
-    /**
      * @return int
      */
     public function get_upload_max_width();

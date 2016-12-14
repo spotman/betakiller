@@ -2,25 +2,13 @@
 
 abstract class Assets_Model_ORM_Image extends Assets_Model_ORM implements Assets_Model_ImageInterface
 {
-    const SIZE_ORIGINAL = 'original';
-    const SIZE_PREVIEW = 'preview';
+    const SIZE_ORIGINAL = Assets_Provider_Image::SIZE_ORIGINAL;
+    const SIZE_PREVIEW = Assets_Provider_Image::SIZE_PREVIEW;
 
     public function get_preview_url($size = NULL)
     {
         return $this->loaded()
             ? $this->get_provider()->get_preview_url($this, $size)
-            : NULL;
-    }
-
-    public function get_preview_dimensions($size = NULL)
-    {
-        return $this->get_provider()->get_preview_dimensions($size);
-    }
-
-    public function get_crop_url($size = NULL)
-    {
-        return $this->loaded()
-            ? $this->get_provider()->get_crop_url($this, $size)
             : NULL;
     }
 
@@ -70,63 +58,6 @@ abstract class Assets_Model_ORM_Image extends Assets_Model_ORM implements Assets
 
     public function get_arguments_for_img_tag($size, array $attributes = [])
     {
-        $original_url = $this->get_original_url();
-
-        if ($size == self::SIZE_ORIGINAL)
-        {
-            $data = [
-                'src'       =>  $original_url,
-                'width'     =>  $this->get_width(),
-                'height'    =>  $this->get_height(),
-            ];
-        }
-        else
-        {
-            $size = ($size != self::SIZE_PREVIEW) ? $size : null;
-
-            $dimensions = $this->get_preview_dimensions($size);
-
-            $data = [
-                'src'       =>  $this->get_preview_url($size),
-                'width'     =>  $dimensions[0],
-                'height'    =>  $dimensions[1],
-            ];
-        }
-
-        // TODO recalculate dimensions if $attributes['width'] or 'height' exists
-
-        $attributes = array_merge([
-            'data-original-url' =>  $original_url,
-            'srcset'            =>  $this->get_srcset(),
-        ], $data, $attributes);
-
-        return $attributes;
-    }
-
-    public function get_srcset()
-    {
-        $sizes = $this->get_provider()->get_allowed_preview_sizes();
-        $srcset = [];
-
-        if ($sizes)
-        {
-            foreach ($sizes as $size)
-            {
-                $width = intval($size);
-                $url = $this->get_preview_url($size);
-                $srcset[] = $this->make_srcset_width_option($url, $width);
-            }
-
-            // Add srcset for original image
-            $url = $this->get_original_url();
-            $srcset[] = $this->make_srcset_width_option($url, $this->get_width());
-        }
-
-        return implode(', ', $srcset);
-    }
-
-    protected function make_srcset_width_option($url, $width)
-    {
-        return $url.' '.$width.'w';
+        return $this->get_provider()->get_arguments_for_img_tag($this, $size, $attributes);
     }
 }

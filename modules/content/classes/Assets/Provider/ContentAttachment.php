@@ -54,8 +54,10 @@ class Assets_Provider_ContentAttachment extends \Assets_Provider
      */
     protected function check_upload_permissions()
     {
+        $user = $this->get_user();
+
         // TODO Move to ACL
-        return $this->_user AND $this->_user->is_admin_allowed();
+        return $user AND $user->is_admin_allowed();
     }
 
     /**
@@ -78,7 +80,9 @@ class Assets_Provider_ContentAttachment extends \Assets_Provider
      */
     protected function check_delete_permissions($model)
     {
+        $user = $this->get_user();
+
         // TODO Move to ACL
-        return $this->_user AND $this->_user->is_admin_allowed();
+        return $user AND $user->is_admin_allowed();
     }
 }

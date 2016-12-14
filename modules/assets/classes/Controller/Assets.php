@@ -66,7 +66,7 @@ class Controller_Assets extends Controller {
 
         $this->check_extension($model);
 
-        $preview_content = $this->_provider->prepare_preview($model, $size);
+        $preview_content = $this->_provider->make_preview($model, $size);
 
         // Deploy to cache
         $this->deploy($model, $preview_content);
@@ -87,13 +87,10 @@ class Controller_Assets extends Controller {
 
         $this->check_extension($model);
 
-        $cropped_content = $this->_provider->crop($model, $size);
+        $preview_url = $model->get_preview_url($size);
 
-        // Deploy to cache
-        $this->deploy($model, $cropped_content);
-
-        // Send file content + headers
-        $this->send_file($cropped_content, $model->get_mime());
+        // Redirect for SEO backward compatibility
+        $this->response->redirect($preview_url, 301);
     }
 
     public function action_delete()
@@ -122,6 +119,11 @@ class Controller_Assets extends Controller {
         $this->_provider = Assets_Provider_Factory::instance()->create($provider_key);
     }
 
+    /**
+     * @return \Assets_ModelInterface|\Assets_Model_ImageInterface|NULL
+     * @throws \Assets_Exception
+     * @throws \HTTP_Exception_404
+     */
     protected function from_item_deploy_url()
     {
         $url = $this->param('item_url');

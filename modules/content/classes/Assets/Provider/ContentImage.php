@@ -55,19 +55,6 @@ class Assets_Provider_ContentImage extends \Assets_Provider_Image
     }
 
     /**
-     * Defines allowed sizes for cropping
-     * Returns array of strings like this
-     *
-     * array('300x200', '75x75')
-     *
-     * @return array|NULL
-     */
-    public function get_allowed_crop_sizes()
-    {
-        return $this->get_assets_provider_config_value(['sizes', 'crop']);
-    }
-
-    /**
      * Returns list of allowed MIME-types (or TRUE if all MIMEs are allowed)
      *
      * @return array|TRUE
@@ -98,8 +85,10 @@ class Assets_Provider_ContentImage extends \Assets_Provider_Image
      */
     protected function check_upload_permissions()
     {
+        $user = $this->get_user();
+
         // TODO Move to ACL
-        return $this->_user AND $this->_user->is_admin_allowed();
+        return $user AND $user->is_admin_allowed();
     }
 
     /**
@@ -122,7 +111,9 @@ class Assets_Provider_ContentImage extends \Assets_Provider_Image
      */
     protected function check_delete_permissions($model)
     {
+        $user = $this->get_user();
+
         // TODO Move to ACL
-        return $this->_user AND $this->_user->is_admin_allowed();
+        return $user AND $user->is_admin_allowed();
     }
 }
