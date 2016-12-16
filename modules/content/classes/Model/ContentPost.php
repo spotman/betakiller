@@ -523,6 +523,10 @@ class Model_ContentPost extends ORM implements SeoContentInterface, ImportedFrom
 
         $params = $this->url_parameters_instance()->set(self::URL_PARAM, $this);
 
+        if ($this->is_default()) {
+            $this->set_uri('/'); // Nullify uri so URL must not have default "index" string
+        }
+
         $this->preset_linked_models($params);
 
         return $iface->url($params);
