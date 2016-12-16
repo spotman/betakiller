@@ -6,6 +6,7 @@
     "doctrine/annotations": "^1.2",
     "doctrine/cache": "^1.5",
     "twig/twig": "^1.22",
+    "twig/extensions": "^1.4",
     "asm89/twig-cache-extension": "^1.2",
     "samdark/sitemap": "^2.0",
     "spotman/davbackup": "1.*",
