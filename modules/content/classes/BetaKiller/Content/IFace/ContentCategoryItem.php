@@ -2,7 +2,7 @@
 namespace BetaKiller\Content\IFace;
 
 use BetaKiller\Content\IFace\Base;
-use Model_ContentCategory;
+//use Model_ContentCategory;
 
 class ContentCategoryItem extends Base
 {
@@ -20,21 +20,21 @@ class ContentCategoryItem extends Base
             'category'  =>  [
                'label'  =>  $category->get_label(),
             ],
-            'posts'     => $this->get_category_posts($category),
+//            'posts'     => $this->get_category_posts($category),
         ];
     }
 
-    protected function get_category_posts(Model_ContentCategory $category)
-    {
-        $data = [];
-
-        foreach ($category->get_all_related_articles() as $article) {
-            $data[] = [
-                'url'   =>  $article->get_public_url(),
-                'label' =>  $article->get_label(),
-            ];
-        }
-
-        return $data;
-    }
+//    protected function get_category_posts(Model_ContentCategory $category)
+//    {
+//        $data = [];
+//
+//        foreach ($category->get_all_related_articles_before() as $article) {
+//            $data[] = [
+//                'url'   =>  $article->get_public_url(),
+//                'label' =>  $article->get_label(),
+//            ];
+//        }
+//
+//        return $data;
+//    }
 }

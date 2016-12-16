@@ -75,9 +75,12 @@ class Model_ContentCategory extends TreeModel implements SeoContentInterface, Im
     }
 
     /**
+     * @param \DateTime $before
+     * @param int|null  $limit
+
      * @return Database_Result|Model_ContentPost[]
      */
-    public function get_all_related_articles()
+    public function get_all_related_articles_before(DateTime $before, $limit = null)
     {
         // Collect all children categories
         $ids = $this->get_all_children($this->primary_key());
@@ -85,8 +88,13 @@ class Model_ContentCategory extends TreeModel implements SeoContentInterface, Im
         // Add current category
         $ids[] = $this->get_id();
 
+        // Remove empty values
+        $ids = array_filter($ids);
+
+        $posts = $this->get_posts_relation()->model_factory();
+
         return $ids
-            ? $this->get_posts_relation()->model_factory()->filter_category_ids($ids)->get_all()
+            ? $posts->filter_category_ids($ids)->filter_posts_before($before)->get_all_articles($limit)
             : [];
     }
 
@@ -96,6 +104,21 @@ class Model_ContentCategory extends TreeModel implements SeoContentInterface, Im
     public function get_related_articles()
     {
         return $this->get_posts_relation()->get_all();
+    }
+
+    /**
+     * @param \DateTime $before
+     * @param int|null  $limit
+     *
+     * @return \Model_ContentPost[]|\Database_Result
+     */
+    public function get_related_articles_before(DateTime $before, $limit = null)
+    {
+        $posts = $this->get_posts_relation();
+
+        return $posts
+            ->filter_posts_before($before)
+            ->get_all_articles($limit);
     }
 
     /**

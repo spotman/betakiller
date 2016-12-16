@@ -259,6 +259,12 @@ abstract class Assets_Provider_Image extends Assets_Provider {
 
     protected function get_srcset_attribute_value(Assets_Model_ImageInterface $model, $ratio = NULL)
     {
+        $model_ratio = $this->get_model_ratio($model);
+
+        if (!$ratio) {
+            $ratio = $model_ratio;
+        }
+
         $sizes = $this->get_srcset_sizes($ratio);
         $srcset = [];
 
@@ -270,13 +276,16 @@ abstract class Assets_Provider_Image extends Assets_Provider {
                 $url = $this->get_preview_url($model, $size);
                 $srcset[] = $this->make_srcset_width_option($url, $width);
             }
+        }
 
+        // If original image ratio is allowed
+        if ($model_ratio == $ratio) {
             // Add srcset for original image
             $url = $this->get_original_url($model);
             $srcset[] = $this->make_srcset_width_option($url, $model->get_width());
         }
 
-        return implode(', ', $srcset);
+        return implode(', ', array_filter($srcset));
     }
 
     protected function get_srcset_sizes($ratio = NULL)
@@ -310,6 +319,11 @@ abstract class Assets_Provider_Image extends Assets_Provider {
         $dimensions = $this->parse_size_dimensions($size);
 
         return $this->calculate_dimensions_ratio($dimensions[0], $dimensions[1]);
+    }
+
+    protected function get_model_ratio(Assets_Model_ImageInterface $image)
+    {
+        return $this->calculate_dimensions_ratio($image->get_width(), $image->get_height());
     }
 
     protected function make_srcset_width_option($url, $width)
