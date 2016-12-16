@@ -273,6 +273,14 @@ class Model_ContentPost extends ORM implements SeoContentInterface, ImportedFrom
     }
 
     /**
+     * @return $this[]|\Database_Result
+     */
+    public function get_all_pages()
+    {
+        return $this->filter_pages()->get_all();
+    }
+
+    /**
      * @param int|int[]|null $filter_type
      * @param int $limit
      * @param int|int[]|null $exclude_id
@@ -464,6 +472,11 @@ class Model_ContentPost extends ORM implements SeoContentInterface, ImportedFrom
     public function filter_articles()
     {
         return $this->filter_type(self::TYPE_ARTICLE);
+    }
+
+    public function filter_pages()
+    {
+        return $this->filter_type(self::TYPE_PAGE);
     }
 
     /**

@@ -28,7 +28,7 @@ class ContentCategoryItem extends Base
     {
         $data = [];
 
-        foreach ($category->get_all_related_posts() as $article) {
+        foreach ($category->get_all_related_articles() as $article) {
             $data[] = [
                 'url'   =>  $article->get_public_url(),
                 'label' =>  $article->get_label(),

@@ -77,7 +77,7 @@ class Model_ContentCategory extends TreeModel implements SeoContentInterface, Im
     /**
      * @return Database_Result|Model_ContentPost[]
      */
-    public function get_all_related_posts()
+    public function get_all_related_articles()
     {
         // Collect all children categories
         $ids = $this->get_all_children($this->primary_key());
@@ -88,6 +88,14 @@ class Model_ContentCategory extends TreeModel implements SeoContentInterface, Im
         return $ids
             ? $this->get_posts_relation()->model_factory()->filter_category_ids($ids)->get_all()
             : [];
+    }
+
+    /**
+     * @return Model_ContentPost[]|\Database_Result
+     */
+    public function get_related_articles()
+    {
+        return $this->get_posts_relation()->get_all();
     }
 
     /**
@@ -136,7 +144,7 @@ class Model_ContentCategory extends TreeModel implements SeoContentInterface, Im
     }
 
     /**
-     * @return Model_ContentArticle
+     * @return \Model_ContentPost
      */
     protected function get_posts_relation()
     {
