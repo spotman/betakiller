@@ -74,6 +74,7 @@ return array(
         \Twig_Extension_Debug::class,
         \BetaKiller_Twig_Extension::class,
         \Twig_CacheExtension::class,
+        \Twig_Extensions_Extension_Text::class,
     ),
 
 );
