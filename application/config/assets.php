@@ -3,7 +3,7 @@
 return array(
 
     'jquery'    =>  array(
-        'js'    =>  array('jquery/jquery-1.11.1.min.js', /* 'jquery/jquery-migrate-1.2.1.js', */ 'jquery/utils.js')
+        'js'    =>  array('jquery/jquery-1.11.1.min.js', /* 'jquery/jquery-migrate-1.2.1.js', */ 'jquery/jquery.utils.js')
     ),
 
     'jquery.ui'     => array(
@@ -153,7 +153,7 @@ return array(
     ),
 
     'require.js'     =>  array(
-        'js'        =>  array('require.js/require.js', 'require.js/config.js'),
+        'js'        =>  array('require.js/require.js', 'require.js/betakiller.config.js', 'require.js/app.config.js'),
     ),
 
 );

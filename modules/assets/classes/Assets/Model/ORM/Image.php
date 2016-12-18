@@ -56,7 +56,7 @@ abstract class Assets_Model_ORM_Image extends Assets_Model_ORM implements Assets
         return $this->set('height', (int) $value);
     }
 
-    public function get_arguments_for_img_tag($size, array $attributes = [])
+    public function get_attributes_for_img_tag($size, array $attributes = [])
     {
         return $this->get_provider()->get_arguments_for_img_tag($this, $size, $attributes);
     }

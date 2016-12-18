@@ -21,7 +21,9 @@ define([
 
             // Create function in global scope
             window[callbackFunctionName] = function(token) {
-                $.JSON.post(tokenLoginURL, { token: token }, widgetSuccessCallback, widgetErrorCallback);
+                $widget.JSON(tokenLoginURL, { token: token })
+                  .done(widgetSuccessCallback)
+                  .fail(widgetErrorCallback);
             };
 
 //            $.getScript("http://ulogin.ru/js/ulogin.js");

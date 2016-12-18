@@ -1,5 +1,6 @@
 define([
-    "twig.original"
+  "twig.original",
+  "twig.extensions"
 ], function(Twig){
 
     // Prototype

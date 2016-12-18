@@ -28,6 +28,7 @@ return array(
             'ifaces'    =>  'ifaces',
             'widgets'   =>  'widgets',
             'templates' =>  'templates',
+            'macros'    =>  'macros',
 
             'statics'   =>  '../static-files',
         ),

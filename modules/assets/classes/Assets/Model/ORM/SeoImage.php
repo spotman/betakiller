@@ -41,13 +41,13 @@ abstract class Assets_Model_ORM_SeoImage extends Assets_Model_ORM_Image
         return $this->get('title');
     }
 
-    public function get_arguments_for_img_tag($size, array $attributes = [])
+    public function get_attributes_for_img_tag($size, array $attributes = [])
     {
         $attributes = array_merge([
             'alt'       =>  $this->get_alt(),
             'title'     =>  $this->get_title(),
         ], $attributes);
 
-        return parent::get_arguments_for_img_tag($size, $attributes);
+        return parent::get_attributes_for_img_tag($size, $attributes);
     }
 }

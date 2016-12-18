@@ -16,7 +16,7 @@ require.config({
 
     paths: {
         'jquery':                   '../jquery/jquery-1.11.1.min',
-        'jquery.utils':             '../jquery/utils',
+        'jquery.utils':             '../jquery/jquery.utils',
         'jquery.ui.widget':         '../jquery/ui/jquery.ui.widget',
         'jquery.ui':                '../jquery/ui/jquery-ui-1.9.2.custom.min',
         'jquery.ui.punch':          '../jquery/ui/jquery.ui.touch-punch.min',
@@ -53,12 +53,11 @@ require.config({
 
         'twig':                     '../twig.js/twig.wrapper',
         'twig.original':            '../twig.js/twig',
+        'twig.extensions':          '../twig.js/twig.extensions',
 
         'api.rpc':                  '../api/rpc.definition',
         'api.rpc.factory':          '../api/rpc.factory',
         'jquery.jsonRPC':           '../api/jquery.jsonRPC',
-
-        'ansi_up':                  '../ansi_up/ansi_up',
 
         'auth.login':               'views/auth/login',
         'auth.widget':              'views/auth/widget',

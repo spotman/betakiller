@@ -8,7 +8,7 @@ define([
         initialize: function(successfulCallback) {
 
             var widget = $("#widget-auth-regular"),
-                form = $('#widget-auth-regular-login-form'),
+                $form = $('#widget-auth-regular-login-form'),
                 submit_button = $("#login-btn"),
                 alert = widget.find(".alert");
 
@@ -26,7 +26,7 @@ define([
                 submit_button.removeAttr("disabled");
             };
 
-            form.submit(function(e) {
+            $form.submit(function(e) {
 
                 var login = $('#widget-auth-regular-user-login').val();
                 var password = $('#widget-auth-regular-user-password').val();
@@ -40,15 +40,10 @@ define([
                 alert.hide();
                 submit_button.attr("disabled", "disabled");
 
-                $.JSON.post(
-                    form.data('action'),
-                    {
-                        "user-login": login,
-                        "user-password": password
-                    },
-                    providerDoneCallback,
-                    providerFailCallback
-                );
+                $form.JSON($form.data('action'), {
+                    "user-login": login,
+                    "user-password": password
+                }).done(providerDoneCallback).fail(providerFailCallback);
 
             });
 
