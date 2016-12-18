@@ -48,7 +48,7 @@ class Widget_CustomTag_Photo extends Widget
         }
 
         return [
-            'image'     =>  $model->get_arguments_for_img_tag($model::SIZE_ORIGINAL, $attributes),
+            'image'     =>  $model->get_attributes_for_img_tag($model::SIZE_ORIGINAL, $attributes),
         ];
     }
 }

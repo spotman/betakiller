@@ -46,7 +46,7 @@ class ContentItem extends Base
         $thumbnails = [];
 
         foreach ($model->get_thumbnails() as $thumb) {
-            $thumbnails[] = $thumb->get_arguments_for_img_tag($thumb::SIZE_ORIGINAL);
+            $thumbnails[] = $thumb->get_attributes_for_img_tag($thumb::SIZE_ORIGINAL);
             // TODO get image last_modified and set it to iface
         }
 

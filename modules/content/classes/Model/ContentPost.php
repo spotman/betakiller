@@ -264,6 +264,11 @@ class Model_ContentPost extends ORM implements SeoContentInterface, ImportedFrom
         return $this->get_popular_content(self::TYPE_ARTICLE, $limit, $exclude_id);
     }
 
+    public function get_fresh_articles($limit = 5, $exclude_id = NULL)
+    {
+        return $this->get_fresh_content(self::TYPE_ARTICLE, $limit, $exclude_id);
+    }
+
     /**
      * @param int|null $limit
      *
@@ -305,6 +310,27 @@ class Model_ContentPost extends ORM implements SeoContentInterface, ImportedFrom
         $model->filter_types((array) $filter_type);
 
         return $model->order_by_views_count()->limit($limit)->get_all();
+    }
+
+    /**
+     * @param int|int[]|null $filter_type
+     * @param int $limit
+     * @param int|int[]|null $exclude_id
+     *
+     * @return \Database_Result|\Model_ContentPost[]
+     */
+    protected function get_fresh_content($filter_type, $limit = 5, $exclude_id = NULL)
+    {
+        $model = $this->model_factory();
+
+        if ($exclude_id)
+        {
+            $model->filter_ids((array) $exclude_id, TRUE);
+        }
+
+        $model->filter_types((array) $filter_type);
+
+        return $model->order_by_created_at(TRUE)->limit($limit)->get_all();
     }
 
     /**
