@@ -148,7 +148,7 @@ abstract class Core_URL_Dispatcher {
         }
         catch (IFace_Exception $e)
         {
-            $parent_url = $parent_iface ? $parent_iface->url($this->parameters()) : NULL;
+            $parent_url = $parent_iface ? $parent_iface->url($this->parameters(), FALSE) : NULL;
 
             if ($parent_url)
             {
