@@ -51,7 +51,7 @@ class Assets_Provider_ContentImage extends \Assets_Provider_Image
      */
     public function get_allowed_preview_sizes()
     {
-        return $this->get_assets_provider_config_value(['sizes', 'preview']);
+        return $this->get_assets_provider_config_value(['sizes']);
     }
 
     /**

@@ -378,7 +378,7 @@ class Task_Content_Import_Wordpress extends Minion_Task
 
         // TODO Make custom tags self-closing
 
-        $document->loadHtml($text); //, LIBXML_NOEMPTYTAG
+        $document->loadHtml($text, LIBXML_PARSEHUGE); //, LIBXML_NOEMPTYTAG
 
         $body = $document->find('body')[0];
 
@@ -387,7 +387,7 @@ class Task_Content_Import_Wordpress extends Minion_Task
             $this->update_links_on_attachments($document);
             $this->remove_links_on_content_images($document);
 
-            $text = $body->innerHtml();
+            $text = $body->innerHtml(LIBXML_NOCDATA);
             $item->set_content($text);
         } else {
             $this->warning('Post parsing error for :url', [':url' => $item->get_uri()]);
@@ -513,7 +513,7 @@ class Task_Content_Import_Wordpress extends Minion_Task
         $handlers->add('gallery', [$this, 'thunder_handler_gallery']);
 
         // [wonderplugin_slider id="1"]
-        $handlers->add('wonderplugin-slider', [$this, 'thunder_handler_wonderplugin']);
+        $handlers->add('wonderplugin_slider', [$this, 'thunder_handler_wonderplugin']);
 
 //        // [adsense-content-top] and similar
 //        $handlers->add('adsense', [$this, 'thunder_handler_adsense']);

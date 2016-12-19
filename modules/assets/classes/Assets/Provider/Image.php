@@ -38,6 +38,11 @@ abstract class Assets_Provider_Image extends Assets_Provider {
         return Route::url('assets-provider-item-preview', $options);
     }
 
+    public function make_size_string($width = NULL, $height = NULL)
+    {
+        return $width.self::SIZE_DELIMITER.$height;
+    }
+
     /**
      * @param string $size
      *
@@ -49,6 +54,11 @@ abstract class Assets_Provider_Image extends Assets_Provider {
         $width = $dimensions[0] ? (int) $dimensions[0] : NULL;
         $height = $dimensions[1] ? (int) $dimensions[1] : NULL;
 
+        return $this->pack_dimensions($width, $height);
+    }
+
+    protected function pack_dimensions($width, $height)
+    {
         return [$width, $height];
     }
 
@@ -62,14 +72,32 @@ abstract class Assets_Provider_Image extends Assets_Provider {
         }
 
         if (!$size)
-            throw new Assets_Provider_Exception('Can not determine image size');
+            throw new Assets_Provider_Exception('Can not determine image size for :provider', [':provider' => $this->_codename]);
 
         return $size;
     }
 
     protected function calculate_dimensions_ratio($width, $height)
     {
+        if (!$height || !$width) {
+            throw new Assets_Provider_Exception('Can not calculate ratio for incomplete dimensions :size', [
+                ':size' => $this->make_size_string($width, $height)
+            ]);
+        }
+
         return $width / $height;
+    }
+
+    protected function restore_omitted_dimensions($width, $height, $original_ratio)
+    {
+        // Fill omitted dimensions
+        if (!$width) {
+            $width = $height * $original_ratio;
+        } elseif (!$height) {
+            $height = $width / $original_ratio;
+        }
+
+        return $this->pack_dimensions($width, $height);
     }
 
     public function make_preview(Assets_Model_ImageInterface $model, $size)
@@ -186,12 +214,9 @@ abstract class Assets_Provider_Image extends Assets_Provider {
             $original_height = $image->height;
             $original_ratio = $this->calculate_dimensions_ratio($original_width, $original_height);
 
-            // Fill omitted dimensions
-            if (!$width) {
-                $width = $height * $original_ratio;
-            } elseif (!$height) {
-                $height = $width / $original_ratio;
-            }
+            $dimensions = $this->restore_omitted_dimensions($width, $height, $original_ratio);
+            $width = $dimensions[0];
+            $height = $dimensions[1];
 
             $resize_ratio = $this->calculate_dimensions_ratio($width, $height);
 
@@ -234,12 +259,13 @@ abstract class Assets_Provider_Image extends Assets_Provider {
             $size = ($size != self::SIZE_PREVIEW) ? $size : null;
 
             $size = $this->determine_size($size);
-
             $dimensions = $this->parse_size_dimensions($size);
 
-            $src = $this->get_preview_url($model, $size);
+            $dimensions = $this->restore_omitted_dimensions($dimensions[0], $dimensions[1], $this->get_model_ratio($model));
             $width = $dimensions[0];
             $height = $dimensions[1];
+
+            $src = $this->get_preview_url($model, $size);
         }
 
         // TODO recalculate dimensions if $attributes['width'] or 'height' exists
@@ -301,7 +327,7 @@ abstract class Assets_Provider_Image extends Assets_Provider {
 
         // Filtering sizes by ratio
         foreach ($allowed_sizes as $size) {
-            $size_ratio = $this->get_size_ratio($size);
+            $size_ratio = $this->get_size_ratio($size, $ratio);
 
             // Skip sizes with another ratio
             if ($ratio != $size_ratio) {
@@ -314,9 +340,13 @@ abstract class Assets_Provider_Image extends Assets_Provider {
         return $sizes;
     }
 
-    protected function get_size_ratio($size)
+    protected function get_size_ratio($size, $original_ratio = null)
     {
         $dimensions = $this->parse_size_dimensions($size);
+
+        if ($original_ratio) {
+            $dimensions = $this->restore_omitted_dimensions($dimensions[0], $dimensions[1], $original_ratio);
+        }
 
         return $this->calculate_dimensions_ratio($dimensions[0], $dimensions[1]);
     }
