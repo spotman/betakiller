@@ -11,7 +11,12 @@
  */
 if ( Kohana::in_production(TRUE) )
 {
-    Kohana::$log->attach(new Log_MongoDB, Log::NOTICE, Log::EMERGENCY);
+    try {
+        $log = new Log_MongoDB;
+        Kohana::$log->attach($log, Log::NOTICE, Log::EMERGENCY);
+    } catch (Exception $e) {
+        // Skip this log writer silently
+    }
 }
 
 Route::set('catch-js-error', 'catch-js-error')

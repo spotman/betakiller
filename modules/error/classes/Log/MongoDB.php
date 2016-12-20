@@ -1,7 +1,7 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
-class Log_MongoDB extends Log_Writer {
-
+class Log_MongoDB extends Log_Writer
+{
     /**
      * Адрес электронной почты, на который отправляются уведомления об ошибках
      */
@@ -23,7 +23,7 @@ class Log_MongoDB extends Log_Writer {
     public function __construct()
     {
         // Notification for absent mongodb driver
-        if (!class_exists(MongoClient::class, FALSE))
+        if (!class_exists(MongoClient::class, true))
             throw new \BetaKiller\Exception('Class MongoClient is missing, install MongoDB driver for PHP');
     }
 
