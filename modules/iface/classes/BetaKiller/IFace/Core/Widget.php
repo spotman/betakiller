@@ -157,8 +157,10 @@ abstract class Widget extends \Controller // TODO Remove extension and replace i
         // Collecting data
         $data = $this->get_data();
 
-        // Serve widget name
-        $data['name'] = $this->getName();
+        // Serve widget data
+        $data['this'] = [
+            'name'  => $this->getName(),
+        ];
 
         // Creating View instance
         $view = $this->view();
