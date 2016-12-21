@@ -56,6 +56,10 @@ class BetaKiller_Kohana_Exception extends Kohana_Kohana_Exception
 
         if (PHP_SAPI == 'cli')
         {
+            if (!$notify) {
+                echo self::text($exception);
+            }
+
             // Exception already processed via Minion_Log
             exit(1);
         }
