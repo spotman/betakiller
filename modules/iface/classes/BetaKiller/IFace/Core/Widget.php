@@ -2,7 +2,6 @@
 namespace BetaKiller\IFace\Core;
 
 use BetaKiller\IFace\WidgetFactory;
-use Controller;
 use Kohana_Exception;
 use Request;
 use Response;
