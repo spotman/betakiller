@@ -36,9 +36,8 @@ class Task_Cache_Warmup extends Minion_Task
         {
             $this->debug('Found IFace :codename', [':codename' => $iface_model->get_codename()]);
 
-
-            $urls = $this->_dispatcher->get_iface_model_available_urls($iface_model, $params, 1);
-            $this->debug(implode(PHP_EOL, $urls).PHP_EOL);
+            $urls = $this->_dispatcher->get_iface_model_available_urls($iface_model, $params, 1, FALSE);
+            $this->debug(PHP_EOL.implode(PHP_EOL, $urls).PHP_EOL);
 
             $url = array_pop($urls);
 
@@ -49,12 +48,15 @@ class Task_Cache_Warmup extends Minion_Task
 
     protected function make_http_request($url)
     {
-        $response = Request::factory($url)->execute();
+        $this->debug('Making request to :url', [':url' => $url]);
+
+        $request = new Request($url);
+        $response = $request->execute();
         $status = $response->status();
 
         if ($status == 200)
         {
-            // TODO Grab page content, parse it and make request to every image/css/js file
+            // TODO Maybe grab page content, parse it and make request to every image/css/js file
 
             $this->info('Cache was warmed up for :url', [':url' => $url]);
         }

@@ -343,7 +343,7 @@ abstract class IFace
         return $this->url_dispatcher()->is_current_iface($this, $parameters);
     }
 
-    public function url(URL_Parameters $parameters = NULL, $remove_cycling_links = TRUE)
+    public function url(URL_Parameters $parameters = NULL, $remove_cycling_links = TRUE, $with_domain = TRUE)
     {
         if ($remove_cycling_links && $this->is_current($parameters))
         {
@@ -351,7 +351,6 @@ abstract class IFace
         }
 
         $parts = array();
-        $with_domain = TRUE;
 
         if (!$this->is_default()) {
             $current = $this;

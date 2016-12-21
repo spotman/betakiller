@@ -409,6 +409,11 @@ class Model_ContentPost extends ORM implements SeoContentInterface, ImportedFrom
         return ($this->get_uri() == $this->get_default_url_value());
     }
 
+    public function filter_default()
+    {
+        return $this->where('uri', '!=', $this->get_default_url_value());
+    }
+
     /**
      * @param array $ids
      * @return $this

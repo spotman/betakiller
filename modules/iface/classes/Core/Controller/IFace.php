@@ -11,6 +11,12 @@ class Core_Controller_IFace extends Controller
         // Getting current IFace
         $iface = $dispatcher->parse_uri($uri);
 
+        // If this is default IFace and client requested non-slash uri, redirect client to /
+        if ( $iface->is_default() AND $uri != '/' )
+        {
+            $this->redirect('/');
+        }
+
         if ($uri)
         {
             $has_trailing_slash = (substr($uri, -1, 1) == '/');
@@ -25,12 +31,6 @@ class Core_Controller_IFace extends Controller
             {
                 $this->redirect($uri.'/', 301); // Permanent redirect
             }
-        }
-
-        // If this is default IFace and client requested non-slash uri, redirect client to /
-        if ( $iface->is_default() AND $uri != '' )
-        {
-            $this->redirect('/');
         }
 
         $output = $iface->render();
@@ -51,6 +51,6 @@ class Core_Controller_IFace extends Controller
      */
     protected function get_request_uri()
     {
-        return Request::current()->detect_uri();
+        return $this->request->uri();
     }
 }

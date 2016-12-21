@@ -150,13 +150,10 @@ abstract class Core_URL_Dispatcher {
         {
             $parent_url = $parent_iface ? $parent_iface->url($this->parameters(), FALSE) : NULL;
 
-            if ($parent_url)
-            {
+            if ($parent_url) {
                 // TODO Create interface for redirect() method, use it in Response and send Response instance to $this via DI
                 HTTP::redirect($parent_url);
-            }
-            else
-            {
+            } else {
                 $this->throw_missing_url_exception($it, $parent_iface);
             }
         }
@@ -270,21 +267,21 @@ abstract class Core_URL_Dispatcher {
         return FALSE;
     }
 
-    public function get_iface_model_available_urls(IFaceModelInterface $model, URL_Parameters $params, $limit = NULL)
+    public function get_iface_model_available_urls(IFaceModelInterface $model, URL_Parameters $params, $limit = NULL, $with_domain = TRUE)
     {
         if ( $model->has_dynamic_url()  )
         {
-            return $this->get_dynamic_model_available_urls($model, $params, $limit);
+            return $this->get_dynamic_model_available_urls($model, $params, $limit, $with_domain);
         }
         else
         {
             // Make static URL
             $iface = $this->iface_from_model_factory($model);
-            return [$iface->url($params)];
+            return [$this->get_iface_url($iface, $params, $with_domain)];
         }
     }
 
-    protected function get_dynamic_model_available_urls(IFaceModelInterface $iface_model, URL_Parameters $params, $limit = NULL)
+    protected function get_dynamic_model_available_urls(IFaceModelInterface $iface_model, URL_Parameters $params, $limit = NULL, $with_domain = TRUE)
     {
         $urls = [];
         $iface = $this->iface_from_model_factory($iface_model);
@@ -304,16 +301,21 @@ abstract class Core_URL_Dispatcher {
             $params->set($model_name, $item, TRUE);
 
             // Make dynamic URL + recursion
-            $urls[] = $iface->url($params);
+            $urls[] = $this->get_iface_url($iface, $params, $with_domain);
 
             if ($iface_model->has_tree_behaviour())
             {
                 // Recursion for tree behaviour
-                $urls = array_merge($urls, $this->get_dynamic_model_available_urls($model, $params, $limit));
+                $urls = array_merge($urls, $this->get_dynamic_model_available_urls($iface_model, $params, $limit));
             }
         }
 
         return $urls;
+    }
+
+    protected function get_iface_url(IFace $iface, URL_Parameters $params = NULL, $with_domain = TRUE)
+    {
+        return $iface->url($params, FALSE, $with_domain);
     }
 
 //    protected function process_custom_url_behaviour(IFaceModelInterface $iface_model, UrlPathIterator $it)
