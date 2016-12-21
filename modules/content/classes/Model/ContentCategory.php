@@ -63,6 +63,11 @@ class Model_ContentCategory extends TreeModel implements SeoContentInterface, Im
         return $this->get('label');
     }
 
+    public function is_active()
+    {
+        return (bool) $this->get('is_active');
+    }
+
     public function get_public_url()
     {
         /** @var \V2017\IFace\ContentCategoryItem $iface */
