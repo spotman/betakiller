@@ -278,6 +278,7 @@ abstract class Assets_Provider_Image extends Assets_Provider {
             'height'            =>  $height,
             'srcset'            =>  $this->get_srcset_attribute_value($model, $image_ratio),
             'data-original-url' =>  $original_url,
+            'data-id'           =>  $model->get_id(),
         ], $attributes);
 
         return $attributes;

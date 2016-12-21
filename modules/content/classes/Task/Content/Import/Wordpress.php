@@ -24,7 +24,6 @@ class Task_Content_Import_Wordpress extends Minion_Task
     protected $attach_parsing_mode;
     protected $attach_parsing_path;
 
-    protected $known_bb_tags = [];
     protected $unknown_bb_tags = [];
 
     protected function _execute(array $params)
@@ -90,25 +89,25 @@ class Task_Content_Import_Wordpress extends Minion_Task
         $wp->set_option(self::WP_OPTION_PARSING_PATH, $parsing_path);
     }
 
-    protected function process_attachments(array $attachments, Assets_Provider $provider = NULL)
-    {
-        $this->info('Processing attachments');
-
-        foreach ($attachments as $attach)
-        {
-            try
-            {
-                $this->process_attachment($attach, $provider);
-            }
-            catch (Exception $e)
-            {
-                $this->warning('Error on processing attach with WP ID = :id'.PHP_EOL.':message', [
-                    ':id'       =>  $attach['ID'],
-                    ':message'  =>  $e->getMessage(),
-                ]);
-            }
-        }
-    }
+//    protected function process_attachments(array $attachments, Assets_Provider $provider = NULL)
+//    {
+//        $this->info('Processing attachments');
+//
+//        foreach ($attachments as $attach)
+//        {
+//            try
+//            {
+//                $this->process_attachment($attach, , $provider);
+//            }
+//            catch (Exception $e)
+//            {
+//                $this->warning('Error on processing attach with WP ID = :id'.PHP_EOL.':message', [
+//                    ':id'       =>  $attach['ID'],
+//                    ':message'  =>  $e->getMessage(),
+//                ]);
+//            }
+//        }
+//    }
 
     /**
      * @return Model_ContentEntity
@@ -125,7 +124,7 @@ class Task_Content_Import_Wordpress extends Minion_Task
         return $content_entity;
     }
 
-    protected function process_attachment(array $attach, Assets_Provider $provider = NULL)
+    protected function process_attachment(array $attach, $entity_item_id, Assets_Provider $provider = NULL)
     {
         $wp_id = $attach['ID'];
         $url = $attach['guid'];
@@ -145,7 +144,7 @@ class Task_Content_Import_Wordpress extends Minion_Task
             $provider = $this->service_content_facade()->assets_provider_factory_from_mime($mime);
         }
 
-        $model = $this->store_attachment($provider, $url, $wp_id);
+        $model = $this->store_attachment($provider, $url, $wp_id, $entity_item_id);
 
         // Save created_at + updated_at
         $created_at = new DateTime($attach['post_date']);
@@ -360,8 +359,13 @@ class Task_Content_Import_Wordpress extends Minion_Task
             $current++;
         }
 
-        if ($this->unknown_bb_tags) {
-            $this->warning('Found unknown BB tags: :list', [':list' => PHP_EOL.implode(PHP_EOL, $this->unknown_bb_tags).PHP_EOL]);
+        $this->notify_about_bb_tags();
+    }
+
+    protected function notify_about_bb_tags()
+    {
+        foreach ($this->unknown_bb_tags as $tag => $url) {
+            $this->notice('Found unknown BB tag [:name] at :url', [':name' => $tag, ':url' => $url]);
         }
     }
 
@@ -384,10 +388,10 @@ class Task_Content_Import_Wordpress extends Minion_Task
 
         if ($body) {
             // Process attachments first coz they are images inside links
-            $this->update_links_on_attachments($document);
+            $this->update_links_on_attachments($document, $item->get_id());
             $this->remove_links_on_content_images($document);
 
-            $text = $body->innerHtml(LIBXML_NOCDATA);
+            $text = $body->innerHtml(LIBXML_PARSEHUGE);
             $item->set_content($text);
         } else {
             $this->warning('Post parsing error for :url', [':url' => $item->get_uri()]);
@@ -411,7 +415,7 @@ class Task_Content_Import_Wordpress extends Minion_Task
         }
     }
 
-    protected function update_links_on_attachments(Document $document)
+    protected function update_links_on_attachments(Document $document, $post_id)
     {
         $links = $document->find('a');
 
@@ -428,7 +432,7 @@ class Task_Content_Import_Wordpress extends Minion_Task
             if (!$attach)
                 throw new Task_Exception('Unknown attachment href :url', [':url' => $href]);
 
-            $model = $this->process_attachment($attach);
+            $model = $this->process_attachment($attach, $post_id);
 
             $new_url = $model->get_original_url();
 
@@ -495,7 +499,7 @@ class Task_Content_Import_Wordpress extends Minion_Task
         foreach ($images_wp_data as $image_data)
         {
             /** @var Model_ContentPostThumbnail $image_model */
-            $image_model = $this->process_attachment($image_data, $provider);
+            $image_model = $this->process_attachment($image_data, $post->get_id(), $provider);
 
             // Linking image to post
             $image_model->set_post($post)->save();
@@ -507,32 +511,27 @@ class Task_Content_Import_Wordpress extends Minion_Task
         $handlers = new \Thunder\Shortcode\HandlerContainer\HandlerContainer();
 
         // [caption id="attachment_571" align="alignnone" width="780"]
-        $handlers->add('caption', [$this, 'thunder_handler_caption']);
+        $handlers->add('caption', function (ShortcodeInterface $shortcode) use ($item) {
+            return $this->thunder_handler_caption($shortcode, $item);
+        });
 
         // [gallery ids="253,261.260"]
-        $handlers->add('gallery', [$this, 'thunder_handler_gallery']);
+        $handlers->add('gallery', function (ShortcodeInterface $shortcode) use ($item) {
+            return $this->thunder_handler_gallery($shortcode, $item);
+        });
 
         // [wonderplugin_slider id="1"]
-        $handlers->add('wonderplugin_slider', [$this, 'thunder_handler_wonderplugin']);
+        $handlers->add('wonderplugin_slider', function (ShortcodeInterface $shortcode) use ($item) {
+            return $this->thunder_handler_wonderplugin($shortcode, $item);
+        });
 
-//        // [adsense-content-top] and similar
-//        $handlers->add('adsense', [$this, 'thunder_handler_adsense']);
-//
-//        $aliases = [
-//            'adsense-content-top',
-//            'adsense-content-bottom',
-//        ];
-//
-//        foreach ($aliases as $alias) {
-//            $facade->addHandlerAlias($alias, 'adsense');
-//        }
-
-        $handlers->setDefault(function(ShortcodeInterface $s) {
+        // All unknown shortcodes
+        $handlers->setDefault(function(ShortcodeInterface $s) use ($item) {
             $serializer = new TextSerializer();
             $name = $s->getName();
 
-            if (!in_array($name, $this->unknown_bb_tags)) {
-                $this->unknown_bb_tags[] = $name;
+            if (!isset($this->unknown_bb_tags[$name])) {
+                $this->unknown_bb_tags[$name] = $item->get_public_url();
                 $this->debug('Unknown BB-code found [:name], keep it', [':name' => $name]);
             }
 
@@ -546,7 +545,7 @@ class Task_Content_Import_Wordpress extends Minion_Task
         $item->set_content($content);
     }
 
-    public function thunder_handler_caption(\Thunder\Shortcode\Shortcode\ShortcodeInterface $s)
+    public function thunder_handler_caption(ShortcodeInterface $s, Model_ContentPost $post)
     {
         $this->debug('Caption found');
 
@@ -555,13 +554,16 @@ class Task_Content_Import_Wordpress extends Minion_Task
         $image_wp_id = intval(str_replace('attachment_', '', $parameters['id']));
         unset($parameters['id']);
 
-        $image = $this->model_factory_content_image_element()->find_by_wp_id($image_wp_id);
+        // Find image in WP and process attachment
+        $wp_image_data = $this->wp()->get_attachment_by_id($image_wp_id);
 
-        if (!$image)
+        if (!$wp_image_data)
         {
             $this->warning('No image found by wp_id :id', [':id' => $image_wp_id]);
             return NULL;
         }
+
+        $image = $this->process_attachment($wp_image_data, $post->get_id());
 
         // Removing <img /> tag
         $caption_text = trim(strip_tags($s->getContent()));
@@ -571,7 +573,7 @@ class Task_Content_Import_Wordpress extends Minion_Task
         return $this->custom_tag_instance()->generate_html(CustomTag::CAPTION, $image->get_id(), $parameters);
     }
 
-    public function thunder_handler_gallery(\Thunder\Shortcode\Shortcode\ShortcodeInterface $s)
+    public function thunder_handler_gallery(\Thunder\Shortcode\Shortcode\ShortcodeInterface $s, Model_ContentPost $post)
     {
         $wp_ids_string = $s->getParameter('ids');
         $type = $s->getParameter('type');
@@ -586,7 +588,6 @@ class Task_Content_Import_Wordpress extends Minion_Task
         $wp_ids_string = str_replace(' ', '', $wp_ids_string);
         $wp_ids = explode(',', $wp_ids_string);
 
-//        $provider = $this->assets_provider_content_image();
         $wp_images = $this->wp()->get_attachments(NULL, $wp_ids);
 
         if (!$wp_images)
@@ -600,7 +601,7 @@ class Task_Content_Import_Wordpress extends Minion_Task
         // Process every image in set
         foreach ($wp_images as $wp_image_data)
         {
-            $model = $this->process_attachment($wp_image_data);
+            $model = $this->process_attachment($wp_image_data, $post->get_id());
             $images_ids[] = $model->get_id();
         }
 
@@ -614,7 +615,7 @@ class Task_Content_Import_Wordpress extends Minion_Task
         return $this->custom_tag_instance()->generate_html(CustomTag::GALLERY, NULL, $attributes);
     }
 
-    public function thunder_handler_wonderplugin(\Thunder\Shortcode\Shortcode\ShortcodeInterface $s)
+    public function thunder_handler_wonderplugin(\Thunder\Shortcode\Shortcode\ShortcodeInterface $s, Model_ContentPost $post)
     {
         $id = $s->getParameter('id');
 
@@ -624,8 +625,7 @@ class Task_Content_Import_Wordpress extends Minion_Task
 
         $images_ids = [];
 
-        foreach ($config['slides'] as $slide)
-        {
+        foreach ($config['slides'] as $slide) {
             $url = $slide['image'];
 //            $url_path = parse_url($url, PHP_URL_PATH);
 
@@ -638,11 +638,13 @@ class Task_Content_Import_Wordpress extends Minion_Task
             // Processing image
 
             /** @var Model_ContentImageElement $image */
-            $image = $this->process_attachment($wp_image);
+            $image = $this->process_attachment($wp_image, $post->get_id());
 
-            $caption = $slide['alt'] ?: $slide['title'];
+            $caption = $slide['title'] ?: $slide['alt'];
 
-            $image->set_alt($caption)->set_title($caption)->save();
+            if ($caption) {
+                $image->set_title($caption)->save();
+            }
 
             $this->debug('Adding image :id to wonderplugin slider', [':id' => $image->get_id()]);
 
@@ -728,25 +730,21 @@ class Task_Content_Import_Wordpress extends Minion_Task
             throw new Task_Exception('Unknown image with src :value', [':value' => $original_url]);
 
         /** @var Model_ContentImageElement $image */
-        $image = $this->process_attachment($wp_image);
+        $image = $this->process_attachment($wp_image, $entity_item_id);
         
         $alt = trim(Arr::get($attributes, 'alt'));
         $title = trim(Arr::get($attributes, 'title'));
 
         // Save alt and title in image model
-        if ($alt)
-        {
+        if ($alt) {
             $image->set_alt($alt);
         }
 
-        if ($title)
-        {
+        if ($title) {
             $image->set_title($title);
         }
 
-        $image
-            ->set_entity_item_id($entity_item_id)
-            ->save();
+        $image->save();
 
         // Removing unnecessary attributes
         unset(

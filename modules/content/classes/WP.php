@@ -53,6 +53,20 @@ class WP
         return $query->execute('wp');
     }
 
+    public function get_attachment_by_id($id)
+    {
+        $query = DB::select()
+            ->from('posts')
+            ->and_where('post_type', '=', self::POST_TYPE_ATTACHMENT)
+            ->and_where('ID', '=', $id)
+            ->limit(1);
+
+        /** @var Database_Result $result */
+        $result = $query->execute('wp');
+
+        return $result->current();
+    }
+
     public function get_attachment_by_path($path)
     {
         $query = DB::select()

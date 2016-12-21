@@ -3,6 +3,11 @@
 interface Assets_Model_ImageInterface extends Assets_ModelInterface
 {
     /**
+     * @return int
+     */
+    public function get_id();
+
+    /**
      * @param string|null $size
      * @return string|null
      */
