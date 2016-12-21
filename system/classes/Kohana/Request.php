@@ -680,7 +680,7 @@ class Kohana_Request implements HTTP_Request {
 		if ( ! $allow_external OR strpos($uri, '://') === FALSE)
 		{
 			// Remove trailing slashes from the URI
-			$this->_uri = trim($uri, '/');
+			$this->_uri = ltrim($uri, '/');
 
 			// Apply the client
 			$this->_client = new Request_Client_Internal($client_params);
