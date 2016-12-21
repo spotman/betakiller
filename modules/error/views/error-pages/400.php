@@ -1,4 +1,4 @@
-<? defined('SYSPATH') OR die('No direct script access.'); ?>
+<?php defined('SYSPATH') OR die('No direct script access.'); ?>
 
 <style>
     .well.center {
