@@ -563,7 +563,7 @@ class Task_Content_Import_Wordpress extends Minion_Task
 
     public function thunder_handler_caption(ShortcodeInterface $s, Model_ContentPost $post)
     {
-        $this->debug('Caption found');
+        $this->debug('[caption] found');
 
         $parameters = $s->getParameters();
 
@@ -591,6 +591,8 @@ class Task_Content_Import_Wordpress extends Minion_Task
 
     public function thunder_handler_gallery(\Thunder\Shortcode\Shortcode\ShortcodeInterface $s, Model_ContentPost $post)
     {
+        $this->debug('[gallery] found');
+
         $wp_ids_string = $s->getParameter('ids');
         $type = $s->getParameter('type');
         $columns = (int) $s->getParameter('columns');
@@ -633,6 +635,8 @@ class Task_Content_Import_Wordpress extends Minion_Task
 
     public function thunder_handler_wonderplugin(\Thunder\Shortcode\Shortcode\ShortcodeInterface $s, Model_ContentPost $post)
     {
+        $this->debug('[wonderplugin_slider] found');
+
         $id = $s->getParameter('id');
 
         $this->debug('Processing wonderplugin slider :id', [':id' => $id]);
