@@ -281,6 +281,13 @@ abstract class Core_URL_Dispatcher {
         }
     }
 
+    public function reset()
+    {
+        $this->_url_parameters->clear();
+        $this->_iface_stack = [];
+        $this->_current_iface = null;
+    }
+
     protected function get_dynamic_model_available_urls(IFaceModelInterface $iface_model, URL_Parameters $params, $limit = NULL, $with_domain = TRUE)
     {
         $urls = [];

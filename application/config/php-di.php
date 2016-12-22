@@ -4,6 +4,9 @@ use \Doctrine\Common\Cache\ArrayCache;
 
 return [
 
+    /**
+     * @url http://php-di.org/doc/performances.html
+     */
     'cache'         =>  new ArrayCache(),
 
     'annotations'   =>  true,

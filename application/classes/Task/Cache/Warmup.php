@@ -50,12 +50,12 @@ class Task_Cache_Warmup extends Minion_Task
     {
         $this->debug('Making request to :url', [':url' => $url]);
 
+        // Reset parameters between internal requests
+        $this->url_dispatcher()->reset();
+
         $request = new Request($url);
         $response = $request->execute();
         $status = $response->status();
-
-        // Reset parameters between internal requests
-        $this->url_parameters()->clear();
 
         if ($status == 200)
         {
