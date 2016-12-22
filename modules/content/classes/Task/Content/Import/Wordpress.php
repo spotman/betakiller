@@ -186,6 +186,8 @@ class Task_Content_Import_Wordpress extends Minion_Task
 
         if (!$model)
         {
+            $this->debug('Adding attach with WP ID = :id', [':id' => $wp_id]);
+
             $url_path = parse_url($url, PHP_URL_PATH);
             $original_filename = basename($url);
 
@@ -379,6 +381,8 @@ class Task_Content_Import_Wordpress extends Minion_Task
 
     protected function post_process_article_text(Model_ContentPost $item)
     {
+        $this->debug('Text post processing...');
+
         $text = $item->get_content();
 
         $text = $this->wp()->autop($text, false);
@@ -390,7 +394,7 @@ class Task_Content_Import_Wordpress extends Minion_Task
 
         // TODO Make custom tags self-closing
 
-        $document->loadHtml($text, LIBXML_PARSEHUGE); //, LIBXML_NOEMPTYTAG
+        $document->loadHtml($text, LIBXML_PARSEHUGE|LIBXML_NONET); //, LIBXML_NOEMPTYTAG
 
         $body = $document->find('body')[0];
 
@@ -399,7 +403,7 @@ class Task_Content_Import_Wordpress extends Minion_Task
             $this->update_links_on_attachments($document, $item->get_id());
             $this->remove_links_on_content_images($document);
 
-            $text = $body->innerHtml(LIBXML_PARSEHUGE);
+            $text = $body->innerHtml(LIBXML_PARSEHUGE|LIBXML_NONET);
             $item->set_content($text);
         } else {
             $this->warning('Post parsing error for :url', [':url' => $item->get_uri()]);
@@ -408,6 +412,8 @@ class Task_Content_Import_Wordpress extends Minion_Task
 
     protected function remove_links_on_content_images(Document $root)
     {
+        $this->debug('Removing links on content images...');
+
         $tag = CustomTag::PHOTO;
 
         $images = $root->find('a > '.$tag);
@@ -425,6 +431,8 @@ class Task_Content_Import_Wordpress extends Minion_Task
 
     protected function update_links_on_attachments(Document $document, $post_id)
     {
+        $this->debug('Updating links on attachments...');
+
         $links = $document->find('a');
 
         foreach ($links as $link)
@@ -461,16 +469,14 @@ class Task_Content_Import_Wordpress extends Minion_Task
 
         $wp_images_ids = [];
 
-        if ($wp->post_has_post_format($wp_id, 'gallery'))
-        {
+        if ($wp->post_has_post_format($wp_id, 'gallery')) {
             $this->debug('Getting thumbnail images from from _format_gallery_images');
 
             // Getting images from meta._format_gallery_images
             $wp_images_ids += (array) unserialize($meta['_format_gallery_images']);
         }
 
-        if (!$wp_images_ids && isset($meta['_thumbnail_id']))
-        {
+        if (!$wp_images_ids && isset($meta['_thumbnail_id'])) {
             $this->debug('Getting thumbnail image from from _thumbnail_id');
 
             // Getting thumbnail image from meta._thumbnail_id
@@ -516,6 +522,8 @@ class Task_Content_Import_Wordpress extends Minion_Task
 
     protected function process_custom_tags(Model_ContentPost $item)
     {
+        $this->debug('Processing custom tags...');
+
         $handlers = new \Thunder\Shortcode\HandlerContainer\HandlerContainer();
 
         // [caption id="attachment_571" align="alignnone" width="780"]
@@ -783,6 +791,8 @@ class Task_Content_Import_Wordpress extends Minion_Task
 
     protected function process_youtube_videos_in_text($text, $entity_item_id)
     {
+        $this->debug('Processing Youtube iframe tags...');
+
         $pattern = '/<iframe[\s]+?src="(http[s]*:\/\/)?www\.youtube\.com\/embed\/([a-zA-Z0-9-_]{11})[^"]*"[^>]*?><\/iframe>/';
 
         // <iframe width="854" height="480" src="https://www.youtube.com/embed/xfTfeWTOxHk" frameborder="0" allowfullscreen></iframe>
