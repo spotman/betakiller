@@ -150,6 +150,14 @@ class Task_Content_Import_Wordpress extends Minion_Task
         $created_at = new DateTime($attach['post_date']);
         $updated_at = new DateTime($attach['post_modified']);
 
+        if ($model instanceof Assets_Model_ORM_SeoImage) {
+            $title = $attach['post_excerpt'];
+
+            if ($title && !$model->get_title()) {
+                $model->set_title($title);
+            }
+        }
+
         $model
             ->set_uploaded_at($created_at)
             ->set_last_modified_at($updated_at)
