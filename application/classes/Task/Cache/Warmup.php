@@ -54,6 +54,9 @@ class Task_Cache_Warmup extends Minion_Task
         $response = $request->execute();
         $status = $response->status();
 
+        // Reset parameters between internal requests
+        $this->url_parameters()->clear();
+
         if ($status == 200)
         {
             // TODO Maybe grab page content, parse it and make request to every image/css/js file
