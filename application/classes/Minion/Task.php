@@ -15,12 +15,19 @@ abstract class Minion_Task extends Kohana_Minion_Task
 
     public function __construct()
     {
-        $this->_options = array_merge([
+        $common_options = [
             'debug' => FALSE,
             'stage' => 'development',
-        ], $this->_options);
+        ];
+
+        $this->_options = array_merge($common_options, $this->_options, $this->define_options());
 
         parent::__construct();
+    }
+
+    protected function define_options()
+    {
+        return [];
     }
 
     protected static function _make_task_class_instance($class_name)
