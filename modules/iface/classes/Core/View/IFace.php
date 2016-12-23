@@ -51,7 +51,7 @@ abstract class Core_View_IFace {
         $meta->description( $iface->get_description() );
 
         Link::instance()
-            ->canonical($iface->url());
+            ->canonical($iface->url(null, false));
 
         // TODO move calls for Meta and Link to overrided methods in Wrapper
 
