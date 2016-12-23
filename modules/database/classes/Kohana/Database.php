@@ -48,6 +48,8 @@ abstract class Kohana_Database {
 	 * @param   string   $name    instance name
 	 * @param   array    $config  configuration parameters
 	 * @return  Database
+     *
+     * @throws Kohana_Exception
 	 */
 	public static function instance($name = NULL, array $config = NULL)
 	{
@@ -106,7 +108,8 @@ abstract class Kohana_Database {
 	 *
 	 * [!!] This method cannot be accessed directly, you must use [Database::instance].
 	 *
-	 * @return  void
+     * @param string $name
+     * @param array $config
 	 */
 	public function __construct($name, array $config)
 	{
@@ -200,7 +203,7 @@ abstract class Kohana_Database {
 	 * @param   string   $sql        SQL query
 	 * @param   mixed    $as_object  result object class string, TRUE for stdClass, FALSE for assoc array
 	 * @param   array    $params     object construct parameters for result class
-	 * @return  object   Database_Result for SELECT queries
+	 * @return  Database_Result   Database_Result for SELECT queries
 	 * @return  array    list (insert id, row count) for INSERT queries
 	 * @return  integer  number of affected rows for all other queries
 	 */
