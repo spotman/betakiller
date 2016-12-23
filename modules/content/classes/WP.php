@@ -28,7 +28,7 @@ class WP
 
         if ($skip_before) {
             $skip_before->setTimezone(new DateTimeZone('UTC'));
-            $query->and_where('post_date_gmt', '>', $skip_before->format("Y-m-d H:i:s"));
+            $query->and_where('post_date_gmt', '>=', $skip_before->format("Y-m-d H:i:s"));
         }
 
         return $query->execute('wp');

@@ -7,7 +7,7 @@ use BetaKiller\Content\ContentElementInterface;
 use Thunder\Shortcode\Shortcode\ShortcodeInterface;
 use Thunder\Shortcode\Serializer\TextSerializer;
 use Thunder\Shortcode\Processor\Processor;
-use Thunder\Shortcode\Parser\RegularParser;
+use Thunder\Shortcode\Parser\RegexParser;
 
 class Task_Content_Import_Wordpress extends Minion_Task
 {
@@ -567,7 +567,7 @@ class Task_Content_Import_Wordpress extends Minion_Task
             return $serializer->serialize($s);
         });
 
-        $processor = new Processor(new RegularParser(), $handlers);
+        $processor = new Processor(new RegexParser, $handlers);
 
         $content = $item->get_content();
         $content = $processor->process($content);
