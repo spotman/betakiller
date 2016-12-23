@@ -58,6 +58,7 @@ class ContentItem extends Base
             'updated_at'    =>  $model->get_updated_at(),
             'thumbnails'    =>  $thumbnails,
             'is_page'       =>  $model->is_page(),
+            'is_default'    =>  $model->is_default(),
         ];
     }
 
