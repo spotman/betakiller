@@ -400,9 +400,6 @@ class Task_Content_Import_Wordpress extends Minion_Task
 
         $text = $this->wp()->autop($text, false);
 
-        // Parsing all images first to get @alt and @title values
-        $text = $this->process_images_in_text($text, $item->get_id());
-
         $document = new Document();
 
         // TODO Make custom tags self-closing
@@ -412,6 +409,9 @@ class Task_Content_Import_Wordpress extends Minion_Task
         $body = $document->find('body')[0];
 
         if ($body) {
+            // Parsing all images first to get @alt and @title values
+            $this->process_images_in_text($document, $item->get_id());
+
             // Process attachments first coz they are images inside links
             $this->update_links_on_attachments($document, $item->get_id());
             $this->remove_links_on_content_images($document);
@@ -694,33 +694,21 @@ class Task_Content_Import_Wordpress extends Minion_Task
     }
 
     /**
-     * @param string    $text
+     * @param Document  $root
      * @param int       $entity_item_id
-     *
-     * @return string
      */
-    protected function process_images_in_text($text, $entity_item_id)
+    protected function process_images_in_text(Document $root, $entity_item_id)
     {
-        // Ищем упоминания о файлах
-        preg_match_all('/<img[^>]+>/i', $text, $matches, PREG_SET_ORDER);
+        $images = $root->find('img');
 
-        // Выходим, если ничего не нашли
-        if (!$matches)
-            return $text;
-
-        foreach ($matches as $match)
-        {
-            // Изначальный тег
-            $original_tag = $match[0];
+        foreach ($images as $image) {
             $target_tag = NULL;
 
-            try
-            {
+            try {
                 // Создаём новый тег <image /> на замену <img />
-                $target_tag = $this->process_img_tag($original_tag, $entity_item_id);
+                $target_tag = $this->process_img_tag($image, $entity_item_id);
             }
-            catch (Exception $e)
-            {
+            catch (Exception $e) {
                 $this->warning(':message', [':message' => $e->getMessage()]);
             }
 
@@ -728,34 +716,35 @@ class Task_Content_Import_Wordpress extends Minion_Task
             if (!$target_tag)
                 continue;
 
-            // Производим замену пути в тексте
-            $text = str_replace($original_tag, $target_tag, $text);
-        }
+            $this->debug('Replacement tag is :tag', [':tag' => $target_tag->html()]);
 
-        return $text;
+            $parent = $image->parent();
+            $parent_of_parent = $parent->parent();
+
+            $parent_tag_name = $parent->getNode()->nodeName;
+
+            $this->debug('Parent tag name is :name', [':name' => $parent_tag_name]);
+
+            // Remove links to content images coz they would be added automatically
+            if ($parent_tag_name == "a" && $parent->attr('href') == $image->attr('src')) {
+                $parent->replace($target_tag);
+            } else {
+                $image->replace($target_tag);
+            }
+
+            $this->debug('Parent html is :html', [':html' => $parent_of_parent->html()]);
+        }
     }
 
-    protected function process_img_tag($tag_string, $entity_item_id)
+    protected function process_img_tag(\DiDom\Element $node, $entity_item_id)
     {
-        // Closing tag
-        if (strpos($tag_string, '/>') === FALSE)
-        {
-            $tag_string = str_replace('>', '/>', $tag_string);
-        }
-
-        // Parsing
-        $sx = simplexml_load_string($tag_string);
-
-        if ($sx === FALSE)
-            throw new Task_Exception('Image tag parsing failed on :string', [':string' => $tag_string]);
-
         // Getting attributes
-        $attributes = iterator_to_array($sx->attributes());
+        $attributes = $node->attributes();
 
         // Original URL
         $original_url = trim($attributes['src']);
 
-        $this->debug('Found inline image :tag', [':tag' => $tag_string]);
+        $this->debug('Found inline image :tag', [':tag' => $node->html()]);
 
         $wp_image = $this->wp()->get_attachment_by_path($original_url);
 
@@ -796,7 +785,9 @@ class Task_Content_Import_Wordpress extends Minion_Task
             );
         }
 
-        return $this->custom_tag_instance()->generate_html(CustomTag::PHOTO, $image->get_id(), $attributes);
+        $attributes['id'] = $image->get_id();
+
+        return $node->getDocument()->createElement(CustomTag::PHOTO, NULL, $attributes);
     }
 
     protected function process_content_youtube_iframes(Model_ContentPost $item)
