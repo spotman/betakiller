@@ -26,7 +26,7 @@ class Task_Cache_Warmup extends Minion_Task
         /** @var \BetaKiller\IFace\IFaceModelTree $tree */
         $tree = \BetaKiller\DI\Container::instance()->get(\BetaKiller\IFace\IFaceModelTree::class);
 
-        $params = $this->url_parameters_instance();
+        $parameters = $this->url_parameters_instance();
 
         // Get all ifaces recursively
         $iterator = $tree->getRecursivePublicIterator();
@@ -36,14 +36,26 @@ class Task_Cache_Warmup extends Minion_Task
         {
             $this->debug('Found IFace :codename', [':codename' => $iface_model->get_codename()]);
 
-            $urls = $this->_dispatcher->get_iface_model_available_urls($iface_model, $params, 1, FALSE);
-            $this->debug(PHP_EOL.implode(PHP_EOL, $urls).PHP_EOL);
-
-            $url = array_pop($urls);
-
-            // Make HMVC request and check response status
-            $this->make_http_request($url);
+            try {
+                $this->process_iface($iface_model, $parameters);
+            } catch (Exception $e) {
+                $this->warning('Exception thrown for :iface with message :text', [
+                    ':iface'    => $iface_model->get_codename(),
+                    ':text'     => $e->getMessage(),
+                ]);
+            }
         }
+    }
+
+    protected function process_iface(\BetaKiller\IFace\IFaceModelInterface $iface_model, URL_Parameters $params)
+    {
+        $urls = $this->_dispatcher->get_iface_model_available_urls($iface_model, $params, 1, FALSE);
+        $this->debug(PHP_EOL.implode(PHP_EOL, $urls).PHP_EOL);
+
+        $url = array_pop($urls);
+
+        // Make HMVC request and check response status
+        $this->make_http_request($url);
     }
 
     protected function make_http_request($url)
