@@ -80,6 +80,11 @@ class BetaKiller_Twig_Extension extends Twig_Extension
             ),
 
             new Twig_SimpleFunction(
+                'in_staging',
+                array($this, 'in_staging')
+            ),
+
+            new Twig_SimpleFunction(
                 'user_is_moderator',
                 array($this, 'user_is_moderator')
             ),
@@ -141,7 +146,12 @@ class BetaKiller_Twig_Extension extends Twig_Extension
 
     public function in_production()
     {
-        return Kohana::in_production(TRUE);
+        return Kohana::in_production();
+    }
+
+    public function in_staging()
+    {
+        return Kohana::in_staging();
     }
 
     /**

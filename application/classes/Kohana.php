@@ -18,6 +18,11 @@ class Kohana extends Kohana_Core {
         return in_array(Kohana::$environment, $values);
     }
 
+    public static function in_staging()
+    {
+        return (Kohana::$environment == Kohana::STAGING);
+    }
+
     public static function config($file)
     {
         return Kohana::$config->load($file);
