@@ -26,8 +26,21 @@ class Task_Content_Import_Wordpress extends Minion_Task
 
     protected $unknown_bb_tags = [];
 
+    protected $skip_before_date = null;
+
+    protected function define_options()
+    {
+        return [
+            'skip-before'   =>  null,
+        ];
+    }
+
     protected function _execute(array $params)
     {
+        if ($params['skip-before']) {
+            $this->skip_before_date = new DateTime($params['skip-before']);
+        }
+
         $this->configure_dialog();
 
         // Posts
@@ -301,7 +314,7 @@ class Task_Content_Import_Wordpress extends Minion_Task
     {
         $wp = $this->wp();
 
-        $posts = $wp->get_posts_and_pages();
+        $posts = $wp->get_posts_and_pages($this->skip_before_date);
 
         $total = $posts->count();
         $current = 1;

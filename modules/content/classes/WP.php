@@ -10,27 +10,33 @@ class WP
     const POST_TYPE_ATTACHMENT = 'attachment';
 
     /**
-     * @param string|array $post_types
+     * @param string|array      $post_types
+     * @param \DateTime|NULL    $skip_before
      *
      * @return Database_Result
      */
-    public function get_posts_by_types($post_types)
+    public function get_posts_by_types($post_types, DateTime $skip_before = null)
     {
-        if (!is_array($post_types))
-        {
+        if (!is_array($post_types)) {
             $post_types = [$post_types];
         }
 
-        return DB::select()
+        $query = DB::select()
             ->from('posts')
             ->and_where('post_type', 'IN', $post_types)
-            ->and_where('post_status', '=', 'publish')
-            ->execute('wp');
+            ->and_where('post_status', '=', 'publish');
+
+        if ($skip_before) {
+            $skip_before->setTimezone(new DateTimeZone('UTC'));
+            $query->and_where('post_date_gmt', '>', $skip_before->format("Y-m-d H:i:s"));
+        }
+
+        return $query->execute('wp');
     }
 
-    public function get_posts_and_pages()
+    public function get_posts_and_pages(DateTime $skip_before = null)
     {
-        return $this->get_posts_by_types([self::POST_TYPE_PAGE, self::POST_TYPE_POST]);
+        return $this->get_posts_by_types([self::POST_TYPE_PAGE, self::POST_TYPE_POST], $skip_before);
     }
 
     public function get_attachments(array $mime_types = NULL, array $filter_ids = NULL)
