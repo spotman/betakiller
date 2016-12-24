@@ -17,7 +17,7 @@ class Core_Controller_IFace extends Controller
             $this->redirect('/');
         }
 
-        if ($uri)
+        if ($uri && $uri != '/')
         {
             $has_trailing_slash = (substr($uri, -1, 1) == '/');
 
