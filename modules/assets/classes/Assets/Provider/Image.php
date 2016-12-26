@@ -183,44 +183,11 @@ abstract class Assets_Provider_Image extends Assets_Provider {
     {
         $content = $this->get_content($model);
 
-        $info = $this->image_helper_factory($content);
+        $info = Image::from_content($content);
 
         $model
             ->set_width($info->width)
             ->set_height($info->height);
-    }
-
-    /**
-     * @param string $content
-     *
-     * @return \Image
-     * @throws \Assets_Provider_Exception
-     */
-    protected function image_helper_factory($content)
-    {
-        if ( ! $content )
-            throw new Assets_Provider_Exception('No content for image info detection');
-
-        // Creating temporary file
-        $temp_file_name = tempnam(sys_get_temp_dir(), 'image-resize-temp');
-
-        if ( ! $temp_file_name )
-            throw new Assets_Provider_Exception('Can not create temporary file for image info detecting');
-
-        try {
-            // Putting content into it
-            file_put_contents($temp_file_name, $content);
-
-            // Creating resizing instance
-            $image = Image::factory($temp_file_name);
-
-            // Deleting temp file
-            unlink($temp_file_name);
-        } catch ( Exception $e ) {
-            throw new Assets_Provider_Exception('Can not get image info, reason: :message', [':message' => $e->getMessage()]);
-        }
-
-        return $image;
     }
 
     /**
@@ -233,7 +200,7 @@ abstract class Assets_Provider_Image extends Assets_Provider {
      */
     protected function resize($original_content, $width, $height, $quality = 100)
     {
-        $image = $this->image_helper_factory($original_content);
+        $image = Image::from_content($original_content);
 
         try {
             // Detect original dimensions and ratio
@@ -250,7 +217,6 @@ abstract class Assets_Provider_Image extends Assets_Provider {
             if ($original_ratio == $resize_ratio) {
                 $image->resize($width, $height);
             } else {
-
                 $image->resize($width, $height, Image::INVERSE)->crop($width, $height);
             }
 
