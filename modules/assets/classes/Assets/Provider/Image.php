@@ -140,8 +140,6 @@ abstract class Assets_Provider_Image extends Assets_Provider {
      */
     protected function _upload($model, $content, array $_post_data, $file_path)
     {
-        $this->preset_width_and_height($model, $file_path);
-
         $max_width = $this->get_upload_max_width();
         $max_height = $this->get_upload_max_height();
 
@@ -160,27 +158,69 @@ abstract class Assets_Provider_Image extends Assets_Provider {
     }
 
     /**
+     * After upload processing
+     *
+     * @param Assets_Model_ImageInterface $model
+     * @param array                 $_post_data
+     */
+    protected function _post_upload($model, array $_post_data)
+    {
+        $this->preset_width_and_height($model);
+
+        // Save dimensions
+        $model->save();
+
+        parent::_post_upload($model, $_post_data);
+    }
+
+    /**
      * Detects image dimensions from provided file
      *
      * @param Assets_Model_ImageInterface $model
-     * @param string $file_path
      * @throws Assets_Provider_Exception
      */
-    protected function preset_width_and_height(Assets_Model_ImageInterface $model, $file_path)
+    protected function preset_width_and_height(Assets_Model_ImageInterface $model)
     {
-        try
-        {
-            // Creating image instance
-            $image = Image::factory($file_path);
+        $content = $this->get_content($model);
 
-            $model
-                ->set_width($image->width)
-                ->set_height($image->height);
+        $info = $this->image_helper_factory($content);
+
+        $model
+            ->set_width($info->width)
+            ->set_height($info->height);
+    }
+
+    /**
+     * @param string $content
+     *
+     * @return \Image
+     * @throws \Assets_Provider_Exception
+     */
+    protected function image_helper_factory($content)
+    {
+        if ( ! $content )
+            throw new Assets_Provider_Exception('No content for image info detection');
+
+        // Creating temporary file
+        $temp_file_name = tempnam(sys_get_temp_dir(), 'image-resize-temp');
+
+        if ( ! $temp_file_name )
+            throw new Assets_Provider_Exception('Can not create temporary file for image info detecting');
+
+        try {
+            // Putting content into it
+            file_put_contents($temp_file_name, $content);
+
+            // Creating resizing instance
+            $image = Image::factory($temp_file_name);
+
+            // Deleting temp file
+            unlink($temp_file_name);
+        } catch ( Exception $e ) {
+            throw new Assets_Provider_Exception('Can not get image info, reason: :message', [':message' => $e->getMessage()]);
         }
-        catch ( Exception $e )
-        {
-            throw new Assets_Provider_Exception('Can not detect image width and height: :message', [':message' => $e->getMessage()]);
-        }
+
+        return $image;
     }
 
     /**
@@ -193,22 +233,9 @@ abstract class Assets_Provider_Image extends Assets_Provider {
      */
     protected function resize($original_content, $width, $height, $quality = 100)
     {
-        if ( ! $original_content )
-            throw new Assets_Provider_Exception('No content for resizing');
-
-        // Creating temporary file
-        $temp_file_name = tempnam(sys_get_temp_dir(), 'image-resize-temp');
-
-        if ( ! $temp_file_name )
-            throw new Assets_Provider_Exception('Can not create temporary file for image resizing');
+        $image = $this->image_helper_factory($original_content);
 
         try {
-            // Putting content into it
-            file_put_contents($temp_file_name, $original_content);
-
-            // Creating resizing instance
-            $image = Image::factory($temp_file_name);
-
             // Detect original dimensions and ratio
             $original_width = $image->width;
             $original_height = $image->height;
@@ -227,15 +254,10 @@ abstract class Assets_Provider_Image extends Assets_Provider {
                 $image->resize($width, $height, Image::INVERSE)->crop($width, $height);
             }
 
-            $resized_content = $image->render(NULL /* auto */, $quality);
+            return $image->render(NULL /* auto */, $quality);
         } catch ( Exception $e ) {
             throw new Assets_Provider_Exception('Can not resize image, reason: :message', [':message' => $e->getMessage()]);
         }
-
-        // Deleting temp file
-        unlink($temp_file_name);
-
-        return $resized_content;
     }
 
     protected function _get_item_deploy_filename(Request $request)
