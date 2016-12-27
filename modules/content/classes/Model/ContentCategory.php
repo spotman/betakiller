@@ -80,27 +80,24 @@ class Model_ContentCategory extends TreeModel implements SeoContentInterface, Im
     }
 
     /**
-     * @param \DateTime $before
-     * @param int|null  $limit
-
-     * @return Database_Result|Model_ContentPost[]
+     * @param bool $include_self
+     *
+     * @return array|\int[]
      */
-    public function get_all_related_articles_before(DateTime $before, $limit = null)
+    public function get_all_related_categories_ids($include_self = true)
     {
         // Collect all children categories
         $ids = $this->get_all_children($this->primary_key());
 
-        // Add current category
-        $ids[] = $this->get_id();
+        if ($include_self) {
+            // Add current category
+            $ids[] = $this->get_id();
+        }
 
         // Remove empty values
         $ids = array_filter($ids);
 
-        $posts = $this->get_posts_relation()->model_factory();
-
-        return $ids
-            ? $posts->filter_category_ids($ids)->filter_posts_before($before)->get_all_articles($limit)
-            : [];
+        return $ids;
     }
 
     /**

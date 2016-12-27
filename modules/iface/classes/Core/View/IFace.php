@@ -37,18 +37,21 @@ abstract class Core_View_IFace {
         // Getting IFace data
         $this->_data = $iface->get_data();
 
-//        // For changing wrapper from view via $_this->wrapper('html')
-//        $this->_data['_iface'] = $this;
+        // For changing wrapper from view via $_this->wrapper('html')
+        $this->_data['iface'] = [
+            'label'     =>  $iface->get_label(),
+            'codename'  =>  $iface->get_codename(),
+        ];
 
         $iface_view->set($this->_data);
 
         $meta = Meta::instance();
 
         // Setting page title
-        $meta->title( $iface->get_title() );
+        $meta->title($iface->get_title());
 
         // Setting page description
-        $meta->description( $iface->get_description() );
+        $meta->description($iface->get_description());
 
         Link::instance()
             ->canonical($iface->url(null, false));

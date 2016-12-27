@@ -1,14 +1,14 @@
 <?php
 
 use BetaKiller\IFace\Widget;
-use BetaKiller\IFace\Widget\Exception;
 
-class Widget_Content_CategoryArticles extends Widget
+class Widget_Content_ArticlesList extends Widget
 {
     use \BetaKiller\Helper\ContentTrait;
 
     const CATEGORY_ID_QUERY_KEY = 'category-id';
-    const BEFORE_TIMESTAMP_QUERY_KEY = 'before';
+    const PAGE_QUERY_KEY = 'page';
+    const SEARCH_TERM_QUERY_KEY = 'term';
 
     protected $items_per_page = 12;
 
@@ -33,21 +33,19 @@ class Widget_Content_CategoryArticles extends Widget
 
     protected function get_articles_data()
     {
-        $latest_post_created_at = null;
         $posts_data = [];
 
+        $page = (int) $this->query(self::PAGE_QUERY_KEY) ?: 1;
+        $term = $this->get_search_term();
+
         $category = $this->get_category();
-        $articles = $this->get_category_articles($category);
+        $results = $this->get_articles($page, $category, $term);
+
+        /** @var Model_ContentPost[] $articles */
+        $articles = $results->getItems();
         $index = 1;
 
         foreach ($articles as $article) {
-
-            $created_at = $article->get_created_at();
-
-            if (!$latest_post_created_at || $created_at < $latest_post_created_at) {
-                $latest_post_created_at = $created_at;
-            }
-
             $is_large = ($index % 3 === 1);
 
             $thumbnail = $article->get_first_thumbnail();
@@ -66,13 +64,14 @@ class Widget_Content_CategoryArticles extends Widget
             $index++;
         }
 
-        if ($latest_post_created_at && count($articles) == $this->items_per_page) {
+        if ($results->hasNextPage()) {
             $url_params = [
-                self::CATEGORY_ID_QUERY_KEY         =>  $category->get_id(),
-                self::BEFORE_TIMESTAMP_QUERY_KEY    =>  $latest_post_created_at->getTimestamp(),
+                self::SEARCH_TERM_QUERY_KEY     =>  $term,
+                self::PAGE_QUERY_KEY            =>  $page + 1,
+                self::CATEGORY_ID_QUERY_KEY     =>  $category ? $category->get_id() : null,
             ];
 
-            $moreURL = $this->url('more').'?'.http_build_query($url_params);
+            $moreURL = $this->url('more').'?'.http_build_query(array_filter($url_params));
         } else {
             $moreURL = null;
         }
@@ -88,26 +87,30 @@ class Widget_Content_CategoryArticles extends Widget
         if ($this->is_ajax()) {
             $category_id = (int) $this->query(self::CATEGORY_ID_QUERY_KEY);
 
-            if (!$category_id) {
-                throw new Exception('Empty category id');
-            }
-
             return $this->model_factory_content_category($category_id);
-        } else {
-            return $this->url_parameter_content_category();
         }
+
+        return $this->url_parameter_content_category();
     }
 
-    protected function get_category_articles(Model_ContentCategory $category)
+    protected function get_search_term()
     {
-        $before_timestamp = (int) $this->query(self::BEFORE_TIMESTAMP_QUERY_KEY);
+        return $this->getContextParam('term') ?: HTML::chars(strip_tags($this->query(self::SEARCH_TERM_QUERY_KEY)));
+    }
 
-        $before_date = new DateTime;
+    protected function get_articles($page, Model_ContentCategory $category = null, $term = null)
+    {
+        $posts_orm = $this->model_factory_content_post();
 
-        if ($before_timestamp) {
-            $before_date->setTimestamp($before_timestamp);
+        if ($category && $category->get_id()) {
+            $categories_ids = $category->get_all_related_categories_ids();
+            $posts_orm->filter_category_ids($categories_ids);
         }
 
-        return $category->get_all_related_articles_before($before_date, $this->items_per_page);
+        if ($term) {
+            $posts_orm->search($term);
+        }
+
+        return $posts_orm->filter_articles()->order_by_created_at()->getSearchResults($page, $this->items_per_page);
     }
 }

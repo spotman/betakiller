@@ -283,6 +283,11 @@ class Model_ContentPost extends ORM implements SeoContentInterface, ImportedFrom
         return $this->filter_articles()->get_all();
     }
 
+    public function search_()
+    {
+        
+    }
+
     /**
      * @return $this[]|\Database_Result
      */
@@ -330,7 +335,7 @@ class Model_ContentPost extends ORM implements SeoContentInterface, ImportedFrom
 
         $model->filter_types((array) $filter_type);
 
-        return $model->order_by_created_at(TRUE)->limit($limit)->get_all();
+        return $model->order_by_created_at()->limit($limit)->get_all();
     }
 
     /**
@@ -496,9 +501,9 @@ class Model_ContentPost extends ORM implements SeoContentInterface, ImportedFrom
         return $this->order_by_field_sequence('type', $values);
     }
 
-    public function order_by_created_at($desc = false)
+    public function order_by_created_at($asc = false)
     {
-        return $this->order_by('created_at', $desc ? 'DESC' : 'ASC');
+        return $this->order_by('created_at', $asc ? 'ASC' : 'DESC');
     }
 
     public function filter_type($value)
@@ -528,7 +533,15 @@ class Model_ContentPost extends ORM implements SeoContentInterface, ImportedFrom
 
     public function filter_posts_before(DateTime $date)
     {
-        return $this->filter_created_by($date, '<')->order_by_created_at(true);
+        return $this->filter_created_by($date, '<')->order_by_created_at();
+    }
+
+    public function search($term)
+    {
+        return $this->search_query($term, [
+            $this->object_column('label'),
+            $this->object_column('content')
+        ]);
     }
 
     /**
