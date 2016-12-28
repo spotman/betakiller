@@ -417,7 +417,7 @@ class Task_Content_Import_Wordpress extends Minion_Task
 
             // Process attachments first coz they are images inside links
             $this->update_links_on_attachments($document, $item->get_id());
-            $this->remove_links_on_content_images($document);
+//            $this->remove_links_on_content_images($document);
 
             $text = $body->innerHtml(LIBXML_PARSEHUGE|LIBXML_NONET);
             $item->set_content($text);
@@ -426,24 +426,24 @@ class Task_Content_Import_Wordpress extends Minion_Task
         }
     }
 
-    protected function remove_links_on_content_images(Document $root)
-    {
-        $this->debug('Removing links on content images...');
-
-        $tag = CustomTag::PHOTO;
-
-        $images = $root->find('a > '.$tag);
-
-        foreach ($images as $image)
-        {
-            $link = $image->parent();
-
-            $link->replace($image);
-
-//            $link->remove();
-            unset($link);
-        }
-    }
+//    protected function remove_links_on_content_images(Document $root)
+//    {
+//        $this->debug('Removing links on content images...');
+//
+//        $tag = CustomTag::PHOTO;
+//
+//        $images = $root->find('a > '.$tag);
+//
+//        foreach ($images as $image)
+//        {
+//            $link = $image->parent();
+//
+//            $link->replace($image);
+//
+////            $link->remove();
+//            unset($link);
+//        }
+//    }
 
     protected function update_links_on_attachments(Document $document, $post_id)
     {
@@ -731,6 +731,8 @@ class Task_Content_Import_Wordpress extends Minion_Task
 
             // Remove links to content images coz they would be added automatically
             if ($parent_tag_name == "a" && $parent->attr('href') == $image->attr('src')) {
+                // Mark image as "zoomable"
+                $target_tag->attr(CustomTag::PHOTO_ZOOMABLE, CustomTag::PHOTO_ZOOMABLE_ENABLED);
                 $parent->replace($target_tag);
             } else {
                 $image->replace($target_tag);

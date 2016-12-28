@@ -1,3 +1,9 @@
+{% if zoomable %}
 <a href="{{ image["data-original-url"] }}" title="{{ image.title|default(image.alt) }}" class="swipebox" rel="content-images">
-    {{ image(image, { class: image.class ~ " responsive-img" }) }}
+{% endif %}
+
+{{ image(image, { class: image.class ~ " responsive-img" }) }}
+
+{% if zoomable %}
 </a>
+{% endif %}

@@ -19,6 +19,9 @@ class CustomTag
     const YOUTUBE       = 'youtube';
     const ATTACHMENT    = 'attachment';
 
+    const PHOTO_ZOOMABLE = 'zoomable';
+    const PHOTO_ZOOMABLE_ENABLED = 'true';
+
     public function get_allowed_tags()
     {
         return [

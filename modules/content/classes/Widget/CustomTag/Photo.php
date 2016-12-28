@@ -14,20 +14,19 @@ class Widget_CustomTag_Photo extends Widget
      */
     public function get_data()
     {
-        $context = $this->getContext();
-
-        $image_id = (int) $context['id'];
+        $image_id = (int) $this->getContextParam('id');
 
         if (!$image_id)
             throw new Widget\Exception('No image ID provided');
 
         $model = $this->model_factory_content_image_element()->get_by_id($image_id);
 
-        $title  = Arr::get($context, 'title');
-        $align  = Arr::get($context, 'align', 'alignnone');
-        $alt    = Arr::get($context, 'alt');
-        $class  = Arr::get($context, 'class');
-        $width  = (int) Arr::get($context, 'width');
+        $title  = $this->getContextParam('title');
+        $align  = $this->getContextParam('align', 'alignnone');
+        $alt    = $this->getContextParam('alt');
+        $class  = $this->getContextParam('class');
+        $width  = (int) $this->getContextParam('width');
+        $zoomable  = ($this->getContextParam(CustomTag::PHOTO_ZOOMABLE) == CustomTag::PHOTO_ZOOMABLE_ENABLED);
 
         if (strpos($class, 'align') === FALSE)
         {
@@ -48,6 +47,7 @@ class Widget_CustomTag_Photo extends Widget
         }
 
         return [
+            'zoomable'  =>  $zoomable,
             'image'     =>  $model->get_attributes_for_img_tag($model::SIZE_ORIGINAL, $attributes),
         ];
     }
