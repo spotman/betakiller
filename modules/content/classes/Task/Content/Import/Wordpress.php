@@ -405,7 +405,7 @@ class Task_Content_Import_Wordpress extends Minion_Task
 
         $document = new Document();
 
-        // TODO Make custom tags self-closing
+        // Make custom tags self-closing
 
         $document->loadHtml($text, LIBXML_PARSEHUGE|LIBXML_NONET); //, LIBXML_NOEMPTYTAG
 
