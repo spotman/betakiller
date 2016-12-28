@@ -567,7 +567,8 @@ class Task_Content_Import_Wordpress extends Minion_Task
             return $serializer->serialize($s);
         });
 
-        $processor = new Processor(new RegexParser, $handlers);
+        $parser = new RegexParser;
+        $processor = new Processor($parser, $handlers);
 
         $content = $item->get_content();
         $content = $processor->process($content);

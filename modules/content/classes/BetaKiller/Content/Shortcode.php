@@ -39,4 +39,10 @@ class Shortcode
         $widget = WidgetFactory::instance()->create($name);
         return $widget->render();
     }
+
+    public function strip_tags($text)
+    {
+        $pattern = '/[[\/\!]*?[^\[\]]*?]/si';
+        return preg_replace($pattern, '', $text);
+    }
 }

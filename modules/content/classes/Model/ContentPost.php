@@ -2,6 +2,7 @@
 
 use BetaKiller\Content\ImportedFromWordpressInterface;
 use BetaKiller\Content\SeoContentInterface;
+use BetaKiller\Content\Shortcode;
 
 class Model_ContentPost extends ORM implements SeoContentInterface, ImportedFromWordpressInterface
 {
@@ -177,6 +178,15 @@ class Model_ContentPost extends ORM implements SeoContentInterface, ImportedFrom
     public function get_content()
     {
         return $this->get('content');
+    }
+
+    public function get_content_preview($length = 250, $end_chars = '...')
+    {
+        $text = $this->get_content();
+        $text = strip_tags($text);
+        $text = Shortcode::instance()->strip_tags($text);
+
+        return Text::limit_chars($text, $length, $end_chars, true);
     }
 
     /**

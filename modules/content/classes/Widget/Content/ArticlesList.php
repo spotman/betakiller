@@ -57,7 +57,7 @@ class Widget_Content_ArticlesList extends Widget
                 'url'           =>  $article->get_public_url(),
                 'label'         =>  $article->get_label(),
                 'title'         =>  $article->get_title(),
-                'text'          =>  Text::limit_chars(strip_tags($article->get_content()), 200, '...', true),
+                'text'          =>  $article->get_content_preview(),
                 'created_at'    =>  $article->get_created_at()->format("d.m.Y"),
             ];
 
