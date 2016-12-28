@@ -109,21 +109,6 @@ class Model_ContentCategory extends TreeModel implements SeoContentInterface, Im
     }
 
     /**
-     * @param \DateTime $before
-     * @param int|null  $limit
-     *
-     * @return \Model_ContentPost[]|\Database_Result
-     */
-    public function get_related_articles_before(DateTime $before, $limit = null)
-    {
-        $posts = $this->get_posts_relation();
-
-        return $posts
-            ->filter_posts_before($before)
-            ->get_all_articles($limit);
-    }
-
-    /**
      * @param int $wp_id
      * @return $this
      * @throws Kohana_Exception
@@ -183,6 +168,6 @@ class Model_ContentCategory extends TreeModel implements SeoContentInterface, Im
     {
         $parent_category = $parameters->get(self::URL_PARAM);
 
-        $this->filter_parent($parent_category);
+        $this->filter_is_active()->filter_parent($parent_category);
     }
 }
