@@ -354,9 +354,7 @@ class Task_Content_Import_Wordpress extends Minion_Task
                 ->set_label($name)
                 ->set_content($content)
                 ->set_title($title)
-                ->set_description($description)
-                ->set_created_at($created_at)
-                ->set_updated_at($updated_at);
+                ->set_description($description);
 
             // Saving model and getting its ID for further processing
             $model->save();
@@ -372,12 +370,17 @@ class Task_Content_Import_Wordpress extends Minion_Task
                 $this->process_content_youtube_iframes($model);
 
                 $this->post_process_article_text($model);
-
-                // Saving model content
-                $model->save();
             } else {
                 $this->warning('Post has no content at :uri', [':uri' => $uri]);
             }
+
+            // Saving original creating and modification dates
+            $model
+                ->set_created_at($created_at)
+                ->set_updated_at($updated_at);
+
+            // Saving model content
+            $model->save();
 
             $current++;
         }

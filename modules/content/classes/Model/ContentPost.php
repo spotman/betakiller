@@ -19,6 +19,14 @@ class Model_ContentPost extends ORM implements SeoContentInterface, ImportedFrom
         self::TYPE_ARTICLE,
     ];
 
+    protected $_updated_at_markers = [
+        'uri',
+        'label',
+        'content',
+        'title',
+        'description',
+    ];
+
     /**
      * Marker for "updated_at" field change
      * Using this because of ORM::set() is checking value is really changed, but we may set the equal value
@@ -493,8 +501,9 @@ class Model_ContentPost extends ORM implements SeoContentInterface, ImportedFrom
      */
     public function update(Validation $validation = NULL)
     {
-        if ($this->changed() AND !$this->updated_at_was_set)
-        {
+        $was_changed = array_intersect($this->_changed, $this->_updated_at_markers);
+
+        if (!$this->changed('updated_at') && $was_changed) {
             $this->set_updated_at(new DateTime);
         }
 
