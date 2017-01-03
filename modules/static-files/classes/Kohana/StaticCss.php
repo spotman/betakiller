@@ -149,7 +149,10 @@ class Kohana_StaticCss extends StaticFile {
             $css = ($this->_config->host == '/') ? $css : $this->_config->host . $css;
 		}
 
-		return ''
+        // TODO Refactoring
+        Response::current()->http2_server_push($css);
+
+        return ''
 		. ($condition ? '<!--[if ' . $condition . ']>' : '')
 		. HTML::style($css, array('media' => 'all'))
 		. ($condition ? '<![endif]-->' : '');

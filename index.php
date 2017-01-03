@@ -157,6 +157,6 @@ else
      */
     echo Request::factory(TRUE, array(), FALSE)
         ->execute()
-        ->send_headers(TRUE)
+        ->send_headers() // Allow multiple "Link" headers for HTTP2 Server Push feature
         ->body();
 }

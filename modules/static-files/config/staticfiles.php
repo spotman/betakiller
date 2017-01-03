@@ -1,6 +1,6 @@
 <?php defined('SYSPATH') or die('No direct script access.');
 
-$host = getenv('HTTP_HOST') ?: getenv('SERVER_NAME');
+//$host = getenv('HTTP_HOST') ?: getenv('SERVER_NAME');
 
 // Turn on the minimization and building in production environment
 $in_production = in_array( Kohana::$environment, array(Kohana::PRODUCTION, Kohana::STAGING) );
@@ -51,7 +51,7 @@ return array(
 
     // Host address (base or CDN)
     // 'host' => "http://static.". $domain .".". $zone,
-    'host' => "http://". $host ."/",
+    'host' => Kohana::$base_url,
 
 	// Cache reset interval
 	'cache_reset_interval' => 24*60*62, // чуть более 1 дня  (чтобы кеш не генерировался в одно и то же время)
