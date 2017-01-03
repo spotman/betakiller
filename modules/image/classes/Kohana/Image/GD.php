@@ -67,7 +67,9 @@ class Kohana_Image_GD extends Image {
 		return Image_GD::$_checked = TRUE;
 	}
 
-	// Temporary image resource
+    /**
+     * @var resource Temporary image resource
+     */
 	protected $_image;
 
 	// Function name to open Image
