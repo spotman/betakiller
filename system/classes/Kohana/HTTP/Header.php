@@ -319,8 +319,12 @@ class Kohana_HTTP_Header extends ArrayObject {
 
 			if (is_array($value))
 			{
-				$header .= $key.': '.(implode(', ', $value))."\r\n";
-			}
+                foreach ($value as $item) {
+                    $header .= $key.': '.$item."\r\n";
+			    }
+
+//                $header .= $key.': '.(implode(', ', $value))."\r\n";
+            }
 			else
 			{
 				$header .= $key.': '.$value."\r\n";
@@ -876,12 +880,16 @@ class Kohana_HTTP_Header extends ArrayObject {
 
 		foreach ($headers as $header => $value)
 		{
-			if (is_array($value))
-			{
-				$value = implode(', ', $value);
-			}
+//				$value = implode(', ', $value);
 
-			$processed_headers[] = Text::ucfirst($header).': '.$value;
+            if (!is_array($value))
+		    {
+		        $value = [$value];
+            }
+
+            foreach ($value as $item) {
+                $processed_headers[] = Text::ucfirst($header).': '.$item;
+            }
 		}
 
 		if ( ! isset($headers['content-type']))
