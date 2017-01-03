@@ -149,9 +149,6 @@ class Kohana_StaticJs extends StaticFile {
 			$js = ($this->_config->host == '/') ? $js : $this->_config->host . $js;
 		}
 
-		// TODO Refactoring
-		Response::current()->http2_server_push($js);
-
 		return ''
 		. ($condition ? '<!--[if ' . $condition . ']>' : '')
 		. HTML::script($js)
