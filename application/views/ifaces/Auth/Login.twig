@@ -1,29 +1,24 @@
-{{ assets("require.js", "jquery") }}
-
 {% block content %}
 
     <div id="auth-widget-container">
         {{ widget("Auth") }}
     </div>
 
-    <script type="application/javascript">
-
-        require([
-            "jquery",
-            "auth.login"
-        ], function($, login) {
-
-            $(function(){
-
-                login.initialize(
-                    $("#auth-widget-container"),
-                    "{{ redirect_url }}"
-                );
-
-            });
-
-        });
-
-    </script>
-
 {% endblock %}
+
+<style>
+
+    html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+    }
+
+    #auth-widget-container {
+        max-width: 600px;
+        margin: 50px auto 0 auto;
+        padding: 15px;
+        text-align: center;
+    }
+
+</style>

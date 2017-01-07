@@ -14,7 +14,7 @@ define([
 
             var init = function() {
 
-                var $widget = $("#widget-auth"),
+                var $widget = $(".widget-auth"),
                     providers = $widget.data("providers").split(","),
                     requiredAuthProviders = [];
 
@@ -41,13 +41,10 @@ define([
             };
 
             // Если внутри контейнера уже есть разметка виджета, то сразу инициализируем
-            if ( $parentContainer.html() )
-            {
+            if ( $parentContainer.html() ) {
                 init();
-            }
-            // Иначе сперва загружаем разметку и внедряем её в контейнер
-            else
-            {
+            } else {
+              // Иначе сперва загружаем разметку и внедряем её в контейнер
                 require(["text!/w/Auth"], function(widgetHTML) {
 
                     // Rendering whole widget

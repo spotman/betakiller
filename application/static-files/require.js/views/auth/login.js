@@ -8,8 +8,7 @@ define([
 
             var readyCallback = function(){};
 
-            var successfulCallback = function()
-            {
+            var successfulCallback = function() {
                 // Всё в порядке, перенаправляем пользователя
                 location.href = redirectURL;
             };
