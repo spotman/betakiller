@@ -7,6 +7,8 @@ class AppConfig implements AppConfigInterface
     const APP_CONFIG_GROUP_NAME = 'app';
     const CONFIG_PATH_IS_TRAILING_SLASH_ENABLED = ['url', 'is_trailing_slash_enabled'];
     const CONFIG_PATH_CIRCULAR_LINK_HREF = ['url', 'circular_link_href'];
+    const CONFIG_PATH_CACHE_ENABLED = ['cache', 'enabled'];
+    const CONFIG_PATH_PAGE_CACHE_PATH = ['cache', 'page', 'path'];
 
     /**
      * @var ConfigInterface
@@ -60,5 +62,21 @@ class AppConfig implements AppConfigInterface
     protected function get(array $path, $default = null)
     {
         return $this->_config->load(array_merge([self::APP_CONFIG_GROUP_NAME], $path)) ?: $default;
+    }
+
+    /**
+     * @return bool
+     */
+    public function is_cache_enabled()
+    {
+        return $this->get(self::CONFIG_PATH_CACHE_ENABLED, false);
+    }
+
+    /**
+     * @return string
+     */
+    public function get_page_cache_path()
+    {
+        return rtrim($this->get(self::CONFIG_PATH_PAGE_CACHE_PATH), DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR;
     }
 }

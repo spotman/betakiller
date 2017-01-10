@@ -22,4 +22,14 @@ interface AppConfigInterface
      * @return string
      */
     public function get_circular_link_href();
+
+    /**
+     * @return bool
+     */
+    public function is_cache_enabled();
+
+    /**
+     * @return string
+     */
+    public function get_page_cache_path();
 }
