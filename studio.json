@@ -1,7 +1,6 @@
 {
     "version": 2,
     "paths": [
-        "../libs/davbackup",
-        "../libs/davbackup"
+        "../libs/*"
     ]
 }
