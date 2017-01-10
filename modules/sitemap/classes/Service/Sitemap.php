@@ -131,7 +131,7 @@ class Service_Sitemap extends Service
         $url = $iface->url($this->_url_parameters);
 
         // TODO Force calculation of the last_modified
-        $last_modified = $iface->get_last_modified();
+        $last_modified = $iface->getLastModified();
         $timestamp = $last_modified ? $last_modified->getTimestamp() : NULL;
 
         // Store URL

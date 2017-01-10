@@ -34,7 +34,7 @@ class ContentItem extends Base
 
     protected function get_post_data(\Model_ContentPost $model)
     {
-        $this->set_last_modified($model->get_api_last_modified());
+        $this->setLastModified($model->get_api_last_modified());
 
         $user = $this->current_user(TRUE);
 
@@ -65,7 +65,7 @@ class ContentItem extends Base
     /**
      * @return \DateInterval
      */
-    public function get_default_expires_interval()
+    public function getDefaultExpiresInterval()
     {
         return new \DateInterval('P1D'); // One day
     }

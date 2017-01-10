@@ -17,7 +17,7 @@ abstract class Admin extends IFace
         return $this->current_user()->is_admin_allowed();
     }
 
-    public function get_default_expires_interval()
+    public function getDefaultExpiresInterval()
     {
         $interval = new \DateInterval('PT1H');
         $interval->invert = 1;
