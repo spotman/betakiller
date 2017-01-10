@@ -709,14 +709,14 @@ class Task_Content_Import_Wordpress extends Minion_Task
             $target_tag = NULL;
 
             try {
-                // Создаём новый тег <image /> на замену <img />
+                // Creating new <photo /> tag as replacement for <img />
                 $target_tag = $this->process_img_tag($image, $entity_item_id);
             }
             catch (Exception $e) {
                 $this->warning(':message', [':message' => $e->getMessage()]);
             }
 
-            // Если новый тег не сформирован, то просто переходим к следующему
+            // Exit if something went wrong
             if (!$target_tag)
                 continue;
 
