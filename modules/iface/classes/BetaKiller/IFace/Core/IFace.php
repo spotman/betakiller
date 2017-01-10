@@ -33,7 +33,7 @@ abstract class IFace
     /**
      * @var DateInterval
      */
-    protected $_expires;
+    protected $_expiresInterval;
 
     /**
      * @Inject
@@ -234,7 +234,7 @@ abstract class IFace
      * @param \DateTime|NULL $last_modified
      * @return $this
      */
-    public function set_last_modified(DateTime $last_modified)
+    public function setLastModified(DateTime $last_modified)
     {
         $this->_last_modified = $last_modified;
 
@@ -244,15 +244,15 @@ abstract class IFace
     /**
      * @return \DateTime
      */
-    public function get_last_modified()
+    public function getLastModified()
     {
-        return $this->_last_modified;
+        return $this->_last_modified ?: $this->getDefaultLastModified();
     }
 
     /**
      * @return \DateTime
      */
-    public function get_default_last_modified()
+    public function getDefaultLastModified()
     {
         return new \DateTime();
     }
@@ -260,7 +260,7 @@ abstract class IFace
     /**
      * @return DateInterval
      */
-    public function get_default_expires_interval()
+    public function getDefaultExpiresInterval()
     {
         return new \DateInterval('PT1H');
     }
@@ -269,9 +269,9 @@ abstract class IFace
      * @param \DateInterval|NULL $expires
      * @return $this
      */
-    public function set_expires_interval(DateInterval $expires)
+    public function setExpiresInterval(DateInterval $expires)
     {
-        $this->_expires = $expires;
+        $this->_expiresInterval = $expires;
 
         return $this;
     }
@@ -279,14 +279,51 @@ abstract class IFace
     /**
      * @return \DateInterval
      */
-    public function get_expires_interval()
+    public function getExpiresInterval()
     {
-        return $this->_expires;
+        return $this->_expiresInterval ?: $this->getDefaultExpiresInterval();
+    }
+
+    /**
+     * @return \DateTime
+     */
+    public function getExpiresDateTime()
+    {
+        return (new DateTime())->add($this->getExpiresInterval());
+    }
+
+    /**
+     * @return int
+     */
+    public function getExpiresSeconds()
+    {
+        $reference = new \DateTimeImmutable;
+        $endTime = $reference->add($this->getExpiresInterval());
+
+        return $endTime->getTimestamp() - $reference->getTimestamp();
+    }
+
+    /**
+     * This hook executed before IFace processing (on every request regardless of caching)
+     * Place here code that needs to be executed on every IFace request (increment views counter, etc)
+     */
+    public function before()
+    {
+        // Empty by default
+    }
+
+    /**
+     * This hook executed after real IFace processing only (on every request if IFace output was not cached)
+     * Place here the code that needs to be executed only after real IFace processing (collect performance stat, etc)
+     */
+    public function after()
+    {
+        // Empty by default
     }
 
     public function __toString()
     {
-        return (string)$this->render();
+        return (string) $this->render();
     }
 
     public function get_parent()
@@ -301,7 +338,6 @@ abstract class IFace
     public function set_parent(IFace $parent)
     {
         $this->_parent = $parent;
-
         return $this;
     }
 
@@ -324,7 +360,6 @@ abstract class IFace
     public function set_model(IFaceModelInterface $model)
     {
         $this->_model = $model;
-
         return $this;
     }
 
@@ -345,8 +380,7 @@ abstract class IFace
 
     public function url(URL_Parameters $parameters = NULL, $remove_cycling_links = TRUE, $with_domain = TRUE)
     {
-        if ($remove_cycling_links && $this->is_current($parameters))
-        {
+        if ($remove_cycling_links && $this->is_current($parameters)) {
             return $this->_app_config->get_circular_link_href();
         }
 
@@ -372,8 +406,7 @@ abstract class IFace
 
         $path = '/' . implode('/', array_reverse($parts));
 
-        if ($this->is_trailing_slash_enabled())
-        {
+        if ($this->is_trailing_slash_enabled()) {
             $path .= '/';
         }
 

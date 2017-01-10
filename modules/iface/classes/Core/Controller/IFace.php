@@ -1,5 +1,8 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
+use \BetaKiller\IFace\IFace;
+use \BetaKiller\IFace\Cache\IFaceCache;
+
 class Core_Controller_IFace extends Controller
 {
     public function action_render()
@@ -12,38 +15,56 @@ class Core_Controller_IFace extends Controller
         $iface = $dispatcher->parse_uri($uri);
 
         // If this is default IFace and client requested non-slash uri, redirect client to /
-        if ( $iface->is_default() AND $uri != '/' )
-        {
+        if ( $iface->is_default() AND $uri != '/' ) {
             $this->redirect('/');
         }
 
-        if ($uri && $uri != '/')
-        {
+        if ($uri && $uri != '/') {
             $has_trailing_slash = (substr($uri, -1, 1) == '/');
 
             $is_trailing_slash_enabled = $iface->is_trailing_slash_enabled();
 
-            if ($has_trailing_slash AND !$is_trailing_slash_enabled)
-            {
-                $this->redirect(rtrim($uri, '/'), 301); // Permanent redirect
-            }
-            elseif (!$has_trailing_slash AND $is_trailing_slash_enabled)
-            {
-                $this->redirect($uri.'/', 301); // Permanent redirect
+            if ($has_trailing_slash AND !$is_trailing_slash_enabled) {
+                // Permanent redirect
+                $this->redirect(rtrim($uri, '/'), 301);
+            } elseif (!$has_trailing_slash AND $is_trailing_slash_enabled) {
+                // Permanent redirect
+                $this->redirect($uri.'/', 301);
             }
         }
 
+        // Starting hook
+        $iface->before();
+
+        // Processing page cache
+        $this->processIFaceCache($iface);
+
         $output = $iface->render();
 
-        $last_modified = $iface->get_last_modified() ?: $iface->get_default_last_modified();
-        $expires_interval = $iface->get_expires_interval() ?: $iface->get_default_expires_interval();
+        // Final hook
+        $iface->after();
 
-        $expires = (new DateTime())->add($expires_interval);
-
-        $this->last_modified($last_modified);
-        $this->expires($expires);
+        $this->last_modified($iface->getLastModified());
+        $this->expires($iface->getExpiresDateTime());
 
         $this->send_string($output);
+    }
+
+    protected function processIFaceCache(IFace $iface)
+    {
+        // Skip caching if request method is not GET nor HEAD
+        if (!in_array($this->request->method(), ['GET', 'HEAD'])) {
+            return;
+        }
+
+        // Skip caching for authorized users
+        if ($this->current_user(TRUE)) {
+            return;
+        }
+
+        /** @var IFaceCache $cache */
+        $cache = \BetaKiller\DI\Container::instance()->get(IFaceCache::class);
+        $cache->process($iface);
     }
 
     /**

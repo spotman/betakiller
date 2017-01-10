@@ -1,5 +1,7 @@
 <?php
 
+use BetaKiller\IFace\Cache\IFaceCache;
+
 return [
 
     'definitions'       =>  [
@@ -9,6 +11,8 @@ return [
         \URL_Parameters::class  =>  DI\factory(function() {
             return \URL_Parameters::instance();
         })->scope(\DI\Scope::PROTOTYPE),
+
+        IFaceCache::class  =>  DI\object(IFaceCache::class)->scope(\DI\Scope::PROTOTYPE),
 
     ],
 
