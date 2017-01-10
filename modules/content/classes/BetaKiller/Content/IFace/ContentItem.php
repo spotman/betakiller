@@ -10,6 +10,20 @@ class ContentItem extends Base
     private $content_model;
 
     /**
+     * This hook executed before IFace processing (on every request regardless of caching)
+     * Place here code that needs to be executed on every IFace request (increment views counter, etc)
+     */
+    public function before()
+    {
+        $user = $this->current_user(TRUE);
+
+        // Count guest views only
+        if (!$user) {
+            $this->get_content_model()->increment_views_count()->save();
+        }
+    }
+
+    /**
      * Returns data for View
      * Override this method in child classes
      *
@@ -35,13 +49,6 @@ class ContentItem extends Base
     protected function get_post_data(\Model_ContentPost $model)
     {
         $this->setLastModified($model->get_api_last_modified());
-
-        $user = $this->current_user(TRUE);
-
-        // Count guest views only
-        if (!$user) {
-            $model->increment_views_count()->save();
-        }
 
         $thumbnails = [];
 
