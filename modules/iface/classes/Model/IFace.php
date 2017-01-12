@@ -163,6 +163,30 @@ class Model_IFace extends TreeModel implements IFaceModelInterface
     }
 
     /**
+     * Sets title for using in <title> tag
+     *
+     * @param string $value
+     *
+     * @return $this
+     */
+    public function set_title($value)
+    {
+        return $this->set('title', (string) $value);
+    }
+
+    /**
+     * Sets description for using in <meta> tag
+     *
+     * @param string $value
+     *
+     * @return $this
+     */
+    public function set_description($value)
+    {
+        return $this->set('description', (string) $value);
+    }
+
+    /**
      * Place here additional query params
      *
      * @return $this
@@ -172,6 +196,4 @@ class Model_IFace extends TreeModel implements IFaceModelInterface
         // No filtering needed
         return $this;
     }
-
-
 }

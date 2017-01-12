@@ -1,11 +1,15 @@
-<?php defined('SYSPATH') OR die('No direct script access.');
+<?php
+namespace BetaKiller\View;
 
-class View_Layout extends Core_View_Layout {
+use Twig;
 
+class ViewLayoutTwig extends \View_Layout
+{
     /**
      * Using Twig layouts now
      *
      * @param $path
+     *
      * @return Twig
      */
     protected function view_factory($path)
@@ -18,5 +22,4 @@ class View_Layout extends Core_View_Layout {
         // Using Twig namespaces
         return '@'.parent::get_view_path();
     }
-
 }

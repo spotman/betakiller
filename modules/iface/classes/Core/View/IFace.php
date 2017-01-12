@@ -12,7 +12,7 @@ abstract class Core_View_IFace {
     /**
      * @var string
      */
-    protected $_wrapper = \View_Wrapper::HTML5;
+    protected $_wrapper_codename = \View_Wrapper::HTML5;
 
     /**
      * @var array
@@ -24,9 +24,9 @@ abstract class Core_View_IFace {
      *
      * @param string $wrapper
      */
-    public function wrapper($wrapper)
+    public function set_wrapper_codename($wrapper)
     {
-        $this->_wrapper = $wrapper;
+        $this->_wrapper_codename = $wrapper;
     }
 
     public function render(IFace $iface)
@@ -68,7 +68,6 @@ abstract class Core_View_IFace {
 
     protected function process_layout(View $iface_view)
     {
-        // TODO DI
         return View_Layout::factory($this->_layout)
             ->set_content($iface_view)
             ->render();
@@ -76,10 +75,19 @@ abstract class Core_View_IFace {
 
     protected function process_wrapper($layout)
     {
-        // TODO DI
-        return View_Wrapper::factory($this->_wrapper)
+        return $this->wrapper_view_factory($this->_wrapper_codename)
             ->set_content($layout)
             ->render();
+    }
+
+    protected function layout_view_factory($path)
+    {
+        return View_Layout::factory($path);
+    }
+
+    protected function wrapper_view_factory($path)
+    {
+        return View_Wrapper::factory($path);
     }
 
     /**
@@ -95,5 +103,4 @@ abstract class Core_View_IFace {
     {
         return 'ifaces'. DIRECTORY_SEPARATOR . str_replace('_', DIRECTORY_SEPARATOR, $iface->get_codename());
     }
-
 }

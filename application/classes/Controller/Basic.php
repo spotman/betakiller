@@ -1,5 +1,8 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
+use \BetaKiller\View\ViewLayoutTwig;
+use \BetaKiller\View\ViewWrapperTwig;
+
 /**
  * Class Controller_Template
  */
@@ -33,7 +36,7 @@ class Controller_Basic extends Controller {
      */
     protected function layout_factory($template_name)
     {
-        return View_Layout::factory($template_name);
+        return ViewLayoutTwig::factory($template_name);
     }
 
     public function after()
@@ -56,7 +59,7 @@ class Controller_Basic extends Controller {
             // Render template with its content
             $output = $this->_layout->render();
 
-            $output = View_Wrapper::factory()
+            $output = ViewWrapperTwig::factory()
                 ->set_content($output)
                 ->render();
         }

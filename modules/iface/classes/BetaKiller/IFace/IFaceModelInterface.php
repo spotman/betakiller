@@ -1,9 +1,10 @@
 <?php
 namespace BetaKiller\IFace;
 
+use BetaKiller\Helper\SeoMetaInterface;
 use BetaKiller\Utils\Kohana\TreeModelInterface;
 
-interface IFaceModelInterface extends TreeModelInterface
+interface IFaceModelInterface extends TreeModelInterface, SeoMetaInterface
 {
     /**
      * Returns iface codename
@@ -60,20 +61,6 @@ interface IFaceModelInterface extends TreeModelInterface
      * @return string
      */
     public function get_label();
-
-    /**
-     * Returns title for using in page <title> tag
-     *
-     * @return string
-     */
-    public function get_title();
-
-    /**
-     * Returns description for using in <meta> tag
-     *
-     * @return string
-     */
-    public function get_description();
 
     /**
      * Returns TRUE if current IFace is hidden in sitemap

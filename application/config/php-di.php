@@ -1,5 +1,8 @@
 <?php
 
+use BetaKiller\View\ViewIFaceTwig;
+use BetaKiller\View\ViewLayoutTwig;
+use BetaKiller\View\ViewWrapperTwig;
 use \Doctrine\Common\Cache\ArrayCache;
 
 return [
@@ -16,7 +19,7 @@ return [
 
         Auth::class  =>  DI\factory(function() {
             return Auth::instance();
-        }),
+        })->scope(\DI\Scope::SINGLETON),
 
         // Helpers
         'User'  =>  DI\factory(function() {
@@ -38,11 +41,18 @@ return [
             return new \BetaKiller\Config\Config();
         }),
 
+        // Inject container
+        // TODO anti-pattern
         \BetaKiller\DI\ContainerInterface::class =>  DI\factory(function() {
             return \BetaKiller\DI\Container::instance();
         }),
 
         \BetaKiller\Config\AppConfigInterface::class => DI\get(\BetaKiller\Config\AppConfig::class),
+
+        // Use Twig in ifaces and layouts
+        View_IFace::class   => DI\get(ViewIFaceTwig::class),
+        View_Layout::class  => DI\get(ViewLayoutTwig::class),
+        View_Wrapper::class => DI\get(ViewWrapperTwig::class),
 
     ],
 

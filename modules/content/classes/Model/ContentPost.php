@@ -1,10 +1,10 @@
 <?php
 
+use BetaKiller\Helper\SeoMetaInterface;
 use BetaKiller\Content\ImportedFromWordpressInterface;
-use BetaKiller\Content\SeoContentInterface;
 use BetaKiller\Content\Shortcode;
 
-class Model_ContentPost extends ORM implements SeoContentInterface, ImportedFromWordpressInterface
+class Model_ContentPost extends ORM implements SeoMetaInterface, ImportedFromWordpressInterface
 {
     use Model_ORM_SeoContentTrait,
         Model_ORM_ImportedFromWordpressTrait;

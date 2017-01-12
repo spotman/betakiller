@@ -1,6 +1,6 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
-class View extends Kohana_View
+class _View extends Kohana_View
 {
     /**
      * Helper for getting value which was previously set

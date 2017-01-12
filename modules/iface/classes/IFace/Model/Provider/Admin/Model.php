@@ -137,6 +137,30 @@ class IFace_Model_Provider_Admin_Model implements IFaceModelInterface
     }
 
     /**
+     * Sets title for using in <title> tag
+     *
+     * @param string $value
+     * @return $this
+     * @throws HTTP_Exception_501
+     */
+    public function set_title($value)
+    {
+        throw new HTTP_Exception_501('Admin model can not change title');
+    }
+
+    /**
+     * Sets description for using in <meta> tag
+     *
+     * @param string $value
+     * @return $this
+     * @throws HTTP_Exception_501
+     */
+    public function set_description($value)
+    {
+        throw new HTTP_Exception_501('Admin model can not change description');
+    }
+
+    /**
      * Returns iface codename
      *
      * @return string

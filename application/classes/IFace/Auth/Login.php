@@ -31,7 +31,7 @@ class IFace_Auth_Login extends IFace {
         }
     }
 
-    public function render()
+    public function before()
     {
         // If user already authorized
         if ( $this->current_user(TRUE) )
@@ -45,10 +45,7 @@ class IFace_Auth_Login extends IFace {
             // Redirect him
             $this->redirect($this->_redirect_url);
         }
-
-        return parent::render();
     }
-
 
     public function get_data()
     {

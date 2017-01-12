@@ -2,9 +2,9 @@
 
 use \BetaKiller\Utils\Kohana\TreeModel;
 use \BetaKiller\Content\ImportedFromWordpressInterface;
-use \BetaKiller\Content\SeoContentInterface;
+use BetaKiller\Helper\SeoMetaInterface;
 
-class Model_ContentCategory extends TreeModel implements SeoContentInterface, ImportedFromWordpressInterface
+class Model_ContentCategory extends TreeModel implements SeoMetaInterface, ImportedFromWordpressInterface
 {
     use Model_ORM_ImportedFromWordpressTrait,
         Model_ORM_SeoContentTrait;
@@ -120,8 +120,7 @@ class Model_ContentCategory extends TreeModel implements SeoContentInterface, Im
             ->filter_wp_id($wp_id)
             ->find();
 
-        if (!$model->loaded())
-        {
+        if (!$model->loaded()) {
             $model->clear();
         }
 

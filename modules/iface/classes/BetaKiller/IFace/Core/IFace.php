@@ -2,9 +2,9 @@
 namespace BetaKiller\IFace\Core;
 
 use BetaKiller\Config\AppConfigInterface;
+use BetaKiller\Helper\SeoMetaInterface;
 use DateInterval;
 use DateTime;
-use IFace_Exception;
 use BetaKiller\IFace\IFaceModelInterface;
 use Text;
 use URL;
@@ -12,7 +12,7 @@ use URL_Dispatcher;
 use URL_Parameters;
 use View_IFace;
 
-abstract class IFace
+abstract class IFace implements SeoMetaInterface
 {
 
     /**
@@ -54,12 +54,8 @@ abstract class IFace
     private $_iface_provider;
 
     /**
-     * @var \View_IFace
-     */
-
-    /**
-     * @Inject
      * @var View_IFace
+     * @Inject
      */
     private $_view_iface;
 
@@ -126,6 +122,32 @@ abstract class IFace
     public function get_description()
     {
         return $this->process_string_pattern($this->get_description_source());
+    }
+
+    /**
+     * Sets title for using in <title> tag
+     *
+     * @param string $value
+     *
+     * @return $this
+     */
+    public function set_title($value)
+    {
+        $this->get_model()->set_title($value);
+        return $this;
+    }
+
+    /**
+     * Sets description for using in <meta> tag
+     *
+     * @param string $value
+     *
+     * @return $this
+     */
+    public function set_description($value)
+    {
+        $this->get_model()->set_description($value);
+        return $this;
     }
 
     /**
@@ -431,34 +453,6 @@ abstract class IFace
     public function is_trailing_slash_enabled()
     {
         return $this->_app_config->is_trailing_slash_enabled();
-    }
-
-//    /**
-//     * Returns array of IFaces for breadcrumbs rendering
-//     * Override this method if your IFace tree is not equal to real semantic
-//     *
-//     * @return \BetaKiller\IFace\Core\IFace[]
-//     */
-//    public function get_breadcrumbs_iface_stack()
-//    {
-//        return $this->url_dispatcher()->stack();
-//    }
-//
-//    /**
-//     * Returns url parameters prepared for breadcrumbs rendering
-//     * Override this method if your IFace tree is not equal to real semantic
-//     *
-//     * @return URL_Parameters
-//     */
-//    public function get_breadcrumbs_url_parameters()
-//    {
-//        return $this->url_parameters();
-//    }
-
-    public function get_view()
-    {
-        // TODO DI
-        return View_IFace::factory();
     }
 
     /**

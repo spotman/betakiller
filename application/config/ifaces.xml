@@ -2,7 +2,7 @@
 <root>
     <!--<iface uri="login" codename="Auth_Login" title="Sign in" />-->
     <!--<iface uri="logout" codename="Auth_Logout" title="Sign out" />-->
-    <!--<iface uri="change-account" codename="Auth_ReLogin" title="Change account" />-->
+    <iface uri="change-account" codename="Auth_ReLogin" title="Change account" />
 
     <iface uri="password-reset" codename="Auth_Password_Reset" title="Reset password" hideInSiteMap="true" />
 
