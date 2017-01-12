@@ -1,11 +1,11 @@
 <?php
 
-namespace BetaKiller\Content\IFace;
+namespace BetaKiller\IFace\App\Content;
 
 use BetaKiller\Helper\ContentTrait;
 use BetaKiller\IFace\IFace;
 
-abstract class Base extends IFace
+abstract class AppBase extends IFace
 {
     use ContentTrait;
 }

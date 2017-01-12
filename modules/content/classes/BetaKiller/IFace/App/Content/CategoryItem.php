@@ -1,10 +1,7 @@
 <?php
-namespace BetaKiller\Content\IFace;
+namespace BetaKiller\IFace\App\Content;
 
-use BetaKiller\Content\IFace\Base;
-//use Model_ContentCategory;
-
-class ContentCategoryItem extends Base
+class CategoryItem extends AppBase
 {
     /**
      * Returns data for View

@@ -602,8 +602,8 @@ class Model_ContentPost extends ORM implements SeoContentInterface, ImportedFrom
 
     public function get_public_url()
     {
-        /** @var \BetaKiller\Content\IFace\ContentItem $iface */
-        $iface = $this->iface_from_codename('ContentItem');
+        /** @var \BetaKiller\IFace\App\Content\PostItem $iface */
+        $iface = $this->iface_from_codename('App_Content_PostItem');
 
         $params = $this->url_parameters_instance()->set(self::URL_PARAM, $this);
 
@@ -619,8 +619,8 @@ class Model_ContentPost extends ORM implements SeoContentInterface, ImportedFrom
     // TODO Move this method to base class and detect IFace via model-iface linking
     public function get_admin_url()
     {
-        /** @var \BetaKiller\Content\IFace\Admin\PostItem $iface */
-        $iface = $this->iface_from_codename('Admin_Content_ArticleItem');
+        /** @var \BetaKiller\IFace\Admin\Content\PostItem $iface */
+        $iface = $this->iface_from_codename('Admin_Content_PostItem');
 
         $params = $this->url_parameters_instance()->set(self::URL_PARAM, $this);
 

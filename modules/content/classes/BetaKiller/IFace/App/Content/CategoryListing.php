@@ -1,13 +1,8 @@
 <?php
-namespace BetaKiller\Content\IFace;
+namespace BetaKiller\IFace\App\Content;
 
-use BetaKiller\Helper\ContentTrait;
-use BetaKiller\IFace\IFace;
-
-class ContentCategoryListing extends IFace
+class CategoryListing extends AppBase
 {
-    use ContentTrait;
-
     /**
      * Returns data for View
      * Override this method in child classes

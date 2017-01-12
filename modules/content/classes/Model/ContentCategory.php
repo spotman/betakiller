@@ -70,8 +70,8 @@ class Model_ContentCategory extends TreeModel implements SeoContentInterface, Im
 
     public function get_public_url()
     {
-        /** @var \V2017\IFace\ContentCategoryItem $iface */
-        $iface = $this->iface_from_codename('ContentCategoryItem');
+        /** @var \BetaKiller\IFace\App\Content\CategoryItem $iface */
+        $iface = $this->iface_from_codename('App_Content_CategoryItem');
 
         $params = $this->url_parameters_instance()
             ->set($this::URL_PARAM, $this);

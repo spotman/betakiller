@@ -1,6 +1,9 @@
-<?php defined('SYSPATH') OR die('No direct script access.');
+<?php
+namespace BetaKiller\IFace\Admin;
 
-class IFace_Admin_Index extends IFace_Admin
+use BetaKiller\IFace\Admin\AdminBase;
+
+class Index extends AdminBase
 {
     /**
      * Returns data for View
@@ -10,6 +13,6 @@ class IFace_Admin_Index extends IFace_Admin
      */
     public function get_data()
     {
-        // TODO: Implement get_data() method.
+        return [];
     }
 }

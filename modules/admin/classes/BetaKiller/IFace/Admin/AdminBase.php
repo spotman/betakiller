@@ -1,7 +1,9 @@
 <?php
-namespace BetaKiller\IFace;
+namespace BetaKiller\IFace\Admin;
 
-abstract class Admin extends IFace
+use BetaKiller\IFace\IFace;
+
+abstract class AdminBase extends IFace
 {
     public function render()
     {

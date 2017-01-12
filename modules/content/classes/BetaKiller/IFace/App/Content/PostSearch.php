@@ -1,8 +1,7 @@
 <?php
+namespace BetaKiller\IFace\App\Content;
 
-namespace BetaKiller\Content\IFace;
-
-class ContentSearch extends Base
+class PostSearch extends AppBase
 {
     /**
      * Returns data for View

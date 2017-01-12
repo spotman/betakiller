@@ -1,9 +1,7 @@
 <?php
-namespace BetaKiller\Content\IFace\Admin;
+namespace BetaKiller\IFace\Admin\Content;
 
-use BetaKiller\Content\IFace\Admin;
-
-class PostIndex extends Admin
+class PostIndex extends AdminBase
 {
     /**
      * Returns data for View

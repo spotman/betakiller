@@ -1,16 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <root>
-    <!--<iface uri="login" codename="Auth_Login" title="Sign in" />-->
-    <!--<iface uri="logout" codename="Auth_Logout" title="Sign out" />-->
-    <!--<iface uri="change-account" codename="Auth_ReLogin" title="Change account" />-->
-
     <!-- TODO вынести это всё в файл config/ifaces.php, который добавляет элементы в IFaceModelTree::admin() -->
     <iface uri="posts" codename="Admin_Content_PostIndex" parentCodename="Admin_Index" title="Posts">
         <iface uri="{ContentPost.id}" codename="Admin_Content_PostItem" title="Admin | Article | {ContentPost.label}" hasDynamicUrl="true" />
     </iface>
-
-    <!--<iface uri="admin" codename="Admin_Index" title="Admin zone">-->
-        <!--<iface uri="users" codename="Admin_User" title="User management"></iface>-->
-        <!--<iface uri="ifaces" codename="Admin_IFace_List" title="IFace management"></iface>-->
-    <!--</iface>-->
 </root>

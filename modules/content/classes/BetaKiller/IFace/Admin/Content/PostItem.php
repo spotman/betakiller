@@ -1,10 +1,7 @@
 <?php
-namespace BetaKiller\Content\IFace\Admin;
+namespace BetaKiller\IFace\Admin\Content;
 
-use Model_ContentArticle;
-use BetaKiller\Content\IFace\Admin;
-
-class PostItem extends Admin
+class PostItem extends AdminBase
 {
     /**
      * Returns data for View

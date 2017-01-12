@@ -112,7 +112,7 @@ class IFace_Provider
     // TODO Move to IFaceFactory
     protected function iface_factory(IFaceModelInterface $model)
     {
-        $ns = $this->_app_config->get_namespace();
+        $app_ns = $this->_app_config->get_namespace();
 
         $codename = $model->get_codename();
 
@@ -121,28 +121,14 @@ class IFace_Provider
         // Add IFace prefix
         array_unshift($codename_array, 'IFace');
 
-        $separator = '\\';
+        $class_name = $app_ns
+            ? $this->detect_iface_class_name($app_ns, $codename_array)
+            : implode('_', $codename_array); // Legacy naming without namespace
 
-        if ($ns)
-        {
-            // Add namespace prefix
-            array_unshift($codename_array, $ns);
-        }
-        else
-        {
-            // Legacy separator
-            $separator = '_';
-        }
-
-        $class_name = implode($separator, $codename_array);
-
-        try
-        {
+        try {
             /** @var IFace $object */
             $object = $this->_container->get($class_name);
-        }
-        catch (Exception $e)
-        {
+        } catch (Exception $e) {
             throw new IFace_Exception('Can not instantiate :class class for codename :codename, error is: :msg', [
                 ':class'    =>  $class_name,
                 ':codename' =>  $codename,
@@ -156,6 +142,23 @@ class IFace_Provider
         $object->set_model($model);
 
         return $object;
+    }
+
+    private function detect_iface_class_name($app_ns, array $codename_array)
+    {
+        $separator = '\\';
+        $common_name = implode($separator, $codename_array);
+
+        foreach ([$app_ns, 'BetaKiller'] as $ns) {
+            // Add namespace prefix
+            $class_name = $ns.$separator.$common_name;
+
+            if (class_exists($class_name)) {
+                return $class_name;
+            }
+        }
+
+        throw new IFace_Exception('No iface class found for :name', [':name' => $common_name]);
     }
 
     public function get_parent(IFace $iface)

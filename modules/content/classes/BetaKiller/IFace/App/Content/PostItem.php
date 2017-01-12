@@ -1,8 +1,7 @@
 <?php
+namespace BetaKiller\IFace\App\Content;
 
-namespace BetaKiller\Content\IFace;
-
-class ContentItem extends Base
+class PostItem extends AppBase
 {
     /**
      * @var \Model_ContentPost
@@ -81,7 +80,7 @@ class ContentItem extends Base
      * @return \Model_ContentPost
      * @throws \IFace_Exception
      */
-    private function detect_content_model()
+    protected function detect_content_model()
     {
         $key = $this->get_content_model_url_param_key();
 
