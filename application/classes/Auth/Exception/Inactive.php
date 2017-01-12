@@ -7,6 +7,6 @@ class Auth_Exception_Inactive extends Auth_Exception
      */
     protected function get_default_message()
     {
-        return __('Your account was switched off');
+        return 'Your account was switched off';
     }
 }

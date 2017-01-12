@@ -7,6 +7,7 @@ return array (
   'Error' => 'Ошибка',
   'Nothing found...' => 'По запрашиваемому адресу ничего не удалось найти...',
   'The requested view :file could not be found' => 'Запрашиваемый view-файл :file не найден',
+  'Do not worry, we are already fixing that' => 'Разработчики уже в курсе и скоро всё исправят',
   'Default value:' => 'Значение по умолчанию:',
   'Permission denied' => 'Доступ запрещён',
   'Can not find widget :class' => 'Can not find widget :class',

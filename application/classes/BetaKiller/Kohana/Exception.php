@@ -232,7 +232,7 @@ class BetaKiller_Kohana_Exception extends Kohana_Kohana_Exception
      */
     protected function get_default_message()
     {
-        return __('System error');
+        return 'System error';
     }
 
     /**

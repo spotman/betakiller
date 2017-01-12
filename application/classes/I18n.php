@@ -155,6 +155,6 @@ class I18n extends Kohana_I18n {
  * Translation file in language: '.static::$lang.'
  * Automatically generated from previous translation file.
  */
-return '.var_export($data, true).';';
+return '.var_export($data, true).';'.PHP_EOL;
     }
 }

@@ -4,6 +4,6 @@ class Auth_Exception_UserDoesNotExists extends Auth_Exception
 {
     protected function get_default_message()
     {
-        return __('User does not exists');
+        return 'User does not exists';
     }
 }
