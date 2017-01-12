@@ -25,15 +25,14 @@ class IFaceCache
         $this->pageCache = new PageCache;
 
         $this->pageCache->setPath($config->get_page_cache_path());
-        $this->pageCache->enableLog();
-        $this->pageCache->setLogFilePath("/tmp/page-cache.log");
+        // $this->pageCache->enableLog();
+        // $this->pageCache->setLogFilePath("/tmp/page-cache.log");
     }
 
     public function clearModelCache(IFaceRelatedModelInterface $model)
     {
-        $iface = $model->get_public_iface();
-
-        // TODO deal with child ifaces (clear cache for whole branch)
+        // deal with child ifaces (clear cache for whole branch)
+//        $iface = $model->get_public_iface();
 
         throw new \HTTP_Exception_501('Not implemented yet');
     }
