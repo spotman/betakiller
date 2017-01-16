@@ -414,7 +414,7 @@
             "dist": {
                 "type": "path",
                 "url": "../../libs/page-cache",
-                "reference": "33ba35ecaa8189639c059b56d7fb95b194f17da6",
+                "reference": "74e291deb5124a4e260f232dbd49c93944a9d59d",
                 "shasum": null
             },
             "require": {
@@ -1231,6 +1231,7 @@
                 "schema",
                 "validate"
             ],
+            "abandoned": "kherge/json",
             "time": "2013-10-30 16:51:34"
         },
         {
@@ -1288,6 +1289,7 @@
                 "phar",
                 "update"
             ],
+            "abandoned": true,
             "time": "2013-11-09 17:13:13"
         },
         {
@@ -1339,6 +1341,7 @@
                 "semantic",
                 "version"
             ],
+            "abandoned": true,
             "time": "2014-05-27 05:29:25"
         },
         {

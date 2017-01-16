@@ -58,6 +58,7 @@ class IFaceCache
         $this->applyIFaceStrategy($iface);
 
         $this->pageCache->setExpiration($expires);
+        $this->pageCache->enableHeaders(true);
         $this->pageCache->init();
     }
 
