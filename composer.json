@@ -14,7 +14,8 @@
     "thunderer/shortcode": "^0.6",
     "imangazaliev/didom": "^1.8",
     "swiftmailer/swiftmailer": "^5.4",
-    "mmamedov/page-cache": "dev-master"
+    "mmamedov/page-cache": "dev-master",
+    "aidantwoods/secureheaders": "^1.0"
   },
   "require-dev": {
     "phpunit/phpunit": "3.7.*",
