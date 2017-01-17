@@ -1,5 +1,7 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
+use BetaKiller\Notification\TransportInterface;
+
 abstract class Kohana_Notification_Message {
 
     use \BetaKiller\Utils\Instance\Simple;
@@ -185,7 +187,7 @@ abstract class Kohana_Notification_Message {
         return 'templates'.DIRECTORY_SEPARATOR.'notification';
     }
 
-    public function render($transport_name)
+    public function render(TransportInterface $transport)
     {
         $view = $this->template_factory();
 
@@ -197,7 +199,7 @@ abstract class Kohana_Notification_Message {
         $view->set($data);
 
         return $view->render(
-            $this->get_template_path().DIRECTORY_SEPARATOR.$this->_template_name.'-'.$transport_name
+            $this->get_template_path().DIRECTORY_SEPARATOR.$this->_template_name.'-'.$transport->get_name()
         );
     }
 

@@ -4,6 +4,12 @@ class Notification_User_Email implements Notification_User_Interface {
 
     protected $_email;
 
+    public function get_id()
+    {
+        // No ID for direct email sending
+        return NULL;
+    }
+
     public static function factory($email)
     {
         return new static($email);

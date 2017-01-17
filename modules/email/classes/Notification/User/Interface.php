@@ -1,12 +1,12 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
-interface Notification_User_Interface {
-
+interface Notification_User_Interface
+{
     /**
-     * Returns TRUE if user is using the site now (so online notifications may be provided)
-     * @return bool
+     * Returns user ID
+     * @return int
      */
-    public function is_online();
+    public function get_id();
 
     /**
      * Returns user email

@@ -1,10 +1,10 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
+use BetaKiller\Notification\NotificationException;
+
 abstract class Kohana_Notification {
 
     use \BetaKiller\Utils\Instance\Simple;
-
-    const TRANSPORT_EMAIL = 'email';
 
     /**
      * @return Notification_Message
@@ -14,53 +14,66 @@ abstract class Kohana_Notification {
         return Notification_Message::instance();
     }
 
-    public function send(Kohana_Notification_Message $message)
+    public function send(Notification_Message $message)
     {
-        $counter = 0;
+        $total = 0;
 
-        //        $from = $message->get_from();
         $to = $message->get_to();
-        $subj = $message->get_subj();
-
-//        if ( ! $from )
-//            throw new Exception('Message source must be specified');
 
         if ( ! $to )
             throw new Exception('Message target must be specified');
 
-        foreach ( $to as $target )
-        {
-            $attachments = $message->get_attachments();
+        $transports = $this->get_transports();
 
-            if ( $target->is_online() AND $target->is_online_notification_allowed() )
-            {
-                // Online notification
-                throw new HTTP_Exception_501;
+        foreach ( $to as $target ) {
+            $counter = 0;
+
+            foreach ($transports as $transport) {
+                try {
+                    $counter = $transport->send($message, $target);
+
+                    // Message delivered, exiting
+                    if ($counter) {
+                        break;
+                    }
+                } catch (Exception $e) {
+                    Log::exception($e);
+                    continue;
+                }
             }
-            else if ( $target->is_email_notification_allowed() )
-            {
-                $body = $this->render_message($message, static::TRANSPORT_EMAIL);
 
-                $fromUser = $message->get_from();
-
-                // Email notification
-                $counter += Email::send(
-                    $fromUser ? $fromUser->get_email() : NULL,
-                    $target->get_email(),
-                    $subj,
-                    $body,
-                    TRUE,
-                    $attachments
-                );
+            // Message delivery failed
+            if (!$counter) {
+                throw new NotificationException('Message delivery failed, see previously logged exceptions');
             }
+
+            $total += $counter;
         }
 
-        return $counter;
+        return $total;
     }
 
-    protected function render_message(Kohana_Notification_Message $message, $transport)
+    /**
+     * @param string $name
+     *
+     * @return \BetaKiller\Notification\TransportInterface
+     */
+    protected function transport_factory($name)
     {
-        return $message->render($transport);
+        $class_name = '\\BetaKiller\\Notification\\Transport\\'.ucfirst($name).'Transport';
+
+        return new $class_name;
+    }
+
+    /**
+     * @return \BetaKiller\Notification\TransportInterface[]
+     */
+    protected function get_transports()
+    {
+        return [
+            $this->transport_factory('online'),
+            $this->transport_factory('email'),
+        ];
     }
 
 }

@@ -332,11 +332,6 @@ class User extends \Model_Auth_User implements \Notification_User_Interface //im
         return $roles_orm->moderators()->get_users()->find_all();
     }
 
-    public function is_online()
-    {
-        return FALSE;
-    }
-
     public function is_email_notification_allowed()
     {
         return TRUE;
