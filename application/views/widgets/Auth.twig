@@ -10,22 +10,27 @@
 
 </div>
 
-<script type="application/javascript">
+{# if widget is inside of IFace_Login or similar #}
+{% if redirect_url is defined %}
 
-  require([
-    "jquery",
-    "auth.login"
-  ], function ($, login) {
+    <script type="application/javascript">
 
-    $(function () {
+      require([
+        "jquery",
+        "auth.login"
+      ], function ($, login) {
 
-      login.initialize(
-        $(".widget-auth"),
-        "{{ redirect_url }}"
-      );
+        $(function () {
 
-    });
+          login.initialize(
+            $(".widget-auth"),
+            "{{ redirect_url }}"
+          );
 
-  });
+        });
 
-</script>
+      });
+
+    </script>
+
+{% endif %}

@@ -10,7 +10,11 @@ define([
 
             var successfulCallback = function() {
                 // Всё в порядке, перенаправляем пользователя
-                location.href = redirectURL;
+                if (redirectURL) {
+                    location.href = redirectURL;
+                } else {
+                    location.reload(true);
+                }
             };
 
             widget.initialize(
