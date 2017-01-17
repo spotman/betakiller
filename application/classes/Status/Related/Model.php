@@ -98,7 +98,7 @@ abstract class Status_Related_Model extends ORM {
     }
 
     /**
-     * @return Status_Model|NULL
+     * @return Status_Related_Model|NULL
      */
     public function set_start_status()
     {
@@ -135,9 +135,14 @@ abstract class Status_Related_Model extends ORM {
         return $this->get($this->get_status_relation_foreign_key());
     }
 
+    public function has_current_status()
+    {
+        return !!$this->get_status_id();
+    }
+
     /**
      * @param int|array|NULL $id
-     * @return Status_Model
+     * @return Status_Model|ORM
      */
     public function status_model_factory($id = NULL)
     {

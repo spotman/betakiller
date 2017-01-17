@@ -7,9 +7,9 @@ abstract class Core_URL_Parameters extends Base
     use \BetaKiller\Utils\Instance\Simple;
 
     /**
-     * @param string            $key
-     * @param URL_DataSource    $object
-     * @param bool|FALSE        $ignore_duplicate
+     * @param string                  $key
+     * @param URL_DataSourceInterface $object
+     * @param bool|FALSE              $ignore_duplicate
      *
      * @return $this
      * @throws Exception

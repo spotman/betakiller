@@ -1,15 +1,11 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
 use BetaKiller\Utils;
+use BetaKiller\Search\Model\Applicable;
+use BetaKiller\Search\Model\ResultsItem;
 
-class ORM extends Utils\Kohana\ORM
-    implements API_Response_Item, URL_DataSource,
-    \BetaKiller\Search\Model\Applicable,
-    \BetaKiller\Search\Model\ResultsItem
-    /* , DataSource_Interface */ {
-
-    use Betakiller\Helper\Base;
-
+class ORM extends Utils\Kohana\ORM implements API_Response_Item, URL_DataSourceInterface, Applicable, ResultsItem
+{
     /**
      * Default implementation for ORM objects
      * Override this method in child classes
@@ -39,7 +35,8 @@ class ORM extends Utils\Kohana\ORM
      * @param string $key
      * @param string $value
      * @param URL_Parameters $parameters
-     * @return URL_DataSource|NULL
+     *
+     * @return URL_DataSourceInterface|NULL
      */
     public function find_by_url_key($key, $value, URL_Parameters $parameters)
     {
@@ -84,7 +81,7 @@ class ORM extends Utils\Kohana\ORM
      * @param URL_Parameters $parameters
      * @param int|null       $limit
      *
-     * @return \URL_DataSource[]
+     * @return \URL_DataSourceInterface[]
      */
     public function get_available_items_by_url_key($key, URL_Parameters $parameters, $limit = NULL)
     {

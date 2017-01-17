@@ -12,6 +12,7 @@ use Thunder\Shortcode\Parser\RegexParser;
 class Task_Content_Import_Wordpress extends Minion_Task
 {
     use \BetaKiller\Helper\ContentTrait;
+    use \BetaKiller\Helper\CurrentUser;
 
     const ATTACH_PARSING_MODE_HTTP = 'http';
     const ATTACH_PARSING_MODE_LOCAL = 'local';
@@ -343,6 +344,9 @@ class Task_Content_Import_Wordpress extends Minion_Task
 
             $model = $content_post_orm->find_by_wp_id($id);
 
+            // Detect is this is a new record
+            $is_new = !$model->get_id();
+
             if ($type == $wp::POST_TYPE_PAGE)
             {
                 $model->mark_as_page();
@@ -378,6 +382,11 @@ class Task_Content_Import_Wordpress extends Minion_Task
             $model
                 ->set_created_at($created_at)
                 ->set_updated_at($updated_at);
+
+            // Auto publishing for new posts (we are importing only published posts)
+            if ($is_new) {
+                $model->publish();
+            }
 
             // Saving model content
             $model->save();

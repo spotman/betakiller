@@ -1,12 +1,8 @@
 <?php
 namespace BetaKiller\Content;
 
-use \BetaKiller\Helper\Base;
-
 class TwigExtension extends \Twig_Extension
 {
-    use Base;
-
     public function getFilters()
     {
         return [

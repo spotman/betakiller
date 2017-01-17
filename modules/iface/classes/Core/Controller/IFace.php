@@ -5,6 +5,9 @@ use \BetaKiller\IFace\Cache\IFaceCache;
 
 class Core_Controller_IFace extends Controller
 {
+    use \BetaKiller\Helper\CurrentUser;
+    use \BetaKiller\Helper\IFace;
+
     public function action_render()
     {
         $uri = $this->get_request_uri();

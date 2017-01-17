@@ -1,9 +1,7 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
-abstract class Status_Workflow {
-
-    use BetaKiller\Helper\Base;
-
+abstract class Status_Workflow
+{
     /**
      * @var Status_Related_Model
      */

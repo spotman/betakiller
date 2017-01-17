@@ -1,9 +1,8 @@
-<?php defined('SYSPATH') OR die('No direct script access.');
+<?php
 
-
-abstract class BetaKiller_API_Model extends Core_API_Model {
-
-    use BetaKiller\Helper\Base;
+abstract class BetaKiller_API_Model extends Core_API_Model
+{
+    use BetaKiller\Helper\CurrentUser;
 
     /**
      * @param string $name
@@ -15,7 +14,7 @@ abstract class BetaKiller_API_Model extends Core_API_Model {
     {
         $model = ORM::factory($name, $id);
 
-        if ( $id AND ! $model->loaded() )
+        if ( $id && !$model->loaded() )
             throw new API_Model_Exception('Incorrect id :id for model :model',
                 array(':id' => $id, ':model' => $name));
 
@@ -27,12 +26,4 @@ abstract class BetaKiller_API_Model extends Core_API_Model {
         $value = trim($value);
         return $value;
     }
-
-//    protected function search_by_uri($uri)
-//    {
-//        $model_result = $this->model()->filter_uri($uri)->find();
-//
-//        return $this->response( $model_result->loaded() ? $model_result : NULL );
-//    }
-
 }

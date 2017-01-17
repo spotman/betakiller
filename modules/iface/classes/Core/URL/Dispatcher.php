@@ -394,13 +394,13 @@ abstract class Core_URL_Dispatcher {
 
         $current_params = $this->parameters();
 
-        foreach ( $parameters->getAll() as $key => $param_model) {   /** @var URL_DataSource $param_model */
+        foreach ( $parameters->getAll() as $key => $param_model) {   /** @var URL_DataSourceInterface $param_model */
 
             if ( !$current_params->has($key) ) {
                 return FALSE;
             }
 
-            /** @var URL_DataSource $current_model */
+            /** @var URL_DataSourceInterface $current_model */
             $current_model = $current_params->get($key);
 
             if ($param_model->get_url_item_id() != $current_model->get_url_item_id()) {
@@ -509,7 +509,7 @@ abstract class Core_URL_Dispatcher {
         $model_name = $prototype->get_model_name();
         $model_key = $prototype->get_model_key();
 
-        /** @var URL_DataSource $model */
+        /** @var URL_DataSourceInterface $model */
         $model = $parameters ? $parameters->get($model_name) : NULL;
 
         // Inherit model from current request url parameters
@@ -535,7 +535,7 @@ abstract class Core_URL_Dispatcher {
         return implode('/', array_reverse($parts));
     }
 
-    protected function calculate_model_key_value(URL_DataSource $model, $key, $is_method_call)
+    protected function calculate_model_key_value(URL_DataSourceInterface $model, $key, $is_method_call)
     {
         if( $is_method_call )
         {
@@ -561,18 +561,19 @@ abstract class Core_URL_Dispatcher {
 
     /**
      * @param $model_name
-     * @return URL_DataSource
+     *
+*@return URL_DataSourceInterface
      * @throws URL_Dispatcher_Exception
      */
     public function model_factory($model_name)
     {
-        /** @var URL_DataSource $object */
+        /** @var URL_DataSourceInterface $object */
         $object = Model::factory($model_name);
 
-        if ( ! ($object instanceof URL_DataSource) )
+        if ( ! ($object instanceof URL_DataSourceInterface) )
             throw new URL_Dispatcher_Exception('The model :name must implement :proto', [
                 ':name' => $model_name,
-                ':proto' => URL_DataSource::class
+                ':proto' => URL_DataSourceInterface::class
             ]);
 
         return $object;

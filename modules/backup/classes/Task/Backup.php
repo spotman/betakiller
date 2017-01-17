@@ -1,7 +1,9 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
 
-class Task_Backup extends Minion_Task {
+class Task_Backup extends Minion_Task
+{
+    use BetaKiller\Helper\ConfigTrait;
 
     protected function _execute(array $params)
     {

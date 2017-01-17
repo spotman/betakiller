@@ -4,6 +4,8 @@ use BetaKiller\Content\ContentElementInterface;
 
 trait Model_ORM_ContentElementTrait
 {
+    use \BetaKiller\Helper\CurrentUser;
+
     protected function initialize_entity_relation()
     {
         $this->belongs_to([

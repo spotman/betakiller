@@ -36,8 +36,10 @@ class Controller_StaticFiles extends Controller {
                 $str = $this->replace_url($str);
             }
 
+            $is_enabled = ($this->config['enabled'] === TRUE);
+
             // Сохраняем в кеш
-            if ( $this->config['enabled'] === TRUE )
+            if ( $is_enabled )
             {
                 // Производим deploy статического файла,
                 // В следующий раз его будет отдавать сразу nginx без запуска PHP
@@ -52,7 +54,7 @@ class Controller_StaticFiles extends Controller {
             // Получаем время модификации оригинала
             $mtime = filemtime($orig);
 
-            if (!$this->in_production())
+            if (!$is_enabled)
             {
                 $this->response->headers('Pragma', 'no-cache');
                 $this->response->headers('Expires', gmdate("D, d M Y H:i:s \G\M\T", time() - 3600));
@@ -118,8 +120,7 @@ class Controller_StaticFiles extends Controller {
 
     public function action_clear()
     {
-        /** @var Model_User $user */
-        $user = Env::get('User');
+        $user = Env::user(TRUE);
 
         if ( ! $user OR ! $user->is_developer() )
             throw new HTTP_Exception_403();

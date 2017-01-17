@@ -201,8 +201,9 @@ abstract class IFace implements SeoMetaInterface
                     $drop   = array_pop($tags);
                     $source = trim(str_replace($drop['key'], '', $source));
                     $i++;
-                } else
+                } else {
                     break;
+                }
             }
         }
 

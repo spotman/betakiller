@@ -3,6 +3,8 @@ use BetaKiller\IFace\IFaceModelTree;
 
 class Task_Cache_Warmup extends Minion_Task
 {
+    use BetaKiller\Helper\IFace;
+
     /**
      * @var IFaceModelTree
      */

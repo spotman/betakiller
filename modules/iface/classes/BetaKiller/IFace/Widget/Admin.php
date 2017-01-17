@@ -5,6 +5,8 @@ use BetaKiller\IFace\Widget;
 
 abstract class Admin extends Widget
 {
+    use \BetaKiller\Helper\CurrentUser;
+
     public function render()
     {
         if (!$this->check_iface_permissions())

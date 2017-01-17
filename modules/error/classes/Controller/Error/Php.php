@@ -1,6 +1,8 @@
 <?php defined('SYSPATH') or die('No direct script access.');
 
-class Controller_Error_Php extends Controller_Developer {
+class Controller_Error_Php extends Controller_Developer
+{
+    use \BetaKiller\Helper\CurrentUser;
 
     const   SHOW_RESOLVED_COOKIE_NAME = "errors:show_resolved_errors";
     const   SORT_BY_COOKIE_NAME = "errors:sort_by";

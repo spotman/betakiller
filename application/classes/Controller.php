@@ -6,7 +6,7 @@
  */
 abstract class Controller extends Controller_Proxy
 {
-    use BetaKiller\Helper\Base;
+    use BetaKiller\Helper\CurrentUser;
 
     const JSON_SUCCESS = Response::JSON_SUCCESS;
     const JSON_ERROR = Response::JSON_ERROR;

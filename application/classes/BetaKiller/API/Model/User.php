@@ -1,8 +1,8 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
 
-abstract class BetaKiller_API_Model_User extends API_Model {
-
+abstract class BetaKiller_API_Model_User extends API_Model
+{
     public function update_profile($data)
     {
         $user = $this->current_user();

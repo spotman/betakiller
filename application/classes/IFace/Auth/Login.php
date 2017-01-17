@@ -2,7 +2,9 @@
 
 use BetaKiller\IFace\IFace;
 
-class IFace_Auth_Login extends IFace {
+class IFace_Auth_Login extends IFace
+{
+    use \BetaKiller\Helper\CurrentUser;
 
     /**
      * @var string Default url for relocate after successful login

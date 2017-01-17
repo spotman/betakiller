@@ -1,6 +1,6 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
-interface URL_DataSource
+interface URL_DataSourceInterface
 {
     /**
      * Performs search for model item where the $key property value is equal to $value
@@ -8,7 +8,8 @@ interface URL_DataSource
      * @param string $key
      * @param string $value
      * @param URL_Parameters $parameters
-     * @return URL_DataSource
+     *
+     * @return URL_DataSourceInterface
      */
     public function find_by_url_key($key, $value, URL_Parameters $parameters);
 
@@ -34,7 +35,7 @@ interface URL_DataSource
      * @param URL_Parameters $parameters
      * @param null           $limit
      *
-     * @return \URL_DataSource[]
+     * @return \URL_DataSourceInterface[]
      */
     public function get_available_items_by_url_key($key, URL_Parameters $parameters, $limit = NULL);
 

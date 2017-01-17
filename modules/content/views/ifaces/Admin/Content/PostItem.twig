@@ -39,6 +39,13 @@
             <span id="article-description-remaining" class="help-block"></span>
         </div>
 
+        <button class="btn save-post-button" type="submit">Save</button>
+
+        {# transitions #}
+        {% if "publish" in post.transitions %}
+            <button class="btn publish-post-button">Publish</button>
+        {% endif %}
+
     </form>
 
     {# TODO thumbnails edit #}
@@ -66,7 +73,7 @@
 
             $content.ckeditor({
               height: "calc(100vh - 200px)",
-              className: "test-class",
+//              className: "test-class",
               autosave_SaveKey: '{{ "betakiller-post-" ~ post.id }}',
               allowedContent: "p; strong; i; em; span[style]; table[class]; thead; tbody; tr; th[style]; td[style]; ul[class]; ol[class]; li; a[href,title]; h2; h3; h4; " + customTagsRulesString
             });

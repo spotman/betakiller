@@ -7,6 +7,8 @@ use samdark\sitemap\Index;
 
 class Service_Sitemap extends Service
 {
+    use BetaKiller\Helper\IFace;
+
     /**
      * @var URL_Parameters
      */

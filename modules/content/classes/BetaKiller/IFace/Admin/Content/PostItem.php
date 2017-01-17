@@ -11,7 +11,7 @@ class PostItem extends AdminBase
      */
     public function get_data()
     {
-        $article = $this->url_parameter_content_post();
+        $post = $this->url_parameter_content_post();
 
 
 //        $thumbnails = [];
@@ -30,12 +30,14 @@ class PostItem extends AdminBase
 
         return [
             'post' => [
-                'id'          => $article->get_id(),
-                'uri'         => $article->get_uri(),
-                'label'       => $article->get_label(),
-                'content'     => $article->get_content(),
-                'title'       => $article->get_title(),
-                'description' => $article->get_description(),
+                'id'            =>  $post->get_id(),
+                'uri'           =>  $post->get_uri(),
+                'label'         =>  $post->get_label(),
+                'content'       =>  $post->get_content(),
+                'title'         =>  $post->get_title(),
+                'description'   =>  $post->get_description(),
+
+                'transitions'   =>  $post->get_allowed_target_transitions(),
 
 //                'thumbnails'    =>  $thumbnails,
             ],

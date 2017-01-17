@@ -4,10 +4,11 @@ use BetaKiller\Helper\SeoMetaInterface;
 use BetaKiller\Content\ImportedFromWordpressInterface;
 use BetaKiller\Content\Shortcode;
 
-class Model_ContentPost extends ORM implements SeoMetaInterface, ImportedFromWordpressInterface
+class Model_ContentPost extends Status_Related_Model implements SeoMetaInterface, ImportedFromWordpressInterface
 {
     use Model_ORM_SeoContentTrait,
-        Model_ORM_ImportedFromWordpressTrait;
+        Model_ORM_ImportedFromWordpressTrait,
+        BetaKiller\Helper\IFace;
 
     const URL_PARAM = 'ContentPost';
 
@@ -66,6 +67,58 @@ class Model_ContentPost extends ORM implements SeoMetaInterface, ImportedFromWor
         ]);
 
         parent::_initialize();
+    }
+
+    /**
+     * Returns key for workflow factory
+     *
+     * @return string
+     */
+    protected function get_workflow_name()
+    {
+        return 'Content_Post';
+    }
+
+    /**
+     * @return \Status_Workflow_Content_Post
+     */
+    protected function workflow()
+    {
+        return parent::workflow();
+    }
+
+    /**
+     * @return string
+     */
+    protected function get_status_relation_model_name()
+    {
+        return 'ContentPostStatus';
+    }
+
+    /**
+     * @return string
+     */
+    protected function get_status_relation_foreign_key()
+    {
+        return 'status_id';
+    }
+
+    public function draft()
+    {
+        $this->workflow()->draft();
+        return $this;
+    }
+
+    public function publish()
+    {
+        $this->workflow()->publish();
+        return $this;
+    }
+
+    public function pause()
+    {
+        $this->workflow()->pause();
+        return $this;
     }
 
     /**
@@ -301,11 +354,6 @@ class Model_ContentPost extends ORM implements SeoMetaInterface, ImportedFromWor
         return $this->filter_articles()->get_all();
     }
 
-    public function search_()
-    {
-        
-    }
-
     /**
      * @return $this[]|\Database_Result
      */
@@ -486,7 +534,9 @@ class Model_ContentPost extends ORM implements SeoMetaInterface, ImportedFromWor
      */
     public function create(Validation $validation = NULL)
     {
-        $this->set_created_at(new DateTime);
+        $this
+            ->set_created_at(new DateTime)
+            ->set_start_status();
 
         return parent::create($validation);
     }
@@ -573,6 +623,8 @@ class Model_ContentPost extends ORM implements SeoMetaInterface, ImportedFromWor
 
         $category = $parameters->get(Model_ContentCategory::URL_PARAM);
 
+        $this->filter_user_allowed_statuses();
+
         $this->and_where_open();
 
         // Plain pages
@@ -598,6 +650,24 @@ class Model_ContentPost extends ORM implements SeoMetaInterface, ImportedFromWor
         $this->or_where_close();
 
         $this->and_where_close();
+    }
+
+    public function filter_published()
+    {
+        return $this->filter_status(Model_ContentPostStatus::PUBLISHED_ID);
+    }
+
+    public function filter_user_allowed_statuses()
+    {
+        $user = Env::user(TRUE);
+
+        // Allow moderators find all statuses
+        if ($user && ($user->is_moderator() || $user->is_developer())) {
+            return $this;
+        }
+
+        // Only published posts must be displayed
+        return $this->filter_published();
     }
 
     public function get_public_url()

@@ -5,6 +5,8 @@ use BetaKiller\IFace\IFace;
 
 abstract class AdminBase extends IFace
 {
+    use \BetaKiller\Helper\CurrentUser;
+
     public function before()
     {
         if (!$this->check_iface_permissions())

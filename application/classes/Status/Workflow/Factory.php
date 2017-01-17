@@ -8,7 +8,7 @@ class Status_Workflow_Factory {
     /**
      * @param $name
      * @param Status_Related_Model $model
-     * @return static
+     * @return Status_Workflow
      */
     public function create($name, Status_Related_Model $model)
     {
