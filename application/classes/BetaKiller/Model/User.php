@@ -212,13 +212,20 @@ class User extends \Model_Auth_User implements \Notification_User_Interface //im
 
     public function before_sign_in()
     {
+        $this->check_is_active();
+    }
+
+    protected function check_is_active()
+    {
         // Проверяем активен ли аккаунт
-        if ( ! $this->is_active() )
+        if ( !$this->is_active() )
             throw new \Auth_Exception_Inactive;
     }
 
     public function after_auto_login()
     {
+        $this->check_is_active();
+
         // Проверяем IP-адрес
         if ( ! $this->check_ip() )
             throw new \Auth_Exception_WrongIP;

@@ -2,15 +2,20 @@
 
 use \BetaKiller\IFace\Widget;
 
-class Widget_Auth_Regular extends Widget {
+class Widget_Auth_Regular extends Widget
+{
+    /**
+     * @var Auth
+     * @Inject
+     */
+    private $auth;
 
     /**
      * Action for logging in
      */
     public function action_login()
     {
-        if ( ! $this->request->is_ajax() )
-        {
+        if ( ! $this->request()->is_ajax() ) {
             throw new HTTP_Exception_400('AJAX only gateway');
         }
 
@@ -19,16 +24,17 @@ class Widget_Auth_Regular extends Widget {
 
         $user_login     = $this->request()->post("user-login");
         $user_password  = $this->request()->post("user-password");
+        $remember       = (bool) $this->request()->post("remember");
 
-        if ( ! $user_login OR ! $user_password )
-        {
+        // Sanitize
+        $user_login     = trim(HTML::chars($user_login));
+        $user_password  = trim(HTML::chars($user_password));
+
+        if (!$user_login || !$user_password) {
             throw new HTTP_Exception_400('No username or password sent');
         }
 
-        // TODO валидация данных перед проверкой
-
-        // TODO DI
-        Auth::instance()->login($user_login, $user_password);
+        $this->auth->login($user_login, $user_password, $remember);
 
         // Возвращаем соответствующий ответ
         $this->send_json(Response::JSON_SUCCESS);
@@ -53,5 +59,4 @@ class Widget_Auth_Regular extends Widget {
         $iface = $this->iface_from_codename('Auth_Password_Reset');
         return $iface->url();
     }
-
 }

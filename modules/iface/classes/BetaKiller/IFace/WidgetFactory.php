@@ -1,6 +1,7 @@
 <?php
 namespace BetaKiller\IFace;
 
+use BetaKiller\DI\Container;
 use BetaKiller\Utils\Instance\Cached;
 use Request;
 use Response;
@@ -30,7 +31,11 @@ class WidgetFactory
             $class_name = \Widget_Default::class;
         }
 
-        return new $class_name($name, $request, $response);
+        return Container::instance()->make($class_name, [
+            'name'      =>  $name,
+            'request'   =>  $request,
+            'response'  =>  $response,
+        ]);
     }
 
     protected static function get_class_prefix()

@@ -46,5 +46,6 @@ return array (
   'Your username or email' => 'Ваш е-мэйл или имя пользователя',
   'Your password' => 'Ваш пароль',
   'Forgot password?' => 'Забыли пароль?',
+  'Remember me' => 'Запомнить меня',
   'System error' => 'Системная ошибка',
 );
