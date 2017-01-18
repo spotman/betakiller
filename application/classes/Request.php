@@ -1,6 +1,6 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
-class Request extends Kohana_Request
+class Request extends BetaKiller\Utils\Kohana\Request
 {
     public static function redirect($url)
     {

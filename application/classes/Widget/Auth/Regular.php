@@ -11,20 +11,30 @@ class Widget_Auth_Regular extends Widget
     private $auth;
 
     /**
+     * Widget_Auth_Regular constructor.
+     *
+     * @param \Auth $auth
+     */
+    public function __construct(\Auth $auth)
+    {
+        $this->auth = $auth;
+    }
+
+    /**
      * Action for logging in
      */
     public function action_login()
     {
-        if ( ! $this->request()->is_ajax() ) {
+        if ( ! $this->getRequest()->is_ajax() ) {
             throw new HTTP_Exception_400('AJAX only gateway');
         }
 
         // Magic call for better exception handling
         $this->content_type_json();
 
-        $user_login     = $this->request()->post("user-login");
-        $user_password  = $this->request()->post("user-password");
-        $remember       = (bool) $this->request()->post("remember");
+        $user_login     = $this->getRequest()->post("user-login");
+        $user_password  = $this->getRequest()->post("user-password");
+        $remember       = (bool) $this->getRequest()->post("remember");
 
         // Sanitize
         $user_login     = trim(HTML::chars($user_login));

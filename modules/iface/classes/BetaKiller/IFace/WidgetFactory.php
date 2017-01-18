@@ -3,17 +3,17 @@ namespace BetaKiller\IFace;
 
 use BetaKiller\DI\Container;
 use BetaKiller\Utils\Instance\Cached;
-use Request;
-use Response;
+use BetaKiller\Utils\Kohana\Request;
+use BetaKiller\Utils\Kohana\Response;
 
 class WidgetFactory
 {
     use Cached;
 
     /**
-     * @param                $name
-     * @param \Request|NULL  $request
-     * @param \Response|NULL $response
+     * @param               $name
+     * @param Request|NULL  $request
+     * @param Response|NULL $response
      *
      * @return Widget
      */
@@ -31,11 +31,14 @@ class WidgetFactory
             $class_name = \Widget_Default::class;
         }
 
-        return Container::instance()->make($class_name, [
-            'name'      =>  $name,
-            'request'   =>  $request,
-            'response'  =>  $response,
-        ]);
+        /** @var Widget $object */
+        $object = Container::instance()->get($class_name);
+
+        $object
+            ->setName($name)
+            ->setRequest($request)
+            ->setResponse($response);
+        return $object;
     }
 
     protected static function get_class_prefix()

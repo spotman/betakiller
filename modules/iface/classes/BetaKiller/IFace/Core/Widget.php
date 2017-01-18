@@ -2,16 +2,20 @@
 namespace BetaKiller\IFace\Core;
 
 use BetaKiller\IFace\WidgetFactory;
-use Kohana_Exception;
-use Request;
-use Response;
+use BetaKiller\IFace\Widget\Exception;
+use BetaKiller\Utils\Kohana\Request;
+use BetaKiller\Utils\Kohana\Response;
+use BetaKiller\Utils\Kohana\ControllerHelperTrait;
+
+use View;
 use Route;
 use Validation;
 
-use BetaKiller\IFace\Widget\Exception;
 
-abstract class Widget extends \Controller // TODO Remove extension and replace it via Helper\Controller
+abstract class Widget
 {
+    use ControllerHelperTrait;
+
     const DEFAULT_STATE = 'default';
 
     /**
@@ -29,23 +33,23 @@ abstract class Widget extends \Controller // TODO Remove extension and replace i
      */
     protected $_context = array();
 
-    public function __construct($name, Request $request, Response $response)
-    {
-        parent::__construct($request, $response);
-
-        $this->setName($name);
-
-        $this->_init();
-    }
+    /**
+     * @var Request
+     */
+    protected $request;
 
     /**
-     * Custom widget initialization
-     * You may set $_current_state here
+     * @var Response
      */
-    protected function _init()
-    {
-        // Empty by default
-    }
+    protected $response;
+
+    /**
+     * @param null       $file
+     * @param array|NULL $data
+     *
+     * @return View
+     */
+    abstract protected function view_factory($file = NULL, array $data = NULL);
 
     /**
      * @param string $name Widget name
@@ -58,6 +62,12 @@ abstract class Widget extends \Controller // TODO Remove extension and replace i
     {
         return WidgetFactory::instance()->create($name, $request, $response);
     }
+
+    /**
+     * Widget constructor.
+     * Empty and protected, use WidgetFactory for creating Widget instances
+     */
+    public function __construct() {}
 
     /**
      * Setter for widget name
@@ -119,10 +129,10 @@ abstract class Widget extends \Controller // TODO Remove extension and replace i
         try {
             $response = $this->render();
         } catch (\Exception $e) {
-            $response = Kohana_Exception::_handler($e);
+            $response = Exception::_handler($e);
         }
 
-        return (string)$response;
+        return (string) $response;
     }
 
     /**
@@ -143,7 +153,7 @@ abstract class Widget extends \Controller // TODO Remove extension and replace i
         $this->_render();
 
         // TODO reset data and context for next render
-        return $this->response();
+        return $this->getResponse();
     }
 
     /**
@@ -215,11 +225,6 @@ abstract class Widget extends \Controller // TODO Remove extension and replace i
         $view_path = 'widgets' . DIRECTORY_SEPARATOR . $file;
 
         return $this->view_factory($view_path, $this->getContext());
-    }
-
-    protected function _execute()
-    {
-        throw new Exception('Direct call is not allowed');
     }
 
     protected function get_validation_errors(Validation $validation)

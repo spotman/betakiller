@@ -12,7 +12,7 @@ class Core_Controller_Widget extends Controller {
     {
         $widget_name = $this->param('widget');
 
-        $object = Widget::factory($widget_name, $this->request(), $this->response());
+        $object = Widget::factory($widget_name, $this->getRequest(), $this->getResponse());
 
         if ( ! ($object instanceof Widget) )
             throw new Widget\Exception('Widget controller can not serve objects which are not instance of class Widget');

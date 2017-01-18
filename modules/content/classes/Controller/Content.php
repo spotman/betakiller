@@ -12,7 +12,7 @@ class Controller_Content extends Controller
         if (!$file)
             throw new HTTP_Exception_404();
 
-        $path = '/'.ltrim($this->request()->uri(), "/");
+        $path = '/'.ltrim($this->getRequest()->uri(), "/");
 
         $model = $this->find_content_model_by_wp_path($path);
 

@@ -6,6 +6,6 @@ class Controller_Sitemap extends Controller
     {
         Service_Sitemap::instance()
             ->generate()
-            ->serve($this->response());
+            ->serve($this->getResponse());
     }
 }
