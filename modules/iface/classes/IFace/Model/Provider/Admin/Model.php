@@ -22,6 +22,13 @@ class IFace_Model_Provider_Admin_Model implements IFaceModelInterface
     protected $_title;
 
     /**
+     * Admin IFaces have "admin" layout by default
+     *
+     * @var string
+     */
+    protected $_layout_codename = 'admin';
+
+    /**
      * @var bool
      */
     protected $_has_dynamic_url;
@@ -216,6 +223,7 @@ class IFace_Model_Provider_Admin_Model implements IFaceModelInterface
             'title'             => $this->get_title(),
             'hasDynamicUrl'     => $this->has_dynamic_url(),
             'hideInSiteMap'     => $this->hide_in_site_map(),
+            'layoutCodename'    => $this->get_layout_codename(),
         );
     }
 
@@ -226,8 +234,7 @@ class IFace_Model_Provider_Admin_Model implements IFaceModelInterface
      */
     public function get_layout_codename()
     {
-        // Admin IFaces always have "admin" layout
-        return 'admin';
+        return $this->_layout_codename;
     }
 
     public function from_array(array $data)
@@ -238,24 +245,24 @@ class IFace_Model_Provider_Admin_Model implements IFaceModelInterface
         $this->_label = isset($data['label']) ? $data['label'] : NULL;
         $this->_title = isset($data['title']) ? $data['title'] : NULL;
 
-        if ( isset($data['parentCodename']) )
-        {
+        if ( isset($data['parentCodename']) ) {
             $this->_parent_codename = $data['parentCodename'];
         }
 
-        if ( isset($data['hasDynamicUrl']) )
-        {
+        if ( isset($data['hasDynamicUrl']) ) {
             $this->_has_dynamic_url = TRUE;
         }
 
-        if ( isset($data['hasTreeBehaviour']) )
-        {
+        if ( isset($data['hasTreeBehaviour']) ) {
             $this->_has_tree_behaviour = TRUE;
         }
 
-        if ( isset($data['hideInSiteMap']) )
-        {
+        if ( isset($data['hideInSiteMap']) ) {
             $this->_hide_in_site_map = TRUE;
+        }
+
+        if ( isset($data['layoutCodename']) ) {
+            $this->_layout_codename = $data['layoutCodename'];
         }
     }
 

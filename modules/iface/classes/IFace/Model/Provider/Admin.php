@@ -1,7 +1,6 @@
-<?php use BetaKiller\IFace\IFaceModelInterface;
+<?php
 
-defined('SYSPATH') OR die('No direct script access.');
-
+use BetaKiller\IFace\IFaceModelInterface;
 
 class IFace_Model_Provider_Admin extends IFace_Model_Provider_Abstract {
 
@@ -14,13 +13,11 @@ class IFace_Model_Provider_Admin extends IFace_Model_Provider_Abstract {
     {
         $config_files = Kohana::find_file('config', 'ifaces', 'xml');
 
-        if ( ! $config_files )
-        {
+        if (!$config_files) {
             throw new IFace_Exception('Missing admin config file');
         }
 
-        foreach ( $config_files as $file )
-        {
+        foreach ($config_files as $file) {
             $this->load_xml_config($file);
         }
     }
@@ -72,10 +69,6 @@ class IFace_Model_Provider_Admin extends IFace_Model_Provider_Abstract {
     protected function set_model(IFaceModelInterface $model)
     {
         $codename = $model->get_codename();
-
-        if ( $this->has_model($codename) )
-            throw new IFace_Exception('Duplicate of codename :codename', array(':codename' => $codename));
-
         $this->_models[$codename] = $model;
     }
 
