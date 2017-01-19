@@ -21,11 +21,17 @@ class Kohana extends Base
         /** @url http://php-di.org/doc/performances.html */
         $cache = $config->get('cache');
 
-        if ( $cache ) {
+        if ($cache) {
             if (!($cache instanceof Cache))
-                throw new \Kohana_Exception('php-di cache must be instance of :type', [':type' => Cache::class]);
+                throw new \Kohana_Exception('PHP-DI cache must be instance of :type', [':type' => Cache::class]);
 
-            $cache->setNamespace('kohana-php-di');
+            $ns = $config->get('namespace');
+
+            if (!$ns) {
+                throw new \Exception('PHP-DI container must have a [namespace] defined in config');
+            }
+
+            $cache->setNamespace($ns);
 
             $builder->setDefinitionCache($cache);
 //            $builder->writeProxiesToFile(true, 'tmp/proxies');
