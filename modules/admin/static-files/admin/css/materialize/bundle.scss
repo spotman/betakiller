@@ -1,0 +1,37 @@
+@charset "UTF-8";
+
+$primary-color: #51b746;
+
+$secondary-color: #888888;
+//$secondary-text-color: #888888;
+$border-color: #dedede;
+//$border-color-light: #ececec;
+//$border-color-dark: #4f4f4f;
+$off-black: #313131;
+$text-color: $off-black;
+$link-color: $primary-color;
+
+//$navbar-font-color: $link-color;
+$navbar-height: 60px;
+$navbar-height-mobile: 54px;
+
+$gutter-width: 15px;
+
+// Header Styles
+$h1-fontsize: 1.8rem;
+$h2-fontsize: 1.6rem;
+$h3-fontsize: 1.4rem;
+$h4-fontsize: 1.3rem;
+$h5-fontsize: 1.2rem;
+$h6-fontsize: 1.1rem;
+
+$roboto-font-path: "../../components/materialize/dist/fonts/roboto/";
+
+@import "../../components/materialize/sass/materialize";
+
+$large-and-down: "only screen and (max-width : #{$large-screen})" !default;
+$large-only: "only screen and (min-width : #{$medium-screen-up}) and (max-width : #{$large-screen})" !default;
+$extra-large-and-up: "only screen and (min-width : #{$large-screen-up})" !default;
+
+@import "_prefixer";
+@import "_grid";

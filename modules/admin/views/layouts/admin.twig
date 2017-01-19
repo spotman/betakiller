@@ -1,12 +1,24 @@
-{% include "@layouts/bootstrap/v3" with { withoutRequireJs: true } %}
+{#{% include "@layouts/bootstrap/v3" with { withoutRequireJs: true } %}#}
+
+{{ assets('require.js') }}
 
 {#{{ css("css/layout-admin.css")}}#}
 
-<div class="container-fluid">
+{# TODO include css with materialize build #}
 
-    <header>
-        <nav class="navbar navbar-default"></nav>
-    </header>
+{{ css("admin/css/admin.css") }}
+{{ css("https://fonts.googleapis.com/icon?family=Material+Icons") }}
+
+{{ js("require.js/admin.config.js") }}
+
+<ul id="admin-side-nav" class="side-nav fixed">
+    <li><a href="#!">First Sidebar Link</a></li>
+    <li><a href="#!">Second Sidebar Link</a></li>
+</ul>
+
+<div id="page-container" class="container-fluid">
+
+    {{ widget('Admin_Bar') }}
 
     {#<nav id="admin-top-menu" class="navbar navbar-default">#}
         {#{% include "@templates/layout/logo" with { logoURL: "/admin" } %}#}
@@ -20,22 +32,17 @@
 
     <div class="row">
 
-        <div class="hidden-xs hidden-sm col-md-3 col-lg-2">
+        {#<div class="hidden-xs hidden-sm col-md-3 col-lg-2">#}
             {#{{ widget("Menu_Admin_Left") }}#}
-        </div>
+        {#</div>#}
 
-        <div class="col-xs-12 col-sm-8 col-md-6 col-lg-8">
+        <div class="col s12">
             {% block page_content "" %}
         </div>
-
-        <div class="col-xs-12 col-sm-4 col-md-3 col-lg-2">
-            {#sdf#}
-        </div>
-
     </div>
 
     <footer>
-        <div class="well text-center">no footer yet</div>
+        <div class="col s12">no footer yet</div>
     </footer>
 
 </div>

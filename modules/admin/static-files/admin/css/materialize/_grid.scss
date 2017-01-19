@@ -1,0 +1,34 @@
+.row {
+  .col {
+
+    @media #{$extra-large-and-up} {
+
+      $i: 1;
+      @while $i <= $num-cols {
+        $perc: unquote((100 / ($num-cols / $i)) + "%");
+        &.xl#{$i} {
+          width: $perc;
+          margin-left: auto;
+          left: auto;
+          right: auto;
+        }
+        $i: $i + 1;
+      }
+
+      $i: 1;
+      @while $i <= $num-cols {
+        $perc: unquote((100 / ($num-cols / $i)) + "%");
+        &.offset-xl#{$i} {
+          margin-left: $perc;
+        }
+        &.pull-xl#{$i} {
+          right: $perc;
+        }
+        &.push-xl#{$i} {
+          left: $perc;
+        }
+        $i: $i + 1;
+      }
+    }
+  }
+}

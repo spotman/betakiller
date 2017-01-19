@@ -1,0 +1,15 @@
+@charset "UTF-8";
+
+@import "materialize/bundle";
+
+#page-container {
+  margin-left: 300px;
+  
+  @media #{$medium-and-down} {
+    margin-left: 0;
+  }
+}
+
+#admin-bar * {
+  color: $text-color !important;
+}

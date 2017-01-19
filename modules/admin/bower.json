@@ -1,0 +1,21 @@
+{
+  "name": "spotman/betakiller-admin",
+  "homepage": "https://github.com/spotman/betakiller-admin",
+  "authors": [
+    "Spotman <i.am@spotman.ru>"
+  ],
+  "description": "Admin template frontend for BetaKiller platform",
+  "main": "",
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "static-files/admin/components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "materialize": "^0.97.8"
+  }
+}
