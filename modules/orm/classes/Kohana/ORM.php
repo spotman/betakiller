@@ -129,6 +129,12 @@ class Kohana_ORM extends Model implements Serializable {
 	 */
 	protected $_object_name;
 
+    /**
+     * Model name in lowercase
+     * @var string
+     */
+	protected $_object_name_lowercase;
+
 	/**
 	 * Plural model name
 	 * @var string
@@ -284,12 +290,22 @@ class Kohana_ORM extends Model implements Serializable {
 	 * Prepares the model database connection, determines the table name,
 	 * and loads column information.
 	 *
+     * @throws Exception
 	 * @return void
 	 */
 	protected function _initialize()
 	{
+	    // Replace namespace delimiters with underscore
+	    $class_name = str_replace('\\', '_', get_class($this));
+	    $pos = strpos($class_name, 'Model_');
+
+	    if ($pos === false) {
+            throw new Exception('Incorrect model class naming '.$class_name);
+        }
+
 		// Set the object name and plural name
-		$this->_object_name = strtolower(substr(get_class($this), 6));
+		$this->_object_name = substr($class_name, $pos + 6);
+	    $this->_object_name_lowercase = strtolower($this->_object_name);
 		
 		// Check if this model has already been initialized
 		if ( ! $init = Arr::get(ORM::$_init_cache, $this->_object_name, FALSE))
@@ -303,7 +319,7 @@ class Kohana_ORM extends Model implements Serializable {
 			// Set the object plural name if none predefined
 			if ( ! isset($this->_object_plural))
 			{
-				$init['_object_plural'] = Inflector::plural($this->_object_name);
+				$init['_object_plural'] = Inflector::plural($this->_object_name_lowercase);
 			}
 
 			if ( ! $this->_errors_filename)
@@ -320,7 +336,7 @@ class Kohana_ORM extends Model implements Serializable {
 			if (empty($this->_table_name))
 			{
 				// Table name is the same as the object name
-				$init['_table_name'] = $this->_object_name;
+				$init['_table_name'] = $this->_object_name_lowercase;
 
 				if ($this->_table_names_plural === TRUE)
 				{
@@ -350,7 +366,7 @@ class Kohana_ORM extends Model implements Serializable {
 					$defaults['model'] = str_replace(' ', '_', ucwords(str_replace('_', ' ', $alias)));
 				}
 				
-				$defaults['foreign_key'] = $this->_object_name.$this->_foreign_key_suffix;
+				$defaults['foreign_key'] = $this->_object_name_lowercase.$this->_foreign_key_suffix;
 
 				$init['_has_one'][$alias] = array_merge($defaults, $details);
 			}
@@ -362,7 +378,7 @@ class Kohana_ORM extends Model implements Serializable {
 					$defaults['model'] = str_replace(' ', '_', ucwords(str_replace('_', ' ', Inflector::singular($alias))));
 				}
 				
-				$defaults['foreign_key'] = $this->_object_name.$this->_foreign_key_suffix;
+				$defaults['foreign_key'] = $this->_object_name_lowercase.$this->_foreign_key_suffix;
 				$defaults['through'] = NULL;
 				
 				if ( ! isset($details['far_key']))

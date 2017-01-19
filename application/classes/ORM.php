@@ -1,11 +1,30 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
+use BetaKiller\Utils\Kohana\ORM\OrmInterface;
 use BetaKiller\Utils;
 use BetaKiller\Search\Model\Applicable;
 use BetaKiller\Search\Model\ResultsItem;
 
-class ORM extends Utils\Kohana\ORM implements API_Response_Item, URL_DataSourceInterface, Applicable, ResultsItem
+class ORM extends Utils\Kohana\ORM implements OrmInterface, API_Response_Item, URL_DataSourceInterface, Applicable, ResultsItem
 {
+    /**
+     * @param string $model
+     * @param null   $id
+     *
+     * @return OrmInterface
+     */
+    public static function factory($model, $id = NULL)
+    {
+        // Set class name
+        $class_name = 'Model_'.$model;
+
+        // TODO Create one basic app-namespaced factory and use it in ORM, IFaceFactory, WidgetFactory, etc
+
+        $object = \BetaKiller\DI\Container::instance()->make($class_name, ['id' => $id]);
+
+        return $object;
+    }
+
     /**
      * Default implementation for ORM objects
      * Override this method in child classes

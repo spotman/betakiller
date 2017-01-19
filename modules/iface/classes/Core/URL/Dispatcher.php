@@ -2,11 +2,13 @@
 
 use BetaKiller\IFace\Core\IFace;
 use BetaKiller\IFace\UrlPathIterator;
-use BetaKiller\Utils\Kohana\TreeModel;
+use BetaKiller\Utils\Kohana\TreeModelOrm;
 //use BetaKiller\IFace\HasCustomUrlBehaviour;
 use BetaKiller\IFace\IFaceModelInterface;
 
-abstract class Core_URL_Dispatcher {
+abstract class Core_URL_Dispatcher
+{
+    use \BetaKiller\Helper\InProduction;
 
 //    use \BetaKiller\Utils\Instance\Simple;
 
@@ -99,6 +101,9 @@ abstract class Core_URL_Dispatcher {
             }
             catch ( URL_Dispatcher_Exception $e )
             {
+                if (!$this->in_production(TRUE))
+                    throw $e;
+
                 // Do nothing
             }
 
@@ -137,6 +142,7 @@ abstract class Core_URL_Dispatcher {
      * @param IFace|NULL $parent_iface
      * @return IFace|null
      * @throws URL_Dispatcher_Exception
+     * @throws IFace_Exception
      */
     protected function parse_uri_layer(UrlPathIterator $it, IFace $parent_iface = null)
     {
@@ -148,6 +154,9 @@ abstract class Core_URL_Dispatcher {
         }
         catch (IFace_Exception $e)
         {
+            if (!$this->in_production(TRUE))
+                throw $e;
+
             $parent_url = $parent_iface ? $parent_iface->url($this->parameters(), FALSE) : NULL;
 
             if ($parent_url) {
@@ -173,14 +182,10 @@ abstract class Core_URL_Dispatcher {
         $fixed = [];
         $dynamic = [];
 
-        foreach ($models as $model)
-        {
-            if ($model->has_dynamic_url() || $model->has_tree_behaviour())
-            {
+        foreach ($models as $model) {
+            if ($model->has_dynamic_url() || $model->has_tree_behaviour()) {
                 $dynamic[] = $model;
-            }
-            else
-            {
+            } else {
                 $fixed[] = $model;
             }
         }
@@ -455,8 +460,7 @@ abstract class Core_URL_Dispatcher {
 
         $dataSource = $this->model_factory($model_name);
 
-        if (!$uri_value)
-        {
+        if (!$uri_value) {
             // Allow processing of root element
             $uri_value = $dataSource->get_default_url_value();
         }
@@ -518,10 +522,10 @@ abstract class Core_URL_Dispatcher {
         if ( ! $model )
             throw new URL_Dispatcher_Exception('Can not find :name model in parameters', array(':name' => $model_name));
 
-        if ($is_tree AND !($model instanceof TreeModel))
+        if ($is_tree AND !($model instanceof TreeModelOrm))
             throw new URL_Dispatcher_Exception('Model :model must be instance of :object for tree traversing', [
                 ':model'    =>  get_class($model),
-                ':object'   =>  TreeModel::class,
+                ':object'   =>  TreeModelOrm::class,
             ]);
 
         $parts = [];

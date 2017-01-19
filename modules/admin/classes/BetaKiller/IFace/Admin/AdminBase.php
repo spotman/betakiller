@@ -2,10 +2,11 @@
 namespace BetaKiller\IFace\Admin;
 
 use BetaKiller\IFace\IFace;
+use BetaKiller\Helper\CurrentUser;
 
 abstract class AdminBase extends IFace
 {
-    use \BetaKiller\Helper\CurrentUser;
+    use CurrentUser;
 
     public function before()
     {

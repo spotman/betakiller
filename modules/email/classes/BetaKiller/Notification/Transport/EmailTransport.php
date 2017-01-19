@@ -12,18 +12,18 @@ class EmailTransport extends AbstractTransport implements TransportInterface
         return self::NAME;
     }
 
-    public function isEnabledFor(\Notification_User_Interface $user)
+    public function isEnabledFor(\BetaKiller\Notification\NotificationUserInterface $user)
     {
         return $user->is_email_notification_allowed();
     }
 
     /**
-     * @param \Notification_Message        $message
-     * @param \Notification_User_Interface $user
+     * @param \Notification_Message                              $message
+     * @param \BetaKiller\Notification\NotificationUserInterface $user
      *
      * @return int Number of messages sent
      */
-    public function send(\Notification_Message $message, \Notification_User_Interface $user)
+    public function send(\Notification_Message $message, \BetaKiller\Notification\NotificationUserInterface $user)
     {
         $subj = $message->get_subj();
         $attachments = $message->get_attachments();

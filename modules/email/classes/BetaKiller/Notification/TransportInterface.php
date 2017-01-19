@@ -10,17 +10,17 @@ interface TransportInterface
     public function get_name();
 
     /**
-     * @param \Notification_User_Interface $user
+     * @param \BetaKiller\Notification\NotificationUserInterface $user
      *
      * @return bool
      */
-    public function isEnabledFor(\Notification_User_Interface $user);
+    public function isEnabledFor(\BetaKiller\Notification\NotificationUserInterface $user);
 
     /**
-     * @param \Notification_Message        $message
-     * @param \Notification_User_Interface $user
+     * @param \Notification_Message                              $message
+     * @param \BetaKiller\Notification\NotificationUserInterface $user
      *
      * @return int Number of messages sent
      */
-    public function send(\Notification_Message $message, \Notification_User_Interface $user);
+    public function send(\Notification_Message $message, \BetaKiller\Notification\NotificationUserInterface $user);
 }

@@ -1,5 +1,7 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
+use BetaKiller\Model\UserInterface;
+
 /**
  * Class Assets_Model_ORM
  *
@@ -85,7 +87,7 @@ abstract class Assets_Model_ORM extends ORM implements Assets_ModelInterface {
     /**
      * Returns User model, who uploaded the file
      *
-     * @return Model_User
+     * @return UserInterface
      */
     public function get_uploaded_by()
     {
@@ -95,10 +97,10 @@ abstract class Assets_Model_ORM extends ORM implements Assets_ModelInterface {
     /**
      * Sets user, who uploaded the file
      *
-     * @param Model_User $user
+     * @param UserInterface $user
      * @return $this
      */
-    public function set_uploaded_by(Model_User $user)
+    public function set_uploaded_by(UserInterface $user)
     {
         return $this->set('uploaded_by_user', $user);
     }

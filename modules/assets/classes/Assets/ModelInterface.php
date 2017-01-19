@@ -1,5 +1,7 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
+use BetaKiller\Model\UserInterface;
+
 /**
  * Interface Assets_ModelInterface
  *
@@ -32,17 +34,17 @@ interface Assets_ModelInterface {
     /**
      * Returns User model, who uploaded the file
      *
-     * @return Model_User
+     * @return UserInterface
      */
     public function get_uploaded_by();
 
     /**
      * Sets user, who uploaded the file
      *
-     * @param Model_User $user
+     * @param UserInterface $user
      * @return $this
      */
-    public function set_uploaded_by(Model_User $user);
+    public function set_uploaded_by(UserInterface $user);
 
     /**
      * Returns the date and time when asset was uploaded

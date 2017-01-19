@@ -11,6 +11,7 @@ return [
      * @url http://php-di.org/doc/performances.html
      */
     'cache'         =>  new ArrayCache(),
+    'namespace'     =>  MultiSite::instance()->site_name() .'-php-di-'.\Kohana::$environment_string,
 
     'annotations'   =>  true,
     'autowiring'    =>  true,
@@ -33,13 +34,13 @@ return [
             return $user;
         }),
 
-        \Model_User::class   => DI\get('User'),
+        \BetaKiller\Model\UserInterface::class  => DI\get('User'),
 
-        \BetaKiller\Model\User::class   => DI\get('User'),
+        \Model_User::class  =>  DI\object(\BetaKiller\Model\User::class)->scope(\DI\Scope::PROTOTYPE),
+        \Model_Role::class  =>  DI\object(\BetaKiller\Model\Role::class)->scope(\DI\Scope::PROTOTYPE),
 
-        \BetaKiller\Config\ConfigInterface::class =>  DI\factory(function() {
-            return new \BetaKiller\Config\Config();
-        }),
+        \BetaKiller\Config\ConfigInterface::class       =>  DI\get(\BetaKiller\Config\Config::class),
+        \BetaKiller\Config\AppConfigInterface::class    =>  DI\get(\BetaKiller\Config\AppConfig::class),
 
         // Inject container
         // TODO anti-pattern
@@ -47,7 +48,6 @@ return [
             return \BetaKiller\DI\Container::instance();
         }),
 
-        \BetaKiller\Config\AppConfigInterface::class => DI\get(\BetaKiller\Config\AppConfig::class),
 
         // Use Twig in ifaces and layouts
         View_IFace::class   => DI\get(ViewIFaceTwig::class),

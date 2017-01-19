@@ -1,7 +1,9 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
-class ORM_Verifiable extends ORM {
+use BetaKiller\Model\UserInterface;
 
+class ORM_Verifiable extends ORM
+{
     protected function _initialize()
     {
         $this->belongs_to(array(
@@ -24,7 +26,7 @@ class ORM_Verifiable extends ORM {
     }
 
     /**
-     * @return Model_User
+     * @return UserInterface
      */
     protected function get_approver_relation()
     {
@@ -32,7 +34,7 @@ class ORM_Verifiable extends ORM {
     }
 
     /**
-     * @return Model_User
+     * @return UserInterface
      */
     public function get_approved_user()
     {
@@ -45,7 +47,7 @@ class ORM_Verifiable extends ORM {
     }
 
     /**
-     * @return Model_User
+     * @return UserInterface
      */
     protected function get_creator_relation()
     {
@@ -55,10 +57,10 @@ class ORM_Verifiable extends ORM {
     /**
      * Устанавливает отметку об утверждении
      *
-     * @param Model_User $user
+     * @param UserInterface $user
      * @return $this
      */
-    public function approve(Model_User $user)
+    public function approve(UserInterface $user)
     {
         if ( $this->is_approved() )
             return $this;
@@ -71,10 +73,10 @@ class ORM_Verifiable extends ORM {
     /**
      * Отмечает кем и когда была создана запись
      *
-     * @param Model_User $user
+     * @param UserInterface $user
      * @return $this
      */
-    public function set_creator(Model_User $user)
+    public function set_creator(UserInterface $user)
     {
         return $this
             ->set('creator', $user)
@@ -84,15 +86,15 @@ class ORM_Verifiable extends ORM {
     /**
      * Returns TRUE if provided user created current record
      *
-     * @param Model_User $user
+     * @param UserInterface $user
      * @return bool
      */
-    public function is_creator(Model_User $user)
+    public function is_creator(UserInterface $user)
     {
         return ( $user->pk() == $this->get_creator_relation()->pk() );
     }
 
-    public function filter_approved_with_acl(Model_User $current_user = NULL)
+    public function filter_approved_with_acl(UserInterface $current_user = NULL)
     {
         $is_moderator = $current_user AND $current_user->is_moderator();
 
@@ -119,14 +121,14 @@ class ORM_Verifiable extends ORM {
         return $this->where($this->object_column("approved_by"), "IS NOT", NULL);
     }
 
-    protected function _autocomplete($term, array $search_fields, $as_key_label_pairs = false)
+    public function autocomplete($term, array $search_fields, $as_key_label_pairs = false)
     {
         $current_user = Env::user(TRUE);
 
         // Фильтруем неподтверждённые варианты выбора, если это нужно
         $this->filter_approved_with_acl($current_user);
 
-        return parent::_autocomplete($term, $search_fields, $as_key_label_pairs);
+        return parent::autocomplete($term, $search_fields, $as_key_label_pairs);
     }
 
     public function order_by_created_at($order = "DESC")
@@ -138,5 +140,4 @@ class ORM_Verifiable extends ORM {
     {
         return $this->order_by('approved_at', $order);
     }
-
 }

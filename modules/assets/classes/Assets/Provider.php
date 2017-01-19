@@ -1,6 +1,7 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
 use BetaKiller\Config\ConfigInterface;
+use BetaKiller\Model\UserInterface;
 
 abstract class Assets_Provider {
 
@@ -23,12 +24,12 @@ abstract class Assets_Provider {
     private $_config;
 
     /**
-     * @var \Model_User
+     * @var UserInterface
      */
     private $_user;
 
 
-    public function __construct(ConfigInterface $config, \Model_User $user)
+    public function __construct(ConfigInterface $config, UserInterface $user)
     {
         $this->_config = $config;
         $this->_user = $user;

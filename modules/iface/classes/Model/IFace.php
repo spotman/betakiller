@@ -1,7 +1,7 @@
 <?php
 
 use BetaKiller\IFace\IFaceModelInterface;
-use BetaKiller\Utils\Kohana\TreeModel;
+use BetaKiller\Utils\Kohana\TreeModelOrm;
 
 /**
  * Class Model_IFace
@@ -9,7 +9,7 @@ use BetaKiller\Utils\Kohana\TreeModel;
  * @author     Spotman
  * @package    Betakiller
  */
-class Model_IFace extends TreeModel implements IFaceModelInterface
+class Model_IFace extends TreeModelOrm implements IFaceModelInterface
 {
     protected function _initialize()
     {
@@ -40,7 +40,7 @@ class Model_IFace extends TreeModel implements IFaceModelInterface
     /**
      * Return parent iface model or NULL
      *
-     * @return IFaceModelInterface|\BetaKiller\Utils\Kohana\TreeModel
+     * @return IFaceModelInterface|\BetaKiller\Utils\Kohana\TreeModelOrm
      */
     public function get_parent()
     {

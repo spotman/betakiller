@@ -1,6 +1,8 @@
-<?php defined('SYSPATH') OR die('No direct script access.');
+<?php use BetaKiller\Notification\NotificationUserInterface;
 
-class Notification_User_Email implements Notification_User_Interface {
+defined('SYSPATH') OR die('No direct script access.');
+
+class Notification_User_Email implements NotificationUserInterface {
 
     protected $_email;
 

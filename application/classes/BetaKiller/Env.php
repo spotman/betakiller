@@ -54,7 +54,7 @@ class BetaKiller_Env
      * Хелпер для получения текущего пользователя
      * @deprecated
      * @param bool $allow_guest
-     * @return Model_User|NULL
+     * @return \BetaKiller\Model\UserInterface|NULL
      * @throws HTTP_Exception_401
      */
     public static function user($allow_guest = FALSE)

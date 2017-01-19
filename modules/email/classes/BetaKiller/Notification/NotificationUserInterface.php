@@ -1,6 +1,7 @@
-<?php defined('SYSPATH') OR die('No direct script access.');
+<?php
+namespace BetaKiller\Notification;
 
-interface Notification_User_Interface
+interface NotificationUserInterface
 {
     /**
      * Returns user ID
@@ -26,4 +27,4 @@ interface Notification_User_Interface
      */
     public function is_online_notification_allowed();
 
-};
+}

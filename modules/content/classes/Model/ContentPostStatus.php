@@ -2,9 +2,10 @@
 
 class Model_ContentPostStatus extends Status_Model
 {
-    const DRAFT_ID = 1;
-    const PUBLISHED_ID = 2;
-    const PAUSED_ID = 3;
+    const INCOMPLETE_ID = 1;
+    const PENDING_ID = 2;
+    const PUBLISHED_ID = 3;
+    const PAUSED_ID = 4;
 
     protected $_table_name = 'content_post_statuses';
 

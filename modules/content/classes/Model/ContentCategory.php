@@ -1,10 +1,10 @@
 <?php
 
-use \BetaKiller\Utils\Kohana\TreeModel;
+use \BetaKiller\Utils\Kohana\TreeModelOrm;
 use \BetaKiller\Content\ImportedFromWordpressInterface;
 use BetaKiller\Helper\SeoMetaInterface;
 
-class Model_ContentCategory extends TreeModel implements SeoMetaInterface, ImportedFromWordpressInterface
+class Model_ContentCategory extends TreeModelOrm implements SeoMetaInterface, ImportedFromWordpressInterface
 {
     use BetaKiller\Helper\IFace;
     use Model_ORM_ImportedFromWordpressTrait,

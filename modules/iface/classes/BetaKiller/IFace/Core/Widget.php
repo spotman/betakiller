@@ -18,6 +18,9 @@ abstract class Widget
 
     const DEFAULT_STATE = 'default';
 
+    const JSON_SUCCESS = Response::JSON_SUCCESS;
+    const JSON_ERROR = Response::JSON_ERROR;
+
     /**
      * @var string
      */

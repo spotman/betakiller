@@ -1,5 +1,6 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
+use BetaKiller\Notification\NotificationUserInterface;
 use BetaKiller\Notification\TransportInterface;
 
 abstract class Kohana_Notification_Message {
@@ -7,12 +8,12 @@ abstract class Kohana_Notification_Message {
     use \BetaKiller\Utils\Instance\Simple;
 
     /**
-     * @var Notification_User_Interface
+     * @var NotificationUserInterface
      */
     protected $_from;
 
     /**
-     * @var Notification_User_Interface[]
+     * @var NotificationUserInterface[]
      */
     protected $_to = array();
 
@@ -46,7 +47,7 @@ abstract class Kohana_Notification_Message {
     protected $_template_data = [];
 
     /**
-     * @return Notification_User_Interface
+     * @return NotificationUserInterface
      */
     public function get_from()
     {
@@ -54,17 +55,18 @@ abstract class Kohana_Notification_Message {
     }
 
     /**
-     * @param Notification_User_Interface $value
-     * @return $this
+     * @param NotificationUserInterface $value
+     *
+*@return $this
      */
-    public function set_from(Notification_User_Interface $value)
+    public function set_from(NotificationUserInterface $value)
     {
         $this->_from = $value;
         return $this;
     }
 
     /**
-     * @return Notification_User_Interface[]
+     * @return NotificationUserInterface[]
      */
     public function get_to()
     {
@@ -84,10 +86,11 @@ abstract class Kohana_Notification_Message {
     }
 
     /**
-     * @param Notification_User_Interface $value
-     * @return $this
+     * @param NotificationUserInterface $value
+     *
+*@return $this
      */
-    public function set_to(Notification_User_Interface $value)
+    public function set_to(NotificationUserInterface $value)
     {
         $this->_to[] = $value;
         return $this;

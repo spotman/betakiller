@@ -662,7 +662,8 @@ class Model_ContentPost extends Status_Related_Model implements SeoMetaInterface
         $user = Env::user(TRUE);
 
         // Allow moderators find all statuses
-        if ($user && ($user->is_moderator() || $user->is_developer())) {
+        // TODO Statuses ACL instead of this ugly thing
+        if ($user && ($user->is_moderator() || $user->is_developer() || $user->has_role('content'))) {
             return $this;
         }
 

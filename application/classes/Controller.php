@@ -80,6 +80,10 @@ abstract class Controller extends Controller_Proxy
             }
         }
 
+        if (!$user_lang) {
+            $user_lang = I18n::lang_list()[0];
+        }
+
         // Store lang in cookie
         Cookie::set(I18n::COOKIE_NAME, $user_lang);
 

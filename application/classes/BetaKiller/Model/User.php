@@ -1,8 +1,12 @@
 <?php
 namespace BetaKiller\Model;
 
-class User extends \Model_Auth_User implements \Notification_User_Interface //implements ACL_Role_Interface
+use BetaKiller\Exception;
+
+class User extends \Model_Auth_User implements UserInterface
 {
+    protected $_table_name = 'users';
+
     protected $_reload_on_wakeup = FALSE;
 
     protected function _initialize()
@@ -24,7 +28,7 @@ class User extends \Model_Auth_User implements \Notification_User_Interface //im
     }
 
     /**
-     * @return \Model_Role
+     * @return RoleInterface
      */
     protected function get_roles_relation()
     {
@@ -85,7 +89,7 @@ class User extends \Model_Auth_User implements \Notification_User_Interface //im
      */
     public function is_developer()
     {
-        return $this->has_role(\Model_Role::DEVELOPERS_ROLE_NAME);
+        return $this->has_role(Role::DEVELOPERS_ROLE_NAME);
     }
 
     /**
@@ -93,52 +97,68 @@ class User extends \Model_Auth_User implements \Notification_User_Interface //im
      */
     public function is_moderator()
     {
-        return $this->has_role(\Model_Role::MODERATORS_ROLE_NAME);
+        return $this->has_role(Role::MODERATORS_ROLE_NAME);
+    }
+
+    /**
+     * @return bool
+     */
+    protected function is_writer()
+    {
+        return $this->has_role(Role::WRITER_ROLE_NAME);
     }
 
     /**
      * @todo Переписать на кешированный ACL ибо слишком затратно делать запрос в БД на проверку роли
      *
-     * @param \Model_Role|string $role
+     * @param RoleInterface|string $role
      * @return bool
      */
     public function has_role($role)
     {
-        if ( ! ($role instanceof \Model_Role) )
-        {
-            /** @var \Model_Role $orm */
-            $orm = \ORM::factory('Role');
-            $role = $orm->get_by_name($role);
-        }
+        $role = $this->prepare_role_object($role);
 
         return $this->has('roles', $role);
     }
 
-    public function add_developers_role()
-    {
-        return $this->add_role(\Model_Role::DEVELOPERS_ROLE_NAME);
-    }
-
     public function add_role($role)
     {
-        if ( ! ($role instanceof \Model_Role) )
-        {
-            /** @var \Model_Role $orm */
-            $orm = \ORM::factory('Role');
-            $role = $orm->get_by_name($role);
-        }
+        $role = $this->prepare_role_object($role);
 
         return $this->add('roles', $role);
     }
 
+    /**
+     * @param string|RoleInterface $role
+     *
+     * @return \BetaKiller\Model\RoleInterface
+     * @throws \BetaKiller\Exception
+     */
+    protected function prepare_role_object($role)
+    {
+        if (is_string($role)) {
+            /** @var RoleInterface $orm */
+            $orm = \ORM::factory('Role');
+            $role = $orm->get_by_name($role);
+        }
+
+        if ( !($role instanceof RoleInterface) ) {
+            throw new Exception('Role object must be instance of :needs', [':needs' => RoleInterface::class]);
+        }
+
+        return $role;
+    }
+
+    /**
+     * @return $this
+     */
     public function add_all_available_roles()
     {
-        /** @var \Model_Role $orm */
+        /** @var RoleInterface $orm */
         $orm = \ORM::factory('Role');
         $roles = $orm->find_all();
 
-        foreach ($roles as $role)
-        {
+        foreach ($roles as $role) {
             $this->add_role($role);
         }
 
@@ -168,7 +188,7 @@ class User extends \Model_Auth_User implements \Notification_User_Interface //im
             ? $lang_model->get_name()
             : NULL;
 
-        return $lang ?: "ru";
+        return $lang;
     }
 
     /**
@@ -269,7 +289,7 @@ class User extends \Model_Auth_User implements \Notification_User_Interface //im
 
     public function get_full_name()
     {
-        return $this->get_first_name() .' '. $this->get_last_name();
+        return $this->get_first_name().' '.$this->get_last_name();
     }
 
     public function get_first_name()
@@ -318,22 +338,22 @@ class User extends \Model_Auth_User implements \Notification_User_Interface //im
     }
 
     /**
-     * @return \Database_Result|\Model_User[]
+     * @return \Database_Result|UserInterface[]
      */
     public function get_developers_list()
     {
-        /** @var \Model_Role $roles_orm */
+        /** @var RoleInterface $roles_orm */
         $roles_orm = \ORM::factory('Role');
 
         return $roles_orm->developers()->get_users()->find_all();
     }
 
     /**
-     * @return \Database_Result|\Model_User[]
+     * @return \Database_Result|UserInterface[]
      */
     public function get_moderators_list()
     {
-        /** @var \Model_Role $roles_orm */
+        /** @var RoleInterface $roles_orm */
         $roles_orm = \ORM::factory('Role');
 
         return $roles_orm->moderators()->get_users()->find_all();
@@ -355,7 +375,7 @@ class User extends \Model_Auth_User implements \Notification_User_Interface //im
      */
     public function is_admin_allowed()
     {
-        return ($this->is_moderator() OR $this->is_developer());
+        return ($this->is_moderator() || $this->is_developer() || $this->is_writer());
     }
 
     public function as_array()

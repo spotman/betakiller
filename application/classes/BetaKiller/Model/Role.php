@@ -1,9 +1,13 @@
-<?php defined('SYSPATH') OR die('No direct script access.');
+<?php
+namespace BetaKiller\Model;
 
-class BetaKiller_Model_Role extends Model_Auth_Role
+use Model_Auth_Role;
+
+class Role extends Model_Auth_Role implements RoleInterface
 {
     const DEVELOPERS_ROLE_NAME  = 'developer';
-    const MODERATORS_ROLE_NAME   = 'moderator';
+    const MODERATORS_ROLE_NAME  = 'moderator';
+    const WRITER_ROLE_NAME      = 'writer';
 
     public function get_name()
     {
@@ -12,8 +16,10 @@ class BetaKiller_Model_Role extends Model_Auth_Role
 
     /**
      * Ищет глобальную роль по её имени
-     * @param $name
-     * @return Model_Role
+     *
+     * @param string $name
+     *
+     * @return RoleInterface
      */
     public function get_by_name($name)
     {
@@ -24,13 +30,14 @@ class BetaKiller_Model_Role extends Model_Auth_Role
      * Returns filtered users relation
      *
      * @param bool $include_not_active
-     * @return Model_User
+     *
+     * @return UserInterface
      */
     public function get_users($include_not_active = FALSE)
     {
         $users = $this->get_users_relation();
 
-        if ( ! $include_not_active )
+        if (!$include_not_active)
             $users->filter_active();
 
         return $users;
@@ -39,7 +46,7 @@ class BetaKiller_Model_Role extends Model_Auth_Role
     /**
      * Returns relation for users with current role
      *
-     * @return Model_User
+     * @return UserInterface
      */
     protected function get_users_relation()
     {
@@ -50,7 +57,7 @@ class BetaKiller_Model_Role extends Model_Auth_Role
      * Returns list of all roles IDs
      * Useful for getting all user`s roles IDs
      *
-     * @return array
+     * @return int[]
      */
     public function find_all_ids()
     {
@@ -60,7 +67,7 @@ class BetaKiller_Model_Role extends Model_Auth_Role
     /**
      * Returns "Developers" role object
      *
-     * @return Model_Role
+     * @return RoleInterface
      */
     public function developers()
     {
@@ -70,7 +77,7 @@ class BetaKiller_Model_Role extends Model_Auth_Role
     /**
      * Returns "Developers" role object
      *
-     * @return Model_Role
+     * @return RoleInterface
      */
     public function moderators()
     {

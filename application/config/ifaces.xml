@@ -1,13 +1,17 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <root>
+    <!-- Auth common ifaces -->
     <iface uri="login" codename="Auth_Login" title="Sign in" layoutCodename="auth" hideInSiteMap="true" />
     <iface uri="logout" codename="Auth_Logout" title="Sign out" hideInSiteMap="true" />
     <iface uri="change-account" codename="Auth_ReLogin" title="Change account" layoutCodename="auth" hideInSiteMap="true" />
+    <!--<iface uri="password-reset" codename="Auth_Password_Reset" title="Reset password" layoutCodename="auth" hideInSiteMap="true" />-->
 
-    <iface uri="password-reset" codename="Auth_Password_Reset" title="Reset password" hideInSiteMap="true" layoutCodename="auth" />
-
-    <!--<iface uri="admin" codename="Admin_Index" title="Admin zone">-->
+    <iface uri="admin" codename="Admin_Index" title="Admin zone" hideInSiteMap="true">
         <!--<iface uri="users" codename="Admin_User" title="User management"></iface>-->
         <!--<iface uri="ifaces" codename="Admin_IFace_List" title="IFace management"></iface>-->
-    <!--</iface>-->
+    </iface>
 </root>
+
+<!-- TODO убрать этот файл после того как будет настроено нормальное дерево интерфейсов -->
+<!-- https://symfony.com/doc/current/components/config/definition.html -->
+

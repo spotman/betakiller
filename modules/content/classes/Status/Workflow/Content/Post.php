@@ -2,8 +2,11 @@
 
 class Status_Workflow_Content_Post extends Status_Workflow
 {
-    const TRANSITION_PUBLISH = 'publish';
-    const TRANSITION_PAUSE = 'pause';
+    const TRANSITION_COMPLETE   = 'complete';
+    const TRANSITION_REJECT     = 'reject';
+    const TRANSITION_PUBLISH    = 'publish';
+    const TRANSITION_PAUSE      = 'pause';
+    const TRANSITION_FIX        = 'fix';
 
     public function draft()
     {
@@ -16,6 +19,13 @@ class Status_Workflow_Content_Post extends Status_Workflow
 
         $this->model()->set_start_status();
     }
+
+    public function complete()
+    {
+        // TODO Notify
+        $this->do_transition(self::TRANSITION_COMPLETE);
+    }
+
 
     public function publish()
     {

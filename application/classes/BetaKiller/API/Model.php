@@ -7,7 +7,7 @@ abstract class BetaKiller_API_Model extends Core_API_Model
     /**
      * @param string $name
      * @param int|NULL $id
-     * @return ORM
+     * @return \BetaKiller\Utils\Kohana\ORM\OrmInterface
      * @throws API_Model_Exception
      */
     protected function orm_model_factory($name, $id = NULL)
