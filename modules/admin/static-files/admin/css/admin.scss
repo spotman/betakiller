@@ -2,11 +2,29 @@
 
 @import "materialize/bundle";
 
-#page-container {
+#admin-page-container {
   margin-left: 300px;
-  
+
+  #admin-bar nav {
+    padding-right: 300px;
+  }
+
   @media #{$medium-and-down} {
     margin-left: 0;
+
+    #admin-bar nav {
+      padding-right: 0;
+    }
+  }
+
+
+}
+
+#admin-side-nav {
+  background-color: $off-black;
+
+  a {
+    color: white;
   }
 }
 

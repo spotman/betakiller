@@ -4,8 +4,7 @@
 
 {#{{ css("css/layout-admin.css")}}#}
 
-{# TODO include css with materialize build #}
-
+{# include css with materialize build #}
 {{ css("admin/css/admin.css") }}
 {{ css("https://fonts.googleapis.com/icon?family=Material+Icons") }}
 
@@ -16,7 +15,7 @@
     <li><a href="#!">Second Sidebar Link</a></li>
 </ul>
 
-<div id="page-container" class="container-fluid">
+<div id="admin-page-container" class="">
 
     {{ widget('Admin_Bar') }}
 
@@ -31,10 +30,6 @@
     {#</nav>#}
 
     <div class="row">
-
-        {#<div class="hidden-xs hidden-sm col-md-3 col-lg-2">#}
-            {#{{ widget("Menu_Admin_Left") }}#}
-        {#</div>#}
 
         <div class="col s12">
             {% block page_content "" %}
