@@ -18,6 +18,9 @@ class ORM extends Utils\Kohana\ORM implements OrmInterface, API_Response_Item, U
         // Set class name
         $class_name = 'Model_'.$model;
 
+        // Coz ORM do not cares about letter cases
+        $class_name = str_replace(' ', '_', ucwords(str_replace('_', ' ', $class_name)));
+
         // TODO Create one basic app-namespaced factory and use it in ORM, IFaceFactory, WidgetFactory, etc
 
         $object = \BetaKiller\DI\Container::instance()->make($class_name, ['id' => $id]);
