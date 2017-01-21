@@ -133,7 +133,7 @@ class Kohana_ORM extends Model implements Serializable {
      * Model name in lowercase
      * @var string
      */
-	protected $_object_name_lowercase;
+//	protected $_object_name_lowercase;
 
 	/**
 	 * Plural model name
@@ -304,8 +304,8 @@ class Kohana_ORM extends Model implements Serializable {
         }
 
 		// Set the object name and plural name
-		$this->_object_name = substr($class_name, $pos + 6);
-	    $this->_object_name_lowercase = strtolower($this->_object_name);
+		$this->_object_name = strtolower(substr($class_name, $pos + 6));
+//	    $this->_object_name_lowercase = strtolower($this->_object_name);
 		
 		// Check if this model has already been initialized
 		if ( ! $init = Arr::get(ORM::$_init_cache, $this->_object_name, FALSE))
@@ -319,7 +319,7 @@ class Kohana_ORM extends Model implements Serializable {
 			// Set the object plural name if none predefined
 			if ( ! isset($this->_object_plural))
 			{
-				$init['_object_plural'] = Inflector::plural($this->_object_name_lowercase);
+				$init['_object_plural'] = Inflector::plural($this->_object_name);
 			}
 
 			if ( ! $this->_errors_filename)
@@ -336,7 +336,7 @@ class Kohana_ORM extends Model implements Serializable {
 			if (empty($this->_table_name))
 			{
 				// Table name is the same as the object name
-				$init['_table_name'] = $this->_object_name_lowercase;
+				$init['_table_name'] = $this->_object_name;
 
 				if ($this->_table_names_plural === TRUE)
 				{
@@ -366,7 +366,7 @@ class Kohana_ORM extends Model implements Serializable {
 					$defaults['model'] = str_replace(' ', '_', ucwords(str_replace('_', ' ', $alias)));
 				}
 				
-				$defaults['foreign_key'] = $this->_object_name_lowercase.$this->_foreign_key_suffix;
+				$defaults['foreign_key'] = $this->_object_name.$this->_foreign_key_suffix;
 
 				$init['_has_one'][$alias] = array_merge($defaults, $details);
 			}
@@ -378,7 +378,7 @@ class Kohana_ORM extends Model implements Serializable {
 					$defaults['model'] = str_replace(' ', '_', ucwords(str_replace('_', ' ', Inflector::singular($alias))));
 				}
 				
-				$defaults['foreign_key'] = $this->_object_name_lowercase.$this->_foreign_key_suffix;
+				$defaults['foreign_key'] = $this->_object_name.$this->_foreign_key_suffix;
 				$defaults['through'] = NULL;
 				
 				if ( ! isset($details['far_key']))
@@ -577,7 +577,7 @@ class Kohana_ORM extends Model implements Serializable {
 	public function changed($field = NULL)
 	{
 		return ($field === NULL)
-			? $this->_changed
+			? (bool) $this->_changed
 			: Arr::get($this->_changed, $field);
 	}
 
@@ -660,7 +660,7 @@ class Kohana_ORM extends Model implements Serializable {
 			$model = $this->_related($column);
 
 			// Use this model's primary key value and foreign model's column
-			$col = $model->_object_name.'.'.$this->_has_one[$column]['foreign_key'];
+			$col = $model->object_name().'.'.$this->_has_one[$column]['foreign_key'];
 			$val = $this->pk();
 
 			$model->where($col, '=', $val)->find();
@@ -678,7 +678,7 @@ class Kohana_ORM extends Model implements Serializable {
 
 				// Join on through model's target foreign key (far_key) and target model's primary key
 				$join_col1 = $through.'.'.$this->_has_many[$column]['far_key'];
-				$join_col2 = $model->_object_name.'.'.$model->_primary_key;
+				$join_col2 = $model->object_name().'.'.$model->primary_key();
 
 				$model->join($through)->on($join_col1, '=', $join_col2);
 
@@ -689,7 +689,7 @@ class Kohana_ORM extends Model implements Serializable {
 			else
 			{
 				// Simple has_many relationship, search where target model's foreign key is this model's primary key
-				$col = $model->_object_name.'.'.$this->_has_many[$column]['foreign_key'];
+				$col = $model->object_name().'.'.$this->_has_many[$column]['foreign_key'];
 				$val = $this->pk();
 			}
 
