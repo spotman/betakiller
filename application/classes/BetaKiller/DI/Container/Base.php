@@ -7,6 +7,9 @@ use Interop\Container\Exception\ContainerException;
 use Interop\Container\Exception\NotFoundException;
 
 use BetaKiller\Utils\Instance\Singleton;
+use Invoker\Exception\InvocationException;
+use Invoker\Exception\NotCallableException;
+use Invoker\Exception\NotEnoughParametersException;
 
 abstract class Base implements ContainerInterface
 {
@@ -76,7 +79,7 @@ abstract class Base implements ContainerInterface
      * Resolves an entry by its name. If given a class name, it will return a new instance of that class.
      *
      * @param string $name Entry name or a class name.
-     * @param array $parameters Optional parameters to use to build the entry. Use this to force specific
+     * @param array  $parameters Optional parameters to use to build the entry. Use this to force specific
      *                           parameters to specific values. Parameters not defined in this array will
      *                           be automatically resolved.
      *
@@ -88,5 +91,22 @@ abstract class Base implements ContainerInterface
     public function make($name, array $parameters = [])
     {
         return $this->getContainer()->make($name, $parameters);
+    }
+
+    /**
+     * Call the given function using the given parameters.
+     *
+     * @param callable $callable Function to call.
+     * @param array    $parameters Parameters to use.
+     *
+     * @return mixed Result of the function.
+     *
+     * @throws InvocationException Base exception class for all the sub-exceptions below.
+     * @throws NotCallableException
+     * @throws NotEnoughParametersException
+     */
+    public function call($callable, array $parameters = [])
+    {
+        return $this->getContainer()->call($callable, $parameters);
     }
 }

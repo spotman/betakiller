@@ -1,12 +1,20 @@
 <?php
 namespace BetaKiller\IFace\Admin;
 
+use BetaKiller\Acl\Resource\AdminResource;
 use BetaKiller\IFace\IFace;
 use BetaKiller\Helper\CurrentUser;
 
 abstract class AdminBase extends IFace
 {
     use CurrentUser;
+
+    protected $adminAclResource;
+
+    public function __construct(AdminResource $adminResource)
+    {
+        $this->adminAclResource = $adminResource;
+    }
 
     public function before()
     {
@@ -16,6 +24,7 @@ abstract class AdminBase extends IFace
 
     protected function check_iface_permissions()
     {
+        $this->adminAclResource->isEnabled();
         // Force authorization
         return $this->current_user()->is_admin_allowed();
     }

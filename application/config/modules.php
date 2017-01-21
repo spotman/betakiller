@@ -9,6 +9,8 @@ return array(
     // Place it first for correct initialization of per-site classes and configs
     'multi-site'            => MODPATH.'multi-site',            // Multiple apps on top of single engine
 
+    'rbac'                  => MODPATH.'rbac',                 // Role based access control
+
     'admin'                 => MODPATH.'admin',                 // Basic admin
     'api'                   => MODPATH.'api',                   // API subsystem
     'assets'                => MODPATH.'assets',                // Asset management subsystem
