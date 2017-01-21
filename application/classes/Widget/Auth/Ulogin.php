@@ -8,7 +8,7 @@ class Widget_Auth_Ulogin extends Widget {
     {
         $instance = $this->ulogin_factory();
 
-        $auth_callback = $instance->get_widget_id().'_auth_callback';
+        $auth_callback = 'ulogin_auth_callback'; // $instance->get_widget_id()
         $instance->set_javascript_callback($auth_callback);
 
         return array(
