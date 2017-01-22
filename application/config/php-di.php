@@ -3,7 +3,17 @@
 use BetaKiller\View\ViewIFaceTwig;
 use BetaKiller\View\ViewLayoutTwig;
 use BetaKiller\View\ViewWrapperTwig;
-use \Doctrine\Common\Cache\ArrayCache;
+use Doctrine\Common\Cache\ArrayCache;
+
+use Spotman\Acl\ResourcesCollector\ResourcesCollectorInterface;
+use Spotman\Acl\RolesCollector\RolesCollectorInterface;
+use Spotman\Acl\PermissionsCollector\PermissionsCollectorInterface;
+use Spotman\Acl\ResourceFactory\ResourceFactoryInterface;
+
+use BetaKiller\Acl\RolesCollector;
+use BetaKiller\Acl\ResourcesCollector;
+use BetaKiller\Acl\PermissionsCollector;
+use BetaKiller\Acl\ResourceFactory;
 
 return [
 
@@ -35,6 +45,7 @@ return [
         }),
 
         \BetaKiller\Model\UserInterface::class  => DI\get('User'),
+        \BetaKiller\Model\RoleInterface::class  => DI\get(\BetaKiller\Model\Role::class),
 
         \Model_User::class  =>  DI\object(\BetaKiller\Model\User::class)->scope(\DI\Scope::PROTOTYPE),
         \Model_Role::class  =>  DI\object(\BetaKiller\Model\Role::class)->scope(\DI\Scope::PROTOTYPE),
@@ -48,6 +59,11 @@ return [
             return \BetaKiller\DI\Container::instance();
         }),
 
+        // Acl roles, resources, permissions and resource factory
+        RolesCollectorInterface::class          => DI\get(RolesCollector::class),
+        ResourcesCollectorInterface::class      => DI\get(ResourcesCollector::class),
+        PermissionsCollectorInterface::class    => DI\get(PermissionsCollector::class),
+        ResourceFactoryInterface::class         => DI\get(ResourceFactory::class),
 
         // Use Twig in ifaces and layouts
         View_IFace::class   => DI\get(ViewIFaceTwig::class),

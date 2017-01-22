@@ -390,4 +390,19 @@ class User extends \Model_Auth_User implements UserInterface
         ];
     }
 
+    /**
+     * @return string
+     */
+    public function getAccessControlIdentity()
+    {
+        return $this->get_username();
+    }
+
+    /**
+     * @return RoleInterface[]|\Traversable
+     */
+    public function getAccessControlRoles()
+    {
+        return $this->get_roles_relation()->find_all()->as_array();
+    }
 }

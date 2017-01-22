@@ -3,8 +3,9 @@ namespace BetaKiller\Model;
 
 use BetaKiller\Utils\Kohana\ORM\OrmInterface;
 use BetaKiller\Notification\NotificationUserInterface;
+use Spotman\Acl\AclUserInterface;
 
-interface UserInterface extends OrmInterface, NotificationUserInterface //implements ACL_Role_Interface
+interface UserInterface extends OrmInterface, NotificationUserInterface, AclUserInterface //implements ACL_Role_Interface
 {
     // Auth_ORM methods
     public function complete_login();

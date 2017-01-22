@@ -24,7 +24,8 @@ abstract class AdminBase extends IFace
 
     protected function check_iface_permissions()
     {
-        $this->adminAclResource->isEnabled();
+        // TODO
+//        $this->adminAclResource->isEnabled();
         // Force authorization
         return $this->current_user()->is_admin_allowed();
     }

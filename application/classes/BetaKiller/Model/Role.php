@@ -83,4 +83,14 @@ class Role extends Model_Auth_Role implements RoleInterface
     {
         return $this->get_by_name(self::MODERATORS_ROLE_NAME);
     }
+
+    /**
+     * Returns the string identifier of the Role
+     *
+     * @return string
+     */
+    public function getRoleId()
+    {
+        return $this->get_name();
+    }
 }

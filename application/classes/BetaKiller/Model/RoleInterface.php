@@ -2,8 +2,9 @@
 namespace BetaKiller\Model;
 
 use BetaKiller\Utils\Kohana\ORM\OrmInterface;
+use Spotman\Acl\AclRoleInterface;
 
-interface RoleInterface extends OrmInterface
+interface RoleInterface extends OrmInterface, AclRoleInterface
 {
     // Model_Auth_Role methods (nothing special)
 
