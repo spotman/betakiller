@@ -112,30 +112,18 @@ try
 catch (Exception $e)
 {
     @ ob_end_clean();
-
     http_response_code(500);
 
-    if (class_exists('Kohana'))
-    {
-        $in_dev = in_array(Kohana::$environment, [Kohana::DEVELOPMENT, Kohana::TESTING]);
-    }
-    else
-    {
-        $in_dev = FALSE;
-    }
-
+    $in_dev = class_exists('Kohana') ? in_array(Kohana::$environment, [Kohana::DEVELOPMENT, Kohana::TESTING]) : false;
     $message = $e->getMessage().PHP_EOL.PHP_EOL.$e->getTraceAsString();
-    if ($in_dev)
-    {
+
+    if ($in_dev) {
         // Show to dev
         echo (PHP_SAPI == 'cli') ? $message : nl2br($message);
-    }
-    else
-    {
+    } else {
         // Write to default log
         error_log($message);
     }
-
     return;
 }
 

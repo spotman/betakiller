@@ -3,6 +3,7 @@ namespace BetaKiller\DI\Container;
 
 use DI\ContainerBuilder;
 use Doctrine\Common\Cache\Cache;
+use Doctrine\Common\Cache\CacheProvider;
 
 class Kohana extends Base
 {
@@ -25,13 +26,15 @@ class Kohana extends Base
             if (!($cache instanceof Cache))
                 throw new \Kohana_Exception('PHP-DI cache must be instance of :type', [':type' => Cache::class]);
 
-            $ns = $config->get('namespace');
+            if ($cache instanceof CacheProvider) {
+                $ns = $config->get('namespace');
 
-            if (!$ns) {
-                throw new \Exception('PHP-DI container must have a [namespace] defined in config');
+                if (!$ns) {
+                    throw new \Exception('PHP-DI container must have a [namespace] defined in config');
+                }
+
+                $cache->setNamespace($ns);
             }
-
-            $cache->setNamespace($ns);
 
             $builder->setDefinitionCache($cache);
 //            $builder->writeProxiesToFile(true, 'tmp/proxies');

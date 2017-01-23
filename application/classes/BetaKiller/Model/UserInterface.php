@@ -5,7 +5,7 @@ use BetaKiller\Utils\Kohana\ORM\OrmInterface;
 use BetaKiller\Notification\NotificationUserInterface;
 use Spotman\Acl\AclUserInterface;
 
-interface UserInterface extends OrmInterface, NotificationUserInterface, AclUserInterface //implements ACL_Role_Interface
+interface UserInterface extends OrmInterface, NotificationUserInterface, AclUserInterface
 {
     // Auth_ORM methods
     public function complete_login();
@@ -190,7 +190,9 @@ interface UserInterface extends OrmInterface, NotificationUserInterface, AclUser
 
     /**
      * Возвращает true если пользователю разрешено использовать админку
+     * Use \BetaKiller\Acl\Resource\AdminResource instead or domain-specific Acl resource
      * @return bool
+     * @deprecated
      */
     public function is_admin_allowed();
 

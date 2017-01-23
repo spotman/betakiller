@@ -26,7 +26,7 @@ interface AppConfigInterface
     /**
      * @return bool
      */
-    public function is_cache_enabled();
+    public function is_page_cache_enabled();
 
     /**
      * @return string

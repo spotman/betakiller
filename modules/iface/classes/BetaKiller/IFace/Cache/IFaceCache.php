@@ -3,7 +3,7 @@ namespace BetaKiller\IFace\Cache;
 
 use BetaKiller\Config\AppConfigInterface;
 use BetaKiller\IFace\IFace;
-use BetaKiller\IFace\IFaceRelatedModelInterface;
+//use BetaKiller\IFace\IFaceRelatedModelInterface;
 use PageCache\PageCache;
 
 class IFaceCache
@@ -20,7 +20,7 @@ class IFaceCache
 
     public function __construct(AppConfigInterface $config)
     {
-        $this->enabled = $config->is_cache_enabled();
+        $this->enabled = $config->is_page_cache_enabled();
 
         $this->pageCache = new PageCache;
 
@@ -29,7 +29,7 @@ class IFaceCache
         // $this->pageCache->setLogFilePath("/tmp/page-cache.log");
     }
 
-    public function clearModelCache(IFaceRelatedModelInterface $model)
+    public function clearModelCache(/* IFaceRelatedModelInterface $model */)
     {
         // deal with child ifaces (clear cache for whole branch)
 //        $iface = $model->get_public_iface();

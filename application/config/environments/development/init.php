@@ -17,6 +17,7 @@
  */
 
 return array(
+    'errors'    =>  TRUE,
     'profile'   =>  TRUE,
-//    'caching'   =>  TRUE,
+    'caching'   =>  FALSE,
 );

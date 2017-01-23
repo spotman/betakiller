@@ -3,7 +3,9 @@
 use BetaKiller\View\ViewIFaceTwig;
 use BetaKiller\View\ViewLayoutTwig;
 use BetaKiller\View\ViewWrapperTwig;
+use Doctrine\Common\Cache\FilesystemCache;
 use Doctrine\Common\Cache\ArrayCache;
+use Doctrine\Common\Cache\ChainCache;
 
 use Spotman\Acl\ResourcesCollector\ResourcesCollectorInterface;
 use Spotman\Acl\RolesCollector\RolesCollectorInterface;
@@ -15,13 +17,20 @@ use BetaKiller\Acl\ResourcesCollector;
 use BetaKiller\Acl\PermissionsCollector;
 use BetaKiller\Acl\ResourceFactory;
 
+$site_path = MultiSite::instance()->site_path();
+$site_name = MultiSite::instance()->site_name();
+
 return [
 
     /**
      * @url http://php-di.org/doc/performances.html
      */
-    'cache'         =>  new ArrayCache(),
-    'namespace'     =>  MultiSite::instance()->site_name() .'-php-di-'.\Kohana::$environment_string,
+    'cache'         =>  new ChainCache([
+        new ArrayCache(),
+        new FilesystemCache($site_path.DIRECTORY_SEPARATOR.'cache'.DIRECTORY_SEPARATOR.'php-di'),
+    ]),
+
+    'namespace'     =>  $site_name.'-php-di-'.\Kohana::$environment_string,
 
     'annotations'   =>  true,
     'autowiring'    =>  true,
@@ -58,6 +67,9 @@ return [
         \BetaKiller\DI\ContainerInterface::class =>  DI\factory(function() {
             return \BetaKiller\DI\Container::instance();
         }),
+
+        // Define cache for production and staging env (dev and testing has ArrayCache)
+        'AclCache' => new FilesystemCache($site_path.DIRECTORY_SEPARATOR.'cache'.DIRECTORY_SEPARATOR.'acl'),
 
         // Acl roles, resources, permissions and resource factory
         RolesCollectorInterface::class          => DI\get(RolesCollector::class),

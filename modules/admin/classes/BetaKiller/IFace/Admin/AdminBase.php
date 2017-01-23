@@ -24,10 +24,16 @@ abstract class AdminBase extends IFace
 
     protected function check_iface_permissions()
     {
-        // TODO
-//        $this->adminAclResource->isEnabled();
         // Force authorization
-        return $this->current_user()->is_admin_allowed();
+        $user = $this->current_user();
+
+        $token = \Profiler::start('Acl', 'first load');
+
+        $value = $this->adminAclResource->isEnabled() || $user->is_admin_allowed();
+
+        \Profiler::stop($token);
+
+        return $value;
     }
 
     public function getDefaultExpiresInterval()

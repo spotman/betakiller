@@ -1,13 +1,46 @@
 <?php
 namespace BetaKiller\Model;
 
-use Model_Auth_Role;
+use BetaKiller\Utils\Kohana\TreeModelOrm;
 
-class Role extends Model_Auth_Role implements RoleInterface
+class Role extends TreeModelOrm implements RoleInterface
 {
     const DEVELOPERS_ROLE_NAME  = 'developer';
     const MODERATORS_ROLE_NAME  = 'moderator';
     const WRITER_ROLE_NAME      = 'writer';
+
+    /**
+     * Prepares the model database connection, determines the table name,
+     * and loads column information.
+     *
+     * @throws \Exception
+     * @return void
+     */
+    protected function _initialize()
+    {
+        $this->has_many([
+            'users' => [
+                'model' => 'User',
+                'through' => 'roles_users'
+            ],
+        ]);
+
+        parent::_initialize();
+    }
+
+    public function rules()
+    {
+        return array(
+            'name' => array(
+                array('not_empty'),
+                array('min_length', array(':value', 4)),
+                array('max_length', array(':value', 32)),
+            ),
+            'description' => array(
+                array('max_length', array(':value', 255)),
+            )
+        );
+    }
 
     public function get_name()
     {
@@ -23,7 +56,7 @@ class Role extends Model_Auth_Role implements RoleInterface
      */
     public function get_by_name($name)
     {
-        return $this->where("name", "=", $name)->find();
+        return $this->where($this->object_column("name"), "=", $name)->find();
     }
 
     /**
@@ -92,5 +125,13 @@ class Role extends Model_Auth_Role implements RoleInterface
     public function getRoleId()
     {
         return $this->get_name();
+    }
+
+    /**
+     * Place here additional query params
+     */
+    protected function additional_tree_model_filtering()
+    {
+        // Nothing to do
     }
 }

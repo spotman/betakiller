@@ -16,7 +16,8 @@
     "swiftmailer/swiftmailer": "^5.4",
     "mmamedov/page-cache": "dev-master",
     "aidantwoods/secureheaders": "^1.0",
-    "zendframework/zend-permissions-acl": "^2.6"
+    "zendframework/zend-permissions-acl": "^2.6",
+    "ocramius/proxy-manager": "^1.0"
   },
   "require-dev": {
     "phpunit/phpunit": "3.7.*",
