@@ -98,6 +98,20 @@ abstract class Status_Related_Model extends ORM {
     }
 
     /**
+     * @return string[]
+     */
+    public function get_allowed_target_transitions_codenames()
+    {
+        $output = [];
+
+        foreach ($this->get_allowed_target_transitions() as $transition) {
+            $output[] = $transition->get_codename();
+        }
+
+        return $output;
+    }
+
+    /**
      * @return Status_Related_Model|NULL
      */
     public function set_start_status()
