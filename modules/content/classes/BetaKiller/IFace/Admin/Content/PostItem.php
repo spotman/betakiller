@@ -37,7 +37,7 @@ class PostItem extends AdminBase
                 'title'         =>  $post->get_title(),
                 'description'   =>  $post->get_description(),
 
-                'transitions'   =>  $post->get_allowed_target_transitions(),
+                'transitions'   =>  $post->get_allowed_target_transitions_codenames(),
 
 //                'thumbnails'    =>  $thumbnails,
             ],

@@ -41,9 +41,15 @@
 
         <button class="btn save-post-button" type="submit">Save</button>
 
+        {{ dump(post.transitions) }}
+
         {# transitions #}
         {% if "publish" in post.transitions %}
             <button class="btn publish-post-button">Publish</button>
+        {% endif %}
+
+        {% if "pause" in post.transitions %}
+            <button class="btn pause-post-button">Pause</button>
         {% endif %}
 
     </form>
