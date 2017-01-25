@@ -44,5 +44,5 @@
 	path = modules/migrations
 	url = git@github.com:spotman/kohana-minion-migrations.git
 [submodule "modules/rbac"]
-	path = modules/rbac
+	path = modules/acl
 	url = git@github.com:spotman/rbac.git
