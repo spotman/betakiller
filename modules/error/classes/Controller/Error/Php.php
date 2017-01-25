@@ -117,7 +117,7 @@ class Controller_Error_Php extends Controller_Developer
 
         foreach ( $list as $user )
         {
-            $return[ $user->pk() ] = $user->get_full_name();
+            $return[ $user->get_id() ] = $user->get_full_name();
         }
 
         return $return;
