@@ -26,11 +26,29 @@ class RolesCollector extends AbstractRolesCollector
      */
     public function collectRoles()
     {
-        /** @var RoleInterface $roles */
+        /** @var RoleInterface[] $roles */
         $roles = $this->roleModel->find_all();
 
         foreach ($roles as $role) {
-            $this->addRole($role);
+            $this->addRoleWithParents($role);
+        }
+    }
+
+    protected function addRoleWithParents(RoleInterface $role)
+    {
+        $parentRoles = $role->get_parents();
+        $parentRolesIdentities = [];
+
+        foreach ($parentRoles as $parentRole) {
+            if (!$this->hasRole($parentRole)) {
+                $this->addRoleWithParents($parentRole);
+            }
+
+            $parentRolesIdentities[] = $parentRole->getRoleId();
+        }
+
+        if (!$this->hasRole($role)) {
+            $this->addRole($role->getRoleId(), $parentRolesIdentities);
         }
     }
 }

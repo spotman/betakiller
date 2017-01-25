@@ -2,9 +2,10 @@
 namespace BetaKiller\Model;
 
 use BetaKiller\Utils\Kohana\ORM\OrmInterface;
+use BetaKiller\Utils\Kohana\TreeModelMultipleParentsInterface;
 use Spotman\Acl\AclRoleInterface;
 
-interface RoleInterface extends OrmInterface, AclRoleInterface
+interface RoleInterface extends OrmInterface, AclRoleInterface, TreeModelMultipleParentsInterface
 {
     // Model_Auth_Role methods (nothing special)
 
