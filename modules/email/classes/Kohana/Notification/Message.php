@@ -3,8 +3,8 @@
 use BetaKiller\Notification\NotificationUserInterface;
 use BetaKiller\Notification\TransportInterface;
 
-abstract class Kohana_Notification_Message {
-
+abstract class Kohana_Notification_Message
+{
     use \BetaKiller\Utils\Instance\Simple;
 
     /**
@@ -26,11 +26,6 @@ abstract class Kohana_Notification_Message {
      * @var array
      */
     protected $_attachments = [];
-
-//    /**
-//     * @var string
-//     */
-//    protected $_text;
 
     /**
      * Template codename
@@ -57,7 +52,7 @@ abstract class Kohana_Notification_Message {
     /**
      * @param NotificationUserInterface $value
      *
-*@return $this
+     * @return $this
      */
     public function set_from(NotificationUserInterface $value)
     {
@@ -88,7 +83,7 @@ abstract class Kohana_Notification_Message {
     /**
      * @param NotificationUserInterface $value
      *
-*@return $this
+     * @return $this
      */
     public function set_to(NotificationUserInterface $value)
     {
@@ -128,32 +123,6 @@ abstract class Kohana_Notification_Message {
         $this->_attachments[] = $path;
         return $this;
     }
-
-//    public function get_text()
-//    {
-//        return $this->_text;
-//    }
-
-//    /**
-//     * @param string $value
-//     * @return $this
-//     */
-//    public function set_text($value)
-//    {
-//        $this->_text = $value;
-//        return $this;
-//    }
-
-//    /**
-//     * @param $email
-//     * @return $this
-//     */
-//    public function from_email($email)
-//    {
-//        $from = Notification_User_Email::factory($email);
-//
-//        return $this->set_from($from);
-//    }
 
     public function send()
     {
@@ -205,5 +174,4 @@ abstract class Kohana_Notification_Message {
             $this->get_template_path().DIRECTORY_SEPARATOR.$this->_template_name.'-'.$transport->get_name()
         );
     }
-
 }
