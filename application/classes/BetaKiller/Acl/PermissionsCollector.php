@@ -29,15 +29,17 @@ class PermissionsCollector extends AbstractPermissionsCollector
         $permissions = $this->permissionModel->get_all_permissions();
 
         foreach ($permissions as $permission) {
-            $role = $permission->get_acl_role_identity();
-            $resource = $permission->get_acl_resource_identity();
-            $name = $permission->get_name();
+            $role                       = $permission->get_acl_role_identity();
+            $actionPermissionIdentity   = $permission->get_acl_action_identity();
+            $actionResourceIdentity     = $permission->get_acl_action_resource_identity();
+            $bindToResourceIdentity     = $permission->get_acl_resource_identity();
+
             $value = $permission->is_allowed();
 
             if ($value === true) {
-                $this->addAllowRule($role, $resource, $name);
+                $this->addAllowRule($role, $actionResourceIdentity, $actionPermissionIdentity, $bindToResourceIdentity);
             } else if ($value === false) {
-                $this->addDenyRule($role, $resource, $name);
+                $this->addDenyRule($role, $actionResourceIdentity, $actionPermissionIdentity, $bindToResourceIdentity);
             }
         }
     }

@@ -25,10 +25,14 @@ class Model_AclPermission extends \ORM
                 'model'         =>  'AclResource',
                 'foreign_key'   =>  'resource_id'
             ],
+
+            'action' => [
+                'model'         =>  'AclResourceAction',
+                'foreign_key'   =>  'action_id'
+            ],
         ]);
 
-
-        $this->load_with(['resource', 'role']);
+        $this->load_with(['resource', 'role', 'action', 'action:resource']);
 
         parent::_initialize();
     }
@@ -44,9 +48,25 @@ class Model_AclPermission extends \ORM
     /**
      * @return string
      */
-    public function get_name()
+    public function get_acl_action_identity()
     {
-        return $this->get('name');
+        return $this->get_action_relation()->get_name();
+    }
+
+    /**
+     * @return string
+     */
+    public function get_acl_action_resource_identity()
+    {
+        return $this->get_action_relation()->get_resource_identity();
+    }
+
+    /**
+     * @return Model_AclResourceAction
+     */
+    protected function get_action_relation()
+    {
+        return $this->get('action');
     }
 
     /**

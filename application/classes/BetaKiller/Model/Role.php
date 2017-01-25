@@ -1,9 +1,9 @@
 <?php
 namespace BetaKiller\Model;
 
-use BetaKiller\Utils\Kohana\TreeModelOrm;
+use BetaKiller\Utils\Kohana\TreeModelMultipleParentsOrm;
 
-class Role extends TreeModelOrm implements RoleInterface
+class Role extends TreeModelMultipleParentsOrm implements RoleInterface
 {
     const DEVELOPERS_ROLE_NAME  = 'developer';
     const MODERATORS_ROLE_NAME  = 'moderator';
@@ -26,6 +26,11 @@ class Role extends TreeModelOrm implements RoleInterface
         ]);
 
         parent::_initialize();
+    }
+
+    protected function get_through_table_name()
+    {
+        return 'roles_inheritance';
     }
 
     public function rules()

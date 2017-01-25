@@ -1,9 +1,9 @@
 <?php
 
 use Spotman\Acl\ResourceInterface;
-use BetaKiller\Utils\Kohana\TreeModelOrm;
+use BetaKiller\Utils\Kohana\TreeModelSingleParentOrm;
 
-class Model_AclResource extends TreeModelOrm implements ResourceInterface
+class Model_AclResource extends TreeModelSingleParentOrm implements ResourceInterface
 {
     protected $_table_name = 'acl_resources';
 
