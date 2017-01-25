@@ -2,13 +2,13 @@
 
 use \BetaKiller\IFace\Widget;
 
-class Widget_Auth_Ulogin extends Widget {
-
+class Widget_Auth_Ulogin extends Widget
+{
     public function get_data()
     {
         $instance = $this->ulogin_factory();
 
-        $auth_callback = 'ulogin_auth_callback'; // $instance->get_widget_id()
+        $auth_callback = 'ulogin_auth_callback';
         $instance->set_javascript_callback($auth_callback);
 
         return array(
@@ -24,22 +24,13 @@ class Widget_Auth_Ulogin extends Widget {
 
         $uLogin = $this->ulogin_factory();
 
-        try
-        {
+        try {
             $uLogin->login();
             $this->send_json();
-        }
-        catch ( Ulogin_Exception $e )
-        {
-//            $this->send_json(self::JSON_ERROR, $e->getMessage());
+        } catch (Ulogin_Exception $e) {
             throw $e;
-        }
-        catch ( Exception $e )
-        {
-//            $this->send_json(self::JSON_ERROR, $e->getMessage());
+        } catch ( Exception $e ) {
             throw $e;
-//            Kohana_Exception::_handler($e);
-//            $this->send_json(self::JSON_ERROR);
         }
     }
 
@@ -51,5 +42,4 @@ class Widget_Auth_Ulogin extends Widget {
         return Ulogin::factory()
             ->set_redirect_uri($this->url('auth'));
     }
-
 }
