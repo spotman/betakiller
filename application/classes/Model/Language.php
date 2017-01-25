@@ -6,6 +6,6 @@ class Model_Language extends ORM
 
     public function get_name()
     {
-        return $this->loaded() ? $this->name : NULL;
+        return $this->loaded() ? $this->get('name') : NULL;
     }
 }
