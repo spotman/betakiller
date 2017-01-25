@@ -2,9 +2,9 @@
 namespace BetaKiller\IFace;
 
 use BetaKiller\Helper\SeoMetaInterface;
-use BetaKiller\Utils\Kohana\TreeModelInterface;
+use BetaKiller\Utils\Kohana\TreeModelSingleParentInterface;
 
-interface IFaceModelInterface extends TreeModelInterface, SeoMetaInterface
+interface IFaceModelInterface extends TreeModelSingleParentInterface, SeoMetaInterface
 {
     /**
      * Returns iface codename

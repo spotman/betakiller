@@ -134,11 +134,12 @@ class IFace_Model_Provider_Admin_Model implements IFaceModelInterface
     }
 
     /**
-     * @param \BetaKiller\Utils\Kohana\TreeModelInterface|null $parent
+     * @param \BetaKiller\Utils\Kohana\TreeModelSingleParentInterface|null $parent
+     *
      * @return $this
      * @throws HTTP_Exception_501
      */
-    public function set_parent(\BetaKiller\Utils\Kohana\TreeModelInterface $parent = NULL)
+    public function set_parent(\BetaKiller\Utils\Kohana\TreeModelSingleParentInterface $parent = NULL)
     {
         throw new HTTP_Exception_501('Admin model can not change parent');
     }

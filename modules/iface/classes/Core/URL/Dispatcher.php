@@ -2,7 +2,7 @@
 
 use BetaKiller\IFace\Core\IFace;
 use BetaKiller\IFace\UrlPathIterator;
-use BetaKiller\Utils\Kohana\TreeModelOrm;
+use BetaKiller\Utils\Kohana\TreeModelSingleParentInterface;
 //use BetaKiller\IFace\HasCustomUrlBehaviour;
 use BetaKiller\IFace\IFaceModelInterface;
 
@@ -64,6 +64,7 @@ abstract class Core_URL_Dispatcher
      * @param $uri
      * @return IFace|null
      * @throws IFace_Exception_MissingURL
+     * @throws Exception
      */
     public function parse_uri($uri)
     {
@@ -522,10 +523,10 @@ abstract class Core_URL_Dispatcher
         if ( ! $model )
             throw new URL_Dispatcher_Exception('Can not find :name model in parameters', array(':name' => $model_name));
 
-        if ($is_tree AND !($model instanceof TreeModelOrm))
+        if ($is_tree AND !($model instanceof TreeModelSingleParentInterface))
             throw new URL_Dispatcher_Exception('Model :model must be instance of :object for tree traversing', [
                 ':model'    =>  get_class($model),
-                ':object'   =>  TreeModelOrm::class,
+                ':object'   =>  TreeModelSingleParentInterface::class,
             ]);
 
         $parts = [];
