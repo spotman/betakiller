@@ -6,6 +6,10 @@
 return array (
   'custom_tag.attachment.title' => 'Скачать файл :name',
   'custom_tag.attachment.alt' => 'кнопка загрузки файла',
-  'Can not determine image size for :provider' => 'Can not determine image size for :provider',
-  'Model with id :id does not exists' => 'Model with id :id does not exists',
+  'name' => 'Имя',
+  'Enter your name, please' => 'Пожалуйста, введите Ваше имя',
+  'email' => 'Email',
+  'Enter your email, please' => 'Пожалуйста, введите адрес Вашей электронной почты',
+  'message' => 'Сообщение',
+  'Enter your message, please' => 'Пожалуйста, введите Ваше сообщение',
 );

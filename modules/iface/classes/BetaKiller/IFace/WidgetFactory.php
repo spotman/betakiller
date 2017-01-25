@@ -19,7 +19,7 @@ class WidgetFactory
      */
     public function create($name, Request $request = NULL, Response $response = NULL)
     {
-        $class_name = static::get_class_prefix() . $name;
+        $class_name = static::get_class_prefix().$name;
 
         // Getting current request if none provided
         $request = $request ?: Request::current();

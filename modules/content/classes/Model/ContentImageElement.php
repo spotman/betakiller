@@ -32,18 +32,4 @@ class Model_ContentImageElement extends Assets_Model_ORM_SeoImage implements Con
     {
         return Assets_Provider_Factory::instance()->create('ContentImage');
     }
-
-//    /**
-//     * Rule definitions for validation
-//     *
-//     * @return array
-//     */
-//    public function rules()
-//    {
-//        return parent::rules() + [
-//            'alt'   =>  [
-//                ['not_empty']
-//            ],
-//        ];
-//    }
 }

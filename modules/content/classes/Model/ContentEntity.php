@@ -58,7 +58,7 @@ class Model_ContentEntity extends ORM
         $model = $this->where('slug', '=', $slug)->find();
 
         if (!$model->loaded())
-            throw new Kohana_Exception('Unknown admin content entity slug :value', [':value' => $slug]);
+            throw new Kohana_Exception('Unknown content entity slug :value', [':value' => $slug]);
 
         return $model;
     }

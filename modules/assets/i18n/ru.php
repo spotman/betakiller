@@ -5,6 +5,7 @@
  */
 return array (
   'Can not find file with url = :url' => 'Can not find file with url = :url',
+  'Can not determine image size for :provider' => 'Невозможно определить размер изображения для провайдера :provider',
   'Crop size :size is not allowed' => 'Размер :size не разрешён',
   'Crop size must have width AND height defined' => 'Размер должен иметь высоту И ширину',
   'Preview size :size is not allowed' => 'Размер :size не разрешён',

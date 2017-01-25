@@ -1,6 +1,8 @@
 <?php
 namespace BetaKiller\Helper;
 
+use BetaKiller\Utils\Kohana\ORM\OrmInterface;
+
 trait ContentTrait
 {
     /**
@@ -46,7 +48,7 @@ trait ContentTrait
     /**
      * @param int|null $id
      *
-     * @return \Model_ContentPost|\ORM
+     * @return \Model_ContentPost|OrmInterface
      */
     public function model_factory_content_post($id = null)
     {
@@ -55,7 +57,7 @@ trait ContentTrait
 
     /**
      * @param int|null $id
-     * @return \Model_ContentCategory|\ORM
+     * @return \Model_ContentCategory|OrmInterface
      */
     public function model_factory_content_category($id = null)
     {
@@ -64,7 +66,7 @@ trait ContentTrait
 
     /**
      * @param int|null $id
-     * @return \Model_ContentEntity|\ORM
+     * @return \Model_ContentEntity|OrmInterface
      */
     protected function model_factory_content_entity($id = NULL)
     {
@@ -73,7 +75,7 @@ trait ContentTrait
 
     /**
      * @param int|null $id
-     * @return \Model_ContentImageElement|\ORM
+     * @return \Model_ContentImageElement|OrmInterface
      */
     protected function model_factory_content_image_element($id = NULL)
     {
@@ -82,7 +84,7 @@ trait ContentTrait
 
     /**
      * @param int|null $id
-     * @return \Model_ContentPostThumbnail|\ORM
+     * @return \Model_ContentPostThumbnail|OrmInterface
      */
     protected function model_factory_content_post_thumbnail($id = NULL)
     {
@@ -91,7 +93,7 @@ trait ContentTrait
 
     /**
      * @param int|null $id
-     * @return \Model_ContentAttachmentElement|\ORM
+     * @return \Model_ContentAttachmentElement|OrmInterface
      */
     protected function model_factory_content_attachment_element($id = NULL)
     {
@@ -100,7 +102,7 @@ trait ContentTrait
 
     /**
      * @param int|null $id
-     * @return \Model_ContentYoutubeRecord|\ORM
+     * @return \Model_ContentYoutubeRecord|OrmInterface
      */
     protected function model_factory_content_youtube_record($id = NULL)
     {
@@ -109,11 +111,21 @@ trait ContentTrait
 
     /**
      * @param int|null $id
-     * @return \Model_Quote|\ORM
+     * @return \Model_Quote|OrmInterface
      */
     protected function model_factory_quote($id = NULL)
     {
         return \ORM::factory('Quote', $id);
+    }
+
+    /**
+     * @param null $id
+     *
+     * @return \Model_ContentComment|OrmInterface
+     */
+    protected function model_factory_content_comment($id = null)
+    {
+        return \ORM::factory('ContentComment', $id);
     }
 
     /**
