@@ -1,13 +1,11 @@
 <?php defined('SYSPATH') or die('No direct script access.');
 
-//$host = getenv('HTTP_HOST') ?: getenv('SERVER_NAME');
-
 // Turn on the minimization and building in production environment
 $in_production = in_array( Kohana::$environment, array(Kohana::PRODUCTION, Kohana::STAGING) );
 
 $build = $in_production;
 
-// TODO Найти нормальный движок для компрессии JS/CSS файлов
+// No compression - it was done via grunt/gulp/etc already
 $minimize = FALSE;
 
 return array(

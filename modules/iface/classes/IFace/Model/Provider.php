@@ -1,10 +1,8 @@
 <?php
 use BetaKiller\IFace\IFaceModelInterface;
 
-class IFace_Model_Provider implements IFace_Model_Provider_Interface {
-
-//    use \BetaKiller\Utils\Instance\Singleton;
-
+class IFace_Model_Provider implements IFace_Model_Provider_Interface
+{
     /**
      * @var IFace_Model_Provider_DB[]|IFace_Model_Provider_Admin[]
      */
@@ -134,24 +132,6 @@ class IFace_Model_Provider implements IFace_Model_Provider_Interface {
         return $reverse ? array_reverse($this->_sources) : $this->_sources;
     }
 
-//    protected function source_exec($method)
-//    {
-//        $value = NULL;
-//
-//        $call_args = func_get_args();
-//        array_shift($call_args);
-//
-//        foreach ( $this->get_sources() as $source )
-//        {
-//            $value = call_user_func_array(array($source, $method), $call_args);
-//
-//            if ( $value )
-//                break;
-//        }
-//
-//        return $value;
-//    }
-
     /**
      * @param IFaceModelInterface[] $models
      */
@@ -178,5 +158,4 @@ class IFace_Model_Provider implements IFace_Model_Provider_Interface {
     {
         $this->_model_instances[ $model->get_codename() ] = $model;
     }
-
 }
