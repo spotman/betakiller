@@ -403,7 +403,6 @@ class User extends \Model_Auth_User implements UserInterface
      */
     public function getAccessControlRoles()
     {
-        // TODO Разобраться почему не загружаются parent
         return $this->get_roles_relation()->find_all()->as_array();
     }
 }
