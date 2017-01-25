@@ -4,7 +4,7 @@ use BetaKiller\IFace\IFaceModelInterface;
 
 class IFace_Model_Provider_Admin_Model implements IFaceModelInterface
 {
-    use \BetaKiller\Utils\Kohana\TreeModelTrait;
+    use \BetaKiller\Utils\Kohana\TreeModelSingleParentTrait;
 
     /**
      * @var IFace_Model_Provider_Admin
