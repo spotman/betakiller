@@ -23,9 +23,25 @@ class ORM extends Utils\Kohana\ORM implements OrmInterface, API_Response_Item, U
 
         // TODO Create one basic app-namespaced factory and use it in ORM, IFaceFactory, WidgetFactory, etc
 
-        $object = \BetaKiller\DI\Container::instance()->make($class_name, ['id' => $id]);
+        // No direct search by ID coz ORM crashes with circular dependencies when extended from TreeModel and initialized with id
 
-        return $object;
+        /** @var OrmInterface $object */
+        $object = \BetaKiller\DI\Container::instance()->make($class_name);
+
+        if (is_array($id)) {
+            // Old Kohana sugar for searching in model
+            foreach ($id as $column => $value) {
+                // Passing an array of column => values
+                $object->where($column, '=', $value);
+            }
+
+            return $object->find();
+        }
+        elseif ($id) {
+            return $object->get_by_id($id, true); // Allow missing elements for BC
+        } else {
+            return $object;
+        }
     }
 
     /**
