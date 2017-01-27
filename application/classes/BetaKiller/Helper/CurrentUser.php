@@ -7,12 +7,4 @@ trait CurrentUser
     {
         return \Env::user($allow_guest);
     }
-
-//    /**
-//     * @return \BetaKiller\Model\User
-//     */
-//    protected function getCurrentUser()
-//    {
-//        return $this->getContainer()->get('User');
-//    }
 }

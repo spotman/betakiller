@@ -12,4 +12,5 @@ return array (
   'Enter your email, please' => 'Пожалуйста, введите адрес Вашей электронной почты',
   'message' => 'Сообщение',
   'Enter your message, please' => 'Пожалуйста, введите Ваше сообщение',
+  ':date at :time' => ':date в :time',
 );

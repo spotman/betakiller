@@ -223,11 +223,13 @@ class User extends \Model_Auth_User implements UserInterface
      * Search for user by username or e-mail
      * @param $username_or_email
      * @throws \HTTP_Exception_403
-     * @return \ORM
+     * @return UserInterface|null
      */
     public function search_by($username_or_email)
     {
-        return $this->where($this->unique_key($username_or_email), '=', $username_or_email)->find();
+        $user = $this->where($this->unique_key($username_or_email), '=', $username_or_email)->find();
+
+        return $user->loaded() ? $user : null;
     }
 
     public function before_sign_in()
