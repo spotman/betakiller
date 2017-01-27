@@ -1,10 +1,19 @@
 <?php
 
 use BetaKiller\Content\ContentRelatedInterface;
+use BetaKiller\Content\ImportedFromWordpressInterface;
+use BetaKiller\Utils\Kohana\TreeModelSingleParentOrm;
+use BetaKiller\Model\UserInterface;
 
-class Model_ContentComment extends ORM implements ContentRelatedInterface
+class Model_ContentComment extends TreeModelSingleParentOrm implements ContentRelatedInterface, ImportedFromWordpressInterface
 {
     use Model_ORM_ContentRelatedTrait;
+    use Model_ORM_ImportedFromWordpressTrait;
+
+    const STATUS_PENDING = 1;
+    const STATUS_APPROVED = 2;
+    const STATUS_SPAM = 3;
+    const STATUS_DELETED = 4;
 
     protected $_table_name = 'content_comments';
 
@@ -22,9 +31,21 @@ class Model_ContentComment extends ORM implements ContentRelatedInterface
                 'model'         =>  'ContentEntity',
                 'foreign_key'   =>  'entity_id',
             ],
+            'author'            =>  [
+                'model'         =>  'User',
+                'foreign_key'   =>  'author_user',
+            ],
         ]);
 
         parent::_initialize();
+    }
+
+    /**
+     * Place here additional query params
+     */
+    protected function additional_tree_model_filtering()
+    {
+        // Nothing to do
     }
 
     /**
@@ -34,21 +55,43 @@ class Model_ContentComment extends ORM implements ContentRelatedInterface
      */
     public function rules()
     {
-        return [
+        $rules = [
+            'entity_id'   =>  [
+                ['not_empty'],
+            ],
+            'entity_item_id'   =>  [
+                ['not_empty'],
+            ],
             'ip_address'   =>  [
                 ['not_empty'],
             ],
-            'name'   =>  [
+            'user_agent'   =>  [
                 ['not_empty'],
             ],
-            'email'   =>  [
+            'status'   =>  [
                 ['not_empty'],
-                ['email'],
             ],
             'message'   =>  [
                 ['not_empty'],
             ],
         ];
+
+        $guestRules = [
+            'author_name'   =>  [
+                ['not_empty'],
+            ],
+            'author_email'   =>  [
+                ['not_empty'],
+                ['email'],
+            ],
+        ];
+
+        // Additional check for guest fields if no user was set
+        if (!$this->get_author_user()) {
+            $rules += $guestRules;
+        }
+
+        return $rules;
     }
 
     /**
@@ -56,18 +99,18 @@ class Model_ContentComment extends ORM implements ContentRelatedInterface
      *
      * @return $this
      */
-    public function set_email($value)
+    public function set_guest_author_email($value)
     {
-        $this->set('email', $value);
+        $this->set('author_email', $value);
         return $this;
     }
 
     /**
      * @return string
      */
-    public function get_email()
+    public function get_guest_author_email()
     {
-        return $this->get('email');
+        return $this->get('author_email');
     }
 
     /**
@@ -75,18 +118,46 @@ class Model_ContentComment extends ORM implements ContentRelatedInterface
      *
      * @return $this
      */
-    public function set_name($value)
+    public function set_guest_author_name($value)
     {
-        $this->set('name', $value);
+        $this->set('author_name', $value);
         return $this;
     }
 
     /**
      * @return string
      */
-    public function get_name()
+    public function get_guest_author_name()
     {
-        return $this->get('name');
+        return $this->get('author_name');
+    }
+
+    public function set_author_user(UserInterface $value = null)
+    {
+        $this->set('author', $value);
+        return $this;
+    }
+
+    /**
+     * @return UserInterface|null
+     */
+    public function get_author_user()
+    {
+        /** @var UserInterface $author */
+        $author = $this->get('author');
+        return $author->loaded() ? $author : null;
+    }
+    
+    public function get_author_name()
+    {
+        $author = $this->get_author_user();
+        return $author ? $author->get_first_name() : $this->get_guest_author_name();
+    }
+
+    public function get_author_email()
+    {
+        $author = $this->get_author_user();
+        return $author ? $author->get_email() : $this->get_guest_author_email();
     }
 
     /**
@@ -127,6 +198,44 @@ class Model_ContentComment extends ORM implements ContentRelatedInterface
         return $this->get('ip_address');
     }
 
+    /**
+     * @param string $value
+     *
+     * @return $this
+     */
+    public function set_guest_author_user($value)
+    {
+        $this->set('author_user', $value);
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function get_guest_author_user()
+    {
+        return $this->get('author_user');
+    }
+
+    /**
+     * @param string $value
+     *
+     * @return $this
+     */
+    public function set_user_agent($value)
+    {
+        $this->set('user_agent', $value);
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function get_user_agent()
+    {
+        return $this->get('user_agent');
+    }
+
     public function set_created_at(DateTime $value)
     {
         $this->set_datetime_column_value('created_at', $value);
@@ -144,6 +253,112 @@ class Model_ContentComment extends ORM implements ContentRelatedInterface
     }
 
     /**
+     * @return bool
+     */
+    public function has_status()
+    {
+        return (bool) $this->get_status();
+    }
+
+    /**
+     * @return bool
+     */
+    public function is_pending()
+    {
+        return $this->get_status() == self::STATUS_PENDING;
+    }
+
+    /**
+     * @return bool
+     */
+    public function is_approved()
+    {
+        return $this->get_status() == self::STATUS_APPROVED;
+    }
+
+    /**
+     * @return bool
+     */
+    public function is_spam()
+    {
+        return $this->get_status() == self::STATUS_SPAM;
+    }
+
+    /**
+     * @return bool
+     */
+    public function is_deleted()
+    {
+        return $this->get_status() == self::STATUS_DELETED;
+    }
+
+    public function mark_as_pending()
+    {
+        return $this->set_status(self::STATUS_PENDING);
+    }
+
+    public function mark_as_approved()
+    {
+        return $this->set_status(self::STATUS_APPROVED);
+    }
+
+    public function mark_as_spam()
+    {
+        return $this->set_status(self::STATUS_SPAM);
+    }
+
+    public function mark_as_deleted()
+    {
+        return $this->set_status(self::STATUS_DELETED);
+    }
+
+    /**
+     * @param int $id
+     */
+    protected function set_status($id)
+    {
+        $this->set('status', (int) $id);
+    }
+
+    /**
+     * @return int
+     */
+    protected function get_status()
+    {
+        return $this->get('status');
+    }
+
+    public function filter_pending()
+    {
+        return $this->filter_status(self::STATUS_PENDING);
+    }
+
+    public function filter_approved()
+    {
+        return $this->filter_status(self::STATUS_APPROVED);
+    }
+
+    public function filter_spam()
+    {
+        return $this->filter_status(self::STATUS_SPAM);
+    }
+
+    public function filter_deleted()
+    {
+        return $this->filter_status(self::STATUS_DELETED);
+    }
+
+    /**
+     * @param int $value
+     *
+     * @return $this
+     */
+    protected function filter_status($value)
+    {
+        return $this->where($this->object_column('status'), '=', $value);
+    }
+
+    /**
      * @param \Model_ContentEntity $entity
      * @param int                  $entity_item_id
      *
@@ -154,9 +369,8 @@ class Model_ContentComment extends ORM implements ContentRelatedInterface
         return $this->model_factory()
             ->filter_entity_id($entity->get_id())
             ->filter_entity_item_id($entity_item_id)
+            ->filter_approved()
             ->order_by_created_at()
             ->find_all();
     }
-
-    // TODO approving comments via statuses
 }

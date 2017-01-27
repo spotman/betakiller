@@ -1,5 +1,6 @@
 <?php
 
+use BetaKiller\Model\UserInterface;
 use BetaKiller\Content\ImportedFromWordpressInterface;
 use BetaKiller\Content\ContentElementInterface;
 
@@ -109,7 +110,7 @@ class Model_ContentYoutubeRecord extends ORM implements ContentElementInterface,
     /**
      * Returns User model, who uploaded the file
      *
-     * @return Model_User
+     * @return UserInterface
      */
     public function get_uploaded_by()
     {
@@ -119,10 +120,10 @@ class Model_ContentYoutubeRecord extends ORM implements ContentElementInterface,
     /**
      * Sets user, who uploaded the file
      *
-     * @param Model_User $user
+     * @param UserInterface $user
      * @return $this
      */
-    public function set_uploaded_by(Model_User $user)
+    public function set_uploaded_by(UserInterface $user)
     {
         return $this->set('uploaded_by_user', $user);
     }

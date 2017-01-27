@@ -30,14 +30,19 @@ trait Model_ORM_ImportedFromWordpressTrait
 
     /**
      * @param int $id
-     * @return \BetaKiller\Content\ImportedFromWordpressInterface|\ORM|null
+     * @return \BetaKiller\Content\ImportedFromWordpressInterface|$this|\BetaKiller\Utils\Kohana\ORM\OrmInterface
      */
     public function find_by_wp_id($id)
     {
-        /** @var \ORM|\BetaKiller\Content\ImportedFromWordpressInterface $model */
+        /** @var \BetaKiller\Utils\Kohana\ORM\OrmInterface|$this|\BetaKiller\Content\ImportedFromWordpressInterface $model */
         $model = $this->filter_wp_id($id)->find();
 
-        return $model->loaded() ? $model : NULL;
+        if (!$model->loaded()) {
+            $model->clear();
+            $model->set_wp_id($id);
+        }
+
+        return $model;
     }
 
     /**
@@ -60,7 +65,7 @@ trait Model_ORM_ImportedFromWordpressTrait
 
     /**
      * @param array $wp_ids
-     * @return \ORM|$this
+     * @return \BetaKiller\Utils\Kohana\ORM\OrmInterface|$this
      */
     public function order_by_wp_ids(array $wp_ids)
     {

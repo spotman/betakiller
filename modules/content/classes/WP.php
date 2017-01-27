@@ -227,6 +227,28 @@ class WP
         }
     }
 
+    public function get_comments()
+    {
+        /** @var Database_Result $query */
+        $query = DB::select_array([
+            ['comment_ID', 'id'],
+            ['comment_parent', 'parent_id'],
+            ['comment_post_ID', 'post_id'],
+            ['comment_date', 'created_at'],
+            ['comment_author', 'author_name'],
+            ['comment_author_email', 'author_email'],
+            ['comment_author_IP', 'author_ip_address'],
+            ['comment_content', 'message'],
+            ['comment_approved', 'approved'],
+            ['comment_agent', 'user_agent'],
+            ['user_id', 'user_id'],
+        ])
+            ->from('comments')
+            ->execute('wp');
+
+        return $query->as_array();
+    }
+
     public function get_quotes_collection_quotes()
     {
         /** @var Database_Result $query */

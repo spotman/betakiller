@@ -11,8 +11,9 @@ use Thunder\Shortcode\Parser\RegexParser;
 
 class Task_Content_Import_Wordpress extends Minion_Task
 {
-    use \BetaKiller\Helper\ContentTrait;
-    use \BetaKiller\Helper\CurrentUser;
+    use BetaKiller\Helper\ContentTrait;
+    use BetaKiller\Helper\CurrentUser;
+    use BetaKiller\Helper\UserModelFactory;
 
     const ATTACH_PARSING_MODE_HTTP = 'http';
     const ATTACH_PARSING_MODE_LOCAL = 'local';
@@ -50,6 +51,10 @@ class Task_Content_Import_Wordpress extends Minion_Task
         // Categories
         $this->import_categories();
 
+        // Comments to posts and pages
+        $this->import_comments();
+
+        // Quotes plugin
         $this->import_quotes();
     }
 
@@ -126,7 +131,7 @@ class Task_Content_Import_Wordpress extends Minion_Task
     /**
      * @return Model_ContentEntity
      */
-    protected function get_content_entity()
+    protected function get_content_post_entity()
     {
         static $content_entity;
 
@@ -217,7 +222,7 @@ class Task_Content_Import_Wordpress extends Minion_Task
             if ($model instanceof ContentElementInterface)
             {
                 // Storing entity
-                $model->set_entity($this->get_content_entity());
+                $model->set_entity($this->get_content_post_entity());
 
                 // Storing entity item ID
                 if ($entity_item_id)
@@ -900,7 +905,7 @@ class Task_Content_Import_Wordpress extends Minion_Task
 
         $video
             ->set_uploaded_by($this->current_user())
-            ->set_entity($this->get_content_entity())
+            ->set_entity($this->get_content_post_entity())
             ->set_entity_item_id($entity_item_id)
             ->save();
 
@@ -998,6 +1003,90 @@ class Task_Content_Import_Wordpress extends Minion_Task
                 ->set_author($author)
                 ->set_text($text)
                 ->save();
+        }
+    }
+
+    protected function import_comments()
+    {
+        $comments_data = $this->wp()->get_comments();
+
+        $this->info('Processing :total comments ', [
+            ':total'    => count($comments_data),
+        ]);
+
+
+        foreach ($comments_data as $data) {
+            $wpID = $data['id'];
+            $wpParentID = $data['parent_id'];
+            $wpPostID = $data['post_id'];
+            $created_at = new DateTime($data['created_at']);
+            $authorName = $data['author_name'];
+            $authorEmail = $data['author_email'];
+            $authorIP = $data['author_ip_address'];
+            $message = $data['message'];
+            $wpApproved = $data['approved'];
+            $userAgent = $data['user_agent'];
+
+            /** @var Model_ContentPost $post */
+            $post = $this->model_factory_content_post()->find_by_wp_id($wpPostID);
+            $postID = $post->get_id();
+
+            if (!$postID) {
+                throw new Task_Exception('Unknown WP post ID [:post] used as reference in WP comment :comment', [
+                    ':post' =>  $wpPostID,
+                    ':comment'  =>  $wpID,
+                ]);
+            }
+
+            /** @var Model_ContentComment|null $model */
+            $model = $this->model_factory_content_comment()->find_by_wp_id($wpID);
+
+            $parent = $wpParentID ? $this->model_factory_content_comment()->find_by_wp_id($wpParentID) : null;
+
+            if ($wpParentID && !$parent->get_id()) {
+                throw new Task_Exception('Unknown WP comment parent ID [:parent] used as reference in WP comment :comment', [
+                    ':parent'   =>  $wpParentID,
+                    ':comment'  =>  $wpID,
+                ]);
+            }
+
+            $isApproved = ($wpApproved == 1);
+            $isSpam = (mb_strtolower($wpApproved) == 'spam');
+            $isTrash = (mb_strtolower($wpApproved) == 'trash');
+
+            // Detecting user by name
+            $authorUser = $this->model_factory_user()->search_by($authorName);
+
+            $model
+                ->set_parent($parent)
+                ->set_entity($this->get_content_post_entity())
+                ->set_entity_item_id($post->get_id())
+                ->set_created_at($created_at)
+                ->set_user_agent($userAgent)
+                ->set_ip_address($authorIP);
+
+            if ($authorUser) {
+                $model->set_author_user($authorUser);
+            } else {
+                $model
+                    ->set_guest_author_name($authorName)
+                    ->set_guest_author_email($authorEmail);
+            }
+
+            if ($isSpam) {
+                $model->mark_as_spam();
+            } elseif ($isTrash) {
+                $model->mark_as_deleted();
+            } elseif ($isApproved) {
+                $model->mark_as_approved();
+            } else {
+                $model->mark_as_pending();
+            }
+
+            $model
+                ->set_message($message);
+
+            $model->save();
         }
     }
 

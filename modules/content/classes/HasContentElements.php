@@ -3,7 +3,7 @@
 interface HasContentElements
 {
     /**
-     * Возвращает ID из таблицы content_entities, к которому привязана текущая модель
+     * Returns entity ID (content_entities.id value)
      *
      * @return int
      */

@@ -109,24 +109,24 @@ class Model_ContentCategory extends TreeModelSingleParentOrm implements SeoMetaI
         return $this->get_posts_relation()->get_all();
     }
 
-    /**
-     * @param int $wp_id
-     * @return $this
-     * @throws Kohana_Exception
-     */
-    public function find_by_wp_id($wp_id)
-    {
-        $model = $this
-            ->model_factory()
-            ->filter_wp_id($wp_id)
-            ->find();
-
-        if (!$model->loaded()) {
-            $model->clear();
-        }
-
-        return $model;
-    }
+//    /**
+//     * @param int $wp_id
+//     * @return $this
+//     * @throws Kohana_Exception
+//     */
+//    public function find_by_wp_id($wp_id)
+//    {
+//        $model = $this
+//            ->model_factory()
+//            ->filter_wp_id($wp_id)
+//            ->find();
+//
+//        if (!$model->loaded()) {
+//            $model->clear();
+//        }
+//
+//        return $model;
+//    }
 
     public function filter_is_active($value = TRUE)
     {

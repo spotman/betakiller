@@ -29,8 +29,6 @@ class Widget_Content_Comments extends Widget
 
         $entity = $this->model_factory_content_entity()->find_by_slug($entitySlug);
 
-        // TODO select only approved comments
-
         $comments = $this->model_factory_content_comment()->get_entity_item_comments($entity, $entityItemId);
 
         $commentsData = [];
@@ -38,12 +36,15 @@ class Widget_Content_Comments extends Widget
         foreach ($comments as $comment) {
             $created_at = $comment->get_created_at();
 
+            $email = $comment->get_author_email();
+
             $commentsData[] = [
-                'name'      =>  $comment->get_name(),
                 'date'      =>  $created_at->format('d.m.Y'),
                 'time'      =>  $created_at->format('H:i:s'),
-                'email'     =>  $comment->get_email(),
+                'name'      =>  $comment->get_author_name(),
+                'email'     =>  $email,
                 'message'   =>  $comment->get_message(),
+                'image'     =>  'http://1.gravatar.com/avatar/'.md5($email).'?s=100&d=identicon&r=g',
             ];
         }
 
@@ -89,10 +90,9 @@ class Widget_Content_Comments extends Widget
         $name       = HTML::chars($this->post('name'));
         $email      = $this->post('email');
         $message    = HTML::chars($this->post('message'));
-        $ipAddress  = $this->getRequest()->client_ip();
+        $ipAddress  = HTML::chars($this->getRequest()->client_ip());
 
-        // TODO throttling + csrf protection
-        // TODO mark comment as "draft"
+        // TODO throttling
 
         $model = $this->model_factory_content_comment();
 
@@ -100,11 +100,13 @@ class Widget_Content_Comments extends Widget
             $model
                 ->set_entity($entity)
                 ->set_entity_item_id($entityItemId)
-                ->set_name($name)
-                ->set_email($email)
+                ->set_guest_author_name($name)
+                ->set_guest_author_email($email)
                 ->set_message($message)
                 ->set_ip_address($ipAddress)
-                ->save($validation);
+                ->mark_as_pending();
+
+            $model->save();
 
             $this->send_success_json();
         } catch (ORM_Validation_Exception $e) {
@@ -112,7 +114,5 @@ class Widget_Content_Comments extends Widget
 
             $this->send_error_json(array_pop($errors));
         }
-
     }
-
 }

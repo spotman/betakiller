@@ -404,25 +404,24 @@ class Model_ContentPost extends Status_Related_Model implements SeoMetaInterface
         return $model->order_by_created_at()->limit($limit)->get_all();
     }
 
-    /**
-     * @param int $wp_id
-     * @return $this
-     * @throws Kohana_Exception
-     */
-    public function find_by_wp_id($wp_id)
-    {
-        $model = $this
-            ->model_factory()
-            ->filter_wp_id($wp_id)
-            ->find();
-
-        if (!$model->loaded())
-        {
-            $model->clear();
-        }
-
-        return $model;
-    }
+//    /**
+//     * @param int $wp_id
+//     * @return $this
+//     * @throws Kohana_Exception
+//     */
+//    public function find_by_wp_id($wp_id)
+//    {
+//        $model = $this
+//            ->model_factory()
+//            ->filter_wp_id($wp_id)
+//            ->find();
+//
+//        if (!$model->loaded()){
+//            $model->clear();
+//        }
+//
+//        return $model;
+//    }
 
     /**
      * @return \ORM

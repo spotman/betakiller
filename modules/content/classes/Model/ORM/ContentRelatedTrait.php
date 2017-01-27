@@ -83,7 +83,7 @@ trait Model_ORM_ContentRelatedTrait
      */
     public function filter_entity_item_id($item_id)
     {
-        return $this->where('entity_item_id', '=', $item_id);
+        return $this->where($this->object_column('entity_item_id'), '=', $item_id);
     }
 
     /**
@@ -93,7 +93,7 @@ trait Model_ORM_ContentRelatedTrait
      */
     public function filter_entity_item_ids(array $item_ids)
     {
-        return $this->where('entity_item_id', 'IN', $item_ids);
+        return $this->where($this->object_column('entity_item_id'), 'IN', $item_ids);
     }
 
     /**
@@ -103,7 +103,7 @@ trait Model_ORM_ContentRelatedTrait
      */
     public function filter_entity_id($entity_id)
     {
-        return $this->where('entity_id', '=', $entity_id);
+        return $this->where($this->object_column('entity_id'), '=', $entity_id);
     }
 
     /**
@@ -111,6 +111,6 @@ trait Model_ORM_ContentRelatedTrait
      */
     public function group_by_entity_item_id()
     {
-        return $this->group_by('entity_item_id');
+        return $this->group_by($this->object_column('entity_item_id'));
     }
 }
