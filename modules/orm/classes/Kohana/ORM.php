@@ -129,12 +129,6 @@ class Kohana_ORM extends Model implements Serializable {
 	 */
 	protected $_object_name;
 
-    /**
-     * Model name in lowercase
-     * @var string
-     */
-//	protected $_object_name_lowercase;
-
 	/**
 	 * Plural model name
 	 * @var string
@@ -297,7 +291,7 @@ class Kohana_ORM extends Model implements Serializable {
 	{
 	    // Replace namespace delimiters with underscore
 	    $class_name = str_replace('\\', '_', get_class($this));
-	    $pos = strpos($class_name, 'Model_');
+	    $pos = strrpos($class_name, 'Model_');
 
 	    if ($pos === false) {
             throw new Exception('Incorrect model class naming '.$class_name);
@@ -305,8 +299,7 @@ class Kohana_ORM extends Model implements Serializable {
 
 		// Set the object name and plural name
 		$this->_object_name = strtolower(substr($class_name, $pos + 6));
-//	    $this->_object_name_lowercase = strtolower($this->_object_name);
-		
+
 		// Check if this model has already been initialized
 		if ( ! $init = Arr::get(ORM::$_init_cache, $this->_object_name, FALSE))
 		{
