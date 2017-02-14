@@ -1,17 +1,17 @@
 {#{{ assets('bootstrap') }}#}
 
 <div class="widget-auth-regular span4 offset4 well">
-    <h1>{{ __('Sign in') }}</h1>
+    <h1>{{ 'Sign in'|i18n }}</h1>
     <div class="alert alert-error hide"></div>
     <form method="POST" data-action="{{ login_url }}" name="regular-login-form" class="form-horizontal">
-        <input type="text" name="user-login" class="span4 form-control" placeholder="{{ __('Your username or email') }}" />
-        <input type="password" name="user-password" class="span4 form-control" placeholder="{{ __('Your password') }}" />
+        <input type="text" name="user-login" class="span4 form-control" placeholder="{{ 'Your username or email'|i18n }}" />
+        <input type="password" name="user-password" class="span4 form-control" placeholder="{{ 'Your password'|i18n }}" />
 
         <label>
-            <input type="checkbox" name="remember" class="span4 form-control" /> {{ __('Remember me') }}
+            <input type="checkbox" name="remember" class="span4 form-control" /> {{ 'Remember me'|i18n }}
         </label>
 
-        <button type="submit" class="btn btn-info btn-block"><i class="icon-user icon-white"></i> {{ __('Sign in') }}</button>
+        <button type="submit" class="btn btn-info btn-block"><i class="icon-user icon-white"></i> {{ 'Sign in'|i18n }}</button>
     </form>
-    <a href="{{ reset_password_url }}" class="pull-right">{{ __("Forgot password?") }}</a>
+    <a href="{{ reset_password_url }}" class="pull-right">{{ "Forgot password?"|i18n }}</a>
 </div>

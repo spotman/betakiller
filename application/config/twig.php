@@ -58,7 +58,6 @@ return array(
 	 *      ),
 	 */
 	'functions' => array(
-        '__'    =>  '__'
     ),
 
 	'filters' => array(),

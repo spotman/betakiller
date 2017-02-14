@@ -142,6 +142,14 @@ class BetaKiller_Twig_Extension extends Twig_Extension
                 return ___($text, $context ?: current($values), $values);
             }),
 
+            /**
+             * I18n via translation strings
+             * @example ":count lots"|i18n({ ":count": lotsCount })
+             */
+            new Twig_SimpleFilter('i18n', function ($text, array $values = null) {
+                return __($text, $values);
+            }),
+
         ];
     }
 
