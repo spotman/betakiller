@@ -11,6 +11,15 @@ return array (
   'email' => 'Email',
   'Enter your email, please' => 'Пожалуйста, введите адрес Вашей электронной почты',
   'message' => 'Сообщение',
-  'Enter your message, please' => 'Пожалуйста, введите Ваше сообщение',
+  'Enter your comment, please' => 'Пожалуйста, введите Ваш комментарий',
   ':date at :time' => ':date в :time',
+  'comments.form.header'  =>  'Оставить комментарий',
+  'comments.count'  =>  [
+    'none' => 'Нет комментариев',
+    'one' => ':count комментарий',
+    'few' => ':count комментария',
+    'many' => ':count комментариев',
+    'other' => ':count комментариев',
+  ],
+  'comment.reply' => 'Ответить',
 );
