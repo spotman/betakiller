@@ -2,7 +2,7 @@
 
 class JS {
 
-    use \BetaKiller\Utils\Instance\Singleton;
+    use \BetaKiller\Utils\Instance\SingletonTrait;
 
     /**
      * Хелпер к добавлению локально размещённого скрипта

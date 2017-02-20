@@ -2,7 +2,7 @@
 
 class BetaKiller_Kohana_Exception extends Kohana_Kohana_Exception
 {
-    use BetaKiller\Helper\IFace;
+    use BetaKiller\Helper\IFaceTrait;
 
     /**
      * Exception counter for preventing recursion

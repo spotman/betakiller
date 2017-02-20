@@ -183,12 +183,12 @@ class ORM extends Utils\Kohana\ORM implements OrmInterface, API_Response_Item, U
     }
 
     /**
-     * @return \Database_Result|\$this[]
+     * @return $this[]
      * @throws Kohana_Exception
      */
     public function get_all()
     {
-        return $this->find_all();
+        return $this->find_all()->as_array();
     }
 
     /**

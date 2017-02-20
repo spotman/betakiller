@@ -6,7 +6,7 @@ use Twig;
 
 abstract class Widget extends Core\Widget
 {
-    use Helper\IFace;
+    use Helper\IFaceTrait;
 
     /**
      * Returns Twig view instance

@@ -2,8 +2,8 @@
 
 class BetaKiller_Twig_Extension extends Twig_Extension
 {
-    use \BetaKiller\Helper\CurrentUser;
-    use \BetaKiller\Helper\IFace;
+    use \BetaKiller\Helper\CurrentUserTrait;
+    use \BetaKiller\Helper\IFaceTrait;
 
     /**
      * Returns the name of the extension.

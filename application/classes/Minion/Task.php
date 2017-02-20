@@ -5,7 +5,7 @@
  */
 abstract class Minion_Task extends Kohana_Minion_Task
 {
-    use BetaKiller\Helper\Log;
+    use BetaKiller\Helper\LogTrait;
 
     const RED           = Minion_CLI::RED;
     const GREEN         = Minion_CLI::GREEN;

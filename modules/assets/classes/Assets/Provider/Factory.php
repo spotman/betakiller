@@ -2,8 +2,8 @@
 
 class Assets_Provider_Factory
 {
-    use BetaKiller\Utils\Instance\Singleton,
-        BetaKiller\Utils\Factory\Base,
+    use BetaKiller\Utils\Instance\SingletonTrait,
+        BetaKiller\Utils\Factory\BaseFactoryTrait,
         BetaKiller\DI\ContainerTrait;
 
     /**

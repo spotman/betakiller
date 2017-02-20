@@ -3,7 +3,7 @@
 abstract class Migration extends Kohana_Migration
 {
 //    use BetaKiller\Helper\Base;
-    use BetaKiller\Helper\Log;
+    use BetaKiller\Helper\LogTrait;
 
     protected function run_sql($sql, $type = Database::UPDATE, $db = NULL)
     {

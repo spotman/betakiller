@@ -5,6 +5,8 @@ use BetaKiller\Utils\Kohana\TreeModelMultipleParentsOrm;
 
 class Role extends TreeModelMultipleParentsOrm implements RoleInterface
 {
+    const GUEST_ROLE_NAME       = 'guest';
+    const LOGIN_ROLE_NAME       = 'login';
     const DEVELOPERS_ROLE_NAME  = 'developer';
     const MODERATORS_ROLE_NAME  = 'moderator';
     const WRITER_ROLE_NAME      = 'writer';
@@ -61,7 +63,7 @@ class Role extends TreeModelMultipleParentsOrm implements RoleInterface
      */
     public function get_by_name($name)
     {
-        return $this->where($this->object_column("name"), "=", $name)->find();
+        return $this->model_factory()->where($this->object_column("name"), "=", $name)->find();
     }
 
     /**
@@ -107,7 +109,7 @@ class Role extends TreeModelMultipleParentsOrm implements RoleInterface
      *
      * @return RoleInterface
      */
-    public function developers()
+    public function get_developer_role()
     {
         return $this->get_by_name(self::DEVELOPERS_ROLE_NAME);
     }
@@ -117,9 +119,25 @@ class Role extends TreeModelMultipleParentsOrm implements RoleInterface
      *
      * @return RoleInterface
      */
-    public function moderators()
+    public function get_moderator_role()
     {
         return $this->get_by_name(self::MODERATORS_ROLE_NAME);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function get_guest_role()
+    {
+        return $this->get_by_name(self::GUEST_ROLE_NAME);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function get_login_role()
+    {
+        return $this->get_by_name(self::LOGIN_ROLE_NAME);
     }
 
     /**

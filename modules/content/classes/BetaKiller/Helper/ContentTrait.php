@@ -119,13 +119,11 @@ trait ContentTrait
     }
 
     /**
-     * @param null $id
-     *
      * @return \Model_ContentComment|OrmInterface
      */
-    protected function model_factory_content_comment($id = null)
+    protected function model_factory_content_comment()
     {
-        return \ORM::factory('ContentComment', $id);
+        return \ORM::factory('ContentComment');
     }
 
     /**

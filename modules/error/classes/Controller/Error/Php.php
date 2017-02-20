@@ -2,7 +2,7 @@
 
 class Controller_Error_Php extends Controller_Developer
 {
-    use \BetaKiller\Helper\CurrentUser;
+    use \BetaKiller\Helper\CurrentUserTrait;
 
     const   SHOW_RESOLVED_COOKIE_NAME = "errors:show_resolved_errors";
     const   SORT_BY_COOKIE_NAME = "errors:sort_by";

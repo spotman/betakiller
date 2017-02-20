@@ -2,7 +2,7 @@
 
 abstract class BetaKiller_API_Model extends Core_API_Model
 {
-    use BetaKiller\Helper\CurrentUser;
+    use BetaKiller\Helper\CurrentUserTrait;
 
     /**
      * @param string $name

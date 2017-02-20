@@ -5,7 +5,7 @@
  */
 class Link
 {
-    use BetaKiller\Utils\Instance\Singleton;
+    use BetaKiller\Utils\Instance\SingletonTrait;
 
     protected $links = [];
 

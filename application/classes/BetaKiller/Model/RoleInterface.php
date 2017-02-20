@@ -45,12 +45,22 @@ interface RoleInterface extends OrmInterface, AclRoleInterface, TreeModelMultipl
      *
      * @return RoleInterface
      */
-    public function developers();
+    public function get_developer_role();
 
     /**
-     * Returns "Developers" role object
+     * Returns "Moderators" role object
      *
      * @return RoleInterface
      */
-    public function moderators();
+    public function get_moderator_role();
+
+    /**
+     * @return RoleInterface
+     */
+    public function get_guest_role();
+
+    /**
+     * @return RoleInterface
+     */
+    public function get_login_role();
 }

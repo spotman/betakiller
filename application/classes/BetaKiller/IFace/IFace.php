@@ -5,7 +5,7 @@ use BetaKiller\Helper;
 
 abstract class IFace extends Kohana\IFace
 {
-    use Helper\IFace;
+    use Helper\IFaceTrait;
 
     final protected function process_api_response(\API_Response $response)
     {

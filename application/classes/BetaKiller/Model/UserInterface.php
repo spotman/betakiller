@@ -85,7 +85,7 @@ interface UserInterface extends OrmInterface, NotificationUserInterface, AclUser
      * Search for user by username or e-mail
      * @param $username_or_email
      * @throws \HTTP_Exception_403
-     * @return UserInterface
+     * @return UserInterface|null
      */
     public function search_by($username_or_email);
 

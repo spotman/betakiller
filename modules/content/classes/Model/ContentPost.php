@@ -3,12 +3,14 @@
 use BetaKiller\Helper\SeoMetaInterface;
 use BetaKiller\Content\ImportedFromWordpressInterface;
 use BetaKiller\Content\Shortcode;
+use BetaKiller\Status\StatusRelatedModelOrm;
 
-class Model_ContentPost extends Status_Related_Model implements SeoMetaInterface, ImportedFromWordpressInterface
+class Model_ContentPost extends StatusRelatedModelOrm implements SeoMetaInterface, ImportedFromWordpressInterface
 {
     use Model_ORM_SeoContentTrait,
         Model_ORM_ImportedFromWordpressTrait,
-        BetaKiller\Helper\IFace;
+        BetaKiller\Helper\IFaceTrait,
+        BetaKiller\Helper\CurrentUserTrait;
 
     const URL_PARAM = 'ContentPost';
 
@@ -80,7 +82,7 @@ class Model_ContentPost extends Status_Related_Model implements SeoMetaInterface
     }
 
     /**
-     * @return \Status_Workflow_Content_Post
+     * @return \Status_Workflow_Content_Post|\BetaKiller\Status\StatusWorkflowInterface
      */
     protected function workflow()
     {
@@ -658,9 +660,9 @@ class Model_ContentPost extends Status_Related_Model implements SeoMetaInterface
 
     public function filter_user_allowed_statuses()
     {
-        $user = Env::user(TRUE);
+        $user = $this->current_user(TRUE);
 
-        // Allow moderators find all statuses
+        // Allow get_moderator_role find all statuses
         // TODO Statuses ACL instead of this ugly thing
         if ($user && ($user->is_moderator() || $user->is_developer() || $user->has_role('content'))) {
             return $this;

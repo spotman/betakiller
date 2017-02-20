@@ -2,7 +2,7 @@
 
 class Widget_Admin_Bar extends \BetaKiller\IFace\Widget
 {
-    use \BetaKiller\Helper\CurrentUser;
+    use \BetaKiller\Helper\CurrentUserTrait;
 
     /**
      * Returns data for View rendering

@@ -1,6 +1,9 @@
 <?php
 
-class Status_Workflow_Content_Post extends Status_Workflow
+use BetaKiller\Status\StatusWorkflow;
+use BetaKiller\Status\StatusWorkflowException;
+
+class Status_Workflow_Content_Post extends StatusWorkflow
 {
     const TRANSITION_COMPLETE   = 'complete';
     const TRANSITION_REJECT     = 'reject';
@@ -11,7 +14,7 @@ class Status_Workflow_Content_Post extends Status_Workflow
     public function draft()
     {
         if ($this->model()->has_current_status()) {
-            throw new Status_Workflow_Exception('Can not mark post [:id] as draft coz it is in [:status] status', [
+            throw new StatusWorkflowException('Can not mark post [:id] as draft coz it is in [:status] status', [
                 ':id'       =>  $this->model()->get_id(),
                 ':status'   =>  $this->model()->get_current_status()->get_codename()
             ]);
@@ -22,10 +25,9 @@ class Status_Workflow_Content_Post extends Status_Workflow
 
     public function complete()
     {
-        // TODO Notify
+        // TODO Notify moderator
         $this->do_transition(self::TRANSITION_COMPLETE);
     }
-
 
     public function publish()
     {
@@ -49,7 +51,7 @@ class Status_Workflow_Content_Post extends Status_Workflow
         $label = $this->model()->get_label();
 
         if (!$label) {
-            throw new Status_Workflow_Exception('Post [:id] must have uri or label before publishing', [':id' => $this->model()->get_id()]);
+            throw new StatusWorkflowException('Post [:id] must have uri or label before publishing', [':id' => $this->model()->get_id()]);
         }
 
         $uri = URL::transliterate($label);
@@ -59,7 +61,7 @@ class Status_Workflow_Content_Post extends Status_Workflow
     }
 
     /**
-     * @return \Model_ContentPost|\Status_Related_Model
+     * @return \Model_ContentPost|\BetaKiller\Status\StatusRelatedModelInterface
      */
     protected function model()
     {

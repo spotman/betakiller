@@ -1,5 +1,7 @@
 <?php
 
+use BetaKiller\Service\ServiceException;
+
 class Service_Content_Youtube extends Service_Content_Base
 {
     /**
@@ -17,7 +19,7 @@ class Service_Content_Youtube extends Service_Content_Base
         $path = parse_url($url, PHP_URL_PATH);
 
         if ( strpos($path, 'embed') === null)
-            throw new Service_Exception('No embed in URL :url', [':url' => $url]);
+            throw new ServiceException('No embed in URL :url', [':url' => $url]);
 
         return basename($path);
     }

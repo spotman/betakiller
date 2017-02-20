@@ -2,12 +2,13 @@
 
 use BetaKiller\IFace\IFaceModelInterface;
 use BetaKiller\Service;
+use BetaKiller\Service\ServiceException;
 use samdark\sitemap\Sitemap;
 use samdark\sitemap\Index;
 
 class Service_Sitemap extends Service
 {
-    use BetaKiller\Helper\IFace;
+    use BetaKiller\Helper\IFaceTrait;
 
     /**
      * @var URL_Parameters
@@ -52,7 +53,7 @@ class Service_Sitemap extends Service
         $base_url = Kohana::$base_url;
 
         if ( strpos($base_url, 'http') === FALSE )
-            throw new Service_Exception('Please, set "base_url" parameter to full URL (with protocol) in config file init.php');
+            throw new ServiceException('Please, set "base_url" parameter to full URL (with protocol) in config file init.php');
 
         // create sitemap
         $this->_sitemap = new Sitemap($this->get_sitemap_file_path());

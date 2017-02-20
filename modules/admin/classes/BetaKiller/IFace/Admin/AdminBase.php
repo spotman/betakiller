@@ -3,11 +3,11 @@ namespace BetaKiller\IFace\Admin;
 
 use BetaKiller\Acl\Resource\AdminResource;
 use BetaKiller\IFace\IFace;
-use BetaKiller\Helper\CurrentUser;
+use BetaKiller\Helper\CurrentUserTrait;
 
 abstract class AdminBase extends IFace
 {
-    use CurrentUser;
+    use CurrentUserTrait;
 
     protected $adminAclResource;
 

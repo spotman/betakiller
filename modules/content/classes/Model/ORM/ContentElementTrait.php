@@ -4,7 +4,7 @@ use BetaKiller\Content\ContentElementInterface;
 
 trait Model_ORM_ContentElementTrait
 {
-    use BetaKiller\Helper\CurrentUser;
+    use BetaKiller\Helper\CurrentUserTrait;
     use Model_ORM_ContentRelatedTrait;
 
     /**

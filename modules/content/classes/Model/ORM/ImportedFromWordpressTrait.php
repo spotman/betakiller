@@ -34,8 +34,11 @@ trait Model_ORM_ImportedFromWordpressTrait
      */
     public function find_by_wp_id($id)
     {
+        /** @var \BetaKiller\Utils\Kohana\ORM\OrmInterface|$this|\BetaKiller\Content\ImportedFromWordpressInterface $orm */
+        $orm = $this->model_factory();
+
         /** @var \BetaKiller\Utils\Kohana\ORM\OrmInterface|$this|\BetaKiller\Content\ImportedFromWordpressInterface $model */
-        $model = $this->filter_wp_id($id)->find();
+        $model = $orm->filter_wp_id($id)->find();
 
         if (!$model->loaded()) {
             $model->clear();

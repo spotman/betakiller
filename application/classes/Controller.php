@@ -6,7 +6,7 @@
  */
 abstract class Controller extends Controller_Proxy
 {
-    use BetaKiller\Helper\CurrentUser;
+    use BetaKiller\Helper\CurrentUserTrait;
     use BetaKiller\Utils\Kohana\ControllerHelperTrait;
 
     const JSON_SUCCESS = Response::JSON_SUCCESS;

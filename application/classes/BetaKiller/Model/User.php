@@ -2,9 +2,12 @@
 namespace BetaKiller\Model;
 
 use BetaKiller\Exception;
+use BetaKiller\Helper\RoleModelFactoryTrait;
 
 class User extends \Model_Auth_User implements UserInterface
 {
+    use RoleModelFactoryTrait;
+
     protected $_table_name = 'users';
 
     protected $_reload_on_wakeup = FALSE;
@@ -137,9 +140,7 @@ class User extends \Model_Auth_User implements UserInterface
     protected function prepare_role_object($role)
     {
         if (is_string($role)) {
-            /** @var RoleInterface $orm */
-            $orm = \ORM::factory('Role');
-            $role = $orm->get_by_name($role);
+            $role = $this->model_factory_role()->get_by_name($role);
         }
 
         if ( !($role instanceof RoleInterface) ) {
@@ -154,9 +155,7 @@ class User extends \Model_Auth_User implements UserInterface
      */
     public function add_all_available_roles()
     {
-        /** @var RoleInterface $orm */
-        $orm = \ORM::factory('Role');
-        $roles = $orm->find_all();
+        $roles = $this->model_factory_role()->find_all();
 
         foreach ($roles as $role) {
             $this->add_role($role);
@@ -344,10 +343,7 @@ class User extends \Model_Auth_User implements UserInterface
      */
     public function get_developers_list()
     {
-        /** @var RoleInterface $roles_orm */
-        $roles_orm = \ORM::factory('Role');
-
-        return $roles_orm->developers()->get_users()->find_all();
+        return $this->model_factory_role()->get_developer_role()->get_users()->find_all();
     }
 
     /**
@@ -355,10 +351,7 @@ class User extends \Model_Auth_User implements UserInterface
      */
     public function get_moderators_list()
     {
-        /** @var RoleInterface $roles_orm */
-        $roles_orm = \ORM::factory('Role');
-
-        return $roles_orm->moderators()->get_users()->find_all();
+        return $this->model_factory_role()->get_moderator_role()->get_users()->find_all();
     }
 
     public function is_email_notification_allowed()

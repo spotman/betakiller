@@ -1,4 +1,6 @@
-<?php defined('SYSPATH') OR die('No direct script access.');
+<?php use BetaKiller\Task\TaskException;
+
+defined('SYSPATH') OR die('No direct script access.');
 
 
 class Task_Backup extends Minion_Task
@@ -17,7 +19,7 @@ class Task_Backup extends Minion_Task
                 break;
 
             default:
-                throw new Task_Exception('Unknown service :name', array(':name' => $service));
+                throw new TaskException('Unknown service :name', array(':name' => $service));
         }
 
         $this->debug('Service '.$service.' selected');
@@ -75,6 +77,6 @@ class Task_Backup extends Minion_Task
         if ( in_array($driver, ['mysqli', 'mysql']) )
             return 'mysql';
 
-        throw new Task_Exception('Unknown database driver :name', array(':name' => $driver));
+        throw new TaskException('Unknown database driver :name', array(':name' => $driver));
     }
 }

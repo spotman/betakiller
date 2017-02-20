@@ -10,6 +10,6 @@ return array(
     ),
 
     'message'  => array(
-        'not_empty' =>  'Enter your message, please'
+        'not_empty' =>  'Enter your comment, please'
     ),
 );

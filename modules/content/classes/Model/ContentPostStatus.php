@@ -1,6 +1,8 @@
 <?php
 
-class Model_ContentPostStatus extends Status_Model
+use BetaKiller\Status\StatusModelOrm;
+
+class Model_ContentPostStatus extends StatusModelOrm
 {
     const INCOMPLETE_ID = 1;
     const PENDING_ID = 2;

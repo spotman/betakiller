@@ -6,7 +6,7 @@ use BetaKiller\Helper\SeoMetaInterface;
 
 class Model_ContentCategory extends TreeModelSingleParentOrm implements SeoMetaInterface, ImportedFromWordpressInterface
 {
-    use BetaKiller\Helper\IFace;
+    use BetaKiller\Helper\IFaceTrait;
     use Model_ORM_ImportedFromWordpressTrait,
         Model_ORM_SeoContentTrait;
 

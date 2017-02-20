@@ -4,16 +4,15 @@ use BetaKiller\Content\ContentRelatedInterface;
 use BetaKiller\Content\ImportedFromWordpressInterface;
 use BetaKiller\Utils\Kohana\TreeModelSingleParentOrm;
 use BetaKiller\Model\UserInterface;
+use BetaKiller\Status\StatusRelatedModelOrmTrait;
+use BetaKiller\Status\StatusRelatedModelInterface;
 
-class Model_ContentComment extends TreeModelSingleParentOrm implements ContentRelatedInterface, ImportedFromWordpressInterface
+class Model_ContentComment extends TreeModelSingleParentOrm
+    implements ContentRelatedInterface, StatusRelatedModelInterface, ImportedFromWordpressInterface
 {
     use Model_ORM_ContentRelatedTrait;
     use Model_ORM_ImportedFromWordpressTrait;
-
-    const STATUS_PENDING = 1;
-    const STATUS_APPROVED = 2;
-    const STATUS_SPAM = 3;
-    const STATUS_DELETED = 4;
+    use StatusRelatedModelOrmTrait;
 
     protected $_table_name = 'content_comments';
 
@@ -37,7 +36,33 @@ class Model_ContentComment extends TreeModelSingleParentOrm implements ContentRe
             ],
         ]);
 
+        $this->initialize_related_model_relation();
+
         parent::_initialize();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    protected function get_workflow_name()
+    {
+        return 'ContentComment';
+    }
+
+    /**
+     * @inheritDoc
+     */
+    protected function get_status_relation_model_name()
+    {
+        return 'ContentCommentStatus';
+    }
+
+    /**
+     * @inheritDoc
+     */
+    protected function get_status_relation_foreign_key()
+    {
+        return 'status_id';
     }
 
     /**
@@ -68,7 +93,7 @@ class Model_ContentComment extends TreeModelSingleParentOrm implements ContentRe
             'user_agent'   =>  [
                 ['not_empty'],
             ],
-            'status'   =>  [
+            'status_id'   =>  [
                 ['not_empty'],
             ],
             'message'   =>  [
@@ -253,11 +278,77 @@ class Model_ContentComment extends TreeModelSingleParentOrm implements ContentRe
     }
 
     /**
-     * @return bool
+     * @return string
      */
-    public function has_status()
+    public function get_path()
     {
-        return (bool) $this->get_status();
+        return $this->get('path');
+    }
+
+    /**
+     * @return $this
+     */
+    protected function set_path()
+    {
+        $parent = $this->get_parent();
+        $parentPath = $parent ? $parent->get_path() : 0;
+
+        $this->set('path', $parentPath.'.'.$this->get_id());
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function order_by_path()
+    {
+        return $this->order_by('path', 'asc');
+    }
+
+    public function get_level()
+    {
+        return substr_count($this->get_path(), '.') - 1;
+    }
+
+    /**
+     * @param \DateInterval $interval
+     *
+     * @return $this
+     */
+    public function filter_last_records(DateInterval  $interval)
+    {
+        $time = new DateTime();
+        $time->sub($interval);
+
+        $this->filter_datetime_column_value($this->object_column('created_at'), $time, '>');
+        return $this;
+    }
+
+    /**
+     * @param string    $ipAddress
+     * @param int       $interval
+     *
+     * @return int
+     */
+    public function get_comments_count_for_ip($ipAddress, $interval = 30)
+    {
+        $interval = new DateInterval('PT'.(int) $interval.'S');
+
+        return $this
+            ->filter_last_records($interval)
+            ->filter_ip_address($ipAddress)
+            ->count_all();
+    }
+
+    /**
+     * @param string $value
+     *
+     * @return $this
+     */
+    public function filter_ip_address($value)
+    {
+        $this->where($this->object_column('ip_address'), '=', (string) $value);
+        return $this;
     }
 
     /**
@@ -265,7 +356,7 @@ class Model_ContentComment extends TreeModelSingleParentOrm implements ContentRe
      */
     public function is_pending()
     {
-        return $this->get_status() == self::STATUS_PENDING;
+        return $this->get_status_id() == Model_ContentCommentStatus::STATUS_PENDING;
     }
 
     /**
@@ -273,7 +364,7 @@ class Model_ContentComment extends TreeModelSingleParentOrm implements ContentRe
      */
     public function is_approved()
     {
-        return $this->get_status() == self::STATUS_APPROVED;
+        return $this->get_status_id() == Model_ContentCommentStatus::STATUS_APPROVED;
     }
 
     /**
@@ -281,7 +372,7 @@ class Model_ContentComment extends TreeModelSingleParentOrm implements ContentRe
      */
     public function is_spam()
     {
-        return $this->get_status() == self::STATUS_SPAM;
+        return $this->get_status_id() == Model_ContentCommentStatus::STATUS_SPAM;
     }
 
     /**
@@ -289,88 +380,92 @@ class Model_ContentComment extends TreeModelSingleParentOrm implements ContentRe
      */
     public function is_deleted()
     {
-        return $this->get_status() == self::STATUS_DELETED;
+        return $this->get_status_id() == Model_ContentCommentStatus::STATUS_DELETED;
     }
 
-    public function mark_as_pending()
+    public function init_as_pending()
     {
-        return $this->set_status(self::STATUS_PENDING);
+        $status = $this->get_status_by_id(Model_ContentCommentStatus::STATUS_PENDING);
+        return $this->init_status($status);
     }
 
-    public function mark_as_approved()
+    public function init_as_approved()
     {
-        return $this->set_status(self::STATUS_APPROVED);
+        $status = $this->get_status_by_id(Model_ContentCommentStatus::STATUS_APPROVED);
+        return $this->init_status($status);
     }
 
-    public function mark_as_spam()
+    public function init_as_spam()
     {
-        return $this->set_status(self::STATUS_SPAM);
+        $status = $this->get_status_by_id(Model_ContentCommentStatus::STATUS_SPAM);
+        return $this->init_status($status);
     }
 
-    public function mark_as_deleted()
+    public function init_as_deleted()
     {
-        return $this->set_status(self::STATUS_DELETED);
-    }
-
-    /**
-     * @param int $id
-     */
-    protected function set_status($id)
-    {
-        $this->set('status', (int) $id);
-    }
-
-    /**
-     * @return int
-     */
-    protected function get_status()
-    {
-        return $this->get('status');
+        $status = $this->get_status_by_id(Model_ContentCommentStatus::STATUS_DELETED);
+        return $this->init_status($status);
     }
 
     public function filter_pending()
     {
-        return $this->filter_status(self::STATUS_PENDING);
+        return $this->filter_status(Model_ContentCommentStatus::STATUS_PENDING);
     }
 
     public function filter_approved()
     {
-        return $this->filter_status(self::STATUS_APPROVED);
+        return $this->filter_status(Model_ContentCommentStatus::STATUS_APPROVED);
     }
 
     public function filter_spam()
     {
-        return $this->filter_status(self::STATUS_SPAM);
+        return $this->filter_status(Model_ContentCommentStatus::STATUS_SPAM);
     }
 
     public function filter_deleted()
     {
-        return $this->filter_status(self::STATUS_DELETED);
-    }
-
-    /**
-     * @param int $value
-     *
-     * @return $this
-     */
-    protected function filter_status($value)
-    {
-        return $this->where($this->object_column('status'), '=', $value);
+        return $this->filter_status(Model_ContentCommentStatus::STATUS_DELETED);
     }
 
     /**
      * @param \Model_ContentEntity $entity
      * @param int                  $entity_item_id
      *
-     * @return \Database_Result|Model_ContentComment[]
+     * @return Model_ContentComment[]
      */
     public function get_entity_item_comments(Model_ContentEntity $entity, $entity_item_id)
     {
-        return $this->model_factory()
+        $model = $this->model_factory();
+
+        $model
             ->filter_entity_id($entity->get_id())
-            ->filter_entity_item_id($entity_item_id)
+            ->filter_entity_item_id($entity_item_id);
+
+        return $model
             ->filter_approved()
-            ->order_by_created_at()
+            ->order_by_path()
             ->find_all();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function create(Validation $validation = NULL)
+    {
+        // Preset default status
+        if (!$this->has_current_status()) {
+            $this->init_as_pending();
+        }
+
+        $path_changed = $this->changed('path');
+
+        /** @var Model_ContentComment $obj */
+        $obj = parent::create($validation);
+
+        if (!$path_changed) {
+            $obj->set_path()->save();
+        }
+
+        return $obj;
     }
 }

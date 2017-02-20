@@ -6,14 +6,14 @@ use DI\DependencyException;
 use Interop\Container\Exception\ContainerException;
 use Interop\Container\Exception\NotFoundException;
 
-use BetaKiller\Utils\Instance\Singleton;
+use BetaKiller\Utils\Instance\SingletonTrait;
 use Invoker\Exception\InvocationException;
 use Invoker\Exception\NotCallableException;
 use Invoker\Exception\NotEnoughParametersException;
 
 abstract class Base implements ContainerInterface
 {
-    use Singleton {
+    use SingletonTrait {
         instance as protected _instance;
     }
 

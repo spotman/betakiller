@@ -1,6 +1,8 @@
 <?php
 
-class Model_ContentPostStatusTransition extends Status_Transition_Model
+use BetaKiller\Status\StatusTransitionModelOrm;
+
+class Model_ContentPostStatusTransition extends StatusTransitionModelOrm
 {
     protected $_table_name = 'content_post_status_transitions';
 

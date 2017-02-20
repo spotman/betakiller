@@ -3,7 +3,7 @@ namespace BetaKiller\IFace\App\Content;
 
 class PostItem extends AppBase
 {
-    use \BetaKiller\Helper\CurrentUser;
+    use \BetaKiller\Helper\CurrentUserTrait;
 
     /**
      * @var \Model_ContentPost

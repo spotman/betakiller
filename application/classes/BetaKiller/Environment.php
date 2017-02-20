@@ -8,7 +8,7 @@ use BetaKiller\Utils;
  */
 class BetaKiller_Environment extends Utils\Registry\Base
 {
-    use Utils\Instance\Singleton;
+    use Utils\Instance\SingletonTrait;
 
     public function get($key)
     {

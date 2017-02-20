@@ -5,7 +5,7 @@ use BetaKiller\IFace\Widget;
 
 abstract class Admin extends Widget
 {
-    use \BetaKiller\Helper\CurrentUser;
+    use \BetaKiller\Helper\CurrentUserTrait;
 
     public function render()
     {

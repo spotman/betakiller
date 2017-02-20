@@ -2,7 +2,7 @@
 
 class IFace_Auth_ReLogin extends IFace_Auth_Login
 {
-    use \BetaKiller\Helper\CurrentUser;
+    use \BetaKiller\Helper\CurrentUserTrait;
 
     protected $auth;
 

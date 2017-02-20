@@ -1,5 +1,6 @@
 <?php
 
+use BetaKiller\Task\TaskException;
 use DiDom\Document;
 use BetaKiller\Content\ImportedFromWordpressInterface;
 use BetaKiller\Content\HasWordpressPathInterface;
@@ -12,8 +13,9 @@ use Thunder\Shortcode\Parser\RegexParser;
 class Task_Content_Import_Wordpress extends Minion_Task
 {
     use BetaKiller\Helper\ContentTrait;
-    use BetaKiller\Helper\CurrentUser;
-    use BetaKiller\Helper\UserModelFactory;
+    use BetaKiller\Helper\CurrentUserTrait;
+    use BetaKiller\Helper\UserModelFactoryTrait;
+    use BetaKiller\Helper\RoleModelFactoryTrait;
 
     const ATTACH_PARSING_MODE_HTTP = 'http';
     const ATTACH_PARSING_MODE_LOCAL = 'local';
@@ -44,6 +46,9 @@ class Task_Content_Import_Wordpress extends Minion_Task
         }
 
         $this->configure_dialog();
+
+        // Users
+        $this->import_users();
 
         // Posts
         $this->import_posts_and_pages();
@@ -86,7 +91,7 @@ class Task_Content_Import_Wordpress extends Minion_Task
                 $parsing_path = rtrim($parsing_path, '/').'/';
 
                 if (!Valid::url($parsing_path))
-                    throw new Task_Exception('Incorrect project URL');
+                    throw new TaskException('Incorrect project URL');
             }
             elseif ($parsing_mode == self::ATTACH_PARSING_MODE_LOCAL)
             {
@@ -95,7 +100,7 @@ class Task_Content_Import_Wordpress extends Minion_Task
                 $parsing_path = '/'.trim($parsing_path, '/');
 
                 if (!is_dir($parsing_path) OR !file_exists($parsing_path))
-                    throw new Task_Exception('Incorrect project path');
+                    throw new TaskException('Incorrect project path');
             }
         }
 
@@ -149,7 +154,7 @@ class Task_Content_Import_Wordpress extends Minion_Task
         $url = $attach['guid'];
 
         if (!$wp_id || !$url)
-            throw new Task_Exception('Empty attach data');
+            throw new TaskException('Empty attach data');
 
         $this->debug('Found attach with guid = :url', [':url' => $url]);
 
@@ -190,15 +195,16 @@ class Task_Content_Import_Wordpress extends Minion_Task
      * @param string            $url
      * @param int               $wp_id
      * @param int|null          $entity_item_id
-     * @return Model_ContentAttachmentElement
-     * @throws Task_Exception
+     *
+*@return Model_ContentAttachmentElement
+     * @throws TaskException
      */
     protected function store_attachment(Assets_Provider $provider, $url, $wp_id, $entity_item_id = NULL)
     {
         $orm = $provider->file_model_factory();
 
         if (!$orm instanceof ImportedFromWordpressInterface)
-            throw new Task_Exception('Attachment model must be instance of :class', [':class' => ImportedFromWordpressInterface::class]);
+            throw new TaskException('Attachment model must be instance of :class', [':class' => ImportedFromWordpressInterface::class]);
 
         // Search for such file already exists
         $model = $orm->find_by_wp_id($wp_id);
@@ -214,7 +220,7 @@ class Task_Content_Import_Wordpress extends Minion_Task
             $path = $this->get_attachment_path($url_path, $provider->get_allowed_mime_types());
 
             if (!$path)
-                throw new Task_Exception('Can not get path for guid = :url', [':url' => $url]);
+                throw new TaskException('Can not get path for guid = :url', [':url' => $url]);
 
             /** @var Model_ContentAttachmentElement $model */
             $model = $provider->store($path, $original_filename);
@@ -269,7 +275,7 @@ class Task_Content_Import_Wordpress extends Minion_Task
             $response = Request::factory($url)->execute();
 
             if ($response->status() != 200)
-                throw new Task_Exception('Got :code status from :url', [
+                throw new TaskException('Got :code status from :url', [
                     ':code' =>  $response->status(),
                     ':url'  => $url,
                 ]);
@@ -277,7 +283,7 @@ class Task_Content_Import_Wordpress extends Minion_Task
             $real_mime = $response->headers('Content-Type');
 
             if (is_array($expected_mimes) AND !in_array($real_mime, $expected_mimes))
-                throw new Task_Exception('Invalid mime-type: [:real], [:expected] expected', [
+                throw new TaskException('Invalid mime-type: [:real], [:expected] expected', [
                     ':real'     =>  $real_mime,
                     ':expected' =>  implode('] or [', $expected_mimes),
                 ]);
@@ -285,7 +291,7 @@ class Task_Content_Import_Wordpress extends Minion_Task
             $content = $response->body();
 
             if (!$content)
-                throw new Task_Exception('Empty content for url [:url]', [':url' => $url,]);
+                throw new TaskException('Empty content for url [:url]', [':url' => $url,]);
 
             $path = tempnam(sys_get_temp_dir(), 'wp-attach-');
 
@@ -298,14 +304,14 @@ class Task_Content_Import_Wordpress extends Minion_Task
             $path = $this->attach_parsing_path.'/'.trim($original_url_path, '/');
 
             if (!file_exists($path))
-                throw new Task_Exception('No file exists at :path', [':path' => $path]);
+                throw new TaskException('No file exists at :path', [':path' => $path]);
 
             $this->debug('Getting attach at local path = :path', [':path' => $path]);
 
             $real_mime = File::mime($path);
 
             if (is_array($expected_mimes) AND !in_array($real_mime, $expected_mimes))
-                throw new Task_Exception('Invalid mime-type: [:real], [:expected] expected', [
+                throw new TaskException('Invalid mime-type: [:real], [:expected] expected', [
                     ':real'     =>  $real_mime,
                     ':expected' =>  implode('] or [', $expected_mimes),
                 ]);
@@ -476,7 +482,7 @@ class Task_Content_Import_Wordpress extends Minion_Task
             $attach = $this->wp()->get_attachment_by_path($href);
 
             if (!$attach)
-                throw new Task_Exception('Unknown attachment href :url', [':url' => $href]);
+                throw new TaskException('Unknown attachment href :url', [':url' => $href]);
 
             $model = $this->process_attachment($attach, $post_id);
 
@@ -684,7 +690,7 @@ class Task_Content_Import_Wordpress extends Minion_Task
             $wp_image = $this->wp()->get_attachment_by_path($url);
 
             if (!$wp_image)
-                throw new Task_Exception('Unknown image in wonderplugin: :url', [':url' => $url]);
+                throw new TaskException('Unknown image in wonderplugin: :url', [':url' => $url]);
 
             // Processing image
 
@@ -769,7 +775,7 @@ class Task_Content_Import_Wordpress extends Minion_Task
         $wp_image = $this->wp()->get_attachment_by_path($original_url);
 
         if (!$wp_image)
-            throw new Task_Exception('Unknown image with src :value', [':value' => $original_url]);
+            throw new TaskException('Unknown image with src :value', [':value' => $original_url]);
 
         /** @var Model_ContentImageElement $image */
         $image = $this->process_attachment($wp_image, $entity_item_id);
@@ -865,7 +871,7 @@ class Task_Content_Import_Wordpress extends Minion_Task
         $sx = simplexml_load_string($tag_string);
 
         if ($sx === FALSE)
-            throw new Task_Exception('Youtube iframe tag parsing failed on :string', [':string' => $tag_string]);
+            throw new TaskException('Youtube iframe tag parsing failed on :string', [':string' => $tag_string]);
 
         // Getting attributes
         $attributes = iterator_to_array($sx->attributes());
@@ -880,7 +886,7 @@ class Task_Content_Import_Wordpress extends Minion_Task
         $youtube_id = $service->get_youtube_id_from_embed_url($original_url);
 
         if (!$youtube_id)
-            throw new Task_Exception('Youtube iframe ID parsing failed on :string', [':string' => $tag_string]);
+            throw new TaskException('Youtube iframe ID parsing failed on :string', [':string' => $tag_string]);
 
         $video = $service->find_record_by_youtube_id($youtube_id);
 
@@ -924,15 +930,12 @@ class Task_Content_Import_Wordpress extends Minion_Task
     {
         $categories = $this->wp()->get_categories_with_posts();
 
-        $categories_orm = $this->model_factory_content_category();
-
         $items_orm = $this->model_factory_content_post();
 
         $total = count($categories);
         $current = 1;
 
-        foreach ($categories as $term)
-        {
+        foreach ($categories as $term) {
             $wp_id = $term['term_id'];
             $uri = $term['slug'];
             $label = $term['name'];
@@ -943,6 +946,7 @@ class Task_Content_Import_Wordpress extends Minion_Task
                 ':total'    => $total,
             ]);
 
+            $categories_orm = $this->model_factory_content_category();
             $category = $categories_orm->find_by_wp_id($wp_id);
 
             $category
@@ -955,14 +959,12 @@ class Task_Content_Import_Wordpress extends Minion_Task
             $posts_wp_ids = $this->wp()->get_posts_ids_linked_to_category($wp_id);
 
             // Check for any linked objects
-            if ($posts_wp_ids)
-            {
+            if ($posts_wp_ids) {
                 // Get real article IDs
                 $articles_ids = $items_orm->find_ids_by_wp_ids($posts_wp_ids);
 
                 // Does articles exist?
-                if ($articles_ids)
-                {
+                if ($articles_ids) {
                     // Link articles to category
                     $category->link_posts($articles_ids);
                 }
@@ -971,11 +973,16 @@ class Task_Content_Import_Wordpress extends Minion_Task
             $current++;
         }
 
-        foreach ($categories as $term)
-        {
-            $wp_id = $term['term_id'];
-            $parent_wp_id = $term['parent'];
+        foreach ($categories as $term) {
+            $wp_id = (int) $term['term_id'];
+            $parent_wp_id = (int) $term['parent'];
 
+            // Skip categories without parent
+            if (!$parent_wp_id) {
+                continue;
+            }
+
+            $categories_orm = $this->model_factory_content_category();
             $category = $categories_orm->find_by_wp_id($wp_id);
             $parent = $categories_orm->find_by_wp_id($parent_wp_id);
 
@@ -1014,7 +1021,6 @@ class Task_Content_Import_Wordpress extends Minion_Task
             ':total'    => count($comments_data),
         ]);
 
-
         foreach ($comments_data as $data) {
             $wpID = $data['id'];
             $wpParentID = $data['parent_id'];
@@ -1032,7 +1038,7 @@ class Task_Content_Import_Wordpress extends Minion_Task
             $postID = $post->get_id();
 
             if (!$postID) {
-                throw new Task_Exception('Unknown WP post ID [:post] used as reference in WP comment :comment', [
+                throw new TaskException('Unknown WP post ID [:post] used as reference in WP comment :comment', [
                     ':post' =>  $wpPostID,
                     ':comment'  =>  $wpID,
                 ]);
@@ -1044,18 +1050,16 @@ class Task_Content_Import_Wordpress extends Minion_Task
             $parent = $wpParentID ? $this->model_factory_content_comment()->find_by_wp_id($wpParentID) : null;
 
             if ($wpParentID && !$parent->get_id()) {
-                throw new Task_Exception('Unknown WP comment parent ID [:parent] used as reference in WP comment :comment', [
+                throw new TaskException('Unknown WP comment parent ID [:parent] used as reference in WP comment :comment', [
                     ':parent'   =>  $wpParentID,
                     ':comment'  =>  $wpID,
                 ]);
             }
 
-            $isApproved = ($wpApproved == 1);
-            $isSpam = (mb_strtolower($wpApproved) == 'spam');
-            $isTrash = (mb_strtolower($wpApproved) == 'trash');
-
-            // Detecting user by name
-            $authorUser = $this->model_factory_user()->search_by($authorName);
+            // Skip existing comments coz they may be edited after import
+            if ($model->get_id()) {
+                continue;
+            }
 
             $model
                 ->set_parent($parent)
@@ -1065,29 +1069,81 @@ class Task_Content_Import_Wordpress extends Minion_Task
                 ->set_user_agent($userAgent)
                 ->set_ip_address($authorIP);
 
+            // Detecting user by name
+            $authorUser = $this->model_factory_user()->search_by($authorName);
+
             if ($authorUser) {
                 $model->set_author_user($authorUser);
             } else {
-                $model
-                    ->set_guest_author_name($authorName)
-                    ->set_guest_author_email($authorEmail);
+                $model->set_guest_author_name($authorName)->set_guest_author_email($authorEmail);
             }
+
+            $isApproved = ($wpApproved == 1);
+            $isSpam = (mb_strtolower($wpApproved) == 'spam');
+            $isTrash = (mb_strtolower($wpApproved) == 'trash');
 
             if ($isSpam) {
-                $model->mark_as_spam();
+                $model->init_as_spam();
             } elseif ($isTrash) {
-                $model->mark_as_deleted();
+                $model->init_as_deleted();
             } elseif ($isApproved) {
-                $model->mark_as_approved();
+                $model->init_as_approved();
             } else {
-                $model->mark_as_pending();
+                $model->init_as_pending();
             }
 
-            $model
-                ->set_message($message);
+            $model->set_message($message);
 
             $model->save();
         }
+    }
+
+    protected function import_users()
+    {
+        $this->info('Importing users...');
+
+        $wpUsers = $this->wp()->get_users();
+
+        foreach ($wpUsers as $wpUser) {
+            $wpLogin = $wpUser['login'];
+            $wpEmail = $wpUser['email'];
+
+            $userModel = $this->model_factory_user()->search_by($wpEmail) ?: $this->model_factory_user()->search_by($wpLogin);
+
+            if (!$userModel) {
+                $userModel = $this->create_new_user($wpLogin, $wpEmail);
+                $this->info('User :login successfully imported', [':login' => $userModel->get_username()]);
+            } else {
+                $this->info('User :login already exists', [':login' => $userModel->get_username()]);
+            }
+        }
+    }
+
+    protected function create_new_user($login, $email)
+    {
+        // TODO move this to system-wide service
+
+        // Generate random password
+        $password = md5(microtime());
+
+        $roleOrm = $this->model_factory_role();
+
+        $basicRoles = [
+            $roleOrm->get_guest_role(),
+            $roleOrm->get_login_role(),
+        ];
+
+        $model = $this->model_factory_user()
+            ->set_username($login)
+            ->set_password($password)
+            ->set_email($email)
+            ->create();
+
+        foreach ($basicRoles as $role) {
+            $model->add_role($role);
+        }
+
+        return $model;
     }
 
     /**

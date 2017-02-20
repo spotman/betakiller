@@ -40,11 +40,19 @@ class Model_Quote extends ORM
         return $this->get('author');
     }
 
+    /**
+     * @param \DateTime $time
+     *
+     * @return $this
+     */
     public function set_created_at(DateTime $time)
     {
         return $this->set_datetime_column_value('created_at', $time);
     }
 
+    /**
+     * @return \DateTime|null
+     */
     public function get_created_at()
     {
         return $this->get_datetime_column_value('created_at');

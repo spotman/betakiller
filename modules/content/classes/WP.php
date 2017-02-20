@@ -2,7 +2,7 @@
 
 class WP
 {
-    use \BetaKiller\Utils\Instance\Singleton;
+    use \BetaKiller\Utils\Instance\SingletonTrait;
 
     const POST_TYPE_PAGE = 'page';
     const POST_TYPE_POST = 'post';
@@ -244,6 +244,20 @@ class WP
             ['user_id', 'user_id'],
         ])
             ->from('comments')
+            ->execute('wp');
+
+        return $query->as_array();
+    }
+
+    public function get_users()
+    {
+        /** @var Database_Result $query */
+        $query = DB::select_array([
+            ['ID', 'id'],
+            ['user_login', 'login'],
+            ['user_email', 'email'],
+        ])
+            ->from('users')
             ->execute('wp');
 
         return $query->as_array();

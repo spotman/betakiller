@@ -5,8 +5,8 @@ use \BetaKiller\IFace\Cache\IFaceCache;
 
 class Core_Controller_IFace extends Controller
 {
-    use \BetaKiller\Helper\CurrentUser;
-    use \BetaKiller\Helper\IFace;
+    use \BetaKiller\Helper\CurrentUserTrait;
+    use \BetaKiller\Helper\IFaceTrait;
 
     public function action_render()
     {

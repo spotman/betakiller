@@ -8,7 +8,7 @@ use BetaKiller\IFace\IFaceModelInterface;
 
 abstract class Core_URL_Dispatcher
 {
-    use \BetaKiller\Helper\InProduction;
+    use \BetaKiller\Helper\InProductionTrait;
 
 //    use \BetaKiller\Utils\Instance\Simple;
 

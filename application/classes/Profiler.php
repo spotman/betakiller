@@ -2,7 +2,7 @@
 
 class Profiler extends Kohana_Profiler {
 
-    use \BetaKiller\Utils\Instance\Singleton;
+    use \BetaKiller\Utils\Instance\SingletonTrait;
 
     /**
      * Перманентно включает профайлер для всех экшнов / контроллеров
