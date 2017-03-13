@@ -1,14 +1,15 @@
 <?php
 
-use BetaKiller\IFace\Core\IFace;
+use BetaKiller\IFace\IFaceInterface;
 use BetaKiller\IFace\IFaceModelInterface;
 use BetaKiller\Config\AppConfigInterface;
 use BetaKiller\DI\ContainerInterface;
 
 class IFace_Provider
 {
-
-
+    /**
+     * @var IFaceInterface[]
+     */
     protected $_iface_instances;
 
     /**
@@ -55,6 +56,11 @@ class IFace_Provider
         return $iface;
     }
 
+    /**
+     * @param \BetaKiller\IFace\IFaceModelInterface $model
+     *
+     * @return \BetaKiller\IFace\IFaceInterface|null
+     */
     public function from_model(IFaceModelInterface $model)
     {
         $codename = $model->get_codename();
@@ -71,6 +77,11 @@ class IFace_Provider
         return $iface;
     }
 
+    /**
+     * @param string $codename
+     *
+     * @return \BetaKiller\IFace\IFaceInterface|null
+     */
     protected function get_cache($codename)
     {
         return isset($this->_iface_instances[$codename])
@@ -78,17 +89,21 @@ class IFace_Provider
             : NULL;
     }
 
-    protected function set_cache($codename, IFace $iface)
+    /**
+     * @param string                            $codename
+     * @param \BetaKiller\IFace\IFaceInterface  $iface
+     */
+    protected function set_cache($codename, IFaceInterface $iface)
     {
         $this->_iface_instances[ $codename ] = $iface;
     }
 
     /**
-     * @param IFace $parent_iface
+     * @param IFaceInterface $parent_iface
      * @return IFaceModelInterface[]
      * @throws IFace_Exception
      */
-    public function get_models_layer(IFace $parent_iface = NULL)
+    public function get_models_layer(IFaceInterface $parent_iface = NULL)
     {
         $parent_iface_model = $parent_iface ? $parent_iface->get_model() : NULL;
 
@@ -126,7 +141,7 @@ class IFace_Provider
             : implode('_', $codename_array); // Legacy naming without namespace
 
         try {
-            /** @var IFace $object */
+            /** @var \BetaKiller\IFace\IFaceInterface $object */
             $object = $this->_container->get($class_name);
         } catch (Exception $e) {
             throw new IFace_Exception('Can not instantiate :class class for codename :codename, error is: :msg', [
@@ -136,8 +151,8 @@ class IFace_Provider
             ]);
         }
 
-        if ( ! ($object instanceof IFace) )
-            throw new IFace_Exception('Class :class must be instance of class IFace', array(':class' => $class_name));
+        if ( ! ($object instanceof \BetaKiller\IFace\IFaceInterface) )
+            throw new IFace_Exception('Class :class must be instance of IFaceInterface', array(':class' => $class_name));
 
         $object->set_model($model);
 
@@ -161,7 +176,12 @@ class IFace_Provider
         throw new IFace_Exception('No iface class found for :name', [':name' => $common_name]);
     }
 
-    public function get_parent(IFace $iface)
+    /**
+     * @param \BetaKiller\IFace\IFaceInterface $iface
+     *
+     * @return \BetaKiller\IFace\IFaceInterface|null
+     */
+    public function get_parent(\BetaKiller\IFace\IFaceInterface $iface)
     {
         $model = $iface->get_model();
         $parent_model = $this->model_provider()->get_parent($model);
@@ -178,5 +198,4 @@ class IFace_Provider
     {
         return $this->_model_provider;
     }
-
 }

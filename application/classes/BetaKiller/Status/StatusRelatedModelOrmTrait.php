@@ -81,15 +81,14 @@ trait StatusRelatedModelOrmTrait
      */
     public function get_status_by_id($id)
     {
-        /** @var \BetaKiller\Status\StatusModelInterface $target */
-        $target = $this->get_status_relation()->model_factory($id);
-        return $target;
+        return $this->get_status_relation()->model_factory($id);
     }
 
     public function do_status_transition(StatusTransitionModelInterface $transition)
     {
-        if ($transition->get_source_node()->get_id() != $this->get_current_status()->get_id())
+        if ($transition->get_source_node()->get_id() !== $this->get_current_status()->get_id()) {
             throw new StatusException('Only transitions from current status are allowed');
+        }
 
         /** @var StatusModelInterface $target_status */
         $target_status = $transition->get_target_node();
@@ -173,11 +172,22 @@ trait StatusRelatedModelOrmTrait
      *
      * @return $this
      */
-    public function filter_status($status_id, $not_equal = FALSE)
+    public function filter_status_id($status_id, $not_equal = FALSE)
     {
         $col = $this->object_column($this->get_status_relation_foreign_key());
 
         return $this->where($col, $not_equal ? '<>' : '=', $status_id);
+    }
+
+    /**
+     * @param StatusModelInterface  $status
+     * @param bool                  $not_equal
+     *
+     * @return $this
+     */
+    public function filter_status(StatusModelInterface $status, $not_equal = FALSE)
+    {
+        return $this->filter_status_id($status->get_id(), $not_equal);
     }
 
     /**
@@ -200,7 +210,7 @@ trait StatusRelatedModelOrmTrait
 
     public function has_current_status()
     {
-        return !!$this->get_status_id();
+        return (bool) $this->get_status_id();
     }
 
     /**

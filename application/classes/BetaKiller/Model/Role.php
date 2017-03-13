@@ -94,17 +94,6 @@ class Role extends TreeModelMultipleParentsOrm implements RoleInterface
     }
 
     /**
-     * Returns list of all roles IDs
-     * Useful for getting all user`s roles IDs
-     *
-     * @return int[]
-     */
-    public function find_all_ids()
-    {
-        return $this->cached()->find_all()->as_array(NULL, $this->primary_key());
-    }
-
-    /**
      * Returns "Developers" role object
      *
      * @return RoleInterface

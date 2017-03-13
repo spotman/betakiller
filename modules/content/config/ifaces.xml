@@ -1,7 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <root>
     <!-- TODO вынести это всё в файл config/ifaces.php, который добавляет элементы в IFaceModelTree::admin() -->
-    <iface uri="posts" codename="Admin_Content_PostIndex" parentCodename="Admin_Index" title="Posts">
+    <iface uri="posts" codename="Admin_Content_PostIndex" parentCodename="Admin_Index" title="Admin | Posts" label="Posts">
         <iface uri="{ContentPost.id}" codename="Admin_Content_PostItem" title="Admin | Article | {ContentPost.label}" hasDynamicUrl="true" />
+    </iface>
+
+    <iface uri="comments" codename="Admin_Content_CommentIndex" parentCodename="Admin_Index" title="Admin | Comments" label="Comments">
+        <iface uri="by-status" codename="Admin_Content_CommentAggregateByStatus" title="Admin | Comments | Status statistic" label="Stat">
+            <iface uri="{ContentCommentStatus.codename}" codename="Admin_Content_CommentListByStatus" title="Admin | Comments | {ContentCommentStatus.getLabel()}" hasDynamicUrl="true" />
+        </iface>
+        <iface uri="{ContentComment.id}" codename="Admin_Content_CommentItem"  title="Admin | Comments | {ContentComment.id}" label="Comment from {ContentComment.get_author_name()}" hasDynamicUrl="true" />
     </iface>
 </root>

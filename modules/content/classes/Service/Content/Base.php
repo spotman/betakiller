@@ -28,7 +28,7 @@ abstract class Service_Content_Base extends \BetaKiller\Service
     }
 
     /**
-     * @return Database_Result|Model_ContentEntity[]
+     * @return Model_ContentEntity[]|\BetaKiller\Utils\Kohana\ORM\OrmInterface[]
      */
     public function get_entities_list()
     {
@@ -37,7 +37,7 @@ abstract class Service_Content_Base extends \BetaKiller\Service
 
     /**
      * @param int $id
-     * @return Model_ContentEntity
+     * @return Model_ContentEntity|\BetaKiller\Utils\Kohana\ORM\OrmInterface
      * @throws Kohana_Exception
      */
     public function find_entity_by_id($id)
@@ -55,27 +55,27 @@ abstract class Service_Content_Base extends \BetaKiller\Service
         return $this->file_model_factory()->get_entity_items_ids($entity);
     }
 
-    public function make_custom_html_tag(ContentElementInterface $content, $target_width = NULL, $target_height = NULL, array $attributes = [])
+//    public function make_custom_html_tag(ContentElementInterface $content, $target_width = NULL, $target_height = NULL, array $attributes = [])
+//    {
+//        $attributes += [
+//            'width'     =>  $target_width,
+//            'height'    =>  $target_height,
+//        ];
+//
+//        return $this->custom_tag_instance()
+//            ->generate_html($this->get_html_custom_tag_name(), $content->get_id(), $attributes);
+//    }
+
+//    public function get_entity_items(Model_ContentEntity $entity)
+//    {
+//        $ids = $this->get_entity_items_ids($entity);
+//
+//        return $entity->get_linked_model_instance()->get_titles_by_item_ids($ids);
+//    }
+
+    public function get_files_list(Model_ContentEntityWithElements $entity, $entity_item_id = NULL)
     {
-        $attributes += [
-            'width'     =>  $target_width,
-            'height'    =>  $target_height,
-        ];
-
-        return $this->custom_tag_instance()
-            ->generate_html($this->get_html_custom_tag_name(), $content->get_id(), $attributes);
-    }
-
-    public function get_entity_items(Model_ContentEntity $entity)
-    {
-        $ids = $this->get_entity_items_ids($entity);
-
-        return $entity->get_related_model_instance()->get_titles_by_item_ids($ids);
-    }
-
-    public function get_files_list(Model_ContentEntityRelated $entity, $entity_item_id = NULL)
-    {
-        $files = $entity->get_files($entity_item_id);
+        $files = $entity->get_elements($entity_item_id);
         $output = [];
 
         foreach ($files as $file)

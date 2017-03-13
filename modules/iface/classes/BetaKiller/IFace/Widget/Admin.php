@@ -2,10 +2,11 @@
 namespace BetaKiller\IFace\Widget;
 
 use BetaKiller\IFace\Widget;
+use BetaKiller\Helper\CurrentUserTrait;
 
 abstract class Admin extends Widget
 {
-    use \BetaKiller\Helper\CurrentUserTrait;
+    use CurrentUserTrait;
 
     public function render()
     {

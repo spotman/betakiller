@@ -5,7 +5,7 @@ use BetaKiller\Utils;
 use BetaKiller\Search\Model\Applicable;
 use BetaKiller\Search\Model\ResultsItem;
 
-class ORM extends Utils\Kohana\ORM implements OrmInterface, API_Response_Item, URL_DataSourceInterface, Applicable, ResultsItem
+class ORM extends Utils\Kohana\ORM implements API_Response_Item, URL_DataSourceInterface, Applicable, ResultsItem
 {
     /**
      * @param string $model
@@ -183,7 +183,7 @@ class ORM extends Utils\Kohana\ORM implements OrmInterface, API_Response_Item, U
     }
 
     /**
-     * @return $this[]
+     * @return $this[]|ORM[]
      * @throws Kohana_Exception
      */
     public function get_all()

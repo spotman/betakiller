@@ -1,6 +1,6 @@
 <?php
 
-class API_Model_Content_Post extends API_Model
+class API_Model_ContentPost extends API_Model
 {
     use \BetaKiller\Helper\ContentTrait;
 
@@ -39,6 +39,8 @@ class API_Model_Content_Post extends API_Model
         if (isset($data->content)) {
             $model->set_content($data->content);
         }
+
+        $model->save();
 
         // Return updated model data
         return $model;

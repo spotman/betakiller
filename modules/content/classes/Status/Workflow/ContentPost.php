@@ -3,7 +3,7 @@
 use BetaKiller\Status\StatusWorkflow;
 use BetaKiller\Status\StatusWorkflowException;
 
-class Status_Workflow_Content_Post extends StatusWorkflow
+class Status_Workflow_ContentPost extends StatusWorkflow
 {
     const TRANSITION_COMPLETE   = 'complete';
     const TRANSITION_REJECT     = 'reject';

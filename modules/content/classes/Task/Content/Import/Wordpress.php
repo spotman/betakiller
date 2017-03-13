@@ -1085,7 +1085,7 @@ class Task_Content_Import_Wordpress extends Minion_Task
             if ($isSpam) {
                 $model->init_as_spam();
             } elseif ($isTrash) {
-                $model->init_as_deleted();
+                $model->init_as_trash();
             } elseif ($isApproved) {
                 $model->init_as_approved();
             } else {

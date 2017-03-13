@@ -25,8 +25,7 @@ class Task_Cache_Warmup extends Minion_Task
 
     protected function _execute(array $params)
     {
-        /** @var \BetaKiller\IFace\IFaceModelTree $tree */
-        $tree = \BetaKiller\DI\Container::instance()->get(\BetaKiller\IFace\IFaceModelTree::class);
+        $tree = $this->_tree;
 
         $parameters = $this->url_parameters_instance();
 

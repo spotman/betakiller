@@ -69,5 +69,4 @@ interface ContentRelatedInterface extends OrmInterface
      * @return int[]
      */
     public function get_entity_items_ids(Model_ContentEntity $entity);
-
 }

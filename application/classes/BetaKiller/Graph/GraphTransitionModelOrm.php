@@ -162,7 +162,7 @@ abstract class GraphTransitionModelOrm extends ORM implements GraphTransitionMod
      */
     protected function filter_source_node(GraphNodeModelInterface $source)
     {
-        return $this->where($this->get_source_node_relation_fk(), '=', $source->get_codename());
+        return $this->where($this->get_source_node_relation_fk(), '=', $source->get_id());
     }
 
     /**

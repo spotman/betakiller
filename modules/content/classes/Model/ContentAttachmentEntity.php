@@ -1,13 +1,13 @@
 <?php
 
-class Model_ContentAttachmentEntity extends Model_ContentEntityRelated
+class Model_ContentAttachmentEntity extends Model_ContentEntityWithElements
 {
     /**
      * Returns model name which describes files (images or attachments)
      *
      * @return string
      */
-    protected function get_file_model_name()
+    protected function get_element_model_name()
     {
         return 'ContentAttachmentElement';
     }
@@ -17,7 +17,7 @@ class Model_ContentAttachmentEntity extends Model_ContentEntityRelated
      *
      * @return string
      */
-    protected function get_file_relation_key()
+    protected function get_element_relation_key()
     {
         return 'attachments';
     }

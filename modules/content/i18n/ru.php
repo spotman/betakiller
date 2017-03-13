@@ -22,4 +22,20 @@ return array (
     'other' => ':count комментариев',
   ],
   'comment.reply' => 'Ответить',
+
+  'comment.status.pending'  => 'Ожидает подтверждения',
+  'comment.status.approved' => 'Опубликован',
+  'comment.status.spam'     => 'СПАМ',
+  'comment.status.deleted'  => 'В корзине',
+
+  'comment.action.edit' => 'Исправить',
+
+  'comment.status.transition.approve'   => 'Опубликовать',
+  'comment.status.transition.reject'    => 'Отклонить',
+  'comment.status.transition.spam'      => 'СПАМ',
+  'comment.status.transition.trash'     => 'В корзину',
+  'comment.status.transition.restore'   => 'Восстановить',
+
+  'notification.comment.author-approve.subj' => ':name, ваш комментарий к записи ":label" от :created_at утверждён и опубликован',
+  'notification.comment.author-approve.text' => ':name, ваш комментарий к записи "<strong>:label</strong>" от :created_at утверждён и опубликован по адресу <a href=":url">:url</a>',
 );

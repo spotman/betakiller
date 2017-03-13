@@ -6,15 +6,19 @@ use BetaKiller\Utils\Kohana\TreeModelSingleParentOrm;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Status\StatusRelatedModelOrmTrait;
 use BetaKiller\Status\StatusRelatedModelInterface;
+use BetaKiller\Helper\HasPublicUrlInterface;
+use BetaKiller\Helper\HasAdminUrlInterface;
+use BetaKiller\Helper\IFaceTrait;
 
 class Model_ContentComment extends TreeModelSingleParentOrm
-    implements ContentRelatedInterface, StatusRelatedModelInterface, ImportedFromWordpressInterface
+    implements ContentRelatedInterface, StatusRelatedModelInterface, ImportedFromWordpressInterface, HasPublicUrlInterface, HasAdminUrlInterface
 {
     use Model_ORM_ContentRelatedTrait;
     use Model_ORM_ImportedFromWordpressTrait;
     use StatusRelatedModelOrmTrait;
+    use IFaceTrait;
 
-    protected $_table_name = 'content_comments';
+    const URL_PARAM = 'ContentComment';
 
     /**
      * Prepares the model database connection, determines the table name,
@@ -25,6 +29,8 @@ class Model_ContentComment extends TreeModelSingleParentOrm
      */
     protected function _initialize()
     {
+        $this->_table_name = 'content_comments';
+
         $this->belongs_to([
             'entity'            =>  [
                 'model'         =>  'ContentEntity',
@@ -119,6 +125,41 @@ class Model_ContentComment extends TreeModelSingleParentOrm
         return $rules;
     }
 
+    public function get_public_url()
+    {
+        return $this->get_related_content_public_url().'#'.$this->get_html_dom_id();
+    }
+
+    public function get_related_content_public_url()
+    {
+        return $this->get_related_item_model()->get_public_url();
+    }
+
+    public function get_admin_url()
+    {
+        /** @var \BetaKiller\IFace\Admin\Content\CommentItem $iface */
+        $iface = $this->iface_from_codename('Admin_Content_CommentItem');
+
+        $params = $this->url_parameters_instance()->set(self::URL_PARAM, $this);
+
+        return $iface->url($params);
+    }
+
+//    public function get_related_content_admin_url()
+//    {
+//        return $this->get_related_item_model()->get_admin_url();
+//    }
+
+    public function get_related_content_label()
+    {
+        return $this->get_related_item_model()->get_label();
+    }
+
+    public function get_html_dom_id()
+    {
+        return 'content-comment-'.$this->get_id();
+    }
+
     /**
      * @param string $value
      *
@@ -171,6 +212,14 @@ class Model_ContentComment extends TreeModelSingleParentOrm
         /** @var UserInterface $author */
         $author = $this->get('author');
         return $author->loaded() ? $author : null;
+    }
+
+    /**
+     * @return bool
+     */
+    public function author_is_guest()
+    {
+        return !$this->get_author_user();
     }
     
     public function get_author_name()
@@ -332,10 +381,10 @@ class Model_ContentComment extends TreeModelSingleParentOrm
      */
     public function get_comments_count_for_ip($ipAddress, $interval = 30)
     {
-        $interval = new DateInterval('PT'.(int) $interval.'S');
+        $key = 'PT'.(int) $interval.'S';
 
         return $this
-            ->filter_last_records($interval)
+            ->filter_last_records(new DateInterval($key))
             ->filter_ip_address($ipAddress)
             ->count_all();
     }
@@ -356,7 +405,7 @@ class Model_ContentComment extends TreeModelSingleParentOrm
      */
     public function is_pending()
     {
-        return $this->get_status_id() == Model_ContentCommentStatus::STATUS_PENDING;
+        return $this->get_status_id() === Model_ContentCommentStatus::STATUS_PENDING;
     }
 
     /**
@@ -364,7 +413,7 @@ class Model_ContentComment extends TreeModelSingleParentOrm
      */
     public function is_approved()
     {
-        return $this->get_status_id() == Model_ContentCommentStatus::STATUS_APPROVED;
+        return $this->get_status_id() === Model_ContentCommentStatus::STATUS_APPROVED;
     }
 
     /**
@@ -372,7 +421,7 @@ class Model_ContentComment extends TreeModelSingleParentOrm
      */
     public function is_spam()
     {
-        return $this->get_status_id() == Model_ContentCommentStatus::STATUS_SPAM;
+        return $this->get_status_id() === Model_ContentCommentStatus::STATUS_SPAM;
     }
 
     /**
@@ -380,7 +429,7 @@ class Model_ContentComment extends TreeModelSingleParentOrm
      */
     public function is_deleted()
     {
-        return $this->get_status_id() == Model_ContentCommentStatus::STATUS_DELETED;
+        return $this->get_status_id() === Model_ContentCommentStatus::STATUS_TRASH;
     }
 
     public function init_as_pending()
@@ -401,30 +450,30 @@ class Model_ContentComment extends TreeModelSingleParentOrm
         return $this->init_status($status);
     }
 
-    public function init_as_deleted()
+    public function init_as_trash()
     {
-        $status = $this->get_status_by_id(Model_ContentCommentStatus::STATUS_DELETED);
+        $status = $this->get_status_by_id(Model_ContentCommentStatus::STATUS_TRASH);
         return $this->init_status($status);
     }
 
-    public function filter_pending()
+    protected function filter_pending()
     {
-        return $this->filter_status(Model_ContentCommentStatus::STATUS_PENDING);
+        return $this->filter_status_id(Model_ContentCommentStatus::STATUS_PENDING);
     }
 
-    public function filter_approved()
+    protected function filter_approved()
     {
-        return $this->filter_status(Model_ContentCommentStatus::STATUS_APPROVED);
+        return $this->filter_status_id(Model_ContentCommentStatus::STATUS_APPROVED);
     }
 
-    public function filter_spam()
+    protected function filter_spam()
     {
-        return $this->filter_status(Model_ContentCommentStatus::STATUS_SPAM);
+        return $this->filter_status_id(Model_ContentCommentStatus::STATUS_SPAM);
     }
 
-    public function filter_deleted()
+    protected function filter_trash()
     {
-        return $this->filter_status(Model_ContentCommentStatus::STATUS_DELETED);
+        return $this->filter_status_id(Model_ContentCommentStatus::STATUS_TRASH);
     }
 
     /**
@@ -433,18 +482,71 @@ class Model_ContentComment extends TreeModelSingleParentOrm
      *
      * @return Model_ContentComment[]
      */
-    public function get_entity_item_comments(Model_ContentEntity $entity, $entity_item_id)
+    public function get_entity_item_approved_comments(Model_ContentEntity $entity, $entity_item_id)
+    {
+        /** @var Model_ContentCommentStatus $status */
+        $status = $this->get_status_relation();
+        $status = $status->get_approved_status();
+
+        return $this->get_comments_by_status($status, $entity, $entity_item_id);
+    }
+
+    public function get_comments_by_status(Model_ContentCommentStatus $status, Model_ContentEntity $entity = null, $entity_item_id = null)
     {
         $model = $this->model_factory();
 
         $model
-            ->filter_entity_id($entity->get_id())
-            ->filter_entity_item_id($entity_item_id);
+            ->filter_entity_and_entity_item_id($entity, $entity_item_id)
+            ->filter_status($status);
 
         return $model
-            ->filter_approved()
             ->order_by_path()
-            ->find_all();
+            ->get_all();
+    }
+
+    public function approve()
+    {
+        $this->workflow()->approve();
+        return $this;
+    }
+
+    public function reject()
+    {
+        $this->workflow()->reject();
+        return $this;
+    }
+
+    public function mark_as_spam()
+    {
+        $this->workflow()->spam();
+        return $this;
+    }
+
+    public function move_to_trash()
+    {
+        $this->workflow()->trash();
+        return $this;
+    }
+
+    public function restore_from_trash()
+    {
+        $this->workflow()->restore();
+        return $this;
+    }
+
+    public function delete()
+    {
+        // TODO Delete child comments
+
+        return parent::delete();
+    }
+
+    /**
+     * @return Status_Workflow_ContentComment|\BetaKiller\Status\StatusWorkflowInterface
+     */
+    protected function workflow()
+    {
+        return $this->workflow_factory();
     }
 
     /**

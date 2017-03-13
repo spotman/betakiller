@@ -119,11 +119,20 @@ trait ContentTrait
     }
 
     /**
+     * @param int|null $id
      * @return \Model_ContentComment|OrmInterface
      */
-    protected function model_factory_content_comment()
+    protected function model_factory_content_comment($id = NULL)
     {
-        return \ORM::factory('ContentComment');
+        return \ORM::factory('ContentComment', $id);
+    }
+
+    /**
+     * @return \Model_ContentCommentStatus|OrmInterface
+     */
+    protected function model_factory_content_comment_status()
+    {
+        return \ORM::factory('ContentCommentStatus');
     }
 
     /**
@@ -148,5 +157,13 @@ trait ContentTrait
     public function url_parameter_content_category()
     {
         return $this->url_parameters()->get(\Model_ContentCategory::URL_PARAM);
+    }
+
+    /**
+     * @return \Model_ContentCommentStatus
+     */
+    public function url_parameter_content_comment_status()
+    {
+        return $this->url_parameters()->get(\Model_ContentCommentStatus::URL_PARAM);
     }
 }

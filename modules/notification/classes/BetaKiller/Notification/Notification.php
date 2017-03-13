@@ -1,34 +1,35 @@
-<?php defined('SYSPATH') OR die('No direct script access.');
+<?php
+namespace BetaKiller\Notification;
 
-use BetaKiller\Notification\NotificationException;
+use BetaKiller\Notification\Transport\EmailTransport;
+use BetaKiller\Notification\Transport\OnlineTransport;
 
-abstract class Kohana_Notification {
-
-    use \BetaKiller\Utils\Instance\Simple;
-
-    /**
-     * @return Notification_Message
-     */
-    public function message()
+class Notification
+{
+    public static function instance()
     {
-        return Notification_Message::instance();
+        return new static;
     }
 
-    public function send(Notification_Message $message)
+    public function send(NotificationMessageInterface $message)
     {
         $total = 0;
-
         $to = $message->get_to();
 
-        if ( ! $to )
-            throw new Exception('Message target must be specified');
+        if (!$to) {
+            throw new \Exception('Message target must be specified');
+        }
 
         $transports = $this->get_transports();
 
-        foreach ( $to as $target ) {
+        foreach ($to as $target) {
             $counter = 0;
 
             foreach ($transports as $transport) {
+                if (!$transport->isEnabledFor($target)) {
+                    continue;
+                }
+
                 try {
                     $counter = $transport->send($message, $target);
 
@@ -36,8 +37,8 @@ abstract class Kohana_Notification {
                     if ($counter) {
                         break;
                     }
-                } catch (Exception $e) {
-                    Log::exception($e);
+                } catch (\Exception $e) {
+                    \Log::exception($e);
                     continue;
                 }
             }
@@ -70,10 +71,15 @@ abstract class Kohana_Notification {
      */
     protected function get_transports()
     {
+        /** @var OnlineTransport $online */
+        $online = $this->transport_factory('online');
+
+        /** @var EmailTransport $email */
+        $email = $this->transport_factory('email');
+
         return [
-            $this->transport_factory('online'),
-            $this->transport_factory('email'),
+            $online,
+            $email,
         ];
     }
-
 }

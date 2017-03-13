@@ -1,22 +1,23 @@
 <?php
 
 use BetaKiller\Content\ContentElementInterface;
+use BetaKiller\Model\UserInterface;
 
-abstract class Model_ContentEntityRelated extends Model_ContentEntity
+abstract class Model_ContentEntityWithElements extends Model_ContentEntity
 {
     /**
-     * Returns model name which describes files (images or attachments)
+     * Returns model name which describes elements (images, attachments, etc)
      *
      * @return string
      */
-    abstract protected function get_file_model_name();
+    abstract protected function get_element_model_name();
 
     /**
-     * Returns relation key for files model
+     * Returns relation key for elements model
      *
      * @return string
      */
-    abstract protected function get_file_relation_key();
+    abstract protected function get_element_relation_key();
 
     /**
      * Prepares the model database connection, determines the table name,
@@ -26,19 +27,19 @@ abstract class Model_ContentEntityRelated extends Model_ContentEntity
      */
     protected function _initialize()
     {
-        $element_key = $this->get_file_relation_key();
+        $element_key = $this->get_element_relation_key();
 
         $this->has_many([
             $element_key        =>  [
-                'model'         =>  $this->get_file_model_name(),
-                'foreign_key'   =>  $this->get_file_relation_key(),
+                'model'         =>  $this->get_element_model_name(),
+                'foreign_key'   =>  $this->get_element_entity_foreign_key(),
             ],
         ]);
 
         parent::_initialize();
     }
 
-    protected function get_files_foreign_key()
+    protected function get_element_entity_foreign_key()
     {
         return 'entity_id';
     }
@@ -47,19 +48,19 @@ abstract class Model_ContentEntityRelated extends Model_ContentEntity
      * @return ContentElementInterface
      * @throws Kohana_Exception
      */
-    protected function get_files_relation()
+    protected function get_elements_relation()
     {
-        return $this->get($this->get_file_relation_key());
+        return $this->get($this->get_element_relation_key());
     }
 
     /**
      * @return ContentElementInterface
      * @throws Kohana_Exception
      */
-    protected function content_file_factory()
+    protected function content_element_factory()
     {
-        $name = $this->get_file_model_name();
-        $model = ORM::factory($name);
+        $name = $this->get_element_model_name();
+        $model = $this->model_factory(null, $name);
 
         $base = ContentElementInterface::class;
 
@@ -71,17 +72,17 @@ abstract class Model_ContentEntityRelated extends Model_ContentEntity
 
     /**
      * @param int $entity_item_id
-     * @param Model_User $user
+     * @param UserInterface $user
      * @param bool $save_in_db
      *
-*@return ContentElementInterface
+     * @return ContentElementInterface
      */
-    public function create_file($entity_item_id, Model_User $user, $save_in_db = TRUE)
+    public function create_file($entity_item_id, UserInterface $user, $save_in_db = TRUE)
     {
-        $model = $this->content_file_factory()
+        $model = $this->content_element_factory()
+            ->set_uploaded_by($user)
             ->set_entity($this)
-            ->set_entity_item_id($entity_item_id)
-            ->set_uploaded_by($user);
+            ->set_entity_item_id($entity_item_id);
 
         if ($save_in_db)
         {
@@ -97,23 +98,23 @@ abstract class Model_ContentEntityRelated extends Model_ContentEntity
      *
      * @param int|null $item_id
      *
-*@return Database_Result|ContentElementInterface[]
+     * @return ContentElementInterface[]
      * @throws Kohana_Exception
      */
-    public function get_files($item_id = NULL)
+    public function get_elements($item_id = NULL)
     {
-        return $this->get_files_query($item_id)->find_all();
+        return $this->get_elements_query($item_id)->get_all();
     }
 
     /**
-     * @param array $items_ids
+     * @param int[] $items_ids
      *
-*@return ContentElementInterface[]
+     * @return ContentElementInterface[]
      * @throws Kohana_Exception
      */
-    public function get_files_for_items_ids(array $items_ids)
+    public function get_elements_for_items_ids(array $items_ids)
     {
-        $files = $this->get_files_relation();
+        $files = $this->get_elements_relation();
 
         $files->filter_entity_item_ids($items_ids);
 
@@ -126,14 +127,13 @@ abstract class Model_ContentEntityRelated extends Model_ContentEntity
     /**
      * @param int|null $item_id
      *
-*@return ContentElementInterface
+     * @return ContentElementInterface
      */
-    protected function get_files_query($item_id = NULL)
+    protected function get_elements_query($item_id = NULL)
     {
-        $orm = $this->get_files_relation();
+        $orm = $this->get_elements_relation();
 
-        if ($item_id !== NULL)
-        {
+        if ($item_id !== NULL) {
             $orm->filter_entity_item_id($item_id);
         }
 

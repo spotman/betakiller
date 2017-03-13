@@ -1,6 +1,6 @@
 <?php
 
-use BetaKiller\IFace\Core\IFace;
+use BetaKiller\IFace\IFaceInterface;
 use BetaKiller\IFace\UrlPathIterator;
 use BetaKiller\Utils\Kohana\TreeModelSingleParentInterface;
 //use BetaKiller\IFace\HasCustomUrlBehaviour;
@@ -9,8 +9,6 @@ use BetaKiller\IFace\IFaceModelInterface;
 abstract class Core_URL_Dispatcher
 {
     use \BetaKiller\Helper\InProductionTrait;
-
-//    use \BetaKiller\Utils\Instance\Simple;
 
     const PROTOTYPE_PCRE = '(\{([A-Za-z_]+)\.([A-Za-z_]+)(\(\))*\})';
 
@@ -25,12 +23,12 @@ abstract class Core_URL_Dispatcher
     protected $_iface_provider;
 
     /**
-     * @var array
+     * @var IFaceInterface[]
      */
     protected $_iface_stack = [];
 
     /**
-     * @var IFace
+     * @var IFaceInterface
      */
     protected $_current_iface;
 
@@ -62,7 +60,7 @@ abstract class Core_URL_Dispatcher
      * Returns IFace
      *
      * @param $uri
-     * @return IFace|null
+     * @return IFaceInterface|null
      * @throws IFace_Exception_MissingURL
      * @throws Exception
      */
@@ -72,7 +70,6 @@ abstract class Core_URL_Dispatcher
         $uri = htmlspecialchars(strip_tags($uri), ENT_QUOTES);
 
         // TODO Check stack cache and url params for current URL
-
 
         // Creating URL iterator
         $url_iterator = new UrlPathIterator($uri);
@@ -131,7 +128,7 @@ abstract class Core_URL_Dispatcher
         return $iface_instance;
     }
 
-    protected function throw_missing_url_exception(UrlPathIterator $it, IFace $parent_iface = null)
+    protected function throw_missing_url_exception(UrlPathIterator $it, IFaceInterface $parent_iface = null)
     {
         throw new IFace_Exception_MissingURL($it->current(), $parent_iface);
     }
@@ -140,12 +137,12 @@ abstract class Core_URL_Dispatcher
      * Performs iface search by uri part(s) in iface layer
      *
      * @param UrlPathIterator $it
-     * @param IFace|NULL $parent_iface
-     * @return IFace|null
+     * @param IFaceInterface|NULL $parent_iface
+     * @return IFaceInterface|null
      * @throws URL_Dispatcher_Exception
      * @throws IFace_Exception
      */
-    protected function parse_uri_layer(UrlPathIterator $it, IFace $parent_iface = null)
+    protected function parse_uri_layer(UrlPathIterator $it, IFaceInterface $parent_iface = null)
     {
         $layer = [];
 
@@ -326,7 +323,7 @@ abstract class Core_URL_Dispatcher
         return $urls;
     }
 
-    protected function get_iface_url(IFace $iface, URL_Parameters $params = NULL, $with_domain = TRUE)
+    protected function get_iface_url(IFaceInterface $iface, URL_Parameters $params = NULL, $with_domain = TRUE)
     {
         return $iface->url($params, FALSE, $with_domain);
     }
@@ -358,10 +355,10 @@ abstract class Core_URL_Dispatcher
     /**
      * Returns TRUE if provided IFace was initialized through url parsing
      *
-     * @param IFace $iface
+     * @param IFaceInterface $iface
      * @return bool
      */
-    public function in_stack(IFace $iface)
+    public function in_stack(IFaceInterface $iface)
     {
         return isset($this->_iface_stack[ $iface->get_codename() ]);
     }
@@ -376,7 +373,7 @@ abstract class Core_URL_Dispatcher
     }
 
     /**
-     * @return IFace
+     * @return IFaceInterface
      */
     public function current_iface()
     {
@@ -384,11 +381,11 @@ abstract class Core_URL_Dispatcher
     }
 
     /**
-     * @param IFace $iface
+     * @param IFaceInterface $iface
      * @param URL_Parameters|NULL $parameters
      * @return bool
      */
-    public function is_current_iface(IFace $iface, URL_Parameters $parameters = NULL)
+    public function is_current_iface(IFaceInterface $iface, URL_Parameters $parameters = NULL)
     {
         if (!$this->_current_iface || $this->_current_iface->get_codename() != $iface->get_codename()) {
             return FALSE;
@@ -418,10 +415,10 @@ abstract class Core_URL_Dispatcher
     }
 
     /**
-     * @param IFace $iface
+     * @param IFaceInterface $iface
      * @return $this
      */
-    protected function push_to_stack(IFace $iface)
+    protected function push_to_stack(IFaceInterface $iface)
     {
         $this->_iface_stack[ $iface->get_codename() ] = $iface;
         $this->_current_iface = $iface;
@@ -491,7 +488,7 @@ abstract class Core_URL_Dispatcher
         }
     }
 
-    public function make_iface_uri(IFace $iface, URL_Parameters $parameters = NULL)
+    public function make_iface_uri(IFaceInterface $iface, URL_Parameters $parameters = NULL)
     {
         $uri = $iface->get_uri();
 
@@ -531,8 +528,7 @@ abstract class Core_URL_Dispatcher
 
         $parts = [];
 
-        do
-        {
+        do {
             $parts[] = $this->calculate_model_key_value($model, $model_key, $prototype->is_method_call());
         }
         while ($is_tree AND ($model = $model->get_parent()));
@@ -567,7 +563,7 @@ abstract class Core_URL_Dispatcher
     /**
      * @param $model_name
      *
-*@return URL_DataSourceInterface
+     * @return URL_DataSourceInterface
      * @throws URL_Dispatcher_Exception
      */
     public function model_factory($model_name)
@@ -583,5 +579,4 @@ abstract class Core_URL_Dispatcher
 
         return $object;
     }
-
 }

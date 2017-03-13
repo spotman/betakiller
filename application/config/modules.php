@@ -27,6 +27,7 @@ return array(
     'migrations'            => MODPATH.'migrations',            // Migrations toolkit
     'minion'                => MODPATH.'minion',                // CLI Tasks
     'mysqli'                => MODPATH.'mysqli',                // Driver for MySQLi
+    'notification'          => MODPATH.'notification',          // Notification subsystem
     'orm'                   => MODPATH.'orm',                   // Object Relationship Mapping
     'paginate'              => MODPATH.'paginate',              // Paginate abstraction for ORM, ORM-REST and others
     'robots-txt'            => MODPATH.'robots-txt',            // Serving /robots.txt

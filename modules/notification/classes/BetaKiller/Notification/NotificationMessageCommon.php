@@ -1,9 +1,11 @@
-<?php defined('SYSPATH') OR die('No direct script access.');
+<?php
+namespace BetaKiller\Notification;
 
 use BetaKiller\Helper\CurrentUserTrait;
 use BetaKiller\Helper\UserModelFactoryTrait;
+use Twig;
 
-class BetaKiller_Notification_Message extends Kohana_Notification_Message
+class NotificationMessageCommon extends NotificationMessageAbstract
 {
     use CurrentUserTrait;
     use UserModelFactoryTrait;
@@ -22,18 +24,10 @@ class BetaKiller_Notification_Message extends Kohana_Notification_Message
         return $this->to_users($moderators);
     }
 
-    public function to_users($users)
-    {
-        foreach ($users as $user) {
-            $this->set_to($user);
-        }
-
-        return $this;
-    }
-
     public function to_current_user()
     {
         $this->set_to($this->current_user());
+
         return $this;
     }
 

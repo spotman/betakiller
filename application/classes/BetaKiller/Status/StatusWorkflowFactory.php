@@ -23,7 +23,7 @@ class StatusWorkflowFactory
         return '\\Status_Workflow_' . $name;
     }
 
-    protected function make_instance($class_name, StatusRelatedModelOrm $model)
+    protected function make_instance($class_name, StatusRelatedModelInterface $model)
     {
         return new $class_name($model);
     }

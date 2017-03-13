@@ -72,7 +72,15 @@ interface StatusRelatedModelInterface
      *
      * @return $this
      */
-    public function filter_status($status_id, $not_equal = FALSE);
+    public function filter_status_id($status_id, $not_equal = FALSE);
+
+    /**
+     * @param StatusModelInterface  $status
+     * @param bool                  $not_equal
+     *
+     * @return $this
+     */
+    public function filter_status(StatusModelInterface $status, $not_equal = FALSE);
 
     /**
      * @param int[] $status_ids

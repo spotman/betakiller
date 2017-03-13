@@ -1,6 +1,8 @@
 <?php
 namespace BetaKiller\Notification\Transport;
 
+use BetaKiller\Notification\NotificationMessageInterface;
+use BetaKiller\Notification\NotificationUserInterface;
 use BetaKiller\Notification\TransportInterface;
 //use BetaKiller\Notification\TransportException;
 
@@ -13,7 +15,7 @@ class OnlineTransport extends AbstractTransport implements TransportInterface
         return self::NAME;
     }
 
-    public function isEnabledFor(\BetaKiller\Notification\NotificationUserInterface $user)
+    public function isEnabledFor(NotificationUserInterface $user)
     {
         return $this->isOnline($user) && $user->is_online_notification_allowed();
     }
@@ -25,7 +27,7 @@ class OnlineTransport extends AbstractTransport implements TransportInterface
      *
      * @return bool
      */
-    public function isOnline(\BetaKiller\Notification\NotificationUserInterface $user)
+    public function isOnline(NotificationUserInterface $user)
     {
         // Non-logged user is always offline
         if (!$user->get_id()) {
@@ -39,13 +41,13 @@ class OnlineTransport extends AbstractTransport implements TransportInterface
     }
 
     /**
-     * @param \Notification_Message                              $message
-     * @param \BetaKiller\Notification\NotificationUserInterface $user
+     * @param \BetaKiller\Notification\NotificationMessageInterface $message
+     * @param \BetaKiller\Notification\NotificationUserInterface    $user
      *
      * @return int Number of messages sent
      * @throws \HTTP_Exception_501
      */
-    public function send(\Notification_Message $message, \BetaKiller\Notification\NotificationUserInterface $user)
+    public function send(NotificationMessageInterface $message, NotificationUserInterface $user)
     {
         throw new \HTTP_Exception_501();
     }

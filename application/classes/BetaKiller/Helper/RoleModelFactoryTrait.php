@@ -5,10 +5,12 @@ trait RoleModelFactoryTrait
 {
     /**
      * @param int|null $id
-     * @return \BetaKiller\Model\RoleInterface|\BetaKiller\Utils\Kohana\ORM\OrmInterface
+     * @return \BetaKiller\Model\RoleInterface
      */
     private function model_factory_role($id = null)
     {
-        return \ORM::factory('Role', $id);
+        /** @var \BetaKiller\Model\RoleInterface $model */
+        $model = \ORM::factory('Role', $id);
+        return $model;
     }
 }

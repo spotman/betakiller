@@ -31,7 +31,7 @@ class Widget_Content_Comments extends Widget
 
         $entity = $this->model_factory_content_entity()->find_by_slug($entitySlug);
 
-        $comments = $this->model_factory_content_comment()->get_entity_item_comments($entity, $entityItemId);
+        $comments = $this->model_factory_content_comment()->get_entity_item_approved_comments($entity, $entityItemId);
 
         $commentsData = [];
 

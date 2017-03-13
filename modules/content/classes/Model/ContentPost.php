@@ -3,9 +3,11 @@
 use BetaKiller\Helper\SeoMetaInterface;
 use BetaKiller\Content\ImportedFromWordpressInterface;
 use BetaKiller\Content\Shortcode;
+use BetaKiller\Content\LinkedContentModelInterface;
 use BetaKiller\Status\StatusRelatedModelOrm;
 
-class Model_ContentPost extends StatusRelatedModelOrm implements SeoMetaInterface, ImportedFromWordpressInterface
+class Model_ContentPost extends StatusRelatedModelOrm
+    implements SeoMetaInterface, ImportedFromWordpressInterface, LinkedContentModelInterface
 {
     use Model_ORM_SeoContentTrait,
         Model_ORM_ImportedFromWordpressTrait,
@@ -38,8 +40,6 @@ class Model_ContentPost extends StatusRelatedModelOrm implements SeoMetaInterfac
      */
     protected $updated_at_was_set = FALSE;
 
-    protected $_table_name = 'content_posts';
-
     /**
      * Prepares the model database connection, determines the table name,
      * and loads column information.
@@ -48,6 +48,8 @@ class Model_ContentPost extends StatusRelatedModelOrm implements SeoMetaInterfac
      */
     protected function _initialize()
     {
+        $this->_table_name = 'content_posts';
+
         $this->belongs_to([
             'category'          =>  [
                 'model'         =>  'ContentCategory',
@@ -82,7 +84,7 @@ class Model_ContentPost extends StatusRelatedModelOrm implements SeoMetaInterfac
     }
 
     /**
-     * @return \Status_Workflow_Content_Post|\BetaKiller\Status\StatusWorkflowInterface
+     * @return \Status_Workflow_ContentPost|\BetaKiller\Status\StatusWorkflowInterface
      */
     protected function workflow()
     {
@@ -111,6 +113,9 @@ class Model_ContentPost extends StatusRelatedModelOrm implements SeoMetaInterfac
         return $this;
     }
 
+    /**
+     * @return Model_ContentPost
+     */
     public function publish()
     {
         $this->workflow()->publish();
@@ -158,12 +163,12 @@ class Model_ContentPost extends StatusRelatedModelOrm implements SeoMetaInterfac
 
     public function is_page()
     {
-        return ($this->get_type() == self::TYPE_PAGE);
+        return ($this->get_type() === self::TYPE_PAGE);
     }
 
     public function is_article()
     {
-        return ($this->get_type() == self::TYPE_ARTICLE);
+        return ($this->get_type() === self::TYPE_ARTICLE);
     }
 
     /**
@@ -369,7 +374,7 @@ class Model_ContentPost extends StatusRelatedModelOrm implements SeoMetaInterfac
      * @param int $limit
      * @param int|int[]|null $exclude_id
      *
-     * @return \Database_Result|\Model_ContentPost[]
+     * @return $this[]
      */
     protected function get_popular_content($filter_type, $limit = 5, $exclude_id = NULL)
     {
@@ -390,7 +395,7 @@ class Model_ContentPost extends StatusRelatedModelOrm implements SeoMetaInterfac
      * @param int $limit
      * @param int|int[]|null $exclude_id
      *
-     * @return \Database_Result|\Model_ContentPost[]
+     * @return $this[]
      */
     protected function get_fresh_content($filter_type, $limit = 5, $exclude_id = NULL)
     {
@@ -478,7 +483,7 @@ class Model_ContentPost extends StatusRelatedModelOrm implements SeoMetaInterfac
 
     public function is_default()
     {
-        return ($this->get_uri() == $this->get_default_url_value());
+        return ($this->get_uri() === $this->get_default_url_value());
     }
 
     public function filter_default()
@@ -554,7 +559,7 @@ class Model_ContentPost extends StatusRelatedModelOrm implements SeoMetaInterfac
     {
         $was_changed = array_intersect($this->_changed, $this->_updated_at_markers);
 
-        if (!$this->changed('updated_at') && $was_changed) {
+        if ($was_changed && !$this->changed('updated_at')) {
             $this->set_updated_at(new DateTime);
         }
 
@@ -655,7 +660,7 @@ class Model_ContentPost extends StatusRelatedModelOrm implements SeoMetaInterfac
 
     public function filter_published()
     {
-        return $this->filter_status(Model_ContentPostStatus::PUBLISHED_ID);
+        return $this->filter_status_id(Model_ContentPostStatus::PUBLISHED_ID);
     }
 
     public function filter_user_allowed_statuses()

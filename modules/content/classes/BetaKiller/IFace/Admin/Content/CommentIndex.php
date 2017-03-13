@@ -6,27 +6,20 @@ class CommentIndex extends AdminBase
     /**
      * Returns data for View
      * Override this method in child classes
-     *
-     * @return array
      */
     public function get_data()
     {
-        // TODO
-        $articles = $this->model_factory_content_comment()->get_all_articles();
+        // Redirect to pending comments
 
-        $data = [];
+        $status = $this->model_factory_content_comment_status()->get_pending_status();
 
-        foreach ($articles as $article)
-        {
-            $data[] = [
-                'id'          => $article->get_id(),
-                'url'         => $article->get_admin_url(),
-                'label'       => $article->get_label(),
-            ];
-        }
+        /** @var CommentListByStatus $iface */
+        $iface = $this->iface_from_codename('Admin_Content_CommentListByStatus');
 
-        return [
-            'posts' => $data,
-        ];
+        $params = $this->url_parameters_instance()->set($status::URL_PARAM, $status);
+
+        $url = $iface->url($params);
+
+        $this->redirect($url);
     }
 }

@@ -1,10 +1,24 @@
 <?php
 
+use BetaKiller\Content\LinkedContentModelInterface;
+
 class Model_ContentEntity extends ORM
 {
     const POSTS_ENTITY_ID = 1;
 
-    protected $_table_name = 'content_entities';
+    /**
+     * Prepares the model database connection, determines the table name,
+     * and loads column information.
+     *
+     * @throws Exception
+     * @return void
+     */
+    protected function _initialize()
+    {
+        $this->_table_name = 'content_entities';
+
+        parent::_initialize();
+    }
 
     /**
      * Возвращает символическое имя сущности
@@ -33,7 +47,7 @@ class Model_ContentEntity extends ORM
      * @return string
      * @throws Kohana_Exception
      */
-    public function get_related_model_name()
+    public function get_linked_model_name()
     {
         return $this->get('model_name');
     }
@@ -57,8 +71,9 @@ class Model_ContentEntity extends ORM
     {
         $model = $this->where('slug', '=', $slug)->find();
 
-        if (!$model->loaded())
+        if (!$model->loaded()) {
             throw new Kohana_Exception('Unknown content entity slug :value', [':value' => $slug]);
+        }
 
         return $model;
     }
@@ -70,29 +85,31 @@ class Model_ContentEntity extends ORM
 
     /**
      * Возвращает инстанс связанной модели
-     * 
-     * @return HasContentElementsInText
+     *
+     * @param int|null $id
+     *
+     * @return LinkedContentModelInterface
      * @throws Exception
      * @throws Kohana_Exception
      */
-    public function get_related_model_instance()
+    public function get_linked_model_instance($id = null)
     {
-        $name = $this->get_related_model_name();
+        $name = $this->get_linked_model_name();
+        $model = $this->model_factory($id, $name);
+        $target_class = LinkedContentModelInterface::class;
 
-        $model = Model::factory($name);
-        $target_class = HasContentElements::class;
-
-        if (!($model instanceof $target_class))
-            throw new Kohana_Exception('Entity-related content model must be instance of :target, :current given', [
+        if (!($model instanceof $target_class)) {
+            throw new Kohana_Exception('Entity-linked content model must be an instance of :target, :current given', [
                 ':target'   =>  $target_class,
                 ':current'  =>  get_class($model),
             ]);
+        }
 
         return $model;
     }
-
-    public function get_related_model_item_title($item_id)
-    {
-        return $this->get_related_model_instance()->get_title_by_item_id($item_id);
-    }
+//
+//    public function get_related_model_item_title($item_id)
+//    {
+//        return $this->get_linked_model_instance()->get_title_by_item_id($item_id);
+//    }
 }

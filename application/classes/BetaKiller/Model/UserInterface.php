@@ -64,11 +64,11 @@ interface UserInterface extends OrmInterface, NotificationUserInterface, AclUser
     public function add_all_available_roles();
 
     /**
-     * Get all user`s roles IDs
+     * Get all user`s roles IDs (include parent roles)
      *
      * @return int[]
      */
-    public function get_roles_ids();
+    public function get_all_user_roles_ids();
 
     /**
      * Возвращает имя языка, назначенного пользователю

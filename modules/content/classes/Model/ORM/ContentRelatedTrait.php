@@ -106,11 +106,33 @@ trait Model_ORM_ContentRelatedTrait
         return $this->where($this->object_column('entity_id'), '=', $entity_id);
     }
 
+    protected function filter_entity_and_entity_item_id(Model_ContentEntity $entity = null, $entity_item_id = null)
+    {
+        if ($entity) {
+            $this->filter_entity_id($entity->get_id());
+        }
+
+        if ($entity_item_id) {
+            $this->filter_entity_item_id($entity_item_id);
+        }
+
+        return $this;
+    }
+
     /**
      * @return ContentRelatedInterface|$this
      */
     public function group_by_entity_item_id()
     {
         return $this->group_by($this->object_column('entity_item_id'));
+    }
+
+    /**
+     * @return \BetaKiller\Content\LinkedContentModelInterface
+     */
+    protected function get_related_item_model()
+    {
+        $id = $this->get_entity_item_id();
+        return $this->get_entity()->get_linked_model_instance($id);
     }
 }

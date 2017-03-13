@@ -1,6 +1,8 @@
 <?php
 namespace BetaKiller\Notification\Transport;
 
+use BetaKiller\Notification\NotificationMessageInterface;
+use BetaKiller\Notification\NotificationUserInterface;
 use BetaKiller\Notification\TransportInterface;
 
 class EmailTransport extends AbstractTransport implements TransportInterface
@@ -12,18 +14,18 @@ class EmailTransport extends AbstractTransport implements TransportInterface
         return self::NAME;
     }
 
-    public function isEnabledFor(\BetaKiller\Notification\NotificationUserInterface $user)
+    public function isEnabledFor(NotificationUserInterface $user)
     {
         return $user->is_email_notification_allowed();
     }
 
     /**
-     * @param \Notification_Message                              $message
-     * @param \BetaKiller\Notification\NotificationUserInterface $user
+     * @param \BetaKiller\Notification\NotificationMessageInterface $message
+     * @param \BetaKiller\Notification\NotificationUserInterface    $user
      *
      * @return int Number of messages sent
      */
-    public function send(\Notification_Message $message, \BetaKiller\Notification\NotificationUserInterface $user)
+    public function send(NotificationMessageInterface $message, NotificationUserInterface $user)
     {
         $subj = $message->get_subj();
         $attachments = $message->get_attachments();

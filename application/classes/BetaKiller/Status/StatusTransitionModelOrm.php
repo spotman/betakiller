@@ -5,7 +5,7 @@ use BetaKiller\Helper\CurrentUserTrait;
 use BetaKiller\Model\RoleInterface;
 use BetaKiller\Graph\GraphTransitionModelOrm;
 
-abstract class StatusTransitionModelOrm extends GraphTransitionModelOrm
+abstract class StatusTransitionModelOrm extends GraphTransitionModelOrm implements StatusTransitionModelInterface
 {
     use CurrentUserTrait;
 
@@ -36,11 +36,11 @@ abstract class StatusTransitionModelOrm extends GraphTransitionModelOrm
         $foreign_key = $through_table.'.'.$this->get_roles_relation_foreign_key();
         $far_key     = $through_table.'.'.$this->get_roles_relation_far_key();
 
-        // inner join ACL table + where role_id in ($user->get_roles_ids())
+        // inner join ACL table + where role_id in ($user->get_all_user_roles_ids())
         return $this
             ->join($through_table, 'INNER')
             ->on($foreign_key, '=', $primary_key)
-            ->where($far_key, 'IN', $user->get_roles_ids());
+            ->where($far_key, 'IN', $user->get_all_user_roles_ids());
     }
 
     /**
@@ -50,7 +50,7 @@ abstract class StatusTransitionModelOrm extends GraphTransitionModelOrm
      */
     public function find_all_roles()
     {
-        return $this->get_roles_relation()->find_all()->as_array();
+        return $this->get_roles_relation()->get_all();
     }
 
     public function add_role(RoleInterface $role)

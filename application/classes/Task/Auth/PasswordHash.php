@@ -8,12 +8,12 @@ class Task_Auth_PasswordHash extends Minion_Task
         $confirm    = $this->password("Enter the password again");
 
         if ($password != $confirm) {
-            $this->write('Passwords are not identical', self::RED);
+            $this->write('Passwords are not identical', self::COLOR_RED);
             return;
         }
 
         $hash = Auth::instance()->hash($password);
 
-        $this->write($hash, self::GREEN);
+        $this->write($hash, self::COLOR_GREEN);
     }
 }

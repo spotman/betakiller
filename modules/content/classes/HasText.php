@@ -11,7 +11,6 @@ interface HasText
     /**
      * @param $id
      * @param string $text
-     * @return
      * @internal param string $lang
      */
     public function update_text_at_item_id($id, $text);

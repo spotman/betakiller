@@ -38,7 +38,7 @@ abstract class Base implements Filter
     /**
      * @param string    $label
      * @param Value[]   $values
-     * @return static
+     * @return Filter\Model\ValuesGroup
      */
     protected function availableValuesGroupFactory($label, array $values)
     {
@@ -46,7 +46,7 @@ abstract class Base implements Filter
     }
 
     /**
-     * @return \Model_User
+     * @return User
      */
     public function getUser()
     {
@@ -61,8 +61,9 @@ abstract class Base implements Filter
      */
     public function getAvailableValues($filterHaving = null)
     {
-        if (!$this->isValuesPopulationAllowed())
+        if (!$this->isValuesPopulationAllowed()) {
             return [];
+        }
 
         $pairs = $this->getAvailableValuesPairs($filterHaving);
 
@@ -72,14 +73,15 @@ abstract class Base implements Filter
     /**
      * @param null $filterHaving
      * @param bool $filterSelected
-     * @return \BetaKiller\Filter\Model\Value[]|null
+     * @return \BetaKiller\Filter\Model\Value|null
      */
     public function getRandomAvailableValue($filterHaving = null, $filterSelected = false)
     {
         $valuesGroups = $this->getAvailableValues($filterHaving);
 
-        if (!$valuesGroups)
+        if (!$valuesGroups) {
             return null;
+        }
 
         $groupIndex = array_rand($valuesGroups);
 
@@ -88,8 +90,9 @@ abstract class Base implements Filter
 
         $values = $group->getValues();
 
-        if (!$values)
+        if (!$values) {
             return null;
+        }
 
         $valueIndex = array_rand($values);
 
@@ -98,8 +101,9 @@ abstract class Base implements Filter
 
     private function processValuesPairs(array $pairs)
     {
-        if (!$pairs)
+        if (!$pairs) {
             return [];
+        }
 
         if ($this->hasGroupedValues()) {
             return $this->wrapGroupedValues($pairs);
@@ -153,11 +157,13 @@ abstract class Base implements Filter
     public function getSelectedValues()
     {
         // Skip empty filters
-        if (!$this->isSelected())
+        if (!$this->isSelected()) {
             return [];
+        }
 
-        if (!$this->isValuesPopulationAllowed())
+        if (!$this->isValuesPopulationAllowed()) {
             return [];
+        }
 
         $pairs = $this->getSelectedValuesPairs();
 

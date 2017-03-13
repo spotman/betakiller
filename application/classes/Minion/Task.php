@@ -1,4 +1,6 @@
-<?php defined('SYSPATH') or die('No direct script access.');
+<?php
+
+use BetaKiller\Model\UserInterface;
 
 /**
  * Interface that all minion tasks must implement
@@ -7,11 +9,10 @@ abstract class Minion_Task extends Kohana_Minion_Task
 {
     use BetaKiller\Helper\LogTrait;
 
-    const RED           = Minion_CLI::RED;
-    const GREEN         = Minion_CLI::GREEN;
-    const BLUE          = Minion_CLI::BLUE;
-
-    const LIGHT_BLUE    = Minion_CLI::LIGHT_BLUE;
+    const COLOR_RED         = Minion_CLI::RED;
+    const COLOR_GREEN       = Minion_CLI::GREEN;
+    const COLOR_BLUE        = Minion_CLI::BLUE;
+    const COLOR_LIGHT_BLUE  = Minion_CLI::LIGHT_BLUE;
 
     public function __construct()
     {
@@ -61,7 +62,7 @@ abstract class Minion_Task extends Kohana_Minion_Task
     {
         $username = 'minion';
 
-        /** @var Model_User $orm */
+        /** @var UserInterface $orm */
         $orm = \ORM::factory('User');
 
         $user = $orm->search_by($username);
@@ -73,7 +74,7 @@ abstract class Minion_Task extends Kohana_Minion_Task
             $host = parse_url(Kohana::$base_url, PHP_URL_HOST);
             $email = $username.'@'.$host;
 
-            /** @var Model_User $user */
+            /** @var UserInterface $user */
             $user = $orm
                 ->set_username($username)
                 ->set_password($password)
@@ -115,8 +116,9 @@ abstract class Minion_Task extends Kohana_Minion_Task
      */
     protected function write($text, $color = NULL)
     {
-        if ($color)
+        if ($color) {
             $text = $this->colorize($text, $color);
+        }
 
         Minion_CLI::write($text);
 
@@ -131,8 +133,9 @@ abstract class Minion_Task extends Kohana_Minion_Task
      */
     protected function write_replace($text, $eol = FALSE, $color = NULL)
     {
-        if ($color)
+        if ($color) {
             $text = $this->colorize($text, $color);
+        }
 
         Minion_CLI::write_replace($text, $eol);
 

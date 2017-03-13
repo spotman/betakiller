@@ -4,15 +4,16 @@ use BetaKiller\Notification\NotificationUserEmail;
 use BetaKiller\Status\StatusWorkflow;
 use BetaKiller\Status\StatusWorkflowException;
 use BetaKiller\Helper\InProductionTrait;
+use BetaKiller\Notification\NotificationMessageCommon;
 
-class Status_Workflow_Content_Comment extends StatusWorkflow
+class Status_Workflow_ContentComment extends StatusWorkflow
 {
     use InProductionTrait;
 
     const TRANSITION_APPROVE    = 'approve';
     const TRANSITION_REJECT     = 'reject';
     const TRANSITION_SPAM       = 'spam';
-    const TRANSITION_DELETE     = 'delete';
+    const TRANSITION_TRASH      = 'trash';
     const TRANSITION_RESTORE    = 'restore';
 
     public function draft()
@@ -44,17 +45,29 @@ class Status_Workflow_Content_Comment extends StatusWorkflow
     {
         // TODO Notify comment author
         $email = $comment->get_author_email();
+        $created_at = $comment->get_created_at()->format('H:i:s d.m.Y');
+        $content_label = $comment->get_related_content_label();
 
         $data = [
-            'name'  =>  $comment->get_author_name(),
+            'name'          =>  $comment->get_author_name(),
+            'url'           =>  $comment->get_public_url(),
+            'created_at'    =>  $created_at,
+            'label'         =>  $content_label,
         ];
 
-        $subj = ''; // TODO
+        // TODO Create default handler in NotificationMessage::render for subject (get i18n key from template name, add ".subj" and convert data keys to Kohana standard :key)
+        $subj = __('notification.comment.author-approve.subj', [
+            ':name'         =>  $data['name'],
+            ':url'          =>  $data['url'],
+            ':label'        =>  $data['label'],
+            ':created_at'   =>  $data['created_at'],
+        ]);
 
-        $message = Notification::instance()
-            ->message()
+        $message = NotificationMessageCommon::instance();
+
+        $message
             ->set_subj($subj)
-            ->set_template_name('moderator/comment/author-approve')
+            ->set_template_name('user/comment/author-approve')
             ->set_template_data($data);
 
         if ($this->in_production()) {
@@ -67,6 +80,9 @@ class Status_Workflow_Content_Comment extends StatusWorkflow
         $message->send();
     }
 
+    /**
+     * @param \Model_ContentComment $reply
+     */
     protected function notify_parent_comment_author_about_reply(Model_ContentComment $reply)
     {
         // Skip if parent comment email is equal to reply email
@@ -86,13 +102,10 @@ class Status_Workflow_Content_Comment extends StatusWorkflow
         $this->do_transition(self::TRANSITION_SPAM);
     }
 
-    public function delete()
+    public function trash()
     {
-        $this->do_transition(self::TRANSITION_DELETE);
-
-        // TODO Delete child comments
-
-        $this->model()->delete();
+        // Simply change status
+        $this->do_transition(self::TRANSITION_TRASH);
     }
 
     public function restore()

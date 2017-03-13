@@ -2,7 +2,7 @@
 namespace BetaKiller\IFace\Core;
 
 use BetaKiller\Config\AppConfigInterface;
-use BetaKiller\Helper\SeoMetaInterface;
+use BetaKiller\IFace\IFaceInterface;
 use DateInterval;
 use DateTime;
 use BetaKiller\IFace\IFaceModelInterface;
@@ -12,16 +12,15 @@ use URL_Dispatcher;
 use URL_Parameters;
 use View_IFace;
 
-abstract class IFace implements SeoMetaInterface
+abstract class IFace implements IFaceInterface
 {
-
     /**
      * @var IFaceModelInterface
      */
     protected $_model;
 
     /**
-     * @var IFace Parent iface
+     * @var IFaceInterface Parent iface
      */
     protected $_parent;
 
@@ -312,7 +311,7 @@ abstract class IFace implements SeoMetaInterface
      */
     public function getExpiresDateTime()
     {
-        return (new DateTime())->add($this->getExpiresInterval());
+        return (new \DateTime())->add($this->getExpiresInterval());
     }
 
     /**
@@ -349,6 +348,9 @@ abstract class IFace implements SeoMetaInterface
         return (string) $this->render();
     }
 
+    /**
+     * @return \BetaKiller\IFace\IFaceInterface|null
+     */
     public function get_parent()
     {
         if (!$this->_parent) {
@@ -358,7 +360,7 @@ abstract class IFace implements SeoMetaInterface
         return $this->_parent;
     }
 
-    public function set_parent(IFace $parent)
+    public function set_parent(IFaceInterface $parent)
     {
         $this->_parent = $parent;
         return $this;

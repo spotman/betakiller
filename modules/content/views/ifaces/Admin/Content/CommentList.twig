@@ -1,0 +1,101 @@
+{% extends layout %}
+
+{% block page_content %}
+
+    {% set actions_config = {
+        "approve":  { method: "approve", color: "green" },
+        "reject":   { method: "reject", color: "red" },
+        "spam":     { method: "markAsSpam", color: "orange" },
+        "trash":    { method: "moveToTrash", color: "red" },
+        "restore":  { method: "restoreFromTrash", color: "green" },
+    } %}
+
+    {% for comment in comments %}
+        <div class="card"> {# sticky-action #}
+            <div class="card-content">
+                <span class="card-title activator grey-text text-darken-4">
+                    [{{ comment.author.ip }}] {{ comment.author.name }} &raquo; <a href="{{ comment.publicURL }}" title="Просмотр на сайте" target="_blank">{{ comment.contentLabel }}</a>
+                    {#<i class="material-icons right">more_vert</i>#}
+                </span>
+                <p>{{ comment.message|nl2br }}</p>
+                {#<p><a href="#">Просмотр на сайте</a></p>#}
+            </div>
+            <div class="card-action">
+                <a href="{{ comment.editURL }}" class="btn">{{ "comment.action.edit"|i18n }}</a>
+                <div class="right">
+                    {% for transition in comment.status.transitions %}
+                        {% set button_config = actions_config[transition] %}
+                        <button class="btn transition-button {{ button_config.color }}" data-api-method="{{ button_config.method }}" data-id="{{ comment.id }}">
+                            {{ ("comment.status.transition." ~ transition)|i18n }}
+                        </button>
+                    {% endfor %}
+
+                    {#{% if "approve" in comment.status.transitions %}#}
+                        {#<button class="btn green action-button" data-api-method="approve">Approve</button>#}
+                    {#{% endif %}#}
+
+                    {#{% if "reject" in comment.status.transitions %}#}
+                        {#<button class="btn red reject-action-button" data-api-method="reject">Reject</button>#}
+                    {#{% endif %}#}
+
+                    {#{% if "spam" in comment.status.transitions %}#}
+                        {#<button class="btn orange spam-action-button" data-api-method="markAsSpam">SPAM</button>#}
+                    {#{% endif %}#}
+
+                    {#{% if "trash" in comment.status.transitions %}#}
+                        {#<button class="btn red delete-action-button">Trash</button>#}
+                    {#{% endif %}#}
+
+                    {#{% if "restore" in comment.status.transitions %}#}
+                        {#<button class="btn green restore-action-button">Restore</button>#}
+                    {#{% endif %}#}
+                </div>
+            </div>
+            {#<div class="card-reveal">#}
+                {#<span class="card-title grey-text text-darken-4">#}
+                    {#<span class="comment-author-name">{{ comment.author.name }}</span>#}
+                    {#<span class="comment-author-email">{{ comment.author.email }}</span>#}
+                    {#<i class="material-icons right">close</i>#}
+                {#</span>#}
+
+                {#<span class="comment-ip">{{ comment.author.ip }}</span>#}
+                {#<p>{{ comment.message|nl2br }}</p>#}
+            {#</div>#}
+        </div>
+    {% endfor %}
+
+    <script type="application/javascript">
+      require([
+        "jquery",
+        "content.api.rpc.definition",
+        "materialize.cards"
+      ], function($, api) {
+
+        $(function() {
+
+          var $transitionButtons = $(".transition-button");
+
+          $transitionButtons.click(function(e) {
+            e.preventDefault();
+
+            var $this = $(this),
+                id = $this.data("id"),
+                method = $this.data("api-method");
+
+            api.comment[method](id)
+              .done(function() {
+                console.log('done');
+              })
+              .fail(function() {
+                console.log('fail');
+              });
+
+          });
+
+
+        });
+
+      });
+    </script>
+
+{% endblock %}

@@ -155,7 +155,7 @@ class User extends \Model_Auth_User implements UserInterface
      */
     public function add_all_available_roles()
     {
-        $roles = $this->model_factory_role()->find_all();
+        $roles = $this->model_factory_role()->get_all();
 
         foreach ($roles as $role) {
             $this->add_role($role);
@@ -170,9 +170,21 @@ class User extends \Model_Auth_User implements UserInterface
      * @todo Store this data in session
      * @return array
      */
-    public function get_roles_ids()
+    public function get_all_user_roles_ids()
     {
-        return $this->get_roles_relation()->find_all_ids();
+        /** @var RoleInterface[] $roles */
+        $roles = [];
+        foreach ($this->get_roles_relation()->get_all() as $role) {
+            $roles = array_merge($roles, $role->get_all_parents());
+        }
+
+        $roles_ids = [];
+
+        foreach ($roles as $role) {
+            $roles_ids[] = $role->get_id();
+        }
+
+        return array_unique($roles_ids);
     }
 
     /**

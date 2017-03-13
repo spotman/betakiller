@@ -1,11 +1,10 @@
 <?php
 namespace BetaKiller\Model;
 
-use BetaKiller\Utils\Kohana\ORM\OrmInterface;
 use BetaKiller\Utils\Kohana\TreeModelMultipleParentsInterface;
 use Spotman\Acl\AclRoleInterface;
 
-interface RoleInterface extends OrmInterface, AclRoleInterface, TreeModelMultipleParentsInterface
+interface RoleInterface extends AclRoleInterface, TreeModelMultipleParentsInterface
 {
     // Model_Auth_Role methods (nothing special)
 
@@ -33,12 +32,9 @@ interface RoleInterface extends OrmInterface, AclRoleInterface, TreeModelMultipl
     public function get_users($include_not_active = false);
 
     /**
-     * Returns list of all roles IDs
-     * Useful for getting all user`s roles IDs
-     *
-     * @return int[]
+     * @return RoleInterface[]
      */
-    public function find_all_ids();
+    public function get_all();
 
     /**
      * Returns "Developers" role object
