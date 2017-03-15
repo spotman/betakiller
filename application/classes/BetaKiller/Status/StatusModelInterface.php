@@ -40,6 +40,7 @@ interface StatusModelInterface extends GraphNodeModelInterface
     public function get_allowed_target_transitions();
 
     /**
+     * Array with codenames of target transitions, <status codename> => <transition codename>
      * @return string[]
      */
     public function get_allowed_target_transitions_codename_array();

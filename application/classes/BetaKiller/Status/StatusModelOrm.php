@@ -86,7 +86,8 @@ abstract class StatusModelOrm extends GraphNodeModelOrm implements StatusModelIn
         $data = [];
 
         foreach ($this->get_allowed_target_transitions() as $transition) {
-            $data[] = $transition->get_codename();
+            $target_status_codename = $transition->get_target_node()->get_codename();
+            $data[$target_status_codename] = $transition->get_codename();
         }
 
         return $data;

@@ -22,11 +22,12 @@ return array (
     'other' => ':count комментариев',
   ],
   'comment.reply' => 'Ответить',
+  'comment.save' => 'Сохранить',
 
   'comment.status.pending'  => 'Ожидает подтверждения',
   'comment.status.approved' => 'Опубликован',
   'comment.status.spam'     => 'СПАМ',
-  'comment.status.deleted'  => 'В корзине',
+  'comment.status.trash'    => 'В корзине',
 
   'comment.action.edit' => 'Исправить',
 

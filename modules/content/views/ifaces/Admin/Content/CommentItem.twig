@@ -1,0 +1,55 @@
+{% extends layout %}
+
+{% block page_content %}
+
+    <form id="content-comment-edit-form" action="#" data-id="{{ id }}">
+        <div class="input-field">
+            <textarea name="message" id="comment-message" class="materialize-textarea" rows="10">{{ message }}</textarea>
+            <label for="comment-message">Message</label>
+        </div>
+
+        <button class="btn save-comment-button" type="submit">
+            {{ "comment.save"|i18n }}
+        </button>
+    </form>
+
+    <script type="application/javascript">
+
+        require([
+          'jquery',
+          'content.api.rpc.definition',
+          'materialize.forms'
+        ], function($, rpc) {
+
+          $(function() {
+            var $form = $('#content-comment-edit-form'),
+                $message = $form.find('#comment-message'),
+                $saveButton = $form.find('button[type="submit"]');
+
+            $form.submit(function(e) {
+              e.preventDefault();
+
+              $saveButton.attr('disabled', 'disabled');
+
+              var data = {
+                id: $form.data('id'),
+                message: $message.val()
+              };
+
+              rpc.comment.save(data)
+                .done(function() {})
+                .fail(function(message) {
+                  alert(message || "Ooops! Something went wrong...");
+                })
+                .always(function() {
+                  $saveButton.removeAttr('disabled');
+                });
+            });
+
+          });
+
+        });
+
+    </script>
+
+{% endblock %}

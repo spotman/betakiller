@@ -166,4 +166,12 @@ trait ContentTrait
     {
         return $this->url_parameters()->get(\Model_ContentCommentStatus::URL_PARAM);
     }
+
+    /**
+     * @return \Model_ContentComment
+     */
+    public function url_parameter_content_comment()
+    {
+        return $this->url_parameters()->get(\Model_ContentComment::URL_PARAM);
+    }
 }

@@ -9,6 +9,11 @@ class CommentItem extends AdminBase
      */
     public function get_data()
     {
-        // TODO get content data
+        $model = $this->url_parameter_content_comment();
+
+        return [
+            'id'        =>  $model->get_id(),
+            'message'   =>  $model->get_message(),
+        ];
     }
 }

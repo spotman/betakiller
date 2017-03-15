@@ -3,66 +3,48 @@
 {% block page_content %}
 
     {% set actions_config = {
-        "approve":  { method: "approve", color: "green" },
-        "reject":   { method: "reject", color: "red" },
-        "spam":     { method: "markAsSpam", color: "orange" },
-        "trash":    { method: "moveToTrash", color: "red" },
-        "restore":  { method: "restoreFromTrash", color: "green" },
+        "approve":  { method: "approve", color: "green", icon: "thumb_up" },
+        "reject":   { method: "reject", color: "red", icon: "thumb_down" },
+        "spam":     { method: "markAsSpam", color: "orange", icon: "warning" },
+        "trash":    { method: "moveToTrash", color: "red", icon: "delete" },
+        "restore":  { method: "restoreFromTrash", color: "green", icon: "settings_backup_restore" },
     } %}
 
-    {% for comment in comments %}
-        <div class="card"> {# sticky-action #}
-            <div class="card-content">
-                <span class="card-title activator grey-text text-darken-4">
-                    [{{ comment.author.ip }}] {{ comment.author.name }} &raquo; <a href="{{ comment.publicURL }}" title="Просмотр на сайте" target="_blank">{{ comment.contentLabel }}</a>
-                    {#<i class="material-icons right">more_vert</i>#}
-                </span>
-                <p>{{ comment.message|nl2br }}</p>
-                {#<p><a href="#">Просмотр на сайте</a></p>#}
-            </div>
-            <div class="card-action">
-                <a href="{{ comment.editURL }}" class="btn">{{ "comment.action.edit"|i18n }}</a>
-                <div class="right">
-                    {% for transition in comment.status.transitions %}
-                        {% set button_config = actions_config[transition] %}
-                        <button class="btn transition-button {{ button_config.color }}" data-api-method="{{ button_config.method }}" data-id="{{ comment.id }}">
-                            {{ ("comment.status.transition." ~ transition)|i18n }}
-                        </button>
-                    {% endfor %}
-
-                    {#{% if "approve" in comment.status.transitions %}#}
-                        {#<button class="btn green action-button" data-api-method="approve">Approve</button>#}
-                    {#{% endif %}#}
-
-                    {#{% if "reject" in comment.status.transitions %}#}
-                        {#<button class="btn red reject-action-button" data-api-method="reject">Reject</button>#}
-                    {#{% endif %}#}
-
-                    {#{% if "spam" in comment.status.transitions %}#}
-                        {#<button class="btn orange spam-action-button" data-api-method="markAsSpam">SPAM</button>#}
-                    {#{% endif %}#}
-
-                    {#{% if "trash" in comment.status.transitions %}#}
-                        {#<button class="btn red delete-action-button">Trash</button>#}
-                    {#{% endif %}#}
-
-                    {#{% if "restore" in comment.status.transitions %}#}
-                        {#<button class="btn green restore-action-button">Restore</button>#}
-                    {#{% endif %}#}
+    <div class="comments-list">
+        {% for comment in comments %}
+            <div class="card"> {# sticky-action #}
+                <div class="card-content">
+                    <div class="card-title grey-text text-darken-4">
+                        [{{ comment.author.ip }}] {{ comment.author.name }} &raquo; <a href="{{ comment.publicURL }}" title="Просмотр на сайте" target="_blank">{{ comment.contentLabel }}</a>
+                    </div>
+                    <p>{{ comment.message|nl2br }}</p>
+                </div>
+                <div class="card-action">
+                    <a href="{{ comment.editURL }}" class="btn">
+                        <i class="material-icons left">mode_edit</i>
+                        {{ "comment.action.edit"|i18n }}
+                    </a>
+                    <div class="right">
+                        {% for target_codename, transition in comment.status.transitions %}
+                            {% set button_config = actions_config[transition] %}
+                            <button class="btn transition-button {{ button_config.color }}"
+                                    data-api-method="{{ button_config.method }}" data-id="{{ comment.id }}"
+                                    data-target-label="{{ ("comment.status." ~ target_codename)|i18n }}">
+                                <i class="material-icons left">{{ button_config.icon }}</i>
+                                {{ ("comment.status.transition." ~ transition)|i18n }}
+                            </button>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="card-overlay valign-wrapper white">
+                    <h3 class="valign">
+                        <i class="material-icons tiny green-text">done</i>
+                        <span class="label"></span>
+                    </h3>
                 </div>
             </div>
-            {#<div class="card-reveal">#}
-                {#<span class="card-title grey-text text-darken-4">#}
-                    {#<span class="comment-author-name">{{ comment.author.name }}</span>#}
-                    {#<span class="comment-author-email">{{ comment.author.email }}</span>#}
-                    {#<i class="material-icons right">close</i>#}
-                {#</span>#}
-
-                {#<span class="comment-ip">{{ comment.author.ip }}</span>#}
-                {#<p>{{ comment.message|nl2br }}</p>#}
-            {#</div>#}
-        </div>
-    {% endfor %}
+        {% endfor %}
+    </div>
 
     <script type="application/javascript">
       require([
@@ -77,25 +59,70 @@
 
           $transitionButtons.click(function(e) {
             e.preventDefault();
+            $transitionButtons.attr('disabled', 'disabled');
 
             var $this = $(this),
                 id = $this.data("id"),
-                method = $this.data("api-method");
+                method = $this.data("api-method"),
+                targetLabel = $this.data("target-label"),
+                $card = $this.closest('.card'),
+                $overlay = $card.find('.card-overlay'),
+                $overlayLabel = $overlay.find('.label');
 
             api.comment[method](id)
               .done(function() {
                 console.log('done');
+                $overlayLabel.text(targetLabel);
+                $card.addClass('processed');
               })
-              .fail(function() {
-                console.log('fail');
+              .fail(function(message) {
+                alert(message || 'Oops! Something went wrong...');
+              })
+              .always(function() {
+                $transitionButtons.removeAttr('disabled');
               });
 
           });
-
 
         });
 
       });
     </script>
+
+    <style>
+
+        .card .card-overlay {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            z-index: 10;
+            vertical-align: middle;
+        }
+
+        .card.processed .card-overlay .valign {
+            width: 100%;
+            text-align: center;
+        }
+
+        .card.processed .card-overlay .label {
+            vertical-align: middle;
+            font-size: 1.6rem;
+        }
+
+        .card.processed .card-overlay .material-icons {
+            vertical-align: middle;
+            font-size: 1.6rem;
+        }
+
+        .card.processed .card-overlay {
+            display: flex;
+            opacity: 1;
+        }
+
+    </style>
 
 {% endblock %}
