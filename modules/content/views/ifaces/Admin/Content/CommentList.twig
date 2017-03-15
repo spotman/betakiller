@@ -71,7 +71,6 @@
 
             api.comment[method](id)
               .done(function() {
-                console.log('done');
                 $overlayLabel.text(targetLabel);
                 $card.addClass('processed');
               })
@@ -103,17 +102,17 @@
             vertical-align: middle;
         }
 
-        .card.processed .card-overlay .valign {
+        .card .card-overlay .valign {
             width: 100%;
             text-align: center;
         }
 
-        .card.processed .card-overlay .label {
+        .card .card-overlay .label {
             vertical-align: middle;
             font-size: 1.6rem;
         }
 
-        .card.processed .card-overlay .material-icons {
+        .card .card-overlay .material-icons {
             vertical-align: middle;
             font-size: 1.6rem;
         }
