@@ -37,9 +37,11 @@
               };
 
               rpc.comment.save(data)
-                .done(function() {})
+                .done(function() {
+                  $saveButton.addClass("green");
+                })
                 .fail(function(message) {
-                  alert(message || "Ooops! Something went wrong...");
+                  alert(message || "Oops! Something went wrong...");
                 })
                 .always(function() {
                   $saveButton.removeAttr('disabled');
