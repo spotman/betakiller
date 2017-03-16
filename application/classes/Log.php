@@ -9,8 +9,7 @@ class Log extends Kohana_Log
 
     protected static function _add($level, $message, array $values = NULL, array $additional = NULL, $trace_level = 0)
     {
-        if ( is_object(Kohana::$log) )
-        {
+        if (is_object(Kohana::$log)) {
             Kohana::$log->add($level, $message, $values, $additional, ++$trace_level);
         }
     }

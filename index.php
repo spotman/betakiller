@@ -54,7 +54,7 @@ error_reporting(E_ALL | E_STRICT);
  */
 
 // Set the full path to the docroot
-define('DOCROOT', realpath(dirname(__FILE__)).DIRECTORY_SEPARATOR);
+define('DOCROOT', realpath(__DIR__).DIRECTORY_SEPARATOR);
 
 // Make the application relative to the docroot, for symlink'd index.php
 $application = realpath(DOCROOT.$application);
@@ -111,15 +111,15 @@ try
 }
 catch (Exception $e)
 {
-    @ ob_end_clean();
+    ob_get_length() && ob_end_clean();
     http_response_code(500);
 
-    $in_dev = class_exists('Kohana') ? in_array(Kohana::$environment, [Kohana::DEVELOPMENT, Kohana::TESTING]) : false;
+    $in_dev = class_exists(\Kohana::class) ? in_array(Kohana::$environment, [\Kohana::DEVELOPMENT, \Kohana::TESTING], true) : false;
     $message = $e->getMessage().PHP_EOL.PHP_EOL.$e->getTraceAsString();
 
     if ($in_dev) {
         // Show to dev
-        echo (PHP_SAPI == 'cli') ? $message : nl2br($message);
+        echo (PHP_SAPI === 'cli') ? $message : nl2br($message);
     } else {
         // Write to default log
         error_log($message);
@@ -127,13 +127,12 @@ catch (Exception $e)
     return;
 }
 
-
-if (PHP_SAPI == 'cli') // Try and load minion
+if (PHP_SAPI === 'cli') // Try and load minion
 {
-    class_exists('Minion_Task') OR die('Please enable the Minion module for CLI support.');
-    set_exception_handler(array('Minion_Exception', 'handler'));
+    class_exists(\Minion_Task::class) OR die('Please enable the Minion module for CLI support.');
+    set_exception_handler(array(\Minion_Exception::class, 'handler'));
 
-    Log::debug('Running :name env', [':name' => Kohana::$environment_string]);
+    Log::debug('Running :name env', [':name' => \Kohana::$environment_string]);
 
     Minion_Task::factory(Minion_CLI::options())->execute();
 }

@@ -38,7 +38,7 @@ setlocale(LC_ALL, 'ru_RU.utf-8', 'ru');
  * @link http://kohanaframework.org/guide/using.autoloading
  * @link http://www.php.net/manual/function.spl-autoload-register
  */
-spl_autoload_register(array('Kohana', 'auto_load'));
+spl_autoload_register(array(\Kohana::class, 'auto_load'));
 
 
 /**
@@ -47,8 +47,9 @@ spl_autoload_register(array('Kohana', 'auto_load'));
 
 $vendor_autoload = DOCROOT.'vendor/autoload.php';
 
-if ( ! file_exists($vendor_autoload) )
-    die("Init Composer first");
+if ( ! file_exists($vendor_autoload) ) {
+    die('Init Composer first');
+}
 
 require_once $vendor_autoload;
 
@@ -71,7 +72,7 @@ ini_set('unserialize_callback_func', 'spl_autoload_call');
 // -- Configuration and initialization -----------------------------------------
 
 // Import arguments in CLI mode
-if (PHP_SAPI == 'cli')
+if (PHP_SAPI === 'cli')
 {
     // No short options
     $short_options = '';
@@ -149,16 +150,3 @@ Kohana::$log->attach(new Log_File(APPPATH.'logs'), Log::NOTICE);
  */
 $modules = Kohana::$config->load('modules')->as_array();
 Kohana::modules($modules);
-
-/**
- * Include default routes. Default routes are located in application/routes/default.php
- */
-include Kohana::find_file('routes', 'default');
-
-/**
- * Include routes for current env
- */
-if ($routes = Kohana::find_file('routes', Kohana::$environment_string))
-{
-    include $routes;
-}
