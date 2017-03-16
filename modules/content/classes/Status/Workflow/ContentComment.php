@@ -43,7 +43,6 @@ class Status_Workflow_ContentComment extends StatusWorkflow
 
     protected function notify_comment_author_about_approve(Model_ContentComment $comment)
     {
-        // TODO Notify comment author
         $email = $comment->get_author_email();
         $created_at = $comment->get_created_at()->format('H:i:s d.m.Y');
         $content_label = $comment->get_related_content_label();
@@ -55,7 +54,6 @@ class Status_Workflow_ContentComment extends StatusWorkflow
             'label'         =>  $content_label,
         ];
 
-        // TODO Create default handler in NotificationMessage::render for subject (get i18n key from template name, add ".subj" and convert data keys to Kohana standard :key)
         $subj = __('notification.comment.author-approve.subj', [
             ':name'         =>  $data['name'],
             ':url'          =>  $data['url'],
