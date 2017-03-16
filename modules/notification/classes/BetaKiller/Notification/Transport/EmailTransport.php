@@ -3,15 +3,12 @@ namespace BetaKiller\Notification\Transport;
 
 use BetaKiller\Notification\NotificationMessageInterface;
 use BetaKiller\Notification\NotificationUserInterface;
-use BetaKiller\Notification\TransportInterface;
 
-class EmailTransport extends AbstractTransport implements TransportInterface
+class EmailTransport extends AbstractTransport
 {
-    const NAME = 'email';
-
     public function get_name()
     {
-        return self::NAME;
+        return 'email';
     }
 
     public function isEnabledFor(NotificationUserInterface $user)

@@ -17,7 +17,7 @@ class Notification
         $to = $message->get_to();
 
         if (!$to) {
-            throw new \Exception('Message target must be specified');
+            throw new NotificationException('Message target must be specified');
         }
 
         $transports = $this->get_transports();
