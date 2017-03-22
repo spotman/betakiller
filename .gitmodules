@@ -46,3 +46,6 @@
 [submodule "modules/rbac"]
 	path = modules/acl
 	url = git@github.com:spotman/rbac.git
+[submodule "modules/sqlite"]
+	path = modules/sqlite
+	url = git@github.com:spotman/kohana-database-sqlite.git
