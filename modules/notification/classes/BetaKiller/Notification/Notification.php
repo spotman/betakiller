@@ -3,9 +3,12 @@ namespace BetaKiller\Notification;
 
 use BetaKiller\Notification\Transport\EmailTransport;
 use BetaKiller\Notification\Transport\OnlineTransport;
+use BetaKiller\Helper\LogTrait;
 
 class Notification
 {
+    use LogTrait;
+
     public static function instance()
     {
         return new static;
@@ -24,27 +27,34 @@ class Notification
 
         foreach ($to as $target) {
             $counter = 0;
+            $attempts = 0;
 
             foreach ($transports as $transport) {
                 if (!$transport->isEnabledFor($target)) {
                     continue;
                 }
 
+                $attempts++;
+
                 try {
                     $counter = $transport->send($message, $target);
 
                     // Message delivered, exiting
                     if ($counter) {
+                        $this->debug('Notification sent to user with email :email with data :data', [
+                            ':email'    =>  $target->get_email(),
+                            ':data'     =>  json_encode($message->get_template_data())
+                        ]);
                         break;
                     }
                 } catch (\Exception $e) {
-                    \Log::exception($e);
+                    $this->exception($e);
                     continue;
                 }
             }
 
             // Message delivery failed
-            if (!$counter) {
+            if ($attempts && !$counter) {
                 throw new NotificationException('Message delivery failed, see previously logged exceptions');
             }
 

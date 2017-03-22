@@ -3,7 +3,15 @@ namespace BetaKiller\Notification;
 
 class NotificationUserEmail implements NotificationUserInterface
 {
+    /**
+     * @var string
+     */
     protected $_email;
+
+    /**
+     * @var bool
+     */
+    protected $_emailNotificationAllowed = true;
 
     public function get_id()
     {
@@ -39,5 +47,23 @@ class NotificationUserEmail implements NotificationUserInterface
     public function is_online_notification_allowed()
     {
         return FALSE;
+    }
+
+    /**
+     * @return $this
+     */
+    public function enable_email_notification()
+    {
+        $this->_emailNotificationAllowed = true;
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function disable_email_notification()
+    {
+        $this->_emailNotificationAllowed = false;
+        return $this;
     }
 };

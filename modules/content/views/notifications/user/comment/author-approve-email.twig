@@ -1,4 +1,4 @@
-{% extends "@templates/notification/default/email" %}
+{% extends "@notifications/default/email" %}
 
 {% block body %}
     {{ "notification.comment.author-approve.text"|i18n({ ":name": name, ":label": label, ":created_at": created_at, ":url": url })|raw }}

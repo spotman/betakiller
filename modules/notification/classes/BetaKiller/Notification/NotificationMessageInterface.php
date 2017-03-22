@@ -71,11 +71,21 @@ interface NotificationMessageInterface
     public function set_template_name($template_name);
 
     /**
+     * @return string
+     */
+    public function get_template_name();
+
+    /**
      * @param array $data
      *
      * @return $this
      */
     public function set_template_data(array $data);
+
+    /**
+     * @return array
+     */
+    public function get_template_data();
 
     /**
      * Render message for sending via provided transport

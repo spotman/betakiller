@@ -178,6 +178,14 @@ abstract class NotificationMessageAbstract implements NotificationMessageInterfa
     }
 
     /**
+     * @return string
+     */
+    public function get_template_name()
+    {
+        return $this->_template_name;
+    }
+
+    /**
      * @param array $data
      *
      * @return $this|NotificationMessageInterface
@@ -187,6 +195,14 @@ abstract class NotificationMessageAbstract implements NotificationMessageInterfa
         $this->_template_data = $data;
 
         return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function get_template_data()
+    {
+        return $this->_template_data;
     }
 
     /**
@@ -202,7 +218,7 @@ abstract class NotificationMessageAbstract implements NotificationMessageInterfa
      */
     protected function get_template_path()
     {
-        return 'templates'.DIRECTORY_SEPARATOR.'notification';
+        return 'notifications';
     }
 
     /**
@@ -215,15 +231,15 @@ abstract class NotificationMessageAbstract implements NotificationMessageInterfa
     {
         $view = $this->template_factory();
 
-        $data = array_merge($this->_template_data, [
-            'to'      => $this->_to,
-            'subject' => $this->_subj,
+        $data = array_merge($this->get_template_data(), [
+            'to'      => $this->get_to(),
+            'subject' => $this->get_subj(),
         ]);
 
         $view->set($data);
 
         return $view->render(
-            $this->get_template_path().DIRECTORY_SEPARATOR.$this->_template_name.'-'.$transport->get_name()
+            $this->get_template_path().DIRECTORY_SEPARATOR.$this->get_template_name().'-'.$transport->get_name()
         );
     }
 }
