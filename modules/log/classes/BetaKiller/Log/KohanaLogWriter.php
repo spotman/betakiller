@@ -18,10 +18,17 @@ class KohanaLogWriter extends \Log_Writer
 
         foreach ($messages as $message) {
             $level = $this->_log_levels[$message['level']];
-//            $text = $this->format_message($message, 'body');
             $text = $message['body'];
+            $context = [];
 
-            $logger->log($level, $text);
+            /** @var \Exception $exception */
+            $exception = isset($message['additional']['exception']) ? $message['additional']['exception'] : null;
+
+            if ($exception) {
+                $context['exception'] = $exception;
+            }
+
+            $logger->log($level, $text, $context);
         }
     }
 }

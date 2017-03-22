@@ -3,6 +3,7 @@ namespace BetaKiller\Log;
 
 use BetaKiller\Helper\CurrentUserTrait;
 use Monolog\ErrorHandler;
+//use Monolog\Handler\ChromePHPHandler;
 use Monolog\Handler\DeduplicationHandler;
 use Monolog\Handler\FingersCrossedHandler;
 use Monolog\Handler\PHPConsoleHandler;
@@ -51,9 +52,11 @@ class Logger implements LoggerInterface
 
 //        ErrorHandler::register($monolog);
 
-        $logFileName = date('Y'.DIRECTORY_SEPARATOR.'m'.DIRECTORY_SEPARATOR.'d').'.log';
-        $coreLogFilePath = APPPATH.'logs'.DIRECTORY_SEPARATOR.$logFileName;
-        $appLogFilePath = \MultiSite::instance()->site_path().DIRECTORY_SEPARATOR.'logs'.DIRECTORY_SEPARATOR.$logFileName;
+        $logFilePath = implode(DIRECTORY_SEPARATOR, ['logs', date('Y'), date('m'), date('d').'.log']);
+        $coreLogFilePath = APPPATH.$logFilePath;
+        $appLogFilePath = \MultiSite::instance()->site_path().DIRECTORY_SEPARATOR.$logFilePath;
+
+        $stripExceptionFormatter = new StripExceptionFromContextFormatter();
 
         $groupHandler = new WhatFailureGroupHandler([
             // Core logs
@@ -62,23 +65,23 @@ class Logger implements LoggerInterface
             // App logs
             new StreamHandler($appLogFilePath, $monolog::NOTICE),
 
-            // TODO CLI
-
-            // TODO SQLite storage
-//            new FingersCrossedHandler()
+            // TODO PhpExceptionStorage handler
+//            new FingersCrossedHandler(),
         ]);
 
-//        $monolog->pushHandler($groupHandler);
         $monolog->pushHandler(new DeduplicationHandler($groupHandler));
 
         $user = $this->current_user(true);
 
         // Enable debugging via PhpConsole for developers
         if ($user && $user->is_developer()) {
-            $monolog->pushHandler(new PHPConsoleHandler());
+            $phpConsoleHandler = new PHPConsoleHandler([
+                'headersLimit'  =>  1024,  // 1KB
+            ]);
+            $phpConsoleHandler->setFormatter($stripExceptionFormatter);
+            $monolog->pushHandler($phpConsoleHandler);
         }
 
-//        $monolog->pushProcessor(new IntrospectionProcessor($monolog::NOTICE, [], 0));
         $monolog->pushProcessor(new MemoryPeakUsageProcessor());
 
         return $monolog;

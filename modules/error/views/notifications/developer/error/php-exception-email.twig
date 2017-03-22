@@ -1,0 +1,24 @@
+{% extends "@notifications/default/email" %}
+
+{% block body %}
+    <p>Новое исключение: <strong>{{ message }}</strong></p>
+
+    <p>Встречается по следующим адресам:</p>
+
+    <ul>
+        {% for url in urls %}
+        <li><a href="{{ url }}">{{ url }}</a></li>
+        {% endfor %}
+    </ul>
+
+    <p>в следующих файлах:</p>
+
+    <ul>
+        {% for path in paths %}
+            <li>{{ path }}</li>
+        {% endfor %}
+    </ul><br />
+
+    <p><a href="{{ adminUrl }}"><strong>Стектрейс и другая информация здесь</strong></a></p>
+
+{% endblock %}

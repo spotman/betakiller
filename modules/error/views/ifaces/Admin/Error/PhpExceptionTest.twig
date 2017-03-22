@@ -1,0 +1,46 @@
+{% extends layout %}
+
+{% block page_content %}
+  <br />
+  <button class="btn orange throw-exception-button" data-code="500">Throw HTTP_Exception_500 exception</button>
+
+
+  <script type="text/javascript">
+
+    require([
+      'jquery',
+      'error.api.rpc.definition'
+    ], function($, api) {
+
+      $(function() {
+        var $throwExceptionButton = $('.throw-exception-button');
+
+        function processApiCall($button, apiMethodPromise) {
+          $button.attr('disabled', 'disabled');
+
+          apiMethodPromise
+            .done(function () {})
+            .fail(function(message) {
+              console.log(message || 'Oops! Something went wrong...')
+            })
+            .always(function() {
+              $button.removeAttr('disabled');
+            });
+        }
+
+        $throwExceptionButton.click(function(e) {
+          e.preventDefault();
+
+          var $this = $(this),
+              code = $this.data('code');
+
+          processApiCall($this, api.phpException.throwHTTP(code));
+        });
+
+      });
+
+    });
+
+  </script>
+
+{% endblock %}

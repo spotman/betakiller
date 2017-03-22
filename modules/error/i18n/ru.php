@@ -4,8 +4,4 @@
  * Automatically generated from previous translation file.
  */
 return array (
-  'test' => 'test',
-  'This is a test' => 'This is a test',
-  'Ошибки с таким хешом не существует' => 'Ошибки с таким хешом не существует',
-  'Unknown' => 'Неизвестно',
 );

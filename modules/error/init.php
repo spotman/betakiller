@@ -7,55 +7,14 @@
  */
 
 /**
- * Attach the MongoDB log-service to logging. Multiple writers are supported.
+ * Attach the SQLite log-service to logging. Multiple writers are supported.
  */
-if ( Kohana::in_production(TRUE) )
-{
+// TODO Remove this in favour of custom Monolog handler
+if (Kohana::in_production(true)) {
     try {
-        $log = new Log_MongoDB;
+        $log = new Log_PhpExceptionStorage();
         Kohana::$log->attach($log, Log::NOTICE, Log::EMERGENCY);
     } catch (Exception $e) {
         // Skip this log writer silently
     }
 }
-
-Route::set('catch-js-error', 'catch-js-error')
-    ->defaults(array(
-        'module'        => 'error',
-        'directory'     => 'Error',
-        'controller'    => 'Js',
-        'action'        => 'catch',
-    ));
-
-Route::set('error-php-list', 'errors/php')
-    ->defaults(array(
-        'module'        => 'error',
-        'directory'     => 'Error',
-        'controller'    => 'Php',
-        'action'        => 'index',
-    ));
-
-Route::set('error-php-actions', 'errors/php/action/<action>(/<param>)')
-    ->defaults(array(
-        'module'        => 'error',
-        'directory'     => 'Error',
-        'controller'    => 'Php',
-        'action'        => 'index',
-    ));
-
-Route::set('error-php-message', 'errors/php/<hash>(/<action>)')
-    ->defaults(array(
-        'module'        => 'error',
-        'directory'     => 'Error',
-        'controller'    => 'PhpMessage',
-        'action'        => 'show',
-    ));
-
-Route::set('error-widget', 'errors/widget(/<action>)')
-    ->defaults(array(
-        'module'        => 'error',
-        'directory'     => 'Error',
-        'controller'    => 'Widget',
-        'action'        => 'index',
-    ));
-

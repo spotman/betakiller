@@ -1,0 +1,198 @@
+{% extends layout %}
+
+{% block page_content %}
+
+    {# TODO Migrate from Bootstrap to Materialize #}
+
+    {#<style type="text/css">#}
+
+        {#ul.unstyled {#}
+            {#margin-bottom: 0;#}
+        {#}#}
+
+    {#</style>#}
+
+    {#<div class="navbar navbar-inner navbar-form form-inline">#}
+
+        {#<a class="btn btn-default" href="{{ toggleShowResolvedErrorsURL }}">#}
+            {#{{ showResolvedErrors ? "Показать только открытые ошибки" : "Показать исправленные ошибки" }}#}
+        {#</a>#}
+
+        {#{% if ( showResolvedErrors ) %}#}
+            {#<label for="user-filter"></label>#}
+            {#<select name="user-filter" id="user-filter" class="form-control">#}
+                {#<option value="0">Все разработчики</option>#}
+                {#{% for id, label in developersList %}#}
+                    {#<option value="id" {{ (userIdFilter == id) ? "selected" : "" }}>{{ label }}</option>#}
+                {#{% endfor %}#}
+            {#</select>#}
+        {#{% endif %}#}
+
+        {#{% set sortKeys = { "time":  "По времени", "module": "По модулю", "message": "По типу ошибки" } %}#}
+
+        {#<div class="btn-group pull-right">#}
+
+            {#{% for sortKey, sortLabel in sortKeys %}#}
+
+                {#{% set isCurrent = (sortKey == sortBy) %}#}
+                {#{% set link = isCurrent ? toggleSortDirectionURL : (sortByURL ~ sortKey) %}#}
+                {#{% set title = isCurrent ? "Изменить направление сортировки" : "Выбрать другой критерий сортировки" %}#}
+                {#{% set icon = sortDirection ? "glyphicon glyphicon-arrow-up" : "glyphicon glyphicon-arrow-down" %}#}
+
+                {#<a tabindex="-1" href="{{ link }}" title="{{ title }}" class="btn btn-default {{ isCurrent ? "active" : "" }}">#}
+                    {#{% if ( isCurrent ) %}<span class="{{ icon }}"></span>{% endif %} {{ sortLabel }}#}
+                {#</a>#}
+
+            {#{% endfor %}#}
+        {#</div>#}
+
+    {#</div>#}
+
+    {#<script type="text/javascript">#}
+
+      {#require([#}
+        {#'jquery'#}
+      {#], function($) {#}
+
+        {#$(function() {#}
+          {#var user_select = $("#user-filter");#}
+
+          {#user_select.change(function()#}
+          {#{#}
+            {#var user_id = user_select.val();#}
+            {#location.href = user_id ? "?user_id=" + user_id : "/errors/php/";#}
+          {#});#}
+        {#});#}
+
+      {#});#}
+
+    {#</script>#}
+
+    {% if exceptions|length %}
+
+        <table class="bordered highlight">
+            {#<thead>#}
+                {#<tr>#}
+                    {#<th>Сообщение</th>#}
+                    {#<th>Действия</th>#}
+                {#</tr>#}
+            {#</thead>#}
+
+            <tbody>
+            {% for error in exceptions %}
+
+                {# Если ошибка сейчас исправлена, отмечаем её зелёным #}
+                {% if (error.isResolved) %}
+                    {% set css_class = "green lighten-5" %}
+                {# Если ошибка сейчас не исправлена, но её раньше кто-то исправлял, отмечаем жёлтым #}
+                {% elseif (error.isRepeated) %}
+                    {% set css_class = "amber lighten-5" %}
+                {% elseif (error.isIgnored) %}
+                    {% set css_class = "brown lighten-5" %}
+                {% else %}
+                    {% set css_class = "" %}
+                {% endif %}
+
+                <tr class="php-exception-item {{ css_class }}" data-hash="{{ error.hash }}">
+                    <td>
+                        <span class="badge grey lighten-4 right">{{ error.lastSeenAt }}</span>
+
+                        {% for module in error.modules %}
+                            <span class="badge blue lighten-5 right">{{ module }}</span>
+                        {% endfor %}
+
+                        <a href="{{ error.showUrl }}" class="truncate">
+                            <strong>{{ error.message|raw }}</strong>
+                        </a>
+
+                        {#<ul class="collection left">#}
+                            {#{% for path in error.paths %}#}
+                                {#<li class="collection-item">{{ path }}</li>#}
+                            {#{% endfor %}#}
+                        {#</ul>#}
+                    </td>
+                    <td class="right-align">
+                      {% if not error.isResolved %}
+                        <button class="btn green resolve-error-button">
+                          <i class="material-icons">done</i>
+                          {#Уже исправлена#}
+                        </button>
+                      {% endif %}
+
+                      {% if not error.isIgnored %}
+                        <button class="btn orange ignore-error-button">
+                          <i class="material-icons">not_interested</i>
+                          {#Игнорировать#}
+                        </button>
+                      {% endif %}
+
+                      <button class="btn red delete-error-button">
+                        <i class="material-icons">delete</i>
+                        {#Удалить#}
+                      </button>
+                    </td>
+                </tr>
+
+            {% endfor %}
+            </tbody>
+
+        </table>
+
+        <script type="text/javascript">
+
+          require([
+            'jquery',
+            'error.api.rpc.definition'
+          ], function($, api) {
+
+            $(function() {
+              var $resolveButtons = $('.resolve-error-button'),
+                  $ignoreButtons = $('.ignore-error-button'),
+                  $deleteButtons = $('.delete-error-button');
+
+              function processActionButtonClick($button, apiMethod) {
+                $button.attr('disabled', 'disabled');
+
+                var $item = $button.closest('.php-exception-item'),
+                    hash = $item.data('hash');
+
+                apiMethod(hash)
+                  .done(function () {
+                    $item.hide(750, function() {
+                      $(this).remove();
+                    })
+                  })
+                  .fail(function(message) {
+                    alert(message || 'Oops! Something went wrong...')
+                  })
+                  .always(function() {
+                    $button.removeAttr('disabled');
+                  });
+              }
+
+              $resolveButtons.click(function(e) {
+                e.preventDefault();
+                processActionButtonClick($(this), api.phpException.resolve);
+              });
+
+              $ignoreButtons.click(function(e) {
+                e.preventDefault();
+                processActionButtonClick($(this), api.phpException.ignore);
+              });
+
+              $deleteButtons.click(function(e) {
+                e.preventDefault();
+                processActionButtonClick($(this), api.phpException.delete);
+              });
+
+            });
+
+          });
+
+        </script>
+
+    {% else %}
+        <h2 class="card-panel green-text center-align">Ошибок не найдено</h2>
+    {% endif %}
+
+{% endblock %}

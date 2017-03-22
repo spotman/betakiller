@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<root>
+    <!-- TODO вынести это всё в файл config/ifaces.php, который добавляет элементы в IFaceModelTree::admin() -->
+    <iface uri="errors" codename="Admin_Error_Index" parentCodename="Admin_Index" title="Admin | Errors" label="Errors">
+        <iface uri="php-exceptions" codename="Admin_Error_UnresolvedPhpExceptionIndex" title="Admin | Unresolved PhpExceptions" label="Unresolved">
+            <iface uri="resolved" codename="Admin_Error_ResolvedPhpExceptionIndex" title="Admin | Resolved PhpExceptions" label="Resolved" />
+            <iface uri="{PhpException.hash}" codename="Admin_Error_PhpExceptionItem" title="{PhpException.message}" hasDynamicUrl="true" />
+            <iface uri="test" codename="Admin_Error_PhpExceptionTest" title="Test" />
+        </iface>
+    </iface>
+</root>
