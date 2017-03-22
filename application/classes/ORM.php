@@ -183,7 +183,7 @@ class ORM extends Utils\Kohana\ORM implements API_Response_Item, URL_DataSourceI
     }
 
     /**
-     * @return $this[]|ORM[]
+     * @return $this[]|array
      * @throws Kohana_Exception
      */
     public function get_all()

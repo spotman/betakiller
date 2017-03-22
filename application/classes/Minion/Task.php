@@ -67,8 +67,7 @@ abstract class Minion_Task extends Kohana_Minion_Task
 
         $user = $orm->search_by($username);
 
-        if (!$user->loaded())
-        {
+        if (!$user->loaded()) {
             $password = microtime();
 
             $host = parse_url(Kohana::$base_url, PHP_URL_HOST);
@@ -79,6 +78,7 @@ abstract class Minion_Task extends Kohana_Minion_Task
                 ->set_username($username)
                 ->set_password($password)
                 ->set_email($email)
+                ->disable_email_notification() // No notification for cron user
                 ->create();
 
             // Allowing everything (admin may remove some roles later if needed)
@@ -105,7 +105,6 @@ abstract class Minion_Task extends Kohana_Minion_Task
      */
     protected function get_min_log_level()
     {
-//        return Log::ALERT;
         return Log::EMERGENCY;
     }
 

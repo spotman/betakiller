@@ -2,6 +2,7 @@
 
 return array(
 
+    'sqlite'                => MODPATH.'sqlite',                // SQLite database driver (used by logs)
     'log'                   => MODPATH.'log',                   // Logs subsystem
     'utils'                 => MODPATH.'utils',                 // Useful classes
 

@@ -54,7 +54,7 @@ class BetaKiller_Kohana_Exception extends Kohana_Kohana_Exception
             static::log($exception);
         }
 
-        if (PHP_SAPI == 'cli')
+        if (PHP_SAPI === 'cli')
         {
             if (!$notify) {
                 echo self::text($exception);

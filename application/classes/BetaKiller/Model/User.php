@@ -8,12 +8,11 @@ class User extends \Model_Auth_User implements UserInterface
 {
     use RoleModelFactoryTrait;
 
-    protected $_table_name = 'users';
-
-    protected $_reload_on_wakeup = FALSE;
-
     protected function _initialize()
     {
+        $this->_table_name = 'users';
+        $this->_reload_on_wakeup = FALSE;
+
         $this->belongs_to(array(
             'language' => array(
                 'model' => 'Language',
@@ -44,7 +43,6 @@ class User extends \Model_Auth_User implements UserInterface
 //
 //        if ( $this->loaded() )
 //        {
-//        $this->date_login = date('Y-m-d H:i:s');
 //        $this->ip = sprintf("%u", ip2long(Request::$client_ip));
 //        $this->session_id = Session::instance()->id();
 //
@@ -174,10 +172,12 @@ class User extends \Model_Auth_User implements UserInterface
     {
         /** @var RoleInterface[] $roles */
         $roles = [];
+
         foreach ($this->get_roles_relation()->get_all() as $role) {
-            $roles = array_merge($roles, $role->get_all_parents());
+            $roles[] = $role->get_all_parents();
         }
 
+        $roles = array_merge(...$roles);
         $roles_ids = [];
 
         foreach ($roles as $role) {
@@ -251,8 +251,9 @@ class User extends \Model_Auth_User implements UserInterface
     protected function check_is_active()
     {
         // Проверяем активен ли аккаунт
-        if ( !$this->is_active() )
+        if ( !$this->is_active() ) {
             throw new \Auth_Exception_Inactive;
+        }
     }
 
     public function after_auto_login()
@@ -260,8 +261,9 @@ class User extends \Model_Auth_User implements UserInterface
         $this->check_is_active();
 
         // Проверяем IP-адрес
-        if ( ! $this->check_ip() )
+        if ( ! $this->check_ip() ) {
             throw new \Auth_Exception_WrongIP;
+        }
     }
 
     public function before_sign_out()
@@ -368,12 +370,31 @@ class User extends \Model_Auth_User implements UserInterface
 
     public function is_email_notification_allowed()
     {
-        return TRUE;
+        return (bool) $this->get('notify_by_email');
     }
 
     public function is_online_notification_allowed()
     {
+        // Online notification isn`t ready yet
         return FALSE;
+    }
+
+    /**
+     * @return $this
+     */
+    public function enable_email_notification()
+    {
+        $this->set('notify_by_email', true);
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function disable_email_notification()
+    {
+        $this->set('notify_by_email', false);
+        return $this;
     }
 
     /**
@@ -410,6 +431,6 @@ class User extends \Model_Auth_User implements UserInterface
      */
     public function getAccessControlRoles()
     {
-        return $this->get_roles_relation()->find_all()->as_array();
+        return $this->get_roles_relation()->get_all();
     }
 }
