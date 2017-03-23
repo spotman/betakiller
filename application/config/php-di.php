@@ -37,6 +37,10 @@ return [
 
     'definitions'   =>  [
 
+        \Psr\Log\LoggerInterface::class =>  DI\factory(function() {
+            return \BetaKiller\Log\Logger::getInstance();
+        })->scope(\DI\Scope::SINGLETON),
+
         Auth::class  =>  DI\factory(function() {
             return Auth::instance();
         })->scope(\DI\Scope::SINGLETON),
