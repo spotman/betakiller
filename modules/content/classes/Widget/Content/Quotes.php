@@ -34,9 +34,13 @@ class Widget_Content_Quotes extends Widget
         $before_date = $before_timestamp ? (new DateTime)->setTimestamp($before_timestamp) : NULL;
         $quote = $orm->get_latest_quote($before_date);
 
+        $createdAt = $quote->get_created_at();
+        $createdAtTimestamp = $createdAt ? $createdAt->getTimestamp() : null;
+        $beforeQuery = $createdAtTimestamp ? '?before='.$createdAtTimestamp : null;
+
         return [
             'quote'         =>  $quote->as_array(),
-            'refreshURL'    =>  $this->url('refresh').'?before='.$quote->get_created_at()->getTimestamp(),
+            'refreshURL'    =>  $this->url('refresh').$beforeQuery,
         ];
     }
 }
