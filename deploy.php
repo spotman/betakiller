@@ -149,7 +149,7 @@ task('deploy:betakiller', [
  * BetaKiller shared dirs
  */
 set('betakiller_shared_dirs', [
-    '{{core_path}}/modules/error/media/php_traces',
+    '{{core_path}}/modules/error/media',
 
     // On some servers exception is thrown if these two lines are uncommented
     '{{core_path}}/application/logs',
