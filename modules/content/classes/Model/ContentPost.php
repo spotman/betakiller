@@ -80,7 +80,7 @@ class Model_ContentPost extends StatusRelatedModelOrm
      */
     protected function get_workflow_name()
     {
-        return 'Content_Post';
+        return 'ContentPost';
     }
 
     /**

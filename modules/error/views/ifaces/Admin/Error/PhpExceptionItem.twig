@@ -101,8 +101,8 @@
 
       $(function () {
         var $resolveButton = $('.resolve-error-button'),
-          $ignoreButton = $('.ignore-error-button'),
-          $deleteButton = $('.delete-error-button');
+            $ignoreButton = $('.ignore-error-button'),
+            $deleteButton = $('.delete-error-button');
 
         function processActionButtonClick($button, apiMethod) {
           $button.attr('disabled', 'disabled');
@@ -137,7 +137,6 @@
           e.preventDefault();
           processActionButtonClick($(this), api.phpException.delete);
         });
-
       });
 
     });
