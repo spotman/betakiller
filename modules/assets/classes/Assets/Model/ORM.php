@@ -59,7 +59,7 @@ abstract class Assets_Model_ORM extends ORM implements Assets_ModelInterface {
      */
     protected function make_hash()
     {
-        $hash = $this->get_hash() ?: (md5(microtime() . $this->get_original_name()));
+        $hash = $this->get_hash() ?: md5(microtime().$this->get_original_name());
         return $this->set('hash', $hash);
     }
 

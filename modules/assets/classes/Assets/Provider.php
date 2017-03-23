@@ -27,18 +27,10 @@ abstract class Assets_Provider {
      */
     private $_user;
 
-    /**
-     * @var \Psr\Log\LoggerInterface
-     */
-    private $_logger;
-
-    public function __construct(ConfigInterface $config, UserInterface $user, \Psr\Log\LoggerInterface $logger)
+    public function __construct(ConfigInterface $config, UserInterface $user)
     {
         $this->_config = $config;
         $this->_user = $user;
-
-        $this->_logger = $logger;
-        $this->_logger->debug('Assets provider created with user = :value', [':value' => $user->get_username()]);
     }
 
     public function get_assets_config_value(array $path)

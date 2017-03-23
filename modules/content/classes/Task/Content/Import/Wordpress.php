@@ -153,13 +153,13 @@ class Task_Content_Import_Wordpress extends Minion_Task
         $wp_id = $attach['ID'];
         $url = $attach['guid'];
 
-        if (!$wp_id || !$url)
+        if (!$wp_id || !$url) {
             throw new TaskException('Empty attach data');
+        }
 
         $this->debug('Found attach with guid = :url', [':url' => $url]);
 
-        if (!$provider)
-        {
+        if (!$provider) {
             $mime = $attach['post_mime_type'];
 
             $this->debug('Creating assets provider by MIME-type :mime', [':mime' => $mime]);
@@ -196,7 +196,7 @@ class Task_Content_Import_Wordpress extends Minion_Task
      * @param int               $wp_id
      * @param int|null          $entity_item_id
      *
-*@return Model_ContentAttachmentElement
+     * @return Model_ContentAttachmentElement
      * @throws TaskException
      */
     protected function store_attachment(Assets_Provider $provider, $url, $wp_id, $entity_item_id = NULL)
@@ -207,59 +207,58 @@ class Task_Content_Import_Wordpress extends Minion_Task
             throw new TaskException('Attachment model must be instance of :class', [':class' => ImportedFromWordpressInterface::class]);
 
         // Search for such file already exists
+        /** @var ContentElementInterface $model */
         $model = $orm->find_by_wp_id($wp_id);
 
-        if (!$model)
-        {
-            $this->debug('Adding attach with WP ID = :id', [':id' => $wp_id]);
+        if ($model->get_id()) {
+            $this->debug('Attach with WP ID = :id already exists, data = :data', [
+                ':id'   => $wp_id,
+                ':data' => $model->as_array(),
+            ]);
+            return $model;
+        }
 
-            $url_path = parse_url($url, PHP_URL_PATH);
-            $original_filename = basename($url);
+        $this->debug('Adding attach with WP ID = :id', [':id' => $wp_id]);
 
-            // Getting path for local file with attachment content
-            $path = $this->get_attachment_path($url_path, $provider->get_allowed_mime_types());
+        $url_path = parse_url($url, PHP_URL_PATH);
+        $original_filename = basename($url);
 
-            if (!$path)
-                throw new TaskException('Can not get path for guid = :url', [':url' => $url]);
+        // Getting path for local file with attachment content
+        $path = $this->get_attachment_path($url_path, $provider->get_allowed_mime_types());
 
-            /** @var Model_ContentAttachmentElement $model */
-            $model = $provider->store($path, $original_filename);
+        if (!$path) {
+            throw new TaskException('Can not get path for guid = :url', [':url' => $url]);
+        }
 
-            if ($model instanceof ContentElementInterface)
-            {
-                // Storing entity
-                $model->set_entity($this->get_content_post_entity());
+        /** @var Model_ContentAttachmentElement $model */
+        $model = $provider->store($path, $original_filename);
 
-                // Storing entity item ID
-                if ($entity_item_id)
-                {
-                    $model->set_entity_item_id($entity_item_id);
-                }
+        if ($model instanceof ContentElementInterface) {
+            // Storing entity
+            $model->set_entity($this->get_content_post_entity());
+
+            // Storing entity item ID
+            if ($entity_item_id) {
+                $model->set_entity_item_id($entity_item_id);
             }
+        }
 
-            if ($model instanceof HasWordpressPathInterface)
-            {
-                // Storing WP ID
-                $model->set_wp_path($url_path);
-            }
-
+        if ($model instanceof HasWordpressPathInterface) {
             // Storing WP ID
-            $model
-                ->set_wp_id($wp_id)
-                ->save();
-
-            // Cleanup temp files
-            if ($this->attach_parsing_mode == self::ATTACH_PARSING_MODE_HTTP)
-            {
-                unlink($path);
-            }
-
-            $this->info('Attach with WP ID = :id successfully stored', [':id' => $wp_id]);
+            $model->set_wp_path($url_path);
         }
-        else
-        {
-            $this->debug('Attach with WP ID = :id already exists', [':id' => $wp_id]);
+
+        // Storing WP ID
+        $model
+            ->set_wp_id($wp_id)
+            ->save();
+
+        // Cleanup temp files
+        if ($this->attach_parsing_mode == self::ATTACH_PARSING_MODE_HTTP) {
+            unlink($path);
         }
+
+        $this->info('Attach with WP ID = :id successfully stored', [':id' => $wp_id]);
 
         return $model;
     }
