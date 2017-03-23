@@ -18,7 +18,6 @@ abstract class Assets_Provider {
     protected $_storage_instance;
 
     /**
-     * @Inject
      * @var ConfigInterface
      */
     private $_config;
@@ -28,11 +27,18 @@ abstract class Assets_Provider {
      */
     private $_user;
 
+    /**
+     * @var \Psr\Log\LoggerInterface
+     */
+    private $_logger;
 
-    public function __construct(ConfigInterface $config, UserInterface $user)
+    public function __construct(ConfigInterface $config, UserInterface $user, \Psr\Log\LoggerInterface $logger)
     {
         $this->_config = $config;
         $this->_user = $user;
+
+        $this->_logger = $logger;
+        $this->_logger->debug('Assets provider created with user = :value', [':value' => $user->get_username()]);
     }
 
     public function get_assets_config_value(array $path)
@@ -40,6 +46,12 @@ abstract class Assets_Provider {
         return $this->_config->load(array_merge([self::CONFIG_KEY], $path));
     }
 
+    /**
+     * @param array $path
+     * @param string|null  $codename
+     *
+     * @return array|\BetaKiller\Config\ConfigGroupInterface|null|string
+     */
     public function get_assets_provider_config_value(array $path, $codename = null)
     {
         $codename = $codename ?: $this->_codename;

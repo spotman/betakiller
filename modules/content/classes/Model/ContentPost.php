@@ -212,7 +212,7 @@ class Model_ContentPost extends StatusRelatedModelOrm
 
     /**
      * @param string $value
-     * @return $this
+     * @return \Model_ContentPost
      * @throws Kohana_Exception
      */
     public function set_label($value)
