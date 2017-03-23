@@ -1077,9 +1077,9 @@ class Task_Content_Import_Wordpress extends Minion_Task
                 $model->set_guest_author_name($authorName)->set_guest_author_email($authorEmail);
             }
 
-            $isApproved = ($wpApproved == 1);
-            $isSpam = (mb_strtolower($wpApproved) == 'spam');
-            $isTrash = (mb_strtolower($wpApproved) == 'trash');
+            $isApproved = ((int) $wpApproved === 1);
+            $isSpam = (mb_strtolower($wpApproved) === 'spam');
+            $isTrash = (mb_strtolower($wpApproved) === 'trash');
 
             if ($isSpam) {
                 $model->init_as_spam();
@@ -1093,7 +1093,14 @@ class Task_Content_Import_Wordpress extends Minion_Task
 
             $model->set_message($message);
 
-            $model->save();
+            try {
+                $model->save();
+            } catch (ORM_Validation_Exception $e) {
+                $this->warning('Comment with WP ID = :id is invalid, skipping :errors', [
+                    ':id' => $wpID,
+                    ':errors'   =>  json_encode($model->get_validation_exception_errors($e)),
+                ]);
+            }
         }
     }
 
