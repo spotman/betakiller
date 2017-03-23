@@ -46,8 +46,8 @@ return [
         })->scope(\DI\Scope::SINGLETON),
 
         // Helpers
-        'User'  =>  DI\factory(function() {
-            $auth = Auth::instance();
+        'User'  =>  DI\factory(function(Auth $auth) {
+//            $auth = Auth::instance();
             $user = $auth->get_user();
 
             if (!$user) {
@@ -71,6 +71,8 @@ return [
         \BetaKiller\DI\ContainerInterface::class =>  DI\factory(function() {
             return \BetaKiller\DI\Container::instance();
         }),
+
+        \Spotman\Acl\AclUserInterface::class  => DI\get('User'),
 
         // Define cache for production and staging env (dev and testing has ArrayCache)
         'AclCache' => new FilesystemCache($site_path.DIRECTORY_SEPARATOR.'cache'.DIRECTORY_SEPARATOR.'acl'),
