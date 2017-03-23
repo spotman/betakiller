@@ -298,7 +298,7 @@ class Task_Content_Import_Wordpress extends Minion_Task
 
             return $path;
         }
-        else if ($this->attach_parsing_mode == self::ATTACH_PARSING_MODE_LOCAL)
+        elseif ($this->attach_parsing_mode == self::ATTACH_PARSING_MODE_LOCAL)
         {
             $path = $this->attach_parsing_path.'/'.trim($original_url_path, '/');
 
