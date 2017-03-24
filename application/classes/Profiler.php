@@ -33,5 +33,4 @@ class Profiler extends Kohana_Profiler {
     {
         return View::factory("profiler/stats")->render();
     }
-
 }

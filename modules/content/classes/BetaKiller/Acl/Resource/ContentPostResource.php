@@ -1,6 +1,6 @@
 <?php
 namespace BetaKiller\Acl\Resource;
 
-use Spotman\Acl\Resource\SinglePermissionResource;
+use Spotman\Acl\Resource\CrudPermissionsResource;
 
-class ContentPostResource extends SinglePermissionResource {}
+class ContentPostResource extends CrudPermissionsResource {}

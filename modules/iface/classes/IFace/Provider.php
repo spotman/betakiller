@@ -148,7 +148,7 @@ class IFace_Provider
                 ':class'    =>  $class_name,
                 ':codename' =>  $codename,
                 ':msg'      =>  $e->getMessage(),
-            ]);
+            ], $e);
         }
 
         if ( ! ($object instanceof \BetaKiller\IFace\IFaceInterface) )

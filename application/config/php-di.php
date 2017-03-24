@@ -7,6 +7,7 @@ use Doctrine\Common\Cache\FilesystemCache;
 use Doctrine\Common\Cache\ArrayCache;
 use Doctrine\Common\Cache\ChainCache;
 
+use Spotman\Acl\Acl;
 use Spotman\Acl\ResourcesCollector\ResourcesCollectorInterface;
 use Spotman\Acl\RolesCollector\RolesCollectorInterface;
 use Spotman\Acl\PermissionsCollector\PermissionsCollectorInterface;
@@ -51,6 +52,7 @@ return [
             $user = $auth->get_user();
 
             if (!$user) {
+                // TODO Create stub class for "Guest" user linked to "guest" group
                 $user = ORM::factory('User');
             }
 
@@ -60,6 +62,7 @@ return [
         \BetaKiller\Model\UserInterface::class  => DI\get('User'),
         \BetaKiller\Model\RoleInterface::class  => DI\get(\BetaKiller\Model\Role::class),
 
+        // Backward compatibility fix
         \Model_User::class  =>  DI\object(\BetaKiller\Model\User::class)->scope(\DI\Scope::PROTOTYPE),
         \Model_Role::class  =>  DI\object(\BetaKiller\Model\Role::class)->scope(\DI\Scope::PROTOTYPE),
 
@@ -72,10 +75,8 @@ return [
             return \BetaKiller\DI\Container::instance();
         }),
 
-        \Spotman\Acl\AclUserInterface::class  => DI\get('User'),
-
         // Define cache for production and staging env (dev and testing has ArrayCache)
-        'AclCache' => new FilesystemCache($site_path.DIRECTORY_SEPARATOR.'cache'.DIRECTORY_SEPARATOR.'acl'),
+        Acl::DI_CACHE_OBJECT_KEY => new FilesystemCache($site_path.DIRECTORY_SEPARATOR.'cache'.DIRECTORY_SEPARATOR.'acl'),
 
         // Acl roles, resources, permissions and resource factory
         RolesCollectorInterface::class          => DI\get(RolesCollector::class),

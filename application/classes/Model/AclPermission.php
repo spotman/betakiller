@@ -4,8 +4,6 @@ use BetaKiller\Model\RoleInterface;
 
 class Model_AclPermission extends \ORM
 {
-    protected $_table_name = 'acl_permissions';
-
     /**
      * Prepares the model database connection, determines the table name,
      * and loads column information.
@@ -15,6 +13,8 @@ class Model_AclPermission extends \ORM
      */
     protected function _initialize()
     {
+        $this->_table_name = 'acl_permissions';
+
         $this->belongs_to([
             'role' =>  [
                 'model'         =>  'Role',
@@ -76,7 +76,7 @@ class Model_AclPermission extends \ORM
     public function is_allowed()
     {
         $value = $this->get('is_allowed');
-        return is_null($value) ? $value : (bool) $value;
+        return ($value === null) ? $value : (bool) $value;
     }
 
     /**
@@ -84,8 +84,7 @@ class Model_AclPermission extends \ORM
      */
     public function get_acl_role_identity()
     {
-        $role = $this->get_role_relation();
-        return ($role && $role->loaded()) ? $role->get_name() : null;
+        return $this->get_role_relation()->get_name();
     }
 
     /**
@@ -93,8 +92,7 @@ class Model_AclPermission extends \ORM
      */
     public function get_acl_resource_identity()
     {
-        $resource = $this->get_resource_relation();
-        return ($resource && $resource->loaded()) ? $resource->getResourceId() : null;
+        return $this->get_resource_relation()->getResourceId();
     }
 
     /**
@@ -114,7 +112,7 @@ class Model_AclPermission extends \ORM
     }
 
     /**
-     * @return \Model_AclResource
+     * @return \Spotman\Acl\ResourceInterface
      */
     protected function get_resource_relation()
     {

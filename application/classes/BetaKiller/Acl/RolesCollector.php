@@ -1,10 +1,11 @@
 <?php
 namespace BetaKiller\Acl;
 
-use Spotman\Acl\RolesCollector\AbstractRolesCollector;
+use Spotman\Acl\Acl;
+use Spotman\Acl\RolesCollector\RolesCollectorInterface;
 use BetaKiller\Model\RoleInterface;
 
-class RolesCollector extends AbstractRolesCollector
+class RolesCollector implements RolesCollectorInterface
 {
     /**
      * @var RoleInterface
@@ -23,32 +24,34 @@ class RolesCollector extends AbstractRolesCollector
 
     /**
      * Collect roles from external source and add them to acl via protected methods addRole / removeRole
+     *
+     * @param \Spotman\Acl\Acl $acl
      */
-    public function collectRoles()
+    public function collectRoles(Acl $acl)
     {
         /** @var RoleInterface[] $roles */
-        $roles = $this->roleModel->find_all();
+        $roles = $this->roleModel->get_all();
 
         foreach ($roles as $role) {
-            $this->addRoleWithParents($role);
+            $this->addRoleWithParents($acl, $role);
         }
     }
 
-    protected function addRoleWithParents(RoleInterface $role)
+    protected function addRoleWithParents(Acl $acl, RoleInterface $role)
     {
         $parentRoles = $role->get_parents();
         $parentRolesIdentities = [];
 
         foreach ($parentRoles as $parentRole) {
-            if (!$this->hasRole($parentRole)) {
-                $this->addRoleWithParents($parentRole);
+            if (!$acl->hasRole($parentRole)) {
+                $this->addRoleWithParents($acl, $parentRole);
             }
 
             $parentRolesIdentities[] = $parentRole->getRoleId();
         }
 
-        if (!$this->hasRole($role)) {
-            $this->addRole($role->getRoleId(), $parentRolesIdentities);
+        if (!$acl->hasRole($role)) {
+            $acl->addRole($role->getRoleId(), $parentRolesIdentities);
         }
     }
 }

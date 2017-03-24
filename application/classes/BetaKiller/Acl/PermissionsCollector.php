@@ -1,10 +1,11 @@
 <?php
 namespace BetaKiller\Acl;
 
-use Spotman\Acl\PermissionsCollector\AbstractPermissionsCollector;
 use Model_AclPermission;
+use Spotman\Acl\Acl;
+use Spotman\Acl\PermissionsCollector\PermissionsCollectorInterface;
 
-class PermissionsCollector extends AbstractPermissionsCollector
+class PermissionsCollector implements PermissionsCollectorInterface
 {
     /**
      * @var Model_AclPermission
@@ -23,8 +24,10 @@ class PermissionsCollector extends AbstractPermissionsCollector
 
     /**
      * Collect entities from external source and add them to acl via protected methods addAllowRule / addDenyRule
+     *
+     * @param \Spotman\Acl\Acl $acl
      */
-    public function collectPermissions()
+    public function collectPermissions(Acl $acl)
     {
         $permissions = $this->permissionModel->get_all_permissions();
 
@@ -37,9 +40,9 @@ class PermissionsCollector extends AbstractPermissionsCollector
             $value = $permission->is_allowed();
 
             if ($value === true) {
-                $this->addAllowRule($role, $actionResourceIdentity, $actionPermissionIdentity, $bindToResourceIdentity);
+                $acl->addAllowRule($role, $actionResourceIdentity, $actionPermissionIdentity, $bindToResourceIdentity);
             } else if ($value === false) {
-                $this->addDenyRule($role, $actionResourceIdentity, $actionPermissionIdentity, $bindToResourceIdentity);
+                $acl->addDenyRule($role, $actionResourceIdentity, $actionPermissionIdentity, $bindToResourceIdentity);
             }
         }
     }
