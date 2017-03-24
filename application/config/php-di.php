@@ -53,7 +53,10 @@ return [
 
             if (!$user) {
                 // TODO Create stub class for "Guest" user linked to "guest" group
+                /** @var \BetaKiller\Model\UserInterface $user */
                 $user = ORM::factory('User');
+                $user->add_role(\BetaKiller\Model\Role::GUEST_ROLE_NAME);
+                $user->set_username('Guest');
             }
 
             return $user;
