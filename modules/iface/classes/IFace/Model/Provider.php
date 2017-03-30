@@ -4,7 +4,7 @@ use BetaKiller\IFace\IFaceModelInterface;
 class IFace_Model_Provider implements IFace_Model_Provider_Interface
 {
     /**
-     * @var IFace_Model_Provider_DB[]|IFace_Model_Provider_Admin[]
+     * @var \IFace_Model_Provider_Interface[]
      */
     protected $_sources;
 
@@ -107,9 +107,10 @@ class IFace_Model_Provider implements IFace_Model_Provider_Interface
      */
     public function get_root()
     {
+        /** @var IFaceModelInterface[] $models */
         $models = array();
 
-        foreach ( $this->get_sources(TRUE) as $source )
+        foreach ( $this->get_sources() as $source )
         {
             $models = array_merge($models, $source->get_root());
         }
@@ -119,6 +120,11 @@ class IFace_Model_Provider implements IFace_Model_Provider_Interface
         return $models;
     }
 
+    /**
+     * @param bool $reverse
+     *
+     * @return \IFace_Model_Provider_Interface[]
+     */
     protected function get_sources($reverse = FALSE)
     {
         if ( ! $this->_sources )
