@@ -10,5 +10,4 @@ class BetaKiller_IFace_Exception_MissingURL extends Core_IFace_Exception_Missing
     {
         return FALSE;
     }
-
 }

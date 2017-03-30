@@ -7,8 +7,9 @@ class Role extends TreeModelMultipleParentsOrm implements RoleInterface
 {
     const GUEST_ROLE_NAME       = 'guest';
     const LOGIN_ROLE_NAME       = 'login';
-    const DEVELOPERS_ROLE_NAME  = 'developer';
-    const MODERATORS_ROLE_NAME  = 'moderator';
+    const ADMIN_ROLE_NAME       = 'admin';
+    const DEVELOPER_ROLE_NAME   = 'developer';
+    const MODERATOR_ROLE_NAME   = 'moderator';
     const WRITER_ROLE_NAME      = 'writer';
 
     /**
@@ -100,7 +101,7 @@ class Role extends TreeModelMultipleParentsOrm implements RoleInterface
      */
     public function get_developer_role()
     {
-        return $this->get_by_name(self::DEVELOPERS_ROLE_NAME);
+        return $this->get_by_name(self::DEVELOPER_ROLE_NAME);
     }
 
     /**
@@ -110,7 +111,7 @@ class Role extends TreeModelMultipleParentsOrm implements RoleInterface
      */
     public function get_moderator_role()
     {
-        return $this->get_by_name(self::MODERATORS_ROLE_NAME);
+        return $this->get_by_name(self::MODERATOR_ROLE_NAME);
     }
 
     /**

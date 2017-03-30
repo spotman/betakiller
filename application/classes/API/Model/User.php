@@ -1,3 +1,5 @@
-<?php defined('SYSPATH') OR die('No direct script access.');
+<?php use BetaKiller\Api\Model\User;
 
-abstract class API_Model_User extends BetaKiller_API_Model_User {}
+defined('SYSPATH') OR die('No direct script access.');
+
+abstract class API_Model_User extends User {}

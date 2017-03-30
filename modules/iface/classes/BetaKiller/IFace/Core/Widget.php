@@ -68,7 +68,7 @@ abstract class Widget
 
     /**
      * Widget constructor.
-     * Empty and protected, use WidgetFactory for creating Widget instances
+     * Empty by default, use WidgetFactory for creating Widget instances
      */
     public function __construct() {}
 

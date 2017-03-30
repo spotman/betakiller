@@ -90,7 +90,7 @@ class User extends \Model_Auth_User implements UserInterface
      */
     public function is_developer()
     {
-        return $this->has_role(Role::DEVELOPERS_ROLE_NAME);
+        return $this->has_role(Role::DEVELOPER_ROLE_NAME);
     }
 
     /**
@@ -98,7 +98,7 @@ class User extends \Model_Auth_User implements UserInterface
      */
     public function is_moderator()
     {
-        return $this->has_role(Role::MODERATORS_ROLE_NAME);
+        return $this->has_role(Role::MODERATOR_ROLE_NAME);
     }
 
     /**

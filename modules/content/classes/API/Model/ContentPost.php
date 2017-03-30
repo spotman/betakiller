@@ -1,6 +1,8 @@
 <?php
 
-class API_Model_ContentPost extends API_Model
+use Spotman\Api\ApiModelCrud;
+
+class API_Model_ContentPost extends ApiModelCrud
 {
     use \BetaKiller\Helper\ContentTrait;
 

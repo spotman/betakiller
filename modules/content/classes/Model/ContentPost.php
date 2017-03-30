@@ -298,7 +298,7 @@ class Model_ContentPost extends StatusRelatedModelOrm
     /**
      * @return DateTime
      */
-    public function get_api_last_modified()
+    public function getApiLastModified()
     {
         return $this->get_updated_at() ?: $this->get_created_at();
     }

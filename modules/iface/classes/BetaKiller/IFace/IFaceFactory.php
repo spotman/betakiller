@@ -12,9 +12,9 @@ class IFaceFactory
      * Creates instance of IFace from model
      *
      * @param \BetaKiller\IFace\IFaceModelInterface $model
-     * @return IFace
+     * @return \BetaKiller\IFace\IFaceInterface
      */
-    public function from_model(\BetaKiller\IFace\IFaceModelInterface $model)
+    public function from_model(IFaceModelInterface $model)
     {
         return $this->get_provider()->from_model($model);
     }
@@ -23,7 +23,7 @@ class IFaceFactory
      * Creates IFace instance from it`s codename
      *
      * @param string $codename IFace codename
-     * @return IFace
+     * @return \BetaKiller\IFace\IFaceInterface
      * @throws \IFace_Exception
      */
     public function from_codename($codename)
@@ -31,6 +31,9 @@ class IFaceFactory
         return $this->get_provider()->by_codename($codename);
     }
 
+    /**
+     * @return \IFace_Provider
+     */
     protected function get_provider()
     {
         return Container::instance()->get(\IFace_Provider::class);

@@ -1,22 +1,31 @@
-<?php defined('SYSPATH') OR die('No direct script access.');
+<?php
+namespace BetaKiller\Api\Model;
 
+use HTML;
+use Spotman\Api\ApiModelCrud;
+use BetaKiller\Helper\ApiModelTrait;
 
-abstract class BetaKiller_API_Model_User extends API_Model
+abstract class User extends ApiModelCrud
 {
+    use ApiModelTrait;
+
     public function update_profile($data)
     {
         $user = $this->current_user();
 
-        $data = (object) $data;
+        $data = (object)$data;
 
-        if ( isset($data->firstName) )
+        if (isset($data->firstName)) {
             $user->set_first_name(HTML::chars($data->firstName));
+        }
 
-        if ( isset($data->lastName) )
+        if (isset($data->lastName)) {
             $user->set_last_name(HTML::chars($data->lastName));
+        }
 
-        if ( isset($data->phone) )
+        if (isset($data->phone)) {
             $user->set_phone(HTML::chars($data->phone));
+        }
 
         $user->update();
     }
@@ -24,12 +33,12 @@ abstract class BetaKiller_API_Model_User extends API_Model
     /**
      * Returns new model or performs search by id
      *
-     * @param null $id
-     * @return Model
+     * @param int|null $id
+     *
+     * @return \Spotman\Api\ApiCrudModelProxyInterface
      */
     protected function model($id = NULL)
     {
         return $this->orm_model_factory('User', $id);
     }
-
 }

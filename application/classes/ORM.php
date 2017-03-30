@@ -4,8 +4,9 @@ use BetaKiller\Utils\Kohana\ORM\OrmInterface;
 use BetaKiller\Utils;
 use BetaKiller\Search\Model\Applicable;
 use BetaKiller\Search\Model\ResultsItem;
+use Spotman\Api\ApiResponseItemInterface;
 
-class ORM extends Utils\Kohana\ORM implements API_Response_Item, URL_DataSourceInterface, Applicable, ResultsItem
+class ORM extends Utils\Kohana\ORM implements ApiResponseItemInterface, URL_DataSourceInterface, Applicable, ResultsItem
 {
     /**
      * @param string $model
@@ -50,7 +51,7 @@ class ORM extends Utils\Kohana\ORM implements API_Response_Item, URL_DataSourceI
      *
      * @return array
      */
-    public function get_api_response_data()
+    public function getApiResponseData()
     {
         return $this->as_array();
     }
@@ -61,7 +62,7 @@ class ORM extends Utils\Kohana\ORM implements API_Response_Item, URL_DataSourceI
      *
      * @return DateTime|NULL
      */
-    public function get_api_last_modified()
+    public function getApiLastModified()
     {
         // Empty by default
         return NULL;
@@ -224,7 +225,7 @@ class ORM extends Utils\Kohana\ORM implements API_Response_Item, URL_DataSourceI
      */
     public function getSearchResultsItemData()
     {
-        return $this->get_api_response_data();
+        return $this->getApiResponseData();
     }
 
     /**

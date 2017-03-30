@@ -11,7 +11,7 @@ class IFace_Model_Provider implements IFace_Model_Provider_Interface
     /**
      * @var IFaceModelInterface[]
      */
-    protected $_model_instances = array();
+    protected $_model_instances = [];
 
     /**
      * Returns default iface model in current provider
@@ -23,14 +23,15 @@ class IFace_Model_Provider implements IFace_Model_Provider_Interface
     {
         $model = NULL;
 
-        foreach ( $this->get_sources() as $source )
-        {
-            if ( $model = $source->get_default() )
+        foreach ($this->get_sources() as $source) {
+            if ($model = $source->get_default()) {
                 break;
+            }
         }
 
-        if ( ! $model )
+        if (!$model) {
             throw new IFace_Exception('No default IFace found');
+        }
 
         $this->set_cache($model);
 
@@ -41,6 +42,7 @@ class IFace_Model_Provider implements IFace_Model_Provider_Interface
      * Returns iface model by codename or NULL if none was found
      *
      * @param $codename
+     *
      * @return IFaceModelInterface|null
      * @throws IFace_Exception
      */
@@ -48,16 +50,16 @@ class IFace_Model_Provider implements IFace_Model_Provider_Interface
     {
         $model = $this->get_cache($codename);
 
-        if ( ! $model )
-        {
-            foreach ( $this->get_sources() as $source )
-            {
-                if ( $model = $source->by_codename($codename) )
+        if (!$model) {
+            foreach ($this->get_sources() as $source) {
+                if ($model = $source->by_codename($codename)) {
                     break;
+                }
             }
 
-            if ( ! $model )
-                throw new IFace_Exception('No IFace found by codename :codename', array(':codename' => $codename));
+            if (!$model) {
+                throw new IFace_Exception('No IFace found by codename :codename', [':codename' => $codename]);
+            }
 
             $this->set_cache($model);
         }
@@ -67,6 +69,7 @@ class IFace_Model_Provider implements IFace_Model_Provider_Interface
 
     /**
      * @param IFaceModelInterface $parent_model
+     *
      * @return IFaceModelInterface[]
      */
     public function get_layer(IFaceModelInterface $parent_model = NULL)
@@ -87,14 +90,16 @@ class IFace_Model_Provider implements IFace_Model_Provider_Interface
 
     /**
      * @param IFaceModelInterface $model
+     *
      * @return IFaceModelInterface|NULL
      */
     public function get_parent(IFaceModelInterface $model)
     {
         $parent = $model->get_parent();
 
-        if ( $parent )
+        if ($parent) {
             $this->set_cache($parent);
+        }
 
         return $parent;
     }
@@ -107,11 +112,9 @@ class IFace_Model_Provider implements IFace_Model_Provider_Interface
      */
     public function get_root()
     {
-        /** @var IFaceModelInterface[] $models */
-        $models = array();
+        $models = [];
 
-        foreach ( $this->get_sources() as $source )
-        {
+        foreach ($this->get_sources() as $source) {
             $models = array_merge($models, $source->get_root());
         }
 
@@ -121,21 +124,18 @@ class IFace_Model_Provider implements IFace_Model_Provider_Interface
     }
 
     /**
-     * @param bool $reverse
-     *
      * @return \IFace_Model_Provider_Interface[]
      */
-    protected function get_sources($reverse = FALSE)
+    protected function get_sources()
     {
-        if ( ! $this->_sources )
-        {
-            $this->_sources = array(
+        if (!$this->_sources) {
+            $this->_sources = [
                 IFace_Model_Provider_DB::instance(),
                 IFace_Model_Provider_Admin::instance(),
-            );
+            ];
         }
 
-        return $reverse ? array_reverse($this->_sources) : $this->_sources;
+        return $this->_sources;
     }
 
     /**
@@ -143,14 +143,14 @@ class IFace_Model_Provider implements IFace_Model_Provider_Interface
      */
     protected function cache_models(array $models)
     {
-        foreach ( $models as $model )
-        {
+        foreach ($models as $model) {
             $this->set_cache($model);
         }
     }
 
     /**
      * @param string $codename
+     *
      * @return IFaceModelInterface|NULL
      */
     protected function get_cache($codename)
@@ -162,6 +162,6 @@ class IFace_Model_Provider implements IFace_Model_Provider_Interface
 
     protected function set_cache(IFaceModelInterface $model)
     {
-        $this->_model_instances[ $model->get_codename() ] = $model;
+        $this->_model_instances[$model->get_codename()] = $model;
     }
 }

@@ -45,11 +45,9 @@ class IFace_Provider
     {
         $iface = $this->get_cache($codename);
 
-        if ( ! $iface )
-        {
+        if (!$iface) {
             $model = $this->model_provider()->by_codename($codename);
             $iface = $this->iface_factory($model);
-
             $this->set_cache($codename, $iface);
         }
 
@@ -64,13 +62,10 @@ class IFace_Provider
     public function from_model(IFaceModelInterface $model)
     {
         $codename = $model->get_codename();
-
         $iface = $this->get_cache($codename);
 
-        if ( ! $iface )
-        {
+        if (!$iface) {
             $iface = $this->iface_factory($model);
-
             $this->set_cache($codename, $iface);
         }
 
@@ -109,10 +104,11 @@ class IFace_Provider
 
         $layer = $this->model_provider()->get_layer($parent_iface_model);
 
-        if ( ! $layer )
+        if ( ! $layer ) {
             throw new IFace_Exception('Empty layer for :codename IFace',
                 array(':codename' => $parent_iface->get_codename())
             );
+        }
 
         return $layer;
     }
@@ -151,8 +147,9 @@ class IFace_Provider
             ], $e);
         }
 
-        if ( ! ($object instanceof \BetaKiller\IFace\IFaceInterface) )
+        if (!($object instanceof \BetaKiller\IFace\IFaceInterface)) {
             throw new IFace_Exception('Class :class must be instance of IFaceInterface', array(':class' => $class_name));
+        }
 
         $object->set_model($model);
 

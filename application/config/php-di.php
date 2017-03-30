@@ -55,7 +55,6 @@ return [
                 // TODO Create stub class for "Guest" user linked to "guest" group
                 /** @var \BetaKiller\Model\UserInterface $user */
                 $user = ORM::factory('User');
-                $user->add_role(\BetaKiller\Model\Role::GUEST_ROLE_NAME);
                 $user->set_username('Guest');
             }
 
@@ -78,7 +77,7 @@ return [
             return \BetaKiller\DI\Container::instance();
         }),
 
-        // Define cache for production and staging env (dev and testing has ArrayCache)
+        // Define cache for production and staging env (dev and testing has ArrayCache); use filesystem cache so it would be cleared after deployment
         Acl::DI_CACHE_OBJECT_KEY => new FilesystemCache($site_path.DIRECTORY_SEPARATOR.'cache'.DIRECTORY_SEPARATOR.'acl'),
 
         // Acl roles, resources, permissions and resource factory

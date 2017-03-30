@@ -1,7 +1,5 @@
 <?php
 
-use BetaKiller\Model\RoleInterface;
-
 class Model_AclPermission extends \ORM
 {
     /**
@@ -92,7 +90,7 @@ class Model_AclPermission extends \ORM
      */
     public function get_acl_resource_identity()
     {
-        return $this->get_resource_relation()->getResourceId();
+        return $this->get_resource_relation()->getCodename();
     }
 
     /**
@@ -104,7 +102,7 @@ class Model_AclPermission extends \ORM
     }
 
     /**
-     * @return RoleInterface
+     * @return \BetaKiller\Model\Role
      */
     protected function get_role_relation()
     {
@@ -112,7 +110,7 @@ class Model_AclPermission extends \ORM
     }
 
     /**
-     * @return \Spotman\Acl\ResourceInterface
+     * @return \Model_AclResource
      */
     protected function get_resource_relation()
     {

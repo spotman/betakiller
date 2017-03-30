@@ -1,8 +1,6 @@
 <?php
 namespace BetaKiller\IFace\Admin;
 
-use BetaKiller\IFace\Admin\AdminBase;
-
 class Index extends AdminBase
 {
     /**

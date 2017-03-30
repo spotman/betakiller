@@ -32,7 +32,7 @@ class ResourcesCollector implements ResourcesCollectorInterface
         $resources = $this->resourceModel->getAllResources();
 
         foreach ($resources as $resource) {
-            $acl->addResource($resource->getResourceId(), $resource->getParentResourceId());
+            $acl->addResource($resource->getCodename(), $resource->getParentResourceCodename());
         }
     }
 }

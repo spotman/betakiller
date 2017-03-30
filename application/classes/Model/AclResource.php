@@ -1,11 +1,15 @@
 <?php
 
-use Spotman\Acl\ResourceInterface;
 use BetaKiller\Utils\Kohana\TreeModelSingleParentOrm;
 
-class Model_AclResource extends TreeModelSingleParentOrm implements ResourceInterface
+class Model_AclResource extends TreeModelSingleParentOrm
 {
-    protected $_table_name = 'acl_resources';
+    protected function _initialize()
+    {
+        $this->_table_name = 'acl_resources';
+
+        parent::_initialize();
+    }
 
     /**
      * Place here additional query params
@@ -18,25 +22,16 @@ class Model_AclResource extends TreeModelSingleParentOrm implements ResourceInte
     /**
      * @return string
      */
-    public function get_codename()
+    public function getCodename()
     {
         return $this->get('codename');
     }
 
-    /**
-     * Returns the string identifier of the Resource
-     *
-     * @return string
-     */
-    public function getResourceId()
-    {
-        return $this->get_codename();
-    }
 
-    public function getParentResourceId()
+    public function getParentResourceCodename()
     {
         $parent = $this->get_parent();
-        return $parent ? $parent->getResourceId() : null;
+        return $parent ? $parent->getCodename() : null;
     }
 
     /**

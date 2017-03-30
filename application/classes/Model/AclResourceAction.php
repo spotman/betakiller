@@ -2,8 +2,6 @@
 
 class Model_AclResourceAction extends \ORM
 {
-    protected $_table_name = 'acl_resource_actions';
-
     /**
      * Prepares the model database connection, determines the table name,
      * and loads column information.
@@ -13,6 +11,8 @@ class Model_AclResourceAction extends \ORM
      */
     protected function _initialize()
     {
+        $this->_table_name = 'acl_resource_actions';
+
         $this->belongs_to([
             'resource' => [
                 'model'         =>  'AclResource',
@@ -39,7 +39,7 @@ class Model_AclResourceAction extends \ORM
      */
     public function get_resource_identity()
     {
-        return $this->get_resource_relation()->getResourceId();
+        return $this->get_resource_relation()->getCodename();
     }
 
     /**

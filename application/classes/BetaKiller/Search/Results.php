@@ -8,11 +8,12 @@
 
 namespace BetaKiller\Search;
 
+use Spotman\Api\ApiResponseItemInterface;
 use BetaKiller\Search\Model\ResultsItem;
 use DateTime;
 use Traversable;
 
-class Results implements Model\Results, \API_Response_Item
+class Results implements Model\Results, ApiResponseItemInterface
 {
     /**
      * @var Model\ResultsItem[]
@@ -112,7 +113,7 @@ class Results implements Model\Results, \API_Response_Item
     /**
      * @return array|Traversable
      */
-    public function get_api_response_data()
+    public function getApiResponseData()
     {
         return [
             'items'         =>  $this->getItemsData(),
@@ -126,7 +127,7 @@ class Results implements Model\Results, \API_Response_Item
     /**
      * @return DateTime|NULL
      */
-    public function get_api_last_modified()
+    public function getApiLastModified()
     {
         // Not done yet
         return null;

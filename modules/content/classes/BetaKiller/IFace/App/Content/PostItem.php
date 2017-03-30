@@ -49,7 +49,7 @@ class PostItem extends AppBase
 
     protected function get_post_data(\Model_ContentPost $model)
     {
-        $this->setLastModified($model->get_api_last_modified());
+        $this->setLastModified($model->getApiLastModified());
 
         $thumbnails = [];
 

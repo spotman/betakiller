@@ -2,10 +2,12 @@
 
 use BetaKiller\Helper\ErrorHelperTrait;
 use BetaKiller\Helper\CurrentUserTrait;
+use Spotman\Api\ApiModelCrud;
+use Spotman\Api\ApiModelException;
 
 // TODO Restrict access to this model via ACL to developers only
 
-class API_Model_PhpException extends API_Model
+class API_Model_PhpException extends ApiModelCrud
 {
     use ErrorHelperTrait;
     use CurrentUserTrait;
@@ -43,7 +45,7 @@ class API_Model_PhpException extends API_Model
         $model = $this->phpExceptionStorageFactory()->findByHash($hash);
 
         if (!$model) {
-            throw new API_Model_Exception('Incorrect php exception hash :value', [':value' => $hash]);
+            throw new ApiModelException('Incorrect php exception hash :value', [':value' => $hash]);
         }
 
         return $model;
