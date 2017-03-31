@@ -235,7 +235,7 @@ class ORM extends Utils\Kohana\ORM implements ApiResponseItemInterface, URL_Data
      */
     public function paginateHelper($currentPage, $itemsPerPage = null)
     {
-        return \ORM\PaginateHelper::factory(
+        return \ORM\PaginateHelper::create(
             $this,
             $currentPage,
             $itemsPerPage ?: 25

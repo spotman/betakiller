@@ -112,10 +112,15 @@ class IFace_Model_Provider implements IFace_Model_Provider_Interface
      */
     public function get_root()
     {
+        /** @var IFaceModelInterface[] $models */
         $models = [];
 
-        foreach ($this->get_sources() as $source) {
-            $models = array_merge($models, $source->get_root());
+        foreach ($this->get_sources(true) as $source) {
+            $root = $source->get_root();
+
+            foreach ($root as $item) {
+                $models[$item->get_codename()] = $item;
+            }
         }
 
         $this->cache_models($models);
@@ -124,9 +129,10 @@ class IFace_Model_Provider implements IFace_Model_Provider_Interface
     }
 
     /**
+     * @param bool $reverse
      * @return \IFace_Model_Provider_Interface[]
      */
-    protected function get_sources()
+    protected function get_sources($reverse = false)
     {
         if (!$this->_sources) {
             $this->_sources = [
@@ -135,7 +141,7 @@ class IFace_Model_Provider implements IFace_Model_Provider_Interface
             ];
         }
 
-        return $this->_sources;
+        return $reverse ? array_reverse($this->_sources) : $this->_sources;
     }
 
     /**

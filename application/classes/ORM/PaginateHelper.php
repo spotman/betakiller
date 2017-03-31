@@ -43,7 +43,7 @@ class PaginateHelper
      * @param int $itemsPerPage
      * @return PaginateHelper
      */
-    public static function factory($model, $currentPage, $itemsPerPage)
+    public static function create($model, $currentPage, $itemsPerPage)
     {
         return new self($model, $currentPage, $itemsPerPage);
     }
