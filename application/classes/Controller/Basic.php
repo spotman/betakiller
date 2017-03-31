@@ -5,8 +5,8 @@ use \BetaKiller\View\ViewWrapperTwig;
 
 /**
  * Class Controller_Template
+ * @deprecated
  */
-
 class Controller_Basic extends Controller {
 
     /**
@@ -94,7 +94,7 @@ class Controller_Basic extends Controller {
      * @param string $string Plain text for output
      * @param int $content_type Content type constant like Response::HTML
      */
-    protected function send_string($string, $content_type = Response::HTML)
+    protected function send_string($string, $content_type = Response::TYPE_HTML)
     {
         $this->_layout = NULL;
         parent::send_string($string, $content_type);

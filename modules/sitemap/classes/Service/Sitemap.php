@@ -154,7 +154,7 @@ class Service_Sitemap extends Service
     public function serve(Response $response)
     {
         $content = file_get_contents($this->get_sitemap_file_path());
-        $response->send_string($content, $response::XML);
+        $response->send_string($content, $response::TYPE_XML);
     }
 
     protected function get_sitemap_file_path()
