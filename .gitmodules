@@ -37,9 +37,6 @@
 [submodule "modules/i18n-plural"]
 	path = modules/i18n-plural
 	url = git@github.com:spotman/kohana-i18n-plural.git
-[submodule "modules/mangodb"]
-	path = modules/mangodb
-	url = git@github.com:Wouterrr/MangoDB.git
 [submodule "modules/migrations"]
 	path = modules/migrations
 	url = git@github.com:spotman/kohana-minion-migrations.git

@@ -24,7 +24,6 @@ return array(
     'jsonrpc'               => MODPATH.'jsonrpc',               // JSON-RPC server
     'image'                 => MODPATH.'image',                 // Image manipulation
     'i18n-plural'           => MODPATH.'i18n-plural',           // International pluralization
-    'mangodb'               => MODPATH.'mangodb',               // ODM wrapper for mongodb
     'meta-tags'             => MODPATH.'meta-tags',             // HTML meta tags helper
     'migrations'            => MODPATH.'migrations',            // Migrations toolkit
     'minion'                => MODPATH.'minion',                // CLI Tasks
