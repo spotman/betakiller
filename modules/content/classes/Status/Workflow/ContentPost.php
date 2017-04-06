@@ -33,6 +33,8 @@ class Status_Workflow_ContentPost extends StatusWorkflow
     {
         $this->make_uri();
 
+        // TODO Check for title/description/image and other critical elements before publishing
+
         $this->doTransition(self::TRANSITION_PUBLISH);
     }
 

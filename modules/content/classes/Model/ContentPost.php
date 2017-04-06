@@ -5,9 +5,10 @@ use BetaKiller\Content\ImportedFromWordpressInterface;
 use BetaKiller\Content\Shortcode;
 use BetaKiller\Content\LinkedContentModelInterface;
 use BetaKiller\Status\StatusRelatedModelOrm;
+use Spotman\Api\AbstractCrudMethodsModelInterface;
 
 class Model_ContentPost extends StatusRelatedModelOrm
-    implements SeoMetaInterface, ImportedFromWordpressInterface, LinkedContentModelInterface
+    implements SeoMetaInterface, ImportedFromWordpressInterface, LinkedContentModelInterface, AbstractCrudMethodsModelInterface
 {
     use Model_ORM_SeoContentTrait,
         Model_ORM_ImportedFromWordpressTrait,
@@ -24,7 +25,7 @@ class Model_ContentPost extends StatusRelatedModelOrm
         self::TYPE_ARTICLE,
     ];
 
-    protected $_updated_at_markers = [
+    protected static $_updated_at_markers = [
         'uri',
         'label',
         'content',
@@ -71,6 +72,26 @@ class Model_ContentPost extends StatusRelatedModelOrm
         ]);
 
         parent::_initialize();
+    }
+
+    /**
+     * Rule definitions for validation
+     *
+     * @return array
+     */
+    public function rules()
+    {
+        return [
+            'type'   =>  [
+                ['not_empty'],
+            ],
+            'label'   =>  [
+                ['not_empty'],
+            ],
+            'status_id'   =>  [
+                ['not_empty'],
+            ],
+        ];
     }
 
     /**
@@ -148,10 +169,11 @@ class Model_ContentPost extends StatusRelatedModelOrm
         return $this->get('type');
     }
 
-    public function set_type($value)
+    protected function set_type($value)
     {
-        if (!in_array($value, $this->_prioritized_types_list))
-            throw new Kohana_Exception('Post type :value is not allowed');
+        if (!in_array($value, $this->_prioritized_types_list, true)) {
+            throw new Kohana_Exception('Post type :value is not allowed', [':value' => $value]);
+        }
 
         return $this->set('type', $value);
     }
@@ -159,6 +181,11 @@ class Model_ContentPost extends StatusRelatedModelOrm
     public function mark_as_page()
     {
         return $this->set_type(self::TYPE_PAGE);
+    }
+
+    public function mark_as_article()
+    {
+        return $this->set_type(self::TYPE_ARTICLE);
     }
 
     public function is_page()
@@ -411,25 +438,6 @@ class Model_ContentPost extends StatusRelatedModelOrm
         return $model->order_by_created_at()->limit($limit)->get_all();
     }
 
-//    /**
-//     * @param int $wp_id
-//     * @return $this
-//     * @throws Kohana_Exception
-//     */
-//    public function find_by_wp_id($wp_id)
-//    {
-//        $model = $this
-//            ->model_factory()
-//            ->filter_wp_id($wp_id)
-//            ->find();
-//
-//        if (!$model->loaded()){
-//            $model->clear();
-//        }
-//
-//        return $model;
-//    }
-
     /**
      * @return \ORM
      */
@@ -557,7 +565,7 @@ class Model_ContentPost extends StatusRelatedModelOrm
      */
     public function update(Validation $validation = NULL)
     {
-        $was_changed = array_intersect($this->_changed, $this->_updated_at_markers);
+        $was_changed = array_intersect($this->_changed, self::$_updated_at_markers);
 
         if ($was_changed && !$this->changed('updated_at')) {
             $this->set_updated_at(new DateTime);
