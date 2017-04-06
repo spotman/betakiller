@@ -1,26 +1,30 @@
 <?php
 namespace BetaKiller\Acl;
 
-use BetaKiller\DI\ContainerInterface;
+use BetaKiller\Factory\NamespaceBasedFactory;
+use Spotman\Acl\Exception;
 use Spotman\Acl\ResourceFactory\ResourceFactoryInterface;
 use Spotman\Acl\ResourceInterface;
-use Spotman\Acl\Exception;
 
 class ResourceFactory implements ResourceFactoryInterface
 {
     /**
-     * @var ContainerInterface
+     * @var \BetaKiller\Factory\NamespaceBasedFactory;
      */
-    private $container;
+    private $factory;
 
     /**
      * ResourceFactory constructor.
      *
-     * @param ContainerInterface $container
+     * @param \BetaKiller\Factory\NamespaceBasedFactory $factory
      */
-    public function __construct(ContainerInterface $container)
+    public function __construct(NamespaceBasedFactory $factory)
     {
-        $this->container = $container;
+        $this->factory = $factory
+            ->cacheInstances()
+            ->setClassPrefixes('Acl', 'Resource')
+            ->setClassSuffix('Resource')
+            ->setExpectedInterface(ResourceInterface::class);
     }
 
     /**
@@ -31,15 +35,6 @@ class ResourceFactory implements ResourceFactoryInterface
      */
     public function createResource($identity)
     {
-        // TODO common namespace factory
-
-        $ns = "\\BetaKiller\\Acl\\Resource\\";
-        $className = $ns.ucfirst($identity).'Resource';
-
-        if (!class_exists($className)) {
-            throw new Exception('Class :name does not exists', [':name' => $className]);
-        }
-
-        return $this->container->get($className);
+        return $this->factory->create(ucfirst($identity));
     }
 }
