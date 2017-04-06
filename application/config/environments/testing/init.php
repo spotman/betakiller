@@ -16,8 +16,8 @@
  * - boolean  expose      set the X-Powered-By header                        FALSE
  */
 
-return array(
-    'errors'    =>  TRUE,
-    'profile'   => TRUE,
-    'caching'   => FALSE,
-);
+return [
+    'errors'  => true,
+    'profile' => true,
+    'caching' => false,
+];

@@ -1,11 +1,11 @@
 <?php
-namespace BetaKiller\Api\Model;
+namespace BetaKiller\Api\Resource;
 
-use HTML;
-use Spotman\Api\ApiModelCrud;
 use BetaKiller\Helper\ApiModelTrait;
+use HTML;
+use Spotman\Api\ModelCrudApiResource;
 
-abstract class User extends ApiModelCrud
+abstract class UserApiResource extends ModelCrudApiResource
 {
     use ApiModelTrait;
 
@@ -35,7 +35,7 @@ abstract class User extends ApiModelCrud
      *
      * @param int|null $id
      *
-     * @return \Spotman\Api\ApiCrudModelProxyInterface
+     * @return \Spotman\Api\AbstractCrudMethodsModelInterface
      */
     protected function model($id = NULL)
     {

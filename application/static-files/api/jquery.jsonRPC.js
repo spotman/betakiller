@@ -86,11 +86,11 @@
                 "text json_rpc_response": function(textValue) {
                     var retval = jQuery.parseJSON(textValue);
 
-                    if (typeof(retval) == 'object') {
-                        if (typeof(retval.error) == 'object') {
+                    if (typeof(retval) === 'object') {
+                        if (typeof(retval.error) === 'object') {
                             retval = new JSONRPCError(retval.error);
                             throw retval;
-                        } else if (typeof(retval.result) != 'undefined') {
+                        } else if (typeof(retval.result) !== 'undefined') {
                             retval = retval.result;
                         } else
                             throw "Invalid JSON response";

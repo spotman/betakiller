@@ -42,8 +42,12 @@ define([
               return rpc(commentResource, 'restoreFromTrash', arguments);
           },
 
-          save: function(data) {
-              return rpc(commentResource, 'save', arguments);
+          create: function(data) {
+            return rpc(commentResource, 'create', arguments);
+          },
+
+          update: function(data) {
+              return rpc(commentResource, 'update', arguments);
           }
         }
     };

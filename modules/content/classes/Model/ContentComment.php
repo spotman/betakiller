@@ -9,9 +9,10 @@ use BetaKiller\Status\StatusRelatedModelInterface;
 use BetaKiller\Helper\HasPublicUrlInterface;
 use BetaKiller\Helper\HasAdminUrlInterface;
 use BetaKiller\Helper\IFaceTrait;
+use Spotman\Api\AbstractCrudMethodsModelInterface;
 
 class Model_ContentComment extends TreeModelSingleParentOrm
-    implements ContentRelatedInterface, StatusRelatedModelInterface, ImportedFromWordpressInterface, HasPublicUrlInterface, HasAdminUrlInterface
+    implements ContentRelatedInterface, StatusRelatedModelInterface, ImportedFromWordpressInterface, HasPublicUrlInterface, HasAdminUrlInterface, AbstractCrudMethodsModelInterface
 {
     use Model_ORM_ContentRelatedTrait;
     use Model_ORM_ImportedFromWordpressTrait;

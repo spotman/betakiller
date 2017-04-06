@@ -36,7 +36,7 @@
                 message: $message.val()
               };
 
-              rpc.comment.save(data)
+              rpc.comment.update(data)
                 .done(function() {
                   $saveButton.addClass("green");
                 })

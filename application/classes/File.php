@@ -10,6 +10,7 @@ class File extends Kohana_File {
 	 * @param string $dir_name
 	 * @param bool   $entire_only If set clears only entire folder content (folders and files inside)
 	 * @return void
+     * @deprecated Remove this dependency
 	 */
 	public static function rmdir($dir_name, $entire_only = FALSE)
 	{

@@ -26,19 +26,19 @@ class Status_Workflow_ContentPost extends StatusWorkflow
     public function complete()
     {
         // TODO Notify moderator
-        $this->do_transition(self::TRANSITION_COMPLETE);
+        $this->doTransition(self::TRANSITION_COMPLETE);
     }
 
     public function publish()
     {
         $this->make_uri();
 
-        $this->do_transition(self::TRANSITION_PUBLISH);
+        $this->doTransition(self::TRANSITION_PUBLISH);
     }
 
     public function pause()
     {
-        $this->do_transition(self::TRANSITION_PAUSE);
+        $this->doTransition(self::TRANSITION_PAUSE);
     }
 
     protected function make_uri()

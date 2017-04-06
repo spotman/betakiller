@@ -34,7 +34,7 @@
           var $this = $(this),
               code = $this.data('code');
 
-          processApiCall($this, api.phpException.throwHTTP(code));
+          processApiCall($this, api.phpException.throwHttpException(code));
         });
 
       });

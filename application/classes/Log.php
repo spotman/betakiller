@@ -1,5 +1,9 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
+/**
+ * Class Log
+ * @deprecated Use Psr\Log\LoggerInterface and DI instead
+ */
 class Log extends Kohana_Log
 {
     /**

@@ -30,7 +30,7 @@ abstract class Controller extends Controller_Proxy
     {
         $base_protocol = parse_url(Kohana::$base_url, PHP_URL_SCHEME);
 
-        $is_secure_needed = ($base_protocol == 'https');
+        $is_secure_needed = ($base_protocol === 'https');
 
         $is_secure = $this->request->secure();
 
@@ -53,11 +53,12 @@ abstract class Controller extends Controller_Proxy
 
         $allowed_languages = I18n::lang_list();
 
-        if ($user_lang AND ! in_array($user_lang, $allowed_languages) )
+        if ($user_lang && ! in_array($user_lang, $allowed_languages, true) ) {
             throw new HTTP_Exception_500(
                 'Unknown language :lang, only these are allowed: :allowed',
                 array(':lang' => $user_lang, ':allowed' => implode(', ', $allowed_languages))
             );
+        }
 
         // If current lang is not set
         if ( ! $user_lang )
@@ -92,7 +93,7 @@ abstract class Controller extends Controller_Proxy
 
         // Save all absent keys if in development env
         if ( ! Kohana::in_production(TRUE) ) {
-            register_shutdown_function(array("I18n", "write"));
+            register_shutdown_function(array(I18n::class, 'write'));
         }
     }
 
@@ -118,9 +119,7 @@ abstract class Controller extends Controller_Proxy
 
         $file = $file ?: $this->request->action();
 
-        $view = $this->view_factory($path . DIRECTORY_SEPARATOR . $file);
-
-        return $view;
+        return $this->view_factory($path . DIRECTORY_SEPARATOR . $file);
     }
 
     /**

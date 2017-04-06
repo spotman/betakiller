@@ -8,11 +8,11 @@ return [
     /**
      * @url http://php-di.org/doc/performances.html
      */
-    'cache'     =>  new ArrayCache(),
+    'cache' => new ArrayCache(),
 
-    'definitions'   => [
+    'definitions' => [
 
-        Acl::DI_CACHE_OBJECT_KEY => DI\get(ArrayCache::class),
+        Acl::DI_CACHE_OBJECT_KEY => DI\object(ArrayCache::class),
 
     ],
 

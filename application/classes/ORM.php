@@ -10,17 +10,17 @@ class ORM extends Utils\Kohana\ORM implements ApiResponseItemInterface, URL_Data
 {
     /**
      * @param string $model
-     * @param null   $id
+     * @param int|array|null   $id
      *
      * @return OrmInterface
      */
     public static function factory($model, $id = NULL)
     {
+        // Coz ORM do not cares about letter cases
+        $model = str_replace(' ', '_', ucwords(str_replace('_', ' ', $model)));
+
         // Set class name
         $class_name = 'Model_'.$model;
-
-        // Coz ORM do not cares about letter cases
-        $class_name = str_replace(' ', '_', ucwords(str_replace('_', ' ', $class_name)));
 
         // TODO Create one basic app-namespaced factory and use it in ORM, IFaceFactory, WidgetFactory, etc
 

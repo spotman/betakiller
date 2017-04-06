@@ -47,29 +47,30 @@ define([
 //            console.log(requestQueue);
 
             // Walk through queue and resolve each deferred
-            while (requestQueue.length)
-            {
-                var queuedRequest   = requestQueue.shift(),
-                    queuedArgs      = queuedRequest.args,
-                    queuedDeferred  = queuedRequest.deferred;
+            while (requestQueue.length) {
+              (function(queuedRequest) {
+                var queuedArgs = queuedRequest.args,
+                    queuedDeferred = queuedRequest.deferred;
 
-//                console.log(method + " queued " + queuedArgs[0] + "." + queuedArgs[0]);
+                // console.log(method + " queued " + queuedArgs[0] + "." + queuedArgs[0]);
 
-                if (method == "resolve") {
-                    doRequest(queuedArgs)
-                        .done(function() {
+                if (method === "resolve") {
+                  doRequest(queuedArgs)
+                    .done(function() {
 //                            console.log(method + " queued " + queuedArgs[0] + "." + queuedArgs[0] + " done!");
-                            queuedDeferred.resolveWith({}, arguments);
-                        })
-                        .fail(function() {
+                      queuedDeferred.resolveWith({}, arguments);
+                    })
+                    .fail(function() {
 //                            console.log(method + " queued " + queuedArgs[0] + "." + queuedArgs[0] + " failed!");
-                            queuedDeferred.rejectWith({}, arguments);
-                        });
-                } else if (method == "reject") {
-                    queuedDeferred.reject();
+                      queuedDeferred.rejectWith({}, arguments);
+                    });
+                } else if (method === "reject") {
+                  queuedDeferred.reject();
                 } else {
-                    throw new Error("Unknown method " + method);
+                  throw new Error("Unknown method " + method);
                 }
+
+              }(requestQueue.shift()));
             }
 
 //            console.log("queue processed");
@@ -101,10 +102,9 @@ define([
 
                 // Overwrite original Deferred with queue callback
                 .then(null, function(xhr, name, JSONRPCError) {
-                    var code = JSONRPCError.getCode();
+                    var code = JSONRPCError.getCode ? JSONRPCError.getCode() : null;
 
-                    if (code == 401)
-                    {
+                    if (code === 401) {
                         // Lock future API requests
                         lock();
 

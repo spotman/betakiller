@@ -23,8 +23,8 @@ define([
               return rpc(phpExceptionResource, 'delete', arguments);
           },
 
-          throwHTTP: function(code) {
-            return rpc(phpExceptionResource, 'throwHTTP', arguments);
+          throwHttpException: function(code) {
+            return rpc(phpExceptionResource, 'throwHttpException', arguments);
           }
 
         }

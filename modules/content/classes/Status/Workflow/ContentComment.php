@@ -30,7 +30,7 @@ class Status_Workflow_ContentComment extends StatusWorkflow
 
     public function approve()
     {
-        $this->do_transition(self::TRANSITION_APPROVE);
+        $this->doTransition(self::TRANSITION_APPROVE);
 
         $comment = $this->model();
 
@@ -91,25 +91,25 @@ class Status_Workflow_ContentComment extends StatusWorkflow
     public function reject()
     {
         // Simply change status
-        $this->do_transition(self::TRANSITION_REJECT);
+        $this->doTransition(self::TRANSITION_REJECT);
     }
 
     public function spam()
     {
         // Simply change status
-        $this->do_transition(self::TRANSITION_SPAM);
+        $this->doTransition(self::TRANSITION_SPAM);
     }
 
     public function trash()
     {
         // Simply change status
-        $this->do_transition(self::TRANSITION_TRASH);
+        $this->doTransition(self::TRANSITION_TRASH);
     }
 
     public function restore()
     {
         // Simply change status
-        $this->do_transition(self::TRANSITION_RESTORE);
+        $this->doTransition(self::TRANSITION_RESTORE);
     }
 
     /**

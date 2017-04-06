@@ -1,6 +1,7 @@
 <?php
 
 use BetaKiller\Config\ConfigInterface;
+use BetaKiller\IFace\Widget\Exception;
 
 class Widget_Auth extends \BetaKiller\IFace\Widget
 {
