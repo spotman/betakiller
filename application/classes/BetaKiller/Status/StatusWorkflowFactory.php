@@ -1,10 +1,36 @@
 <?php
 namespace BetaKiller\Status;
 
+use BetaKiller\Factory\NamespaceBasedFactory;
+use BetaKiller\DI\Container;
+
 class StatusWorkflowFactory
 {
-    use \BetaKiller\Utils\Factory\BaseFactoryTrait,
-        \BetaKiller\Utils\Instance\SingletonTrait;
+    /**
+     * @var \BetaKiller\Factory\NamespaceBasedFactory
+     */
+    protected $factory;
+
+    /**
+     * @return \BetaKiller\Status\StatusWorkflowFactory
+     * @deprecated Use DI instead
+     */
+    public static function instance()
+    {
+        return Container::instance()->get(static::class);
+    }
+
+    /**
+     * StatusWorkflowFactory constructor.
+     *
+     * @param \BetaKiller\Factory\NamespaceBasedFactory $factory
+     */
+    public function __construct(NamespaceBasedFactory $factory)
+    {
+        $this->factory = $factory
+            ->setClassPrefixes('Status', 'Workflow')
+            ->setExpectedInterface(StatusWorkflowInterface::class);
+    }
 
     /**
      * @param string                $name
@@ -14,17 +40,6 @@ class StatusWorkflowFactory
      */
     public function create($name, StatusRelatedModelInterface $model)
     {
-        return $this->_create($name, $model);
-    }
-
-    protected function make_instance_class_name($name)
-    {
-        // TODO Base namespace-related factory with DI
-        return '\\Status_Workflow_' . $name;
-    }
-
-    protected function make_instance($class_name, StatusRelatedModelInterface $model)
-    {
-        return new $class_name($model);
+        return $this->factory->create($name, ['model' => $model]);
     }
 }

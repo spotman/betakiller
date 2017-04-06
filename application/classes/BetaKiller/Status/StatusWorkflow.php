@@ -13,7 +13,7 @@ abstract class StatusWorkflow implements StatusWorkflowInterface
         $this->model = $model;
     }
 
-    public function do_transition($codename)
+    public function doTransition($codename)
     {
         // Find allowed target transition by provided codename
         $target_transition = $this->find_target_transition($codename);
@@ -35,7 +35,7 @@ abstract class StatusWorkflow implements StatusWorkflowInterface
         // Empty by default
     }
 
-    public function is_transition_allowed($codename)
+    public function isTransitionAllowed($codename)
     {
         return $this->model->is_status_transition_allowed($codename);
     }
