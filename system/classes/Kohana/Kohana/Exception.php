@@ -178,12 +178,13 @@ class Kohana_Kohana_Exception extends Exception {
 		try
 		{
 			// Get the exception information
+            $previous = $e->getPrevious();
 			$class   = get_class($e);
 			$code    = $e->getCode();
 			$message = $e->getMessage();
 			$file    = $e->getFile();
 			$line    = $e->getLine();
-			$trace   = $e->getTrace();
+			$trace   = $previous ? $previous->getTrace() : $e->getTrace();
 
 			if ( ! headers_sent())
 			{
