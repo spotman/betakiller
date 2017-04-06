@@ -30,6 +30,9 @@ trait ConvertibleHelper
             ->fromQueryArray($query, $this->getUrlQueryConverterConvertible());
     }
 
+    /**
+     * @return QueryConverter
+     */
     protected function queryConverterFactory()
     {
         //TODO DI

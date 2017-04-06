@@ -7,7 +7,7 @@ abstract class IFace extends Kohana\IFace
 {
     use Helper\IFaceTrait;
 
-    final protected function process_api_response(\Spotman\Api\ApiModelResponse $response)
+    final protected function process_api_response(\Spotman\Api\ApiMethodResponse $response)
     {
         $this->setLastModified($response->getLastModified());
 

@@ -1,10 +1,9 @@
 <?php
 namespace BetaKiller;
 
-use BetaKiller\Filter\Model\Value;
 use \BetaKiller\URL\QueryConverter;
 
-interface Filter extends QueryConverter\ConvertibleItem
+interface FilterInterface extends QueryConverter\ConvertibleItem
 {
     /**
      * Set up internal data from array

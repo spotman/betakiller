@@ -1,7 +1,7 @@
 <?php
 namespace BetaKiller\Filter;
 
-use BetaKiller\Filter;
+use BetaKiller\FilterInterface;
 
 abstract class IDs extends Values {
 

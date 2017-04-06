@@ -37,11 +37,13 @@ interface UserInterface extends OrmInterface, NotificationUserInterface, AclUser
 
     /**
      * @return bool
+     * @deprecated Use ACL resources instead
      */
     public function is_developer();
 
     /**
      * @return bool
+     * @deprecated Use ACL resources instead
      */
     public function is_moderator();
 

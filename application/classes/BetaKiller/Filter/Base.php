@@ -1,11 +1,13 @@
 <?php
 namespace BetaKiller\Filter;
 
-use \BetaKiller\Filter;
+use BetaKiller\Filter;
+use BetaKiller\FilterInterface;
 use BetaKiller\Filter\Model\Value;
+use BetaKiller\Filter\Model\ValuesGroup;
 use BetaKiller\Model\User;
 
-abstract class Base implements Filter
+abstract class Base implements FilterInterface
 {
     /**
      * @var User
@@ -32,7 +34,7 @@ abstract class Base implements Filter
 
     protected function availableValueFactory($key, $label)
     {
-        return Filter\Model\Value::factory($key, $label, $this->isSelected($key));
+        return Value::factory($key, $label, $this->isSelected($key));
     }
 
     /**
@@ -42,7 +44,7 @@ abstract class Base implements Filter
      */
     protected function availableValuesGroupFactory($label, array $values)
     {
-        return Filter\Model\ValuesGroup::factory($label, $values);
+        return ValuesGroup::factory($label, $values);
     }
 
     /**

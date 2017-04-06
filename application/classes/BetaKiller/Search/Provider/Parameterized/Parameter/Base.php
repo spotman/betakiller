@@ -2,9 +2,10 @@
 namespace BetaKiller\Search\Provider\Parameterized\Parameter;
 
 use BetaKiller\Search;
-use \BetaKiller\Search\Provider\Parameterized\Parameter;
-use \BetaKiller\Model;
-use \BetaKiller\Filter;
+use BetaKiller\Search\Provider\Parameterized\Parameter;
+use BetaKiller\Model;
+use BetaKiller\Filter;
+use BetaKiller\FilterInterface;
 
 abstract class Base implements Parameter
 {
@@ -19,7 +20,7 @@ abstract class Base implements Parameter
     protected $_filterFactory;
 
     /**
-     * @var Filter
+     * @var FilterInterface
      */
     protected $_filterInstance;
 
@@ -98,8 +99,9 @@ abstract class Base implements Parameter
      */
     public function getAvailableValues($filterHaving = null)
     {
-        if (!$this->isValuesPopulationAllowed())
+        if (!$this->isValuesPopulationAllowed()) {
             return [];
+        }
 
         return $this->getFilter()->getAvailableValues($filterHaving);
     }
@@ -112,8 +114,9 @@ abstract class Base implements Parameter
      */
     public function getRandomAvailableValue($filterHaving = null, $filterSelected = false)
     {
-        if (!$this->isValuesPopulationAllowed())
+        if (!$this->isValuesPopulationAllowed()) {
             return null;
+        }
 
         return $this->getFilter()->getRandomAvailableValue($filterHaving);
     }
@@ -125,8 +128,9 @@ abstract class Base implements Parameter
      */
     public function getSelectedValues()
     {
-        if (!$this->isValuesPopulationAllowed())
+        if (!$this->isValuesPopulationAllowed()) {
             return [];
+        }
 
         return $this->getFilter()->getSelectedValues();
     }
@@ -173,13 +177,18 @@ abstract class Base implements Parameter
         $this->getFilter()->setUrlQueryValues($values);
     }
 
+    /**
+     * @return \BetaKiller\Filter\Base|\BetaKiller\FilterInterface
+     * @throws \BetaKiller\Search\Provider\Parameterized\Parameter\Exception
+     */
     protected function getFilter()
     {
         if (!$this->_filterInstance) {
             $factory = $this->getFilterFactory();
 
-            if (!$factory)
+            if (!$factory) {
                 throw new Parameter\Exception('Set filter factory instance first');
+            }
 
             $codename              = $this->getFilterCodename();
             $this->_filterInstance = $factory->create($codename);

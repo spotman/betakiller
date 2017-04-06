@@ -3,6 +3,8 @@ namespace BetaKiller\Helper;
 
 use BetaKiller\DI\ContainerTrait;
 use BetaKiller\IFace\IFaceFactory;
+use BetaKiller\IFace\IFaceModelInterface;
+use BetaKiller\IFace\Widget;
 
 trait IFaceTrait
 {
@@ -34,7 +36,7 @@ trait IFaceTrait
 
     /**
      * @param $codename
-     * @return \BetaKiller\IFace\IFace
+     * @return \BetaKiller\IFace\IFaceInterface
      */
     protected function iface_from_codename($codename)
     {
@@ -43,9 +45,9 @@ trait IFaceTrait
 
     /**
      * @param $model \BetaKiller\IFace\IFaceModelInterface
-     * @return \BetaKiller\IFace\IFace
+     * @return \BetaKiller\IFace\IFaceInterface
      */
-    protected function iface_from_model(\BetaKiller\IFace\IFaceModelInterface $model)
+    protected function iface_from_model(IFaceModelInterface $model)
     {
         return IFaceFactory::instance()->from_model($model);
     }
@@ -56,6 +58,6 @@ trait IFaceTrait
      */
     protected function widget_factory($name)
     {
-        return \BetaKiller\IFace\Widget::factory($name);
+        return Widget::factory($name);
     }
 }

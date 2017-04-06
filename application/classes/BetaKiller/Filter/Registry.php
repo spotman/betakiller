@@ -1,7 +1,7 @@
 <?php
 namespace BetaKiller\Filter;
 
-use BetaKiller\Filter;
+use BetaKiller\FilterInterface;
 use BetaKiller\Filter\Model\Applicable;
 use BetaKiller\URL\QueryConverter\Convertible;
 use BetaKiller\Utils;
@@ -105,7 +105,8 @@ abstract class Registry implements \IteratorAggregate, QueryConverter\Convertibl
 
     /**
      * @param $key
-     * @return \BetaKiller\Filter
+     *
+     * @return \BetaKiller\FilterInterface
      */
     public function get($key)
     {
@@ -120,7 +121,7 @@ abstract class Registry implements \IteratorAggregate, QueryConverter\Convertibl
     }
 
     /**
-     * @return Filter[]
+     * @return FilterInterface[]
      */
     public function getAll()
     {
@@ -150,7 +151,7 @@ abstract class Registry implements \IteratorAggregate, QueryConverter\Convertibl
      * Retrieve an external iterator
      *
      * @link  http://php.net/manual/en/iteratoraggregate.getiterator.php
-     * @return Traversable|Filter[] An instance of an object implementing <b>Iterator</b> or
+     * @return Traversable|FilterInterface[] An instance of an object implementing <b>Iterator</b> or
      *        <b>Traversable</b>
      * @since 5.0.0
      */
@@ -161,7 +162,8 @@ abstract class Registry implements \IteratorAggregate, QueryConverter\Convertibl
 
     /**
      * @param $codename
-     * @return Filter
+     *
+     * @return FilterInterface
      */
     protected function filterFactory($codename)
     {
@@ -190,7 +192,7 @@ abstract class Registry implements \IteratorAggregate, QueryConverter\Convertibl
         return $this->_registry;
     }
 
-    protected function add(Filter $filter)
+    protected function add(FilterInterface $filter)
     {
         $codename = $filter->getCodename();
         $this->getRegistry()->set($codename, $filter);
