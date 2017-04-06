@@ -4,7 +4,7 @@ namespace BetaKiller\IFace\Admin;
 use BetaKiller\Acl\Resource\AdminResource;
 use BetaKiller\IFace\IFace;
 use BetaKiller\Helper\CurrentUserTrait;
-use Spotman\Acl\Resolver\UserAccessResolver;
+use Spotman\Acl\Resolver\AccessResolverInterface;
 
 abstract class AdminBase extends IFace
 {
@@ -12,24 +12,19 @@ abstract class AdminBase extends IFace
 
     protected $adminAclResource;
 
-    /**
-     * @var \Spotman\Acl\Resolver\UserAccessResolver
-     */
-    protected $userAccessResolver;
-
-    public function __construct(AdminResource $adminResource, UserAccessResolver $resolver)
+    public function __construct(AdminResource $adminResource, AccessResolverInterface $resolver)
     {
         $this->adminAclResource = $adminResource->useResolver($resolver);
     }
 
     public function before()
     {
-        if (!$this->check_iface_permissions()) {
+        if (!$this->checkIfacePermissions()) {
             throw new \HTTP_Exception_403('Permission denied');
         }
     }
 
-    protected function check_iface_permissions()
+    protected function checkIfacePermissions()
     {
         // Force authorization
         $user = $this->current_user();
