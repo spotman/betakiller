@@ -128,11 +128,6 @@ interface UserInterface extends OrmInterface, NotificationUserInterface, AclUser
     /**
      * @return string
      */
-    public function get_full_name();
-
-    /**
-     * @return string
-     */
     public function get_first_name();
 
     /**

@@ -1,6 +1,8 @@
 <?php
 namespace BetaKiller\Notification;
 
+use I18n;
+
 /**
  * Class NotificationMessageAbstract
  * @package BetaKiller\Notification
@@ -70,6 +72,20 @@ abstract class NotificationMessageAbstract implements NotificationMessageInterfa
     }
 
     /**
+     * @param NotificationUserInterface[]|\Iterator $users
+     *
+     * @return $this
+     */
+    public function to_users($users)
+    {
+        foreach ($users as $user) {
+            $this->set_to($user);
+        }
+
+        return $this;
+    }
+
+    /**
      * @return NotificationUserInterface[]
      */
     public function get_to()
@@ -104,31 +120,57 @@ abstract class NotificationMessageAbstract implements NotificationMessageInterfa
     }
 
     /**
-     * @param NotificationUserInterface[]|\Iterator $users
+     * @param \BetaKiller\Notification\NotificationUserInterface $targetUser
      *
-     * @return $this
-     */
-    public function to_users($users)
-    {
-        foreach ($users as $user) {
-            $this->set_to($user);
-        }
-
-        return $this;
-    }
-
-    /**
      * @return string
      */
-    public function get_subj()
+    public function get_subj(NotificationUserInterface $targetUser)
     {
+        if (!$this->_subj) {
+            return $this->generateSubject($targetUser);
+        }
+
         return $this->_subj;
+    }
+
+    protected function generateSubject(NotificationUserInterface $targetUser)
+    {
+        $key = $this->getBaseI18nKey();
+        $key .= '.subj';
+
+        if (!I18n::has($key)) {
+            throw new NotificationException('Missing translation for key [:value] in [:lang] language', [
+                ':value' => $key,
+                ':lang'  => I18n::lang(),
+            ]);
+        }
+
+        // Getting template data
+        $data = $this->getFullData($targetUser);
+
+        // Prefixing data keys with semicolon
+        $data = I18n::addDoubleColonToKeys($data);
+
+        return __($key, $data);
+    }
+
+    protected function getBaseI18nKey()
+    {
+        $name = $this->get_template_name();
+
+        if (!$name) {
+            throw new NotificationException('Can not i18n key from empty template name');
+        }
+
+        // Make i18n key by replacing "slash" with "dot"
+        return 'notification.'.str_replace('/', '.', $name);
     }
 
     /**
      * @param string $value
      *
      * @return $this
+     * @deprecated Use I18n registry for subject definition (key is based on template path)
      */
     public function set_subj($value)
     {
@@ -221,20 +263,31 @@ abstract class NotificationMessageAbstract implements NotificationMessageInterfa
         return 'notifications';
     }
 
+    protected function getFullData(NotificationUserInterface $targetUser)
+    {
+        return array_merge($this->get_template_data(), [
+            'targetName'  => $targetUser->get_full_name(),
+            'targetEmail' => $targetUser->get_email(),
+        ]);
+    }
+
     /**
-     * @param \BetaKiller\Notification\TransportInterface $transport
+     * @param \BetaKiller\Notification\TransportInterface        $transport
+     *
+     * @param \BetaKiller\Notification\NotificationUserInterface $target
      *
      * @return string
-     * @throws \View_Exception
      */
-    public function render(TransportInterface $transport)
+    public function render(TransportInterface $transport, NotificationUserInterface $target)
     {
         $view = $this->template_factory();
 
-        $data = array_merge($this->get_template_data(), [
-            'to'      => $this->get_to(),
-            'subject' => $this->get_subj(),
+        $data = array_merge($this->getFullData($target), [
+            'subject'     => $this->get_subj($target),
+            'baseI18nKey' => $this->getBaseI18nKey(),
         ]);
+
+        $data['doubleColonPrefixedData'] = I18n::addDoubleColonToKeys($data);
 
         $view->set($data);
 

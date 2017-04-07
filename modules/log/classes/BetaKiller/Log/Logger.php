@@ -2,17 +2,15 @@
 namespace BetaKiller\Log;
 
 use BetaKiller\Helper\CurrentUserTrait;
-use Monolog\ErrorHandler;
-//use Monolog\Handler\ChromePHPHandler;
 use Monolog\Handler\DeduplicationHandler;
-use Monolog\Handler\FingersCrossedHandler;
 use Monolog\Handler\PHPConsoleHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Handler\WhatFailureGroupHandler;
-use Monolog\Processor\IntrospectionProcessor;
 use Monolog\Processor\MemoryPeakUsageProcessor;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LoggerTrait;
+
+//use Monolog\Handler\ChromePHPHandler;
 
 class Logger implements LoggerInterface
 {
@@ -29,15 +27,6 @@ class Logger implements LoggerInterface
      */
     protected $logger;
 
-    public static function getInstance()
-    {
-        if (!static::$_instance) {
-            static::$_instance = new static;
-        }
-
-        return static::$_instance;
-    }
-
     /**
      * Logger constructor.
      */
@@ -52,9 +41,9 @@ class Logger implements LoggerInterface
 
 //        ErrorHandler::register($monolog);
 
-        $logFilePath = implode(DIRECTORY_SEPARATOR, ['logs', date('Y'), date('m'), date('d').'.log']);
+        $logFilePath     = implode(DIRECTORY_SEPARATOR, ['logs', date('Y'), date('m'), date('d').'.log']);
         $coreLogFilePath = APPPATH.$logFilePath;
-        $appLogFilePath = \MultiSite::instance()->site_path().DIRECTORY_SEPARATOR.$logFilePath;
+        $appLogFilePath  = \MultiSite::instance()->site_path().DIRECTORY_SEPARATOR.$logFilePath;
 
         $stripExceptionFormatter = new StripExceptionFromContextFormatter();
 
@@ -76,7 +65,10 @@ class Logger implements LoggerInterface
         // Enable debugging via PhpConsole for developers
         if ($user && $user->is_developer()) {
             $phpConsoleHandler = new PHPConsoleHandler([
-                'headersLimit'  =>  1024,  // 1KB
+                'headersLimit'             => 1024,     // 1KB
+                'detectDumpTraceAndSource' => true,     // Autodetect and append trace data to debug
+                'useOwnErrorsHandler' => true,          // Enable errors handling
+                'useOwnExceptionsHandler' => true,      // Enable exceptions handling
             ]);
             $phpConsoleHandler->setFormatter($stripExceptionFormatter);
             $monolog->pushHandler($phpConsoleHandler);
@@ -85,6 +77,15 @@ class Logger implements LoggerInterface
         $monolog->pushProcessor(new MemoryPeakUsageProcessor());
 
         return $monolog;
+    }
+
+    public static function getInstance()
+    {
+        if (!static::$_instance) {
+            static::$_instance = new static;
+        }
+
+        return static::$_instance;
     }
 
     /**

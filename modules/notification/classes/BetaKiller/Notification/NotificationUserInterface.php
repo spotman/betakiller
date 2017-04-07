@@ -16,6 +16,11 @@ interface NotificationUserInterface
     public function get_email();
 
     /**
+     * @return string
+     */
+    public function get_full_name();
+
+    /**
      * Returns TRUE if user allowed notifications through email
      * @return bool
      */

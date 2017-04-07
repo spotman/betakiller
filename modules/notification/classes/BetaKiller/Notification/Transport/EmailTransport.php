@@ -24,21 +24,16 @@ class EmailTransport extends AbstractTransport
      */
     public function send(NotificationMessageInterface $message, NotificationUserInterface $user)
     {
-        $subj = $message->get_subj();
-        $attachments = $message->get_attachments();
-
-        $body = $this->renderMessage($message);
-
         $fromUser = $message->get_from();
 
+        $from        = $fromUser ? $fromUser->get_email() : null;
+        $to          = $user->get_email();
+        $subj        = $message->get_subj($user);
+        $attachments = $message->get_attachments();
+
+        $body = $this->renderMessage($message, $user);
+
         // Email notification
-        return \Email::send(
-            $fromUser ? $fromUser->get_email() : NULL,
-            $user->get_email(),
-            $subj,
-            $body,
-            TRUE,
-            $attachments
-        );
+        return \Email::send($from, $to, $subj, $body, true, $attachments);
     }
 }

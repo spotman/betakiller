@@ -1,36 +1,38 @@
 <?php
 
+use BetaKiller\Helper\InProductionTrait;
+use BetaKiller\Notification\NotificationMessageCommon;
 use BetaKiller\Notification\NotificationUserEmail;
 use BetaKiller\Status\StatusWorkflow;
 use BetaKiller\Status\StatusWorkflowException;
-use BetaKiller\Helper\InProductionTrait;
-use BetaKiller\Notification\NotificationMessageCommon;
 
 class Status_Workflow_ContentComment extends StatusWorkflow
 {
     use InProductionTrait;
 
-    const TRANSITION_APPROVE    = 'approve';
-    const TRANSITION_REJECT     = 'reject';
-    const TRANSITION_SPAM       = 'markAsSpam';
-    const TRANSITION_TRASH      = 'moveToTrash';
-    const TRANSITION_RESTORE    = 'restoreFromTrash';
-
     public function draft()
     {
         if ($this->model()->has_current_status()) {
             throw new StatusWorkflowException('Can not mark comment [:id] as draft coz it is in [:status] status', [
-                ':id'       =>  $this->model()->get_id(),
-                ':status'   =>  $this->model()->get_current_status()->get_codename()
+                ':id'     => $this->model()->get_id(),
+                ':status' => $this->model()->get_current_status()->get_codename(),
             ]);
         }
 
         $this->model()->set_start_status();
     }
 
+    /**
+     * @return \Model_ContentComment|\BetaKiller\Status\StatusRelatedModelInterface
+     */
+    protected function model()
+    {
+        return $this->model;
+    }
+
     public function approve()
     {
-        $this->doTransition(self::TRANSITION_APPROVE);
+        $this->doTransition(Model_ContentCommentStatusTransition::APPROVE);
 
         $comment = $this->model();
 
@@ -43,33 +45,31 @@ class Status_Workflow_ContentComment extends StatusWorkflow
 
     protected function notify_comment_author_about_approve(Model_ContentComment $comment)
     {
+        $authorUser = $comment->get_author_user();
+
+        // Skip notification for moderators
+        if ($authorUser && $authorUser->is_moderator()) {
+            return;
+        }
+
         $email = $comment->get_author_email();
-        $created_at = $comment->get_created_at()->format('H:i:s d.m.Y');
-        $content_label = $comment->get_related_content_label();
+        $name  = $comment->get_author_name();
 
         $data = [
-            'name'          =>  $comment->get_author_name(),
-            'url'           =>  $comment->get_public_url(),
-            'created_at'    =>  $created_at,
-            'label'         =>  $content_label,
+            'name'       => $name,
+            'url'        => $comment->get_public_url(),
+            'created_at' => $comment->get_created_at()->format('H:i:s d.m.Y'),
+            'label'      => $comment->get_related_content_label(),
         ];
-
-        $subj = __('notification.comment.author-approve.subj', [
-            ':name'         =>  $data['name'],
-            ':url'          =>  $data['url'],
-            ':label'        =>  $data['label'],
-            ':created_at'   =>  $data['created_at'],
-        ]);
 
         $message = NotificationMessageCommon::instance();
 
         $message
-            ->set_subj($subj)
             ->set_template_name('user/comment/author-approve')
             ->set_template_data($data);
 
         if ($this->in_production()) {
-            $to = NotificationUserEmail::factory($email);
+            $to = NotificationUserEmail::factory($email, $name);
             $message->set_to($to);
         } else {
             $message->to_current_user();
@@ -83,40 +83,68 @@ class Status_Workflow_ContentComment extends StatusWorkflow
      */
     protected function notify_parent_comment_author_about_reply(Model_ContentComment $reply)
     {
+        $parent = $reply->get_parent();
+
+        // Skip if comment has no parent
+        if (!$parent) {
+            return;
+        }
+
+        $replyEmail  = $reply->get_author_email();
+        $parentEmail = $parent->get_author_email();
+
         // Skip if parent comment email is equal to reply email
+        if ($replyEmail === $parentEmail) {
+            return;
+        }
 
         // TODO Notify parent comment author
+
+        $parentName = $parent->get_author_name();
+
+        $data = [
+            'url'        => $reply->get_public_url(),
+            'created_at' => $reply->get_created_at()->format('H:i:s d.m.Y'),
+            'label'      => $reply->get_related_content_label(),
+        ];
+
+        $message = NotificationMessageCommon::instance();
+
+        $message
+            ->set_template_name('user/comment/parent-author-reply')
+            ->set_template_data($data);
+
+        if ($this->in_production()) {
+            $to = NotificationUserEmail::factory($parentEmail, $parentName);
+            $message->set_to($to);
+        } else {
+            $message->to_current_user();
+        }
+
+        $message->send();
     }
 
     public function reject()
     {
         // Simply change status
-        $this->doTransition(self::TRANSITION_REJECT);
+        $this->doTransition(Model_ContentCommentStatusTransition::REJECT);
     }
 
     public function markAsSpam()
     {
         // Simply change status
-        $this->doTransition(self::TRANSITION_SPAM);
+        $this->doTransition(Model_ContentCommentStatusTransition::MARK_AS_SPAM);
     }
 
     public function moveToTrash()
     {
         // Simply change status
-        $this->doTransition(self::TRANSITION_TRASH);
+        $this->doTransition(Model_ContentCommentStatusTransition::MOVE_TO_TRASH);
     }
 
     public function restoreFromTrash()
     {
         // Simply change status
-        $this->doTransition(self::TRANSITION_RESTORE);
-    }
-
-    /**
-     * @return \Model_ContentComment|\BetaKiller\Status\StatusRelatedModelInterface
-     */
-    protected function model()
-    {
-        return $this->model;
+        $this->doTransition(Model_ContentCommentStatusTransition::RESTORE_FROM_TRASH);
     }
 }

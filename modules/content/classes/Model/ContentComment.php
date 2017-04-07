@@ -311,9 +311,9 @@ class Model_ContentComment extends TreeModelSingleParentOrm
         return $this->get('user_agent');
     }
 
-    public function set_created_at(DateTime $value)
+    public function set_created_at(DateTime $value = null)
     {
-        $this->set_datetime_column_value('created_at', $value);
+        $this->set_datetime_column_value('created_at', $value ?: new DateTime);
         return $this;
     }
 
@@ -503,6 +503,17 @@ class Model_ContentComment extends TreeModelSingleParentOrm
         return $model
             ->order_by_path()
             ->get_all();
+    }
+
+    public function isApproveAllowed()
+    {
+        return $this->is_status_transition_allowed(Model_ContentCommentStatusTransition::APPROVE);
+    }
+
+    public function draft()
+    {
+        $this->workflow()->draft();
+        return $this;
     }
 
     public function approve()

@@ -85,7 +85,7 @@ class Widget_Content_Comments extends Widget
 
         $validation
             ->rule('csrf-key', 'not_empty')
-            ->rule('csrf-key', ['Security', 'check']);
+            ->rule('csrf-key', [Security::class, 'check']);
 
         if ( !$validation->check() ) {
             $errors = $this->get_validation_errors($validation);
@@ -108,7 +108,7 @@ class Widget_Content_Comments extends Widget
             $parentEntityItemID = $parentModel->get_entity_item_id();
 
             // Check parent comment entity id
-            if ($parentEntity->get_id() != $entity->get_id()) {
+            if (!$parentEntity->isEqualTo($entity)) {
                 throw new Exception('Incorrect parent comment entity; :sent sent instead of :needed', [
                     ':needed'   =>  $entity->get_id(),
                     ':sent'     =>  $parentEntity->get_id(),
@@ -116,7 +116,7 @@ class Widget_Content_Comments extends Widget
             }
 
             // Check parent comment entity item id
-            if ($parentEntityItemID != $entityItemId) {
+            if ($parentEntityItemID !== $entityItemId) {
                 throw new Exception('Incorrect parent comment entity item id; :sent sent instead of :needed', [
                     ':needed'   =>  $entityItemId,
                     ':sent'     =>  $parentEntityItemID,
@@ -131,34 +131,41 @@ class Widget_Content_Comments extends Widget
             throw new Exception('Throttling enabled for IP :ip', [':ip' => $ipAddress]);
         }
 
+        $user = $this->current_user(TRUE);
         $model = $this->model_factory_content_comment();
 
+        $model->draft();
+
+        // Linking comment to entity and entity item
+        $model
+            ->set_entity($entity)
+            ->set_entity_item_id($entityItemId);
+
+        if ($user) {
+            $model->set_author_user($user);
+        } else {
+            $model->set_guest_author_name($name)->set_guest_author_email($email);
+        }
+
+        // Parent comment
+        if ($parentModel) {
+            $model->set_parent($parentModel);
+        }
+
+        $model
+            ->set_ip_address($ipAddress)
+            ->set_user_agent($agent)
+            ->set_message($message)
+            ->set_created_at();
+
         try {
-            // Linking comment to entity and entity item
-            $model
-                ->set_entity($entity)
-                ->set_entity_item_id($entityItemId);
-
-            $user = $this->current_user(TRUE);
-
-            if ($user) {
-                $model->set_author_user($user);
-            } else {
-                $model->set_guest_author_name($name)->set_guest_author_email($email);
-            }
-
-            // Parent comment
-            if ($parentModel) {
-                $model->set_parent($parentModel);
-            }
-
-            $model
-                ->set_ip_address($ipAddress)
-                ->set_user_agent($agent)
-                ->set_message($message);
-
             // Saving comment and getting ID
-            $model->save();
+            $model->save()->reload();
+
+            // Force approving if enabled (developers, moderators, etc)
+            if ($user && $model->isApproveAllowed()) {
+                $model->approve()->save();
+            }
 
             $this->send_success_json();
         } catch (ORM_Validation_Exception $e) {

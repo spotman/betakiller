@@ -8,6 +8,8 @@ class NotificationUserEmail implements NotificationUserInterface
      */
     protected $_email;
 
+    protected $_fullName;
+
     /**
      * @var bool
      */
@@ -19,14 +21,23 @@ class NotificationUserEmail implements NotificationUserInterface
         return NULL;
     }
 
-    public static function factory($email)
+    public static function factory($email, $fullName)
     {
-        return new static($email);
+        return new static($email, $fullName);
     }
 
-    public function __construct($email)
+    public function __construct($email, $fullName)
     {
         $this->_email = $email;
+        $this->_fullName = $fullName;
+    }
+
+    /**
+     * @return string
+     */
+    public function get_full_name()
+    {
+        return $this->_fullName;
     }
 
     public function is_online()
@@ -66,4 +77,4 @@ class NotificationUserEmail implements NotificationUserInterface
         $this->_emailNotificationAllowed = false;
         return $this;
     }
-};
+}

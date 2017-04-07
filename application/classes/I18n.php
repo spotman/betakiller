@@ -6,9 +6,8 @@
  * @package    I18n
  * @author Mikito Takada
  */
-
-class I18n extends Kohana_I18n {
-
+class I18n extends Kohana_I18n
+{
     const COOKIE_NAME = 'lang';
 
     /**
@@ -19,26 +18,46 @@ class I18n extends Kohana_I18n {
     /**
      * @var array Cache of missing strings
      */
-    protected static $_cache_missing = array();
+    protected static $_cache_missing = [];
 
     /**
      * @var array List of app languages
      */
-    protected static $_lang_list = array();
+    protected static $_lang_list = [];
 
     /**
      * Getter/setter for list of allowed languages
+     *
      * @param array $list
+     *
      * @return array
      */
-    public static function lang_list(array $list = NULL)
+    public static function lang_list(array $list = null)
     {
-        if ( $list )
-        {
+        if ($list) {
             static::$_lang_list = $list;
         }
 
         return static::$_lang_list;
+    }
+
+    /**
+     * @param string      $string
+     * @param string|null $lang
+     *
+     * @return bool
+     */
+    public static function has($string, $lang = null)
+    {
+        if (!$lang) {
+            // Use the global target language
+            $lang = static::$lang;
+        }
+
+        // Load the translation table for this language
+        $table = static::load($lang);
+
+        return isset($table[$string]);
     }
 
     /**
@@ -49,12 +68,12 @@ class I18n extends Kohana_I18n {
      *
      * @param   $string string  text to translate
      * @param   $lang string   target language
+     *
      * @return  string
      */
-    public static function get($string, $lang = NULL)
+    public static function get($string, $lang = null)
     {
-        if ( ! $lang )
-        {
+        if (!$lang) {
             // Use the global target language
             $lang = static::$lang;
         }
@@ -63,31 +82,41 @@ class I18n extends Kohana_I18n {
         $table = static::load($lang);
 
         // Return the translated string if it exists
-        if ( isset($table[$string]) )
-        {
+        if (isset($table[$string])) {
             return $table[$string];
         }
-        else
-        {
-            // Пробуем определить текущий модуль
-            $module = Request::current() ? Request::current()->module() : NULL;
 
-            $key = $module ?: 'application';
+        // Detect current module if exists
+        $module = Request::current() ? Request::current()->module() : null;
 
-            // Translated string does not exist
-            // Store the original string as missing - still makes sense to store the original string so that loading the untranslated file will work.
-            static::$_cache_missing[$key][$lang][$string] = $string;
-            return $string;
+        $key = $module ?: 'application';
+
+        // Translated string does not exist
+        // Store the original string as missing - still makes sense to store the original string so that loading the untranslated file will work.
+        static::$_cache_missing[$key][$lang][$string] = $string;
+
+        return $string;
+    }
+
+    public static function addDoubleColonToKeys(array $data)
+    {
+        $output = [];
+
+        foreach ($data as $key => $value) {
+            $key          = ':'.$key;
+            $output[$key] = $value;
         }
+
+        return $output;
     }
 
     public static function write()
     {
         // something new must be added for anything to happen
-        if ( empty(static::$_cache_missing) )
+        if (empty(static::$_cache_missing))
             return;
 
-        foreach ( static::$_cache_missing as $module => $data ) {
+        foreach (static::$_cache_missing as $module => $data) {
             try {
                 self::put_data($module, $data[static::$lang]);
             } catch (Exception $e) {
@@ -103,7 +132,7 @@ class I18n extends Kohana_I18n {
             return;
 
         // Если указан конкретный модуль
-        $base_path = ( $module != 'application' )
+        $base_path = ($module !== 'application')
             // Пишем найденную строку в языковой файл соответствующего модуля
             ? MODPATH.$module.'/'
             // Иначе пишем в общий файл в /application (или в директорию текущего сайта)
@@ -112,35 +141,33 @@ class I18n extends Kohana_I18n {
         $save_path = $base_path.'i18n/';
 
         // check that the path exists
-        if ( ! file_exists($save_path) )
-        {
+        if (!file_exists($save_path)) {
             // if not, create directory
             mkdir($save_path, 0777, true);
         }
 
         // Формируем имя файла
-        $filename = static::$lang.'.php';
-        $full_file_path = $save_path . $filename;
+        $filename       = static::$lang.'.php';
+        $full_file_path = $save_path.$filename;
 
         // Получаем текущее содержимое языкового файла, если он есть
-        $current_app_lang_data = file_exists($full_file_path) ? include $full_file_path : array();
+        $current_app_lang_data = file_exists($full_file_path) ? include $full_file_path : [];
 
         // Если файл поломан, ничего не делаем
-        if ( ! is_array($current_app_lang_data) )
+        if (!is_array($current_app_lang_data))
             return;
 
         $content = static::make_content(array_merge($data, $current_app_lang_data));
 
         // backup old file - if the file size is different.
-        if ( file_exists($full_file_path) AND ( filesize($full_file_path) != strlen($content) ) )
-        {
+        if (file_exists($full_file_path) AND (filesize($full_file_path) != strlen($content))) {
             // Backing up current config
             $old_content = file_get_contents($full_file_path);
             $backup_name = $save_path.static::$lang.'_'.date('Y_m_d__H_i_s').'.php';
-            $result = file_put_contents($backup_name, $old_content);
+            $result      = file_put_contents($backup_name, $old_content);
 
             // Backup failed! Don't write the file.
-            if ( ! $result )
+            if (!$result)
                 return;
         }
 

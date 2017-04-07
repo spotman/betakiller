@@ -37,6 +37,9 @@ return array (
   'comment.status.transition.moveToTrash'     => 'В корзину',
   'comment.status.transition.restoreFromTrash'   => 'Восстановить',
 
-  'notification.comment.author-approve.subj' => ':name, ваш комментарий к записи ":label" от :created_at утверждён и опубликован',
-  'notification.comment.author-approve.text' => ':name, ваш комментарий к записи "<strong>:label</strong>" от :created_at утверждён и опубликован по адресу <a href=":url">:url</a>',
+  'notification.user.comment.author-approve.subj' => ':targetName, ваш комментарий от :created_at к записи ":label" утверждён и опубликован',
+  'notification.user.comment.author-approve.text' => ':targetName, ваш комментарий от :created_at к записи "<strong>:label</strong>" утверждён и опубликован по адресу <a href=":url">:url</a>',
+
+  'notification.user.comment.parent-author-reply.subj' => ':targetName, вам ответили на комментарий к записи ":label"',
+  'notification.user.comment.parent-author-reply.text' => ':targetName,<br />вам ответили на комментарий от :created_at к записи "<strong>:label</strong>".<br />Прочитать комментарий можно по адресу <a href=":url">:url</a>',
 );

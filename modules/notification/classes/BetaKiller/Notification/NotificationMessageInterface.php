@@ -33,14 +33,17 @@ interface NotificationMessageInterface
     public function set_to(NotificationUserInterface $value);
 
     /**
+     * @param \BetaKiller\Notification\NotificationUserInterface $targetUser
+     *
      * @return string
      */
-    public function get_subj();
+    public function get_subj(NotificationUserInterface $targetUser);
 
     /**
      * @param string $value
      *
      * @return $this|NotificationMessageInterface
+     * @deprecated Use I18n registry for subject definition (key is based on template path)
      */
     public function set_subj($value);
 
@@ -90,9 +93,10 @@ interface NotificationMessageInterface
     /**
      * Render message for sending via provided transport
      *
-     * @param \BetaKiller\Notification\TransportInterface $transport
+     * @param \BetaKiller\Notification\TransportInterface        $transport
+     * @param \BetaKiller\Notification\NotificationUserInterface $user
      *
      * @return string
      */
-    public function render(TransportInterface $transport);
+    public function render(TransportInterface $transport, NotificationUserInterface $user);
 }
