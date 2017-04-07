@@ -98,8 +98,6 @@ class Status_Workflow_ContentComment extends StatusWorkflow
             return;
         }
 
-        // TODO Notify parent comment author
-
         $parentName = $parent->get_author_name();
 
         $data = [
