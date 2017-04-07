@@ -12,9 +12,9 @@ class Status_Workflow_ContentComment extends StatusWorkflow
 
     const TRANSITION_APPROVE    = 'approve';
     const TRANSITION_REJECT     = 'reject';
-    const TRANSITION_SPAM       = 'spam';
-    const TRANSITION_TRASH      = 'trash';
-    const TRANSITION_RESTORE    = 'restore';
+    const TRANSITION_SPAM       = 'markAsSpam';
+    const TRANSITION_TRASH      = 'moveToTrash';
+    const TRANSITION_RESTORE    = 'restoreFromTrash';
 
     public function draft()
     {
@@ -94,19 +94,19 @@ class Status_Workflow_ContentComment extends StatusWorkflow
         $this->doTransition(self::TRANSITION_REJECT);
     }
 
-    public function spam()
+    public function markAsSpam()
     {
         // Simply change status
         $this->doTransition(self::TRANSITION_SPAM);
     }
 
-    public function trash()
+    public function moveToTrash()
     {
         // Simply change status
         $this->doTransition(self::TRANSITION_TRASH);
     }
 
-    public function restore()
+    public function restoreFromTrash()
     {
         // Simply change status
         $this->doTransition(self::TRANSITION_RESTORE);

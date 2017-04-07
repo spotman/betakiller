@@ -33,9 +33,9 @@ return array (
 
   'comment.status.transition.approve'   => 'Опубликовать',
   'comment.status.transition.reject'    => 'Отклонить',
-  'comment.status.transition.spam'      => 'СПАМ',
-  'comment.status.transition.trash'     => 'В корзину',
-  'comment.status.transition.restore'   => 'Восстановить',
+  'comment.status.transition.markAsSpam'      => 'СПАМ',
+  'comment.status.transition.moveToTrash'     => 'В корзину',
+  'comment.status.transition.restoreFromTrash'   => 'Восстановить',
 
   'notification.comment.author-approve.subj' => ':name, ваш комментарий к записи ":label" от :created_at утверждён и опубликован',
   'notification.comment.author-approve.text' => ':name, ваш комментарий к записи "<strong>:label</strong>" от :created_at утверждён и опубликован по адресу <a href=":url">:url</a>',

@@ -519,19 +519,19 @@ class Model_ContentComment extends TreeModelSingleParentOrm
 
     public function mark_as_spam()
     {
-        $this->workflow()->spam();
+        $this->workflow()->markAsSpam();
         return $this;
     }
 
     public function move_to_trash()
     {
-        $this->workflow()->trash();
+        $this->workflow()->moveToTrash();
         return $this;
     }
 
     public function restore_from_trash()
     {
-        $this->workflow()->restore();
+        $this->workflow()->restoreFromTrash();
         return $this;
     }
 

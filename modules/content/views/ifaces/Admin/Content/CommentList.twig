@@ -3,11 +3,11 @@
 {% block page_content %}
 
     {% set actions_config = {
-        "approve":  { method: "approve", color: "green", icon: "thumb_up" },
-        "reject":   { method: "reject", color: "red", icon: "thumb_down" },
-        "spam":     { method: "markAsSpam", color: "orange", icon: "warning" },
-        "trash":    { method: "moveToTrash", color: "red", icon: "delete" },
-        "restore":  { method: "restoreFromTrash", color: "green", icon: "settings_backup_restore" },
+        "approve":          { color: "green", icon: "thumb_up" },
+        "reject":           { color: "red", icon: "thumb_down" },
+        "markAsSpam":       { color: "orange", icon: "warning" },
+        "moveToTrash":      { color: "red", icon: "delete" },
+        "restoreFromTrash": { color: "green", icon: "settings_backup_restore" },
     } %}
 
     <div class="comments-list">
@@ -28,7 +28,7 @@
                         {% for target_codename, transition in comment.status.transitions %}
                             {% set button_config = actions_config[transition] %}
                             <button class="btn transition-button {{ button_config.color }}"
-                                    data-api-method="{{ button_config.method }}" data-id="{{ comment.id }}"
+                                    data-api-method="{{ transition }}" data-id="{{ comment.id }}"
                                     data-target-label="{{ ("comment.status." ~ target_codename)|i18n }}">
                                 <i class="material-icons left">{{ button_config.icon }}</i>
                                 {{ ("comment.status.transition." ~ transition)|i18n }}

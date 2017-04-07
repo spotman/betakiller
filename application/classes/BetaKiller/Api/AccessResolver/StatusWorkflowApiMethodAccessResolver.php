@@ -1,8 +1,9 @@
 <?php
-namespace Spotman\Api\AccessResolver;
+namespace BetaKiller\Api\AccessResolver;
 
 use BetaKiller\Status\StatusRelatedModelInterface;
 use BetaKiller\Status\StatusWorkflowFactory;
+use Spotman\Api\AccessResolver\ApiMethodAccessResolverInterface;
 use Spotman\Api\ApiMethodException;
 use Spotman\Api\ApiMethodInterface;
 use Spotman\Api\Method\ModelBasedApiMethodInterface;
