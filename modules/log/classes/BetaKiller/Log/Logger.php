@@ -7,6 +7,7 @@ use Monolog\Handler\PHPConsoleHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Handler\WhatFailureGroupHandler;
 use Monolog\Processor\MemoryPeakUsageProcessor;
+use PhpConsole\Connector;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LoggerTrait;
 
@@ -20,12 +21,12 @@ class Logger implements LoggerInterface
     /**
      * @var LoggerInterface
      */
-    protected static $_instance;
+    private static $instance;
 
     /**
      * @var LoggerInterface
      */
-    protected $logger;
+    private $logger;
 
     /**
      * Logger constructor.
@@ -63,7 +64,7 @@ class Logger implements LoggerInterface
         $user = $this->current_user(true);
 
         // Enable debugging via PhpConsole for developers
-        if ($user && $user->is_developer()) {
+        if ($user && $user->is_developer() && Connector::getInstance()->isActiveClient()) {
             $phpConsoleHandler = new PHPConsoleHandler([
                 'headersLimit'             => 1024,     // 1KB
                 'detectDumpTraceAndSource' => true,     // Autodetect and append trace data to debug
@@ -81,11 +82,11 @@ class Logger implements LoggerInterface
 
     public static function getInstance()
     {
-        if (!static::$_instance) {
-            static::$_instance = new static;
+        if (!self::$instance) {
+            self::$instance = new static;
         }
 
-        return static::$_instance;
+        return static::$instance;
     }
 
     /**
