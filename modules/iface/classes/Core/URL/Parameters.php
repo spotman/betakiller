@@ -4,7 +4,7 @@ use BetaKiller\Utils\Registry\Base;
 
 abstract class Core_URL_Parameters extends Base
 {
-    use \BetaKiller\Utils\Instance\Simple;
+    use BetaKIller\Utils\Instance\Simple;
 
     /**
      * @param string                  $key

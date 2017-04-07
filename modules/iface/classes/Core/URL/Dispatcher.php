@@ -375,7 +375,7 @@ abstract class Core_URL_Dispatcher
     /**
      * @return IFaceInterface
      */
-    public function current_iface()
+    public function currentIFace()
     {
         return $this->_current_iface;
     }

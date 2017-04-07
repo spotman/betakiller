@@ -64,7 +64,7 @@ class IFace_Auth_Login extends IFace
 
     public function redirect_to_current_iface()
     {
-        $url = $this->url_dispatcher()->current_iface()->url(NULL, FALSE);
+        $url = $this->url_dispatcher()->currentIFace()->url(NULL, FALSE);
 
         return $this->redirect_to($url);
     }

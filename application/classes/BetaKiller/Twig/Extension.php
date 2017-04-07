@@ -113,7 +113,7 @@ class BetaKiller_Twig_Extension extends Twig_Extension
                 'parent_iface_url',
                 function() {
                     return $this->url_dispatcher()
-                        ->current_iface()
+                        ->currentIFace()
                         ->get_parent()
                         ->url($this->url_parameters());
                 }
@@ -138,7 +138,12 @@ class BetaKiller_Twig_Extension extends Twig_Extension
              * The first key-value pair would be used if no context provided
              * @example ":count lots"|plural({ ":count": lotsCount })
              */
-            new Twig_SimpleFilter('plural', function ($text, array $values, $context = NULL) {
+            new Twig_SimpleFilter('plural', function ($text, $values, $context = NULL) {
+                if (!is_array($values)) {
+                    $values = [
+                        ':count'    =>  (int)$values,
+                    ];
+                }
                 return ___($text, $context ?: current($values), $values);
             }),
 

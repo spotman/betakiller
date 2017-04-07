@@ -505,6 +505,28 @@ class Model_ContentComment extends TreeModelSingleParentOrm
             ->get_all();
     }
 
+    public function get_pending_comments_count()
+    {
+        /** @var \Model_ContentCommentStatus $statusOrm */
+        $statusOrm = $this->status_model_factory();
+        $status = $statusOrm->get_pending_status();
+
+        return $this->get_comments_count($status);
+    }
+
+    public function get_comments_count(Model_ContentCommentStatus $status = null, Model_ContentEntity $entity = null, $entity_item_id = null)
+    {
+        $model = $this->model_factory();
+
+        $model->filter_entity_and_entity_item_id($entity, $entity_item_id);
+
+        if ($status) {
+            $model->filter_status($status);
+        }
+
+        return $model->compile_as_subquery_and_count_all();
+    }
+
     public function isApproveAllowed()
     {
         return $this->is_status_transition_allowed(Model_ContentCommentStatusTransition::APPROVE);

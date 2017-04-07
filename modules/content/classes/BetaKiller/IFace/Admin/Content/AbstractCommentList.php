@@ -1,7 +1,7 @@
 <?php
 namespace BetaKiller\IFace\Admin\Content;
 
-abstract class CommentList extends AdminBase
+abstract class AbstractCommentList extends AdminBase
 {
     /**
      * Returns data for View

@@ -1,7 +1,7 @@
 <?php
 namespace BetaKiller\IFace\Admin\Content;
 
-class CommentListByStatus extends CommentList
+class CommentListByStatus extends AbstractCommentList
 {
     /**
      * @inheritDoc

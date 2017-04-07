@@ -1,36 +1,65 @@
 {% if enabled is defined and enabled == true %}
 
-    {# include fonts and materialize layout #}
-    {{ css("https://fonts.googleapis.com/icon?family=Material+Icons") }}
-    {{ css("admin/css/admin.css") }}
+  {# include fonts and materialize layout #}
+  {{ css("https://fonts.googleapis.com/icon?family=Material+Icons") }}
+  {{ css("admin/css/admin.css") }}
 
-    <header id="admin-bar" class="navbar-fixed">
-        <nav class="blue white-text">
-            <div class="nav-wrapper">
-                <a href="#" data-activates="admin-side-nav" class="button-collapse left"><i class="material-icons">menu</i></a>
+  <header id="admin-bar" class="navbar-fixed">
+    <nav class="green lighten-5 black-text">
+      <div class="nav-wrapper">
+        <div class="container">
 
-                <button class="btn"></button>
+          <ul class="left">
 
-                <ul class="right hide-on-med-and-down">
-                    {#<li><a href="sass.html"><i class="material-icons">search</i></a></li>#}
-                    {#<li><a href="badges.html"><i class="material-icons">view_module</i></a></li>#}
-                    {#<li><a href="collapsible.html"><i class="material-icons">refresh</i></a></li>#}
-                    <li>
-                        <a href="#" data-activates="admin-bar-user-dropdown" class="dropdown-button">
-                            <i class="material-icons">perm_identity</i>
-                        </a>
+            {#<li>#}
+              {#<a href="#!" data-activates="admin-bar-create-dropdown" data-hover="true" data-constrainwidth="false" data-beloworigin="true" class="dropdown-button">#}
+                {#<i class="material-icons left">note_add</i>#}
+                {#{{ "admin.bar.create"|i18n }}#}
+              {#</a>#}
 
-                        <ul id="admin-bar-user-dropdown" class="dropdown-content">
-                            <li><a href="#!">one</a></li>
-                            <li><a href="#!">two</a></li>
-                            <li class="divider"></li>
-                            <li><a href="#!">three</a></li>
-                        </ul>
+              {#<ul id="admin-bar-create-dropdown" class="dropdown-content">#}
+                {#<li><a href="#!">{{ "admin.bar.create.content.post"|i18n }}</a></li>#}
+                {#<li><a href="#!">{{ "admin.bar.create.quote"|i18n }}</a></li>#}
+              {#</ul>#}
+            {#</li>#}
 
-                    </li>
-                </ul>
-            </div>
-        </nav>
-    </header>
+            <li>
+              <a href="{{ comments.url }}">
+                <i class="material-icons left tiny">chat</i>
+                {{ "admin.bar.comments"|i18n }}
+                {% if comments.count %}
+                <span class="new badge orange" data-badge-caption="{{ "admin.bar.comments.new.badge"|plural(comments.count) }}">
+                  {{ comments.count }}
+                </span>
+                {% endif %}
+              </a>
+            </li>
+
+            {% if edit.url %}
+              <li>
+                <a href="{{ edit.url }}">
+                  <i class="material-icons left tiny">mode_edit</i>
+                  {{ "admin.bar.edit"|i18n }}
+                </a>
+              </li>
+            {% endif %}
+
+          </ul>
+
+
+
+
+          {#<ul class="right hide-on-med-and-down">#}
+            {#<li><a href="sass.html"><i class="material-icons">search</i></a></li>#}
+            {#<li><a href="badges.html"><i class="material-icons">view_module</i></a></li>#}
+            {#<li><a href="collapsible.html"><i class="material-icons">refresh</i></a></li>#}
+            {#<li>#}
+
+            {#</li>#}
+          {#</ul>#}
+        </div>
+      </div>
+    </nav>
+  </header>
 
 {% endif %}
