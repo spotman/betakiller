@@ -494,6 +494,7 @@ class Model_ContentComment extends TreeModelSingleParentOrm
 
     public function get_comments_ordered_by_path(Model_ContentCommentStatus $status = null, Model_ContentEntity $entity = null, $entity_item_id = null)
     {
+        /** @var \Model_ContentComment $model */
         $model = $this->model_factory();
 
         if ($status) {
@@ -509,6 +510,7 @@ class Model_ContentComment extends TreeModelSingleParentOrm
 
     public function get_latest_comments(Model_ContentCommentStatus $status = null)
     {
+        /** @var \Model_ContentComment $model */
         $model = $this->model_factory();
 
         if ($status) {
@@ -531,6 +533,7 @@ class Model_ContentComment extends TreeModelSingleParentOrm
 
     public function get_comments_count(Model_ContentCommentStatus $status = null, Model_ContentEntity $entity = null, $entity_item_id = null)
     {
+        /** @var \Model_ContentComment $model */
         $model = $this->model_factory();
 
         $model->filter_entity_and_entity_item_id($entity, $entity_item_id);
