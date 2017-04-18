@@ -1,8 +1,9 @@
 <?php
 
-use \BetaKiller\Utils\Kohana\TreeModelSingleParentOrm;
-use \BetaKiller\Content\ImportedFromWordpressInterface;
+use BetaKiller\Content\ImportedFromWordpressInterface;
 use BetaKiller\Helper\SeoMetaInterface;
+use BetaKiller\IFace\Url\UrlParameters;
+use BetaKiller\Utils\Kohana\TreeModelSingleParentOrm;
 
 class Model_ContentCategory extends TreeModelSingleParentOrm implements SeoMetaInterface, ImportedFromWordpressInterface
 {
@@ -162,9 +163,9 @@ class Model_ContentCategory extends TreeModelSingleParentOrm implements SeoMetaI
     }
 
     /**
-     * @param URL_Parameters $parameters
+     * @param UrlParameters $parameters
      */
-    protected function custom_find_by_url_filter(URL_Parameters $parameters)
+    protected function custom_find_by_url_filter(UrlParameters $parameters)
     {
         $parent_category = $parameters->get(self::URL_PARAM);
 

@@ -1,7 +1,8 @@
 <?php
 namespace BetaKiller\IFace;
 
-use BetaKiller\DI\Container;
+use BetaKiller\Factory\NamespaceBasedFactory;
+use BetaKiller\IFace\Widget\WidgetInterface;
 use BetaKiller\Utils\Instance\Cached;
 use BetaKiller\Utils\Kohana\Request;
 use BetaKiller\Utils\Kohana\Response;
@@ -11,15 +12,34 @@ class WidgetFactory
     use Cached;
 
     /**
+     * @var NamespaceBasedFactory
+     */
+    protected $factory;
+
+    /**
+     * WidgetFactory constructor.
+     *
+     * @param \BetaKiller\Factory\NamespaceBasedFactory $factory
+     */
+    public function __construct(NamespaceBasedFactory $factory)
+    {
+        $this->factory = $factory
+            ->setClassPrefixes('Widget')
+            ->setClassSuffix('Widget')
+            ->setExpectedInterface(WidgetInterface::class);
+    }
+
+    /**
      * @param               $name
      * @param Request|NULL  $request
      * @param Response|NULL $response
      *
-     * @return Widget
+     * @return WidgetInterface
      */
-    public function create($name, Request $request = NULL, Response $response = NULL)
+    public function create($name, Request $request = null, Response $response = null)
     {
-        $class_name = static::get_class_prefix().$name;
+        /** @var WidgetInterface $object */
+        $object = $this->factory->create($name);
 
         // Getting current request if none provided
         $request = $request ?: Request::current();
@@ -27,22 +47,11 @@ class WidgetFactory
         // Creating empty response if none provided
         $response = $response ?: Response::factory();
 
-        if (!class_exists($class_name)) {
-            $class_name = \Widget_Default::class;
-        }
-
-        /** @var Widget $object */
-        $object = Container::instance()->get($class_name);
-
         $object
             ->setName($name)
             ->setRequest($request)
             ->setResponse($response);
-        return $object;
-    }
 
-    protected static function get_class_prefix()
-    {
-        return 'Widget_';
+        return $object;
     }
 }

@@ -9,7 +9,7 @@ class PostItem extends AdminBase
      *
      * @return array
      */
-    public function get_data()
+    public function getData()
     {
         $post = $this->url_parameter_content_post();
 
@@ -34,8 +34,8 @@ class PostItem extends AdminBase
                 'uri'           =>  $post->get_uri(),
                 'label'         =>  $post->get_label(),
                 'content'       =>  $post->get_content(),
-                'title'         =>  $post->get_title(),
-                'description'   =>  $post->get_description(),
+                'title'         =>  $post->getTitle(),
+                'description'   =>  $post->getDescription(),
 
                 'transitions'   =>  $post->get_allowed_target_transitions_codenames(),
 

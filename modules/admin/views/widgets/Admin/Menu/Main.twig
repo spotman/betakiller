@@ -1,5 +1,17 @@
-<ul>
-    {% for item in items %}
-    <li class="{{ item.active ? 'active' : '' }}"><a href="{{ item.url }}">{{ item.label }}</a></li>
-    {% endfor %}
+<ul id="admin-main-menu-widget">
+  {% for item in items %}
+    <li class="{{ item.active ? 'active' : '' }}">
+      <a href="{{ item.url }}">{{ item.label }}</a>
+      {% if item.children and item.children|length > 0 %}
+        <ul>
+          {% for child in item.children %}
+            <li class="{{ child.active ? 'active' : '' }}">
+              <a href="{{ child.url }}">{{ child.label }}</a>
+            </li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    </li>
+    <li><div class="divider"></div></li>
+  {% endfor %}
 </ul>

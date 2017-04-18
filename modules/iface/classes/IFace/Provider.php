@@ -1,6 +1,7 @@
 <?php
 
 use BetaKiller\Factory\NamespaceBasedFactory;
+use BetaKiller\IFace\Exception\IFaceException;
 use BetaKiller\IFace\IFaceInterface;
 use BetaKiller\IFace\IFaceModelInterface;
 
@@ -69,7 +70,7 @@ class IFace_Provider
     // TODO Move to IFaceFactory
     protected function iface_factory(IFaceModelInterface $model)
     {
-        $codename = $model->get_codename();
+        $codename = $model->getCodename();
 
         /** @var \BetaKiller\IFace\IFaceInterface $object */
         $object = $this->_factory
@@ -77,7 +78,7 @@ class IFace_Provider
             ->setExpectedInterface(IFaceInterface::class)
             ->create($codename);
 
-        $object->set_model($model);
+        $object->setModel($model);
 
         return $object;
     }
@@ -95,17 +96,17 @@ class IFace_Provider
      * @param IFaceInterface $parent_iface
      *
      * @return IFaceModelInterface[]
-     * @throws IFace_Exception
+     * @throws IFaceException
      */
     public function get_models_layer(IFaceInterface $parent_iface = null)
     {
-        $parent_iface_model = $parent_iface ? $parent_iface->get_model() : null;
+        $parent_iface_model = $parent_iface ? $parent_iface->getModel() : null;
 
         $layer = $this->model_provider()->get_layer($parent_iface_model);
 
         if (!$layer) {
-            throw new IFace_Exception('Empty layer for :codename IFace',
-                [':codename' => $parent_iface->get_codename()]
+            throw new IFaceException('Empty layer for :codename IFace',
+                [':codename' => $parent_iface->getCodename()]
             );
         }
 
@@ -126,7 +127,7 @@ class IFace_Provider
      */
     public function get_parent(\BetaKiller\IFace\IFaceInterface $iface)
     {
-        $model        = $iface->get_model();
+        $model        = $iface->getModel();
         $parent_model = $this->model_provider()->get_parent($model);
 
         return $parent_model
@@ -141,7 +142,7 @@ class IFace_Provider
      */
     public function from_model(IFaceModelInterface $model)
     {
-        $codename = $model->get_codename();
+        $codename = $model->getCodename();
         $iface    = $this->get_cache($codename);
 
         if (!$iface) {

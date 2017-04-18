@@ -1,25 +1,13 @@
 <?php
 namespace BetaKiller\IFace\Admin\Content;
 
-class CommentIndex extends AdminBase
+class CommentIndex extends AbstractCommentList
 {
     /**
-     * Returns data for View
-     * Override this method in child classes
+     * @return \Model_ContentComment[]
      */
-    public function get_data()
+    protected function get_comments_list()
     {
-        // Redirect to pending comments
-
-        $status = $this->model_factory_content_comment_status()->get_pending_status();
-
-        /** @var CommentListByStatus $iface */
-        $iface = $this->iface_from_codename('Admin_Content_CommentListByStatus');
-
-        $params = $this->url_parameters_instance()->set($status::URL_PARAM, $status);
-
-        $url = $iface->url($params);
-
-        $this->redirect($url);
+        return $this->model_factory_content_comment()->get_latest_comments();
     }
 }

@@ -1,9 +1,9 @@
 <?php
 
 use BetaKiller\Config\ConfigInterface;
-use BetaKiller\IFace\Widget\Exception;
+use BetaKiller\IFace\Widget\WidgetException;
 
-class Widget_Auth extends \BetaKiller\IFace\Widget
+class Widget_Auth extends \BetaKiller\IFace\Widget\BaseWidget
 {
     const PROVIDER_REGULAR = 'regular';
     const PROVIDER_ULOGIN = 'uLogin';
@@ -18,9 +18,9 @@ class Widget_Auth extends \BetaKiller\IFace\Widget
      * Returns data for View rendering
      *
      * @return array
-     * @throws Exception
+     * @throws WidgetException
      */
-    public function get_data()
+    public function getData()
     {
         // TODO DI
         $this->_config = \BetaKiller\DI\Container::instance()->get(ConfigInterface::class);
@@ -28,7 +28,7 @@ class Widget_Auth extends \BetaKiller\IFace\Widget
         $providers = $this->_config->load(['auth', 'providers']);
 
         if (!$providers) {
-            throw new Exception('No auth providers specified in config');
+            throw new WidgetException('No auth providers specified in config');
         }
 
         return [

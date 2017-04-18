@@ -1,15 +1,15 @@
 <?php
 namespace BetaKiller\IFace;
 
+use BetaKiller\IFace\Url\UrlParameters;
 use BetaKiller\Helper\SeoMetaInterface;
-use URL_Parameters;
 
 interface IFaceInterface extends SeoMetaInterface
 {
     /**
      * @return string
      */
-    public function get_codename();
+    public function getCodename();
 
     /**
      * @return string
@@ -19,35 +19,37 @@ interface IFaceInterface extends SeoMetaInterface
     /**
      * @return string
      */
-    public function get_layout_codename();
+    public function getLayoutCodename();
 
     /**
      * Returns processed label
      *
+     * @param UrlParameters|null $params
+     *
      * @return string
      */
-    public function get_label();
+    public function getLabel(UrlParameters $params = null);
 
     /**
      * Returns label source/pattern
      *
      * @return string
      */
-    public function get_label_source();
+    public function getLabelSource();
 
     /**
      * Returns title source/pattern
      *
      * @return string
      */
-    public function get_title_source();
+    public function getTitleSource();
 
     /**
      * Returns description source/pattern
      *
      * @return string
      */
-    public function get_description_source();
+    public function getDescriptionSource();
 
     /**
      * Returns data for View
@@ -55,7 +57,7 @@ interface IFaceInterface extends SeoMetaInterface
      *
      * @return array
      */
-    public function get_data();
+    public function getData();
 
     /**
      * @param \DateTime|NULL $last_modified
@@ -119,21 +121,21 @@ interface IFaceInterface extends SeoMetaInterface
     /**
      * @return IFaceInterface
      */
-    public function get_parent();
+    public function getParent();
 
     /**
      * @param \BetaKiller\IFace\IFaceInterface $parent
      *
      * @return $this
      */
-    public function set_parent(IFaceInterface $parent);
+    public function setParent(IFaceInterface $parent);
 
     /**
      * Getter for current iface model
      *
      * @return IFaceModelInterface
      */
-    public function get_model();
+    public function getModel();
 
     /**
      * Setter for current iface model
@@ -141,43 +143,43 @@ interface IFaceInterface extends SeoMetaInterface
      * @param IFaceModelInterface $model
      * @return $this
      */
-    public function set_model(IFaceModelInterface $model);
+    public function setModel(IFaceModelInterface $model);
 
     /**
      * @return bool
      */
-    public function is_default();
+    public function isDefault();
 
     /**
      * @return bool
      */
-    public function is_in_stack();
+    public function isInStack();
 
     /**
-     * @param \URL_Parameters|NULL $parameters
+     * @param \BetaKiller\IFace\Url\UrlParameters|NULL $parameters
      *
      * @return bool
      */
-    public function is_current(URL_Parameters $parameters = NULL);
+    public function isCurrent(UrlParameters $parameters = NULL);
 
     /**
-     * @param \URL_Parameters|NULL  $parameters
-     * @param bool                  $remove_cycling_links
-     * @param bool                  $with_domain
+     * @param \BetaKiller\IFace\Url\UrlParameters|NULL $parameters
+     * @param bool                                     $remove_cycling_links
+     * @param bool                                     $with_domain
      *
      * @return string
      */
-    public function url(URL_Parameters $parameters = NULL, $remove_cycling_links = TRUE, $with_domain = TRUE);
+    public function url(UrlParameters $parameters = NULL, $remove_cycling_links = TRUE, $with_domain = TRUE);
 
     /**
      * @return string
      */
-    public function get_uri();
+    public function getUri();
 
     /**
      * Returns TRUE if trailing slash is needed in url
      *
      * @return bool
      */
-    public function is_trailing_slash_enabled();
+    public function isTrailingSlashEnabled();
 }

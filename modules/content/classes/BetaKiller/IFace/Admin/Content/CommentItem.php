@@ -7,7 +7,7 @@ class CommentItem extends AdminBase
      * Returns data for View
      * Override this method in child classes
      */
-    public function get_data()
+    public function getData()
     {
         $model = $this->url_parameter_content_comment();
 

@@ -1,8 +1,8 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
-use \BetaKiller\IFace\Widget;
+use BetaKiller\IFace\Widget\BaseWidget;
 
-class Widget_Auth_Regular extends Widget
+class Widget_Auth_Regular extends BaseWidget
 {
     /**
      * @var Auth
@@ -50,7 +50,7 @@ class Widget_Auth_Regular extends Widget
         $this->send_json(Response::JSON_SUCCESS);
     }
 
-    public function get_data()
+    public function getData()
     {
         return array(
             'login_url'             =>  $this->get_login_url(),

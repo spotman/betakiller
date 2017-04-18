@@ -1,9 +1,10 @@
 <?php
 
-use BetaKiller\Helper\SeoMetaInterface;
 use BetaKiller\Content\ImportedFromWordpressInterface;
-use BetaKiller\Content\Shortcode;
 use BetaKiller\Content\LinkedContentModelInterface;
+use BetaKiller\Content\Shortcode;
+use BetaKiller\Helper\SeoMetaInterface;
+use BetaKiller\IFace\Url\UrlParameters;
 use BetaKiller\Status\StatusRelatedModelOrm;
 use Spotman\Api\AbstractCrudMethodsModelInterface;
 
@@ -150,7 +151,7 @@ class Model_ContentPost extends StatusRelatedModelOrm
     }
 
     /**
-     * Returns custom key which may be used for storing model in URL_Parameters registry.
+     * Returns custom key which may be used for storing model in UrlParameters registry.
      * Default policy applies if NULL returned.
      *
      * @return string|null
@@ -279,7 +280,7 @@ class Model_ContentPost extends StatusRelatedModelOrm
     {
         $text = $this->get_content();
         $text = strip_tags($text);
-        $text = Shortcode::instance()->strip_tags($text);
+        $text = Shortcode::getInstance()->stripTags($text);
 
         return Text::limit_chars($text, $length, $end_chars, true);
     }
@@ -475,11 +476,11 @@ class Model_ContentPost extends StatusRelatedModelOrm
      * This method allows inheritor to preset linked model in URL parameters
      * It is executed after successful url dispatching
      *
-     * @param URL_Parameters $parameters
+     * @param UrlParameters $parameters
      *
      * @return void
      */
-    public function preset_linked_models(URL_Parameters $parameters)
+    public function preset_linked_models(UrlParameters $parameters)
     {
         $category = $this->get_category();
 
@@ -628,9 +629,9 @@ class Model_ContentPost extends StatusRelatedModelOrm
     }
 
     /**
-     * @param URL_Parameters $parameters
+     * @param UrlParameters $parameters
      */
-    protected function custom_find_by_url_filter(URL_Parameters $parameters)
+    protected function custom_find_by_url_filter(UrlParameters $parameters)
     {
         // Load pages first
         $this->prioritize_by_post_types();

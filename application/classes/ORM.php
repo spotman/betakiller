@@ -1,13 +1,22 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
-use BetaKiller\Utils\Kohana\ORM\OrmInterface;
-use BetaKiller\Utils;
+use BetaKiller\DI\Container;
+use BetaKiller\Factory\OrmFactory;
+use BetaKiller\IFace\Url\UrlDataSourceInterface;
+use BetaKiller\IFace\Url\UrlParameters;
 use BetaKiller\Search\Model\Applicable;
 use BetaKiller\Search\Model\ResultsItem;
+use BetaKiller\Utils;
+use BetaKiller\Utils\Kohana\ORM\OrmInterface;
 use Spotman\Api\ApiResponseItemInterface;
 
-class ORM extends Utils\Kohana\ORM implements ApiResponseItemInterface, URL_DataSourceInterface, Applicable, ResultsItem
+class ORM extends Utils\Kohana\ORM implements ApiResponseItemInterface, UrlDataSourceInterface, Applicable, ResultsItem
 {
+    /**
+     * @var OrmFactory
+     */
+    protected static $_factory_instance;
+
     /**
      * @param string $model
      * @param int|array|null   $id
@@ -19,18 +28,13 @@ class ORM extends Utils\Kohana\ORM implements ApiResponseItemInterface, URL_Data
         // Coz ORM do not cares about letter cases
         $model = str_replace(' ', '_', ucwords(str_replace('_', ' ', $model)));
 
-        // Set class name
-        $class_name = 'Model_'.$model;
-
-        // TODO Create one basic app-namespaced factory and use it in ORM, IFaceFactory, WidgetFactory, etc
-
         // No direct search by ID coz ORM crashes with circular dependencies when extended from TreeModel and initialized with id
 
         /** @var OrmInterface $object */
-        $object = \BetaKiller\DI\Container::instance()->make($class_name);
+        $object = self::getFactory()->create($model);
 
+        // Old Kohana sugar for searching in model
         if (is_array($id)) {
-            // Old Kohana sugar for searching in model
             foreach ($id as $column => $value) {
                 // Passing an array of column => values
                 $object->where($column, '=', $value);
@@ -38,11 +42,30 @@ class ORM extends Utils\Kohana\ORM implements ApiResponseItemInterface, URL_Data
 
             return $object->find();
         }
-        elseif ($id) {
+
+        // Search by ID
+        if ($id) {
             return $object->get_by_id($id, true); // Allow missing elements for BC
-        } else {
-            return $object;
         }
+
+        // Plain model factory
+        return $object;
+    }
+
+    protected static function getFactory()
+    {
+        if (!self::$_factory_instance) {
+            /** @var OrmFactory $factory */
+            $factory = Container::instance()->get(OrmFactory::class);
+
+            $factory
+                ->setExpectedInterface(\Kohana_ORM::class)
+                ->setClassPrefixes('Model');
+
+            self::$_factory_instance = $factory;
+        }
+
+        return self::$_factory_instance;
     }
 
     /**
@@ -71,13 +94,13 @@ class ORM extends Utils\Kohana\ORM implements ApiResponseItemInterface, URL_Data
     /**
      * Performs search for model item where the $key property value is equal to $value
      *
-     * @param string $key
-     * @param string $value
-     * @param URL_Parameters $parameters
+     * @param string        $key
+     * @param string        $value
+     * @param UrlParameters $parameters
      *
-     * @return URL_DataSourceInterface|NULL
+     * @return UrlDataSourceInterface|NULL
      */
-    public function find_by_url_key($key, $value, URL_Parameters $parameters)
+    public function find_by_url_key($key, $value, UrlParameters $parameters)
     {
         // Additional filtering for non-pk keys
         if ( $key != $this->primary_key() )
@@ -91,9 +114,9 @@ class ORM extends Utils\Kohana\ORM implements ApiResponseItemInterface, URL_Data
     }
 
     /**
-     * @param URL_Parameters $parameters
+     * @param UrlParameters $parameters
      */
-    protected function custom_find_by_url_filter(URL_Parameters $parameters)
+    protected function custom_find_by_url_filter(UrlParameters $parameters)
     {
         // Empty by default
     }
@@ -116,13 +139,13 @@ class ORM extends Utils\Kohana\ORM implements ApiResponseItemInterface, URL_Data
     /**
      * Returns list of available items (model records) by $key property
      *
-     * @param string         $key
-     * @param URL_Parameters $parameters
-     * @param int|null       $limit
+     * @param string        $key
+     * @param UrlParameters $parameters
+     * @param int|null      $limit
      *
-     * @return \URL_DataSourceInterface[]
+     * @return \BetaKiller\IFace\Url\UrlDataSourceInterface[]
      */
-    public function get_available_items_by_url_key($key, URL_Parameters $parameters, $limit = NULL)
+    public function get_available_items_by_url_key($key, UrlParameters $parameters, $limit = NULL)
     {
         // Additional filtering for non-pk keys
         if ( $key != $this->primary_key() )
@@ -152,17 +175,17 @@ class ORM extends Utils\Kohana\ORM implements ApiResponseItemInterface, URL_Data
      * This method allows inheritor to preset linked model in URL parameters
      * It is executed after successful url dispatching
      *
-     * @param URL_Parameters $parameters
+     * @param UrlParameters $parameters
      *
      * @return void
      */
-    public function preset_linked_models(URL_Parameters $parameters)
+    public function preset_linked_models(UrlParameters $parameters)
     {
         // Nothing by default
     }
 
     /**
-     * Returns custom key which may be used for storing model in URL_Parameters registry.
+     * Returns custom key which may be used for storing model in UrlParameters registry.
      * Default policy applies if NULL returned.
      *
      * @return string|null

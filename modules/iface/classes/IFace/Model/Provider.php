@@ -1,4 +1,5 @@
 <?php
+use BetaKiller\IFace\Exception\IFaceException;
 use BetaKiller\IFace\IFaceModelInterface;
 
 class IFace_Model_Provider implements IFace_Model_Provider_Interface
@@ -17,7 +18,7 @@ class IFace_Model_Provider implements IFace_Model_Provider_Interface
      * Returns default iface model in current provider
      *
      * @return IFaceModelInterface|null
-     * @throws IFace_Exception
+     * @throws IFaceException
      */
     public function get_default()
     {
@@ -30,7 +31,7 @@ class IFace_Model_Provider implements IFace_Model_Provider_Interface
         }
 
         if (!$model) {
-            throw new IFace_Exception('No default IFace found');
+            throw new IFaceException('No default IFace found');
         }
 
         $this->set_cache($model);
@@ -44,7 +45,7 @@ class IFace_Model_Provider implements IFace_Model_Provider_Interface
      * @param $codename
      *
      * @return IFaceModelInterface|null
-     * @throws IFace_Exception
+     * @throws IFaceException
      */
     public function by_codename($codename)
     {
@@ -58,7 +59,7 @@ class IFace_Model_Provider implements IFace_Model_Provider_Interface
             }
 
             if (!$model) {
-                throw new IFace_Exception('No IFace found by codename :codename', [':codename' => $codename]);
+                throw new IFaceException('No IFace found by codename :codename', [':codename' => $codename]);
             }
 
             $this->set_cache($model);
@@ -108,7 +109,7 @@ class IFace_Model_Provider implements IFace_Model_Provider_Interface
      * Returns list of root elements
      *
      * @return IFaceModelInterface[]
-     * @throws IFace_Exception
+     * @throws IFaceException
      */
     public function get_root()
     {
@@ -119,7 +120,7 @@ class IFace_Model_Provider implements IFace_Model_Provider_Interface
             $root = $source->get_root();
 
             foreach ($root as $item) {
-                $models[$item->get_codename()] = $item;
+                $models[$item->getCodename()] = $item;
             }
         }
 
@@ -136,8 +137,8 @@ class IFace_Model_Provider implements IFace_Model_Provider_Interface
     {
         if (!$this->_sources) {
             $this->_sources = [
-                IFace_Model_Provider_DB::instance(),
-                IFace_Model_Provider_Admin::instance(),
+                IFace_Model_Provider_DB::getInstance(),
+                IFace_Model_Provider_Admin::getInstance(),
             ];
         }
 
@@ -168,6 +169,6 @@ class IFace_Model_Provider implements IFace_Model_Provider_Interface
 
     protected function set_cache(IFaceModelInterface $model)
     {
-        $this->_model_instances[$model->get_codename()] = $model;
+        $this->_model_instances[$model->getCodename()] = $model;
     }
 }

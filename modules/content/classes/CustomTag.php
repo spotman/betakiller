@@ -6,7 +6,7 @@
  * Time: 18:49
  */
 
-use\BetaKiller\IFace\Widget;
+use BetaKiller\IFace\Widget\BaseWidget;
 
 
 class CustomTag
@@ -132,7 +132,7 @@ class CustomTag
     {
         $widget_name = 'CustomTag_'.ucfirst($name);
 
-        $widget = Widget::factory($widget_name);
+        $widget = BaseWidget::factory($widget_name);
 
         $widget->setContext($attributes);
 

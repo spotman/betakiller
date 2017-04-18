@@ -14,7 +14,7 @@ abstract class AbstractPhpExceptionIndex extends ErrorAdminBase
      *
      * @return array
      */
-    public function get_data()
+    public function getData()
     {
         $exceptionsData = [];
 

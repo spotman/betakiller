@@ -48,4 +48,5 @@ return array (
   'Forgot password?' => 'Забыли пароль?',
   'Remember me' => 'Запомнить меня',
   'System error' => 'Системная ошибка',
+  'No class found for :name, tried to autoload :tried' => 'No class found for :name, tried to autoload :tried',
 );

@@ -9,7 +9,7 @@ class Index extends ErrorAdminBase
      *
      * @return array
      */
-    public function get_data()
+    public function getData()
     {
         return [];
     }

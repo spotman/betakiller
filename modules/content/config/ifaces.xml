@@ -7,7 +7,7 @@
 
     <iface uri="comments" codename="Admin_Content_CommentIndex" parentCodename="Admin_Index" title="Admin | Comments" label="Comments">
         <iface uri="by-status" codename="Admin_Content_CommentAggregateByStatus" title="Admin | Comments | Status statistic" label="Stat">
-            <iface uri="{ContentCommentStatus.codename}" codename="Admin_Content_CommentListByStatus" title="Admin | Comments | {ContentCommentStatus.getLabel()}" hasDynamicUrl="true" />
+            <iface uri="{ContentCommentStatus.codename}" codename="Admin_Content_CommentListByStatus" title="Admin | Comments | {ContentCommentStatus.getLabel()}" label="{ContentCommentStatus.getLabel()}" hasDynamicUrl="true" />
         </iface>
         <iface uri="{ContentComment.id}" codename="Admin_Content_CommentItem" title="Admin | Comments | {ContentComment.id}" hasDynamicUrl="true" />
     </iface>

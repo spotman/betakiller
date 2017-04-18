@@ -24,6 +24,8 @@ return array (
   'comment.reply' => 'Ответить',
   'comment.save' => 'Сохранить',
 
+  'comment.list.empty'  =>  'Ура! Здесь пока нет комментариев.',
+
   'comment.status.pending'  => 'Ожидает подтверждения',
   'comment.status.approved' => 'Опубликован',
   'comment.status.spam'     => 'СПАМ',

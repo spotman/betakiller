@@ -291,7 +291,7 @@ class Kohana_ORM extends Model implements Serializable {
 	{
 	    // Replace namespace delimiters with underscore
 	    $class_name = str_replace('\\', '_', get_class($this));
-	    $pos = strrpos($class_name, 'Model_');
+	    $pos = strpos($class_name, 'Model');
 
 	    if ($pos === false) {
             throw new Exception('Incorrect model class naming '.$class_name);
@@ -551,13 +551,20 @@ class Kohana_ORM extends Model implements Serializable {
 	 */
 	public function serialize()
 	{
+	    $data = [];
+
 		// Store only information about the object
-		foreach (array('_primary_key_value', '_object', '_changed', '_loaded', '_saved', '_sorting', '_original_values') as $var)
+		foreach ($this->getSerializableProperties() as $var)
 		{
 			$data[$var] = $this->{$var};
 		}
 
 		return serialize($data);
+	}
+
+    protected function getSerializableProperties()
+    {
+        return ['_primary_key_value', '_object', '_changed', '_loaded', '_saved', '_sorting', '_original_values'];
 	}
 
 	/**

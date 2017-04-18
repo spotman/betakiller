@@ -27,11 +27,11 @@ class UpdateApiMethod extends AbstractModelUpdateApiApiMethod
         }
 
         if (isset($data->title)) {
-            $model->set_title($this->sanitize_string($data->title));
+            $model->setTitle($this->sanitize_string($data->title));
         }
 
         if (isset($data->description)) {
-            $model->set_description($this->sanitize_string($data->description));
+            $model->setDescription($this->sanitize_string($data->description));
         }
 
         if (isset($data->content)) {

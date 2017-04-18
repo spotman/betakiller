@@ -64,6 +64,6 @@ class IFaceModelTree
 
     public function is_admin_model(IFaceModelInterface $model)
     {
-        return $model->get_uri() == 'admin' || ($model instanceof \IFace_Model_Provider_Admin_Model);
+        return $model->getUri() == 'admin' || ($model instanceof \IFace_Model_Provider_Admin_Model);
     }
 }

@@ -19,7 +19,7 @@ class IFace_Auth_Logout extends IFace {
      *
      * @return array
      */
-    public function get_data()
+    public function getData()
     {
         return [];
     }

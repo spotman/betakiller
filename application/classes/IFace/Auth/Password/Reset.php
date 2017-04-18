@@ -7,7 +7,7 @@ class IFace_Auth_Password_Reset extends \BetaKiller\IFace\IFace {
      *
      * @return array
      */
-    public function get_data()
+    public function getData()
     {
         return [];
     }

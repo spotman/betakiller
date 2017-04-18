@@ -1,25 +1,25 @@
 <?php
 
-use BetaKiller\IFace\Widget;
+use BetaKiller\IFace\Widget\BaseWidget;
 
-class Widget_CustomTag_Youtube extends Widget
+class Widget_CustomTag_Youtube extends BaseWidget
 {
     use BetaKiller\Helper\ContentTrait;
 
     /**
      * Returns data for View rendering
      *
-     * @throws Widget\Exception
+     * @throws Widget\WidgetException
      * @return array
      */
-    public function get_data()
+    public function getData()
     {
         $context = $this->getContext();
 
         $video_id = (int) $context['id'];
 
         if (!$video_id)
-            throw new Widget\Exception('No YouTube ID provided');
+            throw new Widget\WidgetException('No YouTube ID provided');
 
         $model = $this->model_factory_content_youtube_record()->get_by_id($video_id);
 

@@ -7,7 +7,7 @@ trait Model_ORM_SeoContentTrait
      * @return $this
      * @throws Kohana_Exception
      */
-    public function set_title($value)
+    public function setTitle($value)
     {
         return $this->set('title', $value);
     }
@@ -16,7 +16,7 @@ trait Model_ORM_SeoContentTrait
      * @return string
      * @throws Kohana_Exception
      */
-    public function get_title()
+    public function getTitle()
     {
         return $this->get('title');
     }
@@ -26,7 +26,7 @@ trait Model_ORM_SeoContentTrait
      * @return $this
      * @throws Kohana_Exception
      */
-    public function set_description($value)
+    public function setDescription($value)
     {
         return $this->set('description', $value);
     }
@@ -35,7 +35,7 @@ trait Model_ORM_SeoContentTrait
      * @return string
      * @throws Kohana_Exception
      */
-    public function get_description()
+    public function getDescription()
     {
         return $this->get('description');
     }

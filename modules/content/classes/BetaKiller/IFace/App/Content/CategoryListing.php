@@ -9,7 +9,7 @@ class CategoryListing extends AppBase
      *
      * @return array
      */
-    public function get_data()
+    public function getData()
     {
         return [
             'categories' => $this->get_categories_data(),

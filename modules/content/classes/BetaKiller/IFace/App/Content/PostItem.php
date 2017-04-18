@@ -30,13 +30,13 @@ class PostItem extends AppBase
      *
      * @return array
      */
-    public function get_data()
+    public function getData()
     {
         $model = $this->get_content_model();
 
 //        if ($model->is_default())
 //        {
-//            $parent = $this->get_parent();
+//            $parent = $this->getParent();
 //            $url = $parent ? $parent->url() : '/';
 //
 //            $this->redirect($url);
@@ -80,7 +80,7 @@ class PostItem extends AppBase
 
     /**
      * @return \Model_ContentPost
-     * @throws \IFace_Exception
+     * @throws \BetaKiller\IFace\Exception\IFaceException
      */
     protected function detect_content_model()
     {

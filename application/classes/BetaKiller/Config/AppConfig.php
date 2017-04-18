@@ -30,7 +30,7 @@ class AppConfig implements AppConfigInterface
      *
      * @return string|null
      */
-    public function get_namespace()
+    public function getNamespace()
     {
         return $this->get(['namespace']);
     }
@@ -40,7 +40,7 @@ class AppConfig implements AppConfigInterface
      *
      * @return bool
      */
-    public function is_trailing_slash_enabled()
+    public function isTrailingSlashEnabled()
     {
         return (bool) $this->get(self::CONFIG_PATH_IS_TRAILING_SLASH_ENABLED);
     }
@@ -48,7 +48,7 @@ class AppConfig implements AppConfigInterface
     /**
      * @return string
      */
-    public function get_circular_link_href()
+    public function getCircularLinkHref()
     {
         return $this->get(self::CONFIG_PATH_CIRCULAR_LINK_HREF);
     }
@@ -67,7 +67,7 @@ class AppConfig implements AppConfigInterface
     /**
      * @return bool
      */
-    public function is_page_cache_enabled()
+    public function isPageCacheEnabled()
     {
         return $this->get(self::CONFIG_PATH_PAGE_CACHE_ENABLED, false);
     }
@@ -75,7 +75,7 @@ class AppConfig implements AppConfigInterface
     /**
      * @return string
      */
-    public function get_page_cache_path()
+    public function getPageCachePath()
     {
         return rtrim($this->get(self::CONFIG_PATH_PAGE_CACHE_PATH), DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR;
     }

@@ -23,8 +23,9 @@ class IFaceFactory
      * Creates IFace instance from it`s codename
      *
      * @param string $codename IFace codename
+     *
      * @return \BetaKiller\IFace\IFaceInterface
-     * @throws \IFace_Exception
+     * @throws \BetaKiller\IFace\Exception\IFaceException
      */
     public function from_codename($codename)
     {

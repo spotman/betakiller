@@ -1,25 +1,25 @@
 <?php
 
-use BetaKiller\IFace\Widget;
+use BetaKiller\IFace\Widget\BaseWidget;
 
-class Widget_CustomTag_Gallery extends Widget
+class Widget_CustomTag_Gallery extends BaseWidget
 {
     use BetaKiller\Helper\ContentTrait;
 
     /**
      * Returns data for View rendering
      *
-     * @throws Widget\Exception
+     * @throws Widget\WidgetException
      * @return array
      */
-    public function get_data()
+    public function getData()
     {
         $context = $this->getContext();
 
         $image_ids = explode(',', $context['ids']);
 
         if (!$image_ids)
-            throw new Widget\Exception('No image IDs provided');
+            throw new Widget\WidgetException('No image IDs provided');
 
         // TODO move to tag-related class CustomTag_Gallery
         $allowed_types = [
@@ -30,7 +30,7 @@ class Widget_CustomTag_Gallery extends Widget
         $type = Arr::get($context, 'type', $allowed_types[0]);
 
         if (!in_array($type, $allowed_types))
-            throw new Widget\Exception('Unknown gallery type :value', [':value' => $type]);
+            throw new Widget\WidgetException('Unknown gallery type :value', [':value' => $type]);
 
         $columns = (int) Arr::get($context, 'columns', 3);
 

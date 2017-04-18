@@ -32,7 +32,7 @@ class Model_IFace extends TreeModelSingleParentOrm implements IFaceModelInterfac
      *
      * @return IFaceModelInterface[]|$this[]
      */
-    function get_children()
+    public function get_children()
     {
         return parent::get_children();
     }
@@ -52,7 +52,7 @@ class Model_IFace extends TreeModelSingleParentOrm implements IFaceModelInterfac
      *
      * @return bool
      */
-    public function is_default()
+    public function isDefault()
     {
         return (bool) $this->get('is_default');
     }
@@ -62,7 +62,7 @@ class Model_IFace extends TreeModelSingleParentOrm implements IFaceModelInterfac
      *
      * @return string
      */
-    public function get_codename()
+    public function getCodename()
     {
         return $this->get('codename');
     }
@@ -72,7 +72,7 @@ class Model_IFace extends TreeModelSingleParentOrm implements IFaceModelInterfac
      *
      * @return string
      */
-    public function get_label()
+    public function getLabel()
     {
         return $this->get('label');
     }
@@ -82,7 +82,7 @@ class Model_IFace extends TreeModelSingleParentOrm implements IFaceModelInterfac
      *
      * @return string
      */
-    public function get_title()
+    public function getTitle()
     {
         return $this->get('title');
     }
@@ -92,7 +92,7 @@ class Model_IFace extends TreeModelSingleParentOrm implements IFaceModelInterfac
      *
      * @return string
      */
-    public function get_description()
+    public function getDescription()
     {
         return $this->get('description');
     }
@@ -102,7 +102,7 @@ class Model_IFace extends TreeModelSingleParentOrm implements IFaceModelInterfac
      *
      * @return string
      */
-    public function get_uri()
+    public function getUri()
     {
         return $this->get('uri');
     }
@@ -122,7 +122,7 @@ class Model_IFace extends TreeModelSingleParentOrm implements IFaceModelInterfac
      *
      * @return string
      */
-    public function get_layout_codename()
+    public function getLayoutCodename()
     {
         $layout = $this->get_layout();
 
@@ -139,7 +139,7 @@ class Model_IFace extends TreeModelSingleParentOrm implements IFaceModelInterfac
      *
      * @return bool
      */
-    public function has_dynamic_url()
+    public function hasDynamicUrl()
     {
         return (bool) $this->get('is_dynamic');
     }
@@ -149,7 +149,7 @@ class Model_IFace extends TreeModelSingleParentOrm implements IFaceModelInterfac
      *
      * @return bool
      */
-    public function has_tree_behaviour()
+    public function hasTreeBehaviour()
     {
         return (bool) $this->get('is_tree');
     }
@@ -157,7 +157,7 @@ class Model_IFace extends TreeModelSingleParentOrm implements IFaceModelInterfac
     /**
      * @return bool
      */
-    public function hide_in_site_map()
+    public function hideInSiteMap()
     {
         return (bool) $this->get('hide_in_site_map');
     }
@@ -169,7 +169,7 @@ class Model_IFace extends TreeModelSingleParentOrm implements IFaceModelInterfac
      *
      * @return $this
      */
-    public function set_title($value)
+    public function setTitle($value)
     {
         return $this->set('title', (string) $value);
     }
@@ -181,9 +181,19 @@ class Model_IFace extends TreeModelSingleParentOrm implements IFaceModelInterfac
      *
      * @return $this
      */
-    public function set_description($value)
+    public function setDescription($value)
     {
         return $this->set('description', (string) $value);
+    }
+
+    /**
+     * Returns array representation of the model data
+     *
+     * @return array
+     */
+    public function asArray()
+    {
+        return $this->as_array();
     }
 
     /**

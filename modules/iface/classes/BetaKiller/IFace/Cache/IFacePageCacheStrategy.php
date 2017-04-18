@@ -1,31 +1,31 @@
 <?php
 namespace BetaKiller\IFace\Cache;
 
-use BetaKiller\IFace\IFace;
-use PageCache\StrategyInterface;
+use BetaKiller\IFace\IFaceInterface;
 use PageCache\SessionHandler;
+use PageCache\StrategyInterface;
 
 class IFacePageCacheStrategy implements StrategyInterface
 {
     /**
-     * @var IFace
+     * @var IFaceInterface
      */
     protected $iface;
 
     /**
-     * @var \URL_Parameters
+     * @var \BetaKiller\IFace\Url\UrlParameters
      */
     protected $params;
 
     /**
      * IFacePageCacheStrategy constructor.
      *
-     * @param IFace                 $iface
-     * @param \URL_Parameters|null  $params
+     * @param IFaceInterface                           $iface
+     * @param \BetaKiller\IFace\Url\UrlParameters|null $params
      */
-    public function __construct(IFace $iface, \URL_Parameters $params = null)
+    public function __construct(IFaceInterface $iface, \BetaKiller\IFace\Url\UrlParameters $params = null)
     {
-        $this->iface = $iface;
+        $this->iface  = $iface;
         $this->params = $params;
     }
 
@@ -39,7 +39,7 @@ class IFacePageCacheStrategy implements StrategyInterface
         //when session support is enabled add that to file name
         $session_str = SessionHandler::process();
 
-        $uri = $this->iface->url($this->params, FALSE, FALSE);
+        $uri = $this->iface->url($this->params, false, false);
 
         return md5($session_str.$uri);
     }

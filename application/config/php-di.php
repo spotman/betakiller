@@ -4,14 +4,21 @@ use BetaKiller\Acl\PermissionsCollector;
 use BetaKiller\Acl\ResourceFactory;
 use BetaKiller\Acl\ResourcesCollector;
 use BetaKiller\Acl\RolesCollector;
+use BetaKiller\Factory\CommonFactoryCache;
+use BetaKiller\Factory\FactoryCacheInterface;
 use BetaKiller\Factory\NamespaceBasedFactory;
+use BetaKiller\IFace\View\IFaceView;
+use BetaKiller\IFace\View\LayoutView;
+use BetaKiller\IFace\View\WrapperView;
 use BetaKiller\Model\GuestUser;
-use BetaKiller\View\ViewIFaceTwig;
-use BetaKiller\View\ViewLayoutTwig;
-use BetaKiller\View\ViewWrapperTwig;
+use BetaKiller\View\IFaceViewTwig;
+use BetaKiller\View\LayoutViewTwig;
+use BetaKiller\View\WrapperViewTwig;
+use DI\Scope;
 use Doctrine\Common\Cache\ArrayCache;
 use Doctrine\Common\Cache\ChainCache;
 use Doctrine\Common\Cache\FilesystemCache;
+use Doctrine\Common\Cache\PhpFileCache;
 use Psr\Log\LoggerInterface;
 use Spotman\Acl\Acl;
 use Spotman\Acl\PermissionsCollector\PermissionsCollectorInterface;
@@ -40,16 +47,21 @@ return [
     'definitions' => [
 
         // Always create new instance of this factory
-        NamespaceBasedFactory::class             => DI\object(NamespaceBasedFactory::class)->scope(\DI\Scope::PROTOTYPE),
+        NamespaceBasedFactory::class             => DI\object(NamespaceBasedFactory::class)->scope(Scope::PROTOTYPE),
+
+        // Single cache instance for whole project
+        FactoryCacheInterface::class             => DI\factory(function () use ($site_path) {
+            return new CommonFactoryCache([
+                new PhpFileCache(implode(DIRECTORY_SEPARATOR, [$site_path, 'cache', 'factory'])),
+            ]);
+        })->scope(Scope::SINGLETON),
 
         // Inject container into factories
         \BetaKiller\DI\ContainerInterface::class => DI\factory(function () {
             return \BetaKiller\DI\Container::instance();
         }),
 
-        LoggerInterface::class => DI\factory(function () {
-            return \BetaKiller\Log\Logger::getInstance();
-        })->scope(\DI\Scope::SINGLETON),
+        LoggerInterface::class => DI\object(\BetaKiller\Log\Logger::class),
 
         Auth::class => DI\factory(function () {
             return Auth::instance();
@@ -87,9 +99,9 @@ return [
         ResourceFactoryInterface::class        => DI\object(ResourceFactory::class),
 
         // Use Twig in ifaces and layouts
-        View_IFace::class                      => DI\object(ViewIFaceTwig::class),
-        View_Layout::class                     => DI\object(ViewLayoutTwig::class),
-        View_Wrapper::class                    => DI\object(ViewWrapperTwig::class),
+        IFaceView::class                       => DI\object(IFaceViewTwig::class),
+        LayoutView::class                      => DI\object(LayoutViewTwig::class),
+        WrapperView::class                     => DI\object(WrapperViewTwig::class),
 
     ],
 

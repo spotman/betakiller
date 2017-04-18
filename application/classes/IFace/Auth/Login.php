@@ -49,7 +49,7 @@ class IFace_Auth_Login extends IFace
         }
     }
 
-    public function get_data()
+    public function getData()
     {
         return array(
             'redirect_url'  => $this->_redirect_url
@@ -69,13 +69,13 @@ class IFace_Auth_Login extends IFace
         return $this->redirect_to($url);
     }
 
-    public function get_uri()
+    public function getUri()
     {
         $redirect_query = $this->_redirect_url
             ? '?'.$this->_redirect_url_query_param.'='.urlencode($this->_redirect_url)
             : NULL;
 
-        return parent::get_uri().$redirect_query;
+        return parent::getUri().$redirect_query;
     }
 
 }

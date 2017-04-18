@@ -4,22 +4,22 @@ namespace BetaKiller\Helper;
 use BetaKiller\DI\ContainerTrait;
 use BetaKiller\IFace\IFaceFactory;
 use BetaKiller\IFace\IFaceModelInterface;
-use BetaKiller\IFace\Widget;
+use BetaKiller\IFace\Widget\BaseWidget;
 
 trait IFaceTrait
 {
     use ContainerTrait;
 
     /**
-     * @return \URL_Dispatcher
+     * @return \BetaKiller\IFace\Url\UrlDispatcher
      */
     protected function url_dispatcher()
     {
-        return $this->getContainer()->get(\URL_Dispatcher::class);
+        return $this->getContainer()->get(\BetaKiller\IFace\Url\UrlDispatcher::class);
     }
 
     /**
-     * @return \URL_Parameters
+     * @return \BetaKiller\IFace\Url\UrlParameters
      */
     protected function url_parameters()
     {
@@ -27,16 +27,17 @@ trait IFaceTrait
     }
 
     /**
-     * @return \URL_Parameters
+     * @return \BetaKiller\IFace\Url\UrlParameters
      */
     protected function url_parameters_instance()
     {
-        return $this->getContainer()->get(\URL_Parameters::class);
+        return $this->getContainer()->get(\BetaKiller\IFace\Url\UrlParameters::class);
     }
 
     /**
      * @param $codename
      * @return \BetaKiller\IFace\IFaceInterface
+     * @deprecated Use DI for injecting IFaceFactory instead
      */
     protected function iface_from_codename($codename)
     {
@@ -46,6 +47,7 @@ trait IFaceTrait
     /**
      * @param $model \BetaKiller\IFace\IFaceModelInterface
      * @return \BetaKiller\IFace\IFaceInterface
+     * @deprecated Use DI for injecting IFaceFactory instead
      */
     protected function iface_from_model(IFaceModelInterface $model)
     {
@@ -54,10 +56,11 @@ trait IFaceTrait
 
     /**
      * @param $name
-     * @return \BetaKiller\IFace\Widget
+     * @return \BetaKiller\IFace\Widget\WidgetInterface
+     * @deprecated Use DI for injecting WidgetFactory instead
      */
     protected function widget_factory($name)
     {
-        return Widget::factory($name);
+        return BaseWidget::factory($name);
     }
 }

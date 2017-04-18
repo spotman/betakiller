@@ -1,8 +1,8 @@
 <?php
 
-use BetaKiller\IFace\Widget;
+use BetaKiller\IFace\Widget\BaseWidget;
 
-class Widget_Content_Quotes extends Widget
+class Widget_Content_Quotes extends BaseWidget
 {
     use \BetaKiller\Helper\ContentTrait;
 
@@ -11,7 +11,7 @@ class Widget_Content_Quotes extends Widget
      *
      * @return array
      */
-    public function get_data()
+    public function getData()
     {
         return $this->get_quote_data();
     }

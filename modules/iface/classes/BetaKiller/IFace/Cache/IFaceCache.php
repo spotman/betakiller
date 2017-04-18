@@ -2,8 +2,7 @@
 namespace BetaKiller\IFace\Cache;
 
 use BetaKiller\Config\AppConfigInterface;
-use BetaKiller\IFace\IFace;
-//use BetaKiller\IFace\IFaceRelatedModelInterface;
+use BetaKiller\IFace\IFaceInterface;
 use PageCache\PageCache;
 
 class IFaceCache
@@ -20,11 +19,11 @@ class IFaceCache
 
     public function __construct(AppConfigInterface $config)
     {
-        $this->enabled = $config->is_page_cache_enabled();
+        $this->enabled = $config->isPageCacheEnabled();
 
         $this->pageCache = new PageCache;
 
-        $this->pageCache->setPath($config->get_page_cache_path());
+        $this->pageCache->setPath($config->getPageCachePath());
         // $this->pageCache->enableLog();
         // $this->pageCache->setLogFilePath("/tmp/page-cache.log");
     }
@@ -42,7 +41,7 @@ class IFaceCache
         $this->pageCache->clearCache();
     }
 
-    public function process(IFace $iface)
+    public function process(IFaceInterface $iface)
     {
         if (!$this->enabled) {
             return;
@@ -62,7 +61,7 @@ class IFaceCache
         $this->pageCache->init();
     }
 
-    protected function applyIFaceStrategy(IFace $iface)
+    protected function applyIFaceStrategy(IFaceInterface $iface)
     {
         $strategy = $this->ifacePageCacheStrategyFactory($iface);
         $this->pageCache->setStrategy($strategy);
@@ -70,7 +69,7 @@ class IFaceCache
         return $this;
     }
 
-    protected function ifacePageCacheStrategyFactory(IFace $iface)
+    protected function ifacePageCacheStrategyFactory(IFaceInterface $iface)
     {
         return new IFacePageCacheStrategy($iface);
     }

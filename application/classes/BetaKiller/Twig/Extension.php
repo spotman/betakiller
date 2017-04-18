@@ -114,7 +114,7 @@ class BetaKiller_Twig_Extension extends Twig_Extension
                 function() {
                     return $this->url_dispatcher()
                         ->currentIFace()
-                        ->get_parent()
+                        ->getParent()
                         ->url($this->url_parameters());
                 }
             ),

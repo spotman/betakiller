@@ -1,5 +1,6 @@
 <?php
 
+use BetaKiller\IFace\Exception\IFaceException;
 use BetaKiller\IFace\IFaceModelInterface;
 
 class IFace_Model_Provider_Admin extends IFace_Model_Provider_Abstract {
@@ -14,7 +15,7 @@ class IFace_Model_Provider_Admin extends IFace_Model_Provider_Abstract {
         $config_files = Kohana::find_file('config', 'ifaces', 'xml');
 
         if (!$config_files) {
-            throw new IFace_Exception('Missing admin config file');
+            throw new IFaceException('Missing admin config file');
         }
 
         foreach ($config_files as $file) {
@@ -51,7 +52,7 @@ class IFace_Model_Provider_Admin extends IFace_Model_Provider_Abstract {
 
         if ( (!isset($config['parentCodename']) OR !$config['parentCodename']) AND $parent_model )
         {
-            $config['parentCodename'] = $parent_model->get_codename();
+            $config['parentCodename'] = $parent_model->getCodename();
         }
 
         return $this->model_factory($config);
@@ -68,14 +69,14 @@ class IFace_Model_Provider_Admin extends IFace_Model_Provider_Abstract {
 
     protected function set_model(IFaceModelInterface $model)
     {
-        $codename = $model->get_codename();
+        $codename = $model->getCodename();
         $this->_models[$codename] = $model;
     }
 
     protected function get_model($codename)
     {
         if ( ! $this->has_model($codename) )
-            throw new IFace_Exception('Unknown codename :codename', array(':codename' => $codename));
+            throw new IFaceException('Unknown codename :codename', array(':codename' => $codename));
 
         return $this->_models[$codename];
     }
@@ -118,7 +119,7 @@ class IFace_Model_Provider_Admin extends IFace_Model_Provider_Abstract {
         {
             return $this->get_model($codename);
         }
-        catch ( IFace_Exception $e )
+        catch ( IFaceException $e )
         {
             return NULL;
         }
@@ -132,7 +133,7 @@ class IFace_Model_Provider_Admin extends IFace_Model_Provider_Abstract {
      */
     public function get_childs(IFace_Model_Provider_Admin_Model $parent_model = NULL)
     {
-        $parent_codename = $parent_model ? $parent_model->get_codename() : NULL;
+        $parent_codename = $parent_model ? $parent_model->getCodename() : NULL;
 
         $models = array();
 

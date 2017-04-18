@@ -9,7 +9,7 @@ class CategoryItem extends AppBase
      *
      * @return array
      */
-    public function get_data()
+    public function getData()
     {
         $category = $this->url_parameter_content_category();
 

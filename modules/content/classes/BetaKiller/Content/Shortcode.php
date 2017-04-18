@@ -11,17 +11,12 @@ class Shortcode
 {
     use \BetaKiller\Utils\Instance\Cached;
 
-    /**
-     * Shortcode constructor.
-     */
-    protected function __construct() {}
-
     public function process($text)
     {
         $handlers = new HandlerContainer();
 
         $handlers->setDefault(function(ShortcodeInterface $s) {
-            return $this->render_shortcode($s->getName());
+            return $this->render($s->getName());
         });
 
         $processor = new Processor(new RegularParser(), $handlers);
@@ -29,18 +24,19 @@ class Shortcode
         return $processor->process($text);
     }
 
-    protected function render_shortcode($name)
+    protected function render($name)
     {
         $name = 'Shortcode_'.str_replace('-', '_', $name);
 
         // Make every word uppercase (like in other widgets)
         $name = implode('_', array_map('ucfirst', explode('_', $name)));
 
-        $widget = WidgetFactory::instance()->create($name);
+        $widget = WidgetFactory::getInstance()->create($name);
+
         return $widget->render();
     }
 
-    public function strip_tags($text)
+    public function stripTags($text)
     {
         $pattern = '/[[\/\!]*?[^\[\]]*?]/si';
         return preg_replace($pattern, '', $text);

@@ -1,22 +1,25 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
 use BetaKiller\IFace\IFaceModelInterface;
+use BetaKiller\IFace\Url\UrlDispatcher;
+use BetaKiller\IFace\Url\UrlParameters;
+use BetaKiller\IFace\Url\UrlPrototype;
 use BetaKiller\Service;
 use BetaKiller\Service\ServiceException;
-use samdark\sitemap\Sitemap;
 use samdark\sitemap\Index;
+use samdark\sitemap\Sitemap;
 
 class Service_Sitemap extends Service
 {
     use BetaKiller\Helper\IFaceTrait;
 
     /**
-     * @var URL_Parameters
+     * @var UrlParameters
      */
     protected $_url_parameters;
 
     /**
-     * @var URL_Dispatcher
+     * @var UrlDispatcher
      */
     protected $_url_dispatcher;
 
@@ -37,11 +40,12 @@ class Service_Sitemap extends Service
 
     /**
      * Service_Sitemap constructor.
-     * @param URL_Parameters $_url_parameters
-     * @param URL_Dispatcher $_url_dispatcher
+     *
+     * @param UrlParameters        $_url_parameters
+     * @param UrlDispatcher        $_url_dispatcher
      * @param IFace_Model_Provider $_iface_model_provider
      */
-    public function __construct(URL_Parameters $_url_parameters, URL_Dispatcher $_url_dispatcher, IFace_Model_Provider $_iface_model_provider)
+    public function __construct(UrlParameters $_url_parameters, UrlDispatcher $_url_dispatcher, IFace_Model_Provider $_iface_model_provider)
     {
         $this->_url_parameters       = $_url_parameters;
         $this->_url_dispatcher       = $_url_dispatcher;
@@ -96,15 +100,15 @@ class Service_Sitemap extends Service
         foreach ($iface_models as $iface_model)
         {
             // Skip hidden ifaces
-            if ( $iface_model->hide_in_site_map() )
+            if ( $iface_model->hideInSiteMap() )
                 continue;
 
-            if ( $iface_model->has_dynamic_url()  )
+            if ( $iface_model->hasDynamicUrl()  )
             {
-                $prototype = URL_Prototype::instance()->parse($iface_model->get_uri());
+                $prototype = UrlPrototype::instance()->parse($iface_model->getUri());
 
-                $model_name = $prototype->get_model_name();
-                $model_key = $prototype->get_model_key();
+                $model_name = $prototype->getModelName();
+                $model_key = $prototype->getModelKey();
 
                 $items = $this->model_factory($model_name)
                     ->get_available_items_by_url_key($model_key, $this->_url_parameters);

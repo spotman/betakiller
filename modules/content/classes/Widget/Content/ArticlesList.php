@@ -1,8 +1,8 @@
 <?php
 
-use BetaKiller\IFace\Widget;
+use BetaKiller\IFace\Widget\BaseWidget;
 
-class Widget_Content_ArticlesList extends Widget
+class Widget_Content_ArticlesList extends BaseWidget
 {
     use \BetaKiller\Helper\ContentTrait;
 
@@ -17,7 +17,7 @@ class Widget_Content_ArticlesList extends Widget
      *
      * @return array
      */
-    public function get_data()
+    public function getData()
     {
         return $this->get_articles_data();
     }
@@ -56,7 +56,7 @@ class Widget_Content_ArticlesList extends Widget
                 'thumbnail'     =>  $thumbnail->get_attributes_for_img_tag($thumbnail_size),
                 'url'           =>  $article->get_public_url(),
                 'label'         =>  $article->get_label(),
-                'title'         =>  $article->get_title(),
+                'title'         =>  $article->getTitle(),
                 'text'          =>  $article->get_content_preview(),
                 'created_at'    =>  $article->get_created_at()->format("d.m.Y"),
             ];

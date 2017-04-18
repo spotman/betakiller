@@ -9,7 +9,7 @@ class PostIndex extends AdminBase
      *
      * @return array
      */
-    public function get_data()
+    public function getData()
     {
         $articles = $this->model_factory_content_post()->get_all_articles();
 

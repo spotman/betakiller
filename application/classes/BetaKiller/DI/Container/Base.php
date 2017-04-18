@@ -24,6 +24,7 @@ abstract class Base implements ContainerInterface
 
     /**
      * @return ContainerInterface
+     * @deprecated Bad practice, use DI in constructor instead
      */
     public static function instance()
     {

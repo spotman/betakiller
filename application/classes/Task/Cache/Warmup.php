@@ -1,5 +1,6 @@
 <?php
 use BetaKiller\IFace\IFaceModelTree;
+use BetaKiller\IFace\Url\UrlParameters;
 
 class Task_Cache_Warmup extends Minion_Task
 {
@@ -11,11 +12,11 @@ class Task_Cache_Warmup extends Minion_Task
     protected $_tree;
 
     /**
-     * @var \URL_Dispatcher
+     * @var \BetaKiller\IFace\Url\UrlDispatcher
      */
     protected $_dispatcher;
 
-    public function __construct(IFaceModelTree $tree, \URL_Dispatcher $dispatcher)
+    public function __construct(IFaceModelTree $tree, \BetaKiller\IFace\Url\UrlDispatcher $dispatcher)
     {
         $this->_tree = $tree;
         $this->_dispatcher = $dispatcher;
@@ -35,20 +36,20 @@ class Task_Cache_Warmup extends Minion_Task
         // For each IFace
         foreach ($iterator as $iface_model)
         {
-            $this->debug('Found IFace :codename', [':codename' => $iface_model->get_codename()]);
+            $this->debug('Found IFace :codename', [':codename' => $iface_model->getCodename()]);
 
             try {
                 $this->process_iface($iface_model, $parameters);
             } catch (Exception $e) {
                 $this->warning('Exception thrown for :iface with message :text', [
-                    ':iface'    => $iface_model->get_codename(),
+                    ':iface'    => $iface_model->getCodename(),
                     ':text'     => $e->getMessage(),
                 ]);
             }
         }
     }
 
-    protected function process_iface(\BetaKiller\IFace\IFaceModelInterface $iface_model, URL_Parameters $params)
+    protected function process_iface(\BetaKiller\IFace\IFaceModelInterface $iface_model, UrlParameters $params)
     {
         $urls = $this->_dispatcher->get_iface_model_available_urls($iface_model, $params, 1, FALSE);
         $this->debug(PHP_EOL.implode(PHP_EOL, $urls).PHP_EOL);

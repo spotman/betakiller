@@ -9,7 +9,7 @@ class PostSearch extends AppBase
      *
      * @return array
      */
-    public function get_data()
+    public function getData()
     {
         return [
             'term'  =>  \HTML::chars(strip_tags($this->getUrlQuery('term'))),

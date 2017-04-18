@@ -2,10 +2,10 @@
 
 use BetaKiller\Helper\ContentTrait;
 use BetaKiller\Helper\CurrentUserTrait;
-use BetaKiller\IFace\Widget;
-use BetaKiller\IFace\Widget\Exception;
+use BetaKiller\IFace\Widget\BaseWidget;
+use BetaKiller\IFace\Widget\WidgetException;
 
-class Widget_Content_Comments extends Widget
+class Widget_Content_Comments extends BaseWidget
 {
     use ContentTrait,
         CurrentUserTrait;
@@ -14,19 +14,19 @@ class Widget_Content_Comments extends Widget
      * Returns data for View rendering
      *
      * @return array
-     * @throws Exception
+     * @throws WidgetException
      */
-    public function get_data()
+    public function getData()
     {
         $entitySlug = $this->getContextParam('entity');
         $entityItemId = (int) $this->getContextParam('entityItemId');
 
         if (!$entitySlug) {
-            throw new Exception('[entity] must be provided via widget context');
+            throw new WidgetException('[entity] must be provided via widget context');
         }
 
         if (!$entityItemId) {
-            throw new Exception('[entity_item_id] must be provided via widget context');
+            throw new WidgetException('[entity_item_id] must be provided via widget context');
         }
 
         $entity = $this->model_factory_content_entity()->find_by_slug($entitySlug);
@@ -71,11 +71,11 @@ class Widget_Content_Comments extends Widget
         $entityItemId = $this->post('entityItemId');
 
         if (!$entitySlug) {
-            throw new Exception('[entity] must be provided via request');
+            throw new WidgetException('[entity] must be provided via request');
         }
 
         if (!$entityItemId) {
-            throw new Exception('[entityItemId] must be provided via request');
+            throw new WidgetException('[entityItemId] must be provided via request');
         }
 
         $entity = $this->model_factory_content_entity()->find_by_slug($entitySlug);
@@ -109,7 +109,7 @@ class Widget_Content_Comments extends Widget
 
             // Check parent comment entity id
             if (!$parentEntity->isEqualTo($entity)) {
-                throw new Exception('Incorrect parent comment entity; :sent sent instead of :needed', [
+                throw new WidgetException('Incorrect parent comment entity; :sent sent instead of :needed', [
                     ':needed'   =>  $entity->get_id(),
                     ':sent'     =>  $parentEntity->get_id(),
                 ]);
@@ -117,7 +117,7 @@ class Widget_Content_Comments extends Widget
 
             // Check parent comment entity item id
             if ($parentEntityItemID !== $entityItemId) {
-                throw new Exception('Incorrect parent comment entity item id; :sent sent instead of :needed', [
+                throw new WidgetException('Incorrect parent comment entity item id; :sent sent instead of :needed', [
                     ':needed'   =>  $entityItemId,
                     ':sent'     =>  $parentEntityItemID,
                 ]);
@@ -128,7 +128,7 @@ class Widget_Content_Comments extends Widget
         $commentsCount = $this->model_factory_content_comment()->get_comments_count_for_ip($ipAddress);
 
         if ($commentsCount > 5) {
-            throw new Exception('Throttling enabled for IP :ip', [':ip' => $ipAddress]);
+            throw new WidgetException('Throttling enabled for IP :ip', [':ip' => $ipAddress]);
         }
 
         $user = $this->current_user(TRUE);

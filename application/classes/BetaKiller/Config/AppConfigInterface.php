@@ -9,27 +9,27 @@ interface AppConfigInterface
      *
      * @return string|null
      */
-    public function get_namespace();
+    public function getNamespace();
 
     /**
      * Returns TRUE if trailing slash is needed in url
      *
      * @return bool
      */
-    public function is_trailing_slash_enabled();
+    public function isTrailingSlashEnabled();
 
     /**
      * @return string
      */
-    public function get_circular_link_href();
+    public function getCircularLinkHref();
 
     /**
      * @return bool
      */
-    public function is_page_cache_enabled();
+    public function isPageCacheEnabled();
 
     /**
      * @return string
      */
-    public function get_page_cache_path();
+    public function getPageCachePath();
 }

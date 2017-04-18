@@ -489,19 +489,34 @@ class Model_ContentComment extends TreeModelSingleParentOrm
         $status = $this->get_status_relation();
         $status = $status->get_approved_status();
 
-        return $this->get_comments_by_status($status, $entity, $entity_item_id);
+        return $this->get_comments_ordered_by_path($status, $entity, $entity_item_id);
     }
 
-    public function get_comments_by_status(Model_ContentCommentStatus $status, Model_ContentEntity $entity = null, $entity_item_id = null)
+    public function get_comments_ordered_by_path(Model_ContentCommentStatus $status = null, Model_ContentEntity $entity = null, $entity_item_id = null)
     {
         $model = $this->model_factory();
 
-        $model
-            ->filter_entity_and_entity_item_id($entity, $entity_item_id)
-            ->filter_status($status);
+        if ($status) {
+            $model->filter_status($status);
+        }
+
+        $model->filter_entity_and_entity_item_id($entity, $entity_item_id);
 
         return $model
             ->order_by_path()
+            ->get_all();
+    }
+
+    public function get_latest_comments(Model_ContentCommentStatus $status = null)
+    {
+        $model = $this->model_factory();
+
+        if ($status) {
+            $model->filter_status($status);
+        }
+
+        return $model
+            ->order_by_created_at()
             ->get_all();
     }
 

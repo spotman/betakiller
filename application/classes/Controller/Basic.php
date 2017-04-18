@@ -1,7 +1,8 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
-use \BetaKiller\View\ViewLayoutTwig;
-use \BetaKiller\View\ViewWrapperTwig;
+use BetaKiller\IFace\View\LayoutView;
+use BetaKiller\View\LayoutViewTwig;
+use BetaKiller\View\WrapperViewTwig;
 
 /**
  * Class Controller_Template
@@ -10,7 +11,7 @@ use \BetaKiller\View\ViewWrapperTwig;
 class Controller_Basic extends Controller {
 
     /**
-     * @var string|View_Layout
+     * @var string|LayoutView
      */
     protected $_layout = 'default';
 
@@ -32,11 +33,12 @@ class Controller_Basic extends Controller {
      * Twig layout factory
      *
      * @param $template_name
-     * @return View_Layout
+     *
+     * @return LayoutView
      */
     protected function layout_factory($template_name)
     {
-        return ViewLayoutTwig::factory($template_name);
+        return LayoutViewTwig::factory($template_name);
     }
 
     public function after()
@@ -51,7 +53,7 @@ class Controller_Basic extends Controller {
         elseif ( $this->request->is_ajax() OR ! $this->request->is_initial() )
         {
             // Getting content from template
-            $output = $this->_layout->get_content();
+            $output = $this->_layout->getContent();
         }
         // This is the regular request
         else
@@ -59,8 +61,8 @@ class Controller_Basic extends Controller {
             // Render template with its content
             $output = $this->_layout->render();
 
-            $output = ViewWrapperTwig::factory()
-                ->set_content($output)
+            $output = WrapperViewTwig::factory()
+                ->setContent($output)
                 ->render();
         }
 
@@ -80,7 +82,7 @@ class Controller_Basic extends Controller {
         if ( $this->_layout )
         {
             // Render view for adding js/css files, described in it
-            $this->_layout->set_content((string) $view);
+            $this->_layout->setContent((string) $view);
         }
         else
         {

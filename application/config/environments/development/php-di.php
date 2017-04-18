@@ -1,5 +1,8 @@
 <?php
 
+use BetaKiller\Factory\CommonFactoryCache;
+use BetaKiller\Factory\FactoryCacheInterface;
+use DI\Scope;
 use Doctrine\Common\Cache\ArrayCache;
 use Spotman\Acl\Acl;
 
@@ -11,6 +14,11 @@ return [
     'cache' => new ArrayCache(),
 
     'definitions' => [
+
+        // Basic caching for request lifetime
+        FactoryCacheInterface::class => DI\factory(function () {
+            return new CommonFactoryCache();
+        })->scope(Scope::SINGLETON),
 
         Acl::DI_CACHE_OBJECT_KEY => DI\object(ArrayCache::class),
 

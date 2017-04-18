@@ -12,7 +12,7 @@ class TwigExtension extends \Twig_Extension
             }, array('is_safe' => array('html'))),
 
             new \Twig_SimpleFilter('shortcodes', function($text) {
-                return Shortcode::instance()->process($text);
+                return Shortcode::getInstance()->process($text);
             }, array('is_safe' => array('html'))),
 
         ];

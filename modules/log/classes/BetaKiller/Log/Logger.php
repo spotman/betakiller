@@ -21,17 +21,12 @@ class Logger implements LoggerInterface
     /**
      * @var LoggerInterface
      */
-    private static $instance;
-
-    /**
-     * @var LoggerInterface
-     */
     private $logger;
 
     /**
      * Logger constructor.
      */
-    protected function __construct()
+    public function __construct()
     {
         $this->logger = $this->getMonologInstance();
     }
@@ -78,15 +73,6 @@ class Logger implements LoggerInterface
         $monolog->pushProcessor(new MemoryPeakUsageProcessor());
 
         return $monolog;
-    }
-
-    public static function getInstance()
-    {
-        if (!self::$instance) {
-            self::$instance = new static;
-        }
-
-        return static::$instance;
     }
 
     /**

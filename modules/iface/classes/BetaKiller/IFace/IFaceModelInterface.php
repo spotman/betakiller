@@ -11,61 +11,61 @@ interface IFaceModelInterface extends TreeModelSingleParentInterface, SeoMetaInt
      *
      * @return string
      */
-    public function get_codename();
+    public function getCodename();
 
     /**
      * Returns iface url part
      *
      * @return string
      */
-    public function get_uri();
+    public function getUri();
 
     /**
      * Returns TRUE if iface is marked as "default"
      *
      * @return bool
      */
-    public function is_default();
+    public function isDefault();
 
     /**
      * Returns TRUE if iface provides dynamic url mapping
      *
      * @return bool
      */
-    public function has_dynamic_url();
+    public function hasDynamicUrl();
 
     /**
      * Returns TRUE if iface provides tree-like url mapping
      *
      * @return bool
      */
-    public function has_tree_behaviour();
+    public function hasTreeBehaviour();
 
     /**
      * Returns array representation of the model data
      *
      * @return array
      */
-    public function as_array();
+    public function asArray();
 
     /**
      * Returns iface layout object
      *
      * @return string
      */
-    public function get_layout_codename();
+    public function getLayoutCodename();
 
     /**
      * Returns label for using in breadcrumbs and etc
      *
      * @return string
      */
-    public function get_label();
+    public function getLabel();
 
     /**
      * Returns TRUE if current IFace is hidden in sitemap
      *
      * @return bool
      */
-    public function hide_in_site_map();
+    public function hideInSiteMap();
 }

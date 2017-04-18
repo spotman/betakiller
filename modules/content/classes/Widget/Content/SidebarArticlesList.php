@@ -1,8 +1,8 @@
 <?php
 
-use BetaKiller\IFace\Widget;
+use BetaKiller\IFace\Widget\BaseWidget;
 
-abstract class Widget_Content_SidebarArticlesList extends Widget
+abstract class Widget_Content_SidebarArticlesList extends BaseWidget
 {
     use \BetaKiller\Helper\ContentTrait;
 
@@ -11,7 +11,7 @@ abstract class Widget_Content_SidebarArticlesList extends Widget
      *
      * @return array
      */
-    public function get_data()
+    public function getData()
     {
         $limit = (int) $this->getContextParam('limit', 5);
         $exclude_id = $this->get_current_article_id();

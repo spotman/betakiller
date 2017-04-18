@@ -3,7 +3,7 @@ namespace BetaKiller\IFace;
 
 use BetaKiller\Helper;
 
-abstract class IFace extends Kohana\IFace
+abstract class IFace extends \BetaKiller\IFace\KohanaIFace
 {
     use Helper\IFaceTrait;
 

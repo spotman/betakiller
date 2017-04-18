@@ -1,25 +1,25 @@
 <?php
 
-use BetaKiller\IFace\Widget;
+use BetaKiller\IFace\Widget\BaseWidget;
 
-class Widget_CustomTag_Caption extends Widget
+class Widget_CustomTag_Caption extends BaseWidget
 {
     use BetaKiller\Helper\ContentTrait;
 
     /**
      * Returns data for View rendering
      *
-     * @throws Widget\Exception
+     * @throws Widget\WidgetException
      * @return array
      */
-    public function get_data()
+    public function getData()
     {
         $context = $this->getContext();
 
         $image_id = (int) $context['id'];
 
         if (!$image_id)
-            throw new Widget\Exception('No image ID provided');
+            throw new Widget\WidgetException('No image ID provided');
 
         $title = $context['title'];
         $align = Arr::get($context, 'align', 'alignnone');

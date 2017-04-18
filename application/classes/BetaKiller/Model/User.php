@@ -8,6 +8,8 @@ class User extends \Model_Auth_User implements UserInterface
 {
     use RoleModelFactoryTrait;
 
+    protected $_all_roles_ids = [];
+
     protected function _initialize()
     {
         $this->_table_name = 'users';
@@ -37,19 +39,20 @@ class User extends \Model_Auth_User implements UserInterface
         return $this->get('roles');
     }
 
-//    public function complete_login()
-//    {
-//        parent::complete_login();
+    public function complete_login()
+    {
+        // Fetch all user roles and put it in cache
+        $this->fetchAllUserRolesIDs();
+
+        parent::complete_login();
+
+//        if ($this->loaded()) {
+//            $this->ip = sprintf("%u", ip2long(Request::$client_ip));
+//            $this->session_id = Session::instance()->id();
 //
-//        if ( $this->loaded() )
-//        {
-//        $this->ip = sprintf("%u", ip2long(Request::$client_ip));
-//        $this->session_id = Session::instance()->id();
-//
-//        $this->save();
-//
+//            $this->save();
 //        }
-//    }
+    }
 
     /**
      * @param string $value
@@ -165,26 +168,35 @@ class User extends \Model_Auth_User implements UserInterface
     /**
      * Get all user`s roles IDs
      *
-     * @todo Store this data in session
      * @return array
      */
     public function get_all_user_roles_ids()
     {
-        /** @var RoleInterface[] $roles */
-        $roles = [];
+        return $this->fetchAllUserRolesIDs();
+    }
 
-        foreach ($this->get_roles_relation()->get_all() as $role) {
-            $roles[] = $role->get_all_parents();
+    protected function fetchAllUserRolesIDs()
+    {
+        // Caching coz it is very heavy operation without MPTT
+        if (!$this->_all_roles_ids) {
+            /** @var RoleInterface[] $roles */
+            $roles = [];
+
+            foreach ($this->get_roles_relation()->get_all() as $role) {
+                $roles[] = $role->get_all_parents();
+            }
+
+            $roles = array_merge(...$roles);
+            $roles_ids = [];
+
+            foreach ($roles as $role) {
+                $roles_ids[] = $role->get_id();
+            }
+
+            $this->_all_roles_ids = array_unique($roles_ids);
         }
 
-        $roles = array_merge(...$roles);
-        $roles_ids = [];
-
-        foreach ($roles as $role) {
-            $roles_ids[] = $role->get_id();
-        }
-
-        return array_unique($roles_ids);
+        return $this->_all_roles_ids;
     }
 
     /**
@@ -432,5 +444,12 @@ class User extends \Model_Auth_User implements UserInterface
     public function getAccessControlRoles()
     {
         return $this->get_roles_relation()->get_all();
+    }
+
+    protected function getSerializableProperties()
+    {
+        return array_merge(parent::getSerializableProperties(), [
+            '_all_roles_ids'
+        ]);
     }
 }

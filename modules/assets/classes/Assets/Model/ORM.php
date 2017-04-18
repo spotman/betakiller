@@ -245,7 +245,7 @@ abstract class Assets_Model_ORM extends ORM implements Assets_ModelInterface {
         $hash = basename($url);
 
         /** @var Assets_Model_ORM $model */
-        $model = ORM::factory($this->object_name())->where('hash', '=', $hash)->find();
+        $model = $this->model_factory()->where('hash', '=', $hash)->find();
 
         return $model->loaded() ? $model : NULL;
     }

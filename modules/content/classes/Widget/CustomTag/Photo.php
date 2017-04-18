@@ -1,23 +1,23 @@
 <?php
 
-use BetaKiller\IFace\Widget;
+use BetaKiller\IFace\Widget\BaseWidget;
 
-class Widget_CustomTag_Photo extends Widget
+class Widget_CustomTag_Photo extends BaseWidget
 {
     use BetaKiller\Helper\ContentTrait;
 
     /**
      * Returns data for View rendering
      *
-     * @throws Widget\Exception
+     * @throws Widget\WidgetException
      * @return array
      */
-    public function get_data()
+    public function getData()
     {
         $image_id = (int) $this->getContextParam('id');
 
         if (!$image_id)
-            throw new Widget\Exception('No image ID provided');
+            throw new Widget\WidgetException('No image ID provided');
 
         $model = $this->model_factory_content_image_element()->get_by_id($image_id);
 

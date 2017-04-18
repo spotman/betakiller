@@ -4,6 +4,11 @@ use BetaKiller\Content\ContentRelatedInterface;
 
 trait Model_ORM_ContentRelatedTrait
 {
+    /**
+     * @var \BetaKiller\Content\LinkedContentModelInterface
+     */
+    protected $linkedModel;
+
     protected function initialize_entity_relation()
     {
         $this->belongs_to([
@@ -132,7 +137,11 @@ trait Model_ORM_ContentRelatedTrait
      */
     protected function get_related_item_model()
     {
-        $id = $this->get_entity_item_id();
-        return $this->get_entity()->get_linked_model_instance($id);
+        if (!$this->linkedModel) {
+            $id = $this->get_entity_item_id();
+            $this->linkedModel = $this->get_entity()->get_linked_model_instance($id);
+        }
+
+        return $this->linkedModel;
     }
 }

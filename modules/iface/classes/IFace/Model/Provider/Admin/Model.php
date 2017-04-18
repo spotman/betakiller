@@ -57,7 +57,7 @@ class IFace_Model_Provider_Admin_Model implements IFaceModelInterface
      *
      * @return bool
      */
-    public function is_default()
+    public function isDefault()
     {
         // Admin IFaces can not have "is_default" marker
         return FALSE;
@@ -77,7 +77,7 @@ class IFace_Model_Provider_Admin_Model implements IFaceModelInterface
      *
      * @return string
      */
-    public function get_uri()
+    public function getUri()
     {
         return $this->_uri;
     }
@@ -151,7 +151,7 @@ class IFace_Model_Provider_Admin_Model implements IFaceModelInterface
      * @return $this
      * @throws HTTP_Exception_501
      */
-    public function set_title($value)
+    public function setTitle($value)
     {
         throw new HTTP_Exception_501('Admin model can not change title');
     }
@@ -163,7 +163,7 @@ class IFace_Model_Provider_Admin_Model implements IFaceModelInterface
      * @return $this
      * @throws HTTP_Exception_501
      */
-    public function set_description($value)
+    public function setDescription($value)
     {
         throw new HTTP_Exception_501('Admin model can not change description');
     }
@@ -173,7 +173,7 @@ class IFace_Model_Provider_Admin_Model implements IFaceModelInterface
      *
      * @return string
      */
-    public function get_codename()
+    public function getCodename()
     {
         return $this->_codename;
     }
@@ -183,7 +183,7 @@ class IFace_Model_Provider_Admin_Model implements IFaceModelInterface
      *
      * @return string
      */
-    public function get_label()
+    public function getLabel()
     {
         return $this->_label;
     }
@@ -193,7 +193,7 @@ class IFace_Model_Provider_Admin_Model implements IFaceModelInterface
      *
      * @return string
      */
-    public function get_title()
+    public function getTitle()
     {
         return $this->_title;
     }
@@ -203,7 +203,7 @@ class IFace_Model_Provider_Admin_Model implements IFaceModelInterface
      *
      * @return string
      */
-    public function get_description()
+    public function getDescription()
     {
         // Admin IFace does not need description
         return NULL;
@@ -214,17 +214,17 @@ class IFace_Model_Provider_Admin_Model implements IFaceModelInterface
      *
      * @return array
      */
-    public function as_array()
+    public function asArray()
     {
         return array(
-            'codename'          => $this->get_codename(),
-            'uri'               => $this->get_uri(),
+            'codename'          => $this->getCodename(),
+            'uri'               => $this->getUri(),
             'parentCodename'    => $this->get_parent_codename(),
-            'label'             => $this->get_label(),
-            'title'             => $this->get_title(),
-            'hasDynamicUrl'     => $this->has_dynamic_url(),
-            'hideInSiteMap'     => $this->hide_in_site_map(),
-            'layoutCodename'    => $this->get_layout_codename(),
+            'label'             => $this->getLabel(),
+            'title'             => $this->getTitle(),
+            'hasDynamicUrl'     => $this->hasDynamicUrl(),
+            'hideInSiteMap'     => $this->hideInSiteMap(),
+            'layoutCodename'    => $this->getLayoutCodename(),
         );
     }
 
@@ -233,7 +233,7 @@ class IFace_Model_Provider_Admin_Model implements IFaceModelInterface
      *
      * @return string
      */
-    public function get_layout_codename()
+    public function getLayoutCodename()
     {
         return $this->_layout_codename;
     }
@@ -272,7 +272,7 @@ class IFace_Model_Provider_Admin_Model implements IFaceModelInterface
      *
      * @return bool
      */
-    public function has_dynamic_url()
+    public function hasDynamicUrl()
     {
         return (bool) $this->_has_dynamic_url;
     }
@@ -282,7 +282,7 @@ class IFace_Model_Provider_Admin_Model implements IFaceModelInterface
      *
      * @return bool
      */
-    public function has_tree_behaviour()
+    public function hasTreeBehaviour()
     {
         return (bool) $this->_has_tree_behaviour;
     }
@@ -290,7 +290,7 @@ class IFace_Model_Provider_Admin_Model implements IFaceModelInterface
     /**
      * @return bool
      */
-    public function hide_in_site_map()
+    public function hideInSiteMap()
     {
         return (bool) $this->_hide_in_site_map;
     }

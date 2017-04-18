@@ -1,23 +1,24 @@
 <?php
 
-use BetaKiller\Helper\HasAdminUrlInterface;
+use BetaKiller\IFace\Url\UrlDispatcher;
+use BetaKiller\IFace\Url\UrlParameters;
 
-class Widget_Admin_Bar extends \BetaKiller\IFace\Widget
+class Widget_Admin_Bar extends \BetaKiller\IFace\Widget\BaseWidget
 {
     use BetaKiller\Helper\CurrentUserTrait;
     use BetaKiller\Helper\ContentTrait;
 
     /**
-     * @var \URL_Dispatcher
+     * @var \BetaKiller\IFace\Url\UrlDispatcher
      */
     protected $dispatcher;
 
     /**
      * Widget_Admin_Bar constructor.
      *
-     * @param \URL_Dispatcher $dispatcher
+     * @param \BetaKiller\IFace\Url\UrlDispatcher $dispatcher
      */
-    public function __construct(URL_Dispatcher $dispatcher)
+    public function __construct(UrlDispatcher $dispatcher)
     {
         $this->dispatcher = $dispatcher;
     }
@@ -28,7 +29,7 @@ class Widget_Admin_Bar extends \BetaKiller\IFace\Widget
      *
      * @return array
      */
-    public function get_data()
+    public function getData()
     {
         $user = $this->current_user(true);
 
@@ -71,7 +72,7 @@ class Widget_Admin_Bar extends \BetaKiller\IFace\Widget
         /** @var \BetaKiller\IFace\Admin\Content\CommentListByStatus $iface */
         $iface = $this->iface_from_codename('Admin_Content_CommentListByStatus');
 
-        $param = URL_Parameters::instance();
+        $param = UrlParameters::create();
         $param->set($status::URL_PARAM, $status);
 
         return $iface->url($param);

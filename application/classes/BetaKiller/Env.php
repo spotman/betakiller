@@ -1,4 +1,7 @@
-<?php defined('SYSPATH') OR die('No direct script access.');
+<?php use BetaKiller\IFace\Url\UrlDispatcher;
+use BetaKiller\IFace\Url\UrlParameters;
+
+defined('SYSPATH') OR die('No direct script access.');
 
 /**
  * Class BetaKiller_Env
@@ -80,20 +83,20 @@ class BetaKiller_Env
 
     /**
      * @deprecated
-     * @return URL_Parameters
+     * @return UrlParameters
      */
     public static function url_parameters()
     {
-        return static::get('url_parameters');
+        return static::get('BetaKiller\IFace\Url\UrlParameters');
     }
 
     /**
      * @deprecated
-     * @return URL_Dispatcher
+     * @return UrlDispatcher
      */
     public static function url_dispatcher()
     {
-        return static::get('url_dispatcher');
+        return static::get('BetaKiller\IFace\Url\UrlDispatcher');
     }
 
 }
