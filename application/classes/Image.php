@@ -2,30 +2,47 @@
 
 abstract class Image extends Kohana_Image
 {
-    private static $_tmp_files = [];
+    private static $tmp_files = [];
+
+    private static $shutdownHandlerRegistered = false;
 
     public static function from_content($content, $driver = null)
     {
-        if ( !$content )
+        if ( !$content ) {
             throw new Kohana_Exception('No content for image info detection');
+        }
 
         // Creating temporary file
-        $tmp_file = tempnam(sys_get_temp_dir(), 'image-resize-temp');
+        $tmp_file = tempnam(sys_get_temp_dir(), 'image-resize-temp-');
 
-        if (!$tmp_file)
+        if (!$tmp_file) {
             throw new Kohana_Exception('Can not create temporary file for image info detecting');
+        }
+
+        self::registerShutdownFunction();
 
         // Putting content into it
         file_put_contents($tmp_file, $content);
 
-        self::$_tmp_files[] = $tmp_file;
+        self::$tmp_files[] = $tmp_file;
         return static::factory($tmp_file, $driver);
     }
 
-    public function __destruct()
+    private static function registerShutdownFunction()
     {
-        if (self::$_tmp_files) {
-            foreach (self::$_tmp_files as $file) {
+        if (self::$shutdownHandlerRegistered) {
+            return;
+        }
+
+        register_shutdown_function([Image::class, 'clearTempFiles']);
+
+        self::$shutdownHandlerRegistered = true;
+    }
+
+    public static function clearTempFiles()
+    {
+        if (self::$tmp_files) {
+            foreach (self::$tmp_files as $file) {
                 unlink($file);
             }
         }
