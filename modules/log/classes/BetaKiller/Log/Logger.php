@@ -66,7 +66,7 @@ class Logger implements LoggerInterface
         // Enable debugging via PhpConsole for developers
         if ($debugAllowed && Connector::getInstance()->isActiveClient()) {
             $phpConsoleHandler = new PHPConsoleHandler([
-                'headersLimit'             => 1024,     // 1KB
+                'headersLimit'             => 2048,     // 2KB
                 'detectDumpTraceAndSource' => true,     // Autodetect and append trace data to debug
                 'useOwnErrorsHandler'      => true,     // Enable errors handling
                 'useOwnExceptionsHandler'  => true,     // Enable exceptions handling
