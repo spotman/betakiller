@@ -1,6 +1,7 @@
 <?php
 namespace BetaKiller\Log;
 
+use BetaKiller\Helper\AppEnvTrait;
 use BetaKiller\Helper\CurrentUserTrait;
 use Monolog\Handler\DeduplicationHandler;
 use Monolog\Handler\PHPConsoleHandler;
@@ -10,6 +11,7 @@ use Monolog\Processor\MemoryPeakUsageProcessor;
 use PhpConsole\Connector;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LoggerTrait;
+use MultiSite;
 
 //use Monolog\Handler\ChromePHPHandler;
 
@@ -17,6 +19,7 @@ class Logger implements LoggerInterface
 {
     use LoggerTrait;
     use CurrentUserTrait;
+    use AppEnvTrait;
 
     /**
      * @var LoggerInterface
@@ -39,7 +42,7 @@ class Logger implements LoggerInterface
 
         $logFilePath     = implode(DIRECTORY_SEPARATOR, ['logs', date('Y'), date('m'), date('d').'.log']);
         $coreLogFilePath = APPPATH.$logFilePath;
-        $appLogFilePath  = \MultiSite::instance()->site_path().DIRECTORY_SEPARATOR.$logFilePath;
+        $appLogFilePath  = MultiSite::instance()->site_path().DIRECTORY_SEPARATOR.$logFilePath;
 
         $stripExceptionFormatter = new StripExceptionFromContextFormatter();
 
@@ -58,13 +61,15 @@ class Logger implements LoggerInterface
 
         $user = $this->current_user(true);
 
+        $debugAllowed = $this->inDevelopmentMode() || ($user && $user->is_developer());
+
         // Enable debugging via PhpConsole for developers
-        if ($user && $user->is_developer() && Connector::getInstance()->isActiveClient()) {
+        if ($debugAllowed && Connector::getInstance()->isActiveClient()) {
             $phpConsoleHandler = new PHPConsoleHandler([
                 'headersLimit'             => 1024,     // 1KB
                 'detectDumpTraceAndSource' => true,     // Autodetect and append trace data to debug
-                'useOwnErrorsHandler' => true,          // Enable errors handling
-                'useOwnExceptionsHandler' => true,      // Enable exceptions handling
+                'useOwnErrorsHandler'      => true,     // Enable errors handling
+                'useOwnExceptionsHandler'  => true,     // Enable exceptions handling
             ]);
             $phpConsoleHandler->setFormatter($stripExceptionFormatter);
             $monolog->pushHandler($phpConsoleHandler);

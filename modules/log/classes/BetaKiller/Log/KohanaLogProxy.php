@@ -11,10 +11,20 @@ class KohanaLogProxy extends \Log_Writer
      */
     protected $logger;
 
+    /**
+     * KohanaLogProxy constructor.
+     */
+    public function __construct(LoggerInterface $logger)
+    {
+        $this->logger = $logger;
+    }
+
     public static function register()
     {
+        $writer = Container::instance()->get(self::class);
+
         // Proxy old Kohana logs to new logging subsystem
-        \Kohana::$log->attach(new self());
+        \Kohana::$log->attach($writer);
     }
 
     /**
@@ -40,16 +50,7 @@ class KohanaLogProxy extends \Log_Writer
                 $context['exception'] = $exception;
             }
 
-            $this->getLogger()->log($level, $text, $context);
+            $this->logger->log($level, $text, $context);
         }
-    }
-
-    protected function getLogger()
-    {
-        if (!$this->logger) {
-            $this->logger = Container::instance()->get(LoggerInterface::class);
-        }
-
-        return $this->logger;
     }
 }
