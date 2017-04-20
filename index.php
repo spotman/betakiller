@@ -59,20 +59,23 @@ define('DOCROOT', realpath(__DIR__).DIRECTORY_SEPARATOR);
 // Make the application relative to the docroot, for symlink'd index.php
 $application = realpath(DOCROOT.$application);
 
-if (!is_dir($application))
+if (!is_dir($application)) {
     die('Application directory is not exists');
+}
 
 // Make the modules relative to the docroot, for symlink'd index.php
 $modules = realpath(DOCROOT.$modules);
 
-if (!is_dir($modules))
+if (!is_dir($modules)) {
     die('Core modules directory is not exists');
+}
 
 // Make the system relative to the docroot, for symlink'd index.php
 $system = realpath(DOCROOT.$system);
 
-if (!is_dir($system))
+if (!is_dir($system)) {
     die('System directory is not exists');
+}
 
 // Define the absolute paths for configured directories
 define('APPPATH', $application.DIRECTORY_SEPARATOR);
