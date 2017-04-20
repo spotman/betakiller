@@ -38,7 +38,7 @@ class IFace_Auth_Login extends IFace
         // If user already authorized
         if ( $this->current_user(TRUE) )
         {
-            if ( $this->_redirect_url == $this->_self_url )
+            if ( $this->_redirect_url === $this->_self_url )
             {
                 // Prevent infinite loops
                 $this->_redirect_url = '/';
