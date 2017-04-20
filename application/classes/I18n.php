@@ -113,8 +113,9 @@ class I18n extends Kohana_I18n
     public static function write()
     {
         // something new must be added for anything to happen
-        if (empty(static::$_cache_missing))
+        if (empty(static::$_cache_missing)) {
             return;
+        }
 
         foreach (static::$_cache_missing as $module => $data) {
             try {

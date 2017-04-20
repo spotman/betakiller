@@ -92,7 +92,7 @@ abstract class Controller extends Controller_Proxy
         I18n::lang($user_lang);
 
         // Save all absent keys if in development env
-        if ( ! Kohana::in_production(TRUE) ) {
+        if (!Kohana::in_production(true)) {
             register_shutdown_function(array(I18n::class, 'write'));
         }
     }
