@@ -4,6 +4,7 @@ namespace BetaKiller\IFace\Cache;
 use BetaKiller\Config\AppConfigInterface;
 use BetaKiller\IFace\IFaceInterface;
 use PageCache\PageCache;
+use Psr\Log\LoggerInterface;
 
 class IFaceCache
 {
@@ -17,15 +18,16 @@ class IFaceCache
      */
     protected $enabled;
 
-    public function __construct(AppConfigInterface $config)
+    public function __construct(AppConfigInterface $config, LoggerInterface $logger)
     {
         $this->enabled = $config->isPageCacheEnabled();
 
         $this->pageCache = new PageCache;
 
         $this->pageCache->setPath($config->getPageCachePath());
-        // $this->pageCache->enableLog();
-        // $this->pageCache->setLogFilePath("/tmp/page-cache.log");
+        $this->pageCache->enableLog();
+        $this->pageCache->setLogger($logger);
+//        $this->pageCache->setLogFilePath('/tmp/page-cache.log');
     }
 
     public function clearModelCache(/* IFaceRelatedModelInterface $model */)
@@ -58,6 +60,7 @@ class IFaceCache
 
         $this->pageCache->setExpiration($expires);
         $this->pageCache->enableHeaders(true);
+        $this->pageCache->forwardHeaders(true);
         $this->pageCache->init();
     }
 
