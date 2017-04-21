@@ -27,10 +27,10 @@ class Controller_IFace extends Controller
 
             $is_trailing_slash_enabled = $iface->isTrailingSlashEnabled();
 
-            if ($has_trailing_slash AND !$is_trailing_slash_enabled) {
+            if ($has_trailing_slash && !$is_trailing_slash_enabled) {
                 // Permanent redirect
                 $this->redirect(rtrim($uri, '/'), 301);
-            } elseif (!$has_trailing_slash AND $is_trailing_slash_enabled) {
+            } elseif (!$has_trailing_slash && $is_trailing_slash_enabled) {
                 // Permanent redirect
                 $this->redirect($uri.'/', 301);
             }
@@ -61,7 +61,7 @@ class Controller_IFace extends Controller
         }
 
         // Skip caching for authorized users
-        if ($this->current_user(TRUE)) {
+        if ($this->current_user(true)) {
             return;
         }
 
