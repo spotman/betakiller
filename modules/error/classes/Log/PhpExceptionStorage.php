@@ -1,11 +1,11 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
 use BetaKiller\Notification\NotificationMessageCommon;
-use BetaKiller\Helper\InProductionTrait;
+use BetaKiller\Helper\AppEnvTrait;
 
 class Log_PhpExceptionStorage extends Log_Writer
 {
-    use InProductionTrait;
+    use AppEnvTrait;
 
     /**
      * @var \BetaKiller\Error\PhpExceptionStorageInterface

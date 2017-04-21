@@ -1,7 +1,7 @@
 <?php
 namespace BetaKiller\IFace\Url;
 
-use BetaKiller\Helper\InProductionTrait;
+use BetaKiller\Helper\AppEnvTrait;
 use BetaKiller\IFace\Exception\IFaceException;
 use BetaKiller\IFace\Exception\IFaceMissingUrlException;
 use BetaKiller\IFace\IFaceInterface;
@@ -16,7 +16,7 @@ use Model;
 
 class UrlDispatcher
 {
-    use InProductionTrait;
+    use AppEnvTrait;
 
     const PROTOTYPE_PCRE = '(\{([A-Za-z_]+)\.([A-Za-z_]+)(\(\))*\})';
 

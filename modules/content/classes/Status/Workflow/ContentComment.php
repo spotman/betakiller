@@ -1,6 +1,6 @@
 <?php
 
-use BetaKiller\Helper\InProductionTrait;
+use BetaKiller\Helper\AppEnvTrait;
 use BetaKiller\Notification\NotificationMessageCommon;
 use BetaKiller\Notification\NotificationUserEmail;
 use BetaKiller\Status\StatusWorkflow;
@@ -8,7 +8,7 @@ use BetaKiller\Status\StatusWorkflowException;
 
 class Status_Workflow_ContentComment extends StatusWorkflow
 {
-    use InProductionTrait;
+    use AppEnvTrait;
 
     public function draft()
     {
