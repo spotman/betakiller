@@ -20,5 +20,5 @@ return array(
     'base_url'      => '/',
     'index_file'    => '',
     'expose'        => FALSE,
-    'cache_dir'     => MultiSite::instance()->getWorkingPath().DIRECTORY_SEPARATOR.'cache'.DIRECTORY_SEPARATOR.'kohana',
+    'cache_dir'     => APPPATH.'cache'.DIRECTORY_SEPARATOR.'kohana',
 );
