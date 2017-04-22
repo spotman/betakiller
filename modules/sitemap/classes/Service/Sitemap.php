@@ -173,6 +173,6 @@ class Service_Sitemap extends Service
 
     protected function get_document_root_path()
     {
-        return MultiSite::instance()->doc_root();
+        return MultiSite::instance()->docRoot();
     }
 }

@@ -21,7 +21,7 @@ class Task_Assets_Build extends Minion_Task {
     {
         $static_files_list = Kohana::list_files('static-files');
 
-        $target_directory = MultiSite::instance()->site_path().DIRECTORY_SEPARATOR.'builds'.DIRECTORY_SEPARATOR.'merge';
+        $target_directory = MultiSite::instance()->getSitePath().DIRECTORY_SEPARATOR.'builds'.DIRECTORY_SEPARATOR.'merge';
 
 //        Minion_CLI::write($target_directory);
 

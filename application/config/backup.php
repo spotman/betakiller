@@ -3,6 +3,6 @@
 return array(
 
     'database'  =>  'default',
-    'folder'    =>  MultiSite::instance()->site_path(),
+    'folder'    =>  MultiSite::instance()->getSitePath(),
 
 );

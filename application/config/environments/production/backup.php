@@ -3,6 +3,6 @@
 return array(
 
     // Include all deployer`s directories
-    'folder'    =>  MultiSite::instance()->site_path().'/../../../',
+    'folder'    =>  MultiSite::instance()->getSitePath().'/../../../',
 
 );

@@ -2,7 +2,7 @@
 
 $ms = MultiSite::instance();
 
-if (!$ms->is_site_detected()) {
+if (!$ms->isSiteDetected()) {
     throw new Exception('Migrations task must be called from per-site directory');
 }
 
@@ -14,7 +14,7 @@ return [
         'core'          =>  APPPATH,
         'core:module'   =>  MODPATH,
 
-        'app'           =>  $ms->site_path(),
-        'app:module'    =>  $ms->site_path().DIRECTORY_SEPARATOR.'modules',
+        'app'           =>  $ms->getSitePath(),
+        'app:module'    =>  $ms->getSitePath().DIRECTORY_SEPARATOR.'modules',
     ],
 ];
