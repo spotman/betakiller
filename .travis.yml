@@ -1,7 +1,7 @@
 language: php
 php:
 - 5.6
-- 7.0
+#- 7.0
 branches:
   only:
   - master
@@ -11,15 +11,13 @@ notifications:
   slack:
     secure: dah/GAiBmnEnLUAky5m7ygOHwNaSviWgyMkLHF4aleLSnr1ySVSpQjOsVcgVLBN1NSFYKJdYyO9znB7tQhXUz58hpkgrRDy2wDp7jTFohmOvlDmwSlRGeynIS+EPUmbzjlrK8ziH7G1JgMaGnjiXPTN9RHe3DveHt8MM4JXAKOmEAb8uj9FH6jvyhnzTIthDyoDJgjobFxkrD/9wT+Pr7m0lTZQP/NXs7DlsjVTtcHB5yskyEahdHvyDvtyOPLa1De6HgEm5fel2nv69ydNJhwJke0CTCGPgu3mr7QLWeS2zxnUXxioJFYQsZk9K05KaN9ML4FMOuvHKsFEhnuEe2uo1IL/t0pD0WoMMmgG7LC7a68m529UAa1gc9ZbgURWwA73ls2gfL1b37Vn2/7jXR+rO+1aWdcVyWF53tYtSAPA6k5eveJE/8VhZxGJMvzfZR9y7RVEuRT/7si0ziRIhLeiMJRFdY/P+xEYbwQAZd/FokVAu5FjEOVF72ybZZY986S4hzW7UX87N0ncTJIqejfPAmmHc9/ARpMg8zeC3n6U4dPZC0sZoBQgaI6dl53ov52PUJ/9riSDP9v9h06Oj8u39L02RkhFU81lQ/1WZcmvvlny6oM56QGuousht+b+axt0XIaFUOJejGPu2nIYzcFkpgUBS1RLRd0bLfsoavKY=
 
+# https://gist.github.com/petrbel/c3bf7e0f59c22a52f534
 # Use https (public access) instead of git for git-submodules. This modifies only Travis-CI behavior!
-
 # disable the default submodule logic
 git:
   submodules: false
 
-# https://gist.github.com/petrbel/c3bf7e0f59c22a52f534
 # use sed to replace the SSH URL with the public URL, then init and update submodules
 before_install:
   - sed -i 's/git@github.com:/https:\/\/github.com\//' .gitmodules
   - git submodule update --init --recursive
-  
