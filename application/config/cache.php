@@ -1,4 +1,7 @@
 <?php defined('SYSPATH') or die('No direct script access.');
+
+$fileCacheDir = MultiSite::instance()->getWorkingPath().DIRECTORY_SEPARATOR.'cache'.DIRECTORY_SEPARATOR.'cache-module';
+
 return array
 (
 /*	'memcache' => array(
@@ -59,7 +62,7 @@ return array
 */
 	'file'    => array(
 		'driver'             => 'file',
-		'cache_dir'          => APPPATH.'cache',
+		'cache_dir'          => $fileCacheDir,
 		'default_expire'     => 3600,
 		'ignore_on_delete'   => array(
 			'.gitignore',
@@ -70,7 +73,7 @@ return array
 
 	'default'    => array(
 		'driver'             => 'file',
-		'cache_dir'          => APPPATH.'cache',
+		'cache_dir'          => $fileCacheDir,
 		'default_expire'     => 3600,
 		'ignore_on_delete'   => array(
 			'.gitignore',

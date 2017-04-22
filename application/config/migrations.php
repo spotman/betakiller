@@ -2,8 +2,7 @@
 
 $ms = MultiSite::instance();
 
-if (!$ms->is_site_detected())
-{
+if (!$ms->is_site_detected()) {
     throw new Exception('Migrations task must be called from per-site directory');
 }
 

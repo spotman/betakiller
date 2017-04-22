@@ -26,8 +26,8 @@ use Spotman\Acl\ResourceFactory\ResourceFactoryInterface;
 use Spotman\Acl\ResourcesCollector\ResourcesCollectorInterface;
 use Spotman\Acl\RolesCollector\RolesCollectorInterface;
 
-$site_path = MultiSite::instance()->site_path() ?: APPPATH;
-$site_name = MultiSite::instance()->site_name();
+$workingPath = MultiSite::instance()->getWorkingPath();
+$workingName = MultiSite::instance()->getWorkingName();
 
 return [
 
@@ -36,10 +36,10 @@ return [
      */
     'cache' => new ChainCache([
         new ArrayCache(),
-        new FilesystemCache(implode(DIRECTORY_SEPARATOR, [$site_path, 'cache', 'php-di'])),
+        new FilesystemCache(implode(DIRECTORY_SEPARATOR, [$workingPath, 'cache', 'php-di'])),
     ]),
 
-    'namespace' => ($site_name ?: 'core').'-php-di-'.\Kohana::$environment_string,
+    'namespace' => ($workingName ?: 'core').'-php-di-'.\Kohana::$environment_string,
 
     'annotations' => true,
     'autowiring'  => true,
@@ -50,9 +50,9 @@ return [
         NamespaceBasedFactory::class             => DI\object(NamespaceBasedFactory::class)->scope(Scope::PROTOTYPE),
 
         // Single cache instance for whole project
-        FactoryCacheInterface::class             => DI\factory(function () use ($site_path) {
+        FactoryCacheInterface::class             => DI\factory(function () use ($workingPath) {
             return new CommonFactoryCache([
-                new PhpFileCache(implode(DIRECTORY_SEPARATOR, [$site_path, 'cache', 'factory'])),
+                new PhpFileCache(implode(DIRECTORY_SEPARATOR, [$workingPath, 'cache', 'factory'])),
             ]);
         })->scope(Scope::SINGLETON),
 
@@ -90,7 +90,7 @@ return [
         \Model_Role::class                     => DI\object(\BetaKiller\Model\Role::class)->scope(\DI\Scope::PROTOTYPE),
 
         // Cache for production and staging (dev and testing has ArrayCache); use filesystem cache so it would be cleared after deployment
-        Acl::DI_CACHE_OBJECT_KEY               => new FilesystemCache(implode(DIRECTORY_SEPARATOR, [$site_path, 'cache', 'acl'])),
+        Acl::DI_CACHE_OBJECT_KEY               => new FilesystemCache(implode(DIRECTORY_SEPARATOR, [$workingPath, 'cache', 'acl'])),
 
         // Acl roles, resources, permissions and resource factory
         RolesCollectorInterface::class         => DI\object(RolesCollector::class),

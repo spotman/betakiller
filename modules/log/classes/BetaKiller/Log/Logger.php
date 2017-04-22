@@ -42,7 +42,7 @@ class Logger implements LoggerInterface
 
         $logFilePath     = implode(DIRECTORY_SEPARATOR, ['logs', date('Y'), date('m'), date('d').'.log']);
         $coreLogFilePath = APPPATH.$logFilePath;
-        $appLogFilePath  = MultiSite::instance()->site_path().DIRECTORY_SEPARATOR.$logFilePath;
+        $appLogFilePath  = MultiSite::instance()->getWorkingPath().DIRECTORY_SEPARATOR.$logFilePath;
 
         $stripExceptionFormatter = new StripExceptionFromContextFormatter();
 
