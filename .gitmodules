@@ -46,3 +46,6 @@
 [submodule "modules/sqlite"]
 	path = modules/sqlite
 	url = git@github.com:spotman/kohana-database-sqlite.git
+[submodule "modules/unittest"]
+	path = modules/unittest
+	url = git@github.com:spotman/kohana-unittest.git

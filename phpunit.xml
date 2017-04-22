@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit bootstrap="modules/unittest/bootstrap.php"
+         backupGlobals="false"
+         beStrictAboutCoversAnnotation="true"
+         beStrictAboutOutputDuringTests="true"
+         beStrictAboutTestsThatDoNotTestAnything="true"
+         beStrictAboutTodoAnnotatedTests="true"
+         verbose="true">
+    <testsuites name="BetaKiller">
+        <testsuite>
+            <file>modules/unittest/tests.php</file>
+        </testsuite>
+    </testsuites>
+</phpunit>

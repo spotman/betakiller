@@ -35,6 +35,7 @@ return array(
     'static-files'          => MODPATH.'static-files',          // Static Files (JS/CSS/pictures)
     'twig'                  => MODPATH.'twig',                  // Twig template engine
     'ulogin'                => MODPATH.'ulogin',                // Universal login via ulogin.ru
+    'unittest'              => MODPATH.'unittest',              // Module for unit testing via phpunit
 
     'sitemap'               => MODPATH.'sitemap',               // Generating sitemap.xml
 

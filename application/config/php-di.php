@@ -26,7 +26,7 @@ use Spotman\Acl\ResourceFactory\ResourceFactoryInterface;
 use Spotman\Acl\ResourcesCollector\ResourcesCollectorInterface;
 use Spotman\Acl\RolesCollector\RolesCollectorInterface;
 
-$site_path = MultiSite::instance()->site_path();
+$site_path = MultiSite::instance()->site_path() ?: APPPATH;
 $site_name = MultiSite::instance()->site_name();
 
 return [
@@ -39,7 +39,7 @@ return [
         new FilesystemCache(implode(DIRECTORY_SEPARATOR, [$site_path, 'cache', 'php-di'])),
     ]),
 
-    'namespace' => $site_name.'-php-di-'.\Kohana::$environment_string,
+    'namespace' => ($site_name ?: 'core').'-php-di-'.\Kohana::$environment_string,
 
     'annotations' => true,
     'autowiring'  => true,
