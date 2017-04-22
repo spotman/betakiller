@@ -15,12 +15,12 @@ class Kohana extends Kohana_Core {
             ? array(Kohana::PRODUCTION, Kohana::STAGING)
             : array(Kohana::PRODUCTION);
 
-        return in_array(Kohana::$environment, $values);
+        return in_array(Kohana::$environment, $values, true);
     }
 
     public static function in_staging()
     {
-        return (Kohana::$environment == Kohana::STAGING);
+        return (Kohana::$environment === Kohana::STAGING);
     }
 
     public static function config($file)
@@ -40,6 +40,11 @@ class Kohana extends Kohana_Core {
     {
         $path = rtrim($path, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
         array_unshift(static::$_paths, $path);
+    }
+
+    public static function getPaths()
+    {
+        return static::$_paths;
     }
 
     public static function modules(array $modules = NULL)
@@ -67,8 +72,9 @@ class Kohana extends Kohana_Core {
 
     public static function cache($name, $data = NULL, $lifetime = 60)
     {
-        if ( ! static::$caching )
+        if ( ! static::$caching ) {
             return NULL;
+        }
 
         return static::$_custom_cache
             ? static::custom_cache($name, $data, $lifetime)
@@ -79,32 +85,15 @@ class Kohana extends Kohana_Core {
     {
         $key = sha1($name);
 
-        if ( is_null($data) )
-        {
-            $value = static::$_custom_cache->get($key);
-//            static::log_with_headers('Read-Cache-Key-'.$key, '['.gettype($value).']');
-            return $value;
+        if (null === $data) {
+            return static::$_custom_cache->get($key);
         }
-        else
-        {
-//            static::log_with_headers('Write-Cache-Key-'.$key, '['.gettype($data).'] for '. $lifetime);
-            return static::$_custom_cache->set($key, $data, $lifetime);
-        }
-    }
 
-    protected static function log_with_headers($key, $value)
-    {
-        $response = Response::current();
-
-        if ( $response )
-        {
-            $response->headers($key, $value);
-        }
+        return static::$_custom_cache->set($key, $data, $lifetime);
     }
 
     public static function set_custom_cache(Cache $instance)
     {
         static::$_custom_cache = $instance;
     }
-
 }
