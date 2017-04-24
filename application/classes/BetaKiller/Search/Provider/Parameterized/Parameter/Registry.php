@@ -30,13 +30,13 @@ abstract class Registry implements \IteratorAggregate, QueryConverter\Convertibl
     protected $_parameterFactory;
 
     /**
-     * @var Utils\Registry\Base
+     * @var Utils\Registry\BasicRegistry
      */
     protected $_registry;
 
     public function __construct()
     {
-        $this->_registry = new Utils\Registry\Base();
+        $this->_registry = new Utils\Registry\BasicRegistry();
     }
 
     /**
@@ -46,6 +46,7 @@ abstract class Registry implements \IteratorAggregate, QueryConverter\Convertibl
 
     /**
      * @param \BetaKiller\Model\User|NULL $user
+     *
      * @return $this
      * @deprecated
      * @todo DI

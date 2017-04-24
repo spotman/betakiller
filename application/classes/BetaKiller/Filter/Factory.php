@@ -14,6 +14,7 @@ class Factory
      *
      * @param                             $name
      * @param \BetaKiller\Model\User|null $user
+     *
      * @return mixed|\BetaKiller\Filter\Base
      */
     public function create($name, User $user = null)

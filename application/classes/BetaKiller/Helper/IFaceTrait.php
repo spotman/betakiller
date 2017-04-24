@@ -12,6 +12,7 @@ trait IFaceTrait
 
     /**
      * @return \BetaKiller\IFace\Url\UrlDispatcher
+     * @deprecated Use DI instead
      */
     protected function url_dispatcher()
     {
@@ -20,6 +21,7 @@ trait IFaceTrait
 
     /**
      * @return \BetaKiller\IFace\Url\UrlParameters
+     * @deprecated Use DI instead
      */
     protected function url_parameters()
     {
@@ -27,11 +29,13 @@ trait IFaceTrait
     }
 
     /**
-     * @return \BetaKiller\IFace\Url\UrlParameters
+     * @return \BetaKiller\IFace\Url\UrlParametersInterface
+     * @deprecated Use UrlParametersFactory::create() instead
      */
     protected function url_parameters_instance()
     {
-        return $this->getContainer()->get(\BetaKiller\IFace\Url\UrlParameters::class);
+        // Always new object
+        return $this->getContainer()->make(\BetaKiller\IFace\Url\UrlParametersInterface::class);
     }
 
     /**

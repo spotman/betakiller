@@ -75,7 +75,7 @@ class Model_ContentComment extends TreeModelSingleParentOrm
     /**
      * Place here additional query params
      */
-    protected function additional_tree_model_filtering()
+    protected function additionalTreeModelFiltering()
     {
         // Nothing to do
     }
@@ -340,7 +340,7 @@ class Model_ContentComment extends TreeModelSingleParentOrm
      */
     protected function set_path()
     {
-        $parent = $this->get_parent();
+        $parent = $this->getParent();
         $parentPath = $parent ? $parent->get_path() : 0;
 
         $this->set('path', $parentPath.'.'.$this->get_id());

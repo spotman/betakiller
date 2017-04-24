@@ -4,6 +4,7 @@ namespace BetaKiller\Widget\Admin\Menu;
 use BetaKiller\Helper\ContentTrait;
 use BetaKiller\IFace\IFaceInterface;
 use BetaKiller\IFace\Url\UrlParameters;
+use BetaKiller\IFace\Url\UrlParametersInterface;
 use BetaKiller\IFace\Widget\AbstractAdminWidget;
 
 class MainWidget extends AbstractAdminWidget
@@ -47,7 +48,7 @@ class MainWidget extends AbstractAdminWidget
         return $output;
     }
 
-    protected function getIFaceMenuItemData(IFaceInterface $iface, UrlParameters $params = null)
+    protected function getIFaceMenuItemData(IFaceInterface $iface, UrlParametersInterface $params = null)
     {
         return [
             'url'    => $iface->url($params, false), // Keep links always working

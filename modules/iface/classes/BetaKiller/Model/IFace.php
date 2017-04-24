@@ -1,28 +1,30 @@
 <?php
+namespace BetaKiller\Model;
 
 use BetaKiller\IFace\IFaceModelInterface;
 use BetaKiller\Utils\Kohana\TreeModelSingleParentOrm;
 
 /**
- * Class Model_IFace
+ * Class IFace
+ *
  * @category   Models
  * @author     Spotman
  * @package    Betakiller
  */
-class Model_IFace extends TreeModelSingleParentOrm implements IFaceModelInterface
+class IFace extends TreeModelSingleParentOrm implements IFaceModelInterface
 {
     protected function _initialize()
     {
-        $this->belongs_to(array(
-            'layout'            =>  array(
-                'model'         =>  'Layout',
-                'foreign_key'   =>  'layout_id'
-            ),
-        ));
+        $this->belongs_to([
+            'layout' => [
+                'model'       => 'Layout',
+                'foreign_key' => 'layout_id',
+            ],
+        ]);
 
-        $this->load_with(array(
+        $this->load_with([
             'layout',
-        ));
+        ]);
 
         parent::_initialize();
     }
@@ -32,9 +34,9 @@ class Model_IFace extends TreeModelSingleParentOrm implements IFaceModelInterfac
      *
      * @return IFaceModelInterface[]|$this[]
      */
-    public function get_children()
+    public function getChildren()
     {
-        return parent::get_children();
+        return parent::getChildren();
     }
 
     /**
@@ -42,9 +44,9 @@ class Model_IFace extends TreeModelSingleParentOrm implements IFaceModelInterfac
      *
      * @return IFaceModelInterface|\BetaKiller\Utils\Kohana\TreeModelOrmBase
      */
-    public function get_parent()
+    public function getParent()
     {
-        return parent::get_parent();
+        return parent::getParent();
     }
 
     /**
@@ -54,7 +56,7 @@ class Model_IFace extends TreeModelSingleParentOrm implements IFaceModelInterfac
      */
     public function isDefault()
     {
-        return (bool) $this->get('is_default');
+        return (bool)$this->get('is_default');
     }
 
     /**
@@ -110,7 +112,7 @@ class Model_IFace extends TreeModelSingleParentOrm implements IFaceModelInterfac
     /**
      * Returns layout model
      *
-     * @return Model_Layout
+     * @return Layout
      */
     public function get_layout()
     {
@@ -126,8 +128,7 @@ class Model_IFace extends TreeModelSingleParentOrm implements IFaceModelInterfac
     {
         $layout = $this->get_layout();
 
-        if ( ! $layout->loaded() )
-        {
+        if (!$layout->loaded()) {
             $layout = $layout->get_default();
         }
 
@@ -141,7 +142,7 @@ class Model_IFace extends TreeModelSingleParentOrm implements IFaceModelInterfac
      */
     public function hasDynamicUrl()
     {
-        return (bool) $this->get('is_dynamic');
+        return (bool)$this->get('is_dynamic');
     }
 
     /**
@@ -151,7 +152,7 @@ class Model_IFace extends TreeModelSingleParentOrm implements IFaceModelInterfac
      */
     public function hasTreeBehaviour()
     {
-        return (bool) $this->get('is_tree');
+        return (bool)$this->get('is_tree');
     }
 
     /**
@@ -159,7 +160,7 @@ class Model_IFace extends TreeModelSingleParentOrm implements IFaceModelInterfac
      */
     public function hideInSiteMap()
     {
-        return (bool) $this->get('hide_in_site_map');
+        return (bool)$this->get('hide_in_site_map');
     }
 
     /**
@@ -171,7 +172,7 @@ class Model_IFace extends TreeModelSingleParentOrm implements IFaceModelInterfac
      */
     public function setTitle($value)
     {
-        return $this->set('title', (string) $value);
+        return $this->set('title', (string)$value);
     }
 
     /**
@@ -183,7 +184,7 @@ class Model_IFace extends TreeModelSingleParentOrm implements IFaceModelInterfac
      */
     public function setDescription($value)
     {
-        return $this->set('description', (string) $value);
+        return $this->set('description', (string)$value);
     }
 
     /**
@@ -201,7 +202,7 @@ class Model_IFace extends TreeModelSingleParentOrm implements IFaceModelInterfac
      *
      * @return $this
      */
-    protected function additional_tree_model_filtering()
+    protected function additionalTreeModelFiltering()
     {
         // No filtering needed
         return $this;

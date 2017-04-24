@@ -1,6 +1,10 @@
 <?php
+
+use BetaKiller\IFace\IFaceModelInterface;
+use BetaKiller\IFace\IFaceProvider;
 use BetaKiller\IFace\IFaceModelTree;
 use BetaKiller\IFace\Url\UrlParameters;
+use BetaKiller\IFace\Url\UrlParametersInterface;
 
 class Task_Cache_Warmup extends Minion_Task
 {
@@ -9,49 +13,50 @@ class Task_Cache_Warmup extends Minion_Task
     /**
      * @var IFaceModelTree
      */
-    protected $_tree;
+    private $tree;
 
     /**
-     * @var \BetaKiller\IFace\Url\UrlDispatcher
+     * @var \BetaKiller\IFace\IFaceProvider
      */
-    protected $_dispatcher;
+    private $ifaceProvider;
 
-    public function __construct(IFaceModelTree $tree, \BetaKiller\IFace\Url\UrlDispatcher $dispatcher)
+    public function __construct(IFaceModelTree $tree, IFaceProvider $provider)
     {
-        $this->_tree = $tree;
-        $this->_dispatcher = $dispatcher;
+        $this->tree          = $tree;
+        $this->ifaceProvider = $provider;
 
         parent::__construct();
     }
 
     protected function _execute(array $params)
     {
-        $tree = $this->_tree;
+        $tree = $this->tree;
 
-        $parameters = $this->url_parameters_instance();
+        $parameters = UrlParameters::create();
 
         // Get all ifaces recursively
         $iterator = $tree->getRecursivePublicIterator();
 
         // For each IFace
-        foreach ($iterator as $iface_model)
-        {
-            $this->debug('Found IFace :codename', [':codename' => $iface_model->getCodename()]);
+        foreach ($iterator as $ifaceModel) {
+            $this->debug('Found IFace :codename', [':codename' => $ifaceModel->getCodename()]);
 
             try {
-                $this->process_iface($iface_model, $parameters);
+                $this->processIFaceModel($ifaceModel, $parameters);
             } catch (Exception $e) {
                 $this->warning('Exception thrown for :iface with message :text', [
-                    ':iface'    => $iface_model->getCodename(),
+                    ':iface'    => $ifaceModel->getCodename(),
                     ':text'     => $e->getMessage(),
                 ]);
             }
         }
     }
 
-    protected function process_iface(\BetaKiller\IFace\IFaceModelInterface $iface_model, UrlParameters $params)
+    protected function processIFaceModel(IFaceModelInterface $ifaceModel, UrlParametersInterface $params)
     {
-        $urls = $this->_dispatcher->get_iface_model_available_urls($iface_model, $params, 1, FALSE);
+        $iface = $this->ifaceProvider->fromModel($ifaceModel);
+
+        $urls = $iface->getAvailableUrls($params, 1, false); // No domain coz HMVC do external requests while domain set
         $this->debug(PHP_EOL.implode(PHP_EOL, $urls).PHP_EOL);
 
         $url = array_pop($urls);
@@ -71,7 +76,7 @@ class Task_Cache_Warmup extends Minion_Task
         $response = $request->execute();
         $status = $response->status();
 
-        if ($status == 200)
+        if ($status === 200)
         {
             // TODO Maybe grab page content, parse it and make request to every image/css/js file
 
@@ -81,7 +86,7 @@ class Task_Cache_Warmup extends Minion_Task
         {
             $this->info('Redirect :status received for :url', [':url' => $url, ':status' => $status]);
         }
-        elseif (in_array($status, [401, 403]))
+        elseif (in_array($status, [401, 403], true))
         {
             $this->info('Access denied with :status status for :url', [':url' => $url, ':status' => $status]);
         }

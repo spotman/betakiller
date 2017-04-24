@@ -16,7 +16,7 @@ class IFaceFactory
      */
     public function from_model(IFaceModelInterface $model)
     {
-        return $this->get_provider()->from_model($model);
+        return $this->get_provider()->fromModel($model);
     }
 
     /**
@@ -29,14 +29,14 @@ class IFaceFactory
      */
     public function from_codename($codename)
     {
-        return $this->get_provider()->by_codename($codename);
+        return $this->get_provider()->getByCodename($codename);
     }
 
     /**
-     * @return \IFace_Provider
+     * @return \BetaKiller\IFace\IFaceProvider
      */
     protected function get_provider()
     {
-        return Container::instance()->get(\IFace_Provider::class);
+        return Container::instance()->get(\BetaKiller\IFace\IFaceProvider::class);
     }
 }

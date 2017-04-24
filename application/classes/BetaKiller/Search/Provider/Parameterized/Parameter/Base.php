@@ -26,6 +26,7 @@ abstract class Base implements Parameter
 
     /**
      * Parameter constructor.
+     *
      * @param Model\User $_user
      */
     public function __construct(Model\User $_user = NULL)

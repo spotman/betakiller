@@ -6,20 +6,20 @@ interface UrlDataSourceInterface
     /**
      * Performs search for model item where the $key property value is equal to $value
      *
-     * @param string        $key
-     * @param string        $value
-     * @param UrlParameters $parameters
+     * @param string                                       $key
+     * @param string                                       $value
+     * @param \BetaKiller\IFace\Url\UrlParametersInterface $parameters
      *
-     * @return UrlDataSourceInterface
+     * @return UrlDataSourceInterface|null
      */
-    public function find_by_url_key($key, $value, UrlParameters $parameters);
+    public function findByUrlKey($key, $value, UrlParametersInterface $parameters);
 
     /**
      * Returns default uri for index element (this used if root IFace has dynamic url behaviour)
      *
      * @return string
      */
-    public function get_default_url_value();
+    public function getDefaultUrlValue();
 
     /**
      * Returns value of the $key property
@@ -28,29 +28,29 @@ interface UrlDataSourceInterface
      *
      * @return string
      */
-    public function get_url_key_value($key);
+    public function getUrlKeyValue($key);
 
     /**
      * Returns list of available items (model records) by $key property
      *
-     * @param string        $key
-     * @param UrlParameters $parameters
-     * @param null          $limit
+     * @param string                                       $key
+     * @param \BetaKiller\IFace\Url\UrlParametersInterface $parameters
+     * @param null                                         $limit
      *
      * @return UrlDataSourceInterface[]
      */
-    public function get_available_items_by_url_key($key, UrlParameters $parameters, $limit = null);
+    public function getAvailableItemsByUrlKey($key, UrlParametersInterface $parameters, $limit = null);
 
     /**
      *
      * This method allows inheritor to preset linked model in URL parameters
      * It is executed after successful url dispatching
      *
-     * @param UrlParameters $parameters
+     * @param \BetaKiller\IFace\Url\UrlParametersInterface $parameters
      *
      * @return void
      */
-    public function preset_linked_models(UrlParameters $parameters);
+    public function presetLinkedModels(UrlParametersInterface $parameters);
 
     /**
      * Returns custom key which may be used for storing model in UrlParameters registry.
@@ -58,12 +58,12 @@ interface UrlDataSourceInterface
      *
      * @return string|null
      */
-    public function get_custom_url_parameters_key();
+    public function getCustomUrlParametersKey();
 
     /**
      * Returns string identifier of current DataSource item
      *
      * @return string
      */
-    public function get_url_item_id();
+    public function getUrlItemID();
 }

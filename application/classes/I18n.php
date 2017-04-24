@@ -98,7 +98,7 @@ class I18n extends Kohana_I18n
         return $string;
     }
 
-    public static function addDoubleColonToKeys(array $data)
+    public static function addColonToKeys(array $data)
     {
         $output = [];
 

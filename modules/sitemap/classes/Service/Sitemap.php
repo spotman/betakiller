@@ -1,8 +1,9 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
 use BetaKiller\IFace\IFaceModelInterface;
+use BetaKiller\IFace\ModelProvider\IFaceModelProviderAggregate;
 use BetaKiller\IFace\Url\UrlDispatcher;
-use BetaKiller\IFace\Url\UrlParameters;
+use BetaKiller\IFace\Url\UrlParametersInterface;
 use BetaKiller\IFace\Url\UrlPrototype;
 use BetaKiller\Service;
 use BetaKiller\Service\ServiceException;
@@ -14,7 +15,7 @@ class Service_Sitemap extends Service
     use BetaKiller\Helper\IFaceTrait;
 
     /**
-     * @var UrlParameters
+     * @var UrlParametersInterface
      */
     protected $_url_parameters;
 
@@ -24,7 +25,7 @@ class Service_Sitemap extends Service
     protected $_url_dispatcher;
 
     /**
-     * @var IFace_Model_Provider
+     * @var IFaceModelProviderAggregate
      */
     protected $_iface_model_provider;
 
@@ -41,14 +42,12 @@ class Service_Sitemap extends Service
     /**
      * Service_Sitemap constructor.
      *
-     * @param UrlParameters        $_url_parameters
-     * @param UrlDispatcher        $_url_dispatcher
-     * @param IFace_Model_Provider $_iface_model_provider
+     * @param UrlParametersInterface      $_url_parameters
+     * @param IFaceModelProviderAggregate $_iface_model_provider
      */
-    public function __construct(UrlParameters $_url_parameters, UrlDispatcher $_url_dispatcher, IFace_Model_Provider $_iface_model_provider)
+    public function __construct(UrlParametersInterface $_url_parameters, IFaceModelProviderAggregate $_iface_model_provider)
     {
         $this->_url_parameters       = $_url_parameters;
-        $this->_url_dispatcher       = $_url_dispatcher;
         $this->_iface_model_provider = $_iface_model_provider;
     }
 
@@ -56,7 +55,7 @@ class Service_Sitemap extends Service
     {
         $base_url = Kohana::$base_url;
 
-        if ( strpos($base_url, 'http') === FALSE )
+        if (strpos($base_url, 'http') === false)
             throw new ServiceException('Please, set "base_url" parameter to full URL (with protocol) in config file init.php');
 
         // create sitemap
@@ -71,14 +70,12 @@ class Service_Sitemap extends Service
 
         $sitemapFiles = $this->_sitemap->getSitemapUrls($base_url);
 
-        if ( count($sitemapFiles) > 1 )
-        {
+        if (count($sitemapFiles) > 1) {
             // create sitemap index file
             $index = new Index($this->get_sitemap_index_file_path());
 
             // add URLs
-            foreach ( $sitemapFiles as $sitemapUrl )
-            {
+            foreach ($sitemapFiles as $sitemapUrl) {
                 $index->addSitemap($sitemapUrl);
             }
 
@@ -91,39 +88,34 @@ class Service_Sitemap extends Service
         return $this;
     }
 
-    protected function iterate_layer(IFaceModelInterface $parent = NULL)
+    protected function iterate_layer(IFaceModelInterface $parent = null)
     {
         // Get all available IFaces in layer
-        $iface_models = $this->_iface_model_provider->get_layer($parent);
+        $iface_models = $this->_iface_model_provider->getLayer($parent);
 
         // Iterate over all IFaces
-        foreach ($iface_models as $iface_model)
-        {
+        foreach ($iface_models as $iface_model) {
             // Skip hidden ifaces
-            if ( $iface_model->hideInSiteMap() )
+            if ($iface_model->hideInSiteMap())
                 continue;
 
-            if ( $iface_model->hasDynamicUrl()  )
-            {
+            if ($iface_model->hasDynamicUrl()) {
                 $prototype = UrlPrototype::instance()->parse($iface_model->getUri());
 
-                $model_name = $prototype->getModelName();
-                $model_key = $prototype->getModelKey();
+                $model_name    = $prototype->getModelName();
+                $model_key     = $prototype->getModelKey();
+                $urlDataSource = $prototype->getModelInstance();
 
-                $items = $this->model_factory($model_name)
-                    ->get_available_items_by_url_key($model_key, $this->_url_parameters);
+                $items = $urlDataSource->getAvailableItemsByUrlKey($model_key, $this->_url_parameters);
 
-                foreach ($items as $item)
-                {
+                foreach ($items as $item) {
                     // Save current item to parameters registry
-                    $this->_url_parameters->set($model_name, $item, TRUE);
+                    $this->_url_parameters->set($model_name, $item, true);
 
                     // Make dynamic URL + recursion
                     $this->process_iface_model($iface_model);
                 }
-            }
-            else
-            {
+            } else {
                 // Make static URL + recursion
                 $this->process_iface_model($iface_model);
             }
@@ -139,7 +131,7 @@ class Service_Sitemap extends Service
 
         // TODO Force calculation of the last_modified
         $last_modified = $iface->getLastModified();
-        $timestamp = $last_modified ? $last_modified->getTimestamp() : NULL;
+        $timestamp     = $last_modified ? $last_modified->getTimestamp() : null;
 
         // Store URL
         $this->_sitemap->addItem($url, $timestamp);
@@ -148,11 +140,6 @@ class Service_Sitemap extends Service
 
         // Recursion
         $this->iterate_layer($model);
-    }
-
-    protected function model_factory($name)
-    {
-        return $this->_url_dispatcher->model_factory($name);
     }
 
     public function serve(Response $response)

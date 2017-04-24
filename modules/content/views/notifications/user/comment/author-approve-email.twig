@@ -1,5 +1,5 @@
 {% extends "@notifications/default/email" %}
 
 {% block body %}
-    {{ (baseI18nKey ~ ".text")|i18n(doubleColonPrefixedData)|raw }}
+    {{ (baseI18nKey ~ ".text")|i18n(colonPrefixedData)|raw }}
 {% endblock %}

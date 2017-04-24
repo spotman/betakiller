@@ -39,7 +39,7 @@ class RolesCollector implements RolesCollectorInterface
 
     protected function addRoleWithParents(Acl $acl, RoleInterface $role)
     {
-        $parentRoles = $role->get_parents();
+        $parentRoles = $role->getParents();
         $parentRolesIdentities = [];
 
         foreach ($parentRoles as $parentRole) {

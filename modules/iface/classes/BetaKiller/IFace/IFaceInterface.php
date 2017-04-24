@@ -1,8 +1,9 @@
 <?php
 namespace BetaKiller\IFace;
 
-use BetaKiller\IFace\Url\UrlParameters;
 use BetaKiller\Helper\SeoMetaInterface;
+use BetaKiller\IFace\Url\UrlParameters;
+use BetaKiller\IFace\Url\UrlParametersInterface;
 
 interface IFaceInterface extends SeoMetaInterface
 {
@@ -24,11 +25,11 @@ interface IFaceInterface extends SeoMetaInterface
     /**
      * Returns processed label
      *
-     * @param UrlParameters|null $params
+     * @param UrlParametersInterface|null $params
      *
      * @return string
      */
-    public function getLabel(UrlParameters $params = null);
+    public function getLabel(UrlParametersInterface $params = null);
 
     /**
      * Returns label source/pattern
@@ -61,6 +62,7 @@ interface IFaceInterface extends SeoMetaInterface
 
     /**
      * @param \DateTime|NULL $last_modified
+     *
      * @return $this
      */
     public function setLastModified(\DateTime $last_modified);
@@ -82,6 +84,7 @@ interface IFaceInterface extends SeoMetaInterface
 
     /**
      * @param \DateInterval|NULL $expires
+     *
      * @return $this
      */
     public function setExpiresInterval(\DateInterval $expires);
@@ -141,6 +144,7 @@ interface IFaceInterface extends SeoMetaInterface
      * Setter for current iface model
      *
      * @param IFaceModelInterface $model
+     *
      * @return $this
      */
     public function setModel(IFaceModelInterface $model);
@@ -156,20 +160,20 @@ interface IFaceInterface extends SeoMetaInterface
     public function isInStack();
 
     /**
-     * @param \BetaKiller\IFace\Url\UrlParameters|NULL $parameters
+     * @param \BetaKiller\IFace\Url\UrlParametersInterface|null $parameters
      *
      * @return bool
      */
-    public function isCurrent(UrlParameters $parameters = NULL);
+    public function isCurrent(UrlParametersInterface $parameters = null);
 
     /**
-     * @param \BetaKiller\IFace\Url\UrlParameters|NULL $parameters
-     * @param bool                                     $remove_cycling_links
-     * @param bool                                     $with_domain
+     * @param \BetaKiller\IFace\Url\UrlParametersInterface|null $parameters
+     * @param bool                                              $removeCyclingLinks
+     * @param bool                                              $with_domain
      *
      * @return string
      */
-    public function url(UrlParameters $parameters = NULL, $remove_cycling_links = TRUE, $with_domain = TRUE);
+    public function url(UrlParametersInterface $parameters = null, $removeCyclingLinks = true, $with_domain = true);
 
     /**
      * @return string
@@ -177,9 +181,11 @@ interface IFaceInterface extends SeoMetaInterface
     public function getUri();
 
     /**
-     * Returns TRUE if trailing slash is needed in url
+     * @param \BetaKiller\IFace\Url\UrlParametersInterface $params
+     * @param int|null                            $limit
+     * @param bool                                $withDomain
      *
-     * @return bool
+     * @return string[]
      */
-    public function isTrailingSlashEnabled();
+    public function getAvailableUrls(UrlParametersInterface $params, $limit = null, $withDomain = true);
 }

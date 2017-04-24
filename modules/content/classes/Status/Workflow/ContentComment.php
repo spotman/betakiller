@@ -83,7 +83,7 @@ class Status_Workflow_ContentComment extends StatusWorkflow
      */
     protected function notify_parent_comment_author_about_reply(Model_ContentComment $reply)
     {
-        $parent = $reply->get_parent();
+        $parent = $reply->getParent();
 
         // Skip if comment has no parent
         if (!$parent) {

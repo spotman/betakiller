@@ -1,13 +1,8 @@
 <?php
 namespace BetaKiller\IFace\Url;
 
-use BetaKiller\Utils;
-use BetaKiller\Exception;
-
 class UrlPrototype
 {
-    use Utils\Instance\Simple;
-
     /**
      * @var string
      */
@@ -25,10 +20,12 @@ class UrlPrototype
 
     /**
      * @param string $modelKey
+     * @return $this
      */
     public function setModelKey($modelKey)
     {
         $this->modelKey = $modelKey;
+        return $this;
     }
 
     /**
@@ -41,10 +38,12 @@ class UrlPrototype
 
     /**
      * @param string $modelName
+     * @return $this
      */
     public function setModelName($modelName)
     {
         $this->modelName = $modelName;
+        return $this;
     }
 
     /**
@@ -63,26 +62,22 @@ class UrlPrototype
         return $this->isMethodCall;
     }
 
-    public function parse($string)
+    /**
+     * @return $this
+     */
+    public function markAsMethodCall()
     {
-        if (!$string) {
-            throw new Exception('Empty url prototype string');
-        }
+        return $this->setIsMethodCall(true);
+    }
 
-        $string = trim($string, '{}');
-
-        $model = explode('.', $string);
-        $name  = $model[0];
-        $key   = $model[1];
-
-        if (strpos($key, '()') !== false) {
-            $this->isMethodCall = true;
-            $key                = str_replace('()', '', $key);
-        }
-
-        $this->setModelName($name);
-        $this->setModelKey($key);
-
+    /**
+     * @param bool $value
+     *
+     * @return $this
+     */
+    private function setIsMethodCall($value)
+    {
+        $this->isMethodCall = (bool)$value;
         return $this;
     }
 }

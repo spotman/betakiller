@@ -1,43 +1,48 @@
-<?php defined('SYSPATH') OR die('No direct script access.');
+<?php
+namespace BetaKiller\Model;
+
+use Kohana_Exception;
+use ORM;
 
 /**
- * Class Model_Layout
+ * Class Layout
  *
  * @category   Models
  * @author     Spotman
  * @package    Betakiller
  */
-class Model_Layout extends ORM {
-
+class Layout extends ORM
+{
     /**
      * @return static
      * @throws Kohana_Exception
      */
     public function get_default()
     {
-        $default = $this->where('is_default', '=', TRUE)->cached()->find();
+        $default = $this->where('is_default', '=', true)->cached()->find();
 
-        if ( ! $default->loaded() )
+        if (!$default->loaded()) {
             throw new Kohana_Exception('No default layout found; set it, please');
+        }
 
         return $default;
     }
 
     protected function _initialize()
     {
-        $this->has_many(array(
-            'iface'            =>  array(
-                'model'         =>  'IFace',
-                'foreign_key'   =>  'layout_id'
-            ),
-        ));
+        $this->has_many([
+            'iface' => [
+                'model'       => 'IFace',
+                'foreign_key' => 'layout_id',
+            ],
+        ]);
 
         parent::_initialize();
     }
 
     public function get_id()
     {
-        return (int) $this->pk();
+        return (int)$this->pk();
     }
 
     /**
@@ -47,7 +52,7 @@ class Model_Layout extends ORM {
      */
     public function is_default()
     {
-        return (bool) $this->get('is_default');
+        return (bool)$this->get('is_default');
     }
 
     /**
@@ -69,5 +74,4 @@ class Model_Layout extends ORM {
     {
         return $this->get('title');
     }
-
 }

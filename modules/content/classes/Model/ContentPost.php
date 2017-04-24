@@ -4,7 +4,7 @@ use BetaKiller\Content\ImportedFromWordpressInterface;
 use BetaKiller\Content\LinkedContentModelInterface;
 use BetaKiller\Content\Shortcode;
 use BetaKiller\Helper\SeoMetaInterface;
-use BetaKiller\IFace\Url\UrlParameters;
+use BetaKiller\IFace\Url\UrlParametersInterface;
 use BetaKiller\Status\StatusRelatedModelOrm;
 use Spotman\Api\AbstractCrudMethodsModelInterface;
 
@@ -156,7 +156,7 @@ class Model_ContentPost extends StatusRelatedModelOrm
      *
      * @return string|null
      */
-    public function get_custom_url_parameters_key()
+    public function getCustomUrlParametersKey()
     {
         // Store all child models under this key
         return self::URL_PARAM;
@@ -476,11 +476,11 @@ class Model_ContentPost extends StatusRelatedModelOrm
      * This method allows inheritor to preset linked model in URL parameters
      * It is executed after successful url dispatching
      *
-     * @param UrlParameters $parameters
+     * @param UrlParametersInterface $parameters
      *
      * @return void
      */
-    public function preset_linked_models(UrlParameters $parameters)
+    public function presetLinkedModels(UrlParametersInterface $parameters)
     {
         $category = $this->get_category();
 
@@ -492,12 +492,12 @@ class Model_ContentPost extends StatusRelatedModelOrm
 
     public function is_default()
     {
-        return ($this->get_uri() === $this->get_default_url_value());
+        return ($this->get_uri() === $this->getDefaultUrlValue());
     }
 
     public function filter_default()
     {
-        return $this->where('uri', '!=', $this->get_default_url_value());
+        return $this->where('uri', '!=', $this->getDefaultUrlValue());
     }
 
     /**
@@ -629,9 +629,9 @@ class Model_ContentPost extends StatusRelatedModelOrm
     }
 
     /**
-     * @param UrlParameters $parameters
+     * @param UrlParametersInterface $parameters
      */
-    protected function custom_find_by_url_filter(UrlParameters $parameters)
+    protected function custom_find_by_url_filter(UrlParametersInterface $parameters)
     {
         // Load pages first
         $this->prioritize_by_post_types();
@@ -697,7 +697,7 @@ class Model_ContentPost extends StatusRelatedModelOrm
             $this->set_uri('/'); // Nullify uri so URL must not have default "index" string
         }
 
-        $this->preset_linked_models($params);
+        $this->presetLinkedModels($params);
 
         return $iface->url($params);
     }
@@ -710,7 +710,7 @@ class Model_ContentPost extends StatusRelatedModelOrm
 
         $params = $this->url_parameters_instance()->set(self::URL_PARAM, $this);
 
-        $this->preset_linked_models($params);
+        $this->presetLinkedModels($params);
 
         return $iface->url($params);
     }

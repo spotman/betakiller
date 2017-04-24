@@ -1,11 +1,20 @@
 <?php
 namespace BetaKiller\IFace\Url;
 
-use BetaKiller\Utils\Registry\Base;
-use Exception;
+use BetaKiller\Utils\Registry\BasicRegistry;
 
-class UrlParameters extends Base
+class UrlParameters implements UrlParametersInterface
 {
+    private $registry;
+
+    /**
+     * UrlParameters constructor.
+     */
+    public function __construct()
+    {
+        $this->registry = new BasicRegistry;
+    }
+
     public static function create()
     {
         return new static;
@@ -14,17 +23,72 @@ class UrlParameters extends Base
     /**
      * @param string                 $key
      * @param UrlDataSourceInterface $object
-     * @param bool|FALSE             $ignore_duplicate
+     * @param bool|false             $ignoreDuplicate
      *
      * @return $this
-     * @throws Exception
+     * @throws \Exception
      */
-    public function set($key, $object, $ignore_duplicate = false)
+    public function set($key, UrlDataSourceInterface $object, $ignoreDuplicate = false)
     {
-        $key = $object->get_custom_url_parameters_key() ?: $key;
+        $key = $object->getCustomUrlParametersKey() ?: $key;
 
-        parent::set($key, $object, $ignore_duplicate);
+        $this->registry->set($key, $object, $ignoreDuplicate);
 
         return $this;
+    }
+
+    /**
+     * @param string $key
+     * @return UrlDataSourceInterface|null
+     */
+    public function get($key)
+    {
+        return $this->registry->get($key);
+    }
+
+    /**
+     * @return $this
+     */
+    public function clear()
+    {
+        $this->registry->clear();
+        return $this;
+    }
+
+    /**
+     * @return UrlDataSourceInterface[]
+     */
+    public function getAll()
+    {
+        return $this->registry->getAll();
+    }
+
+    /**
+     * @param string $key
+     * @return bool
+     */
+    public function has($key)
+    {
+        return $this->registry->has($key);
+    }
+
+    /**
+     * Returns keys of currently added items
+     *
+     * @return string[]
+     */
+    public function keys()
+    {
+        return $this->registry->keys();
+    }
+
+    /**
+     * Retrieve an external iterator
+     *
+     * @return \Traversable|\BetaKiller\IFace\Url\UrlDataSourceInterface[]
+     */
+    public function getIterator()
+    {
+        return $this->registry->getIterator();
     }
 }

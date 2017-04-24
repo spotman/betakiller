@@ -14,12 +14,12 @@ abstract class Registry implements \IteratorAggregate, QueryConverter\Convertibl
         QueryConverter\ConvertibleHelper;
 
     /**
-     * @var Utils\Registry\Base
+     * @var Utils\Registry\BasicRegistry
      */
     protected $_registry;
 
     /**
-     * @var Filter\Factory
+     * @var Factory
      */
     protected $_filterFactory;
 
@@ -181,12 +181,12 @@ abstract class Registry implements \IteratorAggregate, QueryConverter\Convertibl
     }
 
     /**
-     * @return Utils\Registry\Base
+     * @return Utils\Registry\BasicRegistry
      */
     protected function getRegistry()
     {
         if (!$this->_registry) {
-            $this->_registry = Utils\Registry\Base::instance();
+            $this->_registry = new Utils\Registry\BasicRegistry;
         }
 
         return $this->_registry;

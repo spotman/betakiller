@@ -67,6 +67,13 @@ class NamespaceBasedFactory
         $this->appConfig       = $appConfig;
         $this->container       = $container;
         $this->classNamesCache = $cache;
+
+        $this->init();
+    }
+
+    protected function init()
+    {
+        // Empty by default
     }
 
     public function setExpectedInterface($interfaceName)

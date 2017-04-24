@@ -1,54 +1,74 @@
 <?php
+namespace BetaKiller\IFace\ModelProvider;
 
 use BetaKiller\IFace\IFaceModelInterface;
+use BetaKiller\Utils\Kohana\TreeModelSingleParentInterface;
+use BetaKiller\Utils\Kohana\TreeModelSingleParentTrait;
+use HTTP_Exception_501;
 
-class IFace_Model_Provider_Admin_Model implements IFaceModelInterface
+class IFaceModelProviderAdminModel implements IFaceModelInterface
 {
-    use \BetaKiller\Utils\Kohana\TreeModelSingleParentTrait;
+    use TreeModelSingleParentTrait;
 
     /**
-     * @var IFace_Model_Provider_Admin
+     * @var IFaceModelProviderAdmin
      */
-    protected $_provider;
+    protected $provider;
 
-    protected $_codename;
+    /**
+     * @var string
+     */
+    protected $codename;
 
-    protected $_parent_codename;
+    /**
+     * @var string
+     */
+    protected $parentCodename;
 
-    protected $_uri;
+    /**
+     * @var string
+     */
+    protected $uri;
 
-    protected $_label;
+    /**
+     * @var string
+     */
+    protected $label;
 
-    protected $_title;
+    /**
+     * @var string
+     */
+    protected $title;
 
     /**
      * Admin IFaces have "admin" layout by default
      *
      * @var string
      */
-    protected $_layout_codename = 'admin';
+    protected $layoutCodename = 'admin';
 
     /**
      * @var bool
      */
-    protected $_has_dynamic_url;
+    protected $hasDynamicUrl;
 
     /**
      * @var bool
      */
-    protected $_has_tree_behaviour;
+    protected $hasTreeBehaviour;
 
     /**
      * @var bool
      */
-    protected $_hide_in_site_map;
+    protected $hideInSiteMap;
 
-    public static function factory($data, IFace_Model_Provider_Admin $provider)
+    public static function factory($data, IFaceModelProviderAdmin $provider)
     {
         /** @var self $instance */
         $instance = new static;
-        $instance->from_array($data);
-        $instance->set_provider($provider);
+        $instance->fromArray($data);
+        $instance->setProvider($provider);
+
         return $instance;
     }
 
@@ -60,7 +80,7 @@ class IFace_Model_Provider_Admin_Model implements IFaceModelInterface
     public function isDefault()
     {
         // Admin IFaces can not have "is_default" marker
-        return FALSE;
+        return false;
     }
 
     /**
@@ -79,7 +99,7 @@ class IFace_Model_Provider_Admin_Model implements IFaceModelInterface
      */
     public function getUri()
     {
-        return $this->_uri;
+        return $this->uri;
     }
 
     /**
@@ -87,12 +107,13 @@ class IFace_Model_Provider_Admin_Model implements IFaceModelInterface
      *
      * @return IFaceModelInterface|null
      */
-    public function get_parent()
+    public function getParent()
     {
-        if ( ! $this->_parent_codename )
-            return NULL;
+        if (!$this->parentCodename) {
+            return null;
+        }
 
-        return $this->get_provider()->by_codename($this->_parent_codename);
+        return $this->getProvider()->getByCodename($this->parentCodename);
     }
 
     /**
@@ -100,17 +121,17 @@ class IFace_Model_Provider_Admin_Model implements IFaceModelInterface
      *
      * @return string
      */
-    public function get_parent_codename()
+    public function getParentCodename()
     {
-        return $this->_parent_codename;
+        return $this->parentCodename;
     }
 
     /**
      * @return \BetaKiller\IFace\IFaceModelInterface[]
      */
-    public function get_root()
+    public function getRoot()
     {
-        return $this->get_provider()->get_root();
+        return $this->getProvider()->getRoot();
     }
 
     /**
@@ -118,19 +139,20 @@ class IFace_Model_Provider_Admin_Model implements IFaceModelInterface
      *
      * @return \BetaKiller\IFace\IFaceModelInterface[]
      */
-    public function get_children()
+    public function getChildren()
     {
-        return $this->get_provider()->get_childs($this);
+        return $this->getProvider()->getChildren($this);
     }
 
     /**
      * @param string|null $column
+     *
      * @return int[]
      * @throws HTTP_Exception_501
      */
-    public function get_all_children($column = NULL)
+    public function getAllChildren($column = null)
     {
-        throw new HTTP_Exception_501('Not implemented yet');
+        throw new HTTP_Exception_501(':method not implemented yet', [':method' => __METHOD__]);
     }
 
     /**
@@ -139,7 +161,7 @@ class IFace_Model_Provider_Admin_Model implements IFaceModelInterface
      * @return $this
      * @throws HTTP_Exception_501
      */
-    public function set_parent(\BetaKiller\Utils\Kohana\TreeModelSingleParentInterface $parent = NULL)
+    public function setParent(TreeModelSingleParentInterface $parent = null)
     {
         throw new HTTP_Exception_501('Admin model can not change parent');
     }
@@ -148,6 +170,7 @@ class IFace_Model_Provider_Admin_Model implements IFaceModelInterface
      * Sets title for using in <title> tag
      *
      * @param string $value
+     *
      * @return $this
      * @throws HTTP_Exception_501
      */
@@ -160,6 +183,7 @@ class IFace_Model_Provider_Admin_Model implements IFaceModelInterface
      * Sets description for using in <meta> tag
      *
      * @param string $value
+     *
      * @return $this
      * @throws HTTP_Exception_501
      */
@@ -175,7 +199,7 @@ class IFace_Model_Provider_Admin_Model implements IFaceModelInterface
      */
     public function getCodename()
     {
-        return $this->_codename;
+        return $this->codename;
     }
 
     /**
@@ -185,7 +209,7 @@ class IFace_Model_Provider_Admin_Model implements IFaceModelInterface
      */
     public function getLabel()
     {
-        return $this->_label;
+        return $this->label;
     }
 
     /**
@@ -195,7 +219,7 @@ class IFace_Model_Provider_Admin_Model implements IFaceModelInterface
      */
     public function getTitle()
     {
-        return $this->_title;
+        return $this->title;
     }
 
     /**
@@ -206,7 +230,7 @@ class IFace_Model_Provider_Admin_Model implements IFaceModelInterface
     public function getDescription()
     {
         // Admin IFace does not need description
-        return NULL;
+        return null;
     }
 
     /**
@@ -216,16 +240,16 @@ class IFace_Model_Provider_Admin_Model implements IFaceModelInterface
      */
     public function asArray()
     {
-        return array(
-            'codename'          => $this->getCodename(),
-            'uri'               => $this->getUri(),
-            'parentCodename'    => $this->get_parent_codename(),
-            'label'             => $this->getLabel(),
-            'title'             => $this->getTitle(),
-            'hasDynamicUrl'     => $this->hasDynamicUrl(),
-            'hideInSiteMap'     => $this->hideInSiteMap(),
-            'layoutCodename'    => $this->getLayoutCodename(),
-        );
+        return [
+            'codename'       => $this->getCodename(),
+            'uri'            => $this->getUri(),
+            'parentCodename' => $this->getParentCodename(),
+            'label'          => $this->getLabel(),
+            'title'          => $this->getTitle(),
+            'hasDynamicUrl'  => $this->hasDynamicUrl(),
+            'hideInSiteMap'  => $this->hideInSiteMap(),
+            'layoutCodename' => $this->getLayoutCodename(),
+        ];
     }
 
     /**
@@ -235,35 +259,35 @@ class IFace_Model_Provider_Admin_Model implements IFaceModelInterface
      */
     public function getLayoutCodename()
     {
-        return $this->_layout_codename;
+        return $this->layoutCodename;
     }
 
-    public function from_array(array $data)
+    public function fromArray(array $data)
     {
-        $this->_codename = $data['codename'];
-        $this->_uri = $data['uri'];
+        $this->codename = $data['codename'];
+        $this->uri      = $data['uri'];
 
-        $this->_label = isset($data['label']) ? $data['label'] : NULL;
-        $this->_title = isset($data['title']) ? $data['title'] : NULL;
+        $this->label = isset($data['label']) ? $data['label'] : null;
+        $this->title = isset($data['title']) ? $data['title'] : null;
 
-        if ( isset($data['parentCodename']) ) {
-            $this->_parent_codename = $data['parentCodename'];
+        if (isset($data['parentCodename'])) {
+            $this->parentCodename = $data['parentCodename'];
         }
 
-        if ( isset($data['hasDynamicUrl']) ) {
-            $this->_has_dynamic_url = TRUE;
+        if (isset($data['hasDynamicUrl'])) {
+            $this->hasDynamicUrl = true;
         }
 
-        if ( isset($data['hasTreeBehaviour']) ) {
-            $this->_has_tree_behaviour = TRUE;
+        if (isset($data['hasTreeBehaviour'])) {
+            $this->hasTreeBehaviour = true;
         }
 
-        if ( isset($data['hideInSiteMap']) ) {
-            $this->_hide_in_site_map = TRUE;
+        if (isset($data['hideInSiteMap'])) {
+            $this->hideInSiteMap = true;
         }
 
-        if ( isset($data['layoutCodename']) ) {
-            $this->_layout_codename = $data['layoutCodename'];
+        if (isset($data['layoutCodename'])) {
+            $this->layoutCodename = $data['layoutCodename'];
         }
     }
 
@@ -274,7 +298,7 @@ class IFace_Model_Provider_Admin_Model implements IFaceModelInterface
      */
     public function hasDynamicUrl()
     {
-        return (bool) $this->_has_dynamic_url;
+        return (bool)$this->hasDynamicUrl;
     }
 
     /**
@@ -284,7 +308,7 @@ class IFace_Model_Provider_Admin_Model implements IFaceModelInterface
      */
     public function hasTreeBehaviour()
     {
-        return (bool) $this->_has_tree_behaviour;
+        return (bool)$this->hasTreeBehaviour;
     }
 
     /**
@@ -292,21 +316,21 @@ class IFace_Model_Provider_Admin_Model implements IFaceModelInterface
      */
     public function hideInSiteMap()
     {
-        return (bool) $this->_hide_in_site_map;
+        return (bool)$this->hideInSiteMap;
     }
 
     /**
-     * @return IFace_Model_Provider_Admin
+     * @return IFaceModelProviderAdmin
      */
-    protected function get_provider()
+    protected function getProvider()
     {
-        return $this->_provider;
+        return $this->provider;
     }
 
-    public function set_provider(IFace_Model_Provider_Admin $provider)
+    public function setProvider(IFaceModelProviderAdmin $provider)
     {
-        $this->_provider = $provider;
+        $this->provider = $provider;
+
         return $this;
     }
-
 }

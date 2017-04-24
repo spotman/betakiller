@@ -2,7 +2,7 @@
 
 use BetaKiller\Content\ImportedFromWordpressInterface;
 use BetaKiller\Helper\SeoMetaInterface;
-use BetaKiller\IFace\Url\UrlParameters;
+use BetaKiller\IFace\Url\UrlParametersInterface;
 use BetaKiller\Utils\Kohana\TreeModelSingleParentOrm;
 
 class Model_ContentCategory extends TreeModelSingleParentOrm implements SeoMetaInterface, ImportedFromWordpressInterface
@@ -89,7 +89,7 @@ class Model_ContentCategory extends TreeModelSingleParentOrm implements SeoMetaI
     public function get_all_related_categories_ids($include_self = true)
     {
         // Collect all children categories
-        $ids = $this->get_all_children($this->primary_key());
+        $ids = $this->getAllChildren($this->primary_key());
 
         if ($include_self) {
             // Add current category
@@ -144,7 +144,7 @@ class Model_ContentCategory extends TreeModelSingleParentOrm implements SeoMetaI
      *
      * @return $this
      */
-    protected function additional_tree_model_filtering()
+    protected function additionalTreeModelFiltering()
     {
         return $this->filter_is_active()->order_by_place();
     }
@@ -163,9 +163,9 @@ class Model_ContentCategory extends TreeModelSingleParentOrm implements SeoMetaI
     }
 
     /**
-     * @param UrlParameters $parameters
+     * @param UrlParametersInterface $parameters
      */
-    protected function custom_find_by_url_filter(UrlParameters $parameters)
+    protected function custom_find_by_url_filter(UrlParametersInterface $parameters)
     {
         $parent_category = $parameters->get(self::URL_PARAM);
 

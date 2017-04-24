@@ -149,7 +149,7 @@ abstract class NotificationMessageAbstract implements NotificationMessageInterfa
         $data = $this->getFullData($targetUser);
 
         // Prefixing data keys with semicolon
-        $data = I18n::addDoubleColonToKeys($data);
+        $data = I18n::addColonToKeys($data);
 
         return __($key, $data);
     }
@@ -287,7 +287,7 @@ abstract class NotificationMessageAbstract implements NotificationMessageInterfa
             'baseI18nKey' => $this->getBaseI18nKey(),
         ]);
 
-        $data['doubleColonPrefixedData'] = I18n::addDoubleColonToKeys($data);
+        $data['colonPrefixedData'] = I18n::addColonToKeys($data);
 
         $view->set($data);
 

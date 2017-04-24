@@ -19,6 +19,7 @@ abstract class Provider
 
     /**
      * @param \BetaKiller\Model\User|NULL $user
+     *
      * @return $this
      * @todo DI
      * @deprecated

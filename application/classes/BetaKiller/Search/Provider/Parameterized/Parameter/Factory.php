@@ -10,8 +10,9 @@ abstract class Factory {
         Utils\Factory\Namespaced;
 
     /**
-     * @param string $name
+     * @param string     $name
      * @param Model\User $user
+     *
      * @return \BetaKiller\Search\Provider\Parameterized\Parameter
      */
     public function create($name, Model\User $user = NULL)
@@ -20,8 +21,9 @@ abstract class Factory {
     }
 
     /**
-     * @param string $class_name
+     * @param string     $class_name
      * @param Model\User $user
+     *
      * @return \BetaKiller\Search\Provider\Parameterized\Parameter
      */
     protected function make_instance($class_name, Model\User $user = NULL)

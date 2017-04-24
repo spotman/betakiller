@@ -183,7 +183,7 @@ class User extends \Model_Auth_User implements UserInterface
             $roles = [];
 
             foreach ($this->get_roles_relation()->get_all() as $role) {
-                $roles[] = $role->get_all_parents();
+                $roles[] = $role->getAllParents();
             }
 
             $roles = array_merge(...$roles);

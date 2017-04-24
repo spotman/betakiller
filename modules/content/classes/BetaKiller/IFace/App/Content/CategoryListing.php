@@ -20,7 +20,7 @@ class CategoryListing extends AppBase
     {
         $data = [];
 
-        $children = $parent ? $parent->get_children() : $this->model_factory_content_category()->get_root();
+        $children = $parent ? $parent->getChildren() : $this->model_factory_content_category()->getRoot();
 
         foreach ($children as $child) {
             if (!$child->is_active()) {

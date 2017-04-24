@@ -14,7 +14,7 @@ class Model_AclResource extends TreeModelSingleParentOrm
     /**
      * Place here additional query params
      */
-    protected function additional_tree_model_filtering()
+    protected function additionalTreeModelFiltering()
     {
         // Nothing to do
     }
@@ -30,7 +30,7 @@ class Model_AclResource extends TreeModelSingleParentOrm
 
     public function getParentResourceCodename()
     {
-        $parent = $this->get_parent();
+        $parent = $this->getParent();
         return $parent ? $parent->getCodename() : null;
     }
 

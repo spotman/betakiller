@@ -59,7 +59,7 @@ return [
         // Inject container into factories
         \BetaKiller\DI\ContainerInterface::class => DI\factory(function () {
             return \BetaKiller\DI\Container::instance();
-        }),
+        })->scope(Scope::SINGLETON),
 
         LoggerInterface::class => DI\object(\BetaKiller\Log\Logger::class),
 

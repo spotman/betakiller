@@ -38,7 +38,7 @@ class Widget_Content_Comments extends BaseWidget
         foreach ($comments as $comment) {
             $created_at = $comment->get_created_at();
             $email = $comment->get_author_email();
-            $parentModel = $comment->get_parent();
+            $parentModel = $comment->getParent();
             $parentID = $parentModel ? $parentModel->get_id() : 0;
 
             $commentsData[] = [
@@ -149,7 +149,7 @@ class Widget_Content_Comments extends BaseWidget
 
         // Parent comment
         if ($parentModel) {
-            $model->set_parent($parentModel);
+            $model->setParent($parentModel);
         }
 
         $model

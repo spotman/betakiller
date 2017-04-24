@@ -1,10 +1,17 @@
 <?php
 namespace BetaKiller\Factory;
 
-//use ORM;
+use BetaKiller\Utils\Kohana\ORM\OrmInterface;
 
 class OrmFactory extends NamespaceBasedFactory
 {
+    protected function init()
+    {
+        $this
+            ->setExpectedInterface(OrmInterface::class)
+            ->setClassPrefixes('Model');
+    }
+
 //    /**
 //     * @param string     $className
 //     * @param array|null $arguments

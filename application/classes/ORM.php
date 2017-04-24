@@ -3,7 +3,7 @@
 use BetaKiller\DI\Container;
 use BetaKiller\Factory\OrmFactory;
 use BetaKiller\IFace\Url\UrlDataSourceInterface;
-use BetaKiller\IFace\Url\UrlParameters;
+use BetaKiller\IFace\Url\UrlParametersInterface;
 use BetaKiller\Search\Model\Applicable;
 use BetaKiller\Search\Model\ResultsItem;
 use BetaKiller\Utils;
@@ -18,12 +18,12 @@ class ORM extends Utils\Kohana\ORM implements ApiResponseItemInterface, UrlDataS
     protected static $_factory_instance;
 
     /**
-     * @param string $model
-     * @param int|array|null   $id
+     * @param string         $model
+     * @param int|array|null $id
      *
      * @return OrmInterface
      */
-    public static function factory($model, $id = NULL)
+    public static function factory($model, $id = null)
     {
         // Coz ORM do not cares about letter cases
         $model = str_replace(' ', '_', ucwords(str_replace('_', ' ', $model)));
@@ -58,10 +58,6 @@ class ORM extends Utils\Kohana\ORM implements ApiResponseItemInterface, UrlDataS
             /** @var OrmFactory $factory */
             $factory = Container::instance()->get(OrmFactory::class);
 
-            $factory
-                ->setExpectedInterface(\Kohana_ORM::class)
-                ->setClassPrefixes('Model');
-
             self::$_factory_instance = $factory;
         }
 
@@ -88,79 +84,78 @@ class ORM extends Utils\Kohana\ORM implements ApiResponseItemInterface, UrlDataS
     public function getApiLastModified()
     {
         // Empty by default
-        return NULL;
+        return null;
     }
 
     /**
      * Performs search for model item where the $key property value is equal to $value
      *
-     * @param string        $key
-     * @param string        $value
-     * @param UrlParameters $parameters
+     * @param string                 $key
+     * @param string                 $value
+     * @param UrlParametersInterface $parameters
      *
      * @return UrlDataSourceInterface|NULL
      */
-    public function find_by_url_key($key, $value, UrlParameters $parameters)
+    public function findByUrlKey($key, $value, UrlParametersInterface $parameters)
     {
         // Additional filtering for non-pk keys
-        if ( $key != $this->primary_key() )
-        {
+        if ($key !== $this->primary_key()) {
             $this->custom_find_by_url_filter($parameters);
         }
 
         $model = $this->where($this->object_column($key), '=', $value)->find();
 
-        return $model->loaded() ? $model : NULL;
+        return $model->loaded() ? $model : null;
     }
 
     /**
-     * @param UrlParameters $parameters
+     * @param UrlParametersInterface $parameters
      */
-    protected function custom_find_by_url_filter(UrlParameters $parameters)
+    protected function custom_find_by_url_filter(UrlParametersInterface $parameters)
     {
         // Empty by default
     }
 
-    public function get_default_url_value()
+    public function getDefaultUrlValue()
     {
         return 'index';
     }
 
     /**
      * Returns value of the $key property
+     *
      * @param string $key
+     *
      * @return string
      */
-    public function get_url_key_value($key)
+    public function getUrlKeyValue($key)
     {
-        return (string) $this->get($key);
+        return (string)$this->get($key);
     }
 
     /**
      * Returns list of available items (model records) by $key property
      *
-     * @param string        $key
-     * @param UrlParameters $parameters
-     * @param int|null      $limit
+     * @param string                 $key
+     * @param UrlParametersInterface $parameters
+     * @param int|null               $limit
      *
      * @return \BetaKiller\IFace\Url\UrlDataSourceInterface[]
      */
-    public function get_available_items_by_url_key($key, UrlParameters $parameters, $limit = NULL)
+    public function getAvailableItemsByUrlKey($key, UrlParametersInterface $parameters, $limit = null)
     {
         // Additional filtering for non-pk keys
-        if ( $key != $this->primary_key() )
-        {
+        if ($key != $this->primary_key()) {
             $this->custom_find_by_url_filter($parameters);
         }
 
-        if ($limit)
-        {
+        if ($limit) {
             $this->limit($limit);
         }
 
         $key_column = $this->object_column($key);
 
-        $models = $this->where($key_column, 'IS NOT', NULL)->group_by($key_column)->find_all();
+        $models = $this->where($key_column, 'IS NOT', null)->group_by($key_column)->find_all();
 
         return $models->count() ? $models->as_array() : [];
     }
@@ -175,11 +170,11 @@ class ORM extends Utils\Kohana\ORM implements ApiResponseItemInterface, UrlDataS
      * This method allows inheritor to preset linked model in URL parameters
      * It is executed after successful url dispatching
      *
-     * @param UrlParameters $parameters
+     * @param UrlParametersInterface $parameters
      *
      * @return void
      */
-    public function preset_linked_models(UrlParameters $parameters)
+    public function presetLinkedModels(UrlParametersInterface $parameters)
     {
         // Nothing by default
     }
@@ -190,10 +185,10 @@ class ORM extends Utils\Kohana\ORM implements ApiResponseItemInterface, UrlDataS
      *
      * @return string|null
      */
-    public function get_custom_url_parameters_key()
+    public function getCustomUrlParametersKey()
     {
         // Nothing by default
-        return NULL;
+        return null;
     }
 
     /**
@@ -201,7 +196,7 @@ class ORM extends Utils\Kohana\ORM implements ApiResponseItemInterface, UrlDataS
      *
      * @return string
      */
-    public function get_url_item_id()
+    public function getUrlItemID()
     {
         return $this->get_id();
     }
@@ -218,6 +213,7 @@ class ORM extends Utils\Kohana\ORM implements ApiResponseItemInterface, UrlDataS
     /**
      * @param $page
      * @param $itemsPerPage
+     *
      * @return \BetaKiller\Search\Model\Results
      */
     public function getSearchResults($page, $itemsPerPage = null)
@@ -252,8 +248,9 @@ class ORM extends Utils\Kohana\ORM implements ApiResponseItemInterface, UrlDataS
     }
 
     /**
-     * @param int       $currentPage
-     * @param int|null  $itemsPerPage
+     * @param int      $currentPage
+     * @param int|null $itemsPerPage
+     *
      * @return \ORM\PaginateHelper
      */
     public function paginateHelper($currentPage, $itemsPerPage = null)

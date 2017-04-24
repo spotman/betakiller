@@ -143,7 +143,7 @@ class Role extends TreeModelMultipleParentsOrm implements RoleInterface
     /**
      * Place here additional query params
      */
-    protected function additional_tree_model_filtering()
+    protected function additionalTreeModelFiltering()
     {
         // Nothing to do
     }

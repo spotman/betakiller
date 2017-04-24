@@ -1,41 +1,44 @@
 <?php
 namespace BetaKiller\IFace;
 
+use BetaKiller\IFace\ModelProvider\IFaceModelProviderAggregate;
 
 class IFaceModelRecursiveIterator extends IFaceModelLayerIterator implements \RecursiveIterator
 {
     /**
-     * @var \IFace_Model_Provider
+     * @var \BetaKiller\IFace\ModelProvider\IFaceModelProviderAggregate
      */
-    protected $_model_provider;
+    protected $modelProvider;
 
     /**
      * IFaceModelLayerIterator constructor.
      *
-     * @param \BetaKiller\IFace\IFaceModelInterface|NULL $parent
-     * @param \IFace_Model_Provider                      $model_provider
+     * @param \BetaKiller\IFace\IFaceModelInterface|NULL                  $parent
+     * @param \BetaKiller\IFace\ModelProvider\IFaceModelProviderAggregate $modelProvider
      */
-    public function __construct(IFaceModelInterface $parent = NULL, \IFace_Model_Provider $model_provider)
+    public function __construct(IFaceModelInterface $parent = null, IFaceModelProviderAggregate $modelProvider)
     {
-        $this->_model_provider = $model_provider;
+        $this->modelProvider = $modelProvider;
 
-        parent::__construct($parent, $model_provider);
+        parent::__construct($parent, $modelProvider);
     }
 
     /**
      * Returns if an iterator can be created for the current entry.
-     * @link http://php.net/manual/en/recursiveiterator.haschildren.php
+     *
+     * @link  http://php.net/manual/en/recursiveiterator.haschildren.php
      * @return bool true if the current entry can be iterated over, otherwise returns false.
      * @since 5.1.0
      */
     public function hasChildren()
     {
-        return TRUE;
+        return true;
     }
 
     /**
      * Returns an iterator for the current entry.
-     * @link http://php.net/manual/en/recursiveiterator.getchildren.php
+     *
+     * @link  http://php.net/manual/en/recursiveiterator.getchildren.php
      * @return \RecursiveIterator An iterator for the current entry.
      * @since 5.1.0
      */
@@ -43,6 +46,6 @@ class IFaceModelRecursiveIterator extends IFaceModelLayerIterator implements \Re
     {
         $current = $this->current();
 
-        return new self($current, $this->_model_provider);
+        return new self($current, $this->modelProvider);
     }
 }

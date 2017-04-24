@@ -6,7 +6,7 @@ use BetaKiller\Utils;
  * Class BetaKiller_Environment
  * @deprecated
  */
-class BetaKiller_Environment extends Utils\Registry\Base
+class BetaKiller_Environment extends Utils\Registry\BasicRegistry
 {
     use Utils\Instance\SingletonTrait;
 

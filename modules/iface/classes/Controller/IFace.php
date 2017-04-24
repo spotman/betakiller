@@ -1,7 +1,9 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
-use \BetaKiller\IFace\IFaceInterface;
-use \BetaKiller\IFace\Cache\IFaceCache;
+use BetaKiller\DI\Container;
+use BetaKiller\IFace\IFaceInterface;
+use BetaKiller\IFace\Cache\IFaceCache;
+use BetaKiller\Config\AppConfigInterface;
 
 class Controller_IFace extends Controller
 {
@@ -15,7 +17,7 @@ class Controller_IFace extends Controller
         $dispatcher = $this->url_dispatcher();
 
         // Getting current IFace
-        $iface = $dispatcher->parse_uri($uri);
+        $iface = $dispatcher->parseUri($uri);
 
         // If this is default IFace and client requested non-slash uri, redirect client to /
         if ( $uri !== '/' && $iface->isDefault() ) {
@@ -23,9 +25,9 @@ class Controller_IFace extends Controller
         }
 
         if ($uri && $uri !== '/') {
-            $has_trailing_slash = (substr($uri, -1, 1) === '/');
+            $has_trailing_slash = (substr($uri, -1) === '/');
 
-            $is_trailing_slash_enabled = $iface->isTrailingSlashEnabled();
+            $is_trailing_slash_enabled = $this->getAppConfig()->isTrailingSlashEnabled();
 
             if ($has_trailing_slash && !$is_trailing_slash_enabled) {
                 // Permanent redirect
@@ -66,8 +68,16 @@ class Controller_IFace extends Controller
         }
 
         /** @var IFaceCache $cache */
-        $cache = \BetaKiller\DI\Container::instance()->get(IFaceCache::class);
+        $cache = Container::instance()->get(IFaceCache::class);
         $cache->process($iface);
+    }
+
+    /**
+     * @return \BetaKiller\Config\AppConfigInterface
+     */
+    protected function getAppConfig()
+    {
+        return Container::instance()->get(AppConfigInterface::class);
     }
 
     /**

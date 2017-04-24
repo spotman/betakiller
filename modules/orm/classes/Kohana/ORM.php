@@ -294,7 +294,7 @@ class Kohana_ORM extends Model implements Serializable {
 	    $pos = strpos($class_name, 'Model');
 
 	    if ($pos === false) {
-            throw new Exception('Incorrect model class naming '.$class_name);
+            throw new \Kohana_Exception('Incorrect model class naming :name', [':name' => $class_name]);
         }
 
 		// Set the object name and plural name

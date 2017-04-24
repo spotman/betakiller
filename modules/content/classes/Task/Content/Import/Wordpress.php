@@ -986,7 +986,7 @@ class Task_Content_Import_Wordpress extends Minion_Task
             $parent = $categories_orm->find_by_wp_id($parent_wp_id);
 
             $category
-                ->set_parent($parent)
+                ->setParent($parent)
                 ->save();
         }
     }
@@ -1061,7 +1061,7 @@ class Task_Content_Import_Wordpress extends Minion_Task
             }
 
             $model
-                ->set_parent($parent)
+                ->setParent($parent)
                 ->set_entity($this->get_content_post_entity())
                 ->set_entity_item_id($post->get_id())
                 ->set_created_at($created_at)
