@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/spotman/betakiller.svg?branch=master)](https://travis-ci.org/spotman/betakiller)
+
 # Betakiller platform
 
 Based on [Kohana](http://kohanaframework.org/) framework (migration to Laravel planned).
