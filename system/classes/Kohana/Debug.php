@@ -444,8 +444,21 @@ class Kohana_Debug {
 
 			if (isset($step['class']))
 			{
+			    switch ($step['type']) {
+                    case 'dynamic':
+                        $type = '&rightarrow;';
+                        break;
+
+                    case 'static':
+                        $type = '::';
+                        break;
+
+                    default:
+                        $type = $step['type'];
+                }
+
 				// Class->method() or Class::method()
-				$function = $step['class'].$step['type'].$step['function'];
+				$function = $step['class'].$type.$step['function'];
 			}
 
 			$output[] = array(
