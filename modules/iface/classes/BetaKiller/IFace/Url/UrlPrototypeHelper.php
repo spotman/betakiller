@@ -16,13 +16,19 @@ class UrlPrototypeHelper
     private $urlParameters;
 
     /**
+     * @var \BetaKiller\IFace\Url\UrlDataSourceFactory
+     */
+    private $dataSourceFactory;
+
+    /**
      * UrlPrototypeHelper constructor.
      *
-     * @param \BetaKiller\IFace\Url\UrlParametersInterface $urlParameters
+     * @param \BetaKiller\IFace\Url\UrlParametersInterface $urlParameters Current request parameters
      */
-    public function __construct(UrlParametersInterface $urlParameters)
+    public function __construct(UrlParametersInterface $urlParameters, UrlDataSourceFactory $factory)
     {
-        $this->urlParameters = $urlParameters;
+        $this->urlParameters     = $urlParameters;
+        $this->dataSourceFactory = $factory;
     }
 
     public function fromIFaceUri(IFaceInterface $iface)
@@ -65,25 +71,7 @@ class UrlPrototypeHelper
             throw new UrlPrototypeException('Empty UrlPrototype model name');
         }
 
-        // TODO Introduce UrlDataSourceFactory and use it
-
-        /** @var UrlDataSourceInterface $object */
-        $object = \ORM::factory($name);
-
-        if (!($object instanceof UrlDataSourceInterface)) {
-            throw new UrlPrototypeException('The model :name must implement :proto', [
-                ':name'  => $name,
-                ':proto' => UrlDataSourceInterface::class,
-            ]);
-        }
-
-        return $object;
-    }
-
-    public function getModelFromUrlParameters(UrlPrototype $prototype, UrlParametersInterface $params = null)
-    {
-        //TODO
-
+        return $this->dataSourceFactory->create($name);
     }
 
     public function replaceUrlParametersParts($sourceString, UrlParametersInterface $parameters = null)
@@ -101,17 +89,7 @@ class UrlPrototypeHelper
     {
         $prototype = $this->fromString($prototypeString);
 
-        $modelName = $prototype->getModelName();
-
-        /** @var UrlDataSourceInterface $model */
-        $model = $parameters ? $parameters->get($modelName) : null;
-
-        // Inherit model from current request url parameters
-        $model = $model ?: $this->urlParameters->get($modelName);
-
-        if (!$model) {
-            throw new UrlPrototypeException('Can not find :name model in parameters', [':name' => $modelName]);
-        }
+        $model = $this->getModelFromUrlParameters($prototype, $parameters);
 
         if ($isTree && !($model instanceof TreeModelSingleParentInterface)) {
             throw new UrlPrototypeException('Model :model must be instance of :object for tree traversing', [
@@ -128,6 +106,30 @@ class UrlPrototypeHelper
 
         return implode('/', array_reverse($parts));
 
+    }
+
+    /**
+     * @param \BetaKiller\IFace\Url\UrlPrototype                $prototype
+     * @param \BetaKiller\IFace\Url\UrlParametersInterface|null $parameters
+     *
+     * @return \BetaKiller\IFace\Url\UrlDataSourceInterface|null
+     * @throws \BetaKiller\IFace\Url\UrlPrototypeException
+     */
+    public function getModelFromUrlParameters(UrlPrototype $prototype, UrlParametersInterface $parameters = null)
+    {
+        $modelName = $prototype->getModelName();
+
+        /** @var UrlDataSourceInterface $model */
+        $model = $parameters ? $parameters->get($modelName) : null;
+
+        // Inherit model from current request url parameters
+        $model = $model ?: $this->urlParameters->get($modelName);
+
+        if (!$model) {
+            throw new UrlPrototypeException('Can not find :name model in parameters', [':name' => $modelName]);
+        }
+
+        return $model;
     }
 
     protected function calculateModelKeyValue(UrlPrototype $prototype, UrlDataSourceInterface $model)

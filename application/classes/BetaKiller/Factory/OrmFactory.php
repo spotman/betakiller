@@ -7,21 +7,13 @@ class OrmFactory extends NamespaceBasedFactory
 {
     protected function init()
     {
-        $this
+        $this->injectDefinitions($this);
+    }
+
+    public function injectDefinitions(NamespaceBasedFactory $factory)
+    {
+        $factory
             ->setExpectedInterface(OrmInterface::class)
             ->setClassPrefixes('Model');
     }
-
-//    /**
-//     * @param string     $className
-//     * @param array|null $arguments
-//     *
-//     * @return \BetaKiller\Utils\Kohana\ORM\OrmInterface
-//     */
-//    protected function createInstance($className, array $arguments = null)
-//    {
-//        $id = $arguments ? array_shift($arguments) : null;
-//
-//        return new $className($id);
-//    }
 }

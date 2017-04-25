@@ -46,7 +46,7 @@ return [
 
     'definitions' => [
 
-        // Always create new instance of this factory
+        // Always create new instance of this basic factory implementation coz it is configured in each factory
         NamespaceBasedFactory::class             => DI\object(NamespaceBasedFactory::class)->scope(Scope::PROTOTYPE),
 
         // Single cache instance for whole project
@@ -69,7 +69,6 @@ return [
 
         // Helpers
         'User'      => DI\factory(function (Auth $auth) {
-//            $auth = Auth::instance();
             $user = $auth->get_user();
 
             if (!$user) {

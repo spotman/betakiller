@@ -1,6 +1,7 @@
 <?php
 namespace BetaKiller\IFace;
 
+use BetaKiller\IFace\Exception\IFaceStackException;
 use BetaKiller\IFace\Url\UrlParameters;
 use BetaKiller\IFace\Url\UrlParametersInterface;
 
@@ -33,6 +34,10 @@ class IFaceStack
 
     public function push(IFaceInterface $iface)
     {
+        if ($this->has($iface)) {
+            throw new IFaceStackException('Duplicate insert for :codename', [':codename' => $iface->getCodename()]);
+        }
+
         $this->items[$iface->getCodename()] = $iface;
         $this->current = $iface;
     }
