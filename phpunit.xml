@@ -11,4 +11,31 @@
             <file>modules/unittest/tests.php</file>
         </testsuite>
     </testsuites>
+
+    <filter>
+        <whitelist processUncoveredFilesFromWhitelist="true">
+            <directory>application/classes</directory>
+            <directory>modules/acl/classes</directory>
+            <directory>modules/admin/classes</directory>
+            <directory>modules/api/classes</directory>
+            <directory>modules/content/classes</directory>
+            <directory>modules/email/classes</directory>
+            <directory>modules/error/classes</directory>
+            <directory>modules/iface/classes</directory>
+            <directory>modules/jsonrpc/classes</directory>
+            <directory>modules/log/classes</directory>
+            <!--<directory>modules/migrations/classes</directory>-->
+            <directory>modules/multi-site/classes</directory>
+            <directory>modules/notification/classes</directory>
+            <directory>modules/robots-txt/classes</directory>
+            <directory>modules/sitemap/classes</directory>
+            <directory>modules/utils/classes</directory>
+            <exclude>
+                <directory>application/tests</directory>
+                <directory>modules/*/tests</directory>
+                <directory suffix=".php">vendor</directory>
+                <directory suffix=".php">system</directory>
+            </exclude>
+        </whitelist>
+    </filter>
 </phpunit>

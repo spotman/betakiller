@@ -1,6 +1,7 @@
-<?php defined('SYSPATH') or die('No direct access allowed.');
+<?php
+namespace BetaKiller;
 
-class Device extends Kohana_Device {
+class Device extends \Kohana_Device {
 
     use \BetaKiller\Utils\Instance\Simple;
 

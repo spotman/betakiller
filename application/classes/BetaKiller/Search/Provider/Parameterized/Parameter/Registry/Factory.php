@@ -10,7 +10,6 @@ namespace BetaKiller\Search\Provider\Parameterized\Parameter\Registry;
 
 use BetaKiller\Search\Provider\Parameterized\Parameter\Registry;
 use BetaKiller\Utils;
-use BetaKiller\Utils\Factory\Exception;
 
 abstract class Factory
 {
