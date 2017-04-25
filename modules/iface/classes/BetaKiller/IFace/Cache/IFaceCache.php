@@ -60,7 +60,9 @@ class IFaceCache
 
         $this->pageCache->setExpiration($expires);
         $this->pageCache->enableHeaders(true);
-        $this->pageCache->forwardHeaders(true);
+
+//        @todo Enable that after approving PR by mmamedov
+//        $this->pageCache->forwardHeaders(true);
         $this->pageCache->init();
     }
 
