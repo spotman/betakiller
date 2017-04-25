@@ -254,7 +254,7 @@ class Task_Content_Import_Wordpress extends Minion_Task
             ->save();
 
         // Cleanup temp files
-        if ($this->attach_parsing_mode == self::ATTACH_PARSING_MODE_HTTP) {
+        if ($this->attach_parsing_mode === self::ATTACH_PARSING_MODE_HTTP) {
             unlink($path);
         }
 
@@ -265,7 +265,7 @@ class Task_Content_Import_Wordpress extends Minion_Task
 
     protected function get_attachment_path($original_url_path, $expected_mimes)
     {
-        if ($this->attach_parsing_mode == self::ATTACH_PARSING_MODE_HTTP)
+        if ($this->attach_parsing_mode === self::ATTACH_PARSING_MODE_HTTP)
         {
             $url = $this->attach_parsing_path.ltrim($original_url_path, '/');
 
@@ -273,7 +273,7 @@ class Task_Content_Import_Wordpress extends Minion_Task
 
             $response = Request::factory($url)->execute();
 
-            if ($response->status() != 200)
+            if ($response->status() !== 200)
                 throw new TaskException('Got :code status from :url', [
                     ':code' =>  $response->status(),
                     ':url'  => $url,
@@ -281,7 +281,7 @@ class Task_Content_Import_Wordpress extends Minion_Task
 
             $real_mime = $response->headers('Content-Type');
 
-            if (is_array($expected_mimes) AND !in_array($real_mime, $expected_mimes))
+            if (is_array($expected_mimes) && !in_array($real_mime, $expected_mimes))
                 throw new TaskException('Invalid mime-type: [:real], [:expected] expected', [
                     ':real'     =>  $real_mime,
                     ':expected' =>  implode('] or [', $expected_mimes),
@@ -298,7 +298,7 @@ class Task_Content_Import_Wordpress extends Minion_Task
 
             return $path;
         }
-        elseif ($this->attach_parsing_mode == self::ATTACH_PARSING_MODE_LOCAL)
+        elseif ($this->attach_parsing_mode === self::ATTACH_PARSING_MODE_LOCAL)
         {
             $path = $this->attach_parsing_path.'/'.trim($original_url_path, '/');
 
@@ -357,18 +357,18 @@ class Task_Content_Import_Wordpress extends Minion_Task
             // Detect is this is a new record
             $is_new = !$model->get_id();
 
-            if ($type == $wp::POST_TYPE_PAGE)
-            {
+            if ($type === $wp::POST_TYPE_PAGE) {
                 $model->mark_as_page();
             }
 
             $model
                 ->set_wp_id($id)
                 ->set_uri($uri)
-                ->set_label($name)
-                ->set_content($content)
-                ->set_title($title)
-                ->set_description($description);
+                ->set_label($name);
+
+            $model->set_content($content);
+            $model->setTitle($title);
+            $model->setDescription($description);
 
             // Saving model and getting its ID for further processing
             $model->save();

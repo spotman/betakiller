@@ -1,10 +1,12 @@
 <?php
 
+use BetaKiller\Helper\SeoMetaInterface;
+
 trait Model_ORM_SeoContentTrait
 {
     /**
      * @param string $value
-     * @return $this
+     * @return SeoMetaInterface
      * @throws Kohana_Exception
      */
     public function setTitle($value)
@@ -23,7 +25,7 @@ trait Model_ORM_SeoContentTrait
 
     /**
      * @param string $value
-     * @return $this
+     * @return SeoMetaInterface
      * @throws Kohana_Exception
      */
     public function setDescription($value)
