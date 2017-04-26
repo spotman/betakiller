@@ -2,10 +2,9 @@
 
 return array(
 
+    'utils'                 => MODPATH.'utils',                 // Useful classes
     'sqlite'                => MODPATH.'sqlite',                // SQLite database driver (used by logs)
     'log'                   => MODPATH.'log',                   // Logs subsystem
-    'utils'                 => MODPATH.'utils',                 // Useful classes
-
     'error'                 => MODPATH.'error',                 // Error handling and logging
 
     // Place it first for correct initialization of per-site classes and configs

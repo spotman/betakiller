@@ -145,6 +145,7 @@ trait ContentTrait
 
     /**
      * @return \Model_ContentPost|NULL
+     * @deprecated Use ContentUrlParametersHelper instead
      */
     public function url_parameter_content_post()
     {
@@ -153,6 +154,7 @@ trait ContentTrait
 
     /**
      * @return \Model_ContentCategory
+     * @deprecated Use ContentUrlParametersHelper instead
      */
     public function url_parameter_content_category()
     {
@@ -161,6 +163,7 @@ trait ContentTrait
 
     /**
      * @return \Model_ContentCommentStatus
+     * @deprecated Use ContentUrlParametersHelper instead
      */
     public function url_parameter_content_comment_status()
     {
@@ -169,6 +172,7 @@ trait ContentTrait
 
     /**
      * @return \Model_ContentComment
+     * @deprecated Use ContentUrlParametersHelper instead
      */
     public function url_parameter_content_comment()
     {

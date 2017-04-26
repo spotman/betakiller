@@ -15,7 +15,7 @@ interface UrlParametersInterface
      * @param UrlDataSourceInterface $object
      * @param bool|false             $ignoreDuplicate
      *
-     * @return $this
+     * @return \BetaKiller\IFace\Url\UrlParametersInterface
      */
     public function set($key, UrlDataSourceInterface $object, $ignoreDuplicate = false);
 
@@ -26,7 +26,7 @@ interface UrlParametersInterface
     public function get($key);
 
     /**
-     * @return $this
+     * @return \BetaKiller\IFace\Url\UrlParametersInterface
      */
     public function clear();
 
