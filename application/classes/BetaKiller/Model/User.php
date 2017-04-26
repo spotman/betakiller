@@ -39,20 +39,20 @@ class User extends \Model_Auth_User implements UserInterface
         return $this->get('roles');
     }
 
-//    public function complete_login()
-//    {
-//        // Fetch all user roles and put it in cache
-//        $this->fetchAllUserRolesIDs();
+    public function complete_login()
+    {
+        // Fetch all user roles and put it in cache
+        $this->fetchAllUserRolesIDs();
+
+        parent::complete_login();
+
+//        if ($this->loaded()) {
+//            $this->ip = sprintf("%u", ip2long(Request::$client_ip));
+//            $this->session_id = Session::instance()->id();
 //
-//        parent::complete_login();
-//
-////        if ($this->loaded()) {
-////            $this->ip = sprintf("%u", ip2long(Request::$client_ip));
-////            $this->session_id = Session::instance()->id();
-////
-////            $this->save();
-////        }
-//    }
+//            $this->save();
+//        }
+    }
 
     /**
      * @param string $value
@@ -412,6 +412,7 @@ class User extends \Model_Auth_User implements UserInterface
     /**
      * Возвращает true если пользователю разрешено использовать админку
      * @return bool
+     * @deprecated
      */
     public function is_admin_allowed()
     {
@@ -446,10 +447,10 @@ class User extends \Model_Auth_User implements UserInterface
         return $this->get_roles_relation()->get_all();
     }
 
-//    protected function getSerializableProperties()
-//    {
-//        return array_merge(parent::getSerializableProperties(), [
-//            '_all_roles_ids'
-//        ]);
-//    }
+    protected function getSerializableProperties()
+    {
+        return array_merge(parent::getSerializableProperties(), [
+            '_all_roles_ids'
+        ]);
+    }
 }
