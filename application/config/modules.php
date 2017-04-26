@@ -2,13 +2,13 @@
 
 return array(
 
+    // Place it first for correct initialization of per-site classes and configs
+    'multi-site'            => MODPATH.'multi-site',            // Multiple apps on top of single engine
+
     'utils'                 => MODPATH.'utils',                 // Useful classes
     'sqlite'                => MODPATH.'sqlite',                // SQLite database driver (used by logs)
     'log'                   => MODPATH.'log',                   // Logs subsystem
     'error'                 => MODPATH.'error',                 // Error handling and logging
-
-    // Place it first for correct initialization of per-site classes and configs
-    'multi-site'            => MODPATH.'multi-site',            // Multiple apps on top of single engine
 
     'acl'                   => MODPATH.'acl',                   // Role based access control
     'admin'                 => MODPATH.'admin',                 // Basic admin
