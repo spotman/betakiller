@@ -69,6 +69,12 @@ require_once $vendor_autoload;
  */
 ini_set('unserialize_callback_func', 'spl_autoload_call');
 
+/**
+ * Prevent exceptions for deep-nested calls with enabled xDebug
+ * @url http://stackoverflow.com/a/4293870/3640406
+ */
+ini_set('xdebug.max_nesting_level', 200);
+
 // -- Configuration and initialization -----------------------------------------
 
 // Import arguments in CLI mode
