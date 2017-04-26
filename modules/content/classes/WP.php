@@ -307,7 +307,7 @@ class WP
      *                    after paragraphing. Default true.
      * @return string Text which has been converted into correct paragraph tags.
      */
-    function autop( $pee, $br = true ) {
+    public function autop( $pee, $br = true ) {
         $pre_tags = array();
 
         if ( trim($pee) === '' )
@@ -466,7 +466,7 @@ class WP
      * @param array $replace_pairs In the form array('from' => 'to', ...).
      * @return string The formatted text.
      */
-    function replace_in_html_tags( $haystack, $replace_pairs ) {
+    private function replace_in_html_tags( $haystack, $replace_pairs ) {
         // Find all elements.
         $textarr = $this->html_split( $haystack );
         $changed = false;
@@ -515,7 +515,7 @@ class WP
      * @param string $input The text which has to be formatted.
      * @return array The formatted text.
      */
-    function html_split( $input ) {
+    private function html_split( $input ) {
         return preg_split( $this->get_html_split_regex(), $input, -1, PREG_SPLIT_DELIM_CAPTURE );
     }
 
@@ -526,7 +526,7 @@ class WP
      *
      * @return string The regular expression
      */
-    function get_html_split_regex() {
+    private function get_html_split_regex() {
         static $regex;
 
         if ( ! isset( $regex ) ) {
@@ -582,7 +582,7 @@ class WP
      * @param array $matches preg_replace_callback matches array
      * @return string
      */
-    public function autop_newline_preservation_helper( $matches ) {
+    private function autop_newline_preservation_helper( $matches ) {
         return str_replace( "\n", "<WPPreserveNewline />", $matches[0] );
     }
 

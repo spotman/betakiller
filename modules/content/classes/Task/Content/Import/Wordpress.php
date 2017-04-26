@@ -203,8 +203,9 @@ class Task_Content_Import_Wordpress extends Minion_Task
     {
         $orm = $provider->file_model_factory();
 
-        if (!$orm instanceof ImportedFromWordpressInterface)
+        if (!$orm instanceof ImportedFromWordpressInterface) {
             throw new TaskException('Attachment model must be instance of :class', [':class' => ImportedFromWordpressInterface::class]);
+        }
 
         // Search for such file already exists
         /** @var ContentElementInterface $model */
@@ -357,14 +358,23 @@ class Task_Content_Import_Wordpress extends Minion_Task
             // Detect is this is a new record
             $is_new = !$model->get_id();
 
-            if ($type === $wp::POST_TYPE_PAGE) {
-                $model->mark_as_page();
+            // Detect type
+            switch ($type) {
+                case $wp::POST_TYPE_PAGE:
+                    $model->mark_as_page();
+                    break;
+
+                case $wp::POST_TYPE_POST:
+                    $model->mark_as_article();
+                    break;
+
+                default:
+                    throw new TaskException('Unknown post type: :value', [':type' => $type]);
             }
 
-            $model
-                ->set_wp_id($id)
-                ->set_uri($uri)
-                ->set_label($name);
+            $model->set_wp_id($id);
+            $model->set_uri($uri);
+            $model->set_label($name);
 
             $model->set_content($content);
             $model->setTitle($title);
