@@ -3,6 +3,7 @@ namespace BetaKiller\Log;
 
 use BetaKiller\Helper\AppEnvTrait;
 use BetaKiller\Helper\CurrentUserTrait;
+use Monolog\ErrorHandler;
 use Monolog\Handler\DeduplicationHandler;
 use Monolog\Handler\PHPConsoleHandler;
 use Monolog\Handler\StreamHandler;
@@ -38,7 +39,7 @@ class Logger implements LoggerInterface
     {
         $monolog = new \Monolog\Logger('default');
 
-//        ErrorHandler::register($monolog);
+        ErrorHandler::register($monolog);
 
         $logFilePath     = implode(DIRECTORY_SEPARATOR, ['logs', date('Y'), date('m'), date('d').'.log']);
         $coreLogFilePath = APPPATH.$logFilePath;
