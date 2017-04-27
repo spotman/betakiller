@@ -16,13 +16,8 @@ class Controller_IFace extends Controller
 
         $dispatcher = $this->url_dispatcher();
 
-        $token = \Profiler::start('url dispatching', 'total');
-
         // Getting current IFace
         $iface = $dispatcher->process($uri);
-
-        $total = (int)(\Profiler::total($token)[0] * 1000);
-        \Log::debug('Url dispatched by :value ms', [':value' => $total]);
 
         // If this is default IFace and client requested non-slash uri, redirect client to /
         if ( $uri !== '/' && $iface->isDefault() ) {
