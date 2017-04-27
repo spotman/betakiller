@@ -244,6 +244,10 @@ class NamespaceBasedFactory
      */
     protected function getClassNameFromCache($baseName)
     {
+        if (!$this->classNamesCache->contains($baseName)) {
+            return false;
+        }
+
         return $this->classNamesCache->fetch($baseName);
     }
 
