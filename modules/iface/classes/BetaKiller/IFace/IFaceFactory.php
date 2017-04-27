@@ -29,7 +29,7 @@ class IFaceFactory
      */
     public function from_codename($codename)
     {
-        return $this->get_provider()->getByCodename($codename);
+        return $this->get_provider()->fromCodename($codename);
     }
 
     /**

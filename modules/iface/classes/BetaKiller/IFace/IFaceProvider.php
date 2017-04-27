@@ -34,7 +34,7 @@ class IFaceProvider
         $this->factory       = $factory;
     }
 
-    public function getByCodename($codename)
+    public function fromCodename($codename)
     {
         $iface = $this->getFromCache($codename);
 

@@ -1,5 +1,7 @@
 <?php
 
+use BetaKiller\IFace\Url\UrlDispatcherCache;
+use BetaKiller\IFace\Url\UrlDispatcherCacheInterface;
 use BetaKiller\Acl\PermissionsCollector;
 use BetaKiller\Acl\ResourceFactory;
 use BetaKiller\Acl\ResourcesCollector;
@@ -53,6 +55,13 @@ return [
         FactoryCacheInterface::class             => DI\factory(function () use ($workingPath) {
             return new CommonFactoryCache([
                 new PhpFileCache(implode(DIRECTORY_SEPARATOR, [$workingPath, 'cache', 'factory'])),
+            ]);
+        })->scope(Scope::SINGLETON),
+
+        // Cache for url dispatcher
+        UrlDispatcherCacheInterface::class => DI\factory(function () use ($workingPath) {
+            return new UrlDispatcherCache([
+                new PhpFileCache(implode(DIRECTORY_SEPARATOR, [$workingPath, 'cache', 'dispatcher'])),
             ]);
         })->scope(Scope::SINGLETON),
 

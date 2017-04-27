@@ -8,7 +8,6 @@ use BetaKiller\IFace\IFaceInterface;
 use BetaKiller\IFace\IFaceModelInterface;
 use BetaKiller\IFace\IFaceProvider;
 use BetaKiller\IFace\IFaceStack;
-use Exception;
 use HTTP;
 
 //use BetaKiller\IFace\HasCustomUrlBehaviour;
@@ -22,37 +21,50 @@ class UrlDispatcher
      *
      * @var \BetaKiller\IFace\IFaceStack
      */
-    protected $ifaceStack;
+    private $ifaceStack;
 
     /**
      * Current Url parameters
      *
      * @var UrlParameters
      */
-    protected $urlParameters;
+    private $urlParameters;
 
     /**
      * @var IFaceProvider
      */
-    protected $ifaceProvider;
+    private $ifaceProvider;
 
     /**
      * @var \BetaKiller\IFace\Url\UrlPrototypeHelper
      */
-    protected $urlPrototypeHelper;
+    private $urlPrototypeHelper;
 
     /**
-     * @param \BetaKiller\IFace\IFaceStack             $stack
-     * @param \BetaKiller\IFace\IFaceProvider          $provider
-     * @param \BetaKiller\IFace\Url\UrlParametersInterface      $parameters
-     * @param \BetaKiller\IFace\Url\UrlPrototypeHelper $helper
+     * @var \BetaKiller\IFace\Url\UrlDispatcherCacheInterface
      */
-    public function __construct(IFaceStack $stack, IFaceProvider $provider, UrlParametersInterface $parameters, UrlPrototypeHelper $helper)
+    private $cache;
+
+    /**
+     * @param \BetaKiller\IFace\IFaceStack                      $stack
+     * @param \BetaKiller\IFace\IFaceProvider                   $provider
+     * @param \BetaKiller\IFace\Url\UrlParametersInterface      $parameters
+     * @param \BetaKiller\IFace\Url\UrlPrototypeHelper          $helper
+     * @param \BetaKiller\IFace\Url\UrlDispatcherCacheInterface $cache
+     */
+    public function __construct(
+        IFaceStack $stack,
+        IFaceProvider $provider,
+        UrlParametersInterface $parameters,
+        UrlPrototypeHelper $helper,
+        UrlDispatcherCacheInterface $cache
+    )
     {
         $this->ifaceStack         = $stack;
         $this->ifaceProvider      = $provider;
         $this->urlParameters      = $parameters;
         $this->urlPrototypeHelper = $helper;
+        $this->cache              = $cache;
     }
 
     /**
@@ -64,23 +76,33 @@ class UrlDispatcher
         return $this->urlParameters;
     }
 
+    public function process($uri)
+    {
+        // Prevent XSS via URL
+        $uri = htmlspecialchars(strip_tags($uri), ENT_QUOTES);
+
+        // Check cache for stack and url params for current URL
+        if (!$this->restoreDataFromCache($uri)) {
+            $this->parseUri($uri);
+
+            // Cache stack + url parameters (between HTTP requests) for current URL
+            $this->storeDataInCache($uri);
+        }
+
+        // Return last IFace
+        return $this->ifaceStack->getCurrent();
+    }
+
     /**
      * Performs parsing of requested url
      * Returns IFace
      *
      * @param string $uri
      *
-     * @return IFaceInterface|null
      * @throws IFaceMissingUrlException
-     * @throws Exception
      */
-    public function parseUri($uri)
+    private function parseUri($uri)
     {
-        // Prevent XSS via URL
-        $uri = htmlspecialchars(strip_tags($uri), ENT_QUOTES);
-
-        // TODO Check stack cache and url params for current URL
-
         // Creating URL iterator
         $urlIterator = new UrlPathIterator($uri);
 
@@ -126,11 +148,6 @@ class UrlDispatcher
 
             $urlIterator->next();
         } while ($urlIterator->valid());
-
-        // TODO Cache stack + url parameters (between HTTP requests) for current URL
-
-        // Return last IFace
-        return $ifaceInstance;
     }
 
     protected function throwMissingUrlException(UrlPathIterator $it, IFaceInterface $parentIFace = null)
@@ -316,7 +333,7 @@ class UrlDispatcher
     }
 
     /**
-     * @param IFaceInterface     $iface
+     * @param IFaceInterface                                    $iface
      * @param \BetaKiller\IFace\Url\UrlParametersInterface|NULL $parameters
      *
      * @return bool
@@ -386,5 +403,58 @@ class UrlDispatcher
 
         // Allow tree url behaviour to set value multiple times
         $registry->set($modelName, $model, true);
+    }
+
+    private function storeDataInCache($url)
+    {
+        $stackData = $this->ifaceStack->getCodenames();
+        $paramsData = $this->urlParameters->getAll();
+
+        $this->cache->set($url, [
+            'stack' => $stackData,
+            'parameters' => $paramsData,
+        ]);
+    }
+
+    /**
+     * @param string $url
+     *
+     * @return bool
+     */
+    private function restoreDataFromCache($url)
+    {
+        $data = $this->cache->get($url);
+
+        if (!$data) {
+            return false;
+        }
+
+        if (!is_array($data)) {
+            throw new UrlDispatcherException('Cached data is incorrect');
+        }
+
+        /** @var array $stackData */
+        $stackData = $data['stack'];
+
+        /** @var \BetaKiller\IFace\Url\UrlDataSourceInterface[] $paramsData */
+        $paramsData = $data['parameters'];
+
+        // Restore ifaces and push them into stack
+        foreach ($stackData as $ifaceCodename) {
+            $iface = $this->ifaceProvider->fromCodename($ifaceCodename);
+            $this->ifaceStack->push($iface);
+        }
+
+        // Restore url parameters
+        foreach ($paramsData as $key => $value) {
+
+            if (!($value instanceof UrlDataSourceInterface)) {
+                throw new UrlDispatcherException('Cached data for url parameters is incorrect');
+            }
+
+            $this->urlParameters->set($key, $value);
+        }
+
+        return true;
     }
 }

@@ -38,8 +38,9 @@ class IFaceStack
             throw new IFaceStackException('Duplicate insert for :codename', [':codename' => $iface->getCodename()]);
         }
 
-        $this->items[$iface->getCodename()] = $iface;
-        $this->current = $iface;
+        $codename               = $iface->getCodename();
+        $this->items[$codename] = $iface;
+        $this->current          = $iface;
     }
 
     public function has(IFaceInterface $iface)
@@ -47,9 +48,19 @@ class IFaceStack
         return isset($this->items[$iface->getCodename()]);
     }
 
+    /**
+     * Return codenames of pushed IFaces
+     *
+     * @return string[]
+     */
+    public function getCodenames()
+    {
+        return array_keys($this->items);
+    }
+
     public function clear()
     {
-        $this->items = [];
+        $this->items   = [];
         $this->current = null;
     }
 
