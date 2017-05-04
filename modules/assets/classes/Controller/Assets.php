@@ -31,7 +31,7 @@ class Controller_Assets extends Controller
             throw new AssetsException('Only one file can be uploaded at once');
         }
 
-        $this->provider_factory();
+        $this->detectProvider();
 
         // Getting first uploaded file
         $_file = array_shift($_FILES);
@@ -48,7 +48,7 @@ class Controller_Assets extends Controller
 
     public function action_original()
     {
-        $this->provider_factory();
+        $this->detectProvider();
 
         $model = $this->fromItemDeployUrl();
 
@@ -69,7 +69,7 @@ class Controller_Assets extends Controller
 
     public function action_preview()
     {
-        $this->provider_factory();
+        $this->detectProvider();
 
         if (!($this->provider instanceof AbstractAssetsProviderImage)) {
             throw new AssetsException('Preview can be served only by instances of :must', [
@@ -81,6 +81,11 @@ class Controller_Assets extends Controller
         $model = $this->fromItemDeployUrl();
 
         $this->checkExtension($model);
+
+        // Redirect to default size
+        if (!$size) {
+            $this->redirectToCanonicalUrl($model);
+        }
 
         $previewContent = $this->provider->makePreview($model, $size);
 
@@ -96,7 +101,7 @@ class Controller_Assets extends Controller
 
     public function action_crop()
     {
-        $this->provider_factory();
+        $this->detectProvider();
 
         if (!($this->provider instanceof AbstractAssetsProviderImage)) {
             throw new AssetsException('Cropping can be processed only by instances of :must', [
@@ -106,6 +111,11 @@ class Controller_Assets extends Controller
 
         $size  = $this->getSizeParam();
         $model = $this->fromItemDeployUrl();
+
+        // Redirect to default size
+        if (!$size) {
+            $this->redirectToCanonicalUrl($model);
+        }
 
         $this->checkExtension($model);
 
@@ -125,7 +135,7 @@ class Controller_Assets extends Controller
         // This method responds via JSON (all exceptions will be caught automatically)
         $this->content_type_json();
 
-        $this->provider_factory();
+        $this->detectProvider();
 
         // Get file model by hash value
         $model = $this->fromItemDeployUrl();
@@ -136,7 +146,7 @@ class Controller_Assets extends Controller
         $this->send_json(self::JSON_SUCCESS);
     }
 
-    protected function provider_factory()
+    protected function detectProvider()
     {
         $requestKey = $this->param('provider');
 
@@ -145,7 +155,7 @@ class Controller_Assets extends Controller
         }
 
         $this->provider = AssetsProviderFactory::instance()->createFromUrlKey($requestKey);
-        $providerKey = $this->provider->getUrlKey();
+        $providerKey    = $this->provider->getUrlKey();
 
         if ($requestKey !== $providerKey) {
             // Redirect to canonical url

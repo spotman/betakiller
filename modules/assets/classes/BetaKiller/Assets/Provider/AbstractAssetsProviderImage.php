@@ -77,6 +77,12 @@ abstract class AbstractAssetsProviderImage extends AbstractAssetsProvider
         return [$width, $height];
     }
 
+    /**
+     * @param string $size
+     *
+     * @return string
+     * @throws \BetaKiller\Assets\AssetsProviderException
+     */
     private function determineSize($size)
     {
         $allowed_sizes = $this->getAllowedPreviewSizes();
@@ -126,7 +132,9 @@ abstract class AbstractAssetsProviderImage extends AbstractAssetsProvider
 
     public function makePreview(AssetsModelImageInterface $model, $size)
     {
-        $this->check_preview_size($size);
+        $size = $this->determineSize($size);
+
+        $this->checkPreviewSize($size);
 
         $content = $this->getContent($model);
 
@@ -144,7 +152,7 @@ abstract class AbstractAssetsProviderImage extends AbstractAssetsProvider
         );
     }
 
-    protected function check_preview_size($size)
+    protected function checkPreviewSize($size)
     {
         $allowedSizes = $this->getAllowedPreviewSizes();
 

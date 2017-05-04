@@ -3,9 +3,8 @@
 use BetaKiller\Assets\Provider\AbstractAssetsProvider;
 use BetaKiller\Assets\Provider\AbstractAssetsProviderImage;
 
+use BetaKiller\Factory\NamespaceBasedFactory;
 use BetaKiller\Utils\Instance\SingletonTrait;
-use BetaKiller\Utils\Factory\BaseFactoryTrait;
-use BetaKiller\DI\ContainerTrait;
 use BetaKiller\Config\ConfigInterface;
 
 /**
@@ -17,9 +16,7 @@ use BetaKiller\Config\ConfigInterface;
  */
 class AssetsProviderFactory
 {
-    use SingletonTrait,
-        BaseFactoryTrait,
-        ContainerTrait;
+    use SingletonTrait;
 
     /**
      * @var \BetaKiller\Config\ConfigInterface
@@ -27,13 +24,23 @@ class AssetsProviderFactory
     private $config;
 
     /**
+     * @var \BetaKiller\Factory\NamespaceBasedFactory
+     */
+    private $factory;
+
+    /**
      * AssetsProviderFactory constructor.
      *
      * @param \BetaKiller\Config\ConfigInterface $config
+     * @param \BetaKiller\Factory\NamespaceBasedFactory $factory
      */
-    public function __construct(ConfigInterface $config)
+    public function __construct(ConfigInterface $config, NamespaceBasedFactory $factory)
     {
         $this->config = $config;
+        $this->factory = $factory
+            ->setClassPrefixes('Assets', 'Provider')
+            ->cacheInstances()
+            ->setExpectedInterface(AbstractAssetsProvider::class);
     }
 
     public function createFromUrlKey($key)
@@ -71,31 +78,16 @@ class AssetsProviderFactory
     /**
      * Factory method
      *
-     * @param $name
+     * @param string $codename
      *
      * @return AbstractAssetsProvider|AbstractAssetsProviderImage
      */
-    public function create($name)
+    public function create($codename)
     {
-        return $this->_create($name);
-    }
-
-    /**
-     * @param \BetaKiller\Assets\Provider\AbstractAssetsProvider $instance
-     * @param                                                    $codename
-     */
-    protected function store_codename($instance, $codename)
-    {
+        /** @var AbstractAssetsProvider $instance */
+        $instance = $this->factory->create($codename);
         $instance->setCodename($codename);
-    }
 
-    protected function make_instance_class_name($name)
-    {
-        return '\\Assets_Provider_'.$name;
-    }
-
-    protected function make_instance($class_name, ...$parameters)
-    {
-        return $this->getContainer()->make($class_name, $parameters);
+        return $instance;
     }
 }
