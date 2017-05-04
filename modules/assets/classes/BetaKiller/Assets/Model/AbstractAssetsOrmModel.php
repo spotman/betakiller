@@ -1,22 +1,27 @@
-<?php defined('SYSPATH') OR die('No direct script access.');
+<?php
+namespace BetaKiller\Assets\Model;
 
+use BetaKiller\Assets\Provider\AbstractAssetsProvider;
+use BetaKiller\Assets\Provider\AbstractAssetsProviderImage;
 use BetaKiller\Model\UserInterface;
+use DateTime;
+use ORM;
 
 /**
- * Class Assets_Model_ORM
+ * Class AbstractAssetsOrmModel
  *
  * Abstract class for all ORM-based asset models
  */
-abstract class Assets_Model_ORM extends ORM implements Assets_ModelInterface {
-
+abstract class AbstractAssetsOrmModel extends ORM implements AssetsModelInterface
+{
     protected function _initialize()
     {
-        $this->belongs_to(array(
-            'uploaded_by_user'  =>  array(
-                'model'         =>  'User',
-                'foreign_key'   =>  'uploaded_by',
-            )
-        ));
+        $this->belongs_to([
+            'uploaded_by_user' => [
+                'model'       => 'User',
+                'foreign_key' => 'uploaded_by',
+            ],
+        ]);
 
         parent::_initialize();
     }
@@ -26,7 +31,7 @@ abstract class Assets_Model_ORM extends ORM implements Assets_ModelInterface {
      *
      * @return string
      */
-    public function get_original_name()
+    public function getOriginalName()
     {
         return $this->get('original_name');
     }
@@ -35,12 +40,14 @@ abstract class Assets_Model_ORM extends ORM implements Assets_ModelInterface {
      * Stores original file name (user-defined filename of uploaded file)
      *
      * @param $name
+     *
      * @return $this
      */
-    public function set_original_name($name)
+    public function setOriginalName($name)
     {
         $this->set('original_name', $name);
-        return $this->make_hash();
+
+        return $this->makeHash();
     }
 
     /**
@@ -48,18 +55,20 @@ abstract class Assets_Model_ORM extends ORM implements Assets_ModelInterface {
      *
      * @return string
      */
-    public function get_hash()
+    public function getHash()
     {
         return $this->get('hash');
     }
 
     /**
      * Creates unique hash from original filename and stores it in `hash` property
+     *
      * @return $this
      */
-    protected function make_hash()
+    private function makeHash()
     {
-        $hash = $this->get_hash() ?: md5(microtime().$this->get_original_name());
+        $hash = $this->getHash() ?: md5(microtime().$this->getOriginalName());
+
         return $this->set('hash', $hash);
     }
 
@@ -68,7 +77,7 @@ abstract class Assets_Model_ORM extends ORM implements Assets_ModelInterface {
      *
      * @return string
      */
-    public function get_mime()
+    public function getMime()
     {
         return $this->get('mime');
     }
@@ -77,9 +86,10 @@ abstract class Assets_Model_ORM extends ORM implements Assets_ModelInterface {
      * Sets MIME-type of the file
      *
      * @param string $mime
+     *
      * @return $this
      */
-    public function set_mime($mime)
+    public function setMime($mime)
     {
         return $this->set('mime', $mime);
     }
@@ -89,7 +99,7 @@ abstract class Assets_Model_ORM extends ORM implements Assets_ModelInterface {
      *
      * @return UserInterface
      */
-    public function get_uploaded_by()
+    public function getUploadedBy()
     {
         return $this->get('uploaded_by_user');
     }
@@ -98,9 +108,10 @@ abstract class Assets_Model_ORM extends ORM implements Assets_ModelInterface {
      * Sets user, who uploaded the file
      *
      * @param UserInterface $user
+     *
      * @return $this
      */
-    public function set_uploaded_by(UserInterface $user)
+    public function setUploadedBy(UserInterface $user)
     {
         return $this->set('uploaded_by_user', $user);
     }
@@ -110,7 +121,7 @@ abstract class Assets_Model_ORM extends ORM implements Assets_ModelInterface {
      *
      * @return DateTime|NULL
      */
-    public function get_uploaded_at()
+    public function getUploadedAt()
     {
         return $this->get_datetime_column_value('uploaded_at');
     }
@@ -122,7 +133,7 @@ abstract class Assets_Model_ORM extends ORM implements Assets_ModelInterface {
      *
      * @return $this
      */
-    public function set_uploaded_at(DateTime $time)
+    public function setUploadedAt(DateTime $time)
     {
         return $this->set_datetime_column_value('uploaded_at', $time);
     }
@@ -132,7 +143,7 @@ abstract class Assets_Model_ORM extends ORM implements Assets_ModelInterface {
      *
      * @return DateTime|NULL
      */
-    public function get_last_modified_at()
+    public function getLastModifiedAt()
     {
         return $this->get_datetime_column_value('last_modified_at');
     }
@@ -144,7 +155,7 @@ abstract class Assets_Model_ORM extends ORM implements Assets_ModelInterface {
      *
      * @return $this
      */
-    public function set_last_modified_at(DateTime $time)
+    public function setLastModifiedAt(DateTime $time)
     {
         return $this->set_datetime_column_value('last_modified_at', $time);
     }
@@ -154,7 +165,7 @@ abstract class Assets_Model_ORM extends ORM implements Assets_ModelInterface {
      *
      * @return integer
      */
-    public function get_size()
+    public function getSize()
     {
         return $this->get('size');
     }
@@ -163,9 +174,10 @@ abstract class Assets_Model_ORM extends ORM implements Assets_ModelInterface {
      * Stores file size in bytes
      *
      * @param integer $size
+     *
      * @return $this
      */
-    public function set_size($size)
+    public function setSize($size)
     {
         return $this->set('size', $size);
     }
@@ -175,9 +187,9 @@ abstract class Assets_Model_ORM extends ORM implements Assets_ModelInterface {
      *
      * @return string
      */
-    public function get_storage_file_name()
+    public function getStorageFileName()
     {
-        return $this->get_ab_path();
+        return $this->getAbPath();
     }
 
     /**
@@ -185,28 +197,28 @@ abstract class Assets_Model_ORM extends ORM implements Assets_ModelInterface {
      *
      * @return string
      */
-    public function get_url()
+    public function getUrl()
     {
-        return $this->get_ab_path('/');
+        return $this->getAbPath('/');
     }
 
     /**
      * Returns deep path for current model (f0/a4/f0a435a89cc65a93d341)
      *
      * @param string $delimiter
+     *
      * @return string
      */
-    protected function get_ab_path($delimiter = DIRECTORY_SEPARATOR)
+    protected function getAbPath($delimiter = DIRECTORY_SEPARATOR)
     {
-        $hash = $this->get_hash();
-        $depth = $this->get_ab_depth();
-        $length = $this->get_ab_part_length();
+        $hash   = $this->getHash();
+        $depth  = $this->getAbDepth();
+        $length = $this->getAbPartLength();
 
-        $parts = array();
+        $parts = [];
 
-        for ( $i = 0; $i < $depth; $i++ )
-        {
-            $parts[] = substr($hash, $i*$length, $length);
+        for ($i = 0; $i < $depth; $i++) {
+            $parts[] = substr($hash, $i * $length, $length);
         }
 
         $parts[] = $hash;
@@ -219,7 +231,7 @@ abstract class Assets_Model_ORM extends ORM implements Assets_ModelInterface {
      *
      * @return int
      */
-    protected function get_ab_depth()
+    protected function getAbDepth()
     {
         return 2;
     }
@@ -229,7 +241,7 @@ abstract class Assets_Model_ORM extends ORM implements Assets_ModelInterface {
      *
      * @return int
      */
-    protected function get_ab_part_length()
+    protected function getAbPartLength()
     {
         return 2;
     }
@@ -238,16 +250,17 @@ abstract class Assets_Model_ORM extends ORM implements Assets_ModelInterface {
      * Performs file model search by hash
      *
      * @param string $url
-     * @return Assets_ModelInterface|NULL
+     *
+     * @return AssetsModelInterface|NULL
      */
-    public function by_url($url)
+    public function byUrl($url)
     {
         $hash = basename($url);
 
-        /** @var Assets_Model_ORM $model */
+        /** @var AbstractAssetsOrmModel $model */
         $model = $this->model_factory()->where('hash', '=', $hash)->find();
 
-        return $model->loaded() ? $model : NULL;
+        return $model->loaded() ? $model : null;
     }
 
     /**
@@ -255,9 +268,9 @@ abstract class Assets_Model_ORM extends ORM implements Assets_ModelInterface {
      *
      * @return string
      */
-    public function get_upload_url()
+    public function getUploadUrl()
     {
-        return $this->get_provider()->get_upload_url();
+        return $this->getProvider()->getUploadUrl();
     }
 
     /**
@@ -265,17 +278,17 @@ abstract class Assets_Model_ORM extends ORM implements Assets_ModelInterface {
      *
      * @return null|string
      */
-    public function get_original_url()
+    public function getOriginalUrl()
     {
         return $this->loaded()
-            ? $this->get_provider()->get_original_url($this)
-            : NULL;
+            ? $this->getProvider()->getOriginalUrl($this)
+            : null;
     }
 
     public function delete()
     {
         // Removing file from storage
-        $this->get_provider()->delete($this);
+        $this->getProvider()->delete($this);
 
         return parent::delete();
     }
@@ -285,7 +298,7 @@ abstract class Assets_Model_ORM extends ORM implements Assets_ModelInterface {
      *
      * @return array
      */
-    public function to_json()
+    public function toJson()
     {
         return $this->as_array();
     }
@@ -293,8 +306,7 @@ abstract class Assets_Model_ORM extends ORM implements Assets_ModelInterface {
     /**
      * Returns assets provider associated with current model
      *
-     * @return Assets_Provider|Assets_Provider_Image
+     * @return AbstractAssetsProvider|AbstractAssetsProviderImage
      */
-    abstract protected function get_provider();
-
+    abstract protected function getProvider();
 }

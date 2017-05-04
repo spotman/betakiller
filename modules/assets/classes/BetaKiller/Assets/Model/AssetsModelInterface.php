@@ -1,57 +1,61 @@
-<?php defined('SYSPATH') OR die('No direct script access.');
+<?php
+namespace BetaKiller\Assets\Model;
 
 use BetaKiller\Model\UserInterface;
+use DateTime;
 
 /**
- * Interface Assets_ModelInterface
+ * Interface AssetsModelInterface
  *
  * Abstract model interface for asset file
  */
-interface Assets_ModelInterface {
-
+interface AssetsModelInterface
+{
     /**
      * Returns filename for storage
      *
      * @return string
      */
-    public function get_storage_file_name();
+    public function getStorageFileName();
 
     /**
      * Returns file model url (for deploy url and deploy path)
      *
      * @return string
      */
-    public function get_url();
+    public function getUrl();
 
     /**
      * Performs file model search by url (deploy url dispatching)
      *
      * @param string $url
-     * @return Assets_ModelInterface|NULL
+     *
+     * @return AssetsModelInterface|NULL
      */
-    public function by_url($url);
+    public function byUrl($url);
 
     /**
      * Returns User model, who uploaded the file
      *
      * @return UserInterface
      */
-    public function get_uploaded_by();
+    public function getUploadedBy();
 
     /**
      * Sets user, who uploaded the file
      *
      * @param UserInterface $user
+     *
      * @return $this
      */
-    public function set_uploaded_by(UserInterface $user);
+    public function setUploadedBy(UserInterface $user);
 
     /**
      * Returns the date and time when asset was uploaded
      *
      * @return DateTime
      */
-    public function get_uploaded_at();
+    public function getUploadedAt();
 
     /**
      * Sets the date and time when asset was uploaded
@@ -60,14 +64,14 @@ interface Assets_ModelInterface {
      *
      * @return mixed
      */
-    public function set_uploaded_at(DateTime $time);
+    public function setUploadedAt(DateTime $time);
 
     /**
      * Returns the date and time when asset was last modified
      *
-     * @return DateTime
+     * @return DateTime|null
      */
-    public function get_last_modified_at();
+    public function getLastModifiedAt();
 
     /**
      * Sets the date and time when asset was last modified
@@ -76,51 +80,55 @@ interface Assets_ModelInterface {
      *
      * @return mixed
      */
-    public function set_last_modified_at(DateTime $time);
+    public function setLastModifiedAt(DateTime $time);
 
     /**
      * Returns original file name (user-defined filename of uploaded file)
      *
      * @return string
      */
-    public function get_original_name();
+    public function getOriginalName();
 
     /**
      * Stores original file name (user-defined filename of uploaded file)
      *
      * @param $name
+     *
      * @return $this
      */
-    public function set_original_name($name);
+    public function setOriginalName($name);
 
     /**
      * Returns MIME-type of the file
      *
      * @return string
      */
-    public function get_mime();
+    public function getMime();
 
     /**
      * Sets MIME-type of the file
      *
      * @param string $mime
+     *
      * @return $this
      */
-    public function set_mime($mime);
+    public function setMime($mime);
 
     /**
      * Returns file size in bytes
      *
      * @return integer
      */
-    public function get_size();
+    public function getSize();
+
     /**
      * Stores file size in bytes
      *
      * @param integer $size
+     *
      * @return $this
      */
-    public function set_size($size);
+    public function setSize($size);
 
     /**
      * Saves the model info
@@ -141,7 +149,7 @@ interface Assets_ModelInterface {
      *
      * @return array
      */
-    public function to_json();
+    public function toJson();
 
     /**
      * Returns TRUE if model is found and loaded
@@ -155,13 +163,12 @@ interface Assets_ModelInterface {
      *
      * @return string
      */
-    public function get_upload_url();
+    public function getUploadUrl();
 
     /**
      * Returns URL to original file/image
      *
      * @return null|string
      */
-    public function get_original_url();
-
+    public function getOriginalUrl();
 }

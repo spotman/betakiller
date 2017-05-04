@@ -1,14 +1,18 @@
 <?php
+namespace BetaKiller\Assets\Model;
 
+use Kohana_Exception;
+use ORM;
 
-abstract class Assets_Model_ORM_SeoImage extends Assets_Model_ORM_Image
+abstract class AbstractAssetsOrmModelSeoImage extends AbstractAssetsOrmImageModel
 {
     /**
      * @param string $value
+     *
      * @return $this|ORM
      * @throws Kohana_Exception
      */
-    public function set_alt($value)
+    public function setAlt($value)
     {
         return $this->set('alt', $value);
     }
@@ -17,17 +21,18 @@ abstract class Assets_Model_ORM_SeoImage extends Assets_Model_ORM_Image
      * @return string
      * @throws Kohana_Exception
      */
-    public function get_alt()
+    public function getAlt()
     {
         return $this->get('alt');
     }
 
     /**
      * @param string $value
+     *
      * @return $this|ORM
      * @throws Kohana_Exception
      */
-    public function set_title($value)
+    public function setTitle($value)
     {
         return $this->set('title', $value);
     }
@@ -36,18 +41,18 @@ abstract class Assets_Model_ORM_SeoImage extends Assets_Model_ORM_Image
      * @return string
      * @throws Kohana_Exception
      */
-    public function get_title()
+    public function getTitle()
     {
         return $this->get('title');
     }
 
-    public function get_attributes_for_img_tag($size, array $attributes = [])
+    public function getAttributesForImgTag($size, array $attributes = [])
     {
         $attributes = array_merge([
-            'alt'       =>  $this->get_alt(),
-            'title'     =>  $this->get_title(),
+            'alt'   => $this->getAlt(),
+            'title' => $this->getTitle(),
         ], $attributes);
 
-        return parent::get_attributes_for_img_tag($size, $attributes);
+        return parent::getAttributesForImgTag($size, $attributes);
     }
 }

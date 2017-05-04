@@ -37,8 +37,8 @@ class Widget_CustomTag_Photo extends BaseWidget
 
         $attributes = [
             'id'    =>  'content-image-'.$model->get_id(),
-            'title' =>  $title ?: $model->get_title(),
-            'alt'   =>  $alt ?: $model->get_alt(),
+            'title' =>  $title ?: $model->getTitle(),
+            'alt'   =>  $alt ?: $model->getAlt(),
             'class' =>  implode(' ', array_unique($classes)),
         ];
 
@@ -48,7 +48,7 @@ class Widget_CustomTag_Photo extends BaseWidget
 
         return [
             'zoomable'  =>  $zoomable,
-            'image'     =>  $model->get_attributes_for_img_tag($model::SIZE_ORIGINAL, $attributes),
+            'image'     =>  $model->getAttributesForImgTag($model::SIZE_ORIGINAL, $attributes),
         ];
     }
 }

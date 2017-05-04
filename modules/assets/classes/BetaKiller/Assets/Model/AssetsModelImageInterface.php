@@ -1,6 +1,7 @@
 <?php
+namespace BetaKiller\Assets\Model;
 
-interface Assets_Model_ImageInterface extends Assets_ModelInterface
+interface AssetsModelImageInterface extends AssetsModelInterface
 {
     /**
      * @return int
@@ -9,39 +10,42 @@ interface Assets_Model_ImageInterface extends Assets_ModelInterface
 
     /**
      * @param string|null $size
+     *
      * @return string|null
      */
-    public function get_preview_url($size = NULL);
+    public function getPreviewUrl($size = null);
 
     /**
      * @return int
      */
-    public function get_upload_max_width();
+    public function getUploadMaxWidth();
 
     /**
      * @return int
      */
-    public function get_upload_max_height();
+    public function getUploadMaxHeight();
 
     /**
      * @return int
      */
-    public function get_width();
+    public function getWidth();
 
     /**
      * @return int
      */
-    public function get_height();
+    public function getHeight();
 
     /**
      * @param int $value
+     *
      * @return $this
      */
-    public function set_width($value);
+    public function setWidth($value);
 
     /**
      * @param int $value
+     *
      * @return $this
      */
-    public function set_height($value);
+    public function setHeight($value);
 }

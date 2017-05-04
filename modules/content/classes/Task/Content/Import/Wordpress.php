@@ -1,14 +1,16 @@
 <?php
 
+use BetaKiller\Assets\Model\AbstractAssetsOrmModelSeoImage;
+use BetaKiller\Assets\Provider\AbstractAssetsProvider;
+use BetaKiller\Content\ContentElementInterface;
+use BetaKiller\Content\HasWordpressPathInterface;
+use BetaKiller\Content\ImportedFromWordpressInterface;
 use BetaKiller\Task\TaskException;
 use DiDom\Document;
-use BetaKiller\Content\ImportedFromWordpressInterface;
-use BetaKiller\Content\HasWordpressPathInterface;
-use BetaKiller\Content\ContentElementInterface;
-use Thunder\Shortcode\Shortcode\ShortcodeInterface;
-use Thunder\Shortcode\Serializer\TextSerializer;
-use Thunder\Shortcode\Processor\Processor;
 use Thunder\Shortcode\Parser\RegexParser;
+use Thunder\Shortcode\Processor\Processor;
+use Thunder\Shortcode\Serializer\TextSerializer;
+use Thunder\Shortcode\Shortcode\ShortcodeInterface;
 
 class Task_Content_Import_Wordpress extends Minion_Task
 {
@@ -113,7 +115,7 @@ class Task_Content_Import_Wordpress extends Minion_Task
         $wp->set_option(self::WP_OPTION_PARSING_PATH, $parsing_path);
     }
 
-//    protected function process_attachments(array $attachments, Assets_Provider $provider = NULL)
+//    protected function process_attachments(array $attachments, AbstractAssetsProvider $provider = NULL)
 //    {
 //        $this->info('Processing attachments');
 //
@@ -148,7 +150,7 @@ class Task_Content_Import_Wordpress extends Minion_Task
         return $content_entity;
     }
 
-    protected function process_attachment(array $attach, $entity_item_id, Assets_Provider $provider = NULL)
+    protected function process_attachment(array $attach, $entity_item_id, AbstractAssetsProvider $provider = NULL)
     {
         $wp_id = $attach['ID'];
         $url = $attach['guid'];
@@ -174,34 +176,34 @@ class Task_Content_Import_Wordpress extends Minion_Task
         $created_at = new DateTime($attach['post_date']);
         $updated_at = new DateTime($attach['post_modified']);
 
-        if ($model instanceof Assets_Model_ORM_SeoImage) {
+        if ($model instanceof AbstractAssetsOrmModelSeoImage) {
             $title = $attach['post_excerpt'];
 
-            if ($title && !$model->get_title()) {
-                $model->set_title($title);
+            if ($title && !$model->getTitle()) {
+                $model->setTitle($title);
             }
         }
 
         $model
-            ->set_uploaded_at($created_at)
-            ->set_last_modified_at($updated_at)
+            ->setUploadedAt($created_at)
+            ->setLastModifiedAt($updated_at)
             ->save();
 
         return $model;
     }
 
     /**
-     * @param Assets_Provider   $provider
-     * @param string            $url
-     * @param int               $wp_id
-     * @param int|null          $entity_item_id
+     * @param AbstractAssetsProvider $provider
+     * @param string                 $url
+     * @param int                    $wp_id
+     * @param int|null               $entity_item_id
      *
      * @return Model_ContentAttachmentElement
      * @throws TaskException
      */
-    protected function store_attachment(Assets_Provider $provider, $url, $wp_id, $entity_item_id = NULL)
+    protected function store_attachment(AbstractAssetsProvider $provider, $url, $wp_id, $entity_item_id = NULL)
     {
-        $orm = $provider->file_model_factory();
+        $orm = $provider->createFileModel();
 
         if (!$orm instanceof ImportedFromWordpressInterface) {
             throw new TaskException('Attachment model must be instance of :class', [':class' => ImportedFromWordpressInterface::class]);
@@ -225,7 +227,7 @@ class Task_Content_Import_Wordpress extends Minion_Task
         $original_filename = basename($url);
 
         // Getting path for local file with attachment content
-        $path = $this->get_attachment_path($url_path, $provider->get_allowed_mime_types());
+        $path = $this->get_attachment_path($url_path, $provider->getAllowedMimeTypes());
 
         if (!$path) {
             throw new TaskException('Can not get path for guid = :url', [':url' => $url]);
@@ -495,7 +497,7 @@ class Task_Content_Import_Wordpress extends Minion_Task
 
             $model = $this->process_attachment($attach, $post_id);
 
-            $new_url = $model->get_original_url();
+            $new_url = $model->getOriginalUrl();
 
             $attach = $document->createElement(CustomTag::ATTACHMENT, NULL, [
                 'id'    =>  $model->get_id(),
@@ -709,7 +711,7 @@ class Task_Content_Import_Wordpress extends Minion_Task
             $caption = $slide['title'] ?: $slide['alt'];
 
             if ($caption) {
-                $image->set_title($caption)->save();
+                $image->setTitle($caption)->save();
             }
 
             $this->debug('Adding image :id to wonderplugin slider', [':id' => $image->get_id()]);
@@ -794,11 +796,11 @@ class Task_Content_Import_Wordpress extends Minion_Task
 
         // Save alt and title in image model
         if ($alt) {
-            $image->set_alt($alt);
+            $image->setAlt($alt);
         }
 
         if ($title) {
-            $image->set_title($title);
+            $image->setTitle($title);
         }
 
         $image->save();

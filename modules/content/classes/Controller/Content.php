@@ -1,6 +1,8 @@
 <?php
 
 
+use BetaKiller\Assets\Model\AssetsModelInterface;
+
 class Controller_Content extends Controller
 {
     use \BetaKiller\Helper\ContentTrait;
@@ -19,7 +21,7 @@ class Controller_Content extends Controller
         if (!$model)
             throw new HTTP_Exception_404();
 
-        $url = $model->get_original_url();
+        $url = $model->getOriginalUrl();
 
         $this->redirect($url, 301);
     }
@@ -27,7 +29,7 @@ class Controller_Content extends Controller
     /**
      * @param string $path
      *
-     * @return Assets_ModelInterface|null
+     * @return AssetsModelInterface|null
      */
     protected function find_content_model_by_wp_path($path)
     {
@@ -40,7 +42,7 @@ class Controller_Content extends Controller
 
         foreach ($models as $orm)
         {
-            /** @var Assets_ModelInterface $model */
+            /** @var AssetsModelInterface $model */
             $model = $orm->find_by_wp_path($path);
 
             if ($model)

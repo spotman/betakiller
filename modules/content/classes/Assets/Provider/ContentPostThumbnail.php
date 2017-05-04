@@ -1,10 +1,12 @@
 <?php
 
-class Assets_Provider_ContentPostThumbnail extends \Assets_Provider_Image
+use BetaKiller\Assets\Model\AssetsModelInterface;
+
+class Assets_Provider_ContentPostThumbnail extends \BetaKiller\Assets\Provider\AbstractAssetsProviderImage
 {
     use \Assets_Provider_ContentTrait;
 
-    protected function get_storage_path_name()
+    protected function getStoragePathName()
     {
         return 'post-thumbnails';
     }
@@ -12,17 +14,17 @@ class Assets_Provider_ContentPostThumbnail extends \Assets_Provider_Image
     /**
      * @return int
      */
-    public function get_upload_max_height()
+    public function getUploadMaxHeight()
     {
-        return $this->get_assets_provider_config_value(['upload', 'max-height']);
+        return $this->getAssetsProviderConfigValue(['upload', 'max-height']);
     }
 
     /**
      * @return int
      */
-    public function get_upload_max_width()
+    public function getUploadMaxWidth()
     {
-        return $this->get_assets_provider_config_value(['upload', 'max-width']);
+        return $this->getAssetsProviderConfigValue(['upload', 'max-width']);
     }
 
     /**
@@ -33,9 +35,9 @@ class Assets_Provider_ContentPostThumbnail extends \Assets_Provider_Image
      *
      * @return array
      */
-    public function get_allowed_preview_sizes()
+    public function getAllowedPreviewSizes()
     {
-        return $this->get_assets_provider_config_value(['sizes']);
+        return $this->getAssetsProviderConfigValue(['sizes']);
     }
 
     /**
@@ -43,7 +45,7 @@ class Assets_Provider_ContentPostThumbnail extends \Assets_Provider_Image
      *
      * @return array|TRUE
      */
-    public function get_allowed_mime_types()
+    public function getAllowedMimeTypes()
     {
         return [
             'image/jpeg',
@@ -55,9 +57,9 @@ class Assets_Provider_ContentPostThumbnail extends \Assets_Provider_Image
     /**
      * Creates empty file model
      *
-     * @return Assets_ModelInterface
+     * @return AssetsModelInterface
      */
-    public function file_model_factory()
+    public function createFileModel()
     {
         return $this->model_factory_content_post_thumbnail();
     }
@@ -67,9 +69,9 @@ class Assets_Provider_ContentPostThumbnail extends \Assets_Provider_Image
      *
      * @return bool
      */
-    protected function check_upload_permissions()
+    protected function checkUploadPermissions()
     {
-        $user = $this->get_user();
+        $user = $this->getUser();
 
         // TODO Move to ACL
         return $user AND $user->is_admin_allowed();
@@ -78,10 +80,11 @@ class Assets_Provider_ContentPostThumbnail extends \Assets_Provider_Image
     /**
      * Returns TRUE if deploy is granted
      *
-     * @param \Assets_ModelInterface $model
+     * @param \BetaKiller\Assets\Model\AssetsModelInterface $model
+     *
      * @return bool
      */
-    protected function check_deploy_permissions($model)
+    protected function checkDeployPermissions($model)
     {
         // TODO Move to ACL
         return TRUE;
@@ -90,12 +93,13 @@ class Assets_Provider_ContentPostThumbnail extends \Assets_Provider_Image
     /**
      * Returns TRUE if delete operation granted
      *
-     * @param Assets_ModelInterface $model
+     * @param AssetsModelInterface $model
+     *
      * @return bool
      */
-    protected function check_delete_permissions($model)
+    protected function checkDeletePermissions($model)
     {
-        $user = $this->get_user();
+        $user = $this->getUser();
 
         // TODO Move to ACL
         return $user AND $user->is_admin_allowed();

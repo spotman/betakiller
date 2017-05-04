@@ -1,16 +1,25 @@
-<?php defined('SYSPATH') OR die('No direct script access.');
+<?php use BetaKiller\Assets\AssetsException;
+use BetaKiller\Assets\AssetsProviderFactory;
+use BetaKiller\Assets\Model\AssetsModelInterface;
+use BetaKiller\Assets\Provider\AbstractAssetsProvider;
+use BetaKiller\Assets\Provider\AbstractAssetsProviderImage;
 
-class Controller_Assets extends Controller {
+class Controller_Assets extends Controller
+{
+    const ACTION_ORIGINAL = 'original';
+    const ACTION_PREVIEW  = 'preview';
+    const ACTION_DELETE   = 'delete';
+    const ACTION_CROP     = 'crop'; // Kept for BC
 
     /**
-     * @var Assets_Provider
+     * @var AbstractAssetsProvider
      */
-    protected $_provider;
+    protected $provider;
 
     /**
      * Common action for uploading files through provider
      *
-     * @throws Assets_Exception
+     * @throws AssetsException
      */
     public function action_upload()
     {
@@ -18,8 +27,9 @@ class Controller_Assets extends Controller {
         $this->content_type_json();
 
         // Restrict multiple files at once
-        if (count($_FILES) > 1)
-            throw new Assets_Exception('Only one file can be uploaded at once');
+        if (count($_FILES) > 1) {
+            throw new AssetsException('Only one file can be uploaded at once');
+        }
 
         $this->provider_factory();
 
@@ -30,67 +40,84 @@ class Controller_Assets extends Controller {
         $_post_data = $this->request->post();
 
         // Uploading via provider
-        $model = $this->_provider->upload($_file, $_post_data);
+        $model = $this->provider->upload($_file, $_post_data);
 
         // Returns
-        $this->send_json(self::JSON_SUCCESS, $model->to_json());
+        $this->send_json(self::JSON_SUCCESS, $model->toJson());
     }
 
     public function action_original()
     {
         $this->provider_factory();
 
-        $model = $this->from_item_deploy_url();
+        $model = $this->fromItemDeployUrl();
 
-        $this->check_extension($model);
+        $this->checkExtension($model);
 
         // Get file content
-        $content = $this->_provider->get_content($model);
+        $content = $this->provider->getContent($model);
 
         // Deploy to cache
         $this->deploy($model, $content);
 
+        // Send last modified date
+        $this->response->last_modified($model->getLastModifiedAt());
+
         // Send file content + headers
-        $this->send_file($content, $model->get_mime());
+        $this->send_file($content, $model->getMime());
     }
 
     public function action_preview()
     {
         $this->provider_factory();
 
-        if ( !($this->_provider instanceof Assets_Provider_Image) )
-            throw new Assets_Exception('Preview can be served only by instances of Assets_Provider_Image');
+        if (!($this->provider instanceof AbstractAssetsProviderImage)) {
+            throw new AssetsException('Preview can be served only by instances of :must', [
+                ':must' => AbstractAssetsProviderImage::class,
+            ]);
+        }
 
-        $size = $this->param('size');
-        $model = $this->from_item_deploy_url();
+        $size  = $this->getSizeParam();
+        $model = $this->fromItemDeployUrl();
 
-        $this->check_extension($model);
+        $this->checkExtension($model);
 
-        $preview_content = $this->_provider->make_preview($model, $size);
+        $previewContent = $this->provider->makePreview($model, $size);
 
         // Deploy to cache
-        $this->deploy($model, $preview_content);
+        $this->deploy($model, $previewContent);
+
+        // Send last modified date
+        $this->response->last_modified($model->getLastModifiedAt());
 
         // Send file content + headers
-        $this->send_file($preview_content, $model->get_mime());
+        $this->send_file($previewContent, $model->getMime());
     }
 
     public function action_crop()
     {
         $this->provider_factory();
 
-        if ( !($this->_provider instanceof Assets_Provider_Image) )
-            throw new Assets_Exception('Cropping can be processed only by instances of Assets_Provider_Image');
+        if (!($this->provider instanceof AbstractAssetsProviderImage)) {
+            throw new AssetsException('Cropping can be processed only by instances of :must', [
+                ':must' => AbstractAssetsProviderImage::class,
+            ]);
+        }
 
-        $size = $this->param('size');
-        $model = $this->from_item_deploy_url();
+        $size  = $this->getSizeParam();
+        $model = $this->fromItemDeployUrl();
 
-        $this->check_extension($model);
+        $this->checkExtension($model);
 
-        $preview_url = $model->get_preview_url($size);
+        $preview_url = $model->getPreviewUrl($size);
 
         // Redirect for SEO backward compatibility
         $this->response->redirect($preview_url, 301);
+    }
+
+    private function getSizeParam()
+    {
+        return $this->param('size');
     }
 
     public function action_delete()
@@ -101,7 +128,7 @@ class Controller_Assets extends Controller {
         $this->provider_factory();
 
         // Get file model by hash value
-        $model = $this->from_item_deploy_url();
+        $model = $this->fromItemDeployUrl();
 
         // Delete file through provider
         $model->delete();
@@ -111,33 +138,40 @@ class Controller_Assets extends Controller {
 
     protected function provider_factory()
     {
-        $provider_key = $this->param('provider');
+        $requestKey = $this->param('provider');
 
-        if ( ! $provider_key )
-            throw new Assets_Exception('You must specify provider codename');
+        if (!$requestKey) {
+            throw new AssetsException('You must specify provider codename');
+        }
 
-        $this->_provider = Assets_Provider_Factory::instance()->create($provider_key);
+        $this->provider = AssetsProviderFactory::instance()->createFromUrlKey($requestKey);
+        $providerKey = $this->provider->getUrlKey();
+
+        if ($requestKey !== $providerKey) {
+            // Redirect to canonical url
+            $model = $this->fromItemDeployUrl();
+
+            $this->redirectToCanonicalUrl($model);
+        }
     }
 
     /**
-     * @return \Assets_ModelInterface|\Assets_Model_ImageInterface|NULL
-     * @throws \Assets_Exception
+     * @return \BetaKiller\Assets\Model\AssetsModelInterface|\BetaKiller\Assets\Model\AssetsModelImageInterface|NULL
+     * @throws \BetaKiller\Assets\AssetsException
      * @throws \HTTP_Exception_404
      */
-    protected function from_item_deploy_url()
+    protected function fromItemDeployUrl()
     {
         $url = $this->param('item_url');
 
-        if ( ! $url )
-            throw new Assets_Exception('You must specify item url');
-
-        try
-        {
-            // Find asset model by url
-            $model = $this->_provider->get_model_by_deploy_url($url);
+        if (!$url) {
+            throw new AssetsException('You must specify item url');
         }
-        catch ( Assets_Exception $e )
-        {
+
+        try {
+            // Find asset model by url
+            $model = $this->provider->getModelByDeployUrl($url);
+        } catch (AssetsException $e) {
             // File not found
             throw new HTTP_Exception_404;
         }
@@ -145,19 +179,48 @@ class Controller_Assets extends Controller {
         return $model;
     }
 
-    protected function deploy(Assets_ModelInterface $model, $content)
+    protected function deploy(AssetsModelInterface $model, $content)
     {
-        $this->_provider->deploy($this->request, $model, $content);
+        $this->provider->deploy($this->request, $model, $content);
     }
 
-    protected function check_extension(Assets_ModelInterface $model)
+    protected function checkExtension(AssetsModelInterface $model)
     {
-        if ( ! $this->request->param('ext') )
-        {
-            $ext = $this->_provider->get_model_extension($model);
+        $requestExt = $this->request->param('ext');
+        $modelExt   = $this->provider->getModelExtension($model);
 
-            $this->redirect($this->request->detect_uri().'.'.$ext);
+        if (!$requestExt || $requestExt !== $modelExt) {
+            $this->redirectToCanonicalUrl($model);
         }
     }
 
+    private function redirectToCanonicalUrl(AssetsModelInterface $model)
+    {
+        $url = $this->getCanonicalUrl($model);
+
+        $this->response->redirect($url, 302);
+    }
+
+    private function getCanonicalUrl(AssetsModelInterface $model)
+    {
+        $action = $this->request->action();
+
+        switch ($action) {
+            case self::ACTION_ORIGINAL:
+                return $this->provider->getOriginalUrl($model);
+
+            case 'preview':
+            case 'crop':
+                /** @var AbstractAssetsProviderImage $provider */
+                $provider = $this->provider;
+
+                return $provider->getPreviewUrl($model, $this->getSizeParam());
+
+            case 'delete':
+                return $this->provider->getDeleteUrl($model);
+
+            default:
+                throw new HTTP_Exception_400('Unknown action :value', [':value' => $action]);
+        }
+    }
 }

@@ -1,11 +1,11 @@
 <?php
 
+use BetaKiller\Assets\AssetsStorageFactory;
 use BetaKiller\Content\ContentElementInterface;
 
 trait Assets_Provider_ContentTrait
 {
     use \BetaKiller\Helper\ContentTrait;
-
 
     /**
      * Custom upload processing
@@ -13,19 +13,17 @@ trait Assets_Provider_ContentTrait
      * @param ContentElementInterface $model
      * @param array                   $_post_data
      */
-    protected function upload_preprocessor($model, array $_post_data)
+    protected function uploadPreprocessor($model, array $_post_data)
     {
         $entity_id = (int) Arr::get($_post_data, 'entityID') ?: NULL;
         $entity_item_id = (int) Arr::get($_post_data, 'entityItemID') ?: NULL;
 
-        if ($entity_id)
-        {
+        if ($entity_id) {
             $entity = $this->model_factory_content_entity($entity_id);
             $model->set_entity($entity);
         }
 
-        if ($entity_item_id)
-        {
+        if ($entity_item_id) {
             $model->set_entity_item_id($entity_item_id);
         }
     }
@@ -33,18 +31,18 @@ trait Assets_Provider_ContentTrait
     /**
      * Returns concrete storage for current provider
      *
-     * @return \Assets_Storage
+     * @return \BetaKiller\Assets\Storage\AbstractAssetsStorage
      */
-    protected function storage_factory()
+    protected function createStorage()
     {
-        // TODO move MultiSite dependency to Assets_Storage_Local config
+        // TODO move MultiSite dependency to AssetsStorageLocal config
         $assets_path = MultiSite::instance()->getSitePath().DIRECTORY_SEPARATOR.'assets'.DIRECTORY_SEPARATOR;
 
-        /** @var \Assets_Storage_Local $storage */
-        $storage = Assets_Storage_Factory::instance()->create('Local');
+        /** @var \BetaKiller\Assets\Storage\AssetsStorageLocal $storage */
+        $storage = AssetsStorageFactory::instance()->create('Local');
 
-        return $storage->set_base_path($assets_path.$this->get_storage_path_name());
+        return $storage->setBasePath($assets_path.$this->getStoragePathName());
     }
 
-    abstract protected function get_storage_path_name();
+    abstract protected function getStoragePathName();
 }

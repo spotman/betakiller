@@ -3,13 +3,13 @@
 return array(
 
     'deploy'    =>  [
-        'enabled'           =>  (in_array(Kohana::$environment, [Kohana::STAGING, Kohana::PRODUCTION])),
+        'enabled'           =>  in_array(Kohana::$environment, [Kohana::STAGING, Kohana::PRODUCTION]),
         'directory_mask'    =>  0775,
     ],
 
 //    'providers' => array(
-//        'provider-key'  =>  array(
-//            'codename'  =>  ''
+//        'codename'  =>  array(
+//            'url_key'  =>  ''
 //        )
 //    )
 

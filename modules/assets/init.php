@@ -1,4 +1,6 @@
-<?php defined('SYSPATH') OR die('No direct script access.');
+<?php
+
+use BetaKiller\Assets\Provider\AbstractAssetsProviderImage;
 
 /**
  * Uploading/downloading/deleting files via concrete provider
@@ -6,55 +8,50 @@
  * "assets/upload/<provider>"
  */
 Route::set('assets-provider-upload', 'assets/<provider>/upload')
-    ->defaults(array(
-        'module'        => 'assets',
-        'controller'    => 'Assets',
-        'action'        => 'upload',
-    ));
+    ->defaults([
+        'module'     => 'assets',
+        'controller' => 'Assets',
+        'action'     => 'upload',
+    ]);
 
-$assets_extension_regexp = '[a-z]{2,4}'; // (jpg|jpeg|gif|png)
-$assets_size_regexp = '[0-9]*'.Assets_Provider_Image::SIZE_DELIMITER.'[0-9]*';
+$assetsExtensionRegexp = '[a-z]{2,}'; // (jpg|jpeg|gif|png)
+$assetsSizeRegexp      = '[0-9]*'.AbstractAssetsProviderImage::SIZE_DELIMITER.'[0-9]*';
 
 /**
  * Deploy/delete/preview files via concrete provider
  */
-Route::set('assets-provider-item', 'assets/<provider>/<item_url>/<action>(.<ext>)',
-    array('item_url' => '[A-Za-z0-9\/]+', 'action' => '(original|preview|delete)', 'ext' => $assets_extension_regexp))
-    ->defaults(array(
-        'module'        => 'assets',
-        'controller'    => 'Assets',
-    ));
+Route::set('assets-provider-item', 'assets/<provider>/<item_url>/<action>(.<ext>)', [
+    'item_url' => '[A-Za-z0-9\/]+',
+    'action'   => '(original|delete)',
+    'ext'      => $assetsExtensionRegexp,
+])
+    ->defaults([
+        'module'     => 'assets',
+        'controller' => 'Assets',
+    ]);
 
 /**
- * Make image preview
+ * Make image preview or crop it
  */
-Route::set('assets-provider-item-preview', 'assets/<provider>/<item_url>/preview-<size>(.<ext>)',
-    array('item_url' => '[A-Za-z0-9\/]+', 'size' => $assets_size_regexp, 'ext' => $assets_extension_regexp))
-    ->defaults(array(
-        'module'        => 'assets',
-        'controller'    => 'Assets',
-        'action'        => 'preview',
-    ));
-
-/**
- * Crop an image
- */
-Route::set('assets-provider-item-crop', 'assets/<provider>/<item_url>/crop-<size>(.<ext>)',
-    array('item_url' => '[A-Za-z0-9\/]+', 'size' => $assets_size_regexp, 'ext' => $assets_extension_regexp))
-    ->defaults(array(
-        'module'        => 'assets',
-        'controller'    => 'Assets',
-        'action'        => 'crop',
-    ));
+Route::set('assets-provider-item-preview', 'assets/<provider>/<item_url>/<action>(-<size>)(.<ext>)', [
+    'item_url' => '[A-Za-z0-9\/]+',
+    'action'   => '(preview|crop)',
+    'size'     => $assetsSizeRegexp,
+    'ext'      => $assetsExtensionRegexp,
+])
+    ->defaults([
+        'module'     => 'assets',
+        'controller' => 'Assets',
+    ]);
 
 /**
  * Fake route for getting asset`s deployment directory
  * It`ll newer triggered because of existing real deployment directory (and default .htaccess policy also)
  */
 Route::set('assets-provider-item-deploy-directory', 'assets/<provider>/<item_url>')
-    ->defaults(array(
-        'module'        => 'assets',
-        'controller'    => 'Assets',
-    ));
+    ->defaults([
+        'module'     => 'assets',
+        'controller' => 'Assets',
+    ]);
 
-unset($assets_extension_regexp, $assets_size_regexp);
+unset($assetsExtensionRegexp, $assetsSizeRegexp);

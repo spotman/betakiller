@@ -1,8 +1,10 @@
 <?php
 
+use BetaKiller\Assets\AssetsProviderFactory;
+use BetaKiller\Assets\Model\AbstractAssetsOrmModel;
 use BetaKiller\Content\ContentElementFromWordpressWithPathInterface;
 
-class Model_ContentAttachmentElement extends Assets_Model_ORM implements ContentElementFromWordpressWithPathInterface
+class Model_ContentAttachmentElement extends AbstractAssetsOrmModel implements ContentElementFromWordpressWithPathInterface
 {
     use Model_ORM_ContentElementTrait,
         Model_ORM_ImportedFromWordpressTrait,
@@ -28,8 +30,8 @@ class Model_ContentAttachmentElement extends Assets_Model_ORM implements Content
      *
      * @return Assets_Provider_ContentAttachment
      */
-    protected function get_provider()
+    protected function getProvider()
     {
-        return Assets_Provider_Factory::instance()->create('ContentAttachment');
+        return AssetsProviderFactory::instance()->create('ContentAttachment');
     }
 }

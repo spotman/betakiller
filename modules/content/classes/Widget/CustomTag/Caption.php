@@ -34,7 +34,7 @@ class Widget_CustomTag_Caption extends BaseWidget
         $model = $this->model_factory_content_image_element()->get_by_id($image_id);
 
         return [
-            'image'     =>  $model->get_attributes_for_img_tag($model::SIZE_ORIGINAL),
+            'image'     =>  $model->getAttributesForImgTag($model::SIZE_ORIGINAL),
             'caption'   =>  $title,
             'align'     =>  $align,
             'class'     =>  $class,

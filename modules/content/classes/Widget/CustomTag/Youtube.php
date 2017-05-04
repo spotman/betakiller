@@ -36,7 +36,7 @@ class Widget_CustomTag_Youtube extends BaseWidget
 //        $attributes = [
 //            'id'        =>  'admin-image-'.$model->get_id(),
 //            'title' =>  $title ?: $model->get_title(),
-//            'alt'   =>  $alt ?: $model->get_alt(),
+//            'alt'   =>  $alt ?: $model->getAlt(),
 //            'class' =>  implode(' ', array_unique($classes)),
 //        ];
 //

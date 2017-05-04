@@ -1,13 +1,14 @@
-<?php defined('SYSPATH') OR die('No direct script access.');
+<?php
+namespace BetaKiller\Assets;
 
-class Assets_Exception_Upload extends Assets_Provider_Exception {
-
+class AssetsExceptionUpload extends AssetsProviderException
+{
     /**
      * Отключаем уведомление разработчиков о данном типе эксепшнов
      */
     public function is_notification_enabled()
     {
-        return FALSE;
+        return false;
     }
 
     /**
@@ -15,7 +16,6 @@ class Assets_Exception_Upload extends Assets_Provider_Exception {
      */
     protected function show_original_message_to_user()
     {
-        return TRUE;
+        return true;
     }
-
 }

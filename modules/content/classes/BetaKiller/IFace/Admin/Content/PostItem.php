@@ -18,7 +18,7 @@ class PostItem extends AdminBase
 //
 //        foreach ($article->get_thumbnails() as $thumb)
 //        {
-//            $thumbnails[] = $thumb->get_attributes_for_img_tag();
+//            $thumbnails[] = $thumb->getAttributesForImgTag();
 //        }
 
         $rules = [];

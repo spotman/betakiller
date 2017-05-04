@@ -1,8 +1,10 @@
 <?php
 
+use BetaKiller\Assets\AssetsProviderFactory;
+use BetaKiller\Assets\Model\AbstractAssetsOrmModelSeoImage;
 use BetaKiller\Content\ContentElementFromWordpressWithPathInterface;
 
-class Model_ContentImageElement extends Assets_Model_ORM_SeoImage implements ContentElementFromWordpressWithPathInterface
+class Model_ContentImageElement extends AbstractAssetsOrmModelSeoImage implements ContentElementFromWordpressWithPathInterface
 {
     use Model_ORM_ContentElementTrait,
         Model_ORM_ImportedFromWordpressTrait,
@@ -28,8 +30,8 @@ class Model_ContentImageElement extends Assets_Model_ORM_SeoImage implements Con
      *
      * @return Assets_Provider_ContentImage
      */
-    protected function get_provider()
+    protected function getProvider()
     {
-        return Assets_Provider_Factory::instance()->create('ContentImage');
+        return AssetsProviderFactory::instance()->create('ContentImage');
     }
 }

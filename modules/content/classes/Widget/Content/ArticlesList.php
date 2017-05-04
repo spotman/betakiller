@@ -53,7 +53,7 @@ class Widget_Content_ArticlesList extends BaseWidget
 
             $posts_data[] = [
                 'is_large'      =>  $is_large,
-                'thumbnail'     =>  $thumbnail->get_attributes_for_img_tag($thumbnail_size),
+                'thumbnail'     =>  $thumbnail->getAttributesForImgTag($thumbnail_size),
                 'url'           =>  $article->get_public_url(),
                 'label'         =>  $article->get_label(),
                 'title'         =>  $article->getTitle(),

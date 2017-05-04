@@ -1,5 +1,6 @@
 <?php
 
+use BetaKiller\Assets\Model\AssetsModelInterface;
 use BetaKiller\Content\ContentElementInterface;
 
 /**
@@ -58,7 +59,7 @@ abstract class Service_Content_WithAssets extends Service_Content_Base
     }
 
     /**
-     * @return ContentElementInterface|\BetaKiller\Content\ImportedFromWordpressInterface|Assets_ModelInterface
+     * @return ContentElementInterface|\BetaKiller\Content\ImportedFromWordpressInterface|AssetsModelInterface
      */
     protected function file_model_factory()
     {

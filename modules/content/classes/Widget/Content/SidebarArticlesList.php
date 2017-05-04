@@ -52,7 +52,7 @@ abstract class Widget_Content_SidebarArticlesList extends BaseWidget
 
         return [
             'label'     =>  $article->get_label(),
-            'thumbnail' =>  $thumbnail->get_attributes_for_img_tag($thumbnail::SIZE_PREVIEW),
+            'thumbnail' =>  $thumbnail->getAttributesForImgTag($thumbnail::SIZE_PREVIEW),
             'url'       =>  $article->get_public_url(),
             'date'      =>  $article->get_created_at()->format('d.m.Y'),
         ];

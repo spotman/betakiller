@@ -17,6 +17,6 @@ class Service_Content_Image extends Service_Content_WithAssets
      */
     protected function get_assets_provider()
     {
-        return \Assets_Provider_Factory::instance()->create('ContentImage');
+        return \BetaKiller\Assets\AssetsProviderFactory::instance()->create('ContentImage');
     }
 }

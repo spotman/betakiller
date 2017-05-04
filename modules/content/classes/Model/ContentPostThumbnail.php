@@ -1,8 +1,10 @@
 <?php
 
+use BetaKiller\Assets\AssetsProviderFactory;
+use BetaKiller\Assets\Model\AbstractAssetsOrmModelSeoImage;
 use BetaKiller\Content\ImportedFromWordpressWithPathInterface;
 
-class Model_ContentPostThumbnail extends Assets_Model_ORM_SeoImage implements ImportedFromWordpressWithPathInterface
+class Model_ContentPostThumbnail extends AbstractAssetsOrmModelSeoImage implements ImportedFromWordpressWithPathInterface
 {
     use Model_ORM_ImportedFromWordpressTrait,
         Model_ORM_HasWordpressPathTrait;
@@ -44,8 +46,8 @@ class Model_ContentPostThumbnail extends Assets_Model_ORM_SeoImage implements Im
      *
      * @return Assets_Provider_ContentPostThumbnail
      */
-    protected function get_provider()
+    protected function getProvider()
     {
-        return Assets_Provider_Factory::instance()->create('ContentPostThumbnail');
+        return AssetsProviderFactory::instance()->create('ContentPostThumbnail');
     }
 }

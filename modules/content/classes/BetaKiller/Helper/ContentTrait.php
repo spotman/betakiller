@@ -22,27 +22,27 @@ trait ContentTrait
     }
 
     /**
-     * @return \Assets_Provider_ContentImage|\Assets_Provider_Image
+     * @return \Assets_Provider_ContentImage|\BetaKiller\Assets\Provider\AbstractAssetsProviderImage
      */
     protected function assets_provider_content_image()
     {
-        return \Assets_Provider_Factory::instance()->create('ContentImage');
+        return \BetaKiller\Assets\AssetsProviderFactory::instance()->create('ContentImage');
     }
 
     /**
-     * @return \Assets_Provider_ContentAttachment|\Assets_Provider
+     * @return \Assets_Provider_ContentAttachment|\BetaKiller\Assets\Provider\AbstractAssetsProvider
      */
     protected function assets_provider_content_attachment()
     {
-        return \Assets_Provider_Factory::instance()->create('ContentAttachment');
+        return \BetaKiller\Assets\AssetsProviderFactory::instance()->create('ContentAttachment');
     }
 
     /**
-     * @return \Assets_Provider_ContentPostThumbnail|\Assets_Provider_Image
+     * @return \Assets_Provider_ContentPostThumbnail|\BetaKiller\Assets\Provider\AbstractAssetsProviderImage
      */
     protected function assets_provider_content_post_thumbnail()
     {
-        return \Assets_Provider_Factory::instance()->create('ContentPostThumbnail');
+        return \BetaKiller\Assets\AssetsProviderFactory::instance()->create('ContentPostThumbnail');
     }
 
     /**
