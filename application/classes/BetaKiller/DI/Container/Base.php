@@ -6,16 +6,16 @@ use DI\DependencyException;
 use Interop\Container\Exception\ContainerException;
 use Interop\Container\Exception\NotFoundException;
 
-use BetaKiller\Utils\Instance\SingletonTrait;
 use Invoker\Exception\InvocationException;
 use Invoker\Exception\NotCallableException;
 use Invoker\Exception\NotEnoughParametersException;
 
 abstract class Base implements ContainerInterface
 {
-    use SingletonTrait {
-        instance as protected _instance;
-    }
+    /**
+     * @var ContainerInterface
+     */
+    protected static $instance;
 
     /**
      * @var ContainerInterface
@@ -26,10 +26,19 @@ abstract class Base implements ContainerInterface
      * @return ContainerInterface
      * @deprecated Bad practice, use DI in constructor instead
      */
-    public static function instance()
+    public static function getInstance()
     {
-        return self::_instance();
+        if (!static::$instance) {
+            static::$instance = new static;
+        }
+        return static::$instance;
     }
+
+    /**
+     * You can`t create objects directly, use CLASS::instance() instead
+     * Also you can define your own protected constructor in child class
+     */
+    protected function __construct() {}
 
     /**
      * @return ContainerInterface

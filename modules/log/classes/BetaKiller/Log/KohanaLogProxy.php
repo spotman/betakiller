@@ -21,7 +21,7 @@ class KohanaLogProxy extends \Log_Writer
 
     public static function register()
     {
-        $writer = Container::instance()->get(self::class);
+        $writer = Container::getInstance()->get(self::class);
 
         // Proxy old Kohana logs to new logging subsystem
         \Kohana::$log->attach($writer);

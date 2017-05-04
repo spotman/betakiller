@@ -7,6 +7,6 @@ abstract class Service
 {
     public static function instance()
     {
-        return Container::instance()->get(static::class);
+        return Container::getInstance()->get(static::class);
     }
 }

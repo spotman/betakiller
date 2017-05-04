@@ -68,7 +68,7 @@ class Controller_IFace extends Controller
         }
 
         /** @var IFaceCache $cache */
-        $cache = Container::instance()->get(IFaceCache::class);
+        $cache = Container::getInstance()->get(IFaceCache::class);
         $cache->process($iface);
     }
 
@@ -77,7 +77,7 @@ class Controller_IFace extends Controller
      */
     protected function getAppConfig()
     {
-        return Container::instance()->get(AppConfigInterface::class);
+        return Container::getInstance()->get(AppConfigInterface::class);
     }
 
     /**

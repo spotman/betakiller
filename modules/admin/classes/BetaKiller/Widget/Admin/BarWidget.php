@@ -100,7 +100,7 @@ class BarWidget extends AbstractAdminWidget
 
         $parameters = $this->dispatcher->parameters();
 
-        if ($currentIFace instanceof BetaKiller\IFace\App\Content\PostItem) {
+        if ($currentIFace instanceof \BetaKiller\IFace\App\Content\PostItem) {
             /** @var Model_ContentPost $model */
             $model = $parameters->get(Model_ContentPost::URL_PARAM);
 

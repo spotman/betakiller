@@ -1,7 +1,5 @@
 <?php
 
-use BetaKiller\IFace\Url\UrlDispatcherCache;
-use BetaKiller\IFace\Url\UrlDispatcherCacheInterface;
 use BetaKiller\Acl\PermissionsCollector;
 use BetaKiller\Acl\ResourceFactory;
 use BetaKiller\Acl\ResourcesCollector;
@@ -9,6 +7,8 @@ use BetaKiller\Acl\RolesCollector;
 use BetaKiller\Factory\CommonFactoryCache;
 use BetaKiller\Factory\FactoryCacheInterface;
 use BetaKiller\Factory\NamespaceBasedFactory;
+use BetaKiller\IFace\Url\UrlDispatcherCache;
+use BetaKiller\IFace\Url\UrlDispatcherCacheInterface;
 use BetaKiller\IFace\View\IFaceView;
 use BetaKiller\IFace\View\LayoutView;
 use BetaKiller\IFace\View\WrapperView;
@@ -59,7 +59,7 @@ return [
         })->scope(Scope::SINGLETON),
 
         // Cache for url dispatcher
-        UrlDispatcherCacheInterface::class => DI\factory(function () use ($workingPath) {
+        UrlDispatcherCacheInterface::class       => DI\factory(function () use ($workingPath) {
             return new UrlDispatcherCache([
                 new PhpFileCache(implode(DIRECTORY_SEPARATOR, [$workingPath, 'cache', 'dispatcher'])),
             ]);
@@ -67,7 +67,7 @@ return [
 
         // Inject container into factories
         \BetaKiller\DI\ContainerInterface::class => DI\factory(function () {
-            return \BetaKiller\DI\Container::instance();
+            return \BetaKiller\DI\Container::getInstance();
         })->scope(Scope::SINGLETON),
 
         LoggerInterface::class => DI\object(\BetaKiller\Log\Logger::class),

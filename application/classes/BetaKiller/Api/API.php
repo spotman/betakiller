@@ -13,6 +13,6 @@ class API extends \Spotman\Api\API
      */
     public static function getInstance()
     {
-        return Container::instance()->get(static::class);
+        return Container::getInstance()->get(static::class);
     }
 }

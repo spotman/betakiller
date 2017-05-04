@@ -23,7 +23,7 @@ class Widget_Auth extends \BetaKiller\IFace\Widget\BaseWidget
     public function getData()
     {
         // TODO DI
-        $this->_config = \BetaKiller\DI\Container::instance()->get(ConfigInterface::class);
+        $this->_config = \BetaKiller\DI\Container::getInstance()->get(ConfigInterface::class);
 
         $providers = $this->_config->load(['auth', 'providers']);
 

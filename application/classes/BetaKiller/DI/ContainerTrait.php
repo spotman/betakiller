@@ -1,9 +1,12 @@
 <?php
 namespace BetaKiller\DI;
 
-use BetaKiller\DI\Container;
-use BetaKiller\DI\ContainerInterface;
-
+/**
+ * Trait ContainerTrait
+ *
+ * @package BetaKiller\DI
+ * @deprecated Use direct DI instead
+ */
 trait ContainerTrait
 {
     /**
@@ -18,9 +21,10 @@ trait ContainerTrait
      *
      * @url http://php-di.org/doc/best-practices.html
      * @return ContainerInterface
+     * @deprecated Use direct DI instead
      */
     private function getContainer()
     {
-        return Container::instance();
+        return Container::getInstance();
     }
 }

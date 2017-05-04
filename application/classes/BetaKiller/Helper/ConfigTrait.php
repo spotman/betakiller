@@ -15,7 +15,7 @@ trait ConfigTrait
     private function config($group, $default = NULL)
     {
         /** @var ConfigInterface $config */
-        $config = Container::instance()->get(ConfigInterface::class);
+        $config = Container::getInstance()->get(ConfigInterface::class);
 
         $path = explode('.', $group);
         return $config->load($path) ?: $default;

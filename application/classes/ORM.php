@@ -56,7 +56,7 @@ class ORM extends Utils\Kohana\ORM implements ApiResponseItemInterface, UrlDataS
     {
         if (!self::$_factory_instance) {
             /** @var OrmFactory $factory */
-            $factory = Container::instance()->get(OrmFactory::class);
+            $factory = Container::getInstance()->get(OrmFactory::class);
 
             self::$_factory_instance = $factory;
         }
