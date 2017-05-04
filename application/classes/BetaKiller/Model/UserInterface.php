@@ -119,6 +119,13 @@ interface UserInterface extends OrmInterface, NotificationUserInterface, AclUser
     public function is_logged_in();
 
     /**
+     * Returns true if current user is guest
+     *
+     * @return bool
+     */
+    public function isGuest();
+
+    /**
      * Filters only active users
      *
      * @return $this

@@ -18,11 +18,14 @@ class MainWidget extends AbstractAdminWidget
      */
     public function getData()
     {
+        $items = [
+            $this->getPostsMenu(),
+            $this->getCommentsMenu(),
+            $this->getErrorsMenu(),
+        ];
+        
         return [
-            'items' => [
-                $this->getPostsMenu(),
-                $this->getCommentsMenu(),
-            ],
+            'items' => array_filter($items),
         ];
     }
 
@@ -77,5 +80,28 @@ class MainWidget extends AbstractAdminWidget
         }
 
         return $this->makeIFaceMenuItemData($commentsIndex, $childrenData);
+    }
+
+    protected function getErrorsMenu()
+    {
+        if (!$this->user->is_developer()) {
+            return null;
+        }
+
+        /** @var \BetaKiller\IFace\Admin\Error\Index $iface */
+        $errorsIndex = $this->iface_from_codename('Admin_Error_Index');
+
+        /** @var \BetaKiller\IFace\Admin\Error\UnresolvedPhpExceptionIndex $iface */
+        $unresolvedErrors = $this->iface_from_codename('Admin_Error_UnresolvedPhpExceptionIndex');
+
+        /** @var \BetaKiller\IFace\Admin\Error\ResolvedPhpExceptionIndex $iface */
+        $resolvedErrors = $this->iface_from_codename('Admin_Error_ResolvedPhpExceptionIndex');
+
+        $childrenData = [
+            $this->makeIFaceMenuItemData($unresolvedErrors),
+            $this->makeIFaceMenuItemData($resolvedErrors),
+        ];
+
+        return $this->makeIFaceMenuItemData($errorsIndex, $childrenData);
     }
 }

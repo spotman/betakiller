@@ -98,10 +98,21 @@ class User extends \Model_Auth_User implements UserInterface
 
     /**
      * @return bool
+     * @deprecated
      */
     public function is_moderator()
     {
         return $this->has_role(Role::MODERATOR_ROLE_NAME);
+    }
+
+    /**
+     * Returns true if current user is guest
+     *
+     * @return bool
+     */
+    public function isGuest()
+    {
+        return $this instanceof GuestUser;
     }
 
     /**

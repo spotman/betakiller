@@ -33,6 +33,8 @@ class BetaKiller_Kohana_Exception extends Kohana_Kohana_Exception
      * @param Exception $exception
      * @return Response
      * @throws Kohana_Exception
+     * @deprecated
+     * @todo Rewrite to ExceptionHandler and move exception handling logic to it
      */
     static public function _handler(Exception $exception)
     {

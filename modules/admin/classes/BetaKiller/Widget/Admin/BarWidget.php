@@ -1,28 +1,36 @@
 <?php
 
+namespace BetaKiller\Widget\Admin;
+
+use BetaKiller\Model\UserInterface;
+use BetaKiller\IFace\Widget\AbstractAdminWidget;
 use BetaKiller\IFace\Url\UrlDispatcher;
 use BetaKiller\IFace\Url\UrlParameters;
+use Model_ContentCommentStatus;
+use Model_ContentPost;
+use BetaKiller\Helper\ContentTrait;
 
-class Widget_Admin_Bar extends \BetaKiller\IFace\Widget\BaseWidget
+class BarWidget extends AbstractAdminWidget
 {
-    use BetaKiller\Helper\CurrentUserTrait;
-    use BetaKiller\Helper\ContentTrait;
+    use ContentTrait;
 
     /**
      * @var \BetaKiller\IFace\Url\UrlDispatcher
      */
     protected $dispatcher;
 
+
     /**
-     * Widget_Admin_Bar constructor.
+     * BarWidget constructor.
      *
+     * @param \BetaKiller\Model\UserInterface $user
      * @param \BetaKiller\IFace\Url\UrlDispatcher $dispatcher
      */
-    public function __construct(UrlDispatcher $dispatcher)
+    public function __construct(UserInterface $user, UrlDispatcher $dispatcher)
     {
+        parent::__construct($user);
         $this->dispatcher = $dispatcher;
     }
-
 
     /**
      * Returns data for View rendering
@@ -31,17 +39,10 @@ class Widget_Admin_Bar extends \BetaKiller\IFace\Widget\BaseWidget
      */
     public function getData()
     {
-        $user = $this->current_user(true);
-
-        // If user is not authorized, then silently exiting
-        if (!$user || !$user->is_admin_allowed()) {
-            return [];
-        }
-
         $data = [
-            'enabled' => true,
-            'comments'  =>  $this->getCommentsData(),
-            'edit'  =>  [
+            'enabled'  => true,
+            'comments' => $this->getCommentsData(),
+            'edit'     => [
                 'url' => $this->getEditButtonUrl(),
             ],
         ];
@@ -49,12 +50,18 @@ class Widget_Admin_Bar extends \BetaKiller\IFace\Widget\BaseWidget
         return $data;
     }
 
+    protected function isEmptyResponseAllowed()
+    {
+        // If user is not authorized, then silently exiting
+        return true;
+    }
+
     protected function getCommentsData()
     {
         $commentOrm = $this->model_factory_content_comment();
-        $statusOrm = $this->model_factory_content_comment_status();
+        $statusOrm  = $this->model_factory_content_comment_status();
 
-        $status = $statusOrm->get_pending_status();
+        $status       = $statusOrm->get_pending_status();
         $pendingCount = $commentOrm->get_comments_count($status);
 
         $url = $pendingCount
@@ -62,7 +69,7 @@ class Widget_Admin_Bar extends \BetaKiller\IFace\Widget\BaseWidget
             : $this->getCommentsRootIfaceUrl();
 
         return [
-            'url' => $url,
+            'url'   => $url,
             'count' => $pendingCount,
         ];
     }
@@ -96,6 +103,7 @@ class Widget_Admin_Bar extends \BetaKiller\IFace\Widget\BaseWidget
         if ($currentIFace instanceof BetaKiller\IFace\App\Content\PostItem) {
             /** @var Model_ContentPost $model */
             $model = $parameters->get(Model_ContentPost::URL_PARAM);
+
             return $model->get_admin_url();
         }
 

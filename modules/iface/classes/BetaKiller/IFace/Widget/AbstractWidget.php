@@ -16,7 +16,7 @@ abstract class AbstractWidget implements WidgetInterface
     const DEFAULT_STATE = 'default';
 
     const JSON_SUCCESS = Response::JSON_SUCCESS;
-    const JSON_ERROR = Response::JSON_ERROR;
+    const JSON_ERROR   = Response::JSON_ERROR;
 
     /**
      * @var string
@@ -31,7 +31,7 @@ abstract class AbstractWidget implements WidgetInterface
     /**
      * @var array Context for widget rendering
      */
-    protected $_context = array();
+    protected $_context = [];
 
     /**
      * @var Request
@@ -49,17 +49,17 @@ abstract class AbstractWidget implements WidgetInterface
      *
      * @return View
      */
-    abstract protected function view_factory($file = NULL, array $data = NULL);
+    abstract protected function view_factory($file = null, array $data = null);
 
     /**
-     * @param string $name Widget name
-     * @param Request $request
+     * @param string   $name Widget name
+     * @param Request  $request
      * @param Response $response
      *
      * @return \BetaKiller\IFace\Widget\WidgetInterface
-     * @deprecated
+     * @deprecated Use WidgetFactory instead
      */
-    public static function factory($name, Request $request = NULL, Response $response = NULL)
+    public static function factory($name, Request $request = null, Response $response = null)
     {
         return WidgetFactory::getInstance()->create($name, $request, $response);
     }
@@ -68,12 +68,15 @@ abstract class AbstractWidget implements WidgetInterface
      * Widget constructor.
      * Empty by default, use WidgetFactory for creating Widget instances
      */
-    public function __construct() {}
+    public function __construct()
+    {
+    }
 
     /**
      * Setter for widget name
      *
      * @param string $value
+     *
      * @return $this
      */
     public function setName($value)
@@ -97,6 +100,7 @@ abstract class AbstractWidget implements WidgetInterface
      * Setter for widget context (additional data for rendering)
      *
      * @param array $value
+     *
      * @return $this
      */
     public function setContext(array $value)
@@ -123,21 +127,40 @@ abstract class AbstractWidget implements WidgetInterface
 
     /**
      * Renders widget and returns its representation
+     *
      * @return string
      */
     public function __toString()
     {
         try {
-            $response = $this->render();
+            return $this->render();
+        } catch (\Throwable $e) {
+            return $this->processException($e);
         } catch (\Exception $e) {
-            $response = WidgetException::_handler($e);
+            return $this->processException($e);
         }
+    }
 
-        return (string) $response;
+    /**
+     * @param \Exception|\\Throwable $e
+     *
+     * @return string
+     * @todo Rewrite to ExceptionHandler and move exception handling logic to it
+     */
+    protected function processException($e)
+    {
+        try {
+            return (string)WidgetException::_handler($e);
+        } catch (\Throwable $e) {
+            return null;
+        } catch (\Exception $e) {
+            return null;
+        }
     }
 
     /**
      * Default action for Controller_Widget
+     * @deprecated Rewrite widget controller to direct Widget::render() call
      */
     public function action_render()
     {
@@ -147,14 +170,14 @@ abstract class AbstractWidget implements WidgetInterface
     /**
      * Renders widget View
      *
-     * @return Response
+     * @return string
      */
     public function render()
     {
         $this->_render();
 
         // TODO reset data and context for next render
-        return $this->getResponse();
+        return (string)$this->getResponse();
     }
 
     /**
@@ -169,7 +192,7 @@ abstract class AbstractWidget implements WidgetInterface
 
         // Serve widget data
         $data['this'] = [
-            'name'  => $this->getName(),
+            'name' => $this->getName(),
         ];
 
         // Creating View instance
@@ -208,22 +231,27 @@ abstract class AbstractWidget implements WidgetInterface
         return $this->_current_state;
     }
 
-    protected function url($action = NULL, $protocol = TRUE)
+    protected function url($action = null, $protocol = true)
     {
-        return Route::url('widget-controller', array('widget' => $this->getName(), 'action' => $action), $protocol);
+        return Route::url('widget-controller', ['widget' => $this->getName(), 'action' => $action], $protocol);
     }
 
-    protected function view($file = NULL)
+    /**
+     * @param string|null $file
+     *
+     * @return \View
+     */
+    protected function view($file = null)
     {
         if (!$file) {
-            $suffix = $this->_current_state != static::DEFAULT_STATE
-                ? '-' . $this->_current_state
+            $suffix = $this->_current_state !== static::DEFAULT_STATE
+                ? '-'.$this->_current_state
                 : '';
 
-            $file = str_replace('_', DIRECTORY_SEPARATOR, $this->_name) . $suffix;
+            $file = str_replace('_', DIRECTORY_SEPARATOR, $this->_name).$suffix;
         }
 
-        $view_path = 'widgets' . DIRECTORY_SEPARATOR . $file;
+        $view_path = 'widgets'.DIRECTORY_SEPARATOR.$file;
 
         return $this->view_factory($view_path, $this->getContext());
     }
@@ -235,12 +263,12 @@ abstract class AbstractWidget implements WidgetInterface
 
     private function get_validation_messages_path()
     {
-        return 'widgets' . DIRECTORY_SEPARATOR . str_replace('_', DIRECTORY_SEPARATOR, $this->_name);
+        return 'widgets'.DIRECTORY_SEPARATOR.str_replace('_', DIRECTORY_SEPARATOR, $this->_name);
     }
 
     /**
      * @param string $message
-     * @param array $variables
+     * @param array  $variables
      *
      * @throws \BetaKiller\IFace\Widget\WidgetException
      */
