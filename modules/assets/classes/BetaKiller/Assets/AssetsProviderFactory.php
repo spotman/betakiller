@@ -10,8 +10,6 @@ use BetaKiller\Config\ConfigInterface;
 /**
  * Class AssetsProviderFactory
  *
- * @todo Refactoring to NamespaceBasedFactory
- *
  * @package BetaKiller\Assets
  */
 class AssetsProviderFactory
