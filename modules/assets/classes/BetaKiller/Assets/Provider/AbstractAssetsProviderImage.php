@@ -35,7 +35,7 @@ abstract class AbstractAssetsProviderImage extends AbstractAssetsProvider
 
         if (!$url) {
             throw new AssetsProviderException('Model must have url', [
-                ':name' => $model->getStorageFileName()
+                ':name' => $model->getStorageFileName(),
             ]);
         }
 
@@ -148,7 +148,7 @@ abstract class AbstractAssetsProviderImage extends AbstractAssetsProvider
             $content,
             $width,
             $height,
-            $this->get_preview_quality()
+            $this->getPreviewQuality()
         );
     }
 
@@ -189,7 +189,8 @@ abstract class AbstractAssetsProviderImage extends AbstractAssetsProvider
         return $this->resize(
             $content,
             $max_width,
-            $max_height
+            $max_height,
+            100 // 100% quality for original image
         );
     }
 
@@ -228,15 +229,15 @@ abstract class AbstractAssetsProviderImage extends AbstractAssetsProvider
     }
 
     /**
-     * @param     $originalContent
-     * @param     $width
-     * @param     $height
-     * @param int $quality
+     * @param string  $originalContent
+     * @param integer $width
+     * @param integer $height
+     * @param integer $quality
      *
      * @returns string Processed content
      * @throws AssetsProviderException
      */
-    protected function resize($originalContent, $width, $height, $quality = 100)
+    protected function resize($originalContent, $width, $height, $quality)
     {
         $image = Image::from_content($originalContent);
 
@@ -320,19 +321,19 @@ abstract class AbstractAssetsProviderImage extends AbstractAssetsProvider
             $ratio = $modelRatio;
         }
 
-        $sizes  = $this->get_srcset_sizes($ratio);
+        $sizes  = $this->getSrcsetSizes($ratio);
         $srcset = [];
 
         if ($sizes) {
             foreach ($sizes as $size) {
-                $width    = intval($size);
+                $width    = (int)$size;
                 $url      = $this->getPreviewUrl($model, $size);
                 $srcset[] = $this->make_srcset_width_option($url, $width);
             }
         }
 
         // If original image ratio is allowed
-        if ($modelRatio == $ratio) {
+        if ($modelRatio === $ratio) {
             // Add srcset for original image
             $url      = $this->getOriginalUrl($model);
             $srcset[] = $this->make_srcset_width_option($url, $model->getWidth());
@@ -341,7 +342,7 @@ abstract class AbstractAssetsProviderImage extends AbstractAssetsProvider
         return implode(', ', array_filter($srcset));
     }
 
-    protected function get_srcset_sizes($ratio = null)
+    protected function getSrcsetSizes($ratio = null)
     {
         $allowed_sizes = $this->getAllowedPreviewSizes();
 
@@ -357,7 +358,7 @@ abstract class AbstractAssetsProviderImage extends AbstractAssetsProvider
             $size_ratio = $this->get_size_ratio($size, $ratio);
 
             // Skip sizes with another ratio
-            if ($ratio != $size_ratio) {
+            if ($ratio !== $size_ratio) {
                 continue;
             }
 
@@ -411,7 +412,7 @@ abstract class AbstractAssetsProviderImage extends AbstractAssetsProvider
     /**
      * @return int
      */
-    public function get_preview_quality()
+    public function getPreviewQuality()
     {
         // This is optimal for JPEG
         return 80;
