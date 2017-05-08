@@ -11,7 +11,7 @@ class PostIndex extends AdminBase
      */
     public function getData()
     {
-        $articles = $this->model_factory_content_post()->get_all_articles();
+        $articles = $this->model_factory_content_post()->getAllArticles();
 
         $data = [];
 
@@ -20,7 +20,7 @@ class PostIndex extends AdminBase
             $data[] = [
                 'id'          => $article->get_id(),
                 'url'         => $article->get_admin_url(),
-                'label'       => $article->get_label(),
+                'label'       => $article->getLabel(),
             ];
         }
 

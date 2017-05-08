@@ -48,17 +48,17 @@ class Widget_Content_ArticlesList extends BaseWidget
         foreach ($articles as $article) {
             $is_large = ($index % 3 === 1);
 
-            $thumbnail = $article->get_first_thumbnail();
+            $thumbnail = $article->getFirstThumbnail();
             $thumbnail_size = $is_large ? $thumbnail::SIZE_ORIGINAL : $thumbnail::SIZE_PREVIEW;
 
             $posts_data[] = [
                 'is_large'      =>  $is_large,
                 'thumbnail'     =>  $thumbnail->getAttributesForImgTag($thumbnail_size),
                 'url'           =>  $article->get_public_url(),
-                'label'         =>  $article->get_label(),
+                'label'         =>  $article->getLabel(),
                 'title'         =>  $article->getTitle(),
-                'text'          =>  $article->get_content_preview(),
-                'created_at'    =>  $article->get_created_at()->format("d.m.Y"),
+                'text'          =>  $article->getContentPreview(),
+                'created_at'    =>  $article->getCreatedAt()->format("d.m.Y"),
             ];
 
             $index++;
@@ -104,13 +104,13 @@ class Widget_Content_ArticlesList extends BaseWidget
 
         if ($category && $category->get_id()) {
             $categories_ids = $category->get_all_related_categories_ids();
-            $posts_orm->filter_category_ids($categories_ids);
+            $posts_orm->filterCategoryIDs($categories_ids);
         }
 
         if ($term) {
             $posts_orm->search($term);
         }
 
-        return $posts_orm->filter_articles()->order_by_created_at()->getSearchResults($page, $this->items_per_page);
+        return $posts_orm->filterArticles()->orderByCreatedAt()->getSearchResults($page, $this->items_per_page);
     }
 }

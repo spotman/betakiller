@@ -2,6 +2,14 @@
 
 {% block page_content %}
 
+  {% set actions_config = {
+  "complete":         { color: "green", icon: "done" },
+  "publish":          { color: "green", icon: "done_all" },
+  "pause":            { color: "grey", icon: "pause" },
+  "reject":           { color: "orange", icon: "thumb_down" },
+  "fix":              { color: "orange", icon: "settings_backup_restore" },
+  } %}
+
     {#{{ js('tiny_mce/tinymce.min.js') }}#}
     {#{{ js('tiny_mce/jquery.tinymce.min.js') }}#}
 
@@ -9,10 +17,12 @@
     {{ js("ckeditor/adapters/jquery.js") }}
     {#{{ js("ckeditor/config.js") }}#}
 
-    {{ js('jquery/word-and-character-counter/jquery.word-and-character-counter.min.js') }}
+    {{ js("ifaces/admin/content-post-item.js") }}
+    {{ css("ifaces/admin/content-post-item.css") }}
 
   <div class="row">
-      <form action="" class="col s12">
+      <form id="post-form" action="" method="post" class="col s12">
+        <input type="hidden" name="id" value="{{ post.id }}" />
           <div class="row">
               <div class="input-field col s12">
                   <input type="text" name="label" id="article-label" placeholder="Post label" value="{{ post.label }}" />
@@ -38,7 +48,6 @@
               <div class="input-field col s12">
                   <input type="text" name="title" id="article-title" class="form-control" value="{{ post.title }}" data-length="60" />
                   <label for="article-title">HTML &lt;title&gt;</label>
-                {#<span id="article-title-remaining" class="help-block"></span>#}
               </div>
           </div>
 
@@ -46,31 +55,33 @@
               <div class="input-field col s12">
                   <textarea name="description" id="article-description" class="materialize-textarea" rows="3" data-length="160">{{ post.description }}</textarea>
                   <label for="article-description">HTML &lt;description&gt;</label>
-                {#<span id="article-description-remaining" class="help-block"></span>#}
               </div>
           </div>
 
           <div class="row">
               <div class="col s12">
-                  <button class="btn save-post-button" type="submit">Save</button>
+                <div class="right">
+                  {# transitions #}
+                  {% for target_codename, transition in post.status.transitions %}
+                    {% set button_config = actions_config[transition] %}
+                    <button class="btn transition-button {{ button_config.color }}"
+                            data-api-method="{{ transition }}" data-id="{{ post.id }}"
+                            data-target-label="{{ ("post.status." ~ target_codename)|i18n }}">
+                      <i class="material-icons left">{{ button_config.icon }}</i>
+                      {{ ("post.status.transition." ~ transition)|i18n }}
+                    </button>
+                  {% endfor %}
+                </div>
 
-                {{ dump(post.transitions) }}
-
-                {# transitions #}
-                {% if "publish" in post.transitions %}
-                    <button class="btn publish-post-button">Publish</button>
-                {% endif %}
-
-                {% if "pause" in post.transitions %}
-                    <button class="btn pause-post-button">Pause</button>
-                {% endif %}
+                <button class="btn save-post-button" type="submit" data-id="{{ post.id }}">
+                  {{ ("post.action.save")|i18n }}
+                </button>
               </div>
           </div>
       </form>
   </div>
 
     {# TODO thumbnails edit #}
-    {# TODO character counter #}
 
     {# TODO https://www.tinymce.com/docs/configure/content-appearance/ #}
 
@@ -84,9 +95,7 @@
 
           $(function() {
 
-            var $content = $('#article-content'),
-                $title = $('#article-title'),
-                $description = $('#article-description');
+            var $content = $('#article-content');
 
             var customTagsRules = {{ custom_tags_rules|json_encode|raw }};
             var customTagsRulesString = "{{ custom_tags_rules|join("; ") }}";
@@ -116,23 +125,6 @@
             {#custom_elements: "{{ custom_tags_list|join(",") }}",#}
             {#toolbar: "undo redo | paste pastetext | styleselect blockquote | bold italic strikethrough underline | alignleft aligncenter alignright alignjustify | numlist bulllist | indent outdent | link image | table code"#}
             {#});#}
-
-//            var counterConfig = {
-//                count: 'down',
-//                msg: 'символов осталось'
-//            };
-//
-//            $title.counter($.extend({}, counterConfig, {
-//                goal: 60,
-//                target: '#article-title-remaining'
-//            }));
-//
-//            $description.counter($.extend({}, counterConfig, {
-//                goal: 160,
-//                target: '#article-description-remaining'
-//            }));
-
-            $title.add($description).characterCounter();
           });
 
         });

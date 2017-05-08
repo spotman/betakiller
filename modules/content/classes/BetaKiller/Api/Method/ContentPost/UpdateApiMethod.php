@@ -19,11 +19,11 @@ class UpdateApiMethod extends AbstractModelUpdateApiApiMethod
     protected function update($model, $data)
     {
         if (isset($data->label)) {
-            $model->set_label($this->sanitize_string($data->label));
+            $model->setLabel($this->sanitize_string($data->label));
         }
 
         if (isset($data->uri)) {
-            $model->set_uri($this->sanitize_string($data->uri));
+            $model->setUri($this->sanitize_string($data->uri));
         }
 
         if (isset($data->title)) {
@@ -35,7 +35,7 @@ class UpdateApiMethod extends AbstractModelUpdateApiApiMethod
         }
 
         if (isset($data->content)) {
-            $model->set_content($data->content);
+            $model->setContent($data->content);
         }
 
         $model->update();

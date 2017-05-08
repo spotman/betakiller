@@ -46,11 +46,11 @@ class Status_Workflow_ContentPost extends StatusWorkflow
     protected function make_uri()
     {
         // Nothing to do if uri was already set
-        if ($this->model()->get_uri()) {
+        if ($this->model()->getUri()) {
             return;
         }
 
-        $label = $this->model()->get_label();
+        $label = $this->model()->getLabel();
 
         if (!$label) {
             throw new StatusWorkflowException('Post [:id] must have uri or label before publishing', [':id' => $this->model()->get_id()]);
@@ -59,7 +59,7 @@ class Status_Workflow_ContentPost extends StatusWorkflow
         $uri = URL::transliterate($label);
 
         // Saving uri
-        $this->model()->set_uri($uri);
+        $this->model()->setUri($uri);
     }
 
     /**

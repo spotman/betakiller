@@ -12,6 +12,6 @@ class Widget_Content_FreshArticles extends Widget_Content_SidebarArticlesList
      */
     protected function get_articles_list($exclude_id, $limit)
     {
-        return $this->model_factory_content_post()->get_fresh_articles($limit, $exclude_id);
+        return $this->model_factory_content_post()->getFreshArticles($limit, $exclude_id);
     }
 }

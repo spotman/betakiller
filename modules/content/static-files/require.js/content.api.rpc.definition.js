@@ -12,12 +12,28 @@ define([
 
     return {
         post: {
+          complete: function(id) {
+              return rpc(postResource, 'complete', arguments);
+          },
+
           publish: function(id) {
               return rpc(postResource, 'publish', arguments);
           },
 
-          save: function(data) {
-              return rpc(postResource, 'save', arguments);
+          reject: function(id) {
+              return rpc(postResource, 'reject', arguments);
+          },
+
+          fix: function(id) {
+              return rpc(postResource, 'fix', arguments);
+          },
+
+          pause: function(id) {
+              return rpc(postResource, 'pause', arguments);
+          },
+
+          update: function(data) {
+              return rpc(postResource, 'update', arguments);
           }
         },
 

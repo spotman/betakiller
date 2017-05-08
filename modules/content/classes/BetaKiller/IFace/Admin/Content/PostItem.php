@@ -1,8 +1,25 @@
 <?php
 namespace BetaKiller\IFace\Admin\Content;
 
+use BetaKiller\Helper\ContentUrlParametersHelper;
+
 class PostItem extends AdminBase
 {
+    /**
+     * @var \BetaKiller\Helper\ContentUrlParametersHelper
+     */
+    private $urlParametersHelper;
+
+    /**
+     * PostItem constructor.
+     *
+     * @param \BetaKiller\Helper\ContentUrlParametersHelper $urlParametersHelper
+     */
+    public function __construct(ContentUrlParametersHelper $urlParametersHelper)
+    {
+        $this->urlParametersHelper = $urlParametersHelper;
+    }
+
     /**
      * Returns data for View
      * Override this method in child classes
@@ -11,33 +28,38 @@ class PostItem extends AdminBase
      */
     public function getData()
     {
-        $post = $this->url_parameter_content_post();
-
+        $post = $this->urlParametersHelper->getContentPost();
 
 //        $thumbnails = [];
 //
-//        foreach ($article->get_thumbnails() as $thumb)
+//        foreach ($article->getThumbnails() as $thumb)
 //        {
 //            $thumbnails[] = $thumb->getAttributesForImgTag();
 //        }
 
         $rules = [];
 
-        foreach (\CustomTag::instance()->get_allowed_tags() as $tag)
+        foreach (\CustomTag::instance()->getAllowedTags() as $tag)
         {
             $rules[$tag] = $tag.'[id,class,align,alt,title,width,height]';
         }
 
+        $status = $post->get_current_status();
+
         return [
             'post' => [
                 'id'            =>  $post->get_id(),
-                'uri'           =>  $post->get_uri(),
-                'label'         =>  $post->get_label(),
-                'content'       =>  $post->get_content(),
+                'uri'           =>  $post->getUri(),
+                'label'         =>  $post->getLabel(),
+                'content'       =>  $post->getContent(),
                 'title'         =>  $post->getTitle(),
                 'description'   =>  $post->getDescription(),
 
-                'transitions'   =>  $post->get_allowed_target_transitions_codenames(),
+                'status'        =>  [
+                    'id'            =>  $status->get_id(),
+                    'codename'      =>  $status->get_codename(),
+                    'transitions'   =>  $status->get_allowed_target_transitions_codename_array(),
+                ],
 
 //                'thumbnails'    =>  $thumbnails,
             ],

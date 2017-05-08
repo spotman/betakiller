@@ -153,7 +153,7 @@ class Model_ContentComment extends TreeModelSingleParentOrm
 
     public function get_related_content_label()
     {
-        return $this->get_related_item_model()->get_label();
+        return $this->get_related_item_model()->getLabel();
     }
 
     public function get_html_dom_id()

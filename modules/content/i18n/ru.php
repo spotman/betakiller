@@ -13,6 +13,21 @@ return array (
   'message' => 'Сообщение',
   'Enter your comment, please' => 'Пожалуйста, введите Ваш комментарий',
   ':date at :time' => ':date в :time',
+
+  'post.action.edit' => 'Исправить',
+  'post.action.save' => 'Сохранить',
+
+  'post.status.incomplete'  => 'Требует доработки',
+  'post.status.pending'  => 'Ожидает подтверждения',
+  'post.status.published' => 'Опубликован',
+  'post.status.paused'     => 'Снято с публикации',
+
+  'post.status.transition.complete'  => 'Готово к публикации',
+  'post.status.transition.publish' => 'Опубликовать',
+  'post.status.transition.reject'  => 'Отправить на доработку',
+  'post.status.transition.pause'     => 'Снять с публикации',
+  'post.status.transition.fix'  => 'Отправить на доработку',
+
   'comments.form.header'  =>  'Оставить комментарий',
   'comments.count'  =>  [
     'none' => 'Нет комментариев',
@@ -32,6 +47,7 @@ return array (
   'comment.status.trash'    => 'В корзине',
 
   'comment.action.edit' => 'Исправить',
+  'comment.action.save' => 'Сохранить',
 
   'comment.status.transition.approve'   => 'Опубликовать',
   'comment.status.transition.reject'    => 'Отклонить',

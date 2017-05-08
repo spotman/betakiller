@@ -48,13 +48,13 @@ abstract class Widget_Content_SidebarArticlesList extends BaseWidget
     protected function get_article_data(Model_ContentPost $article)
     {
         /** @var \Model_ContentImageElement $thumbnail */
-        $thumbnail = $article->get_first_thumbnail();
+        $thumbnail = $article->getFirstThumbnail();
 
         return [
-            'label'     =>  $article->get_label(),
+            'label'     =>  $article->getLabel(),
             'thumbnail' =>  $thumbnail->getAttributesForImgTag($thumbnail::SIZE_PREVIEW),
             'url'       =>  $article->get_public_url(),
-            'date'      =>  $article->get_created_at()->format('d.m.Y'),
+            'date'      =>  $article->getCreatedAt()->format('d.m.Y'),
         ];
     }
 }

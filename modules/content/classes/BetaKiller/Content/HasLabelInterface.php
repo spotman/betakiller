@@ -6,5 +6,5 @@ interface HasLabelInterface
     /**
      * @return string
      */
-    public function get_label();
+    public function getLabel();
 }

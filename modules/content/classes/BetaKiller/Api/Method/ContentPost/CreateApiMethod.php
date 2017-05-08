@@ -22,7 +22,7 @@ class CreateApiMethod extends AbstractModelCreateApiMethod
         $model->draft();
 
         if (isset($data->label)) {
-            $model->set_label($this->sanitize_string($data->label));
+            $model->setLabel($this->sanitize_string($data->label));
         }
 
         if (isset($data->type)) {

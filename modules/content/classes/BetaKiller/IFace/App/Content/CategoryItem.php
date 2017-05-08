@@ -28,7 +28,7 @@ class CategoryItem extends AppBase
 //        foreach ($category->get_all_related_articles_before() as $article) {
 //            $data[] = [
 //                'url'   =>  $article->get_public_url(),
-//                'label' =>  $article->get_label(),
+//                'label' =>  $article->getLabel(),
 //            ];
 //        }
 //

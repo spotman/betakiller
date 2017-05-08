@@ -375,10 +375,10 @@ class Task_Content_Import_Wordpress extends Minion_Task
             }
 
             $model->set_wp_id($id);
-            $model->set_uri($uri);
-            $model->set_label($name);
+            $model->setUri($uri);
+            $model->setLabel($name);
 
-            $model->set_content($content);
+            $model->setContent($content);
             $model->setTitle($title);
             $model->setDescription($description);
 
@@ -388,7 +388,7 @@ class Task_Content_Import_Wordpress extends Minion_Task
             // Link thumbnail images to post
             $this->process_thumbnails($model, $meta);
 
-            if ($model->get_content()) {
+            if ($model->getContent()) {
                 // Parsing custom tags next
                 $this->process_custom_tags($model);
 
@@ -402,8 +402,8 @@ class Task_Content_Import_Wordpress extends Minion_Task
 
             // Saving original creating and modification dates
             $model
-                ->set_created_at($created_at)
-                ->set_updated_at($updated_at);
+                ->setCreatedAt($created_at)
+                ->setUpdatedAt($updated_at);
 
             // Auto publishing for new posts (we are importing only published posts)
             if ($is_new) {
@@ -430,7 +430,7 @@ class Task_Content_Import_Wordpress extends Minion_Task
     {
         $this->debug('Text post processing...');
 
-        $text = $item->get_content();
+        $text = $item->getContent();
 
         $text = $this->wp()->autop($text, false);
 
@@ -451,9 +451,9 @@ class Task_Content_Import_Wordpress extends Minion_Task
 //            $this->remove_links_on_content_images($document);
 
             $text = $body->innerHtml(LIBXML_PARSEHUGE|LIBXML_NONET);
-            $item->set_content($text);
+            $item->setContent($text);
         } else {
-            $this->warning('Post parsing error for :url', [':url' => $item->get_uri()]);
+            $this->warning('Post parsing error for :url', [':url' => $item->getUri()]);
         }
     }
 
@@ -536,7 +536,7 @@ class Task_Content_Import_Wordpress extends Minion_Task
             if ($post->is_article())
             {
                 $this->warning('Article with uri [:uri] has no thumbnail', [
-                    ':uri' => $post->get_uri(),
+                    ':uri' => $post->getUri(),
                 ]);
             }
 
@@ -604,9 +604,9 @@ class Task_Content_Import_Wordpress extends Minion_Task
         $parser = new RegexParser;
         $processor = new Processor($parser, $handlers);
 
-        $content = $item->get_content();
+        $content = $item->getContent();
         $content = $processor->process($content);
-        $item->set_content($content);
+        $item->setContent($content);
     }
 
     public function thunder_handler_caption(ShortcodeInterface $s, Model_ContentPost $post)
@@ -829,9 +829,9 @@ class Task_Content_Import_Wordpress extends Minion_Task
 
     protected function process_content_youtube_iframes(Model_ContentPost $item)
     {
-        $text = $this->process_youtube_videos_in_text($item->get_content(), $item->get_id());
+        $text = $this->process_youtube_videos_in_text($item->getContent(), $item->get_id());
 
-        $item->set_content($text);
+        $item->setContent($text);
     }
 
     protected function process_youtube_videos_in_text($text, $entity_item_id)

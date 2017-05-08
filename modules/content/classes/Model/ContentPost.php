@@ -224,7 +224,7 @@ class Model_ContentPost extends StatusRelatedModelOrm
      * @return $this
      * @throws Kohana_Exception
      */
-    public function set_uri($value)
+    public function setUri($value)
     {
         return $this->set('uri', $value);
     }
@@ -233,7 +233,7 @@ class Model_ContentPost extends StatusRelatedModelOrm
      * @return string
      * @throws Kohana_Exception
      */
-    public function get_uri()
+    public function getUri()
     {
         return $this->get('uri');
     }
@@ -243,7 +243,7 @@ class Model_ContentPost extends StatusRelatedModelOrm
      * @return \Model_ContentPost
      * @throws Kohana_Exception
      */
-    public function set_label($value)
+    public function setLabel($value)
     {
         return $this->set('label', $value);
     }
@@ -252,7 +252,7 @@ class Model_ContentPost extends StatusRelatedModelOrm
      * @return string
      * @throws Kohana_Exception
      */
-    public function get_label()
+    public function getLabel()
     {
         return $this->get('label');
     }
@@ -262,7 +262,7 @@ class Model_ContentPost extends StatusRelatedModelOrm
      * @return $this
      * @throws Kohana_Exception
      */
-    public function set_content($value)
+    public function setContent($value)
     {
         return $this->set('content', $value);
     }
@@ -271,14 +271,14 @@ class Model_ContentPost extends StatusRelatedModelOrm
      * @return string
      * @throws Kohana_Exception
      */
-    public function get_content()
+    public function getContent()
     {
         return $this->get('content');
     }
 
-    public function get_content_preview($length = 250, $end_chars = '...')
+    public function getContentPreview($length = 250, $end_chars = '...')
     {
-        $text = $this->get_content();
+        $text = $this->getContent();
         $text = strip_tags($text);
         $text = Shortcode::getInstance()->stripTags($text);
 
@@ -290,7 +290,7 @@ class Model_ContentPost extends StatusRelatedModelOrm
      * @return $this
      * @throws Kohana_Exception
      */
-    public function set_created_at(DateTime $value)
+    public function setCreatedAt(DateTime $value)
     {
         return $this->set_datetime_column_value('created_at', $value);
     }
@@ -299,7 +299,7 @@ class Model_ContentPost extends StatusRelatedModelOrm
      * @return DateTime|null
      * @throws Kohana_Exception
      */
-    public function get_created_at()
+    public function getCreatedAt()
     {
         return $this->get_datetime_column_value('created_at');
     }
@@ -309,7 +309,7 @@ class Model_ContentPost extends StatusRelatedModelOrm
      * @return $this
      * @throws Kohana_Exception
      */
-    public function set_updated_at(DateTime $value)
+    public function setUpdatedAt(DateTime $value)
     {
         return $this->set_datetime_column_value('updated_at', $value);
     }
@@ -318,7 +318,7 @@ class Model_ContentPost extends StatusRelatedModelOrm
      * @return DateTime|null
      * @throws Kohana_Exception
      */
-    public function get_updated_at()
+    public function getUpdatedAt()
     {
         return $this->get_datetime_column_value('updated_at');
     }
@@ -328,24 +328,24 @@ class Model_ContentPost extends StatusRelatedModelOrm
      */
     public function getApiLastModified()
     {
-        return $this->get_updated_at() ?: $this->get_created_at();
+        return $this->getUpdatedAt() ?: $this->getCreatedAt();
     }
 
     /**
      * @return $this
      */
-    public function increment_views_count()
+    public function incrementViewsCount()
     {
-        $current = $this->get_views_count();
+        $current = $this->getViewsCount();
 
-        return $this->set_views_count(++$current);
+        return $this->setViewsCount(++$current);
     }
 
     /**
      * @return int
      * @throws Kohana_Exception
      */
-    public function get_views_count()
+    public function getViewsCount()
     {
         return (int) $this->get('views_count');
     }
@@ -355,24 +355,24 @@ class Model_ContentPost extends StatusRelatedModelOrm
      * @return $this
      * @throws Kohana_Exception
      */
-    protected function set_views_count($value)
+    protected function setViewsCount($value)
     {
         return $this->set('views_count', (int) $value);
     }
 
-    public function order_by_views_count($asc = false)
+    public function orderByViewsCount($asc = false)
     {
         return $this->order_by('views_count', $asc ? 'ASC' : 'DESC');
     }
 
-    public function get_popular_articles($limit = 5, $exclude_id = NULL)
+    public function getPopularArticles($limit = 5, $exclude_id = NULL)
     {
-        return $this->get_popular_content(self::TYPE_ARTICLE, $limit, $exclude_id);
+        return $this->getPopularContent(self::TYPE_ARTICLE, $limit, $exclude_id);
     }
 
-    public function get_fresh_articles($limit = 5, $exclude_id = NULL)
+    public function getFreshArticles($limit = 5, $exclude_id = NULL)
     {
-        return $this->get_fresh_content(self::TYPE_ARTICLE, $limit, $exclude_id);
+        return $this->getFreshContent(self::TYPE_ARTICLE, $limit, $exclude_id);
     }
 
     /**
@@ -380,21 +380,21 @@ class Model_ContentPost extends StatusRelatedModelOrm
      *
      * @return Model_ContentPost[]|\Database_Result
      */
-    public function get_all_articles($limit = null)
+    public function getAllArticles($limit = null)
     {
         if ($limit) {
             $this->limit($limit);
         }
 
-        return $this->filter_articles()->get_all();
+        return $this->filterArticles()->get_all();
     }
 
     /**
      * @return $this[]|\Database_Result
      */
-    public function get_all_pages()
+    public function getAllPages()
     {
-        return $this->filter_pages()->get_all();
+        return $this->filterPages()->get_all();
     }
 
     /**
@@ -404,8 +404,9 @@ class Model_ContentPost extends StatusRelatedModelOrm
      *
      * @return $this[]
      */
-    protected function get_popular_content($filter_type, $limit = 5, $exclude_id = NULL)
+    protected function getPopularContent($filter_type, $limit = 5, $exclude_id = NULL)
     {
+        /** @var \Model_ContentPost $model */
         $model = $this->model_factory();
 
         if ($exclude_id)
@@ -413,9 +414,9 @@ class Model_ContentPost extends StatusRelatedModelOrm
             $model->filter_ids((array) $exclude_id, TRUE);
         }
 
-        $model->filter_types((array) $filter_type);
+        $model->filterTypes((array) $filter_type);
 
-        return $model->order_by_views_count()->limit($limit)->get_all();
+        return $model->orderByViewsCount()->limit($limit)->get_all();
     }
 
     /**
@@ -425,8 +426,9 @@ class Model_ContentPost extends StatusRelatedModelOrm
      *
      * @return $this[]
      */
-    protected function get_fresh_content($filter_type, $limit = 5, $exclude_id = NULL)
+    protected function getFreshContent($filter_type, $limit = 5, $exclude_id = NULL)
     {
+        /** @var \Model_ContentPost $model */
         $model = $this->model_factory();
 
         if ($exclude_id)
@@ -434,41 +436,41 @@ class Model_ContentPost extends StatusRelatedModelOrm
             $model->filter_ids((array) $exclude_id, TRUE);
         }
 
-        $model->filter_types((array) $filter_type);
+        $model->filterTypes((array) $filter_type);
 
-        return $model->order_by_created_at()->limit($limit)->get_all();
+        return $model->orderByCreatedAt()->limit($limit)->get_all();
     }
 
     /**
      * @return \ORM
      */
-    protected function get_thumbnails_relation()
+    protected function getThumbnailsRelation()
     {
         return $this->get('thumbnails');
     }
 
     /**
-     * @return Model_ContentPostThumbnail[]|Database_Result
+     * @return Model_ContentPostThumbnail[]
      */
-    public function get_thumbnails()
+    public function getThumbnails()
     {
-        return $this->get_thumbnails_query()->get_all();
+        return $this->getThumbnailsQuery()->get_all();
     }
 
     /**
      * @return Model_ContentPostThumbnail
      */
-    public function get_first_thumbnail()
+    public function getFirstThumbnail()
     {
-        return $this->get_thumbnails_query()->limit(1)->find();
+        return $this->getThumbnailsQuery()->limit(1)->find();
     }
 
     /**
      * @return Model_ContentPostThumbnail|\ORM|Database_Query_Builder_Select
      */
-    protected function get_thumbnails_query()
+    protected function getThumbnailsQuery()
     {
-        return $this->get_thumbnails_relation()->order_by('place', 'ASC');
+        return $this->getThumbnailsRelation()->order_by('place', 'ASC');
     }
 
     /**
@@ -490,12 +492,12 @@ class Model_ContentPost extends StatusRelatedModelOrm
         }
     }
 
-    public function is_default()
+    public function isDefault()
     {
-        return ($this->get_uri() === $this->getDefaultUrlValue());
+        return ($this->getUri() === $this->getDefaultUrlValue());
     }
 
-    public function filter_default()
+    public function filterDefault()
     {
         return $this->where('uri', '!=', $this->getDefaultUrlValue());
     }
@@ -504,7 +506,7 @@ class Model_ContentPost extends StatusRelatedModelOrm
      * @param array $ids
      * @return $this
      */
-    public function filter_category_ids(array $ids)
+    public function filterCategoryIDs(array $ids)
     {
         return $this->where($this->object_column('category_id'), 'IN', $ids);
     }
@@ -514,7 +516,7 @@ class Model_ContentPost extends StatusRelatedModelOrm
      *
      * @return $this
      */
-    public function filter_category(Model_ContentCategory $category = NULL)
+    public function filterCategory(Model_ContentCategory $category = NULL)
     {
         $column = $this->object_column('category_id');
 
@@ -526,7 +528,7 @@ class Model_ContentPost extends StatusRelatedModelOrm
     /**
      * @return $this
      */
-    public function filter_with_category()
+    public function filterWithCategory()
     {
         return $this->where($this->object_column('category_id'), 'IS NOT', NULL);
     }
@@ -536,7 +538,7 @@ class Model_ContentPost extends StatusRelatedModelOrm
      *
      * @return $this
      */
-    public function filter_uri($value)
+    public function filterUri($value)
     {
         return $this->where($this->object_column('uri'), '=', $value);
     }
@@ -550,7 +552,7 @@ class Model_ContentPost extends StatusRelatedModelOrm
     public function create(Validation $validation = NULL)
     {
         $this
-            ->set_created_at(new DateTime)
+            ->setCreatedAt(new DateTime)
             ->set_start_status();
 
         return parent::create($validation);
@@ -569,55 +571,55 @@ class Model_ContentPost extends StatusRelatedModelOrm
         $was_changed = array_intersect($this->_changed, self::$_updated_at_markers);
 
         if ($was_changed && !$this->changed('updated_at')) {
-            $this->set_updated_at(new DateTime);
+            $this->setUpdatedAt(new DateTime);
         }
 
         return parent::update($validation);
     }
 
-    public function prioritize_by_post_types()
+    public function prioritizeByPostTypes()
     {
-        return $this->order_by_post_types($this->_prioritized_types_list);
+        return $this->orderByPostTypes($this->_prioritized_types_list);
     }
 
-    public function order_by_post_types(array $values)
+    public function orderByPostTypes(array $values)
     {
         return $this->order_by_field_sequence('type', $values);
     }
 
-    public function order_by_created_at($asc = false)
+    public function orderByCreatedAt($asc = false)
     {
         return $this->order_by('created_at', $asc ? 'ASC' : 'DESC');
     }
 
-    public function filter_type($value)
+    public function filterType($value)
     {
         return $this->where('type', '=', $value);
     }
 
-    public function filter_types(array $values)
+    public function filterTypes(array $values)
     {
         return $this->where('type', 'IN', $values);
     }
 
-    public function filter_articles()
+    public function filterArticles()
     {
-        return $this->filter_type(self::TYPE_ARTICLE);
+        return $this->filterType(self::TYPE_ARTICLE);
     }
 
-    public function filter_pages()
+    public function filterPages()
     {
-        return $this->filter_type(self::TYPE_PAGE);
+        return $this->filterType(self::TYPE_PAGE);
     }
 
-    public function filter_created_by(DateTime $date, $op = '<')
+    public function filterCreatedBy(DateTime $date, $op = '<')
     {
         return $this->filter_datetime_column_value('created_at', $date, $op);
     }
 
-    public function filter_posts_before(DateTime $date)
+    public function filterPostsBefore(DateTime $date)
     {
-        return $this->filter_created_by($date, '<')->order_by_created_at();
+        return $this->filterCreatedBy($date, '<')->orderByCreatedAt();
     }
 
     public function search($term)
@@ -634,32 +636,32 @@ class Model_ContentPost extends StatusRelatedModelOrm
     protected function custom_find_by_url_filter(UrlParametersInterface $parameters)
     {
         // Load pages first
-        $this->prioritize_by_post_types();
+        $this->prioritizeByPostTypes();
 
         $category = $parameters->get(Model_ContentCategory::URL_PARAM);
 
-        $this->filter_user_allowed_statuses();
+        $this->filterUserAllowedStatuses();
 
         $this->and_where_open();
 
         // Plain pages
         $this->or_where_open()
-            ->filter_type(self::TYPE_PAGE)
-            ->filter_category(NULL) // Pages have no category
+            ->filterType(self::TYPE_PAGE)
+            ->filterCategory(NULL) // Pages have no category
             ->or_where_close();
 
         // Articles
-        $this->or_where_open()->filter_type(self::TYPE_ARTICLE);
+        $this->or_where_open()->filterType(self::TYPE_ARTICLE);
 
         if ($category)
         {
             // Concrete category
-            $this->filter_category($category);
+            $this->filterCategory($category);
         }
         else
         {
             // Any category (articles must have category)
-            $this->filter_with_category();
+            $this->filterWithCategory();
         }
 
         $this->or_where_close();
@@ -667,12 +669,12 @@ class Model_ContentPost extends StatusRelatedModelOrm
         $this->and_where_close();
     }
 
-    public function filter_published()
+    private function filterPublished()
     {
         return $this->filter_status_id(Model_ContentPostStatus::PUBLISHED_ID);
     }
 
-    public function filter_user_allowed_statuses()
+    public function filterUserAllowedStatuses()
     {
         $user = $this->current_user(TRUE);
 
@@ -683,7 +685,7 @@ class Model_ContentPost extends StatusRelatedModelOrm
         }
 
         // Only published posts must be displayed
-        return $this->filter_published();
+        return $this->filterPublished();
     }
 
     public function get_public_url()
@@ -693,8 +695,8 @@ class Model_ContentPost extends StatusRelatedModelOrm
 
         $params = $this->url_parameters_instance()->set(self::URL_PARAM, $this);
 
-        if ($this->is_default()) {
-            $this->set_uri('/'); // Nullify uri so URL must not have default "index" string
+        if ($this->isDefault()) {
+            $this->setUri('/'); // Nullify uri so URL must not have default "index" string
         }
 
         $this->presetLinkedModels($params);

@@ -4,18 +4,23 @@ namespace BetaKiller\IFace\Admin;
 use BetaKiller\Acl\Resource\AdminResource;
 use BetaKiller\IFace\IFace;
 use BetaKiller\Helper\CurrentUserTrait;
-use Spotman\Acl\Resolver\AccessResolverInterface;
+use Spotman\Acl\AccessResolver\AclAccessResolverInterface;
 
 abstract class AdminBase extends IFace
 {
     use CurrentUserTrait;
 
+    /**
+     * @Inject
+     * @var AdminResource
+     */
     protected $adminAclResource;
 
-    public function __construct(AdminResource $adminResource, AccessResolverInterface $resolver)
-    {
-        $this->adminAclResource = $adminResource->useResolver($resolver);
-    }
+    /**
+     * @Inject
+     * @var AclAccessResolverInterface
+     */
+    private $resolver;
 
     public function before()
     {
@@ -24,12 +29,16 @@ abstract class AdminBase extends IFace
         }
     }
 
+    /**
+     * @todo deal with AclResourceResolver
+     * @return bool
+     */
     protected function checkIfacePermissions()
     {
         // Force authorization
         $user = $this->current_user();
 
-        return $this->adminAclResource->isEnabled() || $user->is_admin_allowed();
+        return $this->adminAclResource->useResolver($this->resolver)->isEnabled() || $user->is_admin_allowed();
     }
 
     public function getDefaultExpiresInterval()

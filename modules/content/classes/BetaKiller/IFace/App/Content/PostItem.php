@@ -20,7 +20,7 @@ class PostItem extends AppBase
 
         // Count guest views only
         if (!$user) {
-            $this->get_content_model()->increment_views_count()->save();
+            $this->get_content_model()->incrementViewsCount()->save();
         }
     }
 
@@ -34,7 +34,7 @@ class PostItem extends AppBase
     {
         $model = $this->get_content_model();
 
-//        if ($model->is_default())
+//        if ($model->isDefault())
 //        {
 //            $parent = $this->getParent();
 //            $url = $parent ? $parent->url() : '/';
@@ -53,20 +53,20 @@ class PostItem extends AppBase
 
         $thumbnails = [];
 
-        foreach ($model->get_thumbnails() as $thumb) {
+        foreach ($model->getThumbnails() as $thumb) {
             $thumbnails[] = $thumb->getAttributesForImgTag($thumb::SIZE_ORIGINAL);
             // TODO get image last_modified and set it to iface
         }
 
         return [
             'id'            =>  $model->get_id(),
-            'label'         =>  $model->get_label(),
-            'content'       =>  $model->get_content(),
-            'created_at'    =>  $model->get_created_at(),
-            'updated_at'    =>  $model->get_updated_at(),
+            'label'         =>  $model->getLabel(),
+            'content'       =>  $model->getContent(),
+            'created_at'    =>  $model->getCreatedAt(),
+            'updated_at'    =>  $model->getUpdatedAt(),
             'thumbnails'    =>  $thumbnails,
             'is_page'       =>  $model->is_page(),
-            'is_default'    =>  $model->is_default(),
+            'is_default'    =>  $model->isDefault(),
         ];
     }
 

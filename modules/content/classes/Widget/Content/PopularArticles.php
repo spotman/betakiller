@@ -12,6 +12,6 @@ class Widget_Content_PopularArticles extends Widget_Content_SidebarArticlesList
      */
     protected function get_articles_list($exclude_id, $limit)
     {
-        return $this->model_factory_content_post()->get_popular_articles($limit, $exclude_id);
+        return $this->model_factory_content_post()->getPopularArticles($limit, $exclude_id);
     }
 }

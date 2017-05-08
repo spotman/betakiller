@@ -22,7 +22,7 @@ class CustomTag
     const PHOTO_ZOOMABLE = 'zoomable';
     const PHOTO_ZOOMABLE_ENABLED = 'true';
 
-    public function get_allowed_tags()
+    public function getAllowedTags()
     {
         return [
             self::CAPTION,
@@ -35,7 +35,7 @@ class CustomTag
 
     public function get_self_closing_tags()
     {
-        return $this->get_allowed_tags();
+        return $this->getAllowedTags();
     }
 
     public function is_self_closing_tag($name)
@@ -78,7 +78,7 @@ class CustomTag
     {
         if ($filter_tags === TRUE)
         {
-            $filter_tags = $this->get_allowed_tags();
+            $filter_tags = $this->getAllowedTags();
         }
 
         if (!is_array($filter_tags)) {
