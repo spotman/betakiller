@@ -34,4 +34,3 @@ $large-only: "only screen and (min-width : #{$medium-screen-up}) and (max-width 
 $extra-large-and-up: "only screen and (min-width : #{$large-screen-up})" !default;
 
 @import "_prefixer";
-@import "_grid";
