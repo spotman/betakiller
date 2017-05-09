@@ -2,6 +2,8 @@
 
 use BetaKiller\Status\StatusWorkflow;
 use BetaKiller\Status\StatusWorkflowException;
+use BetaKiller\Status\StatusRelatedModelInterface;
+use BetaKiller\Notification\NotificationMessageFactory;
 
 class Status_Workflow_ContentPost extends StatusWorkflow
 {
@@ -10,6 +12,23 @@ class Status_Workflow_ContentPost extends StatusWorkflow
     const TRANSITION_PUBLISH    = 'publish';
     const TRANSITION_PAUSE      = 'pause';
     const TRANSITION_FIX        = 'fix';
+
+    /**
+     * @var \BetaKiller\Notification\NotificationMessageFactory
+     */
+    private $messageFactory;
+
+    /**
+     * Status_Workflow_ContentPost constructor.
+     *
+     * @param \BetaKiller\Status\StatusRelatedModelInterface      $model
+     * @param \BetaKiller\Notification\NotificationMessageFactory $messageFactory
+     */
+    public function __construct(StatusRelatedModelInterface $model, NotificationMessageFactory $messageFactory)
+    {
+        parent::__construct($model);
+        $this->messageFactory = $messageFactory;
+    }
 
     public function draft()
     {
@@ -25,13 +44,38 @@ class Status_Workflow_ContentPost extends StatusWorkflow
 
     public function complete()
     {
-        // TODO Notify moderator
         $this->doTransition(self::TRANSITION_COMPLETE);
+
+        // Publish post if it is allowed
+        if ($this->isTransitionAllowed(self::TRANSITION_PUBLISH)) {
+            $this->publish();
+        } else {
+            $this->notifyModeratorAboutCompletePost();
+        }
+    }
+
+    private function notifyModeratorAboutCompletePost()
+    {
+        /** @var \BetaKiller\Notification\NotificationMessageCommon $message */
+        $message = $this->messageFactory->create('moderator/post/complete');
+
+        $model = $this->model();
+
+        $data = [
+            'url'   =>  $model->get_admin_url(),
+            'label' =>  $model->getLabel(),
+        ];
+
+        $message
+            ->set_template_data($data)
+            ->to_moderators();
+
+        $message->send();
     }
 
     public function publish()
     {
-        $this->make_uri();
+        $this->makeUri();
 
         // TODO Check for title/description/image and other critical elements before publishing
 
@@ -43,7 +87,19 @@ class Status_Workflow_ContentPost extends StatusWorkflow
         $this->doTransition(self::TRANSITION_PAUSE);
     }
 
-    protected function make_uri()
+    public function fix()
+    {
+        $this->doTransition(self::TRANSITION_FIX);
+
+        $this->notifyEditorAboutFixRequest();
+    }
+
+    private function notifyEditorAboutFixRequest()
+    {
+        // TODO Request content manager for editing
+    }
+
+    protected function makeUri()
     {
         // Nothing to do if uri was already set
         if ($this->model()->getUri()) {
@@ -53,7 +109,9 @@ class Status_Workflow_ContentPost extends StatusWorkflow
         $label = $this->model()->getLabel();
 
         if (!$label) {
-            throw new StatusWorkflowException('Post [:id] must have uri or label before publishing', [':id' => $this->model()->get_id()]);
+            throw new StatusWorkflowException('Post [:id] must have uri or label before publishing', [
+                ':id' => $this->model()->get_id(),
+            ]);
         }
 
         $uri = URL::transliterate($label);

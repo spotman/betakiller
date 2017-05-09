@@ -363,11 +363,11 @@ class Task_Content_Import_Wordpress extends Minion_Task
             // Detect type
             switch ($type) {
                 case $wp::POST_TYPE_PAGE:
-                    $model->mark_as_page();
+                    $model->markAsPage();
                     break;
 
                 case $wp::POST_TYPE_POST:
-                    $model->mark_as_article();
+                    $model->markAsArticle();
                     break;
 
                 default:

@@ -19,7 +19,7 @@ trait ContentPostMethodTrait
         return $this->model_factory_content_post($id);
     }
 
-    protected function sanitize_string($value)
+    protected function sanitizeString($value)
     {
         return \HTML::chars(trim(strip_tags($value)));
     }

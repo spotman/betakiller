@@ -65,7 +65,7 @@ class PostItem extends AppBase
             'created_at'    =>  $model->getCreatedAt(),
             'updated_at'    =>  $model->getUpdatedAt(),
             'thumbnails'    =>  $thumbnails,
-            'is_page'       =>  $model->is_page(),
+            'isPage'       =>  $model->isPage(),
             'is_default'    =>  $model->isDefault(),
         ];
     }

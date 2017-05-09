@@ -21,7 +21,7 @@ class Model_ContentPost extends StatusRelatedModelOrm
     const TYPE_ARTICLE = 1;
     const TYPE_PAGE = 2;
 
-    protected $_prioritized_types_list = [
+    protected $prioritizedTypesList = [
         self::TYPE_PAGE,
         self::TYPE_ARTICLE,
     ];
@@ -129,9 +129,21 @@ class Model_ContentPost extends StatusRelatedModelOrm
         return 'status_id';
     }
 
+    /**
+     * @return \Model_ContentPost
+     */
     public function draft()
     {
         $this->workflow()->draft();
+        return $this;
+    }
+
+    /**
+     * @return \Model_ContentPost
+     */
+    public function complete()
+    {
+        $this->workflow()->complete();
         return $this;
     }
 
@@ -150,6 +162,12 @@ class Model_ContentPost extends StatusRelatedModelOrm
         return $this;
     }
 
+    public function fix()
+    {
+        $this->workflow()->fix();
+        return $this;
+    }
+
     /**
      * Returns custom key which may be used for storing model in UrlParameters registry.
      * Default policy applies if NULL returned.
@@ -165,38 +183,38 @@ class Model_ContentPost extends StatusRelatedModelOrm
     /**
      * @return string
      */
-    public function get_type()
+    public function getType()
     {
         return $this->get('type');
     }
 
-    protected function set_type($value)
+    protected function setType($value)
     {
-        if (!in_array($value, $this->_prioritized_types_list, true)) {
+        if (!in_array($value, $this->prioritizedTypesList, true)) {
             throw new Kohana_Exception('Post type :value is not allowed', [':value' => $value]);
         }
 
         return $this->set('type', $value);
     }
 
-    public function mark_as_page()
+    public function markAsPage()
     {
-        return $this->set_type(self::TYPE_PAGE);
+        return $this->setType(self::TYPE_PAGE);
     }
 
-    public function mark_as_article()
+    public function markAsArticle()
     {
-        return $this->set_type(self::TYPE_ARTICLE);
+        return $this->setType(self::TYPE_ARTICLE);
     }
 
-    public function is_page()
+    public function isPage()
     {
-        return ($this->get_type() === self::TYPE_PAGE);
+        return ($this->getType() === self::TYPE_PAGE);
     }
 
     public function is_article()
     {
-        return ($this->get_type() === self::TYPE_ARTICLE);
+        return ($this->getType() === self::TYPE_ARTICLE);
     }
 
     /**
@@ -205,7 +223,7 @@ class Model_ContentPost extends StatusRelatedModelOrm
      * @return $this
      * @throws Kohana_Exception
      */
-    public function set_category(Model_ContentCategory $value)
+    public function setCategory(Model_ContentCategory $value)
     {
         return $this->set('category', $value);
     }
@@ -214,7 +232,7 @@ class Model_ContentPost extends StatusRelatedModelOrm
      * @return Model_ContentCategory
      * @throws Kohana_Exception
      */
-    public function get_category()
+    public function getCategory()
     {
         return $this->get('category');
     }
@@ -484,7 +502,7 @@ class Model_ContentPost extends StatusRelatedModelOrm
      */
     public function presetLinkedModels(UrlParametersInterface $parameters)
     {
-        $category = $this->get_category();
+        $category = $this->getCategory();
 
         if ($category->get_id() && !$parameters->get($category::URL_PARAM))
         {
@@ -579,7 +597,7 @@ class Model_ContentPost extends StatusRelatedModelOrm
 
     public function prioritizeByPostTypes()
     {
-        return $this->orderByPostTypes($this->_prioritized_types_list);
+        return $this->orderByPostTypes($this->prioritizedTypesList);
     }
 
     public function orderByPostTypes(array $values)

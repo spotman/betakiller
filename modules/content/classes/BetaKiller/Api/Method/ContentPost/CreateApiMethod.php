@@ -22,19 +22,19 @@ class CreateApiMethod extends AbstractModelCreateApiMethod
         $model->draft();
 
         if (isset($data->label)) {
-            $model->setLabel($this->sanitize_string($data->label));
+            $model->setLabel($this->sanitizeString($data->label));
         }
 
         if (isset($data->type)) {
-            $type = $this->sanitize_string($data->type);
+            $type = $this->sanitizeString($data->type);
 
             switch ($type) {
                 case 'article':
-                    $model->mark_as_article();
+                    $model->markAsArticle();
                     break;
 
                 case 'page':
-                    $model->mark_as_page();
+                    $model->markAsPage();
                     break;
 
                 default:

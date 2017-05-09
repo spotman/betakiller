@@ -23,8 +23,6 @@ require([
         })
         .fail(function(message) {
           alert(message || 'Oops! Something went wrong...');
-        })
-        .always(function() {
           $transitionButtons.removeAttr('disabled');
         });
     });
@@ -38,11 +36,6 @@ require([
       $form.serializeArray().map(function(item){
         formData[item.name] = item.value;
       });
-
-      console.log(formData);
-      return;
-
-      // TODO check form data
 
       api.post.update(formData)
         .done(function() {

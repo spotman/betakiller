@@ -1,0 +1,5 @@
+{% extends "@notifications/default/email" %}
+
+{% block body %}
+    {{ (baseI18nKey ~ ".text")|i18n(colonPrefixedData)|raw }}
+{% endblock %}
