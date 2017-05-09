@@ -45,6 +45,7 @@ abstract class NotificationMessageAbstract implements NotificationMessageInterfa
 
     /**
      * @return static
+     * @deprecated Use NotificationMessageFactory instead
      */
     public static function instance()
     {

@@ -33,6 +33,13 @@ interface NotificationMessageInterface
     public function set_to(NotificationUserInterface $value);
 
     /**
+     * @param NotificationUserInterface[]|\Iterator $users
+     *
+     * @return $this
+     */
+    public function to_users($users);
+
+    /**
      * @param \BetaKiller\Notification\NotificationUserInterface $targetUser
      *
      * @return string
