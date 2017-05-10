@@ -1,14 +1,33 @@
 <?php
 namespace BetaKiller\IFace\App\Content;
 
+use BetaKiller\Helper\CurrentUserTrait;
+use BetaKiller\Helper\ContentUrlParametersHelper;
+
 class PostItem extends AppBase
 {
-    use \BetaKiller\Helper\CurrentUserTrait;
+    use CurrentUserTrait;
+
+    /**
+     * @var \BetaKiller\Helper\ContentUrlParametersHelper
+     */
+    protected $urlParametersHelper;
 
     /**
      * @var \Model_ContentPost
      */
-    private $content_model;
+    private $contentModel;
+
+    /**
+     * PostItem constructor.
+     *
+     * @param \BetaKiller\Helper\ContentUrlParametersHelper $urlParametersHelper
+     */
+    public function __construct(ContentUrlParametersHelper $urlParametersHelper)
+    {
+        parent::__construct();
+        $this->urlParametersHelper = $urlParametersHelper;
+    }
 
     /**
      * This hook executed before IFace processing (on every request regardless of caching)
@@ -20,7 +39,7 @@ class PostItem extends AppBase
 
         // Count guest views only
         if (!$user) {
-            $this->get_content_model()->incrementViewsCount()->save();
+            $this->getContentModel()->incrementViewsCount()->save();
         }
     }
 
@@ -32,7 +51,7 @@ class PostItem extends AppBase
      */
     public function getData()
     {
-        $model = $this->get_content_model();
+        $model = $this->getContentModel();
 
 //        if ($model->isDefault())
 //        {
@@ -43,11 +62,11 @@ class PostItem extends AppBase
 //        }
 
         return [
-            'post' =>  $this->get_post_data($model),
+            'post' =>  $this->getPostData($model),
         ];
     }
 
-    protected function get_post_data(\Model_ContentPost $model)
+    protected function getPostData(\Model_ContentPost $model)
     {
         $this->setLastModified($model->getApiLastModified());
 
@@ -55,7 +74,11 @@ class PostItem extends AppBase
 
         foreach ($model->getThumbnails() as $thumb) {
             $thumbnails[] = $thumb->getAttributesForImgTag($thumb::SIZE_ORIGINAL);
-            // TODO get image last_modified and set it to iface
+
+            // Get image last modified and set it to iface
+            if ($thumbLastModified = $thumb->getLastModifiedAt()) {
+                $this->setLastModified($thumbLastModified);
+            }
         }
 
         return [
@@ -65,7 +88,7 @@ class PostItem extends AppBase
             'created_at'    =>  $model->getCreatedAt(),
             'updated_at'    =>  $model->getUpdatedAt(),
             'thumbnails'    =>  $thumbnails,
-            'isPage'       =>  $model->isPage(),
+            'is_page'       =>  $model->isPage(),
             'is_default'    =>  $model->isDefault(),
         ];
     }
@@ -82,31 +105,20 @@ class PostItem extends AppBase
      * @return \Model_ContentPost
      * @throws \BetaKiller\IFace\Exception\IFaceException
      */
-    protected function detect_content_model()
+    protected function detectContentModel()
     {
-        $key = $this->get_content_model_url_param_key();
-
-        return $this->url_parameters()->get($key);
-    }
-
-    /**
-     * @return string
-     */
-    protected function get_content_model_url_param_key()
-    {
-        return \Model_ContentPost::URL_PARAM;
+        return $this->urlParametersHelper->getContentPost();
     }
 
     /**
      * @return \Model_ContentPost
      */
-    protected function get_content_model()
+    protected function getContentModel()
     {
-        if (!$this->content_model)
-        {
-            $this->content_model = $this->detect_content_model();
+        if (!$this->contentModel) {
+            $this->contentModel = $this->detectContentModel();
         }
 
-        return $this->content_model;
+        return $this->contentModel;
     }
 }

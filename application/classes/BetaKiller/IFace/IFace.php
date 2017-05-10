@@ -2,12 +2,13 @@
 namespace BetaKiller\IFace;
 
 use BetaKiller\Helper;
+use Spotman\Api\ApiMethodResponse;
 
-abstract class IFace extends \BetaKiller\IFace\KohanaIFace
+abstract class IFace extends KohanaIFace
 {
     use Helper\IFaceTrait;
 
-    final protected function process_api_response(\Spotman\Api\ApiMethodResponse $response)
+    final protected function process_api_response(ApiMethodResponse $response)
     {
         $this->setLastModified($response->getLastModified());
 

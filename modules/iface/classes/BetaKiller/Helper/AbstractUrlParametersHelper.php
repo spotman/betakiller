@@ -21,6 +21,14 @@ class AbstractUrlParametersHelper
         $this->urlParameters = $urlParameters;
     }
 
+    /**
+     * @return \BetaKiller\IFace\Url\UrlParametersInterface
+     */
+    public function getUrlParameters()
+    {
+        return $this->urlParameters;
+    }
+
     protected function get($key, UrlParametersInterface $params = null)
     {
         if (!$params) {

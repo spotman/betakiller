@@ -3,7 +3,6 @@ namespace BetaKiller\IFace;
 
 use BetaKiller\Config\AppConfigInterface;
 use BetaKiller\IFace\Exception\IFaceException;
-use BetaKiller\IFace\Url\UrlParameters;
 use BetaKiller\IFace\Url\UrlParametersInterface;
 use BetaKiller\IFace\View\IFaceView;
 use DateInterval;
@@ -16,34 +15,28 @@ abstract class AbstractIFace implements IFaceInterface
     /**
      * @var IFaceModelInterface
      */
-    protected $faceModel;
+    private $faceModel;
 
     /**
      * @var IFaceInterface Parent iface
      */
-    protected $parent;
+    private $parent;
 
     /**
      * @var DateTime
      */
-    protected $lastModified;
+    private $lastModified;
 
     /**
      * @var DateInterval
      */
-    protected $expiresInterval;
+    private $expiresInterval;
 
     /**
      * @Inject
      * @var AppConfigInterface
      */
     private $appConfig;
-
-    /**
-     * @Inject
-     * @var \BetaKiller\IFace\Url\UrlDispatcher
-     */
-    private $urlDispatcher;
 
     /**
      * @Inject
@@ -111,7 +104,7 @@ abstract class AbstractIFace implements IFaceInterface
     /**
      * Returns processed label
      *
-     * @param UrlParameters|null $params
+     * @param UrlParametersInterface|null $params
      *
      * @return mixed
      */
@@ -185,8 +178,9 @@ abstract class AbstractIFace implements IFaceInterface
         $source = $this->prototypeHelper->replaceUrlParametersParts($source, $params);
 
         // Parse [N[...]] tags
-        $pcre_pattern = '/\[([0-9]{1,2})\[([^\]]+)\]\]/';
+        $pcre_pattern = '/\[([\d]{1,2})\[([^\]]+)\]\]/';
 
+        /** @var array[] $matches */
         preg_match_all($pcre_pattern, $source, $matches, PREG_SET_ORDER);
 
         $tags = [];

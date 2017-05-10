@@ -33,4 +33,12 @@ $large-and-down: "only screen and (max-width : #{$large-screen})" !default;
 $large-only: "only screen and (min-width : #{$medium-screen-up}) and (max-width : #{$large-screen})" !default;
 $extra-large-and-up: "only screen and (min-width : #{$large-screen-up})" !default;
 
+form span.character-counter {
+  float: none !important;
+  display: block;
+  text-align: right;
+  font-size: 12px;
+  height: 12px !important;
+}
+
 @import "_prefixer";
