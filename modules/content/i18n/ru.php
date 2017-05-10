@@ -17,14 +17,14 @@ return [
     'post.action.edit' => 'Исправить',
     'post.action.save' => 'Сохранить',
 
-    'post.status.incomplete' => 'Требует доработки',
-    'post.status.pending'    => 'Ожидает подтверждения',
-    'post.status.published'  => 'Опубликован',
-    'post.status.paused'     => 'Снято с публикации',
+    'post.status.draft'         => 'Черновик',
+    'post.status.pending'       => 'Ожидает подтверждения',
+    'post.status.published'     => 'Опубликовано',
+    'post.status.paused'        => 'Снято с публикации',
+    'post.status.fix_requested' => 'Доработать',
 
     'post.status.transition.complete' => 'Готово к публикации',
     'post.status.transition.publish'  => 'Опубликовать',
-    'post.status.transition.reject'   => 'Отправить на доработку',
     'post.status.transition.pause'    => 'Снять с публикации',
     'post.status.transition.fix'      => 'Отправить на доработку',
 

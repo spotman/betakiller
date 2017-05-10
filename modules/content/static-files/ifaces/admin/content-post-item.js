@@ -9,26 +9,7 @@ require([
     var $transitionButtons = $(".transition-button");
     var $saveButton = $(".save-post-button");
 
-    $transitionButtons.click(function(e) {
-      e.preventDefault();
-      $transitionButtons.attr('disabled', 'disabled');
-
-      var $this = $(this),
-          id = $this.data("id"),
-          method = $this.data("api-method");
-
-      api.post[method](id)
-        .done(function() {
-          location.reload();
-        })
-        .fail(function(message) {
-          alert(message || 'Oops! Something went wrong...');
-          $transitionButtons.removeAttr('disabled');
-        });
-    });
-
-    $form.submit(function(e) {
-      e.preventDefault();
+    function savePost(doneCallback) {
       $saveButton.attr('disabled', 'disabled');
 
       var formData = {};
@@ -39,13 +20,53 @@ require([
 
       api.post.update(formData)
         .done(function() {
+          doneCallback();
         })
         .fail(function(message) {
           alert(message || 'Oops! Something went wrong...');
-        })
-        .always(function() {
           $saveButton.removeAttr('disabled');
         });
+    }
+
+    function processTransition($button) {
+      var id = $button.data("id"),
+          method = $button.data("api-method");
+
+      api.post[method](id)
+        .done(function() {
+          location.reload();
+        })
+        .fail(function(message) {
+          alert(message || 'Oops! Something went wrong...');
+          $transitionButtons.removeAttr('disabled');
+        });
+    }
+
+    $transitionButtons.click(function(e) {
+      e.preventDefault();
+      $transitionButtons.attr('disabled', 'disabled');
+
+      var $button = $(this),
+          autosave = ($button.data("autosave") === true);
+
+      // Autosave only for selected transitions (except fix, pause, etc)
+      if (autosave) {
+        // Save post before processing transition
+        savePost(function() {
+          processTransition($button);
+        });
+      } else {
+        // Immediately process transition
+        processTransition($button);
+      }
+    });
+
+    $form.submit(function(e) {
+      e.preventDefault();
+
+      savePost(function() {
+        $saveButton.removeAttr('disabled');
+      });
     });
 
   });

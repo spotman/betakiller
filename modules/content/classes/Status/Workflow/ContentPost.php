@@ -1,17 +1,16 @@
 <?php
 
+use BetaKiller\Notification\NotificationMessageFactory;
+use BetaKiller\Status\StatusRelatedModelInterface;
 use BetaKiller\Status\StatusWorkflow;
 use BetaKiller\Status\StatusWorkflowException;
-use BetaKiller\Status\StatusRelatedModelInterface;
-use BetaKiller\Notification\NotificationMessageFactory;
 
 class Status_Workflow_ContentPost extends StatusWorkflow
 {
-    const TRANSITION_COMPLETE   = 'complete';
-    const TRANSITION_REJECT     = 'reject';
-    const TRANSITION_PUBLISH    = 'publish';
-    const TRANSITION_PAUSE      = 'pause';
-    const TRANSITION_FIX        = 'fix';
+    const TRANSITION_COMPLETE = 'complete';
+    const TRANSITION_PUBLISH  = 'publish';
+    const TRANSITION_PAUSE    = 'pause';
+    const TRANSITION_FIX      = 'fix';
 
     /**
      * @var \BetaKiller\Notification\NotificationMessageFactory
@@ -34,8 +33,8 @@ class Status_Workflow_ContentPost extends StatusWorkflow
     {
         if ($this->model()->has_current_status()) {
             throw new StatusWorkflowException('Can not mark post [:id] as draft coz it is in [:status] status', [
-                ':id'       =>  $this->model()->get_id(),
-                ':status'   =>  $this->model()->get_current_status()->get_codename()
+                ':id'     => $this->model()->get_id(),
+                ':status' => $this->model()->get_current_status()->get_codename(),
             ]);
         }
 
@@ -62,8 +61,8 @@ class Status_Workflow_ContentPost extends StatusWorkflow
         $model = $this->model();
 
         $data = [
-            'url'   =>  $model->get_admin_url(),
-            'label' =>  $model->getLabel(),
+            'url'   => $model->get_admin_url(),
+            'label' => $model->getLabel(),
         ];
 
         $message
@@ -96,6 +95,7 @@ class Status_Workflow_ContentPost extends StatusWorkflow
 
     private function notifyEditorAboutFixRequest()
     {
+        // TODO Get user which is requested for fix
         // TODO Request content manager for editing
     }
 

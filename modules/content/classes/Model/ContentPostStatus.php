@@ -4,12 +4,18 @@ use BetaKiller\Status\StatusModelOrm;
 
 class Model_ContentPostStatus extends StatusModelOrm
 {
-    const INCOMPLETE_ID = 1;
-    const PENDING_ID = 2;
-    const PUBLISHED_ID = 3;
-    const PAUSED_ID = 4;
+    const DRAFT_ID         = 1;
+    const PENDING_ID       = 2;
+    const PUBLISHED_ID     = 3;
+    const PAUSED_ID        = 4;
+    const FIX_REQUESTED_ID = 5;
 
-    protected $_table_name = 'content_post_statuses';
+    protected function _initialize()
+    {
+        $this->_table_name = 'content_post_statuses';
+
+        parent::_initialize();
+    }
 
     /**
      * @return string

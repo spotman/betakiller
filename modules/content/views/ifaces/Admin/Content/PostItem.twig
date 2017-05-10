@@ -3,11 +3,11 @@
 {% block page_content %}
 
   {% set actions_config = {
-  "complete":         { color: "green", icon: "done" },
-  "publish":          { color: "green", icon: "done_all" },
-  "pause":            { color: "grey", icon: "pause" },
-  "reject":           { color: "orange", icon: "thumb_down" },
-  "fix":              { color: "orange", icon: "settings_backup_restore" },
+  "complete":         { color: "green", icon: "done", autosave: true },
+  "publish":          { color: "green", icon: "done_all", autosave: true },
+  "reject":           { color: "orange", icon: "thumb_down", autosave: false },
+  "pause":            { color: "grey", icon: "pause", autosave: false },
+  "fix":              { color: "orange", icon: "settings_backup_restore", autosave: false },
   } %}
 
     {#{{ js('tiny_mce/tinymce.min.js') }}#}
@@ -32,7 +32,7 @@
 
           <div class="row">
               <div class="input-field col s12">
-                  <input type="text" name="uri" id="article-uri" placeholder="Post label" value="{{ post.uri }}" readonly />
+                  <input type="text" name="uri" id="article-uri" value="{{ post.uri }}" readonly />
                   <label for="article-uri">URI</label>
               </div>
           </div>
@@ -46,15 +46,15 @@
 
           <div class="row">
               <div class="input-field col s12">
-                  <input type="text" name="title" id="article-title" class="form-control" value="{{ post.title }}" data-length="60" />
+                  <input type="text" name="title" id="article-title" class="form-control" value="{{ post.title }}" data-length="60" placeholder="Post title, used in HTML &lsaquo;title&rsaquo; tag" />
                   <label for="article-title">HTML &lt;title&gt;</label>
               </div>
           </div>
 
           <div class="row">
               <div class="input-field col s12">
-                  <textarea name="description" id="article-description" class="materialize-textarea" rows="3" data-length="160">{{ post.description }}</textarea>
-                  <label for="article-description">HTML &lt;description&gt;</label>
+                  <textarea name="description" id="article-description" class="materialize-textarea" rows="3" data-length="160" placeholder="Post title, used in HTML &lt;description&gt; meta tag">{{ post.description }}</textarea>
+                  <label for="article-description">HTML &lt;description&gt; meta tag</label>
               </div>
           </div>
 
@@ -66,7 +66,7 @@
                     {% set button_config = actions_config[transition] %}
                     <button class="btn transition-button {{ button_config.color }}"
                             data-api-method="{{ transition }}" data-id="{{ post.id }}"
-                            data-target-label="{{ ("post.status." ~ target_codename)|i18n }}">
+                            data-autosave="{{ button_config.autosave|bool }}">
                       <i class="material-icons left">{{ button_config.icon }}</i>
                       {{ ("post.status.transition." ~ transition)|i18n }}
                     </button>
