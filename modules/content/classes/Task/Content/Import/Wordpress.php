@@ -86,7 +86,7 @@ class Task_Content_Import_Wordpress extends Minion_Task
 
         if (!$parsing_path)
         {
-            if ($parsing_mode == self::ATTACH_PARSING_MODE_HTTP)
+            if ($parsing_mode === self::ATTACH_PARSING_MODE_HTTP)
             {
                 $parsing_path = $this->read('Input fully qualified project URL');
 
@@ -95,7 +95,7 @@ class Task_Content_Import_Wordpress extends Minion_Task
                 if (!Valid::url($parsing_path))
                     throw new TaskException('Incorrect project URL');
             }
-            elseif ($parsing_mode == self::ATTACH_PARSING_MODE_LOCAL)
+            elseif ($parsing_mode === self::ATTACH_PARSING_MODE_LOCAL)
             {
                 $parsing_path = $this->read('Input absolute project path');
 
@@ -358,7 +358,7 @@ class Task_Content_Import_Wordpress extends Minion_Task
             $model = $content_post_orm->find_by_wp_id($id);
 
             // Detect is this is a new record
-            $is_new = !$model->get_id();
+            $isNew = !$model->get_id();
 
             // Detect type
             switch ($type) {
@@ -376,14 +376,15 @@ class Task_Content_Import_Wordpress extends Minion_Task
 
             $model->set_wp_id($id);
             $model->setUri($uri);
-            $model->setLabel($name);
-
-            $model->setContent($content);
-            $model->setTitle($title);
-            $model->setDescription($description);
+            $model->setCreatedBy($this->current_user());
 
             // Saving model and getting its ID for further processing
             $model->save();
+
+            $model->setLabel($name);
+            $model->setContent($content);
+            $model->setTitle($title);
+            $model->setDescription($description);
 
             // Link thumbnail images to post
             $this->process_thumbnails($model, $meta);
@@ -401,13 +402,12 @@ class Task_Content_Import_Wordpress extends Minion_Task
             }
 
             // Saving original creating and modification dates
-            $model
-                ->setCreatedAt($created_at)
-                ->setUpdatedAt($updated_at);
+            $model->setCreatedAt($created_at);
+            $model->setUpdatedAt($updated_at);
 
             // Auto publishing for new posts (we are importing only published posts)
-            if ($is_new) {
-                $model->publish();
+            if ($isNew) {
+                $model->complete(); // Publishing would be done automatically
             }
 
             // Saving model content

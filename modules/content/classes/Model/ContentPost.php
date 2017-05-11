@@ -1,20 +1,26 @@
 <?php
 
+use BetaKiller\Model\ModelWithRevisionsInterface;
+use BetaKiller\Model\ModelWithRevisionsOrmTrait;
+use BetaKiller\Model\UserInterface;
 use BetaKiller\Content\ImportedFromWordpressInterface;
 use BetaKiller\Content\LinkedContentModelInterface;
 use BetaKiller\Content\Shortcode;
+use BetaKiller\Helper\IFaceTrait;
 use BetaKiller\Helper\SeoMetaInterface;
 use BetaKiller\IFace\Url\UrlParametersInterface;
-use BetaKiller\Status\StatusRelatedModelOrm;
+use BetaKiller\Status\StatusRelatedModelOrmTrait;
 use Spotman\Api\AbstractCrudMethodsModelInterface;
 
-class Model_ContentPost extends StatusRelatedModelOrm
-    implements SeoMetaInterface, ImportedFromWordpressInterface, LinkedContentModelInterface, AbstractCrudMethodsModelInterface
+class Model_ContentPost extends \ORM implements ModelWithRevisionsInterface, SeoMetaInterface, ImportedFromWordpressInterface, LinkedContentModelInterface, AbstractCrudMethodsModelInterface
 {
-    use Model_ORM_SeoContentTrait,
+    use StatusRelatedModelOrmTrait,
+        ModelWithRevisionsOrmTrait,
+        Model_ORM_SeoContentTrait,
         Model_ORM_ImportedFromWordpressTrait,
-        BetaKiller\Helper\IFaceTrait,
-        BetaKiller\Helper\CurrentUserTrait;
+        IFaceTrait {
+        StatusRelatedModelOrmTrait::workflow as private baseWorkflow;
+    }
 
     const URL_PARAM = 'ContentPost';
 
@@ -26,21 +32,9 @@ class Model_ContentPost extends StatusRelatedModelOrm
         self::TYPE_ARTICLE,
     ];
 
-    protected static $_updated_at_markers = [
+    protected static $updatedAtMarkers = [
         'uri',
-        'label',
-        'content',
-        'title',
-        'description',
     ];
-
-    /**
-     * Marker for "updated_at" field change
-     * Using this because of ORM::set() is checking value is really changed, but we may set the equal value
-     *
-     * @var bool
-     */
-    protected $updated_at_was_set = FALSE;
 
     /**
      * Prepares the model database connection, determines the table name,
@@ -72,6 +66,10 @@ class Model_ContentPost extends StatusRelatedModelOrm
             'category',
         ]);
 
+        $this->initializeRevisionsRelations();
+
+        $this->initialize_related_model_relation();
+
         parent::_initialize();
     }
 
@@ -86,12 +84,49 @@ class Model_ContentPost extends StatusRelatedModelOrm
             'type'   =>  [
                 ['not_empty'],
             ],
-            'label'   =>  [
+            'created_by'   =>  [
                 ['not_empty'],
             ],
             'status_id'   =>  [
                 ['not_empty'],
             ],
+        ];
+    }
+
+    /**
+     * @return string
+     */
+    protected function getRevisionModelName()
+    {
+        return 'ContentPostRevision';
+    }
+
+    /**
+     * @return string
+     */
+    protected function getRelatedModelRevisionForeignKey()
+    {
+        return 'revision_id';
+    }
+
+    /**
+     * @return string
+     */
+    protected function getRevisionModelForeignKey()
+    {
+        return 'post_id';
+    }
+
+    /**
+     * @return string[]
+     */
+    protected function getFieldsWithRevisions()
+    {
+        return [
+            'label',
+            'content',
+            'title',
+            'description',
         ];
     }
 
@@ -110,7 +145,7 @@ class Model_ContentPost extends StatusRelatedModelOrm
      */
     protected function workflow()
     {
-        return parent::workflow();
+        return $this->baseWorkflow();
     }
 
     /**
@@ -339,6 +374,24 @@ class Model_ContentPost extends StatusRelatedModelOrm
     public function getUpdatedAt()
     {
         return $this->get_datetime_column_value('updated_at');
+    }
+
+    /**
+     * @param \BetaKiller\Model\UserInterface $user
+     *
+     * @return $this
+     */
+    public function setCreatedBy(UserInterface $user)
+    {
+        return $this->set('created_by', $user);
+    }
+
+    /**
+     * @return UserInterface
+     */
+    public function getCreatedBy()
+    {
+        return $this->get('created_by');
     }
 
     /**
@@ -573,7 +626,11 @@ class Model_ContentPost extends StatusRelatedModelOrm
             ->setCreatedAt(new DateTime)
             ->set_start_status();
 
-        return parent::create($validation);
+        $result = parent::create($validation);
+
+        $this->createRevisionRelatedModel();
+
+        return $result;
     }
 
     /**
@@ -586,11 +643,13 @@ class Model_ContentPost extends StatusRelatedModelOrm
      */
     public function update(Validation $validation = NULL)
     {
-        $was_changed = array_intersect($this->_changed, self::$_updated_at_markers);
+        $changed = array_intersect($this->_changed, self::$updatedAtMarkers) && !$this->changed('updated_at');
 
-        if ($was_changed && !$this->changed('updated_at')) {
+        if ($changed || $this->isRevisionDataChanged()) {
             $this->setUpdatedAt(new DateTime);
         }
+
+        $this->updateRevisionRelatedModel();
 
         return parent::update($validation);
     }

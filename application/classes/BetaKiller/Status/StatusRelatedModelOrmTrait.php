@@ -225,8 +225,9 @@ trait StatusRelatedModelOrmTrait
 
     protected function workflow()
     {
-        if (!$this->_workflow_instance)
+        if (!$this->_workflow_instance) {
             $this->_workflow_instance = $this->workflow_factory();
+        }
 
         return $this->_workflow_instance;
     }
