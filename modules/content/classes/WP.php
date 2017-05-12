@@ -278,6 +278,12 @@ class WP
         return $query->as_array();
     }
 
+    /**
+     * @param int $id
+     *
+     * @return array
+     * @throws \BetaKiller\Exception
+     */
     public function get_wonderplugin_slider_config($id)
     {
         /** @var Database_Result $query */
@@ -290,7 +296,7 @@ class WP
         if (!$query->count())
             throw new BetaKiller\Exception('Can not find wonderplugin config for id = :id', [':id' => $id]);
 
-        return json_decode($query->get('data'), TRUE);
+        return json_decode($query->get('data'), true);
     }
 
     /**
