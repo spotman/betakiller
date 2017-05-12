@@ -28,6 +28,7 @@ class PostIndex extends AdminBase
      */
     public function getData()
     {
+        // TODO deal with pages
         $articles = $this->model_factory_content_post()->getAllArticles();
 
         $data = [];

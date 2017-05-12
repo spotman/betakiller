@@ -4,20 +4,22 @@
 
   <div class="row">
     <div class="col s12">
-      {#<a href="{{ createUrl }}" class="btn right">Create post</a>#}
     </div>
   </div>
 
   <div class="row">
     <div class="col s12">
-      <ul class="collection">
+      <table class="striped">
         {% for revision in revisions %}
-          <li class="collection-item">
+        <tr>
+          <td>
+            {#<a href="#!" class="right">Use</a>#}
             {{ revision.created_at }}
             {{ revision.created_by }}
-          </li>
+          </td>
+        </tr>
         {% endfor %}
-      </ul>
+      </table>
     </div>
   </div>
 

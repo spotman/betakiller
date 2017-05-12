@@ -34,7 +34,6 @@ class PostItemRevisionList extends AdminBase
         $revisions = $post->getAllRevisions();
 
         foreach ($revisions as $revision) {
-            // TODO
             $data[] = [
                 'created_at' => $revision->getCreatedAt()->format('d.m.Y H:i:s'),
                 'created_by' => $revision->getCreatedBy()->get_username(),
