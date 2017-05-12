@@ -2,7 +2,10 @@
 <root>
     <!-- TODO вынести это всё в файл config/ifaces.php, который добавляет элементы в IFaceModelTree::admin() -->
     <iface uri="posts" codename="Admin_Content_PostIndex" parentCodename="Admin_Index" title="Admin | Posts" label="Posts">
-        <iface uri="{ContentPost.id}" codename="Admin_Content_PostItem" title="Admin | Article | {ContentPost.label}" hasDynamicUrl="true" />
+        <iface uri="create" codename="Admin_Content_PostCreate" title="Admin | Post | Create" />
+        <iface uri="{ContentPost.id}" codename="Admin_Content_PostItem" title="Admin | Post | {ContentPost.label}" hasDynamicUrl="true">
+            <iface uri="revisions" codename="Admin_Content_PostItemRevisionList" title="Admin | Post | {ContentPost.label} | Revisions" />
+        </iface>
     </iface>
 
     <iface uri="comments" codename="Admin_Content_CommentIndex" parentCodename="Admin_Index" title="Admin | Comments" label="Comments">

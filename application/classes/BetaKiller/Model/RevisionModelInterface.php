@@ -29,6 +29,18 @@ interface RevisionModelInterface
     public function setCreatedBy(UserInterface $model);
 
     /**
+     * @return UserInterface
+     */
+    public function getCreatedBy();
+
+    public function setCreatedAt(\DateTime $time);
+
+    /**
+     * @return \DateTime
+     */
+    public function getCreatedAt();
+
+    /**
      * @return bool
      */
     public function loaded();

@@ -3,6 +3,7 @@ namespace BetaKiller\Model;
 
 use BetaKiller\Exception;
 use BetaKiller\Helper\CurrentUserTrait;
+use DateTime;
 
 trait ModelWithRevisionsOrmTrait
 {
@@ -104,6 +105,14 @@ trait ModelWithRevisionsOrmTrait
     }
 
     /**
+     * @return \BetaKiller\Model\RevisionModelInterface[]
+     */
+    public function getAllRevisions()
+    {
+        return $this->getAllRevisionsRelation()->orderByCreatedAt()->get_all();
+    }
+
+    /**
      * Insert a new object to the database
      * @param  \Validation $validation Validation object
      * @throws \Kohana_Exception
@@ -148,6 +157,8 @@ trait ModelWithRevisionsOrmTrait
     {
         $revision = $this->getCurrentRevision();
 
+        // TODO разобраться с changed() (всегда true при сохранении поста так как формально данные были обновлены через set(), но по факту имели те же значения)
+
         if (!$revision->changed()) {
             return null;
         }
@@ -158,6 +169,7 @@ trait ModelWithRevisionsOrmTrait
             throw new Exception('Can not link revision to related model without ID');
         }
 
+        $revision->setCreatedAt(new DateTime);
         $revision->setCreatedBy($this->current_user());
 
         // Link new revision to current post

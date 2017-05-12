@@ -37,6 +37,6 @@ class IFaceFactory
      */
     protected function get_provider()
     {
-        return Container::getInstance()->get(\BetaKiller\IFace\IFaceProvider::class);
+        return Container::getInstance()->get(IFaceProvider::class);
     }
 }
