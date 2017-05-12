@@ -37,11 +37,15 @@ class PostItem extends AdminBase
 //            $thumbnails[] = $thumb->getAttributesForImgTag();
 //        }
 
+        // Edit latest revision data
+        $post->useLatestRevision();
+
         $rules = [];
 
         foreach (\CustomTag::instance()->getAllowedTags() as $tag)
         {
-            $rules[$tag] = $tag.'[id,class,align,alt,title,width,height]';
+            // TODO implement class for each custom tag + define allowed HTML tag arguments
+            $rules[$tag] = $tag.'[id,ids,class,align,alt,title,width,height]';
         }
 
         $status = $post->get_current_status();

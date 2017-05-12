@@ -10,9 +10,10 @@ use BetaKiller\Helper\IFaceTrait;
 use BetaKiller\Helper\SeoMetaInterface;
 use BetaKiller\IFace\Url\UrlParametersInterface;
 use BetaKiller\Status\StatusRelatedModelOrmTrait;
+use BetaKiller\Status\StatusRelatedModelInterface;
 use Spotman\Api\AbstractCrudMethodsModelInterface;
 
-class Model_ContentPost extends \ORM implements ModelWithRevisionsInterface, SeoMetaInterface, ImportedFromWordpressInterface, LinkedContentModelInterface, AbstractCrudMethodsModelInterface
+class Model_ContentPost extends \ORM implements StatusRelatedModelInterface, ModelWithRevisionsInterface, SeoMetaInterface, ImportedFromWordpressInterface, LinkedContentModelInterface, AbstractCrudMethodsModelInterface
 {
     use StatusRelatedModelOrmTrait,
         ModelWithRevisionsOrmTrait,

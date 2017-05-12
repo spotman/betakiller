@@ -74,11 +74,14 @@ class Status_Workflow_ContentPost extends StatusWorkflow
 
     public function publish()
     {
+        $this->doTransition(self::TRANSITION_PUBLISH);
+
         $this->makeUri();
 
         // TODO Check for title/description/image and other critical elements before publishing
 
-        $this->doTransition(self::TRANSITION_PUBLISH);
+        // Publish latest revision
+        $this->model()->setLatestRevisionAsActual();
     }
 
     public function pause()

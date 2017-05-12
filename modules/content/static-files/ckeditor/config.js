@@ -10,7 +10,7 @@ CKEDITOR.editorConfig = function( config ) {
 
   config.language = 'ru';
 
-  config.removePlugins = "autogrow";
+  config.removePlugins = "autosave,autogrow";
 
   config.toolbar = [
     { name: 'document', items: [ 'Sourcedialog', '-', 'Save', 'NewPage', 'Preview', 'Print', '-', 'Templates' ] },
