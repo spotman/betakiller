@@ -720,6 +720,9 @@ class Model_ContentPost extends \ORM implements StatusRelatedModelInterface, Mod
 
         $this->filterUserAllowedStatuses();
 
+        // Show only posts having actual revision
+        $this->filterHavingActualRevision();
+
         $this->and_where_open();
 
         // Plain pages

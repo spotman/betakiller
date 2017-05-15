@@ -48,4 +48,20 @@ class Model_ContentPostStatus extends StatusModelOrm
     {
         return 'post_id';
     }
+
+    /**
+     * @return string
+     */
+    protected function getStatusAclModelName()
+    {
+        return 'ContentPostStatusAcl';
+    }
+
+    /**
+     * @return string
+     */
+    protected function getStatusAclModelForeignKey()
+    {
+        return 'status_id';
+    }
 }

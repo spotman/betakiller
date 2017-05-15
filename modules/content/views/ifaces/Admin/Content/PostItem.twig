@@ -10,6 +10,8 @@
   "fix":              { color: "orange", icon: "settings_backup_restore", autosave: false },
   } %}
 
+  {% set isUpdateAllowed = post.isUpdateAllowed %}
+
     {#{{ js('tiny_mce/tinymce.min.js') }}#}
     {#{{ js('tiny_mce/jquery.tinymce.min.js') }}#}
 
@@ -21,7 +23,7 @@
     {{ css("ifaces/admin/content-post-item.css") }}
 
   <div class="row">
-      <form id="post-form" action="" method="post" class="col s12">
+      <form id="post-form" action="" method="post" class="col s12" data-update-allowed="{{ isUpdateAllowed|bool }}">
         <input type="hidden" name="id" value="{{ post.id }}" />
           <div class="row">
               <div class="input-field col s12">
@@ -73,7 +75,7 @@
                   {% endfor %}
                 </div>
 
-                <button class="btn save-post-button" type="submit" data-id="{{ post.id }}">
+                <button class="btn save-post-button" type="submit" data-id="{{ post.id }}" {{ isUpdateAllowed ? "" : "disabled" }}>
                   {{ ("post.action.save")|i18n }}
                 </button>
               </div>
@@ -82,8 +84,6 @@
   </div>
 
     {# TODO thumbnails edit #}
-
-    {# TODO https://www.tinymce.com/docs/configure/content-appearance/ #}
 
     <script type="application/javascript">
 
@@ -97,6 +97,12 @@
 
             var $content = $('#article-content');
 
+            {% set custom_tags_rules = [] %}
+            {% for tag in custom_tags %}
+            {# allow custom tags with any parameters #}
+            {% set custom_tags_rules = custom_tags_rules|merge([tag ~ "[*]"]) %}
+            {% endfor %}
+
             var customTagsRules = {{ custom_tags_rules|json_encode|raw }};
             var customTagsRulesString = "{{ custom_tags_rules|join("; ") }}";
 
@@ -105,14 +111,16 @@
               CKEDITOR.dtd[name] = { id : 1 };
               CKEDITOR.dtd.$empty[name] = 1;
               CKEDITOR.dtd.body[name] = 0;
+              CKEDITOR.dtd.$removeEmpty[name] = 0;
+              CKEDITOR.dtd.$nonEditable[name] = 1;
               CKEDITOR.dtd.$inline[name] = 1;
             });
 
             $content.ckeditor({
               height: "calc(100vh - 200px)",
 //              className: "test-class",
-              autosave_SaveKey: '{{ "betakiller-post-" ~ post.id }}',
-              allowedContent: "p; strong; i; em; span[style]; table[class]; thead; tbody; tr; th[style]; td[style]; ul[class]; ol[class]; li; a[href,title]; h2; h3; h4; " + customTagsRulesString
+              {#autosave_SaveKey: '{{ "betakiller-post-" ~ post.id }}',#}
+              allowedContent: "p(*); strong; i; em; span{*}; table(*); thead; tbody; tr; th[style]; td{*}; ul(*); ol(*); li; a[href,title]; h2; h3; h4; " + customTagsRulesString
             });
 
             {#tinymce.init({#}

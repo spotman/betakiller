@@ -1,9 +1,9 @@
 <?php
 namespace BetaKiller\Api\Method\ContentPost;
 
-use BetaKiller\Api\Method\AbstractStatusWorkflowApiMethod;
+use Spotman\Api\Method\AbstractModelBasedApiMethod;
 
-class PublishApiMethod extends AbstractStatusWorkflowApiMethod
+class PublishApiMethod extends AbstractModelBasedApiMethod
 {
     use ContentPostMethodTrait;
 

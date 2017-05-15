@@ -84,7 +84,8 @@ trait ModelWithRevisionsOrmTrait
      */
     public function useLatestRevision()
     {
-        $this->setCurrentRevision($this->getLatestRevision());
+        $revision = $this->getLatestRevision();
+        $this->setCurrentRevision($revision);
     }
 
     /**
@@ -110,6 +111,15 @@ trait ModelWithRevisionsOrmTrait
     public function getAllRevisions()
     {
         return $this->getAllRevisionsRelation()->orderByCreatedAt()->get_all();
+    }
+
+    /**
+     * @return $this
+     */
+    public function filterHavingActualRevision()
+    {
+        $column = $this->object_column($this->getRelatedModelRevisionForeignKey());
+        return $this->where($column, 'IS NOT', null);
     }
 
     /**

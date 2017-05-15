@@ -9,7 +9,14 @@ require([
     var $transitionButtons = $(".transition-button");
     var $saveButton = $(".save-post-button");
 
+    var isUpdateAllowed = $form.data('update-allowed');
+
     function savePost(doneCallback) {
+      if (!isUpdateAllowed) {
+        doneCallback();
+        return;
+      }
+
       $saveButton.attr('disabled', 'disabled');
 
       var formData = {};
@@ -50,7 +57,7 @@ require([
           autosave = ($button.data("autosave") === true);
 
       // Autosave only for selected transitions (except fix, pause, etc)
-      if (autosave) {
+      if (autosave && isUpdateAllowed) {
         // Save post before processing transition
         savePost(function() {
           processTransition($button);
@@ -63,6 +70,10 @@ require([
 
     $form.submit(function(e) {
       e.preventDefault();
+
+      if (!isUpdateAllowed) {
+        return;
+      }
 
       savePost(function() {
         $saveButton.removeAttr('disabled');

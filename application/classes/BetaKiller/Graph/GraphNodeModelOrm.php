@@ -48,7 +48,7 @@ abstract class GraphNodeModelOrm extends ORM implements GraphNodeModelInterface
     {
         $node = $this->node_model_factory()->filter_start()->cached()->find();
 
-        return $node->loaded() ? $node : NULL;
+        return $node->loaded() ? $node : null;
     }
 
     /**
@@ -58,27 +58,27 @@ abstract class GraphNodeModelOrm extends ORM implements GraphNodeModelInterface
     {
         $node = $this->node_model_factory()->filter_finish()->cached()->find();
 
-        return $node->loaded() ? $node : NULL;
+        return $node->loaded() ? $node : null;
     }
 
     public function filter_start()
     {
-        return $this->where($this->get_start_marker_column_name(), '=', TRUE);
+        return $this->where($this->get_start_marker_column_name(), '=', true);
     }
 
     public function filter_finish()
     {
-        return $this->where($this->get_finish_marker_column_name(), '=', TRUE);
+        return $this->where($this->get_finish_marker_column_name(), '=', true);
     }
 
     public function is_start()
     {
-        return !!$this->get($this->get_start_marker_column_name());
+        return (bool)$this->get($this->get_start_marker_column_name());
     }
 
     public function is_finish()
     {
-        return !!$this->get($this->get_finish_marker_column_name());
+        return (bool)$this->get($this->get_finish_marker_column_name());
     }
 
     /**
@@ -97,19 +97,19 @@ abstract class GraphNodeModelOrm extends ORM implements GraphNodeModelInterface
         return $this->transition_model_factory()->get_target_nodes($this);
     }
 
-    public function get_transitions(GraphNodeModelInterface $source = NULL, GraphNodeModelInterface $target = NULL)
+    public function get_transitions(GraphNodeModelInterface $source = null, GraphNodeModelInterface $target = null)
     {
         return $this->transition_model_factory()->get_transitions($source, $target);
     }
 
     public function get_source_transitions()
     {
-        return $this->get_transitions(NULL, $this);
+        return $this->get_transitions(null, $this);
     }
 
     public function get_target_transitions()
     {
-        return $this->get_transitions($this, NULL);
+        return $this->get_transitions($this, null);
     }
 
     public function transition_exists(GraphNodeModelInterface $source, GraphNodeModelInterface $target)
@@ -128,25 +128,33 @@ abstract class GraphNodeModelOrm extends ORM implements GraphNodeModelInterface
     }
 
     /**
+     * @return GraphNodeModelInterface[]
+     */
+    public function get_all_nodes()
+    {
+        return $this->model_factory()->find_all()->as_array();
+    }
+
+    /**
      * Override this method if you need custom transition filtering
      *
      * @param int|array|NULL $id
      *
-     * @return GraphTransitionModelOrm
+     * @return GraphTransitionModelOrm|\BetaKiller\Utils\Kohana\ORM\OrmInterface
      */
-    protected function transition_model_factory($id = NULL)
+    protected function transition_model_factory($id = null)
     {
-        return ORM::factory($this->get_transition_model_name(), $id);
+        return $this->model_factory($id, $this->get_transition_model_name());
     }
 
     /**
      * @param int|array|NULL $id
      *
-     * @return GraphNodeModelOrm
+     * @return GraphNodeModelOrm|\BetaKiller\Utils\Kohana\ORM\OrmInterface
      */
-    protected function node_model_factory($id = NULL)
+    protected function node_model_factory($id = null)
     {
-        return ORM::factory($this->object_name(), $id);
+        return $this->model_factory($id);
     }
 
     protected function get_start_marker_column_name()

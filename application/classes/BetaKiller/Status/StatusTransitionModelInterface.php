@@ -12,13 +12,6 @@ interface StatusTransitionModelInterface extends GraphTransitionModelInterface
     public function filter_allowed_by_acl();
 
     /**
-     * Returns iterator for all related roles
-     *
-     * @return RoleInterface[]
-     */
-    public function find_all_roles();
-
-    /**
      * @param \BetaKiller\Model\RoleInterface $role
      *
      * @return $this
@@ -31,4 +24,9 @@ interface StatusTransitionModelInterface extends GraphTransitionModelInterface
      * @return $this
      */
     public function remove_role(RoleInterface $role);
+
+    /**
+     * @return string[]
+     */
+    public function getTransitionAllowedRolesNames();
 }

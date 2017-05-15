@@ -50,4 +50,5 @@ return array (
   'System error' => 'Системная ошибка',
   'No class found for :name, tried to autoload :tried' => 'No class found for :name, tried to autoload :tried',
   'Can not instantiate :class class, error is: :msg' => 'Can not instantiate :class class, error is: :msg',
+  'Status ACL disabled for model :name' => 'Status ACL disabled for model :name',
 );

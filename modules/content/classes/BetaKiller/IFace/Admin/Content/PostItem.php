@@ -2,9 +2,16 @@
 namespace BetaKiller\IFace\Admin\Content;
 
 use BetaKiller\Helper\ContentUrlParametersHelper;
+use BetaKiller\Acl\Resource\ContentPostResource;
+use Spotman\Acl\AccessResolver\AclAccessResolverInterface;
 
 class PostItem extends AdminBase
 {
+    /**
+     * @var \BetaKiller\Acl\Resource\ContentPostResource
+     */
+    private $contentPostResource;
+
     /**
      * @var \BetaKiller\Helper\ContentUrlParametersHelper
      */
@@ -15,9 +22,22 @@ class PostItem extends AdminBase
      *
      * @param \BetaKiller\Helper\ContentUrlParametersHelper $urlParametersHelper
      */
-    public function __construct(ContentUrlParametersHelper $urlParametersHelper)
+
+    /**
+     * PostItem constructor.
+     *
+     * @param \BetaKiller\Helper\ContentUrlParametersHelper          $urlParametersHelper
+     * @param \BetaKiller\Acl\Resource\ContentPostResource           $resource
+     * @param \Spotman\Acl\AccessResolver\AclAccessResolverInterface $resolver
+     */
+    public function __construct(
+        ContentUrlParametersHelper $urlParametersHelper,
+        ContentPostResource $resource,
+        AclAccessResolverInterface $resolver
+    )
     {
         $this->urlParametersHelper = $urlParametersHelper;
+        $this->contentPostResource = $resource->useResolver($resolver);
     }
 
     /**
@@ -40,15 +60,9 @@ class PostItem extends AdminBase
         // Edit latest revision data
         $post->useLatestRevision();
 
-        $rules = [];
-
-        foreach (\CustomTag::instance()->getAllowedTags() as $tag)
-        {
-            // TODO implement class for each custom tag + define allowed HTML tag arguments
-            $rules[$tag] = $tag.'[id,ids,class,align,alt,title,width,height]';
-        }
-
         $status = $post->get_current_status();
+
+        $this->contentPostResource->useStatusRelatedModel($post);
 
         return [
             'post' => [
@@ -59,6 +73,8 @@ class PostItem extends AdminBase
                 'title'         =>  $post->getTitle(),
                 'description'   =>  $post->getDescription(),
 
+                'isUpdateAllowed' => $this->contentPostResource->isUpdateAllowed(),
+
                 'status'        =>  [
                     'id'            =>  $status->get_id(),
                     'codename'      =>  $status->get_codename(),
@@ -68,7 +84,7 @@ class PostItem extends AdminBase
 //                'thumbnails'    =>  $thumbnails,
             ],
 
-            'custom_tags_rules'  =>  $rules,
+            'custom_tags'  =>  \CustomTag::instance()->getAllowedTags(),
         ];
     }
 }

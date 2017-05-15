@@ -27,10 +27,7 @@ abstract class AbstractRevisionOrmModel extends \ORM implements RevisionModelInt
      */
     public function getLatestRevision()
     {
-        /** @var \BetaKiller\Model\AbstractRevisionOrmModel $orm */
-        $orm = $this->model_factory();
-
-        return $orm->orderByCreatedAt()->find();
+        return $this->orderByCreatedAt()->find();
     }
 
     public function setCreatedBy(UserInterface $model)

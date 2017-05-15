@@ -27,6 +27,8 @@ use Spotman\Acl\PermissionsCollector\PermissionsCollectorInterface;
 use Spotman\Acl\ResourceFactory\ResourceFactoryInterface;
 use Spotman\Acl\ResourcesCollector\ResourcesCollectorInterface;
 use Spotman\Acl\RolesCollector\RolesCollectorInterface;
+use Spotman\Api\AccessResolver\ApiMethodAccessResolverDetectorInterface;
+use BetaKiller\Api\AccessResolver\CustomApiMethodAccessResolverDetector;
 
 $workingPath = MultiSite::instance()->getWorkingPath();
 $workingName = MultiSite::instance()->getWorkingName();
@@ -103,13 +105,16 @@ return [
         // Acl roles, resources, permissions and resource factory
         RolesCollectorInterface::class         => DI\object(RolesCollector::class),
         ResourcesCollectorInterface::class     => DI\object(ResourcesCollector::class),
-        PermissionsCollectorInterface::class   => DI\object(PermissionsCollector::class),
-        ResourceFactoryInterface::class        => DI\object(ResourceFactory::class),
+        PermissionsCollectorInterface::class            => DI\object(PermissionsCollector::class),
+        ResourceFactoryInterface::class                 => DI\object(ResourceFactory::class),
 
         // Use Twig in ifaces and layouts
-        IFaceView::class                       => DI\object(IFaceViewTwig::class),
-        LayoutView::class                      => DI\object(LayoutViewTwig::class),
-        WrapperView::class                     => DI\object(WrapperViewTwig::class),
+        IFaceView::class                                => DI\object(IFaceViewTwig::class),
+        LayoutView::class                               => DI\object(LayoutViewTwig::class),
+        WrapperView::class                              => DI\object(WrapperViewTwig::class),
+
+        // Custom access resolver detector
+        ApiMethodAccessResolverDetectorInterface::class => DI\object(CustomApiMethodAccessResolverDetector::class),
 
     ],
 

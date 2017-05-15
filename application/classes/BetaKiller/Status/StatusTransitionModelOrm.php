@@ -43,14 +43,8 @@ abstract class StatusTransitionModelOrm extends GraphTransitionModelOrm implemen
             ->where($far_key, 'IN', $user->get_all_user_roles_ids());
     }
 
-    /**
-     * Returns iterator for all related roles
-     *
-     * @return RoleInterface[]
-     */
     public function find_all_roles()
     {
-        return $this->get_roles_relation()->get_all();
     }
 
     public function add_role(RoleInterface $role)
@@ -61,6 +55,30 @@ abstract class StatusTransitionModelOrm extends GraphTransitionModelOrm implemen
     public function remove_role(RoleInterface $role)
     {
         return $this->remove('roles', $role);
+    }
+
+    /**
+     * Returns iterator for all related roles
+     *
+     * @return RoleInterface[]
+     */
+    public function getTransitionAllowedRoles()
+    {
+        return $this->get_roles_relation()->get_all();
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getTransitionAllowedRolesNames()
+    {
+        $roles = [];
+
+        foreach ($this->getTransitionAllowedRoles() as $role) {
+            $roles[] = $role->get_name();
+        }
+
+        return $roles;
     }
 
     /**

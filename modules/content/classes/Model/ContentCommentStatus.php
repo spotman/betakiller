@@ -11,7 +11,30 @@ class Model_ContentCommentStatus extends StatusModelOrm
 
     const URL_PARAM = 'ContentCommentStatus';
 
-    protected $_table_name = 'content_comment_statuses';
+    protected function _initialize()
+    {
+        $this->_table_name = 'content_comment_statuses';
+
+        parent::_initialize();
+    }
+
+    /**
+     * @return string
+     */
+    protected function getStatusAclModelName()
+    {
+        // TODO No ACL for statuses yet
+        return null;
+    }
+
+    /**
+     * @return string
+     */
+    protected function getStatusAclModelForeignKey()
+    {
+        // TODO No ACL for statuses yet
+        return null;
+    }
 
     public function getLabel()
     {
@@ -20,7 +43,7 @@ class Model_ContentCommentStatus extends StatusModelOrm
     }
 
     /**
-     * @return Model_ContentCommentStatus
+     * @return Model_ContentCommentStatus|\BetaKiller\Utils\Kohana\ORM\OrmInterface
      */
     public function get_pending_status()
     {
@@ -28,7 +51,7 @@ class Model_ContentCommentStatus extends StatusModelOrm
     }
 
     /**
-     * @return Model_ContentCommentStatus
+     * @return Model_ContentCommentStatus|\BetaKiller\Utils\Kohana\ORM\OrmInterface
      */
     public function get_approved_status()
     {
@@ -36,7 +59,7 @@ class Model_ContentCommentStatus extends StatusModelOrm
     }
 
     /**
-     * @return Model_ContentCommentStatus
+     * @return Model_ContentCommentStatus|\BetaKiller\Utils\Kohana\ORM\OrmInterface
      */
     public function get_spam_status()
     {
@@ -44,7 +67,7 @@ class Model_ContentCommentStatus extends StatusModelOrm
     }
 
     /**
-     * @return Model_ContentCommentStatus
+     * @return Model_ContentCommentStatus|\BetaKiller\Utils\Kohana\ORM\OrmInterface
      */
     public function get_trash_status()
     {

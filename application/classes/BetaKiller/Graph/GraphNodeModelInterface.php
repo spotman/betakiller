@@ -111,4 +111,9 @@ interface GraphNodeModelInterface
      * @return bool
      */
     public function has_target(GraphNodeModelInterface $target);
+
+    /**
+     * @return GraphNodeModelInterface[]
+     */
+    public function get_all_nodes();
 }

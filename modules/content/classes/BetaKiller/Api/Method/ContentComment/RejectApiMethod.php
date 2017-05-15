@@ -1,9 +1,9 @@
 <?php
 namespace BetaKiller\Api\Method\ContentComment;
 
-use BetaKiller\Api\Method\AbstractStatusWorkflowApiMethod;
+use Spotman\Api\Method\AbstractModelBasedApiMethod;
 
-class RejectApiMethod extends AbstractStatusWorkflowApiMethod
+class RejectApiMethod extends AbstractModelBasedApiMethod
 {
     use ContentCommentMethodTrait;
 

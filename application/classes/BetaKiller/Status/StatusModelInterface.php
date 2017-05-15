@@ -23,7 +23,7 @@ interface StatusModelInterface extends GraphNodeModelInterface
      *
      * @return \BetaKiller\Graph\GraphTransitionModelInterface[]
      */
-    public function get_allowed_transitions(GraphNodeModelInterface $source = NULL, GraphNodeModelInterface $target = NULL);
+    public function get_allowed_transitions(GraphNodeModelInterface $source = null, GraphNodeModelInterface $target = null);
 
     /**
      * Returns list of source transitions allowed by ACL for current user
@@ -41,6 +41,7 @@ interface StatusModelInterface extends GraphNodeModelInterface
 
     /**
      * Array with codenames of target transitions, <status codename> => <transition codename>
+     *
      * @return string[]
      */
     public function get_allowed_target_transitions_codename_array();
@@ -53,4 +54,18 @@ interface StatusModelInterface extends GraphNodeModelInterface
      * @return bool
      */
     public function is_target_transition_allowed($codename);
+
+    /**
+     * @param string $action
+     *
+     * @return string[]
+     */
+    public function getStatusActionAllowedRoles($action);
+
+    /**
+     * Returns true if status-based ACL is enabled (needs *StatusAcl model + *_status_acl table)
+     *
+     * @return bool
+     */
+    public function isStatusAclEnabled();
 }
