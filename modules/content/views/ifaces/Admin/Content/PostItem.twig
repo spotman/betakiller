@@ -12,12 +12,8 @@
 
   {% set isUpdateAllowed = post.isUpdateAllowed %}
 
-    {#{{ js('tiny_mce/tinymce.min.js') }}#}
-    {#{{ js('tiny_mce/jquery.tinymce.min.js') }}#}
-
     {{ js("ckeditor/ckeditor.js") }}
     {{ js("ckeditor/adapters/jquery.js") }}
-    {#{{ js("ckeditor/config.js") }}#}
 
     {{ js("ifaces/admin/content-post-item.js") }}
     {{ css("ifaces/admin/content-post-item.css") }}
@@ -27,35 +23,34 @@
         <input type="hidden" name="id" value="{{ post.id }}" />
           <div class="row">
               <div class="input-field col s12">
-                  <input type="text" name="label" id="article-label" placeholder="Post label" value="{{ post.label }}" />
+                  <input type="text" name="label" id="article-label" placeholder="Post label" value="{{ post.label }}" {{ isUpdateAllowed ? "" : "disabled" }} />
                   <label for="article-label">Label</label>
               </div>
           </div>
 
           <div class="row">
               <div class="input-field col s12">
-                  <input type="text" name="uri" id="article-uri" value="{{ post.uri }}" readonly />
+                  <input type="text" name="uri" id="article-uri" value="{{ post.uri }}" disabled />
                   <label for="article-uri">URI</label>
               </div>
           </div>
 
           <div class="row">
               <div class="input-field col s12">
-                  <textarea name="content" id="article-content" rows="25" style="height: 100vh">{{ post.content }}</textarea>
-                  {#<label for="article-content">Content</label>#}
+                  <textarea name="content" id="article-content" rows="25" style="height: 100vh" {{ isUpdateAllowed ? "" : "disabled" }}>{{ post.content }}</textarea>
               </div>
           </div>
 
           <div class="row">
               <div class="input-field col s12">
-                  <input type="text" name="title" id="article-title" class="form-control" value="{{ post.title }}" data-length="60" placeholder="Post title, used in HTML &lsaquo;title&rsaquo; tag" />
+                  <input type="text" name="title" id="article-title" class="form-control" value="{{ post.title }}" data-length="60" placeholder="Post title, used in HTML &lsaquo;title&rsaquo; tag" {{ isUpdateAllowed ? "" : "disabled" }} />
                   <label for="article-title">HTML &lt;title&gt;</label>
               </div>
           </div>
 
           <div class="row">
               <div class="input-field col s12">
-                  <textarea name="description" id="article-description" class="materialize-textarea" rows="3" data-length="160" placeholder="Post title, used in HTML &lt;description&gt; meta tag">{{ post.description }}</textarea>
+                  <textarea name="description" id="article-description" class="materialize-textarea" rows="3" data-length="160" placeholder="Post title, used in HTML &lt;description&gt; meta tag" {{ isUpdateAllowed ? "" : "disabled" }}>{{ post.description }}</textarea>
                   <label for="article-description">HTML &lt;description&gt; meta tag</label>
               </div>
           </div>
@@ -83,7 +78,7 @@
       </form>
   </div>
 
-    {# TODO thumbnails edit #}
+  {# TODO thumbnails edit #}
 
     <script type="application/javascript">
 
@@ -97,44 +92,34 @@
 
             var $content = $('#article-content');
 
-            {% set custom_tags_rules = [] %}
-            {% for tag in custom_tags %}
-            {# allow custom tags with any parameters #}
-            {% set custom_tags_rules = custom_tags_rules|merge([tag ~ "[*]"]) %}
-            {% endfor %}
+            if ($content.length) {
+              {% set custom_tags_rules = [] %}
+              {% for tag in custom_tags %}
+              {# allow custom tags with any parameters #}
+              {% set custom_tags_rules = custom_tags_rules|merge([tag ~ "[*]"]) %}
+              {% endfor %}
 
-            var customTagsRules = {{ custom_tags_rules|json_encode|raw }};
-            var customTagsRulesString = "{{ custom_tags_rules|join("; ") }}";
+              var customTags = {{ custom_tags|json_encode|raw }};
+              var customTagsRulesString = "{{ custom_tags_rules|join("; ") }}";
 
-            $.each(customTagsRules, function(name) {
-//                console.log(name);
-              CKEDITOR.dtd[name] = { id : 1 };
-              CKEDITOR.dtd.$empty[name] = 1;
-              CKEDITOR.dtd.body[name] = 0;
-              CKEDITOR.dtd.$removeEmpty[name] = 0;
-              CKEDITOR.dtd.$nonEditable[name] = 1;
-              CKEDITOR.dtd.$inline[name] = 1;
-            });
+              $.each(customTags, function(index, name) {
+                console.log(name);
+                CKEDITOR.dtd[name] = { id : 1 };
+                CKEDITOR.dtd.$empty[name] = 1;
+                CKEDITOR.dtd.$removeEmpty[name] = 0;
+                CKEDITOR.dtd.$nonEditable[name] = 1;
+                CKEDITOR.dtd.$inline[name] = 1;
+              });
 
-            $content.ckeditor({
-              height: "calc(100vh - 200px)",
+              $content.ckeditor({
+                height: "calc(100vh - 200px)",
 //              className: "test-class",
-              {#autosave_SaveKey: '{{ "betakiller-post-" ~ post.id }}',#}
-              allowedContent: "p(*); strong; i; em; span{*}; table(*); thead; tbody; tr; th[style]; td{*}; ul(*); ol(*); li; a[href,title]; h2; h3; h4; " + customTagsRulesString
-            });
+                {#autosave_SaveKey: '{{ "betakiller-post-" ~ post.id }}',#}
+                allowedContent: "p(*); strong; i; em; span{*}; table(*); thead; tbody; tr; th[style]; td{*}; ul(*); ol(*); li; a[href,title]; h2; h3; h4; " + customTagsRulesString
+              });
 
-            {#tinymce.init({#}
-            {#selector: "textarea#article-content",#}
-            {#plugins: "code table contextmenu paste link advlist noneditable",#}
-            {#theme: "modern",#}
-            {#menubar: false,#}
-            {#valid_children: "p[{{ custom_tags_list|join(",") }}",#}
-            {#extended_valid_elements: "{{ custom_tags_list|join("[id|class|align|alt|title|width|height],") }}",#}
-            {#custom_elements: "{{ custom_tags_list|join(",") }}",#}
-            {#toolbar: "undo redo | paste pastetext | styleselect blockquote | bold italic strikethrough underline | alignleft aligncenter alignright alignjustify | numlist bulllist | indent outdent | link image | table code"#}
-            {#});#}
+            }
           });
-
         });
 
     </script>
