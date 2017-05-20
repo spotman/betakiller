@@ -217,13 +217,19 @@ class Model_ContentPost extends \ORM implements StatusRelatedModelInterface, Mod
     }
 
     /**
-     * @return string
+     * @return int
      */
     public function getType()
     {
-        return $this->get('type');
+        return (int)$this->get('type');
     }
 
+    /**
+     * @param int $value
+     *
+     * @return $this
+     * @throws \Kohana_Exception
+     */
     protected function setType($value)
     {
         if (!in_array($value, $this->prioritizedTypesList, true)) {
@@ -245,12 +251,17 @@ class Model_ContentPost extends \ORM implements StatusRelatedModelInterface, Mod
 
     public function isPage()
     {
-        return ($this->getType() === self::TYPE_PAGE);
+        return $this->isType(self::TYPE_PAGE);
     }
 
-    public function is_article()
+    public function isArticle()
     {
-        return ($this->getType() === self::TYPE_ARTICLE);
+        return $this->isType(self::TYPE_ARTICLE);
+    }
+
+    protected function isType($type)
+    {
+        return ($this->getType() === (int)$type);
     }
 
     /**
@@ -271,6 +282,17 @@ class Model_ContentPost extends \ORM implements StatusRelatedModelInterface, Mod
     public function getCategory()
     {
         return $this->get('category');
+    }
+
+    public function needsCategory()
+    {
+        return $this->isArticle();
+    }
+
+    public function needsThumbnails()
+    {
+        // Allow plain pages without thumbnails
+        return $this->isArticle();
     }
 
     /**

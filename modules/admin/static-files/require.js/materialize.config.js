@@ -30,7 +30,7 @@ require.config({
     },
 
     'materialize.forms': {
-      deps: ['jquery', 'materialize.global']
+      deps: ['jquery', 'materialize.global', 'materialize.dropdown']
     },
 
     'materialize.charCounter': {
@@ -46,7 +46,7 @@ require.config({
     },
 
     'materialize.dropdown': {
-      deps: ['jquery']
+      deps: ['jquery', 'materialize.animation']
     },
 
     'materialize.animation': {

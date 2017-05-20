@@ -8,6 +8,7 @@ class Assets_Provider_ContentPostThumbnail extends \BetaKiller\Assets\Provider\A
 
     protected function getStoragePathName()
     {
+        // TODO Move to config
         return 'post-thumbnails';
     }
 
@@ -16,6 +17,7 @@ class Assets_Provider_ContentPostThumbnail extends \BetaKiller\Assets\Provider\A
      */
     public function getUploadMaxHeight()
     {
+        // TODO Move to config
         return $this->getAssetsProviderConfigValue(['upload', 'max-height']);
     }
 
@@ -24,6 +26,7 @@ class Assets_Provider_ContentPostThumbnail extends \BetaKiller\Assets\Provider\A
      */
     public function getUploadMaxWidth()
     {
+        // TODO Move to config
         return $this->getAssetsProviderConfigValue(['upload', 'max-width']);
     }
 
@@ -37,6 +40,7 @@ class Assets_Provider_ContentPostThumbnail extends \BetaKiller\Assets\Provider\A
      */
     public function getAllowedPreviewSizes()
     {
+        // TODO Move to config
         return $this->getAssetsProviderConfigValue(['sizes']);
     }
 
@@ -47,6 +51,7 @@ class Assets_Provider_ContentPostThumbnail extends \BetaKiller\Assets\Provider\A
      */
     public function getAllowedMimeTypes()
     {
+        // TODO Move to config
         return [
             'image/jpeg',
             'image/png',
@@ -86,7 +91,7 @@ class Assets_Provider_ContentPostThumbnail extends \BetaKiller\Assets\Provider\A
      */
     protected function checkDeployPermissions($model)
     {
-        // TODO Move to ACL
+        // TODO Move to config
         return TRUE;
     }
 

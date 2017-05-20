@@ -15,13 +15,6 @@ use Route;
  */
 abstract class AbstractAssetsProviderImage extends AbstractAssetsProvider
 {
-
-    // Dimensions values delimiter
-    const SIZE_DELIMITER = 'x';
-
-    const SIZE_ORIGINAL = 'original';
-    const SIZE_PREVIEW  = 'preview';
-
     /**
      * @param AssetsModelInterface $model
      * @param string               $size 300x200
@@ -55,7 +48,7 @@ abstract class AbstractAssetsProviderImage extends AbstractAssetsProvider
 
     private function makeSizeString($width = null, $height = null)
     {
-        return $width.self::SIZE_DELIMITER.$height;
+        return $width.AssetsModelImageInterface::SIZE_DELIMITER.$height;
     }
 
     /**
@@ -65,7 +58,7 @@ abstract class AbstractAssetsProviderImage extends AbstractAssetsProvider
      */
     private function parseSizeDimensions($size)
     {
-        $dimensions = explode(self::SIZE_DELIMITER, $size);
+        $dimensions = explode(AssetsModelImageInterface::SIZE_DELIMITER, $size);
         $width      = $dimensions[0] ? (int)$dimensions[0] : null;
         $height     = $dimensions[1] ? (int)$dimensions[1] : null;
 
@@ -276,12 +269,12 @@ abstract class AbstractAssetsProviderImage extends AbstractAssetsProvider
     {
         $original_url = $this->getOriginalUrl($model);
 
-        if ($size === self::SIZE_ORIGINAL) {
+        if ($size === AssetsModelImageInterface::SIZE_ORIGINAL) {
             $src    = $original_url;
             $width  = $model->getWidth();
             $height = $model->getHeight();
         } else {
-            $size = ($size !== self::SIZE_PREVIEW) ? $size : null;
+            $size = ($size !== AssetsModelImageInterface::SIZE_PREVIEW) ? $size : null;
 
             $size       = $this->determineSize($size);
             $dimensions = $this->parseSizeDimensions($size);

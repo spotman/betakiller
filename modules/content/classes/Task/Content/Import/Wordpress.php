@@ -533,8 +533,7 @@ class Task_Content_Import_Wordpress extends Minion_Task
         }
 
         if (!$wp_images_ids) {
-            // Allow plain pages without thumbnails
-            if ($post->is_article()) {
+            if ($post->needsThumbnails()) {
                 $this->warning('Article with uri [:uri] has no thumbnail', [
                     ':uri' => $post->getUri(),
                 ]);

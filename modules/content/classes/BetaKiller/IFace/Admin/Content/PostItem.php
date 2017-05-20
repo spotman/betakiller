@@ -50,12 +50,12 @@ class PostItem extends AdminBase
     {
         $post = $this->urlParametersHelper->getContentPost();
 
-//        $thumbnails = [];
-//
-//        foreach ($article->getThumbnails() as $thumb)
-//        {
-//            $thumbnails[] = $thumb->getAttributesForImgTag();
-//        }
+        $thumbnails = [];
+
+        foreach ($post->getThumbnails() as $thumb)
+        {
+            $thumbnails[$thumb->get_id()] = $thumb->getAttributesForImgTag($thumb::SIZE_PREVIEW);
+        }
 
         // Edit latest revision data
         $post->useLatestRevision();
@@ -73,6 +73,7 @@ class PostItem extends AdminBase
                 'title'         =>  $post->getTitle(),
                 'description'   =>  $post->getDescription(),
 
+                'needsCategory'   => $post->needsCategory(),
                 'isUpdateAllowed' => $this->contentPostResource->isUpdateAllowed(),
 
                 'status'        =>  [
@@ -81,7 +82,7 @@ class PostItem extends AdminBase
                     'transitions'   =>  $status->get_allowed_target_transitions_codename_array(),
                 ],
 
-//                'thumbnails'    =>  $thumbnails,
+                'thumbnails'    =>  $thumbnails,
             ],
 
             'custom_tags'  =>  \CustomTag::instance()->getAllowedTags(),

@@ -35,7 +35,28 @@
               </div>
           </div>
 
+        {% if post.needsCategory %}
           <div class="row">
+            <div class="input-field col s12">
+              <select name="category" id="article-category">
+                <option value="" disabled>Select category</option>
+                {# TODO category selection #}
+              </select>
+              <label for="article-category">Category</label>
+            </div>
+          </div>
+        {% endif %}
+
+        {# TODO thumbnails edit (maybe select from content images) #}
+        <div class="row">
+          <div class="col s12">
+            {% for thumb_id,thumb_image in post.thumbnails %}
+              {{ image(thumb_image, {"data-id": thumb_id, class: "responsive-img"}) }}
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="row">
               <div class="input-field col s12">
                   <textarea name="content" id="article-content" rows="25" style="height: 100vh" {{ isUpdateAllowed ? "" : "disabled" }}>{{ post.content }}</textarea>
               </div>
@@ -78,8 +99,6 @@
       </form>
   </div>
 
-  {# TODO thumbnails edit #}
-
     <script type="application/javascript">
 
         require([
@@ -90,7 +109,12 @@
 
           $(function() {
 
+            var $category = $('#article-category');
             var $content = $('#article-content');
+
+            if ($category.length) {
+              $category.material_select();
+            }
 
             if ($content.length) {
               {% set custom_tags_rules = [] %}

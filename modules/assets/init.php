@@ -1,6 +1,6 @@
 <?php
 
-use BetaKiller\Assets\Provider\AbstractAssetsProviderImage;
+use BetaKiller\Assets\Model\AssetsModelImageInterface;
 
 /**
  * Uploading/downloading/deleting files via concrete provider
@@ -15,7 +15,7 @@ Route::set('assets-provider-upload', 'assets/<provider>/upload')
     ]);
 
 $assetsExtensionRegexp = '[a-z]{2,}'; // (jpg|jpeg|gif|png)
-$assetsSizeRegexp      = '[0-9]*'.AbstractAssetsProviderImage::SIZE_DELIMITER.'[0-9]*';
+$assetsSizeRegexp      = '[0-9]*'.AssetsModelImageInterface::SIZE_DELIMITER.'[0-9]*';
 
 /**
  * Deploy/delete/preview files via concrete provider
