@@ -24,8 +24,12 @@ class IFaceCache
 
         $this->pageCache = new PageCache;
 
-        $this->pageCache->setPath($config->getPageCachePath());
-        $this->pageCache->enableLog();
+        $this->pageCache->config()
+            ->setCachePath($config->getPageCachePath())
+            ->setEnableLog(true)
+            ->setSendHeaders(true)
+            ->setForwardHeaders(true);
+
         $this->pageCache->setLogger($logger);
 //        $this->pageCache->setLogFilePath('/tmp/page-cache.log');
     }
@@ -40,7 +44,7 @@ class IFaceCache
 
     public function clearCache()
     {
-        $this->pageCache->clearCache();
+        $this->pageCache->clearAllCache();
     }
 
     public function process(IFaceInterface $iface)
@@ -58,11 +62,8 @@ class IFaceCache
 
         $this->applyIFaceStrategy($iface);
 
-        $this->pageCache->setExpiration($expires);
-        $this->pageCache->enableHeaders(true);
+        $this->pageCache->config()->setCacheExpirationInSeconds($expires);
 
-//        @todo Enable that after approving PR by mmamedov
-//        $this->pageCache->forwardHeaders(true);
         $this->pageCache->init();
     }
 
