@@ -23,7 +23,8 @@ class UrlPrototypeHelper
     /**
      * UrlPrototypeHelper constructor.
      *
-     * @param \BetaKiller\IFace\Url\UrlParametersInterface $urlParameters Current request parameters
+     * @param \BetaKiller\IFace\Url\UrlParametersInterface $urlParameters
+     * @param \BetaKiller\IFace\Url\UrlDataSourceFactory   $factory
      */
     public function __construct(UrlParametersInterface $urlParameters, UrlDataSourceFactory $factory)
     {
@@ -44,6 +45,12 @@ class UrlPrototypeHelper
         return $this->fromString($uri);
     }
 
+    /**
+     * @param \BetaKiller\IFace\IFaceModelInterface $ifaceModel
+     *
+     * @return \BetaKiller\IFace\Url\UrlPrototype
+     * @throws \BetaKiller\IFace\Exception\IFaceException
+     */
     public function fromIFaceModelUri(IFaceModelInterface $ifaceModel)
     {
         $uri = $ifaceModel->getUri();
@@ -63,9 +70,9 @@ class UrlPrototypeHelper
      * @return \BetaKiller\IFace\Url\UrlDataSourceInterface
      * @throws \BetaKiller\IFace\Url\UrlPrototypeException
      */
-    public function getModelInstance(UrlPrototype $prototype)
+    public function getDataSourceInstance(UrlPrototype $prototype)
     {
-        $name = $prototype->getModelName();
+        $name = $prototype->getDataSourceName();
 
         if (!$name) {
             throw new UrlPrototypeException('Empty UrlPrototype model name');
@@ -85,13 +92,21 @@ class UrlPrototypeHelper
         );
     }
 
-    public function getCompiledPrototypeValue($prototypeString, UrlParametersInterface $parameters = null, $isTree = false)
+    /**
+     * @param                                                   $prototypeString
+     * @param \BetaKiller\IFace\Url\UrlParametersInterface|null $parameters
+     * @param bool|null                                         $isTree
+     *
+     * @return string
+     * @throws \BetaKiller\IFace\Url\UrlPrototypeException
+     */
+    public function getCompiledPrototypeValue($prototypeString, UrlParametersInterface $parameters = null, $isTree = null)
     {
         $prototype = $this->fromString($prototypeString);
 
         $model = $this->getModelFromUrlParameters($prototype, $parameters);
 
-        if ($isTree && !($model instanceof TreeModelSingleParentInterface)) {
+        if ((bool)$isTree && !($model instanceof TreeModelSingleParentInterface)) {
             throw new UrlPrototypeException('Model :model must be instance of :object for tree traversing', [
                 ':model'  => get_class($model),
                 ':object' => TreeModelSingleParentInterface::class,
@@ -105,25 +120,23 @@ class UrlPrototypeHelper
         } while ($isTree && ($model = $model->getParent()));
 
         return implode('/', array_reverse($parts));
-
     }
 
     /**
      * @param \BetaKiller\IFace\Url\UrlPrototype                $prototype
      * @param \BetaKiller\IFace\Url\UrlParametersInterface|null $parameters
      *
-     * @return \BetaKiller\IFace\Url\UrlDataSourceInterface|null
+     * @return \BetaKiller\IFace\Url\DispatchableEntityInterface|null
      * @throws \BetaKiller\IFace\Url\UrlPrototypeException
      */
     public function getModelFromUrlParameters(UrlPrototype $prototype, UrlParametersInterface $parameters = null)
     {
-        $modelName = $prototype->getModelName();
+        $modelName = $prototype->getDataSourceName();
 
-        /** @var UrlDataSourceInterface $model */
-        $model = $parameters ? $parameters->get($modelName) : null;
+        $model = $parameters ? $parameters->getEntity($modelName) : null;
 
         // Inherit model from current request url parameters
-        $model = $model ?: $this->urlParameters->get($modelName);
+        $model = $model ?: $this->urlParameters->getEntity($modelName);
 
         if (!$model) {
             throw new UrlPrototypeException('Can not find :name model in parameters', [':name' => $modelName]);
@@ -132,24 +145,24 @@ class UrlPrototypeHelper
         return $model;
     }
 
-    protected function calculateModelKeyValue(UrlPrototype $prototype, UrlDataSourceInterface $model)
+    protected function calculateModelKeyValue(UrlPrototype $prototype, DispatchableEntityInterface $entity)
     {
         $key = $prototype->getModelKey();
 
         if (!$prototype->isMethodCall()) {
-            return $model->getUrlKeyValue($key);
+            return $entity->getUrlKeyValue($key);
         }
 
         $method = $key;
 
-        if (!method_exists($model, $method)) {
+        if (!method_exists($entity, $method)) {
             throw new UrlPrototypeException('Method :method does not exists in model :model', [
                 ':method' => $method,
-                ':model'  => get_class($model),
+                ':model'  => get_class($entity),
             ]);
         }
 
-        return $model->$method();
+        return $entity->$method();
     }
 
     /**
@@ -165,7 +178,7 @@ class UrlPrototypeHelper
             throw new UrlPrototypeException('Empty url prototype string');
         }
 
-        $prototype = $this->cretePrototype();
+        $prototype = $this->createPrototype();
 
         list($name, $key) = explode('.', $string);
 
@@ -180,7 +193,7 @@ class UrlPrototypeHelper
             ->setModelKey($key);
     }
 
-    protected function cretePrototype()
+    private function createPrototype()
     {
         return new UrlPrototype;
     }

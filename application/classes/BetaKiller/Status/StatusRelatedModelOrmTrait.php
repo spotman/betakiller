@@ -1,9 +1,10 @@
 <?php
 namespace BetaKiller\Status;
 
-use BetaKiller\Graph\GraphNodeModelInterface;
+use BetaKiller\Acl\Resource\StatusRelatedModelAclResourceInterface;
 use BetaKiller\Graph\GraphTransitionModelInterface;
 use ORM;
+use Spotman\Acl\Resource\CrudPermissionsResourceInterface;
 
 trait StatusRelatedModelOrmTrait
 {
@@ -102,14 +103,6 @@ trait StatusRelatedModelOrmTrait
     }
 
     /**
-     * @return StatusModelInterface[]|GraphNodeModelInterface[]
-     */
-    public function get_allowed_statuses()
-    {
-        return $this->get_current_status()->get_target_nodes();
-    }
-
-    /**
      * @return StatusTransitionModelInterface[]|GraphTransitionModelInterface[]
      */
     public function get_source_transitions()
@@ -172,7 +165,7 @@ trait StatusRelatedModelOrmTrait
      *
      * @return $this
      */
-    public function filter_status_id($status_id, $not_equal = FALSE)
+    public function filter_status_id($status_id, $not_equal = false)
     {
         $col = $this->object_column($this->get_status_relation_foreign_key());
 
@@ -180,12 +173,12 @@ trait StatusRelatedModelOrmTrait
     }
 
     /**
-     * @param StatusModelInterface  $status
-     * @param bool                  $not_equal
+     * @param StatusModelInterface $status
+     * @param bool                 $not_equal
      *
      * @return $this
      */
-    public function filter_status(StatusModelInterface $status, $not_equal = FALSE)
+    public function filter_status(StatusModelInterface $status, $not_equal = false)
     {
         return $this->filter_status_id($status->get_id(), $not_equal);
     }
@@ -196,11 +189,40 @@ trait StatusRelatedModelOrmTrait
      *
      * @return $this
      */
-    public function filter_statuses(array $status_ids, $not_equal = FALSE)
+    public function filter_statuses(array $status_ids, $not_equal = false)
     {
         $col = $this->object_column($this->get_status_relation_foreign_key());
 
         return $this->where($col, $not_equal ? 'NOT IN' : 'IN', $status_ids);
+    }
+
+    /**
+     * @param \BetaKiller\Acl\Resource\StatusRelatedModelAclResourceInterface $resource
+     * @param string|null                                                     $action
+     *
+     * @return array
+     */
+    protected function filterAllowedStatuses(StatusRelatedModelAclResourceInterface $resource, $action = null)
+    {
+        if (!$action) {
+            $action = $resource::PERMISSION_READ;
+        }
+
+        // TODO Deal GLOBALLY with Acl AccessResolver as dependency for AclResource
+
+        /** @var \BetaKiller\Status\StatusModelInterface[] $allStatuses */
+        $allStatuses     = $this->status_model_factory()->get_all_nodes();
+        $allowedStatuses = [];
+
+        foreach ($allStatuses as $status) {
+            if ($resource->isStatusActionAllowed($status, $action)) {
+                $allowedStatuses[] = $status;
+            }
+        }
+
+        // TODO real filtering
+
+        return $allowedStatuses;
     }
 
     public function get_status_id()
@@ -210,7 +232,7 @@ trait StatusRelatedModelOrmTrait
 
     public function has_current_status()
     {
-        return (bool) $this->get_status_id();
+        return (bool)$this->get_status_id();
     }
 
     /**
@@ -218,7 +240,7 @@ trait StatusRelatedModelOrmTrait
      *
      * @return StatusModelOrm|\BetaKiller\Utils\Kohana\ORM\OrmInterface
      */
-    public function status_model_factory($id = NULL)
+    public function status_model_factory($id = null)
     {
         return ORM::factory($this->get_status_relation_model_name(), $id);
     }

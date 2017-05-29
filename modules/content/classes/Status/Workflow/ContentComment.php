@@ -1,14 +1,29 @@
 <?php
 
-use BetaKiller\Helper\AppEnvTrait;
-use BetaKiller\Notification\NotificationMessageCommon;
-use BetaKiller\Notification\NotificationUserEmail;
+use BetaKiller\Helper\NotificationHelper;
+use BetaKiller\Status\StatusRelatedModelInterface;
 use BetaKiller\Status\StatusWorkflow;
 use BetaKiller\Status\StatusWorkflowException;
 
 class Status_Workflow_ContentComment extends StatusWorkflow
 {
-    use AppEnvTrait;
+    /**
+     * @var \BetaKiller\Helper\NotificationHelper
+     */
+    private $notificationHelper;
+
+    /**
+     * Status_Workflow_ContentComment constructor.
+     *
+     * @param \BetaKiller\Status\StatusRelatedModelInterface $model
+     * @param \BetaKiller\Helper\NotificationHelper          $notificationHelper
+     */
+    public function __construct(StatusRelatedModelInterface $model, NotificationHelper $notificationHelper)
+    {
+        parent::__construct($model);
+
+        $this->notificationHelper = $notificationHelper;
+    }
 
     public function draft()
     {
@@ -48,7 +63,7 @@ class Status_Workflow_ContentComment extends StatusWorkflow
         $authorUser = $comment->get_author_user();
 
         // Skip notification for moderators
-        if ($authorUser && $authorUser->is_moderator()) {
+        if ($authorUser && $authorUser->isModerator()) {
             return;
         }
 
@@ -62,18 +77,12 @@ class Status_Workflow_ContentComment extends StatusWorkflow
             'label'      => $comment->get_related_content_label(),
         ];
 
-        $message = NotificationMessageCommon::instance();
+        $message = $this->notificationHelper
+            ->createMessage('user/comment/author-approve')
+            ->setTemplateData($data)
+            ->addTargetEmail($email, $name);
 
-        $message
-            ->set_template_name('user/comment/author-approve')
-            ->set_template_data($data);
-
-        if ($this->in_production()) {
-            $to = NotificationUserEmail::factory($email, $name);
-            $message->set_to($to);
-        } else {
-            $message->to_current_user();
-        }
+        $this->notificationHelper->rewriteTargetsForDebug($message);
 
         $message->send();
     }
@@ -106,18 +115,12 @@ class Status_Workflow_ContentComment extends StatusWorkflow
             'label'      => $reply->get_related_content_label(),
         ];
 
-        $message = NotificationMessageCommon::instance();
+        $message = $this->notificationHelper
+            ->createMessage('user/comment/parent-author-reply')
+            ->setTemplateData($data)
+            ->addTargetEmail($parentEmail, $parentName);
 
-        $message
-            ->set_template_name('user/comment/parent-author-reply')
-            ->set_template_data($data);
-
-        if ($this->in_production()) {
-            $to = NotificationUserEmail::factory($parentEmail, $parentName);
-            $message->set_to($to);
-        } else {
-            $message->to_current_user();
-        }
+        $this->notificationHelper->rewriteTargetsForDebug($message);
 
         $message->send();
     }

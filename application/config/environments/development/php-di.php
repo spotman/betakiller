@@ -1,12 +1,12 @@
 <?php
 
-use BetaKiller\IFace\Url\UrlDispatcherCache;
-use BetaKiller\IFace\Url\UrlDispatcherCacheInterface;
 use BetaKiller\Factory\CommonFactoryCache;
 use BetaKiller\Factory\FactoryCacheInterface;
+use BetaKiller\IFace\Url\UrlDispatcherCache;
+use BetaKiller\IFace\Url\UrlDispatcherCacheInterface;
 use DI\Scope;
 use Doctrine\Common\Cache\ArrayCache;
-use Spotman\Acl\Acl;
+use Spotman\Acl\AclInterface;
 
 return [
 
@@ -27,7 +27,7 @@ return [
             return new UrlDispatcherCache();
         })->scope(Scope::SINGLETON),
 
-        Acl::DI_CACHE_OBJECT_KEY => DI\object(ArrayCache::class),
+        AclInterface::DI_CACHE_OBJECT_KEY => DI\object(ArrayCache::class),
 
     ],
 

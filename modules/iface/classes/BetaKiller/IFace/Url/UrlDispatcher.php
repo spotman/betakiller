@@ -1,7 +1,7 @@
 <?php
 namespace BetaKiller\IFace\Url;
 
-use BetaKiller\Helper\AppEnvTrait;
+use BetaKiller\Helper\AppEnv;
 use BetaKiller\IFace\Exception\IFaceException;
 use BetaKiller\IFace\Exception\IFaceMissingUrlException;
 use BetaKiller\IFace\IFaceInterface;
@@ -9,13 +9,13 @@ use BetaKiller\IFace\IFaceModelInterface;
 use BetaKiller\IFace\IFaceProvider;
 use BetaKiller\IFace\IFaceStack;
 use HTTP;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerInterface;
 
 //use BetaKiller\IFace\HasCustomUrlBehaviour;
 
-class UrlDispatcher
+class UrlDispatcher implements LoggerAwareInterface
 {
-    use AppEnvTrait;
-
     /**
      * Current IFace stack
      *
@@ -26,7 +26,7 @@ class UrlDispatcher
     /**
      * Current Url parameters
      *
-     * @var UrlParameters
+     * @var \BetaKiller\IFace\Url\UrlParametersInterface
      */
     private $urlParameters;
 
@@ -46,18 +46,31 @@ class UrlDispatcher
     private $cache;
 
     /**
+     * @var \BetaKiller\Helper\AppEnv
+     */
+    private $appEnv;
+
+    /**
+     * @Inject
+     * @var \Psr\Log\LoggerInterface
+     */
+    private $logger;
+
+    /**
      * @param \BetaKiller\IFace\IFaceStack                      $stack
      * @param \BetaKiller\IFace\IFaceProvider                   $provider
      * @param \BetaKiller\IFace\Url\UrlParametersInterface      $parameters
      * @param \BetaKiller\IFace\Url\UrlPrototypeHelper          $helper
      * @param \BetaKiller\IFace\Url\UrlDispatcherCacheInterface $cache
+     * @param \BetaKiller\Helper\AppEnv                         $env
      */
     public function __construct(
         IFaceStack $stack,
         IFaceProvider $provider,
         UrlParametersInterface $parameters,
         UrlPrototypeHelper $helper,
-        UrlDispatcherCacheInterface $cache
+        UrlDispatcherCacheInterface $cache,
+        AppEnv $env
     )
     {
         $this->ifaceStack         = $stack;
@@ -65,15 +78,19 @@ class UrlDispatcher
         $this->urlParameters      = $parameters;
         $this->urlPrototypeHelper = $helper;
         $this->cache              = $cache;
+        $this->appEnv             = $env;
     }
 
     /**
-     * @return \BetaKiller\IFace\Url\UrlParameters
-     * @deprecated Use DI instead
+     * Sets a logger instance on the object.
+     *
+     * @param LoggerInterface $logger
+     *
+     * @return void
      */
-    public function parameters()
+    public function setLogger(LoggerInterface $logger)
     {
-        return $this->urlParameters;
+        $this->logger = $logger;
     }
 
     public function process($uri)
@@ -115,9 +132,7 @@ class UrlDispatcher
             $ifaceInstance = null;
 
             try {
-                $rootRequested = !$urlIterator->count();
-
-                if ($rootRequested) {
+                if ($urlIterator->rootRequested()) {
                     $ifaceInstance = $this->ifaceProvider->getDefault();
 
                     $this->processIFaceUrlBehaviour($ifaceInstance->getModel(), $urlIterator);
@@ -125,11 +140,12 @@ class UrlDispatcher
                     $ifaceInstance = $this->parseUriLayer($urlIterator, $parentIFace);
                 }
             } catch (UrlDispatcherException $e) {
-                if (!$this->in_production(true)) {
+                if (!$this->appEnv->inProduction(true)) {
                     throw $e;
                 }
 
-                // Do nothing
+                // Log this exception and keep processing
+                $this->logger->warning('Url parsing error', ['exception' => $e]);
             }
 
             // Throw IFaceMissingUrlException so we can forward user to parent iface or custom 404 page
@@ -172,15 +188,14 @@ class UrlDispatcher
         try {
             $layer = $this->ifaceProvider->getModelsLayer($parentIFace);
         } catch (IFaceException $e) {
-            if (!$this->in_production(true)) {
+            if (!$this->appEnv->inProduction(true)) {
                 throw $e;
             }
 
             $parentUrl = $parentIFace ? $parentIFace->url($this->urlParameters, false) : null;
 
             if ($parentUrl) {
-                // TODO PSR-7 Create interface for redirect() method, use it in Response and send Response instance to $this via DI
-                HTTP::redirect($parentUrl);
+                $this->redirect($parentUrl);
             } else {
                 $this->throwMissingUrlException($it, $parentIFace);
             }
@@ -189,6 +204,12 @@ class UrlDispatcher
         $model = $this->selectIFaceModel($layer, $it);
 
         return $model ? $this->ifaceProvider->fromModel($model) : null;
+    }
+
+    private function redirect($url, $code = null)
+    {
+        // TODO PSR-7 Create interface for redirect() method, use it in Response and send Response instance to $this via DI
+        HTTP::redirect($url, $code ?: 302);
     }
 
     /**
@@ -248,7 +269,7 @@ class UrlDispatcher
 
             do {
                 try {
-                    $this->parseUriParameterPart($model, $it->current());
+                    $this->parseUriParameterPart($model, $it);
                     $it->next();
                     $step++;
                 } catch (UrlDispatcherException $e) {
@@ -268,27 +289,21 @@ class UrlDispatcher
 //            $this->processCustomUrlBehaviour($model, $it);
 //            return $model;
 //        }
-        elseif ($model->hasDynamicUrl()) {
+
+        if ($model->hasDynamicUrl()) {
             // Regular dynamic URL, parse uri
-            $this->parseUriParameterPart($model, $it->current());
+            $this->parseUriParameterPart($model, $it);
 
             return true;
-        } elseif ($model->getUri() === $it->current()) {
+        }
+
+        if ($model->getUri() === $it->current()) {
             // Fixed URL found, simply exit
             return true;
         }
 
         // No processing done
         return false;
-    }
-
-    /**
-     * @deprecated Url dispatching must be persistent
-     */
-    public function reset()
-    {
-        $this->urlParameters->clear();
-        $this->ifaceStack->clear();
     }
 
 //    protected function processCustomUrlBehaviour(IFaceModelInterface $iface_model, UrlPathIterator $it)
@@ -311,45 +326,14 @@ class UrlDispatcher
 //    }
 
     /**
-     * Returns TRUE if provided IFace was initialized through url parsing
-     *
-     * @param IFaceInterface $iface
-     *
-     * @deprecated Use IFaceStack::has() instead
-     *
-     * @return bool
-     */
-    public function hasInStack(IFaceInterface $iface)
-    {
-        return $this->ifaceStack->has($iface);
-    }
-
-    /**
-     * @return IFaceInterface|null
-     */
-    public function currentIFace()
-    {
-        return $this->ifaceStack->getCurrent();
-    }
-
-    /**
-     * @param IFaceInterface                                    $iface
-     * @param \BetaKiller\IFace\Url\UrlParametersInterface|NULL $parameters
-     *
-     * @return bool
-     */
-    public function isCurrentIFace(IFaceInterface $iface, UrlParametersInterface $parameters = null)
-    {
-        return $this->ifaceStack->isCurrent($iface, $parameters);
-    }
-
-    /**
      * @param IFaceInterface $iface
      *
      * @return $this
      */
     protected function pushToStack(IFaceInterface $iface)
     {
+        $this->checkIFaceAccess($iface);
+
         $this->ifaceStack->push($iface);
 
         return $this;
@@ -367,31 +351,33 @@ class UrlDispatcher
 //        }
 //    }
 
-    public function parseUriParameterPart(IFaceModelInterface $ifaceModel, $uriValue)
+    public function parseUriParameterPart(IFaceModelInterface $ifaceModel, UrlPathIterator $it)
     {
         $prototype  = $this->urlPrototypeHelper->fromIFaceModelUri($ifaceModel);
-        $dataSource = $this->urlPrototypeHelper->getModelInstance($prototype);
+        $dataSource = $this->urlPrototypeHelper->getDataSourceInstance($prototype);
 
-        if (!$uriValue) {
-            // Allow processing of root element
-            $uriValue = $dataSource->getDefaultUrlValue();
-        }
+        // Allow processing of root element
+        $uriValue = !$it->rootRequested()
+            ? $it->current()
+            : $uriValue = DispatchableEntityInterface::DEFAULT_URI;
 
-        $modelName = $prototype->getModelName();
         $modelKey  = $prototype->getModelKey();
+        $modelName = $prototype->getDataSourceName();
 
         // Search for model item
-        $model = $dataSource->findByUrlKey($modelKey, $uriValue, $this->urlParameters);
+        $entity = $dataSource->findByUrlKey($modelKey, $uriValue, $this->urlParameters);
 
-        if (!$model) {
+        if (!$entity) {
             throw new UrlDispatcherException('Can not find item for [:prototype] by [:value]', [
                 ':prototype' => $ifaceModel->getUri(),
                 ':value'     => $uriValue,
             ]);
         }
 
+        $this->checkEntityAccess($entity);
+
         // Allow current model to preset "belongs to" models
-        $model->presetLinkedModels($this->urlParameters);
+        $entity->presetLinkedModels($this->urlParameters);
 
         // Store model into registry
         $setter   = mb_strtolower('set_'.$modelName);
@@ -402,16 +388,28 @@ class UrlDispatcher
         }
 
         // Allow tree url behaviour to set value multiple times
-        $registry->set($modelName, $model, true);
+        $registry->setEntity($entity, $ifaceModel->hasTreeBehaviour());
+    }
+
+    private function checkEntityAccess(DispatchableEntityInterface $entity)
+    {
+        // TODO check Acl Resource action for provided entity
+        // TODO Use AclHelper
+    }
+
+    private function checkIFaceAccess(IFaceInterface $ifaceModel)
+    {
+        // TODO check Acl Resource action for provided iface
+        // TODO Use AclHelper
     }
 
     private function storeDataInCache($url)
     {
-        $stackData = $this->ifaceStack->getCodenames();
-        $paramsData = $this->urlParameters->getAll();
+        $stackData  = $this->ifaceStack->getCodenames();
+        $paramsData = $this->urlParameters->getAllEntities();
 
         $this->cache->set($url, [
-            'stack' => $stackData,
+            'stack'      => $stackData,
             'parameters' => $paramsData,
         ]);
     }
@@ -430,31 +428,44 @@ class UrlDispatcher
         }
 
         if (!is_array($data)) {
-            throw new UrlDispatcherException('Cached data is incorrect');
+            // Log and keep processing as no cache was found
+            $this->logger->warning('Cached UrlDispatcher data is incorrect', ['cachedData' => print_r($data, true)]);
+            return false;
         }
 
         /** @var array $stackData */
         $stackData = $data['stack'];
 
-        /** @var \BetaKiller\IFace\Url\UrlDataSourceInterface[] $paramsData */
+        /** @var \BetaKiller\IFace\Url\DispatchableEntityInterface[] $paramsData */
         $paramsData = $data['parameters'];
 
-        // Restore ifaces and push them into stack
-        foreach ($stackData as $ifaceCodename) {
-            $iface = $this->ifaceProvider->fromCodename($ifaceCodename);
-            $this->ifaceStack->push($iface);
-        }
-
-        // Restore url parameters
-        foreach ($paramsData as $key => $value) {
-
-            if (!($value instanceof UrlDataSourceInterface)) {
-                throw new UrlDispatcherException('Cached data for url parameters is incorrect');
+        try {
+            // Restore ifaces and push them into stack
+            foreach ($stackData as $ifaceCodename) {
+                $iface = $this->ifaceProvider->fromCodename($ifaceCodename);
+                $this->ifaceStack->push($iface);
             }
 
-            $this->urlParameters->set($key, $value);
+            // Restore url parameters
+            foreach ($paramsData as $key => $value) {
+                if (!($value instanceof DispatchableEntityInterface)) {
+                    throw new UrlDispatcherException('Cached data for url parameters is incorrect');
+                }
+
+                $this->checkEntityAccess($value);
+
+                $this->urlParameters->setEntity($value);
+            }
+
+            return true;
+        } catch (\Throwable $e) {
+            // Log and keep processing as no cache was found
+            $this->logger->warning('Error on unpacking UrlDispatcher data: ', ['exception' => $e]);
+        } catch (\Exception $e) {
+            // Log and keep processing as no cache was found
+            $this->logger->warning('Error on unpacking UrlDispatcher data: ', ['exception' => $e]);
         }
 
-        return true;
+        return false;
     }
 }

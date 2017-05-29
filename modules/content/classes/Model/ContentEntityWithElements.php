@@ -3,7 +3,7 @@
 use BetaKiller\Content\ContentElementInterface;
 use BetaKiller\Model\UserInterface;
 
-abstract class Model_ContentEntityWithElements extends Model_ContentEntity
+abstract class Model_EntityWithElements extends Model_Entity
 {
     /**
      * Returns model name which describes elements (images, attachments, etc)

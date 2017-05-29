@@ -6,45 +6,58 @@ interface NotificationMessageInterface
     /**
      * @return NotificationUserInterface
      */
-    public function get_from();
+    public function getFrom();
 
     /**
      * @param NotificationUserInterface $value
      *
      * @return $this|NotificationMessageInterface
      */
-    public function set_from(NotificationUserInterface $value);
+    public function setFrom(NotificationUserInterface $value);
 
     /**
      * @return NotificationUserInterface[]
      */
-    public function get_to();
+    public function getTargets();
 
     /**
      * @return string[]
      */
-    public function get_to_emails();
+    public function getTargetsEmails();
 
     /**
      * @param NotificationUserInterface $value
      *
      * @return $this|NotificationMessageInterface
      */
-    public function set_to(NotificationUserInterface $value);
+    public function addTarget(NotificationUserInterface $value);
+
+    /**
+     * @param string $email
+     * @param string $name
+     *
+     * @return $this|\BetaKiller\Notification\NotificationMessageInterface
+     */
+    public function addTargetEmail($email, $fullName);
 
     /**
      * @param NotificationUserInterface[]|\Iterator $users
      *
      * @return $this
      */
-    public function to_users($users);
+    public function addTargetUsers($users);
+
+    /**
+     * @return $this|\BetaKiller\Notification\NotificationMessageInterface
+     */
+    public function clearTargets();
 
     /**
      * @param \BetaKiller\Notification\NotificationUserInterface $targetUser
      *
      * @return string
      */
-    public function get_subj(NotificationUserInterface $targetUser);
+    public function getSubj(NotificationUserInterface $targetUser);
 
     /**
      * @param string $value
@@ -52,19 +65,19 @@ interface NotificationMessageInterface
      * @return $this|NotificationMessageInterface
      * @deprecated Use I18n registry for subject definition (key is based on template path)
      */
-    public function set_subj($value);
+    public function setSubj($value);
 
     /**
      * @return array
      */
-    public function get_attachments();
+    public function getAttachments();
 
     /**
      * @param string $path
      *
      * @return $this|NotificationMessageInterface
      */
-    public function add_attachment($path);
+    public function addAttachment($path);
 
     /**
      * Send current message via default notification instance
@@ -74,28 +87,28 @@ interface NotificationMessageInterface
     public function send();
 
     /**
-     * @param $template_name
+     * @param string $template_name
      *
      * @return $this
      */
-    public function set_template_name($template_name);
+    public function setTemplateName($template_name);
 
     /**
      * @return string
      */
-    public function get_template_name();
+    public function getTemplateName();
 
     /**
      * @param array $data
      *
      * @return $this
      */
-    public function set_template_data(array $data);
+    public function setTemplateData(array $data);
 
     /**
      * @return array
      */
-    public function get_template_data();
+    public function getTemplateData();
 
     /**
      * Render message for sending via provided transport

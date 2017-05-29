@@ -2,16 +2,9 @@
 namespace BetaKiller\IFace\Admin\Content;
 
 use BetaKiller\Helper\ContentUrlParametersHelper;
-use BetaKiller\Acl\Resource\ContentPostResource;
-use Spotman\Acl\AccessResolver\AclAccessResolverInterface;
 
 class PostItem extends AdminBase
 {
-    /**
-     * @var \BetaKiller\Acl\Resource\ContentPostResource
-     */
-    private $contentPostResource;
-
     /**
      * @var \BetaKiller\Helper\ContentUrlParametersHelper
      */
@@ -20,24 +13,11 @@ class PostItem extends AdminBase
     /**
      * PostItem constructor.
      *
-     * @param \BetaKiller\Helper\ContentUrlParametersHelper $urlParametersHelper
-     */
-
-    /**
-     * PostItem constructor.
-     *
      * @param \BetaKiller\Helper\ContentUrlParametersHelper          $urlParametersHelper
-     * @param \BetaKiller\Acl\Resource\ContentPostResource           $resource
-     * @param \Spotman\Acl\AccessResolver\AclAccessResolverInterface $resolver
      */
-    public function __construct(
-        ContentUrlParametersHelper $urlParametersHelper,
-        ContentPostResource $resource,
-        AclAccessResolverInterface $resolver
-    )
+    public function __construct(ContentUrlParametersHelper $urlParametersHelper)
     {
         $this->urlParametersHelper = $urlParametersHelper;
-        $this->contentPostResource = $resource->useResolver($resolver);
     }
 
     /**
@@ -50,10 +30,14 @@ class PostItem extends AdminBase
     {
         $post = $this->urlParametersHelper->getContentPost();
 
+        /** @var \BetaKiller\Acl\Resource\ContentPostResource $contentPostResource */
+        $contentPostResource = $this->acl->getResource('ContentPost');
+
+        $contentPostResource->useStatusRelatedModel($post);
+
         $thumbnails = [];
 
-        foreach ($post->getThumbnails() as $thumb)
-        {
+        foreach ($post->getThumbnails() as $thumb) {
             $thumbnails[$thumb->get_id()] = $thumb->getAttributesForImgTag($thumb::SIZE_PREVIEW);
         }
 
@@ -61,8 +45,6 @@ class PostItem extends AdminBase
         $post->useLatestRevision();
 
         $status = $post->get_current_status();
-
-        $this->contentPostResource->useStatusRelatedModel($post);
 
         return [
             'post' => [
@@ -74,7 +56,7 @@ class PostItem extends AdminBase
                 'description'   =>  $post->getDescription(),
 
                 'needsCategory'   => $post->needsCategory(),
-                'isUpdateAllowed' => $this->contentPostResource->isUpdateAllowed(),
+                'isUpdateAllowed' => $contentPostResource->isUpdateAllowed(),
 
                 'status'        =>  [
                     'id'            =>  $status->get_id(),

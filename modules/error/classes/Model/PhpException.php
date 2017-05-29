@@ -1,17 +1,13 @@
 <?php
 
-use BetaKiller\Error\PhpExceptionModelInterface;
 use BetaKiller\Error\PhpExceptionHistoryModelInterface;
-use BetaKiller\Model\UserInterface;
+use BetaKiller\Error\PhpExceptionModelInterface;
 use BetaKiller\Helper\UserModelFactoryTrait;
-use BetaKiller\Helper\ErrorHelperTrait;
+use BetaKiller\Model\UserInterface;
 
 class Model_PhpException extends \ORM implements PhpExceptionModelInterface
 {
     use UserModelFactoryTrait;
-    use ErrorHelperTrait;
-
-    const URL_PARAM = 'PhpException';
 
     private static $_tablesChecked = false;
 
@@ -24,11 +20,12 @@ class Model_PhpException extends \ORM implements PhpExceptionModelInterface
      */
     protected function _initialize()
     {
-        $this->_db_group = 'filesystem';
+        $this->_db_group   = 'filesystem';
         $this->_table_name = 'errors';
 
         /**
          * Auto-serialize and unserialize columns on get/set
+         *
          * @var array
          */
         $this->_serialize_columns = [
@@ -38,9 +35,9 @@ class Model_PhpException extends \ORM implements PhpExceptionModelInterface
         ];
 
         $this->has_many([
-            'history'   =>  [
-                'model'         =>  'PhpExceptionHistory',
-                'foreign_key'   =>  'error_id',
+            'history' => [
+                'model'       => 'PhpExceptionHistory',
+                'foreign_key' => 'error_id',
             ],
         ]);
 
@@ -106,13 +103,14 @@ class Model_PhpException extends \ORM implements PhpExceptionModelInterface
         $modules = $this->getModules();
 
         // Skip adding if provided path was added already
-        if (!$module || in_array($module, $modules) ) {
+        if (!$module || in_array($module, $modules)) {
             return $this;
         }
 
         $modules[] = $module;
 
         $this->setModules($modules);
+
         return $this;
     }
 
@@ -121,12 +119,13 @@ class Model_PhpException extends \ORM implements PhpExceptionModelInterface
      */
     public function getModules()
     {
-        return (array) $this->get('modules');
+        return (array)$this->get('modules');
     }
 
     protected function setModules(array $modules)
     {
         $this->set('modules', $modules);
+
         return $this;
     }
 
@@ -141,6 +140,7 @@ class Model_PhpException extends \ORM implements PhpExceptionModelInterface
     public function setHash($value)
     {
         $this->set('hash', $value);
+
         return $this;
     }
 
@@ -151,6 +151,7 @@ class Model_PhpException extends \ORM implements PhpExceptionModelInterface
      */
     public function findByHash($hash)
     {
+        /** @var PhpExceptionModelInterface $model */
         $model = $this->model_factory()
             ->where('hash', '=', $hash)
             ->find();
@@ -163,7 +164,7 @@ class Model_PhpException extends \ORM implements PhpExceptionModelInterface
      */
     public function getCounter()
     {
-        return $this->loaded() ? (int) $this->getTotal() : 0;
+        return $this->loaded() ? (int)$this->getTotal() : 0;
     }
 
     /**
@@ -176,7 +177,8 @@ class Model_PhpException extends \ORM implements PhpExceptionModelInterface
 
     protected function setTotal($value)
     {
-        $this->set('total', (int) $value);
+        $this->set('total', (int)$value);
+
         return $this;
     }
 
@@ -204,6 +206,7 @@ class Model_PhpException extends \ORM implements PhpExceptionModelInterface
     public function setMessage($value)
     {
         $this->set('message', $value);
+
         return $this;
     }
 
@@ -217,13 +220,14 @@ class Model_PhpException extends \ORM implements PhpExceptionModelInterface
         $paths = $this->getPaths();
 
         // Skip adding if provided path was added already
-        if (!$path || in_array($path, $paths) ) {
+        if (!$path || in_array($path, $paths)) {
             return $this;
         }
 
         $paths[] = $path;
 
         $this->setPaths($paths);
+
         return $this;
     }
 
@@ -232,12 +236,13 @@ class Model_PhpException extends \ORM implements PhpExceptionModelInterface
      */
     public function getPaths()
     {
-        return (array) $this->get('paths');
+        return (array)$this->get('paths');
     }
 
     protected function setPaths(array $paths)
     {
         $this->set('paths', $paths);
+
         return $this;
     }
 
@@ -251,13 +256,14 @@ class Model_PhpException extends \ORM implements PhpExceptionModelInterface
         $urls = $this->getUrls();
 
         // Skip adding if provided path was added already
-        if (!$url || in_array($url, $urls) ) {
+        if (!$url || in_array($url, $urls)) {
             return $this;
         }
 
         $urls[] = $url;
 
         $this->setUrls($urls);
+
         return $this;
     }
 
@@ -266,12 +272,13 @@ class Model_PhpException extends \ORM implements PhpExceptionModelInterface
      */
     public function getUrls()
     {
-        return (array) $this->get('urls');
+        return (array)$this->get('urls');
     }
 
     protected function setUrls(array $urls)
     {
         $this->set('urls', $urls);
+
         return $this;
     }
 
@@ -347,6 +354,7 @@ class Model_PhpException extends \ORM implements PhpExceptionModelInterface
     protected function setResolvedBy(UserInterface $user = null)
     {
         $this->set('resolved_by', $user ? $user->get_id() : null);
+
         return $this;
     }
 
@@ -371,6 +379,7 @@ class Model_PhpException extends \ORM implements PhpExceptionModelInterface
     {
         $this->setStatus(PhpExceptionModelInterface::STATE_NEW);
         $this->addHistoryRecord($user);
+
         return $this;
     }
 
@@ -485,7 +494,8 @@ class Model_PhpException extends \ORM implements PhpExceptionModelInterface
      */
     protected function setStatus($status)
     {
-        $this->set('status', (string) $status);
+        $this->set('status', (string)$status);
+
         return $this;
     }
 
@@ -518,7 +528,10 @@ class Model_PhpException extends \ORM implements PhpExceptionModelInterface
         // Get error ID for new records
         $this->save();
 
-        return $this->phpExceptionHistoryModelFactory()
+        /** @var \Model_PhpExceptionHistory $historyModel */
+        $historyModel = $this->getHistoryRelation()->model_factory();
+
+        return $historyModel
             ->setPhpException($this)
             ->setStatus($this->getStatus())
             ->setTimestamp(new DateTime)
@@ -577,7 +590,7 @@ class Model_PhpException extends \ORM implements PhpExceptionModelInterface
         /** @var \BetaKiller\IFace\Admin\Error\PhpExceptionItem $iface */
         $iface = $this->iface_from_codename('Admin_Error_PhpExceptionItem');
 
-        $params = $this->url_parameters_instance()->set(self::URL_PARAM, $this);
+        $params = $this->url_parameters_instance()->setDataSource($this);
 
         return $iface->url($params);
     }

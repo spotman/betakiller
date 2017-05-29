@@ -25,7 +25,7 @@ class Task_Content_Import_Wordpress extends Minion_Task
     const WP_OPTION_PARSING_MODE = 'betakiller_parsing_mode';
     const WP_OPTION_PARSING_PATH = 'betakiller_parsing_path';
 
-    const CONTENT_ENTITY_ID = Model_ContentEntity::POSTS_ENTITY_ID;
+    const CONTENT_ENTITY_ID = Model_Entity::POSTS_ENTITY_ID;
 
     protected $attach_parsing_mode;
 
@@ -134,7 +134,7 @@ class Task_Content_Import_Wordpress extends Minion_Task
 //    }
 
     /**
-     * @return Model_ContentEntity
+     * @return Model_Entity
      */
     protected function get_content_post_entity()
     {

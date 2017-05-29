@@ -8,7 +8,7 @@ use BetaKiller\Status\StatusRelatedModelOrmTrait;
 use BetaKiller\Status\StatusRelatedModelInterface;
 use BetaKiller\Helper\HasPublicUrlInterface;
 use BetaKiller\Helper\HasAdminUrlInterface;
-use BetaKiller\Helper\IFaceTrait;
+use BetaKiller\Helper\IFaceHelperTrait;
 use Spotman\Api\AbstractCrudMethodsModelInterface;
 
 class Model_ContentComment extends TreeModelSingleParentOrm
@@ -17,7 +17,7 @@ class Model_ContentComment extends TreeModelSingleParentOrm
     use Model_ORM_ContentRelatedTrait;
     use Model_ORM_ImportedFromWordpressTrait;
     use StatusRelatedModelOrmTrait;
-    use IFaceTrait;
+    use IFaceHelperTrait;
 
     const URL_PARAM = 'ContentComment';
 
@@ -141,7 +141,7 @@ class Model_ContentComment extends TreeModelSingleParentOrm
         /** @var \BetaKiller\IFace\Admin\Content\CommentItem $iface */
         $iface = $this->iface_from_codename('Admin_Content_CommentItem');
 
-        $params = $this->url_parameters_instance()->set(self::URL_PARAM, $this);
+        $params = $this->url_parameters_instance()->setEntity($this);
 
         return $iface->url($params);
     }
@@ -478,12 +478,12 @@ class Model_ContentComment extends TreeModelSingleParentOrm
     }
 
     /**
-     * @param \Model_ContentEntity $entity
-     * @param int                  $entity_item_id
+     * @param \Model_Entity $entity
+     * @param int           $entity_item_id
      *
      * @return Model_ContentComment[]
      */
-    public function get_entity_item_approved_comments(Model_ContentEntity $entity, $entity_item_id)
+    public function get_entity_item_approved_comments(Model_Entity $entity, $entity_item_id)
     {
         /** @var Model_ContentCommentStatus $status */
         $status = $this->get_status_relation();
@@ -492,7 +492,7 @@ class Model_ContentComment extends TreeModelSingleParentOrm
         return $this->get_comments_ordered_by_path($status, $entity, $entity_item_id);
     }
 
-    public function get_comments_ordered_by_path(Model_ContentCommentStatus $status = null, Model_ContentEntity $entity = null, $entity_item_id = null)
+    public function get_comments_ordered_by_path(Model_ContentCommentStatus $status = null, Model_Entity $entity = null, $entity_item_id = null)
     {
         /** @var \Model_ContentComment $model */
         $model = $this->model_factory();
@@ -531,7 +531,7 @@ class Model_ContentComment extends TreeModelSingleParentOrm
         return $this->get_comments_count($status);
     }
 
-    public function get_comments_count(Model_ContentCommentStatus $status = null, Model_ContentEntity $entity = null, $entity_item_id = null)
+    public function get_comments_count(Model_ContentCommentStatus $status = null, Model_Entity $entity = null, $entity_item_id = null)
     {
         /** @var \Model_ContentComment $model */
         $model = $this->model_factory();

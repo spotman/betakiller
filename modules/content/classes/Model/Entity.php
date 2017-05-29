@@ -1,9 +1,13 @@
 <?php
 
-use BetaKiller\Content\LinkedContentModelInterface;
+use BetaKiller\Content\EntityLinkedModelInterface;
 
-class Model_ContentEntity extends ORM
+class Model_Entity extends ORM
 {
+    /**
+     * TODO remove and replace by helper method for searching by name
+     * @deprecated
+     */
     const POSTS_ENTITY_ID = 1;
 
     /**
@@ -15,18 +19,18 @@ class Model_ContentEntity extends ORM
      */
     protected function _initialize()
     {
-        $this->_table_name = 'content_entities';
+        $this->_table_name = 'entities';
 
         parent::_initialize();
     }
 
     /**
-     * Возвращает символическое имя сущности
+     * Returns entity short name (may be used for url creating)
      *
      * @return string
      * @throws Kohana_Exception
      */
-    public function get_slug()
+    public function getSlug()
     {
         return $this->get('slug');
     }
@@ -36,7 +40,7 @@ class Model_ContentEntity extends ORM
      *
      * @return $this
      */
-    public function set_slug($value)
+    public function setSlug($value)
     {
         return $this->set('slug', $value);
     }
@@ -47,7 +51,7 @@ class Model_ContentEntity extends ORM
      * @return string
      * @throws Kohana_Exception
      */
-    public function get_linked_model_name()
+    public function getLinkedModelName()
     {
         return $this->get('model_name');
     }
@@ -57,30 +61,31 @@ class Model_ContentEntity extends ORM
      *
      * @return $this
      */
-    public function set_related_model_name($value)
+    public function setLinkedModelName($value)
     {
         return $this->set('model_name', $value);
     }
 
     /**
      * @param string $slug
-     * @return Model_ContentEntity
+     *
+     * @return Model_Entity
      * @throws Kohana_Exception
      */
-    public function find_by_slug($slug)
+    public function findBySlug($slug)
     {
         $model = $this->where('slug', '=', $slug)->find();
 
         if (!$model->loaded()) {
-            throw new Kohana_Exception('Unknown content entity slug :value', [':value' => $slug]);
+            throw new Kohana_Exception('Unknown entity slug :value', [':value' => $slug]);
         }
 
         return $model;
     }
 
-    public function get_title()
+    public function getTitle()
     {
-        return __('content.entities.'.$this->get_slug());
+        return __('entities.'.$this->getSlug());
     }
 
     /**
@@ -88,19 +93,19 @@ class Model_ContentEntity extends ORM
      *
      * @param int|null $id
      *
-     * @return LinkedContentModelInterface
+     * @return EntityLinkedModelInterface
      * @throws Exception
      * @throws Kohana_Exception
      */
-    public function get_linked_model_instance($id = null)
+    public function getLinkedModelInstance($id = null)
     {
-        $name = $this->get_linked_model_name();
+        $name = $this->getLinkedModelName();
         $model = $this->model_factory($id, $name);
-        $target_class = LinkedContentModelInterface::class;
+        $targetClass = EntityLinkedModelInterface::class;
 
-        if (!($model instanceof $target_class)) {
-            throw new Kohana_Exception('Entity-linked content model must be an instance of :target, :current given', [
-                ':target'   =>  $target_class,
+        if (!($model instanceof $targetClass)) {
+            throw new Kohana_Exception('Entity-linked model must be an instance of :target, :current given', [
+                ':target'   =>  $targetClass,
                 ':current'  =>  get_class($model),
             ]);
         }
@@ -110,6 +115,6 @@ class Model_ContentEntity extends ORM
 //
 //    public function get_related_model_item_title($item_id)
 //    {
-//        return $this->get_linked_model_instance()->get_title_by_item_id($item_id);
+//        return $this->getLinkedModelInstance()->get_title_by_item_id($item_id);
 //    }
 }

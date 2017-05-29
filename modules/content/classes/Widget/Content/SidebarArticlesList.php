@@ -4,7 +4,11 @@ use BetaKiller\IFace\Widget\BaseWidget;
 
 abstract class Widget_Content_SidebarArticlesList extends BaseWidget
 {
-    use \BetaKiller\Helper\ContentTrait;
+    /**
+     * @Inject
+     * @var \BetaKiller\Helper\ContentUrlParametersHelper
+     */
+    private $urlParametersHelper;
 
     /**
      * Returns data for View rendering
@@ -13,20 +17,19 @@ abstract class Widget_Content_SidebarArticlesList extends BaseWidget
      */
     public function getData()
     {
-        $limit = (int) $this->getContextParam('limit', 5);
+        $limit      = (int)$this->getContextParam('limit', 5);
         $exclude_id = $this->get_current_article_id();
 
         $articles = $this->get_articles_list($exclude_id, $limit);
 
         $data = [];
 
-        foreach ($articles as $article)
-        {
+        foreach ($articles as $article) {
             $data[] = $this->get_article_data($article);
         }
 
         return [
-            'articles'  =>  $data,
+            'articles' => $data,
         ];
     }
 
@@ -40,9 +43,9 @@ abstract class Widget_Content_SidebarArticlesList extends BaseWidget
 
     protected function get_current_article_id()
     {
-        $current_article = $this->url_parameter_content_post();
+        $current_article = $this->urlParametersHelper->getContentPost();
 
-        return $current_article ? $current_article->get_id() : NULL;
+        return $current_article ? $current_article->get_id() : null;
     }
 
     protected function get_article_data(Model_ContentPost $article)
@@ -51,10 +54,10 @@ abstract class Widget_Content_SidebarArticlesList extends BaseWidget
         $thumbnail = $article->getFirstThumbnail();
 
         return [
-            'label'     =>  $article->getLabel(),
-            'thumbnail' =>  $thumbnail->getAttributesForImgTag($thumbnail::SIZE_PREVIEW),
-            'url'       =>  $article->get_public_url(),
-            'date'      =>  $article->getCreatedAt()->format('d.m.Y'),
+            'label'     => $article->getLabel(),
+            'thumbnail' => $thumbnail->getAttributesForImgTag($thumbnail::SIZE_PREVIEW),
+            'url'       => $article->get_public_url(),
+            'date'      => $article->getCreatedAt()->format('d.m.Y'),
         ];
     }
 }

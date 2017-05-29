@@ -49,7 +49,7 @@ class UrlPrototype
     /**
      * @return string
      */
-    public function getModelName()
+    public function getDataSourceName()
     {
         return $this->modelName;
     }

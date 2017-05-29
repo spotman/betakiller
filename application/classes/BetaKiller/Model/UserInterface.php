@@ -37,15 +37,14 @@ interface UserInterface extends OrmInterface, NotificationUserInterface, AclUser
 
     /**
      * @return bool
-     * @deprecated Use ACL resources instead
      */
-    public function is_developer();
+    public function isDeveloper();
 
     /**
      * @return bool
      * @deprecated Use ACL resources instead
      */
-    public function is_moderator();
+    public function isModerator();
 
     /**
      * @param RoleInterface|string $role
@@ -204,4 +203,12 @@ interface UserInterface extends OrmInterface, NotificationUserInterface, AclUser
      * @return array
      */
     public function as_array();
+
+    /**
+     * Forces authorization if user is not logged in
+     *
+     * @throws \HTTP_Exception_401
+     * @return void
+     */
+    public function forceAuthorization();
 }

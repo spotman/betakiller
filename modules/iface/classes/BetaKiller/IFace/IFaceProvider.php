@@ -4,23 +4,29 @@ namespace BetaKiller\IFace;
 use BetaKiller\Factory\NamespaceBasedFactory;
 use BetaKiller\IFace\Exception\IFaceException;
 use BetaKiller\IFace\ModelProvider\IFaceModelProviderAggregate;
+use BetaKiller\IFace\Url\DispatchableEntityInterface;
 
 class IFaceProvider
 {
     /**
      * @var IFaceInterface[]
      */
-    protected $ifaceInstances;
+    private $ifaceInstances;
 
     /**
      * @var IFaceModelProviderAggregate
      */
-    protected $modelProvider;
+    private $modelProvider;
 
     /**
      * @var \BetaKiller\Factory\NamespaceBasedFactory
      */
-    protected $factory;
+    private $factory;
+
+    /**
+     * @var string[]
+     */
+    private $entityLinkedCodenameCache;
 
     /**
      * IFaceProvider constructor
@@ -36,12 +42,12 @@ class IFaceProvider
 
     public function fromCodename($codename)
     {
-        $iface = $this->getFromCache($codename);
+        $iface = $this->getInstanceFromCache($codename);
 
         if (!$iface) {
             $model = $this->getModelProvider()->getByCodename($codename);
             $iface = $this->createIFace($model);
-            $this->storeInCache($codename, $iface);
+            $this->storeInstanceInCache($codename, $iface);
         }
 
         return $iface;
@@ -52,7 +58,7 @@ class IFaceProvider
      *
      * @return \BetaKiller\IFace\IFaceInterface|null
      */
-    protected function getFromCache($codename)
+    protected function getInstanceFromCache($codename)
     {
         return isset($this->ifaceInstances[$codename])
             ? $this->ifaceInstances[$codename]
@@ -87,7 +93,7 @@ class IFaceProvider
      * @param string                           $codename
      * @param \BetaKiller\IFace\IFaceInterface $iface
      */
-    protected function storeInCache($codename, IFaceInterface $iface)
+    protected function storeInstanceInCache($codename, IFaceInterface $iface)
     {
         $this->ifaceInstances[$codename] = $iface;
     }
@@ -127,7 +133,7 @@ class IFaceProvider
      */
     public function getParent(IFaceInterface $iface)
     {
-        $model        = $iface->getModel();
+        $model       = $iface->getModel();
         $parentModel = $this->getModelProvider()->getParent($model);
 
         return $parentModel
@@ -143,13 +149,67 @@ class IFaceProvider
     public function fromModel(IFaceModelInterface $model)
     {
         $codename = $model->getCodename();
-        $iface    = $this->getFromCache($codename);
+        $iface    = $this->getInstanceFromCache($codename);
 
         if (!$iface) {
             $iface = $this->createIFace($model);
-            $this->storeInCache($codename, $iface);
+            $this->storeInstanceInCache($codename, $iface);
         }
 
         return $iface;
+    }
+
+    /**
+     * Search for IFace linked to provided entity, entity action and zone
+     *
+     * @param \BetaKiller\IFace\Url\DispatchableEntityInterface $entity
+     * @param string                                            $entityAction
+     * @param string                                            $zone
+     *
+     * @return IFaceInterface
+     * @throws \BetaKiller\IFace\Exception\IFaceException
+     */
+    public function getByEntityActionAndZone(DispatchableEntityInterface $entity, $entityAction, $zone)
+    {
+        $key = implode('.', [$entity->getModelName(), $entityAction, $zone]);
+
+        if (!($iface = $this->getLinkedIFaceFromCache($key))) {
+            $model = $this->getModelProvider()->getByEntityActionAndZone($entity, $entityAction, $zone);
+
+            if (!$model) {
+                throw new IFaceException('No IFace found for :entity.:action entity in :zone zone', [
+                    ':entity' => $entity->getModelName(),
+                    ':action' => $entityAction,
+                    ':zone'   => $zone,
+                ]);
+            }
+
+            $iface = $this->fromModel($model);
+
+            $this->storeLinkedIFaceInCache($key, $iface);
+        }
+
+        return $iface;
+    }
+
+    /**
+     * @param string $key
+     *
+     * @return \BetaKiller\IFace\IFaceInterface|null
+     */
+    private function getLinkedIFaceFromCache($key)
+    {
+        if (!isset($this->entityLinkedCodenameCache[$key])) {
+            return null;
+        }
+
+        $codename = $this->entityLinkedCodenameCache[$key];
+
+        return $this->fromCodename($codename);
+    }
+
+    private function storeLinkedIFaceInCache($key, IFaceInterface $iface)
+    {
+        $this->entityLinkedCodenameCache[$key] = $iface->getCodename();
     }
 }

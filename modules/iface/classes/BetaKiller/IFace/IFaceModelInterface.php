@@ -68,4 +68,25 @@ interface IFaceModelInterface extends TreeModelSingleParentInterface, SeoMetaInt
      * @return bool
      */
     public function hideInSiteMap();
+
+    /**
+     * Returns model name of the linked entity
+     *
+     * @return string
+     */
+    public function getEntityModelName();
+
+    /**
+     * Returns entity [primary] action, applied by this IFace
+     * 
+     * @return string
+     */
+    public function getEntityActionName();
+
+    /**
+     * Returns zone codename where this IFace is placed
+     *
+     * @return string
+     */
+    public function getZoneName();
 }

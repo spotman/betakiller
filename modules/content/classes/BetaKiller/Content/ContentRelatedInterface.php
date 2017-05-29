@@ -1,20 +1,20 @@
 <?php
 namespace BetaKiller\Content;
 
-use Model_ContentEntity;
+use Model_Entity;
 use BetaKiller\Utils\Kohana\ORM\OrmInterface;
 
 interface ContentRelatedInterface extends OrmInterface
 {
     /**
-     * @param Model_ContentEntity $entity
+     * @param Model_Entity $entity
      *
      * @return $this
      */
-    public function set_entity(Model_ContentEntity $entity);
+    public function set_entity(Model_Entity $entity);
 
     /**
-     * @return Model_ContentEntity
+     * @return Model_Entity
      */
     public function get_entity();
 
@@ -64,9 +64,9 @@ interface ContentRelatedInterface extends OrmInterface
     public function group_by_entity_item_id();
 
     /**
-     * @param Model_ContentEntity $entity
+     * @param Model_Entity $entity
      *
      * @return int[]
      */
-    public function get_entity_items_ids(Model_ContentEntity $entity);
+    public function get_entity_items_ids(Model_Entity $entity);
 }

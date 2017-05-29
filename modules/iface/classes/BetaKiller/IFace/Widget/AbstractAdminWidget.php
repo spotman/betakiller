@@ -39,7 +39,6 @@ abstract class AbstractAdminWidget extends BaseWidget
 
     protected function isAccessAllowed()
     {
-        // Force authorization
         return !$this->user->isGuest() && $this->user->is_admin_allowed();
     }
 

@@ -37,11 +37,12 @@ abstract class Service_Content_WithAssets extends Service_Content_Base
     /**
      * @param $full_path
      * @param $original_name
-     * @param Model_ContentEntity $entity
+     * @param Model_Entity $entity
      * @param null $entity_item_id
+     *
      * @return ContentElementInterface
      */
-    public function store_file($full_path, $original_name, Model_ContentEntity $entity, $entity_item_id = NULL)
+    public function store_file($full_path, $original_name, Model_Entity $entity, $entity_item_id = NULL)
     {
         $provider = $this->get_assets_provider();
 

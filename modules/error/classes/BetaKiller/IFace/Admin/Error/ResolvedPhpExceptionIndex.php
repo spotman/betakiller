@@ -8,6 +8,6 @@ class ResolvedPhpExceptionIndex extends AbstractPhpExceptionIndex
      */
     protected function getPhpExceptions()
     {
-        return $this->phpExceptionStorageFactory()->getResolvedPhpExceptions();
+        return $this->phpExceptionStorage->getResolvedPhpExceptions();
     }
 }

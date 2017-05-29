@@ -1,16 +1,19 @@
 <?php
 namespace BetaKiller\Api\Method\PhpException;
 
-use BetaKiller\Helper\ErrorHelperTrait;
 use Spotman\Api\ApiMethodException;
 
 trait PhpExceptionMethodTrait
 {
-    use ErrorHelperTrait;
+    /**
+     * @Inject
+     * @var \BetaKiller\Error\PhpExceptionStorageInterface
+     */
+    protected $phpExceptionStorage;
 
     protected function findByHash($hash)
     {
-        $model = $this->phpExceptionStorageFactory()->findByHash($hash);
+        $model = $this->phpExceptionStorage->findByHash($hash);
 
         if (!$model) {
             throw new ApiMethodException('Incorrect php exception hash :value', [':value' => $hash]);

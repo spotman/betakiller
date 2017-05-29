@@ -7,7 +7,7 @@ use BetaKiller\Utils\Kohana\TreeModelSingleParentOrm;
 
 class Model_ContentCategory extends TreeModelSingleParentOrm implements SeoMetaInterface, ImportedFromWordpressInterface
 {
-    use BetaKiller\Helper\IFaceTrait;
+    use BetaKiller\Helper\IFaceHelperTrait;
     use Model_ORM_ImportedFromWordpressTrait,
         Model_ORM_SeoContentTrait;
 
@@ -70,13 +70,14 @@ class Model_ContentCategory extends TreeModelSingleParentOrm implements SeoMetaI
         return (bool) $this->get('is_active');
     }
 
+    // TODO Implement complex IFace - DataSource link and move url logic to IFaceHelper
     public function get_public_url()
     {
         /** @var \BetaKiller\IFace\App\Content\CategoryItem $iface */
         $iface = $this->iface_from_codename('App_Content_CategoryItem');
 
         $params = $this->url_parameters_instance()
-            ->set($this::URL_PARAM, $this);
+            ->setEntity($this);
 
         return $iface->url($params);
     }
@@ -165,9 +166,9 @@ class Model_ContentCategory extends TreeModelSingleParentOrm implements SeoMetaI
     /**
      * @param UrlParametersInterface $parameters
      */
-    protected function custom_find_by_url_filter(UrlParametersInterface $parameters)
+    protected function customFilterForSearchByUrl(UrlParametersInterface $parameters)
     {
-        $parent_category = $parameters->get(self::URL_PARAM);
+        $parent_category = $parameters->getEntityByClassName($this);
 
         $this->filter_is_active()->filter_parent($parent_category);
     }

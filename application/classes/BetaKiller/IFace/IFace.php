@@ -6,7 +6,7 @@ use Spotman\Api\ApiMethodResponse;
 
 abstract class IFace extends KohanaIFace
 {
-    use Helper\IFaceTrait;
+    use Helper\IFaceHelperTrait;
 
     final protected function process_api_response(ApiMethodResponse $response)
     {

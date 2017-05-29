@@ -11,6 +11,11 @@ class Model_ContentCommentStatus extends StatusModelOrm
 
     const URL_PARAM = 'ContentCommentStatus';
 
+//    public static function getUrlParameterKey()
+//    {
+//        return 'ContentCommentStatus';
+//    }
+
     protected function _initialize()
     {
         $this->_table_name = 'content_comment_statuses';

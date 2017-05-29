@@ -3,18 +3,22 @@
 use BetaKiller\DI\Container;
 use BetaKiller\IFace\IFaceInterface;
 use BetaKiller\IFace\Cache\IFaceCache;
+use BetaKiller\IFace\Url\UrlDispatcher;
 use BetaKiller\Config\AppConfigInterface;
+use BetaKiller\Model\UserInterface;
 
+/**
+ * Class Controller_IFace
+ * @todo Refactoring to ControllerIFace + KohanaRequestAdapter/KohanaResponseAdapter
+ */
 class Controller_IFace extends Controller
 {
-    use \BetaKiller\Helper\CurrentUserTrait;
-    use \BetaKiller\Helper\IFaceTrait;
-
     public function action_render()
     {
         $uri = $this->get_request_uri();
 
-        $dispatcher = $this->url_dispatcher();
+        /** @var UrlDispatcher $dispatcher */
+        $dispatcher = Container::getInstance()->get(UrlDispatcher::class);
 
         // Getting current IFace
         $iface = $dispatcher->process($uri);
@@ -55,15 +59,17 @@ class Controller_IFace extends Controller
         $this->send_string($output);
     }
 
-    protected function processIFaceCache(IFaceInterface $iface)
+    private function processIFaceCache(IFaceInterface $iface)
     {
         // Skip caching if request method is not GET nor HEAD
         if (!in_array($this->request->method(), ['GET', 'HEAD'], true)) {
             return;
         }
 
+        $user = $this->getCurrentUser();
+
         // Skip caching for authorized users
-        if ($this->current_user(true)) {
+        if (!$user->isGuest()) {
             return;
         }
 
@@ -75,15 +81,23 @@ class Controller_IFace extends Controller
     /**
      * @return \BetaKiller\Config\AppConfigInterface
      */
-    protected function getAppConfig()
+    private function getAppConfig()
     {
         return Container::getInstance()->get(AppConfigInterface::class);
     }
 
     /**
+     * @return \BetaKiller\Model\UserInterface
+     */
+    private function getCurrentUser()
+    {
+        return Container::getInstance()->get(UserInterface::class);
+    }
+
+    /**
      * @return string
      */
-    protected function get_request_uri()
+    private function get_request_uri()
     {
         return $this->request->uri();
     }

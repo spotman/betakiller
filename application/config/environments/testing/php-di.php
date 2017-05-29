@@ -1,7 +1,7 @@
 <?php
 
 use Doctrine\Common\Cache\ArrayCache;
-use Spotman\Acl\Acl;
+use Spotman\Acl\AclInterface;
 
 return [
 
@@ -12,7 +12,7 @@ return [
 
     'definitions' => [
 
-        Acl::DI_CACHE_OBJECT_KEY => DI\object(ArrayCache::class),
+        AclInterface::DI_CACHE_OBJECT_KEY => DI\object(ArrayCache::class),
 
     ],
 

@@ -1,4 +1,0 @@
-<?php
-namespace BetaKiller\Acl\ResourcePermissionsCollector;
-
-class ContentPostResourcePermissionsCollector extends AbstractStatusRelatedModelResourcePermissionsCollector {}

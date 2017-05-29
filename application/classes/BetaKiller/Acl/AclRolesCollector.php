@@ -1,11 +1,11 @@
 <?php
 namespace BetaKiller\Acl;
 
-use Spotman\Acl\Acl;
-use Spotman\Acl\RolesCollector\RolesCollectorInterface;
 use BetaKiller\Model\RoleInterface;
+use Spotman\Acl\AclInterface;
+use Spotman\Acl\RolesCollector\AclRolesCollectorInterface;
 
-class RolesCollector implements RolesCollectorInterface
+class AclRolesCollector implements AclRolesCollectorInterface
 {
     /**
      * @var RoleInterface
@@ -13,7 +13,7 @@ class RolesCollector implements RolesCollectorInterface
     private $roleModel;
 
     /**
-     * RolesCollector constructor.
+     * AclRolesCollector constructor.
      *
      * @param \BetaKiller\Model\RoleInterface $roleModel
      */
@@ -25,9 +25,9 @@ class RolesCollector implements RolesCollectorInterface
     /**
      * Collect roles from external source and add them to acl via protected methods addRole / removeRole
      *
-     * @param \Spotman\Acl\Acl $acl
+     * @param \Spotman\Acl\AclInterface $acl
      */
-    public function collectRoles(Acl $acl)
+    public function collectRoles(AclInterface $acl)
     {
         /** @var RoleInterface[] $roles */
         $roles = $this->roleModel->get_all();
@@ -37,9 +37,9 @@ class RolesCollector implements RolesCollectorInterface
         }
     }
 
-    protected function addRoleWithParents(Acl $acl, RoleInterface $role)
+    protected function addRoleWithParents(AclInterface $acl, RoleInterface $role)
     {
-        $parentRoles = $role->getParents();
+        $parentRoles           = $role->getParents();
         $parentRolesIdentities = [];
 
         foreach ($parentRoles as $parentRole) {

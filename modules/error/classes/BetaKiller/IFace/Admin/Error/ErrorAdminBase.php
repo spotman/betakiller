@@ -1,10 +1,6 @@
 <?php
 namespace BetaKiller\IFace\Admin\Error;
 
-use BetaKiller\IFace\Admin\DeveloperOnly;
-use BetaKiller\Helper\ErrorHelperTrait;
+use BetaKiller\IFace\Admin\DeveloperOnlyIFace;
 
-abstract class ErrorAdminBase extends DeveloperOnly
-{
-    use ErrorHelperTrait;
-}
+abstract class ErrorAdminBase extends DeveloperOnlyIFace {}

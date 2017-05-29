@@ -1,6 +1,6 @@
 <?php
 
-class Model_ContentYoutubeEntity extends Model_ContentEntityWithElements
+class Model_ContentYoutubeEntity extends Model_EntityWithElements
 {
     /**
      * Returns model name which describes files (images or attachments)

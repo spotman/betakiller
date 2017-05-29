@@ -4,7 +4,6 @@ namespace BetaKiller\IFace\Admin;
 use BetaKiller\Acl\Resource\AdminResource;
 use BetaKiller\IFace\IFace;
 use BetaKiller\Helper\CurrentUserTrait;
-use Spotman\Acl\AccessResolver\AclAccessResolverInterface;
 
 abstract class AdminBase extends IFace
 {
@@ -12,33 +11,35 @@ abstract class AdminBase extends IFace
 
     /**
      * @Inject
-     * @var AdminResource
+     * @var \Spotman\Acl\AclInterface
      */
-    protected $adminAclResource;
+    protected $acl;
 
     /**
      * @Inject
-     * @var AclAccessResolverInterface
+     * @var \BetaKiller\Model\UserInterface
      */
-    private $resolver;
+    protected $user;
 
     public function before()
     {
+        $this->user->forceAuthorization();
+
         if (!$this->checkIfacePermissions()) {
             throw new \HTTP_Exception_403('Permission denied');
         }
     }
 
     /**
-     * @todo deal with AclResourceResolver
      * @return bool
+     * TODO remove after implementing centralized IFace access control
      */
     protected function checkIfacePermissions()
     {
-        // Force authorization
-        $user = $this->current_user();
+        /** @var AdminResource $adminAclResource */
+        $adminAclResource = $this->acl->getResource('Admin');
 
-        return $this->adminAclResource->useResolver($this->resolver)->isEnabled() || $user->is_admin_allowed();
+        return $adminAclResource->isEnabled();
     }
 
     public function getDefaultExpiresInterval()

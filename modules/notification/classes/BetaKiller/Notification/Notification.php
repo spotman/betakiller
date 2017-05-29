@@ -17,7 +17,7 @@ class Notification
     public function send(NotificationMessageInterface $message)
     {
         $total = 0;
-        $to = $message->get_to();
+        $to = $message->getTargets();
 
         if (!$to) {
             throw new NotificationException('Message target must be specified');
@@ -43,7 +43,7 @@ class Notification
                     if ($counter) {
                         $this->debug('Notification sent to user with email :email with data :data', [
                             ':email'    =>  $target->get_email(),
-                            ':data'     =>  json_encode($message->get_template_data())
+                            ':data'     =>  json_encode($message->getTemplateData())
                         ]);
                         break;
                     }

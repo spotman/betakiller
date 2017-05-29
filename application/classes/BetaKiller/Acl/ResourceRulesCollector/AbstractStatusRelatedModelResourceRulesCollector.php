@@ -1,14 +1,14 @@
 <?php
-namespace BetaKiller\Acl\ResourcePermissionsCollector;
+namespace BetaKiller\Acl\ResourceRulesCollector;
 
 use BetaKiller\Factory\OrmFactory;
 use BetaKiller\Status\StatusModelInterface;
 use Spotman\Acl\ResourceInterface;
-use Spotman\Acl\ResourcePermissionsCollector\AbstractResourcePermissionsCollector;
-use Spotman\Acl\ResourcePermissionsCollector\ResourcePermissionsCollectorInterface;
+use Spotman\Acl\ResourceRulesCollector\AbstractResourceRulesCollector;
+use Spotman\Acl\ResourceRulesCollector\ResourceRulesCollectorInterface;
 
-abstract class AbstractStatusRelatedModelResourcePermissionsCollector extends AbstractResourcePermissionsCollector
-    implements ResourcePermissionsCollectorInterface
+abstract class AbstractStatusRelatedModelResourceRulesCollector extends AbstractResourceRulesCollector
+    implements ResourceRulesCollectorInterface
 {
     /**
      * @var \BetaKiller\Factory\OrmFactory
@@ -16,7 +16,7 @@ abstract class AbstractStatusRelatedModelResourcePermissionsCollector extends Ab
     private $ormFactory;
 
     /**
-     * ContentPostResourcePermissionsCollector constructor.
+     * ContentPostResourceRulesCollector constructor.
      *
      * @param \Spotman\Acl\ResourceInterface $resource
      * @param \BetaKiller\Factory\OrmFactory $ormFactory
@@ -60,7 +60,7 @@ abstract class AbstractStatusRelatedModelResourcePermissionsCollector extends Ab
 
     private function getStatusActionsDefaultAccessList(StatusModelInterface $status)
     {
-        /** @var \BetaKiller\Acl\Resource\ContentPostResource $resource */
+        /** @var \BetaKiller\Acl\Resource\StatusRelatedModelAclResourceInterface $resource */
         $resource = $this->resource;
 
         $actions = $resource->getStatusActionsList();
@@ -81,7 +81,7 @@ abstract class AbstractStatusRelatedModelResourcePermissionsCollector extends Ab
      */
     private function getStatusTransitionsDefaultAccessList(StatusModelInterface $statusModel)
     {
-        /** @var \BetaKiller\Acl\Resource\ContentPostResource $resource */
+        /** @var \BetaKiller\Acl\Resource\StatusRelatedModelAclResourceInterface $resource */
         $resource = $this->resource;
 
         /** @var \BetaKiller\Status\StatusTransitionModelInterface[] $transitions */
@@ -107,7 +107,6 @@ abstract class AbstractStatusRelatedModelResourcePermissionsCollector extends Ab
         $relatedModel = $this->ormFactory->create($name);
 
         // TODO deal with getting status model
-
         return $relatedModel->get_current_status();
     }
 }

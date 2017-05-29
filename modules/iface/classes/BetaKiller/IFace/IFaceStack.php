@@ -2,7 +2,6 @@
 namespace BetaKiller\IFace;
 
 use BetaKiller\IFace\Exception\IFaceStackException;
-use BetaKiller\IFace\Url\UrlParameters;
 use BetaKiller\IFace\Url\UrlParametersInterface;
 
 class IFaceStack
@@ -18,7 +17,7 @@ class IFaceStack
     private $items;
 
     /**
-     * @var UrlParameters
+     * @var UrlParametersInterface
      */
     private $parameters;
 
@@ -58,6 +57,9 @@ class IFaceStack
         return array_keys($this->items);
     }
 
+    /**
+     * @deprecated IFace stack must be persistent
+     */
     public function clear()
     {
         $this->items   = [];
@@ -79,17 +81,12 @@ class IFaceStack
             return true;
         }
 
-        $currentParams = $this->parameters;
-
-        foreach ($parameters->getAll() as $key => $paramModel) {
-            /** @var \BetaKiller\IFace\Url\UrlDataSourceInterface $paramModel */
-
-            if (!$currentParams->has($key)) {
+        foreach ($parameters->getAllEntities() as $key => $paramModel) {
+            if (!$this->parameters->hasEntity($key)) {
                 return false;
             }
 
-            /** @var \BetaKiller\IFace\Url\UrlDataSourceInterface $currentModel */
-            $currentModel = $currentParams->get($key);
+            $currentModel = $this->parameters->getEntity($key);
 
             if ($paramModel->getUrlItemID() !== $currentModel->getUrlItemID()) {
                 return false;

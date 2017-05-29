@@ -2,7 +2,6 @@
 namespace BetaKiller\IFace;
 
 use BetaKiller\Helper\SeoMetaInterface;
-use BetaKiller\IFace\Url\UrlParameters;
 use BetaKiller\IFace\Url\UrlParametersInterface;
 
 interface IFaceInterface extends SeoMetaInterface
@@ -181,11 +180,31 @@ interface IFaceInterface extends SeoMetaInterface
     public function getUri();
 
     /**
+     * Returns zone codename where this IFace is placed
+     *
+     * @return string
+     */
+    public function getZoneName();
+
+    /**
+     * Returns model name of the linked entity
+     *
+     * @return string
+     */
+    public function getEntityModelName();
+
+    /**
+     * Returns entity [primary] action, applied by this IFace
+     *
+     * @return string
+     */
+    public function getEntityActionName();
+
+    /**
      * @param \BetaKiller\IFace\Url\UrlParametersInterface $params
      * @param int|null                            $limit
-     * @param bool                                $withDomain
      *
      * @return string[]
      */
-    public function getAvailableUrls(UrlParametersInterface $params, $limit = null, $withDomain = true);
+    public function getAvailableUrls(UrlParametersInterface $params, $limit = null);
 }

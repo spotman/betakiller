@@ -1,8 +1,12 @@
 <?php
 namespace BetaKiller\Helper;
 
-use BetaKiller\Utils\Kohana\ORM\OrmInterface;
-
+/**
+ * Trait ContentTrait
+ *
+ * @package BetaKiller\Helper
+ * @deprecated Move methods to ContentHelper
+ */
 trait ContentTrait
 {
     /**
@@ -48,7 +52,7 @@ trait ContentTrait
     /**
      * @param int|null $id
      *
-     * @return \Model_ContentPost|OrmInterface
+     * @return \Model_ContentPost|\BetaKiller\Utils\Kohana\ORM\OrmInterface
      */
     public function model_factory_content_post($id = null)
     {
@@ -57,7 +61,7 @@ trait ContentTrait
 
     /**
      * @param int|null $id
-     * @return \Model_ContentCategory|OrmInterface
+     * @return \Model_ContentCategory|\BetaKiller\Utils\Kohana\ORM\OrmInterface
      */
     public function model_factory_content_category($id = null)
     {
@@ -66,7 +70,7 @@ trait ContentTrait
 
     /**
      * @param int|null $id
-     * @return \Model_ContentEntity|OrmInterface
+     * @return \Model_Entity|\BetaKiller\Utils\Kohana\ORM\OrmInterface
      */
     protected function model_factory_content_entity($id = NULL)
     {
@@ -75,7 +79,7 @@ trait ContentTrait
 
     /**
      * @param int|null $id
-     * @return \Model_ContentImageElement|OrmInterface
+     * @return \Model_ContentImageElement|\BetaKiller\Utils\Kohana\ORM\OrmInterface
      */
     protected function model_factory_content_image_element($id = NULL)
     {
@@ -84,7 +88,7 @@ trait ContentTrait
 
     /**
      * @param int|null $id
-     * @return \Model_ContentPostThumbnail|OrmInterface
+     * @return \Model_ContentPostThumbnail|\BetaKiller\Utils\Kohana\ORM\OrmInterface
      */
     protected function model_factory_content_post_thumbnail($id = NULL)
     {
@@ -93,7 +97,7 @@ trait ContentTrait
 
     /**
      * @param int|null $id
-     * @return \Model_ContentAttachmentElement|OrmInterface
+     * @return \Model_ContentAttachmentElement|\BetaKiller\Utils\Kohana\ORM\OrmInterface
      */
     protected function model_factory_content_attachment_element($id = NULL)
     {
@@ -102,7 +106,7 @@ trait ContentTrait
 
     /**
      * @param int|null $id
-     * @return \Model_ContentYoutubeRecord|OrmInterface
+     * @return \Model_ContentYoutubeRecord|\BetaKiller\Utils\Kohana\ORM\OrmInterface
      */
     protected function model_factory_content_youtube_record($id = NULL)
     {
@@ -111,7 +115,7 @@ trait ContentTrait
 
     /**
      * @param int|null $id
-     * @return \Model_Quote|OrmInterface
+     * @return \Model_Quote|\BetaKiller\Utils\Kohana\ORM\OrmInterface
      */
     protected function model_factory_quote($id = NULL)
     {
@@ -120,7 +124,7 @@ trait ContentTrait
 
     /**
      * @param int|null $id
-     * @return \Model_ContentComment|OrmInterface
+     * @return \Model_ContentComment|\BetaKiller\Utils\Kohana\ORM\OrmInterface
      */
     protected function model_factory_content_comment($id = NULL)
     {
@@ -128,7 +132,7 @@ trait ContentTrait
     }
 
     /**
-     * @return \Model_ContentCommentStatus|OrmInterface
+     * @return \Model_ContentCommentStatus|\BetaKiller\Utils\Kohana\ORM\OrmInterface
      */
     protected function model_factory_content_comment_status()
     {
@@ -141,41 +145,5 @@ trait ContentTrait
     protected function custom_tag_instance()
     {
         return \CustomTag::instance();
-    }
-
-    /**
-     * @return \Model_ContentPost|NULL
-     * @deprecated Use ContentUrlParametersHelper instead
-     */
-    public function url_parameter_content_post()
-    {
-        return $this->url_parameters()->get(\Model_ContentPost::URL_PARAM);
-    }
-
-    /**
-     * @return \Model_ContentCategory
-     * @deprecated Use ContentUrlParametersHelper instead
-     */
-    public function url_parameter_content_category()
-    {
-        return $this->url_parameters()->get(\Model_ContentCategory::URL_PARAM);
-    }
-
-    /**
-     * @return \Model_ContentCommentStatus
-     * @deprecated Use ContentUrlParametersHelper instead
-     */
-    public function url_parameter_content_comment_status()
-    {
-        return $this->url_parameters()->get(\Model_ContentCommentStatus::URL_PARAM);
-    }
-
-    /**
-     * @return \Model_ContentComment
-     * @deprecated Use ContentUrlParametersHelper instead
-     */
-    public function url_parameter_content_comment()
-    {
-        return $this->url_parameters()->get(\Model_ContentComment::URL_PARAM);
     }
 }

@@ -5,14 +5,14 @@ use BetaKiller\IFace\Url\UrlParametersInterface;
 use Model_ContentCategory;
 use Model_ContentPost;
 
-class ContentUrlParametersHelper extends AbstractUrlParametersHelper
+class ContentUrlParametersHelper extends UrlParametersHelper
 {
     /**
      * @return \Model_ContentCategory
      */
     public function getContentCategory()
     {
-        return $this->get(Model_ContentCategory::URL_PARAM);
+        return $this->getEntityByClassName(Model_ContentCategory::class);
     }
 
     /**
@@ -23,7 +23,7 @@ class ContentUrlParametersHelper extends AbstractUrlParametersHelper
      */
     public function setContentCategory(Model_ContentCategory $model, UrlParametersInterface $params = null)
     {
-        return $this->set(Model_ContentCategory::URL_PARAM, $model, $params, true);
+        return $this->setEntity($model, $params, true);
     }
 
     /**
@@ -31,7 +31,7 @@ class ContentUrlParametersHelper extends AbstractUrlParametersHelper
      */
     public function getContentPost()
     {
-        return $this->get(\Model_ContentPost::URL_PARAM);
+        return $this->getEntityByClassName(\Model_ContentPost::class);
     }
 
     /**
@@ -42,6 +42,44 @@ class ContentUrlParametersHelper extends AbstractUrlParametersHelper
      */
     public function setContentPost(Model_ContentPost $model, UrlParametersInterface $params = null)
     {
-        return $this->set(\Model_ContentPost::URL_PARAM, $model, $params, true);
+        return $this->setEntity($model, $params, true);
+    }
+
+    /**
+     * @return \Model_ContentComment
+     */
+    public function getContentComment()
+    {
+        return $this->getEntityByClassName(\Model_ContentComment::class);
+    }
+
+    /**
+     * @param \Model_ContentComment                             $model
+     * @param \BetaKiller\IFace\Url\UrlParametersInterface|null $params
+     *
+     * @return \BetaKiller\IFace\Url\UrlParametersInterface
+     */
+    public function setContentComment(\Model_ContentComment $model, UrlParametersInterface $params = null)
+    {
+        return $this->setEntity($model, $params, true);
+    }
+
+    /**
+     * @return \Model_ContentCommentStatus
+     */
+    public function getContentCommentStatus()
+    {
+        return $this->getEntityByClassName(\Model_ContentCommentStatus::class);
+    }
+
+    /**
+     * @param \Model_ContentCommentStatus                       $model
+     * @param \BetaKiller\IFace\Url\UrlParametersInterface|null $params
+     *
+     * @return \BetaKiller\IFace\Url\UrlParametersInterface
+     */
+    public function setContentCommentStatus(\Model_ContentCommentStatus $model, UrlParametersInterface $params = null)
+    {
+        return $this->setEntity($model, $params, true);
     }
 }

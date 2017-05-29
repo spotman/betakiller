@@ -4,6 +4,12 @@ namespace BetaKiller\IFace\Admin\Error;
 abstract class AbstractPhpExceptionIndex extends ErrorAdminBase
 {
     /**
+     * @Inject
+     * @var \BetaKiller\Error\PhpExceptionStorageInterface
+     */
+    protected $phpExceptionStorage;
+
+    /**
      * @return \BetaKiller\Error\PhpExceptionModelInterface[]
      */
     abstract protected function getPhpExceptions();

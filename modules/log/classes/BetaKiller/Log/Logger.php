@@ -1,25 +1,24 @@
 <?php
 namespace BetaKiller\Log;
 
-use BetaKiller\Helper\AppEnvTrait;
-use BetaKiller\Helper\CurrentUserTrait;
+use BetaKiller\Helper\AppEnv;
+use BetaKiller\Model\UserInterface;
 use Monolog\Handler\DeduplicationHandler;
 use Monolog\Handler\PHPConsoleHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Handler\WhatFailureGroupHandler;
 use Monolog\Processor\MemoryPeakUsageProcessor;
+use Monolog\Processor\WebProcessor;
+use MultiSite;
 use PhpConsole\Connector;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LoggerTrait;
-use MultiSite;
 
 //use Monolog\Handler\ChromePHPHandler;
 
 class Logger implements LoggerInterface
 {
     use LoggerTrait;
-    use CurrentUserTrait;
-    use AppEnvTrait;
 
     /**
      * @var LoggerInterface
@@ -27,10 +26,25 @@ class Logger implements LoggerInterface
     private $logger;
 
     /**
-     * Logger constructor.
+     * @var \BetaKiller\Helper\AppEnv
      */
-    public function __construct()
+    private $appEnv;
+
+    /**
+     * @var \BetaKiller\Model\UserInterface
+     */
+    private $user;
+
+    /**
+     * Logger constructor.
+     *
+     * @param \BetaKiller\Helper\AppEnv       $env
+     * @param \BetaKiller\Model\UserInterface $user
+     */
+    public function __construct(AppEnv $env, UserInterface $user)
     {
+        $this->appEnv = $env;
+        $this->user   = $user;
         $this->logger = $this->getMonologInstance();
     }
 
@@ -59,9 +73,7 @@ class Logger implements LoggerInterface
 
         $monolog->pushHandler(new DeduplicationHandler($groupHandler));
 
-        $user = $this->current_user(true);
-
-        $debugAllowed = $this->inDevelopmentMode() || ($user && $user->is_developer());
+        $debugAllowed = $this->appEnv->inDevelopmentMode() || $this->user->isDeveloper();
 
         // Enable debugging via PhpConsole for developers
         if ($debugAllowed && Connector::getInstance()->isActiveClient()) {
@@ -76,6 +88,7 @@ class Logger implements LoggerInterface
         }
 
         $monolog->pushProcessor(new MemoryPeakUsageProcessor());
+        $monolog->pushProcessor(new WebProcessor());
 
         return $monolog;
     }

@@ -12,8 +12,9 @@
 // TODO Remove this in favour of custom Monolog handler
 if (Kohana::in_production(true)) {
     try {
-        $log = new Log_PhpExceptionStorage();
-        Kohana::$log->attach($log, Log::NOTICE, Log::EMERGENCY);
+        /** @var Log_PhpExceptionStorage $log */
+        $log = \BetaKiller\DI\Container::getInstance()->get(Log_PhpExceptionStorage::class);
+        $log->register();
     } catch (Exception $e) {
         // Skip this log writer silently
     }

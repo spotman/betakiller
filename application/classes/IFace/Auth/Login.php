@@ -1,81 +1,85 @@
 <?php
 
 use BetaKiller\IFace\IFace;
+use BetaKiller\Model\UserInterface;
 
 class IFace_Auth_Login extends IFace
 {
-    use \BetaKiller\Helper\CurrentUserTrait;
-
     /**
      * @var string Default url for relocate after successful login
      */
-    protected $_redirect_url = NULL;
+    protected $redirectUrl = null;
 
-    protected $_redirect_url_query_param = 'redirect_url';
+    protected $redirectUrlQueryParam = 'redirect_url';
 
-    protected $_self_url;
+    protected $selfUrl;
 
-    public function __construct()
+    /**
+     * @var UserInterface
+     */
+    protected $user;
+
+    public function __construct(UserInterface $user)
     {
+        $this->user = $user;
+
         $request = Request::current();
 
-        if ( $request )
-        {
-            $queryString = http_build_query($request->query());
-            $this->_self_url = '/'.ltrim($request->uri(), '/');
+        if ($request) {
+            $queryString   = http_build_query($request->query());
+            $this->selfUrl = '/'.ltrim($request->uri(), '/');
 
             if ($queryString) {
-                $this->_self_url .= '?'.$queryString;
+                $this->selfUrl .= '?'.$queryString;
             }
 
             // Initialize redirect url
-            $this->_redirect_url = urldecode($request->query($this->_redirect_url_query_param)) ?: $this->_self_url;
+            $this->redirectUrl = urldecode($request->query($this->redirectUrlQueryParam)) ?: $this->selfUrl;
         }
     }
 
     public function before()
     {
         // If user already authorized
-        if ( $this->current_user(TRUE) )
-        {
-            if ( $this->_redirect_url === $this->_self_url )
-            {
+        if (!$this->user->isGuest()) {
+            if ($this->redirectUrl === $this->selfUrl) {
                 // Prevent infinite loops
-                $this->_redirect_url = '/';
+                $this->redirectUrl = '/';
             }
 
             // Redirect him
-            $this->redirect($this->_redirect_url);
+            $this->redirect($this->redirectUrl);
         }
     }
 
     public function getData()
     {
-        return array(
-            'redirect_url'  => $this->_redirect_url
-        );
+        return [
+            'redirect_url' => $this->redirectUrl,
+        ];
     }
 
-    public function redirect_to($redirect_url)
+    protected function setRedirectUrl($redirectUrl)
     {
-        $this->_redirect_url = $redirect_url;
+        $this->redirectUrl = $redirectUrl;
+
         return $this;
     }
 
-    public function redirect_to_current_iface()
+    public function redirectToCurrentIFace()
     {
-        $url = $this->url_dispatcher()->currentIFace()->url(NULL, FALSE);
+        $current = $this->ifaceHelper->getCurrentIFace();
+        $url = $current->url(null, false);
 
-        return $this->redirect_to($url);
+        return $this->setRedirectUrl($url);
     }
 
     public function getUri()
     {
-        $redirect_query = $this->_redirect_url
-            ? '?'.$this->_redirect_url_query_param.'='.urlencode($this->_redirect_url)
-            : NULL;
+        $redirect_query = $this->redirectUrl
+            ? '?'.$this->redirectUrlQueryParam.'='.urlencode($this->redirectUrl)
+            : null;
 
         return parent::getUri().$redirect_query;
     }
-
 }

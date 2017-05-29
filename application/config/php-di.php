@@ -1,9 +1,10 @@
 <?php
 
-use BetaKiller\Acl\PermissionsCollector;
-use BetaKiller\Acl\ResourceFactory;
-use BetaKiller\Acl\ResourcesCollector;
-use BetaKiller\Acl\RolesCollector;
+use BetaKiller\Acl\AclRulesCollector;
+use BetaKiller\Acl\AclResourceFactory;
+use BetaKiller\Acl\AclResourcesCollector;
+use BetaKiller\Acl\AclRolesCollector;
+use BetaKiller\Api\AccessResolver\CustomApiMethodAccessResolverDetector;
 use BetaKiller\Factory\CommonFactoryCache;
 use BetaKiller\Factory\FactoryCacheInterface;
 use BetaKiller\Factory\NamespaceBasedFactory;
@@ -22,13 +23,12 @@ use Doctrine\Common\Cache\ChainCache;
 use Doctrine\Common\Cache\FilesystemCache;
 use Doctrine\Common\Cache\PhpFileCache;
 use Psr\Log\LoggerInterface;
-use Spotman\Acl\Acl;
-use Spotman\Acl\PermissionsCollector\PermissionsCollectorInterface;
-use Spotman\Acl\ResourceFactory\ResourceFactoryInterface;
-use Spotman\Acl\ResourcesCollector\ResourcesCollectorInterface;
-use Spotman\Acl\RolesCollector\RolesCollectorInterface;
+use Spotman\Acl\AclInterface;
+use Spotman\Acl\RulesCollector\AclRulesCollectorInterface;
+use Spotman\Acl\ResourceFactory\AclResourceFactoryInterface;
+use Spotman\Acl\ResourcesCollector\AclResourcesCollectorInterface;
+use Spotman\Acl\RolesCollector\AclRolesCollectorInterface;
 use Spotman\Api\AccessResolver\ApiMethodAccessResolverDetectorInterface;
-use BetaKiller\Api\AccessResolver\CustomApiMethodAccessResolverDetector;
 
 $workingPath = MultiSite::instance()->getWorkingPath();
 $workingName = MultiSite::instance()->getWorkingName();
@@ -93,20 +93,20 @@ return [
         \BetaKiller\Config\AppConfigInterface::class => DI\object(\BetaKiller\Config\AppConfig::class),
 
         \BetaKiller\Model\UserInterface::class => DI\get('User'),
-        \BetaKiller\Model\RoleInterface::class => DI\get(\BetaKiller\Model\Role::class),
+        \BetaKiller\Model\RoleInterface::class  => DI\get(\BetaKiller\Model\Role::class),
 
         // Backward compatibility fix
-        \Model_User::class                     => DI\object(\BetaKiller\Model\User::class)->scope(\DI\Scope::PROTOTYPE),
-        \Model_Role::class                     => DI\object(\BetaKiller\Model\Role::class)->scope(\DI\Scope::PROTOTYPE),
+        \Model_User::class                      => DI\object(\BetaKiller\Model\User::class)->scope(\DI\Scope::PROTOTYPE),
+        \Model_Role::class                      => DI\object(\BetaKiller\Model\Role::class)->scope(\DI\Scope::PROTOTYPE),
 
         // Cache for production and staging (dev and testing has ArrayCache); use filesystem cache so it would be cleared after deployment
-        Acl::DI_CACHE_OBJECT_KEY               => new FilesystemCache(implode(DIRECTORY_SEPARATOR, [$workingPath, 'cache', 'acl'])),
+        AclInterface::DI_CACHE_OBJECT_KEY               => new FilesystemCache(implode(DIRECTORY_SEPARATOR, [$workingPath, 'cache', 'acl'])),
 
         // Acl roles, resources, permissions and resource factory
-        RolesCollectorInterface::class         => DI\object(RolesCollector::class),
-        ResourcesCollectorInterface::class     => DI\object(ResourcesCollector::class),
-        PermissionsCollectorInterface::class            => DI\object(PermissionsCollector::class),
-        ResourceFactoryInterface::class                 => DI\object(ResourceFactory::class),
+        AclRolesCollectorInterface::class               => DI\object(AclRolesCollector::class),
+        AclResourcesCollectorInterface::class           => DI\object(AclResourcesCollector::class),
+        AclRulesCollectorInterface::class               => DI\object(AclRulesCollector::class),
+        AclResourceFactoryInterface::class              => DI\object(AclResourceFactory::class),
 
         // Use Twig in ifaces and layouts
         IFaceView::class                                => DI\object(IFaceViewTwig::class),

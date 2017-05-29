@@ -1,6 +1,6 @@
 <?php
 
-class Model_ContentAttachmentEntity extends Model_ContentEntityWithElements
+class Model_ContentAttachmentEntity extends Model_EntityWithElements
 {
     /**
      * Returns model name which describes files (images or attachments)

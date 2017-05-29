@@ -91,12 +91,12 @@ class ORM_Verifiable extends ORM
      */
     public function is_creator(UserInterface $user)
     {
-        return ( $user->pk() == $this->get_creator_relation()->pk() );
+        return ( $user->pk() === $this->get_creator_relation()->pk() );
     }
 
     public function filter_approved_with_acl(UserInterface $current_user = NULL)
     {
-        $is_moderator = $current_user AND $current_user->is_moderator();
+        $is_moderator = $current_user && $current_user->isModerator();
 
         // Модератору показываем без фильтрации
         $all_allowed = $is_moderator;

@@ -29,7 +29,7 @@ class Widget_Content_Comments extends BaseWidget
             throw new WidgetException('[entity_item_id] must be provided via widget context');
         }
 
-        $entity = $this->model_factory_content_entity()->find_by_slug($entitySlug);
+        $entity = $this->model_factory_content_entity()->findBySlug($entitySlug);
 
         $comments = $this->model_factory_content_comment()->get_entity_item_approved_comments($entity, $entityItemId);
 
@@ -78,7 +78,7 @@ class Widget_Content_Comments extends BaseWidget
             throw new WidgetException('[entityItemId] must be provided via request');
         }
 
-        $entity = $this->model_factory_content_entity()->find_by_slug($entitySlug);
+        $entity = $this->model_factory_content_entity()->findBySlug($entitySlug);
 
         // Validation
         $validation = Validation::factory($this->post());

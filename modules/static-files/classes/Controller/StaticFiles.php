@@ -122,7 +122,7 @@ class Controller_StaticFiles extends Controller {
     {
         $user = Env::user(TRUE);
 
-        if ( ! $user OR ! $user->is_developer() )
+        if ( ! $user OR ! $user->isDeveloper() )
             throw new HTTP_Exception_403();
 
         $config = self::get_config();

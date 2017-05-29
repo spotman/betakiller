@@ -2,16 +2,13 @@
 namespace BetaKiller\Error;
 
 use BetaKiller\Exception;
-use BetaKiller\Helper\CurrentUserTrait;
+use BetaKiller\Factory\OrmFactory;
 use BetaKiller\Helper\LogTrait;
-use BetaKiller\Helper\ErrorHelperTrait;
+use BetaKiller\Helper\NotificationHelper;
 use BetaKiller\Model\UserInterface;
-use BetaKiller\Notification\NotificationMessageCommon;
 
 class PhpExceptionStorage implements PhpExceptionStorageInterface
 {
-    use ErrorHelperTrait;
-    use CurrentUserTrait;
     use LogTrait;
 
     /**
@@ -25,6 +22,35 @@ class PhpExceptionStorage implements PhpExceptionStorageInterface
     const REPEAT_DELAY = 600;
 
     /**
+     * @var \BetaKiller\Factory\OrmFactory
+     */
+    private $ormFactory;
+
+    /**
+     * @var \BetaKiller\Helper\NotificationHelper
+     */
+    private $notificationHelper;
+
+    /**
+     * @var UserInterface;
+     */
+    private $user;
+
+    /**
+     * PhpExceptionStorage constructor.
+     *
+     * @param \BetaKiller\Factory\OrmFactory        $ormFactory
+     * @param \BetaKiller\Helper\NotificationHelper $notificationHelper
+     * @param \BetaKiller\Model\UserInterface       $user
+     */
+    public function __construct(OrmFactory $ormFactory, NotificationHelper $notificationHelper, UserInterface $user)
+    {
+        $this->user               = $user;
+        $this->ormFactory         = $ormFactory;
+        $this->notificationHelper = $notificationHelper;
+    }
+
+    /**
      * @param \BetaKiller\Error\PhpExceptionModelInterface $model
      *
      * @return string
@@ -32,6 +58,7 @@ class PhpExceptionStorage implements PhpExceptionStorageInterface
     public function getTraceFor(PhpExceptionModelInterface $model)
     {
         $path = $this->getTraceFullPathFor($model);
+
         return file_get_contents($path);
     }
 
@@ -44,7 +71,8 @@ class PhpExceptionStorage implements PhpExceptionStorageInterface
     public function setTraceFor(PhpExceptionModelInterface $model, $traceResponse)
     {
         $path = $this->getTraceFullPathFor($model);
-        file_put_contents($path, (string) $traceResponse);
+        file_put_contents($path, (string)$traceResponse);
+
         return $this;
     }
 
@@ -52,7 +80,7 @@ class PhpExceptionStorage implements PhpExceptionStorageInterface
     {
         $dir = MODPATH.'error/media/php_traces';
 
-        if (!file_exists($dir) && !@mkdir($dir, 0664, TRUE) && !is_dir($dir)) {
+        if (!file_exists($dir) && !@mkdir($dir, 0664, true) && !is_dir($dir)) {
             throw new Exception('Can not create directory [:dir] for php stacktrace files', [':dir' => $dir]);
         }
 
@@ -66,19 +94,19 @@ class PhpExceptionStorage implements PhpExceptionStorageInterface
      */
     public function storeException(\Exception $exception)
     {
-        $user = $this->current_user(true);
+        $user = $this->user;
 
-        if ( $exception instanceof \BetaKiller_Kohana_Exception && !$exception->is_notification_enabled() ) {
+        if ($exception instanceof \BetaKiller_Kohana_Exception && !$exception->is_notification_enabled()) {
             return null;
         }
 
         $class = get_class($exception);
-        $code = $exception->getCode();
-        $file = $exception->getFile();
-        $line = $exception->getLine();
+        $code  = $exception->getCode();
+        $file  = $exception->getFile();
+        $line  = $exception->getLine();
 
         // Combine message and escape symbols to minimize XSS
-        $message = \HTML::chars("[$code] $class: ". $exception->getMessage());
+        $message = \HTML::chars("[$code] $class: ".$exception->getMessage());
 
         // Getting unique hash for current message
         $hash = $this->makeHashFor($message);
@@ -124,7 +152,7 @@ class PhpExceptionStorage implements PhpExceptionStorageInterface
             $e_response = \Kohana_Exception::response($exception);
 
             // Adding trace
-            $this->setTraceFor($model, (string) $e_response);
+            $this->setTraceFor($model, (string)$e_response);
         }
 
         // Trying to get current module
@@ -143,17 +171,19 @@ class PhpExceptionStorage implements PhpExceptionStorageInterface
         // Notify developers if needed
         if ($isNotificationNeeded) {
             $data = [
-                'message'   =>  $model->getMessage(),
-                'urls'      =>  $model->getUrls(),
-                'paths'     =>  $model->getPaths(),
-                'adminUrl'  =>  $model->get_admin_url(),
+                'message'  => $model->getMessage(),
+                'urls'     => $model->getUrls(),
+                'paths'    => $model->getPaths(),
+                'adminUrl' => $model->get_admin_url(),
             ];
 
-            NotificationMessageCommon::instance()
-                ->set_subj('BetaKiller exception')
-                ->set_template_name('developer/error/php-exception')
-                ->set_template_data($data)
-                ->to_developers()
+            $message = $this->notificationHelper->createMessage('developer/error/php-exception');
+
+            $this->notificationHelper->toDevelopers($message);
+
+            $message
+                ->setSubj('BetaKiller exception')
+                ->setTemplateData($data)
                 ->send();
 
             // Saving last notification timestamp
@@ -189,12 +219,13 @@ class PhpExceptionStorage implements PhpExceptionStorageInterface
         // Skip ignored exceptions
         if ($model->isIgnored()) {
             $this->debug('Ignored exception');
+
             return false;
         }
 
-        $lastSeenAt = $model->getLastSeenAt();
-        $lastSeenAtTimestamp = $lastSeenAt->getTimestamp();
-        $lastNotifiedAt = $model->getLastNotifiedAt();
+        $lastSeenAt              = $model->getLastSeenAt();
+        $lastSeenAtTimestamp     = $lastSeenAt->getTimestamp();
+        $lastNotifiedAt          = $model->getLastNotifiedAt();
         $lastNotifiedAtTimestamp = $lastNotifiedAt ? $lastNotifiedAt->getTimestamp() : 0;
 
         $timeDiffInSeconds = $lastSeenAtTimestamp - $lastNotifiedAtTimestamp;
@@ -213,12 +244,14 @@ class PhpExceptionStorage implements PhpExceptionStorageInterface
         // New error needs to be notified only once
         if (!$lastNotifiedAtTimestamp && $model->isNew()) {
             $this->debug('New exception needs to be notified');
+
             return true;
         }
 
         // Repeated error needs to be notified
         if ($model->isRepeated()) {
             $this->debug('Repeated exception needs to be notified');
+
             return true;
         }
 
@@ -270,5 +303,13 @@ class PhpExceptionStorage implements PhpExceptionStorageInterface
     public function ignore(PhpExceptionModelInterface $model, UserInterface $user)
     {
         $model->markAsIgnoredBy($user)->save();
+    }
+
+    /**
+     * @return \BetaKiller\Utils\Kohana\ORM\OrmInterface|\Model_PhpException
+     */
+    private function phpExceptionModelFactory()
+    {
+        return $this->ormFactory->create('PhpException');
     }
 }

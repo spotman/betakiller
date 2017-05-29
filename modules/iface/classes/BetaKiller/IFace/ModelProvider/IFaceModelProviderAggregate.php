@@ -3,6 +3,7 @@ namespace BetaKiller\IFace\ModelProvider;
 
 use BetaKiller\IFace\Exception\IFaceException;
 use BetaKiller\IFace\IFaceModelInterface;
+use BetaKiller\IFace\Url\DispatchableEntityInterface;
 
 class IFaceModelProviderAggregate extends IFaceModelProviderAbstract
 {
@@ -144,6 +145,32 @@ class IFaceModelProviderAggregate extends IFaceModelProviderAbstract
         $this->storeInCacheMultiple($models);
 
         return $models;
+    }
+
+    /**
+     * Search for IFace linked to provided entity, entity action and zone
+     *
+     * @param \BetaKiller\IFace\Url\DispatchableEntityInterface $entity
+     * @param string                                            $entityAction
+     * @param string                                            $zone
+     *
+     * @return IFaceModelInterface|null
+     */
+    public function getByEntityActionAndZone(DispatchableEntityInterface $entity, $entityAction, $zone)
+    {
+        $model = null;
+
+        foreach ($this->getSources() as $source) {
+            if ($model = $source->getByEntityActionAndZone($entity, $entityAction, $zone)) {
+                break;
+            }
+        }
+
+        if ($model) {
+            $this->storeInCache($model);
+        }
+
+        return $model;
     }
 
     /**

@@ -1,25 +1,11 @@
 <?php
 namespace BetaKiller\IFace\Admin\Content;
 
+use BetaKiller\Helper\IFaceHelper;
 use BetaKiller\IFace\IFaceFactory;
 
 class PostIndex extends AdminBase
 {
-    /**
-     * @var \BetaKiller\IFace\IFaceFactory
-     */
-    private $ifaceFactory;
-
-    /**
-     * PostIndex constructor.
-     *
-     * @param \BetaKiller\IFace\IFaceFactory $ifaceFactory
-     */
-    public function __construct(IFaceFactory $ifaceFactory)
-    {
-        $this->ifaceFactory = $ifaceFactory;
-    }
-
     /**
      * Returns data for View
      * Override this method in child classes
@@ -42,7 +28,7 @@ class PostIndex extends AdminBase
         }
 
         /** @var \BetaKiller\IFace\Admin\Content\PostCreate $createPostIFace */
-        $createPostIFace = $this->ifaceFactory->from_codename('Admin_Content_PostCreate');
+        $createPostIFace = $this->ifaceHelper->createIFaceFromCodename('Admin_Content_PostCreate');
 
         return [
             'createUrl' => $createPostIFace->url(),

@@ -41,13 +41,13 @@ class Migration1480169823_Content_Entity_Article_Rename extends Migration {
 	 */
 	public function up()
 	{
-	    $entity = $this->model_factory_content_entity(Model_ContentEntity::POSTS_ENTITY_ID);
+	    $entity = $this->model_factory_content_entity(Model_Entity::POSTS_ENTITY_ID);
 
 	    $content_item_model = $this->model_factory_content_post();
 
 	    $entity
-            ->set_related_model_name($content_item_model->get_model_name())
-            ->set_slug('post')
+            ->setLinkedModelName($content_item_model->get_model_name())
+            ->setSlug('post')
             ->save();
 	}
 

@@ -1,13 +1,11 @@
 <?php
 namespace BetaKiller\IFace\App\Content;
 
-use BetaKiller\Helper\CurrentUserTrait;
 use BetaKiller\Helper\ContentUrlParametersHelper;
+use BetaKiller\Model\UserInterface;
 
 class PostItem extends AppBase
 {
-    use CurrentUserTrait;
-
     /**
      * @var \BetaKiller\Helper\ContentUrlParametersHelper
      */
@@ -19,14 +17,22 @@ class PostItem extends AppBase
     private $contentModel;
 
     /**
+     * @var \BetaKiller\Model\UserInterface
+     */
+    private $user;
+
+    /**
      * PostItem constructor.
      *
      * @param \BetaKiller\Helper\ContentUrlParametersHelper $urlParametersHelper
+     * @param \BetaKiller\Model\UserInterface               $user
      */
-    public function __construct(ContentUrlParametersHelper $urlParametersHelper)
+    public function __construct(ContentUrlParametersHelper $urlParametersHelper, UserInterface $user)
     {
         parent::__construct();
+
         $this->urlParametersHelper = $urlParametersHelper;
+        $this->user                = $user;
     }
 
     /**
@@ -35,10 +41,8 @@ class PostItem extends AppBase
      */
     public function before()
     {
-        $user = $this->current_user(TRUE);
-
         // Count guest views only
-        if (!$user) {
+        if ($this->user->isGuest()) {
             $this->getContentModel()->incrementViewsCount()->save();
         }
     }
@@ -53,16 +57,8 @@ class PostItem extends AppBase
     {
         $model = $this->getContentModel();
 
-//        if ($model->isDefault())
-//        {
-//            $parent = $this->getParent();
-//            $url = $parent ? $parent->url() : '/';
-//
-//            $this->redirect($url);
-//        }
-
         return [
-            'post' =>  $this->getPostData($model),
+            'post' => $this->getPostData($model),
         ];
     }
 
@@ -82,14 +78,14 @@ class PostItem extends AppBase
         }
 
         return [
-            'id'            =>  $model->get_id(),
-            'label'         =>  $model->getLabel(),
-            'content'       =>  $model->getContent(),
-            'created_at'    =>  $model->getCreatedAt(),
-            'updated_at'    =>  $model->getUpdatedAt(),
-            'thumbnails'    =>  $thumbnails,
-            'is_page'       =>  $model->isPage(),
-            'is_default'    =>  $model->isDefault(),
+            'id'         => $model->get_id(),
+            'label'      => $model->getLabel(),
+            'content'    => $model->getContent(),
+            'created_at' => $model->getCreatedAt(),
+            'updated_at' => $model->getUpdatedAt(),
+            'thumbnails' => $thumbnails,
+            'is_page'    => $model->isPage(),
+            'is_default' => $model->isDefault(),
         ];
     }
 

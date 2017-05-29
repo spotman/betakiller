@@ -27,7 +27,7 @@ class DeleteApiMethod extends AbstractApiMethod
      */
     public function execute()
     {
-        $this->phpExceptionStorageFactory()->delete($this->model);
+        $this->phpExceptionStorage->delete($this->model);
 
         return null;
     }

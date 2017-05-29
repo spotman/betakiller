@@ -32,11 +32,6 @@ interface StatusRelatedModelInterface
     public function is_status_transition_allowed($codename);
 
     /**
-     * @return StatusModelInterface[]
-     */
-    public function get_allowed_statuses();
-
-    /**
      * @return StatusTransitionModelInterface[]
      */
     public function get_source_transitions();

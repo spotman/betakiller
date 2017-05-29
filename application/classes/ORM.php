@@ -2,6 +2,7 @@
 
 use BetaKiller\DI\Container;
 use BetaKiller\Factory\OrmFactory;
+use BetaKiller\IFace\Url\DispatchableEntityInterface;
 use BetaKiller\IFace\Url\UrlDataSourceInterface;
 use BetaKiller\IFace\Url\UrlParametersInterface;
 use BetaKiller\Search\Model\Applicable;
@@ -10,12 +11,13 @@ use BetaKiller\Utils;
 use BetaKiller\Utils\Kohana\ORM\OrmInterface;
 use Spotman\Api\ApiResponseItemInterface;
 
-class ORM extends Utils\Kohana\ORM implements ApiResponseItemInterface, UrlDataSourceInterface, Applicable, ResultsItem
+class ORM extends Utils\Kohana\ORM
+    implements ApiResponseItemInterface, UrlDataSourceInterface, DispatchableEntityInterface, Applicable, ResultsItem
 {
     /**
      * @var OrmFactory
      */
-    protected static $_factory_instance;
+    private static $factoryInstance;
 
     /**
      * @param string         $model
@@ -54,14 +56,24 @@ class ORM extends Utils\Kohana\ORM implements ApiResponseItemInterface, UrlDataS
 
     protected static function getFactory()
     {
-        if (!self::$_factory_instance) {
+        if (!self::$factoryInstance) {
             /** @var OrmFactory $factory */
             $factory = Container::getInstance()->get(OrmFactory::class);
 
-            self::$_factory_instance = $factory;
+            self::$factoryInstance = $factory;
         }
 
-        return self::$_factory_instance;
+        return self::$factoryInstance;
+    }
+
+    /**
+     * Returns key which will be used for storing model in UrlParameters registry.
+     *
+     * @return string
+     */
+    public static function getUrlParameterKey()
+    {
+        return static::detectModelName();
     }
 
     /**
@@ -94,13 +106,13 @@ class ORM extends Utils\Kohana\ORM implements ApiResponseItemInterface, UrlDataS
      * @param string                 $value
      * @param UrlParametersInterface $parameters
      *
-     * @return UrlDataSourceInterface|NULL
+     * @return DispatchableEntityInterface|NULL
      */
     public function findByUrlKey($key, $value, UrlParametersInterface $parameters)
     {
         // Additional filtering for non-pk keys
         if ($key !== $this->primary_key()) {
-            $this->custom_find_by_url_filter($parameters);
+            $this->customFilterForSearchByUrl($parameters);
         }
 
         $model = $this->where($this->object_column($key), '=', $value)->find();
@@ -111,14 +123,9 @@ class ORM extends Utils\Kohana\ORM implements ApiResponseItemInterface, UrlDataS
     /**
      * @param UrlParametersInterface $parameters
      */
-    protected function custom_find_by_url_filter(UrlParametersInterface $parameters)
+    protected function customFilterForSearchByUrl(UrlParametersInterface $parameters)
     {
         // Empty by default
-    }
-
-    public function getDefaultUrlValue()
-    {
-        return 'index';
     }
 
     /**
@@ -140,13 +147,13 @@ class ORM extends Utils\Kohana\ORM implements ApiResponseItemInterface, UrlDataS
      * @param UrlParametersInterface $parameters
      * @param int|null               $limit
      *
-     * @return \BetaKiller\IFace\Url\UrlDataSourceInterface[]
+     * @return \BetaKiller\IFace\Url\DispatchableEntityInterface[]
      */
     public function getAvailableItemsByUrlKey($key, UrlParametersInterface $parameters, $limit = null)
     {
         // Additional filtering for non-pk keys
-        if ($key != $this->primary_key()) {
-            $this->custom_find_by_url_filter($parameters);
+        if ($key !== $this->primary_key()) {
+            $this->customFilterForSearchByUrl($parameters);
         }
 
         if ($limit) {
@@ -177,18 +184,6 @@ class ORM extends Utils\Kohana\ORM implements ApiResponseItemInterface, UrlDataS
     public function presetLinkedModels(UrlParametersInterface $parameters)
     {
         // Nothing by default
-    }
-
-    /**
-     * Returns custom key which may be used for storing model in UrlParameters registry.
-     * Default policy applies if NULL returned.
-     *
-     * @return string|null
-     */
-    public function getCustomUrlParametersKey()
-    {
-        // Nothing by default
-        return null;
     }
 
     /**
@@ -261,5 +256,4 @@ class ORM extends Utils\Kohana\ORM implements ApiResponseItemInterface, UrlDataS
             $itemsPerPage ?: 25
         );
     }
-
 }

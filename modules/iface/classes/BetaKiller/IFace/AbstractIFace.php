@@ -4,7 +4,6 @@ namespace BetaKiller\IFace;
 use BetaKiller\Config\AppConfigInterface;
 use BetaKiller\IFace\Exception\IFaceException;
 use BetaKiller\IFace\Url\UrlParametersInterface;
-use BetaKiller\IFace\View\IFaceView;
 use DateInterval;
 use DateTime;
 use Text;
@@ -34,27 +33,21 @@ abstract class AbstractIFace implements IFaceInterface
 
     /**
      * @Inject
+     * @var \BetaKiller\Helper\IFaceHelper
+     */
+    protected $ifaceHelper;
+
+    /**
+     * @Inject
      * @var AppConfigInterface
      */
     private $appConfig;
 
     /**
      * @Inject
-     * @var \BetaKiller\IFace\IFaceStack
-     */
-    private $ifaceStack;
-
-    /**
-     * @Inject
      * @var \BetaKiller\IFace\IFaceProvider
      */
     private $ifaceProvider;
-
-    /**
-     * @var IFaceView
-     * @Inject
-     */
-    private $ifaceView;
 
     /**
      * @Inject
@@ -92,8 +85,7 @@ abstract class AbstractIFace implements IFaceInterface
      */
     public function render()
     {
-        // Getting IFace View instance and rendering
-        return $this->ifaceView->render($this);
+        return $this->ifaceHelper->renderIFace($this);
     }
 
     public function getLayoutCodename()
@@ -406,12 +398,22 @@ abstract class AbstractIFace implements IFaceInterface
 
     public function isInStack()
     {
-        return $this->ifaceStack->has($this);
+        return $this->ifaceHelper->isInStack($this);
     }
 
     public function isCurrent(UrlParametersInterface $parameters = null)
     {
-        return $this->ifaceStack->isCurrent($this, $parameters);
+        return $this->ifaceHelper->isCurrentIFace($this, $parameters);
+    }
+
+    /**
+     * Returns zone codename where this IFace is placed
+     *
+     * @return string
+     */
+    public function getZoneName()
+    {
+        return $this->getModel()->getZoneName();
     }
 
     public function url(UrlParametersInterface $parameters = null, $removeCyclingLinks = true, $withDomain = true)
@@ -476,57 +478,54 @@ abstract class AbstractIFace implements IFaceInterface
     /**
      * @param \BetaKiller\IFace\Url\UrlParametersInterface $params
      * @param int|null                                     $limit
-     * @param bool                                         $withDomain
      *
      * @return string[]
      */
-    public function getAvailableUrls(UrlParametersInterface $params, $limit = null, $withDomain = true)
+    public function getAvailableUrls(UrlParametersInterface $params, $limit = null)
     {
         if (!$this->getModel()->hasDynamicUrl()) {
             // Make static URL
-            return [$this->makeAvailableUrl($params, $withDomain)];
+            return [$this->makeAvailableUrl($params)];
         }
 
-        return $this->getDynamicModelAvailableUrls($params, $limit, $withDomain);
+        return $this->getDynamicModelAvailableUrls($params, $limit);
     }
 
     /**
      * @param \BetaKiller\IFace\Url\UrlParametersInterface $params
      * @param int|null                                     $limit
-     * @param bool                                         $withDomain
      *
      * @return string[]
      */
-    private function getDynamicModelAvailableUrls(UrlParametersInterface $params, $limit = null, $withDomain = true)
+    private function getDynamicModelAvailableUrls(UrlParametersInterface $params, $limit = null)
     {
-        $prototype = $this->prototypeHelper->fromIFaceUri($this);
-        $model     = $this->prototypeHelper->getModelInstance($prototype);
+        $prototype  = $this->prototypeHelper->fromIFaceUri($this);
+        $dataSource = $this->prototypeHelper->getDataSourceInstance($prototype);
 
-        $modelName = $prototype->getModelName();
-        $modelKey  = $prototype->getModelKey();
+        $modelKey = $prototype->getModelKey();
 
-        $items = $model->getAvailableItemsByUrlKey($modelKey, $params, $limit);
+        $items = $dataSource->getAvailableItemsByUrlKey($modelKey, $params, $limit);
         $urls  = [];
 
         foreach ($items as $item) {
             // Save current item to parameters registry
-            $params->set($modelName, $item, true);
+            $params->setEntity($item, true);
 
             // Make dynamic URL
-            $urls[] = $this->makeAvailableUrl($params, $withDomain);
+            $urls[] = $this->makeAvailableUrl($params);
 
             // Recursion for trees
             if ($this->getModel()->hasTreeBehaviour()) {
                 // Recursion for tree behaviour
-                $urls = array_merge($urls, $this->getDynamicModelAvailableUrls($params, $limit, $withDomain));
+                $urls = array_merge($urls, $this->getDynamicModelAvailableUrls($params, $limit));
             }
         }
 
         return $urls;
     }
 
-    private function makeAvailableUrl(UrlParametersInterface $params = null, $withDomain = true)
+    private function makeAvailableUrl(UrlParametersInterface $params = null)
     {
-        return $this->url($params, false, $withDomain); // Disable cycling links removing
+        return $this->url($params, false); // Disable cycling links removing
     }
 }

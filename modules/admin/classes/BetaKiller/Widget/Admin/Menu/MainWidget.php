@@ -1,15 +1,17 @@
 <?php
 namespace BetaKiller\Widget\Admin\Menu;
 
-use BetaKiller\Helper\ContentTrait;
 use BetaKiller\IFace\IFaceInterface;
-use BetaKiller\IFace\Url\UrlParameters;
 use BetaKiller\IFace\Url\UrlParametersInterface;
 use BetaKiller\IFace\Widget\AbstractAdminWidget;
 
 class MainWidget extends AbstractAdminWidget
 {
-    use ContentTrait;
+    /**
+     * @Inject
+     * @var \BetaKiller\Helper\ContentUrlParametersHelper
+     */
+    private $contentUrlParametersHelper;
 
     /**
      * Returns data for View rendering
@@ -23,7 +25,7 @@ class MainWidget extends AbstractAdminWidget
             $this->getCommentsMenu(),
             $this->getErrorsMenu(),
         ];
-        
+
         return [
             'items' => array_filter($items),
         ];
@@ -32,7 +34,7 @@ class MainWidget extends AbstractAdminWidget
     protected function getPostsMenu()
     {
         /** @var \BetaKiller\IFace\Admin\Content\PostIndex $posts */
-        $postsIndex = $this->iface_from_codename('Admin_Content_PostIndex');
+        $postsIndex = $this->ifaceHelper->createIFaceFromCodename('Admin_Content_PostIndex');
 
         return $this->makeIFaceMenuItemData($postsIndex);
     }
@@ -63,18 +65,21 @@ class MainWidget extends AbstractAdminWidget
     protected function getCommentsMenu()
     {
         /** @var \BetaKiller\IFace\Admin\Content\CommentIndex $comments */
-        $commentsIndex = $this->iface_from_codename('Admin_Content_CommentIndex');
+        $commentsIndex = $this->ifaceHelper->createIFaceFromCodename('Admin_Content_CommentIndex');
 
         /** @var \BetaKiller\IFace\Admin\Content\CommentListByStatus $comments */
-        $commentListInStatus = $this->iface_from_codename('Admin_Content_CommentListByStatus');
+        $commentListInStatus = $this->ifaceHelper->createIFaceFromCodename('Admin_Content_CommentListByStatus');
 
         /** @var \Model_ContentCommentStatus[] $statuses */
+        // TODO Get comment statuses only allowed by ACL
         $statuses = $this->model_factory_content_comment_status()->get_all();
 
         $childrenData = [];
 
         foreach ($statuses as $status) {
-            $params = UrlParameters::create()->set($status::URL_PARAM, $status);
+            $params = $this->contentUrlParametersHelper
+                ->createEmpty()
+                ->setEntity($status);
 
             $childrenData[] = $this->getIFaceMenuItemData($commentListInStatus, $params);
         }
@@ -84,18 +89,18 @@ class MainWidget extends AbstractAdminWidget
 
     protected function getErrorsMenu()
     {
-        if (!$this->user->is_developer()) {
+        if (!$this->user->isDeveloper()) {
             return null;
         }
 
         /** @var \BetaKiller\IFace\Admin\Error\Index $iface */
-        $errorsIndex = $this->iface_from_codename('Admin_Error_Index');
+        $errorsIndex = $this->ifaceHelper->createIFaceFromCodename('Admin_Error_Index');
 
         /** @var \BetaKiller\IFace\Admin\Error\UnresolvedPhpExceptionIndex $iface */
-        $unresolvedErrors = $this->iface_from_codename('Admin_Error_UnresolvedPhpExceptionIndex');
+        $unresolvedErrors = $this->ifaceHelper->createIFaceFromCodename('Admin_Error_UnresolvedPhpExceptionIndex');
 
         /** @var \BetaKiller\IFace\Admin\Error\ResolvedPhpExceptionIndex $iface */
-        $resolvedErrors = $this->iface_from_codename('Admin_Error_ResolvedPhpExceptionIndex');
+        $resolvedErrors = $this->ifaceHelper->createIFaceFromCodename('Admin_Error_ResolvedPhpExceptionIndex');
 
         $childrenData = [
             $this->makeIFaceMenuItemData($unresolvedErrors),

@@ -2,6 +2,7 @@
 namespace BetaKiller\IFace\App\Content;
 
 use BetaKiller\IFace\Exception\IFaceMissingUrlException;
+use BetaKiller\IFace\Url\DispatchableEntityInterface;
 
 class PostIndexItem extends PostItem
 {
@@ -13,17 +14,17 @@ class PostIndexItem extends PostItem
     {
         $orm = $this->model_factory_content_post();
 
-        $defaultUri = $orm->getDefaultUrlValue();
-        $params = $this->urlParametersHelper->getUrlParameters();
+        $defaultUri = DispatchableEntityInterface::DEFAULT_URI;
+        $params = $this->urlParametersHelper->getCurrentUrlParameters();
 
-        /** @var \Model_ContentPost|null $model */
-        $model = $orm->findByUrlKey('uri', $defaultUri, $params);
+        /** @var \Model_ContentPost|null $entity */
+        $entity = $orm->findByUrlKey('uri', $defaultUri, $params);
 
-        if (!$model) {
+        if (!$entity) {
             throw new IFaceMissingUrlException($defaultUri, $this->getParent());
         }
 
-        $this->urlParametersHelper->setContentPost($model);
+        $this->urlParametersHelper->setContentPost($entity);
 
         return parent::detectContentModel();
     }

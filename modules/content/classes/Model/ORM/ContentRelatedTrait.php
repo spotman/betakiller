@@ -5,7 +5,7 @@ use BetaKiller\Content\ContentRelatedInterface;
 trait Model_ORM_ContentRelatedTrait
 {
     /**
-     * @var \BetaKiller\Content\LinkedContentModelInterface
+     * @var \BetaKiller\Content\EntityLinkedModelInterface
      */
     protected $linkedModel;
 
@@ -22,17 +22,18 @@ trait Model_ORM_ContentRelatedTrait
     }
 
     /**
-     * @param Model_ContentEntity $entity
+     * @param Model_Entity $entity
+     *
      * @return $this|ORM
      * @throws Kohana_Exception
      */
-    public function set_entity(Model_ContentEntity $entity)
+    public function set_entity(Model_Entity $entity)
     {
         return $this->set('entity', $entity);
     }
 
     /**
-     * @return Model_ContentEntity
+     * @return Model_Entity
      * @throws Kohana_Exception
      */
     public function get_entity()
@@ -45,7 +46,7 @@ trait Model_ORM_ContentRelatedTrait
      */
     public function get_entity_slug()
     {
-        return $this->get_entity()->get_slug();
+        return $this->get_entity()->getSlug();
     }
 
     /**
@@ -69,7 +70,7 @@ trait Model_ORM_ContentRelatedTrait
         return $this->get('entity_item_id');
     }
 
-    public function get_entity_items_ids(Model_ContentEntity $entity)
+    public function get_entity_items_ids(Model_Entity $entity)
     {
         /** @var ContentRelatedInterface $model */
         $model = $this->model_factory();
@@ -111,7 +112,7 @@ trait Model_ORM_ContentRelatedTrait
         return $this->where($this->object_column('entity_id'), '=', $entity_id);
     }
 
-    protected function filter_entity_and_entity_item_id(Model_ContentEntity $entity = null, $entity_item_id = null)
+    protected function filter_entity_and_entity_item_id(Model_Entity $entity = null, $entity_item_id = null)
     {
         if ($entity) {
             $this->filter_entity_id($entity->get_id());
@@ -133,13 +134,13 @@ trait Model_ORM_ContentRelatedTrait
     }
 
     /**
-     * @return \BetaKiller\Content\LinkedContentModelInterface
+     * @return \BetaKiller\Content\EntityLinkedModelInterface
      */
     protected function get_related_item_model()
     {
         if (!$this->linkedModel) {
             $id = $this->get_entity_item_id();
-            $this->linkedModel = $this->get_entity()->get_linked_model_instance($id);
+            $this->linkedModel = $this->get_entity()->getLinkedModelInstance($id);
         }
 
         return $this->linkedModel;

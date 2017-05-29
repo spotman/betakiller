@@ -142,7 +142,7 @@ class Controller_Basic extends Controller {
     {
         // Показываем профайлер только разработчикам и только если это не AJAX/HVMC запрос
         return ( $this->request->is_initial() AND ! $this->request->is_ajax()
-            AND Env::user(TRUE) AND Env::user()->is_developer() AND Profiler::is_enabled() );
+            AND Env::user(TRUE) AND Env::user()->isDeveloper() AND Profiler::is_enabled() );
     }
 
     /**

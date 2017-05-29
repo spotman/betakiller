@@ -592,9 +592,9 @@ class Kohana_Date {
 		$tz   = new DateTimeZone($timezone ? $timezone : date_default_timezone_get());
 		$time = new DateTime($datetime_str, $tz);
 
-		if ($time->getTimeZone()->getName() !== $tz->getName())
+		if ($time->getTimezone()->getName() !== $tz->getName())
 		{
-			$time->setTimeZone($tz);
+			$time->setTimezone($tz);
 		}
 
 		return $time->format($timestamp_format);

@@ -1,101 +1,83 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
-use BetaKiller\Device;
+use BetaKiller\IFace\Widget\BaseWidget;
 
 class BetaKiller_Twig_Extension extends Twig_Extension
 {
-    use \BetaKiller\Helper\CurrentUserTrait;
-    use \BetaKiller\Helper\IFaceTrait;
-
-    /**
-     * Returns the name of the extension.
-     *
-     * @return string The extension name
-     */
-    public function getName()
-    {
-        return 'BetaKiller';
-    }
-
     public function getFunctions()
     {
-        return array(
+        return [
 
             new Twig_SimpleFunction(
                 'js',
-                array($this, 'js'),
-                array('is_safe' => array('html'))
+                [$this, 'js'],
+                ['is_safe' => ['html']]
             ),
 
             new Twig_SimpleFunction(
                 'js_build',
-                array($this, 'js_build'),
-                array('is_safe' => array('html'))
+                [$this, 'js_build'],
+                ['is_safe' => ['html']]
             ),
 
             new Twig_SimpleFunction(
                 'css',
-                array($this, 'css'),
-                array('is_safe' => array('html'))
+                [$this, 'css'],
+                ['is_safe' => ['html']]
             ),
 
             new Twig_SimpleFunction(
                 'static',
-                array($this, 'get_link_to_static_file'),
-                array('is_safe' => array('html'))
+                [$this, 'get_link_to_static_file'],
+                ['is_safe' => ['html']]
             ),
 
             new Twig_SimpleFunction(
                 'image',
-                array($this, 'image'),
-                array('is_safe' => array('html'))
+                [$this, 'image'],
+                ['is_safe' => ['html']]
             ),
 
             new Twig_SimpleFunction(
                 'assets',
-                array($this, 'assets')
+                [$this, 'assets']
             ),
 
             new Twig_SimpleFunction(
                 'meta',
-                array($this, 'meta')
+                [$this, 'meta']
             ),
 
 //            new Twig_SimpleFunction('iface_url', array($this, 'iface_url')),
 
-            new Twig_SimpleFunction('is_device', array($this, 'is_device')),
+            new Twig_SimpleFunction('is_device', [$this, 'is_device']),
 
             new Twig_SimpleFunction(
                 'profiler',
-                array($this, 'show_profiler'),
-                array('is_safe' => array('html'))
+                [$this, 'show_profiler'],
+                ['is_safe' => ['html']]
             ),
 
             new Twig_SimpleFunction(
                 'widget',
-                array($this, 'widget'),
-                array('is_safe' => array('html'), 'needs_context' => true)
+                [$this, 'widget'],
+                ['is_safe' => ['html'], 'needs_context' => true]
             ),
 
             new Twig_SimpleFunction(
                 'in_production',
-                array($this, 'in_production')
+                [$this, 'in_production']
             ),
 
             new Twig_SimpleFunction(
                 'in_staging',
-                array($this, 'in_staging')
-            ),
-
-            new Twig_SimpleFunction(
-                'user_is_moderator',
-                array($this, 'user_is_moderator')
+                [$this, 'in_staging']
             ),
 
             new Twig_SimpleFunction(
                 'json_encode',
                 'json_encode',
-                array('is_safe' => array('html'))
+                ['is_safe' => ['html']]
             ),
 
             /**
@@ -103,25 +85,12 @@ class BetaKiller_Twig_Extension extends Twig_Extension
              */
             new Twig_SimpleFunction(
                 'title',
-                function($value) {
+                function ($value) {
                     Meta::instance()->title($value, Meta::TITLE_APPEND);
                 }
             ),
 
-            /**
-             * Возвращает ссылку на родительский IFace
-             */
-            new Twig_SimpleFunction(
-                'parent_iface_url',
-                function() {
-                    return $this->url_dispatcher()
-                        ->currentIFace()
-                        ->getParent()
-                        ->url($this->url_parameters());
-                }
-            ),
-
-        );
+        ];
     }
 
     public function getFilters()
@@ -138,19 +107,22 @@ class BetaKiller_Twig_Extension extends Twig_Extension
             /**
              * International pluralization via translation strings
              * The first key-value pair would be used if no context provided
+             *
              * @example ":count lots"|plural({ ":count": lotsCount })
              */
-            new Twig_SimpleFilter('plural', function ($text, $values, $context = NULL) {
+            new Twig_SimpleFilter('plural', function ($text, $values, $context = null) {
                 if (!is_array($values)) {
                     $values = [
-                        ':count'    =>  (int)$values,
+                        ':count' => (int)$values,
                     ];
                 }
+
                 return ___($text, $context ?: current($values), $values);
             }),
 
             /**
              * I18n via translation strings
+             *
              * @example ":count lots"|i18n({ ":count": lotsCount })
              */
             new Twig_SimpleFilter('i18n', function ($text, array $values = null) {
@@ -177,12 +149,12 @@ class BetaKiller_Twig_Extension extends Twig_Extension
     {
         $instance = JS::instance();
 
-        foreach ( func_get_args() as $js )
-        {
-            if ( mb_substr($js, 0, 4) == 'http' || mb_substr($js, 0, 2) == '//' )
+        foreach (func_get_args() as $js) {
+            if (mb_strpos($js, 'http') === 0 || mb_strpos($js, '//') === 0) {
                 $instance->add_public($js);
-            else
+            } else {
                 $instance->add_static($js);
+            }
         }
     }
 
@@ -191,16 +163,16 @@ class BetaKiller_Twig_Extension extends Twig_Extension
      */
     public function js_build()
     {
-        // TODO Временно отключаем пока не сделаны билды
-        if ( TRUE OR ! Kohana::in_production() )
-            return;
-
-        $instance = JS::instance();
-
-        foreach ( func_get_args() as $js )
-        {
-            $instance->add($js);
-        }
+//         Временно отключаем пока не сделаны билды
+//
+//        if (!Kohana::in_production())
+//            return;
+//
+//        $instance = JS::instance();
+//
+//        foreach (func_get_args() as $js) {
+//            $instance->add($js);
+//        }
     }
 
     /**
@@ -210,12 +182,12 @@ class BetaKiller_Twig_Extension extends Twig_Extension
     {
         $instance = CSS::instance();
 
-        foreach ( func_get_args() as $css )
-        {
-            if ( mb_substr($css, 0, 4) === 'http' || mb_substr($css, 0, 2) === '//')
+        foreach (func_get_args() as $css) {
+            if (mb_strpos($css, 'http') === 0 || mb_strpos($css, '//') === 0) {
                 $instance->add_public($css);
-            else
+            } else {
                 $instance->add_static($css);
+            }
         }
     }
 
@@ -223,13 +195,12 @@ class BetaKiller_Twig_Extension extends Twig_Extension
     {
         $attributes = array_merge($attributes, $data);
 
-        if (!$force_size)
-        {
+        if (!$force_size) {
             unset($attributes['width'], $attributes['height']);
         }
 
         $title = $attributes['title'];
-        $alt = $attributes['alt'];
+        $alt   = $attributes['alt'];
 
         $attributes['title'] = $title ?: $alt;
 
@@ -242,6 +213,7 @@ class BetaKiller_Twig_Extension extends Twig_Extension
      * Helper for getting link for custom static file
      *
      * @param string $filename
+     *
      * @return string
      */
     public function get_link_to_static_file($filename)
@@ -256,8 +228,7 @@ class BetaKiller_Twig_Extension extends Twig_Extension
     {
         $instance = Assets::instance();
 
-        foreach ( func_get_args() as $asset )
-        {
+        foreach (func_get_args() as $asset) {
             $instance->add($asset);
         }
     }
@@ -266,22 +237,21 @@ class BetaKiller_Twig_Extension extends Twig_Extension
      * Helper for adding HTML meta-headers in output
      *
      * @param string|array $name
-     * @param null $value
+     * @param null         $value
+     *
      * @return string|null
      */
-    public function meta($name = NULL, $value = NULL)
+    public function meta($name = null, $value = null)
     {
         $instance = Meta::instance();
 
-        if ( $value === NULL AND ! is_array($name) )
-        {
+        if ($value === null && !is_array($name)) {
             return $instance->get($name);
         }
-        else
-        {
-            $instance->set($name, $value);
-            return NULL;
-        }
+
+        $instance->set($name, $value);
+
+        return null;
     }
 
     public function show_profiler()
@@ -291,20 +261,16 @@ class BetaKiller_Twig_Extension extends Twig_Extension
 
     public function is_device()
     {
-        return Device::instance()->is_portable();
+        $device = new Device;
+
+        return $device->is_mobile() || $device->is_tablet();
     }
 
-    public function widget(array $context, $name, array $data = array())
+    public function widget(array $context, $name, array $data = [])
     {
-        $widget = $this->widget_factory($name);
+        $widget = BaseWidget::factory($name);
         $widget->setContext(array_merge($context, $data));
+
         return $widget->render();
-    }
-
-    public function user_is_moderator()
-    {
-        $user = $this->current_user(TRUE);
-
-        return $user AND $user->is_moderator();
     }
 }

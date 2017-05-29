@@ -10,6 +10,12 @@ class Widget_Content_ArticlesList extends BaseWidget
     const PAGE_QUERY_KEY = 'page';
     const SEARCH_TERM_QUERY_KEY = 'term';
 
+    /**
+     * @Inject
+     * @var \BetaKiller\Helper\ContentUrlParametersHelper
+     */
+    private $urlParametersHelper;
+
     protected $items_per_page = 12;
 
     /**
@@ -58,7 +64,7 @@ class Widget_Content_ArticlesList extends BaseWidget
                 'label'         =>  $article->getLabel(),
                 'title'         =>  $article->getTitle(),
                 'text'          =>  $article->getContentPreview(),
-                'created_at'    =>  $article->getCreatedAt()->format("d.m.Y"),
+                'created_at'    =>  $article->getCreatedAt()->format('d.m.Y'),
             ];
 
             $index++;
@@ -90,7 +96,7 @@ class Widget_Content_ArticlesList extends BaseWidget
             return $this->model_factory_content_category($category_id);
         }
 
-        return $this->url_parameter_content_category();
+        return $this->urlParametersHelper->getContentCategory();
     }
 
     protected function get_search_term()
@@ -98,6 +104,13 @@ class Widget_Content_ArticlesList extends BaseWidget
         return $this->getContextParam('term') ?: HTML::chars(strip_tags($this->query(self::SEARCH_TERM_QUERY_KEY)));
     }
 
+    /**
+     * @param                             $page
+     * @param \Model_ContentCategory|null $category
+     * @param null                        $term
+     *
+     * @return \BetaKiller\Search\Model\Results
+     */
     protected function get_articles($page, Model_ContentCategory $category = null, $term = null)
     {
         $posts_orm = $this->model_factory_content_post();

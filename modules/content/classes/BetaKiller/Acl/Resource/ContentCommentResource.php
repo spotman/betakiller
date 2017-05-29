@@ -2,9 +2,10 @@
 namespace BetaKiller\Acl\Resource;
 
 use BetaKiller\Model\Role;
-use Spotman\Acl\Resource\CrudPermissionsResource;
+use Spotman\Acl\Resource\AbstractCrudPermissionsResource;
+use Spotman\Acl\Resource\CrudPermissionsResourceInterface;
 
-class ContentCommentResource extends CrudPermissionsResource
+class ContentCommentResource extends AbstractCrudPermissionsResource
 {
     /**
      * Returns default permissions bundled with current resource

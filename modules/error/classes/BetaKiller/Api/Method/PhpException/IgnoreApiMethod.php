@@ -29,7 +29,7 @@ class IgnoreApiMethod extends AbstractApiMethod
      */
     public function execute()
     {
-        $this->phpExceptionStorageFactory()->ignore($this->model, $this->current_user());
+        $this->phpExceptionStorage->ignore($this->model, $this->current_user());
 
         return null;
     }

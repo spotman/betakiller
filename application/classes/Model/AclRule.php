@@ -1,6 +1,6 @@
 <?php
 
-class Model_AclPermission extends \ORM
+class Model_AclRule extends \ORM
 {
     /**
      * Prepares the model database connection, determines the table name,
@@ -11,7 +11,7 @@ class Model_AclPermission extends \ORM
      */
     protected function _initialize()
     {
-        $this->_table_name = 'acl_permissions';
+        $this->_table_name = 'acl_rules';
 
         $this->belongs_to([
             'role' =>  [
@@ -24,13 +24,13 @@ class Model_AclPermission extends \ORM
                 'foreign_key'   =>  'resource_id'
             ],
 
-            'action' => [
-                'model'         =>  'AclResourceAction',
-                'foreign_key'   =>  'action_id'
+            'permission' => [
+                'model'         =>  'AclResourcePermission',
+                'foreign_key'   =>  'permission_id'
             ],
         ]);
 
-        $this->load_with(['resource', 'role', 'action', 'action:resource']);
+        $this->load_with(['resource', 'role', 'permission']);
 
         parent::_initialize();
     }
@@ -46,25 +46,17 @@ class Model_AclPermission extends \ORM
     /**
      * @return string
      */
-    public function get_acl_action_identity()
+    public function getAclActionIdentity()
     {
-        return $this->get_action_relation()->get_name();
+        return $this->getPermissionRelation()->getName();
     }
 
     /**
-     * @return string
+     * @return Model_AclResourcePermission
      */
-    public function get_acl_action_resource_identity()
+    private function getPermissionRelation()
     {
-        return $this->get_action_relation()->get_resource_identity();
-    }
-
-    /**
-     * @return Model_AclResourceAction
-     */
-    protected function get_action_relation()
-    {
-        return $this->get('action');
+        return $this->get('permission');
     }
 
     /**
@@ -80,23 +72,23 @@ class Model_AclPermission extends \ORM
     /**
      * @return string
      */
-    public function get_acl_role_identity()
+    public function getAclRoleIdentity()
     {
-        return $this->get_role_relation()->get_name();
+        return $this->getRoleRelation()->get_name();
     }
 
     /**
      * @return string
      */
-    public function get_acl_resource_identity()
+    public function getAclResourceIdentity()
     {
-        return $this->get_resource_relation()->getCodename();
+        return $this->getResourceRelation()->getCodename();
     }
 
     /**
      * @return $this[]
      */
-    public function get_all_permissions()
+    public function getAllPermissions()
     {
         return $this->get_all();
     }
@@ -104,7 +96,7 @@ class Model_AclPermission extends \ORM
     /**
      * @return \BetaKiller\Model\Role
      */
-    protected function get_role_relation()
+    private function getRoleRelation()
     {
         return $this->get('role');
     }
@@ -112,7 +104,7 @@ class Model_AclPermission extends \ORM
     /**
      * @return \Model_AclResource
      */
-    protected function get_resource_relation()
+    private function getResourceRelation()
     {
         return $this->get('resource');
     }

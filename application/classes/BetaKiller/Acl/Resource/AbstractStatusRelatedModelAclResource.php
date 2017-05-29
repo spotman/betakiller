@@ -1,12 +1,12 @@
 <?php
 namespace BetaKiller\Acl\Resource;
 
-use Spotman\Acl\Resource\CrudPermissionsResource;
-use BetaKiller\Status\StatusRelatedModelInterface;
 use BetaKiller\Status\StatusModelInterface;
+use BetaKiller\Status\StatusRelatedModelInterface;
 use Spotman\Acl\Exception;
+use Spotman\Acl\Resource\AbstractCrudPermissionsResource;
 
-abstract class AbstractStatusRelatedModelAclResource extends CrudPermissionsResource implements StatusRelatedModelAclResourceInterface
+abstract class AbstractStatusRelatedModelAclResource extends AbstractCrudPermissionsResource implements StatusRelatedModelAclResourceInterface
 {
     /**
      * @var \BetaKiller\Status\StatusRelatedModelInterface
@@ -105,13 +105,26 @@ abstract class AbstractStatusRelatedModelAclResource extends CrudPermissionsReso
         return 'status.'.$model->get_codename();
     }
 
+    /**
+     * @return string[]
+     */
     public function getStatusActionsList()
     {
         return [
-            CrudPermissionsResource::PERMISSION_READ,
-            CrudPermissionsResource::PERMISSION_UPDATE,
-            CrudPermissionsResource::PERMISSION_DELETE,
+            self::PERMISSION_READ,
+            self::PERMISSION_UPDATE,
+            self::PERMISSION_DELETE,
         ];
+    }
+
+    /**
+     * Returns true if this resource needs custom permission collector
+     *
+     * @return bool
+     */
+    public function isCustomPermissionCollectorUsed()
+    {
+        return true;
     }
 
     /**

@@ -1,75 +1,105 @@
 <?php
 namespace BetaKiller\IFace\Url;
 
+use BetaKiller\IFace\Exception\UrlParametersException;
 use BetaKiller\Utils\Registry\BasicRegistry;
 
 class UrlParameters implements UrlParametersInterface
 {
-    private $registry;
+    private $entitiesRegistry;
 
     /**
      * UrlParameters constructor.
      */
     public function __construct()
     {
-        $this->registry = new BasicRegistry;
+        $this->entitiesRegistry = new BasicRegistry;
     }
 
+    /**
+     * @return \BetaKiller\IFace\Url\UrlParametersInterface
+     */
     public static function create()
     {
         return new static;
     }
 
     /**
-     * @param string                 $key
-     * @param UrlDataSourceInterface $object
-     * @param bool|false             $ignoreDuplicate
+     * @param \BetaKiller\IFace\Url\DispatchableEntityInterface $object
+     * @param bool|null                                         $ignoreDuplicate
      *
      * @return $this
      * @throws \Exception
      */
-    public function set($key, UrlDataSourceInterface $object, $ignoreDuplicate = false)
+    public function setEntity(DispatchableEntityInterface $object, $ignoreDuplicate = null)
     {
-        $key = $object->getCustomUrlParametersKey() ?: $key;
-
-        $this->registry->set($key, $object, $ignoreDuplicate);
+        $key = $object::getUrlParameterKey();
+        $this->entitiesRegistry->set($key, $object, (bool)$ignoreDuplicate);
 
         return $this;
     }
 
     /**
      * @param string $key
-     * @return UrlDataSourceInterface|null
+     *
+     * @return \BetaKiller\IFace\Url\DispatchableEntityInterface|null
      */
-    public function get($key)
+    public function getEntity($key)
     {
-        return $this->registry->get($key);
+        return $this->entitiesRegistry->get($key);
+    }
+
+    /**
+     * @param string|\BetaKiller\IFace\Url\DispatchableEntityInterface $className
+     *
+     * @return \BetaKiller\IFace\Url\DispatchableEntityInterface|mixed|null
+     */
+    public function getEntityByClassName($className)
+    {
+        if (is_object($className)) {
+            $className = get_class($className);
+        }
+
+        if (!is_a($className, DispatchableEntityInterface::class, true)) {
+            throw new UrlParametersException('Class :name must be instance of :must', [
+                ':name' => $className,
+                ':must' => DispatchableEntityInterface::class,
+            ]);
+        }
+
+        /** @var \BetaKiller\IFace\Url\DispatchableEntityInterface $className Hack for autocomplete */
+        $key = $className::getUrlParameterKey();
+
+        return $this->getEntity($key);
     }
 
     /**
      * @return $this
+     * @deprecated Url dispatching must be persistent
      */
     public function clear()
     {
-        $this->registry->clear();
+        $this->entitiesRegistry->clear();
+
         return $this;
     }
 
     /**
-     * @return UrlDataSourceInterface[]
+     * @return \BetaKiller\IFace\Url\DispatchableEntityInterface[]
      */
-    public function getAll()
+    public function getAllEntities()
     {
-        return $this->registry->getAll();
+        return $this->entitiesRegistry->getAll();
     }
 
     /**
      * @param string $key
+     *
      * @return bool
      */
-    public function has($key)
+    public function hasEntity($key)
     {
-        return $this->registry->has($key);
+        return $this->entitiesRegistry->has($key);
     }
 
     /**
@@ -77,18 +107,8 @@ class UrlParameters implements UrlParametersInterface
      *
      * @return string[]
      */
-    public function keys()
+    public function entitiesKeys()
     {
-        return $this->registry->keys();
-    }
-
-    /**
-     * Retrieve an external iterator
-     *
-     * @return \Traversable|\BetaKiller\IFace\Url\UrlDataSourceInterface[]
-     */
-    public function getIterator()
-    {
-        return $this->registry->getIterator();
+        return $this->entitiesRegistry->keys();
     }
 }

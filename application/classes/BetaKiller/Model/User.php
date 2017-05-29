@@ -91,7 +91,7 @@ class User extends \Model_Auth_User implements UserInterface
     /**
      * @return bool
      */
-    public function is_developer()
+    public function isDeveloper()
     {
         return $this->has_role(Role::DEVELOPER_ROLE_NAME);
     }
@@ -100,7 +100,7 @@ class User extends \Model_Auth_User implements UserInterface
      * @return bool
      * @deprecated
      */
-    public function is_moderator()
+    public function isModerator()
     {
         return $this->has_role(Role::MODERATOR_ROLE_NAME);
     }
@@ -427,7 +427,7 @@ class User extends \Model_Auth_User implements UserInterface
      */
     public function is_admin_allowed()
     {
-        return ($this->is_moderator() || $this->is_developer() || $this->is_writer());
+        return ($this->isModerator() || $this->isDeveloper() || $this->is_writer());
     }
 
     public function as_array()
@@ -456,6 +456,19 @@ class User extends \Model_Auth_User implements UserInterface
     public function getAccessControlRoles()
     {
         return $this->get_roles_relation()->get_all();
+    }
+
+    /**
+     * Forces authorization if user is not logged in
+     *
+     * @throws \HTTP_Exception_401
+     * @return void
+     */
+    public function forceAuthorization()
+    {
+        if ($this->isGuest()) {
+            throw new \HTTP_Exception_401();
+        }
     }
 
     protected function getSerializableProperties()

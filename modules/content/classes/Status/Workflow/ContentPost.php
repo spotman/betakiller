@@ -1,6 +1,6 @@
 <?php
 
-use BetaKiller\Notification\NotificationMessageFactory;
+use BetaKiller\Helper\NotificationHelper;
 use BetaKiller\Status\StatusRelatedModelInterface;
 use BetaKiller\Status\StatusWorkflow;
 use BetaKiller\Status\StatusWorkflowException;
@@ -13,20 +13,20 @@ class Status_Workflow_ContentPost extends StatusWorkflow
     const TRANSITION_FIX      = 'fix';
 
     /**
-     * @var \BetaKiller\Notification\NotificationMessageFactory
+     * @var \BetaKiller\Helper\NotificationHelper
      */
-    private $messageFactory;
+    private $notificationHelper;
 
     /**
      * Status_Workflow_ContentPost constructor.
      *
      * @param \BetaKiller\Status\StatusRelatedModelInterface      $model
-     * @param \BetaKiller\Notification\NotificationMessageFactory $messageFactory
+     * @param \BetaKiller\Helper\NotificationHelper $notificationHelper
      */
-    public function __construct(StatusRelatedModelInterface $model, NotificationMessageFactory $messageFactory)
+    public function __construct(StatusRelatedModelInterface $model, NotificationHelper $notificationHelper)
     {
         parent::__construct($model);
-        $this->messageFactory = $messageFactory;
+        $this->notificationHelper = $notificationHelper;
     }
 
     public function draft()
@@ -55,8 +55,7 @@ class Status_Workflow_ContentPost extends StatusWorkflow
 
     private function notifyModeratorAboutCompletePost()
     {
-        /** @var \BetaKiller\Notification\NotificationMessageCommon $message */
-        $message = $this->messageFactory->create('moderator/post/complete');
+        $message = $this->notificationHelper->createMessage('moderator/post/complete');
 
         $model = $this->model();
 
@@ -65,9 +64,8 @@ class Status_Workflow_ContentPost extends StatusWorkflow
             'label' => $model->getLabel(),
         ];
 
-        $message
-            ->set_template_data($data)
-            ->to_moderators();
+        $message->setTemplateData($data);
+        $this->notificationHelper->toModerators($message);
 
         $message->send();
     }

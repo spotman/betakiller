@@ -2,9 +2,11 @@
 namespace BetaKiller\Error;
 
 use BetaKiller\Helper\HasAdminUrlInterface;
+use BetaKiller\IFace\Url\DispatchableEntityInterface;
+use BetaKiller\IFace\Url\UrlDataSourceInterface;
 use BetaKiller\Model\UserInterface;
 
-interface PhpExceptionModelInterface extends HasAdminUrlInterface
+interface PhpExceptionModelInterface extends HasAdminUrlInterface, UrlDataSourceInterface, DispatchableEntityInterface
 {
     const STATE_NEW         = 'new';
     const STATE_RESOLVED    = 'resolved';
@@ -208,6 +210,11 @@ interface PhpExceptionModelInterface extends HasAdminUrlInterface
      * @return PhpExceptionHistoryModelInterface[]
      */
     public function getHistoricalRecords();
+
+    /**
+     * @return bool
+     */
+    public function loaded();
 
     public function save();
 

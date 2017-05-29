@@ -2,13 +2,12 @@
 
 namespace BetaKiller\Widget\Admin;
 
-use BetaKiller\Model\UserInterface;
-use BetaKiller\IFace\Widget\AbstractAdminWidget;
-use BetaKiller\IFace\Url\UrlDispatcher;
-use BetaKiller\IFace\Url\UrlParameters;
-use Model_ContentCommentStatus;
-use Model_ContentPost;
 use BetaKiller\Helper\ContentTrait;
+use BetaKiller\Helper\ContentUrlParametersHelper;
+use BetaKiller\Helper\IFaceHelper;
+use BetaKiller\IFace\Widget\AbstractAdminWidget;
+use BetaKiller\Model\UserInterface;
+use Model_ContentCommentStatus;
 
 class BarWidget extends AbstractAdminWidget
 {
@@ -19,17 +18,21 @@ class BarWidget extends AbstractAdminWidget
      */
     protected $dispatcher;
 
-
     /**
-     * BarWidget constructor.
-     *
-     * @param \BetaKiller\Model\UserInterface $user
-     * @param \BetaKiller\IFace\Url\UrlDispatcher $dispatcher
+     * @var \BetaKiller\Helper\ContentUrlParametersHelper
      */
-    public function __construct(UserInterface $user, UrlDispatcher $dispatcher)
+    private $contentUrlParamHelper;
+
+    public function __construct(
+        UserInterface $user,
+        IFaceHelper $ifaceHelper,
+        ContentUrlParametersHelper $cUrlParamHelper
+    )
     {
         parent::__construct($user);
-        $this->dispatcher = $dispatcher;
+
+        $this->ifaceHelper           = $ifaceHelper;
+        $this->contentUrlParamHelper = $cUrlParamHelper;
     }
 
     /**
@@ -77,10 +80,11 @@ class BarWidget extends AbstractAdminWidget
     protected function getCommentsListByStatusIfaceUrl(Model_ContentCommentStatus $status)
     {
         /** @var \BetaKiller\IFace\Admin\Content\CommentListByStatus $iface */
-        $iface = $this->iface_from_codename('Admin_Content_CommentListByStatus');
+        $iface = $this->ifaceHelper->createIFaceFromCodename('Admin_Content_CommentListByStatus');
 
-        $param = UrlParameters::create();
-        $param->set($status::URL_PARAM, $status);
+        $param = $this->contentUrlParamHelper->createEmpty();
+
+        $param->setEntity($status);
 
         return $iface->url($param);
     }
@@ -88,7 +92,7 @@ class BarWidget extends AbstractAdminWidget
     protected function getCommentsRootIfaceUrl()
     {
         /** @var \BetaKiller\IFace\Admin\Content\CommentIndex $iface */
-        $iface = $this->iface_from_codename('Admin_Content_CommentIndex');
+        $iface = $this->ifaceHelper->createIFaceFromCodename('Admin_Content_CommentIndex');
 
         return $iface->url();
     }
@@ -96,13 +100,10 @@ class BarWidget extends AbstractAdminWidget
     protected function getEditButtonUrl()
     {
         // TODO Detect editable via publicIFace->model->adminIface link
-        $currentIFace = $this->dispatcher->currentIFace();
-
-        $parameters = $this->dispatcher->parameters();
+        $currentIFace = $this->ifaceHelper->getCurrentIFace();
 
         if ($currentIFace instanceof \BetaKiller\IFace\App\Content\PostItem) {
-            /** @var Model_ContentPost $model */
-            $model = $parameters->get(Model_ContentPost::URL_PARAM);
+            $model = $this->contentUrlParamHelper->getContentPost();
 
             return $model->get_admin_url();
         }

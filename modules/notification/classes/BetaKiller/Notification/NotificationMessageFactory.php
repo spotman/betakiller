@@ -20,13 +20,18 @@ class NotificationMessageFactory
         $this->container = $container;
     }
 
+    /**
+     * @param string|null $name
+     *
+     * @return \BetaKiller\Notification\NotificationMessageInterface
+     */
     public function create($name = null)
     {
         /** @var NotificationMessageInterface $instance */
         $instance = $this->container->get(NotificationMessageInterface::class);
 
         if ($name) {
-            $instance->set_template_name($name);
+            $instance->setTemplateName($name);
         }
 
         return $instance;

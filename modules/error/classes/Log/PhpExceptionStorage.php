@@ -1,23 +1,47 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
-use BetaKiller\Notification\NotificationMessageCommon;
-use BetaKiller\Helper\AppEnvTrait;
+use BetaKiller\Error\PhpExceptionStorageInterface;
+use BetaKiller\Helper\AppEnv;
+use BetaKiller\Helper\NotificationHelper;
 
 class Log_PhpExceptionStorage extends Log_Writer
 {
-    use AppEnvTrait;
-
     /**
      * @var \BetaKiller\Error\PhpExceptionStorageInterface
      */
     protected $storage;
 
     /**
-     * Log_MongoDB constructor.
+     * @var \BetaKiller\Helper\AppEnv
      */
-    public function __construct()
+    private $appEnv;
+
+    /**
+     * @var \BetaKiller\Helper\NotificationHelper
+     */
+    private $notificationHelper;
+
+    /**
+     * Log_PhpExceptionStorage constructor.
+     *
+     * @param \BetaKiller\Error\PhpExceptionStorageInterface $storage
+     * @param \BetaKiller\Helper\AppEnv                      $env
+     * @param \BetaKiller\Helper\NotificationHelper          $notificationHelper
+     */
+    public function __construct(PhpExceptionStorageInterface $storage, AppEnv $env, NotificationHelper $notificationHelper)
     {
-        $this->storage = new \BetaKiller\Error\PhpExceptionStorage();
+        $this->storage            = $storage;
+        $this->appEnv             = $env;
+        $this->notificationHelper = $notificationHelper;
+    }
+
+    public function register()
+    {
+        if (!$this->appEnv->inProduction(true)) {
+            return;
+        }
+
+        Kohana::$log->attach($this, Log::NOTICE, Log::EMERGENCY);
     }
 
     /**
@@ -26,6 +50,7 @@ class Log_PhpExceptionStorage extends Log_Writer
      *     $writer->write($messages);
      *
      * @param   array $messages
+     *
      * @return  void
      */
     public function write(array $messages)
@@ -38,7 +63,7 @@ class Log_PhpExceptionStorage extends Log_Writer
                 // Prevent logging recursion
                 Kohana::$log->detach($this);
 
-                if ($this->in_production(true)) {
+                if ($this->appEnv->inProduction(true)) {
                     // Try to send notification to developers about logging subsystem failure
                     $this->notify_developers_about_failure($e);
                 } else {
@@ -54,14 +79,17 @@ class Log_PhpExceptionStorage extends Log_Writer
     protected function notify_developers_about_failure(\Exception $exception)
     {
         try {
-            NotificationMessageCommon::instance()
-                ->set_subj('BetaKiller logging subsystem failure')
-                ->set_template_name('developer/error/subsystem-failure')
-                ->set_template_data([
-                    'url' => \Kohana::$base_url,
-                    'message' => \Kohana_Exception::text($exception)
+            $message = $this->notificationHelper->createMessage();
+
+            $this->notificationHelper->toDevelopers($message);
+
+            $message
+                ->setSubj('BetaKiller logging subsystem failure')
+                ->setTemplateName('developer/error/subsystem-failure')
+                ->setTemplateData([
+                    'url'     => \Kohana::$base_url,
+                    'message' => \Kohana_Exception::text($exception),
                 ])
-                ->to_developers()
                 ->send();
         } catch (\Exception $e) {
             // Silently fail
