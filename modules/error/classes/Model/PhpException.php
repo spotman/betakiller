@@ -86,14 +86,6 @@ class Model_PhpException extends \ORM implements PhpExceptionModelInterface
     }
 
     /**
-     * @return string
-     */
-    public function getID()
-    {
-        return $this->get_id();
-    }
-
-    /**
      * @param string $module
      *
      * @return $this
@@ -188,6 +180,14 @@ class Model_PhpException extends \ORM implements PhpExceptionModelInterface
     public function incrementCounter()
     {
         return $this->setTotal($this->getTotal() + 1);
+    }
+
+    /**
+     * @return string
+     */
+    public function getLabel()
+    {
+        return $this->getMessage();
     }
 
     /**
@@ -580,18 +580,5 @@ class Model_PhpException extends \ORM implements PhpExceptionModelInterface
     public function orderByCreatedAt($desc = true)
     {
         return $this->order_by('created_at', $desc ? 'desc' : 'asc');
-    }
-
-    /**
-     * @return string
-     */
-    public function get_admin_url()
-    {
-        /** @var \BetaKiller\IFace\Admin\Error\PhpExceptionItem $iface */
-        $iface = $this->iface_from_codename('Admin_Error_PhpExceptionItem');
-
-        $params = $this->url_parameters_instance()->setDataSource($this);
-
-        return $iface->url($params);
     }
 }

@@ -1,6 +1,8 @@
 <?php
 namespace BetaKiller\IFace\Url;
 
+use BetaKiller\Model\DispatchableEntityInterface;
+
 interface UrlParametersInterface
 {
     /**
@@ -11,8 +13,8 @@ interface UrlParametersInterface
     public static function create();
 
     /**
-     * @param \BetaKiller\IFace\Url\DispatchableEntityInterface $object
-     * @param bool|false                                        $ignoreDuplicate
+     * @param \BetaKiller\Model\DispatchableEntityInterface $object
+     * @param bool|false                                    $ignoreDuplicate
      *
      * @return \BetaKiller\IFace\Url\UrlParametersInterface
      */
@@ -21,19 +23,19 @@ interface UrlParametersInterface
     /**
      * @param string $key
      *
-     * @return \BetaKiller\IFace\Url\DispatchableEntityInterface|mixed|null
+     * @return \BetaKiller\Model\DispatchableEntityInterface|mixed|null
      */
     public function getEntity($key);
 
     /**
-     * @param \BetaKiller\IFace\Url\DispatchableEntityInterface|string $className
+     * @param \BetaKiller\Model\DispatchableEntityInterface|string $className
      *
-     * @return \BetaKiller\IFace\Url\DispatchableEntityInterface|mixed|null
+     * @return \BetaKiller\Model\DispatchableEntityInterface|mixed|null
      */
     public function getEntityByClassName($className);
 
     /**
-     * @return \BetaKiller\IFace\Url\DispatchableEntityInterface[]
+     * @return \BetaKiller\Model\DispatchableEntityInterface[]
      */
     public function getAllEntities();
 

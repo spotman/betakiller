@@ -1,6 +1,7 @@
 <?php
 namespace BetaKiller\IFace\Url;
 
+use BetaKiller\Helper\AclHelper;
 use BetaKiller\Helper\AppEnv;
 use BetaKiller\IFace\Exception\IFaceException;
 use BetaKiller\IFace\Exception\IFaceMissingUrlException;
@@ -8,6 +9,7 @@ use BetaKiller\IFace\IFaceInterface;
 use BetaKiller\IFace\IFaceModelInterface;
 use BetaKiller\IFace\IFaceProvider;
 use BetaKiller\IFace\IFaceStack;
+use BetaKiller\Model\DispatchableEntityInterface;
 use HTTP;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
@@ -16,6 +18,11 @@ use Psr\Log\LoggerInterface;
 
 class UrlDispatcher implements LoggerAwareInterface
 {
+    /**
+     * Defines default uri for index element (this used if root IFace has dynamic url behaviour)
+     */
+    const DEFAULT_URI = 'index';
+
     /**
      * Current IFace stack
      *
@@ -57,28 +64,36 @@ class UrlDispatcher implements LoggerAwareInterface
     private $logger;
 
     /**
+     * @var \BetaKiller\Helper\AclHelper
+     */
+    private $aclHelper;
+
+    /**
      * @param \BetaKiller\IFace\IFaceStack                      $stack
      * @param \BetaKiller\IFace\IFaceProvider                   $provider
      * @param \BetaKiller\IFace\Url\UrlParametersInterface      $parameters
-     * @param \BetaKiller\IFace\Url\UrlPrototypeHelper          $helper
+     * @param \BetaKiller\IFace\Url\UrlPrototypeHelper          $prototypeHelper
      * @param \BetaKiller\IFace\Url\UrlDispatcherCacheInterface $cache
      * @param \BetaKiller\Helper\AppEnv                         $env
+     * @param \BetaKiller\Helper\AclHelper                      $aclHelper
      */
     public function __construct(
         IFaceStack $stack,
         IFaceProvider $provider,
         UrlParametersInterface $parameters,
-        UrlPrototypeHelper $helper,
+        UrlPrototypeHelper $prototypeHelper,
         UrlDispatcherCacheInterface $cache,
-        AppEnv $env
+        AppEnv $env,
+        AclHelper $aclHelper
     )
     {
         $this->ifaceStack         = $stack;
         $this->ifaceProvider      = $provider;
         $this->urlParameters      = $parameters;
-        $this->urlPrototypeHelper = $helper;
+        $this->urlPrototypeHelper = $prototypeHelper;
         $this->cache              = $cache;
         $this->appEnv             = $env;
+        $this->aclHelper          = $aclHelper;
     }
 
     /**
@@ -333,7 +348,6 @@ class UrlDispatcher implements LoggerAwareInterface
     protected function pushToStack(IFaceInterface $iface)
     {
         $this->checkIFaceAccess($iface);
-
         $this->ifaceStack->push($iface);
 
         return $this;
@@ -356,16 +370,18 @@ class UrlDispatcher implements LoggerAwareInterface
         $prototype  = $this->urlPrototypeHelper->fromIFaceModelUri($ifaceModel);
         $dataSource = $this->urlPrototypeHelper->getDataSourceInstance($prototype);
 
-        // Allow processing of root element
-        $uriValue = !$it->rootRequested()
-            ? $it->current()
-            : $uriValue = DispatchableEntityInterface::DEFAULT_URI;
+        // Root element have default uri
+        $uriValue = ($it->rootRequested() || ($ifaceModel->isDefault() && !$ifaceModel->hasDynamicUrl()))
+            ? self::DEFAULT_URI
+            : $it->current();
 
         $modelKey  = $prototype->getModelKey();
         $modelName = $prototype->getDataSourceName();
 
+        $aclResource = $this->aclHelper->getAclResourceFromEntityName($modelName);
+
         // Search for model item
-        $entity = $dataSource->findByUrlKey($modelKey, $uriValue, $this->urlParameters);
+        $entity = $dataSource->findByUrlKey($modelKey, $uriValue, $this->urlParameters, $aclResource);
 
         if (!$entity) {
             throw new UrlDispatcherException('Can not find item for [:prototype] by [:value]', [
@@ -393,14 +409,19 @@ class UrlDispatcher implements LoggerAwareInterface
 
     private function checkEntityAccess(DispatchableEntityInterface $entity)
     {
-        // TODO check Acl Resource action for provided entity
-        // TODO Use AclHelper
+        if (!$this->aclHelper->isEntityActionAllowed($entity)) {
+            throw new \HTTP_Exception_403();
+        }
     }
 
-    private function checkIFaceAccess(IFaceInterface $ifaceModel)
+    private function checkIFaceAccess(IFaceInterface $iface)
     {
-        // TODO check Acl Resource action for provided iface
-        // TODO Use AclHelper
+        // Force authorization for non-public zones before security check
+        $this->aclHelper->forceAuthorizationIfNeeded($iface);
+
+        if (!$this->aclHelper->isIFaceAllowed($iface)) {
+            throw new \HTTP_Exception_403();
+        }
     }
 
     private function storeDataInCache($url)
@@ -430,13 +451,14 @@ class UrlDispatcher implements LoggerAwareInterface
         if (!is_array($data)) {
             // Log and keep processing as no cache was found
             $this->logger->warning('Cached UrlDispatcher data is incorrect', ['cachedData' => print_r($data, true)]);
+
             return false;
         }
 
         /** @var array $stackData */
         $stackData = $data['stack'];
 
-        /** @var \BetaKiller\IFace\Url\DispatchableEntityInterface[] $paramsData */
+        /** @var \BetaKiller\Model\DispatchableEntityInterface[] $paramsData */
         $paramsData = $data['parameters'];
 
         try {

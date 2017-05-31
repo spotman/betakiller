@@ -1,8 +1,8 @@
 <?php
 
-use BetaKiller\IFace\Widget\BaseWidget;
+use BetaKiller\IFace\Widget\AbstractBaseWidget;
 
-class Widget_CustomTag_Youtube extends BaseWidget
+class Widget_CustomTag_Youtube extends AbstractBaseWidget
 {
     use BetaKiller\Helper\ContentTrait;
 

@@ -5,6 +5,7 @@ use BetaKiller\Assets\Provider\AbstractAssetsProvider;
 use BetaKiller\Content\ContentElementInterface;
 use BetaKiller\Content\HasWordpressPathInterface;
 use BetaKiller\Content\ImportedFromWordpressInterface;
+use BetaKiller\Model\Entity;
 use BetaKiller\Task\TaskException;
 use DiDom\Document;
 use Thunder\Shortcode\Parser\RegexParser;
@@ -25,7 +26,7 @@ class Task_Content_Import_Wordpress extends Minion_Task
     const WP_OPTION_PARSING_MODE = 'betakiller_parsing_mode';
     const WP_OPTION_PARSING_PATH = 'betakiller_parsing_path';
 
-    const CONTENT_ENTITY_ID = Model_Entity::POSTS_ENTITY_ID;
+    const CONTENT_ENTITY_ID = Entity::POSTS_ENTITY_ID;
 
     protected $attach_parsing_mode;
 
@@ -34,6 +35,12 @@ class Task_Content_Import_Wordpress extends Minion_Task
     protected $unknown_bb_tags = [];
 
     protected $skip_before_date;
+
+    /**
+     * @Inject
+     * @var \BetaKiller\Helper\IFaceHelper
+     */
+    private $ifaceHelper;
 
     protected function define_options()
     {
@@ -134,7 +141,7 @@ class Task_Content_Import_Wordpress extends Minion_Task
 //    }
 
     /**
-     * @return Model_Entity
+     * @return Entity
      */
     protected function get_content_post_entity()
     {
@@ -591,7 +598,7 @@ class Task_Content_Import_Wordpress extends Minion_Task
             $name       = $s->getName();
 
             if (!isset($this->unknown_bb_tags[$name])) {
-                $this->unknown_bb_tags[$name] = $item->get_public_url();
+                $this->unknown_bb_tags[$name] = $this->ifaceHelper->getReadEntityUrl($item);
                 $this->debug('Unknown BB-code found [:name], keep it', [':name' => $name]);
             }
 

@@ -2,16 +2,9 @@
 namespace BetaKiller\Acl\Resource;
 
 use BetaKiller\Status\StatusModelInterface;
-use Spotman\Acl\Resource\CrudPermissionsResourceInterface;
-use BetaKiller\Status\StatusRelatedModelInterface;
 
-interface StatusRelatedModelAclResourceInterface extends CrudPermissionsResourceInterface
+interface StatusRelatedEntityAclResourceInterface extends EntityRelatedAclResourceInterface
 {
-    /**
-     * @param \BetaKiller\Status\StatusRelatedModelInterface $model
-     */
-    public function useStatusRelatedModel(StatusRelatedModelInterface $model);
-
     /**
      * @return string[]
      */
@@ -25,6 +18,12 @@ interface StatusRelatedModelAclResourceInterface extends CrudPermissionsResource
      */
     public function isStatusActionAllowed(StatusModelInterface $model, $action);
 
+    /**
+     * @param \BetaKiller\Status\StatusModelInterface $statusModel
+     * @param string                                  $transitionName
+     *
+     * @return bool
+     */
     public function isTransitionAllowed(StatusModelInterface $statusModel, $transitionName);
 
     /**
@@ -35,5 +34,11 @@ interface StatusRelatedModelAclResourceInterface extends CrudPermissionsResource
      */
     public function makeStatusPermissionIdentity(StatusModelInterface $model, $action);
 
+    /**
+     * @param \BetaKiller\Status\StatusModelInterface $statusModel
+     * @param string                                  $transitionName
+     *
+     * @return string
+     */
     public function makeTransitionPermissionIdentity(StatusModelInterface $statusModel, $transitionName);
 }

@@ -89,4 +89,11 @@ interface IFaceModelInterface extends TreeModelSingleParentInterface, SeoMetaInt
      * @return string
      */
     public function getZoneName();
+
+    /**
+     * Returns array of additional ACL rules in format <ResourceName>.<permissionName> (eq, ["Admin.enabled"])
+     *
+     * @return string[]
+     */
+    public function getAdditionalAclRules();
 }

@@ -5,7 +5,7 @@ abstract class Auth_Exception extends HTTP_Exception_403 {
     /**
      * @return string
      */
-    protected function get_default_message()
+    protected function getDefaultMessage()
     {
         return 'Authentication failed';
     }

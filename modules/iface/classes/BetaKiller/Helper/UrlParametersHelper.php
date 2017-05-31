@@ -1,9 +1,9 @@
 <?php
 namespace BetaKiller\Helper;
 
-use BetaKiller\IFace\Url\DispatchableEntityInterface;
 use BetaKiller\IFace\Url\UrlParameters;
 use BetaKiller\IFace\Url\UrlParametersInterface;
+use BetaKiller\Model\DispatchableEntityInterface;
 
 class UrlParametersHelper
 {

@@ -2,7 +2,7 @@
 
 class Auth_Exception_IncorrectPassword extends Auth_Exception
 {
-    protected function get_default_message()
+    protected function getDefaultMessage()
     {
         return 'Your credentials are invalid';
     }

@@ -12,7 +12,7 @@ class BetaKiller_Kohana_Exception extends Kohana_Kohana_Exception
     public function __construct($message = '', array $variables = null, $code = 0, Exception $previous = null)
     {
         // Set up default message text if it was not set
-        $message = $message ?: $this->get_default_message();
+        $message = $message ?: $this->getDefaultMessage();
 
         parent::__construct($message, $variables, $code, $previous);
     }
@@ -34,7 +34,6 @@ class BetaKiller_Kohana_Exception extends Kohana_Kohana_Exception
      *
      * @return Response
      * @throws Kohana_Exception
-     * @deprecated
      * @todo Rewrite to ExceptionHandler and move exception handling logic to it
      */
     static public function _handler(Exception $exception)
@@ -47,7 +46,7 @@ class BetaKiller_Kohana_Exception extends Kohana_Kohana_Exception
         }
 
         $notify = ($exception instanceof self)
-            ? $exception->is_notification_enabled()
+            ? $exception->isNotificationEnabled()
             : true;
 
         if ($notify) {
@@ -64,16 +63,15 @@ class BetaKiller_Kohana_Exception extends Kohana_Kohana_Exception
             exit(1);
         }
 
-        $always_show_nice_message = ($exception instanceof self)
+        $alwaysShowNiceMessage = ($exception instanceof self)
             ? $exception->always_show_nice_message()
             : false;
 
-        if ($always_show_nice_message && Kohana::in_production(true)) {
-            $response = self::make_nice_message($exception);
+        if ($alwaysShowNiceMessage || Kohana::in_production(true)) {
+            $response = self::makeNiceMessage($exception);
         } else {
             // Use default Kohana response
             $response = parent::response($exception);
-//            static::add_debug_headers($exception, $response);
         }
 
         static::$_counter--;
@@ -88,7 +86,7 @@ class BetaKiller_Kohana_Exception extends Kohana_Kohana_Exception
      *
      * @return Response
      */
-    static public function make_nice_message(Exception $exception)
+    static public function makeNiceMessage(Exception $exception)
     {
         // Prevent displaying custom error pages for expected exceptions (301, 302, 401, 403, etc)
         if (($exception instanceof HTTP_Exception_Expected) && !$exception->always_show_nice_message()) {
@@ -154,7 +152,7 @@ class BetaKiller_Kohana_Exception extends Kohana_Kohana_Exception
         $view = $this->get_view();
 
         // Чтобы не было XSS, преобразуем спецсимволы
-        $view->set('message', HTML::chars($this->get_user_message()));
+        $view->set('message', HTML::chars($this->getUserMessage()));
         $view->set('code', (int)$code);
 
         return $this->template($view)->render();
@@ -179,8 +177,6 @@ class BetaKiller_Kohana_Exception extends Kohana_Kohana_Exception
      */
     public function get_view()
     {
-        // Обнуляем view_path, чтобы оно не влияло на поиск вьюшки
-        // View::reset_view_path();
         return View::factory($this->get_view_path());
     }
 
@@ -201,7 +197,7 @@ class BetaKiller_Kohana_Exception extends Kohana_Kohana_Exception
      * @example HTTP_Exception_Verbal
      * @return bool
      */
-    public function is_notification_enabled()
+    public function isNotificationEnabled()
     {
         return true;
     }
@@ -215,9 +211,9 @@ class BetaKiller_Kohana_Exception extends Kohana_Kohana_Exception
      *
      * @return null|string
      */
-    public function get_user_message($force_show = false)
+    public function getUserMessage($force_show = false)
     {
-        return ($force_show || $this->show_original_message_to_user())
+        return ($force_show || $this->showOriginalMessageToUser())
             ? $this->getMessage()
             : null;
     }
@@ -229,7 +225,7 @@ class BetaKiller_Kohana_Exception extends Kohana_Kohana_Exception
      *
      * @return string
      */
-    protected function get_default_message()
+    protected function getDefaultMessage()
     {
         return 'System error';
     }
@@ -239,7 +235,7 @@ class BetaKiller_Kohana_Exception extends Kohana_Kohana_Exception
      *
      * @return bool
      */
-    protected function show_original_message_to_user()
+    protected function showOriginalMessageToUser()
     {
         return false;
     }

@@ -1,6 +1,8 @@
 <?php
 namespace BetaKiller\IFace\ModelProvider;
 
+use BetaKiller\IFace\IFaceModelInterface;
+use BetaKiller\Model\DispatchableEntityInterface;
 use BetaKiller\Model\IFace;
 use ORM;
 
@@ -13,7 +15,7 @@ class IFaceModelProviderDatabase extends IFaceModelProviderAbstract
      */
     public function getRoot()
     {
-        $orm = $this->ormFactory();
+        $orm = $this->createIFaceOrm();
 
         return $orm
             ->where($orm->object_column('parent_id'), 'IS', null)
@@ -29,7 +31,7 @@ class IFaceModelProviderDatabase extends IFaceModelProviderAbstract
      */
     public function getDefault()
     {
-        $orm = $this->ormFactory();
+        $orm = $this->createIFaceOrm();
 
         $iface = $orm
             ->where($orm->object_column('is_default'), '=', true)
@@ -48,7 +50,7 @@ class IFaceModelProviderDatabase extends IFaceModelProviderAbstract
      */
     public function getByCodename($codename)
     {
-        $orm = $this->ormFactory();
+        $orm = $this->createIFaceOrm();
 
         $iface = $orm
             ->where($orm->object_column('codename'), '=', $codename)
@@ -59,9 +61,31 @@ class IFaceModelProviderDatabase extends IFaceModelProviderAbstract
     }
 
     /**
-     * @return IFace
+     * Search for IFace linked to provided entity, entity action and zone
+     *
+     * @param \BetaKiller\Model\DispatchableEntityInterface $entity
+     * @param string                                        $entityAction
+     * @param string                                        $zone
+     *
+     * @return IFaceModelInterface|null
      */
-    protected function ormFactory()
+    public function getByEntityActionAndZone(DispatchableEntityInterface $entity, $entityAction, $zone)
+    {
+        $orm = $this->createIFaceOrm();
+
+        $iface = $orm
+            ->where('entity.model_name', '=', $entity->getModelName())
+            ->where('action.name', '=', $entityAction)
+            ->where('zone.name', '=', $zone)
+            ->find();
+
+        return $iface->loaded() ? $iface : null;
+    }
+
+    /**
+     * @return \BetaKiller\Model\IFace
+     */
+    protected function createIFaceOrm()
     {
         return ORM::factory('IFace');
     }

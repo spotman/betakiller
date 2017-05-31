@@ -35,9 +35,9 @@ abstract class AbstractCommentList extends AdminBase
 
         return [
             'id'            =>  $comment->get_id(),
-            'publicURL'     =>  $comment->get_public_url(), // Get public URL via related model
-            'editURL'       =>  $comment->get_admin_url(), // Get admin URL via related model
-            'contentLabel'  =>  $comment->get_related_content_label(),
+            'publicURL'     =>  $comment->getPublicReadUrl($this->ifaceHelper), // Get public URL via related model
+            'editURL'       =>  $this->ifaceHelper->getReadEntityUrl($comment), // Get admin URL via related model
+            'contentLabel'  =>  $comment->getRelatedContentLabel(),
             'author'        =>  [
                 'isGuest'   =>  $comment->author_is_guest(),
                 'name'      =>  $comment->get_author_name(),

@@ -3,7 +3,7 @@ namespace BetaKiller\IFace\ModelProvider;
 
 use BetaKiller\IFace\Exception\IFaceException;
 use BetaKiller\IFace\IFaceModelInterface;
-use BetaKiller\IFace\Url\DispatchableEntityInterface;
+use BetaKiller\Model\DispatchableEntityInterface;
 
 class IFaceModelProviderAggregate extends IFaceModelProviderAbstract
 {
@@ -150,9 +150,9 @@ class IFaceModelProviderAggregate extends IFaceModelProviderAbstract
     /**
      * Search for IFace linked to provided entity, entity action and zone
      *
-     * @param \BetaKiller\IFace\Url\DispatchableEntityInterface $entity
-     * @param string                                            $entityAction
-     * @param string                                            $zone
+     * @param \BetaKiller\Model\DispatchableEntityInterface $entity
+     * @param string                                        $entityAction
+     * @param string                                        $zone
      *
      * @return IFaceModelInterface|null
      */

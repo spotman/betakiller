@@ -24,7 +24,7 @@ class Controller_IFace extends Controller
         $iface = $dispatcher->process($uri);
 
         // If this is default IFace and client requested non-slash uri, redirect client to /
-        if ( $uri !== '/' && $iface->isDefault() ) {
+        if ($uri !== '/' && $iface->isDefault() && !$iface->getModel()->hasDynamicUrl()) {
             $this->redirect('/');
         }
 

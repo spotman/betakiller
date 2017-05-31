@@ -16,7 +16,7 @@ trait ContentCommentMethodTrait
      *
      * @return \Model_ContentComment
      */
-    protected function modelFactory($id = NULL)
+    protected function createEntity($id = NULL)
     {
         return $this->model_factory_content_comment($id);
     }

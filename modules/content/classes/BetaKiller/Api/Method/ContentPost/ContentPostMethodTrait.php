@@ -14,7 +14,7 @@ trait ContentPostMethodTrait
      *
      * @return \Model_ContentPost
      */
-    protected function modelFactory($id = null)
+    protected function createEntity($id = null)
     {
         return $this->model_factory_content_post($id);
     }

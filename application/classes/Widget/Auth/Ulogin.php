@@ -1,8 +1,8 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
-use BetaKiller\IFace\Widget\BaseWidget;
+use BetaKiller\IFace\Widget\AbstractBaseWidget;
 
-class Widget_Auth_Ulogin extends BaseWidget
+class Widget_Auth_Ulogin extends AbstractBaseWidget
 {
     public function getData()
     {

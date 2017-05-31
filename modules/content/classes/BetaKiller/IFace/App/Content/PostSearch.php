@@ -1,7 +1,7 @@
 <?php
 namespace BetaKiller\IFace\App\Content;
 
-class PostSearch extends AppBase
+class PostSearch extends AbstractAppBase
 {
     /**
      * Returns data for View

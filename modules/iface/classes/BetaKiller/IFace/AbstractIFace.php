@@ -3,6 +3,7 @@ namespace BetaKiller\IFace;
 
 use BetaKiller\Config\AppConfigInterface;
 use BetaKiller\IFace\Exception\IFaceException;
+use BetaKiller\IFace\Url\UrlDispatcher;
 use BetaKiller\IFace\Url\UrlParametersInterface;
 use DateInterval;
 use DateTime;
@@ -407,13 +408,44 @@ abstract class AbstractIFace implements IFaceInterface
     }
 
     /**
+     * Returns model name of the linked entity
+     *
+     * @return string
+     */
+    public function getEntityModelName()
+    {
+        return $this->getModel()->getEntityModelName();
+    }
+
+    /**
+     * Returns entity [primary] action, applied by this IFace
+     *
+     * @return string
+     */
+    public function getEntityActionName()
+    {
+        return $this->getModel()->getEntityActionName();
+    }
+
+    /**
      * Returns zone codename where this IFace is placed
+     * Inherits zone from parent iface
      *
      * @return string
      */
     public function getZoneName()
     {
-        return $this->getModel()->getZoneName();
+        return $this->getModel()->getZoneName() ?: $this->getParent()->getZoneName();
+    }
+
+    /**
+     * Returns array of additional ACL rules in format <ResourceName>.<permissionName> (eq, ["Admin.enabled"])
+     *
+     * @return string[]
+     */
+    public function getAdditionalAclRules()
+    {
+        return $this->getModel()->getAdditionalAclRules();
     }
 
     public function url(UrlParametersInterface $parameters = null, $removeCyclingLinks = true, $withDomain = true)
@@ -422,26 +454,27 @@ abstract class AbstractIFace implements IFaceInterface
             return $this->appConfig->getCircularLinkHref();
         }
 
-        $parts = [];
+        $parts   = [];
+        $current = $this;
 
-        if (!$this->isDefault()) {
-            $current = $this;
+        /** @var IFaceInterface $parent */
+        $parent = null;
 
-            /** @var IFaceInterface $parent */
-            $parent = null;
+        do {
+            $uri = $current->makeUri($parameters);
 
-            do {
-                $uri = $current->makeUri($parameters);
+            if (!$uri) {
+                throw new IFaceException('Can not make URI for :codename IFace', [':codename' => $current->getCodename()]);
+            }
 
-                if (!$uri) {
-                    return null;
-                }
+            if ($uri === UrlDispatcher::DEFAULT_URI && $this->isDefault()) {
+                $uri = null;
+            }
 
-                $parts[] = $uri;
-                $parent  = $current->getParent();
-                $current = $parent;
-            } while ($parent);
-        }
+            $parts[] = $uri;
+            $parent  = $current->getParent();
+            $current = $parent;
+        } while ($parent);
 
         $path = '/'.implode('/', array_reverse($parts));
 

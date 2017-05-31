@@ -1,9 +1,9 @@
 <?php
 namespace BetaKiller\Api\Method\ContentComment;
 
-use Spotman\Api\Method\AbstractModelUpdateApiApiMethod;
+use BetaKiller\Api\Method\AbstractEntityUpdateApiApiMethod;
 
-class UpdateApiMethod extends AbstractModelUpdateApiApiMethod
+class UpdateApiMethod extends AbstractEntityUpdateApiApiMethod
 {
     use ContentCommentMethodTrait;
 
@@ -14,7 +14,7 @@ class UpdateApiMethod extends AbstractModelUpdateApiApiMethod
      * @param                       $data
      *
      * @throws \Spotman\Api\ApiMethodException
-     * @return \Spotman\Api\AbstractCrudMethodsModelInterface|null
+     * @return \BetaKiller\Model\AbstractEntityInterface|null
      */
     protected function update($model, $data)
     {

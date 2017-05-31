@@ -1,9 +1,9 @@
 <?php
 namespace BetaKiller\Api\Method\ContentPost;
 
-use Spotman\Api\Method\AbstractModelBasedApiMethod;
+use BetaKiller\Api\Method\AbstractEntityBasedApiMethod;
 
-class CompleteApiMethod extends AbstractModelBasedApiMethod
+class CompleteApiMethod extends AbstractEntityBasedApiMethod
 {
     use ContentPostMethodTrait;
 
@@ -23,7 +23,7 @@ class CompleteApiMethod extends AbstractModelBasedApiMethod
     public function execute()
     {
         /** @var \Model_ContentPost $model */
-        $model = $this->getModel();
+        $model = $this->getEntity();
 
         $model->complete()->save();
 

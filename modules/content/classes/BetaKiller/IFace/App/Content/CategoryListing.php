@@ -1,7 +1,7 @@
 <?php
 namespace BetaKiller\IFace\App\Content;
 
-class CategoryListing extends AppBase
+class CategoryListing extends AbstractAppBase
 {
     /**
      * Returns data for View
@@ -33,11 +33,11 @@ class CategoryListing extends AppBase
         return $data;
     }
 
-    protected function get_category_data(\Model_ContentCategory $category = null)
+    protected function get_category_data(\Model_ContentCategory $category)
     {
         return [
             'label'     =>  $category->get_label(),
-            'url'       =>  $category->get_public_url(),
+            'url'       =>  $this->ifaceHelper->getReadEntityUrl($category),
             'children'  =>  $this->get_categories_data($category),
         ];
     }

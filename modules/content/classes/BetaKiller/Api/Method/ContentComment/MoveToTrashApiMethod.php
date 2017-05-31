@@ -1,9 +1,9 @@
 <?php
 namespace BetaKiller\Api\Method\ContentComment;
 
-use Spotman\Api\Method\AbstractModelBasedApiMethod;
+use BetaKiller\Api\Method\AbstractEntityBasedApiMethod;
 
-class MoveToTrashApiMethod extends AbstractModelBasedApiMethod
+class MoveToTrashApiMethod extends AbstractEntityBasedApiMethod
 {
     use ContentCommentMethodTrait;
 
@@ -23,7 +23,7 @@ class MoveToTrashApiMethod extends AbstractModelBasedApiMethod
     public function execute()
     {
         /** @var \Model_ContentComment $model */
-        $model = $this->getModel();
+        $model = $this->getEntity();
 
         $model->move_to_trash()->save();
 

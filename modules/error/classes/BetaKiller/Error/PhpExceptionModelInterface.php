@@ -1,17 +1,16 @@
 <?php
 namespace BetaKiller\Error;
 
-use BetaKiller\Helper\HasAdminUrlInterface;
-use BetaKiller\IFace\Url\DispatchableEntityInterface;
 use BetaKiller\IFace\Url\UrlDataSourceInterface;
+use BetaKiller\Model\DispatchableEntityInterface;
 use BetaKiller\Model\UserInterface;
 
-interface PhpExceptionModelInterface extends HasAdminUrlInterface, UrlDataSourceInterface, DispatchableEntityInterface
+interface PhpExceptionModelInterface extends UrlDataSourceInterface, DispatchableEntityInterface
 {
-    const STATE_NEW         = 'new';
-    const STATE_RESOLVED    = 'resolved';
-    const STATE_REPEATED    = 'repeated';
-    const STATE_IGNORED     = 'ignored';
+    const STATE_NEW      = 'new';
+    const STATE_RESOLVED = 'resolved';
+    const STATE_REPEATED = 'repeated';
+    const STATE_IGNORED  = 'ignored';
 
     /**
      * @return string
@@ -109,16 +108,16 @@ interface PhpExceptionModelInterface extends HasAdminUrlInterface, UrlDataSource
 
     /**
      * Unix timestamp of last notification time
-     * 
+     *
      * @param \DateTime|NULL $time
-     * 
+     *
      * @return $this
      */
     public function setLastSeenAt(\DateTime $time);
 
     /**
      * Unix timestamp of last notification time
-     * 
+     *
      * @return \DateTime|NULL
      */
     public function getLastSeenAt();
@@ -143,6 +142,7 @@ interface PhpExceptionModelInterface extends HasAdminUrlInterface, UrlDataSource
      * Mark exception as new (these exceptions require developer attention)
      *
      * @param UserInterface $user
+     *
      * @return $this
      */
     public function markAsNew(UserInterface $user);
@@ -151,14 +151,16 @@ interface PhpExceptionModelInterface extends HasAdminUrlInterface, UrlDataSource
      * Mark exception as repeated (it was resolved earlier but repeated now)
      *
      * @param UserInterface $user
+     *
      * @return $this
      */
     public function markAsRepeated(UserInterface $user);
 
     /**
      * Mark exception as resolved
-     * 
+     *
      * @param UserInterface $user
+     *
      * @return $this
      */
     public function markAsResolvedBy(UserInterface $user);
@@ -167,6 +169,7 @@ interface PhpExceptionModelInterface extends HasAdminUrlInterface, UrlDataSource
      * Mark exception as ignored
      *
      * @param UserInterface $user
+     *
      * @return $this
      */
     public function markAsIgnoredBy(UserInterface $user);
@@ -180,7 +183,7 @@ interface PhpExceptionModelInterface extends HasAdminUrlInterface, UrlDataSource
 
     /**
      * Returns TRUE if exception was resolved
-     * 
+     *
      * @return bool
      */
     public function isResolved();
@@ -201,7 +204,7 @@ interface PhpExceptionModelInterface extends HasAdminUrlInterface, UrlDataSource
 
     /**
      * Returns user which had resolved this exception
-     * 
+     *
      * @return UserInterface
      */
     public function getResolvedBy();

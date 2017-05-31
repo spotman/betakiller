@@ -1,13 +1,10 @@
 <?php
 namespace BetaKiller\IFace\Widget;
 
-use BetaKiller\Helper\CurrentUserTrait;
 use BetaKiller\Model\UserInterface;
 
-abstract class AbstractAdminWidget extends BaseWidget
+abstract class AbstractAdminWidget extends AbstractBaseWidget
 {
-    use CurrentUserTrait;
-
     /**
      * @var \BetaKiller\Model\UserInterface
      */

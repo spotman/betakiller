@@ -1,9 +1,9 @@
 <?php
 namespace BetaKiller\Api\Method\ContentComment;
 
-use Spotman\Api\Method\AbstractModelBasedApiMethod;
+use BetaKiller\Api\Method\AbstractEntityBasedApiMethod;
 
-class RejectApiMethod extends AbstractModelBasedApiMethod
+class RejectApiMethod extends AbstractEntityBasedApiMethod
 {
     use ContentCommentMethodTrait;
 
@@ -23,7 +23,7 @@ class RejectApiMethod extends AbstractModelBasedApiMethod
     public function execute()
     {
         /** @var \Model_ContentComment $model */
-        $model = $this->getModel();
+        $model = $this->getEntity();
 
         $model->reject()->save();
 

@@ -13,6 +13,13 @@ class Status_Workflow_ContentComment extends StatusWorkflow
     private $notificationHelper;
 
     /**
+     * @Inject
+     * TODO move to constructor
+     * @var \BetaKiller\Helper\IFaceHelper
+     */
+    private $ifaceHelper;
+
+    /**
      * Status_Workflow_ContentComment constructor.
      *
      * @param \BetaKiller\Status\StatusRelatedModelInterface $model
@@ -72,9 +79,9 @@ class Status_Workflow_ContentComment extends StatusWorkflow
 
         $data = [
             'name'       => $name,
-            'url'        => $comment->get_public_url(),
+            'url'        => $comment->getPublicReadUrl($this->ifaceHelper),
             'created_at' => $comment->get_created_at()->format('H:i:s d.m.Y'),
-            'label'      => $comment->get_related_content_label(),
+            'label'      => $comment->getRelatedContentLabel(),
         ];
 
         $message = $this->notificationHelper
@@ -110,9 +117,9 @@ class Status_Workflow_ContentComment extends StatusWorkflow
         $parentName = $parent->get_author_name();
 
         $data = [
-            'url'        => $reply->get_public_url(),
+            'url'        => $reply->getPublicReadUrl($this->ifaceHelper),
             'created_at' => $reply->get_created_at()->format('H:i:s d.m.Y'),
-            'label'      => $reply->get_related_content_label(),
+            'label'      => $reply->getRelatedContentLabel(),
         ];
 
         $message = $this->notificationHelper

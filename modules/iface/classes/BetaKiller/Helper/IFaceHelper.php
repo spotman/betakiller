@@ -1,14 +1,15 @@
 <?php
 namespace BetaKiller\Helper;
 
+use BetaKiller\IFace\CrudlsActionsInterface;
 use BetaKiller\IFace\IFaceFactory;
 use BetaKiller\IFace\IFaceInterface;
 use BetaKiller\IFace\IFaceModelInterface;
 use BetaKiller\IFace\IFaceStack;
-use BetaKiller\IFace\Url\DispatchableEntityInterface;
 use BetaKiller\IFace\Url\UrlParametersInterface;
 use BetaKiller\IFace\View\IFaceView;
 use BetaKiller\IFace\WidgetFactory;
+use BetaKiller\Model\DispatchableEntityInterface;
 
 class IFaceHelper
 {
@@ -113,9 +114,9 @@ class IFaceHelper
     }
 
     /**
-     * @param \BetaKiller\IFace\Url\DispatchableEntityInterface $entity
-     * @param string                                            $action
-     * @param string|null                                       $zone
+     * @param \BetaKiller\Model\DispatchableEntityInterface $entity
+     * @param string                                        $action
+     * @param string|null                                   $zone
      *
      * @return string
      */
@@ -139,4 +140,33 @@ class IFaceHelper
         return $iface->url($params);
     }
 
+    public function getCreateEntityUrl(DispatchableEntityInterface $entity, $zone = null)
+    {
+        return $this->getEntityUrl($entity, CrudlsActionsInterface::CREATE_ACTION, $zone);
+    }
+
+    public function getReadEntityUrl(DispatchableEntityInterface $entity, $zone = null)
+    {
+        return $this->getEntityUrl($entity, CrudlsActionsInterface::READ_ACTION, $zone);
+    }
+
+    public function getUpdateEntityUrl(DispatchableEntityInterface $entity, $zone = null)
+    {
+        return $this->getEntityUrl($entity, CrudlsActionsInterface::UPDATE_ACTION, $zone);
+    }
+
+    public function getDeleteEntityUrl(DispatchableEntityInterface $entity, $zone = null)
+    {
+        return $this->getEntityUrl($entity, CrudlsActionsInterface::DELETE_ACTION, $zone);
+    }
+
+    public function getListEntityUrl(DispatchableEntityInterface $entity, $zone = null)
+    {
+        return $this->getEntityUrl($entity, CrudlsActionsInterface::LIST_ACTION, $zone);
+    }
+
+    public function getSearchEntityUrl(DispatchableEntityInterface $entity, $zone = null)
+    {
+        return $this->getEntityUrl($entity, CrudlsActionsInterface::SEARCH_ACTION, $zone);
+    }
 }

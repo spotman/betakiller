@@ -1,10 +1,9 @@
 <?php
 namespace BetaKiller\Api\AccessResolver;
 
-use BetaKiller\Status\StatusRelatedModelInterface;
+use BetaKiller\Api\Method\EntityBasedApiMethodInterface;
 use Spotman\Api\AccessResolver\DefaultApiMethodAccessResolverDetector;
 use Spotman\Api\ApiMethodInterface;
-use Spotman\Api\Method\ModelBasedApiMethodInterface;
 
 class CustomApiMethodAccessResolverDetector extends DefaultApiMethodAccessResolverDetector
 {
@@ -15,29 +14,15 @@ class CustomApiMethodAccessResolverDetector extends DefaultApiMethodAccessResolv
      */
     public function detect(ApiMethodInterface $method)
     {
-        if ($this->isStatusRelatedMethod($method)) {
-            return StatusRelatedModelApiMethodAccessResolver::CODENAME;
+        if ($this->isEntityRelatedMethod($method)) {
+            return EntityRelatedAclApiMethodAccessResolver::CODENAME;
         }
 
         return parent::detect($method);
     }
 
-    private function isStatusRelatedMethod(ApiMethodInterface $method)
+    private function isEntityRelatedMethod(ApiMethodInterface $method)
     {
-        if (!($method instanceof ModelBasedApiMethodInterface)) {
-            return false;
-        }
-
-        $model = $method->getModel();
-
-        if (!($model instanceof StatusRelatedModelInterface)) {
-            return false;
-        }
-
-        if (!$model->get_current_status()->isStatusAclEnabled()) {
-            return false;
-        }
-
-        return true;
+        return ($method instanceof EntityBasedApiMethodInterface);
     }
 }

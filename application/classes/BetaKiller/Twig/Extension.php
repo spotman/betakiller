@@ -1,6 +1,6 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
-use BetaKiller\IFace\Widget\BaseWidget;
+use BetaKiller\IFace\Widget\AbstractBaseWidget;
 
 class BetaKiller_Twig_Extension extends Twig_Extension
 {
@@ -191,11 +191,22 @@ class BetaKiller_Twig_Extension extends Twig_Extension
         }
     }
 
-    public function image(array $attributes, array $data = [], $force_size = false)
+    /**
+     * Helper for creating <img> tag
+     *
+     * @param array      $attributes
+     * @param array|null $data
+     * @param bool|null  $forceSize
+     *
+     * @return string
+     */
+    public function image(array $attributes, array $data = null, $forceSize = null)
     {
-        $attributes = array_merge($attributes, $data);
+        if ($data) {
+            $attributes = array_merge($attributes, $data);
+        }
 
-        if (!$force_size) {
+        if (!$forceSize) {
             unset($attributes['width'], $attributes['height']);
         }
 
@@ -266,10 +277,14 @@ class BetaKiller_Twig_Extension extends Twig_Extension
         return $device->is_mobile() || $device->is_tablet();
     }
 
-    public function widget(array $context, $name, array $data = [])
+    public function widget(array $context, $name, array $data = null)
     {
-        $widget = BaseWidget::factory($name);
-        $widget->setContext(array_merge($context, $data));
+        if ($data) {
+            $context = array_merge($context, $data);
+        }
+
+        $widget = AbstractBaseWidget::factory($name);
+        $widget->setContext($context);
 
         return $widget->render();
     }

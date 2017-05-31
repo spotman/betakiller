@@ -1,18 +1,10 @@
 <?php
-namespace BetaKiller\IFace\Url;
+namespace BetaKiller\Model;
 
-interface DispatchableEntityInterface
+use BetaKiller\IFace\Url\UrlParametersInterface;
+
+interface DispatchableEntityInterface extends AbstractEntityInterface
 {
-    /**
-     * Defines default uri for index element (this used if root IFace has dynamic url behaviour)
-     */
-    const DEFAULT_URI = 'index';
-
-    /**
-     * @return string
-     */
-    public function getModelName();
-
     /**
      * Returns value of the $key property
      *
@@ -35,16 +27,9 @@ interface DispatchableEntityInterface
     public function presetLinkedModels(UrlParametersInterface $parameters);
 
     /**
-     * Returns string identifier of current DataSource item
-     *
-     * @return string
-     */
-    public function getUrlItemID();
-
-    /**
      * Returns key which will be used for storing model in UrlParameters registry.
      *
      * @return string
      */
-    public static function getUrlParameterKey();
+    public static function getUrlParametersKey();
 }

@@ -1,15 +1,16 @@
 <?php
 
-use BetaKiller\IFace\Widget\BaseWidget;
+use BetaKiller\IFace\Widget\AbstractBaseWidget;
+use BetaKiller\IFace\Widget\WidgetException;
 
-class Widget_CustomTag_Caption extends BaseWidget
+class Widget_CustomTag_Caption extends AbstractBaseWidget
 {
     use BetaKiller\Helper\ContentTrait;
 
     /**
      * Returns data for View rendering
      *
-     * @throws Widget\WidgetException
+     * @throws \BetaKiller\IFace\Widget\WidgetException
      * @return array
      */
     public function getData()
@@ -19,7 +20,7 @@ class Widget_CustomTag_Caption extends BaseWidget
         $image_id = (int) $context['id'];
 
         if (!$image_id)
-            throw new Widget\WidgetException('No image ID provided');
+            throw new WidgetException('No image ID provided');
 
         $title = $context['title'];
         $align = Arr::get($context, 'align', 'alignnone');

@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <root>
     <!-- TODO вынести это всё в файл config/ifaces.php, который добавляет элементы в IFaceModelTree::admin() -->
-    <iface uri="posts" codename="Admin_Content_PostIndex" parentCodename="Admin_Index" title="Admin | Posts" label="Posts">
-        <iface uri="create" codename="Admin_Content_PostCreate" title="Admin | Post | Create" />
-        <iface uri="{ContentPost.id}" codename="Admin_Content_PostItem" title="Admin | Post | {ContentPost.label}" hasDynamicUrl="true">
-            <iface uri="revisions" codename="Admin_Content_PostItemRevisionList" title="Admin | Post | {ContentPost.label} | Revisions" />
+    <iface uri="posts" codename="Admin_Content_PostIndex" parentCodename="Admin_Index" title="Admin | Posts" label="Posts" entity="ContentPost" entityAction="list" zone="admin">
+        <iface uri="create" codename="Admin_Content_PostCreate" title="Admin | Post | Create" entity="ContentPost" entityAction="create" zone="admin" />
+        <iface uri="{ContentPost.id}" codename="Admin_Content_PostItem" title="Admin | Post | {ContentPost.label}" hasDynamicUrl="true" entity="ContentPost" entityAction="read" zone="admin">
+            <iface uri="revisions" codename="Admin_Content_PostItemRevisionList" title="Admin | Post | {ContentPost.label} | Revisions" entity="ContentPost" entityAction="update" zone="admin" />
         </iface>
     </iface>
 
-    <iface uri="comments" codename="Admin_Content_CommentIndex" parentCodename="Admin_Index" title="Admin | Comments" label="Comments">
-        <iface uri="by-status" codename="Admin_Content_CommentAggregateByStatus" title="Admin | Comments | Status statistic" label="Stat">
-            <iface uri="{ContentCommentStatus.codename}" codename="Admin_Content_CommentListByStatus" title="Admin | Comments | {ContentCommentStatus.getLabel()}" label="{ContentCommentStatus.getLabel()}" hasDynamicUrl="true" />
+    <iface uri="comments" codename="Admin_Content_CommentIndex" parentCodename="Admin_Index" title="Admin | Comments" label="Comments" entity="ContentComment" entityAction="list" zone="admin">
+        <iface uri="by-status" codename="Admin_Content_CommentAggregateByStatus" title="Admin | Comments | Status statistic" label="Stat" entity="ContentComment" entityAction="list" zone="admin">
+            <iface uri="{ContentCommentStatus.codename}" codename="Admin_Content_CommentListByStatus" title="Admin | Comments | {ContentCommentStatus.getLabel()}" label="{ContentCommentStatus.getLabel()}" hasDynamicUrl="true" entity="ContentComment" entityAction="list" zone="admin" />
         </iface>
-        <iface uri="{ContentComment.id}" codename="Admin_Content_CommentItem" title="Admin | Comments | {ContentComment.id}" hasDynamicUrl="true" />
+        <iface uri="{ContentComment.id}" codename="Admin_Content_CommentItem" title="Admin | Comments | {ContentComment.id}" hasDynamicUrl="true" entity="ContentComment" entityAction="read" zone="admin" />
     </iface>
 </root>

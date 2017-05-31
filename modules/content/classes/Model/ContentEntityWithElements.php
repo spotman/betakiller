@@ -1,9 +1,10 @@
 <?php
 
 use BetaKiller\Content\ContentElementInterface;
+use BetaKiller\Model\Entity;
 use BetaKiller\Model\UserInterface;
 
-abstract class Model_EntityWithElements extends Model_Entity
+abstract class Model_EntityWithElements extends Entity
 {
     /**
      * Returns model name which describes elements (images, attachments, etc)

@@ -3,17 +3,14 @@ namespace BetaKiller\IFace\Admin;
 
 use BetaKiller\Acl\Resource\AdminResource;
 use BetaKiller\IFace\IFace;
-use BetaKiller\Helper\CurrentUserTrait;
 
 abstract class AdminBase extends IFace
 {
-    use CurrentUserTrait;
-
     /**
      * @Inject
      * @var \Spotman\Acl\AclInterface
      */
-    protected $acl;
+    private $acl;
 
     /**
      * @Inject
@@ -44,8 +41,9 @@ abstract class AdminBase extends IFace
 
     public function getDefaultExpiresInterval()
     {
-        $interval = new \DateInterval('PT1H');
+        $interval         = new \DateInterval('PT1H');
         $interval->invert = 1;
+
         return $interval;
     }
 }

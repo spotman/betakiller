@@ -6,6 +6,7 @@ use BetaKiller\Helper\ContentTrait;
 use BetaKiller\Helper\ContentUrlParametersHelper;
 use BetaKiller\Helper\IFaceHelper;
 use BetaKiller\IFace\Widget\AbstractAdminWidget;
+use BetaKiller\Model\IFaceZone;
 use BetaKiller\Model\UserInterface;
 use Model_ContentCommentStatus;
 
@@ -99,19 +100,37 @@ class BarWidget extends AbstractAdminWidget
 
     protected function getEditButtonUrl()
     {
-        // TODO Detect editable via publicIFace->model->adminIface link
-        $currentIFace = $this->ifaceHelper->getCurrentIFace();
+        $entity = $this->detectPrimaryEntity();
 
-        if ($currentIFace instanceof \BetaKiller\IFace\App\Content\PostItem) {
-            $model = $this->contentUrlParamHelper->getContentPost();
-
-            return $model->get_admin_url();
+        if (!$entity) {
+            return null;
         }
 
-//        if ($currentIFace instanceof BetaKiller\IFace\App\Content\CategoryItem) {
-//            /** @var \Model_ContentCategory $model */
-//            $model = $parameters->get(Model_ContentCategory::URL_PARAM);
-//            return $model->get_admin_url();
+        $currentIFace = $this->ifaceHelper->getCurrentIFace();
+        $currentZone = $currentIFace->getZoneName();
+
+        switch ($currentZone) {
+            case IFaceZone::ADMIN_ZONE:
+                // Show "Read in public" url
+                return $this->ifaceHelper->getReadEntityUrl($entity, IFaceZone::PUBLIC_ZONE);
+
+            case IFaceZone::PUBLIC_ZONE:
+                // Show "Edit in admin" url
+                return $this->ifaceHelper->getUpdateEntityUrl($entity, IFaceZone::ADMIN_ZONE);
+
+            default:
+                return null;
+        }
+    }
+
+    private function detectPrimaryEntity()
+    {
+        if ($post = $this->contentUrlParamHelper->getContentPost()) {
+            return $post;
+        }
+
+//        if ($category = $this->contentUrlParamHelper->getContentCategory()) {
+//            return $category;
 //        }
 
         return null;

@@ -5,7 +5,7 @@ use BetaKiller\Helper\IFaceHelperTrait;
 use BetaKiller\IFace\Widget;
 use Twig;
 
-abstract class BaseWidget extends Widget\AbstractWidget
+abstract class AbstractBaseWidget extends Widget\AbstractWidget
 {
     use IFaceHelperTrait;
 

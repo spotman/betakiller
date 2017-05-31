@@ -1,11 +1,14 @@
 <?php
+namespace BetaKiller\Model;
 
-use BetaKiller\Content\EntityLinkedModelInterface;
+use BetaKiller\Exception;
+use ORM;
 
-class Model_Entity extends ORM
+class Entity extends ORM
 {
     /**
      * TODO remove and replace by helper method for searching by name
+     *
      * @deprecated
      */
     const POSTS_ENTITY_ID = 1;
@@ -14,7 +17,7 @@ class Model_Entity extends ORM
      * Prepares the model database connection, determines the table name,
      * and loads column information.
      *
-     * @throws Exception
+     * @throws \BetaKiller\Exception
      * @return void
      */
     protected function _initialize()
@@ -28,7 +31,7 @@ class Model_Entity extends ORM
      * Returns entity short name (may be used for url creating)
      *
      * @return string
-     * @throws Kohana_Exception
+     * @throws \BetaKiller\Exception
      */
     public function getSlug()
     {
@@ -49,7 +52,7 @@ class Model_Entity extends ORM
      * Возвращает имя модели, с которой связана текущая entity
      *
      * @return string
-     * @throws Kohana_Exception
+     * @throws \BetaKiller\Exception
      */
     public function getLinkedModelName()
     {
@@ -69,21 +72,21 @@ class Model_Entity extends ORM
     /**
      * @param string $slug
      *
-     * @return Model_Entity
-     * @throws Kohana_Exception
+     * @return Entity
+     * @throws \BetaKiller\Exception
      */
     public function findBySlug($slug)
     {
         $model = $this->where('slug', '=', $slug)->find();
 
         if (!$model->loaded()) {
-            throw new Kohana_Exception('Unknown entity slug :value', [':value' => $slug]);
+            throw new Exception('Unknown entity slug :value', [':value' => $slug]);
         }
 
         return $model;
     }
 
-    public function getTitle()
+    public function getLabel()
     {
         return __('entities.'.$this->getSlug());
     }
@@ -93,20 +96,19 @@ class Model_Entity extends ORM
      *
      * @param int|null $id
      *
-     * @return EntityLinkedModelInterface
-     * @throws Exception
-     * @throws Kohana_Exception
+     * @return \BetaKiller\Model\DispatchableEntityInterface
+     * @throws \BetaKiller\Exception
      */
-    public function getLinkedModelInstance($id = null)
+    public function getLinkedEntityInstance($id = null)
     {
-        $name = $this->getLinkedModelName();
-        $model = $this->model_factory($id, $name);
-        $targetClass = EntityLinkedModelInterface::class;
+        $name        = $this->getLinkedModelName();
+        $model       = $this->model_factory($id, $name);
+        $targetClass = DispatchableEntityInterface::class;
 
         if (!($model instanceof $targetClass)) {
-            throw new Kohana_Exception('Entity-linked model must be an instance of :target, :current given', [
-                ':target'   =>  $targetClass,
-                ':current'  =>  get_class($model),
+            throw new Exception('Entity model must be an instance of :target, :current given', [
+                ':target'  => $targetClass,
+                ':current' => get_class($model),
             ]);
         }
 
@@ -115,6 +117,6 @@ class Model_Entity extends ORM
 //
 //    public function get_related_model_item_title($item_id)
 //    {
-//        return $this->getLinkedModelInstance()->get_title_by_item_id($item_id);
+//        return $this->getLinkedEntityInstance()->get_title_by_item_id($item_id);
 //    }
 }

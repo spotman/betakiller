@@ -2,7 +2,7 @@
 namespace BetaKiller\IFace\ModelProvider;
 
 use BetaKiller\IFace\IFaceModelInterface;
-use BetaKiller\IFace\Url\DispatchableEntityInterface;
+use BetaKiller\Model\DispatchableEntityInterface;
 
 interface IFaceModelProviderInterface
 {
@@ -53,9 +53,9 @@ interface IFaceModelProviderInterface
     /**
      * Search for IFace linked to provided entity, entity action and zone
      *
-     * @param \BetaKiller\IFace\Url\DispatchableEntityInterface $entity
-     * @param string                                            $entityAction
-     * @param string                                            $zone
+     * @param \BetaKiller\Model\DispatchableEntityInterface $entity
+     * @param string                                        $entityAction
+     * @param string                                        $zone
      *
      * @return IFaceModelInterface|null
      */

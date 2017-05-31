@@ -1,7 +1,7 @@
 <?php
 namespace BetaKiller\IFace;
 
-use BetaKiller\IFace\Url\DispatchableEntityInterface;
+use BetaKiller\Model\DispatchableEntityInterface;
 
 class IFaceFactory
 {
@@ -48,9 +48,9 @@ class IFaceFactory
     /**
      * Search for IFace linked to provided entity, entity action and zone
      *
-     * @param \BetaKiller\IFace\Url\DispatchableEntityInterface $entity
-     * @param string                                            $entityAction
-     * @param string                                            $zone
+     * @param \BetaKiller\Model\DispatchableEntityInterface $entity
+     * @param string                                        $entityAction
+     * @param string                                        $zone
      *
      * @return \BetaKiller\IFace\IFaceInterface
      * @throws \BetaKiller\IFace\Exception\IFaceException

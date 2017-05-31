@@ -1,8 +1,8 @@
 <?php
 
-use BetaKiller\IFace\Widget\BaseWidget;
+use BetaKiller\IFace\Widget\AbstractBaseWidget;
 
-class Widget_Content_Quotes extends BaseWidget
+class Widget_Content_Quotes extends AbstractBaseWidget
 {
     use \BetaKiller\Helper\ContentTrait;
 

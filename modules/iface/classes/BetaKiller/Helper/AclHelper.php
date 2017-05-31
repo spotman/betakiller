@@ -1,9 +1,12 @@
 <?php
 namespace BetaKiller\Helper;
 
-use BetaKiller\IFace\BreadsActionsInterface;
+use BetaKiller\Acl\Resource\EntityRelatedAclResourceInterface;
+use BetaKiller\IFace\CrudlsActionsInterface;
+use BetaKiller\IFace\Exception\IFaceException;
 use BetaKiller\IFace\IFaceInterface;
-use BetaKiller\IFace\Url\DispatchableEntityInterface;
+use BetaKiller\Model\DispatchableEntityInterface;
+use BetaKiller\Model\IFaceZone;
 use Spotman\Acl\Exception;
 use Spotman\Acl\Resource\ResolvingResourceInterface;
 
@@ -11,48 +14,57 @@ class AclHelper
 {
     /**
      * @Inject
-     * @var \BetaKiller\IFace\Url\UrlDataSourceFactory
-     */
-    private $dataSourceFactory;
-
-    /**
-     * @Inject
-     * @var \BetaKiller\Factory\OrmFactory
-     */
-    private $ormFactory;
-
-    /**
-     * @Inject
      * @var \Spotman\Acl\AclInterface
      */
     private $acl;
 
+    /**
+     * @Inject
+     * @var \BetaKiller\Model\UserInterface
+     */
+    private $user;
 
+    /**
+     * @param \BetaKiller\Model\DispatchableEntityInterface $entity
+     * @param string|null                                   $action
+     *
+     * @return bool
+     */
     public function isEntityActionAllowed(DispatchableEntityInterface $entity, $action = null)
     {
         if (!$action) {
-            $action = BreadsActionsInterface::READ;
+            $action = CrudlsActionsInterface::READ_ACTION;
         }
 
         $resource = $this->getEntityAclResource($entity);
 
-        return $this->acl->isAllowed($resource, $action);
+        return $resource->isPermissionAllowed($action);
     }
 
     public function getEntityAclResource(DispatchableEntityInterface $entity)
     {
         $name = $entity->getModelName();
 
-        return $this->getAclResourceFromEntityName($name);
+        $resource = $this->getAclResourceFromEntityName($name);
+        $resource->setEntity($entity);
+
+        return $resource;
     }
 
-    private function getAclResourceFromEntityName($name)
+    /**
+     * @param $name
+     *
+     * @return \BetaKiller\Acl\Resource\EntityRelatedAclResourceInterface
+     * @throws \Spotman\Acl\Exception
+     */
+    public function getAclResourceFromEntityName($name)
     {
         $resource = $this->acl->getResource($name);
 
-        if (!($resource instanceof ResolvingResourceInterface)) {
-            throw new Exception('Entity :name must be linked to resolvable acl resource', [
+        if (!($resource instanceof EntityRelatedAclResourceInterface)) {
+            throw new Exception('Entity resource [:name] must implement :must', [
                 ':name' => $name,
+                ':must' => EntityRelatedAclResourceInterface::class,
             ]);
         }
 
@@ -61,12 +73,79 @@ class AclHelper
 
     public function isIFaceAllowed(IFaceInterface $iface)
     {
+        $zoneName   = $iface->getZoneName();
         $entityName = $iface->getEntityModelName();
         $actionName = $iface->getEntityActionName();
 
-        $resource = $this->getAclResourceFromEntityName($entityName);
+        if (!$zoneName) {
+            throw new IFaceException('IFace :name needs zone to be configured', [
+                ':name' => $iface->getCodename(),
+            ]);
+        }
 
-        return $this->acl->isAllowed($resource, $actionName);
+        $customRules   = $iface->getAdditionalAclRules();
+        $entityDefined = $entityName && $actionName;
+
+        // Check custom rules first
+        if ($customRules && !$this->checkCustomRules($customRules)) {
+            return false;
+        }
+
+        // Check entity access second (if defined)
+        if ($entityDefined) {
+            $resource = $this->getAclResourceFromEntityName($entityName);
+
+            return $resource->isPermissionAllowed($actionName);
+        }
+
+        // Allow public access to public zone by default if nor entity or custom rules were not defined
+        if ($zoneName === IFaceZone::PUBLIC_ZONE) {
+            return true;
+        }
+
+        // Other zones must define entity/action or custom rules to protect itself
+        if (!($entityDefined || $customRules)) {
+            throw new IFaceException('IFace :name must have linked entity or custom ACL rules to protect itself', [
+                ':name' => $iface->getCodename(),
+            ]);
+        }
+
+        // All checks passed
+        return true;
     }
 
+    public function forceAuthorizationIfNeeded(IFaceInterface $iface)
+    {
+        // Entering to admin and personal zones requires authorized user
+        if ($iface->getZoneName() !== IFaceZone::PUBLIC_ZONE && $this->user->isGuest()) {
+            $this->user->forceAuthorization();
+        }
+    }
+
+    /**
+     * @param string[] $rules
+     *
+     * @return bool
+     */
+    private function checkCustomRules($rules)
+    {
+        foreach ($rules as $value) {
+            list($resourceIdentity, $permissionIdentity) = explode('.', $value, 2);
+
+            $resource = $this->acl->getResource($resourceIdentity);
+
+            if (!($resource instanceof ResolvingResourceInterface)) {
+                throw new Exception('Resource :name must implement :must', [
+                    ':name' => $resource->getResourceId(),
+                    ':must' => ResolvingResourceInterface::class,
+                ]);
+            }
+
+            if (!$resource->isPermissionAllowed($permissionIdentity)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
 }

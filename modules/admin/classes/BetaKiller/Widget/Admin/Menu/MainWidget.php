@@ -1,12 +1,15 @@
 <?php
 namespace BetaKiller\Widget\Admin\Menu;
 
+use BetaKiller\Helper\ContentTrait;
 use BetaKiller\IFace\IFaceInterface;
 use BetaKiller\IFace\Url\UrlParametersInterface;
 use BetaKiller\IFace\Widget\AbstractAdminWidget;
 
 class MainWidget extends AbstractAdminWidget
 {
+    use ContentTrait;
+
     /**
      * @Inject
      * @var \BetaKiller\Helper\ContentUrlParametersHelper

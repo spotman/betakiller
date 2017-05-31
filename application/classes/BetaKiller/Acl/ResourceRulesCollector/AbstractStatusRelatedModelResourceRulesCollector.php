@@ -60,7 +60,7 @@ abstract class AbstractStatusRelatedModelResourceRulesCollector extends Abstract
 
     private function getStatusActionsDefaultAccessList(StatusModelInterface $status)
     {
-        /** @var \BetaKiller\Acl\Resource\StatusRelatedModelAclResourceInterface $resource */
+        /** @var \BetaKiller\Acl\Resource\StatusRelatedEntityAclResourceInterface $resource */
         $resource = $this->resource;
 
         $actions = $resource->getStatusActionsList();
@@ -81,7 +81,7 @@ abstract class AbstractStatusRelatedModelResourceRulesCollector extends Abstract
      */
     private function getStatusTransitionsDefaultAccessList(StatusModelInterface $statusModel)
     {
-        /** @var \BetaKiller\Acl\Resource\StatusRelatedModelAclResourceInterface $resource */
+        /** @var \BetaKiller\Acl\Resource\StatusRelatedEntityAclResourceInterface $resource */
         $resource = $this->resource;
 
         /** @var \BetaKiller\Status\StatusTransitionModelInterface[] $transitions */

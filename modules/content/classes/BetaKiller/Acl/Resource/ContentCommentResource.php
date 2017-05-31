@@ -2,38 +2,42 @@
 namespace BetaKiller\Acl\Resource;
 
 use BetaKiller\Model\Role;
-use Spotman\Acl\Resource\AbstractCrudPermissionsResource;
-use Spotman\Acl\Resource\CrudPermissionsResourceInterface;
 
-class ContentCommentResource extends AbstractCrudPermissionsResource
+class ContentCommentResource extends AbstractStatusRelatedEntityAclResource
 {
     /**
-     * Returns default permissions bundled with current resource
-     * Key=>Value pairs where key is a permission identity and value is an array of roles
-     * Useful for presetting permissions for resources with fixed access control list or permissions based on hard-coded logic
+     * Provides array of roles` names which are allowed to create entities
      *
-     * @return string[][]
+     * @return string[]
      */
-    public function getDefaultAccessList()
+    protected function getCreatePermissionRoles()
     {
         return [
-            self::PERMISSION_CREATE =>  [
-                Role::GUEST_ROLE_NAME,
-                Role::LOGIN_ROLE_NAME,
-            ],
+            Role::GUEST_ROLE_NAME,
+        ];
+    }
 
-            self::PERMISSION_READ =>  [
-                Role::GUEST_ROLE_NAME,
-                Role::LOGIN_ROLE_NAME,
-            ],
+    /**
+     * Provides array of roles` names which are allowed to browse(list) entities
+     *
+     * @return string[]
+     */
+    protected function getListPermissionRoles()
+    {
+        return [
+            Role::GUEST_ROLE_NAME,
+        ];
+    }
 
-            self::PERMISSION_UPDATE =>  [
-                Role::MODERATOR_ROLE_NAME,
-            ],
-
-            self::PERMISSION_DELETE =>  [
-                Role::ADMIN_ROLE_NAME,
-            ],
+    /**
+     * Provides array of roles` names which are allowed to search for entities
+     *
+     * @return string[]
+     */
+    protected function getSearchPermissionRoles()
+    {
+        return [
+            Role::MODERATOR_ROLE_NAME,
         ];
     }
 }

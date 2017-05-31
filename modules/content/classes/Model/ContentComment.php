@@ -1,25 +1,22 @@
 <?php
 
-use BetaKiller\Content\ContentRelatedInterface;
+use BetaKiller\Content\EntityRelatedInterface;
 use BetaKiller\Content\ImportedFromWordpressInterface;
-use BetaKiller\Utils\Kohana\TreeModelSingleParentOrm;
+use BetaKiller\Helper\IFaceHelper;
+use BetaKiller\Model\Entity;
+use BetaKiller\Model\HasPublicReadUrlInterface;
+use BetaKiller\Model\IFaceZone;
 use BetaKiller\Model\UserInterface;
-use BetaKiller\Status\StatusRelatedModelOrmTrait;
 use BetaKiller\Status\StatusRelatedModelInterface;
-use BetaKiller\Helper\HasPublicUrlInterface;
-use BetaKiller\Helper\HasAdminUrlInterface;
-use BetaKiller\Helper\IFaceHelperTrait;
-use Spotman\Api\AbstractCrudMethodsModelInterface;
+use BetaKiller\Status\StatusRelatedModelOrmTrait;
+use BetaKiller\Utils\Kohana\TreeModelSingleParentOrm;
 
 class Model_ContentComment extends TreeModelSingleParentOrm
-    implements ContentRelatedInterface, StatusRelatedModelInterface, ImportedFromWordpressInterface, HasPublicUrlInterface, HasAdminUrlInterface, AbstractCrudMethodsModelInterface
+    implements EntityRelatedInterface, StatusRelatedModelInterface, ImportedFromWordpressInterface, HasPublicReadUrlInterface
 {
-    use Model_ORM_ContentRelatedTrait;
+    use Model_ORM_EntityRelatedTrait;
     use Model_ORM_ImportedFromWordpressTrait;
     use StatusRelatedModelOrmTrait;
-    use IFaceHelperTrait;
-
-    const URL_PARAM = 'ContentComment';
 
     /**
      * Prepares the model database connection, determines the table name,
@@ -33,13 +30,13 @@ class Model_ContentComment extends TreeModelSingleParentOrm
         $this->_table_name = 'content_comments';
 
         $this->belongs_to([
-            'entity'            =>  [
-                'model'         =>  'ContentEntity',
-                'foreign_key'   =>  'entity_id',
+            'entity' => [
+                'model'       => 'Entity',
+                'foreign_key' => 'entity_id',
             ],
-            'author'            =>  [
-                'model'         =>  'User',
-                'foreign_key'   =>  'author_user',
+            'author' => [
+                'model'       => 'User',
+                'foreign_key' => 'author_user',
             ],
         ]);
 
@@ -88,31 +85,31 @@ class Model_ContentComment extends TreeModelSingleParentOrm
     public function rules()
     {
         $rules = [
-            'entity_id'   =>  [
+            'entity_id'      => [
                 ['not_empty'],
             ],
-            'entity_item_id'   =>  [
+            'entity_item_id' => [
                 ['not_empty'],
             ],
-            'ip_address'   =>  [
+            'ip_address'     => [
                 ['not_empty'],
             ],
-            'user_agent'   =>  [
+            'user_agent'     => [
                 ['not_empty'],
             ],
-            'status_id'   =>  [
+            'status_id'      => [
                 ['not_empty'],
             ],
-            'message'   =>  [
+            'message'        => [
                 ['not_empty'],
             ],
         ];
 
         $guestRules = [
-            'author_name'   =>  [
+            'author_name'  => [
                 ['not_empty'],
             ],
-            'author_email'   =>  [
+            'author_email' => [
                 ['not_empty'],
                 ['email'],
             ],
@@ -126,37 +123,29 @@ class Model_ContentComment extends TreeModelSingleParentOrm
         return $rules;
     }
 
-    public function get_public_url()
+    public function getPublicReadUrl(IFaceHelper $helper)
     {
-        return $this->get_related_content_public_url().'#'.$this->get_html_dom_id();
+        return $this->getRelatedEntityPublicUrl($helper).'#'.$this->getHtmlDomID();
     }
 
-    public function get_related_content_public_url()
+    private function getRelatedEntityPublicUrl(IFaceHelper $helper)
     {
-        return $this->get_related_item_model()->get_public_url();
-    }
+        $relatedEntity = $this->getRelatedEntityInstance();
 
-    public function get_admin_url()
-    {
-        /** @var \BetaKiller\IFace\Admin\Content\CommentItem $iface */
-        $iface = $this->iface_from_codename('Admin_Content_CommentItem');
-
-        $params = $this->url_parameters_instance()->setEntity($this);
-
-        return $iface->url($params);
+        return $helper->getReadEntityUrl($relatedEntity, IFaceZone::PUBLIC_ZONE);
     }
 
 //    public function get_related_content_admin_url()
 //    {
-//        return $this->get_related_item_model()->get_admin_url();
+//        return $this->getRelatedEntityInstance()->get_admin_url();
 //    }
 
-    public function get_related_content_label()
+    public function getRelatedContentLabel()
     {
-        return $this->get_related_item_model()->getLabel();
+        return $this->getRelatedEntityInstance()->getLabel();
     }
 
-    public function get_html_dom_id()
+    public function getHtmlDomID()
     {
         return 'content-comment-'.$this->get_id();
     }
@@ -169,6 +158,7 @@ class Model_ContentComment extends TreeModelSingleParentOrm
     public function set_guest_author_email($value)
     {
         $this->set('author_email', $value);
+
         return $this;
     }
 
@@ -188,6 +178,7 @@ class Model_ContentComment extends TreeModelSingleParentOrm
     public function set_guest_author_name($value)
     {
         $this->set('author_name', $value);
+
         return $this;
     }
 
@@ -202,6 +193,7 @@ class Model_ContentComment extends TreeModelSingleParentOrm
     public function set_author_user(UserInterface $value = null)
     {
         $this->set('author', $value);
+
         return $this;
     }
 
@@ -212,6 +204,7 @@ class Model_ContentComment extends TreeModelSingleParentOrm
     {
         /** @var UserInterface $author */
         $author = $this->get('author');
+
         return $author->loaded() ? $author : null;
     }
 
@@ -222,16 +215,18 @@ class Model_ContentComment extends TreeModelSingleParentOrm
     {
         return !$this->get_author_user();
     }
-    
+
     public function get_author_name()
     {
         $author = $this->get_author_user();
+
         return $author ? $author->get_first_name() : $this->get_guest_author_name();
     }
 
     public function get_author_email()
     {
         $author = $this->get_author_user();
+
         return $author ? $author->get_email() : $this->get_guest_author_email();
     }
 
@@ -243,6 +238,7 @@ class Model_ContentComment extends TreeModelSingleParentOrm
     public function set_message($value)
     {
         $this->set('message', $value);
+
         return $this;
     }
 
@@ -262,6 +258,7 @@ class Model_ContentComment extends TreeModelSingleParentOrm
     public function set_ip_address($value)
     {
         $this->set('ip_address', $value);
+
         return $this;
     }
 
@@ -281,6 +278,7 @@ class Model_ContentComment extends TreeModelSingleParentOrm
     public function set_guest_author_user($value)
     {
         $this->set('author_user', $value);
+
         return $this;
     }
 
@@ -300,6 +298,7 @@ class Model_ContentComment extends TreeModelSingleParentOrm
     public function set_user_agent($value)
     {
         $this->set('user_agent', $value);
+
         return $this;
     }
 
@@ -314,6 +313,7 @@ class Model_ContentComment extends TreeModelSingleParentOrm
     public function set_created_at(DateTime $value = null)
     {
         $this->set_datetime_column_value('created_at', $value ?: new DateTime);
+
         return $this;
     }
 
@@ -340,10 +340,11 @@ class Model_ContentComment extends TreeModelSingleParentOrm
      */
     protected function set_path()
     {
-        $parent = $this->getParent();
+        $parent     = $this->getParent();
         $parentPath = $parent ? $parent->get_path() : 0;
 
         $this->set('path', $parentPath.'.'.$this->get_id());
+
         return $this;
     }
 
@@ -365,24 +366,25 @@ class Model_ContentComment extends TreeModelSingleParentOrm
      *
      * @return $this
      */
-    public function filter_last_records(DateInterval  $interval)
+    public function filter_last_records(DateInterval $interval)
     {
         $time = new DateTime();
         $time->sub($interval);
 
         $this->filter_datetime_column_value($this->object_column('created_at'), $time, '>');
+
         return $this;
     }
 
     /**
-     * @param string    $ipAddress
-     * @param int       $interval
+     * @param string $ipAddress
+     * @param int    $interval
      *
      * @return int
      */
     public function get_comments_count_for_ip($ipAddress, $interval = 30)
     {
-        $key = 'PT'.(int) $interval.'S';
+        $key = 'PT'.(int)$interval.'S';
 
         return $this
             ->filter_last_records(new DateInterval($key))
@@ -397,7 +399,8 @@ class Model_ContentComment extends TreeModelSingleParentOrm
      */
     public function filter_ip_address($value)
     {
-        $this->where($this->object_column('ip_address'), '=', (string) $value);
+        $this->where($this->object_column('ip_address'), '=', (string)$value);
+
         return $this;
     }
 
@@ -436,24 +439,28 @@ class Model_ContentComment extends TreeModelSingleParentOrm
     public function init_as_pending()
     {
         $status = $this->get_status_by_id(Model_ContentCommentStatus::STATUS_PENDING);
+
         return $this->init_status($status);
     }
 
     public function init_as_approved()
     {
         $status = $this->get_status_by_id(Model_ContentCommentStatus::STATUS_APPROVED);
+
         return $this->init_status($status);
     }
 
     public function init_as_spam()
     {
         $status = $this->get_status_by_id(Model_ContentCommentStatus::STATUS_SPAM);
+
         return $this->init_status($status);
     }
 
     public function init_as_trash()
     {
         $status = $this->get_status_by_id(Model_ContentCommentStatus::STATUS_TRASH);
+
         return $this->init_status($status);
     }
 
@@ -478,12 +485,12 @@ class Model_ContentComment extends TreeModelSingleParentOrm
     }
 
     /**
-     * @param \Model_Entity $entity
-     * @param int           $entity_item_id
+     * @param \BetaKiller\Model\Entity $entity
+     * @param int                      $entity_item_id
      *
      * @return Model_ContentComment[]
      */
-    public function get_entity_item_approved_comments(Model_Entity $entity, $entity_item_id)
+    public function get_entity_item_approved_comments(Entity $entity, $entity_item_id)
     {
         /** @var Model_ContentCommentStatus $status */
         $status = $this->get_status_relation();
@@ -492,7 +499,7 @@ class Model_ContentComment extends TreeModelSingleParentOrm
         return $this->get_comments_ordered_by_path($status, $entity, $entity_item_id);
     }
 
-    public function get_comments_ordered_by_path(Model_ContentCommentStatus $status = null, Model_Entity $entity = null, $entity_item_id = null)
+    public function get_comments_ordered_by_path(Model_ContentCommentStatus $status = null, Entity $entity = null, $entity_item_id = null)
     {
         /** @var \Model_ContentComment $model */
         $model = $this->model_factory();
@@ -526,12 +533,12 @@ class Model_ContentComment extends TreeModelSingleParentOrm
     {
         /** @var \Model_ContentCommentStatus $statusOrm */
         $statusOrm = $this->status_model_factory();
-        $status = $statusOrm->get_pending_status();
+        $status    = $statusOrm->get_pending_status();
 
         return $this->get_comments_count($status);
     }
 
-    public function get_comments_count(Model_ContentCommentStatus $status = null, Model_Entity $entity = null, $entity_item_id = null)
+    public function get_comments_count(Model_ContentCommentStatus $status = null, Entity $entity = null, $entity_item_id = null)
     {
         /** @var \Model_ContentComment $model */
         $model = $this->model_factory();
@@ -553,36 +560,42 @@ class Model_ContentComment extends TreeModelSingleParentOrm
     public function draft()
     {
         $this->workflow()->draft();
+
         return $this;
     }
 
     public function approve()
     {
         $this->workflow()->approve();
+
         return $this;
     }
 
     public function reject()
     {
         $this->workflow()->reject();
+
         return $this;
     }
 
     public function mark_as_spam()
     {
         $this->workflow()->markAsSpam();
+
         return $this;
     }
 
     public function move_to_trash()
     {
         $this->workflow()->moveToTrash();
+
         return $this;
     }
 
     public function restore_from_trash()
     {
         $this->workflow()->restoreFromTrash();
+
         return $this;
     }
 
@@ -604,7 +617,7 @@ class Model_ContentComment extends TreeModelSingleParentOrm
     /**
      * @inheritDoc
      */
-    public function create(Validation $validation = NULL)
+    public function create(Validation $validation = null)
     {
         // Preset default status
         if (!$this->has_current_status()) {

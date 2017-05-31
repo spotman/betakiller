@@ -1,9 +1,9 @@
 <?php
 namespace BetaKiller\Api\Method\ContentComment;
 
-use Spotman\Api\Method\AbstractModelCreateApiMethod;
+use BetaKiller\Api\Method\AbstractEntityCreateApiMethod;
 
-class CreateApiMethod extends AbstractModelCreateApiMethod
+class CreateApiMethod extends AbstractEntityCreateApiMethod
 {
     use ContentCommentMethodTrait;
 
@@ -14,7 +14,7 @@ class CreateApiMethod extends AbstractModelCreateApiMethod
      * @param                       $data
      *
      * @throws \Spotman\Api\ApiMethodException
-     * @return \Spotman\Api\AbstractCrudMethodsModelInterface
+     * @return \BetaKiller\Model\AbstractEntityInterface
      */
     protected function create($model, $data)
     {

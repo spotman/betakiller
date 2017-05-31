@@ -1,5 +1,5 @@
 <?php
-namespace BetaKiller\Content;
+namespace BetaKiller\Model;
 
 interface HasLabelInterface
 {

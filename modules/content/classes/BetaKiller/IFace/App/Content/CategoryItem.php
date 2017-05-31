@@ -1,7 +1,7 @@
 <?php
 namespace BetaKiller\IFace\App\Content;
 
-class CategoryItem extends AppBase
+class CategoryItem extends AbstractAppBase
 {
     /**
      * @Inject

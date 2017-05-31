@@ -5,7 +5,7 @@
 trait Model_ORM_ContentElementTrait
 {
 //    use BetaKiller\Helper\CurrentUserTrait;
-    use Model_ORM_ContentRelatedTrait;
+    use Model_ORM_EntityRelatedTrait;
 
 //    /**
 //     * @return ContentElementInterface[]

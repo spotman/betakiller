@@ -88,7 +88,7 @@ class IFaceStack
 
             $currentModel = $this->parameters->getEntity($key);
 
-            if ($paramModel->getUrlItemID() !== $currentModel->getUrlItemID()) {
+            if ($paramModel->getID() !== $currentModel->getID()) {
                 return false;
             }
         }

@@ -22,7 +22,7 @@ class PostIndex extends AdminBase
         foreach ($articles as $article) {
             $data[] = [
                 'id'          => $article->get_id(),
-                'url'         => $article->get_admin_url(),
+                'url'         => $this->ifaceHelper->getReadEntityUrl($article),
                 'label'       => $article->getLabel(),
             ];
         }

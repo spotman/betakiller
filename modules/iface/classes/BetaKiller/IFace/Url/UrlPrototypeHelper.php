@@ -4,6 +4,7 @@ namespace BetaKiller\IFace\Url;
 use BetaKiller\IFace\Exception\IFaceException;
 use BetaKiller\IFace\IFaceInterface;
 use BetaKiller\IFace\IFaceModelInterface;
+use BetaKiller\Model\DispatchableEntityInterface;
 use BetaKiller\Utils\Kohana\TreeModelSingleParentInterface;
 
 class UrlPrototypeHelper
@@ -126,7 +127,7 @@ class UrlPrototypeHelper
      * @param \BetaKiller\IFace\Url\UrlPrototype                $prototype
      * @param \BetaKiller\IFace\Url\UrlParametersInterface|null $parameters
      *
-     * @return \BetaKiller\IFace\Url\DispatchableEntityInterface|null
+     * @return \BetaKiller\Model\DispatchableEntityInterface|null
      * @throws \BetaKiller\IFace\Url\UrlPrototypeException
      */
     public function getModelFromUrlParameters(UrlPrototype $prototype, UrlParametersInterface $parameters = null)

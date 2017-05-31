@@ -2,6 +2,7 @@
 namespace BetaKiller\IFace\Url;
 
 use BetaKiller\IFace\Exception\UrlParametersException;
+use BetaKiller\Model\DispatchableEntityInterface;
 use BetaKiller\Utils\Registry\BasicRegistry;
 
 class UrlParameters implements UrlParametersInterface
@@ -25,15 +26,15 @@ class UrlParameters implements UrlParametersInterface
     }
 
     /**
-     * @param \BetaKiller\IFace\Url\DispatchableEntityInterface $object
-     * @param bool|null                                         $ignoreDuplicate
+     * @param \BetaKiller\Model\DispatchableEntityInterface $object
+     * @param bool|null                                     $ignoreDuplicate
      *
      * @return $this
      * @throws \Exception
      */
     public function setEntity(DispatchableEntityInterface $object, $ignoreDuplicate = null)
     {
-        $key = $object::getUrlParameterKey();
+        $key = $object::getUrlParametersKey();
         $this->entitiesRegistry->set($key, $object, (bool)$ignoreDuplicate);
 
         return $this;
@@ -42,7 +43,7 @@ class UrlParameters implements UrlParametersInterface
     /**
      * @param string $key
      *
-     * @return \BetaKiller\IFace\Url\DispatchableEntityInterface|null
+     * @return \BetaKiller\Model\DispatchableEntityInterface|null
      */
     public function getEntity($key)
     {
@@ -50,9 +51,9 @@ class UrlParameters implements UrlParametersInterface
     }
 
     /**
-     * @param string|\BetaKiller\IFace\Url\DispatchableEntityInterface $className
+     * @param string|\BetaKiller\Model\DispatchableEntityInterface $className
      *
-     * @return \BetaKiller\IFace\Url\DispatchableEntityInterface|mixed|null
+     * @return \BetaKiller\Model\DispatchableEntityInterface|mixed|null
      */
     public function getEntityByClassName($className)
     {
@@ -67,8 +68,8 @@ class UrlParameters implements UrlParametersInterface
             ]);
         }
 
-        /** @var \BetaKiller\IFace\Url\DispatchableEntityInterface $className Hack for autocomplete */
-        $key = $className::getUrlParameterKey();
+        /** @var \BetaKiller\Model\DispatchableEntityInterface $className Hack for autocomplete */
+        $key = $className::getUrlParametersKey();
 
         return $this->getEntity($key);
     }
@@ -85,7 +86,7 @@ class UrlParameters implements UrlParametersInterface
     }
 
     /**
-     * @return \BetaKiller\IFace\Url\DispatchableEntityInterface[]
+     * @return \BetaKiller\Model\DispatchableEntityInterface[]
      */
     public function getAllEntities()
     {

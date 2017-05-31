@@ -1,8 +1,8 @@
 <?php
 
-use BetaKiller\IFace\Widget\BaseWidget;
+use BetaKiller\IFace\Widget\AbstractBaseWidget;
 
-abstract class Widget_Content_SidebarArticlesList extends BaseWidget
+abstract class Widget_Content_SidebarArticlesList extends AbstractBaseWidget
 {
     /**
      * @Inject
@@ -56,7 +56,7 @@ abstract class Widget_Content_SidebarArticlesList extends BaseWidget
         return [
             'label'     => $article->getLabel(),
             'thumbnail' => $thumbnail->getAttributesForImgTag($thumbnail::SIZE_PREVIEW),
-            'url'       => $article->get_public_url(),
+            'url'       => $this->ifaceHelper->getReadEntityUrl($article),
             'date'      => $article->getCreatedAt()->format('d.m.Y'),
         ];
     }

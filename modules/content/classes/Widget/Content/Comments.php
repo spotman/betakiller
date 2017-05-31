@@ -2,13 +2,15 @@
 
 use BetaKiller\Helper\ContentTrait;
 use BetaKiller\Helper\CurrentUserTrait;
-use BetaKiller\IFace\Widget\BaseWidget;
+use BetaKiller\IFace\Widget\AbstractBaseWidget;
 use BetaKiller\IFace\Widget\WidgetException;
 
-class Widget_Content_Comments extends BaseWidget
+class Widget_Content_Comments extends AbstractBaseWidget
 {
     use ContentTrait,
         CurrentUserTrait;
+
+    // TODO Разбораться почему не показываются комментарии
 
     /**
      * Returns data for View rendering

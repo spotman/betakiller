@@ -467,7 +467,7 @@ class User extends \Model_Auth_User implements UserInterface
     public function forceAuthorization()
     {
         if ($this->isGuest()) {
-            throw new \HTTP_Exception_401();
+            throw new \HTTP_Exception_401('Authorization required!');
         }
     }
 

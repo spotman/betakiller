@@ -2,7 +2,7 @@
 
 class Auth_Exception_WrongIP extends Auth_Exception
 {
-    protected function get_default_message()
+    protected function getDefaultMessage()
     {
         return 'Your IP address is not valid';
     }

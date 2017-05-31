@@ -70,11 +70,11 @@ trait ContentTrait
 
     /**
      * @param int|null $id
-     * @return \Model_Entity|\BetaKiller\Utils\Kohana\ORM\OrmInterface
+     * @return \BetaKiller\Model\Entity|\BetaKiller\Utils\Kohana\ORM\OrmInterface
      */
     protected function model_factory_content_entity($id = NULL)
     {
-        return \ORM::factory('ContentEntity', $id);
+        return \ORM::factory('Entity', $id);
     }
 
     /**

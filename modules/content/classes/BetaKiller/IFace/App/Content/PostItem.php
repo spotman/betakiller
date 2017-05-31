@@ -4,7 +4,7 @@ namespace BetaKiller\IFace\App\Content;
 use BetaKiller\Helper\ContentUrlParametersHelper;
 use BetaKiller\Model\UserInterface;
 
-class PostItem extends AppBase
+class PostItem extends AbstractAppBase
 {
     /**
      * @var \BetaKiller\Helper\ContentUrlParametersHelper

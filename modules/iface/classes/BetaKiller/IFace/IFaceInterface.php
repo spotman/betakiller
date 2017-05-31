@@ -201,6 +201,13 @@ interface IFaceInterface extends SeoMetaInterface
     public function getEntityActionName();
 
     /**
+     * Returns array of additional ACL rules in format <ResourceName>.<permissionName> (eq, ["Admin.enabled"])
+     *
+     * @return string[]
+     */
+    public function getAdditionalAclRules();
+
+    /**
      * @param \BetaKiller\IFace\Url\UrlParametersInterface $params
      * @param int|null                            $limit
      *

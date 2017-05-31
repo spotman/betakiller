@@ -11,9 +11,16 @@ class PostItem extends AdminBase
     private $urlParametersHelper;
 
     /**
+     * @Inject
+     * TODO move to constructor
+     * @var \BetaKiller\Helper\AclHelper
+     */
+    private $aclHelper;
+
+    /**
      * PostItem constructor.
      *
-     * @param \BetaKiller\Helper\ContentUrlParametersHelper          $urlParametersHelper
+     * @param \BetaKiller\Helper\ContentUrlParametersHelper $urlParametersHelper
      */
     public function __construct(ContentUrlParametersHelper $urlParametersHelper)
     {
@@ -31,9 +38,7 @@ class PostItem extends AdminBase
         $post = $this->urlParametersHelper->getContentPost();
 
         /** @var \BetaKiller\Acl\Resource\ContentPostResource $contentPostResource */
-        $contentPostResource = $this->acl->getResource('ContentPost');
-
-        $contentPostResource->useStatusRelatedModel($post);
+        $contentPostResource = $this->aclHelper->getEntityAclResource($post);
 
         $thumbnails = [];
 
@@ -48,26 +53,26 @@ class PostItem extends AdminBase
 
         return [
             'post' => [
-                'id'            =>  $post->get_id(),
-                'uri'           =>  $post->getUri(),
-                'label'         =>  $post->getLabel(),
-                'content'       =>  $post->getContent(),
-                'title'         =>  $post->getTitle(),
-                'description'   =>  $post->getDescription(),
+                'id'          => $post->getID(),
+                'uri'         => $post->getUri(),
+                'label'       => $post->getLabel(),
+                'content'     => $post->getContent(),
+                'title'       => $post->getTitle(),
+                'description' => $post->getDescription(),
 
                 'needsCategory'   => $post->needsCategory(),
                 'isUpdateAllowed' => $contentPostResource->isUpdateAllowed(),
 
-                'status'        =>  [
-                    'id'            =>  $status->get_id(),
-                    'codename'      =>  $status->get_codename(),
-                    'transitions'   =>  $status->get_allowed_target_transitions_codename_array(),
+                'status' => [
+                    'id'          => $status->get_id(),
+                    'codename'    => $status->get_codename(),
+                    'transitions' => $status->get_allowed_target_transitions_codename_array(),
                 ],
 
-                'thumbnails'    =>  $thumbnails,
+                'thumbnails' => $thumbnails,
             ],
 
-            'custom_tags'  =>  \CustomTag::instance()->getAllowedTags(),
+            'custom_tags' => \CustomTag::instance()->getAllowedTags(),
         ];
     }
 }

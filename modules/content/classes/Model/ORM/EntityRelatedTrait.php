@@ -1,20 +1,21 @@
 <?php
 
-use BetaKiller\Content\ContentRelatedInterface;
+use BetaKiller\Content\EntityRelatedInterface;
+use BetaKiller\Model\Entity;
 
-trait Model_ORM_ContentRelatedTrait
+trait Model_ORM_EntityRelatedTrait
 {
     /**
-     * @var \BetaKiller\Content\EntityLinkedModelInterface
+     * @var \BetaKiller\Model\AbstractEntityInterface
      */
     protected $linkedModel;
 
     protected function initialize_entity_relation()
     {
         $this->belongs_to([
-            'entity'    =>  [
-                'model'         =>  'ContentEntity',
-                'foreign_key'   =>  'entity_id',
+            'entity' => [
+                'model'       => 'Entity',
+                'foreign_key' => 'entity_id',
             ],
         ]);
 
@@ -22,18 +23,18 @@ trait Model_ORM_ContentRelatedTrait
     }
 
     /**
-     * @param Model_Entity $entity
+     * @param Entity $entity
      *
      * @return $this|ORM
      * @throws Kohana_Exception
      */
-    public function set_entity(Model_Entity $entity)
+    public function set_entity(Entity $entity)
     {
         return $this->set('entity', $entity);
     }
 
     /**
-     * @return Model_Entity
+     * @return Entity
      * @throws Kohana_Exception
      */
     public function get_entity()
@@ -53,12 +54,13 @@ trait Model_ORM_ContentRelatedTrait
      * Set link to linked record ID
      *
      * @param int $id
+     *
      * @return $this|ORM
      * @throws Kohana_Exception
      */
     public function set_entity_item_id($id)
     {
-        return $this->set('entity_item_id', (int) $id);
+        return $this->set('entity_item_id', (int)$id);
     }
 
     /**
@@ -70,22 +72,22 @@ trait Model_ORM_ContentRelatedTrait
         return $this->get('entity_item_id');
     }
 
-    public function get_entity_items_ids(Model_Entity $entity)
+    public function get_entity_items_ids(Entity $entity)
     {
-        /** @var ContentRelatedInterface $model */
+        /** @var EntityRelatedInterface $model */
         $model = $this->model_factory();
 
         return $model
             ->filter_entity_id($entity->get_id())
             ->group_by_entity_item_id()
             ->find_all()
-            ->as_array(NULL, 'entity_item_id');
+            ->as_array(null, 'entity_item_id');
     }
 
     /**
      * @param int $item_id
      *
-     * @return ContentRelatedInterface|$this
+     * @return EntityRelatedInterface|$this
      */
     public function filter_entity_item_id($item_id)
     {
@@ -95,7 +97,7 @@ trait Model_ORM_ContentRelatedTrait
     /**
      * @param array $item_ids
      *
-     * @return ContentRelatedInterface|$this
+     * @return EntityRelatedInterface|$this
      */
     public function filter_entity_item_ids(array $item_ids)
     {
@@ -105,14 +107,14 @@ trait Model_ORM_ContentRelatedTrait
     /**
      * @param $entity_id
      *
-     * @return ContentRelatedInterface|$this
+     * @return EntityRelatedInterface|$this
      */
     public function filter_entity_id($entity_id)
     {
         return $this->where($this->object_column('entity_id'), '=', $entity_id);
     }
 
-    protected function filter_entity_and_entity_item_id(Model_Entity $entity = null, $entity_item_id = null)
+    protected function filter_entity_and_entity_item_id(Entity $entity = null, $entity_item_id = null)
     {
         if ($entity) {
             $this->filter_entity_id($entity->get_id());
@@ -126,7 +128,7 @@ trait Model_ORM_ContentRelatedTrait
     }
 
     /**
-     * @return ContentRelatedInterface|$this
+     * @return EntityRelatedInterface|$this
      */
     public function group_by_entity_item_id()
     {
@@ -134,13 +136,13 @@ trait Model_ORM_ContentRelatedTrait
     }
 
     /**
-     * @return \BetaKiller\Content\EntityLinkedModelInterface
+     * @return \BetaKiller\Model\DispatchableEntityInterface
      */
-    protected function get_related_item_model()
+    protected function getRelatedEntityInstance()
     {
         if (!$this->linkedModel) {
-            $id = $this->get_entity_item_id();
-            $this->linkedModel = $this->get_entity()->getLinkedModelInstance($id);
+            $id                = $this->get_entity_item_id();
+            $this->linkedModel = $this->get_entity()->getLinkedEntityInstance($id);
         }
 
         return $this->linkedModel;

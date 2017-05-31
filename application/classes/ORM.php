@@ -1,15 +1,17 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
+use BetaKiller\Acl\Resource\EntityRelatedAclResourceInterface;
 use BetaKiller\DI\Container;
 use BetaKiller\Factory\OrmFactory;
-use BetaKiller\IFace\Url\DispatchableEntityInterface;
 use BetaKiller\IFace\Url\UrlDataSourceInterface;
 use BetaKiller\IFace\Url\UrlParametersInterface;
+use BetaKiller\Model\DispatchableEntityInterface;
 use BetaKiller\Search\Model\Applicable;
 use BetaKiller\Search\Model\ResultsItem;
 use BetaKiller\Utils;
 use BetaKiller\Utils\Kohana\ORM\OrmInterface;
 use Spotman\Api\ApiResponseItemInterface;
+use BetaKiller\IFace\CrudlsActionsInterface;
 
 class ORM extends Utils\Kohana\ORM
     implements ApiResponseItemInterface, UrlDataSourceInterface, DispatchableEntityInterface, Applicable, ResultsItem
@@ -23,7 +25,7 @@ class ORM extends Utils\Kohana\ORM
      * @param string         $model
      * @param int|array|null $id
      *
-     * @return OrmInterface
+     * @return OrmInterface|mixed
      */
     public static function factory($model, $id = null)
     {
@@ -71,7 +73,7 @@ class ORM extends Utils\Kohana\ORM
      *
      * @return string
      */
-    public static function getUrlParameterKey()
+    public static function getUrlParametersKey()
     {
         return static::detectModelName();
     }
@@ -102,22 +104,33 @@ class ORM extends Utils\Kohana\ORM
     /**
      * Performs search for model item where the $key property value is equal to $value
      *
-     * @param string                 $key
-     * @param string                 $value
-     * @param UrlParametersInterface $parameters
+     * @param string                                                     $key
+     * @param string                                                     $value
+     * @param UrlParametersInterface                                     $parameters
      *
-     * @return DispatchableEntityInterface|NULL
+     * @param \BetaKiller\Acl\Resource\EntityRelatedAclResourceInterface $resource
+     *
+     * @return \BetaKiller\Model\DispatchableEntityInterface|NULL
      */
-    public function findByUrlKey($key, $value, UrlParametersInterface $parameters)
+    public function findByUrlKey($key, $value, UrlParametersInterface $parameters, EntityRelatedAclResourceInterface $resource)
     {
         // Additional filtering for non-pk keys
         if ($key !== $this->primary_key()) {
             $this->customFilterForSearchByUrl($parameters);
         }
 
+        $action = CrudlsActionsInterface::READ_ACTION;
+
+        $this->securityFilter($resource, $action);
+
         $model = $this->where($this->object_column($key), '=', $value)->find();
 
         return $model->loaded() ? $model : null;
+    }
+
+    protected function securityFilter(EntityRelatedAclResourceInterface $aclResource, $action)
+    {
+        // Empty by default
     }
 
     /**
@@ -147,7 +160,7 @@ class ORM extends Utils\Kohana\ORM
      * @param UrlParametersInterface $parameters
      * @param int|null               $limit
      *
-     * @return \BetaKiller\IFace\Url\DispatchableEntityInterface[]
+     * @return \BetaKiller\Model\DispatchableEntityInterface[]
      */
     public function getAvailableItemsByUrlKey($key, UrlParametersInterface $parameters, $limit = null)
     {
@@ -187,13 +200,21 @@ class ORM extends Utils\Kohana\ORM
     }
 
     /**
-     * Returns string identifier of current DataSource item
+     * Returns string identifier of current entity
      *
      * @return string
      */
-    public function getUrlItemID()
+    public function getID()
     {
         return $this->get_id();
+    }
+
+    /**
+     * @return string
+     */
+    public function getLabel()
+    {
+        throw new HTTP_Exception_501('Not implemented yet');
     }
 
     /**

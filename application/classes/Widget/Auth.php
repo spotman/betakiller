@@ -3,7 +3,7 @@
 use BetaKiller\Config\ConfigInterface;
 use BetaKiller\IFace\Widget\WidgetException;
 
-class Widget_Auth extends \BetaKiller\IFace\Widget\BaseWidget
+class Widget_Auth extends \BetaKiller\IFace\Widget\AbstractBaseWidget
 {
     const PROVIDER_REGULAR = 'regular';
     const PROVIDER_ULOGIN = 'uLogin';

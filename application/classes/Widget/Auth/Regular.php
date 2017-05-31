@@ -1,9 +1,9 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
 use BetaKiller\Helper\IFaceHelper;
-use BetaKiller\IFace\Widget\BaseWidget;
+use BetaKiller\IFace\Widget\AbstractBaseWidget;
 
-class Widget_Auth_Regular extends BaseWidget
+class Widget_Auth_Regular extends AbstractBaseWidget
 {
     /**
      * @var Auth

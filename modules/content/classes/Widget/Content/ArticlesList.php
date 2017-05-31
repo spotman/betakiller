@@ -1,8 +1,8 @@
 <?php
 
-use BetaKiller\IFace\Widget\BaseWidget;
+use BetaKiller\IFace\Widget\AbstractBaseWidget;
 
-class Widget_Content_ArticlesList extends BaseWidget
+class Widget_Content_ArticlesList extends AbstractBaseWidget
 {
     use \BetaKiller\Helper\ContentTrait;
 
@@ -60,7 +60,7 @@ class Widget_Content_ArticlesList extends BaseWidget
             $posts_data[] = [
                 'is_large'      =>  $is_large,
                 'thumbnail'     =>  $thumbnail->getAttributesForImgTag($thumbnail_size),
-                'url'           =>  $article->get_public_url(),
+                'url'           =>  $this->ifaceHelper->getReadEntityUrl($article),
                 'label'         =>  $article->getLabel(),
                 'title'         =>  $article->getTitle(),
                 'text'          =>  $article->getContentPreview(),

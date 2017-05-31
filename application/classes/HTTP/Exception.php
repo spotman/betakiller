@@ -1,9 +1,10 @@
-<? defined('SYSPATH') OR die('No direct script access.');
+<?php defined('SYSPATH') OR die('No direct script access.');
 
 class HTTP_Exception extends Kohana_HTTP_Exception {
 
     /**
-     * Возвращает красивое сообщение при пробросе исключения на продакшне
+     * Returns nice exception response in non-dev modes
+     *
      * @return Response
      */
     public function get_response()
@@ -15,7 +16,6 @@ class HTTP_Exception extends Kohana_HTTP_Exception {
      * Возвращает объект вьюшки для текущего статуса ошибки
      * Переопредели этот метод в HTTP_Exception_xxx, если нужно взять вьюшку из другого места и с другим именем
      * @return View
-     * @deprecated
      */
     public function get_view()
     {
@@ -36,5 +36,4 @@ class HTTP_Exception extends Kohana_HTTP_Exception {
             return parent::get_view();
         }
     }
-
 }

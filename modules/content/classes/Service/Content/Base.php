@@ -1,6 +1,7 @@
 <?php
 
 use BetaKiller\Content\ContentElementInterface;
+use BetaKiller\Model\Entity;
 
 abstract class Service_Content_Base extends \BetaKiller\Service
 {
@@ -20,7 +21,7 @@ abstract class Service_Content_Base extends \BetaKiller\Service
     abstract protected function file_model_factory();
 
     /**
-     * @return Model_Entity
+     * @return Entity
      */
     protected function entity_model_factory()
     {
@@ -28,7 +29,7 @@ abstract class Service_Content_Base extends \BetaKiller\Service
     }
 
     /**
-     * @return Model_Entity[]|\BetaKiller\Utils\Kohana\ORM\OrmInterface[]
+     * @return Entity[]|\BetaKiller\Utils\Kohana\ORM\OrmInterface[]
      */
     public function get_entities_list()
     {
@@ -38,7 +39,7 @@ abstract class Service_Content_Base extends \BetaKiller\Service
     /**
      * @param int $id
      *
-     * @return Model_Entity|\BetaKiller\Utils\Kohana\ORM\OrmInterface
+     * @return Entity|\BetaKiller\Utils\Kohana\ORM\OrmInterface
      * @throws Kohana_Exception
      */
     public function find_entity_by_id($id)
@@ -51,7 +52,7 @@ abstract class Service_Content_Base extends \BetaKiller\Service
         return $this->entity_model_factory()->findBySlug($slug);
     }
 
-    public function get_entity_items_ids(Model_Entity $entity)
+    public function get_entity_items_ids(Entity $entity)
     {
         return $this->file_model_factory()->get_entity_items_ids($entity);
     }
@@ -67,11 +68,11 @@ abstract class Service_Content_Base extends \BetaKiller\Service
 //            ->generate_html($this->get_html_custom_tag_name(), $content->get_id(), $attributes);
 //    }
 
-//    public function get_entity_items(Model_Entity $entity)
+//    public function get_entity_items(Entity $entity)
 //    {
 //        $ids = $this->get_entity_items_ids($entity);
 //
-//        return $entity->getLinkedModelInstance()->get_titles_by_item_ids($ids);
+//        return $entity->getLinkedEntityInstance()->get_titles_by_item_ids($ids);
 //    }
 
     public function get_files_list(Model_EntityWithElements $entity, $entity_item_id = NULL)

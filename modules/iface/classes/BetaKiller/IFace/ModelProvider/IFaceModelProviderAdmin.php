@@ -3,6 +3,7 @@ namespace BetaKiller\IFace\ModelProvider;
 
 use BetaKiller\IFace\Exception\IFaceException;
 use BetaKiller\IFace\IFaceModelInterface;
+use BetaKiller\Model\DispatchableEntityInterface;
 use Kohana;
 use SimpleXMLElement;
 
@@ -77,8 +78,9 @@ class IFaceModelProviderAdmin extends IFaceModelProviderAbstract
 
     protected function getFromCache($codename)
     {
-        if (!$this->hasInCache($codename))
+        if (!$this->hasInCache($codename)) {
             throw new IFaceException('Unknown codename :codename', [':codename' => $codename]);
+        }
 
         return $this->models[$codename];
     }
@@ -158,5 +160,35 @@ class IFaceModelProviderAdmin extends IFaceModelProviderAbstract
         }
 
         return $models;
+    }
+
+    /**
+     * Search for IFace linked to provided entity, entity action and zone
+     *
+     * @param \BetaKiller\Model\DispatchableEntityInterface $entity
+     * @param string                                        $entityAction
+     * @param string                                        $zone
+     *
+     * @return IFaceModelInterface|null
+     */
+    public function getByEntityActionAndZone(DispatchableEntityInterface $entity, $entityAction, $zone)
+    {
+        foreach ($this->models as $model) {
+            if ($model->getEntityModelName() !== $entity->getModelName()) {
+                continue;
+            }
+
+            if ($model->getEntityActionName() !== $entityAction) {
+                continue;
+            }
+
+            if ($model->getZoneName() !== $zone) {
+                continue;
+            }
+
+            return $model;
+        }
+
+        return null;
     }
 }

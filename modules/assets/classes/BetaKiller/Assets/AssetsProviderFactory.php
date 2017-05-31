@@ -78,7 +78,7 @@ class AssetsProviderFactory
      *
      * @param string $codename
      *
-     * @return AbstractAssetsProvider|AbstractAssetsProviderImage
+     * @return AbstractAssetsProvider|AbstractAssetsProviderImage|mixed
      */
     public function create($codename)
     {

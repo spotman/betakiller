@@ -18,6 +18,13 @@ class Status_Workflow_ContentPost extends StatusWorkflow
     private $notificationHelper;
 
     /**
+     * @Inject
+     * TODO move to constructor
+     * @var \BetaKiller\Helper\IFaceHelper
+     */
+    private $ifaceHelper;
+
+    /**
      * Status_Workflow_ContentPost constructor.
      *
      * @param \BetaKiller\Status\StatusRelatedModelInterface      $model
@@ -60,7 +67,7 @@ class Status_Workflow_ContentPost extends StatusWorkflow
         $model = $this->model();
 
         $data = [
-            'url'   => $model->get_admin_url(),
+            'url'   => $this->ifaceHelper->getReadEntityUrl($model),
             'label' => $model->getLabel(),
         ];
 

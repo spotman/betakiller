@@ -31,7 +31,7 @@ abstract class AbstractPhpExceptionIndex extends ErrorAdminBase
 
             $exceptionsData[] = [
                 'hash'          =>  $model->getHash(),
-                'showUrl'       =>  $model->get_admin_url(),
+                'showUrl'       =>  $this->ifaceHelper->getReadEntityUrl($model),
                 'urls'          =>  $model->getUrls(),
                 'paths'         =>  $paths,
                 'modules'       =>  $model->getModules(),

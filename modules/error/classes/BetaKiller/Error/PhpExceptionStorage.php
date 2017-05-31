@@ -37,6 +37,13 @@ class PhpExceptionStorage implements PhpExceptionStorageInterface
     private $user;
 
     /**
+     * @Inject
+     * TODO move to constructor
+     * @var \BetaKiller\Helper\IFaceHelper
+     */
+    private $ifaceHelper;
+
+    /**
      * PhpExceptionStorage constructor.
      *
      * @param \BetaKiller\Factory\OrmFactory        $ormFactory
@@ -96,7 +103,7 @@ class PhpExceptionStorage implements PhpExceptionStorageInterface
     {
         $user = $this->user;
 
-        if ($exception instanceof \BetaKiller_Kohana_Exception && !$exception->is_notification_enabled()) {
+        if ($exception instanceof \BetaKiller_Kohana_Exception && !$exception->isNotificationEnabled()) {
             return null;
         }
 
@@ -174,7 +181,7 @@ class PhpExceptionStorage implements PhpExceptionStorageInterface
                 'message'  => $model->getMessage(),
                 'urls'     => $model->getUrls(),
                 'paths'    => $model->getPaths(),
-                'adminUrl' => $model->get_admin_url(),
+                'adminUrl' => $this->ifaceHelper->getReadEntityUrl($model),
             ];
 
             $message = $this->notificationHelper->createMessage('developer/error/php-exception');

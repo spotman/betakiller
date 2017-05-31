@@ -13,54 +13,74 @@ class IFaceModelProviderAdminModel implements IFaceModelInterface
     /**
      * @var IFaceModelProviderAdmin
      */
-    protected $provider;
+    private $provider;
 
     /**
      * @var string
      */
-    protected $codename;
+    private $codename;
 
     /**
      * @var string
      */
-    protected $parentCodename;
+    private $parentCodename;
 
     /**
      * @var string
      */
-    protected $uri;
+    private $uri;
 
     /**
      * @var string
      */
-    protected $label;
+    private $label;
 
     /**
      * @var string
      */
-    protected $title;
+    private $title;
 
     /**
      * Admin IFaces have "admin" layout by default
      *
      * @var string
      */
-    protected $layoutCodename = 'admin';
+    private $layoutCodename = 'admin';
 
     /**
      * @var bool
      */
-    protected $hasDynamicUrl;
+    private $hasDynamicUrl = false;
 
     /**
      * @var bool
      */
-    protected $hasTreeBehaviour;
+    private $hasTreeBehaviour = false;
 
     /**
      * @var bool
      */
-    protected $hideInSiteMap;
+    private $hideInSiteMap = false;
+
+    /**
+     * @var string
+     */
+    private $entityName;
+
+    /**
+     * @var string
+     */
+    private $entityAction;
+
+    /**
+     * @var string
+     */
+    private $zone;
+
+    /**
+     * @var string[]
+     */
+    private $aclRules = [];
 
     public static function factory($data, IFaceModelProviderAdmin $provider)
     {
@@ -249,6 +269,10 @@ class IFaceModelProviderAdminModel implements IFaceModelInterface
             'hasDynamicUrl'  => $this->hasDynamicUrl(),
             'hideInSiteMap'  => $this->hideInSiteMap(),
             'layoutCodename' => $this->getLayoutCodename(),
+            'entity'         => $this->getEntityModelName(),
+            'entityAction'   => $this->getEntityActionName(),
+            'zone'           => $this->getZoneName(),
+            'aclRules'       => $this->getAdditionalAclRules(),
         ];
     }
 
@@ -271,7 +295,7 @@ class IFaceModelProviderAdminModel implements IFaceModelInterface
         $this->title = isset($data['title']) ? $data['title'] : null;
 
         if (isset($data['parentCodename'])) {
-            $this->parentCodename = $data['parentCodename'];
+            $this->parentCodename = (string)$data['parentCodename'];
         }
 
         if (isset($data['hasDynamicUrl'])) {
@@ -287,7 +311,24 @@ class IFaceModelProviderAdminModel implements IFaceModelInterface
         }
 
         if (isset($data['layoutCodename'])) {
-            $this->layoutCodename = $data['layoutCodename'];
+            $this->layoutCodename = (string)$data['layoutCodename'];
+        }
+
+        if (isset($data['entity'])) {
+            $this->entityName = (string)$data['entity'];
+        }
+
+        if (isset($data['entityAction'])) {
+            $this->entityAction = (string)$data['entityAction'];
+        }
+
+        if (isset($data['zone'])) {
+            $this->zone = mb_strtolower($data['zone']);
+        }
+
+        if (isset($data['aclRules'])) {
+            $values = explode(',', (string)$data['aclRules']);
+            $this->aclRules = array_filter(array_map('trim', $values));
         }
     }
 
@@ -298,7 +339,7 @@ class IFaceModelProviderAdminModel implements IFaceModelInterface
      */
     public function hasDynamicUrl()
     {
-        return (bool)$this->hasDynamicUrl;
+        return $this->hasDynamicUrl;
     }
 
     /**
@@ -308,7 +349,7 @@ class IFaceModelProviderAdminModel implements IFaceModelInterface
      */
     public function hasTreeBehaviour()
     {
-        return (bool)$this->hasTreeBehaviour;
+        return $this->hasTreeBehaviour;
     }
 
     /**
@@ -316,7 +357,46 @@ class IFaceModelProviderAdminModel implements IFaceModelInterface
      */
     public function hideInSiteMap()
     {
-        return (bool)$this->hideInSiteMap;
+        return $this->hideInSiteMap;
+    }
+
+    /**
+     * Returns model name of the linked entity
+     *
+     * @return string
+     */
+    public function getEntityModelName()
+    {
+        return $this->entityName;
+    }
+
+    /**
+     * Returns entity [primary] action, applied by this IFace
+     *
+     * @return string
+     */
+    public function getEntityActionName()
+    {
+        return $this->entityAction;
+    }
+
+    /**
+     * Returns zone codename where this IFace is placed
+     *
+     * @return string
+     */
+    public function getZoneName()
+    {
+        return $this->zone;
+    }
+
+    /**
+     *
+     * @return string[]
+     */
+    public function getAdditionalAclRules()
+    {
+        return $this->aclRules;
     }
 
     /**

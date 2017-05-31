@@ -1,20 +1,19 @@
 <?php
 
-use BetaKiller\IFace\Url\DispatchableEntityInterface;
+use BetaKiller\Acl\Resource\EntityRelatedAclResourceInterface;
 use BetaKiller\Content\ImportedFromWordpressInterface;
-use BetaKiller\Content\EntityLinkedModelInterface;
 use BetaKiller\Content\Shortcode;
 use BetaKiller\Helper\IFaceHelperTrait;
 use BetaKiller\Helper\SeoMetaInterface;
+use BetaKiller\IFace\Url\UrlDispatcher;
 use BetaKiller\IFace\Url\UrlParametersInterface;
 use BetaKiller\Model\ModelWithRevisionsInterface;
 use BetaKiller\Model\ModelWithRevisionsOrmTrait;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Status\StatusRelatedModelInterface;
 use BetaKiller\Status\StatusRelatedModelOrmTrait;
-use Spotman\Api\AbstractCrudMethodsModelInterface;
 
-class Model_ContentPost extends \ORM implements StatusRelatedModelInterface, ModelWithRevisionsInterface, SeoMetaInterface, ImportedFromWordpressInterface, EntityLinkedModelInterface, AbstractCrudMethodsModelInterface
+class Model_ContentPost extends \ORM implements StatusRelatedModelInterface, ModelWithRevisionsInterface, SeoMetaInterface, ImportedFromWordpressInterface
 {
     use StatusRelatedModelOrmTrait,
         ModelWithRevisionsOrmTrait,
@@ -583,7 +582,7 @@ class Model_ContentPost extends \ORM implements StatusRelatedModelInterface, Mod
 
     public function isDefault()
     {
-        return ($this->getUri() === DispatchableEntityInterface::DEFAULT_URI);
+        return ($this->getUri() === UrlDispatcher::DEFAULT_URI);
     }
 
     /**
@@ -684,7 +683,7 @@ class Model_ContentPost extends \ORM implements StatusRelatedModelInterface, Mod
 
     public function orderByCreatedAt($asc = false)
     {
-        return $this->order_by('created_at', $asc ? 'ASC' : 'DESC');
+        return $this->order_by($this->object_column('created_at'), $asc ? 'ASC' : 'DESC');
     }
 
     public function filterType($value)
@@ -735,8 +734,6 @@ class Model_ContentPost extends \ORM implements StatusRelatedModelInterface, Mod
 
         $category = $parameters->getEntityByClassName(Model_ContentCategory::class);
 
-        $this->filterAclAllowedStatuses();
-
         // Show only posts having actual revision
         $this->filterHavingActualRevision();
 
@@ -765,43 +762,12 @@ class Model_ContentPost extends \ORM implements StatusRelatedModelInterface, Mod
         $this->and_where_close();
     }
 
-    public function filterAclAllowedStatuses()
+    /**
+     * @param \BetaKiller\Acl\Resource\EntityRelatedAclResourceInterface $aclResource
+     * @param                                                            $action
+     */
+    protected function securityFilter(EntityRelatedAclResourceInterface $aclResource, $action)
     {
-        /** @var \BetaKiller\Acl\Resource\ContentPostResource $resource */
-        $resource = $this->getRelatedAclResource();
-
-        $this->filterAllowedStatuses($resource);
-
-        return $this;
-    }
-
-    public function get_public_url()
-    {
-        /** @var \BetaKiller\IFace\App\Content\PostItem $iface */
-        $iface = $this->iface_from_codename('App_Content_PostItem');
-
-        $params = $this->url_parameters_instance()->setEntity($this);
-
-        // TODO Move this logic into iface url generator
-        if ($this->isDefault()) {
-            $this->setUri('/'); // Nullify uri so URL must not have default "index" string
-        }
-
-        $this->presetLinkedModels($params);
-
-        return $iface->url($params);
-    }
-
-    // TODO Move this method to base class and detect IFace via model-iface linking
-    public function get_admin_url()
-    {
-        /** @var \BetaKiller\IFace\Admin\Content\PostItem $iface */
-        $iface = $this->iface_from_codename('Admin_Content_PostItem');
-
-        $params = $this->url_parameters_instance()->setEntity($this);
-
-        $this->presetLinkedModels($params);
-
-        return $iface->url($params);
+        $this->filterAllowedStatuses($aclResource);
     }
 }

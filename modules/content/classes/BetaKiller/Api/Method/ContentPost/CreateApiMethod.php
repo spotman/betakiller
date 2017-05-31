@@ -1,10 +1,10 @@
 <?php
 namespace BetaKiller\Api\Method\ContentPost;
 
+use BetaKiller\Api\Method\AbstractEntityCreateApiMethod;
 use Spotman\Api\ApiMethodException;
-use Spotman\Api\Method\AbstractModelCreateApiMethod;
 
-class CreateApiMethod extends AbstractModelCreateApiMethod
+class CreateApiMethod extends AbstractEntityCreateApiMethod
 {
     use ContentPostMethodTrait;
 
@@ -15,7 +15,7 @@ class CreateApiMethod extends AbstractModelCreateApiMethod
      * @param                       $data
      *
      * @throws \Spotman\Api\ApiMethodException
-     * @return \Spotman\Api\AbstractCrudMethodsModelInterface
+     * @return \BetaKiller\Model\AbstractEntityInterface
      */
     protected function create($model, $data)
     {

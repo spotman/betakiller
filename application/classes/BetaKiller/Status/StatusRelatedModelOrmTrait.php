@@ -1,10 +1,9 @@
 <?php
 namespace BetaKiller\Status;
 
-use BetaKiller\Acl\Resource\StatusRelatedModelAclResourceInterface;
+use BetaKiller\Acl\Resource\StatusRelatedEntityAclResourceInterface;
 use BetaKiller\Graph\GraphTransitionModelInterface;
 use ORM;
-use Spotman\Acl\Resource\CrudPermissionsResourceInterface;
 
 trait StatusRelatedModelOrmTrait
 {
@@ -197,18 +196,16 @@ trait StatusRelatedModelOrmTrait
     }
 
     /**
-     * @param \BetaKiller\Acl\Resource\StatusRelatedModelAclResourceInterface $resource
-     * @param string|null                                                     $action
+     * @param \BetaKiller\Acl\Resource\StatusRelatedEntityAclResourceInterface $resource
+     * @param string|null                                                      $action
      *
-     * @return array
+     * @return $this
      */
-    protected function filterAllowedStatuses(StatusRelatedModelAclResourceInterface $resource, $action = null)
+    protected function filterAllowedStatuses(StatusRelatedEntityAclResourceInterface $resource, $action = null)
     {
         if (!$action) {
-            $action = $resource::PERMISSION_READ;
+            $action = $resource::READ_ACTION;
         }
-
-        // TODO Deal GLOBALLY with Acl AccessResolver as dependency for AclResource
 
         /** @var \BetaKiller\Status\StatusModelInterface[] $allStatuses */
         $allStatuses     = $this->status_model_factory()->get_all_nodes();
@@ -216,13 +213,13 @@ trait StatusRelatedModelOrmTrait
 
         foreach ($allStatuses as $status) {
             if ($resource->isStatusActionAllowed($status, $action)) {
-                $allowedStatuses[] = $status;
+                $allowedStatuses[] = $status->get_id();
             }
         }
 
-        // TODO real filtering
+        $this->filter_statuses($allowedStatuses);
 
-        return $allowedStatuses;
+        return $this;
     }
 
     public function get_status_id()

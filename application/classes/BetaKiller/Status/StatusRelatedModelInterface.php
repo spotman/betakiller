@@ -1,7 +1,9 @@
 <?php
 namespace BetaKiller\Status;
 
-interface StatusRelatedModelInterface
+use BetaKiller\Model\AbstractEntityInterface;
+
+interface StatusRelatedModelInterface extends AbstractEntityInterface
 {
     /**
      * @return StatusModelInterface
@@ -67,15 +69,15 @@ interface StatusRelatedModelInterface
      *
      * @return $this
      */
-    public function filter_status_id($status_id, $not_equal = FALSE);
+    public function filter_status_id($status_id, $not_equal = false);
 
     /**
-     * @param StatusModelInterface  $status
-     * @param bool                  $not_equal
+     * @param StatusModelInterface $status
+     * @param bool                 $not_equal
      *
      * @return $this
      */
-    public function filter_status(StatusModelInterface $status, $not_equal = FALSE);
+    public function filter_status(StatusModelInterface $status, $not_equal = false);
 
     /**
      * @param int[] $status_ids
@@ -83,7 +85,7 @@ interface StatusRelatedModelInterface
      *
      * @return $this
      */
-    public function filter_statuses(array $status_ids, $not_equal = FALSE);
+    public function filter_statuses(array $status_ids, $not_equal = false);
 
     /**
      * @return int
@@ -100,5 +102,5 @@ interface StatusRelatedModelInterface
      *
      * @return StatusModelOrm|\BetaKiller\Utils\Kohana\ORM\OrmInterface
      */
-    public function status_model_factory($id = NULL);
+    public function status_model_factory($id = null);
 }

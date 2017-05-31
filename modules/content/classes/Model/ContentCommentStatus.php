@@ -9,13 +9,6 @@ class Model_ContentCommentStatus extends StatusModelOrm
     const STATUS_SPAM = 3;
     const STATUS_TRASH = 4;
 
-    const URL_PARAM = 'ContentCommentStatus';
-
-//    public static function getUrlParameterKey()
-//    {
-//        return 'ContentCommentStatus';
-//    }
-
     protected function _initialize()
     {
         $this->_table_name = 'content_comment_statuses';
@@ -28,8 +21,7 @@ class Model_ContentCommentStatus extends StatusModelOrm
      */
     protected function getStatusAclModelName()
     {
-        // TODO No ACL for statuses yet
-        return null;
+        return 'ContentCommentStatusAcl';
     }
 
     /**
@@ -37,8 +29,7 @@ class Model_ContentCommentStatus extends StatusModelOrm
      */
     protected function getStatusAclModelForeignKey()
     {
-        // TODO No ACL for statuses yet
-        return null;
+        return 'status_id';
     }
 
     public function getLabel()

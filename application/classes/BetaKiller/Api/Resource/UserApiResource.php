@@ -33,9 +33,9 @@ abstract class UserApiResource extends ModelCrudApiResource
     /**
      * Returns new model or performs search by id
      *
-     * @param int|null $id
+     * @param null $id
      *
-     * @return \Spotman\Api\AbstractCrudMethodsModelInterface
+     * @return \BetaKiller\Utils\Kohana\ORM\OrmInterface|mixed
      */
     protected function model($id = NULL)
     {

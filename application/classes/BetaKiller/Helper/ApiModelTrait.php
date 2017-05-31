@@ -12,7 +12,7 @@ trait ApiModelTrait
      * @param string   $name
      * @param int|NULL $id
      *
-     * @return \BetaKiller\Utils\Kohana\ORM\OrmInterface|\Spotman\Api\AbstractCrudMethodsModelInterface
+     * @return \BetaKiller\Utils\Kohana\ORM\OrmInterface|mixed
      * @throws ApiMethodException
      */
     protected function orm_model_factory($name, $id = NULL)
