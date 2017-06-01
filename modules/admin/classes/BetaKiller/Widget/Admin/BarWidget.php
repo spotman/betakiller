@@ -52,7 +52,10 @@ class BarWidget extends AbstractAdminWidget
      */
     public function getData()
     {
-        $data = [
+        $isAdminZone = $this->ifaceHelper->getCurrentIFace()->getZoneName() === IFaceZone::ADMIN_ZONE;
+
+            $data = [
+            'isAdminZone'       => $isAdminZone,
             'enabled'           => true,
             'comments'          => $this->getCommentsData(),
             'createButtonItems' => $this->getCreateButtonItems(),
@@ -61,6 +64,8 @@ class BarWidget extends AbstractAdminWidget
                 'adminUrl'  => $this->getAdminEditButtonUrl(),
             ],
         ];
+
+        // TODO Preview post button
 
         return $data;
     }
@@ -95,11 +100,13 @@ class BarWidget extends AbstractAdminWidget
         $commentOrm = $this->model_factory_content_comment();
         $statusOrm  = $this->model_factory_content_comment_status();
 
-        $status       = $statusOrm->get_pending_status();
-        $pendingCount = $commentOrm->get_comments_count($status);
+        $status       = $statusOrm->getPendingStatus();
+        $pendingCount = $commentOrm->getCommentsCount($status);
 
-        // TODO better ACL
-        if (!$this->aclHelper->isEntityActionAllowed($status)) {
+        /** @var \BetaKiller\Acl\Resource\ContentCommentResource $resource */
+        $resource = $this->aclHelper->getResource('ContentComment');
+
+        if (!$resource->isStatusActionAllowed($status, $resource::UPDATE_ACTION)) {
             return null;
         }
 

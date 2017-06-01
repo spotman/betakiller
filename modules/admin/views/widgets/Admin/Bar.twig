@@ -3,15 +3,16 @@
   {# include fonts and materialize layout #}
   {{ css("https://fonts.googleapis.com/icon?family=Material+Icons") }}
   {{ css("admin/css/admin.css") }}
+  {{ js("widgets/admin-bar.js") }}
 
   <header id="admin-bar" class="navbar-fixed">
     <nav class="green lighten-5 black-text">
       <div class="nav-wrapper">
-        <div class="container">
+        <div class="{{ not isAdminZone ? "container" : "" }}">
 
           <ul class="left">
 
-            {% if createButtonItems|length %}
+            {% if createButtonItems|length > 0 %}
             <li>
               <a href="#!" data-activates="admin-bar-create-dropdown" data-hover="true" data-constrainWidth="false" data-belowOrigin="true" class="dropdown-button">
                 <i class="material-icons left">note_add</i>

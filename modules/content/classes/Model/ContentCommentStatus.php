@@ -41,7 +41,7 @@ class Model_ContentCommentStatus extends StatusModelOrm
     /**
      * @return Model_ContentCommentStatus|\BetaKiller\Utils\Kohana\ORM\OrmInterface
      */
-    public function get_pending_status()
+    public function getPendingStatus()
     {
         return $this->model_factory(self::STATUS_PENDING);
     }

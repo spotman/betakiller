@@ -533,17 +533,17 @@ class Model_ContentComment extends TreeModelSingleParentOrm
     {
         /** @var \Model_ContentCommentStatus $statusOrm */
         $statusOrm = $this->status_model_factory();
-        $status    = $statusOrm->get_pending_status();
+        $status    = $statusOrm->getPendingStatus();
 
-        return $this->get_comments_count($status);
+        return $this->getCommentsCount($status);
     }
 
-    public function get_comments_count(Model_ContentCommentStatus $status = null, Entity $entity = null, $entity_item_id = null)
+    public function getCommentsCount(Model_ContentCommentStatus $status = null, Entity $entity = null, $entityItemId = null)
     {
         /** @var \Model_ContentComment $model */
         $model = $this->model_factory();
 
-        $model->filter_entity_and_entity_item_id($entity, $entity_item_id);
+        $model->filter_entity_and_entity_item_id($entity, $entityItemId);
 
         if ($status) {
             $model->filter_status($status);
