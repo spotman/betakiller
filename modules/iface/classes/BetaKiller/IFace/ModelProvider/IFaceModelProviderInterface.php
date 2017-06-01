@@ -60,4 +60,12 @@ interface IFaceModelProviderInterface
      * @return IFaceModelInterface|null
      */
     public function getByEntityActionAndZone(DispatchableEntityInterface $entity, $entityAction, $zone);
+
+    /**
+     * @param string $action
+     * @param string $zone
+     *
+     * @return IFaceModelInterface[]
+     */
+    public function getByActionAndZone($action, $zone);
 }

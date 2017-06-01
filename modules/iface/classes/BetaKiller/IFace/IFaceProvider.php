@@ -193,6 +193,24 @@ class IFaceProvider
     }
 
     /**
+     * @param string $action
+     * @param string $zone
+     *
+     * @return \BetaKiller\IFace\IFace[]
+     */
+    public function getByActionAndZone($action, $zone)
+    {
+        $models = $this->getModelProvider()->getByActionAndZone($action, $zone);
+        $ifaces = [];
+
+        foreach ($models as $model) {
+            $ifaces[] = $this->fromModel($model);
+        }
+
+        return $ifaces;
+    }
+
+    /**
      * @param string $key
      *
      * @return \BetaKiller\IFace\IFaceInterface|null

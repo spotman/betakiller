@@ -36,7 +36,10 @@ abstract class AbstractAdminWidget extends AbstractBaseWidget
 
     protected function isAccessAllowed()
     {
-        return !$this->user->isGuest() && $this->user->is_admin_allowed();
+        /** @var \BetaKiller\Acl\Resource\AdminResource $adminResource */
+        $adminResource = $this->aclHelper->getResource('Admin');
+
+        return !$this->user->isGuest() && $adminResource->isEnabled();
     }
 
     protected function isEmptyResponseAllowed()

@@ -2,14 +2,15 @@
 namespace BetaKiller\Acl\Resource;
 
 use BetaKiller\Model\Role;
-use Spotman\Acl\Resource\AbstractResolvingResource;
 
-class PhpExceptionResource extends AbstractResolvingResource
+class PhpExceptionResource extends AbstractEntityRelatedAclResource
 {
-    const PERMISSION_RESOLVE = 'resolve';
-    const PERMISSION_IGNORE  = 'ignore';
-    const PERMISSION_DELETE  = 'delete';
-    const PERMISSION_THROW   = 'throwHttpException';
+    const PERMISSION_LIST_RESOLVED   = 'listResolved';
+    const PERMISSION_LIST_UNRESOLVED = 'listUnresolved';
+    const PERMISSION_RESOLVE         = 'resolve';
+    const PERMISSION_IGNORE          = 'ignore';
+    const PERMISSION_DELETE          = 'delete';
+    const PERMISSION_TEST            = 'test';
 
     /**
      * Returns default permissions bundled with current resource
@@ -21,7 +22,35 @@ class PhpExceptionResource extends AbstractResolvingResource
     public function getDefaultAccessList()
     {
         return [
-            self::PERMISSION_RESOLVE => [
+            self::CREATE_ACTION => [
+                Role::GUEST_ROLE_NAME,
+            ],
+
+            self::READ_ACTION => [
+                Role::DEVELOPER_ROLE_NAME,
+            ],
+
+            self::UPDATE_ACTION => [
+                Role::DEVELOPER_ROLE_NAME,
+            ],
+
+            self::DELETE_ACTION => [
+                Role::DEVELOPER_ROLE_NAME,
+            ],
+
+            self::SEARCH_ACTION => [
+                Role::DEVELOPER_ROLE_NAME,
+            ],
+
+            self::PERMISSION_LIST_RESOLVED => [
+                Role::DEVELOPER_ROLE_NAME,
+            ],
+
+            self::PERMISSION_LIST_UNRESOLVED => [
+                Role::DEVELOPER_ROLE_NAME,
+            ],
+
+            self::PERMISSION_LIST_UNRESOLVED => [
                 Role::DEVELOPER_ROLE_NAME,
             ],
 
@@ -33,7 +62,7 @@ class PhpExceptionResource extends AbstractResolvingResource
                 Role::DEVELOPER_ROLE_NAME,
             ],
 
-            self::PERMISSION_THROW => [
+            self::PERMISSION_TEST => [
                 Role::DEVELOPER_ROLE_NAME,
             ],
         ];

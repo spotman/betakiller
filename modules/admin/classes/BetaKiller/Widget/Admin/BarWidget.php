@@ -5,6 +5,8 @@ namespace BetaKiller\Widget\Admin;
 use BetaKiller\Helper\ContentTrait;
 use BetaKiller\Helper\ContentUrlParametersHelper;
 use BetaKiller\Helper\IFaceHelper;
+use BetaKiller\IFace\CrudlsActionsInterface;
+use BetaKiller\IFace\IFaceProvider;
 use BetaKiller\IFace\Widget\AbstractAdminWidget;
 use BetaKiller\Model\IFaceZone;
 use BetaKiller\Model\UserInterface;
@@ -24,16 +26,23 @@ class BarWidget extends AbstractAdminWidget
      */
     private $contentUrlParamHelper;
 
+    /**
+     * @var \BetaKiller\IFace\IFaceProvider
+     */
+    private $ifaceProvider;
+
     public function __construct(
         UserInterface $user,
         IFaceHelper $ifaceHelper,
-        ContentUrlParametersHelper $cUrlParamHelper
+        ContentUrlParametersHelper $cUrlParamHelper,
+        IFaceProvider $ifaceProvider
     )
     {
         parent::__construct($user);
 
         $this->ifaceHelper           = $ifaceHelper;
         $this->contentUrlParamHelper = $cUrlParamHelper;
+        $this->ifaceProvider         = $ifaceProvider;
     }
 
     /**
@@ -44,10 +53,12 @@ class BarWidget extends AbstractAdminWidget
     public function getData()
     {
         $data = [
-            'enabled'  => true,
-            'comments' => $this->getCommentsData(),
-            'edit'     => [
-                'url' => $this->getEditButtonUrl(),
+            'enabled'           => true,
+            'comments'          => $this->getCommentsData(),
+            'createButtonItems' => $this->getCreateButtonItems(),
+            'primaryEntity'     => [
+                'publicUrl' => $this->getPublicReadButtonUrl(),
+                'adminUrl'  => $this->getAdminEditButtonUrl(),
             ],
         ];
 
@@ -60,13 +71,37 @@ class BarWidget extends AbstractAdminWidget
         return true;
     }
 
-    protected function getCommentsData()
+    private function getCreateButtonItems()
+    {
+        $items  = [];
+        $ifaces = $this->ifaceProvider->getByActionAndZone(CrudlsActionsInterface::CREATE_ACTION, IFaceZone::ADMIN_ZONE);
+
+        foreach ($ifaces as $iface) {
+            if (!$this->aclHelper->isIFaceAllowed($iface)) {
+                continue;
+            }
+
+            $items[] = [
+                'label' => $iface->getLabel(),
+                'url'   => $iface->url(),
+            ];
+        }
+
+        return $items;
+    }
+
+    private function getCommentsData()
     {
         $commentOrm = $this->model_factory_content_comment();
         $statusOrm  = $this->model_factory_content_comment_status();
 
         $status       = $statusOrm->get_pending_status();
         $pendingCount = $commentOrm->get_comments_count($status);
+
+        // TODO better ACL
+        if (!$this->aclHelper->isEntityActionAllowed($status)) {
+            return null;
+        }
 
         $url = $pendingCount
             ? $this->getCommentsListByStatusIfaceUrl($status)
@@ -78,7 +113,7 @@ class BarWidget extends AbstractAdminWidget
         ];
     }
 
-    protected function getCommentsListByStatusIfaceUrl(Model_ContentCommentStatus $status)
+    private function getCommentsListByStatusIfaceUrl(Model_ContentCommentStatus $status)
     {
         /** @var \BetaKiller\IFace\Admin\Content\CommentListByStatus $iface */
         $iface = $this->ifaceHelper->createIFaceFromCodename('Admin_Content_CommentListByStatus');
@@ -90,7 +125,7 @@ class BarWidget extends AbstractAdminWidget
         return $iface->url($param);
     }
 
-    protected function getCommentsRootIfaceUrl()
+    private function getCommentsRootIfaceUrl()
     {
         /** @var \BetaKiller\IFace\Admin\Content\CommentIndex $iface */
         $iface = $this->ifaceHelper->createIFaceFromCodename('Admin_Content_CommentIndex');
@@ -98,7 +133,17 @@ class BarWidget extends AbstractAdminWidget
         return $iface->url();
     }
 
-    protected function getEditButtonUrl()
+    private function getAdminEditButtonUrl()
+    {
+        return $this->getPrimaryEntityActionUrl(IFaceZone::ADMIN_ZONE);
+    }
+
+    private function getPublicReadButtonUrl()
+    {
+        return $this->getPrimaryEntityActionUrl(IFaceZone::PUBLIC_ZONE);
+    }
+
+    private function getPrimaryEntityActionUrl($targetZone)
     {
         $entity = $this->detectPrimaryEntity();
 
@@ -107,16 +152,20 @@ class BarWidget extends AbstractAdminWidget
         }
 
         $currentIFace = $this->ifaceHelper->getCurrentIFace();
-        $currentZone = $currentIFace->getZoneName();
+        $currentZone  = $currentIFace->getZoneName();
+
+        if ($currentZone === $targetZone) {
+            return null;
+        }
 
         switch ($currentZone) {
             case IFaceZone::ADMIN_ZONE:
                 // Show "Read in public" url
-                return $this->ifaceHelper->getReadEntityUrl($entity, IFaceZone::PUBLIC_ZONE);
+                return $this->ifaceHelper->getReadEntityUrl($entity, $targetZone);
 
             case IFaceZone::PUBLIC_ZONE:
                 // Show "Edit in admin" url
-                return $this->ifaceHelper->getUpdateEntityUrl($entity, IFaceZone::ADMIN_ZONE);
+                return $this->ifaceHelper->getReadEntityUrl($entity, $targetZone);
 
             default:
                 return null;

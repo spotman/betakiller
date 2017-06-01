@@ -83,6 +83,22 @@ class IFaceModelProviderDatabase extends IFaceModelProviderAbstract
     }
 
     /**
+     * @param string $action
+     * @param string $zone
+     *
+     * @return IFaceModelInterface[]
+     */
+    public function getByActionAndZone($action, $zone)
+    {
+        $orm = $this->createIFaceOrm();
+
+        return $orm
+            ->where('action.name', '=', $action)
+            ->where('zone.name', '=', $zone)
+            ->get_all();
+    }
+
+    /**
      * @return \BetaKiller\Model\IFace
      */
     protected function createIFaceOrm()

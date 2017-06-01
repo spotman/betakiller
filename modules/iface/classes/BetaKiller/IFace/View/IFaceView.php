@@ -35,8 +35,8 @@ class IFaceView
 
     public function render(IFaceInterface $iface)
     {
-        $view_path  = $this->getViewPath($iface);
-        $iface_view = $this->view_factory($view_path);
+        $viewPath  = $this->getViewPath($iface);
+        $ifaceView = $this->view_factory($viewPath);
 
         // Getting IFace data
         $this->data = $iface->getData();
@@ -47,12 +47,14 @@ class IFaceView
             'codename' => $iface->getCodename(),
         ];
 
-        $iface_view->set($this->data);
+        foreach ($this->data as $key => $value) {
+            $ifaceView->set($key, $value);
+        }
 
         $meta = Meta::instance();
 
         // Setting page title
-        $meta->title($iface->getTitle());
+        $meta->title($this->getIFaceTitle($iface));
 
         // Setting page description
         $meta->description($iface->getDescription());
@@ -65,9 +67,27 @@ class IFaceView
         // Getting IFace layout
         $this->layout = $iface->getLayoutCodename();
 
-        $layout = $this->processLayout($iface_view);
+        $layout = $this->processLayout($ifaceView);
 
         return $this->processWrapper($layout);
+    }
+
+    private function getIFaceTitle(IFaceInterface $iface)
+    {
+        $title = $iface->getTitle();
+
+        if ($title) {
+            return $title;
+        }
+
+        $labels = [];
+
+        $current = $iface;
+        do {
+            $labels[] = $current->getLabel();
+        } while ($current = $current->getParent());
+
+        return implode(' - ', $labels);
     }
 
     protected function processLayout(View $iface_view)

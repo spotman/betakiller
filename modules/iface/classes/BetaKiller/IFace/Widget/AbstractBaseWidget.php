@@ -16,6 +16,12 @@ abstract class AbstractBaseWidget extends Widget\AbstractWidget
     protected $ifaceHelper;
 
     /**
+     * @Inject
+     * @var \BetaKiller\Helper\AclHelper
+     */
+    protected $aclHelper;
+
+    /**
      * Returns Twig view instance
      *
      * @param null  $file

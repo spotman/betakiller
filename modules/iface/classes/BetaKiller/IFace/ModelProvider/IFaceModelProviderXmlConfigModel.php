@@ -6,12 +6,12 @@ use BetaKiller\Utils\Kohana\TreeModelSingleParentInterface;
 use BetaKiller\Utils\Kohana\TreeModelSingleParentTrait;
 use HTTP_Exception_501;
 
-class IFaceModelProviderAdminModel implements IFaceModelInterface
+class IFaceModelProviderXmlConfigModel implements IFaceModelInterface
 {
     use TreeModelSingleParentTrait;
 
     /**
-     * @var IFaceModelProviderAdmin
+     * @var IFaceModelProviderXmlConfig
      */
     private $provider;
 
@@ -82,7 +82,7 @@ class IFaceModelProviderAdminModel implements IFaceModelInterface
      */
     private $aclRules = [];
 
-    public static function factory($data, IFaceModelProviderAdmin $provider)
+    public static function factory($data, IFaceModelProviderXmlConfig $provider)
     {
         /** @var self $instance */
         $instance = new static;
@@ -400,14 +400,14 @@ class IFaceModelProviderAdminModel implements IFaceModelInterface
     }
 
     /**
-     * @return IFaceModelProviderAdmin
+     * @return IFaceModelProviderXmlConfig
      */
     protected function getProvider()
     {
         return $this->provider;
     }
 
-    public function setProvider(IFaceModelProviderAdmin $provider)
+    public function setProvider(IFaceModelProviderXmlConfig $provider)
     {
         $this->provider = $provider;
 

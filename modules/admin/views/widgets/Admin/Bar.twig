@@ -11,18 +11,40 @@
 
           <ul class="left">
 
-            {#<li>#}
-              {#<a href="#!" data-activates="admin-bar-create-dropdown" data-hover="true" data-constrainwidth="false" data-beloworigin="true" class="dropdown-button">#}
-                {#<i class="material-icons left">note_add</i>#}
-                {#{{ "admin.bar.create"|i18n }}#}
-              {#</a>#}
+            {% if createButtonItems|length %}
+            <li>
+              <a href="#!" data-activates="admin-bar-create-dropdown" data-hover="true" data-constrainWidth="false" data-belowOrigin="true" class="dropdown-button">
+                <i class="material-icons left">note_add</i>
+                {{ "admin.bar.create"|i18n }}
+              </a>
 
-              {#<ul id="admin-bar-create-dropdown" class="dropdown-content">#}
-                {#<li><a href="#!">{{ "admin.bar.create.content.post"|i18n }}</a></li>#}
-                {#<li><a href="#!">{{ "admin.bar.create.quote"|i18n }}</a></li>#}
-              {#</ul>#}
-            {#</li>#}
+              <ul id="admin-bar-create-dropdown" class="dropdown-content">
+                {% for item in createButtonItems %}
+                <li><a href="{{ item.url }}">{{ item.label }}</a></li>
+                {% endfor %}
+              </ul>
+            </li>
+            {% endif %}
 
+            {% if primaryEntity.publicUrl %}
+              <li>
+                <a href="{{ primaryEntity.publicUrl }}">
+                  <i class="material-icons left tiny">visibility</i>
+                  {{ "admin.bar.read"|i18n }}
+                </a>
+              </li>
+            {% endif %}
+
+            {% if primaryEntity.adminUrl %}
+              <li>
+                <a href="{{ primaryEntity.adminUrl }}">
+                  <i class="material-icons left tiny">mode_edit</i>
+                  {{ "admin.bar.edit"|i18n }}
+                </a>
+              </li>
+            {% endif %}
+
+            {% if comments %}
             <li>
               <a href="{{ comments.url }}">
                 <i class="material-icons left tiny">chat</i>
@@ -34,14 +56,6 @@
                 {% endif %}
               </a>
             </li>
-
-            {% if edit.url %}
-              <li>
-                <a href="{{ edit.url }}">
-                  <i class="material-icons left tiny">mode_edit</i>
-                  {{ "admin.bar.edit"|i18n }}
-                </a>
-              </li>
             {% endif %}
 
           </ul>

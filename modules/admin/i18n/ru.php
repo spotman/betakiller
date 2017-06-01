@@ -2,6 +2,7 @@
 
 return [
     'admin.bar.create'   => 'Создать',
+    'admin.bar.read'     => 'Просмотр',
     'admin.bar.edit'     => 'Изменить',
     'admin.bar.comments' => 'Комментарии',
 

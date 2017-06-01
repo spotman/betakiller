@@ -92,14 +92,14 @@ class Entity extends ORM
     }
 
     /**
-     * Возвращает инстанс связанной модели
+     * Returns instance of linked entity
      *
-     * @param int|null $id
+     * @param int $id
      *
      * @return \BetaKiller\Model\DispatchableEntityInterface
      * @throws \BetaKiller\Exception
      */
-    public function getLinkedEntityInstance($id = null)
+    public function getLinkedEntityInstance($id)
     {
         $name        = $this->getLinkedModelName();
         $model       = $this->model_factory($id, $name);
@@ -114,9 +114,4 @@ class Entity extends ORM
 
         return $model;
     }
-//
-//    public function get_related_model_item_title($item_id)
-//    {
-//        return $this->getLinkedEntityInstance()->get_title_by_item_id($item_id);
-//    }
 }

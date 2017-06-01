@@ -7,10 +7,10 @@ use BetaKiller\Model\DispatchableEntityInterface;
 use Kohana;
 use SimpleXMLElement;
 
-class IFaceModelProviderAdmin extends IFaceModelProviderAbstract
+class IFaceModelProviderXmlConfig extends IFaceModelProviderAbstract
 {
     /**
-     * @var IFaceModelProviderAdminModel[]
+     * @var IFaceModelProviderXmlConfigModel[]
      */
     protected $models;
 
@@ -63,11 +63,11 @@ class IFaceModelProviderAdmin extends IFaceModelProviderAbstract
     /**
      * @param array $config
      *
-     * @return IFaceModelProviderAdminModel
+     * @return IFaceModelProviderXmlConfigModel
      */
     protected function createModelFromConfig(array $config)
     {
-        return IFaceModelProviderAdminModel::factory($config, $this);
+        return IFaceModelProviderXmlConfigModel::factory($config, $this);
     }
 
     protected function storeInCache(IFaceModelInterface $model)
@@ -136,16 +136,16 @@ class IFaceModelProviderAdmin extends IFaceModelProviderAbstract
      */
     public function getChildren(IFaceModelInterface $parentModel)
     {
-        if (!($parentModel instanceof IFaceModelProviderAdminModel)) {
+        if (!($parentModel instanceof IFaceModelProviderXmlConfigModel)) {
             throw new IFaceException(__CLASS__.' accept only instances of :must', [
-                'must:' => IFaceModelProviderAdminModel::class,
+                'must:' => IFaceModelProviderXmlConfigModel::class,
             ]);
         }
 
         return $this->getChilds($parentModel);
     }
 
-    protected function getChilds(IFaceModelProviderAdminModel $parentModel = null)
+    protected function getChilds(IFaceModelProviderXmlConfigModel $parentModel = null)
     {
         $parent_codename = $parentModel ? $parentModel->getCodename() : null;
 
@@ -190,5 +190,30 @@ class IFaceModelProviderAdmin extends IFaceModelProviderAbstract
         }
 
         return null;
+    }
+
+    /**
+     * @param string $action
+     * @param string $zone
+     *
+     * @return IFaceModelInterface[]
+     */
+    public function getByActionAndZone($action, $zone)
+    {
+        $output = [];
+
+        foreach ($this->models as $model) {
+            if ($model->getEntityActionName() !== $action) {
+                continue;
+            }
+
+            if ($model->getZoneName() !== $zone) {
+                continue;
+            }
+
+            $output[] = $model;
+        }
+
+        return $output;
     }
 }

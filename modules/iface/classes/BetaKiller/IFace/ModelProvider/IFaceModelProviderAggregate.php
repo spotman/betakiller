@@ -13,7 +13,7 @@ class IFaceModelProviderAggregate extends IFaceModelProviderAbstract
     private $databaseProvider;
 
     /**
-     * @var \BetaKiller\IFace\ModelProvider\IFaceModelProviderAdmin
+     * @var \BetaKiller\IFace\ModelProvider\IFaceModelProviderXmlConfig
      */
     private $adminProvider;
 
@@ -30,10 +30,10 @@ class IFaceModelProviderAggregate extends IFaceModelProviderAbstract
     /**
      * IFaceModelProviderAggregate constructor.
      *
-     * @param \BetaKiller\IFace\ModelProvider\IFaceModelProviderDatabase $databaseProvider
-     * @param \BetaKiller\IFace\ModelProvider\IFaceModelProviderAdmin    $adminProvider
+     * @param \BetaKiller\IFace\ModelProvider\IFaceModelProviderDatabase  $databaseProvider
+     * @param \BetaKiller\IFace\ModelProvider\IFaceModelProviderXmlConfig $adminProvider
      */
-    public function __construct(IFaceModelProviderDatabase $databaseProvider, IFaceModelProviderAdmin $adminProvider)
+    public function __construct(IFaceModelProviderDatabase $databaseProvider, IFaceModelProviderXmlConfig $adminProvider)
     {
         $this->databaseProvider = $databaseProvider;
         $this->adminProvider    = $adminProvider;
@@ -171,6 +171,23 @@ class IFaceModelProviderAggregate extends IFaceModelProviderAbstract
         }
 
         return $model;
+    }
+
+    /**
+     * @param string $action
+     * @param string $zone
+     *
+     * @return IFaceModelInterface[]
+     */
+    public function getByActionAndZone($action, $zone)
+    {
+        $models = [];
+
+        foreach ($this->getSources() as $source) {
+            $models[] = $source->getByActionAndZone($action, $zone);
+        }
+
+        return array_merge(...$models);
     }
 
     /**

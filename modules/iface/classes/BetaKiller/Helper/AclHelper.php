@@ -114,6 +114,26 @@ class AclHelper
         return true;
     }
 
+    /**
+     * @param $identity
+     *
+     * @return \Spotman\Acl\Resource\ResolvingResourceInterface
+     * @throws \Spotman\Acl\Exception
+     */
+    public function getResource($identity)
+    {
+        $resource = $this->acl->getResource($identity);
+
+        if (!($resource instanceof ResolvingResourceInterface)) {
+            throw new Exception('Resource :name must implement :must', [
+                ':name' => $resource->getResourceId(),
+                ':must' => ResolvingResourceInterface::class,
+            ]);
+        }
+
+        return $resource;
+    }
+
     public function forceAuthorizationIfNeeded(IFaceInterface $iface)
     {
         // Entering to admin and personal zones requires authorized user
@@ -132,14 +152,7 @@ class AclHelper
         foreach ($rules as $value) {
             list($resourceIdentity, $permissionIdentity) = explode('.', $value, 2);
 
-            $resource = $this->acl->getResource($resourceIdentity);
-
-            if (!($resource instanceof ResolvingResourceInterface)) {
-                throw new Exception('Resource :name must implement :must', [
-                    ':name' => $resource->getResourceId(),
-                    ':must' => ResolvingResourceInterface::class,
-                ]);
-            }
+            $resource = $this->getResource($resourceIdentity);
 
             if (!$resource->isPermissionAllowed($permissionIdentity)) {
                 return false;

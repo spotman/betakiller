@@ -2,6 +2,7 @@
 namespace BetaKiller\IFace;
 
 use BetaKiller\IFace\ModelProvider\IFaceModelProviderAggregate;
+use BetaKiller\Model\IFaceZone;
 
 class IFaceModelTree
 {
@@ -33,7 +34,7 @@ class IFaceModelTree
     public function getRecursivePublicIterator(IFaceModelInterface $parent = null)
     {
         return $this->getRecursiveFilterIterator(function (IFaceModelInterface $model) {
-            return !$this->isAdminModel($model);
+            return $this->isPublicModel($model);
         }, $parent);
     }
 
@@ -64,8 +65,13 @@ class IFaceModelTree
         return new \RecursiveIteratorIterator($filter, \RecursiveIteratorIterator::SELF_FIRST);
     }
 
-    public function isAdminModel(IFaceModelInterface $model)
+    private function isAdminModel(IFaceModelInterface $model)
     {
-        return $model->getUri() === 'admin' || ($model instanceof ModelProvider\IFaceModelProviderAdminModel);
+        return $model->getZoneName() === IFaceZone::ADMIN_ZONE;
+    }
+
+    private function isPublicModel(IFaceModelInterface $model)
+    {
+        return $model->getZoneName() === IFaceZone::PUBLIC_ZONE;
     }
 }
