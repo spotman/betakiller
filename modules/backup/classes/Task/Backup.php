@@ -44,8 +44,9 @@ class Task_Backup extends Minion_Task
          * Force utf8 charset for mysql
          * @url http://stackoverflow.com/questions/4475548/pdo-mysql-and-broken-utf-8-encoding
          */
-        if ( $dbDriver == 'mysql' )
+        if ( $dbDriver === 'mysql' ) {
             $dbName .= ';charset=utf8';
+        }
 
         $instance->setConnection(
             $dbUser, // user
@@ -66,16 +67,19 @@ class Task_Backup extends Minion_Task
             ->setPath($folder)
             ->setPrefix($prefix, $timestampedPrefix);
 
-        if ( $instance->execute() )
+        if ( $instance->execute() ) {
             $this->info('Backup done, see file '.$instance->getRealName());
-        else
+        }
+        else {
             $this->warning('Backup was not created!');
+        }
     }
 
     protected function getDBDriver($driver)
     {
-        if ( in_array($driver, ['mysqli', 'mysql']) )
+        if ( in_array($driver, ['mysqli', 'mysql'], true) ) {
             return 'mysql';
+        }
 
         throw new TaskException('Unknown database driver :name', array(':name' => $driver));
     }

@@ -59,7 +59,7 @@ class Log_PhpExceptionStorage extends Log_Writer
             try {
                 // Write each message into the log
                 $this->write_message($message);
-            } catch (\Exception $e) {
+            } catch (\Throwable $e) {
                 // Prevent logging recursion
                 Kohana::$log->detach($this);
 
@@ -76,7 +76,7 @@ class Log_PhpExceptionStorage extends Log_Writer
         }
     }
 
-    protected function notify_developers_about_failure(\Exception $exception)
+    protected function notify_developers_about_failure(\Throwable $exception)
     {
         try {
             $message = $this->notificationHelper->createMessage();
@@ -91,7 +91,7 @@ class Log_PhpExceptionStorage extends Log_Writer
                     'message' => \Kohana_Exception::text($exception),
                 ])
                 ->send();
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             // Silently fail
         }
     }

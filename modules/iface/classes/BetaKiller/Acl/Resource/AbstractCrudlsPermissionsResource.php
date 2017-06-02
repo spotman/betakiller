@@ -8,48 +8,48 @@ abstract class AbstractCrudlsPermissionsResource extends AbstractResolvingResour
     /**
      * @return bool
      */
-    public function isCreateAllowed()
+    public function isCreateAllowed(): bool
     {
-        return $this->isPermissionAllowed(self::CREATE_ACTION);
+        return $this->isPermissionAllowed(self::ACTION_CREATE);
     }
 
     /**
      * @return bool
      */
-    public function isReadAllowed()
+    public function isReadAllowed(): bool
     {
-        return $this->isPermissionAllowed(self::READ_ACTION);
+        return $this->isPermissionAllowed(self::ACTION_READ);
     }
 
     /**
      * @return bool
      */
-    public function isUpdateAllowed()
+    public function isUpdateAllowed(): bool
     {
-        return $this->isPermissionAllowed(self::UPDATE_ACTION);
+        return $this->isPermissionAllowed(self::ACTION_UPDATE);
     }
 
     /**
      * @return bool
      */
-    public function isDeleteAllowed()
+    public function isDeleteAllowed(): bool
     {
-        return $this->isPermissionAllowed(self::DELETE_ACTION);
+        return $this->isPermissionAllowed(self::ACTION_DELETE);
     }
 
     /**
      * @return bool
      */
-    public function isListAllowed()
+    public function isListAllowed(): bool
     {
-        return $this->isPermissionAllowed(self::LIST_ACTION);
+        return $this->isPermissionAllowed(self::ACTION_LIST);
     }
 
     /**
      * @return bool
      */
-    public function isSearchAllowed()
+    public function isSearchAllowed(): bool
     {
-        return $this->isPermissionAllowed(self::SEARCH_ACTION);
+        return $this->isPermissionAllowed(self::ACTION_SEARCH);
     }
 }

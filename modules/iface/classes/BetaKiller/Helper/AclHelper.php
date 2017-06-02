@@ -30,18 +30,19 @@ class AclHelper
      *
      * @return bool
      */
-    public function isEntityActionAllowed(DispatchableEntityInterface $entity, $action = null)
+    public function isEntityActionAllowed(DispatchableEntityInterface $entity, ?string $action = null): bool
     {
-        if (!$action) {
-            $action = CrudlsActionsInterface::READ_ACTION;
-        }
-
         $resource = $this->getEntityAclResource($entity);
 
-        return $resource->isPermissionAllowed($action);
+        return $resource->isPermissionAllowed($action ?? CrudlsActionsInterface::ACTION_READ);
     }
 
-    public function getEntityAclResource(DispatchableEntityInterface $entity)
+    /**
+     * @param \BetaKiller\Model\DispatchableEntityInterface $entity
+     *
+     * @return \BetaKiller\Acl\Resource\EntityRelatedAclResourceInterface
+     */
+    public function getEntityAclResource(DispatchableEntityInterface $entity): EntityRelatedAclResourceInterface
     {
         $name = $entity->getModelName();
 
@@ -57,7 +58,7 @@ class AclHelper
      * @return \BetaKiller\Acl\Resource\EntityRelatedAclResourceInterface
      * @throws \Spotman\Acl\Exception
      */
-    public function getAclResourceFromEntityName($name)
+    public function getAclResourceFromEntityName(string $name): EntityRelatedAclResourceInterface
     {
         $resource = $this->acl->getResource($name);
 
@@ -71,7 +72,13 @@ class AclHelper
         return $resource;
     }
 
-    public function isIFaceAllowed(IFaceInterface $iface)
+    /**
+     * @param \BetaKiller\IFace\IFaceInterface $iface
+     *
+     * @return bool
+     * @throws \BetaKiller\IFace\Exception\IFaceException
+     */
+    public function isIFaceAllowed(IFaceInterface $iface): bool
     {
         $zoneName   = $iface->getZoneName();
         $entityName = $iface->getEntityModelName();
@@ -120,7 +127,7 @@ class AclHelper
      * @return \Spotman\Acl\Resource\ResolvingResourceInterface
      * @throws \Spotman\Acl\Exception
      */
-    public function getResource($identity)
+    public function getResource(string $identity): ResolvingResourceInterface
     {
         $resource = $this->acl->getResource($identity);
 
@@ -134,7 +141,7 @@ class AclHelper
         return $resource;
     }
 
-    public function forceAuthorizationIfNeeded(IFaceInterface $iface)
+    public function forceAuthorizationIfNeeded(IFaceInterface $iface): void
     {
         // Entering to admin and personal zones requires authorized user
         if ($iface->getZoneName() !== IFaceZone::PUBLIC_ZONE && $this->user->isGuest()) {
@@ -147,7 +154,7 @@ class AclHelper
      *
      * @return bool
      */
-    private function checkCustomRules($rules)
+    private function checkCustomRules(array $rules): bool
     {
         foreach ($rules as $value) {
             list($resourceIdentity, $permissionIdentity) = explode('.', $value, 2);

@@ -119,7 +119,7 @@ class ORM extends Utils\Kohana\ORM
             $this->customFilterForSearchByUrl($parameters);
         }
 
-        $action = CrudlsActionsInterface::READ_ACTION;
+        $action = CrudlsActionsInterface::ACTION_READ;
 
         $this->securityFilter($resource, $action);
 

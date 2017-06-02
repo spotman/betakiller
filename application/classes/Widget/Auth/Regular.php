@@ -11,11 +11,6 @@ class Widget_Auth_Regular extends AbstractBaseWidget
     private $auth;
 
     /**
-     * @var \BetaKiller\Helper\IFaceHelper
-     */
-    private $ifaceHelper;
-
-    /**
      * Widget_Auth_Regular constructor.
      *
      * @param \Auth                          $auth

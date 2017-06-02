@@ -13,13 +13,13 @@ class CustomTag
 {
     use \BetaKiller\Utils\Instance\Simple;
 
-    const CAPTION       = 'caption';
-    const GALLERY       = 'gallery';
-    const PHOTO         = 'photo';
-    const YOUTUBE       = 'youtube';
-    const ATTACHMENT    = 'attachment';
+    const CAPTION    = 'caption';
+    const GALLERY    = 'gallery';
+    const PHOTO      = 'photo';
+    const YOUTUBE    = 'youtube';
+    const ATTACHMENT = 'attachment';
 
-    const PHOTO_ZOOMABLE = 'zoomable';
+    const PHOTO_ZOOMABLE         = 'zoomable';
     const PHOTO_ZOOMABLE_ENABLED = 'true';
 
     public function getAllowedTags()
@@ -33,21 +33,20 @@ class CustomTag
         ];
     }
 
-    public function get_self_closing_tags()
+    public function getSelfClosingTags()
     {
         return $this->getAllowedTags();
     }
 
-    public function is_self_closing_tag($name)
+    public function isSelfClosingTag($name)
     {
-        return in_array($name, $this->get_self_closing_tags());
+        return in_array($name, $this->getSelfClosingTags(), true);
     }
 
-    public function generate_html($name, $id = NULL, array $attributes = [], $content = NULL)
+    public function generateHtml($name, $id = null, array $attributes = [], $content = null)
     {
-        if ($id)
-        {
-            $attributes = $attributes + ['id' => $id];
+        if ($id) {
+            $attributes += ['id' => $id];
         }
 
         // Generating HTML-tag
@@ -55,12 +54,9 @@ class CustomTag
 
         $node .= \HTML::attributes(array_filter($attributes));
 
-        if (!$this->is_self_closing_tag($name) && $content)
-        {
+        if (!$this->isSelfClosingTag($name) && $content) {
             $node .= '>'.$content.'</'.$name.'>';
-        }
-        else
-        {
+        } else {
             $node .= ' />';
         }
 
@@ -68,28 +64,23 @@ class CustomTag
     }
 
     /**
-    * @param string $text
-    * @param string|string[] $filter_tags
-    * @param callable $callback
-    * @return string
-    * @throws \Kohana_Exception
-    */
-    public function parse($text, $filter_tags, callable $callback)
+     * @param string          $text
+     * @param string[]|null $filterTags
+     * @param callable        $callback
+     *
+     * @return string
+     * @throws \Kohana_Exception
+     */
+    public function parse($text, ?array $filterTags, callable $callback)
     {
-        if ($filter_tags === TRUE)
-        {
-            $filter_tags = $this->getAllowedTags();
-        }
-
-        if (!is_array($filter_tags)) {
-            $filter_tags = [$filter_tags];
+        if ($filterTags === null) {
+            $filterTags = $this->getAllowedTags();
         }
 
         /** @url https://regex101.com/r/yF1bL4/3 */
-        $pattern = '/<('.implode('|', $filter_tags).')[^\/>]*\/>/i';
+        $pattern = '/<('.implode('|', $filterTags).')[^\/>]*\/>/i';
 
-        if (!preg_match_all($pattern, $text, $matches, PREG_SET_ORDER))
-        {
+        if (!preg_match_all($pattern, $text, $matches, PREG_SET_ORDER)) {
             return $text;
         }
 
@@ -101,7 +92,7 @@ class CustomTag
             // Парсим тег
             $sx = @simplexml_load_string($tag_string);
 
-            if ($sx === FALSE)
+            if ($sx === false)
                 throw new \Kohana_Exception('Custom tag parsing failed on :string', [':string' => $tag_string]);
 
             // Получаем атрибуты
@@ -116,7 +107,7 @@ class CustomTag
 
             $output = call_user_func($callback, $tag_name, $attributes);
 
-            if ($output !== NULL) {
+            if ($output !== null) {
                 $text = str_replace(
                     $tag_string,
                     $output,
@@ -141,7 +132,7 @@ class CustomTag
 
     public function process($text)
     {
-        return $this->parse($text, TRUE, function($name, array $attributes) {
+        return $this->parse($text, null, function ($name, array $attributes) {
             return $this->render($name, $attributes);
         });
     }

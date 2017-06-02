@@ -204,7 +204,7 @@ trait StatusRelatedModelOrmTrait
     protected function filterAllowedStatuses(StatusRelatedEntityAclResourceInterface $resource, $action = null)
     {
         if (!$action) {
-            $action = $resource::READ_ACTION;
+            $action = $resource::ACTION_READ;
         }
 
         /** @var \BetaKiller\Status\StatusModelInterface[] $allStatuses */

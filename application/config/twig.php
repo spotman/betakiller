@@ -40,14 +40,12 @@ return array(
 	 * http://twig.sensiolabs.org/doc/api.html#environment-options
 	 */
 	'environment' => array(
-		'auto_reload'         => ! Kohana::in_production(TRUE),
-		'debug'               => ! Kohana::in_production(),
-		'autoescape'          => TRUE,
-		'base_template_class' => 'Twig_Template',
+		'auto_reload'         => !Kohana::in_production(TRUE),
+		'debug'               => !Kohana::in_production(),
+		'autoescape'          => 'html',
         'cache'               => MultiSite::instance()->getWorkingPath().DIRECTORY_SEPARATOR.'cache'.DIRECTORY_SEPARATOR.'twig',
-		'charset'             => 'utf-8',
 		'optimizations'       => -1,
-		'strict_variables'    => TRUE,
+		'strict_variables'    => true,
 	),
 
 	/**

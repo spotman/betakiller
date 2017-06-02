@@ -11,20 +11,20 @@ abstract class AbstractStatusRelatedEntityAclResource extends AbstractEntityRela
      *
      * @return string[]
      */
-    abstract protected function getCreatePermissionRoles();
+    abstract protected function getCreatePermissionRoles(): array;
 
     /**
      * Provides array of roles` names which are allowed to browse(list) entities
      * @return string[]
      */
-    abstract protected function getListPermissionRoles();
+    abstract protected function getListPermissionRoles(): array;
 
     /**
      * Provides array of roles` names which are allowed to search for entities
      *
      * @return string[]
      */
-    abstract protected function getSearchPermissionRoles();
+    abstract protected function getSearchPermissionRoles(): array;
 
     /**
      * Returns default permissions bundled with current resource
@@ -33,12 +33,12 @@ abstract class AbstractStatusRelatedEntityAclResource extends AbstractEntityRela
      *
      * @return string[][]
      */
-    public function getDefaultAccessList()
+    public function getDefaultAccessList(): array
     {
         return [
-            self::CREATE_ACTION => $this->getCreatePermissionRoles(),
-            self::LIST_ACTION   => $this->getListPermissionRoles(),
-            self::SEARCH_ACTION => $this->getSearchPermissionRoles(),
+            self::ACTION_CREATE => $this->getCreatePermissionRoles(),
+            self::ACTION_LIST   => $this->getListPermissionRoles(),
+            self::ACTION_SEARCH => $this->getSearchPermissionRoles(),
         ];
     }
 
@@ -47,10 +47,10 @@ abstract class AbstractStatusRelatedEntityAclResource extends AbstractEntityRela
      *
      * @return bool
      */
-    public function isPermissionAllowed($permissionIdentity)
+    public function isPermissionAllowed(string $permissionIdentity): bool
     {
         // Read/Update/Delete permissions rely on model status permissions
-        if (in_array($permissionIdentity, $this->getStatusActionsList())) {
+        if (in_array($permissionIdentity, $this->getStatusActionsList(), true)) {
             /** @var StatusRelatedModelInterface $entity */
             $entity = $this->getEntity();
             $status = $entity->get_current_status();
@@ -77,14 +77,14 @@ abstract class AbstractStatusRelatedEntityAclResource extends AbstractEntityRela
      *
      * @return bool
      */
-    public function isStatusActionAllowed(StatusModelInterface $model, $action)
+    public function isStatusActionAllowed(StatusModelInterface $model, $action): bool
     {
         $identity = $this->makeStatusPermissionIdentity($model, $action);
 
         return parent::isPermissionAllowed($identity);
     }
 
-    public function isTransitionAllowed(StatusModelInterface $statusModel, $transitionName)
+    public function isTransitionAllowed(StatusModelInterface $statusModel, $transitionName): bool
     {
         $identity = $this->makeTransitionPermissionIdentity($statusModel, $transitionName);
 
@@ -97,17 +97,17 @@ abstract class AbstractStatusRelatedEntityAclResource extends AbstractEntityRela
      *
      * @return string
      */
-    public function makeStatusPermissionIdentity(StatusModelInterface $model, $action)
+    public function makeStatusPermissionIdentity(StatusModelInterface $model, $action): string
     {
         return $this->makeStatusPermissionIdentityBase($model).'.action.'.$action;
     }
 
-    public function makeTransitionPermissionIdentity(StatusModelInterface $statusModel, $transitionName)
+    public function makeTransitionPermissionIdentity(StatusModelInterface $statusModel, $transitionName): string
     {
         return $this->makeStatusPermissionIdentityBase($statusModel).'.transition.'.$transitionName;
     }
 
-    private function makeStatusPermissionIdentityBase(StatusModelInterface $model)
+    private function makeStatusPermissionIdentityBase(StatusModelInterface $model): string
     {
         return 'status.'.$model->get_codename();
     }
@@ -115,12 +115,12 @@ abstract class AbstractStatusRelatedEntityAclResource extends AbstractEntityRela
     /**
      * @return string[]
      */
-    public function getStatusActionsList()
+    public function getStatusActionsList(): array
     {
         return [
-            self::READ_ACTION,
-            self::UPDATE_ACTION,
-            self::DELETE_ACTION,
+            self::ACTION_READ,
+            self::ACTION_UPDATE,
+            self::ACTION_DELETE,
         ];
     }
 
@@ -129,7 +129,7 @@ abstract class AbstractStatusRelatedEntityAclResource extends AbstractEntityRela
      *
      * @return bool
      */
-    public function isCustomRulesCollectorUsed()
+    public function isCustomRulesCollectorUsed(): bool
     {
         return true;
     }

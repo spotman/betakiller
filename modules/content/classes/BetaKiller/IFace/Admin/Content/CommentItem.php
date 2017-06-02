@@ -1,8 +1,6 @@
 <?php
 namespace BetaKiller\IFace\Admin\Content;
 
-use BetaKiller\Helper\ContentUrlParametersHelper;
-
 class CommentItem extends AdminBase
 {
     /**

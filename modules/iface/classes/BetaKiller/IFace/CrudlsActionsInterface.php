@@ -3,10 +3,10 @@ namespace BetaKiller\IFace;
 
 interface CrudlsActionsInterface
 {
-    const CREATE_ACTION = 'create';
-    const READ_ACTION   = 'read';
-    const UPDATE_ACTION = 'update';
-    const DELETE_ACTION = 'delete';
-    const LIST_ACTION   = 'list';
-    const SEARCH_ACTION = 'search';
+    const ACTION_CREATE = 'create';
+    const ACTION_READ   = 'read';
+    const ACTION_UPDATE = 'update';
+    const ACTION_DELETE = 'delete';
+    const ACTION_LIST   = 'list';
+    const ACTION_SEARCH = 'search';
 }

@@ -6,6 +6,7 @@ use BetaKiller\Content\ContentElementInterface;
 use BetaKiller\Content\HasWordpressPathInterface;
 use BetaKiller\Content\ImportedFromWordpressInterface;
 use BetaKiller\Model\Entity;
+use BetaKiller\Model\IFaceZone;
 use BetaKiller\Task\TaskException;
 use DiDom\Document;
 use Thunder\Shortcode\Parser\RegexParser;
@@ -42,14 +43,14 @@ class Task_Content_Import_Wordpress extends Minion_Task
      */
     private $ifaceHelper;
 
-    protected function define_options()
+    protected function define_options(): array
     {
         return [
             'skip-before' => null,
         ];
     }
 
-    protected function _execute(array $params)
+    protected function _execute(array $params): void
     {
         if ($params['skip-before']) {
             $this->skip_before_date = new DateTime($params['skip-before']);
@@ -73,7 +74,7 @@ class Task_Content_Import_Wordpress extends Minion_Task
         $this->import_quotes();
     }
 
-    protected function configure_dialog()
+    protected function configure_dialog(): void
     {
         $wp = $this->wp();
 
@@ -143,7 +144,7 @@ class Task_Content_Import_Wordpress extends Minion_Task
     /**
      * @return Entity
      */
-    protected function get_content_post_entity()
+    protected function get_content_post_entity(): \BetaKiller\Model\Entity
     {
         static $content_entity;
 
@@ -154,7 +155,7 @@ class Task_Content_Import_Wordpress extends Minion_Task
         return $content_entity;
     }
 
-    protected function process_attachment(array $attach, $entity_item_id, AbstractAssetsProvider $provider = null)
+    protected function process_attachment(array $attach, $entity_item_id, AbstractAssetsProvider $provider = null): \Model_ContentAttachmentElement
     {
         $wp_id = $attach['ID'];
         $url   = $attach['guid'];
@@ -205,7 +206,7 @@ class Task_Content_Import_Wordpress extends Minion_Task
      * @return Model_ContentAttachmentElement
      * @throws TaskException
      */
-    protected function store_attachment(AbstractAssetsProvider $provider, $url, $wp_id, $entity_item_id = null)
+    protected function store_attachment(AbstractAssetsProvider $provider, $url, $wp_id, $entity_item_id = null): \Model_ContentAttachmentElement
     {
         $orm = $provider->createFileModel();
 
@@ -333,7 +334,7 @@ class Task_Content_Import_Wordpress extends Minion_Task
         return null;
     }
 
-    protected function import_posts_and_pages()
+    protected function import_posts_and_pages(): void
     {
         $wp = $this->wp();
 
@@ -352,8 +353,8 @@ class Task_Content_Import_Wordpress extends Minion_Task
             $updated_at = new DateTime($post['post_modified']);
 
             $meta        = $wp->get_post_meta($id);
-            $title       = isset($meta['_aioseop_title']) ? $meta['_aioseop_title'] : null;
-            $description = isset($meta['_aioseop_description']) ? $meta['_aioseop_description'] : null;
+            $title       = $meta['_aioseop_title'] ?? null;
+            $description = $meta['_aioseop_description'] ?? null;
 
             $this->info('[:current/:total] Processing article :uri', [
                 ':uri'     => $uri,
@@ -427,14 +428,14 @@ class Task_Content_Import_Wordpress extends Minion_Task
         $this->notify_about_bb_tags();
     }
 
-    protected function notify_about_bb_tags()
+    protected function notify_about_bb_tags(): void
     {
         foreach ($this->unknown_bb_tags as $tag => $url) {
             $this->notice('Found unknown BB tag [:name] at :url', [':name' => $tag, ':url' => $url]);
         }
     }
 
-    protected function post_process_article_text(Model_ContentPost $item)
+    protected function post_process_article_text(Model_ContentPost $item): void
     {
         $this->debug('Text post processing...');
 
@@ -445,8 +446,7 @@ class Task_Content_Import_Wordpress extends Minion_Task
         $document = new Document();
 
         // Make custom tags self-closing
-
-        $document->loadHtml($text, LIBXML_PARSEHUGE | LIBXML_NONET); //, LIBXML_NOEMPTYTAG
+        $document->loadHtml($text, LIBXML_PARSEHUGE | LIBXML_NONET);
 
         $body = $document->find('body')[0];
 
@@ -458,11 +458,30 @@ class Task_Content_Import_Wordpress extends Minion_Task
             $this->update_links_on_attachments($document, $item->get_id());
 //            $this->remove_links_on_content_images($document);
 
-            $text = $body->innerHtml(LIBXML_PARSEHUGE | LIBXML_NONET);
+            $text = $body->innerHtml();
+            $text = $this->removeClosingCustomTags($text);
             $item->setContent($text);
         } else {
             $this->warning('Post parsing error for :url', [':url' => $item->getUri()]);
         }
+    }
+
+    /**
+     * Dirty hack for php-dom library that creates CustomTag elements with closing tags
+     *
+     * @param string $text
+     *
+     * @return string
+     */
+    private function removeClosingCustomTags($text): string
+    {
+        $ct = CustomTag::instance();
+
+        foreach ($ct->getSelfClosingTags() as $tag) {
+            $text = str_replace('></'.$tag.'>', ' />', $text);
+        }
+
+        return $text;
     }
 
 //    protected function remove_links_on_content_images(Document $root)
@@ -484,7 +503,7 @@ class Task_Content_Import_Wordpress extends Minion_Task
 //        }
 //    }
 
-    protected function update_links_on_attachments(Document $document, $post_id)
+    protected function update_links_on_attachments(Document $document, $post_id): void
     {
         $this->debug('Updating links on attachments...');
 
@@ -518,7 +537,7 @@ class Task_Content_Import_Wordpress extends Minion_Task
         }
     }
 
-    protected function process_thumbnails(Model_ContentPost $post, array $meta)
+    protected function process_thumbnails(Model_ContentPost $post, array $meta): void
     {
         $wp    = $this->wp();
         $wp_id = $post->get_wp_id();
@@ -529,7 +548,7 @@ class Task_Content_Import_Wordpress extends Minion_Task
             $this->debug('Getting thumbnail images from from _format_gallery_images');
 
             // Getting images from meta._format_gallery_images
-            $wp_images_ids += (array)unserialize($meta['_format_gallery_images']);
+            $wp_images_ids += (array)unserialize($meta['_format_gallery_images'], false);
         }
 
         if (!$wp_images_ids && isset($meta['_thumbnail_id'])) {
@@ -571,7 +590,7 @@ class Task_Content_Import_Wordpress extends Minion_Task
         }
     }
 
-    protected function process_custom_tags(Model_ContentPost $item)
+    protected function process_custom_tags(Model_ContentPost $item): void
     {
         $this->debug('Processing custom tags...');
 
@@ -598,7 +617,7 @@ class Task_Content_Import_Wordpress extends Minion_Task
             $name       = $s->getName();
 
             if (!isset($this->unknown_bb_tags[$name])) {
-                $this->unknown_bb_tags[$name] = $this->ifaceHelper->getReadEntityUrl($item);
+                $this->unknown_bb_tags[$name] = $this->ifaceHelper->getReadEntityUrl($item, IFaceZone::PUBLIC_ZONE);
                 $this->debug('Unknown BB-code found [:name], keep it', [':name' => $name]);
             }
 
@@ -613,7 +632,7 @@ class Task_Content_Import_Wordpress extends Minion_Task
         $item->setContent($content);
     }
 
-    public function thunder_handler_caption(ShortcodeInterface $s, Model_ContentPost $post)
+    public function thunder_handler_caption(ShortcodeInterface $s, Model_ContentPost $post): ?string
     {
         $this->debug('[caption] found');
 
@@ -638,10 +657,10 @@ class Task_Content_Import_Wordpress extends Minion_Task
 
         $parameters['title'] = $caption_text;
 
-        return $this->custom_tag_instance()->generate_html(CustomTag::CAPTION, $image->get_id(), $parameters);
+        return $this->custom_tag_instance()->generateHtml(CustomTag::CAPTION, $image->get_id(), $parameters);
     }
 
-    public function thunder_handler_gallery(\Thunder\Shortcode\Shortcode\ShortcodeInterface $s, Model_ContentPost $post)
+    public function thunder_handler_gallery(\Thunder\Shortcode\Shortcode\ShortcodeInterface $s, Model_ContentPost $post): ?string
     {
         $this->debug('[gallery] found');
 
@@ -680,10 +699,10 @@ class Task_Content_Import_Wordpress extends Minion_Task
         ];
 
         // No ID in this tag
-        return $this->custom_tag_instance()->generate_html(CustomTag::GALLERY, null, $attributes);
+        return $this->custom_tag_instance()->generateHtml(CustomTag::GALLERY, null, $attributes);
     }
 
-    public function thunder_handler_wonderplugin(\Thunder\Shortcode\Shortcode\ShortcodeInterface $s, Model_ContentPost $post)
+    public function thunder_handler_wonderplugin(\Thunder\Shortcode\Shortcode\ShortcodeInterface $s, Model_ContentPost $post): string
     {
         $this->debug('[wonderplugin_slider] found');
 
@@ -731,55 +750,55 @@ class Task_Content_Import_Wordpress extends Minion_Task
         ];
 
         // No ID in this tag
-        return $this->custom_tag_instance()->generate_html(CustomTag::GALLERY, null, $attributes);
+        return $this->custom_tag_instance()->generateHtml(CustomTag::GALLERY, null, $attributes);
     }
 
     /**
      * @param Document $root
      * @param int      $entity_item_id
      */
-    protected function process_images_in_text(Document $root, $entity_item_id)
+    protected function process_images_in_text(Document $root, $entity_item_id): void
     {
         $images = $root->find('img');
 
         foreach ($images as $image) {
-            $target_tag = null;
+            $targetTag = null;
 
             try {
                 // Creating new <photo /> tag as replacement for <img />
-                $target_tag = $this->process_img_tag($image, $entity_item_id);
-            } catch (Exception $e) {
+                $targetTag = $this->processImgTag($image, $entity_item_id);
+            } catch (Throwable $e) {
                 $this->warning(':message', [':message' => $e->getMessage()]);
             }
 
             // Exit if something went wrong
-            if (!$target_tag) {
+            if (!$targetTag) {
                 continue;
             }
 
-            $this->debug('Replacement tag is :tag', [':tag' => $target_tag->html()]);
+            $this->debug('Replacement tag is :tag', [':tag' => $targetTag->html()]);
 
             $parent           = $image->parent();
             $parent_of_parent = $parent->parent();
 
-            $parent_tag_name = $parent->getNode()->nodeName;
+            $parentTagName = $parent->getNode()->nodeName;
 
-            $this->debug('Parent tag name is :name', [':name' => $parent_tag_name]);
+            $this->debug('Parent tag name is :name', [':name' => $parentTagName]);
 
             // Remove links to content images coz they would be added automatically
-            if ($parent_tag_name === 'a' && $parent->attr('href') === $image->attr('src')) {
+            if ($parentTagName === 'a' && $parent->attr('href') === $image->attr('src')) {
                 // Mark image as "zoomable"
-                $target_tag->attr(CustomTag::PHOTO_ZOOMABLE, CustomTag::PHOTO_ZOOMABLE_ENABLED);
-                $parent->replace($target_tag);
+                $targetTag->attr(CustomTag::PHOTO_ZOOMABLE, CustomTag::PHOTO_ZOOMABLE_ENABLED);
+                $parent->replace($targetTag);
             } else {
-                $image->replace($target_tag);
+                $image->replace($targetTag);
             }
 
             $this->debug('Parent html is :html', [':html' => $parent_of_parent->html()]);
         }
     }
 
-    protected function process_img_tag(\DiDom\Element $node, $entity_item_id)
+    protected function processImgTag(\DiDom\Element $node, $entity_item_id): \DiDom\Element
     {
         // Getting attributes
         $attributes = $node->attributes();
@@ -831,10 +850,18 @@ class Task_Content_Import_Wordpress extends Minion_Task
 
         $attributes['id'] = $image->get_id();
 
-        return $node->getDocument()->createElement(CustomTag::PHOTO, null, $attributes);
+        $element = $node->getDocument()->createElement(CustomTag::PHOTO);
+
+        foreach ($attributes as $key => $value) {
+            $element->setAttribute($key, $value);
+        }
+
+        return $element;
+
+//        return $node->getDocument()->createElement(CustomTag::PHOTO, null, $attributes);
     }
 
-    protected function process_content_youtube_iframes(Model_ContentPost $item)
+    protected function process_content_youtube_iframes(Model_ContentPost $item): void
     {
         $text = $this->process_youtube_videos_in_text($item->getContent(), $item->get_id());
 
@@ -867,8 +894,6 @@ class Task_Content_Import_Wordpress extends Minion_Task
                 $target_tag = $this->process_youtube_iframe_tag($original_tag, $entity_item_id);
             } catch (\Throwable $e) {
                 $this->warning($e->getMessage());
-            } catch (Exception $e) {
-                $this->warning($e->getMessage());
             }
 
             // Если новый тег не сформирован, то просто переходим к следующему
@@ -883,7 +908,7 @@ class Task_Content_Import_Wordpress extends Minion_Task
         return $text;
     }
 
-    protected function process_youtube_iframe_tag($tag_string, $entity_item_id)
+    protected function process_youtube_iframe_tag($tag_string, $entity_item_id): string
     {
         // Parsing
         $sx = simplexml_load_string($tag_string);
@@ -937,13 +962,13 @@ class Task_Content_Import_Wordpress extends Minion_Task
             'height' => $height,
         ];
 
-        return $this->custom_tag_instance()->generate_html(CustomTag::YOUTUBE, $video->get_id(), $attributes);
+        return $this->custom_tag_instance()->generateHtml(CustomTag::YOUTUBE, $video->get_id(), $attributes);
     }
 
     /**
      * Import all categories with WP IDs
      */
-    protected function import_categories()
+    protected function import_categories(): void
     {
         $categories = $this->wp()->get_categories_with_posts();
 
@@ -1010,7 +1035,7 @@ class Task_Content_Import_Wordpress extends Minion_Task
         }
     }
 
-    protected function import_quotes()
+    protected function import_quotes(): void
     {
         $quotes_data = $this->wp()->get_quotes_collection_quotes();
 
@@ -1031,7 +1056,7 @@ class Task_Content_Import_Wordpress extends Minion_Task
         }
     }
 
-    protected function import_comments()
+    protected function import_comments(): void
     {
         $comments_data = $this->wp()->get_comments();
 
@@ -1123,7 +1148,7 @@ class Task_Content_Import_Wordpress extends Minion_Task
         }
     }
 
-    protected function import_users()
+    protected function import_users(): void
     {
         $this->info('Importing users...');
 
@@ -1174,7 +1199,7 @@ class Task_Content_Import_Wordpress extends Minion_Task
     /**
      * @return WP
      */
-    protected function wp()
+    protected function wp(): \WP
     {
         return WP::instance();
     }

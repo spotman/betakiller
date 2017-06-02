@@ -14,14 +14,14 @@
 class Kohana_Profiler {
 
 	/**
-	 * @var  integer   maximium number of application stats to keep
+	 * @var  integer   maximum number of application stats to keep
 	 */
 	public static $rollover = 1000;
 
 	/**
 	 * @var  array  collected benchmarks
 	 */
-	protected static $_marks = array();
+	public static $_marks = [];
 
 	/**
 	 * Starts a new benchmark and returns a unique token. The returned token
@@ -33,26 +33,27 @@ class Kohana_Profiler {
 	 * @param   string  $name   benchmark name
 	 * @return  string
 	 */
-	public static function start($group, $name)
+	public static function start($group, $name): string
 	{
 		static $counter = 0;
 
 		// Create a unique token based on the counter
 		$token = 'kp/'.base_convert($counter++, 10, 32);
 
-		Profiler::$_marks[$token] = array
-		(
-			'group' => strtolower($group),
-			'name'  => (string) $name,
+        static::$_marks = static::$_marks ?: [];
 
-			// Start the benchmark
-			'start_time'   => microtime(TRUE),
-			'start_memory' => memory_get_usage(),
+        static::$_marks[$token] = [
+            'group' => strtolower($group),
+            'name'  => (string) $name,
 
-			// Set the stop keys without values
-			'stop_time'    => FALSE,
-			'stop_memory'  => FALSE,
-		);
+            // Start the benchmark
+            'start_time'   => microtime(TRUE),
+            'start_memory' => memory_get_usage(),
+
+            // Set the stop keys without values
+            'stop_time'    => FALSE,
+            'stop_memory'  => FALSE,
+        ];
 
 		return $token;
 	}

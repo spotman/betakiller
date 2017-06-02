@@ -122,7 +122,7 @@ class Kohana_StaticFile {
             {
                 mkdir($dir, 0775, TRUE);
             }
-            catch ( Exception $e)
+            catch ( Throwable $e)
             {
                 throw new Kohana_Exception('Can not create cache dir :dir', array(':dir' => $dir));
             }

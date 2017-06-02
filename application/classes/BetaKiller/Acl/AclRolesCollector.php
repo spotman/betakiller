@@ -43,14 +43,14 @@ class AclRolesCollector implements AclRolesCollectorInterface
         $parentRolesIdentities = [];
 
         foreach ($parentRoles as $parentRole) {
-            if (!$acl->hasRole($parentRole)) {
+            if (!$acl->hasRole($parentRole->getRoleId())) {
                 $this->addRoleWithParents($acl, $parentRole);
             }
 
             $parentRolesIdentities[] = $parentRole->getRoleId();
         }
 
-        if (!$acl->hasRole($role)) {
+        if (!$acl->hasRole($role->getRoleId())) {
             $acl->addRole($role->getRoleId(), $parentRolesIdentities);
         }
     }

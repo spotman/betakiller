@@ -103,12 +103,17 @@ class UrlDispatcher implements LoggerAwareInterface
      *
      * @return void
      */
-    public function setLogger(LoggerInterface $logger)
+    public function setLogger(LoggerInterface $logger): void
     {
         $this->logger = $logger;
     }
 
-    public function process($uri)
+    /**
+     * @param string $uri
+     *
+     * @return \BetaKiller\IFace\IFaceInterface
+     */
+    public function process(string $uri): IFaceInterface
     {
         // Prevent XSS via URL
         $uri = htmlspecialchars(strip_tags($uri), ENT_QUOTES);
@@ -133,7 +138,7 @@ class UrlDispatcher implements LoggerAwareInterface
      *
      * @throws IFaceMissingUrlException
      */
-    private function parseUri($uri)
+    private function parseUri(string $uri): void
     {
         // Creating URL iterator
         $urlIterator = new UrlPathIterator($uri);
@@ -181,7 +186,7 @@ class UrlDispatcher implements LoggerAwareInterface
         } while ($urlIterator->valid());
     }
 
-    protected function throwMissingUrlException(UrlPathIterator $it, IFaceInterface $parentIFace = null)
+    protected function throwMissingUrlException(UrlPathIterator $it, IFaceInterface $parentIFace = null): void
     {
         throw new IFaceMissingUrlException($it->current(), $parentIFace);
     }
@@ -196,7 +201,7 @@ class UrlDispatcher implements LoggerAwareInterface
      * @throws UrlDispatcherException
      * @throws IFaceException
      */
-    protected function parseUriLayer(UrlPathIterator $it, IFaceInterface $parentIFace = null)
+    protected function parseUriLayer(UrlPathIterator $it, IFaceInterface $parentIFace = null): ?IFaceInterface
     {
         $layer = [];
 
@@ -221,7 +226,7 @@ class UrlDispatcher implements LoggerAwareInterface
         return $model ? $this->ifaceProvider->fromModel($model) : null;
     }
 
-    private function redirect($url, $code = null)
+    private function redirect($url, $code = null): void
     {
         // TODO PSR-7 Create interface for redirect() method, use it in Response and send Response instance to $this via DI
         HTTP::redirect($url, $code ?: 302);
@@ -233,7 +238,7 @@ class UrlDispatcher implements LoggerAwareInterface
      * @return \BetaKiller\IFace\IFaceModelInterface[]
      * @throws IFaceException
      */
-    protected function sortModelsLayer(array $models)
+    private function sortModelsLayer(array $models): array
     {
         $fixed   = [];
         $dynamic = [];
@@ -258,9 +263,9 @@ class UrlDispatcher implements LoggerAwareInterface
      * @param \BetaKiller\IFace\IFaceModelInterface[] $models
      * @param UrlPathIterator                         $it
      *
-     * @return \BetaKiller\IFace\IFaceModelInterface|NULL
+     * @return \BetaKiller\IFace\IFaceModelInterface|null
      */
-    protected function selectIFaceModel(array $models, UrlPathIterator $it)
+    private function selectIFaceModel(array $models, UrlPathIterator $it): ?IFaceModelInterface
     {
         // Put fixed urls first
         $models = $this->sortModelsLayer($models);
@@ -275,7 +280,7 @@ class UrlDispatcher implements LoggerAwareInterface
         return null;
     }
 
-    public function processIFaceUrlBehaviour(IFaceModelInterface $model, UrlPathIterator $it)
+    private function processIFaceUrlBehaviour(IFaceModelInterface $model, UrlPathIterator $it): bool
     {
         if ($it->count() && $model->hasTreeBehaviour()) {
             // Tree behaviour in URL
@@ -342,15 +347,11 @@ class UrlDispatcher implements LoggerAwareInterface
 
     /**
      * @param IFaceInterface $iface
-     *
-     * @return $this
      */
-    protected function pushToStack(IFaceInterface $iface)
+    private function pushToStack(IFaceInterface $iface): void
     {
         $this->checkIFaceAccess($iface);
         $this->ifaceStack->push($iface);
-
-        return $this;
     }
 
 //    public function parse_url_parameters_parts($source_string)
@@ -365,7 +366,7 @@ class UrlDispatcher implements LoggerAwareInterface
 //        }
 //    }
 
-    public function parseUriParameterPart(IFaceModelInterface $ifaceModel, UrlPathIterator $it)
+    private function parseUriParameterPart(IFaceModelInterface $ifaceModel, UrlPathIterator $it): void
     {
         $prototype  = $this->urlPrototypeHelper->fromIFaceModelUri($ifaceModel);
         $dataSource = $this->urlPrototypeHelper->getDataSourceInstance($prototype);
@@ -407,14 +408,14 @@ class UrlDispatcher implements LoggerAwareInterface
         $registry->setEntity($entity, $ifaceModel->hasTreeBehaviour());
     }
 
-    private function checkEntityAccess(DispatchableEntityInterface $entity)
+    private function checkEntityAccess(DispatchableEntityInterface $entity): void
     {
         if (!$this->aclHelper->isEntityActionAllowed($entity)) {
             throw new \HTTP_Exception_403();
         }
     }
 
-    private function checkIFaceAccess(IFaceInterface $iface)
+    private function checkIFaceAccess(IFaceInterface $iface): void
     {
         // Force authorization for non-public zones before security check
         $this->aclHelper->forceAuthorizationIfNeeded($iface);
@@ -424,7 +425,7 @@ class UrlDispatcher implements LoggerAwareInterface
         }
     }
 
-    private function storeDataInCache($url)
+    private function storeDataInCache($url): void
     {
         $stackData  = $this->ifaceStack->getCodenames();
         $paramsData = $this->urlParameters->getAllEntities();
@@ -440,7 +441,7 @@ class UrlDispatcher implements LoggerAwareInterface
      *
      * @return bool
      */
-    private function restoreDataFromCache($url)
+    private function restoreDataFromCache($url): bool
     {
         $data = $this->cache->get($url);
 
@@ -481,9 +482,6 @@ class UrlDispatcher implements LoggerAwareInterface
 
             return true;
         } catch (\Throwable $e) {
-            // Log and keep processing as no cache was found
-            $this->logger->warning('Error on unpacking UrlDispatcher data: ', ['exception' => $e]);
-        } catch (\Exception $e) {
             // Log and keep processing as no cache was found
             $this->logger->warning('Error on unpacking UrlDispatcher data: ', ['exception' => $e]);
         }

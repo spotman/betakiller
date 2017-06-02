@@ -1,4 +1,4 @@
-<? defined('SYSPATH') OR die('No direct script access.');
+<?php defined('SYSPATH') OR die('No direct script access.');
 
 class JS {
 
@@ -22,7 +22,7 @@ class JS {
     public function add_public($url)
     {
         // Добавляем слеш в начале, если его нет
-        if ( mb_substr($url, 0, 4) != 'http' AND mb_substr($url, 0, 1) != '/' )
+        if ( mb_substr($url, 0, 4) !== 'http' && mb_substr($url, 0, 1) !== '/' )
         {
             $url = '/'. $url;
         }

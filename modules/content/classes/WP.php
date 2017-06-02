@@ -320,7 +320,7 @@ class WP
             return '';
 
         // Just to make things a little easier, pad the end.
-        $pee = $pee . "\n";
+        $pee .= "\n";
 
         /*
          * Pre tags shouldn't be touched by autop.

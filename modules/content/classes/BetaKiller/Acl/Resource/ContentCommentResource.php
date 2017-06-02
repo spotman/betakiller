@@ -10,7 +10,7 @@ class ContentCommentResource extends AbstractStatusRelatedEntityAclResource
      *
      * @return string[]
      */
-    protected function getCreatePermissionRoles()
+    protected function getCreatePermissionRoles(): array
     {
         return [
             Role::GUEST_ROLE_NAME,
@@ -22,7 +22,7 @@ class ContentCommentResource extends AbstractStatusRelatedEntityAclResource
      *
      * @return string[]
      */
-    protected function getListPermissionRoles()
+    protected function getListPermissionRoles(): array
     {
         return [
             Role::GUEST_ROLE_NAME,
@@ -34,7 +34,7 @@ class ContentCommentResource extends AbstractStatusRelatedEntityAclResource
      *
      * @return string[]
      */
-    protected function getSearchPermissionRoles()
+    protected function getSearchPermissionRoles(): array
     {
         return [
             Role::MODERATOR_ROLE_NAME,

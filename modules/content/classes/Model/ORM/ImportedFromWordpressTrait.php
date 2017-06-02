@@ -59,8 +59,9 @@ trait Model_ORM_ImportedFromWordpressTrait
         /** @var \ORM|$this $model */
         $model = $this->model_factory();
 
+        $model->order_by_wp_ids($wp_ids);
+
         return $model
-            ->order_by_wp_ids($wp_ids)
             ->where($this->object_column('wp_id'), 'IN', (array) $wp_ids)
             ->find_all()
             ->as_array(NULL, $this->primary_key());

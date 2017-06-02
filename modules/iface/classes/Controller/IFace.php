@@ -6,6 +6,7 @@ use BetaKiller\IFace\Cache\IFaceCache;
 use BetaKiller\IFace\Url\UrlDispatcher;
 use BetaKiller\Config\AppConfigInterface;
 use BetaKiller\Model\UserInterface;
+use BetaKiller\IFace\Url\UrlParametersInterface;
 
 /**
  * Class Controller_IFace
@@ -13,12 +14,21 @@ use BetaKiller\Model\UserInterface;
  */
 class Controller_IFace extends Controller
 {
-    public function action_render()
+    /**
+     * @throws \HTTP_Exception_400
+     */
+    public function action_render(): void
     {
-        $uri = $this->get_request_uri();
-
         /** @var UrlDispatcher $dispatcher */
         $dispatcher = Container::getInstance()->get(UrlDispatcher::class);
+
+        /** @var UrlParametersInterface $params */
+        $params = Container::getInstance()->get(UrlParametersInterface::class);
+
+        $uri = $this->getRequestUri();
+        $queryParts = $this->getRequestQueryParts();
+
+        $params->setQueryParts($queryParts);
 
         // Getting current IFace
         $iface = $dispatcher->process($uri);
@@ -53,13 +63,17 @@ class Controller_IFace extends Controller
         // Final hook
         $iface->after();
 
+        if ($unusedParts = $params->getUnusedQueryPartsKeys()) {
+            throw new HTTP_Exception_400('Request have unused query parts: :keys', [':keys' => $unusedParts]);
+        }
+
         $this->last_modified($iface->getLastModified());
         $this->expires($iface->getExpiresDateTime());
 
         $this->send_string($output);
     }
 
-    private function processIFaceCache(IFaceInterface $iface)
+    private function processIFaceCache(IFaceInterface $iface): void
     {
         // Skip caching if request method is not GET nor HEAD
         if (!in_array($this->request->method(), ['GET', 'HEAD'], true)) {
@@ -81,7 +95,7 @@ class Controller_IFace extends Controller
     /**
      * @return \BetaKiller\Config\AppConfigInterface
      */
-    private function getAppConfig()
+    private function getAppConfig(): \BetaKiller\Config\AppConfigInterface
     {
         return Container::getInstance()->get(AppConfigInterface::class);
     }
@@ -89,7 +103,7 @@ class Controller_IFace extends Controller
     /**
      * @return \BetaKiller\Model\UserInterface
      */
-    private function getCurrentUser()
+    private function getCurrentUser(): \BetaKiller\Model\UserInterface
     {
         return Container::getInstance()->get(UserInterface::class);
     }
@@ -97,8 +111,16 @@ class Controller_IFace extends Controller
     /**
      * @return string
      */
-    private function get_request_uri()
+    private function getRequestUri(): string
     {
         return $this->request->uri();
+    }
+
+    /**
+     * @return string[]
+     */
+    private function getRequestQueryParts(): array
+    {
+        return $this->request->query();
     }
 }

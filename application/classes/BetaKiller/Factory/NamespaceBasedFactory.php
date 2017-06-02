@@ -165,7 +165,7 @@ class NamespaceBasedFactory
 
             try {
                 $instance = $this->createInstance($className, $arguments);
-            } catch (\Exception $e) {
+            } catch (\Throwable $e) {
                 throw new FactoryException('Can not instantiate :class class, error is: :msg', [
                     ':class' => $className,
                     ':msg'   => $e->getMessage(),

@@ -26,14 +26,13 @@
 
 <div class="error-overlay"></div>
 <div class="well center">
-    <h2><?php echo $message ?: __("You have no enough privileges for viewing current page.") ?></h2>
+    <h2><?php echo $message ?: __('You need to login before going further.') ?></h2>
 
-    <?php if ( !Env::get('user') ): ?>
-    <p><strong><?php echo __("Authorize, please") ?></strong></p><br />
-    <a href="/login<?php echo Request::current() ? "?return=". Request::current()->detect_uri() : NULL; ?>" class="btn btn-large btn-info"><i class="icon-lock icon-white"></i> <?= __("Sign in") ?></a>
+    <?php if (!Env::get('user')): ?>
+        <a href="/login<?php echo (Request::current() ? '?redirect_url='.Request::current()->detect_uri() : null); ?>"
+           class="btn btn-lg btn-info"><i class="icon-lock icon-white"></i> <?php echo __('Sign in') ?></a>
     <?php else: ?>
-<!--    <a href="/logout" class="btn btn-large btn-info"><i class="icon-lock icon-white"></i> --><?//= __("Выйти") ?><!--</a>-->
-        <a  href="#" class="btn btn-large btn-info" onclick="window.history.back(-1);return false;">
+        <a href="#" class="btn btn-large btn-info" onclick="window.history.back();return false;">
             <i class="icon-lock icon-white"></i> <?php echo __('Back') ?>
         </a>
     <?php endif; ?>

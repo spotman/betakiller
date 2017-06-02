@@ -19,7 +19,7 @@ class Kohana_ORM_Validation_Exception extends Kohana_Exception {
    * The alias of the main ORM model this exception was created for
    * @var string
    */
-	protected $_alias = NULL;
+	protected $_alias;
 
 	/**
 	 * Constructs a new exception for the specified model

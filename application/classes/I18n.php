@@ -120,7 +120,7 @@ class I18n extends Kohana_I18n
         foreach (static::$_cache_missing as $module => $data) {
             try {
                 self::put_data($module, $data[static::$lang]);
-            } catch (Exception $e) {
+            } catch (Throwable $e) {
                 Log::exception($e);
             }
         }

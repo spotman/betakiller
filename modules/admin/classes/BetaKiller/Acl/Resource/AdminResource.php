@@ -12,7 +12,7 @@ class AdminResource extends SinglePermissionResource
      *
      * @return array Key=>Value pairs where key is a permission identity and value is an array of roles
      */
-    public function getDefaultAccessList()
+    public function getDefaultAccessList(): array
     {
         // No default permissions
         return [

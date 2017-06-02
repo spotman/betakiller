@@ -48,10 +48,10 @@ trait LogTrait
     }
 
     /**
-     * @param \Exception $e
+     * @param \Throwable $e
      * @return $this
      */
-    protected function exception(\Exception $e)
+    protected function exception(\Throwable $e)
     {
         \Log::exception($e);
         return $this;

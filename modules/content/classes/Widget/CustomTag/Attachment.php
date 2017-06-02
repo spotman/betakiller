@@ -1,6 +1,7 @@
 <?php
 
 use BetaKiller\IFace\Widget\AbstractBaseWidget;
+use BetaKiller\IFace\Widget\WidgetException;
 
 class Widget_CustomTag_Attachment extends AbstractBaseWidget
 {
@@ -9,7 +10,7 @@ class Widget_CustomTag_Attachment extends AbstractBaseWidget
     /**
      * Returns data for View rendering
      *
-     * @throws Widget\WidgetException
+     * @throws \BetaKiller\IFace\Widget\WidgetException
      * @return array
      */
     public function getData()
@@ -18,8 +19,9 @@ class Widget_CustomTag_Attachment extends AbstractBaseWidget
 
         $attach_id = (int) $context['id'];
 
-        if (!$attach_id)
-            throw new Widget\WidgetException('No attachment ID provided');
+        if (!$attach_id) {
+            throw new WidgetException('No attachment ID provided');
+        }
 
         $model = $this->model_factory_content_attachment_element()->get_by_id($attach_id);
 

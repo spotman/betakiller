@@ -1,6 +1,7 @@
 <?php
 
 use BetaKiller\IFace\Widget\AbstractBaseWidget;
+use BetaKiller\IFace\Widget\WidgetException;
 
 class Widget_CustomTag_Photo extends AbstractBaseWidget
 {
@@ -9,37 +10,37 @@ class Widget_CustomTag_Photo extends AbstractBaseWidget
     /**
      * Returns data for View rendering
      *
-     * @throws Widget\WidgetException
+     * @throws \BetaKiller\IFace\Widget\WidgetException
      * @return array
      */
     public function getData()
     {
-        $image_id = (int) $this->getContextParam('id');
+        $image_id = (int)$this->getContextParam('id');
 
-        if (!$image_id)
-            throw new Widget\WidgetException('No image ID provided');
+        if (!$image_id) {
+            throw new WidgetException('No image ID provided');
+        }
 
         $model = $this->model_factory_content_image_element()->get_by_id($image_id);
 
-        $title  = $this->getContextParam('title');
-        $align  = $this->getContextParam('align', 'alignnone');
-        $alt    = $this->getContextParam('alt');
-        $class  = $this->getContextParam('class');
-        $width  = (int) $this->getContextParam('width');
-        $zoomable  = ($this->getContextParam(CustomTag::PHOTO_ZOOMABLE) == CustomTag::PHOTO_ZOOMABLE_ENABLED);
+        $title    = $this->getContextParam('title');
+        $align    = $this->getContextParam('align', 'alignnone');
+        $alt      = $this->getContextParam('alt');
+        $class    = $this->getContextParam('class');
+        $width    = (int)$this->getContextParam('width');
+        $zoomable = ($this->getContextParam(CustomTag::PHOTO_ZOOMABLE) === CustomTag::PHOTO_ZOOMABLE_ENABLED);
 
-        if (strpos($class, 'align') === FALSE)
-        {
+        if (strpos($class, 'align') === false) {
             $classes[] = $align;
         }
 
         $classes = array_filter(explode(' ', $class));
 
         $attributes = [
-            'id'    =>  'content-image-'.$model->get_id(),
-            'title' =>  $title ?: $model->getTitle(),
-            'alt'   =>  $alt ?: $model->getAlt(),
-            'class' =>  implode(' ', array_unique($classes)),
+            'id'    => 'content-image-'.$model->get_id(),
+            'title' => $title ?: $model->getTitle(),
+            'alt'   => $alt ?: $model->getAlt(),
+            'class' => implode(' ', array_unique($classes)),
         ];
 
         if ($width) {
@@ -47,8 +48,8 @@ class Widget_CustomTag_Photo extends AbstractBaseWidget
         }
 
         return [
-            'zoomable'  =>  $zoomable,
-            'image'     =>  $model->getAttributesForImgTag($model::SIZE_ORIGINAL, $attributes),
+            'zoomable' => $zoomable,
+            'image'    => $model->getAttributesForImgTag($model::SIZE_ORIGINAL, $attributes),
         ];
     }
 }

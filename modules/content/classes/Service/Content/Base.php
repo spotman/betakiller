@@ -65,7 +65,7 @@ abstract class Service_Content_Base extends \BetaKiller\Service
 //        ];
 //
 //        return $this->custom_tag_instance()
-//            ->generate_html($this->get_html_custom_tag_name(), $content->get_id(), $attributes);
+//            ->generateHtml($this->get_html_custom_tag_name(), $content->get_id(), $attributes);
 //    }
 
 //    public function get_entity_items(Entity $entity)

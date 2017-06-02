@@ -15,27 +15,27 @@ class ContentCategoryResource extends AbstractEntityRelatedAclResource
     public function getDefaultAccessList()
     {
         return [
-            self::CREATE_ACTION => [
+            self::ACTION_CREATE => [
                 Role::MODERATOR_ROLE_NAME,
             ],
 
-            self::READ_ACTION => [
+            self::ACTION_READ => [
                 Role::GUEST_ROLE_NAME,
             ],
 
-            self::UPDATE_ACTION => [
+            self::ACTION_UPDATE => [
                 Role::MODERATOR_ROLE_NAME,
             ],
 
-            self::DELETE_ACTION => [
+            self::ACTION_DELETE => [
                 Role::ADMIN_ROLE_NAME,
             ],
 
-            self::LIST_ACTION => [
+            self::ACTION_LIST => [
                 Role::GUEST_ROLE_NAME,
             ],
 
-            self::SEARCH_ACTION => [
+            self::ACTION_SEARCH => [
                 Role::GUEST_ROLE_NAME,
             ],
         ];

@@ -1,6 +1,7 @@
 <?php
 
 use BetaKiller\IFace\Widget\AbstractBaseWidget;
+use BetaKiller\IFace\Widget\WidgetException;
 
 class Widget_CustomTag_Youtube extends AbstractBaseWidget
 {
@@ -9,7 +10,7 @@ class Widget_CustomTag_Youtube extends AbstractBaseWidget
     /**
      * Returns data for View rendering
      *
-     * @throws Widget\WidgetException
+     * @throws \BetaKiller\IFace\Widget\WidgetException
      * @return array
      */
     public function getData()
@@ -19,7 +20,7 @@ class Widget_CustomTag_Youtube extends AbstractBaseWidget
         $video_id = (int) $context['id'];
 
         if (!$video_id)
-            throw new Widget\WidgetException('No YouTube ID provided');
+            throw new WidgetException('No YouTube ID provided');
 
         $model = $this->model_factory_content_youtube_record()->get_by_id($video_id);
 

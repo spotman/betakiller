@@ -1,6 +1,7 @@
 <?php
 namespace BetaKiller\IFace\App\Content;
 
+use BetaKiller\Acl\Resource\ContentPostResource;
 use BetaKiller\Helper\ContentUrlParametersHelper;
 use BetaKiller\Model\UserInterface;
 
@@ -22,6 +23,12 @@ class PostItem extends AbstractAppBase
     private $user;
 
     /**
+     * @Inject
+     * @var \BetaKiller\Helper\AclHelper
+     */
+    private $aclHelper;
+
+    /**
      * PostItem constructor.
      *
      * @param \BetaKiller\Helper\ContentUrlParametersHelper $urlParametersHelper
@@ -39,7 +46,7 @@ class PostItem extends AbstractAppBase
      * This hook executed before IFace processing (on every request regardless of caching)
      * Place here code that needs to be executed on every IFace request (increment views counter, etc)
      */
-    public function before()
+    public function before(): void
     {
         // Count guest views only
         if ($this->user->isGuest()) {
@@ -53,16 +60,29 @@ class PostItem extends AbstractAppBase
      *
      * @return array
      */
-    public function getData()
+    public function getData(): array
     {
         $model = $this->getContentModel();
 
+        $urlParams = $this->urlParametersHelper->getCurrentUrlParameters();
+        $previewMode = (bool)$urlParams->getQueryPart('preview');
+
+        if ($previewMode) {
+            if (!$this->aclHelper->isEntityActionAllowed($model, ContentPostResource::ACTION_PREVIEW)) {
+                throw new \HTTP_Exception_403('You can not preview this post');
+            }
+
+            // See latest revision data
+            $model->useLatestRevision();
+        }
+
         return [
             'post' => $this->getPostData($model),
+            'previewMode' => $previewMode,
         ];
     }
 
-    protected function getPostData(\Model_ContentPost $model)
+    protected function getPostData(\Model_ContentPost $model): array
     {
         $this->setLastModified($model->getApiLastModified());
 

@@ -97,7 +97,7 @@ abstract class Kohana_Image {
 			// Get the image information
 			$info = getimagesize($file);
 		}
-		catch (Exception $e)
+		catch (Throwable $e)
 		{
 			// Ignore all errors while reading the image
 		}
@@ -133,7 +133,7 @@ abstract class Kohana_Image {
 			// Render the current image
 			return $this->render();
 		}
-		catch (Exception $e)
+		catch (Throwable $e)
 		{
 			if (is_object(Kohana::$log))
 			{

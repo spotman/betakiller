@@ -15,27 +15,27 @@ class ContentCommentStatusResource extends AbstractEntityRelatedAclResource
     public function getDefaultAccessList()
     {
         return [
-            self::CREATE_ACTION => [
+            self::ACTION_CREATE => [
                 Role::DEVELOPER_ROLE_NAME,
             ],
 
-            self::READ_ACTION => [
+            self::ACTION_READ => [
                 Role::MODERATOR_ROLE_NAME,
             ],
 
-            self::UPDATE_ACTION => [
+            self::ACTION_UPDATE => [
                 Role::DEVELOPER_ROLE_NAME,
             ],
 
-            self::DELETE_ACTION => [
+            self::ACTION_DELETE => [
                 Role::DEVELOPER_ROLE_NAME,
             ],
 
-            self::LIST_ACTION => [
+            self::ACTION_LIST => [
                 Role::DEVELOPER_ROLE_NAME,
             ],
 
-            self::SEARCH_ACTION => [
+            self::ACTION_SEARCH => [
                 Role::DEVELOPER_ROLE_NAME,
             ],
         ];

@@ -43,7 +43,7 @@ class Log extends Kohana_Log
         static::_add(self::ERROR, $message, $values, $additional, ++$trace_level);
     }
 
-    public static function exception(Exception $e)
+    public static function exception(Throwable $e)
     {
         Kohana_Exception::log($e);
     }

@@ -143,7 +143,9 @@ class Model_ContentYoutubeRecord extends ORM implements ContentElementInterface,
      */
     public function find_by_youtube_id($id)
     {
-        $model = $this->model_factory()->filter_youtube_id($id)->find();
+        /** @var \Model_ContentYoutubeRecord $orm */
+        $orm = $this->model_factory();
+        $model = $orm->filter_youtube_id($id)->find();
 
         return $model->loaded() ? $model : null;
     }

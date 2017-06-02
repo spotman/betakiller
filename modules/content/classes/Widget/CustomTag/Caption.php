@@ -19,8 +19,9 @@ class Widget_CustomTag_Caption extends AbstractBaseWidget
 
         $image_id = (int) $context['id'];
 
-        if (!$image_id)
+        if (!$image_id) {
             throw new WidgetException('No image ID provided');
+        }
 
         $title = $context['title'];
         $align = Arr::get($context, 'align', 'alignnone');

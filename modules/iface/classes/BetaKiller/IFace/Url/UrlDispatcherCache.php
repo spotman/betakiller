@@ -1,6 +1,8 @@
 <?php
 namespace BetaKiller\IFace\Url;
 
+use BetaKiller\IFace\IFaceInterface;
+use BetaKiller\Model\DispatchableEntityInterface;
 use Doctrine\Common\Cache\ArrayCache;
 use Doctrine\Common\Cache\ChainCache;
 
@@ -16,8 +18,10 @@ class UrlDispatcherCache implements UrlDispatcherCacheInterface
      *
      * @param \Doctrine\Common\Cache\Cache[] $cacheProviders
      */
-    public function __construct(array $cacheProviders = [])
+    public function __construct(array $cacheProviders = null)
     {
+        $cacheProviders = $cacheProviders ?? [];
+
         // Prepend basic cache
         array_unshift($cacheProviders, new ArrayCache());
 
@@ -26,24 +30,26 @@ class UrlDispatcherCache implements UrlDispatcherCacheInterface
 
 
     /**
-     * @param $url
+     * @param string $url
      *
      * @return array|null
      */
-    public function get($url)
+    public function get(string $url)
     {
         $data = $this->cache->fetch($url);
 
-        return unserialize($data);
+        return unserialize($data, [
+            IFaceInterface::class,
+            DispatchableEntityInterface::class,
+        ]);
     }
 
     /**
      * @param string $url
      * @param array  $item
      */
-    public function set($url, array $item)
+    public function set(string $url, array $item): void
     {
         $this->cache->save($url, serialize($item));
     }
-
 }

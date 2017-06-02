@@ -6,6 +6,7 @@ use BetaKiller\Model\Entity;
 
 /**
  * Class Service_Content_WithAssets
+ *
  * @deprecated
  */
 abstract class Service_Content_WithAssets extends Service_Content_Base
@@ -16,18 +17,17 @@ abstract class Service_Content_WithAssets extends Service_Content_Base
      * @return Service_Content_WithAssets
      * @deprecated
      */
-    public static function service_instance_by_mime($mime)
+    public static function service_instance_by_mime(string $mime)
     {
         /** @var Service_Content_WithAssets[] $mime_services */
         $mime_services = [
             Service_Content_Image::instance(),
         ];
 
-        foreach ($mime_services as $service)
-        {
-            $allowed_mimes = $service->get_assets_provider()->get_allowed_mime_types();
+        foreach ($mime_services as $service) {
+            $allowed_mimes = $service->get_assets_provider()->getAllowedMimeTypes();
 
-            if ($allowed_mimes AND is_array($allowed_mimes) AND in_array($mime, $allowed_mimes))
+            if ($allowed_mimes && is_array($allowed_mimes) && in_array($mime, $allowed_mimes))
                 return $service;
         }
 
@@ -36,20 +36,20 @@ abstract class Service_Content_WithAssets extends Service_Content_Base
     }
 
     /**
-     * @param $full_path
-     * @param $original_name
+     * @param        $full_path
+     * @param        $original_name
      * @param Entity $entity
-     * @param null $entity_item_id
+     * @param null   $entity_item_id
      *
      * @return ContentElementInterface
      */
-    public function store_file($full_path, $original_name, Entity $entity, $entity_item_id = NULL)
+    public function store_file($full_path, $original_name, Entity $entity, $entity_item_id = null)
     {
         $provider = $this->get_assets_provider();
 
         $post_data = [
-            'entityID'      =>  $entity->get_id(),
-            'entityItemID'  =>  $entity_item_id,
+            'entityID'     => $entity->get_id(),
+            'entityItemID' => $entity_item_id,
         ];
 
         return $provider->store($full_path, $original_name, $post_data);
@@ -57,7 +57,7 @@ abstract class Service_Content_WithAssets extends Service_Content_Base
 
     public function get_allowed_mime_types()
     {
-        return $this->get_assets_provider()->get_allowed_mime_types();
+        return $this->get_assets_provider()->getAllowedMimeTypes();
     }
 
     /**
@@ -65,7 +65,7 @@ abstract class Service_Content_WithAssets extends Service_Content_Base
      */
     protected function file_model_factory()
     {
-        return $this->get_assets_provider()->file_model_factory();
+        return $this->get_assets_provider()->createFileModel();
     }
 
     /**

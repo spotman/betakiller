@@ -9,15 +9,15 @@ abstract class Minion_Task extends Kohana_Minion_Task
 {
     use BetaKiller\Helper\LogTrait;
 
-    const COLOR_RED         = Minion_CLI::RED;
-    const COLOR_GREEN       = Minion_CLI::GREEN;
-    const COLOR_BLUE        = Minion_CLI::BLUE;
-    const COLOR_LIGHT_BLUE  = Minion_CLI::LIGHT_BLUE;
+    const COLOR_RED        = Minion_CLI::RED;
+    const COLOR_GREEN      = Minion_CLI::GREEN;
+    const COLOR_BLUE       = Minion_CLI::BLUE;
+    const COLOR_LIGHT_BLUE = Minion_CLI::LIGHT_BLUE;
 
     public function __construct()
     {
         $common_options = [
-            'debug' => FALSE,
+            'debug' => false,
             'stage' => 'development',
         ];
 
@@ -43,7 +43,7 @@ abstract class Minion_Task extends Kohana_Minion_Task
      */
     public function execute()
     {
-        $max_log_level = ( $this->_options['debug'] !== FALSE )
+        $max_log_level = ($this->_options['debug'] !== false)
             ? Log::DEBUG
             : $this->get_max_log_level();
 
@@ -52,13 +52,13 @@ abstract class Minion_Task extends Kohana_Minion_Task
         Log::instance()->attach(new Minion_Log($max_log_level), $max_log_level, $min_log_level);
 
         // Auth for CLI
-        $user = $this->get_cli_user_model();
+        $user = $this->getCliUserModel();
         Auth::instance()->force_login($user);
 
         return parent::execute();
     }
 
-    protected function get_cli_user_model()
+    protected function getCliUserModel()
     {
         $username = 'minion';
 
@@ -70,7 +70,7 @@ abstract class Minion_Task extends Kohana_Minion_Task
         if (!$user->loaded()) {
             $password = microtime();
 
-            $host = parse_url(Kohana::$base_url, PHP_URL_HOST);
+            $host  = parse_url(Kohana::$base_url, PHP_URL_HOST);
             $email = $username.'@'.$host;
 
             /** @var UserInterface $user */
@@ -91,6 +91,7 @@ abstract class Minion_Task extends Kohana_Minion_Task
     /**
      *
      * Constant like Log::INFO
+     *
      * @return int
      */
     protected function get_max_log_level()
@@ -109,11 +110,12 @@ abstract class Minion_Task extends Kohana_Minion_Task
     }
 
     /**
-     * @param $text
+     * @param      $text
      * @param null $color
+     *
      * @return $this
      */
-    protected function write($text, $color = NULL)
+    protected function write($text, $color = null)
     {
         if ($color) {
             $text = $this->colorize($text, $color);
@@ -125,12 +127,13 @@ abstract class Minion_Task extends Kohana_Minion_Task
     }
 
     /**
-     * @param $text
-     * @param bool $eol
+     * @param        $text
+     * @param bool   $eol
      * @param string $color
+     *
      * @return $this
      */
-    protected function write_replace($text, $eol = FALSE, $color = NULL)
+    protected function write_replace($text, $eol = false, $color = null)
     {
         if ($color) {
             $text = $this->colorize($text, $color);
@@ -141,7 +144,7 @@ abstract class Minion_Task extends Kohana_Minion_Task
         return $this;
     }
 
-    private function colorize($text, $fore, $back = NULL)
+    private function colorize($text, $fore, $back = null)
     {
         return Minion_CLI::color($text, $fore, $back);
     }
@@ -150,10 +153,11 @@ abstract class Minion_Task extends Kohana_Minion_Task
      * Get user input from CLI
      *
      * @param string $message
-     * @param array $options
+     * @param array  $options
+     *
      * @return string
      */
-    protected function read($message, array $options = NULL)
+    protected function read($message, array $options = null)
     {
         return Minion_CLI::read($message, $options);
     }
@@ -162,6 +166,7 @@ abstract class Minion_Task extends Kohana_Minion_Task
      * Get password user input from CLI
      *
      * @param $message
+     *
      * @return string
      */
     protected function password($message)

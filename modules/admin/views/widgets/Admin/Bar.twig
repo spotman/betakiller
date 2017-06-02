@@ -10,6 +10,35 @@
       <div class="nav-wrapper">
         <div class="{{ not isAdminZone ? "container" : "" }}">
 
+          <ul class="right">
+            {% if primaryEntity.publicUrl %}
+              <li>
+                <a href="{{ primaryEntity.publicUrl }}" class="view-entity-button">
+                  <i class="material-icons left tiny">visibility</i>
+                  {{ "admin.bar.public"|i18n }}
+                </a>
+              </li>
+            {% endif %}
+
+            {% if primaryEntity.previewUrl %}
+              <li>
+                <a href="{{ primaryEntity.previewUrl }}" class="preview-entity-button" target="_blank">
+                  <i class="material-icons left tiny">visibility</i>
+                  {{ "admin.bar.preview"|i18n }}
+                </a>
+              </li>
+            {% endif %}
+
+            {% if primaryEntity.adminUrl %}
+              <li>
+                <a href="{{ primaryEntity.adminUrl }}" class="edit-entity-button">
+                  <i class="material-icons left tiny">mode_edit</i>
+                  {{ "admin.bar.edit"|i18n }}
+                </a>
+              </li>
+            {% endif %}
+          </ul>
+
           <ul class="left">
 
             {% if createButtonItems|length > 0 %}
@@ -25,24 +54,6 @@
                 {% endfor %}
               </ul>
             </li>
-            {% endif %}
-
-            {% if primaryEntity.publicUrl %}
-              <li>
-                <a href="{{ primaryEntity.publicUrl }}">
-                  <i class="material-icons left tiny">visibility</i>
-                  {{ "admin.bar.read"|i18n }}
-                </a>
-              </li>
-            {% endif %}
-
-            {% if primaryEntity.adminUrl %}
-              <li>
-                <a href="{{ primaryEntity.adminUrl }}">
-                  <i class="material-icons left tiny">mode_edit</i>
-                  {{ "admin.bar.edit"|i18n }}
-                </a>
-              </li>
             {% endif %}
 
             {% if comments %}

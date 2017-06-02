@@ -47,7 +47,7 @@ class Notification
                         ]);
                         break;
                     }
-                } catch (\Exception $e) {
+                } catch (\Throwable $e) {
                     $this->exception($e);
                     continue;
                 }

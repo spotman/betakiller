@@ -14,7 +14,7 @@ class CommentAggregateByStatus extends AdminBase
         // TODO: Implement getData() method.
 
         // TODO get aggregated statuses list
-        $statuses = $this->model_factory_content_comment();
+//        $statuses = $this->model_factory_content_comment();
 
 
         return [];

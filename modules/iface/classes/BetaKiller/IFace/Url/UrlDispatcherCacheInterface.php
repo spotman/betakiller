@@ -8,11 +8,11 @@ interface UrlDispatcherCacheInterface
      *
      * @return array|null
      */
-    public function get($url);
+    public function get(string $url);
 
     /**
      * @param string $url
      * @param array  $item
      */
-    public function set($url, array $item);
+    public function set(string $url, array $item);
 }

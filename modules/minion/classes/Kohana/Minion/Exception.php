@@ -18,14 +18,14 @@ class Kohana_Minion_Exception extends Kohana_Exception {
 	 * Should this still log? Maybe not as useful since we'll see the error on the screen.
 	 *
 	 * @uses    Kohana_Exception::text
-	 * @param   Exception   $e
+	 * @param   \Throwable   $e
 	 * @return  boolean
 	 */
-	public static function handler(Exception $e)
+	public static function handler(Throwable $e)
 	{
 		try
 		{
-		    if (class_exists('ORM_Validation_Exception') && $e instanceof ORM_Validation_Exception)
+		    if (class_exists(ORM_Validation_Exception::class) && $e instanceof ORM_Validation_Exception)
             {
                 echo Kohana_Exception::text($e);
                 echo Debug::dump($e->errors('orm'));
@@ -52,7 +52,7 @@ class Kohana_Minion_Exception extends Kohana_Exception {
 
 			exit($exit_code);
 		}
-		catch (Exception $e)
+		catch (Throwable $e)
 		{
 			// Clean the output buffer if one exists
 			ob_get_level() and ob_clean();

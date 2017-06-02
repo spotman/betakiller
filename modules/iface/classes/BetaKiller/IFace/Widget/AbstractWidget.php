@@ -136,8 +136,6 @@ abstract class AbstractWidget implements WidgetInterface
             return $this->render();
         } catch (\Throwable $e) {
             return $this->processException($e);
-        } catch (\Exception $e) {
-            return $this->processException($e);
         }
     }
 
@@ -152,8 +150,6 @@ abstract class AbstractWidget implements WidgetInterface
         try {
             return (string)WidgetException::_handler($e);
         } catch (\Throwable $e) {
-            return null;
-        } catch (\Exception $e) {
             return null;
         }
     }

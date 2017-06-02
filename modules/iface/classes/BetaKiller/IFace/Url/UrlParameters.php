@@ -10,6 +10,20 @@ class UrlParameters implements UrlParametersInterface
     private $entitiesRegistry;
 
     /**
+     * Key => value pairs
+     *
+     * @var string[]
+     */
+    private $queryParts = [];
+
+    /**
+     * Array of query parts` keys
+     *
+     * @var string[]
+     */
+    private $usedQueryParts = [];
+
+    /**
      * UrlParameters constructor.
      */
     public function __construct()
@@ -20,7 +34,7 @@ class UrlParameters implements UrlParametersInterface
     /**
      * @return \BetaKiller\IFace\Url\UrlParametersInterface
      */
-    public static function create()
+    public static function create(): UrlParametersInterface
     {
         return new static;
     }
@@ -29,10 +43,9 @@ class UrlParameters implements UrlParametersInterface
      * @param \BetaKiller\Model\DispatchableEntityInterface $object
      * @param bool|null                                     $ignoreDuplicate
      *
-     * @return $this
-     * @throws \Exception
+     * @return \BetaKiller\IFace\Url\UrlParametersInterface
      */
-    public function setEntity(DispatchableEntityInterface $object, $ignoreDuplicate = null)
+    public function setEntity(DispatchableEntityInterface $object, ?bool $ignoreDuplicate = null): UrlParametersInterface
     {
         $key = $object::getUrlParametersKey();
         $this->entitiesRegistry->set($key, $object, (bool)$ignoreDuplicate);
@@ -45,7 +58,7 @@ class UrlParameters implements UrlParametersInterface
      *
      * @return \BetaKiller\Model\DispatchableEntityInterface|null
      */
-    public function getEntity($key)
+    public function getEntity(string $key): ?DispatchableEntityInterface
     {
         return $this->entitiesRegistry->get($key);
     }
@@ -75,10 +88,10 @@ class UrlParameters implements UrlParametersInterface
     }
 
     /**
-     * @return $this
+     * @return \BetaKiller\IFace\Url\UrlParametersInterface
      * @deprecated Url dispatching must be persistent
      */
-    public function clear()
+    public function clear(): UrlParametersInterface
     {
         $this->entitiesRegistry->clear();
 
@@ -88,7 +101,7 @@ class UrlParameters implements UrlParametersInterface
     /**
      * @return \BetaKiller\Model\DispatchableEntityInterface[]
      */
-    public function getAllEntities()
+    public function getAllEntities(): array
     {
         return $this->entitiesRegistry->getAll();
     }
@@ -98,7 +111,7 @@ class UrlParameters implements UrlParametersInterface
      *
      * @return bool
      */
-    public function hasEntity($key)
+    public function hasEntity(string $key): bool
     {
         return $this->entitiesRegistry->has($key);
     }
@@ -108,8 +121,56 @@ class UrlParameters implements UrlParametersInterface
      *
      * @return string[]
      */
-    public function entitiesKeys()
+    public function entitiesKeys(): array
     {
         return $this->entitiesRegistry->keys();
+    }
+
+    /**
+     * Set query parts fetched from current HTTP request
+     *
+     * @param array $parts
+     *
+     * @return \BetaKiller\IFace\Url\UrlParametersInterface
+     */
+    public function setQueryParts(array $parts): UrlParametersInterface
+    {
+        $this->queryParts     = $parts;
+        $this->usedQueryParts = [];
+
+        return $this;
+    }
+
+    /**
+     * Returns query part value
+     *
+     * @param string    $key
+     * @param bool|null $required
+     *
+     * @return string|string[]
+     */
+    public function getQueryPart($key, $required = null)
+    {
+        if (isset($this->queryParts[$key])) {
+            $this->usedQueryParts[] = $key;
+
+            return $this->queryParts[$key];
+        }
+
+        if ($required) {
+            throw new UrlParametersException('Missing [:key] query part', [':key' => $key]);
+        }
+
+        return null;
+    }
+
+    /**
+     * Returns true if HTTP request contains query parts which is never used in request processing
+     *
+     * @return array
+     */
+    public function getUnusedQueryPartsKeys(): array
+    {
+        return array_diff(array_keys($this->queryParts), $this->usedQueryParts);
     }
 }

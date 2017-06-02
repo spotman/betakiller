@@ -1,9 +1,7 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
-class Profiler extends Kohana_Profiler {
-
-    use \BetaKiller\Utils\Instance\SingletonTrait;
-
+class Profiler extends Kohana_Profiler
+{
     /**
      * Перманентно включает профайлер для всех экшнов / контроллеров
      */

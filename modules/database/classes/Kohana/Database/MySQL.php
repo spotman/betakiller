@@ -59,7 +59,7 @@ class Kohana_Database_MySQL extends Database {
 				$this->_connection = mysql_connect($hostname, $username, $password, TRUE);
 			}
 		}
-		catch (Exception $e)
+		catch (Throwable $e)
 		{
 			// No connection exists
 			$this->_connection = NULL;
@@ -132,7 +132,7 @@ class Kohana_Database_MySQL extends Database {
 				}
 			}
 		}
-		catch (Exception $e)
+		catch (Throwable $e)
 		{
 			// Database is probably not disconnected
 			$status = ! is_resource($this->_connection);

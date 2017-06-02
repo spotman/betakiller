@@ -36,7 +36,7 @@ class BetaKiller_Kohana_Exception extends Kohana_Kohana_Exception
      * @throws Kohana_Exception
      * @todo Rewrite to ExceptionHandler and move exception handling logic to it
      */
-    static public function _handler(Exception $exception)
+    static public function _handler(Throwable $exception)
     {
         static::$_counter++;
 
@@ -107,7 +107,7 @@ class BetaKiller_Kohana_Exception extends Kohana_Kohana_Exception
             $response
                 ->status($http_code)
                 ->body($exception->render_custom_message($http_code) ?: $exception->render_default_message($http_code));
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             $response->status(500);
             static::log($e);
         }
@@ -119,7 +119,7 @@ class BetaKiller_Kohana_Exception extends Kohana_Kohana_Exception
     {
         try {
             return $this->get_iface($code)->render();
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             static::log($e);
 
             return null;

@@ -207,7 +207,7 @@ class Kohana_Session_Database extends Session {
 			// Delete the cookie
 			Cookie::delete($this->_name);
 		}
-		catch (Exception $e)
+		catch (Throwable $e)
 		{
 			// An error occurred, the session has not been deleted
 			return FALSE;

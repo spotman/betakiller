@@ -15,7 +15,7 @@ if (Kohana::in_production(true)) {
         /** @var Log_PhpExceptionStorage $log */
         $log = \BetaKiller\DI\Container::getInstance()->get(Log_PhpExceptionStorage::class);
         $log->register();
-    } catch (Exception $e) {
+    } catch (Throwable $e) {
         // Skip this log writer silently
     }
 }

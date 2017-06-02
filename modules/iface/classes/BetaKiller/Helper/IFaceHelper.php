@@ -142,31 +142,31 @@ class IFaceHelper
 
     public function getCreateEntityUrl(DispatchableEntityInterface $entity, $zone = null)
     {
-        return $this->getEntityUrl($entity, CrudlsActionsInterface::CREATE_ACTION, $zone);
+        return $this->getEntityUrl($entity, CrudlsActionsInterface::ACTION_CREATE, $zone);
     }
 
     public function getReadEntityUrl(DispatchableEntityInterface $entity, $zone = null)
     {
-        return $this->getEntityUrl($entity, CrudlsActionsInterface::READ_ACTION, $zone);
+        return $this->getEntityUrl($entity, CrudlsActionsInterface::ACTION_READ, $zone);
     }
 
     public function getUpdateEntityUrl(DispatchableEntityInterface $entity, $zone = null)
     {
-        return $this->getEntityUrl($entity, CrudlsActionsInterface::UPDATE_ACTION, $zone);
+        return $this->getEntityUrl($entity, CrudlsActionsInterface::ACTION_UPDATE, $zone);
     }
 
     public function getDeleteEntityUrl(DispatchableEntityInterface $entity, $zone = null)
     {
-        return $this->getEntityUrl($entity, CrudlsActionsInterface::DELETE_ACTION, $zone);
+        return $this->getEntityUrl($entity, CrudlsActionsInterface::ACTION_DELETE, $zone);
     }
 
     public function getListEntityUrl(DispatchableEntityInterface $entity, $zone = null)
     {
-        return $this->getEntityUrl($entity, CrudlsActionsInterface::LIST_ACTION, $zone);
+        return $this->getEntityUrl($entity, CrudlsActionsInterface::ACTION_LIST, $zone);
     }
 
     public function getSearchEntityUrl(DispatchableEntityInterface $entity, $zone = null)
     {
-        return $this->getEntityUrl($entity, CrudlsActionsInterface::SEARCH_ACTION, $zone);
+        return $this->getEntityUrl($entity, CrudlsActionsInterface::ACTION_SEARCH, $zone);
     }
 }
