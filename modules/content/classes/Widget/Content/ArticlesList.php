@@ -1,6 +1,7 @@
 <?php
 
 use BetaKiller\IFace\Widget\AbstractBaseWidget;
+use BetaKiller\Model\IFaceZone;
 
 class Widget_Content_ArticlesList extends AbstractBaseWidget
 {
@@ -60,7 +61,7 @@ class Widget_Content_ArticlesList extends AbstractBaseWidget
             $posts_data[] = [
                 'is_large'      =>  $is_large,
                 'thumbnail'     =>  $thumbnail->getAttributesForImgTag($thumbnail_size),
-                'url'           =>  $this->ifaceHelper->getReadEntityUrl($article),
+                'url'           =>  $this->ifaceHelper->getReadEntityUrl($article, IFaceZone::PUBLIC_ZONE),
                 'label'         =>  $article->getLabel(),
                 'title'         =>  $article->getTitle(),
                 'text'          =>  $article->getContentPreview(),

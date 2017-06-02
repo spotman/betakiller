@@ -53,7 +53,7 @@ class BarWidget extends AbstractAdminWidget
      *
      * @return array
      */
-    public function getData()
+    public function getData(): array
     {
         $isAdminZone = $this->ifaceHelper->getCurrentIFace()->getZoneName() === IFaceZone::ADMIN_ZONE;
 
@@ -71,18 +71,16 @@ class BarWidget extends AbstractAdminWidget
             ],
         ];
 
-        // TODO Preview post button
-
         return $data;
     }
 
-    protected function isEmptyResponseAllowed()
+    protected function isEmptyResponseAllowed(): bool
     {
         // If user is not authorized, then silently exiting
         return true;
     }
 
-    private function getCreateButtonItems()
+    private function getCreateButtonItems(): array
     {
         $items  = [];
         $ifaces = $this->ifaceProvider->getByActionAndZone(CrudlsActionsInterface::ACTION_CREATE, IFaceZone::ADMIN_ZONE);
@@ -101,7 +99,7 @@ class BarWidget extends AbstractAdminWidget
         return $items;
     }
 
-    private function getCommentsData()
+    private function getCommentsData(): ?array
     {
         $commentOrm = $this->model_factory_content_comment();
         $statusOrm  = $this->model_factory_content_comment_status();
@@ -126,7 +124,7 @@ class BarWidget extends AbstractAdminWidget
         ];
     }
 
-    private function getCommentsListByStatusIfaceUrl(Model_ContentCommentStatus $status)
+    private function getCommentsListByStatusIfaceUrl(Model_ContentCommentStatus $status): string
     {
         /** @var \BetaKiller\IFace\Admin\Content\CommentListByStatus $iface */
         $iface = $this->ifaceHelper->createIFaceFromCodename('Admin_Content_CommentListByStatus');
@@ -138,7 +136,7 @@ class BarWidget extends AbstractAdminWidget
         return $iface->url($param);
     }
 
-    private function getCommentsRootIfaceUrl()
+    private function getCommentsRootIfaceUrl(): string
     {
         /** @var \BetaKiller\IFace\Admin\Content\CommentIndex $iface */
         $iface = $this->ifaceHelper->createIFaceFromCodename('Admin_Content_CommentIndex');
@@ -146,7 +144,7 @@ class BarWidget extends AbstractAdminWidget
         return $iface->url();
     }
 
-    private function getPreviewButtonUrl(DispatchableEntityInterface $entity)
+    private function getPreviewButtonUrl(?DispatchableEntityInterface $entity): ?string
     {
         if (!$entity) {
             return null;
@@ -168,17 +166,17 @@ class BarWidget extends AbstractAdminWidget
         }
     }
 
-    private function getAdminEditButtonUrl(DispatchableEntityInterface $entity)
+    private function getAdminEditButtonUrl(?DispatchableEntityInterface $entity): ?string
     {
         return $this->getPrimaryEntityActionUrl($entity, IFaceZone::ADMIN_ZONE);
     }
 
-    private function getPublicReadButtonUrl(DispatchableEntityInterface $entity)
+    private function getPublicReadButtonUrl(?DispatchableEntityInterface $entity): ?string
     {
         return $this->getPrimaryEntityActionUrl($entity, IFaceZone::PUBLIC_ZONE);
     }
 
-    private function getPrimaryEntityActionUrl(DispatchableEntityInterface $entity, $targetZone)
+    private function getPrimaryEntityActionUrl(?DispatchableEntityInterface $entity, $targetZone): ?string
     {
         if (!$entity) {
             return null;
@@ -205,7 +203,7 @@ class BarWidget extends AbstractAdminWidget
         }
     }
 
-    private function detectPrimaryEntity()
+    private function detectPrimaryEntity(): ?\Model_ContentPost
     {
         if ($post = $this->contentUrlParamHelper->getContentPost()) {
             return $post;

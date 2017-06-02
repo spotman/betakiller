@@ -2,6 +2,7 @@
 namespace BetaKiller\Helper;
 
 use BetaKiller\IFace\CrudlsActionsInterface;
+use BetaKiller\IFace\Exception\IFaceException;
 use BetaKiller\IFace\IFaceFactory;
 use BetaKiller\IFace\IFaceInterface;
 use BetaKiller\IFace\IFaceModelInterface;
@@ -123,8 +124,14 @@ class IFaceHelper
     public function getEntityUrl(DispatchableEntityInterface $entity, $action, $zone = null)
     {
         if (!$zone) {
+            $currentIFace = $this->getCurrentIFace();
+
+            if (!$currentIFace) {
+                throw new IFaceException('IFace zone must be specified');
+            }
+
             // Fetch zone from current IFace
-            $zone = $this->getCurrentIFace()->getZoneName();
+            $zone = $currentIFace->getZoneName();
         }
 
         // Search for IFace with provided entity, action and zone

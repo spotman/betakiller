@@ -64,7 +64,9 @@ class Controller_IFace extends Controller
         $iface->after();
 
         if ($unusedParts = $params->getUnusedQueryPartsKeys()) {
-            throw new HTTP_Exception_400('Request have unused query parts: :keys', [':keys' => $unusedParts]);
+            throw new HTTP_Exception_400('Request have unused query parts: :keys', [
+                ':keys' => implode(', ', $unusedParts),
+            ]);
         }
 
         $this->last_modified($iface->getLastModified());

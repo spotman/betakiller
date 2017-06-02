@@ -9,4 +9,6 @@ return [
     'IFace :name must have linked entity or custom ACL rules to protect itself' => 'IFace :name must have linked entity or custom ACL rules to protect itself',
     'IFace :name needs zone to be configured'                                   => 'IFace :name needs zone to be configured',
     'No IFace found for :entity.:action entity in :zone zone'                   => 'No IFace found for :entity.:action entity in :zone zone',
+    'Request have unused query parts: :keys'                                    => 'Request have unused query parts: :keys',
+    'IFace zone must be specified'                                              => 'IFace zone must be specified',
 ];
