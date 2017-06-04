@@ -44,7 +44,7 @@ class KohanaLogProxy extends \Log_Writer
             $context = [];
 
             /** @var \Exception $exception */
-            $exception = isset($message['additional']['exception']) ? $message['additional']['exception'] : null;
+            $exception = $message['additional']['exception'] ?? null;
 
             if ($exception) {
                 $context['exception'] = $exception;

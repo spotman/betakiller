@@ -72,7 +72,7 @@ return [
             return \BetaKiller\DI\Container::getInstance();
         })->scope(Scope::SINGLETON),
 
-        LoggerInterface::class => DI\object(\BetaKiller\Log\Logger::class),
+        LoggerInterface::class => DI\object(\BetaKiller\Log\Logger::class)->lazy(),
 
         Auth::class => DI\factory(function () {
             return Auth::instance();
