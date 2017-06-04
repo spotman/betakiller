@@ -14,5 +14,5 @@
 </style>
 
 <div class="well center">
-    <h4><?= $message ?></h4>
+    <h4><?php echo $message ?></h4>
 </div>

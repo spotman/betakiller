@@ -19,7 +19,7 @@ class HTTP_Exception_401 extends Kohana_HTTP_Exception_401 {
         return FALSE;
     }
 
-    protected function always_show_nice_message()
+    protected function alwaysShowNiceMessage()
     {
         return TRUE;
     }
@@ -28,7 +28,7 @@ class HTTP_Exception_401 extends Kohana_HTTP_Exception_401 {
      * @param $code
      * @return IFace_Auth_Login
      */
-    protected function get_iface($code)
+    protected function getIFaceFromCode($code)
     {
         return $this->iface_from_codename('Auth_Login');
     }

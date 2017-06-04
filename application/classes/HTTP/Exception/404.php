@@ -16,7 +16,7 @@ class HTTP_Exception_404 extends Kohana_HTTP_Exception_404
         return 'Not found';
     }
 
-    protected function always_show_nice_message()
+    protected function alwaysShowNiceMessage()
     {
         return TRUE;
     }

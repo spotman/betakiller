@@ -17,14 +17,14 @@ class HTTP_Exception extends Kohana_HTTP_Exception {
      * Переопредели этот метод в HTTP_Exception_xxx, если нужно взять вьюшку из другого места и с другим именем
      * @return View
      */
-    public function get_view()
+    public function getView()
     {
         try
         {
             $code = $this->getCode();
 
             // Попробуем получить вьюшку для текущего статуса ошибки
-            return View::factory($this->get_view_path($code))
+            return View::factory($this->getViewPath($code))
                 ->set('code', $code)
                 ->set('message', HTML::chars($this->getMessage()));
         }
@@ -33,7 +33,7 @@ class HTTP_Exception extends Kohana_HTTP_Exception {
             static::log($e);
 
             // Иначе показываем базовое сообщение
-            return parent::get_view();
+            return parent::getView();
         }
     }
 }

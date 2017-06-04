@@ -10,6 +10,12 @@ class Assets {
 
     protected $_config;
 
+    /**
+     * @param string $name
+     *
+     * @return $this
+     * @throws \HTTP_Exception_500
+     */
     public function add($name)
     {
         $method_name = $this->make_method_name($name);

@@ -24,9 +24,9 @@ class HTTP_Exception_Verbal extends HTTP_Exception_400 {
         return FALSE;
     }
 
-    protected function get_view_path($file = NULL)
+    protected function getViewPath($file = NULL)
     {
-        return parent::get_view_path('verbal');
+        return parent::getViewPath('verbal');
     }
 
 }

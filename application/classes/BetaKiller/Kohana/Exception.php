@@ -64,7 +64,7 @@ class BetaKiller_Kohana_Exception extends Kohana_Kohana_Exception
         }
 
         $alwaysShowNiceMessage = ($exception instanceof self)
-            ? $exception->always_show_nice_message()
+            ? $exception->alwaysShowNiceMessage()
             : false;
 
         if ($alwaysShowNiceMessage || Kohana::in_production(true)) {
@@ -89,7 +89,7 @@ class BetaKiller_Kohana_Exception extends Kohana_Kohana_Exception
     static public function makeNiceMessage(Exception $exception)
     {
         // Prevent displaying custom error pages for expected exceptions (301, 302, 401, 403, etc)
-        if (($exception instanceof HTTP_Exception_Expected) && !$exception->always_show_nice_message()) {
+        if (($exception instanceof HTTP_Exception_Expected) && !$exception->alwaysShowNiceMessage()) {
             return $exception->get_response();
         }
 
@@ -102,11 +102,11 @@ class BetaKiller_Kohana_Exception extends Kohana_Kohana_Exception
 
         try {
             $code      = $exception->getCode();
-            $http_code = ($exception instanceof HTTP_Exception) ? $code : 500;
+            $httpCode = ($exception instanceof HTTP_Exception) ? $code : 500;
 
             $response
-                ->status($http_code)
-                ->body($exception->render_custom_message($http_code) ?: $exception->render_default_message($http_code));
+                ->status($httpCode)
+                ->body($exception->renderCustomMessage($httpCode) ?: $exception->renderDefaultMessage($httpCode));
         } catch (Throwable $e) {
             $response->status(500);
             static::log($e);
@@ -115,10 +115,10 @@ class BetaKiller_Kohana_Exception extends Kohana_Kohana_Exception
         return $response;
     }
 
-    public function render_custom_message($code)
+    public function renderCustomMessage($code)
     {
         try {
-            return $this->get_iface($code)->render();
+            return $this->getIFaceFromCode($code)->render();
         } catch (Throwable $e) {
             static::log($e);
 
@@ -131,7 +131,7 @@ class BetaKiller_Kohana_Exception extends Kohana_Kohana_Exception
      *
      * @return \BetaKiller\IFace\IFaceInterface
      */
-    protected function get_iface($code)
+    protected function getIFaceFromCode($code)
     {
         return $this->iface_from_codename('Error'.$code);
     }
@@ -141,15 +141,15 @@ class BetaKiller_Kohana_Exception extends Kohana_Kohana_Exception
      *
      * @return bool
      */
-    protected function always_show_nice_message()
+    protected function alwaysShowNiceMessage()
     {
         return false;
     }
 
-    public function render_default_message($code)
+    public function renderDefaultMessage($code)
     {
         // Получаем вьюшку для текущего исключения
-        $view = $this->get_view();
+        $view = $this->getView();
 
         // Чтобы не было XSS, преобразуем спецсимволы
         $view->set('message', HTML::chars($this->getUserMessage()));
@@ -167,7 +167,7 @@ class BetaKiller_Kohana_Exception extends Kohana_Kohana_Exception
      */
     public function template(View $error)
     {
-        return View::factory($this->get_view_path('template'), ['error' => $error]);
+        return View::factory($this->getViewPath('template'), ['error' => $error]);
     }
 
     /**
@@ -175,9 +175,9 @@ class BetaKiller_Kohana_Exception extends Kohana_Kohana_Exception
      *
      * @return View
      */
-    public function get_view()
+    public function getView()
     {
-        return View::factory($this->get_view_path());
+        return View::factory($this->getViewPath());
     }
 
     /**
@@ -185,7 +185,7 @@ class BetaKiller_Kohana_Exception extends Kohana_Kohana_Exception
      *
      * @return string
      */
-    protected function get_view_path($file = null)
+    protected function getViewPath($file = null)
     {
         return 'error-pages/'.($file ?: 500);
     }

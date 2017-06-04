@@ -14,9 +14,9 @@
 </style>
 
 <div class="well center">
-    <h2><span class="label label-danger"><?= __("System error") ?></span></h2>
-    <h4><?= __("Do not worry, we are already fixing that") ?>.</h4>
+    <h2><span class="label label-danger"><?php echo __('System error') ?></span></h2>
+    <h4><?php echo __('Don`t worry, we are fixing that already') ?>.</h4>
     <!--
-    <?= isset($message) ? $message : NULL ?>
+    <?php echo $message  ?? null ?>
     -->
 </div>

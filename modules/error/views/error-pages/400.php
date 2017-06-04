@@ -19,6 +19,6 @@
 </style>
 
 <div class="well center">
-    <h2><span class="label label-important"><?= __("Wrong HTTP request, check your browser.") ?></span></h2>
-    <h4><?= $message ?></h4>
+    <h2><span class="label label-important"><?php echo __("Wrong HTTP request, check your browser.") ?></span></h2>
+    <h4><?php echo $message ?></h4>
 </div>

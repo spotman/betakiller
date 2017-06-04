@@ -19,5 +19,5 @@
 </style>
 
 <div class="well center">
-    <h4><?= __("Page not found...") ?></h4>
+    <h4><?php echo __("Page not found...") ?></h4>
 </div>
