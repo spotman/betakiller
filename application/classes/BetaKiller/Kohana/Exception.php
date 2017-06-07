@@ -17,20 +17,8 @@ class BetaKiller_Kohana_Exception extends Kohana_Kohana_Exception
         parent::__construct($message, $variables, $code, $previous);
     }
 
-//    /**
-//     * Sending additional headers for better debugging
-//     * @param Exception $exception
-//     * @param Response $response
-//     * @deprecated
-//     */
-//    public static function add_debug_headers(Exception $exception, Response $response)
-//    {
-//        $response->headers('X-Exception-Class', get_class($exception));
-//        $response->headers('X-Exception-Message', $exception->getMessage());
-//    }
-
     /**
-     * @param Exception $exception
+     * @param Throwable $exception
      *
      * @return Response
      * @throws Kohana_Exception
