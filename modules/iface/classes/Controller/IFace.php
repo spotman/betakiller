@@ -97,7 +97,7 @@ class Controller_IFace extends Controller
     /**
      * @return \BetaKiller\Config\AppConfigInterface
      */
-    private function getAppConfig(): \BetaKiller\Config\AppConfigInterface
+    private function getAppConfig(): AppConfigInterface
     {
         return Container::getInstance()->get(AppConfigInterface::class);
     }
@@ -105,7 +105,7 @@ class Controller_IFace extends Controller
     /**
      * @return \BetaKiller\Model\UserInterface
      */
-    private function getCurrentUser(): \BetaKiller\Model\UserInterface
+    private function getCurrentUser(): UserInterface
     {
         return Container::getInstance()->get(UserInterface::class);
     }

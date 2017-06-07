@@ -11,7 +11,7 @@ class Widget_Content_Quotes extends AbstractBaseWidget
      *
      * @return array
      */
-    public function getData()
+    public function getData(): array
     {
         return $this->get_quote_data();
     }

@@ -2,8 +2,9 @@
 
 use BetaKiller\Config\ConfigInterface;
 use BetaKiller\IFace\Widget\WidgetException;
+use BetaKiller\IFace\Widget\AbstractBaseWidget;
 
-class Widget_Auth extends \BetaKiller\IFace\Widget\AbstractBaseWidget
+class Widget_Auth extends AbstractBaseWidget
 {
     const PROVIDER_REGULAR = 'regular';
     const PROVIDER_ULOGIN = 'uLogin';
@@ -20,11 +21,8 @@ class Widget_Auth extends \BetaKiller\IFace\Widget\AbstractBaseWidget
      * @return array
      * @throws WidgetException
      */
-    public function getData()
+    public function getData(): array
     {
-        // TODO DI
-        $this->_config = \BetaKiller\DI\Container::getInstance()->get(ConfigInterface::class);
-
         $providers = $this->_config->load(['auth', 'providers']);
 
         if (!$providers) {

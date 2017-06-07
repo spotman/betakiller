@@ -74,7 +74,7 @@ interface UrlParametersInterface
      * @param string    $key
      * @param bool|null $required
      *
-     * @return string|string[]
+     * @return string|int|array
      */
     public function getQueryPart($key, $required = null);
 

@@ -25,7 +25,7 @@ class UrlParametersHelper
     /**
      * @return \BetaKiller\IFace\Url\UrlParametersInterface
      */
-    public function createEmpty()
+    public function createEmpty(): UrlParametersInterface
     {
         return UrlParameters::create();
     }
@@ -33,7 +33,7 @@ class UrlParametersHelper
     /**
      * @return \BetaKiller\IFace\Url\UrlParametersInterface
      */
-    public function getCurrentUrlParameters()
+    public function getCurrentUrlParameters(): UrlParametersInterface
     {
         return $this->urlParameters;
     }
@@ -56,12 +56,17 @@ class UrlParametersHelper
         return $params->getEntityByClassName($className);
     }
 
-    protected function setEntity(DispatchableEntityInterface $model, UrlParametersInterface $params = null, $ignoreDuplicates = false)
+    protected function setEntity(DispatchableEntityInterface $model, UrlParametersInterface $params = null): UrlParametersInterface
     {
         if (!$params) {
             $params = $this->urlParameters;
         }
 
-        return $params->setEntity($model, $ignoreDuplicates);
+        return $params->setEntity($model, true);
+    }
+
+    public function getQueryPart(string $name, ?bool $required = null)
+    {
+        return $this->urlParameters->getQueryPart($name, $required);
     }
 }

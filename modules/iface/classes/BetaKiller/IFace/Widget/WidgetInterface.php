@@ -19,7 +19,7 @@ interface WidgetInterface
      *
      * @return string
      */
-    public function getName();
+    public function getName(): string;
 
     /**
      * @param \BetaKiller\Utils\Kohana\Request $request
@@ -48,7 +48,7 @@ interface WidgetInterface
      *
      * @return array
      */
-    public function getContext();
+    public function getContext(): array;
 
     /**
      * @param string $name
@@ -67,29 +67,29 @@ interface WidgetInterface
     /**
      * Default action for Controller_Widget
      */
-    public function action_render();
+    public function action_render(): void;
 
     /**
      * Renders widget View
      *
-     * @return Response
+     * @return string
      */
-    public function render();
+    public function render(): string;
 
     /**
      * Returns data for View rendering
      *
      * @return array
      */
-    public function getData();
+    public function getData(): array;
 
     /**
      * @param string $currentState
      */
-    public function setCurrentState($currentState);
+    public function setCurrentState($currentState): void;
 
     /**
      * @return string
      */
-    public function getCurrentState();
+    public function getCurrentState(): string;
 }

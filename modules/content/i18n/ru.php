@@ -63,4 +63,6 @@ return [
 
     'notification.user.comment.parent-author-reply.subj' => ':targetName, вам ответили на комментарий к записи ":label"',
     'notification.user.comment.parent-author-reply.text' => ':targetName,<br />вам ответили на комментарий от :created_at к записи "<strong>:label</strong>".<br />Прочитать комментарий можно по адресу <a href=":url">:url</a>',
+
+    'You can not preview this post' => 'You can not preview this post',
 ];

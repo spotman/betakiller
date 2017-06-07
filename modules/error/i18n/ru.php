@@ -4,4 +4,5 @@
  * Automatically generated from previous translation file.
  */
 return array (
+    'Authorize, please' => 'Authorize, please',
 );

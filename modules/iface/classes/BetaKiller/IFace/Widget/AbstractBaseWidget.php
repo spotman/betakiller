@@ -1,14 +1,11 @@
 <?php
 namespace BetaKiller\IFace\Widget;
 
-use BetaKiller\Helper\IFaceHelperTrait;
-use BetaKiller\IFace\Widget;
 use Twig;
+use View;
 
-abstract class AbstractBaseWidget extends Widget\AbstractWidget
+abstract class AbstractBaseWidget extends AbstractWidget
 {
-    use IFaceHelperTrait;
-
     /**
      * @Inject
      * @var \BetaKiller\Helper\IFaceHelper
@@ -27,9 +24,9 @@ abstract class AbstractBaseWidget extends Widget\AbstractWidget
      * @param null  $file
      * @param array $data
      *
-     * @return Twig
+     * @return Twig|View
      */
-    protected function view_factory($file = null, array $data = null)
+    protected function view_factory($file = null, ?array $data = null): View
     {
         return Twig::factory($file, $data);
     }

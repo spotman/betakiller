@@ -47,9 +47,9 @@ abstract class AbstractWidget implements WidgetInterface
      * @param null       $file
      * @param array|NULL $data
      *
-     * @return View
+     * @return \View
      */
-    abstract protected function view_factory($file = null, array $data = null);
+    abstract protected function view_factory($file = null, array $data = null): View;
 
     /**
      * @param string   $name Widget name
@@ -59,7 +59,7 @@ abstract class AbstractWidget implements WidgetInterface
      * @return \BetaKiller\IFace\Widget\WidgetInterface
      * @deprecated Use WidgetFactory instead
      */
-    public static function factory($name, Request $request = null, Response $response = null)
+    public static function factory($name, Request $request = null, Response $response = null): WidgetInterface
     {
         return WidgetFactory::getInstance()->create($name, $request, $response);
     }
@@ -91,7 +91,7 @@ abstract class AbstractWidget implements WidgetInterface
      *
      * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->_name;
     }
@@ -115,14 +115,14 @@ abstract class AbstractWidget implements WidgetInterface
      *
      * @return array
      */
-    public function getContext()
+    public function getContext(): array
     {
         return $this->_context;
     }
 
     public function getContextParam($name, $default = null)
     {
-        return isset($this->_context[$name]) ? $this->_context[$name] : $default;
+        return $this->_context[$name] ?? $default;
     }
 
     /**
@@ -140,25 +140,26 @@ abstract class AbstractWidget implements WidgetInterface
     }
 
     /**
-     * @param \Exception|\\Throwable $e
+     * @param \Throwable $e
      *
      * @return string
      * @todo Rewrite to ExceptionHandler and move exception handling logic to it
      */
-    protected function processException($e)
+    protected function processException(\Throwable $e): string
     {
         try {
             return (string)WidgetException::_handler($e);
         } catch (\Throwable $e) {
-            return null;
+            return '';
         }
     }
 
     /**
      * Default action for Controller_Widget
+     *
      * @deprecated Rewrite widget controller to direct Widget::render() call
      */
-    public function action_render()
+    public function action_render(): void
     {
         $this->_render();
     }
@@ -168,7 +169,7 @@ abstract class AbstractWidget implements WidgetInterface
      *
      * @return string
      */
-    public function render()
+    public function render(): string
     {
         $this->_render();
 
@@ -181,7 +182,7 @@ abstract class AbstractWidget implements WidgetInterface
      * Use $this->send_string() / $this->send_json() / $this->send_jsonp() methods to populate output
      * Override this method in your widget if default behaviour is not enough for you
      */
-    protected function _render()
+    protected function _render(): void
     {
         // Collecting data
         $data = $this->getData();
@@ -195,7 +196,9 @@ abstract class AbstractWidget implements WidgetInterface
         $view = $this->view();
 
         // Assigning data (override context keys)
-        $view->set($data);
+        foreach ($data as $key => $value) {
+            $view->set($key, $value);
+        }
 
         // Sending View to output
         $this->send_view($view);
@@ -206,7 +209,7 @@ abstract class AbstractWidget implements WidgetInterface
      *
      * @return array
      */
-    public function getData()
+    public function getData(): array
     {
         return [];
     }
@@ -214,7 +217,7 @@ abstract class AbstractWidget implements WidgetInterface
     /**
      * @param string $current_state
      */
-    public function setCurrentState($current_state)
+    public function setCurrentState($current_state): void
     {
         $this->_current_state = $current_state;
     }
@@ -222,14 +225,25 @@ abstract class AbstractWidget implements WidgetInterface
     /**
      * @return string
      */
-    public function getCurrentState()
+    public function getCurrentState(): string
     {
         return $this->_current_state;
     }
 
-    protected function url($action = null, $protocol = true)
+    /**
+     * @param null $action
+     * @param bool $protocol
+     *
+     * @return string
+     * @deprecated
+     */
+    protected function url($action = null, $protocol = null): string
     {
-        return Route::url('widget-controller', ['widget' => $this->getName(), 'action' => $action], $protocol);
+        return Route::url(
+            'widget-controller',
+            ['widget' => $this->getName(), 'action' => $action],
+            $protocol ?? true
+        );
     }
 
     /**
@@ -237,7 +251,7 @@ abstract class AbstractWidget implements WidgetInterface
      *
      * @return \View
      */
-    protected function view($file = null)
+    protected function view($file = null): \View
     {
         if (!$file) {
             $suffix = $this->_current_state !== static::DEFAULT_STATE
@@ -252,23 +266,23 @@ abstract class AbstractWidget implements WidgetInterface
         return $this->view_factory($view_path, $this->getContext());
     }
 
-    protected function get_validation_errors(Validation $validation)
+    protected function get_validation_errors(Validation $validation): array
     {
         return $validation->errors($this->get_validation_messages_path());
     }
 
-    private function get_validation_messages_path()
+    private function get_validation_messages_path(): string
     {
         return 'widgets'.DIRECTORY_SEPARATOR.str_replace('_', DIRECTORY_SEPARATOR, $this->_name);
     }
 
     /**
-     * @param string $message
-     * @param array  $variables
+     * @param string     $message
+     * @param array|null $variables
      *
      * @throws \BetaKiller\IFace\Widget\WidgetException
      */
-    protected function throw_exception($message, array $variables = [])
+    protected function throw_exception($message, ?array $variables = null): void
     {
         throw new WidgetException($message, $variables);
     }

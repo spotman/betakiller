@@ -15,7 +15,7 @@ abstract class Widget_Content_SidebarArticlesList extends AbstractBaseWidget
      *
      * @return array
      */
-    public function getData()
+    public function getData(): array
     {
         $limit      = (int)$this->getContextParam('limit', 5);
         $exclude_id = $this->get_current_article_id();

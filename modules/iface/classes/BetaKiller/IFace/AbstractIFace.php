@@ -3,6 +3,7 @@ namespace BetaKiller\IFace;
 
 use BetaKiller\Config\AppConfigInterface;
 use BetaKiller\IFace\Exception\IFaceException;
+use BetaKiller\IFace\Url\UrlDataSourceInterface;
 use BetaKiller\IFace\Url\UrlDispatcher;
 use BetaKiller\IFace\Url\UrlParametersInterface;
 use DateInterval;
@@ -457,7 +458,6 @@ abstract class AbstractIFace implements IFaceInterface
         $parts   = [];
         $current = $this;
 
-        /** @var IFaceInterface $parent */
         $parent = null;
 
         do {
@@ -530,31 +530,34 @@ abstract class AbstractIFace implements IFaceInterface
      *
      * @return string[]
      */
-    private function getDynamicModelAvailableUrls(UrlParametersInterface $params, $limit = null)
+    private function getDynamicModelAvailableUrls(UrlParametersInterface $params, $limit = null): array
     {
         $prototype  = $this->prototypeHelper->fromIFaceUri($this);
         $dataSource = $this->prototypeHelper->getDataSourceInstance($prototype);
 
-        $modelKey = $prototype->getModelKey();
+        return $this->getDataSourceAvailableUrls($dataSource, $prototype->getModelKey(), $params, $limit);
+    }
 
-        $items = $dataSource->getAvailableItemsByUrlKey($modelKey, $params, $limit);
-        $urls  = [];
+    private function getDataSourceAvailableUrls(UrlDataSourceInterface $dataSource, string $key, UrlParametersInterface $params, $limit = null): array
+    {
+        $items = $dataSource->getAvailableItemsByUrlKey($key, $params, $limit);
+        $urlsBlocks  = [];
 
         foreach ($items as $item) {
             // Save current item to parameters registry
             $params->setEntity($item, true);
 
             // Make dynamic URL
-            $urls[] = $this->makeAvailableUrl($params);
+            $urlsBlocks[] = [$this->makeAvailableUrl($params)];
 
             // Recursion for trees
             if ($this->getModel()->hasTreeBehaviour()) {
                 // Recursion for tree behaviour
-                $urls = array_merge($urls, $this->getDynamicModelAvailableUrls($params, $limit));
+                $urlsBlocks[] = $this->getDataSourceAvailableUrls($dataSource, $key, $params, $limit);
             }
         }
 
-        return $urls;
+        return array_merge(...$urlsBlocks);
     }
 
     private function makeAvailableUrl(UrlParametersInterface $params = null)

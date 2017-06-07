@@ -24,12 +24,12 @@ class Widget_Content_ArticlesList extends AbstractBaseWidget
      *
      * @return array
      */
-    public function getData()
+    public function getData(): array
     {
         return $this->get_articles_data();
     }
 
-    public function action_more()
+    public function action_more(): void
     {
         $this->content_type_json();
 
@@ -38,7 +38,7 @@ class Widget_Content_ArticlesList extends AbstractBaseWidget
         $this->send_success_json($data);
     }
 
-    protected function get_articles_data()
+    protected function get_articles_data(): array
     {
         $posts_data = [];
 
@@ -50,25 +50,21 @@ class Widget_Content_ArticlesList extends AbstractBaseWidget
 
         /** @var Model_ContentPost[] $articles */
         $articles = $results->getItems();
-        $index = 1;
 
         foreach ($articles as $article) {
-            $is_large = ($index % 3 === 1);
-
             $thumbnail = $article->getFirstThumbnail();
-            $thumbnail_size = $is_large ? $thumbnail::SIZE_ORIGINAL : $thumbnail::SIZE_PREVIEW;
 
             $posts_data[] = [
-                'is_large'      =>  $is_large,
-                'thumbnail'     =>  $thumbnail->getAttributesForImgTag($thumbnail_size),
+                'thumbnail' => [
+                    'original' => $thumbnail->getAttributesForImgTag($thumbnail::SIZE_ORIGINAL),
+                    'preview' => $thumbnail->getAttributesForImgTag($thumbnail::SIZE_PREVIEW),
+                ],
                 'url'           =>  $this->ifaceHelper->getReadEntityUrl($article, IFaceZone::PUBLIC_ZONE),
                 'label'         =>  $article->getLabel(),
                 'title'         =>  $article->getTitle(),
                 'text'          =>  $article->getContentPreview(),
                 'created_at'    =>  $article->getCreatedAt()->format('d.m.Y'),
             ];
-
-            $index++;
         }
 
         if ($results->hasNextPage()) {
@@ -100,7 +96,7 @@ class Widget_Content_ArticlesList extends AbstractBaseWidget
         return $this->urlParametersHelper->getContentCategory();
     }
 
-    protected function get_search_term()
+    protected function get_search_term(): string
     {
         return $this->getContextParam('term') ?: HTML::chars(strip_tags($this->query(self::SEARCH_TERM_QUERY_KEY)));
     }
@@ -112,7 +108,7 @@ class Widget_Content_ArticlesList extends AbstractBaseWidget
      *
      * @return \BetaKiller\Search\Model\Results
      */
-    protected function get_articles($page, Model_ContentCategory $category = null, $term = null)
+    protected function get_articles($page, Model_ContentCategory $category = null, $term = null): \BetaKiller\Search\Model\Results
     {
         $posts_orm = $this->model_factory_content_post();
 

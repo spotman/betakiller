@@ -20,12 +20,12 @@ abstract class AbstractAdminWidget extends AbstractBaseWidget
         $this->user = $user;
     }
 
-    public function render()
+    public function render(): string
     {
         if (!$this->isAccessAllowed()) {
 
             if ($this->isEmptyResponseAllowed()) {
-                return null;
+                return '';
             }
 
             throw new \HTTP_Exception_403('Permission denied');
@@ -34,7 +34,7 @@ abstract class AbstractAdminWidget extends AbstractBaseWidget
         return parent::render();
     }
 
-    protected function isAccessAllowed()
+    protected function isAccessAllowed(): bool
     {
         /** @var \BetaKiller\Acl\Resource\AdminResource $adminResource */
         $adminResource = $this->aclHelper->getResource('Admin');
