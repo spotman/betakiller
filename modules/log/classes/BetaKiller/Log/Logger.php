@@ -2,7 +2,6 @@
 namespace BetaKiller\Log;
 
 use BetaKiller\Helper\AppEnv;
-use BetaKiller\Model\UserInterface;
 use Monolog\Handler\DeduplicationHandler;
 use Monolog\Handler\PHPConsoleHandler;
 use Monolog\Handler\StreamHandler;
@@ -31,21 +30,21 @@ class Logger implements LoggerInterface
     private $appEnv;
 
     /**
-     * @var \BetaKiller\Model\UserInterface
+     * @var MultiSite
      */
-    private $user;
+    private $multiSite;
 
     /**
      * Logger constructor.
      *
-     * @param \BetaKiller\Helper\AppEnv       $env
-     * @param \BetaKiller\Model\UserInterface $user
+     * @param \BetaKiller\Helper\AppEnv $env
+     * @param MultiSite                 $multiSite
      */
-    public function __construct(AppEnv $env, UserInterface $user)
+    public function __construct(AppEnv $env, MultiSite $multiSite)
     {
-        $this->appEnv = $env;
-        $this->user   = $user;
-        $this->logger = $this->getMonologInstance();
+        $this->appEnv    = $env;
+        $this->multiSite = $multiSite;
+        $this->logger    = $this->getMonologInstance();
     }
 
     protected function getMonologInstance()
@@ -56,7 +55,7 @@ class Logger implements LoggerInterface
 
         $logFilePath     = implode(DIRECTORY_SEPARATOR, ['logs', date('Y'), date('m'), date('d').'.log']);
         $coreLogFilePath = APPPATH.$logFilePath;
-        $appLogFilePath  = MultiSite::instance()->getWorkingPath().DIRECTORY_SEPARATOR.$logFilePath;
+        $appLogFilePath  = $this->multiSite->getWorkingPath().DIRECTORY_SEPARATOR.$logFilePath;
 
         $stripExceptionFormatter = new StripExceptionFromContextFormatter();
 
@@ -73,7 +72,8 @@ class Logger implements LoggerInterface
 
         $monolog->pushHandler(new DeduplicationHandler($groupHandler));
 
-        $debugAllowed = $this->appEnv->inDevelopmentMode() || $this->user->isDeveloper();
+        // TODO Implement boolean flag in session named "debugEnabled"
+        $debugAllowed = $this->appEnv->inDevelopmentMode();
 
         // Enable debugging via PhpConsole for developers
         if ($debugAllowed && Connector::getInstance()->isActiveClient()) {
@@ -102,7 +102,7 @@ class Logger implements LoggerInterface
      *
      * @return void
      */
-    public function log($level, $message, array $context = [])
+    public function log($level, $message, array $context = null): void
     {
         // Proxy to selected logger
         $this->logger->log($level, $message, $context);

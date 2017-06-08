@@ -13,7 +13,7 @@ class Widget_CustomTag_Youtube extends AbstractBaseWidget
      * @throws \BetaKiller\IFace\Widget\WidgetException
      * @return array
      */
-    public function getData()
+    public function getData(): array
     {
         $context = $this->getContext();
 

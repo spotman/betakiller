@@ -1,9 +1,10 @@
 <?php
 
 use BetaKiller\Acl\Resource\EntityRelatedAclResourceInterface;
+use BetaKiller\Acl\Resource\StatusRelatedEntityAclResourceInterface;
 use BetaKiller\Content\ImportedFromWordpressInterface;
 use BetaKiller\Content\Shortcode;
-use BetaKiller\Helper\IFaceHelperTrait;
+use BetaKiller\Exception;
 use BetaKiller\Helper\SeoMetaInterface;
 use BetaKiller\IFace\Url\UrlDispatcher;
 use BetaKiller\IFace\Url\UrlParametersInterface;
@@ -18,8 +19,7 @@ class Model_ContentPost extends \ORM implements StatusRelatedModelInterface, Mod
     use StatusRelatedModelOrmTrait,
         ModelWithRevisionsOrmTrait,
         Model_ORM_SeoContentTrait,
-        Model_ORM_ImportedFromWordpressTrait,
-        IFaceHelperTrait {
+        Model_ORM_ImportedFromWordpressTrait {
         StatusRelatedModelOrmTrait::workflow as private baseWorkflow;
     }
 
@@ -321,7 +321,7 @@ class Model_ContentPost extends \ORM implements StatusRelatedModelInterface, Mod
      * @return string
      * @throws Kohana_Exception
      */
-    public function getLabel()
+    public function getLabel(): string
     {
         return $this->get('label');
     }
@@ -571,7 +571,7 @@ class Model_ContentPost extends \ORM implements StatusRelatedModelInterface, Mod
      *
      * @return void
      */
-    public function presetLinkedModels(UrlParametersInterface $parameters)
+    public function presetLinkedModels(UrlParametersInterface $parameters): void
     {
         $category = $this->getCategory();
 
@@ -768,6 +768,13 @@ class Model_ContentPost extends \ORM implements StatusRelatedModelInterface, Mod
      */
     protected function securityFilter(EntityRelatedAclResourceInterface $aclResource, $action)
     {
+        if (!($aclResource instanceof StatusRelatedEntityAclResourceInterface)) {
+            throw new Exception('Acl resource :name must implement :must for security filter processing', [
+                ':name' => $aclResource->getResourceId(),
+                ':must' => StatusRelatedEntityAclResourceInterface::class,
+            ]);
+        }
+
         $this->filterAllowedStatuses($aclResource);
     }
 }

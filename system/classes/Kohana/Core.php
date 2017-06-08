@@ -109,7 +109,18 @@ class Kohana_Core {
 	/**
 	 * @var  array  Types of errors to display at shutdown
 	 */
-	public static $shutdown_errors = array(E_PARSE, E_ERROR, E_USER_ERROR);
+	public static $shutdown_errors = array(
+	    E_PARSE,
+        E_ERROR,
+        E_USER_ERROR,
+        E_COMPILE_ERROR,
+        E_COMPILE_WARNING,
+        E_STRICT,
+        E_DEPRECATED,
+        E_CORE_ERROR,
+        E_CORE_WARNING,
+        E_NOTICE,
+    );
 
 	/**
 	 * @var  boolean  set the X-Powered-By header
@@ -983,7 +994,7 @@ class Kohana_Core {
 	 */
 	public static function error_handler($code, $error, $file = NULL, $line = NULL)
 	{
-		if (error_reporting() & $code)
+        if (error_reporting() & $code)
 		{
 			// This error is not suppressed by current error reporting settings
 			// Convert the error into an ErrorException
@@ -1008,23 +1019,23 @@ class Kohana_Core {
 			return;
 		}
 
-		try
+        try
 		{
-			if (Kohana::$caching === TRUE AND Kohana::$_files_changed === TRUE)
+            if (Kohana::$caching === TRUE && Kohana::$_files_changed === TRUE)
 			{
 				// Write the file path cache
 				Kohana::cache('Kohana::find_file()', Kohana::$_files);
 			}
 		}
-		catch (Exception $e)
+		catch (Throwable $e)
 		{
 			// Pass the exception to the handler
 			Kohana_Exception::handler($e);
 		}
 
-		if (Kohana::$errors AND $error = error_get_last() AND in_array($error['type'], Kohana::$shutdown_errors))
+        if (Kohana::$errors && ($error = error_get_last()) && in_array($error['type'], Kohana::$shutdown_errors, true))
 		{
-			// Clean the output buffer
+            // Clean the output buffer
 			ob_get_level() AND ob_clean();
 
 			// Fake an exception for nice debugging

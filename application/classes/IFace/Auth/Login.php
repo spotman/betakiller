@@ -1,9 +1,9 @@
 <?php
 
-use BetaKiller\IFace\IFace;
+use BetaKiller\IFace\AbstractIFace;
 use BetaKiller\Model\UserInterface;
 
-class IFace_Auth_Login extends IFace
+class IFace_Auth_Login extends AbstractIFace
 {
     /**
      * @var string Default url for relocate after successful login
@@ -19,8 +19,16 @@ class IFace_Auth_Login extends IFace
      */
     protected $user;
 
+    /**
+     * @Inject
+     * @var \BetaKiller\Helper\ResponseHelper
+     */
+    private $responseHelper;
+
     public function __construct(UserInterface $user)
     {
+        parent::__construct();
+
         $this->user = $user;
 
         $request = Request::current();
@@ -38,7 +46,7 @@ class IFace_Auth_Login extends IFace
         }
     }
 
-    public function before()
+    public function before(): void
     {
         // If user already authorized
         if (!$this->user->isGuest()) {
@@ -48,11 +56,11 @@ class IFace_Auth_Login extends IFace
             }
 
             // Redirect him
-            $this->redirect($this->redirectUrl);
+            $this->responseHelper->redirect($this->redirectUrl);
         }
     }
 
-    public function getData()
+    public function getData(): array
     {
         return [
             'redirect_url' => $this->redirectUrl,
@@ -74,7 +82,7 @@ class IFace_Auth_Login extends IFace
         return $this->setRedirectUrl($url);
     }
 
-    public function getUri()
+    public function getUri(): string
     {
         $redirect_query = $this->redirectUrl
             ? '?'.$this->redirectUrlQueryParam.'='.urlencode($this->redirectUrl)

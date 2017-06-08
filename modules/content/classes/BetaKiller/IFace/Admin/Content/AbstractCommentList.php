@@ -1,7 +1,7 @@
 <?php
 namespace BetaKiller\IFace\Admin\Content;
 
-abstract class AbstractCommentList extends AdminBase
+abstract class AbstractCommentList extends AbstractAdminBase
 {
     /**
      * Returns data for View
@@ -9,7 +9,7 @@ abstract class AbstractCommentList extends AdminBase
      *
      * @return array
      */
-    public function getData()
+    public function getData(): array
     {
         $comments = $this->get_comments_list();
 

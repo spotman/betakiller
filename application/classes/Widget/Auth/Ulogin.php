@@ -4,18 +4,18 @@ use BetaKiller\IFace\Widget\AbstractBaseWidget;
 
 class Widget_Auth_Ulogin extends AbstractBaseWidget
 {
-    public function getData()
+    public function getData(): array
     {
         $instance = $this->ulogin_factory();
 
         $auth_callback = 'ulogin_auth_callback';
         $instance->set_javascript_callback($auth_callback);
 
-        return array(
-            'token_login_url'   =>  $instance->get_redirect_uri(),
-            'auth_callback'     =>  $auth_callback,
-            'ulogin_view'       =>  $instance->render(),
-        );
+        return [
+            'token_login_url' => $instance->get_redirect_uri(),
+            'auth_callback'   => $auth_callback,
+            'ulogin_view'     => $instance->render(),
+        ];
     }
 
     public function action_auth()
@@ -29,7 +29,7 @@ class Widget_Auth_Ulogin extends AbstractBaseWidget
             $this->send_json();
         } catch (Ulogin_Exception $e) {
             throw $e;
-        } catch ( Exception $e ) {
+        } catch (Throwable $e) {
             throw $e;
         }
     }

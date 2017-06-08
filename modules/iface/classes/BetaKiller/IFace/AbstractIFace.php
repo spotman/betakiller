@@ -19,17 +19,17 @@ abstract class AbstractIFace implements IFaceInterface
     private $faceModel;
 
     /**
-     * @var IFaceInterface Parent iface
+     * @var IFaceInterface|null Parent iface
      */
     private $parent;
 
     /**
-     * @var DateTime
+     * @var DateTime|null
      */
     private $lastModified;
 
     /**
-     * @var DateInterval
+     * @var DateInterval|null
      */
     private $expiresInterval;
 
@@ -57,18 +57,6 @@ abstract class AbstractIFace implements IFaceInterface
      */
     private $prototypeHelper;
 
-    /**
-     * Returns URL query parts array for current HTTP request
-     *
-     * @todo Remove and replace in client code with RequestHelper
-     * @deprecated
-     *
-     * @param $key
-     *
-     * @return array
-     */
-    abstract protected function getUrlQuery($key = null);
-
     public function __construct()
     {
         // Empty by default
@@ -77,7 +65,7 @@ abstract class AbstractIFace implements IFaceInterface
     /**
      * @return string
      */
-    public function getCodename()
+    public function getCodename(): string
     {
         return $this->getModel()->getCodename();
     }
@@ -85,12 +73,12 @@ abstract class AbstractIFace implements IFaceInterface
     /**
      * @return string
      */
-    public function render()
+    public function render(): string
     {
         return $this->ifaceHelper->renderIFace($this);
     }
 
-    public function getLayoutCodename()
+    public function getLayoutCodename(): string
     {
         return $this->getModel()->getLayoutCodename();
     }
@@ -100,9 +88,9 @@ abstract class AbstractIFace implements IFaceInterface
      *
      * @param UrlParametersInterface|null $params
      *
-     * @return mixed
+     * @return string
      */
-    public function getLabel(UrlParametersInterface $params = null)
+    public function getLabel(UrlParametersInterface $params = null): string
     {
         return $this->processStringPattern($this->getLabelSource(), null, $params);
     }
@@ -112,7 +100,7 @@ abstract class AbstractIFace implements IFaceInterface
      *
      * @return string
      */
-    public function getTitle()
+    public function getTitle(): ?string
     {
         return $this->processStringPattern($this->getTitleSource(), 80); // Limit to 80 chars
     }
@@ -122,7 +110,7 @@ abstract class AbstractIFace implements IFaceInterface
      *
      * @return string
      */
-    public function getDescription()
+    public function getDescription(): ?string
     {
         return $this->processStringPattern($this->getDescriptionSource());
     }
@@ -134,7 +122,7 @@ abstract class AbstractIFace implements IFaceInterface
      *
      * @return $this
      */
-    public function setTitle($value)
+    public function setTitle(string $value)
     {
         $this->getModel()->setTitle($value);
 
@@ -148,7 +136,7 @@ abstract class AbstractIFace implements IFaceInterface
      *
      * @return $this
      */
-    public function setDescription($value)
+    public function setDescription(string $value)
     {
         $this->getModel()->setDescription($value);
 
@@ -166,8 +154,12 @@ abstract class AbstractIFace implements IFaceInterface
      *
      * @return string
      */
-    private function processStringPattern($source, $limit = null, UrlParametersInterface $params = null)
+    private function processStringPattern(?string $source, ?int $limit = null, UrlParametersInterface $params = null): ?string
     {
+        if (!$source) {
+            return null;
+        }
+
         // Replace url parameters
         $source = $this->prototypeHelper->replaceUrlParametersParts($source, $params);
 
@@ -227,7 +219,7 @@ abstract class AbstractIFace implements IFaceInterface
      *
      * @return string
      */
-    public function getLabelSource()
+    public function getLabelSource(): string
     {
         return $this->getModel()->getLabel();
     }
@@ -237,7 +229,7 @@ abstract class AbstractIFace implements IFaceInterface
      *
      * @return string
      */
-    public function getTitleSource()
+    public function getTitleSource(): ?string
     {
         return $this->getModel()->getTitle();
     }
@@ -247,7 +239,7 @@ abstract class AbstractIFace implements IFaceInterface
      *
      * @return string
      */
-    public function getDescriptionSource()
+    public function getDescriptionSource(): ?string
     {
         return $this->getModel()->getDescription();
     }
@@ -267,7 +259,7 @@ abstract class AbstractIFace implements IFaceInterface
     /**
      * @return \DateTime
      */
-    public function getLastModified()
+    public function getLastModified(): DateTime
     {
         return $this->lastModified ?: $this->getDefaultLastModified();
     }
@@ -275,7 +267,7 @@ abstract class AbstractIFace implements IFaceInterface
     /**
      * @return \DateTime
      */
-    public function getDefaultLastModified()
+    public function getDefaultLastModified(): DateTime
     {
         return new \DateTime();
     }
@@ -283,7 +275,7 @@ abstract class AbstractIFace implements IFaceInterface
     /**
      * @return DateInterval
      */
-    public function getDefaultExpiresInterval()
+    public function getDefaultExpiresInterval(): DateInterval
     {
         return new \DateInterval('PT1H');
     }
@@ -303,7 +295,7 @@ abstract class AbstractIFace implements IFaceInterface
     /**
      * @return \DateInterval
      */
-    public function getExpiresInterval()
+    public function getExpiresInterval(): DateInterval
     {
         return $this->expiresInterval ?: $this->getDefaultExpiresInterval();
     }
@@ -311,7 +303,7 @@ abstract class AbstractIFace implements IFaceInterface
     /**
      * @return \DateTime
      */
-    public function getExpiresDateTime()
+    public function getExpiresDateTime(): DateTime
     {
         return (new \DateTime())->add($this->getExpiresInterval());
     }
@@ -319,7 +311,7 @@ abstract class AbstractIFace implements IFaceInterface
     /**
      * @return int
      */
-    public function getExpiresSeconds()
+    public function getExpiresSeconds(): int
     {
         $reference = new \DateTimeImmutable;
         $endTime   = $reference->add($this->getExpiresInterval());
@@ -331,7 +323,7 @@ abstract class AbstractIFace implements IFaceInterface
      * This hook executed before IFace processing (on every request regardless of caching)
      * Place here code that needs to be executed on every IFace request (increment views counter, etc)
      */
-    public function before()
+    public function before(): void
     {
         // Empty by default
     }
@@ -340,12 +332,12 @@ abstract class AbstractIFace implements IFaceInterface
      * This hook executed after real IFace processing only (on every request if IFace output was not cached)
      * Place here the code that needs to be executed only after real IFace processing (collect performance stat, etc)
      */
-    public function after()
+    public function after(): void
     {
         // Empty by default
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         return (string)$this->render();
     }
@@ -353,7 +345,7 @@ abstract class AbstractIFace implements IFaceInterface
     /**
      * @return \BetaKiller\IFace\IFaceInterface|null
      */
-    public function getParent()
+    public function getParent(): ?IFaceInterface
     {
         if (!$this->parent) {
             $this->parent = $this->ifaceProvider->getParent($this);
@@ -374,7 +366,7 @@ abstract class AbstractIFace implements IFaceInterface
      *
      * @return IFaceModelInterface
      */
-    public function getModel()
+    public function getModel(): IFaceModelInterface
     {
         return $this->faceModel;
     }
@@ -393,17 +385,17 @@ abstract class AbstractIFace implements IFaceInterface
         return $this;
     }
 
-    public function isDefault()
+    public function isDefault(): bool
     {
         return $this->getModel()->isDefault();
     }
 
-    public function isInStack()
+    public function isInStack(): bool
     {
         return $this->ifaceHelper->isInStack($this);
     }
 
-    public function isCurrent(UrlParametersInterface $parameters = null)
+    public function isCurrent(UrlParametersInterface $parameters = null): bool
     {
         return $this->ifaceHelper->isCurrentIFace($this, $parameters);
     }
@@ -413,7 +405,7 @@ abstract class AbstractIFace implements IFaceInterface
      *
      * @return string
      */
-    public function getEntityModelName()
+    public function getEntityModelName(): ?string
     {
         return $this->getModel()->getEntityModelName();
     }
@@ -423,7 +415,7 @@ abstract class AbstractIFace implements IFaceInterface
      *
      * @return string
      */
-    public function getEntityActionName()
+    public function getEntityActionName(): ?string
     {
         return $this->getModel()->getEntityActionName();
     }
@@ -434,7 +426,7 @@ abstract class AbstractIFace implements IFaceInterface
      *
      * @return string
      */
-    public function getZoneName()
+    public function getZoneName(): string
     {
         return $this->getModel()->getZoneName() ?: $this->getParent()->getZoneName();
     }
@@ -444,12 +436,12 @@ abstract class AbstractIFace implements IFaceInterface
      *
      * @return string[]
      */
-    public function getAdditionalAclRules()
+    public function getAdditionalAclRules(): array
     {
         return $this->getModel()->getAdditionalAclRules();
     }
 
-    public function url(UrlParametersInterface $parameters = null, $removeCyclingLinks = true, $withDomain = true)
+    public function url(UrlParametersInterface $parameters = null, ?bool $removeCyclingLinks = null, ?bool $withDomain = null): string
     {
         if ($removeCyclingLinks && $this->isCurrent($parameters)) {
             return $this->appConfig->getCircularLinkHref();
@@ -485,7 +477,7 @@ abstract class AbstractIFace implements IFaceInterface
         return $withDomain ? URL::site($path, true) : $path;
     }
 
-    private function makeUri(UrlParametersInterface $parameters = null)
+    private function makeUri(UrlParametersInterface $parameters = null): string
     {
         $model = $this->getModel();
 
@@ -503,7 +495,7 @@ abstract class AbstractIFace implements IFaceInterface
         return $this->prototypeHelper->getCompiledPrototypeValue($uri, $parameters, $model->hasTreeBehaviour());
     }
 
-    public function getUri()
+    public function getUri(): string
     {
         return $this->getModel()->getUri();
     }
@@ -514,7 +506,7 @@ abstract class AbstractIFace implements IFaceInterface
      *
      * @return string[]
      */
-    public function getAvailableUrls(UrlParametersInterface $params, $limit = null)
+    public function getAvailableUrls(UrlParametersInterface $params, ?int $limit = null): array
     {
         if (!$this->getModel()->hasDynamicUrl()) {
             // Make static URL
@@ -530,7 +522,7 @@ abstract class AbstractIFace implements IFaceInterface
      *
      * @return string[]
      */
-    private function getDynamicModelAvailableUrls(UrlParametersInterface $params, $limit = null): array
+    private function getDynamicModelAvailableUrls(UrlParametersInterface $params, ?int $limit = null): array
     {
         $prototype  = $this->prototypeHelper->fromIFaceUri($this);
         $dataSource = $this->prototypeHelper->getDataSourceInstance($prototype);
@@ -538,7 +530,7 @@ abstract class AbstractIFace implements IFaceInterface
         return $this->getDataSourceAvailableUrls($dataSource, $prototype->getModelKey(), $params, $limit);
     }
 
-    private function getDataSourceAvailableUrls(UrlDataSourceInterface $dataSource, string $key, UrlParametersInterface $params, $limit = null): array
+    private function getDataSourceAvailableUrls(UrlDataSourceInterface $dataSource, string $key, UrlParametersInterface $params, ?int $limit = null): array
     {
         $items = $dataSource->getAvailableItemsByUrlKey($key, $params, $limit);
         $urlsBlocks  = [];
@@ -560,7 +552,7 @@ abstract class AbstractIFace implements IFaceInterface
         return array_merge(...$urlsBlocks);
     }
 
-    private function makeAvailableUrl(UrlParametersInterface $params = null)
+    private function makeAvailableUrl(UrlParametersInterface $params = null): string
     {
         return $this->url($params, false); // Disable cycling links removing
     }

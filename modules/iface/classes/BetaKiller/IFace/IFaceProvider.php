@@ -60,9 +60,7 @@ class IFaceProvider
      */
     protected function getInstanceFromCache($codename)
     {
-        return isset($this->ifaceInstances[$codename])
-            ? $this->ifaceInstances[$codename]
-            : null;
+        return $this->ifaceInstances[$codename] ?? null;
     }
 
     /**
@@ -196,7 +194,7 @@ class IFaceProvider
      * @param string $action
      * @param string $zone
      *
-     * @return \BetaKiller\IFace\IFace[]
+     * @return \BetaKiller\IFace\IFaceInterface[]
      */
     public function getByActionAndZone($action, $zone)
     {

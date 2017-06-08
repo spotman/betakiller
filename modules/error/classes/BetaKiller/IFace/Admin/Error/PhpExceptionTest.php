@@ -9,7 +9,7 @@ class PhpExceptionTest extends ErrorAdminBase
      *
      * @return array
      */
-    public function getData()
+    public function getData(): array
     {
         return [];
     }

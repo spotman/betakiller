@@ -1,7 +1,7 @@
 <?php
 namespace BetaKiller\IFace\Admin;
 
-class Index extends AdminBase
+class Index extends AbstractAdminBase
 {
     /**
      * Returns data for View
@@ -9,7 +9,7 @@ class Index extends AdminBase
      *
      * @return array
      */
-    public function getData()
+    public function getData(): array
     {
         return [];
     }

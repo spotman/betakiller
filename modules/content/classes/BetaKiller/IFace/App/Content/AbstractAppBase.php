@@ -2,9 +2,9 @@
 namespace BetaKiller\IFace\App\Content;
 
 use BetaKiller\Helper\ContentTrait;
-use BetaKiller\IFace\IFace;
+use BetaKiller\IFace\AbstractIFace;
 
-abstract class AbstractAppBase extends IFace
+abstract class AbstractAppBase extends AbstractIFace
 {
     use ContentTrait;
 }

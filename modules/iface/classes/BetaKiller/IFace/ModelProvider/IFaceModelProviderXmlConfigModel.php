@@ -21,7 +21,7 @@ class IFaceModelProviderXmlConfigModel implements IFaceModelInterface
     private $codename;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $parentCodename;
 
@@ -63,12 +63,12 @@ class IFaceModelProviderXmlConfigModel implements IFaceModelInterface
     private $hideInSiteMap = false;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $entityName;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $entityAction;
 
@@ -97,7 +97,7 @@ class IFaceModelProviderXmlConfigModel implements IFaceModelInterface
      *
      * @return bool
      */
-    public function isDefault()
+    public function isDefault(): bool
     {
         // Admin IFaces can not have "is_default" marker
         return false;
@@ -117,7 +117,7 @@ class IFaceModelProviderXmlConfigModel implements IFaceModelInterface
      *
      * @return string
      */
-    public function getUri()
+    public function getUri(): string
     {
         return $this->uri;
     }
@@ -127,7 +127,7 @@ class IFaceModelProviderXmlConfigModel implements IFaceModelInterface
      *
      * @return IFaceModelInterface|null
      */
-    public function getParent()
+    public function getParent(): ?IFaceModelInterface
     {
         if (!$this->parentCodename) {
             return null;
@@ -139,9 +139,9 @@ class IFaceModelProviderXmlConfigModel implements IFaceModelInterface
     /**
      * Returns codename of parent IFace or NULL
      *
-     * @return string
+     * @return string|null
      */
-    public function getParentCodename()
+    public function getParentCodename(): ?string
     {
         return $this->parentCodename;
     }
@@ -194,7 +194,7 @@ class IFaceModelProviderXmlConfigModel implements IFaceModelInterface
      * @return $this
      * @throws HTTP_Exception_501
      */
-    public function setTitle($value)
+    public function setTitle(string $value)
     {
         throw new HTTP_Exception_501('Admin model can not change title');
     }
@@ -207,7 +207,7 @@ class IFaceModelProviderXmlConfigModel implements IFaceModelInterface
      * @return $this
      * @throws HTTP_Exception_501
      */
-    public function setDescription($value)
+    public function setDescription(string $value)
     {
         throw new HTTP_Exception_501('Admin model can not change description');
     }
@@ -217,7 +217,7 @@ class IFaceModelProviderXmlConfigModel implements IFaceModelInterface
      *
      * @return string
      */
-    public function getCodename()
+    public function getCodename(): string
     {
         return $this->codename;
     }
@@ -227,7 +227,7 @@ class IFaceModelProviderXmlConfigModel implements IFaceModelInterface
      *
      * @return string
      */
-    public function getLabel()
+    public function getLabel(): string
     {
         return $this->label;
     }
@@ -237,7 +237,7 @@ class IFaceModelProviderXmlConfigModel implements IFaceModelInterface
      *
      * @return string
      */
-    public function getTitle()
+    public function getTitle(): ?string
     {
         return $this->title;
     }
@@ -247,7 +247,7 @@ class IFaceModelProviderXmlConfigModel implements IFaceModelInterface
      *
      * @return string
      */
-    public function getDescription()
+    public function getDescription(): ?string
     {
         // Admin IFace does not need description
         return null;
@@ -258,7 +258,7 @@ class IFaceModelProviderXmlConfigModel implements IFaceModelInterface
      *
      * @return array
      */
-    public function asArray()
+    public function asArray(): array
     {
         return [
             'codename'       => $this->getCodename(),
@@ -281,18 +281,18 @@ class IFaceModelProviderXmlConfigModel implements IFaceModelInterface
      *
      * @return string
      */
-    public function getLayoutCodename()
+    public function getLayoutCodename(): string
     {
         return $this->layoutCodename;
     }
 
-    public function fromArray(array $data)
+    public function fromArray(array $data): void
     {
         $this->codename = $data['codename'];
         $this->uri      = $data['uri'];
 
-        $this->label = isset($data['label']) ? $data['label'] : null;
-        $this->title = isset($data['title']) ? $data['title'] : null;
+        $this->label = $data['label'] ?? null;
+        $this->title = $data['title'] ?? null;
 
         if (isset($data['parentCodename'])) {
             $this->parentCodename = (string)$data['parentCodename'];
@@ -337,7 +337,7 @@ class IFaceModelProviderXmlConfigModel implements IFaceModelInterface
      *
      * @return bool
      */
-    public function hasDynamicUrl()
+    public function hasDynamicUrl(): bool
     {
         return $this->hasDynamicUrl;
     }
@@ -347,7 +347,7 @@ class IFaceModelProviderXmlConfigModel implements IFaceModelInterface
      *
      * @return bool
      */
-    public function hasTreeBehaviour()
+    public function hasTreeBehaviour(): bool
     {
         return $this->hasTreeBehaviour;
     }
@@ -355,7 +355,7 @@ class IFaceModelProviderXmlConfigModel implements IFaceModelInterface
     /**
      * @return bool
      */
-    public function hideInSiteMap()
+    public function hideInSiteMap(): bool
     {
         return $this->hideInSiteMap;
     }
@@ -365,7 +365,7 @@ class IFaceModelProviderXmlConfigModel implements IFaceModelInterface
      *
      * @return string
      */
-    public function getEntityModelName()
+    public function getEntityModelName(): ?string
     {
         return $this->entityName;
     }
@@ -375,7 +375,7 @@ class IFaceModelProviderXmlConfigModel implements IFaceModelInterface
      *
      * @return string
      */
-    public function getEntityActionName()
+    public function getEntityActionName(): ?string
     {
         return $this->entityAction;
     }
@@ -385,7 +385,7 @@ class IFaceModelProviderXmlConfigModel implements IFaceModelInterface
      *
      * @return string
      */
-    public function getZoneName()
+    public function getZoneName(): string
     {
         return $this->zone;
     }
@@ -394,7 +394,7 @@ class IFaceModelProviderXmlConfigModel implements IFaceModelInterface
      *
      * @return string[]
      */
-    public function getAdditionalAclRules()
+    public function getAdditionalAclRules(): array
     {
         return $this->aclRules;
     }
@@ -402,7 +402,7 @@ class IFaceModelProviderXmlConfigModel implements IFaceModelInterface
     /**
      * @return IFaceModelProviderXmlConfig
      */
-    protected function getProvider()
+    protected function getProvider(): ?IFaceModelProviderXmlConfig
     {
         return $this->provider;
     }

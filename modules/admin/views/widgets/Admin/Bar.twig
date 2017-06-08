@@ -11,20 +11,20 @@
         <div class="{{ not isAdminZone ? "container" : "" }}">
 
           <ul class="right">
-            {% if primaryEntity.publicUrl %}
+            {% if primaryEntity.previewUrl %}
               <li>
-                <a href="{{ primaryEntity.publicUrl }}" class="view-entity-button">
+                <a href="#!" data-href="{{ primaryEntity.previewUrl }}" class="preview-entity-button" target="_blank">
                   <i class="material-icons left tiny">visibility</i>
-                  {{ "admin.bar.public"|i18n }}
+                  {{ "admin.bar.preview"|i18n }}
                 </a>
               </li>
             {% endif %}
 
-            {% if primaryEntity.previewUrl %}
+            {% if primaryEntity.publicUrl %}
               <li>
-                <a href="{{ primaryEntity.previewUrl }}" class="preview-entity-button" target="_blank">
-                  <i class="material-icons left tiny">visibility</i>
-                  {{ "admin.bar.preview"|i18n }}
+                <a href="{{ primaryEntity.publicUrl }}" class="view-entity-button">
+                  <i class="material-icons left tiny">done_all</i>
+                  {{ "admin.bar.public"|i18n }}
                 </a>
               </li>
             {% endif %}

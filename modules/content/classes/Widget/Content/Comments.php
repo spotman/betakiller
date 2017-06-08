@@ -10,15 +10,13 @@ class Widget_Content_Comments extends AbstractBaseWidget
     use ContentTrait,
         CurrentUserTrait;
 
-    // TODO Разбораться почему не показываются комментарии
-
     /**
      * Returns data for View rendering
      *
      * @return array
      * @throws WidgetException
      */
-    public function getData()
+    public function getData(): array
     {
         $entitySlug = $this->getContextParam('entity');
         $entityItemId = (int) $this->getContextParam('entityItemId');

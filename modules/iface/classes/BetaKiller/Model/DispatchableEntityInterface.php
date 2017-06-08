@@ -12,7 +12,7 @@ interface DispatchableEntityInterface extends AbstractEntityInterface
      *
      * @return string
      */
-    public function getUrlKeyValue($key);
+    public function getUrlKeyValue($key): string;
 
     /**
      *
@@ -24,12 +24,12 @@ interface DispatchableEntityInterface extends AbstractEntityInterface
      * @return void
      * @deprecated Implement dynamic linking based on scheme (relations between entities)
      */
-    public function presetLinkedModels(UrlParametersInterface $parameters);
+    public function presetLinkedModels(UrlParametersInterface $parameters): void;
 
     /**
      * Returns key which will be used for storing model in UrlParameters registry.
      *
      * @return string
      */
-    public static function getUrlParametersKey();
+    public static function getUrlParametersKey(): string;
 }

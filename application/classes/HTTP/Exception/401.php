@@ -30,7 +30,7 @@ class HTTP_Exception_401 extends Kohana_HTTP_Exception_401 {
      */
     protected function getIFaceFromCode($code)
     {
-        return $this->iface_from_codename('Auth_Login');
+        return $this->createIFaceFromCodename('Auth_Login');
     }
 
     /**

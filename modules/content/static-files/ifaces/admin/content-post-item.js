@@ -80,6 +80,22 @@ require([
       });
     });
 
+    var $bar = $('#admin-bar'),
+        $previewButton = $bar.find('.preview-entity-button');
+
+    // Save post before sending user to a preview
+    if ($previewButton.length) {
+      $previewButton.click(function(e) {
+        e.preventDefault();
+
+        savePost(function() {
+          location.href = $previewButton.data('href');
+        });
+
+        return false;
+      });
+    }
+
   });
 
 });

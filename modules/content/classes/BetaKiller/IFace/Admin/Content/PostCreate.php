@@ -1,7 +1,7 @@
 <?php
 namespace BetaKiller\IFace\Admin\Content;
 
-class PostCreate extends AdminBase
+class PostCreate extends AbstractAdminBase
 {
     /**
      * Returns data for View
@@ -9,7 +9,7 @@ class PostCreate extends AdminBase
      *
      * @return array
      */
-    public function getData()
+    public function getData(): array
     {
         // TODO
         return [];

@@ -86,7 +86,7 @@ class Entity extends ORM
         return $model;
     }
 
-    public function getLabel()
+    public function getLabel(): string
     {
         return __('entities.'.$this->getSlug());
     }

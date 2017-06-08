@@ -15,7 +15,7 @@ class CategoryItem extends AbstractAppBase
      *
      * @return array
      */
-    public function getData()
+    public function getData(): array
     {
         $category = $this->urlParametersHelper->getContentCategory();
 

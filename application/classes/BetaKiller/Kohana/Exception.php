@@ -1,9 +1,9 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
+use BetaKiller\IFace\IFaceFactory;
+
 class BetaKiller_Kohana_Exception extends Kohana_Kohana_Exception
 {
-    use BetaKiller\Helper\IFaceHelperTrait;
-
     /**
      * Exception counter for preventing recursion
      */
@@ -89,7 +89,7 @@ class BetaKiller_Kohana_Exception extends Kohana_Kohana_Exception
         $response = Response::factory();
 
         try {
-            $code      = $exception->getCode();
+            $code     = $exception->getCode();
             $httpCode = ($exception instanceof HTTP_Exception) ? $code : 500;
 
             $response
@@ -117,11 +117,23 @@ class BetaKiller_Kohana_Exception extends Kohana_Kohana_Exception
     /**
      * @param int $code
      *
-     * @return \BetaKiller\IFace\IFaceInterface
+     * @return \BetaKiller\IFace\IFaceInterface|mixed
      */
     protected function getIFaceFromCode($code)
     {
-        return $this->iface_from_codename('Error'.$code);
+        return $this->createIFaceFromCodename('Error'.$code);
+    }
+
+    /**
+     * @param string $codename
+     *
+     * @return \BetaKiller\IFace\IFaceInterface|mixed
+     */
+    protected function createIFaceFromCodename(string $codename)
+    {
+        $factory = \BetaKiller\DI\Container::getInstance()->get(IFaceFactory::class);
+
+        return $factory->fromCodename($codename);
     }
 
     /**

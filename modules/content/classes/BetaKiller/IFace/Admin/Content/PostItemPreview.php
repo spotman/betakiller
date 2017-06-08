@@ -3,7 +3,7 @@ namespace BetaKiller\IFace\Admin\Content;
 
 use BetaKiller\Model\IFaceZone;
 
-class PostItemPreview extends AdminBase
+class PostItemPreview extends AbstractAdminBase
 {
     /**
      * @Inject
@@ -17,12 +17,25 @@ class PostItemPreview extends AdminBase
      */
     public function getData(): array
     {
-        $post = $this->urlParametersHelper->getContentPost();
+//        $post = $this->urlParametersHelper->getContentPost();
 
-        $previewUrl = $this->ifaceHelper->getReadEntityUrl($post, IFaceZone::PUBLIC_ZONE).'?preview=true';
+//        $previewUrl = $this->ifaceHelper->getReadEntityUrl($post, IFaceZone::PUBLIC_ZONE).'?preview=true';
 
-        return [
-            'previewUrl' => $previewUrl,
-        ];
+//        $this->redirect($previewUrl);
+
+        return [];
+    }
+
+    /**
+     * @return string
+     */
+    public function render(): string
+    {
+        /** @var \BetaKiller\IFace\App\Content\PostItem $iface */
+        $iface = $this->ifaceHelper->createIFaceFromCodename('App_Content_PostItem');
+
+        // TODO extend public PostItem template
+
+        return $iface->render();
     }
 }

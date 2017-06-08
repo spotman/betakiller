@@ -4,7 +4,7 @@ namespace BetaKiller\IFace\Admin\Content;
 use BetaKiller\Helper\IFaceHelper;
 use BetaKiller\IFace\IFaceFactory;
 
-class PostIndex extends AdminBase
+class PostIndex extends AbstractAdminBase
 {
     /**
      * Returns data for View
@@ -12,7 +12,7 @@ class PostIndex extends AdminBase
      *
      * @return array
      */
-    public function getData()
+    public function getData(): array
     {
         // TODO deal with pages
         $articles = $this->model_factory_content_post()->getAllArticles();

@@ -32,7 +32,7 @@ class Model_ContentCommentStatus extends StatusModelOrm
         return 'status_id';
     }
 
-    public function getLabel()
+    public function getLabel(): string
     {
         $codename = $this->get_codename();
         return __('comment.status.'.$codename);

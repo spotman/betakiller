@@ -23,7 +23,7 @@ class PhpExceptionItem extends ErrorAdminBase
      *
      * @return array
      */
-    public function getData()
+    public function getData(): array
     {
         $model = $this->urlParametersHelper->getPhpException();
 

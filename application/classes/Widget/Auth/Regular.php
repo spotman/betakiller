@@ -52,7 +52,7 @@ class Widget_Auth_Regular extends AbstractBaseWidget
         $this->send_json(Response::JSON_SUCCESS);
     }
 
-    public function getData()
+    public function getData(): array
     {
         return [
             'login_url'          => $this->get_login_url(),

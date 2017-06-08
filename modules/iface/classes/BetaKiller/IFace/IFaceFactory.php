@@ -40,7 +40,7 @@ class IFaceFactory
      * @return \BetaKiller\IFace\IFaceInterface
      * @throws \BetaKiller\IFace\Exception\IFaceException
      */
-    public function fromCodename($codename)
+    public function fromCodename(string $codename)
     {
         return $this->provider->fromCodename($codename);
     }

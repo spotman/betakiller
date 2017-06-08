@@ -3,6 +3,7 @@
 use BetaKiller\Acl\Resource\EntityRelatedAclResourceInterface;
 use BetaKiller\DI\Container;
 use BetaKiller\Factory\OrmFactory;
+use BetaKiller\IFace\CrudlsActionsInterface;
 use BetaKiller\IFace\Url\UrlDataSourceInterface;
 use BetaKiller\IFace\Url\UrlParametersInterface;
 use BetaKiller\Model\DispatchableEntityInterface;
@@ -11,7 +12,6 @@ use BetaKiller\Search\Model\ResultsItem;
 use BetaKiller\Utils;
 use BetaKiller\Utils\Kohana\ORM\OrmInterface;
 use Spotman\Api\ApiResponseItemInterface;
-use BetaKiller\IFace\CrudlsActionsInterface;
 
 class ORM extends Utils\Kohana\ORM
     implements ApiResponseItemInterface, UrlDataSourceInterface, DispatchableEntityInterface, Applicable, ResultsItem
@@ -73,7 +73,7 @@ class ORM extends Utils\Kohana\ORM
      *
      * @return string
      */
-    public static function getUrlParametersKey()
+    public static function getUrlParametersKey(): string
     {
         return static::detectModelName();
     }
@@ -112,7 +112,12 @@ class ORM extends Utils\Kohana\ORM
      *
      * @return \BetaKiller\Model\DispatchableEntityInterface|NULL
      */
-    public function findByUrlKey($key, $value, UrlParametersInterface $parameters, EntityRelatedAclResourceInterface $resource)
+    public function findByUrlKey(
+        string $key,
+        string $value,
+        UrlParametersInterface $parameters,
+        EntityRelatedAclResourceInterface $resource
+    ): ?DispatchableEntityInterface
     {
         // Additional filtering for non-pk keys
         if ($key !== $this->primary_key()) {
@@ -148,7 +153,7 @@ class ORM extends Utils\Kohana\ORM
      *
      * @return string
      */
-    public function getUrlKeyValue($key)
+    public function getUrlKeyValue($key): string
     {
         return (string)$this->get($key);
     }
@@ -162,8 +167,11 @@ class ORM extends Utils\Kohana\ORM
      *
      * @return \BetaKiller\Model\DispatchableEntityInterface[]
      */
-    public function getAvailableItemsByUrlKey($key, UrlParametersInterface $parameters, $limit = null)
-    {
+    public function getAvailableItemsByUrlKey(
+        string $key,
+        UrlParametersInterface $parameters,
+        ?int $limit = null
+    ): array {
         // Additional filtering for non-pk keys
         if ($key !== $this->primary_key()) {
             $this->customFilterForSearchByUrl($parameters);
@@ -194,7 +202,7 @@ class ORM extends Utils\Kohana\ORM
      *
      * @return void
      */
-    public function presetLinkedModels(UrlParametersInterface $parameters)
+    public function presetLinkedModels(UrlParametersInterface $parameters): void
     {
         // Nothing by default
     }
@@ -212,7 +220,7 @@ class ORM extends Utils\Kohana\ORM
     /**
      * @return string
      */
-    public function getLabel()
+    public function getLabel(): string
     {
         throw new HTTP_Exception_501('Not implemented yet');
     }

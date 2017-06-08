@@ -1,7 +1,7 @@
 <?php
 namespace BetaKiller\IFace\Admin\Content;
 
-class CommentItem extends AdminBase
+class CommentItem extends AbstractAdminBase
 {
     /**
      * @Inject
@@ -13,7 +13,7 @@ class CommentItem extends AdminBase
      * Returns data for View
      * Override this method in child classes
      */
-    public function getData()
+    public function getData(): array
     {
         $model = $this->urlParametersHelper->getContentComment();
 

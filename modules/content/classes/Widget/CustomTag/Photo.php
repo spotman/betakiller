@@ -13,7 +13,7 @@ class Widget_CustomTag_Photo extends AbstractBaseWidget
      * @throws \BetaKiller\IFace\Widget\WidgetException
      * @return array
      */
-    public function getData()
+    public function getData(): array
     {
         $image_id = (int)$this->getContextParam('id');
 

@@ -13,6 +13,8 @@ class KohanaLogProxy extends \Log_Writer
 
     /**
      * KohanaLogProxy constructor.
+     *
+     * @param \Psr\Log\LoggerInterface $logger
      */
     public function __construct(LoggerInterface $logger)
     {
@@ -39,8 +41,8 @@ class KohanaLogProxy extends \Log_Writer
     public function write(array $messages)
     {
         foreach ($messages as $message) {
-            $level = $this->_log_levels[$message['level']];
-            $text = $message['body'];
+            $level   = $this->_log_levels[$message['level']];
+            $text    = $message['body'];
             $context = [];
 
             /** @var \Exception $exception */

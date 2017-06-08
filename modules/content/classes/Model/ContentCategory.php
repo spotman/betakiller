@@ -98,14 +98,14 @@ class Model_ContentCategory extends TreeModelSingleParentOrm implements SeoMetaI
         return $this->get_posts_relation()->get_all();
     }
 
-    public function filter_is_active($value = true)
+    public function filter_is_active(?bool $value = null)
     {
-        return $this->where($this->object_column('is_active'), '=', $value);
+        return $this->where($this->object_column('is_active'), '=', $value ?? true);
     }
 
-    public function order_by_place($desc = false)
+    public function order_by_place(?bool $desc = null)
     {
-        return $this->order_by($this->object_column('place'), $desc ? 'desc' : 'asc');
+        return $this->order_by($this->object_column('place'), ($desc ?? false ) ? 'desc' : 'asc');
     }
 
     /**
@@ -134,7 +134,7 @@ class Model_ContentCategory extends TreeModelSingleParentOrm implements SeoMetaI
     /**
      * @param UrlParametersInterface $parameters
      */
-    protected function customFilterForSearchByUrl(UrlParametersInterface $parameters)
+    protected function customFilterForSearchByUrl(UrlParametersInterface $parameters): void
     {
         $parent_category = $parameters->getEntityByClassName($this);
 

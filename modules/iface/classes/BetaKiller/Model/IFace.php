@@ -13,7 +13,7 @@ use BetaKiller\Utils\Kohana\TreeModelSingleParentOrm;
  */
 class IFace extends TreeModelSingleParentOrm implements IFaceModelInterface
 {
-    protected function _initialize()
+    protected function _initialize(): void
     {
         $this->belongs_to([
             'layout' => [
@@ -92,7 +92,7 @@ class IFace extends TreeModelSingleParentOrm implements IFaceModelInterface
      *
      * @return bool
      */
-    public function isDefault()
+    public function isDefault(): bool
     {
         return (bool)$this->get('is_default');
     }
@@ -102,7 +102,7 @@ class IFace extends TreeModelSingleParentOrm implements IFaceModelInterface
      *
      * @return string
      */
-    public function getCodename()
+    public function getCodename(): string
     {
         return $this->get('codename');
     }
@@ -112,7 +112,7 @@ class IFace extends TreeModelSingleParentOrm implements IFaceModelInterface
      *
      * @return string
      */
-    public function getLabel()
+    public function getLabel(): string
     {
         return $this->get('label');
     }
@@ -122,7 +122,7 @@ class IFace extends TreeModelSingleParentOrm implements IFaceModelInterface
      *
      * @return string
      */
-    public function getTitle()
+    public function getTitle(): string
     {
         return $this->get('title');
     }
@@ -132,7 +132,7 @@ class IFace extends TreeModelSingleParentOrm implements IFaceModelInterface
      *
      * @return string
      */
-    public function getDescription()
+    public function getDescription(): string
     {
         return $this->get('description');
     }
@@ -142,7 +142,7 @@ class IFace extends TreeModelSingleParentOrm implements IFaceModelInterface
      *
      * @return string
      */
-    public function getUri()
+    public function getUri(): string
     {
         return $this->get('uri');
     }
@@ -152,7 +152,7 @@ class IFace extends TreeModelSingleParentOrm implements IFaceModelInterface
      *
      * @return Layout
      */
-    public function get_layout()
+    private function getLayoutRelation(): Layout
     {
         return $this->get('layout');
     }
@@ -162,9 +162,9 @@ class IFace extends TreeModelSingleParentOrm implements IFaceModelInterface
      *
      * @return string
      */
-    public function getLayoutCodename()
+    public function getLayoutCodename(): string
     {
-        $layout = $this->get_layout();
+        $layout = $this->getLayoutRelation();
 
         if (!$layout->loaded()) {
             $layout = $layout->get_default();
@@ -178,7 +178,7 @@ class IFace extends TreeModelSingleParentOrm implements IFaceModelInterface
      *
      * @return bool
      */
-    public function hasDynamicUrl()
+    public function hasDynamicUrl(): bool
     {
         return (bool)$this->get('is_dynamic');
     }
@@ -188,7 +188,7 @@ class IFace extends TreeModelSingleParentOrm implements IFaceModelInterface
      *
      * @return bool
      */
-    public function hasTreeBehaviour()
+    public function hasTreeBehaviour(): bool
     {
         return (bool)$this->get('is_tree');
     }
@@ -196,7 +196,7 @@ class IFace extends TreeModelSingleParentOrm implements IFaceModelInterface
     /**
      * @return bool
      */
-    public function hideInSiteMap()
+    public function hideInSiteMap(): bool
     {
         return (bool)$this->get('hide_in_site_map');
     }
@@ -208,7 +208,7 @@ class IFace extends TreeModelSingleParentOrm implements IFaceModelInterface
      *
      * @return $this
      */
-    public function setTitle($value)
+    public function setTitle(string $value)
     {
         return $this->set('title', (string)$value);
     }
@@ -220,7 +220,7 @@ class IFace extends TreeModelSingleParentOrm implements IFaceModelInterface
      *
      * @return $this
      */
-    public function setDescription($value)
+    public function setDescription(string $value)
     {
         return $this->set('description', (string)$value);
     }
@@ -230,7 +230,7 @@ class IFace extends TreeModelSingleParentOrm implements IFaceModelInterface
      *
      * @return string
      */
-    public function getEntityModelName()
+    public function getEntityModelName(): string
     {
         return $this->getEntityRelation()->getLinkedModelName();
     }
@@ -240,7 +240,7 @@ class IFace extends TreeModelSingleParentOrm implements IFaceModelInterface
      *
      * @return string
      */
-    public function getEntityActionName()
+    public function getEntityActionName(): string
     {
         return $this->getEntityActionRelation()->getName();
     }
@@ -250,7 +250,7 @@ class IFace extends TreeModelSingleParentOrm implements IFaceModelInterface
      *
      * @return string
      */
-    public function getZoneName()
+    public function getZoneName(): string
     {
         return $this->getZoneRelation()->getName();
     }
@@ -260,7 +260,7 @@ class IFace extends TreeModelSingleParentOrm implements IFaceModelInterface
      *
      * @return string[]
      */
-    public function getAdditionalAclRules()
+    public function getAdditionalAclRules(): array
     {
         /** @var \BetaKiller\Model\IFaceAclRule[] $rules */
         $rules = $this->getAclRulesRelation()->get_all();
@@ -276,7 +276,7 @@ class IFace extends TreeModelSingleParentOrm implements IFaceModelInterface
     /**
      * @return \BetaKiller\Model\Entity
      */
-    private function getEntityRelation()
+    private function getEntityRelation(): Entity
     {
         return $this->get('entity');
     }
@@ -284,7 +284,7 @@ class IFace extends TreeModelSingleParentOrm implements IFaceModelInterface
     /**
      * @return \BetaKiller\Model\EntityAction
      */
-    private function getEntityActionRelation()
+    private function getEntityActionRelation(): EntityAction
     {
         return $this->get('action');
     }
@@ -292,7 +292,7 @@ class IFace extends TreeModelSingleParentOrm implements IFaceModelInterface
     /**
      * @return \BetaKiller\Model\IFaceZone
      */
-    private function getZoneRelation()
+    private function getZoneRelation(): IFaceZone
     {
         return $this->get('zone');
     }
@@ -300,7 +300,7 @@ class IFace extends TreeModelSingleParentOrm implements IFaceModelInterface
     /**
      * @return \BetaKiller\Model\IFaceAclRule
      */
-    private function getAclRulesRelation()
+    private function getAclRulesRelation(): IFaceAclRule
     {
         return $this->get('aclRules');
     }
@@ -310,7 +310,7 @@ class IFace extends TreeModelSingleParentOrm implements IFaceModelInterface
      *
      * @return array
      */
-    public function asArray()
+    public function asArray(): array
     {
         return $this->as_array();
     }

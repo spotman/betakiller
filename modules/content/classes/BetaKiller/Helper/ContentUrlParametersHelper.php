@@ -10,9 +10,9 @@ use Model_ContentCommentStatus;
 class ContentUrlParametersHelper extends UrlParametersHelper
 {
     /**
-     * @return \Model_ContentCategory
+     * @return \Model_ContentCategory|null
      */
-    public function getContentCategory(): Model_ContentCategory
+    public function getContentCategory(): ?Model_ContentCategory
     {
         return $this->getEntityByClassName(Model_ContentCategory::class);
     }
@@ -42,15 +42,15 @@ class ContentUrlParametersHelper extends UrlParametersHelper
      *
      * @return \BetaKiller\IFace\Url\UrlParametersInterface
      */
-    public function setContentPost(Model_ContentPost $model, UrlParametersInterface $params = null): \BetaKiller\IFace\Url\UrlParametersInterface
+    public function setContentPost(Model_ContentPost $model, UrlParametersInterface $params = null): UrlParametersInterface
     {
         return $this->setEntity($model, $params);
     }
 
     /**
-     * @return \Model_ContentComment
+     * @return \Model_ContentComment|null
      */
-    public function getContentComment(): Model_ContentComment
+    public function getContentComment(): ?Model_ContentComment
     {
         return $this->getEntityByClassName(Model_ContentComment::class);
     }
@@ -67,9 +67,9 @@ class ContentUrlParametersHelper extends UrlParametersHelper
     }
 
     /**
-     * @return \Model_ContentCommentStatus
+     * @return \Model_ContentCommentStatus|null
      */
-    public function getContentCommentStatus(): Model_ContentCommentStatus
+    public function getContentCommentStatus(): ?Model_ContentCommentStatus
     {
         return $this->getEntityByClassName(Model_ContentCommentStatus::class);
     }
@@ -80,7 +80,7 @@ class ContentUrlParametersHelper extends UrlParametersHelper
      *
      * @return \BetaKiller\IFace\Url\UrlParametersInterface
      */
-    public function setContentCommentStatus(\Model_ContentCommentStatus $model, UrlParametersInterface $params = null): UrlParametersInterface
+    public function setContentCommentStatus(Model_ContentCommentStatus $model, UrlParametersInterface $params = null): UrlParametersInterface
     {
         return $this->setEntity($model, $params);
     }

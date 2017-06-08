@@ -9,14 +9,14 @@ interface SeoMetaInterface
      * @param string $value
      * @return $this
      */
-    public function setTitle($value);
+    public function setTitle(string $value);
 
     /**
      * Returns title for using in <title> tag
      *
      * @return string
      */
-    public function getTitle();
+    public function getTitle(): ?string;
 
     /**
      * Sets description for using in <meta> tag
@@ -24,12 +24,12 @@ interface SeoMetaInterface
      * @param string $value
      * @return $this
      */
-    public function setDescription($value);
+    public function setDescription(string $value);
 
     /**
      * Returns description for using in <meta> tag
      *
      * @return string
      */
-    public function getDescription();
+    public function getDescription(): ?string;
 }

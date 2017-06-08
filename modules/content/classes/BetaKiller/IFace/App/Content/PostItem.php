@@ -4,6 +4,7 @@ namespace BetaKiller\IFace\App\Content;
 use BetaKiller\Acl\Resource\ContentPostResource;
 use BetaKiller\Helper\ContentUrlParametersHelper;
 use BetaKiller\Model\UserInterface;
+use Model_ContentPost;
 
 class PostItem extends AbstractAppBase
 {
@@ -64,11 +65,14 @@ class PostItem extends AbstractAppBase
     {
         $model = $this->getContentModel();
 
-        $urlParams = $this->urlParametersHelper->getCurrentUrlParameters();
+        $urlParams   = $this->urlParametersHelper->getCurrentUrlParameters();
         $previewMode = (bool)$urlParams->getQueryPart('preview');
 
         if ($previewMode) {
-            if (!$this->aclHelper->isEntityActionAllowed($model, ContentPostResource::ACTION_PREVIEW)) {
+            $previewAllowed = $this->aclHelper->isEntityActionAllowed($model, ContentPostResource::ACTION_PREVIEW);
+            $updateAllowed  = $this->aclHelper->isEntityActionAllowed($model, ContentPostResource::ACTION_UPDATE);
+
+            if (!$updateAllowed || !$previewAllowed) {
                 throw new \HTTP_Exception_403('You can not preview this post');
             }
 
@@ -77,12 +81,12 @@ class PostItem extends AbstractAppBase
         }
 
         return [
-            'post' => $this->getPostData($model),
+            'post'        => $this->getPostData($model),
             'previewMode' => $previewMode,
         ];
     }
 
-    protected function getPostData(\Model_ContentPost $model): array
+    protected function getPostData(Model_ContentPost $model): array
     {
         $this->setLastModified($model->getApiLastModified());
 
@@ -112,7 +116,7 @@ class PostItem extends AbstractAppBase
     /**
      * @return \DateInterval
      */
-    public function getDefaultExpiresInterval()
+    public function getDefaultExpiresInterval(): \DateInterval
     {
         return new \DateInterval('P1D'); // One day
     }
@@ -121,7 +125,7 @@ class PostItem extends AbstractAppBase
      * @return \Model_ContentPost
      * @throws \BetaKiller\IFace\Exception\IFaceException
      */
-    protected function detectContentModel()
+    protected function detectContentModel(): Model_ContentPost
     {
         return $this->urlParametersHelper->getContentPost();
     }
@@ -129,7 +133,7 @@ class PostItem extends AbstractAppBase
     /**
      * @return \Model_ContentPost
      */
-    protected function getContentModel()
+    protected function getContentModel(): Model_ContentPost
     {
         if (!$this->contentModel) {
             $this->contentModel = $this->detectContentModel();

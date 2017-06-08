@@ -21,7 +21,7 @@ class MainWidget extends AbstractAdminWidget
      *
      * @return array
      */
-    public function getData()
+    public function getData(): array
     {
         $items = [
             $this->getPostsMenu(),

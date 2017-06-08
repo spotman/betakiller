@@ -9,8 +9,10 @@ use BetaKiller\IFace\IFaceModelInterface;
 use BetaKiller\IFace\IFaceStack;
 use BetaKiller\IFace\Url\UrlParametersInterface;
 use BetaKiller\IFace\View\IFaceView;
+use BetaKiller\IFace\Widget\WidgetInterface;
 use BetaKiller\IFace\WidgetFactory;
 use BetaKiller\Model\DispatchableEntityInterface;
+use Spotman\Api\ApiMethodResponse;
 
 class IFaceHelper
 {
@@ -63,22 +65,22 @@ class IFaceHelper
         $this->paramsHelper  = $paramsHelper;
     }
 
-    public function getCurrentIFace()
+    public function getCurrentIFace(): ?IFaceInterface
     {
         return $this->stack->getCurrent();
     }
 
-    public function isCurrentIFace(IFaceInterface $iface, UrlParametersInterface $params = null)
+    public function isCurrentIFace(IFaceInterface $iface, UrlParametersInterface $params = null): bool
     {
         return $this->stack->isCurrent($iface, $params);
     }
 
-    public function isInStack(IFaceInterface $iface)
+    public function isInStack(IFaceInterface $iface): bool
     {
         return $this->stack->has($iface);
     }
 
-    public function renderIFace(IFaceInterface $iface)
+    public function renderIFace(IFaceInterface $iface): string
     {
         // Getting IFace View instance and rendering
         return $this->view->render($iface);
@@ -89,7 +91,7 @@ class IFaceHelper
      *
      * @return \BetaKiller\IFace\IFaceInterface
      */
-    public function createIFaceFromCodename($codename)
+    public function createIFaceFromCodename(string $codename): IFaceInterface
     {
         return $this->ifaceFactory->fromCodename($codename);
     }
@@ -99,7 +101,7 @@ class IFaceHelper
      *
      * @return \BetaKiller\IFace\IFaceInterface
      */
-    public function createIFaceFromModel(IFaceModelInterface $model)
+    public function createIFaceFromModel(IFaceModelInterface $model): IFaceInterface
     {
         return $this->ifaceFactory->fromModel($model);
     }
@@ -109,7 +111,7 @@ class IFaceHelper
      *
      * @return \BetaKiller\IFace\Widget\WidgetInterface
      */
-    public function createWidget($name)
+    public function createWidget(string $name): WidgetInterface
     {
         return $this->widgetFactory->create($name);
     }
@@ -121,7 +123,7 @@ class IFaceHelper
      *
      * @return string
      */
-    public function getEntityUrl(DispatchableEntityInterface $entity, $action, $zone = null)
+    public function getEntityUrl(DispatchableEntityInterface $entity, string $action, ?string $zone = null): string
     {
         if (!$zone) {
             $currentIFace = $this->getCurrentIFace();
@@ -147,33 +149,40 @@ class IFaceHelper
         return $iface->url($params);
     }
 
-    public function getCreateEntityUrl(DispatchableEntityInterface $entity, $zone = null)
+    public function getCreateEntityUrl(DispatchableEntityInterface $entity, ?string $zone = null): string
     {
         return $this->getEntityUrl($entity, CrudlsActionsInterface::ACTION_CREATE, $zone);
     }
 
-    public function getReadEntityUrl(DispatchableEntityInterface $entity, $zone = null)
+    public function getReadEntityUrl(DispatchableEntityInterface $entity, ?string $zone = null): string
     {
         return $this->getEntityUrl($entity, CrudlsActionsInterface::ACTION_READ, $zone);
     }
 
-    public function getUpdateEntityUrl(DispatchableEntityInterface $entity, $zone = null)
+    public function getUpdateEntityUrl(DispatchableEntityInterface $entity, ?string $zone = null): string
     {
         return $this->getEntityUrl($entity, CrudlsActionsInterface::ACTION_UPDATE, $zone);
     }
 
-    public function getDeleteEntityUrl(DispatchableEntityInterface $entity, $zone = null)
+    public function getDeleteEntityUrl(DispatchableEntityInterface $entity, ?string $zone = null): string
     {
         return $this->getEntityUrl($entity, CrudlsActionsInterface::ACTION_DELETE, $zone);
     }
 
-    public function getListEntityUrl(DispatchableEntityInterface $entity, $zone = null)
+    public function getListEntityUrl(DispatchableEntityInterface $entity, ?string $zone = null): string
     {
         return $this->getEntityUrl($entity, CrudlsActionsInterface::ACTION_LIST, $zone);
     }
 
-    public function getSearchEntityUrl(DispatchableEntityInterface $entity, $zone = null)
+    public function getSearchEntityUrl(DispatchableEntityInterface $entity, ?string $zone = null): string
     {
         return $this->getEntityUrl($entity, CrudlsActionsInterface::ACTION_SEARCH, $zone);
+    }
+
+    public function processApiResponse(ApiMethodResponse $response, IFaceInterface $iface)
+    {
+        $iface->setLastModified($response->getLastModified());
+
+        return $response->getData();
     }
 }

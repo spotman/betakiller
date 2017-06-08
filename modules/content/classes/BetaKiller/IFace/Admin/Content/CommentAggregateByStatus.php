@@ -1,7 +1,7 @@
 <?php
 namespace BetaKiller\IFace\Admin\Content;
 
-class CommentAggregateByStatus extends AdminBase
+class CommentAggregateByStatus extends AbstractAdminBase
 {
     /**
      * Returns data for View
@@ -9,7 +9,7 @@ class CommentAggregateByStatus extends AdminBase
      *
      * @return array
      */
-    public function getData()
+    public function getData(): array
     {
         // TODO: Implement getData() method.
 

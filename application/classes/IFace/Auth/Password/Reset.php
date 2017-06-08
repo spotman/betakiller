@@ -1,15 +1,17 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
-class IFace_Auth_Password_Reset extends \BetaKiller\IFace\IFace {
+use BetaKiller\IFace\AbstractIFace;
+
+class IFace_Auth_Password_Reset extends AbstractIFace
+{
     /**
      * Returns data for View
      * Override this method in child classes
      *
      * @return array
      */
-    public function getData()
+    public function getData(): array
     {
         return [];
     }
-
 }

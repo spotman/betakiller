@@ -1,16 +1,30 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
-use \BetaKiller\IFace\IFace;
+use BetaKiller\IFace\AbstractIFace;
 
-class IFace_Auth_Logout extends IFace {
+class IFace_Auth_Logout extends AbstractIFace
+{
+    /**
+     * @Inject
+     * @var \Auth
+     */
+    private $auth;
 
-    public function render()
+    /**
+     * @Inject
+     * @var \BetaKiller\Helper\ResponseHelper
+     */
+    private $responseHelper;
+
+    public function render(): string
     {
         // Sign out the user
-        Env::auth()->logout(TRUE);
+        $this->auth->logout(true);
 
         // Redirect to site index
-        $this->redirect('/');
+        $this->responseHelper->redirect('/');
+
+        return '';
     }
 
     /**
@@ -19,9 +33,8 @@ class IFace_Auth_Logout extends IFace {
      *
      * @return array
      */
-    public function getData()
+    public function getData(): array
     {
         return [];
     }
-
 }

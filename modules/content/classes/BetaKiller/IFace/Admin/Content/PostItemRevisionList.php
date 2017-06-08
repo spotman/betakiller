@@ -3,7 +3,7 @@ namespace BetaKiller\IFace\Admin\Content;
 
 use BetaKiller\Helper\ContentUrlParametersHelper;
 
-class PostItemRevisionList extends AdminBase
+class PostItemRevisionList extends AbstractAdminBase
 {
     /**
      * @var \BetaKiller\Helper\ContentUrlParametersHelper
@@ -26,7 +26,7 @@ class PostItemRevisionList extends AdminBase
      *
      * @return array
      */
-    public function getData()
+    public function getData(): array
     {
         $post = $this->urlParametersHelper->getContentPost();
 

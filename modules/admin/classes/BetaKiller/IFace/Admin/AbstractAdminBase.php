@@ -1,11 +1,11 @@
 <?php
 namespace BetaKiller\IFace\Admin;
 
-use BetaKiller\IFace\IFace;
+use BetaKiller\IFace\AbstractIFace;
 
-abstract class AdminBase extends IFace
+abstract class AbstractAdminBase extends AbstractIFace
 {
-    public function getDefaultExpiresInterval()
+    public function getDefaultExpiresInterval(): \DateInterval
     {
         // No caching for admin zone
         $interval         = new \DateInterval('PT1H');
