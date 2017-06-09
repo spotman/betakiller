@@ -1,7 +1,9 @@
 <?php
 namespace BetaKiller\IFace\ModelProvider;
 
+use BetaKiller\IFace\Exception\IFaceException;
 use BetaKiller\IFace\IFaceModelInterface;
+use BetaKiller\Model\IFaceZone;
 use BetaKiller\Utils\Kohana\TreeModelSingleParentInterface;
 use BetaKiller\Utils\Kohana\TreeModelSingleParentTrait;
 use HTTP_Exception_501;
@@ -43,9 +45,9 @@ class IFaceModelProviderXmlConfigModel implements IFaceModelInterface
     /**
      * Admin IFaces have "admin" layout by default
      *
-     * @var string
+     * @var string|null
      */
-    private $layoutCodename = 'admin';
+    private $layoutCodename;
 
     /**
      * @var bool
@@ -75,7 +77,7 @@ class IFaceModelProviderXmlConfigModel implements IFaceModelInterface
     /**
      * @var string
      */
-    private $zone;
+    private $zone = IFaceZone::PUBLIC_ZONE;
 
     /**
      * @var string[]
@@ -229,7 +231,7 @@ class IFaceModelProviderXmlConfigModel implements IFaceModelInterface
      */
     public function getLabel(): string
     {
-        return $this->label;
+        return $this->label ?: '';
     }
 
     /**
@@ -281,15 +283,15 @@ class IFaceModelProviderXmlConfigModel implements IFaceModelInterface
      *
      * @return string
      */
-    public function getLayoutCodename(): string
+    public function getLayoutCodename(): ?string
     {
         return $this->layoutCodename;
     }
 
     public function fromArray(array $data): void
     {
-        $this->codename = $data['codename'];
         $this->uri      = $data['uri'];
+        $this->codename = $data['codename'];
 
         $this->label = $data['label'] ?? null;
         $this->title = $data['title'] ?? null;
@@ -327,7 +329,7 @@ class IFaceModelProviderXmlConfigModel implements IFaceModelInterface
         }
 
         if (isset($data['aclRules'])) {
-            $values = explode(',', (string)$data['aclRules']);
+            $values         = explode(',', (string)$data['aclRules']);
             $this->aclRules = array_filter(array_map('trim', $values));
         }
     }
@@ -402,8 +404,12 @@ class IFaceModelProviderXmlConfigModel implements IFaceModelInterface
     /**
      * @return IFaceModelProviderXmlConfig
      */
-    protected function getProvider(): ?IFaceModelProviderXmlConfig
+    protected function getProvider(): IFaceModelProviderXmlConfig
     {
+        if (!$this->provider) {
+            throw new IFaceException('Provider is not defined, set it via setProvider() method');
+        }
+
         return $this->provider;
     }
 

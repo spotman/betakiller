@@ -2,8 +2,8 @@
 
 class Auth_Exception_WrongIP extends Auth_Exception
 {
-    protected function getDefaultMessage()
+    protected function getDefaultMessageI18nKey()
     {
-        return 'Your IP address is not valid';
+        return 'error.auth.wrong_ip';
     }
 }

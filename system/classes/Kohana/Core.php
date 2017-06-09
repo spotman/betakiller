@@ -654,8 +654,7 @@ class Kohana_Core {
 	 * @param   string  $file   filename with subdirectory
 	 * @param   string  $ext    extension to search for
 	 * @param   boolean $array  return an array of files?
-	 * @return  array   a list of files when $array is TRUE
-	 * @return  string  single file path
+	 * @return  array|string   single file path or a list of files when $array is TRUE
 	 */
 	public static function find_file($dir, $file, $ext = NULL, $array = FALSE)
 	{

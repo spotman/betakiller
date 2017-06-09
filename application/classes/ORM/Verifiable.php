@@ -121,12 +121,10 @@ class ORM_Verifiable extends ORM
         return $this->where($this->object_column("approved_by"), "IS NOT", NULL);
     }
 
-    public function autocomplete($term, array $search_fields, $as_key_label_pairs = false)
+    public function autocompleteApproved(?UserInterface $user, $term, array $search_fields, $as_key_label_pairs = false)
     {
-        $current_user = Env::user(TRUE);
-
         // Фильтруем неподтверждённые варианты выбора, если это нужно
-        $this->filter_approved_with_acl($current_user);
+        $this->filter_approved_with_acl($user);
 
         return parent::autocomplete($term, $search_fields, $as_key_label_pairs);
     }

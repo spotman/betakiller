@@ -6,8 +6,6 @@ use Spotman\Api\ApiMethodException;
 
 trait ApiModelTrait
 {
-    use CurrentUserTrait;
-
     /**
      * @param string   $name
      * @param int|NULL $id

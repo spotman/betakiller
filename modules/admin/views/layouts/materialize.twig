@@ -3,6 +3,10 @@
 {{ js("require.js/materialize.config.js") }}
 {{ assets('jquery') }}
 
+{% if use_admin_css is defined and use_admin_css %}
+  {{ css("admin/css/admin.css") }}
+{% endif %}
+
 {#{{ js("components/jquery/dist/jquery.min.js", "jquery/jquery.utils.js") }}#}
 
 {#{{ css('http://fonts.googleapis.com/icon?family=Material+Icons') }}#}

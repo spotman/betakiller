@@ -7,11 +7,19 @@ use Spotman\Api\ModelCrudApiResource;
 
 abstract class UserApiResource extends ModelCrudApiResource
 {
+    /**
+     * @Inject
+     * @var \BetaKiller\Model\UserInterface
+     */
+    private $user;
+
     use ApiModelTrait;
 
     public function update_profile($data)
     {
-        $user = $this->current_user();
+        $user = $this->user;
+
+        $user->forceAuthorization();
 
         $data = (object)$data;
 

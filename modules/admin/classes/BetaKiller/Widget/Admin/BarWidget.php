@@ -12,6 +12,7 @@ use BetaKiller\IFace\IFaceProvider;
 use BetaKiller\IFace\Widget\AbstractAdminWidget;
 use BetaKiller\Model\DispatchableEntityInterface;
 use BetaKiller\Model\IFaceZone;
+use BetaKiller\Model\Layout;
 use BetaKiller\Model\UserInterface;
 use Model_ContentCommentStatus;
 
@@ -39,8 +40,7 @@ class BarWidget extends AbstractAdminWidget
         IFaceHelper $ifaceHelper,
         ContentUrlParametersHelper $cUrlParamHelper,
         IFaceProvider $ifaceProvider
-    )
-    {
+    ) {
         parent::__construct($user);
 
         $this->ifaceHelper           = $ifaceHelper;
@@ -55,12 +55,14 @@ class BarWidget extends AbstractAdminWidget
      */
     public function getData(): array
     {
-        $isAdminZone = $this->ifaceHelper->getCurrentIFace()->getZoneName() === IFaceZone::ADMIN_ZONE;
+        $currentIFace = $this->ifaceHelper->getCurrentIFace();
+        $currentLayout  = $currentIFace->getLayoutCodename();
+        $isAdminLayout  = $currentLayout === Layout::LAYOUT_ADMIN;
 
         $entity = $this->detectPrimaryEntity();
 
         $data = [
-            'isAdminZone'       => $isAdminZone,
+            'isAdminLayout'     => $isAdminLayout,
             'enabled'           => true,
             'comments'          => $this->getCommentsData(),
             'createButtonItems' => $this->getCreateButtonItems(),
@@ -150,16 +152,18 @@ class BarWidget extends AbstractAdminWidget
             return null;
         }
 
-        $currentIFace = $this->ifaceHelper->getCurrentIFace();
-        $currentZone  = $currentIFace->getZoneName();
+        $previewAction = ContentPostResource::ACTION_PREVIEW;
 
-        // No preview button in public zone
-        if ($currentZone === IFaceZone::PUBLIC_ZONE) {
+        $currentIFace  = $this->ifaceHelper->getCurrentIFace();
+        $currentAction = $currentIFace->getEntityActionName();
+
+        // No preview button in preview mode
+        if ($currentAction === $previewAction) {
             return null;
         }
 
         try {
-            return $this->ifaceHelper->getEntityUrl($entity, ContentPostResource::ACTION_PREVIEW);
+            return $this->ifaceHelper->getEntityUrl($entity, $previewAction);
         } catch (IFaceException $e) {
             // No iface found for preview action
             return null;
@@ -176,6 +180,7 @@ class BarWidget extends AbstractAdminWidget
         return $this->getPrimaryEntityActionUrl($entity, IFaceZone::PUBLIC_ZONE);
     }
 
+    // TODO Show "Edit" button in preview mode
     private function getPrimaryEntityActionUrl(?DispatchableEntityInterface $entity, $targetZone): ?string
     {
         if (!$entity) {

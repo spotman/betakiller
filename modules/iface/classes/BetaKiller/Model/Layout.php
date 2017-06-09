@@ -13,6 +13,9 @@ use ORM;
  */
 class Layout extends ORM
 {
+    const LAYOUT_PUBLIC = 'public';
+    const LAYOUT_ADMIN = 'admin';
+
     /**
      * @return static
      * @throws Kohana_Exception

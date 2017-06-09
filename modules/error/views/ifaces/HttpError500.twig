@@ -1,0 +1,29 @@
+{% extends layout %}
+
+{% block page_content %}
+
+  {{ js("js/ifaces/error-500.js") }}
+
+  <div class="valign-wrapper error-500">
+    <div class="valign center-block">
+      <div class="card-panel blue-grey white-text">
+        {% block header %}
+        <h1>{{ "error.500.label"|i18n }}</h1>
+        {% endblock %}
+
+        <p>{{ "error.500.p1"|i18n }}</p>
+        <p>{{ "error.500.p2"|i18n }}</p>
+        <p>
+          <button class="btn flat cancel-refresh">{{ "error.500.button.cancel" }}</button>
+        </p>
+
+        {#<p>{{ "error.500.p3"|i18n({ hash: hash }) }}</p>#}
+
+        <div class="progress">
+          <div class="determinate blue"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+{% endblock %}

@@ -2,4 +2,4 @@
 
 use BetaKiller\IFace\Widget\AbstractBaseWidget;
 
-class Widget_Auth_Password_Reset extends AbstractBaseWidget {}
+class Widget_Auth_PasswordReset extends AbstractBaseWidget {}

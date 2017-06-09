@@ -41,7 +41,7 @@ class Model_ContentPost extends \ORM implements StatusRelatedModelInterface, Mod
      *
      * @return void
      */
-    protected function _initialize()
+    protected function _initialize(): void
     {
         $this->_table_name = 'content_posts';
 
@@ -77,7 +77,7 @@ class Model_ContentPost extends \ORM implements StatusRelatedModelInterface, Mod
      *
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             'type'       => [
@@ -95,7 +95,7 @@ class Model_ContentPost extends \ORM implements StatusRelatedModelInterface, Mod
     /**
      * @return string
      */
-    protected function getRevisionModelName()
+    protected function getRevisionModelName(): string
     {
         return 'ContentPostRevision';
     }
@@ -103,7 +103,7 @@ class Model_ContentPost extends \ORM implements StatusRelatedModelInterface, Mod
     /**
      * @return string
      */
-    protected function getRelatedModelRevisionForeignKey()
+    protected function getRelatedModelRevisionForeignKey(): string
     {
         return 'revision_id';
     }
@@ -111,7 +111,7 @@ class Model_ContentPost extends \ORM implements StatusRelatedModelInterface, Mod
     /**
      * @return string
      */
-    protected function getRevisionModelForeignKey()
+    protected function getRevisionModelForeignKey(): string
     {
         return 'post_id';
     }
@@ -119,7 +119,7 @@ class Model_ContentPost extends \ORM implements StatusRelatedModelInterface, Mod
     /**
      * @return string[]
      */
-    protected function getFieldsWithRevisions()
+    protected function getFieldsWithRevisions(): array
     {
         return [
             'label',
@@ -134,7 +134,7 @@ class Model_ContentPost extends \ORM implements StatusRelatedModelInterface, Mod
      *
      * @return string
      */
-    protected function get_workflow_name()
+    protected function get_workflow_name(): string
     {
         return 'ContentPost';
     }
@@ -150,7 +150,7 @@ class Model_ContentPost extends \ORM implements StatusRelatedModelInterface, Mod
     /**
      * @return string
      */
-    protected function get_status_relation_model_name()
+    protected function get_status_relation_model_name(): string
     {
         return 'ContentPostStatus';
     }
@@ -158,7 +158,7 @@ class Model_ContentPost extends \ORM implements StatusRelatedModelInterface, Mod
     /**
      * @return string
      */
-    protected function get_status_relation_foreign_key()
+    protected function get_status_relation_foreign_key(): string
     {
         return 'status_id';
     }
@@ -166,7 +166,7 @@ class Model_ContentPost extends \ORM implements StatusRelatedModelInterface, Mod
     /**
      * @return \Model_ContentPost
      */
-    public function draft()
+    public function draft(): \Model_ContentPost
     {
         $this->workflow()->draft();
 
@@ -176,7 +176,7 @@ class Model_ContentPost extends \ORM implements StatusRelatedModelInterface, Mod
     /**
      * @return \Model_ContentPost
      */
-    public function complete()
+    public function complete(): \Model_ContentPost
     {
         $this->workflow()->complete();
 
@@ -186,7 +186,7 @@ class Model_ContentPost extends \ORM implements StatusRelatedModelInterface, Mod
     /**
      * @return Model_ContentPost
      */
-    public function publish()
+    public function publish(): \Model_ContentPost
     {
         $this->workflow()->publish();
 
@@ -210,7 +210,7 @@ class Model_ContentPost extends \ORM implements StatusRelatedModelInterface, Mod
     /**
      * @return int
      */
-    public function getType()
+    public function getType(): int
     {
         return (int)$this->get('type');
     }
@@ -230,27 +230,27 @@ class Model_ContentPost extends \ORM implements StatusRelatedModelInterface, Mod
         return $this->set('type', $value);
     }
 
-    public function markAsPage()
+    public function markAsPage(): \Model_ContentPost
     {
         return $this->setType(self::TYPE_PAGE);
     }
 
-    public function markAsArticle()
+    public function markAsArticle(): \Model_ContentPost
     {
         return $this->setType(self::TYPE_ARTICLE);
     }
 
-    public function isPage()
+    public function isPage(): bool
     {
         return $this->isType(self::TYPE_PAGE);
     }
 
-    public function isArticle()
+    public function isArticle(): bool
     {
         return $this->isType(self::TYPE_ARTICLE);
     }
 
-    protected function isType($type)
+    protected function isType($type): bool
     {
         return ($this->getType() === (int)$type);
     }
@@ -270,17 +270,17 @@ class Model_ContentPost extends \ORM implements StatusRelatedModelInterface, Mod
      * @return Model_ContentCategory
      * @throws Kohana_Exception
      */
-    public function getCategory()
+    public function getCategory(): \Model_ContentCategory
     {
         return $this->get('category');
     }
 
-    public function needsCategory()
+    public function needsCategory(): bool
     {
         return $this->isArticle();
     }
 
-    public function needsThumbnails()
+    public function needsThumbnails(): bool
     {
         // Allow plain pages without thumbnails
         return $this->isArticle();
@@ -301,7 +301,7 @@ class Model_ContentPost extends \ORM implements StatusRelatedModelInterface, Mod
      * @return string
      * @throws Kohana_Exception
      */
-    public function getUri()
+    public function getUri(): string
     {
         return $this->get('uri');
     }
@@ -312,7 +312,7 @@ class Model_ContentPost extends \ORM implements StatusRelatedModelInterface, Mod
      * @return \Model_ContentPost
      * @throws Kohana_Exception
      */
-    public function setLabel($value)
+    public function setLabel($value): \Model_ContentPost
     {
         return $this->set('label', $value);
     }
@@ -341,18 +341,18 @@ class Model_ContentPost extends \ORM implements StatusRelatedModelInterface, Mod
      * @return string
      * @throws Kohana_Exception
      */
-    public function getContent()
+    public function getContent(): string
     {
         return $this->get('content');
     }
 
-    public function getContentPreview($length = 250, $end_chars = '...')
+    public function getContentPreview(?int $length = null, ?string $end_chars = null): string
     {
         $text = $this->getContent();
         $text = strip_tags($text);
         $text = Shortcode::getInstance()->stripTags($text);
 
-        return Text::limit_chars($text, $length, $end_chars, true);
+        return Text::limit_chars($text, $length ?? 250, $end_chars ?? '...', true);
     }
 
     /**
@@ -370,7 +370,7 @@ class Model_ContentPost extends \ORM implements StatusRelatedModelInterface, Mod
      * @return DateTime|null
      * @throws Kohana_Exception
      */
-    public function getCreatedAt()
+    public function getCreatedAt(): ?\DateTime
     {
         return $this->get_datetime_column_value('created_at');
     }
@@ -390,7 +390,7 @@ class Model_ContentPost extends \ORM implements StatusRelatedModelInterface, Mod
      * @return DateTime|null
      * @throws Kohana_Exception
      */
-    public function getUpdatedAt()
+    public function getUpdatedAt(): ?\DateTime
     {
         return $this->get_datetime_column_value('updated_at');
     }
@@ -408,7 +408,7 @@ class Model_ContentPost extends \ORM implements StatusRelatedModelInterface, Mod
     /**
      * @return UserInterface
      */
-    public function getCreatedBy()
+    public function getCreatedBy(): \BetaKiller\Model\UserInterface
     {
         return $this->get('created_by');
     }
@@ -416,7 +416,7 @@ class Model_ContentPost extends \ORM implements StatusRelatedModelInterface, Mod
     /**
      * @return DateTime
      */
-    public function getApiLastModified()
+    public function getApiLastModified(): \DateTime
     {
         return $this->getUpdatedAt() ?: $this->getCreatedAt();
     }
@@ -435,7 +435,7 @@ class Model_ContentPost extends \ORM implements StatusRelatedModelInterface, Mod
      * @return int
      * @throws Kohana_Exception
      */
-    public function getViewsCount()
+    public function getViewsCount(): int
     {
         return (int)$this->get('views_count');
     }
@@ -451,17 +451,17 @@ class Model_ContentPost extends \ORM implements StatusRelatedModelInterface, Mod
         return $this->set('views_count', (int)$value);
     }
 
-    public function orderByViewsCount($asc = false)
+    public function orderByViewsCount(?bool $asc = null)
     {
-        return $this->order_by('views_count', $asc ? 'ASC' : 'DESC');
+        return $this->order_by('views_count', ($asc ?? false) ? 'ASC' : 'DESC');
     }
 
-    public function getPopularArticles($limit = 5, $exclude_id = null)
+    public function getPopularArticles(?int $limit = null, $exclude_id = null): array
     {
         return $this->getPopularContent(self::TYPE_ARTICLE, $limit, $exclude_id);
     }
 
-    public function getFreshArticles($limit = 5, $exclude_id = null)
+    public function getFreshArticles(?int $limit = null, $exclude_id = null): array
     {
         return $this->getFreshContent(self::TYPE_ARTICLE, $limit, $exclude_id);
     }
@@ -471,7 +471,7 @@ class Model_ContentPost extends \ORM implements StatusRelatedModelInterface, Mod
      *
      * @return Model_ContentPost[]
      */
-    public function getAllArticles($limit = null)
+    public function getAllArticles($limit = null): array
     {
         if ($limit) {
             $this->limit($limit);
@@ -483,7 +483,7 @@ class Model_ContentPost extends \ORM implements StatusRelatedModelInterface, Mod
     /**
      * @return Model_ContentPost[]
      */
-    public function getAllPages()
+    public function getAllPages(): array
     {
         return $this->filterPages()->get_all();
     }
@@ -495,7 +495,7 @@ class Model_ContentPost extends \ORM implements StatusRelatedModelInterface, Mod
      *
      * @return $this[]
      */
-    protected function getPopularContent($filter_type, $limit = 5, $exclude_id = null)
+    protected function getPopularContent($filter_type, ?int $limit, $exclude_id = null): array
     {
         /** @var \Model_ContentPost $model */
         $model = $this->model_factory();
@@ -506,7 +506,7 @@ class Model_ContentPost extends \ORM implements StatusRelatedModelInterface, Mod
 
         $model->filterTypes((array)$filter_type);
 
-        return $model->orderByViewsCount()->limit($limit)->get_all();
+        return $model->orderByViewsCount()->limit($limit ?? 5)->get_all();
     }
 
     /**
@@ -516,7 +516,7 @@ class Model_ContentPost extends \ORM implements StatusRelatedModelInterface, Mod
      *
      * @return $this[]
      */
-    protected function getFreshContent($filter_type, $limit = 5, $exclude_id = null)
+    protected function getFreshContent($filter_type, ?int $limit = null, $exclude_id = null): array
     {
         /** @var \Model_ContentPost $model */
         $model = $this->model_factory();
@@ -527,13 +527,13 @@ class Model_ContentPost extends \ORM implements StatusRelatedModelInterface, Mod
 
         $model->filterTypes((array)$filter_type);
 
-        return $model->orderByCreatedAt()->limit($limit)->get_all();
+        return $model->orderByCreatedAt()->limit($limit ?? 5)->get_all();
     }
 
     /**
      * @return \ORM
      */
-    protected function getThumbnailsRelation()
+    protected function getThumbnailsRelation(): \ORM
     {
         return $this->get('thumbnails');
     }
@@ -541,7 +541,7 @@ class Model_ContentPost extends \ORM implements StatusRelatedModelInterface, Mod
     /**
      * @return Model_ContentPostThumbnail[]
      */
-    public function getThumbnails()
+    public function getThumbnails(): array
     {
         return $this->getThumbnailsQuery()->get_all();
     }
@@ -549,7 +549,7 @@ class Model_ContentPost extends \ORM implements StatusRelatedModelInterface, Mod
     /**
      * @return Model_ContentPostThumbnail
      */
-    public function getFirstThumbnail()
+    public function getFirstThumbnail(): \Model_ContentPostThumbnail
     {
         return $this->getThumbnailsQuery()->limit(1)->find();
     }
@@ -580,7 +580,7 @@ class Model_ContentPost extends \ORM implements StatusRelatedModelInterface, Mod
         }
     }
 
-    public function isDefault()
+    public function isDefault(): bool
     {
         return ($this->getUri() === UrlDispatcher::DEFAULT_URI);
     }
@@ -600,7 +600,7 @@ class Model_ContentPost extends \ORM implements StatusRelatedModelInterface, Mod
      *
      * @return $this
      */
-    public function filterCategory(Model_ContentCategory $category = null)
+    public function filterCategory(?Model_ContentCategory $category)
     {
         $column = $this->object_column('category_id');
 
@@ -635,7 +635,7 @@ class Model_ContentPost extends \ORM implements StatusRelatedModelInterface, Mod
      * @throws Kohana_Exception
      * @return ORM
      */
-    public function create(Validation $validation = null)
+    public function create(Validation $validation = null): \ORM
     {
         $this
             ->setCreatedAt(new DateTime)
@@ -658,7 +658,7 @@ class Model_ContentPost extends \ORM implements StatusRelatedModelInterface, Mod
      * @throws Kohana_Exception
      * @return ORM
      */
-    public function update(Validation $validation = null)
+    public function update(Validation $validation = null): \ORM
     {
         $changed = array_intersect($this->_changed, self::$updatedAtMarkers) && !$this->changed('updated_at');
 
@@ -681,9 +681,9 @@ class Model_ContentPost extends \ORM implements StatusRelatedModelInterface, Mod
         return $this->order_by_field_sequence('type', $values);
     }
 
-    public function orderByCreatedAt($asc = false)
+    public function orderByCreatedAt(?bool $asc = null)
     {
-        return $this->order_by($this->object_column('created_at'), $asc ? 'ASC' : 'DESC');
+        return $this->order_by($this->object_column('created_at'), ($asc ?? false) ? 'ASC' : 'DESC');
     }
 
     public function filterType($value)
@@ -706,9 +706,9 @@ class Model_ContentPost extends \ORM implements StatusRelatedModelInterface, Mod
         return $this->filterType(self::TYPE_PAGE);
     }
 
-    public function filterCreatedBy(DateTime $date, $op = '<')
+    public function filterCreatedBy(DateTime $date, ?string $op = null)
     {
-        return $this->filter_datetime_column_value('created_at', $date, $op);
+        return $this->filter_datetime_column_value('created_at', $date, $op ?? '<');
     }
 
     public function filterPostsBefore(DateTime $date)
@@ -727,7 +727,7 @@ class Model_ContentPost extends \ORM implements StatusRelatedModelInterface, Mod
     /**
      * @param UrlParametersInterface $parameters
      */
-    protected function customFilterForSearchByUrl(UrlParametersInterface $parameters)
+    protected function customFilterForSearchByUrl(UrlParametersInterface $parameters): void
     {
         // Load pages first
         $this->prioritizeByPostTypes();
@@ -766,7 +766,7 @@ class Model_ContentPost extends \ORM implements StatusRelatedModelInterface, Mod
      * @param \BetaKiller\Acl\Resource\EntityRelatedAclResourceInterface $aclResource
      * @param                                                            $action
      */
-    protected function securityFilter(EntityRelatedAclResourceInterface $aclResource, $action)
+    protected function securityFilter(EntityRelatedAclResourceInterface $aclResource, $action): void
     {
         if (!($aclResource instanceof StatusRelatedEntityAclResourceInterface)) {
             throw new Exception('Acl resource :name must implement :must for security filter processing', [

@@ -65,17 +65,9 @@ class PostItem extends AbstractAppBase
     {
         $model = $this->getContentModel();
 
-        $urlParams   = $this->urlParametersHelper->getCurrentUrlParameters();
-        $previewMode = (bool)$urlParams->getQueryPart('preview');
+        $previewMode = $this->ifaceHelper->isCurrentIFaceAction(ContentPostResource::ACTION_PREVIEW);
 
         if ($previewMode) {
-            $previewAllowed = $this->aclHelper->isEntityActionAllowed($model, ContentPostResource::ACTION_PREVIEW);
-            $updateAllowed  = $this->aclHelper->isEntityActionAllowed($model, ContentPostResource::ACTION_UPDATE);
-
-            if (!$updateAllowed || !$previewAllowed) {
-                throw new \HTTP_Exception_403('You can not preview this post');
-            }
-
             // See latest revision data
             $model->useLatestRevision();
         }

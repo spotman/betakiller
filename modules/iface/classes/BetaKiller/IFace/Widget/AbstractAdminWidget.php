@@ -28,7 +28,7 @@ abstract class AbstractAdminWidget extends AbstractBaseWidget
                 return '';
             }
 
-            throw new \HTTP_Exception_403('Permission denied');
+            throw new \HTTP_Exception_403();
         }
 
         return parent::render();

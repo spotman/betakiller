@@ -1,13 +1,12 @@
 <?php
 namespace BetaKiller\Api\Method\PhpException;
 
-use BetaKiller\Helper\CurrentUserTrait;
+use BetaKiller\Model\UserInterface;
 use Spotman\Api\Method\AbstractApiMethod;
 
 class IgnoreApiMethod extends AbstractApiMethod
 {
     use PhpExceptionMethodTrait;
-    use CurrentUserTrait;
 
     /**
      * @var \BetaKiller\Error\PhpExceptionModelInterface|null
@@ -15,12 +14,19 @@ class IgnoreApiMethod extends AbstractApiMethod
     protected $model;
 
     /**
-     * ResolveApiMethod constructor.
-     *
-     * @param string $hash
+     * @var \BetaKiller\Model\UserInterface
      */
-    public function __construct($hash)
+    private $user;
+
+    /**
+     * IgnoreApiMethod constructor.
+     *
+     * @param string                          $hash
+     * @param \BetaKiller\Model\UserInterface $user
+     */
+    public function __construct(string $hash, UserInterface $user)
     {
+        $this->user  = $user;
         $this->model = $this->findByHash($hash);
     }
 
@@ -29,7 +35,7 @@ class IgnoreApiMethod extends AbstractApiMethod
      */
     public function execute()
     {
-        $this->phpExceptionStorage->ignore($this->model, $this->current_user());
+        $this->phpExceptionStorage->ignore($this->model, $this->user);
 
         return null;
     }

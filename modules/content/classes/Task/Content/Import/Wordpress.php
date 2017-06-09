@@ -17,7 +17,6 @@ use Thunder\Shortcode\Shortcode\ShortcodeInterface;
 class Task_Content_Import_Wordpress extends Minion_Task
 {
     use BetaKiller\Helper\ContentTrait;
-    use BetaKiller\Helper\CurrentUserTrait;
     use BetaKiller\Helper\UserModelFactoryTrait;
     use BetaKiller\Helper\RoleModelFactoryTrait;
 
@@ -42,6 +41,12 @@ class Task_Content_Import_Wordpress extends Minion_Task
      * @var \BetaKiller\Helper\IFaceHelper
      */
     private $ifaceHelper;
+
+    /**
+     * @Inject
+     * @var \BetaKiller\Model\UserInterface
+     */
+    private $user;
 
     protected function define_options(): array
     {
@@ -385,7 +390,7 @@ class Task_Content_Import_Wordpress extends Minion_Task
 
             $model->set_wp_id($id);
             $model->setUri($uri);
-            $model->setCreatedBy($this->current_user());
+            $model->setCreatedBy($this->user);
 
             // Saving model and getting its ID for further processing
             $model->save();
@@ -952,7 +957,7 @@ class Task_Content_Import_Wordpress extends Minion_Task
         }
 
         $video
-            ->set_uploaded_by($this->current_user())
+            ->set_uploaded_by($this->user)
             ->set_entity($this->get_content_post_entity())
             ->set_entity_item_id($entity_item_id)
             ->save();

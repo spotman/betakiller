@@ -102,12 +102,12 @@ class Kohana_Request_Client_Internal extends Request_Client {
 				throw new Kohana_Exception('Controller failed to return a Response');
 			}
 		}
-		catch (HTTP_Exception $e)
-		{
-			// Get the response via the Exception
-			$response = $e->get_response();
-		}
-		catch (Exception $e)
+//		catch (HTTP_Exception $e)
+//		{
+//			// Get the response via the Exception
+//			$response = $e->get_response();
+//		}
+		catch (Throwable $e)
 		{
 			// Generate an appropriate Response object
 			$response = Kohana_Exception::_handler($e);

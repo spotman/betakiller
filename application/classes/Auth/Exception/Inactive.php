@@ -5,8 +5,8 @@ class Auth_Exception_Inactive extends Auth_Exception
     /**
      * @return string
      */
-    protected function getDefaultMessage()
+    protected function getDefaultMessageI18nKey()
     {
-        return 'Your account was switched off';
+        return 'error.auth.inactive';
     }
 }

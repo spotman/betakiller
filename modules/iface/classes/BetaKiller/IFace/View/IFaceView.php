@@ -87,7 +87,7 @@ class IFaceView
             $labels[] = $current->getLabel();
         } while ($current = $current->getParent());
 
-        return implode(' - ', $labels);
+        return implode(' - ', array_filter($labels));
     }
 
     protected function processLayout(View $iface_view)

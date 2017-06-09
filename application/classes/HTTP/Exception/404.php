@@ -11,11 +11,6 @@ class HTTP_Exception_404 extends Kohana_HTTP_Exception_404
         return FALSE;
     }
 
-    protected function getDefaultMessage()
-    {
-        return 'Not found';
-    }
-
     protected function alwaysShowNiceMessage()
     {
         return TRUE;

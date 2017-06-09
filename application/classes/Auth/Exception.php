@@ -1,13 +1,13 @@
 <?php defined('SYSPATH') OR die('No direct access allowed.');
 
-abstract class Auth_Exception extends HTTP_Exception_403 {
-
+abstract class Auth_Exception extends HTTP_Exception_403
+{
     /**
      * @return string
      */
-    protected function getDefaultMessage()
+    protected function getDefaultMessageI18nKey()
     {
-        return 'Authentication failed';
+        return 'error.auth.common';
     }
 
 }

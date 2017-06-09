@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <root>
+    <iface codename="HttpErrorList" uri="http-errors" layoutCodename="error" hideInSiteMap="true" zone="admin">
+        <iface codename="HttpError400" uri="400" />
+        <iface codename="HttpError401" uri="401" />
+        <iface codename="HttpError403" uri="403" />
+        <iface codename="HttpError404" uri="404" />
+        <iface codename="HttpError500" uri="500" />
+    </iface>
+
     <!-- TODO вынести это всё в файл config/ifaces.php, который добавляет элементы в IFaceModelTree::admin() -->
     <iface uri="errors" codename="Admin_Error_Index" parentCodename="Admin_Index" title="Admin | Errors" label="Errors" aclRules="Admin.enabled" zone="admin">
         <iface uri="php-exceptions" codename="Admin_Error_UnresolvedPhpExceptionIndex" title="Admin | Unresolved PhpExceptions" label="Unresolved" entity="PhpException" entityAction="listUnresolved" zone="admin">

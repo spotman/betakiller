@@ -1,6 +1,7 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
 use BetaKiller\Helper\IFaceHelper;
+use BetaKiller\IFace\Auth\PasswordReset;
 use BetaKiller\IFace\Widget\AbstractBaseWidget;
 
 class Widget_Auth_Regular extends AbstractBaseWidget
@@ -67,8 +68,8 @@ class Widget_Auth_Regular extends AbstractBaseWidget
 
     protected function get_reset_password_url()
     {
-        /** @var IFace_Auth_Password_Reset $iface */
-        $iface = $this->ifaceHelper->createIFaceFromCodename('Auth_Password_Reset');
+        /** @var PasswordReset $iface */
+        $iface = $this->ifaceHelper->createIFaceFromCodename('Auth_PasswordReset');
 
         return $iface->url();
     }

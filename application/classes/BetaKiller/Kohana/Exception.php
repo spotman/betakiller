@@ -1,5 +1,6 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
+use BetaKiller\IFace\AbstractHttpErrorIFace;
 use BetaKiller\IFace\IFaceFactory;
 
 class BetaKiller_Kohana_Exception extends Kohana_Kohana_Exception
@@ -9,10 +10,10 @@ class BetaKiller_Kohana_Exception extends Kohana_Kohana_Exception
      */
     protected static $_counter = 0;
 
-    public function __construct($message = '', array $variables = null, $code = 0, Exception $previous = null)
+    public function __construct($message = '', array $variables = null, $code = 0, Throwable $previous = null)
     {
         // Set up default message text if it was not set
-        $message = $message ?: $this->getDefaultMessage();
+        $message = $message ?: $this->getDefaultMessageI18nKey();
 
         parent::__construct($message, $variables, $code, $previous);
     }
@@ -42,6 +43,7 @@ class BetaKiller_Kohana_Exception extends Kohana_Kohana_Exception
             static::log($exception);
         }
 
+        // Hack for CLI mode
         if (PHP_SAPI === 'cli') {
             if (!$notify) {
                 echo self::text($exception);
@@ -51,16 +53,8 @@ class BetaKiller_Kohana_Exception extends Kohana_Kohana_Exception
             exit(1);
         }
 
-        $alwaysShowNiceMessage = ($exception instanceof self)
-            ? $exception->alwaysShowNiceMessage()
-            : false;
-
-        if ($alwaysShowNiceMessage || Kohana::in_production(true)) {
-            $response = self::makeNiceMessage($exception);
-        } else {
-            // Use default Kohana response
-            $response = parent::response($exception);
-        }
+        // Make nice message if allowed or use default Kohana response
+        $response = self::makeNiceMessage($exception) ?: parent::response($exception);
 
         static::$_counter--;
 
@@ -70,15 +64,23 @@ class BetaKiller_Kohana_Exception extends Kohana_Kohana_Exception
     /**
      * Возвращает контент красивого сообщения об ошибке
      *
-     * @param Exception $exception
+     * @param \Throwable $exception
      *
-     * @return Response
+     * @return Response|null
      */
-    static public function makeNiceMessage(Exception $exception)
+    static public function makeNiceMessage(Throwable $exception): ?Response
     {
-        // Prevent displaying custom error pages for expected exceptions (301, 302, 401, 403, etc)
+        // Prevent displaying custom error pages for expected exceptions (301, 302, etc)
         if (($exception instanceof HTTP_Exception_Expected) && !$exception->alwaysShowNiceMessage()) {
             return $exception->get_response();
+        }
+
+        $alwaysShowNiceMessage = ($exception instanceof self)
+            ? $exception->alwaysShowNiceMessage()
+            : false;
+
+        if (!$alwaysShowNiceMessage && !Kohana::in_production(true)) {
+            return null;
         }
 
         // Если это не наследник Kohana_Exception, оборачиваем его, чтобы показать базовое сообщение об ошибке
@@ -89,12 +91,15 @@ class BetaKiller_Kohana_Exception extends Kohana_Kohana_Exception
         $response = Response::factory();
 
         try {
-            $code     = $exception->getCode();
-            $httpCode = ($exception instanceof HTTP_Exception) ? $code : 500;
+            $httpCode = self::getHttpErrorCode($exception);
 
-            $response
-                ->status($httpCode)
-                ->body($exception->renderCustomMessage($httpCode) ?: $exception->renderDefaultMessage($httpCode));
+            $iface = self::getErrorIFaceForCode($httpCode);
+
+            $body = $iface
+                ? $iface->setException($exception)->render()
+                : self::renderDefaultMessage($exception);
+
+            $response->status($httpCode)->body($body);
         } catch (Throwable $e) {
             $response->status(500);
             static::log($e);
@@ -103,10 +108,27 @@ class BetaKiller_Kohana_Exception extends Kohana_Kohana_Exception
         return $response;
     }
 
-    public function renderCustomMessage($code)
+    private static function getErrorIFaceForCode(int $code): ?AbstractHttpErrorIFace
+    {
+        // Try to find IFace provided code first and use default IFace if failed
+        foreach ([$code, 500] as $tryCode) {
+            if ($iface = static::createErrorIFaceFromCode($tryCode)) {
+                return $iface;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * @param int $code
+     *
+     * @return \BetaKiller\IFace\AbstractHttpErrorIFace|null
+     */
+    private static function createErrorIFaceFromCode(int $code): ?AbstractHttpErrorIFace
     {
         try {
-            return $this->getIFaceFromCode($code)->render();
+            return static::createIFaceFromCodename('HttpError'.$code);
         } catch (Throwable $e) {
             static::log($e);
 
@@ -115,21 +137,11 @@ class BetaKiller_Kohana_Exception extends Kohana_Kohana_Exception
     }
 
     /**
-     * @param int $code
-     *
-     * @return \BetaKiller\IFace\IFaceInterface|mixed
-     */
-    protected function getIFaceFromCode($code)
-    {
-        return $this->createIFaceFromCodename('Error'.$code);
-    }
-
-    /**
      * @param string $codename
      *
-     * @return \BetaKiller\IFace\IFaceInterface|mixed
+     * @return \BetaKiller\IFace\AbstractHttpErrorIFace|mixed
      */
-    protected function createIFaceFromCodename(string $codename)
+    private static function createIFaceFromCodename(string $codename): ?AbstractHttpErrorIFace
     {
         $factory = \BetaKiller\DI\Container::getInstance()->get(IFaceFactory::class);
 
@@ -146,48 +158,16 @@ class BetaKiller_Kohana_Exception extends Kohana_Kohana_Exception
         return false;
     }
 
-    public function renderDefaultMessage($code)
+    private static function renderDefaultMessage(Throwable $e): string
     {
-        // Получаем вьюшку для текущего исключения
-        $view = $this->getView();
+        if ($userMessage = self::getUserMessage($e)) {
+            // Prevent XSS
+           return HTML::chars($userMessage);
+        }
 
-        // Чтобы не было XSS, преобразуем спецсимволы
-        $view->set('message', HTML::chars($this->getUserMessage()));
-        $view->set('code', (int)$code);
+        $key = self::getErrorLabelI18nKey($e);
 
-        return $this->template($view)->render();
-    }
-
-    /**
-     * Обрамляет вьюшку в базовый шаблон ошибки
-     *
-     * @param View $error
-     *
-     * @return View
-     */
-    public function template(View $error)
-    {
-        return View::factory($this->getViewPath('template'), ['error' => $error]);
-    }
-
-    /**
-     * Returns basic error view
-     *
-     * @return View
-     */
-    public function getView()
-    {
-        return View::factory($this->getViewPath());
-    }
-
-    /**
-     * @param null|integer|string $file HTTP code number or filename (without extension) of error view
-     *
-     * @return string
-     */
-    protected function getViewPath($file = null)
-    {
-        return 'error-pages/'.($file ?: 500);
+        return __($key);
     }
 
     /**
@@ -207,15 +187,33 @@ class BetaKiller_Kohana_Exception extends Kohana_Kohana_Exception
      * For most of exception classes it returns NULL (we do not want to inform user about our problems)
      * For populating original message to user set up protected property $_show_original_message_to_user of your custom exception class
      *
-     * @param bool $force_show Show original message
+     *
+     * @param \Throwable $e
      *
      * @return null|string
      */
-    public function getUserMessage($force_show = false)
+    public static function getUserMessage(Throwable $e)
     {
-        return ($force_show || $this->showOriginalMessageToUser())
-            ? $this->getMessage()
-            : null;
+        $show = ($e instanceof self) && $e->showOriginalMessageToUser();
+
+        return $show ? $e->getMessage() : null;
+    }
+
+    public static function getErrorLabelI18nKey(Throwable $e)
+    {
+        $code = static::getHttpErrorCode($e);
+
+        return static::getLabelI18nKeyForCode($code);
+    }
+
+    private static function getHttpErrorCode(Throwable $e)
+    {
+        return ($e instanceof HTTP_Exception) ? $e->getCode() : 500;
+    }
+
+    private static function getLabelI18nKeyForCode(int $code)
+    {
+        return 'error.'.$code.'.label';
     }
 
     /**
@@ -225,9 +223,9 @@ class BetaKiller_Kohana_Exception extends Kohana_Kohana_Exception
      *
      * @return string
      */
-    protected function getDefaultMessage()
+    protected function getDefaultMessageI18nKey()
     {
-        return 'System error';
+        return static::getLabelI18nKeyForCode(500);
     }
 
     /**

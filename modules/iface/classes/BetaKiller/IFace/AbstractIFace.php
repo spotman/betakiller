@@ -80,7 +80,17 @@ abstract class AbstractIFace implements IFaceInterface
 
     public function getLayoutCodename(): string
     {
-        return $this->getModel()->getLayoutCodename();
+        if ($zone = $this->getModel()->getLayoutCodename()) {
+            return $zone;
+        }
+
+        $parent = $this->getParent();
+
+        if (!$parent) {
+            throw new IFaceException('Can not detect layout codename for iface :codename', [':codename' => $this->getCodename()]);
+        }
+
+        return $parent->getLayoutCodename();
     }
 
     /**
@@ -92,7 +102,7 @@ abstract class AbstractIFace implements IFaceInterface
      */
     public function getLabel(UrlParametersInterface $params = null): string
     {
-        return $this->processStringPattern($this->getLabelSource(), null, $params);
+        return $this->processStringPattern($this->getLabelSource(), null, $params) ?: '';
     }
 
     /**
@@ -362,6 +372,14 @@ abstract class AbstractIFace implements IFaceInterface
     }
 
     /**
+     * @return \BetaKiller\IFace\IFaceInterface[]
+     */
+    public function getChildren(): array
+    {
+        return $this->ifaceProvider->getChildren($this);
+    }
+
+    /**
      * Getter for current iface model
      *
      * @return IFaceModelInterface
@@ -428,7 +446,17 @@ abstract class AbstractIFace implements IFaceInterface
      */
     public function getZoneName(): string
     {
-        return $this->getModel()->getZoneName() ?: $this->getParent()->getZoneName();
+        if ($zone = $this->getModel()->getZoneName()) {
+            return $zone;
+        }
+
+        $parent = $this->getParent();
+
+        if (!$parent) {
+            throw new IFaceException('Can not detect zone for iface :codename', [':codename' => $this->getCodename()]);
+        }
+
+        return $parent->getZoneName();
     }
 
     /**
@@ -471,7 +499,10 @@ abstract class AbstractIFace implements IFaceInterface
         $path = '/'.implode('/', array_reverse($parts));
 
         if ($this->appConfig->isTrailingSlashEnabled()) {
-            $path .= '/';
+            // Add trailing slash before query parameters
+            $split = explode('?', $path, 2);
+            $split[0] .= '/';
+            $path = implode('?', $split);
         }
 
         return $withDomain ? URL::site($path, true) : $path;
@@ -479,12 +510,12 @@ abstract class AbstractIFace implements IFaceInterface
 
     private function makeUri(UrlParametersInterface $parameters = null): string
     {
+        // Allow IFace to add custom url generating logic
+        $uri = $this->getUri();
         $model = $this->getModel();
 
-        $uri = $model->getUri();
-
         if (!$uri) {
-            throw new IFaceException('IFace :codename must have uri', [':codename' => $model->getCodename()]);
+            throw new IFaceException('IFace :codename must have uri', [':codename' => $this->getCodename()]);
         }
 
         // Static IFaces has raw uri value

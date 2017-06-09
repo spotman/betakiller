@@ -1,13 +1,16 @@
 <?php
 namespace BetaKiller\Status;
 
-use BetaKiller\Helper\CurrentUserTrait;
-use BetaKiller\Model\RoleInterface;
 use BetaKiller\Graph\GraphTransitionModelOrm;
+use BetaKiller\Model\RoleInterface;
 
 abstract class StatusTransitionModelOrm extends GraphTransitionModelOrm implements StatusTransitionModelInterface
 {
-    use CurrentUserTrait;
+    /**
+     * @Inject
+     * @var \BetaKiller\Model\UserInterface
+     */
+    private $user;
 
     protected function _initialize()
     {
@@ -28,7 +31,7 @@ abstract class StatusTransitionModelOrm extends GraphTransitionModelOrm implemen
      */
     public function filter_allowed_by_acl()
     {
-        $user = $this->current_user(true);
+        $user = $this->user;
 
         $through_table = $this->get_roles_relation_through_table_name();
 

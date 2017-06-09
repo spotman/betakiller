@@ -1,41 +1,19 @@
 <?php
 namespace BetaKiller\IFace\Admin\Content;
 
-use BetaKiller\Model\IFaceZone;
+use BetaKiller\IFace\App\Content\PostItem;
 
-class PostItemPreview extends AbstractAdminBase
+class PostItemPreview extends PostItem
 {
     /**
-     * @Inject
-     * @var \BetaKiller\Helper\ContentUrlParametersHelper
+     * This hook executed before IFace processing (on every request regardless of caching)
+     * Place here code that needs to be executed on every IFace request (increment views counter, etc)
      */
-    private $urlParametersHelper;
-
-    /**
-     * Returns data for View
-     * Override this method in child classes
-     */
-    public function getData(): array
+    public function before(): void
     {
-//        $post = $this->urlParametersHelper->getContentPost();
+        // Disable caching
+        $this->ifaceHelper->setExpiresInPast($this);
 
-//        $previewUrl = $this->ifaceHelper->getReadEntityUrl($post, IFaceZone::PUBLIC_ZONE).'?preview=true';
-
-//        $this->redirect($previewUrl);
-
-        return [];
-    }
-
-    /**
-     * @return string
-     */
-    public function render(): string
-    {
-        /** @var \BetaKiller\IFace\App\Content\PostItem $iface */
-        $iface = $this->ifaceHelper->createIFaceFromCodename('App_Content_PostItem');
-
-        // TODO extend public PostItem template
-
-        return $iface->render();
+        parent::before();
     }
 }

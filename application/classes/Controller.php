@@ -6,13 +6,12 @@
  */
 abstract class Controller extends Controller_Proxy
 {
-    use BetaKiller\Helper\CurrentUserTrait;
     use BetaKiller\Utils\Kohana\ControllerHelperTrait;
 
     const JSON_SUCCESS = Response::JSON_SUCCESS;
-    const JSON_ERROR = Response::JSON_ERROR;
+    const JSON_ERROR   = Response::JSON_ERROR;
 
-    protected static $_after_callbacks = array();
+    protected static $_after_callbacks = [];
 
     public function before()
     {
@@ -34,8 +33,7 @@ abstract class Controller extends Controller_Proxy
 
         $is_secure = $this->request->secure();
 
-        if ( ($is_secure_needed && !$is_secure) || ($is_secure && !$is_secure_needed))
-        {
+        if (($is_secure_needed && !$is_secure) || ($is_secure && !$is_secure_needed)) {
             $url = $this->request->url($base_protocol);
             $this->redirect($url);
         }
@@ -53,30 +51,26 @@ abstract class Controller extends Controller_Proxy
 
         $allowed_languages = I18n::lang_list();
 
-        if ($user_lang && ! in_array($user_lang, $allowed_languages, true) ) {
+        if ($user_lang && !in_array($user_lang, $allowed_languages, true)) {
             throw new HTTP_Exception_500(
                 'Unknown language :lang, only these are allowed: :allowed',
-                array(':lang' => $user_lang, ':allowed' => implode(', ', $allowed_languages))
+                [':lang' => $user_lang, ':allowed' => implode(', ', $allowed_languages)]
             );
         }
 
         // If current lang is not set
-        if ( ! $user_lang )
-        {
+        if (!$user_lang) {
             // Get current user
-            $user = $this->current_user(TRUE);
+            $user = Auth::instance()->get_user();
 
             // If user is authorized
-            if ( $user )
-            {
+            if ($user) {
                 // Get its lang
                 $user_lang = $user->get_language_name();
-            }
-            // Else detect the preferred lang
-            else
-            {
+            } // Else detect the preferred lang
+            else {
                 /** @var HTTP_Header $headers */
-                $headers = $this->request->headers();
+                $headers   = $this->request->headers();
                 $user_lang = $headers->preferred_language($allowed_languages);
             }
         }
@@ -93,7 +87,7 @@ abstract class Controller extends Controller_Proxy
 
         // Save all absent keys if in development env
         if (!Kohana::in_production(true)) {
-            register_shutdown_function(array(I18n::class, 'write'));
+            register_shutdown_function([I18n::class, 'write']);
         }
     }
 
@@ -109,27 +103,29 @@ abstract class Controller extends Controller_Proxy
      * View Factory for current request (directory/controller/action)
      *
      * @param string|null $file View file path (relative to directory/controller)
+     *
      * @return View
      */
-    protected function view($file = NULL)
+    protected function view($file = null)
     {
         $path = $this->request->directory()
-            ? $this->request->directory() . DIRECTORY_SEPARATOR . $this->request->controller()
+            ? $this->request->directory().DIRECTORY_SEPARATOR.$this->request->controller()
             : $this->request->controller();
 
         $file = $file ?: $this->request->action();
 
-        return $this->view_factory($path . DIRECTORY_SEPARATOR . $file);
+        return $this->view_factory($path.DIRECTORY_SEPARATOR.$file);
     }
 
     /**
      * Helper for View::factory()
      *
      * @param string $file
-     * @param array $data
+     * @param array  $data
+     *
      * @return View
      */
-    protected function view_factory($file = NULL, array $data = NULL)
+    protected function view_factory($file = null, array $data = null)
     {
         return View::factory($file, $data);
     }

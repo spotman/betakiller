@@ -1,8 +1,11 @@
-<?php defined('SYSPATH') OR die('No direct script access.');
+<?php namespace BetaKiller\IFace\Auth;
 
+defined('SYSPATH') OR die('No direct script access.');
+
+use Auth;
 use BetaKiller\Model\UserInterface;
 
-class IFace_Auth_ReLogin extends IFace_Auth_Login
+class ReLogin extends Login
 {
     /**
      * @var \Auth
@@ -18,12 +21,12 @@ class IFace_Auth_ReLogin extends IFace_Auth_Login
         $this->setRedirectUrl('/');
     }
 
-    public function before()
+    public function before(): void
     {
         // If user is logged in
         if (!$this->user->isGuest()) {
             // Sign out the user
-            $this->auth->logout(TRUE);
+            $this->auth->logout(true);
         }
     }
 }

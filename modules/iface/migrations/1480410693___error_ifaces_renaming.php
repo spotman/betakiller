@@ -35,8 +35,8 @@ class Migration1480410693_Error_Ifaces_Renaming extends Migration {
     protected function get_ifaces_list()
     {
         return [
-            'Error_404' =>  'Error404',
-            'Error_500' =>  'Error500',
+            'Error_404' =>  'HttpError404',
+            'Error_500' =>  'HttpError500',
         ];
 	}
 

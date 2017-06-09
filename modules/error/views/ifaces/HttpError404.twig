@@ -1,0 +1,18 @@
+{% extends layout %}
+
+{% block page_content %}
+  <div class="error-404">
+    {% block header %}
+      <h1>{{ label }}</h1>
+    {% endblock %}
+
+    <p class="center-align">
+      {{ "error.404.p1"|i18n }}
+      {{ "error.404.p2"|i18n }}
+      {{ "error.404.search.message"|i18n }}
+    </p>
+
+    {% block search_form "" %}
+
+  </div>
+{% endblock %}

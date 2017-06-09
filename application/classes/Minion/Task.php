@@ -33,6 +33,9 @@ abstract class Minion_Task extends Kohana_Minion_Task
 
     protected static function _make_task_class_instance($class_name)
     {
+        // Auth for CLI
+        static::forceCliUserAuth();
+
         return \BetaKiller\DI\Container::getInstance()->get($class_name);
     }
 
@@ -51,14 +54,16 @@ abstract class Minion_Task extends Kohana_Minion_Task
 
         Log::instance()->attach(new Minion_Log($max_log_level), $max_log_level, $min_log_level);
 
-        // Auth for CLI
-        $user = $this->getCliUserModel();
-        Auth::instance()->force_login($user);
-
         return parent::execute();
     }
 
-    protected function getCliUserModel()
+    private static function forceCliUserAuth()
+    {
+        $user = static::getCliUserModel();
+        Auth::instance()->force_login($user);
+    }
+
+    private static function getCliUserModel()
     {
         $username = 'minion';
 

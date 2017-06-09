@@ -1,24 +1,33 @@
 <?php
 namespace BetaKiller\Api\Method\PhpException;
 
-use BetaKiller\Helper\CurrentUserTrait;
+use BetaKiller\Model\UserInterface;
 use Spotman\Api\Method\AbstractApiMethod;
 
 class ThrowHttpExceptionApiMethod extends AbstractApiMethod
 {
     use PhpExceptionMethodTrait;
-    use CurrentUserTrait;
-
-    protected $code;
 
     /**
-     * ResolveApiMethod constructor.
-     *
-     * @param string $code
+     * @var UserInterface
      */
-    public function __construct($code)
+    private $user;
+
+    /**
+     * @var int
+     */
+    private $code;
+
+    /**
+     * ThrowHttpExceptionApiMethod constructor.
+     *
+     * @param int                             $code
+     * @param \BetaKiller\Model\UserInterface $user
+     */
+    public function __construct(int $code, UserInterface $user)
     {
-        $this->code = (int)$code;
+        $this->code = $code;
+        $this->user = $user;
     }
 
     /**
@@ -26,8 +35,7 @@ class ThrowHttpExceptionApiMethod extends AbstractApiMethod
      */
     public function execute()
     {
-        $user = $this->current_user();
-
-        throw \HTTP_Exception::factory($this->code, 'This is a test from :username', [':username' => $user->get_username()]);
+        throw \HTTP_Exception::factory($this->code, 'This is a test from :username',
+            [':username' => $this->user->get_username()]);
     }
 }

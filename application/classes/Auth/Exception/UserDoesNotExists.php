@@ -2,8 +2,14 @@
 
 class Auth_Exception_UserDoesNotExists extends Auth_Exception
 {
-    protected function getDefaultMessage()
+    protected function getDefaultMessageI18nKey()
     {
-        return 'User does not exists';
+        return 'error.auth.user_not_exists';
+    }
+
+    public function isNotificationEnabled()
+    {
+        // Notify admin when incorrect username used
+        return true;
     }
 }

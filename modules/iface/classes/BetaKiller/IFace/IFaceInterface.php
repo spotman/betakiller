@@ -133,6 +133,11 @@ interface IFaceInterface extends SeoMetaInterface
     public function setParent(IFaceInterface $parent);
 
     /**
+     * @return \BetaKiller\IFace\IFaceInterface[]
+     */
+    public function getChildren(): array;
+
+    /**
      * Getter for current iface model
      *
      * @return IFaceModelInterface

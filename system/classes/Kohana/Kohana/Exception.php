@@ -46,9 +46,9 @@ class Kohana_Kohana_Exception extends Exception
      * @param   string         $message   error message
      * @param   array          $variables translation variables
      * @param   integer|string $code      the exception code
-     * @param   Exception      $previous  Previous exception
+     * @param   \Throwable     $previous  Previous exception
      */
-    public function __construct($message = '', array $variables = null, $code = 0, Exception $previous = null)
+    public function __construct($message = '', array $variables = null, $code = 0, Throwable $previous = null)
     {
         // Set the message
         $message = __($message, $variables);
@@ -252,7 +252,8 @@ class Kohana_Kohana_Exception extends Exception
             $response->status(($e instanceof HTTP_Exception) ? $e->getCode() : 500);
 
             // Set the response headers
-            $response->headers('Content-Type', Kohana_Exception::$error_view_content_type.'; charset='.Kohana::$charset);
+            $response->headers('Content-Type',
+                Kohana_Exception::$error_view_content_type.'; charset='.Kohana::$charset);
 
             // Set the response body
             $response->body($view->render());

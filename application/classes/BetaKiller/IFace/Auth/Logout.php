@@ -1,8 +1,9 @@
-<?php defined('SYSPATH') OR die('No direct script access.');
+<?php
+namespace BetaKiller\IFace\Auth;
 
 use BetaKiller\IFace\AbstractIFace;
 
-class IFace_Auth_Logout extends AbstractIFace
+class Logout extends AbstractIFace
 {
     /**
      * @Inject

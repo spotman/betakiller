@@ -162,10 +162,11 @@ class IFace extends TreeModelSingleParentOrm implements IFaceModelInterface
      *
      * @return string
      */
-    public function getLayoutCodename(): string
+    public function getLayoutCodename(): ?string
     {
         $layout = $this->getLayoutRelation();
 
+        // TODO Allow null layout so it will climb up the ifaces tree to detect layout (if it fails then exception fired)
         if (!$layout->loaded()) {
             $layout = $layout->get_default();
         }

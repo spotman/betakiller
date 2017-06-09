@@ -50,11 +50,11 @@ interface IFaceModelInterface extends TreeModelSingleParentInterface, SeoMetaInt
     public function asArray(): array;
 
     /**
-     * Returns iface layout object
+     * Returns layout codename or null if using parent layout
      *
      * @return string
      */
-    public function getLayoutCodename(): string;
+    public function getLayoutCodename(): ?string;
 
     /**
      * Returns TRUE if current IFace is hidden in sitemap

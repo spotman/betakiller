@@ -2,12 +2,10 @@
 namespace BetaKiller\Api\Method\ContentComment;
 
 use BetaKiller\Helper\ContentTrait;
-use BetaKiller\Helper\CurrentUserTrait;
 
 trait ContentCommentMethodTrait
 {
     use ContentTrait;
-    use CurrentUserTrait;
 
     /**
      * Returns new model or performs search by id

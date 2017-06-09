@@ -70,6 +70,14 @@ class IFaceHelper
         return $this->stack->getCurrent();
     }
 
+    public function isCurrentIFaceAction(string $name): bool
+    {
+        $currentIFace  = $this->getCurrentIFace();
+        $currentAction = $currentIFace->getEntityActionName();
+
+        return $currentAction === $name;
+    }
+
     public function isCurrentIFace(IFaceInterface $iface, UrlParametersInterface $params = null): bool
     {
         return $this->stack->isCurrent($iface, $params);
@@ -184,5 +192,14 @@ class IFaceHelper
         $iface->setLastModified($response->getLastModified());
 
         return $response->getData();
+    }
+
+    public function setExpiresInPast(IFaceInterface $iface): void
+    {
+        // No caching for admin zone
+        $interval         = new \DateInterval('PT1H');
+        $interval->invert = 1;
+
+        $iface->setExpiresInterval($interval);
     }
 }

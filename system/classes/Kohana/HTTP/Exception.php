@@ -1,72 +1,78 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
-abstract class Kohana_HTTP_Exception extends Kohana_Exception {
+abstract class Kohana_HTTP_Exception extends Kohana_Exception
+{
 
-	/**
-	 * Creates an HTTP_Exception of the specified type.
-	 * 
-	 * @param   integer $code       the http status code
-	 * @param   string  $message    status message, custom content to display with error
-	 * @param   array   $variables  translation variables
-	 * @return  HTTP_Exception
-	 */
-	public static function factory($code, $message = NULL, array $variables = NULL, Exception $previous = NULL)
-	{
-		$class = 'HTTP_Exception_'.$code;
-		
-		return new $class($message, $variables, $previous);
-	}
+    /**
+     * Creates an HTTP_Exception of the specified type.
+     *
+     * @param   integer         $code      the http status code
+     * @param   string          $message   status message, custom content to display with error
+     * @param   array           $variables translation variables
+     * @param   \Throwable|null $previous
+     *
+     * @return  HTTP_Exception
+     */
+    public static function factory($code, $message = null, array $variables = null, ?Throwable $previous = null)
+    {
+        $class = 'HTTP_Exception_'.$code;
 
-	/**
-	 * @var  int        http status code
-	 */
-	protected $_code = 0;
+        return new $class($message, $variables, $previous);
+    }
 
-	/**
-	 * @var  Request    Request instance that triggered this exception.
-	 */
-	protected $_request;
+    /**
+     * @var  int        http status code
+     */
+    protected $_code = 0;
 
-	/**
-	 * Creates a new translated exception.
-	 *
-	 *     throw new Kohana_Exception('Something went terrible wrong, :user',
-	 *         array(':user' => $user));
-	 *
-	 * @param   string  $message    status message, custom content to display with error
-	 * @param   array   $variables  translation variables
-	 * @return  void
-	 */
-	public function __construct($message = NULL, array $variables = NULL, Exception $previous = NULL)
-	{
-		parent::__construct($message, $variables, $this->_code, $previous);
-	}
+    /**
+     * @var  Request    Request instance that triggered this exception.
+     */
+    protected $_request;
 
-	/**
-	 * Store the Request that triggered this exception.
-	 * 
-	 * @param   Request   $request  Request object that triggered this exception.
-	 * @return  $this
-	 */
-	public function request(Request $request = NULL)
-	{
-		if ($request === NULL)
-			return $this->_request;
-		
-		$this->_request = $request;
+    /**
+     * Creates a new translated exception.
+     *
+     *     throw new Kohana_Exception('Something went terrible wrong, :user',
+     *         array(':user' => $user));
+     *
+     * @param   string $message   status message, custom content to display with error
+     * @param   array  $variables translation variables
+     *
+     * @return  void
+     */
+    public function __construct($message = null, array $variables = null, Throwable $previous = null)
+    {
+        parent::__construct($message, $variables, $this->_code, $previous);
+    }
 
-		return $this;
-	}
+    /**
+     * Store the Request that triggered this exception.
+     *
+     * @param   Request $request Request object that triggered this exception.
+     *
+     * @return  $this
+     */
+    public function request(Request $request = null)
+    {
+        if ($request === null) {
+            return $this->_request;
+        }
 
-	/**
-	 * Generate a Response for the current Exception
-	 * 
-	 * @uses   Kohana_Exception::response()
-	 * @return Response
-	 */
-	public function get_response()
-	{
-		return Kohana_Exception::response($this);
-	}
+        $this->_request = $request;
+
+        return $this;
+    }
+
+    /**
+     * Generate a Response for the current Exception
+     *
+     * @uses   Kohana_Exception::response()
+     * @return Response
+     */
+    public function get_response()
+    {
+        return Kohana_Exception::response($this);
+    }
 
 } // End Kohana_HTTP_Exception

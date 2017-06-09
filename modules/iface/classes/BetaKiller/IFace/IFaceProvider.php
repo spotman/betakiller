@@ -117,6 +117,24 @@ class IFaceProvider
         return $layer;
     }
 
+    /**
+     * @param \BetaKiller\IFace\IFaceInterface $parentIFace
+     *
+     * @return \BetaKiller\IFace\IFaceInterface[]
+     */
+    public function getChildren(IFaceInterface $parentIFace)
+    {
+        $models = $this->getModelsLayer($parentIFace);
+
+        $ifaces = [];
+
+        foreach ($models as $model) {
+            $ifaces[] = $this->fromModel($model);
+        }
+
+        return $ifaces;
+    }
+
     public function getDefault()
     {
         $defaultModel = $this->getModelProvider()->getDefault();

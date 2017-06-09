@@ -11,4 +11,5 @@ return [
     'No IFace found for :entity.:action entity in :zone zone'                   => 'No IFace found for :entity.:action entity in :zone zone',
     'Request have unused query parts: :keys'                                    => 'Request have unused query parts: :keys',
     'IFace zone must be specified'                                              => 'IFace zone must be specified',
+    'Can not detect layout codename for iface :codename'                        => 'Can not detect layout codename for iface :codename',
 ];

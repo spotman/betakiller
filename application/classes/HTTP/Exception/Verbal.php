@@ -2,31 +2,24 @@
 
 /**
  * Class HTTP_Exception_Verbal
- * Бросайте исключения этого типа, если нужно прервать выполнение скрипта и сообщить пользователю о проблеме
- * Исключение этого типа не логируется так как причиной проблемы является сам пользователь
+ * Throw exceptions of the current type if you need to stop script execution and send message to the user.
+ * Notifications are disabled for this type coz throwing this kind of exception is a normal flow.
  */
-class HTTP_Exception_Verbal extends HTTP_Exception_400 {
-
+class HTTP_Exception_Verbal extends HTTP_Exception_400
+{
     /**
-     * Показываем пользователю оригинальный текст исключения в красивых обёртках и в JSON-ответе
+     * @return bool
      */
     protected function showOriginalMessageToUser()
     {
-        return TRUE;
+        return true;
     }
 
     /**
-     * Отключаем уведомление о текущем типе исключений
      * @return bool
      */
     public function isNotificationEnabled()
     {
-        return FALSE;
+        return false;
     }
-
-    protected function getViewPath($file = NULL)
-    {
-        return parent::getViewPath('verbal');
-    }
-
 }

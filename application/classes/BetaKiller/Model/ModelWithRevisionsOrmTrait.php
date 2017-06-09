@@ -2,12 +2,15 @@
 namespace BetaKiller\Model;
 
 use BetaKiller\Exception;
-use BetaKiller\Helper\CurrentUserTrait;
 use DateTime;
 
 trait ModelWithRevisionsOrmTrait
 {
-    use CurrentUserTrait;
+    /**
+     * @Inject
+     * @var \BetaKiller\Model\UserInterface
+     */
+    private $user;
 
     /**
      * @var \BetaKiller\Model\RevisionModelInterface
@@ -179,8 +182,12 @@ trait ModelWithRevisionsOrmTrait
             throw new Exception('Can not link revision to related model without ID');
         }
 
+        $user = $this->user;
+
+        $user->forceAuthorization();
+
         $revision->setCreatedAt(new DateTime);
-        $revision->setCreatedBy($this->current_user());
+        $revision->setCreatedBy($user);
 
         // Link new revision to current post
         $key = $this->getRevisionModelForeignKey();

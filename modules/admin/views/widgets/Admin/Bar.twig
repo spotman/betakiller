@@ -8,7 +8,7 @@
   <header id="admin-bar" class="navbar-fixed">
     <nav class="green lighten-5 black-text">
       <div class="nav-wrapper">
-        <div class="{{ not isAdminZone ? "container" : "" }}">
+        <div class="{{ not isAdminLayout ? "container" : "" }}">
 
           <ul class="right">
             {% if primaryEntity.previewUrl %}
@@ -39,7 +39,7 @@
             {% endif %}
           </ul>
 
-          <ul class="left">
+          <ul>
 
             {% if createButtonItems|length > 0 %}
             <li>
