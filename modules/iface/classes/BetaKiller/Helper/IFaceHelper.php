@@ -7,11 +7,13 @@ use BetaKiller\IFace\IFaceFactory;
 use BetaKiller\IFace\IFaceInterface;
 use BetaKiller\IFace\IFaceModelInterface;
 use BetaKiller\IFace\IFaceStack;
+use BetaKiller\IFace\PreviewActionInterface;
 use BetaKiller\IFace\Url\UrlParametersInterface;
 use BetaKiller\IFace\View\IFaceView;
 use BetaKiller\IFace\Widget\WidgetInterface;
 use BetaKiller\IFace\WidgetFactory;
 use BetaKiller\Model\DispatchableEntityInterface;
+use BetaKiller\Model\IFaceZone;
 use Spotman\Api\ApiMethodResponse;
 
 class IFaceHelper
@@ -130,6 +132,7 @@ class IFaceHelper
      * @param string|null                                   $zone
      *
      * @return string
+     * @throws \BetaKiller\IFace\Exception\IFaceException
      */
     public function getEntityUrl(DispatchableEntityInterface $entity, string $action, ?string $zone = null): string
     {
@@ -185,6 +188,11 @@ class IFaceHelper
     public function getSearchEntityUrl(DispatchableEntityInterface $entity, ?string $zone = null): string
     {
         return $this->getEntityUrl($entity, CrudlsActionsInterface::ACTION_SEARCH, $zone);
+    }
+
+    public function getPreviewEntityUrl(DispatchableEntityInterface $entity): ?string
+    {
+        return $this->getEntityUrl($entity, PreviewActionInterface::ACTION_PREVIEW, IFaceZone::PREVIEW_ZONE);
     }
 
     public function processApiResponse(ApiMethodResponse $response, IFaceInterface $iface)

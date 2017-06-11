@@ -13,8 +13,9 @@ use BetaKiller\Model\ModelWithRevisionsOrmTrait;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Status\StatusRelatedModelInterface;
 use BetaKiller\Status\StatusRelatedModelOrmTrait;
+use BetaKiller\Model\EntityWithPreviewModeInterface;
 
-class Model_ContentPost extends \ORM implements StatusRelatedModelInterface, ModelWithRevisionsInterface, SeoMetaInterface, ImportedFromWordpressInterface
+class Model_ContentPost extends \ORM implements StatusRelatedModelInterface, ModelWithRevisionsInterface, SeoMetaInterface, ImportedFromWordpressInterface, EntityWithPreviewModeInterface
 {
     use StatusRelatedModelOrmTrait,
         ModelWithRevisionsOrmTrait,
@@ -722,6 +723,12 @@ class Model_ContentPost extends \ORM implements StatusRelatedModelInterface, Mod
             $this->object_column('label'),
             $this->object_column('content'),
         ]);
+    }
+
+    public function isPreviewNeeded(): bool
+    {
+        // TODO: detect is post has unpublished revisions
+        return true;
     }
 
     /**

@@ -2,15 +2,16 @@
 
 namespace BetaKiller\Widget\Admin;
 
-use BetaKiller\Acl\Resource\ContentPostResource;
 use BetaKiller\Helper\ContentTrait;
 use BetaKiller\Helper\ContentUrlParametersHelper;
 use BetaKiller\Helper\IFaceHelper;
 use BetaKiller\IFace\CrudlsActionsInterface;
 use BetaKiller\IFace\Exception\IFaceException;
 use BetaKiller\IFace\IFaceProvider;
+use BetaKiller\IFace\PreviewActionInterface;
 use BetaKiller\IFace\Widget\AbstractAdminWidget;
 use BetaKiller\Model\DispatchableEntityInterface;
+use BetaKiller\Model\EntityWithPreviewModeInterface;
 use BetaKiller\Model\IFaceZone;
 use BetaKiller\Model\Layout;
 use BetaKiller\Model\UserInterface;
@@ -55,9 +56,9 @@ class BarWidget extends AbstractAdminWidget
      */
     public function getData(): array
     {
-        $currentIFace = $this->ifaceHelper->getCurrentIFace();
-        $currentLayout  = $currentIFace->getLayoutCodename();
-        $isAdminLayout  = $currentLayout === Layout::LAYOUT_ADMIN;
+        $currentIFace  = $this->ifaceHelper->getCurrentIFace();
+        $currentLayout = $currentIFace->getLayoutCodename();
+        $isAdminLayout = $currentLayout === Layout::LAYOUT_ADMIN;
 
         $entity = $this->detectPrimaryEntity();
 
@@ -85,7 +86,8 @@ class BarWidget extends AbstractAdminWidget
     private function getCreateButtonItems(): array
     {
         $items  = [];
-        $ifaces = $this->ifaceProvider->getByActionAndZone(CrudlsActionsInterface::ACTION_CREATE, IFaceZone::ADMIN_ZONE);
+        $ifaces = $this->ifaceProvider->getByActionAndZone(CrudlsActionsInterface::ACTION_CREATE,
+            IFaceZone::ADMIN_ZONE);
 
         foreach ($ifaces as $iface) {
             if (!$this->aclHelper->isIFaceAllowed($iface)) {
@@ -146,42 +148,27 @@ class BarWidget extends AbstractAdminWidget
         return $iface->url();
     }
 
-    private function getPreviewButtonUrl(?DispatchableEntityInterface $entity): ?string
-    {
-        if (!$entity) {
-            return null;
-        }
-
-        $previewAction = ContentPostResource::ACTION_PREVIEW;
-
-        $currentIFace  = $this->ifaceHelper->getCurrentIFace();
-        $currentAction = $currentIFace->getEntityActionName();
-
-        // No preview button in preview mode
-        if ($currentAction === $previewAction) {
-            return null;
-        }
-
-        try {
-            return $this->ifaceHelper->getEntityUrl($entity, $previewAction);
-        } catch (IFaceException $e) {
-            // No iface found for preview action
-            return null;
-        }
-    }
-
     private function getAdminEditButtonUrl(?DispatchableEntityInterface $entity): ?string
     {
-        return $this->getPrimaryEntityActionUrl($entity, IFaceZone::ADMIN_ZONE);
+        return $this->getPrimaryEntityActionUrl($entity, IFaceZone::ADMIN_ZONE, CrudlsActionsInterface::ACTION_READ);
     }
 
     private function getPublicReadButtonUrl(?DispatchableEntityInterface $entity): ?string
     {
-        return $this->getPrimaryEntityActionUrl($entity, IFaceZone::PUBLIC_ZONE);
+        return $this->getPrimaryEntityActionUrl($entity, IFaceZone::PUBLIC_ZONE, CrudlsActionsInterface::ACTION_READ);
     }
 
-    // TODO Show "Edit" button in preview mode
-    private function getPrimaryEntityActionUrl(?DispatchableEntityInterface $entity, $targetZone): ?string
+    private function getPreviewButtonUrl(?DispatchableEntityInterface $entity): ?string
+    {
+        return $this->getPrimaryEntityActionUrl($entity, IFaceZone::PREVIEW_ZONE,
+            PreviewActionInterface::ACTION_PREVIEW);
+    }
+
+    private function getPrimaryEntityActionUrl(
+        ?DispatchableEntityInterface $entity,
+        string $zone,
+        string $action
+    ): ?string
     {
         if (!$entity) {
             return null;
@@ -190,21 +177,26 @@ class BarWidget extends AbstractAdminWidget
         $currentIFace = $this->ifaceHelper->getCurrentIFace();
         $currentZone  = $currentIFace->getZoneName();
 
-        if ($currentZone === $targetZone) {
+        if ($currentZone === $zone) {
             return null;
         }
 
-        switch ($currentZone) {
-            case IFaceZone::ADMIN_ZONE:
-                // Show "Read in public" url
-                return $this->ifaceHelper->getReadEntityUrl($entity, $targetZone);
-
-            case IFaceZone::PUBLIC_ZONE:
-                // Show "Edit in admin" url
-                return $this->ifaceHelper->getReadEntityUrl($entity, $targetZone);
-
-            default:
+        if ($currentZone === IFaceZone::PREVIEW_ZONE) {
+            if (!($entity instanceof EntityWithPreviewModeInterface)) {
+                // No preview allowed for current entity
                 return null;
+            }
+
+            if (!$entity->isPreviewNeeded()) {
+                return null;
+            }
+        }
+
+        try {
+            return $this->ifaceHelper->getEntityUrl($entity, $action, $zone);
+        } catch (IFaceException $e) {
+            // No IFace found for provided zone/action
+            return null;
         }
     }
 

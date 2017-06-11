@@ -20,20 +20,20 @@
               </li>
             {% endif %}
 
-            {% if primaryEntity.publicUrl %}
-              <li>
-                <a href="{{ primaryEntity.publicUrl }}" class="view-entity-button">
-                  <i class="material-icons left tiny">done_all</i>
-                  {{ "admin.bar.public"|i18n }}
-                </a>
-              </li>
-            {% endif %}
-
             {% if primaryEntity.adminUrl %}
               <li>
                 <a href="{{ primaryEntity.adminUrl }}" class="edit-entity-button">
                   <i class="material-icons left tiny">mode_edit</i>
                   {{ "admin.bar.edit"|i18n }}
+                </a>
+              </li>
+            {% endif %}
+
+            {% if primaryEntity.publicUrl %}
+              <li>
+                <a href="{{ primaryEntity.publicUrl }}" class="view-entity-button">
+                  <i class="material-icons left tiny">done_all</i>
+                  {{ "admin.bar.public"|i18n }}
                 </a>
               </li>
             {% endif %}

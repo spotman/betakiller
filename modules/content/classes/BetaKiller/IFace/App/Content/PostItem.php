@@ -1,8 +1,8 @@
 <?php
 namespace BetaKiller\IFace\App\Content;
 
-use BetaKiller\Acl\Resource\ContentPostResource;
 use BetaKiller\Helper\ContentUrlParametersHelper;
+use BetaKiller\IFace\PreviewActionInterface;
 use BetaKiller\Model\UserInterface;
 use Model_ContentPost;
 
@@ -65,7 +65,7 @@ class PostItem extends AbstractAppBase
     {
         $model = $this->getContentModel();
 
-        $previewMode = $this->ifaceHelper->isCurrentIFaceAction(ContentPostResource::ACTION_PREVIEW);
+        $previewMode = $this->ifaceHelper->isCurrentIFaceAction(PreviewActionInterface::ACTION_PREVIEW);
 
         if ($previewMode) {
             // See latest revision data
