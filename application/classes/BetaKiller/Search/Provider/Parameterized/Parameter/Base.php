@@ -1,11 +1,11 @@
 <?php
 namespace BetaKiller\Search\Provider\Parameterized\Parameter;
 
+use BetaKiller\Filter\Factory;
+use BetaKiller\Filter\FilterInterface;
+use BetaKiller\Model\UserInterface;
 use BetaKiller\Search;
 use BetaKiller\Search\Provider\Parameterized\Parameter;
-use BetaKiller\Model;
-use BetaKiller\Filter;
-use BetaKiller\FilterInterface;
 
 abstract class Base implements Parameter
 {
@@ -15,7 +15,7 @@ abstract class Base implements Parameter
     protected $_user;
 
     /**
-     * @var Filter\Factory
+     * @var \BetaKiller\Filter\Factory
      */
     protected $_filterFactory;
 
@@ -27,15 +27,15 @@ abstract class Base implements Parameter
     /**
      * Parameter constructor.
      *
-     * @param Model\User $_user
+     * @param \BetaKiller\Model\UserInterface $_user
      */
-    public function __construct(Model\User $_user = NULL)
+    public function __construct(UserInterface $_user = NULL)
     {
         $this->_user = $_user;
     }
 
     /**
-     * @return Filter\Factory
+     * @return \BetaKiller\Filter\Factory
      */
     public function getFilterFactory()
     {
@@ -43,9 +43,9 @@ abstract class Base implements Parameter
     }
 
     /**
-     * @param Filter\Factory $filterFactory
+     * @param \BetaKiller\Filter\Factory $filterFactory
      */
-    public function setFilterFactory(Filter\Factory $filterFactory)
+    public function setFilterFactory(Factory $filterFactory)
     {
         $this->_filterFactory = $filterFactory;
     }
@@ -125,7 +125,7 @@ abstract class Base implements Parameter
     /**
      * Returns array of selected values groups
      *
-     * @return Filter\Model\ValuesGroup[]
+     * @return \BetaKiller\Filter\Model\ValuesGroup[]
      */
     public function getSelectedValues()
     {
@@ -179,7 +179,7 @@ abstract class Base implements Parameter
     }
 
     /**
-     * @return \BetaKiller\Filter\Base|\BetaKiller\FilterInterface
+     * @return \BetaKiller\Filter\Base|\BetaKiller\Filter\FilterInterface
      * @throws \BetaKiller\Search\Provider\Parameterized\Parameter\Exception
      */
     protected function getFilter()

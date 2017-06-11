@@ -2,6 +2,7 @@
 namespace BetaKiller\Log;
 
 use BetaKiller\Helper\AppEnv;
+use Monolog\ErrorHandler;
 use Monolog\Handler\DeduplicationHandler;
 use Monolog\Handler\PHPConsoleHandler;
 use Monolog\Handler\StreamHandler;
@@ -51,13 +52,15 @@ class Logger implements LoggerInterface
     {
         $monolog = new \Monolog\Logger('default');
 
+//        TODO PhpExceptionStorage handler
 //        ErrorHandler::register($monolog);
 
         $logFilePath     = implode(DIRECTORY_SEPARATOR, ['logs', date('Y'), date('m'), date('d').'.log']);
         $coreLogFilePath = APPPATH.$logFilePath;
         $appLogFilePath  = $this->multiSite->getWorkingPath().DIRECTORY_SEPARATOR.$logFilePath;
 
-        $stripExceptionFormatter = new StripExceptionFromContextFormatter();
+        // TODO Implement boolean flag in session named "debugEnabled" and enable logging of DEBUG level messages
+        $debugAllowed = $this->appEnv->inDevelopmentMode();
 
         $groupHandler = new WhatFailureGroupHandler([
             // Core logs
@@ -72,9 +75,6 @@ class Logger implements LoggerInterface
 
         $monolog->pushHandler(new DeduplicationHandler($groupHandler));
 
-        // TODO Implement boolean flag in session named "debugEnabled"
-        $debugAllowed = $this->appEnv->inDevelopmentMode();
-
         // Enable debugging via PhpConsole for developers
         if ($debugAllowed && Connector::getInstance()->isActiveClient()) {
             $phpConsoleHandler = new PHPConsoleHandler([
@@ -83,6 +83,7 @@ class Logger implements LoggerInterface
                 'useOwnErrorsHandler'      => true,     // Enable errors handling
                 'useOwnExceptionsHandler'  => true,     // Enable exceptions handling
             ]);
+            $stripExceptionFormatter = new StripExceptionFromContextFormatter();
             $phpConsoleHandler->setFormatter($stripExceptionFormatter);
             $monolog->pushHandler($phpConsoleHandler);
         }

@@ -1,9 +1,10 @@
 <?php
-namespace BetaKiller;
+namespace BetaKiller\Filter;
 
-use \BetaKiller\URL\QueryConverter;
+use BetaKiller\Filter\Model\Applicable;
+use BetaKiller\URL\QueryConverter\ConvertibleItem;
 
-interface FilterInterface extends QueryConverter\ConvertibleItem
+interface FilterInterface extends ConvertibleItem
 {
     /**
      * Set up internal data from array
@@ -20,7 +21,7 @@ interface FilterInterface extends QueryConverter\ConvertibleItem
      */
     public function asArray();
 
-    public function apply(Filter\Model\Applicable $model);
+    public function apply(Applicable $model);
 
     /**
      * @return string
@@ -45,7 +46,7 @@ interface FilterInterface extends QueryConverter\ConvertibleItem
     /**
      * Returns array of selected values groups
      *
-     * @return Filter\Model\ValuesGroup[]
+     * @return \BetaKiller\Filter\Model\ValuesGroup[]
      */
     public function getSelectedValues();
 

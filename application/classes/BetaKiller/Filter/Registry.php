@@ -1,11 +1,10 @@
 <?php
 namespace BetaKiller\Filter;
 
-use BetaKiller\FilterInterface;
 use BetaKiller\Filter\Model\Applicable;
+use BetaKiller\URL\QueryConverter;
 use BetaKiller\URL\QueryConverter\Convertible;
 use BetaKiller\Utils;
-use BetaKiller\URL\QueryConverter;
 use Traversable;
 
 abstract class Registry implements \IteratorAggregate, QueryConverter\Convertible
@@ -106,7 +105,7 @@ abstract class Registry implements \IteratorAggregate, QueryConverter\Convertibl
     /**
      * @param $key
      *
-     * @return \BetaKiller\FilterInterface
+     * @return \BetaKiller\Filter\FilterInterface
      */
     public function get($key)
     {

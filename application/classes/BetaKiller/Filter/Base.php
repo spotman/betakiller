@@ -2,7 +2,6 @@
 namespace BetaKiller\Filter;
 
 use BetaKiller\Filter;
-use BetaKiller\FilterInterface;
 use BetaKiller\Filter\Model\Value;
 use BetaKiller\Filter\Model\ValuesGroup;
 use BetaKiller\Model\User;
