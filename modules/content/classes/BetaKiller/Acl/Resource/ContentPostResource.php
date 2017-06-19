@@ -1,27 +1,10 @@
 <?php
 namespace BetaKiller\Acl\Resource;
 
-use BetaKiller\IFace\PreviewActionInterface;
 use BetaKiller\Model\Role;
 
-class ContentPostResource extends AbstractStatusRelatedEntityAclResource implements PreviewActionInterface
+class ContentPostResource extends AbstractStatusRelatedEntityAclResource
 {
-    /**
-     * Returns default permissions bundled with current resource
-     * Key=>Value pairs where key is a permission identity and value is an array of roles
-     * Useful for presetting permissions for resources with fixed access control list or permissions based on hard-coded logic
-     *
-     * @return string[][]
-     */
-    public function getDefaultAccessList(): array
-    {
-        return parent::getDefaultAccessList() + [
-                self::ACTION_PREVIEW => [
-                Role::WRITER_ROLE_NAME,
-            ]
-        ];
-    }
-
     /**
      * Provides array of roles` names which are allowed to create entities
      *

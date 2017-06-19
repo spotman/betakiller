@@ -85,7 +85,7 @@ trait ModelWithRevisionsOrmTrait
     /**
      * @return void
      */
-    public function useLatestRevision()
+    public function useLatestRevision(): void
     {
         $revision = $this->getLatestRevision();
         $this->setCurrentRevision($revision);
@@ -94,7 +94,7 @@ trait ModelWithRevisionsOrmTrait
     /**
      * @return void
      */
-    public function useActualRevision()
+    public function useActualRevision(): void
     {
         $this->setCurrentRevision($this->getActualRevision());
     }
@@ -102,7 +102,7 @@ trait ModelWithRevisionsOrmTrait
     /**
      * @return void
      */
-    public function setLatestRevisionAsActual()
+    public function setLatestRevisionAsActual(): void
     {
         $revision = $this->getLatestRevision();
         $this->setActualRevision($revision);
@@ -111,7 +111,7 @@ trait ModelWithRevisionsOrmTrait
     /**
      * @return \BetaKiller\Model\RevisionModelInterface[]
      */
-    public function getAllRevisions()
+    public function getAllRevisions(): array
     {
         return $this->getAllRevisionsRelation()->orderByCreatedAt()->get_all();
     }
@@ -123,6 +123,32 @@ trait ModelWithRevisionsOrmTrait
     {
         $column = $this->object_column($this->getRelatedModelRevisionForeignKey());
         return $this->where($column, 'IS NOT', null);
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasPendingRevisions(): bool
+    {
+        $actual = $this->getActualRevision();
+
+        // No actual revision needs to apply pending revisions
+        if (!$actual) {
+            return true;
+        }
+
+        return $this->getPendingCount($actual) > 0;
+    }
+
+    private function getPendingCount(RevisionModelInterface $actual): int
+    {
+        $orm = $this->getAllRevisionsRelation();
+
+        if ($actual) {
+            $orm->filterPending($actual);
+        }
+
+        return $orm->count_all();
     }
 
     /**
@@ -209,7 +235,7 @@ trait ModelWithRevisionsOrmTrait
         $this->createRevisionIfChanged();
     }
 
-    public function isRevisionDataChanged()
+    public function isRevisionDataChanged(): bool
     {
         return $this->getCurrentRevision()->changed();
     }

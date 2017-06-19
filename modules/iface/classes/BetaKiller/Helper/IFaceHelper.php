@@ -1,18 +1,19 @@
 <?php
 namespace BetaKiller\Helper;
 
+use BetaKiller\Exception;
 use BetaKiller\IFace\CrudlsActionsInterface;
 use BetaKiller\IFace\Exception\IFaceException;
 use BetaKiller\IFace\IFaceFactory;
 use BetaKiller\IFace\IFaceInterface;
 use BetaKiller\IFace\IFaceModelInterface;
 use BetaKiller\IFace\IFaceStack;
-use BetaKiller\IFace\PreviewActionInterface;
 use BetaKiller\IFace\Url\UrlParametersInterface;
 use BetaKiller\IFace\View\IFaceView;
 use BetaKiller\IFace\Widget\WidgetInterface;
 use BetaKiller\IFace\WidgetFactory;
 use BetaKiller\Model\DispatchableEntityInterface;
+use BetaKiller\Model\EntityWithPreviewModeInterface;
 use BetaKiller\Model\IFaceZone;
 use Spotman\Api\ApiMethodResponse;
 
@@ -58,8 +59,7 @@ class IFaceHelper
         IFaceFactory $ifaceFactory,
         WidgetFactory $widgetFactory,
         UrlParametersHelper $paramsHelper
-    )
-    {
+    ) {
         $this->view          = $view;
         $this->stack         = $stack;
         $this->ifaceFactory  = $ifaceFactory;
@@ -78,6 +78,14 @@ class IFaceHelper
         $currentAction = $currentIFace->getEntityActionName();
 
         return $currentAction === $name;
+    }
+
+    public function isCurrentIFaceZone(string $zone): bool
+    {
+        $currentIFace = $this->getCurrentIFace();
+        $currentZone  = $currentIFace->getZoneName();
+
+        return $currentZone === $zone;
     }
 
     public function isCurrentIFace(IFaceInterface $iface, UrlParametersInterface $params = null): bool
@@ -132,7 +140,7 @@ class IFaceHelper
      * @param string|null                                   $zone
      *
      * @return string
-     * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \BetaKiller\Exception
      */
     public function getEntityUrl(DispatchableEntityInterface $entity, string $action, ?string $zone = null): string
     {
@@ -140,11 +148,18 @@ class IFaceHelper
             $currentIFace = $this->getCurrentIFace();
 
             if (!$currentIFace) {
-                throw new IFaceException('IFace zone must be specified');
+                throw new Exception('IFace zone must be specified');
             }
 
             // Fetch zone from current IFace
             $zone = $currentIFace->getZoneName();
+        }
+
+        if ($zone === IFaceZone::PREVIEW_ZONE && !($entity instanceof EntityWithPreviewModeInterface)) {
+            throw new IFaceException('Entity :name must implement :must for using preview zone', [
+                ':name' => get_class($entity),
+                ':must' => EntityWithPreviewModeInterface::class,
+            ]);
         }
 
         // Search for IFace with provided entity, action and zone
@@ -192,7 +207,7 @@ class IFaceHelper
 
     public function getPreviewEntityUrl(DispatchableEntityInterface $entity): ?string
     {
-        return $this->getEntityUrl($entity, PreviewActionInterface::ACTION_PREVIEW, IFaceZone::PREVIEW_ZONE);
+        return $this->getEntityUrl($entity, CrudlsActionsInterface::ACTION_READ, IFaceZone::PREVIEW_ZONE);
     }
 
     public function processApiResponse(ApiMethodResponse $response, IFaceInterface $iface)

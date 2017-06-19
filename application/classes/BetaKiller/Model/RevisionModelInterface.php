@@ -56,4 +56,11 @@ interface RevisionModelInterface
      * @return \BetaKiller\Model\RevisionModelInterface|null
      */
     public function createNewRevisionIfChanged();
+
+    /**
+     * @param \BetaKiller\Model\RevisionModelInterface $actual
+     *
+     * @return $this
+     */
+    public function filterPending(RevisionModelInterface $actual);
 }

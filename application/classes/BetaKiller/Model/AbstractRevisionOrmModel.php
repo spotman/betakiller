@@ -66,6 +66,17 @@ abstract class AbstractRevisionOrmModel extends \ORM implements RevisionModelInt
     }
 
     /**
+     * @param \BetaKiller\Model\RevisionModelInterface $actual
+     *
+     * @return $this
+     */
+    public function filterPending(RevisionModelInterface $actual)
+    {
+        $this->filter_datetime_column_value('created_at', $actual->getCreatedAt(), '>');
+        return $this;
+    }
+
+    /**
      * Returns new revision model if new revision was created or null if not
      *
      * @return \BetaKiller\Model\RevisionModelInterface|null

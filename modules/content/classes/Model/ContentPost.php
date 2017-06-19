@@ -725,12 +725,6 @@ class Model_ContentPost extends \ORM implements StatusRelatedModelInterface, Mod
         ]);
     }
 
-    public function isPreviewNeeded(): bool
-    {
-        // TODO: detect is post has unpublished revisions
-        return true;
-    }
-
     /**
      * @param UrlParametersInterface $parameters
      */

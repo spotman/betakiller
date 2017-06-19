@@ -3,14 +3,21 @@
  * For licensing, see LICENSE.md or http://ckeditor.com/license
  */
 
-CKEDITOR.editorConfig = function( config ) {
-	// Define changes to default configuration here. For example:
-	// config.language = 'fr';
-	// config.uiColor = '#AADC6E';
+// Patch global variable for using in CKEditor autosave plugin
+require(['moment'], function(moment) {
+  window.moment = moment;
+});
 
+CKEDITOR.disableAutoInline = true;
+
+CKEDITOR.editorConfig = function( config ) {
   config.language = 'ru';
 
-  config.removePlugins = "autosave,autogrow";
+  config.autosave_delay = 5;
+  config.autosave_saveOnDestroy = false;
+  //config.autosave_saveDetectionSelectors = '.ckeditor-autosave-saved-trigger';
+  config.autoGrow_onStartup = true;
+  //config.autoGrow_maxHeight = 1500;
 
   config.toolbar = [
     { name: 'document', items: [ 'Sourcedialog', '-', 'Save', 'NewPage', 'Preview', 'Print', '-', 'Templates' ] },

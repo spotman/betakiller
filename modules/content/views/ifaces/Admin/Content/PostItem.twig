@@ -38,7 +38,7 @@
         {% if post.needsCategory %}
           <div class="row">
             <div class="input-field col s12">
-              <select name="category" id="article-category">
+              <select name="category" id="article-category" {{ isUpdateAllowed ? "" : "disabled" }}>
                 <option value="" disabled>Select category</option>
                 {# TODO category selection #}
               </select>
@@ -58,7 +58,8 @@
 
         <div class="row">
               <div class="input-field col s12">
-                  <textarea name="content" id="article-content" rows="25" style="height: 100vh" {{ isUpdateAllowed ? "" : "disabled" }}>{{ post.content }}</textarea>
+                  {#<textarea name="content" id="article-content" rows="25" style="height: 100vh" {{ isUpdateAllowed ? "" : "disabled" }}>{{ post.content }}</textarea>#}
+                  <div id="article-content" data-custom-tags="{{ custom_tags|join(",") }}">{{ post.content|raw }}</div>
               </div>
           </div>
 
@@ -82,7 +83,7 @@
                   {# transitions #}
                   {% for target_codename, transition in post.status.transitions %}
                     {% set button_config = actions_config[transition] %}
-                    <button class="btn transition-button {{ button_config.color }}"
+                    <button class="btn transition-button ckeditor-autosave-saved-trigger {{ button_config.color }}"
                             data-api-method="{{ transition }}" data-id="{{ post.id }}"
                             data-autosave="{{ button_config.autosave|bool }}">
                       <i class="material-icons left">{{ button_config.icon }}</i>
@@ -91,61 +92,13 @@
                   {% endfor %}
                 </div>
 
-                <button class="btn save-post-button" type="submit" data-id="{{ post.id }}" {{ isUpdateAllowed ? "" : "disabled" }}>
+                <button class="btn save-post-button"
+                        type="submit" data-id="{{ post.id }}" {{ isUpdateAllowed ? "" : "disabled" }}>
                   {{ ("post.action.save")|i18n }}
                 </button>
               </div>
           </div>
       </form>
   </div>
-
-    <script type="application/javascript">
-
-        require([
-          'jquery',
-          'materialize.forms',
-          'materialize.charCounter'
-        ], function($) {
-
-          $(function() {
-
-            var $category = $('#article-category');
-            var $content = $('#article-content');
-
-            if ($category.length) {
-              $category.material_select();
-            }
-
-            if ($content.length) {
-              {% set custom_tags_rules = [] %}
-              {% for tag in custom_tags %}
-              {# allow custom tags with any parameters #}
-              {% set custom_tags_rules = custom_tags_rules|merge([tag ~ "[*]"]) %}
-              {% endfor %}
-
-              var customTags = {{ custom_tags|json_encode|raw }};
-              var customTagsRulesString = "{{ custom_tags_rules|join("; ") }}";
-
-              $.each(customTags, function(index, name) {
-                console.log(name);
-                CKEDITOR.dtd[name] = { id : 1 };
-                CKEDITOR.dtd.$empty[name] = 1;
-                CKEDITOR.dtd.$removeEmpty[name] = 0;
-                CKEDITOR.dtd.$nonEditable[name] = 1;
-                CKEDITOR.dtd.$inline[name] = 1;
-              });
-
-              $content.ckeditor({
-                height: "calc(100vh - 200px)",
-//              className: "test-class",
-                {#autosave_SaveKey: '{{ "betakiller-post-" ~ post.id }}',#}
-                allowedContent: "p(*); strong; i; em; span{*}; table(*); thead; tbody; tr; th[style]; td{*}; ul(*); ol(*); li; a[href,title]; h2; h3; h4; " + customTagsRulesString
-              });
-
-            }
-          });
-        });
-
-    </script>
 
 {% endblock %}

@@ -8,10 +8,8 @@ use BetaKiller\Helper\IFaceHelper;
 use BetaKiller\IFace\CrudlsActionsInterface;
 use BetaKiller\IFace\Exception\IFaceException;
 use BetaKiller\IFace\IFaceProvider;
-use BetaKiller\IFace\PreviewActionInterface;
 use BetaKiller\IFace\Widget\AbstractAdminWidget;
 use BetaKiller\Model\DispatchableEntityInterface;
-use BetaKiller\Model\EntityWithPreviewModeInterface;
 use BetaKiller\Model\IFaceZone;
 use BetaKiller\Model\Layout;
 use BetaKiller\Model\UserInterface;
@@ -160,14 +158,13 @@ class BarWidget extends AbstractAdminWidget
 
     private function getPreviewButtonUrl(?DispatchableEntityInterface $entity): ?string
     {
-        return $this->getPrimaryEntityActionUrl($entity, IFaceZone::PREVIEW_ZONE,
-            PreviewActionInterface::ACTION_PREVIEW);
+        return $this->getPrimaryEntityActionUrl($entity, IFaceZone::PREVIEW_ZONE, CrudlsActionsInterface::ACTION_READ);
     }
 
     private function getPrimaryEntityActionUrl(
         ?DispatchableEntityInterface $entity,
-        string $zone,
-        string $action
+        string $targetZone,
+        string $targetAction
     ): ?string
     {
         if (!$entity) {
@@ -177,23 +174,12 @@ class BarWidget extends AbstractAdminWidget
         $currentIFace = $this->ifaceHelper->getCurrentIFace();
         $currentZone  = $currentIFace->getZoneName();
 
-        if ($currentZone === $zone) {
+        if ($currentZone === $targetZone) {
             return null;
         }
 
-        if ($currentZone === IFaceZone::PREVIEW_ZONE) {
-            if (!($entity instanceof EntityWithPreviewModeInterface)) {
-                // No preview allowed for current entity
-                return null;
-            }
-
-            if (!$entity->isPreviewNeeded()) {
-                return null;
-            }
-        }
-
         try {
-            return $this->ifaceHelper->getEntityUrl($entity, $action, $zone);
+            return $this->ifaceHelper->getEntityUrl($entity, $targetAction, $targetZone);
         } catch (IFaceException $e) {
             // No IFace found for provided zone/action
             return null;

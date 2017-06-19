@@ -2,7 +2,7 @@
 namespace BetaKiller\IFace\App\Content;
 
 use BetaKiller\Helper\ContentUrlParametersHelper;
-use BetaKiller\IFace\PreviewActionInterface;
+use BetaKiller\Model\IFaceZone;
 use BetaKiller\Model\UserInterface;
 use Model_ContentPost;
 
@@ -22,12 +22,6 @@ class PostItem extends AbstractAppBase
      * @var \BetaKiller\Model\UserInterface
      */
     private $user;
-
-    /**
-     * @Inject
-     * @var \BetaKiller\Helper\AclHelper
-     */
-    private $aclHelper;
 
     /**
      * PostItem constructor.
@@ -65,7 +59,7 @@ class PostItem extends AbstractAppBase
     {
         $model = $this->getContentModel();
 
-        $previewMode = $this->ifaceHelper->isCurrentIFaceAction(PreviewActionInterface::ACTION_PREVIEW);
+        $previewMode = $this->ifaceHelper->isCurrentIFaceZone(IFaceZone::PREVIEW_ZONE);
 
         if ($previewMode) {
             // See latest revision data
