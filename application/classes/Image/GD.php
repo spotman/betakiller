@@ -19,8 +19,10 @@ class Image_GD extends Kohana_Image_GD
 
     protected function process_interlacing()
     {
-        // Enabling interlace mode for all images
-        imageinterlace($this->_image, 1);
+        // Enabling interlace mode for JPEG
+        if ($this->mime === 'image/jpeg') {
+            imageinterlace($this->_image, 1);
+        }
     }
 
     /**

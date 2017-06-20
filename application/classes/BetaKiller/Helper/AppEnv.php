@@ -24,4 +24,9 @@ class AppEnv
     {
         return Kohana::$environment === Kohana::DEVELOPMENT;
     }
+
+    public function getMode(): string
+    {
+        return Kohana::$environment_string;
+    }
 }

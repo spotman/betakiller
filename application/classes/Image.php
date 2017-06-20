@@ -47,4 +47,13 @@ abstract class Image extends Kohana_Image
             }
         }
     }
+
+    public function asDataURI(): string
+    {
+        // Read image path, convert to base64 encoding
+        $imageData = base64_encode($this->render(null, 75));
+
+        // Format the image SRC:  data:{mime};base64,{data};
+        return 'data:'.$this->mime.';base64,'.$imageData;
+    }
 }

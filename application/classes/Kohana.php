@@ -92,6 +92,7 @@ class Kohana extends Kohana_Core {
         return static::$_custom_cache->set($key, $data, $lifetime);
     }
 
+    // TODO Use system-wide Doctrine cache
     public static function set_custom_cache(Cache $instance)
     {
         static::$_custom_cache = $instance;
