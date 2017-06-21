@@ -187,7 +187,7 @@ after('deploy:betakiller:writable', 'deploy:writable');
  * PHP tasks
  */
 task('php:version', function () {
-    writeln(PHP_VERSION);
+    writeln(run('{{bin/php}} -v'));
 })->desc('PHP version');
 
 /**
