@@ -183,6 +183,12 @@ task('deploy:betakiller:writable', function() {
 
 after('deploy:betakiller:writable', 'deploy:writable');
 
+/**
+ * PHP tasks
+ */
+task('php:version', function () {
+    writeln(PHP_VERSION);
+})->desc('PHP version');
 
 /**
  * Apache tasks
@@ -208,7 +214,6 @@ task('git:config:user', function () {
     git_config('user.email', $email);
 
 })->desc('set global git properties like user.email');
-
 
 task('git:status', function () {
     git_status();
