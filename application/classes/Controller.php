@@ -27,15 +27,18 @@ abstract class Controller extends Controller_Proxy
      */
     protected function check_connection_protocol()
     {
-        $base_protocol = parse_url(Kohana::$base_url, PHP_URL_SCHEME);
+        // Redirect only initial requests from HTTP
+        if($this->request->is_initial() && $this->request->client_ip() !== '0.0.0.0') {
+            $base_protocol = parse_url(Kohana::$base_url, PHP_URL_SCHEME);
 
-        $is_secure_needed = ($base_protocol === 'https');
+            $is_secure_needed = ($base_protocol === 'https');
 
-        $is_secure = $this->request->secure();
+            $is_secure = $this->request->secure();
 
-        if (($is_secure_needed && !$is_secure) || ($is_secure && !$is_secure_needed)) {
-            $url = $this->request->url($base_protocol);
-            $this->redirect($url);
+            if (($is_secure_needed && !$is_secure) || ($is_secure && !$is_secure_needed)) {
+                $url = $this->request->url($base_protocol);
+                $this->redirect($url);
+            }
         }
     }
 

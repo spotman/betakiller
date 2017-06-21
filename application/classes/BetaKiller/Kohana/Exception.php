@@ -25,7 +25,7 @@ class BetaKiller_Kohana_Exception extends Kohana_Kohana_Exception
      * @throws Kohana_Exception
      * @todo Rewrite to ExceptionHandler and move exception handling logic to it
      */
-    static public function _handler(Throwable $exception)
+    public static function _handler(Throwable $exception)
     {
         static::$_counter++;
 
@@ -43,15 +43,15 @@ class BetaKiller_Kohana_Exception extends Kohana_Kohana_Exception
             static::log($exception);
         }
 
-        // Hack for CLI mode
-        if (PHP_SAPI === 'cli') {
-            if (!$notify) {
-                echo self::text($exception);
-            }
-
-            // Exception already processed via Minion_Log
-            exit(1);
-        }
+//        // Hack for CLI mode
+//        if (PHP_SAPI === 'cli') {
+//            if (!$notify) {
+//                echo self::text($exception);
+//            }
+//
+//            // Exception already processed via Minion_Log
+//            exit(1);
+//        }
 
         // Make nice message if allowed or use default Kohana response
         $response = self::makeNiceMessage($exception) ?: parent::response($exception);
@@ -68,7 +68,7 @@ class BetaKiller_Kohana_Exception extends Kohana_Kohana_Exception
      *
      * @return Response|null
      */
-    static public function makeNiceMessage(Throwable $exception): ?Response
+    public static function makeNiceMessage(Throwable $exception): ?Response
     {
         // Prevent displaying custom error pages for expected exceptions (301, 302, etc)
         if (($exception instanceof HTTP_Exception_Expected) && !$exception->alwaysShowNiceMessage()) {
@@ -89,10 +89,9 @@ class BetaKiller_Kohana_Exception extends Kohana_Kohana_Exception
         }
 
         $response = Response::factory();
+        $httpCode = self::getHttpErrorCode($exception);
 
         try {
-            $httpCode = self::getHttpErrorCode($exception);
-
             $iface = self::getErrorIFaceForCode($httpCode);
 
             $body = $iface

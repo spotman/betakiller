@@ -29,8 +29,12 @@ class Task_Cache_Warmup extends Minion_Task
      */
     private $ifaceStack;
 
-    public function __construct(IFaceModelTree $tree, IFaceStack $stack, IFaceProvider $provider, UrlParametersHelper $paramsHelper)
-    {
+    public function __construct(
+        IFaceModelTree $tree,
+        IFaceStack $stack,
+        IFaceProvider $provider,
+        UrlParametersHelper $paramsHelper
+    ) {
         $this->tree                = $tree;
         $this->ifaceStack          = $stack;
         $this->ifaceProvider       = $provider;
@@ -66,9 +70,8 @@ class Task_Cache_Warmup extends Minion_Task
         $iface = $this->ifaceProvider->fromModel($ifaceModel);
 
         $urls = $iface->getAvailableUrls($params, 1);
-        $this->debug(PHP_EOL.implode(PHP_EOL, $urls).PHP_EOL);
-
-        $url = array_pop($urls);
+        $url  = array_pop($urls);
+        $this->debug('Selected url = '.$url);
 
         // No domain coz HMVC do external requests while domain set
         $path = parse_url($url, PHP_URL_PATH);
@@ -86,7 +89,7 @@ class Task_Cache_Warmup extends Minion_Task
         $this->urlParametersHelper->getCurrentUrlParameters()->clear();
         $this->ifaceStack->clear();
 
-        $request  = new Request($url);
+        $request  = new Request($url, [], false);
         $response = $request->execute();
         $status   = $response->status();
 
@@ -94,8 +97,14 @@ class Task_Cache_Warmup extends Minion_Task
             // TODO Maybe grab page content, parse it and make request to every image/css/js file
 
             $this->info('Cache was warmed up for :url', [':url' => $url]);
-        } elseif ($status < 400) {
-            $this->info('Redirect :status received for :url', [':url' => $url, ':status' => $status]);
+        } elseif ($status >= 300 && $status < 400) {
+            $this->info('Redirect :status received for :url', [
+                ':url'    => $url,
+                ':status' => $status,
+            ]);
+            $this->debug('Headers are :values', [
+                ':values' => print_r($response->headers(), true),
+            ]);
         } elseif (in_array($status, [401, 403], true)) {
             $this->info('Access denied with :status status for :url', [':url' => $url, ':status' => $status]);
         } else {

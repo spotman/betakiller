@@ -394,7 +394,7 @@ class UrlDispatcher implements LoggerAwareInterface
         $this->checkEntityAccess($entity);
 
         // Allow current model to preset "belongs to" models
-        $entity->presetLinkedModels($this->urlParameters);
+        $entity->presetLinkedEntities($this->urlParameters);
 
         // Store model into registry
         $setter   = mb_strtolower('set_'.$modelName);

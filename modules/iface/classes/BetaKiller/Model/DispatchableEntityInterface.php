@@ -24,7 +24,7 @@ interface DispatchableEntityInterface extends AbstractEntityInterface
      * @return void
      * @deprecated Implement dynamic linking based on scheme (relations between entities)
      */
-    public function presetLinkedModels(UrlParametersInterface $parameters): void;
+    public function presetLinkedEntities(UrlParametersInterface $parameters): void;
 
     /**
      * Returns key which will be used for storing model in UrlParameters registry.

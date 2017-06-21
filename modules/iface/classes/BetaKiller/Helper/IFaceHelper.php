@@ -170,7 +170,7 @@ class IFaceHelper
 
         $params = $this->paramsHelper->createEmpty();
         $params->setEntity($entity);
-        $entity->presetLinkedModels($params);
+        $entity->presetLinkedEntities($params);
 
         return $iface->url($params);
     }

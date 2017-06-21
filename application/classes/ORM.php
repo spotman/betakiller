@@ -202,7 +202,7 @@ class ORM extends Utils\Kohana\ORM
      *
      * @return void
      */
-    public function presetLinkedModels(UrlParametersInterface $parameters): void
+    public function presetLinkedEntities(UrlParametersInterface $parameters): void
     {
         // Nothing by default
     }

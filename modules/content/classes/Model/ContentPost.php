@@ -572,7 +572,7 @@ class Model_ContentPost extends \ORM implements StatusRelatedModelInterface, Mod
      *
      * @return void
      */
-    public function presetLinkedModels(UrlParametersInterface $parameters): void
+    public function presetLinkedEntities(UrlParametersInterface $parameters): void
     {
         $category = $this->getCategory();
 
