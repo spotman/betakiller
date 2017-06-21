@@ -402,7 +402,7 @@ function run_minion_task($name) {
 
     $stage = stage();
 
-    $cmd = "cd $path && php index.php --task=$name --stage=$stage";
+    $cmd = "cd $path && {{bin/php}} index.php --task=$name --stage=$stage";
 
     if (isVerbose()) {
         $cmd .= ' --debug';
