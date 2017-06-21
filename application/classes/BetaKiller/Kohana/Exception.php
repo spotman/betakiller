@@ -43,15 +43,14 @@ class BetaKiller_Kohana_Exception extends Kohana_Kohana_Exception
             static::log($exception);
         }
 
-//        // Hack for CLI mode
-//        if (PHP_SAPI === 'cli') {
-//            if (!$notify) {
-//                echo self::text($exception);
-//            }
-//
-//            // Exception already processed via Minion_Log
-//            exit(1);
-//        }
+        // Hack for CLI mode
+        if (PHP_SAPI === 'cli') {
+            if (!$notify) {
+                echo self::text($exception);
+            }
+
+            return null;
+        }
 
         // Make nice message if allowed or use default Kohana response
         $response = self::makeNiceMessage($exception) ?: parent::response($exception);
