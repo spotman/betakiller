@@ -96,6 +96,11 @@ return [
 
         // Helpers
         'User'      => DI\factory(function (Auth $auth) {
+            // Auth user for CLI
+            if (PHP_SAPI === 'cli') {
+                return \BetaKiller\Task\AbstractTask::getCliUserModel();
+            }
+
             $user = $auth->get_user();
 
             if (!$user) {

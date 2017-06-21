@@ -33,9 +33,6 @@ abstract class Minion_Task extends Kohana_Minion_Task
 
     protected static function _make_task_class_instance($class_name)
     {
-        // Auth for CLI
-        static::forceCliUserAuth();
-
         return \BetaKiller\DI\Container::getInstance()->get($class_name);
     }
 
@@ -55,42 +52,6 @@ abstract class Minion_Task extends Kohana_Minion_Task
         Log::instance()->attach(new Minion_Log($max_log_level), $max_log_level, $min_log_level);
 
         return parent::execute();
-    }
-
-    private static function forceCliUserAuth()
-    {
-        $user = static::getCliUserModel();
-        Auth::instance()->force_login($user);
-    }
-
-    private static function getCliUserModel()
-    {
-        $username = 'minion';
-
-        /** @var UserInterface $orm */
-        $orm = \ORM::factory('User');
-
-        $user = $orm->search_by($username);
-
-        if (!$user->loaded()) {
-            $password = microtime();
-
-            $host  = parse_url(Kohana::$base_url, PHP_URL_HOST);
-            $email = $username.'@'.$host;
-
-            /** @var UserInterface $user */
-            $user = $orm
-                ->set_username($username)
-                ->set_password($password)
-                ->set_email($email)
-                ->disable_email_notification() // No notification for cron user
-                ->create();
-
-            // Allowing everything (admin may remove some roles later if needed)
-            $user->add_all_available_roles();
-        }
-
-        return $user;
     }
 
     /**

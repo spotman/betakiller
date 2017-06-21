@@ -13,8 +13,9 @@ use Thunder\Shortcode\Parser\RegexParser;
 use Thunder\Shortcode\Processor\Processor;
 use Thunder\Shortcode\Serializer\TextSerializer;
 use Thunder\Shortcode\Shortcode\ShortcodeInterface;
+use BetaKiller\Task\AbstractTask;
 
-class Task_Content_Import_Wordpress extends Minion_Task
+class Task_Content_Import_Wordpress extends AbstractTask
 {
     use BetaKiller\Helper\ContentTrait;
     use BetaKiller\Helper\UserModelFactoryTrait;
