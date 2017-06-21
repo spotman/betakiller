@@ -2,9 +2,9 @@
 
 use BetaKiller\Assets\AssetsProviderFactory;
 use BetaKiller\Assets\Model\AbstractAssetsOrmModelSeoImage;
-use BetaKiller\Content\ContentElementFromWordpressWithPathInterface;
+use BetaKiller\Content\WordpressAttachmentInterface;
 
-class Model_ContentImageElement extends AbstractAssetsOrmModelSeoImage implements ContentElementFromWordpressWithPathInterface
+class Model_ContentImageElement extends AbstractAssetsOrmModelSeoImage implements WordpressAttachmentInterface
 {
     use Model_ORM_ContentElementTrait,
         Model_ORM_ImportedFromWordpressTrait,

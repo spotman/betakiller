@@ -161,7 +161,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
         return $content_entity;
     }
 
-    protected function process_attachment(array $attach, $entity_item_id, AbstractAssetsProvider $provider = null): \Model_ContentAttachmentElement
+    protected function process_attachment(array $attach, $entity_item_id, AbstractAssetsProvider $provider = null)
     {
         $wp_id = $attach['ID'];
         $url   = $attach['guid'];
@@ -209,10 +209,10 @@ class Task_Content_Import_Wordpress extends AbstractTask
      * @param int                    $wp_id
      * @param int|null               $entity_item_id
      *
-     * @return Model_ContentAttachmentElement
+     * @return \BetaKiller\Content\WordpressAttachmentInterface
      * @throws TaskException
      */
-    protected function store_attachment(AbstractAssetsProvider $provider, $url, $wp_id, $entity_item_id = null): \Model_ContentAttachmentElement
+    protected function store_attachment(AbstractAssetsProvider $provider, $url, $wp_id, $entity_item_id = null)
     {
         $orm = $provider->createFileModel();
 
@@ -221,7 +221,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
         }
 
         // Search for such file already exists
-        /** @var ContentElementInterface $model */
+        /** @var \BetaKiller\Content\WordpressAttachmentInterface $model */
         $model = $orm->find_by_wp_id($wp_id);
 
         if ($model->get_id()) {
@@ -245,7 +245,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
             throw new TaskException('Can not get path for guid = :url', [':url' => $url]);
         }
 
-        /** @var Model_ContentAttachmentElement $model */
+        /** @var \BetaKiller\Content\WordpressAttachmentInterface $model */
         $model = $provider->store($path, $original_filename);
 
         if ($model instanceof ContentElementInterface) {
@@ -285,7 +285,9 @@ class Task_Content_Import_Wordpress extends AbstractTask
 
             $this->debug('Loading attach at url = :url', [':url' => $url]);
 
-            $response = Request::factory($url)->execute();
+            // TODO Replace with system-wide crawler
+            $request = Request::factory($url);
+            $response = $request->execute();
 
             if ($response->status() !== 200) {
                 throw new TaskException('Got :code status from :url', [
