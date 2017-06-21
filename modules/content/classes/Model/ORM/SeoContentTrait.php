@@ -20,7 +20,7 @@ trait Model_ORM_SeoContentTrait
      */
     public function getTitle(): ?string
     {
-        return (string)$this->get('title');
+        return $this->get('title');
     }
 
     /**
@@ -39,6 +39,6 @@ trait Model_ORM_SeoContentTrait
      */
     public function getDescription(): ?string
     {
-        return (string)$this->get('description');
+        return $this->get('description');
     }
 }

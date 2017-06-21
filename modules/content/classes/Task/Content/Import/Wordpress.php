@@ -398,8 +398,14 @@ class Task_Content_Import_Wordpress extends AbstractTask
 
             $model->setLabel($name);
             $model->setContent($content);
-            $model->setTitle($title);
-            $model->setDescription($description);
+
+            if ($title) {
+                $model->setTitle($title);
+            }
+
+            if ($description) {
+                $model->setDescription($description);
+            }
 
             // Link thumbnail images to post
             $this->process_thumbnails($model, $meta);
