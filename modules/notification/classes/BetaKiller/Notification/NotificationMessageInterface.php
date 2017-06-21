@@ -34,7 +34,7 @@ interface NotificationMessageInterface
 
     /**
      * @param string $email
-     * @param string $name
+     * @param string $fullName
      *
      * @return $this|\BetaKiller\Notification\NotificationMessageInterface
      */

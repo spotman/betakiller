@@ -14,8 +14,6 @@ use PhpConsole\Connector;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LoggerTrait;
 
-//use Monolog\Handler\ChromePHPHandler;
-
 class Logger implements LoggerInterface
 {
     use LoggerTrait;
@@ -73,6 +71,8 @@ class Logger implements LoggerInterface
 //            new FingersCrossedHandler(),
         ]);
 
+        // TODO CLI mode logging
+
         $monolog->pushHandler(new DeduplicationHandler($groupHandler));
 
         // Enable debugging via PhpConsole for developers
@@ -105,6 +105,10 @@ class Logger implements LoggerInterface
      */
     public function log($level, $message, array $context = null): void
     {
+        if ($context) {
+            $message = strtr($message, $context);
+        }
+
         // Proxy to selected logger
         $this->logger->log($level, $message, $context);
     }

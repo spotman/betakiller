@@ -471,6 +471,9 @@ abstract class AbstractIFace implements IFaceInterface
 
     public function url(UrlParametersInterface $parameters = null, ?bool $removeCyclingLinks = null, ?bool $withDomain = null): string
     {
+        $removeCyclingLinks = $removeCyclingLinks ?? true;
+        $withDomain = $withDomain ?? true;
+
         if ($removeCyclingLinks && $this->isCurrent($parameters)) {
             return $this->appConfig->getCircularLinkHref();
         }
