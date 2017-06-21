@@ -5,7 +5,7 @@
 
 require 'recipe/common.php';
 
-use \Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Input\InputOption;
 
 define('BETAKILLER_CORE_PATH', 'core');
 
@@ -26,15 +26,15 @@ define('DEFAULT_BRANCH', 'master');
 option('branch', 'b', InputOption::VALUE_OPTIONAL, 'GIT branch to checkout', DEFAULT_BRANCH);
 
 // Option --to for migrations:down
-option('to', 't', InputOption::VALUE_OPTIONAL, 'Target migration', null);
+option('to', 't', InputOption::VALUE_OPTIONAL, 'Target migration');
 
 // Option for Minion tasks direct calls
 option('task', null, InputOption::VALUE_OPTIONAL, 'Minion task name');
 
 
-define('DEPLOYER_DEV_STAGE',        'development');
-define('DEPLOYER_TESTING_STAGE',    'testing');
-define('DEPLOYER_STAGING_STAGE',    'staging');
+define('DEPLOYER_DEV_STAGE', 'development');
+define('DEPLOYER_TESTING_STAGE', 'testing');
+define('DEPLOYER_STAGING_STAGE', 'staging');
 define('DEPLOYER_PRODUCTION_STAGE', 'production');
 
 set('default_stage', DEPLOYER_DEV_STAGE);
@@ -56,15 +56,18 @@ if (file_exists(getcwd().'/servers.yml')) {
 /**
  * Check environment before real deployment starts
  */
-task('check', function() {
-    if (stage() == DEPLOYER_DEV_STAGE)
+task('check', function () {
+    if (stage() === DEPLOYER_DEV_STAGE) {
         throw new \Symfony\Component\Process\Exception\RuntimeException('Can not deploy to a local stage');
+    }
 
-    if ( !has('app_repository') )
+    if (!has('app_repository')) {
         throw new \Symfony\Component\Process\Exception\RuntimeException('Please, set up GIT repo via env("app_repository")');
+    }
 
-    if ( !has('app_path') )
+    if (!has('app_path')) {
         throw new \Symfony\Component\Process\Exception\RuntimeException('Please, set up site path via env("app_path")');
+    }
 
     // Store these parameters to env for using them in shared and writable dirs
     env('app_repository', get('app_repository'));
@@ -75,34 +78,34 @@ task('check', function() {
 });
 
 // Prepare app env
-task('deploy:repository:prepare:app', function() {
+task('deploy:repository:prepare:app', function () {
     env('repository', get('app_repository'));
     env('repository_path', get('app_path'));
 })->desc('Prepare app repository');
 
 // Prepare BetaKiller env
-task('deploy:repository:prepare:betakiller', function() {
+task('deploy:repository:prepare:betakiller', function () {
     env('repository', get('core_repository'));
     env('repository_path', get('core_path'));
 })->desc('Prepare BetaKiller repository');
 
 function cd_repository_path_cmd() {
     return 'cd {{release_path}}/{{repository_path}}';
-};
+}
 
 // Clone repo task
-task('deploy:repository:clone', function() {
+task('deploy:repository:clone', function () {
     cd('{{release_path}}');
     run('git clone {{repository}} {{repository_path}}');
 })->desc('Fetch repository'); //.env()->parse('{{repository_path}}')
 
 // Update repo task
-task('deploy:repository:update', function() {
+task('deploy:repository:update', function () {
     run(cd_repository_path_cmd().' && git pull && git submodule update --init --recursive');
 })->desc('Update repository');    // .env()->parse('{{repository_path}}')
 
 // Installing vendors in BetaKiller
-task('deploy:vendors:betakiller', function() {
+task('deploy:vendors:betakiller', function () {
     process_vendors('core');
 })->desc('Process Composer inside BetaKiller repository');
 
@@ -113,7 +116,7 @@ task('deploy:vendors:app', function () {
 
 function process_vendors($repo) {
     $composer = env('bin/composer');
-    $envVars = env('env_vars') ? 'export ' . env('env_vars') . ' &&' : '';
+    $envVars  = env('env_vars') ? 'export '.env('env_vars').' &&' : '';
 
     $path = get_repo_path($repo);
 
@@ -156,7 +159,7 @@ set('betakiller_shared_dirs', [
     '{{app_path}}/logs',
 ]);
 
-task('deploy:betakiller:shared', function() {
+task('deploy:betakiller:shared', function () {
     set('shared_dirs', get('betakiller_shared_dirs'));
 })->desc('Process BetaKiller shared files and dirs');
 
@@ -177,7 +180,7 @@ set('betakiller_writable_dirs', [
     '{{app_path}}/assets',
 ]);
 
-task('deploy:betakiller:writable', function() {
+task('deploy:betakiller:writable', function () {
     set('writable_dirs', get('betakiller_writable_dirs'));
 })->desc('Process BetaKiller writable dirs');
 
@@ -212,7 +215,6 @@ task('git:config:user', function () {
 
     $email = ask('Enter git email:', 'no-reply@betakiller.ru');
     git_config('user.email', $email);
-
 })->desc('set global git properties like user.email');
 
 task('git:status', function () {
@@ -248,12 +250,13 @@ task('git:pull:all', function () {
  */
 task('git:check', function () {
     $current_revision_path = env('current');
-    $path = get_repo_path(NULL, $current_revision_path);
+    $path                  = get_repo_path(null, $current_revision_path);
 
     $out = git_status($path);
 
-    if (stripos($out, 'nothing to commit (working directory clean)') !== FALSE)
+    if (stripos($out, 'nothing to commit (working directory clean)') !== false) {
         return;
+    }
 
     if (askConfirmation('Commit changes?', false)) {
         git_commit_all($path);
@@ -271,8 +274,9 @@ task('git:checkout', function () {
  * Custom Minion tasks
  */
 task('minion', function () {
-    if (!input()->hasOption('task'))
+    if (!input()->hasOption('task')) {
         throw new Exception('Specify task name via --task option');
+    }
 
     $name = input()->getOption('task');
 
@@ -293,13 +297,15 @@ task('migrations:install', function () {
 task('migrations:create', function () {
     $scope = ask('Enter scope (app, core, app:module:module_name or core:module:module_name)', 'app');
 
-    if (!$scope)
+    if (!$scope) {
         throw new Exception('Migration scope is required');
+    }
 
     $name = ask('Enter migration short name (3-128 characters, [A-Za-z0-9-_]+)');
 
-    if (!$name)
+    if (!$name) {
         throw new Exception('Migration name is required');
+    }
 
     $desc = ask('Enter migration description', '');
 
@@ -382,21 +388,26 @@ task('deploy', [
     // Finalize
     'deploy:symlink',
     'cleanup',
-])->desc('Deploy app bundle')->onlyForStage([DEPLOYER_STAGING_STAGE, DEPLOYER_PRODUCTION_STAGE, DEPLOYER_TESTING_STAGE]);
+])->desc('Deploy app bundle')->onlyForStage([
+    DEPLOYER_STAGING_STAGE,
+    DEPLOYER_PRODUCTION_STAGE,
+    DEPLOYER_TESTING_STAGE,
+]);
 
 
 /**
  * Run minion-task and echo result to console
  *
  * @param string $name
+ *
  * @return \Deployer\Type\Result
  * @throws Exception
  */
 function run_minion_task($name) {
     $current_path = getcwd();
-    $path = get_repo_path();
+    $path         = get_repo_path();
 
-    if (strpos($current_path, BETAKILLER_CORE_PATH) === FALSE) {
+    if (strpos($current_path, BETAKILLER_CORE_PATH) === false) {
         $path .= '/public';
     }
 
@@ -409,7 +420,7 @@ function run_minion_task($name) {
     }
 
     $response = run($cmd);
-    $text = $response->toString();
+    $text     = $response->toString();
 
     if ($text) {
         write($text);
@@ -423,6 +434,7 @@ function run_minion_task($name) {
  *
  * @param string $gitCmd
  * @param string $path
+ *
  * @return \Deployer\Type\Result
  * @throws Exception
  */
@@ -437,34 +449,37 @@ function run_git_command($gitCmd, $path = null) {
     return $result;
 }
 
-function git_status($path = NULL) {
+function git_status($path = null) {
     return run_git_command('status', $path);
 }
 
-function git_add($base_path = NULL) {
+function git_add($base_path = null) {
     $add_path = ask('Path to add files:', '.');
+
     return run_git_command('add '.$add_path, $base_path);
 }
 
-function git_commit($path = NULL) {
+function git_commit($path = null) {
     $message = ask('Enter commit message:', 'Commit from production');
+
     return run_git_command('commit -m "'.$message.'"', $path);
 }
 
-function git_commit_all($path = NULL) {
+function git_commit_all($path = null) {
     return git_add($path).git_commit($path);
 }
 
-function git_checkout($path = NULL) {
+function git_checkout($path = null) {
     $branch = input()->getOption('branch');
+
     return run_git_command('checkout '.$branch, $path);
 }
 
-function git_push($path = NULL) {
+function git_push($path = null) {
     return run_git_command('push', $path);
 }
 
-function git_pull($path = NULL) {
+function git_pull($path = null) {
     return run_git_command('pull', $path);
 }
 
@@ -486,7 +501,7 @@ function stage() {
 }
 
 function get_latest_release_path() {
-    $list = env('releases_list');
+    $list    = env('releases_list');
     $release = $list[0];
 
     if (output()->isVerbose()) {
@@ -502,8 +517,8 @@ function get_latest_release_path() {
     return env()->parse('{{deploy_path}}/releases/'.$release);
 }
 
-function get_repo_path($repo = NULL, $base_path = NULL) {
-    if (stage() == DEPLOYER_DEV_STAGE) {
+function get_repo_path(?string $repo = null, ?string $base_path = null) {
+    if (stage() === DEPLOYER_DEV_STAGE) {
         return getcwd();
     }
 
@@ -513,8 +528,9 @@ function get_repo_path($repo = NULL, $base_path = NULL) {
         $repo = input()->getOption('repo') ?: 'core';
     }
 
-    if (!in_array($repo, $allowed))
+    if (!in_array($repo, $allowed, true)) {
         throw new Exception('Unknown repo '.$repo);
+    }
 
     if (!$base_path) {
         $base_path = get_latest_release_path();
