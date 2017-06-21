@@ -2,9 +2,8 @@
 namespace BetaKiller\Content;
 
 use BetaKiller\Model\Entity;
-use BetaKiller\Utils\Kohana\ORM\OrmInterface;
 
-interface EntityRelatedInterface extends OrmInterface
+interface EntityRelatedInterface
 {
     /**
      * @param Entity $entity
