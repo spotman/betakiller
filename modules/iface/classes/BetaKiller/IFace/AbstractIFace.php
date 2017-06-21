@@ -583,7 +583,8 @@ abstract class AbstractIFace implements IFaceInterface
             }
         }
 
-        return array_merge(...$urlsBlocks);
+        // Empty $urlBlocks leads array_merge() to return null
+        return $urlsBlocks ? array_merge(...$urlsBlocks) : [];
     }
 
     private function makeAvailableUrl(UrlParametersInterface $params = null): string

@@ -229,9 +229,9 @@ class IFace extends TreeModelSingleParentOrm implements IFaceModelInterface
     /**
      * Returns model name of the linked entity
      *
-     * @return string
+     * @return string|null
      */
-    public function getEntityModelName(): string
+    public function getEntityModelName(): ?string
     {
         return $this->getEntityRelation()->getLinkedModelName();
     }
@@ -239,9 +239,9 @@ class IFace extends TreeModelSingleParentOrm implements IFaceModelInterface
     /**
      * Returns entity [primary] action, applied by this IFace
      *
-     * @return string
+     * @return string|null
      */
-    public function getEntityActionName(): string
+    public function getEntityActionName(): ?string
     {
         return $this->getEntityActionRelation()->getName();
     }
