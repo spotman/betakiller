@@ -14,6 +14,7 @@ use BetaKiller\Model\UserInterface;
 use BetaKiller\Status\StatusRelatedModelInterface;
 use BetaKiller\Status\StatusRelatedModelOrmTrait;
 use BetaKiller\Model\EntityWithPreviewModeInterface;
+use BetaKiller\Model\RevisionModelInterface;
 
 class Model_ContentPost extends \ORM implements StatusRelatedModelInterface, ModelWithRevisionsInterface, SeoMetaInterface, ImportedFromWordpressInterface, EntityWithPreviewModeInterface
 {
@@ -719,9 +720,11 @@ class Model_ContentPost extends \ORM implements StatusRelatedModelInterface, Mod
 
     public function search($term)
     {
+        $revisionKey = RevisionModelInterface::ACTUAL_REVISION_KEY;
+
         return $this->search_query($term, [
-            $this->object_column('label'),
-            $this->object_column('content'),
+            $revisionKey.'.label',
+            $revisionKey.'.content',
         ]);
     }
 
