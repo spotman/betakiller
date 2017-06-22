@@ -1,4 +1,4 @@
-<?php defined('SYSPATH') OR die('No direct script access.');
+<?php
 
 use BetaKiller\Error\PhpExceptionStorageInterface;
 use BetaKiller\Helper\AppEnv;
@@ -89,6 +89,7 @@ class Log_PhpExceptionStorage extends Log_Writer
                 ->setTemplateData([
                     'url'     => \Kohana::$base_url,
                     'message' => \Kohana_Exception::text($exception),
+                    'stacktrace' => $exception->getTraceAsString(),
                 ])
                 ->send();
         } catch (\Throwable $e) {
@@ -99,7 +100,7 @@ class Log_PhpExceptionStorage extends Log_Writer
     protected function write_message(array $msg)
     {
         /** @var Exception|Kohana_Exception|null $exception */
-        $exception = isset($msg['additional']['exception']) ? $msg['additional']['exception'] : null;
+        $exception = $msg['additional']['exception'] ?? null;
 
         if (!$exception) {
             return;
