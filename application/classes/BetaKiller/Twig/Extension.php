@@ -8,73 +8,78 @@ class BetaKiller_Twig_Extension extends Twig_Extension
     {
         return [
 
-            new Twig_SimpleFunction(
+            new Twig_Function(
                 'js',
                 [$this, 'js'],
                 ['is_safe' => ['html']]
             ),
 
-            new Twig_SimpleFunction(
+            new Twig_Function(
                 'js_build',
                 [$this, 'js_build'],
                 ['is_safe' => ['html']]
             ),
 
-            new Twig_SimpleFunction(
+            new Twig_Function(
                 'css',
                 [$this, 'css'],
                 ['is_safe' => ['html']]
             ),
 
-            new Twig_SimpleFunction(
+            new Twig_Function(
                 'static',
                 [$this, 'get_link_to_static_file'],
                 ['is_safe' => ['html']]
             ),
 
-            new Twig_SimpleFunction(
+            new Twig_Function(
                 'image',
                 [$this, 'image'],
                 ['is_safe' => ['html']]
             ),
 
-            new Twig_SimpleFunction(
+            new Twig_Function(
                 'assets',
                 [$this, 'assets']
             ),
 
-            new Twig_SimpleFunction(
+            new Twig_Function(
                 'meta',
                 [$this, 'meta']
             ),
 
 //            new Twig_SimpleFunction('iface_url', array($this, 'iface_url')),
 
-            new Twig_SimpleFunction('is_device', [$this, 'is_device']),
+            new Twig_Function('is_device', [$this, 'is_device']),
 
-            new Twig_SimpleFunction(
+            new Twig_Function(
                 'profiler',
                 [$this, 'show_profiler'],
                 ['is_safe' => ['html']]
             ),
 
-            new Twig_SimpleFunction(
+            new Twig_Function(
                 'widget',
                 [$this, 'widget'],
                 ['is_safe' => ['html'], 'needs_context' => true]
             ),
 
-            new Twig_SimpleFunction(
+            new Twig_Function(
                 'in_production',
                 [$this, 'in_production']
             ),
 
-            new Twig_SimpleFunction(
+            new Twig_Function(
                 'in_staging',
                 [$this, 'in_staging']
             ),
 
-            new Twig_SimpleFunction(
+            new Twig_Function(
+                'user_is_moderator',
+                [$this, 'user_is_moderator']
+            ),
+
+            new Twig_Function(
                 'json_encode',
                 'json_encode',
                 ['is_safe' => ['html']]
@@ -83,7 +88,7 @@ class BetaKiller_Twig_Extension extends Twig_Extension
             /**
              * Добавляет элемент в тег <title> (автоматически срендерится при обработке шаблона)
              */
-            new Twig_SimpleFunction(
+            new Twig_Function(
                 'title',
                 function ($value) {
                     Meta::instance()->title($value, Meta::TITLE_APPEND);
@@ -100,7 +105,7 @@ class BetaKiller_Twig_Extension extends Twig_Extension
             /**
              * Converts boolean value to JavaScript string representation
              */
-            new Twig_SimpleFilter('bool', function ($value) {
+            new Twig_Filter('bool', function ($value) {
                 return $value ? 'true' : 'false';
             }),
 
@@ -110,7 +115,7 @@ class BetaKiller_Twig_Extension extends Twig_Extension
              *
              * @example ":count lots"|plural({ ":count": lotsCount })
              */
-            new Twig_SimpleFilter('plural', function ($text, $values, $context = null) {
+            new Twig_Filter('plural', function ($text, $values, $context = null) {
                 if (!is_array($values)) {
                     $values = [
                         ':count' => (int)$values,
@@ -125,7 +130,7 @@ class BetaKiller_Twig_Extension extends Twig_Extension
              *
              * @example ":count lots"|i18n({ ":count": lotsCount })
              */
-            new Twig_SimpleFilter('i18n', function ($text, array $values = null) {
+            new Twig_Filter('i18n', function ($text, array $values = null) {
                 return __($text, $values);
             }),
 
@@ -140,6 +145,13 @@ class BetaKiller_Twig_Extension extends Twig_Extension
     public function in_staging()
     {
         return Kohana::in_staging();
+    }
+
+    public function user_is_moderator()
+    {
+        $user = \BetaKiller\DI\Container::getInstance()->get(\BetaKiller\Model\UserInterface::class);
+
+        return $user->isModerator();
     }
 
     /**
