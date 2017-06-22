@@ -95,11 +95,11 @@ class PhpExceptionStorage implements PhpExceptionStorageInterface
     }
 
     /**
-     * @param \Exception $exception
+     * @param \Throwable $exception
      *
      * @return PhpExceptionModelInterface|null
      */
-    public function storeException(\Exception $exception)
+    public function storeException(\Throwable $exception)
     {
         $user = $this->user;
 

@@ -29,11 +29,11 @@ interface PhpExceptionStorageInterface
     public function setTraceFor(PhpExceptionModelInterface $model, $traceResponse);
 
     /**
-     * @param \Exception $exception
+     * @param \Throwable $exception
      *
      * @return PhpExceptionModelInterface
      */
-    public function storeException(\Exception $exception);
+    public function storeException(\Throwable $exception);
 
     /**
      * @param string $hash
