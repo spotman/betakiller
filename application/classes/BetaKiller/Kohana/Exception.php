@@ -46,7 +46,7 @@ class BetaKiller_Kohana_Exception extends Kohana_Kohana_Exception
         if (PHP_SAPI === 'cli') {
             // Force exception message even if notification is disabled
             if (!$notify) {
-                echo self::text($exception);
+                echo self::text($exception).PHP_EOL.$exception->getTraceAsString();
             }
 
             // CLI log handler already printed the message, return empty response
