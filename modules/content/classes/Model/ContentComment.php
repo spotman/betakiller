@@ -1,6 +1,6 @@
 <?php
 
-use BetaKiller\Content\EntityRelatedInterface;
+use BetaKiller\Content\EntityModelRelatedInterface;
 use BetaKiller\Content\ImportedFromWordpressInterface;
 use BetaKiller\Helper\IFaceHelper;
 use BetaKiller\Model\Entity;
@@ -12,7 +12,7 @@ use BetaKiller\Status\StatusRelatedModelOrmTrait;
 use BetaKiller\Utils\Kohana\TreeModelSingleParentOrm;
 
 class Model_ContentComment extends TreeModelSingleParentOrm
-    implements EntityRelatedInterface, StatusRelatedModelInterface, ImportedFromWordpressInterface, HasPublicReadUrlInterface
+    implements EntityModelRelatedInterface, StatusRelatedModelInterface, ImportedFromWordpressInterface, HasPublicReadUrlInterface
 {
     use Model_ORM_EntityRelatedTrait;
     use Model_ORM_ImportedFromWordpressTrait;

@@ -2,9 +2,7 @@
 namespace BetaKiller\Acl;
 
 use BetaKiller\Factory\NamespaceBasedFactory;
-use Spotman\Acl\AccessResolver\AclAccessResolverInterface;
 use Spotman\Acl\Exception;
-use Spotman\Acl\Resource\ResolvingResourceInterface;
 use Spotman\Acl\ResourceFactory\AclResourceFactoryInterface;
 use Spotman\Acl\ResourceInterface;
 
@@ -16,25 +14,16 @@ class AclResourceFactory implements AclResourceFactoryInterface
     private $factory;
 
     /**
-     * @var \Spotman\Acl\AccessResolver\AclAccessResolverInterface
-     */
-    private $resolver;
-
-    /**
      * AclResourceFactory constructor.
      *
-     * @param \BetaKiller\Factory\NamespaceBasedFactory              $factory
-     * @param \Spotman\Acl\AccessResolver\AclAccessResolverInterface $resolver
+     * @param \BetaKiller\Factory\NamespaceBasedFactory $factory
      */
-    public function __construct(NamespaceBasedFactory $factory, AclAccessResolverInterface $resolver)
-    {
+    public function __construct(NamespaceBasedFactory $factory) {
         $this->factory = $factory
             ->cacheInstances()
             ->setClassPrefixes('Acl', 'Resource')
             ->setClassSuffix('Resource')
             ->setExpectedInterface(ResourceInterface::class);
-
-        $this->resolver = $resolver;
     }
 
     /**
@@ -43,14 +32,7 @@ class AclResourceFactory implements AclResourceFactoryInterface
      * @return ResourceInterface
      * @throws Exception
      */
-    public function createResource($identity)
-    {
-        $resource = $this->factory->create(ucfirst($identity));
-
-        if ($resource instanceof ResolvingResourceInterface) {
-            $resource->useResolver($this->resolver);
-        }
-
-        return $resource;
+    public function createResource($identity) {
+        return $this->factory->create(ucfirst($identity));
     }
 }

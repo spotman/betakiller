@@ -43,12 +43,13 @@ class BetaKiller_Kohana_Exception extends Kohana_Kohana_Exception
             static::log($exception);
         }
 
-        // Hack for CLI mode
         if (PHP_SAPI === 'cli') {
+            // Force exception message even if notification is disabled
             if (!$notify) {
                 echo self::text($exception);
             }
 
+            // CLI log handler already printed the message
             return null;
         }
 

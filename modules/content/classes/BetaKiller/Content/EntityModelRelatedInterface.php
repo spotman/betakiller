@@ -3,7 +3,7 @@ namespace BetaKiller\Content;
 
 use BetaKiller\Model\Entity;
 
-interface EntityRelatedInterface
+interface EntityModelRelatedInterface
 {
     /**
      * @param Entity $entity

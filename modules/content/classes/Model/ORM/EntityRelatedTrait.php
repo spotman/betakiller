@@ -1,6 +1,6 @@
 <?php
 
-use BetaKiller\Content\EntityRelatedInterface;
+use BetaKiller\Content\EntityModelRelatedInterface;
 use BetaKiller\Model\Entity;
 
 trait Model_ORM_EntityRelatedTrait
@@ -74,7 +74,7 @@ trait Model_ORM_EntityRelatedTrait
 
     public function get_entity_items_ids(Entity $entity)
     {
-        /** @var EntityRelatedInterface $model */
+        /** @var EntityModelRelatedInterface $model */
         $model = $this->model_factory();
 
         return $model
@@ -87,7 +87,7 @@ trait Model_ORM_EntityRelatedTrait
     /**
      * @param int $item_id
      *
-     * @return EntityRelatedInterface|$this
+     * @return EntityModelRelatedInterface|$this
      */
     public function filter_entity_item_id($item_id)
     {
@@ -97,7 +97,7 @@ trait Model_ORM_EntityRelatedTrait
     /**
      * @param array $item_ids
      *
-     * @return EntityRelatedInterface|$this
+     * @return EntityModelRelatedInterface|$this
      */
     public function filter_entity_item_ids(array $item_ids)
     {
@@ -107,7 +107,7 @@ trait Model_ORM_EntityRelatedTrait
     /**
      * @param $entity_id
      *
-     * @return EntityRelatedInterface|$this
+     * @return EntityModelRelatedInterface|$this
      */
     public function filter_entity_id($entity_id)
     {
@@ -128,7 +128,7 @@ trait Model_ORM_EntityRelatedTrait
     }
 
     /**
-     * @return EntityRelatedInterface|$this
+     * @return EntityModelRelatedInterface|$this
      */
     public function group_by_entity_item_id()
     {
