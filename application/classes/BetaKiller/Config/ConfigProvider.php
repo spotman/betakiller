@@ -3,4 +3,4 @@ namespace BetaKiller\Config;
 
 use BetaKiller\Config\Implementations\Kohana;
 
-class Config extends Kohana implements ConfigInterface {}
+class ConfigProvider extends Kohana implements ConfigProviderInterface {}

@@ -1,7 +1,7 @@
 <?php
 namespace BetaKiller\Config;
 
-interface ConfigInterface
+interface ConfigProviderInterface
 {
     /**
      * @param array $group

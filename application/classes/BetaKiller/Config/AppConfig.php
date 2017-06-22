@@ -11,16 +11,16 @@ class AppConfig implements AppConfigInterface
     const CONFIG_PATH_PAGE_CACHE_PATH = ['cache', 'page', 'path'];
 
     /**
-     * @var ConfigInterface
+     * @var ConfigProviderInterface
      */
     private $_config;
 
     /**
      * AppConfig constructor.
      *
-     * @param \BetaKiller\Config\ConfigInterface $_config
+     * @param \BetaKiller\Config\ConfigProviderInterface $_config
      */
-    public function __construct(ConfigInterface $_config)
+    public function __construct(ConfigProviderInterface $_config)
     {
         $this->_config = $_config;
     }

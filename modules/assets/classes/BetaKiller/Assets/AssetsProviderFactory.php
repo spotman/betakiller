@@ -5,7 +5,7 @@ use BetaKiller\Assets\Provider\AbstractAssetsProviderImage;
 
 use BetaKiller\Factory\NamespaceBasedFactory;
 use BetaKiller\Utils\Instance\SingletonTrait;
-use BetaKiller\Config\ConfigInterface;
+use BetaKiller\Config\ConfigProviderInterface;
 
 /**
  * Class AssetsProviderFactory
@@ -17,7 +17,7 @@ class AssetsProviderFactory
     use SingletonTrait;
 
     /**
-     * @var \BetaKiller\Config\ConfigInterface
+     * @var \BetaKiller\Config\ConfigProviderInterface
      */
     private $config;
 
@@ -29,10 +29,10 @@ class AssetsProviderFactory
     /**
      * AssetsProviderFactory constructor.
      *
-     * @param \BetaKiller\Config\ConfigInterface $config
-     * @param \BetaKiller\Factory\NamespaceBasedFactory $factory
+     * @param \BetaKiller\Config\ConfigProviderInterface $config
+     * @param \BetaKiller\Factory\NamespaceBasedFactory  $factory
      */
-    public function __construct(ConfigInterface $config, NamespaceBasedFactory $factory)
+    public function __construct(ConfigProviderInterface $config, NamespaceBasedFactory $factory)
     {
         $this->config = $config;
         $this->factory = $factory

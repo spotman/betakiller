@@ -1,7 +1,7 @@
 <?php
 namespace BetaKiller\Assets;
 
-use BetaKiller\Config\ConfigInterface;
+use BetaKiller\Config\ConfigProviderInterface;
 use BetaKiller\Model\UserInterface;
 use DateTime;
 use File;
@@ -25,7 +25,7 @@ abstract class AssetsProvider
     protected $_storage_instance;
 
     /**
-     * @var ConfigInterface
+     * @var ConfigProviderInterface
      */
     private $config;
 
@@ -34,7 +34,7 @@ abstract class AssetsProvider
      */
     private $user;
 
-    public function __construct(ConfigInterface $config, UserInterface $user)
+    public function __construct(ConfigProviderInterface $config, UserInterface $user)
     {
         $this->config = $config;
         $this->user   = $user;

@@ -110,8 +110,8 @@ return [
             return $user;
         }),
 
-        \BetaKiller\Config\ConfigInterface::class    => DI\object(\BetaKiller\Config\Config::class),
-        \BetaKiller\Config\AppConfigInterface::class => DI\object(\BetaKiller\Config\AppConfig::class),
+        \BetaKiller\Config\ConfigProviderInterface::class => DI\object(\BetaKiller\Config\ConfigProvider::class),
+        \BetaKiller\Config\AppConfigInterface::class      => DI\object(\BetaKiller\Config\AppConfig::class),
 
         \BetaKiller\Model\UserInterface::class          => DI\get('User'),
         \BetaKiller\Model\RoleInterface::class          => DI\get(\BetaKiller\Model\Role::class),

@@ -1,6 +1,6 @@
 <?php
 
-use BetaKiller\Config\ConfigInterface;
+use BetaKiller\Config\ConfigProviderInterface;
 use BetaKiller\IFace\Widget\WidgetException;
 use BetaKiller\IFace\Widget\AbstractBaseWidget;
 
@@ -10,7 +10,7 @@ class Widget_Auth extends AbstractBaseWidget
     const PROVIDER_ULOGIN = 'uLogin';
 
     /**
-     * @var ConfigInterface
+     * @var ConfigProviderInterface
      * @Inject
      */
     private $_config;

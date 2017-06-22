@@ -1,7 +1,7 @@
 <?php
 namespace BetaKiller\Cache;
 
-use BetaKiller\Config\ConfigInterface;
+use BetaKiller\Config\ConfigProviderInterface;
 use BetaKiller\Exception;
 use MultiSite;
 use BetaKiller\Helper\AppEnv;
@@ -21,7 +21,7 @@ class DoctrineCacheProvider extends ChainCache
      */
     private $defaultExpire;
 
-    public function __construct(MultiSite $multiSite, AppEnv $appEnv, ConfigInterface $config)
+    public function __construct(MultiSite $multiSite, AppEnv $appEnv, ConfigProviderInterface $config)
     {
         $workingName = $multiSite->getWorkingName();
 

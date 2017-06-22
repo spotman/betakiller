@@ -1,9 +1,9 @@
 <?php
 namespace BetaKiller\Config\Implementations;
 
-use BetaKiller\Config\ConfigInterface;
+use BetaKiller\Config\ConfigProviderInterface;
 
-abstract class Kohana implements ConfigInterface
+abstract class Kohana implements ConfigProviderInterface
 {
     const KEY_SEPARATOR = '.';
 
