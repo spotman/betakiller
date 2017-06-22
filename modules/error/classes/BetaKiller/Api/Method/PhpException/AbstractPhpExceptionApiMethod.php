@@ -2,20 +2,15 @@
 namespace BetaKiller\Api\Method\PhpException;
 
 use BetaKiller\Error\PhpExceptionModelInterface;
+use BetaKiller\Error\PhpExceptionStorageInterface;
 use Spotman\Api\ApiMethodException;
 use Spotman\Api\Method\AbstractApiMethod;
 
 abstract class AbstractPhpExceptionApiMethod extends AbstractApiMethod
 {
-    /**
-     * @Inject
-     * @var \BetaKiller\Error\PhpExceptionStorageInterface
-     */
-    protected $phpExceptionStorage;
-
-    protected function findByHash($hash): PhpExceptionModelInterface
+    protected function findByHash( PhpExceptionStorageInterface $storage, string $hash): PhpExceptionModelInterface
     {
-        $model = $this->phpExceptionStorage->findByHash($hash);
+        $model = $storage->findByHash($hash);
 
         if (!$model) {
             throw new ApiMethodException('Incorrect php exception hash :value', [':value' => $hash]);

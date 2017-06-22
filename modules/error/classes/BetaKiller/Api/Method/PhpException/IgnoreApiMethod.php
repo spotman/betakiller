@@ -1,14 +1,20 @@
 <?php
 namespace BetaKiller\Api\Method\PhpException;
 
+use BetaKiller\Error\PhpExceptionStorageInterface;
 use BetaKiller\Model\UserInterface;
 
 class IgnoreApiMethod extends AbstractPhpExceptionApiMethod
 {
     /**
+     * @var \BetaKiller\Error\PhpExceptionStorageInterface
+     */
+    private $storage;
+
+    /**
      * @var \BetaKiller\Error\PhpExceptionModelInterface|null
      */
-    protected $model;
+    private $model;
 
     /**
      * @var \BetaKiller\Model\UserInterface
@@ -18,13 +24,15 @@ class IgnoreApiMethod extends AbstractPhpExceptionApiMethod
     /**
      * IgnoreApiMethod constructor.
      *
-     * @param string                          $hash
-     * @param \BetaKiller\Model\UserInterface $user
+     * @param string                                         $hash
+     * @param \BetaKiller\Error\PhpExceptionStorageInterface $storage
+     * @param \BetaKiller\Model\UserInterface                $user
      */
-    public function __construct(string $hash, UserInterface $user)
+    public function __construct(string $hash, PhpExceptionStorageInterface $storage, UserInterface $user)
     {
-        $this->user  = $user;
-        $this->model = $this->findByHash($hash);
+        $this->storage = $storage;
+        $this->user    = $user;
+        $this->model   = $this->findByHash($storage, $hash);
     }
 
     /**
@@ -32,7 +40,7 @@ class IgnoreApiMethod extends AbstractPhpExceptionApiMethod
      */
     public function execute()
     {
-        $this->phpExceptionStorage->ignore($this->model, $this->user);
+        $this->storage->ignore($this->model, $this->user);
 
         return null;
     }

@@ -1,21 +1,30 @@
 <?php
 namespace BetaKiller\Api\Method\PhpException;
 
+use BetaKiller\Error\PhpExceptionStorageInterface;
+
 class DeleteApiMethod extends AbstractPhpExceptionApiMethod
 {
     /**
-     * @var \BetaKiller\Error\PhpExceptionModelInterface|null
+     * @var \BetaKiller\Error\PhpExceptionStorageInterface
      */
-    protected $model;
+    private $storage;
 
     /**
-     * ResolveApiMethod constructor.
-     *
-     * @param string $hash
+     * @var \BetaKiller\Error\PhpExceptionModelInterface|null
      */
-    public function __construct($hash)
+    private $model;
+
+    /**
+     * DeleteApiMethod constructor.
+     *
+     * @param string                                         $hash
+     * @param \BetaKiller\Error\PhpExceptionStorageInterface $storage
+     */
+    public function __construct(string $hash, PhpExceptionStorageInterface $storage)
     {
-        $this->model = $this->findByHash($hash);
+        $this->storage = $storage;
+        $this->model   = $this->findByHash($storage, $hash);
     }
 
     /**
@@ -23,7 +32,7 @@ class DeleteApiMethod extends AbstractPhpExceptionApiMethod
      */
     public function execute()
     {
-        $this->phpExceptionStorage->delete($this->model);
+        $this->storage->delete($this->model);
 
         return null;
     }
