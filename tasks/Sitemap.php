@@ -16,7 +16,7 @@ use Crunz\Schedule;
 $scheduler = new Schedule();
 
 $scheduler
-    ->run('php index.php --stage=production sitemap')
+    ->run('/usr/bin/env php7.1 index.php --stage=production sitemap')
     ->description('Sitemap generation')
     ->in('public')
     ->every('minutes', 5)
