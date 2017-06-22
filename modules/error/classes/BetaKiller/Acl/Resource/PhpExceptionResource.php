@@ -54,6 +54,10 @@ class PhpExceptionResource extends AbstractEntityRelatedAclResource
                 Role::DEVELOPER_ROLE_NAME,
             ],
 
+            self::PERMISSION_RESOLVE => [
+                Role::DEVELOPER_ROLE_NAME,
+            ],
+
             self::PERMISSION_IGNORE => [
                 Role::DEVELOPER_ROLE_NAME,
             ],
