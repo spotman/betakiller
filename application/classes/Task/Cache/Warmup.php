@@ -52,6 +52,13 @@ class Task_Cache_Warmup extends Minion_Task
 
         // For each IFace
         foreach ($iterator as $ifaceModel) {
+            if ($ifaceModel->hideInSiteMap()) {
+                $this->debug('Skip IFace :codename coz it is hidden in sitemap', [
+                    ':codename' => $ifaceModel->getCodename(),
+                ]);
+                continue;
+            }
+
             $this->debug('Found IFace :codename', [':codename' => $ifaceModel->getCodename()]);
 
             try {
