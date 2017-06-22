@@ -63,7 +63,7 @@ class Task_Cache_Warmup extends Minion_Task
 
             try {
                 $this->processIFaceModel($ifaceModel, $parameters);
-            } catch (Exception $e) {
+            } catch (Throwable $e) {
                 $this->warning('Exception thrown for :iface with message :text', [
                     ':iface' => $ifaceModel->getCodename(),
                     ':text'  => $e->getMessage(),
