@@ -12,6 +12,11 @@ use DateTime;
 interface AssetsModelInterface
 {
     /**
+     * @return int
+     */
+    public function get_id();
+
+    /**
      * Returns filename for storage
      *
      * @return string

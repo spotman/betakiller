@@ -227,7 +227,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
         if ($model->get_id()) {
             $this->debug('Attach with WP ID = :id already exists, data = :data', [
                 ':id'   => $wp_id,
-                ':data' => $model->as_array(),
+                ':data' => $model->toJson(),
             ]);
 
             return $model;
@@ -864,7 +864,8 @@ class Task_Content_Import_Wordpress extends AbstractTask
 
         $attributes['id'] = $image->get_id();
 
-        $element = $node->getDocument()->createElement(CustomTag::PHOTO);
+        $document = $node->getDocument();
+        $element = $document->createElement(CustomTag::PHOTO);
 
         foreach ($attributes as $key => $value) {
             $element->setAttribute($key, $value);
@@ -1006,9 +1007,10 @@ class Task_Content_Import_Wordpress extends AbstractTask
             $category       = $categories_orm->find_by_wp_id($wp_id);
 
             $category
-                ->set_wp_id($wp_id)
-                ->set_uri($uri)
-                ->set_label($label);
+                ->set_label($label)
+                ->set_uri($uri);
+
+            $category->set_wp_id($wp_id);
 
             $category->save();
 
