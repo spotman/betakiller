@@ -49,8 +49,8 @@ class BetaKiller_Kohana_Exception extends Kohana_Kohana_Exception
                 echo self::text($exception);
             }
 
-            // CLI log handler already printed the message
-            return null;
+            // CLI log handler already printed the message, return empty response
+            return new Response;
         }
 
         // Make nice message if allowed or use default Kohana response

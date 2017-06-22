@@ -258,7 +258,7 @@ task('git:check', function () {
         return;
     }
 
-    if (askConfirmation('Commit changes?', false)) {
+    if (askConfirmation('Commit changes?')) {
         git_commit_all($path);
         git_push($path);
     } else {
@@ -313,7 +313,7 @@ task('migrations:create', function () {
 
     $out_arr = explode('Done! Check ', $output);
 
-    if (count($out_arr) == 2) {
+    if (count($out_arr) === 2) {
         $file_path = trim($out_arr[1]);
 
         if (file_exists($file_path)) {
