@@ -5,6 +5,7 @@ use BetaKiller\Exception;
 use BetaKiller\Factory\OrmFactory;
 use BetaKiller\Helper\LogTrait;
 use BetaKiller\Helper\NotificationHelper;
+use BetaKiller\Model\IFaceZone;
 use BetaKiller\Model\UserInterface;
 
 class PhpExceptionStorage implements PhpExceptionStorageInterface
@@ -181,7 +182,7 @@ class PhpExceptionStorage implements PhpExceptionStorageInterface
                 'message'  => $model->getMessage(),
                 'urls'     => $model->getUrls(),
                 'paths'    => $model->getPaths(),
-                'adminUrl' => $this->ifaceHelper->getReadEntityUrl($model),
+                'adminUrl' => $this->ifaceHelper->getReadEntityUrl($model, IFaceZone::ADMIN_ZONE),
             ];
 
             $message = $this->notificationHelper->createMessage('developer/error/php-exception');
