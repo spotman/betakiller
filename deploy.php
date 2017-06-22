@@ -357,6 +357,12 @@ task('cache:warmup', function () {
     run_minion_task('cache:warmup');
 })->desc('Warm up cache by making internal HTTP request to every IFace');
 
+/**
+ * Success message
+ */
+task('done', function () {
+    writeln('<info>Successfully deployed at '.date('H:i:s').'!</info>');
+})->once()->setPrivate();
 
 task('deploy', [
     // Check app configuration
@@ -388,6 +394,7 @@ task('deploy', [
     // Finalize
     'deploy:symlink',
     'cleanup',
+    'done',
 ])->desc('Deploy app bundle')->onlyForStage([
     DEPLOYER_STAGING_STAGE,
     DEPLOYER_PRODUCTION_STAGE,
