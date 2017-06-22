@@ -6,6 +6,7 @@ use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Helper\UrlParametersHelper;
 use BetaKiller\IFace\AbstractIFace;
 use BetaKiller\Model\UserInterface;
+use BetaKiller\Task\AbstractTask;
 
 class Login extends AbstractIFace
 {
@@ -81,8 +82,8 @@ class Login extends AbstractIFace
 
     public function before(): void
     {
-        // If user already authorized
-        if (!$this->user->isGuest()) {
+        // If user already authorized (skip this step in CLI mode)
+        if (PHP_SAPI !== 'cli' && !$this->user->isGuest()) {
             if ($this->redirectUrl === $this->currentUrl) {
                 // Prevent infinite loops
                 $this->redirectUrl = '/';

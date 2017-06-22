@@ -5,9 +5,11 @@ use BetaKiller\Model\UserInterface;
 
 abstract class AbstractTask extends \Minion_Task
 {
+    const CLI_USER_NAME = 'minion';
+
     public static function getCliUserModel(): UserInterface
     {
-        $username = 'minion';
+        $username = self::CLI_USER_NAME;
 
         /** @var UserInterface $orm */
         $orm = \ORM::factory('User');
