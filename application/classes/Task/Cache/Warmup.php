@@ -89,9 +89,14 @@ class Task_Cache_Warmup extends Minion_Task
         $this->urlParametersHelper->getCurrentUrlParameters()->clear();
         $this->ifaceStack->clear();
 
-        $request  = new Request($url, [], false);
-        $response = $request->execute();
-        $status   = $response->status();
+        try {
+            $request  = new Request($url, [], false);
+            $response = $request->execute();
+            $status   = $response->status();
+        } catch (Throwable $e) {
+            $this->warning('Got exception :e for url :url', [':url' => $url, ':e' => $e->getMessage()]);
+            return;
+        }
 
         if ($status === 200) {
             // TODO Maybe grab page content, parse it and make request to every image/css/js file
