@@ -1,9 +1,11 @@
 <?php
 namespace BetaKiller\Api\Method\PhpException;
 
+use BetaKiller\Error\PhpExceptionModelInterface;
 use Spotman\Api\ApiMethodException;
+use Spotman\Api\Method\AbstractApiMethod;
 
-trait PhpExceptionMethodTrait
+abstract class AbstractPhpExceptionApiMethod extends AbstractApiMethod
 {
     /**
      * @Inject
@@ -11,7 +13,7 @@ trait PhpExceptionMethodTrait
      */
     protected $phpExceptionStorage;
 
-    protected function findByHash($hash)
+    protected function findByHash($hash): PhpExceptionModelInterface
     {
         $model = $this->phpExceptionStorage->findByHash($hash);
 

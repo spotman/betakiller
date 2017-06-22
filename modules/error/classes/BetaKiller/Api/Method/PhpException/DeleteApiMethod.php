@@ -1,12 +1,8 @@
 <?php
 namespace BetaKiller\Api\Method\PhpException;
 
-use Spotman\Api\Method\AbstractApiMethod;
-
-class DeleteApiMethod extends AbstractApiMethod
+class DeleteApiMethod extends AbstractPhpExceptionApiMethod
 {
-    use PhpExceptionMethodTrait;
-
     /**
      * @var \BetaKiller\Error\PhpExceptionModelInterface|null
      */

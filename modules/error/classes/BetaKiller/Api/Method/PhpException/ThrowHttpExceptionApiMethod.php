@@ -2,12 +2,9 @@
 namespace BetaKiller\Api\Method\PhpException;
 
 use BetaKiller\Model\UserInterface;
-use Spotman\Api\Method\AbstractApiMethod;
 
-class ThrowHttpExceptionApiMethod extends AbstractApiMethod
+class ThrowHttpExceptionApiMethod extends AbstractPhpExceptionApiMethod
 {
-    use PhpExceptionMethodTrait;
-
     /**
      * @var UserInterface
      */
