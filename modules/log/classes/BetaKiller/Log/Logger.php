@@ -2,8 +2,7 @@
 namespace BetaKiller\Log;
 
 use BetaKiller\Helper\AppEnv;
-use Monolog\ErrorHandler;
-use Monolog\Handler\DeduplicationHandler;
+use Monolog\Handler\FingersCrossedHandler;
 use Monolog\Handler\PHPConsoleHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Handler\WhatFailureGroupHandler;
@@ -68,12 +67,13 @@ class Logger implements LoggerInterface
             new StreamHandler($appLogFilePath, $monolog::NOTICE),
 
             // TODO PhpExceptionStorage handler
-//            new FingersCrossedHandler(),
         ]);
+
+        $crossedHandler = new FingersCrossedHandler($groupHandler, $monolog::NOTICE);
 
         // TODO CLI mode logging
 
-        $monolog->pushHandler(new DeduplicationHandler($groupHandler));
+        $monolog->pushHandler($crossedHandler);
 
         // Enable debugging via PhpConsole for developers
         if ($debugAllowed && Connector::getInstance()->isActiveClient()) {
