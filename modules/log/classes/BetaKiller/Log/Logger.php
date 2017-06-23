@@ -61,10 +61,10 @@ class Logger implements LoggerInterface
 
         $groupHandler = new WhatFailureGroupHandler([
             // Core logs
-            new StreamHandler($coreLogFilePath, $monolog::NOTICE),
+            new StreamHandler($coreLogFilePath, $monolog::DEBUG),
 
             // App logs
-            new StreamHandler($appLogFilePath, $monolog::NOTICE),
+            new StreamHandler($appLogFilePath, $monolog::DEBUG),
 
             // TODO PhpExceptionStorage handler
         ]);
