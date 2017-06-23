@@ -46,7 +46,7 @@ class Task_Cache_Warmup extends Minion_Task
     protected function _execute(array $params)
     {
         // Disable exception handling coz it has exit() call inside and brakes iterator
-        BetaKiller_Kohana_Exception::disableHandler();
+//        BetaKiller_Kohana_Exception::disableHandler();
 
         $parameters = $this->urlParametersHelper->createEmpty();
 
