@@ -88,9 +88,9 @@ class NotificationHelper
         return $this;
     }
 
-    public function rewriteTargetsForDebug(NotificationMessageInterface $message, $keepInStage = null)
+    public function rewriteTargetsForDebug(NotificationMessageInterface $message, ?bool $keepInStage = null)
     {
-        if (!$this->appEnv->inProduction($keepInStage)) {
+        if (!$this->appEnv->inProduction($keepInStage ?? true)) {
             $message->clearTargets();
 
             $this->toDevelopers($message);
