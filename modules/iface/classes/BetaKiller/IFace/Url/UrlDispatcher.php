@@ -466,7 +466,7 @@ class UrlDispatcher implements LoggerAwareInterface
             // Restore ifaces and push them into stack
             foreach ($stackData as $ifaceCodename) {
                 $iface = $this->ifaceProvider->fromCodename($ifaceCodename);
-                $this->ifaceStack->push($iface);
+                $this->pushToStack($iface);
             }
 
             // Restore url parameters
