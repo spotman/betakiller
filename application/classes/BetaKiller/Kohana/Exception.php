@@ -10,12 +10,19 @@ class BetaKiller_Kohana_Exception extends Kohana_Kohana_Exception
      */
     protected static $_counter = 0;
 
+    private static $_handlerEnabled = true;
+
     public function __construct($message = '', array $variables = null, $code = 0, Throwable $previous = null)
     {
         // Set up default message text if it was not set
         $message = $message ?: $this->getDefaultMessageI18nKey();
 
         parent::__construct($message, $variables, $code, $previous);
+    }
+
+    public static function disableHandler()
+    {
+        self::$_handlerEnabled = false;
     }
 
     /**
@@ -27,6 +34,11 @@ class BetaKiller_Kohana_Exception extends Kohana_Kohana_Exception
      */
     public static function _handler(Throwable $exception)
     {
+        // Suppress processing and return empty response
+        if (!self::$_handlerEnabled) {
+            return new Response;
+        }
+
         static::$_counter++;
 
         if (static::$_counter > 10) {
