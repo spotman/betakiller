@@ -6,6 +6,7 @@ use BetaKiller\Helper\IFaceHelper;
  * Interface HasPublicReadUrlInterface
  *
  * @package BetaKiller\Helper
+ * @deprecated
  */
 interface HasPublicReadUrlInterface
 {

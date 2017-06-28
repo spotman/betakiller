@@ -285,13 +285,11 @@ class UrlDispatcher implements LoggerAwareInterface
         if ($it->count() && $model->hasTreeBehaviour()) {
             // Tree behaviour in URL
             $absentFound = false;
-            $step        = 1;
 
             do {
                 try {
                     $this->parseUriParameterPart($model, $it);
                     $it->next();
-                    $step++;
                 } catch (UrlDispatcherException $e) {
                     $absentFound = true;
 
@@ -379,10 +377,8 @@ class UrlDispatcher implements LoggerAwareInterface
         $modelKey  = $prototype->getModelKey();
         $modelName = $prototype->getDataSourceName();
 
-        $aclResource = $this->aclHelper->getAclResourceFromEntityName($modelName);
-
         // Search for model item
-        $entity = $dataSource->findByUrlKey($modelKey, $uriValue, $this->urlParameters, $aclResource);
+        $entity = $dataSource->findEntityByUrlKey($modelKey, $uriValue, $this->urlParameters);
 
         if (!$entity) {
             throw new UrlDispatcherException('Can not find item for [:prototype] by [:value]', [
@@ -391,16 +387,13 @@ class UrlDispatcher implements LoggerAwareInterface
             ]);
         }
 
-        $this->checkEntityAccess($entity);
-
         // Allow current model to preset "belongs to" models
         $entity->presetLinkedEntities($this->urlParameters);
 
         // Store model into registry
-        $setter   = mb_strtolower('set_'.$modelName);
         $registry = $this->urlParameters;
 
-        if (method_exists($registry, $setter)) {
+        if (method_exists($registry, mb_strtolower('set_'.$modelName))) {
             throw new UrlDispatcherException('Method calls on UrlParameters registry are deprecated');
         }
 
@@ -408,19 +401,12 @@ class UrlDispatcher implements LoggerAwareInterface
         $registry->setEntity($entity, $ifaceModel->hasTreeBehaviour());
     }
 
-    private function checkEntityAccess(DispatchableEntityInterface $entity): void
-    {
-        if (!$this->aclHelper->isEntityActionAllowed($entity)) {
-            throw new \HTTP_Exception_403();
-        }
-    }
-
     private function checkIFaceAccess(IFaceInterface $iface): void
     {
         // Force authorization for non-public zones before security check
         $this->aclHelper->forceAuthorizationIfNeeded($iface);
 
-        if (!$this->aclHelper->isIFaceAllowed($iface)) {
+        if (!$this->aclHelper->isIFaceAllowed($iface, $this->urlParameters)) {
             throw new \HTTP_Exception_403();
         }
     }
@@ -463,21 +449,19 @@ class UrlDispatcher implements LoggerAwareInterface
         $paramsData = $data['parameters'];
 
         try {
-            // Restore ifaces and push them into stack
-            foreach ($stackData as $ifaceCodename) {
-                $iface = $this->ifaceProvider->fromCodename($ifaceCodename);
-                $this->pushToStack($iface);
-            }
-
-            // Restore url parameters
+            // Restore url parameters first so iface access can be checked
             foreach ($paramsData as $key => $value) {
                 if (!($value instanceof DispatchableEntityInterface)) {
                     throw new UrlDispatcherException('Cached data for url parameters is incorrect');
                 }
 
-                $this->checkEntityAccess($value);
-
                 $this->urlParameters->setEntity($value);
+            }
+
+            // Restore ifaces and push them into stack (with access check)
+            foreach ($stackData as $ifaceCodename) {
+                $iface = $this->ifaceProvider->fromCodename($ifaceCodename);
+                $this->pushToStack($iface);
             }
 
             return true;

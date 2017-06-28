@@ -7,13 +7,13 @@ use BetaKiller\Helper\ContentUrlParametersHelper;
 use BetaKiller\Helper\IFaceHelper;
 use BetaKiller\IFace\CrudlsActionsInterface;
 use BetaKiller\IFace\Exception\IFaceException;
+use BetaKiller\IFace\IFaceInterface;
 use BetaKiller\IFace\IFaceProvider;
 use BetaKiller\IFace\Widget\AbstractAdminWidget;
 use BetaKiller\Model\DispatchableEntityInterface;
 use BetaKiller\Model\IFaceZone;
 use BetaKiller\Model\Layout;
 use BetaKiller\Model\UserInterface;
-use Model_ContentCommentStatus;
 
 class BarWidget extends AbstractAdminWidget
 {
@@ -106,19 +106,18 @@ class BarWidget extends AbstractAdminWidget
         $commentOrm = $this->model_factory_content_comment();
         $statusOrm  = $this->model_factory_content_comment_status();
 
-        $status       = $statusOrm->getPendingStatus();
-        $pendingCount = $commentOrm->getCommentsCount($status);
+        $pendingStatus = $statusOrm->getPendingStatus();
+        $pendingCount  = $commentOrm->getCommentsCount($pendingStatus);
 
-        /** @var \BetaKiller\Acl\Resource\ContentCommentResource $resource */
-        $resource = $this->aclHelper->getResource('ContentComment');
+        $iface = $pendingCount
+            ? $this->getCommentsListByStatusIface()
+            : $this->getCommentsRootIface();
 
-        if (!$resource->isStatusActionAllowed($status, $resource::ACTION_UPDATE)) {
-            return null;
-        }
+        $params = $this->contentUrlParamHelper
+            ->createEmpty()
+            ->setEntity($pendingStatus);
 
-        $url = $pendingCount
-            ? $this->getCommentsListByStatusIfaceUrl($status)
-            : $this->getCommentsRootIfaceUrl();
+        $url = $this->aclHelper->isIFaceAllowed($iface, $params) ? $iface->url($params) : null;
 
         return [
             'url'   => $url,
@@ -126,24 +125,22 @@ class BarWidget extends AbstractAdminWidget
         ];
     }
 
-    private function getCommentsListByStatusIfaceUrl(Model_ContentCommentStatus $status): string
+    /**
+     * @uses \BetaKiller\IFace\Admin\Content\CommentListByStatus
+     * @return \BetaKiller\IFace\IFaceInterface
+     */
+    private function getCommentsListByStatusIface(): IFaceInterface
     {
-        /** @var \BetaKiller\IFace\Admin\Content\CommentListByStatus $iface */
-        $iface = $this->ifaceHelper->createIFaceFromCodename('Admin_Content_CommentListByStatus');
-
-        $param = $this->contentUrlParamHelper->createEmpty();
-
-        $param->setEntity($status);
-
-        return $iface->url($param);
+        return $this->ifaceHelper->createIFaceFromCodename('Admin_Content_CommentListByStatus');
     }
 
-    private function getCommentsRootIfaceUrl(): string
+    /**
+     * @uses \BetaKiller\IFace\Admin\Content\CommentIndex
+     * @return \BetaKiller\IFace\IFaceInterface
+     */
+    private function getCommentsRootIface(): IFaceInterface
     {
-        /** @var \BetaKiller\IFace\Admin\Content\CommentIndex $iface */
-        $iface = $this->ifaceHelper->createIFaceFromCodename('Admin_Content_CommentIndex');
-
-        return $iface->url();
+        return $this->ifaceHelper->createIFaceFromCodename('Admin_Content_CommentIndex');
     }
 
     private function getAdminEditButtonUrl(?DispatchableEntityInterface $entity): ?string

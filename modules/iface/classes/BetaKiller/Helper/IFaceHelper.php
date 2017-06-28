@@ -3,7 +3,6 @@ namespace BetaKiller\Helper;
 
 use BetaKiller\Exception;
 use BetaKiller\IFace\CrudlsActionsInterface;
-use BetaKiller\IFace\Exception\IFaceException;
 use BetaKiller\IFace\IFaceFactory;
 use BetaKiller\IFace\IFaceInterface;
 use BetaKiller\IFace\IFaceModelInterface;
@@ -13,7 +12,6 @@ use BetaKiller\IFace\View\IFaceView;
 use BetaKiller\IFace\Widget\WidgetInterface;
 use BetaKiller\IFace\WidgetFactory;
 use BetaKiller\Model\DispatchableEntityInterface;
-use BetaKiller\Model\EntityWithPreviewModeInterface;
 use BetaKiller\Model\IFaceZone;
 use Spotman\Api\ApiMethodResponse;
 
@@ -153,13 +151,6 @@ class IFaceHelper
 
             // Fetch zone from current IFace
             $zone = $currentIFace->getZoneName();
-        }
-
-        if ($zone === IFaceZone::PREVIEW_ZONE && !($entity instanceof EntityWithPreviewModeInterface)) {
-            throw new IFaceException('Entity :name must implement :must for using preview zone', [
-                ':name' => get_class($entity),
-                ':must' => EntityWithPreviewModeInterface::class,
-            ]);
         }
 
         // Search for IFace with provided entity, action and zone

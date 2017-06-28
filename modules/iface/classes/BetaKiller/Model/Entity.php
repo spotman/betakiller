@@ -114,4 +114,14 @@ class Entity extends ORM
 
         return $model;
     }
+
+    /**
+     * @return \BetaKiller\Model\Entity[]
+     */
+    public function getAllEntities(): array
+    {
+        /** @var \BetaKiller\Model\Entity $orm */
+        $orm = $this->model_factory();
+        return $orm->get_all();
+    }
 }

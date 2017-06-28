@@ -1,7 +1,6 @@
 <?php
 namespace BetaKiller\IFace\Url;
 
-use BetaKiller\Acl\Resource\EntityRelatedAclResourceInterface;
 use BetaKiller\Model\DispatchableEntityInterface;
 
 interface UrlDataSourceInterface
@@ -9,18 +8,16 @@ interface UrlDataSourceInterface
     /**
      * Performs search for model item where the $key property value is equal to $value
      *
-     * @param string                                                     $key
-     * @param string                                                     $value
-     * @param \BetaKiller\IFace\Url\UrlParametersInterface               $params
-     * @param \BetaKiller\Acl\Resource\EntityRelatedAclResourceInterface $resource
+     * @param string                                       $key
+     * @param string                                       $value
+     * @param \BetaKiller\IFace\Url\UrlParametersInterface $params
      *
      * @return \BetaKiller\Model\DispatchableEntityInterface|null
      */
-    public function findByUrlKey(
+    public function findEntityByUrlKey(
         string $key,
         string $value,
-        UrlParametersInterface $params,
-        EntityRelatedAclResourceInterface $resource
+        UrlParametersInterface $params
     ): ?DispatchableEntityInterface;
 
     /**
@@ -32,7 +29,7 @@ interface UrlDataSourceInterface
      *
      * @return \BetaKiller\Model\DispatchableEntityInterface[]
      */
-    public function getAvailableItemsByUrlKey(
+    public function getEntitiesByUrlKey(
         string $key,
         UrlParametersInterface $parameters,
         ?int $limit = null

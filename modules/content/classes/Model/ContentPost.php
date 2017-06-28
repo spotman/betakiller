@@ -1,22 +1,19 @@
 <?php
 
-use BetaKiller\Acl\Resource\EntityRelatedAclResourceInterface;
-use BetaKiller\Acl\Resource\StatusRelatedEntityAclResourceInterface;
 use BetaKiller\Content\ImportedFromWordpressInterface;
 use BetaKiller\Content\Shortcode;
-use BetaKiller\Exception;
 use BetaKiller\Helper\SeoMetaInterface;
 use BetaKiller\IFace\Url\UrlDispatcher;
 use BetaKiller\IFace\Url\UrlParametersInterface;
+use BetaKiller\Model\HasPublicZoneAccessSpecificationInterface;
 use BetaKiller\Model\ModelWithRevisionsInterface;
 use BetaKiller\Model\ModelWithRevisionsOrmTrait;
+use BetaKiller\Model\RevisionModelInterface;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Status\StatusRelatedModelInterface;
 use BetaKiller\Status\StatusRelatedModelOrmTrait;
-use BetaKiller\Model\EntityWithPreviewModeInterface;
-use BetaKiller\Model\RevisionModelInterface;
 
-class Model_ContentPost extends \ORM implements StatusRelatedModelInterface, ModelWithRevisionsInterface, SeoMetaInterface, ImportedFromWordpressInterface, EntityWithPreviewModeInterface
+class Model_ContentPost extends \ORM implements StatusRelatedModelInterface, ModelWithRevisionsInterface, SeoMetaInterface, ImportedFromWordpressInterface, HasPublicZoneAccessSpecificationInterface
 {
     use StatusRelatedModelOrmTrait,
         ModelWithRevisionsOrmTrait,
@@ -731,15 +728,12 @@ class Model_ContentPost extends \ORM implements StatusRelatedModelInterface, Mod
     /**
      * @param UrlParametersInterface $parameters
      */
-    protected function customFilterForSearchByUrl(UrlParametersInterface $parameters): void
+    protected function customFilterForUrlDispatching(UrlParametersInterface $parameters): void
     {
         // Load pages first
         $this->prioritizeByPostTypes();
 
         $category = $parameters->getEntityByClassName(Model_ContentCategory::class);
-
-        // Show only posts having actual revision
-        $this->filterHavingActualRevision();
 
         $this->and_where_open();
 
@@ -766,19 +760,9 @@ class Model_ContentPost extends \ORM implements StatusRelatedModelInterface, Mod
         $this->and_where_close();
     }
 
-    /**
-     * @param \BetaKiller\Acl\Resource\EntityRelatedAclResourceInterface $aclResource
-     * @param                                                            $action
-     */
-    protected function securityFilter(EntityRelatedAclResourceInterface $aclResource, $action): void
+    public function isPublicZoneAccessAllowed(): bool
     {
-        if (!($aclResource instanceof StatusRelatedEntityAclResourceInterface)) {
-            throw new Exception('Acl resource :name must implement :must for security filter processing', [
-                ':name' => $aclResource->getResourceId(),
-                ':must' => StatusRelatedEntityAclResourceInterface::class,
-            ]);
-        }
-
-        $this->filterAllowedStatuses($aclResource);
+        // Show only posts having actual revision
+        return $this->hasActualRevision();
     }
 }

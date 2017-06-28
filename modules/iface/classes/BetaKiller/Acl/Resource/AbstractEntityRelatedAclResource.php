@@ -31,4 +31,16 @@ abstract class AbstractEntityRelatedAclResource extends AbstractCrudlsPermission
 
         return $this->entity;
     }
+
+    public function isEntityRequiredForAction(string $actionName): bool
+    {
+        $rawActions = [
+            self::ACTION_CREATE,
+            self::ACTION_LIST,
+            self::ACTION_SEARCH,
+        ];
+
+        // Create action does not require entity model to be set before processing
+        return !in_array($actionName, $rawActions, true);
+    }
 }

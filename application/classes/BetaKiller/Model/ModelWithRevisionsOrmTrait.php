@@ -125,6 +125,11 @@ trait ModelWithRevisionsOrmTrait
         return $this->where($column, 'IS NOT', null);
     }
 
+    public function hasActualRevision(): bool
+    {
+        return (bool)$this->getActualRevision();
+    }
+
     /**
      * @return bool
      */

@@ -2,6 +2,7 @@
 namespace BetaKiller\IFace\Admin\Content;
 
 use BetaKiller\Helper\ContentUrlParametersHelper;
+use BetaKiller\IFace\CrudlsActionsInterface;
 
 class PostItem extends AbstractAdminBase
 {
@@ -37,9 +38,6 @@ class PostItem extends AbstractAdminBase
     {
         $post = $this->urlParametersHelper->getContentPost();
 
-        /** @var \BetaKiller\Acl\Resource\ContentPostResource $contentPostResource */
-        $contentPostResource = $this->aclHelper->getEntityAclResource($post);
-
         $thumbnails = [];
 
         foreach ($post->getThumbnails() as $thumb) {
@@ -51,6 +49,8 @@ class PostItem extends AbstractAdminBase
 
         $status = $post->get_current_status();
 
+        $updateAllowed = $this->aclHelper->isEntityActionAllowed($post, CrudlsActionsInterface::ACTION_UPDATE);
+
         return [
             'post' => [
                 'id'          => $post->getID(),
@@ -61,7 +61,7 @@ class PostItem extends AbstractAdminBase
                 'description' => $post->getDescription(),
 
                 'needsCategory'   => $post->needsCategory(),
-                'isUpdateAllowed' => $contentPostResource->isUpdateAllowed(),
+                'isUpdateAllowed' => $updateAllowed,
 
                 'status' => [
                     'id'          => $status->get_id(),

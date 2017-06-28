@@ -222,5 +222,5 @@ interface IFaceInterface extends SeoMetaInterface
      *
      * @return string[]
      */
-    public function getAvailableUrls(UrlParametersInterface $params, ?int $limit = null): array;
+    public function getPublicAvailableUrls(UrlParametersInterface $params, ?int $limit = null): array;
 }

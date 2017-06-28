@@ -41,6 +41,12 @@ abstract class AbstractIFace implements IFaceInterface
 
     /**
      * @Inject
+     * @var \BetaKiller\Helper\AclHelper
+     */
+    private $aclHelper;
+
+    /**
+     * @Inject
      * @var AppConfigInterface
      */
     private $appConfig;
@@ -540,7 +546,7 @@ abstract class AbstractIFace implements IFaceInterface
      *
      * @return string[]
      */
-    public function getAvailableUrls(UrlParametersInterface $params, ?int $limit = null): array
+    public function getPublicAvailableUrls(UrlParametersInterface $params, ?int $limit = null): array
     {
         if (!$this->getModel()->hasDynamicUrl()) {
             // Make static URL
@@ -561,17 +567,20 @@ abstract class AbstractIFace implements IFaceInterface
         $prototype  = $this->prototypeHelper->fromIFaceUri($this);
         $dataSource = $this->prototypeHelper->getDataSourceInstance($prototype);
 
-        return $this->getDataSourceAvailableUrls($dataSource, $prototype->getModelKey(), $params, $limit);
+        $urlsBlocks = $this->getDataSourceAvailableUrls($dataSource, $prototype->getModelKey(), $params, $limit);
+
+        // Empty $urlBlocks leads array_merge() to return null
+        return array_filter($urlsBlocks ? array_merge(...$urlsBlocks) : []);
     }
 
     private function getDataSourceAvailableUrls(UrlDataSourceInterface $dataSource, string $key, UrlParametersInterface $params, ?int $limit = null): array
     {
-        $items = $dataSource->getAvailableItemsByUrlKey($key, $params, $limit);
+        $entities = $dataSource->getEntitiesByUrlKey($key, $params, $limit);
         $urlsBlocks  = [];
 
-        foreach ($items as $item) {
+        foreach ($entities as $entity) {
             // Save current item to parameters registry
-            $params->setEntity($item, true);
+            $params->setEntity($entity, true);
 
             // Make dynamic URL
             $urlsBlocks[] = [$this->makeAvailableUrl($params)];
@@ -583,12 +592,15 @@ abstract class AbstractIFace implements IFaceInterface
             }
         }
 
-        // Empty $urlBlocks leads array_merge() to return null
-        return $urlsBlocks ? array_merge(...$urlsBlocks) : [];
+        return $urlsBlocks;
     }
 
     private function makeAvailableUrl(UrlParametersInterface $params = null): string
     {
+        if (!$this->aclHelper->isIFaceAllowed($this, $params)) {
+            return null;
+        }
+
         return $this->url($params, false); // Disable cycling links removing
     }
 }

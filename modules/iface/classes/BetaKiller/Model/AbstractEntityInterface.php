@@ -9,10 +9,10 @@ interface AbstractEntityInterface extends HasLabelInterface
      *
      * @return string
      */
-    public function getID();
+    public function getID(): string;
 
     /**
      * @return string
      */
-    public function getModelName();
+    public function getModelName(): string;
 }

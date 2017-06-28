@@ -1,9 +1,7 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
-use BetaKiller\Acl\Resource\EntityRelatedAclResourceInterface;
 use BetaKiller\DI\Container;
 use BetaKiller\Factory\OrmFactory;
-use BetaKiller\IFace\CrudlsActionsInterface;
 use BetaKiller\IFace\Url\UrlDataSourceInterface;
 use BetaKiller\IFace\Url\UrlParametersInterface;
 use BetaKiller\Model\DispatchableEntityInterface;
@@ -39,7 +37,7 @@ class ORM extends Utils\Kohana\ORM
 
         // Old Kohana sugar for searching in model
         if (is_array($id)) {
-            foreach ($id as $column => $value) {
+            foreach ((array)$id as $column => $value) {
                 // Passing an array of column => values
                 $object->where($column, '=', $value);
             }
@@ -104,44 +102,32 @@ class ORM extends Utils\Kohana\ORM
     /**
      * Performs search for model item where the $key property value is equal to $value
      *
-     * @param string                                                     $key
-     * @param string                                                     $value
-     * @param UrlParametersInterface                                     $parameters
-     *
-     * @param \BetaKiller\Acl\Resource\EntityRelatedAclResourceInterface $resource
+     * @param string                 $key
+     * @param string                 $value
+     * @param UrlParametersInterface $parameters
      *
      * @return \BetaKiller\Model\DispatchableEntityInterface|NULL
      */
-    public function findByUrlKey(
+    public function findEntityByUrlKey(
         string $key,
         string $value,
-        UrlParametersInterface $parameters,
-        EntityRelatedAclResourceInterface $resource
+        UrlParametersInterface $parameters
     ): ?DispatchableEntityInterface
     {
         // Additional filtering for non-pk keys
         if ($key !== $this->primary_key()) {
-            $this->customFilterForSearchByUrl($parameters);
+            $this->customFilterForUrlDispatching($parameters);
         }
-
-        $action = CrudlsActionsInterface::ACTION_READ;
-
-        $this->securityFilter($resource, $action);
 
         $model = $this->where($this->object_column($key), '=', $value)->find();
 
         return $model->loaded() ? $model : null;
     }
 
-    protected function securityFilter(EntityRelatedAclResourceInterface $aclResource, $action)
-    {
-        // Empty by default
-    }
-
     /**
      * @param UrlParametersInterface $parameters
      */
-    protected function customFilterForSearchByUrl(UrlParametersInterface $parameters)
+    protected function customFilterForUrlDispatching(UrlParametersInterface $parameters)
     {
         // Empty by default
     }
@@ -167,14 +153,14 @@ class ORM extends Utils\Kohana\ORM
      *
      * @return \BetaKiller\Model\DispatchableEntityInterface[]
      */
-    public function getAvailableItemsByUrlKey(
+    public function getEntitiesByUrlKey(
         string $key,
         UrlParametersInterface $parameters,
         ?int $limit = null
     ): array {
         // Additional filtering for non-pk keys
         if ($key !== $this->primary_key()) {
-            $this->customFilterForSearchByUrl($parameters);
+            $this->customFilterForUrlDispatching($parameters);
         }
 
         if ($limit) {
@@ -183,12 +169,12 @@ class ORM extends Utils\Kohana\ORM
 
         $key_column = $this->object_column($key);
 
-        $models = $this->where($key_column, 'IS NOT', null)->group_by($key_column)->find_all();
+        $result = $this->where($key_column, 'IS NOT', null)->group_by($key_column)->find_all();
 
-        return $models->count() ? $models->as_array() : [];
+        return $result->count() ? $result->as_array() : [];
     }
 
-    public function get_validation_exception_errors(ORM_Validation_Exception $e)
+    public function get_validation_exception_errors(ORM_Validation_Exception $e): array
     {
         return $e->errors('models');
     }
@@ -212,7 +198,7 @@ class ORM extends Utils\Kohana\ORM
      *
      * @return string
      */
-    public function getID()
+    public function getID(): string
     {
         return $this->get_id();
     }

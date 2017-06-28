@@ -79,7 +79,7 @@ class Task_Cache_Warmup extends Minion_Task
     {
         $iface = $this->ifaceProvider->fromModel($ifaceModel);
 
-        $urls = $iface->getAvailableUrls($params, 1);
+        $urls = $iface->getPublicAvailableUrls($params, 1);
         $url  = array_pop($urls);
         $this->debug('Selected url = '.$url);
 

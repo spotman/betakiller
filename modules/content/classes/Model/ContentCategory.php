@@ -134,7 +134,7 @@ class Model_ContentCategory extends TreeModelSingleParentOrm implements SeoMetaI
     /**
      * @param UrlParametersInterface $parameters
      */
-    protected function customFilterForSearchByUrl(UrlParametersInterface $parameters): void
+    protected function customFilterForUrlDispatching(UrlParametersInterface $parameters): void
     {
         $parent_category = $parameters->getEntityByClassName($this);
 
