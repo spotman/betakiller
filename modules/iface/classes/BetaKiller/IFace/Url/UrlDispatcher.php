@@ -378,7 +378,7 @@ class UrlDispatcher implements LoggerAwareInterface
         $modelName = $prototype->getDataSourceName();
 
         // Search for model item
-        $entity = $dataSource->findEntityByUrlKey($modelKey, $uriValue, $this->urlParameters);
+        $entity = $dataSource->findEntityByUrlKeyValue($modelKey, $uriValue, $this->urlParameters);
 
         if (!$entity) {
             throw new UrlDispatcherException('Can not find item for [:prototype] by [:value]', [

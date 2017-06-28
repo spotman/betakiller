@@ -12,7 +12,7 @@ interface DispatchableEntityInterface extends AbstractEntityInterface
      *
      * @return string
      */
-    public function getUrlKeyValue($key): string;
+    public function getUrlKeyValue(string $key): string;
 
     /**
      *

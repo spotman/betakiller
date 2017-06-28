@@ -14,7 +14,7 @@ interface UrlDataSourceInterface
      *
      * @return \BetaKiller\Model\DispatchableEntityInterface|null
      */
-    public function findEntityByUrlKey(
+    public function findEntityByUrlKeyValue(
         string $key,
         string $value,
         UrlParametersInterface $params

@@ -60,21 +60,21 @@ interface IFaceInterface extends SeoMetaInterface
     public function getData(): array;
 
     /**
-     * @param \DateTime|NULL $last_modified
+     * @param \DateTimeInterface $last_modified
      *
      * @return $this
      */
-    public function setLastModified(\DateTime $last_modified);
+    public function setLastModified(\DateTimeInterface $last_modified);
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
-    public function getLastModified(): \DateTime;
+    public function getLastModified(): \DateTimeInterface;
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
-    public function getDefaultLastModified(): \DateTime;
+    public function getDefaultLastModified(): \DateTimeInterface;
 
     /**
      * @return \DateInterval
@@ -94,9 +94,9 @@ interface IFaceInterface extends SeoMetaInterface
     public function getExpiresInterval(): \DateInterval;
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
-    public function getExpiresDateTime(): \DateTime;
+    public function getExpiresDateTime(): \DateTimeInterface;
 
     /**
      * @return int

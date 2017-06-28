@@ -108,7 +108,7 @@ class ORM extends Utils\Kohana\ORM
      *
      * @return \BetaKiller\Model\DispatchableEntityInterface|NULL
      */
-    public function findEntityByUrlKey(
+    public function findEntityByUrlKeyValue(
         string $key,
         string $value,
         UrlParametersInterface $parameters
@@ -139,7 +139,7 @@ class ORM extends Utils\Kohana\ORM
      *
      * @return string
      */
-    public function getUrlKeyValue($key): string
+    public function getUrlKeyValue(string $key): string
     {
         return (string)$this->get($key);
     }

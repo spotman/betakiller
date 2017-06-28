@@ -7,7 +7,7 @@ use BetaKiller\IFace\Url\UrlDataSourceInterface;
 use BetaKiller\IFace\Url\UrlDispatcher;
 use BetaKiller\IFace\Url\UrlParametersInterface;
 use DateInterval;
-use DateTime;
+use DateTimeInterface;
 use Text;
 use URL;
 
@@ -24,7 +24,7 @@ abstract class AbstractIFace implements IFaceInterface
     private $parent;
 
     /**
-     * @var DateTime|null
+     * @var DateTimeInterface|null
      */
     private $lastModified;
 
@@ -261,11 +261,11 @@ abstract class AbstractIFace implements IFaceInterface
     }
 
     /**
-     * @param \DateTime|NULL $last_modified
+     * @param \DateTimeInterface $last_modified
      *
      * @return $this
      */
-    public function setLastModified(DateTime $last_modified)
+    public function setLastModified(\DateTimeInterface $last_modified)
     {
         $this->lastModified = $last_modified;
 
@@ -273,17 +273,17 @@ abstract class AbstractIFace implements IFaceInterface
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
-    public function getLastModified(): DateTime
+    public function getLastModified(): DateTimeInterface
     {
         return $this->lastModified ?: $this->getDefaultLastModified();
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
-    public function getDefaultLastModified(): DateTime
+    public function getDefaultLastModified(): DateTimeInterface
     {
         return new \DateTime();
     }
@@ -317,9 +317,9 @@ abstract class AbstractIFace implements IFaceInterface
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
-    public function getExpiresDateTime(): DateTime
+    public function getExpiresDateTime(): DateTimeInterface
     {
         return (new \DateTime())->add($this->getExpiresInterval());
     }

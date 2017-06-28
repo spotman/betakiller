@@ -27,7 +27,7 @@ class UrlDataSourceFactory
      * @return \BetaKiller\IFace\Url\UrlDataSourceInterface
      * @throws \BetaKiller\Factory\FactoryException
      */
-    public function create($codename)
+    public function create($codename): UrlDataSourceInterface
     {
         return $this->factory->create($codename);
     }
