@@ -1,9 +1,9 @@
 <?php
 namespace BetaKiller\Search\Provider\Parameterized;
 
-use \BetaKiller\Filter;
-use \BetaKiller\Search;
-use \BetaKiller\URL\QueryConverter;
+use BetaKiller\Filter;
+use BetaKiller\Search;
+use BetaKiller\URL\QueryConverter;
 
 interface Parameter extends QueryConverter\ConvertibleItem
 {
@@ -30,9 +30,9 @@ interface Parameter extends QueryConverter\ConvertibleItem
     /**
      * Applies current filters to model
      *
-     * @param Search\Model\Applicable $model
+     * @param \BetaKiller\Search\ApplicableModelInterface $model
      */
-    public function apply(Search\Model\Applicable $model);
+    public function apply(Search\ApplicableModelInterface $model);
 
     /**
      * Returns array of values groups (optional filtering by value for autocomplete)

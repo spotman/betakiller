@@ -2,7 +2,7 @@
 namespace BetaKiller\IFace\Url;
 
 use BetaKiller\Factory\NamespaceBasedFactory;
-use BetaKiller\Factory\OrmFactory;
+use BetaKiller\Factory\RepositoryFactory;
 
 /**
  * Class UrlDataSourceFactory
@@ -13,10 +13,10 @@ class UrlDataSourceFactory
 {
     private $factory;
 
-    public function __construct(NamespaceBasedFactory $factory, OrmFactory $ormFactory)
+    public function __construct(NamespaceBasedFactory $factory, RepositoryFactory $repositoryFactory)
     {
-        // Using the same definitions as the OrmFactory does
-        $ormFactory->injectDefinitions($factory);
+        // Using the same definitions as the RepositoryFactory does
+        $repositoryFactory->injectDefinitions($factory);
 
         $this->factory = $factory->setExpectedInterface(UrlDataSourceInterface::class);
     }

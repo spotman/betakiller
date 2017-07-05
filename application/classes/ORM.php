@@ -2,17 +2,16 @@
 
 use BetaKiller\DI\Container;
 use BetaKiller\Factory\OrmFactory;
-use BetaKiller\IFace\Url\UrlDataSourceInterface;
-use BetaKiller\IFace\Url\UrlParametersInterface;
-use BetaKiller\Model\DispatchableEntityInterface;
-use BetaKiller\Search\Model\Applicable;
-use BetaKiller\Search\Model\ResultsItem;
+use BetaKiller\IFace\Exception\UrlContainerException;
+use BetaKiller\IFace\Url\UrlContainerInterface;
+use BetaKiller\IFace\Url\UrlParameterInterface;
+use BetaKiller\Model\ExtendedOrmInterface;
+use BetaKiller\Search\SearchResultsInterface;
 use BetaKiller\Utils;
 use BetaKiller\Utils\Kohana\ORM\OrmInterface;
-use Spotman\Api\ApiResponseItemInterface;
+use ORM\PaginateHelper;
 
-class ORM extends Utils\Kohana\ORM
-    implements ApiResponseItemInterface, UrlDataSourceInterface, DispatchableEntityInterface, Applicable, ResultsItem
+class ORM extends Utils\Kohana\ORM implements ExtendedOrmInterface
 {
     /**
      * @var OrmFactory
@@ -54,7 +53,7 @@ class ORM extends Utils\Kohana\ORM
         return $object;
     }
 
-    protected static function getFactory()
+    protected static function getFactory(): OrmFactory
     {
         if (!self::$factoryInstance) {
             /** @var OrmFactory $factory */
@@ -66,8 +65,28 @@ class ORM extends Utils\Kohana\ORM
         return self::$factoryInstance;
     }
 
+    public function getModelName(OrmInterface $object = null): string
+    {
+        return static::detectModelName($object);
+    }
+
+    protected static function detectModelName(OrmInterface $object = null): string
+    {
+        $className = $object ? get_class($object) : static::class;
+
+        // Try namespaces first
+        $pos = strrpos($className, '\\');
+
+        if ($pos === false) {
+            // Use legacy naming
+            $pos = 5; // "Model_" is 6 letters
+        }
+
+        return substr($className, $pos + 1);
+    }
+
     /**
-     * Returns key which will be used for storing model in UrlParameters registry.
+     * Returns key which will be used for storing model in UrlContainer registry.
      *
      * @return string
      */
@@ -77,12 +96,28 @@ class ORM extends Utils\Kohana\ORM
     }
 
     /**
+     * Returns true if current parameter is the same as provided one
+     *
+     * @param \BetaKiller\IFace\Url\UrlParameterInterface $parameter
+     *
+     * @return bool
+     */
+    public function isSameAs(UrlParameterInterface $parameter): bool
+    {
+        if (!($parameter instanceof static)) {
+            throw new UrlContainerException('Trying to compare instances of different classes');
+        }
+
+        return $parameter->getID() === $this->getID();
+    }
+
+    /**
      * Default implementation for ORM objects
      * Override this method in child classes
      *
      * @return array
      */
-    public function getApiResponseData()
+    public function getApiResponseData(): array
     {
         return $this->as_array();
     }
@@ -91,45 +126,12 @@ class ORM extends Utils\Kohana\ORM
      * Default implementation for ORM objects
      * Override this method in child classes
      *
-     * @return DateTime|NULL
+     * @return \DateTimeImmutable|null
      */
-    public function getApiLastModified()
+    public function getApiLastModified(): ?DateTimeImmutable
     {
         // Empty by default
         return null;
-    }
-
-    /**
-     * Performs search for model item where the $key property value is equal to $value
-     *
-     * @param string                 $key
-     * @param string                 $value
-     * @param UrlParametersInterface $parameters
-     *
-     * @return \BetaKiller\Model\DispatchableEntityInterface|NULL
-     */
-    public function findEntityByUrlKeyValue(
-        string $key,
-        string $value,
-        UrlParametersInterface $parameters
-    ): ?DispatchableEntityInterface
-    {
-        // Additional filtering for non-pk keys
-        if ($key !== $this->primary_key()) {
-            $this->customFilterForUrlDispatching($parameters);
-        }
-
-        $model = $this->where($this->object_column($key), '=', $value)->find();
-
-        return $model->loaded() ? $model : null;
-    }
-
-    /**
-     * @param UrlParametersInterface $parameters
-     */
-    protected function customFilterForUrlDispatching(UrlParametersInterface $parameters)
-    {
-        // Empty by default
     }
 
     /**
@@ -144,37 +146,7 @@ class ORM extends Utils\Kohana\ORM
         return (string)$this->get($key);
     }
 
-    /**
-     * Returns list of available items (model records) by $key property
-     *
-     * @param string                 $key
-     * @param UrlParametersInterface $parameters
-     * @param int|null               $limit
-     *
-     * @return \BetaKiller\Model\DispatchableEntityInterface[]
-     */
-    public function getEntitiesByUrlKey(
-        string $key,
-        UrlParametersInterface $parameters,
-        ?int $limit = null
-    ): array {
-        // Additional filtering for non-pk keys
-        if ($key !== $this->primary_key()) {
-            $this->customFilterForUrlDispatching($parameters);
-        }
-
-        if ($limit) {
-            $this->limit($limit);
-        }
-
-        $key_column = $this->object_column($key);
-
-        $result = $this->where($key_column, 'IS NOT', null)->group_by($key_column)->find_all();
-
-        return $result->count() ? $result->as_array() : [];
-    }
-
-    public function get_validation_exception_errors(ORM_Validation_Exception $e): array
+    public function getValidationExceptionErrors(ORM_Validation_Exception $e): array
     {
         return $e->errors('models');
     }
@@ -184,11 +156,12 @@ class ORM extends Utils\Kohana\ORM
      * This method allows inheritor to preset linked model in URL parameters
      * It is executed after successful url dispatching
      *
-     * @param UrlParametersInterface $parameters
+     * @param UrlContainerInterface $parameters
      *
      * @return void
+     * @deprecated
      */
-    public function presetLinkedEntities(UrlParametersInterface $parameters): void
+    public function presetLinkedEntities(UrlContainerInterface $parameters): void
     {
         // Nothing by default
     }
@@ -212,21 +185,12 @@ class ORM extends Utils\Kohana\ORM
     }
 
     /**
-     * @return $this[]|array
-     * @throws Kohana_Exception
-     */
-    public function get_all()
-    {
-        return $this->find_all()->as_array();
-    }
-
-    /**
-     * @param $page
-     * @param $itemsPerPage
+     * @param int      $page
+     * @param int|null $itemsPerPage
      *
-     * @return \BetaKiller\Search\Model\Results
+     * @return \BetaKiller\Search\SearchResultsInterface
      */
-    public function getSearchResults($page, $itemsPerPage = null)
+    public function getSearchResults(int $page, ?int $itemsPerPage = null): SearchResultsInterface
     {
         // Оборачиваем в пэйджинатор
         $pager = $this->paginateHelper($page, $itemsPerPage);
@@ -235,7 +199,7 @@ class ORM extends Utils\Kohana\ORM
         $items = $pager->getResults();
 
         // Оборачиваем в контейнер
-        $results = \BetaKiller\Search\Results::factory(
+        $results = \BetaKiller\Search\SearchResults::factory(
             $pager->getTotalItems(),
             $pager->getTotalPages(),
             $pager->hasNextPage()
@@ -252,7 +216,7 @@ class ORM extends Utils\Kohana\ORM
     /**
      * @return array
      */
-    public function getSearchResultsItemData()
+    public function getSearchResultsItemData(): array
     {
         return $this->getApiResponseData();
     }
@@ -263,7 +227,7 @@ class ORM extends Utils\Kohana\ORM
      *
      * @return \ORM\PaginateHelper
      */
-    public function paginateHelper($currentPage, $itemsPerPage = null)
+    protected function paginateHelper(int $currentPage, ?int $itemsPerPage = null): PaginateHelper
     {
         return \ORM\PaginateHelper::create(
             $this,

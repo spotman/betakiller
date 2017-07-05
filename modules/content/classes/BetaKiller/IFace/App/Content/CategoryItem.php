@@ -21,7 +21,7 @@ class CategoryItem extends AbstractAppBase
 
         return [
             'category'  =>  [
-               'label'  =>  $category->get_label(),
+               'label'  =>  $category->getLabel(),
             ],
         ];
     }

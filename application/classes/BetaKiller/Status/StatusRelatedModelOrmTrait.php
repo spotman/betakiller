@@ -163,6 +163,8 @@ trait StatusRelatedModelOrmTrait
      * @param bool    $not_equal
      *
      * @return $this
+     * @deprecated
+     * @todo Move to repo
      */
     public function filter_status_id($status_id, $not_equal = false)
     {
@@ -176,6 +178,8 @@ trait StatusRelatedModelOrmTrait
      * @param bool                 $not_equal
      *
      * @return $this
+     * @deprecated
+     * @todo Move to repo
      */
     public function filter_status(StatusModelInterface $status, $not_equal = false)
     {
@@ -187,6 +191,8 @@ trait StatusRelatedModelOrmTrait
      * @param bool  $not_equal
      *
      * @return $this
+     * @deprecated
+     * @todo Move to repo
      */
     public function filter_statuses(array $status_ids, $not_equal = false)
     {
@@ -200,6 +206,8 @@ trait StatusRelatedModelOrmTrait
      * @param string|null                                                      $action
      *
      * @return $this
+     * @deprecated
+     * @todo Move to repo
      */
     protected function filterAllowedStatuses(StatusRelatedEntityAclResourceInterface $resource, $action = null)
     {

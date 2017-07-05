@@ -1,17 +1,26 @@
 <?php
 
+use BetaKiller\Model\ContentPost;
+use BetaKiller\Helper\ContentHelper;
+
 class Widget_Content_FreshArticles extends Widget_Content_SidebarArticlesList
 {
     use \BetaKiller\Helper\ContentTrait;
 
     /**
+     * @var ContentHelper
+     * @Inject
+     */
+    private $contentHelper;
+
+    /**
      * @param int $exclude_id
      * @param int $limit
      *
-     * @return Model_ContentPost[]
+     * @return ContentPost[]
      */
     protected function get_articles_list($exclude_id, $limit)
     {
-        return $this->model_factory_content_post()->getFreshArticles($limit, $exclude_id);
+        $this->contentHelper->getPostRepository()->getFreshArticles($limit, $exclude_id);
     }
 }

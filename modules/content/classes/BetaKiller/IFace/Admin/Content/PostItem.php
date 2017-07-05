@@ -19,6 +19,18 @@ class PostItem extends AbstractAdminBase
     private $aclHelper;
 
     /**
+     * @var \BetaKiller\Helper\AssetsHelper
+     * @Inject
+     */
+    private $assetsHelper;
+
+    /**
+     * @var \CustomTagFacade
+     * @Inject
+     */
+    private $customTagFacade;
+
+    /**
      * PostItem constructor.
      *
      * @param \BetaKiller\Helper\ContentUrlParametersHelper $urlParametersHelper
@@ -41,7 +53,7 @@ class PostItem extends AbstractAdminBase
         $thumbnails = [];
 
         foreach ($post->getThumbnails() as $thumb) {
-            $thumbnails[$thumb->get_id()] = $thumb->getAttributesForImgTag($thumb::SIZE_PREVIEW);
+            $thumbnails[$thumb->get_id()] = $this->assetsHelper->getAttributesForImgTag($thumb, $thumb::SIZE_PREVIEW);
         }
 
         // Edit latest revision data
@@ -72,7 +84,7 @@ class PostItem extends AbstractAdminBase
                 'thumbnails' => $thumbnails,
             ],
 
-            'custom_tags' => \CustomTag::instance()->getAllowedTags(),
+            'custom_tags' => $this->customTagFacade->getAllowedTags(),
         ];
     }
 }

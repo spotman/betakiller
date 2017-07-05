@@ -3,8 +3,7 @@
 use BetaKiller\Helper\IFaceHelper;
 use BetaKiller\IFace\IFaceModelInterface;
 use BetaKiller\IFace\ModelProvider\IFaceModelProviderAggregate;
-use BetaKiller\IFace\Url\UrlParametersInterface;
-use BetaKiller\IFace\Url\UrlPrototypeHelper;
+use BetaKiller\IFace\Url\UrlContainerInterface;
 use BetaKiller\Service;
 use BetaKiller\Service\ServiceException;
 use samdark\sitemap\Index;
@@ -15,7 +14,7 @@ class Service_Sitemap extends Service
     use \BetaKiller\Helper\LogTrait;
 
     /**
-     * @var UrlParametersInterface
+     * @var UrlContainerInterface
      */
     private $urlParameters;
 
@@ -42,16 +41,15 @@ class Service_Sitemap extends Service
     /**
      * Service_Sitemap constructor.
      *
-     * @param \BetaKiller\IFace\Url\UrlParametersInterface                $urlParameters
+     * @param \BetaKiller\IFace\Url\UrlContainerInterface                 $urlParameters
      * @param \BetaKiller\IFace\ModelProvider\IFaceModelProviderAggregate $ifaceModelProvider
      * @param \BetaKiller\Helper\IFaceHelper                              $ifaceHelper
      */
     public function __construct(
-        UrlParametersInterface $urlParameters,
+        UrlContainerInterface $urlParameters,
         IFaceModelProviderAggregate $ifaceModelProvider,
         IFaceHelper $ifaceHelper
-    )
-    {
+    ) {
         $this->urlParameters      = $urlParameters;
         $this->ifaceModelProvider = $ifaceModelProvider;
         $this->ifaceHelper        = $ifaceHelper;

@@ -11,7 +11,7 @@ class CreateApiMethod extends AbstractEntityCreateApiMethod
     /**
      * Implement this method
      *
-     * @param \Model_ContentPost    $model
+     * @param \BetaKiller\Model\ContentPost $model
      * @param                       $data
      *
      * @throws \Spotman\Api\ApiMethodException

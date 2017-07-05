@@ -3,7 +3,7 @@
 use BetaKiller\IFace\Exception\IFaceStackException;
 use BetaKiller\IFace\IFaceInterface;
 use BetaKiller\IFace\IFaceStack;
-use BetaKiller\IFace\Url\UrlParametersInterface;
+use BetaKiller\IFace\Url\UrlContainerInterface;
 
 class IFaceStackTest extends \BetaKiller\Test\TestCase
 {
@@ -142,7 +142,7 @@ class IFaceStackTest extends \BetaKiller\Test\TestCase
 
     private function createEmptyStack()
     {
-        /** @var UrlParametersInterface $params */
+        /** @var UrlContainerInterface $params */
         $params = $this->revealOrReturn($this->urlParams);
 
         return new IFaceStack($params);
@@ -150,7 +150,7 @@ class IFaceStackTest extends \BetaKiller\Test\TestCase
 
     private function emptyUrlParameters()
     {
-        return $this->prophesize(UrlParametersInterface::class);
+        return $this->prophesize(UrlContainerInterface::class);
     }
 
     private function emptyIFace($codename)

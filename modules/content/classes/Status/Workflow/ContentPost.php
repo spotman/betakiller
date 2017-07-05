@@ -129,7 +129,7 @@ class Status_Workflow_ContentPost extends StatusWorkflow
     }
 
     /**
-     * @return \Model_ContentPost|\BetaKiller\Status\StatusRelatedModelInterface
+     * @return \BetaKiller\Model\ContentPost|\BetaKiller\Status\StatusRelatedModelInterface
      */
     protected function model()
     {

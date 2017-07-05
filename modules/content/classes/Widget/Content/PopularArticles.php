@@ -1,17 +1,26 @@
 <?php
 
+use BetaKiller\Model\ContentPost;
+use BetaKiller\Helper\ContentHelper;
+
 class Widget_Content_PopularArticles extends Widget_Content_SidebarArticlesList
 {
     use \BetaKiller\Helper\ContentTrait;
 
     /**
+     * @var \BetaKiller\Helper\ContentHelper
+     * @Inject
+     */
+    private $contentHelper;
+
+    /**
      * @param int $exclude_id
      * @param int $limit
      *
-     * @return Model_ContentPost[]
+     * @return ContentPost[]
      */
-    protected function get_articles_list($exclude_id, $limit)
+    protected function get_articles_list($exclude_id, $limit): array
     {
-        return $this->model_factory_content_post()->getPopularArticles($limit, $exclude_id);
+        $this->contentHelper->getPostRepository()->getPopularArticles($limit, $exclude_id);
     }
 }

@@ -10,12 +10,18 @@ class CommentListByStatus extends AbstractCommentList
     private $urlParametersHelper;
 
     /**
-     * @return \Model_ContentComment[]
+     * @Inject
+     * @var \BetaKiller\Repository\ContentCommentRepository
      */
-    protected function get_comments_list()
+    private $commentRepository;
+
+    /**
+     * @return \BetaKiller\Model\ContentComment[]
+     */
+    protected function get_comments_list(): array
     {
         $status = $this->urlParametersHelper->getContentCommentStatus();
 
-        return $this->model_factory_content_comment()->get_latest_comments($status);
+        return $this->commentRepository->get_latest_comments($status);
     }
 }

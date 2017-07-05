@@ -3,61 +3,79 @@ namespace BetaKiller\Assets\Model;
 
 abstract class AbstractAssetsOrmImageModel extends AbstractAssetsOrmModel implements AssetsModelImageInterface
 {
-    public function getPreviewUrl($size = null)
+    /**
+     * @return int
+     */
+    public function getWidth(): int
     {
-        return $this->loaded()
-            ? $this->getProvider()->getPreviewUrl($this, $size)
-            : null;
-    }
-
-    public function getUploadMaxWidth()
-    {
-        return $this->getProvider()->getUploadMaxWidth();
-    }
-
-    public function getUploadMaxHeight()
-    {
-        return $this->getProvider()->getUploadMaxHeight();
+        return (int)$this->get('width');
     }
 
     /**
      * @return int
      */
-    public function getWidth()
+    public function getHeight(): int
     {
-        return $this->get('width');
-    }
-
-    /**
-     * @return int
-     */
-    public function getHeight()
-    {
-        return $this->get('height');
+        return (int)$this->get('height');
     }
 
     /**
      * @param int $value
-     *
-     * @return $this
      */
-    public function setWidth($value)
+    public function setWidth(int $value): void
     {
-        return $this->set('width', (int)$value);
+        $this->set('width', $value);
     }
 
     /**
      * @param int $value
-     *
-     * @return $this
      */
-    public function setHeight($value)
+    public function setHeight(int $value): void
     {
-        return $this->set('height', (int)$value);
+        $this->set('height', $value);
     }
 
-    public function getAttributesForImgTag($size, array $attributes = [])
+    /**
+     * @param string $value
+     */
+    public function setAlt(string $value): void
     {
-        return $this->getProvider()->getArgumentsForImgTag($this, $size, $attributes);
+        $this->set('alt', $value);
+    }
+
+    /**
+     * @return string
+     */
+    public function getAlt(): string
+    {
+        return (string)$this->get('alt');
+    }
+
+    /**
+     * @param string $value
+     */
+    public function setTitle(string $value): void
+    {
+        $this->set('title', $value);
+    }
+
+    /**
+     * @return string
+     */
+    public function getTitle(): string
+    {
+        return (string)$this->get('title');
+    }
+
+    /**
+     * @return array
+     */
+    public function getDefaultAttributesForImgTag(): array
+    {
+        // Empty by default
+        return [
+            'alt'   => $this->getAlt(),
+            'title' => $this->getTitle(),
+        ];
     }
 }

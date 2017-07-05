@@ -1,8 +1,6 @@
 <?php
-
 namespace BetaKiller\Widget\Admin;
 
-use BetaKiller\Helper\ContentTrait;
 use BetaKiller\Helper\ContentUrlParametersHelper;
 use BetaKiller\Helper\IFaceHelper;
 use BetaKiller\IFace\CrudlsActionsInterface;
@@ -10,6 +8,7 @@ use BetaKiller\IFace\Exception\IFaceException;
 use BetaKiller\IFace\IFaceInterface;
 use BetaKiller\IFace\IFaceProvider;
 use BetaKiller\IFace\Widget\AbstractAdminWidget;
+use BetaKiller\Model\ContentPost;
 use BetaKiller\Model\DispatchableEntityInterface;
 use BetaKiller\Model\IFaceZone;
 use BetaKiller\Model\Layout;
@@ -17,8 +16,6 @@ use BetaKiller\Model\UserInterface;
 
 class BarWidget extends AbstractAdminWidget
 {
-    use ContentTrait;
-
     /**
      * @var \BetaKiller\IFace\Url\UrlDispatcher
      */
@@ -33,6 +30,12 @@ class BarWidget extends AbstractAdminWidget
      * @var \BetaKiller\IFace\IFaceProvider
      */
     private $ifaceProvider;
+
+    /**
+     * @Inject
+     * @var \BetaKiller\Helper\ContentHelper
+     */
+    private $contentHelper;
 
     public function __construct(
         UserInterface $user,
@@ -103,11 +106,8 @@ class BarWidget extends AbstractAdminWidget
 
     private function getCommentsData(): ?array
     {
-        $commentOrm = $this->model_factory_content_comment();
-        $statusOrm  = $this->model_factory_content_comment_status();
-
-        $pendingStatus = $statusOrm->getPendingStatus();
-        $pendingCount  = $commentOrm->getCommentsCount($pendingStatus);
+        $pendingStatus = $this->contentHelper->getCommentStatusRepository()->getPendingStatus();
+        $pendingCount  = $this->contentHelper->getCommentRepository()->getCommentsCount($pendingStatus);
 
         $iface = $pendingCount
             ? $this->getCommentsListByStatusIface()
@@ -115,7 +115,7 @@ class BarWidget extends AbstractAdminWidget
 
         $params = $this->contentUrlParamHelper
             ->createEmpty()
-            ->setEntity($pendingStatus);
+            ->setParameter($pendingStatus);
 
         $url = $this->aclHelper->isIFaceAllowed($iface, $params) ? $iface->url($params) : null;
 
@@ -183,7 +183,7 @@ class BarWidget extends AbstractAdminWidget
         }
     }
 
-    private function detectPrimaryEntity(): ?\Model_ContentPost
+    private function detectPrimaryEntity(): ?ContentPost
     {
         if ($post = $this->contentUrlParamHelper->getContentPost()) {
             return $post;

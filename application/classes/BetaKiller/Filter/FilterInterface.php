@@ -1,7 +1,7 @@
 <?php
 namespace BetaKiller\Filter;
 
-use BetaKiller\Filter\Model\Applicable;
+use BetaKiller\Filter\Model\ApplicableInterface;
 use BetaKiller\URL\QueryConverter\ConvertibleItem;
 
 interface FilterInterface extends ConvertibleItem
@@ -21,7 +21,7 @@ interface FilterInterface extends ConvertibleItem
      */
     public function asArray();
 
-    public function apply(Applicable $model);
+    public function apply(ApplicableInterface $model);
 
     /**
      * @return string

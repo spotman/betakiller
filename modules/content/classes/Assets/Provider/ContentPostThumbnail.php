@@ -1,8 +1,9 @@
 <?php
 
 use BetaKiller\Assets\Model\AssetsModelInterface;
+use BetaKiller\Assets\Provider\AbstractAssetsProviderImage;
 
-class Assets_Provider_ContentPostThumbnail extends \BetaKiller\Assets\Provider\AbstractAssetsProviderImage
+class Assets_Provider_ContentPostThumbnail extends AbstractAssetsProviderImage
 {
     use \Assets_Provider_ContentTrait;
 
@@ -12,37 +13,6 @@ class Assets_Provider_ContentPostThumbnail extends \BetaKiller\Assets\Provider\A
         return 'post-thumbnails';
     }
 
-    /**
-     * @return int
-     */
-    public function getUploadMaxHeight()
-    {
-        // TODO Move to config
-        return $this->getAssetsProviderConfigValue(['upload', 'max-height']);
-    }
-
-    /**
-     * @return int
-     */
-    public function getUploadMaxWidth()
-    {
-        // TODO Move to config
-        return $this->getAssetsProviderConfigValue(['upload', 'max-width']);
-    }
-
-    /**
-     * Defines allowed sizes for previews
-     * Returns array of strings like this
-     *
-     * array('300x200', '75x75', '400x', 'x250')
-     *
-     * @return array
-     */
-    public function getAllowedPreviewSizes()
-    {
-        // TODO Move to config
-        return $this->getAssetsProviderConfigValue(['sizes']);
-    }
 
     /**
      * Returns list of allowed MIME-types (or TRUE if all MIMEs are allowed)
@@ -57,16 +27,6 @@ class Assets_Provider_ContentPostThumbnail extends \BetaKiller\Assets\Provider\A
             'image/png',
             'image/gif',
         ];
-    }
-
-    /**
-     * Creates empty file model
-     *
-     * @return AssetsModelInterface
-     */
-    public function createFileModel()
-    {
-        return $this->model_factory_content_post_thumbnail();
     }
 
     /**

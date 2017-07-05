@@ -26,7 +26,7 @@ abstract class Base implements ContainerInterface
      * @return ContainerInterface
      * @deprecated Bad practice, use DI in constructor instead
      */
-    public static function getInstance()
+    public static function getInstance(): ContainerInterface
     {
         if (!static::$instance) {
             static::$instance = new static;
@@ -118,5 +118,19 @@ abstract class Base implements ContainerInterface
     public function call($callable, array $parameters = [])
     {
         return $this->getContainer()->call($callable, $parameters);
+    }
+
+    /**
+     * Inject all dependencies on an existing instance.
+     *
+     * @param object $instance Object to perform injection upon
+     *
+     * @throws \InvalidArgumentException
+     * @throws \DI\DependencyException Error while injecting dependencies
+     * @return object $instance Returns the same instance
+     */
+    public function injectOn($instance)
+    {
+        return $this->getContainer()->injectOn($instance);
     }
 }

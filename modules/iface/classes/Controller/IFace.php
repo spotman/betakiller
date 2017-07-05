@@ -6,7 +6,7 @@ use BetaKiller\IFace\Cache\IFaceCache;
 use BetaKiller\IFace\Url\UrlDispatcher;
 use BetaKiller\Config\AppConfigInterface;
 use BetaKiller\Model\UserInterface;
-use BetaKiller\IFace\Url\UrlParametersInterface;
+use BetaKiller\IFace\Url\UrlContainerInterface;
 
 /**
  * Class Controller_IFace
@@ -22,8 +22,8 @@ class Controller_IFace extends Controller
         /** @var UrlDispatcher $dispatcher */
         $dispatcher = Container::getInstance()->get(UrlDispatcher::class);
 
-        /** @var UrlParametersInterface $params */
-        $params = Container::getInstance()->get(UrlParametersInterface::class);
+        /** @var UrlContainerInterface $params */
+        $params = Container::getInstance()->get(UrlContainerInterface::class);
 
         $uri = $this->getRequestUri();
         $queryParts = $this->getRequestQueryParts();

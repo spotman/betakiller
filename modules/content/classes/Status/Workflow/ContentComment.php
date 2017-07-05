@@ -1,6 +1,7 @@
 <?php
 
 use BetaKiller\Helper\NotificationHelper;
+use BetaKiller\Model\ContentComment;
 use BetaKiller\Status\StatusRelatedModelInterface;
 use BetaKiller\Status\StatusWorkflow;
 use BetaKiller\Status\StatusWorkflowException;
@@ -45,7 +46,7 @@ class Status_Workflow_ContentComment extends StatusWorkflow
     }
 
     /**
-     * @return \Model_ContentComment|\BetaKiller\Status\StatusRelatedModelInterface
+     * @return \BetaKiller\Model\ContentComment|\BetaKiller\Status\StatusRelatedModelInterface
      */
     protected function model()
     {
@@ -65,7 +66,7 @@ class Status_Workflow_ContentComment extends StatusWorkflow
         $this->notify_parent_comment_author_about_reply($comment);
     }
 
-    protected function notify_comment_author_about_approve(Model_ContentComment $comment)
+    protected function notify_comment_author_about_approve(ContentComment $comment)
     {
         $authorUser = $comment->get_author_user();
 
@@ -95,9 +96,9 @@ class Status_Workflow_ContentComment extends StatusWorkflow
     }
 
     /**
-     * @param \Model_ContentComment $reply
+     * @param \BetaKiller\Model\ContentComment $reply
      */
-    protected function notify_parent_comment_author_about_reply(Model_ContentComment $reply)
+    protected function notify_parent_comment_author_about_reply(ContentComment $reply)
     {
         $parent = $reply->getParent();
 

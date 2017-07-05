@@ -1,20 +1,17 @@
 <?php
 
+use BetaKiller\Model\ContentYoutubeRecord;
 use BetaKiller\Service\ServiceException;
 
-class Service_Content_Youtube extends Service_Content_Base
+class Service_Content_Youtube extends \BetaKiller\Service
 {
     /**
-     * Custom HTML-tag name related to current service
-     *
-     * @return string
+     * @var \BetaKiller\Repository\ContentYoutubeRecordRepository
+     * @Inject
      */
-    public function get_html_custom_tag_name()
-    {
-        return CustomTag::YOUTUBE;
-    }
+    private $youtubeRepository;
 
-    public function get_youtube_id_from_embed_url($url)
+    public function getYoutubeIdFromEmbedUrl($url): string
     {
         $path = parse_url($url, PHP_URL_PATH);
 
@@ -25,27 +22,19 @@ class Service_Content_Youtube extends Service_Content_Base
     }
 
     /**
-     * @param string $youtube_id
-     * @return Model_ContentYoutubeRecord
+     * @param string $youtubeID
+     *
+     * @return ContentYoutubeRecord
      */
-    public function find_record_by_youtube_id($youtube_id)
+    public function findRecordByYoutubeId($youtubeID): ContentYoutubeRecord
     {
-        $model = $this->file_model_factory()->find_by_youtube_id($youtube_id);
+        $model = $this->youtubeRepository->find_by_youtube_id($youtubeID);
 
-        if (!$model)
-        {
-            $model = $this->file_model_factory()->set_youtube_id($youtube_id);
+        if (!$model) {
+            $model = $this->youtubeRepository->create();
+            $model->setYoutubeId($youtubeID);
         }
 
         return $model;
     }
-
-    /**
-     * @return Model_ContentYoutubeRecord
-     */
-    protected function file_model_factory()
-    {
-        return $this->model_factory_content_youtube_record();
-    }
-
 }

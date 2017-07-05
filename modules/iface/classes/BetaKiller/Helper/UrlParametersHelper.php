@@ -1,44 +1,44 @@
 <?php
 namespace BetaKiller\Helper;
 
-use BetaKiller\IFace\Url\UrlParameters;
-use BetaKiller\IFace\Url\UrlParametersInterface;
+use BetaKiller\IFace\Url\UrlContainer;
+use BetaKiller\IFace\Url\UrlContainerInterface;
 use BetaKiller\Model\DispatchableEntityInterface;
 
 class UrlParametersHelper
 {
     /**
-     * @var \BetaKiller\IFace\Url\UrlParametersInterface
+     * @var \BetaKiller\IFace\Url\UrlContainerInterface
      */
     private $urlParameters;
 
     /**
      * ContentUrlParametersHelper constructor.
      *
-     * @param \BetaKiller\IFace\Url\UrlParametersInterface $urlParameters
+     * @param \BetaKiller\IFace\Url\UrlContainerInterface $urlParameters
      */
-    public function __construct(UrlParametersInterface $urlParameters)
+    public function __construct(UrlContainerInterface $urlParameters)
     {
         $this->urlParameters = $urlParameters;
     }
 
     /**
-     * @return \BetaKiller\IFace\Url\UrlParametersInterface
+     * @return \BetaKiller\IFace\Url\UrlContainerInterface
      */
-    public function createEmpty(): UrlParametersInterface
+    public function createEmpty(): UrlContainerInterface
     {
-        return UrlParameters::create();
+        return UrlContainer::create();
     }
 
     /**
-     * @return \BetaKiller\IFace\Url\UrlParametersInterface
+     * @return \BetaKiller\IFace\Url\UrlContainerInterface
      */
-    public function getCurrentUrlParameters(): UrlParametersInterface
+    public function getCurrentUrlParameters(): UrlContainerInterface
     {
         return $this->urlParameters;
     }
 
-    protected function getEntity($key, UrlParametersInterface $params = null)
+    protected function getEntity($key, UrlContainerInterface $params = null)
     {
         if (!$params) {
             $params = $this->urlParameters;
@@ -47,7 +47,7 @@ class UrlParametersHelper
         return $params->getEntity($key);
     }
 
-    protected function getEntityByClassName($className, UrlParametersInterface $params = null)
+    protected function getEntityByClassName($className, UrlContainerInterface $params = null)
     {
         if (!$params) {
             $params = $this->urlParameters;
@@ -56,13 +56,13 @@ class UrlParametersHelper
         return $params->getEntityByClassName($className);
     }
 
-    protected function setEntity(DispatchableEntityInterface $model, UrlParametersInterface $params = null): UrlParametersInterface
+    protected function setEntity(DispatchableEntityInterface $model, UrlContainerInterface $params = null): UrlContainerInterface
     {
         if (!$params) {
             $params = $this->urlParameters;
         }
 
-        return $params->setEntity($model, true);
+        return $params->setParameter($model, true);
     }
 
     public function getQueryPart(string $name, ?bool $required = null)

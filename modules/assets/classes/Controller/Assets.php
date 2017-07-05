@@ -119,7 +119,7 @@ class Controller_Assets extends Controller
 
         $this->checkExtension($model);
 
-        $preview_url = $model->getPreviewUrl($size);
+        $preview_url = $this->provider->getPreviewUrl($model, $size);
 
         // Redirect for SEO backward compatibility
         $this->response->redirect($preview_url, 301);
@@ -141,7 +141,7 @@ class Controller_Assets extends Controller
         $model = $this->fromItemDeployUrl();
 
         // Delete file through provider
-        $model->delete();
+        $this->provider->delete($model);
 
         $this->send_json(self::JSON_SUCCESS);
     }
@@ -189,12 +189,12 @@ class Controller_Assets extends Controller
         return $model;
     }
 
-    protected function deploy(AssetsModelInterface $model, $content)
+    protected function deploy(AssetsModelInterface $model, $content): void
     {
         $this->provider->deploy($this->request, $model, $content);
     }
 
-    protected function checkExtension(AssetsModelInterface $model)
+    protected function checkExtension(AssetsModelInterface $model): void
     {
         $requestExt = $this->request->param('ext');
         $modelExt   = $this->provider->getModelExtension($model);
@@ -204,14 +204,14 @@ class Controller_Assets extends Controller
         }
     }
 
-    private function redirectToCanonicalUrl(AssetsModelInterface $model)
+    private function redirectToCanonicalUrl(AssetsModelInterface $model): void
     {
         $url = $this->getCanonicalUrl($model);
 
         $this->response->redirect($url, 302);
     }
 
-    private function getCanonicalUrl(AssetsModelInterface $model)
+    private function getCanonicalUrl(AssetsModelInterface $model): string
     {
         $action = $this->request->action();
 
@@ -221,10 +221,11 @@ class Controller_Assets extends Controller
 
             case 'preview':
             case 'crop':
-                /** @var AbstractAssetsProviderImage $provider */
-                $provider = $this->provider;
+                if (!($this->provider instanceof AbstractAssetsProviderImage)) {
+                    throw new HTTP_Exception_400('Action :name may be used on images only', [':name' => $action]);
+                }
 
-                return $provider->getPreviewUrl($model, $this->getSizeParam());
+                return $this->provider->getPreviewUrl($model, $this->getSizeParam());
 
             case 'delete':
                 return $this->provider->getDeleteUrl($model);

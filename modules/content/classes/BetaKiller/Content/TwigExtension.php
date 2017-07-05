@@ -8,7 +8,7 @@ class TwigExtension extends \Twig_Extension
         return [
 
             new \Twig_SimpleFilter('custom_tags', function($text) {
-                return \CustomTag::instance()->process($text);
+                return \CustomTagFacade::instance()->process($text);
             }, array('is_safe' => array('html'))),
 
             new \Twig_SimpleFilter('shortcodes', function($text) {

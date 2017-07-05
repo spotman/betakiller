@@ -2,14 +2,14 @@
 namespace BetaKiller\Search\Provider\Parameterized\Parameter;
 
 use BetaKiller\Filter\Model\ValuesGroup;
-use BetaKiller\Search\Provider\Parameterized\Parameter;
+use BetaKiller\Model\User;
 use BetaKiller\Search;
 use BetaKiller\Search\Provider;
+use BetaKiller\Search\Provider\Parameterized\Parameter;
+use BetaKiller\URL\QueryConverter;
 use BetaKiller\URL\QueryConverter\Convertible;
 use BetaKiller\URL\QueryConverter\ConvertibleItem;
 use BetaKiller\Utils;
-use BetaKiller\Model\User;
-use BetaKiller\URL\QueryConverter;
 use Traversable;
 
 abstract class Registry implements \IteratorAggregate, QueryConverter\Convertible
@@ -116,7 +116,7 @@ abstract class Registry implements \IteratorAggregate, QueryConverter\Convertibl
         return $output;
     }
 
-    public function apply(Search\Model\Applicable $model)
+    public function apply(Search\ApplicableModelInterface $model)
     {
         foreach ($this->getParameters() as $param) {
             // Skip empty parameters

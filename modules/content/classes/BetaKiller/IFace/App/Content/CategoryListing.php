@@ -16,14 +16,14 @@ class CategoryListing extends AbstractAppBase
         ];
     }
 
-    protected function get_categories_data(\Model_ContentCategory $parent = null)
+    protected function get_categories_data(\BetaKiller\Model\ContentCategory $parent = null)
     {
         $data = [];
 
         $children = $parent ? $parent->getChildren() : $this->model_factory_content_category()->getRoot();
 
         foreach ($children as $child) {
-            if (!$child->is_active()) {
+            if (!$child->isActive()) {
                 continue;
             }
 
@@ -33,10 +33,10 @@ class CategoryListing extends AbstractAppBase
         return $data;
     }
 
-    protected function get_category_data(\Model_ContentCategory $category)
+    protected function get_category_data(\BetaKiller\Model\ContentCategory $category)
     {
         return [
-            'label'     =>  $category->get_label(),
+            'label'     =>  $category->getLabel(),
             'url'       =>  $this->ifaceHelper->getReadEntityUrl($category),
             'children'  =>  $this->get_categories_data($category),
         ];

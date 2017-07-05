@@ -22,7 +22,7 @@ class FixApiMethod extends AbstractEntityBasedApiMethod
      */
     public function execute()
     {
-        /** @var \Model_ContentPost $model */
+        /** @var \BetaKiller\Model\ContentPost $model */
         $model = $this->getEntity();
 
         $model->fix()->save();

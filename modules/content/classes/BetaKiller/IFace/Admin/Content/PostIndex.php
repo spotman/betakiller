@@ -3,9 +3,16 @@ namespace BetaKiller\IFace\Admin\Content;
 
 use BetaKiller\Helper\IFaceHelper;
 use BetaKiller\IFace\IFaceFactory;
+use BetaKiller\Helper\ContentHelper;
 
 class PostIndex extends AbstractAdminBase
 {
+    /**
+     * @var ContentHelper
+     * @Inject
+     */
+    private $contentHelper;
+
     /**
      * Returns data for View
      * Override this method in child classes
@@ -14,8 +21,10 @@ class PostIndex extends AbstractAdminBase
      */
     public function getData(): array
     {
+        $postRepo = $this->contentHelper->getPostRepository();
+
         // TODO deal with pages
-        $articles = $this->model_factory_content_post()->getAllArticles();
+        $articles = $postRepo->getAllArticles();
 
         $data = [];
 

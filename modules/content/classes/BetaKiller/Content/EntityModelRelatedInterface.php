@@ -35,37 +35,4 @@ interface EntityModelRelatedInterface
      * @return int
      */
     public function get_entity_item_id();
-
-    /**
-     * @param $item_id
-     *
-     * @return $this
-     */
-    public function filter_entity_item_id($item_id);
-
-    /**
-     * @param int[] $item_ids
-     *
-     * @return $this
-     */
-    public function filter_entity_item_ids(array $item_ids);
-
-    /**
-     * @param int $entity_id
-     *
-     * @return $this
-     */
-    public function filter_entity_id($entity_id);
-
-    /**
-     * @return $this
-     */
-    public function group_by_entity_item_id();
-
-    /**
-     * @param Entity $entity
-     *
-     * @return int[]
-     */
-    public function get_entity_items_ids(Entity $entity);
 }

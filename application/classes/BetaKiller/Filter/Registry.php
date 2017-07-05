@@ -1,7 +1,7 @@
 <?php
 namespace BetaKiller\Filter;
 
-use BetaKiller\Filter\Model\Applicable;
+use BetaKiller\Filter\Model\ApplicableInterface;
 use BetaKiller\URL\QueryConverter;
 use BetaKiller\URL\QueryConverter\Convertible;
 use BetaKiller\Utils;
@@ -90,10 +90,11 @@ abstract class Registry implements \IteratorAggregate, QueryConverter\Convertibl
     }
 
     /**
-     * @param Applicable $model
+     * @param ApplicableInterface $model
+     *
      * @return $this|static|\BetaKiller\Filter\Registry
      */
-    public function apply(Model\Applicable $model)
+    public function apply(Model\ApplicableInterface $model)
     {
         foreach ( $this->getAll() as $instance ) {
             $instance->apply($model);

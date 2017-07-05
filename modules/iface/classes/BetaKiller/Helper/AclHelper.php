@@ -5,7 +5,7 @@ use BetaKiller\Acl\Resource\EntityRelatedAclResourceInterface;
 use BetaKiller\IFace\CrudlsActionsInterface;
 use BetaKiller\IFace\Exception\IFaceException;
 use BetaKiller\IFace\IFaceInterface;
-use BetaKiller\IFace\Url\UrlParametersInterface;
+use BetaKiller\IFace\Url\UrlContainerInterface;
 use BetaKiller\Model\DispatchableEntityInterface;
 use BetaKiller\Model\GuestUser;
 use BetaKiller\Model\HasAdminZoneAccessSpecificationInterface;
@@ -81,15 +81,15 @@ class AclHelper
     }
 
     /**
-     * @param \BetaKiller\IFace\IFaceInterface                  $iface
-     * @param \BetaKiller\IFace\Url\UrlParametersInterface|null $params
-     * @param null|\Spotman\Acl\AclUserInterface                $user
+     * @param \BetaKiller\IFace\IFaceInterface                 $iface
+     * @param \BetaKiller\IFace\Url\UrlContainerInterface|null $params
+     * @param null|\Spotman\Acl\AclUserInterface               $user
      *
      * @return bool
      * @throws \BetaKiller\IFace\Exception\IFaceException
      * @throws \Spotman\Acl\Exception
      */
-    public function isIFaceAllowed(IFaceInterface $iface, ?UrlParametersInterface $params = null, ?AclUserInterface $user = null): bool
+    public function isIFaceAllowed(IFaceInterface $iface, ?UrlContainerInterface $params = null, ?AclUserInterface $user = null): bool
     {
         $zoneName   = $iface->getZoneName();
         $entityName = $iface->getEntityModelName();
@@ -118,10 +118,10 @@ class AclHelper
         if ($entityDefined) {
             $resource = $this->getAclResourceFromEntityName($entityName);
 
-            // Copy entity from UrlParameters if required
+            // Copy entity from UrlContainer if required
             if ($resource->isEntityRequiredForAction($actionName)) {
                 if (!$params) {
-                    throw new Exception('UrlParameters are required for action :action', [
+                    throw new Exception('UrlContainer are required for action :action', [
                         ':action' => $actionName,
                     ]);
                 }
@@ -129,7 +129,7 @@ class AclHelper
                 $entityInstance = $params->getEntity($entityName);
 
                 if (!$entityInstance) {
-                    throw new Exception('Entity instance :entity is absent in UrlParameters for action :action', [
+                    throw new Exception('Entity instance :entity is absent in UrlContainer for action :action', [
                         ':entity' => $entityName,
                         ':action' => $actionName,
                     ]);

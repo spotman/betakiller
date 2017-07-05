@@ -22,7 +22,7 @@ class ApproveApiMethod extends AbstractEntityBasedApiMethod
      */
     public function execute()
     {
-        /** @var \Model_ContentComment $model */
+        /** @var \BetaKiller\Model\ContentComment $model */
         $model = $this->getEntity();
 
         $model->approve()->save();

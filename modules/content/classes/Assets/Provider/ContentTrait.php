@@ -27,22 +27,4 @@ trait Assets_Provider_ContentTrait
             $model->set_entity_item_id($entity_item_id);
         }
     }
-
-    /**
-     * Returns concrete storage for current provider
-     *
-     * @return \BetaKiller\Assets\Storage\AbstractAssetsStorage
-     */
-    protected function createStorage()
-    {
-        // TODO move MultiSite dependency to AssetsStorageLocal config
-        $assets_path = MultiSite::instance()->getSitePath().DIRECTORY_SEPARATOR.'assets'.DIRECTORY_SEPARATOR;
-
-        /** @var \BetaKiller\Assets\Storage\AssetsStorageLocal $storage */
-        $storage = AssetsStorageFactory::instance()->create('Local');
-
-        return $storage->setBasePath($assets_path.$this->getStoragePathName());
-    }
-
-    abstract protected function getStoragePathName();
 }

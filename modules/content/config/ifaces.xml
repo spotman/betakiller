@@ -15,4 +15,11 @@
         </iface>
         <iface uri="{ContentComment.id}" codename="Admin_Content_CommentItem" label="{ContentComment.getLabel()}" hasDynamicUrl="true" entity="ContentComment" entityAction="read" zone="admin" />
     </iface>
+
+    <iface uri="custom-tags" codename="Admin_Content_CustomTag_Index" parentCodename="Admin_Index" label="Custom tag plugin" zone="admin" aclRules="Admin.enabled">
+        <iface uri="{CustomTag.name}" codename="Admin_Content_CustomTag_Item" label="{CustomTag.name}" hasDynamicUrl="true" zone="admin" aclRules="Admin.enabled">
+            <iface uri="wysiwyg-preview" codename="Admin_Content_CustomTag_WysiwygPreview" label="Preview" zone="admin" />
+        </iface>
+    </iface>
+
 </root>

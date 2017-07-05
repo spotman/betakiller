@@ -84,9 +84,9 @@ abstract class Base implements Parameter
     /**
      * Applies current filters to model
      *
-     * @param Search\Model\Applicable $model
+     * @param \BetaKiller\Search\ApplicableModelInterface $model
      */
-    public function apply(Search\Model\Applicable $model)
+    public function apply(Search\ApplicableModelInterface $model)
     {
         $this->getFilter()->apply($model);
     }

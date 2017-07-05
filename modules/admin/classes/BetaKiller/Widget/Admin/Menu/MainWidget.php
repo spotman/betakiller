@@ -3,7 +3,7 @@ namespace BetaKiller\Widget\Admin\Menu;
 
 use BetaKiller\Helper\ContentTrait;
 use BetaKiller\IFace\IFaceInterface;
-use BetaKiller\IFace\Url\UrlParametersInterface;
+use BetaKiller\IFace\Url\UrlContainerInterface;
 use BetaKiller\IFace\Widget\AbstractAdminWidget;
 
 class MainWidget extends AbstractAdminWidget
@@ -15,6 +15,12 @@ class MainWidget extends AbstractAdminWidget
      * @var \BetaKiller\Helper\ContentUrlParametersHelper
      */
     private $contentUrlParametersHelper;
+
+    /**
+     * @Inject
+     * @var \BetaKiller\Helper\AclHelper
+     */
+    private $aclHelper;
 
     /**
      * Returns data for View rendering
@@ -34,7 +40,7 @@ class MainWidget extends AbstractAdminWidget
         ];
     }
 
-    protected function getPostsMenu()
+    protected function getPostsMenu(): array
     {
         /** @var \BetaKiller\IFace\Admin\Content\PostIndex $posts */
         $postsIndex = $this->ifaceHelper->createIFaceFromCodename('Admin_Content_PostIndex');
@@ -48,7 +54,7 @@ class MainWidget extends AbstractAdminWidget
      *
      * @return array
      */
-    protected function makeIFaceMenuItemData(IFaceInterface $iface, array $childrenIfacesData = null)
+    protected function makeIFaceMenuItemData(IFaceInterface $iface, array $childrenIfacesData = null): array
     {
         $output             = $this->getIFaceMenuItemData($iface);
         $output['children'] = $childrenIfacesData;
@@ -56,8 +62,12 @@ class MainWidget extends AbstractAdminWidget
         return $output;
     }
 
-    protected function getIFaceMenuItemData(IFaceInterface $iface, UrlParametersInterface $params = null)
+    protected function getIFaceMenuItemData(IFaceInterface $iface, UrlContainerInterface $params = null): array
     {
+        if (!$this->aclHelper->isIFaceAllowed($iface, $params)) {
+            return [];
+        }
+
         return [
             'url'    => $iface->url($params, false), // Keep links always working
             'label'  => $iface->getLabel($params),
@@ -73,8 +83,7 @@ class MainWidget extends AbstractAdminWidget
         /** @var \BetaKiller\IFace\Admin\Content\CommentListByStatus $comments */
         $commentListInStatus = $this->ifaceHelper->createIFaceFromCodename('Admin_Content_CommentListByStatus');
 
-        /** @var \Model_ContentCommentStatus[] $statuses */
-        // TODO Get comment statuses only allowed by ACL
+        /** @var \BetaKiller\Model\ContentCommentStatus[] $statuses */
         $statuses = $this->model_factory_content_comment_status()->get_all();
 
         $childrenData = [];
@@ -82,7 +91,7 @@ class MainWidget extends AbstractAdminWidget
         foreach ($statuses as $status) {
             $params = $this->contentUrlParametersHelper
                 ->createEmpty()
-                ->setEntity($status);
+                ->setParameter($status);
 
             $childrenData[] = $this->getIFaceMenuItemData($commentListInStatus, $params);
         }

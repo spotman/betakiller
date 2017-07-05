@@ -25,11 +25,11 @@ abstract class AbstractCommentList extends AbstractAdminBase
     }
 
     /**
-     * @return \Model_ContentComment[]
+     * @return \BetaKiller\Model\ContentComment[]
      */
     abstract protected function get_comments_list();
 
-    protected function get_comment_data(\Model_ContentComment $comment)
+    protected function get_comment_data(\BetaKiller\Model\ContentComment $comment)
     {
         $status = $comment->get_current_status();
 

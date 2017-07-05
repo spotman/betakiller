@@ -1,27 +1,41 @@
 <?php
 
-
+use BetaKiller\Assets\AssetsException;
 use BetaKiller\Assets\Model\AssetsModelInterface;
 
 class Controller_Content extends Controller
 {
     use \BetaKiller\Helper\ContentTrait;
 
+    /**
+     * @var \BetaKiller\Helper\ContentHelper
+     * @Inject
+     */
+    private $contentHelper;
+
+    /**
+     * @var \BetaKiller\Helper\AssetsHelper
+     * @Inject
+     */
+    private $assetsHelper;
+
     public function action_files_bc_redirect()
     {
         $file = $this->param('file');
 
-        if (!$file)
+        if (!$file) {
             throw new HTTP_Exception_404();
+        }
 
-        $path = '/'.ltrim($this->getRequest()->uri(), "/");
+        $path = '/'.ltrim($this->getRequest()->uri(), '/');
 
         $model = $this->find_content_model_by_wp_path($path);
 
-        if (!$model)
+        if (!$model) {
             throw new HTTP_Exception_404();
+        }
 
-        $url = $model->getOriginalUrl();
+        $url = $this->assetsHelper->getOriginalUrl($model);
 
         $this->redirect($url, 301);
     }
@@ -31,24 +45,33 @@ class Controller_Content extends Controller
      *
      * @return AssetsModelInterface|null
      */
-    protected function find_content_model_by_wp_path($path)
+    protected function find_content_model_by_wp_path($path): ?AssetsModelInterface
     {
-        /** @var \BetaKiller\Content\HasWordpressPathInterface[] $models */
-        $models = [
-            $this->model_factory_content_image_element(),
-            $this->model_factory_content_post_thumbnail(),
-            $this->model_factory_content_attachment_element(),
+        /** @var \BetaKiller\Content\RepositoryHasWordpressPathInterface[] $repositories */
+
+        $repositories = [
+            $this->contentHelper->getImageRepository(),
+            $this->contentHelper->getPostThumbnailRepository(),
+            $this->contentHelper->getAttachmentRepository(),
         ];
 
-        foreach ($models as $orm)
-        {
-            /** @var AssetsModelInterface $model */
-            $model = $orm->find_by_wp_path($path);
+        foreach ($repositories as $repo) {
+            $model = $repo->find_by_wp_path($path);
 
-            if ($model)
-                return $model;
+            if (!$model) {
+                continue;
+            }
+
+            if (!($model instanceof AssetsModelInterface)) {
+                throw new AssetsException('Model :name must be instance of :must', [
+                    ':name' => get_class($model),
+                    ':must' => AssetsModelInterface::class,
+                ]);
+            }
+
+            return $model;
         }
 
-        return NULL;
+        return null;
     }
 }

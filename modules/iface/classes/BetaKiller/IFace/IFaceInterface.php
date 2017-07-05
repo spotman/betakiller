@@ -2,7 +2,7 @@
 namespace BetaKiller\IFace;
 
 use BetaKiller\Helper\SeoMetaInterface;
-use BetaKiller\IFace\Url\UrlParametersInterface;
+use BetaKiller\IFace\Url\UrlContainerInterface;
 
 interface IFaceInterface extends SeoMetaInterface
 {
@@ -24,11 +24,11 @@ interface IFaceInterface extends SeoMetaInterface
     /**
      * Returns processed label
      *
-     * @param UrlParametersInterface|null $params
+     * @param UrlContainerInterface|null $params
      *
      * @return string
      */
-    public function getLabel(UrlParametersInterface $params = null): string;
+    public function getLabel(UrlContainerInterface $params = null): string;
 
     /**
      * Returns label source/pattern
@@ -164,21 +164,21 @@ interface IFaceInterface extends SeoMetaInterface
     public function isInStack(): bool;
 
     /**
-     * @param \BetaKiller\IFace\Url\UrlParametersInterface|null $parameters
+     * @param \BetaKiller\IFace\Url\UrlContainerInterface|null $parameters
      *
      * @return bool
      */
-    public function isCurrent(UrlParametersInterface $parameters = null): bool;
+    public function isCurrent(UrlContainerInterface $parameters = null): bool;
 
     /**
-     * @param \BetaKiller\IFace\Url\UrlParametersInterface|null $parameters
-     * @param bool|null                                         $removeCyclingLinks
-     * @param bool|null                                         $withDomain
+     * @param \BetaKiller\IFace\Url\UrlContainerInterface|null $parameters
+     * @param bool|null                                        $removeCyclingLinks
+     * @param bool|null                                        $withDomain
      *
      * @return string
      */
     public function url(
-        ?UrlParametersInterface $parameters = null,
+        ?UrlContainerInterface $parameters = null,
         ?bool $removeCyclingLinks = null,
         ?bool $withDomain = null
     ): string;
@@ -217,10 +217,10 @@ interface IFaceInterface extends SeoMetaInterface
     public function getAdditionalAclRules(): array;
 
     /**
-     * @param \BetaKiller\IFace\Url\UrlParametersInterface $params
-     * @param int|null                                     $limit
+     * @param \BetaKiller\IFace\Url\UrlContainerInterface $params
+     * @param int|null                                    $limit
      *
      * @return string[]
      */
-    public function getPublicAvailableUrls(UrlParametersInterface $params, ?int $limit = null): array;
+    public function getPublicAvailableUrls(UrlContainerInterface $params, ?int $limit = null): array;
 }

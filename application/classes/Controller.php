@@ -15,6 +15,8 @@ abstract class Controller extends Controller_Proxy
 
     public function before()
     {
+        \BetaKiller\DI\Container::getInstance()->injectOn($this);
+
         parent::before();
 
         $this->check_connection_protocol();

@@ -1,19 +1,36 @@
 <?php
 namespace BetaKiller\Factory;
 
-use BetaKiller\Utils\Kohana\ORM\OrmInterface;
+use BetaKiller\Model\ExtendedOrmInterface;
 
-class OrmFactory extends NamespaceBasedFactory
+class OrmFactory
 {
-    protected function init()
+    /**
+     * @var \BetaKiller\Factory\NamespaceBasedFactory
+     */
+    private $factory;
+
+    /**
+     * OrmFactory constructor.
+     *
+     * @param \BetaKiller\Factory\NamespaceBasedFactory $factory
+     */
+    public function __construct(NamespaceBasedFactory $factory)
     {
-        $this->injectDefinitions($this);
+        $this->factory = $factory;
+
+        $this->injectDefinitions($this->factory);
     }
 
-    public function injectDefinitions(NamespaceBasedFactory $factory)
+    public function injectDefinitions(NamespaceBasedFactory $factory): void
     {
         $factory
-            ->setExpectedInterface(OrmInterface::class)
+            ->setExpectedInterface(ExtendedOrmInterface::class)
             ->setClassPrefixes('Model');
+    }
+
+    public function create(string $name): ExtendedOrmInterface
+    {
+        return $this->factory->create($name);
     }
 }

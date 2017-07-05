@@ -22,7 +22,7 @@ class PublishApiMethod extends AbstractEntityBasedApiMethod
      */
     public function execute()
     {
-        /** @var \Model_ContentPost $model */
+        /** @var \BetaKiller\Model\ContentPost $model */
         $model = $this->getEntity();
 
         $model->publish()->save();

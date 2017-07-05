@@ -43,17 +43,18 @@ abstract class Provider
     /**
      * @param $page
      * @param $itemsPerPage
-     * @return \BetaKiller\Search\Model\Results
+     *
+     * @return \BetaKiller\Search\SearchResultsInterface
      */
     abstract public function getResults($page, $itemsPerPage);
 
     /**
      * Helper for getting empty result
      *
-     * @return \BetaKiller\Search\Results
+     * @return \BetaKiller\Search\SearchResults
      */
     protected function getEmptyResults()
     {
-        return Results::factory(0, 0, false);
+        return SearchResults::factory(0, 0, false);
     }
 }

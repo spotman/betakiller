@@ -2,7 +2,7 @@
 namespace BetaKiller\IFace;
 
 use BetaKiller\IFace\Exception\IFaceStackException;
-use BetaKiller\IFace\Url\UrlParametersInterface;
+use BetaKiller\IFace\Url\UrlContainerInterface;
 
 class IFaceStack
 {
@@ -17,21 +17,21 @@ class IFaceStack
     private $items;
 
     /**
-     * @var UrlParametersInterface
+     * @var UrlContainerInterface
      */
     private $parameters;
 
     /**
      * IFaceStack constructor.
      *
-     * @param \BetaKiller\IFace\Url\UrlParametersInterface $parameters
+     * @param \BetaKiller\IFace\Url\UrlContainerInterface $parameters
      */
-    public function __construct(UrlParametersInterface $parameters)
+    public function __construct(UrlContainerInterface $parameters)
     {
         $this->parameters = $parameters;
     }
 
-    public function push(IFaceInterface $iface)
+    public function push(IFaceInterface $iface): void
     {
         if ($this->has($iface)) {
             throw new IFaceStackException('Duplicate insert for :codename', [':codename' => $iface->getCodename()]);
@@ -42,7 +42,7 @@ class IFaceStack
         $this->current          = $iface;
     }
 
-    public function has(IFaceInterface $iface)
+    public function has(IFaceInterface $iface): bool
     {
         return isset($this->items[$iface->getCodename()]);
     }
@@ -52,7 +52,7 @@ class IFaceStack
      *
      * @return string[]
      */
-    public function getCodenames()
+    public function getCodenames(): array
     {
         return array_keys($this->items);
     }
@@ -60,18 +60,18 @@ class IFaceStack
     /**
      * @deprecated IFace stack must be persistent
      */
-    public function clear()
+    public function clear(): void
     {
         $this->items   = [];
         $this->current = null;
     }
 
-    public function getCurrent()
+    public function getCurrent(): IFaceInterface
     {
         return $this->current;
     }
 
-    public function isCurrent(IFaceInterface $iface, UrlParametersInterface $parameters = null)
+    public function isCurrent(IFaceInterface $iface, UrlContainerInterface $parameters = null): bool
     {
         if (!$this->current || $this->current->getCodename() !== $iface->getCodename()) {
             return false;
@@ -81,14 +81,14 @@ class IFaceStack
             return true;
         }
 
-        foreach ($parameters->getAllEntities() as $key => $paramModel) {
-            if (!$this->parameters->hasEntity($key)) {
+        foreach ($parameters->getAllParameters() as $key => $providedParam) {
+            if (!$this->parameters->hasParameter($key)) {
                 return false;
             }
 
-            $currentModel = $this->parameters->getEntity($key);
+            $currentParam = $this->parameters->getParameter($key);
 
-            if ($paramModel->getID() !== $currentModel->getID()) {
+            if (!$currentParam->isSameAs($providedParam)) {
                 return false;
             }
         }

@@ -4,8 +4,6 @@ namespace BetaKiller\Search\Provider;
 use BetaKiller\Filter\Model\ValuesGroup;
 use BetaKiller\Search;
 use BetaKiller\Search\Provider;
-use BetaKiller\URL\QueryConverter;
-use BetaKiller\Utils;
 use BetaKiller\Search\Provider\Parameterized\Parameter\Registry;
 
 //use \AFS\Filter\Registry;
@@ -25,7 +23,8 @@ abstract class Parameterized extends Search\Provider
     /**
      * @param $page
      * @param int|null $itemsPerPage
-     * @return \BetaKiller\Search\Model\Results|\BetaKiller\Search\Model\ResultsItem[]
+     *
+     * @return \BetaKiller\Search\SearchResultsInterface|\BetaKiller\Search\SearchResultsItemInterface[]
      * @throws \BetaKiller\Search\Provider\Exception
      */
     public function getResults($page, $itemsPerPage = null)
@@ -183,13 +182,13 @@ abstract class Parameterized extends Search\Provider
         return $values;
     }
 
-    protected function apply(Search\Model\Applicable $model)
+    protected function apply(Search\ApplicableModelInterface $model)
     {
         $this->getCurrentParametersRegistry()->apply($model);
     }
 
     /**
-     * @return \BetaKiller\Search\Model\Applicable
+     * @return \BetaKiller\Search\ApplicableModelInterface
      */
     abstract protected function searchModelFactory();
 

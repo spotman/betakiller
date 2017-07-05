@@ -20,7 +20,7 @@ class Entity extends ORM
      * @throws \BetaKiller\Exception
      * @return void
      */
-    protected function _initialize()
+    protected function _initialize(): void
     {
         $this->_table_name = 'entities';
 
@@ -33,17 +33,17 @@ class Entity extends ORM
      * @return string
      * @throws \BetaKiller\Exception
      */
-    public function getSlug()
+    public function getSlug(): string
     {
-        return $this->get('slug');
+        return (string)$this->get('slug');
     }
 
     /**
      * @param string $value
      *
-     * @return $this
+     * @return \BetaKiller\Model\Entity
      */
-    public function setSlug($value)
+    public function setSlug(string $value): Entity
     {
         return $this->set('slug', $value);
     }
@@ -54,37 +54,21 @@ class Entity extends ORM
      * @return string
      * @throws \BetaKiller\Exception
      */
-    public function getLinkedModelName()
+    public function getLinkedModelName(): string
     {
-        return $this->get('model_name');
+        return (string)$this->get('model_name');
     }
 
     /**
      * @param string $value
      *
-     * @return $this
+     * @return \BetaKiller\Model\Entity
      */
-    public function setLinkedModelName($value)
+    public function setLinkedModelName(string $value): Entity
     {
         return $this->set('model_name', $value);
     }
 
-    /**
-     * @param string $slug
-     *
-     * @return Entity
-     * @throws \BetaKiller\Exception
-     */
-    public function findBySlug($slug)
-    {
-        $model = $this->where('slug', '=', $slug)->find();
-
-        if (!$model->loaded()) {
-            throw new Exception('Unknown entity slug :value', [':value' => $slug]);
-        }
-
-        return $model;
-    }
 
     public function getLabel(): string
     {
@@ -99,8 +83,9 @@ class Entity extends ORM
      * @return \BetaKiller\Model\DispatchableEntityInterface
      * @throws \BetaKiller\Exception
      */
-    public function getLinkedEntityInstance($id)
+    public function getLinkedEntityInstance($id): DispatchableEntityInterface
     {
+        // TODO Rewrite to EntityManager or something similar
         $name        = $this->getLinkedModelName();
         $model       = $this->model_factory($id, $name);
         $targetClass = DispatchableEntityInterface::class;
@@ -113,15 +98,5 @@ class Entity extends ORM
         }
 
         return $model;
-    }
-
-    /**
-     * @return \BetaKiller\Model\Entity[]
-     */
-    public function getAllEntities(): array
-    {
-        /** @var \BetaKiller\Model\Entity $orm */
-        $orm = $this->model_factory();
-        return $orm->get_all();
     }
 }

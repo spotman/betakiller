@@ -9,52 +9,52 @@ class NamespaceBasedFactory
     /**
      * @var mixed[]
      */
-    protected static $instances = [];
+    private static $instances = [];
 
     /**
      * @var \BetaKiller\Config\AppConfigInterface
      */
-    protected $appConfig;
+    private $appConfig;
 
     /**
      * @var \BetaKiller\DI\ContainerInterface
      */
-    protected $container;
+    private $container;
 
     /**
      * @var array
      */
-    protected $rootNamespaces = [];
+    private $rootNamespaces = [];
 
     /**
      * @var string[]
      */
-    protected $classPrefixes;
+    private $classPrefixes;
 
     /**
      * @var string
      */
-    protected $classSuffix;
+    private $classSuffix;
 
     /**
      * @var string
      */
-    protected $expectedInterface;
+    private $expectedInterface;
 
     /**
      * @var bool
      */
-    protected $instanceCachingEnabled = false;
+    private $instanceCachingEnabled = false;
 
     /**
      * @var callable
      */
-    protected $prepareArgumentsCallback;
+    private $prepareArgumentsCallback;
 
     /**
      * @var \BetaKiller\Factory\FactoryCacheInterface
      */
-    protected $classNamesCache;
+    private $classNamesCache;
 
     /**
      *
@@ -67,13 +67,6 @@ class NamespaceBasedFactory
         $this->appConfig       = $appConfig;
         $this->container       = $container;
         $this->classNamesCache = $cache;
-
-        $this->init();
-    }
-
-    protected function init()
-    {
-        // Empty by default
     }
 
     public function setExpectedInterface($interfaceName)
@@ -185,7 +178,7 @@ class NamespaceBasedFactory
         return $instance;
     }
 
-    private function detectClassName($codename)
+    private function detectClassName($codename): string
     {
         $appNamespace = $this->appConfig->getNamespace();
 
@@ -240,18 +233,18 @@ class NamespaceBasedFactory
     /**
      * @param string $baseName
      *
-     * @return string|false
+     * @return string|null
      */
-    protected function getClassNameFromCache($baseName)
+    protected function getClassNameFromCache($baseName): ?string
     {
         if (!$this->classNamesCache->contains($baseName)) {
-            return false;
+            return null;
         }
 
         return $this->classNamesCache->fetch($baseName);
     }
 
-    protected function storeClassNameInCache($baseName, $className)
+    protected function storeClassNameInCache($baseName, $className): bool
     {
         return $this->classNamesCache->save($baseName, $className);
     }
@@ -268,7 +261,7 @@ class NamespaceBasedFactory
             : null;
     }
 
-    private function hasInstanceInCache($className)
+    private function hasInstanceInCache($className): bool
     {
         return isset(self::$instances[$className]);
     }
@@ -280,7 +273,7 @@ class NamespaceBasedFactory
             : $this->container->make($className);
     }
 
-    private function storeInstanceInCache($className, $instance)
+    private function storeInstanceInCache($className, $instance): void
     {
         if (!$this->instanceCachingEnabled) {
             return;

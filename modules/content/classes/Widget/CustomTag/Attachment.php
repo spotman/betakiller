@@ -2,10 +2,17 @@
 
 use BetaKiller\IFace\Widget\AbstractBaseWidget;
 use BetaKiller\IFace\Widget\WidgetException;
+use BetaKiller\Helper\AssetsHelper;
 
 class Widget_CustomTag_Attachment extends AbstractBaseWidget
 {
     use BetaKiller\Helper\ContentTrait;
+
+    /**
+     * @var \BetaKiller\Helper\AssetsHelper
+     * @Inject
+     */
+    private $assetsHelper;
 
     /**
      * Returns data for View rendering
@@ -34,7 +41,7 @@ class Widget_CustomTag_Attachment extends AbstractBaseWidget
 
         return [
             'attachment'    =>  [
-                'url'       =>  $model->getOriginalUrl(),
+                'url'       =>  $this->assetsHelper->getOriginalUrl($model),
                 'title'     =>  $title ?: __('custom_tag.attachment.title', $i18n_params),
                 'alt'       =>  __('custom_tag.attachment.alt', $i18n_params),
                 'class'     =>  $class,

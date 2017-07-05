@@ -49,8 +49,9 @@ class Migration1480169823_Content_Entity_Article_Rename extends Migration {
 
 	    $entity
             ->setLinkedModelName($content_item_model->getModelName())
-            ->setSlug('post')
-            ->save();
+            ->setSlug('post');
+
+        $entity->save();
 	}
 
 	/**

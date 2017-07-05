@@ -33,7 +33,7 @@ class UrlDispatcher implements LoggerAwareInterface
     /**
      * Current Url parameters
      *
-     * @var \BetaKiller\IFace\Url\UrlParametersInterface
+     * @var \BetaKiller\IFace\Url\UrlContainerInterface
      */
     private $urlParameters;
 
@@ -71,7 +71,7 @@ class UrlDispatcher implements LoggerAwareInterface
     /**
      * @param \BetaKiller\IFace\IFaceStack                      $stack
      * @param \BetaKiller\IFace\IFaceProvider                   $provider
-     * @param \BetaKiller\IFace\Url\UrlParametersInterface      $parameters
+     * @param \BetaKiller\IFace\Url\UrlContainerInterface       $parameters
      * @param \BetaKiller\IFace\Url\UrlPrototypeHelper          $prototypeHelper
      * @param \BetaKiller\IFace\Url\UrlDispatcherCacheInterface $cache
      * @param \BetaKiller\Helper\AppEnv                         $env
@@ -80,7 +80,7 @@ class UrlDispatcher implements LoggerAwareInterface
     public function __construct(
         IFaceStack $stack,
         IFaceProvider $provider,
-        UrlParametersInterface $parameters,
+        UrlContainerInterface $parameters,
         UrlPrototypeHelper $prototypeHelper,
         UrlDispatcherCacheInterface $cache,
         AppEnv $env,
@@ -378,27 +378,29 @@ class UrlDispatcher implements LoggerAwareInterface
         $modelName = $prototype->getDataSourceName();
 
         // Search for model item
-        $entity = $dataSource->findEntityByUrlKeyValue($modelKey, $uriValue, $this->urlParameters);
+        $item = $dataSource->findItemByUrlKeyValue($modelKey, $uriValue, $this->urlParameters);
 
-        if (!$entity) {
+        if (!$item) {
             throw new UrlDispatcherException('Can not find item for [:prototype] by [:value]', [
                 ':prototype' => $ifaceModel->getUri(),
                 ':value'     => $uriValue,
             ]);
         }
 
-        // Allow current model to preset "belongs to" models
-        $entity->presetLinkedEntities($this->urlParameters);
+        if ($item instanceof DispatchableEntityInterface) {
+            // Allow current model to preset "belongs to" models
+            $item->presetLinkedEntities($this->urlParameters);
+        }
 
         // Store model into registry
         $registry = $this->urlParameters;
 
         if (method_exists($registry, mb_strtolower('set_'.$modelName))) {
-            throw new UrlDispatcherException('Method calls on UrlParameters registry are deprecated');
+            throw new UrlDispatcherException('Method calls on UrlContainer registry are deprecated');
         }
 
         // Allow tree url behaviour to set value multiple times
-        $registry->setEntity($entity, $ifaceModel->hasTreeBehaviour());
+        $registry->setParameter($item, $ifaceModel->hasTreeBehaviour());
     }
 
     private function checkIFaceAccess(IFaceInterface $iface): void
@@ -414,7 +416,7 @@ class UrlDispatcher implements LoggerAwareInterface
     private function storeDataInCache($url): void
     {
         $stackData  = $this->ifaceStack->getCodenames();
-        $paramsData = $this->urlParameters->getAllEntities();
+        $paramsData = $this->urlParameters->getAllParameters();
 
         $this->cache->set($url, [
             'stack'      => $stackData,
@@ -445,17 +447,17 @@ class UrlDispatcher implements LoggerAwareInterface
         /** @var array $stackData */
         $stackData = $data['stack'];
 
-        /** @var \BetaKiller\Model\DispatchableEntityInterface[] $paramsData */
+        /** @var \BetaKiller\IFace\Url\UrlParameterInterface[] $paramsData */
         $paramsData = $data['parameters'];
 
         try {
             // Restore url parameters first so iface access can be checked
             foreach ($paramsData as $key => $value) {
-                if (!($value instanceof DispatchableEntityInterface)) {
+                if (!($value instanceof UrlParameterInterface)) {
                     throw new UrlDispatcherException('Cached data for url parameters is incorrect');
                 }
 
-                $this->urlParameters->setEntity($value);
+                $this->urlParameters->setParameter($value);
             }
 
             // Restore ifaces and push them into stack (with access check)

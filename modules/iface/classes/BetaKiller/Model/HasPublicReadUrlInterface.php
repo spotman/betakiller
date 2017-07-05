@@ -6,7 +6,6 @@ use BetaKiller\Helper\IFaceHelper;
  * Interface HasPublicReadUrlInterface
  *
  * @package BetaKiller\Helper
- * @deprecated
  */
 interface HasPublicReadUrlInterface
 {
@@ -15,5 +14,5 @@ interface HasPublicReadUrlInterface
      *
      * @return string
      */
-    public function getPublicReadUrl(IFaceHelper $helper);
+    public function getPublicReadUrl(IFaceHelper $helper): string;
 }

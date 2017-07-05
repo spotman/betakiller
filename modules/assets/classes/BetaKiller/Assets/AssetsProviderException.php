@@ -1,3 +1,4 @@
-<?php namespace BetaKiller\Assets;
+<?php
+namespace BetaKiller\Assets;
 
 class AssetsProviderException extends AssetsException {}

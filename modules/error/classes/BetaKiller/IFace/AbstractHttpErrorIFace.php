@@ -1,8 +1,6 @@
 <?php
 namespace BetaKiller\IFace;
 
-use BetaKiller\IFace\Url\UrlParametersInterface;
-
 abstract class AbstractHttpErrorIFace extends AbstractIFace
 {
     /**

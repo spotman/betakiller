@@ -1,6 +1,7 @@
 <?php
 
 use BetaKiller\IFace\Widget\AbstractBaseWidget;
+use BetaKiller\Model\ContentPost;
 use BetaKiller\Model\IFaceZone;
 
 abstract class Widget_Content_SidebarArticlesList extends AbstractBaseWidget
@@ -10,6 +11,12 @@ abstract class Widget_Content_SidebarArticlesList extends AbstractBaseWidget
      * @var \BetaKiller\Helper\ContentUrlParametersHelper
      */
     private $urlParametersHelper;
+
+    /**
+     * @var \BetaKiller\Helper\AssetsHelper
+     * @Inject
+     */
+    private $assetsHelper;
 
     /**
      * Returns data for View rendering
@@ -38,7 +45,7 @@ abstract class Widget_Content_SidebarArticlesList extends AbstractBaseWidget
      * @param int $exclude_id
      * @param int $limit
      *
-     * @return Model_ContentPost[]
+     * @return ContentPost[]
      */
     abstract protected function get_articles_list($exclude_id, $limit);
 
@@ -49,16 +56,16 @@ abstract class Widget_Content_SidebarArticlesList extends AbstractBaseWidget
         return $current_article ? $current_article->get_id() : null;
     }
 
-    protected function getArticleData(Model_ContentPost $article): array
+    protected function getArticleData(ContentPost $article): array
     {
-        /** @var \Model_ContentImageElement $thumbnail */
+        /** @var \BetaKiller\Model\ContentImage $thumbnail */
         $thumbnail = $article->getFirstThumbnail();
 
         $createdAt = $article->getCreatedAt();
 
         return [
             'label'     => $article->getLabel(),
-            'thumbnail' => $thumbnail->getAttributesForImgTag($thumbnail::SIZE_PREVIEW),
+            'thumbnail' => $this->assetsHelper->getAttributesForImgTag($thumbnail, $thumbnail::SIZE_PREVIEW),
             'url'       => $this->ifaceHelper->getReadEntityUrl($article, IFaceZone::PUBLIC_ZONE),
             'date'      => $createdAt ? $createdAt->format('d.m.Y') : null,
         ];

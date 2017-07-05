@@ -3,8 +3,8 @@ namespace BetaKiller\IFace\App\Content;
 
 use BetaKiller\Helper\ContentUrlParametersHelper;
 use BetaKiller\Model\IFaceZone;
+use BetaKiller\Model\ContentPost;
 use BetaKiller\Model\UserInterface;
-use Model_ContentPost;
 
 class PostItem extends AbstractAppBase
 {
@@ -14,7 +14,7 @@ class PostItem extends AbstractAppBase
     protected $urlParametersHelper;
 
     /**
-     * @var \Model_ContentPost
+     * @var \BetaKiller\Model\ContentPost
      */
     private $contentModel;
 
@@ -22,6 +22,12 @@ class PostItem extends AbstractAppBase
      * @var \BetaKiller\Model\UserInterface
      */
     private $user;
+
+    /**
+     * @var \BetaKiller\Helper\AssetsHelper
+     * @Inject
+     */
+    private $assetsHelper;
 
     /**
      * PostItem constructor.
@@ -72,14 +78,14 @@ class PostItem extends AbstractAppBase
         ];
     }
 
-    protected function getPostData(Model_ContentPost $model): array
+    protected function getPostData(ContentPost $model): array
     {
         $this->setLastModified($model->getApiLastModified());
 
         $thumbnails = [];
 
         foreach ($model->getThumbnails() as $thumb) {
-            $thumbnails[] = $thumb->getAttributesForImgTag($thumb::SIZE_ORIGINAL);
+            $thumbnails[] = $this->assetsHelper->getAttributesForImgTag($thumb, $thumb::SIZE_ORIGINAL);
 
             // Get image last modified and set it to iface
             if ($thumbLastModified = $thumb->getLastModifiedAt()) {
@@ -108,18 +114,18 @@ class PostItem extends AbstractAppBase
     }
 
     /**
-     * @return \Model_ContentPost
+     * @return \BetaKiller\Model\ContentPost
      * @throws \BetaKiller\IFace\Exception\IFaceException
      */
-    protected function detectContentModel(): Model_ContentPost
+    protected function detectContentModel(): ContentPost
     {
         return $this->urlParametersHelper->getContentPost();
     }
 
     /**
-     * @return \Model_ContentPost
+     * @return \BetaKiller\Model\ContentPost
      */
-    protected function getContentModel(): Model_ContentPost
+    protected function getContentModel(): ContentPost
     {
         if (!$this->contentModel) {
             $this->contentModel = $this->detectContentModel();

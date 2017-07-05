@@ -1,19 +1,21 @@
 <?php
 
-use BetaKiller\Assets\Model\AbstractAssetsOrmModelSeoImage;
+use BetaKiller\Assets\Model\AssetsModelImageInterface;
 use BetaKiller\Assets\Provider\AbstractAssetsProvider;
-use BetaKiller\Content\ContentElementInterface;
-use BetaKiller\Content\HasWordpressPathInterface;
-use BetaKiller\Content\ImportedFromWordpressInterface;
+use BetaKiller\Model\ContentImage;
+use BetaKiller\Model\ContentPost;
+use BetaKiller\Model\ContentPostThumbnail;
 use BetaKiller\Model\Entity;
 use BetaKiller\Model\IFaceZone;
+use BetaKiller\Model\ContentComment;
+use BetaKiller\Repository\WordpressAttachmentRepositoryInterface;
+use BetaKiller\Task\AbstractTask;
 use BetaKiller\Task\TaskException;
 use DiDom\Document;
 use Thunder\Shortcode\Parser\RegexParser;
 use Thunder\Shortcode\Processor\Processor;
 use Thunder\Shortcode\Serializer\TextSerializer;
 use Thunder\Shortcode\Shortcode\ShortcodeInterface;
-use BetaKiller\Task\AbstractTask;
 
 class Task_Content_Import_Wordpress extends AbstractTask
 {
@@ -48,6 +50,36 @@ class Task_Content_Import_Wordpress extends AbstractTask
      * @var \BetaKiller\Model\UserInterface
      */
     private $user;
+
+    /**
+     * @var \BetaKiller\Helper\AssetsHelper
+     * @Inject
+     */
+    private $assetsHelper;
+
+    /**
+     * @var \BetaKiller\Repository\ContentPostRepository
+     * @Inject
+     */
+    private $postRepository;
+
+    /**
+     * @var \BetaKiller\Repository\ContentCommentRepository
+     * @Inject
+     */
+    private $commentRepository;
+
+    /**
+     * @var \BetaKiller\Repository\ContentCategoryRepository
+     * @Inject
+     */
+    private $categoryRepository;
+
+    /**
+     * @var \BetaKiller\Repository\ContentYoutubeRecordRepository
+     * @Inject
+     */
+    private $youtubeRepository;
 
     protected function define_options(): array
     {
@@ -187,7 +219,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
         $created_at = new DateTime($attach['post_date']);
         $updated_at = new DateTime($attach['post_modified']);
 
-        if ($model instanceof AbstractAssetsOrmModelSeoImage) {
+        if ($model instanceof AssetsModelImageInterface) {
             $title = $attach['post_excerpt'];
 
             if ($title && !$model->getTitle()) {
@@ -195,10 +227,10 @@ class Task_Content_Import_Wordpress extends AbstractTask
             }
         }
 
-        $model
-            ->setUploadedAt($created_at)
-            ->setLastModifiedAt($updated_at)
-            ->save();
+        $model->setUploadedAt($created_at);
+        $model->setLastModifiedAt($updated_at);
+
+        $provider->saveModel($model);
 
         return $model;
     }
@@ -214,17 +246,19 @@ class Task_Content_Import_Wordpress extends AbstractTask
      */
     protected function store_attachment(AbstractAssetsProvider $provider, $url, $wp_id, $entity_item_id = null)
     {
-        $orm = $provider->createFileModel();
+        $repository = $provider->getRepository();
 
-        if (!$orm instanceof ImportedFromWordpressInterface) {
-            throw new TaskException('Attachment model must be instance of :class', [':class' => ImportedFromWordpressInterface::class]);
+        if (!($repository instanceof WordpressAttachmentRepositoryInterface)) {
+            throw new TaskException('Attachment repository must be instance of :class', [
+                ':class' => WordpressAttachmentRepositoryInterface::class,
+            ]);
         }
 
         // Search for such file already exists
         /** @var \BetaKiller\Content\WordpressAttachmentInterface $model */
-        $model = $orm->find_by_wp_id($wp_id);
+        $model = $repository->find_by_wp_id($wp_id);
 
-        if ($model->get_id()) {
+        if ($model->getID()) {
             $this->debug('Attach with WP ID = :id already exists, data = :data', [
                 ':id'   => $wp_id,
                 ':data' => $model->toJson(),
@@ -248,25 +282,20 @@ class Task_Content_Import_Wordpress extends AbstractTask
         /** @var \BetaKiller\Content\WordpressAttachmentInterface $model */
         $model = $provider->store($path, $original_filename);
 
-        if ($model instanceof ContentElementInterface) {
-            // Storing entity
-            $model->set_entity($this->get_content_post_entity());
+        // Storing entity
+        $model->set_entity($this->get_content_post_entity());
 
-            // Storing entity item ID
-            if ($entity_item_id) {
-                $model->set_entity_item_id($entity_item_id);
-            }
+        // Storing entity item ID
+        if ($entity_item_id) {
+            $model->set_entity_item_id($entity_item_id);
         }
 
-        if ($model instanceof HasWordpressPathInterface) {
-            // Storing WP ID
-            $model->set_wp_path($url_path);
-        }
+        // Storing WP path
+        $model->set_wp_path($url_path);
 
         // Storing WP ID
-        $model
-            ->set_wp_id($wp_id)
-            ->save();
+        $model->set_wp_id($wp_id);
+        $provider->saveModel($model);
 
         // Cleanup temp files
         if ($this->attach_parsing_mode === self::ATTACH_PARSING_MODE_HTTP) {
@@ -286,7 +315,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
             $this->debug('Loading attach at url = :url', [':url' => $url]);
 
             // TODO Replace with system-wide crawler
-            $request = Request::factory($url);
+            $request  = Request::factory($url);
             $response = $request->execute();
 
             if ($response->status() !== 200) {
@@ -370,9 +399,8 @@ class Task_Content_Import_Wordpress extends AbstractTask
                 ':total'   => $total,
             ]);
 
-            $content_post_orm = $this->model_factory_content_post();
-
-            $model = $content_post_orm->find_by_wp_id($id);
+            /** @var ContentPost|null $model */
+            $model = $this->postRepository->find_by_wp_id($id);
 
             // Detect is this is a new record
             $isNew = !$model->get_id();
@@ -396,7 +424,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
             $model->setCreatedBy($this->user);
 
             // Saving model and getting its ID for further processing
-            $model->save();
+            $this->postRepository->save($model);
 
             $model->setLabel($name);
             $model->setContent($content);
@@ -434,7 +462,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
             }
 
             // Saving model content
-            $model->save();
+            $this->postRepository->save($model);
 
             $current++;
         }
@@ -449,7 +477,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
         }
     }
 
-    protected function post_process_article_text(Model_ContentPost $item): void
+    protected function post_process_article_text(ContentPost $item): void
     {
         $this->debug('Text post processing...');
 
@@ -481,7 +509,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
     }
 
     /**
-     * Dirty hack for php-dom library that creates CustomTag elements with closing tags
+     * Dirty hack for php-dom library that creates CustomTagFacade elements with closing tags
      *
      * @param string $text
      *
@@ -489,7 +517,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
      */
     private function removeClosingCustomTags($text): string
     {
-        $ct = CustomTag::instance();
+        $ct = CustomTagFacade::instance();
 
         foreach ($ct->getSelfClosingTags() as $tag) {
             $text = str_replace('></'.$tag.'>', ' />', $text);
@@ -502,7 +530,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
 //    {
 //        $this->debug('Removing links on content images...');
 //
-//        $tag = CustomTag::PHOTO;
+//        $tag = CustomTagFacade::PHOTO;
 //
 //        $images = $root->find('a > '.$tag);
 //
@@ -539,10 +567,10 @@ class Task_Content_Import_Wordpress extends AbstractTask
 
             $model = $this->process_attachment($attach, $post_id);
 
-            $new_url = $model->getOriginalUrl();
+            $new_url = $this->assetsHelper->getOriginalUrl($model);
 
-            $attach = $document->createElement(CustomTag::ATTACHMENT, null, [
-                'id' => $model->get_id(),
+            $attach = $document->createElement(CustomTagFacade::ATTACHMENT, null, [
+                'id' => $model->getID(),
             ]);
 
             $link->replace($attach);
@@ -551,7 +579,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
         }
     }
 
-    protected function process_thumbnails(Model_ContentPost $post, array $meta): void
+    protected function process_thumbnails(ContentPost $post, array $meta): void
     {
         $wp    = $this->wp();
         $wp_id = $post->get_wp_id();
@@ -596,7 +624,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
         $provider = $this->assets_provider_content_post_thumbnail();
 
         foreach ($images_wp_data as $image_data) {
-            /** @var Model_ContentPostThumbnail $image_model */
+            /** @var ContentPostThumbnail $image_model */
             $image_model = $this->process_attachment($image_data, $post->get_id(), $provider);
 
             // Linking image to post
@@ -604,7 +632,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
         }
     }
 
-    protected function process_custom_tags(Model_ContentPost $item): void
+    protected function process_custom_tags(ContentPost $item): void
     {
         $this->debug('Processing custom tags...');
 
@@ -646,7 +674,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
         $item->setContent($content);
     }
 
-    public function thunder_handler_caption(ShortcodeInterface $s, Model_ContentPost $post): ?string
+    public function thunder_handler_caption(ShortcodeInterface $s, ContentPost $post): ?string
     {
         $this->debug('[caption] found');
 
@@ -671,10 +699,13 @@ class Task_Content_Import_Wordpress extends AbstractTask
 
         $parameters['title'] = $caption_text;
 
-        return $this->custom_tag_instance()->generateHtml(CustomTag::CAPTION, $image->get_id(), $parameters);
+        return $this->custom_tag_instance()->generateHtml(CustomTagFacade::CAPTION, $image->getID(), $parameters);
     }
 
-    public function thunder_handler_gallery(\Thunder\Shortcode\Shortcode\ShortcodeInterface $s, Model_ContentPost $post): ?string
+    public function thunder_handler_gallery(
+        \Thunder\Shortcode\Shortcode\ShortcodeInterface $s,
+        ContentPost $post
+    ): ?string
     {
         $this->debug('[gallery] found');
 
@@ -703,7 +734,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
         // Process every image in set
         foreach ($wp_images as $wp_image_data) {
             $model        = $this->process_attachment($wp_image_data, $post->get_id());
-            $images_ids[] = $model->get_id();
+            $images_ids[] = $model->getID();
         }
 
         $attributes = [
@@ -713,11 +744,13 @@ class Task_Content_Import_Wordpress extends AbstractTask
         ];
 
         // No ID in this tag
-        return $this->custom_tag_instance()->generateHtml(CustomTag::GALLERY, null, $attributes);
+        return $this->custom_tag_instance()->generateHtml(CustomTagFacade::GALLERY, null, $attributes);
     }
 
-    public function thunder_handler_wonderplugin(\Thunder\Shortcode\Shortcode\ShortcodeInterface $s, Model_ContentPost $post): string
-    {
+    public function thunder_handler_wonderplugin(
+        \Thunder\Shortcode\Shortcode\ShortcodeInterface $s,
+        ContentPost $post
+    ): string {
         $this->debug('[wonderplugin_slider] found');
 
         $id = $s->getParameter('id');
@@ -742,20 +775,22 @@ class Task_Content_Import_Wordpress extends AbstractTask
                 throw new TaskException('Unknown image in wonderplugin: :url', [':url' => $url]);
             }
 
-            // Processing image
+            if (!$wp_image['post_excerpt']) {
+                $caption = $slide['title'] ?: $slide['alt'];
 
-            /** @var Model_ContentImageElement $image */
-            $image = $this->process_attachment($wp_image, $post->get_id());
-
-            $caption = $slide['title'] ?: $slide['alt'];
-
-            if ($caption) {
-                $image->setTitle($caption)->save();
+                // Preset image title
+                $wp_image['post_excerpt'] = $caption;
             }
 
-            $this->debug('Adding image :id to wonderplugin slider', [':id' => $image->get_id()]);
+            // Processing image
 
-            $images_ids[] = $image->get_id();
+            /** @var \BetaKiller\Assets\Model\AssetsModelImageInterface $image */
+            $image = $this->process_attachment($wp_image, $post->get_id());
+
+
+            $this->debug('Adding image :id to wonderplugin slider', [':id' => $image->getID()]);
+
+            $images_ids[] = $image->getID();
         }
 
         $attributes = [
@@ -764,7 +799,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
         ];
 
         // No ID in this tag
-        return $this->custom_tag_instance()->generateHtml(CustomTag::GALLERY, null, $attributes);
+        return $this->custom_tag_instance()->generateHtml(CustomTagFacade::GALLERY, null, $attributes);
     }
 
     /**
@@ -802,7 +837,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
             // Remove links to content images coz they would be added automatically
             if ($parentTagName === 'a' && $parent->attr('href') === $image->attr('src')) {
                 // Mark image as "zoomable"
-                $targetTag->attr(CustomTag::PHOTO_ZOOMABLE, CustomTag::PHOTO_ZOOMABLE_ENABLED);
+                $targetTag->attr(CustomTagFacade::PHOTO_ZOOMABLE, CustomTagFacade::PHOTO_ZOOMABLE_ENABLED);
                 $parent->replace($targetTag);
             } else {
                 $image->replace($targetTag);
@@ -828,7 +863,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
             throw new TaskException('Unknown image with src :value', [':value' => $original_url]);
         }
 
-        /** @var Model_ContentImageElement $image */
+        /** @var ContentImage $image */
         $image = $this->process_attachment($wp_image, $entity_item_id);
 
         $alt   = trim(Arr::get($attributes, 'alt'));
@@ -865,18 +900,17 @@ class Task_Content_Import_Wordpress extends AbstractTask
         $attributes['id'] = $image->get_id();
 
         $document = $node->getDocument();
-        $element = $document->createElement(CustomTag::PHOTO);
+        $element  = $document->createElement(CustomTagFacade::PHOTO);
 
         foreach ($attributes as $key => $value) {
             $element->setAttribute($key, $value);
         }
 
         return $element;
-
-//        return $node->getDocument()->createElement(CustomTag::PHOTO, null, $attributes);
+//        return $node->getDocument()->createElement(CustomTagFacade::PHOTO, null, $attributes);
     }
 
-    protected function process_content_youtube_iframes(Model_ContentPost $item): void
+    protected function process_content_youtube_iframes(ContentPost $item): void
     {
         $text = $this->process_youtube_videos_in_text($item->getContent(), $item->get_id());
 
@@ -942,24 +976,24 @@ class Task_Content_Import_Wordpress extends AbstractTask
 
         $service = $this->service_content_youtube();
 
-        $youtube_id = $service->get_youtube_id_from_embed_url($original_url);
+        $youtube_id = $service->getYoutubeIdFromEmbedUrl($original_url);
 
         if (!$youtube_id) {
             throw new TaskException('Youtube iframe ID parsing failed on :string', [':string' => $tag_string]);
         }
 
-        $video = $service->find_record_by_youtube_id($youtube_id);
+        $video = $service->findRecordByYoutubeId($youtube_id);
 
         $width  = trim(Arr::get($attributes, 'width'));
         $height = trim(Arr::get($attributes, 'height'));
 
         // Save width and height in video model if they not set
-        if ($width && !$video->get_width()) {
-            $video->set_width($width);
+        if ($width && !$video->getWidth()) {
+            $video->setWidth($width);
         }
 
-        if ($height && !$video->get_height()) {
-            $video->set_height($height);
+        if ($height && !$video->getHeight()) {
+            $video->setHeight($height);
         }
 
         if ($video->changed()) {
@@ -967,17 +1001,18 @@ class Task_Content_Import_Wordpress extends AbstractTask
         }
 
         $video
-            ->set_uploaded_by($this->user)
+            ->setUploadedBy($this->user)
             ->set_entity($this->get_content_post_entity())
-            ->set_entity_item_id($entity_item_id)
-            ->save();
+            ->set_entity_item_id($entity_item_id);
+
+        $this->youtubeRepository->save($video);
 
         $attributes = [
             'width'  => $width,
             'height' => $height,
         ];
 
-        return $this->custom_tag_instance()->generateHtml(CustomTag::YOUTUBE, $video->get_id(), $attributes);
+        return $this->custom_tag_instance()->generateHtml(CustomTagFacade::YOUTUBE, $video->get_id(), $attributes);
     }
 
     /**
@@ -986,8 +1021,6 @@ class Task_Content_Import_Wordpress extends AbstractTask
     protected function import_categories(): void
     {
         $categories = $this->wp()->get_categories_with_posts();
-
-        $items_orm = $this->model_factory_content_post();
 
         $total   = count($categories);
         $current = 1;
@@ -1003,16 +1036,15 @@ class Task_Content_Import_Wordpress extends AbstractTask
                 ':total'   => $total,
             ]);
 
-            $categories_orm = $this->model_factory_content_category();
-            $category       = $categories_orm->find_by_wp_id($wp_id);
+            /** @var \BetaKiller\Model\ContentCategoryInterface|null $category */
+            $category = $this->categoryRepository->find_by_wp_id($wp_id);
 
-            $category
-                ->set_label($label)
-                ->set_uri($uri);
+            $category->setLabel($label);
+            $category->setUri($uri);
 
             $category->set_wp_id($wp_id);
 
-            $category->save();
+            $this->categoryRepository->save($category);
 
             // Find articles related to current category
             $posts_wp_ids = $this->wp()->get_posts_ids_linked_to_category($wp_id);
@@ -1020,12 +1052,12 @@ class Task_Content_Import_Wordpress extends AbstractTask
             // Check for any linked objects
             if ($posts_wp_ids) {
                 // Get real article IDs
-                $articles_ids = $items_orm->find_ids_by_wp_ids($posts_wp_ids);
+                $articles_ids = $this->postRepository->find_ids_by_wp_ids($posts_wp_ids);
 
                 // Does articles exist?
                 if ($articles_ids) {
                     // Link articles to category
-                    $category->link_posts($articles_ids);
+                    $category->linkPosts($articles_ids);
                 }
             }
 
@@ -1041,13 +1073,15 @@ class Task_Content_Import_Wordpress extends AbstractTask
                 continue;
             }
 
-            $categories_orm = $this->model_factory_content_category();
-            $category       = $categories_orm->find_by_wp_id($wp_id);
-            $parent         = $categories_orm->find_by_wp_id($parent_wp_id);
+            /** @var \BetaKiller\Model\ContentCategoryInterface|null $category */
+            $category = $this->categoryRepository->find_by_wp_id($wp_id);
 
-            $category
-                ->setParent($parent)
-                ->save();
+            /** @var \BetaKiller\Model\ContentCategoryInterface|null $parent */
+            $parent = $this->categoryRepository->find_by_wp_id($parent_wp_id);
+
+            $category->setParent($parent);
+
+            $this->categoryRepository->save($category);
         }
     }
 
@@ -1092,8 +1126,8 @@ class Task_Content_Import_Wordpress extends AbstractTask
             $wpApproved  = $data['approved'];
             $userAgent   = $data['user_agent'];
 
-            /** @var Model_ContentPost $post */
-            $post   = $this->model_factory_content_post()->find_by_wp_id($wpPostID);
+            /** @var ContentPost $post */
+            $post   = $this->postRepository->find_by_wp_id($wpPostID);
             $postID = $post->get_id();
 
             if (!$postID) {
@@ -1103,16 +1137,18 @@ class Task_Content_Import_Wordpress extends AbstractTask
                 ]);
             }
 
-            /** @var Model_ContentComment|null $model */
-            $model = $this->model_factory_content_comment()->find_by_wp_id($wpID);
+            /** @var ContentComment|null $model */
+            $model = $this->commentRepository->find_by_wp_id($wpID);
 
-            $parent = $wpParentID ? $this->model_factory_content_comment()->find_by_wp_id($wpParentID) : null;
+            /** @var ContentComment|null $parent */
+            $parent = $wpParentID ? $this->commentRepository->find_by_wp_id($wpParentID) : null;
 
             if ($wpParentID && !$parent->get_id()) {
-                throw new TaskException('Unknown WP comment parent ID [:parent] used as reference in WP comment :comment', [
-                    ':parent'  => $wpParentID,
-                    ':comment' => $wpID,
-                ]);
+                throw new TaskException('Unknown WP comment parent ID [:parent] used as reference in WP comment :comment',
+                    [
+                        ':parent'  => $wpParentID,
+                        ':comment' => $wpID,
+                    ]);
             }
 
             // Skip existing comments coz they may be edited after import
@@ -1120,8 +1156,9 @@ class Task_Content_Import_Wordpress extends AbstractTask
                 continue;
             }
 
+            $model->setParent($parent);
+
             $model
-                ->setParent($parent)
                 ->set_entity($this->get_content_post_entity())
                 ->set_entity_item_id($post->get_id())
                 ->set_created_at($created_at)
@@ -1154,11 +1191,11 @@ class Task_Content_Import_Wordpress extends AbstractTask
             $model->set_message($message);
 
             try {
-                $model->save();
+                $this->commentRepository->save($model);
             } catch (ORM_Validation_Exception $e) {
                 $this->warning('Comment with WP ID = :id is invalid, skipping :errors', [
                     ':id'     => $wpID,
-                    ':errors' => json_encode($model->get_validation_exception_errors($e)),
+                    ':errors' => json_encode($model->getValidationExceptionErrors($e)),
                 ]);
             }
         }

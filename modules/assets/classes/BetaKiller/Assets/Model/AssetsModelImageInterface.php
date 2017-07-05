@@ -12,46 +12,47 @@ interface AssetsModelImageInterface extends AssetsModelInterface
     /**
      * @return int
      */
-    public function get_id();
-
-    /**
-     * @param string|null $size
-     *
-     * @return string|null
-     */
-    public function getPreviewUrl($size = null);
+    public function getWidth(): int;
 
     /**
      * @return int
      */
-    public function getUploadMaxWidth();
-
-    /**
-     * @return int
-     */
-    public function getUploadMaxHeight();
-
-    /**
-     * @return int
-     */
-    public function getWidth();
-
-    /**
-     * @return int
-     */
-    public function getHeight();
+    public function getHeight(): int;
 
     /**
      * @param int $value
-     *
-     * @return $this
      */
-    public function setWidth($value);
+    public function setWidth(int $value): void;
 
     /**
      * @param int $value
-     *
-     * @return $this
      */
-    public function setHeight($value);
+    public function setHeight(int $value): void;
+
+    /**
+     * @param string $value
+     */
+    public function setAlt(string $value): void;
+
+    /**
+     * @return string
+     */
+    public function getAlt(): string;
+
+    /**
+     * @param string $value
+     */
+    public function setTitle(string $value): void;
+
+    /**
+     * @return string
+     */
+    public function getTitle(): string;
+
+    /**
+     * Returns additional attributes for <img> tag
+     *
+     * @return array
+     */
+    public function getDefaultAttributesForImgTag(): array;
 }

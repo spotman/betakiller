@@ -1,7 +1,8 @@
 <?php
 
-use BetaKiller\Assets\Provider\AbstractAssetsProviderImage;
 use BetaKiller\Assets\Model\AssetsModelInterface;
+use BetaKiller\Assets\Provider\AbstractAssetsProviderImage;
+use BetaKiller\Model\ContentImage;
 
 class Assets_Provider_ContentImage extends AbstractAssetsProviderImage
 {
@@ -10,10 +11,11 @@ class Assets_Provider_ContentImage extends AbstractAssetsProviderImage
     /**
      * Custom upload processing
      *
-     * @param Model_ContentImageElement $model
-     * @param string $content
-     * @param array $_post_data
-     * @param string $file_path Full path to source file
+     * @param ContentImage $model
+     * @param string       $content
+     * @param array        $_post_data
+     * @param string       $file_path Full path to source file
+     *
      * @return string
      */
     protected function customUploadProcessing($model, $content, array $_post_data, $file_path)
@@ -26,35 +28,6 @@ class Assets_Provider_ContentImage extends AbstractAssetsProviderImage
     protected function getStoragePathName()
     {
         return 'images';
-    }
-
-    /**
-     * @return int
-     */
-    public function getUploadMaxHeight()
-    {
-        return $this->getAssetsProviderConfigValue(['upload', 'max-height']);
-    }
-
-    /**
-     * @return int
-     */
-    public function getUploadMaxWidth()
-    {
-        return $this->getAssetsProviderConfigValue(['upload', 'max-width']);
-    }
-
-    /**
-     * Defines allowed sizes for previews
-     * Returns array of strings like this
-     *
-     * array('300x200', '75x75', '400x', 'x250')
-     *
-     * @return array
-     */
-    public function getAllowedPreviewSizes()
-    {
-        return $this->getAssetsProviderConfigValue(['sizes']);
     }
 
     /**

@@ -8,6 +8,12 @@ class Widget_CustomTag_Photo extends AbstractBaseWidget
     use BetaKiller\Helper\ContentTrait;
 
     /**
+     * @var \BetaKiller\Helper\AssetsHelper
+     * @Inject
+     */
+    private $assetsHelper;
+
+    /**
      * Returns data for View rendering
      *
      * @throws \BetaKiller\IFace\Widget\WidgetException
@@ -28,7 +34,7 @@ class Widget_CustomTag_Photo extends AbstractBaseWidget
         $alt      = $this->getContextParam('alt');
         $class    = $this->getContextParam('class');
         $width    = (int)$this->getContextParam('width');
-        $zoomable = ($this->getContextParam(CustomTag::PHOTO_ZOOMABLE) === CustomTag::PHOTO_ZOOMABLE_ENABLED);
+        $zoomable = ($this->getContextParam(CustomTagFacade::PHOTO_ZOOMABLE) === CustomTagFacade::PHOTO_ZOOMABLE_ENABLED);
 
         if (strpos($class, 'align') === false) {
             $classes[] = $align;
@@ -49,7 +55,7 @@ class Widget_CustomTag_Photo extends AbstractBaseWidget
 
         return [
             'zoomable' => $zoomable,
-            'image'    => $model->getAttributesForImgTag($model::SIZE_ORIGINAL, $attributes),
+            'image'    => $this->assetsHelper->getAttributesForImgTag($model, $model::SIZE_ORIGINAL, $attributes),
         ];
     }
 }

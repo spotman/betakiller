@@ -8,6 +8,12 @@ class Widget_CustomTag_Caption extends AbstractBaseWidget
     use BetaKiller\Helper\ContentTrait;
 
     /**
+     * @var \BetaKiller\Helper\AssetsHelper
+     * @Inject
+     */
+    private $assetsHelper;
+
+    /**
      * Returns data for View rendering
      *
      * @throws \BetaKiller\IFace\Widget\WidgetException
@@ -36,7 +42,7 @@ class Widget_CustomTag_Caption extends AbstractBaseWidget
         $model = $this->model_factory_content_image_element()->get_by_id($image_id);
 
         return [
-            'image'     =>  $model->getAttributesForImgTag($model::SIZE_ORIGINAL),
+            'image'     =>  $this->assetsHelper->getAttributesForImgTag($model, $model::SIZE_ORIGINAL),
             'caption'   =>  $title,
             'align'     =>  $align,
             'class'     =>  $class,

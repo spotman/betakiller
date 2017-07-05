@@ -5,7 +5,7 @@ use BetaKiller\Config\AppConfigInterface;
 use BetaKiller\IFace\Exception\IFaceException;
 use BetaKiller\IFace\Url\UrlDataSourceInterface;
 use BetaKiller\IFace\Url\UrlDispatcher;
-use BetaKiller\IFace\Url\UrlParametersInterface;
+use BetaKiller\IFace\Url\UrlContainerInterface;
 use DateInterval;
 use DateTimeInterface;
 use Text;
@@ -102,11 +102,11 @@ abstract class AbstractIFace implements IFaceInterface
     /**
      * Returns processed label
      *
-     * @param UrlParametersInterface|null $params
+     * @param UrlContainerInterface|null $params
      *
      * @return string
      */
-    public function getLabel(UrlParametersInterface $params = null): string
+    public function getLabel(UrlContainerInterface $params = null): string
     {
         return $this->processStringPattern($this->getLabelSource(), null, $params) ?: '';
     }
@@ -162,15 +162,15 @@ abstract class AbstractIFace implements IFaceInterface
     /**
      * Pattern consists of tags like [N[Text]] where N is tag priority
      *
-     * @param string                      $source
-     * @param int|NULL                    $limit
-     * @param UrlParametersInterface|null $params
+     * @param string                     $source
+     * @param int|NULL                   $limit
+     * @param UrlContainerInterface|null $params
      *
      * @todo maybe extract to another helper class
      *
      * @return string
      */
-    private function processStringPattern(?string $source, ?int $limit = null, UrlParametersInterface $params = null): ?string
+    private function processStringPattern(?string $source, ?int $limit = null, UrlContainerInterface $params = null): ?string
     {
         if (!$source) {
             return null;
@@ -419,7 +419,7 @@ abstract class AbstractIFace implements IFaceInterface
         return $this->ifaceHelper->isInStack($this);
     }
 
-    public function isCurrent(UrlParametersInterface $parameters = null): bool
+    public function isCurrent(UrlContainerInterface $parameters = null): bool
     {
         return $this->ifaceHelper->isCurrentIFace($this, $parameters);
     }
@@ -475,7 +475,7 @@ abstract class AbstractIFace implements IFaceInterface
         return $this->getModel()->getAdditionalAclRules();
     }
 
-    public function url(UrlParametersInterface $parameters = null, ?bool $removeCyclingLinks = null, ?bool $withDomain = null): string
+    public function url(UrlContainerInterface $parameters = null, ?bool $removeCyclingLinks = null, ?bool $withDomain = null): string
     {
         $removeCyclingLinks = $removeCyclingLinks ?? true;
         $withDomain = $withDomain ?? true;
@@ -517,7 +517,7 @@ abstract class AbstractIFace implements IFaceInterface
         return $withDomain ? URL::site($path, true) : $path;
     }
 
-    private function makeUri(UrlParametersInterface $parameters = null): string
+    private function makeUri(UrlContainerInterface $parameters = null): string
     {
         // Allow IFace to add custom url generating logic
         $uri = $this->getUri();
@@ -541,12 +541,12 @@ abstract class AbstractIFace implements IFaceInterface
     }
 
     /**
-     * @param \BetaKiller\IFace\Url\UrlParametersInterface $params
-     * @param int|null                                     $limit
+     * @param \BetaKiller\IFace\Url\UrlContainerInterface $params
+     * @param int|null                                    $limit
      *
      * @return string[]
      */
-    public function getPublicAvailableUrls(UrlParametersInterface $params, ?int $limit = null): array
+    public function getPublicAvailableUrls(UrlContainerInterface $params, ?int $limit = null): array
     {
         if (!$this->getModel()->hasDynamicUrl()) {
             // Make static URL
@@ -557,12 +557,12 @@ abstract class AbstractIFace implements IFaceInterface
     }
 
     /**
-     * @param \BetaKiller\IFace\Url\UrlParametersInterface $params
-     * @param int|null                                     $limit
+     * @param \BetaKiller\IFace\Url\UrlContainerInterface $params
+     * @param int|null                                    $limit
      *
      * @return string[]
      */
-    private function getDynamicModelAvailableUrls(UrlParametersInterface $params, ?int $limit = null): array
+    private function getDynamicModelAvailableUrls(UrlContainerInterface $params, ?int $limit = null): array
     {
         $prototype  = $this->prototypeHelper->fromIFaceUri($this);
         $dataSource = $this->prototypeHelper->getDataSourceInstance($prototype);
@@ -573,14 +573,14 @@ abstract class AbstractIFace implements IFaceInterface
         return array_filter($urlsBlocks ? array_merge(...$urlsBlocks) : []);
     }
 
-    private function getDataSourceAvailableUrls(UrlDataSourceInterface $dataSource, string $key, UrlParametersInterface $params, ?int $limit = null): array
+    private function getDataSourceAvailableUrls(UrlDataSourceInterface $dataSource, string $key, UrlContainerInterface $params, ?int $limit = null): array
     {
-        $entities = $dataSource->getEntitiesByUrlKey($key, $params, $limit);
+        $items = $dataSource->getItemsByUrlKey($key, $params, $limit);
         $urlsBlocks  = [];
 
-        foreach ($entities as $entity) {
+        foreach ($items as $item) {
             // Save current item to parameters registry
-            $params->setEntity($entity, true);
+            $params->setParameter($item, true);
 
             // Make dynamic URL
             $urlsBlocks[] = [$this->makeAvailableUrl($params)];
@@ -595,7 +595,7 @@ abstract class AbstractIFace implements IFaceInterface
         return $urlsBlocks;
     }
 
-    private function makeAvailableUrl(UrlParametersInterface $params = null): string
+    private function makeAvailableUrl(UrlContainerInterface $params = null): string
     {
         if (!$this->aclHelper->isIFaceAllowed($this, $params)) {
             return null;

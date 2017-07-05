@@ -2,7 +2,7 @@
 namespace BetaKiller\IFace\Cache;
 
 use BetaKiller\IFace\IFaceInterface;
-use BetaKiller\IFace\Url\UrlParametersInterface;
+use BetaKiller\IFace\Url\UrlContainerInterface;
 use PageCache\SessionHandler;
 use PageCache\StrategyInterface;
 
@@ -14,17 +14,17 @@ class IFacePageCacheStrategy implements StrategyInterface
     protected $iface;
 
     /**
-     * @var \BetaKiller\IFace\Url\UrlParametersInterface
+     * @var \BetaKiller\IFace\Url\UrlContainerInterface
      */
     protected $params;
 
     /**
      * IFacePageCacheStrategy constructor.
      *
-     * @param IFaceInterface                           $iface
-     * @param \BetaKiller\IFace\Url\UrlParametersInterface|null $params
+     * @param IFaceInterface                                   $iface
+     * @param \BetaKiller\IFace\Url\UrlContainerInterface|null $params
      */
-    public function __construct(IFaceInterface $iface, UrlParametersInterface $params = null)
+    public function __construct(IFaceInterface $iface, UrlContainerInterface $params = null)
     {
         $this->iface  = $iface;
         $this->params = $params;

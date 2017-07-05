@@ -4,10 +4,16 @@ namespace BetaKiller\IFace\Admin\Content;
 class CommentIndex extends AbstractCommentList
 {
     /**
-     * @return \Model_ContentComment[]
+     * @Inject
+     * @var \BetaKiller\Repository\ContentCommentRepository
      */
-    protected function get_comments_list()
+    private $commentRepository;
+
+    /**
+     * @return \BetaKiller\Model\ContentComment[]
+     */
+    protected function get_comments_list(): array
     {
-        return $this->model_factory_content_comment()->get_latest_comments();
+        return $this->commentRepository->get_latest_comments();
     }
 }

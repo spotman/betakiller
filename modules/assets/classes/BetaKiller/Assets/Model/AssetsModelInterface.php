@@ -1,36 +1,41 @@
 <?php
 namespace BetaKiller\Assets\Model;
 
+use BetaKiller\Model\AbstractEntityInterface;
 use BetaKiller\Model\UserInterface;
-use DateTime;
+use DateTimeImmutable;
+use DateTimeInterface;
 
 /**
  * Interface AssetsModelInterface
  *
  * Abstract model interface for asset file
  */
-interface AssetsModelInterface
+interface AssetsModelInterface extends AbstractEntityInterface
 {
     /**
      * Returns filename for storage
      *
      * @return string
      */
-    public function getStorageFileName();
+    public function getStorageFileName(): string;
 
     /**
      * Returns file model url (for deploy url and deploy path)
      *
      * @return string
+     * @deprecated Use dedicated AssetsUrlStrategy instead
      */
-    public function getUrl();
+    public function getUrl(): string;
 
     /**
      * Performs file model search by url (deploy url dispatching)
      *
      * @param string $url
      *
-     * @return AssetsModelInterface|NULL
+     * @return AssetsModelInterface|null
+     * @TODO Move to Repository
+     * @deprecated
      */
     public function byUrl($url);
 
@@ -39,101 +44,118 @@ interface AssetsModelInterface
      *
      * @return UserInterface
      */
-    public function getUploadedBy();
+    public function getUploadedBy(): UserInterface;
 
     /**
      * Sets user, who uploaded the file
      *
      * @param UserInterface $user
      *
-     * @return $this
+     * @return AssetsModelInterface
      */
-    public function setUploadedBy(UserInterface $user);
+    public function setUploadedBy(UserInterface $user): AssetsModelInterface;
 
     /**
      * Returns the date and time when asset was uploaded
      *
-     * @return DateTime
+     * @return \DateTimeImmutable
      */
-    public function getUploadedAt();
+    public function getUploadedAt(): DateTimeImmutable;
 
     /**
      * Sets the date and time when asset was uploaded
      *
-     * @param \DateTime $time
+     * @param \DateTimeInterface $time
      *
-     * @return mixed
+     * @return AssetsModelInterface
      */
-    public function setUploadedAt(DateTime $time);
+    public function setUploadedAt(DateTimeInterface $time): AssetsModelInterface;
 
     /**
      * Returns the date and time when asset was last modified
      *
-     * @return DateTime|null
+     * @return \DateTimeImmutable|null
      */
-    public function getLastModifiedAt();
+    public function getLastModifiedAt(): ?DateTimeImmutable;
 
     /**
      * Sets the date and time when asset was last modified
      *
-     * @param \DateTime $time
+     * @param \DateTimeInterface $time
      *
-     * @return mixed
+     * @return AssetsModelInterface
      */
-    public function setLastModifiedAt(DateTime $time);
+    public function setLastModifiedAt(DateTimeInterface $time): AssetsModelInterface;
 
     /**
      * Returns original file name (user-defined filename of uploaded file)
      *
      * @return string
      */
-    public function getOriginalName();
+    public function getOriginalName(): string;
 
     /**
      * Stores original file name (user-defined filename of uploaded file)
      *
-     * @param $name
+     * @param string $name
      *
-     * @return $this
+     * @return AssetsModelInterface
      */
-    public function setOriginalName($name);
+    public function setOriginalName(string $name): AssetsModelInterface;
+
+    /**
+     * Returns unique hash
+     *
+     * @return string
+     */
+    public function getHash(): string;
+
+    /**
+     * Stores unique hash
+     *
+     * @param string $hash
+     *
+     * @return \BetaKiller\Assets\Model\AssetsModelInterface
+     */
+    public function setHash(string $hash): AssetsModelInterface;
 
     /**
      * Returns MIME-type of the file
      *
      * @return string
      */
-    public function getMime();
+    public function getMime(): string;
 
     /**
      * Sets MIME-type of the file
      *
      * @param string $mime
      *
-     * @return $this
+     * @return AssetsModelInterface
      */
-    public function setMime($mime);
+    public function setMime(string $mime): AssetsModelInterface;
 
     /**
      * Returns file size in bytes
      *
      * @return integer
      */
-    public function getSize();
+    public function getSize(): int;
 
     /**
      * Stores file size in bytes
      *
      * @param integer $size
      *
-     * @return $this
+     * @return AssetsModelInterface
      */
-    public function setSize($size);
+    public function setSize(int $size): AssetsModelInterface;
 
     /**
      * Saves the model info
      *
      * @return bool
+     * @deprecated Use Repository pattern instead
      */
     public function save();
 
@@ -141,6 +163,7 @@ interface AssetsModelInterface
      * Removes model
      *
      * @return bool
+     * @deprecated Use Repository pattern instead
      */
     public function delete();
 
@@ -149,26 +172,13 @@ interface AssetsModelInterface
      *
      * @return array
      */
-    public function toJson();
+    public function toJson(): array;
 
     /**
      * Returns TRUE if model is found and loaded
      *
      * @return bool
+     * @deprecated Use Repository pattern instead
      */
     public function loaded();
-
-    /**
-     * Returns URL for uploading new assets
-     *
-     * @return string
-     */
-    public function getUploadUrl();
-
-    /**
-     * Returns URL to original file/image
-     *
-     * @return null|string
-     */
-    public function getOriginalUrl();
 }

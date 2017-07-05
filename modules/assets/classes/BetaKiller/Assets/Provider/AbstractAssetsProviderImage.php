@@ -13,7 +13,7 @@ use Route;
  * Class AbstractAssetsProviderImage
  * Abstract class for all image assets
  */
-abstract class AbstractAssetsProviderImage extends AbstractAssetsProvider
+abstract class AbstractAssetsProviderImage extends AbstractAssetsProvider implements ImageAssetsProviderInterface
 {
     /**
      * @param AssetsModelInterface $model
@@ -22,13 +22,13 @@ abstract class AbstractAssetsProviderImage extends AbstractAssetsProvider
      * @return string
      * @throws AssetsProviderException
      */
-    public function getPreviewUrl(AssetsModelInterface $model, $size = null)
+    public function getPreviewUrl(AssetsModelInterface $model, $size = null): string
     {
         $url = $model->getUrl();
 
         if (!$url) {
-            throw new AssetsProviderException('Model must have url', [
-                ':name' => $model->getStorageFileName(),
+            throw new AssetsProviderException('Model with hash :hash must have url', [
+                ':hash' => $model->getHash(),
             ]);
         }
 
@@ -46,7 +46,7 @@ abstract class AbstractAssetsProviderImage extends AbstractAssetsProvider
         return Route::url('assets-provider-item-preview', $options);
     }
 
-    private function makeSizeString($width = null, $height = null)
+    private function makeSizeString($width = null, $height = null): string
     {
         return $width.AssetsModelImageInterface::SIZE_DELIMITER.$height;
     }
@@ -56,7 +56,7 @@ abstract class AbstractAssetsProviderImage extends AbstractAssetsProvider
      *
      * @return int[]
      */
-    private function parseSizeDimensions($size)
+    private function parseSizeDimensions($size): array
     {
         $dimensions = explode(AssetsModelImageInterface::SIZE_DELIMITER, $size);
         $width      = $dimensions[0] ? (int)$dimensions[0] : null;
@@ -65,7 +65,7 @@ abstract class AbstractAssetsProviderImage extends AbstractAssetsProvider
         return $this->packDimensions($width, $height);
     }
 
-    private function packDimensions($width, $height)
+    private function packDimensions($width, $height): array
     {
         return [$width, $height];
     }
@@ -76,7 +76,7 @@ abstract class AbstractAssetsProviderImage extends AbstractAssetsProvider
      * @return string
      * @throws \BetaKiller\Assets\AssetsProviderException
      */
-    private function determineSize($size)
+    private function determineSize($size): string
     {
         $allowed_sizes = $this->getAllowedPreviewSizes();
 
@@ -100,7 +100,7 @@ abstract class AbstractAssetsProviderImage extends AbstractAssetsProvider
      * @return float
      * @throws \BetaKiller\Assets\AssetsProviderException
      */
-    private function calculateDimensionsRatio($width, $height)
+    private function calculateDimensionsRatio($width, $height): float
     {
         if (!$height || !$width) {
             throw new AssetsProviderException('Can not calculate ratio for incomplete dimensions :size', [
@@ -111,7 +111,7 @@ abstract class AbstractAssetsProviderImage extends AbstractAssetsProvider
         return $width / $height;
     }
 
-    private function restoreOmittedDimensions($width, $height, $original_ratio)
+    private function restoreOmittedDimensions($width, $height, $original_ratio): array
     {
         // Fill omitted dimensions
         if (!$width) {
@@ -123,7 +123,7 @@ abstract class AbstractAssetsProviderImage extends AbstractAssetsProvider
         return $this->packDimensions($width, $height);
     }
 
-    public function makePreview(AssetsModelImageInterface $model, $size)
+    public function makePreview(AssetsModelImageInterface $model, $size): string
     {
         $size = $this->determineSize($size);
 
@@ -145,7 +145,7 @@ abstract class AbstractAssetsProviderImage extends AbstractAssetsProvider
         );
     }
 
-    protected function checkPreviewSize($size)
+    protected function checkPreviewSize($size): void
     {
         $allowedSizes = $this->getAllowedPreviewSizes();
 
@@ -163,7 +163,7 @@ abstract class AbstractAssetsProviderImage extends AbstractAssetsProvider
      * @return string
      * @throws AssetsProviderException
      */
-    protected function customUploadProcessing($model, $content, array $_post_data, $file_path)
+    protected function customUploadProcessing($model, string $content, ?array $_post_data, string $file_path): string
     {
         $max_width  = $this->getUploadMaxWidth();
         $max_height = $this->getUploadMaxHeight();
@@ -193,12 +193,12 @@ abstract class AbstractAssetsProviderImage extends AbstractAssetsProvider
      * @param AssetsModelImageInterface $model
      * @param array                     $_post_data
      */
-    protected function postUploadProcessing($model, array $_post_data)
+    protected function postUploadProcessing($model, ?array $_post_data): void
     {
         $this->presetWidthAndHeight($model);
 
         // Save dimensions
-        $model->save();
+        $this->saveModel($model);
 
         parent::postUploadProcessing($model, $_post_data);
     }
@@ -210,15 +210,14 @@ abstract class AbstractAssetsProviderImage extends AbstractAssetsProvider
      *
      * @throws AssetsProviderException
      */
-    protected function presetWidthAndHeight(AssetsModelImageInterface $model)
+    protected function presetWidthAndHeight(AssetsModelImageInterface $model): void
     {
         $content = $this->getContent($model);
 
         $info = Image::from_content($content);
 
-        $model
-            ->setWidth($info->width)
-            ->setHeight($info->height);
+        $model->setWidth($info->width);
+        $model->setHeight($info->height);
     }
 
     /**
@@ -230,7 +229,7 @@ abstract class AbstractAssetsProviderImage extends AbstractAssetsProvider
      * @returns string Processed content
      * @throws AssetsProviderException
      */
-    protected function resize($originalContent, $width, $height, $quality)
+    protected function resize($originalContent, $width, $height, $quality): string
     {
         $image = Image::from_content($originalContent);
 
@@ -258,15 +257,17 @@ abstract class AbstractAssetsProviderImage extends AbstractAssetsProvider
         }
     }
 
-    protected function getItemDeployFilename(Request $request)
+    protected function getItemDeployFilename(Request $request): string
     {
         $size = $request->param('size');
 
         return $request->action().($size ? '-'.$size : '').'.'.$request->param('ext');
     }
 
-    public function getArgumentsForImgTag(AssetsModelImageInterface $model, $size, array $attributes = [])
+    public function getAttributesForImgTag(AssetsModelImageInterface $model, ?string $size, array $attributes = null): array
     {
+        $attributes = array_merge($model->getDefaultAttributesForImgTag(), $attributes ?? []);
+
         $original_url = $this->getOriginalUrl($model);
 
         if ($size === AssetsModelImageInterface::SIZE_ORIGINAL) {
@@ -294,7 +295,7 @@ abstract class AbstractAssetsProviderImage extends AbstractAssetsProvider
             'height'            => $height,
             'srcset'            => $this->getSrcsetAttributeValue($model, $image_ratio),
             'data-original-url' => $original_url,
-            'data-id'           => $model->get_id(),
+            'data-id'           => $model->getID(),
         ], $attributes);
 
         return $attributes;
@@ -306,7 +307,7 @@ abstract class AbstractAssetsProviderImage extends AbstractAssetsProvider
      *
      * @return string
      */
-    protected function getSrcsetAttributeValue(AssetsModelImageInterface $model, $ratio = null)
+    protected function getSrcsetAttributeValue(AssetsModelImageInterface $model, $ratio = null): string
     {
         $modelRatio = $this->getModelRatio($model);
 
@@ -321,7 +322,7 @@ abstract class AbstractAssetsProviderImage extends AbstractAssetsProvider
             foreach ($sizes as $size) {
                 $width    = (int)$size;
                 $url      = $this->getPreviewUrl($model, $size);
-                $srcset[] = $this->make_srcset_width_option($url, $width);
+                $srcset[] = $this->makeSrcsetWidthOption($url, $width);
             }
         }
 
@@ -329,13 +330,13 @@ abstract class AbstractAssetsProviderImage extends AbstractAssetsProvider
         if ($modelRatio === $ratio) {
             // Add srcset for original image
             $url      = $this->getOriginalUrl($model);
-            $srcset[] = $this->make_srcset_width_option($url, $model->getWidth());
+            $srcset[] = $this->makeSrcsetWidthOption($url, $model->getWidth());
         }
 
         return implode(', ', array_filter($srcset));
     }
 
-    protected function getSrcsetSizes($ratio = null)
+    protected function getSrcsetSizes($ratio = null): array
     {
         $allowed_sizes = $this->getAllowedPreviewSizes();
 
@@ -348,7 +349,7 @@ abstract class AbstractAssetsProviderImage extends AbstractAssetsProvider
 
         // Filtering sizes by ratio
         foreach ($allowed_sizes as $size) {
-            $size_ratio = $this->get_size_ratio($size, $ratio);
+            $size_ratio = $this->getSizeRatio($size, $ratio);
 
             // Skip sizes with another ratio
             if ($ratio !== $size_ratio) {
@@ -361,7 +362,7 @@ abstract class AbstractAssetsProviderImage extends AbstractAssetsProvider
         return $sizes;
     }
 
-    protected function get_size_ratio($size, $original_ratio = null)
+    protected function getSizeRatio($size, $original_ratio = null): float
     {
         $dimensions = $this->parseSizeDimensions($size);
 
@@ -372,12 +373,12 @@ abstract class AbstractAssetsProviderImage extends AbstractAssetsProvider
         return $this->calculateDimensionsRatio($dimensions[0], $dimensions[1]);
     }
 
-    protected function getModelRatio(AssetsModelImageInterface $image)
+    protected function getModelRatio(AssetsModelImageInterface $image): float
     {
         return $this->calculateDimensionsRatio($image->getWidth(), $image->getHeight());
     }
 
-    protected function make_srcset_width_option($url, $width)
+    protected function makeSrcsetWidthOption($url, $width): string
     {
         return $url.' '.$width.'w';
     }
@@ -385,12 +386,18 @@ abstract class AbstractAssetsProviderImage extends AbstractAssetsProvider
     /**
      * @return int
      */
-    abstract public function getUploadMaxHeight();
+    public function getUploadMaxHeight(): ?int
+    {
+        return $this->getAssetsProviderConfigValue(['upload', 'max-height']);
+    }
 
     /**
      * @return int
      */
-    abstract public function getUploadMaxWidth();
+    public function getUploadMaxWidth(): ?int
+    {
+        return $this->getAssetsProviderConfigValue(['upload', 'max-width']);
+    }
 
     /**
      * Defines allowed sizes for previews
@@ -400,7 +407,10 @@ abstract class AbstractAssetsProviderImage extends AbstractAssetsProvider
      *
      * @return array
      */
-    abstract public function getAllowedPreviewSizes();
+    public function getAllowedPreviewSizes(): array
+    {
+        return $this->getAssetsProviderConfigValue(['sizes']);
+    }
 
     /**
      * @return int

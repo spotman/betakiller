@@ -30,7 +30,7 @@ trait ContentTrait
      */
     protected function assets_provider_content_image()
     {
-        return \BetaKiller\Assets\AssetsProviderFactory::instance()->create('ContentImage');
+        return \BetaKiller\Assets\AssetsProviderFactory::instance()->createFromModelCodename('ContentImage');
     }
 
     /**
@@ -38,7 +38,7 @@ trait ContentTrait
      */
     protected function assets_provider_content_attachment()
     {
-        return \BetaKiller\Assets\AssetsProviderFactory::instance()->create('ContentAttachment');
+        return \BetaKiller\Assets\AssetsProviderFactory::instance()->createFromModelCodename('ContentAttachment');
     }
 
     /**
@@ -46,13 +46,13 @@ trait ContentTrait
      */
     protected function assets_provider_content_post_thumbnail()
     {
-        return \BetaKiller\Assets\AssetsProviderFactory::instance()->create('ContentPostThumbnail');
+        return \BetaKiller\Assets\AssetsProviderFactory::instance()->createFromModelCodename('ContentPostThumbnail');
     }
 
     /**
      * @param int|null $id
      *
-     * @return \Model_ContentPost|\BetaKiller\Utils\Kohana\ORM\OrmInterface
+     * @return \BetaKiller\Model\ContentPost|\BetaKiller\Utils\Kohana\ORM\OrmInterface
      */
     public function model_factory_content_post($id = null)
     {
@@ -61,7 +61,7 @@ trait ContentTrait
 
     /**
      * @param int|null $id
-     * @return \Model_ContentCategory|\BetaKiller\Utils\Kohana\ORM\OrmInterface
+     * @return \BetaKiller\Model\ContentCategory|\BetaKiller\Utils\Kohana\ORM\OrmInterface
      */
     public function model_factory_content_category($id = null)
     {
@@ -79,7 +79,7 @@ trait ContentTrait
 
     /**
      * @param int|null $id
-     * @return \Model_ContentImageElement|\BetaKiller\Utils\Kohana\ORM\OrmInterface
+     * @return \BetaKiller\Model\ContentImage|\BetaKiller\Utils\Kohana\ORM\OrmInterface
      */
     protected function model_factory_content_image_element($id = NULL)
     {
@@ -88,7 +88,7 @@ trait ContentTrait
 
     /**
      * @param int|null $id
-     * @return \Model_ContentPostThumbnail|\BetaKiller\Utils\Kohana\ORM\OrmInterface
+     * @return \BetaKiller\Model\ContentPostThumbnail|\BetaKiller\Utils\Kohana\ORM\OrmInterface
      */
     protected function model_factory_content_post_thumbnail($id = NULL)
     {
@@ -97,7 +97,7 @@ trait ContentTrait
 
     /**
      * @param int|null $id
-     * @return \Model_ContentAttachmentElement|\BetaKiller\Utils\Kohana\ORM\OrmInterface
+     * @return \BetaKiller\Model\ContentAttachment|\BetaKiller\Utils\Kohana\ORM\OrmInterface
      */
     protected function model_factory_content_attachment_element($id = NULL)
     {
@@ -106,7 +106,7 @@ trait ContentTrait
 
     /**
      * @param int|null $id
-     * @return \Model_ContentYoutubeRecord|\BetaKiller\Utils\Kohana\ORM\OrmInterface
+     * @return \BetaKiller\Model\ContentYoutubeRecord|\BetaKiller\Utils\Kohana\ORM\OrmInterface
      */
     protected function model_factory_content_youtube_record($id = NULL)
     {
@@ -124,7 +124,7 @@ trait ContentTrait
 
     /**
      * @param int|null $id
-     * @return \Model_ContentComment|\BetaKiller\Utils\Kohana\ORM\OrmInterface
+     * @return \BetaKiller\Model\ContentComment|\BetaKiller\Utils\Kohana\ORM\OrmInterface
      */
     protected function model_factory_content_comment($id = NULL)
     {
@@ -132,7 +132,7 @@ trait ContentTrait
     }
 
     /**
-     * @return \Model_ContentCommentStatus|\BetaKiller\Utils\Kohana\ORM\OrmInterface
+     * @return \BetaKiller\Model\ContentCommentStatus|\BetaKiller\Utils\Kohana\ORM\OrmInterface
      */
     protected function model_factory_content_comment_status()
     {
@@ -140,10 +140,10 @@ trait ContentTrait
     }
 
     /**
-     * @return \CustomTag
+     * @return \CustomTagFacade
      */
     protected function custom_tag_instance()
     {
-        return \CustomTag::instance();
+        return \CustomTagFacade::instance();
     }
 }

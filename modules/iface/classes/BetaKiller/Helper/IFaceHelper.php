@@ -7,7 +7,7 @@ use BetaKiller\IFace\IFaceFactory;
 use BetaKiller\IFace\IFaceInterface;
 use BetaKiller\IFace\IFaceModelInterface;
 use BetaKiller\IFace\IFaceStack;
-use BetaKiller\IFace\Url\UrlParametersInterface;
+use BetaKiller\IFace\Url\UrlContainerInterface;
 use BetaKiller\IFace\View\IFaceView;
 use BetaKiller\IFace\Widget\WidgetInterface;
 use BetaKiller\IFace\WidgetFactory;
@@ -86,7 +86,7 @@ class IFaceHelper
         return $currentZone === $zone;
     }
 
-    public function isCurrentIFace(IFaceInterface $iface, UrlParametersInterface $params = null): bool
+    public function isCurrentIFace(IFaceInterface $iface, UrlContainerInterface $params = null): bool
     {
         return $this->stack->isCurrent($iface, $params);
     }
@@ -160,7 +160,7 @@ class IFaceHelper
         // TODO Fetch linked entities from current entity on-demand
 
         $params = $this->paramsHelper->createEmpty();
-        $params->setEntity($entity);
+        $params->setParameter($entity);
         $entity->presetLinkedEntities($params);
 
         return $iface->url($params);

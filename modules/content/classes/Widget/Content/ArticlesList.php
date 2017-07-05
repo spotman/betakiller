@@ -1,14 +1,17 @@
 <?php
 
 use BetaKiller\IFace\Widget\AbstractBaseWidget;
+use BetaKiller\Model\ContentPost;
 use BetaKiller\Model\IFaceZone;
+use BetaKiller\Model\ContentCategory;
+use BetaKiller\Search\SearchResultsInterface;
 
 class Widget_Content_ArticlesList extends AbstractBaseWidget
 {
     use \BetaKiller\Helper\ContentTrait;
 
     const CATEGORY_ID_QUERY_KEY = 'category-id';
-    const PAGE_QUERY_KEY = 'page';
+    const PAGE_QUERY_KEY        = 'page';
     const SEARCH_TERM_QUERY_KEY = 'term';
 
     /**
@@ -17,7 +20,19 @@ class Widget_Content_ArticlesList extends AbstractBaseWidget
      */
     private $urlParametersHelper;
 
-    protected $items_per_page = 12;
+    /**
+     * @var \BetaKiller\Helper\ContentHelper
+     * @Inject
+     */
+    private $contentHelper;
+
+    /**
+     * @var \BetaKiller\Helper\AssetsHelper
+     * @Inject
+     */
+    private $assetsHelper;
+
+    protected $itemsPerPage = 12;
 
     /**
      * Returns data for View rendering
@@ -42,36 +57,36 @@ class Widget_Content_ArticlesList extends AbstractBaseWidget
     {
         $posts_data = [];
 
-        $page = (int) $this->query(self::PAGE_QUERY_KEY) ?: 1;
+        $page = (int)$this->query(self::PAGE_QUERY_KEY) ?: 1;
         $term = $this->get_search_term();
 
         $category = $this->get_category();
-        $results = $this->get_articles($page, $category, $term);
+        $results  = $this->get_articles($page, $category, $term);
 
-        /** @var Model_ContentPost[] $articles */
+        /** @var ContentPost[] $articles */
         $articles = $results->getItems();
 
         foreach ($articles as $article) {
             $thumbnail = $article->getFirstThumbnail();
 
             $posts_data[] = [
-                'thumbnail' => [
-                    'original' => $thumbnail->getAttributesForImgTag($thumbnail::SIZE_ORIGINAL),
-                    'preview' => $thumbnail->getAttributesForImgTag($thumbnail::SIZE_PREVIEW),
+                'thumbnail'  => [
+                    'original' => $this->assetsHelper->getAttributesForImgTag($thumbnail, $thumbnail::SIZE_ORIGINAL),
+                    'preview'  => $this->assetsHelper->getAttributesForImgTag($thumbnail, $thumbnail::SIZE_PREVIEW),
                 ],
-                'url'           =>  $this->ifaceHelper->getReadEntityUrl($article, IFaceZone::PUBLIC_ZONE),
-                'label'         =>  $article->getLabel(),
-                'title'         =>  $article->getTitle(),
-                'text'          =>  $article->getContentPreview(),
-                'created_at'    =>  $article->getCreatedAt()->format('d.m.Y'),
+                'url'        => $this->ifaceHelper->getReadEntityUrl($article, IFaceZone::PUBLIC_ZONE),
+                'label'      => $article->getLabel(),
+                'title'      => $article->getTitle(),
+                'text'       => $this->contentHelper->getPostContentPreview($article),
+                'created_at' => $article->getCreatedAt()->format('d.m.Y'),
             ];
         }
 
         if ($results->hasNextPage()) {
             $url_params = [
-                self::SEARCH_TERM_QUERY_KEY     =>  $term,
-                self::PAGE_QUERY_KEY            =>  $page + 1,
-                self::CATEGORY_ID_QUERY_KEY     =>  $category ? $category->get_id() : null,
+                self::SEARCH_TERM_QUERY_KEY => $term,
+                self::PAGE_QUERY_KEY        => $page + 1,
+                self::CATEGORY_ID_QUERY_KEY => $category ? $category->get_id() : null,
             ];
 
             $moreURL = $this->url('more').'?'.http_build_query(array_filter($url_params));
@@ -80,15 +95,15 @@ class Widget_Content_ArticlesList extends AbstractBaseWidget
         }
 
         return [
-            'articles'  =>  $posts_data,
-            'moreURL'   =>  $moreURL,
+            'articles' => $posts_data,
+            'moreURL'  => $moreURL,
         ];
     }
 
     protected function get_category()
     {
         if ($this->is_ajax()) {
-            $category_id = (int) $this->query(self::CATEGORY_ID_QUERY_KEY);
+            $category_id = (int)$this->query(self::CATEGORY_ID_QUERY_KEY);
 
             return $this->model_factory_content_category($category_id);
         }
@@ -103,24 +118,15 @@ class Widget_Content_ArticlesList extends AbstractBaseWidget
 
     /**
      * @param                             $page
-     * @param \Model_ContentCategory|null $category
-     * @param null                        $term
+     * @param \BetaKiller\Model\ContentCategory|null $category
+     * @param null $term
      *
-     * @return \BetaKiller\Search\Model\Results
+     * @return \BetaKiller\Search\SearchResultsInterface
      */
-    protected function get_articles($page, Model_ContentCategory $category = null, $term = null): \BetaKiller\Search\Model\Results
+    protected function get_articles($page, ContentCategory $category = null, $term = null): SearchResultsInterface
     {
-        $posts_orm = $this->model_factory_content_post();
+        $postRepo = $this->contentHelper->getPostRepository();
 
-        if ($category && $category->get_id()) {
-            $categories_ids = $category->get_all_related_categories_ids();
-            $posts_orm->filterCategoryIDs($categories_ids);
-        }
-
-        if ($term) {
-            $posts_orm->search($term);
-        }
-
-        return $posts_orm->filterArticles()->orderByCreatedAt()->getSearchResults($page, $this->items_per_page);
+        return $postRepo->searchArticles($page, $this->itemsPerPage, $category, $term);
     }
 }

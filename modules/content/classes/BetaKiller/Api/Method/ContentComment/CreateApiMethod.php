@@ -10,7 +10,7 @@ class CreateApiMethod extends AbstractEntityCreateApiMethod
     /**
      * Implement this method
      *
-     * @param \Model_ContentComment $model
+     * @param \BetaKiller\Model\ContentComment $model
      * @param                       $data
      *
      * @throws \Spotman\Api\ApiMethodException

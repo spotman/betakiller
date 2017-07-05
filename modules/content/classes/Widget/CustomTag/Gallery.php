@@ -9,6 +9,12 @@ class Widget_CustomTag_Gallery extends AbstractBaseWidget
     use BetaKiller\Helper\LogTrait;
 
     /**
+     * @var \BetaKiller\Helper\AssetsHelper
+     * @Inject
+     */
+    private $assetsHelper;
+
+    /**
      * Returns data for View rendering
      *
      * @throws \BetaKiller\IFace\Widget\WidgetException
@@ -46,7 +52,7 @@ class Widget_CustomTag_Gallery extends AbstractBaseWidget
                 continue;
             }
 
-            $images[] = $model->getAttributesForImgTag($model::SIZE_PREVIEW);
+            $images[] = $this->assetsHelper->getAttributesForImgTag($model, $model::SIZE_PREVIEW);
         }
 
         if (!$images) {

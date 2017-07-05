@@ -12,7 +12,7 @@ trait ContentPostMethodTrait
      *
      * @param int|null $id
      *
-     * @return \Model_ContentPost
+     * @return \BetaKiller\Model\ContentPost
      */
     protected function createEntity($id = null)
     {

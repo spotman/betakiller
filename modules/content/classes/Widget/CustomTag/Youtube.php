@@ -35,7 +35,7 @@ class Widget_CustomTag_Youtube extends AbstractBaseWidget
 //        $classes['align'] = $align;
 //
 //        $attributes = [
-//            'id'        =>  'admin-image-'.$model->get_id(),
+//            'id'        =>  'admin-image-'.$model->getID(),
 //            'title' =>  $title ?: $model->get_title(),
 //            'alt'   =>  $alt ?: $model->getAlt(),
 //            'class' =>  implode(' ', array_unique($classes)),
@@ -48,7 +48,7 @@ class Widget_CustomTag_Youtube extends AbstractBaseWidget
         return [
             'video' => [
                 // TODO
-                'src'       =>  $model->get_youtube_embed_url(),
+                'src'       =>  $model->getYoutubeEmbedUrl(),
                 'width'     =>  $width,
                 'height'    =>  $height,
             ],

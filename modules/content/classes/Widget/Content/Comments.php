@@ -1,18 +1,27 @@
 <?php
 
-use BetaKiller\Helper\ContentTrait;
 use BetaKiller\IFace\Widget\AbstractBaseWidget;
 use BetaKiller\IFace\Widget\WidgetException;
 
 class Widget_Content_Comments extends AbstractBaseWidget
 {
-    use ContentTrait;
-
     /**
      * @Inject
      * @var \BetaKiller\Model\UserInterface
      */
     private $user;
+
+    /**
+     * @Inject
+     * @var \BetaKiller\Repository\ContentCommentRepository
+     */
+    private $commentRepository;
+
+    /**
+     * @Inject
+     * @var \BetaKiller\Repository\EntityRepository
+     */
+    private $entityRepository;
 
     /**
      * Returns data for View rendering
@@ -33,9 +42,9 @@ class Widget_Content_Comments extends AbstractBaseWidget
             throw new WidgetException('[entity_item_id] must be provided via widget context');
         }
 
-        $entity = $this->model_factory_content_entity()->findBySlug($entitySlug);
+        $entity = $this->entityRepository->findBySlug($entitySlug);
 
-        $comments = $this->model_factory_content_comment()->get_entity_item_approved_comments($entity, $entityItemId);
+        $comments = $this->commentRepository->getEntityItemApprovedComments($entity, $entityItemId);
 
         $commentsData = [];
 
@@ -82,7 +91,7 @@ class Widget_Content_Comments extends AbstractBaseWidget
             throw new WidgetException('[entityItemId] must be provided via request');
         }
 
-        $entity = $this->model_factory_content_entity()->findBySlug($entitySlug);
+        $entity = $this->entityRepository->findBySlug($entitySlug);
 
         // Validation
         $validation = Validation::factory($this->post());
@@ -105,7 +114,8 @@ class Widget_Content_Comments extends AbstractBaseWidget
         $agent     = HTML::chars($this->getRequest()->get_user_agent());
         $parentID  = (int)$this->post('parent');
 
-        $parentModel = $parentID ? $this->model_factory_content_comment()->get_by_id($parentID) : null;
+        /** @var \BetaKiller\Model\ContentComment|null $parentModel */
+        $parentModel = $parentID ? $this->commentRepository->findById($parentID) : null;
 
         // Check parent comment
         if ($parentModel) {
@@ -116,7 +126,7 @@ class Widget_Content_Comments extends AbstractBaseWidget
             if (!$parentEntity->isEqualTo($entity)) {
                 throw new WidgetException('Incorrect parent comment entity; :sent sent instead of :needed', [
                     ':needed' => $entity->get_id(),
-                    ':sent'   => $parentEntity->get_id(),
+                    ':sent'   => $parentEntity->getID(),
                 ]);
             }
 
@@ -130,14 +140,14 @@ class Widget_Content_Comments extends AbstractBaseWidget
         }
 
         // Throttling
-        $commentsCount = $this->model_factory_content_comment()->get_comments_count_for_ip($ipAddress);
+        $commentsCount = $this->commentRepository->getCommentsCountForIP($ipAddress);
 
         if ($commentsCount > 5) {
             throw new WidgetException('Throttling enabled for IP :ip', [':ip' => $ipAddress]);
         }
 
         $user  = $this->user;
-        $model = $this->model_factory_content_comment();
+        $model = $this->commentRepository->create();
 
         $model->draft();
 
@@ -165,11 +175,14 @@ class Widget_Content_Comments extends AbstractBaseWidget
 
         try {
             // Saving comment and getting ID
-            $model->save()->reload();
+            $this->commentRepository->save($model);
+
+            $model->reload();
 
             // Force approving if enabled (developers, moderators, etc)
             if ($user && $model->isApproveAllowed()) {
-                $model->approve()->save();
+                $model->approve();
+                $this->commentRepository->save($model);
             }
 
             $this->send_success_json();

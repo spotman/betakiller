@@ -5,7 +5,7 @@ use BetaKiller\IFace\IFaceModelInterface;
 use BetaKiller\IFace\IFaceModelTree;
 use BetaKiller\IFace\IFaceProvider;
 use BetaKiller\IFace\IFaceStack;
-use BetaKiller\IFace\Url\UrlParametersInterface;
+use BetaKiller\IFace\Url\UrlContainerInterface;
 
 class Task_Cache_Warmup extends Minion_Task
 {
@@ -75,7 +75,7 @@ class Task_Cache_Warmup extends Minion_Task
         }
     }
 
-    protected function processIFaceModel(IFaceModelInterface $ifaceModel, UrlParametersInterface $params)
+    protected function processIFaceModel(IFaceModelInterface $ifaceModel, UrlContainerInterface $params)
     {
         $iface = $this->ifaceProvider->fromModel($ifaceModel);
 

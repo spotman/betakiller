@@ -22,7 +22,7 @@ class MoveToTrashApiMethod extends AbstractEntityBasedApiMethod
      */
     public function execute()
     {
-        /** @var \Model_ContentComment $model */
+        /** @var \BetaKiller\Model\ContentComment $model */
         $model = $this->getEntity();
 
         $model->move_to_trash()->save();

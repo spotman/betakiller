@@ -1,86 +1,86 @@
 <?php
 namespace BetaKiller\Helper;
 
-use BetaKiller\IFace\Url\UrlParametersInterface;
-use Model_ContentCategory;
-use Model_ContentPost;
-use Model_ContentComment;
-use Model_ContentCommentStatus;
+use BetaKiller\IFace\Url\UrlContainerInterface;
+use BetaKiller\Model\ContentCategory;
+use BetaKiller\Model\ContentComment;
+use BetaKiller\Model\ContentPost;
+use BetaKiller\Model\ContentCommentStatus;
 
 class ContentUrlParametersHelper extends UrlParametersHelper
 {
     /**
-     * @return \Model_ContentCategory|null
+     * @return \BetaKiller\Model\ContentCategory|null
      */
-    public function getContentCategory(): ?Model_ContentCategory
+    public function getContentCategory(): ?ContentCategory
     {
-        return $this->getEntityByClassName(Model_ContentCategory::class);
+        return $this->getEntityByClassName(ContentCategory::class);
     }
 
     /**
-     * @param \Model_ContentCategory                            $model
-     * @param \BetaKiller\IFace\Url\UrlParametersInterface|null $params
+     * @param \BetaKiller\Model\ContentCategory                $model
+     * @param \BetaKiller\IFace\Url\UrlContainerInterface|null $params
      *
-     * @return \BetaKiller\IFace\Url\UrlParametersInterface
+     * @return \BetaKiller\IFace\Url\UrlContainerInterface
      */
-    public function setContentCategory(Model_ContentCategory $model, UrlParametersInterface $params = null): UrlParametersInterface
+    public function setContentCategory(ContentCategory $model, UrlContainerInterface $params = null): UrlContainerInterface
     {
         return $this->setEntity($model, $params);
     }
 
     /**
-     * @return \Model_ContentPost|null
+     * @return \BetaKiller\Model\ContentPost|null
      */
-    public function getContentPost(): ?Model_ContentPost
+    public function getContentPost(): ?ContentPost
     {
-        return $this->getEntityByClassName(Model_ContentPost::class);
+        return $this->getEntityByClassName(ContentPost::class);
     }
 
     /**
-     * @param \Model_ContentPost                                $model
-     * @param \BetaKiller\IFace\Url\UrlParametersInterface|null $params
+     * @param \BetaKiller\Model\ContentPost                    $model
+     * @param \BetaKiller\IFace\Url\UrlContainerInterface|null $params
      *
-     * @return \BetaKiller\IFace\Url\UrlParametersInterface
+     * @return \BetaKiller\IFace\Url\UrlContainerInterface
      */
-    public function setContentPost(Model_ContentPost $model, UrlParametersInterface $params = null): UrlParametersInterface
+    public function setContentPost(ContentPost $model, UrlContainerInterface $params = null): UrlContainerInterface
     {
         return $this->setEntity($model, $params);
     }
 
     /**
-     * @return \Model_ContentComment|null
+     * @return \BetaKiller\Model\ContentComment|null
      */
-    public function getContentComment(): ?Model_ContentComment
+    public function getContentComment(): ?ContentComment
     {
-        return $this->getEntityByClassName(Model_ContentComment::class);
+        return $this->getEntityByClassName(ContentComment::class);
     }
 
     /**
-     * @param \Model_ContentComment                             $model
-     * @param \BetaKiller\IFace\Url\UrlParametersInterface|null $params
+     * @param \BetaKiller\Model\ContentComment                 $model
+     * @param \BetaKiller\IFace\Url\UrlContainerInterface|null $params
      *
-     * @return \BetaKiller\IFace\Url\UrlParametersInterface
+     * @return \BetaKiller\IFace\Url\UrlContainerInterface
      */
-    public function setContentComment(Model_ContentComment $model, UrlParametersInterface $params = null): UrlParametersInterface
+    public function setContentComment(ContentComment $model, UrlContainerInterface $params = null): UrlContainerInterface
     {
         return $this->setEntity($model, $params);
     }
 
     /**
-     * @return \Model_ContentCommentStatus|null
+     * @return \BetaKiller\Model\ContentCommentStatus|null
      */
-    public function getContentCommentStatus(): ?Model_ContentCommentStatus
+    public function getContentCommentStatus(): ?ContentCommentStatus
     {
-        return $this->getEntityByClassName(Model_ContentCommentStatus::class);
+        return $this->getEntityByClassName(ContentCommentStatus::class);
     }
 
     /**
-     * @param \Model_ContentCommentStatus                       $model
-     * @param \BetaKiller\IFace\Url\UrlParametersInterface|null $params
+     * @param \BetaKiller\Model\ContentCommentStatus           $model
+     * @param \BetaKiller\IFace\Url\UrlContainerInterface|null $params
      *
-     * @return \BetaKiller\IFace\Url\UrlParametersInterface
+     * @return \BetaKiller\IFace\Url\UrlContainerInterface
      */
-    public function setContentCommentStatus(Model_ContentCommentStatus $model, UrlParametersInterface $params = null): UrlParametersInterface
+    public function setContentCommentStatus(ContentCommentStatus $model, UrlContainerInterface $params = null): UrlContainerInterface
     {
         return $this->setEntity($model, $params);
     }

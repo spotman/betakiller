@@ -12,7 +12,7 @@ trait ContentCommentMethodTrait
      *
      * @param int|null $id
      *
-     * @return \Model_ContentComment
+     * @return \BetaKiller\Model\ContentComment
      */
     protected function createEntity($id = NULL)
     {

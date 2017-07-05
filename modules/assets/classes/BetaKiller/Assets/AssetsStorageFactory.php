@@ -1,43 +1,36 @@
-<?php namespace BetaKiller\Assets;
+<?php
+namespace BetaKiller\Assets;
 
-use BetaKiller\Assets\Storage\AssetsStorageCfs;
-use BetaKiller\Assets\Storage\AssetsStorageLocal;
+use BetaKiller\Assets\Storage\AssetsStorageInterface;
+use BetaKiller\Factory\NamespaceBasedFactory;
 
 class AssetsStorageFactory
 {
     /**
-     * @var AssetsStorageFactory
+     * @var \BetaKiller\Factory\NamespaceBasedFactory
      */
-    protected static $_instance;
+    private $factory;
 
     /**
-     * @return \BetaKiller\Assets\AssetsStorageFactory
-     * @deprecated Use DI instead
+     * AssetsStorageFactory constructor.
+     *
+     * @param \BetaKiller\Factory\NamespaceBasedFactory $factory
      */
-    public static function instance()
+    public function __construct(NamespaceBasedFactory $factory)
     {
-        if (!static::$_instance) {
-            static::$_instance = new static();
-        }
-
-        return static::$_instance;
+        $this->factory = $factory
+            ->setClassPrefixes('Assets', 'Storage')
+            ->setClassSuffix('AssetsStorage')
+            ->setExpectedInterface(AssetsStorageInterface::class);
     }
 
     /**
      * @param string $codename
      *
-     * @return AssetsStorageLocal|AssetsStorageCfs
-     * @throws AssetsStorageException
-     * @todo Rewrite to NamespaceBasedFactory
+     * @return \BetaKiller\Assets\Storage\AssetsStorageInterface
      */
-    public function create($codename)
+    public function create(string $codename): AssetsStorageInterface
     {
-        $class_name = 'BetaKiller\\Assets\\Storage\\AssetsStorage'.$codename;
-
-        if (!class_exists($class_name)) {
-            throw new AssetsStorageException('Unknown storage :class', [':class' => $class_name]);
-        }
-
-        return new $class_name;
+        return $this->factory->create($codename);
     }
 }
