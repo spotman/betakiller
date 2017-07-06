@@ -118,7 +118,6 @@ class MainWidget extends AbstractAdminWidget
             $this->makeIFaceMenuItemData($resolvedErrors),
         ];
 
-
         return $this->makeIFaceMenuItemData($errorsIndex, $childrenData);
     }
 }
