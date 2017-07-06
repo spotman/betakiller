@@ -1,10 +1,15 @@
 <?php
 namespace BetaKiller\Assets\Provider;
 
+use BetaKiller\Acl\Resource\AssetsAclResourceInterface;
 use BetaKiller\Assets\AssetsException;
 use BetaKiller\Assets\AssetsExceptionUpload;
 use BetaKiller\Assets\AssetsProviderException;
+use BetaKiller\Assets\Handler\AssetsHandlerInterface;
 use BetaKiller\Assets\Model\AssetsModelInterface;
+use BetaKiller\Assets\MultiLevelPath;
+use BetaKiller\Assets\Storage\AssetsStorageInterface;
+use BetaKiller\Assets\UrlStrategy\AssetsUrlStrategyInterface;
 use BetaKiller\Config\ConfigProviderInterface;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Repository\RepositoryInterface;
@@ -27,6 +32,9 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
     const CONFIG_MODEL_STORAGE_KEY      = 'storage';
     const CONFIG_MODEL_STORAGE_NAME_KEY = 'name';
     const CONFIG_MODEL_STORAGE_PATH_KEY = 'path';
+    const CONFIG_MODEL_DEPLOY_KEY       = 'deploy';
+    const CONFIG_MODEL_MIMES            = 'mimes';
+    const CONFIG_MODEL_POST_UPLOAD_KEY  = 'post_upload';
     const CONFIG_STORAGE_BASE_PATH_KEY  = 'base_path';
 
     /**
@@ -60,16 +68,29 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
     private $multiLevelPath;
 
     /**
-     * @var UserInterface
+     * @var \BetaKiller\Acl\Resource\AssetsAclResourceInterface
      */
-    private $user;
+    private $aclResource;
 
-    public function __construct(ConfigProviderInterface $config, UserInterface $user)
-    {
-        // TODO All deps
+    /**
+     * @var \BetaKiller\Assets\Handler\AssetsHandlerInterface[]
+     */
+    private $postUploadHandlers = [];
 
-        $this->config = $config;
-        $this->user   = $user;
+    public function __construct(
+        RepositoryInterface $repository,
+        AssetsStorageInterface $storage,
+        AssetsAclResourceInterface $aclResource,
+        AssetsUrlStrategyInterface $urlStrategy,
+        ConfigProviderInterface $config,
+        MultiLevelPath $multiLevelPath
+    ) {
+        $this->repository     = $repository;
+        $this->storage        = $storage;
+        $this->aclResource    = $aclResource;
+        $this->urlStrategy    = $urlStrategy;
+        $this->config         = $config;
+        $this->multiLevelPath = $multiLevelPath;
     }
 
     public function getAssetsConfigValue(array $path)
@@ -156,7 +177,7 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
         return Route::url('assets-provider-item', $options);
     }
 
-    private function getModelUrlPath(AssetsModelInterface $model): string
+    protected function getModelUrlPath(AssetsModelInterface $model): string
     {
         $filename = $this->urlStrategy->getFilenameFromModel($model);
         $path     = $this->multiLevelPath->make($filename, '/');
@@ -181,13 +202,14 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
     }
 
     /**
-     * @param array $_file      Item from $_FILES
-     * @param array $_post_data Array with items from $_POST
+     * @param array                           $_file    Item from $_FILES
+     * @param array                           $postData Array with items from $_POST
+     * @param \BetaKiller\Model\UserInterface $user
      *
      * @return AssetsModelInterface
      * @throws AssetsProviderException
      */
-    public function upload(array $_file, array $_post_data): AssetsModelInterface
+    public function upload(array $_file, array $postData, UserInterface $user): AssetsModelInterface
     {
         // Check permissions
         if (!$this->checkUploadPermissions()) {
@@ -200,13 +222,17 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
             throw new AssetsExceptionUpload('Incorrect file, upload rejected');
         }
 
-        $full_path = $_file['tmp_name'];
-        $safe_name = strip_tags($_file['name']);
+        $fullPath     = $_file['tmp_name'];
+        $originalName = strip_tags($_file['name']);
 
-        return $this->store($full_path, $safe_name, $_post_data);
+        $model = $this->store($fullPath, $originalName, $user);
+
+        $this->postUploadProcessing($model, $postData);
+
+        return $model;
     }
 
-    public function store(string $fullPath, string $originalName, array $postData = null): AssetsModelInterface
+    public function store(string $fullPath, string $originalName, UserInterface $user): AssetsModelInterface
     {
         // Check permissions
         if (!$this->checkStorePermissions()) {
@@ -226,14 +252,14 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
         $content = file_get_contents($fullPath);
 
         // Custom processing
-        $content = $this->customUploadProcessing($model, $content, $postData, $fullPath);
+        $content = $this->customContentProcessing($content, $model);
 
         // Put data into model
         $model
             ->setOriginalName($originalName)
             ->setSize(strlen($content))
             ->setMime($mime_type)
-            ->setUploadedBy($this->user);
+            ->setUploadedBy($user);
 
         // Calculate hash
         $model->setHash($this->calculateHash($content));
@@ -243,8 +269,6 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
 
         // Save model
         $this->saveModel($model);
-
-        $this->postUploadProcessing($model, $postData);
 
         return $model;
     }
@@ -259,16 +283,6 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
         $this->repository->save($model);
     }
 
-    /**
-     * @param \BetaKiller\Assets\Model\AssetsModelInterface $model
-     *
-     * @deprecated Use direct call of self::delete
-     */
-    public function deleteModel(AssetsModelInterface $model): void
-    {
-        $this->repository->delete($model);
-    }
-
     protected function getFileMimeType($file_path): string
     {
         return File::mime($file_path);
@@ -277,16 +291,14 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
     /**
      * Custom upload processing
      *
-     * @param AssetsModelInterface $model
      * @param string               $content
-     * @param array                $postData
-     * @param string               $filePath Full path to source file
+     * @param AssetsModelInterface $model
      *
      * @return string
      */
-    protected function customUploadProcessing($model, string $content, ?array $postData, string $filePath): string
+    protected function customContentProcessing(string $content, $model): string
     {
-        // Empty by default
+        // No changes by default
         return $content;
     }
 
@@ -294,11 +306,26 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
      * After upload processing
      *
      * @param AssetsModelInterface $model
-     * @param array                $_post_data
+     * @param array                $postData
      */
-    protected function postUploadProcessing($model, array $_post_data): void
+    protected function postUploadProcessing($model, array $postData): void
     {
-        // Empty by default
+        if ($this->postUploadHandlers) {
+            foreach ($this->postUploadHandlers as $handler) {
+                $handler->update($this, $model, $postData);
+            }
+
+            // Save updated model if needed
+            $this->saveModel($model);
+        }
+    }
+
+    /**
+     * @param \BetaKiller\Assets\Handler\AssetsHandlerInterface $handler
+     */
+    public function addPostUploadHandler(AssetsHandlerInterface $handler): void
+    {
+        $this->postUploadHandlers[] = $handler;
     }
 
     public function deploy(Request $request, AssetsModelInterface $model, string $content): bool
@@ -311,7 +338,7 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
         }
 
         // Check permissions
-        if (!$this->checkDeployPermissions($model)) {
+        if (!$this->checkDeployPermissions()) {
             return false;
         }
 
@@ -357,7 +384,7 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
         }
 
         // Remove model from repository
-        $this->deleteModel($model);
+        $this->repository->delete($model);
 
         // Remove file from storage
         $this->storage->delete($model);
@@ -528,39 +555,44 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
     }
 
     /**
-     * @return \BetaKiller\Model\UserInterface
-     * @deprecated
-     */
-    protected function getUser(): UserInterface
-    {
-        return $this->user;
-    }
-
-    /**
      * Returns list of allowed MIME-types (or TRUE if all MIMEs are allowed)
      *
      * @return array|TRUE
-     * @todo Replace with config call
      */
-    abstract public function getAllowedMimeTypes();
+    public function getAllowedMimeTypes()
+    {
+        return $this->getAssetsProviderConfigValue([self::CONFIG_MODEL_MIMES]);
+    }
 
     /**
      * Returns TRUE if upload is granted
      *
      * @return bool
-     * @todo Replace with AclResource call
      */
-    abstract protected function checkUploadPermissions();
+    protected function checkUploadPermissions(): bool
+    {
+        return $this->aclResource->isUploadAllowed();
+    }
+
+    /**
+     * Returns TRUE if store is granted
+     *
+     * @return bool
+     */
+    protected function checkStorePermissions(): bool
+    {
+        return $this->aclResource->isCreateAllowed();
+    }
 
     /**
      * Returns TRUE if deploy is granted
      *
-     * @param AssetsModelInterface $model
-     *
      * @return bool
-     * @todo Replace with AclResource call
      */
-    abstract protected function checkDeployPermissions($model);
+    protected function checkDeployPermissions(): bool
+    {
+        return (bool)$this->getAssetsProviderConfigValue([self::CONFIG_MODEL_DEPLOY_KEY]);
+    }
 
     /**
      * Returns TRUE if delete operation granted
@@ -568,18 +600,9 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
      * @param AssetsModelInterface $model
      *
      * @return bool
-     * @todo Replace with AclResource call
      */
-    abstract protected function checkDeletePermissions($model);
-
-    /**
-     * Returns TRUE if store is granted
-     *
-     * @return bool
-     * @todo Replace with AclResource call
-     */
-    protected function checkStorePermissions()
+    protected function checkDeletePermissions($model): bool
     {
-        return $this->checkUploadPermissions();
+        return $this->aclResource->setEntity($model)->isDeleteAllowed();
     }
 }

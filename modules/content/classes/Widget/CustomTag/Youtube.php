@@ -2,10 +2,15 @@
 
 use BetaKiller\IFace\Widget\AbstractBaseWidget;
 use BetaKiller\IFace\Widget\WidgetException;
+use BetaKiller\Repository\ContentYoutubeRecordRepository;
 
 class Widget_CustomTag_Youtube extends AbstractBaseWidget
 {
-    use BetaKiller\Helper\ContentTrait;
+    /**
+     * @Inject
+     * @var ContentYoutubeRecordRepository
+     */
+    private $repository;
 
     /**
      * Returns data for View rendering
@@ -17,19 +22,21 @@ class Widget_CustomTag_Youtube extends AbstractBaseWidget
     {
         $context = $this->getContext();
 
-        $video_id = (int) $context['id'];
+        $videoID = (int)$context['id'];
 
-        if (!$video_id)
+        if (!$videoID) {
             throw new WidgetException('No YouTube ID provided');
+        }
 
-        $model = $this->model_factory_content_youtube_record()->get_by_id($video_id);
+        /** @var \BetaKiller\Model\ContentYoutubeRecord $model */
+        $model = $this->repository->findById($videoID);
 
 //        $title  = Arr::get($context, 'title');
 //        $align  = Arr::get($context, 'align', 'alignnone');
 //        $alt    = Arr::get($context, 'alt');
 //        $class  = Arr::get($context, 'class');
-        $width  = (int) Arr::get($context, 'width');
-        $height  = (int) Arr::get($context, 'height');
+        $width  = (int)Arr::get($context, 'width');
+        $height = (int)Arr::get($context, 'height');
 
 //        $classes = array_filter(explode(' ', $class));
 //        $classes['align'] = $align;
@@ -48,9 +55,9 @@ class Widget_CustomTag_Youtube extends AbstractBaseWidget
         return [
             'video' => [
                 // TODO
-                'src'       =>  $model->getYoutubeEmbedUrl(),
-                'width'     =>  $width,
-                'height'    =>  $height,
+                'src'    => $model->getYoutubeEmbedUrl(),
+                'width'  => $width,
+                'height' => $height,
             ],
         ];
     }

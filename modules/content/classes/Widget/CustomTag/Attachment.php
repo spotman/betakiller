@@ -2,17 +2,20 @@
 
 use BetaKiller\IFace\Widget\AbstractBaseWidget;
 use BetaKiller\IFace\Widget\WidgetException;
-use BetaKiller\Helper\AssetsHelper;
 
 class Widget_CustomTag_Attachment extends AbstractBaseWidget
 {
-    use BetaKiller\Helper\ContentTrait;
-
     /**
      * @var \BetaKiller\Helper\AssetsHelper
      * @Inject
      */
     private $assetsHelper;
+
+    /**
+     * @Inject
+     * @var \BetaKiller\Repository\ContentAttachmentRepository
+     */
+    private $repository;
 
     /**
      * Returns data for View rendering
@@ -24,27 +27,28 @@ class Widget_CustomTag_Attachment extends AbstractBaseWidget
     {
         $context = $this->getContext();
 
-        $attach_id = (int) $context['id'];
+        $attachID = (int)$context['id'];
 
-        if (!$attach_id) {
+        if (!$attachID) {
             throw new WidgetException('No attachment ID provided');
         }
 
-        $model = $this->model_factory_content_attachment_element()->get_by_id($attach_id);
+        /** @var \BetaKiller\Model\ContentAttachment $model */
+        $model = $this->repository->findById($attachID);
 
-        $title  = HTML::chars(Arr::get($context, 'title'));
-        $class  = Arr::get($context, 'class');
+        $title = HTML::chars(Arr::get($context, 'title'));
+        $class = Arr::get($context, 'class');
 
-        $i18n_params = [
-            ':name' =>  $model->getOriginalName(),
+        $i18nParams = [
+            ':name' => $model->getOriginalName(),
         ];
 
         return [
-            'attachment'    =>  [
-                'url'       =>  $this->assetsHelper->getOriginalUrl($model),
-                'title'     =>  $title ?: __('custom_tag.attachment.title', $i18n_params),
-                'alt'       =>  __('custom_tag.attachment.alt', $i18n_params),
-                'class'     =>  $class,
+            'attachment' => [
+                'url'   => $this->assetsHelper->getOriginalUrl($model),
+                'title' => $title ?: __('custom_tag.attachment.title', $i18nParams),
+                'alt'   => __('custom_tag.attachment.alt', $i18nParams),
+                'class' => $class,
             ],
         ];
     }

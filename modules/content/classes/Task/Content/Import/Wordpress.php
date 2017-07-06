@@ -1,13 +1,14 @@
 <?php
 
 use BetaKiller\Assets\Model\AssetsModelImageInterface;
-use BetaKiller\Assets\Provider\AbstractAssetsProvider;
+use BetaKiller\Assets\Provider\AssetsProviderInterface;
+use BetaKiller\Content\WordpressAttachmentInterface;
+use BetaKiller\Model\ContentComment;
 use BetaKiller\Model\ContentImage;
 use BetaKiller\Model\ContentPost;
 use BetaKiller\Model\ContentPostThumbnail;
 use BetaKiller\Model\Entity;
 use BetaKiller\Model\IFaceZone;
-use BetaKiller\Model\ContentComment;
 use BetaKiller\Repository\WordpressAttachmentRepositoryInterface;
 use BetaKiller\Task\AbstractTask;
 use BetaKiller\Task\TaskException;
@@ -19,7 +20,6 @@ use Thunder\Shortcode\Shortcode\ShortcodeInterface;
 
 class Task_Content_Import_Wordpress extends AbstractTask
 {
-    use BetaKiller\Helper\ContentTrait;
     use BetaKiller\Helper\UserModelFactoryTrait;
     use BetaKiller\Helper\RoleModelFactoryTrait;
 
@@ -28,8 +28,6 @@ class Task_Content_Import_Wordpress extends AbstractTask
 
     const WP_OPTION_PARSING_MODE = 'betakiller_parsing_mode';
     const WP_OPTION_PARSING_PATH = 'betakiller_parsing_path';
-
-    const CONTENT_ENTITY_ID = Entity::POSTS_ENTITY_ID;
 
     protected $attach_parsing_mode;
 
@@ -58,6 +56,12 @@ class Task_Content_Import_Wordpress extends AbstractTask
     private $assetsHelper;
 
     /**
+     * @var \BetaKiller\Helper\ContentHelper
+     * @Inject
+     */
+    private $contentHelper;
+
+    /**
      * @var \BetaKiller\Repository\ContentPostRepository
      * @Inject
      */
@@ -80,6 +84,18 @@ class Task_Content_Import_Wordpress extends AbstractTask
      * @Inject
      */
     private $youtubeRepository;
+
+    /**
+     * @Inject
+     * @var \BetaKiller\Repository\EntityRepository
+     */
+    private $entityRepository;
+
+    /**
+     * @Inject
+     * @var \BetaKiller\Repository\QuoteRepository
+     */
+    private $quoteRepository;
 
     protected function define_options(): array
     {
@@ -182,18 +198,18 @@ class Task_Content_Import_Wordpress extends AbstractTask
     /**
      * @return Entity
      */
-    protected function get_content_post_entity(): \BetaKiller\Model\Entity
+    protected function get_content_post_entity(): Entity
     {
-        static $content_entity;
+        static $contentEntity;
 
-        if (!$content_entity) {
-            $content_entity = $this->model_factory_content_entity(self::CONTENT_ENTITY_ID);
+        if (!$contentEntity) {
+            $contentEntity = $this->entityRepository->findByModelName('ContentPost');
         }
 
-        return $content_entity;
+        return $contentEntity;
     }
 
-    protected function process_attachment(array $attach, $entity_item_id, AbstractAssetsProvider $provider = null)
+    protected function process_attachment(array $attach, $entity_item_id, AssetsProviderInterface $provider = null)
     {
         $wp_id = $attach['ID'];
         $url   = $attach['guid'];
@@ -210,7 +226,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
             $this->debug('Creating assets provider by MIME-type :mime', [':mime' => $mime]);
 
             // Detect and instantiate assets provider by file MIME-type
-            $provider = $this->service_content_facade()->assets_provider_factory_from_mime($mime);
+            $provider = $this->contentHelper->createAssetsProviderFromMimeType($mime);
         }
 
         $model = $this->store_attachment($provider, $url, $wp_id, $entity_item_id);
@@ -236,16 +252,20 @@ class Task_Content_Import_Wordpress extends AbstractTask
     }
 
     /**
-     * @param AbstractAssetsProvider $provider
-     * @param string                 $url
-     * @param int                    $wp_id
-     * @param int|null               $entity_item_id
+     * @param AssetsProviderInterface $provider
+     * @param string                  $url
+     * @param int                     $wp_id
+     * @param int|null                $entityItemID
      *
      * @return \BetaKiller\Content\WordpressAttachmentInterface
      * @throws TaskException
      */
-    protected function store_attachment(AbstractAssetsProvider $provider, $url, $wp_id, $entity_item_id = null)
-    {
+    protected function store_attachment(
+        AssetsProviderInterface $provider,
+        string $url,
+        int $wp_id,
+        ?int $entityItemID = null
+    ): WordpressAttachmentInterface {
         $repository = $provider->getRepository();
 
         if (!($repository instanceof WordpressAttachmentRepositoryInterface)) {
@@ -280,14 +300,14 @@ class Task_Content_Import_Wordpress extends AbstractTask
         }
 
         /** @var \BetaKiller\Content\WordpressAttachmentInterface $model */
-        $model = $provider->store($path, $original_filename);
+        $model = $provider->store($path, $original_filename, $this->user);
 
         // Storing entity
-        $model->set_entity($this->get_content_post_entity());
+        $model->setEntity($this->get_content_post_entity());
 
         // Storing entity item ID
-        if ($entity_item_id) {
-            $model->set_entity_item_id($entity_item_id);
+        if ($entityItemID) {
+            $model->setEntityItemID($entityItemID);
         }
 
         // Storing WP path
@@ -517,7 +537,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
      */
     private function removeClosingCustomTags($text): string
     {
-        $ct = CustomTagFacade::instance();
+        $ct = $this->custom_tag_instance();
 
         foreach ($ct->getSelfClosingTags() as $tag) {
             $text = str_replace('></'.$tag.'>', ' />', $text);
@@ -621,7 +641,8 @@ class Task_Content_Import_Wordpress extends AbstractTask
             return;
         }
 
-        $provider = $this->assets_provider_content_post_thumbnail();
+
+        $provider = $this->contentHelper->getPostThumbnailAssetsProvider();
 
         foreach ($images_wp_data as $image_data) {
             /** @var ContentPostThumbnail $image_model */
@@ -974,15 +995,18 @@ class Task_Content_Import_Wordpress extends AbstractTask
 
         $this->debug('Found youtube iframe :tag', [':tag' => $tag_string]);
 
-        $service = $this->service_content_youtube();
+        $youtubeID = $this->youtubeRepository->getYoutubeIdFromEmbedUrl($original_url);
 
-        $youtube_id = $service->getYoutubeIdFromEmbedUrl($original_url);
-
-        if (!$youtube_id) {
+        if (!$youtubeID) {
             throw new TaskException('Youtube iframe ID parsing failed on :string', [':string' => $tag_string]);
         }
 
-        $video = $service->findRecordByYoutubeId($youtube_id);
+        $video = $this->youtubeRepository->findRecordByYoutubeEmbedUrl($youtubeID);
+
+        if (!$video) {
+            $video = $this->youtubeRepository->create();
+            $video->setYoutubeId($youtubeID);
+        }
 
         $width  = trim(Arr::get($attributes, 'width'));
         $height = trim(Arr::get($attributes, 'height'));
@@ -997,13 +1021,13 @@ class Task_Content_Import_Wordpress extends AbstractTask
         }
 
         if ($video->changed()) {
-            $this->info('Youtube video :id processed', [':id' => $youtube_id]);
+            $this->info('Youtube video :id processed', [':id' => $youtubeID]);
         }
 
         $video
             ->setUploadedBy($this->user)
-            ->set_entity($this->get_content_post_entity())
-            ->set_entity_item_id($entity_item_id);
+            ->setEntity($this->get_content_post_entity())
+            ->setEntityItemID($entity_item_id);
 
         $this->youtubeRepository->save($video);
 
@@ -1095,14 +1119,16 @@ class Task_Content_Import_Wordpress extends AbstractTask
             $author     = $data['author'];
             $created_at = new DateTime($data['created_at']);
 
-            $model = $this->model_factory_quote($id);
+            $model = $this->quoteRepository->findById($id);
+
+            $model->set_id($id);
 
             $model
-                ->set_id($id)
-                ->set_created_at($created_at)
-                ->set_author($author)
-                ->set_text($text)
-                ->save();
+                ->setCreatedAt($created_at)
+                ->setAuthor($author)
+                ->setText($text);
+
+            $this->quoteRepository->save($model);
         }
     }
 
@@ -1159,8 +1185,8 @@ class Task_Content_Import_Wordpress extends AbstractTask
             $model->setParent($parent);
 
             $model
-                ->set_entity($this->get_content_post_entity())
-                ->set_entity_item_id($post->get_id())
+                ->setEntity($this->get_content_post_entity())
+                ->setEntityItemID($post->get_id())
                 ->set_created_at($created_at)
                 ->set_user_agent($userAgent)
                 ->set_ip_address($authorIP);
@@ -1255,5 +1281,13 @@ class Task_Content_Import_Wordpress extends AbstractTask
     protected function wp(): \WP
     {
         return WP::instance();
+    }
+
+    /**
+     * @return \CustomTagFacade
+     */
+    private function custom_tag_instance(): CustomTagFacade
+    {
+        return \CustomTagFacade::instance();
     }
 }

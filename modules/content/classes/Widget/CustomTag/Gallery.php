@@ -5,7 +5,6 @@ use BetaKiller\IFace\Widget\WidgetException;
 
 class Widget_CustomTag_Gallery extends AbstractBaseWidget
 {
-    use BetaKiller\Helper\ContentTrait;
     use BetaKiller\Helper\LogTrait;
 
     /**
@@ -13,6 +12,12 @@ class Widget_CustomTag_Gallery extends AbstractBaseWidget
      * @Inject
      */
     private $assetsHelper;
+
+    /**
+     * @Inject
+     * @var \BetaKiller\Repository\ContentImageRepository
+     */
+    private $repository;
 
     /**
      * Returns data for View rendering
@@ -38,19 +43,17 @@ class Widget_CustomTag_Gallery extends AbstractBaseWidget
 
         $type = Arr::get($context, 'type', $allowed_types[0]);
 
-        if (!in_array($type, $allowed_types, true))
+        if (!in_array($type, $allowed_types, true)) {
             throw new WidgetException('Unknown gallery type :value', [':value' => $type]);
+        }
 
         $columns = (int)Arr::get($context, 'columns', 3);
 
         $images = [];
 
         foreach ($image_ids as $id) {
-            $model = $this->model_factory_content_image_element($id);
-
-            if (!$model->loaded()) {
-                continue;
-            }
+            /** @var \BetaKiller\Model\ContentImage $model */
+            $model = $this->repository->findById($id);
 
             $images[] = $this->assetsHelper->getAttributesForImgTag($model, $model::SIZE_PREVIEW);
         }

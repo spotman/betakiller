@@ -1,8 +1,16 @@
 <?php
 namespace BetaKiller\IFace\App\Content;
 
+use BetaKiller\Model\ContentCategory;
+
 class CategoryListing extends AbstractAppBase
 {
+    /**
+     * @Inject
+     * @var \BetaKiller\Repository\ContentCategoryRepository
+     */
+    private $categoryRepository;
+
     /**
      * Returns data for View
      * Override this method in child classes
@@ -16,11 +24,11 @@ class CategoryListing extends AbstractAppBase
         ];
     }
 
-    protected function get_categories_data(\BetaKiller\Model\ContentCategory $parent = null)
+    protected function get_categories_data(ContentCategory $parent = null): array
     {
         $data = [];
 
-        $children = $parent ? $parent->getChildren() : $this->model_factory_content_category()->getRoot();
+        $children = $parent ? $parent->getChildren() : $this->categoryRepository->getRoot();
 
         foreach ($children as $child) {
             if (!$child->isActive()) {

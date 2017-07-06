@@ -10,17 +10,17 @@ interface EntityModelRelatedInterface
      *
      * @return $this
      */
-    public function set_entity(Entity $entity);
+    public function setEntity(Entity $entity);
 
     /**
      * @return Entity
      */
-    public function get_entity();
+    public function getEntity();
 
     /**
      * @return string
      */
-    public function get_entity_slug();
+    public function getEntitySlug(): string;
 
     /**
      * Устанавливает ссылку на ID записи из таблицы, к которой привязана entity
@@ -29,10 +29,10 @@ interface EntityModelRelatedInterface
      *
      * @return $this
      */
-    public function set_entity_item_id($id);
+    public function setEntityItemID(int $id);
 
     /**
      * @return int
      */
-    public function get_entity_item_id();
+    public function getEntityItemID(): int;
 }

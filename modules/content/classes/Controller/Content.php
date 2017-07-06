@@ -5,8 +5,6 @@ use BetaKiller\Assets\Model\AssetsModelInterface;
 
 class Controller_Content extends Controller
 {
-    use \BetaKiller\Helper\ContentTrait;
-
     /**
      * @var \BetaKiller\Helper\ContentHelper
      * @Inject

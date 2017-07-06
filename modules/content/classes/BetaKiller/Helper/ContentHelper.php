@@ -1,9 +1,12 @@
 <?php
 namespace BetaKiller\Helper;
 
+use BetaKiller\Assets\AssetsProviderFactory;
+use BetaKiller\Assets\Provider\AttachmentAssetsProviderInterface;
+use BetaKiller\Assets\Provider\ImageAssetsProviderInterface;
 use BetaKiller\Content\Shortcode;
+use BetaKiller\Factory\RepositoryFactory;
 use BetaKiller\Model\ContentPost;
-use BetaKiller\Model\ContentPostThumbnail;
 use BetaKiller\Repository\ContentAttachmentRepository;
 use BetaKiller\Repository\ContentCategoryRepository;
 use BetaKiller\Repository\ContentCommentRepository;
@@ -26,13 +29,18 @@ class ContentHelper
     private $repositoryFactory;
 
     /**
-     * ContentHelper constructor.
-     *
-     * @param \BetaKiller\Content\Shortcode $shortcode
+     * @var \BetaKiller\Assets\AssetsProviderFactory
      */
-    public function __construct(Shortcode $shortcode)
-    {
-        $this->shortcode = $shortcode;
+    private $providerFactory;
+
+    public function __construct(
+        RepositoryFactory $repositoryFactory,
+        AssetsProviderFactory $providerFactory,
+        Shortcode $shortcode
+    ) {
+        $this->repositoryFactory = $repositoryFactory;
+        $this->providerFactory   = $providerFactory;
+        $this->shortcode         = $shortcode;
     }
 
     public function getPostRepository(): ContentPostRepository
@@ -82,5 +90,39 @@ class ContentHelper
         $text = $this->shortcode->stripTags($text);
 
         return \Text::limit_chars($text, $length ?? 250, $end_chars ?? '...', true);
+    }
+
+    public function getPostThumbnailAssetsProvider(): ImageAssetsProviderInterface
+    {
+        return $this->providerFactory->createFromModelCodename('ContentPostThumbnail');
+    }
+
+    public function getImageAssetsProvider(): ImageAssetsProviderInterface
+    {
+        return $this->providerFactory->createFromModelCodename('ContentImage');
+    }
+
+    public function getAttachmentAssetsProvider(): AttachmentAssetsProviderInterface
+    {
+        return $this->providerFactory->createFromModelCodename('ContentAttachment');
+    }
+
+    public function createAssetsProviderFromMimeType(string $mimeType)
+    {
+        /** @var \BetaKiller\Assets\Provider\AssetsProviderInterface[] $mimeProviders */
+        $mimeProviders = [
+            $this->getImageAssetsProvider(),
+        ];
+
+        foreach ($mimeProviders as $provider) {
+            $allowedMimeTypes = $provider->getAllowedMimeTypes();
+
+            if ($allowedMimeTypes && is_array($allowedMimeTypes) && in_array($mimeType, $allowedMimeTypes, true)) {
+                return $provider;
+            }
+        }
+
+        // Default way
+        return $this->getAttachmentAssetsProvider();
     }
 }

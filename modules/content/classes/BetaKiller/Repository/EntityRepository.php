@@ -36,6 +36,25 @@ class EntityRepository extends AbstractOrmBasedRepository
     }
 
     /**
+     * @param string $modelName
+     *
+     * @return \BetaKiller\Model\Entity|mixed
+     * @throws \BetaKiller\Repository\RepositoryException
+     */
+    public function findByModelName(string $modelName): Entity
+    {
+        $orm = $this->getOrmInstance();
+
+        $model = $orm->where('model_name', '=', $modelName)->find();
+
+        if (!$model->loaded()) {
+            throw new RepositoryException('Unknown entity model name :value', [':value' => $modelName]);
+        }
+
+        return $model;
+    }
+
+    /**
      * @return \BetaKiller\Model\Entity[]
      */
     public function getAllEntities(): array

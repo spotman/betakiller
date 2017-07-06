@@ -1,12 +1,9 @@
 <?php
 
 use BetaKiller\Model\ContentPost;
-use BetaKiller\Helper\ContentHelper;
 
 class Widget_Content_PopularArticles extends Widget_Content_SidebarArticlesList
 {
-    use \BetaKiller\Helper\ContentTrait;
-
     /**
      * @var \BetaKiller\Helper\ContentHelper
      * @Inject
@@ -21,6 +18,6 @@ class Widget_Content_PopularArticles extends Widget_Content_SidebarArticlesList
      */
     protected function get_articles_list($exclude_id, $limit): array
     {
-        $this->contentHelper->getPostRepository()->getPopularArticles($limit, $exclude_id);
+        return $this->contentHelper->getPostRepository()->getPopularArticles($limit, $exclude_id);
     }
 }

@@ -1,15 +1,12 @@
 <?php
 namespace BetaKiller\Widget\Admin\Menu;
 
-use BetaKiller\Helper\ContentTrait;
 use BetaKiller\IFace\IFaceInterface;
 use BetaKiller\IFace\Url\UrlContainerInterface;
 use BetaKiller\IFace\Widget\AbstractAdminWidget;
 
 class MainWidget extends AbstractAdminWidget
 {
-    use ContentTrait;
-
     /**
      * @Inject
      * @var \BetaKiller\Helper\ContentUrlParametersHelper
@@ -18,9 +15,9 @@ class MainWidget extends AbstractAdminWidget
 
     /**
      * @Inject
-     * @var \BetaKiller\Helper\AclHelper
+     * @var \BetaKiller\Repository\ContentCommentStatusRepository
      */
-    private $aclHelper;
+    private $commentStatusRepository;
 
     /**
      * Returns data for View rendering
@@ -75,7 +72,7 @@ class MainWidget extends AbstractAdminWidget
         ];
     }
 
-    protected function getCommentsMenu()
+    protected function getCommentsMenu(): array
     {
         /** @var \BetaKiller\IFace\Admin\Content\CommentIndex $comments */
         $commentsIndex = $this->ifaceHelper->createIFaceFromCodename('Admin_Content_CommentIndex');
@@ -84,7 +81,7 @@ class MainWidget extends AbstractAdminWidget
         $commentListInStatus = $this->ifaceHelper->createIFaceFromCodename('Admin_Content_CommentListByStatus');
 
         /** @var \BetaKiller\Model\ContentCommentStatus[] $statuses */
-        $statuses = $this->model_factory_content_comment_status()->get_all();
+        $statuses = $this->commentStatusRepository->getAll();
 
         $childrenData = [];
 
@@ -99,7 +96,7 @@ class MainWidget extends AbstractAdminWidget
         return $this->makeIFaceMenuItemData($commentsIndex, $childrenData);
     }
 
-    protected function getErrorsMenu()
+    protected function getErrorsMenu(): ?array
     {
         if (!$this->user->isDeveloper()) {
             return null;
@@ -114,10 +111,13 @@ class MainWidget extends AbstractAdminWidget
         /** @var \BetaKiller\IFace\Admin\Error\ResolvedPhpExceptionIndex $iface */
         $resolvedErrors = $this->ifaceHelper->createIFaceFromCodename('Admin_Error_ResolvedPhpExceptionIndex');
 
+        $this->makeIFaceMenuItemData($unresolvedErrors);
+
         $childrenData = [
             $this->makeIFaceMenuItemData($unresolvedErrors),
             $this->makeIFaceMenuItemData($resolvedErrors),
         ];
+
 
         return $this->makeIFaceMenuItemData($errorsIndex, $childrenData);
     }

@@ -119,8 +119,8 @@ class Widget_Content_Comments extends AbstractBaseWidget
 
         // Check parent comment
         if ($parentModel) {
-            $parentEntity       = $parentModel->get_entity();
-            $parentEntityItemID = $parentModel->get_entity_item_id();
+            $parentEntity       = $parentModel->getEntity();
+            $parentEntityItemID = $parentModel->getEntityItemID();
 
             // Check parent comment entity id
             if (!$parentEntity->isEqualTo($entity)) {
@@ -153,8 +153,8 @@ class Widget_Content_Comments extends AbstractBaseWidget
 
         // Linking comment to entity and entity item
         $model
-            ->set_entity($entity)
-            ->set_entity_item_id($entityItemId);
+            ->setEntity($entity)
+            ->setEntityItemID($entityItemId);
 
         if (!$user->isGuest()) {
             $model->set_author_user($user);

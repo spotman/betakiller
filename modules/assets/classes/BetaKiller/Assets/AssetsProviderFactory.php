@@ -1,16 +1,17 @@
 <?php
 namespace BetaKiller\Assets;
 
+use BetaKiller\Acl\Resource\AssetsAclResourceInterface;
 use BetaKiller\Assets\Provider\AbstractAssetsProvider;
-use BetaKiller\Assets\Provider\AbstractAssetsProviderImage;
 use BetaKiller\Assets\Provider\AssetsProviderInterface;
 use BetaKiller\Assets\Storage\AssetsStorageInterface;
 use BetaKiller\Assets\UrlStrategy\AssetsUrlStrategyInterface;
 use BetaKiller\Config\ConfigProviderInterface;
 use BetaKiller\Factory\NamespaceBasedFactory;
+use BetaKiller\Factory\RepositoryFactory;
 use BetaKiller\Repository\RepositoryInterface;
 use BetaKiller\Utils\Instance\SingletonTrait;
-use Spotman\Acl\Resource\ResolvingResourceInterface;
+use Spotman\Acl\AclInterface;
 
 /**
  * Class AssetsProviderFactory
@@ -47,6 +48,11 @@ class AssetsProviderFactory
     private $urlStrategyFactory;
 
     /**
+     * @var \BetaKiller\Assets\AssetsHandlerFactory
+     */
+    private $handlerFactory;
+
+    /**
      * @var \Spotman\Acl\AclInterface
      */
     private $acl;
@@ -59,15 +65,35 @@ class AssetsProviderFactory
     /**
      * AssetsProviderFactory constructor.
      *
-     * @param \BetaKiller\Config\ConfigProviderInterface $config
-     * @param \BetaKiller\Factory\NamespaceBasedFactory  $factory
+     * @param \BetaKiller\Factory\NamespaceBasedFactory   $factory
+     * @param \BetaKiller\Config\ConfigProviderInterface  $config
+     * @param \BetaKiller\Factory\RepositoryFactory       $repositoryFactory
+     * @param \BetaKiller\Assets\AssetsStorageFactory     $storageFactory
+     * @param \BetaKiller\Assets\AssetsUrlStrategyFactory $urlStrategyFactory
+     * @param \BetaKiller\Assets\AssetsHandlerFactory     $handlerFactory
+     * @param \Spotman\Acl\AclInterface                   $acl
      */
-    public function __construct(ConfigProviderInterface $config, NamespaceBasedFactory $factory)
+    public function __construct(
+        NamespaceBasedFactory $factory,
+        ConfigProviderInterface $config,
+        RepositoryFactory $repositoryFactory,
+        AssetsStorageFactory $storageFactory,
+        AssetsUrlStrategyFactory $urlStrategyFactory,
+        AssetsHandlerFactory $handlerFactory,
+        AclInterface $acl
+    )
     {
-        $this->config  = $config;
         $this->factory = $factory
             ->setClassPrefixes('Assets', 'Provider')
+            ->setClassSuffix('AssetsProvider')
             ->setExpectedInterface(AssetsProviderInterface::class);
+
+        $this->config  = $config;
+        $this->repositoryFactory = $repositoryFactory;
+        $this->storageFactory = $storageFactory;
+        $this->urlStrategyFactory = $urlStrategyFactory;
+        $this->handlerFactory = $handlerFactory;
+        $this->acl = $acl;
     }
 
     public function createFromUrlKey($key)
@@ -132,7 +158,7 @@ class AssetsProviderFactory
      *
      * @param string $modelName
      *
-     * @return AbstractAssetsProvider|AbstractAssetsProviderImage|AssetsProviderInterface|mixed
+     * @return \BetaKiller\Assets\Provider\ImageAssetsProviderInterface|AssetsProviderInterface|mixed
      */
     public function createFromModelCodename(string $modelName)
     {
@@ -140,10 +166,11 @@ class AssetsProviderFactory
             return $cached;
         }
 
-        $modelConfig     = $this->getModelConfig($modelName);
-        $providerName    = $modelConfig[AbstractAssetsProvider::CONFIG_MODEL_PROVIDER_KEY];
-        $storageConfig   = $modelConfig[AbstractAssetsProvider::CONFIG_MODEL_STORAGE_KEY];
-        $urlStrategyName = $modelConfig[AbstractAssetsProvider::CONFIG_MODEL_URL_STRATEGY_KEY] ?? 'Hash';
+        $modelConfig             = $this->getModelConfig($modelName);
+        $providerName            = $modelConfig[AbstractAssetsProvider::CONFIG_MODEL_PROVIDER_KEY];
+        $storageConfig           = $modelConfig[AbstractAssetsProvider::CONFIG_MODEL_STORAGE_KEY];
+        $urlStrategyName         = $modelConfig[AbstractAssetsProvider::CONFIG_MODEL_URL_STRATEGY_KEY] ?? 'Hash';
+        $postUploadHandlersNames = $modelConfig[AbstractAssetsProvider::CONFIG_MODEL_POST_UPLOAD_KEY] ?? [];
 
         // Repository codename is equal model name
         $repository = $this->repositoryFactory->create($modelName);
@@ -151,44 +178,37 @@ class AssetsProviderFactory
         // Acl resource name is equal to model name
         $aclResource = $this->acl->getResource($modelName);
 
-        if (!($aclResource instanceof ResolvingResourceInterface)) {
+        if (!($aclResource instanceof AssetsAclResourceInterface)) {
             throw new AssetsException('Acl resource :name must implement :must', [
                 ':name' => $modelName,
-                ':must' => ResolvingResourceInterface::class,
+                ':must' => AssetsAclResourceInterface::class,
             ]);
         }
 
-        $storageInstance = $this->createStorageFromConfig($storageConfig);
+        $storage = $this->createStorageFromConfig($storageConfig);
 
-        $urlStrategyInstance = $this->urlStrategyFactory->create($urlStrategyName);
+        $urlStrategy = $this->urlStrategyFactory->create($urlStrategyName, $repository);
 
-        // TODO Collect custom processing rules
-
-        $providerInstance = $this->create($providerName, $repository, $storageInstance, $aclResource, $urlStrategyInstance);
-
-        $this->instances[$modelName] = $providerInstance;
-
-        return $providerInstance;
-    }
-
-    public function create(
-        string $codename,
-        RepositoryInterface $repository,
-        AssetsStorageInterface $storage,
-        ResolvingResourceInterface $aclResource,
-        AssetsUrlStrategyInterface $urlStrategy
-    ): AssetsProviderInterface {
-        /** @var \BetaKiller\Assets\Provider\AssetsProviderInterface $instance */
-        $instance = $this->factory->create($codename, [
+        /** @var \BetaKiller\Assets\Provider\AssetsProviderInterface $providerInstance */
+        $providerInstance = $this->factory->create($providerName, [
             'storage'     => $storage,
             'repository'  => $repository,
             'aclResource' => $aclResource,
             'urlStrategy' => $urlStrategy,
         ]);
 
-        $instance->setCodename($codename);
+        // Store codename for future use
+        $providerInstance->setCodename($modelName);
 
-        return $instance;
+        // Inject custom post upload handlers
+        foreach ($postUploadHandlersNames as $handlerName) {
+            $handler = $this->handlerFactory->create($handlerName);
+            $providerInstance->addPostUploadHandler($handler);
+        }
+
+        $this->instances[$modelName] = $providerInstance;
+
+        return $providerInstance;
     }
 
     /**

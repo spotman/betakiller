@@ -5,7 +5,7 @@ namespace BetaKiller\Assets\UrlStrategy;
 use BetaKiller\Repository\HashUrlStrategyRepositoryInterface;
 use BetaKiller\Assets\Model\AssetsModelInterface;
 
-class HashUrlStrategy implements AssetsUrlStrategyInterface
+class HashAssetsUrlStrategy implements AssetsUrlStrategyInterface
 {
     /**
      * @var \BetaKiller\Repository\HashUrlStrategyRepositoryInterface
@@ -13,7 +13,7 @@ class HashUrlStrategy implements AssetsUrlStrategyInterface
     private $repository;
 
     /**
-     * HashUrlStrategy constructor.
+     * HashAssetsUrlStrategy constructor.
      *
      * @param \BetaKiller\Repository\HashUrlStrategyRepositoryInterface $repository
      */

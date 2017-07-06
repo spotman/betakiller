@@ -50,10 +50,6 @@ class PhpExceptionResource extends AbstractEntityRelatedAclResource
                 Role::DEVELOPER_ROLE_NAME,
             ],
 
-            self::PERMISSION_LIST_UNRESOLVED => [
-                Role::DEVELOPER_ROLE_NAME,
-            ],
-
             self::PERMISSION_RESOLVE => [
                 Role::DEVELOPER_ROLE_NAME,
             ],
@@ -70,5 +66,14 @@ class PhpExceptionResource extends AbstractEntityRelatedAclResource
                 Role::DEVELOPER_ROLE_NAME,
             ],
         ];
+    }
+
+    protected function getActionsWithoutEntity(): array
+    {
+        return array_merge(parent::getActionsWithoutEntity(), [
+            self::PERMISSION_LIST_RESOLVED,
+            self::PERMISSION_LIST_UNRESOLVED,
+            self::PERMISSION_TEST,
+        ]);
     }
 }

@@ -13,10 +13,12 @@ abstract class AbstractEntityRelatedAclResource extends AbstractCrudlsPermission
 
     /**
      * @param \BetaKiller\Model\AbstractEntityInterface $entity
+     * @return $this
      */
-    public function setEntity(AbstractEntityInterface $entity): void
+    public function setEntity(AbstractEntityInterface $entity)
     {
         $this->entity = $entity;
+        return $this;
     }
 
     /**
@@ -34,13 +36,16 @@ abstract class AbstractEntityRelatedAclResource extends AbstractCrudlsPermission
 
     public function isEntityRequiredForAction(string $actionName): bool
     {
-        $rawActions = [
+        return !in_array($actionName, $this->getActionsWithoutEntity(), true);
+    }
+
+    protected function getActionsWithoutEntity(): array
+    {
+        // Create, list and search actions do not require entity model to be set before processing
+        return [
             self::ACTION_CREATE,
             self::ACTION_LIST,
             self::ACTION_SEARCH,
         ];
-
-        // Create action does not require entity model to be set before processing
-        return !in_array($actionName, $rawActions, true);
     }
 }

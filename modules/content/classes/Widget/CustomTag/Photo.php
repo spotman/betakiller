@@ -5,13 +5,17 @@ use BetaKiller\IFace\Widget\WidgetException;
 
 class Widget_CustomTag_Photo extends AbstractBaseWidget
 {
-    use BetaKiller\Helper\ContentTrait;
-
     /**
      * @var \BetaKiller\Helper\AssetsHelper
      * @Inject
      */
     private $assetsHelper;
+
+    /**
+     * @Inject
+     * @var \BetaKiller\Repository\ContentImageRepository
+     */
+    private $repository;
 
     /**
      * Returns data for View rendering
@@ -21,13 +25,14 @@ class Widget_CustomTag_Photo extends AbstractBaseWidget
      */
     public function getData(): array
     {
-        $image_id = (int)$this->getContextParam('id');
+        $imageID = (int)$this->getContextParam('id');
 
-        if (!$image_id) {
+        if (!$imageID) {
             throw new WidgetException('No image ID provided');
         }
 
-        $model = $this->model_factory_content_image_element()->get_by_id($image_id);
+        /** @var \BetaKiller\Model\ContentImage $model */
+        $model = $this->repository->findById($imageID);
 
         $title    = $this->getContextParam('title');
         $align    = $this->getContextParam('align', 'alignnone');

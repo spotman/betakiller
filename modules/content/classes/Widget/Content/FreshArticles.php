@@ -1,12 +1,10 @@
 <?php
 
-use BetaKiller\Model\ContentPost;
 use BetaKiller\Helper\ContentHelper;
+use BetaKiller\Model\ContentPost;
 
 class Widget_Content_FreshArticles extends Widget_Content_SidebarArticlesList
 {
-    use \BetaKiller\Helper\ContentTrait;
-
     /**
      * @var ContentHelper
      * @Inject
@@ -21,6 +19,6 @@ class Widget_Content_FreshArticles extends Widget_Content_SidebarArticlesList
      */
     protected function get_articles_list($exclude_id, $limit)
     {
-        $this->contentHelper->getPostRepository()->getFreshArticles($limit, $exclude_id);
+        return $this->contentHelper->getPostRepository()->getFreshArticles($limit, $exclude_id);
     }
 }

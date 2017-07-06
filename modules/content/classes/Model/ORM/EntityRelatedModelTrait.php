@@ -27,7 +27,7 @@ trait Model_ORM_EntityRelatedModelTrait
      * @return $this|ORM
      * @throws Kohana_Exception
      */
-    public function set_entity(Entity $entity)
+    public function setEntity(Entity $entity)
     {
         return $this->set('entity', $entity);
     }
@@ -36,7 +36,7 @@ trait Model_ORM_EntityRelatedModelTrait
      * @return Entity
      * @throws Kohana_Exception
      */
-    public function get_entity()
+    public function getEntity()
     {
         return $this->get('entity');
     }
@@ -44,9 +44,9 @@ trait Model_ORM_EntityRelatedModelTrait
     /**
      * @return string
      */
-    public function get_entity_slug()
+    public function getEntitySlug(): string
     {
-        return $this->get_entity()->getSlug();
+        return $this->getEntity()->getSlug();
     }
 
     /**
@@ -57,16 +57,16 @@ trait Model_ORM_EntityRelatedModelTrait
      * @return $this|ORM
      * @throws Kohana_Exception
      */
-    public function set_entity_item_id($id)
+    public function setEntityItemID(int $id)
     {
-        return $this->set('entity_item_id', (int)$id);
+        return $this->set('entity_item_id', $id);
     }
 
     /**
      * @return int
      * @throws Kohana_Exception
      */
-    public function get_entity_item_id()
+    public function getEntityItemID(): int
     {
         return $this->get('entity_item_id');
     }
@@ -77,8 +77,8 @@ trait Model_ORM_EntityRelatedModelTrait
     protected function getRelatedEntityInstance()
     {
         if (!$this->linkedModel) {
-            $id                = $this->get_entity_item_id();
-            $this->linkedModel = $this->get_entity()->getLinkedEntityInstance($id);
+            $id                = $this->getEntityItemID();
+            $this->linkedModel = $this->getEntity()->getLinkedEntityInstance($id);
         }
 
         return $this->linkedModel;

@@ -4,17 +4,24 @@ namespace BetaKiller\Assets\Provider;
 use BetaKiller\Assets\AssetsProviderException;
 use BetaKiller\Assets\Model\AssetsModelImageInterface;
 use BetaKiller\Assets\Model\AssetsModelInterface;
-use Exception;
+use BetaKiller\Model\UserInterface;
 use Image;
 use Request;
 use Route;
 
 /**
- * Class AbstractAssetsProviderImage
- * Abstract class for all image assets
+ * Class ImageAssetsProvider
+ * Common class for all image assets
  */
-abstract class AbstractAssetsProviderImage extends AbstractAssetsProvider implements ImageAssetsProviderInterface
+final class ImageAssetsProvider extends AbstractAssetsProvider implements ImageAssetsProviderInterface
 {
+    const CONFIG_MODEL_UPLOAD_KEY          = 'upload';
+    const CONFIG_MODEL_MAX_HEIGHT_KEY      = 'max-height';
+    const CONFIG_MODEL_MAX_WIDTH_KEY       = 'max-width';
+    const CONFIG_MODEL_PREVIEW_KEY         = 'preview';
+    const CONFIG_MODEL_PREVIEW_SIZES_KEY   = 'sizes';
+    const CONFIG_MODEL_PREVIEW_QUALITY_KEY = 'quality';
+
     /**
      * @param AssetsModelInterface $model
      * @param string               $size 300x200
@@ -22,22 +29,14 @@ abstract class AbstractAssetsProviderImage extends AbstractAssetsProvider implem
      * @return string
      * @throws AssetsProviderException
      */
-    public function getPreviewUrl(AssetsModelInterface $model, $size = null): string
+    public function getPreviewUrl(AssetsModelInterface $model, ?string $size = null): string
     {
-        $url = $model->getUrl();
-
-        if (!$url) {
-            throw new AssetsProviderException('Model with hash :hash must have url', [
-                ':hash' => $model->getHash(),
-            ]);
-        }
-
         $size = $this->determineSize($size);
 
         $options = [
             'provider' => $this->getUrlKey(),
             'action'   => 'preview',
-            'item_url' => $url,
+            'item_url' => $this->getModelUrlPath($model),
             'size'     => $size,
             'ext'      => $this->getModelExtension($model),
         ];
@@ -56,7 +55,7 @@ abstract class AbstractAssetsProviderImage extends AbstractAssetsProvider implem
      *
      * @return int[]
      */
-    private function parseSizeDimensions($size): array
+    private function parseSizeDimensions(string $size): array
     {
         $dimensions = explode(AssetsModelImageInterface::SIZE_DELIMITER, $size);
         $width      = $dimensions[0] ? (int)$dimensions[0] : null;
@@ -65,7 +64,7 @@ abstract class AbstractAssetsProviderImage extends AbstractAssetsProvider implem
         return $this->packDimensions($width, $height);
     }
 
-    private function packDimensions($width, $height): array
+    private function packDimensions(?int $width, ?int $height): array
     {
         return [$width, $height];
     }
@@ -76,7 +75,7 @@ abstract class AbstractAssetsProviderImage extends AbstractAssetsProvider implem
      * @return string
      * @throws \BetaKiller\Assets\AssetsProviderException
      */
-    private function determineSize($size): string
+    private function determineSize(?string $size): string
     {
         $allowed_sizes = $this->getAllowedPreviewSizes();
 
@@ -100,7 +99,7 @@ abstract class AbstractAssetsProviderImage extends AbstractAssetsProvider implem
      * @return float
      * @throws \BetaKiller\Assets\AssetsProviderException
      */
-    private function calculateDimensionsRatio($width, $height): float
+    private function calculateDimensionsRatio(int $width, int $height): float
     {
         if (!$height || !$width) {
             throw new AssetsProviderException('Can not calculate ratio for incomplete dimensions :size', [
@@ -111,19 +110,19 @@ abstract class AbstractAssetsProviderImage extends AbstractAssetsProvider implem
         return $width / $height;
     }
 
-    private function restoreOmittedDimensions($width, $height, $original_ratio): array
+    private function restoreOmittedDimensions(?int $width, ?int $height, float $original_ratio): array
     {
         // Fill omitted dimensions
         if (!$width) {
             $width = $height * $original_ratio;
         } elseif (!$height) {
-            $height = $width / $original_ratio;
+            $height = (int)($width / $original_ratio);
         }
 
         return $this->packDimensions($width, $height);
     }
 
-    public function makePreview(AssetsModelImageInterface $model, $size): string
+    public function makePreviewContent(AssetsModelImageInterface $model, string $size): string
     {
         $size = $this->determineSize($size);
 
@@ -155,69 +154,36 @@ abstract class AbstractAssetsProviderImage extends AbstractAssetsProvider implem
     }
 
     /**
-     * @param AssetsModelImageInterface $model
      * @param string                    $content
-     * @param array                     $_post_data
-     * @param string                    $file_path
+     * @param AssetsModelImageInterface $model
      *
      * @return string
-     * @throws AssetsProviderException
+     * @throws \BetaKiller\Assets\AssetsProviderException
+     * @internal param array $_post_data
+     *
      */
-    protected function customUploadProcessing($model, string $content, ?array $_post_data, string $file_path): string
+    protected function customContentProcessing(string $content, $model): string
     {
-        $max_width  = $this->getUploadMaxWidth();
-        $max_height = $this->getUploadMaxHeight();
+        $maxWidth  = $this->getUploadMaxWidth();
+        $maxHeight = $this->getUploadMaxHeight();
 
-        if (!$max_width || !$max_height) {
+        if (!$maxWidth || !$maxHeight) {
             throw new AssetsProviderException('Upload max dimensions must be set for provider :name', [
                 ':name' => $this->codename,
             ]);
         }
 
         // Skip resizing if image is fitting requirements
-        if ($model->getWidth() <= $max_width && $model->getHeight() <= $max_height) {
+        if ($model->getWidth() <= $maxWidth && $model->getHeight() <= $maxHeight) {
             return $content;
         }
 
         return $this->resize(
             $content,
-            $max_width,
-            $max_height,
+            $maxWidth,
+            $maxHeight,
             100 // 100% quality for original image
         );
-    }
-
-    /**
-     * After upload processing
-     *
-     * @param AssetsModelImageInterface $model
-     * @param array                     $_post_data
-     */
-    protected function postUploadProcessing($model, ?array $_post_data): void
-    {
-        $this->presetWidthAndHeight($model);
-
-        // Save dimensions
-        $this->saveModel($model);
-
-        parent::postUploadProcessing($model, $_post_data);
-    }
-
-    /**
-     * Detects image dimensions from provided file
-     *
-     * @param AssetsModelImageInterface $model
-     *
-     * @throws AssetsProviderException
-     */
-    protected function presetWidthAndHeight(AssetsModelImageInterface $model): void
-    {
-        $content = $this->getContent($model);
-
-        $info = Image::from_content($content);
-
-        $model->setWidth($info->width);
-        $model->setHeight($info->height);
     }
 
     /**
@@ -250,7 +216,7 @@ abstract class AbstractAssetsProviderImage extends AbstractAssetsProvider implem
             }
 
             return $image->render(null /* auto */, $quality);
-        } catch (Exception $e) {
+        } catch (\Throwable $e) {
             throw new AssetsProviderException('Can not resize image, reason: :message', [
                 ':message' => $e->getMessage(),
             ]);
@@ -264,9 +230,12 @@ abstract class AbstractAssetsProviderImage extends AbstractAssetsProvider implem
         return $request->action().($size ? '-'.$size : '').'.'.$request->param('ext');
     }
 
-    public function getAttributesForImgTag(AssetsModelImageInterface $model, ?string $size, array $attributes = null): array
-    {
-        $attributes = array_merge($model->getDefaultAttributesForImgTag(), $attributes ?? []);
+    public function getAttributesForImgTag(
+        AssetsModelImageInterface $model,
+        ?string $size = null,
+        array $attrs = null
+    ): array {
+        $attrs = array_merge($model->getDefaultAttributesForImgTag(), $attrs ?? []);
 
         $original_url = $this->getOriginalUrl($model);
 
@@ -280,7 +249,8 @@ abstract class AbstractAssetsProviderImage extends AbstractAssetsProvider implem
             $size       = $this->determineSize($size);
             $dimensions = $this->parseSizeDimensions($size);
 
-            list($width, $height) = $this->restoreOmittedDimensions($dimensions[0], $dimensions[1], $this->getModelRatio($model));
+            list($width, $height) = $this->restoreOmittedDimensions($dimensions[0], $dimensions[1],
+                $this->getModelRatio($model));
 
             $src = $this->getPreviewUrl($model, $size);
         }
@@ -289,16 +259,16 @@ abstract class AbstractAssetsProviderImage extends AbstractAssetsProvider implem
 
         $image_ratio = $this->calculateDimensionsRatio($width, $height);
 
-        $attributes = array_merge([
+        $attrs = array_merge([
             'src'               => $src,
             'width'             => $width,
             'height'            => $height,
             'srcset'            => $this->getSrcsetAttributeValue($model, $image_ratio),
             'data-original-url' => $original_url,
             'data-id'           => $model->getID(),
-        ], $attributes);
+        ], $attrs);
 
-        return $attributes;
+        return $attrs;
     }
 
     /**
@@ -388,7 +358,7 @@ abstract class AbstractAssetsProviderImage extends AbstractAssetsProvider implem
      */
     public function getUploadMaxHeight(): ?int
     {
-        return $this->getAssetsProviderConfigValue(['upload', 'max-height']);
+        return $this->getAssetsProviderConfigValue([self::CONFIG_MODEL_UPLOAD_KEY, self::CONFIG_MODEL_MAX_HEIGHT_KEY]);
     }
 
     /**
@@ -396,7 +366,7 @@ abstract class AbstractAssetsProviderImage extends AbstractAssetsProvider implem
      */
     public function getUploadMaxWidth(): ?int
     {
-        return $this->getAssetsProviderConfigValue(['upload', 'max-width']);
+        return $this->getAssetsProviderConfigValue([self::CONFIG_MODEL_UPLOAD_KEY, self::CONFIG_MODEL_MAX_WIDTH_KEY]);
     }
 
     /**
@@ -409,15 +379,44 @@ abstract class AbstractAssetsProviderImage extends AbstractAssetsProvider implem
      */
     public function getAllowedPreviewSizes(): array
     {
-        return $this->getAssetsProviderConfigValue(['sizes']);
+        return $this->getAssetsProviderConfigValue([
+            self::CONFIG_MODEL_PREVIEW_KEY,
+            self::CONFIG_MODEL_PREVIEW_SIZES_KEY,
+        ]);
     }
 
     /**
      * @return int
      */
-    public function getPreviewQuality()
+    public function getPreviewQuality(): int
     {
-        // This is optimal for JPEG
-        return 80;
+        return $this->getAssetsProviderConfigValue([
+            self::CONFIG_MODEL_PREVIEW_KEY,
+            self::CONFIG_MODEL_PREVIEW_QUALITY_KEY,
+        ]) ?: 80; // This is optimal for JPEG
+    }
+
+    public function store(string $fullPath, string $originalName, UserInterface $user): AssetsModelInterface
+    {
+        /** @var \BetaKiller\Assets\Model\AssetsModelImageInterface $model */
+        $model = parent::store($fullPath, $originalName, $user);
+
+        $this->detectImageDimensions($model);
+        $this->saveModel($model);
+
+        return $model;
+    }
+
+    /**
+     * @param \BetaKiller\Assets\Model\AssetsModelImageInterface $model
+     */
+    private function detectImageDimensions(AssetsModelImageInterface $model): void
+    {
+        $content = $this->getContent($model);
+
+        $info = Image::from_content($content);
+
+        $model->setWidth($info->width);
+        $model->setHeight($info->height);
     }
 }

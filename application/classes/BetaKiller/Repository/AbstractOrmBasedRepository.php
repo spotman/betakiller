@@ -25,10 +25,19 @@ abstract class AbstractOrmBasedRepository extends AbstractRepository
      * @param int $id
      *
      * @return ExtendedOrmInterface|mixed
+     * @throws \Exception
      */
     public function findById(int $id)
     {
         return $this->getOrmInstance()->get_by_id($id);
+    }
+
+    /**
+     * @return \BetaKiller\Model\AbstractEntityInterface[]|\Traversable
+     */
+    public function getAll()
+    {
+        return $this->getOrmInstance()->get_all();
     }
 
     /**

@@ -42,7 +42,7 @@ class AclHelper
     {
         $resource = $this->getEntityAclResource($entity);
 
-        return $this->isPermissionAllowed($resource,$action ?? CrudlsActionsInterface::ACTION_READ);
+        return $this->isPermissionAllowed($resource, $action ?? CrudlsActionsInterface::ACTION_READ);
     }
 
     /**
@@ -89,8 +89,11 @@ class AclHelper
      * @throws \BetaKiller\IFace\Exception\IFaceException
      * @throws \Spotman\Acl\Exception
      */
-    public function isIFaceAllowed(IFaceInterface $iface, ?UrlContainerInterface $params = null, ?AclUserInterface $user = null): bool
-    {
+    public function isIFaceAllowed(
+        IFaceInterface $iface,
+        ?UrlContainerInterface $params = null,
+        ?AclUserInterface $user = null
+    ): bool {
         $zoneName   = $iface->getZoneName();
         $entityName = $iface->getEntityModelName();
         $actionName = $iface->getEntityActionName();
@@ -253,8 +256,11 @@ class AclHelper
         return true;
     }
 
-    private function isPermissionAllowed(ResolvingResourceInterface $resource, string $permission, ?AclUserInterface $user = null): bool
-    {
+    private function isPermissionAllowed(
+        ResolvingResourceInterface $resource,
+        string $permission,
+        ?AclUserInterface $user = null
+    ): bool {
         if ($user) {
             $resource->useResolver(new UserAccessResolver($this->acl, $user));
         }

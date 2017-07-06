@@ -5,13 +5,17 @@ use BetaKiller\IFace\Widget\WidgetException;
 
 class Widget_CustomTag_Caption extends AbstractBaseWidget
 {
-    use BetaKiller\Helper\ContentTrait;
-
     /**
      * @var \BetaKiller\Helper\AssetsHelper
      * @Inject
      */
     private $assetsHelper;
+
+    /**
+     * @Inject
+     * @var \BetaKiller\Repository\ContentImageRepository
+     */
+    private $repository;
 
     /**
      * Returns data for View rendering
@@ -23,30 +27,30 @@ class Widget_CustomTag_Caption extends AbstractBaseWidget
     {
         $context = $this->getContext();
 
-        $image_id = (int) $context['id'];
+        $imageID = (int)$context['id'];
 
-        if (!$image_id) {
+        if (!$imageID) {
             throw new WidgetException('No image ID provided');
         }
 
         $title = $context['title'];
         $align = Arr::get($context, 'align', 'alignnone');
         $class = Arr::get($context, 'class');
-        $width = (int) Arr::get($context, 'width');
+        $width = (int)Arr::get($context, 'width');
 
-        if (strpos($class, 'align') === FALSE)
-        {
+        if (strpos($class, 'align') === false) {
             $class .= ' '.$align;
         }
 
-        $model = $this->model_factory_content_image_element()->get_by_id($image_id);
+        /** @var \BetaKiller\Model\ContentImage $model */
+        $model = $this->repository->findById($imageID);
 
         return [
-            'image'     =>  $this->assetsHelper->getAttributesForImgTag($model, $model::SIZE_ORIGINAL),
-            'caption'   =>  $title,
-            'align'     =>  $align,
-            'class'     =>  $class,
-            'width'     =>  $width,
+            'image'   => $this->assetsHelper->getAttributesForImgTag($model, $model::SIZE_ORIGINAL),
+            'caption' => $title,
+            'align'   => $align,
+            'class'   => $class,
+            'width'   => $width,
         ];
     }
 }

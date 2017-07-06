@@ -21,25 +21,6 @@ interface AssetsModelInterface extends AbstractEntityInterface
     public function getStorageFileName(): string;
 
     /**
-     * Returns file model url (for deploy url and deploy path)
-     *
-     * @return string
-     * @deprecated Use dedicated AssetsUrlStrategy instead
-     */
-    public function getUrl(): string;
-
-    /**
-     * Performs file model search by url (deploy url dispatching)
-     *
-     * @param string $url
-     *
-     * @return AssetsModelInterface|null
-     * @TODO Move to Repository
-     * @deprecated
-     */
-    public function byUrl($url);
-
-    /**
      * Returns User model, who uploaded the file
      *
      * @return UserInterface
@@ -152,33 +133,9 @@ interface AssetsModelInterface extends AbstractEntityInterface
     public function setSize(int $size): AssetsModelInterface;
 
     /**
-     * Saves the model info
-     *
-     * @return bool
-     * @deprecated Use Repository pattern instead
-     */
-    public function save();
-
-    /**
-     * Removes model
-     *
-     * @return bool
-     * @deprecated Use Repository pattern instead
-     */
-    public function delete();
-
-    /**
      * Returns array representation of the model
      *
      * @return array
      */
     public function toJson(): array;
-
-    /**
-     * Returns TRUE if model is found and loaded
-     *
-     * @return bool
-     * @deprecated Use Repository pattern instead
-     */
-    public function loaded();
 }

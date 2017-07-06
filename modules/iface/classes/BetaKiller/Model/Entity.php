@@ -7,13 +7,6 @@ use ORM;
 class Entity extends ORM
 {
     /**
-     * TODO remove and replace by helper method for searching by name
-     *
-     * @deprecated
-     */
-    const POSTS_ENTITY_ID = 1;
-
-    /**
      * Prepares the model database connection, determines the table name,
      * and loads column information.
      *

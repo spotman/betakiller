@@ -1,8 +1,10 @@
-<?php use BetaKiller\Assets\AssetsException;
+<?php
+
+use BetaKiller\Assets\AssetsException;
 use BetaKiller\Assets\AssetsProviderFactory;
 use BetaKiller\Assets\Model\AssetsModelInterface;
-use BetaKiller\Assets\Provider\AbstractAssetsProvider;
-use BetaKiller\Assets\Provider\AbstractAssetsProviderImage;
+use BetaKiller\Assets\Provider\AssetsProviderInterface;
+use BetaKiller\Assets\Provider\ImageAssetsProviderInterface;
 
 class Controller_Assets extends Controller
 {
@@ -12,16 +14,28 @@ class Controller_Assets extends Controller
     const ACTION_CROP     = 'crop'; // Kept for BC
 
     /**
-     * @var AbstractAssetsProvider
+     * @Inject
+     * @var AssetsProviderFactory
      */
-    protected $provider;
+    private $providerFactory;
+
+    /**
+     * @Inject
+     * @var \BetaKiller\Model\UserInterface
+     */
+    private $user;
+
+    /**
+     * @var AssetsProviderInterface
+     */
+    private $provider;
 
     /**
      * Common action for uploading files through provider
      *
      * @throws AssetsException
      */
-    public function action_upload()
+    public function action_upload(): void
     {
         // This method responds via JSON (all exceptions will be caught automatically)
         $this->content_type_json();
@@ -40,13 +54,13 @@ class Controller_Assets extends Controller
         $_post_data = $this->request->post();
 
         // Uploading via provider
-        $model = $this->provider->upload($_file, $_post_data);
+        $model = $this->provider->upload($_file, $_post_data, $this->user);
 
         // Returns
         $this->send_json(self::JSON_SUCCESS, $model->toJson());
     }
 
-    public function action_original()
+    public function action_original(): void
     {
         $this->detectProvider();
 
@@ -67,13 +81,13 @@ class Controller_Assets extends Controller
         $this->send_file($content, $model->getMime());
     }
 
-    public function action_preview()
+    public function action_preview(): void
     {
         $this->detectProvider();
 
-        if (!($this->provider instanceof AbstractAssetsProviderImage)) {
+        if (!($this->provider instanceof ImageAssetsProviderInterface)) {
             throw new AssetsException('Preview can be served only by instances of :must', [
-                ':must' => AbstractAssetsProviderImage::class,
+                ':must' => ImageAssetsProviderInterface::class,
             ]);
         }
 
@@ -87,7 +101,7 @@ class Controller_Assets extends Controller
             $this->redirectToCanonicalUrl($model);
         }
 
-        $previewContent = $this->provider->makePreview($model, $size);
+        $previewContent = $this->provider->makePreviewContent($model, $size);
 
         // Deploy to cache
         $this->deploy($model, $previewContent);
@@ -99,13 +113,13 @@ class Controller_Assets extends Controller
         $this->send_file($previewContent, $model->getMime());
     }
 
-    public function action_crop()
+    public function action_crop(): void
     {
         $this->detectProvider();
 
-        if (!($this->provider instanceof AbstractAssetsProviderImage)) {
+        if (!($this->provider instanceof ImageAssetsProviderInterface)) {
             throw new AssetsException('Cropping can be processed only by instances of :must', [
-                ':must' => AbstractAssetsProviderImage::class,
+                ':must' => ImageAssetsProviderInterface::class,
             ]);
         }
 
@@ -125,12 +139,12 @@ class Controller_Assets extends Controller
         $this->response->redirect($preview_url, 301);
     }
 
-    private function getSizeParam()
+    private function getSizeParam(): ?string
     {
         return $this->param('size');
     }
 
-    public function action_delete()
+    public function action_delete(): void
     {
         // This method responds via JSON (all exceptions will be caught automatically)
         $this->content_type_json();
@@ -146,7 +160,7 @@ class Controller_Assets extends Controller
         $this->send_json(self::JSON_SUCCESS);
     }
 
-    protected function detectProvider()
+    protected function detectProvider(): void
     {
         $requestKey = $this->param('provider');
 
@@ -154,7 +168,7 @@ class Controller_Assets extends Controller
             throw new AssetsException('You must specify provider codename');
         }
 
-        $this->provider = AssetsProviderFactory::instance()->createFromUrlKey($requestKey);
+        $this->provider = $this->providerFactory->createFromUrlKey($requestKey);
         $providerKey    = $this->provider->getUrlKey();
 
         if ($requestKey !== $providerKey) {
@@ -221,7 +235,7 @@ class Controller_Assets extends Controller
 
             case 'preview':
             case 'crop':
-                if (!($this->provider instanceof AbstractAssetsProviderImage)) {
+                if (!($this->provider instanceof ImageAssetsProviderInterface)) {
                     throw new HTTP_Exception_400('Action :name may be used on images only', [':name' => $action]);
                 }
 

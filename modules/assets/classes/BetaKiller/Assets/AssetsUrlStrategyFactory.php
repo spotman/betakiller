@@ -3,6 +3,7 @@ namespace BetaKiller\Assets;
 
 use BetaKiller\Assets\UrlStrategy\AssetsUrlStrategyInterface;
 use BetaKiller\Factory\NamespaceBasedFactory;
+use BetaKiller\Repository\RepositoryInterface;
 
 class AssetsUrlStrategyFactory
 {
@@ -25,12 +26,15 @@ class AssetsUrlStrategyFactory
     }
 
     /**
-     * @param string $codename
+     * @param string                                                    $codename
+     * @param \BetaKiller\Repository\RepositoryInterface $repository
      *
      * @return \BetaKiller\Assets\UrlStrategy\AssetsUrlStrategyInterface
      */
-    public function create(string $codename): AssetsUrlStrategyInterface
+    public function create(string $codename, RepositoryInterface $repository): AssetsUrlStrategyInterface
     {
-        return $this->factory->create($codename);
+        return $this->factory->create($codename, [
+            'repository' => $repository,
+        ]);
     }
 }

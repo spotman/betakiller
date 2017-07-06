@@ -4,8 +4,8 @@ namespace BetaKiller\Helper;
 use BetaKiller\Assets\AssetsException;
 use BetaKiller\Assets\Model\AssetsModelImageInterface;
 use BetaKiller\Assets\Model\AssetsModelInterface;
-use BetaKiller\Assets\Provider\AbstractAssetsProvider;
-use BetaKiller\Assets\Provider\AbstractAssetsProviderImage;
+use BetaKiller\Assets\Provider\AssetsProviderInterface;
+use BetaKiller\Assets\Provider\ImageAssetsProviderInterface;
 
 class AssetsHelper
 {
@@ -17,7 +17,7 @@ class AssetsHelper
 
     /**
      * Returns URL for uploading new assets
-
+     *
      * @param \BetaKiller\Assets\Model\AssetsModelInterface $model
      *
      * @return string
@@ -49,19 +49,20 @@ class AssetsHelper
         return $this->getImageProviderByModel($model)->getAttributesForImgTag($model, $size, $attributes);
     }
 
-    private function getProviderByModel(AssetsModelInterface $model): AbstractAssetsProvider // TODO Replace with interface
+    private function getProviderByModel(AssetsModelInterface $model): AssetsProviderInterface
     {
         $name = $model->getModelName();
 
         return $this->providerFactory->createFromModelCodename($name);
     }
 
-    private function getImageProviderByModel(AssetsModelImageInterface $model): AbstractAssetsProviderImage // TODO replace with interface
+    private function getImageProviderByModel(AssetsModelImageInterface $model): ImageAssetsProviderInterface
     {
         $provider = $this->getProviderByModel($model);
 
-        if (!($provider instanceof AbstractAssetsProviderImage)) {
-            throw new AssetsException('Model :name must be linked to image provider', [':name' => $model->getModelName()]);
+        if (!($provider instanceof ImageAssetsProviderInterface)) {
+            throw new AssetsException('Model :name must be linked to image provider',
+                [':name' => $model->getModelName()]);
         }
 
         return $provider;

@@ -9,30 +9,30 @@ interface CrudlsPermissionsResourceInterface extends ResolvingResourceInterface,
     /**
      * @return bool
      */
-    public function isListAllowed();
+    public function isListAllowed(): bool;
 
     /**
      * @return bool
      */
-    public function isCreateAllowed();
+    public function isCreateAllowed(): bool;
 
     /**
      * @return bool
      */
-    public function isReadAllowed();
+    public function isReadAllowed(): bool;
 
     /**
      * @return bool
      */
-    public function isUpdateAllowed();
+    public function isUpdateAllowed(): bool;
 
     /**
      * @return bool
      */
-    public function isDeleteAllowed();
+    public function isDeleteAllowed(): bool;
 
     /**
      * @return bool
      */
-    public function isSearchAllowed();
+    public function isSearchAllowed(): bool;
 }

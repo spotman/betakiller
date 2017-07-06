@@ -1,15 +1,13 @@
 <?php
 
 use BetaKiller\IFace\Widget\AbstractBaseWidget;
+use BetaKiller\Model\ContentCategory;
 use BetaKiller\Model\ContentPost;
 use BetaKiller\Model\IFaceZone;
-use BetaKiller\Model\ContentCategory;
 use BetaKiller\Search\SearchResultsInterface;
 
 class Widget_Content_ArticlesList extends AbstractBaseWidget
 {
-    use \BetaKiller\Helper\ContentTrait;
-
     const CATEGORY_ID_QUERY_KEY = 'category-id';
     const PAGE_QUERY_KEY        = 'page';
     const SEARCH_TERM_QUERY_KEY = 'term';
@@ -103,9 +101,11 @@ class Widget_Content_ArticlesList extends AbstractBaseWidget
     protected function get_category()
     {
         if ($this->is_ajax()) {
-            $category_id = (int)$this->query(self::CATEGORY_ID_QUERY_KEY);
+            $categoryID = (int)$this->query(self::CATEGORY_ID_QUERY_KEY);
 
-            return $this->model_factory_content_category($category_id);
+            $categoryRepo = $this->contentHelper->getCategoryRepository();
+
+            return $categoryRepo->findById($categoryID);
         }
 
         return $this->urlParametersHelper->getContentCategory();
@@ -117,9 +117,9 @@ class Widget_Content_ArticlesList extends AbstractBaseWidget
     }
 
     /**
-     * @param                             $page
+     * @param                                        $page
      * @param \BetaKiller\Model\ContentCategory|null $category
-     * @param null $term
+     * @param null                                   $term
      *
      * @return \BetaKiller\Search\SearchResultsInterface
      */
