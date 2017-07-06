@@ -232,7 +232,8 @@ class AclHelper
     }
 
     /**
-     * @param string[] $rules
+     * @param string[]                           $rules
+     * @param null|\Spotman\Acl\AclUserInterface $user
      *
      * @return bool
      */
