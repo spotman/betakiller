@@ -53,7 +53,6 @@ interface IFaceInterface extends SeoMetaInterface
 
     /**
      * Returns data for View
-     * Override this method in child classes
      *
      * @return array
      */
