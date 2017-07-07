@@ -66,7 +66,7 @@ class IFaceStack
         $this->current = null;
     }
 
-    public function getCurrent(): IFaceInterface
+    public function getCurrent(): ?IFaceInterface
     {
         return $this->current;
     }
