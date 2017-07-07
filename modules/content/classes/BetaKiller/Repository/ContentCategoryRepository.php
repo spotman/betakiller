@@ -11,6 +11,14 @@ class ContentCategoryRepository extends AbstractOrmBasedDispatchableRepository i
     use \Model_ORM_RepositoryHasWordpressIdTrait;
 
     /**
+     * @return string
+     */
+    public function getUrlKeyName(): string
+    {
+        return 'uri';
+    }
+
+    /**
      * @return ContentCategory[]
      */
     public function getRoot(): array

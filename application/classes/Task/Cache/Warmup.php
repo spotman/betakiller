@@ -75,19 +75,23 @@ class Task_Cache_Warmup extends Minion_Task
         }
     }
 
-    protected function processIFaceModel(IFaceModelInterface $ifaceModel, UrlContainerInterface $params)
+    protected function processIFaceModel(IFaceModelInterface $ifaceModel, UrlContainerInterface $params): void
     {
         $iface = $this->ifaceProvider->fromModel($ifaceModel);
 
-        $urls = $iface->getPublicAvailableUrls($params, 1);
-        $url  = array_pop($urls);
-        $this->debug('Selected url = '.$url);
+        $urls = $iface->getPublicAvailableUrls($params);
 
-        // No domain coz HMVC do external requests while domain set
-        $path = parse_url($url, PHP_URL_PATH);
+        $this->debug('Found '.count($urls),' urls');
 
-        // Make HMVC request and check response status
-        $this->makeHttpRequest($path);
+        foreach ($urls as $url) {
+            $this->debug('Selected url = '.$url);
+
+            // No domain coz HMVC do external requests while domain set
+            $path = parse_url($url, PHP_URL_PATH);
+
+            // Make HMVC request and check response status
+            $this->makeHttpRequest($path);
+        }
     }
 
     protected function makeHttpRequest($url)

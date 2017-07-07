@@ -4,8 +4,10 @@ namespace BetaKiller\Content\CustomTag;
 use BetaKiller\Model\ContentYoutubeRecord;
 use BetaKiller\Repository\ContentYoutubeRecordRepository;
 
-class YoutubeCustomTag implements CustomTagInterface
+class YoutubeCustomTag extends AbstractCustomTag
 {
+    const TAG_NAME = 'youtube';
+
     /**
      * @var \BetaKiller\Repository\ContentYoutubeRecordRepository
      */
@@ -19,6 +21,16 @@ class YoutubeCustomTag implements CustomTagInterface
     public function __construct(ContentYoutubeRecordRepository $repository)
     {
         $this->repository = $repository;
+    }
+
+    /**
+     * Returns HTML tag name
+     *
+     * @return string
+     */
+    public function getTagName(): string
+    {
+        return self::TAG_NAME;
     }
 
     public function getWysiwygPluginPreviewSrc(array $attributes): string

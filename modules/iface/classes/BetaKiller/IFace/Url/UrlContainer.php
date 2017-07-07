@@ -47,7 +47,7 @@ class UrlContainer implements UrlContainerInterface
      */
     public function setParameter(UrlParameterInterface $object, ?bool $ignoreDuplicate = null): UrlContainerInterface
     {
-        $key = $object::getUrlParametersKey();
+        $key = $object::getUrlContainerKey();
         $this->entitiesRegistry->set($key, $object, $ignoreDuplicate);
 
         return $this;
@@ -98,7 +98,7 @@ class UrlContainer implements UrlContainerInterface
         }
 
         /** @var \BetaKiller\Model\DispatchableEntityInterface $className Hack for autocomplete */
-        $key = $className::getUrlParametersKey();
+        $key = $className::getUrlContainerKey();
 
         return $this->getEntity($key);
     }

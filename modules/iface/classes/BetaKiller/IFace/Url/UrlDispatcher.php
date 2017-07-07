@@ -85,8 +85,7 @@ class UrlDispatcher implements LoggerAwareInterface
         UrlDispatcherCacheInterface $cache,
         AppEnv $env,
         AclHelper $aclHelper
-    )
-    {
+    ) {
         $this->ifaceStack         = $stack;
         $this->ifaceProvider      = $provider;
         $this->urlParameters      = $parameters;
@@ -369,16 +368,17 @@ class UrlDispatcher implements LoggerAwareInterface
         $prototype  = $this->urlPrototypeHelper->fromIFaceModelUri($ifaceModel);
         $dataSource = $this->urlPrototypeHelper->getDataSourceInstance($prototype);
 
+        $this->urlPrototypeHelper->validatePrototypeModelKey($prototype, $dataSource);
+
         // Root element have default uri
         $uriValue = ($it->rootRequested() || ($ifaceModel->isDefault() && !$ifaceModel->hasDynamicUrl()))
             ? self::DEFAULT_URI
             : $it->current();
 
-        $modelKey  = $prototype->getModelKey();
-        $modelName = $prototype->getDataSourceName();
-
         // Search for model item
-        $item = $dataSource->findItemByUrlKeyValue($modelKey, $uriValue, $this->urlParameters);
+        $item = $prototype->hasIdKey()
+            ? $dataSource->findById((int)$uriValue)
+            : $dataSource->findItemByUrlKeyValue($uriValue, $this->urlParameters);
 
         if (!$item) {
             throw new UrlDispatcherException('Can not find item for [:prototype] by [:value]', [
@@ -395,7 +395,7 @@ class UrlDispatcher implements LoggerAwareInterface
         // Store model into registry
         $registry = $this->urlParameters;
 
-        if (method_exists($registry, mb_strtolower('set_'.$modelName))) {
+        if (method_exists($registry, mb_strtolower('set_'.$prototype->getModelKey()))) {
             throw new UrlDispatcherException('Method calls on UrlContainer registry are deprecated');
         }
 
@@ -413,15 +413,27 @@ class UrlDispatcher implements LoggerAwareInterface
         }
     }
 
-    private function storeDataInCache($url): void
+    private function storeDataInCache(string $url): bool
     {
         $stackData  = $this->ifaceStack->getCodenames();
         $paramsData = $this->urlParameters->getAllParameters();
 
-        $this->cache->set($url, [
+        foreach ($paramsData as $param) {
+            if (!$this->isParameterSerializable($param)) {
+                $this->logger->debug('Skip caching non-serializable parameter');
+
+                return false;
+            }
+        }
+
+        $cacheKey = $this->getUrlCacheKey($url);
+
+        $this->cache->set($cacheKey, [
             'stack'      => $stackData,
             'parameters' => $paramsData,
         ]);
+
+        return true;
     }
 
     /**
@@ -429,9 +441,10 @@ class UrlDispatcher implements LoggerAwareInterface
      *
      * @return bool
      */
-    private function restoreDataFromCache($url): bool
+    private function restoreDataFromCache(string $url): bool
     {
-        $data = $this->cache->get($url);
+        $cacheKey = $this->getUrlCacheKey($url);
+        $data     = $this->cache->get($cacheKey);
 
         if (!$data) {
             return false;
@@ -457,6 +470,12 @@ class UrlDispatcher implements LoggerAwareInterface
                     throw new UrlDispatcherException('Cached data for url parameters is incorrect');
                 }
 
+                if (!$this->isParameterSerializable($value)) {
+                    $this->logger->debug('Skip unpacking data from non-serializable parameter');
+
+                    return false;
+                }
+
                 $this->urlParameters->setParameter($value);
             }
 
@@ -473,5 +492,15 @@ class UrlDispatcher implements LoggerAwareInterface
         }
 
         return false;
+    }
+
+    private function isParameterSerializable(UrlParameterInterface $param): bool
+    {
+        return !($param instanceof NonPersistentUrlParameterInterface);
+    }
+
+    private function getUrlCacheKey(string $url): string
+    {
+        return 'urlDispatcher.'.$url;
     }
 }

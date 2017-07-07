@@ -6,45 +6,48 @@
  * Time: 18:49
  */
 
-use BetaKiller\IFace\Widget\AbstractBaseWidget;
-
+use BetaKiller\Content\CustomTag\AttachmentCustomTag;
+use BetaKiller\Content\CustomTag\CaptionCustomTag;
+use BetaKiller\Content\CustomTag\CustomTagException;
+use BetaKiller\Content\CustomTag\GalleryCustomTag;
+use BetaKiller\Content\CustomTag\PhotoCustomTag;
+use BetaKiller\Content\CustomTag\YoutubeCustomTag;
 
 class CustomTagFacade
 {
-    use \BetaKiller\Utils\Instance\Simple;
+    use \BetaKiller\Utils\Instance\SingletonTrait;
 
-    const CAPTION    = 'caption';
-    const GALLERY    = 'gallery';
-    const PHOTO      = 'photo';
-    const YOUTUBE    = 'youtube';
-    const ATTACHMENT = 'attachment';
-
-    const PHOTO_ZOOMABLE         = 'zoomable';
-    const PHOTO_ZOOMABLE_ENABLED = 'true';
+    /**
+     * @Inject
+     * @var \BetaKiller\IFace\WidgetFactory
+     */
+    private $widgetFactory;
 
     public function getAllowedTags()
     {
         return [
-            self::CAPTION,
-            self::GALLERY,
-            self::PHOTO,
-            self::YOUTUBE,
-            self::ATTACHMENT,
+            CaptionCustomTag::TAG_NAME,
+            GalleryCustomTag::TAG_NAME,
+            PhotoCustomTag::TAG_NAME,
+            YoutubeCustomTag::TAG_NAME,
+            AttachmentCustomTag::TAG_NAME,
         ];
     }
 
-    public function getSelfClosingTags()
+    public function getSelfClosingTags(): array
     {
         return $this->getAllowedTags();
     }
 
-    public function isSelfClosingTag($name)
+    public function isSelfClosingTag(string $name): bool
     {
         return in_array($name, $this->getSelfClosingTags(), true);
     }
 
-    public function generateHtml($name, $id = null, array $attributes = [], $content = null)
+    public function generateHtml(string $name, int $id = null, array $attributes = null, string $content = null): string
     {
+        $attributes = $attributes ?? [];
+
         if ($id) {
             $attributes += ['id' => $id];
         }
@@ -54,7 +57,7 @@ class CustomTagFacade
 
         $node .= \HTML::attributes(array_filter($attributes));
 
-        if (!$this->isSelfClosingTag($name) && $content) {
+        if ($content && !$this->isSelfClosingTag($name)) {
             $node .= '>'.$content.'</'.$name.'>';
         } else {
             $node .= ' />';
@@ -64,14 +67,14 @@ class CustomTagFacade
     }
 
     /**
-     * @param string          $text
+     * @param string        $text
      * @param string[]|null $filterTags
-     * @param callable        $callback
+     * @param callable      $callback
      *
      * @return string
-     * @throws \Kohana_Exception
+     * @throws \BetaKiller\Content\CustomTag\CustomTagException
      */
-    public function parse($text, ?array $filterTags, callable $callback)
+    public function parse($text, ?array $filterTags, callable $callback): string
     {
         if ($filterTags === null) {
             $filterTags = $this->getAllowedTags();
@@ -92,8 +95,9 @@ class CustomTagFacade
             // Парсим тег
             $sx = @simplexml_load_string($tag_string);
 
-            if ($sx === false)
-                throw new \Kohana_Exception('Custom tag parsing failed on :string', [':string' => $tag_string]);
+            if ($sx === false) {
+                throw new CustomTagException('Custom tag parsing failed on :string', [':string' => $tag_string]);
+            }
 
             // Получаем атрибуты
             $attributes = [];
@@ -105,7 +109,7 @@ class CustomTagFacade
                 $attributes[$name] = $value;
             }
 
-            $output = call_user_func($callback, $tag_name, $attributes);
+            $output = $callback($tag_name, $attributes);
 
             if ($output !== null) {
                 $text = str_replace(
@@ -119,18 +123,20 @@ class CustomTagFacade
         return $text;
     }
 
-    public function render($name, array $attributes = [])
+    public function render(string $name, ?array $attributes = null): string
     {
-        $widget_name = 'CustomTag_'.ucfirst($name);
+        $widgetName = 'CustomTag_'.ucfirst($name);
 
-        $widget = AbstractBaseWidget::factory($widget_name);
+        $widget = $this->widgetFactory->create($widgetName);
 
-        $widget->setContext($attributes);
+        if ($attributes) {
+            $widget->setContext($attributes);
+        }
 
         return $widget->render();
     }
 
-    public function process($text)
+    public function process(string $text): string
     {
         return $this->parse($text, null, function ($name, array $attributes) {
             return $this->render($name, $attributes);

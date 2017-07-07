@@ -1,7 +1,6 @@
 <?php
 namespace BetaKiller\IFace\Url;
 
-
 interface UrlParameterInterface
 {
     /**
@@ -9,7 +8,7 @@ interface UrlParameterInterface
      *
      * @return string
      */
-    public static function getUrlParametersKey(): string;
+    public static function getUrlContainerKey(): string;
 
     /**
      * Returns value of the $key property

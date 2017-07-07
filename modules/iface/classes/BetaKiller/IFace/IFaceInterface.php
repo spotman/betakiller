@@ -217,9 +217,8 @@ interface IFaceInterface extends SeoMetaInterface
 
     /**
      * @param \BetaKiller\IFace\Url\UrlContainerInterface $params
-     * @param int|null                                    $limit
      *
      * @return string[]
      */
-    public function getPublicAvailableUrls(UrlContainerInterface $params, ?int $limit = null): array;
+    public function getPublicAvailableUrls(UrlContainerInterface $params): array;
 }

@@ -1,5 +1,6 @@
 <?php
 
+use BetaKiller\Content\CustomTag\PhotoCustomTag;
 use BetaKiller\IFace\Widget\AbstractBaseWidget;
 use BetaKiller\IFace\Widget\WidgetException;
 
@@ -39,7 +40,7 @@ class Widget_CustomTag_Photo extends AbstractBaseWidget
         $alt      = $this->getContextParam('alt');
         $class    = $this->getContextParam('class');
         $width    = (int)$this->getContextParam('width');
-        $zoomable = ($this->getContextParam(CustomTagFacade::PHOTO_ZOOMABLE) === CustomTagFacade::PHOTO_ZOOMABLE_ENABLED);
+        $zoomable = ($this->getContextParam(PhotoCustomTag::ATTRIBUTE_ZOOMABLE_NAME) === PhotoCustomTag::ATTRIBUTE_ZOOMABLE_ENABLED);
 
         if (strpos($class, 'align') === false) {
             $classes[] = $align;

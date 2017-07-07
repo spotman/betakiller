@@ -90,7 +90,7 @@ class ORM extends Utils\Kohana\ORM implements ExtendedOrmInterface
      *
      * @return string
      */
-    public static function getUrlParametersKey(): string
+    public static function getUrlContainerKey(): string
     {
         return static::detectModelName();
     }

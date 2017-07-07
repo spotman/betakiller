@@ -17,8 +17,8 @@
     </iface>
 
     <iface uri="custom-tags" codename="Admin_Content_CustomTag_Index" parentCodename="Admin_Index" label="Custom tag plugin" zone="admin" aclRules="Admin.enabled">
-        <iface uri="{CustomTag.name}" codename="Admin_Content_CustomTag_Item" label="{CustomTag.name}" hasDynamicUrl="true" zone="admin" aclRules="Admin.enabled">
-            <iface uri="wysiwyg-preview" codename="Admin_Content_CustomTag_WysiwygPreview" label="Preview" zone="admin" />
+        <iface uri="{CustomTag.codename}" codename="Admin_Content_CustomTag_Item" label="{CustomTag.codename}" hasDynamicUrl="true" zone="admin" aclRules="Admin.enabled">
+            <iface uri="wysiwyg-preview" codename="Admin_Content_CustomTag_WysiwygPreview" label="Preview" zone="admin" aclRules="Admin.enabled" />
         </iface>
     </iface>
 

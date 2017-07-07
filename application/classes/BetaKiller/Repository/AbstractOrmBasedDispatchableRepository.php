@@ -9,26 +9,23 @@ use BetaKiller\Utils\Kohana\ORM\OrmInterface;
 abstract class AbstractOrmBasedDispatchableRepository extends AbstractOrmBasedRepository implements UrlDataSourceInterface
 {
     /**
-     * Performs search for model item where the $key property value is equal to $value
+     * Performs search for model item where the url key property is equal to $value
      *
-     * @param string                                      $key
      * @param string                                      $value
      * @param \BetaKiller\IFace\Url\UrlContainerInterface $parameters
      *
      * @return UrlParameterInterface|null
      */
     public function findItemByUrlKeyValue(
-        string $key,
         string $value,
         UrlContainerInterface $parameters
     ): ?UrlParameterInterface
     {
         $orm = $this->getOrmInstance();
+        $key = $this->getUrlKeyName();
 
         // Additional filtering for non-pk keys
-        if ($key !== $orm->primary_key()) {
-            $this->customFilterForUrlDispatching($orm, $parameters);
-        }
+        $this->customFilterForUrlDispatching($orm, $parameters);
 
         $model = $orm->where($orm->object_column($key), '=', $value)->find();
 
@@ -36,33 +33,21 @@ abstract class AbstractOrmBasedDispatchableRepository extends AbstractOrmBasedRe
     }
 
     /**
-     * Returns list of available items (model records) by $key property
+     * Returns list of available items (model records) by url key property
      *
-     * @param string                $key
      * @param UrlContainerInterface $parameters
-     * @param int|null              $limit
      *
      * @return \BetaKiller\IFace\Url\UrlParameterInterface[]
      */
-    public function getItemsByUrlKey(
-        string $key,
-        UrlContainerInterface $parameters,
-        ?int $limit = null
-    ): array {
+    public function getItemsHavingUrlKey(UrlContainerInterface $parameters): array {
         $orm = $this->getOrmInstance();
 
         // Additional filtering for non-pk keys
-        if ($key !== $orm->primary_key()) {
-            $this->customFilterForUrlDispatching($orm, $parameters);
-        }
+        $this->customFilterForUrlDispatching($orm, $parameters);
 
-        if ($limit) {
-            $orm->limit($limit);
-        }
+        $keyColumn = $orm->object_column($this->getUrlKeyName());
 
-        $key_column = $orm->object_column($key);
-
-        $result = $orm->where($key_column, 'IS NOT', null)->group_by($key_column)->find_all();
+        $result = $orm->where($keyColumn, 'IS NOT', null)->group_by($keyColumn)->find_all();
 
         return $result->count() ? $result->as_array() : [];
     }

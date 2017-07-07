@@ -14,10 +14,16 @@ class ContentPostRepository extends AbstractOrmBasedDispatchableRepository imple
 {
     use \Model_ORM_RepositoryHasWordpressIdTrait;
 
-    protected function customFilterForUrlDispatching(
-        OrmInterface $orm,
-        UrlContainerInterface $parameters
-    ): void {
+    /**
+     * @return string
+     */
+    public function getUrlKeyName(): string
+    {
+        return 'uri';
+    }
+
+    protected function customFilterForUrlDispatching(OrmInterface $orm, UrlContainerInterface $parameters): void
+    {
         // Load pages first
         $this->prioritizeByPostTypes($orm);
 
@@ -69,7 +75,7 @@ class ContentPostRepository extends AbstractOrmBasedDispatchableRepository imple
         int $page,
         int $itemsPerPage,
         ContentCategory $category = null,
-        $term = null
+        ?string $term = null
     ): SearchResultsInterface {
         $orm = $this->getOrmInstance();
 

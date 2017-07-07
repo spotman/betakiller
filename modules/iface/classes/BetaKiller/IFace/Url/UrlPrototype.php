@@ -3,6 +3,9 @@ namespace BetaKiller\IFace\Url;
 
 class UrlPrototype
 {
+    const KEY_SEPARATOR = '.';
+    const METHOD_CALL_MARKER = '()';
+
     /**
      * @var string
      */
@@ -19,37 +22,88 @@ class UrlPrototype
     protected $isMethodCall = false;
 
     /**
+     * UrlPrototype constructor.
+     *
+     * @param string $modelName
      * @param string $modelKey
-     * @return $this
+     * @param bool   $isMethodCall
      */
-    public function setModelKey($modelKey)
+    public function __construct(string $modelName, string $modelKey, ?bool $isMethodCall = null)
+    {
+        $this->setModelName($modelName);
+        $this->setModelKey($modelKey);
+
+        if ($isMethodCall) {
+            $this->markAsMethodCall();
+        }
+    }
+
+    /**
+     * @param string $string
+     *
+     * @return \BetaKiller\IFace\Url\UrlPrototype
+     */
+    public static function fromString(string $string): UrlPrototype
+    {
+        if (!$string) {
+            throw new UrlPrototypeException('Empty url prototype string');
+        }
+
+        if ($string[0] !== '{' || substr($string, -1) !== '}') {
+            throw new UrlPrototypeException('Prototype string must be surrounded by curly braces');
+        }
+
+        $string = trim($string, '{}');
+
+        list($modelName, $keyPart) = explode(self::KEY_SEPARATOR, $string, 2);
+
+        $key = str_replace(self::METHOD_CALL_MARKER, '', $keyPart);
+        $isMethodCall = substr($keyPart, -2) === self::METHOD_CALL_MARKER;
+
+        return new self($modelName, $key, $isMethodCall);
+    }
+
+    /**
+     * @param string $modelKey
+     *
+     * @return UrlPrototype
+     */
+    private function setModelKey(string $modelKey): UrlPrototype
     {
         $this->modelKey = $modelKey;
+
         return $this;
     }
 
     /**
      * @return string
      */
-    public function getModelKey()
+    public function getModelKey(): string
     {
         return $this->modelKey;
     }
 
+    public function hasIdKey(): bool
+    {
+        return $this->modelKey === 'id';
+    }
+
     /**
      * @param string $modelName
-     * @return $this
+     *
+     * @return UrlPrototype
      */
-    public function setModelName($modelName)
+    private function setModelName(string $modelName): UrlPrototype
     {
         $this->modelName = $modelName;
+
         return $this;
     }
 
     /**
      * @return string
      */
-    public function getDataSourceName()
+    public function getDataSourceName(): string
     {
         return $this->modelName;
     }
@@ -57,27 +111,40 @@ class UrlPrototype
     /**
      * @return bool
      */
-    public function isMethodCall()
+    public function isMethodCall(): bool
     {
         return $this->isMethodCall;
     }
 
-    /**
-     * @return $this
-     */
-    public function markAsMethodCall()
+    public function asString(): string
     {
-        return $this->setIsMethodCall(true);
+        $str = $this->getDataSourceName().self::KEY_SEPARATOR.$this->getModelKey();
+
+        if ($this->isMethodCall()) {
+            $str .= self::METHOD_CALL_MARKER;
+        }
+
+        return $str;
     }
 
     /**
-     * @param bool $value
+     * The __toString method allows a class to decide how it will react when it is converted to a string.
      *
-     * @return $this
+     * @return string
+     * @link http://php.net/manual/en/language.oop5.magic.php#language.oop5.magic.tostring
      */
-    private function setIsMethodCall($value)
+    public function __toString()
     {
-        $this->isMethodCall = (bool)$value;
+        return $this->asString();
+    }
+
+    /**
+     * @return UrlPrototype
+     */
+    private function markAsMethodCall(): UrlPrototype
+    {
+        $this->isMethodCall = true;
+
         return $this;
     }
 }

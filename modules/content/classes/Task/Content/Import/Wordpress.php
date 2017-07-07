@@ -2,6 +2,11 @@
 
 use BetaKiller\Assets\Model\AssetsModelImageInterface;
 use BetaKiller\Assets\Provider\AssetsProviderInterface;
+use BetaKiller\Content\CustomTag\AttachmentCustomTag;
+use BetaKiller\Content\CustomTag\CaptionCustomTag;
+use BetaKiller\Content\CustomTag\GalleryCustomTag;
+use BetaKiller\Content\CustomTag\PhotoCustomTag;
+use BetaKiller\Content\CustomTag\YoutubeCustomTag;
 use BetaKiller\Content\WordpressAttachmentInterface;
 use BetaKiller\Model\ContentComment;
 use BetaKiller\Model\ContentImage;
@@ -17,6 +22,7 @@ use Thunder\Shortcode\Parser\RegexParser;
 use Thunder\Shortcode\Processor\Processor;
 use Thunder\Shortcode\Serializer\TextSerializer;
 use Thunder\Shortcode\Shortcode\ShortcodeInterface;
+use BetaKiller\Model\UserInterface;
 
 class Task_Content_Import_Wordpress extends AbstractTask
 {
@@ -96,6 +102,12 @@ class Task_Content_Import_Wordpress extends AbstractTask
      * @var \BetaKiller\Repository\QuoteRepository
      */
     private $quoteRepository;
+
+    /**
+     * @Inject
+     * @var \CustomTagFacade
+     */
+    private $customTagFacade;
 
     protected function define_options(): array
     {
@@ -537,9 +549,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
      */
     private function removeClosingCustomTags($text): string
     {
-        $ct = $this->custom_tag_instance();
-
-        foreach ($ct->getSelfClosingTags() as $tag) {
+        foreach ($this->customTagFacade->getSelfClosingTags() as $tag) {
             $text = str_replace('></'.$tag.'>', ' />', $text);
         }
 
@@ -550,7 +560,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
 //    {
 //        $this->debug('Removing links on content images...');
 //
-//        $tag = CustomTagFacade::PHOTO;
+//        $tag = CustomTagFacade::TAG_NAME;
 //
 //        $images = $root->find('a > '.$tag);
 //
@@ -589,7 +599,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
 
             $new_url = $this->assetsHelper->getOriginalUrl($model);
 
-            $attach = $document->createElement(CustomTagFacade::ATTACHMENT, null, [
+            $attach = $document->createElement(AttachmentCustomTag::TAG_NAME, null, [
                 'id' => $model->getID(),
             ]);
 
@@ -720,7 +730,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
 
         $parameters['title'] = $caption_text;
 
-        return $this->custom_tag_instance()->generateHtml(CustomTagFacade::CAPTION, $image->getID(), $parameters);
+        return $this->customTagFacade->generateHtml(CaptionCustomTag::TAG_NAME, $image->getID(), $parameters);
     }
 
     public function thunder_handler_gallery(
@@ -765,7 +775,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
         ];
 
         // No ID in this tag
-        return $this->custom_tag_instance()->generateHtml(CustomTagFacade::GALLERY, null, $attributes);
+        return $this->customTagFacade->generateHtml(GalleryCustomTag::TAG_NAME, null, $attributes);
     }
 
     public function thunder_handler_wonderplugin(
@@ -820,7 +830,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
         ];
 
         // No ID in this tag
-        return $this->custom_tag_instance()->generateHtml(CustomTagFacade::GALLERY, null, $attributes);
+        return $this->customTagFacade->generateHtml(GalleryCustomTag::TAG_NAME, null, $attributes);
     }
 
     /**
@@ -858,7 +868,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
             // Remove links to content images coz they would be added automatically
             if ($parentTagName === 'a' && $parent->attr('href') === $image->attr('src')) {
                 // Mark image as "zoomable"
-                $targetTag->attr(CustomTagFacade::PHOTO_ZOOMABLE, CustomTagFacade::PHOTO_ZOOMABLE_ENABLED);
+                $targetTag->attr(PhotoCustomTag::ATTRIBUTE_ZOOMABLE_NAME, PhotoCustomTag::ATTRIBUTE_ZOOMABLE_ENABLED);
                 $parent->replace($targetTag);
             } else {
                 $image->replace($targetTag);
@@ -921,14 +931,14 @@ class Task_Content_Import_Wordpress extends AbstractTask
         $attributes['id'] = $image->get_id();
 
         $document = $node->getDocument();
-        $element  = $document->createElement(CustomTagFacade::PHOTO);
+        $element  = $document->createElement(PhotoCustomTag::TAG_NAME);
 
         foreach ($attributes as $key => $value) {
             $element->setAttribute($key, $value);
         }
 
         return $element;
-//        return $node->getDocument()->createElement(CustomTagFacade::PHOTO, null, $attributes);
+//        return $node->getDocument()->createElement(CustomTagFacade::TAG_NAME, null, $attributes);
     }
 
     protected function process_content_youtube_iframes(ContentPost $item): void
@@ -1036,7 +1046,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
             'height' => $height,
         ];
 
-        return $this->custom_tag_instance()->generateHtml(CustomTagFacade::YOUTUBE, $video->get_id(), $attributes);
+        return $this->customTagFacade->generateHtml(YoutubeCustomTag::TAG_NAME, $video->get_id(), $attributes);
     }
 
     /**
@@ -1248,7 +1258,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
         }
     }
 
-    protected function create_new_user($login, $email)
+    protected function create_new_user(string $login, string $email): UserInterface
     {
         // TODO move this to system-wide service
 
@@ -1281,13 +1291,5 @@ class Task_Content_Import_Wordpress extends AbstractTask
     protected function wp(): \WP
     {
         return WP::instance();
-    }
-
-    /**
-     * @return \CustomTagFacade
-     */
-    private function custom_tag_instance(): CustomTagFacade
-    {
-        return \CustomTagFacade::instance();
     }
 }

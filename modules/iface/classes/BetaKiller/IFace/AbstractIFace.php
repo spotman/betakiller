@@ -6,6 +6,7 @@ use BetaKiller\IFace\Exception\IFaceException;
 use BetaKiller\IFace\Url\UrlDataSourceInterface;
 use BetaKiller\IFace\Url\UrlDispatcher;
 use BetaKiller\IFace\Url\UrlContainerInterface;
+use BetaKiller\IFace\Url\UrlPrototype;
 use DateInterval;
 use DateTimeInterface;
 use Text;
@@ -542,40 +543,43 @@ abstract class AbstractIFace implements IFaceInterface
 
     /**
      * @param \BetaKiller\IFace\Url\UrlContainerInterface $params
-     * @param int|null                                    $limit
      *
      * @return string[]
      */
-    public function getPublicAvailableUrls(UrlContainerInterface $params, ?int $limit = null): array
+    public function getPublicAvailableUrls(UrlContainerInterface $params): array
     {
         if (!$this->getModel()->hasDynamicUrl()) {
             // Make static URL
             return [$this->makeAvailableUrl($params)];
         }
 
-        return $this->getDynamicModelAvailableUrls($params, $limit);
+        return $this->getDynamicModelAvailableUrls($params);
     }
 
     /**
      * @param \BetaKiller\IFace\Url\UrlContainerInterface $params
-     * @param int|null                                    $limit
      *
      * @return string[]
      */
-    private function getDynamicModelAvailableUrls(UrlContainerInterface $params, ?int $limit = null): array
+    private function getDynamicModelAvailableUrls(UrlContainerInterface $params): array
     {
         $prototype  = $this->prototypeHelper->fromIFaceUri($this);
         $dataSource = $this->prototypeHelper->getDataSourceInstance($prototype);
 
-        $urlsBlocks = $this->getDataSourceAvailableUrls($dataSource, $prototype->getModelKey(), $params, $limit);
+        $this->prototypeHelper->validatePrototypeModelKey($prototype, $dataSource);
+
+        $urlsBlocks = $this->getDataSourceAvailableUrls($dataSource, $prototype, $params);
 
         // Empty $urlBlocks leads array_merge() to return null
         return array_filter($urlsBlocks ? array_merge(...$urlsBlocks) : []);
     }
 
-    private function getDataSourceAvailableUrls(UrlDataSourceInterface $dataSource, string $key, UrlContainerInterface $params, ?int $limit = null): array
+    private function getDataSourceAvailableUrls(UrlDataSourceInterface $dataSource, UrlPrototype $prototype, UrlContainerInterface $params): array
     {
-        $items = $dataSource->getItemsByUrlKey($key, $params, $limit);
+        $items = $prototype->hasIdKey()
+            ? $dataSource->getAll()
+            : $dataSource->getItemsHavingUrlKey($params);
+
         $urlsBlocks  = [];
 
         foreach ($items as $item) {
@@ -583,19 +587,26 @@ abstract class AbstractIFace implements IFaceInterface
             $params->setParameter($item, true);
 
             // Make dynamic URL
-            $urlsBlocks[] = [$this->makeAvailableUrl($params)];
+            $url = $this->makeAvailableUrl($params);
+
+            if (!$url) {
+                // No tree traversal if current url is not allowed
+                continue;
+            }
+
+            $urlsBlocks[] = [$url];
 
             // Recursion for trees
             if ($this->getModel()->hasTreeBehaviour()) {
                 // Recursion for tree behaviour
-                $urlsBlocks[] = $this->getDataSourceAvailableUrls($dataSource, $key, $params, $limit);
+                $urlsBlocks[] = $this->getDataSourceAvailableUrls($dataSource, $prototype, $params);
             }
         }
 
         return $urlsBlocks;
     }
 
-    private function makeAvailableUrl(UrlContainerInterface $params = null): string
+    private function makeAvailableUrl(UrlContainerInterface $params = null): ?string
     {
         if (!$this->aclHelper->isIFaceAllowed($this, $params)) {
             return null;

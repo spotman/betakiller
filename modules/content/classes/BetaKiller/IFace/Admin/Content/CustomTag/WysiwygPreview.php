@@ -1,17 +1,19 @@
 <?php
-namespace BetaKiller\IFace\Admin\CustomTag;
+namespace BetaKiller\IFace\Admin\Content\CustomTag;
 
-use BetaKiller\IFace\Admin\AbstractAdminBase;
 use BetaKiller\Content\CustomTag\CustomTagInterface;
+use BetaKiller\IFace\Admin\AbstractAdminBase;
 
 class WysiwygPreview extends AbstractAdminBase
 {
     /**
+     * @Inject
      * @var \BetaKiller\IFace\Url\UrlContainerInterface
      */
     private $urlParameters;
 
     /**
+     * @Inject
      * @var \BetaKiller\Helper\ResponseHelper
      */
     private $responseHelper;
@@ -25,7 +27,7 @@ class WysiwygPreview extends AbstractAdminBase
     public function getData(): array
     {
         /** @var CustomTagInterface $currentTag */
-        $currentTag = $this->urlParameters->getParameter('CustomTag');
+        $currentTag = $this->urlParameters->getParameter(CustomTagInterface::URL_CONTAINER_KEY);
 
         $attributesKeys = $this->urlParameters->getQueryPartsKeys();
 
