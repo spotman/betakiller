@@ -87,9 +87,9 @@ interface AssetsModelInterface extends AbstractEntityInterface
     /**
      * Returns unique hash
      *
-     * @return string
+     * @return string|null
      */
-    public function getHash(): string;
+    public function getHash(): ?string;
 
     /**
      * Stores unique hash

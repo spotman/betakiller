@@ -29,7 +29,11 @@ abstract class AbstractOrmBasedRepository extends AbstractRepository
      */
     public function findById(int $id)
     {
-        return $this->getOrmInstance()->get_by_id($id, true);
+        try {
+            return $this->getOrmInstance()->get_by_id($id);
+        } catch (\Throwable $e) {
+            return null;
+        }
     }
 
     /**

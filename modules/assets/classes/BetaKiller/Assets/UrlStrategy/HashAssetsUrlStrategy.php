@@ -2,6 +2,7 @@
 namespace BetaKiller\Assets\UrlStrategy;
 
 
+use BetaKiller\Assets\AssetsException;
 use BetaKiller\Repository\HashUrlStrategyRepositoryInterface;
 use BetaKiller\Assets\Model\AssetsModelInterface;
 
@@ -45,7 +46,15 @@ class HashAssetsUrlStrategy implements AssetsUrlStrategyInterface
      */
     public function getFilenameFromModel(AssetsModelInterface $model): string
     {
-        return $model->getHash();
+        $hash = $model->getHash();
+
+        if (!$hash) {
+            throw new AssetsException('Asset has no hash :object', [
+                ':object' => json_encode($model->toJson()),
+            ]);
+        }
+
+        return $hash;
     }
 
 }

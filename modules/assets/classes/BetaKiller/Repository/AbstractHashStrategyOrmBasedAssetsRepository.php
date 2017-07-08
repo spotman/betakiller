@@ -7,7 +7,7 @@ abstract class AbstractHashStrategyOrmBasedAssetsRepository extends AbstractOrmB
 {
     public function findByHash(string $hash): ?AssetsModelInterface
     {
-        /** @var \BetaKiller\Assets\Model\OrmBasedAssetsModelInterface $model */
+        /** @var \BetaKiller\Assets\Model\AssetsModelInterface|mixed $model */
         $model = $this->getOrmInstance()->where('hash', '=', $hash)->find();
 
         return $model->loaded() ? $model : null;

@@ -1,6 +1,7 @@
 <?php
 namespace BetaKiller\Model;
 
+use BetaKiller\Helper\SeoMetaInterface;
 use BetaKiller\IFace\IFaceModelInterface;
 use BetaKiller\Utils\Kohana\TreeModelSingleParentOrm;
 
@@ -207,9 +208,9 @@ class IFace extends TreeModelSingleParentOrm implements IFaceModelInterface
      *
      * @param string $value
      *
-     * @return $this
+     * @return SeoMetaInterface
      */
-    public function setTitle(string $value)
+    public function setTitle(string $value): SeoMetaInterface
     {
         return $this->set('title', (string)$value);
     }
@@ -219,9 +220,9 @@ class IFace extends TreeModelSingleParentOrm implements IFaceModelInterface
      *
      * @param string $value
      *
-     * @return $this
+     * @return SeoMetaInterface
      */
-    public function setDescription(string $value)
+    public function setDescription(string $value): SeoMetaInterface
     {
         return $this->set('description', (string)$value);
     }

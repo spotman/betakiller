@@ -12,7 +12,7 @@ use BetaKiller\Model\ContentImageInterface;
  */
 class ContentImageRepository extends AbstractHashStrategyOrmBasedAssetsRepository implements WordpressAttachmentRepositoryInterface
 {
-    use BetaKiller\Repository\OrmBasedContentElementRepositoryTrait;
+    use OrmBasedContentElementRepositoryTrait;
     use OrmBasedRepositoryHasWordpressIdTrait;
     use OrmBasedRepositoryHasWordpressPathTrait;
 }

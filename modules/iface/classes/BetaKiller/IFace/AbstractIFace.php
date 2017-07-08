@@ -2,6 +2,7 @@
 namespace BetaKiller\IFace;
 
 use BetaKiller\Config\AppConfigInterface;
+use BetaKiller\Helper\SeoMetaInterface;
 use BetaKiller\IFace\Exception\IFaceException;
 use BetaKiller\IFace\Url\UrlDataSourceInterface;
 use BetaKiller\IFace\Url\UrlDispatcher;
@@ -137,9 +138,9 @@ abstract class AbstractIFace implements IFaceInterface
      *
      * @param string $value
      *
-     * @return $this
+     * @return SeoMetaInterface
      */
-    public function setTitle(string $value)
+    public function setTitle(string $value): SeoMetaInterface
     {
         $this->getModel()->setTitle($value);
 
@@ -151,9 +152,9 @@ abstract class AbstractIFace implements IFaceInterface
      *
      * @param string $value
      *
-     * @return $this
+     * @return SeoMetaInterface
      */
-    public function setDescription(string $value)
+    public function setDescription(string $value): SeoMetaInterface
     {
         $this->getModel()->setDescription($value);
 

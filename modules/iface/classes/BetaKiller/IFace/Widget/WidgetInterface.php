@@ -1,15 +1,13 @@
 <?php
 namespace BetaKiller\IFace\Widget;
 
-use BetaKiller\Utils\Kohana\Request;
-use BetaKiller\Utils\Kohana\Response;
-
 interface WidgetInterface
 {
     /**
      * Setter for widget name
      *
      * @param string $value
+     *
      * @return $this
      */
     public function setName($value);
@@ -22,23 +20,24 @@ interface WidgetInterface
     public function getName(): string;
 
     /**
-     * @param \BetaKiller\Utils\Kohana\Request $request
+     * @param \Request $request
      *
      * @return $this
      */
-    public function setRequest(Request $request);
+    public function setRequest(\Request $request);
 
     /**
-     * @param \BetaKiller\Utils\Kohana\Response $response
+     * @param \Response $response
      *
      * @return $this
      */
-    public function setResponse(Response $response);
+    public function setResponse(\Response $response);
 
     /**
      * Setter for widget context (additional data for rendering)
      *
      * @param array $value
+     *
      * @return $this
      */
     public function setContext(array $value);
@@ -51,7 +50,7 @@ interface WidgetInterface
     public function getContext(): array;
 
     /**
-     * @param string $name
+     * @param string     $name
      * @param mixed|null $default
      *
      * @return mixed
@@ -60,6 +59,7 @@ interface WidgetInterface
 
     /**
      * Renders widget and returns its representation
+     *
      * @return string
      */
     public function __toString();

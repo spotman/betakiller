@@ -35,6 +35,10 @@ class Widget_CustomTag_Attachment extends AbstractBaseWidget
 
         $model = $this->repository->findById($attachID);
 
+        if (!$model) {
+            throw new WidgetException('No content attachment found for ID :value', [':value' => $attachID]);
+        }
+
         $title = HTML::chars(Arr::get($context, 'title'));
         $class = Arr::get($context, 'class');
 

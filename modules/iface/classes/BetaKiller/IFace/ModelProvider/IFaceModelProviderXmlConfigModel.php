@@ -1,6 +1,7 @@
 <?php
 namespace BetaKiller\IFace\ModelProvider;
 
+use BetaKiller\Helper\SeoMetaInterface;
 use BetaKiller\IFace\Exception\IFaceException;
 use BetaKiller\IFace\IFaceModelInterface;
 use BetaKiller\Model\IFaceZone;
@@ -109,7 +110,7 @@ class IFaceModelProviderXmlConfigModel implements IFaceModelInterface
      * @return int
      * @throws HTTP_Exception_501
      */
-    public function get_id()
+    public function get_id(): int
     {
         throw new HTTP_Exception_501('Admin IFace model have no ID');
     }
@@ -193,10 +194,10 @@ class IFaceModelProviderXmlConfigModel implements IFaceModelInterface
      *
      * @param string $value
      *
-     * @return $this
+     * @return SeoMetaInterface
      * @throws HTTP_Exception_501
      */
-    public function setTitle(string $value)
+    public function setTitle(string $value): SeoMetaInterface
     {
         throw new HTTP_Exception_501('Admin model can not change title');
     }
@@ -206,10 +207,10 @@ class IFaceModelProviderXmlConfigModel implements IFaceModelInterface
      *
      * @param string $value
      *
-     * @return $this
+     * @return SeoMetaInterface
      * @throws HTTP_Exception_501
      */
-    public function setDescription(string $value)
+    public function setDescription(string $value): SeoMetaInterface
     {
         throw new HTTP_Exception_501('Admin model can not change description');
     }

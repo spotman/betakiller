@@ -11,7 +11,7 @@ use ORM;
  *
  * Abstract class for all ORM-based asset models
  */
-abstract class AbstractAssetsOrmModel extends ORM implements OrmBasedAssetsModelInterface
+abstract class AbstractAssetsOrmModel extends ORM implements AssetsModelInterface
 {
     protected function _initialize(): void
     {
@@ -52,9 +52,9 @@ abstract class AbstractAssetsOrmModel extends ORM implements OrmBasedAssetsModel
     /**
      * Returns file`s hash string
      *
-     * @return string
+     * @return string|null
      */
-    public function getHash(): string
+    public function getHash(): ?string
     {
         return $this->get('hash');
     }
