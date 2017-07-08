@@ -1,4 +1,0 @@
-<?php
-namespace BetaKiller\Content;
-
-interface RepositoryHasWordpressIdAndPathInterface extends RepositoryHasWordpressIdInterface, RepositoryHasWordpressPathInterface {}

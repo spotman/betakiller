@@ -3,14 +3,11 @@
 namespace BetaKiller\Model;
 
 use BetaKiller\Assets\Model\AbstractAssetsOrmImageModel;
-use BetaKiller\Content\EntityHasWordpressIdAndPathInterface;
-use Model_ORM_EntityHasWordpressIdTrait;
-use Model_ORM_EntityHasWordpressPathTrait;
 
-class ContentPostThumbnail extends AbstractAssetsOrmImageModel implements EntityHasWordpressIdAndPathInterface
+class ContentPostThumbnail extends AbstractAssetsOrmImageModel implements ContentPostThumbnailInterface
 {
-    use Model_ORM_EntityHasWordpressIdTrait,
-        Model_ORM_EntityHasWordpressPathTrait;
+    use OrmBasedEntityHasWordpressIdTrait,
+        OrmBasedEntityHasWordpressPathTrait;
 
     protected function _initialize(): void
     {
@@ -29,18 +26,16 @@ class ContentPostThumbnail extends AbstractAssetsOrmImageModel implements Entity
     /**
      * @return \BetaKiller\Model\ContentPost
      */
-    public function get_post(): ContentPost
+    public function getPost(): ContentPost
     {
         return $this->get('post');
     }
 
     /**
      * @param $post \BetaKiller\Model\ContentPost
-     *
-     * @return $this
      */
-    public function set_post(ContentPost $post)
+    public function setPost(ContentPost $post): void
     {
-        return $this->set('post', $post);
+        $this->set('post', $post);
     }
 }

@@ -7,9 +7,9 @@ interface SeoMetaInterface
      * Sets title for using in <title> tag
      *
      * @param string $value
-     * @return $this
+     * @return \BetaKiller\Helper\SeoMetaInterface
      */
-    public function setTitle(string $value);
+    public function setTitle(string $value): SeoMetaInterface;
 
     /**
      * Returns title for using in <title> tag
@@ -22,9 +22,9 @@ interface SeoMetaInterface
      * Sets description for using in <meta> tag
      *
      * @param string $value
-     * @return $this
+     * @return \BetaKiller\Helper\SeoMetaInterface
      */
-    public function setDescription(string $value);
+    public function setDescription(string $value): SeoMetaInterface;
 
     /**
      * Returns description for using in <meta> tag

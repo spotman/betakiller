@@ -2,16 +2,12 @@
 namespace BetaKiller\Model;
 
 use BetaKiller\Assets\Model\AbstractAssetsOrmModel;
-use BetaKiller\Content\ContentAttachmentInterface;
-use Model_ORM_ContentElementEntityTrait;
-use Model_ORM_EntityHasWordpressIdTrait;
-use Model_ORM_EntityHasWordpressPathTrait;
 
 class ContentAttachment extends AbstractAssetsOrmModel implements ContentAttachmentInterface
 {
-    use Model_ORM_ContentElementEntityTrait,
-        Model_ORM_EntityHasWordpressIdTrait,
-        Model_ORM_EntityHasWordpressPathTrait;
+    use OrmBasedContentElementEntityTrait,
+        OrmBasedEntityHasWordpressIdTrait,
+        OrmBasedEntityHasWordpressPathTrait;
 
     /**
      * Prepares the model database connection, determines the table name,

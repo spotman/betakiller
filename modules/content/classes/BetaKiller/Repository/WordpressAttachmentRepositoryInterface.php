@@ -1,7 +1,12 @@
 <?php
 namespace BetaKiller\Repository;
 
-use BetaKiller\Content\ContentElementRepositoryInterface;
-use BetaKiller\Content\RepositoryHasWordpressIdAndPathInterface;
-
-interface WordpressAttachmentRepositoryInterface extends ContentElementRepositoryInterface, RepositoryHasWordpressIdAndPathInterface {}
+/**
+ * Interface WordpressAttachmentRepositoryInterface
+ *
+ * @package BetaKiller\Content
+ */
+interface WordpressAttachmentRepositoryInterface
+    extends RepositoryHasWordpressIdInterface, RepositoryHasWordpressPathInterface
+{
+}

@@ -1,14 +1,12 @@
 <?php
 namespace BetaKiller\Model;
 
-use BetaKiller\Content\ContentElementInterface;
 use Kohana_Exception;
-use Model_ORM_ContentElementEntityTrait;
 use ORM;
 
 class ContentYoutubeRecord extends ORM implements ContentElementInterface
 {
-    use Model_ORM_ContentElementEntityTrait;
+    use OrmBasedContentElementEntityTrait;
 
     /**
      * Prepares the model database connection, determines the table name,

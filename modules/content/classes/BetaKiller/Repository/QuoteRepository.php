@@ -1,28 +1,26 @@
 <?php
 namespace BetaKiller\Repository;
 
-use BetaKiller\Model\Quote;
+use BetaKiller\Model\QuoteInterface;
 use BetaKiller\Utils\Kohana\ORM\OrmInterface;
 use DateTimeInterface;
 
+/**
+ * Class QuoteRepository
+ *
+ * @package BetaKiller\Repository
+ * @method QuoteInterface findById(int $id)
+ * @method QuoteInterface create()
+ * @method QuoteInterface[] getAll()
+ */
 class QuoteRepository extends AbstractOrmBasedRepository
 {
     /**
-     * Creates empty entity
-     *
-     * @return mixed
-     */
-    public function create(): Quote
-    {
-        return parent::create();
-    }
-
-    /**
      * @param \DateTimeInterface|null $before
      *
-     * @return Quote|mixed
+     * @return \BetaKiller\Model\QuoteInterface|mixed
      */
-    public function getLatestQuote(DateTimeInterface $before = NULL): Quote
+    public function getLatestQuote(DateTimeInterface $before = null): QuoteInterface
     {
         $orm = $this->getOrmInstance();
 

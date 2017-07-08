@@ -22,6 +22,6 @@ class CommentListByStatus extends AbstractCommentList
     {
         $status = $this->urlParametersHelper->getContentCommentStatus();
 
-        return $this->commentRepository->get_latest_comments($status);
+        return $this->commentRepository->getLatestComments($status);
     }
 }

@@ -1,7 +1,7 @@
 <?php
 namespace BetaKiller\Repository;
 
-use BetaKiller\Content\ContentImageInterface;
+use BetaKiller\Model\ContentImageInterface;
 
 /**
  * Class ContentImageRepository
@@ -12,7 +12,7 @@ use BetaKiller\Content\ContentImageInterface;
  */
 class ContentImageRepository extends AbstractHashStrategyOrmBasedAssetsRepository implements WordpressAttachmentRepositoryInterface
 {
-    use \Model_ORM_EntityRelatedRepositoryTrait;
-    use \Model_ORM_RepositoryHasWordpressIdTrait;
-    use \Model_ORM_RepositoryHasWordpressPathTrait;
+    use BetaKiller\Repository\OrmBasedContentElementRepositoryTrait;
+    use OrmBasedRepositoryHasWordpressIdTrait;
+    use OrmBasedRepositoryHasWordpressPathTrait;
 }

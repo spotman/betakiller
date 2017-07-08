@@ -3,13 +3,11 @@ namespace BetaKiller\Model;
 
 use BetaKiller\Utils\Kohana\TreeModelSingleParentOrm;
 use Kohana_Exception;
-use Model_ORM_EntityHasWordpressIdTrait;
-use Model_ORM_SeoContentTrait;
 
 class ContentCategory extends TreeModelSingleParentOrm implements ContentCategoryInterface
 {
-    use Model_ORM_EntityHasWordpressIdTrait,
-        Model_ORM_SeoContentTrait;
+    use OrmBasedEntityHasWordpressIdTrait,
+        OrmBasedSeoMetaTrait;
 
     protected function _initialize(): void
     {
@@ -121,7 +119,7 @@ class ContentCategory extends TreeModelSingleParentOrm implements ContentCategor
      * @return $this
      * @todo Rewrite this to tree model repository
      */
-    protected function additionalTreeModelFiltering()
+    protected function additionalTreeTraversalFiltering()
     {
         return $this->filter_is_active()->order_by_place();
     }

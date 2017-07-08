@@ -1,7 +1,6 @@
 <?php
 namespace BetaKiller\Model;
 
-use BetaKiller\Content\EntityHasWordpressIdInterface;
 use BetaKiller\Helper\SeoMetaInterface;
 use BetaKiller\IFace\Url\UrlContainerInterface;
 use BetaKiller\IFace\Url\UrlDispatcher;
@@ -10,8 +9,6 @@ use BetaKiller\Status\StatusRelatedModelOrmTrait;
 use Database_Query_Builder_Select;
 use DateTime;
 use Kohana_Exception;
-use Model_ORM_EntityHasWordpressIdTrait;
-use Model_ORM_SeoContentTrait;
 use ORM;
 use Validation;
 
@@ -19,8 +16,8 @@ class ContentPost extends \ORM implements StatusRelatedModelInterface, ModelWith
 {
     use StatusRelatedModelOrmTrait,
         ModelWithRevisionsOrmTrait,
-        Model_ORM_SeoContentTrait,
-        Model_ORM_EntityHasWordpressIdTrait {
+        OrmBasedSeoMetaTrait,
+        OrmBasedEntityHasWordpressIdTrait {
         StatusRelatedModelOrmTrait::workflow as private baseWorkflow;
     }
 
@@ -455,7 +452,7 @@ class ContentPost extends \ORM implements StatusRelatedModelInterface, ModelWith
     }
 
     /**
-     * @return \BetaKiller\Model\ContentPostThumbnail[]
+     * @return \BetaKiller\Model\ContentPostThumbnailInterface[]
      */
     public function getThumbnails(): array
     {
@@ -463,9 +460,9 @@ class ContentPost extends \ORM implements StatusRelatedModelInterface, ModelWith
     }
 
     /**
-     * @return \BetaKiller\Model\ContentPostThumbnail
+     * @return \BetaKiller\Model\ContentPostThumbnailInterface
      */
-    public function getFirstThumbnail(): ContentPostThumbnail
+    public function getFirstThumbnail(): ContentPostThumbnailInterface
     {
         return $this->getThumbnailsQuery()->limit(1)->find();
     }

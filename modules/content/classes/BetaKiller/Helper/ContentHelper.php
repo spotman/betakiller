@@ -2,6 +2,7 @@
 namespace BetaKiller\Helper;
 
 use BetaKiller\Assets\AssetsProviderFactory;
+use BetaKiller\Assets\Provider\AssetsProviderInterface;
 use BetaKiller\Assets\Provider\AttachmentAssetsProviderInterface;
 use BetaKiller\Assets\Provider\ImageAssetsProviderInterface;
 use BetaKiller\Content\Shortcode;
@@ -107,7 +108,7 @@ class ContentHelper
         return $this->providerFactory->createFromModelCodename('ContentAttachment');
     }
 
-    public function createAssetsProviderFromMimeType(string $mimeType)
+    public function createAssetsProviderFromMimeType(string $mimeType): AssetsProviderInterface
     {
         /** @var \BetaKiller\Assets\Provider\AssetsProviderInterface[] $mimeProviders */
         $mimeProviders = [

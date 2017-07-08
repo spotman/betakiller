@@ -1,7 +1,6 @@
 <?php
 namespace BetaKiller\Model;
 
-
 interface AbstractEntityInterface extends HasLabelInterface
 {
     /**
@@ -10,6 +9,11 @@ interface AbstractEntityInterface extends HasLabelInterface
      * @return string
      */
     public function getID(): string;
+
+    /**
+     * @return bool
+     */
+    public function hasID(): bool;
 
     /**
      * @return string

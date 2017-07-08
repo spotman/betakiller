@@ -2,16 +2,12 @@
 namespace BetaKiller\Model;
 
 use BetaKiller\Assets\Model\AbstractAssetsOrmImageModel;
-use BetaKiller\Content\ContentImageInterface;
-use Model_ORM_ContentElementEntityTrait;
-use Model_ORM_EntityHasWordpressIdTrait;
-use Model_ORM_EntityHasWordpressPathTrait;
 
 class ContentImage extends AbstractAssetsOrmImageModel implements ContentImageInterface
 {
-    use Model_ORM_ContentElementEntityTrait,
-        Model_ORM_EntityHasWordpressIdTrait,
-        Model_ORM_EntityHasWordpressPathTrait;
+    use OrmBasedContentElementEntityTrait,
+        OrmBasedEntityHasWordpressIdTrait,
+        OrmBasedEntityHasWordpressPathTrait;
 
     /**
      * Prepares the model database connection, determines the table name,

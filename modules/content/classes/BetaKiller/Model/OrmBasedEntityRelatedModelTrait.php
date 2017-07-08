@@ -1,8 +1,15 @@
 <?php
+namespace BetaKiller\Model;
 
-use BetaKiller\Model\Entity;
+use Kohana_Exception;
+use ORM;
 
-trait Model_ORM_EntityRelatedModelTrait
+/**
+ * Trait OrmBasedEntityRelatedModelTrait
+ *
+ * @package BetaKiller\Content
+ */
+trait OrmBasedEntityRelatedModelTrait
 {
     /**
      * @var \BetaKiller\Model\AbstractEntityInterface
@@ -36,7 +43,7 @@ trait Model_ORM_EntityRelatedModelTrait
      * @return Entity
      * @throws Kohana_Exception
      */
-    public function getEntity()
+    public function getEntity(): Entity
     {
         return $this->get('entity');
     }

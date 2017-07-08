@@ -33,7 +33,6 @@ class Widget_CustomTag_Attachment extends AbstractBaseWidget
             throw new WidgetException('No attachment ID provided');
         }
 
-        /** @var \BetaKiller\Model\ContentAttachment $model */
         $model = $this->repository->findById($attachID);
 
         $title = HTML::chars(Arr::get($context, 'title'));

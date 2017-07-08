@@ -1,7 +1,6 @@
 <?php
 namespace BetaKiller\Api\Resource;
 
-use BetaKiller\Helper\ApiModelTrait;
 use HTML;
 use Spotman\Api\ModelCrudApiResource;
 
@@ -13,9 +12,13 @@ abstract class UserApiResource extends ModelCrudApiResource
      */
     private $user;
 
-    use ApiModelTrait;
+    /**
+     * @Inject
+     * @var \BetaKiller\Repository\UserRepository
+     */
+    private $userRepository;
 
-    public function update_profile($data)
+    protected function updateProfile($data): void
     {
         $user = $this->user;
 
@@ -35,18 +38,6 @@ abstract class UserApiResource extends ModelCrudApiResource
             $user->set_phone(HTML::chars($data->phone));
         }
 
-        $user->update();
-    }
-
-    /**
-     * Returns new model or performs search by id
-     *
-     * @param null $id
-     *
-     * @return \BetaKiller\Utils\Kohana\ORM\OrmInterface|mixed
-     */
-    protected function model($id = NULL)
-    {
-        return $this->orm_model_factory('User', $id);
+        $this->userRepository->save($user);
     }
 }

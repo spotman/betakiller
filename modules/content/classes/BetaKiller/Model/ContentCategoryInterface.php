@@ -1,10 +1,14 @@
 <?php
 namespace BetaKiller\Model;
 
-use BetaKiller\Content\EntityHasWordpressIdInterface;
 use BetaKiller\Helper\SeoMetaInterface;
 use BetaKiller\Utils\Kohana\TreeModelSingleParentInterface;
 
+/**
+ * Interface ContentCategoryInterface
+ *
+ * @package BetaKiller\Content
+ */
 interface ContentCategoryInterface extends DispatchableEntityInterface, SeoMetaInterface, EntityHasWordpressIdInterface, TreeModelSingleParentInterface
 {
     /**

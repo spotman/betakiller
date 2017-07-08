@@ -41,7 +41,7 @@ abstract class Base implements ContainerInterface
     protected function __construct() {}
 
     /**
-     * @return ContainerInterface
+     * @return ContainerInterface|mixed
      */
     protected function getContainer()
     {
@@ -53,7 +53,7 @@ abstract class Base implements ContainerInterface
     }
 
     /**
-     * @return ContainerInterface
+     * @return ContainerInterface|mixed
      */
     abstract protected function containerFactory();
 
@@ -80,7 +80,7 @@ abstract class Base implements ContainerInterface
      *
      * @return boolean
      */
-    public function has($id)
+    public function has($id): bool
     {
         return $this->getContainer()->has($id);
     }
@@ -98,9 +98,9 @@ abstract class Base implements ContainerInterface
      * @throws \DI\NotFoundException         No entry or class found for the given name.
      * @return mixed
      */
-    public function make($name, array $parameters = [])
+    public function make($name, array $parameters = null)
     {
-        return $this->getContainer()->make($name, $parameters);
+        return $this->getContainer()->make($name, $parameters ?? []);
     }
 
     /**
@@ -115,19 +115,19 @@ abstract class Base implements ContainerInterface
      * @throws NotCallableException
      * @throws NotEnoughParametersException
      */
-    public function call($callable, array $parameters = [])
+    public function call($callable, array $parameters = null)
     {
-        return $this->getContainer()->call($callable, $parameters);
+        return $this->getContainer()->call($callable, $parameters ?: []);
     }
 
     /**
      * Inject all dependencies on an existing instance.
      *
-     * @param object $instance Object to perform injection upon
+     * @param mixed $instance Object to perform injection upon
      *
      * @throws \InvalidArgumentException
      * @throws \DI\DependencyException Error while injecting dependencies
-     * @return object $instance Returns the same instance
+     * @return mixed $instance Returns the same instance
      */
     public function injectOn($instance)
     {

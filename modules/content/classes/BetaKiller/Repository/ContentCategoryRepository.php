@@ -1,14 +1,24 @@
 <?php
 namespace BetaKiller\Repository;
 
-use BetaKiller\Content\RepositoryHasWordpressIdInterface;
 use BetaKiller\IFace\Url\UrlContainerInterface;
 use BetaKiller\Model\ContentCategory;
+use BetaKiller\Model\ContentCategoryInterface;
 use BetaKiller\Utils\Kohana\ORM\OrmInterface;
 
-class ContentCategoryRepository extends AbstractOrmBasedDispatchableRepository implements RepositoryHasWordpressIdInterface
+/**
+ * Class ContentCategoryRepository
+ *
+ * @package BetaKiller\Content
+ * @method ContentCategoryInterface|null findById(int $id)
+ * @method ContentCategoryInterface|null findByWpID(int $id)
+ * @method ContentCategoryInterface create()
+ * @method ContentCategoryInterface[] getAll()
+ */
+class ContentCategoryRepository extends AbstractOrmBasedDispatchableRepository implements
+    RepositoryHasWordpressIdInterface
 {
-    use \Model_ORM_RepositoryHasWordpressIdTrait;
+    use OrmBasedRepositoryHasWordpressIdTrait;
 
     /**
      * @return string
@@ -19,7 +29,7 @@ class ContentCategoryRepository extends AbstractOrmBasedDispatchableRepository i
     }
 
     /**
-     * @return ContentCategory[]
+     * @return ContentCategoryInterface[]
      */
     public function getRoot(): array
     {

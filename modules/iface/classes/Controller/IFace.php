@@ -1,37 +1,61 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
-use BetaKiller\DI\Container;
-use BetaKiller\IFace\IFaceInterface;
-use BetaKiller\IFace\Cache\IFaceCache;
-use BetaKiller\IFace\Url\UrlDispatcher;
 use BetaKiller\Config\AppConfigInterface;
-use BetaKiller\Model\UserInterface;
+use BetaKiller\IFace\Cache\IFaceCache;
+use BetaKiller\IFace\IFaceInterface;
 use BetaKiller\IFace\Url\UrlContainerInterface;
+use BetaKiller\IFace\Url\UrlDispatcher;
+use BetaKiller\Model\UserInterface;
 
 /**
  * Class Controller_IFace
+ *
  * @todo Refactoring to ControllerIFace + KohanaRequestAdapter/KohanaResponseAdapter
  */
 class Controller_IFace extends Controller
 {
     /**
+     * @Inject
+     * @var UserInterface
+     */
+    private $user;
+
+    /**
+     * @Inject
+     * @var AppConfigInterface
+     */
+    private $appConfig;
+
+    /**
+     * @Inject
+     * @var UrlDispatcher
+     */
+    private $urlDispatcher;
+
+    /**
+     * @Inject
+     * @var UrlContainerInterface
+     */
+    private $urlContainer;
+
+    /**
+     * @Inject
+     * @var IFaceCache
+     */
+    private $ifaceCache;
+
+    /**
      * @throws \HTTP_Exception_400
      */
     public function action_render(): void
     {
-        /** @var UrlDispatcher $dispatcher */
-        $dispatcher = Container::getInstance()->get(UrlDispatcher::class);
-
-        /** @var UrlContainerInterface $params */
-        $params = Container::getInstance()->get(UrlContainerInterface::class);
-
-        $uri = $this->getRequestUri();
+        $uri        = $this->getRequestUri();
         $queryParts = $this->getRequestQueryParts();
 
-        $params->setQueryParts($queryParts);
+        $this->urlContainer->setQueryParts($queryParts);
 
         // Getting current IFace
-        $iface = $dispatcher->process($uri);
+        $iface = $this->urlDispatcher->process($uri);
 
         // If this is default IFace and client requested non-slash uri, redirect client to /
         if ($uri !== '/' && $iface->isDefault() && !$iface->getModel()->hasDynamicUrl()) {
@@ -41,7 +65,7 @@ class Controller_IFace extends Controller
         if ($uri && $uri !== '/') {
             $has_trailing_slash = (substr($uri, -1) === '/');
 
-            $is_trailing_slash_enabled = $this->getAppConfig()->isTrailingSlashEnabled();
+            $is_trailing_slash_enabled = $this->appConfig->isTrailingSlashEnabled();
 
             if ($has_trailing_slash && !$is_trailing_slash_enabled) {
                 // Permanent redirect
@@ -63,7 +87,7 @@ class Controller_IFace extends Controller
         // Final hook
         $iface->after();
 
-        if ($unusedParts = $params->getUnusedQueryPartsKeys()) {
+        if ($unusedParts = $this->urlContainer->getUnusedQueryPartsKeys()) {
             throw new HTTP_Exception_400('Request have unused query parts: :keys', [
                 ':keys' => implode(', ', $unusedParts),
             ]);
@@ -82,32 +106,12 @@ class Controller_IFace extends Controller
             return;
         }
 
-        $user = $this->getCurrentUser();
-
         // Skip caching for authorized users
-        if (!$user->isGuest()) {
+        if (!$this->user->isGuest()) {
             return;
         }
 
-        /** @var IFaceCache $cache */
-        $cache = Container::getInstance()->get(IFaceCache::class);
-        $cache->process($iface);
-    }
-
-    /**
-     * @return \BetaKiller\Config\AppConfigInterface
-     */
-    private function getAppConfig(): AppConfigInterface
-    {
-        return Container::getInstance()->get(AppConfigInterface::class);
-    }
-
-    /**
-     * @return \BetaKiller\Model\UserInterface
-     */
-    private function getCurrentUser(): UserInterface
-    {
-        return Container::getInstance()->get(UserInterface::class);
+        $this->ifaceCache->process($iface);
     }
 
     /**

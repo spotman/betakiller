@@ -1,18 +1,25 @@
 <?php
 namespace BetaKiller\Repository;
 
-use BetaKiller\Content\RepositoryHasWordpressIdInterface;
 use BetaKiller\IFace\Url\UrlContainerInterface;
 use BetaKiller\Model\ContentCategory;
 use BetaKiller\Model\ContentPost;
 use BetaKiller\Model\RevisionModelInterface;
 use BetaKiller\Search\SearchResultsInterface;
 use BetaKiller\Utils\Kohana\ORM\OrmInterface;
-use DateTimeInterface;
 
+/**
+ * Class ContentPostRepository
+ *
+ * @package BetaKiller\Content
+ * @method ContentPost|null findById(int $id)
+ * @method ContentPost|null findByWpID(int $id)
+ * @method ContentPost create()
+ * @method ContentPost[] getAll()
+ */
 class ContentPostRepository extends AbstractOrmBasedDispatchableRepository implements RepositoryHasWordpressIdInterface
 {
-    use \Model_ORM_RepositoryHasWordpressIdTrait;
+    use OrmBasedRepositoryHasWordpressIdTrait;
 
     /**
      * @return string
@@ -80,8 +87,8 @@ class ContentPostRepository extends AbstractOrmBasedDispatchableRepository imple
         $orm = $this->getOrmInstance();
 
         if ($category && $category->get_id()) {
-            $categories_ids = $category->get_all_related_categories_ids();
-            $this->filterCategoryIDs($orm, $categories_ids);
+            $categoriesIDs = $category->get_all_related_categories_ids();
+            $this->filterCategoryIDs($orm, $categoriesIDs);
         }
 
         if ($term) {
@@ -122,13 +129,13 @@ class ContentPostRepository extends AbstractOrmBasedDispatchableRepository imple
 
     /**
      * @param int|null $limit
-     * @param int|null $exclude_id
+     * @param int|null $excludeID
      *
      * @return ContentPost[]
      */
-    public function getFreshArticles(?int $limit = null, $exclude_id = null): array
+    public function getFreshArticles(?int $limit = null, $excludeID = null): array
     {
-        return $this->getFreshContent(ContentPost::TYPE_ARTICLE, $limit, $exclude_id);
+        return $this->getFreshContent(ContentPost::TYPE_ARTICLE, $limit, $excludeID);
     }
 
     /**
@@ -162,21 +169,21 @@ class ContentPostRepository extends AbstractOrmBasedDispatchableRepository imple
     }
 
     /**
-     * @param int|int[]|null $filter_type
+     * @param int|int[]|null $filterType
      * @param int            $limit
-     * @param int|int[]|null $exclude_id
+     * @param int|int[]|null $excludeID
      *
      * @return ContentPost[]
      */
-    private function getPopularContent($filter_type, ?int $limit, $exclude_id = null): array
+    private function getPopularContent($filterType, ?int $limit, $excludeID = null): array
     {
         $orm = $this->getOrmInstance();
 
-        if ($exclude_id) {
-            $orm->filter_ids((array)$exclude_id, true);
+        if ($excludeID) {
+            $orm->filter_ids((array)$excludeID, true);
         }
 
-        $this->filterTypes($orm, (array)$filter_type);
+        $this->filterTypes($orm, (array)$filterType);
         $this->orderByViewsCount($orm);
         $orm->limit($limit ?? 5);
 
@@ -184,21 +191,21 @@ class ContentPostRepository extends AbstractOrmBasedDispatchableRepository imple
     }
 
     /**
-     * @param int|int[]|null $filter_type
+     * @param int|int[]|null $filterType
      * @param int            $limit
-     * @param int|int[]|null $exclude_id
+     * @param int|int[]|null $excludeID
      *
      * @return ContentPost[]
      */
-    private function getFreshContent($filter_type, ?int $limit = null, $exclude_id = null): array
+    private function getFreshContent($filterType, ?int $limit = null, $excludeID = null): array
     {
         $orm = $this->getOrmInstance();
 
-        if ($exclude_id) {
-            $orm->filter_ids((array)$exclude_id, true);
+        if ($excludeID) {
+            $orm->filter_ids((array)$excludeID, true);
         }
 
-        $this->filterTypes($orm, (array)$filter_type);
+        $this->filterTypes($orm, (array)$filterType);
         $this->orderByViewsCount($orm);
         $orm->limit($limit ?? 5);
 
@@ -236,16 +243,16 @@ class ContentPostRepository extends AbstractOrmBasedDispatchableRepository imple
 //        $this->filterCreatedBy($orm, $date, '<');
 //        $this->orderByCreatedAt($orm);
 //    }
-
-    /**
-     * @param OrmInterface       $orm
-     * @param \DateTimeInterface $date
-     * @param null|string        $op
-     */
-    private function filterCreatedBy(OrmInterface $orm, DateTimeInterface $date, ?string $op = null): void
-    {
-        $orm->filter_datetime_column_value('created_at', $date, $op ?? '<');
-    }
+//
+//    /**
+//     * @param OrmInterface       $orm
+//     * @param \DateTimeInterface $date
+//     * @param null|string        $op
+//     */
+//    private function filterCreatedBy(OrmInterface $orm, DateTimeInterface $date, ?string $op = null): void
+//    {
+//        $orm->filter_datetime_column_value('created_at', $date, $op ?? '<');
+//    }
 
     /**
      * @param \BetaKiller\Utils\Kohana\ORM\OrmInterface $orm

@@ -1,9 +1,10 @@
 <?php
+namespace BetaKiller\Repository;
 
 use BetaKiller\Model\Entity;
 use BetaKiller\Utils\Kohana\ORM\OrmInterface;
 
-trait Model_ORM_EntityRelatedRepositoryTrait
+trait OrmBasedEntityRelatedRepositoryTrait
 {
 //    public function get_entity_items_ids(Entity $entity)
 //    {
@@ -11,7 +12,7 @@ trait Model_ORM_EntityRelatedRepositoryTrait
 //        $model = $this->model_factory();
 //
 //        return $model
-//            ->filter_entity_id($entity->get_id())
+//            ->filterEntityID($entity->get_id())
 //            ->group_by_entity_item_id()
 //            ->find_all()
 //            ->as_array(null, 'entity_item_id');
@@ -21,7 +22,7 @@ trait Model_ORM_EntityRelatedRepositoryTrait
      * @param \BetaKiller\Utils\Kohana\ORM\OrmInterface $orm
      * @param int                                       $item_id
      */
-    protected function filter_entity_item_id(OrmInterface $orm, int $item_id): void
+    protected function filterEntityItemID(OrmInterface $orm, int $item_id): void
     {
         $orm->where($orm->object_column('entity_item_id'), '=', $item_id);
     }
@@ -40,19 +41,22 @@ trait Model_ORM_EntityRelatedRepositoryTrait
      * @param \BetaKiller\Utils\Kohana\ORM\OrmInterface $orm
      * @param int                                       $entity_id
      */
-    protected function filter_entity_id(OrmInterface $orm, int $entity_id): void
+    protected function filterEntityID(OrmInterface $orm, int $entity_id): void
     {
         $orm->where($orm->object_column('entity_id'), '=', $entity_id);
     }
 
-    protected function filter_entity_and_entity_item_id(OrmInterface $orm, ?Entity $entity = null, ?int $entity_item_id = null): void
-    {
+    protected function filterEntityAndEntityItemID(
+        OrmInterface $orm,
+        ?Entity $entity = null,
+        ?int $entity_item_id = null
+    ): void {
         if ($entity) {
-            $this->filter_entity_id($orm, $entity->get_id());
+            $this->filterEntityID($orm, $entity->get_id());
         }
 
         if ($entity_item_id) {
-            $this->filter_entity_item_id($orm, $entity_item_id);
+            $this->filterEntityItemID($orm, $entity_item_id);
         }
     }
 

@@ -14,7 +14,7 @@ class Model_AclResource extends TreeModelSingleParentOrm
     /**
      * Place here additional query params
      */
-    protected function additionalTreeModelFiltering()
+    protected function additionalTreeTraversalFiltering()
     {
         // Nothing to do
     }

@@ -3,18 +3,16 @@ namespace BetaKiller\Repository;
 
 use BetaKiller\Model\Entity;
 
+/**
+ * Class EntityRepository
+ *
+ * @package BetaKiller\Repository
+ * @method Entity findById(int $id)
+ * @method Entity create()
+ * @method Entity[] getAll()
+ */
 class EntityRepository extends AbstractOrmBasedRepository
 {
-    /**
-     * Creates empty entity
-     *
-     * @return mixed
-     */
-    public function create(): Entity
-    {
-        return parent::create();
-    }
-
     /**
      * @param string $slug
      *

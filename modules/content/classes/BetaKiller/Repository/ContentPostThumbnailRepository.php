@@ -1,21 +1,21 @@
 <?php
 namespace BetaKiller\Repository;
 
-use BetaKiller\Content\RepositoryHasWordpressIdAndPathInterface;
-use BetaKiller\Model\ContentPostThumbnail;
+use BetaKiller\Model\ContentPostThumbnailInterface;
 
-class ContentPostThumbnailRepository extends AbstractHashStrategyOrmBasedAssetsRepository implements RepositoryHasWordpressIdAndPathInterface
+/**
+ * Class ContentPostThumbnailRepository
+ *
+ * @package BetaKiller\Content
+ * @method ContentPostThumbnailInterface create()
+ * @method ContentPostThumbnailInterface|null findById(int $id)
+ * @method ContentPostThumbnailInterface|null findByWpId(int $id)
+ * @method ContentPostThumbnailInterface[] getAll()
+ */
+class ContentPostThumbnailRepository extends AbstractHashStrategyOrmBasedAssetsRepository implements
+    WordpressAttachmentRepositoryInterface, EntityModelRelatedRepositoryInterface
 {
-    use \Model_ORM_RepositoryHasWordpressIdTrait;
-    use \Model_ORM_RepositoryHasWordpressPathTrait;
-
-    /**
-     * Creates empty entity
-     *
-     * @return mixed
-     */
-    public function create(): ContentPostThumbnail
-    {
-        return parent::create();
-    }
+    use OrmBasedRepositoryHasWordpressIdTrait;
+    use OrmBasedRepositoryHasWordpressPathTrait;
+    use OrmBasedEntityRelatedRepositoryTrait;
 }

@@ -2,26 +2,21 @@
 
 namespace BetaKiller\Model;
 
-use BetaKiller\Content\EntityHasWordpressIdInterface;
-use BetaKiller\Content\EntityModelRelatedInterface;
 use BetaKiller\Helper\IFaceHelper;
-use BetaKiller\Status\StatusRelatedModelInterface;
 use BetaKiller\Status\StatusRelatedModelOrmTrait;
 use BetaKiller\Utils\Kohana\TreeModelSingleParentOrm;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Exception;
 use Model_ContentCommentStatusTransition;
-use Model_ORM_EntityHasWordpressIdTrait;
-use Model_ORM_EntityRelatedModelTrait;
 use Status_Workflow_ContentComment;
 use Validation;
 
 class ContentComment extends TreeModelSingleParentOrm
-    implements EntityModelRelatedInterface, StatusRelatedModelInterface, EntityHasWordpressIdInterface, HasPublicReadUrlInterface
+    implements ContentCommentInterface
 {
-    use Model_ORM_EntityRelatedModelTrait;
-    use Model_ORM_EntityHasWordpressIdTrait;
+    use OrmBasedEntityRelatedModelTrait;
+    use OrmBasedEntityHasWordpressIdTrait;
     use StatusRelatedModelOrmTrait;
 
     /**
@@ -78,7 +73,7 @@ class ContentComment extends TreeModelSingleParentOrm
     /**
      * Place here additional query params
      */
-    protected function additionalTreeModelFiltering()
+    protected function additionalTreeTraversalFiltering()
     {
         // Nothing to do
     }
@@ -246,7 +241,7 @@ class ContentComment extends TreeModelSingleParentOrm
     /**
      * @return string
      */
-    public function get_message()
+    public function get_message(): string
     {
         return $this->get('message');
     }
@@ -266,7 +261,7 @@ class ContentComment extends TreeModelSingleParentOrm
     /**
      * @return string
      */
-    public function get_ip_address()
+    public function get_ip_address(): string
     {
         return $this->get('ip_address');
     }
@@ -455,13 +450,6 @@ class ContentComment extends TreeModelSingleParentOrm
         $this->workflow()->restoreFromTrash();
 
         return $this;
-    }
-
-    public function delete()
-    {
-        // TODO Delete child comments
-
-        return parent::delete();
     }
 
     /**

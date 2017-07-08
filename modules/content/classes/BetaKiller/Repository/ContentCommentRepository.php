@@ -1,34 +1,35 @@
 <?php
 namespace BetaKiller\Repository;
 
-use BetaKiller\Content\RepositoryHasWordpressIdInterface;
 use BetaKiller\Model\ContentComment;
+use BetaKiller\Model\ContentCommentInterface;
 use BetaKiller\Model\ContentCommentStatus;
 use BetaKiller\Model\Entity;
 use BetaKiller\Utils\Kohana\ORM\OrmInterface;
 use DateInterval;
 use DateTime;
 
-class ContentCommentRepository extends AbstractOrmBasedRepository implements RepositoryHasWordpressIdInterface
+/**
+ * Class ContentCommentRepository
+ *
+ * @package BetaKiller\Content
+ *
+ * @method ContentCommentInterface|null findById(int $id)
+ * @method ContentCommentInterface|null findByWpID(int $id)
+ * @method ContentCommentInterface create()
+ * @method ContentCommentInterface[] getAll()
+ */
+class ContentCommentRepository extends AbstractOrmBasedRepository
+    implements EntityModelRelatedRepositoryInterface, RepositoryHasWordpressIdInterface
 {
-    use \Model_ORM_RepositoryHasWordpressIdTrait;
-    use \Model_ORM_EntityRelatedRepositoryTrait;
+    use OrmBasedRepositoryHasWordpressIdTrait;
+    use OrmBasedEntityRelatedRepositoryTrait;
 
     /**
      * @Inject
      * @var \BetaKiller\Repository\ContentCommentStatusRepository
      */
     private $commentStatusRepository;
-
-    /**
-     * Creates empty entity
-     *
-     * @return mixed
-     */
-    public function create(): ContentComment
-    {
-        return parent::create();
-    }
 
     /**
      * @param string $ipAddress
@@ -52,29 +53,29 @@ class ContentCommentRepository extends AbstractOrmBasedRepository implements Rep
 
     /**
      * @param \BetaKiller\Model\Entity $entity
-     * @param int                      $entity_item_id
+     * @param int                      $entityItemID
      *
      * @return \BetaKiller\Model\ContentComment[]
      */
-    public function getEntityItemApprovedComments(Entity $entity, int $entity_item_id): array
+    public function getEntityItemApprovedComments(Entity $entity, int $entityItemID): array
     {
         /** @var \BetaKiller\Model\ContentCommentStatus $status */
         $status = $this->commentStatusRepository->getApprovedStatus();
 
-        return $this->getCommentsOrderedByPath($status, $entity, $entity_item_id);
+        return $this->getCommentsOrderedByPath($status, $entity, $entityItemID);
     }
 
     /**
      * @param \BetaKiller\Model\ContentCommentStatus|null $status
      * @param \BetaKiller\Model\Entity|null               $entity
-     * @param int|null                                    $entity_item_id
+     * @param int|null                                    $entityItemID
      *
      * @return ContentComment[]
      */
     public function getCommentsOrderedByPath(
         ?ContentCommentStatus $status = null,
         ?Entity $entity = null,
-        ?int $entity_item_id = null
+        ?int $entityItemID = null
     ): array {
         /** @var \BetaKiller\Model\ContentComment $model */
         $model = $this->getOrmInstance();
@@ -83,7 +84,7 @@ class ContentCommentRepository extends AbstractOrmBasedRepository implements Rep
             $model->filter_status($status);
         }
 
-        $this->filter_entity_and_entity_item_id($model, $entity, $entity_item_id);
+        $this->filterEntityAndEntityItemID($model, $entity, $entityItemID);
 
         $this->orderByPath($model);
 
@@ -95,7 +96,7 @@ class ContentCommentRepository extends AbstractOrmBasedRepository implements Rep
      *
      * @return ContentComment[]
      */
-    public function get_latest_comments(?ContentCommentStatus $status = null): array
+    public function getLatestComments(?ContentCommentStatus $status = null): array
     {
         /** @var \BetaKiller\Model\ContentComment $model */
         $model = $this->getOrmInstance();
@@ -124,13 +125,23 @@ class ContentCommentRepository extends AbstractOrmBasedRepository implements Rep
         /** @var \BetaKiller\Model\ContentComment $orm */
         $orm = $this->getOrmInstance();
 
-        $this->filter_entity_and_entity_item_id($orm, $entity, $entityItemId);
+        $this->filterEntityAndEntityItemID($orm, $entity, $entityItemId);
 
         if ($status) {
             $orm->filter_status($status);
         }
 
         return $orm->compile_as_subquery_and_count_all();
+    }
+
+    /**
+     * @param \BetaKiller\Model\ExtendedOrmInterface|mixed $entity
+     */
+    public function delete($entity): void
+    {
+        // TODO Delete child comments
+
+        parent::delete($entity);
     }
 
 //    private function filter_pending()

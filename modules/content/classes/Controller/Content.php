@@ -45,7 +45,7 @@ class Controller_Content extends Controller
      */
     protected function find_content_model_by_wp_path($path): ?AssetsModelInterface
     {
-        /** @var \BetaKiller\Content\RepositoryHasWordpressPathInterface[] $repositories */
+        /** @var \BetaKiller\Repository\RepositoryHasWordpressPathInterface[] $repositories */
 
         $repositories = [
             $this->contentHelper->getImageRepository(),

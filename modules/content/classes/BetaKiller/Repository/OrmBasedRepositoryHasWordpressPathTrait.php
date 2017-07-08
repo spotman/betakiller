@@ -1,9 +1,15 @@
 <?php
+namespace BetaKiller\Repository;
 
-use BetaKiller\Content\EntityHasWordpressPathInterface;
+use BetaKiller\Model\EntityHasWordpressPathInterface;
 use BetaKiller\Utils\Kohana\ORM\OrmInterface;
 
-trait Model_ORM_RepositoryHasWordpressPathTrait
+/**
+ * Trait OrmBasedRepositoryHasWordpressPathTrait
+ *
+ * @package BetaKiller\Content
+ */
+trait OrmBasedRepositoryHasWordpressPathTrait
 {
     /**
      * @param string $wp_path

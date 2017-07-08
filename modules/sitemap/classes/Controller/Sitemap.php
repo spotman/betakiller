@@ -2,10 +2,14 @@
 
 class Controller_Sitemap extends Controller
 {
-    public function action_index()
+    /**
+     * @Inject
+     * @var \Service_Sitemap
+     */
+    private $sitemapService;
+
+    public function action_index(): void
     {
-        Service_Sitemap::instance()
-            ->generate()
-            ->serve($this->getResponse());
+        $this->sitemapService->generate()->serve($this->getResponse());
     }
 }

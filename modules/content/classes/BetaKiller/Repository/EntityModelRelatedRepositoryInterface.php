@@ -1,5 +1,5 @@
 <?php
-namespace BetaKiller\Content;
+namespace BetaKiller\Repository;
 
 //use BetaKiller\Model\Entity;
 

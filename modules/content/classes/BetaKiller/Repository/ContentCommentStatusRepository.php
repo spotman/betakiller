@@ -3,18 +3,17 @@ namespace BetaKiller\Repository;
 
 use BetaKiller\Model\ContentCommentStatus;
 
+/**
+ * Class ContentCommentStatusRepository
+ *
+ * @package BetaKiller\Content
+ * @method ContentCommentStatus|null findById(int $id)
+ * @method ContentCommentStatus|null findByWpID(int $id)
+ * @method ContentCommentStatus create()
+ * @method ContentCommentStatus[] getAll()
+ */
 class ContentCommentStatusRepository extends AbstractOrmBasedRepository
 {
-    /**
-     * Creates empty entity
-     *
-     * @return mixed
-     */
-    public function create(): ContentCommentStatus
-    {
-        return parent::create();
-    }
-
     /**
      * @return \BetaKiller\Model\ContentCommentStatus
      */

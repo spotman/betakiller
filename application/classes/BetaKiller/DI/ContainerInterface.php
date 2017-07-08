@@ -13,7 +13,7 @@ interface ContainerInterface extends \Interop\Container\ContainerInterface, Fact
      * @throws \InvalidArgumentException
      * @throws \DI\DependencyException Error while injecting dependencies
      * @return object $instance Returns the same instance
-     * @deprecated Remove after dropping Kohana entirely
+     * @todo Remove after dropping Kohana entirely
      */
     public function injectOn($instance);
 }

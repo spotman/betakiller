@@ -1,15 +1,19 @@
 <?php
 
-use BetaKiller\Helper\SeoMetaInterface;
+namespace BetaKiller\Model;
 
-trait Model_ORM_SeoContentTrait
+use BetaKiller\Helper\SeoMetaInterface;
+use Kohana_Exception;
+
+trait OrmBasedSeoMetaTrait
 {
     /**
      * @param string $value
+     *
      * @return SeoMetaInterface
      * @throws Kohana_Exception
      */
-    public function setTitle(string $value)
+    public function setTitle(string $value): SeoMetaInterface
     {
         return $this->set('title', $value);
     }
@@ -25,10 +29,11 @@ trait Model_ORM_SeoContentTrait
 
     /**
      * @param string $value
+     *
      * @return SeoMetaInterface
      * @throws Kohana_Exception
      */
-    public function setDescription(string $value)
+    public function setDescription(string $value): SeoMetaInterface
     {
         return $this->set('description', $value);
     }

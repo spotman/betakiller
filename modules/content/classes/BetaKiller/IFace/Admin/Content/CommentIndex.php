@@ -14,6 +14,6 @@ class CommentIndex extends AbstractCommentList
      */
     protected function get_comments_list(): array
     {
-        return $this->commentRepository->get_latest_comments();
+        return $this->commentRepository->getLatestComments();
     }
 }

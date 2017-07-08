@@ -2,8 +2,6 @@
 
 class WP
 {
-    use \BetaKiller\Utils\Instance\SingletonTrait;
-
     const POST_TYPE_PAGE = 'page';
     const POST_TYPE_POST = 'post';
     const POST_TYPE_REVISION = 'revision';

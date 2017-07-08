@@ -1,7 +1,5 @@
 <?php
-namespace BetaKiller\Content;
-
-use BetaKiller\Model\Entity;
+namespace BetaKiller\Model;
 
 interface EntityModelRelatedInterface
 {
@@ -15,7 +13,7 @@ interface EntityModelRelatedInterface
     /**
      * @return Entity
      */
-    public function getEntity();
+    public function getEntity(): Entity;
 
     /**
      * @return string

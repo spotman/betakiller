@@ -1,20 +1,19 @@
 <?php
 namespace BetaKiller\Repository;
 
-use BetaKiller\Content\ContentAttachmentInterface;
+use BetaKiller\Model\ContentAttachmentInterface;
 
+/**
+ * Class ContentAttachmentRepository
+ *
+ * @package BetaKiller\Content
+ * @method ContentAttachmentInterface|null findById(int $id)
+ * @method ContentAttachmentInterface|null findByWpId(int $id)
+ * @method ContentAttachmentInterface create()
+ * @method ContentAttachmentInterface[] getAll()
+ */
 class ContentAttachmentRepository extends AbstractHashStrategyOrmBasedAssetsRepository implements WordpressAttachmentRepositoryInterface
 {
-    use \Model_ORM_RepositoryHasWordpressIdTrait;
-    use \Model_ORM_RepositoryHasWordpressPathTrait;
-
-    /**
-     * Creates empty entity
-     *
-     * @return mixed
-     */
-    public function create(): ContentAttachmentInterface
-    {
-        return parent::create();
-    }
+    use OrmBasedRepositoryHasWordpressIdTrait;
+    use OrmBasedRepositoryHasWordpressPathTrait;
 }

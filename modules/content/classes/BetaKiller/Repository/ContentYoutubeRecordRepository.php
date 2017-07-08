@@ -4,19 +4,17 @@ namespace BetaKiller\Repository;
 use BetaKiller\Model\ContentYoutubeRecord;
 use BetaKiller\Utils\Kohana\ORM\OrmInterface;
 
-class ContentYoutubeRecordRepository extends AbstractOrmBasedRepository
+/**
+ * Class ContentYoutubeRecordRepository
+ *
+ * @package BetaKiller\Content
+ * @method ContentYoutubeRecord findById(int $id)
+ * @method ContentYoutubeRecord create()
+ * @method ContentYoutubeRecord[] getAll()
+ */
+class ContentYoutubeRecordRepository extends AbstractOrmBasedRepository implements ContentElementRepositoryInterface
 {
-    use \Model_ORM_ContentElementRepositoryTrait;
-
-    /**
-     * Creates empty entity
-     *
-     * @return ContentYoutubeRecord
-     */
-    public function create(): ContentYoutubeRecord
-    {
-        return parent::create();
-    }
+    use OrmBasedContentElementRepositoryTrait;
 
     public function findRecordByYoutubeEmbedUrl(string $url): ContentYoutubeRecord
     {
@@ -34,7 +32,7 @@ class ContentYoutubeRecordRepository extends AbstractOrmBasedRepository
         /** @var \BetaKiller\Model\ContentYoutubeRecord $orm */
         $orm   = $this->getOrmInstance();
 
-        $this->filter_youtube_id($orm, $id);
+        $this->filterYoutubeID($orm, $id);
 
         $model = $orm->find();
 
@@ -45,7 +43,7 @@ class ContentYoutubeRecordRepository extends AbstractOrmBasedRepository
      * @param \BetaKiller\Utils\Kohana\ORM\OrmInterface $orm
      * @param string                                    $value
      */
-    private function filter_youtube_id(OrmInterface $orm, string $value): void
+    private function filterYoutubeID(OrmInterface $orm, string $value): void
     {
         $orm->where('youtube_id', '=', $value);
     }

@@ -1,33 +1,41 @@
-<?php use BetaKiller\Task\TaskException;
+<?php
 
-defined('SYSPATH') OR die('No direct script access.');
+use BetaKiller\Task\AbstractTask;
+use BetaKiller\Task\TaskException;
 
-
-class Task_Backup extends Minion_Task
+class Task_Backup extends AbstractTask
 {
-    use BetaKiller\Helper\ConfigTrait;
+    /**
+     * @Inject
+     * @var \BetaKiller\Config\ConfigProviderInterface
+     */
+    private $configProvider;
 
-    protected function _execute(array $params)
+    protected function _execute(array $params): void
     {
         $service = $this->config('backup.service');
 
-        $instance = NULL;
+        $instance = null;
 
         switch ($service) {
-            case "YandexDisk":
+            case 'YandexDisk':
                 $instance = new YandexBackup($this->config('backup.login'), $this->config('backup.password'));
                 break;
 
+            case 'GoogleDisk':
+                $instance = new GoogleBackup($this->config('backup.login'), $this->config('backup.password'));
+                break;
+
             default:
-                throw new TaskException('Unknown service :name', array(':name' => $service));
+                throw new TaskException('Unknown backup service :name', [':name' => $service]);
         }
 
         $this->debug('Service '.$service.' selected');
 
         $instance->setType($this->config('backup.type'));
 
-        $dbKey = 'database.'.$this->config('backup.database').'.';
-        $dbDriver = $this->getDBDriver( mb_strtolower($this->config($dbKey.'type')) );
+        $dbKey    = 'database.'.$this->config('backup.database').'.';
+        $dbDriver = $this->getDBDriver(mb_strtolower($this->config($dbKey.'type')));
 
         $dbHost = $this->config($dbKey.'connection.hostname');
         $dbPort = $this->config($dbKey.'connection.port');
@@ -44,7 +52,7 @@ class Task_Backup extends Minion_Task
          * Force utf8 charset for mysql
          * @url http://stackoverflow.com/questions/4475548/pdo-mysql-and-broken-utf-8-encoding
          */
-        if ( $dbDriver === 'mysql' ) {
+        if ($dbDriver === 'mysql') {
             $dbName .= ';charset=utf8';
         }
 
@@ -60,27 +68,40 @@ class Task_Backup extends Minion_Task
 
         $this->info('Backing up folder '.$folder);
 
-        $prefix = $this->config('backup.prefix');
+        $prefix            = $this->config('backup.prefix');
         $timestampedPrefix = $this->config('backup.useTimestampedPrefix');
 
         $instance
             ->setPath($folder)
             ->setPrefix($prefix, $timestampedPrefix);
 
-        if ( $instance->execute() ) {
+        if ($instance->execute()) {
             $this->info('Backup done, see file '.$instance->getRealName());
-        }
-        else {
+        } else {
             $this->warning('Backup was not created!');
         }
     }
 
-    protected function getDBDriver($driver)
+    /**
+     * @param string $group
+     * @param null   $default
+     *
+     * @return \Config_Group|string|int|bool|null
+     * @throws \Kohana_Exception
+     */
+    private function config($group, $default = null)
     {
-        if ( in_array($driver, ['mysqli', 'mysql'], true) ) {
+        $path = explode('.', $group);
+
+        return $this->configProvider->load($path) ?: $default;
+    }
+
+    protected function getDBDriver($driver): string
+    {
+        if (in_array($driver, ['mysqli', 'mysql'], true)) {
             return 'mysql';
         }
 
-        throw new TaskException('Unknown database driver :name', array(':name' => $driver));
+        throw new TaskException('Unknown database driver :name', [':name' => $driver]);
     }
 }

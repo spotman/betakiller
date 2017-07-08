@@ -24,12 +24,12 @@ abstract class AbstractOrmBasedRepository extends AbstractRepository
     /**
      * @param int $id
      *
-     * @return ExtendedOrmInterface|mixed
+     * @return ExtendedOrmInterface|mixed|null
      * @throws \Exception
      */
     public function findById(int $id)
     {
-        return $this->getOrmInstance()->get_by_id($id);
+        return $this->getOrmInstance()->get_by_id($id, true);
     }
 
     /**
@@ -80,7 +80,10 @@ abstract class AbstractOrmBasedRepository extends AbstractRepository
         }
     }
 
-    protected function getOrmInstance(): ExtendedOrmInterface
+    /**
+     * @return \BetaKiller\Model\ExtendedOrmInterface|mixed
+     */
+    protected function getOrmInstance()
     {
         $name = static::getCodename();
 

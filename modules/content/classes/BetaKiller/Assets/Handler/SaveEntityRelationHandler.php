@@ -25,7 +25,7 @@ class SaveEntityRelationHandler implements AssetsHandlerInterface
 
     /**
      * @param \BetaKiller\Assets\Provider\AssetsProviderInterface $provider
-     * @param \BetaKiller\Content\EntityModelRelatedInterface     $model
+     * @param \BetaKiller\Model\EntityModelRelatedInterface       $model
      * @param array                                               $postData
      */
     public function update(AssetsProviderInterface $provider, $model, array $postData): void

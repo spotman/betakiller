@@ -5,7 +5,7 @@ use DateTimeImmutable;
 use DateTimeInterface;
 use ORM;
 
-class Quote extends ORM
+class Quote extends ORM implements QuoteInterface
 {
     /**
      * @param string $value
@@ -13,7 +13,7 @@ class Quote extends ORM
      * @return $this
      * @throws \Kohana_Exception
      */
-    public function setText($value)
+    public function setText(string $value)
     {
         return $this->set('text', (string)$value);
     }

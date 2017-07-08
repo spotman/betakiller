@@ -321,7 +321,7 @@ class IFace extends TreeModelSingleParentOrm implements IFaceModelInterface
      *
      * @return $this
      */
-    protected function additionalTreeModelFiltering()
+    protected function additionalTreeTraversalFiltering()
     {
         // No filtering needed
         return $this;

@@ -173,7 +173,12 @@ class ORM extends Utils\Kohana\ORM implements ExtendedOrmInterface
      */
     public function getID(): string
     {
-        return $this->get_id();
+        return (string)$this->get_id();
+    }
+
+    public function hasID(): bool
+    {
+        return (bool)$this->get_id();
     }
 
     /**

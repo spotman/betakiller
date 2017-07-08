@@ -16,21 +16,22 @@ class Kohana extends Base
         $definitions = $config->get('definitions');
         $builder->addDefinitions($definitions);
 
-        $useAutowiring = $config->get('autowiring', true);
+        $useAutowiring  = $config->get('autowiring', true);
         $useAnnotations = $config->get('annotations', true);
 
         /** @url http://php-di.org/doc/performances.html */
         $cache = $config->get('cache');
 
         if ($cache) {
-            if (!($cache instanceof Cache))
+            if (!($cache instanceof Cache)) {
                 throw new \Kohana_Exception('PHP-DI cache must be instance of :type', [':type' => Cache::class]);
+            }
 
             if ($cache instanceof CacheProvider) {
                 $ns = $config->get('namespace');
 
                 if (!$ns) {
-                    throw new \Exception('PHP-DI container must have a [namespace] defined in config');
+                    throw new \Kohana_Exception('PHP-DI container must have a [namespace] defined in config');
                 }
 
                 $cache->setNamespace($ns);
