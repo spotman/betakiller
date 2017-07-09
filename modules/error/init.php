@@ -12,10 +12,10 @@
 // TODO Remove this in favour of custom Monolog handler
 if (Kohana::in_production(true)) {
     try {
-        /** @var Log_PhpExceptionStorage $log */
-        $log = \BetaKiller\DI\Container::getInstance()->get(Log_PhpExceptionStorage::class);
+        /** @var Log_PhpExceptionService $log */
+        $log = \BetaKiller\DI\Container::getInstance()->get(Log_PhpExceptionService::class);
         $log->register();
-    } catch (Throwable $e) {
+    } catch (Throwable $ignored) {
         // Skip this log writer silently
     }
 }

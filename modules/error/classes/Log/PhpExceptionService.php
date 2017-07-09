@@ -1,15 +1,15 @@
 <?php
 
-use BetaKiller\Error\PhpExceptionStorageInterface;
+use BetaKiller\Error\PhpExceptionService;
 use BetaKiller\Helper\AppEnv;
 use BetaKiller\Helper\NotificationHelper;
 
-class Log_PhpExceptionStorage extends Log_Writer
+class Log_PhpExceptionService extends Log_Writer
 {
     /**
-     * @var \BetaKiller\Error\PhpExceptionStorageInterface
+     * @var \BetaKiller\Error\PhpExceptionService
      */
-    protected $storage;
+    protected $service;
 
     /**
      * @var \BetaKiller\Helper\AppEnv
@@ -22,15 +22,18 @@ class Log_PhpExceptionStorage extends Log_Writer
     private $notificationHelper;
 
     /**
-     * Log_PhpExceptionStorage constructor.
+     * Log_PhpExceptionService constructor.
      *
-     * @param \BetaKiller\Error\PhpExceptionStorageInterface $storage
+     * @param \BetaKiller\Error\PhpExceptionService $service
      * @param \BetaKiller\Helper\AppEnv                      $env
      * @param \BetaKiller\Helper\NotificationHelper          $notificationHelper
      */
-    public function __construct(PhpExceptionStorageInterface $storage, AppEnv $env, NotificationHelper $notificationHelper)
-    {
-        $this->storage            = $storage;
+    public function __construct(
+        PhpExceptionService $service,
+        AppEnv $env,
+        NotificationHelper $notificationHelper
+    ) {
+        $this->service            = $service;
         $this->appEnv             = $env;
         $this->notificationHelper = $notificationHelper;
     }
@@ -87,13 +90,14 @@ class Log_PhpExceptionStorage extends Log_Writer
                 ->setSubj('BetaKiller logging subsystem failure')
                 ->setTemplateName('developer/error/subsystem-failure')
                 ->setTemplateData([
-                    'url'     => \Kohana::$base_url,
-                    'message' => \Kohana_Exception::text($exception),
+                    'url'        => \Kohana::$base_url,
+                    'message'    => \Kohana_Exception::text($exception),
                     'stacktrace' => $exception->getTraceAsString(),
                 ])
                 ->send();
-        } catch (\Throwable $e) {
-            // Silently fail
+        } catch (\Throwable $ignored) {
+            // Fail silently
+            error_log($ignored->getMessage().PHP_EOL.$ignored->getTraceAsString());
         }
     }
 
@@ -106,6 +110,6 @@ class Log_PhpExceptionStorage extends Log_Writer
             return;
         }
 
-        $this->storage->storeException($exception);
+        $this->service->storeException($exception);
     }
 }

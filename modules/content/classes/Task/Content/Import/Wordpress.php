@@ -87,6 +87,12 @@ class Task_Content_Import_Wordpress extends AbstractTask
 
     /**
      * @Inject
+     * @var \BetaKiller\Repository\ContentImageRepository
+     */
+    private $imageRepository;
+
+    /**
+     * @Inject
      * @var \BetaKiller\Repository\EntityRepository
      */
     private $entityRepository;
@@ -536,10 +542,10 @@ class Task_Content_Import_Wordpress extends AbstractTask
 
         if ($body) {
             // Parsing all images first to get @alt and @title values
-            $this->process_images_in_text($document, $item->get_id());
+            $this->process_images_in_text($document, $item->getID());
 
             // Process attachments first coz they are images inside links
-            $this->update_links_on_attachments($document, $item->get_id());
+            $this->update_links_on_attachments($document, $item->getID());
 //            $this->remove_links_on_content_images($document);
 
             $text = $body->innerHtml();
@@ -670,7 +676,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
 
         foreach ($images_wp_data as $image_data) {
             /** @var \BetaKiller\Model\ContentPostThumbnailInterface $image_model */
-            $image_model = $this->process_attachment($image_data, $post->get_id(), $provider);
+            $image_model = $this->process_attachment($image_data, $post->getID(), $provider);
 
             // Linking image to post
             $image_model->setPost($post);
@@ -739,7 +745,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
             return null;
         }
 
-        $image = $this->process_attachment($wp_image_data, $post->get_id());
+        $image = $this->process_attachment($wp_image_data, $post->getID());
 
         // Removing <img /> tag
         $caption_text = trim(strip_tags($s->getContent()));
@@ -777,7 +783,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
 
         // Process every image in set
         foreach ($wp_images as $wp_image_data) {
-            $model        = $this->process_attachment($wp_image_data, $post->get_id());
+            $model        = $this->process_attachment($wp_image_data, $post->getID());
             $images_ids[] = $model->getID();
         }
 
@@ -827,7 +833,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
             // Processing image
 
             /** @var \BetaKiller\Assets\Model\AssetsModelImageInterface $image */
-            $image = $this->process_attachment($wp_image, $post->get_id());
+            $image = $this->process_attachment($wp_image, $post->getID());
 
 
             $this->debug('Adding image :id to wonderplugin slider', [':id' => $image->getID()]);
@@ -920,7 +926,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
             $image->setTitle($title);
         }
 
-        $image->save();
+        $this->imageRepository->save($image);
 
         // Removing unnecessary attributes
         unset(
@@ -939,7 +945,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
             );
         }
 
-        $attributes['id'] = $image->get_id();
+        $attributes['id'] = $image->getID();
 
         $document = $node->getDocument();
         $element  = $document->createElement(PhotoCustomTag::TAG_NAME);
@@ -954,7 +960,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
 
     protected function process_content_youtube_iframes(ContentPost $item): void
     {
-        $text = $this->process_youtube_videos_in_text($item->getContent(), $item->get_id());
+        $text = $this->process_youtube_videos_in_text($item->getContent(), $item->getID());
 
         $item->setContent($text);
     }
@@ -981,8 +987,8 @@ class Task_Content_Import_Wordpress extends AbstractTask
             $target_tag   = null;
 
             try {
-                // Создаём новый тег <youtube /> на замену <img />
-                $target_tag = $this->process_youtube_iframe_tag($original_tag, $entity_item_id);
+                // Создаём новый тег <youtube /> на замену <iframe />
+                $target_tag = $this->processYoutubeIFrameTag($original_tag, $entity_item_id);
             } catch (\Throwable $e) {
                 $this->warning($e->getMessage());
             }
@@ -999,7 +1005,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
         return $text;
     }
 
-    protected function process_youtube_iframe_tag($tag_string, $entity_item_id): string
+    protected function processYoutubeIFrameTag($tag_string, $entity_item_id): string
     {
         // Parsing
         $sx = simplexml_load_string($tag_string);
@@ -1057,7 +1063,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
             'height' => $height,
         ];
 
-        return $this->customTagFacade->generateHtml(YoutubeCustomTag::TAG_NAME, $video->get_id(), $attributes);
+        return $this->customTagFacade->generateHtml(YoutubeCustomTag::TAG_NAME, $video->getID(), $attributes);
     }
 
     /**
@@ -1134,18 +1140,23 @@ class Task_Content_Import_Wordpress extends AbstractTask
 
     protected function import_quotes(): void
     {
-        $quotes_data = $this->wp->get_quotes_collection_quotes();
+        $quotesData = $this->wp->get_quotes_collection_quotes();
 
-        foreach ($quotes_data as $data) {
-            $id         = $data['id'];
-            $text       = $data['text'];
-            $author     = $data['author'];
-            $created_at = new DateTime($data['created_at']);
+        foreach ($quotesData as $data) {
+            $id        = $data['id'];
+            $text      = $data['text'];
+            $author    = $data['author'];
+            $createdAt = new DateTime($data['created_at']);
 
-            $model = $this->quoteRepository->findById($id);
+            $model = $this->quoteRepository->findByWpId($id);
+
+            if (!$model) {
+                $model = $this->quoteRepository->create();
+                $model->setWpId($id);
+            }
 
             $model
-                ->setCreatedAt($created_at)
+                ->setCreatedAt($createdAt)
                 ->setAuthor($author)
                 ->setText($text);
 
@@ -1207,7 +1218,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
 
             $model
                 ->setEntity($this->get_content_post_entity())
-                ->setEntityItemID($post->get_id());
+                ->setEntityItemID($post->getID());
 
             $model
                 ->set_ip_address($authorIP)
@@ -1244,7 +1255,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
             } catch (ORM_Validation_Exception $e) {
                 $this->warning('Comment with WP ID = :id is invalid, skipping :errors', [
                     ':id'     => $wpID,
-                    ':errors' => json_encode($model->getValidationExceptionErrors($e)),
+                    ':errors' => json_encode($this->commentRepository->getValidationExceptionErrors($e)),
                 ]);
             }
         }
@@ -1264,9 +1275,9 @@ class Task_Content_Import_Wordpress extends AbstractTask
 
             if (!$userModel) {
                 $userModel = $this->userRepository->createNewUser($wpLogin, $wpEmail);
-                $this->info('User :login successfully imported', [':login' => $userModel->get_username()]);
+                $this->info('User :login successfully imported', [':login' => $userModel->getUsername()]);
             } else {
-                $this->info('User :login already exists', [':login' => $userModel->get_username()]);
+                $this->info('User :login already exists', [':login' => $userModel->getUsername()]);
             }
         }
     }

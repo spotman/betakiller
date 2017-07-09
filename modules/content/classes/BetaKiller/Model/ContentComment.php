@@ -143,7 +143,7 @@ class ContentComment extends TreeModelSingleParentOrm
 
     public function getHtmlDomID(): string
     {
-        return 'content-comment-'.$this->get_id();
+        return 'content-comment-'.$this->getID();
     }
 
     /**
@@ -216,14 +216,14 @@ class ContentComment extends TreeModelSingleParentOrm
     {
         $author = $this->get_author_user();
 
-        return $author ? $author->get_first_name() : $this->get_guest_author_name();
+        return $author ? $author->getFirstName() : $this->get_guest_author_name();
     }
 
     public function get_author_email(): string
     {
         $author = $this->get_author_user();
 
-        return $author ? $author->get_email() : $this->get_guest_author_email();
+        return $author ? $author->getEmail() : $this->get_guest_author_email();
     }
 
     /**
@@ -334,7 +334,7 @@ class ContentComment extends TreeModelSingleParentOrm
         $parent     = $this->getParent();
         $parentPath = $parent ? $parent->get_path() : 0;
 
-        $this->set('path', $parentPath.'.'.$this->get_id());
+        $this->set('path', $parentPath.'.'.$this->getID());
 
         return $this;
     }

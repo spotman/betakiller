@@ -3,21 +3,19 @@ namespace BetaKiller\Notification\Transport;
 
 use BetaKiller\Notification\NotificationMessageInterface;
 use BetaKiller\Notification\NotificationUserInterface;
-use BetaKiller\Notification\TransportInterface;
-//use BetaKiller\Notification\TransportException;
 
-class OnlineTransport extends AbstractTransport implements TransportInterface
+class OnlineTransport extends AbstractTransport
 {
     const NAME = 'email';
 
-    public function get_name()
+    public function getName(): string
     {
         return self::NAME;
     }
 
-    public function isEnabledFor(NotificationUserInterface $user)
+    public function isEnabledFor(NotificationUserInterface $user): bool
     {
-        return $this->isOnline($user) && $user->is_online_notification_allowed();
+        return $user->isOnlineNotificationAllowed() && $this->isOnline($user);
     }
 
     /**
@@ -27,13 +25,8 @@ class OnlineTransport extends AbstractTransport implements TransportInterface
      *
      * @return bool
      */
-    public function isOnline(NotificationUserInterface $user)
+    public function isOnline(NotificationUserInterface $user): bool
     {
-        // Non-logged user is always offline
-        if (!$user->get_id()) {
-            return false;
-        }
-
         // TODO Online detection logic
         // Check websocket connection
 
@@ -47,8 +40,8 @@ class OnlineTransport extends AbstractTransport implements TransportInterface
      * @return int Number of messages sent
      * @throws \HTTP_Exception_501
      */
-    public function send(NotificationMessageInterface $message, NotificationUserInterface $user)
+    public function send(NotificationMessageInterface $message, NotificationUserInterface $user): int
     {
-        throw new \HTTP_Exception_501();
+        throw new \HTTP_Exception_501('Not implemented yet');
     }
 }

@@ -8,7 +8,7 @@ use DateTimeImmutable;
 use DateTimeInterface;
 
 interface ContentCommentInterface extends TreeModelSingleParentInterface, EntityModelRelatedInterface,
-    StatusRelatedModelInterface, EntityHasWordpressIdInterface, HasPublicReadUrlInterface
+    StatusRelatedModelInterface, EntityHasWordpressIdInterface, HasPublicReadUrlInterface, DispatchableEntityInterface
 {
     public function getRelatedContentLabel(): string;
 

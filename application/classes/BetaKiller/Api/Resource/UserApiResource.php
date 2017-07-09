@@ -27,15 +27,15 @@ abstract class UserApiResource extends ModelCrudApiResource
         $data = (object)$data;
 
         if (isset($data->firstName)) {
-            $user->set_first_name(HTML::chars($data->firstName));
+            $user->setFirstName(HTML::chars($data->firstName));
         }
 
         if (isset($data->lastName)) {
-            $user->set_last_name(HTML::chars($data->lastName));
+            $user->setLastName(HTML::chars($data->lastName));
         }
 
         if (isset($data->phone)) {
-            $user->set_phone(HTML::chars($data->phone));
+            $user->setPhone(HTML::chars($data->phone));
         }
 
         $this->userRepository->save($user);

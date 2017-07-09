@@ -31,7 +31,8 @@ use Spotman\Acl\ResourcesCollector\AclResourcesCollectorInterface;
 use Spotman\Acl\RolesCollector\AclRolesCollectorInterface;
 use Spotman\Acl\RulesCollector\AclRulesCollectorInterface;
 use Spotman\Api\AccessResolver\ApiMethodAccessResolverDetectorInterface;
-
+use BetaKiller\Repository\UserRepository;
+use BetaKiller\Repository\RoleRepository;
 
 $workingPath = MultiSite::instance()->getWorkingPath();
 $workingName = MultiSite::instance()->getWorkingName();
@@ -95,10 +96,33 @@ return [
         })->scope(\DI\Scope::SINGLETON),
 
         // Helpers
-        'User'      => DI\factory(function (Auth $auth) {
+        'User'      => DI\factory(function (Auth $auth, UserRepository $userRepository, RoleRepository $roleRepository) {
             // Auth user for CLI
             if (PHP_SAPI === 'cli') {
-                return \BetaKiller\Task\AbstractTask::getCliUserModel();
+                $cliUserName = \BetaKiller\Task\AbstractTask::CLI_USER_NAME;
+
+                $user = $userRepository->searchBy($cliUserName);
+
+                if (!$user) {
+                    $host  = parse_url(\Kohana::$base_url, PHP_URL_HOST);
+                    $email = $cliUserName.'@'.$host;
+
+                    $user = $userRepository->createNewUser($cliUserName, $email);
+
+                    // No notification for cron user
+                    $user->disableEmailNotification();
+
+                    // Allowing everything (admin may remove some roles later if needed)
+                    $roles = $roleRepository->getAll();
+
+                    foreach ($roles as $role) {
+                        $user->addRole($role);
+                    }
+
+                    $userRepository->save($user);
+                }
+
+                return $user;
             }
 
             $user = $auth->get_user();

@@ -43,11 +43,6 @@ class Layout extends ORM
         parent::_initialize();
     }
 
-    public function get_id()
-    {
-        return (int)$this->pk();
-    }
-
     /**
      * Returns TRUE if layout is marked as "default"
      *

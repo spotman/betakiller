@@ -10,11 +10,14 @@ use DateTimeInterface;
  *
  * @package BetaKiller\Repository
  * @method QuoteInterface findById(int $id)
+ * @method QuoteInterface findByWpId(int $id)
  * @method QuoteInterface create()
  * @method QuoteInterface[] getAll()
  */
-class QuoteRepository extends AbstractOrmBasedRepository
+class QuoteRepository extends AbstractOrmBasedRepository implements RepositoryHasWordpressIdInterface
 {
+    use OrmBasedRepositoryHasWordpressIdTrait;
+
     /**
      * @param \DateTimeInterface|null $before
      *

@@ -53,7 +53,7 @@ class PostItem extends AbstractAdminBase
         $thumbnails = [];
 
         foreach ($post->getThumbnails() as $thumb) {
-            $thumbnails[$thumb->get_id()] = $this->assetsHelper->getAttributesForImgTag($thumb, $thumb::SIZE_PREVIEW);
+            $thumbnails[$thumb->getID()] = $this->assetsHelper->getAttributesForImgTag($thumb, $thumb::SIZE_PREVIEW);
         }
 
         // Edit latest revision data

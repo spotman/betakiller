@@ -6,14 +6,14 @@ use BetaKiller\Notification\NotificationUserInterface;
 
 class EmailTransport extends AbstractTransport
 {
-    public function get_name()
+    public function getName(): string
     {
         return 'email';
     }
 
-    public function isEnabledFor(NotificationUserInterface $user)
+    public function isEnabledFor(NotificationUserInterface $user): bool
     {
-        return $user->is_email_notification_allowed();
+        return $user->isEmailNotificationAllowed();
     }
 
     /**
@@ -22,12 +22,12 @@ class EmailTransport extends AbstractTransport
      *
      * @return int Number of messages sent
      */
-    public function send(NotificationMessageInterface $message, NotificationUserInterface $user)
+    public function send(NotificationMessageInterface $message, NotificationUserInterface $user): int
     {
         $fromUser = $message->getFrom();
 
-        $from        = $fromUser ? $fromUser->get_email() : null;
-        $to          = $user->get_email();
+        $from        = $fromUser ? $fromUser->getEmail() : null;
+        $to          = $user->getEmail();
         $subj        = $message->getSubj($user);
         $attachments = $message->getAttachments();
 

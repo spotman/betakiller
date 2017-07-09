@@ -52,7 +52,7 @@ trait OrmBasedEntityRelatedRepositoryTrait
         ?int $entity_item_id = null
     ): void {
         if ($entity) {
-            $this->filterEntityID($orm, $entity->get_id());
+            $this->filterEntityID($orm, $entity->getID());
         }
 
         if ($entity_item_id) {

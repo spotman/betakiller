@@ -53,7 +53,7 @@ abstract class Widget_Content_SidebarArticlesList extends AbstractBaseWidget
     {
         $current_article = $this->urlParametersHelper->getContentPost();
 
-        return $current_article ? $current_article->get_id() : null;
+        return $current_article ? $current_article->getID() : null;
     }
 
     protected function getArticleData(ContentPost $article): array

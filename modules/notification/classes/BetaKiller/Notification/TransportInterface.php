@@ -6,14 +6,14 @@ interface TransportInterface
     /**
      * @return string
      */
-    public function get_name();
+    public function getName(): string;
 
     /**
      * @param \BetaKiller\Notification\NotificationUserInterface $user
      *
      * @return bool
      */
-    public function isEnabledFor(NotificationUserInterface $user);
+    public function isEnabledFor(NotificationUserInterface $user): bool;
 
     /**
      * @param \BetaKiller\Notification\NotificationMessageInterface $message
@@ -21,5 +21,5 @@ interface TransportInterface
      *
      * @return int Number of messages sent
      */
-    public function send(NotificationMessageInterface $message, NotificationUserInterface $user);
+    public function send(NotificationMessageInterface $message, NotificationUserInterface $user): int;
 }

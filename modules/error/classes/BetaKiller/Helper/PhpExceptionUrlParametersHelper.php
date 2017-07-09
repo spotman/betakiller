@@ -4,10 +4,10 @@ namespace BetaKiller\Helper;
 class PhpExceptionUrlParametersHelper extends UrlParametersHelper
 {
     /**
-     * @return \Model_PhpException|null
+     * @return \BetaKiller\Model\PhpException|null
      */
     public function getPhpException()
     {
-        return $this->getEntityByClassName(\Model_PhpException::class);
+        return $this->getEntityByClassName(\BetaKiller\Model\PhpException::class);
     }
 }

@@ -12,6 +12,12 @@ abstract class AbstractOrmBasedRepository extends AbstractRepository
     private $ormFactory;
 
     /**
+     * @Inject
+     * @var \Psr\Log\LoggerInterface
+     */
+    private $logger;
+
+    /**
      * AbstractOrmBasedRepository constructor.
      *
      * @param \BetaKiller\Factory\OrmFactory $ormFactory
@@ -32,6 +38,7 @@ abstract class AbstractOrmBasedRepository extends AbstractRepository
         try {
             return $this->getOrmInstance()->get_by_id($id);
         } catch (\Throwable $e) {
+            $this->logger->emergency('Can not find item by id '.$id, ['exception' => $e]);
             return null;
         }
     }
@@ -72,6 +79,11 @@ abstract class AbstractOrmBasedRepository extends AbstractRepository
         $this->checkEntityInheritance($entity);
 
         $entity->delete();
+    }
+
+    public function getValidationExceptionErrors(\ORM_Validation_Exception $e): array
+    {
+        return $e->errors('models');
     }
 
     private function checkEntityInheritance($entity): void

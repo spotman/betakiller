@@ -52,10 +52,10 @@ class Widget_Content_Comments extends AbstractBaseWidget
             $created_at  = $comment->get_created_at();
             $email       = $comment->get_author_email();
             $parentModel = $comment->getParent();
-            $parentID    = $parentModel ? $parentModel->get_id() : 0;
+            $parentID    = $parentModel ? $parentModel->getID() : 0;
 
             $commentsData[] = [
-                'id'        => $comment->get_id(),
+                'id'        => $comment->getID(),
                 'parent_id' => $parentID,
                 'date'      => $created_at->format('d.m.Y'),
                 'time'      => $created_at->format('H:i:s'),
@@ -125,7 +125,7 @@ class Widget_Content_Comments extends AbstractBaseWidget
             // Check parent comment entity id
             if (!$parentEntity->isEqualTo($entity)) {
                 throw new WidgetException('Incorrect parent comment entity; :sent sent instead of :needed', [
-                    ':needed' => $entity->get_id(),
+                    ':needed' => $entity->getID(),
                     ':sent'   => $parentEntity->getID(),
                 ]);
             }

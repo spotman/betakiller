@@ -32,8 +32,11 @@ class Widget_CustomTag_Photo extends AbstractBaseWidget
             throw new WidgetException('No image ID provided');
         }
 
-        /** @var \BetaKiller\Model\ContentImage $model */
         $model = $this->repository->findById($imageID);
+
+        if (!$model) {
+            throw new WidgetException('No image found for ID :id', [':id' => $imageID]);
+        }
 
         $title    = $this->getContextParam('title');
         $align    = $this->getContextParam('align', 'alignnone');
@@ -49,7 +52,7 @@ class Widget_CustomTag_Photo extends AbstractBaseWidget
         $classes = array_filter(explode(' ', $class));
 
         $attributes = [
-            'id'    => 'content-image-'.$model->get_id(),
+            'id'    => 'content-image-'.$model->getID(),
             'title' => $title ?: $model->getTitle(),
             'alt'   => $alt ?: $model->getAlt(),
             'class' => implode(' ', array_unique($classes)),

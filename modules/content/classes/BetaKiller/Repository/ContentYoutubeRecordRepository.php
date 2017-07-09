@@ -16,7 +16,7 @@ class ContentYoutubeRecordRepository extends AbstractOrmBasedRepository implemen
 {
     use OrmBasedContentElementRepositoryTrait;
 
-    public function findRecordByYoutubeEmbedUrl(string $url): ContentYoutubeRecord
+    public function findRecordByYoutubeEmbedUrl(string $url): ?ContentYoutubeRecord
     {
         $id = $this->getYoutubeIdFromEmbedUrl($url);
         return $this->findByYoutubeID($id);

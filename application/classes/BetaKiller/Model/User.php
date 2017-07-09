@@ -3,6 +3,7 @@ namespace BetaKiller\Model;
 
 use BetaKiller\Exception;
 use BetaKiller\Helper\RoleModelFactoryTrait;
+use BetaKiller\Notification\NotificationUserInterface;
 
 class User extends \Model_Auth_User implements UserInterface
 {
@@ -10,21 +11,21 @@ class User extends \Model_Auth_User implements UserInterface
 
     protected $_all_roles_ids = [];
 
-    protected function _initialize()
+    protected function _initialize(): void
     {
-        $this->_table_name = 'users';
-        $this->_reload_on_wakeup = FALSE;
+        $this->_table_name       = 'users';
+        $this->_reload_on_wakeup = false;
 
-        $this->belongs_to(array(
-            'language' => array(
-                'model' => 'Language',
+        $this->belongs_to([
+            'language' => [
+                'model'       => 'Language',
                 'foreign_key' => 'language_id',
-            ),
-        ));
+            ],
+        ]);
 
-        $this->has_many(array(
-            'ulogins' => array(),
-        ));
+        $this->has_many([
+            'ulogins' => [],
+        ]);
 
         $this->load_with(['language']);
 
@@ -32,9 +33,10 @@ class User extends \Model_Auth_User implements UserInterface
     }
 
     /**
-     * @return RoleInterface
+     * @return Role
+     * @throws \Kohana_Exception
      */
-    protected function get_roles_relation()
+    protected function get_roles_relation(): Role
     {
         return $this->get('roles');
     }
@@ -56,34 +58,40 @@ class User extends \Model_Auth_User implements UserInterface
 
     /**
      * @param string $value
-     * @return $this
+     *
+     * @return \BetaKiller\Model\UserInterface
+     * @throws \Kohana_Exception
      */
-    public function set_username($value)
+    public function setUsername(string $value): UserInterface
     {
         return $this->set('username', $value);
     }
 
     /**
      * @return string
+     * @throws \Kohana_Exception
      */
-    public function get_username()
+    public function getUsername(): string
     {
         return $this->get('username');
     }
 
     /**
      * @param string $value
-     * @return $this
+     *
+     * @return \BetaKiller\Model\UserInterface
+     * @throws \Kohana_Exception
      */
-    public function set_password($value)
+    public function setPassword(string $value): UserInterface
     {
         return $this->set('password', $value);
     }
 
     /**
      * @return string
+     * @throws \Kohana_Exception
      */
-    public function get_password()
+    public function getPassword(): string
     {
         return $this->get('password');
     }
@@ -91,18 +99,28 @@ class User extends \Model_Auth_User implements UserInterface
     /**
      * @return bool
      */
-    public function isDeveloper()
+    public function isDeveloper(): bool
     {
-        return $this->has_role(Role::DEVELOPER_ROLE_NAME);
+        return $this->hasRole($this->getRole(Role::DEVELOPER_ROLE_NAME));
     }
 
     /**
      * @return bool
      * @deprecated
      */
-    public function isModerator()
+    public function isModerator(): bool
     {
-        return $this->has_role(Role::MODERATOR_ROLE_NAME);
+        return $this->hasRole($this->getRole(Role::MODERATOR_ROLE_NAME));
+    }
+
+    /**
+     * @param string $role
+     *
+     * @return \BetaKiller\Model\RoleInterface
+     */
+    private function getRole(string $role): RoleInterface
+    {
+        return $this->model_factory_role()->get_by_name($role);
     }
 
     /**
@@ -110,70 +128,31 @@ class User extends \Model_Auth_User implements UserInterface
      *
      * @return bool
      */
-    public function isGuest()
+    public function isGuest(): bool
     {
-        return $this instanceof GuestUser;
-    }
-
-    /**
-     * @return bool
-     */
-    protected function is_writer()
-    {
-        return $this->has_role(Role::WRITER_ROLE_NAME);
+        return ($this instanceof GuestUser);
     }
 
     /**
      * @todo Переписать на кешированный ACL ибо слишком затратно делать запрос в БД на проверку роли
      *
      * @param RoleInterface|string $role
+     *
      * @return bool
      */
-    public function has_role($role)
+    public function hasRole(RoleInterface $role): bool
     {
-        $role = $this->prepare_role_object($role);
-
         return $this->has('roles', $role);
     }
 
-    public function add_role($role)
-    {
-        $role = $this->prepare_role_object($role);
-
-        return $this->add('roles', $role);
-    }
-
     /**
-     * @param string|RoleInterface $role
+     * @param \BetaKiller\Model\RoleInterface|string $role
      *
-     * @return \BetaKiller\Model\RoleInterface
-     * @throws \BetaKiller\Exception
+     * @return \BetaKiller\Model\UserInterface
      */
-    protected function prepare_role_object($role)
+    public function addRole(RoleInterface $role): UserInterface
     {
-        if (is_string($role)) {
-            $role = $this->model_factory_role()->get_by_name($role);
-        }
-
-        if ( !($role instanceof RoleInterface) ) {
-            throw new Exception('Role object must be instance of :needs', [':needs' => RoleInterface::class]);
-        }
-
-        return $role;
-    }
-
-    /**
-     * @return $this
-     */
-    public function add_all_available_roles()
-    {
-        $roles = $this->model_factory_role()->get_all();
-
-        foreach ($roles as $role) {
-            $this->add_role($role);
-        }
-
-        return $this;
+        return $this->add('roles', $role);
     }
 
     /**
@@ -181,7 +160,7 @@ class User extends \Model_Auth_User implements UserInterface
      *
      * @return array
      */
-    public function get_all_user_roles_ids()
+    public function getAllUserRolesIDs(): array
     {
         return $this->fetchAllUserRolesIDs();
     }
@@ -198,7 +177,7 @@ class User extends \Model_Auth_User implements UserInterface
                 $roles[] = $role->getAllParents();
             }
 
-            $roles = array_merge(...$roles);
+            $roles     = array_merge(...$roles);
             $roles_ids = [];
 
             foreach ($roles as $role) {
@@ -212,24 +191,27 @@ class User extends \Model_Auth_User implements UserInterface
     }
 
     /**
-     * Возвращает имя языка, назначенного пользователю
-     * @return string
+     * Returns user`s language name
+     *
+     * @return string|null
+     * @throws \Kohana_Exception
      */
-    public function get_language_name()
+    public function getLanguageName(): ?string
     {
-        $lang_model = $this->get_language();
+        $lang_model = $this->getLanguage();
 
-        $lang = ( $this->loaded() AND $lang_model->loaded() )
+        $lang = ($this->loaded() && $lang_model->loaded())
             ? $lang_model->get_name()
-            : NULL;
+            : null;
 
         return $lang;
     }
 
     /**
      * @return NULL|\Model_Language
+     * @throws \Kohana_Exception
      */
-    public function get_language()
+    public function getLanguage(): ?\Model_Language
     {
         return $this->get('language');
     }
@@ -238,7 +220,7 @@ class User extends \Model_Auth_User implements UserInterface
      * @todo сделать проверку соответствия ip-адреса тому, на который был выдан токен
      * @return bool
      */
-    public function check_ip()
+    public function check_ip(): bool
     {
 //        $ip = Request::client_ip();
 //        $client_ip = ip2long($this->get_real_ip_address());
@@ -251,46 +233,57 @@ class User extends \Model_Auth_User implements UserInterface
 //            return FALSE;
 //        }
 //
-        return TRUE;
+        return true;
     }
 
     /**
      * Search for user by username or e-mail
+     *
      * @param $username_or_email
-     * @throws \HTTP_Exception_403
+     *
      * @return UserInterface|null
+     * @throws \Kohana_Exception
      */
-    public function search_by($username_or_email)
+    public function searchBy($username_or_email): ?UserInterface
     {
         $user = $this->where($this->unique_key($username_or_email), '=', $username_or_email)->find();
 
         return $user->loaded() ? $user : null;
     }
 
-    public function before_sign_in()
+    public function before_sign_in(): void
     {
         $this->check_is_active();
     }
 
-    protected function check_is_active()
+    /**
+     * @throws \Auth_Exception_Inactive
+     * @throws \Kohana_Exception
+     */
+    protected function check_is_active(): void
     {
         // Проверяем активен ли аккаунт
-        if ( !$this->is_active() ) {
+        if (!$this->isActive()) {
             throw new \Auth_Exception_Inactive;
         }
     }
 
-    public function after_auto_login()
+    /**
+     * @throws \Auth_Exception_WrongIP
+     * @throws \Auth_Exception_Inactive
+     * @throws \Kohana_Exception
+     */
+    public function afterAutoLogin(): void
     {
         $this->check_is_active();
 
         // Проверяем IP-адрес
-        if ( ! $this->check_ip() ) {
+        if (!$this->check_ip()) {
             throw new \Auth_Exception_WrongIP;
         }
     }
 
-    public function before_sign_out()
+    public function beforeSignOut(): void
     {
         // Empty by default
     }
@@ -299,21 +292,11 @@ class User extends \Model_Auth_User implements UserInterface
      * Returns TRUE, if user account is switched on
      *
      * @return bool
+     * @throws \Kohana_Exception
      */
-    public function is_active()
+    public function isActive(): bool
     {
-        return ( $this->loaded() AND $this->get('is_active') );
-    }
-
-    /**
-     * Returns TRUE if user is logged in now
-     *
-     * @return bool
-     * @throws \HTTP_Exception_501
-     */
-    public function is_logged_in()
-    {
-        throw new \HTTP_Exception_501('Not implemented yet');
+        return ($this->loaded() && $this->get('is_active'));
     }
 
     /**
@@ -323,40 +306,40 @@ class User extends \Model_Auth_User implements UserInterface
      */
     public function filter_active()
     {
-        return $this->where('is_active', '=', TRUE);
+        return $this->where('is_active', '=', true);
     }
 
-    public function get_full_name()
+    public function getFullName(): string
     {
-        return $this->get_first_name().' '.$this->get_last_name();
+        return $this->getFirstName().' '.$this->getLastName();
     }
 
-    public function get_first_name()
+    public function getFirstName(): string
     {
-        return $this->get('first_name');
+        return (string)$this->get('first_name');
     }
 
-    public function set_first_name($value)
+    public function setFirstName(string $value): UserInterface
     {
         return $this->set('first_name', $value);
     }
 
-    public function get_last_name()
+    public function getLastName(): string
     {
-        return $this->get('last_name');
+        return (string)$this->get('last_name');
     }
 
-    public function set_last_name($value)
+    public function setLastName(string $value): UserInterface
     {
         return $this->set('last_name', $value);
     }
 
-    public function get_email()
+    public function getEmail(): string
     {
         return $this->get('email');
     }
 
-    public function set_email($value)
+    public function setEmail(string $value): UserInterface
     {
         return $this->set('email', $value);
     }
@@ -365,94 +348,69 @@ class User extends \Model_Auth_User implements UserInterface
      * Возвращает основной номер телефона
      *
      * @return string
+     * @throws \Kohana_Exception
      */
-    public function get_phone()
+    public function getPhone(): string
     {
-        return $this->get('phone');
+        return (string)$this->get('phone');
     }
 
-    public function set_phone($number)
+    public function setPhone(string $number): UserInterface
     {
         return $this->set('phone', $number);
     }
 
-    /**
-     * @return \Database_Result|UserInterface[]
-     */
-    public function get_developers_list()
+    public function isEmailNotificationAllowed(): bool
     {
-        return $this->model_factory_role()->get_developer_role()->get_users()->find_all();
+        return (bool)$this->get('notify_by_email');
     }
 
-    /**
-     * @return \Database_Result|UserInterface[]
-     */
-    public function get_moderators_list()
-    {
-        return $this->model_factory_role()->get_moderator_role()->get_users()->find_all();
-    }
-
-    public function is_email_notification_allowed()
-    {
-        return (bool) $this->get('notify_by_email');
-    }
-
-    public function is_online_notification_allowed()
+    public function isOnlineNotificationAllowed(): bool
     {
         // Online notification isn`t ready yet
-        return FALSE;
+        return false;
     }
 
     /**
-     * @return $this
+     * @throws \Kohana_Exception
      */
-    public function enable_email_notification()
+    public function enableEmailNotification(): void
     {
         $this->set('notify_by_email', true);
-        return $this;
     }
 
     /**
-     * @return $this
+     * @throws \Kohana_Exception
      */
-    public function disable_email_notification()
+    public function disableEmailNotification(): void
     {
         $this->set('notify_by_email', false);
-        return $this;
     }
 
-    /**
-     * Возвращает true если пользователю разрешено использовать админку
-     * @return bool
-     * @deprecated
-     */
-    public function is_admin_allowed()
-    {
-        return ($this->isModerator() || $this->isDeveloper() || $this->is_writer());
-    }
-
-    public function as_array()
+    public function as_array(): array
     {
         return [
-            'id'        =>  $this->get_id(),
-            'username'  =>  $this->get_username(),
-            'email'     =>  $this->get_email(),
-            'firstName' =>  $this->get_first_name(),
-            'lastName'  =>  $this->get_last_name(),
-            'phone'     =>  $this->get_phone(),
+            'id'        => $this->get_id(),
+            'username'  => $this->getUsername(),
+            'email'     => $this->getEmail(),
+            'firstName' => $this->getFirstName(),
+            'lastName'  => $this->getLastName(),
+            'phone'     => $this->getPhone(),
         ];
     }
 
     /**
      * @return string
+     * @throws \Kohana_Exception
      */
-    public function getAccessControlIdentity()
+    public function getAccessControlIdentity(): string
     {
-        return $this->get_username();
+        return $this->getUsername();
     }
 
     /**
      * @return RoleInterface[]|\Traversable
+     * @throws \Kohana_Exception
      */
     public function getAccessControlRoles()
     {
@@ -465,7 +423,7 @@ class User extends \Model_Auth_User implements UserInterface
      * @throws \HTTP_Exception_401
      * @return void
      */
-    public function forceAuthorization()
+    public function forceAuthorization(): void
     {
         if ($this->isGuest()) {
             throw new \HTTP_Exception_401();
@@ -475,7 +433,7 @@ class User extends \Model_Auth_User implements UserInterface
     protected function getSerializableProperties()
     {
         return array_merge(parent::getSerializableProperties(), [
-            '_all_roles_ids'
+            '_all_roles_ids',
         ]);
     }
 }

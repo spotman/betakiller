@@ -11,6 +11,12 @@ abstract class Controller extends Controller_Proxy
     const JSON_SUCCESS = Response::JSON_SUCCESS;
     const JSON_ERROR   = Response::JSON_ERROR;
 
+    /**
+     * @Inject
+     * @var \BetaKiller\Model\UserInterface
+     */
+    private $user;
+
     protected static $_after_callbacks = [];
 
     public function before()
@@ -52,43 +58,40 @@ abstract class Controller extends Controller_Proxy
     protected function init_i18n()
     {
         // Get lang from cookie
-        $user_lang = Cookie::get(I18n::COOKIE_NAME);
+        $userLang = Cookie::get(I18n::COOKIE_NAME);
 
         $allowed_languages = I18n::lang_list();
 
-        if ($user_lang && !in_array($user_lang, $allowed_languages, true)) {
-            throw new HTTP_Exception_500(
-                'Unknown language :lang, only these are allowed: :allowed',
-                [':lang' => $user_lang, ':allowed' => implode(', ', $allowed_languages)]
-            );
+        if ($userLang && !in_array($userLang, $allowed_languages, true)) {
+            throw new HTTP_Exception_500('Unknown language :lang, only these are allowed: :allowed', [
+                ':lang' => $userLang,
+                ':allowed' => implode(', ', $allowed_languages),
+            ]);
         }
 
         // If current lang is not set
-        if (!$user_lang) {
-            // Get current user
-            $user = Auth::instance()->get_user();
-
+        if (!$userLang) {
             // If user is authorized
-            if ($user) {
+            if ($this->user->isGuest()) {
                 // Get its lang
-                $user_lang = $user->get_language_name();
+                $userLang = $this->user->getLanguageName();
             } // Else detect the preferred lang
             else {
                 /** @var HTTP_Header $headers */
                 $headers   = $this->request->headers();
-                $user_lang = $headers->preferred_language($allowed_languages);
+                $userLang = $headers->preferred_language($allowed_languages);
             }
         }
 
-        if (!$user_lang) {
-            $user_lang = I18n::lang_list()[0];
+        if (!$userLang) {
+            $userLang = I18n::lang_list()[0];
         }
 
         // Store lang in cookie
-        Cookie::set(I18n::COOKIE_NAME, $user_lang);
+        Cookie::set(I18n::COOKIE_NAME, $userLang);
 
         // Set I18n lang
-        I18n::lang($user_lang);
+        I18n::lang($userLang);
 
         // Save all absent keys if in development env
         if (!Kohana::in_production(true)) {

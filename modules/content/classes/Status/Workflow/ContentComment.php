@@ -37,7 +37,7 @@ class Status_Workflow_ContentComment extends StatusWorkflow
     {
         if ($this->model()->has_current_status()) {
             throw new StatusWorkflowException('Can not mark comment [:id] as draft coz it is in [:status] status', [
-                ':id'     => $this->model()->get_id(),
+                ':id'     => $this->model()->getID(),
                 ':status' => $this->model()->get_current_status()->get_codename(),
             ]);
         }

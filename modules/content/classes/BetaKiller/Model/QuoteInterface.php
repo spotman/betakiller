@@ -5,7 +5,7 @@ use DateTimeImmutable;
 use DateTimeInterface;
 use ORM;
 
-interface QuoteInterface
+interface QuoteInterface extends EntityHasWordpressIdInterface
 {
     /**
      * @param string $value

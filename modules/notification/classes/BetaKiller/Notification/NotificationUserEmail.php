@@ -8,6 +8,9 @@ class NotificationUserEmail implements NotificationUserInterface
      */
     protected $_email;
 
+    /**
+     * @var string
+     */
     protected $_fullName;
 
     /**
@@ -15,18 +18,12 @@ class NotificationUserEmail implements NotificationUserInterface
      */
     protected $_emailNotificationAllowed = true;
 
-    public function get_id()
-    {
-        // No ID for direct email sending
-        return NULL;
-    }
-
-    public static function factory($email, $fullName)
+    public static function factory(string $email, string $fullName): NotificationUserEmail
     {
         return new static($email, $fullName);
     }
 
-    public function __construct($email, $fullName)
+    public function __construct(string $email, string $fullName)
     {
         $this->_email = $email;
         $this->_fullName = $fullName;
@@ -35,7 +32,7 @@ class NotificationUserEmail implements NotificationUserInterface
     /**
      * @return string
      */
-    public function get_full_name()
+    public function getFullName(): string
     {
         return $this->_fullName;
     }
@@ -45,36 +42,28 @@ class NotificationUserEmail implements NotificationUserInterface
         return FALSE;
     }
 
-    public function get_email()
+    public function getEmail(): string
     {
         return $this->_email;
     }
 
-    public function is_email_notification_allowed()
+    public function isEmailNotificationAllowed(): bool
     {
         return TRUE;
     }
 
-    public function is_online_notification_allowed()
+    public function isOnlineNotificationAllowed(): bool
     {
         return FALSE;
     }
 
-    /**
-     * @return $this
-     */
-    public function enable_email_notification()
+    public function enableEmailNotification(): void
     {
         $this->_emailNotificationAllowed = true;
-        return $this;
     }
 
-    /**
-     * @return $this
-     */
-    public function disable_email_notification()
+    public function disableEmailNotification(): void
     {
         $this->_emailNotificationAllowed = false;
-        return $this;
     }
 }

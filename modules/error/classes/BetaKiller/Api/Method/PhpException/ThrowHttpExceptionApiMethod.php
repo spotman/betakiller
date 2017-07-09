@@ -33,6 +33,6 @@ class ThrowHttpExceptionApiMethod extends AbstractPhpExceptionApiMethod
     public function execute()
     {
         throw \HTTP_Exception::factory($this->code, 'This is a test from :username',
-            [':username' => $this->user->get_username()]);
+            [':username' => $this->user->getUsername()]);
     }
 }

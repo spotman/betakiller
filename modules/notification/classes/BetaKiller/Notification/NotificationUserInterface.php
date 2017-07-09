@@ -4,41 +4,29 @@ namespace BetaKiller\Notification;
 interface NotificationUserInterface
 {
     /**
-     * Returns user ID
-     * @return int
-     */
-    public function get_id();
-
-    /**
      * Returns user email
      * @return string
      */
-    public function get_email();
+    public function getEmail(): string;
 
     /**
      * @return string
      */
-    public function get_full_name();
+    public function getFullName(): string;
 
     /**
      * Returns TRUE if user allowed notifications through email
      * @return bool
      */
-    public function is_email_notification_allowed();
+    public function isEmailNotificationAllowed(): bool;
 
-    /**
-     * @return $this
-     */
-    public function enable_email_notification();
+    public function enableEmailNotification(): void;
 
-    /**
-     * @return $this
-     */
-    public function disable_email_notification();
+    public function disableEmailNotification(): void;
 
     /**
      * Returns TRUE if user allowed online notifications through WebSockets/AJAX/etc
      * @return bool
      */
-    public function is_online_notification_allowed();
+    public function isOnlineNotificationAllowed(): bool;
 }

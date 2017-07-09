@@ -30,7 +30,7 @@ class PostIndex extends AbstractAdminBase
 
         foreach ($articles as $article) {
             $data[] = [
-                'id'          => $article->get_id(),
+                'id'          => $article->getID(),
                 'url'         => $this->ifaceHelper->getReadEntityUrl($article),
                 'label'       => $article->getLabel(),
             ];

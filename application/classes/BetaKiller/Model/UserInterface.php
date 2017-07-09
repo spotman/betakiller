@@ -1,11 +1,11 @@
 <?php
 namespace BetaKiller\Model;
 
-use BetaKiller\Utils\Kohana\ORM\OrmInterface;
 use BetaKiller\Notification\NotificationUserInterface;
+use BetaKiller\Utils\Kohana\ORM\OrmInterface;
 use Spotman\Acl\AclUserInterface;
 
-interface UserInterface extends OrmInterface, NotificationUserInterface, AclUserInterface
+interface UserInterface extends AbstractEntityInterface, OrmInterface, NotificationUserInterface, AclUserInterface
 {
     // Auth_ORM methods
     public function complete_login();
@@ -17,70 +17,66 @@ interface UserInterface extends OrmInterface, NotificationUserInterface, AclUser
      * @param string $value
      * @return $this
      */
-    public function set_username($value);
+    public function setUsername(string $value);
 
     /**
      * @return string
      */
-    public function get_username();
+    public function getUsername(): string;
 
     /**
      * @param string $value
      * @return $this
      */
-    public function set_password($value);
+    public function setPassword(string $value);
 
     /**
      * @return string
      */
-    public function get_password();
+    public function getPassword(): string;
 
     /**
      * @return bool
      */
-    public function isDeveloper();
+    public function isDeveloper(): bool;
 
     /**
      * @return bool
      * @deprecated Use ACL resources instead
      */
-    public function isModerator();
+    public function isModerator(): bool;
 
     /**
      * @param RoleInterface|string $role
      * @return bool
      */
-    public function has_role($role);
+    public function hasRole(RoleInterface $role): bool;
 
     /**
      * @param string|RoleInterface $role
      *
-     * @return $this
+     * @return \BetaKiller\Model\UserInterface
      */
-    public function add_role($role);
-
-    /**
-     * @return $this
-     */
-    public function add_all_available_roles();
+    public function addRole(RoleInterface $role): UserInterface;
 
     /**
      * Get all user`s roles IDs (include parent roles)
      *
      * @return int[]
      */
-    public function get_all_user_roles_ids();
+    public function getAllUserRolesIDs(): array;
 
     /**
-     * Возвращает имя языка, назначенного пользователю
-     * @return string
+     * Returns user`s language name
+     *
+     * @return string|null
      */
-    public function get_language_name();
+    public function getLanguageName(): ?string;
 
     /**
      * @return NULL|\Model_Language
      */
-    public function get_language();
+    public function getLanguage(): ?\Model_Language;
 
     /**
      * Search for user by username or e-mail
@@ -88,7 +84,7 @@ interface UserInterface extends OrmInterface, NotificationUserInterface, AclUser
      * @throws \HTTP_Exception_403
      * @return UserInterface|null
      */
-    public function search_by($username_or_email);
+    public function searchBy($username_or_email): ?UserInterface;
 
     public function before_sign_in();
 
@@ -96,113 +92,89 @@ interface UserInterface extends OrmInterface, NotificationUserInterface, AclUser
      * @return void
      * @throws \Auth_Exception_WrongIP
      */
-    public function after_auto_login();
+    public function afterAutoLogin(): void;
 
     /**
      * @return void
      */
-    public function before_sign_out();
+    public function beforeSignOut(): void;
 
     /**
      * Returns TRUE, if user account is switched on
      *
      * @return bool
      */
-    public function is_active();
-
-    /**
-     * Returns TRUE if user is logged in now
-     *
-     * @return bool
-     */
-    public function is_logged_in();
+    public function isActive(): bool;
 
     /**
      * Returns true if current user is guest
      *
      * @return bool
      */
-    public function isGuest();
+    public function isGuest(): bool;
 
     /**
      * Filters only active users
      *
      * @return $this
+     * @deprecated
      */
     public function filter_active();
 
     /**
      * @return string
      */
-    public function get_first_name();
+    public function getFirstName(): string;
 
     /**
      * @param string $value
      *
-     * @return $this
+     * @return \BetaKiller\Model\UserInterface
      */
-    public function set_first_name($value);
+    public function setFirstName(string $value): UserInterface;
 
     /**
      * @return string
      */
-    public function get_last_name();
+    public function getLastName(): string;
 
     /**
      * @param string $value
      *
-     * @return $this
+     * @return \BetaKiller\Model\UserInterface
      */
-    public function set_last_name($value);
+    public function setLastName(string $value): UserInterface;
 
     /**
      * @return string
      */
-    public function get_email();
+    public function getEmail(): string;
 
     /**
      * @param string $value
      *
-     * @return $this
+     * @return \BetaKiller\Model\UserInterface
      */
-    public function set_email($value);
+    public function setEmail(string $value): UserInterface;
 
     /**
      * Возвращает основной номер телефона
      *
      * @return string
      */
-    public function get_phone();
+    public function getPhone(): string;
 
     /**
      * @param string $number
      *
-     * @return $this
+     * @return \BetaKiller\Model\UserInterface
      */
-    public function set_phone($number);
-
-    /**
-     * @return \Database_Result|UserInterface[]
-     */
-    public function get_developers_list();
-
-    /**
-     * @return \Database_Result|UserInterface[]
-     */
-    public function get_moderators_list();
-
-    /**
-     * Возвращает true если пользователю разрешено использовать админку
-     * Use \BetaKiller\Acl\Resource\AdminResource instead or domain-specific Acl resource
-     * @return bool
-     * @deprecated
-     */
-    public function is_admin_allowed();
+    public function setPhone(string $number): UserInterface;
 
     /**
      * @return array
      */
-    public function as_array();
+    public function as_array(): array;
 
     /**
      * Forces authorization if user is not logged in
@@ -210,5 +182,5 @@ interface UserInterface extends OrmInterface, NotificationUserInterface, AclUser
      * @throws \HTTP_Exception_401
      * @return void
      */
-    public function forceAuthorization();
+    public function forceAuthorization(): void;
 }

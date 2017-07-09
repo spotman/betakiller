@@ -39,11 +39,11 @@ abstract class StatusTransitionModelOrm extends GraphTransitionModelOrm implemen
         $foreign_key = $through_table.'.'.$this->get_roles_relation_foreign_key();
         $far_key     = $through_table.'.'.$this->get_roles_relation_far_key();
 
-        // inner join ACL table + where role_id in ($user->get_all_user_roles_ids())
+        // inner join ACL table + where role_id in ($user->getAllUserRolesIDs())
         return $this
             ->join($through_table, 'INNER')
             ->on($foreign_key, '=', $primary_key)
-            ->where($far_key, 'IN', $user->get_all_user_roles_ids());
+            ->where($far_key, 'IN', $user->getAllUserRolesIDs());
     }
 
     public function find_all_roles()

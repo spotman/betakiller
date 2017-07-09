@@ -4,10 +4,10 @@ namespace BetaKiller\IFace\Admin\Error;
 class ResolvedPhpExceptionIndex extends AbstractPhpExceptionIndex
 {
     /**
-     * @return \BetaKiller\Error\PhpExceptionModelInterface[]
+     * @return \BetaKiller\Model\PhpExceptionModelInterface[]
      */
-    protected function getPhpExceptions()
+    protected function getPhpExceptions(): array
     {
-        return $this->phpExceptionStorage->getResolvedPhpExceptions();
+        return $this->repository->getResolvedPhpExceptions();
     }
 }

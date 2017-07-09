@@ -94,7 +94,7 @@ class PostItem extends AbstractAppBase
         }
 
         return [
-            'id'         => $model->get_id(),
+            'id'         => $model->getID(),
             'label'      => $model->getLabel(),
             'content'    => $model->getContent(),
             'created_at' => $model->getCreatedAt(),

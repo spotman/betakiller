@@ -1,11 +1,11 @@
 <?php
 
-use BetaKiller\Error\PhpExceptionModelInterface;
-use BetaKiller\Error\PhpExceptionHistoryModelInterface;
-use BetaKiller\Model\UserInterface;
-use BetaKiller\Helper\UserModelFactoryTrait;
+namespace BetaKiller\Model;
 
-class Model_PhpExceptionHistory extends \ORM implements PhpExceptionHistoryModelInterface
+use BetaKiller\Helper\UserModelFactoryTrait;
+use DateTimeImmutable;
+
+class PhpExceptionHistory extends \ORM implements PhpExceptionHistoryModelInterface
 {
     use UserModelFactoryTrait;
 
@@ -16,46 +16,48 @@ class Model_PhpExceptionHistory extends \ORM implements PhpExceptionHistoryModel
      * @throws \Exception
      * @return void
      */
-    protected function _initialize()
+    protected function _initialize(): void
     {
-        $this->_db_group = 'filesystem';
+        $this->_db_group   = 'filesystem';
         $this->_table_name = 'error_history';
 
         $this->belongs_to([
-            'error' =>  [
-                'model'         =>  'PhpException',
-                'foreign_key'   =>  'error_id',
-            ]
+            'error' => [
+                'model'       => 'PhpException',
+                'foreign_key' => 'error_id',
+            ],
         ]);
 
         parent::_initialize();
     }
 
     /**
-     * @return \BetaKiller\Error\PhpExceptionModelInterface
+     * @return \BetaKiller\Model\PhpExceptionModelInterface
      */
-    public function getPhpException()
+    public function getPhpException(): PhpExceptionModelInterface
     {
         return $this->get('error');
     }
 
     /**
-     * @param \BetaKiller\Error\PhpExceptionModelInterface $phpException
+     * @param \BetaKiller\Model\PhpExceptionModelInterface $phpException
      *
      * @return PhpExceptionHistoryModelInterface
      */
-    public function setPhpException(PhpExceptionModelInterface $phpException)
+    public function setPhpException(PhpExceptionModelInterface $phpException): PhpExceptionHistoryModelInterface
     {
         $this->set('error', $phpException);
+
         return $this;
     }
 
     /**
      * @return UserInterface|null
      */
-    public function getUser()
+    public function getUser(): ?UserInterface
     {
         $id = $this->get('user');
+
         return $id ? $this->model_factory_user($id) : null;
     }
 
@@ -64,37 +66,39 @@ class Model_PhpExceptionHistory extends \ORM implements PhpExceptionHistoryModel
      *
      * @return PhpExceptionHistoryModelInterface
      */
-    public function setUser(UserInterface $user = null)
+    public function setUser(UserInterface $user = null): PhpExceptionHistoryModelInterface
     {
         $this->set('user', $user ? $user->get_id() : null);
+
         return $this;
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeImmutable
      */
-    public function getTimestamp()
+    public function getTimestamp(): DateTimeImmutable
     {
         return $this->get_datetime_column_value('ts');
     }
 
     /**
-     * @param \DateTime $time
+     * @param \DateTimeInterface $time
      *
      * @return PhpExceptionHistoryModelInterface
      */
-    public function setTimestamp(\DateTime $time)
+    public function setTimestamp(\DateTimeInterface $time): PhpExceptionHistoryModelInterface
     {
         $this->set_datetime_column_value('ts', $time);
+
         return $this;
     }
 
     /**
      * @return string
      */
-    public function getStatus()
+    public function getStatus(): string
     {
-        return $this->get('status');
+        return (string)$this->get('status');
     }
 
     /**
@@ -102,9 +106,10 @@ class Model_PhpExceptionHistory extends \ORM implements PhpExceptionHistoryModel
      *
      * @return PhpExceptionHistoryModelInterface
      */
-    public function setStatus($status)
+    public function setStatus(string $status): PhpExceptionHistoryModelInterface
     {
-        $this->set('status', (string) $status);
+        $this->set('status', (string)$status);
+
         return $this;
     }
 }

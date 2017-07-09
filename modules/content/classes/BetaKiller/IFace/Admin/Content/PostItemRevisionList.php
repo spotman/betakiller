@@ -36,7 +36,7 @@ class PostItemRevisionList extends AbstractAdminBase
         foreach ($revisions as $revision) {
             $data[] = [
                 'created_at' => $revision->getCreatedAt()->format('d.m.Y H:i:s'),
-                'created_by' => $revision->getCreatedBy()->get_username(),
+                'created_by' => $revision->getCreatedBy()->getUsername(),
             ];
         }
 

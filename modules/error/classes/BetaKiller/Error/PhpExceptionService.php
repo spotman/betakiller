@@ -1,14 +1,15 @@
 <?php
 namespace BetaKiller\Error;
 
-use BetaKiller\Exception;
-use BetaKiller\Factory\OrmFactory;
+use BetaKiller\Helper\IFaceHelper;
 use BetaKiller\Helper\LogTrait;
 use BetaKiller\Helper\NotificationHelper;
 use BetaKiller\Model\IFaceZone;
+use BetaKiller\Model\PhpExceptionModelInterface;
 use BetaKiller\Model\UserInterface;
+use BetaKiller\Repository\PhpExceptionRepository;
 
-class PhpExceptionStorage implements PhpExceptionStorageInterface
+class PhpExceptionService
 {
     use LogTrait;
 
@@ -23,9 +24,9 @@ class PhpExceptionStorage implements PhpExceptionStorageInterface
     const REPEAT_DELAY = 600;
 
     /**
-     * @var \BetaKiller\Factory\OrmFactory
+     * @var \BetaKiller\Repository\PhpExceptionRepository
      */
-    private $ormFactory;
+    private $repository;
 
     /**
      * @var \BetaKiller\Helper\NotificationHelper
@@ -38,61 +39,28 @@ class PhpExceptionStorage implements PhpExceptionStorageInterface
     private $user;
 
     /**
-     * @Inject
-     * TODO move to constructor
      * @var \BetaKiller\Helper\IFaceHelper
      */
     private $ifaceHelper;
 
     /**
-     * PhpExceptionStorage constructor.
+     * PhpExceptionService constructor.
      *
-     * @param \BetaKiller\Factory\OrmFactory        $ormFactory
-     * @param \BetaKiller\Helper\NotificationHelper $notificationHelper
-     * @param \BetaKiller\Model\UserInterface       $user
+     * @param \BetaKiller\Repository\PhpExceptionRepository $repository
+     * @param \BetaKiller\Helper\NotificationHelper         $notificationHelper
+     * @param \BetaKiller\Helper\IFaceHelper                $ifaceHelper
+     * @param \BetaKiller\Model\UserInterface               $user
      */
-    public function __construct(OrmFactory $ormFactory, NotificationHelper $notificationHelper, UserInterface $user)
-    {
+    public function __construct(
+        PhpExceptionRepository $repository,
+        NotificationHelper $notificationHelper,
+        IFaceHelper $ifaceHelper,
+        UserInterface $user
+    ) {
         $this->user               = $user;
-        $this->ormFactory         = $ormFactory;
+        $this->repository         = $repository;
+        $this->ifaceHelper        = $ifaceHelper;
         $this->notificationHelper = $notificationHelper;
-    }
-
-    /**
-     * @param \BetaKiller\Error\PhpExceptionModelInterface $model
-     *
-     * @return string
-     */
-    public function getTraceFor(PhpExceptionModelInterface $model)
-    {
-        $path = $this->getTraceFullPathFor($model);
-
-        return file_get_contents($path);
-    }
-
-    /**
-     * @param \BetaKiller\Error\PhpExceptionModelInterface $model
-     * @param string                                       $traceResponse
-     *
-     * @return $this
-     */
-    public function setTraceFor(PhpExceptionModelInterface $model, $traceResponse)
-    {
-        $path = $this->getTraceFullPathFor($model);
-        file_put_contents($path, (string)$traceResponse);
-
-        return $this;
-    }
-
-    protected function getTraceFullPathFor(PhpExceptionModelInterface $model)
-    {
-        $dir = MODPATH.'error/media/php_traces';
-
-        if (!file_exists($dir) && !@mkdir($dir, 0664, true) && !is_dir($dir)) {
-            throw new Exception('Can not create directory [:dir] for php stacktrace files', [':dir' => $dir]);
-        }
-
-        return $dir.DIRECTORY_SEPARATOR.$model->getHash();
     }
 
     /**
@@ -100,7 +68,7 @@ class PhpExceptionStorage implements PhpExceptionStorageInterface
      *
      * @return PhpExceptionModelInterface|null
      */
-    public function storeException(\Throwable $exception)
+    public function storeException(\Throwable $exception): ?PhpExceptionModelInterface
     {
         $user = $this->user;
 
@@ -119,10 +87,8 @@ class PhpExceptionStorage implements PhpExceptionStorageInterface
         // Getting unique hash for current message
         $hash = $this->makeHashFor($message);
 
-        $orm = $this->phpExceptionModelFactory();
-
         // Searching for existing exception
-        $model = $orm->findByHash($hash);
+        $model = $this->repository->findByHash($hash);
 
         $currentTime = new \DateTime;
 
@@ -132,7 +98,7 @@ class PhpExceptionStorage implements PhpExceptionStorageInterface
                 ->setLastSeenAt($currentTime)
                 ->markAsRepeated($user);
         } else {
-            $model = $orm
+            $model = $this->repository->create()
                 ->setHash($hash)
                 ->setCreatedAt($currentTime)
                 ->setLastSeenAt($currentTime)
@@ -160,7 +126,7 @@ class PhpExceptionStorage implements PhpExceptionStorageInterface
             $e_response = \Kohana_Exception::response($exception);
 
             // Adding trace
-            $this->setTraceFor($model, (string)$e_response);
+            $model->setTrace((string)$e_response);
         }
 
         // Trying to get current module
@@ -170,7 +136,7 @@ class PhpExceptionStorage implements PhpExceptionStorageInterface
         $model->addModule($module);
 
         // Saving
-        $model->save();
+        $this->repository->save($model);
 
         $isNotificationNeeded = $this->isNotificationNeededFor($model, static::REPEAT_COUNT, static::REPEAT_DELAY);
 
@@ -195,17 +161,11 @@ class PhpExceptionStorage implements PhpExceptionStorageInterface
                 ->send();
 
             // Saving last notification timestamp
-            $model->setLastNotifiedAt($currentTime)->save();
+            $model->setLastNotifiedAt($currentTime);
+            $this->repository->save($model);
         }
 
         return $model;
-    }
-
-    public function delete(PhpExceptionModelInterface $model)
-    {
-        @unlink($this->getTraceFullPathFor($model));
-
-        $model->delete();
     }
 
     protected function makeHashFor($message)
@@ -222,7 +182,7 @@ class PhpExceptionStorage implements PhpExceptionStorageInterface
      *
      * @return bool
      */
-    public function isNotificationNeededFor(PhpExceptionModelInterface $model, $repeatCount, $repeatDelay)
+    public function isNotificationNeededFor(PhpExceptionModelInterface $model, $repeatCount, $repeatDelay): bool
     {
         // Skip ignored exceptions
         if ($model->isIgnored()) {
@@ -267,57 +227,5 @@ class PhpExceptionStorage implements PhpExceptionStorageInterface
 
         // Throttle by occurrence number
         return ($model->getCounter() % $repeatCount === 1);
-    }
-
-    /**
-     * @return PhpExceptionModelInterface[]
-     */
-    public function getUnresolvedPhpExceptions()
-    {
-        return $this->phpExceptionModelFactory()->filterUnresolved()->orderByCreatedAt()->get_all();
-    }
-
-    /**
-     * @return PhpExceptionModelInterface[]
-     */
-    public function getResolvedPhpExceptions()
-    {
-        return $this->phpExceptionModelFactory()->filterResolved()->orderByCreatedAt()->get_all();
-    }
-
-    /**
-     * @param string $hash
-     *
-     * @return \BetaKiller\Error\PhpExceptionModelInterface|null
-     */
-    public function findByHash($hash)
-    {
-        return $this->phpExceptionModelFactory()->findByHash($hash);
-    }
-
-    /**
-     * @param \BetaKiller\Error\PhpExceptionModelInterface $model
-     * @param \BetaKiller\Model\UserInterface              $user
-     */
-    public function resolve(PhpExceptionModelInterface $model, UserInterface $user)
-    {
-        $model->markAsResolvedBy($user)->save();
-    }
-
-    /**
-     * @param \BetaKiller\Error\PhpExceptionModelInterface $model
-     * @param \BetaKiller\Model\UserInterface              $user
-     */
-    public function ignore(PhpExceptionModelInterface $model, UserInterface $user)
-    {
-        $model->markAsIgnoredBy($user)->save();
-    }
-
-    /**
-     * @return \BetaKiller\Utils\Kohana\ORM\OrmInterface|\Model_PhpException
-     */
-    private function phpExceptionModelFactory()
-    {
-        return $this->ormFactory->create('PhpException');
     }
 }

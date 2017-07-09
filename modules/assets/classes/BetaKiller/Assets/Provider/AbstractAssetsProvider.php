@@ -527,6 +527,10 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
         return $this->getAssetsConfigValue([self::CONFIG_DOC_ROOT_KEY]) ?: $_SERVER['DOCUMENT_ROOT'];
     }
 
+    /**
+     * @return string
+     * @todo Use this instead of Route
+     */
     private function getUrlPath(): string
     {
         return $this->getAssetsConfigValue([self::CONFIG_URL_PATH_KEY]);

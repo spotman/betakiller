@@ -7,6 +7,8 @@ use ORM;
 
 class Quote extends ORM implements QuoteInterface
 {
+    use OrmBasedEntityHasWordpressIdTrait;
+
     /**
      * @param string $value
      *

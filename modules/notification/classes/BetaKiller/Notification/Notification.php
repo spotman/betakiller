@@ -42,7 +42,7 @@ class Notification
                     // Message delivered, exiting
                     if ($counter) {
                         $this->debug('Notification sent to user with email :email with data :data', [
-                            ':email'    =>  $target->get_email(),
+                            ':email'    =>  $target->getEmail(),
                             ':data'     =>  json_encode($message->getTemplateData())
                         ]);
                         break;

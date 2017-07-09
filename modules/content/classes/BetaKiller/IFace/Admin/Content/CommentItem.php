@@ -18,7 +18,7 @@ class CommentItem extends AbstractAdminBase
         $model = $this->urlParametersHelper->getContentComment();
 
         return [
-            'id'        =>  $model->get_id(),
+            'id'        =>  $model->getID(),
             'message'   =>  $model->get_message(),
         ];
     }

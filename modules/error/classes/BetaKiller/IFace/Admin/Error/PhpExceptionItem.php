@@ -12,12 +12,6 @@ class PhpExceptionItem extends ErrorAdminBase
     private $urlParametersHelper;
 
     /**
-     * @Inject
-     * @var \BetaKiller\Error\PhpExceptionStorageInterface
-     */
-    private $storage;
-
-    /**
      * Returns data for View
      * Override this method in child classes
      *
@@ -30,8 +24,6 @@ class PhpExceptionItem extends ErrorAdminBase
         if (!$model) {
             throw new Exception('Incorrect php exception hash');
         }
-
-        $trace = $this->storage->getTraceFor($model);
 
         /** @var UnresolvedPhpExceptionIndex $unresolvedIFace */
         $unresolvedIFace = $this->ifaceHelper->createIFaceFromCodename('Admin_Error_UnresolvedPhpExceptionIndex');
@@ -48,7 +40,7 @@ class PhpExceptionItem extends ErrorAdminBase
 
             $history[] = [
                 'status' => $record->getStatus(),
-                'user'   => $user ? $user->get_username() : null,
+                'user'   => $user ? $user->getUsername() : null,
                 'time'   => $record->getTimestamp()->format('d.m.Y H:i:s'),
             ];
         }
@@ -68,7 +60,7 @@ class PhpExceptionItem extends ErrorAdminBase
             'isResolved' => $model->isResolved(),
             'isIgnored'  => $model->isIgnored(),
             'counter'    => $model->getCounter(),
-            'trace'      => $trace,
+            'trace'      => $model->getTrace(),
             'history'    => $history,
         ];
     }

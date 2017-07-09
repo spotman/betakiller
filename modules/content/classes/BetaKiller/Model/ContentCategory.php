@@ -80,7 +80,7 @@ class ContentCategory extends TreeModelSingleParentOrm implements ContentCategor
 
         if ($include_self ?? true) {
             // Add current category
-            $ids[] = $this->get_id();
+            $ids[] = $this->getID();
         }
 
         // Remove empty values

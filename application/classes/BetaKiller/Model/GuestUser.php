@@ -19,7 +19,7 @@ class GuestUser extends User
     /**
      * @return string
      */
-    public function get_username()
+    public function getUsername(): string
     {
         return 'Guest';
     }

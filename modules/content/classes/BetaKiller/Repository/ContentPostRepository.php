@@ -3,6 +3,7 @@ namespace BetaKiller\Repository;
 
 use BetaKiller\IFace\Url\UrlContainerInterface;
 use BetaKiller\Model\ContentCategory;
+use BetaKiller\Model\ContentCategoryInterface;
 use BetaKiller\Model\ContentPost;
 use BetaKiller\Model\RevisionModelInterface;
 use BetaKiller\Search\SearchResultsInterface;
@@ -86,7 +87,7 @@ class ContentPostRepository extends AbstractOrmBasedDispatchableRepository imple
     ): SearchResultsInterface {
         $orm = $this->getOrmInstance();
 
-        if ($category && $category->get_id()) {
+        if ($category && $category->hasID()) {
             $categoriesIDs = $category->get_all_related_categories_ids();
             $this->filterCategoryIDs($orm, $categoriesIDs);
         }
@@ -223,14 +224,14 @@ class ContentPostRepository extends AbstractOrmBasedDispatchableRepository imple
 
     /**
      * @param OrmInterface    $orm
-     * @param ContentCategory $category
+     * @param ContentCategoryInterface $category
      */
-    private function filterCategory(OrmInterface $orm, ?ContentCategory $category): void
+    private function filterCategory(OrmInterface $orm, ?ContentCategoryInterface $category): void
     {
         $column = $orm->object_column('category_id');
 
         $category
-            ? $orm->where($column, '=', $category->get_id())
+            ? $orm->where($column, '=', $category->getID())
             : $orm->where($column, 'IS', null);
     }
 

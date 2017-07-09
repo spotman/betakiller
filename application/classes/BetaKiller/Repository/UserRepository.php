@@ -24,7 +24,7 @@ class UserRepository extends AbstractOrmBasedRepository
 
     public function searchBy(string $loginOrEmail): ?UserInterface
     {
-        return $this->getOrmInstance()->search_by($loginOrEmail);
+        return $this->getOrmInstance()->searchBy($loginOrEmail);
     }
 
     /**
@@ -56,10 +56,10 @@ class UserRepository extends AbstractOrmBasedRepository
         return $role->get_users()->get_all();
     }
 
-    public function createNewUser(string $login, string $email): UserInterface
+    public function createNewUser(string $login, string $email, ?string $password = null): UserInterface
     {
-        // Generate random password
-        $password = md5(microtime());
+        // Generate random password if none provided
+        $password = $password ?? md5(microtime());
 
         $basicRoles = [
             $this->roleRepository->getGuestRole(),
@@ -67,15 +67,18 @@ class UserRepository extends AbstractOrmBasedRepository
         ];
 
         $model = $this->create()
-            ->set_username($login)
-            ->set_password($password)
-            ->set_email($email);
+            ->setUsername($login)
+            ->setPassword($password)
+            ->setEmail($email);
+
+        // Enable email notifications by default
+        $model->enableEmailNotification();
 
         // Create new model via save so ID will be populated for adding roles
         $this->save($model);
 
         foreach ($basicRoles as $role) {
-            $model->add_role($role);
+            $model->addRole($role);
         }
 
         return $model;

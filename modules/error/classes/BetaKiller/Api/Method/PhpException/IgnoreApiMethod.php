@@ -1,18 +1,19 @@
 <?php
 namespace BetaKiller\Api\Method\PhpException;
 
-use BetaKiller\Error\PhpExceptionStorageInterface;
 use BetaKiller\Model\UserInterface;
+use BetaKiller\Repository\PhpExceptionRepository;
+use Spotman\Api\ApiMethodResponse;
 
 class IgnoreApiMethod extends AbstractPhpExceptionApiMethod
 {
     /**
-     * @var \BetaKiller\Error\PhpExceptionStorageInterface
+     * @var PhpExceptionRepository
      */
-    private $storage;
+    private $repository;
 
     /**
-     * @var \BetaKiller\Error\PhpExceptionModelInterface|null
+     * @var \BetaKiller\Model\PhpExceptionModelInterface|null
      */
     private $model;
 
@@ -24,23 +25,25 @@ class IgnoreApiMethod extends AbstractPhpExceptionApiMethod
     /**
      * IgnoreApiMethod constructor.
      *
-     * @param string                                         $hash
-     * @param \BetaKiller\Error\PhpExceptionStorageInterface $storage
-     * @param \BetaKiller\Model\UserInterface                $user
+     * @param string                                        $hash
+     * @param \BetaKiller\Repository\PhpExceptionRepository $repository
+     * @param \BetaKiller\Model\UserInterface               $user
      */
-    public function __construct(string $hash, PhpExceptionStorageInterface $storage, UserInterface $user)
+    public function __construct(string $hash, PhpExceptionRepository $repository, UserInterface $user)
     {
-        $this->storage = $storage;
-        $this->user    = $user;
-        $this->model   = $this->findByHash($storage, $hash);
+        $this->repository = $repository;
+        $this->user       = $user;
+        $this->model      = $this->findByHash($repository, $hash);
     }
 
     /**
      * @return \Spotman\Api\ApiMethodResponse|null
      */
-    public function execute()
+    public function execute(): ?ApiMethodResponse
     {
-        $this->storage->ignore($this->model, $this->user);
+        $this->model->markAsIgnoredBy($this->user);
+
+        $this->repository->save($this->model);
 
         return null;
     }

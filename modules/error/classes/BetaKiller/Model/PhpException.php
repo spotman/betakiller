@@ -1,11 +1,16 @@
 <?php
+namespace BetaKiller\Model;
 
-use BetaKiller\Error\PhpExceptionHistoryModelInterface;
-use BetaKiller\Error\PhpExceptionModelInterface;
+use BetaKiller\Exception;
 use BetaKiller\Helper\UserModelFactoryTrait;
-use BetaKiller\Model\UserInterface;
+use Database;
+use DateTime;
+use DateTimeImmutable;
+use DB;
+use Kohana_Exception;
+use ORM;
 
-class Model_PhpException extends \ORM implements PhpExceptionModelInterface
+class PhpException extends \ORM implements PhpExceptionModelInterface
 {
     use UserModelFactoryTrait;
 
@@ -18,7 +23,7 @@ class Model_PhpException extends \ORM implements PhpExceptionModelInterface
      * @throws \Exception
      * @return void
      */
-    protected function _initialize()
+    protected function _initialize(): void
     {
         $this->_db_group   = 'filesystem';
         $this->_table_name = 'errors';
@@ -90,12 +95,12 @@ class Model_PhpException extends \ORM implements PhpExceptionModelInterface
      *
      * @return $this
      */
-    public function addModule($module)
+    public function addModule(string $module)
     {
         $modules = $this->getModules();
 
         // Skip adding if provided path was added already
-        if (!$module || in_array($module, $modules)) {
+        if (!$module || in_array($module, $modules, true)) {
             return $this;
         }
 
@@ -109,7 +114,7 @@ class Model_PhpException extends \ORM implements PhpExceptionModelInterface
     /**
      * @return string[]
      */
-    public function getModules()
+    public function getModules(): array
     {
         return (array)$this->get('modules');
     }
@@ -124,12 +129,12 @@ class Model_PhpException extends \ORM implements PhpExceptionModelInterface
     /**
      * @return string
      */
-    public function getHash()
+    public function getHash(): string
     {
         return $this->get('hash');
     }
 
-    public function setHash($value)
+    public function setHash(string $value)
     {
         $this->set('hash', $value);
 
@@ -137,24 +142,9 @@ class Model_PhpException extends \ORM implements PhpExceptionModelInterface
     }
 
     /**
-     * @param string $hash
-     *
-     * @return PhpExceptionModelInterface|null
-     */
-    public function findByHash($hash)
-    {
-        /** @var PhpExceptionModelInterface $model */
-        $model = $this->model_factory()
-            ->where('hash', '=', $hash)
-            ->find();
-
-        return $model->loaded() ? $model : null;
-    }
-
-    /**
      * @return int
      */
-    public function getCounter()
+    public function getCounter(): int
     {
         return $this->loaded() ? (int)$this->getTotal() : 0;
     }
@@ -162,14 +152,14 @@ class Model_PhpException extends \ORM implements PhpExceptionModelInterface
     /**
      * @return int
      */
-    protected function getTotal()
+    protected function getTotal(): int
     {
         return $this->get('total');
     }
 
-    protected function setTotal($value)
+    protected function setTotal(int $value)
     {
-        $this->set('total', (int)$value);
+        $this->set('total', $value);
 
         return $this;
     }
@@ -193,7 +183,7 @@ class Model_PhpException extends \ORM implements PhpExceptionModelInterface
     /**
      * @return string
      */
-    public function getMessage()
+    public function getMessage(): string
     {
         return $this->get('message');
     }
@@ -203,7 +193,7 @@ class Model_PhpException extends \ORM implements PhpExceptionModelInterface
      *
      * @return $this
      */
-    public function setMessage($value)
+    public function setMessage(string $value)
     {
         $this->set('message', $value);
 
@@ -215,12 +205,12 @@ class Model_PhpException extends \ORM implements PhpExceptionModelInterface
      *
      * @return $this
      */
-    public function addPath($path)
+    public function addPath(string $path)
     {
         $paths = $this->getPaths();
 
         // Skip adding if provided path was added already
-        if (!$path || in_array($path, $paths)) {
+        if (!$path || in_array($path, $paths, true)) {
             return $this;
         }
 
@@ -234,7 +224,7 @@ class Model_PhpException extends \ORM implements PhpExceptionModelInterface
     /**
      * @return string[]
      */
-    public function getPaths()
+    public function getPaths(): array
     {
         return (array)$this->get('paths');
     }
@@ -251,12 +241,12 @@ class Model_PhpException extends \ORM implements PhpExceptionModelInterface
      *
      * @return $this
      */
-    public function addUrl($url)
+    public function addUrl(string $url)
     {
         $urls = $this->getUrls();
 
         // Skip adding if provided path was added already
-        if (!$url || in_array($url, $urls)) {
+        if (!$url || in_array($url, $urls, true)) {
             return $this;
         }
 
@@ -270,7 +260,7 @@ class Model_PhpException extends \ORM implements PhpExceptionModelInterface
     /**
      * @return string[]
      */
-    public function getUrls()
+    public function getUrls(): array
     {
         return (array)$this->get('urls');
     }
@@ -283,11 +273,51 @@ class Model_PhpException extends \ORM implements PhpExceptionModelInterface
     }
 
     /**
-     * @param \DateTime|NULL $time
+     * @return string
+     */
+    public function getTrace(): string
+    {
+        $path = $this->getTraceFullPath();
+
+        return file_get_contents($path);
+    }
+
+    private function getTraceFullPath(): string
+    {
+        $dir = MODPATH.'error/media/php_traces';
+
+        if (!file_exists($dir) && !@mkdir($dir, 0664, true) && !is_dir($dir)) {
+            throw new Exception('Can not create directory [:dir] for php stacktrace files', [':dir' => $dir]);
+        }
+
+        return $dir.DIRECTORY_SEPARATOR.$this->getHash();
+    }
+
+
+    /**
+     * @param string $formattedTrace
+     *
+     * @return \BetaKiller\Model\PhpExceptionModelInterface
+     */
+    public function setTrace(string $formattedTrace): PhpExceptionModelInterface
+    {
+        $path = $this->getTraceFullPath();
+        file_put_contents($path, $formattedTrace);
+
+        return $this;
+    }
+
+    public function deleteTrace(): void
+    {
+        unlink($this->getTraceFullPath());
+    }
+
+    /**
+     * @param \DateTimeInterface|NULL $time
      *
      * @return $this
      */
-    public function setCreatedAt(\DateTime $time)
+    public function setCreatedAt(\DateTimeInterface $time)
     {
         $this->set_datetime_column_value('created_at', $time);
 
@@ -295,9 +325,9 @@ class Model_PhpException extends \ORM implements PhpExceptionModelInterface
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeImmutable
      */
-    public function getCreatedAt()
+    public function getCreatedAt(): DateTimeImmutable
     {
         return $this->get_datetime_column_value('created_at');
     }
@@ -305,11 +335,11 @@ class Model_PhpException extends \ORM implements PhpExceptionModelInterface
     /**
      * Unix timestamp of last notification time
      *
-     * @param \DateTime|NULL $time
+     * @param \DateTimeInterface|NULL $time
      *
      * @return $this
      */
-    public function setLastSeenAt(\DateTime $time)
+    public function setLastSeenAt(\DateTimeInterface $time)
     {
         $this->set_datetime_column_value('last_seen_at', $time);
 
@@ -319,9 +349,9 @@ class Model_PhpException extends \ORM implements PhpExceptionModelInterface
     /**
      * Unix timestamp of last notification time
      *
-     * @return \DateTime|NULL
+     * @return \DateTimeImmutable
      */
-    public function getLastSeenAt()
+    public function getLastSeenAt(): DateTimeImmutable
     {
         return $this->get_datetime_column_value('last_seen_at');
     }
@@ -330,11 +360,11 @@ class Model_PhpException extends \ORM implements PhpExceptionModelInterface
     /**
      * Unix timestamp of last notification time
      *
-     * @param \DateTime|NULL $time
+     * @param \DateTimeInterface $time
      *
      * @return $this
      */
-    public function setLastNotifiedAt(\DateTime $time)
+    public function setLastNotifiedAt(\DateTimeInterface $time)
     {
         $this->set_datetime_column_value('last_notified_at', $time);
 
@@ -344,14 +374,14 @@ class Model_PhpException extends \ORM implements PhpExceptionModelInterface
     /**
      * Unix timestamp of last notification time
      *
-     * @return \DateTime|NULL
+     * @return \DateTimeImmutable|NULL
      */
-    public function getLastNotifiedAt()
+    public function getLastNotifiedAt(): ?DateTimeImmutable
     {
         return $this->get_datetime_column_value('last_notified_at');
     }
 
-    protected function setResolvedBy(UserInterface $user = null)
+    protected function setResolvedBy(?UserInterface $user)
     {
         $this->set('resolved_by', $user ? $user->get_id() : null);
 
@@ -361,7 +391,7 @@ class Model_PhpException extends \ORM implements PhpExceptionModelInterface
     /**
      * @return UserInterface|null
      */
-    public function getResolvedBy()
+    public function getResolvedBy(): ?UserInterface
     {
         $id = $this->get('resolved_by');
 
@@ -375,7 +405,7 @@ class Model_PhpException extends \ORM implements PhpExceptionModelInterface
      *
      * @return $this
      */
-    public function markAsNew(UserInterface $user = null)
+    public function markAsNew(UserInterface $user)
     {
         $this->setStatus(PhpExceptionModelInterface::STATE_NEW);
         $this->addHistoryRecord($user);
@@ -390,7 +420,7 @@ class Model_PhpException extends \ORM implements PhpExceptionModelInterface
      *
      * @return $this
      */
-    public function markAsRepeated(UserInterface $user = null)
+    public function markAsRepeated(UserInterface $user)
     {
         // Skip if exception was not resolved yet
         if (!$this->isResolved()) {
@@ -444,7 +474,7 @@ class Model_PhpException extends \ORM implements PhpExceptionModelInterface
      *
      * @return bool
      */
-    public function isResolved()
+    public function isResolved(): bool
     {
         return $this->getStatus() === PhpExceptionModelInterface::STATE_RESOLVED;
     }
@@ -454,7 +484,7 @@ class Model_PhpException extends \ORM implements PhpExceptionModelInterface
      *
      * @return bool
      */
-    public function isRepeated()
+    public function isRepeated(): bool
     {
         return $this->getStatus() === PhpExceptionModelInterface::STATE_REPEATED;
     }
@@ -464,7 +494,7 @@ class Model_PhpException extends \ORM implements PhpExceptionModelInterface
      *
      * @return bool
      */
-    public function isNew()
+    public function isNew(): bool
     {
         return !$this->getID() || $this->getStatus() === PhpExceptionModelInterface::STATE_NEW;
     }
@@ -474,7 +504,7 @@ class Model_PhpException extends \ORM implements PhpExceptionModelInterface
      *
      * @return bool
      */
-    public function isIgnored()
+    public function isIgnored(): bool
     {
         return $this->getStatus() === PhpExceptionModelInterface::STATE_IGNORED;
     }
@@ -482,7 +512,7 @@ class Model_PhpException extends \ORM implements PhpExceptionModelInterface
     /**
      * @return string
      */
-    public function getStatus()
+    public function getStatus(): string
     {
         return $this->get('status');
     }
@@ -492,7 +522,7 @@ class Model_PhpException extends \ORM implements PhpExceptionModelInterface
      *
      * @return PhpExceptionModelInterface
      */
-    protected function setStatus($status)
+    protected function setStatus($status): PhpExceptionModelInterface
     {
         $this->set('status', (string)$status);
 
@@ -500,9 +530,9 @@ class Model_PhpException extends \ORM implements PhpExceptionModelInterface
     }
 
     /**
-     * @return Model_PhpExceptionHistory
+     * @return PhpExceptionHistory
      */
-    protected function getHistoryRelation()
+    protected function getHistoryRelation(): PhpExceptionHistory
     {
         return $this->get('history');
     }
@@ -510,7 +540,7 @@ class Model_PhpException extends \ORM implements PhpExceptionModelInterface
     /**
      * @return PhpExceptionHistoryModelInterface[]
      */
-    public function getHistoricalRecords()
+    public function getHistoricalRecords(): array
     {
         return $this->getHistoryRelation()->get_all();
     }
@@ -520,15 +550,15 @@ class Model_PhpException extends \ORM implements PhpExceptionModelInterface
      *
      * @param UserInterface|null $user
      *
-     * @return \BetaKiller\Error\PhpExceptionHistoryModelInterface
+     * @return \BetaKiller\Model\PhpExceptionHistoryModelInterface
      * @internal param string $type What have been done
      */
-    protected function addHistoryRecord(UserInterface $user = null)
+    protected function addHistoryRecord(UserInterface $user = null): PhpExceptionHistoryModelInterface
     {
         // Get error ID for new records
         $this->save();
 
-        /** @var \Model_PhpExceptionHistory $historyModel */
+        /** @var \BetaKiller\Model\PhpExceptionHistory $historyModel */
         $historyModel = $this->getHistoryRelation()->model_factory();
 
         return $historyModel
@@ -546,39 +576,15 @@ class Model_PhpException extends \ORM implements PhpExceptionModelInterface
      * @throws Kohana_Exception
      * @return ORM
      */
-    public function delete()
+    public function delete(): ORM
     {
+        $this->deleteTrace();
+
         // Delete historical records coz SQLite can not do it automatically
         foreach ($this->getHistoricalRecords() as $history) {
             $history->delete();
         }
 
         return parent::delete();
-    }
-
-    /**
-     * @return $this
-     */
-    public function filterUnresolved()
-    {
-        return $this->where('resolved_by', 'IS', null);
-    }
-
-    /**
-     * @return $this
-     */
-    public function filterResolved()
-    {
-        return $this->where('resolved_by', 'IS NOT', null);
-    }
-
-    /**
-     * @param bool $desc
-     *
-     * @return $this
-     */
-    public function orderByCreatedAt($desc = true)
-    {
-        return $this->order_by('created_at', $desc ? 'desc' : 'asc');
     }
 }

@@ -146,11 +146,6 @@ class ORM extends Utils\Kohana\ORM implements ExtendedOrmInterface
         return (string)$this->get($key);
     }
 
-    public function getValidationExceptionErrors(ORM_Validation_Exception $e): array
-    {
-        return $e->errors('models');
-    }
-
     /**
      *
      * This method allows inheritor to preset linked model in URL parameters
@@ -173,12 +168,12 @@ class ORM extends Utils\Kohana\ORM implements ExtendedOrmInterface
      */
     public function getID(): string
     {
-        return (string)$this->get_id();
+        return (string)$this->pk();
     }
 
     public function hasID(): bool
     {
-        return (bool)$this->get_id();
+        return (bool)$this->pk();
     }
 
     /**

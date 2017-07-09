@@ -1,11 +1,7 @@
 <?php
-namespace BetaKiller\Error;
+namespace BetaKiller\Model;
 
-use BetaKiller\IFace\Url\UrlDataSourceInterface;
-use BetaKiller\Model\DispatchableEntityInterface;
-use BetaKiller\Model\UserInterface;
-
-interface PhpExceptionModelInterface extends UrlDataSourceInterface, DispatchableEntityInterface
+interface PhpExceptionModelInterface extends DispatchableEntityInterface
 {
     const STATE_NEW      = 'new';
     const STATE_RESOLVED = 'resolved';
@@ -15,43 +11,31 @@ interface PhpExceptionModelInterface extends UrlDataSourceInterface, Dispatchabl
     /**
      * @return string
      */
-    public function getID();
-
-    /**
-     * @return string
-     */
-    public function getHash();
+    public function getHash(): string;
 
     /**
      * @param string $value
      *
      * @return $this
      */
-    public function setHash($value);
-
-    /**
-     * @param string $hash
-     *
-     * @return PhpExceptionModelInterface|null
-     */
-    public function findByHash($hash);
+    public function setHash(string $value);
 
     /**
      * @param string $module
      *
      * @return $this
      */
-    public function addModule($module);
+    public function addModule(string $module);
 
     /**
      * @return string[]
      */
-    public function getModules();
+    public function getModules(): array;
 
     /**
      * @return int
      */
-    public function getCounter();
+    public function getCounter(): int;
 
     /**
      * @return $this
@@ -61,82 +45,96 @@ interface PhpExceptionModelInterface extends UrlDataSourceInterface, Dispatchabl
     /**
      * @return string
      */
-    public function getMessage();
+    public function getMessage(): string;
 
     /**
      * @param string $value
      *
      * @return $this
      */
-    public function setMessage($value);
+    public function setMessage(string $value);
 
     /**
      * @param string $path
      *
      * @return $this
      */
-    public function addPath($path);
+    public function addPath(string $path);
 
     /**
      * @return string[]
      */
-    public function getPaths();
+    public function getPaths(): array;
 
     /**
      * @param string $url
      *
      * @return $this
      */
-    public function addUrl($url);
+    public function addUrl(string $url);
 
     /**
      * @return string[]
      */
-    public function getUrls();
+    public function getUrls(): array;
 
     /**
-     * @param \DateTime|NULL $time
+     * @return string
+     */
+    public function getTrace(): string;
+
+    /**
+     * @param string $formattedTrace
+     *
+     * @return \BetaKiller\Model\PhpExceptionModelInterface
+     */
+    public function setTrace(string $formattedTrace): PhpExceptionModelInterface;
+
+    public function deleteTrace(): void;
+
+    /**
+     * @param \DateTimeInterface $time
      *
      * @return $this
      */
-    public function setCreatedAt(\DateTime $time);
+    public function setCreatedAt(\DateTimeInterface $time);
 
     /**
-     * @return \DateTime
+     * @return \DateTimeImmutable
      */
-    public function getCreatedAt();
+    public function getCreatedAt(): \DateTimeImmutable;
 
     /**
      * Unix timestamp of last notification time
      *
-     * @param \DateTime|NULL $time
+     * @param \DateTimeInterface $time
      *
      * @return $this
      */
-    public function setLastSeenAt(\DateTime $time);
+    public function setLastSeenAt(\DateTimeInterface $time);
 
     /**
      * Unix timestamp of last notification time
      *
-     * @return \DateTime|NULL
+     * @return \DateTimeImmutable
      */
-    public function getLastSeenAt();
+    public function getLastSeenAt(): \DateTimeImmutable;
 
     /**
      * Unix timestamp of last notification time
      *
-     * @param \DateTime|NULL $time
+     * @param \DateTimeInterface $time
      *
      * @return $this
      */
-    public function setLastNotifiedAt(\DateTime $time);
+    public function setLastNotifiedAt(\DateTimeInterface $time);
 
     /**
      * Unix timestamp of last notification time
      *
-     * @return \DateTime|NULL
+     * @return \DateTimeImmutable|NULL
      */
-    public function getLastNotifiedAt();
+    public function getLastNotifiedAt(): ?\DateTimeImmutable;
 
     /**
      * Mark exception as new (these exceptions require developer attention)
@@ -179,47 +177,38 @@ interface PhpExceptionModelInterface extends UrlDataSourceInterface, Dispatchabl
      *
      * @return bool
      */
-    public function isNew();
+    public function isNew(): bool;
 
     /**
      * Returns TRUE if exception was resolved
      *
      * @return bool
      */
-    public function isResolved();
+    public function isResolved(): bool;
 
     /**
      * Returns TRUE if current exception is in 'repeat' state
      *
      * @return bool
      */
-    public function isRepeated();
+    public function isRepeated(): bool;
 
     /**
      * Returns TRUE if current exception is in 'ignored' state
      *
      * @return bool
      */
-    public function isIgnored();
+    public function isIgnored(): bool;
 
     /**
      * Returns user which had resolved this exception
      *
-     * @return UserInterface
+     * @return UserInterface|null
      */
-    public function getResolvedBy();
+    public function getResolvedBy(): ?UserInterface;
 
     /**
      * @return PhpExceptionHistoryModelInterface[]
      */
-    public function getHistoricalRecords();
-
-    /**
-     * @return bool
-     */
-    public function loaded();
-
-    public function save();
-
-    public function delete();
+    public function getHistoricalRecords(): array;
 }

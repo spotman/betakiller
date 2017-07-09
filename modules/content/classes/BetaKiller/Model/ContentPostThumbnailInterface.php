@@ -1,7 +1,9 @@
 <?php
 namespace BetaKiller\Model;
 
-interface ContentPostThumbnailInterface extends WordpressAttachmentInterface
+use BetaKiller\Assets\Model\AssetsModelImageInterface;
+
+interface ContentPostThumbnailInterface extends WordpressAttachmentInterface, AssetsModelImageInterface
 {
     /**
      * @return \BetaKiller\Model\ContentPost

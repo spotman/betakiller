@@ -105,7 +105,7 @@ abstract class NotificationMessageAbstract implements NotificationMessageInterfa
         $emails = [];
 
         foreach ($this->getTargets() as $to) {
-            $emails[] = $to->get_email();
+            $emails[] = $to->getEmail();
         }
 
         return $emails;
@@ -280,8 +280,8 @@ abstract class NotificationMessageAbstract implements NotificationMessageInterfa
     protected function getFullData(NotificationUserInterface $targetUser)
     {
         return array_merge($this->getTemplateData(), [
-            'targetName'  => $targetUser->get_full_name(),
-            'targetEmail' => $targetUser->get_email(),
+            'targetName'  => $targetUser->getFullName(),
+            'targetEmail' => $targetUser->getEmail(),
         ]);
     }
 
@@ -308,7 +308,7 @@ abstract class NotificationMessageAbstract implements NotificationMessageInterfa
         }
 
         return $view->render(
-            $this->get_template_path().DIRECTORY_SEPARATOR.$this->getTemplateName().'-'.$transport->get_name()
+            $this->get_template_path().DIRECTORY_SEPARATOR.$this->getTemplateName().'-'.$transport->getName()
         );
     }
 }
