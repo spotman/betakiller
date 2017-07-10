@@ -188,7 +188,7 @@ trait ModelWithRevisionsOrmTrait
         return $result;
     }
 
-    protected function createRevisionRelatedModel()
+    protected function createRevisionRelatedModel(): void
     {
         // Create revision if revisionable fields were set
         $this->createRevisionIfChanged();
@@ -197,7 +197,7 @@ trait ModelWithRevisionsOrmTrait
     /**
      * @return \BetaKiller\Model\RevisionModelInterface|null
      */
-    protected function createRevisionIfChanged()
+    protected function createRevisionIfChanged(): ?RevisionModelInterface
     {
         $revision = $this->getCurrentRevision();
 

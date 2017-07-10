@@ -9,6 +9,7 @@ interface AssetsStorageInterface
      * Model path would be prepended with this
      *
      * @param string $path
+     * @throws \BetaKiller\Assets\AssetsStorageException
      */
     public function setBasePath(string $path): void;
 

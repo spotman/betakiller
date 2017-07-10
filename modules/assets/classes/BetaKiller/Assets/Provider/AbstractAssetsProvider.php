@@ -165,7 +165,7 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
         return $this->getItemUrl('delete', $model);
     }
 
-    protected function getItemUrl($action, AssetsModelInterface $model): string
+    protected function getItemUrl(string $action, AssetsModelInterface $model): string
     {
         $options = [
             'provider' => $this->getUrlKey(),
@@ -177,6 +177,12 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
         return Route::url('assets-provider-item', $options);
     }
 
+    /**
+     * @param \BetaKiller\Assets\Model\AssetsModelInterface $model
+     *
+     * @return string
+     * @throws \BetaKiller\Assets\AssetsProviderException
+     */
     protected function getModelUrlPath(AssetsModelInterface $model): string
     {
         $filename = $this->urlStrategy->getFilenameFromModel($model);
@@ -189,6 +195,12 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
         return $path;
     }
 
+    /**
+     * @param \BetaKiller\Assets\Model\AssetsModelInterface $model
+     *
+     * @return string
+     * @throws \BetaKiller\Assets\AssetsException
+     */
     public function getModelExtension(AssetsModelInterface $model): string
     {
         $mime       = $model->getMime();
@@ -232,6 +244,14 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
         return $model;
     }
 
+    /**
+     * @param string                          $fullPath
+     * @param string                          $originalName
+     * @param \BetaKiller\Model\UserInterface $user
+     *
+     * @return \BetaKiller\Assets\Model\AssetsModelInterface
+     * @throws \BetaKiller\Assets\AssetsProviderException
+     */
     public function store(string $fullPath, string $originalName, UserInterface $user): AssetsModelInterface
     {
         // Check permissions

@@ -3,8 +3,6 @@ namespace BetaKiller\Model;
 
 interface ModelWithRevisionsInterface
 {
-// TODO copy methods from abstract class
-
     /**
      * @return void
      */
@@ -24,6 +22,8 @@ interface ModelWithRevisionsInterface
      * @return \BetaKiller\Model\RevisionModelInterface[]
      */
     public function getAllRevisions(): array;
+
+    public function hasActualRevision(): bool;
 
     /**
      * @return $this

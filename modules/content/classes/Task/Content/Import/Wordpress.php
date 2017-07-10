@@ -467,7 +467,6 @@ class Task_Content_Import_Wordpress extends AbstractTask
                     throw new TaskException('Unknown post type: :value', [':type' => $type]);
             }
 
-            $model->setWpId($wpID);
             $model->setUri($uri);
             $model->setCreatedBy($this->user);
 
@@ -503,6 +502,9 @@ class Task_Content_Import_Wordpress extends AbstractTask
             // Saving original creating and modification dates
             $model->setCreatedAt($created_at);
             $model->setUpdatedAt($updated_at);
+
+            // Actualize revision with imported data
+            $model->setLatestRevisionAsActual();
 
             // Auto publishing for new posts (we are importing only published posts)
             if ($isNew) {

@@ -16,14 +16,17 @@ abstract class AbstractAssetsStorage implements AssetsStorageInterface
 
     /**
      * @param string $basePath
-     *
-     * @throws \BetaKiller\Assets\AssetsStorageException
      */
     public function setBasePath(string $basePath): void
     {
         $this->basePath = $basePath;
     }
 
+    /**
+     * @param \BetaKiller\Assets\Model\AssetsModelInterface $model
+     *
+     * @return string
+     */
     protected function getModelFullPath(AssetsModelInterface $model): string
     {
         $relativePath = $this->getModelRelativePath($model);
@@ -47,6 +50,7 @@ abstract class AbstractAssetsStorage implements AssetsStorageInterface
      * @param \BetaKiller\Assets\Model\AssetsModelInterface $model
      *
      * @return string
+     * @throws \BetaKiller\Assets\AssetsStorageException
      */
     public function get(AssetsModelInterface $model): string
     {
@@ -59,7 +63,9 @@ abstract class AbstractAssetsStorage implements AssetsStorageInterface
      * Stores file
      *
      * @param \BetaKiller\Assets\Model\AssetsModelInterface $model
-     * @param string               $content
+     * @param string                                        $content
+     *
+     * @throws \BetaKiller\Assets\AssetsStorageException
      */
     public function put(AssetsModelInterface $model, string $content): void
     {
@@ -72,6 +78,8 @@ abstract class AbstractAssetsStorage implements AssetsStorageInterface
      * Deletes the file
      *
      * @param \BetaKiller\Assets\Model\AssetsModelInterface $model
+     *
+     * @throws \BetaKiller\Assets\AssetsStorageException
      */
     public function delete(AssetsModelInterface $model): void
     {
