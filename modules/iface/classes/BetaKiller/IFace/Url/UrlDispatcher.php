@@ -496,7 +496,8 @@ class UrlDispatcher implements LoggerAwareInterface
 
     private function isParameterSerializable(UrlParameterInterface $param): bool
     {
-        return !($param instanceof NonPersistentUrlParameterInterface);
+        // TODO Deal with this (remove or refactor to using some kind of interface)
+        return true;
     }
 
     private function getUrlCacheKey(string $url): string

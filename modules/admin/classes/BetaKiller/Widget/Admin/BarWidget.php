@@ -1,7 +1,7 @@
 <?php
 namespace BetaKiller\Widget\Admin;
 
-use BetaKiller\Helper\ContentUrlParametersHelper;
+use BetaKiller\Helper\ContentUrlContainerHelper;
 use BetaKiller\Helper\IFaceHelper;
 use BetaKiller\IFace\CrudlsActionsInterface;
 use BetaKiller\IFace\Exception\IFaceException;
@@ -22,7 +22,7 @@ class BarWidget extends AbstractAdminWidget
     protected $dispatcher;
 
     /**
-     * @var \BetaKiller\Helper\ContentUrlParametersHelper
+     * @var \BetaKiller\Helper\ContentUrlContainerHelper
      */
     private $contentUrlParamHelper;
 
@@ -40,7 +40,7 @@ class BarWidget extends AbstractAdminWidget
     public function __construct(
         UserInterface $user,
         IFaceHelper $ifaceHelper,
-        ContentUrlParametersHelper $cUrlParamHelper,
+        ContentUrlContainerHelper $cUrlParamHelper,
         IFaceProvider $ifaceProvider
     ) {
         parent::__construct($user);

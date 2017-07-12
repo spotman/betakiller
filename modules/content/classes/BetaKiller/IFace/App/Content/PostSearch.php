@@ -5,7 +5,7 @@ class PostSearch extends AbstractAppBase
 {
     /**
      * @Inject
-     * @var \BetaKiller\Helper\UrlParametersHelper
+     * @var \BetaKiller\Helper\UrlContainerHelper
      */
     private $urlParametersHelper;
 

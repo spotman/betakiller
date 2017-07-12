@@ -2,6 +2,7 @@
 namespace BetaKiller\Repository;
 
 use BetaKiller\Config\ConfigProviderInterface;
+use BetaKiller\IFace\Url\ConfigBasedUrlParameterInterface;
 use BetaKiller\IFace\Url\UrlContainerInterface;
 use BetaKiller\IFace\Url\UrlParameterInterface;
 
@@ -56,6 +57,7 @@ abstract class AbstractConfigBasedUrlParameterRepository extends AbstractUrlPara
      * @param \BetaKiller\IFace\Url\UrlContainerInterface $params
      *
      * @return \BetaKiller\IFace\Url\UrlParameterInterface|null
+     * @throws \BetaKiller\Repository\RepositoryException
      */
     public function findItemByUrlKeyValue(string $value, UrlContainerInterface $params): ?UrlParameterInterface
     {
@@ -89,6 +91,7 @@ abstract class AbstractConfigBasedUrlParameterRepository extends AbstractUrlPara
      * @param int $id
      *
      * @return mixed
+     * @throws \BetaKiller\Repository\RepositoryException
      */
     public function findById(int $id)
     {
@@ -119,7 +122,7 @@ abstract class AbstractConfigBasedUrlParameterRepository extends AbstractUrlPara
     /**
      * @param string $codename
      *
-     * @return mixed
+     * @return ConfigBasedUrlParameterInterface|mixed
      */
-    abstract protected function createItemFromCodename(string $codename);
+    abstract protected function createItemFromCodename(string $codename): ConfigBasedUrlParameterInterface;
 }

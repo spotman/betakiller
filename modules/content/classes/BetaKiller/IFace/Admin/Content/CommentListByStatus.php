@@ -5,7 +5,7 @@ class CommentListByStatus extends AbstractCommentList
 {
     /**
      * @Inject
-     * @var \BetaKiller\Helper\ContentUrlParametersHelper
+     * @var \BetaKiller\Helper\ContentUrlContainerHelper
      */
     private $urlParametersHelper;
 

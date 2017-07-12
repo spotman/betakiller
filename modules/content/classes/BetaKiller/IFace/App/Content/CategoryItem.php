@@ -5,7 +5,7 @@ class CategoryItem extends AbstractAppBase
 {
     /**
      * @Inject
-     * @var \BetaKiller\Helper\ContentUrlParametersHelper
+     * @var \BetaKiller\Helper\ContentUrlContainerHelper
      */
     private $urlParametersHelper;
 

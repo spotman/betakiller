@@ -7,7 +7,7 @@ use BetaKiller\Model\ContentComment;
 use BetaKiller\Model\ContentPost;
 use BetaKiller\Model\ContentCommentStatus;
 
-class ContentUrlParametersHelper extends UrlParametersHelper
+class ContentUrlContainerHelper extends UrlContainerHelper
 {
     /**
      * @return \BetaKiller\Model\ContentCategory|null

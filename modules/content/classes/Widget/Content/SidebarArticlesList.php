@@ -8,7 +8,7 @@ abstract class Widget_Content_SidebarArticlesList extends AbstractBaseWidget
 {
     /**
      * @Inject
-     * @var \BetaKiller\Helper\ContentUrlParametersHelper
+     * @var \BetaKiller\Helper\ContentUrlContainerHelper
      */
     private $urlParametersHelper;
 

@@ -1,21 +1,21 @@
 <?php
 namespace BetaKiller\IFace\Admin\Content;
 
-use BetaKiller\Helper\ContentUrlParametersHelper;
+use BetaKiller\Helper\ContentUrlContainerHelper;
 
 class PostItemRevisionList extends AbstractAdminBase
 {
     /**
-     * @var \BetaKiller\Helper\ContentUrlParametersHelper
+     * @var \BetaKiller\Helper\ContentUrlContainerHelper
      */
     private $urlParametersHelper;
 
     /**
      * PostItemRevisionList constructor.
      *
-     * @param \BetaKiller\Helper\ContentUrlParametersHelper $urlParametersHelper
+     * @param \BetaKiller\Helper\ContentUrlContainerHelper $urlParametersHelper
      */
-    public function __construct(ContentUrlParametersHelper $urlParametersHelper)
+    public function __construct(ContentUrlContainerHelper $urlParametersHelper)
     {
         $this->urlParametersHelper = $urlParametersHelper;
     }

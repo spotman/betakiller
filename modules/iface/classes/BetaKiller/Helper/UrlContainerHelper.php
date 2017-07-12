@@ -5,21 +5,21 @@ use BetaKiller\IFace\Url\UrlContainer;
 use BetaKiller\IFace\Url\UrlContainerInterface;
 use BetaKiller\Model\DispatchableEntityInterface;
 
-class UrlParametersHelper
+class UrlContainerHelper
 {
     /**
      * @var \BetaKiller\IFace\Url\UrlContainerInterface
      */
-    private $urlParameters;
+    private $urlContainer;
 
     /**
-     * ContentUrlParametersHelper constructor.
+     * ContentUrlContainerHelper constructor.
      *
      * @param \BetaKiller\IFace\Url\UrlContainerInterface $urlParameters
      */
     public function __construct(UrlContainerInterface $urlParameters)
     {
-        $this->urlParameters = $urlParameters;
+        $this->urlContainer = $urlParameters;
     }
 
     /**
@@ -35,13 +35,13 @@ class UrlParametersHelper
      */
     public function getCurrentUrlParameters(): UrlContainerInterface
     {
-        return $this->urlParameters;
+        return $this->urlContainer;
     }
 
     protected function getEntity($key, UrlContainerInterface $params = null)
     {
         if (!$params) {
-            $params = $this->urlParameters;
+            $params = $this->urlContainer;
         }
 
         return $params->getEntity($key);
@@ -50,7 +50,7 @@ class UrlParametersHelper
     protected function getEntityByClassName($className, UrlContainerInterface $params = null)
     {
         if (!$params) {
-            $params = $this->urlParameters;
+            $params = $this->urlContainer;
         }
 
         return $params->getEntityByClassName($className);
@@ -59,7 +59,7 @@ class UrlParametersHelper
     protected function setEntity(DispatchableEntityInterface $model, UrlContainerInterface $params = null): UrlContainerInterface
     {
         if (!$params) {
-            $params = $this->urlParameters;
+            $params = $this->urlContainer;
         }
 
         return $params->setParameter($model, true);
@@ -67,6 +67,6 @@ class UrlParametersHelper
 
     public function getQueryPart(string $name, ?bool $required = null)
     {
-        return $this->urlParameters->getQueryPart($name, $required);
+        return $this->urlContainer->getQueryPart($name, $required);
     }
 }

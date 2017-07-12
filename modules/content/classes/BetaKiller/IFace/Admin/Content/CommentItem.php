@@ -5,7 +5,7 @@ class CommentItem extends AbstractAdminBase
 {
     /**
      * @Inject
-     * @var \BetaKiller\Helper\ContentUrlParametersHelper
+     * @var \BetaKiller\Helper\ContentUrlContainerHelper
      */
     private $urlParametersHelper;
 

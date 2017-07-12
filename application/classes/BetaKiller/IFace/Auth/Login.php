@@ -3,10 +3,9 @@ namespace BetaKiller\IFace\Auth;
 
 use BetaKiller\Helper\RequestHelper;
 use BetaKiller\Helper\ResponseHelper;
-use BetaKiller\Helper\UrlParametersHelper;
+use BetaKiller\Helper\UrlContainerHelper;
 use BetaKiller\IFace\AbstractIFace;
 use BetaKiller\Model\UserInterface;
-use BetaKiller\Task\AbstractTask;
 
 class Login extends AbstractIFace
 {
@@ -41,7 +40,7 @@ class Login extends AbstractIFace
     private $requestHelper;
 
     /**
-     * @var \BetaKiller\Helper\UrlParametersHelper
+     * @var \BetaKiller\Helper\UrlContainerHelper
      */
     private $urlParametersHelper;
 
@@ -49,7 +48,7 @@ class Login extends AbstractIFace
         UserInterface $user,
         RequestHelper $reqHelper,
         ResponseHelper $respHelper,
-        UrlParametersHelper $urlParamsHelper
+        UrlContainerHelper $urlParamsHelper
     ) {
         parent::__construct();
 

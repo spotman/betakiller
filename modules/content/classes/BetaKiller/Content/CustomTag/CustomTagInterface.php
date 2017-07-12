@@ -1,12 +1,15 @@
 <?php
 namespace BetaKiller\Content\CustomTag;
 
-use BetaKiller\IFace\Url\NonPersistentUrlParameterInterface;
-
-interface CustomTagInterface extends NonPersistentUrlParameterInterface
+interface CustomTagInterface
 {
     const CLASS_SUFFIX      = 'CustomTag';
     const URL_CONTAINER_KEY = 'CustomTag';
+
+    /**
+     * @return string
+     */
+    public static function getCodename(): string;
 
     /**
      * Returns HTML tag name

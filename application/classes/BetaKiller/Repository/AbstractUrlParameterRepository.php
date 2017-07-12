@@ -12,10 +12,11 @@ abstract class AbstractUrlParameterRepository extends AbstractReadOnlyRepository
      * Creates empty entity
      *
      * @return mixed
+     * @throws \BetaKiller\Repository\RepositoryException
      */
     public function create()
     {
-        throw new RepositoryException('Config based :repo repository can not create new entity, use findByName() instead', [
+        throw new RepositoryException('Url parameter :repo repository can not create new entity, use findByCodename() instead', [
             ':repo' => static::getCodename(),
         ]);
     }

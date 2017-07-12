@@ -477,12 +477,12 @@ abstract class AbstractIFace implements IFaceInterface
         return $this->getModel()->getAdditionalAclRules();
     }
 
-    public function url(UrlContainerInterface $parameters = null, ?bool $removeCyclingLinks = null, ?bool $withDomain = null): string
+    public function url(UrlContainerInterface $urlContainer = null, ?bool $removeCyclingLinks = null, ?bool $withDomain = null): string
     {
         $removeCyclingLinks = $removeCyclingLinks ?? true;
         $withDomain = $withDomain ?? true;
 
-        if ($removeCyclingLinks && $this->isCurrent($parameters)) {
+        if ($removeCyclingLinks && $this->isCurrent($urlContainer)) {
             return $this->appConfig->getCircularLinkHref();
         }
 
@@ -492,7 +492,7 @@ abstract class AbstractIFace implements IFaceInterface
         $parent = null;
 
         do {
-            $uri = $current->makeUri($parameters);
+            $uri = $current->makeUri($urlContainer);
 
             if (!$uri) {
                 throw new IFaceException('Can not make URI for :codename IFace', [':codename' => $current->getCodename()]);

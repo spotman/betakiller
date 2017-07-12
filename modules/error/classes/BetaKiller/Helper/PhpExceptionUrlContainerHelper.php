@@ -1,7 +1,7 @@
 <?php
 namespace BetaKiller\Helper;
 
-class PhpExceptionUrlParametersHelper extends UrlParametersHelper
+class PhpExceptionUrlContainerHelper extends UrlContainerHelper
 {
     /**
      * @return \BetaKiller\Model\PhpException|null

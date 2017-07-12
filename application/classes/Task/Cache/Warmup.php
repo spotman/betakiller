@@ -1,6 +1,6 @@
 <?php
 
-use BetaKiller\Helper\UrlParametersHelper;
+use BetaKiller\Helper\UrlContainerHelper;
 use BetaKiller\IFace\IFaceModelInterface;
 use BetaKiller\IFace\IFaceModelTree;
 use BetaKiller\IFace\IFaceProvider;
@@ -20,7 +20,7 @@ class Task_Cache_Warmup extends Minion_Task
     private $ifaceProvider;
 
     /**
-     * @var \BetaKiller\Helper\UrlParametersHelper
+     * @var \BetaKiller\Helper\UrlContainerHelper
      */
     private $urlParametersHelper;
 
@@ -33,7 +33,7 @@ class Task_Cache_Warmup extends Minion_Task
         IFaceModelTree $tree,
         IFaceStack $stack,
         IFaceProvider $provider,
-        UrlParametersHelper $paramsHelper
+        UrlContainerHelper $paramsHelper
     ) {
         $this->tree                = $tree;
         $this->ifaceStack          = $stack;

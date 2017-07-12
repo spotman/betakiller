@@ -38,25 +38,25 @@ class IFaceHelper
     private $view;
 
     /**
-     * @var \BetaKiller\Helper\UrlParametersHelper
+     * @var \BetaKiller\Helper\UrlContainerHelper
      */
     private $paramsHelper;
 
     /**
      * IFaceHelper constructor.
      *
-     * @param \BetaKiller\IFace\View\IFaceView       $view
-     * @param \BetaKiller\IFace\IFaceStack           $stack
-     * @param \BetaKiller\IFace\IFaceFactory         $ifaceFactory
-     * @param \BetaKiller\IFace\WidgetFactory        $widgetFactory
-     * @param \BetaKiller\Helper\UrlParametersHelper $paramsHelper
+     * @param \BetaKiller\IFace\View\IFaceView      $view
+     * @param \BetaKiller\IFace\IFaceStack          $stack
+     * @param \BetaKiller\IFace\IFaceFactory        $ifaceFactory
+     * @param \BetaKiller\IFace\WidgetFactory       $widgetFactory
+     * @param \BetaKiller\Helper\UrlContainerHelper $paramsHelper
      */
     public function __construct(
         IFaceView $view,
         IFaceStack $stack,
         IFaceFactory $ifaceFactory,
         WidgetFactory $widgetFactory,
-        UrlParametersHelper $paramsHelper
+        UrlContainerHelper $paramsHelper
     ) {
         $this->view          = $view;
         $this->stack         = $stack;

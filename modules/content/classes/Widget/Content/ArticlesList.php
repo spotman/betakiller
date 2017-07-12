@@ -14,7 +14,7 @@ class Widget_Content_ArticlesList extends AbstractBaseWidget
 
     /**
      * @Inject
-     * @var \BetaKiller\Helper\ContentUrlParametersHelper
+     * @var \BetaKiller\Helper\ContentUrlContainerHelper
      */
     private $urlParametersHelper;
 

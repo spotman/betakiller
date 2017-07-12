@@ -9,7 +9,7 @@ class MainWidget extends AbstractAdminWidget
 {
     /**
      * @Inject
-     * @var \BetaKiller\Helper\ContentUrlParametersHelper
+     * @var \BetaKiller\Helper\ContentUrlContainerHelper
      */
     private $contentUrlParametersHelper;
 

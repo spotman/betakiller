@@ -7,7 +7,7 @@ class PhpExceptionItem extends ErrorAdminBase
 {
     /**
      * @Inject
-     * @var \BetaKiller\Helper\PhpExceptionUrlParametersHelper
+     * @var \BetaKiller\Helper\PhpExceptionUrlContainerHelper
      */
     private $urlParametersHelper;
 

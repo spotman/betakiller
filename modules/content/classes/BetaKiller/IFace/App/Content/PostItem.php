@@ -1,7 +1,7 @@
 <?php
 namespace BetaKiller\IFace\App\Content;
 
-use BetaKiller\Helper\ContentUrlParametersHelper;
+use BetaKiller\Helper\ContentUrlContainerHelper;
 use BetaKiller\Model\IFaceZone;
 use BetaKiller\Model\ContentPost;
 use BetaKiller\Model\UserInterface;
@@ -9,7 +9,7 @@ use BetaKiller\Model\UserInterface;
 class PostItem extends AbstractAppBase
 {
     /**
-     * @var \BetaKiller\Helper\ContentUrlParametersHelper
+     * @var \BetaKiller\Helper\ContentUrlContainerHelper
      */
     protected $urlParametersHelper;
 
@@ -32,10 +32,10 @@ class PostItem extends AbstractAppBase
     /**
      * PostItem constructor.
      *
-     * @param \BetaKiller\Helper\ContentUrlParametersHelper $urlParametersHelper
-     * @param \BetaKiller\Model\UserInterface               $user
+     * @param \BetaKiller\Helper\ContentUrlContainerHelper $urlParametersHelper
+     * @param \BetaKiller\Model\UserInterface              $user
      */
-    public function __construct(ContentUrlParametersHelper $urlParametersHelper, UserInterface $user)
+    public function __construct(ContentUrlContainerHelper $urlParametersHelper, UserInterface $user)
     {
         parent::__construct();
 

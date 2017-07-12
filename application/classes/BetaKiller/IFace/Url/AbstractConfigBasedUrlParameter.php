@@ -3,19 +3,35 @@ namespace BetaKiller\IFace\Url;
 
 use BetaKiller\Repository\AbstractUrlParameterRepository;
 
-abstract class AbstractConfigBasedUrlParameter implements NonPersistentUrlParameterInterface
+abstract class AbstractConfigBasedUrlParameter implements ConfigBasedUrlParameterInterface
 {
+    /**
+     * @var string
+     */
+    private $codename;
+
+    /**
+     * AbstractConfigBasedUrlParameter constructor.
+     *
+     * @param string $codename
+     */
+    public function __construct(string $codename)
+    {
+        $this->codename = $codename;
+    }
+
     /**
      * Returns value of the $key property
      *
      * @param string $key
      *
      * @return string
+     * @throws \BetaKiller\IFace\Url\UrlPrototypeException
      */
     public function getUrlKeyValue(string $key): string
     {
         $allowed  = AbstractUrlParameterRepository::URL_KEY_NAME;
-        $codename = static::getCodename();
+        $codename = $this->getCodename();
 
         if ($key !== $allowed) {
             throw new UrlPrototypeException('Config-based url parameter [:name] may use ":allowed" key only', [
@@ -25,5 +41,27 @@ abstract class AbstractConfigBasedUrlParameter implements NonPersistentUrlParame
         }
 
         return $codename;
+    }
+
+    /**
+     * Config-based url parameters needs codename to be defined
+     *
+     * @return string
+     */
+    public function getCodename(): string
+    {
+        return $this->codename;
+    }
+
+    /**
+     * Returns true if current parameter is the same as provided one
+     *
+     * @param \BetaKiller\IFace\Url\ConfigBasedUrlParameterInterface|mixed $parameter
+     *
+     * @return bool
+     */
+    public function isSameAs(UrlParameterInterface $parameter): bool
+    {
+        return ($parameter::getUrlContainerKey() === $this::getUrlContainerKey()) && ($parameter->getCodename() === $this->getCodename());
     }
 }
