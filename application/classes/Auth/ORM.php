@@ -26,7 +26,7 @@ class Auth_ORM extends Kohana_Auth_ORM
             }
         }
 
-        $user->before_sign_in();
+        $user->beforeSignIn();
 
         if (!parent::_login($user, $password, $remember)) {
             throw new Auth_Exception_IncorrectPassword;

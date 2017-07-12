@@ -60,9 +60,9 @@ class Role extends TreeModelMultipleParentsOrm implements RoleInterface
      *
      * @param string $name
      *
-     * @return RoleInterface
+     * @return RoleInterface|mixed
      */
-    public function get_by_name($name)
+    public function get_by_name($name): RoleInterface
     {
         return $this->model_factory()->where($this->object_column("name"), "=", $name)->find();
     }

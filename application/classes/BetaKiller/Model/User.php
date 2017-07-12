@@ -1,14 +1,8 @@
 <?php
 namespace BetaKiller\Model;
 
-use BetaKiller\Exception;
-use BetaKiller\Helper\RoleModelFactoryTrait;
-use BetaKiller\Notification\NotificationUserInterface;
-
 class User extends \Model_Auth_User implements UserInterface
 {
-    use RoleModelFactoryTrait;
-
     protected $_all_roles_ids = [];
 
     protected function _initialize(): void
@@ -120,7 +114,10 @@ class User extends \Model_Auth_User implements UserInterface
      */
     private function getRole(string $role): RoleInterface
     {
-        return $this->model_factory_role()->get_by_name($role);
+        /** @var \BetaKiller\Model\Role $roleOrm */
+        $roleOrm = $this->model_factory(null, 'Role');
+
+        return $roleOrm->get_by_name($role);
     }
 
     /**
@@ -220,7 +217,7 @@ class User extends \Model_Auth_User implements UserInterface
      * @todo сделать проверку соответствия ip-адреса тому, на который был выдан токен
      * @return bool
      */
-    public function check_ip(): bool
+    public function checkIp(): bool
     {
 //        $ip = Request::client_ip();
 //        $client_ip = ip2long($this->get_real_ip_address());
@@ -251,16 +248,16 @@ class User extends \Model_Auth_User implements UserInterface
         return $user->loaded() ? $user : null;
     }
 
-    public function before_sign_in(): void
+    public function beforeSignIn(): void
     {
-        $this->check_is_active();
+        $this->checkIsActive();
     }
 
     /**
      * @throws \Auth_Exception_Inactive
      * @throws \Kohana_Exception
      */
-    protected function check_is_active(): void
+    protected function checkIsActive(): void
     {
         // Проверяем активен ли аккаунт
         if (!$this->isActive()) {
@@ -275,10 +272,10 @@ class User extends \Model_Auth_User implements UserInterface
      */
     public function afterAutoLogin(): void
     {
-        $this->check_is_active();
+        $this->checkIsActive();
 
         // Проверяем IP-адрес
-        if (!$this->check_ip()) {
+        if (!$this->checkIp()) {
             throw new \Auth_Exception_WrongIP;
         }
     }
@@ -303,6 +300,7 @@ class User extends \Model_Auth_User implements UserInterface
      * Filters only active users
      *
      * @return $this
+     * @deprecated
      */
     public function filter_active()
     {

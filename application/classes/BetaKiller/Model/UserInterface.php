@@ -86,7 +86,7 @@ interface UserInterface extends AbstractEntityInterface, OrmInterface, Notificat
      */
     public function searchBy($username_or_email): ?UserInterface;
 
-    public function before_sign_in();
+    public function beforeSignIn();
 
     /**
      * @return void

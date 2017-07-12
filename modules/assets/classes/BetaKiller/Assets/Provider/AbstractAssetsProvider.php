@@ -219,7 +219,9 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
      * @param \BetaKiller\Model\UserInterface $user
      *
      * @return AssetsModelInterface
-     * @throws AssetsProviderException
+     * @throws \BetaKiller\Assets\AssetsProviderException
+     * @throws \BetaKiller\Assets\AssetsStorageException
+     * @throws \BetaKiller\Assets\AssetsExceptionUpload
      */
     public function upload(array $_file, array $postData, UserInterface $user): AssetsModelInterface
     {
@@ -251,6 +253,8 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
      *
      * @return \BetaKiller\Assets\Model\AssetsModelInterface
      * @throws \BetaKiller\Assets\AssetsProviderException
+     * @throws \BetaKiller\Assets\AssetsExceptionUpload
+     * @throws \BetaKiller\Assets\AssetsStorageException
      */
     public function store(string $fullPath, string $originalName, UserInterface $user): AssetsModelInterface
     {
@@ -394,7 +398,8 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
     /**
      * @param AssetsModelInterface $model
      *
-     * @throws AssetsProviderException
+     * @throws \BetaKiller\Assets\AssetsProviderException
+     * @throws \BetaKiller\Assets\AssetsStorageException
      */
     public function delete(AssetsModelInterface $model): void
     {
@@ -439,6 +444,7 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
      * @param AssetsModelInterface $model
      *
      * @return string
+     * @throws \BetaKiller\Assets\AssetsStorageException
      */
     public function getContent(AssetsModelInterface $model): string
     {
@@ -451,6 +457,9 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
      *
      * @param AssetsModelInterface $model
      * @param string               $content
+     *
+     * @throws \BetaKiller\Assets\AssetsStorageException
+     * @throws \BetaKiller\Assets\AssetsProviderException
      */
     public function setContent(AssetsModelInterface $model, string $content): void
     {
@@ -465,7 +474,8 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
      *
      * @param string $mime MIME-type
      *
-     * @throws AssetsProviderException
+     * @throws \BetaKiller\Assets\AssetsProviderException
+     * @throws \BetaKiller\Assets\AssetsExceptionUpload
      * @return bool
      */
     public function checkAllowedMimeTypes(string $mime): bool
@@ -560,6 +570,8 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
      * Removes all deployed versions of provided asset
      *
      * @param AssetsModelInterface $model
+     *
+     * @throws \BetaKiller\Assets\AssetsProviderException
      */
     protected function dropDeployCache(AssetsModelInterface $model): void
     {
@@ -570,7 +582,7 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
         }
 
         // Remove all versions of file
-        foreach (glob("{$path}/*") as $file) {
+        foreach (glob($path.DIRECTORY_SEPARATOR.'*') as $file) {
             unlink($file);
         }
 
