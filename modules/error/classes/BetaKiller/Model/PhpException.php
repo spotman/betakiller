@@ -154,7 +154,7 @@ class PhpException extends \ORM implements PhpExceptionModelInterface
      */
     protected function getTotal(): int
     {
-        return $this->get('total');
+        return (int)$this->get('total');
     }
 
     protected function setTotal(int $value)
