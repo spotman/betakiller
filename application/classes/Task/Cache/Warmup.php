@@ -81,7 +81,7 @@ class Task_Cache_Warmup extends Minion_Task
 
         $urls = $iface->getPublicAvailableUrls($params);
 
-        $this->debug('Found '.count($urls),' urls');
+        $this->debug('Found :count urls', [':count' => count($urls)]);
 
         foreach ($urls as $url) {
             $this->debug('Selected url = '.$url);
