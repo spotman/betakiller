@@ -4,6 +4,7 @@ namespace BetaKiller\IFace\Cache;
 use BetaKiller\Config\AppConfigInterface;
 use BetaKiller\IFace\IFaceInterface;
 use PageCache\PageCache;
+use PageCache\StrategyInterface;
 use Psr\Log\LoggerInterface;
 
 class IFaceCache
@@ -18,11 +19,11 @@ class IFaceCache
      */
     protected $enabled;
 
-    public function __construct(AppConfigInterface $config, LoggerInterface $logger)
+    public function __construct(AppConfigInterface $config, PageCache $pageCache, LoggerInterface $logger)
     {
         $this->enabled = $config->isPageCacheEnabled();
 
-        $this->pageCache = new PageCache;
+        $this->pageCache = $pageCache;
 
         $this->pageCache->config()
             ->setCachePath($config->getPageCachePath())
@@ -34,7 +35,7 @@ class IFaceCache
 //        $this->pageCache->setLogFilePath('/tmp/page-cache.log');
     }
 
-    public function clearModelCache(/* IFaceRelatedModelInterface $model */)
+    public function clearModelCache(/* IFaceRelatedModelInterface $model */): void
     {
         // deal with child ifaces (clear cache for whole branch)
 //        $iface = $model->get_public_iface();
@@ -42,12 +43,12 @@ class IFaceCache
         throw new \HTTP_Exception_501('Not implemented yet');
     }
 
-    public function clearCache()
+    public function clearCache(): void
     {
         $this->pageCache->clearAllCache();
     }
 
-    public function process(IFaceInterface $iface)
+    public function process(IFaceInterface $iface): void
     {
         if (!$this->enabled) {
             return;
@@ -75,7 +76,7 @@ class IFaceCache
         return $this;
     }
 
-    protected function ifacePageCacheStrategyFactory(IFaceInterface $iface)
+    protected function ifacePageCacheStrategyFactory(IFaceInterface $iface): StrategyInterface
     {
         return new IFacePageCacheStrategy($iface);
     }
