@@ -2,6 +2,7 @@
 namespace BetaKiller\Log;
 
 use BetaKiller\Helper\AppEnv;
+use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\FingersCrossedHandler;
 use Monolog\Handler\PHPConsoleHandler;
 use Monolog\Handler\StreamHandler;
@@ -74,13 +75,22 @@ class Logger implements LoggerInterface
 
         // CLI mode logging
         if (PHP_SAPI === 'cli') {
-            $cliLevel = $debugAllowed ? $monolog::DEBUG : $monolog::INFO;
-            $monolog->pushHandler(new StreamHandler('php://stdout', $cliLevel));
+            // Disable original error messages
+            ini_set('error_reporting', 'off');
+
+            $cliFormat = "[%level_name%] %message%\n";
+            $cliLevel  = $debugAllowed ? $monolog::DEBUG : $monolog::INFO;
+
+            // TODO Color scheme and formatter from Minion_Log
+            $cliHandler = new StreamHandler('php://stdout', $cliLevel);
+            $cliHandler->setFormatter(new LineFormatter($cliFormat));
+
+            $monolog->pushHandler($cliHandler);
         }
 
         // Enable debugging via PhpConsole for developers
         if ($debugAllowed && Connector::getInstance()->isActiveClient()) {
-            $phpConsoleHandler = new PHPConsoleHandler([
+            $phpConsoleHandler       = new PHPConsoleHandler([
                 'headersLimit'             => 2048,     // 2KB
                 'detectDumpTraceAndSource' => true,     // Autodetect and append trace data to debug
                 'useOwnErrorsHandler'      => true,     // Enable errors handling
