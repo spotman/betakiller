@@ -231,10 +231,8 @@ abstract class Kohana_Minion_Task {
 
 	/**
 	 * Execute the task with the specified set of options
-	 *
-	 * @return null
 	 */
-	public function execute()
+	public function execute(): void
 	{
 		$options = $this->get_options();
 
@@ -242,7 +240,7 @@ abstract class Kohana_Minion_Task {
 		$validation = Validation::factory($options);
 		$validation = $this->build_validation($validation);
 
-		if ( $this->_method != '_help' AND ! $validation->check())
+		if ( $this->_method !== '_help' AND ! $validation->check())
 		{
 			echo View::factory('minion/error/validation')
 				->set('task', Minion_Task::convert_class_to_task($this))

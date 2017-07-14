@@ -56,8 +56,7 @@ class Logger implements LoggerInterface
         $coreLogFilePath = APPPATH.$logFilePath;
         $appLogFilePath  = $this->multiSite->getWorkingPath().DIRECTORY_SEPARATOR.$logFilePath;
 
-        // TODO Implement boolean flag in session named "debugEnabled" and enable logging of DEBUG level messages
-        $debugAllowed = $this->appEnv->inDevelopmentMode();
+        $debugAllowed = $this->appEnv->isDebugEnabled();
 
         $groupHandler = new WhatFailureGroupHandler([
             // Core logs
@@ -71,9 +70,13 @@ class Logger implements LoggerInterface
 
         $crossedHandler = new FingersCrossedHandler($groupHandler, $monolog::NOTICE);
 
-        // TODO CLI mode logging
-
         $monolog->pushHandler($crossedHandler);
+
+        // CLI mode logging
+        if (PHP_SAPI === 'cli') {
+            $cliLevel = $debugAllowed ? $monolog::DEBUG : $monolog::INFO;
+            $monolog->pushHandler(new StreamHandler('php://stdout', $cliLevel));
+        }
 
         // Enable debugging via PhpConsole for developers
         if ($debugAllowed && Connector::getInstance()->isActiveClient()) {
@@ -106,7 +109,12 @@ class Logger implements LoggerInterface
     public function log($level, $message, array $context = null): void
     {
         if ($context) {
-            $message = strtr($message, $context);
+            foreach ($context as $key => $item) {
+                if (is_string($item) && strstr($key, ':') === 0) {
+                    $message = strtr($message, $key, $item);
+                    unset($context[$key]);
+                }
+            }
         }
 
         // Proxy to selected logger

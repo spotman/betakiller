@@ -1,13 +1,23 @@
 <?php
 
-use BetaKiller\Model\UserInterface;
-
 /**
  * Interface that all minion tasks must implement
  */
 abstract class Minion_Task extends Kohana_Minion_Task
 {
     use BetaKiller\Helper\LogTrait;
+
+    /**
+     * @Inject
+     * @var \BetaKiller\Helper\AppEnv
+     */
+    private $appEnv;
+
+    /**
+     * @Inject
+     * @var \Psr\Log\LoggerInterface
+     */
+    private $logger;
 
     const COLOR_RED        = Minion_CLI::RED;
     const COLOR_GREEN      = Minion_CLI::GREEN;
@@ -39,40 +49,18 @@ abstract class Minion_Task extends Kohana_Minion_Task
     /**
      * Execute the task with the specified set of options
      *
-     * @return null
      */
-    public function execute()
+    public function execute(): void
     {
-        $max_log_level = ($this->_options['debug'] !== false)
-            ? Log::DEBUG
-            : $this->get_max_log_level();
+        $isDebugEnabled = ($this->_options['debug'] !== false);
 
-        $min_log_level = $this->get_min_log_level();
+        if ($isDebugEnabled) {
+            $this->appEnv->enableDebug();
+        }
 
-        Log::instance()->attach(new Minion_Log($max_log_level), $max_log_level, $min_log_level);
+        $this->logger->debug('Running :name env', [':name' => $this->appEnv->getModeName()]);
 
-        return parent::execute();
-    }
-
-    /**
-     *
-     * Constant like Log::INFO
-     *
-     * @return int
-     */
-    protected function get_max_log_level()
-    {
-        return Log::INFO;
-    }
-
-    /**
-     * Constant like Log::ALERT
-     *
-     * @return int
-     */
-    protected function get_min_log_level()
-    {
-        return Log::EMERGENCY;
+        parent::execute();
     }
 
     /**
@@ -99,13 +87,13 @@ abstract class Minion_Task extends Kohana_Minion_Task
      *
      * @return $this
      */
-    protected function write_replace($text, $eol = false, $color = null)
+    protected function write_replace($text, ?bool $eol, $color = null)
     {
         if ($color) {
             $text = $this->colorize($text, $color);
         }
 
-        Minion_CLI::write_replace($text, $eol);
+        Minion_CLI::write_replace($text, $eol ?? false);
 
         return $this;
     }
@@ -123,7 +111,7 @@ abstract class Minion_Task extends Kohana_Minion_Task
      *
      * @return string
      */
-    protected function read($message, array $options = null)
+    protected function read($message, array $options = null): string
     {
         return Minion_CLI::read($message, $options);
     }
@@ -135,7 +123,7 @@ abstract class Minion_Task extends Kohana_Minion_Task
      *
      * @return string
      */
-    protected function password($message)
+    protected function password($message): string
     {
         return Minion_CLI::password($message);
     }

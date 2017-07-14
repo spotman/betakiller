@@ -89,6 +89,7 @@ return [
             return \BetaKiller\DI\Container::getInstance();
         })->scope(Scope::SINGLETON),
 
+        // Use logger only when really needed
         LoggerInterface::class => DI\object(\BetaKiller\Log\Logger::class)->lazy(),
 
         Auth::class => DI\factory(function () {
