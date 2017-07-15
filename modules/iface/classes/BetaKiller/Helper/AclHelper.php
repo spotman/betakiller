@@ -149,8 +149,8 @@ class AclHelper
             return $this->isPermissionAllowed($resource, $actionName, $user);
         }
 
-        // Allow public access to public zone by default if nor entity or custom rules were not defined
-        if ($zoneName === IFaceZone::PUBLIC_ZONE) {
+        // Allow access to public/personal zone by default if nor entity or custom rules were not defined
+        if (in_array($zoneName, [IFaceZone::PUBLIC_ZONE, IFaceZone::PERSONAL_ZONE], true)) {
             return true;
         }
 

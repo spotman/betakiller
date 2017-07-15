@@ -14,10 +14,10 @@ class IFaceZone extends ORM
      * Prepares the model database connection, determines the table name,
      * and loads column information.
      *
-     * @throws \BetaKiller\Exception
+     * @throws \Exception
      * @return void
      */
-    protected function _initialize()
+    protected function _initialize(): void
     {
         $this->_table_name = 'iface_zones';
 
@@ -26,9 +26,10 @@ class IFaceZone extends ORM
 
     /**
      * @return string|null
+     * @throws \Kohana_Exception
      */
-    public function getName()
+    public function getName(): ?string
     {
-        return $this->get('name');
+        return (string)$this->get('name');
     }
 }
