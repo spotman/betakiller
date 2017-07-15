@@ -119,12 +119,16 @@ class Logger implements LoggerInterface
     public function log($level, $message, array $context = null): void
     {
         if ($context) {
+            $data = [];
+
             foreach ($context as $key => $item) {
                 if (is_string($key) && is_string($item) && $key[0] === ':') {
-                    $message = strtr($message, $key, $item);
+                    $data[$key] = $item;
                     unset($context[$key]);
                 }
             }
+
+            $message = strtr($message, $data);
         }
 
         // Proxy to selected logger
