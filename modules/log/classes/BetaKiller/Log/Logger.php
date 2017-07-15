@@ -2,7 +2,8 @@
 namespace BetaKiller\Log;
 
 use BetaKiller\Helper\AppEnv;
-use Monolog\Formatter\LineFormatter;
+use Bramus\Monolog\Formatter\ColoredLineFormatter;
+use Bramus\Monolog\Formatter\ColorSchemes\DefaultScheme;
 use Monolog\Handler\FingersCrossedHandler;
 use Monolog\Handler\PHPConsoleHandler;
 use Monolog\Handler\StreamHandler;
@@ -50,7 +51,7 @@ class Logger implements LoggerInterface
     {
         $monolog = new \Monolog\Logger('default');
 
-//        TODO PhpExceptionStorage handler
+//        TODO Enable monolog exception handlers after migrating from Kohana
 //        ErrorHandler::register($monolog);
 
         $logFilePath     = implode(DIRECTORY_SEPARATOR, ['logs', date('Y'), date('m'), date('d').'.log']);
@@ -78,12 +79,11 @@ class Logger implements LoggerInterface
             // Disable original error messages
             ini_set('error_reporting', 'off');
 
-            $cliFormat = "[%level_name%] %message%\n";
-            $cliLevel  = $debugAllowed ? $monolog::DEBUG : $monolog::INFO;
-
-            // TODO Color scheme and formatter from Minion_Log
-            $cliHandler = new StreamHandler('php://stdout', $cliLevel);
-            $cliHandler->setFormatter(new LineFormatter($cliFormat));
+            // Color scheme and formatter
+            $cliLevel = $debugAllowed ? $monolog::DEBUG : $monolog::INFO;
+            $cliHandler   = new StreamHandler('php://stdout', $cliLevel);
+            $cliFormatter = new ColoredLineFormatter(new DefaultScheme(), "[%level_name%] %message%\n");
+            $cliHandler->setFormatter($cliFormatter);
 
             $monolog->pushHandler($cliHandler);
         }

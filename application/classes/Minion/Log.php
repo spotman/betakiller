@@ -1,5 +1,9 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
+/**
+ * Class Minion_Log
+ * @deprecated
+ */
 class Minion_Log extends Log_Writer
 {
     protected $_log_level;
