@@ -1,8 +1,10 @@
-<?php namespace BetaKiller\IFace\Auth;
-
-defined('SYSPATH') OR die('No direct script access.');
+<?php
+namespace BetaKiller\IFace\Auth;
 
 use Auth;
+use BetaKiller\Helper\RequestHelper;
+use BetaKiller\Helper\ResponseHelper;
+use BetaKiller\Helper\UrlContainerHelper;
 use BetaKiller\Model\UserInterface;
 
 class ReLogin extends Login
@@ -12,11 +14,16 @@ class ReLogin extends Login
      */
     private $auth;
 
-    public function __construct(Auth $auth, UserInterface $user)
-    {
+    public function __construct(
+        Auth $auth,
+        UserInterface $user,
+        RequestHelper $reqHelper,
+        ResponseHelper $respHelper,
+        UrlContainerHelper $urlParamsHelper
+    ) {
         $this->auth = $auth;
 
-        parent::__construct($user);
+        parent::__construct($user, $reqHelper, $respHelper, $urlParamsHelper);
 
         $this->setRedirectUrl('/');
     }

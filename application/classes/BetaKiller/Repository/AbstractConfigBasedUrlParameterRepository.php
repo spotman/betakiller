@@ -80,11 +80,11 @@ abstract class AbstractConfigBasedUrlParameterRepository extends AbstractUrlPara
     }
 
     /**
-     * @return \Traversable|mixed[]
+     * @return \Traversable|ConfigBasedUrlParameterInterface[]|mixed[]
      */
     public function getAll()
     {
-        return new \ArrayIterator($this->items);
+        return $this->items;
     }
 
     /**

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <root>
-    <iface codename="HttpErrorList" uri="http-errors" layoutCodename="error" hideInSiteMap="true" zone="admin">
+    <iface codename="HttpErrorList" uri="http-errors" layoutCodename="error" hideInSiteMap="true" zone="public" aclRules="Admin.enabled">
         <iface codename="HttpError400" uri="400" />
         <iface codename="HttpError401" uri="401" />
         <iface codename="HttpError403" uri="403" />

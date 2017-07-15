@@ -4,9 +4,9 @@ namespace BetaKiller\IFace;
 use BetaKiller\Config\AppConfigInterface;
 use BetaKiller\Helper\SeoMetaInterface;
 use BetaKiller\IFace\Exception\IFaceException;
+use BetaKiller\IFace\Url\UrlContainerInterface;
 use BetaKiller\IFace\Url\UrlDataSourceInterface;
 use BetaKiller\IFace\Url\UrlDispatcher;
-use BetaKiller\IFace\Url\UrlContainerInterface;
 use BetaKiller\IFace\Url\UrlPrototype;
 use DateInterval;
 use DateTimeInterface;
@@ -95,7 +95,8 @@ abstract class AbstractIFace implements IFaceInterface
         $parent = $this->getParent();
 
         if (!$parent) {
-            throw new IFaceException('Can not detect layout codename for iface :codename', [':codename' => $this->getCodename()]);
+            throw new IFaceException('Can not detect layout codename for iface :codename',
+                [':codename' => $this->getCodename()]);
         }
 
         return $parent->getLayoutCodename();
@@ -172,7 +173,11 @@ abstract class AbstractIFace implements IFaceInterface
      *
      * @return string
      */
-    private function processStringPattern(?string $source, ?int $limit = null, UrlContainerInterface $params = null): ?string
+    private function processStringPattern(
+        ?string $source,
+        ?int $limit = null,
+        UrlContainerInterface $params = null
+    ): ?string
     {
         if (!$source) {
             return null;
@@ -477,10 +482,13 @@ abstract class AbstractIFace implements IFaceInterface
         return $this->getModel()->getAdditionalAclRules();
     }
 
-    public function url(UrlContainerInterface $urlContainer = null, ?bool $removeCyclingLinks = null, ?bool $withDomain = null): string
-    {
+    public function url(
+        UrlContainerInterface $urlContainer = null,
+        ?bool $removeCyclingLinks = null,
+        ?bool $withDomain = null
+    ): string {
         $removeCyclingLinks = $removeCyclingLinks ?? true;
-        $withDomain = $withDomain ?? true;
+        $withDomain         = $withDomain ?? true;
 
         if ($removeCyclingLinks && $this->isCurrent($urlContainer)) {
             return $this->appConfig->getCircularLinkHref();
@@ -495,7 +503,8 @@ abstract class AbstractIFace implements IFaceInterface
             $uri = $current->makeUri($urlContainer);
 
             if (!$uri) {
-                throw new IFaceException('Can not make URI for :codename IFace', [':codename' => $current->getCodename()]);
+                throw new IFaceException('Can not make URI for :codename IFace',
+                    [':codename' => $current->getCodename()]);
             }
 
             if ($uri === UrlDispatcher::DEFAULT_URI && $this->isDefault()) {
@@ -511,9 +520,9 @@ abstract class AbstractIFace implements IFaceInterface
 
         if ($this->appConfig->isTrailingSlashEnabled()) {
             // Add trailing slash before query parameters
-            $split = explode('?', $path, 2);
+            $split    = explode('?', $path, 2);
             $split[0] .= '/';
-            $path = implode('?', $split);
+            $path     = implode('?', $split);
         }
 
         return $withDomain ? URL::site($path, true) : $path;
@@ -522,7 +531,7 @@ abstract class AbstractIFace implements IFaceInterface
     private function makeUri(UrlContainerInterface $parameters = null): string
     {
         // Allow IFace to add custom url generating logic
-        $uri = $this->getUri();
+        $uri   = $this->getUri();
         $model = $this->getModel();
 
         if (!$uri) {
@@ -546,6 +555,7 @@ abstract class AbstractIFace implements IFaceInterface
      * @param \BetaKiller\IFace\Url\UrlContainerInterface $params
      *
      * @return string[]
+     * @todo This method calculates only urls for current iface but pair "uri => urlParameter" is needed for traversing over url tree and creating full url map
      */
     public function getPublicAvailableUrls(UrlContainerInterface $params): array
     {
@@ -569,19 +579,22 @@ abstract class AbstractIFace implements IFaceInterface
 
         $this->prototypeHelper->validatePrototypeModelKey($prototype, $dataSource);
 
-        $urlsBlocks = $this->getDataSourceAvailableUrls($dataSource, $prototype, $params);
+        $urls = [];
 
-        // Empty $urlBlocks leads array_merge() to return null
-        return array_filter($urlsBlocks ? array_merge(...$urlsBlocks) : []);
+        $this->collectDataSourceAvailableUrls($dataSource, $prototype, $params, $urls);
+
+        return array_filter($urls);
     }
 
-    private function getDataSourceAvailableUrls(UrlDataSourceInterface $dataSource, UrlPrototype $prototype, UrlContainerInterface $params): array
-    {
+    private function collectDataSourceAvailableUrls(
+        UrlDataSourceInterface $dataSource,
+        UrlPrototype $prototype,
+        UrlContainerInterface $params,
+        array &$urls
+    ): void {
         $items = $prototype->hasIdKey()
             ? $dataSource->getAll()
             : $dataSource->getItemsHavingUrlKey($params);
-
-        $urlsBlocks  = [];
 
         foreach ($items as $item) {
             // Save current item to parameters registry
@@ -595,16 +608,14 @@ abstract class AbstractIFace implements IFaceInterface
                 continue;
             }
 
-            $urlsBlocks[] = [$url];
+            $urls[] = $url;
 
             // Recursion for trees
             if ($this->getModel()->hasTreeBehaviour()) {
                 // Recursion for tree behaviour
-                $urlsBlocks[] = $this->getDataSourceAvailableUrls($dataSource, $prototype, $params);
+                $this->collectDataSourceAvailableUrls($dataSource, $prototype, $params, $urls);
             }
         }
-
-        return $urlsBlocks;
     }
 
     private function makeAvailableUrl(UrlContainerInterface $params = null): ?string

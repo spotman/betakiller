@@ -6,13 +6,12 @@ use BetaKiller\IFace\ModelProvider\IFaceModelProviderAggregate;
 use BetaKiller\IFace\Url\UrlContainerInterface;
 use BetaKiller\Service;
 use BetaKiller\Service\ServiceException;
+use Psr\Log\LoggerInterface;
 use samdark\sitemap\Index;
 use samdark\sitemap\Sitemap;
 
 class Service_Sitemap extends Service
 {
-    use \BetaKiller\Helper\LogTrait;
-
     /**
      * @var UrlContainerInterface
      */
@@ -27,6 +26,11 @@ class Service_Sitemap extends Service
      * @var \BetaKiller\Helper\IFaceHelper
      */
     private $ifaceHelper;
+
+    /**
+     * @var \Psr\Log\LoggerInterface
+     */
+    private $logger;
 
     /**
      * @var \samdark\sitemap\Sitemap
@@ -44,39 +48,42 @@ class Service_Sitemap extends Service
      * @param \BetaKiller\IFace\Url\UrlContainerInterface                 $urlParameters
      * @param \BetaKiller\IFace\ModelProvider\IFaceModelProviderAggregate $ifaceModelProvider
      * @param \BetaKiller\Helper\IFaceHelper                              $ifaceHelper
+     * @param \Psr\Log\LoggerInterface                                    $logger
      */
     public function __construct(
         UrlContainerInterface $urlParameters,
         IFaceModelProviderAggregate $ifaceModelProvider,
-        IFaceHelper $ifaceHelper
+        IFaceHelper $ifaceHelper,
+        LoggerInterface $logger
     ) {
         $this->urlParameters      = $urlParameters;
         $this->ifaceModelProvider = $ifaceModelProvider;
         $this->ifaceHelper        = $ifaceHelper;
+        $this->logger             = $logger;
     }
 
     public function generate()
     {
-        $base_url = Kohana::$base_url;
+        $baseUrl = Kohana::$base_url;
 
-        if (strpos($base_url, 'http') === false) {
+        if (strpos($baseUrl, 'http') === false) {
             throw new ServiceException('Please, set "base_url" parameter to full URL (with protocol) in config file init.php');
         }
 
         // Create sitemap
-        $this->sitemap = new Sitemap($this->get_sitemap_file_path());
+        $this->sitemap = new Sitemap($this->getSitemapFilePath());
 
         // Recursively iterate over all ifaces
-        $this->iterate_layer();
+        $this->iterateLayer();
 
         // Write sitemap files
         $this->sitemap->write();
 
-        $sitemapFiles = $this->sitemap->getSitemapUrls($base_url);
+        $sitemapFiles = $this->sitemap->getSitemapUrls($baseUrl);
 
         if (count($sitemapFiles) > 1) {
             // Create sitemap index file
-            $index = new Index($this->get_sitemap_index_file_path());
+            $index = new Index($this->getSitemapIndexFilePath());
 
             // Add URLs
             foreach ($sitemapFiles as $sitemapUrl) {
@@ -87,12 +94,12 @@ class Service_Sitemap extends Service
             $index->write();
         }
 
-        $this->info($this->linksCounter.' links have been written to sitemap.xml');
+        $this->logger->info(':count links have been written to sitemap.xml', [':count' => $this->linksCounter]);
 
         return $this;
     }
 
-    protected function iterate_layer(IFaceModelInterface $parent = null)
+    protected function iterateLayer(IFaceModelInterface $parent = null)
     {
         // Get all available IFaces in layer
         $ifaceModels = $this->ifaceModelProvider->getLayer($parent);
@@ -110,32 +117,37 @@ class Service_Sitemap extends Service
             $urls = $iface->getPublicAvailableUrls($this->urlParameters);
 
             foreach ($urls as $url) {
+                if (!$url) {
+                    continue;
+                }
+
+                $this->logger->debug('Found url :value', [':value' => $url]);
                 // Store URL
                 $this->sitemap->addItem($url);
                 $this->linksCounter++;
             }
 
-            $this->iterate_layer($ifaceModel);
+            $this->iterateLayer($ifaceModel);
         }
     }
 
     public function serve(Response $response)
     {
-        $content = file_get_contents($this->get_sitemap_file_path());
+        $content = file_get_contents($this->getSitemapFilePath());
         $response->send_string($content, $response::TYPE_XML);
     }
 
-    protected function get_sitemap_file_path()
+    protected function getSitemapFilePath()
     {
-        return $this->get_document_root_path().DIRECTORY_SEPARATOR.'sitemap.xml';
+        return $this->getDocumentRootPath().DIRECTORY_SEPARATOR.'sitemap.xml';
     }
 
-    protected function get_sitemap_index_file_path()
+    protected function getSitemapIndexFilePath()
     {
-        return $this->get_document_root_path().DIRECTORY_SEPARATOR.'sitemap_index.xml';
+        return $this->getDocumentRootPath().DIRECTORY_SEPARATOR.'sitemap_index.xml';
     }
 
-    protected function get_document_root_path()
+    protected function getDocumentRootPath()
     {
         return MultiSite::instance()->docRoot();
     }

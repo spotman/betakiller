@@ -8,7 +8,7 @@ class Task_Sitemap extends Minion_Task
      */
     private $sitemapService;
 
-    protected function _execute(array $params)
+    protected function _execute(array $params): void
     {
         $this->sitemapService->generate();
     }

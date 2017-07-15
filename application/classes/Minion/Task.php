@@ -17,7 +17,7 @@ abstract class Minion_Task extends Kohana_Minion_Task
      * @Inject
      * @var \Psr\Log\LoggerInterface
      */
-    private $logger;
+    protected $logger;
 
     const COLOR_RED        = Minion_CLI::RED;
     const COLOR_GREEN      = Minion_CLI::GREEN;
@@ -36,7 +36,7 @@ abstract class Minion_Task extends Kohana_Minion_Task
         parent::__construct();
     }
 
-    protected function define_options()
+    protected function define_options(): array
     {
         return [];
     }

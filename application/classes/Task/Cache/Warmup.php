@@ -7,7 +7,7 @@ use BetaKiller\IFace\IFaceProvider;
 use BetaKiller\IFace\IFaceStack;
 use BetaKiller\IFace\Url\UrlContainerInterface;
 
-class Task_Cache_Warmup extends Minion_Task
+class Task_Cache_Warmup extends \BetaKiller\Task\AbstractTask
 {
     /**
      * @var IFaceModelTree
@@ -62,12 +62,12 @@ class Task_Cache_Warmup extends Minion_Task
 //                continue;
 //            }
 
-            $this->debug('Found IFace :codename', [':codename' => $ifaceModel->getCodename()]);
+            $this->logger->debug('Found IFace :codename', [':codename' => $ifaceModel->getCodename()]);
 
             try {
                 $this->processIFaceModel($ifaceModel, $parameters);
             } catch (Throwable $e) {
-                $this->warning('Exception thrown for :iface with message :text', [
+                $this->logger->warning('Exception thrown for :iface with message :text', [
                     ':iface' => $ifaceModel->getCodename(),
                     ':text'  => $e->getMessage(),
                 ]);
@@ -81,10 +81,10 @@ class Task_Cache_Warmup extends Minion_Task
 
         $urls = $iface->getPublicAvailableUrls($params);
 
-        $this->debug('Found :count urls', [':count' => count($urls)]);
+        $this->logger->debug('Found :count urls', [':count' => count($urls)]);
 
         foreach ($urls as $url) {
-            $this->debug('Selected url = '.$url);
+            $this->logger->debug('Selected url = '.$url);
 
             // No domain coz HMVC do external requests while domain set
             $path = parse_url($url, PHP_URL_PATH);
@@ -96,7 +96,7 @@ class Task_Cache_Warmup extends Minion_Task
 
     protected function makeHttpRequest($url)
     {
-        $this->debug('Making request to :url', [':url' => $url]);
+        $this->logger->debug('Making request to :url', [':url' => $url]);
 
         // Reset parameters between internal requests
         // TODO remove this trick
@@ -108,26 +108,25 @@ class Task_Cache_Warmup extends Minion_Task
             $response = $request->execute();
             $status   = $response->status();
         } catch (Throwable $e) {
-            $this->warning('Got exception :e for url :url', [':url' => $url, ':e' => $e->getMessage()]);
+            $this->logger->warning('Got exception :e for url :url', [':url' => $url, ':e' => $e->getMessage()]);
+
             return;
         }
 
         if ($status === 200) {
             // TODO Maybe grab page content, parse it and make request to every image/css/js file
 
-            $this->info('Cache was warmed up for :url', [':url' => $url]);
+            $this->logger->info('Cache was warmed up for :url', [':url' => $url]);
         } elseif ($status >= 300 && $status < 400) {
-            $this->info('Redirect :status received for :url', [
+            $this->logger->info('Redirect :status received for :url', [
                 ':url'    => $url,
                 ':status' => $status,
             ]);
-            $this->debug('Headers are :values', [
-                ':values' => print_r($response->headers(), true),
-            ]);
+            $this->logger->debug('Headers are :values', [':values' => json_encode($response->headers())]);
         } elseif (in_array($status, [401, 403], true)) {
-            $this->info('Access denied with :status status for :url', [':url' => $url, ':status' => $status]);
+            $this->logger->info('Access denied with :status status for :url', [':url' => $url, ':status' => $status]);
         } else {
-            $this->warning('Got :status status for URL :url', [':url' => $url, ':status' => $status]);
+            $this->logger->warning('Got :status status for URL :url', [':url' => $url, ':status' => $status]);
         }
     }
 }
