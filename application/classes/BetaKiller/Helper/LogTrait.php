@@ -1,12 +1,19 @@
 <?php
 namespace BetaKiller\Helper;
 
+/**
+ * Trait LogTrait
+ *
+ * @package BetaKiller\Helper
+ * @deprecated Use \Psr\Log\LoggerInterface instead
+ */
 trait LogTrait
 {
     /**
      * @param string $message
      * @param array $variables
      * @return $this
+     * @deprecated Use \Psr\Log\LoggerInterface instead
      */
     protected function debug($message, array $variables = NULL)
     {
@@ -18,6 +25,7 @@ trait LogTrait
      * @param string $message
      * @param array $variables
      * @return $this
+     * @deprecated Use \Psr\Log\LoggerInterface instead
      */
     protected function info($message, array $variables = NULL)
     {
@@ -29,6 +37,7 @@ trait LogTrait
      * @param string $message
      * @param array $variables
      * @return $this
+     * @deprecated Use \Psr\Log\LoggerInterface instead
      */
     protected function notice($message, array $variables = NULL)
     {
@@ -40,6 +49,7 @@ trait LogTrait
      * @param string $message
      * @param array $variables
      * @return $this
+     * @deprecated Use \Psr\Log\LoggerInterface instead
      */
     protected function warning($message, array $variables = NULL)
     {
@@ -50,6 +60,7 @@ trait LogTrait
     /**
      * @param \Throwable $e
      * @return $this
+     * @deprecated Use \Psr\Log\LoggerInterface instead
      */
     protected function exception(\Throwable $e)
     {
