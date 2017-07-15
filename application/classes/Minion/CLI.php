@@ -12,5 +12,4 @@ class Minion_CLI extends Kohana_Minion_CLI
 
     const LIGHT_BLUE    = 'light_blue';
     const LIGHT_GREY    = 'light_gray';
-
 }

@@ -70,7 +70,8 @@ class Logger implements LoggerInterface
             // TODO PhpExceptionStorage handler
         ]);
 
-        $crossedHandler = new FingersCrossedHandler($groupHandler, $monolog::NOTICE);
+        $logsLevel      = $debugAllowed ? $monolog::DEBUG : $monolog::NOTICE;
+        $crossedHandler = new FingersCrossedHandler($groupHandler, $logsLevel);
 
         $monolog->pushHandler($crossedHandler);
 
@@ -80,9 +81,9 @@ class Logger implements LoggerInterface
             ini_set('error_reporting', 'off');
 
             // Color scheme and formatter
-            $cliLevel = $debugAllowed ? $monolog::DEBUG : $monolog::INFO;
+            $cliLevel     = $debugAllowed ? $monolog::DEBUG : $monolog::INFO;
             $cliHandler   = new StreamHandler('php://stdout', $cliLevel);
-            $cliFormatter = new ColoredLineFormatter(new DefaultScheme(), "[%level_name%] %message%\n");
+            $cliFormatter = new ColoredLineFormatter(new DefaultScheme(), "%message%\n");
             $cliHandler->setFormatter($cliFormatter);
 
             $monolog->pushHandler($cliHandler);
@@ -101,6 +102,7 @@ class Logger implements LoggerInterface
             $monolog->pushHandler($phpConsoleHandler);
         }
 
+        $monolog->pushProcessor(new KohanaPlaceholderProcessor());
         $monolog->pushProcessor(new MemoryPeakUsageProcessor());
         $monolog->pushProcessor(new WebProcessor());
 
@@ -118,19 +120,6 @@ class Logger implements LoggerInterface
      */
     public function log($level, $message, array $context = null): void
     {
-        if ($context) {
-            $data = [];
-
-            foreach ($context as $key => $item) {
-                if (is_string($key) && is_string($item) && $key[0] === ':') {
-                    $data[$key] = $item;
-                    unset($context[$key]);
-                }
-            }
-
-            $message = strtr($message, $data);
-        }
-
         // Proxy to selected logger
         $this->logger->log($level, $message, $context);
     }
