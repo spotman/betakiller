@@ -120,7 +120,7 @@ class Logger implements LoggerInterface
     {
         if ($context) {
             foreach ($context as $key => $item) {
-                if (is_string($item) && strstr($key, ':') === 0) {
+                if (is_string($key) && is_string($item) && $key[0] === ':') {
                     $message = strtr($message, $key, $item);
                     unset($context[$key]);
                 }
