@@ -12,8 +12,16 @@ use BetaKiller\Model\ContentCommentStatus;
  * @method ContentCommentStatus create()
  * @method ContentCommentStatus[] getAll()
  */
-class ContentCommentStatusRepository extends AbstractOrmBasedRepository
+class ContentCommentStatusRepository extends AbstractOrmBasedDispatchableRepository
 {
+    /**
+     * @return string
+     */
+    public function getUrlKeyName(): string
+    {
+        return 'codename';
+    }
+
     /**
      * @return \BetaKiller\Model\ContentCommentStatus
      */

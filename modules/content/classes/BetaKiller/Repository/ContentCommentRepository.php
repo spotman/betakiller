@@ -19,7 +19,7 @@ use DateTime;
  * @method ContentCommentInterface create()
  * @method ContentCommentInterface[] getAll()
  */
-class ContentCommentRepository extends AbstractOrmBasedRepository
+class ContentCommentRepository extends AbstractOrmBasedDispatchableRepository
     implements EntityModelRelatedRepositoryInterface, RepositoryHasWordpressIdInterface
 {
     use OrmBasedRepositoryHasWordpressIdTrait;
@@ -30,6 +30,15 @@ class ContentCommentRepository extends AbstractOrmBasedRepository
      * @var \BetaKiller\Repository\ContentCommentStatusRepository
      */
     private $commentStatusRepository;
+
+    /**
+     * @return string
+     * @throws \BetaKiller\Repository\RepositoryException
+     */
+    public function getUrlKeyName(): string
+    {
+        throw new RepositoryException('No search for content comment allowed by url key');
+    }
 
     /**
      * @param string $ipAddress
