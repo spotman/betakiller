@@ -2,6 +2,7 @@
 namespace BetaKiller\Api\Method\ContentComment;
 
 use BetaKiller\Api\Method\AbstractEntityBasedApiMethod;
+use Spotman\Api\ApiMethodResponse;
 
 class ApproveApiMethod extends AbstractEntityBasedApiMethod
 {
@@ -20,7 +21,7 @@ class ApproveApiMethod extends AbstractEntityBasedApiMethod
     /**
      * @return \Spotman\Api\ApiMethodResponse|null
      */
-    public function execute()
+    public function execute(): ?ApiMethodResponse
     {
         /** @var \BetaKiller\Model\ContentComment $model */
         $model = $this->getEntity();

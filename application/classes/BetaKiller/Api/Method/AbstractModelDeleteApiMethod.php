@@ -2,6 +2,7 @@
 namespace BetaKiller\Api\Method;
 
 use Spotman\Api\ApiMethodException;
+use Spotman\Api\ApiMethodResponse;
 
 abstract class AbstractModelDeleteApiMethod extends AbstractEntityBasedApiMethod
 {
@@ -17,7 +18,7 @@ abstract class AbstractModelDeleteApiMethod extends AbstractEntityBasedApiMethod
     /**
      * @return \Spotman\Api\ApiMethodResponse|null
      */
-    public function execute()
+    public function execute(): ?ApiMethodResponse
     {
         $model = $this->getEntity();
 

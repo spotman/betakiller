@@ -9,7 +9,7 @@ class Model_AclResourcePermission extends \ORM
      * @throws Exception
      * @return void
      */
-    protected function _initialize()
+    protected function _initialize(): void
     {
         $this->_table_name = 'acl_resource_permissions';
 
@@ -19,7 +19,7 @@ class Model_AclResourcePermission extends \ORM
     /**
      * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->get('name');
     }

@@ -2,6 +2,7 @@
 namespace BetaKiller\Api\Method\ContentPost;
 
 use BetaKiller\Api\Method\AbstractEntityBasedApiMethod;
+use Spotman\Api\ApiMethodResponse;
 
 class PublishApiMethod extends AbstractEntityBasedApiMethod
 {
@@ -20,7 +21,7 @@ class PublishApiMethod extends AbstractEntityBasedApiMethod
     /**
      * @return \Spotman\Api\ApiMethodResponse|null
      */
-    public function execute()
+    public function execute(): ?ApiMethodResponse
     {
         /** @var \BetaKiller\Model\ContentPost $model */
         $model = $this->getEntity();

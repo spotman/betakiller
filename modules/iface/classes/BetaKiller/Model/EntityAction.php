@@ -12,7 +12,7 @@ class EntityAction extends ORM
      * @throws \BetaKiller\Exception
      * @return void
      */
-    protected function _initialize()
+    protected function _initialize(): void
     {
         $this->_table_name = 'entity_actions';
 
@@ -22,7 +22,7 @@ class EntityAction extends ORM
     /**
      * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->get('name');
     }

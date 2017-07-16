@@ -2,6 +2,7 @@
 namespace BetaKiller\Api\Method;
 
 use Spotman\Api\ApiMethodException;
+use Spotman\Api\ApiMethodResponse;
 
 abstract class AbstractEntityUpdateApiApiMethod extends AbstractEntityBasedApiMethod
 {
@@ -24,7 +25,7 @@ abstract class AbstractEntityUpdateApiApiMethod extends AbstractEntityBasedApiMe
     /**
      * @return \Spotman\Api\ApiMethodResponse|null
      */
-    public function execute()
+    public function execute(): ?ApiMethodResponse
     {
         $model = $this->getEntity();
         $response_data = $this->update($model, $this->data);

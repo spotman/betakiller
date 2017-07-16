@@ -1,6 +1,8 @@
 <?php
 namespace BetaKiller\Api\Method;
 
+use Spotman\Api\ApiMethodResponse;
+
 abstract class AbstractEntityCreateApiMethod extends AbstractEntityBasedApiMethod
 {
     /**
@@ -16,7 +18,7 @@ abstract class AbstractEntityCreateApiMethod extends AbstractEntityBasedApiMetho
     /**
      * @return \Spotman\Api\ApiMethodResponse|null
      */
-    public function execute()
+    public function execute(): ?ApiMethodResponse
     {
         $entity = $this->getEntity();
         $responseData = $this->create($entity, $this->data);
