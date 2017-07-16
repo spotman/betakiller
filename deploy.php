@@ -361,7 +361,7 @@ task('cache:warmup', function () {
  * Success message
  */
 task('done', function () {
-    writeln('<info>Successfully deployed at '.date('H:i:s').'!</info>');
+    writeln('<info>Successfully deployed at '.date('H:i:s T').'!</info>');
 })->once()->setPrivate();
 
 task('deploy', [
