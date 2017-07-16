@@ -234,7 +234,9 @@ class IFace extends TreeModelSingleParentOrm implements IFaceModelInterface
      */
     public function getEntityModelName(): ?string
     {
-        return $this->getEntityRelation()->getLinkedModelName();
+        $entity = $this->getEntityRelation();
+
+        return $entity->loaded() ? $entity->getLinkedModelName() : null;
     }
 
     /**
@@ -244,7 +246,8 @@ class IFace extends TreeModelSingleParentOrm implements IFaceModelInterface
      */
     public function getEntityActionName(): ?string
     {
-        return $this->getEntityActionRelation()->getName();
+        $entityAction = $this->getEntityActionRelation();
+        return $entityAction->loaded() ? $entityAction->getName() : null;
     }
 
     /**

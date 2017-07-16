@@ -45,7 +45,6 @@ class Entity extends ORM
      * Возвращает имя модели, с которой связана текущая entity
      *
      * @return string
-     * @throws \BetaKiller\Exception
      */
     public function getLinkedModelName(): string
     {
