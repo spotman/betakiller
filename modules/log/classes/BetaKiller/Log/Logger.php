@@ -78,7 +78,7 @@ class Logger implements LoggerInterface
         // CLI mode logging
         if (PHP_SAPI === 'cli') {
             // Disable original error messages
-            ini_set('error_reporting', 'off');
+//            ini_set('error_reporting', 'off');
 
             // Color scheme and formatter
             $cliLevel     = $debugAllowed ? $monolog::DEBUG : $monolog::INFO;
