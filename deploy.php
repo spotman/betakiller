@@ -362,7 +362,7 @@ task('cache:warmup', function () {
  */
 task('done', function () {
     writeln('<info>Successfully deployed at '.date('H:i:s T').'!</info>');
-})->once()->setPrivate();
+})->once();
 
 task('deploy', [
     // Check app configuration
