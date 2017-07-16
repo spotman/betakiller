@@ -9,6 +9,9 @@ use Symfony\Component\Console\Input\InputOption;
 
 define('BETAKILLER_CORE_PATH', 'core');
 
+$tzName = date_default_timezone_get();
+$tz = new DateTimeZone($tzName);
+
 set('core_path', BETAKILLER_CORE_PATH);
 set('core_repository', 'git@github.com:spotman/betakiller.git');
 
@@ -360,8 +363,9 @@ task('cache:warmup', function () {
 /**
  * Success message
  */
-task('done', function () {
-    writeln('<info>Successfully deployed at '.date('H:i:s T').'!</info>');
+task('done', function () use ($tz) {
+    $dateTime = new DateTimeImmutable();
+    writeln('<info>Successfully deployed at '.$dateTime->setTimezone($tz)->format('H:i:s T').'!</info>');
 })->once();
 
 task('deploy', [
