@@ -21,8 +21,8 @@ class BetaKiller_Kohana_Exception extends Kohana_Kohana_Exception
     /**
      * @param Throwable $exception
      *
-     * @return Response
-     * @throws Kohana_Exception
+     * @return \Response
+     * @throws \Kohana_Exception
      * @todo Rewrite to ExceptionHandler and move exception handling logic to it
      */
     public static function _handler(Throwable $exception)
@@ -152,7 +152,7 @@ class BetaKiller_Kohana_Exception extends Kohana_Kohana_Exception
      *
      * @return bool
      */
-    protected function alwaysShowNiceMessage()
+    protected function alwaysShowNiceMessage(): bool
     {
         return false;
     }
@@ -176,7 +176,7 @@ class BetaKiller_Kohana_Exception extends Kohana_Kohana_Exception
      * @example HTTP_Exception_Verbal
      * @return bool
      */
-    public function isNotificationEnabled()
+    public function isNotificationEnabled(): bool
     {
         return true;
     }
@@ -191,7 +191,7 @@ class BetaKiller_Kohana_Exception extends Kohana_Kohana_Exception
      *
      * @return null|string
      */
-    public static function getUserMessage(Throwable $e)
+    public static function getUserMessage(Throwable $e): ?string
     {
         $show = ($e instanceof self) && $e->showOriginalMessageToUser();
 
@@ -222,7 +222,7 @@ class BetaKiller_Kohana_Exception extends Kohana_Kohana_Exception
      *
      * @return string
      */
-    protected function getDefaultMessageI18nKey()
+    protected function getDefaultMessageI18nKey(): string
     {
         return static::getLabelI18nKeyForCode(500);
     }
@@ -232,7 +232,7 @@ class BetaKiller_Kohana_Exception extends Kohana_Kohana_Exception
      *
      * @return bool
      */
-    protected function showOriginalMessageToUser()
+    protected function showOriginalMessageToUser(): bool
     {
         return false;
     }

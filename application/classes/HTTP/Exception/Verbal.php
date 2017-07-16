@@ -10,7 +10,7 @@ class HTTP_Exception_Verbal extends HTTP_Exception_400
     /**
      * @return bool
      */
-    protected function showOriginalMessageToUser()
+    protected function showOriginalMessageToUser(): bool
     {
         return true;
     }
@@ -18,7 +18,7 @@ class HTTP_Exception_Verbal extends HTTP_Exception_400
     /**
      * @return bool
      */
-    public function isNotificationEnabled()
+    public function isNotificationEnabled(): bool
     {
         return false;
     }

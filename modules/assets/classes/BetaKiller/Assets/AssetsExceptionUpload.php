@@ -6,7 +6,7 @@ class AssetsExceptionUpload extends AssetsProviderException
     /**
      * Отключаем уведомление разработчиков о данном типе эксепшнов
      */
-    public function isNotificationEnabled()
+    public function isNotificationEnabled(): bool
     {
         return false;
     }
@@ -14,7 +14,7 @@ class AssetsExceptionUpload extends AssetsProviderException
     /**
      * Show text of this message in JSON-response
      */
-    protected function showOriginalMessageToUser()
+    protected function showOriginalMessageToUser(): bool
     {
         return true;
     }

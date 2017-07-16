@@ -9,7 +9,7 @@ abstract class HTTP_Exception_Expected extends Kohana_HTTP_Exception_Expected
      * @example HTTP_Exception_Verbal
      * @return bool
      */
-    public function isNotificationEnabled()
+    public function isNotificationEnabled(): bool
     {
         return false;
     }

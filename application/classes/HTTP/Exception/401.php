@@ -5,7 +5,7 @@ class HTTP_Exception_401 extends Kohana_HTTP_Exception_401
     /**
      * Показываем пользователю оригинальный текст исключения в красивых обёртках и в JSON-ответе
      */
-    protected function showOriginalMessageToUser()
+    protected function showOriginalMessageToUser(): bool
     {
         return true;
     }
@@ -15,12 +15,12 @@ class HTTP_Exception_401 extends Kohana_HTTP_Exception_401
      *
      * @return bool
      */
-    public function isNotificationEnabled()
+    public function isNotificationEnabled(): bool
     {
         return false;
     }
 
-    protected function alwaysShowNiceMessage()
+    protected function alwaysShowNiceMessage(): bool
     {
         return true;
     }
