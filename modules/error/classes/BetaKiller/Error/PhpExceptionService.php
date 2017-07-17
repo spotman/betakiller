@@ -2,17 +2,15 @@
 namespace BetaKiller\Error;
 
 use BetaKiller\Helper\IFaceHelper;
-use BetaKiller\Helper\LogTrait;
 use BetaKiller\Helper\NotificationHelper;
 use BetaKiller\Model\IFaceZone;
 use BetaKiller\Model\PhpExceptionModelInterface;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Repository\PhpExceptionRepository;
+use Psr\Log\LoggerInterface;
 
 class PhpExceptionService
 {
-    use LogTrait;
-
     /**
      * Notify about N-th duplicated exception only
      */
@@ -44,23 +42,31 @@ class PhpExceptionService
     private $ifaceHelper;
 
     /**
+     * @var \Psr\Log\LoggerInterface
+     */
+    private $logger;
+
+    /**
      * PhpExceptionService constructor.
      *
      * @param \BetaKiller\Repository\PhpExceptionRepository $repository
      * @param \BetaKiller\Helper\NotificationHelper         $notificationHelper
      * @param \BetaKiller\Helper\IFaceHelper                $ifaceHelper
      * @param \BetaKiller\Model\UserInterface               $user
+     * @param \Psr\Log\LoggerInterface                      $logger
      */
     public function __construct(
         PhpExceptionRepository $repository,
         NotificationHelper $notificationHelper,
         IFaceHelper $ifaceHelper,
-        UserInterface $user
+        UserInterface $user,
+        LoggerInterface $logger
     ) {
         $this->user               = $user;
         $this->repository         = $repository;
         $this->ifaceHelper        = $ifaceHelper;
         $this->notificationHelper = $notificationHelper;
+        $this->logger             = $logger;
     }
 
     /**
@@ -116,31 +122,35 @@ class PhpExceptionService
         $url = $request ? $request::detect_uri() : null;
 
         // Adding URL
-        $model->addUrl($url);
+        if ($url) {
+            $model->addUrl($url);
+        }
 
         // Adding error source file and line number
         $model->addPath($file.':'.$line);
 
         if ($exception) {
             // Getting HTML stacktrace
-            $e_response = \Kohana_Exception::response($exception);
+            $eResponse = \Kohana_Exception::response($exception);
 
             // Adding trace
-            $model->setTrace((string)$e_response);
+            $model->setTrace((string)$eResponse);
         }
 
         // Trying to get current module
         $module = $request ? $request->module() : null;
 
         // Adding module name for grouping purposes
-        $model->addModule($module);
+        if ($model) {
+            $model->addModule($module);
+        }
 
         // Saving
         $this->repository->save($model);
 
         $isNotificationNeeded = $this->isNotificationNeededFor($model, static::REPEAT_COUNT, static::REPEAT_DELAY);
 
-        $this->debug('Notification needed is :value', [':value' => $isNotificationNeeded ? 'true' : 'false']);
+        $this->logger->debug('Notification needed is :value', [':value' => $isNotificationNeeded ? 'true' : 'false']);
 
         // Notify developers if needed
         if ($isNotificationNeeded) {
@@ -186,7 +196,7 @@ class PhpExceptionService
     {
         // Skip ignored exceptions
         if ($model->isIgnored()) {
-            $this->debug('Ignored exception');
+            $this->logger->debug('Ignored exception');
 
             return false;
         }
@@ -198,7 +208,7 @@ class PhpExceptionService
 
         $timeDiffInSeconds = $lastSeenAtTimestamp - $lastNotifiedAtTimestamp;
 
-        $this->debug('Time diff between :last and :seen is :diff', [
+        $this->logger->debug('Time diff between :last and :seen is :diff', [
             ':last' => $lastNotifiedAtTimestamp,
             ':seen' => $lastSeenAtTimestamp,
             ':diff' => $timeDiffInSeconds,
@@ -211,19 +221,19 @@ class PhpExceptionService
 
         // New error needs to be notified only once
         if (!$lastNotifiedAtTimestamp && $model->isNew()) {
-            $this->debug('New exception needs to be notified');
+            $this->logger->debug('New exception needs to be notified');
 
             return true;
         }
 
         // Repeated error needs to be notified
         if ($model->isRepeated()) {
-            $this->debug('Repeated exception needs to be notified');
+            $this->logger->debug('Repeated exception needs to be notified');
 
             return true;
         }
 
-        $this->debug('Total counter is :value', [':value' => $model->getCounter()]);
+        $this->logger->debug('Total counter is :value', [':value' => $model->getCounter()]);
 
         // Throttle by occurrence number
         return ($model->getCounter() % $repeatCount === 1);
