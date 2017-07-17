@@ -2,21 +2,17 @@
 
 abstract class Task_Worker_Gearman extends \BetaKiller\Task\AbstractTask
 {
-    /**
-     * @Inject
-     * @var \BetaKiller\Log\LoggerHelper
-     */
-    private $loggerHelper;
+    use \BetaKiller\Helper\LoggerHelperTrait;
 
     /**
-     * @return array <key> => <method name>
+     * @return string[] array <key> => <method name>
      */
-    abstract protected function getWorkerMethods();
+    abstract protected function getWorkerMethods(): array;
 
     /**
      * @return bool
      */
-    protected function restartAfterMethodCall()
+    protected function restartAfterMethodCall(): bool
     {
         return false;
     }
@@ -49,7 +45,7 @@ abstract class Task_Worker_Gearman extends \BetaKiller\Task\AbstractTask
                     $job->sendComplete((string)$result);
                 } catch (Throwable $e) {
                     // Log exception
-                    $this->loggerHelper->logException($e);
+                    $this->logException($this->logger, $e);
 
                     // Notify client
                     $job->sendData($e->getMessage());

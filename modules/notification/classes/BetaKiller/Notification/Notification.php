@@ -1,25 +1,28 @@
 <?php
 namespace BetaKiller\Notification;
 
-use BetaKiller\Log\LoggerHelper;
+use BetaKiller\Helper\LoggerHelperTrait;
 use BetaKiller\Notification\Transport\EmailTransport;
 use BetaKiller\Notification\Transport\OnlineTransport;
+use Psr\Log\LoggerInterface;
 
 class Notification
 {
+    use LoggerHelperTrait;
+
     /**
-     * @var \BetaKiller\Log\LoggerHelper
+     * @var \Psr\Log\LoggerInterface
      */
-    private $loggerHelper;
+    private $logger;
 
     /**
      * Notification constructor.
      *
-     * @param \BetaKiller\Log\LoggerHelper $loggerHelper
+     * @param \Psr\Log\LoggerInterface $logger
      */
-    public function __construct(LoggerHelper $loggerHelper)
+    public function __construct(LoggerInterface $logger)
     {
-        $this->loggerHelper = $loggerHelper;
+        $this->logger = $logger;
     }
 
     public function send(NotificationMessageInterface $message): int
@@ -49,14 +52,14 @@ class Notification
 
                     // Message delivered, exiting
                     if ($counter) {
-                        $this->loggerHelper->debug('Notification sent to user with email :email with data :data', [
+                        $this->logger->debug('Notification sent to user with email :email with data :data', [
                             ':email'    =>  $target->getEmail(),
                             ':data'     =>  json_encode($message->getTemplateData())
                         ]);
                         break;
                     }
                 } catch (\Throwable $e) {
-                    $this->loggerHelper->logException($e);
+                    $this->logException($this->logger, $e);
                     continue;
                 }
             }
