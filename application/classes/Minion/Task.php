@@ -5,8 +5,6 @@
  */
 abstract class Minion_Task extends Kohana_Minion_Task
 {
-    use BetaKiller\Helper\LogTrait;
-
     /**
      * @Inject
      * @var \BetaKiller\Helper\AppEnv

@@ -30,7 +30,7 @@ class Task_Backup extends AbstractTask
                 throw new TaskException('Unknown backup service :name', [':name' => $service]);
         }
 
-        $this->debug('Service '.$service.' selected');
+        $this->logger->debug('Service '.$service.' selected');
 
         $instance->setType($this->config('backup.type'));
 
@@ -43,10 +43,10 @@ class Task_Backup extends AbstractTask
         $dbUser = $this->config($dbKey.'connection.username');
         $dbPass = $this->config($dbKey.'connection.password');
 
-        $this->debug('dbDriver is '.$dbDriver);
-        $this->debug('dbHost is '.$dbHost);
+        $this->logger->debug('dbDriver is '.$dbDriver);
+        $this->logger->debug('dbHost is '.$dbHost);
 
-        $this->info('Backing up database '.$dbName);
+        $this->logger->info('Backing up database '.$dbName);
 
         /**
          * Force utf8 charset for mysql
@@ -66,7 +66,7 @@ class Task_Backup extends AbstractTask
 
         $folder = realpath($this->config('backup.folder'));
 
-        $this->info('Backing up folder '.$folder);
+        $this->logger->info('Backing up folder '.$folder);
 
         $prefix            = $this->config('backup.prefix');
         $timestampedPrefix = $this->config('backup.useTimestampedPrefix');
@@ -76,9 +76,9 @@ class Task_Backup extends AbstractTask
             ->setPrefix($prefix, $timestampedPrefix);
 
         if ($instance->execute()) {
-            $this->info('Backup done, see file '.$instance->getRealName());
+            $this->logger->info('Backup done, see file '.$instance->getRealName());
         } else {
-            $this->warning('Backup was not created!');
+            $this->logger->warning('Backup was not created!');
         }
     }
 

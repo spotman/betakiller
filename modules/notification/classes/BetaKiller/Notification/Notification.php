@@ -1,20 +1,28 @@
 <?php
 namespace BetaKiller\Notification;
 
+use BetaKiller\Log\LoggerHelper;
 use BetaKiller\Notification\Transport\EmailTransport;
 use BetaKiller\Notification\Transport\OnlineTransport;
-use BetaKiller\Helper\LogTrait;
 
 class Notification
 {
-    use LogTrait;
+    /**
+     * @var \BetaKiller\Log\LoggerHelper
+     */
+    private $loggerHelper;
 
-    public static function instance()
+    /**
+     * Notification constructor.
+     *
+     * @param \BetaKiller\Log\LoggerHelper $loggerHelper
+     */
+    public function __construct(LoggerHelper $loggerHelper)
     {
-        return new static;
+        $this->loggerHelper = $loggerHelper;
     }
 
-    public function send(NotificationMessageInterface $message)
+    public function send(NotificationMessageInterface $message): int
     {
         $total = 0;
         $to = $message->getTargets();
@@ -23,7 +31,7 @@ class Notification
             throw new NotificationException('Message target must be specified');
         }
 
-        $transports = $this->get_transports();
+        $transports = $this->getTransports();
 
         foreach ($to as $target) {
             $counter = 0;
@@ -41,14 +49,14 @@ class Notification
 
                     // Message delivered, exiting
                     if ($counter) {
-                        $this->debug('Notification sent to user with email :email with data :data', [
+                        $this->loggerHelper->debug('Notification sent to user with email :email with data :data', [
                             ':email'    =>  $target->getEmail(),
                             ':data'     =>  json_encode($message->getTemplateData())
                         ]);
                         break;
                     }
                 } catch (\Throwable $e) {
-                    $this->exception($e);
+                    $this->loggerHelper->logException($e);
                     continue;
                 }
             }
@@ -69,23 +77,23 @@ class Notification
      *
      * @return \BetaKiller\Notification\TransportInterface
      */
-    protected function transport_factory($name)
+    protected function transportFactory($name): TransportInterface
     {
-        $class_name = '\\BetaKiller\\Notification\\Transport\\'.ucfirst($name).'Transport';
+        $className = '\\BetaKiller\\Notification\\Transport\\'.ucfirst($name).'Transport';
 
-        return new $class_name;
+        return new $className;
     }
 
     /**
      * @return \BetaKiller\Notification\TransportInterface[]
      */
-    protected function get_transports()
+    protected function getTransports(): array
     {
         /** @var OnlineTransport $online */
-        $online = $this->transport_factory('online');
+        $online = $this->transportFactory('online');
 
         /** @var EmailTransport $email */
-        $email = $this->transport_factory('email');
+        $email = $this->transportFactory('email');
 
         return [
             $online,

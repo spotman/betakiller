@@ -2,34 +2,34 @@
 
 abstract class Migration extends Kohana_Migration
 {
-//    use BetaKiller\Helper\Base;
-    use BetaKiller\Helper\LogTrait;
+    /**
+     * @Inject
+     * @var \Psr\Log\LoggerInterface
+     */
+    protected $logger;
 
-    protected function run_sql($sql, $type = Database::UPDATE, $db = NULL)
+    protected function run_sql($sql, $type = null, $db = null)
     {
-        DB::query($type, $sql)->execute($db);
+        DB::query($type ?? Database::UPDATE, $sql)->execute($db);
 
-        $this->debug('SQL done: :query', [':query' => $sql]);
+        $this->logger->debug('SQL done: :query', [':query' => $sql]);
     }
 
-    protected function table_exists($table_name, $db = NULL)
+    protected function table_exists($table_name, $db = null)
     {
-        return $this->table_has_column($table_name, NULL, $db);
+        return $this->table_has_column($table_name, null, $db);
     }
 
-    protected function table_has_column($table_name, $column_name, $db = NULL)
+    protected function table_has_column($table_name, $column_name, $db = null)
     {
-        try
-        {
+        try {
             DB::select($column_name)->from($table_name)->limit(1)->execute($db)->as_array();
 
             // Query completed => table and column exists
-            return TRUE;
-
-        } catch (Database_Exception $e)
-        {
+            return true;
+        } catch (Database_Exception $ignore) {
             // Query failed => table or column is absent
-            return FALSE;
+            return false;
         }
     }
 }

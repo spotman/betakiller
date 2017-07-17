@@ -25,7 +25,7 @@ class NotificationMessageFactory
      *
      * @return \BetaKiller\Notification\NotificationMessageInterface
      */
-    public function create($name = null)
+    public function create(string $name = null): NotificationMessageInterface
     {
         /** @var NotificationMessageInterface $instance */
         $instance = $this->container->get(NotificationMessageInterface::class);

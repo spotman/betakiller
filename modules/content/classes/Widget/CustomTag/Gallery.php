@@ -5,8 +5,6 @@ use BetaKiller\IFace\Widget\WidgetException;
 
 class Widget_CustomTag_Gallery extends AbstractBaseWidget
 {
-    use BetaKiller\Helper\LogTrait;
-
     /**
      * @var \BetaKiller\Helper\AssetsHelper
      * @Inject
@@ -18,6 +16,12 @@ class Widget_CustomTag_Gallery extends AbstractBaseWidget
      * @var \BetaKiller\Repository\ContentImageRepository
      */
     private $repository;
+
+    /**
+     * @Inject
+     * @var \Psr\Log\LoggerInterface
+     */
+    private $logger;
 
     /**
      * Returns data for View rendering
@@ -59,7 +63,7 @@ class Widget_CustomTag_Gallery extends AbstractBaseWidget
         }
 
         if (!$images) {
-            $this->warning('Gallery has no images for ids [:ids]', [':ids' => implode(', ', $image_ids)]);
+            $this->logger->warning('Gallery has no images for ids [:ids]', [':ids' => implode(', ', $image_ids)]);
         }
 
         return [

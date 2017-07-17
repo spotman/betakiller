@@ -6,109 +6,109 @@ interface NotificationMessageInterface
     /**
      * @return NotificationUserInterface
      */
-    public function getFrom();
+    public function getFrom(): NotificationUserInterface;
 
     /**
      * @param NotificationUserInterface $value
      *
-     * @return $this|NotificationMessageInterface
+     * @return NotificationMessageInterface
      */
-    public function setFrom(NotificationUserInterface $value);
+    public function setFrom(NotificationUserInterface $value): NotificationMessageInterface;
 
     /**
      * @return NotificationUserInterface[]
      */
-    public function getTargets();
+    public function getTargets(): array;
 
     /**
      * @return string[]
      */
-    public function getTargetsEmails();
+    public function getTargetsEmails(): array;
 
     /**
      * @param NotificationUserInterface $value
      *
-     * @return $this|NotificationMessageInterface
+     * @return NotificationMessageInterface
      */
-    public function addTarget(NotificationUserInterface $value);
+    public function addTarget(NotificationUserInterface $value): NotificationMessageInterface;
 
     /**
      * @param string $email
      * @param string $fullName
      *
-     * @return $this|\BetaKiller\Notification\NotificationMessageInterface
+     * @return \BetaKiller\Notification\NotificationMessageInterface
      */
-    public function addTargetEmail($email, $fullName);
+    public function addTargetEmail(string $email, string $fullName): NotificationMessageInterface;
 
     /**
      * @param NotificationUserInterface[]|\Iterator $users
      *
-     * @return $this
+     * @return NotificationMessageInterface
      */
-    public function addTargetUsers($users);
+    public function addTargetUsers($users): NotificationMessageInterface;
 
     /**
-     * @return $this|\BetaKiller\Notification\NotificationMessageInterface
+     * @return \BetaKiller\Notification\NotificationMessageInterface
      */
-    public function clearTargets();
+    public function clearTargets(): NotificationMessageInterface;
 
     /**
      * @param \BetaKiller\Notification\NotificationUserInterface $targetUser
      *
      * @return string
      */
-    public function getSubj(NotificationUserInterface $targetUser);
+    public function getSubj(NotificationUserInterface $targetUser): string;
 
     /**
      * @param string $value
      *
-     * @return $this|NotificationMessageInterface
+     * @return NotificationMessageInterface
      * @deprecated Use I18n registry for subject definition (key is based on template path)
      */
-    public function setSubj($value);
+    public function setSubj(string $value): NotificationMessageInterface;
 
     /**
      * @return array
      */
-    public function getAttachments();
+    public function getAttachments(): array;
 
     /**
      * @param string $path
      *
-     * @return $this|NotificationMessageInterface
+     * @return NotificationMessageInterface
      */
-    public function addAttachment($path);
+    public function addAttachment(string $path): NotificationMessageInterface;
 
     /**
      * Send current message via default notification instance
      *
      * @return int
      */
-    public function send();
+    public function send(): int;
 
     /**
-     * @param string $template_name
+     * @param string $templateName
      *
-     * @return $this
+     * @return NotificationMessageInterface
      */
-    public function setTemplateName($template_name);
+    public function setTemplateName(string $templateName): NotificationMessageInterface;
 
     /**
      * @return string
      */
-    public function getTemplateName();
+    public function getTemplateName(): string;
 
     /**
      * @param array $data
      *
-     * @return $this
+     * @return NotificationMessageInterface
      */
-    public function setTemplateData(array $data);
+    public function setTemplateData(array $data): NotificationMessageInterface;
 
     /**
      * @return array
      */
-    public function getTemplateData();
+    public function getTemplateData(): array;
 
     /**
      * Render message for sending via provided transport
@@ -118,5 +118,5 @@ interface NotificationMessageInterface
      *
      * @return string
      */
-    public function render(TransportInterface $transport, NotificationUserInterface $user);
+    public function render(TransportInterface $transport, NotificationUserInterface $user): string;
 }

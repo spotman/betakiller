@@ -5,6 +5,7 @@ use I18n;
 
 /**
  * Class NotificationMessageAbstract
+ *
  * @package BetaKiller\Notification
  */
 abstract class NotificationMessageAbstract implements NotificationMessageInterface
@@ -44,9 +45,19 @@ abstract class NotificationMessageAbstract implements NotificationMessageInterfa
     private $templateData = [];
 
     /**
+     * @var \BetaKiller\Notification\Notification
+     */
+    private $facade;
+
+    public function __construct(Notification $facade)
+    {
+        $this->facade = $facade;
+    }
+
+    /**
      * @return NotificationUserInterface
      */
-    public function getFrom()
+    public function getFrom(): NotificationUserInterface
     {
         return $this->from;
     }
@@ -54,9 +65,9 @@ abstract class NotificationMessageAbstract implements NotificationMessageInterfa
     /**
      * @param NotificationUserInterface $value
      *
-     * @return $this
+     * @return NotificationMessageInterface
      */
-    public function setFrom(NotificationUserInterface $value)
+    public function setFrom(NotificationUserInterface $value): NotificationMessageInterface
     {
         $this->from = $value;
 
@@ -66,9 +77,9 @@ abstract class NotificationMessageAbstract implements NotificationMessageInterfa
     /**
      * @param NotificationUserInterface[]|\Iterator $users
      *
-     * @return $this
+     * @return NotificationMessageInterface
      */
-    public function addTargetUsers($users)
+    public function addTargetUsers($users): NotificationMessageInterface
     {
         foreach ($users as $user) {
             $this->addTarget($user);
@@ -81,18 +92,19 @@ abstract class NotificationMessageAbstract implements NotificationMessageInterfa
      * @param string      $email
      * @param string|null $fullName
      *
-     * @return $this|\BetaKiller\Notification\NotificationMessageInterface
+     * @return \BetaKiller\Notification\NotificationMessageInterface
      */
-    public function addTargetEmail($email, $fullName)
+    public function addTargetEmail(string $email, string $fullName): NotificationMessageInterface
     {
         $target = new NotificationUserEmail($email, $fullName);
+
         return $this->addTarget($target);
     }
 
     /**
      * @return NotificationUserInterface[]
      */
-    public function getTargets()
+    public function getTargets(): array
     {
         return $this->targets;
     }
@@ -100,7 +112,7 @@ abstract class NotificationMessageAbstract implements NotificationMessageInterfa
     /**
      * @return string[]
      */
-    public function getTargetsEmails()
+    public function getTargetsEmails(): array
     {
         $emails = [];
 
@@ -114,9 +126,9 @@ abstract class NotificationMessageAbstract implements NotificationMessageInterfa
     /**
      * @param NotificationUserInterface $value
      *
-     * @return $this
+     * @return NotificationMessageInterface
      */
-    public function addTarget(NotificationUserInterface $value)
+    public function addTarget(NotificationUserInterface $value): NotificationMessageInterface
     {
         $this->targets[] = $value;
 
@@ -124,9 +136,9 @@ abstract class NotificationMessageAbstract implements NotificationMessageInterfa
     }
 
     /**
-     * @return $this|\BetaKiller\Notification\NotificationMessageInterface
+     * @return \BetaKiller\Notification\NotificationMessageInterface
      */
-    public function clearTargets()
+    public function clearTargets(): NotificationMessageInterface
     {
         $this->targets = [];
 
@@ -138,7 +150,7 @@ abstract class NotificationMessageAbstract implements NotificationMessageInterfa
      *
      * @return string
      */
-    public function getSubj(NotificationUserInterface $targetUser)
+    public function getSubj(NotificationUserInterface $targetUser): string
     {
         if (!$this->subj) {
             return $this->generateSubject($targetUser);
@@ -147,7 +159,7 @@ abstract class NotificationMessageAbstract implements NotificationMessageInterfa
         return $this->subj;
     }
 
-    protected function generateSubject(NotificationUserInterface $targetUser)
+    protected function generateSubject(NotificationUserInterface $targetUser): string
     {
         $key = $this->getBaseI18nKey();
         $key .= '.subj';
@@ -168,7 +180,7 @@ abstract class NotificationMessageAbstract implements NotificationMessageInterfa
         return __($key, $data);
     }
 
-    protected function getBaseI18nKey()
+    protected function getBaseI18nKey(): string
     {
         $name = $this->getTemplateName();
 
@@ -183,10 +195,10 @@ abstract class NotificationMessageAbstract implements NotificationMessageInterfa
     /**
      * @param string $value
      *
-     * @return $this
+     * @return NotificationMessageInterface
      * @deprecated Use I18n registry for subject definition (key is based on template path)
      */
-    public function setSubj($value)
+    public function setSubj(string $value): NotificationMessageInterface
     {
         $this->subj = $value;
 
@@ -196,7 +208,7 @@ abstract class NotificationMessageAbstract implements NotificationMessageInterfa
     /**
      * @return array
      */
-    public function getAttachments()
+    public function getAttachments(): array
     {
         return $this->attachments;
     }
@@ -204,9 +216,9 @@ abstract class NotificationMessageAbstract implements NotificationMessageInterfa
     /**
      * @param string $path
      *
-     * @return $this
+     * @return NotificationMessageInterface
      */
-    public function addAttachment($path)
+    public function addAttachment(string $path): NotificationMessageInterface
     {
         $this->attachments[] = $path;
 
@@ -216,19 +228,19 @@ abstract class NotificationMessageAbstract implements NotificationMessageInterfa
     /**
      * @return int
      */
-    public function send()
+    public function send(): int
     {
-        return Notification::instance()->send($this);
+        return $this->facade->send($this);
     }
 
     /**
-     * @param $template_name
+     * @param $templateName
      *
-     * @return $this|NotificationMessageInterface
+     * @return NotificationMessageInterface
      */
-    public function setTemplateName($template_name)
+    public function setTemplateName(string $templateName): NotificationMessageInterface
     {
-        $this->templateName = $template_name;
+        $this->templateName = $templateName;
 
         return $this;
     }
@@ -236,7 +248,7 @@ abstract class NotificationMessageAbstract implements NotificationMessageInterfa
     /**
      * @return string
      */
-    public function getTemplateName()
+    public function getTemplateName(): string
     {
         return $this->templateName;
     }
@@ -244,9 +256,9 @@ abstract class NotificationMessageAbstract implements NotificationMessageInterfa
     /**
      * @param array $data
      *
-     * @return $this|NotificationMessageInterface
+     * @return NotificationMessageInterface
      */
-    public function setTemplateData(array $data)
+    public function setTemplateData(array $data): NotificationMessageInterface
     {
         $this->templateData = $data;
 
@@ -256,7 +268,7 @@ abstract class NotificationMessageAbstract implements NotificationMessageInterfa
     /**
      * @return array
      */
-    public function getTemplateData()
+    public function getTemplateData(): array
     {
         return $this->templateData;
     }
@@ -264,7 +276,7 @@ abstract class NotificationMessageAbstract implements NotificationMessageInterfa
     /**
      * @return \View
      */
-    protected function template_factory()
+    protected function template_factory(): \View
     {
         return \View::factory();
     }
@@ -272,12 +284,12 @@ abstract class NotificationMessageAbstract implements NotificationMessageInterfa
     /**
      * @return string
      */
-    protected function get_template_path()
+    protected function getTemplatePath(): string
     {
         return 'notifications';
     }
 
-    protected function getFullData(NotificationUserInterface $targetUser)
+    protected function getFullData(NotificationUserInterface $targetUser): array
     {
         return array_merge($this->getTemplateData(), [
             'targetName'  => $targetUser->getFullName(),
@@ -287,12 +299,11 @@ abstract class NotificationMessageAbstract implements NotificationMessageInterfa
 
     /**
      * @param \BetaKiller\Notification\TransportInterface        $transport
-     *
      * @param \BetaKiller\Notification\NotificationUserInterface $target
      *
      * @return string
      */
-    public function render(TransportInterface $transport, NotificationUserInterface $target)
+    public function render(TransportInterface $transport, NotificationUserInterface $target): string
     {
         $view = $this->template_factory();
 
@@ -308,7 +319,7 @@ abstract class NotificationMessageAbstract implements NotificationMessageInterfa
         }
 
         return $view->render(
-            $this->get_template_path().DIRECTORY_SEPARATOR.$this->getTemplateName().'-'.$transport->getName()
+            $this->getTemplatePath().DIRECTORY_SEPARATOR.$this->getTemplateName().'-'.$transport->getName()
         );
     }
 }
