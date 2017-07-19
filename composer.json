@@ -23,7 +23,6 @@
     "php-console/php-console": "^3.1",
     "psr/log": "^1.0",
     "monolog/monolog": "^1",
-    "lavary/crunz": "^1.4",
     "roave/doctrine-simplecache": "^1.1",
     "pcelta/doctrine-cache-factory": "^0.1.0",
     "bramus/monolog-colored-line-formatter": "~2.0"
