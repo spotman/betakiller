@@ -28,11 +28,32 @@ class AppConfig implements AppConfigInterface
     /**
      * Returns namespace for app-related classes (ifaces, widgets, factories, etc) or NULL if these classes located at root namespace
      *
-     * @return string|null
+     * @return string
      */
-    public function getNamespace()
+    public function getNamespace(): string
     {
         return $this->get(['namespace']);
+    }
+
+    /**
+     * Returns app`s base URL
+     *
+     * @return string
+     */
+    public function getBaseUrl(): string
+    {
+        return \Kohana::$base_url;
+    }
+
+    /**
+     * Returns app`s administrator email
+     *
+     * @return string
+     */
+    public function getAdminEmail(): string
+    {
+        $host  = parse_url($this->getBaseUrl(), PHP_URL_HOST);
+        return 'admin@'.$host;
     }
 
     /**
@@ -40,7 +61,7 @@ class AppConfig implements AppConfigInterface
      *
      * @return bool
      */
-    public function isTrailingSlashEnabled()
+    public function isTrailingSlashEnabled(): bool
     {
         return (bool) $this->get(self::CONFIG_PATH_IS_TRAILING_SLASH_ENABLED);
     }
@@ -48,7 +69,7 @@ class AppConfig implements AppConfigInterface
     /**
      * @return string
      */
-    public function getCircularLinkHref()
+    public function getCircularLinkHref(): string
     {
         return $this->get(self::CONFIG_PATH_CIRCULAR_LINK_HREF);
     }
@@ -67,7 +88,7 @@ class AppConfig implements AppConfigInterface
     /**
      * @return bool
      */
-    public function isPageCacheEnabled()
+    public function isPageCacheEnabled(): bool
     {
         return $this->get(self::CONFIG_PATH_PAGE_CACHE_ENABLED, false);
     }
@@ -75,7 +96,7 @@ class AppConfig implements AppConfigInterface
     /**
      * @return string
      */
-    public function getPageCachePath()
+    public function getPageCachePath(): string
     {
         return rtrim($this->get(self::CONFIG_PATH_PAGE_CACHE_PATH), DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR;
     }

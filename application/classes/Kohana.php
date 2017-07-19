@@ -1,5 +1,9 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
+/**
+ * Class Kohana
+ * @deprecated
+ */
 class Kohana extends Kohana_Core {
 
     public static $environment_string = 'development';

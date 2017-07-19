@@ -7,29 +7,43 @@ interface AppConfigInterface
     /**
      * Returns namespace for app-related classes (ifaces, widgets, factories, etc) or NULL if these classes located at root namespace
      *
-     * @return string|null
+     * @return string
      */
-    public function getNamespace();
+    public function getNamespace(): string;
+
+    /**
+     * Returns app`s base URL
+     *
+     * @return string
+     */
+    public function getBaseUrl(): string;
+
+    /**
+     * Returns app`s administrator email
+     *
+     * @return string
+     */
+    public function getAdminEmail(): string;
 
     /**
      * Returns TRUE if trailing slash is needed in url
      *
      * @return bool
      */
-    public function isTrailingSlashEnabled();
+    public function isTrailingSlashEnabled(): bool;
 
     /**
      * @return string
      */
-    public function getCircularLinkHref();
+    public function getCircularLinkHref(): string;
 
     /**
      * @return bool
      */
-    public function isPageCacheEnabled();
+    public function isPageCacheEnabled(): bool;
 
     /**
      * @return string
      */
-    public function getPageCachePath();
+    public function getPageCachePath(): string;
 }
