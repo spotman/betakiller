@@ -49,7 +49,7 @@ class NotificationHelper
      *
      * @return \BetaKiller\Notification\NotificationMessageInterface
      */
-    public function createMessage($name = null)
+    public function createMessage($name = null): NotificationMessageInterface
     {
         return $this->messageFactory->create($name);
     }
