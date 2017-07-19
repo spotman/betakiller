@@ -3,6 +3,10 @@
 {% block body %}
     <h2 style="color: red">Error logging subsystem failure on site <a href="{{ url }}">{{ url }}</a>!</h2>
 
-    <p>{{ message }}</p>
-    <p>{{ stacktrace|nl2br }}</p>
+    <p>{{ subsystem.message }}</p>
+    <p>{{ subsystem.stacktrace|nl2br }}</p>
+
+    <h2 style="color: blue">Original exception was</h2>
+    <p>{{ original.message }}</p>
+    <p>{{ original.stacktrace|nl2br }}</p>
 {% endblock %}

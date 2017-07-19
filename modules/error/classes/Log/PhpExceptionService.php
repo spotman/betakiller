@@ -9,7 +9,7 @@ class Log_PhpExceptionService extends Log_Writer
     /**
      * @var \BetaKiller\Error\PhpExceptionService
      */
-    protected $service;
+    private $service;
 
     /**
      * @var \BetaKiller\Helper\AppEnv
@@ -22,11 +22,16 @@ class Log_PhpExceptionService extends Log_Writer
     private $notificationHelper;
 
     /**
+     * @var bool
+     */
+    private $enabled = true;
+
+    /**
      * Log_PhpExceptionService constructor.
      *
      * @param \BetaKiller\Error\PhpExceptionService $service
-     * @param \BetaKiller\Helper\AppEnv                      $env
-     * @param \BetaKiller\Helper\NotificationHelper          $notificationHelper
+     * @param \BetaKiller\Helper\AppEnv             $env
+     * @param \BetaKiller\Helper\NotificationHelper $notificationHelper
      */
     public function __construct(
         PhpExceptionService $service,
@@ -56,53 +61,20 @@ class Log_PhpExceptionService extends Log_Writer
      *
      * @return  void
      */
-    public function write(array $messages)
+    public function write(array $messages): void
     {
         foreach ($messages as $message) {
-            try {
-                // Write each message into the log
-                $this->write_message($message);
-            } catch (\Throwable $e) {
-                // Prevent logging recursion
-                Kohana::$log->detach($this);
-
-                if ($this->appEnv->inProduction(true)) {
-                    // Try to send notification to developers about logging subsystem failure
-                    $this->notify_developers_about_failure($e);
-                } else {
-                    die(\Kohana_Exception::response($e));
-                }
-
-                // Stop executing
-                break;
-            }
+            // Write each message into the log
+            $this->writeMessage($message);
         }
     }
 
-    protected function notify_developers_about_failure(\Throwable $exception)
+    private function writeMessage(array $msg)
     {
-        try {
-            $message = $this->notificationHelper->createMessage();
-
-            $this->notificationHelper->toDevelopers($message);
-
-            $message
-                ->setSubj('BetaKiller logging subsystem failure')
-                ->setTemplateName('developer/error/subsystem-failure')
-                ->setTemplateData([
-                    'url'        => \Kohana::$base_url,
-                    'message'    => \Kohana_Exception::text($exception),
-                    'stacktrace' => $exception->getTraceAsString(),
-                ])
-                ->send();
-        } catch (\Throwable $ignored) {
-            // Fail silently
-            error_log($ignored->getMessage().PHP_EOL.$ignored->getTraceAsString());
+        if (!$this->enabled) {
+            return;
         }
-    }
 
-    protected function write_message(array $msg)
-    {
         /** @var Exception|Kohana_Exception|null $exception */
         $exception = $msg['additional']['exception'] ?? null;
 
@@ -110,6 +82,72 @@ class Log_PhpExceptionService extends Log_Writer
             return;
         }
 
-        $this->service->storeException($exception);
+        try {
+            $this->service->storeException($exception);
+        } catch (Throwable $subsystemException) {
+            // Prevent logging recursion
+            $this->enabled = false;
+
+            $this->notifyDevelopersAboutFailure($subsystemException, $exception);
+        }
+    }
+
+    private function notifyDevelopersAboutFailure(Throwable $subsystemException, Throwable $originalException): void
+    {
+        // Try to send notification to developers about logging subsystem failure
+        try {
+            $this->sendNotification($subsystemException, $originalException);
+        } catch (Throwable $notificationException) {
+            $this->sendPlainEmail($notificationException, $subsystemException, $originalException);
+        }
+    }
+
+    private function sendNotification(Throwable $subsystemException, Throwable $originalException): void
+    {
+        $message = $this->notificationHelper->createMessage();
+
+        $this->notificationHelper->toDevelopers($message);
+
+        $message
+            ->setSubj('BetaKiller logging subsystem failure')
+            ->setTemplateName('developer/error/subsystem-failure')
+            ->setTemplateData([
+                'url'       => \Kohana::$base_url,
+                'subsystem' => [
+                    'message'    => $this->getExceptionText($subsystemException),
+                    'stacktrace' => $subsystemException->getTraceAsString(),
+                ],
+                'original'  => [
+                    'message'    => $this->getExceptionText($originalException),
+                    'stacktrace' => $originalException->getTraceAsString(),
+                ],
+            ])
+            ->send();
+    }
+
+    private function getExceptionText(Throwable $e): string
+    {
+        return sprintf('%s [ %s ]: %s ~ %s [ %d ]',
+            get_class($e), $e->getCode(), strip_tags($e->getMessage()), Debug::path($e->getFile()), $e->getLine());
+    }
+
+    private function sendPlainEmail(Throwable $notificationX, Throwable $subsystemX, Throwable $originalX)
+    {
+        try {
+            // TODO Replace with getting info from AppConfig
+            $host  = parse_url(\Kohana::$base_url, PHP_URL_HOST);
+            $email = 'admin@'.$host;
+
+            $message = '';
+
+            foreach ([$notificationX, $subsystemX, $originalX] as $e) {
+                $message .= $this->getExceptionText($e).PHP_EOL.$e->getTraceAsString().PHP_EOL.PHP_EOL;
+            }
+
+            // Send plain message
+            mail($email, 'Exception handling error', nl2br($message));
+        } catch (Throwable $ignored) {
+            // Nothing we can do more, silently skip
+        }
     }
 }
