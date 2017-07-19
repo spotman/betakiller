@@ -1,5 +1,6 @@
 <?php
 
+use BetaKiller\Config\AppConfigInterface;
 use BetaKiller\Error\PhpExceptionService;
 use BetaKiller\Helper\AppEnv;
 use BetaKiller\Helper\NotificationHelper;
@@ -17,6 +18,11 @@ class Log_PhpExceptionService extends Log_Writer
     private $appEnv;
 
     /**
+     * @var \BetaKiller\Config\AppConfigInterface
+     */
+    private $appConfig;
+
+    /**
      * @var \BetaKiller\Helper\NotificationHelper
      */
     private $notificationHelper;
@@ -31,15 +37,18 @@ class Log_PhpExceptionService extends Log_Writer
      *
      * @param \BetaKiller\Error\PhpExceptionService $service
      * @param \BetaKiller\Helper\AppEnv             $env
+     * @param \BetaKiller\Config\AppConfigInterface $appConfig
      * @param \BetaKiller\Helper\NotificationHelper $notificationHelper
      */
     public function __construct(
         PhpExceptionService $service,
         AppEnv $env,
+        AppConfigInterface $appConfig,
         NotificationHelper $notificationHelper
     ) {
         $this->service            = $service;
         $this->appEnv             = $env;
+        $this->appConfig          = $appConfig;
         $this->notificationHelper = $notificationHelper;
     }
 
@@ -112,7 +121,7 @@ class Log_PhpExceptionService extends Log_Writer
             ->setSubj('BetaKiller logging subsystem failure')
             ->setTemplateName('developer/error/subsystem-failure')
             ->setTemplateData([
-                'url'       => \Kohana::$base_url,
+                'url'       => $this->appConfig->getBaseUrl(),
                 'subsystem' => [
                     'message'    => $this->getExceptionText($subsystemException),
                     'stacktrace' => $subsystemException->getTraceAsString(),
@@ -134,10 +143,6 @@ class Log_PhpExceptionService extends Log_Writer
     private function sendPlainEmail(Throwable $notificationX, Throwable $subsystemX, Throwable $originalX)
     {
         try {
-            // TODO Replace with getting info from AppConfig
-            $host  = parse_url(\Kohana::$base_url, PHP_URL_HOST);
-            $email = 'admin@'.$host;
-
             $message = '';
 
             foreach ([$notificationX, $subsystemX, $originalX] as $e) {
@@ -145,9 +150,9 @@ class Log_PhpExceptionService extends Log_Writer
             }
 
             // Send plain message
-            mail($email, 'Exception handling error', nl2br($message));
+            mail($this->appConfig->getAdminEmail(), 'Exception handling error', nl2br($message));
         } catch (Throwable $ignored) {
-            // Nothing we can do more, silently skip
+            // Nothing we can do here, silently skip
         }
     }
 }
