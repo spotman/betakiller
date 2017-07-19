@@ -5,7 +5,7 @@ use Twig;
 
 class NotificationMessageCommon extends NotificationMessageAbstract
 {
-    protected function template_factory()
+    protected function template_factory(): \View
     {
         return Twig::factory();
     }
