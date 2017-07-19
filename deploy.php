@@ -1,16 +1,22 @@
 <?php
 
-// For php-ssh extension
-//require dirname(__FILE__).'/vendor/autoload.php';
+use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Process\Exception\RuntimeException;
+use function Deployer\{
+    after, ask, askConfirmation, cd, get, has, input, inventory, isVerbose, localhost, option, parse, run, set, task, write, writeln
+};
 
 require 'recipe/common.php';
 
-use Symfony\Component\Console\Input\InputOption;
+// For php-ssh extension
+//require dirname(__FILE__).'/vendor/autoload.php';
+
+set('git_tty', true); // [Optional] Allocate tty for git on first deployment
 
 define('BETAKILLER_CORE_PATH', 'core');
 
 $tzName = date_default_timezone_get();
-$tz = new DateTimeZone($tzName);
+$tz     = new DateTimeZone($tzName);
 
 set('core_path', BETAKILLER_CORE_PATH);
 set('core_repository', 'git@github.com:spotman/betakiller.git');
@@ -26,7 +32,6 @@ option('repo', null, InputOption::VALUE_OPTIONAL, 'Tag to deploy.', 'app');
 
 // Option --branch
 define('DEFAULT_BRANCH', 'master');
-option('branch', 'b', InputOption::VALUE_OPTIONAL, 'GIT branch to checkout', DEFAULT_BRANCH);
 
 // Option --to for migrations:down
 option('to', 't', InputOption::VALUE_OPTIONAL, 'Target migration');
@@ -43,17 +48,18 @@ define('DEPLOYER_PRODUCTION_STAGE', 'production');
 set('default_stage', DEPLOYER_DEV_STAGE);
 
 // Local server for creating migrations, git actions, etc
-localServer('dev')
+localhost('dev')
     ->stage(DEPLOYER_DEV_STAGE);
 
 // Local server for testing deployment tasks in dev environment
-localServer('testing')
-    ->env('deploy_path', sys_get_temp_dir().DIRECTORY_SEPARATOR.'deployer-testing')
+localhost('testing')
+    ->set('deploy_path', sys_get_temp_dir().DIRECTORY_SEPARATOR.'deployer-testing')
     ->stage(DEPLOYER_TESTING_STAGE);
 
-if (file_exists(getcwd().'/servers.yml')) {
+$serversFile = getcwd().'/servers.yml';
+if (file_exists($serversFile)) {
     // Process app servers list
-    serverList('servers.yml');
+    inventory($serversFile);
 }
 
 /**
@@ -61,35 +67,35 @@ if (file_exists(getcwd().'/servers.yml')) {
  */
 task('check', function () {
     if (stage() === DEPLOYER_DEV_STAGE) {
-        throw new \Symfony\Component\Process\Exception\RuntimeException('Can not deploy to a local stage');
+        throw new RuntimeException('Can not deploy to a local stage');
     }
 
-    if (!has('app_repository')) {
-        throw new \Symfony\Component\Process\Exception\RuntimeException('Please, set up GIT repo via env("app_repository")');
+    if (!get('app_repository')) {
+        throw new RuntimeException('Please, set up GIT repo via set("app_repository")');
     }
 
-    if (!has('app_path')) {
-        throw new \Symfony\Component\Process\Exception\RuntimeException('Please, set up site path via env("app_path")');
+    if (!get('app_path')) {
+        throw new RuntimeException('Please, set up site path via set("app_path")');
     }
 
     // Store these parameters to env for using them in shared and writable dirs
-    env('app_repository', get('app_repository'));
-    env('app_path', get('app_path'));
-
-    env('core_repository', get('core_repository'));
-    env('core_path', get('core_path'));
+//    env('app_repository', get('app_repository'));
+//    env('app_path', get('app_path'));
+//
+//    env('core_repository', get('core_repository'));
+//    env('core_path', get('core_path'));
 });
 
 // Prepare app env
 task('deploy:repository:prepare:app', function () {
-    env('repository', get('app_repository'));
-    env('repository_path', get('app_path'));
+    set('repository', get('app_repository'));
+    set('repository_path', get('app_path'));
 })->desc('Prepare app repository');
 
 // Prepare BetaKiller env
 task('deploy:repository:prepare:betakiller', function () {
-    env('repository', get('core_repository'));
-    env('repository_path', get('core_path'));
+    set('repository', get('core_repository'));
+    set('repository_path', get('core_path'));
 })->desc('Prepare BetaKiller repository');
 
 function cd_repository_path_cmd() {
@@ -118,10 +124,10 @@ task('deploy:vendors:app', function () {
 })->desc('Process Composer inside app repository');
 
 function process_vendors($repo) {
-    $composer = env('bin/composer');
-    $envVars  = env('env_vars') ? 'export '.env('env_vars').' &&' : '';
+    $composer = get('bin/composer');
+    $envVars  = get('env_vars') ? 'export '.get('env_vars').' &&' : '';
 
-    $path = get_repo_path($repo);
+    $path = getRepoPath($repo);
 
     $result = run("cd $path && $envVars $composer {{composer_options}}");
 
@@ -214,63 +220,63 @@ task('httpd:restart', function () {
 task('git:config:user', function () {
 
     $name = ask('Enter git name:', stage());
-    git_config('user.name', $name);
+    gitConfig('user.name', $name);
 
     $email = ask('Enter git email:', 'no-reply@betakiller.ru');
-    git_config('user.email', $email);
+    gitConfig('user.email', $email);
 })->desc('set global git properties like user.email');
 
 task('git:status', function () {
-    git_status();
+    gitStatus();
 })->desc('git status');
 
 task('git:add', function () {
-    git_add();
+    gitAdd();
 })->desc('git add');
 
 task('git:commit', function () {
-    git_commit();
+    gitCommit();
 })->desc('git commit -m "Commit message"');
 
 task('git:commit:all', function () {
-    git_commit_all();
+    gitCommitAll();
 })->desc('git add . && git commit -m "Commit message"');
 
 task('git:push', function () {
-    git_push();
+    gitPush();
 })->desc('git push');
 
 task('git:pull', function () {
-    git_pull();
+    gitPull();
 })->desc('git pull');
 
 task('git:pull:all', function () {
-    git_pull_all();
+    gitPullAll();
 })->desc('git pull for all repositories');
 
 /**
  * Makes git:check inside of {current} directory
  */
 task('git:check', function () {
-    $current_revision_path = env('current');
-    $path                  = get_repo_path(null, $current_revision_path);
+    $currentRevisionPath = get('current');
+    $path                = getRepoPath(null, $currentRevisionPath);
 
-    $out = git_status($path);
+    $out = gitStatus($path);
 
     if (stripos($out, 'nothing to commit (working directory clean)') !== false) {
         return;
     }
 
     if (askConfirmation('Commit changes?')) {
-        git_commit_all($path);
-        git_push($path);
+        gitCommitAll($path);
+        gitPush($path);
     } else {
         writeln('Exiting...');
     }
 })->desc('Checks for new files that not in GIT and commits them');
 
 task('git:checkout', function () {
-    git_checkout();
+    gitCheckout();
 })->desc('git checkout _branch_ (use --branch option)');
 
 /**
@@ -283,7 +289,7 @@ task('minion', function () {
 
     $name = input()->getOption('task');
 
-    run_minion_task($name);
+    runMinionTask($name);
 })->desc('Run Minion task by its name');
 
 
@@ -291,7 +297,7 @@ task('minion', function () {
  * Create table with migrations
  */
 task('migrations:install', function () {
-    run_minion_task('migrations:install');
+    runMinionTask('migrations:install');
 })->desc('Install migrations table');
 
 /**
@@ -312,29 +318,29 @@ task('migrations:create', function () {
 
     $desc = ask('Enter migration description', '');
 
-    $output = run_minion_task("migrations:create --name=$name --description=$desc --scope=$scope");
+    $output = runMinionTask("migrations:create --name=$name --description=$desc --scope=$scope");
 
-    $out_arr = explode('Done! Check ', $output);
+    $outArr = explode('Done! Check ', $output);
 
-    if (count($out_arr) === 2) {
-        $file_path = trim($out_arr[1]);
+    if (count($outArr) === 2) {
+        $filePath = trim($outArr[1]);
 
-        if (file_exists($file_path)) {
-            $dir = dirname($file_path);
-            run_git_command('add .', $dir);
+        if (file_exists($filePath)) {
+            $dir = dirname($filePath);
+            runGitCommand('add .', $dir);
         } else {
             writeln('Can not parse output, add migration file to git by yourself');
         }
     } else {
         writeln('Can not parse output, add migration file to git by yourself');
     }
-})->onlyForStage(DEPLOYER_DEV_STAGE)->desc('Create migration');
+})->onStage(DEPLOYER_DEV_STAGE)->desc('Create migration');
 
 /**
  * Apply migrations
  */
 task('migrations:up', function () {
-    run_minion_task('migrations:up');
+    runMinionTask('migrations:up');
 })->desc('Apply migrations');
 
 /**
@@ -343,21 +349,21 @@ task('migrations:up', function () {
 task('migrations:down', function () {
     $to = input()->getOption('to');
 
-    run_minion_task('migrations:down --to='.$to);
+    runMinionTask('migrations:down --to='.$to);
 })->desc('Rollback migrations; use "--to" option to set new migration base');
 
 /**
  * Show migrations history
  */
 task('migrations:history', function () {
-    run_minion_task('migrations:history');
+    runMinionTask('migrations:history');
 })->desc('Show migrations list');
 
 /**
  * Warm up cache by making internal HTTP request to every IFace
  */
 task('cache:warmup', function () {
-    run_minion_task('cache:warmup');
+    runMinionTask('cache:warmup');
 })->desc('Warm up cache by making internal HTTP request to every IFace');
 
 /**
@@ -366,7 +372,7 @@ task('cache:warmup', function () {
 task('done', function () use ($tz) {
     $dateTime = new DateTimeImmutable();
     writeln('<info>Successfully deployed at '.$dateTime->setTimezone($tz)->format('H:i:s T').'!</info>');
-})->once();
+});
 
 task('deploy', [
     // Check app configuration
@@ -399,11 +405,10 @@ task('deploy', [
     'deploy:symlink',
     'cleanup',
     'done',
-])->desc('Deploy app bundle')->onlyForStage([
+])->desc('Deploy app bundle')->onStage(
     DEPLOYER_STAGING_STAGE,
     DEPLOYER_PRODUCTION_STAGE,
-    DEPLOYER_TESTING_STAGE,
-]);
+    DEPLOYER_TESTING_STAGE);
 
 
 /**
@@ -414,11 +419,11 @@ task('deploy', [
  * @return \Deployer\Type\Result
  * @throws Exception
  */
-function run_minion_task($name) {
-    $current_path = getcwd();
-    $path         = get_repo_path();
+function runMinionTask($name) {
+    $currentPath = getcwd();
+    $path        = getRepoPath();
 
-    if (strpos($current_path, BETAKILLER_CORE_PATH) === false) {
+    if (strpos($currentPath, BETAKILLER_CORE_PATH) === false) {
         $path .= '/public';
     }
 
@@ -449,9 +454,9 @@ function run_minion_task($name) {
  * @return \Deployer\Type\Result
  * @throws Exception
  */
-function run_git_command($gitCmd, $path = null) {
+function runGitCommand($gitCmd, $path = null) {
     if (!$path) {
-        $path = get_repo_path();
+        $path = getRepoPath();
     }
 
     $result = run("cd $path && git $gitCmd");
@@ -460,46 +465,46 @@ function run_git_command($gitCmd, $path = null) {
     return $result;
 }
 
-function git_status($path = null) {
-    return run_git_command('status', $path);
+function gitStatus($path = null) {
+    return runGitCommand('status', $path);
 }
 
-function git_add($base_path = null) {
-    $add_path = ask('Path to add files:', '.');
+function gitAdd($basePath = null) {
+    $addPath = ask('Path to add files:', '.');
 
-    return run_git_command('add '.$add_path, $base_path);
+    return runGitCommand('add '.$addPath, $basePath);
 }
 
-function git_commit($path = null) {
+function gitCommit($path = null) {
     $message = ask('Enter commit message:', 'Commit from production');
 
-    return run_git_command('commit -m "'.$message.'"', $path);
+    return runGitCommand('commit -m "'.$message.'"', $path);
 }
 
-function git_commit_all($path = null) {
-    return git_add($path).git_commit($path);
+function gitCommitAll($path = null) {
+    return gitAdd($path).gitCommit($path);
 }
 
-function git_checkout($path = null) {
-    $branch = input()->getOption('branch');
+function gitCheckout($path = null) {
+    $branch = input()->getOption('branch') ?: DEFAULT_BRANCH;
 
-    return run_git_command('checkout '.$branch, $path);
+    return runGitCommand('checkout '.$branch, $path);
 }
 
-function git_push($path = null) {
-    return run_git_command('push', $path);
+function gitPush($path = null) {
+    return runGitCommand('push', $path);
 }
 
-function git_pull($path = null) {
-    return run_git_command('pull', $path);
+function gitPull($path = null) {
+    return runGitCommand('pull', $path);
 }
 
-function git_pull_all() {
-    return git_pull(get_repo_path('core')).git_pull(get_repo_path('app'));
+function gitPullAll() {
+    return gitPull(getRepoPath('core')).gitPull(getRepoPath('app'));
 }
 
-function git_config($key, $value) {
-    return run_git_command("config --global $key \"$value\"");
+function gitConfig($key, $value) {
+    return runGitCommand("config --global $key \"$value\"");
 }
 
 /**
@@ -511,24 +516,25 @@ function stage() {
     return input()->getArgument('stage') ?: get('default_stage');
 }
 
-function get_latest_release_path() {
-    $list    = env('releases_list');
+function getLatestReleasePath() {
+    /** @var string[] $list */
+    $list    = get('releases_list');
     $release = $list[0];
 
-    if (output()->isVerbose()) {
-        output()->writeln(PHP_EOL.'Releases are:'.PHP_EOL);
+    if (isVerbose()) {
+        writeln(PHP_EOL.'Releases are:'.PHP_EOL);
 
         foreach ($list as $key => $item) {
-            output()->writeln($key.' => '.$item);
+            writeln($key.' => '.$item);
         }
 
-        output()->writeln('');
+        writeln('');
     }
 
-    return env()->parse('{{deploy_path}}/releases/'.$release);
+    return parse('{{deploy_path}}/releases/'.$release);
 }
 
-function get_repo_path(?string $repo = null, ?string $base_path = null) {
+function getRepoPath(?string $repo = null, ?string $base_path = null) {
     if (stage() === DEPLOYER_DEV_STAGE) {
         return getcwd();
     }
@@ -544,7 +550,7 @@ function get_repo_path(?string $repo = null, ?string $base_path = null) {
     }
 
     if (!$base_path) {
-        $base_path = get_latest_release_path();
+        $base_path = getLatestReleasePath();
     }
 
     return $base_path.'/'.get($repo.'_path');
