@@ -6,7 +6,7 @@ interface NotificationMessageInterface
     /**
      * @return NotificationUserInterface
      */
-    public function getFrom(): NotificationUserInterface;
+    public function getFrom(): ?NotificationUserInterface;
 
     /**
      * @param NotificationUserInterface $value

@@ -57,7 +57,7 @@ abstract class NotificationMessageAbstract implements NotificationMessageInterfa
     /**
      * @return NotificationUserInterface
      */
-    public function getFrom(): NotificationUserInterface
+    public function getFrom(): ?NotificationUserInterface
     {
         return $this->from;
     }
