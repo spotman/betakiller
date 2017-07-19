@@ -11,6 +11,7 @@ class PhpExceptionResource extends AbstractEntityRelatedAclResource
     const PERMISSION_IGNORE          = 'ignore';
     const PERMISSION_DELETE          = 'delete';
     const PERMISSION_TEST            = 'test';
+    const PERMISSION_THROW           = 'throwHttpException';
 
     /**
      * Returns default permissions bundled with current resource
@@ -65,6 +66,10 @@ class PhpExceptionResource extends AbstractEntityRelatedAclResource
             self::PERMISSION_TEST => [
                 Role::DEVELOPER_ROLE_NAME,
             ],
+
+            self::PERMISSION_THROW => [
+                Role::DEVELOPER_ROLE_NAME,
+            ],
         ];
     }
 
@@ -74,6 +79,7 @@ class PhpExceptionResource extends AbstractEntityRelatedAclResource
             self::PERMISSION_LIST_RESOLVED,
             self::PERMISSION_LIST_UNRESOLVED,
             self::PERMISSION_TEST,
+            self::PERMISSION_THROW,
         ]);
     }
 }
