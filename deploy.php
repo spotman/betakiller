@@ -3,7 +3,7 @@
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Process\Exception\RuntimeException;
 use function Deployer\{
-    after, ask, askConfirmation, cd, get, has, input, inventory, isVerbose, localhost, option, parse, run, set, task, write, writeln
+    after, ask, askConfirmation, cd, get, input, inventory, isVerbose, localhost, option, parse, run, set, task, write, writeln
 };
 
 require 'recipe/common.php';
