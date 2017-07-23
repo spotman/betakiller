@@ -141,7 +141,7 @@ class PhpExceptionService
         $module = $request ? $request->module() : null;
 
         // Adding module name for grouping purposes
-        if ($model) {
+        if ($module) {
             $model->addModule($module);
         }
 
