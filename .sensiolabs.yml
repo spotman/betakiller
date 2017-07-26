@@ -1,0 +1,21 @@
+global_exclude_dirs:
+    - vendor
+    - system
+    - modules/auth
+    - modules/database
+    - modules/minion
+    - modules/static-files
+    - modules/image
+    - modules/orm
+
+rules:
+    php.use_global_variable_or_function:
+        enabled: false
+    web.non_utf8_encoding:
+        enabled: false
+    php.use_php_eval_function:
+        enabled: false
+    php.use_exit_function:
+        enabled: false
+    doctrine.database_query_contains_string_and_variable_concatenation:
+        enabled: false
