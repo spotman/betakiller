@@ -10,12 +10,12 @@ global_exclude_dirs:
 
 rules:
     php.use_global_variable_or_function:
-        enabled: false
+        enabled: true
     web.non_utf8_encoding:
-        enabled: false
+        enabled: true
     php.use_php_eval_function:
-        enabled: false
+        enabled: true
     php.use_exit_function:
-        enabled: false
+        enabled: true
     doctrine.database_query_contains_string_and_variable_concatenation:
-        enabled: false
+        enabled: true
