@@ -4,9 +4,6 @@ namespace Deployer;
 use Deployer\Exception\Exception;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Process\Exception\RuntimeException;
-//use function Deployer\{
-//    after, ask, askConfirmation, cd, get, input, inventory, isVerbose, localhost, option, parse, run, set, task, write, writeln
-//};
 
 require 'recipe/common.php';
 
@@ -79,13 +76,6 @@ task('check', function () {
     if (!get('app_path')) {
         throw new RuntimeException('Please, set up site path via set("app_path")');
     }
-
-    // Store these parameters to env for using them in shared and writable dirs
-//    env('app_repository', get('app_repository'));
-//    env('app_path', get('app_path'));
-//
-//    env('core_repository', get('core_repository'));
-//    env('core_path', get('core_path'));
 });
 
 // Prepare app env
