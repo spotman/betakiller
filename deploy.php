@@ -1,6 +1,7 @@
 <?php
 namespace Deployer;
 
+use Deployer\Exception\Exception;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Process\Exception\RuntimeException;
 //use function Deployer\{
@@ -17,7 +18,7 @@ set('git_tty', true); // [Optional] Allocate tty for git on first deployment
 define('BETAKILLER_CORE_PATH', 'core');
 
 $tzName = date_default_timezone_get();
-$tz     = new DateTimeZone($tzName);
+$tz     = new \DateTimeZone($tzName);
 
 set('core_path', BETAKILLER_CORE_PATH);
 set('core_repository', 'git@github.com:spotman/betakiller.git');
@@ -371,7 +372,7 @@ task('cache:warmup', function () {
  * Success message
  */
 task('done', function () use ($tz) {
-    $dateTime = new DateTimeImmutable();
+    $dateTime = new \DateTimeImmutable();
     writeln('<info>Successfully deployed at '.$dateTime->setTimezone($tz)->format('H:i:s T').'!</info>');
 });
 
