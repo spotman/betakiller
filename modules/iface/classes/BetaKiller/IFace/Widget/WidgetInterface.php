@@ -10,7 +10,7 @@ interface WidgetInterface
      *
      * @return $this
      */
-    public function setName($value);
+    public function setName(string $value);
 
     /**
      * Getter for widget name

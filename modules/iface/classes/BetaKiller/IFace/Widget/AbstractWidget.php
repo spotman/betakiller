@@ -79,7 +79,7 @@ abstract class AbstractWidget implements WidgetInterface
      *
      * @return $this
      */
-    public function setName($value)
+    public function setName(string $value)
     {
         $this->_name = $value;
 
@@ -266,12 +266,12 @@ abstract class AbstractWidget implements WidgetInterface
         return $this->view_factory($view_path, $this->getContext());
     }
 
-    protected function get_validation_errors(Validation $validation): array
+    protected function getValidationErrors(Validation $validation): array
     {
-        return $validation->errors($this->get_validation_messages_path());
+        return $validation->errors($this->getValidationMessagesPath());
     }
 
-    private function get_validation_messages_path(): string
+    private function getValidationMessagesPath(): string
     {
         return 'widgets'.DIRECTORY_SEPARATOR.str_replace('_', DIRECTORY_SEPARATOR, $this->_name);
     }
@@ -282,7 +282,7 @@ abstract class AbstractWidget implements WidgetInterface
      *
      * @throws \BetaKiller\IFace\Widget\WidgetException
      */
-    protected function throw_exception($message, ?array $variables = null): void
+    protected function throwException($message, ?array $variables = null): void
     {
         throw new WidgetException($message, $variables);
     }
