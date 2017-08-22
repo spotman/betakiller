@@ -16,7 +16,7 @@ class BetaKiller_Twig_Extension extends Twig_Extension
 
             new Twig_Function(
                 'js_build',
-                [$this, 'js_build'],
+                [$this, 'jsBuild'],
                 ['is_safe' => ['html']]
             ),
 
@@ -28,7 +28,7 @@ class BetaKiller_Twig_Extension extends Twig_Extension
 
             new Twig_Function(
                 'static',
-                [$this, 'get_link_to_static_file'],
+                [$this, 'getLinkToStaticFile'],
                 ['is_safe' => ['html']]
             ),
 
@@ -48,13 +48,11 @@ class BetaKiller_Twig_Extension extends Twig_Extension
                 [$this, 'meta']
             ),
 
-//            new Twig_SimpleFunction('iface_url', array($this, 'iface_url')),
-
-            new Twig_Function('is_device', [$this, 'is_device']),
+            new Twig_Function('isDevice', [$this, 'isDevice']),
 
             new Twig_Function(
                 'profiler',
-                [$this, 'show_profiler'],
+                [$this, 'showProfiler'],
                 ['is_safe' => ['html']]
             ),
 
@@ -66,17 +64,17 @@ class BetaKiller_Twig_Extension extends Twig_Extension
 
             new Twig_Function(
                 'in_production',
-                [$this, 'in_production']
+                [$this, 'inProduction']
             ),
 
             new Twig_Function(
                 'in_staging',
-                [$this, 'in_staging']
+                [$this, 'inStaging']
             ),
 
             new Twig_Function(
                 'user_is_moderator',
-                [$this, 'user_is_moderator']
+                [$this, 'userIsModerator']
             ),
 
             new Twig_Function(
@@ -86,7 +84,7 @@ class BetaKiller_Twig_Extension extends Twig_Extension
             ),
 
             /**
-             * Добавляет элемент в тег <title> (автоматически срендерится при обработке шаблона)
+             * Add element to <title> tag (will be combined automatically upon template render)
              */
             new Twig_Function(
                 'title',
@@ -137,17 +135,17 @@ class BetaKiller_Twig_Extension extends Twig_Extension
         ];
     }
 
-    public function in_production()
+    public function inProduction()
     {
         return Kohana::in_production();
     }
 
-    public function in_staging()
+    public function inStaging()
     {
         return Kohana::in_staging();
     }
 
-    public function user_is_moderator()
+    public function userIsModerator()
     {
         $user = \BetaKiller\DI\Container::getInstance()->get(\BetaKiller\Model\UserInterface::class);
 
@@ -173,9 +171,9 @@ class BetaKiller_Twig_Extension extends Twig_Extension
     /**
      * Helper for adding JS builds (Require.JS, etc) in production environment
      */
-    public function js_build()
+    public function jsBuild()
     {
-//         Временно отключаем пока не сделаны билды
+//         Disabled coz build subsystem is not finished
 //
 //        if (!Kohana::in_production())
 //            return;
@@ -212,7 +210,7 @@ class BetaKiller_Twig_Extension extends Twig_Extension
      *
      * @return string
      */
-    public function image(array $attributes, array $data = null, $forceSize = null)
+    public function image(array $attributes, array $data = null, $forceSize = null): string
     {
         if ($data) {
             $attributes = array_merge($attributes, $data);
@@ -239,7 +237,7 @@ class BetaKiller_Twig_Extension extends Twig_Extension
      *
      * @return string
      */
-    public function get_link_to_static_file($filename)
+    public function getLinkToStaticFile(string $filename): string
     {
         return StaticFile::instance()->getLink($filename);
     }
@@ -264,7 +262,7 @@ class BetaKiller_Twig_Extension extends Twig_Extension
      *
      * @return string|null
      */
-    public function meta($name = null, $value = null)
+    public function meta($name = null, $value = null): ?string
     {
         $instance = Meta::instance();
 
@@ -277,12 +275,12 @@ class BetaKiller_Twig_Extension extends Twig_Extension
         return null;
     }
 
-    public function show_profiler()
+    public function showProfiler()
     {
         return Profiler::render();
     }
 
-    public function is_device()
+    public function isDevice()
     {
         $device = new Device;
 
