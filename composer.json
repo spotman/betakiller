@@ -1,6 +1,8 @@
 {
   "name": "spotman/betakiller",
   "description": "BetaKiller development platform based on Kohana framework",
+  "licence": "MIT",
+  "type": "project",
   "require": {
     "php": ">=7.1.0",
     "php-di/php-di": "^5.4",
