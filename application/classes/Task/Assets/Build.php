@@ -1,4 +1,4 @@
-<?php defined('SYSPATH') OR die('No direct script access.');
+<?php
 
 
 class Task_Assets_Build extends Minion_Task {

@@ -1,3 +1,3 @@
-<?php defined('SYSPATH') OR die('No direct script access.');
+<?php
 
 class Response extends \BetaKiller\Utils\Kohana\Response {}

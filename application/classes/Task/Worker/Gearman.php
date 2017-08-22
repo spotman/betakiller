@@ -1,4 +1,4 @@
-<?php defined('SYSPATH') OR die('No direct script access.');
+<?php
 
 abstract class Task_Worker_Gearman extends \BetaKiller\Task\AbstractTask
 {

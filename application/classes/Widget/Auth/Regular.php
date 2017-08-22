@@ -1,4 +1,4 @@
-<?php defined('SYSPATH') OR die('No direct script access.');
+<?php
 
 use BetaKiller\Helper\IFaceHelper;
 use BetaKiller\IFace\Auth\PasswordReset;

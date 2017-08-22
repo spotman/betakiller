@@ -1,4 +1,4 @@
-<?php defined('SYSPATH') OR die('No direct script access.');
+<?php
 /**
  * Translation file in language: ru
  * Automatically generated from previous translation file.

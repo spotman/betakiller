@@ -1,4 +1,3 @@
-<?php defined('SYSPATH') OR die('No direct script access.');
-
+<?php
 
 class Task_Worker_Exception extends Minion_Exception {}

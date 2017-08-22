@@ -1,11 +1,11 @@
-<?php defined('SYSPATH') OR die('No direct script access.');
+<?php
 
 class Auth_Exception_Inactive extends Auth_Exception
 {
     /**
      * @return string
      */
-    protected function getDefaultMessageI18nKey()
+    protected function getDefaultMessageI18nKey(): string
     {
         return 'error.auth.inactive';
     }
