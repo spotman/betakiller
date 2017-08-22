@@ -19,30 +19,30 @@ class ValuesGroup
     protected $_values;
 
     /**
-     * @param string    $_label
-     * @param array     $_values
+     * @param string $_label
+     * @param array  $_values
+     *
      * @return static
      */
-    public static function factory($_label, array $_values) //$_codename,
+    public static function factory(string $_label, array $_values)
     {
         return new static($_label, $_values);
     }
 
     /**
-     * @param string    $_label
-     * @param Value[]   $_values
+     * @param string  $_label
+     * @param Value[] $_values
      */
-    public function __construct($_label, array $_values)
+    public function __construct(string $_label, array $_values)
     {
-//        $this->_codename    = $_codename;
-        $this->_label       = $_label;
-        $this->_values      = $_values;
+        $this->_label  = $_label;
+        $this->_values = $_values;
     }
 
     /**
      * @return string
      */
-    public function getLabel()
+    public function getLabel(): string
     {
         return $this->_label;
     }
@@ -50,7 +50,7 @@ class ValuesGroup
     /**
      * @return Value[]
      */
-    public function getValues()
+    public function getValues(): array
     {
         return $this->_values;
     }
@@ -58,26 +58,30 @@ class ValuesGroup
     /**
      * @param \BetaKiller\Filter\Model\Value $value
      */
-    public function addValue(Value $value)
+    public function addValue(Value $value): void
     {
         $this->_values[] = $value;
     }
 
     /**
-     * @param string $nsSeparator
-     * @param bool   $selectedOnly
-     * @return array
+     * @param string|null $nsSeparator
+     * @param bool|null   $selectedOnly
+     *
+     * @return string[]
      */
-    public function asValuesArray($nsSeparator = '-', $selectedOnly = false)
+    public function asValuesArray(?string $nsSeparator = null, ?bool $selectedOnly = null): array
     {
-        $output = [];
+        $nsSeparator  = $nsSeparator ?? '-';
+        $selectedOnly = $selectedOnly ?? false;
+        $output       = [];
 
         foreach ($this->getValues() as $value) {
-            if ($selectedOnly AND !$value->isSelected())
+            if ($selectedOnly && !$value->isSelected()) {
                 continue;
+            }
 
             $keyPrefix = $value->getKeyNamespace();
-            $key = $keyPrefix
+            $key       = $keyPrefix
                 ? $keyPrefix.$nsSeparator.$value->getKey()
                 : $value->getKey();
 
@@ -90,7 +94,7 @@ class ValuesGroup
     /**
      * @return string
      */
-    public function getCodename()
+    public function getCodename(): string
     {
         return $this->_codename;
     }
@@ -98,9 +102,8 @@ class ValuesGroup
     /**
      * @param string $codename
      */
-    public function setCodename($codename)
+    public function setCodename(string $codename): void
     {
         $this->_codename = $codename;
     }
-
 }

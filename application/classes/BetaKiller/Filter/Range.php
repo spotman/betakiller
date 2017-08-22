@@ -1,31 +1,30 @@
 <?php
 namespace BetaKiller\Filter;
 
-abstract class Range extends Base {
+abstract class Range extends Base
+{
+    /**
+     * @var int|null
+     */
+    protected $_from = null;
 
     /**
      * @var int|null
      */
-    protected $_from = NULL;
-
-    /**
-     * @var int|null
-     */
-    protected $_to = NULL;
+    protected $_to = null;
 
     /**
      * @param array $data
+     *
      * @return static
      */
     public function fromArray(array $data)
     {
-        if ( isset($data['from']) )
-        {
+        if (isset($data['from'])) {
             $this->setFrom($data['from']);
         }
 
-        if ( isset($data['to']) )
-        {
+        if (isset($data['to'])) {
             $this->setTo($data['to']);
         }
 
@@ -35,30 +34,30 @@ abstract class Range extends Base {
     /**
      * @return array
      */
-    public function asArray()
+    public function asArray(): array
     {
-        return array(
-            'from'  =>  $this->getFrom(),
-            'to'    =>  $this->getTo(),
-        );
+        return [
+            'from' => $this->getFrom(),
+            'to'   => $this->getTo(),
+        ];
     }
 
-    public function getFrom()
+    public function getFrom(): ?int
     {
         return $this->_from;
     }
 
-    public function setFrom($value)
+    public function setFrom(?int $value)
     {
         $this->_from = $value;
     }
 
-    public function getTo()
+    public function getTo(): ?int
     {
         return $this->_to;
     }
 
-    public function setTo($value)
+    public function setTo(?int $value)
     {
         $this->_to = $value;
     }
@@ -67,42 +66,47 @@ abstract class Range extends Base {
      * Returns TRUE if filter was previously selected (optional filtering via key)
      *
      * @param string|int|null $value
+     *
      * @return bool
      */
-    public function isSelected($value = null)
+    public function isSelected($value = null): bool
     {
         $from = $this->getFrom();
         $to   = $this->getTo();
 
         if ($value === null) {
-            return !($to === null AND $from === null);
-        } elseif ($from AND $value < $from) {
-            return false;
-        } elseif ($to AND $value > $to) {
-            return false;
-        } else {
-            return true;
+            return !($to === null && $from === null);
         }
+
+        if ($from && $value < $from) {
+            return false;
+        }
+
+        if ($to && $value > $to) {
+            return false;
+        }
+
+        // Value is in range
+        return true;
     }
 
-    public function setUrlQueryValues(array $values)
+    public function setUrlQueryValues(array $values): void
     {
-        if (count($values) != 2)
+        if (count($values) !== 2) {
             throw new Exception('Range filter accepts only two values: "from,to"');
+        }
 
-        $from   = $values[0];
-        $to     = $values[1];
+        list($from, $to) = $values;
 
-        $this->setFrom($from);
-        $this->setTo($to);
+        $this->setFrom((int)$from);
+        $this->setTo((int)$to);
     }
 
-    public function getUrlQueryValues()
+    public function getUrlQueryValues(): array
     {
         return [
             $this->getFrom(),
-            $this->getTo()
+            $this->getTo(),
         ];
     }
-
 }
