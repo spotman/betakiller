@@ -65,7 +65,7 @@ else
 		</tr>
 		<tr>
 			<th>System Directory</th>
-			<?php if (is_dir(SYSPATH) AND is_file(SYSPATH.'classes/Kohana'.EXT)): ?>
+			<?php if (is_dir(SYSPATH) && is_file(SYSPATH.'classes/Kohana'.EXT)): ?>
 				<td class="pass"><?php echo SYSPATH ?></td>
 			<?php else: $failed = TRUE ?>
 				<td class="fail">The configured <code>system</code> directory does not exist or does not contain required files.</td>
@@ -73,7 +73,7 @@ else
 		</tr>
 		<tr>
 			<th>Application Directory</th>
-			<?php if (is_dir(APPPATH) AND is_file(APPPATH.'bootstrap'.EXT)): ?>
+			<?php if (is_dir(APPPATH) && is_file(APPPATH.'bootstrap'.EXT)): ?>
 				<td class="pass"><?php echo APPPATH ?></td>
 			<?php else: $failed = TRUE ?>
 				<td class="fail">The configured <code>application</code> directory does not exist or does not contain required files.</td>
@@ -81,7 +81,7 @@ else
 		</tr>
 		<tr>
 			<th>Cache Directory</th>
-			<?php if (is_dir(APPPATH) AND is_dir(APPPATH.'cache') AND is_writable(APPPATH.'cache')): ?>
+			<?php if (is_dir(APPPATH) && is_dir(APPPATH.'cache') && is_writable(APPPATH.'cache')): ?>
 				<td class="pass"><?php echo APPPATH.'cache/' ?></td>
 			<?php else: $failed = TRUE ?>
 				<td class="fail">The <code><?php echo APPPATH.'cache/' ?></code> directory is not writable.</td>
@@ -89,7 +89,7 @@ else
 		</tr>
 		<tr>
 			<th>Logs Directory</th>
-			<?php if (is_dir(APPPATH) AND is_dir(APPPATH.'logs') AND is_writable(APPPATH.'logs')): ?>
+			<?php if (is_dir(APPPATH) && is_dir(APPPATH.'logs') && is_writable(APPPATH.'logs')): ?>
 				<td class="pass"><?php echo APPPATH.'logs/' ?></td>
 			<?php else: $failed = TRUE ?>
 				<td class="fail">The <code><?php echo APPPATH.'logs/' ?></code> directory is not writable.</td>
