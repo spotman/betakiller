@@ -9,14 +9,14 @@
 namespace BetaKiller\URL\QueryConverter;
 
 
-interface ConvertibleItem
+interface ConvertibleItemInterface
 {
     /**
      * Returns item`s string key for url query part
      *
      * @return string
      */
-    public function getUrlQueryKey();
+    public function getUrlQueryKey(): string;
 
     /**
      * Returns item`s scalar value (string, int, float) or array of values for using in url query part value
@@ -43,5 +43,5 @@ interface ConvertibleItem
      * Returns true if current item is usable for url converting
      * @return bool
      */
-    public function isUrlConversionAllowed();
+    public function isUrlConversionAllowed(): bool;
 }

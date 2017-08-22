@@ -40,7 +40,7 @@ trait ConvertibleHelper
     }
 
     /**
-     * @return Convertible
+     * @return ConvertibleInterface
      */
     abstract protected function getUrlQueryConverterConvertible();
 

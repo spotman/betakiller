@@ -3,11 +3,11 @@ namespace BetaKiller\Filter;
 
 use BetaKiller\Filter\Model\ApplicableInterface;
 use BetaKiller\URL\QueryConverter;
-use BetaKiller\URL\QueryConverter\Convertible;
+use BetaKiller\URL\QueryConverter\ConvertibleInterface;
 use BetaKiller\Utils;
 use Traversable;
 
-abstract class Registry implements \IteratorAggregate, QueryConverter\Convertible
+abstract class Registry implements \IteratorAggregate, QueryConverter\ConvertibleInterface
 {
     use Utils\Instance\Simple,
         QueryConverter\ConvertibleHelper;
@@ -139,9 +139,9 @@ abstract class Registry implements \IteratorAggregate, QueryConverter\Convertibl
 
     /**
      * @param string $key
-     * @return QueryConverter\ConvertibleItem
+     * @return QueryConverter\ConvertibleItemInterface
      */
-    public function getItemByQueryKey($key)
+    public function getItemByQueryKey(string $key)
     {
         $codename = ucfirst($key);
         return $this->get($codename);
@@ -199,7 +199,7 @@ abstract class Registry implements \IteratorAggregate, QueryConverter\Convertibl
     }
 
     /**
-     * @return Convertible
+     * @return ConvertibleInterface
      */
     protected function getUrlQueryConverterConvertible()
     {

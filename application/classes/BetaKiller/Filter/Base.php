@@ -200,7 +200,7 @@ abstract class Base implements FilterInterface
         return false;
     }
 
-    public function getUrlQueryKey()
+    public function getUrlQueryKey(): string
     {
         return lcfirst($this->getCodename());
     }
@@ -215,7 +215,7 @@ abstract class Base implements FilterInterface
      *
      * @return bool
      */
-    public function isUrlConversionAllowed()
+    public function isUrlConversionAllowed(): bool
     {
         // Is convertible by default
         return true;

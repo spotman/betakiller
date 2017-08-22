@@ -2,9 +2,9 @@
 namespace BetaKiller\Filter;
 
 use BetaKiller\Filter\Model\ApplicableInterface;
-use BetaKiller\URL\QueryConverter\ConvertibleItem;
+use BetaKiller\URL\QueryConverter\ConvertibleItemInterface;
 
-interface FilterInterface extends ConvertibleItem
+interface FilterInterface extends ConvertibleItemInterface
 {
     /**
      * Set up internal data from array

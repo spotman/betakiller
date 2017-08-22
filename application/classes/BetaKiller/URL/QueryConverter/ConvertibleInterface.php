@@ -8,21 +8,22 @@ namespace BetaKiller\URL\QueryConverter;
  * Time: 15:45
  */
 
-interface Convertible extends \IteratorAggregate
+interface ConvertibleInterface extends \IteratorAggregate
 {
     /**
      * @param string $key
-     * @return ConvertibleItem
+     *
+     * @return ConvertibleItemInterface
      */
-    public function getItemByQueryKey($key);
+    public function getItemByQueryKey(string $key): ConvertibleItemInterface;
 
     /**
      * @return string
      */
-    public function getUrlQueryKeysNamespace();
+    public function getUrlQueryKeysNamespace(): string;
 
     /**
-     * Retrieve an external iterator for set of ConvertibleItem`s
+     * Retrieve an external iterator for set of ConvertibleItemInterface`s
      *
      * @link http://php.net/manual/en/iteratoraggregate.getiterator.php
      * @return \Traversable An instance of an object implementing <b>Iterator</b> or

@@ -7,12 +7,12 @@ use BetaKiller\Search;
 use BetaKiller\Search\Provider;
 use BetaKiller\Search\Provider\Parameterized\Parameter;
 use BetaKiller\URL\QueryConverter;
-use BetaKiller\URL\QueryConverter\Convertible;
-use BetaKiller\URL\QueryConverter\ConvertibleItem;
+use BetaKiller\URL\QueryConverter\ConvertibleInterface;
+use BetaKiller\URL\QueryConverter\ConvertibleItemInterface;
 use BetaKiller\Utils;
 use Traversable;
 
-abstract class Registry implements \IteratorAggregate, QueryConverter\Convertible
+abstract class Registry implements \IteratorAggregate, QueryConverter\ConvertibleInterface
 {
     use Utils\Instance\Simple,
         QueryConverter\ConvertibleHelper;
@@ -212,9 +212,10 @@ abstract class Registry implements \IteratorAggregate, QueryConverter\Convertibl
 
     /**
      * @param string $key
-     * @return ConvertibleItem
+     *
+     * @return ConvertibleItemInterface
      */
-    public function getItemByQueryKey($key)
+    public function getItemByQueryKey(string $key)
     {
         $codename = ucfirst($key);
         return $this->getParameter($codename);
@@ -255,7 +256,7 @@ abstract class Registry implements \IteratorAggregate, QueryConverter\Convertibl
     }
 
     /**
-     * @return Convertible
+     * @return ConvertibleInterface
      */
     protected function getUrlQueryConverterConvertible()
     {

@@ -5,7 +5,7 @@ use BetaKiller\Filter;
 use BetaKiller\Search;
 use BetaKiller\URL\QueryConverter;
 
-interface Parameter extends QueryConverter\ConvertibleItem
+interface Parameter extends QueryConverter\ConvertibleItemInterface
 {
     /**
      * Set up internal data from array

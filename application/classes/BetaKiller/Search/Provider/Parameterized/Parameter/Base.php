@@ -158,7 +158,7 @@ abstract class Base implements Parameter
         return $this->getFilter()->isSelected($value);
     }
 
-    public function getUrlQueryKey()
+    public function getUrlQueryKey(): string
     {
         return $this->getFilter()->getUrlQueryKey();
     }
