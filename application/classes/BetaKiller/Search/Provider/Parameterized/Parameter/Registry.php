@@ -5,7 +5,7 @@ use BetaKiller\Filter\Model\ValuesGroup;
 use BetaKiller\Model\User;
 use BetaKiller\Search;
 use BetaKiller\Search\Provider;
-use BetaKiller\Search\Provider\Parameterized\Parameter;
+use BetaKiller\Search\Provider\Parameterized\ParameterInterface;
 use BetaKiller\URL\QueryConverter;
 use BetaKiller\URL\QueryConverter\ConvertibleInterface;
 use BetaKiller\URL\QueryConverter\ConvertibleItemInterface;
@@ -74,7 +74,8 @@ abstract class Registry implements \IteratorAggregate, QueryConverter\Convertibl
 
     /**
      * @param $codename
-     * @return Provider\Parameterized\Parameter
+     *
+     * @return Provider\Parameterized\ParameterInterface
      * @throws Utils\Registry\Exception
      */
     public function getParameter($codename)
@@ -90,7 +91,7 @@ abstract class Registry implements \IteratorAggregate, QueryConverter\Convertibl
     }
 
     /**
-     * @return Provider\Parameterized\Parameter[]
+     * @return Provider\Parameterized\ParameterInterface[]
      */
     protected function getParameters()
     {
@@ -187,11 +188,11 @@ abstract class Registry implements \IteratorAggregate, QueryConverter\Convertibl
     }
 
     /**
-     * @param \BetaKiller\Search\Provider\Parameterized\Parameter $param
-     * @param ValuesGroup[]                                       $groups
-     * @param string                                              $nsSeparator
+     * @param \BetaKiller\Search\Provider\Parameterized\ParameterInterface $param
+     * @param ValuesGroup[]                                                $groups
+     * @param string                                                       $nsSeparator
      */
-    protected function presetParametersValuesGroupsCodename(Parameter $param, array $groups, $nsSeparator = '-')
+    protected function presetParametersValuesGroupsCodename(ParameterInterface $param, array $groups, $nsSeparator = '-')
     {
         $ns = $this->getUrlQueryKeysNamespace();
         $codename = $param->getUrlQueryKey();
@@ -225,7 +226,7 @@ abstract class Registry implements \IteratorAggregate, QueryConverter\Convertibl
      * Retrieve an external iterator
      *
      * @link  http://php.net/manual/en/iteratoraggregate.getiterator.php
-     * @return Traversable|Parameter[] An instance of an object implementing <b>Iterator</b> or
+     * @return Traversable|ParameterInterface[] An instance of an object implementing <b>Iterator</b> or
      *        <b>Traversable</b>
      * @since 5.0.0
      */

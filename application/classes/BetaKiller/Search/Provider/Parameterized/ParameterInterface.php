@@ -1,16 +1,17 @@
 <?php
 namespace BetaKiller\Search\Provider\Parameterized;
 
-use BetaKiller\Filter;
-use BetaKiller\Search;
-use BetaKiller\URL\QueryConverter;
+use BetaKiller\Filter\Model\Value;
+use BetaKiller\Search\ApplicableModelInterface;
+use BetaKiller\URL\QueryConverter\ConvertibleItemInterface;
 
-interface Parameter extends QueryConverter\ConvertibleItemInterface
+interface ParameterInterface extends ConvertibleItemInterface
 {
     /**
      * Set up internal data from array
      *
      * @param array $data
+     *
      * @return $this
      */
     public function fromArray(array $data);
@@ -20,53 +21,55 @@ interface Parameter extends QueryConverter\ConvertibleItemInterface
      *
      * @return array
      */
-    public function asArray();
+    public function asArray(): array;
 
     /**
      * @return string
      */
-    public function getCodename();
+    public function getCodename(): string;
 
     /**
      * Applies current filters to model
      *
      * @param \BetaKiller\Search\ApplicableModelInterface $model
      */
-    public function apply(Search\ApplicableModelInterface $model);
+    public function apply(ApplicableModelInterface $model): void;
 
     /**
      * Returns array of values groups (optional filtering by value for autocomplete)
      *
      * @param string|null $filterHaving
+     *
      * @return \BetaKiller\Filter\Model\ValuesGroup[]
      */
-    public function getAvailableValues($filterHaving = null);
+    public function getAvailableValues($filterHaving = null): array;
 
     /**
      * @param string|null $filterHaving
-     * @param bool        $filterSelected
+     * @param bool|null   $filterSelected
+     *
      * @return \BetaKiller\Filter\Model\Value
      */
-    public function getRandomAvailableValue($filterHaving = null, $filterSelected = false);
+    public function getRandomAvailableValue($filterHaving = null, ?bool $filterSelected = null): ?Value;
 
     /**
      * Returns array of selected values groups
      *
-     * @return Filter\Model\ValuesGroup[]
+     * @return \BetaKiller\Filter\Model\ValuesGroup[]
      */
-    public function getSelectedValues();
+    public function getSelectedValues(): array;
 
     /**
      * Returns true if parameter`s values population is enabled
      *
      * @return bool
      */
-    public function isValuesPopulationAllowed();
+    public function isValuesPopulationAllowed(): bool;
 
     /**
      * Returns true if parameter was previously selected (optional filtering via key)
      *
      * @return bool
      */
-    public function isSelected();
+    public function isSelected(): bool;
 }

@@ -4,21 +4,21 @@ namespace BetaKiller\Filter;
 use BetaKiller\Filter;
 use BetaKiller\Filter\Model\Value;
 use BetaKiller\Filter\Model\ValuesGroup;
-use BetaKiller\Model\User;
+use BetaKiller\Model\UserInterface;
 
-abstract class Base implements FilterInterface
+abstract class AbstractFilter implements FilterInterface
 {
     /**
-     * @var User
+     * @var UserInterface
      */
     protected $_user;
 
     /**
-     * Base constructor.
+     * AbstractFilter constructor.
      *
-     * @param \BetaKiller\Model\User $_user
+     * @param \BetaKiller\Model\UserInterface $_user
      */
-    public function __construct(User $_user = null)
+    public function __construct(UserInterface $_user = null)
     {
         $this->_user = $_user;
     }
@@ -26,7 +26,7 @@ abstract class Base implements FilterInterface
     /**
      * @return string
      */
-    public function getCodename()
+    public function getCodename(): string
     {
         return (new \ReflectionClass($this))->getShortName();
     }
@@ -37,19 +37,20 @@ abstract class Base implements FilterInterface
     }
 
     /**
-     * @param string    $label
-     * @param Value[]   $values
+     * @param string  $label
+     * @param Value[] $values
+     *
      * @return Filter\Model\ValuesGroup
      */
-    protected function availableValuesGroupFactory($label, array $values)
+    protected function availableValuesGroupFactory($label, array $values): ValuesGroup
     {
         return ValuesGroup::factory($label, $values);
     }
 
     /**
-     * @return User
+     * @return UserInterface
      */
-    public function getUser()
+    public function getUser(): UserInterface
     {
         return $this->_user;
     }
@@ -58,9 +59,10 @@ abstract class Base implements FilterInterface
      * Returns array of values or grouped values
      *
      * @param string|null $filterHaving
+     *
      * @return \BetaKiller\Filter\Model\ValuesGroup[]
      */
-    public function getAvailableValues($filterHaving = null)
+    public function getAvailableValues($filterHaving = null): array
     {
         if (!$this->isValuesPopulationAllowed()) {
             return [];
@@ -74,9 +76,10 @@ abstract class Base implements FilterInterface
     /**
      * @param null $filterHaving
      * @param bool $filterSelected
+     *
      * @return \BetaKiller\Filter\Model\Value|null
      */
-    public function getRandomAvailableValue($filterHaving = null, $filterSelected = false)
+    public function getRandomAvailableValue($filterHaving = null, ?bool $filterSelected = null): Value
     {
         $valuesGroups = $this->getAvailableValues($filterHaving);
 
@@ -108,13 +111,14 @@ abstract class Base implements FilterInterface
 
         if ($this->hasGroupedValues()) {
             return $this->wrapGroupedValues($pairs);
-        } else {
-            // Force wrapping into ValuesGroup with null label
-            $values = $this->wrapValuesPairs($pairs);
-            return [
-                $this->availableValuesGroupFactory(null, $values)
-            ];
         }
+
+        // Force wrapping into ValuesGroup with null label
+        $values = $this->wrapValuesPairs($pairs);
+
+        return [
+            $this->availableValuesGroupFactory(null, $values),
+        ];
     }
 
     private function wrapValuesPairs(array $pairs)
@@ -146,16 +150,17 @@ abstract class Base implements FilterInterface
      * Returns array of values with structure like <key> => <label>
      *
      * @param string|null $filterHaving
+     *
      * @return array
      */
-    abstract protected function getAvailableValuesPairs($filterHaving = null);
+    abstract protected function getAvailableValuesPairs($filterHaving = null): array;
 
     /**
      * Returns array of selected values groups
      *
      * @return Filter\Model\ValuesGroup[]
      */
-    public function getSelectedValues()
+    public function getSelectedValues(): array
     {
         // Skip empty filters
         if (!$this->isSelected()) {
@@ -174,16 +179,16 @@ abstract class Base implements FilterInterface
     /**
      * Returns array of values with structure like <key> => <label>
      *
-     * @return array
+     * @return string[]
      */
-    abstract protected function getSelectedValuesPairs();
+    abstract protected function getSelectedValuesPairs(): array;
 
     /**
      * Returns true if filter`s values population is enabled
      *
      * @return bool
      */
-    public function isValuesPopulationAllowed()
+    public function isValuesPopulationAllowed(): bool
     {
         // Enabled by default
         return true;
@@ -194,7 +199,7 @@ abstract class Base implements FilterInterface
      *
      * @return bool
      */
-    public function hasGroupedValues()
+    public function hasGroupedValues(): bool
     {
         // No grouped values by default
         return false;
@@ -205,7 +210,7 @@ abstract class Base implements FilterInterface
         return lcfirst($this->getCodename());
     }
 
-    public function setUrlQueryKey($value)
+    public function setUrlQueryKey($value): void
     {
         // Empty, codename is given from class name automatically
     }
@@ -220,5 +225,4 @@ abstract class Base implements FilterInterface
         // Is convertible by default
         return true;
     }
-
 }

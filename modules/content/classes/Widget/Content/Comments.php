@@ -101,7 +101,7 @@ class Widget_Content_Comments extends AbstractBaseWidget
             ->rule('csrf-key', [Security::class, 'check']);
 
         if (!$validation->check()) {
-            $errors = $this->get_validation_errors($validation);
+            $errors = $this->getValidationErrors($validation);
             $this->send_error_json($errors);
 
             return;
@@ -187,7 +187,7 @@ class Widget_Content_Comments extends AbstractBaseWidget
 
             $this->send_success_json();
         } catch (ORM_Validation_Exception $e) {
-            $errors = $this->get_validation_errors($model->validation());
+            $errors = $this->getValidationErrors($model->validation());
 
             $this->send_error_json(array_pop($errors));
         }

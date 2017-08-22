@@ -1,13 +1,14 @@
 <?php
 namespace BetaKiller\Search\Provider\Parameterized\Parameter;
 
-use BetaKiller\Filter\Factory;
+use BetaKiller\Filter\FilterFactory;
 use BetaKiller\Filter\FilterInterface;
+use BetaKiller\Filter\Model\Value;
 use BetaKiller\Model\UserInterface;
-use BetaKiller\Search;
-use BetaKiller\Search\Provider\Parameterized\Parameter;
+use BetaKiller\Search\ApplicableModelInterface;
+use BetaKiller\Search\Provider\Parameterized\ParameterInterface;
 
-abstract class Base implements Parameter
+abstract class AbstractParameter implements ParameterInterface
 {
     /**
      * @var \BetaKiller\Model\User
@@ -15,7 +16,7 @@ abstract class Base implements Parameter
     protected $_user;
 
     /**
-     * @var \BetaKiller\Filter\Factory
+     * @var \BetaKiller\Filter\FilterFactory
      */
     protected $_filterFactory;
 
@@ -25,27 +26,27 @@ abstract class Base implements Parameter
     protected $_filterInstance;
 
     /**
-     * Parameter constructor.
+     * ParameterInterface constructor.
      *
      * @param \BetaKiller\Model\UserInterface $_user
      */
-    public function __construct(UserInterface $_user = NULL)
+    public function __construct(UserInterface $_user = null)
     {
         $this->_user = $_user;
     }
 
     /**
-     * @return \BetaKiller\Filter\Factory
+     * @return \BetaKiller\Filter\FilterFactory
      */
-    public function getFilterFactory()
+    public function getFilterFactory(): FilterFactory
     {
         return $this->_filterFactory;
     }
 
     /**
-     * @param \BetaKiller\Filter\Factory $filterFactory
+     * @param \BetaKiller\Filter\FilterFactory $filterFactory
      */
-    public function setFilterFactory(Factory $filterFactory)
+    public function setFilterFactory(FilterFactory $filterFactory)
     {
         $this->_filterFactory = $filterFactory;
     }
@@ -53,7 +54,7 @@ abstract class Base implements Parameter
     /**
      * @return string
      */
-    public function getCodename()
+    public function getCodename(): string
     {
         return (new \ReflectionClass($this))->getShortName();
     }
@@ -63,7 +64,7 @@ abstract class Base implements Parameter
      *
      * @return array
      */
-    public function asArray()
+    public function asArray(): array
     {
         return $this->getFilter()->asArray();
     }
@@ -72,9 +73,10 @@ abstract class Base implements Parameter
      * Set up internal data from array
      *
      * @param array $data
-     * @return $this
+     *
+     * @return ParameterInterface
      */
-    public function fromArray(array $data)
+    public function fromArray(array $data): ParameterInterface
     {
         $this->getFilter()->fromArray($data);
 
@@ -86,7 +88,7 @@ abstract class Base implements Parameter
      *
      * @param \BetaKiller\Search\ApplicableModelInterface $model
      */
-    public function apply(Search\ApplicableModelInterface $model)
+    public function apply(ApplicableModelInterface $model): void
     {
         $this->getFilter()->apply($model);
     }
@@ -95,10 +97,11 @@ abstract class Base implements Parameter
      * Returns array of values or values groups
      *
      * @param string|null $filterHaving
+     *
      * @return \BetaKiller\Filter\Model\ValuesGroup[]
      * @throws \BetaKiller\Search\Provider\Parameterized\Parameter\Exception
      */
-    public function getAvailableValues($filterHaving = null)
+    public function getAvailableValues($filterHaving = null): array
     {
         if (!$this->isValuesPopulationAllowed()) {
             return [];
@@ -109,11 +112,12 @@ abstract class Base implements Parameter
 
     /**
      * @param string|null $filterHaving
-     * @param bool        $filterSelected
+     * @param bool|null   $filterSelected
+     *
      * @return \BetaKiller\Filter\Model\Value|null
      * @throws \BetaKiller\Search\Provider\Parameterized\Parameter\Exception
      */
-    public function getRandomAvailableValue($filterHaving = null, $filterSelected = false)
+    public function getRandomAvailableValue($filterHaving = null, ?bool $filterSelected = null): ?Value
     {
         if (!$this->isValuesPopulationAllowed()) {
             return null;
@@ -127,7 +131,7 @@ abstract class Base implements Parameter
      *
      * @return \BetaKiller\Filter\Model\ValuesGroup[]
      */
-    public function getSelectedValues()
+    public function getSelectedValues(): array
     {
         if (!$this->isValuesPopulationAllowed()) {
             return [];
@@ -141,7 +145,7 @@ abstract class Base implements Parameter
      *
      * @return bool
      */
-    public function isValuesPopulationAllowed()
+    public function isValuesPopulationAllowed(): bool
     {
         return $this->getFilter()->isValuesPopulationAllowed();
     }
@@ -150,10 +154,11 @@ abstract class Base implements Parameter
      * Returns true if parameter was previously selected (optional filtering via key)
      *
      * @param mixed|null $value
+     *
      * @return bool
      * @throws \BetaKiller\Search\Provider\Parameterized\Parameter\Exception
      */
-    public function isSelected($value = null)
+    public function isSelected($value = null): bool
     {
         return $this->getFilter()->isSelected($value);
     }
@@ -163,7 +168,7 @@ abstract class Base implements Parameter
         return $this->getFilter()->getUrlQueryKey();
     }
 
-    public function setUrlQueryKey($value)
+    public function setUrlQueryKey($value): void
     {
         // Empty, codename is given from class name
     }
@@ -173,22 +178,22 @@ abstract class Base implements Parameter
         return $this->getFilter()->getUrlQueryValues();
     }
 
-    public function setUrlQueryValues(array $values)
+    public function setUrlQueryValues(array $values): void
     {
         $this->getFilter()->setUrlQueryValues($values);
     }
 
     /**
-     * @return \BetaKiller\Filter\Base|\BetaKiller\Filter\FilterInterface
+     * @return \BetaKiller\Filter\AbstractFilter|\BetaKiller\Filter\FilterInterface
      * @throws \BetaKiller\Search\Provider\Parameterized\Parameter\Exception
      */
-    protected function getFilter()
+    protected function getFilter(): FilterInterface
     {
         if (!$this->_filterInstance) {
             $factory = $this->getFilterFactory();
 
             if (!$factory) {
-                throw new Parameter\Exception('Set filter factory instance first');
+                throw new Exception('Set filter factory instance first');
             }
 
             $codename              = $this->getFilterCodename();

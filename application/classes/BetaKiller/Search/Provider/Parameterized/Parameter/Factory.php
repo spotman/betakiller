@@ -13,7 +13,7 @@ abstract class Factory {
      * @param string     $name
      * @param Model\User $user
      *
-     * @return \BetaKiller\Search\Provider\Parameterized\Parameter
+     * @return \BetaKiller\Search\Provider\Parameterized\ParameterInterface
      */
     public function create($name, Model\User $user = NULL)
     {
@@ -24,7 +24,7 @@ abstract class Factory {
      * @param string     $class_name
      * @param Model\User $user
      *
-     * @return \BetaKiller\Search\Provider\Parameterized\Parameter
+     * @return \BetaKiller\Search\Provider\Parameterized\ParameterInterface
      */
     protected function make_instance($class_name, Model\User $user = NULL)
     {

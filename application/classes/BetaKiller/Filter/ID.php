@@ -1,7 +1,7 @@
 <?php
 namespace BetaKiller\Filter;
 
-abstract class ID extends Base {
+abstract class ID extends AbstractFilter {
 
     protected $_id = null;
 

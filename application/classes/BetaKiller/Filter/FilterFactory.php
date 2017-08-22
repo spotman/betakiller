@@ -2,9 +2,9 @@
 namespace BetaKiller\Filter;
 
 use BetaKiller\Model\User;
-use \BetaKiller\Utils;
+use BetaKiller\Utils;
 
-class Factory
+class FilterFactory
 {
     use Utils\Factory\Namespaced,
         Utils\Instance\Simple;
@@ -15,9 +15,9 @@ class Factory
      * @param                             $name
      * @param \BetaKiller\Model\User|null $user
      *
-     * @return mixed|\BetaKiller\Filter\Base
+     * @return mixed|\BetaKiller\Filter\FilterInterface
      */
-    public function create($name, User $user = null)
+    public function create($name, User $user = null): FilterInterface
     {
         return $this->_create($name, $user);
     }

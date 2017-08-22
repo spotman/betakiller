@@ -1,7 +1,7 @@
 <?php
 namespace BetaKiller\Filter;
 
-abstract class Value extends Base {
+abstract class Value extends AbstractFilter {
 
     protected $_value = NULL;
 

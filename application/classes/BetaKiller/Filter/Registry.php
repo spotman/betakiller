@@ -18,14 +18,14 @@ abstract class Registry implements \IteratorAggregate, QueryConverter\Convertibl
     protected $_registry;
 
     /**
-     * @var Factory
+     * @var FilterFactory
      */
     protected $_filterFactory;
 
     /**
-     * @param Factory $filterFactory
+     * @param FilterFactory $filterFactory
      */
-    public function setFilterFactory(Factory $filterFactory)
+    public function setFilterFactory(FilterFactory $filterFactory)
     {
         $this->_filterFactory = $filterFactory;
     }
@@ -33,7 +33,7 @@ abstract class Registry implements \IteratorAggregate, QueryConverter\Convertibl
     /**
      * Returns current filter factory instance
      *
-     * @return Factory
+     * @return FilterFactory
      */
     protected function getFilterFactory()
     {
@@ -48,11 +48,11 @@ abstract class Registry implements \IteratorAggregate, QueryConverter\Convertibl
     /**
      * Returns default filter factory instance
      *
-     * @return Factory
+     * @return FilterFactory
      */
     protected function getDefaultFilterFactory()
     {
-        return Factory::instance();
+        return FilterFactory::instance();
     }
 
     /**

@@ -1,7 +1,7 @@
 <?php
 namespace BetaKiller\Filter;
 
-abstract class Range extends Base
+abstract class Range extends AbstractFilter
 {
     /**
      * @var int|null
