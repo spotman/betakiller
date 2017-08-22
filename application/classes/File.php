@@ -16,15 +16,15 @@ class File extends Kohana_File {
 	{
 		if (is_dir($dir_name))
 		{
-			$objects = scandir($dir_name);
+			$objects = scandir($dir_name, SORT_ASC);
 
 			foreach ($objects as $object)
 			{
-				if ($object != '.' AND $object != '..')
+				if ($object !== '.' && $object !== '..')
 				{
 					$object_inside = $dir_name . DIRECTORY_SEPARATOR . $object;
 
-					if (filetype($object_inside) == 'dir')
+					if (filetype($object_inside) === 'dir')
 					{
 
 						self::rmdir($object_inside);

@@ -161,7 +161,7 @@ class I18n extends Kohana_I18n
         $content = static::make_content(array_merge($data, $current_app_lang_data));
 
         // backup old file - if the file size is different.
-        if (file_exists($full_file_path) AND (filesize($full_file_path) != strlen($content))) {
+        if (file_exists($full_file_path) && (filesize($full_file_path) != strlen($content))) {
             // Backing up current config
             $old_content = file_get_contents($full_file_path);
             $backup_name = $save_path.static::$lang.'_'.date('Y_m_d__H_i_s').'.php';

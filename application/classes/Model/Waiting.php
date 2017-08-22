@@ -72,7 +72,7 @@ class Model_Waiting extends ORM {
             ->where('email', '=', $this->get('email'))
             ->find();
 
-        return ($duplicate->loaded() AND $duplicate->pk());
+        return ($duplicate->loaded() && $duplicate->pk());
     }
 
 }

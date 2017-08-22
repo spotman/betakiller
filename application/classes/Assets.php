@@ -77,7 +77,7 @@ class Assets {
     protected function process_static($object, $method_name, $files)
     {
         // Search for specific method in object
-        if ( $files === TRUE AND method_exists($object, $method_name) )
+        if ( $files === TRUE && method_exists($object, $method_name) )
         {
             $object->$method_name();
         }
