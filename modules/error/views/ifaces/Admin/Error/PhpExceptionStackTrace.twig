@@ -4,6 +4,6 @@
   {% if trace %}
     {{ trace|raw }}
   {% else %}
-    Файл стектрейса отсутствует
+    <h1 style="color:red">Stacktrace file is missing!</h1>
   {% endif %}
 {% endblock %}

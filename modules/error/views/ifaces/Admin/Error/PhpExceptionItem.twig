@@ -3,32 +3,35 @@
 {% set status_icon = { new: "assignment_late", repeated: "repeat", resolved: "assignment_ind", ignored: "not_interested" } %}
 
 {% block page_content %}
+
+  {{ js("require.js/error.requirejs.config.js") }}
+
   <div class="row">
     <div class="col s12">
       <a class="btn left" href="{{ backUrl }}">
         <i class="material-icons left">view_list</i>
-        К списку
+        Return to list
       </a>
 
       <div class="right right-align">
         {% if not isResolved %}
-          <button class="btn green resolve-error-button" data-hash="{{ hash }}" data-done-text="Исправлена"
-                  data-done-icon="done" title="Исправлена">
+          <button class="btn green resolve-error-button" data-hash="{{ hash }}" data-done-text="Fixed"
+                  data-done-icon="done" title="Fixed">
             <i class="icon material-icons">done</i>
             {#<span class="text"></span>#}
           </button>
         {% endif %}
 
         {% if not isIgnored %}
-          <button class="btn orange ignore-error-button" data-hash="{{ hash }}" data-done-text="В игноре"
-                  data-done-icon="done" title="Игнорировать">
+          <button class="btn orange ignore-error-button" data-hash="{{ hash }}" data-done-text="Ignored"
+                  data-done-icon="done" title="Ignore">
             <i class="icon material-icons">not_interested</i>
             {#<span class="text"></span>#}
           </button>
         {% endif %}
 
-        <button class="btn red delete-error-button" data-hash="{{ hash }}" data-done-text="Удалена"
-                data-done-icon="done" title="Удалить">
+        <button class="btn red delete-error-button" data-hash="{{ hash }}" data-done-text="Deleted"
+                data-done-icon="done" title="Delete">
           <i class="icon material-icons">delete</i>
           {#<span class="text"></span>#}
         </button>
@@ -39,55 +42,60 @@
 
   <div class="row">
     <div class="col s12">
-      Последний раз ошибка встречается <span class="orange chip">{{ lastSeenAt }}</span> (всего {{ counter }} раз)&nbsp;
+      Last seen at <span class="orange chip">{{ lastSeenAt }}</span> (total {{ counter }} times)&nbsp;
 
       {% if modules|length %}
-        в модулях: &nbsp;
+        in modules: &nbsp;
         {% for module in modules %}
           <span class="chip">{{ module }}</span>
         {% endfor %}
       {% endif %}
     </div>
 
-    <div class="col s12 m4 l4 xl4">
-      по следующим адресам:
-      <ul class="collection">
-        {% for url in urls %}
-          <li class="collection-item"><a href="{{ url }}" target="_blank">{{ url }}</a></li>
-        {% endfor %}
-      </ul>
-    </div>
-
-    <div class="col s12 m4 l4 xl5">
-      в следующих файлах:<br/>
-
-      <ul class="collection">
-        {% for path in paths %}
-          <li class="collection-item truncate">{{ path }}</li>
-        {% endfor %}
-      </ul>
-    </div>
-
-    <div class="col s12 m4 l4 xl3">
-      История изменений:
-      <ul class="collection">
-        {% for item in history %}
-          <li class="collection-item">
-            <i class="material-icons left">{{ status_icon[item.status] }}</i>
-            <span class="badge">{{ item.user ?: "Guest" }}</span>
-            <span class="truncate">{{ item.time }}</span>
-          </li>
-        {% endfor %}
-      </ul>
-    </div>
-
     <div class="col s12">
-      {% if has_trace %}
-        <h3>Оригинальный стектрейс</h3>
-        <iframe src="{{ trace_url }}" width="100%" height="500px" frameborder="0"></iframe>
-      {% else %}
-        <div class="card-panel red">Файл стектрейса отсутствует</div>
-      {% endif %}
+
+      <ul class="collapsible" data-collapsible="expandable">
+        <li>
+          <div class="collapsible-header"><i class="material-icons">cloud</i>Urls</div>
+          <div class="collapsible-body">
+            <ul class="collection">
+              {% for url in urls %}
+                <li class="collection-item"><a href="{{ url }}" target="_blank">{{ url }}</a></li>
+              {% endfor %}
+            </ul>
+          </div>
+        </li>
+        <li>
+          <div class="collapsible-header"><i class="material-icons">folder</i>Paths</div>
+          <div class="collapsible-body">
+            <ul class="collection">
+              {% for path in paths %}
+                <li class="collection-item truncate">{{ path }}</li>
+              {% endfor %}
+            </ul>
+          </div>
+        </li>
+        <li>
+          <div class="collapsible-header"><i class="material-icons">history</i>History</div>
+          <div class="collapsible-body">
+            <ul class="collection">
+              {% for item in history %}
+                <li class="collection-item">
+                  <i class="material-icons left">{{ status_icon[item.status] }}</i>
+                  <span class="truncate">{{ item.user ?: "Guest" }}&nbsp;at&nbsp;{{ item.time }}</span>
+                </li>
+              {% endfor %}
+            </ul>
+          </div>
+        </li>
+        <li>
+          <div class="collapsible-header active"><i class="material-icons">info</i>Trace</div>
+          <div class="collapsible-body">
+            <iframe src="{{ trace_url }}" width="100%" class="trace-iframe" frameborder="0" scrolling="no"></iframe>
+          </div>
+        </li>
+      </ul>
+
     </div>
 
   </div>
@@ -96,13 +104,19 @@
 
     require([
       'jquery',
-      'error.api.rpc.definition'
+      'error.api.rpc.definition',
+      'materialize.collapsible',
+      'jquery.browser',
+      'jquery.iframe-auto-height'
     ], function ($, api) {
 
       $(function () {
         const $resolveButton = $('.resolve-error-button'),
             $ignoreButton = $('.ignore-error-button'),
-            $deleteButton = $('.delete-error-button');
+            $deleteButton = $('.delete-error-button'),
+            $traceIFrame = $('.trace-iframe');
+
+        $traceIFrame.iframeAutoHeight();
 
         function processActionButtonClick($button, apiMethod) {
           $button.attr('disabled', 'disabled');
