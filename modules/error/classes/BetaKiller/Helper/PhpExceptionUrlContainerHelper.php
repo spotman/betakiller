@@ -1,13 +1,15 @@
 <?php
 namespace BetaKiller\Helper;
 
+use BetaKiller\Model\PhpException;
+
 class PhpExceptionUrlContainerHelper extends UrlContainerHelper
 {
     /**
      * @return \BetaKiller\Model\PhpException|null
      */
-    public function getPhpException()
+    public function getPhpException(): ?PhpException
     {
-        return $this->getEntityByClassName(\BetaKiller\Model\PhpException::class);
+        return $this->getEntityByClassName(PhpException::class);
     }
 }

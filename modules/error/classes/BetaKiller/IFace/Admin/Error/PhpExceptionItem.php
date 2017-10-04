@@ -49,6 +49,8 @@ class PhpExceptionItem extends ErrorAdminBase
             return \Debug::path($path);
         }, $model->getPaths());
 
+        $traceIFace = $this->ifaceHelper->createIFaceFromCodename('Admin_Error_PhpExceptionStackTrace');
+
         return [
             'backUrl'    => $backIFace->url(),
             'hash'       => $model->getHash(),
@@ -60,7 +62,8 @@ class PhpExceptionItem extends ErrorAdminBase
             'isResolved' => $model->isResolved(),
             'isIgnored'  => $model->isIgnored(),
             'counter'    => $model->getCounter(),
-            'trace'      => $model->getTrace(),
+            'has_trace'  => $model->hasTrace(),
+            'trace_url'  => $traceIFace->url(),
             'history'    => $history,
         ];
     }

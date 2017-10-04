@@ -272,6 +272,13 @@ class PhpException extends \ORM implements PhpExceptionModelInterface
         return $this;
     }
 
+    public function hasTrace(): bool
+    {
+        $path = $this->getTraceFullPath();
+
+        return file_exists($path);
+    }
+
     /**
      * @return string
      */

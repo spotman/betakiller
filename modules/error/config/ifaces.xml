@@ -12,8 +12,10 @@
     <iface uri="errors" codename="Admin_Error_Index" parentCodename="Admin_Index" title="Admin | Errors" label="Errors" aclRules="Admin.enabled" zone="admin">
         <iface uri="php-exceptions" codename="Admin_Error_UnresolvedPhpExceptionIndex" title="Admin | Unresolved PhpExceptions" label="Unresolved" entity="PhpException" entityAction="listUnresolved" zone="admin">
             <iface uri="resolved" codename="Admin_Error_ResolvedPhpExceptionIndex" title="Admin | Resolved PhpExceptions" label="Resolved" entity="PhpException" entityAction="listResolved" zone="admin" />
-            <iface uri="{PhpException.hash}" codename="Admin_Error_PhpExceptionItem" title="{PhpException.message}" hasDynamicUrl="true" entity="PhpException" entityAction="read" zone="admin"/>
             <iface uri="test" codename="Admin_Error_PhpExceptionTest" title="Test" entity="PhpException" entityAction="test" zone="admin" />
+            <iface uri="{PhpException.hash}" codename="Admin_Error_PhpExceptionItem" title="{PhpException.message}" hasDynamicUrl="true" entity="PhpException" entityAction="read" zone="admin">
+                <iface uri="stacktrace" codename="Admin_Error_PhpExceptionStackTrace" title="Stacktrace" zone="admin" layoutCodename="raw" aclRules="Admin.enabled" />
+            </iface>
         </iface>
     </iface>
 </root>

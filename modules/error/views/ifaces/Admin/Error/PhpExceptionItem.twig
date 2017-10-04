@@ -82,9 +82,9 @@
     </div>
 
     <div class="col s12">
-      {% if trace %}
+      {% if has_trace %}
         <h3>Оригинальный стектрейс</h3>
-        {{ trace|raw }}
+        <iframe src="{{ trace_url }}" width="100%" height="500px" frameborder="0"></iframe>
       {% else %}
         <div class="card-panel red">Файл стектрейса отсутствует</div>
       {% endif %}
@@ -100,18 +100,18 @@
     ], function ($, api) {
 
       $(function () {
-        var $resolveButton = $('.resolve-error-button'),
+        const $resolveButton = $('.resolve-error-button'),
             $ignoreButton = $('.ignore-error-button'),
             $deleteButton = $('.delete-error-button');
 
         function processActionButtonClick($button, apiMethod) {
           $button.attr('disabled', 'disabled');
 
-          var hash = $button.data('hash');
+          const hash = $button.data('hash');
 
           apiMethod(hash)
             .done(function () {
-              var text = $button.data('done-text'),
+              const text = $button.data('done-text'),
                 icon = $button.data('done-icon');
 
               $button.find('.text').text(text);
