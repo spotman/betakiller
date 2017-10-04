@@ -11,8 +11,8 @@ require([
     var $transitionButtons = $(".transition-button");
     var $saveButton = $(".save-post-button");
 
+    var postID = $form.find('[name="id"]').val();
     var isUpdateAllowed = $form.data('update-allowed');
-
 
     var $category = $('#article-category');
     var $content = $('#article-content');
@@ -22,17 +22,12 @@ require([
     }
 
     if ($content.length) {
-
       var customTags = $content.data('custom-tags').split(',');
       var customTagsRules = $.map(customTags, function (tag) {
         return tag + "[*]"
       });
 
-      console.log('custom tags rules are', customTagsRules);
-
-      // TODO Fix editor
-
-      CKEDITOR.disableAutoInline = true;
+      //console.log('custom tags rules are', customTagsRules);
 
       $.each(customTags, function (index, name) {
         CKEDITOR.dtd[name] = {id: 1};
@@ -42,9 +37,45 @@ require([
         CKEDITOR.dtd.$inline[name] = 1;
       });
 
+      // TODO Move this to dedicated AMD module
       $content.ckeditor({
+        contentEntityName: 'ContentPost',
+        contentEntityItemID: postID,
         allowedContent: "p(*); strong; i; em; span{*}; table(*); thead; tbody; tr; th[style]; td{*}; ul(*); ol(*); li; a[href,title]; h2; h3; h4; " + customTagsRules.join(';')
       });
+
+      // TODO Fix editor toolbar position
+      //$.when($content.ckeditor().promise).then(function () {
+      //  var editor = $content.ckeditor().editor;
+      //
+      //  var $editor = $(editor.container.$),
+      //      $toolbar = $editor.find('.cke_top').first();
+      //
+      //  var toolbarWidth = $toolbar.outerWidth(),
+      //      toolbarHeight = $toolbar.outerHeight();
+      //
+      //  // Create placeholder for simpler toolbar manipulation
+      //  var $toolbarPlaceholder = $('<div>').css({
+      //    width: toolbarWidth + "px",
+      //    height: toolbarHeight + "px"
+      //  });
+      //
+      //  $toolbarPlaceholder.insertAfter($toolbar);
+      //
+      //  // Move toolbar to form
+      //  $form.css({position: "relative"}).append($toolbar);
+      //
+      //  $toolbar.css({
+      //    display: "block",
+      //    position: "absolute",
+      //    top: "60px",
+      //    left: 0,
+      //    zIndex: 1000,
+      //    width: toolbarWidth + "px",
+      //    height: toolbarHeight + "px"
+      //  });
+      //
+      //});
     }
 
     function savePost(doneCallback) {

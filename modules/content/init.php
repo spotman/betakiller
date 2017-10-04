@@ -1,4 +1,4 @@
-<?php defined('SYSPATH') OR die('No direct script access.');
+<?php
 
 Route::set('wp-content-bc', 'wp-content/<file>', ['file' => '[\S]+'])
     ->defaults(array(

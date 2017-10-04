@@ -23,14 +23,14 @@
         <input type="hidden" name="id" value="{{ post.id }}" />
           <div class="row">
               <div class="input-field col s12">
-                  <input type="text" name="label" id="article-label" placeholder="Post label" value="{{ post.label }}" {{ isUpdateAllowed ? "" : "disabled" }} />
+                  <input name="label" id="article-label" placeholder="Post label" value="{{ post.label }}" {{ isUpdateAllowed ? "" : "disabled" }} />
                   <label for="article-label">Label</label>
               </div>
           </div>
 
           <div class="row">
               <div class="input-field col s12">
-                  <input type="text" name="uri" id="article-uri" value="{{ post.uri }}" disabled />
+                  <input name="uri" id="article-uri" value="{{ post.uri }}" disabled />
                   <label for="article-uri">URI</label>
               </div>
           </div>
@@ -59,13 +59,17 @@
         <div class="row">
               <div class="input-field col s12">
                   {#<textarea name="content" id="article-content" rows="25" style="height: 100vh" {{ isUpdateAllowed ? "" : "disabled" }}>{{ post.content }}</textarea>#}
-                  <div id="article-content" data-custom-tags="{{ custom_tags|join(",") }}">{{ post.content|raw }}</div>
+                  {#<div id="article-content" data-custom-tags="{{ custom_tags|join(",") }}">{{ post.content|raw }}</div>#}
+                  <textarea id="article-content" name="content" {{ isUpdateAllowed ? "" : "disabled" }}
+                            data-custom-tags="{{ custom_tags|join(",") }}">
+                    {{ post.content }}
+                  </textarea>
               </div>
           </div>
 
           <div class="row">
               <div class="input-field col s12">
-                  <input type="text" name="title" id="article-title" class="form-control" value="{{ post.title }}" data-length="60" placeholder="Post title, used in HTML &lsaquo;title&rsaquo; tag" {{ isUpdateAllowed ? "" : "disabled" }} />
+                  <input name="title" id="article-title" class="form-control" value="{{ post.title }}" data-length="60" placeholder="Post title, used in HTML &lsaquo;title&rsaquo; tag" {{ isUpdateAllowed ? "" : "disabled" }} />
                   <label for="article-title">HTML &lt;title&gt;</label>
               </div>
           </div>
@@ -92,9 +96,8 @@
                   {% endfor %}
                 </div>
 
-                <button class="btn save-post-button"
-                        type="submit" data-id="{{ post.id }}" {{ isUpdateAllowed ? "" : "disabled" }}>
-                  {{ ("post.action.save")|i18n }}
+                <button class="btn save-post-button" data-id="{{ post.id }}" {{ isUpdateAllowed ? "" : "disabled" }}>
+                  {{ "post.action.save"|i18n }}
                 </button>
               </div>
           </div>
