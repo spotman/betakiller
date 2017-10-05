@@ -27,13 +27,14 @@ class IFaceModelProviderXmlConfig extends IFaceModelProviderAbstract
         }
     }
 
-    protected function loadXmlConfig($file)
+    protected function loadXmlConfig(string $file): void
     {
-        $sxo = simplexml_load_file($file);
+        $content = file_get_contents($file);
+        $sxo = simplexml_load_string($content);
         $this->parseXmlBranch($sxo);
     }
 
-    protected function parseXmlBranch(SimpleXMLElement $branch, IFaceModelInterface $parentModel = null)
+    protected function parseXmlBranch(SimpleXMLElement $branch, IFaceModelInterface $parentModel = null): void
     {
         // Parse branch childs
         foreach ($branch->children() as $childNode) {
@@ -48,7 +49,7 @@ class IFaceModelProviderXmlConfig extends IFaceModelProviderAbstract
         }
     }
 
-    protected function parseXmlItem(SimpleXMLElement $branch, IFaceModelInterface $parentModel = null)
+    protected function parseXmlItem(SimpleXMLElement $branch, IFaceModelInterface $parentModel = null): IFaceModelProviderXmlConfigModel
     {
         $attr   = (array)$branch->attributes();
         $config = $attr['@attributes'];
@@ -65,7 +66,7 @@ class IFaceModelProviderXmlConfig extends IFaceModelProviderAbstract
      *
      * @return IFaceModelProviderXmlConfigModel
      */
-    protected function createModelFromConfig(array $config)
+    protected function createModelFromConfig(array $config): IFaceModelProviderXmlConfigModel
     {
         return IFaceModelProviderXmlConfigModel::factory($config, $this);
     }
@@ -95,7 +96,7 @@ class IFaceModelProviderXmlConfig extends IFaceModelProviderAbstract
      *
      * @return IFaceModelInterface[]
      */
-    public function getRoot()
+    public function getRoot(): array
     {
         return $this->getChilds();
     }
@@ -105,26 +106,22 @@ class IFaceModelProviderXmlConfig extends IFaceModelProviderAbstract
      *
      * @return IFaceModelInterface
      */
-    public function getDefault()
+    public function getDefault(): ?IFaceModelInterface
     {
         // Admin IFaces can not be marked as "default"
         return null;
     }
 
     /**
-     * Returns iface model by codename or NULL if none was found
+     * Returns iface model by codename or throws exception if none was found
      *
-     * @param $codename
+     * @param string $codename
      *
      * @return IFaceModelInterface
      */
-    public function getByCodename($codename)
+    public function getByCodename(string $codename): IFaceModelInterface
     {
-        try {
-            return $this->getFromCache($codename);
-        } catch (IFaceException $e) {
-            return null;
-        }
+        return $this->getFromCache($codename);
     }
 
     /**
@@ -132,9 +129,10 @@ class IFaceModelProviderXmlConfig extends IFaceModelProviderAbstract
      *
      * @param IFaceModelInterface $parentModel
      *
-     * @return array
+     * @return IFaceModelInterface[]
+     * @throws \BetaKiller\IFace\Exception\IFaceException
      */
-    public function getChildren(IFaceModelInterface $parentModel)
+    public function getChildren(IFaceModelInterface $parentModel): array
     {
         if (!($parentModel instanceof IFaceModelProviderXmlConfigModel)) {
             throw new IFaceException(__CLASS__.' accept only instances of :must', [
@@ -145,7 +143,12 @@ class IFaceModelProviderXmlConfig extends IFaceModelProviderAbstract
         return $this->getChilds($parentModel);
     }
 
-    protected function getChilds(IFaceModelProviderXmlConfigModel $parentModel = null)
+    /**
+     * @param \BetaKiller\IFace\ModelProvider\IFaceModelProviderXmlConfigModel|null $parentModel
+     *
+     * @return IFaceModelInterface[]
+     */
+    protected function getChilds(IFaceModelProviderXmlConfigModel $parentModel = null): array
     {
         $parent_codename = $parentModel ? $parentModel->getCodename() : null;
 
@@ -171,7 +174,7 @@ class IFaceModelProviderXmlConfig extends IFaceModelProviderAbstract
      *
      * @return IFaceModelInterface|null
      */
-    public function getByEntityActionAndZone(DispatchableEntityInterface $entity, $entityAction, $zone)
+    public function getByEntityActionAndZone(DispatchableEntityInterface $entity, string $entityAction, string $zone): ?IFaceModelInterface
     {
         foreach ($this->models as $model) {
             if ($model->getEntityModelName() !== $entity->getModelName()) {
@@ -198,7 +201,7 @@ class IFaceModelProviderXmlConfig extends IFaceModelProviderAbstract
      *
      * @return IFaceModelInterface[]
      */
-    public function getByActionAndZone($action, $zone)
+    public function getByActionAndZone(string $action, string $zone): array
     {
         $output = [];
 

@@ -10,7 +10,7 @@ abstract class IFaceModelProviderAbstract implements IFaceModelProviderInterface
      *
      * @return IFaceModelInterface|NULL
      */
-    public function getParent(IFaceModelInterface $model)
+    public function getParent(IFaceModelInterface $model): ?IFaceModelInterface
     {
         return $model->getParent();
     }
@@ -20,7 +20,7 @@ abstract class IFaceModelProviderAbstract implements IFaceModelProviderInterface
      *
      * @return \BetaKiller\IFace\IFaceModelInterface[]
      */
-    public function getChildren(IFaceModelInterface $parentModel)
+    public function getChildren(IFaceModelInterface $parentModel): array
     {
         return $parentModel->getChildren();
     }
@@ -29,8 +29,9 @@ abstract class IFaceModelProviderAbstract implements IFaceModelProviderInterface
      * @param IFaceModelInterface $parentModel
      *
      * @return IFaceModelInterface[]
+     * @throws \BetaKiller\IFace\Exception\IFaceException
      */
-    public function getLayer(IFaceModelInterface $parentModel = null)
+    public function getLayer(IFaceModelInterface $parentModel = null): array
     {
         return $parentModel
             ? $this->getChildren($parentModel)

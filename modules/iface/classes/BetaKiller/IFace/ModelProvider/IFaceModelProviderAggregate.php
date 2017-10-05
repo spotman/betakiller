@@ -45,7 +45,7 @@ class IFaceModelProviderAggregate extends IFaceModelProviderAbstract
      * @return IFaceModelInterface|null
      * @throws IFaceException
      */
-    public function getDefault()
+    public function getDefault(): IFaceModelInterface
     {
         $model = null;
 
@@ -67,24 +67,28 @@ class IFaceModelProviderAggregate extends IFaceModelProviderAbstract
     /**
      * Returns iface model by codename or NULL if none was found
      *
-     * @param $codename
+     * @param string $codename
      *
-     * @return IFaceModelInterface|null
+     * @return IFaceModelInterface
      * @throws IFaceException
      */
-    public function getByCodename($codename)
+    public function getByCodename(string $codename): IFaceModelInterface
     {
         $model = $this->getFromCache($codename);
+        $exception = null;
 
         if (!$model) {
             foreach ($this->getSources() as $source) {
-                if ($model = $source->getByCodename($codename)) {
+                try {
+                    $model = $source->getByCodename($codename);
                     break;
+                } catch (IFaceException $e) {
+                    $exception = $e;
                 }
             }
 
             if (!$model) {
-                throw new IFaceException('No IFace found by codename :codename', [':codename' => $codename]);
+                throw new IFaceException('No IFace found by codename :codename', [':codename' => $codename], 0, $exception);
             }
 
             $this->storeInCache($model);
@@ -98,7 +102,7 @@ class IFaceModelProviderAggregate extends IFaceModelProviderAbstract
      *
      * @return \BetaKiller\IFace\IFaceModelInterface[]
      */
-    public function getChildren(IFaceModelInterface $parentModel)
+    public function getChildren(IFaceModelInterface $parentModel): array
     {
         $models = parent::getChildren($parentModel);
 
@@ -112,7 +116,7 @@ class IFaceModelProviderAggregate extends IFaceModelProviderAbstract
      *
      * @return IFaceModelInterface|NULL
      */
-    public function getParent(IFaceModelInterface $model)
+    public function getParent(IFaceModelInterface $model): ?IFaceModelInterface
     {
         $parent = parent::getParent($model);
 
@@ -127,9 +131,9 @@ class IFaceModelProviderAggregate extends IFaceModelProviderAbstract
      * Returns list of root elements
      *
      * @return IFaceModelInterface[]
-     * @throws IFaceException
+     * @throws \BetaKiller\IFace\Exception\IFaceException
      */
-    public function getRoot()
+    public function getRoot(): array
     {
         /** @var IFaceModelInterface[] $models */
         $models = [];
@@ -155,8 +159,9 @@ class IFaceModelProviderAggregate extends IFaceModelProviderAbstract
      * @param string                                        $zone
      *
      * @return IFaceModelInterface|null
+     * @throws \BetaKiller\IFace\Exception\IFaceException
      */
-    public function getByEntityActionAndZone(DispatchableEntityInterface $entity, $entityAction, $zone)
+    public function getByEntityActionAndZone(DispatchableEntityInterface $entity, string $entityAction, string $zone): ?IFaceModelInterface
     {
         $model = null;
 
@@ -178,8 +183,9 @@ class IFaceModelProviderAggregate extends IFaceModelProviderAbstract
      * @param string $zone
      *
      * @return IFaceModelInterface[]
+     * @throws \BetaKiller\IFace\Exception\IFaceException
      */
-    public function getByActionAndZone($action, $zone)
+    public function getByActionAndZone(string $action, string $zone): array
     {
         $models = [];
 
@@ -195,7 +201,7 @@ class IFaceModelProviderAggregate extends IFaceModelProviderAbstract
      *
      * @return \BetaKiller\IFace\ModelProvider\IFaceModelProviderInterface[]
      */
-    protected function getSources($reverse = null)
+    protected function getSources($reverse = null): array
     {
         if (!$this->sources) {
             $this->sources = [
@@ -210,7 +216,7 @@ class IFaceModelProviderAggregate extends IFaceModelProviderAbstract
     /**
      * @param IFaceModelInterface[] $models
      */
-    protected function storeInCacheMultiple(array $models)
+    protected function storeInCacheMultiple(array $models): void
     {
         foreach ($models as $model) {
             $this->storeInCache($model);
@@ -222,14 +228,12 @@ class IFaceModelProviderAggregate extends IFaceModelProviderAbstract
      *
      * @return IFaceModelInterface|NULL
      */
-    protected function getFromCache($codename)
+    protected function getFromCache($codename): ?IFaceModelInterface
     {
-        return isset($this->modelInstances[$codename])
-            ? $this->modelInstances[$codename]
-            : null;
+        return $this->modelInstances[$codename] ?? null;
     }
 
-    protected function storeInCache(IFaceModelInterface $model)
+    protected function storeInCache(IFaceModelInterface $model): void
     {
         $this->modelInstances[$model->getCodename()] = $model;
     }
