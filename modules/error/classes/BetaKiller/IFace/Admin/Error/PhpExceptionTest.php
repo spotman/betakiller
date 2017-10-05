@@ -11,6 +11,15 @@ class PhpExceptionTest extends ErrorAdminBase
      */
     public function getData(): array
     {
-        return [];
+        /** @var \BetaKiller\IFace\Admin\Error\PhpExceptionTestHTTP500 $http500IFace */
+        $http500IFace = $this->ifaceHelper->createIFaceFromCodename('Admin_Error_PhpExceptionTestHTTP500');
+
+        /** @var \BetaKiller\IFace\Admin\Error\PhpExceptionTestLogger $loggerIFace */
+        $loggerIFace = $this->ifaceHelper->createIFaceFromCodename('Admin_Error_PhpExceptionTestLogger');
+
+        return [
+            'http_500_test_url' => $http500IFace->url(),
+            'logger_test_url'   => $loggerIFace->url(),
+        ];
     }
 }

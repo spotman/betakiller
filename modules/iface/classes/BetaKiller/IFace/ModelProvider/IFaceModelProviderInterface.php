@@ -17,7 +17,7 @@ interface IFaceModelProviderInterface
     /**
      * Returns default iface model in current provider
      *
-     * @return IFaceModelInterface
+     * @return IFaceModelInterface|null
      * @throws \BetaKiller\IFace\Exception\IFaceException
      */
     public function getDefault(): ?IFaceModelInterface;

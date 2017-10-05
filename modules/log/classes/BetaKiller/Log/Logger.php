@@ -91,6 +91,9 @@ class Logger implements LoggerInterface
 
         // Enable debugging via PhpConsole for developers
         if ($debugAllowed && Connector::getInstance()->isActiveClient()) {
+            // TODO Throw exceptions in dev mode so Kohana stacktrace page can be shown
+//            $monolog->pushHandler(new ThrowExceptionsHandler());
+
             $phpConsoleHandler       = new PHPConsoleHandler([
                 'headersLimit'             => 2048,     // 2KB
                 'detectDumpTraceAndSource' => true,     // Autodetect and append trace data to debug

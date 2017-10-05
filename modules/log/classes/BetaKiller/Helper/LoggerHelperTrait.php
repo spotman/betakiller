@@ -5,7 +5,7 @@ use Psr\Log\LoggerInterface;
 
 trait LoggerHelperTrait
 {
-    final public function logException(LoggerInterface $logger, \Throwable $e): void
+    final protected function logException(LoggerInterface $logger, \Throwable $e): void
     {
         $logger->alert(':message at :file::line', [
             ':message'  => $e->getMessage(),

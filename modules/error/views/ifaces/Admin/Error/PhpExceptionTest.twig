@@ -2,8 +2,15 @@
 
 {% block page_content %}
   <br />
-  <button class="btn orange throw-exception-button" data-code="500">Throw HTTP_Exception_500 exception</button>
+  <button class="btn orange throw-exception-button" data-code="500">Throw HTTP_Exception_500 exception in API</button>
 
+  <br />
+  <br />
+  <a href="{{ http_500_test_url }}" class="btn orange" target="_blank">Throw HTTP_Exception_500 exception in HTTP</a>
+
+  <br />
+  <br />
+  <a href="{{ logger_test_url }}" class="btn orange" target="_blank">Send HTTP_Exception_500 exception to Logger</a>
 
   <script type="text/javascript">
 
@@ -13,7 +20,7 @@
     ], function($, api) {
 
       $(function() {
-        var $throwExceptionButton = $('.throw-exception-button');
+        const $throwExceptionButton = $('.throw-exception-button');
 
         function processApiCall($button, apiMethodPromise) {
           $button.attr('disabled', 'disabled');
@@ -31,7 +38,7 @@
         $throwExceptionButton.click(function(e) {
           e.preventDefault();
 
-          var $this = $(this),
+          const $this = $(this),
               code = $this.data('code');
 
           processApiCall($this, api.phpException.throwHttpException(code));

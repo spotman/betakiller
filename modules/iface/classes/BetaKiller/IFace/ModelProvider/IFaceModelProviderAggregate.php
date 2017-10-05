@@ -42,7 +42,7 @@ class IFaceModelProviderAggregate extends IFaceModelProviderAbstract
     /**
      * Returns default iface model in current provider
      *
-     * @return IFaceModelInterface|null
+     * @return IFaceModelInterface
      * @throws IFaceException
      */
     public function getDefault(): IFaceModelInterface
