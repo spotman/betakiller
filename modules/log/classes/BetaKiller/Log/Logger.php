@@ -54,11 +54,28 @@ class Logger implements LoggerInterface
 //        TODO Enable monolog exception handlers after migrating from Kohana
 //        ErrorHandler::register($monolog);
 
+        $isDebugAllowed = $this->appEnv->isDebugEnabled();
+
+        // CLI mode logging
+        if (PHP_SAPI === 'cli') {
+            // Disable original error messages
+//            ini_set('error_reporting', 'off');
+
+            // Color scheme and formatter
+            $cliLevel     = $isDebugAllowed ? $monolog::DEBUG : $monolog::INFO;
+            $cliHandler   = new StreamHandler('php://stdout', $cliLevel);
+            $cliFormatter = new ColoredLineFormatter(new DefaultScheme(), "%message%\n");
+            $cliHandler->setFormatter($cliFormatter);
+
+            $monolog->pushHandler($cliHandler);
+        } else {
+            // TODO Show nice HTML messages or Kohana stacktrace page
+            $monolog->pushHandler(new HtmlResponseHandler($isDebugAllowed));
+        }
+
         $logFilePath     = implode(DIRECTORY_SEPARATOR, ['logs', date('Y'), date('m'), date('d').'.log']);
         $coreLogFilePath = APPPATH.$logFilePath;
         $appLogFilePath  = $this->multiSite->getWorkingPath().DIRECTORY_SEPARATOR.$logFilePath;
-
-        $debugAllowed = $this->appEnv->isDebugEnabled();
 
         $groupHandler = new WhatFailureGroupHandler([
             // Core logs
@@ -70,30 +87,13 @@ class Logger implements LoggerInterface
             // TODO PhpExceptionStorage handler
         ]);
 
-        $logsLevel      = $debugAllowed ? $monolog::DEBUG : $monolog::NOTICE;
+        $logsLevel      = $isDebugAllowed ? $monolog::DEBUG : $monolog::NOTICE;
         $crossedHandler = new FingersCrossedHandler($groupHandler, $logsLevel);
 
         $monolog->pushHandler($crossedHandler);
 
-        // CLI mode logging
-        if (PHP_SAPI === 'cli') {
-            // Disable original error messages
-//            ini_set('error_reporting', 'off');
-
-            // Color scheme and formatter
-            $cliLevel     = $debugAllowed ? $monolog::DEBUG : $monolog::INFO;
-            $cliHandler   = new StreamHandler('php://stdout', $cliLevel);
-            $cliFormatter = new ColoredLineFormatter(new DefaultScheme(), "%message%\n");
-            $cliHandler->setFormatter($cliFormatter);
-
-            $monolog->pushHandler($cliHandler);
-        }
-
-        // Enable debugging via PhpConsole for developers
-        if ($debugAllowed && Connector::getInstance()->isActiveClient()) {
-            // TODO Throw exceptions in dev mode so Kohana stacktrace page can be shown
-//            $monolog->pushHandler(new ThrowExceptionsHandler());
-
+        // Enable debugging via PhpConsole
+        if ($isDebugAllowed && Connector::getInstance()->isActiveClient()) {
             $phpConsoleHandler       = new PHPConsoleHandler([
                 'headersLimit'             => 2048,     // 2KB
                 'detectDumpTraceAndSource' => true,     // Autodetect and append trace data to debug

@@ -55,7 +55,7 @@ class Controller_IFace extends Controller
         $this->urlContainer->setQueryParts($queryParts);
 
         // Getting current IFace
-        $iface = $this->urlDispatcher->process($uri);
+        $iface = $this->urlDispatcher->process($uri, $this->request->client_ip());
 
         // If this is default IFace and client requested non-slash uri, redirect client to /
         if ($uri !== '/' && $iface->isDefault() && !$iface->getModel()->hasDynamicUrl()) {

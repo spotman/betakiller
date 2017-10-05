@@ -4,19 +4,24 @@ namespace BetaKiller\Log;
 use Monolog\Handler\AbstractHandler;
 
 /**
- * Class ThrowExceptionsHandler
+ * Class HtmlResponseHandler
  *
  * @package BetaKiller\Log
- * @deprecated
  */
-class ThrowExceptionsHandler extends AbstractHandler
+class HtmlResponseHandler extends AbstractHandler
 {
     /**
-     * ThrowExceptionsHandler constructor.
-     * @deprecated
+     * @var bool
      */
-    public function __construct()
+    private $isDebugEnabled;
+
+    /**
+     * HtmlResponseHandler constructor.
+     */
+    public function __construct(bool $isDebugEnabled)
     {
+        $this->isDebugEnabled = $isDebugEnabled;
+
         parent::__construct();
     }
 
@@ -40,9 +45,25 @@ class ThrowExceptionsHandler extends AbstractHandler
         $exception = $record['context']['exception'] ?? null;
 
         if ($exception && $exception instanceof \Throwable) {
-            throw $exception;
+            if ($this->isDebugEnabled) {
+                $this->sendDebugHtmlResponse($exception);
+            } else {
+                $this->sendNiceHtmlResponse($exception);
+            }
         }
 
-        return false;
+        return true;
+    }
+
+    private function sendNiceHtmlResponse(\Throwable $e): void
+    {
+        // TODO
+
+    }
+
+    private function sendDebugHtmlResponse(\Throwable $e): void
+    {
+        // TODO
+
     }
 }
