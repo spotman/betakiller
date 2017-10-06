@@ -4,7 +4,7 @@ namespace BetaKiller\Ref;
 use BetaKiller\Event\UrlDispatchedEvent;
 use BetaKiller\MessageBus\EventBus;
 use BetaKiller\MessageBus\EventHandlerInterface;
-use BetaKiller\Repository\RefHitsRepository;
+use BetaKiller\Repository\RefHitRepository;
 
 class Initializer
 {
@@ -16,7 +16,7 @@ class Initializer
 
     /**
      * @Inject
-     * @var \BetaKiller\Repository\RefHitsRepository
+     * @var \BetaKiller\Repository\RefHitRepository
      */
     private $refHitsRepository;
 
@@ -32,16 +32,16 @@ class Initializer
             new class ($this->refHitsRepository) implements EventHandlerInterface
             {
                 /**
-                 * @var \BetaKiller\Repository\RefHitsRepository
+                 * @var \BetaKiller\Repository\RefHitRepository
                  */
                 private $refHitsRepository;
 
                 /**
                  *  constructor.
                  *
-                 * @param \BetaKiller\Repository\RefHitsRepository $refLogRepository
+                 * @param \BetaKiller\Repository\RefHitRepository $refLogRepository
                  */
-                public function __construct(RefHitsRepository $refLogRepository)
+                public function __construct(RefHitRepository $refLogRepository)
                 {
                     $this->refHitsRepository = $refLogRepository;
                 }

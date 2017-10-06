@@ -4,14 +4,14 @@ namespace BetaKiller\Repository;
 use BetaKiller\Model\RefHit;
 
 /**
- * Class RefHitsRepository
+ * Class RefHitRepository
  *
  * @package BetaKiller\Repository
  * @method RefHit findById(int $id)
  * @method RefHit create()
  * @method RefHit[] getAll()
  */
-class RefHitsRepository extends AbstractOrmBasedRepository
+class RefHitRepository extends AbstractOrmBasedRepository
 {
     /**
      * @param int|null $limit

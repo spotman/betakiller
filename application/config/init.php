@@ -17,7 +17,7 @@
  */
 
 return array(
-    'base_url'      => '/',
+    'base_url'      => NULL,
     'index_file'    => '',
     'expose'        => FALSE,
     'cache_dir'     => APPPATH.'cache'.DIRECTORY_SEPARATOR.'kohana',

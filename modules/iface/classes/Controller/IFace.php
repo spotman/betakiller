@@ -120,7 +120,8 @@ class Controller_IFace extends Controller
      */
     private function getRequestUri(): string
     {
-        return '/'.ltrim($this->request->uri(), '/');
+        return $this->request->url();
+//        return '/'.ltrim($this->request->uri(), '/');
     }
 
     /**

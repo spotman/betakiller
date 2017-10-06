@@ -120,9 +120,11 @@ class UrlDispatcher implements LoggerAwareInterface
         // Prevent XSS via URL
         $uri = htmlspecialchars(strip_tags($uri), ENT_QUOTES);
 
+        $path = parse_url($uri, PHP_URL_PATH);
+
         // Check cache for stack and url params for current URL
         if (!$this->restoreDataFromCache($uri)) {
-            $this->parseUri($uri);
+            $this->parseUriPath($path);
 
             // Cache stack + url parameters (between HTTP requests) for current URL
             $this->storeDataInCache($uri);
@@ -144,7 +146,7 @@ class UrlDispatcher implements LoggerAwareInterface
      * @param string $uri
      * @throws \BetaKiller\IFace\Exception\IFaceException
      */
-    private function parseUri(string $uri): void
+    private function parseUriPath(string $uri): void
     {
         // Creating URL iterator
         $urlIterator = new UrlPathIterator($uri);

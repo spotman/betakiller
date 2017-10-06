@@ -2,10 +2,13 @@
 namespace BetaKiller\MessageBus;
 
 use BetaKiller\Helper\LoggerHelperTrait;
+use Psr\Log\LoggerAwareTrait;
+use Psr\Log\LoggerInterface;
 
 abstract class AbstractMessageBus
 {
     use LoggerHelperTrait;
+    use LoggerAwareTrait;
 
     /**
      * @var \BetaKiller\MessageBus\MessageInterface[]
@@ -17,10 +20,10 @@ abstract class AbstractMessageBus
      */
     private $handlers = [];
 
-    /**
-     * @var \Psr\Log\LoggerInterface
-     */
-    private $logger;
+    public function __construct(LoggerInterface $logger)
+    {
+        $this->setLogger($logger);
+    }
 
     abstract protected function getHandlerInterface(): string;
 
