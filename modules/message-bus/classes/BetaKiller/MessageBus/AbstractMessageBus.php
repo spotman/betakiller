@@ -1,8 +1,12 @@
 <?php
 namespace BetaKiller\MessageBus;
 
+use BetaKiller\Helper\LoggerHelperTrait;
+
 abstract class AbstractMessageBus
 {
+    use LoggerHelperTrait;
+
     /**
      * @var \BetaKiller\MessageBus\MessageInterface[]
      */
@@ -13,11 +17,16 @@ abstract class AbstractMessageBus
      */
     private $handlers = [];
 
+    /**
+     * @var \Psr\Log\LoggerInterface
+     */
+    private $logger;
+
     abstract protected function getHandlerInterface(): string;
 
     abstract protected function getMessageHandlersLimit(): int;
 
-    abstract protected function process($message, $handler): void;
+    abstract protected function _process($message, $handler): void;
 
     public function on(string $messageClassName, $handler): void
     {
@@ -75,7 +84,17 @@ abstract class AbstractMessageBus
             $this->process($message, $handler);
         }
     }
-    
+
+    private function process($message, $handler): void
+    {
+        // Wrap every message bus processing with try-catch block and log exceptions
+        try {
+            $this->_process($message, $handler);
+        } catch (\Throwable $e) {
+            $this->logException($this->logger, $e);
+        }
+    }
+
     private function getMessageName(MessageInterface $message): string
     {
         return get_class($message);

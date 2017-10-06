@@ -46,6 +46,7 @@ class Controller_IFace extends Controller
 
     /**
      * @throws \HTTP_Exception_400
+     * @throws \BetaKiller\IFace\Exception\IFaceException
      */
     public function action_render(): void
     {
@@ -119,7 +120,7 @@ class Controller_IFace extends Controller
      */
     private function getRequestUri(): string
     {
-        return $this->request->uri();
+        return '/'.ltrim($this->request->uri(), '/');
     }
 
     /**

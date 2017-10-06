@@ -4,7 +4,7 @@ namespace BetaKiller\Ref;
 use BetaKiller\Event\UrlDispatchedEvent;
 use BetaKiller\MessageBus\EventBus;
 use BetaKiller\MessageBus\EventHandlerInterface;
-use BetaKiller\Repository\RefLogRepository;
+use BetaKiller\Repository\RefHitsRepository;
 
 class Initializer
 {
@@ -16,9 +16,9 @@ class Initializer
 
     /**
      * @Inject
-     * @var \BetaKiller\Repository\RefLogRepository
+     * @var \BetaKiller\Repository\RefHitsRepository
      */
-    private $refLogRepository;
+    private $refHitsRepository;
 
     public function init(): void
     {
@@ -29,21 +29,21 @@ class Initializer
     {
         $this->eventBus->on(
             UrlDispatchedEvent::class,
-            new class ($this->refLogRepository) implements EventHandlerInterface
+            new class ($this->refHitsRepository) implements EventHandlerInterface
             {
                 /**
-                 * @var \BetaKiller\Repository\RefLogRepository
+                 * @var \BetaKiller\Repository\RefHitsRepository
                  */
-                private $refLogRepository;
+                private $refHitsRepository;
 
                 /**
                  *  constructor.
                  *
-                 * @param \BetaKiller\Repository\RefLogRepository $refLogRepository
+                 * @param \BetaKiller\Repository\RefHitsRepository $refLogRepository
                  */
-                public function __construct(RefLogRepository $refLogRepository)
+                public function __construct(RefHitsRepository $refLogRepository)
                 {
-                    $this->refLogRepository = $refLogRepository;
+                    $this->refHitsRepository = $refLogRepository;
                 }
 
                 /**
@@ -52,11 +52,7 @@ class Initializer
                  */
                 public function handleEvent($message, EventBus $bus): void
                 {
-                    if (!$message->httpReferer) {
-                        return;
-                    }
-
-                    $model = $this->refLogRepository->create();
+                    $model = $this->refHitsRepository->create();
 
                     $model
                         ->setSourceUrl($message->httpReferer)
@@ -64,7 +60,7 @@ class Initializer
                         ->setIP($message->ip)
                         ->setTimestamp(new \DateTimeImmutable());
 
-                    $this->refLogRepository->save($model);
+                    $this->refHitsRepository->save($model);
                 }
             });
     }

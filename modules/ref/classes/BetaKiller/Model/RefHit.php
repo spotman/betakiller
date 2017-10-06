@@ -1,7 +1,7 @@
 <?php
 namespace BetaKiller\Model;
 
-class RefLog extends \ORM
+class RefHit extends \ORM
 {
     /**
      * Prepares the model database connection, determines the table name,
@@ -12,30 +12,30 @@ class RefLog extends \ORM
      */
     protected function _initialize(): void
     {
-        $this->_table_name = 'ref_log';
+        $this->_table_name = 'ref_hits';
 
         parent::_initialize();
     }
 
-    public function setSourceUrl(string $url): RefLog
+    public function setSourceUrl(?string $url): RefHit
     {
         $this->set('source_url', $url);
         return $this;
     }
 
-    public function setTargetUrl(string $url): RefLog
+    public function setTargetUrl(string $url): RefHit
     {
         $this->set('target_url', $url);
         return $this;
     }
 
-    public function setIP(string $ip): RefLog
+    public function setIP(string $ip): RefHit
     {
         $this->set('ip', $ip);
         return $this;
     }
 
-    public function setTimestamp(\DateTimeImmutable $dateTime): RefLog
+    public function setTimestamp(\DateTimeImmutable $dateTime): RefHit
     {
         $this->set_datetime_column_value('created_at', $dateTime);
         return $this;
@@ -44,5 +44,25 @@ class RefLog extends \ORM
     public function markAsProcessed(): void
     {
         $this->set('processed', 1);
+    }
+
+    public function getSourceUrl(): ?string
+    {
+        return $this->get('source_url');
+    }
+
+    public function getTargetUrl(): string
+    {
+        return $this->get('target_url');
+    }
+
+    public function getIP(): string
+    {
+        return $this->get('ip');
+    }
+
+    public function getTimestamp(): \DateTimeImmutable
+    {
+        return $this->get_datetime_column_value('created_at');
     }
 }

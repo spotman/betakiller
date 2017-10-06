@@ -1,22 +1,22 @@
 <?php
 namespace BetaKiller\Repository;
 
-use BetaKiller\Model\RefLog;
+use BetaKiller\Model\RefHit;
 
 /**
- * Class RefLogRepository
+ * Class RefHitsRepository
  *
  * @package BetaKiller\Repository
- * @method RefLog findById(int $id)
- * @method RefLog create()
- * @method RefLog[] getAll()
+ * @method RefHit findById(int $id)
+ * @method RefHit create()
+ * @method RefHit[] getAll()
  */
-class RefLogRepository extends AbstractOrmBasedRepository
+class RefHitsRepository extends AbstractOrmBasedRepository
 {
     /**
      * @param int|null $limit
      *
-     * @return RefLog[]
+     * @return RefHit[]
      * @throws \Kohana_Exception
      */
     public function getPending(?int $limit = null): array
