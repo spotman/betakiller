@@ -42,7 +42,8 @@ class Task_Ref_ProcessHits extends AbstractTask
             }
         }
 
-        $this->hitsRepository->deleteProcessed();
+//         Temporarily disable cleanup to keep data for ongoing features
+//        $this->hitsRepository->deleteProcessed();
     }
 
     private function processRefLogRecord(RefHit $record): void
