@@ -52,6 +52,11 @@ class Initializer
                  */
                 public function handleEvent($message, EventBus $bus): void
                 {
+                    // Skip calls like "cache warmup" from CLI mode
+                    if (PHP_SAPI === 'cli') {
+                        return;
+                    }
+
                     $model = $this->refHitsRepository->create();
 
                     $model
