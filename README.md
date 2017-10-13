@@ -10,19 +10,19 @@ Under the hood:
 - [PHP-DI](http://php-di.org/) as DI container (with autowiring enabled, [core config](application/config/twig.php))
 - DDD used for core development (Entities, Repositories, Factories, etc)
 - Unique [IFace module](modules/iface) for easier organizing server-side part of UI
-- [Custom ACL subsystem](modules/acl) with dedicated resource classes (Zend ACL on steroids)
+- [Custom ACL subsystem](https://github.com/spotman/rbac) with dedicated resource classes (Zend ACL on steroids)
 - Simple [Message bus](modules/message-bus) for inter-modular communication
-- [JSON-RPC API](modules/api) with "<Collection>.<Method>" hierarchy and automatic ACL binding
-- [Migrations](modules/migrations) with CLI helper and ability to create migrations for module, core or application
+- [JSON-RPC API](https://github.com/spotman/kohana-simple-api) with "<Collection>.<Method>" hierarchy and automatic ACL binding
+- [Migrations](https://github.com/spotman/kohana-minion-migrations) with CLI helper and ability to create migrations for module, core or application
 - [Custom error management](modules/error) with logging to local SQLite3 DB
 - [Notifications subsystem](modules/notification) with multiple providers for simpler communication with users
-- Multiple sites on a single core via [MultiSite module](modules/multi-site)
+- Multiple sites on a single core via [MultiSite module](https://github.com/spotman/kohana-multi-site)
 - [Kohana ORM](modules/orm) as current DBAL (migration to [Propel3](https://github.com/propelorm/Propel3) planned)
 - [Deployer](https://deployer.org/) as default deploying tool
 - [Monolog](https://github.com/Seldaek/monolog) as default logger (with ChromePHP for online debugging)
 - [Minion](modules/minion) as CLI task subsystem
-- [HTML meta-tags](modules/meta-tags), [robots.txt](modules/robots-txt/README.md) and [sitemap.xml](modules/sitemap) processors
-- [Multiple useful helpers](modules/utils/README.md) for Kohana-based projects
+- [HTML meta-tags](https://github.com/spotman/kohana-meta-tags), [robots.txt](https://github.com/spotman/kohana-robots.txt) and [sitemap.xml](modules/sitemap) processors
+- [Multiple useful helpers](https://github.com/spotman/kohana-utils) for Kohana-based projects
 - Multiple helpers like AppConfig and AppEnv
 - A lot of improvements are on the go
 
