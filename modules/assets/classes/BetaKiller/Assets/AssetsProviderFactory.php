@@ -5,12 +5,9 @@ use BetaKiller\Acl\Resource\AssetsAclResourceInterface;
 use BetaKiller\Assets\Provider\AbstractAssetsProvider;
 use BetaKiller\Assets\Provider\AssetsProviderInterface;
 use BetaKiller\Assets\Storage\AssetsStorageInterface;
-use BetaKiller\Assets\UrlStrategy\AssetsUrlStrategyInterface;
 use BetaKiller\Config\ConfigProviderInterface;
 use BetaKiller\Factory\NamespaceBasedFactory;
 use BetaKiller\Factory\RepositoryFactory;
-use BetaKiller\Repository\RepositoryInterface;
-use BetaKiller\Utils\Instance\SingletonTrait;
 use Spotman\Acl\AclInterface;
 
 /**
@@ -20,8 +17,6 @@ use Spotman\Acl\AclInterface;
  */
 class AssetsProviderFactory
 {
-    use SingletonTrait;
-
     /**
      * @var \BetaKiller\Config\ConfigProviderInterface
      */
@@ -81,19 +76,18 @@ class AssetsProviderFactory
         AssetsUrlStrategyFactory $urlStrategyFactory,
         AssetsHandlerFactory $handlerFactory,
         AclInterface $acl
-    )
-    {
+    ) {
         $this->factory = $factory
             ->setClassPrefixes('Assets', 'Provider')
             ->setClassSuffix('AssetsProvider')
             ->setExpectedInterface(AssetsProviderInterface::class);
 
-        $this->config  = $config;
-        $this->repositoryFactory = $repositoryFactory;
-        $this->storageFactory = $storageFactory;
+        $this->config             = $config;
+        $this->repositoryFactory  = $repositoryFactory;
+        $this->storageFactory     = $storageFactory;
         $this->urlStrategyFactory = $urlStrategyFactory;
-        $this->handlerFactory = $handlerFactory;
-        $this->acl = $acl;
+        $this->handlerFactory     = $handlerFactory;
+        $this->acl                = $acl;
     }
 
     public function createFromUrlKey($key)
@@ -159,6 +153,9 @@ class AssetsProviderFactory
      * @param string $modelName
      *
      * @return \BetaKiller\Assets\Provider\ImageAssetsProviderInterface|AssetsProviderInterface|mixed
+     * @throws \BetaKiller\Factory\FactoryException
+     * @throws \BetaKiller\Assets\AssetsException
+     * @throws \BetaKiller\Assets\AssetsStorageException
      */
     public function createFromModelCodename(string $modelName)
     {
@@ -215,6 +212,7 @@ class AssetsProviderFactory
      * @param array $storageConfig
      *
      * @return \BetaKiller\Assets\Storage\AssetsStorageInterface
+     * @throws \BetaKiller\Assets\AssetsStorageException
      * @TODO Move to StorageFactory
      */
     private function createStorageFromConfig(array $storageConfig): AssetsStorageInterface

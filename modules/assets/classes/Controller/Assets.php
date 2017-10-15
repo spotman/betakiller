@@ -180,7 +180,7 @@ class Controller_Assets extends Controller
     }
 
     /**
-     * @return \BetaKiller\Assets\Model\AssetsModelInterface|\BetaKiller\Assets\Model\AssetsModelImageInterface|NULL
+     * @return \BetaKiller\Assets\Model\AssetsModelInterface|\BetaKiller\Assets\Model\AssetsModelImageInterface
      * @throws \BetaKiller\Assets\AssetsException
      * @throws \HTTP_Exception_404
      */
@@ -194,13 +194,11 @@ class Controller_Assets extends Controller
 
         try {
             // Find asset model by url
-            $model = $this->provider->getModelByDeployUrl($url);
-        } catch (AssetsException $e) {
+            return $this->provider->getModelByDeployUrl($url);
+        } /** @noinspection BadExceptionsProcessingInspection */ catch (AssetsException $e) {
             // File not found
             throw new HTTP_Exception_404;
         }
-
-        return $model;
     }
 
     protected function deploy(AssetsModelInterface $model, $content): void
