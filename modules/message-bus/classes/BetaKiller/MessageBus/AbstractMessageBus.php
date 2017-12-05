@@ -31,6 +31,12 @@ abstract class AbstractMessageBus
 
     abstract protected function _process($message, $handler): void;
 
+    /**
+     * @param string $messageClassName
+     * @param        $handler
+     *
+     * @throws \BetaKiller\MessageBus\MessageBusException
+     */
     public function on(string $messageClassName, $handler): void
     {
         $handlerInterface = $this->getHandlerInterface();
@@ -65,6 +71,11 @@ abstract class AbstractMessageBus
         }
     }
 
+    /**
+     * @param \BetaKiller\MessageBus\MessageInterface $message
+     *
+     * @throws \BetaKiller\MessageBus\MessageBusException
+     */
     public function emit(MessageInterface $message): void
     {
         $this->handle($message);
@@ -72,7 +83,12 @@ abstract class AbstractMessageBus
         // Add message
         $this->processedMessages[] = $message;
     }
-    
+
+    /**
+     * @param \BetaKiller\MessageBus\MessageInterface $message
+     *
+     * @throws \BetaKiller\MessageBus\MessageBusException
+     */
     private function handle(MessageInterface $message): void
     {
         $name = $this->getMessageName($message);

@@ -20,11 +20,17 @@ class Initializer
      */
     private $refHitsRepository;
 
+    /**
+     * @throws \BetaKiller\MessageBus\MessageBusException
+     */
     public function init(): void
     {
         $this->registerEventsHandlers();
     }
 
+    /**
+     * @throws \BetaKiller\MessageBus\MessageBusException
+     */
     private function registerEventsHandlers(): void
     {
         $this->eventBus->on(
