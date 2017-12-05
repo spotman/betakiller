@@ -31,7 +31,6 @@ abstract class AbstractOrmBasedRepository extends AbstractRepository
      * @param int $id
      *
      * @return ExtendedOrmInterface|mixed|null
-     * @throws \Exception
      */
     public function findById(int $id)
     {
@@ -45,10 +44,16 @@ abstract class AbstractOrmBasedRepository extends AbstractRepository
 
     /**
      * @return \BetaKiller\Model\AbstractEntityInterface[]|\Traversable
+     *
+     * @throws \BetaKiller\Repository\RepositoryException
      */
     public function getAll()
     {
-        return $this->getOrmInstance()->get_all();
+        try {
+            return $this->getOrmInstance()->get_all();
+        } catch (\Kohana_Exception $e) {
+            throw new RepositoryException($e->getMessage(), null, $e->getCode(), $e);
+        }
     }
 
     /**
@@ -63,6 +68,8 @@ abstract class AbstractOrmBasedRepository extends AbstractRepository
 
     /**
      * @param ExtendedOrmInterface|mixed $entity
+     *
+     * @throws \BetaKiller\Repository\RepositoryException
      */
     public function save($entity): void
     {
@@ -73,12 +80,18 @@ abstract class AbstractOrmBasedRepository extends AbstractRepository
 
     /**
      * @param ExtendedOrmInterface|mixed $entity
+     *
+     * @throws \BetaKiller\Repository\RepositoryException
      */
     public function delete($entity): void
     {
         $this->checkEntityInheritance($entity);
 
-        $entity->delete();
+        try {
+            $entity->delete();
+        } catch (\Kohana_Exception $e) {
+            throw new RepositoryException($e->getMessage(), null, $e->getCode(), $e);
+        }
     }
 
     public function getValidationExceptionErrors(\ORM_Validation_Exception $e): array
@@ -86,11 +99,16 @@ abstract class AbstractOrmBasedRepository extends AbstractRepository
         return $e->errors('models');
     }
 
+    /**
+     * @param $entity
+     *
+     * @throws \BetaKiller\Repository\RepositoryException
+     */
     private function checkEntityInheritance($entity): void
     {
         if (!($entity instanceof ExtendedOrmInterface)) {
             throw new RepositoryException('Entity :class must be instance of :must', [
-                ':class' => get_class($entity),
+                ':class' => \get_class($entity),
                 ':must'  => ExtendedOrmInterface::class,
             ]);
         }

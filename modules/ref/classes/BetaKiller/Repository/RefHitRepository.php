@@ -17,19 +17,23 @@ class RefHitRepository extends AbstractOrmBasedRepository
      * @param int|null $limit
      *
      * @return RefHit[]
-     * @throws \Kohana_Exception
+     * @throws \BetaKiller\Repository\RepositoryException
      */
     public function getPending(?int $limit = null): array
     {
-        $orm = $this->getOrmInstance();
-
         $limit = $limit ?? 100;
 
-        if ($limit) {
-            $orm->limit($limit);
-        }
+        try {
+            $orm = $this->getOrmInstance();
 
-        return $orm->where('processed', '=', 0)->get_all();
+            if ($limit) {
+                $orm->limit($limit);
+            }
+
+            return $orm->where('processed', '=', 0)->get_all();
+        } catch (\Kohana_Exception $e) {
+            throw new RepositoryException($e->getMessage(), null, $e->getCode(), $e);
+        }
     }
 
     /**
