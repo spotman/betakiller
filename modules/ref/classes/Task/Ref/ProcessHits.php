@@ -26,6 +26,11 @@ class Task_Ref_ProcessHits extends AbstractTask
      */
     private $linkRepository;
 
+    /**
+     * @param array $params
+     *
+     * @throws \BetaKiller\Repository\RepositoryException
+     */
     protected function _execute(array $params): void
     {
         $records = $this->hitsRepository->getPending();
@@ -46,6 +51,11 @@ class Task_Ref_ProcessHits extends AbstractTask
 //        $this->hitsRepository->deleteProcessed();
     }
 
+    /**
+     * @param \BetaKiller\Model\RefHit $record
+     *
+     * @throws \BetaKiller\Repository\RepositoryException
+     */
     private function processRefLogRecord(RefHit $record): void
     {
         $sourceUrl = $record->getSourceUrl();
