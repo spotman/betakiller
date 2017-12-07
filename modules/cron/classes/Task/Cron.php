@@ -1,6 +1,8 @@
 <?php
 
 use BetaKiller\Task\AbstractTask;
+use BetaKiller\Task\TaskException;
+use Symfony\Component\Yaml\Yaml;
 
 class Task_Cron extends AbstractTask
 {
@@ -29,15 +31,18 @@ class Task_Cron extends AbstractTask
         $cronFile = $sitePath.DIRECTORY_SEPARATOR.'crontab.yml';
 
         /** @var array[] $records */
-        $records = \Symfony\Component\Yaml\Yaml::parseFile($cronFile);
+        $records = Yaml::parseFile($cronFile, Yaml::PARSE_EXCEPTION_ON_INVALID_TYPE);
 
         if (!$records) {
-            throw new \BetaKiller\Task\TaskException('Missing crontab.yml');
+            throw new TaskException('Missing crontab.yml');
         }
 
         foreach ($records as $name => $data) {
-            // Cleanup spaces and tabs
-            $expr   = trim($data['at']);
+            $expr = $data['at'] ?? null;
+
+            if (!$expr) {
+                throw new TaskException('Missing "at" key value in [:name] task', [':name' => $name]);
+            }
 
             $cron = \Cron\CronExpression::factory($expr);
 
