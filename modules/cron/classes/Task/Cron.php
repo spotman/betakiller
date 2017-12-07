@@ -16,70 +16,69 @@ class Task_Cron extends AbstractTask
      */
     private $env;
 
+    /**
+     * @param array $params
+     *
+     * @throws \BetaKiller\Task\TaskException
+     * @throws \Symfony\Component\Yaml\Exception\ParseException
+     */
     protected function _execute(array $params): void
     {
         $sitePath = $this->multiSite->getSitePath();
 
-        $cronFile = $sitePath.DIRECTORY_SEPARATOR.'crontab';
-        $records = \file($cronFile);
+        $cronFile = $sitePath.DIRECTORY_SEPARATOR.'crontab.yml';
+
+        /** @var array[] $records */
+        $records = \Symfony\Component\Yaml\Yaml::parseFile($cronFile);
 
         if (!$records) {
-            return;
+            throw new \BetaKiller\Task\TaskException('Missing crontab.yml');
         }
 
-        foreach ($records as $record) {
-            list($expression, $task) = explode(' => ', $record);
-
+        foreach ($records as $name => $data) {
             // Cleanup spaces and tabs
-            $expression = trim($expression);
-            $task = trim($task);
+            $expr   = trim($data['at']);
 
-            $cron = \Cron\CronExpression::factory($expression);
+            $cron = \Cron\CronExpression::factory($expr);
 
-            $this->logger->debug('Checking is due :task', [':task' => $task]);
+            $this->logger->debug('Checking is due :task', [':task' => $name]);
 
             if ($cron->isDue()) {
                 // TODO Enqueue task if not queued
-                $this->runTask($task);
+                $this->runTask($name, $data);
             }
         }
 
         // TODO Get first queued task and run it
     }
 
-    private function runTask(string $taskString)
+    private function runTask(string $name, array $params)
     {
-        $taskPrefix = '--task=';
-
-        // Add missing prefix
-        if (strpos($taskString, $taskPrefix) === false) {
-            $taskString = $taskPrefix.$taskString;
-        }
-
-        $options = $this->parseTaskOptions($taskString);
-
         $stage = $this->env->getModeName();
 
         // Add stage if not defined
-        if (!isset($options['stage'])) {
-            $options['stage'] = $stage;
+        if (!isset($params['stage'])) {
+            $params['stage'] = $stage;
         }
 
         // Ensure that target stage is reached
-        if ($options['stage'] !== $stage) {
+        if ($params['stage'] !== $stage) {
             $this->logger->debug('Skipping task :name for stage :stage', [
-                ':name' => $options['task'],
-                ':stage' => $options['stage'],
+                ':name'  => $name,
+                ':stage' => $params['stage'],
             ]);
+
             return;
         }
 
-        $sitePath = $this->multiSite->getSitePath();
+        $sitePath  = $this->multiSite->getSitePath();
         $indexPath = $sitePath.DIRECTORY_SEPARATOR.'public';
 
-        $php = 'php';
+        $php = PHP_BINARY;
 
         $cmd = "cd $indexPath && $php index.php";
+
+        $options = ['task' => $name] + $params;
 
         foreach ($options as $optionName => $optionValue) {
             $cmd .= ' --'.$optionName.'='.$optionValue;
@@ -88,15 +87,5 @@ class Task_Cron extends AbstractTask
         $this->logger->info($cmd);
 
         echo shell_exec($cmd);
-    }
-
-    private function parseTaskOptions(string $taskArgs): array
-    {
-        // Allow any option
-        $getOpt = new \GetOpt\GetOpt(null, [\GetOpt\GetOpt::SETTING_STRICT_OPTIONS => false]);
-
-        $getOpt->process($taskArgs);
-
-        return $getOpt->getOptions();
     }
 }
