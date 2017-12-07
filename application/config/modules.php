@@ -16,7 +16,8 @@ return array(
     'assets'                => MODPATH.'assets',                // Asset management subsystem
     'auth'                  => MODPATH.'auth',                  // Basic authentication
     'backup'                => MODPATH.'backup',                // Complex backup (files + database)
-    'cache'                 => MODPATH.'cache',                 // Caching with multiple backends
+//    'cache'                 => MODPATH.'cache',                 // Caching with multiple backends
+    'cron'                  => MODPATH.'cron',                  // helper for running scheduled tasks
     'database'              => MODPATH.'database',              // Database access
     'device'                => MODPATH.'device',                // Device detection
     'email'                 => MODPATH.'email',                 // Mailing module
