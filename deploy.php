@@ -12,7 +12,7 @@ require 'recipe/common.php';
 
 set('git_tty', true); // [Optional] Allocate tty for git on first deployment
 
-define('BETAKILLER_CORE_PATH', 'core');
+\define('BETAKILLER_CORE_PATH', 'core');
 
 $tzName = date_default_timezone_get();
 $tz     = new \DateTimeZone($tzName);
@@ -30,7 +30,7 @@ set('app_path', 'app');
 option('repo', null, InputOption::VALUE_OPTIONAL, 'Tag to deploy.', 'app');
 
 // Option --branch
-define('DEFAULT_BRANCH', 'master');
+\define('DEFAULT_BRANCH', 'master');
 
 // Option --to for migrations:down
 option('to', 't', InputOption::VALUE_OPTIONAL, 'Target migration');
@@ -39,10 +39,10 @@ option('to', 't', InputOption::VALUE_OPTIONAL, 'Target migration');
 option('task', null, InputOption::VALUE_OPTIONAL, 'Minion task name');
 
 
-define('DEPLOYER_DEV_STAGE', 'development');
-define('DEPLOYER_TESTING_STAGE', 'testing');
-define('DEPLOYER_STAGING_STAGE', 'staging');
-define('DEPLOYER_PRODUCTION_STAGE', 'production');
+\define('DEPLOYER_DEV_STAGE', 'development');
+\define('DEPLOYER_TESTING_STAGE', 'testing');
+\define('DEPLOYER_STAGING_STAGE', 'staging');
+\define('DEPLOYER_PRODUCTION_STAGE', 'production');
 
 set('default_stage', DEPLOYER_DEV_STAGE);
 
@@ -115,7 +115,13 @@ task('deploy:vendors:app', function () {
     process_vendors('app');
 })->desc('Process Composer inside app repository');
 
-function process_vendors($repo) {
+/**
+ * @param string $repo
+ *
+ * @return \Deployer\Type\Result
+ * @throws \Deployer\Exception\Exception
+ */
+function process_vendors(string $repo) {
     $composer = get('bin/composer');
     $envVars  = get('env_vars') ? 'export '.get('env_vars').' &&' : '';
 
@@ -314,11 +320,11 @@ task('migrations:create', function () {
 
     $outArr = explode('Done! Check ', $output);
 
-    if (count($outArr) === 2) {
+    if (\count($outArr) === 2) {
         $filePath = trim($outArr[1]);
 
         if (file_exists($filePath)) {
-            $dir = dirname($filePath);
+            $dir = \dirname($filePath);
             runGitCommand('add .', $dir);
         } else {
             writeln('Can not parse output, add migration file to git by yourself');
@@ -457,45 +463,98 @@ function runGitCommand($gitCmd, $path = null) {
     return $result;
 }
 
-function gitStatus($path = null) {
+/**
+ * @param null|string $path
+ *
+ * @return \Deployer\Type\Result
+ * @throws \Deployer\Exception\Exception
+ */
+function gitStatus(?string $path = null) {
     return runGitCommand('status', $path);
 }
 
-function gitAdd($basePath = null) {
+/**
+ * @param null|string $basePath
+ *
+ * @return \Deployer\Type\Result
+ * @throws \Deployer\Exception\Exception
+ */
+function gitAdd(?string $basePath = null) {
     $addPath = ask('Path to add files:', '.');
 
     return runGitCommand('add '.$addPath, $basePath);
 }
 
-function gitCommit($path = null) {
+/**
+ * @param null|string $path
+ *
+ * @return \Deployer\Type\Result
+ * @throws \Deployer\Exception\Exception
+ */
+function gitCommit(?string $path = null) {
     $message = ask('Enter commit message:', 'Commit from production');
 
     return runGitCommand('commit -m "'.$message.'"', $path);
 }
 
-function gitCommitAll($path = null) {
+/**
+ * @param null|string $path
+ *
+ * @return string
+ * @throws \Deployer\Exception\Exception
+ */
+function gitCommitAll(?string $path = null) {
     return gitAdd($path).gitCommit($path);
 }
 
-function gitCheckout($path = null) {
+/**
+ * @param null|string $path
+ *
+ * @return \Deployer\Type\Result
+ * @throws \Deployer\Exception\Exception
+ */
+function gitCheckout(?string $path = null) {
     $branch = input()->getOption('branch') ?: DEFAULT_BRANCH;
 
     return runGitCommand('checkout '.$branch, $path);
 }
 
-function gitPush($path = null) {
+/**
+ * @param null|string $path
+ *
+ * @return \Deployer\Type\Result
+ * @throws \Deployer\Exception\Exception
+ */
+function gitPush(?string $path = null) {
     return runGitCommand('push', $path);
 }
 
-function gitPull($path = null) {
+/**
+ * @param null|string $path
+ *
+ * @return \Deployer\Type\Result
+ * @throws \Deployer\Exception\Exception
+ */
+function gitPull(?string $path = null) {
     return runGitCommand('pull', $path);
 }
 
+/**
+ * @return string
+ * @throws \Deployer\Exception\Exception
+ */
 function gitPullAll() {
     return gitPull(getRepoPath('core')).gitPull(getRepoPath('app'));
 }
 
-function gitConfig($key, $value) {
+/**
+ * @param string $key
+ * @param string $value
+ *
+ * @return \Deployer\Type\Result
+ * @throws \Deployer\Exception\Exception
+ */
+function gitConfig(string $key, string $value) {
     return runGitCommand("config --global $key \"$value\"");
 }
 
@@ -526,6 +585,13 @@ function getLatestReleasePath() {
     return parse('{{deploy_path}}/releases/'.$release);
 }
 
+/**
+ * @param null|string $repo
+ * @param null|string $base_path
+ *
+ * @return string
+ * @throws \Deployer\Exception\Exception
+ */
 function getRepoPath(?string $repo = null, ?string $base_path = null) {
     if (stage() === DEPLOYER_DEV_STAGE) {
         return getcwd();
@@ -537,7 +603,7 @@ function getRepoPath(?string $repo = null, ?string $base_path = null) {
         $repo = input()->getOption('repo') ?: 'core';
     }
 
-    if (!in_array($repo, $allowed, true)) {
+    if (!\in_array($repo, $allowed, true)) {
         throw new Exception('Unknown repo '.$repo);
     }
 

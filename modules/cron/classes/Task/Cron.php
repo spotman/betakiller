@@ -90,11 +90,16 @@ class Task_Cron extends AbstractTask
 
             $this->logger->debug('Task [:task] is due', [':task' => $name]);
 
-            // Enqueue task if not queued
-            if (!isset($this->queue[$name])) {
-                $this->queue[$name] = $data;
-                $this->logger->debug('Task [:task] was queued', [':task' => $name]);
+            // Skip task if already queued
+            if (isset($this->queue[$name])) {
+                $this->logger->warning('Task [:task] is already queued, skipping', [':task' => $name]);
+                continue;
             }
+
+            // Enqueue task
+            $this->queue[$name] = $data;
+
+            $this->logger->debug('Task [:task] was queued', [':task' => $name]);
         }
     }
 
@@ -102,6 +107,7 @@ class Task_Cron extends AbstractTask
     {
         if (!$this->queue) {
             $this->logger->debug('No queued tasks, exiting');
+
             return;
         }
 
