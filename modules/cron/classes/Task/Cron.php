@@ -2,6 +2,7 @@
 
 use BetaKiller\Task\AbstractTask;
 use BetaKiller\Task\TaskException;
+use Cron\CronExpression;
 use Symfony\Component\Yaml\Yaml;
 
 class Task_Cron extends AbstractTask
@@ -44,9 +45,9 @@ class Task_Cron extends AbstractTask
                 throw new TaskException('Missing "at" key value in [:name] task', [':name' => $name]);
             }
 
-            $cron = \Cron\CronExpression::factory($expr);
-
             $this->logger->debug('Checking is due :task', [':task' => $name]);
+
+            $cron = CronExpression::factory($expr);
 
             if ($cron->isDue()) {
                 // TODO Enqueue task if not queued
