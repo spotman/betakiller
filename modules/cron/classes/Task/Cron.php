@@ -134,6 +134,6 @@ class Task_Cron extends AbstractTask
 
         $this->logger->info($cmd);
 
-        echo shell_exec($cmd);
+        shell_exec($cmd);
     }
 }
