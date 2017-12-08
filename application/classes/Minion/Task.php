@@ -29,12 +29,12 @@ abstract class Minion_Task extends Kohana_Minion_Task
             'stage' => 'development',
         ];
 
-        $this->_options = array_merge($common_options, $this->_options, $this->define_options());
+        $this->_options = array_merge($common_options, $this->_options, $this->defineOptions());
 
         parent::__construct();
     }
 
-    protected function define_options(): array
+    protected function defineOptions(): array
     {
         return [];
     }
