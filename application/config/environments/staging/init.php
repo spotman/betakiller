@@ -17,7 +17,8 @@
  */
 
 return array(
-    'errors'    =>  FALSE,
+    // TODO Disable Kohana errors handling after migrating to Monolog
+    'errors'    =>  TRUE,
     'profile'   =>  TRUE,
     'caching'   =>  TRUE,
 );

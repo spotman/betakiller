@@ -71,6 +71,7 @@ class Logger implements LoggerInterface
         } else {
             // TODO Show nice HTML messages or Kohana stacktrace page
             $monolog->pushHandler(new HtmlResponseHandler($isDebugAllowed));
+            $monolog->pushProcessor(new WebProcessor());
         }
 
         $logFilePath     = implode(DIRECTORY_SEPARATOR, ['logs', date('Y'), date('m'), date('d').'.log']);
@@ -107,7 +108,6 @@ class Logger implements LoggerInterface
 
         $monolog->pushProcessor(new KohanaPlaceholderProcessor());
         $monolog->pushProcessor(new MemoryPeakUsageProcessor());
-        $monolog->pushProcessor(new WebProcessor());
 
         return $monolog;
     }
