@@ -88,7 +88,6 @@ class Task_Cron extends AbstractTask
             $expr         = $data['at'] ?? null;
             $params       = $data['params'] ?? null;
             $taskStage    = $data['stage'] ?? null;
-            $maxInstances = $data['count'] ?? 1;
 
             if (!$expr) {
                 throw new TaskException('Missing "at" key value in [:name] task', [':name' => $name]);
@@ -114,7 +113,6 @@ class Task_Cron extends AbstractTask
             $this->logger->debug('Task [:task] is due', [':task' => $name]);
 
             $task = new Task($name, $params);
-            $task->setMaxInstancesCount($maxInstances);
 
             // Skip task if already queued
             if ($this->queue->isQueued($task)) {
@@ -134,12 +132,6 @@ class Task_Cron extends AbstractTask
      */
     private function runQueuedTasks(): void
     {
-//        if (!$this->queue) {
-//            $this->logger->debug('No queued tasks, exiting');
-//
-//            return;
-//        }
-
         $pool = new Pool();
         $pool->setMaxSimultaneous(3);
 
@@ -148,12 +140,11 @@ class Task_Cron extends AbstractTask
 
             $task->started();
 
-            $this->logger->debug('Started task [:name]', [':name' => $task->getName()]);
+            $this->logger->debug('Task [:name] is started', [':name' => $task->getName()]);
         });
 
         $pool->setOnSuccess(function (Process $process) {
             $task = $this->getTaskByProcessFingerprint($process);
-//            $task = $this->queue->getByPID($process->getPid());
 
             $task->done();
             $this->queue->dequeue($task);
@@ -163,7 +154,6 @@ class Task_Cron extends AbstractTask
 
         $pool->setOnFailure(function (Process $process) {
             $task = $this->getTaskByProcessFingerprint($process);
-//            $task = $this->queue->getByPID($process->getPid());
 
             $task->failed();
 
@@ -184,26 +174,21 @@ class Task_Cron extends AbstractTask
         // Select queued tasks where start_at >= current time, limit 5
         // It allows to postpone failed tasks for 5 minutes
         foreach ($this->queue->getReadyToStart() as $task) {
-            $this->logger->debug('Task :name is ready to start', [':name' => $task->getName()]);
+            $this->logger->debug('Task [:name] is ready to start', [':name' => $task->getName()]);
 
             $cmd = $this->getTaskCmd($task, $this->currentStage);
 
-            $maxCount = $task->getMaxInstancesCount();
+            $process = new Process($cmd);
 
-            for ($i = 0; $i < $maxCount; $i++) {
-                $process = new Process($cmd);
+            // Store fingerprint for simpler task identification upon start
+            $process->setEnv([
+                'fingerprint' => $task->getFingerprint(),
+            ]);
 
-                // Store fingerprint for simpler task identification upon start
-                $process->setEnv([
-                    'fingerprint' => $task->getFingerprint(),
-                    'instance'    => $i+1,
-                ]);
-
-                if ($this->isHuman) {
-                    $table->add($process);
-                } else {
-                    $pool->add($process);
-                }
+            if ($this->isHuman) {
+                $table->add($process);
+            } else {
+                $pool->add($process);
             }
         }
 
@@ -258,15 +243,4 @@ class Task_Cron extends AbstractTask
 
         return $cmd;
     }
-
-//    private function runTask(Task $task): void
-//    {
-//
-//        $this->logger->debug('Running :cmd', [':cmd' => $cmd]);
-//
-//        shell_exec($cmd);
-//
-//        // Dequeue if return code is 0
-//        // If failed then set start_at = current time + 5 minutes
-//    }
 }

@@ -16,11 +16,6 @@ class Task
     private $params;
 
     /**
-     * @var int
-     */
-    private $instancesMaxCount = 1;
-
-    /**
      * @var string
      */
     private $fingerprint;
@@ -97,16 +92,6 @@ class Task
         $this->fingerprint = sha1(\json_encode([$this->name, $this->params]));
     }
 
-    public function setMaxInstancesCount(int $count): void
-    {
-        $this->instancesMaxCount = $count;
-    }
-
-    public function getMaxInstancesCount(): int
-    {
-        return $this->instancesMaxCount;
-    }
-
     public function enqueued(?DateTimeImmutable $queuedAt = null): void
     {
         $this->queuedAt = $queuedAt ?? new DateTimeImmutable;
@@ -124,7 +109,7 @@ class Task
         $this->finishedAt = $stopTime ?? new DateTimeImmutable;
     }
 
-    public function failed(?DateTimeImmutable $stopTime = null): void
+    public function failed(): void
     {
         $this->clearPID();
     }
