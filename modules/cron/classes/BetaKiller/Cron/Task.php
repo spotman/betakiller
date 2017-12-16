@@ -40,12 +40,6 @@ class Task
      */
     private $pid;
 
-//    public static function fromConfig(array $config): void
-//    {
-//        // TODO
-//
-//    }
-
     /**
      * Task constructor.
      *
