@@ -1,7 +1,7 @@
 <?php
 namespace BetaKiller\IFace\Admin\Content\CustomTag;
 
-use BetaKiller\Content\CustomTag\CustomTagInterface;
+use BetaKiller\Content\Shortcode\ShortcodeInterface;
 use BetaKiller\IFace\Admin\AbstractAdminBase;
 
 class WysiwygPreview extends AbstractAdminBase
@@ -23,11 +23,12 @@ class WysiwygPreview extends AbstractAdminBase
      * Override this method in child classes
      *
      * @return array
+     * @throws \HTTP_Exception_302
      */
     public function getData(): array
     {
-        /** @var CustomTagInterface $currentTag */
-        $currentTag = $this->urlParameters->getParameter(CustomTagInterface::URL_CONTAINER_KEY);
+        /** @var ShortcodeInterface $currentTag */
+        $currentTag = $this->urlParameters->getParameter(ShortcodeInterface::URL_CONTAINER_KEY);
 
         $attributesKeys = $this->urlParameters->getQueryPartsKeys();
 
@@ -37,7 +38,9 @@ class WysiwygPreview extends AbstractAdminBase
             $attributes[$key] = $this->urlParameters->getQueryPart($key);
         }
 
-        $imageUrl = $currentTag->getWysiwygPluginPreviewSrc($attributes);
+        $currentTag->setAttributes($attributes);
+
+        $imageUrl = $currentTag->getWysiwygPluginPreviewSrc();
 
         $this->responseHelper->redirect($imageUrl);
 

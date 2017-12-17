@@ -5,7 +5,7 @@ use BetaKiller\Assets\AssetsProviderFactory;
 use BetaKiller\Assets\Provider\AssetsProviderInterface;
 use BetaKiller\Assets\Provider\AttachmentAssetsProviderInterface;
 use BetaKiller\Assets\Provider\ImageAssetsProviderInterface;
-use BetaKiller\Content\Shortcode;
+use BetaKiller\Content\Shortcode\ShortcodeFacade;
 use BetaKiller\Factory\RepositoryFactory;
 use BetaKiller\Model\ContentPost;
 use BetaKiller\Repository\ContentAttachmentRepository;
@@ -20,9 +20,9 @@ use BetaKiller\Repository\ContentYoutubeRecordRepository;
 class ContentHelper
 {
     /**
-     * @var \BetaKiller\Content\Shortcode
+     * @var \BetaKiller\Content\Shortcode\ShortcodeFacade
      */
-    private $shortcode;
+    private $shortcodeFacade;
 
     /**
      * @var \BetaKiller\Factory\RepositoryFactory
@@ -37,11 +37,11 @@ class ContentHelper
     public function __construct(
         RepositoryFactory $repositoryFactory,
         AssetsProviderFactory $providerFactory,
-        Shortcode $shortcode
+        ShortcodeFacade $shortcodeFacade
     ) {
         $this->repositoryFactory = $repositoryFactory;
         $this->providerFactory   = $providerFactory;
-        $this->shortcode         = $shortcode;
+        $this->shortcodeFacade   = $shortcodeFacade;
     }
 
     public function getPostRepository(): ContentPostRepository
@@ -88,7 +88,7 @@ class ContentHelper
     {
         $text = $post->getContent();
         $text = strip_tags($text);
-        $text = $this->shortcode->stripTags($text);
+        $text = $this->shortcodeFacade->stripTags($text);
 
         return \Text::limit_chars($text, $length ?? 250, $end_chars ?? '...', true);
     }
@@ -116,9 +116,9 @@ class ContentHelper
         ];
 
         foreach ($mimeProviders as $provider) {
-            $allowedMimeTypes = $provider->getAllowedMimeTypes();
+            $allowedMimes = $provider->getAllowedMimeTypes();
 
-            if ($allowedMimeTypes && is_array($allowedMimeTypes) && in_array($mimeType, $allowedMimeTypes, true)) {
+            if ($allowedMimes && \is_array($allowedMimes) && \in_array($mimeType, $allowedMimes, true)) {
                 return $provider;
             }
         }

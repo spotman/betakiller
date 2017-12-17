@@ -11,13 +11,20 @@ abstract class AbstractConfigBasedUrlParameter implements ConfigBasedUrlParamete
     private $codename;
 
     /**
+     * @var array
+     */
+    private $options;
+
+    /**
      * AbstractConfigBasedUrlParameter constructor.
      *
-     * @param string $codename
+     * @param string     $codename
+     * @param array|null $options
      */
-    public function __construct(string $codename)
+    public function __construct(string $codename, ?array $options = null)
     {
         $this->codename = $codename;
+        $this->options  = $options;
     }
 
     /**
@@ -54,6 +61,29 @@ abstract class AbstractConfigBasedUrlParameter implements ConfigBasedUrlParamete
     }
 
     /**
+     * Config-based url parameters may define properties in config file
+     *
+     * @return array|null
+     */
+    public function getOptions(): ?array
+    {
+        return $this->options;
+    }
+
+    /**
+     * Returns config-based property or null
+     *
+     * @param string     $key
+     * @param mixed|null $default
+     *
+     * @return mixed
+     */
+    public function getOption(string $key, $default = null)
+    {
+        return $this->options[$key] ?? $default;
+    }
+
+    /**
      * Returns true if current parameter is the same as provided one
      *
      * @param \BetaKiller\IFace\Url\ConfigBasedUrlParameterInterface|mixed $parameter
@@ -62,6 +92,8 @@ abstract class AbstractConfigBasedUrlParameter implements ConfigBasedUrlParamete
      */
     public function isSameAs(UrlParameterInterface $parameter): bool
     {
-        return ($parameter::getUrlContainerKey() === $this::getUrlContainerKey()) && ($parameter->getCodename() === $this->getCodename());
+        return ($parameter::getUrlContainerKey() === $this::getUrlContainerKey())
+            && ($parameter->getCodename() === $this->getCodename())
+            && ($parameter->getOptions() === $this->getOptions());
     }
 }

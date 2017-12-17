@@ -59,9 +59,9 @@
         <div class="row">
               <div class="input-field col s12">
                   {#<textarea name="content" id="article-content" rows="25" style="height: 100vh" {{ isUpdateAllowed ? "" : "disabled" }}>{{ post.content }}</textarea>#}
-                  {#<div id="article-content" data-custom-tags="{{ custom_tags|join(",") }}">{{ post.content|raw }}</div>#}
+                  {#<div id="article-content" data-custom-tags="{{ shortcodes|join(",") }}">{{ post.content|raw }}</div>#}
                   <textarea id="article-content" name="content" {{ isUpdateAllowed ? "" : "disabled" }}
-                            data-custom-tags="{{ custom_tags|join(",") }}">
+                            data-custom-tags="{{ shortcodes|join(",") }}">
                     {{ post.content }}
                   </textarea>
               </div>

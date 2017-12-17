@@ -21,10 +21,9 @@ trait ModelWithRevisionsOrmTrait
      * Prepares the model database connection, determines the table name,
      * and loads column information.
      *
-     * @throws \Exception
      * @return void
      */
-    protected function initializeRevisionsRelations()
+    protected function initializeRevisionsRelations(): void
     {
         $this->belongs_to([
             RevisionModelInterface::ACTUAL_REVISION_KEY => [
@@ -50,7 +49,6 @@ trait ModelWithRevisionsOrmTrait
      *
      * @param   string $column Column name
      *
-     * @throws \Kohana_Exception
      * @return mixed
      */
     public function get($column)
@@ -69,13 +67,13 @@ trait ModelWithRevisionsOrmTrait
      * @param  string $column Column name
      * @param  mixed  $value  Column value
      *
-     * @throws \Kohana_Exception
      * @return $this
      */
     public function set($column, $value)
     {
         if ($this->isRevisionableColumn($column)) {
             $this->getCurrentRevision()->set($column, $value);
+
             return $this;
         }
 
@@ -104,8 +102,18 @@ trait ModelWithRevisionsOrmTrait
      */
     public function setLatestRevisionAsActual(): void
     {
+        // Push changes to database so current revision becomes latest
+        $this->createRevisionIfChanged();
+
         $revision = $this->getLatestRevision();
         $this->setActualRevision($revision);
+    }
+
+    public function isActualRevision(RevisionModelInterface $revision): bool
+    {
+        $actual = $this->getActualRevision();
+
+        return $actual && $actual->getID() === $revision->getID();
     }
 
     /**
@@ -122,6 +130,7 @@ trait ModelWithRevisionsOrmTrait
     public function filterHavingActualRevision()
     {
         $column = $this->object_column($this->getRelatedModelRevisionForeignKey());
+
         return $this->where($column, 'IS NOT', null);
     }
 
@@ -158,11 +167,12 @@ trait ModelWithRevisionsOrmTrait
 
     /**
      * Insert a new object to the database
+     *
      * @param  \Validation $validation Validation object
-     * @throws \Kohana_Exception
+     *
      * @return $this
      */
-    public function create(\Validation $validation = NULL)
+    public function create(\Validation $validation = null)
     {
         $result = parent::create($validation);
 
@@ -175,11 +185,12 @@ trait ModelWithRevisionsOrmTrait
      * Updates a single record or multiple records
      *
      * @chainable
+     *
      * @param  \Validation $validation Validation object
-     * @throws \Kohana_Exception
+     *
      * @return $this
      */
-    public function update(\Validation $validation = NULL)
+    public function update(\Validation $validation = null)
     {
         $result = parent::update($validation);
 
@@ -196,6 +207,7 @@ trait ModelWithRevisionsOrmTrait
 
     /**
      * @return \BetaKiller\Model\RevisionModelInterface|null
+     * @throws \HTTP_Exception_401
      */
     protected function createRevisionIfChanged(): ?RevisionModelInterface
     {
@@ -235,7 +247,7 @@ trait ModelWithRevisionsOrmTrait
         return $newRevision;
     }
 
-    protected function updateRevisionRelatedModel()
+    protected function updateRevisionRelatedModel(): void
     {
         $this->createRevisionIfChanged();
     }
@@ -245,12 +257,12 @@ trait ModelWithRevisionsOrmTrait
         return $this->getCurrentRevision()->changed();
     }
 
-    private function isRevisionableColumn($column)
+    private function isRevisionableColumn(string $column): bool
     {
-        return in_array($column, $this->getFieldsWithRevisions(), true);
+        return \in_array($column, $this->getFieldsWithRevisions(), true);
     }
 
-    private function getCurrentRevision()
+    private function getCurrentRevision(): RevisionModelInterface
     {
         if (!$this->currentRevision) {
             // Use actual revision by default
@@ -262,9 +274,10 @@ trait ModelWithRevisionsOrmTrait
 
     /**
      * @param \BetaKiller\Model\RevisionModelInterface $model
+     *
      * @return void
      */
-    private function setCurrentRevision(RevisionModelInterface $model)
+    private function setCurrentRevision(RevisionModelInterface $model): void
     {
         $this->currentRevision = $model;
     }
@@ -272,7 +285,7 @@ trait ModelWithRevisionsOrmTrait
     /**
      * @return \BetaKiller\Model\RevisionModelInterface|null
      */
-    private function getActualRevision()
+    private function getActualRevision(): ?RevisionModelInterface
     {
         /** @var \BetaKiller\Model\RevisionModelInterface $model */
         $model = $this->get(RevisionModelInterface::ACTUAL_REVISION_KEY);
@@ -282,14 +295,15 @@ trait ModelWithRevisionsOrmTrait
 
     /**
      * @param \BetaKiller\Model\RevisionModelInterface $model
+     *
      * @return void
      */
-    private function setActualRevision(RevisionModelInterface $model)
+    private function setActualRevision(RevisionModelInterface $model): void
     {
         $this->set(RevisionModelInterface::ACTUAL_REVISION_KEY, $model);
     }
 
-    private function getLatestRevision()
+    private function getLatestRevision(): RevisionModelInterface
     {
         return $this->getAllRevisionsRelation()->getLatestRevision();
     }
@@ -297,7 +311,7 @@ trait ModelWithRevisionsOrmTrait
     /**
      * @return \BetaKiller\Model\AbstractRevisionOrmModel
      */
-    private function getAllRevisionsRelation()
+    private function getAllRevisionsRelation(): AbstractRevisionOrmModel
     {
         return $this->get(RevisionModelInterface::ALL_REVISIONS_KEY);
     }
@@ -305,7 +319,7 @@ trait ModelWithRevisionsOrmTrait
     /**
      * @return \BetaKiller\Model\RevisionModelInterface
      */
-    private function getEmptyRevision()
+    private function getEmptyRevision(): RevisionModelInterface
     {
         return $this->model_factory(null, $this->getRevisionModelName());
     }
@@ -313,20 +327,20 @@ trait ModelWithRevisionsOrmTrait
     /**
      * @return string
      */
-    abstract protected function getRevisionModelName();
+    abstract protected function getRevisionModelName(): string;
 
     /**
      * @return string
      */
-    abstract protected function getRelatedModelRevisionForeignKey();
+    abstract protected function getRelatedModelRevisionForeignKey(): string;
 
     /**
      * @return string
      */
-    abstract protected function getRevisionModelForeignKey();
+    abstract protected function getRevisionModelForeignKey(): string;
 
     /**
      * @return string[]
      */
-    abstract protected function getFieldsWithRevisions();
+    abstract protected function getFieldsWithRevisions(): array;
 }

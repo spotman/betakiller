@@ -1,8 +1,6 @@
 <?php
 namespace BetaKiller\Model;
 
-use BetaKiller\Exception;
-use BetaKiller\Helper\RoleModelFactoryTrait;
 
 class GuestUser extends User
 {
@@ -12,7 +10,7 @@ class GuestUser extends User
     public function getAccessControlRoles()
     {
         return [
-            $this->get_roles_relation()->get_guest_role(),
+            new Role(['name' => Role::GUEST_ROLE_NAME]),
         ];
     }
 

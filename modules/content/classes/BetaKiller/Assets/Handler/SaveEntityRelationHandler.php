@@ -6,7 +6,7 @@ use BetaKiller\Repository\EntityRepository;
 
 class SaveEntityRelationHandler implements AssetsHandlerInterface
 {
-    const CODENAME = 'SaveEntityRelation';
+    public const CODENAME = 'SaveEntityRelation';
 
     /**
      * @var \BetaKiller\Repository\EntityRepository

@@ -13,10 +13,7 @@ abstract class AbstractWidget implements WidgetInterface
 {
     use ControllerHelperTrait;
 
-    const DEFAULT_STATE = 'default';
-
-    const JSON_SUCCESS = Response::JSON_SUCCESS;
-    const JSON_ERROR   = Response::JSON_ERROR;
+    protected const DEFAULT_STATE = 'default';
 
     /**
      * @var string
@@ -48,6 +45,8 @@ abstract class AbstractWidget implements WidgetInterface
      * @param array|NULL $data
      *
      * @return \View
+     * @deprecated
+     * @todo Inject view factory in constructor
      */
     abstract protected function view_factory($file = null, array $data = null): View;
 
@@ -254,16 +253,23 @@ abstract class AbstractWidget implements WidgetInterface
     protected function view($file = null): \View
     {
         if (!$file) {
+            $name = $this->getViewName();
+
             $suffix = $this->_current_state !== static::DEFAULT_STATE
                 ? '-'.$this->_current_state
                 : '';
 
-            $file = str_replace('_', DIRECTORY_SEPARATOR, $this->_name).$suffix;
+            $file = str_replace('_', DIRECTORY_SEPARATOR, $name).$suffix;
         }
 
-        $view_path = 'widgets'.DIRECTORY_SEPARATOR.$file;
+        $viewPath = 'widgets'.DIRECTORY_SEPARATOR.$file;
 
-        return $this->view_factory($view_path, $this->getContext());
+        return $this->view_factory($viewPath, $this->getContext());
+    }
+
+    protected function getViewName(): string
+    {
+        return $this->_name;
     }
 
     protected function getValidationErrors(Validation $validation): array

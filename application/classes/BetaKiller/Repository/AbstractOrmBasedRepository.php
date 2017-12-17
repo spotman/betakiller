@@ -70,6 +70,7 @@ abstract class AbstractOrmBasedRepository extends AbstractRepository
      * @param ExtendedOrmInterface|mixed $entity
      *
      * @throws \BetaKiller\Repository\RepositoryException
+     * @throws \ORM_Validation_Exception
      */
     public function save($entity): void
     {

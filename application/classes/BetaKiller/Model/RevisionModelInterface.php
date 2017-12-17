@@ -3,13 +3,15 @@ namespace BetaKiller\Model;
 
 interface RevisionModelInterface
 {
-    const ALL_REVISIONS_KEY   = 'all_revisions';
-    const ACTUAL_REVISION_KEY = 'actual_revision';
+    public const ALL_REVISIONS_KEY   = 'all_revisions';
+    public const ACTUAL_REVISION_KEY = 'actual_revision';
+
+    public function getID();
 
     /**
      * @return \BetaKiller\Model\RevisionModelInterface
      */
-    public function getLatestRevision();
+    public function getLatestRevision(): RevisionModelInterface;
 
     /**
      * @param string $column
@@ -31,14 +33,14 @@ interface RevisionModelInterface
     /**
      * @return UserInterface
      */
-    public function getCreatedBy();
+    public function getCreatedBy(): UserInterface;
 
     public function setCreatedAt(\DateTime $time);
 
     /**
      * @return \DateTime
      */
-    public function getCreatedAt();
+    public function getCreatedAt(): \DateTimeInterface;
 
     /**
      * @return bool

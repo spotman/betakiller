@@ -1,5 +1,6 @@
 <?php
 
+use BetaKiller\Config\AppConfigInterface;
 use BetaKiller\Helper\IFaceHelper;
 use BetaKiller\IFace\IFaceModelInterface;
 use BetaKiller\IFace\ModelProvider\IFaceModelProviderAggregate;
@@ -28,6 +29,11 @@ class Service_Sitemap extends Service
     private $ifaceHelper;
 
     /**
+     * @var AppConfigInterface
+     */
+    private $appConfig;
+
+    /**
      * @var \Psr\Log\LoggerInterface
      */
     private $logger;
@@ -49,22 +55,25 @@ class Service_Sitemap extends Service
      * @param \BetaKiller\IFace\ModelProvider\IFaceModelProviderAggregate $ifaceModelProvider
      * @param \BetaKiller\Helper\IFaceHelper                              $ifaceHelper
      * @param \Psr\Log\LoggerInterface                                    $logger
+     * @param \BetaKiller\Config\AppConfigInterface                       $appConfig
      */
     public function __construct(
         UrlContainerInterface $urlParameters,
         IFaceModelProviderAggregate $ifaceModelProvider,
         IFaceHelper $ifaceHelper,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        AppConfigInterface $appConfig
     ) {
         $this->urlParameters      = $urlParameters;
         $this->ifaceModelProvider = $ifaceModelProvider;
         $this->ifaceHelper        = $ifaceHelper;
+        $this->appConfig          = $appConfig;
         $this->logger             = $logger;
     }
 
     public function generate()
     {
-        $baseUrl = Kohana::$base_url;
+        $baseUrl = $this->appConfig->getBaseUrl();
 
         if (strpos($baseUrl, 'http') === false) {
             throw new ServiceException('Please, set "base_url" parameter to full URL (with protocol) in config file init.php');

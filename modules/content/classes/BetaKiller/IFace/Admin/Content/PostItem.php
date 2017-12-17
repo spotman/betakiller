@@ -25,7 +25,7 @@ class PostItem extends AbstractAdminBase
     private $assetsHelper;
 
     /**
-     * @var \CustomTagFacade
+     * @var \BetaKiller\Content\Shortcode\ShortcodeFacade
      * @Inject
      */
     private $customTagFacade;
@@ -38,6 +38,8 @@ class PostItem extends AbstractAdminBase
     public function __construct(ContentUrlContainerHelper $urlParametersHelper)
     {
         $this->urlParametersHelper = $urlParametersHelper;
+
+        parent::__construct();
     }
 
     /**
@@ -45,10 +47,15 @@ class PostItem extends AbstractAdminBase
      * Override this method in child classes
      *
      * @return array
+     * @throws \HTTP_Exception_404
      */
     public function getData(): array
     {
         $post = $this->urlParametersHelper->getContentPost();
+
+        if (!$post) {
+            throw new \HTTP_Exception_404();
+        }
 
         $thumbnails = [];
 
@@ -84,7 +91,7 @@ class PostItem extends AbstractAdminBase
                 'thumbnails' => $thumbnails,
             ],
 
-            'custom_tags' => $this->customTagFacade->getAllowedTags(),
+            'shortcodes' => $this->customTagFacade->getEditableTagsNames(),
         ];
     }
 }

@@ -2,11 +2,11 @@
 
 use BetaKiller\Assets\Model\AssetsModelImageInterface;
 use BetaKiller\Assets\Provider\AssetsProviderInterface;
-use BetaKiller\Content\CustomTag\AttachmentCustomTag;
-use BetaKiller\Content\CustomTag\CaptionCustomTag;
-use BetaKiller\Content\CustomTag\GalleryCustomTag;
-use BetaKiller\Content\CustomTag\PhotoCustomTag;
-use BetaKiller\Content\CustomTag\YoutubeCustomTag;
+use BetaKiller\Content\Shortcode\AttachmentShortcode;
+use BetaKiller\Content\Shortcode\GalleryShortcode;
+use BetaKiller\Content\Shortcode\ImageShortcode;
+use BetaKiller\Content\Shortcode\ShortcodeInterface;
+use BetaKiller\Content\Shortcode\YoutubeShortcode;
 use BetaKiller\Model\ContentPost;
 use BetaKiller\Model\Entity;
 use BetaKiller\Model\IFaceZone;
@@ -18,15 +18,15 @@ use DiDom\Document;
 use Thunder\Shortcode\Parser\RegexParser;
 use Thunder\Shortcode\Processor\Processor;
 use Thunder\Shortcode\Serializer\TextSerializer;
-use Thunder\Shortcode\Shortcode\ShortcodeInterface;
+use Thunder\Shortcode\Shortcode\ShortcodeInterface as ThunderShortcodeInterface;
 
 class Task_Content_Import_Wordpress extends AbstractTask
 {
-    const ATTACH_PARSING_MODE_HTTP  = 'http';
-    const ATTACH_PARSING_MODE_LOCAL = 'local';
+    private const ATTACH_PARSING_MODE_HTTP  = 'http';
+    private const ATTACH_PARSING_MODE_LOCAL = 'local';
 
-    const WP_OPTION_PARSING_MODE = 'betakiller_parsing_mode';
-    const WP_OPTION_PARSING_PATH = 'betakiller_parsing_path';
+    private const WP_OPTION_PARSING_MODE = 'betakiller_parsing_mode';
+    private const WP_OPTION_PARSING_PATH = 'betakiller_parsing_path';
 
     /**
      * @var string
@@ -127,9 +127,9 @@ class Task_Content_Import_Wordpress extends AbstractTask
 
     /**
      * @Inject
-     * @var \CustomTagFacade
+     * @var \BetaKiller\Content\Shortcode\ShortcodeFacade
      */
-    private $customTagFacade;
+    private $shortcodeFacade;
 
     /**
      * @Inject
@@ -137,13 +137,21 @@ class Task_Content_Import_Wordpress extends AbstractTask
      */
     private $wp;
 
-    protected function define_options(): array
+    protected function defineOptions(): array
     {
         return [
             'skip-before' => null,
         ];
     }
 
+    /**
+     * @param array $params
+     *
+     * @throws \BetaKiller\Repository\RepositoryException
+     * @throws \BetaKiller\Task\TaskException
+     * @throws \Kohana_Exception
+     * @throws \ORM_Validation_Exception
+     */
     protected function _execute(array $params): void
     {
         if ($params['skip-before']) {
@@ -170,6 +178,9 @@ class Task_Content_Import_Wordpress extends AbstractTask
         $this->import_quotes();
     }
 
+    /**
+     * @throws \BetaKiller\Task\TaskException
+     */
     private function configureDialog(): void
     {
         $parsingMode = $this->wp->get_option(self::WP_OPTION_PARSING_MODE);
@@ -215,6 +226,14 @@ class Task_Content_Import_Wordpress extends AbstractTask
         $this->wp->set_option(self::WP_OPTION_PARSING_PATH, $parsingPath);
     }
 
+    /**
+     * @param array                                                    $attach
+     * @param int                                                      $entityItemID
+     * @param \BetaKiller\Assets\Provider\AssetsProviderInterface|null $provider
+     *
+     * @return \BetaKiller\Model\WordpressAttachmentInterface
+     * @throws \BetaKiller\Task\TaskException
+     */
     private function processAttachment(
         array $attach,
         int $entityItemID,
@@ -337,7 +356,15 @@ class Task_Content_Import_Wordpress extends AbstractTask
         return $model;
     }
 
-    private function getAttachmentPath(string $originalUrlPath, $expectedMimes)
+    /**
+     * @param string $originalUrlPath
+     * @param        $expectedMimes
+     *
+     * @return bool|null|string
+     * @throws \BetaKiller\Task\TaskException
+     * @throws \Request_Exception
+     */
+    private function getAttachmentPath(string $originalUrlPath, $expectedMimes): ?string
     {
         if ($this->attachParsingMode === self::ATTACH_PARSING_MODE_HTTP) {
             $url = $this->attachParsingPath.ltrim($originalUrlPath, '/');
@@ -401,6 +428,11 @@ class Task_Content_Import_Wordpress extends AbstractTask
         return null;
     }
 
+    /**
+     * @throws \BetaKiller\Repository\RepositoryException
+     * @throws \BetaKiller\Task\TaskException
+     * @throws \Kohana_Exception
+     */
     private function importPostsAndPages(): void
     {
         $posts = $this->wp->get_posts_and_pages($this->skipBeforeDate);
@@ -487,13 +519,13 @@ class Task_Content_Import_Wordpress extends AbstractTask
             $model->setCreatedAt($createdAt);
             $model->setUpdatedAt($updatedAt);
 
-            // Actualize revision with imported data
-            $model->setLatestRevisionAsActual();
-
             // Auto publishing for new posts (we are importing only published posts)
             if ($isNew) {
                 $model->complete(); // Publishing would be done automatically
             }
+
+            // Actualize revision with imported data
+            $model->setLatestRevisionAsActual();
 
             // Saving model content
             $this->postRepository->save($model);
@@ -511,6 +543,12 @@ class Task_Content_Import_Wordpress extends AbstractTask
         }
     }
 
+    /**
+     * @param \BetaKiller\Model\ContentPost $item
+     *
+     * @throws \BetaKiller\Task\TaskException
+     * @throws \Kohana_Exception
+     */
     private function postProcessArticleText(ContentPost $item): void
     {
         $this->logger->debug('Text post processing...');
@@ -535,34 +573,34 @@ class Task_Content_Import_Wordpress extends AbstractTask
 //            $this->remove_links_on_content_images($document);
 
             $text = $body->innerHtml();
-            $text = $this->removeClosingCustomTags($text);
+//            $text = $this->removeClosingCustomTags($text);
             $item->setContent($text);
         } else {
             $this->logger->warning('Post parsing error for :url', [':url' => $item->getUri()]);
         }
     }
 
-    /**
-     * Dirty hack for php-dom library that creates CustomTagFacade elements with closing tags
-     *
-     * @param string $text
-     *
-     * @return string
-     */
-    private function removeClosingCustomTags($text): string
-    {
-        foreach ($this->customTagFacade->getSelfClosingTags() as $tag) {
-            $text = str_replace('></'.$tag.'>', ' />', $text);
-        }
-
-        return $text;
-    }
+//    /**
+//     * Dirty hack for php-dom library that creates ShortcodeFacade elements with closing tags
+//     *
+//     * @param string $text
+//     *
+//     * @return string
+//     */
+//    private function removeClosingCustomTags($text): string
+//    {
+//        foreach ($this->shortcodeFacade->getSelfClosingTags() as $tag) {
+//            $text = str_replace('></'.$tag.'>', ' />', $text);
+//        }
+//
+//        return $text;
+//    }
 
 //    protected function remove_links_on_content_images(Document $root)
 //    {
 //        $this->debug('Removing links on content images...');
 //
-//        $tag = CustomTagFacade::TAG_NAME;
+//        $tag = ShortcodeFacade::TAG_NAME;
 //
 //        $images = $root->find('a > '.$tag);
 //
@@ -577,6 +615,12 @@ class Task_Content_Import_Wordpress extends AbstractTask
 //        }
 //    }
 
+    /**
+     * @param \DiDom\Document $document
+     * @param int             $postID
+     *
+     * @throws \BetaKiller\Task\TaskException
+     */
     private function updateLinksOnAttachments(Document $document, int $postID): void
     {
         $this->logger->debug('Updating links on attachments...');
@@ -601,21 +645,33 @@ class Task_Content_Import_Wordpress extends AbstractTask
 
             $newUrl = $this->assetsHelper->getOriginalUrl($model);
 
-            // TODO Если внутри ссылки есть картинка, которая ведёт на ту же картинку, то надо заменить этот блок картинкой со спецатрибутами zoomable
+            $attributes = [
+                'id' => $model->getID(),
+            ];
+
+            // TODO Если внутри ссылки есть картинка, которая ведёт на тот же URL, то надо заменить этот блок картинкой со спецатрибутами zoomable
 
             // TODO Links with images inside must be marked as type="button"
             // TODO Links without child elements => type="link" text="..."
 
-            $attach = $document->createElement(AttachmentCustomTag::TAG_NAME, null, [
-                'id' => $model->getID(),
+            $shortcode = $this->shortcodeFacade->create(AttachmentShortcode::codename(), $attributes);
+
+            $link->replace($shortcode->asDomText());
+
+            $this->logger->debug('Link for :old was changed to :new', [
+                ':old' => $href,
+                ':new' => $newUrl,
             ]);
-
-            $link->replace($attach);
-
-            $this->logger->debug('Link for :old was changed to :new', [':old' => $href, ':new' => $newUrl]);
         }
     }
 
+    /**
+     * @param \BetaKiller\Model\ContentPost $post
+     * @param array                         $meta
+     *
+     * @throws \BetaKiller\Task\TaskException
+     * @throws \Kohana_Exception
+     */
     private function processThumbnails(ContentPost $post, array $meta): void
     {
         $wpID = $post->getWpId();
@@ -626,7 +682,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
             $this->logger->debug('Getting thumbnail images from from _format_gallery_images');
 
             // Getting images from meta._format_gallery_images
-            $wpImagesIDs += (array)unserialize($meta['_format_gallery_images'], false);
+            $wpImagesIDs += (array)unserialize($meta['_format_gallery_images'], ['allowed_classes' => false]);
         }
 
         if (!$wpImagesIDs && isset($meta['_thumbnail_id'])) {
@@ -670,6 +726,11 @@ class Task_Content_Import_Wordpress extends AbstractTask
         }
     }
 
+    /**
+     * @param \BetaKiller\Model\ContentPost $item
+     *
+     * @throws \Kohana_Exception
+     */
     private function processCustomBbTags(ContentPost $item): void
     {
         $this->logger->debug('Processing custom tags...');
@@ -677,22 +738,22 @@ class Task_Content_Import_Wordpress extends AbstractTask
         $handlers = new \Thunder\Shortcode\HandlerContainer\HandlerContainer();
 
         // [caption id="attachment_571" align="alignnone" width="780"]
-        $handlers->add('caption', function (ShortcodeInterface $shortcode) use ($item) {
+        $handlers->add('caption', function (ThunderShortcodeInterface $shortcode) use ($item) {
             return $this->thunderHandlerCaption($shortcode, $item);
         });
 
         // [gallery ids="253,261.260"]
-        $handlers->add('gallery', function (ShortcodeInterface $shortcode) use ($item) {
+        $handlers->add('gallery', function (ThunderShortcodeInterface $shortcode) use ($item) {
             return $this->thunderHandlerGallery($shortcode, $item);
         });
 
         // [wonderplugin_slider id="1"]
-        $handlers->add('wonderplugin_slider', function (ShortcodeInterface $shortcode) use ($item) {
+        $handlers->add('wonderplugin_slider', function (ThunderShortcodeInterface $shortcode) use ($item) {
             return $this->thunderHandlerWonderplugin($shortcode, $item);
         });
 
         // All unknown shortcodes
-        $handlers->setDefault(function (ShortcodeInterface $s) use ($item) {
+        $handlers->setDefault(function (ThunderShortcodeInterface $s) use ($item) {
             $serializer = new TextSerializer();
             $name       = $s->getName();
 
@@ -712,14 +773,20 @@ class Task_Content_Import_Wordpress extends AbstractTask
         $item->setContent($content);
     }
 
-    public function thunderHandlerCaption(ShortcodeInterface $s, ContentPost $post): ?string
+    /**
+     * @param \Thunder\Shortcode\Shortcode\ShortcodeInterface $s
+     * @param \BetaKiller\Model\ContentPost                   $post
+     *
+     * @return null|string
+     * @throws \BetaKiller\Task\TaskException
+     */
+    public function thunderHandlerCaption(ThunderShortcodeInterface $s, ContentPost $post): ?string
     {
         $this->logger->debug('[caption] found');
 
         $parameters = $s->getParameters();
 
         $imageWpID = (int)str_replace('attachment_', '', $parameters['id']);
-        unset($parameters['id']);
 
         // Find image in WP and process attachment
         $wpImageData = $this->wp->get_attachment_by_id($imageWpID);
@@ -736,20 +803,29 @@ class Task_Content_Import_Wordpress extends AbstractTask
         $captionText = trim(strip_tags($s->getContent()));
 
         $parameters['title'] = $captionText;
+        $parameters['id'] = $image->getID();
+        $parameters[ImageShortcode::ATTR_LAYOUT_NAME] = ImageShortcode::ATTR_LAYOUT_CAPTION;
 
-        return $this->customTagFacade->generateHtml(CaptionCustomTag::TAG_NAME, $image->getID(), $parameters);
+        return $this->shortcodeFacade->create(ImageShortcode::codename(), $parameters)->asHtml();
     }
 
-    public function thunderHandlerGallery(ShortcodeInterface $s, ContentPost $post): ?string
+    /**
+     * @param \Thunder\Shortcode\Shortcode\ShortcodeInterface $s
+     * @param \BetaKiller\Model\ContentPost                   $post
+     *
+     * @return null|string
+     * @throws \BetaKiller\Task\TaskException
+     */
+    public function thunderHandlerGallery(ThunderShortcodeInterface $s, ContentPost $post): ?string
     {
         $this->logger->debug('[gallery] found');
 
         $wpIDsList = $s->getParameter('ids');
-        $type      = $s->getParameter('type');
+        $layout      = $s->getParameter('type');
         $columns   = (int)$s->getParameter('columns');
 
-        if (strpos($type, 'slider') !== false) {
-            $type = 'slider';
+        if (strpos($layout, 'slider') !== false) {
+            $layout = 'slider';
         }
 
         // Removing spaces
@@ -759,7 +835,9 @@ class Task_Content_Import_Wordpress extends AbstractTask
         $wpImages = $this->wp->get_attachments(null, $wpIDs);
 
         if (!$wpImages) {
-            $this->logger->warning('No images found for gallery with WP IDs :ids', [':ids' => implode(', ', $wpIDs)]);
+            $this->logger->warning('No images found for gallery with WP IDs :ids', [
+                ':ids' => implode(', ', $wpIDs),
+            ]);
 
             return null;
         }
@@ -774,15 +852,25 @@ class Task_Content_Import_Wordpress extends AbstractTask
 
         $attributes = [
             'ids'     => implode(',', $imagesIDs),
-            'type'    => $type,
+            'layout'    => $layout,
             'columns' => $columns,
         ];
 
-        // No ID in this tag
-        return $this->customTagFacade->generateHtml(GalleryCustomTag::TAG_NAME, null, $attributes);
+        // TODO Deal with gallery ID
+        // $attributes['id'] = $image->getID();
+
+        return $this->shortcodeFacade->create(GalleryShortcode::codename(), $attributes)->asHtml();
     }
 
-    public function thunderHandlerWonderplugin(ShortcodeInterface $s, ContentPost $post): string
+    /**
+     * @param \Thunder\Shortcode\Shortcode\ShortcodeInterface $s
+     * @param \BetaKiller\Model\ContentPost                   $post
+     *
+     * @return string
+     * @throws \BetaKiller\Exception
+     * @throws \BetaKiller\Task\TaskException
+     */
+    public function thunderHandlerWonderplugin(ThunderShortcodeInterface $s, ContentPost $post): string
     {
         $this->logger->debug('[wonderplugin_slider] found');
 
@@ -829,37 +917,49 @@ class Task_Content_Import_Wordpress extends AbstractTask
             'type' => 'slider',
         ];
 
-        // No ID in this tag
-        return $this->customTagFacade->generateHtml(GalleryCustomTag::TAG_NAME, null, $attributes);
+        // TODO Deal with gallery ID
+
+        return $this->shortcodeFacade->create(GalleryShortcode::codename(), $attributes)->asHtml();
     }
 
     /**
-     * @param Document $root
-     * @param int      $entityItemID
+     * @param \DiDom\Document $root
+     * @param int             $entityItemID
      */
     private function processImagesInText(Document $root, int $entityItemID): void
     {
         $images = $root->find('img');
 
         foreach ($images as $image) {
-            $targetTag = null;
+            $shortcode = null;
 
             try {
-                // Creating new <photo /> tag as replacement for <img />
-                $targetTag = $this->processImgTag($image, $entityItemID);
+                // Creating new [image /] tag as replacement for <img />
+                $shortcode = $this->processImgTag($image, $entityItemID);
             } catch (Throwable $e) {
-                $this->logger->warning(':message', [':message' => $e->getMessage()]);
+                $this->logger->warning(':error', [':error' => $e->getMessage()]);
             }
 
             // Exit if something went wrong
-            if (!$targetTag) {
+            if (!$shortcode) {
                 continue;
             }
 
-            $this->logger->debug('Replacement tag is :tag', [':tag' => $targetTag->html()]);
+            $this->logger->debug('Replacement tag is :tag', [':tag' => $shortcode->asHtml()]);
 
-            $parent      = $image->parent();
+            $parent = $image->parent();
+
+            if (!$parent) {
+                $this->logger->warning('Image has no parent :html', [':html' => $image->html()]);
+                continue;
+            }
+
             $grandParent = $parent->parent();
+
+            if (!$grandParent) {
+                $this->logger->warning('Image has no grand parent :html', [':html' => $image->html()]);
+                continue;
+            }
 
             $parentTagName = $parent->getNode()->nodeName;
 
@@ -867,18 +967,25 @@ class Task_Content_Import_Wordpress extends AbstractTask
 
             // Remove links to content images coz they would be added automatically
             if ($parentTagName === 'a' && $parent->attr('href') === $image->attr('src')) {
-                // Mark image as "zoomable"
-                $targetTag->attr(PhotoCustomTag::ATTRIBUTE_ZOOMABLE_NAME, PhotoCustomTag::ATTRIBUTE_ZOOMABLE_ENABLED);
-                $parent->replace($targetTag);
+                $parent->replace($shortcode->asDomText());
             } else {
-                $image->replace($targetTag);
+                $image->replace($shortcode->asDomText());
             }
 
             $this->logger->debug('Parent html is :html', [':html' => $grandParent->html()]);
         }
     }
 
-    private function processImgTag(\DiDom\Element $node, $entity_item_id): \DiDom\Element
+    /**
+     * @param \DiDom\Element $node
+     * @param                $entity_item_id
+     *
+     * @return ShortcodeInterface|null
+     * @throws \BetaKiller\Repository\RepositoryException
+     * @throws \BetaKiller\Task\TaskException
+     * @throws \ORM_Validation_Exception
+     */
+    private function processImgTag(\DiDom\Element $node, $entity_item_id): ?ShortcodeInterface
     {
         // Getting attributes
         $attributes = $node->attributes();
@@ -930,16 +1037,32 @@ class Task_Content_Import_Wordpress extends AbstractTask
 
         $attributes['id'] = $image->getID();
 
-        $document = $node->getDocument();
-        $element  = $document->createElement(PhotoCustomTag::TAG_NAME);
+        /** @var ImageShortcode $shortcode */
+        $shortcode = $this->shortcodeFacade->create(ImageShortcode::codename(), $attributes);
 
-        foreach ($attributes as $key => $value) {
-            $element->setAttribute($key, $value);
+        $parent = $node->parent();
+
+        if (!$parent) {
+            $this->logger->warning('Image has no parent :html', [':html' => $node->html()]);
+            return null;
         }
 
-        return $element;
+        $parentNodeName = $parent->getNode()->nodeName;
+
+        // Remove links to content images coz they would be added automatically
+        if ($parentNodeName === 'a' && $parent->attr('href') === $node->attr('src')) {
+            // Mark image as "zoomable"
+            $shortcode->enableZoomable();
+        }
+
+        return $shortcode;
     }
 
+    /**
+     * @param \BetaKiller\Model\ContentPost $item
+     *
+     * @throws \Kohana_Exception
+     */
     private function processContentYoutubeIFrames(ContentPost $item): void
     {
         $text = $this->processYoutubeVideosInText($item->getContent(), $item->getID());
@@ -947,7 +1070,13 @@ class Task_Content_Import_Wordpress extends AbstractTask
         $item->setContent($text);
     }
 
-    private function processYoutubeVideosInText(string $text, int $entityItemID)
+    /**
+     * @param string $text
+     * @param int    $entityItemID
+     *
+     * @return string
+     */
+    private function processYoutubeVideosInText(string $text, int $entityItemID): string
     {
         $this->logger->debug('Processing Youtube iframe tags...');
 
@@ -987,6 +1116,17 @@ class Task_Content_Import_Wordpress extends AbstractTask
         return $text;
     }
 
+    /**
+     * @param string $tagString
+     * @param int    $entityItemID
+     *
+     * @return string
+     * @throws \BetaKiller\Exception
+     * @throws \BetaKiller\Repository\RepositoryException
+     * @throws \BetaKiller\Task\TaskException
+     * @throws \Kohana_Exception
+     * @throws \ORM_Validation_Exception
+     */
     private function processYoutubeIFrameTag(string $tagString, int $entityItemID): string
     {
         // Parsing
@@ -1041,15 +1181,19 @@ class Task_Content_Import_Wordpress extends AbstractTask
         $this->youtubeRepository->save($video);
 
         $attributes = [
+            'id' => $video->getID(),
             'width'  => $width,
             'height' => $height,
         ];
 
-        return $this->customTagFacade->generateHtml(YoutubeCustomTag::TAG_NAME, $video->getID(), $attributes);
+        return $this->shortcodeFacade->create(YoutubeShortcode::codename(), $attributes)->asHtml();
     }
 
     /**
      * Import all categories with WP IDs
+     *
+     * @throws \BetaKiller\Repository\RepositoryException
+     * @throws \ORM_Validation_Exception
      */
     private function importCategories(): void
     {
@@ -1117,6 +1261,11 @@ class Task_Content_Import_Wordpress extends AbstractTask
         }
     }
 
+    /**
+     * @throws \BetaKiller\Repository\RepositoryException
+     * @throws \Kohana_Exception
+     * @throws \ORM_Validation_Exception
+     */
     private function import_quotes(): void
     {
         $quotesData = $this->wp->get_quotes_collection_quotes();
@@ -1143,6 +1292,10 @@ class Task_Content_Import_Wordpress extends AbstractTask
         }
     }
 
+    /**
+     * @throws \BetaKiller\Repository\RepositoryException
+     * @throws \BetaKiller\Task\TaskException
+     */
     private function importComments(): void
     {
         $comments_data = $this->wp->get_comments();

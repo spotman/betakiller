@@ -30,9 +30,10 @@ class AclResourceFactory implements AclResourceFactoryInterface
      * @param string $identity
      *
      * @return ResourceInterface
-     * @throws Exception
+     * @throws \BetaKiller\Factory\FactoryException
      */
-    public function createResource($identity) {
+    public function createResource(string $identity): \Spotman\Acl\ResourceInterface
+    {
         return $this->factory->create(ucfirst($identity));
     }
 }

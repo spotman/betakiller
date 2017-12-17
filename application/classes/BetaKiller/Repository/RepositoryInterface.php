@@ -3,8 +3,8 @@ namespace BetaKiller\Repository;
 
 interface RepositoryInterface
 {
-    const CLASS_PREFIX = 'Repository';
-    const CLASS_SUFFIX = 'Repository';
+    public const CLASS_PREFIX = 'Repository';
+    public const CLASS_SUFFIX = 'Repository';
 
     public static function getCodename(): string;
 

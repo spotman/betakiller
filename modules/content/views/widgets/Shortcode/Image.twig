@@ -1,0 +1,23 @@
+{% if layout == "default" %}
+
+  {% if zoomable %}
+    <a href="{{ image["data-original-url"] }}" title="{{ image.title|default(image.alt) }}" class="swipebox" rel="content-images">
+  {% endif %}
+
+  {{ image(image, { class: image.class ~ " responsive-img" }) }}
+
+  {% if zoomable %}
+    </a>
+  {% endif %}
+
+{% elseif layout == "caption" %}
+
+  {% set attrs = {class: "responsive-img swipebox", alt: caption, title: caption, rel: "content-images", href: image['data-original-url']} %}
+
+  <div class="wp-caption {{ align ~ " " ~ class }}"> {# {{ (width > 0 ? 'style="width:' ~ width ~ 'px"' : '')|raw }} #}
+    {{ image(image, attrs) }}
+    <span class="wp-caption-text image-caption">{{ caption }}</span>
+  </div>
+
+{% endif %}
+

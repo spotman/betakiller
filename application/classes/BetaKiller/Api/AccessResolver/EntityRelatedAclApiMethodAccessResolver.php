@@ -3,15 +3,22 @@ namespace BetaKiller\Api\AccessResolver;
 
 use BetaKiller\Api\Method\EntityBasedApiMethodInterface;
 use BetaKiller\Status\StatusRelatedModelInterface;
+use Spotman\Acl\Resource\ResolvingResourceInterface;
 use Spotman\Api\AccessResolver\AclApiMethodAccessResolver;
 use Spotman\Api\ApiMethodException;
 use Spotman\Api\ApiMethodInterface;
 
 class EntityRelatedAclApiMethodAccessResolver extends AclApiMethodAccessResolver
 {
-    const CODENAME = 'EntityRelatedAcl';
+    public const CODENAME = 'EntityRelatedAcl';
 
-    protected function getAclResourceFromApiMethod(ApiMethodInterface $method)
+    /**
+     * @param \Spotman\Api\ApiMethodInterface $method
+     *
+     * @return \BetaKiller\Acl\Resource\EntityRelatedAclResourceInterface|\Spotman\Acl\Resource\ResolvingResourceInterface
+     * @throws \Spotman\Api\ApiMethodException
+     */
+    protected function getAclResourceFromApiMethod(ApiMethodInterface $method): ResolvingResourceInterface
     {
         if (!($method instanceof EntityBasedApiMethodInterface)) {
             throw new ApiMethodException('Api method [:collection.:method] must implement :interface', [

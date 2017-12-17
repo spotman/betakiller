@@ -1,6 +1,6 @@
 {% if images|length %}
 
-    {% if type == "masonry" %}
+    {% if layout == "masonry" %}
 
         {% set column_class = "s" ~ (12 / columns)|round(0, 'floor') %}
 
@@ -12,7 +12,7 @@
             {% endfor %}
         </div>
 
-    {% elseif type == "slider" %}
+    {% elseif layout == "slider" %}
 
     <div class="content-gallery content-gallery-slider">
         {% for image in images %}

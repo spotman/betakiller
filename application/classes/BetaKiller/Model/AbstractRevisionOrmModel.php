@@ -25,7 +25,7 @@ abstract class AbstractRevisionOrmModel extends \ORM implements RevisionModelInt
     /**
      * @return \BetaKiller\Model\RevisionModelInterface
      */
-    public function getLatestRevision()
+    public function getLatestRevision(): RevisionModelInterface
     {
         return $this->orderByCreatedAt()->find();
     }
@@ -38,7 +38,7 @@ abstract class AbstractRevisionOrmModel extends \ORM implements RevisionModelInt
     /**
      * @return \BetaKiller\Model\UserInterface
      */
-    public function getCreatedBy()
+    public function getCreatedBy(): UserInterface
     {
         return $this->get('owner');
     }
@@ -51,9 +51,9 @@ abstract class AbstractRevisionOrmModel extends \ORM implements RevisionModelInt
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
-    public function getCreatedAt()
+    public function getCreatedAt(): \DateTimeInterface
     {
         return $this->get_datetime_column_value('created_at');
     }
@@ -81,7 +81,7 @@ abstract class AbstractRevisionOrmModel extends \ORM implements RevisionModelInt
      *
      * @return \BetaKiller\Model\RevisionModelInterface|null
      */
-    public function createNewRevisionIfChanged()
+    public function createNewRevisionIfChanged(): ?RevisionModelInterface
     {
         if (!$this->changed()) {
             return null;

@@ -18,20 +18,20 @@ use Twig;
  */
 class WrapperViewTwig extends WrapperView
 {
-    protected function viewFactory($view_path)
+    protected function viewFactory(string $view_path)
     {
         // Using Twig instead of View
         return Twig::factory($view_path);
     }
 
-    protected function getViewPath($codename)
+    protected function getViewPath(string $codename): string
     {
         // Using aliases in Twig
         return '@' . parent::getViewPath($codename);
     }
 
     // TODO move to BetaKiller_Twig_Extension
-    protected function getData()
+    protected function getData(): array
     {
         return [
             'meta_tags' => Meta::instance()->render(),

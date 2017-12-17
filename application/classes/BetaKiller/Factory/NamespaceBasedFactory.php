@@ -153,7 +153,7 @@ class NamespaceBasedFactory
 
         if (!$instance) {
             if ($this->prepareArgumentsCallback) {
-                $arguments = call_user_func($this->prepareArgumentsCallback, $arguments, $className);
+                $arguments = \call_user_func($this->prepareArgumentsCallback, $arguments, $className);
             }
 
             try {
@@ -167,7 +167,7 @@ class NamespaceBasedFactory
 
             if ($this->expectedInterface && !($instance instanceof $this->expectedInterface)) {
                 throw new FactoryException('Class :class must be instance of :expected', [
-                    ':class'    => get_class($instance),
+                    ':class'    => \get_class($instance),
                     ':expected' => $this->expectedInterface,
                 ]);
             }

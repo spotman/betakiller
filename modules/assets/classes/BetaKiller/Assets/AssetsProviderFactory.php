@@ -4,7 +4,6 @@ namespace BetaKiller\Assets;
 use BetaKiller\Acl\Resource\AssetsAclResourceInterface;
 use BetaKiller\Assets\Provider\AbstractAssetsProvider;
 use BetaKiller\Assets\Provider\AssetsProviderInterface;
-use BetaKiller\Assets\Storage\AssetsStorageInterface;
 use BetaKiller\Config\ConfigProviderInterface;
 use BetaKiller\Factory\NamespaceBasedFactory;
 use BetaKiller\Factory\RepositoryFactory;
@@ -90,7 +89,15 @@ class AssetsProviderFactory
         $this->acl                = $acl;
     }
 
-    public function createFromUrlKey($key)
+    /**
+     * @param string $key
+     *
+     * @return \BetaKiller\Assets\Provider\AssetsProviderInterface|\BetaKiller\Assets\Provider\ImageAssetsProviderInterface|mixed
+     * @throws \BetaKiller\Assets\AssetsException
+     * @throws \BetaKiller\Assets\AssetsStorageException
+     * @throws \BetaKiller\Factory\FactoryException
+     */
+    public function createFromUrlKey(string $key)
     {
         // Try to find provider by url key
         $codename = $this->getModelCodenameByUrlKey($key);
@@ -133,21 +140,6 @@ class AssetsProviderFactory
     }
 
     /**
-     * @param string $storageName
-     *
-     * @return array
-     * @TODO Move to StorageFactory
-     */
-    private function getStorageDefaultConfig(string $storageName): array
-    {
-        return $this->config->load([
-            AbstractAssetsProvider::CONFIG_KEY,
-            AbstractAssetsProvider::CONFIG_STORAGES_KEY,
-            $storageName,
-        ]);
-    }
-
-    /**
      * Factory method
      *
      * @param string $modelName
@@ -182,7 +174,7 @@ class AssetsProviderFactory
             ]);
         }
 
-        $storage = $this->createStorageFromConfig($storageConfig);
+        $storage = $this->storageFactory->createFromConfig($storageConfig);
 
         $urlStrategy = $this->urlStrategyFactory->create($urlStrategyName, $repository);
 
@@ -206,30 +198,5 @@ class AssetsProviderFactory
         $this->instances[$modelName] = $providerInstance;
 
         return $providerInstance;
-    }
-
-    /**
-     * @param array $storageConfig
-     *
-     * @return \BetaKiller\Assets\Storage\AssetsStorageInterface
-     * @throws \BetaKiller\Assets\AssetsStorageException
-     * @TODO Move to StorageFactory
-     */
-    private function createStorageFromConfig(array $storageConfig): AssetsStorageInterface
-    {
-        $storageName = $storageConfig[AbstractAssetsProvider::CONFIG_MODEL_STORAGE_NAME_KEY];
-
-        $defaultStorageConfig = $this->getStorageDefaultConfig($storageName);
-
-        $storageConfig = array_merge($defaultStorageConfig, $storageConfig);
-
-        $relativePath = $storageConfig[AbstractAssetsProvider::CONFIG_MODEL_STORAGE_PATH_KEY];
-        $basePath     = $storageConfig[AbstractAssetsProvider::CONFIG_STORAGE_BASE_PATH_KEY];
-
-        $instance = $this->storageFactory->create($storageName);
-
-        $instance->setBasePath($basePath.DIRECTORY_SEPARATOR.$relativePath);
-
-        return $instance;
     }
 }

@@ -112,17 +112,27 @@ abstract class AbstractConfigBasedUrlParameterRepository extends AbstractUrlPara
         }
 
         // Filling repository with instances by config
-        foreach ($config as $codename) {
-            $this->items[$codename] = $this->createItemFromCodename($codename);
+        foreach ($config as $name => $options) {
+            if (\is_string($name)) {
+                // Full definition with properties
+                $codename = $name;
+            } else {
+                // Simple definition without properties
+                $codename = $options;
+                $options = null;
+            }
+
+            $this->items[$codename] = $this->createItemFromCodename($codename, $options);
         }
     }
 
     abstract protected function getItemsListConfigKey(): array;
 
     /**
-     * @param string $codename
+     * @param string     $codename
+     * @param array|null $properties
      *
      * @return ConfigBasedUrlParameterInterface|mixed
      */
-    abstract protected function createItemFromCodename(string $codename): ConfigBasedUrlParameterInterface;
+    abstract protected function createItemFromCodename(string $codename, ?array $properties = null): ConfigBasedUrlParameterInterface;
 }

@@ -11,7 +11,7 @@ use View;
  */
 class WrapperView
 {
-    const HTML5 = 'html5';
+    public const HTML5 = 'html5';
 
     protected $_codename;
 
@@ -20,9 +20,9 @@ class WrapperView
      */
     protected $_content;
 
-    public static function factory($codename = self::HTML5)
+    public static function factory(?string $codename = null)
     {
-        return new static($codename);
+        return new static($codename ?? self::HTML5);
     }
 
     public function __construct($_codename)
@@ -59,7 +59,7 @@ class WrapperView
      *
      * @return array
      */
-    protected function getData()
+    protected function getData(): array
     {
         return [];
     }
@@ -69,12 +69,12 @@ class WrapperView
      *
      * @return View
      */
-    protected function viewFactory($view_path)
+    protected function viewFactory(string $view_path)
     {
         return View::factory($view_path);
     }
 
-    protected function getViewPath($codename)
+    protected function getViewPath(string $codename): string
     {
         return 'wrappers'.DIRECTORY_SEPARATOR.$codename;
     }
