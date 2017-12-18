@@ -81,6 +81,27 @@ class Controller_Assets extends Controller
         $this->send_file($content, $model->getMime());
     }
 
+    public function action_download(): void
+    {
+        $this->detectProvider();
+
+        $model = $this->fromItemDeployUrl();
+
+        $this->checkExtension($model);
+
+        // Get file content
+        $content = $this->provider->getContent($model);
+
+        // Deploy to cache
+        $this->deploy($model, $content);
+
+        // Send last modified date
+        $this->response->last_modified($model->getLastModifiedAt());
+
+        // Send file content + headers
+        $this->send_file($content, $model->getMime(), $model->getOriginalName(), true);
+    }
+
     public function action_preview(): void
     {
         $this->detectProvider();

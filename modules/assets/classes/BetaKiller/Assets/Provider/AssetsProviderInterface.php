@@ -26,13 +26,22 @@ interface AssetsProviderInterface
     public function getUrlKey(): string;
 
     /**
-     * Returns public URL for provided model
+     * Returns public original URL for provided model
      *
      * @param AssetsModelInterface $model
      *
      * @return string
      */
     public function getOriginalUrl(AssetsModelInterface $model): string;
+
+    /**
+     * Returns public download URL for provided model
+     *
+     * @param \BetaKiller\Assets\Model\AssetsModelInterface $model
+     *
+     * @return string
+     */
+    public function getDownloadUrl(AssetsModelInterface $model): string;
 
     /**
      * Returns URL for deleting provided file

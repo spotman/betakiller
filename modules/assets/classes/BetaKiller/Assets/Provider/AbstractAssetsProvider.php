@@ -21,21 +21,21 @@ use Upload;
 
 abstract class AbstractAssetsProvider implements AssetsProviderInterface
 {
-    const CONFIG_KEY                    = 'assets';
-    const CONFIG_DOC_ROOT_KEY           = 'doc_root';
-    const CONFIG_URL_PATH_KEY           = 'url_path';
-    const CONFIG_PROVIDERS_KEY          = 'providers';
-    const CONFIG_STORAGES_KEY           = 'storages';
-    const CONFIG_MODEL_URL_KEY          = 'url_key';
-    const CONFIG_MODEL_PROVIDER_KEY     = 'provider';
-    const CONFIG_MODEL_URL_STRATEGY_KEY = 'url_strategy';
-    const CONFIG_MODEL_STORAGE_KEY      = 'storage';
-    const CONFIG_MODEL_STORAGE_NAME_KEY = 'name';
-    const CONFIG_MODEL_STORAGE_PATH_KEY = 'path';
-    const CONFIG_MODEL_DEPLOY_KEY       = 'deploy';
-    const CONFIG_MODEL_MIMES            = 'mimes';
-    const CONFIG_MODEL_POST_UPLOAD_KEY  = 'post_upload';
-    const CONFIG_STORAGE_BASE_PATH_KEY  = 'base_path';
+    public const CONFIG_KEY                    = 'assets';
+    public const CONFIG_DOC_ROOT_KEY           = 'doc_root';
+    public const CONFIG_URL_PATH_KEY           = 'url_path';
+    public const CONFIG_PROVIDERS_KEY          = 'providers';
+    public const CONFIG_STORAGES_KEY           = 'storages';
+    public const CONFIG_MODEL_URL_KEY          = 'url_key';
+    public const CONFIG_MODEL_PROVIDER_KEY     = 'provider';
+    public const CONFIG_MODEL_URL_STRATEGY_KEY = 'url_strategy';
+    public const CONFIG_MODEL_STORAGE_KEY      = 'storage';
+    public const CONFIG_MODEL_STORAGE_NAME_KEY = 'name';
+    public const CONFIG_MODEL_STORAGE_PATH_KEY = 'path';
+    public const CONFIG_MODEL_DEPLOY_KEY       = 'deploy';
+    public const CONFIG_MODEL_MIMES            = 'mimes';
+    public const CONFIG_MODEL_POST_UPLOAD_KEY  = 'post_upload';
+    public const CONFIG_STORAGE_BASE_PATH_KEY  = 'base_path';
 
     /**
      * @var string
@@ -151,6 +151,18 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
     public function getOriginalUrl(AssetsModelInterface $model): string
     {
         return $this->getItemUrl('original', $model);
+    }
+
+    /**
+     * Returns public download URL for provided model
+     *
+     * @param \BetaKiller\Assets\Model\AssetsModelInterface $model
+     *
+     * @return string
+     */
+    public function getDownloadUrl(AssetsModelInterface $model): string
+    {
+        return $this->getItemUrl('download', $model);
     }
 
     /**

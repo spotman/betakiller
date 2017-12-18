@@ -44,6 +44,11 @@ class AssetsHelper
         return $this->getImageProviderByModel($model)->getPreviewUrl($model, $size);
     }
 
+    public function getDownloadUrl(AssetsModelInterface $model): string
+    {
+        return $this->getProviderByModel($model)->getDownloadUrl($model);
+    }
+
     public function getAttributesForImgTag(AssetsModelImageInterface $model, $size, array $attributes = null): array
     {
         return $this->getImageProviderByModel($model)->getAttributesForImgTag($model, $size, $attributes);

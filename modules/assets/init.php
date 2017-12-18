@@ -22,7 +22,7 @@ $assetsSizeRegexp      = '[0-9]*'.AssetsModelImageInterface::SIZE_DELIMITER.'[0-
  */
 Route::set('assets-provider-item', 'assets/<provider>/<item_url>/<action>(.<ext>)', [
     'item_url' => '[A-Za-z0-9\/]+',
-    'action'   => '(original|delete)',
+    'action'   => '(original|download|delete)',
     'ext'      => $assetsExtensionRegexp,
 ])
     ->defaults([
