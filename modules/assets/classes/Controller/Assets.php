@@ -92,9 +92,6 @@ class Controller_Assets extends Controller
         // Get file content
         $content = $this->provider->getContent($model);
 
-        // Deploy to cache
-        $this->deploy($model, $content);
-
         // Send last modified date
         $this->response->last_modified($model->getLastModifiedAt());
 
