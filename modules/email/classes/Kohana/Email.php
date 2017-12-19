@@ -106,6 +106,9 @@ class Kohana_Email
         // Connect to SwiftMailer
         (static::$mail === null) and Email::connect();
 
+        // @link https://toster.ru/q/48752
+        static::$mail->getTransport()->start();
+
         // Determine the message type
         $content_type = ($html === true) ? 'text/html' : 'text/plain';
 
@@ -182,7 +185,12 @@ class Kohana_Email
             }
         }
 
-        return static::$mail->send($msg);
+        $count = static::$mail->send($msg);
+
+        // @link https://toster.ru/q/48752
+        static::$mail->getTransport()->stop();
+
+        return $count;
     }
 
 } // End email
