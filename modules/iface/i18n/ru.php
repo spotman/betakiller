@@ -1,4 +1,4 @@
-<?php defined('SYSPATH') OR die('No direct script access.');
+<?php
 
 return [
     'Class :name must be instance of :must'                                     => 'Class :name must be instance of :must',

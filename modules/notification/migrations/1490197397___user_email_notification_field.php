@@ -1,4 +1,4 @@
-<?php defined('SYSPATH') or die('No direct access allowed.');
+<?php
 
 class Migration1490197397_User_Email_Notification_Field extends Migration {
 

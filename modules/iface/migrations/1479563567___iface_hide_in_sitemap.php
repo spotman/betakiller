@@ -1,4 +1,4 @@
-<?php defined('SYSPATH') or die('No direct access allowed.');
+<?php
 
 class Migration1479563567_Iface_Hide_In_Sitemap extends Migration {
 

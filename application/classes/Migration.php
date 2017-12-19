@@ -1,4 +1,4 @@
-<?php defined('SYSPATH') or die('No direct access allowed.');
+<?php
 
 abstract class Migration extends Kohana_Migration
 {
@@ -27,7 +27,9 @@ abstract class Migration extends Kohana_Migration
 
             // Query completed => table and column exists
             return true;
-        } catch (Database_Exception $ignore) {
+        }
+        /** @noinspection BadExceptionsProcessingInspection */
+        catch (Database_Exception $ignore) {
             // Query failed => table or column is absent
             return false;
         }

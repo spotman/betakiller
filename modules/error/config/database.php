@@ -1,4 +1,4 @@
-<?php defined('SYSPATH') OR die('No direct access allowed.');
+<?php
 
 $errorsDbDsn = 'sqlite:'.implode(DIRECTORY_SEPARATOR, [realpath(MODPATH.'error'), 'media', 'errors.sqlite']);
 

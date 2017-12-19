@@ -1,4 +1,4 @@
-<?php defined('SYSPATH') or die('No direct access allowed.');
+<?php
 
 class Migration1480410693_Error_Ifaces_Renaming extends Migration {
 

@@ -1,4 +1,4 @@
-<?php defined('SYSPATH') or die('No direct access allowed.');
+<?php
 
 class Migration1474879723_Iface_Is_Tree_Field extends Migration {
 

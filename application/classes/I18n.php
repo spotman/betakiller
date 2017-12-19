@@ -178,7 +178,7 @@ class I18n extends Kohana_I18n
 
     protected static function make_content(array $data)
     {
-        return Kohana::FILE_SECURITY.'
+        return '<?php
 /**
  * Translation file in language: '.static::$lang.'
  * Automatically generated from previous translation file.
