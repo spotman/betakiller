@@ -22,7 +22,7 @@ class UrlDispatcher implements LoggerAwareInterface
     /**
      * Defines default uri for index element (this used if root IFace has dynamic url behaviour)
      */
-    const DEFAULT_URI = 'index';
+    public const DEFAULT_URI = 'index';
 
     /**
      * Current IFace stack
@@ -383,13 +383,6 @@ class UrlDispatcher implements LoggerAwareInterface
         $item = $prototype->hasIdKey()
             ? $dataSource->findById((int)$uriValue)
             : $dataSource->findItemByUrlKeyValue($uriValue, $this->urlParameters);
-
-        if (!$item) {
-            throw new UrlDispatcherException('Can not find item for [:prototype] by [:value]', [
-                ':prototype' => $ifaceModel->getUri(),
-                ':value'     => $uriValue,
-            ]);
-        }
 
         if ($item instanceof DispatchableEntityInterface) {
             // Allow current model to preset "belongs to" models

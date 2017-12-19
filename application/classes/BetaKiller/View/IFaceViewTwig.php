@@ -3,7 +3,6 @@ namespace BetaKiller\View;
 
 use BetaKiller\IFace\View\IFaceView;
 use Twig;
-use View;
 
 class IFaceViewTwig extends IFaceView
 {
@@ -12,31 +11,31 @@ class IFaceViewTwig extends IFaceView
      *
      * @return Twig
      */
-    protected function view_factory($path)
+    protected function viewFactory(string $path): ViewInterface
     {
         // Use Twig templates instead of Kohana views
         return Twig::factory($path);
     }
 
     /**
-     * @param View $ifaceView
+     * @param \BetaKiller\View\ViewInterface $ifaceView
      *
-     * @return View
+     * @return string
      */
-    protected function processLayout(View $ifaceView)
+    protected function processLayout(ViewInterface $ifaceView): string
     {
         $layoutPath = $this->layoutViewFactory($this->layout)->getViewPath();
 
         // Extend layout inside of IFace view via "extend" tag
-        return $ifaceView->set('layout', $layoutPath);
+        return $ifaceView->set('layout', $layoutPath)->render();
     }
 
-    protected function layoutViewFactory($path)
+    protected function layoutViewFactory(string $path)
     {
         return LayoutViewTwig::factory($path);
     }
 
-    protected function wrapperViewFactory($path)
+    protected function wrapperViewFactory(string $path)
     {
         return WrapperViewTwig::factory($path);
     }

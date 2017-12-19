@@ -7,7 +7,7 @@ use BetaKiller\Model\ContentAttachmentInterface;
  * Class ContentAttachmentRepository
  *
  * @package BetaKiller\Content
- * @method ContentAttachmentInterface|null findById(int $id)
+ * @method ContentAttachmentInterface findById(int $id)
  * @method ContentAttachmentInterface|null findByWpId(int $id)
  * @method ContentAttachmentInterface create()
  * @method ContentAttachmentInterface[] getAll()

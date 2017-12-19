@@ -21,7 +21,7 @@ abstract class AbstractOrmBasedDispatchableRepository extends AbstractOrmBasedRe
     public function findItemByUrlKeyValue(
         string $value,
         UrlContainerInterface $parameters
-    ): ?UrlParameterInterface
+    ): UrlParameterInterface
     {
         $orm = $this->getOrmInstance();
         $key = $this->getUrlKeyName();
@@ -30,6 +30,13 @@ abstract class AbstractOrmBasedDispatchableRepository extends AbstractOrmBasedRe
         $this->customFilterForUrlDispatching($orm, $parameters);
 
         $model = $orm->where($orm->object_column($key), '=', $value)->find();
+
+        if (!$model->loaded()) {
+            throw new RepositoryException('Can not find item for [:repo] by [:value]', [
+                ':repo'  => $orm->getModelName(),
+                ':value' => $value,
+            ]);
+        }
 
         return $model->loaded() ? $model : null;
     }

@@ -41,7 +41,6 @@ class YoutubeShortcode extends AbstractEditableShortcode
             throw new ShortcodeException('No YouTube ID provided');
         }
 
-        /** @var \BetaKiller\Model\ContentYoutubeRecord $model */
         $model = $this->repository->findById($videoID);
 
 //        $title  = Arr::get($context, 'title');

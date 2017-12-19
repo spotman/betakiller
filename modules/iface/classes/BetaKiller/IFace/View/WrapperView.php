@@ -1,6 +1,7 @@
 <?php
 namespace BetaKiller\IFace\View;
 
+use BetaKiller\View\ViewInterface;
 use View;
 
 /**
@@ -13,6 +14,9 @@ class WrapperView
 {
     public const HTML5 = 'html5';
 
+    /**
+     * @var string
+     */
     protected $_codename;
 
     /**
@@ -25,7 +29,7 @@ class WrapperView
         return new static($codename ?? self::HTML5);
     }
 
-    public function __construct($_codename)
+    public function __construct(string $_codename)
     {
         $this->_codename = $_codename;
     }
@@ -35,23 +39,24 @@ class WrapperView
      *
      * @return $this
      */
-    public function setContent($_content)
+    public function setContent(string $_content): WrapperView
     {
-        // Force content rendering
-        $this->_content = (string)$_content;
+        $this->_content = $_content;
 
         return $this;
     }
 
-    public function render()
+    public function render(): string
     {
         $path = $this->getViewPath($this->_codename);
 
-        return $this
-            ->viewFactory($path)
-            ->set($this->getData())
-            ->set('content', $this->_content)
-            ->render();
+        $view = $this->viewFactory($path);
+
+        foreach ($this->getData() as $key => $value) {
+            $view->set($key, $value);
+        }
+
+        return $view->set('content', $this->_content)->render();
     }
 
     /**
@@ -67,9 +72,9 @@ class WrapperView
     /**
      * @param $view_path
      *
-     * @return View
+     * @return \BetaKiller\View\ViewInterface
      */
-    protected function viewFactory(string $view_path)
+    protected function viewFactory(string $view_path): ViewInterface
     {
         return View::factory($view_path);
     }
@@ -77,16 +82,5 @@ class WrapperView
     protected function getViewPath(string $codename): string
     {
         return 'wrappers'.DIRECTORY_SEPARATOR.$codename;
-    }
-
-    /**
-     * The __toString method allows a class to decide how it will react when it is converted to a string.
-     *
-     * @return string
-     * @link http://php.net/manual/en/language.oop5.magic.php#language.oop5.magic.tostring
-     */
-    public function __toString()
-    {
-        return $this->render();
     }
 }

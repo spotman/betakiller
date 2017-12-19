@@ -1,25 +1,40 @@
 <?php
 namespace BetaKiller\Error;
 
+use BetaKiller\Config\AppConfigInterface;
 use BetaKiller\Helper\IFaceHelper;
 use BetaKiller\Helper\NotificationHelper;
 use BetaKiller\Model\IFaceZone;
 use BetaKiller\Model\PhpExceptionModelInterface;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Repository\PhpExceptionRepository;
-use Psr\Log\LoggerInterface;
+use Monolog\Handler\AbstractProcessingHandler;
+use Monolog\Logger;
+use Psr\Log\LoggerAwareTrait;
 
-class PhpExceptionService
+/**
+ * Class PhpExceptionStorageHandler
+ *
+ * @package BetaKiller\Error
+ */
+class PhpExceptionStorageHandler extends AbstractProcessingHandler
 {
+    use LoggerAwareTrait;
+
     /**
      * Notify about N-th duplicated exception only
      */
-    const REPEAT_COUNT = 50;
+    private const REPEAT_COUNT = 50;
 
     /**
      * Notify not faster than 1 message in T seconds
      */
-    const REPEAT_DELAY = 600;
+    private const REPEAT_DELAY = 600;
+
+    /**
+     * @var bool
+     */
+    private $enabled = true;
 
     /**
      * @var \BetaKiller\Repository\PhpExceptionRepository
@@ -27,12 +42,17 @@ class PhpExceptionService
     private $repository;
 
     /**
+     * @var \BetaKiller\Config\AppConfigInterface
+     */
+    private $appConfig;
+
+    /**
      * @var \BetaKiller\Helper\NotificationHelper
      */
     private $notificationHelper;
 
     /**
-     * @var UserInterface;
+     * @var \BetaKiller\Model\UserInterface;
      */
     private $user;
 
@@ -42,37 +62,67 @@ class PhpExceptionService
     private $ifaceHelper;
 
     /**
-     * @var \Psr\Log\LoggerInterface
-     */
-    private $logger;
-
-    /**
-     * PhpExceptionService constructor.
+     * PhpExceptionStorageHandler constructor.
      *
      * @param \BetaKiller\Repository\PhpExceptionRepository $repository
-     * @param \BetaKiller\Helper\NotificationHelper         $notificationHelper
      * @param \BetaKiller\Helper\IFaceHelper                $ifaceHelper
      * @param \BetaKiller\Model\UserInterface               $user
-     * @param \Psr\Log\LoggerInterface                      $logger
+     * @param \BetaKiller\Config\AppConfigInterface         $appConfig
+     * @param \BetaKiller\Helper\NotificationHelper         $notificationHelper
      */
     public function __construct(
         PhpExceptionRepository $repository,
-        NotificationHelper $notificationHelper,
         IFaceHelper $ifaceHelper,
         UserInterface $user,
-        LoggerInterface $logger
+        AppConfigInterface $appConfig,
+        NotificationHelper $notificationHelper
     ) {
-        $this->user               = $user;
         $this->repository         = $repository;
+        $this->user               = $user;
         $this->ifaceHelper        = $ifaceHelper;
+        $this->appConfig          = $appConfig;
         $this->notificationHelper = $notificationHelper;
-        $this->logger             = $logger;
+
+        parent::__construct(Logger::NOTICE);
+    }
+
+    /**
+     * Writes the record down to the log of the implementing handler
+     *
+     * @param  array $record
+     *
+     * @return void
+     */
+    protected function write(array $record): void
+    {
+        if (!$this->enabled) {
+            return;
+        }
+
+        /** @var \Throwable|null $exception */
+        $exception = $record['context']['exception'] ?? null;
+
+        if (!$exception) {
+            return;
+        }
+
+        try {
+            $this->storeException($exception);
+        } catch (\Throwable $subsystemException) {
+            // Prevent logging recursion
+            $this->enabled = false;
+
+            $this->notifyDevelopersAboutFailure($subsystemException, $exception);
+        }
     }
 
     /**
      * @param \Throwable $exception
      *
-     * @return PhpExceptionModelInterface|null
+     * @return \BetaKiller\Model\PhpExceptionModelInterface|null
+     * @throws \ORM_Validation_Exception
+     * @throws \BetaKiller\Repository\RepositoryException
+     * @throws \Kohana_Exception
      */
     public function storeException(\Throwable $exception): ?PhpExceptionModelInterface
     {
@@ -82,7 +132,7 @@ class PhpExceptionService
             return null;
         }
 
-        $class = get_class($exception);
+        $class = \get_class($exception);
         $code  = $exception->getCode();
         $file  = $exception->getFile();
         $line  = $exception->getLine();
@@ -115,7 +165,7 @@ class PhpExceptionService
         // Increase occurrence counter
         $model->incrementCounter();
 
-        /** @var \Request $request */
+        /** @var \Request|null $request */
         $request = \Request::current() ?: null;
 
         // Trying to get current URL
@@ -150,7 +200,7 @@ class PhpExceptionService
 
         $isNotificationNeeded = $this->isNotificationNeededFor($model, static::REPEAT_COUNT, static::REPEAT_DELAY);
 
-        $this->logger->debug('Notification needed is :value', [':value' => $isNotificationNeeded ? 'true' : 'false']);
+//        $this->logger->debug('Notification needed is :value', [':value' => $isNotificationNeeded ? 'true' : 'false']);
 
         // Notify developers if needed
         if ($isNotificationNeeded) {
@@ -196,7 +246,7 @@ class PhpExceptionService
     {
         // Skip ignored exceptions
         if ($model->isIgnored()) {
-            $this->logger->debug('Ignored exception');
+//            $this->logger->debug('Ignored exception');
 
             return false;
         }
@@ -208,11 +258,11 @@ class PhpExceptionService
 
         $timeDiffInSeconds = $lastSeenAtTimestamp - $lastNotifiedAtTimestamp;
 
-        $this->logger->debug('Time diff between :last and :seen is :diff', [
-            ':last' => $lastNotifiedAtTimestamp,
-            ':seen' => $lastSeenAtTimestamp,
-            ':diff' => $timeDiffInSeconds,
-        ]);
+//        $this->logger->debug('Time diff between :last and :seen is :diff', [
+//            ':last' => $lastNotifiedAtTimestamp,
+//            ':seen' => $lastSeenAtTimestamp,
+//            ':diff' => $timeDiffInSeconds,
+//        ]);
 
         // Throttle by time
         if ($lastNotifiedAtTimestamp && ($timeDiffInSeconds < $repeatDelay)) {
@@ -221,21 +271,79 @@ class PhpExceptionService
 
         // New error needs to be notified only once
         if (!$lastNotifiedAtTimestamp && $model->isNew()) {
-            $this->logger->debug('New exception needs to be notified');
+//            $this->logger->debug('New exception needs to be notified');
 
             return true;
         }
 
         // Repeated error needs to be notified
         if ($model->isRepeated()) {
-            $this->logger->debug('Repeated exception needs to be notified');
+//            $this->logger->debug('Repeated exception needs to be notified');
 
             return true;
         }
 
-        $this->logger->debug('Total counter is :value', [':value' => $model->getCounter()]);
+//        $this->logger->debug('Total counter is :value', [':value' => $model->getCounter()]);
 
         // Throttle by occurrence number
         return ($model->getCounter() % $repeatCount === 1);
+    }
+
+    private function notifyDevelopersAboutFailure(\Throwable $subsystemException, \Throwable $originalException): void
+    {
+        // Try to send notification to developers about logging subsystem failure
+        try {
+            $this->sendNotification($subsystemException, $originalException);
+        } catch (\Throwable $notificationException) {
+            $this->sendPlainEmail($notificationException, $subsystemException, $originalException);
+        }
+    }
+
+    private function sendNotification(\Throwable $subsystemException, \Throwable $originalException): void
+    {
+        $message = $this->notificationHelper->createMessage();
+
+        $this->notificationHelper->toDevelopers($message);
+
+        $message
+            ->setSubj('BetaKiller logging subsystem failure')
+            ->setTemplateName('developer/error/subsystem-failure')
+            ->setTemplateData([
+                'url'       => $this->appConfig->getBaseUrl(),
+                'subsystem' => [
+                    'message'    => $this->getExceptionText($subsystemException),
+                    'stacktrace' => $subsystemException->getTraceAsString(),
+                ],
+                'original'  => [
+                    'message'    => $this->getExceptionText($originalException),
+                    'stacktrace' => $originalException->getTraceAsString(),
+                ],
+            ])
+            ->send();
+    }
+
+    private function getExceptionText(\Throwable $e): string
+    {
+        return sprintf('%s [ %s ]: %s ~ %s [ %d ]',
+            \get_class($e), $e->getCode(), strip_tags($e->getMessage()), \Debug::path($e->getFile()), $e->getLine());
+    }
+
+    private function sendPlainEmail(\Throwable $notificationX, \Throwable $subsystemX, \Throwable $originalX)
+    {
+        try {
+            $message = '';
+
+            foreach ([$notificationX, $subsystemX, $originalX] as $e) {
+                $message .= $this->getExceptionText($e).PHP_EOL.$e->getTraceAsString().PHP_EOL.PHP_EOL;
+            }
+
+            // Send plain message
+            mail($this->appConfig->getAdminEmail(), 'Exception handling error', nl2br($message));
+        } catch (\Throwable $ignored) {
+            // Nothing we can do here, store exception in a system log as a last resort
+
+            /** @noinspection ForgottenDebugOutputInspection */
+            error_log($ignored->getMessage().PHP_EOL.$ignored->getTraceAsString());
+        }
     }
 }

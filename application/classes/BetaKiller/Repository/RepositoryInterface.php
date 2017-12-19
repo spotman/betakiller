@@ -12,6 +12,7 @@ interface RepositoryInterface
      * @param int $id
      *
      * @return mixed
+     * @throws \BetaKiller\Repository\RepositoryException
      */
     public function findById(int $id);
 
@@ -29,11 +30,13 @@ interface RepositoryInterface
 
     /**
      * @param $entity
+     * @throws \BetaKiller\Repository\RepositoryException
      */
     public function save($entity): void;
 
     /**
      * @param $entity
+     * @throws \BetaKiller\Repository\RepositoryException
      */
     public function delete($entity): void;
 }

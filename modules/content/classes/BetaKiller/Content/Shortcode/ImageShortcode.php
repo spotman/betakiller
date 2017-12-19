@@ -4,9 +4,8 @@ namespace BetaKiller\Content\Shortcode;
 use BetaKiller\Helper\AssetsHelper;
 use BetaKiller\Repository\ContentImageRepository;
 
-class ImageShortcode extends AbstractEditableShortcode
+class ImageShortcode extends AbstractContentElementShortcode
 {
-    public const ATTR_LAYOUT_NAME    = 'layout';
     public const ATTR_LAYOUT_CAPTION = 'caption';
 
     private const ATTR_ZOOMABLE_NAME    = 'zoomable';
@@ -56,6 +55,12 @@ class ImageShortcode extends AbstractEditableShortcode
         return ($this->getAttribute(self::ATTR_ZOOMABLE_NAME) === self::ATTR_ZOOMABLE_ENABLED);
     }
 
+    public function useCaptionLayout(string $title): void
+    {
+        $this->setLayout(self::ATTR_LAYOUT_CAPTION);
+        $this->setAttribute('title', $title);
+    }
+
     public function getWysiwygPluginPreviewSrc(): string
     {
         $id    = (int)$this->getAttribute('id');
@@ -78,10 +83,6 @@ class ImageShortcode extends AbstractEditableShortcode
 
         $model = $this->imageRepository->findById($imageID);
 
-        if (!$model) {
-            throw new ShortcodeException('No image found for ID :id', [':id' => $imageID]);
-        }
-
         $layouts = [
             'default',
             'caption',
@@ -99,7 +100,7 @@ class ImageShortcode extends AbstractEditableShortcode
 
         $classes = array_filter(explode(' ', $class));
 
-        $layout = $this->getAttribute(self::ATTR_LAYOUT_NAME) ?? $layouts[0];
+        $layout = $this->getAttribute(self::ATTR_LAYOUT) ?? $layouts[0];
 
         if (!\in_array($layout, $layouts, true)) {
             throw new ShortcodeException('Incorrect image layout :value', [':value' => $layout]);

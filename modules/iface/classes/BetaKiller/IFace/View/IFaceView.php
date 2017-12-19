@@ -2,6 +2,7 @@
 namespace BetaKiller\IFace\View;
 
 use BetaKiller\IFace\IFaceInterface;
+use BetaKiller\View\ViewInterface;
 use Link;
 use Meta;
 use View;
@@ -16,7 +17,7 @@ class IFaceView
     /**
      * @var string
      */
-    protected $wrapperCodename = \BetaKiller\IFace\View\WrapperView::HTML5;
+    protected $wrapperCodename = WrapperView::HTML5;
 
     /**
      * @var array
@@ -28,15 +29,15 @@ class IFaceView
      *
      * @param string $wrapper
      */
-    public function setWrapperCodename($wrapper)
+    public function setWrapperCodename(string $wrapper): void
     {
         $this->wrapperCodename = $wrapper;
     }
 
-    public function render(IFaceInterface $iface)
+    public function render(IFaceInterface $iface): string
     {
         $viewPath  = $this->getViewPath($iface);
-        $ifaceView = $this->view_factory($viewPath);
+        $ifaceView = $this->viewFactory($viewPath);
 
         // Getting IFace data
         $this->data = $iface->getData();
@@ -90,26 +91,26 @@ class IFaceView
         return implode(' - ', array_filter($labels));
     }
 
-    protected function processLayout(View $iface_view)
+    protected function processLayout(ViewInterface $ifaceView): string
     {
-        return LayoutView::factory($this->layout)
-            ->setContent($iface_view)
+        return $this->layoutViewFactory($this->layout)
+            ->setContent($ifaceView)
             ->render();
     }
 
-    protected function processWrapper($layout)
+    protected function processWrapper(string $layoutContent): string
     {
         return $this->wrapperViewFactory($this->wrapperCodename)
-            ->setContent($layout)
+            ->setContent($layoutContent)
             ->render();
     }
 
-    protected function layoutViewFactory($path)
+    protected function layoutViewFactory(string $path)
     {
         return LayoutView::factory($path);
     }
 
-    protected function wrapperViewFactory($path)
+    protected function wrapperViewFactory(string $path)
     {
         return WrapperView::factory($path);
     }
@@ -117,14 +118,14 @@ class IFaceView
     /**
      * @param $path
      *
-     * @return View
+     * @return ViewInterface
      */
-    protected function view_factory($path)
+    protected function viewFactory(string $path): ViewInterface
     {
         return View::factory($path);
     }
 
-    protected function getViewPath(IFaceInterface $iface)
+    protected function getViewPath(IFaceInterface $iface): string
     {
         return 'ifaces'.DIRECTORY_SEPARATOR.str_replace('_', DIRECTORY_SEPARATOR, $iface->getCodename());
     }

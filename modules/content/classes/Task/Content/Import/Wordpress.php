@@ -234,7 +234,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
      * @return \BetaKiller\Model\WordpressAttachmentInterface
      * @throws \BetaKiller\Task\TaskException
      */
-    private function processAttachment(
+    private function processWordpressAttachment(
         array $attach,
         int $entityItemID,
         AssetsProviderInterface $provider = null
@@ -565,55 +565,17 @@ class Task_Content_Import_Wordpress extends AbstractTask
         $body = $document->find('body')[0];
 
         if ($body) {
-            // Parsing all images first to get @alt and @title values
-            $this->processImagesInText($document, $item->getID());
-
             // Process attachments first coz they are images inside links
             $this->updateLinksOnAttachments($document, $item->getID());
-//            $this->remove_links_on_content_images($document);
 
-            $text = $body->innerHtml();
-//            $text = $this->removeClosingCustomTags($text);
-            $item->setContent($text);
+            // Parsing all other images next to get @alt and @title values
+            $this->processImagesInText($document, $item->getID());
+
+            $item->setContent($body->innerHtml());
         } else {
             $this->logger->warning('Post parsing error for :url', [':url' => $item->getUri()]);
         }
     }
-
-//    /**
-//     * Dirty hack for php-dom library that creates ShortcodeFacade elements with closing tags
-//     *
-//     * @param string $text
-//     *
-//     * @return string
-//     */
-//    private function removeClosingCustomTags($text): string
-//    {
-//        foreach ($this->shortcodeFacade->getSelfClosingTags() as $tag) {
-//            $text = str_replace('></'.$tag.'>', ' />', $text);
-//        }
-//
-//        return $text;
-//    }
-
-//    protected function remove_links_on_content_images(Document $root)
-//    {
-//        $this->debug('Removing links on content images...');
-//
-//        $tag = ShortcodeFacade::TAG_NAME;
-//
-//        $images = $root->find('a > '.$tag);
-//
-//        foreach ($images as $image)
-//        {
-//            $link = $image->parent();
-//
-//            $link->replace($image);
-//
-////            $link->remove();
-//            unset($link);
-//        }
-//    }
 
     /**
      * @param \DiDom\Document $document
@@ -635,33 +597,56 @@ class Task_Content_Import_Wordpress extends AbstractTask
                 continue;
             }
 
-            $attach = $this->wp->get_attachment_by_path($href);
+            // Search for image inside
+            $img = $link->first('img');
 
-            if (!$attach) {
-                throw new TaskException('Unknown attachment href :url', [':url' => $href]);
+            if ($img && $img->attr('src') === $href) {
+                // Clickable image
+                // Remove links to content images coz they would be added automatically
+                $imageShortcode = $this->processImgTag($img, $postID);
+
+                // Clickable image must be zoomable
+                $imageShortcode->enableZoomable();
+
+                // Replace link with image shortcode
+                $link->replace($imageShortcode->asDomText());
+            } else {
+                // Link to another attachment
+                $wpAttach = $this->wp->get_attachment_by_path($href);
+
+                if (!$wpAttach) {
+                    throw new TaskException('Unknown attachment href :url', [':url' => $href]);
+                }
+
+                $provider = $this->contentHelper->getAttachmentAssetsProvider();
+
+                // Force saving images in AttachmentAssetsProvider
+                $attachElement = $this->processWordpressAttachment($wpAttach, $postID, $provider);
+
+                $attributes = [
+                    'id' => $attachElement->getID(),
+                ];
+
+                /** @var AttachmentShortcode $attachShortcode */
+                $attachShortcode = $this->shortcodeFacade->create(AttachmentShortcode::codename(), $attributes);
+
+                if ($img) {
+                    // Image as a thumbnail => layout="image" image-id="<id>"
+                    $imageShortcode = $this->processImgTag($img, $postID);
+
+                    $attachShortcode->useImageLayout($imageShortcode->getID());
+                } else {
+                    // Regular text link => layout="text" label="..."
+                    $attachShortcode->useTextLayout($link->text());
+                }
+
+                $link->replace($attachShortcode->asDomText());
             }
 
-            $model = $this->processAttachment($attach, $postID);
-
-            $newUrl = $this->assetsHelper->getOriginalUrl($model);
-
-            $attributes = [
-                'id' => $model->getID(),
-            ];
-
-            // TODO Если внутри ссылки есть картинка, которая ведёт на тот же URL, то надо заменить этот блок картинкой со спецатрибутами zoomable
-
-            // TODO Links with images inside must be marked as type="button"
-            // TODO Links without child elements => type="link" text="..."
-
-            $shortcode = $this->shortcodeFacade->create(AttachmentShortcode::codename(), $attributes);
-
-            $link->replace($shortcode->asDomText());
-
-            $this->logger->debug('Link for :old was changed to :new', [
-                ':old' => $href,
-                ':new' => $newUrl,
-            ]);
+//            $this->logger->debug('Link for :old was changed to :new', [
+//                ':old' => $href,
+//                ':new' => $this->assetsHelper->getOriginalUrl($model),
+//            ]);
         }
     }
 
@@ -717,7 +702,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
 
         foreach ($imagesWpData as $imageData) {
             /** @var \BetaKiller\Model\ContentPostThumbnailInterface $imageModel */
-            $imageModel = $this->processAttachment($imageData, $post->getID(), $provider);
+            $imageModel = $this->processWordpressAttachment($imageData, $post->getID(), $provider);
 
             // Linking image to post
             $imageModel->setPost($post);
@@ -797,16 +782,18 @@ class Task_Content_Import_Wordpress extends AbstractTask
             return null;
         }
 
-        $image = $this->processAttachment($wpImageData, $post->getID());
+        $image = $this->processWordpressAttachment($wpImageData, $post->getID());
 
         // Removing <img /> tag
         $captionText = trim(strip_tags($s->getContent()));
 
-        $parameters['title'] = $captionText;
-        $parameters['id'] = $image->getID();
-        $parameters[ImageShortcode::ATTR_LAYOUT_NAME] = ImageShortcode::ATTR_LAYOUT_CAPTION;
+        /** @var ImageShortcode $shortcode */
+        $shortcode = $this->shortcodeFacade->create(ImageShortcode::codename(), $parameters);
 
-        return $this->shortcodeFacade->create(ImageShortcode::codename(), $parameters)->asHtml();
+        $shortcode->useCaptionLayout($captionText);
+        $shortcode->setID($image->getID());
+
+        return $shortcode->asHtml();
     }
 
     /**
@@ -846,7 +833,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
 
         // Process every image in set
         foreach ($wpImages as $wpImageData) {
-            $model       = $this->processAttachment($wpImageData, $post->getID());
+            $model       = $this->processWordpressAttachment($wpImageData, $post->getID());
             $imagesIDs[] = $model->getID();
         }
 
@@ -905,7 +892,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
 
             // Processing image
 
-            $image = $this->processAttachment($wpImage, $post->getID());
+            $image = $this->processWordpressAttachment($wpImage, $post->getID());
 
             $this->logger->debug('Adding image :id to wonderplugin slider', [':id' => $image->getID()]);
 
@@ -947,32 +934,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
 
             $this->logger->debug('Replacement tag is :tag', [':tag' => $shortcode->asHtml()]);
 
-            $parent = $image->parent();
-
-            if (!$parent) {
-                $this->logger->warning('Image has no parent :html', [':html' => $image->html()]);
-                continue;
-            }
-
-            $grandParent = $parent->parent();
-
-            if (!$grandParent) {
-                $this->logger->warning('Image has no grand parent :html', [':html' => $image->html()]);
-                continue;
-            }
-
-            $parentTagName = $parent->getNode()->nodeName;
-
-            $this->logger->debug('Parent tag name is :name', [':name' => $parentTagName]);
-
-            // Remove links to content images coz they would be added automatically
-            if ($parentTagName === 'a' && $parent->attr('href') === $image->attr('src')) {
-                $parent->replace($shortcode->asDomText());
-            } else {
-                $image->replace($shortcode->asDomText());
-            }
-
-            $this->logger->debug('Parent html is :html', [':html' => $grandParent->html()]);
+            $image->replace($shortcode->asDomText());
         }
     }
 
@@ -980,12 +942,12 @@ class Task_Content_Import_Wordpress extends AbstractTask
      * @param \DiDom\Element $node
      * @param                $entity_item_id
      *
-     * @return ShortcodeInterface|null
+     * @return ImageShortcode
      * @throws \BetaKiller\Repository\RepositoryException
      * @throws \BetaKiller\Task\TaskException
      * @throws \ORM_Validation_Exception
      */
-    private function processImgTag(\DiDom\Element $node, $entity_item_id): ?ShortcodeInterface
+    private function processImgTag(\DiDom\Element $node, $entity_item_id): ImageShortcode
     {
         // Getting attributes
         $attributes = $node->attributes();
@@ -1002,7 +964,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
         }
 
         /** @var \BetaKiller\Model\ContentImageInterface $image */
-        $image = $this->processAttachment($wpImage, $entity_item_id);
+        $image = $this->processWordpressAttachment($wpImage, $entity_item_id);
 
         $alt   = trim(Arr::get($attributes, 'alt'));
         $title = trim(Arr::get($attributes, 'title'));
@@ -1039,21 +1001,6 @@ class Task_Content_Import_Wordpress extends AbstractTask
 
         /** @var ImageShortcode $shortcode */
         $shortcode = $this->shortcodeFacade->create(ImageShortcode::codename(), $attributes);
-
-        $parent = $node->parent();
-
-        if (!$parent) {
-            $this->logger->warning('Image has no parent :html', [':html' => $node->html()]);
-            return null;
-        }
-
-        $parentNodeName = $parent->getNode()->nodeName;
-
-        // Remove links to content images coz they would be added automatically
-        if ($parentNodeName === 'a' && $parent->attr('href') === $node->attr('src')) {
-            // Mark image as "zoomable"
-            $shortcode->enableZoomable();
-        }
 
         return $shortcode;
     }

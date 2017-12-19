@@ -1,6 +1,7 @@
 <?php
 namespace BetaKiller\Log;
 
+use BetaKiller\Error\PhpExceptionStorageHandler;
 use BetaKiller\Helper\AppEnv;
 use Bramus\Monolog\Formatter\ColoredLineFormatter;
 use Bramus\Monolog\Formatter\ColorSchemes\DefaultScheme;
@@ -12,6 +13,7 @@ use Monolog\Processor\MemoryPeakUsageProcessor;
 use Monolog\Processor\WebProcessor;
 use MultiSite;
 use PhpConsole\Connector;
+use PhpConsole\Storage\File;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LoggerTrait;
 
@@ -35,32 +37,35 @@ class Logger implements LoggerInterface
     private $multiSite;
 
     /**
+     * @var PhpExceptionStorageHandler
+     */
+    private $phpExceptionStorageHandler;
+
+    /**
      * Logger constructor.
      *
-     * @param \BetaKiller\Helper\AppEnv $env
-     * @param MultiSite                 $multiSite
+     * @param \BetaKiller\Helper\AppEnv                    $env
+     * @param \MultiSite                                   $multiSite
+     * @param \BetaKiller\Error\PhpExceptionStorageHandler $phpExceptionHandler
      */
-    public function __construct(AppEnv $env, MultiSite $multiSite)
+    public function __construct(AppEnv $env, MultiSite $multiSite, PhpExceptionStorageHandler $phpExceptionHandler)
     {
-        $this->appEnv    = $env;
-        $this->multiSite = $multiSite;
-        $this->logger    = $this->getMonologInstance();
+        $this->appEnv                     = $env;
+        $this->multiSite                  = $multiSite;
+        $this->phpExceptionStorageHandler = $phpExceptionHandler;
+        $this->logger                     = $this->getMonologInstance();
+
+        $phpExceptionHandler->setLogger($this);
     }
 
     protected function getMonologInstance()
     {
         $monolog = new \Monolog\Logger('default');
 
-//        TODO Enable monolog exception handlers after migrating from Kohana
-//        ErrorHandler::register($monolog);
-
         $isDebugAllowed = $this->appEnv->isDebugEnabled();
 
         // CLI mode logging
         if (PHP_SAPI === 'cli') {
-            // Disable original error messages
-//            ini_set('error_reporting', 'off');
-
             // Color scheme and formatter
             $cliLevel     = $isDebugAllowed ? $monolog::DEBUG : $monolog::INFO;
             $cliHandler   = new StreamHandler('php://stdout', $cliLevel);
@@ -69,8 +74,6 @@ class Logger implements LoggerInterface
 
             $monolog->pushHandler($cliHandler);
         } else {
-            // TODO Show nice HTML messages or Kohana stacktrace page
-            $monolog->pushHandler(new HtmlResponseHandler($isDebugAllowed));
             $monolog->pushProcessor(new WebProcessor());
         }
 
@@ -84,8 +87,6 @@ class Logger implements LoggerInterface
 
             // App logs
             new StreamHandler($appLogFilePath, $monolog::DEBUG),
-
-            // TODO PhpExceptionStorage handler
         ]);
 
         $logsLevel      = $isDebugAllowed ? $monolog::DEBUG : $monolog::NOTICE;
@@ -93,17 +94,28 @@ class Logger implements LoggerInterface
 
         $monolog->pushHandler($crossedHandler);
 
+
         // Enable debugging via PhpConsole
-        if ($isDebugAllowed && Connector::getInstance()->isActiveClient()) {
-            $phpConsoleHandler       = new PHPConsoleHandler([
-                'headersLimit'             => 2048,     // 2KB
-                'detectDumpTraceAndSource' => true,     // Autodetect and append trace data to debug
-                'useOwnErrorsHandler'      => true,     // Enable errors handling
-                'useOwnExceptionsHandler'  => true,     // Enable exceptions handling
-            ]);
-            $stripExceptionFormatter = new StripExceptionFromContextFormatter();
-            $phpConsoleHandler->setFormatter($stripExceptionFormatter);
-            $monolog->pushHandler($phpConsoleHandler);
+        if ($isDebugAllowed) {
+            $phpConsoleStoragePath = \sys_get_temp_dir().DIRECTORY_SEPARATOR.$this->appEnv->getModeName().'.phpConsole.data';
+
+            // Can be called only before PhpConsole\Connector::getInstance() and PhpConsole\Handler::getInstance()
+            Connector::setPostponeStorage(new File($phpConsoleStoragePath));
+
+            if (Connector::getInstance()->isActiveClient()) {
+                $phpConsoleHandler       = new PHPConsoleHandler([
+                    'detectDumpTraceAndSource' => true,     // Autodetect and append trace data to debug
+                    'useOwnErrorsHandler'      => false,    // Enable errors handling
+                    'useOwnExceptionsHandler'  => false,    // Enable exceptions handling
+                ]);
+
+                $stripExceptionFormatter = new StripExceptionFromContextFormatter();
+                $phpConsoleHandler->setFormatter($stripExceptionFormatter);
+                $monolog->pushHandler($phpConsoleHandler);
+            }
+        } elseif ($this->appEnv->inProduction(true)) {
+            // PhpExceptionStorage handler
+            $monolog->pushHandler($this->phpExceptionStorageHandler);
         }
 
         $monolog->pushProcessor(new KohanaPlaceholderProcessor());

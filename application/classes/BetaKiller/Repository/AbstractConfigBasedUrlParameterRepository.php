@@ -59,7 +59,7 @@ abstract class AbstractConfigBasedUrlParameterRepository extends AbstractUrlPara
      * @return \BetaKiller\IFace\Url\UrlParameterInterface|null
      * @throws \BetaKiller\Repository\RepositoryException
      */
-    public function findItemByUrlKeyValue(string $value, UrlContainerInterface $params): ?UrlParameterInterface
+    public function findItemByUrlKeyValue(string $value, UrlContainerInterface $params): UrlParameterInterface
     {
         $value = ucfirst($value);
 

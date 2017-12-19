@@ -11,9 +11,9 @@ interface UrlDataSourceInterface extends RepositoryInterface
      * @param string                                      $value
      * @param \BetaKiller\IFace\Url\UrlContainerInterface $params
      *
-     * @return \BetaKiller\IFace\Url\UrlParameterInterface|null
+     * @return \BetaKiller\IFace\Url\UrlParameterInterface
      */
-    public function findItemByUrlKeyValue(string $value, UrlContainerInterface $params): ?UrlParameterInterface;
+    public function findItemByUrlKeyValue(string $value, UrlContainerInterface $params): UrlParameterInterface;
 
     /**
      * Returns list of available items (model records) by url key property

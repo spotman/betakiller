@@ -18,7 +18,7 @@ use Twig;
  */
 class WrapperViewTwig extends WrapperView
 {
-    protected function viewFactory(string $view_path)
+    protected function viewFactory(string $view_path): ViewInterface
     {
         // Using Twig instead of View
         return Twig::factory($view_path);

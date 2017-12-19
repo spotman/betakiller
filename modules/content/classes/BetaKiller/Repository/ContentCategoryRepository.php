@@ -10,7 +10,7 @@ use BetaKiller\Utils\Kohana\ORM\OrmInterface;
  * Class ContentCategoryRepository
  *
  * @package BetaKiller\Content
- * @method ContentCategoryInterface|null findById(int $id)
+ * @method ContentCategoryInterface findById(int $id)
  * @method ContentCategoryInterface|null findByWpID(int $id)
  * @method ContentCategoryInterface create()
  * @method ContentCategoryInterface[] getAll()

@@ -1,6 +1,7 @@
 <?php
 namespace BetaKiller\IFace\View;
 
+use BetaKiller\View\ViewInterface;
 use View;
 
 class LayoutView
@@ -15,7 +16,7 @@ class LayoutView
      */
     protected $_path;
 
-    public static function factory($_path)
+    public static function factory(string $_path)
     {
         return new static($_path);
     }
@@ -27,8 +28,9 @@ class LayoutView
 
     /**
      * @return string
+     * @throws \View_Exception
      */
-    public function render()
+    public function render(): string
     {
         $view_path = $this->getViewPath();
 
@@ -42,10 +44,10 @@ class LayoutView
      *
      * @return $this
      */
-    public function setContent($_content)
+    public function setContent(string $_content): LayoutView
     {
         // Force content rendering
-        $this->_content = (string)$_content;
+        $this->_content = $_content;
 
         return $this;
     }
@@ -53,12 +55,12 @@ class LayoutView
     /**
      * @return string
      */
-    public function getContent()
+    public function getContent(): string
     {
         return $this->_content;
     }
 
-    public function getViewPath()
+    public function getViewPath(): string
     {
         return 'layouts'.DIRECTORY_SEPARATOR.$this->_path;
     }
@@ -66,21 +68,10 @@ class LayoutView
     /**
      * @param $path
      *
-     * @return View
+     * @return \BetaKiller\View\ViewInterface
      */
-    protected function viewFactory($path)
+    protected function viewFactory(string $path): ViewInterface
     {
         return View::factory($path);
-    }
-
-    /**
-     * The __toString method allows a class to decide how it will react when it is converted to a string.
-     *
-     * @return string
-     * @link http://php.net/manual/en/language.oop5.magic.php#language.oop5.magic.tostring
-     */
-    public function __toString()
-    {
-        return $this->render();
     }
 }

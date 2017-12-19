@@ -1,7 +1,7 @@
 {% extends "@notifications/default/email" %}
 
 {% block body %}
-    <h2 style="color: red">Error logging subsystem failure on site <a href="{{ url }}">{{ url }}</a>!</h2>
+    <h2 style="color: red">Error logging subsystem failure!</h2>
 
     <p>{{ subsystem.message }}</p>
     <p>{{ subsystem.stacktrace|nl2br }}</p>

@@ -1,6 +1,7 @@
 <?php
 namespace BetaKiller\Content\Shortcode;
 
+use BetaKiller\Helper\LoggerHelperTrait;
 use BetaKiller\Utils\Instance\SingletonTrait;
 use Thunder\Shortcode\HandlerContainer\HandlerContainer;
 use Thunder\Shortcode\Parser\RegularParser;
@@ -11,6 +12,7 @@ use Thunder\Shortcode\Shortcode\ShortcodeInterface as ThunderShortcodeInterface;
 class ShortcodeFacade
 {
     use SingletonTrait;
+    use LoggerHelperTrait;
 
     /**
      * @Inject
@@ -29,6 +31,12 @@ class ShortcodeFacade
      * @var \BetaKiller\Content\Shortcode\ShortcodeFactory
      */
     private $shortcodeFactory;
+
+    /**
+     * @Inject
+     * @var \Psr\Log\LoggerInterface
+     */
+    private $logger;
 
     public function getEditableTagsNames(): array
     {
@@ -55,13 +63,18 @@ class ShortcodeFacade
         return $this->shortcodeFactory->create($tagName, $attributes, $classCodename);
     }
 
-
     public function process(string $text): string
     {
         $handlers = new HandlerContainer();
 
         $handlers->setDefault(function (ThunderShortcodeInterface $s) {
-            return $this->render($s->getName(), $s->getParameters());
+            try {
+                return $this->render($s->getName(), $s->getParameters());
+            } catch (\Throwable $e) {
+                $this->logException($this->logger, $e);
+
+                return null;
+            }
         });
 
         $processor = new Processor(new RegularParser(), $handlers);

@@ -12,12 +12,6 @@ abstract class AbstractOrmBasedRepository extends AbstractRepository
     private $ormFactory;
 
     /**
-     * @Inject
-     * @var \Psr\Log\LoggerInterface
-     */
-    private $logger;
-
-    /**
      * AbstractOrmBasedRepository constructor.
      *
      * @param \BetaKiller\Factory\OrmFactory $ormFactory
@@ -30,15 +24,18 @@ abstract class AbstractOrmBasedRepository extends AbstractRepository
     /**
      * @param int $id
      *
-     * @return ExtendedOrmInterface|mixed|null
+     * @return ExtendedOrmInterface|mixed
+     * @throws \BetaKiller\Repository\RepositoryException
      */
     public function findById(int $id)
     {
         try {
             return $this->getOrmInstance()->get_by_id($id);
-        } catch (\Throwable $e) {
-            $this->logger->emergency('Can not find item by id '.$id, ['exception' => $e]);
-            return null;
+        } catch (\Kohana_Exception $e) {
+            throw new RepositoryException('Can not find item in [:repo] repo by id = :id', [
+                ':repo' => static::getCodename(),
+                ':id'   => $id,
+            ], $e->getCode(), $e);
         }
     }
 
