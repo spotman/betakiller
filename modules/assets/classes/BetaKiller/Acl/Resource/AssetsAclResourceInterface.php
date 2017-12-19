@@ -3,7 +3,7 @@ namespace BetaKiller\Acl\Resource;
 
 interface AssetsAclResourceInterface extends EntityRelatedAclResourceInterface
 {
-    const ACTION_UPLOAD = 'upload';
+    public const ACTION_UPLOAD = 'upload';
 
     /**
      * @return bool
