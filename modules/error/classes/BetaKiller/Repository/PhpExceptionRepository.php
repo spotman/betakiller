@@ -92,7 +92,7 @@ class PhpExceptionRepository extends AbstractOrmBasedDispatchableRepository
      */
     private function orderByCreatedAt(OrmInterface $orm, ?bool $asc = null)
     {
-        $orm->order_by('created_at', $asc ? 'desc' : 'asc');
+        $orm->order_by('created_at', $asc ? 'asc' : 'desc');
 
         return $this;
     }
