@@ -2,6 +2,7 @@
 namespace BetaKiller\IFace\Admin\Error;
 
 use BetaKiller\Exception;
+use BetaKiller\Model\PhpExceptionHistoryModelInterface;
 
 class PhpExceptionItem extends ErrorAdminBase
 {
@@ -36,13 +37,7 @@ class PhpExceptionItem extends ErrorAdminBase
         $history = [];
 
         foreach ($model->getHistoricalRecords() as $record) {
-            $user = $record->getUser();
-
-            $history[] = [
-                'status' => $record->getStatus(),
-                'user'   => $user ? $user->getUsername() : null,
-                'time'   => $record->getTimestamp()->format('d.m.Y H:i:s'),
-            ];
+            $history[] = $this->getHistoricalRecordData($record);
         }
 
         $paths = array_map(function ($path) {
@@ -65,6 +60,17 @@ class PhpExceptionItem extends ErrorAdminBase
             'counter'    => $model->getCounter(),
             'trace_url'  => $traceIFace->url(),
             'history'    => $history,
+        ];
+    }
+
+    private function getHistoricalRecordData(PhpExceptionHistoryModelInterface $record): array
+    {
+        $user = $record->getUser();
+
+        return [
+            'status' => $record->getStatus(),
+            'user'   => $user ? $user->getUsername() : null,
+            'time'   => $record->getTimestamp()->format('d.m.Y H:i:s'),
         ];
     }
 }
