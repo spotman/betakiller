@@ -1,4 +1,6 @@
 <?php
+use BetaKiller\Ref\Initializer;
 
-$refInit = \BetaKiller\DI\Container::getInstance()->get(\BetaKiller\Ref\Initializer::class);
+/** @var Initializer $refInit */
+$refInit = \BetaKiller\DI\Container::getInstance()->get(Initializer::class);
 $refInit->init();
