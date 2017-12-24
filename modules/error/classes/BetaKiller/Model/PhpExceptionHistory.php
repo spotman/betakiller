@@ -58,7 +58,13 @@ class PhpExceptionHistory extends \ORM implements PhpExceptionHistoryModelInterf
     {
         $id = $this->get('user');
 
-        return $id ? $this->model_factory_user($id) : null;
+        if (!$id) {
+            return null;
+        }
+
+        $user = $this->model_factory_user($id);
+
+        return $user->loaded() ? $user : null;
     }
 
     /**
