@@ -11,6 +11,7 @@ use BetaKiller\IFace\IFaceProvider;
 use BetaKiller\IFace\IFaceStack;
 use BetaKiller\MessageBus\EventBus;
 use BetaKiller\Model\DispatchableEntityInterface;
+use BetaKiller\Repository\RepositoryException;
 use HTTP;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
@@ -169,7 +170,7 @@ class UrlDispatcher implements LoggerAwareInterface
                 }
             } catch (UrlDispatcherException $e) {
                 // Log this exception and keep processing
-                $this->logger->warning('Url parsing error', ['exception' => $e]);
+                $this->logger->alert('Url parsing error', ['exception' => $e]);
             }
 
             // Throw IFaceMissingUrlException so we can forward user to parent iface or custom 404 page
@@ -253,7 +254,7 @@ class UrlDispatcher implements LoggerAwareInterface
             }
         }
 
-        if (count($dynamic) > 1) {
+        if (\count($dynamic) > 1) {
             throw new IFaceException('Layer must have only one IFace with dynamic dispatching');
         }
 
@@ -367,6 +368,14 @@ class UrlDispatcher implements LoggerAwareInterface
 //        }
 //    }
 
+    /**
+     * @param \BetaKiller\IFace\IFaceModelInterface $ifaceModel
+     * @param \BetaKiller\IFace\Url\UrlPathIterator $it
+     *
+     * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \BetaKiller\IFace\Url\UrlDispatcherException
+     * @throws \BetaKiller\IFace\Url\UrlPrototypeException
+     */
     private function parseUriParameterPart(IFaceModelInterface $ifaceModel, UrlPathIterator $it): void
     {
         $prototype  = $this->urlPrototypeHelper->fromIFaceModelUri($ifaceModel);
@@ -379,10 +388,14 @@ class UrlDispatcher implements LoggerAwareInterface
             ? self::DEFAULT_URI
             : $it->current();
 
-        // Search for model item
-        $item = $prototype->hasIdKey()
-            ? $dataSource->findById((int)$uriValue)
-            : $dataSource->findItemByUrlKeyValue($uriValue, $this->urlParameters);
+        try {
+            // Search for model item
+            $item = $prototype->hasIdKey()
+                ? $dataSource->findById((int)$uriValue)
+                : $dataSource->findItemByUrlKeyValue($uriValue, $this->urlParameters);
+        } catch (RepositoryException $e) {
+            throw new UrlDispatcherException(':error', [':error' => $e->getMessage()], $e->getCode(), $e);
+        }
 
         if ($item instanceof DispatchableEntityInterface) {
             // Allow current model to preset "belongs to" models
@@ -447,7 +460,7 @@ class UrlDispatcher implements LoggerAwareInterface
             return false;
         }
 
-        if (!is_array($data)) {
+        if (!\is_array($data)) {
             // Log and keep processing as no cache was found
             $this->logger->warning('Cached UrlDispatcher data is incorrect', ['cachedData' => print_r($data, true)]);
 

@@ -1,0 +1,38 @@
+.error-500 {
+    height: 100%;
+    max-width: 430px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.error-500 h1 {
+    margin-top: 0;
+}
+
+.error-500 p {
+    display: block;
+    margin-top: 15px;
+}
+
+.error-500 .determinate {
+    width: 100%;
+    max-width: 0;
+    transition: max-width 15s linear;
+    -webkit-transition: max-width 15s linear;
+    -moz-transition: max-width 15s linear;
+    -ms-transition: max-width 15s linear;
+    -o-transition: max-width 15s linear;
+}
+
+.error-500.countdown-started .determinate {
+    max-width: 100%;
+}
+
+.error-500.countdown-cancelled .determinate {
+    transition: max-width 0s;
+    -webkit-transition: max-width 0s;
+    -moz-transition: max-width 0s;
+    -ms-transition: max-width 0s;
+    -o-transition: max-width 0s;
+    max-width: 0;
+}

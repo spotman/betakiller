@@ -70,7 +70,7 @@ class IFaceModelProviderAggregate extends IFaceModelProviderAbstract
      * @param string $codename
      *
      * @return IFaceModelInterface
-     * @throws IFaceException
+     * @throws \BetaKiller\IFace\Exception\IFaceException
      */
     public function getByCodename(string $codename): IFaceModelInterface
     {

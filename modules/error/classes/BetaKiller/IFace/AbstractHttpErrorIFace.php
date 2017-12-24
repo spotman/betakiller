@@ -15,6 +15,19 @@ abstract class AbstractHttpErrorIFace extends AbstractIFace
     private $user;
 
     /**
+     * This hook executed before IFace processing (on every request regardless of caching)
+     * Place here code that needs to be executed on every IFace request (increment views counter, etc)
+     */
+    public function before(): void
+    {
+        if (!$this->exception) {
+            $this->exception = $this->getDefaultHttpException();
+        }
+
+        parent::before();
+    }
+
+    /**
      * Returns data for View
      * Override this method in child classes
      *
@@ -39,6 +52,8 @@ abstract class AbstractHttpErrorIFace extends AbstractIFace
 
         return $this;
     }
+
+    abstract protected function getDefaultHttpException(): \HTTP_Exception;
 
     /**
      * Returns label source/pattern

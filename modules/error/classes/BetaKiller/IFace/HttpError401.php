@@ -3,6 +3,11 @@ namespace BetaKiller\IFace;
 
 class HttpError401 extends AbstractHttpErrorIFace
 {
+    protected function getDefaultHttpException(): \HTTP_Exception
+    {
+        return new \HTTP_Exception_401();
+    }
+
     /**
      * @return string
      */

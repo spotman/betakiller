@@ -41,7 +41,13 @@ class IFaceProvider
         $this->factory       = $factory;
     }
 
-    public function fromCodename(string $codename): ?IFaceInterface
+    /**
+     * @param string $codename
+     *
+     * @return \BetaKiller\IFace\IFaceInterface
+     * @throws \BetaKiller\IFace\Exception\IFaceException
+     */
+    public function fromCodename(string $codename): IFaceInterface
     {
         $iface = $this->getInstanceFromCache($codename);
 
@@ -65,7 +71,7 @@ class IFaceProvider
     }
 
     /**
-     * @return IFaceModelProviderAggregate|IFaceModelProviderInterface
+     * @return IFaceModelProviderInterface
      */
     protected function getModelProvider(): IFaceModelProviderInterface
     {
@@ -144,6 +150,10 @@ class IFaceProvider
     public function getDefault(): IFaceInterface
     {
         $defaultModel = $this->getModelProvider()->getDefault();
+
+        if (!$defaultModel) {
+            throw new IFaceException('Default iface is missing');
+        }
 
         return $this->createIFace($defaultModel);
     }

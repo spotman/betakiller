@@ -17,7 +17,7 @@ require([
       $(this).attr('disabled', 'disabled');
 
       timeout && clearTimeout(timeout);
-      $container.removeClass("countdown-started");
+      $container.addClass("countdown-cancelled");
     });
   });
 

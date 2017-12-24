@@ -5,6 +5,8 @@ use BetaKiller\IFace\IFaceFactory;
 
 class BetaKiller_Kohana_Exception extends Kohana_Kohana_Exception
 {
+    public const DEFAULT_EXCEPTION_CODE = 500;
+
     /**
      * Exception counter for preventing recursion
      */
@@ -142,7 +144,7 @@ class BetaKiller_Kohana_Exception extends Kohana_Kohana_Exception
     private static function getErrorIFaceForCode(int $code): ?AbstractHttpErrorIFace
     {
         // Try to find IFace provided code first and use default IFace if failed
-        foreach ([$code, 500] as $tryCode) {
+        foreach ([$code, self::DEFAULT_EXCEPTION_CODE] as $tryCode) {
             if ($iface = static::createErrorIFaceFromCode($tryCode)) {
                 return $iface;
             }
@@ -193,7 +195,7 @@ class BetaKiller_Kohana_Exception extends Kohana_Kohana_Exception
     {
         if ($userMessage = self::getUserMessage($e)) {
             // Prevent XSS
-           return HTML::chars($userMessage);
+            return HTML::chars($userMessage);
         }
 
         $key = self::getErrorLabelI18nKey($e);
@@ -239,7 +241,7 @@ class BetaKiller_Kohana_Exception extends Kohana_Kohana_Exception
 
     private static function getHttpErrorCode(Throwable $e)
     {
-        return ($e instanceof HTTP_Exception) ? $e->getCode() : 500;
+        return ($e instanceof HTTP_Exception) ? $e->getCode() : self::DEFAULT_EXCEPTION_CODE;
     }
 
     private static function getLabelI18nKeyForCode(int $code)
@@ -252,11 +254,13 @@ class BetaKiller_Kohana_Exception extends Kohana_Kohana_Exception
      * Allows throwing concrete exception without message
      * Useful for custom exception types
      *
+     * @param int|null $code
+     *
      * @return string
      */
-    protected function getDefaultMessageI18nKey(): string
+    protected function getDefaultMessageI18nKey(?int $code = null): string
     {
-        return static::getLabelI18nKeyForCode(500);
+        return static::getLabelI18nKeyForCode($code ?? self::DEFAULT_EXCEPTION_CODE);
     }
 
     /**
