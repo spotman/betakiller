@@ -1,5 +1,5 @@
 <?php
-namespace BetaKiller\IFace\Admin\Content\CustomTag;
+namespace BetaKiller\IFace\Admin\Content\Shortcode;
 
 use BetaKiller\Content\Shortcode\ShortcodeInterface;
 use BetaKiller\IFace\Admin\AbstractAdminBase;

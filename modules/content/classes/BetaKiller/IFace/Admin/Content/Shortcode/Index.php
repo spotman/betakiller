@@ -1,9 +1,9 @@
 <?php
-namespace BetaKiller\IFace\Admin\Content\CustomTag;
+namespace BetaKiller\IFace\Admin\Content\Shortcode;
 
 use BetaKiller\IFace\Admin\AbstractAdminBase;
 
-class Item extends AbstractAdminBase
+class Index extends AbstractAdminBase
 {
     /**
      * Returns data for View
@@ -12,7 +12,7 @@ class Item extends AbstractAdminBase
      */
     public function getData(): array
     {
-        // TODO: Get custom tag data or something similar
+        // TODO: List of custom tags maybe
         return [];
     }
 }
