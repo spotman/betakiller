@@ -4,6 +4,8 @@
  * Automatically generated from previous translation file.
  */
 return [
+    ':error' => ':error',
+
     'error.400.label' => 'Неверный HTTP запрос',
     'error.401.label' => 'Войдите на сайт',
 
