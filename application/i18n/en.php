@@ -4,6 +4,8 @@
  * Automatically generated from previous translation file.
  */
 return [
+    ':error' => ':error',
+
     'error.auth.common'             => 'Authentication failed',
     'error.auth.inactive'           => 'Your account was switched off',
     'error.auth.incorrect_password' => 'Your credentials are invalid',
@@ -18,5 +20,4 @@ return [
 
     'error.404.label' => 'Page not found',
     'error.500.label' => 'System error',
-
 ];

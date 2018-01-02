@@ -27,6 +27,7 @@ class ShortcodeWidget extends AbstractBaseWidget
     {
         $shortcode = $this->getShortcode();
 
+        // Set widget name equal to shortcode name for using it in a widget view
         $this->setName($shortcode->getTagName());
 
         return $shortcode->getWidgetData();

@@ -4,9 +4,9 @@ namespace BetaKiller\Assets\Handler;
 use BetaKiller\Assets\Provider\AssetsProviderInterface;
 use BetaKiller\Repository\EntityRepository;
 
-class SaveEntityRelationHandler implements AssetsHandlerInterface
+class SaveEntityItemRelationHandler implements AssetsHandlerInterface
 {
-    public const CODENAME = 'SaveEntityRelation';
+    public const CODENAME = 'SaveEntityItemRelation';
 
     /**
      * @var \BetaKiller\Repository\EntityRepository
@@ -14,7 +14,7 @@ class SaveEntityRelationHandler implements AssetsHandlerInterface
     private $entityRepository;
 
     /**
-     * SaveEntityRelationHandler constructor.
+     * SaveEntityItemRelationHandler constructor.
      *
      * @param \BetaKiller\Repository\EntityRepository $entityRepository
      */

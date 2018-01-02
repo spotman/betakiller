@@ -4,6 +4,7 @@
  * Automatically generated from previous translation file.
  */
 return [
+    ':error'                                                    => ':error',
     'Nothing found...'                                          => 'По запрашиваемому адресу ничего не удалось найти...',
     'The requested view :file could not be found'               => 'Запрашиваемый view-файл :file не найден',
     'Default value:'                                            => 'Значение по умолчанию:',
@@ -50,4 +51,5 @@ return [
     'No class found for :name, tried to autoload :tried'        => 'No class found for :name, tried to autoload :tried',
     'Can not instantiate :class class, error is: :msg'          => 'Can not instantiate :class class, error is: :msg',
     'Status ACL disabled for model :name'                       => 'Status ACL disabled for model :name',
+    'Can not find item [:name] in repository :repo'             => 'Can not find item [:name] in repository :repo',
 ];

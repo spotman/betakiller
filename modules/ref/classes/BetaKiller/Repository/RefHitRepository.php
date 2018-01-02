@@ -32,7 +32,7 @@ class RefHitRepository extends AbstractOrmBasedRepository
 
             return $orm->where('processed', '=', 0)->get_all();
         } catch (\Kohana_Exception $e) {
-            throw new RepositoryException($e->getMessage(), null, $e->getCode(), $e);
+            throw new RepositoryException(':error', [':error' => $e->getMessage()], $e->getCode(), $e);
         }
     }
 

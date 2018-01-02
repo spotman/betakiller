@@ -36,7 +36,7 @@ abstract class AbstractEntityRelatedAclResource extends AbstractCrudlsPermission
 
     public function isEntityRequiredForAction(string $actionName): bool
     {
-        return !in_array($actionName, $this->getActionsWithoutEntity(), true);
+        return !\in_array($actionName, $this->getActionsWithoutEntity(), true);
     }
 
     protected function getActionsWithoutEntity(): array

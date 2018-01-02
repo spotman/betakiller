@@ -1,5 +1,5 @@
 <?php
-use BetaKiller\Assets\Handler\SaveEntityRelationHandler;
+use BetaKiller\Assets\Handler\SaveEntityItemRelationHandler;
 
 return [
     'providers' =>  [
@@ -12,7 +12,7 @@ return [
                 'image/gif',
             ],
             'post_upload' => [
-                SaveEntityRelationHandler::CODENAME,
+                SaveEntityItemRelationHandler::CODENAME,
             ],
 
             'deploy' => true,
@@ -33,7 +33,7 @@ return [
             ],
 
             'post_upload' => [
-                SaveEntityRelationHandler::CODENAME,
+                SaveEntityItemRelationHandler::CODENAME,
             ],
             'deploy' => true,
 
@@ -50,7 +50,7 @@ return [
             // Allow any mime-type to be uploaded
             'mimes' => true,
             'post_upload' => [
-                SaveEntityRelationHandler::CODENAME,
+                SaveEntityItemRelationHandler::CODENAME,
             ],
 
             'deploy' => true,

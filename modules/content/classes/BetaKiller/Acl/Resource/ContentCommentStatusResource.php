@@ -12,7 +12,7 @@ class ContentCommentStatusResource extends AbstractEntityRelatedAclResource
      *
      * @return string[][]
      */
-    public function getDefaultAccessList()
+    public function getDefaultAccessList(): array
     {
         return [
             self::ACTION_CREATE => [

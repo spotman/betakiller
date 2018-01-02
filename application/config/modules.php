@@ -10,6 +10,9 @@ return array(
     'log'                   => MODPATH.'log',                   // Logs subsystem
     'error'                 => MODPATH.'error',                 // Error handling and logging
 
+    // Process legacy routing first
+    'static-files'          => MODPATH.'static-files',          // Static Files (JS/CSS/pictures)
+
     'acl'                   => MODPATH.'acl',                   // Role based access control
     'admin'                 => MODPATH.'admin',                 // Basic admin
     'api'                   => MODPATH.'api',                   // API subsystem
@@ -33,7 +36,6 @@ return array(
     'orm'                   => MODPATH.'orm',                   // Object Relationship Mapping
     'paginate'              => MODPATH.'paginate',              // Paginate abstraction for ORM, ORM-REST and others
     'robots-txt'            => MODPATH.'robots-txt',            // Serving /robots.txt
-    'static-files'          => MODPATH.'static-files',          // Static Files (JS/CSS/pictures)
     'twig'                  => MODPATH.'twig',                  // Twig template engine
     'ulogin'                => MODPATH.'ulogin',                // Universal login via ulogin.ru
     'unittest'              => MODPATH.'unittest',              // Module for unit testing via phpunit

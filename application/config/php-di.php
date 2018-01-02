@@ -5,6 +5,7 @@ use BetaKiller\Acl\AclResourcesCollector;
 use BetaKiller\Acl\AclRolesCollector;
 use BetaKiller\Acl\AclRulesCollector;
 use BetaKiller\Api\AccessResolver\CustomApiMethodAccessResolverDetector;
+use BetaKiller\Config\AppConfigInterface;
 use BetaKiller\Factory\CommonFactoryCache;
 use BetaKiller\Factory\FactoryCacheInterface;
 use BetaKiller\Factory\NamespaceBasedFactory;
@@ -97,7 +98,7 @@ return [
         })->scope(\DI\Scope::SINGLETON),
 
         // Helpers
-        'User'      => DI\factory(function (Auth $auth, UserRepository $userRepository, RoleRepository $roleRepository) {
+        'User'      => DI\factory(function (Auth $auth, UserRepository $userRepository, RoleRepository $roleRepository, AppConfigInterface $appConfig) {
             // Auth user for CLI
             if (PHP_SAPI === 'cli') {
                 $cliUserName = \BetaKiller\Task\AbstractTask::CLI_USER_NAME;
@@ -105,7 +106,7 @@ return [
                 $user = $userRepository->searchBy($cliUserName);
 
                 if (!$user) {
-                    $host  = parse_url(\Kohana::$base_url, PHP_URL_HOST);
+                    $host  = parse_url($appConfig->getBaseUrl(), PHP_URL_HOST);
                     $email = $cliUserName.'@'.$host;
 
                     $user = $userRepository->createNewUser($cliUserName, $email);
@@ -136,7 +137,7 @@ return [
         }),
 
         \BetaKiller\Config\ConfigProviderInterface::class => DI\object(\BetaKiller\Config\ConfigProvider::class),
-        \BetaKiller\Config\AppConfigInterface::class      => DI\object(\BetaKiller\Config\AppConfig::class),
+        AppConfigInterface::class      => DI\object(\BetaKiller\Config\AppConfig::class),
 
         \BetaKiller\Model\UserInterface::class          => DI\get('User'),
         \BetaKiller\Model\RoleInterface::class          => DI\get(\BetaKiller\Model\Role::class),
