@@ -119,7 +119,7 @@ class BetaKiller_Kohana_Exception extends Kohana_Kohana_Exception
 
         // Если это не наследник Kohana_Exception, оборачиваем его, чтобы показать базовое сообщение об ошибке
         if (!($exception instanceof Kohana_Exception)) {
-            $exception = new Kohana_Exception($exception->getMessage(), null, $exception->getCode(), $exception);
+            $exception = new Kohana_Exception(':error', [':error' => $exception->getMessage()], $exception->getCode(), $exception);
         }
 
         $response = Response::factory();

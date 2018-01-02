@@ -49,7 +49,7 @@ abstract class AbstractOrmBasedRepository extends AbstractRepository
         try {
             return $this->getOrmInstance()->get_all();
         } catch (\Kohana_Exception $e) {
-            throw new RepositoryException($e->getMessage(), null, $e->getCode(), $e);
+            throw new RepositoryException(':error', [':error' => $e->getMessage()], $e->getCode(), $e);
         }
     }
 
@@ -88,7 +88,7 @@ abstract class AbstractOrmBasedRepository extends AbstractRepository
         try {
             $entity->delete();
         } catch (\Kohana_Exception $e) {
-            throw new RepositoryException($e->getMessage(), null, $e->getCode(), $e);
+            throw new RepositoryException(':error', [':error' => $e->getMessage()], $e->getCode(), $e);
         }
     }
 

@@ -76,7 +76,7 @@ class IFaceModelProviderDatabase extends IFaceModelProviderAbstract
 
             return $iface;
         } catch (\Kohana_Exception $e) {
-            throw new IFaceException($e->getMessage(), null, $e->getCode(), $e);
+            throw new IFaceException(':error', [':error' => $e->getMessage()], $e->getCode(), $e);
         }
     }
 

@@ -5,8 +5,8 @@ use BetaKiller\Assets\Provider\AssetsProviderInterface;
 use BetaKiller\Content\Shortcode\AttachmentShortcode;
 use BetaKiller\Content\Shortcode\GalleryShortcode;
 use BetaKiller\Content\Shortcode\ImageShortcode;
-use BetaKiller\Content\Shortcode\ShortcodeInterface;
 use BetaKiller\Content\Shortcode\YoutubeShortcode;
+use BetaKiller\Helper\LoggerHelperTrait;
 use BetaKiller\Model\ContentPost;
 use BetaKiller\Model\Entity;
 use BetaKiller\Model\IFaceZone;
@@ -27,6 +27,8 @@ class Task_Content_Import_Wordpress extends AbstractTask
 
     private const WP_OPTION_PARSING_MODE = 'betakiller_parsing_mode';
     private const WP_OPTION_PARSING_PATH = 'betakiller_parsing_path';
+
+    use LoggerHelperTrait;
 
     /**
      * @var string
@@ -64,12 +66,6 @@ class Task_Content_Import_Wordpress extends AbstractTask
      * @var \BetaKiller\Model\UserInterface
      */
     private $user;
-
-    /**
-     * @var \BetaKiller\Helper\AssetsHelper
-     * @Inject
-     */
-    private $assetsHelper;
 
     /**
      * @var \BetaKiller\Helper\ContentHelper
@@ -924,7 +920,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
                 // Creating new [image /] tag as replacement for <img />
                 $shortcode = $this->processImgTag($image, $entityItemID);
             } catch (Throwable $e) {
-                $this->logger->warning(':error', [':error' => $e->getMessage()]);
+                $this->logException($this->logger, $e);
             }
 
             // Exit if something went wrong
@@ -1048,7 +1044,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
                 // Создаём новый тег <youtube /> на замену <iframe />
                 $targetTag = $this->processYoutubeIFrameTag($originalTag, $entityItemID);
             } catch (\Throwable $e) {
-                $this->logger->warning($e->getMessage());
+                $this->logException($this->logger, $e);
             }
 
             // Если новый тег не сформирован, то просто переходим к следующему
