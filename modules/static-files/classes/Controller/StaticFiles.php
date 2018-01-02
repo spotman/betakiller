@@ -23,9 +23,20 @@ class Controller_StaticFiles extends Controller
         $this->config = $this->get_config();
 
         $info = pathinfo($file);
-        $dir  = ('.' !== $info['dirname']) ? $info['dirname'].'/' : '';
 
         if ($orig = $this->static_original($file)) {
+            // Получаем время модификации оригинала
+            $mtime = filemtime($orig);
+            $lastModified = (new DateTime())->setTimestamp($mtime);
+
+            $this->response->last_modified($lastModified);
+//            $this->response->headers('last-modified', gmdate("D, d M Y H:i:s \G\M\T", $mtime));
+
+            // Check for not modified header
+            if ($this->response->check_if_not_modified_since()) {
+                return;
+            }
+
             // Читаем содержимое оригинала
             $str = file_get_contents($orig);
 
@@ -47,20 +58,16 @@ class Controller_StaticFiles extends Controller
                 }
             }
 
-            // Получаем время модификации оригинала
-            $mtime = filemtime($orig);
-
-            if (!$is_enabled) {
-                $this->response->headers('Pragma', 'no-cache');
-                $this->response->headers('Expires', gmdate("D, d M Y H:i:s \G\M\T", time() - 3600));
-            }
+//            if (!$is_enabled) {
+//                $this->response->headers('Pragma', 'no-cache');
+//                $this->response->headers('Expires', gmdate("D, d M Y H:i:s \G\M\T", time() - 3600));
+//            }
 
             // А пока отдадим файл руками
 //			$this->check_cache(sha1($this->request->uri()) . $mtime, $this->request);
             $this->response->body($str);
             $this->response->headers('Content-Type', File::mime_by_ext($info['extension']));
             $this->response->headers('Content-Length', strlen($str));
-            $this->response->headers('Last-Modified', gmdate("D, d M Y H:i:s \G\M\T", $mtime));
         } else {
             // Return a 404 status
             throw new HTTP_Exception_404("File [:file] not found", [':file' => $file]);
@@ -95,8 +102,8 @@ class Controller_StaticFiles extends Controller
             .$info['filename'].'.'
             .$info['extension'];
 
-        if (!file_exists(dirname($deploy))) {
-            @ mkdir(dirname($deploy), $config['chmod'], true);
+        if (!file_exists(dirname($deploy)) && !mkdir(dirname($deploy)) && !is_dir(dirname($deploy))) {
+            throw new \RuntimeException(sprintf('Directory "%s" was not created', dirname($deploy)));
         }
 
         return $deploy;
