@@ -7,7 +7,7 @@ class StaticFile extends Kohana_StaticFile
     /**
      * @return static
      */
-    public static function instance(): self
+    public static function instance()
     {
         if (!self::$instance) {
             self::$instance = new self;
