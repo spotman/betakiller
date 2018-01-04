@@ -14,9 +14,22 @@ use BetaKiller\IFace\Url\ConfigBasedUrlParameterInterface;
  */
 class ShortcodeRepository extends AbstractConfigBasedUrlParameterRepository
 {
+    public function findByTagName(string $tagName): ShortcodeUrlParameter
+    {
+        return $this->findByOptionValue(ShortcodeUrlParameter::OPTION_TAG_NAME, $tagName);
+    }
+
     protected function getItemsListConfigKey(): array
     {
         return ['content', 'shortcodes'];
+    }
+
+    /**
+     * @return string
+     */
+    public function getUrlKeyName(): string
+    {
+        return 'tagName';
     }
 
     /**

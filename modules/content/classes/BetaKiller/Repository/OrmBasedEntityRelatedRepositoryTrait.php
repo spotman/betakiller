@@ -8,7 +8,7 @@ trait OrmBasedEntityRelatedRepositoryTrait
 {
 //    public function get_entity_items_ids(Entity $entity)
 //    {
-//        /** @var EntityModelRelatedInterface $model */
+//        /** @var EntityItemRelatedInterface $model */
 //        $model = $this->model_factory();
 //
 //        return $model
@@ -30,7 +30,7 @@ trait OrmBasedEntityRelatedRepositoryTrait
 //    /**
 //     * @param array $item_ids
 //     *
-//     * @return EntityModelRelatedInterface|$this
+//     * @return EntityItemRelatedInterface|$this
 //     */
 //    public function filter_entity_item_ids(array $item_ids)
 //    {
@@ -61,7 +61,7 @@ trait OrmBasedEntityRelatedRepositoryTrait
     }
 
 //    /**
-//     * @return EntityModelRelatedInterface|$this
+//     * @return EntityItemRelatedInterface|$this
 //     */
 //    public function group_by_entity_item_id()
 //    {

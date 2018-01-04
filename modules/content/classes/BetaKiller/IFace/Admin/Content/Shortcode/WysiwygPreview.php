@@ -14,6 +14,12 @@ class WysiwygPreview extends AbstractAdminBase
 
     /**
      * @Inject
+     * @var \BetaKiller\Content\Shortcode\ShortcodeFacade
+     */
+    private $shortcodeFacade;
+
+    /**
+     * @Inject
      * @var \BetaKiller\Helper\ResponseHelper
      */
     private $responseHelper;
@@ -27,8 +33,9 @@ class WysiwygPreview extends AbstractAdminBase
      */
     public function getData(): array
     {
-        /** @var ShortcodeInterface $currentTag */
-        $currentTag = $this->urlParameters->getParameter(ShortcodeInterface::URL_CONTAINER_KEY);
+        $param = $this->urlParameters->getParameter(ShortcodeInterface::URL_CONTAINER_KEY);
+
+        $shortcode = $this->shortcodeFacade->createFromUrlParameter($param);
 
         $attributesKeys = $this->urlParameters->getQueryPartsKeys();
 
@@ -38,9 +45,9 @@ class WysiwygPreview extends AbstractAdminBase
             $attributes[$key] = $this->urlParameters->getQueryPart($key);
         }
 
-        $currentTag->setAttributes($attributes);
+        $shortcode->setAttributes($attributes);
 
-        $imageUrl = $currentTag->getWysiwygPluginPreviewSrc();
+        $imageUrl = $shortcode->getWysiwygPluginPreviewSrc();
 
         $this->responseHelper->redirect($imageUrl);
 

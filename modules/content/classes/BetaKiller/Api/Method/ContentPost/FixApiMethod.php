@@ -2,6 +2,7 @@
 namespace BetaKiller\Api\Method\ContentPost;
 
 use BetaKiller\Api\Method\AbstractEntityBasedApiMethod;
+use BetaKiller\Status\StatusWorkflowFactory;
 use Spotman\Api\ApiMethodResponse;
 
 class FixApiMethod extends AbstractEntityBasedApiMethod
@@ -9,24 +10,40 @@ class FixApiMethod extends AbstractEntityBasedApiMethod
     use ContentPostMethodTrait;
 
     /**
-     * ApproveApiMethod constructor.
-     *
-     * @param int $id
+     * @var \BetaKiller\Status\StatusWorkflowFactory
      */
-    public function __construct($id)
+    private $workflowFactory;
+
+    /**
+     * FixApiMethod constructor.
+     *
+     * @param int                                      $id
+     * @param \BetaKiller\Status\StatusWorkflowFactory $workflowFactory
+     */
+    public function __construct($id, StatusWorkflowFactory $workflowFactory)
     {
-        $this->id = (int)$id;
+        $this->id              = (int)$id;
+        $this->workflowFactory = $workflowFactory;
     }
 
     /**
      * @return \Spotman\Api\ApiMethodResponse|null
+     * @throws \HTTP_Exception_501
+     * @throws \BetaKiller\Status\StatusException
+     * @throws \BetaKiller\Repository\RepositoryException
+     * @throws \BetaKiller\Factory\FactoryException
      */
     public function execute(): ?ApiMethodResponse
     {
         /** @var \BetaKiller\Model\ContentPost $model */
         $model = $this->getEntity();
 
-        $model->fix()->save();
+        /** @var \BetaKiller\Status\ContentPostWorkflow $workflow */
+        $workflow = $this->workflowFactory->create($model);
+
+        $workflow->fix();
+
+        $this->saveEntity();
 
         return null;
     }

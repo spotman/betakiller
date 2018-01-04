@@ -129,6 +129,12 @@ class Task_Content_Import_Wordpress extends AbstractTask
 
     /**
      * @Inject
+     * @var \BetaKiller\Status\ContentPostWorkflow
+     */
+    private $postWorkflowFactory;
+
+    /**
+     * @Inject
      * @var \WP
      */
     private $wp;
@@ -327,7 +333,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
         /** @var \BetaKiller\Model\WordpressAttachmentInterface $model */
         $model = $provider->store($path, $originalFilename, $this->user);
 
-        if ($model instanceof \BetaKiller\Model\EntityModelRelatedInterface) {
+        if ($model instanceof \BetaKiller\Model\EntityItemRelatedInterface) {
             // Storing entity
             $model->setEntity($this->contentPostEntity);
 
@@ -517,7 +523,10 @@ class Task_Content_Import_Wordpress extends AbstractTask
 
             // Auto publishing for new posts (we are importing only published posts)
             if ($isNew) {
-                $model->complete(); // Publishing would be done automatically
+                /** @var \BetaKiller\Status\ContentPostWorkflow $workflow */
+                $workflow = $this->postWorkflowFactory->create($model);
+
+                $workflow->complete(); // Publishing would be done automatically
             }
 
             // Actualize revision with imported data
@@ -624,7 +633,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
                 ];
 
                 /** @var AttachmentShortcode $attachShortcode */
-                $attachShortcode = $this->shortcodeFacade->create(AttachmentShortcode::codename(), $attributes);
+                $attachShortcode = $this->shortcodeFacade->createFromCodename(AttachmentShortcode::codename(), $attributes);
 
                 if ($img) {
                     // Image as a thumbnail => layout="image" image-id="<id>"
@@ -784,7 +793,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
         $captionText = trim(strip_tags($s->getContent()));
 
         /** @var ImageShortcode $shortcode */
-        $shortcode = $this->shortcodeFacade->create(ImageShortcode::codename(), $parameters);
+        $shortcode = $this->shortcodeFacade->createFromCodename(ImageShortcode::codename(), $parameters);
 
         $shortcode->useCaptionLayout($captionText);
         $shortcode->setID($image->getID());
@@ -842,7 +851,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
         // TODO Deal with gallery ID
         // $attributes['id'] = $image->getID();
 
-        return $this->shortcodeFacade->create(GalleryShortcode::codename(), $attributes)->asHtml();
+        return $this->shortcodeFacade->createFromCodename(GalleryShortcode::codename(), $attributes)->asHtml();
     }
 
     /**
@@ -902,7 +911,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
 
         // TODO Deal with gallery ID
 
-        return $this->shortcodeFacade->create(GalleryShortcode::codename(), $attributes)->asHtml();
+        return $this->shortcodeFacade->createFromCodename(GalleryShortcode::codename(), $attributes)->asHtml();
     }
 
     /**
@@ -996,7 +1005,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
         $attributes['id'] = $image->getID();
 
         /** @var ImageShortcode $shortcode */
-        $shortcode = $this->shortcodeFacade->create(ImageShortcode::codename(), $attributes);
+        $shortcode = $this->shortcodeFacade->createFromCodename(ImageShortcode::codename(), $attributes);
 
         return $shortcode;
     }
@@ -1129,7 +1138,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
             'height' => $height,
         ];
 
-        return $this->shortcodeFacade->create(YoutubeShortcode::codename(), $attributes)->asHtml();
+        return $this->shortcodeFacade->createFromCodename(YoutubeShortcode::codename(), $attributes)->asHtml();
     }
 
     /**

@@ -11,6 +11,12 @@ class ShortcodeFactory
     private $factory;
 
     /**
+     * @Inject
+     * @var \BetaKiller\Repository\ShortcodeRepository
+     */
+    private $repository;
+
+    /**
      * ShortcodeFactory constructor.
      *
      * @param \BetaKiller\Factory\NamespaceBasedFactory $factory
@@ -18,29 +24,50 @@ class ShortcodeFactory
     public function __construct(NamespaceBasedFactory $factory)
     {
         $this->factory = $factory
-            ->setClassPrefixes('Content', ShortcodeInterface::CLASS_NS)
+            ->setClassNamespaces('Content', ShortcodeInterface::CLASS_NS)
             ->setClassSuffix(ShortcodeInterface::CLASS_SUFFIX)
             ->setExpectedInterface(ShortcodeInterface::class);
     }
 
-    public function convertTagNameToCodename(string $tagName): string
+    public function createFromTagName(string $tagName, ?array $attributes = null): ShortcodeInterface
     {
-        // Make CamelCase naming
-        return implode('', array_map('ucfirst', explode('-', $tagName)));
+        $urlParameter = $this->repository->findByTagName($tagName);
+
+        return $this->createFromUrlParameter($urlParameter, $attributes);
     }
 
-    public function create(string $tagName, ?array $attributes = null, ?string $codename = null): ShortcodeInterface
+    public function createFromCodename(string $codename, ?array $attributes = null): ShortcodeInterface
     {
-        // Make CamelCase naming
-        $tagCodename = $this->convertTagNameToCodename($tagName);
+        $urlParameter = $this->repository->findByCodename($codename);
 
-        // Use tag-related class if nothing special was provided in $codename
-        if (!$codename) {
-            $codename = $tagCodename;
+        return $this->createFromUrlParameter($urlParameter, $attributes);
+    }
+
+    private function getClassCodename(ShortcodeUrlParameter $parameter): string
+    {
+        // Use common class for static shortcodes and shortcode-specific class for others
+        return $parameter->isStatic()
+            ? StaticShortcode::codename()
+            : $parameter->getCodename();
+    }
+
+    public function createFromUrlParameter(ShortcodeUrlParameter $param, ?array $attributes = null): ShortcodeInterface
+    {
+        $classCodename = $this->getClassCodename($param);
+        $tagCodename = $param->getCodename();
+
+        return $this->create($classCodename, $param->getTagName(), $attributes, $tagCodename);
+    }
+
+    private function create(string $classCodename, string $tagName, ?array $attributes = null, ?string $tagCodename = null): ShortcodeInterface
+    {
+        // Use similar codename if nothing special was provided in $tagCodename
+        if (!$tagCodename) {
+            $tagCodename = $classCodename;
         }
 
         /** @var ShortcodeInterface $shortcode */
-        $shortcode = $this->factory->create($codename, [
+        $shortcode = $this->factory->create($classCodename, [
             'tagName' => $tagName,
             'codename' => $tagCodename,
         ]);

@@ -17,7 +17,7 @@
     </iface>
 
     <iface uri="shortcodes" codename="Admin_Content_Shortcode_Index" parentCodename="Admin_Index" label="Shortcodes plugin" zone="admin" aclRules="Admin.enabled">
-        <iface uri="{Shortcode.codename}" codename="Admin_Content_Shortcode_Item" label="{Shortcode.codename}" hasDynamicUrl="true" zone="admin" aclRules="Admin.enabled">
+        <iface uri="{Shortcode.tagName}" codename="Admin_Content_Shortcode_Item" label="{Shortcode.codename}" hasDynamicUrl="true" zone="admin" aclRules="Admin.enabled">
             <iface uri="wysiwyg-preview" codename="Admin_Content_Shortcode_WysiwygPreview" label="Preview" zone="admin" aclRules="Admin.enabled" />
         </iface>
     </iface>

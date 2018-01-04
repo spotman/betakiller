@@ -1,15 +1,12 @@
 <?php
 namespace BetaKiller\Model;
 
-use Kohana_Exception;
-use ORM;
-
 /**
- * Trait OrmBasedEntityRelatedModelTrait
+ * Trait OrmBasedEntityItemRelatedModelTrait
  *
  * @package BetaKiller\Content
  */
-trait OrmBasedEntityRelatedModelTrait
+trait OrmBasedEntityItemRelatedModelTrait
 {
     /**
      * @var \BetaKiller\Model\AbstractEntityInterface
@@ -31,17 +28,15 @@ trait OrmBasedEntityRelatedModelTrait
     /**
      * @param Entity $entity
      *
-     * @return $this|ORM
-     * @throws Kohana_Exception
+     * @return EntityItemRelatedInterface
      */
-    public function setEntity(Entity $entity)
+    public function setEntity(Entity $entity): EntityItemRelatedInterface
     {
         return $this->set('entity', $entity);
     }
 
     /**
      * @return Entity
-     * @throws Kohana_Exception
      */
     public function getEntity(): Entity
     {
@@ -50,6 +45,7 @@ trait OrmBasedEntityRelatedModelTrait
 
     /**
      * @return string
+     * @throws \BetaKiller\Exception
      */
     public function getEntitySlug(): string
     {
@@ -61,17 +57,15 @@ trait OrmBasedEntityRelatedModelTrait
      *
      * @param int $id
      *
-     * @return $this|ORM
-     * @throws Kohana_Exception
+     * @return EntityItemRelatedInterface
      */
-    public function setEntityItemID(int $id)
+    public function setEntityItemID(int $id): EntityItemRelatedInterface
     {
         return $this->set('entity_item_id', $id);
     }
 
     /**
      * @return int
-     * @throws Kohana_Exception
      */
     public function getEntityItemID(): int
     {
@@ -80,8 +74,9 @@ trait OrmBasedEntityRelatedModelTrait
 
     /**
      * @return \BetaKiller\Model\DispatchableEntityInterface
+     * @throws \BetaKiller\Exception
      */
-    protected function getRelatedEntityInstance()
+    protected function getRelatedEntityInstance(): DispatchableEntityInterface
     {
         if (!$this->linkedModel) {
             $id                = $this->getEntityItemID();

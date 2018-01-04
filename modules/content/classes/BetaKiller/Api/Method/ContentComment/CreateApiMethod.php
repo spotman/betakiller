@@ -10,11 +10,10 @@ class CreateApiMethod extends AbstractEntityCreateApiMethod
     /**
      * Implement this method
      *
-     * @param \BetaKiller\Model\ContentComment $model
-     * @param                       $data
+     * @param \BetaKiller\Api\Method\ContentComment\AbstractEntityInterface $model
+     * @param                                                               $data
      *
-     * @throws \Spotman\Api\ApiMethodException
-     * @return \BetaKiller\Model\AbstractEntityInterface
+     * @return \BetaKiller\Api\Method\ContentComment\AbstractEntityInterface
      */
     protected function create($model, $data)
     {

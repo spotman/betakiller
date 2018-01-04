@@ -2,6 +2,7 @@
 namespace BetaKiller\Api\Method\ContentPost;
 
 use BetaKiller\Api\Method\AbstractEntityBasedApiMethod;
+use BetaKiller\Status\StatusWorkflowFactory;
 use Spotman\Api\ApiMethodResponse;
 
 class PauseApiMethod extends AbstractEntityBasedApiMethod
@@ -9,13 +10,20 @@ class PauseApiMethod extends AbstractEntityBasedApiMethod
     use ContentPostMethodTrait;
 
     /**
-     * ApproveApiMethod constructor.
-     *
-     * @param int $id
+     * @var \BetaKiller\Status\StatusWorkflowFactory
      */
-    public function __construct($id)
+    private $workflowFactory;
+
+    /**
+     * PauseApiMethod constructor.
+     *
+     * @param int                                      $id
+     * @param \BetaKiller\Status\StatusWorkflowFactory $workflowFactory
+     */
+    public function __construct($id, StatusWorkflowFactory $workflowFactory)
     {
-        $this->id = (int)$id;
+        $this->id              = (int)$id;
+        $this->workflowFactory = $workflowFactory;
     }
 
     /**
@@ -26,7 +34,12 @@ class PauseApiMethod extends AbstractEntityBasedApiMethod
         /** @var \BetaKiller\Model\ContentPost $model */
         $model = $this->getEntity();
 
-        $model->pause()->save();
+        /** @var \BetaKiller\Status\ContentPostWorkflow $workflow */
+        $workflow = $this->workflowFactory->create($model);
+
+        $workflow->pause();
+
+        $this->saveEntity();
 
         return null;
     }

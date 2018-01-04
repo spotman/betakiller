@@ -5,7 +5,9 @@ use BetaKiller\IFace\Url\AbstractConfigBasedUrlParameter;
 
 class ShortcodeUrlParameter extends AbstractConfigBasedUrlParameter
 {
-    private const OPTION_NAME_IS_STATIC = 'is_static';
+    public const OPTION_TAG_NAME    = 'tag_name';
+    public const OPTION_IS_STATIC   = 'is_static';
+    public const OPTION_IS_EDITABLE = 'is_editable';
 
     /**
      * Returns key which will be used for storing model in UrlContainer registry.
@@ -17,8 +19,18 @@ class ShortcodeUrlParameter extends AbstractConfigBasedUrlParameter
         return ShortcodeInterface::URL_CONTAINER_KEY;
     }
 
+    public function getTagName(): string
+    {
+        return $this->getOption(self::OPTION_TAG_NAME);
+    }
+
     public function isStatic(): bool
     {
-        return (bool)$this->getOption(self::OPTION_NAME_IS_STATIC);
+        return (bool)$this->getOption(self::OPTION_IS_STATIC);
+    }
+
+    public function isEditable(): bool
+    {
+        return (bool)$this->getOption(self::OPTION_IS_EDITABLE);
     }
 }

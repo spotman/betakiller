@@ -17,12 +17,10 @@ class ContentPost extends \ORM implements StatusRelatedModelInterface, ModelWith
     use StatusRelatedModelOrmTrait,
         ModelWithRevisionsOrmTrait,
         OrmBasedSeoMetaTrait,
-        OrmBasedEntityHasWordpressIdTrait {
-        StatusRelatedModelOrmTrait::workflow as private baseWorkflow;
-    }
+        OrmBasedEntityHasWordpressIdTrait;
 
-    const TYPE_ARTICLE = 1;
-    const TYPE_PAGE    = 2;
+    public const TYPE_ARTICLE = 1;
+    public const TYPE_PAGE    = 2;
 
     private static $prioritizedTypesList = [
         self::TYPE_PAGE,
@@ -132,17 +130,9 @@ class ContentPost extends \ORM implements StatusRelatedModelInterface, ModelWith
      *
      * @return string
      */
-    protected function get_workflow_name(): string
+    public function getWorkflowName(): string
     {
         return 'ContentPost';
-    }
-
-    /**
-     * @return \Status_Workflow_ContentPost|\BetaKiller\Status\StatusWorkflowInterface
-     */
-    protected function workflow()
-    {
-        return $this->baseWorkflow();
     }
 
     /**
@@ -162,50 +152,6 @@ class ContentPost extends \ORM implements StatusRelatedModelInterface, ModelWith
     }
 
     /**
-     * @return \BetaKiller\Model\ContentPost
-     */
-    public function draft(): ContentPost
-    {
-        $this->workflow()->draft();
-
-        return $this;
-    }
-
-    /**
-     * @return \BetaKiller\Model\ContentPost
-     */
-    public function complete(): ContentPost
-    {
-        $this->workflow()->complete();
-
-        return $this;
-    }
-
-    /**
-     * @return \BetaKiller\Model\ContentPost
-     */
-    public function publish(): ContentPost
-    {
-        $this->workflow()->publish();
-
-        return $this;
-    }
-
-    public function pause()
-    {
-        $this->workflow()->pause();
-
-        return $this;
-    }
-
-    public function fix()
-    {
-        $this->workflow()->fix();
-
-        return $this;
-    }
-
-    /**
      * @return int
      */
     public function getType(): int
@@ -221,7 +167,7 @@ class ContentPost extends \ORM implements StatusRelatedModelInterface, ModelWith
      */
     protected function setType($value)
     {
-        if (!in_array($value, self::$prioritizedTypesList, true)) {
+        if (!\in_array($value, self::$prioritizedTypesList, true)) {
             throw new Kohana_Exception('Post type :value is not allowed', [':value' => $value]);
         }
 

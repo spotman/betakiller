@@ -1,5 +1,4 @@
 <?php
-
 namespace BetaKiller\Model;
 
 use BetaKiller\Helper\IFaceHelper;
@@ -9,13 +8,11 @@ use DateTimeImmutable;
 use DateTimeInterface;
 use Exception;
 use Model_ContentCommentStatusTransition;
-use Status_Workflow_ContentComment;
 use Validation;
 
-class ContentComment extends TreeModelSingleParentOrm
-    implements ContentCommentInterface
+class ContentComment extends TreeModelSingleParentOrm implements ContentCommentInterface
 {
-    use OrmBasedEntityRelatedModelTrait;
+    use OrmBasedEntityItemRelatedModelTrait;
     use OrmBasedEntityHasWordpressIdTrait;
     use StatusRelatedModelOrmTrait;
 
@@ -49,7 +46,7 @@ class ContentComment extends TreeModelSingleParentOrm
     /**
      * @inheritDoc
      */
-    protected function get_workflow_name(): string
+    public function getWorkflowName(): string
     {
         return 'ContentComment';
     }
@@ -404,60 +401,9 @@ class ContentComment extends TreeModelSingleParentOrm
         return $this->init_status($status);
     }
 
-
-    public function isApproveAllowed(): bool
+    public function isApproveAllowed(UserInterface $user): bool
     {
-        return $this->is_status_transition_allowed(Model_ContentCommentStatusTransition::APPROVE);
-    }
-
-    public function draft()
-    {
-        $this->workflow()->draft();
-
-        return $this;
-    }
-
-    public function approve()
-    {
-        $this->workflow()->approve();
-
-        return $this;
-    }
-
-    public function reject()
-    {
-        $this->workflow()->reject();
-
-        return $this;
-    }
-
-    public function mark_as_spam()
-    {
-        $this->workflow()->markAsSpam();
-
-        return $this;
-    }
-
-    public function move_to_trash()
-    {
-        $this->workflow()->moveToTrash();
-
-        return $this;
-    }
-
-    public function restore_from_trash()
-    {
-        $this->workflow()->restoreFromTrash();
-
-        return $this;
-    }
-
-    /**
-     * @return Status_Workflow_ContentComment|\BetaKiller\Status\StatusWorkflowInterface
-     */
-    protected function workflow()
-    {
-        return $this->workflow_factory();
+        return $this->is_status_transition_allowed(Model_ContentCommentStatusTransition::APPROVE, $user);
     }
 
     /**

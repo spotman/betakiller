@@ -1,14 +1,14 @@
 <?php
 namespace BetaKiller\Model;
 
-interface EntityModelRelatedInterface
+interface EntityItemRelatedInterface
 {
     /**
      * @param Entity $entity
      *
-     * @return $this
+     * @return \BetaKiller\Model\EntityItemRelatedInterface
      */
-    public function setEntity(Entity $entity);
+    public function setEntity(Entity $entity): EntityItemRelatedInterface;
 
     /**
      * @return Entity
@@ -27,7 +27,7 @@ interface EntityModelRelatedInterface
      *
      * @return $this
      */
-    public function setEntityItemID(int $id);
+    public function setEntityItemID(int $id): EntityItemRelatedInterface;
 
     /**
      * @return int

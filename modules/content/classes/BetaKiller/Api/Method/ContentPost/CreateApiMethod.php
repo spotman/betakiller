@@ -2,6 +2,7 @@
 namespace BetaKiller\Api\Method\ContentPost;
 
 use BetaKiller\Api\Method\AbstractEntityCreateApiMethod;
+use BetaKiller\Status\StatusWorkflowFactory;
 use Spotman\Api\ApiMethodException;
 
 class CreateApiMethod extends AbstractEntityCreateApiMethod
@@ -9,17 +10,35 @@ class CreateApiMethod extends AbstractEntityCreateApiMethod
     use ContentPostMethodTrait;
 
     /**
+     * @var \BetaKiller\Status\StatusWorkflowFactory
+     */
+    private $workflowFactory;
+
+    public function __construct($data, StatusWorkflowFactory $factory)
+    {
+        parent::__construct($data);
+
+        $this->workflowFactory = $factory;
+    }
+
+    /**
      * Implement this method
      *
-     * @param \BetaKiller\Model\ContentPost $model
-     * @param                       $data
+     * @param \BetaKiller\Model\ContentPost                              $model
+     * @param                                                            $data
      *
-     * @throws \Spotman\Api\ApiMethodException
      * @return \BetaKiller\Model\AbstractEntityInterface
+     * @throws \BetaKiller\Status\StatusWorkflowException
+     * @throws \BetaKiller\Factory\FactoryException
+     * @throws \Kohana_Exception
+     * @throws \Spotman\Api\ApiMethodException
      */
     protected function create($model, $data)
     {
-        $model->draft();
+        /** @var \BetaKiller\Status\ContentPostWorkflow $workflow */
+        $workflow = $this->workflowFactory->create($model);
+
+        $workflow->draft();
 
         if (isset($data->label)) {
             $model->setLabel($this->sanitizeString($data->label));
@@ -41,8 +60,6 @@ class CreateApiMethod extends AbstractEntityCreateApiMethod
                     throw new ApiMethodException('Unknown content post type :value', [':value' => $type]);
             }
         }
-
-        $model->create();
 
         // Return created model data
         return $model;

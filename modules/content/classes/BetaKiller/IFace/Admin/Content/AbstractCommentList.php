@@ -6,6 +6,12 @@ use BetaKiller\Model\ContentCommentInterface;
 abstract class AbstractCommentList extends AbstractAdminBase
 {
     /**
+     * @Inject
+     * @var \BetaKiller\Model\UserInterface
+     */
+    private $user;
+
+    /**
      * Returns data for View
      * Override this method in child classes
      *
@@ -50,7 +56,7 @@ abstract class AbstractCommentList extends AbstractAdminBase
             'status'       => [
                 'id'          => $status->get_id(),
                 'codename'    => $status->get_codename(),
-                'transitions' => $status->get_allowed_target_transitions_codename_array(),
+                'transitions' => $status->get_allowed_target_transitions_codename_array($this->user),
             ],
             'message'      => $comment->get_message(),
             'preview'      => \Text::limit_chars($comment->get_message(), 300, null, true),

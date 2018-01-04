@@ -13,6 +13,12 @@ class PostItem extends AbstractAdminBase
 
     /**
      * @Inject
+     * @var \BetaKiller\Model\UserInterface
+     */
+    private $user;
+
+    /**
+     * @Inject
      * TODO move to constructor
      * @var \BetaKiller\Helper\AclHelper
      */
@@ -85,7 +91,7 @@ class PostItem extends AbstractAdminBase
                 'status' => [
                     'id'          => $status->get_id(),
                     'codename'    => $status->get_codename(),
-                    'transitions' => $status->get_allowed_target_transitions_codename_array(),
+                    'transitions' => $status->get_allowed_target_transitions_codename_array($this->user),
                 ],
 
                 'thumbnails' => $thumbnails,

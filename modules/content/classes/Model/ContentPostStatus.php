@@ -20,7 +20,7 @@ class Model_ContentPostStatus extends StatusModelOrm
     /**
      * @return string
      */
-    protected function get_related_model_key()
+    protected function get_related_model_key(): string
     {
         return 'status';
     }
@@ -28,7 +28,7 @@ class Model_ContentPostStatus extends StatusModelOrm
     /**
      * @return string
      */
-    protected function get_related_model_name()
+    protected function get_related_model_name(): string
     {
         return 'ContentPost';
     }
@@ -44,7 +44,7 @@ class Model_ContentPostStatus extends StatusModelOrm
     /**
      * @return string
      */
-    protected function get_related_model_fk()
+    protected function get_related_model_fk(): string
     {
         return 'post_id';
     }
@@ -52,7 +52,7 @@ class Model_ContentPostStatus extends StatusModelOrm
     /**
      * @return string
      */
-    protected function getStatusAclModelName()
+    protected function getStatusAclModelName(): string
     {
         return 'ContentPostStatusAcl';
     }
@@ -60,7 +60,7 @@ class Model_ContentPostStatus extends StatusModelOrm
     /**
      * @return string
      */
-    protected function getStatusAclModelForeignKey()
+    protected function getStatusAclModelForeignKey(): string
     {
         return 'status_id';
     }

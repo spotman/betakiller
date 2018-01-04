@@ -8,5 +8,5 @@ namespace BetaKiller\Model;
  */
 trait OrmBasedContentElementEntityTrait
 {
-    use OrmBasedEntityRelatedModelTrait;
+    use OrmBasedEntityItemRelatedModelTrait;
 }

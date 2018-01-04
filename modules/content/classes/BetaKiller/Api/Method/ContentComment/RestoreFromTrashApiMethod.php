@@ -2,6 +2,7 @@
 namespace BetaKiller\Api\Method\ContentComment;
 
 use BetaKiller\Api\Method\AbstractEntityBasedApiMethod;
+use BetaKiller\Status\StatusWorkflowFactory;
 use Spotman\Api\ApiMethodResponse;
 
 class RestoreFromTrashApiMethod extends AbstractEntityBasedApiMethod
@@ -9,13 +10,20 @@ class RestoreFromTrashApiMethod extends AbstractEntityBasedApiMethod
     use ContentCommentMethodTrait;
 
     /**
+     * @var \BetaKiller\Status\StatusWorkflowFactory
+     */
+    private $workflowFactory;
+
+    /**
      * RestoreFromTrashApiMethod constructor.
      *
-     * @param int $id
+     * @param int                                      $id
+     * @param \BetaKiller\Status\StatusWorkflowFactory $workflowFactory
      */
-    public function __construct($id)
+    public function __construct($id, StatusWorkflowFactory $workflowFactory)
     {
-        $this->id = (int)$id;
+        $this->id              = (int)$id;
+        $this->workflowFactory = $workflowFactory;
     }
 
     /**
@@ -23,10 +31,15 @@ class RestoreFromTrashApiMethod extends AbstractEntityBasedApiMethod
      */
     public function execute(): ?ApiMethodResponse
     {
-        /** @var \BetaKiller\Model\ContentComment $model */
+        /** @var \BetaKiller\Model\ContentCommentInterface $model */
         $model = $this->getEntity();
 
-        $model->restore_from_trash()->save();
+        /** @var \BetaKiller\Status\ContentCommentWorkflow $workflow */
+        $workflow = $this->workflowFactory->create($model);
+
+        $workflow->restoreFromTrash();
+
+        $this->saveEntity();
 
         return null;
     }

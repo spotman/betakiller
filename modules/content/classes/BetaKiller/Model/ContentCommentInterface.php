@@ -7,7 +7,7 @@ use BetaKiller\Utils\Kohana\TreeModelSingleParentInterface;
 use DateTimeImmutable;
 use DateTimeInterface;
 
-interface ContentCommentInterface extends TreeModelSingleParentInterface, EntityModelRelatedInterface,
+interface ContentCommentInterface extends TreeModelSingleParentInterface, EntityItemRelatedInterface,
     StatusRelatedModelInterface, EntityHasWordpressIdInterface, HasPublicReadUrlInterface, DispatchableEntityInterface
 {
     public function getRelatedContentLabel(): string;
@@ -158,35 +158,10 @@ interface ContentCommentInterface extends TreeModelSingleParentInterface, Entity
      */
     public function init_as_trash();
 
-    public function isApproveAllowed(): bool;
-
     /**
-     * @return $this
+     * @param \BetaKiller\Model\UserInterface $user
+     *
+     * @return bool
      */
-    public function draft();
-
-    /**
-     * @return $this
-     */
-    public function approve();
-
-    /**
-     * @return $this
-     */
-    public function reject();
-
-    /**
-     * @return $this
-     */
-    public function mark_as_spam();
-
-    /**
-     * @return $this
-     */
-    public function move_to_trash();
-
-    /**
-     * @return $this
-     */
-    public function restore_from_trash();
+    public function isApproveAllowed(UserInterface $user): bool;
 }

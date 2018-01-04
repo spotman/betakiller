@@ -24,15 +24,16 @@ class ImageShortcode extends AbstractContentElementShortcode
     /**
      * ImageShortcode constructor.
      *
+     * @param string                                        $tagName
      * @param \BetaKiller\Repository\ContentImageRepository $repository
      * @param \BetaKiller\Helper\AssetsHelper               $helper
      */
-    public function __construct(ContentImageRepository $repository, AssetsHelper $helper)
+    public function __construct(string $tagName, ContentImageRepository $repository, AssetsHelper $helper)
     {
         $this->imageRepository = $repository;
         $this->assetsHelper    = $helper;
 
-        parent::__construct('image');
+        parent::__construct($tagName);
     }
 
     /**
@@ -66,7 +67,7 @@ class ImageShortcode extends AbstractContentElementShortcode
         $id    = (int)$this->getAttribute('id');
         $model = $this->imageRepository->findById($id);
 
-        return $this->assetsHelper->getPreviewUrl($model);
+        return $this->assetsHelper->getOriginalUrl($model);
     }
 
     /**

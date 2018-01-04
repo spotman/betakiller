@@ -1,12 +1,13 @@
 <?php
+namespace BetaKiller\Status;
 
+use BetaKiller\Helper\IFaceHelper;
 use BetaKiller\Helper\NotificationHelper;
 use BetaKiller\Model\ContentComment;
-use BetaKiller\Status\StatusRelatedModelInterface;
-use BetaKiller\Status\StatusWorkflow;
-use BetaKiller\Status\StatusWorkflowException;
+use BetaKiller\Model\UserInterface;
+use Model_ContentCommentStatusTransition;
 
-class Status_Workflow_ContentComment extends StatusWorkflow
+class ContentCommentWorkflow extends StatusWorkflow
 {
     /**
      * @var \BetaKiller\Helper\NotificationHelper
@@ -14,26 +15,34 @@ class Status_Workflow_ContentComment extends StatusWorkflow
     private $notificationHelper;
 
     /**
-     * @Inject
-     * TODO move to constructor
      * @var \BetaKiller\Helper\IFaceHelper
      */
     private $ifaceHelper;
 
     /**
-     * Status_Workflow_ContentComment constructor.
+     * ContentCommentWorkflow constructor.
      *
      * @param \BetaKiller\Status\StatusRelatedModelInterface $model
+     * @param \BetaKiller\Model\UserInterface                $user
      * @param \BetaKiller\Helper\NotificationHelper          $notificationHelper
+     * @param \BetaKiller\Helper\IFaceHelper                 $ifaceHelper
      */
-    public function __construct(StatusRelatedModelInterface $model, NotificationHelper $notificationHelper)
-    {
-        parent::__construct($model);
+    public function __construct(
+        StatusRelatedModelInterface $model,
+        UserInterface $user,
+        NotificationHelper $notificationHelper,
+        IFaceHelper $ifaceHelper
+    ) {
+        parent::__construct($model, $user);
 
         $this->notificationHelper = $notificationHelper;
+        $this->ifaceHelper        = $ifaceHelper;
     }
 
-    public function draft()
+    /**
+     * @throws \BetaKiller\Status\StatusWorkflowException
+     */
+    public function draft(): void
     {
         if ($this->model()->has_current_status()) {
             throw new StatusWorkflowException('Can not mark comment [:id] as draft coz it is in [:status] status', [
@@ -53,7 +62,11 @@ class Status_Workflow_ContentComment extends StatusWorkflow
         return $this->model;
     }
 
-    public function approve()
+    /**
+     * @throws \BetaKiller\Status\StatusException
+     * @throws \HTTP_Exception_501
+     */
+    public function approve(): void
     {
         $this->doTransition(Model_ContentCommentStatusTransition::APPROVE);
 
@@ -133,25 +146,41 @@ class Status_Workflow_ContentComment extends StatusWorkflow
         $message->send();
     }
 
-    public function reject()
+    /**
+     * @throws \BetaKiller\Status\StatusException
+     * @throws \HTTP_Exception_501
+     */
+    public function reject(): void
     {
         // Simply change status
         $this->doTransition(Model_ContentCommentStatusTransition::REJECT);
     }
 
-    public function markAsSpam()
+    /**
+     * @throws \BetaKiller\Status\StatusException
+     * @throws \HTTP_Exception_501
+     */
+    public function markAsSpam(): void
     {
         // Simply change status
         $this->doTransition(Model_ContentCommentStatusTransition::MARK_AS_SPAM);
     }
 
-    public function moveToTrash()
+    /**
+     * @throws \BetaKiller\Status\StatusException
+     * @throws \HTTP_Exception_501
+     */
+    public function moveToTrash(): void
     {
         // Simply change status
         $this->doTransition(Model_ContentCommentStatusTransition::MOVE_TO_TRASH);
     }
 
-    public function restoreFromTrash()
+    /**
+     * @throws \BetaKiller\Status\StatusException
+     * @throws \HTTP_Exception_501
+     */
+    public function restoreFromTrash(): void
     {
         // Simply change status
         $this->doTransition(Model_ContentCommentStatusTransition::RESTORE_FROM_TRASH);

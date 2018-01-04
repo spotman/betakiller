@@ -7,10 +7,11 @@ use BetaKiller\Repository\ContentImageRepository;
 
 class AttachmentShortcode extends AbstractContentElementShortcode
 {
-    private const ATTR_LAYOUT_TEXT  = 'text';
-    private const ATTR_LAYOUT_IMAGE = 'image';
-    private const ATTR_IMAGE_ID     = 'image-id';
-    private const ATTR_LABEL        = 'label';
+    private const ATTR_LAYOUT_TEXT   = 'text';
+    private const ATTR_LAYOUT_IMAGE  = 'image';
+    private const ATTR_LAYOUT_BUTTON = 'button';
+    private const ATTR_IMAGE_ID      = 'image-id';
+    private const ATTR_LABEL         = 'label';
 
     /**
      * @var \BetaKiller\Repository\ContentAttachmentRepository
@@ -30,11 +31,13 @@ class AttachmentShortcode extends AbstractContentElementShortcode
     /**
      * AttachmentShortcode constructor.
      *
+     * @param string                                             $tagName
      * @param \BetaKiller\Repository\ContentAttachmentRepository $repository
      * @param \BetaKiller\Repository\ContentImageRepository      $imageRepository
      * @param \BetaKiller\Helper\AssetsHelper                    $helper
      */
     public function __construct(
+        string $tagName,
         ContentAttachmentRepository $repository,
         ContentImageRepository $imageRepository,
         AssetsHelper $helper
@@ -43,7 +46,7 @@ class AttachmentShortcode extends AbstractContentElementShortcode
         $this->imageRepository      = $imageRepository;
         $this->assetsHelper         = $helper;
 
-        parent::__construct('attachment');
+        parent::__construct($tagName);
     }
 
     /**
@@ -58,11 +61,32 @@ class AttachmentShortcode extends AbstractContentElementShortcode
 
     public function getWysiwygPluginPreviewSrc(): string
     {
-//        $id = (int)$attributes['id'];
-//        $model = $this->attachmentRepository->findById($id);
+        $id = $this->getID();
 
-        // TODO Show button or link (depends on attributes)
-        return '/assets/static/images/download-button.png';
+        if (!$id) {
+            throw new ShortcodeException('Missing ID for :name tag', [':name' => $this->getTagName()]);
+        }
+
+        // Check attachment for existence
+        $this->attachmentRepository->findById($id);
+
+        $layout = $this->getLayout();
+
+        switch ($layout) {
+            case self::ATTR_LAYOUT_BUTTON:
+                return '/assets/static/images/download-button.png';
+
+            case self::ATTR_LAYOUT_IMAGE:
+                return $this->getImageUrl();
+
+            case self::ATTR_LAYOUT_TEXT:
+                return '/assets/static/images/download-text.png';
+        }
+
+        throw new ShortcodeException('Unknown [:name] shortcode layout: :value', [
+            ':name'  => $this->getTagName(),
+            ':value' => $layout,
+        ]);
     }
 
     /**
@@ -112,6 +136,13 @@ class AttachmentShortcode extends AbstractContentElementShortcode
         $image = $this->imageRepository->findById($id);
 
         return $this->assetsHelper->getOriginalUrl($image);
+    }
+
+    public function useButtonLayout(): void
+    {
+        $this->setLayout(self::ATTR_LAYOUT_BUTTON);
+        $this->setAttribute(self::ATTR_LABEL, null);
+        $this->setAttribute(self::ATTR_IMAGE_ID, null);
     }
 
     public function useImageLayout(int $imageID): void

@@ -1,16 +1,17 @@
 <?php
+namespace BetaKiller\Status;
 
+use BetaKiller\Helper\IFaceHelper;
 use BetaKiller\Helper\NotificationHelper;
-use BetaKiller\Status\StatusRelatedModelInterface;
-use BetaKiller\Status\StatusWorkflow;
-use BetaKiller\Status\StatusWorkflowException;
+use BetaKiller\Model\UserInterface;
+use URL;
 
-class Status_Workflow_ContentPost extends StatusWorkflow
+class ContentPostWorkflow extends StatusWorkflow
 {
-    const TRANSITION_COMPLETE = 'complete';
-    const TRANSITION_PUBLISH  = 'publish';
-    const TRANSITION_PAUSE    = 'pause';
-    const TRANSITION_FIX      = 'fix';
+    public const TRANSITION_COMPLETE = 'complete';
+    public const TRANSITION_PUBLISH  = 'publish';
+    public const TRANSITION_PAUSE    = 'pause';
+    public const TRANSITION_FIX      = 'fix';
 
     /**
      * @var \BetaKiller\Helper\NotificationHelper
@@ -18,24 +19,33 @@ class Status_Workflow_ContentPost extends StatusWorkflow
     private $notificationHelper;
 
     /**
-     * @Inject
-     * TODO move to constructor
      * @var \BetaKiller\Helper\IFaceHelper
      */
     private $ifaceHelper;
 
     /**
-     * Status_Workflow_ContentPost constructor.
+     * ContentPostWorkflow constructor.
      *
-     * @param \BetaKiller\Status\StatusRelatedModelInterface      $model
-     * @param \BetaKiller\Helper\NotificationHelper $notificationHelper
+     * @param \BetaKiller\Status\StatusRelatedModelInterface $model
+     * @param \BetaKiller\Model\UserInterface                $user
+     * @param \BetaKiller\Helper\NotificationHelper          $notificationHelper
+     * @param \BetaKiller\Helper\IFaceHelper                 $ifaceHelper
      */
-    public function __construct(StatusRelatedModelInterface $model, NotificationHelper $notificationHelper)
-    {
-        parent::__construct($model);
+    public function __construct(
+        StatusRelatedModelInterface $model,
+        UserInterface $user,
+        NotificationHelper $notificationHelper,
+        IFaceHelper $ifaceHelper
+    ) {
+        parent::__construct($model, $user);
+
         $this->notificationHelper = $notificationHelper;
+        $this->ifaceHelper        = $ifaceHelper;
     }
 
+    /**
+     * @throws \BetaKiller\Status\StatusWorkflowException
+     */
     public function draft()
     {
         if ($this->model()->has_current_status()) {
@@ -48,7 +58,13 @@ class Status_Workflow_ContentPost extends StatusWorkflow
         $this->model()->set_start_status();
     }
 
-    public function complete()
+    /**
+     * @throws \Kohana_Exception
+     * @throws \BetaKiller\Status\StatusWorkflowException
+     * @throws \BetaKiller\Status\StatusException
+     * @throws \HTTP_Exception_501
+     */
+    public function complete(): void
     {
         $this->doTransition(self::TRANSITION_COMPLETE);
 
@@ -77,7 +93,13 @@ class Status_Workflow_ContentPost extends StatusWorkflow
         $message->send();
     }
 
-    public function publish()
+    /**
+     * @throws \Kohana_Exception
+     * @throws \BetaKiller\Status\StatusException
+     * @throws \BetaKiller\Status\StatusWorkflowException
+     * @throws \HTTP_Exception_501
+     */
+    public function publish(): void
     {
         $this->doTransition(self::TRANSITION_PUBLISH);
 
@@ -89,12 +111,20 @@ class Status_Workflow_ContentPost extends StatusWorkflow
         $this->model()->setLatestRevisionAsActual();
     }
 
-    public function pause()
+    /**
+     * @throws \BetaKiller\Status\StatusException
+     * @throws \HTTP_Exception_501
+     */
+    public function pause(): void
     {
         $this->doTransition(self::TRANSITION_PAUSE);
     }
 
-    public function fix()
+    /**
+     * @throws \BetaKiller\Status\StatusException
+     * @throws \HTTP_Exception_501
+     */
+    public function fix(): void
     {
         $this->doTransition(self::TRANSITION_FIX);
 
@@ -107,7 +137,11 @@ class Status_Workflow_ContentPost extends StatusWorkflow
         // TODO Request content manager for editing
     }
 
-    protected function makeUri()
+    /**
+     * @throws \BetaKiller\Status\StatusWorkflowException
+     * @throws \Kohana_Exception
+     */
+    protected function makeUri(): void
     {
         // Nothing to do if uri was already set
         if ($this->model()->getUri()) {

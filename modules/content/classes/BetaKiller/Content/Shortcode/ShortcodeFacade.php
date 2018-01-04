@@ -40,27 +40,30 @@ class ShortcodeFacade
 
     public function getEditableTagsNames(): array
     {
+        $output = [];
+
         foreach ($this->repository->getAll() as $item) {
-            $item->getCodename();
+            if ($item->isEditable()) {
+                $output[] = $item->getTagName();
+            }
         }
 
-        // TODO Decide where to store "is_editable" flag: on config or in class (config is better coz there may be no class at all)
-
-        return [];
+        return $output;
     }
 
-    public function create(string $tagName, ?array $attributes = null): ShortcodeInterface
+    public function createFromTagName(string $tagName, ?array $attributes = null): ShortcodeInterface
     {
-        $tagCodename = $this->shortcodeFactory->convertTagNameToCodename($tagName);
+        return $this->shortcodeFactory->createFromTagName($tagName, $attributes);
+    }
 
-        $urlParameter = $this->repository->findByCodename($tagCodename);
+    public function createFromCodename(string $codename, ?array $attributes = null): ShortcodeInterface
+    {
+        return $this->shortcodeFactory->createFromCodename($codename, $attributes);
+    }
 
-        // Use common class for static shortcodes
-        $classCodename = $urlParameter->isStatic()
-            ? StaticShortcode::codename()
-            : $urlParameter->getCodename();
-
-        return $this->shortcodeFactory->create($tagName, $attributes, $classCodename);
+    public function createFromUrlParameter(ShortcodeUrlParameter $param, ?array $attributes = null): ShortcodeInterface
+    {
+        return $this->shortcodeFactory->createFromUrlParameter($param, $attributes);
     }
 
     public function process(string $text): string
@@ -84,7 +87,7 @@ class ShortcodeFacade
 
     protected function render(string $tagName, ?array $attributes = null): string
     {
-        $shortcode = $this->create($tagName, $attributes);
+        $shortcode = $this->createFromTagName($tagName, $attributes);
 
         /** @var \BetaKiller\Widget\ShortcodeWidget $widget */
         $widget = $this->widgetFactory->create('Shortcode');

@@ -5,7 +5,7 @@ abstract class AbstractContentElementShortcode extends AbstractEditableShortcode
 {
     public const ATTR_LAYOUT = 'layout';
 
-    public function getID(): int
+    public function getID(): ?int
     {
         return $this->getAttribute('id');
     }

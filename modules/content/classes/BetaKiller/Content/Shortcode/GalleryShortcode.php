@@ -1,7 +1,7 @@
 <?php
 namespace BetaKiller\Content\Shortcode;
 
-class GalleryShortcode extends AbstractEditableShortcode
+class GalleryShortcode extends AbstractContentElementShortcode
 {
     /**
      * @var \BetaKiller\Helper\AssetsHelper
@@ -20,11 +20,6 @@ class GalleryShortcode extends AbstractEditableShortcode
      * @var \Psr\Log\LoggerInterface
      */
     private $logger;
-
-    public function __construct()
-    {
-        parent::__construct('gallery');
-    }
 
     /**
      * Returns true if current tag may have text content between open and closing markers
@@ -53,7 +48,7 @@ class GalleryShortcode extends AbstractEditableShortcode
             'slider',
         ];
 
-        $layout = $this->getAttribute('layout') ?? $allowedLayouts[0];
+        $layout = $this->getLayout() ?? $allowedLayouts[0];
 
         if (!\in_array($layout, $allowedLayouts, true)) {
             throw new ShortcodeException('Unknown gallery layout :value', [':value' => $layout]);
@@ -64,7 +59,6 @@ class GalleryShortcode extends AbstractEditableShortcode
         $images = [];
 
         foreach ($imageIDs as $id) {
-            /** @var \BetaKiller\Model\ContentImage $model */
             $model = $this->repository->findById($id);
 
             $images[] = $this->assetsHelper->getAttributesForImgTag($model, $model::SIZE_PREVIEW);
@@ -85,7 +79,17 @@ class GalleryShortcode extends AbstractEditableShortcode
 
     public function getWysiwygPluginPreviewSrc(): string
     {
+        $imageIDs = explode(',', $this->getAttribute('ids'));
+
+        if (!$imageIDs) {
+            throw new ShortcodeException('No image IDs provided');
+        }
+
+        $firstID = array_pop($imageIDs);
+
+        $model = $this->repository->findById($firstID);
+
         // TODO Show slider or gallery image (depends on attributes)
-        return '/assets/static/images/gallery-wysiwyg.png';
+        return $this->assetsHelper->getOriginalUrl($model);
     }
 }

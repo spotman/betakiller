@@ -14,13 +14,14 @@ class YoutubeShortcode extends AbstractEditableShortcode
     /**
      * YoutubeShortcode constructor.
      *
+     * @param string                                                $tagName
      * @param \BetaKiller\Repository\ContentYoutubeRecordRepository $repository
      */
-    public function __construct(ContentYoutubeRecordRepository $repository)
+    public function __construct(string $tagName, ContentYoutubeRecordRepository $repository)
     {
         $this->repository = $repository;
 
-        parent::__construct('youtube');
+        parent::__construct($tagName);
     }
 
     /**

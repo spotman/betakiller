@@ -24,6 +24,12 @@ class Widget_Content_Comments extends AbstractBaseWidget
     private $entityRepository;
 
     /**
+     * @Inject
+     * @var \BetaKiller\Status\StatusWorkflowFactory
+     */
+    private $workflowFactory;
+
+    /**
      * Returns data for View rendering
      *
      * @return array
@@ -49,8 +55,9 @@ class Widget_Content_Comments extends AbstractBaseWidget
         $commentsData = [];
 
         foreach ($comments as $comment) {
-            $created_at  = $comment->get_created_at();
-            $email       = $comment->get_author_email();
+            $created_at = $comment->get_created_at();
+            $email      = $comment->get_author_email();
+            /** @var \BetaKiller\Model\ContentCommentInterface $parentModel */
             $parentModel = $comment->getParent();
             $parentID    = $parentModel ? $parentModel->getID() : 0;
 
@@ -74,6 +81,11 @@ class Widget_Content_Comments extends AbstractBaseWidget
         ];
     }
 
+    /**
+     * @throws \BetaKiller\IFace\Widget\WidgetException
+     * @throws \BetaKiller\Repository\RepositoryException
+     * @throws \Kohana_Exception
+     */
     public function action_add()
     {
         if ($this->is_ajax()) {
@@ -149,7 +161,10 @@ class Widget_Content_Comments extends AbstractBaseWidget
         $user  = $this->user;
         $model = $this->commentRepository->create();
 
-        $model->draft();
+        /** @var \BetaKiller\Status\ContentCommentWorkflow $workflow */
+        $workflow = $this->workflowFactory->create($model);
+
+        $workflow->draft();
 
         // Linking comment to entity and entity item
         $model
@@ -177,16 +192,15 @@ class Widget_Content_Comments extends AbstractBaseWidget
             // Saving comment and getting ID
             $this->commentRepository->save($model);
 
-            $model->reload();
-
             // Force approving if enabled (developers, moderators, etc)
-            if ($user && $model->isApproveAllowed()) {
-                $model->approve();
+            if ($user && $model->isApproveAllowed($this->user)) {
+                $workflow->approve();
                 $this->commentRepository->save($model);
             }
 
             $this->send_success_json();
-        } catch (ORM_Validation_Exception $e) {
+        } /** @noinspection BadExceptionsProcessingInspection */
+        catch (ORM_Validation_Exception $e) {
             $errors = $this->getValidationErrors($model->validation());
 
             $this->send_error_json(array_pop($errors));
