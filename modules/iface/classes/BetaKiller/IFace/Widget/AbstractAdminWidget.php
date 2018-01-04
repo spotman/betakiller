@@ -18,6 +18,8 @@ abstract class AbstractAdminWidget extends AbstractBaseWidget
     public function __construct(UserInterface $user)
     {
         $this->user = $user;
+
+        parent::__construct();
     }
 
     public function render(): string
@@ -36,10 +38,15 @@ abstract class AbstractAdminWidget extends AbstractBaseWidget
 
     protected function isAccessAllowed(): bool
     {
+        // Hide admin widget from non-authorized users (this check lowers execution time also)
+        if ($this->user->isGuest()) {
+            return false;
+        }
+
         /** @var \BetaKiller\Acl\Resource\AdminResource $adminResource */
         $adminResource = $this->aclHelper->getResource('Admin');
 
-        return !$this->user->isGuest() && $adminResource->isEnabled();
+        return  $adminResource->isEnabled();
     }
 
     protected function isEmptyResponseAllowed()

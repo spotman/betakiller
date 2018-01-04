@@ -24,7 +24,7 @@ class WidgetFactory
     public function __construct(NamespaceBasedFactory $factory)
     {
         $this->factory = $factory
-            ->setClassPrefixes('Widget')
+            ->setClassNamespaces('Widget')
             ->setClassSuffix('Widget')
             ->setExpectedInterface(WidgetInterface::class);
     }

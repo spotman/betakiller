@@ -12,4 +12,5 @@ return [
     'Request have unused query parts: :keys'                                    => 'Request have unused query parts: :keys',
     'IFace zone must be specified'                                              => 'IFace zone must be specified',
     'Can not detect layout codename for iface :codename'                        => 'Can not detect layout codename for iface :codename',
+    'Url prototype model key does not match default url key in :prototype'      => 'Url prototype model key does not match default url key in :prototype',
 ];

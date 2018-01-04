@@ -139,6 +139,7 @@ class IFaceHelper
      *
      * @return string
      * @throws \BetaKiller\Exception
+     * @throws \BetaKiller\IFace\Exception\IFaceException
      */
     public function getEntityUrl(DispatchableEntityInterface $entity, string $action, ?string $zone = null): string
     {

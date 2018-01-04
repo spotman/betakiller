@@ -85,7 +85,7 @@ class IFaceProvider
 
         /** @var \BetaKiller\IFace\IFaceInterface $object */
         $object = $this->factory
-            ->setClassPrefixes('IFace')
+            ->setClassNamespaces('IFace')
             ->setExpectedInterface(IFaceInterface::class)
             ->create($codename);
 

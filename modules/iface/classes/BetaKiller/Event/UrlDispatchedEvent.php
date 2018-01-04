@@ -1,7 +1,6 @@
 <?php
 namespace BetaKiller\Event;
 
-use BetaKiller\IFace\IFaceInterface;
 use BetaKiller\MessageBus\EventMessageInterface;
 
 class UrlDispatchedEvent implements EventMessageInterface
@@ -24,14 +23,24 @@ class UrlDispatchedEvent implements EventMessageInterface
     /**
      * UrlDispatchedEvent constructor.
      *
-     * @param string                           $url
-     * @param string                           $ip
-     * @param string                           $httpReferer
+     * @param string $url
+     * @param string $ip
+     * @param string $httpReferer
      */
     public function __construct(string $url, string $ip, ?string $httpReferer)
     {
-        $this->url          = $url;
-        $this->ip           = $ip;
-        $this->httpReferer  = $httpReferer;
+        $this->url         = $url;
+        $this->ip          = $ip;
+        $this->httpReferer = $httpReferer;
+    }
+
+    /**
+     * Must return true if message requires at least one handler to be processed
+     *
+     * @return bool
+     */
+    public function handlersRequired(): bool
+    {
+        return false;
     }
 }
