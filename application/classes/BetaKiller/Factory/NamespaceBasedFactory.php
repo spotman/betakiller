@@ -4,7 +4,7 @@ namespace BetaKiller\Factory;
 use BetaKiller\Config\AppConfigInterface;
 use BetaKiller\DI\ContainerInterface;
 
-class NamespaceBasedFactory
+final class NamespaceBasedFactory
 {
     /**
      * @var mixed[]
@@ -57,6 +57,11 @@ class NamespaceBasedFactory
     private $classNamesCache;
 
     /**
+     * @var bool
+     */
+    private $rawInstance;
+
+    /**
      *
      * @param \BetaKiller\Config\AppConfigInterface     $appConfig
      * @param \BetaKiller\DI\ContainerInterface         $container
@@ -69,7 +74,7 @@ class NamespaceBasedFactory
         $this->classNamesCache = $cache;
     }
 
-    public function setExpectedInterface($interfaceName)
+    public function setExpectedInterface($interfaceName): NamespaceBasedFactory
     {
         $this->expectedInterface = (string)$interfaceName;
 
@@ -81,7 +86,7 @@ class NamespaceBasedFactory
      *
      * @return $this
      */
-    public function setClassPrefixes(...$prefixes)
+    public function setClassPrefixes(string ...$prefixes): NamespaceBasedFactory
     {
         $this->classPrefixes = $prefixes;
 
@@ -93,7 +98,7 @@ class NamespaceBasedFactory
      *
      * @return $this
      */
-    public function setClassSuffix($suffix)
+    public function setClassSuffix(string $suffix): NamespaceBasedFactory
     {
         $this->classSuffix = $suffix;
 
@@ -105,9 +110,9 @@ class NamespaceBasedFactory
      *
      * @return $this
      */
-    public function addRootNamespace($ns)
+    public function addRootNamespace(string $ns): NamespaceBasedFactory
     {
-        $this->rootNamespaces[] = (string)$ns;
+        $this->rootNamespaces[] = $ns;
 
         return $this;
     }
@@ -115,7 +120,7 @@ class NamespaceBasedFactory
     /**
      * @return $this
      */
-    public function cacheInstances()
+    public function cacheInstances(): NamespaceBasedFactory
     {
         $this->instanceCachingEnabled = true;
 
@@ -127,9 +132,19 @@ class NamespaceBasedFactory
      *
      * @return $this
      */
-    public function prepareArgumentsWith(callable $func)
+    public function prepareArgumentsWith(callable $func): NamespaceBasedFactory
     {
         $this->prepareArgumentsCallback = $func;
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function rawInstances(): NamespaceBasedFactory
+    {
+        $this->rawInstance = true;
 
         return $this;
     }
@@ -178,7 +193,13 @@ class NamespaceBasedFactory
         return $instance;
     }
 
-    private function detectClassName($codename): string
+    /**
+     * @param string $codename
+     *
+     * @return string
+     * @throws \BetaKiller\Factory\FactoryException
+     */
+    private function detectClassName(string $codename): string
     {
         $appNamespace = $this->appConfig->getNamespace();
 
@@ -235,7 +256,7 @@ class NamespaceBasedFactory
      *
      * @return string|null
      */
-    protected function getClassNameFromCache($baseName): ?string
+    private function getClassNameFromCache(string $baseName): ?string
     {
         if (!$this->classNamesCache->contains($baseName)) {
             return null;
@@ -244,7 +265,7 @@ class NamespaceBasedFactory
         return $this->classNamesCache->fetch($baseName);
     }
 
-    protected function storeClassNameInCache($baseName, $className): bool
+    private function storeClassNameInCache(string $baseName, string $className): bool
     {
         return $this->classNamesCache->save($baseName, $className);
     }
@@ -254,26 +275,47 @@ class NamespaceBasedFactory
      *
      * @return mixed|null
      */
-    private function getInstanceFromCache($className)
+    private function getInstanceFromCache(string $className)
     {
         return ($this->instanceCachingEnabled && $this->hasInstanceInCache($className))
             ? self::$instances[$className]
             : null;
     }
 
-    private function hasInstanceInCache($className): bool
+    private function hasInstanceInCache(string $className): bool
     {
         return isset(self::$instances[$className]);
     }
 
-    protected function createInstance($className, array $arguments = null)
+    /**
+     * @param string     $className
+     * @param array|null $arguments
+     *
+     * @return mixed
+     * @throws \DI\DependencyException
+     * @throws \DI\NotFoundException
+     * @throws \InvalidArgumentException
+     */
+    private function createInstance(string $className, array $arguments = null)
     {
+        if ($this->rawInstance) {
+            return $arguments
+                ? new $className(...$arguments)
+                : new $className;
+        }
+
         return $arguments
             ? $this->container->make($className, $arguments)
             : $this->container->make($className);
     }
 
-    private function storeInstanceInCache($className, $instance): void
+    /**
+     * @param string $className
+     * @param        $instance
+     *
+     * @throws \BetaKiller\Factory\FactoryException
+     */
+    private function storeInstanceInCache(string $className, $instance): void
     {
         if (!$this->instanceCachingEnabled) {
             return;
