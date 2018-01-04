@@ -21,7 +21,7 @@ class AclResourceFactory implements AclResourceFactoryInterface
     public function __construct(NamespaceBasedFactory $factory) {
         $this->factory = $factory
             ->cacheInstances()
-            ->setClassPrefixes('Acl', 'Resource')
+            ->setClassNamespaces('Acl', 'Resource')
             ->setClassSuffix('Resource')
             ->setExpectedInterface(ResourceInterface::class);
     }

@@ -20,7 +20,7 @@ class AssetsUrlStrategyFactory
     public function __construct(NamespaceBasedFactory $factory)
     {
         $this->factory = $factory
-            ->setClassPrefixes('Assets', 'UrlStrategy')
+            ->setClassNamespaces('Assets', 'UrlStrategy')
             ->setClassSuffix('AssetsUrlStrategy')
             ->setExpectedInterface(AssetsUrlStrategyInterface::class);
     }

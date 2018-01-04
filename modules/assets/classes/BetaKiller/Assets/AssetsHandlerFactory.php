@@ -19,7 +19,7 @@ class AssetsHandlerFactory
     public function __construct(NamespaceBasedFactory $factory)
     {
         $this->factory = $factory
-            ->setClassPrefixes('Assets', 'Handler')
+            ->setClassNamespaces('Assets', 'Handler')
             ->setClassSuffix('Handler')
             ->setExpectedInterface(AssetsHandlerInterface::class);
     }

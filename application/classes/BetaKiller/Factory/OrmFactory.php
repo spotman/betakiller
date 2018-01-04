@@ -26,7 +26,7 @@ class OrmFactory
     {
         $factory
             ->setExpectedInterface(ExtendedOrmInterface::class)
-            ->setClassPrefixes('Model')
+            ->setClassNamespaces('Model')
             ->rawInstances();
     }
 

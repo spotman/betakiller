@@ -77,7 +77,7 @@ class AssetsProviderFactory
         AclInterface $acl
     ) {
         $this->factory = $factory
-            ->setClassPrefixes('Assets', 'Provider')
+            ->setClassNamespaces('Assets', 'Provider')
             ->setClassSuffix('AssetsProvider')
             ->setExpectedInterface(AssetsProviderInterface::class);
 

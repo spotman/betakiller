@@ -29,7 +29,7 @@ final class NamespaceBasedFactory
     /**
      * @var string[]
      */
-    private $classPrefixes;
+    private $classNamespaces;
 
     /**
      * @var string
@@ -82,13 +82,13 @@ final class NamespaceBasedFactory
     }
 
     /**
-     * @param string[] ...$prefixes
+     * @param string[] ...$namespaces
      *
      * @return $this
      */
-    public function setClassPrefixes(string ...$prefixes): NamespaceBasedFactory
+    public function setClassNamespaces(string ...$namespaces): NamespaceBasedFactory
     {
-        $this->classPrefixes = $prefixes;
+        $this->classNamespaces = $namespaces;
 
         return $this;
     }
@@ -206,9 +206,9 @@ final class NamespaceBasedFactory
         // Explode legacy naming by underscore
         $codenameArray = explode('_', $codename);
 
-        // Add class prefixes if needed
-        if ($this->classPrefixes) {
-            $codenameArray = array_merge($this->classPrefixes, $codenameArray);
+        // Add class namespaces if needed
+        if ($this->classNamespaces) {
+            $codenameArray = array_merge($this->classNamespaces, $codenameArray);
         }
 
         $separator = '\\';

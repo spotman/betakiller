@@ -27,7 +27,7 @@ class AssetsStorageFactory
     public function __construct(NamespaceBasedFactory $factory, ConfigProviderInterface $config)
     {
         $this->factory = $factory
-            ->setClassPrefixes('Assets', 'Storage')
+            ->setClassNamespaces('Assets', 'Storage')
             ->setClassSuffix('AssetsStorage')
             ->setExpectedInterface(AssetsStorageInterface::class);
 
