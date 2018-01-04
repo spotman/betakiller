@@ -21,6 +21,8 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
 {
     use LoggerAwareTrait;
 
+    public const MIN_LEVEL = Logger::ERROR;
+
     /**
      * Notify about N-th duplicated exception only
      */
@@ -83,7 +85,7 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
         $this->appConfig          = $appConfig;
         $this->notificationHelper = $notificationHelper;
 
-        parent::__construct(Logger::NOTICE);
+        parent::__construct(self::MIN_LEVEL);
     }
 
     /**

@@ -1,7 +1,6 @@
 <?php
 namespace BetaKiller\Log;
 
-use BetaKiller\DI\Container;
 use Psr\Log\LoggerInterface;
 
 class KohanaLogProxy extends \Log_Writer
@@ -9,7 +8,7 @@ class KohanaLogProxy extends \Log_Writer
     /**
      * @var \Psr\Log\LoggerInterface
      */
-    protected $logger;
+    private $logger;
 
     /**
      * KohanaLogProxy constructor.
@@ -19,14 +18,6 @@ class KohanaLogProxy extends \Log_Writer
     public function __construct(LoggerInterface $logger)
     {
         $this->logger = $logger;
-    }
-
-    public static function register()
-    {
-        $writer = Container::getInstance()->get(self::class);
-
-        // Proxy old Kohana logs to new logging subsystem
-        \Kohana::$log->attach($writer);
     }
 
     /**
