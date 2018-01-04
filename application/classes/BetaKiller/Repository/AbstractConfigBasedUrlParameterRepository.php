@@ -14,7 +14,7 @@ abstract class AbstractConfigBasedUrlParameterRepository extends AbstractUrlPara
     protected $configProvider;
 
     /**
-     * @var mixed[]
+     * @var ConfigBasedUrlParameterInterface[]
      */
     protected $items = [];
 
@@ -48,6 +48,28 @@ abstract class AbstractConfigBasedUrlParameterRepository extends AbstractUrlPara
         }
 
         return $item;
+    }
+
+    /**
+     * @param string $name
+     * @param string $value
+     *
+     * @return \BetaKiller\IFace\Url\ConfigBasedUrlParameterInterface|mixed
+     * @throws \BetaKiller\Repository\RepositoryException
+     */
+    protected function findByOptionValue(string $name, string $value)
+    {
+        foreach ($this->items as $item) {
+            if ($item->getOption($name) === $value) {
+                return $item;
+            }
+        }
+
+        throw new RepositoryException('Can not find item by :name = :value in repository :repo', [
+            ':name'  => $name,
+            ':value' => $value,
+            ':repo'  => static::getCodename(),
+        ]);
     }
 
     /**
@@ -119,7 +141,7 @@ abstract class AbstractConfigBasedUrlParameterRepository extends AbstractUrlPara
             } else {
                 // Simple definition without properties
                 $codename = $options;
-                $options = null;
+                $options  = null;
             }
 
             $this->items[$codename] = $this->createItemFromCodename($codename, $options);
@@ -134,5 +156,8 @@ abstract class AbstractConfigBasedUrlParameterRepository extends AbstractUrlPara
      *
      * @return ConfigBasedUrlParameterInterface|mixed
      */
-    abstract protected function createItemFromCodename(string $codename, ?array $properties = null): ConfigBasedUrlParameterInterface;
+    abstract protected function createItemFromCodename(
+        string $codename,
+        ?array $properties = null
+    ): ConfigBasedUrlParameterInterface;
 }

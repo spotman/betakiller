@@ -2,16 +2,12 @@
 namespace BetaKiller\Status;
 
 use BetaKiller\Graph\GraphTransitionModelOrm;
+use BetaKiller\Model\Role;
 use BetaKiller\Model\RoleInterface;
+use BetaKiller\Model\UserInterface;
 
 abstract class StatusTransitionModelOrm extends GraphTransitionModelOrm implements StatusTransitionModelInterface
 {
-    /**
-     * @Inject
-     * @var \BetaKiller\Model\UserInterface
-     */
-    private $user;
-
     protected function _initialize()
     {
         $this->has_many([
@@ -27,12 +23,12 @@ abstract class StatusTransitionModelOrm extends GraphTransitionModelOrm implemen
     }
 
     /**
+     * @param \BetaKiller\Model\UserInterface $user
+     *
      * @return $this
      */
-    public function filter_allowed_by_acl()
+    public function filter_allowed_by_acl(UserInterface $user)
     {
-        $user = $this->user;
-
         $through_table = $this->get_roles_relation_through_table_name();
 
         $primary_key = $this->object_primary_key();
@@ -44,10 +40,6 @@ abstract class StatusTransitionModelOrm extends GraphTransitionModelOrm implemen
             ->join($through_table, 'INNER')
             ->on($foreign_key, '=', $primary_key)
             ->where($far_key, 'IN', $user->getAllUserRolesIDs());
-    }
-
-    public function find_all_roles()
-    {
     }
 
     public function add_role(RoleInterface $role)
@@ -117,9 +109,9 @@ abstract class StatusTransitionModelOrm extends GraphTransitionModelOrm implemen
     }
 
     /**
-     * @return RoleInterface
+     * @return \BetaKiller\Model\Role
      */
-    protected function get_roles_relation()
+    protected function get_roles_relation(): Role
     {
         return $this->get($this->get_roles_relation_key());
     }

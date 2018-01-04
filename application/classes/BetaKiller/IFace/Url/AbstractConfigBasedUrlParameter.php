@@ -37,17 +37,18 @@ abstract class AbstractConfigBasedUrlParameter implements ConfigBasedUrlParamete
      */
     public function getUrlKeyValue(string $key): string
     {
-        $allowed  = AbstractUrlParameterRepository::URL_KEY_NAME;
-        $codename = $this->getCodename();
+        $value = ($key === AbstractUrlParameterRepository::URL_KEY_CODENAME)
+            ? $this->getCodename()
+            : $this->getOption($key);
 
-        if ($key !== $allowed) {
-            throw new UrlPrototypeException('Config-based url parameter [:name] may use ":allowed" key only', [
-                ':name'    => $codename,
-                ':allowed' => $allowed,
+        if ($value) {
+            throw new UrlPrototypeException('Config-based url parameter [:name] has no ":key" value', [
+                ':name'    => $this->getCodename(),
+                ':key' => $key,
             ]);
         }
 
-        return $codename;
+        return $value;
     }
 
     /**

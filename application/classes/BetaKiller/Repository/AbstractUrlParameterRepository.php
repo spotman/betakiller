@@ -6,7 +6,7 @@ use BetaKiller\IFace\Url\UrlParameterInterface;
 
 abstract class AbstractUrlParameterRepository extends AbstractReadOnlyRepository implements UrlDataSourceInterface
 {
-    public const URL_KEY_NAME = 'codename';
+    public const URL_KEY_CODENAME = 'codename';
 
     /**
      * Creates empty entity
@@ -33,6 +33,6 @@ abstract class AbstractUrlParameterRepository extends AbstractReadOnlyRepository
      */
     public function getUrlKeyName(): string
     {
-        return self::URL_KEY_NAME;
+        return self::URL_KEY_CODENAME;
     }
 }

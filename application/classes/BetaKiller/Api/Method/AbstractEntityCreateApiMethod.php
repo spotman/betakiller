@@ -17,11 +17,15 @@ abstract class AbstractEntityCreateApiMethod extends AbstractEntityBasedApiMetho
 
     /**
      * @return \Spotman\Api\ApiMethodResponse|null
+     * @throws \BetaKiller\Repository\RepositoryException
+     * @throws \BetaKiller\Factory\FactoryException
      */
     public function execute(): ?ApiMethodResponse
     {
-        $entity = $this->getEntity();
+        $entity       = $this->getEntity();
         $responseData = $this->create($entity, $this->data);
+
+        $this->saveEntity();
 
         return $this->response($responseData);
     }
@@ -29,11 +33,10 @@ abstract class AbstractEntityCreateApiMethod extends AbstractEntityBasedApiMetho
     /**
      * Override this method
      *
-     * @param $model
-     * @param $data
+     * @param \BetaKiller\Model\AbstractEntityInterface      $model
+     * @param                                                $data
      *
-     * @throws \Spotman\Api\ApiMethodException
-     * @return \BetaKiller\Model\AbstractEntityInterface
+     * @return mixed
      */
     abstract protected function create($model, $data);
 }

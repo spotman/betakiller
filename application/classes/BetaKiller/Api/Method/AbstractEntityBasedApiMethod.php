@@ -32,12 +32,17 @@ abstract class AbstractEntityBasedApiMethod extends AbstractApiMethod implements
      * Returns new entity
      *
      * @return \BetaKiller\Model\AbstractEntityInterface
+     * @throws \BetaKiller\Factory\FactoryException
      */
     protected function createEntity(): AbstractEntityInterface
     {
         return $this->getRepository()->create();
     }
 
+    /**
+     * @return \BetaKiller\Repository\RepositoryInterface
+     * @throws \BetaKiller\Factory\FactoryException
+     */
     protected function getRepository(): RepositoryInterface
     {
         if (!$this->repository) {
@@ -47,6 +52,10 @@ abstract class AbstractEntityBasedApiMethod extends AbstractApiMethod implements
         return $this->repository;
     }
 
+    /**
+     * @return \BetaKiller\Repository\RepositoryInterface
+     * @throws \BetaKiller\Factory\FactoryException
+     */
     private function fetchRepository(): RepositoryInterface
     {
         // Repository name is equal to API collection name
@@ -55,20 +64,40 @@ abstract class AbstractEntityBasedApiMethod extends AbstractApiMethod implements
         return $this->repositoryFactory->create($repoName);
     }
 
-    private function fetchEntity($id): AbstractEntityInterface
+    /**
+     * @param $id
+     *
+     * @return \BetaKiller\Model\AbstractEntityInterface
+     * @throws \BetaKiller\Factory\FactoryException
+     * @throws \BetaKiller\Repository\RepositoryException
+     */
+    private function fetchEntity(int $id): AbstractEntityInterface
     {
         return $this->getRepository()->findById($id);
     }
 
     /**
      * @return \BetaKiller\Model\AbstractEntityInterface
+     * @throws \BetaKiller\Factory\FactoryException
+     * @throws \BetaKiller\Repository\RepositoryException
      */
-    public function getEntity()
+    public function getEntity(): AbstractEntityInterface
     {
         if (!$this->entity) {
-            $this->entity = $this->fetchEntity($this->id);
+            $this->entity = $this->id
+                ? $this->fetchEntity($this->id)
+                : $this->createEntity();
         }
 
         return $this->entity;
+    }
+
+    /**
+     * @throws \BetaKiller\Factory\FactoryException
+     * @throws \BetaKiller\Repository\RepositoryException
+     */
+    protected function saveEntity(): void
+    {
+        $this->getRepository()->save($this->entity);
     }
 }

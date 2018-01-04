@@ -1,6 +1,8 @@
 <?php
 namespace BetaKiller\Status;
 
+use BetaKiller\Model\UserInterface;
+
 abstract class StatusWorkflow implements StatusWorkflowInterface
 {
     /**
@@ -8,12 +10,24 @@ abstract class StatusWorkflow implements StatusWorkflowInterface
      */
     protected $model;
 
-    public function __construct(StatusRelatedModelInterface $model)
+    /**
+     * @var \BetaKiller\Model\UserInterface
+     */
+    protected $user;
+
+    public function __construct(StatusRelatedModelInterface $model, UserInterface $user)
     {
         $this->model = $model;
+        $this->user = $user;
     }
 
-    public function doTransition($codename)
+    /**
+     * @param string $codename
+     *
+     * @throws \BetaKiller\Status\StatusException
+     * @throws \HTTP_Exception_501
+     */
+    public function doTransition(string $codename): void
     {
         // Find allowed target transition by provided codename
         $target_transition = $this->findTargetTransition($codename);
@@ -37,21 +51,27 @@ abstract class StatusWorkflow implements StatusWorkflowInterface
         // Empty by default
     }
 
-    public function isTransitionAllowed($codename)
+    public function isTransitionAllowed(string $codename): bool
     {
-        return $this->model->is_status_transition_allowed($codename);
+        return $this->model->is_status_transition_allowed($codename, $this->user);
     }
 
     /**
      * Override this in child class if you need status transition history
      * @return bool
      */
-    protected function isHistoryEnabled()
+    protected function isHistoryEnabled(): bool
     {
         return FALSE;
     }
 
-    protected function findTargetTransition($codename)
+    /**
+     * @param string $codename
+     *
+     * @return \BetaKiller\Status\StatusTransitionModelInterface
+     * @throws \BetaKiller\Status\StatusException
+     */
+    protected function findTargetTransition(string $codename): StatusTransitionModelInterface
     {
         $targets = $this->model->get_target_transitions();
 

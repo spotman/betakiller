@@ -74,6 +74,9 @@ abstract class AbstractOrmBasedRepository extends AbstractRepository
         $this->checkEntityInheritance($entity);
 
         $entity->save();
+
+        // Force updating all the related models
+        $entity->reload();
     }
 
     /**
