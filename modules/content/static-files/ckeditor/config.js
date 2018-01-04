@@ -23,7 +23,7 @@ CKEDITOR.editorConfig = function( config ) {
   config.autoGrow_onStartup = true;
   //config.autoGrow_maxHeight = 1500;
 
-  config.extraPlugins = "customtags";
+  config.extraPlugins = "shortcodes";
 
   //config.toolbar = [
   //  { name: 'document', items: [ 'Sourcedialog', '-', 'Save', 'NewPage', 'Preview', 'Print', '-', 'Templates' ] },

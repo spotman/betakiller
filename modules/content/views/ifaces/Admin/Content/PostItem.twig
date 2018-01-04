@@ -47,7 +47,7 @@
           </div>
         {% endif %}
 
-        {# TODO thumbnails edit (maybe select from content images) #}
+        {# TODO thumbnails edit #}
         <div class="row">
           <div class="col s12">
             {% for thumb_id,thumb_image in post.thumbnails %}
@@ -58,10 +58,9 @@
 
         <div class="row">
               <div class="input-field col s12">
-                  {#<textarea name="content" id="article-content" rows="25" style="height: 100vh" {{ isUpdateAllowed ? "" : "disabled" }}>{{ post.content }}</textarea>#}
                   {#<div id="article-content" data-custom-tags="{{ shortcodes|join(",") }}">{{ post.content|raw }}</div>#}
                   <textarea id="article-content" name="content" {{ isUpdateAllowed ? "" : "disabled" }}
-                            data-custom-tags="{{ shortcodes|join(",") }}">
+                            rows="25" style="height: 100vh" data-shortcodes="{{ shortcodes|join(",") }}">
                     {{ post.content }}
                   </textarea>
               </div>

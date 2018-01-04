@@ -17,11 +17,16 @@ function objectToQueryString(obj) {
 }
 
 function getFakeObjectClassName(tagName) {
-  return "custom-tag-" + tagName + "-fake-object";
+  return "shortcode-" + tagName + "-fake-object";
 }
 
 function getBasePluginUrl(tagName) {
-  return '/admin/custom-tags/' + tagName + '/';
+  // Dirty hack for stupid CKEditor
+  if (tagName === "photo") {
+    tagName = "image";
+  }
+
+  return '/admin/shortcodes/' + tagName + '/';
 }
 
 function makeFakeObjectSrc(attributes, tagName) {
@@ -50,9 +55,9 @@ function makeIndexUrl(editor, tagName) {
 
 // TODO Replace with AMD module or remove and use CKEditor event bus
 // Helper for holding functions
-//CKEDITOR["customTags"] = {};
+//CKEDITOR["shortcodes"] = {};
 
-CKEDITOR["customTags"] = {
+CKEDITOR["shortcodes"] = {
   createFakeParserObject: function (editor, realNode, tagName) {
     var obj = editor.createFakeParserElement(realNode, getFakeObjectClassName(tagName), tagName, true);
 
@@ -75,7 +80,7 @@ CKEDITOR["customTags"] = {
 };
 
 
-CKEDITOR.plugins.add('customtags', {
+CKEDITOR.plugins.add('shortcodes', {
   //icons: pluginName,
   requires: ['iframedialog', 'fakeobjects'],
   init: function (editor) {
@@ -95,7 +100,7 @@ CKEDITOR.plugins.add('customtags', {
 
       customContentTags.map(function (tagName) {
         tagsRulesElements[tagName] = function (element) {
-          return CKEDITOR["customTags"].createFakeParserObject(editor, element, tagName);
+          return CKEDITOR["shortcodes"].createFakeParserObject(editor, element, tagName);
         };
       });
 
@@ -194,7 +199,7 @@ function initAbstractPlugin(tagName, editor) {
           // console.log('realNode after commit', this.realNode);
 
           // Создаём новый фейковый объект и заменяем им старый (это единственный способ, который работает с гадским CKEditor)
-          CKEDITOR["customTags"].createFakeObject(editor, this.realNode, tagName)
+          CKEDITOR["shortcodes"].createFakeObject(editor, this.realNode, tagName)
             .replace(this.fakeObject);
         }
       }

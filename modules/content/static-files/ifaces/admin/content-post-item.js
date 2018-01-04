@@ -5,78 +5,88 @@ require([
   'materialize.charCounter'
 ], function ($, api) {
 
+  const shortcodeToCustomTag = {
+    "image": "photo"
+  };
+
   $(function () {
 
-    var $form = $('#post-form');
-    var $transitionButtons = $(".transition-button");
-    var $saveButton = $(".save-post-button");
+    const $form = $('#post-form');
+    const $transitionButtons = $(".transition-button");
+    const $saveButton = $(".save-post-button");
 
-    var postID = $form.find('[name="id"]').val();
-    var isUpdateAllowed = $form.data('update-allowed');
+    const postID = $form.find('[name="id"]').val();
+    const isUpdateAllowed = $form.data('update-allowed');
 
-    var $category = $('#article-category');
-    var $content = $('#article-content');
+    const $category = $('#article-category');
+    const $content = $('#article-content');
+
+    if (!$content.length) {
+      throw new Error('Missing content element');
+    }
 
     if ($category.length) {
       $category.material_select();
     }
 
-    if ($content.length) {
-      var customTags = $content.data('custom-tags').split(',');
-      var customTagsRules = $.map(customTags, function (tag) {
-        return tag + "[*]"
-      });
+    // TODO Move this to dedicated AMD module
 
-      //console.log('custom tags rules are', customTagsRules);
+    const shortcodes = $content.data('shortcodes').split(',');
+    const customTagsRules = $.map(shortcodes, function (shortcode) {
+      return getShortcodeCustomTag(shortcode) + "[*]"
+    });
 
-      $.each(customTags, function (index, name) {
-        CKEDITOR.dtd[name] = {id: 1};
-        CKEDITOR.dtd.$empty[name] = 1;
-        CKEDITOR.dtd.$removeEmpty[name] = 0;
-        CKEDITOR.dtd.$nonEditable[name] = 1;
-        CKEDITOR.dtd.$inline[name] = 1;
-      });
+    // Replace original shortcodes with CKEditor custom tags
+    $content.val(convertShortcodesToCustomTags($content.val(), shortcodes));
 
-      // TODO Move this to dedicated AMD module
-      $content.ckeditor({
-        contentEntityName: 'ContentPost',
-        contentEntityItemID: postID,
-        allowedContent: "p(*); strong; i; em; span{*}; table(*); thead; tbody; tr; th[style]; td{*}; ul(*); ol(*); li; a[href,title]; h2; h3; h4; " + customTagsRules.join(';')
-      });
+    //console.log('custom tags rules are', customTagsRules);
 
-      // TODO Fix editor toolbar position
-      //$.when($content.ckeditor().promise).then(function () {
-      //  var editor = $content.ckeditor().editor;
-      //
-      //  var $editor = $(editor.container.$),
-      //      $toolbar = $editor.find('.cke_top').first();
-      //
-      //  var toolbarWidth = $toolbar.outerWidth(),
-      //      toolbarHeight = $toolbar.outerHeight();
-      //
-      //  // Create placeholder for simpler toolbar manipulation
-      //  var $toolbarPlaceholder = $('<div>').css({
-      //    width: toolbarWidth + "px",
-      //    height: toolbarHeight + "px"
-      //  });
-      //
-      //  $toolbarPlaceholder.insertAfter($toolbar);
-      //
-      //  // Move toolbar to form
-      //  $form.css({position: "relative"}).append($toolbar);
-      //
-      //  $toolbar.css({
-      //    display: "block",
-      //    position: "absolute",
-      //    top: "60px",
-      //    left: 0,
-      //    zIndex: 1000,
-      //    width: toolbarWidth + "px",
-      //    height: toolbarHeight + "px"
-      //  });
-      //
-      //});
-    }
+    $.each(shortcodes, function (index, name) {
+      window.CKEDITOR.dtd[name] = {id: 1};
+      window.CKEDITOR.dtd.$empty[name] = 1;
+      window.CKEDITOR.dtd.$removeEmpty[name] = 0;
+      window.CKEDITOR.dtd.$nonEditable[name] = 1;
+      window.CKEDITOR.dtd.$inline[name] = 1;
+    });
+
+    $content.ckeditor({
+      contentEntityName: 'ContentPost',
+      contentEntityItemID: postID,
+      allowedContent: "p(*); strong; i; em; span{*}; table(*); thead; tbody; tr; th[style]; td{*}; ul(*); ol(*); li; a[href,title]; h2; h3; h4; " + customTagsRules.join(';')
+    });
+
+    // TODO Fix editor toolbar position
+    //$.when($content.ckeditor().promise).then(function () {
+    //  var editor = $content.ckeditor().editor;
+    //
+    //  var $editor = $(editor.container.$),
+    //      $toolbar = $editor.find('.cke_top').first();
+    //
+    //  var toolbarWidth = $toolbar.outerWidth(),
+    //      toolbarHeight = $toolbar.outerHeight();
+    //
+    //  // Create placeholder for simpler toolbar manipulation
+    //  var $toolbarPlaceholder = $('<div>').css({
+    //    width: toolbarWidth + "px",
+    //    height: toolbarHeight + "px"
+    //  });
+    //
+    //  $toolbarPlaceholder.insertAfter($toolbar);
+    //
+    //  // Move toolbar to form
+    //  $form.css({position: "relative"}).append($toolbar);
+    //
+    //  $toolbar.css({
+    //    display: "block",
+    //    position: "absolute",
+    //    top: "60px",
+    //    left: 0,
+    //    zIndex: 1000,
+    //    width: toolbarWidth + "px",
+    //    height: toolbarHeight + "px"
+    //  });
+    //
+    //});
 
     function savePost(doneCallback) {
       if (!isUpdateAllowed) {
@@ -86,11 +96,14 @@ require([
 
       $saveButton.attr('disabled', 'disabled');
 
-      var formData = {};
+      const formData = {};
 
       $form.serializeArray().map(function (item) {
         formData[item.name] = item.value;
       });
+
+      // Replace CKEditor custom tags with original shortcodes
+      formData.content = convertCustomTagsToShortcodes(formData.content, shortcodes);
 
       api.post.update(formData)
         .done(function () {
@@ -103,8 +116,8 @@ require([
     }
 
     function processTransition($button) {
-      var id     = $button.data("id"),
-          method = $button.data("api-method");
+      const id     = $button.data("id"),
+            method = $button.data("api-method");
 
       api.post[method](id)
         .done(function () {
@@ -120,8 +133,8 @@ require([
       e.preventDefault();
       $transitionButtons.attr('disabled', 'disabled');
 
-      var $button  = $(this),
-          autosave = ($button.data("autosave") === true);
+      const $button  = $(this),
+            autosave = ($button.data("autosave") === true);
 
       // Autosave only for selected transitions (except fix, pause, etc)
       if (autosave && isUpdateAllowed) {
@@ -147,8 +160,8 @@ require([
       });
     });
 
-    var $bar           = $('#admin-bar'),
-        $previewButton = $bar.find('.preview-entity-button');
+    const $bar           = $('#admin-bar'),
+          $previewButton = $bar.find('.preview-entity-button');
 
     // Save post before sending user to a preview
     if ($previewButton.length) {
@@ -164,5 +177,53 @@ require([
     }
 
   });
+
+  function getShortcodeCustomTag(shortcodeName) {
+    return shortcodeToCustomTag[shortcodeName] || shortcodeName;
+  }
+
+  function convertShortcodesToCustomTags(input, shortcodes) {
+    const matches = input.match(/\[(\S+)\s*([^\/\]]*)\/\]/ig);
+
+    $.each(matches, function(i, original) {
+      $.each(shortcodes, function (j, shortcodeName) {
+        const regex = new RegExp("\\[" + shortcodeName);
+
+        if (regex.test(original)) {
+          const tagName = getShortcodeCustomTag(shortcodeName);
+          const updated = original
+            .replace("[" + shortcodeName, "<" + tagName)
+            .replace("[/" + shortcodeName, "</" + tagName)
+            .replace("/]", "/>");
+
+          input = input.replace(original, updated);
+        }
+      });
+    });
+
+    return input;
+  }
+
+  function convertCustomTagsToShortcodes(input, shortcodes) {
+    const matches = input.match(/\<(\S+)\s*([^\/\>]*)\/\>/ig);
+
+    $.each(matches, function(i, original) {
+      $.each(shortcodes, function (j, shortcodeName) {
+        const tagName = getShortcodeCustomTag(shortcodeName);
+        const regex = new RegExp("\\<" + tagName);
+
+        if (regex.test(original)) {
+          const updated = original
+            .replace("<" + tagName, "[" + shortcodeName)
+            .replace("</" + tagName, "[/" + shortcodeName)
+            .replace("/>", "/]");
+
+          input = input.replace(original, updated);
+        }
+      });
+    });
+
+    return input;
+  }
 
 });
