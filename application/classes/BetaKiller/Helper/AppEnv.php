@@ -49,4 +49,9 @@ class AppEnv
     {
         return Kohana::$environment_string;
     }
+
+    public function isCLI(): bool
+    {
+        return PHP_SAPI === 'cli';
+    }
 }

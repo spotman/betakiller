@@ -1,5 +1,7 @@
 <?php
 
+use BetaKiller\Helper\I18n;
+
 /**
  * Class Controller
  * Basic controller with common helpers
@@ -8,26 +10,37 @@ abstract class Controller extends Controller_Proxy
 {
     use BetaKiller\Utils\Kohana\ControllerHelperTrait;
 
-    const JSON_SUCCESS = Response::JSON_SUCCESS;
-    const JSON_ERROR   = Response::JSON_ERROR;
+    protected const JSON_SUCCESS = Response::JSON_SUCCESS;
+    protected const JSON_ERROR   = Response::JSON_ERROR;
 
     /**
      * @Inject
-     * @var \BetaKiller\Model\UserInterface
+     * @var I18n
      */
-    private $user;
+    private $i18n;
+
+    /**
+     * @Inject
+     * @var \BetaKiller\Config\AppConfigInterface
+     */
+    private $appConfig;
 
     protected static $_after_callbacks = [];
 
-    public function before()
+    /**
+     * @throws \BetaKiller\Exception
+     * @throws \DI\DependencyException
+     * @throws \InvalidArgumentException
+     */
+    public function before(): void
     {
-        \BetaKiller\DI\Container::getInstance()->injectOn($this);
-
         parent::before();
+
+        \BetaKiller\DI\Container::getInstance()->injectOn($this);
 
         $this->check_connection_protocol();
 
-        $this->init_i18n();
+        $this->i18n->initialize($this->request);
     }
 
     /**
@@ -36,8 +49,8 @@ abstract class Controller extends Controller_Proxy
     protected function check_connection_protocol()
     {
         // Redirect only initial requests from HTTP
-        if($this->request->is_initial() && $this->request->client_ip() !== '0.0.0.0') {
-            $base_protocol = parse_url(Kohana::$base_url, PHP_URL_SCHEME);
+        if ($this->request->is_initial() && $this->request->client_ip() !== '0.0.0.0') {
+            $base_protocol = parse_url($this->appConfig->getBaseUrl(), PHP_URL_SCHEME);
 
             $is_secure_needed = ($base_protocol === 'https');
 
@@ -50,62 +63,12 @@ abstract class Controller extends Controller_Proxy
         }
     }
 
-    /**
-     * I18n initialization
-     *
-     * @throws HTTP_Exception_500
-     */
-    protected function init_i18n()
-    {
-        // Get lang from cookie
-        $userLang = Cookie::get(I18n::COOKIE_NAME);
-
-        $allowed_languages = I18n::lang_list();
-
-        if ($userLang && !in_array($userLang, $allowed_languages, true)) {
-            throw new HTTP_Exception_500('Unknown language :lang, only these are allowed: :allowed', [
-                ':lang' => $userLang,
-                ':allowed' => implode(', ', $allowed_languages),
-            ]);
-        }
-
-        // If current lang is not set
-        if (!$userLang) {
-            // If user is authorized
-            if ($this->user->isGuest()) {
-                // Get its lang
-                $userLang = $this->user->getLanguageName();
-            } // Else detect the preferred lang
-            else {
-                /** @var HTTP_Header $headers */
-                $headers   = $this->request->headers();
-                $userLang = $headers->preferred_language($allowed_languages);
-            }
-        }
-
-        if (!$userLang) {
-            $userLang = I18n::lang_list()[0];
-        }
-
-        // Store lang in cookie
-        Cookie::set(I18n::COOKIE_NAME, $userLang);
-
-        // Set I18n lang
-        I18n::lang($userLang);
-
-        // Save all absent keys if in development env
-        if (!Kohana::in_production(true)) {
-            register_shutdown_function([I18n::class, 'write']);
-        }
-    }
-
     public function after()
     {
         parent::after();
 
         $this->response->check_if_not_modified_since();
     }
-
 
     /**
      * View Factory for current request (directory/controller/action)

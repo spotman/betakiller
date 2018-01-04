@@ -8,8 +8,6 @@
  */
 class I18n extends Kohana_I18n
 {
-    const COOKIE_NAME = 'lang';
-
     /**
      * @var  string  source language: en-us, es-es, zh-cn, etc
      */
@@ -32,7 +30,7 @@ class I18n extends Kohana_I18n
      *
      * @return array
      */
-    public static function lang_list(array $list = null)
+    public static function lang_list(array $list = null): array
     {
         if ($list) {
             static::$_lang_list = $list;
@@ -47,7 +45,7 @@ class I18n extends Kohana_I18n
      *
      * @return bool
      */
-    public static function has($string, $lang = null)
+    public static function has($string, $lang = null): bool
     {
         if (!$lang) {
             // Use the global target language
@@ -71,7 +69,7 @@ class I18n extends Kohana_I18n
      *
      * @return  string
      */
-    public static function get($string, $lang = null)
+    public static function get($string, $lang = null): string
     {
         if (!$lang) {
             // Use the global target language
@@ -129,8 +127,9 @@ class I18n extends Kohana_I18n
     protected static function put_data($module, $data)
     {
         // Skip empty records
-        if (!$data)
+        if (!$data) {
             return;
+        }
 
         // Если указан конкретный модуль
         $base_path = ($module !== 'application')
@@ -142,9 +141,8 @@ class I18n extends Kohana_I18n
         $save_path = $base_path.'i18n/';
 
         // check that the path exists
-        if (!file_exists($save_path)) {
-            // if not, create directory
-            mkdir($save_path, 0777, true);
+        if (!file_exists($save_path) && !mkdir($save_path) && !is_dir($save_path)) {
+            throw new \RuntimeException(sprintf('Directory "%s" was not created', $save_path));
         }
 
         // Формируем имя файла
@@ -161,7 +159,7 @@ class I18n extends Kohana_I18n
         $content = static::make_content(array_merge($data, $current_app_lang_data));
 
         // backup old file - if the file size is different.
-        if (file_exists($full_file_path) && (filesize($full_file_path) != strlen($content))) {
+        if (file_exists($full_file_path) && (filesize($full_file_path) !== strlen($content))) {
             // Backing up current config
             $old_content = file_get_contents($full_file_path);
             $backup_name = $save_path.static::$lang.'_'.date('Y_m_d__H_i_s').'.php';

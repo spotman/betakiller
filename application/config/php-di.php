@@ -5,7 +5,10 @@ use BetaKiller\Acl\AclResourcesCollector;
 use BetaKiller\Acl\AclRolesCollector;
 use BetaKiller\Acl\AclRulesCollector;
 use BetaKiller\Api\AccessResolver\CustomApiMethodAccessResolverDetector;
+use BetaKiller\Config\AppConfig;
 use BetaKiller\Config\AppConfigInterface;
+use BetaKiller\Config\ConfigProvider;
+use BetaKiller\Config\ConfigProviderInterface;
 use BetaKiller\Factory\CommonFactoryCache;
 use BetaKiller\Factory\FactoryCacheInterface;
 use BetaKiller\Factory\NamespaceBasedFactory;
@@ -14,7 +17,6 @@ use BetaKiller\IFace\Url\UrlDispatcherCacheInterface;
 use BetaKiller\IFace\View\IFaceView;
 use BetaKiller\IFace\View\LayoutView;
 use BetaKiller\IFace\View\WrapperView;
-use BetaKiller\Model\GuestUser;
 use BetaKiller\View\IFaceViewTwig;
 use BetaKiller\View\LayoutViewTwig;
 use BetaKiller\View\WrapperViewTwig;
@@ -32,8 +34,6 @@ use Spotman\Acl\ResourcesCollector\AclResourcesCollectorInterface;
 use Spotman\Acl\RolesCollector\AclRolesCollectorInterface;
 use Spotman\Acl\RulesCollector\AclRulesCollectorInterface;
 use Spotman\Api\AccessResolver\ApiMethodAccessResolverDetectorInterface;
-use BetaKiller\Repository\UserRepository;
-use BetaKiller\Repository\RoleRepository;
 
 $workingPath = MultiSite::instance()->getWorkingPath();
 $workingName = MultiSite::instance()->getWorkingName();
@@ -98,46 +98,12 @@ return [
         })->scope(\DI\Scope::SINGLETON),
 
         // Helpers
-        'User'      => DI\factory(function (Auth $auth, UserRepository $userRepository, RoleRepository $roleRepository, AppConfigInterface $appConfig) {
-            // Auth user for CLI
-            if (PHP_SAPI === 'cli') {
-                $cliUserName = \BetaKiller\Task\AbstractTask::CLI_USER_NAME;
-
-                $user = $userRepository->searchBy($cliUserName);
-
-                if (!$user) {
-                    $host  = parse_url($appConfig->getBaseUrl(), PHP_URL_HOST);
-                    $email = $cliUserName.'@'.$host;
-
-                    $user = $userRepository->createNewUser($cliUserName, $email);
-
-                    // No notification for cron user
-                    $user->disableEmailNotification();
-
-                    // Allowing everything (admin may remove some roles later if needed)
-                    $roles = $roleRepository->getAll();
-
-                    foreach ($roles as $role) {
-                        $user->addRole($role);
-                    }
-
-                    $userRepository->save($user);
-                }
-
-                return $user;
-            }
-
-            $user = $auth->get_user();
-
-            if (!$user) {
-                $user = new GuestUser();
-            }
-
-            return $user;
+        'User'      => DI\factory(function (\BetaKiller\Helper\UserDetector $detector) {
+            return $detector->detect();
         }),
 
-        \BetaKiller\Config\ConfigProviderInterface::class => DI\object(\BetaKiller\Config\ConfigProvider::class),
-        AppConfigInterface::class      => DI\object(\BetaKiller\Config\AppConfig::class),
+        ConfigProviderInterface::class => DI\object(ConfigProvider::class),
+        AppConfigInterface::class      => DI\object(AppConfig::class),
 
         \BetaKiller\Model\UserInterface::class          => DI\get('User'),
         \BetaKiller\Model\RoleInterface::class          => DI\get(\BetaKiller\Model\Role::class),
