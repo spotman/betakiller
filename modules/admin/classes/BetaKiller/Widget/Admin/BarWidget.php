@@ -54,11 +54,14 @@ class BarWidget extends AbstractAdminWidget
      * Returns data for View rendering
      *
      * @return array
+     * @throws \BetaKiller\Exception
+     * @throws \Spotman\Acl\Exception
+     * @throws \BetaKiller\IFace\Exception\IFaceException
      */
     public function getData(): array
     {
         $currentIFace  = $this->ifaceHelper->getCurrentIFace();
-        $currentLayout = $currentIFace->getLayoutCodename();
+        $currentLayout = $currentIFace ? $currentIFace->getLayoutCodename() : null;
         $isAdminLayout = $currentLayout === Layout::LAYOUT_ADMIN;
 
         $entity = $this->detectPrimaryEntity();
@@ -84,6 +87,11 @@ class BarWidget extends AbstractAdminWidget
         return true;
     }
 
+    /**
+     * @return array
+     * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \Spotman\Acl\Exception
+     */
     private function getCreateButtonItems(): array
     {
         $items  = [];
@@ -104,6 +112,11 @@ class BarWidget extends AbstractAdminWidget
         return $items;
     }
 
+    /**
+     * @return array|null
+     * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \Spotman\Acl\Exception
+     */
     private function getCommentsData(): ?array
     {
         $pendingStatus = $this->contentHelper->getCommentStatusRepository()->getPendingStatus();
@@ -143,21 +156,47 @@ class BarWidget extends AbstractAdminWidget
         return $this->ifaceHelper->createIFaceFromCodename('Admin_Content_CommentIndex');
     }
 
+    /**
+     * @param \BetaKiller\Model\DispatchableEntityInterface|null $entity
+     *
+     * @return null|string
+     * @throws \BetaKiller\Exception
+     */
     private function getAdminEditButtonUrl(?DispatchableEntityInterface $entity): ?string
     {
         return $this->getPrimaryEntityActionUrl($entity, IFaceZone::ADMIN_ZONE, CrudlsActionsInterface::ACTION_READ);
     }
 
+    /**
+     * @param \BetaKiller\Model\DispatchableEntityInterface|null $entity
+     *
+     * @return null|string
+     * @throws \BetaKiller\Exception
+     */
     private function getPublicReadButtonUrl(?DispatchableEntityInterface $entity): ?string
     {
         return $this->getPrimaryEntityActionUrl($entity, IFaceZone::PUBLIC_ZONE, CrudlsActionsInterface::ACTION_READ);
     }
 
+    /**
+     * @param \BetaKiller\Model\DispatchableEntityInterface|null $entity
+     *
+     * @return null|string
+     * @throws \BetaKiller\Exception
+     */
     private function getPreviewButtonUrl(?DispatchableEntityInterface $entity): ?string
     {
         return $this->getPrimaryEntityActionUrl($entity, IFaceZone::PREVIEW_ZONE, CrudlsActionsInterface::ACTION_READ);
     }
 
+    /**
+     * @param \BetaKiller\Model\DispatchableEntityInterface|null $entity
+     * @param string                                             $targetZone
+     * @param string                                             $targetAction
+     *
+     * @return null|string
+     * @throws \BetaKiller\Exception
+     */
     private function getPrimaryEntityActionUrl(
         ?DispatchableEntityInterface $entity,
         string $targetZone,
@@ -169,7 +208,7 @@ class BarWidget extends AbstractAdminWidget
         }
 
         $currentIFace = $this->ifaceHelper->getCurrentIFace();
-        $currentZone  = $currentIFace->getZoneName();
+        $currentZone  = $currentIFace ? $currentIFace->getZoneName() : IFaceZone::PUBLIC_ZONE;
 
         if ($currentZone === $targetZone) {
             return null;
@@ -177,7 +216,9 @@ class BarWidget extends AbstractAdminWidget
 
         try {
             return $this->ifaceHelper->getEntityUrl($entity, $targetAction, $targetZone);
-        } catch (IFaceException $e) {
+        }
+        /** @noinspection BadExceptionsProcessingInspection */
+        catch (IFaceException $e) {
             // No IFace found for provided zone/action
             return null;
         }
