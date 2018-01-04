@@ -1,12 +1,18 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
 
-class StaticFile extends Kohana_StaticFile {
+class StaticFile extends Kohana_StaticFile
+{
+    private static $instance;
 
-    use \BetaKiller\Utils\Instance\SingletonTrait;
-
-    public function __construct()
+    /**
+     * @return static
+     */
+    public static function instance(): self
     {
-        parent::__construct();
+        if (!self::$instance) {
+            self::$instance = new self;
+        }
+        return self::$instance;
     }
 
     public function getLink($path)
