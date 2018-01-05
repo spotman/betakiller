@@ -149,6 +149,7 @@ abstract class NotificationMessageAbstract implements NotificationMessageInterfa
      * @param \BetaKiller\Notification\NotificationUserInterface $targetUser
      *
      * @return string
+     * @throws \BetaKiller\Notification\NotificationException
      */
     public function getSubj(NotificationUserInterface $targetUser): string
     {
@@ -159,27 +160,36 @@ abstract class NotificationMessageAbstract implements NotificationMessageInterfa
         return $this->subj;
     }
 
+    /**
+     * @param \BetaKiller\Notification\NotificationUserInterface $targetUser
+     *
+     * @return string
+     * @throws \BetaKiller\Notification\NotificationException
+     */
     protected function generateSubject(NotificationUserInterface $targetUser): string
     {
         $key = $this->getBaseI18nKey();
         $key .= '.subj';
 
-        if (!I18n::has($key)) {
+        // Getting template data
+        $data = $this->getFullData($targetUser);
+
+        $output = __($key, $data);
+
+        if ($output === $key) {
             throw new NotificationException('Missing translation for key [:value] in [:lang] language', [
                 ':value' => $key,
                 ':lang'  => I18n::lang(),
             ]);
         }
 
-        // Getting template data
-        $data = $this->getFullData($targetUser);
-
-//        // Prefixing data keys with semicolon
-//        $data = I18n::addPlaceholderPrefixToKeys($data);
-
-        return __($key, $data);
+        return $output;
     }
 
+    /**
+     * @return string
+     * @throws \BetaKiller\Notification\NotificationException
+     */
     protected function getBaseI18nKey(): string
     {
         $name = $this->getTemplateName();
@@ -227,6 +237,7 @@ abstract class NotificationMessageAbstract implements NotificationMessageInterfa
 
     /**
      * @return int
+     * @throws \BetaKiller\Notification\NotificationException
      */
     public function send(): int
     {
@@ -302,6 +313,8 @@ abstract class NotificationMessageAbstract implements NotificationMessageInterfa
      * @param \BetaKiller\Notification\NotificationUserInterface $target
      *
      * @return string
+     * @throws \View_Exception
+     * @throws \BetaKiller\Notification\NotificationException
      */
     public function render(TransportInterface $transport, NotificationUserInterface $target): string
     {

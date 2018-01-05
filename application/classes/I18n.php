@@ -18,28 +18,7 @@ class I18n extends Kohana_I18n
     /**
      * @var array Cache of missing strings
      */
-    protected static $_cache_missing = [];
-
-    /**
-     * @var array List of app languages
-     */
-    protected static $_lang_list = [];
-
-    /**
-     * Getter/setter for list of allowed languages
-     *
-     * @param array $list
-     *
-     * @return array
-     */
-    public static function lang_list(array $list = null): array
-    {
-        if ($list) {
-            static::$_lang_list = $list;
-        }
-
-        return static::$_lang_list;
-    }
+    private static $missingKeys = [];
 
     /**
      * @param string      $string
@@ -92,8 +71,9 @@ class I18n extends Kohana_I18n
         $key = $module ?: 'application';
 
         // Translated string does not exist
-        // Store the original string as missing - still makes sense to store the original string so that loading the untranslated file will work.
-        static::$_cache_missing[$key][$lang][$string] = $string;
+        // Store the original string as missing
+        // Still makes sense to store the original string so that loading the untranslated file will work.
+        static::$missingKeys[$key][$lang][$string] = $string;
 
         return $string;
     }
@@ -114,63 +94,73 @@ class I18n extends Kohana_I18n
         return $output;
     }
 
-    public static function write()
+    public static function saveMissingKeys(): void
+    {
+        register_shutdown_function([__CLASS__, 'writeMissingKeys']);
+    }
+
+    public static function writeMissingKeys()
     {
         // something new must be added for anything to happen
-        if (empty(static::$_cache_missing)) {
+        if (empty(static::$missingKeys)) {
             return;
         }
 
-        foreach (static::$_cache_missing as $module => $data) {
+        foreach (static::$missingKeys as $module => $data) {
             try {
-                self::put_data($module, $data[static::$lang]);
+                self::putData($module, $data[static::$lang]);
             } catch (Throwable $e) {
                 Kohana_Exception::log($e);
             }
         }
     }
 
-    protected static function put_data($module, $data)
+    /**
+     * @param string $module
+     * @param array  $data
+     *
+     * @throws \RuntimeException
+     */
+    protected static function putData(string $module, array $data)
     {
         // Skip empty records
         if (!$data) {
             return;
         }
 
-        // Если указан конкретный модуль
-        $base_path = ($module !== 'application')
-            // Пишем найденную строку в языковой файл соответствующего модуля
+        // Use module-related i18n file if module is defined or app-related instead
+        $basePath = ($module !== 'application')
             ? MODPATH.$module.'/'
-            // Иначе пишем в общий файл в /application (или в директорию текущего сайта)
             : Kohana::include_paths()[0];
 
-        $save_path = $base_path.'i18n/';
+        $savePath = $basePath.'i18n/';
 
-        // check that the path exists
-        if (!file_exists($save_path) && !mkdir($save_path) && !is_dir($save_path)) {
-            throw new \RuntimeException(sprintf('Directory "%s" was not created', $save_path));
+        // Check that the path exists
+        if (!file_exists($savePath) && !mkdir($savePath) && !is_dir($savePath)) {
+            throw new \RuntimeException(sprintf('Directory "%s" was not created', $savePath));
         }
 
-        // Формируем имя файла
-        $filename       = static::$lang.'.php';
-        $full_file_path = $save_path.$filename;
+        // Define filename
+        $filename     = static::$lang.'.php';
+        $fullFilePath = $savePath.$filename;
 
-        // Получаем текущее содержимое языкового файла, если он есть
-        $current_app_lang_data = file_exists($full_file_path) ? include $full_file_path : [];
+        // Get current file content if exists
+        /** @noinspection PhpIncludeInspection */
+        $currentAppLangData = file_exists($fullFilePath) ? include $fullFilePath : [];
 
-        // Если файл поломан, ничего не делаем
-        if (!is_array($current_app_lang_data)) {
+        // Do nothing if i18n file is broken
+        if (!is_array($currentAppLangData)) {
             return;
         }
 
-        $content = static::make_content(array_merge($data, $current_app_lang_data));
+        $content = static::makeFileContent(array_merge($data, $currentAppLangData));
 
-        // backup old file - if the file size is different.
-        if (file_exists($full_file_path) && (filesize($full_file_path) !== strlen($content))) {
+        // Backup old file - if the file size is different.
+        if (file_exists($fullFilePath) && (filesize($fullFilePath) !== strlen($content))) {
             // Backing up current config
-            $old_content = file_get_contents($full_file_path);
-            $backup_name = $save_path.static::$lang.'_'.date('Y_m_d__H_i_s').'.php';
-            $result      = file_put_contents($backup_name, $old_content);
+            $oldContent = file_get_contents($fullFilePath);
+            $backupName = $savePath.static::$lang.'_'.date('Y_m_d__H_i_s').'.php';
+            $result     = file_put_contents($backupName, $oldContent);
 
             // Backup failed! Don't write the file.
             if (!$result) {
@@ -179,10 +169,10 @@ class I18n extends Kohana_I18n
         }
 
         // Save the file
-        file_put_contents($full_file_path, $content, LOCK_EX);
+        file_put_contents($fullFilePath, $content, LOCK_EX);
     }
 
-    protected static function make_content(array $data)
+    protected static function makeFileContent(array $data)
     {
         return '<?php
 /**

@@ -4,12 +4,6 @@ namespace BetaKiller\Config;
 
 class AppConfig implements AppConfigInterface
 {
-    const APP_CONFIG_GROUP_NAME = 'app';
-    const CONFIG_PATH_IS_TRAILING_SLASH_ENABLED = ['url', 'is_trailing_slash_enabled'];
-    const CONFIG_PATH_CIRCULAR_LINK_HREF = ['url', 'circular_link_href'];
-    const CONFIG_PATH_PAGE_CACHE_ENABLED = ['cache', 'page', 'enabled'];
-    const CONFIG_PATH_PAGE_CACHE_PATH = ['cache', 'page', 'path'];
-
     /**
      * @var ConfigProviderInterface
      */
@@ -63,7 +57,7 @@ class AppConfig implements AppConfigInterface
      */
     public function isTrailingSlashEnabled(): bool
     {
-        return (bool) $this->get(self::CONFIG_PATH_IS_TRAILING_SLASH_ENABLED);
+        return (bool) $this->get(self::PATH_IS_TRAILING_SLASH_ENABLED);
     }
 
     /**
@@ -71,7 +65,7 @@ class AppConfig implements AppConfigInterface
      */
     public function getCircularLinkHref(): string
     {
-        return $this->get(self::CONFIG_PATH_CIRCULAR_LINK_HREF);
+        return $this->get(self::PATH_CIRCULAR_LINK_HREF);
     }
 
     /**
@@ -82,7 +76,7 @@ class AppConfig implements AppConfigInterface
      */
     protected function get(array $path, $default = null)
     {
-        return $this->_config->load(array_merge([self::APP_CONFIG_GROUP_NAME], $path)) ?: $default;
+        return $this->_config->load(array_merge([self::CONFIG_GROUP_NAME], $path)) ?: $default;
     }
 
     /**
@@ -90,7 +84,7 @@ class AppConfig implements AppConfigInterface
      */
     public function isPageCacheEnabled(): bool
     {
-        return $this->get(self::CONFIG_PATH_PAGE_CACHE_ENABLED, false);
+        return $this->get(self::PATH_PAGE_CACHE_ENABLED, false);
     }
 
     /**
@@ -98,6 +92,14 @@ class AppConfig implements AppConfigInterface
      */
     public function getPageCachePath(): string
     {
-        return rtrim($this->get(self::CONFIG_PATH_PAGE_CACHE_PATH), DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR;
+        return rtrim($this->get(self::PATH_PAGE_CACHE_PATH), DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getAllowedLanguages(): array
+    {
+        return $this->get(['languages'], ['en']);
     }
 }
