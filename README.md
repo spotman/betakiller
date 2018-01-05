@@ -17,7 +17,7 @@ Under the hood:
 - [Custom error management](modules/error) with logging to local SQLite3 DB
 - [Notifications subsystem](modules/notification) with multiple providers for simpler communication with users
 - Multiple sites on a single core via [MultiSite module](https://github.com/spotman/kohana-multi-site)
-- [Kohana ORM](modules/orm) as current DBAL (migration to [Propel3](https://github.com/propelorm/Propel3) planned)
+- [Kohana ORM](modules/orm) as current DBAL/ORM (migration to [Propel3](https://github.com/propelorm/Propel3) planned)
 - [Deployer](https://deployer.org/) as default deploying tool
 - [Monolog](https://github.com/Seldaek/monolog) as default logger (with ChromePHP for online debugging)
 - [Minion](modules/minion) as CLI task subsystem
