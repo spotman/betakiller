@@ -13,9 +13,9 @@ use BetaKiller\Model\ContentPostThumbnailInterface;
  * @method ContentPostThumbnailInterface[] getAll()
  */
 class ContentPostThumbnailRepository extends AbstractHashStrategyOrmBasedAssetsRepository implements
-    WordpressAttachmentRepositoryInterface, EntityModelRelatedRepositoryInterface
+    WordpressAttachmentRepositoryInterface, EntityItemRelatedRepositoryInterface
 {
     use OrmBasedRepositoryHasWordpressIdTrait;
     use OrmBasedRepositoryHasWordpressPathTrait;
-    use OrmBasedEntityRelatedRepositoryTrait;
+    use OrmBasedEntityItemRelatedRepositoryTrait;
 }

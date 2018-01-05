@@ -19,7 +19,7 @@ class UpdateApiMethod extends AbstractEntityUpdateApiApiMethod
     protected function update($model, $data)
     {
         if (isset($data->author_name)) {
-            $model->set_guest_author_name($this->sanitize_string($data->author_name));
+            $model->set_guest_author_name($this->sanitizeString($data->author_name));
         }
 
         if (isset($data->message)) {

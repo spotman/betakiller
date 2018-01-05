@@ -2,13 +2,11 @@
 namespace BetaKiller\Search\Provider;
 
 use BetaKiller\Filter\Model\ValuesGroup;
-use BetaKiller\Search;
-use BetaKiller\Search\Provider;
+use BetaKiller\Search\ApplicableSearchModelInterface;
 use BetaKiller\Search\Provider\Parameterized\Parameter\Registry;
+use BetaKiller\Search\SearchResultsInterface;
 
-//use \AFS\Filter\Registry;
-
-abstract class Parameterized extends Search\Provider
+abstract class Parameterized extends AbstractProvider
 {
     /**
      * @var Registry[]
@@ -21,18 +19,18 @@ abstract class Parameterized extends Search\Provider
     protected $currentParametersRegistry;
 
     /**
-     * @param $page
+     * @param int      $page
      * @param int|null $itemsPerPage
      *
-     * @return \BetaKiller\Search\SearchResultsInterface|\BetaKiller\Search\SearchResultsItemInterface[]
-     * @throws \BetaKiller\Search\Provider\Exception
+     * @return \BetaKiller\Search\SearchResultsInterface
+     * @throws \BetaKiller\Search\Provider\SearchProviderException
      */
-    public function getResults($page, $itemsPerPage = null)
+    public function getResults(int $page, int $itemsPerPage): SearchResultsInterface
     {
-        if (!$this->getCurrentParametersRegistry()->hasSelectedParameters())
+        if (!$this->getCurrentParametersRegistry()->hasSelectedParameters()) {
             return $this->getEmptyResults();
+        }
 
-        /** @var \ORM $model */
         $model = $this->searchModelFactory();
 
         $this->apply($model);
@@ -42,29 +40,28 @@ abstract class Parameterized extends Search\Provider
         $url = $this->makeResultsUrl();
         $result->setURL($url);
 
-//        die($model->last_query());
-
         return $result;
     }
 
     /**
      * @return string
-     * @throws \BetaKiller\Search\Provider\Exception
+     * @throws \BetaKiller\Search\Provider\SearchProviderException
      */
-    protected function makeResultsUrl()
+    protected function makeResultsUrl(): string
     {
-        $url = $this->getBaseResultsUrl();
+        $url         = $this->getBaseResultsUrl();
         $queryString = $this->getCurrentParametersRegistry()->toUrlQueryString();
 
         $result = $queryString
             ? http_build_url($url, '?'.$queryString, HTTP_URL_JOIN_QUERY)
             : $url;
 
-        if (!$result)
-            throw new Exception('Url creating failed with [:url] and [:query]', [
-                ':url'      =>  $url,
-                ':query'    =>  $queryString,
+        if (!$result) {
+            throw new SearchProviderException('Url creating failed with [:url] and [:query]', [
+                ':url'   => $url,
+                ':query' => $queryString,
             ]);
+        }
 
         return $result;
     }
@@ -72,24 +69,31 @@ abstract class Parameterized extends Search\Provider
     /**
      * @return string
      */
-    abstract protected function getBaseResultsUrl();
+    abstract protected function getBaseResultsUrl(): string;
 
     /**
      * @return \BetaKiller\Search\Provider\Parameterized\Parameter\Registry
-     * @throws \BetaKiller\Search\Provider\Exception
+     * @throws \BetaKiller\Search\Provider\SearchProviderException
      */
-    protected function getCurrentParametersRegistry()
+    protected function getCurrentParametersRegistry(): Registry
     {
-        if (!$this->currentParametersRegistry)
-            throw new Search\Provider\Exception('Select parameters registry before applying parameters');
+        if (!$this->currentParametersRegistry) {
+            throw new SearchProviderException('Select parameters registry before applying parameters');
+        }
 
         return $this->currentParametersRegistry;
     }
 
-    public function setCurrentParametersRegistry($codename)
+    /**
+     * @param string $codename
+     *
+     * @throws \BetaKiller\Search\Provider\SearchProviderException
+     */
+    public function setCurrentParametersRegistry(string $codename)
     {
-        if (!isset($this->parametersRegistries[$codename]))
-            throw new Exception('No registry found by codename :codename', [':codename' => $codename]);
+        if (!isset($this->parametersRegistries[$codename])) {
+            throw new SearchProviderException('No registry found by codename :codename', [':codename' => $codename]);
+        }
 
         $this->currentParametersRegistry = $this->parametersRegistries[$codename];
     }
@@ -98,11 +102,14 @@ abstract class Parameterized extends Search\Provider
      * @param string                                                       $codename
      * @param \BetaKiller\Search\Provider\Parameterized\Parameter\Registry $parametersRegistry
      */
-    public function addParametersRegistry($codename, Provider\Parameterized\Parameter\Registry $parametersRegistry)
+    public function addParametersRegistry(string $codename, Registry $parametersRegistry)
     {
         $this->parametersRegistries[$codename] = $parametersRegistry;
     }
 
+    /**
+     * @param array $query
+     */
     public function fromUrlQueryArray(array $query)
     {
         foreach ($this->parametersRegistries as $registry) {
@@ -110,68 +117,73 @@ abstract class Parameterized extends Search\Provider
         }
     }
 
-    public function toUrlQueryArray()
+    /**
+     * @return array
+     * @throws \BetaKiller\Search\Provider\SearchProviderException
+     */
+    public function toUrlQueryArray(): array
     {
         return $this->getCurrentParametersRegistry()->toUrlQueryArray();
     }
 
-    public function toUrlQueryString()
+    /**
+     * @return string
+     * @throws \BetaKiller\Search\Provider\SearchProviderException
+     */
+    public function toUrlQueryString(): string
     {
         return $this->getCurrentParametersRegistry()->toUrlQueryString();
     }
 
     /**
      * @param string|null $filterHaving
+     *
      * @return ValuesGroup[]
-     * @throws \BetaKiller\Search\Provider\Exception
+     * @throws \BetaKiller\Search\Provider\SearchProviderException
      */
-    public function getAvailableValues($filterHaving = null)
+    public function getAvailableValues($filterHaving = null): array
     {
         $values = [];
 
         foreach ($this->parametersRegistries as $registry) {
-            $values = array_merge(
-                $values,
-                $this->makeRegistryValues($registry->getAvailableValues($filterHaving))
-            );
+            $values[] = $this->makeRegistryValues($registry->getAvailableValues($filterHaving));
         }
 
-        return $values;
+        return array_merge(...$values);
     }
 
     /**
      * @return ValuesGroup[]
-     * @throws \BetaKiller\Search\Provider\Exception
+     * @throws \BetaKiller\Search\Provider\SearchProviderException
      */
-    public function getSelectedValues()
+    public function getSelectedValues(): array
     {
         $values = [];
 
         foreach ($this->parametersRegistries as $registry) {
-            $values = array_merge(
-                $values,
-                $this->makeRegistryValues($registry->getSelectedValues())
-            );
+            $values[] = $this->makeRegistryValues($registry->getSelectedValues());
         }
 
-        return $values;
+        return array_merge(...$values);
     }
 
     /**
      * @param ValuesGroup[] $valuesGroups
+     *
      * @return ValuesGroup[]
-     * @throws \BetaKiller\Search\Provider\Exception
+     * @throws \BetaKiller\Search\Provider\SearchProviderException
      */
-    protected function makeRegistryValues(array $valuesGroups)
+    protected function makeRegistryValues(array $valuesGroups): array
     {
         $values = [];
 
         foreach ($valuesGroups as $group) {
             $codename = $group->getCodename();
-            $label = $group->getLabel();
+            $label    = $group->getLabel();
 
-            if (!$codename)
-                throw new Exception('ValuesGroup [:label] codename is empty', [':label' => $label]);
+            if (!$codename) {
+                throw new SearchProviderException('ValuesGroup [:label] codename is empty', [':label' => $label]);
+            }
 
             // Make compound key for preventing duplicates
             $key = $codename.'-'.$label;
@@ -182,14 +194,18 @@ abstract class Parameterized extends Search\Provider
         return $values;
     }
 
-    protected function apply(Search\ApplicableModelInterface $model)
+    /**
+     * @param \BetaKiller\Search\ApplicableSearchModelInterface $model
+     *
+     * @throws \BetaKiller\Search\Provider\SearchProviderException
+     */
+    protected function apply(ApplicableSearchModelInterface $model)
     {
         $this->getCurrentParametersRegistry()->apply($model);
     }
 
     /**
-     * @return \BetaKiller\Search\ApplicableModelInterface
+     * @return \BetaKiller\Search\ApplicableSearchModelInterface|mixed
      */
     abstract protected function searchModelFactory();
-
-};
+}

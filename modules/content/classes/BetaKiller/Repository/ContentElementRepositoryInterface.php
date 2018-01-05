@@ -1,4 +1,4 @@
 <?php
 namespace BetaKiller\Repository;
 
-interface ContentElementRepositoryInterface extends EntityModelRelatedRepositoryInterface {}
+interface ContentElementRepositoryInterface extends EntityItemRelatedRepositoryInterface {}

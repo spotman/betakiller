@@ -3,7 +3,7 @@ namespace BetaKiller\Api\Method\ContentComment;
 
 trait ContentCommentMethodTrait
 {
-    protected function sanitize_string($value): string
+    protected function sanitizeString($value): string
     {
         return \HTML::chars(trim(strip_tags($value)));
     }

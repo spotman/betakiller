@@ -3,12 +3,33 @@
 /**
  * Class Assets
  */
-
-class Assets {
-
+class Assets
+{
     use \BetaKiller\Utils\Instance\SingletonTrait;
 
+    /**
+     * @var \JS
+     */
+    protected $js;
+
+    /**
+     * @var \CSS
+     */
+    protected $css;
+
     protected $_config;
+
+    /**
+     * Assets constructor.
+     *
+     * @param \JS  $js
+     * @param \CSS $css
+     */
+    public function __construct(\JS $js, \CSS $css)
+    {
+        $this->js  = $js;
+        $this->css = $css;
+    }
 
     /**
      * @param string $name
@@ -16,32 +37,28 @@ class Assets {
      * @return $this
      * @throws \HTTP_Exception_500
      */
-    public function add($name)
+    public function add(string $name): Assets
     {
-        $method_name = $this->make_method_name($name);
+        $methodName = $this->makeMethodName($name);
 
         // Search for specific method in current class
-        if ( method_exists($this, $method_name) )
-        {
-            $this->$method_name();
-        }
-        else
-        {
+        if (method_exists($this, $methodName)) {
+            $this->$methodName();
+        } else {
             $config = $this->config()->get($name);
 
-            if ( ! $config )
-                throw new HTTP_Exception_500('Unknown asset :name', array(':name' => $name));
+            if (!$config) {
+                throw new HTTP_Exception_500('Unknown asset :name', [':name' => $name]);
+            }
 
             // TODO process dependencies
 
-            if ( isset($config['js']) )
-            {
-                $this->process_static($this->js(), $method_name, $config['js']);
+            if (isset($config['js'])) {
+                $this->processStatic($this->js, $methodName, $config['js']);
             }
 
-            if ( isset($config['css']) )
-            {
-                $this->process_static($this->css(), $method_name, $config['css']);
+            if (isset($config['css'])) {
+                $this->processStatic($this->css, $methodName, $config['css']);
             }
         }
 
@@ -50,54 +67,41 @@ class Assets {
 
     protected function config()
     {
-        if ( ! $this->_config )
-        {
+        if (!$this->_config) {
             $this->_config = Kohana::config('assets');
         }
 
         return $this->_config;
     }
 
-    protected function css()
-    {
-        return CSS::instance();
-    }
-
-    protected function js()
-    {
-        return JS::instance();
-    }
-
     /**
      * @param JS|CSS $object
-     * @param string $method_name
-     * @param mixed $files
+     * @param string $methodName
+     * @param mixed  $files
+     *
      * @throws HTTP_Exception_500
      */
-    protected function process_static($object, $method_name, $files)
+    protected function processStatic($object, $methodName, $files): void
     {
         // Search for specific method in object
-        if ( $files === TRUE && method_exists($object, $method_name) )
-        {
-            $object->$method_name();
-        }
-        else if ( $files !== TRUE )
-        {
-            if ( ! is_array($files) )
-            {
-                $files = array($files);
-            }
+        if ($files === true && method_exists($object, $methodName)) {
+            $object->$methodName();
+        } else {
+            if ($files !== true) {
+                if (!is_array($files)) {
+                    $files = (array)$files;
+                }
 
-            foreach ( $files as $file )
-            {
-                $object->add($file);
+                foreach ($files as $file) {
+                    $object->addStatic($file);
+                }
+            } else {
+                throw new HTTP_Exception_500('Can not process asset static :method', [':method' => $methodName]);
             }
         }
-        else
-            throw new HTTP_Exception_500('Can not process asset static :method', array(':method' => $method_name));
     }
 
-    protected function make_method_name($name)
+    protected function makeMethodName($name)
     {
         return str_replace('.', '_', $name);
     }

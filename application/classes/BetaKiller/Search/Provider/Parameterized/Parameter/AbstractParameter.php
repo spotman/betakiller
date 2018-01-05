@@ -5,7 +5,7 @@ use BetaKiller\Filter\FilterFactory;
 use BetaKiller\Filter\FilterInterface;
 use BetaKiller\Filter\Model\Value;
 use BetaKiller\Model\UserInterface;
-use BetaKiller\Search\ApplicableModelInterface;
+use BetaKiller\Search\ApplicableSearchModelInterface;
 use BetaKiller\Search\Provider\Parameterized\ParameterInterface;
 
 abstract class AbstractParameter implements ParameterInterface
@@ -86,9 +86,9 @@ abstract class AbstractParameter implements ParameterInterface
     /**
      * Applies current filters to model
      *
-     * @param \BetaKiller\Search\ApplicableModelInterface $model
+     * @param \BetaKiller\Search\ApplicableSearchModelInterface $model
      */
-    public function apply(ApplicableModelInterface $model): void
+    public function apply(ApplicableSearchModelInterface $model): void
     {
         $this->getFilter()->apply($model);
     }

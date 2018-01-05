@@ -1,9 +1,9 @@
 <?php
 namespace BetaKiller\Search;
 
-use BetaKiller\Filter;
+use BetaKiller\Filter\Model\ApplicableFilterModelInterface;
 
-interface ApplicableModelInterface extends Filter\Model\ApplicableInterface
+interface ApplicableSearchModelInterface extends ApplicableFilterModelInterface
 {
     /**
      * @param $page int

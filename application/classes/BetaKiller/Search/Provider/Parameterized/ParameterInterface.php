@@ -2,7 +2,7 @@
 namespace BetaKiller\Search\Provider\Parameterized;
 
 use BetaKiller\Filter\Model\Value;
-use BetaKiller\Search\ApplicableModelInterface;
+use BetaKiller\Search\ApplicableSearchModelInterface;
 use BetaKiller\URL\QueryConverter\ConvertibleItemInterface;
 
 interface ParameterInterface extends ConvertibleItemInterface
@@ -31,9 +31,9 @@ interface ParameterInterface extends ConvertibleItemInterface
     /**
      * Applies current filters to model
      *
-     * @param \BetaKiller\Search\ApplicableModelInterface $model
+     * @param \BetaKiller\Search\ApplicableSearchModelInterface $model
      */
-    public function apply(ApplicableModelInterface $model): void;
+    public function apply(ApplicableSearchModelInterface $model): void;
 
     /**
      * Returns array of values groups (optional filtering by value for autocomplete)

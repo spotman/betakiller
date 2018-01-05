@@ -40,10 +40,6 @@ class CfsAssetsStorage extends LocalAssetsStorage
      */
     protected function doGet(string $path): string
     {
-//        $path_info = pathinfo($path);
-
         throw new AssetsStorageException('Implement me!');
-
-//        $found = Kohana::find_file($path)
     }
 }

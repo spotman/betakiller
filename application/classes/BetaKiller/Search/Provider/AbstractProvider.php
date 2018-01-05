@@ -1,9 +1,11 @@
 <?php
-namespace BetaKiller\Search;
+namespace BetaKiller\Search\Provider;
 
 use BetaKiller\Model\User;
+use BetaKiller\Search\SearchResults;
+use BetaKiller\Search\SearchResultsInterface;
 
-abstract class Provider
+abstract class AbstractProvider
 {
     /**
      * @var \BetaKiller\Model\User
@@ -21,19 +23,18 @@ abstract class Provider
      * @param \BetaKiller\Model\User|NULL $user
      *
      * @return $this
-     * @todo DI
-     * @deprecated
+     * @deprecated Use DI instead
      */
-    public function setUser(User $user = NULL)
+    public function setUser(User $user = null)
     {
         $this->_user = $user;
+
         return $this;
     }
 
     /**
      * @return User
-     * @todo DI
-     * @deprecated
+     * @deprecated Use DI instead
      */
     public function getUser()
     {
@@ -41,19 +42,19 @@ abstract class Provider
     }
 
     /**
-     * @param $page
-     * @param $itemsPerPage
+     * @param int $page
+     * @param int $itemsPerPage
      *
      * @return \BetaKiller\Search\SearchResultsInterface
      */
-    abstract public function getResults($page, $itemsPerPage);
+    abstract public function getResults(int $page, int $itemsPerPage): SearchResultsInterface;
 
     /**
      * Helper for getting empty result
      *
-     * @return \BetaKiller\Search\SearchResults
+     * @return \BetaKiller\Search\SearchResultsInterface
      */
-    protected function getEmptyResults()
+    protected function getEmptyResults(): SearchResultsInterface
     {
         return SearchResults::factory(0, 0, false);
     }

@@ -35,8 +35,8 @@ class WrapperViewTwig extends WrapperView
     {
         return [
             'meta_tags' => Meta::instance()->render(),
-            'js_all'    => JS::instance()->get_all(),
-            'css_all'   => CSS::instance()->get_all(),
+            'js_all'    => JS::instance()->getAll(),
+            'css_all'   => CSS::instance()->getAll(),
             'links_all' => Link::instance()->render(),
         ];
     }

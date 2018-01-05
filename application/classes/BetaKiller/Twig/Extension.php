@@ -1,10 +1,49 @@
 <?php
 
-use BetaKiller\IFace\Widget\AbstractBaseWidget;
-
 class BetaKiller_Twig_Extension extends Twig_Extension
 {
-    public function getFunctions()
+    /**
+     * @Inject
+     * @var \JS
+     */
+    private $js;
+
+    /**
+     * @Inject
+     * @var \CSS
+     */
+    private $css;
+
+    /**
+     * @Inject
+     * @var \Assets
+     */
+    private $assets;
+
+    /**
+     * @Inject
+     * @var \BetaKiller\Helper\AppEnv
+     */
+    private $appEnv;
+
+    /**
+     * @Inject
+     * @var \BetaKiller\IFace\WidgetFactory
+     */
+    private $widgetFactory;
+
+    /**
+     * BetaKiller_Twig_Extension constructor.
+     *
+     * @throws \InvalidArgumentException
+     * @throws \DI\DependencyException
+     */
+    public function __construct()
+    {
+        \BetaKiller\DI\Container::getInstance()->injectOn($this);
+    }
+
+    public function getFunctions(): array
     {
         return [
 
@@ -73,11 +112,6 @@ class BetaKiller_Twig_Extension extends Twig_Extension
             ),
 
             new Twig_Function(
-                'user_is_moderator',
-                [$this, 'userIsModerator']
-            ),
-
-            new Twig_Function(
                 'json_encode',
                 'json_encode',
                 ['is_safe' => ['html']]
@@ -96,7 +130,7 @@ class BetaKiller_Twig_Extension extends Twig_Extension
         ];
     }
 
-    public function getFilters()
+    public function getFilters(): array
     {
         return [
 
@@ -138,21 +172,20 @@ class BetaKiller_Twig_Extension extends Twig_Extension
         ];
     }
 
-    public function inProduction()
+    /**
+     * @return bool
+     */
+    public function inProduction(): bool
     {
-        return Kohana::in_production();
+        return $this->appEnv->inProduction();
     }
 
-    public function inStaging()
+    /**
+     * @return bool
+     */
+    public function inStaging(): bool
     {
-        return Kohana::in_staging();
-    }
-
-    public function userIsModerator()
-    {
-        $user = \BetaKiller\DI\Container::getInstance()->get(\BetaKiller\Model\UserInterface::class);
-
-        return $user->isModerator();
+        return $this->appEnv->inStagingMode();
     }
 
     /**
@@ -160,13 +193,11 @@ class BetaKiller_Twig_Extension extends Twig_Extension
      */
     public function js()
     {
-        $instance = JS::instance();
-
         foreach (func_get_args() as $js) {
             if (mb_strpos($js, 'http') === 0 || mb_strpos($js, '//') === 0) {
-                $instance->add_public($js);
+                $this->js->addPublic($js);
             } else {
-                $instance->add_static($js);
+                $this->js->addStatic($js);
             }
         }
     }
@@ -176,16 +207,13 @@ class BetaKiller_Twig_Extension extends Twig_Extension
      */
     public function jsBuild()
     {
-//         Disabled coz build subsystem is not finished
-//
-//        if (!Kohana::in_production())
-//            return;
-//
-//        $instance = JS::instance();
-//
-//        foreach (func_get_args() as $js) {
-//            $instance->add($js);
-//        }
+        if (!$this->inProduction()) {
+            return;
+        }
+
+        foreach (func_get_args() as $js) {
+            $this->js->addStatic($js);
+        }
     }
 
     /**
@@ -193,13 +221,11 @@ class BetaKiller_Twig_Extension extends Twig_Extension
      */
     public function css()
     {
-        $instance = CSS::instance();
-
         foreach (func_get_args() as $css) {
             if (mb_strpos($css, 'http') === 0 || mb_strpos($css, '//') === 0) {
-                $instance->add_public($css);
+                $this->css->addPublic($css);
             } else {
-                $instance->add_static($css);
+                $this->css->addStatic($css);
             }
         }
     }
@@ -213,7 +239,7 @@ class BetaKiller_Twig_Extension extends Twig_Extension
      *
      * @return string
      */
-    public function image(array $attributes, array $data = null, $forceSize = null): string
+    public function image(array $attributes, ?array $data = null, ?bool $forceSize = null): string
     {
         if ($data) {
             $attributes = array_merge($attributes, $data);
@@ -247,13 +273,13 @@ class BetaKiller_Twig_Extension extends Twig_Extension
 
     /**
      * Helper for adding assets
+     *
+     * @throws \HTTP_Exception_500
      */
-    public function assets()
+    public function assets(): void
     {
-        $instance = Assets::instance();
-
         foreach (func_get_args() as $asset) {
-            $instance->add($asset);
+            $this->assets->add($asset);
         }
     }
 
@@ -278,25 +304,38 @@ class BetaKiller_Twig_Extension extends Twig_Extension
         return null;
     }
 
-    public function showProfiler()
+    /**
+     * @return string
+     */
+    public function showProfiler(): string
     {
         return Profiler::render();
     }
 
-    public function isDevice()
+    /**
+     * @return bool
+     */
+    public function isDevice(): bool
     {
         $device = new Device;
 
         return $device->is_mobile() || $device->is_tablet();
     }
 
-    public function widget(array $context, $name, array $data = null)
+    /**
+     * @param array      $context
+     * @param string     $name
+     * @param array|null $data
+     *
+     * @return string
+     */
+    public function widget(array $context, string $name, array $data = null): string
     {
         if ($data) {
             $context = array_merge($context, $data);
         }
 
-        $widget = AbstractBaseWidget::factory($name);
+        $widget = $this->widgetFactory->create($name);
         $widget->setContext($context);
 
         return $widget->render();

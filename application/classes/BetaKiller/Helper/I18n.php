@@ -52,7 +52,7 @@ class I18n
         }
 
         // Detect the browser` preferred lang if current lang is not set
-        if (!$userLang) {
+        if (!$userLang && !$this->appEnv->isCLI()) {
             /** @var \HTTP_Header $headers */
             $headers  = $request->headers();
 

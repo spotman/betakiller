@@ -35,6 +35,11 @@ class AppEnv
         return Kohana::$environment === Kohana::TESTING;
     }
 
+    public function inStagingMode(): bool
+    {
+        return Kohana::$environment === Kohana::STAGING;
+    }
+
     public function isDebugEnabled(): bool
     {
         return $this->debugEnabled || $this->inDevelopmentMode() || $this->inTestingMode();

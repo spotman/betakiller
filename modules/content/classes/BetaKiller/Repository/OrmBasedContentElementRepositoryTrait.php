@@ -3,5 +3,5 @@ namespace BetaKiller\Repository;
 
 trait OrmBasedContentElementRepositoryTrait
 {
-    use OrmBasedEntityRelatedRepositoryTrait;
+    use OrmBasedEntityItemRelatedRepositoryTrait;
 }

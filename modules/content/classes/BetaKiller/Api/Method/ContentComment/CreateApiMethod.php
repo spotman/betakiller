@@ -17,7 +17,7 @@ class CreateApiMethod extends AbstractEntityCreateApiMethod
      */
     protected function create($model, $data)
     {
-        $model->set_guest_author_name($this->sanitize_string($data->author_name));
+        $model->set_guest_author_name($this->sanitizeString($data->author_name));
         $model->set_message($data->message);
 
         $model->create();

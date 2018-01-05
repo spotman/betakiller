@@ -36,14 +36,6 @@ class Model_AclRule extends \ORM
     }
 
     /**
-     * Place here additional query params
-     */
-    protected function additional_tree_model_filtering()
-    {
-        // Nothing to do
-    }
-
-    /**
      * @return string
      */
     public function getAclActionIdentity()
@@ -63,10 +55,10 @@ class Model_AclRule extends \ORM
      * Null means "inherit", true - enabled, false - disabled
      * @return bool|null
      */
-    public function is_allowed()
+    public function isAllowed()
     {
         $value = $this->get('is_allowed');
-        return ($value === null) ? $value : (bool) $value;
+        return ($value === null) ? null : (bool) $value;
     }
 
     /**

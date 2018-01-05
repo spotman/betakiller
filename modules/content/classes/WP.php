@@ -2,10 +2,10 @@
 
 class WP
 {
-    const POST_TYPE_PAGE = 'page';
-    const POST_TYPE_POST = 'post';
-    const POST_TYPE_REVISION = 'revision';
-    const POST_TYPE_ATTACHMENT = 'attachment';
+    public const POST_TYPE_PAGE = 'page';
+    public const POST_TYPE_POST = 'post';
+    public const POST_TYPE_REVISION = 'revision';
+    public const POST_TYPE_ATTACHMENT = 'attachment';
 
     /**
      * @param string|array   $post_types
@@ -41,7 +41,6 @@ class WP
     {
         $query = DB::select()
             ->from('posts')
-//            ->and_where('post_status', '=', 'inherit')
             ->and_where('post_type', '=', self::POST_TYPE_ATTACHMENT);
 
         if ($mime_types)
@@ -115,8 +114,6 @@ class WP
         {
             $query->and_where('term_taxonomy.taxonomy', '=', $taxonomy);
         }
-
-//        die($query->compile('wp'));
 
         /** @var Database_Result $result */
         $result = $query->execute('wp');
@@ -214,6 +211,7 @@ class WP
                 ])
                 ->execute('wp');
         }
+        /** @noinspection BadExceptionsProcessingInspection */
         catch (Database_Exception $e)
         {
             DB::update('options')

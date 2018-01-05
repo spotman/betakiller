@@ -2,7 +2,6 @@
 namespace BetaKiller\Search\Provider;
 
 use BetaKiller\Utils;
-use BetaKiller\Search\Provider;
 
 abstract class Factory {
 
@@ -11,7 +10,8 @@ abstract class Factory {
 
     /**
      * @param $name
-     * @return \BetaKiller\Search\Provider
+     *
+     * @return \BetaKiller\Search\Provider\AbstractProvider
      */
     public function create($name)
     {

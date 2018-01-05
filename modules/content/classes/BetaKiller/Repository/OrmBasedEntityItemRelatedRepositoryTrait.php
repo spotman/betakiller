@@ -4,7 +4,7 @@ namespace BetaKiller\Repository;
 use BetaKiller\Model\Entity;
 use BetaKiller\Utils\Kohana\ORM\OrmInterface;
 
-trait OrmBasedEntityRelatedRepositoryTrait
+trait OrmBasedEntityItemRelatedRepositoryTrait
 {
 //    public function get_entity_items_ids(Entity $entity)
 //    {

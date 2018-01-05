@@ -36,7 +36,7 @@ class AclRulesCollector implements AclRulesCollectorInterface
             $resourceIdentity         = $permission->getAclResourceIdentity();
             $actionPermissionIdentity = $permission->getAclActionIdentity();
 
-            $value = $permission->is_allowed();
+            $value = $permission->isAllowed();
 
             if ($value === true) {
                 $acl->addAllowRule($role, $resourceIdentity, $actionPermissionIdentity);

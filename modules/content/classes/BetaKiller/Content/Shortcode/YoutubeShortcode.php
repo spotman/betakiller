@@ -4,7 +4,7 @@ namespace BetaKiller\Content\Shortcode;
 use BetaKiller\Model\ContentYoutubeRecord;
 use BetaKiller\Repository\ContentYoutubeRecordRepository;
 
-class YoutubeShortcode extends AbstractEditableShortcode
+class YoutubeShortcode extends AbstractContentElementShortcode
 {
     /**
      * @var \BetaKiller\Repository\ContentYoutubeRecordRepository
@@ -34,9 +34,13 @@ class YoutubeShortcode extends AbstractEditableShortcode
         return false;
     }
 
+    /**
+     * @return array
+     * @throws \BetaKiller\Content\Shortcode\ShortcodeException
+     */
     public function getWidgetData(): array
     {
-        $videoID = (int)$this->getAttribute('id');
+        $videoID = (int)$this->getID();
 
         if (!$videoID) {
             throw new ShortcodeException('No YouTube ID provided');
@@ -44,30 +48,11 @@ class YoutubeShortcode extends AbstractEditableShortcode
 
         $model = $this->repository->findById($videoID);
 
-//        $title  = Arr::get($context, 'title');
-//        $align  = Arr::get($context, 'align', 'alignnone');
-//        $alt    = Arr::get($context, 'alt');
-//        $class  = Arr::get($context, 'class');
         $width  = (int)$this->getAttribute('width');
         $height = (int)$this->getAttribute('height');
 
-//        $classes = array_filter(explode(' ', $class));
-//        $classes['align'] = $align;
-//
-//        $attributes = [
-//            'id'        =>  'admin-image-'.$model->getID(),
-//            'title' =>  $title ?: $model->get_title(),
-//            'alt'   =>  $alt ?: $model->getAlt(),
-//            'class' =>  implode(' ', array_unique($classes)),
-//        ];
-//
-//        if ($width) {
-//            $attributes['style'] = 'width: '.$width.'px';
-//        }
-
         return [
             'video' => [
-                // TODO
                 'src'    => $model->getYoutubeEmbedUrl(),
                 'width'  => $width,
                 'height' => $height,
@@ -75,9 +60,13 @@ class YoutubeShortcode extends AbstractEditableShortcode
         ];
     }
 
+    /**
+     * @return string
+     * @throws \BetaKiller\Content\Shortcode\ShortcodeException
+     */
     public function getWysiwygPluginPreviewSrc(): string
     {
-        $id = (int)$this->getAttribute('id');
+        $id = (int)$this->getID();
         $model = $this->getRecordById($id);
 
         return $model->getPreviewUrl();

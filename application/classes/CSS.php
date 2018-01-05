@@ -1,119 +1,86 @@
 <?php
 
-class CSS {
-
+class CSS
+{
     use \BetaKiller\Utils\Instance\SingletonTrait;
 
     /**
-     * Хелпер к добавлению локально размещённого стиля
-     * @param $filename
-     * @return string Код для вставки стиля на страницу
+     * @var \StaticCss
      */
-    public function add($filename)
+    private $staticCss;
+
+    /**
+     * CSS constructor.
+     *
+     * @param \StaticCss $css
+     */
+    public function __construct(\StaticCss $css)
     {
-        return $this->add_static($filename);
+        $this->staticCss = $css;
     }
 
     /**
-     * Добавляет файл стиля по http пути
-     * @param $url
-     * @return string Код для вставки стиля на страницу
+     * Add public stylesheet via HTTP path
+     *
+     * @param string $url
+     *
+     * @return string HTML code
      */
-    public function add_public($url)
+    public function addPublic(string $url): string
     {
-        // Добавляем слеш в начале, если его нет
-        if ( mb_substr($url, 0, 4) !== 'http' && mb_substr($url, 0, 1) !== '/' )
-        {
-            $url = '/'. $url;
+        // Add slash if not exists
+        if (mb_strpos($url, 'http') !== 0 && mb_strpos($url, '/') !== 0) {
+            $url = '/'.$url;
         }
 
-        return StaticCss::instance()->addCss($url);
+        return $this->staticCss->addCss($url);
     }
 
     /**
-     * Добавляет файл стиля, размещённый в одной из директорий static-files
-     * @param $filename
-     * @return string Код для вставки стиля на страницу
+     * Add local stylesheet from static-files directory
+     *
+     * @param string $filename
+     *
+     * @return string HTML code
      */
-    public function add_static($filename)
+    public function addStatic(string $filename): string
     {
-        return StaticCss::instance()->addCssStatic($filename);
+        return $this->staticCss->addCssStatic($filename);
     }
 
     /**
-     * Добавляет инлайн стиль в документ
-     * @param $string
+     * Add inline CSS
+     *
+     * @param string $string
+     *
+     * @deprecated
      */
-    public function add_inline($string)
+    public function addInline(string $string): void
     {
-        StaticCss::instance()->addCssInline($string);
+        $this->staticCss->addCssInline($string);
     }
 
-    public function get_files()
+    /**
+     * @return null|string
+     */
+    public function getFiles(): ?string
     {
-        return StaticCss::instance()->getCss();
+        return $this->staticCss->getCss();
     }
 
-    public function get_inline()
+    /**
+     * @return null|string
+     */
+    public function getInline(): ?string
     {
-        return StaticCss::instance()->getCssInline();
+        return $this->staticCss->getCssInline();
     }
 
-    public function get_all()
+    /**
+     * @return string
+     */
+    public function getAll(): string
     {
-        return $this->get_files() . $this->get_inline();
-    }
-
-
-//    public function jquery_ui()
-//    {
-//        return $this->add_static('jquery/ui/css/smoothness/jquery-ui-1.9.2.custom.css');
-//    }
-
-//    public function jquery_validation() {}
-
-//    public function jquery_fileupload()
-//    {
-//        return $this->add_static('jquery/fileupload/jquery.fileupload-ui.css');
-//    }
-
-//    public function jquery_chosen()
-//    {
-//        return $this->add_static('jquery/chosen/chosen.css');
-//    }
-//
-//    public function jquery_qtip()
-//    {
-//        return $this->add_static('jquery/qtip/jquery.qtip.css');
-//    }
-//
-//    public function jquery_pnotify()
-//    {
-//        return $this->add_static('jquery/pnotify/jquery.pnotify.default.css');
-//    }
-
-//    /**
-//     * Хелпер для добавления плагина выбора времени
-//     * @link http://jonthornton.github.io/jquery-timepicker/
-//     */
-//    public function jquery_timepicker()
-//    {
-//        return $this->add_static('jquery/timepicker/jquery.timepicker.css');
-//    }
-//
-//    /**
-//     * Helper for JQuery mobile menu plugin
-//     *
-//     * @link http://mmenu.frebsite.nl/
-//     */
-//    public function jquery_mmenu()
-//    {
-//        $this->add_static('jquery/mmenu/jquery.mmenu.all.css');
-//    }
-
-
-    public function bootstrap()
-    {
-        return $this->add_static('bootstrap/v3/css/bootstrap.css');
+        return $this->getFiles().$this->getInline();
     }
 }

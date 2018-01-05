@@ -7,6 +7,7 @@ global_exclude_dirs:
     - modules/static-files
     - modules/image
     - modules/orm
+    - modules/admin/static-files/admin/components
 
 rules:
     php.use_global_variable_or_function:

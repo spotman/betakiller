@@ -49,16 +49,14 @@ class ShortcodeWidget extends AbstractBaseWidget
         return $this->shortcode;
     }
 
+    /**
+     * @return string
+     * @throws \BetaKiller\IFace\Widget\WidgetException
+     */
     protected function getViewName(): string
     {
         $shortcode = $this->getShortcode();
 
         return 'Shortcode_'.$shortcode->getCodename();
-
-//        // WTF is going on here?
-//        $name = 'Shortcode_'.str_replace('-', '_', $shortcode->getCodename());
-//
-//        // Make every word uppercase (like in other widgets)
-//        return implode('_', array_map('ucfirst', explode('_', $name)));
     }
 }

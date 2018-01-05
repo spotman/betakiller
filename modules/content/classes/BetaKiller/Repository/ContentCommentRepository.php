@@ -20,10 +20,10 @@ use DateTime;
  * @method ContentCommentInterface[] getAll()
  */
 class ContentCommentRepository extends AbstractOrmBasedDispatchableRepository
-    implements EntityModelRelatedRepositoryInterface, RepositoryHasWordpressIdInterface
+    implements EntityItemRelatedRepositoryInterface, RepositoryHasWordpressIdInterface
 {
     use OrmBasedRepositoryHasWordpressIdTrait;
-    use OrmBasedEntityRelatedRepositoryTrait;
+    use OrmBasedEntityItemRelatedRepositoryTrait;
 
     /**
      * @Inject
