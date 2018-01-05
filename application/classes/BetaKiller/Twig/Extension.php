@@ -130,7 +130,7 @@ class BetaKiller_Twig_Extension extends Twig_Extension
              */
             new Twig_Filter('i18n', function (array $context, string $text, array $values = null) {
                 // Use all surrounding context variables for simplicity
-                $values = array_merge($context, $values);
+                $values = $values ? array_merge($context, $values) : $context;
 
                 return __($text, $values);
             }, ['needs_context' => true, 'is_safe' => ['html']]),
