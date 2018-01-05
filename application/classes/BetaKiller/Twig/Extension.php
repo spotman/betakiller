@@ -128,9 +128,12 @@ class BetaKiller_Twig_Extension extends Twig_Extension
              *
              * @example ":count lots"|i18n({ ":count": lotsCount })
              */
-            new Twig_Filter('i18n', function ($text, array $values = null) {
+            new Twig_Filter('i18n', function (array $context, string $text, array $values = null) {
+                // Use all surrounding context variables for simplicity
+                $values = array_merge($context, $values);
+
                 return __($text, $values);
-            }),
+            }, ['needs_context' => true, 'is_safe' => ['html']]),
 
         ];
     }

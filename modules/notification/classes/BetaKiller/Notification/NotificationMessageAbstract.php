@@ -174,8 +174,8 @@ abstract class NotificationMessageAbstract implements NotificationMessageInterfa
         // Getting template data
         $data = $this->getFullData($targetUser);
 
-        // Prefixing data keys with semicolon
-        $data = I18n::addColonToKeys($data);
+//        // Prefixing data keys with semicolon
+//        $data = I18n::addPlaceholderPrefixToKeys($data);
 
         return __($key, $data);
     }
@@ -311,8 +311,6 @@ abstract class NotificationMessageAbstract implements NotificationMessageInterfa
             'subject'     => $this->getSubj($target),
             'baseI18nKey' => $this->getBaseI18nKey(),
         ]);
-
-        $data['colonPrefixedData'] = I18n::addColonToKeys($data);
 
         foreach ($data as $key => $value) {
             $view->set($key, $value);

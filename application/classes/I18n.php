@@ -4,10 +4,12 @@
  * A patch for the Internationalization (i18n) class.
  *
  * @package    I18n
- * @author Mikito Takada
+ * @author     Mikito Takada
  */
 class I18n extends Kohana_I18n
 {
+    public const PLACEHOLDER_PREFIX = ':';
+
     /**
      * @var  string  source language: en-us, es-es, zh-cn, etc
      */
@@ -65,7 +67,7 @@ class I18n extends Kohana_I18n
      *     $hello = I18n::get('Hello friends, my name is :name');
      *
      * @param   $string string  text to translate
-     * @param   $lang string   target language
+     * @param   $lang   string   target language
      *
      * @return  string
      */
@@ -96,12 +98,16 @@ class I18n extends Kohana_I18n
         return $string;
     }
 
-    public static function addColonToKeys(array $data)
+    public static function addPlaceholderPrefixToKeys(array $data)
     {
         $output = [];
 
         foreach ($data as $key => $value) {
-            $key          = ':'.$key;
+            // Add prefix if it does not exist
+            if (strpos($key, self::PLACEHOLDER_PREFIX) !== 0) {
+                $key = self::PLACEHOLDER_PREFIX.$key;
+            }
+
             $output[$key] = $value;
         }
 
@@ -119,7 +125,7 @@ class I18n extends Kohana_I18n
             try {
                 self::put_data($module, $data[static::$lang]);
             } catch (Throwable $e) {
-                Log::exception($e);
+                Kohana_Exception::log($e);
             }
         }
     }
@@ -153,8 +159,9 @@ class I18n extends Kohana_I18n
         $current_app_lang_data = file_exists($full_file_path) ? include $full_file_path : [];
 
         // Если файл поломан, ничего не делаем
-        if (!is_array($current_app_lang_data))
+        if (!is_array($current_app_lang_data)) {
             return;
+        }
 
         $content = static::make_content(array_merge($data, $current_app_lang_data));
 
@@ -166,8 +173,9 @@ class I18n extends Kohana_I18n
             $result      = file_put_contents($backup_name, $old_content);
 
             // Backup failed! Don't write the file.
-            if (!$result)
+            if (!$result) {
                 return;
+            }
         }
 
         // Save the file

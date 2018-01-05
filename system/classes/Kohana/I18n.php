@@ -161,6 +161,11 @@ if ( ! function_exists('__'))
 			$string = I18n::get($string);
 		}
 
+		if ($values) {
+            // Add prefix if does not exists
+            $values = I18n::addPlaceholderPrefixToKeys($values);
+        }
+
 		return empty($values) ? $string : strtr($string, $values);
 	}
 }
