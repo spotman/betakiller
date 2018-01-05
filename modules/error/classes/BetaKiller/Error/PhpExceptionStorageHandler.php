@@ -2,9 +2,7 @@
 namespace BetaKiller\Error;
 
 use BetaKiller\Config\AppConfigInterface;
-use BetaKiller\Helper\IFaceHelper;
 use BetaKiller\Helper\NotificationHelper;
-use BetaKiller\Model\IFaceZone;
 use BetaKiller\Model\PhpExceptionModelInterface;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Repository\PhpExceptionRepository;
@@ -59,29 +57,21 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
     private $user;
 
     /**
-     * @var \BetaKiller\Helper\IFaceHelper
-     */
-    private $ifaceHelper;
-
-    /**
      * PhpExceptionStorageHandler constructor.
      *
      * @param \BetaKiller\Repository\PhpExceptionRepository $repository
-     * @param \BetaKiller\Helper\IFaceHelper                $ifaceHelper
      * @param \BetaKiller\Model\UserInterface               $user
      * @param \BetaKiller\Config\AppConfigInterface         $appConfig
      * @param \BetaKiller\Helper\NotificationHelper         $notificationHelper
      */
     public function __construct(
         PhpExceptionRepository $repository,
-        IFaceHelper $ifaceHelper,
         UserInterface $user,
         AppConfigInterface $appConfig,
         NotificationHelper $notificationHelper
     ) {
         $this->repository         = $repository;
         $this->user               = $user;
-        $this->ifaceHelper        = $ifaceHelper;
         $this->appConfig          = $appConfig;
         $this->notificationHelper = $notificationHelper;
 
@@ -196,35 +186,16 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
             $model->addModule($module);
         }
 
-        // Saving
-        $this->repository->save($model);
-
         $isNotificationNeeded = $this->isNotificationNeededFor($model, static::REPEAT_COUNT, static::REPEAT_DELAY);
 
 //        $this->logger->debug('Notification needed is :value', [':value' => $isNotificationNeeded ? 'true' : 'false']);
 
-        // Notify developers if needed
         if ($isNotificationNeeded) {
-            $data = [
-                'message'  => $model->getMessage(),
-                'urls'     => $model->getUrls(),
-                'paths'    => $model->getPaths(),
-                'adminUrl' => $this->ifaceHelper->getReadEntityUrl($model, IFaceZone::ADMIN_ZONE),
-            ];
-
-            $message = $this->notificationHelper->createMessage('developer/error/php-exception');
-
-            $this->notificationHelper->toDevelopers($message);
-
-            $message
-                ->setSubj('BetaKiller exception')
-                ->setTemplateData($data)
-                ->send();
-
-            // Saving last notification timestamp
-            $model->setLastNotifiedAt($currentTime);
-            $this->repository->save($model);
+            $model->notificationRequired();
         }
+
+        // Saving
+        $this->repository->save($model);
 
         return $model;
     }

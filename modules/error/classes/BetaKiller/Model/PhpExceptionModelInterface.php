@@ -3,10 +3,10 @@ namespace BetaKiller\Model;
 
 interface PhpExceptionModelInterface extends DispatchableEntityInterface
 {
-    const STATE_NEW      = 'new';
-    const STATE_RESOLVED = 'resolved';
-    const STATE_REPEATED = 'repeated';
-    const STATE_IGNORED  = 'ignored';
+    public const STATE_NEW      = 'new';
+    public const STATE_RESOLVED = 'resolved';
+    public const STATE_REPEATED = 'repeated';
+    public const STATE_IGNORED  = 'ignored';
 
     /**
      * @return string
@@ -211,4 +211,21 @@ interface PhpExceptionModelInterface extends DispatchableEntityInterface
      * @return PhpExceptionHistoryModelInterface[]
      */
     public function getHistoricalRecords(): array;
+
+    /**
+     * Marks current exception instance as "notification required" = 1
+     */
+    public function notificationRequired(): void;
+
+    /**
+     * Marks current exception instance as "notification required" = 0
+     */
+    public function wasNotified(): void;
+
+    /**
+     * Returns true if someone needs to be notified about current exception instance
+     *
+     * @return bool
+     */
+    public function isNotificationRequired(): bool;
 }

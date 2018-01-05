@@ -74,7 +74,8 @@ class PhpException extends \ORM implements PhpExceptionModelInterface
           resolved_by INTEGER UNSIGNED NULL,
           status VARCHAR(16) NOT NULL,
           message TEXT NOT NULL,
-          total INTEGER UNSIGNED NOT NULL DEFAULT 0
+          total INTEGER UNSIGNED NOT NULL DEFAULT 0,
+          notification_required UNSIGNED INTEGER(1) NOT NULL DEFAULT 0
         )')->execute($this->_db_group);
     }
 
@@ -414,7 +415,7 @@ class PhpException extends \ORM implements PhpExceptionModelInterface
      */
     public function markAsNew(UserInterface $user)
     {
-        $this->setStatus(PhpExceptionModelInterface::STATE_NEW);
+        $this->setStatus(self::STATE_NEW);
         $this->addHistoryRecord($user);
 
         return $this;
@@ -436,7 +437,7 @@ class PhpException extends \ORM implements PhpExceptionModelInterface
 
         // Reset resolved_by
         $this->setResolvedBy(null);
-        $this->setStatus(PhpExceptionModelInterface::STATE_REPEATED);
+        $this->setStatus(self::STATE_REPEATED);
         $this->addHistoryRecord($user);
 
         return $this;
@@ -453,7 +454,7 @@ class PhpException extends \ORM implements PhpExceptionModelInterface
     {
         // Reset resolved_by
         $this->setResolvedBy($user);
-        $this->setStatus(PhpExceptionModelInterface::STATE_RESOLVED);
+        $this->setStatus(self::STATE_RESOLVED);
         $this->addHistoryRecord($user);
 
         return $this;
@@ -470,7 +471,7 @@ class PhpException extends \ORM implements PhpExceptionModelInterface
     {
         // Reset resolved_by
         $this->setResolvedBy(null);
-        $this->setStatus(PhpExceptionModelInterface::STATE_IGNORED);
+        $this->setStatus(self::STATE_IGNORED);
         $this->addHistoryRecord($user);
 
         return $this;
@@ -483,7 +484,7 @@ class PhpException extends \ORM implements PhpExceptionModelInterface
      */
     public function isResolved(): bool
     {
-        return $this->getStatus() === PhpExceptionModelInterface::STATE_RESOLVED;
+        return $this->getStatus() === self::STATE_RESOLVED;
     }
 
     /**
@@ -493,7 +494,7 @@ class PhpException extends \ORM implements PhpExceptionModelInterface
      */
     public function isRepeated(): bool
     {
-        return $this->getStatus() === PhpExceptionModelInterface::STATE_REPEATED;
+        return $this->getStatus() === self::STATE_REPEATED;
     }
 
     /**
@@ -503,7 +504,7 @@ class PhpException extends \ORM implements PhpExceptionModelInterface
      */
     public function isNew(): bool
     {
-        return !$this->getID() || $this->getStatus() === PhpExceptionModelInterface::STATE_NEW;
+        return !$this->getID() || $this->getStatus() === self::STATE_NEW;
     }
 
     /**
@@ -513,7 +514,7 @@ class PhpException extends \ORM implements PhpExceptionModelInterface
      */
     public function isIgnored(): bool
     {
-        return $this->getStatus() === PhpExceptionModelInterface::STATE_IGNORED;
+        return $this->getStatus() === self::STATE_IGNORED;
     }
 
     /**
@@ -550,6 +551,32 @@ class PhpException extends \ORM implements PhpExceptionModelInterface
     public function getHistoricalRecords(): array
     {
         return $this->getHistoryRelation()->get_all();
+    }
+
+    /**
+     * Marks current exception instance as "notification required"
+     */
+    public function notificationRequired(): void
+    {
+        $this->set('notification_required', true);
+    }
+
+    /**
+     * Marks current exception instance as "notification required" = 0
+     */
+    public function wasNotified(): void
+    {
+        $this->set('notification_required', false);
+    }
+
+    /**
+     * Returns true if someone needs to be notified about current exception instance
+     *
+     * @return bool
+     */
+    public function isNotificationRequired(): bool
+    {
+        return (bool)$this->get('notification_required');
     }
 
     /**

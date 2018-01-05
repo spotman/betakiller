@@ -46,6 +46,18 @@ class PhpExceptionRepository extends AbstractOrmBasedDispatchableRepository
     }
 
     /**
+     * @return PhpExceptionModelInterface[]
+     */
+    public function getRequiredNotification(): array
+    {
+        $orm = $this->getOrmInstance();
+
+        $this->filterNotificationRequired($orm)->orderByCreatedAt($orm);
+
+        return $orm->get_all();
+    }
+
+    /**
      * @param string $hash
      *
      * @return PhpExceptionModelInterface|null
@@ -80,6 +92,13 @@ class PhpExceptionRepository extends AbstractOrmBasedDispatchableRepository
     private function filterResolved(OrmInterface $orm)
     {
         $orm->where('resolved_by', 'IS NOT', null);
+
+        return $this;
+    }
+
+    private function filterNotificationRequired(OrmInterface $orm)
+    {
+        $orm->where('notification_required', '=', true);
 
         return $this;
     }
