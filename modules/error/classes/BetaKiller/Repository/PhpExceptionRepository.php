@@ -28,7 +28,7 @@ class PhpExceptionRepository extends AbstractOrmBasedDispatchableRepository
     {
         $orm = $this->getOrmInstance();
 
-        $this->filterUnresolved($orm)->orderByCreatedAt($orm);
+        $this->filterUnresolved($orm)->orderByLastSeenAt($orm);
 
         return $orm->get_all();
     }
@@ -40,7 +40,7 @@ class PhpExceptionRepository extends AbstractOrmBasedDispatchableRepository
     {
         $orm = $this->getOrmInstance();
 
-        $this->filterResolved($orm)->orderByCreatedAt($orm);
+        $this->filterResolved($orm)->orderByLastSeenAt($orm);
 
         return $orm->get_all();
     }
@@ -52,7 +52,9 @@ class PhpExceptionRepository extends AbstractOrmBasedDispatchableRepository
     {
         $orm = $this->getOrmInstance();
 
-        $this->filterNotificationRequired($orm)->orderByCreatedAt($orm);
+        $this->filterNotificationRequired($orm)
+            ->filterNew($orm)
+            ->orderByLastSeenAt($orm);
 
         return $orm->get_all();
     }
@@ -75,9 +77,9 @@ class PhpExceptionRepository extends AbstractOrmBasedDispatchableRepository
     /**
      * @param \BetaKiller\Utils\Kohana\ORM\OrmInterface $orm
      *
-     * @return $this
+     * @return \BetaKiller\Repository\PhpExceptionRepository
      */
-    private function filterUnresolved(OrmInterface $orm)
+    private function filterUnresolved(OrmInterface $orm): self
     {
         $orm->where('resolved_by', 'IS', null);
 
@@ -87,16 +89,21 @@ class PhpExceptionRepository extends AbstractOrmBasedDispatchableRepository
     /**
      * @param \BetaKiller\Utils\Kohana\ORM\OrmInterface $orm
      *
-     * @return $this
+     * @return \BetaKiller\Repository\PhpExceptionRepository
      */
-    private function filterResolved(OrmInterface $orm)
+    private function filterResolved(OrmInterface $orm): self
     {
         $orm->where('resolved_by', 'IS NOT', null);
 
         return $this;
     }
 
-    private function filterNotificationRequired(OrmInterface $orm)
+    /**
+     * @param \BetaKiller\Utils\Kohana\ORM\OrmInterface $orm
+     *
+     * @return \BetaKiller\Repository\PhpExceptionRepository
+     */
+    private function filterNotificationRequired(OrmInterface $orm): self
     {
         $orm->where('notification_required', '=', true);
 
@@ -105,13 +112,36 @@ class PhpExceptionRepository extends AbstractOrmBasedDispatchableRepository
 
     /**
      * @param \BetaKiller\Utils\Kohana\ORM\OrmInterface $orm
+     *
+     * @return \BetaKiller\Repository\PhpExceptionRepository
+     */
+    private function filterNew(OrmInterface $orm): self
+    {
+        return $this->filterStatus($orm, PhpExceptionModelInterface::STATE_NEW);
+    }
+
+    /**
+     * @param \BetaKiller\Utils\Kohana\ORM\OrmInterface $orm
+     * @param string                                    $status
+     *
+     * @return \BetaKiller\Repository\PhpExceptionRepository
+     */
+    private function filterStatus(OrmInterface $orm, string $status): self
+    {
+        $orm->where('status', '=', $status);
+
+        return $this;
+    }
+
+    /**
+     * @param \BetaKiller\Utils\Kohana\ORM\OrmInterface $orm
      * @param bool|null                                 $asc
      *
-     * @return $this
+     * @return \BetaKiller\Repository\PhpExceptionRepository
      */
-    private function orderByCreatedAt(OrmInterface $orm, ?bool $asc = null)
+    private function orderByLastSeenAt(OrmInterface $orm, ?bool $asc = null): self
     {
-        $orm->order_by('created_at', $asc ? 'asc' : 'desc');
+        $orm->order_by('last_seen_at', $asc ? 'asc' : 'desc');
 
         return $this;
     }
