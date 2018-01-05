@@ -5,13 +5,13 @@ use BetaKiller\Helper\IFaceHelper;
 use BetaKiller\IFace\IFaceModelInterface;
 use BetaKiller\IFace\ModelProvider\IFaceModelProviderAggregate;
 use BetaKiller\IFace\Url\UrlContainerInterface;
-use BetaKiller\Service;
+use BetaKiller\Service\AbstractService;
 use BetaKiller\Service\ServiceException;
 use Psr\Log\LoggerInterface;
 use samdark\sitemap\Index;
 use samdark\sitemap\Sitemap;
 
-class Service_Sitemap extends Service
+class Service_Sitemap extends AbstractService
 {
     /**
      * @var UrlContainerInterface

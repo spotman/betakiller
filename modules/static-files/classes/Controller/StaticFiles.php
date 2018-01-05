@@ -90,20 +90,28 @@ class Controller_StaticFiles extends Controller
         return Kohana::find_file('static-files', $dir.$info['filename'], $info['extension']);
     }
 
+    /**
+     * @param $file
+     *
+     * @return string
+     * @throws \RuntimeException
+     */
     private function static_deploy($file)
     {
         $config = $this->get_config();
 
         $info   = pathinfo($file);
-        $dir    = ('.' !== $info['dirname']) ? $info['dirname'].'/' : '';
+        $dir    = ($info['dirname'] !== '.') ? $info['dirname'].'/' : '';
         $deploy = rtrim($config['path'], '/')
             .'/'
             .ltrim($config['url'], '/').$dir
             .$info['filename'].'.'
             .$info['extension'];
 
-        if (!file_exists(dirname($deploy)) && !mkdir(dirname($deploy)) && !is_dir(dirname($deploy))) {
-            throw new \RuntimeException(sprintf('Directory "%s" was not created', dirname($deploy)));
+        $dir = dirname($deploy);
+
+        if (!file_exists($dir) && !mkdir($dir, 0777, true) && !is_dir($dir)) {
+            throw new \RuntimeException(sprintf('Directory "%s" was not created', $dir));
         }
 
         return $deploy;

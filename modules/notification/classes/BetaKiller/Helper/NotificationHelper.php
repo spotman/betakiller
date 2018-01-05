@@ -1,10 +1,10 @@
 <?php
 namespace BetaKiller\Helper;
 
-use BetaKiller\Repository\UserRepository;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Notification\NotificationMessageFactory;
 use BetaKiller\Notification\NotificationMessageInterface;
+use BetaKiller\Service\UserService;
 
 class NotificationHelper
 {
@@ -19,29 +19,33 @@ class NotificationHelper
     private $user;
 
     /**
-     * @var \BetaKiller\Repository\UserRepository
-     */
-    private $userRepository;
-
-    /**
      * @var \BetaKiller\Helper\AppEnv
      */
     private $appEnv;
 
     /**
+     * @var \BetaKiller\Service\UserService
+     */
+    private $userService;
+
+    /**
      * NotificationHelper constructor.
      *
-     * @param \BetaKiller\Notification\NotificationMessageFactory $messageFactory
+     * @param \BetaKiller\Notification\NotificationMessageFactory $factory
      * @param \BetaKiller\Model\UserInterface                     $user
      * @param \BetaKiller\Helper\AppEnv                           $env
-     * @param \BetaKiller\Repository\UserRepository               $userRepository
+     * @param \BetaKiller\Service\UserService                     $userService
      */
-    public function __construct(NotificationMessageFactory $messageFactory, UserInterface $user, AppEnv $env, UserRepository $userRepository)
-    {
-        $this->messageFactory = $messageFactory;
+    public function __construct(
+        NotificationMessageFactory $factory,
+        UserInterface $user,
+        AppEnv $env,
+        UserService $userService
+    ) {
+        $this->messageFactory = $factory;
         $this->user           = $user;
         $this->appEnv         = $env;
-        $this->userRepository = $userRepository;
+        $this->userService    = $userService;
     }
 
     /**
@@ -57,11 +61,11 @@ class NotificationHelper
     /**
      * @param \BetaKiller\Notification\NotificationMessageInterface $message
      *
-     * @return $this
+     * @return NotificationHelper
      */
-    public function toDevelopers(NotificationMessageInterface $message)
+    public function toDevelopers(NotificationMessageInterface $message): NotificationHelper
     {
-        $developers = $this->userRepository->getDevelopers();
+        $developers = $this->userService->getDevelopers();
 
         $message->addTargetUsers($developers);
 
@@ -71,11 +75,11 @@ class NotificationHelper
     /**
      * @param \BetaKiller\Notification\NotificationMessageInterface $message
      *
-     * @return $this
+     * @return NotificationHelper
      */
-    public function toModerators(NotificationMessageInterface $message)
+    public function toModerators(NotificationMessageInterface $message): NotificationHelper
     {
-        $moderators = $this->userRepository->getModerators();
+        $moderators = $this->userService->getModerators();
 
         $message->addTargetUsers($moderators);
 
@@ -85,10 +89,10 @@ class NotificationHelper
     /**
      * @param \BetaKiller\Notification\NotificationMessageInterface $message
      *
-     * @return $this
+     * @return NotificationHelper
      * @throws \HTTP_Exception_401
      */
-    public function toCurrentUser(NotificationMessageInterface $message)
+    public function toCurrentUser(NotificationMessageInterface $message): NotificationHelper
     {
         $this->user->forceAuthorization();
 
@@ -97,12 +101,18 @@ class NotificationHelper
         return $this;
     }
 
-    public function rewriteTargetsForDebug(NotificationMessageInterface $message, ?bool $keepInStage = null)
+    /**
+     * @param \BetaKiller\Notification\NotificationMessageInterface $msg
+     * @param bool|null                                             $inStage
+     *
+     * @return \BetaKiller\Helper\NotificationHelper
+     */
+    public function rewriteTargetsForDebug(NotificationMessageInterface $msg, ?bool $inStage = null): NotificationHelper
     {
-        if (!$this->appEnv->inProduction($keepInStage ?? true)) {
-            $message->clearTargets();
+        if (!$this->appEnv->inProduction($inStage ?? true)) {
+            $msg->clearTargets();
 
-            $this->toDevelopers($message);
+            $this->toDevelopers($msg);
         }
 
         return $this;

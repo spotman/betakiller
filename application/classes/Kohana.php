@@ -51,18 +51,6 @@ class Kohana extends Kohana_Core {
         return static::$_paths;
     }
 
-    public static function modules(array $modules = NULL)
-    {
-        $result = parent::modules($modules);
-
-        if ( $modules !== NULL )
-        {
-            MultiSite::instance()->initSite();
-        }
-
-        return $result;
-    }
-
     public static function reinit()
     {
         self::$_init = FALSE;

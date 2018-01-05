@@ -123,6 +123,12 @@ class Task_Content_Import_Wordpress extends AbstractTask
 
     /**
      * @Inject
+     * @var \BetaKiller\Service\UserService
+     */
+    private $userService;
+
+    /**
+     * @Inject
      * @var \BetaKiller\Content\Shortcode\ShortcodeFacade
      */
     private $shortcodeFacade;
@@ -1358,7 +1364,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
             $userModel = $this->userRepository->searchBy($wpEmail) ?: $this->userRepository->searchBy($wpLogin);
 
             if (!$userModel) {
-                $userModel = $this->userRepository->createNewUser($wpLogin, $wpEmail);
+                $userModel = $this->userService->createUser($wpLogin, $wpEmail);
                 $this->logger->info('User :login successfully imported', [':login' => $userModel->getUsername()]);
             } else {
                 $this->logger->info('User :login already exists', [':login' => $userModel->getUsername()]);

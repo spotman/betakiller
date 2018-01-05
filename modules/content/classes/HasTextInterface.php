@@ -1,6 +1,6 @@
 <?php
 
-interface HasText
+interface HasTextInterface
 {
     /**
      * @return array

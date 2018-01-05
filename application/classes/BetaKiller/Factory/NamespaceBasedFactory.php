@@ -177,7 +177,7 @@ final class NamespaceBasedFactory
                 throw new FactoryException('Can not instantiate :class class, error is: :msg', [
                     ':class' => $className,
                     ':msg'   => $e->getMessage(),
-                ], null, $e);
+                ], $e->getCode(), $e);
             }
 
             if ($this->expectedInterface && !($instance instanceof $this->expectedInterface)) {

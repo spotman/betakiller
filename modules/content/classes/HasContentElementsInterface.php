@@ -1,11 +1,11 @@
 <?php
 
-interface HasContentElements
+interface HasContentElementsInterface
 {
     /**
      * Returns entity ID (content_entities.id value)
      *
      * @return int
      */
-    public function get_content_entity_id();
+    public function getContentEntityID(): int;
 }

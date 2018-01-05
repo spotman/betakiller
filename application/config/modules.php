@@ -6,9 +6,10 @@ return array(
     'multi-site'            => MODPATH.'multi-site',            // Multiple apps on top of single engine
 
     'utils'                 => MODPATH.'utils',                 // Useful classes
-    'sqlite'                => MODPATH.'sqlite',                // SQLite database driver (used by logs)
     'log'                   => MODPATH.'log',                   // Logs subsystem
+    'sqlite'                => MODPATH.'sqlite',                // SQLite database driver (used by logs)
     'error'                 => MODPATH.'error',                 // Error handling and logging
+    'message-bus'           => MODPATH.'message-bus',           // Event and command buses
 
     // Process legacy routing first
     'static-files'          => MODPATH.'static-files',          // Static Files (JS/CSS/pictures)
@@ -19,7 +20,6 @@ return array(
     'assets'                => MODPATH.'assets',                // Asset management subsystem
     'auth'                  => MODPATH.'auth',                  // Basic authentication
     'backup'                => MODPATH.'backup',                // Complex backup (files + database)
-//    'cache'                 => MODPATH.'cache',                 // Caching with multiple backends
     'cron'                  => MODPATH.'cron',                  // helper for running scheduled tasks
     'database'              => MODPATH.'database',              // Database access
     'device'                => MODPATH.'device',                // Device detection
@@ -27,7 +27,6 @@ return array(
     'jsonrpc'               => MODPATH.'jsonrpc',               // JSON-RPC server
     'image'                 => MODPATH.'image',                 // Image manipulation
     'i18n-plural'           => MODPATH.'i18n-plural',           // International pluralization
-    'message-bus'           => MODPATH.'message-bus',           // Event and command buses
     'meta-tags'             => MODPATH.'meta-tags',             // HTML meta tags helper
     'migrations'            => MODPATH.'migrations',            // Migrations toolkit
     'minion'                => MODPATH.'minion',                // CLI Tasks
