@@ -1,14 +1,13 @@
 <?php
 namespace BetaKiller\Notification;
 
-use BetaKiller\Helper\LoggerHelperTrait;
 use BetaKiller\Notification\Transport\EmailTransport;
 use BetaKiller\Notification\Transport\OnlineTransport;
 use Psr\Log\LoggerInterface;
 
 class Notification
 {
-    use LoggerHelperTrait;
+    use BetaKiller\Helper\LoggerHelperTrait;
 
     /**
      * @var \Psr\Log\LoggerInterface

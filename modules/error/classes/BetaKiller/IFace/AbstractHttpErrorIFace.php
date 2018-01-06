@@ -1,10 +1,13 @@
 <?php
 namespace BetaKiller\IFace;
 
+use BetaKiller\Error\ExceptionHandler;
+use BetaKiller\Exception\HttpExceptionInterface;
+
 abstract class AbstractHttpErrorIFace extends AbstractIFace
 {
     /**
-     * @var \Throwable
+     * @var HttpExceptionInterface
      */
     private $exception;
 
@@ -13,6 +16,12 @@ abstract class AbstractHttpErrorIFace extends AbstractIFace
      * @var \BetaKiller\Model\UserInterface
      */
     private $user;
+
+    /**
+     * @Inject
+     * @var \BetaKiller\Error\ExceptionHandler
+     */
+    private $exceptionHandler;
 
     /**
      * This hook executed before IFace processing (on every request regardless of caching)
@@ -32,6 +41,7 @@ abstract class AbstractHttpErrorIFace extends AbstractIFace
      * Override this method in child classes
      *
      * @return array
+     * @throws \BetaKiller\IFace\Exception\IFaceException
      */
     public function getData(): array
     {
@@ -40,7 +50,7 @@ abstract class AbstractHttpErrorIFace extends AbstractIFace
 
         return [
             'label'     => $this->getLabel(),
-            'message'   => \HTTP_Exception::getUserMessage($this->exception),
+            'message'   => $this->exceptionHandler->getUserMessage($this->exception),
             'login_url' => $loginIFace->url(),
             'is_guest'  => $this->user->isGuest(),
         ];
@@ -53,7 +63,7 @@ abstract class AbstractHttpErrorIFace extends AbstractIFace
         return $this;
     }
 
-    abstract protected function getDefaultHttpException(): \HTTP_Exception;
+    abstract protected function getDefaultHttpException(): HttpExceptionInterface;
 
     /**
      * Returns label source/pattern
@@ -62,7 +72,7 @@ abstract class AbstractHttpErrorIFace extends AbstractIFace
      */
     public function getLabelSource(): string
     {
-        $i18nKey = \HTTP_Exception::getErrorLabelI18nKey($this->exception);
+        $i18nKey = ExceptionHandler::getErrorLabelI18nKey($this->exception);
 
         return __($i18nKey);
     }

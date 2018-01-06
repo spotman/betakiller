@@ -1,6 +1,8 @@
 <?php
 
-class HTTP_Exception extends Kohana_HTTP_Exception {
+use BetaKiller\Exception\HttpExceptionInterface;
+
+class HTTP_Exception extends Kohana_HTTP_Exception implements HttpExceptionInterface {
 
     /**
      * Returns nice exception response in non-dev modes

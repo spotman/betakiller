@@ -3,7 +3,6 @@ namespace BetaKiller\Widget;
 
 use BetaKiller\Content\Shortcode\ShortcodeInterface;
 use BetaKiller\IFace\Widget\AbstractBaseWidget;
-use BetaKiller\IFace\Widget\WidgetException;
 
 class ShortcodeWidget extends AbstractBaseWidget
 {
@@ -21,7 +20,7 @@ class ShortcodeWidget extends AbstractBaseWidget
      * Returns data for View rendering
      *
      * @return array
-     * @throws \BetaKiller\IFace\Widget\WidgetException
+     * @throws \BetaKiller\Widget\WidgetException
      */
     public function getData(): array
     {
@@ -35,7 +34,7 @@ class ShortcodeWidget extends AbstractBaseWidget
 
     /**
      * @return \BetaKiller\Content\Shortcode\ShortcodeInterface
-     * @throws \BetaKiller\IFace\Widget\WidgetException
+     * @throws \BetaKiller\Widget\WidgetException
      */
     private function getShortcode(): ShortcodeInterface
     {
@@ -51,7 +50,7 @@ class ShortcodeWidget extends AbstractBaseWidget
 
     /**
      * @return string
-     * @throws \BetaKiller\IFace\Widget\WidgetException
+     * @throws \BetaKiller\Widget\WidgetException
      */
     protected function getViewName(): string
     {

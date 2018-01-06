@@ -1,13 +1,13 @@
 <?php
 
 use BetaKiller\Config\ConfigProviderInterface;
-use BetaKiller\IFace\Widget\WidgetException;
 use BetaKiller\IFace\Widget\AbstractBaseWidget;
+use BetaKiller\Widget\WidgetException;
 
 class Widget_Auth extends AbstractBaseWidget
 {
-    const PROVIDER_REGULAR = 'regular';
-    const PROVIDER_ULOGIN = 'uLogin';
+    public const PROVIDER_REGULAR = 'regular';
+    public const PROVIDER_ULOGIN  = 'uLogin';
 
     /**
      * @var ConfigProviderInterface
@@ -30,7 +30,7 @@ class Widget_Auth extends AbstractBaseWidget
         }
 
         return [
-            'providers' =>  $providers,
+            'providers' => $providers,
         ];
     }
 }

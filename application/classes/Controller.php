@@ -25,20 +25,32 @@ abstract class Controller extends Controller_Proxy
      */
     private $appConfig;
 
-    protected static $_after_callbacks = [];
+    /**
+     * Creates a new controller instance. Each controller must be constructed
+     * with the request object that created it.
+     *
+     * @param   Request  $request  Request that created the controller
+     * @param   Response $response The request's response
+     *
+     * @return  void
+     * @throws \InvalidArgumentException
+     * @throws \DI\DependencyException
+     */
+    public function __construct(\Request $request, \Response $response)
+    {
+        parent::__construct($request, $response);
+
+        \BetaKiller\DI\Container::getInstance()->injectOn($this);
+    }
 
     /**
      * @throws \BetaKiller\Exception
-     * @throws \DI\DependencyException
-     * @throws \InvalidArgumentException
      */
     public function before(): void
     {
         parent::before();
 
-        \BetaKiller\DI\Container::getInstance()->injectOn($this);
-
-        $this->check_connection_protocol();
+        $this->checkConnectionProtocol();
 
         $this->i18n->initialize($this->request);
     }
@@ -46,18 +58,18 @@ abstract class Controller extends Controller_Proxy
     /**
      * Checks for current protocol and makes redirect if it`s not equal to the base protocol
      */
-    protected function check_connection_protocol()
+    private function checkConnectionProtocol()
     {
         // Redirect only initial requests from HTTP
         if ($this->request->is_initial() && $this->request->client_ip() !== '0.0.0.0') {
-            $base_protocol = parse_url($this->appConfig->getBaseUrl(), PHP_URL_SCHEME);
+            $baseProtocol = parse_url($this->appConfig->getBaseUrl(), PHP_URL_SCHEME);
 
-            $is_secure_needed = ($base_protocol === 'https');
+            $isSecureNeeded = ($baseProtocol === 'https');
 
-            $is_secure = $this->request->secure();
+            $isSecure = $this->request->secure();
 
-            if (($is_secure_needed && !$is_secure) || ($is_secure && !$is_secure_needed)) {
-                $url = $this->request->url($base_protocol);
+            if (($isSecureNeeded && !$isSecure) || ($isSecure && !$isSecureNeeded)) {
+                $url = $this->request->url($baseProtocol);
                 $this->redirect($url);
             }
         }
@@ -68,36 +80,5 @@ abstract class Controller extends Controller_Proxy
         parent::after();
 
         $this->response->check_if_not_modified_since();
-    }
-
-    /**
-     * View Factory for current request (directory/controller/action)
-     *
-     * @param string|null $file View file path (relative to directory/controller)
-     *
-     * @return View
-     */
-    protected function view($file = null)
-    {
-        $path = $this->request->directory()
-            ? $this->request->directory().DIRECTORY_SEPARATOR.$this->request->controller()
-            : $this->request->controller();
-
-        $file = $file ?: $this->request->action();
-
-        return $this->view_factory($path.DIRECTORY_SEPARATOR.$file);
-    }
-
-    /**
-     * Helper for View::factory()
-     *
-     * @param string $file
-     * @param array  $data
-     *
-     * @return View
-     */
-    protected function view_factory($file = null, array $data = null)
-    {
-        return View::factory($file, $data);
     }
 }

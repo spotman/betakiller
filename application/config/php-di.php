@@ -9,6 +9,7 @@ use BetaKiller\Config\AppConfig;
 use BetaKiller\Config\AppConfigInterface;
 use BetaKiller\Config\ConfigProvider;
 use BetaKiller\Config\ConfigProviderInterface;
+use BetaKiller\Exception\ExceptionHandlerInterface;
 use BetaKiller\Factory\CommonFactoryCache;
 use BetaKiller\Factory\FactoryCacheInterface;
 use BetaKiller\Factory\NamespaceBasedFactory;
@@ -19,6 +20,8 @@ use BetaKiller\IFace\View\LayoutView;
 use BetaKiller\IFace\View\WrapperView;
 use BetaKiller\View\IFaceViewTwig;
 use BetaKiller\View\LayoutViewTwig;
+use BetaKiller\View\TwigViewFactory;
+use BetaKiller\View\ViewFactoryInterface;
 use BetaKiller\View\WrapperViewTwig;
 use DI\Scope;
 use Doctrine\Common\Cache\ArrayCache;
@@ -54,6 +57,8 @@ return [
     'autowiring'  => true,
 
     'definitions' => [
+
+        ExceptionHandlerInterface::class => DI\object(\BetaKiller\Error\ExceptionHandler::class),
 
         // PSR-16 adapter for system-wide Doctrine Cache
         Psr\SimpleCache\CacheInterface::class      => DI\factory(function (\Psr\Container\ContainerInterface $container) {
@@ -130,6 +135,8 @@ return [
         // Custom access resolver detector
         ApiMethodAccessResolverDetectorInterface::class => DI\object(CustomApiMethodAccessResolverDetector::class),
 
+        // Use Twig as default view
+        ViewFactoryInterface::class    => DI\object(TwigViewFactory::class),
     ],
 
 ];

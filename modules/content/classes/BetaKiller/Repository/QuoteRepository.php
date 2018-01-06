@@ -23,7 +23,7 @@ class QuoteRepository extends AbstractOrmBasedRepository implements RepositoryHa
      *
      * @return \BetaKiller\Model\QuoteInterface|mixed
      */
-    public function getLatestQuote(DateTimeInterface $before = null): QuoteInterface
+    public function getLatestQuote(?DateTimeInterface $before = null): QuoteInterface
     {
         $orm = $this->getOrmInstance();
 

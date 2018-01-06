@@ -9,10 +9,10 @@ use BetaKiller\IFace\IFaceModelInterface;
 use BetaKiller\IFace\IFaceStack;
 use BetaKiller\IFace\Url\UrlContainerInterface;
 use BetaKiller\IFace\View\IFaceView;
-use BetaKiller\IFace\Widget\WidgetInterface;
-use BetaKiller\IFace\WidgetFactory;
 use BetaKiller\Model\DispatchableEntityInterface;
 use BetaKiller\Model\IFaceZone;
+use BetaKiller\Widget\WidgetFactory;
+use BetaKiller\Widget\WidgetInterface;
 use Spotman\Api\ApiMethodResponse;
 
 class IFaceHelper
@@ -23,7 +23,7 @@ class IFaceHelper
     private $ifaceFactory;
 
     /**
-     * @var \BetaKiller\IFace\WidgetFactory
+     * @var \BetaKiller\Widget\WidgetFactory
      */
     private $widgetFactory;
 
@@ -48,7 +48,7 @@ class IFaceHelper
      * @param \BetaKiller\IFace\View\IFaceView      $view
      * @param \BetaKiller\IFace\IFaceStack          $stack
      * @param \BetaKiller\IFace\IFaceFactory        $ifaceFactory
-     * @param \BetaKiller\IFace\WidgetFactory       $widgetFactory
+     * @param \BetaKiller\Widget\WidgetFactory      $widgetFactory
      * @param \BetaKiller\Helper\UrlContainerHelper $paramsHelper
      */
     public function __construct(
@@ -125,7 +125,7 @@ class IFaceHelper
     /**
      * @param $name
      *
-     * @return \BetaKiller\IFace\Widget\WidgetInterface
+     * @return \BetaKiller\Widget\WidgetInterface
      */
     public function createWidget(string $name): WidgetInterface
     {

@@ -2,6 +2,7 @@
 namespace BetaKiller\Error;
 
 use BetaKiller\Config\AppConfigInterface;
+use BetaKiller\Exception\ExceptionHandlerInterface;
 use BetaKiller\Helper\AppEnv;
 use BetaKiller\Log\LazyLoadProxyHandler;
 use BetaKiller\Log\Logger;
@@ -35,23 +36,31 @@ class Initializer implements ModuleInitializerInterface
     private $container;
 
     /**
+     * @var \BetaKiller\Exception\ExceptionHandlerInterface
+     */
+    private $handler;
+
+    /**
      * Initializer constructor.
      *
-     * @param \Psr\Container\ContainerInterface     $container
-     * @param \BetaKiller\Log\Logger                $logger
-     * @param \BetaKiller\Helper\AppEnv             $appEnv
-     * @param \BetaKiller\Config\AppConfigInterface $appConfig
+     * @param \Psr\Container\ContainerInterface               $container
+     * @param \BetaKiller\Log\Logger                          $logger
+     * @param \BetaKiller\Helper\AppEnv                       $appEnv
+     * @param \BetaKiller\Config\AppConfigInterface           $appConfig
+     * @param \BetaKiller\Exception\ExceptionHandlerInterface $handler
      */
     public function __construct(
         ContainerInterface $container,
         Logger $logger,
         AppEnv $appEnv,
-        AppConfigInterface $appConfig
+        AppConfigInterface $appConfig,
+        ExceptionHandlerInterface $handler
     ) {
         $this->logger    = $logger;
         $this->container = $container;
         $this->appEnv    = $appEnv;
         $this->appConfig = $appConfig;
+        $this->handler   = $handler;
     }
 
     /**
@@ -61,12 +70,19 @@ class Initializer implements ModuleInitializerInterface
      */
     public function init(): void
     {
+        $this->registerExceptionHandler();
+
         // Enable debugging via PhpConsole in browser mode
         if ($this->appEnv->isDebugEnabled() && !$this->appEnv->isCLI()) {
             $this->initPhpConsole();
         } elseif ($this->appEnv->inProduction(true)) {
             $this->initPhpExceptionStorage();
         }
+    }
+
+    private function registerExceptionHandler(): void
+    {
+        \Kohana_Exception::setHandler($this->handler);
     }
 
     /**

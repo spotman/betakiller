@@ -5,7 +5,7 @@ abstract class Auth_Exception extends HTTP_Exception_403
     /**
      * @return string
      */
-    protected function getDefaultMessageI18nKey()
+    public function getDefaultMessageI18nKey(): string
     {
         return 'error.auth.common';
     }

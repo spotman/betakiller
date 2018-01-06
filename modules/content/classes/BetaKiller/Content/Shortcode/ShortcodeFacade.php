@@ -2,7 +2,6 @@
 namespace BetaKiller\Content\Shortcode;
 
 use BetaKiller\Helper\LoggerHelperTrait;
-use BetaKiller\Utils\Instance\SingletonTrait;
 use Thunder\Shortcode\HandlerContainer\HandlerContainer;
 use Thunder\Shortcode\Parser\RegularParser;
 use Thunder\Shortcode\Processor\Processor;
@@ -11,7 +10,6 @@ use Thunder\Shortcode\Shortcode\ShortcodeInterface as ThunderShortcodeInterface;
 
 class ShortcodeFacade
 {
-    use SingletonTrait;
     use LoggerHelperTrait;
 
     /**
@@ -22,7 +20,7 @@ class ShortcodeFacade
 
     /**
      * @Inject
-     * @var \BetaKiller\IFace\WidgetFactory
+     * @var \BetaKiller\Widget\WidgetFactory
      */
     private $widgetFactory;
 
@@ -85,6 +83,13 @@ class ShortcodeFacade
         return $processor->process($text);
     }
 
+    /**
+     * @param string     $tagName
+     * @param array|null $attributes
+     *
+     * @return string
+     * @throws \BetaKiller\Factory\FactoryException
+     */
     protected function render(string $tagName, ?array $attributes = null): string
     {
         $shortcode = $this->createFromTagName($tagName, $attributes);

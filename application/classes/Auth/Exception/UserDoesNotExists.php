@@ -2,7 +2,7 @@
 
 class Auth_Exception_UserDoesNotExists extends Auth_Exception
 {
-    protected function getDefaultMessageI18nKey(): string
+    public function getDefaultMessageI18nKey(): string
     {
         return 'error.auth.user_not_exists';
     }

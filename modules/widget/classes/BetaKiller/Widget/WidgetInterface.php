@@ -1,7 +1,10 @@
 <?php
-namespace BetaKiller\IFace\Widget;
+namespace BetaKiller\Widget;
 
-interface WidgetInterface
+use BetaKiller\View\ViewFactoryInterface;
+use Psr\Log\LoggerAwareInterface;
+
+interface WidgetInterface extends LoggerAwareInterface
 {
     /**
      * Setter for widget name
@@ -10,7 +13,7 @@ interface WidgetInterface
      *
      * @return $this
      */
-    public function setName(string $value);
+    public function setName(string $value): WidgetInterface;
 
     /**
      * Getter for widget name
@@ -22,14 +25,16 @@ interface WidgetInterface
     /**
      * @param \Request $request
      *
-     * @return $this
+     * @return $this|mixed
+     * @deprecated Inject PSR request into each action (every action acts like PSR handler)
      */
     public function setRequest(\Request $request);
 
     /**
      * @param \Response $response
      *
-     * @return $this
+     * @return $this|mixed
+     * @deprecated Inject PSR response into each action (every action acts like PSR handler)
      */
     public function setResponse(\Response $response);
 
@@ -38,9 +43,9 @@ interface WidgetInterface
      *
      * @param array $value
      *
-     * @return $this
+     * @return \BetaKiller\IFace\Widget\WidgetInterface
      */
-    public function setContext(array $value);
+    public function setContext(array $value): WidgetInterface;
 
     /**
      * Getter for widget context (additional data for rendering)
@@ -56,6 +61,18 @@ interface WidgetInterface
      * @return mixed
      */
     public function getContextParam($name, $default = null);
+
+    /**
+     * @return \BetaKiller\View\ViewFactoryInterface
+     */
+    public function getViewFactory(): ViewFactoryInterface;
+
+    /**
+     * @param \BetaKiller\View\ViewFactoryInterface $viewFactory
+     *
+     * @return \BetaKiller\IFace\Widget\WidgetInterface
+     */
+    public function setViewFactory(ViewFactoryInterface $viewFactory): WidgetInterface;
 
     /**
      * Renders widget and returns its representation

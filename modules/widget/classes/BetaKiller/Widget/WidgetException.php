@@ -1,5 +1,5 @@
 <?php
-namespace BetaKiller\IFace\Widget;
+namespace BetaKiller\Widget;
 
 use BetaKiller\Exception;
 

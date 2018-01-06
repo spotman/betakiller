@@ -2,6 +2,9 @@
 
 return array(
 
+    'core'                  => MODPATH.'core',                  // Core interfaces and classes
+    'helper'                => MODPATH.'helper',                // Common helpers without external dependencies
+
     // Place it first for correct initialization of per-site classes and configs
     'multi-site'            => MODPATH.'multi-site',            // Multiple apps on top of single engine
 
@@ -35,11 +38,11 @@ return array(
     'orm'                   => MODPATH.'orm',                   // Object Relationship Mapping
     'paginate'              => MODPATH.'paginate',              // Paginate abstraction for ORM, ORM-REST and others
     'robots-txt'            => MODPATH.'robots-txt',            // Serving /robots.txt
+    'sitemap'               => MODPATH.'sitemap',               // Generating sitemap.xml
     'twig'                  => MODPATH.'twig',                  // Twig template engine
     'ulogin'                => MODPATH.'ulogin',                // Universal login via ulogin.ru
     'unittest'              => MODPATH.'unittest',              // Module for unit testing via phpunit
-
-    'sitemap'               => MODPATH.'sitemap',               // Generating sitemap.xml
+    'widget'                => MODPATH.'widget',                // Basic widgets support
 
     // Allow another modules to set routes
     'iface'                 => MODPATH.'iface',                 // Dynamic user interfaces

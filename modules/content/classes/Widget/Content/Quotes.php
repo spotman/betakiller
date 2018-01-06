@@ -17,23 +17,23 @@ class Widget_Content_Quotes extends AbstractBaseWidget
      */
     public function getData(): array
     {
-        return $this->get_quote_data();
+        return $this->getQuoteData();
     }
 
     public function action_refresh(): void
     {
         $this->content_type_json();
 
-        $data = $this->get_quote_data();
+        $beforeTimestamp = (int)$this->query('before');
+        $beforeDate      = $beforeTimestamp ? (new DateTime)->setTimestamp($beforeTimestamp) : null;
+
+        $data = $this->getQuoteData($beforeDate);
 
         $this->send_success_json($data);
     }
 
-    protected function get_quote_data(): array
+    protected function getQuoteData(?DateTimeInterface $beforeDate = null): array
     {
-        $beforeTimestamp = (int)$this->query('before');
-        $beforeDate      = $beforeTimestamp ? (new DateTime)->setTimestamp($beforeTimestamp) : null;
-
         $quote = $this->repository->getLatestQuote($beforeDate);
 
         $createdAt          = $quote->getCreatedAt();

@@ -5,7 +5,7 @@ class HTTP_Exception_403 extends Kohana_HTTP_Exception_403
     /**
      * Показываем пользователю оригинальный текст исключения в красивых обёртках и в JSON-ответе
      */
-    protected function showOriginalMessageToUser(): bool
+    public function showOriginalMessageToUser(): bool
     {
         return true;
     }
@@ -15,7 +15,7 @@ class HTTP_Exception_403 extends Kohana_HTTP_Exception_403
      *
      * @return bool
      */
-    protected function alwaysShowNiceMessage(): bool
+    public function alwaysShowNiceMessage(): bool
     {
         return true;
     }

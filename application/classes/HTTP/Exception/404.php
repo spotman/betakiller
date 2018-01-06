@@ -11,7 +11,7 @@ class HTTP_Exception_404 extends Kohana_HTTP_Exception_404
         return FALSE;
     }
 
-    protected function alwaysShowNiceMessage(): bool
+    public function alwaysShowNiceMessage(): bool
     {
         return TRUE;
     }

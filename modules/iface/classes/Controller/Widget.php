@@ -1,17 +1,27 @@
 <?php
 
-use BetaKiller\IFace\WidgetFactory;
-
 class Controller_Widget extends Controller
 {
     /**
-     * @return \BetaKiller\IFace\Widget\WidgetInterface
-     * @throws \BetaKiller\IFace\Widget\WidgetException
+     * @Inject
+     * @var \BetaKiller\Widget\WidgetFactory
+     */
+    private $widgetFactory;
+
+    /**
+     * @return \BetaKiller\Widget\WidgetInterface
+     * @throws \BetaKiller\Factory\FactoryException
      */
     protected function get_proxy_object()
     {
-        $widget_name = $this->param('widget');
+        $widgetName = $this->param('widget');
 
-        return WidgetFactory::getInstance()->create($widget_name, $this->getRequest(), $this->getResponse());
+        $instance = $this->widgetFactory->create($widgetName);
+
+        $instance
+            ->setRequest($this->request)
+            ->setResponse($this->response);
+
+        return $instance;
     }
 }

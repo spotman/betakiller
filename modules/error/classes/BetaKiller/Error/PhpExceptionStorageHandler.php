@@ -2,6 +2,7 @@
 namespace BetaKiller\Error;
 
 use BetaKiller\Config\AppConfigInterface;
+use BetaKiller\ExceptionInterface;
 use BetaKiller\Helper\NotificationHelper;
 use BetaKiller\Model\PhpExceptionModelInterface;
 use BetaKiller\Model\UserInterface;
@@ -120,7 +121,7 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
     {
         $user = $this->user;
 
-        if ($exception instanceof \BetaKiller_Kohana_Exception && !$exception->isNotificationEnabled()) {
+        if ($exception instanceof ExceptionInterface && !$exception->isNotificationEnabled()) {
             return null;
         }
 

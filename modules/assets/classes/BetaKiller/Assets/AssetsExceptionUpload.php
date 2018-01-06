@@ -14,7 +14,7 @@ class AssetsExceptionUpload extends AssetsProviderException
     /**
      * Show text of this message in JSON-response
      */
-    protected function showOriginalMessageToUser(): bool
+    public function showOriginalMessageToUser(): bool
     {
         return true;
     }

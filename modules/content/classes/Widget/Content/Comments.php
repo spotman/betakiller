@@ -1,7 +1,7 @@
 <?php
 
 use BetaKiller\IFace\Widget\AbstractBaseWidget;
-use BetaKiller\IFace\Widget\WidgetException;
+use BetaKiller\Widget\WidgetException;
 
 class Widget_Content_Comments extends AbstractBaseWidget
 {
@@ -82,7 +82,7 @@ class Widget_Content_Comments extends AbstractBaseWidget
     }
 
     /**
-     * @throws \BetaKiller\IFace\Widget\WidgetException
+     * @throws \BetaKiller\Widget\WidgetException
      * @throws \BetaKiller\Repository\RepositoryException
      * @throws \Kohana_Exception
      */

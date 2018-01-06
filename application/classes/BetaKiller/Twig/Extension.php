@@ -28,7 +28,7 @@ class BetaKiller_Twig_Extension extends Twig_Extension
 
     /**
      * @Inject
-     * @var \BetaKiller\IFace\WidgetFactory
+     * @var \BetaKiller\Widget\WidgetFactory
      */
     private $widgetFactory;
 
@@ -328,6 +328,7 @@ class BetaKiller_Twig_Extension extends Twig_Extension
      * @param array|null $data
      *
      * @return string
+     * @throws \BetaKiller\Factory\FactoryException
      */
     public function widget(array $context, string $name, array $data = null): string
     {

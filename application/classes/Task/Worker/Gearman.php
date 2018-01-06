@@ -1,8 +1,10 @@
 <?php
 
+use BetaKiller\Helper\LoggerHelperTrait;
+
 abstract class Task_Worker_Gearman extends \BetaKiller\Task\AbstractTask
 {
-    use \BetaKiller\Helper\LoggerHelperTrait;
+    use LoggerHelperTrait;
 
     /**
      * @return string[] array <key> => <method name>

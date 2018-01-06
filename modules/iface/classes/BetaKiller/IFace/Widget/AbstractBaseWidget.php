@@ -1,8 +1,8 @@
 <?php
 namespace BetaKiller\IFace\Widget;
 
-use Twig;
-use View;
+
+use BetaKiller\Widget\AbstractWidget;
 
 abstract class AbstractBaseWidget extends AbstractWidget
 {
@@ -17,17 +17,4 @@ abstract class AbstractBaseWidget extends AbstractWidget
      * @var \BetaKiller\Helper\AclHelper
      */
     protected $aclHelper;
-
-    /**
-     * Returns Twig view instance
-     *
-     * @param null  $file
-     * @param array $data
-     *
-     * @return Twig|View
-     */
-    protected function view_factory($file = null, ?array $data = null): View
-    {
-        return Twig::factory($file, $data);
-    }
 }

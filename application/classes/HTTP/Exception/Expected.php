@@ -1,6 +1,8 @@
 <?php
 
-abstract class HTTP_Exception_Expected extends Kohana_HTTP_Exception_Expected
+use BetaKiller\Exception\HttpExceptionExpectedInterface;
+
+abstract class HTTP_Exception_Expected extends Kohana_HTTP_Exception_Expected implements HttpExceptionExpectedInterface
 {
     /**
      * Returns TRUE if someone must be notified about current exception type
