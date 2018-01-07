@@ -28,3 +28,7 @@ rules:
         enabled: false
     php.dynamically_change_configuration:
         enabled: false
+    task_todo_comment:
+        enabled: false
+    php.neglected_tests:
+        enabled: false
