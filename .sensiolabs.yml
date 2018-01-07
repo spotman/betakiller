@@ -20,3 +20,11 @@ rules:
         enabled: true
     doctrine.database_query_contains_string_and_variable_concatenation:
         enabled: true
+    php.missing_use_statement:
+        enabled: false
+    php.use_php_sleep_function:
+        enabled: false
+    php.silenced_error:
+        enabled: false
+    php.dynamically_change_configuration:
+        enabled: false
