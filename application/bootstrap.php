@@ -54,7 +54,7 @@ if ( ! file_exists($vendor_autoload) ) {
 require_once $vendor_autoload;
 
 /**
- * Enable the Kohana auto-loader for unserialization.
+ * Enable auto-loader for unserialization.
  *
  * @link http://www.php.net/manual/function.spl-autoload-call
  * @link http://www.php.net/manual/var.configuration#unserialize-callback-func
