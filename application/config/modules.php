@@ -38,6 +38,7 @@ return array(
     'orm'                   => MODPATH.'orm',                   // Object Relationship Mapping
     'paginate'              => MODPATH.'paginate',              // Paginate abstraction for ORM, ORM-REST and others
     'robots-txt'            => MODPATH.'robots-txt',            // Serving /robots.txt
+    'search'                => MODPATH.'search',                // Search and filtering capabilities
     'sitemap'               => MODPATH.'sitemap',               // Generating sitemap.xml
     'twig'                  => MODPATH.'twig',                  // Twig template engine
     'ulogin'                => MODPATH.'ulogin',                // Universal login via ulogin.ru

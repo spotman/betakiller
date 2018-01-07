@@ -2,15 +2,17 @@
 
 use BetaKiller\IFace\Widget\AbstractBaseWidget;
 use BetaKiller\Model\ContentCategory;
+use BetaKiller\Model\ContentCategoryInterface;
 use BetaKiller\Model\ContentPost;
 use BetaKiller\Model\IFaceZone;
 use BetaKiller\Search\SearchResultsInterface;
+use BetaKiller\Widget\WidgetException;
 
 class Widget_Content_ArticlesList extends AbstractBaseWidget
 {
-    const CATEGORY_ID_QUERY_KEY = 'category-id';
-    const PAGE_QUERY_KEY        = 'page';
-    const SEARCH_TERM_QUERY_KEY = 'term';
+    private const CATEGORY_ID_QUERY_KEY = 'category-id';
+    private const PAGE_QUERY_KEY        = 'page';
+    private const SEARCH_TERM_QUERY_KEY = 'term';
 
     /**
      * @Inject
@@ -36,30 +38,59 @@ class Widget_Content_ArticlesList extends AbstractBaseWidget
      * Returns data for View rendering
      *
      * @return array
+     * @throws \Kohana_Exception
+     * @throws \BetaKiller\Widget\WidgetException
      */
     public function getData(): array
     {
-        return $this->get_articles_data();
+        $category = $this->urlParametersHelper->getContentCategory();
+
+        if (!$category) {
+            throw new WidgetException('Missing content category');
+        }
+
+        return $this->getArticlesData($category);
     }
 
+    /**
+     * @throws \Kohana_Exception
+     */
     public function action_more(): void
     {
         $this->content_type_json();
 
-        $data = $this->get_articles_data();
+        if (!$this->is_ajax()) {
+            $this->send_error_json();
+            return;
+        }
+
+        $term = HTML::chars(strip_tags($this->query(self::SEARCH_TERM_QUERY_KEY)));
+        $page = (int)$this->query(self::PAGE_QUERY_KEY);
+        $categoryID = (int)$this->query(self::CATEGORY_ID_QUERY_KEY);
+
+        $categoryRepo = $this->contentHelper->getCategoryRepository();
+        $category = $categoryRepo->findById($categoryID);
+
+        $data = $this->getArticlesData($category, $page, $term);
 
         $this->send_success_json($data);
     }
 
-    protected function get_articles_data(): array
+    /**
+     * @param \BetaKiller\Model\ContentCategoryInterface $category
+     * @param int|null                                   $page
+     * @param null|string                                $term
+     *
+     * @return array
+     * @throws \Kohana_Exception
+     */
+    protected function getArticlesData(ContentCategoryInterface $category, ?int $page = null, ?string $term = null): array
     {
-        $posts_data = [];
+        $postsData = [];
 
-        $page = (int)$this->query(self::PAGE_QUERY_KEY) ?: 1;
-        $term = $this->get_search_term();
+        $page = $page ?: 1;
 
-        $category = $this->get_category();
-        $results  = $this->get_articles($page, $category, $term);
+        $results  = $this->getArticles($page, $category, $this->getContextTerm() ?: $term);
 
         /** @var ContentPost[] $articles */
         $articles = $results->getItems();
@@ -67,7 +98,7 @@ class Widget_Content_ArticlesList extends AbstractBaseWidget
         foreach ($articles as $article) {
             $thumbnail = $article->getFirstThumbnail();
 
-            $posts_data[] = [
+            $postsData[] = [
                 'thumbnail'  => [
                     'original' => $this->assetsHelper->getAttributesForImgTag($thumbnail, $thumbnail::SIZE_ORIGINAL),
                     'preview'  => $this->assetsHelper->getAttributesForImgTag($thumbnail, $thumbnail::SIZE_PREVIEW),
@@ -93,27 +124,14 @@ class Widget_Content_ArticlesList extends AbstractBaseWidget
         }
 
         return [
-            'articles' => $posts_data,
+            'articles' => $postsData,
             'moreURL'  => $moreURL,
         ];
     }
 
-    protected function get_category()
+    protected function getContextTerm(): ?string
     {
-        if ($this->is_ajax()) {
-            $categoryID = (int)$this->query(self::CATEGORY_ID_QUERY_KEY);
-
-            $categoryRepo = $this->contentHelper->getCategoryRepository();
-
-            return $categoryRepo->findById($categoryID);
-        }
-
-        return $this->urlParametersHelper->getContentCategory();
-    }
-
-    protected function get_search_term(): string
-    {
-        return $this->getContextParam('term') ?: HTML::chars(strip_tags($this->query(self::SEARCH_TERM_QUERY_KEY)));
+        return $this->getContextParam('term');
     }
 
     /**
@@ -123,7 +141,7 @@ class Widget_Content_ArticlesList extends AbstractBaseWidget
      *
      * @return \BetaKiller\Search\SearchResultsInterface
      */
-    protected function get_articles($page, ContentCategory $category = null, $term = null): SearchResultsInterface
+    protected function getArticles($page, ContentCategory $category = null, $term = null): SearchResultsInterface
     {
         $postRepo = $this->contentHelper->getPostRepository();
 
