@@ -4,10 +4,10 @@ namespace BetaKiller\IFace;
 
 use BetaKiller\IFace\Url\CustomUrlBehaviourInterface;
 
-interface HasCustomUrlBehaviour
+interface HasCustomUrlBehaviourInterface
 {
     /**
      * @return CustomUrlBehaviourInterface
      */
-    public function get_custom_url_behaviour();
+    public function getCustomUrlBehaviour(): CustomUrlBehaviourInterface;
 }

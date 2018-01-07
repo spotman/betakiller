@@ -16,7 +16,7 @@ use HTTP;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 
-//use BetaKiller\IFace\HasCustomUrlBehaviour;
+//use BetaKiller\IFace\HasCustomUrlBehaviourInterface;
 
 class UrlDispatcher implements LoggerAwareInterface
 {
@@ -334,14 +334,14 @@ class UrlDispatcher implements LoggerAwareInterface
 //        $starter_iface = $this->createIFaceFromModel($iface_model);
 //
 //        // Check instance implements interface
-//        if (!($starter_iface  instanceof HasCustomUrlBehaviour))
+//        if (!($starter_iface  instanceof HasCustomUrlBehaviourInterface))
 //            throw new UrlDispatcherException('IFace :codename must implement :base', [
 //                ':codename' =>  $starter_iface->getCodename(),
-//                ':base'     =>  HasCustomUrlBehaviour::class,
+//                ':base'     =>  HasCustomUrlBehaviourInterface::class,
 //            ]);
 //
 //        // Getting custom behaviour instance
-//        $behaviour = $starter_iface->get_custom_url_behaviour();
+//        $behaviour = $starter_iface->getCustomUrlBehaviour();
 //
 //        // Pairs "iface codename" => "uri scheme"
 //        $behaviour->processCustomUrlBehaviour($it, $this->parameters());

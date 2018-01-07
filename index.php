@@ -125,6 +125,7 @@ catch (Exception $e)
         echo (PHP_SAPI === 'cli') ? $message : nl2br($message);
     } else {
         // Write to default log
+        /** @noinspection ForgottenDebugOutputInspection */
         error_log($message);
     }
     return;
