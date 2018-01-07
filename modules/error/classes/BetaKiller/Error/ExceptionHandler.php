@@ -110,11 +110,6 @@ class ExceptionHandler implements ExceptionHandlerInterface
             return null;
         }
 
-        // Если это не наследник Kohana_Exception, оборачиваем его, чтобы показать базовое сообщение об ошибке
-//        if (!($exception instanceof Kohana_Exception)) {
-//            $exception = new Kohana_Exception(':error', [':error' => $exception->getMessage()], $exception->getCode(), $exception);
-//        }
-
         $response = Response::factory();
         $httpCode = self::getHttpErrorCode($exception);
 
@@ -207,7 +202,7 @@ class ExceptionHandler implements ExceptionHandlerInterface
 
     public static function getErrorLabelI18nKey(\Throwable $e)
     {
-        $code = static::getHttpErrorCode($e);
+        $code = self::getHttpErrorCode($e);
 
         return static::getLabelI18nKeyForCode($code);
     }
