@@ -60,7 +60,7 @@ class Kohana_Exception extends Kohana_Kohana_Exception implements ExceptionInter
      *
      * @return \Response
      */
-    public static function _handler(Throwable $exception)
+    public static function _handler(Throwable $exception): \Response
     {
         // Use default Kohana handler as fallback
         if (!self::$exceptionHandler) {
