@@ -214,8 +214,10 @@ class ExceptionHandler implements ExceptionHandlerInterface
 
     private static function getHttpErrorCode(\Throwable $e)
     {
-        return ($e instanceof HttpExceptionInterface)
-            ? $e->getCode()
+        $code = $e->getCode();
+
+        return (($e instanceof HttpExceptionInterface) && $code)
+            ? $code
             : ExceptionInterface::DEFAULT_EXCEPTION_CODE;
     }
 
