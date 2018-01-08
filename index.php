@@ -60,21 +60,24 @@ define('DOCROOT', realpath(__DIR__).DIRECTORY_SEPARATOR);
 $application = realpath(DOCROOT.$application);
 
 if (!is_dir($application)) {
-    die('Application directory is not exists');
+    echo 'Application directory is not exists';
+    return;
 }
 
 // Make the modules relative to the docroot, for symlink'd index.php
 $modules = realpath(DOCROOT.$modules);
 
 if (!is_dir($modules)) {
-    die('Core modules directory is not exists');
+    echo 'Core modules directory is not exists';
+    return;
 }
 
 // Make the system relative to the docroot, for symlink'd index.php
 $system = realpath(DOCROOT.$system);
 
 if (!is_dir($system)) {
-    die('System directory is not exists');
+    echo 'System directory is not exists';
+    return;
 }
 
 // Define the absolute paths for configured directories
@@ -112,7 +115,7 @@ try
     // Bootstrap the application
     require APPPATH.'bootstrap.php';
 }
-catch (Exception $e)
+catch (Throwable $e)
 {
     ob_get_length() && ob_end_clean();
     http_response_code(500);
@@ -133,7 +136,10 @@ catch (Exception $e)
 
 if (PHP_SAPI === 'cli') // Try and load minion
 {
-    class_exists(\Minion_Task::class) OR die('Please enable the Minion module for CLI support.');
+    if (!class_exists(\Minion_Task::class)) {
+        echo 'Please enable the Minion module for CLI support.';
+        return;
+    }
 
     // Now we`re  using single exception handler for web and cli
     // set_exception_handler(array(\Minion_Exception::class, 'handler'));

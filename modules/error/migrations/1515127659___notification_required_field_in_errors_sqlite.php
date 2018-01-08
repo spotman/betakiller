@@ -1,4 +1,4 @@
-<?php defined('SYSPATH') or die('No direct access allowed.');
+<?php
 
 class Migration1515127659_Notification_Required_Field_In_Errors_Sqlite extends Migration {
 
