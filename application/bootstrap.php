@@ -5,15 +5,12 @@
 // Load the core Kohana class
 require SYSPATH.'classes/Kohana/Core'.EXT;
 
-if (is_file(APPPATH.'classes/Kohana'.EXT))
-{
-	// Application extends the core
-	require APPPATH.'classes/Kohana'.EXT;
-}
-else
-{
-	// Load empty core extension
-	require SYSPATH.'classes/Kohana'.EXT;
+if (is_file(APPPATH.'classes/Kohana'.EXT)) {
+    // Application extends the core
+    require APPPATH.'classes/Kohana'.EXT;
+} else {
+    // Load empty core extension
+    require SYSPATH.'classes/Kohana'.EXT;
 }
 
 /**
@@ -38,7 +35,7 @@ setlocale(LC_ALL, 'ru_RU.utf-8', 'ru');
  * @link http://kohanaframework.org/guide/using.autoloading
  * @link http://www.php.net/manual/function.spl-autoload-register
  */
-spl_autoload_register(array(\Kohana::class, 'auto_load'));
+spl_autoload_register([\Kohana::class, 'auto_load']);
 
 
 /**
@@ -47,8 +44,8 @@ spl_autoload_register(array(\Kohana::class, 'auto_load'));
 
 $vendor_autoload = DOCROOT.'vendor/autoload.php';
 
-if ( ! file_exists($vendor_autoload) ) {
-    die('Init Composer first');
+if (!file_exists($vendor_autoload)) {
+    throw new Exception('Init Composer first');
 }
 
 require_once $vendor_autoload;
@@ -70,19 +67,17 @@ ini_set('xdebug.max_nesting_level', 200);
 // -- Configuration and initialization -----------------------------------------
 
 // Import arguments in CLI mode
-if (PHP_SAPI === 'cli')
-{
+if (PHP_SAPI === 'cli') {
     // No short options
     $short_options = '';
 
-    $long_options  = array(
+    $long_options = [
         'stage::',    // Run CLI script in concrete stage
-    );
+    ];
 
     $cli_options = getopt($short_options, $long_options);
 
-    if (isset($cli_options['stage']))
-    {
+    if (isset($cli_options['stage'])) {
         // Store requested stage in environment var
         putenv('KOHANA_ENV='.$cli_options['stage']);
     }
@@ -101,7 +96,7 @@ Cookie::$salt = 'hd398gfhk75403lnvrfe8d10gg';
  */
 
 Kohana::$environment_string = strtolower(getenv('KOHANA_ENV') ?: 'development');
-Kohana::$environment = constant('Kohana::'.strtoupper(Kohana::$environment_string));
+Kohana::$environment        = constant('Kohana::'.strtoupper(Kohana::$environment_string));
 
 /**
  * Attach a file reader to config. Multiple readers are supported.

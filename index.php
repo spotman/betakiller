@@ -33,6 +33,7 @@ define('EXT', '.php');
 
 /**
  * Set the PHP error reporting level. If you set this in php.ini, you remove this.
+ *
  * @link http://www.php.net/manual/errorfunc.configuration#ini.error-reporting
  *
  * When developing your application, it is highly recommended to enable notices
@@ -61,6 +62,7 @@ $application = realpath(DOCROOT.$application);
 
 if (!is_dir($application)) {
     echo 'Application directory is not exists';
+
     return;
 }
 
@@ -69,6 +71,7 @@ $modules = realpath(DOCROOT.$modules);
 
 if (!is_dir($modules)) {
     echo 'Core modules directory is not exists';
+
     return;
 }
 
@@ -77,6 +80,7 @@ $system = realpath(DOCROOT.$system);
 
 if (!is_dir($system)) {
     echo 'System directory is not exists';
+
     return;
 }
 
@@ -88,42 +92,34 @@ define('SYSPATH', $system.DIRECTORY_SEPARATOR);
 // Clean up the configuration vars
 unset($application, $modules, $system);
 
-//if (file_exists('install'.EXT))
-//{
-//    // Load the installation check
-//    return include 'install'.EXT;
-//}
-
 /**
  * Define the start time of the application, used for profiling.
  */
-if ( ! defined('KOHANA_START_TIME'))
-{
-    define('KOHANA_START_TIME', microtime(TRUE));
+if (!defined('KOHANA_START_TIME')) {
+    define('KOHANA_START_TIME', microtime(true));
 }
 
 /**
  * Define the memory usage at the start of the application, used for profiling.
  */
-if ( ! defined('KOHANA_START_MEMORY'))
-{
+if (!defined('KOHANA_START_MEMORY')) {
     define('KOHANA_START_MEMORY', memory_get_usage());
 }
 
-try
-{
+try {
     // Bootstrap the application
     require APPPATH.'bootstrap.php';
-}
-catch (Throwable $e)
-{
+} catch (Throwable $e) {
     ob_get_length() && ob_end_clean();
     http_response_code(500);
 
-    $in_dev = class_exists(\Kohana::class) ? in_array(Kohana::$environment, [\Kohana::DEVELOPMENT, \Kohana::TESTING], true) : false;
+    $inDev = class_exists(\Kohana::class)
+        ? in_array(Kohana::$environment, [\Kohana::DEVELOPMENT, \Kohana::TESTING], true)
+        : false;
+
     $message = $e->getMessage().PHP_EOL.PHP_EOL.$e->getTraceAsString();
 
-    if ($in_dev) {
+    if ($inDev) {
         // Show to dev
         echo (PHP_SAPI === 'cli') ? $message : nl2br($message);
     } else {
@@ -131,6 +127,7 @@ catch (Throwable $e)
         /** @noinspection ForgottenDebugOutputInspection */
         error_log($message);
     }
+
     return;
 }
 
@@ -138,22 +135,18 @@ if (PHP_SAPI === 'cli') // Try and load minion
 {
     if (!class_exists(\Minion_Task::class)) {
         echo 'Please enable the Minion module for CLI support.';
+
         return;
     }
 
-    // Now we`re  using single exception handler for web and cli
-    // set_exception_handler(array(\Minion_Exception::class, 'handler'));
-
     Minion_Task::factory(Minion_CLI::options())->execute();
-}
-else
-{
+} else {
     /**
      * Execute the main request. A source of the URI can be passed, eg: $_SERVER['PATH_INFO'].
      * If no source is specified, the URI will be automatically detected.
      */
-    echo Request::factory(TRUE, array(), FALSE)
+    echo Request::factory(true, [], false)
         ->execute()
-        ->send_headers() // Allow multiple "Link" headers for HTTP2 Server Push feature
+        ->send_headers()// Allow multiple "Link" headers for HTTP2 Server Push feature
         ->body();
 }
