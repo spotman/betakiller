@@ -41,7 +41,7 @@ class AbstractStatusAclModelOrm extends \ORM implements StatusAclModelInterface
         $roles = [];
 
         foreach ($records as $record) {
-            $roles[] = $record->getRole()->get_name();
+            $roles[] = $record->getRole()->getName();
         }
 
         return $roles;

@@ -1311,17 +1311,17 @@ class Task_Content_Import_Wordpress extends AbstractTask
                 ->setEntityItemID($post->getID());
 
             $model
-                ->set_ip_address($authorIP)
-                ->set_user_agent($userAgent)
-                ->set_created_at($created_at);
+                ->setIpAddress($authorIP)
+                ->setUserAgent($userAgent)
+                ->setCreatedAt($created_at);
 
             // Detecting user by name
             $authorUser = $this->userRepository->searchBy($authorName);
 
             if ($authorUser) {
-                $model->set_author_user($authorUser);
+                $model->setAuthorUser($authorUser);
             } else {
-                $model->set_guest_author_name($authorName)->set_guest_author_email($authorEmail);
+                $model->setGuestAuthorName($authorName)->setGuestAuthorEmail($authorEmail);
             }
 
             $isApproved = ((int)$wpApproved === 1);
@@ -1329,16 +1329,16 @@ class Task_Content_Import_Wordpress extends AbstractTask
             $isTrash    = (mb_strtolower($wpApproved) === 'trash');
 
             if ($isSpam) {
-                $model->init_as_spam();
+                $model->initAsSpam();
             } elseif ($isTrash) {
-                $model->init_as_trash();
+                $model->initAsTrash();
             } elseif ($isApproved) {
-                $model->init_as_approved();
+                $model->initAsApproved();
             } else {
-                $model->init_as_pending();
+                $model->initAsPending();
             }
 
-            $model->set_message($message);
+            $model->setMessage($message);
 
             try {
                 $this->commentRepository->save($model);

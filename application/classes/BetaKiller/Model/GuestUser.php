@@ -10,7 +10,7 @@ class GuestUser extends User
     public function getAccessControlRoles()
     {
         return [
-            new Role(['name' => Role::GUEST_ROLE_NAME]),
+            new Role(['name' => RoleInterface::GUEST_ROLE_NAME]),
         ];
     }
 

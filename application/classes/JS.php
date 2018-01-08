@@ -2,8 +2,6 @@
 
 class JS
 {
-    use \BetaKiller\Utils\Instance\SingletonTrait;
-
     /**
      * @var \StaticJs
      */

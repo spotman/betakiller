@@ -73,10 +73,10 @@ trait OrmBasedEntityItemRelatedModelTrait
     }
 
     /**
-     * @return \BetaKiller\Model\DispatchableEntityInterface
+     * @return \BetaKiller\Model\RelatedEntityInterface
      * @throws \BetaKiller\Exception
      */
-    protected function getRelatedEntityInstance(): DispatchableEntityInterface
+    protected function getRelatedEntityInstance(): RelatedEntityInterface
     {
         if (!$this->linkedModel) {
             $id                = $this->getEntityItemID();

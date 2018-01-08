@@ -19,7 +19,7 @@ class CommentItem extends AbstractAdminBase
 
         return [
             'id'        =>  $model->getID(),
-            'message'   =>  $model->get_message(),
+            'message'   =>  $model->getMessage(),
         ];
     }
 }

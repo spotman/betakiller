@@ -14,7 +14,7 @@ class Model_ContentPostStatusTransition extends StatusTransitionModelOrm
     /**
      * @return string
      */
-    protected function get_node_model_name()
+    protected function getNodeModelName(): string
     {
         return 'ContentPostStatus';
     }

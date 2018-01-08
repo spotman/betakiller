@@ -4,59 +4,20 @@ namespace BetaKiller\Model;
 use BetaKiller\Utils\Kohana\TreeModelMultipleParentsInterface;
 use Spotman\Acl\AclRoleInterface;
 
-interface RoleInterface extends AclRoleInterface, TreeModelMultipleParentsInterface
+interface RoleInterface extends AbstractEntityInterface, AclRoleInterface, TreeModelMultipleParentsInterface
 {
     // Model_Auth_Role methods (nothing special)
 
     // Extended methods
+    public const DEVELOPER_ROLE_NAME = 'developer';
+    public const WRITER_ROLE_NAME    = 'writer';
+    public const MODERATOR_ROLE_NAME = 'moderator';
+    public const ADMIN_ROLE_NAME     = 'admin';
+    public const LOGIN_ROLE_NAME     = 'login';
+    public const GUEST_ROLE_NAME     = 'guest';
 
     /**
      * @return string
      */
-    public function get_name();
-
-    /**
-     * Ищет глобальную роль по её имени
-     *
-     * @param $name
-     * @return RoleInterface
-     */
-    public function get_by_name($name);
-
-    /**
-     * Returns filtered users relation
-     *
-     * @param bool $include_not_active
-     * @return UserInterface
-     */
-    public function get_users($include_not_active = false);
-
-    /**
-     * @return RoleInterface[]
-     */
-    public function get_all();
-
-    /**
-     * Returns "Developers" role object
-     *
-     * @return RoleInterface
-     */
-    public function get_developer_role();
-
-    /**
-     * Returns "Moderators" role object
-     *
-     * @return RoleInterface
-     */
-    public function get_moderator_role();
-
-    /**
-     * @return RoleInterface
-     */
-    public function get_guest_role();
-
-    /**
-     * @return RoleInterface
-     */
-    public function get_login_role();
+    public function getName(): string;
 }

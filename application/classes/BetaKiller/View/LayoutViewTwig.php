@@ -1,26 +1,69 @@
 <?php
 namespace BetaKiller\View;
 
-use BetaKiller\IFace\View\LayoutView;
-use Twig;
+use CSS;
+use JS;
 
 class LayoutViewTwig extends LayoutView
 {
     /**
-     * Using Twig layouts now
-     *
-     * @param $path
-     *
-     * @return Twig
+     * @var \JS
      */
-    protected function viewFactory(string $path): ViewInterface
+    private $js;
+
+    /**
+     * @var \CSS
+     */
+    private $css;
+
+    /**
+     * LayoutViewTwig constructor.
+     *
+     * @param \BetaKiller\View\ViewFactoryInterface $factory
+     * @param \JS                                   $js
+     * @param \CSS                                  $css
+     * @param \BetaKiller\View\HtmlHeadHelper       $headHelper
+     */
+    public function __construct(ViewFactoryInterface $factory, JS $js, CSS $css, HtmlHeadHelper $headHelper)
     {
-        return Twig::factory($path);
+        $this->js  = $js;
+        $this->css = $css;
+
+        parent::__construct($factory, $headHelper);
     }
 
-    public function getViewPath(): string
+    protected function getLayoutBasePath(): string
     {
         // Using Twig namespaces
-        return '@'.parent::getViewPath();
+        return '@layouts';
+    }
+
+    protected function getWrapperBasePath(): string
+    {
+        // Using Twig namespaces
+        return '@wrappers';
+    }
+
+    /**
+     * @param \BetaKiller\View\ViewInterface $ifaceView
+     *
+     * @return string
+     */
+    public function render(ViewInterface $ifaceView): string
+    {
+        $layoutPath = $this->getLayoutViewPath();
+
+        // Extend layout inside of IFace view via "extend" tag
+        return $this->wrap(
+            $ifaceView->set('layout', $layoutPath)->render()
+        );
+    }
+
+    protected function getWrapperData(): array
+    {
+        return parent::getWrapperData() + [
+                'js_all'  => $this->js->getAll(),
+                'css_all' => $this->css->getAll(),
+            ];
     }
 }

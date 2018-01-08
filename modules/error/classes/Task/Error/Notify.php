@@ -24,6 +24,13 @@ class Task_Error_Notify extends AbstractTask
      */
     private $ifaceHelper;
 
+    /**
+     * @param array $params
+     *
+     * @throws \BetaKiller\Notification\NotificationException
+     * @throws \BetaKiller\Repository\RepositoryException
+     * @throws \ORM_Validation_Exception
+     */
     protected function _execute(array $params)
     {
         // Repository returns filtered notifications
@@ -41,6 +48,10 @@ class Task_Error_Notify extends AbstractTask
 
     /**
      * @param \BetaKiller\Model\PhpExceptionModelInterface $model
+     *
+     * @throws \ORM_Validation_Exception
+     * @throws \BetaKiller\Notification\NotificationException
+     * @throws \BetaKiller\Repository\RepositoryException
      */
     private function notifyAboutException(PhpExceptionModelInterface $model): void
     {
@@ -52,14 +63,14 @@ class Task_Error_Notify extends AbstractTask
             'adminUrl' => $this->ifaceHelper->getReadEntityUrl($model, IFaceZone::ADMIN_ZONE),
         ];
 
-        $message = $this->notificationHelper->createMessage('developer/error/php-exception');
-
-        $this->notificationHelper->toDevelopers($message);
-
-        $message
+        $message = $this->notificationHelper
+            ->createMessage('developer/error/php-exception')
             ->setSubj('BetaKiller exception')
-            ->setTemplateData($data)
-            ->send();
+            ->setTemplateData($data);
+
+        $this->notificationHelper
+            ->toDevelopers($message)
+            ->send($message);
 
         // Saving last notification timestamp
         $model->setLastNotifiedAt(new DateTimeImmutable);

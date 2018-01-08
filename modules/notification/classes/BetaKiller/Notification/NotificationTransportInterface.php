@@ -1,7 +1,7 @@
 <?php
 namespace BetaKiller\Notification;
 
-interface TransportInterface
+interface NotificationTransportInterface
 {
     /**
      * @return string
@@ -19,7 +19,13 @@ interface TransportInterface
      * @param \BetaKiller\Notification\NotificationMessageInterface $message
      * @param \BetaKiller\Notification\NotificationUserInterface    $user
      *
+     * @param \BetaKiller\Notification\MessageRendererInterface     $renderer
+     *
      * @return int Number of messages sent
      */
-    public function send(NotificationMessageInterface $message, NotificationUserInterface $user): int;
+    public function send(
+        NotificationMessageInterface $message,
+        NotificationUserInterface $user,
+        MessageRendererInterface $renderer
+    ): int;
 }

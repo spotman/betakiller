@@ -9,7 +9,12 @@ use BetaKiller\Utils\Kohana\TreeModelSingleParentInterface;
  *
  * @package BetaKiller\Content
  */
-interface ContentCategoryInterface extends DispatchableEntityInterface, SeoMetaInterface, EntityHasWordpressIdInterface, TreeModelSingleParentInterface
+interface ContentCategoryInterface extends
+    DispatchableEntityInterface,
+    SeoMetaInterface,
+    EntityHasWordpressIdInterface,
+    TreeModelSingleParentInterface,
+    HasLabelInterface
 {
     /**
      * @param string $value

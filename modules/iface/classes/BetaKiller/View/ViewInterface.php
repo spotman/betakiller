@@ -5,14 +5,6 @@ namespace BetaKiller\View;
 interface ViewInterface
 {
     /**
-     * @param null       $file
-     * @param array|null $data
-     *
-     * @return \BetaKiller\View\ViewInterface
-     */
-    public static function factory($file = null, array $data = null);
-
-    /**
      * Sets a global variable, similar to [View::set], except that the
      * variable will be accessible to all views.
      *
@@ -170,7 +162,6 @@ interface ViewInterface
      * @param   string $file view filename
      *
      * @return  string
-     * @throws  \View_Exception
      * @uses    View::capture
      */
     public function render($file = null);

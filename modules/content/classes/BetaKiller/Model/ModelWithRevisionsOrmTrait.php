@@ -7,7 +7,6 @@ use DateTime;
 trait ModelWithRevisionsOrmTrait
 {
     /**
-     * @Inject
      * @var \BetaKiller\Model\UserInterface
      */
     private $user;
@@ -166,6 +165,14 @@ trait ModelWithRevisionsOrmTrait
     }
 
     /**
+     * @param \BetaKiller\Model\UserInterface $user
+     */
+    public function injectNewRevisionAuthor(UserInterface $user): void
+    {
+        $this->user = $user;
+    }
+
+    /**
      * Insert a new object to the database
      *
      * @param  \Validation $validation Validation object
@@ -207,6 +214,7 @@ trait ModelWithRevisionsOrmTrait
 
     /**
      * @return \BetaKiller\Model\RevisionModelInterface|null
+     * @throws \BetaKiller\Exception
      * @throws \HTTP_Exception_401
      */
     protected function createRevisionIfChanged(): ?RevisionModelInterface
@@ -219,13 +227,17 @@ trait ModelWithRevisionsOrmTrait
             return null;
         }
 
-        $id = $this->get_id();
+        $id = $this->getID();
 
         if (!$id) {
             throw new Exception('Can not link revision to related model without ID');
         }
 
         $user = $this->user;
+
+        if (!$user) {
+            throw new Exception('Inject revision author into model before saving');
+        }
 
         $user->forceAuthorization();
 

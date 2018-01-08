@@ -1,38 +1,21 @@
 <?php
 namespace BetaKiller\Model;
 
-use Kohana_Exception;
 use ORM;
 
 /**
- * Class Layout
+ * Class IFaceLayout
  *
  * @category   Models
  * @author     Spotman
- * @package    Betakiller
+ * @package    BetaKiller\IFace
  */
-class Layout extends ORM
+class IFaceLayout extends ORM implements LayoutInterface
 {
-    const LAYOUT_PUBLIC = 'public';
-    const LAYOUT_ADMIN = 'admin';
-
-    /**
-     * @return static
-     * @throws Kohana_Exception
-     */
-    public function get_default()
-    {
-        $default = $this->where('is_default', '=', true)->cached()->find();
-
-        if (!$default->loaded()) {
-            throw new Kohana_Exception('No default layout found; set it, please');
-        }
-
-        return $default;
-    }
-
     protected function _initialize()
     {
+        $this->_table_name = 'layouts';
+
         $this->has_many([
             'iface' => [
                 'model'       => 'IFace',
@@ -48,7 +31,7 @@ class Layout extends ORM
      *
      * @return bool
      */
-    public function is_default()
+    public function isDefault(): bool
     {
         return (bool)$this->get('is_default');
     }
@@ -58,7 +41,7 @@ class Layout extends ORM
      *
      * @return string
      */
-    public function get_codename()
+    public function getCodename(): string
     {
         return $this->get('codename');
     }
@@ -68,7 +51,7 @@ class Layout extends ORM
      *
      * @return string
      */
-    public function get_title()
+    public function getTitle(): string
     {
         return $this->get('title');
     }

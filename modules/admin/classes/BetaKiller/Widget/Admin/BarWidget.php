@@ -11,7 +11,7 @@ use BetaKiller\IFace\Widget\AbstractAdminWidget;
 use BetaKiller\Model\ContentPost;
 use BetaKiller\Model\DispatchableEntityInterface;
 use BetaKiller\Model\IFaceZone;
-use BetaKiller\Model\Layout;
+use BetaKiller\Model\LayoutInterface;
 use BetaKiller\Model\UserInterface;
 
 class BarWidget extends AbstractAdminWidget
@@ -62,7 +62,7 @@ class BarWidget extends AbstractAdminWidget
     {
         $currentIFace  = $this->ifaceHelper->getCurrentIFace();
         $currentLayout = $currentIFace ? $currentIFace->getLayoutCodename() : null;
-        $isAdminLayout = $currentLayout === Layout::LAYOUT_ADMIN;
+        $isAdminLayout = $currentLayout === LayoutInterface::LAYOUT_ADMIN;
 
         $entity = $this->detectPrimaryEntity();
 
@@ -201,8 +201,7 @@ class BarWidget extends AbstractAdminWidget
         ?DispatchableEntityInterface $entity,
         string $targetZone,
         string $targetAction
-    ): ?string
-    {
+    ): ?string {
         if (!$entity) {
             return null;
         }
@@ -216,8 +215,7 @@ class BarWidget extends AbstractAdminWidget
 
         try {
             return $this->ifaceHelper->getEntityUrl($entity, $targetAction, $targetZone);
-        }
-        /** @noinspection BadExceptionsProcessingInspection */
+        } /** @noinspection BadExceptionsProcessingInspection */
         catch (IFaceException $e) {
             // No IFace found for provided zone/action
             return null;

@@ -6,8 +6,7 @@ use BetaKiller\Utils;
 
 class FilterFactory
 {
-    use Utils\Factory\NamespacedFactoryTrait,
-        Utils\Instance\Simple;
+    use Utils\Factory\NamespacedFactoryTrait;
 
     /**
      * Factory method

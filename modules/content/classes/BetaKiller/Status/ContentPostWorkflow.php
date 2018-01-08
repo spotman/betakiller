@@ -48,14 +48,14 @@ class ContentPostWorkflow extends StatusWorkflow
      */
     public function draft()
     {
-        if ($this->model()->has_current_status()) {
+        if ($this->model()->hasCurrentStatus()) {
             throw new StatusWorkflowException('Can not mark post [:id] as draft coz it is in [:status] status', [
-                ':id'     => $this->model()->get_id(),
-                ':status' => $this->model()->get_current_status()->get_codename(),
+                ':id'     => $this->model()->getID(),
+                ':status' => $this->model()->getCurrentStatus()->getCodename(),
             ]);
         }
 
-        $this->model()->set_start_status();
+        $this->model()->getStartStatus();
     }
 
     /**
@@ -76,6 +76,11 @@ class ContentPostWorkflow extends StatusWorkflow
         }
     }
 
+    /**
+     * @throws \BetaKiller\Notification\NotificationException
+     * @throws \BetaKiller\Repository\RepositoryException
+     * @throws \Kohana_Exception
+     */
     private function notifyModeratorAboutCompletePost()
     {
         $message = $this->notificationHelper->createMessage('moderator/post/complete');
@@ -88,9 +93,9 @@ class ContentPostWorkflow extends StatusWorkflow
         ];
 
         $message->setTemplateData($data);
-        $this->notificationHelper->toModerators($message);
-
-        $message->send();
+        $this->notificationHelper
+            ->toModerators($message)
+            ->send($message);
     }
 
     /**
@@ -152,7 +157,7 @@ class ContentPostWorkflow extends StatusWorkflow
 
         if (!$label) {
             throw new StatusWorkflowException('Post [:id] must have uri or label before publishing', [
-                ':id' => $this->model()->get_id(),
+                ':id' => $this->model()->getID(),
             ]);
         }
 

@@ -1,6 +1,11 @@
 <?php
 namespace BetaKiller\Notification;
 
+/**
+ * Interface NotificationMessageInterface
+ *
+ * @package BetaKiller\Notification
+ */
 interface NotificationMessageInterface
 {
     /**
@@ -80,13 +85,6 @@ interface NotificationMessageInterface
     public function addAttachment(string $path): NotificationMessageInterface;
 
     /**
-     * Send current message via default notification instance
-     *
-     * @return int
-     */
-    public function send(): int;
-
-    /**
      * @param string $templateName
      *
      * @return NotificationMessageInterface
@@ -111,12 +109,15 @@ interface NotificationMessageInterface
     public function getTemplateData(): array;
 
     /**
-     * Render message for sending via provided transport
-     *
-     * @param \BetaKiller\Notification\TransportInterface        $transport
-     * @param \BetaKiller\Notification\NotificationUserInterface $user
-     *
      * @return string
+     * @throws \BetaKiller\Notification\NotificationException
      */
-    public function render(TransportInterface $transport, NotificationUserInterface $user): string;
+    public function getBaseI18nKey(): string;
+
+    /**
+     * @param \BetaKiller\Notification\NotificationUserInterface $targetUser
+     *
+     * @return array
+     */
+    public function getFullDataForTarget(NotificationUserInterface $targetUser): array;
 }

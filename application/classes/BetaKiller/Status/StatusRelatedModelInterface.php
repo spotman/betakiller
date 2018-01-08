@@ -11,7 +11,7 @@ interface StatusRelatedModelInterface extends AbstractEntityInterface
     /**
      * @return StatusModelInterface
      */
-    public function get_current_status();
+    public function getCurrentStatus();
 
     /**
      * @param \BetaKiller\Status\StatusModelInterface $target
@@ -19,14 +19,14 @@ interface StatusRelatedModelInterface extends AbstractEntityInterface
      * @return $this
      * @throws \BetaKiller\Status\StatusException
      */
-    public function change_status(StatusModelInterface $target);
+    public function changeStatus(StatusModelInterface $target);
 
     /**
      * @param \BetaKiller\Status\StatusTransitionModelInterface $transition
      *
      * @throws \BetaKiller\Status\StatusException
      */
-    public function do_status_transition(StatusTransitionModelInterface $transition): void;
+    public function doStatusTransition(StatusTransitionModelInterface $transition): void;
 
     /**
      * @param string $codename
@@ -34,43 +34,43 @@ interface StatusRelatedModelInterface extends AbstractEntityInterface
      *
      * @return bool
      */
-    public function is_status_transition_allowed(string $codename, UserInterface $user): bool;
+    public function isStatusTransitionAllowed(string $codename, UserInterface $user): bool;
 
     /**
      * @return StatusTransitionModelInterface[]
      */
-    public function get_source_transitions();
+    public function getSourceTransitions();
 
     /**
      * @return StatusTransitionModelInterface[]
      */
-    public function get_target_transitions();
-
-    /**
-     * @param \BetaKiller\Model\UserInterface $user
-     *
-     * @return StatusTransitionModelInterface[]
-     */
-    public function get_allowed_source_transitions(UserInterface $user);
+    public function getTargetTransitions();
 
     /**
      * @param \BetaKiller\Model\UserInterface $user
      *
      * @return StatusTransitionModelInterface[]
      */
-    public function get_allowed_target_transitions(UserInterface $user);
+    public function getAllowedSourceTransitions(UserInterface $user);
+
+    /**
+     * @param \BetaKiller\Model\UserInterface $user
+     *
+     * @return StatusTransitionModelInterface[]
+     */
+    public function getAllowedTargetTransitions(UserInterface $user);
 
     /**
      * @param \BetaKiller\Model\UserInterface $user
      *
      * @return string[]
      */
-    public function get_allowed_target_transitions_codenames(UserInterface $user);
+    public function getAllowedTargetTransitionsCodenames(UserInterface $user);
 
     /**
      * @return $this
      */
-    public function set_start_status();
+    public function getStartStatus();
 
     /**
      * @param integer $status_id
@@ -80,7 +80,7 @@ interface StatusRelatedModelInterface extends AbstractEntityInterface
      * @deprecated
      * @todo Move to repo
      */
-    public function filter_status_id($status_id, $not_equal = false);
+    public function filterStatusID($status_id, $not_equal = false);
 
     /**
      * @param StatusModelInterface $status
@@ -90,7 +90,7 @@ interface StatusRelatedModelInterface extends AbstractEntityInterface
      * @deprecated
      * @todo Move to repo
      */
-    public function filter_status(StatusModelInterface $status, $not_equal = false);
+    public function filterStatus(StatusModelInterface $status, $not_equal = false);
 
     /**
      * @param int[] $status_ids
@@ -100,22 +100,22 @@ interface StatusRelatedModelInterface extends AbstractEntityInterface
      * @deprecated
      * @todo Move to repo
      */
-    public function filter_statuses(array $status_ids, $not_equal = false);
+    public function filterStatuses(array $status_ids, $not_equal = false);
 
     /**
      * @return int
      */
-    public function get_status_id();
+    public function getStatusID();
 
     /**
      * @return bool
      */
-    public function has_current_status();
+    public function hasCurrentStatus();
 
     /**
      * @param int|NULL $id
      *
      * @return StatusModelOrm|\BetaKiller\Utils\Kohana\ORM\OrmInterface
      */
-    public function status_model_factory($id = null);
+    public function statusModelFactory($id = null);
 }

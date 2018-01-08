@@ -6,71 +6,71 @@ interface GraphNodeModelInterface
     /**
      * @return int
      */
-    public function get_id();
+    public function getID();
 
     /**
      * @return string
      */
-    public function get_codename();
+    public function getCodename(): string;
 
     /**
      * @param string $value
      *
-     * @return $this
+     * @return void
      */
-    public function set_codename($value);
+    public function setCodename(string $value): void;
 
     /**
      * @return string
      */
-    public function get_label();
+    public function getLabel(): string;
 
     /**
      * @param string $value
      *
-     * @return $this
+     * @return void
      */
-    public function set_label($value);
+    public function setLabel(string $value): void;
 
     /**
      * @return NULL|GraphNodeModelInterface
      */
-    public function get_start_node();
+    public function getStartNode();
 
     /**
      * @return NULL|GraphNodeModelInterface
      */
-    public function get_finish_node();
+    public function getFinishNode();
 
     /**
      * @return $this
      */
-    public function filter_start();
+    public function filterStart();
 
     /**
      * @return $this
      */
-    public function filter_finish();
+    public function filterFinish();
 
     /**
      * @return bool
      */
-    public function is_start();
+    public function isStart(): bool;
 
     /**
      * @return bool
      */
-    public function is_finish();
+    public function isFinish(): bool;
 
     /**
      * @return GraphNodeModelInterface[]
      */
-    public function get_source_nodes();
+    public function getSourceNodes(): array;
 
     /**
      * @return GraphNodeModelInterface[]
      */
-    public function get_target_nodes();
+    public function getTargetNodes(): array;
 
     /**
      * @param GraphNodeModelInterface|NULL $source
@@ -78,17 +78,17 @@ interface GraphNodeModelInterface
      *
      * @return GraphTransitionModelInterface[]
      */
-    public function get_transitions(GraphNodeModelInterface $source = NULL, GraphNodeModelInterface $target = NULL);
+    public function getTransitions(GraphNodeModelInterface $source = NULL, GraphNodeModelInterface $target = NULL): array;
 
     /**
      * @return GraphTransitionModelInterface[]
      */
-    public function get_source_transitions();
+    public function getSourceTransitions(): array;
 
     /**
      * @return GraphTransitionModelInterface[]
      */
-    public function get_target_transitions();
+    public function getTargetTransitions(): array;
 
     /**
      * @param GraphNodeModelInterface $source
@@ -96,24 +96,24 @@ interface GraphNodeModelInterface
      *
      * @return bool
      */
-    public function transition_exists(GraphNodeModelInterface $source, GraphNodeModelInterface $target);
+    public function transitionExists(GraphNodeModelInterface $source, GraphNodeModelInterface $target): bool;
 
     /**
      * @param GraphNodeModelInterface $source
      *
      * @return bool
      */
-    public function has_source(GraphNodeModelInterface $source);
+    public function hasSource(GraphNodeModelInterface $source): bool;
 
     /**
      * @param GraphNodeModelInterface $target
      *
      * @return bool
      */
-    public function has_target(GraphNodeModelInterface $target);
+    public function hasTarget(GraphNodeModelInterface $target): bool;
 
     /**
      * @return GraphNodeModelInterface[]
      */
-    public function get_all_nodes();
+    public function getAllNodes(): array;
 }

@@ -1,21 +1,21 @@
 <?php
 namespace BetaKiller\Status;
 
-use BetaKiller\Graph\GraphTransitionModelOrm;
+use BetaKiller\Graph\AbstractGraphTransitionModelOrm;
 use BetaKiller\Model\Role;
 use BetaKiller\Model\RoleInterface;
 use BetaKiller\Model\UserInterface;
 
-abstract class StatusTransitionModelOrm extends GraphTransitionModelOrm implements StatusTransitionModelInterface
+abstract class StatusTransitionModelOrm extends AbstractGraphTransitionModelOrm implements StatusTransitionModelInterface
 {
     protected function _initialize()
     {
         $this->has_many([
-            $this->get_roles_relation_key() => [
+            $this->getRolesRelationKey() => [
                 'model'       => 'Role',
-                'foreign_key' => $this->get_roles_relation_foreign_key(),
-                'far_key'     => $this->get_roles_relation_far_key(),
-                'through'     => $this->get_roles_relation_through_table_name(),
+                'foreign_key' => $this->getRolesRelationForeignKey(),
+                'far_key'     => $this->getRolesRelationFarKey(),
+                'through'     => $this->getRolesRelationThroughTableName(),
             ],
         ]);
 
@@ -27,13 +27,13 @@ abstract class StatusTransitionModelOrm extends GraphTransitionModelOrm implemen
      *
      * @return $this
      */
-    public function filter_allowed_by_acl(UserInterface $user)
+    public function filterAllowedByAcl(UserInterface $user)
     {
-        $through_table = $this->get_roles_relation_through_table_name();
+        $through_table = $this->getRolesRelationThroughTableName();
 
         $primary_key = $this->object_primary_key();
-        $foreign_key = $through_table.'.'.$this->get_roles_relation_foreign_key();
-        $far_key     = $through_table.'.'.$this->get_roles_relation_far_key();
+        $foreign_key = $through_table.'.'.$this->getRolesRelationForeignKey();
+        $far_key     = $through_table.'.'.$this->getRolesRelationFarKey();
 
         // inner join ACL table + where role_id in ($user->getAllUserRolesIDs())
         return $this
@@ -42,12 +42,12 @@ abstract class StatusTransitionModelOrm extends GraphTransitionModelOrm implemen
             ->where($far_key, 'IN', $user->getAllUserRolesIDs());
     }
 
-    public function add_role(RoleInterface $role)
+    public function addRole(RoleInterface $role)
     {
         return $this->add('roles', $role);
     }
 
-    public function remove_role(RoleInterface $role)
+    public function removeRole(RoleInterface $role)
     {
         return $this->remove('roles', $role);
     }
@@ -59,7 +59,7 @@ abstract class StatusTransitionModelOrm extends GraphTransitionModelOrm implemen
      */
     public function getTransitionAllowedRoles()
     {
-        return $this->get_roles_relation()->get_all();
+        return $this->getRolesRelation()->get_all();
     }
 
     /**
@@ -70,7 +70,7 @@ abstract class StatusTransitionModelOrm extends GraphTransitionModelOrm implemen
         $roles = [];
 
         foreach ($this->getTransitionAllowedRoles() as $role) {
-            $roles[] = $role->get_name();
+            $roles[] = $role->getName();
         }
 
         return $roles;
@@ -79,7 +79,7 @@ abstract class StatusTransitionModelOrm extends GraphTransitionModelOrm implemen
     /**
      * @return string
      */
-    protected function get_roles_relation_through_table_name()
+    protected function getRolesRelationThroughTableName(): string
     {
         return $this->table_name().'_acl';
     }
@@ -87,7 +87,7 @@ abstract class StatusTransitionModelOrm extends GraphTransitionModelOrm implemen
     /**
      * @return string
      */
-    protected function get_roles_relation_key()
+    protected function getRolesRelationKey(): string
     {
         return 'roles';
     }
@@ -95,7 +95,7 @@ abstract class StatusTransitionModelOrm extends GraphTransitionModelOrm implemen
     /**
      * @return string
      */
-    protected function get_roles_relation_foreign_key()
+    protected function getRolesRelationForeignKey(): string
     {
         return 'transition_id';
     }
@@ -103,7 +103,7 @@ abstract class StatusTransitionModelOrm extends GraphTransitionModelOrm implemen
     /**
      * @return string
      */
-    protected function get_roles_relation_far_key()
+    protected function getRolesRelationFarKey(): string
     {
         return 'role_id';
     }
@@ -111,8 +111,8 @@ abstract class StatusTransitionModelOrm extends GraphTransitionModelOrm implemen
     /**
      * @return \BetaKiller\Model\Role
      */
-    protected function get_roles_relation(): Role
+    protected function getRolesRelation(): Role
     {
-        return $this->get($this->get_roles_relation_key());
+        return $this->get($this->getRolesRelationKey());
     }
 }

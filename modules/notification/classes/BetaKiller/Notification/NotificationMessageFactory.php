@@ -1,25 +1,8 @@
 <?php
 namespace BetaKiller\Notification;
 
-use BetaKiller\DI\ContainerInterface;
-
 class NotificationMessageFactory
 {
-    /**
-     * @var \BetaKiller\DI\ContainerInterface
-     */
-    private $container;
-
-    /**
-     * NotificationMessageFactory constructor.
-     *
-     * @param \BetaKiller\DI\ContainerInterface $container
-     */
-    public function __construct(ContainerInterface $container)
-    {
-        $this->container = $container;
-    }
-
     /**
      * @param string|null $name
      *
@@ -27,8 +10,7 @@ class NotificationMessageFactory
      */
     public function create(string $name = null): NotificationMessageInterface
     {
-        /** @var NotificationMessageInterface $instance */
-        $instance = $this->container->get(NotificationMessageInterface::class);
+        $instance = new NotificationMessage;
 
         if ($name) {
             $instance->setTemplateName($name);

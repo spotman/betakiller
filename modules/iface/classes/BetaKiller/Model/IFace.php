@@ -18,7 +18,7 @@ class IFace extends TreeModelSingleParentOrm implements IFaceModelInterface
     {
         $this->belongs_to([
             'layout' => [
-                'model'       => 'Layout',
+                'model'       => 'IFaceLayout',
                 'foreign_key' => 'layout_id',
             ],
         ]);
@@ -46,7 +46,7 @@ class IFace extends TreeModelSingleParentOrm implements IFaceModelInterface
 
         $this->has_many([
             'aclRules' => [
-                'model' => 'IFaceAclRule',
+                'model'       => 'IFaceAclRule',
                 'foreign_key' => 'iface_id',
             ],
         ]);
@@ -151,15 +151,16 @@ class IFace extends TreeModelSingleParentOrm implements IFaceModelInterface
     /**
      * Returns layout model
      *
-     * @return Layout
+     * @return IFaceLayout
      */
-    private function getLayoutRelation(): Layout
+    private function getLayoutRelation(): IFaceLayout
     {
         return $this->get('layout');
     }
 
     /**
      * Returns layout codename
+     * Allow null layout so it will be detected via climbing up the IFaces tree
      *
      * @return string
      */
@@ -167,12 +168,7 @@ class IFace extends TreeModelSingleParentOrm implements IFaceModelInterface
     {
         $layout = $this->getLayoutRelation();
 
-        // TODO Allow null layout so it will climb up the ifaces tree to detect layout (if it fails then exception fired)
-        if (!$layout->loaded()) {
-            $layout = $layout->get_default();
-        }
-
-        return $layout->get_codename();
+        return $layout->loaded() ? $layout->getCodename() : null;
     }
 
     /**
@@ -247,6 +243,7 @@ class IFace extends TreeModelSingleParentOrm implements IFaceModelInterface
     public function getEntityActionName(): ?string
     {
         $entityAction = $this->getEntityActionRelation();
+
         return $entityAction->loaded() ? $entityAction->getName() : null;
     }
 
@@ -268,7 +265,7 @@ class IFace extends TreeModelSingleParentOrm implements IFaceModelInterface
     public function getAdditionalAclRules(): array
     {
         /** @var \BetaKiller\Model\IFaceAclRule[] $rules */
-        $rules = $this->getAclRulesRelation()->get_all();
+        $rules  = $this->getAclRulesRelation()->get_all();
         $output = [];
 
         foreach ($rules as $rule) {

@@ -20,7 +20,7 @@ class Model_ContentPostStatus extends StatusModelOrm
     /**
      * @return string
      */
-    protected function get_related_model_key(): string
+    protected function getRelatedModelKey(): string
     {
         return 'status';
     }
@@ -28,7 +28,7 @@ class Model_ContentPostStatus extends StatusModelOrm
     /**
      * @return string
      */
-    protected function get_related_model_name(): string
+    protected function getRelatedModelName(): string
     {
         return 'ContentPost';
     }
@@ -36,7 +36,7 @@ class Model_ContentPostStatus extends StatusModelOrm
     /**
      * @return string
      */
-    protected function get_transition_model_name()
+    protected function getTransitionModelName(): string
     {
         return 'ContentPostStatusTransition';
     }
@@ -44,7 +44,7 @@ class Model_ContentPostStatus extends StatusModelOrm
     /**
      * @return string
      */
-    protected function get_related_model_fk(): string
+    protected function getRelatedModelFk(): string
     {
         return 'post_id';
     }

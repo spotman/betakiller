@@ -1,7 +1,7 @@
 <?php
 namespace BetaKiller\Acl\Resource;
 
-use BetaKiller\Model\Role;
+use BetaKiller\Model\RoleInterface;
 
 class ContentPostResource extends AbstractStatusRelatedEntityAclResource
 {
@@ -13,10 +13,10 @@ class ContentPostResource extends AbstractStatusRelatedEntityAclResource
     protected function getCreatePermissionRoles(): array
     {
         return [
-            Role::ADMIN_ROLE_NAME,
-            Role::MODERATOR_ROLE_NAME,
-            Role::DEVELOPER_ROLE_NAME,
-            Role::WRITER_ROLE_NAME,
+            RoleInterface::ADMIN_ROLE_NAME,
+            RoleInterface::MODERATOR_ROLE_NAME,
+            RoleInterface::DEVELOPER_ROLE_NAME,
+            RoleInterface::WRITER_ROLE_NAME,
         ];
     }
 
@@ -28,7 +28,7 @@ class ContentPostResource extends AbstractStatusRelatedEntityAclResource
     protected function getListPermissionRoles(): array
     {
         return [
-            Role::GUEST_ROLE_NAME,
+            RoleInterface::GUEST_ROLE_NAME,
         ];
     }
 
@@ -40,7 +40,7 @@ class ContentPostResource extends AbstractStatusRelatedEntityAclResource
     protected function getSearchPermissionRoles(): array
     {
         return [
-            Role::GUEST_ROLE_NAME,
+            RoleInterface::GUEST_ROLE_NAME,
         ];
     }
 }

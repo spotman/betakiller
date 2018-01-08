@@ -39,4 +39,9 @@ interface ModelWithRevisionsInterface
      * @return bool
      */
     public function hasPendingRevisions(): bool;
+
+    /**
+     * @param \BetaKiller\Model\UserInterface $user
+     */
+    public function injectNewRevisionAuthor(UserInterface $user): void;
 }

@@ -1,13 +1,13 @@
 <?php
 namespace BetaKiller\Search\Provider\Parameterized\Parameter;
 
-use BetaKiller\Utils;
 use BetaKiller\Model;
+use BetaKiller\Utils;
 
-abstract class Factory {
+abstract class Factory
+{
 
-    use Utils\Instance\Simple,
-        Utils\Factory\NamespacedFactoryTrait;
+    use Utils\Factory\NamespacedFactoryTrait;
 
     /**
      * @param string     $name
@@ -15,7 +15,7 @@ abstract class Factory {
      *
      * @return \BetaKiller\Search\Provider\Parameterized\ParameterInterface
      */
-    public function create($name, Model\User $user = NULL)
+    public function create($name, Model\User $user = null)
     {
         return $this->_create($name, $user);
     }
@@ -26,7 +26,7 @@ abstract class Factory {
      *
      * @return \BetaKiller\Search\Provider\Parameterized\ParameterInterface
      */
-    protected function make_instance($class_name, Model\User $user = NULL)
+    protected function make_instance($class_name, Model\User $user = null)
     {
         return new $class_name($user);
     }

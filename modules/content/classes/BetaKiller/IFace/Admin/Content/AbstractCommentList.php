@@ -39,7 +39,7 @@ abstract class AbstractCommentList extends AbstractAdminBase
 
     protected function get_comment_data(ContentCommentInterface $comment)
     {
-        $status = $comment->get_current_status();
+        $status = $comment->getCurrentStatus();
 
         return [
             'id'           => $comment->getID(),
@@ -47,19 +47,19 @@ abstract class AbstractCommentList extends AbstractAdminBase
             'editURL'      => $this->ifaceHelper->getReadEntityUrl($comment), // Get admin URL via related model
             'contentLabel' => $comment->getRelatedContentLabel(),
             'author'       => [
-                'isGuest' => $comment->author_is_guest(),
-                'name'    => $comment->get_author_name(),
-                'email'   => $comment->get_author_email(),
-                'ip'      => $comment->get_ip_address(),
-                'agent'   => $comment->get_user_agent(),
+                'isGuest' => $comment->authorIsGuest(),
+                'name'    => $comment->getAuthorName(),
+                'email'   => $comment->getAuthorEmail(),
+                'ip'      => $comment->getIpAddress(),
+                'agent'   => $comment->getUserAgent(),
             ],
             'status'       => [
-                'id'          => $status->get_id(),
-                'codename'    => $status->get_codename(),
-                'transitions' => $status->get_allowed_target_transitions_codename_array($this->user),
+                'id'          => $status->getID(),
+                'codename'    => $status->getCodename(),
+                'transitions' => $status->getAllowedTargetTransitionsCodenameArray($this->user),
             ],
-            'message'      => $comment->get_message(),
-            'preview'      => \Text::limit_chars($comment->get_message(), 300, null, true),
+            'message'      => $comment->getMessage(),
+            'preview'      => \Text::limit_chars($comment->getMessage(), 300, null, true),
         ];
     }
 }

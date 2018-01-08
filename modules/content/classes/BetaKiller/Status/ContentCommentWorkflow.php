@@ -5,6 +5,7 @@ use BetaKiller\Helper\IFaceHelper;
 use BetaKiller\Helper\NotificationHelper;
 use BetaKiller\Model\ContentComment;
 use BetaKiller\Model\UserInterface;
+use BetaKiller\Service\UserService;
 use Model_ContentCommentStatusTransition;
 
 class ContentCommentWorkflow extends StatusWorkflow
@@ -20,23 +21,31 @@ class ContentCommentWorkflow extends StatusWorkflow
     private $ifaceHelper;
 
     /**
+     * @var \BetaKiller\Service\UserService
+     */
+    private $userService;
+
+    /**
      * ContentCommentWorkflow constructor.
      *
      * @param \BetaKiller\Status\StatusRelatedModelInterface $model
      * @param \BetaKiller\Model\UserInterface                $user
      * @param \BetaKiller\Helper\NotificationHelper          $notificationHelper
      * @param \BetaKiller\Helper\IFaceHelper                 $ifaceHelper
+     * @param \BetaKiller\Service\UserService                $service
      */
     public function __construct(
         StatusRelatedModelInterface $model,
         UserInterface $user,
         NotificationHelper $notificationHelper,
-        IFaceHelper $ifaceHelper
+        IFaceHelper $ifaceHelper,
+        UserService $service
     ) {
         parent::__construct($model, $user);
 
         $this->notificationHelper = $notificationHelper;
         $this->ifaceHelper        = $ifaceHelper;
+        $this->userService        = $service;
     }
 
     /**
@@ -44,14 +53,14 @@ class ContentCommentWorkflow extends StatusWorkflow
      */
     public function draft(): void
     {
-        if ($this->model()->has_current_status()) {
+        if ($this->model()->hasCurrentStatus()) {
             throw new StatusWorkflowException('Can not mark comment [:id] as draft coz it is in [:status] status', [
                 ':id'     => $this->model()->getID(),
-                ':status' => $this->model()->get_current_status()->get_codename(),
+                ':status' => $this->model()->getCurrentStatus()->getCodename(),
             ]);
         }
 
-        $this->model()->set_start_status();
+        $this->model()->getStartStatus();
     }
 
     /**
@@ -63,6 +72,8 @@ class ContentCommentWorkflow extends StatusWorkflow
     }
 
     /**
+     * @throws \BetaKiller\Notification\NotificationException
+     * @throws \BetaKiller\Exception
      * @throws \BetaKiller\Status\StatusException
      * @throws \HTTP_Exception_501
      */
@@ -73,28 +84,35 @@ class ContentCommentWorkflow extends StatusWorkflow
         $comment = $this->model();
 
         // Notify comment author
-        $this->notify_comment_author_about_approve($comment);
+        $this->notifyCommentAuthorAboutApprove($comment);
 
         // Notify parent comment author
-        $this->notify_parent_comment_author_about_reply($comment);
+        $this->notifyParentCommentAuthorAboutReply($comment);
     }
 
-    protected function notify_comment_author_about_approve(ContentComment $comment)
+    /**
+     * @param \BetaKiller\Model\ContentComment $comment
+     *
+     * @throws \BetaKiller\Exception
+     * @throws \BetaKiller\Notification\NotificationException
+     * @throws \BetaKiller\Repository\RepositoryException
+     */
+    protected function notifyCommentAuthorAboutApprove(ContentComment $comment)
     {
-        $authorUser = $comment->get_author_user();
+        $authorUser = $comment->getAuthorUser();
 
         // Skip notification for moderators
-        if ($authorUser && $authorUser->isModerator()) {
+        if ($authorUser && $this->userService->isModerator($authorUser)) {
             return;
         }
 
-        $email = $comment->get_author_email();
-        $name  = $comment->get_author_name();
+        $email = $comment->getAuthorEmail();
+        $name  = $comment->getAuthorName();
 
         $data = [
             'name'       => $name,
             'url'        => $comment->getPublicReadUrl($this->ifaceHelper),
-            'created_at' => $comment->get_created_at()->format('H:i:s d.m.Y'),
+            'created_at' => $comment->getCreatedAt()->format('H:i:s d.m.Y'),
             'label'      => $comment->getRelatedContentLabel(),
         ];
 
@@ -103,15 +121,18 @@ class ContentCommentWorkflow extends StatusWorkflow
             ->setTemplateData($data)
             ->addTargetEmail($email, $name);
 
-        $this->notificationHelper->rewriteTargetsForDebug($message);
-
-        $message->send();
+        $this->notificationHelper
+            ->rewriteTargetsForDebug($message)
+            ->send($message);
     }
 
     /**
      * @param \BetaKiller\Model\ContentComment $reply
+     *
+     * @throws \BetaKiller\Notification\NotificationException
+     * @throws \BetaKiller\Repository\RepositoryException
      */
-    protected function notify_parent_comment_author_about_reply(ContentComment $reply)
+    protected function notifyParentCommentAuthorAboutReply(ContentComment $reply)
     {
         $parent = $reply->getParent();
 
@@ -120,19 +141,19 @@ class ContentCommentWorkflow extends StatusWorkflow
             return;
         }
 
-        $replyEmail  = $reply->get_author_email();
-        $parentEmail = $parent->get_author_email();
+        $replyEmail  = $reply->getAuthorEmail();
+        $parentEmail = $parent->getAuthorEmail();
 
         // Skip if parent comment email is equal to reply email
         if ($replyEmail === $parentEmail) {
             return;
         }
 
-        $parentName = $parent->get_author_name();
+        $parentName = $parent->getAuthorName();
 
         $data = [
             'url'        => $reply->getPublicReadUrl($this->ifaceHelper),
-            'created_at' => $reply->get_created_at()->format('H:i:s d.m.Y'),
+            'created_at' => $reply->getCreatedAt()->format('H:i:s d.m.Y'),
             'label'      => $reply->getRelatedContentLabel(),
         ];
 
@@ -141,9 +162,9 @@ class ContentCommentWorkflow extends StatusWorkflow
             ->setTemplateData($data)
             ->addTargetEmail($parentEmail, $parentName);
 
-        $this->notificationHelper->rewriteTargetsForDebug($message);
-
-        $message->send();
+        $this->notificationHelper
+            ->rewriteTargetsForDebug($message)
+            ->send($message);
     }
 
     /**

@@ -11,21 +11,21 @@ interface StatusTransitionModelInterface extends GraphTransitionModelInterface
      * @param \BetaKiller\Model\UserInterface $user
      * @return $this
      */
-    public function filter_allowed_by_acl(UserInterface $user);
+    public function filterAllowedByAcl(UserInterface $user);
 
     /**
      * @param \BetaKiller\Model\RoleInterface $role
      *
      * @return $this
      */
-    public function add_role(RoleInterface $role);
+    public function addRole(RoleInterface $role);
 
     /**
      * @param \BetaKiller\Model\RoleInterface $role
      *
      * @return $this
      */
-    public function remove_role(RoleInterface $role);
+    public function removeRole(RoleInterface $role);
 
     /**
      * @return string[]

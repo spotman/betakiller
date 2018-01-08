@@ -72,7 +72,7 @@ class PostItem extends AbstractAdminBase
         // Edit latest revision data
         $post->useLatestRevision();
 
-        $status = $post->get_current_status();
+        $status = $post->getCurrentStatus();
 
         $updateAllowed = $this->aclHelper->isEntityActionAllowed($post, CrudlsActionsInterface::ACTION_UPDATE);
 
@@ -89,9 +89,9 @@ class PostItem extends AbstractAdminBase
                 'isUpdateAllowed' => $updateAllowed,
 
                 'status' => [
-                    'id'          => $status->get_id(),
-                    'codename'    => $status->get_codename(),
-                    'transitions' => $status->get_allowed_target_transitions_codename_array($this->user),
+                    'id'          => $status->getID(),
+                    'codename'    => $status->getCodename(),
+                    'transitions' => $status->getAllowedTargetTransitionsCodenameArray($this->user),
                 ],
 
                 'thumbnails' => $thumbnails,

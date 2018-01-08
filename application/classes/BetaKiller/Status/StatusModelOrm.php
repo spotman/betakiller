@@ -1,12 +1,12 @@
 <?php
 namespace BetaKiller\Status;
 
+use BetaKiller\Graph\AbstractGraphNodeModelOrm;
 use BetaKiller\Graph\GraphNodeModelInterface;
-use BetaKiller\Graph\GraphNodeModelOrm;
 use BetaKiller\Graph\GraphTransitionModelInterface;
 use BetaKiller\Model\UserInterface;
 
-abstract class StatusModelOrm extends GraphNodeModelOrm implements StatusModelInterface
+abstract class StatusModelOrm extends AbstractGraphNodeModelOrm implements StatusModelInterface
 {
     protected const STATUS_ACL_RELATION_KEY = 'status_acl';
 
@@ -16,9 +16,9 @@ abstract class StatusModelOrm extends GraphNodeModelOrm implements StatusModelIn
     protected function _initialize()
     {
         $this->has_many([
-            $this->get_related_model_key() => [
-                'model'       => $this->get_related_model_name(),
-                'foreign_key' => $this->get_related_model_fk(),
+            $this->getRelatedModelKey() => [
+                'model'       => $this->getRelatedModelName(),
+                'foreign_key' => $this->getRelatedModelFk(),
             ],
         ]);
 
@@ -38,18 +38,18 @@ abstract class StatusModelOrm extends GraphNodeModelOrm implements StatusModelIn
      * @return int
      * @throws \Kohana_Exception
      */
-    public function get_related_count(): int
+    public function getRelatedCount(): int
     {
-        return $this->get_related_model_relation()->count_all();
+        return $this->getRelatedModelRelation()->count_all();
     }
 
     /**
      * @return StatusRelatedModelInterface[]
      * @throws \Kohana_Exception
      */
-    public function get_related_list(): array
+    public function getRelatedList(): array
     {
-        return $this->get_related_model_relation()->get_all();
+        return $this->getRelatedModelRelation()->get_all();
     }
 
     /**
@@ -57,23 +57,27 @@ abstract class StatusModelOrm extends GraphNodeModelOrm implements StatusModelIn
      *
      * @return StatusTransitionModelOrm|\BetaKiller\Utils\Kohana\ORM\OrmInterface
      */
-    protected function transition_model_factory($id = null)
+    protected function transitionModelFactory($id = null)
     {
-        return parent::transition_model_factory($id);
+        return parent::transitionModelFactory($id);
     }
 
     /**
      * Returns list of transitions allowed by ACL for current user
      *
      * @param \BetaKiller\Model\UserInterface $user
-     * @param GraphNodeModelInterface|null $source
-     * @param GraphNodeModelInterface|null $target
+     * @param GraphNodeModelInterface|null    $source
+     * @param GraphNodeModelInterface|null    $target
      *
      * @return GraphTransitionModelInterface[]
+     * @throws \Kohana_Exception
      */
-    public function get_allowed_transitions(UserInterface $user, GraphNodeModelInterface $source = null, GraphNodeModelInterface $target = null): array
-    {
-        return $this->transition_model_factory()->filter_allowed_by_acl($user)->get_transitions($source, $target);
+    public function getAllowedTransitions(
+        UserInterface $user,
+        ?GraphNodeModelInterface $source = null,
+        ?GraphNodeModelInterface $target = null
+    ): array {
+        return $this->transitionModelFactory()->filterAllowedByAcl($user)->getTransitions($source, $target);
     }
 
     /**
@@ -83,9 +87,9 @@ abstract class StatusModelOrm extends GraphNodeModelOrm implements StatusModelIn
      *
      * @return GraphTransitionModelInterface[]
      */
-    public function get_allowed_source_transitions(UserInterface $user): array
+    public function getAllowedSourceTransitions(UserInterface $user): array
     {
-        return $this->get_allowed_transitions($user, null, $this);
+        return $this->getAllowedTransitions($user, null, $this);
     }
 
     /**
@@ -95,9 +99,9 @@ abstract class StatusModelOrm extends GraphNodeModelOrm implements StatusModelIn
      *
      * @return GraphTransitionModelInterface[]
      */
-    public function get_allowed_target_transitions(UserInterface $user): array
+    public function getAllowedTargetTransitions(UserInterface $user): array
     {
-        return $this->get_allowed_transitions($user, $this);
+        return $this->getAllowedTransitions($user, $this);
     }
 
     /**
@@ -105,13 +109,13 @@ abstract class StatusModelOrm extends GraphNodeModelOrm implements StatusModelIn
      *
      * @return string[]
      */
-    public function get_allowed_target_transitions_codename_array(UserInterface $user): array
+    public function getAllowedTargetTransitionsCodenameArray(UserInterface $user): array
     {
         $data = [];
 
-        foreach ($this->get_allowed_target_transitions($user) as $transition) {
-            $target_status_codename        = $transition->get_target_node()->get_codename();
-            $data[$target_status_codename] = $transition->get_codename();
+        foreach ($this->getAllowedTargetTransitions($user) as $transition) {
+            $targetStatusCodename        = $transition->getTargetNode()->getCodename();
+            $data[$targetStatusCodename] = $transition->getCodename();
         }
 
         return $data;
@@ -120,14 +124,14 @@ abstract class StatusModelOrm extends GraphNodeModelOrm implements StatusModelIn
     /**
      * Returns TRUE if target transition is allowed
      *
-     * @param string $codename
+     * @param string                          $codename
      * @param \BetaKiller\Model\UserInterface $user
      *
      * @return bool
      */
-    public function is_target_transition_allowed(string $codename, UserInterface $user): bool
+    public function isTargetTransitionAllowed(string $codename, UserInterface $user): bool
     {
-        $allowed = $this->get_allowed_target_transitions_codename_array($user);
+        $allowed = $this->getAllowedTargetTransitionsCodenameArray($user);
 
         return \in_array($codename, $allowed, true);
     }
@@ -181,25 +185,25 @@ abstract class StatusModelOrm extends GraphNodeModelOrm implements StatusModelIn
      * @return StatusRelatedModelOrm
      * @throws \Kohana_Exception
      */
-    protected function get_related_model_relation(): StatusRelatedModelOrm
+    protected function getRelatedModelRelation(): StatusRelatedModelOrm
     {
-        return $this->get($this->get_related_model_key());
+        return $this->get($this->getRelatedModelKey());
     }
 
     /**
      * @return string
      */
-    abstract protected function get_related_model_key(): string;
+    abstract protected function getRelatedModelKey(): string;
 
     /**
      * @return string
      */
-    abstract protected function get_related_model_name(): string;
+    abstract protected function getRelatedModelName(): string;
 
     /**
      * @return string
      */
-    abstract protected function get_related_model_fk(): string;
+    abstract protected function getRelatedModelFk(): string;
 
     /**
      * @return string

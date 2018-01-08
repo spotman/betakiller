@@ -53,7 +53,7 @@ abstract class AbstractStatusRelatedEntityAclResource extends AbstractEntityRela
         if (in_array($permissionIdentity, $this->getStatusActionsList(), true)) {
             /** @var StatusRelatedModelInterface $entity */
             $entity = $this->getEntity();
-            $status = $entity->get_current_status();
+            $status = $entity->getCurrentStatus();
 
             return $this->isStatusActionAllowed($status, $permissionIdentity);
         }
@@ -65,7 +65,7 @@ abstract class AbstractStatusRelatedEntityAclResource extends AbstractEntityRela
 
         /** @var StatusRelatedModelInterface $entity */
         $entity = $this->getEntity();
-        $status = $entity->get_current_status();
+        $status = $entity->getCurrentStatus();
 
         // Other permissions rely on model status transition permissions
         return $this->isTransitionAllowed($status, $permissionIdentity);
@@ -109,7 +109,7 @@ abstract class AbstractStatusRelatedEntityAclResource extends AbstractEntityRela
 
     private function makeStatusPermissionIdentityBase(StatusModelInterface $model): string
     {
-        return 'status.'.$model->get_codename();
+        return 'status.'.$model->getCodename();
     }
 
     /**

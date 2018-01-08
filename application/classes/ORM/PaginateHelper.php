@@ -43,7 +43,7 @@ class PaginateHelper
      * @param int $itemsPerPage
      * @return PaginateHelper
      */
-    public static function create($model, $currentPage, $itemsPerPage)
+    public static function create($model, $currentPage, $itemsPerPage): PaginateHelper
     {
         return new self($model, $currentPage, $itemsPerPage);
     }
@@ -75,22 +75,34 @@ class PaginateHelper
         return $results;
     }
 
-    public function getTotalPages()
+    /**
+     * @return int
+     */
+    public function getTotalPages(): int
     {
         return $this->totalPages;
     }
 
-    public function getTotalItems()
+    /**
+     * @return int
+     */
+    public function getTotalItems(): int
     {
         return $this->totalItems;
     }
 
-    public function hasNextPage()
+    /**
+     * @return bool
+     */
+    public function hasNextPage(): bool
     {
         return (($this->currentPage + 1) <= $this->getTotalPages());
     }
 
-    public function hasPreviousPage()
+    /**
+     * @return bool
+     */
+    public function hasPreviousPage(): bool
     {
         return (($this->currentPage - 1) >= 0);
     }

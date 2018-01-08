@@ -19,144 +19,144 @@ interface ContentCommentInterface extends TreeModelSingleParentInterface, Entity
      *
      * @return $this
      */
-    public function set_guest_author_email(string $value);
+    public function setGuestAuthorEmail(string $value);
 
     /**
      * @return string
      */
-    public function get_guest_author_email(): string;
+    public function getGuestAuthorEmail(): string;
 
     /**
      * @param string $value
      *
      * @return $this
      */
-    public function set_guest_author_name(string $value);
+    public function setGuestAuthorName(string $value);
 
     /**
      * @return string
      */
-    public function get_guest_author_name(): string;
+    public function getGuestAuthorName(): string;
 
-    public function set_author_user(UserInterface $value = null);
+    public function setAuthorUser(UserInterface $value = null);
 
     /**
      * @return UserInterface|null
      */
-    public function get_author_user(): ?UserInterface;
+    public function getAuthorUser(): ?UserInterface;
 
     /**
      * @return bool
      */
-    public function author_is_guest(): bool;
+    public function authorIsGuest(): bool;
 
-    public function get_author_name(): string;
+    public function getAuthorName(): string;
 
-    public function get_author_email(): string;
-
-    /**
-     * @param string $value
-     *
-     * @return $this
-     */
-    public function set_message(string $value);
-
-    /**
-     * @return string
-     */
-    public function get_message(): string;
+    public function getAuthorEmail(): string;
 
     /**
      * @param string $value
      *
      * @return $this
      */
-    public function set_ip_address(string $value);
+    public function setMessage(string $value);
 
     /**
      * @return string
      */
-    public function get_ip_address(): string;
+    public function getMessage(): string;
 
     /**
      * @param string $value
      *
      * @return $this
      */
-    public function set_guest_author_user(string $value);
+    public function setIpAddress(string $value);
 
     /**
      * @return string
      */
-    public function get_guest_author_user(): string;
+    public function getIpAddress(): string;
 
     /**
      * @param string $value
      *
      * @return $this
      */
-    public function set_user_agent(string $value);
+    public function setGuestAuthorUser(string $value);
 
     /**
      * @return string
      */
-    public function get_user_agent(): string;
+    public function getGuestAuthorUser(): string;
+
+    /**
+     * @param string $value
+     *
+     * @return $this
+     */
+    public function setUserAgent(string $value);
+
+    /**
+     * @return string
+     */
+    public function getUserAgent(): string;
 
     /**
      * @param \DateTimeInterface|null $value
      *
      * @return $this
      */
-    public function set_created_at(DateTimeInterface $value = null);
+    public function setCreatedAt(DateTimeInterface $value = null);
 
-    public function get_created_at(): DateTimeImmutable;
+    public function getCreatedAt(): DateTimeImmutable;
 
     /**
      * @return string
      */
-    public function get_path(): string;
+    public function getPath(): string;
 
-    public function get_level(): int;
-
-    /**
-     * @return bool
-     */
-    public function is_pending(): bool;
+    public function getLevel(): int;
 
     /**
      * @return bool
      */
-    public function is_approved(): bool;
+    public function isPending(): bool;
 
     /**
      * @return bool
      */
-    public function is_spam(): bool;
+    public function isApproved(): bool;
 
     /**
      * @return bool
      */
-    public function is_deleted(): bool;
+    public function isSpam(): bool;
+
+    /**
+     * @return bool
+     */
+    public function isDeleted(): bool;
 
     /**
      * @return $this
      */
-    public function init_as_pending();
+    public function initAsPending();
 
     /**
      * @return $this
      */
-    public function init_as_approved();
+    public function initAsApproved();
 
     /**
      * @return $this
      */
-    public function init_as_spam();
+    public function initAsSpam();
 
     /**
      * @return $this
      */
-    public function init_as_trash();
+    public function initAsTrash();
 
     /**
      * @param \BetaKiller\Model\UserInterface $user

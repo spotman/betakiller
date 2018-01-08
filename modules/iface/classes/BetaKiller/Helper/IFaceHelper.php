@@ -8,9 +8,9 @@ use BetaKiller\IFace\IFaceInterface;
 use BetaKiller\IFace\IFaceModelInterface;
 use BetaKiller\IFace\IFaceStack;
 use BetaKiller\IFace\Url\UrlContainerInterface;
-use BetaKiller\IFace\View\IFaceView;
 use BetaKiller\Model\DispatchableEntityInterface;
 use BetaKiller\Model\IFaceZone;
+use BetaKiller\View\IFaceView;
 use BetaKiller\Widget\WidgetFactory;
 use BetaKiller\Widget\WidgetInterface;
 use Spotman\Api\ApiMethodResponse;
@@ -33,7 +33,7 @@ class IFaceHelper
     private $stack;
 
     /**
-     * @var \BetaKiller\IFace\View\IFaceView
+     * @var \BetaKiller\View\IFaceView
      */
     private $view;
 
@@ -45,7 +45,7 @@ class IFaceHelper
     /**
      * IFaceHelper constructor.
      *
-     * @param \BetaKiller\IFace\View\IFaceView      $view
+     * @param \BetaKiller\View\IFaceView            $view
      * @param \BetaKiller\IFace\IFaceStack          $stack
      * @param \BetaKiller\IFace\IFaceFactory        $ifaceFactory
      * @param \BetaKiller\Widget\WidgetFactory      $widgetFactory

@@ -19,7 +19,7 @@ interface IFaceInterface extends SeoMetaInterface
     /**
      * @return string
      */
-    public function getLayoutCodename(): string;
+    public function getLayoutCodename(): ?string;
 
     /**
      * Returns processed label

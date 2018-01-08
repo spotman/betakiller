@@ -74,7 +74,7 @@ class PhpExceptionHistory extends \ORM implements PhpExceptionHistoryModelInterf
      */
     public function setUser(UserInterface $user = null): PhpExceptionHistoryModelInterface
     {
-        $this->set('user', $user ? $user->get_id() : null);
+        $this->set('user', $user ? $user->getID() : null);
 
         return $this;
     }

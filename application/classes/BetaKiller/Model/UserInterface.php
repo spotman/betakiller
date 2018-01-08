@@ -15,9 +15,9 @@ interface UserInterface extends AbstractEntityInterface, OrmInterface, Notificat
 
     /**
      * @param string $value
-     * @return $this
+     * @return \BetaKiller\Model\UserInterface
      */
-    public function setUsername(string $value);
+    public function setUsername(string $value): UserInterface;
 
     /**
      * @return string
@@ -26,25 +26,15 @@ interface UserInterface extends AbstractEntityInterface, OrmInterface, Notificat
 
     /**
      * @param string $value
+     *
      * @return $this
      */
-    public function setPassword(string $value);
+    public function setPassword(string $value): UserInterface;
 
     /**
      * @return string
      */
     public function getPassword(): string;
-
-    /**
-     * @return bool
-     */
-    public function isDeveloper(): bool;
-
-    /**
-     * @return bool
-     * @deprecated Use ACL resources instead
-     */
-    public function isModerator(): bool;
 
     /**
      * @param RoleInterface|string $role
@@ -80,13 +70,17 @@ interface UserInterface extends AbstractEntityInterface, OrmInterface, Notificat
 
     /**
      * Search for user by username or e-mail
-     * @param $username_or_email
-     * @throws \HTTP_Exception_403
+     *
+     * @param string $usernameOrEmail
+     *
      * @return UserInterface|null
      */
-    public function searchBy($username_or_email): ?UserInterface;
+    public function searchBy(string $usernameOrEmail): ?UserInterface;
 
-    public function beforeSignIn();
+    /**
+     * @return void
+     */
+    public function beforeSignIn(): void;
 
     /**
      * @return void
@@ -112,14 +106,6 @@ interface UserInterface extends AbstractEntityInterface, OrmInterface, Notificat
      * @return bool
      */
     public function isGuest(): bool;
-
-    /**
-     * Filters only active users
-     *
-     * @return $this
-     * @deprecated
-     */
-    public function filter_active();
 
     /**
      * @return string
@@ -170,11 +156,6 @@ interface UserInterface extends AbstractEntityInterface, OrmInterface, Notificat
      * @return \BetaKiller\Model\UserInterface
      */
     public function setPhone(string $number): UserInterface;
-
-    /**
-     * @return array
-     */
-    public function as_array(): array;
 
     /**
      * Forces authorization if user is not logged in

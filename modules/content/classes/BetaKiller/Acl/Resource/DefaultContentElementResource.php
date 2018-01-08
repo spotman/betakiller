@@ -1,7 +1,7 @@
 <?php
 namespace BetaKiller\Acl\Resource;
 
-use BetaKiller\Model\Role;
+use BetaKiller\Model\RoleInterface;
 
 class DefaultContentElementResource extends AbstractAssetsAclResource
 {
@@ -11,9 +11,9 @@ class DefaultContentElementResource extends AbstractAssetsAclResource
     protected function getUploadDefaultAccessList(): array
     {
         return [
-            Role::WRITER_ROLE_NAME,
-            Role::MODERATOR_ROLE_NAME,
-            Role::ADMIN_ROLE_NAME,
+            RoleInterface::WRITER_ROLE_NAME,
+            RoleInterface::MODERATOR_ROLE_NAME,
+            RoleInterface::ADMIN_ROLE_NAME,
         ];
     }
 
@@ -23,9 +23,9 @@ class DefaultContentElementResource extends AbstractAssetsAclResource
     protected function getCreateDefaultAccessList(): array
     {
         return [
-            Role::WRITER_ROLE_NAME,
-            Role::MODERATOR_ROLE_NAME,
-            Role::ADMIN_ROLE_NAME,
+            RoleInterface::WRITER_ROLE_NAME,
+            RoleInterface::MODERATOR_ROLE_NAME,
+            RoleInterface::ADMIN_ROLE_NAME,
         ];
     }
 
@@ -35,8 +35,8 @@ class DefaultContentElementResource extends AbstractAssetsAclResource
     protected function getReadDefaultAccessList(): array
     {
         return [
-            Role::GUEST_ROLE_NAME,
-            Role::LOGIN_ROLE_NAME,
+            RoleInterface::GUEST_ROLE_NAME,
+            RoleInterface::LOGIN_ROLE_NAME,
         ];
     }
 
@@ -46,9 +46,9 @@ class DefaultContentElementResource extends AbstractAssetsAclResource
     protected function getUpdateDefaultAccessList(): array
     {
         return [
-            Role::WRITER_ROLE_NAME,
-            Role::MODERATOR_ROLE_NAME,
-            Role::ADMIN_ROLE_NAME,
+            RoleInterface::WRITER_ROLE_NAME,
+            RoleInterface::MODERATOR_ROLE_NAME,
+            RoleInterface::ADMIN_ROLE_NAME,
         ];
     }
 
@@ -58,9 +58,9 @@ class DefaultContentElementResource extends AbstractAssetsAclResource
     protected function getDeleteDefaultAccessList(): array
     {
         return [
-            Role::WRITER_ROLE_NAME,
-            Role::MODERATOR_ROLE_NAME,
-            Role::ADMIN_ROLE_NAME,
+            RoleInterface::WRITER_ROLE_NAME,
+            RoleInterface::MODERATOR_ROLE_NAME,
+            RoleInterface::ADMIN_ROLE_NAME,
         ];
     }
 
@@ -70,9 +70,9 @@ class DefaultContentElementResource extends AbstractAssetsAclResource
     protected function getListDefaultAccessList(): array
     {
         return [
-            Role::WRITER_ROLE_NAME,
-            Role::MODERATOR_ROLE_NAME,
-            Role::ADMIN_ROLE_NAME,
+            RoleInterface::WRITER_ROLE_NAME,
+            RoleInterface::MODERATOR_ROLE_NAME,
+            RoleInterface::ADMIN_ROLE_NAME,
         ];
     }
 
@@ -82,9 +82,9 @@ class DefaultContentElementResource extends AbstractAssetsAclResource
     protected function getSearchDefaultAccessList(): array
     {
         return [
-            Role::WRITER_ROLE_NAME,
-            Role::MODERATOR_ROLE_NAME,
-            Role::ADMIN_ROLE_NAME,
+            RoleInterface::WRITER_ROLE_NAME,
+            RoleInterface::MODERATOR_ROLE_NAME,
+            RoleInterface::ADMIN_ROLE_NAME,
         ];
     }
 }

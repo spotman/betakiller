@@ -90,7 +90,7 @@ class ContentCommentRepository extends AbstractOrmBasedDispatchableRepository
         $model = $this->getOrmInstance();
 
         if ($status) {
-            $model->filter_status($status);
+            $model->filterStatus($status);
         }
 
         $this->filterEntityAndEntityItemID($model, $entity, $entityItemID);
@@ -111,7 +111,7 @@ class ContentCommentRepository extends AbstractOrmBasedDispatchableRepository
         $model = $this->getOrmInstance();
 
         if ($status) {
-            $model->filter_status($status);
+            $model->filterStatus($status);
         }
 
         $this->orderByCreatedAt($model);
@@ -137,7 +137,7 @@ class ContentCommentRepository extends AbstractOrmBasedDispatchableRepository
         $this->filterEntityAndEntityItemID($orm, $entity, $entityItemId);
 
         if ($status) {
-            $orm->filter_status($status);
+            $orm->filterStatus($status);
         }
 
         return $orm->compile_as_subquery_and_count_all();
@@ -155,25 +155,25 @@ class ContentCommentRepository extends AbstractOrmBasedDispatchableRepository
 
 //    private function filter_pending()
 //    {
-//        return $this->filter_status_id(ContentCommentStatus::STATUS_PENDING);
+//        return $this->filterStatusID(ContentCommentStatus::STATUS_PENDING);
 //    }
 //
 //    private function filter_approved()
 //    {
-//        return $this->filter_status_id(ContentCommentStatus::STATUS_APPROVED);
+//        return $this->filterStatusID(ContentCommentStatus::STATUS_APPROVED);
 //    }
 //
 //    private function filter_spam()
 //    {
-//        return $this->filter_status_id(ContentCommentStatus::STATUS_SPAM);
+//        return $this->filterStatusID(ContentCommentStatus::STATUS_SPAM);
 //    }
 //
 //    private function filter_trash()
 //    {
-//        return $this->filter_status_id(ContentCommentStatus::STATUS_TRASH);
+//        return $this->filterStatusID(ContentCommentStatus::STATUS_TRASH);
 //    }
 //
-//    private function filter_status_id(ContentCommentStatus $orm, int $id)
+//    private function filterStatusID(ContentCommentStatus $orm, int $id)
 //    {
 //
 //    }
@@ -184,7 +184,7 @@ class ContentCommentRepository extends AbstractOrmBasedDispatchableRepository
 //    public function get_pending_comments_count()
 //    {
 //        /** @var \ContentCommentStatus $statusOrm */
-//        $statusOrm = $this->status_model_factory();
+//        $statusOrm = $this->statusModelFactory();
 //        $status    = $statusOrm->getPendingStatus();
 //
 //        return $this->getCommentsCount($status);

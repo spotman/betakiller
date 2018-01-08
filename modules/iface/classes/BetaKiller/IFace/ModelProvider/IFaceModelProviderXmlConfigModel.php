@@ -107,12 +107,30 @@ class IFaceModelProviderXmlConfigModel implements IFaceModelInterface
     }
 
     /**
-     * @return int
+     * @return string
      * @throws HTTP_Exception_501
      */
-    public function get_id(): int
+    public function getID(): string
     {
         throw new HTTP_Exception_501('Admin IFace model have no ID');
+    }
+
+    /**
+     * @return bool
+     * @throws \HTTP_Exception_501
+     */
+    public function hasID(): bool
+    {
+        throw new HTTP_Exception_501('Admin IFace model have no ID');
+    }
+
+    /**
+     * @return string
+     * @throws \HTTP_Exception_501
+     */
+    public function getModelName(): string
+    {
+        throw new HTTP_Exception_501('Admin IFace model have no model name');
     }
 
     /**
@@ -168,12 +186,12 @@ class IFaceModelProviderXmlConfigModel implements IFaceModelInterface
     }
 
     /**
-     * @param string|null $column
+     * @param string|null $columnName
      *
-     * @return int[]
-     * @throws HTTP_Exception_501
+     * @return void
+     * @throws \HTTP_Exception_501
      */
-    public function getAllChildren($column = null)
+    public function getAllChildren(string $columnName = null)
     {
         throw new HTTP_Exception_501(':method not implemented yet', [':method' => __METHOD__]);
     }

@@ -4,57 +4,52 @@ namespace BetaKiller\Graph;
 interface GraphTransitionModelInterface
 {
     /**
-     * @return int
-     */
-    public function get_id();
-
-    /**
      * @return string
      */
-    public function get_codename();
+    public function getCodename(): string;
 
     /**
      * @param string $value
      *
-     * @return $this
+     * @return void
      */
-    public function set_codename($value);
+    public function setCodename(string $value): void;
 
     /**
      * @return string
      */
-    public function get_label();
+    public function getLabel(): string;
 
     /**
      * @param string $value
      *
-     * @return $this
+     * @return void
      */
-    public function set_label($value);
+    public function setLabel(string $value): void;
 
     /**
      * @return GraphNodeModelInterface
      */
-    public function get_source_node();
+    public function getSourceNode();
 
     /**
      * @return GraphNodeModelInterface
      */
-    public function get_target_node();
+    public function getTargetNode();
 
     /**
      * @param GraphNodeModelInterface $node
      *
      * @return GraphNodeModelInterface[]
      */
-    public function get_source_nodes(GraphNodeModelInterface $node);
+    public function getSourceNodes(GraphNodeModelInterface $node): array;
 
     /**
      * @param GraphNodeModelInterface $node
      *
      * @return GraphNodeModelInterface[]
      */
-    public function get_target_nodes(GraphNodeModelInterface $node);
+    public function getTargetNodes(GraphNodeModelInterface $node): array;
 
     /**
      * @param GraphNodeModelInterface|NULL $source
@@ -62,7 +57,7 @@ interface GraphTransitionModelInterface
      *
      * @return GraphTransitionModelInterface[]
      */
-    public function get_transitions(GraphNodeModelInterface $source = NULL, GraphNodeModelInterface $target = NULL);
+    public function getTransitions(GraphNodeModelInterface $source = null, GraphNodeModelInterface $target = null): array;
 
     /**
      * @param GraphNodeModelInterface $source
@@ -70,5 +65,5 @@ interface GraphTransitionModelInterface
      *
      * @return bool
      */
-    public function transition_exists(GraphNodeModelInterface $source, GraphNodeModelInterface $target);
+    public function transitionExists(GraphNodeModelInterface $source, GraphNodeModelInterface $target): bool;
 }

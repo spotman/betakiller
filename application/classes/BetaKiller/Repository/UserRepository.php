@@ -1,6 +1,7 @@
 <?php
 namespace BetaKiller\Repository;
 
+use BetaKiller\Model\ExtendedOrmInterface;
 use BetaKiller\Model\RoleInterface;
 use BetaKiller\Model\User;
 use BetaKiller\Model\UserInterface;
@@ -25,10 +26,23 @@ class UserRepository extends AbstractOrmBasedRepository
      * @param \BetaKiller\Model\RoleInterface $role
      *
      * @return UserInterface[]
+     * @throws \BetaKiller\Repository\RepositoryException
      */
     public function getUsersWithRole(RoleInterface $role): array
     {
+        $orm = $this->getOrmInstance();
+
+        $this->filterRole($orm, $role);
+
+        return $this->findAll($orm);
+    }
+
+    private function filterRole(ExtendedOrmInterface $orm, RoleInterface $role): self
+    {
         // TODO Deal with roles inheritance (current implementation returns only users with explicit role)
-        return $role->get_users()->get_all();
+        $orm->join_related('roles', 'roles');
+        $orm->where('roles.id', '=', $role->getID());
+
+        return $this;
     }
 }

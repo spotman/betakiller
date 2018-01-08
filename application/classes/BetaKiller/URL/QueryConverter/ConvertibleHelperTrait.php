@@ -10,7 +10,7 @@ namespace BetaKiller\URL\QueryConverter;
 
 use BetaKiller\URL\QueryConverter;
 
-trait ConvertibleHelper
+trait ConvertibleHelperTrait
 {
     public function toUrlQueryArray()
     {
@@ -36,7 +36,7 @@ trait ConvertibleHelper
     protected function queryConverterFactory()
     {
         //TODO DI
-        return QueryConverter::instance();
+        return new QueryConverter;
     }
 
     /**

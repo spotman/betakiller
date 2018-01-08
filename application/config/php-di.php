@@ -15,14 +15,12 @@ use BetaKiller\Factory\FactoryCacheInterface;
 use BetaKiller\Factory\NamespaceBasedFactory;
 use BetaKiller\IFace\Url\UrlDispatcherCache;
 use BetaKiller\IFace\Url\UrlDispatcherCacheInterface;
-use BetaKiller\IFace\View\IFaceView;
-use BetaKiller\IFace\View\LayoutView;
-use BetaKiller\IFace\View\WrapperView;
-use BetaKiller\View\IFaceViewTwig;
+use BetaKiller\Notification\DefaultMessageRendered;
+use BetaKiller\Notification\MessageRendererInterface;
+use BetaKiller\View\LayoutViewInterface;
 use BetaKiller\View\LayoutViewTwig;
 use BetaKiller\View\TwigViewFactory;
 use BetaKiller\View\ViewFactoryInterface;
-use BetaKiller\View\WrapperViewTwig;
 use DI\Scope;
 use Doctrine\Common\Cache\ArrayCache;
 use Doctrine\Common\Cache\Cache;
@@ -58,10 +56,11 @@ return [
 
     'definitions' => [
 
-        ExceptionHandlerInterface::class => DI\object(\BetaKiller\Error\ExceptionHandler::class),
+        ExceptionHandlerInterface::class           => DI\object(\BetaKiller\Error\ExceptionHandler::class),
 
         // PSR-16 adapter for system-wide Doctrine Cache
-        Psr\SimpleCache\CacheInterface::class      => DI\factory(function (\Psr\Container\ContainerInterface $container) {
+        Psr\SimpleCache\CacheInterface::class      => DI\factory(function (\Psr\Container\ContainerInterface $container
+        ) {
             return new SimpleCacheAdapter($container->get(Cache::class));
         }),
 
@@ -96,7 +95,8 @@ return [
         })->scope(Scope::SINGLETON),
 
         // Use logger only when really needed
-        LoggerInterface::class => DI\object(\BetaKiller\Log\Logger::class), //->lazy(),
+        LoggerInterface::class                     => DI\object(\BetaKiller\Log\Logger::class),
+        //->lazy(),
 
         Auth::class => DI\factory(function () {
             return Auth::instance();
@@ -127,16 +127,20 @@ return [
         AclRulesCollectorInterface::class               => DI\object(AclRulesCollector::class),
         AclResourceFactoryInterface::class              => DI\object(AclResourceFactory::class),
 
-        // Use Twig in ifaces and layouts
-        IFaceView::class                                => DI\object(IFaceViewTwig::class),
-        LayoutView::class                               => DI\object(LayoutViewTwig::class),
-        WrapperView::class                              => DI\object(WrapperViewTwig::class),
+        // Use Twig as default view
+        ViewFactoryInterface::class                     => DI\object(TwigViewFactory::class),
+        // Use Twig in layouts
+        LayoutViewInterface::class                      => DI\object(LayoutViewTwig::class),
 
         // Custom access resolver detector
         ApiMethodAccessResolverDetectorInterface::class => DI\object(CustomApiMethodAccessResolverDetector::class),
 
-        // Use Twig as default view
-        ViewFactoryInterface::class    => DI\object(TwigViewFactory::class),
+        // Use default renderer for notification messages
+        MessageRendererInterface::class => DI\object(DefaultMessageRendered::class),
+
+        Meta::class => \DI\factory(function () {
+            return Meta::instance();
+        }),
     ],
 
 ];

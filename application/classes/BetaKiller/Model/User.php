@@ -3,7 +3,7 @@ namespace BetaKiller\Model;
 
 class User extends \Model_Auth_User implements UserInterface
 {
-    protected $_all_roles_ids = [];
+    protected $allUserRolesIDs = [];
 
     protected function _initialize(): void
     {
@@ -30,24 +30,9 @@ class User extends \Model_Auth_User implements UserInterface
      * @return Role
      * @throws \Kohana_Exception
      */
-    protected function get_roles_relation(): Role
+    protected function getRolesRelation(): Role
     {
         return $this->get('roles');
-    }
-
-    public function complete_login()
-    {
-        // Fetch all user roles and put it in cache
-        $this->fetchAllUserRolesIDs();
-
-        parent::complete_login();
-
-//        if ($this->loaded()) {
-//            $this->ip = sprintf("%u", ip2long(Request::$client_ip));
-//            $this->session_id = Session::instance()->id();
-//
-//            $this->save();
-//        }
     }
 
     /**
@@ -91,36 +76,6 @@ class User extends \Model_Auth_User implements UserInterface
     }
 
     /**
-     * @return bool
-     */
-    public function isDeveloper(): bool
-    {
-        return $this->hasRole($this->getRole(Role::DEVELOPER_ROLE_NAME));
-    }
-
-    /**
-     * @return bool
-     * @deprecated
-     */
-    public function isModerator(): bool
-    {
-        return $this->hasRole($this->getRole(Role::MODERATOR_ROLE_NAME));
-    }
-
-    /**
-     * @param string $role
-     *
-     * @return \BetaKiller\Model\RoleInterface
-     */
-    private function getRole(string $role): RoleInterface
-    {
-        /** @var \BetaKiller\Model\Role $roleOrm */
-        $roleOrm = $this->model_factory(null, 'Role');
-
-        return $roleOrm->get_by_name($role);
-    }
-
-    /**
      * Returns true if current user is guest
      *
      * @return bool
@@ -159,32 +114,28 @@ class User extends \Model_Auth_User implements UserInterface
      */
     public function getAllUserRolesIDs(): array
     {
-        return $this->fetchAllUserRolesIDs();
+        // Caching coz it is very heavy operation without MPTT
+        if (!$this->allUserRolesIDs) {
+            $this->allUserRolesIDs = $this->fetchAllUserRolesIDs();
+        }
+
+        return $this->allUserRolesIDs;
     }
 
     protected function fetchAllUserRolesIDs()
     {
-        // Caching coz it is very heavy operation without MPTT
-        if (!$this->_all_roles_ids) {
-            /** @var RoleInterface[] $roles */
-            $roles = [];
+        $rolesIDs = [];
 
-            foreach ($this->get_roles_relation()->get_all() as $role) {
-                $roles[] = [$role];
-                $roles[] = $role->getAllParents();
+        foreach ($this->getRolesRelation()->get_all() as $role) {
+            $rolesIDs[] = $role->getID();
+
+            /** @var \BetaKiller\Model\RoleInterface $parent */
+            foreach ($role->getAllParents() as $parent) {
+                $rolesIDs[] = $parent->getID();
             }
-
-            $roles     = array_merge(...$roles);
-            $roles_ids = [];
-
-            foreach ($roles as $role) {
-                $roles_ids[] = $role->get_id();
-            }
-
-            $this->_all_roles_ids = array_unique($roles_ids);
         }
 
-        return $this->_all_roles_ids;
+        return array_unique($rolesIDs);
     }
 
     /**
@@ -195,55 +146,35 @@ class User extends \Model_Auth_User implements UserInterface
      */
     public function getLanguageName(): ?string
     {
-        $lang_model = $this->getLanguage();
+        $langModel = $this->getLanguage();
 
-        $lang = ($this->loaded() && $lang_model->loaded())
-            ? $lang_model->get_name()
+        $lang = ($this->loaded() && $langModel->loaded())
+            ? $langModel->getName()
             : null;
 
         return $lang;
     }
 
     /**
-     * @return NULL|\Model_Language
+     * @return \Model_Language
      * @throws \Kohana_Exception
      */
-    public function getLanguage(): ?\Model_Language
+    public function getLanguage(): \Model_Language
     {
         return $this->get('language');
     }
 
     /**
-     * @todo сделать проверку соответствия ip-адреса тому, на который был выдан токен
-     * @return bool
-     */
-    public function checkIp(): bool
-    {
-//        $ip = Request::client_ip();
-//        $client_ip = ip2long($this->get_real_ip_address());
-//
-//        if ( ! (($client_ip >= ip2long('10.0.0.0') AND $client_ip < ip2long('10.255.255.255')) OR
-//            ($client_ip >= ip2long('172.16.0.0') AND $client_ip < ip2long('172.31.255.255')) OR
-//            ($client_ip >= ip2long('192.168.0.0') AND $client_ip < ip2long('192.168.255.255')) OR
-//            $_SERVER['REMOTE_ADDR'] == '127.0.0.1'))
-//        {
-//            return FALSE;
-//        }
-//
-        return true;
-    }
-
-    /**
      * Search for user by username or e-mail
      *
-     * @param $username_or_email
+     * @param string $usernameOrEmail
      *
      * @return UserInterface|null
      * @throws \Kohana_Exception
      */
-    public function searchBy($username_or_email): ?UserInterface
+    public function searchBy(string $usernameOrEmail): ?UserInterface
     {
-        $user = $this->where($this->unique_key($username_or_email), '=', $username_or_email)->find();
+        $user = $this->where($this->unique_key($usernameOrEmail), '=', $usernameOrEmail)->find();
 
         return $user->loaded() ? $user : null;
     }
@@ -266,18 +197,12 @@ class User extends \Model_Auth_User implements UserInterface
     }
 
     /**
-     * @throws \Auth_Exception_WrongIP
      * @throws \Auth_Exception_Inactive
      * @throws \Kohana_Exception
      */
     public function afterAutoLogin(): void
     {
         $this->checkIsActive();
-
-        // Проверяем IP-адрес
-        if (!$this->checkIp()) {
-            throw new \Auth_Exception_WrongIP;
-        }
     }
 
     public function beforeSignOut(): void
@@ -294,17 +219,6 @@ class User extends \Model_Auth_User implements UserInterface
     public function isActive(): bool
     {
         return ($this->loaded() && $this->get('is_active'));
-    }
-
-    /**
-     * Filters only active users
-     *
-     * @return $this
-     * @deprecated
-     */
-    public function filter_active()
-    {
-        return $this->where('is_active', '=', true);
     }
 
     public function getFullName(): string
@@ -388,7 +302,7 @@ class User extends \Model_Auth_User implements UserInterface
     public function as_array(): array
     {
         return [
-            'id'        => $this->get_id(),
+            'id'        => $this->getID(),
             'username'  => $this->getUsername(),
             'email'     => $this->getEmail(),
             'firstName' => $this->getFirstName(),
@@ -412,7 +326,7 @@ class User extends \Model_Auth_User implements UserInterface
      */
     public function getAccessControlRoles()
     {
-        return $this->get_roles_relation()->get_all();
+        return $this->getRolesRelation()->get_all();
     }
 
     /**
@@ -431,7 +345,7 @@ class User extends \Model_Auth_User implements UserInterface
     protected function getSerializableProperties()
     {
         return array_merge(parent::getSerializableProperties(), [
-            '_all_roles_ids',
+            'allUserRolesIDs',
         ]);
     }
 }

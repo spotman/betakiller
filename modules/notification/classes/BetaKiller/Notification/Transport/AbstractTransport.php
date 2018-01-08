@@ -1,14 +1,8 @@
 <?php
 namespace BetaKiller\Notification\Transport;
 
-use BetaKiller\Notification\NotificationMessageInterface;
-use BetaKiller\Notification\NotificationUserInterface;
-use BetaKiller\Notification\TransportInterface;
+use BetaKiller\Notification\NotificationTransportInterface;
 
-abstract class AbstractTransport implements TransportInterface
+abstract class AbstractTransport implements NotificationTransportInterface
 {
-    protected function renderMessage(NotificationMessageInterface $message, NotificationUserInterface $user)
-    {
-        return $message->render($this, $user);
-    }
 }

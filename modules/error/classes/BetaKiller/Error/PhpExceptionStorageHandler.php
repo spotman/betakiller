@@ -272,11 +272,16 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
         }
     }
 
+    /**
+     * @param \Throwable $subsystemException
+     * @param \Throwable $originalException
+     *
+     * @throws \BetaKiller\Notification\NotificationException
+     * @throws \BetaKiller\Repository\RepositoryException
+     */
     private function sendNotification(\Throwable $subsystemException, \Throwable $originalException): void
     {
         $message = $this->notificationHelper->createMessage();
-
-        $this->notificationHelper->toDevelopers($message);
 
         $message
             ->setSubj('BetaKiller logging subsystem failure')
@@ -291,8 +296,11 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
                     'message'    => $this->getExceptionText($originalException),
                     'stacktrace' => $originalException->getTraceAsString(),
                 ],
-            ])
-            ->send();
+            ]);
+
+        $this->notificationHelper
+            ->toDevelopers($message)
+            ->send($message);
     }
 
     private function getExceptionText(\Throwable $e): string

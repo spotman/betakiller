@@ -391,7 +391,7 @@ class PhpException extends \ORM implements PhpExceptionModelInterface
 
     protected function setResolvedBy(?UserInterface $user)
     {
-        $this->set('resolved_by', $user ? $user->get_id() : null);
+        $this->set('resolved_by', $user ? $user->getID() : null);
 
         return $this;
     }

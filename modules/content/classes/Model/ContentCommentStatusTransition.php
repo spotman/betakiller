@@ -20,7 +20,7 @@ class Model_ContentCommentStatusTransition extends StatusTransitionModelOrm
     /**
      * @return string
      */
-    protected function get_node_model_name()
+    protected function getNodeModelName(): string
     {
         return 'ContentCommentStatus';
     }

@@ -2,8 +2,6 @@
 
 class CSS
 {
-    use \BetaKiller\Utils\Instance\SingletonTrait;
-
     /**
      * @var \StaticCss
      */

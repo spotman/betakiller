@@ -4,8 +4,8 @@ class Model_Language extends ORM
 {
     protected $_table_name = 'languages';
 
-    public function get_name()
+    public function getName()
     {
-        return $this->loaded() ? $this->get('name') : NULL;
+        return $this->loaded() ? $this->get('name') : null;
     }
 }

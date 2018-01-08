@@ -93,7 +93,7 @@ abstract class Range extends AbstractFilter
     public function setUrlQueryValues(array $values): void
     {
         if (count($values) !== 2) {
-            throw new Exception('Range filter accepts only two values: "from,to"');
+            throw new FilterException('Range filter accepts only two values: "from,to"');
         }
 
         list($from, $to) = $values;

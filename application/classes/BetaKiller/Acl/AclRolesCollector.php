@@ -2,24 +2,25 @@
 namespace BetaKiller\Acl;
 
 use BetaKiller\Model\RoleInterface;
+use BetaKiller\Repository\RoleRepository;
 use Spotman\Acl\AclInterface;
 use Spotman\Acl\RolesCollector\AclRolesCollectorInterface;
 
 class AclRolesCollector implements AclRolesCollectorInterface
 {
     /**
-     * @var RoleInterface
+     * @var \BetaKiller\Repository\RoleRepository
      */
-    private $roleModel;
+    private $roleRepo;
 
     /**
      * AclRolesCollector constructor.
      *
-     * @param \BetaKiller\Model\RoleInterface $roleModel
+     * @param \BetaKiller\Repository\RoleRepository $roleRepo
      */
-    public function __construct(RoleInterface $roleModel)
+    public function __construct(RoleRepository $roleRepo)
     {
-        $this->roleModel = $roleModel;
+        $this->roleRepo = $roleRepo;
     }
 
     /**
@@ -27,10 +28,9 @@ class AclRolesCollector implements AclRolesCollectorInterface
      *
      * @param \Spotman\Acl\AclInterface $acl
      */
-    public function collectRoles(AclInterface $acl)
+    public function collectRoles(AclInterface $acl): void
     {
-        /** @var RoleInterface[] $roles */
-        $roles = $this->roleModel->get_all();
+        $roles = $this->roleRepo->getAll();
 
         foreach ($roles as $role) {
             $this->addRoleWithParents($acl, $role);

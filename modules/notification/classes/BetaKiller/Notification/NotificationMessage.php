@@ -1,14 +1,12 @@
 <?php
 namespace BetaKiller\Notification;
 
-use I18n;
-
 /**
- * Class NotificationMessageAbstract
+ * Class NotificationMessage
  *
  * @package BetaKiller\Notification
  */
-abstract class NotificationMessageAbstract implements NotificationMessageInterface
+class NotificationMessage implements NotificationMessageInterface
 {
     /**
      * @var NotificationUserInterface
@@ -43,16 +41,6 @@ abstract class NotificationMessageAbstract implements NotificationMessageInterfa
      * @var array
      */
     private $templateData = [];
-
-    /**
-     * @var \BetaKiller\Notification\Notification
-     */
-    private $facade;
-
-    public function __construct(Notification $facade)
-    {
-        $this->facade = $facade;
-    }
 
     /**
      * @return NotificationUserInterface
@@ -172,14 +160,13 @@ abstract class NotificationMessageAbstract implements NotificationMessageInterfa
         $key .= '.subj';
 
         // Getting template data
-        $data = $this->getFullData($targetUser);
+        $data = $this->getFullDataForTarget($targetUser);
 
         $output = __($key, $data);
 
         if ($output === $key) {
-            throw new NotificationException('Missing translation for key [:value] in [:lang] language', [
+            throw new NotificationException('Missing translation for key [:value]', [
                 ':value' => $key,
-                ':lang'  => I18n::lang(),
             ]);
         }
 
@@ -190,7 +177,7 @@ abstract class NotificationMessageAbstract implements NotificationMessageInterfa
      * @return string
      * @throws \BetaKiller\Notification\NotificationException
      */
-    protected function getBaseI18nKey(): string
+    public function getBaseI18nKey(): string
     {
         $name = $this->getTemplateName();
 
@@ -236,15 +223,6 @@ abstract class NotificationMessageAbstract implements NotificationMessageInterfa
     }
 
     /**
-     * @return int
-     * @throws \BetaKiller\Notification\NotificationException
-     */
-    public function send(): int
-    {
-        return $this->facade->send($this);
-    }
-
-    /**
      * @param $templateName
      *
      * @return NotificationMessageInterface
@@ -285,52 +263,15 @@ abstract class NotificationMessageAbstract implements NotificationMessageInterfa
     }
 
     /**
-     * @return \View
+     * @param \BetaKiller\Notification\NotificationUserInterface $targetUser
+     *
+     * @return array
      */
-    protected function template_factory(): \View
-    {
-        return \View::factory();
-    }
-
-    /**
-     * @return string
-     */
-    protected function getTemplatePath(): string
-    {
-        return 'notifications';
-    }
-
-    protected function getFullData(NotificationUserInterface $targetUser): array
+    public function getFullDataForTarget(NotificationUserInterface $targetUser): array
     {
         return array_merge($this->getTemplateData(), [
             'targetName'  => $targetUser->getFullName(),
             'targetEmail' => $targetUser->getEmail(),
         ]);
-    }
-
-    /**
-     * @param \BetaKiller\Notification\TransportInterface        $transport
-     * @param \BetaKiller\Notification\NotificationUserInterface $target
-     *
-     * @return string
-     * @throws \View_Exception
-     * @throws \BetaKiller\Notification\NotificationException
-     */
-    public function render(TransportInterface $transport, NotificationUserInterface $target): string
-    {
-        $view = $this->template_factory();
-
-        $data = array_merge($this->getFullData($target), [
-            'subject'     => $this->getSubj($target),
-            'baseI18nKey' => $this->getBaseI18nKey(),
-        ]);
-
-        foreach ($data as $key => $value) {
-            $view->set($key, $value);
-        }
-
-        return $view->render(
-            $this->getTemplatePath().DIRECTORY_SEPARATOR.$this->getTemplateName().'-'.$transport->getName()
-        );
     }
 }

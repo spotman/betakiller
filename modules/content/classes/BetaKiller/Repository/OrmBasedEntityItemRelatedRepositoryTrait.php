@@ -12,7 +12,7 @@ trait OrmBasedEntityItemRelatedRepositoryTrait
 //        $model = $this->model_factory();
 //
 //        return $model
-//            ->filterEntityID($entity->get_id())
+//            ->filterEntityID($entity->getID())
 //            ->group_by_entity_item_id()
 //            ->find_all()
 //            ->as_array(null, 'entity_item_id');

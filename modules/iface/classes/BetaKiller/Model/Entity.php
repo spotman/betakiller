@@ -72,20 +72,20 @@ class Entity extends ORM
      *
      * @param int $id
      *
-     * @return \BetaKiller\Model\DispatchableEntityInterface
+     * @return \BetaKiller\Model\RelatedEntityInterface
      * @throws \BetaKiller\Exception
      */
-    public function getLinkedEntityInstance($id): DispatchableEntityInterface
+    public function getLinkedEntityInstance($id): RelatedEntityInterface
     {
         // TODO Rewrite to EntityManager or something similar
         $name        = $this->getLinkedModelName();
         $model       = $this->model_factory($id, $name);
-        $targetClass = DispatchableEntityInterface::class;
+        $targetClass = RelatedEntityInterface::class;
 
         if (!($model instanceof $targetClass)) {
             throw new Exception('Entity model must be an instance of :target, :current given', [
                 ':target'  => $targetClass,
-                ':current' => get_class($model),
+                ':current' => \get_class($model),
             ]);
         }
 

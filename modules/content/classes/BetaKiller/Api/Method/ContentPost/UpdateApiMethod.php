@@ -8,13 +8,20 @@ class UpdateApiMethod extends AbstractEntityUpdateApiApiMethod
     use ContentPostMethodTrait;
 
     /**
+     * @Inject
+     * @var \BetaKiller\Model\UserInterface
+     */
+    private $user;
+
+    /**
      * Override this method
      *
-     * @param \BetaKiller\Model\ContentPost $model
-     * @param                    $data
+     * @param \BetaKiller\Model\ContentPostInterface $model
+     * @param                                        $data
      *
-     * @throws \Spotman\Api\ApiMethodException
-     * @return \BetaKiller\Model\AbstractEntityInterface|null
+     * @throws \BetaKiller\Repository\RepositoryException
+     * @throws \BetaKiller\Factory\FactoryException
+     * @return \BetaKiller\Model\AbstractEntityInterface|mixed|null
      */
     protected function update($model, $data)
     {
@@ -39,9 +46,10 @@ class UpdateApiMethod extends AbstractEntityUpdateApiApiMethod
             $model->setContent($data->content);
         }
 
-        $model->update();
+        $model->injectNewRevisionAuthor($this->user);
 
-        // Return updated model data
-        return $model;
+        $this->saveEntity();
+
+        return true;
     }
 }

@@ -2,15 +2,11 @@
 
 {% block html_tag %}<html>{% endblock %}
     <head>
-        {{ meta("content_type", "text/html") }}
-        {{ meta_tags|raw }}
-
-        {{ links_all|raw }}
-
+        {{ head|raw }}
         {{ css_all|raw }}
-        {{ js_all|raw }}
     </head>
     <body>
     {{ content|raw }}
+    {{ js_all|raw }}
     </body>
 </html>

@@ -3,9 +3,10 @@ namespace BetaKiller\Search\Provider\Parameterized\Parameter;
 
 use BetaKiller\Filter\Model\ValuesGroup;
 use BetaKiller\Model\User;
-use BetaKiller\Search;
+use BetaKiller\Search\ApplicableSearchModelInterface;
 use BetaKiller\Search\Provider\Parameterized\ParameterInterface;
 use BetaKiller\URL\QueryConverter;
+use BetaKiller\URL\QueryConverter\ConvertibleHelperTrait;
 use BetaKiller\URL\QueryConverter\ConvertibleInterface;
 use BetaKiller\URL\QueryConverter\ConvertibleItemInterface;
 use BetaKiller\Utils;
@@ -13,8 +14,7 @@ use Traversable;
 
 abstract class Registry implements \IteratorAggregate, QueryConverter\ConvertibleInterface
 {
-    use Utils\Instance\Simple,
-        QueryConverter\ConvertibleHelper;
+    use ConvertibleHelperTrait;
 
     /**
      * @var \BetaKiller\Model\User
@@ -24,7 +24,7 @@ abstract class Registry implements \IteratorAggregate, QueryConverter\Convertibl
     protected $_user;
 
     /**
-     * @var Provider\Parameterized\Parameter\Factory
+     * @var \BetaKiller\Search\Provider\Parameterized\Parameter\Factory
      */
     protected $_parameterFactory;
 
@@ -50,19 +50,22 @@ abstract class Registry implements \IteratorAggregate, QueryConverter\Convertibl
      * @deprecated
      * @todo DI
      */
-    public function setUser(User $user = NULL)
+    public function setUser(User $user = null)
     {
         $this->_user = $user;
+
         return $this;
     }
 
     /**
-     * @param Provider\Parameterized\Parameter\Factory $parameterFactory
+     * @param \BetaKiller\Search\Provider\Parameterized\Parameter\Factory $parameterFactory
+     *
      * @return $this
      */
-    public function setParameterFactory(Provider\Parameterized\Parameter\Factory $parameterFactory)
+    public function setParameterFactory(Factory $parameterFactory)
     {
         $this->_parameterFactory = $parameterFactory;
+
         return $this;
     }
 
@@ -74,14 +77,14 @@ abstract class Registry implements \IteratorAggregate, QueryConverter\Convertibl
     /**
      * @param $codename
      *
-     * @return Provider\Parameterized\ParameterInterface
+     * @return \BetaKiller\Search\Provider\Parameterized\ParameterInterface
      * @throws Utils\Registry\Exception
      */
     public function getParameter($codename)
     {
         $instance = $this->_registry->get($codename);
 
-        if ( !$instance ) {
+        if (!$instance) {
             $instance = $this->parameterFactory($codename);
             $this->_registry->set($codename, $instance);
         }
@@ -90,7 +93,7 @@ abstract class Registry implements \IteratorAggregate, QueryConverter\Convertibl
     }
 
     /**
-     * @return Provider\Parameterized\ParameterInterface[]
+     * @return \BetaKiller\Search\Provider\Parameterized\ParameterInterface[]
      */
     protected function getParameters()
     {
@@ -109,14 +112,16 @@ abstract class Registry implements \IteratorAggregate, QueryConverter\Convertibl
         $output = [];
 
         foreach ($this->getParameters() as $param) {
-            $codename = mb_strtolower($param->getCodename());
-            $output[ $codename ] = $param->asArray();
+
+            /** @var string $codename */
+            $codename          = mb_strtolower($param->getCodename());
+            $output[$codename] = $param->asArray();
         }
 
         return $output;
     }
 
-    public function apply(Search\ApplicableSearchModelInterface $model)
+    public function apply(ApplicableSearchModelInterface $model)
     {
         foreach ($this->getParameters() as $param) {
             // Skip empty parameters
@@ -141,8 +146,9 @@ abstract class Registry implements \IteratorAggregate, QueryConverter\Convertibl
     }
 
     /**
-     * @param string|null   $filterHaving
-     * @param string        $nsSeparator
+     * @param string|null $filterHaving
+     * @param string      $nsSeparator
+     *
      * @return \BetaKiller\Filter\Model\ValuesGroup[]
      */
     public function getAvailableValues($filterHaving = null, $nsSeparator = '-')
@@ -152,8 +158,9 @@ abstract class Registry implements \IteratorAggregate, QueryConverter\Convertibl
         foreach ($this->getParameters() as $param) {
             $valuesGroups = $param->getAvailableValues($filterHaving);
 
-            if (!$valuesGroups)
+            if (!$valuesGroups) {
                 continue;
+            }
 
             $this->presetParametersValuesGroupsCodename($param, $valuesGroups, $nsSeparator);
 
@@ -165,6 +172,7 @@ abstract class Registry implements \IteratorAggregate, QueryConverter\Convertibl
 
     /**
      * @param string $nsSeparator
+     *
      * @return ValuesGroup[]
      */
     public function getSelectedValues($nsSeparator = '-')
@@ -175,8 +183,9 @@ abstract class Registry implements \IteratorAggregate, QueryConverter\Convertibl
             $valuesGroups = $param->getSelectedValues();
 
             // Skip empty parameters
-            if (!$valuesGroups)
+            if (!$valuesGroups) {
                 continue;
+            }
 
             $this->presetParametersValuesGroupsCodename($param, $valuesGroups, $nsSeparator);
 
@@ -191,9 +200,12 @@ abstract class Registry implements \IteratorAggregate, QueryConverter\Convertibl
      * @param ValuesGroup[]                                                $groups
      * @param string                                                       $nsSeparator
      */
-    protected function presetParametersValuesGroupsCodename(ParameterInterface $param, array $groups, $nsSeparator = '-')
-    {
-        $ns = $this->getUrlQueryKeysNamespace();
+    protected function presetParametersValuesGroupsCodename(
+        ParameterInterface $param,
+        array $groups,
+        $nsSeparator = '-'
+    ) {
+        $ns       = $this->getUrlQueryKeysNamespace();
         $codename = $param->getUrlQueryKey();
 
         if ($ns) {
@@ -201,8 +213,9 @@ abstract class Registry implements \IteratorAggregate, QueryConverter\Convertibl
         }
 
         foreach ($groups as $group) {
-            if (!$group->getCodename())
+            if (!$group->getCodename()) {
                 $group->setCodename($codename);
+            }
 
             foreach ($group->getValues() as $value) {
                 $value->setKeyNamespace($codename);
@@ -215,9 +228,10 @@ abstract class Registry implements \IteratorAggregate, QueryConverter\Convertibl
      *
      * @return ConvertibleItemInterface
      */
-    public function getItemByQueryKey(string $key)
+    public function getItemByQueryKey(string $key): ConvertibleItemInterface
     {
         $codename = ucfirst($key);
+
         return $this->getParameter($codename);
     }
 
@@ -251,8 +265,7 @@ abstract class Registry implements \IteratorAggregate, QueryConverter\Convertibl
             $codename = $ns.'\\'.$codename;
         }
 
-        $instance = $this->_parameterFactory->create($codename, $this->_user);
-        return $instance;
+        return $this->_parameterFactory->create($codename, $this->_user);
     }
 
     /**
@@ -262,5 +275,4 @@ abstract class Registry implements \IteratorAggregate, QueryConverter\Convertibl
     {
         return $this;
     }
-
 }

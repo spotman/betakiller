@@ -66,7 +66,7 @@ class Model_AclRule extends \ORM
      */
     public function getAclRoleIdentity()
     {
-        return $this->getRoleRelation()->get_name();
+        return $this->getRoleRelation()->getName();
     }
 
     /**

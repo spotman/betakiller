@@ -3,10 +3,9 @@ namespace BetaKiller\Search\Provider;
 
 use BetaKiller\Utils;
 
-abstract class Factory {
-
-    use Utils\Instance\Simple,
-        Utils\Factory\NamespacedFactoryTrait;
+abstract class Factory
+{
+    use Utils\Factory\NamespacedFactoryTrait;
 
     /**
      * @param $name
@@ -17,5 +16,4 @@ abstract class Factory {
     {
         return $this->_create($name);
     }
-
 }

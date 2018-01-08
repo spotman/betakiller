@@ -115,7 +115,7 @@ class Widget_Content_ArticlesList extends AbstractBaseWidget
             $url_params = [
                 self::SEARCH_TERM_QUERY_KEY => $term,
                 self::PAGE_QUERY_KEY        => $page + 1,
-                self::CATEGORY_ID_QUERY_KEY => $category ? $category->get_id() : null,
+                self::CATEGORY_ID_QUERY_KEY => $category ? $category->getID() : null,
             ];
 
             $moreURL = $this->url('more').'?'.http_build_query(array_filter($url_params));

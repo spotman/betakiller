@@ -5,8 +5,6 @@
  */
 class Assets
 {
-    use \BetaKiller\Utils\Instance\SingletonTrait;
-
     /**
      * @var \JS
      */

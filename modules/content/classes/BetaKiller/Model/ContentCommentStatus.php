@@ -35,7 +35,7 @@ class ContentCommentStatus extends StatusModelOrm
 
     public function getLabel(): string
     {
-        $codename = $this->get_codename();
+        $codename = $this->getCodename();
 
         return __('comment.status.'.$codename);
     }
@@ -43,7 +43,7 @@ class ContentCommentStatus extends StatusModelOrm
     /**
      * @return string
      */
-    protected function get_related_model_key(): string
+    protected function getRelatedModelKey(): string
     {
         return 'status';
     }
@@ -51,7 +51,7 @@ class ContentCommentStatus extends StatusModelOrm
     /**
      * @return string
      */
-    protected function get_related_model_name(): string
+    protected function getRelatedModelName(): string
     {
         return 'ContentComment';
     }
@@ -59,7 +59,7 @@ class ContentCommentStatus extends StatusModelOrm
     /**
      * @return string
      */
-    protected function get_transition_model_name(): string
+    protected function getTransitionModelName(): string
     {
         return 'ContentCommentStatusTransition';
     }
@@ -67,7 +67,7 @@ class ContentCommentStatus extends StatusModelOrm
     /**
      * @return string
      */
-    protected function get_related_model_fk(): string
+    protected function getRelatedModelFk(): string
     {
         return 'status_id';
     }

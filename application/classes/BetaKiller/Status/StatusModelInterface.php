@@ -9,12 +9,12 @@ interface StatusModelInterface extends GraphNodeModelInterface
     /**
      * @return int
      */
-    public function get_related_count(): int;
+    public function getRelatedCount(): int;
 
     /**
      * @return StatusRelatedModelInterface[]
      */
-    public function get_related_list(): array;
+    public function getRelatedList(): array;
 
     /**
      * Returns list of transitions allowed by ACL for current user
@@ -25,7 +25,10 @@ interface StatusModelInterface extends GraphNodeModelInterface
      *
      * @return \BetaKiller\Graph\GraphTransitionModelInterface[]
      */
-    public function get_allowed_transitions(UserInterface $user, GraphNodeModelInterface $source = null, GraphNodeModelInterface $target = null): array;
+    public function getAllowedTransitions(UserInterface $user,
+                                          ?GraphNodeModelInterface $source = null,
+                                          ?GraphNodeModelInterface $target = null
+    ): array;
 
     /**
      * Returns list of source transitions allowed by ACL for current user
@@ -34,7 +37,7 @@ interface StatusModelInterface extends GraphNodeModelInterface
      *
      * @return \BetaKiller\Graph\GraphTransitionModelInterface[]
      */
-    public function get_allowed_source_transitions(UserInterface $user): array;
+    public function getAllowedSourceTransitions(UserInterface $user): array;
 
     /**
      * Returns list of target transitions allowed by ACL for current user
@@ -43,7 +46,7 @@ interface StatusModelInterface extends GraphNodeModelInterface
      *
      * @return \BetaKiller\Graph\GraphTransitionModelInterface[]
      */
-    public function get_allowed_target_transitions(UserInterface $user): array;
+    public function getAllowedTargetTransitions(UserInterface $user): array;
 
     /**
      * Array with codenames of target transitions, <status codename> => <transition codename>
@@ -52,7 +55,7 @@ interface StatusModelInterface extends GraphNodeModelInterface
      *
      * @return string[]
      */
-    public function get_allowed_target_transitions_codename_array(UserInterface $user): array;
+    public function getAllowedTargetTransitionsCodenameArray(UserInterface $user): array;
 
     /**
      * Returns TRUE if target transition is allowed
@@ -62,7 +65,7 @@ interface StatusModelInterface extends GraphNodeModelInterface
      *
      * @return bool
      */
-    public function is_target_transition_allowed(string $codename, UserInterface $user): bool;
+    public function isTargetTransitionAllowed(string $codename, UserInterface $user): bool;
 
     /**
      * @param string $action

@@ -38,6 +38,15 @@ class UserService extends AbstractService
         $this->appConfig = $appConfig;
     }
 
+    /**
+     * @param string      $login
+     * @param string      $email
+     * @param null|string $password
+     *
+     * @return \BetaKiller\Model\UserInterface
+     * @throws \BetaKiller\Repository\RepositoryException
+     * @throws \ORM_Validation_Exception
+     */
     public function createUser(string $login, string $email, ?string $password = null): UserInterface
     {
         // Generate random password if none provided
@@ -101,6 +110,7 @@ class UserService extends AbstractService
 
     /**
      * @return \Database_Result|UserInterface[]
+     * @throws \BetaKiller\Repository\RepositoryException
      */
     public function getDevelopers()
     {
@@ -110,6 +120,7 @@ class UserService extends AbstractService
 
     /**
      * @return \Database_Result|UserInterface[]
+     * @throws \BetaKiller\Repository\RepositoryException
      */
     public function getModerators()
     {
@@ -117,4 +128,25 @@ class UserService extends AbstractService
         return $this->userRepository->getUsersWithRole($role);
     }
 
+    /**
+     * @param \BetaKiller\Model\UserInterface $user
+     *
+     * @return bool
+     * @throws \BetaKiller\Repository\RepositoryException
+     */
+    public function isDeveloper(UserInterface $user): bool
+    {
+        return $user->hasRole($this->roleRepository->getDeveloperRole());
+    }
+
+    /**
+     * @param \BetaKiller\Model\UserInterface $user
+     *
+     * @return bool
+     * @throws \BetaKiller\Repository\RepositoryException
+     */
+    public function isModerator(UserInterface $user): bool
+    {
+        return $user->hasRole($this->roleRepository->getModeratorRole());
+    }
 }

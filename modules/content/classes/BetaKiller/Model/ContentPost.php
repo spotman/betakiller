@@ -1,10 +1,8 @@
 <?php
 namespace BetaKiller\Model;
 
-use BetaKiller\Helper\SeoMetaInterface;
 use BetaKiller\IFace\Url\UrlContainerInterface;
 use BetaKiller\IFace\Url\UrlDispatcher;
-use BetaKiller\Status\StatusRelatedModelInterface;
 use BetaKiller\Status\StatusRelatedModelOrmTrait;
 use Database_Query_Builder_Select;
 use DateTime;
@@ -12,7 +10,7 @@ use Kohana_Exception;
 use ORM;
 use Validation;
 
-class ContentPost extends \ORM implements StatusRelatedModelInterface, ModelWithRevisionsInterface, SeoMetaInterface, EntityHasWordpressIdInterface, HasPublicZoneAccessSpecificationInterface
+class ContentPost extends \ORM implements ContentPostInterface
 {
     use StatusRelatedModelOrmTrait,
         ModelWithRevisionsOrmTrait,
@@ -63,7 +61,7 @@ class ContentPost extends \ORM implements StatusRelatedModelInterface, ModelWith
 
         $this->initializeRevisionsRelations();
 
-        $this->initialize_related_model_relation();
+        $this->initializeRelatedModelRelation();
 
         parent::_initialize();
     }
@@ -138,7 +136,7 @@ class ContentPost extends \ORM implements StatusRelatedModelInterface, ModelWith
     /**
      * @return string
      */
-    protected function get_status_relation_model_name(): string
+    protected function getStatusRelationModelName(): string
     {
         return 'ContentPostStatus';
     }
@@ -146,7 +144,7 @@ class ContentPost extends \ORM implements StatusRelatedModelInterface, ModelWith
     /**
      * @return string
      */
-    protected function get_status_relation_foreign_key(): string
+    protected function getStatusRelationForeignKey(): string
     {
         return 'status_id';
     }
@@ -179,12 +177,12 @@ class ContentPost extends \ORM implements StatusRelatedModelInterface, ModelWith
         return self::$prioritizedTypesList;
     }
 
-    public function markAsPage(): ContentPost
+    public function markAsPage(): ContentPostInterface
     {
         return $this->setType(self::TYPE_PAGE);
     }
 
-    public function markAsArticle(): ContentPost
+    public function markAsArticle(): ContentPostInterface
     {
         return $this->setType(self::TYPE_ARTICLE);
     }
@@ -205,20 +203,17 @@ class ContentPost extends \ORM implements StatusRelatedModelInterface, ModelWith
     }
 
     /**
-     * @param ContentCategory $value
-     *
-     * @throws Kohana_Exception
+     * @param \BetaKiller\Model\ContentCategoryInterface $value
      */
-    public function setCategory(ContentCategory $value): void
+    public function setCategory(ContentCategoryInterface $value): void
     {
         $this->set('category', $value);
     }
 
     /**
      * @return ContentCategory
-     * @throws Kohana_Exception
      */
-    public function getCategory(): ContentCategory
+    public function getCategory(): ContentCategoryInterface
     {
         return $this->get('category');
     }
@@ -238,16 +233,14 @@ class ContentPost extends \ORM implements StatusRelatedModelInterface, ModelWith
      * @param string $value
      *
      * @return $this
-     * @throws Kohana_Exception
      */
-    public function setUri($value)
+    public function setUri(string $value): ContentPostInterface
     {
         return $this->set('uri', $value);
     }
 
     /**
      * @return string
-     * @throws Kohana_Exception
      */
     public function getUri(): string
     {
@@ -257,16 +250,15 @@ class ContentPost extends \ORM implements StatusRelatedModelInterface, ModelWith
     /**
      * @param string $value
      *
-     * @throws Kohana_Exception
+     * @return \BetaKiller\Model\ContentPostInterface
      */
-    public function setLabel(string $value): void
+    public function setLabel(string $value): ContentPostInterface
     {
-        $this->set('label', $value);
+        return $this->set('label', $value);
     }
 
     /**
      * @return string
-     * @throws Kohana_Exception
      */
     public function getLabel(): string
     {
@@ -277,16 +269,14 @@ class ContentPost extends \ORM implements StatusRelatedModelInterface, ModelWith
      * @param string $value
      *
      * @return $this
-     * @throws Kohana_Exception
      */
-    public function setContent($value)
+    public function setContent(string $value): ContentPostInterface
     {
         return $this->set('content', $value);
     }
 
     /**
      * @return string
-     * @throws Kohana_Exception
      */
     public function getContent(): string
     {
@@ -294,19 +284,17 @@ class ContentPost extends \ORM implements StatusRelatedModelInterface, ModelWith
     }
 
     /**
-     * @param DateTime $value
+     * @param \DateTimeInterface $value
      *
      * @return $this
-     * @throws Kohana_Exception
      */
-    public function setCreatedAt(DateTime $value)
+    public function setCreatedAt(\DateTimeInterface $value): ContentPostInterface
     {
         return $this->set_datetime_column_value('created_at', $value);
     }
 
     /**
      * @return \DateTimeImmutable
-     * @throws Kohana_Exception
      */
     public function getCreatedAt(): \DateTimeImmutable
     {
@@ -314,19 +302,17 @@ class ContentPost extends \ORM implements StatusRelatedModelInterface, ModelWith
     }
 
     /**
-     * @param DateTime $value
+     * @param \DateTimeInterface $value
      *
      * @return $this
-     * @throws Kohana_Exception
      */
-    public function setUpdatedAt(DateTime $value)
+    public function setUpdatedAt(\DateTimeInterface $value): ContentPostInterface
     {
         return $this->set_datetime_column_value('updated_at', $value);
     }
 
     /**
      * @return \DateTimeImmutable|null
-     * @throws Kohana_Exception
      */
     public function getUpdatedAt(): ?\DateTimeImmutable
     {
@@ -338,7 +324,7 @@ class ContentPost extends \ORM implements StatusRelatedModelInterface, ModelWith
      *
      * @return $this
      */
-    public function setCreatedBy(UserInterface $user)
+    public function setCreatedBy(UserInterface $user): ContentPostInterface
     {
         return $this->set('created_by', $user);
     }
@@ -362,7 +348,7 @@ class ContentPost extends \ORM implements StatusRelatedModelInterface, ModelWith
     /**
      * @return $this
      */
-    public function incrementViewsCount()
+    public function incrementViewsCount(): ContentPostInterface
     {
         $current = $this->getViewsCount();
 
@@ -371,7 +357,6 @@ class ContentPost extends \ORM implements StatusRelatedModelInterface, ModelWith
 
     /**
      * @return int
-     * @throws Kohana_Exception
      */
     public function getViewsCount(): int
     {
@@ -382,11 +367,10 @@ class ContentPost extends \ORM implements StatusRelatedModelInterface, ModelWith
      * @param int $value
      *
      * @return $this
-     * @throws Kohana_Exception
      */
-    protected function setViewsCount($value)
+    protected function setViewsCount(int $value): ContentPostInterface
     {
-        return $this->set('views_count', (int)$value);
+        return $this->set('views_count', $value);
     }
 
     /**
@@ -435,7 +419,7 @@ class ContentPost extends \ORM implements StatusRelatedModelInterface, ModelWith
     {
         $category = $this->getCategory();
 
-        if ($category->get_id() && !$parameters->getEntityByClassName($category)) {
+        if ($category->getID() && !$parameters->getEntityByClassName($category)) {
             $parameters->setParameter($category);
         }
     }
@@ -457,7 +441,7 @@ class ContentPost extends \ORM implements StatusRelatedModelInterface, ModelWith
     {
         $this
             ->setCreatedAt(new DateTime)
-            ->set_start_status();
+            ->getStartStatus();
 
         $result = parent::create($validation);
 

@@ -38,7 +38,7 @@ class ContentComment extends TreeModelSingleParentOrm implements ContentCommentI
             ],
         ]);
 
-        $this->initialize_related_model_relation();
+        $this->initializeRelatedModelRelation();
 
         parent::_initialize();
     }
@@ -54,7 +54,7 @@ class ContentComment extends TreeModelSingleParentOrm implements ContentCommentI
     /**
      * @inheritDoc
      */
-    protected function get_status_relation_model_name(): string
+    protected function getStatusRelationModelName(): string
     {
         return 'ContentCommentStatus';
     }
@@ -62,7 +62,7 @@ class ContentComment extends TreeModelSingleParentOrm implements ContentCommentI
     /**
      * @inheritDoc
      */
-    protected function get_status_relation_foreign_key(): string
+    protected function getStatusRelationForeignKey(): string
     {
         return 'status_id';
     }
@@ -114,7 +114,7 @@ class ContentComment extends TreeModelSingleParentOrm implements ContentCommentI
         ];
 
         // Additional check for guest fields if no user was set
-        if (!$this->get_author_user()) {
+        if (!$this->getAuthorUser()) {
             $rules += $guestRules;
         }
 
@@ -126,6 +126,12 @@ class ContentComment extends TreeModelSingleParentOrm implements ContentCommentI
         return $this->getRelatedEntityPublicUrl($helper).'#'.$this->getHtmlDomID();
     }
 
+    /**
+     * @param \BetaKiller\Helper\IFaceHelper $helper
+     *
+     * @return string
+     * @throws \BetaKiller\Exception
+     */
     private function getRelatedEntityPublicUrl(IFaceHelper $helper): string
     {
         $relatedEntity = $this->getRelatedEntityInstance();
@@ -133,11 +139,18 @@ class ContentComment extends TreeModelSingleParentOrm implements ContentCommentI
         return $helper->getReadEntityUrl($relatedEntity, IFaceZone::PUBLIC_ZONE);
     }
 
+    /**
+     * @return string
+     * @throws \BetaKiller\Exception
+     */
     public function getRelatedContentLabel(): string
     {
         return $this->getRelatedEntityInstance()->getLabel();
     }
 
+    /**
+     * @return string
+     */
     public function getHtmlDomID(): string
     {
         return 'content-comment-'.$this->getID();
@@ -148,7 +161,7 @@ class ContentComment extends TreeModelSingleParentOrm implements ContentCommentI
      *
      * @return $this
      */
-    public function set_guest_author_email(string $value)
+    public function setGuestAuthorEmail(string $value)
     {
         $this->set('author_email', $value);
 
@@ -158,7 +171,7 @@ class ContentComment extends TreeModelSingleParentOrm implements ContentCommentI
     /**
      * @return string
      */
-    public function get_guest_author_email(): string
+    public function getGuestAuthorEmail(): string
     {
         return $this->get('author_email');
     }
@@ -168,7 +181,7 @@ class ContentComment extends TreeModelSingleParentOrm implements ContentCommentI
      *
      * @return $this
      */
-    public function set_guest_author_name(string $value)
+    public function setGuestAuthorName(string $value)
     {
         $this->set('author_name', $value);
 
@@ -178,12 +191,12 @@ class ContentComment extends TreeModelSingleParentOrm implements ContentCommentI
     /**
      * @return string
      */
-    public function get_guest_author_name(): string
+    public function getGuestAuthorName(): string
     {
         return $this->get('author_name');
     }
 
-    public function set_author_user(UserInterface $value = null)
+    public function setAuthorUser(UserInterface $value = null)
     {
         $this->set('author', $value);
 
@@ -193,7 +206,7 @@ class ContentComment extends TreeModelSingleParentOrm implements ContentCommentI
     /**
      * @return UserInterface|null
      */
-    public function get_author_user(): ?UserInterface
+    public function getAuthorUser(): ?UserInterface
     {
         /** @var UserInterface $author */
         $author = $this->get('author');
@@ -204,23 +217,29 @@ class ContentComment extends TreeModelSingleParentOrm implements ContentCommentI
     /**
      * @return bool
      */
-    public function author_is_guest(): bool
+    public function authorIsGuest(): bool
     {
-        return !$this->get_author_user();
+        return !$this->getAuthorUser();
     }
 
-    public function get_author_name(): string
+    /**
+     * @return string
+     */
+    public function getAuthorName(): string
     {
-        $author = $this->get_author_user();
+        $author = $this->getAuthorUser();
 
-        return $author ? $author->getFirstName() : $this->get_guest_author_name();
+        return $author ? $author->getFirstName() : $this->getGuestAuthorName();
     }
 
-    public function get_author_email(): string
+    /**
+     * @return string
+     */
+    public function getAuthorEmail(): string
     {
-        $author = $this->get_author_user();
+        $author = $this->getAuthorUser();
 
-        return $author ? $author->getEmail() : $this->get_guest_author_email();
+        return $author ? $author->getEmail() : $this->getGuestAuthorEmail();
     }
 
     /**
@@ -228,7 +247,7 @@ class ContentComment extends TreeModelSingleParentOrm implements ContentCommentI
      *
      * @return $this
      */
-    public function set_message(string $value)
+    public function setMessage(string $value)
     {
         $this->set('message', $value);
 
@@ -238,7 +257,7 @@ class ContentComment extends TreeModelSingleParentOrm implements ContentCommentI
     /**
      * @return string
      */
-    public function get_message(): string
+    public function getMessage(): string
     {
         return $this->get('message');
     }
@@ -248,7 +267,7 @@ class ContentComment extends TreeModelSingleParentOrm implements ContentCommentI
      *
      * @return $this
      */
-    public function set_ip_address(string $value)
+    public function setIpAddress(string $value)
     {
         $this->set('ip_address', $value);
 
@@ -258,7 +277,7 @@ class ContentComment extends TreeModelSingleParentOrm implements ContentCommentI
     /**
      * @return string
      */
-    public function get_ip_address(): string
+    public function getIpAddress(): string
     {
         return $this->get('ip_address');
     }
@@ -268,7 +287,7 @@ class ContentComment extends TreeModelSingleParentOrm implements ContentCommentI
      *
      * @return $this
      */
-    public function set_guest_author_user(string $value)
+    public function setGuestAuthorUser(string $value)
     {
         $this->set('author_user', $value);
 
@@ -278,7 +297,7 @@ class ContentComment extends TreeModelSingleParentOrm implements ContentCommentI
     /**
      * @return string
      */
-    public function get_guest_author_user(): string
+    public function getGuestAuthorUser(): string
     {
         return $this->get('author_user');
     }
@@ -288,7 +307,7 @@ class ContentComment extends TreeModelSingleParentOrm implements ContentCommentI
      *
      * @return $this
      */
-    public function set_user_agent(string $value)
+    public function setUserAgent(string $value)
     {
         $this->set('user_agent', $value);
 
@@ -298,19 +317,19 @@ class ContentComment extends TreeModelSingleParentOrm implements ContentCommentI
     /**
      * @return string
      */
-    public function get_user_agent(): string
+    public function getUserAgent(): string
     {
         return $this->get('user_agent');
     }
 
-    public function set_created_at(DateTimeInterface $value = null)
+    public function setCreatedAt(DateTimeInterface $value = null)
     {
         $this->set_datetime_column_value('created_at', $value ?: new DateTimeImmutable);
 
         return $this;
     }
 
-    public function get_created_at(): DateTimeImmutable
+    public function getCreatedAt(): DateTimeImmutable
     {
         return $this->get_datetime_column_value('created_at');
     }
@@ -318,7 +337,7 @@ class ContentComment extends TreeModelSingleParentOrm implements ContentCommentI
     /**
      * @return string
      */
-    public function get_path(): string
+    public function getPath(): string
     {
         return $this->get('path');
     }
@@ -326,84 +345,84 @@ class ContentComment extends TreeModelSingleParentOrm implements ContentCommentI
     /**
      * @return $this
      */
-    protected function set_path()
+    protected function setPath()
     {
         $parent     = $this->getParent();
-        $parentPath = $parent ? $parent->get_path() : 0;
+        $parentPath = $parent ? $parent->getPath() : 0;
 
         $this->set('path', $parentPath.'.'.$this->getID());
 
         return $this;
     }
 
-    public function get_level(): int
+    public function getLevel(): int
     {
-        return substr_count($this->get_path(), '.') - 1;
+        return substr_count($this->getPath(), '.') - 1;
     }
 
     /**
      * @return bool
      */
-    public function is_pending(): bool
+    public function isPending(): bool
     {
-        return $this->get_status_id() === ContentCommentStatus::STATUS_PENDING;
+        return $this->getStatusID() === ContentCommentStatus::STATUS_PENDING;
     }
 
     /**
      * @return bool
      */
-    public function is_approved(): bool
+    public function isApproved(): bool
     {
-        return $this->get_status_id() === ContentCommentStatus::STATUS_APPROVED;
+        return $this->getStatusID() === ContentCommentStatus::STATUS_APPROVED;
     }
 
     /**
      * @return bool
      */
-    public function is_spam(): bool
+    public function isSpam(): bool
     {
-        return $this->get_status_id() === ContentCommentStatus::STATUS_SPAM;
+        return $this->getStatusID() === ContentCommentStatus::STATUS_SPAM;
     }
 
     /**
      * @return bool
      */
-    public function is_deleted(): bool
+    public function isDeleted(): bool
     {
-        return $this->get_status_id() === ContentCommentStatus::STATUS_TRASH;
+        return $this->getStatusID() === ContentCommentStatus::STATUS_TRASH;
     }
 
-    public function init_as_pending()
+    public function initAsPending()
     {
-        $status = $this->get_status_by_id(ContentCommentStatus::STATUS_PENDING);
+        $status = $this->getStatusByID(ContentCommentStatus::STATUS_PENDING);
 
-        return $this->init_status($status);
+        return $this->initStatus($status);
     }
 
-    public function init_as_approved()
+    public function initAsApproved()
     {
-        $status = $this->get_status_by_id(ContentCommentStatus::STATUS_APPROVED);
+        $status = $this->getStatusByID(ContentCommentStatus::STATUS_APPROVED);
 
-        return $this->init_status($status);
+        return $this->initStatus($status);
     }
 
-    public function init_as_spam()
+    public function initAsSpam()
     {
-        $status = $this->get_status_by_id(ContentCommentStatus::STATUS_SPAM);
+        $status = $this->getStatusByID(ContentCommentStatus::STATUS_SPAM);
 
-        return $this->init_status($status);
+        return $this->initStatus($status);
     }
 
-    public function init_as_trash()
+    public function initAsTrash()
     {
-        $status = $this->get_status_by_id(ContentCommentStatus::STATUS_TRASH);
+        $status = $this->getStatusByID(ContentCommentStatus::STATUS_TRASH);
 
-        return $this->init_status($status);
+        return $this->initStatus($status);
     }
 
     public function isApproveAllowed(UserInterface $user): bool
     {
-        return $this->is_status_transition_allowed(Model_ContentCommentStatusTransition::APPROVE, $user);
+        return $this->isStatusTransitionAllowed(Model_ContentCommentStatusTransition::APPROVE, $user);
     }
 
     /**
@@ -412,8 +431,8 @@ class ContentComment extends TreeModelSingleParentOrm implements ContentCommentI
     public function create(Validation $validation = null)
     {
         // Preset default status
-        if (!$this->has_current_status()) {
-            $this->init_as_pending();
+        if (!$this->hasCurrentStatus()) {
+            $this->initAsPending();
         }
 
         $path_changed = $this->changed('path');
@@ -422,7 +441,7 @@ class ContentComment extends TreeModelSingleParentOrm implements ContentCommentI
         $obj = parent::create($validation);
 
         if (!$path_changed) {
-            $obj->set_path()->save();
+            $obj->setPath()->save();
         }
 
         return $obj;

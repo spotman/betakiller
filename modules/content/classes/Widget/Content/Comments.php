@@ -55,8 +55,8 @@ class Widget_Content_Comments extends AbstractBaseWidget
         $commentsData = [];
 
         foreach ($comments as $comment) {
-            $created_at = $comment->get_created_at();
-            $email      = $comment->get_author_email();
+            $created_at = $comment->getCreatedAt();
+            $email      = $comment->getAuthorEmail();
             /** @var \BetaKiller\Model\ContentCommentInterface $parentModel */
             $parentModel = $comment->getParent();
             $parentID    = $parentModel ? $parentModel->getID() : 0;
@@ -66,11 +66,11 @@ class Widget_Content_Comments extends AbstractBaseWidget
                 'parent_id' => $parentID,
                 'date'      => $created_at->format('d.m.Y'),
                 'time'      => $created_at->format('H:i:s'),
-                'name'      => $comment->get_author_name(),
+                'name'      => $comment->getAuthorName(),
                 'email'     => $email,
-                'message'   => $comment->get_message(),
+                'message'   => $comment->getMessage(),
                 'image'     => 'https://1.gravatar.com/avatar/'.md5($email).'?s=100&d=identicon&r=g',
-                'level'     => $comment->get_level(),
+                'level'     => $comment->getLevel(),
             ];
         }
 
@@ -172,9 +172,9 @@ class Widget_Content_Comments extends AbstractBaseWidget
             ->setEntityItemID($entityItemId);
 
         if (!$user->isGuest()) {
-            $model->set_author_user($user);
+            $model->setAuthorUser($user);
         } else {
-            $model->set_guest_author_name($name)->set_guest_author_email($email);
+            $model->setGuestAuthorName($name)->setGuestAuthorEmail($email);
         }
 
         // Parent comment
@@ -183,10 +183,10 @@ class Widget_Content_Comments extends AbstractBaseWidget
         }
 
         $model
-            ->set_ip_address($ipAddress)
-            ->set_user_agent($agent)
-            ->set_message($message)
-            ->set_created_at();
+            ->setIpAddress($ipAddress)
+            ->setUserAgent($agent)
+            ->setMessage($message)
+            ->setCreatedAt();
 
         try {
             // Saving comment and getting ID

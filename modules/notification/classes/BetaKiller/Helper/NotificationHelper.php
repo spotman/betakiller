@@ -2,16 +2,16 @@
 namespace BetaKiller\Helper;
 
 use BetaKiller\Model\UserInterface;
-use BetaKiller\Notification\NotificationMessageFactory;
+use BetaKiller\Notification\NotificationFacade;
 use BetaKiller\Notification\NotificationMessageInterface;
 use BetaKiller\Service\UserService;
 
 class NotificationHelper
 {
     /**
-     * @var \BetaKiller\Notification\NotificationMessageFactory
+     * @var \BetaKiller\Notification\NotificationFacade
      */
-    private $messageFactory;
+    private $facade;
 
     /**
      * @var \BetaKiller\Model\UserInterface
@@ -31,21 +31,21 @@ class NotificationHelper
     /**
      * NotificationHelper constructor.
      *
-     * @param \BetaKiller\Notification\NotificationMessageFactory $factory
-     * @param \BetaKiller\Model\UserInterface                     $user
-     * @param \BetaKiller\Helper\AppEnv                           $env
-     * @param \BetaKiller\Service\UserService                     $userService
+     * @param \BetaKiller\Notification\NotificationFacade $facade
+     * @param \BetaKiller\Model\UserInterface             $user
+     * @param \BetaKiller\Helper\AppEnv                   $env
+     * @param \BetaKiller\Service\UserService             $userService
      */
     public function __construct(
-        NotificationMessageFactory $factory,
+        NotificationFacade $facade,
         UserInterface $user,
         AppEnv $env,
         UserService $userService
     ) {
-        $this->messageFactory = $factory;
-        $this->user           = $user;
-        $this->appEnv         = $env;
-        $this->userService    = $userService;
+        $this->facade      = $facade;
+        $this->user        = $user;
+        $this->appEnv      = $env;
+        $this->userService = $userService;
     }
 
     /**
@@ -55,15 +55,27 @@ class NotificationHelper
      */
     public function createMessage($name = null): NotificationMessageInterface
     {
-        return $this->messageFactory->create($name);
+        return $this->facade->create($name);
+    }
+
+    /**
+     * @param \BetaKiller\Notification\NotificationMessageInterface $message
+     *
+     * @return int
+     * @throws \BetaKiller\Notification\NotificationException
+     */
+    public function send(NotificationMessageInterface $message): int
+    {
+        return $this->facade->send($message);
     }
 
     /**
      * @param \BetaKiller\Notification\NotificationMessageInterface $message
      *
      * @return NotificationHelper
+     * @throws \BetaKiller\Repository\RepositoryException
      */
-    public function toDevelopers(NotificationMessageInterface $message): NotificationHelper
+    public function toDevelopers(NotificationMessageInterface $message): self
     {
         $developers = $this->userService->getDevelopers();
 
@@ -76,8 +88,9 @@ class NotificationHelper
      * @param \BetaKiller\Notification\NotificationMessageInterface $message
      *
      * @return NotificationHelper
+     * @throws \BetaKiller\Repository\RepositoryException
      */
-    public function toModerators(NotificationMessageInterface $message): NotificationHelper
+    public function toModerators(NotificationMessageInterface $message): self
     {
         $moderators = $this->userService->getModerators();
 
@@ -92,7 +105,7 @@ class NotificationHelper
      * @return NotificationHelper
      * @throws \HTTP_Exception_401
      */
-    public function toCurrentUser(NotificationMessageInterface $message): NotificationHelper
+    public function toCurrentUser(NotificationMessageInterface $message): self
     {
         $this->user->forceAuthorization();
 
@@ -106,8 +119,9 @@ class NotificationHelper
      * @param bool|null                                             $inStage
      *
      * @return \BetaKiller\Helper\NotificationHelper
+     * @throws \BetaKiller\Repository\RepositoryException
      */
-    public function rewriteTargetsForDebug(NotificationMessageInterface $msg, ?bool $inStage = null): NotificationHelper
+    public function rewriteTargetsForDebug(NotificationMessageInterface $msg, ?bool $inStage = null): self
     {
         if (!$this->appEnv->inProduction($inStage ?? true)) {
             $msg->clearTargets();

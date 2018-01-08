@@ -2,18 +2,18 @@
 namespace BetaKiller\Filter;
 
 use BetaKiller\Filter\Model\ApplicableFilterModelInterface;
-use BetaKiller\URL\QueryConverter;
+use BetaKiller\URL\QueryConverter\ConvertibleHelperTrait;
 use BetaKiller\URL\QueryConverter\ConvertibleInterface;
-use BetaKiller\Utils;
+use BetaKiller\URL\QueryConverter\ConvertibleItemInterface;
+use BetaKiller\Utils\Registry\BasicRegistry;
 use Traversable;
 
-abstract class AbstractFilterRegistry implements \IteratorAggregate, QueryConverter\ConvertibleInterface
+abstract class AbstractFilterRegistry implements \IteratorAggregate, ConvertibleInterface
 {
-    use Utils\Instance\Simple,
-        QueryConverter\ConvertibleHelper;
+    use ConvertibleHelperTrait;
 
     /**
-     * @var Utils\Registry\BasicRegistry
+     * @var \BetaKiller\Utils\Registry\BasicRegistry
      */
     protected $registry;
 
@@ -52,7 +52,7 @@ abstract class AbstractFilterRegistry implements \IteratorAggregate, QueryConver
      */
     protected function getDefaultFilterFactory()
     {
-        return FilterFactory::instance();
+        return new FilterFactory;
     }
 
     /**
@@ -139,9 +139,9 @@ abstract class AbstractFilterRegistry implements \IteratorAggregate, QueryConver
 
     /**
      * @param string $key
-     * @return QueryConverter\ConvertibleItemInterface
+     * @return \BetaKiller\URL\QueryConverter\ConvertibleItemInterface
      */
-    public function getItemByQueryKey(string $key)
+    public function getItemByQueryKey(string $key): ConvertibleItemInterface
     {
         $codename = ucfirst($key);
         return $this->get($codename);
@@ -167,7 +167,6 @@ abstract class AbstractFilterRegistry implements \IteratorAggregate, QueryConver
      */
     protected function filterFactory($codename)
     {
-//        $codename = $this->getFilterNamespace().$codename;
         return $this->getFilterFactory()->create($codename);
     }
 
@@ -181,12 +180,12 @@ abstract class AbstractFilterRegistry implements \IteratorAggregate, QueryConver
     }
 
     /**
-     * @return Utils\Registry\BasicRegistry
+     * @return \BetaKiller\Utils\Registry\BasicRegistry
      */
     protected function getRegistry()
     {
         if (!$this->registry) {
-            $this->registry = new Utils\Registry\BasicRegistry;
+            $this->registry = new BasicRegistry;
         }
 
         return $this->registry;

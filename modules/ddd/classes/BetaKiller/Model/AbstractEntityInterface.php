@@ -1,7 +1,7 @@
 <?php
 namespace BetaKiller\Model;
 
-interface AbstractEntityInterface extends HasLabelInterface
+interface AbstractEntityInterface
 {
     /**
      * Returns string identifier for current entity (DB record ID, instance-related unique hash, etc)

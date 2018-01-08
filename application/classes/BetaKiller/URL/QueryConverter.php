@@ -10,15 +10,13 @@ namespace BetaKiller\URL;
 
 use BetaKiller\URL\QueryConverter\ConvertibleInterface;
 use BetaKiller\URL\QueryConverter\ConvertibleItemInterface;
-use BetaKiller\URL\QueryConverter\Exception;
+use BetaKiller\URL\QueryConverter\UrlQueryConverterException;
 use BetaKiller\Utils;
 
 class QueryConverter
 {
-    use Utils\Instance\Simple;
-
-    protected $_valuesSeparator = ',';
-    protected $_nsSeparator = '-';
+    protected $valuesSeparator = ',';
+    protected $nsSeparator = '-';
 
     /**
      * Apply url query parts array to ConvertibleInterface object
@@ -28,7 +26,7 @@ class QueryConverter
      * @param array|null                                          $allowedKeys Optional allowed keys array
      *
      * @return \BetaKiller\URL\QueryConverter\ConvertibleInterface
-     * @throws \BetaKiller\URL\QueryConverter\Exception
+     * @throws \BetaKiller\URL\QueryConverter\UrlQueryConverterException
      */
     public function fromQueryArray(array $query, ConvertibleInterface $obj, array $allowedKeys = null)
     {
@@ -41,7 +39,7 @@ class QueryConverter
         foreach ($query as $key => $concatValues) {
             // Remove namespace from key
             if ($ns) {
-                $key = str_replace($ns.$this->_nsSeparator, '', $key);
+                $key = str_replace($ns.$this->nsSeparator, '', $key);
             }
 
             // Skip unknown keys
@@ -50,10 +48,10 @@ class QueryConverter
             }
 
             // Convert values string to array
-            $values = explode($this->_valuesSeparator, $concatValues);
+            $values = explode($this->valuesSeparator, $concatValues);
 
             if (!count($values)) {
-                throw new Exception('No values provided in query part for [:key] key', [':key' => $key]);
+                throw new UrlQueryConverterException('No values provided in query part for [:key] key', [':key' => $key]);
             }
 
             // Process values
@@ -127,11 +125,11 @@ class QueryConverter
             if ($values) {
                 // Add namespace to url key
                 if ($ns) {
-                    $key = $ns.$this->_nsSeparator.$key;
+                    $key = $ns.$this->nsSeparator.$key;
                 }
 
                 // Store values
-                $result[$key] = implode($this->_valuesSeparator, $values);
+                $result[$key] = implode($this->valuesSeparator, $values);
             }
         }
 
@@ -174,8 +172,9 @@ class QueryConverter
      * Converts value to its string representation
      *
      * @param $value
+     *
      * @return string
-     * @throws \BetaKiller\URL\QueryConverter\Exception
+     * @throws \BetaKiller\URL\QueryConverter\UrlQueryConverterException
      */
     protected function makeValue($value)
     {
@@ -186,7 +185,7 @@ class QueryConverter
         } elseif (is_scalar($value)) {
             return (string) $value;
         } else {
-            throw new Exception('Only scalar values allowed');
+            throw new UrlQueryConverterException('Only scalar values allowed');
         }
     }
 

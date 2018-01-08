@@ -8,31 +8,26 @@ use ORM;
 
 trait StatusRelatedModelOrmTrait
 {
-    /**
-     * @var StatusWorkflowInterface
-     */
-    protected $_workflow_instance;
-
-    protected function initialize_related_model_relation()
+    protected function initializeRelatedModelRelation()
     {
-        $status_relation_key = $this->get_status_relation_key();
+        $statusRelationKey = $this->getStatusRelationKey();
 
         $this->belongs_to([
-            $status_relation_key => [
-                'model'       => $this->get_status_relation_model_name(),
-                'foreign_key' => $this->get_status_relation_foreign_key(),
+            $statusRelationKey => [
+                'model'       => $this->getStatusRelationModelName(),
+                'foreign_key' => $this->getStatusRelationForeignKey(),
             ],
         ]);
 
-        $this->load_with([$status_relation_key]);
+        $this->load_with([$statusRelationKey]);
     }
 
     /**
      * @return StatusModelInterface
      */
-    public function get_current_status()
+    public function getCurrentStatus()
     {
-        return $this->get_status_relation();
+        return $this->getStatusRelation();
     }
 
     /**
@@ -41,20 +36,20 @@ trait StatusRelatedModelOrmTrait
      * @return $this
      * @throws \BetaKiller\Status\StatusException
      */
-    public function change_status(StatusModelInterface $target)
+    public function changeStatus(StatusModelInterface $target)
     {
-        $current = $this->get_current_status();
+        $current = $this->getCurrentStatus();
 
         // Check if model has current status
-        if (!$current->get_id()) {
+        if (!$current->getID()) {
             throw new StatusException('Model must have current status before changing it');
         }
 
-        if (!$current->has_target($target)) {
-            throw new StatusException('Target status :target is not allowed', [':target' => $target->get_codename()]);
+        if (!$current->hasTarget($target)) {
+            throw new StatusException('Target status :target is not allowed', [':target' => $target->getCodename()]);
         }
 
-        return $this->set_current_status($target);
+        return $this->setCurrentStatus($target);
     }
 
     /**
@@ -63,16 +58,16 @@ trait StatusRelatedModelOrmTrait
      * @return $this
      * @throws \BetaKiller\Status\StatusException
      */
-    public function init_status(StatusModelInterface $status)
+    public function initStatus(StatusModelInterface $status)
     {
-        $current = $this->get_current_status();
+        $current = $this->getCurrentStatus();
 
         // Check if model has no current status
-        if ($current->get_id()) {
+        if ($current->getID()) {
             throw new StatusException('Model can not have current status before initializing');
         }
 
-        return $this->set_current_status($status);
+        return $this->setCurrentStatus($status);
     }
 
     /**
@@ -80,9 +75,9 @@ trait StatusRelatedModelOrmTrait
      *
      * @return \BetaKiller\Status\StatusModelInterface
      */
-    public function get_status_by_id($id)
+    public function getStatusByID($id)
     {
-        return $this->get_status_relation()->model_factory($id);
+        return $this->getStatusRelation()->model_factory($id);
     }
 
     /**
@@ -90,16 +85,16 @@ trait StatusRelatedModelOrmTrait
      *
      * @throws \BetaKiller\Status\StatusException
      */
-    public function do_status_transition(StatusTransitionModelInterface $transition): void
+    public function doStatusTransition(StatusTransitionModelInterface $transition): void
     {
-        if ($transition->get_source_node()->get_id() !== $this->get_current_status()->get_id()) {
+        if ($transition->getSourceNode()->getID() !== $this->getCurrentStatus()->getID()) {
             throw new StatusException('Only transitions from current status are allowed');
         }
 
         /** @var StatusModelInterface $target_status */
-        $target_status = $transition->get_target_node();
+        $target_status = $transition->getTargetNode();
 
-        $this->set_current_status($target_status);
+        $this->setCurrentStatus($target_status);
     }
 
     /**
@@ -108,35 +103,25 @@ trait StatusRelatedModelOrmTrait
      *
      * @return bool
      */
-    public function is_status_transition_allowed(string $codename, UserInterface $user): bool
+    public function isStatusTransitionAllowed(string $codename, UserInterface $user): bool
     {
-        return $this->get_current_status()->is_target_transition_allowed($codename, $user);
+        return $this->getCurrentStatus()->isTargetTransitionAllowed($codename, $user);
     }
 
     /**
      * @return StatusTransitionModelInterface[]|GraphTransitionModelInterface[]
      */
-    public function get_source_transitions(): array
+    public function getSourceTransitions(): array
     {
-        return $this->get_current_status()->get_source_transitions();
+        return $this->getCurrentStatus()->getSourceTransitions();
     }
 
     /**
      * @return StatusTransitionModelInterface[]|GraphTransitionModelInterface[]
      */
-    public function get_target_transitions(): array
+    public function getTargetTransitions(): array
     {
-        return $this->get_current_status()->get_target_transitions();
-    }
-
-    /**
-     * @param \BetaKiller\Model\UserInterface $user
-     *
-     * @return StatusTransitionModelInterface[]|GraphTransitionModelInterface[]
-     */
-    public function get_allowed_source_transitions(UserInterface $user): array
-    {
-        return $this->get_current_status()->get_allowed_source_transitions($user);
+        return $this->getCurrentStatus()->getTargetTransitions();
     }
 
     /**
@@ -144,9 +129,19 @@ trait StatusRelatedModelOrmTrait
      *
      * @return StatusTransitionModelInterface[]|GraphTransitionModelInterface[]
      */
-    public function get_allowed_target_transitions(UserInterface $user): array
+    public function getAllowedSourceTransitions(UserInterface $user): array
     {
-        return $this->get_current_status()->get_allowed_target_transitions($user);
+        return $this->getCurrentStatus()->getAllowedSourceTransitions($user);
+    }
+
+    /**
+     * @param \BetaKiller\Model\UserInterface $user
+     *
+     * @return StatusTransitionModelInterface[]|GraphTransitionModelInterface[]
+     */
+    public function getAllowedTargetTransitions(UserInterface $user): array
+    {
+        return $this->getCurrentStatus()->getAllowedTargetTransitions($user);
     }
 
     /**
@@ -154,12 +149,12 @@ trait StatusRelatedModelOrmTrait
      *
      * @return string[]
      */
-    public function get_allowed_target_transitions_codenames(UserInterface $user): array
+    public function getAllowedTargetTransitionsCodenames(UserInterface $user): array
     {
         $output = [];
 
-        foreach ($this->get_allowed_target_transitions($user) as $transition) {
-            $output[] = $transition->get_codename();
+        foreach ($this->getAllowedTargetTransitions($user) as $transition) {
+            $output[] = $transition->getCodename();
         }
 
         return $output;
@@ -168,17 +163,18 @@ trait StatusRelatedModelOrmTrait
     /**
      * @return static
      * @throws \BetaKiller\Status\StatusException
+     * @todo Move to repo
      */
-    public function set_start_status()
+    public function getStartStatus()
     {
         /** @var StatusModelInterface|null $start */
-        $start = $this->status_model_factory()->get_start_node();
+        $start = $this->statusModelFactory()->getStartNode();
 
         if (!$start) {
             throw new StatusException('No start status defined for :name', [':name' => \get_class($this)]);
         }
 
-        return $this->set_current_status($start);
+        return $this->setCurrentStatus($start);
     }
 
     /**
@@ -189,9 +185,9 @@ trait StatusRelatedModelOrmTrait
      * @deprecated
      * @todo Move to repo
      */
-    public function filter_status_id($status_id, $not_equal = false)
+    public function filterStatusID($status_id, $not_equal = false)
     {
-        $col = $this->object_column($this->get_status_relation_foreign_key());
+        $col = $this->object_column($this->getStatusRelationForeignKey());
 
         return $this->where($col, $not_equal ? '<>' : '=', $status_id);
     }
@@ -204,9 +200,9 @@ trait StatusRelatedModelOrmTrait
      * @deprecated
      * @todo Move to repo
      */
-    public function filter_status(StatusModelInterface $status, $not_equal = false)
+    public function filterStatus(StatusModelInterface $status, $not_equal = false)
     {
-        return $this->filter_status_id($status->get_id(), $not_equal);
+        return $this->filterStatusID($status->getID(), $not_equal);
     }
 
     /**
@@ -217,9 +213,9 @@ trait StatusRelatedModelOrmTrait
      * @deprecated
      * @todo Move to repo
      */
-    public function filter_statuses(array $status_ids, $not_equal = false)
+    public function filterStatuses(array $status_ids, $not_equal = false)
     {
-        $col = $this->object_column($this->get_status_relation_foreign_key());
+        $col = $this->object_column($this->getStatusRelationForeignKey());
 
         return $this->where($col, $not_equal ? 'NOT IN' : 'IN', $status_ids);
     }
@@ -239,38 +235,39 @@ trait StatusRelatedModelOrmTrait
         }
 
         /** @var \BetaKiller\Status\StatusModelInterface[] $allStatuses */
-        $allStatuses     = $this->status_model_factory()->get_all_nodes();
+        $allStatuses     = $this->statusModelFactory()->getAllNodes();
         $allowedStatuses = [];
 
         foreach ($allStatuses as $status) {
             if ($resource->isStatusActionAllowed($status, $action)) {
-                $allowedStatuses[] = $status->get_id();
+                $allowedStatuses[] = $status->getID();
             }
         }
 
-        $this->filter_statuses($allowedStatuses);
+        $this->filterStatuses($allowedStatuses);
 
         return $this;
     }
 
-    public function get_status_id()
+    public function getStatusID()
     {
-        return $this->get($this->get_status_relation_foreign_key());
+        return $this->get($this->getStatusRelationForeignKey());
     }
 
-    public function has_current_status()
+    public function hasCurrentStatus()
     {
-        return (bool)$this->get_status_id();
+        return (bool)$this->getStatusID();
     }
 
     /**
      * @param int|array|NULL $id
      *
      * @return StatusModelOrm|\BetaKiller\Utils\Kohana\ORM\OrmInterface
+     * @deprecated
      */
-    public function status_model_factory($id = null)
+    public function statusModelFactory($id = null)
     {
-        return ORM::factory($this->get_status_relation_model_name(), $id);
+        return ORM::factory($this->getStatusRelationModelName(), $id);
     }
 
     /**
@@ -283,9 +280,9 @@ trait StatusRelatedModelOrmTrait
     /**
      * @return StatusModelOrm
      */
-    protected function get_status_relation(): StatusModelOrm
+    protected function getStatusRelation(): StatusModelOrm
     {
-        return $this->get($this->get_status_relation_key());
+        return $this->get($this->getStatusRelationKey());
     }
 
     /**
@@ -293,12 +290,12 @@ trait StatusRelatedModelOrmTrait
      *
      * @return $this
      */
-    protected function set_current_status(StatusModelInterface $target)
+    protected function setCurrentStatus(StatusModelInterface $target)
     {
-        return $this->set($this->get_status_relation_key(), $target);
+        return $this->set($this->getStatusRelationKey(), $target);
     }
 
-    protected function get_status_relation_key(): string
+    protected function getStatusRelationKey(): string
     {
         return 'status';
     }
@@ -306,10 +303,10 @@ trait StatusRelatedModelOrmTrait
     /**
      * @return string
      */
-    abstract protected function get_status_relation_model_name(): string;
+    abstract protected function getStatusRelationModelName(): string;
 
     /**
      * @return string
      */
-    abstract protected function get_status_relation_foreign_key(): string;
+    abstract protected function getStatusRelationForeignKey(): string;
 }

@@ -16,6 +16,12 @@ class BetaKiller_Twig_Extension extends Twig_Extension
 
     /**
      * @Inject
+     * @var \Meta
+     */
+    private $meta;
+
+    /**
+     * @Inject
      * @var \Assets
      */
     private $assets;
@@ -122,9 +128,7 @@ class BetaKiller_Twig_Extension extends Twig_Extension
              */
             new Twig_Function(
                 'title',
-                function ($value) {
-                    Meta::instance()->title($value, Meta::TITLE_APPEND);
-                }
+                [$this, 'title']
             ),
 
         ];
@@ -170,6 +174,11 @@ class BetaKiller_Twig_Extension extends Twig_Extension
             }, ['needs_context' => true, 'is_safe' => ['html']]),
 
         ];
+    }
+
+    public function title(string $value)
+    {
+        return $this->meta->title($value, Meta::TITLE_APPEND);
     }
 
     /**
@@ -293,13 +302,11 @@ class BetaKiller_Twig_Extension extends Twig_Extension
      */
     public function meta($name = null, $value = null): ?string
     {
-        $instance = Meta::instance();
-
         if ($value === null && !is_array($name)) {
-            return $instance->get($name);
+            return $this->meta->get($name);
         }
 
-        $instance->set($name, $value);
+        $this->meta->set($name, $value);
 
         return null;
     }

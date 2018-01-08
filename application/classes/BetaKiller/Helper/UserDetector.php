@@ -1,10 +1,12 @@
 <?php
 namespace BetaKiller\Helper;
 
+use Auth;
 use BetaKiller\Exception;
 use BetaKiller\Model\GuestUser;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Repository\UserRepository;
+use BetaKiller\Service\UserService;
 use BetaKiller\Task\AbstractTask;
 
 class UserDetector
@@ -30,19 +32,26 @@ class UserDetector
     private $i18n;
 
     /**
+     * @var \BetaKiller\Service\UserService
+     */
+    private $service;
+
+    /**
      * UserDetector constructor.
      *
+     * @param \BetaKiller\Service\UserService       $service
      * @param \BetaKiller\Helper\AppEnv             $appEnv
      * @param \Auth                                 $auth
      * @param \BetaKiller\Repository\UserRepository $repo
      * @param \BetaKiller\Helper\I18n               $i18n
      */
-    public function __construct(AppEnv $appEnv, \Auth $auth, UserRepository $repo, I18n $i18n)
+    public function __construct(UserService $service, AppEnv $appEnv, Auth $auth, UserRepository $repo, I18n $i18n)
     {
         $this->appEnv     = $appEnv;
         $this->auth       = $auth;
         $this->repository = $repo;
         $this->i18n       = $i18n;
+        $this->service    = $service;
     }
 
     /**
@@ -51,6 +60,7 @@ class UserDetector
      */
     public function detect(): UserInterface
     {
+        /** @var UserInterface|null $user */
         $user = $this->appEnv->isCLI()
             ? $this->detectCliUser()
             : $this->auth->get_user();
@@ -62,7 +72,7 @@ class UserDetector
 
         $this->setSystemLanguage($user);
 
-        if ($user->isDeveloper()) {
+        if ($this->service->isDeveloper($user)) {
             $this->appEnv->enableDebug();
         }
 

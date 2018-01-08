@@ -20,9 +20,17 @@ class MainWidget extends AbstractAdminWidget
     private $commentStatusRepository;
 
     /**
+     * @Inject
+     * @var \BetaKiller\Service\UserService
+     */
+    private $userService;
+
+    /**
      * Returns data for View rendering
      *
      * @return array
+     * @throws \Spotman\Acl\Exception
+     * @throws \BetaKiller\IFace\Exception\IFaceException
      */
     public function getData(): array
     {
@@ -37,6 +45,11 @@ class MainWidget extends AbstractAdminWidget
         ];
     }
 
+    /**
+     * @return array
+     * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \Spotman\Acl\Exception
+     */
     protected function getPostsMenu(): array
     {
         /** @var \BetaKiller\IFace\Admin\Content\PostIndex $posts */
@@ -50,6 +63,8 @@ class MainWidget extends AbstractAdminWidget
      * @param \BetaKiller\IFace\IFaceInterface[]|null $childrenIfacesData
      *
      * @return array
+     * @throws \Spotman\Acl\Exception
+     * @throws \BetaKiller\IFace\Exception\IFaceException
      */
     protected function makeIFaceMenuItemData(IFaceInterface $iface, array $childrenIfacesData = null): array
     {
@@ -59,6 +74,14 @@ class MainWidget extends AbstractAdminWidget
         return $output;
     }
 
+    /**
+     * @param \BetaKiller\IFace\IFaceInterface                 $iface
+     * @param \BetaKiller\IFace\Url\UrlContainerInterface|null $params
+     *
+     * @return array
+     * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \Spotman\Acl\Exception
+     */
     protected function getIFaceMenuItemData(IFaceInterface $iface, UrlContainerInterface $params = null): array
     {
         if (!$this->aclHelper->isIFaceAllowed($iface, $params)) {
@@ -72,6 +95,11 @@ class MainWidget extends AbstractAdminWidget
         ];
     }
 
+    /**
+     * @return array
+     * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \Spotman\Acl\Exception
+     */
     protected function getCommentsMenu(): array
     {
         /** @var \BetaKiller\IFace\Admin\Content\CommentIndex $comments */
@@ -96,9 +124,14 @@ class MainWidget extends AbstractAdminWidget
         return $this->makeIFaceMenuItemData($commentsIndex, $childrenData);
     }
 
+    /**
+     * @return array|null
+     * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \Spotman\Acl\Exception
+     */
     protected function getErrorsMenu(): ?array
     {
-        if (!$this->user->isDeveloper()) {
+        if (!$this->userService->isDeveloper($this->user)) {
             return null;
         }
 

@@ -8,6 +8,7 @@ use BetaKiller\IFace\Url\UrlContainerInterface;
 use BetaKiller\IFace\Url\UrlDataSourceInterface;
 use BetaKiller\IFace\Url\UrlDispatcher;
 use BetaKiller\IFace\Url\UrlPrototype;
+use BetaKiller\Model\IFaceZone;
 use DateInterval;
 use DateTimeInterface;
 use Text;
@@ -86,20 +87,16 @@ abstract class AbstractIFace implements IFaceInterface
         return $this->ifaceHelper->renderIFace($this);
     }
 
-    public function getLayoutCodename(): string
+    public function getLayoutCodename(): ?string
     {
-        if ($zone = $this->getModel()->getLayoutCodename()) {
-            return $zone;
-        }
+        $current = $this;
 
-        $parent = $this->getParent();
+        // Climb up the IFace tree for a layout codename
+        do {
+            $layoutCodename = $current->getModel()->getLayoutCodename();
+        } while (!$layoutCodename && $current = $current->getParent());
 
-        if (!$parent) {
-            throw new IFaceException('Can not detect layout codename for iface :codename',
-                [':codename' => $this->getCodename()]);
-        }
-
-        return $parent->getLayoutCodename();
+        return $layoutCodename;
     }
 
     /**
@@ -459,17 +456,14 @@ abstract class AbstractIFace implements IFaceInterface
      */
     public function getZoneName(): string
     {
-        if ($zone = $this->getModel()->getZoneName()) {
-            return $zone;
-        }
+        $current = $this;
 
-        $parent = $this->getParent();
+        do {
+            $zoneName = $current->getModel()->getZoneName();
+        } while(!$zoneName && $current = $current->getParent());
 
-        if (!$parent) {
-            throw new IFaceException('Can not detect zone for iface :codename', [':codename' => $this->getCodename()]);
-        }
-
-        return $parent->getZoneName();
+        // Public zone by default
+        return $zoneName ?: IFaceZone::PUBLIC_ZONE;
     }
 
     /**

@@ -14,12 +14,12 @@ use BetaKiller\Utils;
 abstract class Factory
 {
     use Utils\Factory\NamespacedFactoryTrait;
-    use Utils\Instance\Simple;
 
     /**
      * Factory method
      *
      * @param $name
+     *
      * @return Registry
      */
     public function create($name)

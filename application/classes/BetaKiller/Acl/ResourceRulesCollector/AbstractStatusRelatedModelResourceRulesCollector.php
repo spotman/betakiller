@@ -47,7 +47,7 @@ abstract class AbstractStatusRelatedModelResourceRulesCollector extends Abstract
     private function getStatusDefaultAccessList(StatusModelInterface $model)
     {
         /** @var StatusModelInterface[] $statuses */
-        $statuses = $model->get_all_nodes();
+        $statuses = $model->getAllNodes();
         $data     = [];
 
         foreach ($statuses as $status) {
@@ -85,11 +85,11 @@ abstract class AbstractStatusRelatedModelResourceRulesCollector extends Abstract
         $resource = $this->resource;
 
         /** @var \BetaKiller\Status\StatusTransitionModelInterface[] $transitions */
-        $transitions = $statusModel->get_target_transitions();
+        $transitions = $statusModel->getTargetTransitions();
         $data        = [];
 
         foreach ($transitions as $transition) {
-            $identity        = $resource->makeTransitionPermissionIdentity($statusModel, $transition->get_codename());
+            $identity        = $resource->makeTransitionPermissionIdentity($statusModel, $transition->getCodename());
             $data[$identity] = $transition->getTransitionAllowedRolesNames();
         }
 
@@ -107,6 +107,6 @@ abstract class AbstractStatusRelatedModelResourceRulesCollector extends Abstract
         $relatedModel = $this->ormFactory->create($name);
 
         // TODO deal with getting status model
-        return $relatedModel->get_current_status();
+        return $relatedModel->getCurrentStatus();
     }
 }

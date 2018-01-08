@@ -8,4 +8,6 @@
 
 namespace BetaKiller\URL\QueryConverter;
 
-class Exception extends \BetaKiller\Exception {}
+use BetaKiller\Exception;
+
+class UrlQueryConverterException extends Exception {}

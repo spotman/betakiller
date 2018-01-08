@@ -36,7 +36,7 @@ abstract class StatusWorkflow implements StatusWorkflowInterface
         $this->custom_target_transition_check($target_transition);
 
         // Process transition
-        $this->model->do_status_transition($target_transition);
+        $this->model->doStatusTransition($target_transition);
 
         // Write history record if needed
         if ($this->isHistoryEnabled()) {
@@ -53,7 +53,7 @@ abstract class StatusWorkflow implements StatusWorkflowInterface
 
     public function isTransitionAllowed(string $codename): bool
     {
-        return $this->model->is_status_transition_allowed($codename, $this->user);
+        return $this->model->isStatusTransitionAllowed($codename, $this->user);
     }
 
     /**
@@ -73,17 +73,17 @@ abstract class StatusWorkflow implements StatusWorkflowInterface
      */
     protected function findTargetTransition(string $codename): StatusTransitionModelInterface
     {
-        $targets = $this->model->get_target_transitions();
+        $targets = $this->model->getTargetTransitions();
 
         foreach ($targets as $target) {
-            if ($target->get_codename() === $codename) {
+            if ($target->getCodename() === $codename) {
                 return $target;
             }
         }
 
         throw new StatusException('Can not find target transition by codename :transition from status :status', [
             ':transition' => $codename,
-            ':status'     => $this->model->get_current_status()->get_codename(),
+            ':status'     => $this->model->getCurrentStatus()->getCodename(),
         ]);
     }
 }

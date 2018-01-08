@@ -1,24 +1,24 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <root>
     <!-- TODO вынести это всё в файл config/ifaces.php, который добавляет элементы в IFaceModelTree::admin() -->
-    <iface uri="posts" codename="Admin_Content_PostIndex" parentCodename="Admin_Index" label="Posts" entity="ContentPost" entityAction="list" zone="admin">
-        <iface uri="create" codename="Admin_Content_PostCreate" label="Create post" entity="ContentPost" entityAction="create" zone="admin" />
-        <iface uri="{ContentPost.id}" codename="Admin_Content_PostItem" label="{ContentPost.label}" hasDynamicUrl="true" entity="ContentPost" entityAction="read" zone="admin">
+    <iface uri="posts" codename="Admin_Content_PostIndex" parentCodename="Admin_Index" label="Posts" entity="ContentPost" entityAction="list">
+        <iface uri="create" codename="Admin_Content_PostCreate" label="Create post" entity="ContentPost" entityAction="create" />
+        <iface uri="{ContentPost.id}" codename="Admin_Content_PostItem" label="{ContentPost.label}" hasDynamicUrl="true" entity="ContentPost" entityAction="read">
             <iface uri="preview" codename="Admin_Content_PostItemPreview" label="Preview" entity="ContentPost" entityAction="read" zone="preview" layoutCodename="public" />
-            <iface uri="revisions" codename="Admin_Content_PostItemRevisionList" label="Revisions" entity="ContentPost" entityAction="read" zone="admin" />
+            <iface uri="revisions" codename="Admin_Content_PostItemRevisionList" label="Revisions" entity="ContentPost" entityAction="read" />
         </iface>
     </iface>
 
-    <iface uri="comments" codename="Admin_Content_CommentIndex" parentCodename="Admin_Index" label="Comments" entity="ContentComment" entityAction="list" zone="admin">
-        <iface uri="by-status" codename="Admin_Content_CommentAggregateByStatus" label="Status statistic" entity="ContentComment" entityAction="list" zone="admin">
-            <iface uri="{ContentCommentStatus.codename}" codename="Admin_Content_CommentListByStatus" label="{ContentCommentStatus.getLabel()}" hasDynamicUrl="true" entity="ContentComment" entityAction="list" zone="admin" />
+    <iface uri="comments" codename="Admin_Content_CommentIndex" parentCodename="Admin_Index" label="Comments" entity="ContentComment" entityAction="list">
+        <iface uri="by-status" codename="Admin_Content_CommentAggregateByStatus" label="Status statistic" entity="ContentComment" entityAction="list">
+            <iface uri="{ContentCommentStatus.codename}" codename="Admin_Content_CommentListByStatus" label="{ContentCommentStatus.getLabel()}" hasDynamicUrl="true" entity="ContentComment" entityAction="list" />
         </iface>
-        <iface uri="{ContentComment.id}" codename="Admin_Content_CommentItem" label="{ContentComment.getLabel()}" hasDynamicUrl="true" entity="ContentComment" entityAction="read" zone="admin" />
+        <iface uri="{ContentComment.id}" codename="Admin_Content_CommentItem" label="{ContentComment.getLabel()}" hasDynamicUrl="true" entity="ContentComment" entityAction="read" />
     </iface>
 
-    <iface uri="shortcodes" codename="Admin_Content_Shortcode_Index" parentCodename="Admin_Index" label="Shortcodes plugin" zone="admin" aclRules="Admin.enabled">
-        <iface uri="{Shortcode.tagName}" codename="Admin_Content_Shortcode_Item" label="{Shortcode.codename}" hasDynamicUrl="true" zone="admin" aclRules="Admin.enabled">
-            <iface uri="wysiwyg-preview" codename="Admin_Content_Shortcode_WysiwygPreview" label="Preview" zone="admin" aclRules="Admin.enabled" />
+    <iface uri="shortcodes" codename="Admin_Content_Shortcode_Index" parentCodename="Admin_Index" label="Shortcodes plugin" aclRules="Admin.enabled">
+        <iface uri="{Shortcode.tagName}" codename="Admin_Content_Shortcode_Item" label="{Shortcode.codename}" hasDynamicUrl="true" aclRules="Admin.enabled">
+            <iface uri="wysiwyg-preview" codename="Admin_Content_Shortcode_WysiwygPreview" label="Preview" aclRules="Admin.enabled" />
         </iface>
     </iface>
 

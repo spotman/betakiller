@@ -1,7 +1,7 @@
 <?php
 namespace BetaKiller\Acl\Resource;
 
-use BetaKiller\Model\Role;
+use BetaKiller\Model\RoleInterface;
 use Spotman\Acl\Resource\SinglePermissionResource;
 
 class AdminResource extends SinglePermissionResource
@@ -17,8 +17,8 @@ class AdminResource extends SinglePermissionResource
         // No default permissions
         return [
             self::PERMISSION_IDENTITY   =>  [
-                Role::ADMIN_ROLE_NAME,
-                Role::DEVELOPER_ROLE_NAME,
+                RoleInterface::ADMIN_ROLE_NAME,
+                RoleInterface::DEVELOPER_ROLE_NAME,
             ],
         ];
     }

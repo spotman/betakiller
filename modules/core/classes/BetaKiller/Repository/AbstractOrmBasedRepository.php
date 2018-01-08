@@ -49,7 +49,7 @@ abstract class AbstractOrmBasedRepository extends AbstractRepository
         try {
             return $this->getOrmInstance()->get_all();
         } catch (\Kohana_Exception $e) {
-            throw new RepositoryException(':error', [':error' => $e->getMessage()], $e->getCode(), $e);
+            throw RepositoryException::wrap($e);
         }
     }
 
@@ -66,14 +66,20 @@ abstract class AbstractOrmBasedRepository extends AbstractRepository
     /**
      * @param ExtendedOrmInterface|mixed $entity
      *
-     * @throws \BetaKiller\Repository\RepositoryException
      * @throws \ORM_Validation_Exception
+     * @throws \BetaKiller\Repository\RepositoryException
      */
     public function save($entity): void
     {
         $this->checkEntityInheritance($entity);
 
-        $entity->save();
+        try {
+            $entity->save();
+        } catch (\ORM_Validation_Exception $e) {
+            throw $e;
+        } catch (\Throwable $e) {
+            throw RepositoryException::wrap($e);
+        }
 
         // Force updating all the related models
         $entity->reload();
@@ -91,7 +97,7 @@ abstract class AbstractOrmBasedRepository extends AbstractRepository
         try {
             $entity->delete();
         } catch (\Kohana_Exception $e) {
-            throw new RepositoryException(':error', [':error' => $e->getMessage()], $e->getCode(), $e);
+            throw RepositoryException::wrap($e);
         }
     }
 
@@ -123,5 +129,41 @@ abstract class AbstractOrmBasedRepository extends AbstractRepository
         $name = static::getCodename();
 
         return $this->ormFactory->create($name);
+    }
+
+    /**
+     * @param \BetaKiller\Model\ExtendedOrmInterface $orm
+     *
+     * @return ExtendedOrmInterface|mixed
+     * @throws \BetaKiller\Repository\RepositoryException
+     */
+    protected function findOne(ExtendedOrmInterface $orm)
+    {
+        try {
+            $model = $orm->find();
+        } catch (\Kohana_Exception $e) {
+            throw RepositoryException::wrap($e);
+        }
+
+        if (!$model->loaded()) {
+            return null;
+        }
+
+        return $model;
+    }
+
+    /**
+     * @param \BetaKiller\Model\ExtendedOrmInterface $orm
+     *
+     * @return \BetaKiller\Utils\Kohana\ORM\OrmInterface[]|\Database_Result
+     * @throws \BetaKiller\Repository\RepositoryException
+     */
+    protected function findAll(ExtendedOrmInterface $orm)
+    {
+        try {
+            return $orm->find_all();
+        } catch (\Kohana_Exception $e) {
+            throw RepositoryException::wrap($e);
+        }
     }
 }

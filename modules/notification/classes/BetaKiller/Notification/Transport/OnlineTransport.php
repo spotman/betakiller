@@ -1,16 +1,15 @@
 <?php
 namespace BetaKiller\Notification\Transport;
 
+use BetaKiller\Notification\MessageRendererInterface;
 use BetaKiller\Notification\NotificationMessageInterface;
 use BetaKiller\Notification\NotificationUserInterface;
 
 class OnlineTransport extends AbstractTransport
 {
-    const NAME = 'email';
-
     public function getName(): string
     {
-        return self::NAME;
+        return 'online';
     }
 
     public function isEnabledFor(NotificationUserInterface $user): bool
@@ -36,12 +35,16 @@ class OnlineTransport extends AbstractTransport
     /**
      * @param \BetaKiller\Notification\NotificationMessageInterface $message
      * @param \BetaKiller\Notification\NotificationUserInterface    $user
+     * @param \BetaKiller\Notification\MessageRendererInterface     $renderer
      *
      * @return int Number of messages sent
      * @throws \HTTP_Exception_501
      */
-    public function send(NotificationMessageInterface $message, NotificationUserInterface $user): int
-    {
+    public function send(
+        NotificationMessageInterface $message,
+        NotificationUserInterface $user,
+        MessageRendererInterface $renderer
+    ): int {
         throw new \HTTP_Exception_501('Not implemented yet');
     }
 }

@@ -2,6 +2,7 @@
 
 return array(
 
+    'ddd'                   => MODPATH.'ddd',                   // Interfaces and classes for DDD
     'core'                  => MODPATH.'core',                  // Core interfaces and classes
     'helper'                => MODPATH.'helper',                // Common helpers without external dependencies
 
