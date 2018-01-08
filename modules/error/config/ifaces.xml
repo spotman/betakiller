@@ -9,15 +9,15 @@
     </iface>
 
     <!-- TODO вынести это всё в файл config/ifaces.php, который добавляет элементы в IFaceModelTree::admin() -->
-    <iface uri="errors" codename="Admin_Error_Index" parentCodename="Admin_Index" title="Admin | Errors" label="Errors" aclRules="Admin.enabled" zone="admin">
-        <iface uri="php-exceptions" codename="Admin_Error_UnresolvedPhpExceptionIndex" title="Admin | Unresolved PhpExceptions" label="Unresolved" entity="PhpException" entityAction="listUnresolved" zone="admin">
-            <iface uri="resolved" codename="Admin_Error_ResolvedPhpExceptionIndex" title="Admin | Resolved PhpExceptions" label="Resolved" entity="PhpException" entityAction="listResolved" zone="admin" />
-            <iface uri="test" codename="Admin_Error_PhpExceptionTest" title="Test" entity="PhpException" entityAction="test" zone="admin">
-                <iface uri="500" codename="Admin_Error_PhpExceptionTestHTTP500" title="HTTP 500 test" zone="admin" aclRules="Admin.enabled" />
-                <iface uri="logger" codename="Admin_Error_PhpExceptionTestLogger" title="Logger test" zone="admin" aclRules="Admin.enabled" />
+    <iface uri="errors" codename="Admin_Error_Index" parentCodename="Admin_Index" title="Admin | Errors" label="Errors" aclRules="Admin.enabled">
+        <iface uri="php-exceptions" codename="Admin_Error_UnresolvedPhpExceptionIndex" title="Admin | Unresolved PhpExceptions" label="Unresolved" entity="PhpException" entityAction="listUnresolved">
+            <iface uri="resolved" codename="Admin_Error_ResolvedPhpExceptionIndex" title="Admin | Resolved PhpExceptions" label="Resolved" entity="PhpException" entityAction="listResolved" />
+            <iface uri="test" codename="Admin_Error_PhpExceptionTest" title="Test" entity="PhpException" entityAction="test">
+                <iface uri="500" codename="Admin_Error_PhpExceptionTestHTTP500" title="HTTP 500 test" aclRules="Admin.enabled" />
+                <iface uri="logger" codename="Admin_Error_PhpExceptionTestLogger" title="Logger test" aclRules="Admin.enabled" />
             </iface>
-            <iface uri="{PhpException.hash}" codename="Admin_Error_PhpExceptionItem" title="{PhpException.message}" hasDynamicUrl="true" entity="PhpException" entityAction="read" zone="admin">
-                <iface uri="stacktrace" codename="Admin_Error_PhpExceptionStackTrace" title="Stacktrace" zone="admin" layoutCodename="raw" aclRules="Admin.enabled" />
+            <iface uri="{PhpException.hash}" codename="Admin_Error_PhpExceptionItem" title="{PhpException.message}" hasDynamicUrl="true" entity="PhpException" entityAction="read">
+                <iface uri="stacktrace" codename="Admin_Error_PhpExceptionStackTrace" title="Stacktrace" layoutCodename="raw" aclRules="Admin.enabled" />
             </iface>
         </iface>
     </iface>

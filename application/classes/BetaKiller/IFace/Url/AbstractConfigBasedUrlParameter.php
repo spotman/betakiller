@@ -41,7 +41,7 @@ abstract class AbstractConfigBasedUrlParameter implements ConfigBasedUrlParamete
             ? $this->getCodename()
             : $this->getOption($key);
 
-        if ($value) {
+        if (!$value) {
             throw new UrlPrototypeException('Config-based url parameter [:name] has no ":key" value', [
                 ':name'    => $this->getCodename(),
                 ':key' => $key,
