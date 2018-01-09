@@ -44,10 +44,10 @@ abstract class AbstractOrmBasedRepository extends AbstractRepository
      *
      * @throws \BetaKiller\Repository\RepositoryException
      */
-    public function getAll()
+    public function getAll(): array
     {
         try {
-            return $this->getOrmInstance()->get_all();
+            return $this->getOrmInstance()->find_all()->as_array();
         } catch (\Kohana_Exception $e) {
             throw RepositoryException::wrap($e);
         }
@@ -155,13 +155,13 @@ abstract class AbstractOrmBasedRepository extends AbstractRepository
     /**
      * @param \BetaKiller\Model\ExtendedOrmInterface $orm
      *
-     * @return \BetaKiller\Utils\Kohana\ORM\OrmInterface[]|\Database_Result
+     * @return array
      * @throws \BetaKiller\Repository\RepositoryException
      */
-    protected function findAll(ExtendedOrmInterface $orm)
+    protected function findAll(ExtendedOrmInterface $orm): array
     {
         try {
-            return $orm->find_all();
+            return $orm->find_all()->as_array();
         } catch (\Kohana_Exception $e) {
             throw RepositoryException::wrap($e);
         }
