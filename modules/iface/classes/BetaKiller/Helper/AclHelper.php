@@ -150,7 +150,7 @@ class AclHelper
         }
 
         // Allow access to public/personal zone by default if nor entity or custom rules were not defined
-        if (in_array($zoneName, [IFaceZone::PUBLIC_ZONE, IFaceZone::PERSONAL_ZONE], true)) {
+        if (\in_array($zoneName, [IFaceZone::PUBLIC_ZONE, IFaceZone::PERSONAL_ZONE], true)) {
             return true;
         }
 

@@ -5,10 +5,10 @@ use ORM;
 
 class IFaceZone extends ORM
 {
-    const PUBLIC_ZONE   = 'public';
-    const ADMIN_ZONE    = 'admin';
-    const PERSONAL_ZONE = 'personal';
-    const PREVIEW_ZONE  = 'preview';
+    public const PUBLIC_ZONE   = 'public';
+    public const ADMIN_ZONE    = 'admin';
+    public const PERSONAL_ZONE = 'personal';
+    public const PREVIEW_ZONE  = 'preview';
 
     /**
      * Prepares the model database connection, determines the table name,
@@ -28,7 +28,7 @@ class IFaceZone extends ORM
      * @return string|null
      * @throws \Kohana_Exception
      */
-    public function getName(): ?string
+    public function getName(): string
     {
         return (string)$this->get('name');
     }

@@ -251,6 +251,7 @@ class IFace extends TreeModelSingleParentOrm implements IFaceModelInterface
      * Returns zone codename where this IFace is placed
      *
      * @return string
+     * @throws \Kohana_Exception
      */
     public function getZoneName(): string
     {

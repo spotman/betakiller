@@ -78,7 +78,7 @@ class IFaceModelProviderXmlConfigModel implements IFaceModelInterface
     /**
      * @var string
      */
-    private $zone = IFaceZone::PUBLIC_ZONE;
+    private $zone = IFaceZone::ADMIN_ZONE;
 
     /**
      * @var string[]

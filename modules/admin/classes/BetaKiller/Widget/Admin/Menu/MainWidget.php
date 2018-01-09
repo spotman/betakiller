@@ -68,7 +68,13 @@ class MainWidget extends AbstractAdminWidget
      */
     protected function makeIFaceMenuItemData(IFaceInterface $iface, array $childrenIfacesData = null): array
     {
-        $output             = $this->getIFaceMenuItemData($iface);
+        $output = $this->getIFaceMenuItemData($iface);
+
+        // If iface not allowed, do not show itself and its children
+        if (!$output) {
+            return [];
+        }
+
         $output['children'] = $childrenIfacesData;
 
         return $output;
@@ -126,6 +132,7 @@ class MainWidget extends AbstractAdminWidget
 
     /**
      * @return array|null
+     * @throws \BetaKiller\Repository\RepositoryException
      * @throws \BetaKiller\IFace\Exception\IFaceException
      * @throws \Spotman\Acl\Exception
      */
@@ -143,8 +150,6 @@ class MainWidget extends AbstractAdminWidget
 
         /** @var \BetaKiller\IFace\Admin\Error\ResolvedPhpExceptionIndex $iface */
         $resolvedErrors = $this->ifaceHelper->createIFaceFromCodename('Admin_Error_ResolvedPhpExceptionIndex');
-
-        $this->makeIFaceMenuItemData($unresolvedErrors);
 
         $childrenData = [
             $this->makeIFaceMenuItemData($unresolvedErrors),
