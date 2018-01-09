@@ -9,8 +9,6 @@ use BetaKiller\Model\UserInterface;
 
 /**
  * Class Controller_IFace
- *
- * @todo Refactoring to ControllerIFace + KohanaRequestAdapter/KohanaResponseAdapter
  */
 class Controller_IFace extends Controller
 {
@@ -127,7 +125,6 @@ class Controller_IFace extends Controller
     private function getRequestUri(): string
     {
         return $this->request->url();
-//        return '/'.ltrim($this->request->uri(), '/');
     }
 
     /**

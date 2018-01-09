@@ -1,8 +1,0 @@
-{% if not withoutRequireJs|default(false) %}
-{{ assets('require.js') }}
-{% endif %}
-
-{{ meta("viewport", "width=device-width, initial-scale=1.0") }}
-{{ assets('jquery', 'bootstrap') }}
-
-{% block content "" %}
