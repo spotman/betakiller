@@ -166,4 +166,17 @@ abstract class AbstractOrmBasedRepository extends AbstractRepository
             throw RepositoryException::wrap($e);
         }
     }
+
+    /**
+     * @param \BetaKiller\Model\ExtendedOrmInterface $orm
+     * @param int                                    $count
+     *
+     * @return $this|self
+     */
+    protected function limit(ExtendedOrmInterface $orm, int $count): self
+    {
+        $orm->limit($count);
+
+        return $this;
+    }
 }

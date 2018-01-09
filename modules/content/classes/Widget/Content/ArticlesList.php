@@ -6,7 +6,6 @@ use BetaKiller\Model\ContentCategoryInterface;
 use BetaKiller\Model\ContentPost;
 use BetaKiller\Model\IFaceZone;
 use BetaKiller\Search\SearchResultsInterface;
-use BetaKiller\Widget\WidgetException;
 
 class Widget_Content_ArticlesList extends AbstractBaseWidget
 {
@@ -39,15 +38,10 @@ class Widget_Content_ArticlesList extends AbstractBaseWidget
      *
      * @return array
      * @throws \Kohana_Exception
-     * @throws \BetaKiller\Widget\WidgetException
      */
     public function getData(): array
     {
         $category = $this->urlParametersHelper->getContentCategory();
-
-        if (!$category) {
-            throw new WidgetException('Missing content category');
-        }
 
         return $this->getArticlesData($category);
     }
@@ -61,15 +55,16 @@ class Widget_Content_ArticlesList extends AbstractBaseWidget
 
         if (!$this->is_ajax()) {
             $this->send_error_json();
+
             return;
         }
 
-        $term = HTML::chars(strip_tags($this->query(self::SEARCH_TERM_QUERY_KEY)));
-        $page = (int)$this->query(self::PAGE_QUERY_KEY);
+        $term       = HTML::chars(strip_tags($this->query(self::SEARCH_TERM_QUERY_KEY)));
+        $page       = (int)$this->query(self::PAGE_QUERY_KEY);
         $categoryID = (int)$this->query(self::CATEGORY_ID_QUERY_KEY);
 
         $categoryRepo = $this->contentHelper->getCategoryRepository();
-        $category = $categoryRepo->findById($categoryID);
+        $category     = $categoryRepo->findById($categoryID);
 
         $data = $this->getArticlesData($category, $page, $term);
 
@@ -84,13 +79,16 @@ class Widget_Content_ArticlesList extends AbstractBaseWidget
      * @return array
      * @throws \Kohana_Exception
      */
-    protected function getArticlesData(ContentCategoryInterface $category, ?int $page = null, ?string $term = null): array
-    {
+    protected function getArticlesData(
+        ?ContentCategoryInterface $category,
+        ?int $page = null,
+        ?string $term = null
+    ): array {
         $postsData = [];
 
         $page = $page ?: 1;
 
-        $results  = $this->getArticles($page, $category, $this->getContextTerm() ?: $term);
+        $results = $this->getArticles($page, $category, $this->getContextTerm() ?: $term);
 
         /** @var ContentPost[] $articles */
         $articles = $results->getItems();

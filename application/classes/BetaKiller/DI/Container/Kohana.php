@@ -38,7 +38,6 @@ class Kohana extends Base
             }
 
             $builder->setDefinitionCache($cache);
-//            $builder->writeProxiesToFile(true, 'tmp/proxies');
         }
 
         return $builder

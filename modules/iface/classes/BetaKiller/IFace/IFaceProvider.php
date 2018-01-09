@@ -178,7 +178,7 @@ class IFaceProvider
      *
      * @return \BetaKiller\IFace\IFaceInterface
      */
-    public function fromModel(IFaceModelInterface $model): ?IFaceInterface
+    public function fromModel(IFaceModelInterface $model): IFaceInterface
     {
         $codename = $model->getCodename();
         $iface    = $this->getInstanceFromCache($codename);

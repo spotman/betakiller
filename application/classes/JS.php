@@ -1,6 +1,6 @@
 <?php
 
-class JS
+class JS implements CommonStaticInterface
 {
     /**
      * @var \StaticJs

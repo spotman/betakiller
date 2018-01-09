@@ -46,6 +46,6 @@ class ContentCategoryRepository extends AbstractOrmBasedDispatchableRepository i
         /** @var \BetaKiller\Model\ContentCategory $categoryOrm */
         $categoryOrm = $orm;
 
-        $categoryOrm->filter_is_active()->filter_parent($parent_category);
+        $categoryOrm->filterIsActive()->filter_parent($parent_category);
     }
 }

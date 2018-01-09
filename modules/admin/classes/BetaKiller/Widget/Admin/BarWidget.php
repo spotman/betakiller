@@ -1,13 +1,14 @@
 <?php
 namespace BetaKiller\Widget\Admin;
 
-use BetaKiller\Helper\ContentUrlContainerHelper;
 use BetaKiller\Helper\IFaceHelper;
+use BetaKiller\Helper\UrlContainerHelper;
 use BetaKiller\IFace\CrudlsActionsInterface;
 use BetaKiller\IFace\Exception\IFaceException;
 use BetaKiller\IFace\IFaceInterface;
 use BetaKiller\IFace\IFaceProvider;
 use BetaKiller\IFace\Widget\AbstractAdminWidget;
+use BetaKiller\Model\ContentCategory;
 use BetaKiller\Model\ContentPost;
 use BetaKiller\Model\DispatchableEntityInterface;
 use BetaKiller\Model\IFaceZone;
@@ -22,9 +23,9 @@ class BarWidget extends AbstractAdminWidget
     protected $dispatcher;
 
     /**
-     * @var \BetaKiller\Helper\ContentUrlContainerHelper
+     * @var \BetaKiller\Helper\UrlContainerHelper
      */
-    private $contentUrlParamHelper;
+    private $urlParamHelper;
 
     /**
      * @var \BetaKiller\IFace\IFaceProvider
@@ -40,14 +41,14 @@ class BarWidget extends AbstractAdminWidget
     public function __construct(
         UserInterface $user,
         IFaceHelper $ifaceHelper,
-        ContentUrlContainerHelper $cUrlParamHelper,
+        UrlContainerHelper $urlParamHelper,
         IFaceProvider $ifaceProvider
     ) {
         parent::__construct($user);
 
-        $this->ifaceHelper           = $ifaceHelper;
-        $this->contentUrlParamHelper = $cUrlParamHelper;
-        $this->ifaceProvider         = $ifaceProvider;
+        $this->ifaceHelper    = $ifaceHelper;
+        $this->urlParamHelper = $urlParamHelper;
+        $this->ifaceProvider  = $ifaceProvider;
     }
 
     /**
@@ -126,7 +127,7 @@ class BarWidget extends AbstractAdminWidget
             ? $this->getCommentsListByStatusIface()
             : $this->getCommentsRootIface();
 
-        $params = $this->contentUrlParamHelper
+        $params = $this->urlParamHelper
             ->createEmpty()
             ->setParameter($pendingStatus);
 
@@ -222,16 +223,22 @@ class BarWidget extends AbstractAdminWidget
         }
     }
 
-    private function detectPrimaryEntity(): ?ContentPost
+    private function detectPrimaryEntity(): ?DispatchableEntityInterface
     {
-        if ($post = $this->contentUrlParamHelper->getContentPost()) {
-            return $post;
+        foreach ($this->getPrimaryEntitiesClassNames() as $className) {
+            if ($entity = $this->urlParamHelper->getEntityByClassName($className)) {
+                return $entity;
+            }
         }
 
-//        if ($category = $this->contentUrlParamHelper->getContentCategory()) {
-//            return $category;
-//        }
-
         return null;
+    }
+
+    private function getPrimaryEntitiesClassNames(): array
+    {
+        return [
+            ContentPost::class,
+            ContentCategory::class,
+        ];
     }
 }

@@ -68,17 +68,26 @@ class ContentPostRepository extends AbstractOrmBasedDispatchableRepository imple
     /**
      * @param ContentCategory $category
      *
-     * @return ContentPost[]
+     * @return \BetaKiller\Model\ContentPostInterface[]
+     * @throws \BetaKiller\Repository\RepositoryException
      */
     public function getCategoryArticles(ContentCategory $category): array
     {
         $orm = $this->getOrmInstance();
 
-        $this->filterCategory($orm, $category);
-
-        return $orm->get_all();
+        return $this
+            ->filterCategory($orm, $category)
+            ->findAll($orm);
     }
 
+    /**
+     * @param int                               $page
+     * @param int                               $itemsPerPage
+     * @param \BetaKiller\Model\ContentCategory $category
+     * @param null|string                       $term
+     *
+     * @return \BetaKiller\Search\SearchResultsInterface
+     */
     public function searchArticles(
         int $page,
         int $itemsPerPage,
@@ -88,7 +97,7 @@ class ContentPostRepository extends AbstractOrmBasedDispatchableRepository imple
         $orm = $this->getOrmInstance();
 
         if ($category && $category->hasID()) {
-            $categoriesIDs = $category->get_all_related_categories_ids();
+            $categoriesIDs = $category->getAllRelatedCategoriesIDs();
             $this->filterCategoryIDs($orm, $categoriesIDs);
         }
 
@@ -96,18 +105,20 @@ class ContentPostRepository extends AbstractOrmBasedDispatchableRepository imple
             $this->search($orm, $term);
         }
 
-        $this->filterArticles($orm);
-        $this->orderByCreatedAt($orm);
+        $this
+            ->filterArticles($orm)
+            ->orderByCreatedAt($orm);
 
         return $orm->getSearchResults($page, $itemsPerPage);
     }
 
-
     /**
      * @param OrmInterface $orm
      * @param string       $term
+     *
+     * @return \BetaKiller\Repository\ContentPostRepository
      */
-    private function search(OrmInterface $orm, string $term): void
+    private function search(OrmInterface $orm, string $term): self
     {
         $revisionKey = RevisionModelInterface::ACTUAL_REVISION_KEY;
 
@@ -115,13 +126,16 @@ class ContentPostRepository extends AbstractOrmBasedDispatchableRepository imple
             $revisionKey.'.label',
             $revisionKey.'.content',
         ]);
+
+        return $this;
     }
 
     /**
      * @param int|null $limit
      * @param int|null $excludeID
      *
-     * @return ContentPost[]
+     * @return \BetaKiller\Model\ContentPostInterface[]
+     * @throws \BetaKiller\Repository\RepositoryException
      */
     public function getPopularArticles(?int $limit = null, $excludeID = null): array
     {
@@ -132,7 +146,8 @@ class ContentPostRepository extends AbstractOrmBasedDispatchableRepository imple
      * @param int|null $limit
      * @param int|null $excludeID
      *
-     * @return ContentPost[]
+     * @return \BetaKiller\Model\ContentPostInterface[]
+     * @throws \BetaKiller\Repository\RepositoryException
      */
     public function getFreshArticles(?int $limit = null, $excludeID = null): array
     {
@@ -143,30 +158,32 @@ class ContentPostRepository extends AbstractOrmBasedDispatchableRepository imple
      * @param int|null $limit
      *
      * @return ContentPost[]
+     * @throws \BetaKiller\Repository\RepositoryException
      */
     public function getAllArticles(?int $limit = null): array
     {
         $orm = $this->getOrmInstance();
 
         if ($limit) {
-            $orm->limit($limit);
+            $this->limit($orm, $limit);
         }
 
-        $this->filterArticles($orm);
-
-        return $orm->get_all();
+        return $this
+            ->filterArticles($orm)
+            ->findAll($orm);
     }
 
     /**
      * @return ContentPost[]
+     * @throws \BetaKiller\Repository\RepositoryException
      */
     public function getAllPages(): array
     {
         $orm = $this->getOrmInstance();
 
-        $this->filterPages($orm);
-
-        return $orm->get_all();
+        return $this
+            ->filterPages($orm)
+            ->findAll($orm);
     }
 
     /**
@@ -175,6 +192,7 @@ class ContentPostRepository extends AbstractOrmBasedDispatchableRepository imple
      * @param int|int[]|null $excludeID
      *
      * @return ContentPost[]
+     * @throws \BetaKiller\Repository\RepositoryException
      */
     private function getPopularContent($filterType, ?int $limit, $excludeID = null): array
     {
@@ -184,11 +202,11 @@ class ContentPostRepository extends AbstractOrmBasedDispatchableRepository imple
             $orm->filter_ids((array)$excludeID, true);
         }
 
-        $this->filterTypes($orm, (array)$filterType);
-        $this->orderByViewsCount($orm);
-        $orm->limit($limit ?? 5);
-
-        return $orm->get_all();
+        return $this
+            ->filterTypes($orm, (array)$filterType)
+            ->orderByViewsCount($orm)
+            ->limit($orm, $limit ?? 5)
+            ->findAll($orm);
     }
 
     /**
@@ -196,7 +214,8 @@ class ContentPostRepository extends AbstractOrmBasedDispatchableRepository imple
      * @param int            $limit
      * @param int|int[]|null $excludeID
      *
-     * @return ContentPost[]
+     * @return \BetaKiller\Model\ContentPostInterface[]
+     * @throws \BetaKiller\Repository\RepositoryException
      */
     private function getFreshContent($filterType, ?int $limit = null, $excludeID = null): array
     {
@@ -206,138 +225,148 @@ class ContentPostRepository extends AbstractOrmBasedDispatchableRepository imple
             $orm->filter_ids((array)$excludeID, true);
         }
 
-        $this->filterTypes($orm, (array)$filterType);
-        $this->orderByViewsCount($orm);
-        $orm->limit($limit ?? 5);
+        $this
+            ->filterTypes($orm, (array)$filterType)
+            ->orderByViewsCount($orm)
+            ->limit($orm, $limit ?? 5);
 
-        return $orm->get_all();
+        return $this->findAll($orm);
     }
 
     /**
      * @param OrmInterface $orm
      * @param array        $ids
+     *
+     * @return \BetaKiller\Repository\ContentPostRepository
      */
-    private function filterCategoryIDs(OrmInterface $orm, array $ids): void
+    private function filterCategoryIDs(OrmInterface $orm, array $ids): self
     {
         $orm->where($orm->object_column('category_id'), 'IN', $ids);
+
+        return $this;
     }
 
     /**
-     * @param OrmInterface    $orm
+     * @param OrmInterface             $orm
      * @param ContentCategoryInterface $category
+     *
+     * @return \BetaKiller\Repository\ContentPostRepository
      */
-    private function filterCategory(OrmInterface $orm, ?ContentCategoryInterface $category): void
+    private function filterCategory(OrmInterface $orm, ?ContentCategoryInterface $category): self
     {
         $column = $orm->object_column('category_id');
 
         $category
             ? $orm->where($column, '=', $category->getID())
             : $orm->where($column, 'IS', null);
-    }
 
-//    /**
-//     * @param OrmInterface       $orm
-//     * @param \DateTimeInterface $date
-//     */
-//    private function filterPostsBefore(OrmInterface $orm, DateTimeInterface $date): void
-//    {
-//        $this->filterCreatedBy($orm, $date, '<');
-//        $this->orderByCreatedAt($orm);
-//    }
-//
-//    /**
-//     * @param OrmInterface       $orm
-//     * @param \DateTimeInterface $date
-//     * @param null|string        $op
-//     */
-//    private function filterCreatedBy(OrmInterface $orm, DateTimeInterface $date, ?string $op = null): void
-//    {
-//        $orm->filter_datetime_column_value('created_at', $date, $op ?? '<');
-//    }
-
-    /**
-     * @param \BetaKiller\Utils\Kohana\ORM\OrmInterface $orm
-     */
-    private function filterArticles(OrmInterface $orm): void
-    {
-        $this->filterType($orm, ContentPost::TYPE_ARTICLE);
+        return $this;
     }
 
     /**
      * @param \BetaKiller\Utils\Kohana\ORM\OrmInterface $orm
+     *
+     * @return \BetaKiller\Repository\ContentPostRepository
      */
-    private function filterPages(OrmInterface $orm): void
+    private function filterArticles(OrmInterface $orm): self
     {
-        $this->filterType($orm, ContentPost::TYPE_PAGE);
+        return $this->filterType($orm, ContentPost::TYPE_ARTICLE);
+    }
+
+    /**
+     * @param \BetaKiller\Utils\Kohana\ORM\OrmInterface $orm
+     *
+     * @return \BetaKiller\Repository\ContentPostRepository
+     */
+    private function filterPages(OrmInterface $orm): self
+    {
+        return $this->filterType($orm, ContentPost::TYPE_PAGE);
     }
 
     /**
      * @param OrmInterface $orm
      * @param int[]        $values
+     *
+     * @return \BetaKiller\Repository\ContentPostRepository
      */
-    private function filterTypes(OrmInterface $orm, array $values): void
+    private function filterTypes(OrmInterface $orm, array $values): self
     {
         $orm->where('type', 'IN', $values);
+
+        return $this;
     }
 
     /**
      * @param OrmInterface $orm
      * @param int          $value
+     *
+     * @return \BetaKiller\Repository\ContentPostRepository
      */
-    private function filterType(OrmInterface $orm, int $value): void
+    private function filterType(OrmInterface $orm, int $value): self
     {
         $orm->where('type', '=', $value);
-    }
 
-//    /**
-//     * @param OrmInterface $orm
-//     * @param string       $value
-//     */
-//    private function filterUri(OrmInterface $orm, string $value): void
-//    {
-//        $orm->where($orm->object_column('uri'), '=', $value);
-//    }
+        return $this;
+    }
 
     /**
      * @param \BetaKiller\Utils\Kohana\ORM\OrmInterface $orm
+     *
+     * @return \BetaKiller\Repository\ContentPostRepository
      */
-    private function filterWithCategory(OrmInterface $orm): void
+    private function filterWithCategory(OrmInterface $orm): self
     {
         $orm->where($orm->object_column('category_id'), 'IS NOT', null);
+
+        return $this;
     }
 
     /**
      * @param OrmInterface $orm
      * @param bool|null    $asc
+     *
+     * @return \BetaKiller\Repository\ContentPostRepository
      */
-    private function orderByCreatedAt(OrmInterface $orm, ?bool $asc = null): void
+    private function orderByCreatedAt(OrmInterface $orm, ?bool $asc = null): self
     {
         $orm->order_by($orm->object_column('created_at'), ($asc ?? false) ? 'ASC' : 'DESC');
+
+        return $this;
     }
 
     /**
      * @param \BetaKiller\Utils\Kohana\ORM\OrmInterface $orm
+     *
+     * @return \BetaKiller\Repository\ContentPostRepository
      */
-    private function prioritizeByPostTypes(OrmInterface $orm): void
+    private function prioritizeByPostTypes(OrmInterface $orm): self
     {
-        $this->orderByPostTypes($orm, ContentPost::getPrioritizedTypesList());
+        return $this->orderByPostTypes($orm, ContentPost::getPrioritizedTypesList());
     }
 
     /**
      * @param \BetaKiller\Utils\Kohana\ORM\OrmInterface $orm
      * @param int[]                                     $values
+     *
+     * @return \BetaKiller\Repository\ContentPostRepository
      */
-    private function orderByPostTypes(OrmInterface $orm, array $values): void
+    private function orderByPostTypes(OrmInterface $orm, array $values): self
     {
         $orm->order_by_field_sequence('type', $values);
+
+        return $this;
     }
 
     /**
      * @param OrmInterface $orm
      * @param bool|null    $asc
+     *
+     * @return \BetaKiller\Repository\ContentPostRepository
      */
-    private function orderByViewsCount(OrmInterface $orm, ?bool $asc = null): void
+    private function orderByViewsCount(OrmInterface $orm, ?bool $asc = null): self
     {
         $orm->order_by('views_count', ($asc ?? false) ? 'ASC' : 'DESC');
+
+        return $this;
     }
 }

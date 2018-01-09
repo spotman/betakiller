@@ -45,13 +45,14 @@ class ContentCommentRepository extends AbstractOrmBasedDispatchableRepository
      * @param int|null $interval
      *
      * @return int
+     * @throws \Exception
      */
     public function getCommentsCountForIP(string $ipAddress, ?int $interval = null): int
     {
         $interval = $interval ?: 30;
 
         $orm = $this->getOrmInstance();
-        $key = 'PT'.(int)$interval.'S';
+        $key = 'PT'.$interval.'S';
 
         $this
             ->filterLastRecords($orm, new \DateInterval($key))
@@ -65,6 +66,7 @@ class ContentCommentRepository extends AbstractOrmBasedDispatchableRepository
      * @param int                      $entityItemID
      *
      * @return \BetaKiller\Model\ContentComment[]
+     * @throws \BetaKiller\Repository\RepositoryException
      */
     public function getEntityItemApprovedComments(Entity $entity, int $entityItemID): array
     {
@@ -77,46 +79,48 @@ class ContentCommentRepository extends AbstractOrmBasedDispatchableRepository
     /**
      * @param \BetaKiller\Model\ContentCommentStatus|null $status
      * @param \BetaKiller\Model\Entity|null               $entity
-     * @param int|null                                    $entityItemID
+     * @param int|null                                    $entityItemId
      *
      * @return ContentComment[]
+     * @throws \BetaKiller\Repository\RepositoryException
      */
     public function getCommentsOrderedByPath(
         ?ContentCommentStatus $status = null,
         ?Entity $entity = null,
-        ?int $entityItemID = null
+        ?int $entityItemId = null
     ): array {
-        /** @var \BetaKiller\Model\ContentComment $model */
-        $model = $this->getOrmInstance();
+        /** @var \BetaKiller\Model\ContentComment $orm */
+        $orm = $this->getOrmInstance();
 
         if ($status) {
-            $model->filterStatus($status);
+            $orm->filterStatus($status);
         }
 
-        $this->filterEntityAndEntityItemID($model, $entity, $entityItemID);
+        $this->filterEntityAndEntityItemID($orm, $entity, $entityItemId);
 
-        $this->orderByPath($model);
+        $this->orderByPath($orm);
 
-        return $model->get_all();
+        return $this->findAll($orm);
     }
 
     /**
      * @param \BetaKiller\Model\ContentCommentStatus|null $status
      *
-     * @return ContentComment[]
+     * @return ContentCommentInterface[]
+     * @throws \BetaKiller\Repository\RepositoryException
      */
     public function getLatestComments(?ContentCommentStatus $status = null): array
     {
-        /** @var \BetaKiller\Model\ContentComment $model */
-        $model = $this->getOrmInstance();
+        /** @var \BetaKiller\Model\ContentComment $orm */
+        $orm = $this->getOrmInstance();
 
         if ($status) {
-            $model->filterStatus($status);
+            $orm->filterStatus($status);
         }
 
-        $this->orderByCreatedAt($model);
+        $this->orderByCreatedAt($orm);
 
-        return $model->get_all();
+        return $this->findAll($orm);
     }
 
     /**
@@ -145,6 +149,8 @@ class ContentCommentRepository extends AbstractOrmBasedDispatchableRepository
 
     /**
      * @param \BetaKiller\Model\ExtendedOrmInterface|mixed $entity
+     *
+     * @throws \BetaKiller\Repository\RepositoryException
      */
     public function delete($entity): void
     {
@@ -153,50 +159,13 @@ class ContentCommentRepository extends AbstractOrmBasedDispatchableRepository
         parent::delete($entity);
     }
 
-//    private function filter_pending()
-//    {
-//        return $this->filterStatusID(ContentCommentStatus::STATUS_PENDING);
-//    }
-//
-//    private function filter_approved()
-//    {
-//        return $this->filterStatusID(ContentCommentStatus::STATUS_APPROVED);
-//    }
-//
-//    private function filter_spam()
-//    {
-//        return $this->filterStatusID(ContentCommentStatus::STATUS_SPAM);
-//    }
-//
-//    private function filter_trash()
-//    {
-//        return $this->filterStatusID(ContentCommentStatus::STATUS_TRASH);
-//    }
-//
-//    private function filterStatusID(ContentCommentStatus $orm, int $id)
-//    {
-//
-//    }
-//
-//    /**
-//     * @return int
-//     */
-//    public function get_pending_comments_count()
-//    {
-//        /** @var \ContentCommentStatus $statusOrm */
-//        $statusOrm = $this->statusModelFactory();
-//        $status    = $statusOrm->getPendingStatus();
-//
-//        return $this->getCommentsCount($status);
-//    }
-
     /**
      * @param \BetaKiller\Utils\Kohana\ORM\OrmInterface $orm
      * @param \DateInterval                             $interval
      *
      * @return $this
      */
-    private function filterLastRecords(OrmInterface $orm, DateInterval $interval)
+    private function filterLastRecords(OrmInterface $orm, DateInterval $interval): self
     {
         $time = new DateTime();
         $time->sub($interval);
@@ -212,9 +181,9 @@ class ContentCommentRepository extends AbstractOrmBasedDispatchableRepository
      *
      * @return $this
      */
-    private function filterIpAddress(OrmInterface $orm, string $value)
+    private function filterIpAddress(OrmInterface $orm, string $value): self
     {
-        $orm->where($orm->object_column('ip_address'), '=', (string)$value);
+        $orm->where($orm->object_column('ip_address'), '=', $value);
 
         return $this;
     }
@@ -224,7 +193,7 @@ class ContentCommentRepository extends AbstractOrmBasedDispatchableRepository
      *
      * @return $this
      */
-    private function orderByPath(OrmInterface $orm)
+    private function orderByPath(OrmInterface $orm): self
     {
         $orm->order_by('path', 'asc');
 
@@ -237,7 +206,7 @@ class ContentCommentRepository extends AbstractOrmBasedDispatchableRepository
      *
      * @return $this
      */
-    private function orderByCreatedAt(OrmInterface $orm, ?bool $asc = null)
+    private function orderByCreatedAt(OrmInterface $orm, ?bool $asc = null): self
     {
         $orm->order_by('created_at', $asc ? 'asc' : 'desc');
 

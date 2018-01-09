@@ -73,13 +73,13 @@ class Assets
     }
 
     /**
-     * @param JS|CSS $object
-     * @param string $methodName
-     * @param mixed  $files
+     * @param \CommonStaticInterface $object
+     * @param string                 $methodName
+     * @param mixed                  $files
      *
-     * @throws HTTP_Exception_500
+     * @throws \HTTP_Exception_500
      */
-    protected function processStatic($object, $methodName, $files): void
+    protected function processStatic(CommonStaticInterface $object, string $methodName, $files): void
     {
         // Search for specific method in object
         if ($files === true && method_exists($object, $methodName)) {

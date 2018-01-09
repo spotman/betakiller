@@ -45,9 +45,6 @@ class Task_Cache_Warmup extends \BetaKiller\Task\AbstractTask
 
     protected function _execute(array $params)
     {
-        // Disable exception handling coz it has exit() call inside and brakes iterator
-//        BetaKiller_Kohana_Exception::disableHandler();
-
         $parameters = $this->urlParametersHelper->createEmpty();
 
         // Get all ifaces recursively
@@ -55,13 +52,6 @@ class Task_Cache_Warmup extends \BetaKiller\Task\AbstractTask
 
         // For each IFace
         foreach ($iterator as $ifaceModel) {
-//            if ($ifaceModel->hideInSiteMap()) {
-//                $this->debug('Skip IFace :codename coz it is hidden in sitemap', [
-//                    ':codename' => $ifaceModel->getCodename(),
-//                ]);
-//                continue;
-//            }
-
             $this->logger->debug('Found IFace :codename', [':codename' => $ifaceModel->getCodename()]);
 
             try {

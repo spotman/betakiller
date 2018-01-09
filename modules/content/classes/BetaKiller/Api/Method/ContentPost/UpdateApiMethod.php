@@ -29,10 +29,10 @@ class UpdateApiMethod extends AbstractEntityUpdateApiApiMethod
             $model->setLabel($this->sanitizeString($data->label));
         }
 
-        // TODO deal with url change
-//        if (isset($data->uri)) {
-//            $model->setUri($this->sanitizeString($data->uri));
-//        }
+        if (isset($data->uri) && $data->uri !== $model->getUri()) {
+            // TODO deal with url change
+            $model->setUri($this->sanitizeString($data->uri));
+        }
 
         if (isset($data->title)) {
             $model->setTitle($this->sanitizeString($data->title));

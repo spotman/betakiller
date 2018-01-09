@@ -73,7 +73,7 @@ class ContentCategory extends TreeModelSingleParentOrm implements ContentCategor
      * @deprecated
      * @todo Move to repository
      */
-    public function get_all_related_categories_ids(?bool $include_self = null): array
+    public function getAllRelatedCategoriesIDs(?bool $include_self = null): array
     {
         // Collect all children categories
         $ids = $this->getAllChildren($this->primary_key());
@@ -96,7 +96,7 @@ class ContentCategory extends TreeModelSingleParentOrm implements ContentCategor
      * @deprecated
      * @todo Move to repository
      */
-    public function filter_is_active(?bool $value = null)
+    public function filterIsActive(?bool $value = null)
     {
         return $this->where($this->object_column('is_active'), '=', $value ?? true);
     }
@@ -108,7 +108,7 @@ class ContentCategory extends TreeModelSingleParentOrm implements ContentCategor
      * @deprecated
      * @todo Move to repository
      */
-    public function order_by_place(?bool $desc = null)
+    public function orderByPlace(?bool $desc = null)
     {
         return $this->order_by($this->object_column('place'), ($desc ?? false) ? 'desc' : 'asc');
     }
@@ -121,7 +121,7 @@ class ContentCategory extends TreeModelSingleParentOrm implements ContentCategor
      */
     protected function additionalTreeTraversalFiltering()
     {
-        return $this->filter_is_active()->order_by_place();
+        return $this->filterIsActive()->orderByPlace();
     }
 
     public function linkPosts(array $item_ids): void

@@ -1,66 +1,61 @@
 <?php
 
 
-class Task_Assets_Build extends Minion_Task {
+class Task_Assets_Build extends Minion_Task
+{
+    protected function defineOptions(): array
+    {
+        return [
+            'target' => null,
+        ];
+    }
 
     /**
-     * The list of options this task accepts and their default values.
+     * @param array $params
      *
-     *     protected $_options = array(
-     *         'limit' => 4,
-     *         'table' => NULL,
-     *     );
-     *
-     * @var array
+     * @throws \RuntimeException
+     * @throws \Kohana_Exception
      */
-    protected $_options = array(
-        'target'    =>  ''
-    );
-
-    protected function _execute(array $params)
+    protected function _execute(array $params): void
     {
-        $static_files_list = Kohana::list_files('static-files');
+        $staticFilesList = Kohana::list_files('static-files');
 
-        $target_directory = MultiSite::instance()->getSitePath().DIRECTORY_SEPARATOR.'builds'.DIRECTORY_SEPARATOR.'merge';
+        $targetDir = implode(DIRECTORY_SEPARATOR, [MultiSite::instance()->getSitePath(), 'builds', 'merge']);
 
-//        Minion_CLI::write($target_directory);
+        $this->logger->debug('Build target dir is :dir', [':dir' => $targetDir]);
 
-        foreach( $static_files_list as $file )
-        {
-            $this->process_file($file, $target_directory);
+        foreach ($staticFilesList as $file) {
+            $this->processFile($file, $targetDir);
         }
-
-//        var_dump($static_files_list);
     }
 
-    protected function process_file($file, $target_base)
+    /**
+     * @param        $file
+     * @param string $targetBase
+     *
+     * @throws \RuntimeException
+     * @throws \Kohana_Exception
+     */
+    protected function processFile($file, string $targetBase)
     {
-        if ( is_array($file) )
-        {
-            foreach ( $file as $item )
-            {
-                $this->process_file($item, $target_base);
+        if (is_array($file)) {
+            foreach ($file as $item) {
+                $this->processFile($item, $targetBase);
             }
-        }
-        else
-        {
-            $file_array = explode('static-files'.DIRECTORY_SEPARATOR, $file);
+        } else {
+            $fileArray = explode('static-files', $file);
 
-            $target = $target_base.DIRECTORY_SEPARATOR.$file_array[1];
+            $target = $targetBase.$fileArray[1];
 
-            $target_base_dir = dirname($target);
+            $targetBaseDir = dirname($target);
 
-            if ( ! file_exists($target_base_dir) )
-            {
-                mkdir($target_base_dir, 0775, TRUE);
+            if (!file_exists($targetBaseDir) && !mkdir($targetBaseDir) && !is_dir($targetBaseDir)) {
+                throw new \RuntimeException(sprintf('Directory "%s" was not created', $targetBaseDir));
             }
 
-            Minion_CLI::color($file, 'green');
-            Minion_CLI::color($target, 'blue');
+            $this->logger->debug('Copying :from to :to', [':from' => $file, ':to' => $target]);
 
-//            copy($file, $target);
+            copy($file, $target) && unlink($target);
         }
-
     }
-
 }

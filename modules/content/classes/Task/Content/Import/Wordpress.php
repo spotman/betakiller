@@ -725,6 +725,9 @@ class Task_Content_Import_Wordpress extends AbstractTask
     /**
      * @param \BetaKiller\Model\ContentPost $item
      *
+     * @throws \BetaKiller\Task\TaskException
+     * @throws \BetaKiller\Exception
+     * @throws \RuntimeException
      * @throws \Kohana_Exception
      */
     private function processCustomBbTags(ContentPost $item): void
@@ -885,7 +888,6 @@ class Task_Content_Import_Wordpress extends AbstractTask
 
         foreach ($slides as $slide) {
             $url = $slide['image'];
-//            $url_path = parse_url($url, PHP_URL_PATH);
 
             // Searching for image
             $wpImage = $this->wp->get_attachment_by_path($url);
@@ -902,7 +904,6 @@ class Task_Content_Import_Wordpress extends AbstractTask
             }
 
             // Processing image
-
             $image = $this->processWordpressAttachment($wpImage, $post->getID());
 
             $this->logger->debug('Adding image :id to wonderplugin slider', [':id' => $image->getID()]);

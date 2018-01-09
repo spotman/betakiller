@@ -7,9 +7,6 @@ use Symfony\Component\Process\Exception\RuntimeException;
 
 require 'recipe/common.php';
 
-// For php-ssh extension
-//require dirname(__FILE__).'/vendor/autoload.php';
-
 set('git_tty', true); // [Optional] Allocate tty for git on first deployment
 
 \define('BETAKILLER_CORE_PATH', 'core');
@@ -22,9 +19,6 @@ set('core_repository', 'git@github.com:spotman/betakiller.git');
 
 // Default application path
 set('app_path', 'app');
-
-// Use PHP SSH2 extension
-//set('ssh_type', 'ext-ssh2');
 
 // Option for GIT management
 option('repo', null, InputOption::VALUE_OPTIONAL, 'Tag to deploy.', 'app');

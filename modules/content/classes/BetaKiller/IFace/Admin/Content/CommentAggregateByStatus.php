@@ -11,11 +11,7 @@ class CommentAggregateByStatus extends AbstractAdminBase
      */
     public function getData(): array
     {
-        // TODO: Implement getData() method.
-
         // TODO get aggregated statuses list
-//        $statuses = $this->model_factory_content_comment();
-
 
         return [];
     }

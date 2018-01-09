@@ -38,7 +38,7 @@ class UrlContainerHelper
         return $this->urlContainer;
     }
 
-    protected function getEntity($key, UrlContainerInterface $params = null)
+    public function getEntity($key, UrlContainerInterface $params = null)
     {
         if (!$params) {
             $params = $this->urlContainer;
@@ -47,7 +47,7 @@ class UrlContainerHelper
         return $params->getEntity($key);
     }
 
-    protected function getEntityByClassName($className, UrlContainerInterface $params = null)
+    public function getEntityByClassName($className, UrlContainerInterface $params = null)
     {
         if (!$params) {
             $params = $this->urlContainer;
@@ -56,7 +56,7 @@ class UrlContainerHelper
         return $params->getEntityByClassName($className);
     }
 
-    protected function setEntity(DispatchableEntityInterface $model, UrlContainerInterface $params = null): UrlContainerInterface
+    public function setEntity(DispatchableEntityInterface $model, UrlContainerInterface $params = null): UrlContainerInterface
     {
         if (!$params) {
             $params = $this->urlContainer;

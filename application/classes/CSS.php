@@ -1,6 +1,6 @@
 <?php
 
-class CSS
+class CSS implements CommonStaticInterface
 {
     /**
      * @var \StaticCss
