@@ -17,6 +17,10 @@ class Controller_Content extends Controller
      */
     private $assetsHelper;
 
+    /**
+     * @throws \BetaKiller\Assets\AssetsException
+     * @throws \HTTP_Exception_404
+     */
     public function action_files_bc_redirect()
     {
         $file = $this->param('file');
@@ -27,7 +31,7 @@ class Controller_Content extends Controller
 
         $path = '/'.ltrim($this->getRequest()->uri(), '/');
 
-        $model = $this->find_content_model_by_wp_path($path);
+        $model = $this->findContentModelByWpPath($path);
 
         if (!$model) {
             throw new HTTP_Exception_404();
@@ -42,8 +46,9 @@ class Controller_Content extends Controller
      * @param string $path
      *
      * @return AssetsModelInterface|null
+     * @throws \BetaKiller\Assets\AssetsException
      */
-    protected function find_content_model_by_wp_path($path): ?AssetsModelInterface
+    protected function findContentModelByWpPath($path): ?AssetsModelInterface
     {
         /** @var \BetaKiller\Repository\RepositoryHasWordpressPathInterface[] $repositories */
 
@@ -54,7 +59,7 @@ class Controller_Content extends Controller
         ];
 
         foreach ($repositories as $repo) {
-            $model = $repo->find_by_wp_path($path);
+            $model = $repo->findByWpPath($path);
 
             if (!$model) {
                 continue;
@@ -62,7 +67,7 @@ class Controller_Content extends Controller
 
             if (!($model instanceof AssetsModelInterface)) {
                 throw new AssetsException('Model :name must be instance of :must', [
-                    ':name' => get_class($model),
+                    ':name' => \get_class($model),
                     ':must' => AssetsModelInterface::class,
                 ]);
             }

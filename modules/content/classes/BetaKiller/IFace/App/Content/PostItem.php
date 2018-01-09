@@ -1,9 +1,11 @@
 <?php
 namespace BetaKiller\IFace\App\Content;
 
+use BetaKiller\Helper\AssetsHelper;
 use BetaKiller\Helper\ContentUrlContainerHelper;
-use BetaKiller\Model\IFaceZone;
+use BetaKiller\Helper\IFaceHelper;
 use BetaKiller\Model\ContentPost;
+use BetaKiller\Model\IFaceZone;
 use BetaKiller\Model\UserInterface;
 
 class PostItem extends AbstractAppBase
@@ -25,22 +27,28 @@ class PostItem extends AbstractAppBase
 
     /**
      * @var \BetaKiller\Helper\AssetsHelper
-     * @Inject
      */
     private $assetsHelper;
 
     /**
      * PostItem constructor.
      *
+     * @param \BetaKiller\Helper\IFaceHelper               $ifaceHelper
+     * @param \BetaKiller\Helper\AssetsHelper              $assetsHelper
      * @param \BetaKiller\Helper\ContentUrlContainerHelper $urlParametersHelper
      * @param \BetaKiller\Model\UserInterface              $user
      */
-    public function __construct(ContentUrlContainerHelper $urlParametersHelper, UserInterface $user)
-    {
-        parent::__construct();
+    public function __construct(
+        IFaceHelper $ifaceHelper,
+        AssetsHelper $assetsHelper,
+        ContentUrlContainerHelper $urlParametersHelper,
+        UserInterface $user
+    ) {
+        parent::__construct($ifaceHelper);
 
         $this->urlParametersHelper = $urlParametersHelper;
         $this->user                = $user;
+        $this->assetsHelper        = $assetsHelper;
     }
 
     /**
@@ -107,6 +115,7 @@ class PostItem extends AbstractAppBase
 
     /**
      * @return \DateInterval
+     * @throws \Exception
      */
     public function getDefaultExpiresInterval(): \DateInterval
     {
@@ -115,7 +124,6 @@ class PostItem extends AbstractAppBase
 
     /**
      * @return \BetaKiller\Model\ContentPost
-     * @throws \BetaKiller\IFace\Exception\IFaceException
      */
     protected function detectContentModel(): ContentPost
     {

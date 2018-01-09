@@ -3,8 +3,9 @@ namespace BetaKiller\IFace;
 
 use BetaKiller\Helper\SeoMetaInterface;
 use BetaKiller\IFace\Url\UrlContainerInterface;
+use BetaKiller\Model\HasLabelInterface;
 
-interface IFaceInterface extends SeoMetaInterface
+interface IFaceInterface extends SeoMetaInterface, HasLabelInterface
 {
     /**
      * @return string
@@ -22,36 +23,6 @@ interface IFaceInterface extends SeoMetaInterface
     public function getLayoutCodename(): ?string;
 
     /**
-     * Returns processed label
-     *
-     * @param UrlContainerInterface|null $params
-     *
-     * @return string
-     */
-    public function getLabel(UrlContainerInterface $params = null): string;
-
-    /**
-     * Returns label source/pattern
-     *
-     * @return string
-     */
-    public function getLabelSource(): string;
-
-    /**
-     * Returns title source/pattern
-     *
-     * @return string
-     */
-    public function getTitleSource(): ?string;
-
-    /**
-     * Returns description source/pattern
-     *
-     * @return string
-     */
-    public function getDescriptionSource(): ?string;
-
-    /**
      * Returns data for View
      *
      * @return array
@@ -59,11 +30,11 @@ interface IFaceInterface extends SeoMetaInterface
     public function getData(): array;
 
     /**
-     * @param \DateTimeInterface $last_modified
+     * @param \DateTimeInterface $lastModified
      *
      * @return $this
      */
-    public function setLastModified(\DateTimeInterface $last_modified);
+    public function setLastModified(\DateTimeInterface $lastModified): self;
 
     /**
      * @return \DateTimeInterface
@@ -85,7 +56,7 @@ interface IFaceInterface extends SeoMetaInterface
      *
      * @return $this
      */
-    public function setExpiresInterval(\DateInterval $expires);
+    public function setExpiresInterval(\DateInterval $expires): self;
 
     /**
      * @return \DateInterval
@@ -121,20 +92,9 @@ interface IFaceInterface extends SeoMetaInterface
 
     /**
      * @return IFaceInterface|null
+     * @deprecated Use IFaceTree instead
      */
     public function getParent(): ?IFaceInterface;
-
-    /**
-     * @param \BetaKiller\IFace\IFaceInterface $parent
-     *
-     * @return $this
-     */
-    public function setParent(IFaceInterface $parent);
-
-    /**
-     * @return \BetaKiller\IFace\IFaceInterface[]
-     */
-    public function getChildren(): array;
 
     /**
      * Getter for current iface model
@@ -150,24 +110,12 @@ interface IFaceInterface extends SeoMetaInterface
      *
      * @return $this
      */
-    public function setModel(IFaceModelInterface $model);
+    public function setModel(IFaceModelInterface $model): self;
 
     /**
      * @return bool
      */
     public function isDefault(): bool;
-
-    /**
-     * @return bool
-     */
-    public function isInStack(): bool;
-
-    /**
-     * @param \BetaKiller\IFace\Url\UrlContainerInterface|null $parameters
-     *
-     * @return bool
-     */
-    public function isCurrent(UrlContainerInterface $parameters = null): bool;
 
     /**
      * @param \BetaKiller\IFace\Url\UrlContainerInterface|null $parameters
@@ -214,11 +162,4 @@ interface IFaceInterface extends SeoMetaInterface
      * @return string[]
      */
     public function getAdditionalAclRules(): array;
-
-    /**
-     * @param \BetaKiller\IFace\Url\UrlContainerInterface $params
-     *
-     * @return string[]
-     */
-    public function getPublicAvailableUrls(UrlContainerInterface $params): array;
 }

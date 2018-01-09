@@ -178,11 +178,6 @@ class UrlDispatcher implements LoggerAwareInterface
                 $this->throwMissingUrlException($urlIterator, $parentIFace);
             }
 
-            // Store link to parent IFace if exists
-            if ($parentIFace) {
-                $ifaceInstance->setParent($parentIFace);
-            }
-
             $parentIFace = $ifaceInstance;
 
             $this->pushToStack($ifaceInstance);

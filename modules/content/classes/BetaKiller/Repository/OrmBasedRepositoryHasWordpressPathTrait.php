@@ -16,7 +16,7 @@ trait OrmBasedRepositoryHasWordpressPathTrait
      *
      * @return EntityHasWordpressPathInterface|null
      */
-    public function find_by_wp_path($wp_path): ?EntityHasWordpressPathInterface
+    public function findByWpPath($wp_path): ?EntityHasWordpressPathInterface
     {
         /** @var OrmInterface $orm */
         $orm = $this->getOrmInstance();

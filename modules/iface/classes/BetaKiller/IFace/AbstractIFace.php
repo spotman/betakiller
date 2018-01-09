@@ -1,25 +1,20 @@
 <?php
 namespace BetaKiller\IFace;
 
-use BetaKiller\Config\AppConfigInterface;
+use BetaKiller\Helper\IFaceHelper;
 use BetaKiller\Helper\SeoMetaInterface;
 use BetaKiller\IFace\Exception\IFaceException;
 use BetaKiller\IFace\Url\UrlContainerInterface;
-use BetaKiller\IFace\Url\UrlDataSourceInterface;
-use BetaKiller\IFace\Url\UrlDispatcher;
-use BetaKiller\IFace\Url\UrlPrototype;
 use BetaKiller\Model\IFaceZone;
 use DateInterval;
 use DateTimeInterface;
-use Text;
-use URL;
 
 abstract class AbstractIFace implements IFaceInterface
 {
     /**
      * @var IFaceModelInterface
      */
-    private $faceModel;
+    private $model;
 
     /**
      * @var IFaceInterface|null Parent iface
@@ -37,42 +32,18 @@ abstract class AbstractIFace implements IFaceInterface
     private $expiresInterval;
 
     /**
-     * @Inject
      * @var \BetaKiller\Helper\IFaceHelper
      */
     protected $ifaceHelper;
 
-    /**
-     * @Inject
-     * @var \BetaKiller\Helper\AclHelper
-     */
-    private $aclHelper;
-
-    /**
-     * @Inject
-     * @var AppConfigInterface
-     */
-    private $appConfig;
-
-    /**
-     * @Inject
-     * @var \BetaKiller\IFace\IFaceProvider
-     */
-    private $ifaceProvider;
-
-    /**
-     * @Inject
-     * @var \BetaKiller\IFace\Url\UrlPrototypeHelper
-     */
-    private $prototypeHelper;
-
-    public function __construct()
+    public function __construct(IFaceHelper $ifaceHelper)
     {
-        // Empty by default
+        $this->ifaceHelper = $ifaceHelper;
     }
 
     /**
      * @return string
+     * @throws \BetaKiller\IFace\Exception\IFaceException
      */
     public function getCodename(): string
     {
@@ -87,6 +58,10 @@ abstract class AbstractIFace implements IFaceInterface
         return $this->ifaceHelper->renderIFace($this);
     }
 
+    /**
+     * @return null|string
+     * @throws \BetaKiller\IFace\Exception\IFaceException
+     */
     public function getLayoutCodename(): ?string
     {
         $current = $this;
@@ -100,35 +75,36 @@ abstract class AbstractIFace implements IFaceInterface
     }
 
     /**
-     * Returns processed label
-     *
-     * @param UrlContainerInterface|null $params
+     * Returns plain label
      *
      * @return string
+     * @throws \BetaKiller\IFace\Exception\IFaceException
      */
-    public function getLabel(UrlContainerInterface $params = null): string
+    public function getLabel(): string
     {
-        return $this->processStringPattern($this->getLabelSource(), null, $params) ?: '';
+        return $this->getModel()->getLabel();
     }
 
     /**
-     * Returns processed title
+     * Returns plain title
      *
      * @return string
+     * @throws \BetaKiller\IFace\Exception\IFaceException
      */
     public function getTitle(): ?string
     {
-        return $this->processStringPattern($this->getTitleSource(), 80); // Limit to 80 chars
+        return $this->getModel()->getTitle();
     }
 
     /**
-     * Returns processed description
+     * Returns plain description
      *
      * @return string
+     * @throws \BetaKiller\IFace\Exception\IFaceException
      */
     public function getDescription(): ?string
     {
-        return $this->processStringPattern($this->getDescriptionSource());
+        return $this->getModel()->getDescription();
     }
 
     /**
@@ -137,6 +113,7 @@ abstract class AbstractIFace implements IFaceInterface
      * @param string $value
      *
      * @return SeoMetaInterface
+     * @throws \BetaKiller\IFace\Exception\IFaceException
      */
     public function setTitle(string $value): SeoMetaInterface
     {
@@ -151,6 +128,7 @@ abstract class AbstractIFace implements IFaceInterface
      * @param string $value
      *
      * @return SeoMetaInterface
+     * @throws \BetaKiller\IFace\Exception\IFaceException
      */
     public function setDescription(string $value): SeoMetaInterface
     {
@@ -160,118 +138,13 @@ abstract class AbstractIFace implements IFaceInterface
     }
 
     /**
-     * Pattern consists of tags like [N[Text]] where N is tag priority
-     *
-     * @param string                     $source
-     * @param int|NULL                   $limit
-     * @param UrlContainerInterface|null $params
-     *
-     * @todo maybe extract to another helper class
-     *
-     * @return string
-     */
-    private function processStringPattern(
-        ?string $source,
-        ?int $limit = null,
-        UrlContainerInterface $params = null
-    ): ?string
-    {
-        if (!$source) {
-            return null;
-        }
-
-        // Replace url parameters
-        $source = $this->prototypeHelper->replaceUrlParametersParts($source, $params);
-
-        // Parse [N[...]] tags
-        $pcre_pattern = '/\[([\d]{1,2})\[([^\]]+)\]\]/';
-
-        /** @var array[] $matches */
-        preg_match_all($pcre_pattern, $source, $matches, PREG_SET_ORDER);
-
-        $tags = [];
-
-        foreach ($matches as list($key, $priority, $value)) {
-            $tags[$priority] = [
-                'key'   => $key,
-                'value' => $value,
-            ];
-        }
-
-        $output = $source;
-
-        if ($tags) {
-            // Sort tags via keys in straight order
-            ksort($tags);
-
-            // Iteration counter
-            $i         = 0;
-            $max_loops = count($tags);
-
-            while ($i < $max_loops && mb_strlen($output) > 0) {
-                $output = $source;
-
-                // Replace tags
-                foreach ($tags as $tag) {
-                    $output = str_replace($tag['key'], $tag['value'], $output);
-                }
-
-                if ($limit && mb_strlen($output) > $limit) {
-                    $drop   = array_pop($tags);
-                    $source = trim(str_replace($drop['key'], '', $source));
-                    $i++;
-                } else {
-                    break;
-                }
-            }
-        }
-
-        if ($limit && mb_strlen($output) > $limit) {
-            // Dirty limit
-            Text::limit_chars($output, $limit, null, true);
-        }
-
-        return $output;
-    }
-
-    /**
-     * Returns label source/pattern
-     *
-     * @return string
-     */
-    public function getLabelSource(): string
-    {
-        return $this->getModel()->getLabel();
-    }
-
-    /**
-     * Returns title source/pattern
-     *
-     * @return string
-     */
-    public function getTitleSource(): ?string
-    {
-        return $this->getModel()->getTitle();
-    }
-
-    /**
-     * Returns description source/pattern
-     *
-     * @return string
-     */
-    public function getDescriptionSource(): ?string
-    {
-        return $this->getModel()->getDescription();
-    }
-
-    /**
-     * @param \DateTimeInterface $last_modified
+     * @param \DateTimeInterface $lastModified
      *
      * @return $this
      */
-    public function setLastModified(\DateTimeInterface $last_modified)
+    public function setLastModified(\DateTimeInterface $lastModified): IFaceInterface
     {
-        $this->lastModified = $last_modified;
+        $this->lastModified = $lastModified;
 
         return $this;
     }
@@ -294,6 +167,7 @@ abstract class AbstractIFace implements IFaceInterface
 
     /**
      * @return DateInterval
+     * @throws \Exception
      */
     public function getDefaultExpiresInterval(): DateInterval
     {
@@ -301,11 +175,11 @@ abstract class AbstractIFace implements IFaceInterface
     }
 
     /**
-     * @param \DateInterval|NULL $expires
+     * @param \DateInterval $expires
      *
      * @return $this
      */
-    public function setExpiresInterval(DateInterval $expires)
+    public function setExpiresInterval(DateInterval $expires): IFaceInterface
     {
         $this->expiresInterval = $expires;
 
@@ -314,6 +188,7 @@ abstract class AbstractIFace implements IFaceInterface
 
     /**
      * @return \DateInterval
+     * @throws \Exception
      */
     public function getExpiresInterval(): DateInterval
     {
@@ -322,6 +197,7 @@ abstract class AbstractIFace implements IFaceInterface
 
     /**
      * @return \DateTimeInterface
+     * @throws \Exception
      */
     public function getExpiresDateTime(): DateTimeInterface
     {
@@ -330,6 +206,7 @@ abstract class AbstractIFace implements IFaceInterface
 
     /**
      * @return int
+     * @throws \Exception
      */
     public function getExpiresSeconds(): int
     {
@@ -368,35 +245,25 @@ abstract class AbstractIFace implements IFaceInterface
     public function getParent(): ?IFaceInterface
     {
         if (!$this->parent) {
-            $this->parent = $this->ifaceProvider->getParent($this);
+            $this->parent = $this->ifaceHelper->getIFaceParent($this);
         }
 
         return $this->parent;
-    }
-
-    public function setParent(IFaceInterface $parent)
-    {
-        $this->parent = $parent;
-
-        return $this;
-    }
-
-    /**
-     * @return \BetaKiller\IFace\IFaceInterface[]
-     */
-    public function getChildren(): array
-    {
-        return $this->ifaceProvider->getChildren($this);
     }
 
     /**
      * Getter for current iface model
      *
      * @return IFaceModelInterface
+     * @throws \BetaKiller\IFace\Exception\IFaceException
      */
     public function getModel(): IFaceModelInterface
     {
-        return $this->faceModel;
+        if (!$this->model) {
+            throw new IFaceException('Model required for IFace');
+        }
+
+        return $this->model;
     }
 
     /**
@@ -406,32 +273,27 @@ abstract class AbstractIFace implements IFaceInterface
      *
      * @return $this
      */
-    public function setModel(IFaceModelInterface $model)
+    public function setModel(IFaceModelInterface $model): IFaceInterface
     {
-        $this->faceModel = $model;
+        $this->model = $model;
 
         return $this;
     }
 
+    /**
+     * @return bool
+     * @throws \BetaKiller\IFace\Exception\IFaceException
+     */
     public function isDefault(): bool
     {
         return $this->getModel()->isDefault();
-    }
-
-    public function isInStack(): bool
-    {
-        return $this->ifaceHelper->isInStack($this);
-    }
-
-    public function isCurrent(UrlContainerInterface $parameters = null): bool
-    {
-        return $this->ifaceHelper->isCurrentIFace($this, $parameters);
     }
 
     /**
      * Returns model name of the linked entity
      *
      * @return string
+     * @throws \BetaKiller\IFace\Exception\IFaceException
      */
     public function getEntityModelName(): ?string
     {
@@ -442,6 +304,7 @@ abstract class AbstractIFace implements IFaceInterface
      * Returns entity [primary] action, applied by this IFace
      *
      * @return string
+     * @throws \BetaKiller\IFace\Exception\IFaceException
      */
     public function getEntityActionName(): ?string
     {
@@ -453,6 +316,7 @@ abstract class AbstractIFace implements IFaceInterface
      * Inherits zone from parent iface
      *
      * @return string
+     * @throws \BetaKiller\IFace\Exception\IFaceException
      */
     public function getZoneName(): string
     {
@@ -460,7 +324,7 @@ abstract class AbstractIFace implements IFaceInterface
 
         do {
             $zoneName = $current->getModel()->getZoneName();
-        } while(!$zoneName && $current = $current->getParent());
+        } while (!$zoneName && $current = $current->getParent());
 
         // Public zone by default
         return $zoneName ?: IFaceZone::PUBLIC_ZONE;
@@ -470,154 +334,35 @@ abstract class AbstractIFace implements IFaceInterface
      * Returns array of additional ACL rules in format <ResourceName>.<permissionName> (eq, ["Admin.enabled"])
      *
      * @return string[]
+     * @throws \BetaKiller\IFace\Exception\IFaceException
      */
     public function getAdditionalAclRules(): array
     {
         return $this->getModel()->getAdditionalAclRules();
     }
 
+    /**
+     * @param \BetaKiller\IFace\Url\UrlContainerInterface|null $urlContainer
+     * @param bool|null                                        $removeCyclingLinks
+     * @param bool|null                                        $withDomain
+     *
+     * @return string
+     * @throws \BetaKiller\IFace\Exception\IFaceException
+     */
     public function url(
         UrlContainerInterface $urlContainer = null,
         ?bool $removeCyclingLinks = null,
         ?bool $withDomain = null
     ): string {
-        $removeCyclingLinks = $removeCyclingLinks ?? true;
-        $withDomain         = $withDomain ?? true;
-
-        if ($removeCyclingLinks && $this->isCurrent($urlContainer)) {
-            return $this->appConfig->getCircularLinkHref();
-        }
-
-        $parts   = [];
-        $current = $this;
-
-        $parent = null;
-
-        do {
-            $uri = $current->makeUri($urlContainer);
-
-            if (!$uri) {
-                throw new IFaceException('Can not make URI for :codename IFace',
-                    [':codename' => $current->getCodename()]);
-            }
-
-            if ($uri === UrlDispatcher::DEFAULT_URI && $this->isDefault()) {
-                $uri = null;
-            }
-
-            $parts[] = $uri;
-            $parent  = $current->getParent();
-            $current = $parent;
-        } while ($parent);
-
-        $path = '/'.implode('/', array_reverse($parts));
-
-        if ($this->appConfig->isTrailingSlashEnabled()) {
-            // Add trailing slash before query parameters
-            $split    = explode('?', $path, 2);
-            $split[0] .= '/';
-            $path     = implode('?', $split);
-        }
-
-        return $withDomain ? URL::site($path, true) : $path;
+        return $this->ifaceHelper->makeUrl($this, $urlContainer, $removeCyclingLinks, $withDomain);
     }
 
-    private function makeUri(UrlContainerInterface $parameters = null): string
-    {
-        // Allow IFace to add custom url generating logic
-        $uri   = $this->getUri();
-        $model = $this->getModel();
-
-        if (!$uri) {
-            throw new IFaceException('IFace :codename must have uri', [':codename' => $this->getCodename()]);
-        }
-
-        // Static IFaces has raw uri value
-        if (!$model->hasDynamicUrl()) {
-            return $uri;
-        }
-
-        return $this->prototypeHelper->getCompiledPrototypeValue($uri, $parameters, $model->hasTreeBehaviour());
-    }
-
+    /**
+     * @return string
+     * @throws \BetaKiller\IFace\Exception\IFaceException
+     */
     public function getUri(): string
     {
         return $this->getModel()->getUri();
-    }
-
-    /**
-     * @param \BetaKiller\IFace\Url\UrlContainerInterface $params
-     *
-     * @return string[]
-     * @todo This method calculates only urls for current iface but pair "uri => urlParameter" is needed for traversing over url tree and creating full url map
-     */
-    public function getPublicAvailableUrls(UrlContainerInterface $params): array
-    {
-        if (!$this->getModel()->hasDynamicUrl()) {
-            // Make static URL
-            return [$this->makeAvailableUrl($params)];
-        }
-
-        return $this->getDynamicModelAvailableUrls($params);
-    }
-
-    /**
-     * @param \BetaKiller\IFace\Url\UrlContainerInterface $params
-     *
-     * @return string[]
-     */
-    private function getDynamicModelAvailableUrls(UrlContainerInterface $params): array
-    {
-        $prototype  = $this->prototypeHelper->fromIFaceUri($this);
-        $dataSource = $this->prototypeHelper->getDataSourceInstance($prototype);
-
-        $this->prototypeHelper->validatePrototypeModelKey($prototype, $dataSource);
-
-        $urls = [];
-
-        $this->collectDataSourceAvailableUrls($dataSource, $prototype, $params, $urls);
-
-        return array_filter($urls);
-    }
-
-    private function collectDataSourceAvailableUrls(
-        UrlDataSourceInterface $dataSource,
-        UrlPrototype $prototype,
-        UrlContainerInterface $params,
-        array &$urls
-    ): void {
-        $items = $prototype->hasIdKey()
-            ? $dataSource->getAll()
-            : $dataSource->getItemsHavingUrlKey($params);
-
-        foreach ($items as $item) {
-            // Save current item to parameters registry
-            $params->setParameter($item, true);
-
-            // Make dynamic URL
-            $url = $this->makeAvailableUrl($params);
-
-            if (!$url) {
-                // No tree traversal if current url is not allowed
-                continue;
-            }
-
-            $urls[] = $url;
-
-            // Recursion for trees
-            if ($this->getModel()->hasTreeBehaviour()) {
-                // Recursion for tree behaviour
-                $this->collectDataSourceAvailableUrls($dataSource, $prototype, $params, $urls);
-            }
-        }
-    }
-
-    private function makeAvailableUrl(UrlContainerInterface $params = null): ?string
-    {
-        if (!$this->aclHelper->isIFaceAllowed($this, $params)) {
-            return null;
-        }
-
-        return $this->url($params, false); // Disable cycling links removing
     }
 }

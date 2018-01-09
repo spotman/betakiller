@@ -6,6 +6,11 @@ use BetaKiller\IFace\Admin\AbstractAdminBase;
 class Index extends AbstractAdminBase
 {
     /**
+     * @var
+     */
+    private $repo;
+
+    /**
      * Returns data for View
      *
      * @return array

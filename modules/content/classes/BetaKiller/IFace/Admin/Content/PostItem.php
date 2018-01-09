@@ -2,6 +2,7 @@
 namespace BetaKiller\IFace\Admin\Content;
 
 use BetaKiller\Helper\ContentUrlContainerHelper;
+use BetaKiller\Helper\IFaceHelper;
 use BetaKiller\IFace\CrudlsActionsInterface;
 
 class PostItem extends AbstractAdminBase
@@ -39,13 +40,14 @@ class PostItem extends AbstractAdminBase
     /**
      * PostItem constructor.
      *
+     * @param \BetaKiller\Helper\IFaceHelper               $ifaceHelper
      * @param \BetaKiller\Helper\ContentUrlContainerHelper $urlParametersHelper
      */
-    public function __construct(ContentUrlContainerHelper $urlParametersHelper)
+    public function __construct(IFaceHelper $ifaceHelper, ContentUrlContainerHelper $urlParametersHelper)
     {
-        $this->urlParametersHelper = $urlParametersHelper;
+        parent::__construct($ifaceHelper);
 
-        parent::__construct();
+        $this->urlParametersHelper = $urlParametersHelper;
     }
 
     /**

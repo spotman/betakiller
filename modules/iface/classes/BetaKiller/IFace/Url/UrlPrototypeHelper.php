@@ -9,7 +9,7 @@ use BetaKiller\Utils\Kohana\TreeModelSingleParentInterface;
 
 class UrlPrototypeHelper
 {
-    const PROTOTYPE_PCRE = '(\{([A-Za-z_]+)\.([A-Za-z_]+)(\(\))*\})';
+    public const PROTOTYPE_PCRE = '(\{([A-Za-z_]+)\.([A-Za-z_]+)(\(\))*\})';
 
     /**
      * @var \BetaKiller\IFace\Url\UrlContainerInterface

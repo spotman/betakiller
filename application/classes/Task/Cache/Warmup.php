@@ -1,9 +1,9 @@
 <?php
 
+use BetaKiller\Helper\IFaceHelper;
 use BetaKiller\Helper\UrlContainerHelper;
 use BetaKiller\IFace\IFaceModelInterface;
 use BetaKiller\IFace\IFaceModelTree;
-use BetaKiller\IFace\IFaceProvider;
 use BetaKiller\IFace\IFaceStack;
 use BetaKiller\IFace\Url\UrlContainerInterface;
 
@@ -15,11 +15,6 @@ class Task_Cache_Warmup extends \BetaKiller\Task\AbstractTask
     private $tree;
 
     /**
-     * @var \BetaKiller\IFace\IFaceProvider
-     */
-    private $ifaceProvider;
-
-    /**
      * @var \BetaKiller\Helper\UrlContainerHelper
      */
     private $urlParametersHelper;
@@ -29,15 +24,20 @@ class Task_Cache_Warmup extends \BetaKiller\Task\AbstractTask
      */
     private $ifaceStack;
 
+    /**
+     * @var \BetaKiller\Helper\IFaceHelper
+     */
+    private $ifaceHelper;
+
     public function __construct(
         IFaceModelTree $tree,
         IFaceStack $stack,
-        IFaceProvider $provider,
+        IFaceHelper $ifaceHelper,
         UrlContainerHelper $paramsHelper
     ) {
         $this->tree                = $tree;
         $this->ifaceStack          = $stack;
-        $this->ifaceProvider       = $provider;
+        $this->ifaceHelper         = $ifaceHelper;
         $this->urlParametersHelper = $paramsHelper;
 
         parent::__construct();
@@ -67,9 +67,9 @@ class Task_Cache_Warmup extends \BetaKiller\Task\AbstractTask
 
     protected function processIFaceModel(IFaceModelInterface $ifaceModel, UrlContainerInterface $params): void
     {
-        $iface = $this->ifaceProvider->fromModel($ifaceModel);
+        $iface = $this->ifaceHelper->createIFaceFromModel($ifaceModel);
 
-        $urls = $iface->getPublicAvailableUrls($params);
+        $urls = $this->ifaceHelper->getPublicAvailableUrls($iface, $params);
 
         $this->logger->debug('Found :count urls', [':count' => count($urls)]);
 

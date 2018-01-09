@@ -3,6 +3,9 @@ namespace BetaKiller\Helper;
 
 interface SeoMetaInterface
 {
+    public const TITLE_LIMIT = 80;
+    public const DESCRIPTION_LIMIT = 260;
+
     /**
      * Sets title for using in <title> tag
      *

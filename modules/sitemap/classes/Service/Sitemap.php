@@ -123,7 +123,7 @@ class Service_Sitemap extends AbstractService
             $iface = $this->ifaceHelper->createIFaceFromModel($ifaceModel);
 
             // TODO Deal with calculation of the last_modified
-            $urls = $iface->getPublicAvailableUrls($this->urlParameters);
+            $urls = $this->ifaceHelper->getPublicAvailableUrls($iface, $this->urlParameters);
 
             foreach ($urls as $url) {
                 if (!$url) {

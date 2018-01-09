@@ -1,6 +1,7 @@
 <?php
 namespace BetaKiller\IFace\Auth;
 
+use BetaKiller\Helper\IFaceHelper;
 use BetaKiller\Helper\RequestHelper;
 use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Helper\UrlContainerHelper;
@@ -45,12 +46,13 @@ class Login extends AbstractIFace
     private $urlParametersHelper;
 
     public function __construct(
+        IFaceHelper $ifaceHelper,
         UserInterface $user,
         RequestHelper $reqHelper,
         ResponseHelper $respHelper,
         UrlContainerHelper $urlParamsHelper
     ) {
-        parent::__construct();
+        parent::__construct($ifaceHelper);
 
         $this->user = $user;
         $this->requestHelper = $reqHelper;

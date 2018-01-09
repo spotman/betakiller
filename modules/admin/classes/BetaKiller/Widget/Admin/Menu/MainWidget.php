@@ -26,6 +26,12 @@ class MainWidget extends AbstractAdminWidget
     private $userService;
 
     /**
+     * @Inject
+     * @var \BetaKiller\Helper\StringPatternHelper
+     */
+    private $patternHelper;
+
+    /**
      * Returns data for View rendering
      *
      * @return array
@@ -96,8 +102,8 @@ class MainWidget extends AbstractAdminWidget
 
         return [
             'url'    => $iface->url($params, false), // Keep links always working
-            'label'  => $iface->getLabel($params),
-            'active' => $iface->isCurrent($params),
+            'label'  => $this->patternHelper->processPattern($iface->getLabel(), null, $params),
+            'active' => $this->ifaceHelper->isCurrentIFace($iface, $params),
         ];
     }
 
