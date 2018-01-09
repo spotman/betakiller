@@ -87,6 +87,16 @@ class LayoutView implements LayoutViewInterface
         );
     }
 
+    /**
+     * @return \BetaKiller\View\LayoutViewInterface
+     */
+    public function clear(): LayoutViewInterface
+    {
+        $this->headHelper->clear();
+
+        return $this;
+    }
+
     protected function wrap(string $layoutContent): string
     {
         $wrapperPath = $this->getWrapperViewPath();

@@ -73,7 +73,7 @@ class IFaceHelper
     public function isCurrentIFaceAction(string $name): bool
     {
         $currentIFace  = $this->getCurrentIFace();
-        $currentAction = $currentIFace->getEntityActionName();
+        $currentAction = $currentIFace ? $currentIFace->getEntityActionName() : null;
 
         return $currentAction === $name;
     }
@@ -81,7 +81,7 @@ class IFaceHelper
     public function isCurrentIFaceZone(string $zone): bool
     {
         $currentIFace = $this->getCurrentIFace();
-        $currentZone  = $currentIFace->getZoneName();
+        $currentZone  = $currentIFace ? $currentIFace->getZoneName() : null;
 
         return $currentZone === $zone;
     }

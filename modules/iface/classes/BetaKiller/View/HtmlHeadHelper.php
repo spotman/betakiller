@@ -22,6 +22,14 @@ class HtmlHeadHelper
         $this->meta = $meta;
     }
 
+    public function clear(): self
+    {
+        $this->meta->delete();
+        $this->links = [];
+
+        return $this;
+    }
+
     /**
      * Set HTML <title> tag text
      *

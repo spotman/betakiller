@@ -350,4 +350,11 @@ class Kohana_StaticJs extends StaticFile {
 		$this->addJs($this->_config['jquery_url']);
 	}
 
+    public function clear(): void
+    {
+        $this->_js = array();
+        $this->_js_inline = array();
+        $this->_js_onload = array();
+    }
+
 } // END Kohana_StaticJs

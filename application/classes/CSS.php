@@ -81,4 +81,12 @@ class CSS
     {
         return $this->getFiles().$this->getInline();
     }
+
+    /**
+     * @return void
+     */
+    public function clear(): void
+    {
+        $this->staticCss->clear();
+    }
 }

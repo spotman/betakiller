@@ -59,6 +59,17 @@ class LayoutViewTwig extends LayoutView
         );
     }
 
+    /**
+     * @return \BetaKiller\View\LayoutViewInterface
+     */
+    public function clear(): LayoutViewInterface
+    {
+        $this->js->clear();
+        $this->css->clear();
+
+        return parent::clear();
+    }
+
     protected function getWrapperData(): array
     {
         return parent::getWrapperData() + [

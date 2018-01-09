@@ -45,7 +45,6 @@ class Controller_IFace extends Controller
     private $ifaceCache;
 
     /**
-     * @throws \HTTP_Exception_400
      * @throws \BetaKiller\IFace\Exception\IFaceException
      */
     public function action_render(): void
@@ -83,21 +82,28 @@ class Controller_IFace extends Controller
         // Processing page cache
         $this->processIFaceCache($iface);
 
-        $output = $iface->render();
+        try {
+            $output = $iface->render();
 
-        // Final hook
-        $iface->after();
+            // Final hook
+            $iface->after();
 
-        if ($unusedParts = $this->urlContainer->getUnusedQueryPartsKeys()) {
-            throw new HTTP_Exception_400('Request have unused query parts: :keys', [
-                ':keys' => implode(', ', $unusedParts),
-            ]);
+            if ($unusedParts = $this->urlContainer->getUnusedQueryPartsKeys()) {
+                throw new HTTP_Exception_400('Request have unused query parts: :keys', [
+                    ':keys' => implode(', ', $unusedParts),
+                ]);
+            }
+
+            $this->last_modified($iface->getLastModified());
+            $this->expires($iface->getExpiresDateTime());
+
+            $this->send_string($output);
+        } catch (Throwable $e) {
+            // Prevent response caching
+            $this->ifaceCache->disable();
+
+            throw $e;
         }
-
-        $this->last_modified($iface->getLastModified());
-        $this->expires($iface->getExpiresDateTime());
-
-        $this->send_string($output);
     }
 
     private function processIFaceCache(IFaceInterface $iface): void

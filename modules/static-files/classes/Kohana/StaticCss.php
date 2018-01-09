@@ -287,4 +287,10 @@ class Kohana_StaticCss extends StaticFile {
 		return $this->getCss() . "\n" . $this->getCssInline();
 	}
 
+    public function clear(): void
+    {
+        $this->_css = [];
+        $this->_css_inline = [];
+	}
+
 } // END Kohana_StaticCss

@@ -19,6 +19,15 @@ class IFaceCache
      */
     protected $enabled;
 
+    /**
+     * IFaceCache constructor.
+     *
+     * @param \BetaKiller\Config\AppConfigInterface $config
+     * @param \PageCache\PageCache                  $pageCache
+     * @param \Psr\Log\LoggerInterface              $logger
+     *
+     * @throws \PageCache\PageCacheException
+     */
     public function __construct(AppConfigInterface $config, PageCache $pageCache, LoggerInterface $logger)
     {
         $this->enabled = $config->isPageCacheEnabled();
@@ -32,13 +41,14 @@ class IFaceCache
             ->setForwardHeaders(true);
 
         $this->pageCache->setLogger($logger);
-//        $this->pageCache->setLogFilePath('/tmp/page-cache.log');
     }
 
-    public function clearModelCache(/* IFaceRelatedModelInterface $model */): void
+    /**
+     * @throws \HTTP_Exception_501
+     */
+    public function clearModelCache(): void
     {
         // deal with child ifaces (clear cache for whole branch)
-//        $iface = $model->get_public_iface();
 
         throw new \HTTP_Exception_501('Not implemented yet');
     }
@@ -66,6 +76,13 @@ class IFaceCache
         $this->pageCache->config()->setCacheExpirationInSeconds($expires);
 
         $this->pageCache->init();
+    }
+
+    public function disable(): void
+    {
+        $this->enabled = false;
+
+        $this->pageCache::destroy();
     }
 
     protected function applyIFaceStrategy(IFaceInterface $iface)

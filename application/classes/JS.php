@@ -91,4 +91,12 @@ class JS
     {
         return $this->getFiles().$this->getInline();
     }
+
+    /**
+     * @return void
+     */
+    public function clear(): void
+    {
+        $this->staticJs->clear();
+    }
 }

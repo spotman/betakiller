@@ -35,4 +35,9 @@ interface LayoutViewInterface
      * @return string
      */
     public function render(ViewInterface $ifaceView): string;
+
+    /**
+     * @return \BetaKiller\View\LayoutViewInterface
+     */
+    public function clear(): self;
 }

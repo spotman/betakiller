@@ -54,6 +54,9 @@ class IFaceView
      */
     public function render(IFaceInterface $iface): string
     {
+        // Hack for dropping original iface data on processing exception error page
+        $this->layoutView->clear();
+
         $viewPath  = $this->getViewPath($iface);
         $ifaceView = $this->viewFactory->create($viewPath);
 
