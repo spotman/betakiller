@@ -1,36 +1,14 @@
 {{ assets("require.js") }}
 
-<div class="widget-auth" data-providers="{{ providers|join(",") }}">
-
+<div class="widget-auth" data-providers="{{ providers|join(",") }}" data-redirect-url="{{ redirect_url|default() }}">
     <div class="widget-auth-providers-container">
         {% for provider in providers %}
             {{ widget("Auth_" ~ provider|capitalize) }}
         {% endfor %}
     </div>
-
 </div>
 
 {# if widget is inside of IFace_Login or similar #}
 {% if redirect_url is defined %}
-
-    <script type="application/javascript">
-
-      require([
-        "jquery",
-        "auth.login"
-      ], function ($, login) {
-
-        $(function () {
-
-          login.initialize(
-            $(".widget-auth"),
-            "{{ redirect_url }}"
-          );
-
-        });
-
-      });
-
-    </script>
-
+  {{ js("widgets/auth/auth.js") }}
 {% endif %}

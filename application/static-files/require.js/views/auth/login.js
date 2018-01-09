@@ -4,7 +4,9 @@ define([
 
     return {
 
-        initialize: function($container, redirectURL) {
+        initialize: function($container) {
+
+          var redirectURL = $container.data("redirect-url");
 
             var readyCallback = function(){};
 
