@@ -132,7 +132,6 @@ class ORM extends Utils\Kohana\ORM implements ExtendedOrmInterface
         $entities = [];
 
         foreach ($this->_belongs_to as $column => $config) {
-
             /** @var OrmInterface $model */
             $model = $this->get($column);
 
@@ -142,6 +141,26 @@ class ORM extends Utils\Kohana\ORM implements ExtendedOrmInterface
         }
 
         return $entities;
+    }
+
+    /**
+     * Returns true if this entity has linked one with provided key
+     *
+     * @param string $key
+     *
+     * @return bool
+     */
+    public function hasLinkedEntity(string $key): bool
+    {
+        foreach ($this->_belongs_to as $column => $config) {
+            $modelName = $config['model'] ?? null;
+
+            if ($modelName && $modelName === $key) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

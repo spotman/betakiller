@@ -41,6 +41,10 @@ class ResolvingUrlContainer extends UrlContainer
             }
 
             if ($param instanceof DispatchableEntityInterface) {
+                if (!$param->hasLinkedEntity($key)) {
+                    continue;
+                }
+
                 $linkedParam = $this->findParameterByKeyRecursive($param->getLinkedEntities(), $key);
 
                 if ($linkedParam) {

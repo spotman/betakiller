@@ -21,4 +21,13 @@ interface DispatchableEntityInterface extends AbstractEntityInterface, UrlParame
      * @return \BetaKiller\Model\DispatchableEntityInterface[]
      */
     public function getLinkedEntities(): array;
+
+    /**
+     * Returns true if this entity has linked one with provided key
+     *
+     * @param string $key
+     *
+     * @return bool
+     */
+    public function hasLinkedEntity(string $key): bool;
 }

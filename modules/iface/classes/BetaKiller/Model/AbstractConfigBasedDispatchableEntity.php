@@ -69,6 +69,19 @@ abstract class AbstractConfigBasedDispatchableEntity implements ConfigBasedDispa
     }
 
     /**
+     * Returns true if this entity has linked one with provided key
+     *
+     * @param string $key
+     *
+     * @return bool
+     */
+    public function hasLinkedEntity(string $key): bool
+    {
+        // No linked entities by default
+        return false;
+    }
+
+    /**
      * Returns value of the $key property
      *
      * @param string $key
