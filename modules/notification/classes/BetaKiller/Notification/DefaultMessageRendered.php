@@ -72,17 +72,18 @@ class DefaultMessageRendered implements MessageRendererInterface
 
     private function useTargetLang(NotificationUserInterface $user): void
     {
-        $lang = $user->getLanguageName();
+        $lang = $user->getLanguageName() ?: $this->i18n->getAppLanguage();
 
-        if ($lang) {
-            $this->originalLang = $this->i18n->getLang();
-            $this->i18n->setLang($lang);
-        }
+        $this->originalLang = $this->i18n->getLang();
+        $this->i18n->setLang($lang);
     }
 
     private function restoreOriginalLanguage(): void
     {
-        $this->i18n->setLang($this->originalLang);
+        if ($this->originalLang) {
+            $this->i18n->setLang($this->originalLang);
+            $this->originalLang = null;
+        }
     }
 
     /**

@@ -57,14 +57,18 @@ class I18n
         }
 
         // Use app`s main language as a default one
-        $appLang = $this->allowedLanguages[0];
-
-        $this->setLang($appLang);
+        $this->setLang($this->getAppLanguage());
 
         // Save all absent i18n keys if in development env
         if ($this->appEnv->inDevelopmentMode()) {
             \I18n::saveMissingKeys();
         }
+    }
+
+    public function getAppLanguage(): string
+    {
+        // First language is primary
+        return $this->allowedLanguages[0];
     }
 
     /**
