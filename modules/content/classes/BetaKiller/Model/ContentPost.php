@@ -411,25 +411,6 @@ class ContentPost extends \ORM implements ContentPostInterface
         return $this->getThumbnailsRelation()->order_by('place', 'ASC');
     }
 
-//    /**
-//     *
-//     * This method allows inheritor to preset linked model in URL parameters
-//     * It is executed after successful url dispatching
-//     *
-//     * @param UrlContainerInterface $parameters
-//     *
-//     * @return void
-//     * @deprecated
-//     */
-//    public function presetLinkedEntities(UrlContainerInterface $parameters): void
-//    {
-//        $category = $this->getCategory();
-//
-//        if ($category->getID() && !$parameters->getEntityByClassName($category)) {
-//            $parameters->setParameter($category);
-//        }
-//    }
-
     public function isDefault(): bool
     {
         return ($this->getUri() === UrlDispatcher::DEFAULT_URI);
