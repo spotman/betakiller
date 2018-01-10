@@ -51,12 +51,4 @@ class EntityRepository extends AbstractOrmBasedRepository
 
         return $model;
     }
-
-    /**
-     * @return \BetaKiller\Model\Entity[]
-     */
-    public function getAllEntities(): array
-    {
-        return $this->getOrmInstance()->get_all();
-    }
 }

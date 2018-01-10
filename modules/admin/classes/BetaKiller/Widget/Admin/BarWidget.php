@@ -8,8 +8,6 @@ use BetaKiller\IFace\Exception\IFaceException;
 use BetaKiller\IFace\IFaceInterface;
 use BetaKiller\IFace\IFaceProvider;
 use BetaKiller\IFace\Widget\AbstractAdminWidget;
-use BetaKiller\Model\ContentCategory;
-use BetaKiller\Model\ContentPost;
 use BetaKiller\Model\DispatchableEntityInterface;
 use BetaKiller\Model\IFaceZone;
 use BetaKiller\Model\LayoutInterface;
@@ -64,8 +62,7 @@ class BarWidget extends AbstractAdminWidget
         $currentIFace  = $this->ifaceHelper->getCurrentIFace();
         $currentLayout = $currentIFace ? $currentIFace->getLayoutCodename() : null;
         $isAdminLayout = $currentLayout === LayoutInterface::LAYOUT_ADMIN;
-
-        $entity = $this->detectPrimaryEntity();
+        $primaryEntity = $currentIFace ? $this->detectPrimaryEntity($currentIFace) : null;
 
         $data = [
             'isAdminLayout'     => $isAdminLayout,
@@ -73,9 +70,9 @@ class BarWidget extends AbstractAdminWidget
             'comments'          => $this->getCommentsData(),
             'createButtonItems' => $this->getCreateButtonItems(),
             'primaryEntity'     => [
-                'previewUrl' => $this->getPreviewButtonUrl($entity),
-                'publicUrl'  => $this->getPublicReadButtonUrl($entity),
-                'adminUrl'   => $this->getAdminEditButtonUrl($entity),
+                'previewUrl' => $this->getPreviewButtonUrl($primaryEntity),
+                'publicUrl'  => $this->getPublicReadButtonUrl($primaryEntity),
+                'adminUrl'   => $this->getAdminEditButtonUrl($primaryEntity),
             ],
         ];
 
@@ -142,6 +139,7 @@ class BarWidget extends AbstractAdminWidget
     /**
      * @uses \BetaKiller\IFace\Admin\Content\CommentListByStatus
      * @return \BetaKiller\IFace\IFaceInterface
+     * @throws \BetaKiller\IFace\Exception\IFaceException
      */
     private function getCommentsListByStatusIface(): IFaceInterface
     {
@@ -151,6 +149,7 @@ class BarWidget extends AbstractAdminWidget
     /**
      * @uses \BetaKiller\IFace\Admin\Content\CommentIndex
      * @return \BetaKiller\IFace\IFaceInterface
+     * @throws \BetaKiller\IFace\Exception\IFaceException
      */
     private function getCommentsRootIface(): IFaceInterface
     {
@@ -223,22 +222,15 @@ class BarWidget extends AbstractAdminWidget
         }
     }
 
-    private function detectPrimaryEntity(): ?DispatchableEntityInterface
+    private function detectPrimaryEntity(IFaceInterface $iface): ?DispatchableEntityInterface
     {
-        foreach ($this->getPrimaryEntitiesClassNames() as $className) {
-            if ($entity = $this->urlParamHelper->getEntityByClassName($className)) {
-                return $entity;
-            }
-        }
+        $current = $iface;
 
-        return null;
-    }
+        do {
+            $name   = $iface->getEntityModelName();
+            $entity = $name ? $this->urlParamHelper->getEntity($name) : null;
+        } while (!$entity && $current = $current->getParent());
 
-    private function getPrimaryEntitiesClassNames(): array
-    {
-        return [
-            ContentPost::class,
-            ContentCategory::class,
-        ];
+        return $entity;
     }
 }
