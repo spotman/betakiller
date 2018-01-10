@@ -70,14 +70,14 @@ class Initializer implements ModuleInitializerInterface
      */
     public function init(): void
     {
-        $this->registerExceptionHandler();
-
-        // Enable debugging via PhpConsole in browser mode
-        if ($this->appEnv->isDebugEnabled() && !$this->appEnv->isCLI()) {
+        // Enable debugging via PhpConsole
+        if ($this->appEnv->isDebugEnabled() && $this->isPhpConsoleActive()) {
             $this->initPhpConsole();
         } elseif ($this->appEnv->inProduction(true)) {
             $this->initPhpExceptionStorage();
         }
+
+        $this->registerExceptionHandler();
     }
 
     private function registerExceptionHandler(): void
@@ -86,9 +86,10 @@ class Initializer implements ModuleInitializerInterface
     }
 
     /**
+     * @return bool
      * @throws \Exception
      */
-    private function initPhpConsole(): void
+    private function isPhpConsoleActive(): bool
     {
         $storageFileName = $this->appConfig->getNamespace().'.'.$this->appEnv->getModeName().'.phpConsole.data';
         $storagePath     = \sys_get_temp_dir().DIRECTORY_SEPARATOR.$storageFileName;
@@ -96,17 +97,23 @@ class Initializer implements ModuleInitializerInterface
         // Can be called only before PhpConsole\Connector::getInstance() and PhpConsole\Handler::getInstance()
         Connector::setPostponeStorage(new File($storagePath));
 
-        if (Connector::getInstance()->isActiveClient()) {
-            $phpConsoleHandler = new PHPConsoleHandler([
-                'detectDumpTraceAndSource' => true,     // Autodetect and append trace data to debug
-                'useOwnErrorsHandler'      => false,    // Enable errors handling
-                'useOwnExceptionsHandler'  => false,    // Enable exceptions handling
-            ]);
+        return Connector::getInstance()->isActiveClient();
+    }
 
-            $phpConsoleHandler->setFormatter(new StripExceptionFromContextFormatter());
+    /**
+     * @throws \Exception
+     */
+    private function initPhpConsole(): void
+    {
+        $phpConsoleHandler = new PHPConsoleHandler([
+            'detectDumpTraceAndSource' => true,     // Autodetect and append trace data to debug
+            'useOwnErrorsHandler'      => false,    // Enable errors handling
+            'useOwnExceptionsHandler'  => false,    // Enable exceptions handling
+        ]);
 
-            $this->logger->pushHandler($phpConsoleHandler);
-        }
+        $phpConsoleHandler->setFormatter(new StripExceptionFromContextFormatter());
+
+        $this->logger->pushHandler($phpConsoleHandler);
     }
 
     /**
