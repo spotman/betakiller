@@ -2,7 +2,7 @@
 namespace BetaKiller\IFace;
 
 
-use BetaKiller\IFace\Url\CustomUrlBehaviourInterface;
+use BetaKiller\Url\CustomUrlBehaviourInterface;
 
 interface HasCustomUrlBehaviourInterface
 {

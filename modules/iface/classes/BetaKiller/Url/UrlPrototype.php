@@ -1,10 +1,10 @@
 <?php
-namespace BetaKiller\IFace\Url;
+namespace BetaKiller\Url;
 
 class UrlPrototype
 {
-    const KEY_SEPARATOR = '.';
-    const METHOD_CALL_MARKER = '()';
+    private const KEY_SEPARATOR = '.';
+    private const METHOD_CALL_MARKER = '()';
 
     /**
      * @var string
@@ -42,6 +42,7 @@ class UrlPrototype
      * @param string $string
      *
      * @return \BetaKiller\IFace\Url\UrlPrototype
+     * @throws \BetaKiller\Url\UrlPrototypeException
      */
     public static function fromString(string $string): UrlPrototype
     {
@@ -86,6 +87,14 @@ class UrlPrototype
     public function hasIdKey(): bool
     {
         return $this->modelKey === 'id';
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasModelKey(): bool
+    {
+        return !empty($this->modelKey);
     }
 
     /**

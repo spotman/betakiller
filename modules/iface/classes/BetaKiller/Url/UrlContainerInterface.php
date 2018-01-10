@@ -1,20 +1,20 @@
 <?php
-namespace BetaKiller\IFace\Url;
+namespace BetaKiller\Url;
 
 interface UrlContainerInterface
 {
     /**
      * Creates new instance of
      *
-     * @return \BetaKiller\IFace\Url\UrlContainerInterface
+     * @return \BetaKiller\Url\UrlContainerInterface
      */
     public static function create(): UrlContainerInterface;
 
     /**
-     * @param \BetaKiller\IFace\Url\UrlParameterInterface $object
-     * @param bool|null                                   $ignoreDuplicate
+     * @param \BetaKiller\Url\UrlParameterInterface $object
+     * @param bool|null                             $ignoreDuplicate
      *
-     * @return \BetaKiller\IFace\Url\UrlContainerInterface
+     * @return \BetaKiller\Url\UrlContainerInterface
      */
     public function setParameter(
         UrlParameterInterface $object,
@@ -31,7 +31,7 @@ interface UrlContainerInterface
     /**
      * @param string $key
      *
-     * @return \BetaKiller\IFace\Url\UrlParameterInterface|mixed|null
+     * @return \BetaKiller\Url\UrlParameterInterface|mixed|null
      */
     public function getParameter(string $key);
 
@@ -43,7 +43,7 @@ interface UrlContainerInterface
     public function getEntityByClassName($className);
 
     /**
-     * @return \BetaKiller\IFace\Url\UrlParameterInterface[]
+     * @return \BetaKiller\Url\UrlParameterInterface[]
      */
     public function getAllParameters(): array;
 
@@ -55,15 +55,15 @@ interface UrlContainerInterface
     public function hasParameter(string $key): bool;
 
     /**
-     * @param \BetaKiller\IFace\Url\UrlParameterInterface $instance
+     * @param \BetaKiller\Url\UrlParameterInterface $instance
      *
      * @return bool
      */
     public function hasParameterInstance(UrlParameterInterface $instance): bool;
 
     /**
-     * @return \BetaKiller\IFace\Url\UrlContainerInterface
-     * @deprecated Url parameters must be persistent
+     * @return \BetaKiller\Url\UrlContainerInterface
+     * @deprecated Url parameters must not be cleared (this is a hack for persistent DI instances)
      */
     public function clear(): UrlContainerInterface;
 
@@ -79,7 +79,7 @@ interface UrlContainerInterface
      *
      * @param array $parts
      *
-     * @return \BetaKiller\IFace\Url\UrlContainerInterface
+     * @return \BetaKiller\Url\UrlContainerInterface
      */
     public function setQueryParts(array $parts): UrlContainerInterface;
 

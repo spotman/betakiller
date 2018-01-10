@@ -22,12 +22,12 @@ abstract class AbstractOrmBasedRepository extends AbstractRepository
     }
 
     /**
-     * @param int $id
+     * @param string $id
      *
      * @return ExtendedOrmInterface|mixed
      * @throws \BetaKiller\Repository\RepositoryException
      */
-    public function findById(int $id)
+    public function findById(string $id)
     {
         try {
             return $this->getOrmInstance()->get_by_id($id);

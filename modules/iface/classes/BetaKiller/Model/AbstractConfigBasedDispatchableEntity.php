@@ -1,10 +1,13 @@
 <?php
-namespace BetaKiller\IFace\Url;
+namespace BetaKiller\Model;
 
-use BetaKiller\Repository\AbstractUrlParameterRepository;
+use BetaKiller\Url\UrlParameterInterface;
+use BetaKiller\Url\UrlPrototypeException;
 
-abstract class AbstractConfigBasedUrlParameter implements ConfigBasedUrlParameterInterface
+abstract class AbstractConfigBasedDispatchableEntity implements ConfigBasedDispatchableEntityInterface
 {
+    public const URL_KEY_CODENAME = 'codename';
+
     /**
      * @var string
      */
@@ -16,7 +19,7 @@ abstract class AbstractConfigBasedUrlParameter implements ConfigBasedUrlParamete
     private $options;
 
     /**
-     * AbstractConfigBasedUrlParameter constructor.
+     * AbstractConfigBasedDispatchableEntity constructor.
      *
      * @param string     $codename
      * @param array|null $options
@@ -28,16 +31,54 @@ abstract class AbstractConfigBasedUrlParameter implements ConfigBasedUrlParamete
     }
 
     /**
+     * Returns string identifier for current entity (DB record ID, instance-related unique hash, etc)
+     *
+     * @return string
+     */
+    public function getID(): string
+    {
+        return $this->getCodename();
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasID(): bool
+    {
+        return (bool)$this->getID();
+    }
+
+    /**
+     * @return string
+     */
+    public function getModelName(): string
+    {
+        return $this->getCodename();
+    }
+
+    /**
+     * Entity may return instances of linked entities if it have.
+     * This method is used to fetch missing entities in UrlContainer walking through links between them
+     *
+     * @return \BetaKiller\Model\DispatchableEntityInterface[]
+     */
+    public function getLinkedEntities(): array
+    {
+        // No entities by default
+        return [];
+    }
+
+    /**
      * Returns value of the $key property
      *
      * @param string $key
      *
      * @return string
-     * @throws \BetaKiller\IFace\Url\UrlPrototypeException
+     * @throws \BetaKiller\Url\UrlPrototypeException
      */
     public function getUrlKeyValue(string $key): string
     {
-        $value = ($key === AbstractUrlParameterRepository::URL_KEY_CODENAME)
+        $value = ($key === self::URL_KEY_CODENAME)
             ? $this->getCodename()
             : $this->getOption($key);
 
@@ -87,7 +128,7 @@ abstract class AbstractConfigBasedUrlParameter implements ConfigBasedUrlParamete
     /**
      * Returns true if current parameter is the same as provided one
      *
-     * @param \BetaKiller\IFace\Url\ConfigBasedUrlParameterInterface|mixed $parameter
+     * @param \BetaKiller\Model\ConfigBasedDispatchableEntityInterface|mixed $parameter
      *
      * @return bool
      */

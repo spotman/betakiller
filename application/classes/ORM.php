@@ -3,9 +3,10 @@
 use BetaKiller\DI\Container;
 use BetaKiller\Factory\OrmFactory;
 use BetaKiller\IFace\Exception\UrlContainerException;
-use BetaKiller\IFace\Url\UrlParameterInterface;
 use BetaKiller\Model\ExtendedOrmInterface;
 use BetaKiller\Search\SearchResultsInterface;
+use BetaKiller\Url\UrlParameterException;
+use BetaKiller\Url\UrlParameterInterface;
 use BetaKiller\Utils;
 use BetaKiller\Utils\Kohana\ORM\OrmInterface;
 use ORM\PaginateHelper;
@@ -97,15 +98,15 @@ class ORM extends Utils\Kohana\ORM implements ExtendedOrmInterface
     /**
      * Returns true if current parameter is the same as provided one
      *
-     * @param \BetaKiller\IFace\Url\UrlParameterInterface $parameter
+     * @param \BetaKiller\Url\UrlParameterInterface $parameter
      *
      * @return bool
-     * @throws \BetaKiller\IFace\Exception\UrlContainerException
+     * @throws \BetaKiller\Url\UrlParameterException
      */
     public function isSameAs(UrlParameterInterface $parameter): bool
     {
         if (!($parameter instanceof static)) {
-            throw new UrlContainerException('Trying to compare instances of different classes');
+            throw new UrlParameterException('Trying to compare instances of different classes');
         }
 
         return $parameter->getID() === $this->getID();

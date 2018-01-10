@@ -2,7 +2,7 @@
 namespace BetaKiller\IFace;
 
 use BetaKiller\IFace\Exception\IFaceStackException;
-use BetaKiller\IFace\Url\UrlContainerInterface;
+use BetaKiller\Url\UrlContainerInterface;
 
 class IFaceStack
 {
@@ -24,13 +24,18 @@ class IFaceStack
     /**
      * IFaceStack constructor.
      *
-     * @param \BetaKiller\IFace\Url\UrlContainerInterface $parameters
+     * @param \BetaKiller\Url\UrlContainerInterface $parameters
      */
     public function __construct(UrlContainerInterface $parameters)
     {
         $this->parameters = $parameters;
     }
 
+    /**
+     * @param \BetaKiller\IFace\IFaceInterface $iface
+     *
+     * @throws \BetaKiller\IFace\Exception\IFaceStackException
+     */
     public function push(IFaceInterface $iface): void
     {
         if ($this->has($iface)) {

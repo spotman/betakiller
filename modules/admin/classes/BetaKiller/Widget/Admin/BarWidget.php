@@ -16,7 +16,7 @@ use BetaKiller\Model\UserInterface;
 class BarWidget extends AbstractAdminWidget
 {
     /**
-     * @var \BetaKiller\IFace\Url\UrlDispatcher
+     * @var \BetaKiller\Url\UrlDispatcher
      */
     protected $dispatcher;
 

@@ -2,8 +2,8 @@
 
 use BetaKiller\Factory\CommonFactoryCache;
 use BetaKiller\Factory\FactoryCacheInterface;
-use BetaKiller\IFace\Url\UrlDispatcherCache;
-use BetaKiller\IFace\Url\UrlDispatcherCacheInterface;
+use BetaKiller\Url\UrlDispatcherCache;
+use BetaKiller\Url\UrlDispatcherCacheInterface;
 use DI\Scope;
 use Doctrine\Common\Cache\ArrayCache;
 use Spotman\Acl\AclInterface;

@@ -6,6 +6,8 @@ abstract class AbstractReadOnlyRepository extends AbstractRepository
 {
     /**
      * @param $entity
+     *
+     * @throws \BetaKiller\Repository\RepositoryException
      */
     public function save($entity): void
     {
@@ -16,6 +18,8 @@ abstract class AbstractReadOnlyRepository extends AbstractRepository
 
     /**
      * @param $entity
+     *
+     * @throws \BetaKiller\Repository\RepositoryException
      */
     public function delete($entity): void
     {

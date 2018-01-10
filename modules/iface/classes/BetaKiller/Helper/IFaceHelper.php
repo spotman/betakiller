@@ -9,13 +9,13 @@ use BetaKiller\IFace\IFaceInterface;
 use BetaKiller\IFace\IFaceModelInterface;
 use BetaKiller\IFace\IFaceProvider;
 use BetaKiller\IFace\IFaceStack;
-use BetaKiller\IFace\Url\UrlContainerInterface;
-use BetaKiller\IFace\Url\UrlDataSourceInterface;
-use BetaKiller\IFace\Url\UrlDispatcher;
-use BetaKiller\IFace\Url\UrlPrototype;
-use BetaKiller\IFace\Url\UrlPrototypeHelper;
 use BetaKiller\Model\DispatchableEntityInterface;
 use BetaKiller\Model\IFaceZone;
+use BetaKiller\Url\UrlContainerInterface;
+use BetaKiller\Url\UrlDataSourceInterface;
+use BetaKiller\Url\UrlDispatcher;
+use BetaKiller\Url\UrlPrototype;
+use BetaKiller\Url\UrlPrototypeHelper;
 use BetaKiller\View\IFaceView;
 use Spotman\Api\ApiMethodResponse;
 
@@ -42,7 +42,7 @@ class IFaceHelper
     private $appConfig;
 
     /**
-     * @var \BetaKiller\IFace\Url\UrlPrototypeHelper
+     * @var \BetaKiller\Url\UrlPrototypeHelper
      */
     private $urlHelper;
 
@@ -59,13 +59,13 @@ class IFaceHelper
     /**
      * IFaceHelper constructor.
      *
-     * @param \BetaKiller\View\IFaceView               $view
-     * @param \BetaKiller\IFace\IFaceStack             $stack
-     * @param \BetaKiller\Helper\UrlContainerHelper    $paramsHelper
-     * @param \BetaKiller\Config\AppConfigInterface    $appConfig
-     * @param \BetaKiller\IFace\IFaceProvider          $provider
-     * @param \BetaKiller\IFace\Url\UrlPrototypeHelper $urlHelper
-     * @param \BetaKiller\Helper\AclHelper             $aclHelper
+     * @param \BetaKiller\View\IFaceView            $view
+     * @param \BetaKiller\IFace\IFaceStack          $stack
+     * @param \BetaKiller\Helper\UrlContainerHelper $paramsHelper
+     * @param \BetaKiller\Config\AppConfigInterface $appConfig
+     * @param \BetaKiller\IFace\IFaceProvider       $provider
+     * @param \BetaKiller\Url\UrlPrototypeHelper    $urlHelper
+     * @param \BetaKiller\Helper\AclHelper          $aclHelper
      */
     public function __construct(
         IFaceView $view,
@@ -299,13 +299,13 @@ class IFaceHelper
     }
 
     /**
-     * @param \BetaKiller\IFace\IFaceInterface                 $iface
-     * @param \BetaKiller\IFace\Url\UrlContainerInterface|null $urlContainer
-     * @param bool|null                                        $removeCyclingLinks
-     * @param bool|null                                        $withDomain
+     * @param \BetaKiller\IFace\IFaceInterface           $iface
+     * @param \BetaKiller\Url\UrlContainerInterface|null $urlContainer
+     * @param bool|null                                  $removeCyclingLinks
+     * @param bool|null                                  $withDomain
      *
      * @return string
-     * @throws \BetaKiller\IFace\Url\UrlPrototypeException
+     * @throws \BetaKiller\Url\UrlPrototypeException
      * @throws \BetaKiller\IFace\Exception\IFaceException
      */
     public function makeUrl(
@@ -357,11 +357,11 @@ class IFaceHelper
     }
 
     /**
-     * @param \BetaKiller\IFace\IFaceInterface                 $iface
-     * @param \BetaKiller\IFace\Url\UrlContainerInterface|null $params
+     * @param \BetaKiller\IFace\IFaceInterface           $iface
+     * @param \BetaKiller\Url\UrlContainerInterface|null $params
      *
      * @return string
-     * @throws \BetaKiller\IFace\Url\UrlPrototypeException
+     * @throws \BetaKiller\Url\UrlPrototypeException
      * @throws \BetaKiller\IFace\Exception\IFaceException
      */
     private function makeUri(IFaceInterface $iface, UrlContainerInterface $params = null): string
@@ -383,13 +383,13 @@ class IFaceHelper
     }
 
     /**
-     * @param \BetaKiller\IFace\IFaceInterface            $iface
-     * @param \BetaKiller\IFace\Url\UrlContainerInterface $params
+     * @param \BetaKiller\IFace\IFaceInterface      $iface
+     * @param \BetaKiller\Url\UrlContainerInterface $params
      *
      * @todo This method calculates only urls for current iface but pair "uri => urlParameter" is needed for traversing over url tree and creating full url map
      * @return string[]
      * @throws \Spotman\Acl\Exception
-     * @throws \BetaKiller\IFace\Url\UrlPrototypeException
+     * @throws \BetaKiller\Url\UrlPrototypeException
      * @throws \BetaKiller\IFace\Exception\IFaceException
      */
     public function getPublicAvailableUrls(IFaceInterface $iface, UrlContainerInterface $params): array
@@ -403,13 +403,13 @@ class IFaceHelper
     }
 
     /**
-     * @param \BetaKiller\IFace\IFaceInterface            $iface
-     * @param \BetaKiller\IFace\Url\UrlContainerInterface $params
+     * @param \BetaKiller\IFace\IFaceInterface      $iface
+     * @param \BetaKiller\Url\UrlContainerInterface $params
      *
      * @return string[]
      * @throws \Spotman\Acl\Exception
      * @throws \BetaKiller\IFace\Exception\IFaceException
-     * @throws \BetaKiller\IFace\Url\UrlPrototypeException
+     * @throws \BetaKiller\Url\UrlPrototypeException
      */
     private function getDynamicModelAvailableUrls(IFaceInterface $iface, UrlContainerInterface $params): array
     {
@@ -426,11 +426,11 @@ class IFaceHelper
     }
 
     /**
-     * @param \BetaKiller\IFace\IFaceInterface             $iface
-     * @param \BetaKiller\IFace\Url\UrlDataSourceInterface $dataSource
-     * @param \BetaKiller\IFace\Url\UrlPrototype           $prototype
-     * @param \BetaKiller\IFace\Url\UrlContainerInterface  $params
-     * @param array                                        $urls
+     * @param \BetaKiller\IFace\IFaceInterface       $iface
+     * @param \BetaKiller\Url\UrlDataSourceInterface $dataSource
+     * @param \BetaKiller\Url\UrlPrototype           $prototype
+     * @param \BetaKiller\Url\UrlContainerInterface  $params
+     * @param array                                  $urls
      *
      * @throws \BetaKiller\IFace\Exception\IFaceException
      * @throws \Spotman\Acl\Exception
@@ -469,8 +469,8 @@ class IFaceHelper
     }
 
     /**
-     * @param \BetaKiller\IFace\IFaceInterface                 $iface
-     * @param \BetaKiller\IFace\Url\UrlContainerInterface|null $params
+     * @param \BetaKiller\IFace\IFaceInterface           $iface
+     * @param \BetaKiller\Url\UrlContainerInterface|null $params
      *
      * @return null|string
      * @throws \BetaKiller\IFace\Exception\IFaceException

@@ -2,8 +2,8 @@
 namespace BetaKiller\Widget\Admin\Menu;
 
 use BetaKiller\IFace\IFaceInterface;
-use BetaKiller\IFace\Url\UrlContainerInterface;
 use BetaKiller\IFace\Widget\AbstractAdminWidget;
+use BetaKiller\Url\UrlContainerInterface;
 
 class MainWidget extends AbstractAdminWidget
 {
@@ -87,8 +87,8 @@ class MainWidget extends AbstractAdminWidget
     }
 
     /**
-     * @param \BetaKiller\IFace\IFaceInterface                 $iface
-     * @param \BetaKiller\IFace\Url\UrlContainerInterface|null $params
+     * @param \BetaKiller\IFace\IFaceInterface           $iface
+     * @param \BetaKiller\Url\UrlContainerInterface|null $params
      *
      * @return array
      * @throws \BetaKiller\IFace\Exception\IFaceException

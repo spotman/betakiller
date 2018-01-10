@@ -2,13 +2,13 @@
 namespace BetaKiller\Helper;
 
 
-use BetaKiller\IFace\Url\UrlContainerInterface;
+use BetaKiller\Url\UrlContainerInterface;
 
 class StringPatternHelper
 {
     /**
      * @Inject
-     * @var \BetaKiller\IFace\Url\UrlPrototypeHelper
+     * @var \BetaKiller\Url\UrlPrototypeHelper
      */
     private $prototypeHelper;
 

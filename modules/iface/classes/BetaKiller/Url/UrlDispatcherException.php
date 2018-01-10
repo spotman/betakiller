@@ -1,5 +1,5 @@
 <?php
-namespace BetaKiller\IFace\Url;
+namespace BetaKiller\Url;
 
 use BetaKiller\Exception;
 

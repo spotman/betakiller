@@ -1,5 +1,5 @@
 <?php
-namespace BetaKiller\IFace\Url;
+namespace BetaKiller\Url;
 
 interface UrlParameterInterface
 {
@@ -11,18 +11,9 @@ interface UrlParameterInterface
     public static function getUrlContainerKey(): string;
 
     /**
-     * Returns value of the $key property
-     *
-     * @param string $key
-     *
-     * @return string
-     */
-    public function getUrlKeyValue(string $key): string;
-
-    /**
      * Returns true if current parameter is the same as provided one
      *
-     * @param \BetaKiller\IFace\Url\UrlParameterInterface $parameter
+     * @param \BetaKiller\Url\UrlParameterInterface $parameter
      *
      * @return bool
      */

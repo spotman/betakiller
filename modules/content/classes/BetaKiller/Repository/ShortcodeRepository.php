@@ -1,28 +1,28 @@
 <?php
 namespace BetaKiller\Repository;
 
-use BetaKiller\Content\Shortcode\ShortcodeUrlParameter;
-use BetaKiller\IFace\Url\ConfigBasedUrlParameterInterface;
+use BetaKiller\Content\Shortcode\ShortcodeEntity;
+use BetaKiller\Model\ConfigBasedDispatchableEntityInterface;
 
 /**
  * Class ParserRepository
  *
  * @package BetaKiller\Content
  *
- * @method ShortcodeUrlParameter findByCodename(string $name)
- * @method ShortcodeUrlParameter[] getAll()
+ * @method ShortcodeEntity findByCodename(string $name)
+ * @method ShortcodeEntity[] getAll()
  */
-class ShortcodeRepository extends AbstractConfigBasedUrlParameterRepository
+class ShortcodeRepository extends AbstractConfigBasedDispatchableRepository
 {
     /**
      * @param string $tagName
      *
-     * @return \BetaKiller\Content\Shortcode\ShortcodeUrlParameter
+     * @return \BetaKiller\Content\Shortcode\ShortcodeEntity
      * @throws \BetaKiller\Repository\RepositoryException
      */
-    public function findByTagName(string $tagName): ShortcodeUrlParameter
+    public function findByTagName(string $tagName): ShortcodeEntity
     {
-        return $this->findByOptionValue(ShortcodeUrlParameter::OPTION_TAG_NAME, $tagName);
+        return $this->findByOptionValue(ShortcodeEntity::OPTION_TAG_NAME, $tagName);
     }
 
     protected function getItemsListConfigKey(): array
@@ -39,14 +39,16 @@ class ShortcodeRepository extends AbstractConfigBasedUrlParameterRepository
     }
 
     /**
-     * @param string     $codename
+     * @param string $codename
      *
      * @param array|null $options
      *
-     * @return ConfigBasedUrlParameterInterface|mixed
+     * @return ConfigBasedDispatchableEntityInterface|mixed
      */
-    protected function createItemFromCodename(string $codename, ?array $options = null): ConfigBasedUrlParameterInterface
-    {
-        return new ShortcodeUrlParameter($codename, $options);
+    protected function createItemFromCodename(
+        string $codename,
+        ?array $options = null
+    ): ConfigBasedDispatchableEntityInterface {
+        return new ShortcodeEntity($codename, $options);
     }
 }

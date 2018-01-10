@@ -1,9 +1,9 @@
 <?php
 namespace BetaKiller\Content\Shortcode;
 
-use BetaKiller\IFace\Url\AbstractConfigBasedUrlParameter;
+use BetaKiller\Model\AbstractConfigBasedDispatchableEntity;
 
-class ShortcodeUrlParameter extends AbstractConfigBasedUrlParameter
+class ShortcodeEntity extends AbstractConfigBasedDispatchableEntity
 {
     public const OPTION_TAG_NAME    = 'tag_name';
     public const OPTION_IS_STATIC   = 'is_static';

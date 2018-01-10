@@ -1,12 +1,12 @@
 <?php
-namespace BetaKiller\IFace\Url;
+namespace BetaKiller\Model;
 
 /**
- * Interface ConfigBasedUrlParameterInterface
+ * Interface ConfigBasedDispatchableEntityInterface
  *
  * @package BetaKiller\Core
  */
-interface ConfigBasedUrlParameterInterface extends UrlParameterInterface
+interface ConfigBasedDispatchableEntityInterface extends DispatchableEntityInterface
 {
     /**
      * Config-based url parameters needs codename to be defined

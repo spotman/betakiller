@@ -9,12 +9,12 @@ interface RepositoryInterface
     public static function getCodename(): string;
 
     /**
-     * @param int $id
+     * @param string $id
      *
      * @return mixed
      * @throws \BetaKiller\Repository\RepositoryException
      */
-    public function findById(int $id);
+    public function findById(string $id);
 
     /**
      * @return \BetaKiller\Model\AbstractEntityInterface[]|\Traversable

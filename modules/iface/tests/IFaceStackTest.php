@@ -3,7 +3,7 @@
 use BetaKiller\IFace\Exception\IFaceStackException;
 use BetaKiller\IFace\IFaceInterface;
 use BetaKiller\IFace\IFaceStack;
-use BetaKiller\IFace\Url\UrlContainerInterface;
+use BetaKiller\Url\UrlContainerInterface;
 
 class IFaceStackTest extends \BetaKiller\Test\TestCase
 {

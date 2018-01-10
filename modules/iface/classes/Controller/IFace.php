@@ -3,9 +3,9 @@
 use BetaKiller\Config\AppConfigInterface;
 use BetaKiller\IFace\Cache\IFaceCache;
 use BetaKiller\IFace\IFaceInterface;
-use BetaKiller\IFace\Url\UrlContainerInterface;
-use BetaKiller\IFace\Url\UrlDispatcher;
 use BetaKiller\Model\UserInterface;
+use BetaKiller\Url\UrlContainerInterface;
+use BetaKiller\Url\UrlDispatcher;
 
 /**
  * Class Controller_IFace

@@ -4,9 +4,9 @@ use BetaKiller\Config\AppConfigInterface;
 use BetaKiller\Helper\IFaceHelper;
 use BetaKiller\IFace\IFaceModelInterface;
 use BetaKiller\IFace\ModelProvider\IFaceModelProviderAggregate;
-use BetaKiller\IFace\Url\UrlContainerInterface;
 use BetaKiller\Service\AbstractService;
 use BetaKiller\Service\ServiceException;
+use BetaKiller\Url\UrlContainerInterface;
 use Psr\Log\LoggerInterface;
 use samdark\sitemap\Index;
 use samdark\sitemap\Sitemap;
@@ -51,7 +51,7 @@ class Service_Sitemap extends AbstractService
     /**
      * Service_Sitemap constructor.
      *
-     * @param \BetaKiller\IFace\Url\UrlContainerInterface                 $urlParameters
+     * @param \BetaKiller\Url\UrlContainerInterface                       $urlParameters
      * @param \BetaKiller\IFace\ModelProvider\IFaceModelProviderAggregate $ifaceModelProvider
      * @param \BetaKiller\Helper\IFaceHelper                              $ifaceHelper
      * @param \Psr\Log\LoggerInterface                                    $logger

@@ -1,5 +1,5 @@
 <?php
-namespace BetaKiller\IFace\Url;
+namespace BetaKiller\Url;
 
 class UrlPathIterator implements \Iterator, \Countable
 {
@@ -46,7 +46,7 @@ class UrlPathIterator implements \Iterator, \Countable
 
     public function count()
     {
-        return count($this->array);
+        return \count($this->array);
     }
 
     public function rootRequested()

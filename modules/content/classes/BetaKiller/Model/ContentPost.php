@@ -1,8 +1,8 @@
 <?php
 namespace BetaKiller\Model;
 
-use BetaKiller\IFace\Url\UrlDispatcher;
 use BetaKiller\Status\StatusRelatedModelOrmTrait;
+use BetaKiller\Url\UrlDispatcher;
 use DateTime;
 use Kohana_Exception;
 use ORM;

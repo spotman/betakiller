@@ -1,5 +1,5 @@
 <?php
-namespace BetaKiller\IFace\Url;
+namespace BetaKiller\Url;
 
 interface UrlDispatcherCacheInterface
 {

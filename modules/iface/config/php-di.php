@@ -1,9 +1,9 @@
 <?php
 
 use BetaKiller\IFace\Cache\IFaceCache;
-use BetaKiller\IFace\Url\ResolvingUrlContainer;
-use BetaKiller\IFace\Url\UrlContainerInterface;
-use BetaKiller\IFace\Url\UrlDispatcher;
+use BetaKiller\Url\ResolvingUrlContainer;
+use BetaKiller\Url\UrlContainerInterface;
+use BetaKiller\Url\UrlDispatcher;
 
 return [
 

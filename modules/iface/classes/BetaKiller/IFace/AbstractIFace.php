@@ -3,8 +3,8 @@ namespace BetaKiller\IFace;
 
 use BetaKiller\Helper\SeoMetaInterface;
 use BetaKiller\IFace\Exception\IFaceException;
-use BetaKiller\IFace\Url\UrlContainerInterface;
 use BetaKiller\Model\IFaceZone;
+use BetaKiller\Url\UrlContainerInterface;
 use DateInterval;
 use DateTimeInterface;
 
@@ -343,9 +343,9 @@ abstract class AbstractIFace implements IFaceInterface
     }
 
     /**
-     * @param \BetaKiller\IFace\Url\UrlContainerInterface|null $urlContainer
-     * @param bool|null                                        $removeCyclingLinks
-     * @param bool|null                                        $withDomain
+     * @param \BetaKiller\Url\UrlContainerInterface|null $urlContainer
+     * @param bool|null                                  $removeCyclingLinks
+     * @param bool|null                                  $withDomain
      *
      * @return string
      * @throws \BetaKiller\IFace\Exception\IFaceException

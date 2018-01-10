@@ -2,8 +2,8 @@
 namespace BetaKiller\IFace;
 
 use BetaKiller\Helper\SeoMetaInterface;
-use BetaKiller\IFace\Url\UrlContainerInterface;
 use BetaKiller\Model\HasLabelInterface;
+use BetaKiller\Url\UrlContainerInterface;
 
 interface IFaceInterface extends SeoMetaInterface, HasLabelInterface
 {
@@ -118,9 +118,9 @@ interface IFaceInterface extends SeoMetaInterface, HasLabelInterface
     public function isDefault(): bool;
 
     /**
-     * @param \BetaKiller\IFace\Url\UrlContainerInterface|null $parameters
-     * @param bool|null                                        $removeCyclingLinks
-     * @param bool|null                                        $withDomain
+     * @param \BetaKiller\Url\UrlContainerInterface|null $parameters
+     * @param bool|null                                  $removeCyclingLinks
+     * @param bool|null                                  $withDomain
      *
      * @return string
      */

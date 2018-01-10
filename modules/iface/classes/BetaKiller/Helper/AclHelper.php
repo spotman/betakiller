@@ -5,7 +5,6 @@ use BetaKiller\Acl\Resource\EntityRelatedAclResourceInterface;
 use BetaKiller\IFace\CrudlsActionsInterface;
 use BetaKiller\IFace\Exception\IFaceException;
 use BetaKiller\IFace\IFaceInterface;
-use BetaKiller\IFace\Url\UrlContainerInterface;
 use BetaKiller\Model\DispatchableEntityInterface;
 use BetaKiller\Model\GuestUser;
 use BetaKiller\Model\HasAdminZoneAccessSpecificationInterface;
@@ -13,6 +12,7 @@ use BetaKiller\Model\HasPersonalZoneAccessSpecificationInterface;
 use BetaKiller\Model\HasPreviewZoneAccessSpecificationInterface;
 use BetaKiller\Model\HasPublicZoneAccessSpecificationInterface;
 use BetaKiller\Model\IFaceZone;
+use BetaKiller\Url\UrlContainerInterface;
 use Spotman\Acl\AccessResolver\UserAccessResolver;
 use Spotman\Acl\AclUserInterface;
 use Spotman\Acl\Exception;
@@ -81,9 +81,9 @@ class AclHelper
     }
 
     /**
-     * @param \BetaKiller\IFace\IFaceInterface                 $iface
-     * @param \BetaKiller\IFace\Url\UrlContainerInterface|null $params
-     * @param null|\Spotman\Acl\AclUserInterface               $user
+     * @param \BetaKiller\IFace\IFaceInterface           $iface
+     * @param \BetaKiller\Url\UrlContainerInterface|null $params
+     * @param null|\Spotman\Acl\AclUserInterface         $user
      *
      * @return bool
      * @throws \BetaKiller\IFace\Exception\IFaceException

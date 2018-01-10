@@ -1,9 +1,9 @@
 <?php
 namespace BetaKiller\Repository;
 
-use BetaKiller\IFace\Url\UrlContainerInterface;
-use BetaKiller\IFace\Url\UrlDataSourceInterface;
-use BetaKiller\IFace\Url\UrlParameterInterface;
+use BetaKiller\Url\UrlContainerInterface;
+use BetaKiller\Url\UrlDataSourceInterface;
+use BetaKiller\Url\UrlParameterInterface;
 use BetaKiller\Utils\Kohana\ORM\OrmInterface;
 
 abstract class AbstractOrmBasedDispatchableRepository extends AbstractOrmBasedRepository implements
@@ -12,8 +12,8 @@ abstract class AbstractOrmBasedDispatchableRepository extends AbstractOrmBasedRe
     /**
      * Performs search for model item where the url key property is equal to $value
      *
-     * @param string                                      $value
-     * @param \BetaKiller\IFace\Url\UrlContainerInterface $parameters
+     * @param string                                $value
+     * @param \BetaKiller\Url\UrlContainerInterface $parameters
      *
      * @return UrlParameterInterface|null
      * @throws \Kohana_Exception
@@ -46,7 +46,7 @@ abstract class AbstractOrmBasedDispatchableRepository extends AbstractOrmBasedRe
      *
      * @param UrlContainerInterface $parameters
      *
-     * @return \BetaKiller\IFace\Url\UrlParameterInterface[]
+     * @return \BetaKiller\Url\UrlParameterInterface[]
      * @throws \Kohana_Exception
      */
     public function getItemsHavingUrlKey(UrlContainerInterface $parameters): array

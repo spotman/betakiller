@@ -5,7 +5,7 @@ use BetaKiller\Helper\UrlContainerHelper;
 use BetaKiller\IFace\IFaceModelInterface;
 use BetaKiller\IFace\IFaceModelTree;
 use BetaKiller\IFace\IFaceStack;
-use BetaKiller\IFace\Url\UrlContainerInterface;
+use BetaKiller\Url\UrlContainerInterface;
 
 class Task_Cache_Warmup extends \BetaKiller\Task\AbstractTask
 {

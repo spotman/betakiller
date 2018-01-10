@@ -43,7 +43,7 @@ class ShortcodeFactory
         return $this->createFromUrlParameter($urlParameter, $attributes);
     }
 
-    private function getClassCodename(ShortcodeUrlParameter $parameter): string
+    private function getClassCodename(ShortcodeEntity $parameter): string
     {
         // Use common class for static shortcodes and shortcode-specific class for others
         return $parameter->isStatic()
@@ -51,7 +51,7 @@ class ShortcodeFactory
             : $parameter->getCodename();
     }
 
-    public function createFromUrlParameter(ShortcodeUrlParameter $param, ?array $attributes = null): ShortcodeInterface
+    public function createFromUrlParameter(ShortcodeEntity $param, ?array $attributes = null): ShortcodeInterface
     {
         $classCodename = $this->getClassCodename($param);
         $tagCodename = $param->getCodename();

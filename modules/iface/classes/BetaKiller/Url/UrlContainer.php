@@ -1,5 +1,5 @@
 <?php
-namespace BetaKiller\IFace\Url;
+namespace BetaKiller\Url;
 
 use BetaKiller\IFace\Exception\UrlContainerException;
 use BetaKiller\Model\DispatchableEntityInterface;
@@ -8,7 +8,7 @@ use BetaKiller\Utils\Registry\RegistryException;
 
 class UrlContainer implements UrlContainerInterface
 {
-    private $entitiesRegistry;
+    private $paramsRegistry;
 
     /**
      * Key => value pairs
@@ -29,11 +29,11 @@ class UrlContainer implements UrlContainerInterface
      */
     public function __construct()
     {
-        $this->entitiesRegistry = new BasicRegistry;
+        $this->paramsRegistry = new BasicRegistry;
     }
 
     /**
-     * @return \BetaKiller\IFace\Url\UrlContainerInterface
+     * @return \BetaKiller\Url\UrlContainerInterface
      */
     public static function create(): UrlContainerInterface
     {
@@ -41,17 +41,17 @@ class UrlContainer implements UrlContainerInterface
     }
 
     /**
-     * @param \BetaKiller\IFace\Url\UrlParameterInterface $object
-     * @param bool|null                                   $ignoreDuplicate
+     * @param \BetaKiller\Url\UrlParameterInterface $object
+     * @param bool|null                             $ignoreDuplicate
      *
-     * @return \BetaKiller\IFace\Url\UrlContainerInterface
+     * @return \BetaKiller\Url\UrlContainerInterface
      */
     public function setParameter(UrlParameterInterface $object, ?bool $ignoreDuplicate = null): UrlContainerInterface
     {
         $key = $object::getUrlContainerKey();
 
         try {
-            $this->entitiesRegistry->set($key, $object, $ignoreDuplicate);
+            $this->paramsRegistry->set($key, $object, $ignoreDuplicate);
         } catch (RegistryException $e) {
             throw UrlContainerException::wrap($e);
         }
@@ -79,11 +79,11 @@ class UrlContainer implements UrlContainerInterface
     /**
      * @param string $key
      *
-     * @return \BetaKiller\IFace\Url\UrlParameterInterface|null
+     * @return \BetaKiller\Url\UrlParameterInterface|null
      */
     public function getParameter(string $key): ?UrlParameterInterface
     {
-        return $this->entitiesRegistry->get($key);
+        return $this->paramsRegistry->get($key);
     }
 
     /**
@@ -112,22 +112,22 @@ class UrlContainer implements UrlContainerInterface
     }
 
     /**
-     * @return \BetaKiller\IFace\Url\UrlContainerInterface
+     * @return \BetaKiller\Url\UrlContainerInterface
      * @deprecated Url dispatching must be persistent
      */
     public function clear(): UrlContainerInterface
     {
-        $this->entitiesRegistry->clear();
+        $this->paramsRegistry->clear();
 
         return $this;
     }
 
     /**
-     * @return \BetaKiller\Model\DispatchableEntityInterface[]
+     * @return \BetaKiller\Url\UrlParameterInterface[]
      */
     public function getAllParameters(): array
     {
-        return $this->entitiesRegistry->getAll();
+        return $this->paramsRegistry->getAll();
     }
 
     /**
@@ -137,17 +137,22 @@ class UrlContainer implements UrlContainerInterface
      */
     public function hasParameter(string $key): bool
     {
-        return $this->entitiesRegistry->has($key);
+        return $this->paramsRegistry->has($key);
     }
 
     /**
-     * @param \BetaKiller\IFace\Url\UrlParameterInterface $instance
+     * @param \BetaKiller\Url\UrlParameterInterface $instance
      *
      * @return bool
      */
     public function hasParameterInstance(UrlParameterInterface $instance): bool
     {
         return $this->hasParameter($instance::getUrlContainerKey());
+    }
+
+    public function isKey(UrlParameterInterface $param, string $key): bool
+    {
+        return $param::getUrlContainerKey() === $key;
     }
 
     /**
@@ -157,7 +162,7 @@ class UrlContainer implements UrlContainerInterface
      */
     public function parametersKeys(): array
     {
-        return $this->entitiesRegistry->keys();
+        return $this->paramsRegistry->keys();
     }
 
     /**
@@ -165,7 +170,7 @@ class UrlContainer implements UrlContainerInterface
      *
      * @param array $parts
      *
-     * @return \BetaKiller\IFace\Url\UrlContainerInterface
+     * @return \BetaKiller\Url\UrlContainerInterface
      */
     public function setQueryParts(array $parts): UrlContainerInterface
     {

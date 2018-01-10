@@ -1,9 +1,9 @@
 <?php
 namespace BetaKiller\Repository;
 
-use BetaKiller\IFace\Url\UrlContainerInterface;
 use BetaKiller\Model\ContentCategory;
 use BetaKiller\Model\ContentCategoryInterface;
+use BetaKiller\Url\UrlContainerInterface;
 use BetaKiller\Utils\Kohana\ORM\OrmInterface;
 
 /**

@@ -1,5 +1,5 @@
 <?php
-namespace BetaKiller\IFace\Url;
+namespace BetaKiller\Url;
 
 use BetaKiller\Factory\NamespaceBasedFactory;
 use BetaKiller\Factory\RepositoryFactory;
@@ -7,7 +7,7 @@ use BetaKiller\Factory\RepositoryFactory;
 /**
  * Class UrlDataSourceFactory
  *
- * @package BetaKiller\IFace\Url
+ * @package BetaKiller\Url
  */
 class UrlDataSourceFactory
 {
@@ -24,7 +24,7 @@ class UrlDataSourceFactory
     /**
      * @param string $codename
      *
-     * @return \BetaKiller\IFace\Url\UrlDataSourceInterface
+     * @return \BetaKiller\Url\UrlDataSourceInterface
      * @throws \BetaKiller\Factory\FactoryException
      */
     public function create($codename): UrlDataSourceInterface

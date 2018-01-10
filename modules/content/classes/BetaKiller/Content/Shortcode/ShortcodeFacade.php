@@ -59,7 +59,7 @@ class ShortcodeFacade
         return $this->shortcodeFactory->createFromCodename($codename, $attributes);
     }
 
-    public function createFromUrlParameter(ShortcodeUrlParameter $param, ?array $attributes = null): ShortcodeInterface
+    public function createFromUrlParameter(ShortcodeEntity $param, ?array $attributes = null): ShortcodeInterface
     {
         return $this->shortcodeFactory->createFromUrlParameter($param, $attributes);
     }

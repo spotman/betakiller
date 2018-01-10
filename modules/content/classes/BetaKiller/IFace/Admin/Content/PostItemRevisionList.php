@@ -2,8 +2,7 @@
 namespace BetaKiller\IFace\Admin\Content;
 
 use BetaKiller\Helper\ContentUrlContainerHelper;
-use BetaKiller\IFace\Exception\IFaceException;
-use BetaKiller\IFace\Url\UrlDispatcherException;
+use BetaKiller\Url\UrlDispatcherException;
 
 class PostItemRevisionList extends AbstractAdminBase
 {
