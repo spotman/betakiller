@@ -52,7 +52,7 @@ abstract class Controller extends Controller_Proxy
 
         $this->checkConnectionProtocol();
 
-        $this->i18n->initialize($this->request);
+        $this->i18n->initFromRequest($this->request);
     }
 
     /**

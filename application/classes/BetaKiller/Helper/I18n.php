@@ -3,6 +3,7 @@ namespace BetaKiller\Helper;
 
 use BetaKiller\Config\AppConfigInterface;
 use BetaKiller\Exception;
+use BetaKiller\Model\UserInterface;
 
 class I18n
 {
@@ -24,15 +25,46 @@ class I18n
     private $appConfig;
 
     /**
+     * @var string[]
+     */
+    private $allowedLanguages;
+
+    /**
      * I18n constructor.
      *
      * @param \BetaKiller\Helper\AppEnv             $appEnv
      * @param \BetaKiller\Config\AppConfigInterface $appConfig
+     *
+     * @throws \BetaKiller\Exception
      */
     public function __construct(AppEnv $appEnv, AppConfigInterface $appConfig)
     {
         $this->appEnv = $appEnv;
         $this->appConfig = $appConfig;
+
+        $this->initDefault();
+    }
+
+    /**
+     * @throws \BetaKiller\Exception
+     */
+    private function initDefault(): void
+    {
+        $this->allowedLanguages = $this->appConfig->getAllowedLanguages();
+
+        if (!$this->allowedLanguages) {
+            throw new Exception('Define app languages in config/app.php');
+        }
+
+        // Use app`s main language as a default one
+        $appLang = $this->allowedLanguages[0];
+
+        $this->setLang($appLang);
+
+        // Save all absent i18n keys if in development env
+        if ($this->appEnv->inDevelopmentMode()) {
+            \I18n::saveMissingKeys();
+        }
     }
 
     /**
@@ -40,44 +72,45 @@ class I18n
      *
      * @throws \BetaKiller\Exception
      */
-    public function initialize(\Request $request): void
+    public function initFromRequest(\Request $request): void
     {
         // Get lang from cookie
-        $userLang = $this->loadCookie();
-
-        $allowedLanguages = $this->appConfig->getAllowedLanguages();
-
-        if (!$allowedLanguages) {
-            throw new Exception('Define app languages in config/app.php');
-        }
+        $browserLang = $this->loadCookie();
 
         // Detect the browser` preferred lang if current lang is not set
-        if (!$userLang && !$this->appEnv->isCLI()) {
+        if (!$browserLang && !$this->appEnv->isCLI()) {
             /** @var \HTTP_Header $headers */
             $headers  = $request->headers();
 
-            if ($preferredLang = $headers->preferred_language($allowedLanguages)) {
-                $userLang = $preferredLang;
+            $preferredLang = $headers->preferred_language($this->allowedLanguages);
+
+            if ($preferredLang) {
+                $browserLang = $preferredLang;
             }
         }
 
-        // Use app`s main language as a fallback
-        if (!$userLang) {
-            $userLang = $allowedLanguages[0];
-        }
-
-        if (!\in_array($userLang, $allowedLanguages, true)) {
+        if ($browserLang && !\in_array($browserLang, $this->allowedLanguages, true)) {
             throw new Exception('Unknown language :lang, only these are allowed: :allowed', [
-                ':lang'    => $userLang,
-                ':allowed' => implode(', ', $allowedLanguages),
+                ':lang'    => $browserLang,
+                ':allowed' => implode(', ', $this->allowedLanguages),
             ]);
         }
 
-        $this->setLang($userLang);
+        if ($browserLang) {
+            $this->setLang($browserLang);
+        }
 
-        // Save all absent i18n keys if in development env
-        if ($this->appEnv->inDevelopmentMode()) {
-            \I18n::saveMissingKeys();
+        $this->saveCookie();
+    }
+
+    public function initFromUser(UserInterface $user): void
+    {
+        if (!$user->isGuest() && $lang = $user->getLanguageName()) {
+            $this->setLang($lang);
+        }
+
+        if (!$this->appEnv->isCLI()) {
+            $this->saveCookie();
         }
     }
 
@@ -92,8 +125,6 @@ class I18n
 
         // Set I18n lang
         \I18n::lang($value);
-
-        $this->saveCookie();
     }
 
     private function loadCookie(): ?string

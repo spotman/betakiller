@@ -96,8 +96,6 @@ class UserDetector
 
     private function setSystemLanguage(UserInterface $user): void
     {
-        if (!$user->isGuest() && $lang = $user->getLanguageName()) {
-            $this->i18n->setLang($lang);
-        }
+        $this->i18n->initFromUser($user);
     }
 }
