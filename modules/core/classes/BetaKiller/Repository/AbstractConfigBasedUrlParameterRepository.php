@@ -22,6 +22,8 @@ abstract class AbstractConfigBasedUrlParameterRepository extends AbstractUrlPara
      * ParserRepository constructor.
      *
      * @param \BetaKiller\Config\ConfigProviderInterface $configProvider
+     *
+     * @throws \BetaKiller\Repository\RepositoryException
      */
     public function __construct(ConfigProviderInterface $configProvider)
     {
@@ -122,6 +124,9 @@ abstract class AbstractConfigBasedUrlParameterRepository extends AbstractUrlPara
         ]);
     }
 
+    /**
+     * @throws \BetaKiller\Repository\RepositoryException
+     */
     private function fillFromConfig(): void
     {
         $configKey = $this->getItemsListConfigKey();

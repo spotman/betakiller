@@ -14,6 +14,12 @@ use BetaKiller\IFace\Url\ConfigBasedUrlParameterInterface;
  */
 class ShortcodeRepository extends AbstractConfigBasedUrlParameterRepository
 {
+    /**
+     * @param string $tagName
+     *
+     * @return \BetaKiller\Content\Shortcode\ShortcodeUrlParameter
+     * @throws \BetaKiller\Repository\RepositoryException
+     */
     public function findByTagName(string $tagName): ShortcodeUrlParameter
     {
         return $this->findByOptionValue(ShortcodeUrlParameter::OPTION_TAG_NAME, $tagName);
