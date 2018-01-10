@@ -1,10 +1,8 @@
 <?php
 namespace BetaKiller\Model;
 
-use BetaKiller\IFace\Url\UrlContainerInterface;
 use BetaKiller\IFace\Url\UrlDispatcher;
 use BetaKiller\Status\StatusRelatedModelOrmTrait;
-use Database_Query_Builder_Select;
 use DateTime;
 use Kohana_Exception;
 use ORM;
@@ -163,7 +161,7 @@ class ContentPost extends \ORM implements ContentPostInterface
      * @return $this
      * @throws \Kohana_Exception
      */
-    protected function setType($value)
+    protected function setType($value): self
     {
         if (!\in_array($value, self::$prioritizedTypesList, true)) {
             throw new Kohana_Exception('Post type :value is not allowed', [':value' => $value]);
@@ -346,6 +344,14 @@ class ContentPost extends \ORM implements ContentPostInterface
     }
 
     /**
+     * @return array|\Traversable
+     */
+    public function getApiResponseData()
+    {
+        return $this->as_array();
+    }
+
+    /**
      * @return $this
      */
     public function incrementViewsCount(): ContentPostInterface
@@ -398,31 +404,31 @@ class ContentPost extends \ORM implements ContentPostInterface
     }
 
     /**
-     * @return \BetaKiller\Model\ContentPostThumbnail|\ORM|Database_Query_Builder_Select
+     * @return \BetaKiller\Model\ContentPostThumbnail|\BetaKiller\Model\ExtendedOrmInterface
      */
     protected function getThumbnailsQuery()
     {
         return $this->getThumbnailsRelation()->order_by('place', 'ASC');
     }
 
-    /**
-     *
-     * This method allows inheritor to preset linked model in URL parameters
-     * It is executed after successful url dispatching
-     *
-     * @param UrlContainerInterface $parameters
-     *
-     * @return void
-     * @deprecated
-     */
-    public function presetLinkedEntities(UrlContainerInterface $parameters): void
-    {
-        $category = $this->getCategory();
-
-        if ($category->getID() && !$parameters->getEntityByClassName($category)) {
-            $parameters->setParameter($category);
-        }
-    }
+//    /**
+//     *
+//     * This method allows inheritor to preset linked model in URL parameters
+//     * It is executed after successful url dispatching
+//     *
+//     * @param UrlContainerInterface $parameters
+//     *
+//     * @return void
+//     * @deprecated
+//     */
+//    public function presetLinkedEntities(UrlContainerInterface $parameters): void
+//    {
+//        $category = $this->getCategory();
+//
+//        if ($category->getID() && !$parameters->getEntityByClassName($category)) {
+//            $parameters->setParameter($category);
+//        }
+//    }
 
     public function isDefault(): bool
     {

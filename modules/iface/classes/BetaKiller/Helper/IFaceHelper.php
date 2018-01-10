@@ -172,15 +172,11 @@ class IFaceHelper
             $zone = $currentIFace->getZoneName();
         }
 
-        // Search for IFace with provided entity, action and zone
-        $iface = $this->provider->getByEntityActionAndZone($entity, $action, $zone);
-
-        // TODO Create ResolvingUrlParameters instance from current entity
-        // TODO Fetch linked entities from current entity on-demand
-
         $params = $this->paramsHelper->createEmpty();
         $params->setParameter($entity);
-        $entity->presetLinkedEntities($params);
+
+        // Search for IFace with provided entity, action and zone
+        $iface = $this->provider->getByEntityActionAndZone($entity, $action, $zone);
 
         return $iface->url($params);
     }

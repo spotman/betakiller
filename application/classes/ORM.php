@@ -3,7 +3,6 @@
 use BetaKiller\DI\Container;
 use BetaKiller\Factory\OrmFactory;
 use BetaKiller\IFace\Exception\UrlContainerException;
-use BetaKiller\IFace\Url\UrlContainerInterface;
 use BetaKiller\IFace\Url\UrlParameterInterface;
 use BetaKiller\Model\ExtendedOrmInterface;
 use BetaKiller\Search\SearchResultsInterface;
@@ -101,6 +100,7 @@ class ORM extends Utils\Kohana\ORM implements ExtendedOrmInterface
      * @param \BetaKiller\IFace\Url\UrlParameterInterface $parameter
      *
      * @return bool
+     * @throws \BetaKiller\IFace\Exception\UrlContainerException
      */
     public function isSameAs(UrlParameterInterface $parameter): bool
     {
@@ -109,29 +109,6 @@ class ORM extends Utils\Kohana\ORM implements ExtendedOrmInterface
         }
 
         return $parameter->getID() === $this->getID();
-    }
-
-    /**
-     * Default implementation for ORM objects
-     * Override this method in child classes
-     *
-     * @return array
-     */
-    public function getApiResponseData(): array
-    {
-        return $this->as_array();
-    }
-
-    /**
-     * Default implementation for ORM objects
-     * Override this method in child classes
-     *
-     * @return \DateTimeImmutable|null
-     */
-    public function getApiLastModified(): ?DateTimeImmutable
-    {
-        // Empty by default
-        return null;
     }
 
     /**
@@ -147,18 +124,23 @@ class ORM extends Utils\Kohana\ORM implements ExtendedOrmInterface
     }
 
     /**
-     *
-     * This method allows inheritor to preset linked model in URL parameters
-     * It is executed after successful url dispatching
-     *
-     * @param UrlContainerInterface $parameters
-     *
-     * @return void
-     * @deprecated
+     * @return \BetaKiller\Model\DispatchableEntityInterface[]
      */
-    public function presetLinkedEntities(UrlContainerInterface $parameters): void
+    public function getLinkedEntities(): array
     {
-        // Nothing by default
+        $entities = [];
+
+        foreach ($this->_belongs_to as $column => $config) {
+
+            /** @var OrmInterface $model */
+            $model = $this->get($column);
+
+            if ($model->loaded() && $model->get_id()) {
+                $entities[] = $model;
+            }
+        }
+
+        return $entities;
     }
 
     /**
@@ -174,14 +156,6 @@ class ORM extends Utils\Kohana\ORM implements ExtendedOrmInterface
     public function hasID(): bool
     {
         return (bool)$this->pk();
-    }
-
-    /**
-     * @return string
-     */
-    public function getLabel(): string
-    {
-        throw new HTTP_Exception_501('Not implemented yet');
     }
 
     /**
@@ -218,7 +192,7 @@ class ORM extends Utils\Kohana\ORM implements ExtendedOrmInterface
      */
     public function getSearchResultsItemData(): array
     {
-        return $this->getApiResponseData();
+        return $this->as_array();
     }
 
     /**

@@ -392,11 +392,6 @@ class UrlDispatcher implements LoggerAwareInterface
             throw new UrlDispatcherException(':error', [':error' => $e->getMessage()], $e->getCode(), $e);
         }
 
-        if ($item instanceof DispatchableEntityInterface) {
-            // Allow current model to preset "belongs to" models
-            $item->presetLinkedEntities($this->urlParameters);
-        }
-
         // Store model into registry
         $registry = $this->urlParameters;
 

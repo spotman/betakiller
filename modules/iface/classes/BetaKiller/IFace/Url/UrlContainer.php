@@ -4,6 +4,7 @@ namespace BetaKiller\IFace\Url;
 use BetaKiller\IFace\Exception\UrlContainerException;
 use BetaKiller\Model\DispatchableEntityInterface;
 use BetaKiller\Utils\Registry\BasicRegistry;
+use BetaKiller\Utils\Registry\RegistryException;
 
 class UrlContainer implements UrlContainerInterface
 {
@@ -48,7 +49,12 @@ class UrlContainer implements UrlContainerInterface
     public function setParameter(UrlParameterInterface $object, ?bool $ignoreDuplicate = null): UrlContainerInterface
     {
         $key = $object::getUrlContainerKey();
-        $this->entitiesRegistry->set($key, $object, $ignoreDuplicate);
+
+        try {
+            $this->entitiesRegistry->set($key, $object, $ignoreDuplicate);
+        } catch (RegistryException $e) {
+            throw UrlContainerException::wrap($e);
+        }
 
         return $this;
     }
@@ -57,6 +63,7 @@ class UrlContainer implements UrlContainerInterface
      * @param string $key
      *
      * @return \BetaKiller\Model\DispatchableEntityInterface|null
+     * @throws \BetaKiller\IFace\Exception\UrlContainerException
      */
     public function getEntity(string $key): ?DispatchableEntityInterface
     {
@@ -83,11 +90,12 @@ class UrlContainer implements UrlContainerInterface
      * @param string|\BetaKiller\Model\DispatchableEntityInterface $className
      *
      * @return \BetaKiller\Model\DispatchableEntityInterface|mixed|null
+     * @throws \BetaKiller\IFace\Exception\UrlContainerException
      */
     public function getEntityByClassName($className)
     {
-        if (is_object($className)) {
-            $className = get_class($className);
+        if (\is_object($className)) {
+            $className = \get_class($className);
         }
 
         if (!is_a($className, DispatchableEntityInterface::class, true)) {
@@ -133,6 +141,16 @@ class UrlContainer implements UrlContainerInterface
     }
 
     /**
+     * @param \BetaKiller\IFace\Url\UrlParameterInterface $instance
+     *
+     * @return bool
+     */
+    public function hasParameterInstance(UrlParameterInterface $instance): bool
+    {
+        return $this->hasParameter($instance::getUrlContainerKey());
+    }
+
+    /**
      * Returns keys of currently added items
      *
      * @return string[]
@@ -164,6 +182,7 @@ class UrlContainer implements UrlContainerInterface
      * @param bool|null $required
      *
      * @return string|string[]
+     * @throws \BetaKiller\IFace\Exception\UrlContainerException
      */
     public function getQueryPart($key, $required = null)
     {

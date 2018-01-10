@@ -2,10 +2,14 @@
 namespace BetaKiller\Model;
 
 use BetaKiller\Helper\SeoMetaInterface;
+use BetaKiller\Search\SearchResultsItemInterface;
 use BetaKiller\Status\StatusRelatedModelInterface;
+use Spotman\Api\ApiResponseItemInterface;
 
 interface ContentPostInterface extends
+    DispatchableEntityInterface,
     RelatedEntityInterface,
+    ApiResponseItemInterface,
     EntityHasWordpressIdInterface,
     StatusRelatedModelInterface,
     ModelWithRevisionsInterface,

@@ -55,6 +55,13 @@ interface UrlContainerInterface
     public function hasParameter(string $key): bool;
 
     /**
+     * @param \BetaKiller\IFace\Url\UrlParameterInterface $instance
+     *
+     * @return bool
+     */
+    public function hasParameterInstance(UrlParameterInterface $instance): bool;
+
+    /**
      * @return \BetaKiller\IFace\Url\UrlContainerInterface
      * @deprecated Url parameters must be persistent
      */
