@@ -1,7 +1,6 @@
 <?php
 namespace BetaKiller\IFace\Auth;
 
-use BetaKiller\Helper\IFaceHelper;
 use BetaKiller\Helper\RequestHelper;
 use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Helper\UrlContainerHelper;
@@ -46,17 +45,16 @@ class Login extends AbstractIFace
     private $urlParametersHelper;
 
     public function __construct(
-        IFaceHelper $ifaceHelper,
         UserInterface $user,
         RequestHelper $reqHelper,
         ResponseHelper $respHelper,
         UrlContainerHelper $urlParamsHelper
     ) {
-        parent::__construct($ifaceHelper);
+        parent::__construct();
 
-        $this->user = $user;
-        $this->requestHelper = $reqHelper;
-        $this->responseHelper = $respHelper;
+        $this->user                = $user;
+        $this->requestHelper       = $reqHelper;
+        $this->responseHelper      = $respHelper;
         $this->urlParametersHelper = $urlParamsHelper;
 
         $this->detectRedirectUrl();
@@ -67,7 +65,7 @@ class Login extends AbstractIFace
         $currentUrl = $this->requestHelper->getCurrentUrl();
 
         if ($currentUrl) {
-            $queryString = http_build_query($this->requestHelper->getUrlQueryParts());
+            $queryString      = http_build_query($this->requestHelper->getUrlQueryParts());
             $this->currentUrl = '/'.ltrim($currentUrl, '/');
 
             if ($queryString) {

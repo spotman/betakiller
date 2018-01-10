@@ -20,12 +20,11 @@ class ReLogin extends Login
         UserInterface $user,
         RequestHelper $reqHelper,
         ResponseHelper $respHelper,
-        UrlContainerHelper $urlParamsHelper,
-        IFaceHelper $ifaceHelper
+        UrlContainerHelper $urlParamsHelper
     ) {
         $this->auth = $auth;
 
-        parent::__construct($ifaceHelper, $user, $reqHelper, $respHelper, $urlParamsHelper);
+        parent::__construct($user, $reqHelper, $respHelper, $urlParamsHelper);
 
         $this->setRedirectUrl('/');
     }

@@ -5,7 +5,6 @@ use BetaKiller\Config\AppConfigInterface;
 use BetaKiller\Exception;
 use BetaKiller\IFace\CrudlsActionsInterface;
 use BetaKiller\IFace\Exception\IFaceException;
-use BetaKiller\IFace\IFaceFactory;
 use BetaKiller\IFace\IFaceInterface;
 use BetaKiller\IFace\IFaceModelInterface;
 use BetaKiller\IFace\IFaceProvider;
@@ -22,11 +21,6 @@ use Spotman\Api\ApiMethodResponse;
 
 class IFaceHelper
 {
-    /**
-     * @var \BetaKiller\IFace\IFaceFactory
-     */
-    private $ifaceFactory;
-
     /**
      * @var \BetaKiller\IFace\IFaceStack
      */
@@ -48,13 +42,11 @@ class IFaceHelper
     private $appConfig;
 
     /**
-     * @Inject
      * @var \BetaKiller\IFace\Url\UrlPrototypeHelper
      */
     private $urlHelper;
 
     /**
-     * @Inject
      * @var \BetaKiller\Helper\AclHelper
      */
     private $aclHelper;
@@ -69,7 +61,6 @@ class IFaceHelper
      *
      * @param \BetaKiller\View\IFaceView               $view
      * @param \BetaKiller\IFace\IFaceStack             $stack
-     * @param \BetaKiller\IFace\IFaceFactory           $ifaceFactory
      * @param \BetaKiller\Helper\UrlContainerHelper    $paramsHelper
      * @param \BetaKiller\Config\AppConfigInterface    $appConfig
      * @param \BetaKiller\IFace\IFaceProvider          $provider
@@ -79,7 +70,6 @@ class IFaceHelper
     public function __construct(
         IFaceView $view,
         IFaceStack $stack,
-        IFaceFactory $ifaceFactory,
         UrlContainerHelper $paramsHelper,
         AppConfigInterface $appConfig,
         IFaceProvider $provider,
@@ -88,7 +78,6 @@ class IFaceHelper
     ) {
         $this->view         = $view;
         $this->stack        = $stack;
-        $this->ifaceFactory = $ifaceFactory;
         $this->paramsHelper = $paramsHelper;
         $this->appConfig    = $appConfig;
         $this->provider     = $provider;
@@ -147,17 +136,18 @@ class IFaceHelper
      */
     public function createIFaceFromCodename(string $codename): IFaceInterface
     {
-        return $this->ifaceFactory->fromCodename($codename);
+        return $this->provider->fromCodename($codename);
     }
 
     /**
      * @param \BetaKiller\IFace\IFaceModelInterface $model
      *
      * @return \BetaKiller\IFace\IFaceInterface
+     * @throws \BetaKiller\IFace\Exception\IFaceException
      */
     public function createIFaceFromModel(IFaceModelInterface $model): IFaceInterface
     {
-        return $this->ifaceFactory->fromModel($model);
+        return $this->provider->fromModel($model);
     }
 
     /**
@@ -183,7 +173,7 @@ class IFaceHelper
         }
 
         // Search for IFace with provided entity, action and zone
-        $iface = $this->ifaceFactory->getByEntityActionAndZone($entity, $action, $zone);
+        $iface = $this->provider->getByEntityActionAndZone($entity, $action, $zone);
 
         // TODO Create ResolvingUrlParameters instance from current entity
         // TODO Fetch linked entities from current entity on-demand
@@ -285,6 +275,12 @@ class IFaceHelper
         return $this->getEntityUrl($entity, CrudlsActionsInterface::ACTION_READ, IFaceZone::PREVIEW_ZONE);
     }
 
+    /**
+     * @param \Spotman\Api\ApiMethodResponse   $response
+     * @param \BetaKiller\IFace\IFaceInterface $iface
+     *
+     * @return mixed
+     */
     public function processApiResponse(ApiMethodResponse $response, IFaceInterface $iface)
     {
         $iface->setLastModified($response->getLastModified());
@@ -292,6 +288,11 @@ class IFaceHelper
         return $response->getData();
     }
 
+    /**
+     * @param \BetaKiller\IFace\IFaceInterface $iface
+     *
+     * @throws \Exception
+     */
     public function setExpiresInPast(IFaceInterface $iface): void
     {
         // No caching for admin zone
@@ -308,6 +309,7 @@ class IFaceHelper
      * @param bool|null                                        $withDomain
      *
      * @return string
+     * @throws \BetaKiller\IFace\Url\UrlPrototypeException
      * @throws \BetaKiller\IFace\Exception\IFaceException
      */
     public function makeUrl(
@@ -492,6 +494,7 @@ class IFaceHelper
      *
      * @return \BetaKiller\IFace\IFaceInterface|null
      * @deprecated Do not use direct parent search, use special iterators for traversing up and down the IFaceTree
+     * @throws \BetaKiller\IFace\Exception\IFaceException
      */
     public function getIFaceParent(IFaceInterface $iface): ?IFaceInterface
     {

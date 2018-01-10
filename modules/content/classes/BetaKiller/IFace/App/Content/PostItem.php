@@ -3,7 +3,6 @@ namespace BetaKiller\IFace\App\Content;
 
 use BetaKiller\Helper\AssetsHelper;
 use BetaKiller\Helper\ContentUrlContainerHelper;
-use BetaKiller\Helper\IFaceHelper;
 use BetaKiller\Model\ContentPost;
 use BetaKiller\Model\IFaceZone;
 use BetaKiller\Model\UserInterface;
@@ -33,18 +32,16 @@ class PostItem extends AbstractAppBase
     /**
      * PostItem constructor.
      *
-     * @param \BetaKiller\Helper\IFaceHelper               $ifaceHelper
      * @param \BetaKiller\Helper\AssetsHelper              $assetsHelper
      * @param \BetaKiller\Helper\ContentUrlContainerHelper $urlParametersHelper
      * @param \BetaKiller\Model\UserInterface              $user
      */
     public function __construct(
-        IFaceHelper $ifaceHelper,
         AssetsHelper $assetsHelper,
         ContentUrlContainerHelper $urlParametersHelper,
         UserInterface $user
     ) {
-        parent::__construct($ifaceHelper);
+        parent::__construct();
 
         $this->urlParametersHelper = $urlParametersHelper;
         $this->user                = $user;

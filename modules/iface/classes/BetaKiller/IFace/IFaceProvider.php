@@ -1,18 +1,17 @@
 <?php
 namespace BetaKiller\IFace;
 
-use BetaKiller\Factory\NamespaceBasedFactory;
+use BetaKiller\Factory\FactoryException;
 use BetaKiller\IFace\Exception\IFaceException;
 use BetaKiller\IFace\ModelProvider\IFaceModelProviderAggregate;
-use BetaKiller\IFace\ModelProvider\IFaceModelProviderInterface;
 use BetaKiller\Model\DispatchableEntityInterface;
 
 class IFaceProvider
 {
     /**
-     * @var IFaceInterface[]
+     * @var \BetaKiller\IFace\IFaceFactory
      */
-    private $ifaceInstances;
+    protected $factory;
 
     /**
      * @var IFaceModelProviderAggregate
@@ -20,28 +19,25 @@ class IFaceProvider
     private $modelProvider;
 
     /**
-     * @var \BetaKiller\Factory\NamespaceBasedFactory
-     */
-    private $factory;
-
-    /**
      * @var string[]
      */
-    private $entityLinkedCodenameCache;
+    private $entityLinkedCache;
 
     /**
      * IFaceProvider constructor
      *
-     * @param IFaceModelProviderAggregate $modelProvider
-     * @param NamespaceBasedFactory       $factory
+     * @param IFaceModelProviderAggregate    $modelProvider
+     * @param \BetaKiller\IFace\IFaceFactory $factory
      */
-    public function __construct(IFaceModelProviderAggregate $modelProvider, NamespaceBasedFactory $factory)
+    public function __construct(IFaceModelProviderAggregate $modelProvider, IFaceFactory $factory)
     {
         $this->modelProvider = $modelProvider;
         $this->factory       = $factory;
     }
 
     /**
+     * Creates IFace instance from it`s codename (automatic model detection)
+     *
      * @param string $codename
      *
      * @return \BetaKiller\IFace\IFaceInterface
@@ -49,58 +45,26 @@ class IFaceProvider
      */
     public function fromCodename(string $codename): IFaceInterface
     {
-        $iface = $this->getInstanceFromCache($codename);
+        $model = $this->modelProvider->getByCodename($codename);
 
-        if (!$iface) {
-            $model = $this->getModelProvider()->getByCodename($codename);
-            $iface = $this->createIFace($model);
-            $this->storeInstanceInCache($codename, $iface);
-        }
-
-        return $iface;
+        return $this->fromModel($model);
     }
 
     /**
-     * @param string $codename
+     * Creates IFace instance from it`s model
      *
-     * @return \BetaKiller\IFace\IFaceInterface|null
+     * @param \BetaKiller\IFace\IFaceModelInterface $model
+     *
+     * @return \BetaKiller\IFace\IFaceInterface
+     * @throws \BetaKiller\IFace\Exception\IFaceException
      */
-    protected function getInstanceFromCache(string $codename): ?IFaceInterface
+    public function fromModel(IFaceModelInterface $model): IFaceInterface
     {
-        return $this->ifaceInstances[$codename] ?? null;
-    }
-
-    /**
-     * @return IFaceModelProviderInterface
-     */
-    protected function getModelProvider(): IFaceModelProviderInterface
-    {
-        return $this->modelProvider;
-    }
-
-    // TODO Move to IFaceFactory
-    protected function createIFace(IFaceModelInterface $model): IFaceInterface
-    {
-        $codename = $model->getCodename();
-
-        /** @var \BetaKiller\IFace\IFaceInterface $object */
-        $object = $this->factory
-            ->setClassNamespaces('IFace')
-            ->setExpectedInterface(IFaceInterface::class)
-            ->create($codename);
-
-        $object->setModel($model);
-
-        return $object;
-    }
-
-    /**
-     * @param string                           $codename
-     * @param \BetaKiller\IFace\IFaceInterface $iface
-     */
-    protected function storeInstanceInCache(string $codename, IFaceInterface $iface): void
-    {
-        $this->ifaceInstances[$codename] = $iface;
+        try {
+            return $this->factory->createFromModel($model);
+        } catch (FactoryException $e) {
+            throw IFaceException::wrap($e);
+        }
     }
 
     /**
@@ -113,7 +77,7 @@ class IFaceProvider
     {
         $parentIFaceModel = $parentIFace ? $parentIFace->getModel() : null;
 
-        $layer = $this->getModelProvider()->getLayer($parentIFaceModel);
+        $layer = $this->modelProvider->getLayer($parentIFaceModel);
 
         if (!$layer) {
             throw new IFaceException('Empty layer for :codename IFace',
@@ -149,46 +113,29 @@ class IFaceProvider
      */
     public function getDefault(): IFaceInterface
     {
-        $defaultModel = $this->getModelProvider()->getDefault();
+        $defaultModel = $this->modelProvider->getDefault();
 
         if (!$defaultModel) {
             throw new IFaceException('Default iface is missing');
         }
 
-        return $this->createIFace($defaultModel);
+        return $this->fromModel($defaultModel);
     }
 
     /**
      * @param \BetaKiller\IFace\IFaceInterface $iface
      *
      * @return \BetaKiller\IFace\IFaceInterface|null
+     * @throws \BetaKiller\IFace\Exception\IFaceException
      */
     public function getParent(IFaceInterface $iface): ?IFaceInterface
     {
         $model       = $iface->getModel();
-        $parentModel = $this->getModelProvider()->getParent($model);
+        $parentModel = $this->modelProvider->getParent($model);
 
         return $parentModel
             ? $this->fromModel($parentModel)
             : null;
-    }
-
-    /**
-     * @param \BetaKiller\IFace\IFaceModelInterface $model
-     *
-     * @return \BetaKiller\IFace\IFaceInterface
-     */
-    public function fromModel(IFaceModelInterface $model): IFaceInterface
-    {
-        $codename = $model->getCodename();
-        $iface    = $this->getInstanceFromCache($codename);
-
-        if (!$iface) {
-            $iface = $this->createIFace($model);
-            $this->storeInstanceInCache($codename, $iface);
-        }
-
-        return $iface;
     }
 
     /**
@@ -201,12 +148,15 @@ class IFaceProvider
      * @return IFaceInterface
      * @throws \BetaKiller\IFace\Exception\IFaceException
      */
-    public function getByEntityActionAndZone(DispatchableEntityInterface $entity, string $entityAction, string $zone): ?IFaceInterface
-    {
+    public function getByEntityActionAndZone(
+        DispatchableEntityInterface $entity,
+        string $entityAction,
+        string $zone
+    ): IFaceInterface {
         $key = implode('.', [$entity->getModelName(), $entityAction, $zone]);
 
         if (!($iface = $this->getLinkedIFaceFromCache($key))) {
-            $model = $this->getModelProvider()->getByEntityActionAndZone($entity, $entityAction, $zone);
+            $model = $this->modelProvider->getByEntityActionAndZone($entity, $entityAction, $zone);
 
             if (!$model) {
                 throw new IFaceException('No IFace found for :entity.:action entity in :zone zone', [
@@ -233,7 +183,7 @@ class IFaceProvider
      */
     public function getByActionAndZone(string $action, string $zone): array
     {
-        $models = $this->getModelProvider()->getByActionAndZone($action, $zone);
+        $models = $this->modelProvider->getByActionAndZone($action, $zone);
         $ifaces = [];
 
         foreach ($models as $model) {
@@ -247,20 +197,25 @@ class IFaceProvider
      * @param string $key
      *
      * @return \BetaKiller\IFace\IFaceInterface|null
+     * @throws \BetaKiller\IFace\Exception\IFaceException
      */
     private function getLinkedIFaceFromCache(string $key): ?IFaceInterface
     {
-        if (!isset($this->entityLinkedCodenameCache[$key])) {
+        if (!isset($this->entityLinkedCache[$key])) {
             return null;
         }
 
-        $codename = $this->entityLinkedCodenameCache[$key];
+        $codename = $this->entityLinkedCache[$key];
 
         return $this->fromCodename($codename);
     }
 
+    /**
+     * @param string                           $key
+     * @param \BetaKiller\IFace\IFaceInterface $iface
+     */
     private function storeLinkedIFaceInCache(string $key, IFaceInterface $iface): void
     {
-        $this->entityLinkedCodenameCache[$key] = $iface->getCodename();
+        $this->entityLinkedCache[$key] = $iface->getCodename();
     }
 }

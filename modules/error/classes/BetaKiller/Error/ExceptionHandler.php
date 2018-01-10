@@ -9,7 +9,7 @@ use BetaKiller\ExceptionInterface;
 use BetaKiller\Helper\AppEnv;
 use BetaKiller\Helper\LoggerHelperTrait;
 use BetaKiller\IFace\AbstractHttpErrorIFace;
-use BetaKiller\IFace\IFaceFactory;
+use BetaKiller\IFace\IFaceProvider;
 use Psr\Log\LoggerInterface;
 use Response;
 
@@ -18,9 +18,9 @@ class ExceptionHandler implements ExceptionHandlerInterface
     use LoggerHelperTrait;
 
     /**
-     * @var \BetaKiller\IFace\IFaceFactory
+     * @var \BetaKiller\IFace\IFaceProvider
      */
-    private $ifaceFactory;
+    private $ifaceProvider;
 
     /**
      * @var \BetaKiller\Helper\AppEnv
@@ -40,15 +40,15 @@ class ExceptionHandler implements ExceptionHandlerInterface
     /**
      * ExceptionHandler constructor.
      *
-     * @param \BetaKiller\Helper\AppEnv      $appEnv
-     * @param \BetaKiller\IFace\IFaceFactory $ifaceFactory
-     * @param \Psr\Log\LoggerInterface       $logger
+     * @param \BetaKiller\Helper\AppEnv       $appEnv
+     * @param \BetaKiller\IFace\IFaceProvider $ifaceProvider
+     * @param \Psr\Log\LoggerInterface        $logger
      */
-    public function __construct(AppEnv $appEnv, IFaceFactory $ifaceFactory, LoggerInterface $logger)
+    public function __construct(AppEnv $appEnv, IFaceProvider $ifaceProvider, LoggerInterface $logger)
     {
-        $this->ifaceFactory = $ifaceFactory;
-        $this->appEnv = $appEnv;
-        $this->logger = $logger;
+        $this->appEnv        = $appEnv;
+        $this->logger        = $logger;
+        $this->ifaceProvider = $ifaceProvider;
     }
 
     public function handle(\Throwable $exception): Response
@@ -170,7 +170,7 @@ class ExceptionHandler implements ExceptionHandlerInterface
      */
     private function createIFaceFromCodename(string $codename): ?AbstractHttpErrorIFace
     {
-        return $this->ifaceFactory->fromCodename($codename);
+        return $this->ifaceProvider->fromCodename($codename);
     }
 
     private function renderDefaultMessage(\Throwable $e): string

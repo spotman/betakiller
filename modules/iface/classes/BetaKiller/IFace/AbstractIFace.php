@@ -1,7 +1,6 @@
 <?php
 namespace BetaKiller\IFace;
 
-use BetaKiller\Helper\IFaceHelper;
 use BetaKiller\Helper\SeoMetaInterface;
 use BetaKiller\IFace\Exception\IFaceException;
 use BetaKiller\IFace\Url\UrlContainerInterface;
@@ -32,13 +31,15 @@ abstract class AbstractIFace implements IFaceInterface
     private $expiresInterval;
 
     /**
+     * @Inject
+     * @todo Remove this dependency coz it`s used rarely
      * @var \BetaKiller\Helper\IFaceHelper
      */
     protected $ifaceHelper;
 
-    public function __construct(IFaceHelper $ifaceHelper)
+    public function __construct()
     {
-        $this->ifaceHelper = $ifaceHelper;
+        // Empty by default, use __construct for defining concrete IFace dependencies
     }
 
     /**

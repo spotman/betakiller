@@ -1,7 +1,7 @@
 <?php
 namespace BetaKiller\IFace;
 
-use BetaKiller\Model\DispatchableEntityInterface;
+use BetaKiller\Factory\NamespaceBasedFactory;
 
 class IFaceFactory
 {
@@ -11,13 +11,21 @@ class IFaceFactory
     private $provider;
 
     /**
+     * @var \BetaKiller\Factory\NamespaceBasedFactory
+     */
+    private $factory;
+
+    /**
      * IFaceFactory constructor.
      *
-     * @param \BetaKiller\IFace\IFaceProvider $provider
+     * @param \BetaKiller\Factory\NamespaceBasedFactory $factory
      */
-    public function __construct(IFaceProvider $provider)
+    public function __construct(NamespaceBasedFactory $factory)
     {
-        $this->provider = $provider;
+        $this->factory = $factory
+            ->cacheInstances()
+            ->setClassNamespaces('IFace')
+            ->setExpectedInterface(IFaceInterface::class);
     }
 
     /**
@@ -26,37 +34,15 @@ class IFaceFactory
      * @param \BetaKiller\IFace\IFaceModelInterface $model
      *
      * @return \BetaKiller\IFace\IFaceInterface
+     * @throws \BetaKiller\Factory\FactoryException
      */
-    public function fromModel(IFaceModelInterface $model)
+    public function createFromModel(IFaceModelInterface $model): IFaceInterface
     {
-        return $this->provider->fromModel($model);
-    }
+        $codename = $model->getCodename();
 
-    /**
-     * Creates IFace instance from it`s codename
-     *
-     * @param string $codename IFace codename
-     *
-     * @return \BetaKiller\IFace\IFaceInterface
-     * @throws \BetaKiller\IFace\Exception\IFaceException
-     */
-    public function fromCodename(string $codename)
-    {
-        return $this->provider->fromCodename($codename);
-    }
+        /** @var \BetaKiller\IFace\IFaceInterface $instance */
+        $instance = $this->factory->create($codename);
 
-    /**
-     * Search for IFace linked to provided entity, entity action and zone
-     *
-     * @param \BetaKiller\Model\DispatchableEntityInterface $entity
-     * @param string                                        $entityAction
-     * @param string                                        $zone
-     *
-     * @return \BetaKiller\IFace\IFaceInterface
-     * @throws \BetaKiller\IFace\Exception\IFaceException
-     */
-    public function getByEntityActionAndZone(DispatchableEntityInterface $entity, $entityAction, $zone)
-    {
-        return $this->provider->getByEntityActionAndZone($entity, $entityAction, $zone);
+        return $instance->setModel($model);
     }
 }
