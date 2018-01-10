@@ -78,7 +78,7 @@ abstract class Registry implements \IteratorAggregate, QueryConverter\Convertibl
      * @param $codename
      *
      * @return \BetaKiller\Search\Provider\Parameterized\ParameterInterface
-     * @throws Utils\Registry\Exception
+     * @throws Utils\Registry\RegistryException
      */
     public function getParameter($codename)
     {
