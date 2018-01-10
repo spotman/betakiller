@@ -5,6 +5,7 @@ interface NotificationUserInterface
 {
     /**
      * Returns user email
+     *
      * @return string
      */
     public function getEmail(): string;
@@ -16,6 +17,7 @@ interface NotificationUserInterface
 
     /**
      * Returns TRUE if user allowed notifications through email
+     *
      * @return bool
      */
     public function isEmailNotificationAllowed(): bool;
@@ -26,7 +28,15 @@ interface NotificationUserInterface
 
     /**
      * Returns TRUE if user allowed online notifications through WebSockets/AJAX/etc
+     *
      * @return bool
      */
     public function isOnlineNotificationAllowed(): bool;
+
+    /**
+     * Return preferred language (used in templates)
+     *
+     * @return null|string
+     */
+    public function getLanguageName(): ?string;
 }

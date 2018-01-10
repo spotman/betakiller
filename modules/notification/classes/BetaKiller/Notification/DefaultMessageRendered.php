@@ -1,6 +1,7 @@
 <?php
 namespace BetaKiller\Notification;
 
+use BetaKiller\Helper\I18n;
 use BetaKiller\View\ViewFactoryInterface;
 
 class DefaultMessageRendered implements MessageRendererInterface
@@ -11,13 +12,25 @@ class DefaultMessageRendered implements MessageRendererInterface
     private $viewFactory;
 
     /**
+     * @var \BetaKiller\Helper\I18n
+     */
+    private $i18n;
+
+    /**
+     * @var string
+     */
+    private $originalLang;
+
+    /**
      * DefaultMessageRendered constructor.
      *
      * @param \BetaKiller\View\ViewFactoryInterface $viewFactory
+     * @param \BetaKiller\Helper\I18n               $i18n
      */
-    public function __construct(ViewFactoryInterface $viewFactory)
+    public function __construct(ViewFactoryInterface $viewFactory, I18n $i18n)
     {
         $this->viewFactory = $viewFactory;
+        $this->i18n = $i18n;
     }
 
     /**
@@ -35,6 +48,9 @@ class DefaultMessageRendered implements MessageRendererInterface
         NotificationUserInterface $target,
         NotificationTransportInterface $transport
     ): string {
+        // User language in templates
+        $this->useTargetLang($target);
+
         $file = $this->getTemplatePath().DIRECTORY_SEPARATOR.$message->getTemplateName().'-'.$transport->getName();
         $view = $this->viewFactory->create($file);
 
@@ -47,7 +63,26 @@ class DefaultMessageRendered implements MessageRendererInterface
             $view->set($key, $value);
         }
 
-        return $view->render();
+        $text = $view->render();
+
+        $this->restoreOriginalLanguage();
+
+        return $text;
+    }
+
+    private function useTargetLang(NotificationUserInterface $user): void
+    {
+        $lang = $user->getLanguageName();
+
+        if ($lang) {
+            $this->originalLang = $this->i18n->getLang();
+            $this->i18n->setLang($lang);
+        }
+    }
+
+    private function restoreOriginalLanguage(): void
+    {
+        $this->i18n->setLang($this->originalLang);
     }
 
     /**
