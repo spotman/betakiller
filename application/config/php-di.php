@@ -95,8 +95,7 @@ return [
         })->scope(Scope::SINGLETON),
 
         // Use logger only when really needed
-        LoggerInterface::class                     => DI\object(\BetaKiller\Log\Logger::class),
-        //->lazy(),
+        LoggerInterface::class                     => DI\get(\BetaKiller\Log\Logger::class),
 
         Auth::class => DI\factory(function () {
             return Auth::instance();
@@ -114,8 +113,8 @@ return [
         \BetaKiller\Model\RoleInterface::class          => DI\get(\BetaKiller\Model\Role::class),
 
         // Backward compatibility fix
-        \Model_User::class                              => DI\object(\BetaKiller\Model\User::class)->scope(\DI\Scope::PROTOTYPE),
-        \Model_Role::class                              => DI\object(\BetaKiller\Model\Role::class)->scope(\DI\Scope::PROTOTYPE),
+//        \Model_User::class                              => DI\object(\BetaKiller\Model\User::class)->scope(\DI\Scope::PROTOTYPE),
+//        \Model_Role::class                              => DI\object(\BetaKiller\Model\Role::class)->scope(\DI\Scope::PROTOTYPE),
 
         // Cache for production and staging (dev and testing has ArrayCache); use filesystem cache so it would be cleared after deployment
         AclInterface::DI_CACHE_OBJECT_KEY               => new FilesystemCache(implode(DIRECTORY_SEPARATOR,
@@ -136,7 +135,7 @@ return [
         ApiMethodAccessResolverDetectorInterface::class => DI\object(CustomApiMethodAccessResolverDetector::class),
 
         // Use default renderer for notification messages
-        MessageRendererInterface::class => DI\object(DefaultMessageRendered::class),
+        MessageRendererInterface::class                 => DI\object(DefaultMessageRendered::class),
 
         Meta::class => \DI\factory(function () {
             return Meta::instance();

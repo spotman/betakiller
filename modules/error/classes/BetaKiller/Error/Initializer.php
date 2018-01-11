@@ -122,7 +122,7 @@ class Initializer implements ModuleInitializerInterface
      */
     private function initPhpExceptionStorage(): void
     {
-        $logger = $this->logger;
+        $logger    = $this->logger;
         $container = $this->container;
 
         $factory = function () use ($logger, $container) {

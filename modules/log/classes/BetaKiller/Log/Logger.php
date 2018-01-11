@@ -6,6 +6,7 @@ use Monolog\Handler\FingersCrossedHandler;
 use Monolog\Handler\HandlerInterface;
 use Monolog\Handler\StreamHandler;
 use Monolog\Handler\WhatFailureGroupHandler;
+use Monolog\Processor\IntrospectionProcessor;
 use Monolog\Processor\MemoryPeakUsageProcessor;
 use Monolog\Processor\WebProcessor;
 use MultiSite;
@@ -75,13 +76,13 @@ class Logger implements LoggerInterface
             new StreamHandler($appLogFilePath, $monolog::DEBUG),
         ]);
 
-        $logsLevel      = $isDebugAllowed ? $monolog::DEBUG : $monolog::NOTICE;
-        $crossedHandler = new FingersCrossedHandler($groupHandler, $logsLevel);
+        $logsLevel = $isDebugAllowed ? $monolog::DEBUG : $monolog::NOTICE;
 
-        $monolog->pushHandler($crossedHandler);
+        $monolog->pushHandler(new FingersCrossedHandler($groupHandler, $logsLevel));
 
         $monolog->pushProcessor(new KohanaPlaceholderProcessor());
         $monolog->pushProcessor(new MemoryPeakUsageProcessor());
+        $monolog->pushProcessor(new IntrospectionProcessor($monolog::NOTICE));
 
         return $monolog;
     }
