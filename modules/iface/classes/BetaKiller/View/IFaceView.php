@@ -3,6 +3,7 @@ namespace BetaKiller\View;
 
 use BetaKiller\Helper\SeoMetaInterface;
 use BetaKiller\Helper\StringPatternHelper;
+use BetaKiller\IFace\Exception\IFaceException;
 use BetaKiller\IFace\IFaceInterface;
 use BetaKiller\Repository\IFaceLayoutRepository;
 
@@ -60,6 +61,7 @@ class IFaceView
      * @param \BetaKiller\IFace\IFaceInterface $iface
      *
      * @return string
+     * @throws \BetaKiller\IFace\Exception\IFaceException
      * @throws \BetaKiller\Repository\RepositoryException
      */
     public function render(IFaceInterface $iface): string
@@ -97,12 +99,24 @@ class IFaceView
         return $this->layoutView->render($ifaceView);
     }
 
+    /**
+     * @param \BetaKiller\IFace\IFaceInterface $iface
+     *
+     * @return string
+     * @throws \BetaKiller\IFace\Exception\IFaceException
+     */
     private function getIFaceTitle(IFaceInterface $iface): string
     {
         $title = $iface->getTitle();
 
         if (!$title) {
             $title = $this->generateTitleFromLabels($iface);
+        }
+
+        if (!$title) {
+            throw new IFaceException('Can not compose title for IFace :codename', [
+                ':codename' => $iface->getCodename(),
+            ]);
         }
 
         return $this->stringPatternHelper->processPattern($title, SeoMetaInterface::TITLE_LIMIT);
