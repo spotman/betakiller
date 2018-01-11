@@ -41,7 +41,7 @@ class UrlPrototype
     /**
      * @param string $string
      *
-     * @return \BetaKiller\IFace\Url\UrlPrototype
+     * @return \BetaKiller\Url\UrlPrototype
      * @throws \BetaKiller\Url\UrlPrototypeException
      */
     public static function fromString(string $string): UrlPrototype
@@ -56,7 +56,9 @@ class UrlPrototype
 
         $string = trim($string, '{}');
 
-        list($modelName, $keyPart) = explode(self::KEY_SEPARATOR, $string, 2);
+        $parsed = explode(self::KEY_SEPARATOR, $string, 2);
+        $modelName = $parsed[0];
+        $keyPart = $parsed[1] ?? null;
 
         $key = str_replace(self::METHOD_CALL_MARKER, '', $keyPart);
         $isMethodCall = substr($keyPart, -2) === self::METHOD_CALL_MARKER;
