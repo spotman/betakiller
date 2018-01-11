@@ -4,14 +4,14 @@ namespace BetaKiller\Model;
 use BetaKiller\Exception;
 use ORM;
 
-class Entity extends ORM
+class Entity extends ORM implements EntityModelInterface
 {
     /**
      * Prepares the model database connection, determines the table name,
      * and loads column information.
      *
-     * @throws \BetaKiller\Exception
      * @return void
+     * @throws \Exception
      */
     protected function _initialize(): void
     {
@@ -24,7 +24,7 @@ class Entity extends ORM
      * Returns entity short name (may be used for url creating)
      *
      * @return string
-     * @throws \BetaKiller\Exception
+     * @throws \Kohana_Exception
      */
     public function getSlug(): string
     {
@@ -36,13 +36,13 @@ class Entity extends ORM
      *
      * @return \BetaKiller\Model\Entity
      */
-    public function setSlug(string $value): Entity
+    public function setSlug(string $value): EntityModelInterface
     {
         return $this->set('slug', $value);
     }
 
     /**
-     * Возвращает имя модели, с которой связана текущая entity
+     * Returns model name of the current entity
      *
      * @return string
      */
@@ -56,12 +56,14 @@ class Entity extends ORM
      *
      * @return \BetaKiller\Model\Entity
      */
-    public function setLinkedModelName(string $value): Entity
+    public function setLinkedModelName(string $value): EntityModelInterface
     {
         return $this->set('model_name', $value);
     }
 
-
+    /**
+     * @return string
+     */
     public function getLabel(): string
     {
         return __('entities.'.$this->getSlug());

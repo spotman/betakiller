@@ -94,21 +94,47 @@ class UrlContainer implements UrlContainerInterface
      */
     public function getEntityByClassName($className)
     {
+        $key = $this->resolveObjectOrClassToKey($className, DispatchableEntityInterface::class);
+
+        return $this->getEntity($key);
+    }
+
+    /**
+     * @param string|\BetaKiller\Model\DispatchableEntityInterface $className
+     *
+     * @return \BetaKiller\Model\DispatchableEntityInterface|mixed|null
+     * @throws \BetaKiller\IFace\Exception\UrlContainerException
+     */
+    public function getParameterByClassName($className)
+    {
+        $key = $this->resolveObjectOrClassToKey($className, UrlParameterInterface::class);
+
+        return $this->getParameter($key);
+    }
+
+    /**
+     * @param        $className
+     *
+     * @param string $targetClass
+     *
+     * @return string
+     * @throws \BetaKiller\IFace\Exception\UrlContainerException
+     */
+    private function resolveObjectOrClassToKey($className, string $targetClass): string
+    {
         if (\is_object($className)) {
             $className = \get_class($className);
         }
 
-        if (!is_a($className, DispatchableEntityInterface::class, true)) {
+        if (!is_a($className, $targetClass, true)) {
             throw new UrlContainerException('Class :name must be instance of :must', [
                 ':name' => $className,
-                ':must' => DispatchableEntityInterface::class,
+                ':must' => $targetClass,
             ]);
         }
 
         /** @var \BetaKiller\Model\DispatchableEntityInterface $className Hack for autocomplete */
-        $key = $className::getUrlContainerKey();
-
-        return $this->getEntity($key);
+        return $className::getUrlContainerKey();
     }
 
     /**

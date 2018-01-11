@@ -50,14 +50,6 @@ abstract class AbstractConfigBasedDispatchableEntity implements ConfigBasedDispa
     }
 
     /**
-     * @return string
-     */
-    public function getModelName(): string
-    {
-        return $this->getCodename();
-    }
-
-    /**
      * Entity may return instances of linked entities if it have.
      * This method is used to fetch missing entities in UrlContainer walking through links between them
      *

@@ -2,7 +2,6 @@
 namespace BetaKiller\Helper;
 
 use BetaKiller\Config\AppConfigInterface;
-use BetaKiller\Exception;
 use BetaKiller\IFace\CrudlsActionsInterface;
 use BetaKiller\IFace\Exception\IFaceException;
 use BetaKiller\IFace\IFaceInterface;
@@ -156,7 +155,6 @@ class IFaceHelper
      * @param string|null                                   $zone
      *
      * @return string
-     * @throws \BetaKiller\Exception
      * @throws \BetaKiller\IFace\Exception\IFaceException
      */
     public function getEntityUrl(DispatchableEntityInterface $entity, string $action, ?string $zone = null): string
@@ -165,7 +163,7 @@ class IFaceHelper
             $currentIFace = $this->getCurrentIFace();
 
             if (!$currentIFace) {
-                throw new Exception('IFace zone must be specified');
+                throw new IFaceException('IFace zone must be specified');
             }
 
             // Fetch zone from current IFace
@@ -186,7 +184,6 @@ class IFaceHelper
      * @param null|string                                   $zone
      *
      * @return string
-     * @throws \BetaKiller\Exception
      * @throws \BetaKiller\IFace\Exception\IFaceException
      */
     public function getCreateEntityUrl(DispatchableEntityInterface $entity, ?string $zone = null): string
@@ -199,7 +196,6 @@ class IFaceHelper
      * @param null|string                                   $zone
      *
      * @return string
-     * @throws \BetaKiller\Exception
      * @throws \BetaKiller\IFace\Exception\IFaceException
      */
     public function getReadEntityUrl(DispatchableEntityInterface $entity, ?string $zone = null): string
@@ -212,7 +208,6 @@ class IFaceHelper
      * @param null|string                                   $zone
      *
      * @return string
-     * @throws \BetaKiller\Exception
      * @throws \BetaKiller\IFace\Exception\IFaceException
      */
     public function getUpdateEntityUrl(DispatchableEntityInterface $entity, ?string $zone = null): string
@@ -225,7 +220,6 @@ class IFaceHelper
      * @param null|string                                   $zone
      *
      * @return string
-     * @throws \BetaKiller\Exception
      * @throws \BetaKiller\IFace\Exception\IFaceException
      */
     public function getDeleteEntityUrl(DispatchableEntityInterface $entity, ?string $zone = null): string
@@ -238,7 +232,6 @@ class IFaceHelper
      * @param null|string                                   $zone
      *
      * @return string
-     * @throws \BetaKiller\Exception
      * @throws \BetaKiller\IFace\Exception\IFaceException
      */
     public function getListEntityUrl(DispatchableEntityInterface $entity, ?string $zone = null): string
@@ -251,7 +244,6 @@ class IFaceHelper
      * @param null|string                                   $zone
      *
      * @return string
-     * @throws \BetaKiller\Exception
      * @throws \BetaKiller\IFace\Exception\IFaceException
      */
     public function getSearchEntityUrl(DispatchableEntityInterface $entity, ?string $zone = null): string

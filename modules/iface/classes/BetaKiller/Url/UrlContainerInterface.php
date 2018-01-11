@@ -43,6 +43,14 @@ interface UrlContainerInterface
     public function getEntityByClassName($className);
 
     /**
+     * @param string|\BetaKiller\Url\UrlParameterInterface $className
+     *
+     * @return \BetaKiller\Url\UrlParameterInterface|mixed|null
+     * @throws \BetaKiller\IFace\Exception\UrlContainerException
+     */
+    public function getParameterByClassName($className);
+
+    /**
      * @return \BetaKiller\Url\UrlParameterInterface[]
      */
     public function getAllParameters(): array;
