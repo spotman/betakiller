@@ -1,29 +1,36 @@
 <?php
 namespace BetaKiller\Repository;
 
-use BetaKiller\Model\Entity;
+use BetaKiller\Model\EntityModelInterface;
 
 /**
  * Class EntityRepository
  *
  * @package BetaKiller\Repository
- * @method Entity findById(int $id)
- * @method Entity create()
- * @method Entity[] getAll()
+ * @method EntityModelInterface findById(int $id)
+ * @method EntityModelInterface create()
+ * @method EntityModelInterface[] getAll()
  */
-class EntityRepository extends AbstractOrmBasedRepository
+class EntityRepository extends AbstractOrmBasedDispatchableRepository
 {
+    /**
+     * @return string
+     */
+    public function getUrlKeyName(): string
+    {
+        return EntityModelInterface::URL_KEY;
+    }
+
     /**
      * @param string $slug
      *
-     * @return Entity
+     * @return EntityModelInterface
      * @throws \BetaKiller\Repository\RepositoryException
      */
-    public function findBySlug(string $slug): Entity
+    public function findBySlug(string $slug): EntityModelInterface
     {
         $orm = $this->getOrmInstance();
 
-        /** @var Entity $model */
         $model = $orm->where('slug', '=', $slug)->find();
 
         if (!$model->loaded()) {
@@ -36,10 +43,10 @@ class EntityRepository extends AbstractOrmBasedRepository
     /**
      * @param string $modelName
      *
-     * @return \BetaKiller\Model\Entity|mixed
+     * @return \BetaKiller\Model\EntityModelInterface|mixed
      * @throws \BetaKiller\Repository\RepositoryException
      */
-    public function findByModelName(string $modelName): Entity
+    public function findByModelName(string $modelName): EntityModelInterface
     {
         $orm = $this->getOrmInstance();
 

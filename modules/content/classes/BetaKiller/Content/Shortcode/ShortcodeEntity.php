@@ -5,10 +5,6 @@ use BetaKiller\Model\AbstractConfigBasedDispatchableEntity;
 
 class ShortcodeEntity extends AbstractConfigBasedDispatchableEntity implements ShortcodeEntityInterface
 {
-    public const OPTION_TYPE             = 'type';
-    public const OPTION_TAG_NAME         = 'tag_name';
-    public const OPTION_MAY_HAVE_CONTENT = 'may_have_content';
-
     /**
      * Returns key which will be used for storing model in UrlContainer registry.
      *
@@ -17,6 +13,14 @@ class ShortcodeEntity extends AbstractConfigBasedDispatchableEntity implements S
     public static function getUrlContainerKey(): string
     {
         return ShortcodeEntityInterface::URL_CONTAINER_KEY;
+    }
+
+    /**
+     * @return string
+     */
+    public function getModelName(): string
+    {
+        return self::URL_CONTAINER_KEY;
     }
 
     /**

@@ -1,8 +1,7 @@
 <?php
 namespace BetaKiller\IFace\Admin\Content\Shortcode;
 
-use BetaKiller\Content\Shortcode\ShortcodeFacade;
-use BetaKiller\Content\Shortcode\ShortcodeInterface;
+use BetaKiller\Content\Shortcode\ShortcodeEntityInterface;
 use BetaKiller\IFace\Admin\AbstractAdminBase;
 use BetaKiller\Repository\ShortcodeRepository;
 
@@ -21,29 +20,27 @@ class Index extends AbstractAdminBase
     /**
      * Index constructor.
      *
-     * @param \BetaKiller\Repository\ShortcodeRepository    $repo
-     * @param \BetaKiller\Content\Shortcode\ShortcodeFacade $facade
+     * @param \BetaKiller\Repository\ShortcodeRepository $repo
      */
-    public function __construct(ShortcodeRepository $repo, ShortcodeFacade $facade)
+    public function __construct(ShortcodeRepository $repo)
     {
         parent::__construct();
 
         $this->repo = $repo;
-        $this->facade = $facade;
     }
 
     /**
      * Returns data for View
      *
      * @return array
+     * @throws \BetaKiller\IFace\Exception\IFaceException
      */
     public function getData(): array
     {
         $data = [];
 
         foreach ($this->repo->getAll() as $entity) {
-            $shortcode = $this->facade->createFromEntity($entity);
-            $data[] = $this->makeShortcodeData($shortcode);
+            $data[] = $this->makeShortcodeData($entity);
         }
 
         return [
@@ -51,13 +48,18 @@ class Index extends AbstractAdminBase
         ];
     }
 
-    private function makeShortcodeData(ShortcodeInterface $shortcode): array
+    /**
+     * @param \BetaKiller\Content\Shortcode\ShortcodeEntityInterface $shortcode
+     *
+     * @return array
+     * @throws \BetaKiller\IFace\Exception\IFaceException
+     */
+    private function makeShortcodeData(ShortcodeEntityInterface $shortcode): array
     {
         return [
             'codename' => $shortcode->getCodename(),
             'tag_name' => $shortcode->getTagName(),
-            // TODO
-            'url' => '',
+            'url'      => $this->ifaceHelper->getReadEntityUrl($shortcode),
         ];
     }
 }

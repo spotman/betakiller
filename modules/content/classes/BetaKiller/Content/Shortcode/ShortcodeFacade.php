@@ -75,13 +75,13 @@ class ShortcodeFacade
     }
 
     /**
-     * @param \BetaKiller\Content\Shortcode\ShortcodeEntity $param
-     * @param array|null                                    $attributes
+     * @param \BetaKiller\Content\Shortcode\ShortcodeEntityInterface $param
+     * @param array|null                                             $attributes
      *
      * @return \BetaKiller\Content\Shortcode\ShortcodeInterface
      * @throws \BetaKiller\Factory\FactoryException
      */
-    public function createFromEntity(ShortcodeEntity $param, ?array $attributes = null): ShortcodeInterface
+    public function createFromEntity(ShortcodeEntityInterface $param, ?array $attributes = null): ShortcodeInterface
     {
         return $this->shortcodeFactory->createFromEntity($param, $attributes);
     }

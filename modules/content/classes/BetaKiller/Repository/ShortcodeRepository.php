@@ -2,6 +2,7 @@
 namespace BetaKiller\Repository;
 
 use BetaKiller\Content\Shortcode\ShortcodeEntity;
+use BetaKiller\Content\Shortcode\ShortcodeEntityInterface;
 use BetaKiller\Model\ConfigBasedDispatchableEntityInterface;
 
 /**
@@ -22,7 +23,7 @@ class ShortcodeRepository extends AbstractConfigBasedDispatchableRepository
      */
     public function findByTagName(string $tagName): ShortcodeEntity
     {
-        return $this->findByOptionValue(ShortcodeEntity::OPTION_TAG_NAME, $tagName);
+        return $this->findByOptionValue(ShortcodeEntityInterface::OPTION_TAG_NAME, $tagName);
     }
 
     protected function getItemsListConfigKey(): array
@@ -35,7 +36,7 @@ class ShortcodeRepository extends AbstractConfigBasedDispatchableRepository
      */
     public function getUrlKeyName(): string
     {
-        return 'tagName';
+        return ShortcodeEntityInterface::URL_KEY;
     }
 
     /**

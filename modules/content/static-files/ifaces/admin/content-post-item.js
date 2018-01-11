@@ -50,7 +50,7 @@ require([
     });
 
     $content.ckeditor({
-      contentEntityName: 'ContentPost',
+      contentEntityName: 'post',
       contentEntityItemID: postID,
       allowedContent: "p(*); strong; i; em; span{*}; table(*); thead; tbody; tr; th[style]; td{*}; ul(*); ol(*); li; a[href,title]; h2; h3; h4; " + customTagsRules.join(';')
     });

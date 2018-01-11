@@ -58,7 +58,12 @@ class ShortcodeFactory
         return $this->createFromEntity($urlParameter, $attributes);
     }
 
-    private function getClassCodename(ShortcodeEntity $entity): string
+    /**
+     * @param \BetaKiller\Content\Shortcode\ShortcodeEntityInterface $entity
+     *
+     * @return string
+     */
+    private function getClassCodename(ShortcodeEntityInterface $entity): string
     {
         switch (true) {
             // Use common class for static shortcodes
@@ -76,13 +81,13 @@ class ShortcodeFactory
     }
 
     /**
-     * @param \BetaKiller\Content\Shortcode\ShortcodeEntity $entity
-     * @param array|null                                    $attributes
+     * @param \BetaKiller\Content\Shortcode\ShortcodeEntityInterface $entity
+     * @param array|null                                             $attributes
      *
      * @return \BetaKiller\Content\Shortcode\ShortcodeInterface
      * @throws \BetaKiller\Factory\FactoryException
      */
-    public function createFromEntity(ShortcodeEntity $entity, ?array $attributes = null): ShortcodeInterface
+    public function createFromEntity(ShortcodeEntityInterface $entity, ?array $attributes = null): ShortcodeInterface
     {
         $classCodename = $this->getClassCodename($entity);
 

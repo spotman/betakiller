@@ -1,0 +1,31 @@
+{% extends layout %}
+
+{% block page_content %}
+
+  <div class="row">
+    <div class="col s12">
+      <a href="{{ createUrl|default('#') }}" class="btn right">Create shortcode</a>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col s12">
+
+      <table class="responsive-table bordered highlight">
+        <tr>
+          <th>Tag</th>
+          <th>Codename</th>
+        </tr>
+
+        {% for shortcode in shortcodes %}
+          <tr>
+            <th><a href="{{ shortcode.url }}">[{{ shortcode.tag_name }}]</a></th>
+            <th><a href="{{ shortcode.url }}">{{ shortcode.codename }}</a></th>
+          </tr>
+        {% endfor %}
+      </table>
+
+    </div>
+  </div>
+
+{% endblock %}

@@ -34,7 +34,7 @@ class GalleryShortcode extends AbstractContentElementShortcode
     {
         return [
             new CommaSeparatedIDsAttribute('ids'),
-            new NumberAttribute('column', true),
+            new NumberAttribute('columns', true),
         ];
     }
 

@@ -220,9 +220,9 @@ function initAbstractPlugin(tagName, editor) {
 
     editor.addMenuGroup(contextMenuGroup);
     editor.addMenuItem(contextMenuItem, {
-      label: 'Свойства изображения', // TODO
+      label: 'Свойства', // TODO
       icon: 'sourcedialog', // this.path + 'images/icon.png',
-      command: propertiesDialogName,
+      command: iFrameDialogName,
       group: contextMenuGroup
     });
 
