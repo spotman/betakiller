@@ -65,4 +65,6 @@ return [
     'notification.user.comment.parent-author-reply.text' => ':targetName,<br />вам ответили на комментарий от :created_at к записи "<strong>:label</strong>".<br />Прочитать комментарий можно по адресу <a href=":url">:url</a>',
 
     'error.post.preview_not_allowed' => 'Предпросмотр статей разрешён только редакторам',
+
+    'entities.post' => 'Статьи и страницы',
 ];
