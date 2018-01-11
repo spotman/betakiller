@@ -1,7 +1,7 @@
 <?php
 namespace BetaKiller\IFace\Admin\Content\Shortcode;
 
-use BetaKiller\Content\Shortcode\ShortcodeInterface;
+use BetaKiller\Content\Shortcode\ShortcodeEntityInterface;
 use BetaKiller\IFace\Admin\AbstractAdminBase;
 
 class WysiwygPreview extends AbstractAdminBase
@@ -33,9 +33,9 @@ class WysiwygPreview extends AbstractAdminBase
      */
     public function getData(): array
     {
-        $param = $this->urlParameters->getParameter(ShortcodeInterface::URL_CONTAINER_KEY);
+        $entity = $this->urlParameters->getEntity(ShortcodeEntityInterface::URL_CONTAINER_KEY);
 
-        $shortcode = $this->shortcodeFacade->createFromUrlParameter($param);
+        $shortcode = $this->shortcodeFacade->createFromEntity($entity);
 
         $attributesKeys = $this->urlParameters->getQueryPartsKeys();
 

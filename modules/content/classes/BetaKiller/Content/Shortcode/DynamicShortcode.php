@@ -1,17 +1,8 @@
 <?php
 namespace BetaKiller\Content\Shortcode;
 
-class StaticShortcode extends AbstractShortcode
+class DynamicShortcode extends AbstractShortcode
 {
-    /**
-     * @return array
-     */
-    protected function getDefinitions(): array
-    {
-        // No attributes available in static shortcodes
-        return [];
-    }
-
     public function getWysiwygPluginPreviewSrc(): string
     {
         return '';

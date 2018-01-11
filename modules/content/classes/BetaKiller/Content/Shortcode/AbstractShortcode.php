@@ -1,17 +1,19 @@
 <?php
 namespace BetaKiller\Content\Shortcode;
 
+use BetaKiller\Content\Shortcode\Attribute\ShortcodeAttributeInterface;
+
 abstract class AbstractShortcode implements ShortcodeInterface
 {
     /**
-     * @var string
+     * @var \BetaKiller\Content\Shortcode\ShortcodeEntityInterface
      */
-    private $tagName;
+    private $entity;
 
     /**
-     * @var string
+     * @var \BetaKiller\Content\Shortcode\Attribute\ShortcodeAttributeInterface[]
      */
-    private $codename;
+    private $definitions;
 
     /**
      * @var array Shortcode tag values
@@ -23,6 +25,9 @@ abstract class AbstractShortcode implements ShortcodeInterface
      */
     private $content;
 
+    /**
+     * @return string
+     */
     public static function codename(): string
     {
         $className = static::class;
@@ -32,11 +37,24 @@ abstract class AbstractShortcode implements ShortcodeInterface
         return str_replace(self::CLASS_SUFFIX, '', $baseName);
     }
 
-    public function __construct(string $tagName, ?string $codename = null)
+    /**
+     * AbstractShortcode constructor.
+     *
+     * @param \BetaKiller\Content\Shortcode\ShortcodeEntityInterface $entity
+     */
+    public function __construct(ShortcodeEntityInterface $entity)
     {
-        $this->tagName = $tagName;
-        $this->codename = $codename ?? static::codename();
+        $this->entity = $entity;
+
+        foreach ($this->getDefinitions() as $item) {
+            $this->definitions[$item->getName()] = $item;
+        }
     }
+
+    /**
+     * @return \BetaKiller\Content\Shortcode\Attribute\ShortcodeAttributeInterface[]
+     */
+    abstract protected function getDefinitions(): array;
 
     /**
      * Returns HTML tag name
@@ -45,12 +63,15 @@ abstract class AbstractShortcode implements ShortcodeInterface
      */
     public function getTagName(): string
     {
-        return $this->tagName;
+        return $this->entity->getTagName();
     }
 
+    /**
+     * @return string
+     */
     public function getCodename(): string
     {
-        return $this->codename;
+        return $this->entity->getCodename();
     }
 
     /**
@@ -66,34 +87,81 @@ abstract class AbstractShortcode implements ShortcodeInterface
     }
 
     /**
-     * @param string      $key
+     * @param string      $name
      * @param null|string $value
      *
      * @throws \BetaKiller\Content\Shortcode\ShortcodeException
      */
-    public function setAttribute(string $key, ?string $value): void
+    public function setAttribute(string $name, ?string $value): void
     {
-        if (!$this->isAttributeAvailable($key)) {
-            throw new ShortcodeException('Attribute :key is not available for shortcode :tag', [
-                ':key' => $key,
-                ':tag' => $this->getTagName(),
+        if (!$this->isAttributeAvailable($name)) {
+            throw new ShortcodeException('Attribute [:name] is not available for shortcode [:tag]', [
+                ':name' => $name,
+                ':tag'  => $this->getTagName(),
             ]);
         }
 
-        // TODO Check for available values for attribute
-        $this->attributes[$key] = $value;
+        if (!$this->isAttributeValueAvailable($name, $value)) {
+            throw new ShortcodeException('Attribute [:name] value [:value] is not allowed for shortcode [:tag]', [
+                ':name'  => $name,
+                ':value' => $value,
+                ':tag'   => $this->getTagName(),
+            ]);
+        }
+
+        $this->attributes[$name] = $value;
     }
 
     /**
-     * @param string $key
+     * Returns true if attribute is available for current tag
+     *
+     * @param string $name
      *
      * @return bool
      */
-    private function isAttributeAvailable(string $key): bool
+    private function isAttributeAvailable(string $name): bool
     {
-        // TODO Check is attribute available for current tag
+        // Definition exists => attribute is available
+        return $this->hasAttributeDefinition($name);
+    }
 
-        return (bool)$key;
+    private function hasAttributeDefinition(string $name): bool
+    {
+        return isset($this->definitions[$name]);
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return \BetaKiller\Content\Shortcode\Attribute\ShortcodeAttributeInterface
+     * @throws \BetaKiller\Content\Shortcode\ShortcodeException
+     */
+    private function getAttributeDefinition(string $name): ShortcodeAttributeInterface
+    {
+        if (!$this->hasAttributeDefinition($name)) {
+            throw new ShortcodeException('Attribute [:name] definition is missing for [:tag] tag', [
+                ':name' => $name,
+                ':tag'  => $this->getTagName(),
+            ]);
+        }
+
+        return $this->definitions[$name];
+    }
+
+    /**
+     * Check for available attribute value
+     *
+     * @param string $name
+     * @param string $value
+     *
+     * @return bool
+     * @throws \BetaKiller\Content\Shortcode\ShortcodeException
+     */
+    private function isAttributeValueAvailable(string $name, string $value): bool
+    {
+        $definition = $this->getAttributeDefinition($name);
+
+        return $definition->isValueAvailable($value);
     }
 
     /**
@@ -136,6 +204,16 @@ abstract class AbstractShortcode implements ShortcodeInterface
     }
 
     /**
+     * Returns true if current tag may have text content between opening and closing markers
+     *
+     * @return bool
+     */
+    public function mayHaveContent(): bool
+    {
+        return $this->entity->mayHaveContent();
+    }
+
+    /**
      * @return null|string
      * @throws \BetaKiller\Content\Shortcode\ShortcodeException
      */
@@ -152,6 +230,7 @@ abstract class AbstractShortcode implements ShortcodeInterface
 
     /**
      * @param string $value
+     *
      * @throws \BetaKiller\Content\Shortcode\ShortcodeException
      */
     public function setContent(string $value): void
@@ -172,8 +251,8 @@ abstract class AbstractShortcode implements ShortcodeInterface
      */
     public function asHtml(): string
     {
-        $name    = $this->getTagName();
-        $attrs   = $this->getAttributes();
+        $name  = $this->getTagName();
+        $attrs = $this->getAttributes();
 
         // Generating shortcode tag
         $node = '['.$name;

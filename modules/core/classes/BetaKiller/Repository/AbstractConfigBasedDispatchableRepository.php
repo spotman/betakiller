@@ -144,7 +144,7 @@ abstract class AbstractConfigBasedDispatchableRepository extends AbstractPredefi
     protected function findByOptionValue(string $name, string $value)
     {
         foreach ($this->items as $item) {
-            if ($item->getOption($name) === $value) {
+            if ($item->getConfigOption($name) === $value) {
                 return $item;
             }
         }

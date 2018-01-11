@@ -1,25 +1,26 @@
 <?php
+use BetaKiller\Content\Shortcode\ShortcodeEntityInterface;
 
 return [
     'shortcodes' => [
         \BetaKiller\Content\Shortcode\ImageShortcode::codename() => [
+            'type'  => ShortcodeEntityInterface::TYPE_CONTENT_ELEMENT,
             'tag_name' => 'image',
-            'is_editable' => true,
         ],
 
         \BetaKiller\Content\Shortcode\GalleryShortcode::codename() => [
+            'type'  => ShortcodeEntityInterface::TYPE_CONTENT_ELEMENT,
             'tag_name' => 'gallery',
-            'is_editable' => true,
         ],
 
         \BetaKiller\Content\Shortcode\YoutubeShortcode::codename() => [
+            'type'  => ShortcodeEntityInterface::TYPE_CONTENT_ELEMENT,
             'tag_name' => 'youtube',
-            'is_editable' => true,
         ],
 
         \BetaKiller\Content\Shortcode\AttachmentShortcode::codename() => [
+            'type'  => ShortcodeEntityInterface::TYPE_CONTENT_ELEMENT,
             'tag_name' => 'attachment',
-            'is_editable' => true,
         ],
     ]
 ];

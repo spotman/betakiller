@@ -1,6 +1,7 @@
 <?php
 namespace BetaKiller\Content\Shortcode;
 
+use BetaKiller\Content\Shortcode\Attribute\NumberAttribute;
 use BetaKiller\Model\ContentYoutubeRecord;
 use BetaKiller\Repository\ContentYoutubeRecordRepository;
 
@@ -14,24 +15,34 @@ class YoutubeShortcode extends AbstractContentElementShortcode
     /**
      * YoutubeShortcode constructor.
      *
-     * @param string                                                $tagName
-     * @param \BetaKiller\Repository\ContentYoutubeRecordRepository $repository
+     * @param \BetaKiller\Content\Shortcode\ShortcodeEntityInterface $entity
+     * @param \BetaKiller\Repository\ContentYoutubeRecordRepository  $repository
      */
-    public function __construct(string $tagName, ContentYoutubeRecordRepository $repository)
+    public function __construct(ShortcodeEntityInterface $entity, ContentYoutubeRecordRepository $repository)
     {
         $this->repository = $repository;
 
-        parent::__construct($tagName);
+        parent::__construct($entity);
     }
 
     /**
-     * Returns true if current tag may have text content between open and closing markers
-     *
-     * @return bool
+     * @return \BetaKiller\Content\Shortcode\Attribute\ShortcodeAttributeInterface[]
      */
-    public function mayHaveContent(): bool
+    protected function getContentElementShortcodeDefinitions(): array
     {
-        return false;
+        return [
+            new NumberAttribute('width', true),
+            new NumberAttribute('height', true),
+        ];
+    }
+
+    /**
+     * @return string[]
+     */
+    protected function getAvailableLayouts(): array
+    {
+        // No layouts
+        return [];
     }
 
     /**
@@ -66,7 +77,7 @@ class YoutubeShortcode extends AbstractContentElementShortcode
      */
     public function getWysiwygPluginPreviewSrc(): string
     {
-        $id = (int)$this->getID();
+        $id    = (int)$this->getID();
         $model = $this->getRecordById($id);
 
         return $model->getPreviewUrl();

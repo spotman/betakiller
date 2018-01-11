@@ -3,11 +3,11 @@ namespace BetaKiller\Content\Shortcode;
 
 use BetaKiller\Model\AbstractConfigBasedDispatchableEntity;
 
-class ShortcodeEntity extends AbstractConfigBasedDispatchableEntity
+class ShortcodeEntity extends AbstractConfigBasedDispatchableEntity implements ShortcodeEntityInterface
 {
-    public const OPTION_TAG_NAME    = 'tag_name';
-    public const OPTION_IS_STATIC   = 'is_static';
-    public const OPTION_IS_EDITABLE = 'is_editable';
+    public const OPTION_TYPE             = 'type';
+    public const OPTION_TAG_NAME         = 'tag_name';
+    public const OPTION_MAY_HAVE_CONTENT = 'may_have_content';
 
     /**
      * Returns key which will be used for storing model in UrlContainer registry.
@@ -16,21 +16,84 @@ class ShortcodeEntity extends AbstractConfigBasedDispatchableEntity
      */
     public static function getUrlContainerKey(): string
     {
-        return ShortcodeInterface::URL_CONTAINER_KEY;
+        return ShortcodeEntityInterface::URL_CONTAINER_KEY;
     }
 
+    /**
+     * @return string
+     */
+    public function getType(): string
+    {
+        return $this->getConfigOption(self::OPTION_TYPE);
+    }
+
+    /**
+     * @return string
+     */
     public function getTagName(): string
     {
-        return $this->getOption(self::OPTION_TAG_NAME);
+        return $this->getConfigOption(self::OPTION_TAG_NAME);
     }
 
+    /**
+     * @return bool
+     */
     public function isStatic(): bool
     {
-        return (bool)$this->getOption(self::OPTION_IS_STATIC);
+        return $this->isType(self::TYPE_STATIC);
     }
 
+    /**
+     * @return bool
+     */
+    public function isDynamic(): bool
+    {
+        return $this->isType(self::TYPE_DYNAMIC);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isContentElement(): bool
+    {
+        return $this->isType(self::TYPE_CONTENT_ELEMENT);
+    }
+
+    /**
+     * Returns true if current tag may have text content between opening and closing markers
+     *
+     * @return bool
+     */
+    public function mayHaveContent(): bool
+    {
+        return (bool)$this->getConfigOption(self::OPTION_MAY_HAVE_CONTENT, false);
+    }
+
+    /**
+     * Returns true if current tag is editable in WYSIWYG editor
+     *
+     * @return bool
+     */
     public function isEditable(): bool
     {
-        return (bool)$this->getOption(self::OPTION_IS_EDITABLE);
+        return !$this->isStatic();
+    }
+
+    /**
+     * @return bool
+     */
+    public function isDeletable(): bool
+    {
+        return !$this->isStatic();
+    }
+
+    /**
+     * @param string $type
+     *
+     * @return bool
+     */
+    private function isType(string $type): bool
+    {
+        return $this->getType() === $type;
     }
 }

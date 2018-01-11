@@ -40,28 +40,50 @@ class ShortcodeFacade
     {
         $output = [];
 
-        foreach ($this->repository->getAll() as $item) {
-            if ($item->isEditable()) {
-                $output[] = $item->getTagName();
+        foreach ($this->repository->getAll() as $entity) {
+            if ($entity->isEditable()) {
+                $output[] = $entity->getTagName();
             }
         }
 
         return $output;
     }
 
+    /**
+     * @param string     $tagName
+     * @param array|null $attributes
+     *
+     * @return \BetaKiller\Content\Shortcode\ShortcodeInterface
+     * @throws \BetaKiller\Factory\FactoryException
+     * @throws \BetaKiller\Repository\RepositoryException
+     */
     public function createFromTagName(string $tagName, ?array $attributes = null): ShortcodeInterface
     {
         return $this->shortcodeFactory->createFromTagName($tagName, $attributes);
     }
 
+    /**
+     * @param string     $codename
+     * @param array|null $attributes
+     *
+     * @return \BetaKiller\Content\Shortcode\ShortcodeInterface
+     * @throws \BetaKiller\Factory\FactoryException
+     */
     public function createFromCodename(string $codename, ?array $attributes = null): ShortcodeInterface
     {
         return $this->shortcodeFactory->createFromCodename($codename, $attributes);
     }
 
-    public function createFromUrlParameter(ShortcodeEntity $param, ?array $attributes = null): ShortcodeInterface
+    /**
+     * @param \BetaKiller\Content\Shortcode\ShortcodeEntity $param
+     * @param array|null                                    $attributes
+     *
+     * @return \BetaKiller\Content\Shortcode\ShortcodeInterface
+     * @throws \BetaKiller\Factory\FactoryException
+     */
+    public function createFromEntity(ShortcodeEntity $param, ?array $attributes = null): ShortcodeInterface
     {
-        return $this->shortcodeFactory->createFromUrlParameter($param, $attributes);
+        return $this->shortcodeFactory->createFromEntity($param, $attributes);
     }
 
     public function process(string $text): string

@@ -1,8 +1,14 @@
 <?php
 namespace BetaKiller\Content\Shortcode;
 
+use BetaKiller\Content\Shortcode\Attribute\CommaSeparatedIDsAttribute;
+use BetaKiller\Content\Shortcode\Attribute\NumberAttribute;
+
 class GalleryShortcode extends AbstractContentElementShortcode
 {
+    private const LAYOUT_MASONRY = 'masonry';
+    private const LAYOUT_SLIDER  = 'slider';
+
     /**
      * @var \BetaKiller\Helper\AssetsHelper
      * @Inject
@@ -22,13 +28,25 @@ class GalleryShortcode extends AbstractContentElementShortcode
     private $logger;
 
     /**
-     * Returns true if current tag may have text content between open and closing markers
-     *
-     * @return bool
+     * @return \BetaKiller\Content\Shortcode\Attribute\ShortcodeAttributeInterface[]
      */
-    public function mayHaveContent(): bool
+    protected function getContentElementShortcodeDefinitions(): array
     {
-        return false;
+        return [
+            new CommaSeparatedIDsAttribute('ids'),
+            new NumberAttribute('column', true),
+        ];
+    }
+
+    /**
+     * @return string[]
+     */
+    protected function getAvailableLayouts(): array
+    {
+        return [
+            self::LAYOUT_MASONRY,
+            self::LAYOUT_SLIDER,
+        ];
     }
 
     /**
@@ -43,17 +61,7 @@ class GalleryShortcode extends AbstractContentElementShortcode
             throw new ShortcodeException('No image IDs provided');
         }
 
-        $allowedLayouts = [
-            'masonry',
-            'slider',
-        ];
-
-        $layout = $this->getLayout() ?? $allowedLayouts[0];
-
-        if (!\in_array($layout, $allowedLayouts, true)) {
-            throw new ShortcodeException('Unknown gallery layout :value', [':value' => $layout]);
-        }
-
+        $layout  = $this->getLayout(self::LAYOUT_MASONRY);
         $columns = (int)($this->getAttribute('columns') ?? 3);
 
         $images = [];
@@ -77,6 +85,10 @@ class GalleryShortcode extends AbstractContentElementShortcode
         ];
     }
 
+    /**
+     * @return string
+     * @throws \BetaKiller\Content\Shortcode\ShortcodeException
+     */
     public function getWysiwygPluginPreviewSrc(): string
     {
         $imageIDs = explode(',', $this->getAttribute('ids'));
@@ -89,7 +101,6 @@ class GalleryShortcode extends AbstractContentElementShortcode
 
         $model = $this->repository->findById($firstID);
 
-        // TODO Show slider or gallery image (depends on attributes)
         return $this->assetsHelper->getOriginalUrl($model);
     }
 }

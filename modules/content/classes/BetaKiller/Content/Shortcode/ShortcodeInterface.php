@@ -5,7 +5,6 @@ interface ShortcodeInterface
 {
     public const CLASS_NS          = 'Shortcode';
     public const CLASS_SUFFIX      = 'Shortcode';
-    public const URL_CONTAINER_KEY = 'Shortcode';
 
     public function getCodename(): string;
 
@@ -65,13 +64,6 @@ interface ShortcodeInterface
      * @param string $value
      */
     public function setContent(string $value): void;
-
-    /**
-     * Returns true if current tag is editable in WYSIWYG editor
-     *
-     * @return bool
-     */
-    public function isEditable(): bool;
 
     /**
      * Returns data for rendering

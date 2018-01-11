@@ -1,17 +1,22 @@
 <?php
 namespace BetaKiller\Content\Shortcode;
 
+use BetaKiller\Content\Shortcode\Attribute\ClassAttribute;
+use BetaKiller\Content\Shortcode\Attribute\NumberAttribute;
+use BetaKiller\Content\Shortcode\Attribute\TextAttribute;
 use BetaKiller\Helper\AssetsHelper;
 use BetaKiller\Repository\ContentAttachmentRepository;
 use BetaKiller\Repository\ContentImageRepository;
 
 class AttachmentShortcode extends AbstractContentElementShortcode
 {
-    private const ATTR_LAYOUT_TEXT   = 'text';
-    private const ATTR_LAYOUT_IMAGE  = 'image';
-    private const ATTR_LAYOUT_BUTTON = 'button';
-    private const ATTR_IMAGE_ID      = 'image-id';
-    private const ATTR_LABEL         = 'label';
+    private const ATTR_LABEL    = 'label';
+    private const ATTR_TITLE    = 'title';
+    private const ATTR_IMAGE_ID = 'image-id';
+
+    private const LAYOUT_TEXT   = 'text';
+    private const LAYOUT_IMAGE  = 'image';
+    private const LAYOUT_BUTTON = 'button';
 
     /**
      * @var \BetaKiller\Repository\ContentAttachmentRepository
@@ -31,13 +36,13 @@ class AttachmentShortcode extends AbstractContentElementShortcode
     /**
      * AttachmentShortcode constructor.
      *
-     * @param string                                             $tagName
-     * @param \BetaKiller\Repository\ContentAttachmentRepository $repository
-     * @param \BetaKiller\Repository\ContentImageRepository      $imageRepository
-     * @param \BetaKiller\Helper\AssetsHelper                    $helper
+     * @param \BetaKiller\Content\Shortcode\ShortcodeEntityInterface $entity
+     * @param \BetaKiller\Repository\ContentAttachmentRepository     $repository
+     * @param \BetaKiller\Repository\ContentImageRepository          $imageRepository
+     * @param \BetaKiller\Helper\AssetsHelper                        $helper
      */
     public function __construct(
-        string $tagName,
+        ShortcodeEntityInterface $entity,
         ContentAttachmentRepository $repository,
         ContentImageRepository $imageRepository,
         AssetsHelper $helper
@@ -46,19 +51,38 @@ class AttachmentShortcode extends AbstractContentElementShortcode
         $this->imageRepository      = $imageRepository;
         $this->assetsHelper         = $helper;
 
-        parent::__construct($tagName);
+        parent::__construct($entity);
     }
 
     /**
-     * Returns true if current tag may have text content between open and closing markers
-     *
-     * @return bool
+     * @return string[]
      */
-    public function mayHaveContent(): bool
+    protected function getAvailableLayouts(): array
     {
-        return false;
+        return [
+            self::LAYOUT_BUTTON,
+            self::LAYOUT_IMAGE,
+            self::LAYOUT_TEXT,
+        ];
     }
 
+    /**
+     * @return \BetaKiller\Content\Shortcode\Attribute\ShortcodeAttributeInterface[]
+     */
+    protected function getContentElementShortcodeDefinitions(): array
+    {
+        return [
+            new TextAttribute(self::ATTR_LABEL),
+            new TextAttribute(self::ATTR_TITLE, true),
+            new ClassAttribute(true),
+            new NumberAttribute(self::ATTR_IMAGE_ID, true),
+        ];
+    }
+
+    /**
+     * @return string
+     * @throws \BetaKiller\Content\Shortcode\ShortcodeException
+     */
     public function getWysiwygPluginPreviewSrc(): string
     {
         $id = $this->getID();
@@ -73,13 +97,13 @@ class AttachmentShortcode extends AbstractContentElementShortcode
         $layout = $this->getLayout();
 
         switch ($layout) {
-            case self::ATTR_LAYOUT_BUTTON:
+            case self::LAYOUT_BUTTON:
                 return '/assets/static/images/download-button.png';
 
-            case self::ATTR_LAYOUT_IMAGE:
+            case self::LAYOUT_IMAGE:
                 return $this->getImageUrl();
 
-            case self::ATTR_LAYOUT_TEXT:
+            case self::LAYOUT_TEXT:
                 return '/assets/static/images/download-text.png';
         }
 
@@ -95,7 +119,7 @@ class AttachmentShortcode extends AbstractContentElementShortcode
      */
     public function getWidgetData(): array
     {
-        $attachID = (int)$this->getAttribute('id');
+        $attachID = (int)$this->getID();
 
         if (!$attachID) {
             throw new ShortcodeException('No attachment ID provided');
@@ -110,7 +134,7 @@ class AttachmentShortcode extends AbstractContentElementShortcode
             ':name' => $model->getOriginalName(),
         ];
 
-        $imageUrl = ($this->getLayout() === self::ATTR_LAYOUT_IMAGE)
+        $imageUrl = $this->isLayout(self::LAYOUT_IMAGE)
             ? $this->getImageUrl()
             : null;
 
@@ -125,6 +149,10 @@ class AttachmentShortcode extends AbstractContentElementShortcode
         ];
     }
 
+    /**
+     * @return string
+     * @throws \BetaKiller\Content\Shortcode\ShortcodeException
+     */
     private function getImageUrl(): string
     {
         $id = $this->getAttribute(self::ATTR_IMAGE_ID);
@@ -138,26 +166,44 @@ class AttachmentShortcode extends AbstractContentElementShortcode
         return $this->assetsHelper->getOriginalUrl($image);
     }
 
+    /**
+     * @throws \BetaKiller\Content\Shortcode\ShortcodeException
+     */
     public function useButtonLayout(): void
     {
-        $this->setLayout(self::ATTR_LAYOUT_BUTTON);
+        $this->setLayout(self::LAYOUT_BUTTON);
         $this->setAttribute(self::ATTR_LABEL, null);
         $this->setAttribute(self::ATTR_IMAGE_ID, null);
     }
 
+    /**
+     * @param int $imageID
+     *
+     * @throws \BetaKiller\Content\Shortcode\ShortcodeException
+     */
     public function useImageLayout(int $imageID): void
     {
-        $this->setLayout(self::ATTR_LAYOUT_IMAGE);
+        $this->setLayout(self::LAYOUT_IMAGE);
         $this->setImageID($imageID);
     }
 
+    /**
+     * @param string $label
+     *
+     * @throws \BetaKiller\Content\Shortcode\ShortcodeException
+     */
     public function useTextLayout(string $label): void
     {
-        $this->setLayout(self::ATTR_LAYOUT_TEXT);
+        $this->setLayout(self::LAYOUT_TEXT);
         $this->setAttribute(self::ATTR_LABEL, $label);
         $this->setAttribute(self::ATTR_IMAGE_ID, null);
     }
 
+    /**
+     * @param int $value
+     *
+     * @throws \BetaKiller\Content\Shortcode\ShortcodeException
+     */
     protected function setImageID(int $value): void
     {
         $this->setAttribute(self::ATTR_IMAGE_ID, $value);

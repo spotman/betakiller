@@ -29,47 +29,66 @@ class ShortcodeFactory
             ->setExpectedInterface(ShortcodeInterface::class);
     }
 
+    /**
+     * @param string     $tagName
+     * @param array|null $attributes
+     *
+     * @return \BetaKiller\Content\Shortcode\ShortcodeInterface
+     * @throws \BetaKiller\Factory\FactoryException
+     * @throws \BetaKiller\Repository\RepositoryException
+     */
     public function createFromTagName(string $tagName, ?array $attributes = null): ShortcodeInterface
     {
         $urlParameter = $this->repository->findByTagName($tagName);
 
-        return $this->createFromUrlParameter($urlParameter, $attributes);
+        return $this->createFromEntity($urlParameter, $attributes);
     }
 
+    /**
+     * @param string     $codename
+     * @param array|null $attributes
+     *
+     * @return \BetaKiller\Content\Shortcode\ShortcodeInterface
+     * @throws \BetaKiller\Factory\FactoryException
+     */
     public function createFromCodename(string $codename, ?array $attributes = null): ShortcodeInterface
     {
         $urlParameter = $this->repository->findByCodename($codename);
 
-        return $this->createFromUrlParameter($urlParameter, $attributes);
+        return $this->createFromEntity($urlParameter, $attributes);
     }
 
-    private function getClassCodename(ShortcodeEntity $parameter): string
+    private function getClassCodename(ShortcodeEntity $entity): string
     {
-        // Use common class for static shortcodes and shortcode-specific class for others
-        return $parameter->isStatic()
-            ? StaticShortcode::codename()
-            : $parameter->getCodename();
-    }
+        switch (true) {
+            // Use common class for static shortcodes
+            case $entity->isStatic():
+                return StaticShortcode::codename();
 
-    public function createFromUrlParameter(ShortcodeEntity $param, ?array $attributes = null): ShortcodeInterface
-    {
-        $classCodename = $this->getClassCodename($param);
-        $tagCodename = $param->getCodename();
+            // Dynamic shortcodes are slightly enhanced version of StaticShortcode with dynamic templates
+            case $entity->isDynamic():
+                return DynamicShortcode::codename();
 
-        return $this->create($classCodename, $param->getTagName(), $attributes, $tagCodename);
-    }
-
-    private function create(string $classCodename, string $tagName, ?array $attributes = null, ?string $tagCodename = null): ShortcodeInterface
-    {
-        // Use similar codename if nothing special was provided in $tagCodename
-        if (!$tagCodename) {
-            $tagCodename = $classCodename;
+            // Shortcode-specific class for others
+            default:
+                return $entity->getCodename();
         }
+    }
+
+    /**
+     * @param \BetaKiller\Content\Shortcode\ShortcodeEntity $entity
+     * @param array|null                                    $attributes
+     *
+     * @return \BetaKiller\Content\Shortcode\ShortcodeInterface
+     * @throws \BetaKiller\Factory\FactoryException
+     */
+    public function createFromEntity(ShortcodeEntity $entity, ?array $attributes = null): ShortcodeInterface
+    {
+        $classCodename = $this->getClassCodename($entity);
 
         /** @var ShortcodeInterface $shortcode */
         $shortcode = $this->factory->create($classCodename, [
-            'tagName' => $tagName,
-            'codename' => $tagCodename,
+            'entity' => $entity,
         ]);
 
         if ($attributes) {

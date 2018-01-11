@@ -21,7 +21,8 @@ class Index extends AbstractAdminBase
     /**
      * Index constructor.
      *
-     * @param \BetaKiller\Repository\ShortcodeRepository $repo
+     * @param \BetaKiller\Repository\ShortcodeRepository    $repo
+     * @param \BetaKiller\Content\Shortcode\ShortcodeFacade $facade
      */
     public function __construct(ShortcodeRepository $repo, ShortcodeFacade $facade)
     {
@@ -40,8 +41,8 @@ class Index extends AbstractAdminBase
     {
         $data = [];
 
-        foreach ($this->repo->getAll() as $param) {
-            $shortcode = $this->facade->createFromUrlParameter($param);
+        foreach ($this->repo->getAll() as $entity) {
+            $shortcode = $this->facade->createFromEntity($entity);
             $data[] = $this->makeShortcodeData($shortcode);
         }
 

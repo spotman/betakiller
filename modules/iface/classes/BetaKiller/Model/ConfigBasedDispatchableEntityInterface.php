@@ -20,7 +20,7 @@ interface ConfigBasedDispatchableEntityInterface extends DispatchableEntityInter
      *
      * @return array|null
      */
-    public function getOptions(): ?array;
+    public function getConfigOptions(): ?array;
 
     /**
      * Returns config-based property or null
@@ -30,5 +30,5 @@ interface ConfigBasedDispatchableEntityInterface extends DispatchableEntityInter
      *
      * @return mixed
      */
-    public function getOption(string $key, $default = null);
+    public function getConfigOption(string $key, $default = null);
 }

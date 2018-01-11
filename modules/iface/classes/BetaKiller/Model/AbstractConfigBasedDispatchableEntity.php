@@ -16,18 +16,18 @@ abstract class AbstractConfigBasedDispatchableEntity implements ConfigBasedDispa
     /**
      * @var array
      */
-    private $options;
+    private $configOptions;
 
     /**
      * AbstractConfigBasedDispatchableEntity constructor.
      *
      * @param string     $codename
-     * @param array|null $options
+     * @param array|null $configOptions
      */
-    public function __construct(string $codename, ?array $options = null)
+    public function __construct(string $codename, ?array $configOptions = null)
     {
-        $this->codename = $codename;
-        $this->options  = $options;
+        $this->codename      = $codename;
+        $this->configOptions = $configOptions;
     }
 
     /**
@@ -37,6 +37,7 @@ abstract class AbstractConfigBasedDispatchableEntity implements ConfigBasedDispa
      */
     public function getID(): string
     {
+        // TODO Deal with this
         return $this->getCodename();
     }
 
@@ -93,12 +94,12 @@ abstract class AbstractConfigBasedDispatchableEntity implements ConfigBasedDispa
     {
         $value = ($key === self::URL_KEY_CODENAME)
             ? $this->getCodename()
-            : $this->getOption($key);
+            : $this->getConfigOption($key);
 
         if (!$value) {
             throw new UrlPrototypeException('Config-based url parameter [:name] has no ":key" value', [
-                ':name'    => $this->getCodename(),
-                ':key' => $key,
+                ':name' => $this->getCodename(),
+                ':key'  => $key,
             ]);
         }
 
@@ -120,9 +121,9 @@ abstract class AbstractConfigBasedDispatchableEntity implements ConfigBasedDispa
      *
      * @return array|null
      */
-    public function getOptions(): ?array
+    public function getConfigOptions(): ?array
     {
-        return $this->options;
+        return $this->configOptions;
     }
 
     /**
@@ -133,9 +134,9 @@ abstract class AbstractConfigBasedDispatchableEntity implements ConfigBasedDispa
      *
      * @return mixed
      */
-    public function getOption(string $key, $default = null)
+    public function getConfigOption(string $key, $default = null)
     {
-        return $this->options[$key] ?? $default;
+        return $this->configOptions[$key] ?? $default;
     }
 
     /**
@@ -147,8 +148,8 @@ abstract class AbstractConfigBasedDispatchableEntity implements ConfigBasedDispa
      */
     public function isSameAs(UrlParameterInterface $parameter): bool
     {
-        return ($parameter::getUrlContainerKey() === $this::getUrlContainerKey())
+        return ($parameter instanceof self)
             && ($parameter->getCodename() === $this->getCodename())
-            && ($parameter->getOptions() === $this->getOptions());
+            && ($parameter->getConfigOptions() === $this->getConfigOptions());
     }
 }
