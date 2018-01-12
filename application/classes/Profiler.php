@@ -3,32 +3,11 @@
 class Profiler extends Kohana_Profiler
 {
     /**
-     * Перманентно включает профайлер для всех экшнов / контроллеров
+     * @return string
+     * @throws \View_Exception
      */
-    public static function enable()
+    public static function render(): string
     {
-        Session::instance()->set("profiler_enabled", TRUE);
-    }
-
-    /**
-     * Отменяет действие enable()
-     */
-    public static function disable()
-    {
-        Session::instance()->delete("profiler_enabled");
-    }
-
-    /**
-     * Возвращает TRUE, если профайлер включён
-     * @return bool
-     */
-    public static function is_enabled()
-    {
-        return Session::instance()->get("profiler_enabled");
-    }
-
-    public static function render()
-    {
-        return View::factory("profiler/stats")->render();
+        return View::factory('profiler/stats')->render();
     }
 }
