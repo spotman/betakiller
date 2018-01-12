@@ -1,8 +1,9 @@
 <?php
+namespace BetaKiller\Model;
 
 use BetaKiller\Utils\Kohana\TreeModelSingleParentOrm;
 
-class Model_AclResource extends TreeModelSingleParentOrm
+class AclResource extends TreeModelSingleParentOrm
 {
     protected function _initialize()
     {
@@ -31,6 +32,7 @@ class Model_AclResource extends TreeModelSingleParentOrm
     public function getParentResourceCodename()
     {
         $parent = $this->getParent();
+
         return $parent ? $parent->getCodename() : null;
     }
 

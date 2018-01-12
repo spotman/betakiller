@@ -17,10 +17,10 @@ abstract class Minion_Task extends Kohana_Minion_Task
      */
     protected $logger;
 
-    protected const COLOR_RED        = Minion_CLI::RED;
-    protected const COLOR_GREEN      = Minion_CLI::GREEN;
-    protected const COLOR_BLUE       = Minion_CLI::BLUE;
-    protected const COLOR_LIGHT_BLUE = Minion_CLI::LIGHT_BLUE;
+    protected const COLOR_RED        = 'red';
+    protected const COLOR_GREEN      = 'green';
+    protected const COLOR_BLUE       = 'blue';
+    protected const COLOR_LIGHT_BLUE = 'light_blue';
 
     public function __construct()
     {

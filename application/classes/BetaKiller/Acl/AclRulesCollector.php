@@ -1,23 +1,23 @@
 <?php
 namespace BetaKiller\Acl;
 
-use Model_AclRule;
+use BetaKiller\Model\AclRule;
 use Spotman\Acl\AclInterface;
 use Spotman\Acl\RulesCollector\AclRulesCollectorInterface;
 
 class AclRulesCollector implements AclRulesCollectorInterface
 {
     /**
-     * @var Model_AclRule
+     * @var AclRule
      */
     private $permissionModel;
 
     /**
      * AclRulesCollector constructor.
      *
-     * @param Model_AclRule $permissionModel
+     * @param AclRule $permissionModel
      */
-    public function __construct(Model_AclRule $permissionModel)
+    public function __construct(AclRule $permissionModel)
     {
         $this->permissionModel = $permissionModel;
     }

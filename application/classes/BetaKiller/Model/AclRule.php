@@ -1,6 +1,9 @@
 <?php
+namespace BetaKiller\Model;
 
-class Model_AclRule extends \ORM
+use Exception;
+
+class AclRule extends \ORM
 {
     /**
      * Prepares the model database connection, determines the table name,
@@ -14,19 +17,19 @@ class Model_AclRule extends \ORM
         $this->_table_name = 'acl_rules';
 
         $this->belongs_to([
-            'role' =>  [
-                'model'         =>  'Role',
-                'foreign_key'   =>  'role_id',
+            'role' => [
+                'model'       => 'Role',
+                'foreign_key' => 'role_id',
             ],
 
             'resource' => [
-                'model'         =>  'AclResource',
-                'foreign_key'   =>  'resource_id'
+                'model'       => 'AclResource',
+                'foreign_key' => 'resource_id',
             ],
 
             'permission' => [
-                'model'         =>  'AclResourcePermission',
-                'foreign_key'   =>  'permission_id'
+                'model'       => 'AclResourcePermission',
+                'foreign_key' => 'permission_id',
             ],
         ]);
 
@@ -44,7 +47,7 @@ class Model_AclRule extends \ORM
     }
 
     /**
-     * @return Model_AclResourcePermission
+     * @return AclResourcePermission
      */
     private function getPermissionRelation()
     {
@@ -53,12 +56,14 @@ class Model_AclRule extends \ORM
 
     /**
      * Null means "inherit", true - enabled, false - disabled
+     *
      * @return bool|null
      */
     public function isAllowed()
     {
         $value = $this->get('is_allowed');
-        return ($value === null) ? null : (bool) $value;
+
+        return ($value === null) ? null : (bool)$value;
     }
 
     /**
@@ -94,7 +99,7 @@ class Model_AclRule extends \ORM
     }
 
     /**
-     * @return \Model_AclResource
+     * @return \BetaKiller\Model\AclResource
      */
     private function getResourceRelation()
     {

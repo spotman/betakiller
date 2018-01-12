@@ -1,23 +1,23 @@
 <?php
 namespace BetaKiller\Acl;
 
+use BetaKiller\Model\AclResource;
 use Spotman\Acl\AclInterface;
-use Model_AclResource;
 use Spotman\Acl\ResourcesCollector\AclResourcesCollectorInterface;
 
 class AclResourcesCollector implements AclResourcesCollectorInterface
 {
     /**
-     * @var Model_AclResource
+     * @var AclResource
      */
     private $resourceModel;
 
     /**
      * AclResourcesCollector constructor.
      *
-     * @param Model_AclResource $resourceModel
+     * @param AclResource $resourceModel
      */
-    public function __construct(Model_AclResource $resourceModel)
+    public function __construct(AclResource $resourceModel)
     {
         $this->resourceModel = $resourceModel;
     }

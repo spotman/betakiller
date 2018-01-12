@@ -156,10 +156,10 @@ class User extends \Model_Auth_User implements UserInterface
     }
 
     /**
-     * @return \Model_Language
+     * @return \BetaKiller\Model\Language
      * @throws \Kohana_Exception
      */
-    public function getLanguage(): \Model_Language
+    public function getLanguage(): \BetaKiller\Model\Language
     {
         return $this->get('language');
     }

@@ -64,9 +64,9 @@ interface UserInterface extends AbstractEntityInterface, OrmInterface, Notificat
     public function getLanguageName(): ?string;
 
     /**
-     * @return NULL|\Model_Language
+     * @return NULL|\BetaKiller\Model\Language
      */
-    public function getLanguage(): ?\Model_Language;
+    public function getLanguage(): ?\BetaKiller\Model\Language;
 
     /**
      * Search for user by username or e-mail

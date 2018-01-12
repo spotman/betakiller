@@ -13,11 +13,6 @@ class Index extends AbstractAdminBase
     private $repo;
 
     /**
-     * @var \BetaKiller\Content\Shortcode\ShortcodeFacade
-     */
-    private $facade;
-
-    /**
      * Index constructor.
      *
      * @param \BetaKiller\Repository\ShortcodeRepository $repo

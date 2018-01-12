@@ -1,6 +1,10 @@
 <?php
 
-class Model_AclResourcePermission extends \ORM
+namespace BetaKiller\Model;
+
+use Exception;
+
+class AclResourcePermission extends \ORM
 {
     /**
      * Prepares the model database connection, determines the table name,

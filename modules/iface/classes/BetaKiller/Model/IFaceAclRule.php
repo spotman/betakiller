@@ -41,7 +41,7 @@ class IFaceAclRule extends ORM
     }
 
     /**
-     * @return \Model_AclResource
+     * @return \BetaKiller\Model\AclResource
      */
     public function getResource()
     {
@@ -57,7 +57,7 @@ class IFaceAclRule extends ORM
     }
 
     /**
-     * @return \Model_AclResourcePermission
+     * @return \BetaKiller\Model\AclResourcePermission
      */
     public function getResourcePermission()
     {
