@@ -6,7 +6,9 @@ use BetaKiller\Content\Shortcode\Attribute\ClassAttribute;
 use BetaKiller\Content\Shortcode\Attribute\NumberAttribute;
 use BetaKiller\Content\Shortcode\Attribute\StyleAttribute;
 use BetaKiller\Content\Shortcode\Attribute\TextAttribute;
+use BetaKiller\Content\Shortcode\Editor\EditorListingItem;
 use BetaKiller\Helper\AssetsHelper;
+use BetaKiller\Model\EntityModelInterface;
 use BetaKiller\Repository\ContentImageRepository;
 
 class ImageShortcode extends AbstractContentElementShortcode
@@ -57,7 +59,6 @@ class ImageShortcode extends AbstractContentElementShortcode
             new ClassAttribute(true),
             new StyleAttribute(),
             new NumberAttribute('width', true),
-            new NumberAttribute('height', true),
         ];
     }
 
@@ -140,20 +141,14 @@ class ImageShortcode extends AbstractContentElementShortcode
             $classes[] = $align;
         }
 
-        if ($width) {
-            $style .= 'width: '.$width.'px;';
-        }
-
-        if ($width) {
-            $style .= 'height: '.$width.'px;';
-        }
-
         $attributes = [
-            'id'    => 'content-image-'.$model->getID(),
-            'title' => $title ?: $model->getTitle(),
-            'alt'   => $alt ?: $model->getAlt(),
-            'class' => implode(' ', $classes),
-            'style' => $style,
+            'id'     => 'content-image-'.$model->getID(),
+            'title'  => $title ?: $model->getTitle(),
+            'alt'    => $alt ?: $model->getAlt(),
+            'class'  => implode(' ', $classes),
+            'style'  => $style,
+            'width'  => $width,
+            'height' => $height,
         ];
 
         return [
@@ -163,10 +158,31 @@ class ImageShortcode extends AbstractContentElementShortcode
             'caption' => $title,
             'align'   => $align,
             'class'   => $class,
-            'width'   => $width,
-            'height'  => $height,
 
             'image' => $this->assetsHelper->getAttributesForImgTag($model, $model::SIZE_ORIGINAL, $attributes),
         ];
+    }
+
+    /**
+     * @param \BetaKiller\Model\EntityModelInterface|null $relatedEntity
+     * @param int|null                                    $itemID
+     *
+     * @return \BetaKiller\Content\Shortcode\Editor\EditorListingItem[]
+     */
+    public function getEditorListingItems(?EntityModelInterface $relatedEntity, ?int $itemID): array
+    {
+        $images = $this->imageRepository->getEditorListing($relatedEntity, $itemID);
+
+        $data = [];
+
+        foreach ($images as $image) {
+            $data[] = new EditorListingItem(
+                $image->getID(),
+                $this->assetsHelper->getPreviewUrl($image),
+                $image->isValid()
+            );
+        }
+
+        return $data;
     }
 }

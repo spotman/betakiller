@@ -4,6 +4,7 @@ namespace BetaKiller\IFace\Admin\Content\Shortcode\Editor;
 use BetaKiller\Content\Shortcode\Editor\ShortcodeEditorFactory;
 use BetaKiller\Content\Shortcode\Editor\ShortcodeEditorInterface;
 use BetaKiller\Content\Shortcode\ShortcodeEntityInterface;
+use BetaKiller\Content\Shortcode\ShortcodeFacade;
 use BetaKiller\IFace\Admin\Content\AbstractAdminBase;
 use BetaKiller\Url\UrlContainerInterface;
 
@@ -20,16 +21,25 @@ abstract class AbstractEditor extends AbstractAdminBase
     protected $urlContainer;
 
     /**
+     * @var \BetaKiller\Content\Shortcode\ShortcodeFacade
+     */
+    protected $shortcodeFacade;
+
+    /**
      * @var \BetaKiller\Content\Shortcode\Editor\ShortcodeEditorFactory
      */
     private $editorFactory;
 
-    public function __construct(ShortcodeEditorFactory $factory, UrlContainerInterface $urlContainer)
-    {
+    public function __construct(
+        ShortcodeEditorFactory $factory,
+        UrlContainerInterface $urlContainer,
+        ShortcodeFacade $facade
+    ) {
         parent::__construct();
 
         $this->editorFactory = $factory;
-        $this->urlContainer  = $urlContainer;
+        $this->urlContainer = $urlContainer;
+        $this->shortcodeFacade = $facade;
     }
 
     /**

@@ -3,6 +3,7 @@ namespace BetaKiller\Content\Shortcode;
 
 use BetaKiller\Content\Shortcode\Attribute\DiscreteValuesAttribute;
 use BetaKiller\Content\Shortcode\Attribute\IdAttribute;
+use BetaKiller\Model\EntityModelInterface;
 
 abstract class AbstractContentElementShortcode extends AbstractShortcode
 {
@@ -33,6 +34,14 @@ abstract class AbstractContentElementShortcode extends AbstractShortcode
     abstract protected function getContentElementShortcodeDefinitions(): array;
 
     /**
+     * @param \BetaKiller\Model\EntityModelInterface|null $relatedEntity
+     * @param int|null                                    $itemID
+     *
+     * @return \BetaKiller\Content\Shortcode\Editor\EditorListingItem[]
+     */
+    abstract public function getEditorListingItems(?EntityModelInterface $relatedEntity, ?int $itemID): array;
+
+    /**
      * @return int|null
      * @throws \BetaKiller\Content\Shortcode\ShortcodeException
      */
@@ -52,14 +61,47 @@ abstract class AbstractContentElementShortcode extends AbstractShortcode
     }
 
     /**
-     * @param null|string $default
+     * @param bool|null $useDefaultIfEmpty
      *
      * @return null|string
      * @throws \BetaKiller\Content\Shortcode\ShortcodeException
      */
-    public function getLayout(?string $default = null): ?string
+    public function getLayout(?bool $useDefaultIfEmpty = null): ?string
     {
-        return $this->getAttribute(self::ATTR_LAYOUT) ?: $default;
+        $useDefaultIfEmpty = $useDefaultIfEmpty ?? true;
+
+        $layout = $this->getAttribute(self::ATTR_LAYOUT);
+
+        if (!$layout && $useDefaultIfEmpty) {
+            $layout = $this->getDefaultLayout();
+        }
+
+        return $layout;
+    }
+
+    /**
+     * @throws \BetaKiller\Content\Shortcode\ShortcodeException
+     */
+    public function useDefaultLayout(): void
+    {
+        $this->setLayout($this->getDefaultLayout());
+    }
+
+    /**
+     * @return string
+     * @throws \BetaKiller\Content\Shortcode\ShortcodeException
+     */
+    public function getDefaultLayout(): string
+    {
+        $layouts = $this->getAvailableLayouts();
+
+        if (!$layouts) {
+            throw new ShortcodeException('Can not get default layout coz no layouts defined in shortcode :name', [
+                ':name' => $this->getCodename(),
+            ]);
+        }
+
+        return $layouts[0];
     }
 
     /**
@@ -80,7 +122,7 @@ abstract class AbstractContentElementShortcode extends AbstractShortcode
      */
     protected function isLayout(string $value): bool
     {
-        return $this->getLayout() === $value;
+        return $this->getLayout(false) === $value;
     }
 
     /**

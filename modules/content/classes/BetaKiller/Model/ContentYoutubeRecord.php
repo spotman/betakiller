@@ -18,7 +18,7 @@ class ContentYoutubeRecord extends ORM implements ContentElementInterface
     {
         $this->_table_name = 'content_youtube_records';
 
-        $this->initialize_entity_relation();
+        $this->initializeEntityRelation();
 
         $this->belongs_to([
             'uploaded_by_user' => [
@@ -131,5 +131,18 @@ class ContentYoutubeRecord extends ORM implements ContentElementInterface
     public function setUploadedBy(UserInterface $user): ContentYoutubeRecord
     {
         return $this->set('uploaded_by_user', $user);
+    }
+
+    /**
+     * Returns true if content element has all required info
+     *
+     * @return bool
+     */
+    public function isValid(): bool
+    {
+        return $this->getID()
+            && $this->getEntityItemID()
+            && $this->getEntitySlug()
+            && $this->getYoutubeId();
     }
 }

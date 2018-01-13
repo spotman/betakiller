@@ -13,7 +13,7 @@ trait OrmBasedEntityItemRelatedModelTrait
      */
     protected $linkedModel;
 
-    protected function initialize_entity_relation(): void
+    protected function initializeEntityRelation(): void
     {
         $this->belongs_to([
             'entity' => [
@@ -45,7 +45,6 @@ trait OrmBasedEntityItemRelatedModelTrait
 
     /**
      * @return string
-     * @throws \BetaKiller\Exception
      */
     public function getEntitySlug(): string
     {

@@ -1,13 +1,19 @@
 <?php
 namespace BetaKiller\Content\Shortcode;
 
-use BetaKiller\Content\Shortcode\Attribute\CommaSeparatedIDsAttribute;
+use BetaKiller\Content\Shortcode\Attribute\IdAttribute;
 use BetaKiller\Content\Shortcode\Attribute\NumberAttribute;
+use BetaKiller\Content\Shortcode\Editor\EditorListingItem;
+use BetaKiller\Model\ContentGalleryInterface;
+use BetaKiller\Model\EntityModelInterface;
 
 class GalleryShortcode extends AbstractContentElementShortcode
 {
-    private const LAYOUT_MASONRY = 'masonry';
-    private const LAYOUT_SLIDER  = 'slider';
+    public const LAYOUT_TABLE   = 'default';
+    public const LAYOUT_MASONRY = 'masonry';
+    public const LAYOUT_SLIDER  = 'slider';
+
+    public const ATTR_COLUMNS  = 'columns';
 
     /**
      * @var \BetaKiller\Helper\AssetsHelper
@@ -17,15 +23,9 @@ class GalleryShortcode extends AbstractContentElementShortcode
 
     /**
      * @Inject
-     * @var \BetaKiller\Repository\ContentImageRepository
+     * @var \BetaKiller\Repository\ContentGalleryRepository
      */
-    private $repository;
-
-    /**
-     * @Inject
-     * @var \Psr\Log\LoggerInterface
-     */
-    private $logger;
+    private $galleryRepository;
 
     /**
      * @return \BetaKiller\Content\Shortcode\Attribute\ShortcodeAttributeInterface[]
@@ -33,7 +33,7 @@ class GalleryShortcode extends AbstractContentElementShortcode
     protected function getContentElementShortcodeDefinitions(): array
     {
         return [
-            new CommaSeparatedIDsAttribute('ids'),
+            new IdAttribute(),
             new NumberAttribute('columns', true),
         ];
     }
@@ -44,9 +44,56 @@ class GalleryShortcode extends AbstractContentElementShortcode
     protected function getAvailableLayouts(): array
     {
         return [
+            self::LAYOUT_TABLE,
             self::LAYOUT_MASONRY,
             self::LAYOUT_SLIDER,
         ];
+    }
+
+    /**
+     * @param int|null $columns
+     *
+     * @throws \BetaKiller\Content\Shortcode\ShortcodeException
+     */
+    public function useTableLayout(?int $columns = null): void
+    {
+        $this->setLayout(self::LAYOUT_TABLE);
+
+        if ($columns) {
+            $this->setColumns($columns);
+        }
+    }
+
+    /**
+     * @param int|null $columns
+     *
+     * @throws \BetaKiller\Content\Shortcode\ShortcodeException
+     */
+    public function useMasonryLayout(?int $columns = null): void
+    {
+        $this->setLayout(self::LAYOUT_MASONRY);
+
+        if ($columns) {
+            $this->setColumns($columns);
+        }
+    }
+
+    /**
+     * @throws \BetaKiller\Content\Shortcode\ShortcodeException
+     */
+    public function useSliderLayout(): void
+    {
+        $this->setLayout(self::LAYOUT_SLIDER);
+    }
+
+    /**
+     * @param int $value
+     *
+     * @throws \BetaKiller\Content\Shortcode\ShortcodeException
+     */
+    public function setColumns(int $value): void
+    {
+        $this->setAttribute(self::ATTR_COLUMNS, $value);
     }
 
     /**
@@ -55,34 +102,47 @@ class GalleryShortcode extends AbstractContentElementShortcode
      */
     public function getWidgetData(): array
     {
-        $imageIDs = explode(',', $this->getAttribute('ids'));
+        $id = (int)$this->getID();
 
-        if (!$imageIDs) {
-            throw new ShortcodeException('No image IDs provided');
-        }
+        $gallery = $this->galleryRepository->findById($id);
+        $images  = $this->getImages($gallery,true);
 
-        $layout  = $this->getLayout(self::LAYOUT_MASONRY);
+        $layout  = $this->getLayout();
         $columns = (int)($this->getAttribute('columns') ?? 3);
 
-        $images = [];
+        $imagesData = [];
 
-        foreach ($imageIDs as $id) {
-            $model = $this->repository->findById($id);
-
-            $images[] = $this->assetsHelper->getAttributesForImgTag($model, $model::SIZE_PREVIEW);
-        }
-
-        if (!$images) {
-            $this->logger->warning('Gallery has no images for ids [:ids]', [
-                ':ids' => implode(', ', $imageIDs),
-            ]);
+        foreach ($images as $model) {
+            $imagesData[] = $this->assetsHelper->getAttributesForImgTag($model, $model::SIZE_PREVIEW);
         }
 
         return [
-            'images'  => $images,
+            'images'  => $imagesData,
             'layout'  => $layout,
             'columns' => $columns,
         ];
+    }
+
+    /**
+     * @param \BetaKiller\Model\ContentGalleryInterface $gallery
+     *
+     * @param bool|null                                 $throwIfAbsent
+     *
+     * @return \BetaKiller\Model\ContentImageInterface[]
+     * @throws \BetaKiller\Content\Shortcode\ShortcodeException
+     */
+    private function getImages(ContentGalleryInterface $gallery, bool $throwIfAbsent = null): array
+    {
+        $throwIfAbsent = $throwIfAbsent ?? true;
+        $images        = $gallery->getImages();
+
+        if (!$images && $throwIfAbsent) {
+            throw new ShortcodeException('Gallery [:id] has no images', [
+                ':id' => $gallery->getID(),
+            ]);
+        }
+
+        return $images;
     }
 
     /**
@@ -91,16 +151,47 @@ class GalleryShortcode extends AbstractContentElementShortcode
      */
     public function getWysiwygPluginPreviewSrc(): string
     {
-        $imageIDs = explode(',', $this->getAttribute('ids'));
+        $id      = (int)$this->getID();
+        $gallery = $this->galleryRepository->findById($id);
 
-        if (!$imageIDs) {
-            throw new ShortcodeException('No image IDs provided');
+        return $this->getPreviewUrl($gallery);
+    }
+
+    /**
+     * @param \BetaKiller\Model\ContentGalleryInterface $gallery
+     *
+     * @return string
+     * @throws \BetaKiller\Content\Shortcode\ShortcodeException
+     */
+    private function getPreviewUrl(ContentGalleryInterface $gallery): string
+    {
+        $images     = $this->getImages($gallery, true);
+        $firstImage = array_pop($images);
+
+        return $this->assetsHelper->getOriginalUrl($firstImage);
+    }
+
+    /**
+     * @param \BetaKiller\Model\EntityModelInterface|null $relatedEntity
+     * @param int|null                                    $itemID
+     *
+     * @return \BetaKiller\Content\Shortcode\Editor\EditorListingItem[]
+     * @throws \BetaKiller\Content\Shortcode\ShortcodeException
+     */
+    public function getEditorListingItems(?EntityModelInterface $relatedEntity, ?int $itemID): array
+    {
+        $galleries = $this->galleryRepository->getEditorListing($relatedEntity, $itemID);
+
+        $data = [];
+
+        foreach ($galleries as $gallery) {
+            $data[] = new EditorListingItem(
+                $gallery->getID(),
+                $this->getPreviewUrl($gallery),
+                $gallery->isValid()
+            );
         }
 
-        $firstID = array_pop($imageIDs);
-
-        $model = $this->repository->findById($firstID);
-
-        return $this->assetsHelper->getOriginalUrl($model);
+        return $data;
     }
 }

@@ -9,7 +9,7 @@ trait ModelWithRevisionsOrmTrait
     /**
      * @var \BetaKiller\Model\UserInterface
      */
-    private $user;
+    private $revisionAuthor;
 
     /**
      * @var \BetaKiller\Model\RevisionModelInterface
@@ -169,7 +169,7 @@ trait ModelWithRevisionsOrmTrait
      */
     public function injectNewRevisionAuthor(UserInterface $user): void
     {
-        $this->user = $user;
+        $this->revisionAuthor = $user;
     }
 
     /**
@@ -233,7 +233,7 @@ trait ModelWithRevisionsOrmTrait
             throw new Exception('Can not link revision to related model without ID');
         }
 
-        $user = $this->user;
+        $user = $this->revisionAuthor;
 
         if (!$user) {
             throw new Exception('Inject revision author into model before saving');

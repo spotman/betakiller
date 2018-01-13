@@ -19,12 +19,12 @@ class StaticShortcodeEditor extends AbstractShortcodeEditor
     /**
      * Returns data for IndexItem IFace
      *
-     * @param \BetaKiller\Model\EntityModelInterface|null $entity
+     * @param \BetaKiller\Model\EntityModelInterface|null $relatedEntity
      * @param int|null                                    $itemID
      *
      * @return array
      */
-    public function getIndexIFaceData(?EntityModelInterface $entity, ?int $itemID): array
+    public function getIndexIFaceData(?EntityModelInterface $relatedEntity, ?int $itemID): array
     {
         // Static shortcodes have no index data
         return [];
@@ -33,9 +33,11 @@ class StaticShortcodeEditor extends AbstractShortcodeEditor
     /**
      * Returns data for EditItem IFace
      *
+     * @param \BetaKiller\Content\Shortcode\Editor\ShortcodeInterface $shortcode
+     *
      * @return array
      */
-    public function getEditIFaceData(): array
+    public function getEditIFaceData(ShortcodeInterface $shortcode): array
     {
         // Static shortcodes are not editable
         return [];

@@ -1,6 +1,7 @@
 <?php
 namespace BetaKiller\Content\Shortcode\Editor;
 
+use BetaKiller\Content\Shortcode\ShortcodeInterface;
 use BetaKiller\Model\EntityModelInterface;
 
 interface ShortcodeEditorInterface
@@ -17,19 +18,21 @@ interface ShortcodeEditorInterface
     /**
      * Returns data for IndexItem IFace
      *
-     * @param \BetaKiller\Model\EntityModelInterface|null $entity
-     * @param int|null                                                       $itemID
+     * @param \BetaKiller\Model\EntityModelInterface|null $relatedEntity
+     * @param int|null                                    $itemID
      *
      * @return array
      */
-    public function getIndexIFaceData(?EntityModelInterface $entity, ?int $itemID): array;
+    public function getIndexIFaceData(?EntityModelInterface $relatedEntity, ?int $itemID): array;
 
     /**
      * Returns data for EditItem IFace
      *
+     * @param ShortcodeInterface $shortcode
+     *
      * @return array
      */
-    public function getEditIFaceData(): array;
+    public function getEditIFaceData(ShortcodeInterface $shortcode): array;
 
     /**
      * Returns data for DeleteItem IFace

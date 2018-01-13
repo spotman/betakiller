@@ -2,6 +2,7 @@ require.config({
 
   paths: {
     "materialize.global":         "../admin/components/materialize/js/global",
+    "materialize.buttons":        "../admin/components/materialize/js/buttons",
     "materialize.cards":          "../admin/components/materialize/js/cards",
     "materialize.forms":          "../admin/components/materialize/js/forms",
     "materialize.charCounter":    "../admin/components/materialize/js/character_counter",
@@ -26,6 +27,10 @@ require.config({
     // },
 
     'materialize.cards': {
+      deps: ['jquery', 'materialize.global', 'velocity']
+    },
+
+    'materialize.buttons': {
       deps: ['jquery', 'materialize.global', 'velocity']
     },
 

@@ -14,7 +14,7 @@
 
   {% set attrs = {class: "responsive-img swipebox", alt: caption, title: caption, rel: "content-images", href: image['data-original-url']} %}
 
-  <div class="wp-caption {{ align ~ " " ~ class }}"> {# {{ (width > 0 ? 'style="width:' ~ width ~ 'px"' : '')|raw }} #}
+  <div class="wp-caption {{ align ~ " " ~ class }}">
     {{ image(image, attrs) }}
     <span class="wp-caption-text image-caption">{{ caption }}</span>
   </div>

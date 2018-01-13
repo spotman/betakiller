@@ -1,5 +1,96 @@
-<strong>{{ entity }}</strong><br />
-<strong>{{ id }}</strong><br />
+{{ js("ifaces/admin/shortcode-editor/content-element-editor-index.js") }}
 
-content element index
+<div class="row">
+  {% for item in items %}
+    <div class="editor-content-element-listing-item col s12 m4 l4 xl3">
 
+      <div class="card small">
+        <div class="card-image" style="position: relative;">
+          <img src="{{ item.image }}">
+          {#<span class="card-title">{{ item.label }}</span>#}
+        </div>
+        <div class="fixed-action-btn horizontal" style="position: absolute; padding-top: 0">
+          <a class="btn-floating grey darken-1">
+            <i class="large material-icons">more_vert</i>
+          </a>
+          <ul>
+            <li>
+              <a href="{{ item.delete_url }}" class="btn-floating red darken-1">
+                <i class="material-icons">delete</i>
+              </a>
+            </li>
+            <li>
+              <a href="{{ item.edit_url }}" class="btn-floating green">
+                <i class="material-icons">mode_edit</i>
+              </a>
+            </li>
+          </ul>
+        </div>
+        <div class="validation-sign">
+            {% if item.is_valid %}
+              <div class="btn-floating green">
+                <i class="material-icons">done</i>
+              </div>
+            {% else %}
+              <a href="{{ item.edit_url }}" class="btn-floating red">
+                <i class="material-icons">priority_high</i>
+              </a>
+            {% endif %}
+        </div>
+        {#<div class="card-content">#}
+          {#<p>{{ item.label }}</p>#}
+        {#</div>#}
+      </div>
+    </div>
+  {% endfor %}
+
+  <style>
+    .editor-content-element-listing-item .card.small {
+      height: 200px !important;
+    }
+
+    .editor-content-element-listing-item .card-image {
+      max-height: 100% !important;
+    }
+
+    /*.editor-content-element-listing-item .card-title {*/
+      /*font-size: 20px !important;*/
+    /*}*/
+
+    .editor-content-element-listing-item .fixed-action-btn {
+      top: auto !important;
+      bottom: 23px !important;
+      z-index: 3 !important;
+      padding-left: 30px !important;
+    }
+
+    .editor-content-element-listing-item .fixed-action-btn.active {
+      padding-left: 125px !important;
+    }
+
+    .editor-content-element-listing-item .fixed-action-btn ul {
+      right: 50px !important;
+      height: auto !important;
+      top: 0 !important;
+    }
+
+    .editor-content-element-listing-item .fixed-action-btn li {
+      margin-top: 0 !important;
+    }
+
+    .editor-content-element-listing-item .validation-sign {
+      position: absolute;
+      bottom: 23px;
+      left: 23px;
+    }
+
+    /*.editor-content-element-listing-item .card-content {*/
+      /*position: absolute !important;*/
+      /*bottom: 0 !important;*/
+      /*left: 0 !important;*/
+      /*z-index: 2;*/
+      /*background: white;*/
+      /*width: 100%;*/
+    /*}*/
+  </style>
+</div>

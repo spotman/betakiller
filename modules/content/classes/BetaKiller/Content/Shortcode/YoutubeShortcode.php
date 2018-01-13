@@ -3,6 +3,7 @@ namespace BetaKiller\Content\Shortcode;
 
 use BetaKiller\Content\Shortcode\Attribute\NumberAttribute;
 use BetaKiller\Model\ContentYoutubeRecord;
+use BetaKiller\Model\EntityModelInterface;
 use BetaKiller\Repository\ContentYoutubeRecordRepository;
 
 class YoutubeShortcode extends AbstractContentElementShortcode
@@ -86,5 +87,17 @@ class YoutubeShortcode extends AbstractContentElementShortcode
     private function getRecordById(int $id): ContentYoutubeRecord
     {
         return $this->repository->findById($id);
+    }
+
+    /**
+     * @param \BetaKiller\Model\EntityModelInterface|null $relatedEntity
+     * @param int|null                                    $itemID
+     *
+     * @return \BetaKiller\Content\Shortcode\Editor\EditorListingItem[]
+     */
+    public function getEditorListingItems(?EntityModelInterface $relatedEntity, ?int $itemID): array
+    {
+        // TODO: Implement getEditorListingItems() method.
+        return [];
     }
 }

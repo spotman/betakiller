@@ -22,8 +22,8 @@
                 <iface uri="{Id}" codename="Admin_Content_Shortcode_Editor_EntityIdIndexItem" label="{Entity.getLabel()} - {Id}" hasDynamicUrl="true" entity="Shortcode" entityAction="read" />
             </iface>
 
-            <iface uri="edit" codename="Admin_Content_Shortcode_Editor_Edit" label="Edit shortcode" entity="Shortcode" entityAction="update" />
-            <iface uri="delete" codename="Admin_Content_Shortcode_Editor_Delete" label="Delete shortcode" entity="Shortcode" entityAction="delete" />
+            <iface uri="edit" codename="Admin_Content_Shortcode_Editor_EditItem" label="Edit shortcode" entity="Shortcode" entityAction="update" />
+            <iface uri="delete" codename="Admin_Content_Shortcode_Editor_DeleteItem" label="Delete shortcode" entity="Shortcode" entityAction="delete" />
             <iface uri="wysiwyg-preview" codename="Admin_Content_Shortcode_WysiwygPreview" label="Preview" entity="Shortcode" entityAction="read" />
         </iface>
     </iface>

@@ -15,12 +15,12 @@ use Route;
  */
 final class ImageAssetsProvider extends AbstractAssetsProvider implements ImageAssetsProviderInterface
 {
-    const CONFIG_MODEL_UPLOAD_KEY          = 'upload';
-    const CONFIG_MODEL_MAX_HEIGHT_KEY      = 'max-height';
-    const CONFIG_MODEL_MAX_WIDTH_KEY       = 'max-width';
-    const CONFIG_MODEL_PREVIEW_KEY         = 'preview';
-    const CONFIG_MODEL_PREVIEW_SIZES_KEY   = 'sizes';
-    const CONFIG_MODEL_PREVIEW_QUALITY_KEY = 'quality';
+    public const CONFIG_MODEL_UPLOAD_KEY          = 'upload';
+    public const CONFIG_MODEL_MAX_HEIGHT_KEY      = 'max-height';
+    public const CONFIG_MODEL_MAX_WIDTH_KEY       = 'max-width';
+    public const CONFIG_MODEL_PREVIEW_KEY         = 'preview';
+    public const CONFIG_MODEL_PREVIEW_SIZES_KEY   = 'sizes';
+    public const CONFIG_MODEL_PREVIEW_QUALITY_KEY = 'quality';
 
     /**
      * @param AssetsModelInterface $model
@@ -110,13 +110,13 @@ final class ImageAssetsProvider extends AbstractAssetsProvider implements ImageA
         return $width / $height;
     }
 
-    private function restoreOmittedDimensions(?int $width, ?int $height, float $original_ratio): array
+    private function restoreOmittedDimensions(?int $width, ?int $height, float $originalRatio): array
     {
         // Fill omitted dimensions
         if (!$width) {
-            $width = $height * $original_ratio;
+            $width = (int)($height * $originalRatio);
         } elseif (!$height) {
-            $height = (int)($width / $original_ratio);
+            $height = (int)($width / $originalRatio);
         }
 
         return $this->packDimensions($width, $height);
@@ -237,10 +237,10 @@ final class ImageAssetsProvider extends AbstractAssetsProvider implements ImageA
     ): array {
         $attrs = array_merge($model->getDefaultAttributesForImgTag(), $attrs ?? []);
 
-        $original_url = $this->getOriginalUrl($model);
+        $originalUrl = $this->getOriginalUrl($model);
 
         if ($size === AssetsModelImageInterface::SIZE_ORIGINAL) {
-            $src    = $original_url;
+            $src    = $originalUrl;
             $width  = $model->getWidth();
             $height = $model->getHeight();
         } else {
@@ -255,16 +255,22 @@ final class ImageAssetsProvider extends AbstractAssetsProvider implements ImageA
             $src = $this->getPreviewUrl($model, $size);
         }
 
-        // TODO recalculate dimensions if $attributes['width'] or 'height' exists
+        $targetRatio = $this->calculateDimensionsRatio($width, $height);
 
-        $image_ratio = $this->calculateDimensionsRatio($width, $height);
+        $targetWidth  = $attrs['width'] ?? null;
+        $targetHeight = $attrs['height'] ?? null;
+
+        // Recalculate dimensions if $attributes['width'] or 'height' exists
+        if ($targetWidth || $targetHeight) {
+            list($width, $height) = $this->restoreOmittedDimensions($targetWidth, $targetHeight, $targetRatio);
+        }
 
         $attrs = array_merge([
             'src'               => $src,
             'width'             => $width,
             'height'            => $height,
-            'srcset'            => $this->getSrcsetAttributeValue($model, $image_ratio),
-            'data-original-url' => $original_url,
+            'srcset'            => $this->getSrcsetAttributeValue($model, $targetRatio),
+            'data-original-url' => $originalUrl,
             'data-id'           => $model->getID(),
         ], $attrs);
 

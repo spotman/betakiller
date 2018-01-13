@@ -157,9 +157,14 @@ abstract class AbstractShortcode implements ShortcodeInterface
      * @return bool
      * @throws \BetaKiller\Content\Shortcode\ShortcodeException
      */
-    private function isAttributeValueAvailable(string $name, string $value): bool
+    private function isAttributeValueAvailable(string $name, ?string $value): bool
     {
         $definition = $this->getAttributeDefinition($name);
+
+        // Required fields must not have an empty value, optional ones may
+        if (!$value) {
+            return $definition->isOptional();
+        }
 
         return $definition->isValueAvailable($value);
     }

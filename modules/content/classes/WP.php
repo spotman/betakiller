@@ -277,7 +277,7 @@ class WP
     /**
      * @param int $id
      *
-     * @return array
+     * @return array[]
      * @throws \BetaKiller\Exception
      */
     public function get_wonderplugin_slider_config($id)

@@ -8,6 +8,7 @@ use BetaKiller\Content\Shortcode\ImageShortcode;
 use BetaKiller\Content\Shortcode\YoutubeShortcode;
 use BetaKiller\Helper\LoggerHelperTrait;
 use BetaKiller\Model\ContentPost;
+use BetaKiller\Model\ContentPostInterface;
 use BetaKiller\Model\Entity;
 use BetaKiller\Model\IFaceZone;
 use BetaKiller\Model\WordpressAttachmentInterface;
@@ -92,6 +93,12 @@ class Task_Content_Import_Wordpress extends AbstractTask
     private $categoryRepository;
 
     /**
+     * @Inject
+     * @var \BetaKiller\Repository\ContentGalleryRepository
+     */
+    private $galleryRepository;
+
+    /**
      * @var \BetaKiller\Repository\ContentYoutubeRecordRepository
      * @Inject
      */
@@ -135,7 +142,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
 
     /**
      * @Inject
-     * @var \BetaKiller\Status\ContentPostWorkflow
+     * @var \BetaKiller\Status\StatusWorkflowFactory
      */
     private $postWorkflowFactory;
 
@@ -183,7 +190,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
         $this->importComments();
 
         // Quotes plugin
-        $this->import_quotes();
+        $this->importQuotes();
     }
 
     /**
@@ -312,14 +319,10 @@ class Task_Content_Import_Wordpress extends AbstractTask
         }
 
         // Search for such file already exists
-//        /** @var \BetaKiller\Model\WordpressAttachmentInterface $model */
         $model = $repository->findByWpID($wpID);
 
         if ($model) {
-            $this->logger->debug('Attach with WP ID = :id already exists, data = :data', [
-                ':id'   => $wpID,
-                ':data' => $model->toJson(),
-            ]);
+            $this->logger->debug('Attach with WP ID = :id already exists', [':id' => $wpID,]);
 
             return $model;
         }
@@ -437,6 +440,8 @@ class Task_Content_Import_Wordpress extends AbstractTask
     }
 
     /**
+     * @throws \BetaKiller\Factory\FactoryException
+     * @throws \ORM_Validation_Exception
      * @throws \BetaKiller\Repository\RepositoryException
      * @throws \BetaKiller\Task\TaskException
      * @throws \Kohana_Exception
@@ -493,6 +498,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
 
             $model->setUri($uri);
             $model->setCreatedBy($this->user);
+            $model->injectNewRevisionAuthor($this->user);
 
             // Saving model and getting its ID for further processing
             $this->postRepository->save($model);
@@ -550,7 +556,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
     private function notifyAboutUnknownBbTags(): void
     {
         foreach ($this->unknownBbTags as $tag => $url) {
-            $this->logger->notice('Found unknown BB tag [:name] at :url', [':name' => $tag, ':url' => $url]);
+            $this->logger->warning('Found unknown BB tag [:name] at :url', [':name' => $tag, ':url' => $url]);
         }
     }
 
@@ -592,6 +598,11 @@ class Task_Content_Import_Wordpress extends AbstractTask
      * @param \DiDom\Document $document
      * @param int             $postID
      *
+     * @throws \ORM_Validation_Exception
+     * @throws \LogicException
+     * @throws \BetaKiller\Repository\RepositoryException
+     * @throws \BetaKiller\Content\Shortcode\ShortcodeException
+     * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\Task\TaskException
      */
     private function updateLinksOnAttachments(Document $document, int $postID): void
@@ -634,12 +645,10 @@ class Task_Content_Import_Wordpress extends AbstractTask
                 // Force saving images in AttachmentAssetsProvider
                 $attachElement = $this->processWordpressAttachment($wpAttach, $postID, $provider);
 
-                $attributes = [
-                    'id' => $attachElement->getID(),
-                ];
-
                 /** @var AttachmentShortcode $attachShortcode */
-                $attachShortcode = $this->shortcodeFacade->createFromCodename(AttachmentShortcode::codename(), $attributes);
+                $attachShortcode = $this->shortcodeFacade->createFromCodename(AttachmentShortcode::codename());
+
+                $attachShortcode->setID($attachElement->getID());
 
                 if ($img) {
                     // Image as a thumbnail => layout="image" image-id="<id>"
@@ -725,10 +734,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
     /**
      * @param \BetaKiller\Model\ContentPost $item
      *
-     * @throws \BetaKiller\Task\TaskException
-     * @throws \BetaKiller\Exception
      * @throws \RuntimeException
-     * @throws \Kohana_Exception
      */
     private function processCustomBbTags(ContentPost $item): void
     {
@@ -756,9 +762,15 @@ class Task_Content_Import_Wordpress extends AbstractTask
             $serializer = new TextSerializer();
             $name       = $s->getName();
 
-            if (!isset($this->unknownBbTags[$name])) {
-                $this->unknownBbTags[$name] = $this->ifaceHelper->getReadEntityUrl($item, IFaceZone::PUBLIC_ZONE);
-                $this->logger->debug('Unknown BB-code found [:name], keep it', [':name' => $name]);
+            try {
+                $this->shortcodeFacade->createFromTagName($name);
+            } catch (\Throwable $e) {
+                $this->logException($this->logger, $e);
+
+                if (!isset($this->unknownBbTags[$name])) {
+                    $this->unknownBbTags[$name] = $this->ifaceHelper->getReadEntityUrl($item, IFaceZone::PUBLIC_ZONE);
+                    $this->logger->debug('Unknown BB-code found [:name], keep it', [':name' => $name]);
+                }
             }
 
             return $serializer->serialize($s);
@@ -777,15 +789,17 @@ class Task_Content_Import_Wordpress extends AbstractTask
      * @param \BetaKiller\Model\ContentPost                   $post
      *
      * @return null|string
+     * @throws \BetaKiller\Content\Shortcode\ShortcodeException
+     * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\Task\TaskException
      */
     public function thunderHandlerCaption(ThunderShortcodeInterface $s, ContentPost $post): ?string
     {
         $this->logger->debug('[caption] found');
 
-        $parameters = $s->getParameters();
+        $attributes = $s->getParameters();
 
-        $imageWpID = (int)str_replace('attachment_', '', $parameters['id']);
+        $imageWpID = (int)str_replace('attachment_', '', $attributes['id']);
 
         // Find image in WP and process attachment
         $wpImageData = $this->wp->get_attachment_by_id($imageWpID);
@@ -801,8 +815,11 @@ class Task_Content_Import_Wordpress extends AbstractTask
         // Removing <img /> tag
         $captionText = trim(strip_tags($s->getContent()));
 
+        // Do not use height, it would be calculated automatically in the widget
+        unset($attributes['height']);
+
         /** @var ImageShortcode $shortcode */
-        $shortcode = $this->shortcodeFacade->createFromCodename(ImageShortcode::codename(), $parameters);
+        $shortcode = $this->shortcodeFacade->createFromCodename(ImageShortcode::codename(), $attributes);
 
         $shortcode->useCaptionLayout($captionText);
         $shortcode->setID($image->getID());
@@ -812,26 +829,51 @@ class Task_Content_Import_Wordpress extends AbstractTask
 
     /**
      * @param \Thunder\Shortcode\Shortcode\ShortcodeInterface $s
-     * @param \BetaKiller\Model\ContentPost                   $post
+     * @param \BetaKiller\Model\ContentPostInterface          $post
      *
      * @return null|string
+     * @throws \ORM_Validation_Exception
+     * @throws \BetaKiller\Repository\RepositoryException
+     * @throws \BetaKiller\Content\Shortcode\ShortcodeException
+     * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\Task\TaskException
      */
-    public function thunderHandlerGallery(ThunderShortcodeInterface $s, ContentPost $post): ?string
+    public function thunderHandlerGallery(ThunderShortcodeInterface $s, ContentPostInterface $post): ?string
     {
+        // TODO Deal with gallery duplicating on multiple task execution
         $this->logger->debug('[gallery] found');
 
-        $wpIDsList = $s->getParameter('ids');
-        $layout      = $s->getParameter('type');
-        $columns   = (int)$s->getParameter('columns');
+        $gallery = $this->galleryRepository->create();
 
-        if (strpos($layout, 'slider') !== false) {
-            $layout = 'slider';
-        }
+        // Link gallery to current post
+        $gallery->setEntity($this->contentPostEntity)->setEntityItemID($post->getID());
+
+        /** @var GalleryShortcode $shortcode */
+        $shortcode = $this->shortcodeFacade->createFromCodename(GalleryShortcode::codename());
+
+        $wpIDsList = $s->getParameter('ids');
+        $type      = $s->getParameter('type');
+        $columns   = $s->getParameter('columns');
 
         // Removing spaces
         $wpIDsList = str_replace(' ', '', $wpIDsList);
         $wpIDs     = explode(',', $wpIDsList);
+
+        if (strpos($type, 'slider') !== false) {
+            $shortcode->useSliderLayout();
+        } elseif (strpos($type, 'masonry') !== false) {
+            $shortcode->useMasonryLayout($columns);
+        } elseif ($type) {
+            throw new TaskException('Unknown gallery type [:value]', [':value' => $type]);
+        } else {
+            // Use default layout if none provided
+            $shortcode->useDefaultLayout();
+        }
+
+        // Saving to get ID
+        $this->galleryRepository->save($gallery);
+
+        $shortcode->setID($gallery->getID());
 
         $wpImages = $this->wp->get_attachments(null, $wpIDs);
 
@@ -843,48 +885,53 @@ class Task_Content_Import_Wordpress extends AbstractTask
             return null;
         }
 
-        $imagesIDs = [];
-
         // Process every image in set
         foreach ($wpImages as $wpImageData) {
-            $model       = $this->processWordpressAttachment($wpImageData, $post->getID());
-            $imagesIDs[] = $model->getID();
+            /** @var \BetaKiller\Model\ContentImageInterface $model */
+            $model = $this->processWordpressAttachment($wpImageData, $post->getID());
+
+            $gallery->addImage($model);
         }
 
-        $attributes = [
-            'ids'     => implode(',', $imagesIDs),
-            'layout'    => $layout,
-            'columns' => $columns,
-        ];
-
-        // TODO Deal with gallery ID
-        // $attributes['id'] = $image->getID();
-
-        return $this->shortcodeFacade->createFromCodename(GalleryShortcode::codename(), $attributes)->asHtml();
+        return $shortcode->asHtml();
     }
 
     /**
      * @param \Thunder\Shortcode\Shortcode\ShortcodeInterface $s
-     * @param \BetaKiller\Model\ContentPost                   $post
+     * @param \BetaKiller\Model\ContentPostInterface          $post
      *
      * @return string
+     * @throws \ORM_Validation_Exception
+     * @throws \BetaKiller\Repository\RepositoryException
+     * @throws \BetaKiller\Content\Shortcode\ShortcodeException
      * @throws \BetaKiller\Exception
+     * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\Task\TaskException
      */
-    public function thunderHandlerWonderplugin(ThunderShortcodeInterface $s, ContentPost $post): string
+    public function thunderHandlerWonderplugin(ThunderShortcodeInterface $s, ContentPostInterface $post): string
     {
         $this->logger->debug('[wonderplugin_slider] found');
 
-        $id = $s->getParameter('id');
+        $gallery = $this->galleryRepository->create();
 
-        $this->logger->debug('Processing wonderplugin slider :id', [':id' => $id]);
+        // Link gallery to current post
+        $gallery->setEntity($this->contentPostEntity)->setEntityItemID($post->getID());
 
-        $config = $this->wp->get_wonderplugin_slider_config($id);
+        /** @var GalleryShortcode $shortcode */
+        $shortcode = $this->shortcodeFacade->createFromCodename(GalleryShortcode::codename());
+
+        // Saving to get ID
+        $this->galleryRepository->save($gallery);
+
+        $shortcode->setID($gallery->getID());
+        $shortcode->useSliderLayout();
+
+        $wonderPluginID = $s->getParameter('id');
+        $config         = $this->wp->get_wonderplugin_slider_config($wonderPluginID);
+        $this->logger->debug('Processing wonderplugin slider :id', [':id' => $wonderPluginID]);
 
         /** @var array $slides */
         $slides = $config['slides'];
-
-        $imagesIDs = [];
 
         foreach ($slides as $slide) {
             $url = $slide['image'];
@@ -903,22 +950,15 @@ class Task_Content_Import_Wordpress extends AbstractTask
                 $wpImage['post_excerpt'] = $caption;
             }
 
-            // Processing image
+            /** @var \BetaKiller\Model\ContentImageInterface $image */
             $image = $this->processWordpressAttachment($wpImage, $post->getID());
 
             $this->logger->debug('Adding image :id to wonderplugin slider', [':id' => $image->getID()]);
 
-            $imagesIDs[] = $image->getID();
+            $gallery->addImage($image);
         }
 
-        $attributes = [
-            'ids'  => implode(',', $imagesIDs),
-            'type' => 'slider',
-        ];
-
-        // TODO Deal with gallery ID
-
-        return $this->shortcodeFacade->createFromCodename(GalleryShortcode::codename(), $attributes)->asHtml();
+        return $shortcode->asHtml();
     }
 
     /**
@@ -955,6 +995,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
      * @param                $entity_item_id
      *
      * @return ImageShortcode
+     * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\Repository\RepositoryException
      * @throws \BetaKiller\Task\TaskException
      * @throws \ORM_Validation_Exception
@@ -1001,13 +1042,12 @@ class Task_Content_Import_Wordpress extends AbstractTask
         );
 
         // Convert old full-size images to responsive images
-        if (isset($attributes['width']) && $attributes['width'] === 780) // TODO move 780 to config
-        {
-            unset(
-                $attributes['width'],
-                $attributes['height']
-            );
+        if (isset($attributes['width']) && $attributes['width'] === 780) { // TODO move 780 to config
+            unset($attributes['width']);
         }
+
+        // Height would be calculated automatically from width and scale in widget
+        unset($attributes['height']);
 
         $attributes['id'] = $image->getID();
 
@@ -1019,8 +1059,6 @@ class Task_Content_Import_Wordpress extends AbstractTask
 
     /**
      * @param \BetaKiller\Model\ContentPost $item
-     *
-     * @throws \Kohana_Exception
      */
     private function processContentYoutubeIFrames(ContentPost $item): void
     {
@@ -1080,6 +1118,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
      * @param int    $entityItemID
      *
      * @return string
+     * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\Exception
      * @throws \BetaKiller\Repository\RepositoryException
      * @throws \BetaKiller\Task\TaskException
@@ -1140,7 +1179,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
         $this->youtubeRepository->save($video);
 
         $attributes = [
-            'id' => $video->getID(),
+            'id'     => $video->getID(),
             'width'  => $width,
             'height' => $height,
         ];
@@ -1225,7 +1264,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
      * @throws \Kohana_Exception
      * @throws \ORM_Validation_Exception
      */
-    private function import_quotes(): void
+    private function importQuotes(): void
     {
         $quotesData = $this->wp->get_quotes_collection_quotes();
 

@@ -19,8 +19,22 @@ class ContentImage extends AbstractAssetsOrmImageModel implements ContentImageIn
     {
         $this->_table_name = 'content_images';
 
-        $this->initialize_entity_relation();
+        $this->initializeEntityRelation();
 
         parent::_initialize();
+    }
+
+    /**
+     * Returns true if content element has all required info
+     *
+     * @return bool
+     */
+    public function isValid(): bool
+    {
+        return $this->getID()
+            && $this->getEntityItemID()
+            && $this->getEntitySlug()
+            && $this->getAlt()
+            && $this->getTitle();
     }
 }

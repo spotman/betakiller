@@ -5,6 +5,7 @@ use BetaKiller\Content\Shortcode\Attribute\ClassAttribute;
 use BetaKiller\Content\Shortcode\Attribute\NumberAttribute;
 use BetaKiller\Content\Shortcode\Attribute\TextAttribute;
 use BetaKiller\Helper\AssetsHelper;
+use BetaKiller\Model\EntityModelInterface;
 use BetaKiller\Repository\ContentAttachmentRepository;
 use BetaKiller\Repository\ContentImageRepository;
 
@@ -207,5 +208,17 @@ class AttachmentShortcode extends AbstractContentElementShortcode
     protected function setImageID(int $value): void
     {
         $this->setAttribute(self::ATTR_IMAGE_ID, $value);
+    }
+
+    /**
+     * @param \BetaKiller\Model\EntityModelInterface|null $relatedEntity
+     * @param int|null                                    $itemID
+     *
+     * @return \BetaKiller\Content\Shortcode\Editor\EditorListingItem[]
+     */
+    public function getEditorListingItems(?EntityModelInterface $relatedEntity, ?int $itemID): array
+    {
+        // TODO: Implement getEditorListingItems() method.
+        return [];
     }
 }

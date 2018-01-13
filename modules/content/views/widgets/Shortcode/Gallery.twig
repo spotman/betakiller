@@ -1,29 +1,29 @@
 {% if images|length %}
 
-    {% if layout == "masonry" %}
-
-        {% set column_class = "s" ~ (12 / columns)|round(0, 'floor') %}
-
-        <div class="content-gallery content-gallery-masonry row">
-            {% for image in images %}
-                <a href="{{ image["data-original-url"] }}" class="col {{ column_class }} swipebox" rel="content-images">
-                    {{ image(image, { class: "responsive-img" }, true) }}
-                </a>
-            {% endfor %}
-        </div>
-
-    {% elseif layout == "slider" %}
+  {% if layout == "slider" %}
 
     <div class="content-gallery content-gallery-slider">
-        {% for image in images %}
-            {{ image(image, { class: "responsive-img carousel-cell swipebox", rel: "content-images", href: image["data-original-url"] }, true) }}
-        {% endfor %}
+      {% for image in images %}
+        {{ image(image, { class: "responsive-img carousel-cell swipebox", rel: "content-images", href: image["data-original-url"] }, true) }}
+      {% endfor %}
 
-        <div class="image-caption"></div>
+      <div class="image-caption"></div>
     </div>
 
-    {% endif %}
+  {% else %} {# "masonry" and "default" layouts are just the same right now #}
+
+    {% set width = (100 / columns) ~ "%" %} {# |round(0, 'floor' #}
+
+    <div class="content-gallery content-gallery-masonry row">
+      {% for image in images %}
+        <a href="{{ image["data-original-url"] }}" class="col swipebox" rel="content-images" style="width: {{ width }}">
+          {{ image(image, { class: "responsive-img" }, true) }}
+        </a>
+      {% endfor %}
+    </div>
+
+  {% endif %}
 
 {% else %}
-    {# No images #}
+  {# No images #}
 {% endif %}
