@@ -403,7 +403,7 @@ class PhpException extends \ORM implements PhpExceptionModelInterface
     {
         $id = $this->get('resolved_by');
 
-        return $id ? $this->model_factory_user($id) : null;
+        return $id ? $this->modelFactoryUser($id) : null;
     }
 
     /**
