@@ -15,10 +15,10 @@ abstract class Controller_Proxy extends Kohana_Controller
         $this->_init();
 
         // Determine the method to use
-        $this->_proxy_method = $this->get_proxy_method();
+        $this->_proxy_method = $this->getProxyMethod();
 
         // Getting the proxy object
-        $this->_proxy_object = $this->get_proxy_object();
+        $this->_proxy_object = $this->getProxyObject();
 
         // If the action doesn't exist, it's a 404
         if ( ! method_exists($this->_proxy_object, $this->_proxy_method) )
@@ -67,7 +67,7 @@ abstract class Controller_Proxy extends Kohana_Controller
         return $this->_proxy_object->{$this->_proxy_method}($this);
     }
 
-    protected function get_proxy_object()
+    protected function getProxyObject()
     {
         return $this;
     }
@@ -75,7 +75,7 @@ abstract class Controller_Proxy extends Kohana_Controller
     /**
      * @return string
      */
-    protected function get_proxy_method()
+    protected function getProxyMethod()
     {
         return 'action_'.$this->request->action();
     }

@@ -12,7 +12,7 @@ class Controller_Widget extends Controller
      * @return \BetaKiller\Widget\WidgetInterface
      * @throws \BetaKiller\Factory\FactoryException
      */
-    protected function get_proxy_object()
+    protected function getProxyObject()
     {
         $widgetName = $this->param('widget');
 
