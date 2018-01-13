@@ -33,7 +33,7 @@ abstract class StatusWorkflow implements StatusWorkflowInterface
         $target_transition = $this->findTargetTransition($codename);
 
         // Make custom check
-        $this->custom_target_transition_check($target_transition);
+        $this->customTargetTransitionCheck($target_transition);
 
         // Process transition
         $this->model->doStatusTransition($target_transition);
@@ -46,7 +46,7 @@ abstract class StatusWorkflow implements StatusWorkflowInterface
         }
     }
 
-    protected function custom_target_transition_check(StatusTransitionModelInterface $transition)
+    protected function customTargetTransitionCheck(StatusTransitionModelInterface $transition)
     {
         // Empty by default
     }
