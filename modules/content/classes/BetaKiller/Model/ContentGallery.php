@@ -43,6 +43,20 @@ class ContentGallery extends ORM implements ContentGalleryInterface
         return $this->count_relations('images') > 0;
     }
 
+    private function imagesAreValid(): bool
+    {
+        $count = 0;
+
+        foreach ($this->getImages() as $image) {
+            $count++;
+            if (!$image->isValid()) {
+                return false;
+            }
+        }
+
+        return $count > 0;
+    }
+
     /**
      * Returns true if content element has all required info
      *
@@ -53,7 +67,7 @@ class ContentGallery extends ORM implements ContentGalleryInterface
         return $this->getID()
             && $this->getEntityItemID()
             && $this->getEntitySlug()
-            && $this->hasImages();
+            && $this->imagesAreValid();
     }
 
     /**

@@ -1,0 +1,11 @@
+{% include "@layouts/materialize" %}
+
+{# include css with materialize build #}
+{{ css("admin/css/admin.css") }}
+{{ css("https://fonts.googleapis.com/icon?family=Material+Icons") }}
+
+{{ js("require.js/admin.config.js") }}
+
+<div class="container">
+  {% block page_content "" %}
+</div>
