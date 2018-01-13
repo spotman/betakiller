@@ -8,6 +8,8 @@ namespace BetaKiller\Model;
  */
 interface ConfigBasedDispatchableEntityInterface extends DispatchableEntityInterface
 {
+    public const URL_KEY_CODENAME = 'codename';
+
     /**
      * Config-based url parameters needs codename to be defined
      *

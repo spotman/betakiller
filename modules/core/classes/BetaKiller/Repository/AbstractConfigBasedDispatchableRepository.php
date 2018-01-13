@@ -118,7 +118,13 @@ abstract class AbstractConfigBasedDispatchableRepository extends AbstractPredefi
      */
     public function findItemByUrlKeyValue(string $value, UrlContainerInterface $params): UrlParameterInterface
     {
-        return $this->findByOptionValue($this->getUrlKeyName(), $value);
+        $key = $this->getUrlKeyName();
+
+        if ($key === ConfigBasedDispatchableEntityInterface::URL_KEY_CODENAME) {
+            return $this->findByCodename($value);
+        }
+
+        return $this->findByOptionValue($key, $value);
     }
 
     /**

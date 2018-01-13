@@ -6,8 +6,6 @@ use BetaKiller\Url\UrlPrototypeException;
 
 abstract class AbstractConfigBasedDispatchableEntity implements ConfigBasedDispatchableEntityInterface
 {
-    public const URL_KEY_CODENAME = 'codename';
-
     /**
      * @var string
      */
