@@ -1,8 +1,6 @@
 <?php
 namespace BetaKiller\Log;
 
-use Bramus\Monolog\Formatter\ColoredLineFormatter;
-use Bramus\Monolog\Formatter\ColorSchemes\DefaultScheme;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 
@@ -21,8 +19,6 @@ class CliHandler extends StreamHandler
 
         parent::__construct('php://stdout', $level);
 
-        // Color scheme and formatter
-        $cliFormatter = new ColoredLineFormatter(new DefaultScheme(), "%message%\n");
-        $this->setFormatter($cliFormatter);
+        $this->setFormatter(new CliFormatter($isDebugAllowed));
     }
 }
