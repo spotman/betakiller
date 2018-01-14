@@ -1,6 +1,7 @@
 <?php
 namespace BetaKiller\Repository;
 
+use BetaKiller\Model\AbstractEntityInterface;
 use BetaKiller\Model\EntityModelInterface;
 
 /**
@@ -57,5 +58,16 @@ class EntityRepository extends AbstractOrmBasedDispatchableRepository
         }
 
         return $model;
+    }
+
+    /**
+     * @param \BetaKiller\Model\AbstractEntityInterface $instance
+     *
+     * @return \BetaKiller\Model\EntityModelInterface
+     * @throws \BetaKiller\Repository\RepositoryException
+     */
+    public function findByEntityInstance(AbstractEntityInterface $instance): EntityModelInterface
+    {
+        return $this->findByModelName($instance->getModelName());
     }
 }

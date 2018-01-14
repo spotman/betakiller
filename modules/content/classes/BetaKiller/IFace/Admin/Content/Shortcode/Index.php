@@ -32,14 +32,21 @@ class Index extends AbstractAdminBase
      */
     public function getData(): array
     {
-        $data = [];
+        $otherData = [];
 
-        foreach ($this->repo->getAll() as $entity) {
-            $data[] = $this->makeShortcodeData($entity);
+        /** @var ShortcodeEntityInterface[] $otherShortcodes */
+        $otherShortcodes = array_merge($this->repo->getStaticShortcodes(), $this->repo->getDynamicShortcodes());
+
+        foreach ($otherShortcodes as $entity) {
+            $tagName             = $entity->getTagName();
+            $otherData[$tagName] = $this->makeShortcodeData($entity);
         }
 
+        // Sort by tag name alphabetically
+        ksort($otherData);
+
         return [
-            'shortcodes' => $data,
+            'other_shortcodes' => $otherData,
         ];
     }
 

@@ -3,6 +3,8 @@ namespace BetaKiller\IFace\Admin\Content;
 
 use BetaKiller\Helper\ContentUrlContainerHelper;
 use BetaKiller\IFace\CrudlsActionsInterface;
+use BetaKiller\Model\ContentPostInterface;
+use BetaKiller\Model\EntityModelInterface;
 
 class PostItem extends AbstractAdminBase
 {
@@ -37,6 +39,12 @@ class PostItem extends AbstractAdminBase
     private $customTagFacade;
 
     /**
+     * @Inject
+     * @var \BetaKiller\Repository\EntityRepository
+     */
+    private $entityRepo;
+
+    /**
      * PostItem constructor.
      *
      * @param \BetaKiller\Helper\ContentUrlContainerHelper $urlParametersHelper
@@ -53,6 +61,7 @@ class PostItem extends AbstractAdminBase
      * Override this method in child classes
      *
      * @return array
+     * @throws \BetaKiller\Exception
      * @throws \HTTP_Exception_404
      */
     public function getData(): array
@@ -62,6 +71,8 @@ class PostItem extends AbstractAdminBase
         if (!$post) {
             throw new \HTTP_Exception_404();
         }
+
+        $entity = $this->entityRepo->findByEntityInstance($post);
 
         $thumbnails = [];
 
@@ -96,6 +107,8 @@ class PostItem extends AbstractAdminBase
 
                 'thumbnails' => $thumbnails,
             ],
+
+            'entity_slug' => $entity->getSlug(),
 
             'shortcodes' => $this->customTagFacade->getEditableTagsNames(),
         ];

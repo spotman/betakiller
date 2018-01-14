@@ -15,7 +15,6 @@ require([
     const $transitionButtons = $(".transition-button");
     const $saveButton = $(".save-post-button");
 
-    const postID = $form.find('[name="id"]').val();
     const isUpdateAllowed = $form.data('update-allowed');
 
     const $category = $('#article-category');
@@ -49,10 +48,17 @@ require([
       window.CKEDITOR.dtd.$inline[name] = 1;
     });
 
+    const entitySlug = $content.data('entity-slug'),
+          entityItemId = $content.data('entity-item-id');
+
+    if (!entitySlug || !entityItemId) {
+      throw new Error('Entity slug or entity item id is missing');
+    }
+
     $content.ckeditor({
-      contentEntityName: 'post',
-      contentEntityItemID: postID,
-      allowedContent: "p(*); strong; i; em; span{*}; table(*); thead; tbody; tr; th[style]; td{*}; ul(*); ol(*); li; a[href,title]; h2; h3; h4; " + customTagsRules.join(';')
+      contentEntityName: entitySlug,
+      contentEntityItemID: entityItemId,
+      allowedContent: "p(*); strong; i; em; span{*}; table(*); thead; tbody; tr[style]; th[style]; td{*}; ul(*); ol(*); li; a[href,title]; h2; h3; h4; " + customTagsRules.join(';')
     });
 
     // TODO Fix editor toolbar position

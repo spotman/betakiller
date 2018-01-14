@@ -124,7 +124,7 @@ abstract class AbstractConfigBasedDispatchableRepository extends AbstractPredefi
             return $this->findByCodename($value);
         }
 
-        return $this->findByOptionValue($key, $value);
+        return $this->findOneByOptionValue($key, $value);
     }
 
     /**
@@ -147,7 +147,7 @@ abstract class AbstractConfigBasedDispatchableRepository extends AbstractPredefi
      * @return \BetaKiller\Model\ConfigBasedDispatchableEntityInterface|mixed
      * @throws \BetaKiller\Repository\RepositoryException
      */
-    protected function findByOptionValue(string $name, string $value)
+    protected function findOneByOptionValue(string $name, string $value)
     {
         foreach ($this->items as $item) {
             if ($item->getConfigOption($name) === $value) {
@@ -160,6 +160,25 @@ abstract class AbstractConfigBasedDispatchableRepository extends AbstractPredefi
             ':value' => $value,
             ':repo'  => static::getCodename(),
         ]);
+    }
+
+    /**
+     * @param string $name
+     * @param string $value
+     *
+     * @return \BetaKiller\Model\ConfigBasedDispatchableEntityInterface[]|array
+     */
+    protected function findAllByOptionValue(string $name, string $value): array
+    {
+        $filtered = [];
+
+        foreach ($this->items as $item) {
+            if ($item->getConfigOption($name) === $value) {
+                $filtered[] = $item;
+            }
+        }
+
+        return $filtered;
     }
 
     /**

@@ -33,7 +33,6 @@ class GalleryShortcode extends AbstractContentElementShortcode
     protected function getContentElementShortcodeDefinitions(): array
     {
         return [
-            new IdAttribute(),
             new NumberAttribute('columns', true),
         ];
     }

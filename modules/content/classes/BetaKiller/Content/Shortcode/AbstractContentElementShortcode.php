@@ -5,10 +5,8 @@ use BetaKiller\Content\Shortcode\Attribute\DiscreteValuesAttribute;
 use BetaKiller\Content\Shortcode\Attribute\IdAttribute;
 use BetaKiller\Model\EntityModelInterface;
 
-abstract class AbstractContentElementShortcode extends AbstractShortcode
+abstract class AbstractContentElementShortcode extends AbstractShortcode implements ContentElementShortcodeInterface
 {
-    public const ATTR_LAYOUT = 'layout';
-
     /**
      * @return \BetaKiller\Content\Shortcode\Attribute\ShortcodeAttributeInterface[]
      */

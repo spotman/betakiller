@@ -19,7 +19,7 @@
     <iface uri="shortcodes" codename="Admin_Content_Shortcode_Index" parentCodename="Admin_Index" label="Shortcodes plugin" entity="Shortcode" entityAction="list" layoutCodename="iframe">
         <iface uri="{Shortcode.tag_name}" codename="Admin_Content_Shortcode_Editor_IndexItem" label="{Shortcode.codename}" hasDynamicUrl="true" entity="Shortcode" entityAction="read">
             <iface uri="{Entity.slug}" codename="Admin_Content_Shortcode_Editor_EntityIndexItem" label="{Entity.getLabel()}" hasDynamicUrl="true" entity="Shortcode" entityAction="read">
-                <iface uri="{Id}" codename="Admin_Content_Shortcode_Editor_EntityIdIndexItem" label="{Entity.getLabel()} - {Id}" hasDynamicUrl="true" entity="Shortcode" entityAction="read" />
+                <iface uri="{Id}" codename="Admin_Content_Shortcode_Editor_EntityIdIndexItem" label="{Id}" hasDynamicUrl="true" entity="Shortcode" entityAction="read" />
             </iface>
 
             <iface uri="edit" codename="Admin_Content_Shortcode_Editor_EditItem" label="Edit shortcode" entity="Shortcode" entityAction="update" />

@@ -53,17 +53,20 @@ class ContentElementShortcodeEditor extends AbstractShortcodeEditor
 
         foreach ($shortcode->getEditorListingItems($relatedEntity, $itemID) as $item) {
             $items[] = [
-                'is_valid'   => $item->isValid(),
+                'id'         => $item->getId(),
                 'image'      => $item->getImageUrl(),
+                'tag_name'   => $this->shortcodeEntity->getTagName(),
+                'is_valid'   => $item->isValid(),
                 'edit_url'   => $baseEditUrl.'?id='.$item->getId(),
                 'delete_url' => $baseDeleteUrl.'?id='.$item->getId(),
             ];
         }
 
         return [
-            'entity' => $relatedEntity ? $relatedEntity->getLabel() : null,
-            'id'     => $itemID,
-            'items'  => $items,
+            'entity_id'      => $relatedEntity ? $relatedEntity->getID() : null,
+            'entity_item_id' => $itemID,
+            'upload_url'     => '',
+            'items'          => $items,
         ];
     }
 

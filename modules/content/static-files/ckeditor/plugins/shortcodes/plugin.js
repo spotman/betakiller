@@ -1,13 +1,66 @@
 /**
- * Plugin for content images
+ * Plugin for shortcodes
  */
 
-var customContentTags = ['photo', 'gallery', 'youtube', 'attachment'];
+// TODO Listen for messages from dialogs
+
+window.addEventListener('message', function(event) {
+  const data = event.data;
+
+  console.log('postMessage event received');
+  console.log(event);
+
+  if (!CKEDITOR.currentInstance || !data.name) {
+    return;
+  }
+
+  switch(data.name) {
+    case "CKEditorInsertShortcode":
+      insertShortcode(data.tagName, data.attributes);
+      break;
+
+    case "CKEditorInsertText":
+      insertPlainText(data.text);
+      break;
+
+    case "CKEditorCloseDialog":
+      // Closing will be called after switch
+      break;
+
+    default:
+      return;
+  }
+
+  // Hide current dialog
+  CKEDITOR.dialog.getCurrent().hide();
+
+  function insertPlainText(text) {
+    CKEDITOR.currentInstance.insertHtml(text);
+  }
+
+  function insertShortcode(tagName, attributes) {
+    const customTagName = convertTagNameToCustomTag(tagName),
+          element = CKEDITOR.document.createElement(customTagName, {attributes: attributes})
+
+    CKEDITOR.currentInstance.insertHtml(element.getOuterHtml());
+  }
+});
+
+
+function makeRandomEditorDialogName() {
+  let text = "";
+  const possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+
+  for (let i = 0; i < 8; i++)
+    text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+  return text;
+}
 
 function objectToQueryString(obj) {
-  var out = [];
+  let out = [];
 
-  for (var key in obj) {
+  for (let key in obj) {
     if (obj.hasOwnProperty(key)) {
       out.push(key + '=' + encodeURIComponent(obj[key]));
     }
@@ -16,30 +69,31 @@ function objectToQueryString(obj) {
   return out.join('&');
 }
 
-function getFakeObjectClassName(tagName) {
-  return "shortcode-" + tagName + "-fake-object";
-}
-
-function getBasePluginUrl(tagName) {
+function convertTagNameToCustomTag(tagName) {
   // Dirty hack for stupid CKEditor
-  if (tagName === "photo") {
-    tagName = "image";
+  if (tagName === "image") {
+    tagName = "photo";
   }
 
-  return '/admin/shortcodes/' + tagName + '/';
+  return tagName;
 }
 
-function makeFakeObjectSrc(attributes, tagName) {
-  //console.log(arguments);
-  return getBasePluginUrl(tagName) + 'wysiwyg-preview/?' + objectToQueryString(attributes);
+function getBaseUrl() {
+  return '/admin/shortcodes/';
 }
 
-function makeIndexUrl(editor, tagName) {
-  //console.log(arguments);
-  var entity = editor.config.contentEntityName || null,
-      itemID = editor.config.contentEntityItemID || null;
+function getBasePluginUrl(customTag) {
+  const tagName = convertCustomTagToTagName(customTag);
 
-  var url = getBasePluginUrl(tagName);
+  return getBaseUrl() + tagName + '/';
+}
+
+function makeEditorIndexUrl(editor, tagName) {
+  //console.log(arguments);
+  const entity = editor.config.contentEntityName || null,
+        itemID = editor.config.contentEntityItemID || null;
+
+  let url = getBasePluginUrl(tagName);
 
   if (entity) {
     url += entity + '/';
@@ -52,14 +106,33 @@ function makeIndexUrl(editor, tagName) {
   return url;
 }
 
+function makeEditUrl(tagName, attributes) {
+  return getBasePluginUrl(tagName) + 'edit/?' + objectToQueryString(attributes);
+}
+
+function makeFakeObjectSrc(attributes, tagName) {
+  //console.log(arguments);
+  return getBasePluginUrl(tagName) + 'wysiwyg-preview/?' + objectToQueryString(attributes);
+}
+
+function getFakeObjectClassName(tagName) {
+  return "shortcode-" + tagName + "-fake-object";
+}
+
+function convertCustomTagToTagName(customTag) {
+  // Dirty hack for stupid CKEditor
+  if (customTag === "photo") {
+    customTag = "image";
+  }
+
+  return customTag;
+}
 
 // TODO Replace with AMD module or remove and use CKEditor event bus
 // Helper for holding functions
-//CKEDITOR["shortcodes"] = {};
-
-CKEDITOR["shortcodes"] = {
+CKEDITOR.shortcodes = {
   createFakeParserObject: function (editor, realNode, tagName) {
-    var obj = editor.createFakeParserElement(realNode, getFakeObjectClassName(tagName), tagName, true);
+    let obj = editor.createFakeParserElement(realNode, getFakeObjectClassName(tagName), tagName, true);
 
     obj.attributes.src = makeFakeObjectSrc(realNode.attributes, tagName);
 
@@ -68,182 +141,318 @@ CKEDITOR["shortcodes"] = {
   //createDomElement: function (tagName) {
   //  return new CKEDITOR.dom.element(tagName);
   //},
-  createFakeObject: function (editor, realNode, tagName) {
+  createFakeObject: function (editor, realNode, customTagName) {
     // realNode.setName(tagName);
-    var obj = editor.createFakeElement(realNode, getFakeObjectClassName(tagName), tagName, true);
+    let obj = editor.createFakeElement(realNode, getFakeObjectClassName(customTagName), customTagName, true);
 
-    var src = makeFakeObjectSrc(realNode.attributes, tagName);
+    console.log(realNode);
 
-    obj.setAttribute('src', src);
+    obj.setAttribute('src', makeFakeObjectSrc(realNode.getAttributes(), customTagName));
+
     return obj;
   }
 };
-
 
 CKEDITOR.plugins.add('shortcodes', {
   //icons: pluginName,
   requires: ['iframedialog', 'fakeobjects'],
   init: function (editor) {
 
-    customContentTags.map(function (tagName) {
-      initAbstractPlugin(tagName, editor);
+    // TODO Get from editor HTML tag "data-*" attribute
+    editor.config.customContentElementsTags = ['image', 'gallery', 'youtube', 'attachment'];
+
+    /**
+     * @link https://stackoverflow.com/questions/3437786/get-the-size-of-the-screen-current-web-page-and-browser-window
+     */
+    const width = window.innerWidth
+      || document.documentElement.clientWidth
+      || document.body.clientWidth;
+
+    const height = window.innerHeight
+      || document.documentElement.clientHeight
+      || document.body.clientHeight;
+
+    const iFrameHeight = height - 250,
+          iFrameWidth  = width - 250;
+
+    const staticShortcodesIframeName = 'StaticShortcodesIFrame';
+
+    // Static shortcodes listing
+    CKEDITOR.dialog.addIframe(
+      staticShortcodesIframeName,
+      'Static shortcodes',
+      getBaseUrl(), iFrameWidth, iFrameHeight,
+      function () {}, // Iframe loaded callback
+      {buttons: []} // CKEDITOR.dialog.okButton
+    );
+
+    // Static shortcodes dialog command
+    editor.addCommand(staticShortcodesIframeName, new CKEDITOR.dialogCommand(staticShortcodesIframeName));
+
+    // Static shortcodes button
+    editor.ui.addButton('shortcodes', {
+      label: 'Plain shortcodes',
+      command: staticShortcodesIframeName,
+      //toolbar: 'insert',
+      icon: "plugins/shortcodes/icons/shortcodes.png"
     });
+
+    // Init content element plugins
+    editor.config.customContentElementsTags.map(function (tagName) {
+      initConcreteShortcodePlugin(tagName, editor);
+    });
+
+    function initConcreteShortcodePlugin(tagName, editor) {
+      const pluginName               = tagName + 'Shortcode',
+            editorIndexIframeName    = pluginName + 'EditorIndexIFrame';
+
+      // shortcodes listing
+      CKEDITOR.dialog.addIframe(
+        editorIndexIframeName,
+        'Content Shortcode Editor - [' + tagName + ']',
+        makeEditorIndexUrl(editor, tagName), iFrameWidth, iFrameHeight,
+        function () {}, // Iframe loaded callback.
+        {buttons: []} // CKEDITOR.dialog.okButton
+      );
+
+      // Elements listing command
+      editor.addCommand(editorIndexIframeName, new CKEDITOR.dialogCommand(editorIndexIframeName));
+
+      // Double click on fake object
+      editor.on('doubleclick', function (evt) {
+        const element = evt.data.element;
+
+        if (!element || element.isReadOnly()) {
+          return;
+        }
+
+        //console.log(evt);
+
+        const elementCustomTag = element.data('cke-real-element-type'),
+              pluginCustomTag  = convertTagNameToCustomTag(tagName);
+
+        //console.log(selection, element);
+        //console.log(elementCustomTag, pluginCustomTag);
+
+        // Exit if selected element is not acceptable by plugin
+        if (elementCustomTag !== pluginCustomTag) {
+          return;
+        }
+
+        this.fakeObject = element;
+        this.realNode = editor.restoreRealElement(this.fakeObject);
+
+        const editIframeName = makeRandomEditorDialogName(),
+              realAttributes = this.realNode.getAttributes();
+
+        // Shortcode index
+        CKEDITOR.dialog.addIframe(
+          editIframeName,
+          'Content Shortcode Editor - [' + tagName + ']',
+          makeEditUrl(tagName, realAttributes), iFrameWidth, iFrameHeight,
+          function () {
+          }, // Iframe loaded callback.
+          {buttons: []} // CKEDITOR.dialog.okButton
+        );
+
+        console.log('using dialog ' + editIframeName + " with attributes", realAttributes);
+
+        evt.data.dialog = editIframeName;
+
+        //const selection = editor.getSelection();
+        //
+        //console.log('realNode on show', this.realNode);
+        //
+        //selection.lock();
+        //
+        //selection.unlock();
+        //
+        //CKEDITOR["shortcodes"].createFakeObject(editor, this.realNode, pluginCustomTag).replace(this.fakeObject);
+
+
+        //editor.insertHTML();
+
+        //this.setupContent(this.realNode);
+
+        //var oldWidth  = parseInt(realNode.getAttribute('width')),
+        //    oldHeight = parseInt(realNode.getAttribute('height')),
+        //    scale     = oldWidth / oldHeight;
+        //
+        //// Пересчитываем высоту элемента исходя из пропорций
+        //var newWidth  = this.getValue(),
+        //    newHeight = newWidth / scale;
+        //
+        //realNode.setAttribute('width', newWidth);
+        //
+        //if (newHeight && !isNaN(newHeight)) {
+        //  realNode.setAttribute('height', newHeight);
+        //}
+
+      });
+
+      // Кнопка на панели управления
+      editor.ui.addButton(tagName, {
+        label: "[" + tagName + "]",
+        command: editorIndexIframeName,
+        //toolbar: 'insert',
+        icon: "plugins/shortcodes/icons/" + tagName + ".png"
+      });
+
+    }
 
   },
 
   afterInit: function (editor) {
-    var dataProcessor = editor.dataProcessor,
-        dataFilter    = dataProcessor && dataProcessor.dataFilter;
+    const dataProcessor = editor.dataProcessor,
+          dataFilter    = dataProcessor && dataProcessor.dataFilter;
 
     if (dataFilter) {
-      var tagsRulesElements = {};
+      const tagsRulesElements = {};
 
-      customContentTags.map(function (tagName) {
-        tagsRulesElements[tagName] = function (element) {
-          return CKEDITOR["shortcodes"].createFakeParserObject(editor, element, tagName);
+      editor.config.customContentElementsTags.map(function (tagName) {
+        const customTag = convertTagNameToCustomTag(tagName);
+        tagsRulesElements[customTag] = function (element) {
+          return CKEDITOR.shortcodes.createFakeParserObject(editor, element, customTag);
         };
       });
 
-      // Создаем правило замены тега на fake element
+      // Replace custom tags with fake element
       dataFilter.addRules({elements: tagsRulesElements});
     }
   }
 
 });
 
-function initAbstractPlugin(tagName, editor) {
-  var pluginName           = 'customTag' + tagName,
-      iFrameDialogName     = pluginName + 'IFrameDialog',
-      propertiesDialogName = pluginName + 'PropertiesDialog';
-
-  var iFrameHeight = 500,
-      iFrameWidth  = 1115;
-
-  // Диалоговое окно с айфреймом админки
-  CKEDITOR.dialog.addIframe(
-    iFrameDialogName,
-    'Content Photo', // TODO
-    makeIndexUrl(editor, tagName), iFrameWidth, iFrameHeight,
-    function () {
-      // Iframe loaded callback.
-    }
-    //,
-    //{
-    //  buttons: [] // CKEDITOR.dialog.okButton
-    //}
-  );
-
-  // Диалоговое окно со свойствами элемента
-  CKEDITOR.dialog.add(propertiesDialogName, function (editor) {
-    return {
-      title: 'Свойства изображения', // TODO
-      minWidth: 400,
-      minHeight: 70,
-
-      contents: [
-        {
-          id: 'tab-basic',
-          label: 'Основные свойства',
-          elements: [
-            {
-              type: 'text',
-              id: 'width',
-              label: 'Ширина',
-              validate: CKEDITOR.dialog.validate.notEmpty("Width field cannot be empty."),
-              setup: function (realNode) {
-                this.setValue(parseInt(realNode.getAttribute('width')));
-              },
-              commit: function (realNode) {
-                var oldWidth  = parseInt(realNode.getAttribute('width')),
-                    oldHeight = parseInt(realNode.getAttribute('height')),
-                    scale     = oldWidth / oldHeight;
-
-                // Пересчитываем высоту элемента исходя из пропорций
-                var newWidth  = this.getValue(),
-                    newHeight = newWidth / scale;
-
-                realNode.setAttribute('width', newWidth);
-
-                if (newHeight && !isNaN(newHeight)) {
-                  realNode.setAttribute('height', newHeight);
-                }
-              }
-            }
-          ]
-        }
-      ],
-      onShow: function () {
-        this.fakeObject = this.realNode = null;
-
-        var selection = editor.getSelection(),
-            element   = selection.getStartElement();
-
-        // Если элемент выбран и это наш элемент
-        if (element && element.data('cke-real-element-type') === tagName) {
-          this.fakeObject = element;
-          this.realNode = editor.restoreRealElement(this.fakeObject);
-
-          // console.log('realNode on show', this.realNode);
-
-          this.setupContent(this.realNode);
-        } else {
-          throw new Error('Unknown node type');
-        }
-      },
-      onOk: function () {
-        if (this.fakeObject) {
-          // console.log('realNode before commit', this.realNode);
-
-          this.commitContent(this.realNode);
-
-          // console.log('realNode after commit', this.realNode);
-
-          // Создаём новый фейковый объект и заменяем им старый (это единственный способ, который работает с гадским CKEditor)
-          CKEDITOR["shortcodes"].createFakeObject(editor, this.realNode, tagName)
-            .replace(this.fakeObject);
-        }
-      }
-    };
-  });
 
 
-  // Команда для открытия админки со списком элементов
-  editor.addCommand(iFrameDialogName, new CKEDITOR.dialogCommand(iFrameDialogName));
 
-  // Команда для открытия окна со свойствами
-  editor.addCommand(propertiesDialogName, new CKEDITOR.dialogCommand(propertiesDialogName));
+//// Диалоговое окно со свойствами элемента
+//CKEDITOR.dialog.add(propertiesDialogName, function (editor) {
+//  return {
+//    title: 'Свойства изображения', // TODO
+//    minWidth: 400,
+//    minHeight: 70,
+//
+//    contents: [
+//      {
+//        id: 'tab-basic',
+//        label: 'Основные свойства',
+//        elements: [
+//          {
+//            type: 'text',
+//            id: 'width',
+//            label: 'Ширина',
+//            validate: CKEDITOR.dialog.validate.notEmpty("Width field cannot be empty."),
+//            setup: function (realNode) {
+//              this.setValue(parseInt(realNode.getAttribute('width')));
+//            },
+//            commit: function (realNode) {
+//            }
+//          }
+//        ]
+//      }
+//    ],
+//    onShow: function () {
+//      this.fakeObject = this.realNode = null;
+//
+//      var selection = editor.getSelection(),
+//          element   = selection.getStartElement();
+//
+//      // Если элемент выбран и это наш элемент
+//      if (element && element.data('cke-real-element-type') === customTag) {
+//        this.fakeObject = element;
+//        this.realNode = editor.restoreRealElement(this.fakeObject);
+//
+//        // console.log('realNode on show', this.realNode);
+//
+//        this.setupContent(this.realNode);
+//      } else {
+//        throw new Error('Unknown node type');
+//      }
+//    },
+//    onOk: function () {
+//      if (this.fakeObject) {
+//        // console.log('realNode before commit', this.realNode);
+//
+//        this.commitContent(this.realNode);
+//
+//        // console.log('realNode after commit', this.realNode);
+//
+//        // Создаём новый фейковый объект и заменяем им старый (это единственный способ, который работает с гадским CKEditor)
+//        CKEDITOR["shortcodes"].createFakeObject(editor, this.realNode, tagName)
+//          .replace(this.fakeObject);
+//      }
+//    }
+//  };
+//});
 
-  // Контекстное меню
-  if (editor.contextMenu) {
-    var contextMenuGroup = tagName + 'Group',
-        contextMenuItem  = tagName + 'PropertiesItem';
 
-    editor.addMenuGroup(contextMenuGroup);
-    editor.addMenuItem(contextMenuItem, {
-      label: 'Свойства', // TODO
-      icon: 'sourcedialog', // this.path + 'images/icon.png',
-      command: iFrameDialogName,
-      group: contextMenuGroup
-    });
+//// Контекстное меню
+//if (editor.contextMenu) {
+//  var contextMenuGroup = tagName + 'Group',
+//      contextMenuItem  = tagName + 'PropertiesItem';
+//
+//  editor.addMenuGroup(contextMenuGroup);
+//  editor.addMenuItem(contextMenuItem, {
+//    label: 'Свойства',
+//    icon: 'sourcedialog', // this.path + 'images/icon.png',
+//    command: editIframeName,
+//    group: contextMenuGroup
+//  });
+//
+//  var fakeObjectClassName = getFakeObjectClassName(tagName);
+//
+//  editor.contextMenu.addListener(function (element) {
+//    if (element.hasClass(fakeObjectClassName)) {
+//      var output = {};
+//      output[contextMenuItem] = CKEDITOR.TRISTATE_OFF;
+//      return output;
+//    }
+//  });
+//}
 
-    var fakeObjectClassName = getFakeObjectClassName(tagName);
 
-    editor.contextMenu.addListener(function (element) {
-      if (element.hasClass(fakeObjectClassName)) {
-        var output = {};
-        output[contextMenuItem] = CKEDITOR.TRISTATE_OFF;
-        return output;
-      }
-    });
-  }
+//if (element.is('a')) {
+//  evt.data.dialog = (element.getAttribute('name') && (!element.getAttribute('href') || !element.getChildCount())) ? 'anchor' : 'link';
+//  editor.getSelection().selectElement(element);
+//}
+//else if (CKEDITOR.plugins.link.tryRestoreFakeAnchor(editor, element))
+//  evt.data.dialog = 'anchor';
 
-  // Кнопка на панели управления
-  editor.ui.addButton(tagName, {
-    label: tagName,
-    command: iFrameDialogName,
-    toolbar: 'insert',
-    icon: tagName
-    // icon: this.path + 'images/icon.png'
-  });
 
-}
+//// Edit shortcode iframe
+//editor.addCommand(editIframeName, new CKEDITOR.dialogCommand(editIframeName));
+
+//// Команда для открытия окна со свойствами
+//editor.addCommand(propertiesDialogName, new CKEDITOR.dialogCommand(propertiesDialogName));
+//
+//var testDialog = 'testDialog';
+//
+//function genCommand() {
+//  return {
+//    exec: function (editor) {
+//      //editor.insertHtml( "you pressed" );
+//
+//      var selection = editor.getSelection(),
+//          element   = selection.getStartElement();
+//
+//      console.log(selection, element);
+//      console.log(element.data('cke-real-element-type'));
+//
+//      // Если элемент выбран и это наш элемент
+//      if (element && element.data('cke-real-element-type') === customTag) {
+//        this.fakeObject = element;
+//        this.realNode = editor.restoreRealElement(this.fakeObject);
+//
+//        console.log('realNode on show', this.realNode);
+//
+//        //this.setupContent(this.realNode);
+//      } else {
+//        throw new Error('Unknown node type');
+//      }
+//
+//    }
+//  }
+//}
+//
+//editor.addCommand(testDialog, genCommand());

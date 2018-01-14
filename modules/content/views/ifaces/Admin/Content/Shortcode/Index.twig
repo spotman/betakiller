@@ -1,31 +1,64 @@
 {% extends layout %}
 
 {% block page_content %}
+  {{ js("ifaces/admin/shortcode-editor/shortcode-index.js") }}
+
+  {#
+  {% set colors = {
+    "Image": "blue",
+    "Gallery": "pink",
+    "Youtube": "red",
+    "Attachment": "grey",
+  } %}
 
   <div class="row">
-    <div class="col s12">
-      <a href="{{ createUrl|default('#') }}" class="btn right">Create shortcode</a>
-    </div>
+    {% for shortcode in primary_shortcodes %}
+      {% set color = colors[shortcode.codename] %}
+      <div class="col s12 m6 l3 xl3">
+        <div class="primary-shortcode-item">
+          <a href="{{ shortcode.url }}" class="btn btn-large btn {{ color }}">[{{ shortcode.tag_name }}]</a>
+        </div>
+      </div>
+    {% endfor %}
   </div>
+  #}
 
   <div class="row">
-    <div class="col s12">
-
-      <table class="responsive-table bordered highlight">
-        <tr>
-          <th>Tag</th>
-          <th>Codename</th>
-        </tr>
-
-        {% for shortcode in shortcodes %}
-          <tr>
-            <th><a href="{{ shortcode.url }}">[{{ shortcode.tag_name }}]</a></th>
-            <th><a href="{{ shortcode.url }}">{{ shortcode.codename }}</a></th>
-          </tr>
-        {% endfor %}
-      </table>
-
-    </div>
+    {% for shortcode in other_shortcodes %}
+      <div class="col s12 m6 l6 xl4 center-align">
+        <button class="btn btn-flat btn-large static-shortcode">
+          {{ "[" ~ shortcode.tag_name ~ " /]" }}
+        </button>
+      </div>
+    {% endfor %}
   </div>
+
+  {#<style>#}
+    {#.primary-shortcode-item {#}
+      {#text-align: center;#}
+      {#padding-top: 25px;#}
+      {#padding-bottom: 25px;#}
+      {#/*height: 100px;*/#}
+    {#}#}
+
+    {#/*.primary-shortcode-item::before {*/#}
+      {#/*content: "";*/#}
+      {#/*display: block;*/#}
+      {#/*height: 0;*/#}
+      {#/*width: 100%;*/#}
+      {#/*padding-top: 100%;*/#}
+    {#/*}*/#}
+
+    {#.primary-shortcode-item a {#}
+      {#/*display: block;*/#}
+      {#/*position: absolute;*/#}
+      {#/*top: 50%;*/#}
+      {#/*left: auto;*/#}
+      {#/*right: auto;*/#}
+      {#/*margin-left: auto;*/#}
+      {#/*margin-right: auto;*/#}
+    {#}#}
+
+  {#</style>#}
 
 {% endblock %}

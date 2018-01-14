@@ -815,6 +815,11 @@ class Task_Content_Import_Wordpress extends AbstractTask
         // Removing <img /> tag
         $captionText = trim(strip_tags($s->getContent()));
 
+        // Convert old full-size images to responsive images
+        if (isset($attributes['width']) && (int)$attributes['width'] === 780) { // TODO move 780 to config
+            unset($attributes['width']);
+        }
+
         // Do not use height, it would be calculated automatically in the widget
         unset($attributes['height']);
 
@@ -1042,7 +1047,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
         );
 
         // Convert old full-size images to responsive images
-        if (isset($attributes['width']) && $attributes['width'] === 780) { // TODO move 780 to config
+        if (isset($attributes['width']) && (int)$attributes['width'] === 780) { // TODO move 780 to config
             unset($attributes['width']);
         }
 

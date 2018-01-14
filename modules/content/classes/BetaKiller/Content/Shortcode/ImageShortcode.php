@@ -152,7 +152,7 @@ class ImageShortcode extends AbstractContentElementShortcode
         ];
 
         return [
-            'layout'   => $this->getAttribute(self::ATTR_LAYOUT) ?? self::LAYOUT_DEFAULT,
+            'layout'   => $this->getAttribute(ContentElementShortcodeInterface::ATTR_LAYOUT) ?? self::LAYOUT_DEFAULT,
             'zoomable' => $this->isZoomable(),
 
             'caption' => $title,

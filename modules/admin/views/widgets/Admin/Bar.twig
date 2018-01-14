@@ -15,7 +15,7 @@
               <li>
                 <a href="#!" data-href="{{ primaryEntity.previewUrl }}" class="preview-entity-button" target="_blank">
                   <i class="material-icons left tiny">visibility</i>
-                  {{ "admin.bar.preview"|i18n }}
+                  <span class="hide-on-med-and-down">{{ "admin.bar.preview"|i18n }}</span>
                 </a>
               </li>
             {% endif %}
@@ -24,7 +24,7 @@
               <li>
                 <a href="{{ primaryEntity.adminUrl }}" class="edit-entity-button">
                   <i class="material-icons left tiny">mode_edit</i>
-                  {{ "admin.bar.edit"|i18n }}
+                  <span class="hide-on-med-and-down">{{ "admin.bar.edit"|i18n }}</span>
                 </a>
               </li>
             {% endif %}
@@ -33,7 +33,7 @@
               <li>
                 <a href="{{ primaryEntity.publicUrl }}" class="view-entity-button">
                   <i class="material-icons left tiny">done_all</i>
-                  {{ "admin.bar.public"|i18n }}
+                  <span class="hide-on-med-and-down">{{ "admin.bar.public"|i18n }}</span>
                 </a>
               </li>
             {% endif %}
@@ -45,7 +45,7 @@
             <li>
               <a href="#!" data-activates="admin-bar-create-dropdown" data-hover="true" data-constrainWidth="false" data-belowOrigin="true" class="dropdown-button">
                 <i class="material-icons left">note_add</i>
-                {{ "admin.bar.create"|i18n }}
+                <span class="hide-on-med-and-down">{{ "admin.bar.create"|i18n }}</span>
               </a>
 
               <ul id="admin-bar-create-dropdown" class="dropdown-content">
@@ -60,7 +60,7 @@
             <li>
               <a href="{{ comments.url }}">
                 <i class="material-icons left tiny">chat</i>
-                {{ "admin.bar.comments"|i18n }}
+                <span class="hide-on-med-and-down">{{ "admin.bar.comments"|i18n }}</span>
                 {% if comments.count %}
                 <span class="new badge orange" data-badge-caption="{{ "admin.bar.comments.new.badge"|plural(comments.count) }}">
                   {{ comments.count }}

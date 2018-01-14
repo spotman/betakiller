@@ -2,7 +2,7 @@
 namespace BetaKiller\Model;
 
 
-interface EntityModelInterface extends HasLabelInterface
+interface EntityModelInterface extends DispatchableEntityInterface, HasLabelInterface
 {
     public const URL_CONTAINER_KEY = 'Entity';
     public const URL_KEY = 'slug';

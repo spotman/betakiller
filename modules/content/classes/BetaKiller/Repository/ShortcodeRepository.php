@@ -18,12 +18,46 @@ class ShortcodeRepository extends AbstractConfigBasedDispatchableRepository
     /**
      * @param string $tagName
      *
-     * @return \BetaKiller\Content\Shortcode\ShortcodeEntity
+     * @return \BetaKiller\Content\Shortcode\ShortcodeEntityInterface
      * @throws \BetaKiller\Repository\RepositoryException
      */
-    public function findByTagName(string $tagName): ShortcodeEntity
+    public function findByTagName(string $tagName): ShortcodeEntityInterface
     {
-        return $this->findByOptionValue(ShortcodeEntityInterface::OPTION_TAG_NAME, $tagName);
+        return $this->findOneByOptionValue(ShortcodeEntityInterface::OPTION_TAG_NAME, $tagName);
+    }
+
+    /**
+     * @return \BetaKiller\Content\Shortcode\ShortcodeEntityInterface[]
+     */
+    public function getContentElementShortcodes(): array
+    {
+        return $this->findByType(ShortcodeEntityInterface::TYPE_CONTENT_ELEMENT);
+    }
+
+    /**
+     * @return \BetaKiller\Content\Shortcode\ShortcodeEntityInterface[]
+     */
+    public function getStaticShortcodes(): array
+    {
+        return $this->findByType(ShortcodeEntityInterface::TYPE_STATIC);
+    }
+
+    /**
+     * @return \BetaKiller\Content\Shortcode\ShortcodeEntityInterface[]
+     */
+    public function getDynamicShortcodes(): array
+    {
+        return $this->findByType(ShortcodeEntityInterface::TYPE_DYNAMIC);
+    }
+
+    /**
+     * @param string $type
+     *
+     * @return \BetaKiller\Content\Shortcode\ShortcodeEntityInterface[]
+     */
+    protected function findByType(string $type): array
+    {
+        return $this->findAllByOptionValue(ShortcodeEntityInterface::OPTION_TYPE, $type);
     }
 
     protected function getItemsListConfigKey(): array

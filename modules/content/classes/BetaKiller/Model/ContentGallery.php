@@ -19,13 +19,6 @@ class ContentGallery extends ORM implements ContentGalleryInterface
 
         $this->initializeEntityRelation();
 
-//        $this->belongs_to([
-//            'uploaded_by_user' => [
-//                'model'       => 'User',
-//                'foreign_key' => 'uploaded_by',
-//            ],
-//        ]);
-
         $this->has_many([
             'images' => [
                 'model'       => 'ContentImage',
@@ -36,11 +29,6 @@ class ContentGallery extends ORM implements ContentGalleryInterface
         ]);
 
         parent::_initialize();
-    }
-
-    private function hasImages(): bool
-    {
-        return $this->count_relations('images') > 0;
     }
 
     private function imagesAreValid(): bool
