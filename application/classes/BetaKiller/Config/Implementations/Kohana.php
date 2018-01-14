@@ -5,7 +5,7 @@ use BetaKiller\Config\ConfigProviderInterface;
 
 abstract class Kohana implements ConfigProviderInterface
 {
-    const KEY_SEPARATOR = '.';
+    public const KEY_SEPARATOR = '.';
 
     /**
      * @param array $group

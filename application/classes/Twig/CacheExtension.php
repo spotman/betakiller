@@ -11,7 +11,7 @@ class Twig_CacheExtension extends CacheExtension
 {
     public function __construct()
     {
-        if (Kohana::in_production(TRUE))
+        if (Kohana::inProduction(TRUE))
         {
             $cacheProvider  = new DoctrineCacheAdapter(new ArrayCache());
             $lifetimeCacheStrategy  = new LifetimeCacheStrategy($cacheProvider);

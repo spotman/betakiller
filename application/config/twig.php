@@ -12,7 +12,7 @@ return array(
         /**
          * Enable caching of directories list
          */
-        'cache' =>  Kohana::in_production(TRUE),
+        'cache' =>  Kohana::inProduction(TRUE),
 
         /**
          * Namespaces to add
@@ -40,8 +40,8 @@ return array(
 	 * http://twig.sensiolabs.org/doc/api.html#environment-options
 	 */
 	'environment' => array(
-		'auto_reload'         => !Kohana::in_production(TRUE),
-		'debug'               => !Kohana::in_production(),
+		'auto_reload'         => !Kohana::inProduction(TRUE),
+		'debug'               => !Kohana::inProduction(),
 		'autoescape'          => 'html',
         'cache'               => MultiSite::instance()->getWorkingPath().DIRECTORY_SEPARATOR.'cache'.DIRECTORY_SEPARATOR.'twig',
 		'optimizations'       => -1,

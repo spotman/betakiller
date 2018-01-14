@@ -1,5 +1,9 @@
 <?php
 
+use BetaKiller\Config\ConfigGroupInterface;
+use BetaKiller\Config\ConfigProviderInterface;
+use BetaKiller\Exception;
+
 /**
  * Class Assets
  */
@@ -15,18 +19,28 @@ class Assets
      */
     protected $css;
 
-    protected $_config;
+    /**
+     * @var ConfigGroupInterface
+     */
+    protected $config;
+
+    /**
+     * @var \BetaKiller\Config\ConfigProviderInterface
+     */
+    private $configProvider;
 
     /**
      * Assets constructor.
      *
-     * @param \JS  $js
-     * @param \CSS $css
+     * @param \JS                                        $js
+     * @param \CSS                                       $css
+     * @param \BetaKiller\Config\ConfigProviderInterface $configProvider
      */
-    public function __construct(\JS $js, \CSS $css)
+    public function __construct(\JS $js, \CSS $css, ConfigProviderInterface $configProvider)
     {
-        $this->js  = $js;
-        $this->css = $css;
+        $this->js             = $js;
+        $this->css            = $css;
+        $this->configProvider = $configProvider;
     }
 
     /**
@@ -34,6 +48,7 @@ class Assets
      *
      * @return $this
      * @throws \HTTP_Exception_500
+     * @throws \BetaKiller\Exception
      */
     public function add(string $name): Assets
     {
@@ -43,13 +58,11 @@ class Assets
         if (method_exists($this, $methodName)) {
             $this->$methodName();
         } else {
-            $config = $this->config()->get($name);
+            $config = $this->config()[$name];
 
             if (!$config) {
-                throw new HTTP_Exception_500('Unknown asset :name', [':name' => $name]);
+                throw new Exception('Unknown asset :name', [':name' => $name]);
             }
-
-            // TODO process dependencies
 
             if (isset($config['js'])) {
                 $this->processStatic($this->js, $methodName, $config['js']);
@@ -63,13 +76,21 @@ class Assets
         return $this;
     }
 
-    protected function config()
+    /**
+     * @return array
+     * @throws \BetaKiller\Exception
+     */
+    protected function config(): array
     {
-        if (!$this->_config) {
-            $this->_config = Kohana::config('assets');
+        if (!$this->config) {
+            $this->config = $this->configProvider->load(['assets']);
+
+            if (!$this->config) {
+                throw new Exception('Missing assets config');
+            }
         }
 
-        return $this->_config;
+        return $this->config->as_array();
     }
 
     /**

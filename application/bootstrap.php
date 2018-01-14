@@ -95,8 +95,8 @@ Cookie::$salt = 'hd398gfhk75403lnvrfe8d10gg';
  * saying "Couldn't find constant Kohana::<INVALID_ENV_NAME>"
  */
 
-Kohana::$environment_string = strtolower(getenv('KOHANA_ENV') ?: 'development');
-Kohana::$environment        = constant('Kohana::'.strtoupper(Kohana::$environment_string));
+Kohana::$environmentString = strtolower(getenv('KOHANA_ENV') ?: 'development');
+Kohana::$environment       = constant('Kohana::'.strtoupper(Kohana::$environmentString));
 
 /**
  * Attach a file reader to config. Multiple readers are supported.
@@ -107,7 +107,7 @@ Kohana::$config->attach(new Config_File);
 /**
  * Attach the environment specific configuration file reader
  */
-Kohana::$config->attach(new Config_File('config/environments/'.Kohana::$environment_string));
+Kohana::$config->attach(new Config_File('config/environments/'.Kohana::$environmentString));
 
 
 /**

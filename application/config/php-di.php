@@ -49,7 +49,7 @@ return [
         new FilesystemCache(implode(DIRECTORY_SEPARATOR, [$workingPath, 'cache', 'php-di'])),
     ]),
 
-    'namespace' => ($workingName ?: 'core').'-php-di-'.\Kohana::$environment_string,
+    'namespace' => ($workingName ?: 'core').'-php-di-'.\Kohana::$environmentString,
 
     'annotations' => true,
     'autowiring'  => true,

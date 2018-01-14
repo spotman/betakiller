@@ -22,7 +22,7 @@ class AppEnv
      */
     public function inProduction($useStaging = null): bool
     {
-        return Kohana::in_production((bool)$useStaging);
+        return Kohana::inProduction((bool)$useStaging);
     }
 
     public function inDevelopmentMode(): bool
@@ -52,7 +52,7 @@ class AppEnv
 
     public function getModeName(): string
     {
-        return Kohana::$environment_string;
+        return Kohana::$environmentString;
     }
 
     public function isCLI(): bool
