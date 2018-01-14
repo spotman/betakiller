@@ -2,8 +2,8 @@
 
 return array(
 
-    'ddd'                   => MODPATH.'ddd',                   // Interfaces and classes for DDD
     'core'                  => MODPATH.'core',                  // Core interfaces and classes
+    'ddd'                   => MODPATH.'ddd',                   // Interfaces and classes for DDD
     'helper'                => MODPATH.'helper',                // Common helpers without external dependencies
 
     // Place it first for correct initialization of per-site classes and configs

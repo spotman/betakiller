@@ -4,7 +4,7 @@ namespace BetaKiller\DI;
 use DI\FactoryInterface;
 use DI\InvokerInterface;
 
-interface ContainerInterface extends \Interop\Container\ContainerInterface, FactoryInterface, InvokerInterface
+interface ContainerInterface extends \Psr\Container\ContainerInterface, FactoryInterface, InvokerInterface
 {
     /**
      * Inject all dependencies on an existing instance.
