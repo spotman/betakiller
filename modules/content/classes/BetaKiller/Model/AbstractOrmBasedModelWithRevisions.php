@@ -1,7 +1,6 @@
 <?php
 namespace BetaKiller\Model;
 
-use BetaKiller\Content\SimpleDiff;
 use BetaKiller\Exception;
 use DateTime;
 
