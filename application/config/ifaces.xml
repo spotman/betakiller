@@ -6,7 +6,7 @@
     <iface uri="change-account" codename="Auth_ReLogin" title="Change account" layoutCodename="auth" hideInSiteMap="true" zone="personal" />
     <!--<iface uri="password-reset" codename="Auth_PasswordReset" title="Reset password" layoutCodename="auth" hideInSiteMap="true" />-->
 
-    <iface uri="admin" codename="Admin_Index" label="Admin" hideInSiteMap="true" zone="admin" aclRules="Admin.enabled" layoutCodename="admin" />
+    <iface uri="admin" codename="Admin_Index" label="Admin" hideInSiteMap="true" zone="admin" layoutCodename="admin" />
 </root>
 
 <!-- TODO убрать этот файл после того как будет настроено нормальное дерево интерфейсов -->

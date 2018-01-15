@@ -1,7 +1,7 @@
 <?php
 namespace BetaKiller\Error;
 
-
+use BetaKiller\Exception;
 use BetaKiller\Exception\ExceptionHandlerInterface;
 use BetaKiller\Exception\HttpExceptionExpectedInterface;
 use BetaKiller\Exception\HttpExceptionInterface;
@@ -35,7 +35,7 @@ class ExceptionHandler implements ExceptionHandlerInterface
     /**
      * Exception counter for preventing recursion
      */
-    private static $_counter = 0;
+    private static $counter = 0;
 
     /**
      * ExceptionHandler constructor.
@@ -51,12 +51,17 @@ class ExceptionHandler implements ExceptionHandlerInterface
         $this->ifaceProvider = $ifaceProvider;
     }
 
+    /**
+     * @param \Throwable $exception
+     *
+     * @return \Response
+     */
     public function handle(\Throwable $exception): Response
     {
-        static::$_counter++;
+        self::$counter++;
 
-        if (static::$_counter > 10) {
-            $this->logger->alert('Too much exceptions (recursion)');
+        if (self::$counter > 10) {
+            $this->logger->alert('Too much exceptions (recursion, see below)');
             $this->logException($this->logger, $exception);
             die();
         }
@@ -83,13 +88,13 @@ class ExceptionHandler implements ExceptionHandlerInterface
         // Make nice message if allowed or use default Kohana response
         $response = $this->makeNiceMessage($exception) ?: $this->makeDebugResponse($exception);
 
-        static::$_counter--;
+        self::$counter--;
 
         return $response;
     }
 
     /**
-     * Возвращает контент красивого сообщения об ошибке
+     * Returns user-friendly exception page
      *
      * @param \Throwable $exception
      *
@@ -106,39 +111,60 @@ class ExceptionHandler implements ExceptionHandlerInterface
             ? $exception->alwaysShowNiceMessage()
             : false;
 
-        if (!$alwaysShowNiceMessage && !$this->appEnv->inProduction(true)) {
+        $isDebug = $this->appEnv->isDebugEnabled();
+
+        if (!$alwaysShowNiceMessage && $isDebug) {
             return null;
         }
 
         $response = Response::factory();
-        $httpCode = self::getHttpErrorCode($exception);
+        $httpCode = $this->getErrorHttpCode($exception);
 
         try {
             $iface = $this->getErrorIFaceForCode($httpCode);
 
             $body = $iface
-                ? $iface->setException($exception)->render()
-                : $this->renderDefaultMessage($exception);
+                ? $iface->render()
+                : $this->renderFallbackMessage($exception);
 
             $response->status($httpCode)->body($body);
         } catch (\Throwable $e) {
             $this->logException($this->logger, $e);
+
+            if ($isDebug) {
+                $response = $this->makeDebugResponse($e);
+            }
+
             $response->status(500);
         }
 
         return $response;
     }
 
+    /**
+     * Returns developer-friendly exception page
+     *
+     * @param \Throwable $exception
+     *
+     * @return \Response
+     */
     private function makeDebugResponse(\Throwable $exception): Response
     {
         return \Kohana_Exception::response($exception);
     }
 
+    /**
+     * @param int $code
+     *
+     * @return \BetaKiller\IFace\AbstractHttpErrorIFace|null
+     */
     private function getErrorIFaceForCode(int $code): ?AbstractHttpErrorIFace
     {
         // Try to find IFace provided code first and use default IFace if failed
         foreach ([$code, ExceptionInterface::DEFAULT_EXCEPTION_CODE] as $tryCode) {
-            if ($iface = $this->createErrorIFaceFromCode($tryCode)) {
+            $iface = $this->createErrorIFaceFromCode($tryCode);
+
+            if ($iface) {
                 return $iface;
             }
         }
@@ -173,41 +199,85 @@ class ExceptionHandler implements ExceptionHandlerInterface
         return $this->ifaceProvider->fromCodename($codename);
     }
 
-    private function renderDefaultMessage(\Throwable $e): string
+    /**
+     * @param \Throwable $e
+     *
+     * @return string
+     * @throws \BetaKiller\Exception
+     */
+    private function renderFallbackMessage(\Throwable $e): string
     {
-        if ($userMessage = $this->getUserMessage($e)) {
-            // Prevent XSS
-            return htmlspecialchars($userMessage, ENT_QUOTES);
-        }
+        $message = $this->getExceptionMessage($e);
 
-        $key = self::getErrorLabelI18nKey($e);
-
-        return __($key);
+        // Prevent XSS
+        return htmlspecialchars($message, ENT_QUOTES);
     }
 
     /**
      * Returns text which would be shown to user on uncaught exception
-     * For most of exception classes it returns *null* (we do not want to inform user about our problems)
+     * For most of exception classes it returns default label (we do not want to inform user about our problems)
      *
      * @param \Throwable $e
      *
-     * @return null|string
+     * @return string
+     * @throws \BetaKiller\Exception
      */
-    public function getUserMessage(\Throwable $e): ?string
+    public function getExceptionMessage(\Throwable $e): string
     {
-        $show = ($e instanceof ExceptionInterface) && $e->showOriginalMessageToUser();
+        $showOriginalMessage = ($e instanceof ExceptionInterface) && $e->showOriginalMessageToUser();
 
-        return $show ? $e->getMessage() : null;
+        return $showOriginalMessage
+            ? $this->getOriginalMessage($e)
+            : $this->getMaskedMessage($e);
     }
 
-    public static function getErrorLabelI18nKey(\Throwable $e)
+    /**
+     * @param \Throwable $e
+     *
+     * @return string
+     * @throws \BetaKiller\Exception
+     */
+    private function getOriginalMessage(\Throwable $e): string
     {
-        $code = self::getHttpErrorCode($e);
+        $message = $e->getMessage();
 
-        return static::getLabelI18nKeyForCode($code);
+        // Return message if exists
+        if ($message) {
+            return $message;
+        }
+
+        // Use default message if defined
+        $i18nKey = ($e instanceof ExceptionInterface) ? $e->getDefaultMessageI18nKey() : null;
+
+        // Http exceptions may omit message and will use default label instead
+        if (!$i18nKey && $e instanceof HttpExceptionInterface) {
+            $i18nKey = $this->getErrorLabelI18nKey($e);
+        }
+
+        if (!$i18nKey) {
+            throw new Exception('Exception :class must provide message in constructor or define default message', [
+                ':class' => \get_class($e),
+            ]);
+        }
+
+        return __($i18nKey);
     }
 
-    private static function getHttpErrorCode(\Throwable $e)
+    private function getMaskedMessage(\Throwable $e): string
+    {
+        $key = $this->getErrorLabelI18nKey($e);
+
+        return __($key);
+    }
+
+    private function getErrorLabelI18nKey(\Throwable $e)
+    {
+        $code = $this->getErrorHttpCode($e);
+
+        return $this->getLabelI18nKeyForHttpCode($code);
+    }
+
+    private function getErrorHttpCode(\Throwable $e)
     {
         $code = $e->getCode();
 
@@ -216,8 +286,8 @@ class ExceptionHandler implements ExceptionHandlerInterface
             : ExceptionInterface::DEFAULT_EXCEPTION_CODE;
     }
 
-    private static function getLabelI18nKeyForCode(int $code)
+    private function getLabelI18nKeyForHttpCode(int $code)
     {
-        return 'error.'.$code.'.label';
+        return 'error.http.'.$code.'.label';
     }
 }

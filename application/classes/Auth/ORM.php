@@ -1,16 +1,20 @@
 <?php
 
+use BetaKiller\Auth\IncorrectPasswordException;
+use BetaKiller\Auth\UserDoesNotExistsException;
+
 class Auth_ORM extends Kohana_Auth_ORM
 {
     /**
      * Logs a user in.
      *
      * @param   string|\BetaKiller\Model\UserInterface $user
-     * @param   string            $password
-     * @param   boolean           $remember enable autologin
+     * @param   string                                 $password
+     * @param   boolean                                $remember enable autologin
      *
      * @return  boolean
-     * @throws Auth_Exception
+     * @throws \BetaKiller\Auth\IncorrectPasswordException
+     * @throws \BetaKiller\Auth\UserDoesNotExistsException
      */
     protected function _login($user, $password, $remember)
     {
@@ -22,14 +26,14 @@ class Auth_ORM extends Kohana_Auth_ORM
             $user = $orm->searchBy($username);
 
             if (!$user || !$user->loaded()) {
-                throw new Auth_Exception_UserDoesNotExists;
+                throw new UserDoesNotExistsException;
             }
         }
 
         $user->beforeSignIn();
 
         if (!parent::_login($user, $password, $remember)) {
-            throw new Auth_Exception_IncorrectPassword;
+            throw new IncorrectPasswordException;
         }
 
         return true;

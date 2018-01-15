@@ -9,20 +9,21 @@
           <h1 class="center-align">{{ label }}</h1>
         {% endblock %}
 
-        <p class="center-align">{{ message ?: ("error.403.message"|i18n) }}</p>
+        <p class="center-align">{{ "error.http.403.message"|i18n }}</p>
 
         <p class="center-align">
           {% if is_guest %}
             <a href="{{ login_url }}" class="btn btn-large green">
-              {{ "error.403.login_button"|i18n }}
+              {{ "error.http.403.login_button"|i18n }}
             </a>
           {% else %}
-            <a href="#!" class="btn btn-large green" onclick="window.history.back(); return false;">
-              {{ "error.403.back_button"|i18n }}
-            </a>
+            <button class="btn btn-large green" onclick="window.history.back(); return false;">
+              {{ "error.http.back_button"|i18n }}
+            </button>
           {% endif %}
         </p>
       </div>
     </div>
   </div>
+
 {% endblock %}

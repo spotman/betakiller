@@ -115,7 +115,8 @@ class UrlDispatcher implements LoggerAwareInterface
      * @param string $ip
      *
      * @return \BetaKiller\IFace\IFaceInterface
-     * @throws \BetaKiller\Factory\FactoryException
+     * @throws \Spotman\Acl\Exception
+     * @throws \BetaKiller\Auth\AuthorizationRequiredException
      * @throws \BetaKiller\MessageBus\MessageBusException
      * @throws \HTTP_Exception_403
      * @throws \BetaKiller\IFace\Exception\IFaceStackException
@@ -153,7 +154,8 @@ class UrlDispatcher implements LoggerAwareInterface
      *
      * @param string $uri
      *
-     * @throws \BetaKiller\Factory\FactoryException
+     * @throws \Spotman\Acl\Exception
+     * @throws \BetaKiller\Auth\AuthorizationRequiredException
      * @throws \BetaKiller\Url\UrlPrototypeException
      * @throws \HTTP_Exception_403
      * @throws \BetaKiller\IFace\Exception\IFaceStackException
@@ -218,7 +220,6 @@ class UrlDispatcher implements LoggerAwareInterface
      *
      * @return IFaceInterface|null
      * @throws \BetaKiller\Url\UrlPrototypeException
-     * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\IFace\Exception\IFaceMissingUrlException
      * @throws \BetaKiller\Url\UrlDispatcherException
      * @throws IFaceException
@@ -286,7 +287,6 @@ class UrlDispatcher implements LoggerAwareInterface
      *
      * @return \BetaKiller\IFace\IFaceModelInterface|null
      * @throws \BetaKiller\Url\UrlPrototypeException
-     * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\Url\UrlDispatcherException
      * @throws \BetaKiller\IFace\Exception\IFaceException
      */
@@ -310,7 +310,6 @@ class UrlDispatcher implements LoggerAwareInterface
      * @param \BetaKiller\Url\UrlPathIterator       $it
      *
      * @return bool
-     * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\IFace\Exception\IFaceException
      * @throws \BetaKiller\Url\UrlDispatcherException
      * @throws \BetaKiller\Url\UrlPrototypeException
@@ -381,6 +380,8 @@ class UrlDispatcher implements LoggerAwareInterface
     /**
      * @param IFaceInterface $iface
      *
+     * @throws \Spotman\Acl\Exception
+     * @throws \BetaKiller\Auth\AuthorizationRequiredException
      * @throws \HTTP_Exception_403
      * @throws \BetaKiller\IFace\Exception\IFaceException
      * @throws \BetaKiller\IFace\Exception\IFaceStackException
@@ -468,6 +469,7 @@ class UrlDispatcher implements LoggerAwareInterface
     /**
      * @param \BetaKiller\IFace\IFaceInterface $iface
      *
+     * @throws \BetaKiller\Auth\AuthorizationRequiredException
      * @throws \BetaKiller\IFace\Exception\IFaceException
      * @throws \HTTP_Exception_403
      * @throws \Spotman\Acl\Exception

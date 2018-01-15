@@ -248,11 +248,11 @@ class ContentPost extends \ORM implements ContentPostInterface
     /**
      * @param string $value
      *
-     * @return \BetaKiller\Model\ContentPostInterface
+     * @return void
      */
-    public function setLabel(string $value): ContentPostInterface
+    public function setLabel(string $value): void
     {
-        return $this->set('label', $value);
+        $this->set('label', $value);
     }
 
     /**

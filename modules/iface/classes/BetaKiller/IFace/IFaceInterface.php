@@ -86,11 +86,6 @@ interface IFaceInterface extends SeoMetaInterface, HasLabelInterface
     public function after(): void;
 
     /**
-     * @return string
-     */
-    public function __toString(): string;
-
-    /**
      * @return IFaceInterface|null
      * @deprecated Use IFaceTree instead
      */

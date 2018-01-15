@@ -1,15 +1,16 @@
 <?php
 
-return array(
+return [
 
     'core'                  => MODPATH.'core',                  // Core interfaces and classes
     'ddd'                   => MODPATH.'ddd',                   // Interfaces and classes for DDD
     'helper'                => MODPATH.'helper',                // Common helpers without external dependencies
+    'utils'                 => MODPATH.'utils',                 // Useful classes
+    'platform'              => MODPATH.'platform',              // Platform implementation
 
-    // Place it first for correct initialization of per-site classes and configs
+    // Place it before other modules for correct initialization of per-site classes and configs
     'multi-site'            => MODPATH.'multi-site',            // Multiple apps on top of single engine
 
-    'utils'                 => MODPATH.'utils',                 // Useful classes
     'log'                   => MODPATH.'log',                   // Logs subsystem
     'sqlite'                => MODPATH.'sqlite',                // SQLite database driver (used by logs)
     'error'                 => MODPATH.'error',                 // Error handling and logging
@@ -48,4 +49,4 @@ return array(
 
     // Allow another modules to set routes
     'iface'                 => MODPATH.'iface',                 // Dynamic user interfaces
-);
+];

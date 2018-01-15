@@ -6,7 +6,7 @@ use BetaKiller\Helper\I18n;
  * Class Controller
  * Basic controller with common helpers
  */
-abstract class Controller extends Controller_Proxy
+abstract class Controller extends ControllerProxy
 {
     use BetaKiller\Utils\Kohana\ControllerHelperTrait;
 

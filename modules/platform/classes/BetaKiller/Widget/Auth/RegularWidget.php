@@ -1,10 +1,14 @@
 <?php
+namespace BetaKiller\Widget\Auth;
 
+use Auth;
 use BetaKiller\Helper\IFaceHelper;
 use BetaKiller\IFace\Auth\PasswordReset;
 use BetaKiller\IFace\Widget\AbstractBaseWidget;
+use HTML;
+use HTTP_Exception_400;
 
-class Widget_Auth_Regular extends AbstractBaseWidget
+class RegularWidget extends AbstractBaseWidget
 {
     /**
      * @var Auth
@@ -12,13 +16,15 @@ class Widget_Auth_Regular extends AbstractBaseWidget
     private $auth;
 
     /**
-     * Widget_Auth_Regular constructor.
+     * RegularWidget constructor.
      *
      * @param \Auth                          $auth
      * @param \BetaKiller\Helper\IFaceHelper $ifaceHelper
      */
     public function __construct(\Auth $auth, IFaceHelper $ifaceHelper)
     {
+        parent::__construct();
+
         $this->auth        = $auth;
         $this->ifaceHelper = $ifaceHelper;
     }
@@ -50,23 +56,23 @@ class Widget_Auth_Regular extends AbstractBaseWidget
         $this->auth->login($user_login, $user_password, $remember);
 
         // Возвращаем соответствующий ответ
-        $this->send_json(Response::JSON_SUCCESS);
+        $this->send_success_json();
     }
 
     public function getData(): array
     {
         return [
-            'login_url'          => $this->get_login_url(),
-            'reset_password_url' => $this->get_reset_password_url(),
+            'login_url'          => $this->getLoginUrl(),
+            'reset_password_url' => $this->getResetPasswordUrl(),
         ];
     }
 
-    protected function get_login_url()
+    protected function getLoginUrl()
     {
         return $this->url('login');
     }
 
-    protected function get_reset_password_url()
+    protected function getResetPasswordUrl()
     {
         /** @var PasswordReset $iface */
         $iface = $this->ifaceHelper->createIFaceFromCodename('Auth_PasswordReset');

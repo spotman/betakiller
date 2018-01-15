@@ -215,7 +215,7 @@ trait ModelWithRevisionsOrmTrait
     /**
      * @return \BetaKiller\Model\RevisionModelInterface|null
      * @throws \BetaKiller\Exception
-     * @throws \HTTP_Exception_401
+     * @throws \BetaKiller\Auth\AuthorizationRequiredException
      */
     protected function createRevisionIfChanged(): ?RevisionModelInterface
     {

@@ -1,0 +1,17 @@
+{% extends layout %}
+
+{% block page_content %}
+
+  <div class="valign-wrapper" style="height: 100%">
+    <div class="valign center-block">
+      <div class="container">
+        {% for iface in ifaces %}
+          <a href="{{ iface.url }}" class="btn btn-large blue darken-2" title="{{ iface.label }}">
+            {{ iface.codename }}
+          </a>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+{% endblock %}

@@ -200,6 +200,14 @@ class IFace extends TreeModelSingleParentOrm implements IFaceModelInterface
     }
 
     /**
+     * @param string $value
+     */
+    public function setLabel(string $value): void
+    {
+        $this->set('label', $value);
+    }
+
+    /**
      * Sets title for using in <title> tag
      *
      * @param string $value
@@ -208,7 +216,7 @@ class IFace extends TreeModelSingleParentOrm implements IFaceModelInterface
      */
     public function setTitle(string $value): SeoMetaInterface
     {
-        return $this->set('title', (string)$value);
+        return $this->set('title', $value);
     }
 
     /**
@@ -220,7 +228,7 @@ class IFace extends TreeModelSingleParentOrm implements IFaceModelInterface
      */
     public function setDescription(string $value): SeoMetaInterface
     {
-        return $this->set('description', (string)$value);
+        return $this->set('description', $value);
     }
 
     /**

@@ -1,6 +1,9 @@
 <?php
 namespace BetaKiller\Model;
 
+use BetaKiller\Auth\AuthorizationRequiredException;
+use BetaKiller\Auth\InactiveException;
+
 class User extends \Model_Auth_User implements UserInterface
 {
     protected $allUserRolesIDs = [];
@@ -159,7 +162,7 @@ class User extends \Model_Auth_User implements UserInterface
      * @return \BetaKiller\Model\Language
      * @throws \Kohana_Exception
      */
-    public function getLanguage(): \BetaKiller\Model\Language
+    public function getLanguage(): Language
     {
         return $this->get('language');
     }
@@ -185,19 +188,19 @@ class User extends \Model_Auth_User implements UserInterface
     }
 
     /**
-     * @throws \Auth_Exception_Inactive
+     * @throws \BetaKiller\Auth\InactiveException
      * @throws \Kohana_Exception
      */
     protected function checkIsActive(): void
     {
         // Проверяем активен ли аккаунт
         if (!$this->isActive()) {
-            throw new \Auth_Exception_Inactive;
+            throw new InactiveException;
         }
     }
 
     /**
-     * @throws \Auth_Exception_Inactive
+     * @throws \BetaKiller\Auth\InactiveException
      * @throws \Kohana_Exception
      */
     public function afterAutoLogin(): void
@@ -332,13 +335,13 @@ class User extends \Model_Auth_User implements UserInterface
     /**
      * Forces authorization if user is not logged in
      *
-     * @throws \HTTP_Exception_401
+     * @throws \BetaKiller\Auth\AuthorizationRequiredException
      * @return void
      */
     public function forceAuthorization(): void
     {
         if ($this->isGuest()) {
-            throw new \HTTP_Exception_401();
+            throw new AuthorizationRequiredException();
         }
     }
 

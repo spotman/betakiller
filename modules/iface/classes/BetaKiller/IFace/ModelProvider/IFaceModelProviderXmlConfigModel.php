@@ -88,7 +88,7 @@ class IFaceModelProviderXmlConfigModel implements IFaceModelInterface
     public static function factory($data, IFaceModelProviderXmlConfig $provider)
     {
         /** @var self $instance */
-        $instance = new static;
+        $instance = new self;
         $instance->fromArray($data);
         $instance->setProvider($provider);
 
@@ -251,6 +251,14 @@ class IFaceModelProviderXmlConfigModel implements IFaceModelInterface
     public function getLabel(): string
     {
         return $this->label ?: '';
+    }
+
+    /**
+     * @param string $value
+     */
+    public function setLabel(string $value): void
+    {
+        $this->label = $value;
     }
 
     /**
@@ -422,6 +430,7 @@ class IFaceModelProviderXmlConfigModel implements IFaceModelInterface
 
     /**
      * @return IFaceModelProviderXmlConfig
+     * @throws \BetaKiller\IFace\Exception\IFaceException
      */
     protected function getProvider(): IFaceModelProviderXmlConfig
     {

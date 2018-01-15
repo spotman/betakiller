@@ -1,6 +1,7 @@
 <?php
 namespace BetaKiller\Helper;
 
+use BetaKiller\Acl\Resource\AdminResource;
 use BetaKiller\Acl\Resource\EntityRelatedAclResourceInterface;
 use BetaKiller\IFace\CrudlsActionsInterface;
 use BetaKiller\IFace\Exception\IFaceException;
@@ -37,6 +38,7 @@ class AclHelper
      * @param string|null                                   $action
      *
      * @return bool
+     * @throws \Spotman\Acl\Exception
      */
     public function isEntityActionAllowed(DispatchableEntityInterface $entity, ?string $action = null): bool
     {
@@ -49,6 +51,7 @@ class AclHelper
      * @param \BetaKiller\Model\DispatchableEntityInterface $entity
      *
      * @return \BetaKiller\Acl\Resource\EntityRelatedAclResourceInterface
+     * @throws \Spotman\Acl\Exception
      */
     private function getEntityAclResource(DispatchableEntityInterface $entity): EntityRelatedAclResourceInterface
     {
@@ -104,13 +107,24 @@ class AclHelper
             ]);
         }
 
-        if (!$user && $zoneName === IFaceZone::PUBLIC_ZONE) {
+        // Force check for guest role in public zone (so every public iface must be visible for guest users)
+        if ($zoneName === IFaceZone::PUBLIC_ZONE) {
             // Public zone needs GuestUser to check access)
             $user = new GuestUser;
         }
 
+        // Use current user as default one
+        if (!$user) {
+            $user = $this->user;
+        }
+
         $customRules   = $iface->getAdditionalAclRules();
         $entityDefined = $entityName && $actionName;
+
+        // Force check for admin panel is enabled
+        if ($zoneName === IFaceZone::ADMIN_ZONE) {
+            $customRules[] = AdminResource::SHORTCUT;
+        }
 
         // Check custom rules first
         if (!$this->checkCustomRules($customRules, $user)) {
@@ -165,6 +179,13 @@ class AclHelper
         return true;
     }
 
+    /**
+     * @param \BetaKiller\Model\DispatchableEntityInterface $entity
+     * @param \BetaKiller\IFace\IFaceInterface              $iface
+     *
+     * @return bool
+     * @throws \Spotman\Acl\Exception
+     */
     private function isEntityAllowedInZone(DispatchableEntityInterface $entity, IFaceInterface $iface): bool
     {
         $spec = $this->getEntityZoneAccessSpecification($entity, $iface);
@@ -173,6 +194,13 @@ class AclHelper
         return $spec ?? true;
     }
 
+    /**
+     * @param \BetaKiller\Model\DispatchableEntityInterface $entity
+     * @param \BetaKiller\IFace\IFaceInterface              $iface
+     *
+     * @return bool|null
+     * @throws \Spotman\Acl\Exception
+     */
     private function getEntityZoneAccessSpecification(DispatchableEntityInterface $entity, IFaceInterface $iface): ?bool
     {
         $zoneName = $iface->getZoneName();
@@ -223,6 +251,11 @@ class AclHelper
         return $resource;
     }
 
+    /**
+     * @param \BetaKiller\IFace\IFaceInterface $iface
+     *
+     * @throws \BetaKiller\Auth\AuthorizationRequiredException
+     */
     public function forceAuthorizationIfNeeded(IFaceInterface $iface): void
     {
         // Entering to admin and personal zones requires authorized user
@@ -236,6 +269,7 @@ class AclHelper
      * @param null|\Spotman\Acl\AclUserInterface $user
      *
      * @return bool
+     * @throws \Spotman\Acl\Exception
      */
     private function checkCustomRules(array $rules, ?AclUserInterface $user = null): bool
     {
@@ -257,6 +291,13 @@ class AclHelper
         return true;
     }
 
+    /**
+     * @param \Spotman\Acl\Resource\ResolvingResourceInterface $resource
+     * @param string                                           $permission
+     * @param null|\Spotman\Acl\AclUserInterface               $user
+     *
+     * @return bool
+     */
     private function isPermissionAllowed(
         ResolvingResourceInterface $resource,
         string $permission,

@@ -10,7 +10,7 @@ interface EntityRelatedAclResourceInterface extends CrudlsPermissionsResourceInt
      *
      * @return $this
      */
-    public function setEntity(AbstractEntityInterface $entity);
+    public function setEntity(AbstractEntityInterface $entity): self;
 
     /**
      * @param string $actionName

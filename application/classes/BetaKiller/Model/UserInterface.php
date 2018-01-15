@@ -7,14 +7,11 @@ use Spotman\Acl\AclUserInterface;
 
 interface UserInterface extends AbstractEntityInterface, OrmInterface, NotificationUserInterface, AclUserInterface
 {
-    // Auth_ORM methods
-    public function complete_login();
-
-
     // Extended methods
 
     /**
      * @param string $value
+     *
      * @return \BetaKiller\Model\UserInterface
      */
     public function setUsername(string $value): UserInterface;
@@ -38,6 +35,7 @@ interface UserInterface extends AbstractEntityInterface, OrmInterface, Notificat
 
     /**
      * @param RoleInterface|string $role
+     *
      * @return bool
      */
     public function hasRole(RoleInterface $role): bool;
@@ -84,7 +82,7 @@ interface UserInterface extends AbstractEntityInterface, OrmInterface, Notificat
 
     /**
      * @return void
-     * @throws \Auth_Exception_WrongIP
+     * @throws \BetaKiller\Auth\WrongIPException
      */
     public function afterAutoLogin(): void;
 
@@ -144,7 +142,7 @@ interface UserInterface extends AbstractEntityInterface, OrmInterface, Notificat
     public function setEmail(string $value): UserInterface;
 
     /**
-     * Возвращает основной номер телефона
+     * Returns primary phone number
      *
      * @return string
      */
@@ -160,7 +158,7 @@ interface UserInterface extends AbstractEntityInterface, OrmInterface, Notificat
     /**
      * Forces authorization if user is not logged in
      *
-     * @throws \HTTP_Exception_401
+     * @throws \BetaKiller\Auth\AuthorizationRequiredException
      * @return void
      */
     public function forceAuthorization(): void;

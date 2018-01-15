@@ -119,7 +119,7 @@ class IFaceHelper
      * @param \BetaKiller\IFace\IFaceInterface $iface
      *
      * @return string
-     * @throws \BetaKiller\Repository\RepositoryException
+     * @throws \BetaKiller\IFace\Exception\IFaceException
      */
     public function renderIFace(IFaceInterface $iface): string
     {

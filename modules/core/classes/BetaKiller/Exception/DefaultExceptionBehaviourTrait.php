@@ -1,18 +1,19 @@
 <?php
-namespace BetaKiller;
+namespace BetaKiller\Exception;
 
 
-interface ExceptionInterface extends \Throwable
+trait DefaultExceptionBehaviourTrait
 {
-    public const DEFAULT_EXCEPTION_CODE = 500;
-
     /**
      * Returns TRUE if someone must be notified about current exception type
      * Override this method with *false* return if notification about exceptions of concrete class is not needed
      *
      * @return bool
      */
-    public function isNotificationEnabled(): bool;
+    public function isNotificationEnabled(): bool
+    {
+        return true;
+    }
 
     /**
      * If returns true, then original exception message will be shown to end-user in JSON and error pages
@@ -20,7 +21,10 @@ interface ExceptionInterface extends \Throwable
      *
      * @return bool
      */
-    public function showOriginalMessageToUser(): bool;
+    public function showOriginalMessageToUser(): bool
+    {
+        return false;
+    }
 
     /**
      * Overwrite this method with "return TRUE" to show custom message in all cases
@@ -28,7 +32,10 @@ interface ExceptionInterface extends \Throwable
      *
      * @return bool
      */
-    public function alwaysShowNiceMessage(): bool;
+    public function alwaysShowNiceMessage(): bool
+    {
+        return false;
+    }
 
     /**
      * Returns default message for current exception
@@ -38,5 +45,9 @@ interface ExceptionInterface extends \Throwable
      *
      * @return string
      */
-    public function getDefaultMessageI18nKey(): ?string;
+    public function getDefaultMessageI18nKey(): ?string
+    {
+        // No default message
+        return null;
+    }
 }

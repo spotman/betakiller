@@ -1,10 +1,11 @@
 <?php
 namespace BetaKiller\Acl\Resource;
 
-use Spotman\Acl\Exception;
 use BetaKiller\Model\AbstractEntityInterface;
+use Spotman\Acl\Exception;
 
-abstract class AbstractEntityRelatedAclResource extends AbstractCrudlsPermissionsResource implements EntityRelatedAclResourceInterface
+abstract class AbstractEntityRelatedAclResource extends AbstractCrudlsPermissionsResource implements
+    EntityRelatedAclResourceInterface
 {
     /**
      * @var \BetaKiller\Model\AbstractEntityInterface
@@ -13,11 +14,13 @@ abstract class AbstractEntityRelatedAclResource extends AbstractCrudlsPermission
 
     /**
      * @param \BetaKiller\Model\AbstractEntityInterface $entity
+     *
      * @return $this
      */
-    public function setEntity(AbstractEntityInterface $entity)
+    public function setEntity(AbstractEntityInterface $entity): EntityRelatedAclResourceInterface
     {
         $this->entity = $entity;
+
         return $this;
     }
 

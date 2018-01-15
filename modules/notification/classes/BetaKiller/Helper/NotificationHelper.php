@@ -103,7 +103,7 @@ class NotificationHelper
      * @param \BetaKiller\Notification\NotificationMessageInterface $message
      *
      * @return NotificationHelper
-     * @throws \HTTP_Exception_401
+     * @throws \BetaKiller\Auth\AuthorizationRequiredException
      */
     public function toCurrentUser(NotificationMessageInterface $message): self
     {

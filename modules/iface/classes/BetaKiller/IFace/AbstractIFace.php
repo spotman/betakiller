@@ -53,6 +53,7 @@ abstract class AbstractIFace implements IFaceInterface
 
     /**
      * @return string
+     * @throws \BetaKiller\IFace\Exception\IFaceException
      */
     public function render(): string
     {
@@ -84,6 +85,19 @@ abstract class AbstractIFace implements IFaceInterface
     public function getLabel(): string
     {
         return $this->getModel()->getLabel();
+    }
+
+    /**
+     * Returns plain label
+     *
+     * @param string $value
+     *
+     * @return void
+     * @throws \BetaKiller\IFace\Exception\IFaceException
+     */
+    public function setLabel(string $value): void
+    {
+        $this->getModel()->setLabel($value);
     }
 
     /**
@@ -235,13 +249,9 @@ abstract class AbstractIFace implements IFaceInterface
         // Empty by default
     }
 
-    public function __toString(): string
-    {
-        return (string)$this->render();
-    }
-
     /**
      * @return \BetaKiller\IFace\IFaceInterface|null
+     * @throws \BetaKiller\IFace\Exception\IFaceException
      */
     public function getParent(): ?IFaceInterface
     {

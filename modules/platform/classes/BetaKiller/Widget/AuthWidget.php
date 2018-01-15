@@ -1,10 +1,10 @@
 <?php
+namespace BetaKiller\Widget;
 
 use BetaKiller\Config\ConfigProviderInterface;
 use BetaKiller\IFace\Widget\AbstractBaseWidget;
-use BetaKiller\Widget\WidgetException;
 
-class Widget_Auth extends AbstractBaseWidget
+class AuthWidget extends AbstractBaseWidget
 {
     public const PROVIDER_REGULAR = 'regular';
     public const PROVIDER_ULOGIN  = 'uLogin';
@@ -13,7 +13,7 @@ class Widget_Auth extends AbstractBaseWidget
      * @var ConfigProviderInterface
      * @Inject
      */
-    private $_config;
+    private $config;
 
     /**
      * Returns data for View rendering
@@ -23,7 +23,7 @@ class Widget_Auth extends AbstractBaseWidget
      */
     public function getData(): array
     {
-        $providers = $this->_config->load(['auth', 'providers']);
+        $providers = $this->config->load(['auth', 'providers']);
 
         if (!$providers) {
             throw new WidgetException('No auth providers specified in config');

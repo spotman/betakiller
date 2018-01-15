@@ -6,6 +6,7 @@ use BetaKiller\Helper\StringPatternHelper;
 use BetaKiller\IFace\Exception\IFaceException;
 use BetaKiller\IFace\IFaceInterface;
 use BetaKiller\Repository\IFaceLayoutRepository;
+use BetaKiller\Repository\RepositoryException;
 
 class IFaceView
 {
@@ -62,7 +63,6 @@ class IFaceView
      *
      * @return string
      * @throws \BetaKiller\IFace\Exception\IFaceException
-     * @throws \BetaKiller\Repository\RepositoryException
      */
     public function render(IFaceInterface $iface): string
     {
@@ -149,15 +149,19 @@ class IFaceView
     /**
      * @param \BetaKiller\IFace\IFaceInterface $iface
      *
+     * @throws \BetaKiller\IFace\Exception\IFaceException
      * @return string
-     * @throws \BetaKiller\Repository\RepositoryException
      */
     private function getLayoutCodename(IFaceInterface $iface): string
     {
         $layoutCodename = $iface->getLayoutCodename();
 
         if (!$layoutCodename) {
-            $defaultLayout  = $this->layoutRepo->getDefault();
+            try {
+                $defaultLayout = $this->layoutRepo->getDefault();
+            } catch (RepositoryException $e) {
+                throw IFaceException::wrap($e);
+            }
             $layoutCodename = $defaultLayout->getCodename();
         }
 

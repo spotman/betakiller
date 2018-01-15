@@ -1,22 +1,13 @@
 <?php
-use BetaKiller\Error\ExceptionHandler;
-use BetaKiller\Exception\ExceptionHandlerInterface;
-use BetaKiller\ExceptionInterface;
 
-class Kohana_Exception extends Kohana_Kohana_Exception implements ExceptionInterface
+use BetaKiller\Exception\ExceptionHandlerInterface;
+
+class Kohana_Exception extends Kohana_Kohana_Exception
 {
     /**
      * @var ExceptionHandlerInterface
      */
     private static $exceptionHandler;
-
-    public function __construct($message = '', array $variables = null, $code = 0, Throwable $previous = null)
-    {
-        // Set up default message text if it was not set
-        $message = $message ?: $this->getDefaultMessageI18nKey();
-
-        parent::__construct($message, $variables, $code, $previous);
-    }
 
     public static function setHandler(ExceptionHandlerInterface $handler)
     {
@@ -71,52 +62,8 @@ class Kohana_Exception extends Kohana_Kohana_Exception implements ExceptionInter
             return self::$exceptionHandler->handle($exception);
         } catch (\Throwable $e) {
             self::log($e);
+
             return parent::_handler($exception);
         }
-    }
-
-    /**
-     * Returns default message for current exception
-     * Allows throwing concrete exception without message
-     * Useful for custom exception types
-     *
-     * @return string
-     */
-    public function getDefaultMessageI18nKey(): string
-    {
-        return ExceptionHandler::getErrorLabelI18nKey($this);
-    }
-
-    /**
-     * Returns TRUE if someone must be notified about current exception type
-     * Override this method with *false* return if notification about exceptions of concrete class is not needed
-     *
-     * @return bool
-     */
-    public function isNotificationEnabled(): bool
-    {
-        return true;
-    }
-
-    /**
-     * If returns true, then original exception message will be shown to end-user in JSON and error pages
-     * Override this method with *true* return if it's domain exception
-     *
-     * @return bool
-     */
-    public function showOriginalMessageToUser(): bool
-    {
-        return false;
-    }
-
-    /**
-     * Overwrite this method with "return TRUE" to show custom message in all cases
-     * Override this method with *true* return if this exception type has dedicated error page like 404
-     *
-     * @return bool
-     */
-    public function alwaysShowNiceMessage(): bool
-    {
-        return false;
     }
 }

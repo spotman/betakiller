@@ -1,0 +1,23 @@
+{% extends layout %}
+
+{% block page_content %}
+
+  <div class="valign-wrapper error-400" style="height: 100%">
+    <div class="valign center-block">
+      <div class="card-panel blue-grey white-text">
+        {% block header %}
+          <h1 class="center-align">{{ label }}</h1>
+        {% endblock %}
+
+        <p class="center-align">{{ "error.http.400.message"|i18n }}</p>
+
+        <p class="center-align">
+          <button class="btn btn-large green" onclick="window.history.back(); return false;">
+            {{ "error.http.back_button"|i18n }}
+          </button>
+        </p>
+      </div>
+    </div>
+  </div>
+
+{% endblock %}

@@ -6,6 +6,8 @@ use Spotman\Acl\Resource\SinglePermissionResource;
 
 class AdminResource extends SinglePermissionResource
 {
+    public const SHORTCUT = 'Admin.enabled';
+
     /**
      * Returns default permissions bundled with current resource
      * Useful for presetting permissions for resources with fixed access control list or permissions based on hard-coded logic

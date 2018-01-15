@@ -3,37 +3,32 @@ namespace BetaKiller\IFace;
 
 use BetaKiller\Error\ExceptionHandler;
 use BetaKiller\Exception\HttpExceptionInterface;
+use BetaKiller\Model\UserInterface;
 
 abstract class AbstractHttpErrorIFace extends AbstractIFace
 {
     /**
-     * @var HttpExceptionInterface
+     * @var ExceptionHandler
      */
-    private $exception;
+    private $exceptionHandler;
 
     /**
-     * @Inject
      * @var \BetaKiller\Model\UserInterface
      */
     private $user;
 
     /**
-     * @Inject
-     * @var \BetaKiller\Error\ExceptionHandler
+     * AbstractHttpErrorIFace constructor.
+     *
+     * @param \BetaKiller\Model\UserInterface    $user
+     * @param \BetaKiller\Error\ExceptionHandler $exceptionHandler
      */
-    private $exceptionHandler;
-
-    /**
-     * This hook executed before IFace processing (on every request regardless of caching)
-     * Place here code that needs to be executed on every IFace request (increment views counter, etc)
-     */
-    public function before(): void
+    public function __construct(UserInterface $user, ExceptionHandler $exceptionHandler)
     {
-        if (!$this->exception) {
-            $this->exception = $this->getDefaultHttpException();
-        }
+        parent::__construct();
 
-        parent::before();
+        $this->user             = $user;
+        $this->exceptionHandler = $exceptionHandler;
     }
 
     /**
@@ -41,6 +36,7 @@ abstract class AbstractHttpErrorIFace extends AbstractIFace
      * Override this method in child classes
      *
      * @return array
+     * @throws \BetaKiller\Exception
      * @throws \BetaKiller\IFace\Exception\IFaceException
      */
     public function getData(): array
@@ -50,30 +46,23 @@ abstract class AbstractHttpErrorIFace extends AbstractIFace
 
         return [
             'label'     => $this->getLabel(),
-            'message'   => $this->exceptionHandler->getUserMessage($this->exception),
             'login_url' => $loginIFace->url(),
             'is_guest'  => $this->user->isGuest(),
         ];
     }
 
-    public function setException(\Throwable $e): AbstractHttpErrorIFace
+    /**
+     * Returns plain label
+     *
+     * @return string
+     * @throws \BetaKiller\Exception
+     */
+    public function getLabel(): string
     {
-        $this->exception = $e;
+        $exception = $this->getDefaultHttpException();
 
-        return $this;
+        return $this->exceptionHandler->getExceptionMessage($exception);
     }
 
     abstract protected function getDefaultHttpException(): HttpExceptionInterface;
-
-    /**
-     * Returns label source/pattern
-     *
-     * @return string
-     */
-    public function getLabelSource(): string
-    {
-        $i18nKey = ExceptionHandler::getErrorLabelI18nKey($this->exception);
-
-        return __($i18nKey);
-    }
 }
