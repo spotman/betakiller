@@ -118,7 +118,7 @@ class ContentPostRepository extends AbstractOrmBasedDispatchableRepository imple
      *
      * @return \BetaKiller\Repository\ContentPostRepository
      */
-    private function search(OrmInterface $orm, string $term): self
+    private function search(OrmInterface $orm, string $term): ContentPostRepository
     {
         $revisionKey = ModelWithRevisionsInterface::ACTUAL_REVISION_KEY;
 
@@ -239,7 +239,7 @@ class ContentPostRepository extends AbstractOrmBasedDispatchableRepository imple
      *
      * @return \BetaKiller\Repository\ContentPostRepository
      */
-    private function filterCategoryIDs(OrmInterface $orm, array $ids): self
+    private function filterCategoryIDs(OrmInterface $orm, array $ids): ContentPostRepository
     {
         $orm->where($orm->object_column('category_id'), 'IN', $ids);
 
@@ -252,7 +252,7 @@ class ContentPostRepository extends AbstractOrmBasedDispatchableRepository imple
      *
      * @return \BetaKiller\Repository\ContentPostRepository
      */
-    private function filterCategory(OrmInterface $orm, ?ContentCategoryInterface $category): self
+    private function filterCategory(OrmInterface $orm, ?ContentCategoryInterface $category): ContentPostRepository
     {
         $column = $orm->object_column('category_id');
 
@@ -268,7 +268,7 @@ class ContentPostRepository extends AbstractOrmBasedDispatchableRepository imple
      *
      * @return \BetaKiller\Repository\ContentPostRepository
      */
-    private function filterArticles(OrmInterface $orm): self
+    private function filterArticles(OrmInterface $orm): ContentPostRepository
     {
         return $this->filterType($orm, ContentPost::TYPE_ARTICLE);
     }
@@ -278,7 +278,7 @@ class ContentPostRepository extends AbstractOrmBasedDispatchableRepository imple
      *
      * @return \BetaKiller\Repository\ContentPostRepository
      */
-    private function filterPages(OrmInterface $orm): self
+    private function filterPages(OrmInterface $orm): ContentPostRepository
     {
         return $this->filterType($orm, ContentPost::TYPE_PAGE);
     }
@@ -289,7 +289,7 @@ class ContentPostRepository extends AbstractOrmBasedDispatchableRepository imple
      *
      * @return \BetaKiller\Repository\ContentPostRepository
      */
-    private function filterTypes(OrmInterface $orm, array $values): self
+    private function filterTypes(OrmInterface $orm, array $values): ContentPostRepository
     {
         $orm->where('type', 'IN', $values);
 
@@ -302,7 +302,7 @@ class ContentPostRepository extends AbstractOrmBasedDispatchableRepository imple
      *
      * @return \BetaKiller\Repository\ContentPostRepository
      */
-    private function filterType(OrmInterface $orm, int $value): self
+    private function filterType(OrmInterface $orm, int $value): ContentPostRepository
     {
         $orm->where('type', '=', $value);
 
@@ -314,7 +314,7 @@ class ContentPostRepository extends AbstractOrmBasedDispatchableRepository imple
      *
      * @return \BetaKiller\Repository\ContentPostRepository
      */
-    private function filterWithCategory(OrmInterface $orm): self
+    private function filterWithCategory(OrmInterface $orm): ContentPostRepository
     {
         $orm->where($orm->object_column('category_id'), 'IS NOT', null);
 
@@ -327,7 +327,7 @@ class ContentPostRepository extends AbstractOrmBasedDispatchableRepository imple
      *
      * @return \BetaKiller\Repository\ContentPostRepository
      */
-    private function orderByCreatedAt(OrmInterface $orm, ?bool $asc = null): self
+    private function orderByCreatedAt(OrmInterface $orm, ?bool $asc = null): ContentPostRepository
     {
         $orm->order_by($orm->object_column('created_at'), ($asc ?? false) ? 'ASC' : 'DESC');
 
@@ -339,7 +339,7 @@ class ContentPostRepository extends AbstractOrmBasedDispatchableRepository imple
      *
      * @return \BetaKiller\Repository\ContentPostRepository
      */
-    private function prioritizeByPostTypes(OrmInterface $orm): self
+    private function prioritizeByPostTypes(OrmInterface $orm): ContentPostRepository
     {
         return $this->orderByPostTypes($orm, ContentPost::getPrioritizedTypesList());
     }
@@ -350,7 +350,7 @@ class ContentPostRepository extends AbstractOrmBasedDispatchableRepository imple
      *
      * @return \BetaKiller\Repository\ContentPostRepository
      */
-    private function orderByPostTypes(OrmInterface $orm, array $values): self
+    private function orderByPostTypes(OrmInterface $orm, array $values): ContentPostRepository
     {
         $orm->order_by_field_sequence('type', $values);
 
@@ -363,7 +363,7 @@ class ContentPostRepository extends AbstractOrmBasedDispatchableRepository imple
      *
      * @return \BetaKiller\Repository\ContentPostRepository
      */
-    private function orderByViewsCount(OrmInterface $orm, ?bool $asc = null): self
+    private function orderByViewsCount(OrmInterface $orm, ?bool $asc = null): ContentPostRepository
     {
         $orm->order_by('views_count', ($asc ?? false) ? 'ASC' : 'DESC');
 

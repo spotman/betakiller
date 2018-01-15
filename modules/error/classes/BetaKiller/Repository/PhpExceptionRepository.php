@@ -79,7 +79,7 @@ class PhpExceptionRepository extends AbstractOrmBasedDispatchableRepository
      *
      * @return \BetaKiller\Repository\PhpExceptionRepository
      */
-    private function filterUnresolved(OrmInterface $orm): self
+    private function filterUnresolved(OrmInterface $orm): PhpExceptionRepository
     {
         $orm->where('resolved_by', 'IS', null);
 
@@ -91,7 +91,7 @@ class PhpExceptionRepository extends AbstractOrmBasedDispatchableRepository
      *
      * @return \BetaKiller\Repository\PhpExceptionRepository
      */
-    private function filterResolved(OrmInterface $orm): self
+    private function filterResolved(OrmInterface $orm): PhpExceptionRepository
     {
         $orm->where('resolved_by', 'IS NOT', null);
 
@@ -103,7 +103,7 @@ class PhpExceptionRepository extends AbstractOrmBasedDispatchableRepository
      *
      * @return \BetaKiller\Repository\PhpExceptionRepository
      */
-    private function filterNotificationRequired(OrmInterface $orm): self
+    private function filterNotificationRequired(OrmInterface $orm): PhpExceptionRepository
     {
         $orm->where('notification_required', '=', true);
 
@@ -115,7 +115,7 @@ class PhpExceptionRepository extends AbstractOrmBasedDispatchableRepository
      *
      * @return \BetaKiller\Repository\PhpExceptionRepository
      */
-    private function filterNew(OrmInterface $orm): self
+    private function filterNew(OrmInterface $orm): PhpExceptionRepository
     {
         return $this->filterStatus($orm, PhpExceptionModelInterface::STATE_NEW);
     }
@@ -126,7 +126,7 @@ class PhpExceptionRepository extends AbstractOrmBasedDispatchableRepository
      *
      * @return \BetaKiller\Repository\PhpExceptionRepository
      */
-    private function filterStatus(OrmInterface $orm, string $status): self
+    private function filterStatus(OrmInterface $orm, string $status): PhpExceptionRepository
     {
         $orm->where('status', '=', $status);
 
@@ -139,7 +139,7 @@ class PhpExceptionRepository extends AbstractOrmBasedDispatchableRepository
      *
      * @return \BetaKiller\Repository\PhpExceptionRepository
      */
-    private function orderByLastSeenAt(OrmInterface $orm, ?bool $asc = null): self
+    private function orderByLastSeenAt(OrmInterface $orm, ?bool $asc = null): PhpExceptionRepository
     {
         $orm->order_by('last_seen_at', $asc ? 'asc' : 'desc');
 

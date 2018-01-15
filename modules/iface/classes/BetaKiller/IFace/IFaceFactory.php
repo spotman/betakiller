@@ -6,11 +6,6 @@ use BetaKiller\Factory\NamespaceBasedFactory;
 class IFaceFactory
 {
     /**
-     * @var \BetaKiller\IFace\IFaceProvider
-     */
-    private $provider;
-
-    /**
      * @var \BetaKiller\Factory\NamespaceBasedFactory
      */
     private $factory;
