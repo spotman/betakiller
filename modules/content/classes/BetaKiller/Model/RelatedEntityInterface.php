@@ -3,7 +3,7 @@ namespace BetaKiller\Model;
 
 /**
  * Interface RelatedEntityInterface
- * Defines entities with incoming relations from EntityRelatedInterface objects
+ * Defines entities with incoming relations from EntityItemRelatedInterface objects
  *
  * @package BetaKiller\Model
  */

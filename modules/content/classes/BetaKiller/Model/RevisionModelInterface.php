@@ -1,13 +1,8 @@
 <?php
 namespace BetaKiller\Model;
 
-interface RevisionModelInterface
+interface RevisionModelInterface extends AbstractEntityInterface
 {
-    public const ALL_REVISIONS_KEY   = 'all_revisions';
-    public const ACTUAL_REVISION_KEY = 'actual_revision';
-
-    public function getID();
-
     /**
      * @return \BetaKiller\Model\RevisionModelInterface
      */
@@ -43,21 +38,26 @@ interface RevisionModelInterface
     public function getCreatedAt(): \DateTimeInterface;
 
     /**
-     * @return bool
+     * @return \BetaKiller\Model\AbstractEntityInterface
      */
-    public function loaded();
+    public function getRelatedEntity(): AbstractEntityInterface;
+
+    /**
+     * @param \BetaKiller\Model\AbstractEntityInterface $entity
+     */
+    public function setRelatedEntity(AbstractEntityInterface $entity): void;
 
     /**
      * @return bool
      */
-    public function changed();
+    public function isChanged(): bool;
 
     /**
      * Returns new revision model if new revision was created or null if not
      *
      * @return \BetaKiller\Model\RevisionModelInterface|null
      */
-    public function createNewRevisionIfChanged();
+    public function createNewRevisionIfChanged(): ?RevisionModelInterface;
 
     /**
      * @param \BetaKiller\Model\RevisionModelInterface $actual

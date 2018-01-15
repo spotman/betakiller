@@ -450,7 +450,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
     {
         $posts = $this->wp->getPostsAndPages($this->skipBeforeDate);
 
-        $total   = $posts->count();
+        $total   = count($posts);
         $current = 1;
 
         foreach ($posts as $post) {
@@ -498,7 +498,6 @@ class Task_Content_Import_Wordpress extends AbstractTask
 
             $model->setUri($uri);
             $model->setCreatedBy($this->user);
-            $model->injectNewRevisionAuthor($this->user);
 
             // Saving model and getting its ID for further processing
             $this->postRepository->save($model);
@@ -513,6 +512,8 @@ class Task_Content_Import_Wordpress extends AbstractTask
             if ($description) {
                 $model->setDescription($description);
             }
+
+            $model->injectNewRevisionAuthor($this->user);
 
             // Link thumbnail images to post
             $this->processThumbnails($model, $meta);
@@ -576,22 +577,29 @@ class Task_Content_Import_Wordpress extends AbstractTask
 
         $document = new Document();
 
+        $html = '<html><body>'.$text.'</body></html>';
+
         // Make custom tags self-closing
-        $document->loadHtml($text, LIBXML_PARSEHUGE | LIBXML_NONET);
+        $document->loadHtml($html, LIBXML_COMPACT | LIBXML_PARSEHUGE | LIBXML_NONET);
+
+        if (!$document->has('body')) {
+            $this->logger->alert('Post parsing error for :url', [':url' => $item->getUri()]);
+            return;
+        }
 
         $body = $document->find('body')[0];
 
-        if ($body) {
-            // Process attachments first coz they are images inside links
-            $this->updateLinksOnAttachments($document, $item->getID());
-
-            // Parsing all other images next to get @alt and @title values
-            $this->processImagesInText($document, $item->getID());
-
-            $item->setContent($body->innerHtml());
-        } else {
-            $this->logger->warning('Post parsing error for :url', [':url' => $item->getUri()]);
+        if ($body->innerHtml() !== $text) {
+            $this->logger->alert('HTML parsing had modified the post content');
         }
+
+        // Process attachments first coz they are images inside links
+        $this->updateLinksOnAttachments($document, $item->getID());
+
+        // Parsing all other images next to get @alt and @title values
+        $this->processImagesInText($document, $item->getID());
+
+        $item->setContent($body->innerHtml());
     }
 
     /**
@@ -1164,11 +1172,8 @@ class Task_Content_Import_Wordpress extends AbstractTask
         $height = trim(Arr::get($attributes, 'height'));
 
         // Save width and height in video model if they not set
-        if ($width && !$video->getWidth()) {
+        if (!$video->getWidth() && !$video->getHeight()) {
             $video->setWidth($width);
-        }
-
-        if ($height && !$video->getHeight()) {
             $video->setHeight($height);
         }
 
@@ -1183,13 +1188,12 @@ class Task_Content_Import_Wordpress extends AbstractTask
 
         $this->youtubeRepository->save($video);
 
-        $attributes = [
-            'id'     => $video->getID(),
-            'width'  => $width,
-            'height' => $height,
-        ];
+        /** @var YoutubeShortcode $shortcode */
+        $shortcode = $this->shortcodeFacade->createFromCodename(YoutubeShortcode::codename());
 
-        return $this->shortcodeFacade->createFromCodename(YoutubeShortcode::codename(), $attributes)->asHtml();
+        $shortcode->setID($video->getID());
+
+        return $shortcode->asHtml();
     }
 
     /**

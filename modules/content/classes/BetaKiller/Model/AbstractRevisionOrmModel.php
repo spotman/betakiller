@@ -17,9 +17,47 @@ abstract class AbstractRevisionOrmModel extends \ORM implements RevisionModelInt
                 'model' => 'User',
                 'foreign_key' => 'created_by',
             ],
+            'entity'  =>  [
+                'model' => $this->getRelatedEntityModelName(),
+                'foreign_key' => $this->getRelatedEntityForeignKey(),
+            ],
         ]);
 
         parent::_initialize();
+    }
+
+    /**
+     * @return string
+     */
+    abstract protected function getRelatedEntityModelName(): string;
+
+    /**
+     * @return string
+     */
+    abstract protected function getRelatedEntityForeignKey(): string;
+
+    /**
+     * @return bool
+     */
+    public function isChanged(): bool
+    {
+        return $this->changed();
+    }
+
+    /**
+     * @return \BetaKiller\Model\AbstractEntityInterface
+     */
+    public function getRelatedEntity(): AbstractEntityInterface
+    {
+        return $this->get('entity');
+    }
+
+    /**
+     * @param \BetaKiller\Model\AbstractEntityInterface $entity
+     */
+    public function setRelatedEntity(AbstractEntityInterface $entity): void
+    {
+        $this->set('entity', $entity);
     }
 
     /**

@@ -4,7 +4,7 @@ namespace BetaKiller\Repository;
 use BetaKiller\Model\ContentCategory;
 use BetaKiller\Model\ContentCategoryInterface;
 use BetaKiller\Model\ContentPost;
-use BetaKiller\Model\RevisionModelInterface;
+use BetaKiller\Model\ModelWithRevisionsInterface;
 use BetaKiller\Search\SearchResultsInterface;
 use BetaKiller\Url\UrlContainerInterface;
 use BetaKiller\Utils\Kohana\ORM\OrmInterface;
@@ -120,7 +120,7 @@ class ContentPostRepository extends AbstractOrmBasedDispatchableRepository imple
      */
     private function search(OrmInterface $orm, string $term): self
     {
-        $revisionKey = RevisionModelInterface::ACTUAL_REVISION_KEY;
+        $revisionKey = ModelWithRevisionsInterface::ACTUAL_REVISION_KEY;
 
         $orm->search_query($term, [
             $revisionKey.'.label',

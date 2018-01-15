@@ -8,10 +8,9 @@ use Kohana_Exception;
 use ORM;
 use Validation;
 
-class ContentPost extends \ORM implements ContentPostInterface
+class ContentPost extends AbstractOrmBasedModelWithRevisions implements ContentPostInterface
 {
     use StatusRelatedModelOrmTrait,
-        ModelWithRevisionsOrmTrait,
         OrmBasedSeoMetaTrait,
         OrmBasedEntityHasWordpressIdTrait;
 
@@ -430,11 +429,7 @@ class ContentPost extends \ORM implements ContentPostInterface
             ->setCreatedAt(new DateTime)
             ->getStartStatus();
 
-        $result = parent::create($validation);
-
-        $this->createRevisionRelatedModel();
-
-        return $result;
+        return parent::create($validation);
     }
 
     /**
@@ -454,8 +449,6 @@ class ContentPost extends \ORM implements ContentPostInterface
         if ($changed || $this->isRevisionDataChanged()) {
             $this->setUpdatedAt(new DateTime);
         }
-
-        $this->updateRevisionRelatedModel();
 
         return parent::update($validation);
     }

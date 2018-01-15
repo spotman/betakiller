@@ -1,10 +1,11 @@
 <?php
 namespace BetaKiller\Model;
 
+use BetaKiller\Content\SimpleDiff;
 use BetaKiller\Exception;
 use DateTime;
 
-trait ModelWithRevisionsOrmTrait
+abstract class AbstractOrmBasedModelWithRevisions extends \ORM implements ModelWithRevisionsInterface
 {
     /**
      * @var \BetaKiller\Model\UserInterface
@@ -25,21 +26,21 @@ trait ModelWithRevisionsOrmTrait
     protected function initializeRevisionsRelations(): void
     {
         $this->belongs_to([
-            RevisionModelInterface::ACTUAL_REVISION_KEY => [
+            ModelWithRevisionsInterface::ACTUAL_REVISION_KEY => [
                 'model'       => $this->getRevisionModelName(),
                 'foreign_key' => $this->getRelatedModelRevisionForeignKey(),
             ],
         ]);
 
         $this->has_many([
-            RevisionModelInterface::ALL_REVISIONS_KEY => [
+            ModelWithRevisionsInterface::ALL_REVISIONS_KEY => [
                 'model'       => $this->getRevisionModelName(),
                 'foreign_key' => $this->getRevisionModelForeignKey(),
             ],
         ]);
 
         // Autoload actual revision model
-        $this->load_with([RevisionModelInterface::ACTUAL_REVISION_KEY]);
+        $this->load_with([ModelWithRevisionsInterface::ACTUAL_REVISION_KEY]);
     }
 
     /**
@@ -48,7 +49,8 @@ trait ModelWithRevisionsOrmTrait
      *
      * @param   string $column Column name
      *
-     * @return mixed
+     * @return $this|\BetaKiller\Model\ExtendedOrmInterface
+     * @throws \Kohana_Exception
      */
     public function get($column)
     {
@@ -66,12 +68,17 @@ trait ModelWithRevisionsOrmTrait
      * @param  string $column Column name
      * @param  mixed  $value  Column value
      *
-     * @return $this
+     * @return $this|\BetaKiller\Model\ExtendedOrmInterface
+     * @throws \Kohana_Exception
      */
     public function set($column, $value)
     {
         if ($this->isRevisionableColumn($column)) {
-            $this->getCurrentRevision()->set($column, $value);
+            $revision = $this->getCurrentRevision();
+
+            if ($revision->get($column) !== $value) {
+                $revision->set($column, $value);
+            }
 
             return $this;
         }
@@ -104,8 +111,8 @@ trait ModelWithRevisionsOrmTrait
         // Push changes to database so current revision becomes latest
         $this->createRevisionIfChanged();
 
-        $revision = $this->getLatestRevision();
-        $this->setActualRevision($revision);
+        $this->currentRevision = $this->getLatestRevision();
+        $this->setActualRevision($this->currentRevision);
     }
 
     public function isActualRevision(RevisionModelInterface $revision): bool
@@ -177,13 +184,25 @@ trait ModelWithRevisionsOrmTrait
      *
      * @param  \Validation $validation Validation object
      *
-     * @return $this
+     * @return $this|\BetaKiller\Model\ExtendedOrmInterface
+     * @throws \Kohana_Exception
      */
     public function create(\Validation $validation = null)
     {
+        // First, create model and get ID
         $result = parent::create($validation);
 
-        $this->createRevisionRelatedModel();
+        // Create revision linked to new model ID
+        $newRevision = $this->createRevisionIfChanged();
+
+        if ($newRevision) {
+            $this->currentRevision = $newRevision;
+        }
+
+        // If new actual revision was set, then update
+        if ($this->changed()) {
+            parent::update();
+        }
 
         return $result;
     }
@@ -195,21 +214,21 @@ trait ModelWithRevisionsOrmTrait
      *
      * @param  \Validation $validation Validation object
      *
-     * @return $this
+     * @return $this|\BetaKiller\Model\ExtendedOrmInterface
+     * @throws \BetaKiller\Exception
+     * @throws \Kohana_Exception
      */
     public function update(\Validation $validation = null)
     {
-        $result = parent::update($validation);
+        // Update revision model first and set actual_revision field
+        $newRevision = $this->createRevisionIfChanged();
 
-        $this->updateRevisionRelatedModel();
+        if ($newRevision) {
+            $this->currentRevision = $newRevision;
+        }
 
-        return $result;
-    }
-
-    protected function createRevisionRelatedModel(): void
-    {
-        // Create revision if revisionable fields were set
-        $this->createRevisionIfChanged();
+        // Regular update + store new revision ID
+        return parent::update($validation);
     }
 
     /**
@@ -223,13 +242,11 @@ trait ModelWithRevisionsOrmTrait
 
         // TODO разобраться с changed() (всегда true при сохранении поста так как формально данные были обновлены через set(), но по факту имели те же значения)
 
-        if (!$revision->changed()) {
+        if (!$revision->isChanged()) {
             return null;
         }
 
-        $id = $this->getID();
-
-        if (!$id) {
+        if (!$this->hasID()) {
             throw new Exception('Can not link revision to related model without ID');
         }
 
@@ -244,29 +261,22 @@ trait ModelWithRevisionsOrmTrait
         $revision->setCreatedAt(new DateTime);
         $revision->setCreatedBy($user);
 
-        // Link new revision to current post
-        $key = $this->getRevisionModelForeignKey();
-        $revision->set($key, $id);
+        // Link new revision to current entity
+        $revision->setRelatedEntity($this);
 
         $newRevision = $revision->createNewRevisionIfChanged();
 
         // Link latest revision to current post
         if ($newRevision && !$this->getActualRevision()) {
             $this->setActualRevision($newRevision);
-            parent::update();
         }
 
         return $newRevision;
     }
 
-    protected function updateRevisionRelatedModel(): void
-    {
-        $this->createRevisionIfChanged();
-    }
-
     public function isRevisionDataChanged(): bool
     {
-        return $this->getCurrentRevision()->changed();
+        return $this->getCurrentRevision()->isChanged();
     }
 
     private function isRevisionableColumn(string $column): bool
@@ -300,9 +310,9 @@ trait ModelWithRevisionsOrmTrait
     private function getActualRevision(): ?RevisionModelInterface
     {
         /** @var \BetaKiller\Model\RevisionModelInterface $model */
-        $model = $this->get(RevisionModelInterface::ACTUAL_REVISION_KEY);
+        $model = $this->get(ModelWithRevisionsInterface::ACTUAL_REVISION_KEY);
 
-        return $model->loaded() ? $model : null;
+        return $model->hasID() ? $model : null;
     }
 
     /**
@@ -312,7 +322,7 @@ trait ModelWithRevisionsOrmTrait
      */
     private function setActualRevision(RevisionModelInterface $model): void
     {
-        $this->set(RevisionModelInterface::ACTUAL_REVISION_KEY, $model);
+        $this->set(ModelWithRevisionsInterface::ACTUAL_REVISION_KEY, $model);
     }
 
     private function getLatestRevision(): RevisionModelInterface
@@ -325,7 +335,7 @@ trait ModelWithRevisionsOrmTrait
      */
     private function getAllRevisionsRelation(): AbstractRevisionOrmModel
     {
-        return $this->get(RevisionModelInterface::ALL_REVISIONS_KEY);
+        return $this->get(ModelWithRevisionsInterface::ALL_REVISIONS_KEY);
     }
 
     /**

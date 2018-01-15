@@ -17,6 +17,16 @@ class ContentPostRevision extends AbstractRevisionOrmModel
         parent::_initialize();
     }
 
+    protected function getRelatedEntityModelName(): string
+    {
+        return 'ContentPost';
+    }
+
+    protected function getRelatedEntityForeignKey(): string
+    {
+        return 'post_id';
+    }
+
     /**
      * Rule definitions for validation
      *
