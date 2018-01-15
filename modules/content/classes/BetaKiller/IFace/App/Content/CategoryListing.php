@@ -1,7 +1,7 @@
 <?php
 namespace BetaKiller\IFace\App\Content;
 
-use BetaKiller\Model\ContentCategory;
+use BetaKiller\Model\ContentCategoryInterface;
 
 class CategoryListing extends AbstractAppBase
 {
@@ -20,11 +20,11 @@ class CategoryListing extends AbstractAppBase
     public function getData(): array
     {
         return [
-            'categories' => $this->get_categories_data(),
+            'categories' => $this->getCategoriesData(),
         ];
     }
 
-    protected function get_categories_data(ContentCategory $parent = null): array
+    protected function getCategoriesData(ContentCategoryInterface $parent = null): array
     {
         $data = [];
 
@@ -35,18 +35,18 @@ class CategoryListing extends AbstractAppBase
                 continue;
             }
 
-            $data[] = $this->get_category_data($child);
+            $data[] = $this->getCategoryData($child);
         }
 
         return $data;
     }
 
-    protected function get_category_data(\BetaKiller\Model\ContentCategory $category)
+    protected function getCategoryData(ContentCategoryInterface $category)
     {
         return [
-            'label'     =>  $category->getLabel(),
-            'url'       =>  $this->ifaceHelper->getReadEntityUrl($category),
-            'children'  =>  $this->get_categories_data($category),
+            'label'    => $category->getLabel(),
+            'url'      => $this->ifaceHelper->getReadEntityUrl($category),
+            'children' => $this->getCategoriesData($category),
         ];
     }
 }

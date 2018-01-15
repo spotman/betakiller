@@ -2,7 +2,6 @@
 namespace BetaKiller\Widget;
 
 use BetaKiller\Content\Shortcode\ShortcodeInterface;
-use BetaKiller\IFace\Widget\AbstractBaseWidget;
 
 class ShortcodeWidget extends AbstractBaseWidget
 {

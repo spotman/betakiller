@@ -1,9 +1,15 @@
 <?php
+namespace BetaKiller\Widget\Content;
 
-use BetaKiller\IFace\Widget\AbstractBaseWidget;
+use BetaKiller\Widget\AbstractBaseWidget;
 use BetaKiller\Widget\WidgetException;
+use HTML;
+use ORM_Validation_Exception;
+use Security;
+use Valid;
+use Validation;
 
-class Widget_Content_Comments extends AbstractBaseWidget
+class CommentsWidget extends AbstractBaseWidget
 {
     /**
      * @Inject
@@ -33,6 +39,7 @@ class Widget_Content_Comments extends AbstractBaseWidget
      * Returns data for View rendering
      *
      * @return array
+     * @throws \BetaKiller\Repository\RepositoryException
      * @throws WidgetException
      */
     public function getData(): array
@@ -82,6 +89,8 @@ class Widget_Content_Comments extends AbstractBaseWidget
     }
 
     /**
+     * @throws \Exception
+     * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\Widget\WidgetException
      * @throws \BetaKiller\Repository\RepositoryException
      * @throws \Kohana_Exception
@@ -109,7 +118,7 @@ class Widget_Content_Comments extends AbstractBaseWidget
         $validation = Validation::factory($this->post());
 
         $validation
-            ->rule('csrf-key', 'not_empty')
+            ->rule('csrf-key', [Valid::class, 'not_empty'])
             ->rule('csrf-key', [Security::class, 'check']);
 
         if (!$validation->check()) {
@@ -135,7 +144,7 @@ class Widget_Content_Comments extends AbstractBaseWidget
             $parentEntityItemID = $parentModel->getEntityItemID();
 
             // Check parent comment entity id
-            if (!$parentEntity->isEqualTo($entity)) {
+            if (!$parentEntity->isSameAs($entity)) {
                 throw new WidgetException('Incorrect parent comment entity; :sent sent instead of :needed', [
                     ':needed' => $entity->getID(),
                     ':sent'   => $parentEntity->getID(),
@@ -201,7 +210,7 @@ class Widget_Content_Comments extends AbstractBaseWidget
             $this->send_success_json();
         } /** @noinspection BadExceptionsProcessingInspection */
         catch (ORM_Validation_Exception $e) {
-            $errors = $this->getValidationErrors($model->validation());
+            $errors = $this->getValidationErrors($e->getValidationObject());
 
             $this->send_error_json(array_pop($errors));
         }

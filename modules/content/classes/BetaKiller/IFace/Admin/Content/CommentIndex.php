@@ -11,8 +11,9 @@ class CommentIndex extends AbstractCommentList
 
     /**
      * @return \BetaKiller\Model\ContentComment[]
+     * @throws \BetaKiller\Repository\RepositoryException
      */
-    protected function get_comments_list(): array
+    protected function getCommentsList(): array
     {
         return $this->commentRepository->getLatestComments();
     }

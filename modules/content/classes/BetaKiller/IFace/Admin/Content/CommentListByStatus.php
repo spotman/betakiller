@@ -17,8 +17,9 @@ class CommentListByStatus extends AbstractCommentList
 
     /**
      * @return \BetaKiller\Model\ContentComment[]
+     * @throws \BetaKiller\Repository\RepositoryException
      */
-    protected function get_comments_list(): array
+    protected function getCommentsList(): array
     {
         $status = $this->urlParametersHelper->getContentCommentStatus();
 

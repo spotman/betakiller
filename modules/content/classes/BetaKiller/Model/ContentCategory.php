@@ -132,7 +132,7 @@ class ContentCategory extends TreeModelSingleParentOrm implements ContentCategor
     /**
      * @return \BetaKiller\Model\ContentPost
      */
-    protected function get_posts_relation()
+    protected function getPostsRelation(): ContentPost
     {
         return $this->get('posts');
     }

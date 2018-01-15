@@ -1,8 +1,5 @@
 <?php
-namespace BetaKiller\IFace\Widget;
-
-
-use BetaKiller\Widget\AbstractWidget;
+namespace BetaKiller\Widget;
 
 abstract class AbstractBaseWidget extends AbstractWidget
 {

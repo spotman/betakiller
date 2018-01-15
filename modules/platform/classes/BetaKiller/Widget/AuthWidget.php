@@ -2,7 +2,6 @@
 namespace BetaKiller\Widget;
 
 use BetaKiller\Config\ConfigProviderInterface;
-use BetaKiller\IFace\Widget\AbstractBaseWidget;
 
 class AuthWidget extends AbstractBaseWidget
 {

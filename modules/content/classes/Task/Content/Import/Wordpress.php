@@ -198,7 +198,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
      */
     private function configureDialog(): void
     {
-        $parsingMode = $this->wp->get_option(self::WP_OPTION_PARSING_MODE);
+        $parsingMode = $this->wp->getOption(self::WP_OPTION_PARSING_MODE);
 
         if (!$parsingMode) {
             $parsingMode = $this->read('Select parsing mode', [
@@ -210,7 +210,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
         $this->logger->info('Parsing mode is: '.$parsingMode);
 
 
-        $parsingPath = $this->wp->get_option(self::WP_OPTION_PARSING_PATH);
+        $parsingPath = $this->wp->getOption(self::WP_OPTION_PARSING_PATH);
 
         if (!$parsingPath) {
             if ($parsingMode === self::ATTACH_PARSING_MODE_HTTP) {
@@ -237,8 +237,8 @@ class Task_Content_Import_Wordpress extends AbstractTask
         $this->attachParsingMode = $parsingMode;
         $this->attachParsingPath = $parsingPath;
 
-        $this->wp->set_option(self::WP_OPTION_PARSING_MODE, $parsingMode);
-        $this->wp->set_option(self::WP_OPTION_PARSING_PATH, $parsingPath);
+        $this->wp->setOption(self::WP_OPTION_PARSING_MODE, $parsingMode);
+        $this->wp->setOption(self::WP_OPTION_PARSING_PATH, $parsingPath);
     }
 
     /**
@@ -448,7 +448,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
      */
     private function importPostsAndPages(): void
     {
-        $posts = $this->wp->get_posts_and_pages($this->skipBeforeDate);
+        $posts = $this->wp->getPostsAndPages($this->skipBeforeDate);
 
         $total   = $posts->count();
         $current = 1;
@@ -462,7 +462,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
             $createdAt = new DateTime($post['post_date']);
             $updatedAt = new DateTime($post['post_modified']);
 
-            $meta        = $this->wp->get_post_meta($wpID);
+            $meta        = $this->wp->getPostMeta($wpID);
             $title       = $meta['_aioseop_title'] ?? null;
             $description = $meta['_aioseop_description'] ?? null;
 
@@ -634,7 +634,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
                 $link->replace($imageShortcode->asDomText());
             } else {
                 // Link to another attachment
-                $wpAttach = $this->wp->get_attachment_by_path($href);
+                $wpAttach = $this->wp->getAttachmentByPath($href);
 
                 if (!$wpAttach) {
                     throw new TaskException('Unknown attachment href :url', [':url' => $href]);
@@ -683,7 +683,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
 
         $wpImagesIDs = [];
 
-        if ($this->wp->post_has_post_format($wpID, 'gallery')) {
+        if ($this->wp->postHasPostFormat($wpID, 'gallery')) {
             $this->logger->debug('Getting thumbnail images from from _format_gallery_images');
 
             // Getting images from meta._format_gallery_images
@@ -708,7 +708,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
         }
 
         // Getting data for each thumbnail
-        $imagesWpData = $this->wp->get_attachments(null, $wpImagesIDs);
+        $imagesWpData = $this->wp->getAttachments(null, $wpImagesIDs);
 
         if (!$imagesWpData) {
             $this->logger->warning('Some images can not be found with WP ids :ids', [
@@ -802,7 +802,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
         $imageWpID = (int)str_replace('attachment_', '', $attributes['id']);
 
         // Find image in WP and process attachment
-        $wpImageData = $this->wp->get_attachment_by_id($imageWpID);
+        $wpImageData = $this->wp->getAttachmentByID($imageWpID);
 
         if (!$wpImageData) {
             $this->logger->warning('No image found by wp_id :id', [':id' => $imageWpID]);
@@ -880,7 +880,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
 
         $shortcode->setID($gallery->getID());
 
-        $wpImages = $this->wp->get_attachments(null, $wpIDs);
+        $wpImages = $this->wp->getAttachments(null, $wpIDs);
 
         if (!$wpImages) {
             $this->logger->warning('No images found for gallery with WP IDs :ids', [
@@ -932,7 +932,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
         $shortcode->useSliderLayout();
 
         $wonderPluginID = $s->getParameter('id');
-        $config         = $this->wp->get_wonderplugin_slider_config($wonderPluginID);
+        $config         = $this->wp->getWonderpluginSliderConfig($wonderPluginID);
         $this->logger->debug('Processing wonderplugin slider :id', [':id' => $wonderPluginID]);
 
         /** @var array $slides */
@@ -942,7 +942,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
             $url = $slide['image'];
 
             // Searching for image
-            $wpImage = $this->wp->get_attachment_by_path($url);
+            $wpImage = $this->wp->getAttachmentByPath($url);
 
             if (!$wpImage) {
                 throw new TaskException('Unknown image in wonderplugin: :url', [':url' => $url]);
@@ -1015,7 +1015,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
 
         $this->logger->debug('Found inline image :tag', [':tag' => $node->html()]);
 
-        $wpImage = $this->wp->get_attachment_by_path($originalUrl);
+        $wpImage = $this->wp->getAttachmentByPath($originalUrl);
 
         if (!$wpImage) {
             throw new TaskException('Unknown image with src :value', [':value' => $originalUrl]);
@@ -1200,7 +1200,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
      */
     private function importCategories(): void
     {
-        $categories = $this->wp->get_categories_with_posts();
+        $categories = $this->wp->getCategoriesWithPosts();
 
         $total   = count($categories);
         $current = 1;
@@ -1229,7 +1229,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
             $this->categoryRepository->save($category);
 
             // Find articles related to current category
-            $postsWpIDs = $this->wp->get_posts_ids_linked_to_category($wpID);
+            $postsWpIDs = $this->wp->getPostsIDsLinkedToCategory($wpID);
 
             // Check for any linked objects
             if ($postsWpIDs) {
@@ -1271,7 +1271,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
      */
     private function importQuotes(): void
     {
-        $quotesData = $this->wp->get_quotes_collection_quotes();
+        $quotesData = $this->wp->getQuotesCollectionQuotes();
 
         foreach ($quotesData as $data) {
             $id        = $data['id'];
@@ -1301,7 +1301,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
      */
     private function importComments(): void
     {
-        $comments_data = $this->wp->get_comments();
+        $comments_data = $this->wp->getComments();
 
         $this->logger->info('Processing :total comments ', [
             ':total' => count($comments_data),
@@ -1400,7 +1400,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
     {
         $this->logger->info('Importing users...');
 
-        $wpUsers = $this->wp->get_users();
+        $wpUsers = $this->wp->getUsers();
 
         foreach ($wpUsers as $wpUser) {
             $wpLogin = $wpUser['login'];

@@ -1,8 +1,11 @@
 <?php
+namespace BetaKiller\Widget\Content;
 
-use BetaKiller\IFace\Widget\AbstractBaseWidget;
+use BetaKiller\Widget\AbstractBaseWidget;
+use DateTime;
+use DateTimeInterface;
 
-class Widget_Content_Quotes extends AbstractBaseWidget
+class QuotesWidget extends AbstractBaseWidget
 {
     /**
      * @Inject

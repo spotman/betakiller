@@ -4,7 +4,7 @@ namespace BetaKiller\Widget\Auth;
 use Auth;
 use BetaKiller\Helper\IFaceHelper;
 use BetaKiller\IFace\Auth\PasswordReset;
-use BetaKiller\IFace\Widget\AbstractBaseWidget;
+use BetaKiller\Widget\AbstractBaseWidget;
 use HTML;
 use HTTP_Exception_400;
 

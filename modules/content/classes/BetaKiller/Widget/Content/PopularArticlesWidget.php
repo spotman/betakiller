@@ -1,8 +1,7 @@
 <?php
+namespace BetaKiller\Widget\Content;
 
-use BetaKiller\Model\ContentPost;
-
-class Widget_Content_PopularArticles extends Widget_Content_SidebarArticlesList
+class PopularArticlesWidget extends SidebarArticlesListWidget
 {
     /**
      * @var \BetaKiller\Helper\ContentHelper
@@ -14,9 +13,10 @@ class Widget_Content_PopularArticles extends Widget_Content_SidebarArticlesList
      * @param int $exclude_id
      * @param int $limit
      *
-     * @return ContentPost[]
+     * @return \BetaKiller\Model\ContentPostInterface[]
+     * @throws \BetaKiller\Repository\RepositoryException
      */
-    protected function get_articles_list($exclude_id, $limit): array
+    protected function getArticlesList($exclude_id, $limit): array
     {
         return $this->contentHelper->getPostRepository()->getPopularArticles($limit, $exclude_id);
     }

@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Interface HasTextInterface
+ * @deprecated
+ */
 interface HasTextInterface
 {
     /**

@@ -4,16 +4,16 @@ namespace BetaKiller\Model;
 interface EntityItemRelatedInterface
 {
     /**
-     * @param Entity $entity
+     * @param \BetaKiller\Model\EntityModelInterface $entity
      *
      * @return \BetaKiller\Model\EntityItemRelatedInterface
      */
-    public function setEntity(Entity $entity): EntityItemRelatedInterface;
+    public function setEntity(EntityModelInterface $entity): EntityItemRelatedInterface;
 
     /**
-     * @return Entity
+     * @return \BetaKiller\Model\EntityModelInterface
      */
-    public function getEntity(): Entity;
+    public function getEntity(): EntityModelInterface;
 
     /**
      * @return string

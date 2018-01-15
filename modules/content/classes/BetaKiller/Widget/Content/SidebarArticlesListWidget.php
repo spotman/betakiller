@@ -1,10 +1,11 @@
 <?php
+namespace BetaKiller\Widget\Content;
 
-use BetaKiller\IFace\Widget\AbstractBaseWidget;
-use BetaKiller\Model\ContentPost;
+use BetaKiller\Model\ContentPostInterface;
 use BetaKiller\Model\IFaceZone;
+use BetaKiller\Widget\AbstractBaseWidget;
 
-abstract class Widget_Content_SidebarArticlesList extends AbstractBaseWidget
+abstract class SidebarArticlesListWidget extends AbstractBaseWidget
 {
     /**
      * @Inject
@@ -28,7 +29,7 @@ abstract class Widget_Content_SidebarArticlesList extends AbstractBaseWidget
         $limit      = (int)$this->getContextParam('limit', 5);
         $exclude_id = $this->getCurrentArticleID();
 
-        $articles = $this->get_articles_list($exclude_id, $limit);
+        $articles = $this->getArticlesList($exclude_id, $limit);
 
         $data = [];
 
@@ -45,9 +46,9 @@ abstract class Widget_Content_SidebarArticlesList extends AbstractBaseWidget
      * @param int $exclude_id
      * @param int $limit
      *
-     * @return ContentPost[]
+     * @return ContentPostInterface[]
      */
-    abstract protected function get_articles_list($exclude_id, $limit);
+    abstract protected function getArticlesList($exclude_id, $limit): array;
 
     protected function getCurrentArticleID()
     {
@@ -56,7 +57,7 @@ abstract class Widget_Content_SidebarArticlesList extends AbstractBaseWidget
         return $current_article ? $current_article->getID() : null;
     }
 
-    protected function getArticleData(ContentPost $article): array
+    protected function getArticleData(ContentPostInterface $article): array
     {
         /** @var \BetaKiller\Model\ContentImage $thumbnail */
         $thumbnail = $article->getFirstThumbnail();

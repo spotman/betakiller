@@ -11,7 +11,6 @@ interface EntityModelInterface extends DispatchableEntityInterface, HasLabelInte
      * Returns entity short name (may be used for url creating)
      *
      * @return string
-     * @throws \BetaKiller\Exception
      */
     public function getSlug(): string;
 
@@ -42,7 +41,6 @@ interface EntityModelInterface extends DispatchableEntityInterface, HasLabelInte
      * @param int $id
      *
      * @return \BetaKiller\Model\RelatedEntityInterface
-     * @throws \BetaKiller\Exception
      */
     public function getLinkedEntityInstance($id): RelatedEntityInterface;
 }

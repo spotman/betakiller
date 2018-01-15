@@ -1,13 +1,15 @@
 <?php
+namespace BetaKiller\Widget\Content;
 
-use BetaKiller\IFace\Widget\AbstractBaseWidget;
 use BetaKiller\Model\ContentCategory;
 use BetaKiller\Model\ContentCategoryInterface;
 use BetaKiller\Model\ContentPost;
 use BetaKiller\Model\IFaceZone;
 use BetaKiller\Search\SearchResultsInterface;
+use BetaKiller\Widget\AbstractBaseWidget;
+use HTML;
 
-class Widget_Content_ArticlesList extends AbstractBaseWidget
+class ArticlesListWidget extends AbstractBaseWidget
 {
     private const CATEGORY_ID_QUERY_KEY = 'category-id';
     private const PAGE_QUERY_KEY        = 'page';
@@ -31,6 +33,9 @@ class Widget_Content_ArticlesList extends AbstractBaseWidget
      */
     private $assetsHelper;
 
+    /**
+     * @var int
+     */
     protected $itemsPerPage = 12;
 
     /**

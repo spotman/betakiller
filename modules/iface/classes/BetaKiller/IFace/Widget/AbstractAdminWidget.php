@@ -2,6 +2,7 @@
 namespace BetaKiller\IFace\Widget;
 
 use BetaKiller\Model\UserInterface;
+use BetaKiller\Widget\AbstractBaseWidget;
 
 abstract class AbstractAdminWidget extends AbstractBaseWidget
 {

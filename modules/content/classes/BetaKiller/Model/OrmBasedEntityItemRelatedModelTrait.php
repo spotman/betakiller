@@ -26,19 +26,19 @@ trait OrmBasedEntityItemRelatedModelTrait
     }
 
     /**
-     * @param Entity $entity
+     * @param \BetaKiller\Model\EntityModelInterface $entity
      *
      * @return EntityItemRelatedInterface
      */
-    public function setEntity(Entity $entity): EntityItemRelatedInterface
+    public function setEntity(EntityModelInterface $entity): EntityItemRelatedInterface
     {
         return $this->set('entity', $entity);
     }
 
     /**
-     * @return Entity
+     * @return \BetaKiller\Model\EntityModelInterface
      */
-    public function getEntity(): Entity
+    public function getEntity(): EntityModelInterface
     {
         return $this->get('entity');
     }
@@ -73,7 +73,6 @@ trait OrmBasedEntityItemRelatedModelTrait
 
     /**
      * @return \BetaKiller\Model\RelatedEntityInterface
-     * @throws \BetaKiller\Exception
      */
     protected function getRelatedEntityInstance(): RelatedEntityInterface
     {

@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Interface HasContentElementsInterface
+ * @deprecated
+ */
 interface HasContentElementsInterface
 {
     /**

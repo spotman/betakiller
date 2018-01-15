@@ -1,7 +1,7 @@
 <?php
 namespace BetaKiller\Widget\Auth;
 
-use BetaKiller\IFace\Widget\AbstractBaseWidget;
+use BetaKiller\Widget\AbstractBaseWidget;
 
 class PasswordResetWidget extends AbstractBaseWidget
 {

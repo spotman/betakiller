@@ -19,12 +19,12 @@ abstract class AbstractCommentList extends AbstractAdminBase
      */
     public function getData(): array
     {
-        $comments = $this->get_comments_list();
+        $comments = $this->getCommentsList();
 
         $data = [];
 
         foreach ($comments as $comment) {
-            $data[] = $this->get_comment_data($comment);
+            $data[] = $this->getCommentData($comment);
         }
 
         return [
@@ -35,9 +35,9 @@ abstract class AbstractCommentList extends AbstractAdminBase
     /**
      * @return \BetaKiller\Model\ContentCommentInterface[]
      */
-    abstract protected function get_comments_list();
+    abstract protected function getCommentsList(): array;
 
-    protected function get_comment_data(ContentCommentInterface $comment)
+    protected function getCommentData(ContentCommentInterface $comment)
     {
         $status = $comment->getCurrentStatus();
 

@@ -5,6 +5,7 @@ use BetaKiller\Model\ContentComment;
 use BetaKiller\Model\ContentCommentInterface;
 use BetaKiller\Model\ContentCommentStatus;
 use BetaKiller\Model\Entity;
+use BetaKiller\Model\EntityModelInterface;
 use BetaKiller\Utils\Kohana\ORM\OrmInterface;
 use DateInterval;
 use DateTime;
@@ -41,7 +42,7 @@ class ContentCommentRepository extends AbstractOrmBasedDispatchableRepository
     }
 
     /**
-     * @param string $ipAddress
+     * @param string   $ipAddress
      * @param int|null $interval
      *
      * @return int
@@ -62,13 +63,13 @@ class ContentCommentRepository extends AbstractOrmBasedDispatchableRepository
     }
 
     /**
-     * @param \BetaKiller\Model\Entity $entity
-     * @param int                      $entityItemID
+     * @param \BetaKiller\Model\EntityModelInterface $entity
+     * @param int                                    $entityItemID
      *
      * @return \BetaKiller\Model\ContentComment[]
      * @throws \BetaKiller\Repository\RepositoryException
      */
-    public function getEntityItemApprovedComments(Entity $entity, int $entityItemID): array
+    public function getEntityItemApprovedComments(EntityModelInterface $entity, int $entityItemID): array
     {
         /** @var \BetaKiller\Model\ContentCommentStatus $status */
         $status = $this->commentStatusRepository->getApprovedStatus();
