@@ -1,14 +1,16 @@
 <?php
 
+namespace BetaKiller\Model;
+
 use BetaKiller\Status\StatusModelOrm;
 
-class Model_ContentPostStatus extends StatusModelOrm
+class ContentPostStatus extends StatusModelOrm
 {
-    const DRAFT_ID         = 1;
-    const PENDING_ID       = 2;
-    const PUBLISHED_ID     = 3;
-    const PAUSED_ID        = 4;
-    const FIX_REQUESTED_ID = 5;
+    public const DRAFT_ID         = 1;
+    public const PENDING_ID       = 2;
+    public const PUBLISHED_ID     = 3;
+    public const PAUSED_ID        = 4;
+    public const FIX_REQUESTED_ID = 5;
 
     protected function _initialize()
     {

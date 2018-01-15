@@ -5,10 +5,10 @@ use BetaKiller\Status\StatusModelOrm;
 
 class ContentCommentStatus extends StatusModelOrm
 {
-    const STATUS_PENDING  = 1;
-    const STATUS_APPROVED = 2;
-    const STATUS_SPAM     = 3;
-    const STATUS_TRASH    = 4;
+    public const STATUS_PENDING  = 1;
+    public const STATUS_APPROVED = 2;
+    public const STATUS_SPAM     = 3;
+    public const STATUS_TRASH    = 4;
 
     protected function _initialize(): void
     {

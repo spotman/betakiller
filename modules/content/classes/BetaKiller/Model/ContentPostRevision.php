@@ -1,14 +1,13 @@
 <?php
+namespace BetaKiller\Model;
 
-use BetaKiller\Model\AbstractRevisionOrmModel;
-
-class Model_ContentPostRevision extends AbstractRevisionOrmModel
+class ContentPostRevision extends AbstractRevisionOrmModel
 {
     /**
      * Prepares the model database connection, determines the table name,
      * and loads column information.
      *
-     * @throws Exception
+     * @throws \Exception
      * @return void
      */
     protected function _initialize()
@@ -26,9 +25,9 @@ class Model_ContentPostRevision extends AbstractRevisionOrmModel
     public function rules()
     {
         return parent::rules() + [
-            'label'   =>  [
-                ['not_empty'],
-            ],
-        ];
+                'label' => [
+                    ['not_empty'],
+                ],
+            ];
     }
 }

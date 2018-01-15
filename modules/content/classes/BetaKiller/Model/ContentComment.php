@@ -7,7 +7,6 @@ use BetaKiller\Utils\Kohana\TreeModelSingleParentOrm;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Exception;
-use Model_ContentCommentStatusTransition;
 use Validation;
 
 class ContentComment extends TreeModelSingleParentOrm implements ContentCommentInterface
@@ -422,7 +421,7 @@ class ContentComment extends TreeModelSingleParentOrm implements ContentCommentI
 
     public function isApproveAllowed(UserInterface $user): bool
     {
-        return $this->isStatusTransitionAllowed(Model_ContentCommentStatusTransition::APPROVE, $user);
+        return $this->isStatusTransitionAllowed(ContentCommentStatusTransition::APPROVE, $user);
     }
 
     /**

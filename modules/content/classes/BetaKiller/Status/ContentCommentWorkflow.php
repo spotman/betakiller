@@ -4,9 +4,9 @@ namespace BetaKiller\Status;
 use BetaKiller\Helper\IFaceHelper;
 use BetaKiller\Helper\NotificationHelper;
 use BetaKiller\Model\ContentComment;
+use BetaKiller\Model\ContentCommentStatusTransition;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Service\UserService;
-use Model_ContentCommentStatusTransition;
 
 class ContentCommentWorkflow extends StatusWorkflow
 {
@@ -79,7 +79,7 @@ class ContentCommentWorkflow extends StatusWorkflow
      */
     public function approve(): void
     {
-        $this->doTransition(Model_ContentCommentStatusTransition::APPROVE);
+        $this->doTransition(ContentCommentStatusTransition::APPROVE);
 
         $comment = $this->model();
 
@@ -174,7 +174,7 @@ class ContentCommentWorkflow extends StatusWorkflow
     public function reject(): void
     {
         // Simply change status
-        $this->doTransition(Model_ContentCommentStatusTransition::REJECT);
+        $this->doTransition(ContentCommentStatusTransition::REJECT);
     }
 
     /**
@@ -184,7 +184,7 @@ class ContentCommentWorkflow extends StatusWorkflow
     public function markAsSpam(): void
     {
         // Simply change status
-        $this->doTransition(Model_ContentCommentStatusTransition::MARK_AS_SPAM);
+        $this->doTransition(ContentCommentStatusTransition::MARK_AS_SPAM);
     }
 
     /**
@@ -194,7 +194,7 @@ class ContentCommentWorkflow extends StatusWorkflow
     public function moveToTrash(): void
     {
         // Simply change status
-        $this->doTransition(Model_ContentCommentStatusTransition::MOVE_TO_TRASH);
+        $this->doTransition(ContentCommentStatusTransition::MOVE_TO_TRASH);
     }
 
     /**
@@ -204,6 +204,6 @@ class ContentCommentWorkflow extends StatusWorkflow
     public function restoreFromTrash(): void
     {
         // Simply change status
-        $this->doTransition(Model_ContentCommentStatusTransition::RESTORE_FROM_TRASH);
+        $this->doTransition(ContentCommentStatusTransition::RESTORE_FROM_TRASH);
     }
 }

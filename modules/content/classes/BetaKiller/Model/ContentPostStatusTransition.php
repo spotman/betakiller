@@ -1,8 +1,9 @@
 <?php
+namespace BetaKiller\Model;
 
 use BetaKiller\Status\StatusTransitionModelOrm;
 
-class Model_ContentPostStatusTransition extends StatusTransitionModelOrm
+class ContentPostStatusTransition extends StatusTransitionModelOrm
 {
     protected function _initialize()
     {

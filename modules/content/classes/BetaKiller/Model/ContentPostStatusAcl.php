@@ -1,8 +1,9 @@
 <?php
+namespace BetaKiller\Model;
 
 use BetaKiller\Status\AbstractStatusAclModelOrm;
 
-class Model_ContentPostStatusAcl extends AbstractStatusAclModelOrm
+class ContentPostStatusAcl extends AbstractStatusAclModelOrm
 {
     /**
      * Prepares the model database connection, determines the table name,
