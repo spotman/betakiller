@@ -52,6 +52,10 @@ class I18n extends Kohana_I18n
      */
     public static function get($string, $lang = null): string
     {
+        if (!$string) {
+            return '';
+        }
+
         if (!$lang) {
             // Use the global target language
             $lang = static::$lang;
@@ -154,19 +158,6 @@ class I18n extends Kohana_I18n
         }
 
         $content = static::makeFileContent(array_merge($data, $currentAppLangData));
-
-        // Backup old file - if the file size is different.
-        if (file_exists($fullFilePath) && (filesize($fullFilePath) !== strlen($content))) {
-            // Backing up current config
-            $oldContent = file_get_contents($fullFilePath);
-            $backupName = $savePath.static::$lang.'_'.date('Y_m_d__H_i_s').'.php';
-            $result     = file_put_contents($backupName, $oldContent);
-
-            // Backup failed! Don't write the file.
-            if (!$result) {
-                return;
-            }
-        }
 
         // Save the file
         file_put_contents($fullFilePath, $content, LOCK_EX);
