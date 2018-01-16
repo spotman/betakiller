@@ -3,11 +3,22 @@ global_exclude_dirs:
     - vendor
     - system
     - modules/auth
+    - modules/cache
     - modules/database
-    - modules/minion
-    - modules/static-files
+    - modules/device
+    - modules/email
+    - modules/i18n-plural
     - modules/image
+    - modules/minion
+    - modules/migrations
+    - modules/mysqli
     - modules/orm
+    - modules/paginate
+    - modules/static-files
+    - modules/sqlite
+    - modules/ulogin
+    - modules/unittests
+    - modules/utils
     - modules/admin/static-files/admin/components
 
 rules:
