@@ -4,11 +4,10 @@ namespace BetaKiller\Repository;
 use BetaKiller\Config\ConfigProviderInterface;
 use BetaKiller\Model\ConfigBasedDispatchableEntityInterface;
 use BetaKiller\Url\UrlContainerInterface;
-use BetaKiller\Url\UrlDataSourceInterface;
 use BetaKiller\Url\UrlParameterInterface;
 
 abstract class AbstractConfigBasedDispatchableRepository extends AbstractPredefinedRepository
-    implements UrlDataSourceInterface
+    implements DispatchableRepositoryInterface
 {
     /**
      * @var \BetaKiller\Config\ConfigProviderInterface

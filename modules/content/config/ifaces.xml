@@ -4,8 +4,10 @@
     <iface uri="posts" codename="Admin_Content_PostIndex" parentCodename="Admin_Index" label="Posts" entity="ContentPost" entityAction="list">
         <iface uri="create" codename="Admin_Content_PostCreate" label="Create post" entity="ContentPost" entityAction="create" />
         <iface uri="{ContentPost.id}" codename="Admin_Content_PostItem" label="{ContentPost.label}" hasDynamicUrl="true" entity="ContentPost" entityAction="read">
+            <iface uri="revisions" codename="Admin_Content_PostItemRevisionList" label="Revisions" entity="ContentPost" entityAction="read">
+                <iface uri="{ContentPostRevision.id}" hasDynamicUrl="true" codename="Admin_Content_PostItemRevision" label="Revision {ContentPostRevision.id}" entity="ContentPostRevision" entityAction="read" />
+            </iface>
             <iface uri="preview" codename="Admin_Content_PostItemPreview" label="Preview" entity="ContentPost" entityAction="read" zone="preview" layoutCodename="public" />
-            <iface uri="revisions" codename="Admin_Content_PostItemRevisionList" label="Revisions" entity="ContentPost" entityAction="read" />
         </iface>
     </iface>
 

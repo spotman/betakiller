@@ -1,7 +1,7 @@
 <?php
 namespace BetaKiller\Model;
 
-interface RevisionModelInterface extends AbstractEntityInterface
+interface RevisionModelInterface extends DispatchableEntityInterface
 {
     /**
      * @return \BetaKiller\Model\RevisionModelInterface

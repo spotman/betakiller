@@ -1,0 +1,39 @@
+{% extends layout %}
+
+{% block page_content %}
+
+  {{ css("html-diff.css") }}
+
+  <div class="row">
+
+    <div class="col s12">
+      <div class="section">
+        <h2>Label</h2>
+        <div>{{ revision.label|raw }}</div>
+      </div>
+    </div>
+
+    <div class="col s12">
+      <div class="section">
+        <h2>Title</h2>
+        <div>{{ revision.title|raw }}</div>
+      </div>
+    </div>
+
+    <div class="col s12">
+      <div class="section">
+        <h2>Description</h2>
+        <div>{{ revision.description|raw }}</div>
+      </div>
+    </div>
+
+    <div class="col s12">
+      <div class="section">
+        <h2>Content</h2>
+        <div>{{ revision.content|raw }}</div>
+      </div>
+    </div>
+
+  </div>
+
+{% endblock %}

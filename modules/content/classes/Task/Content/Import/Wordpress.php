@@ -440,6 +440,8 @@ class Task_Content_Import_Wordpress extends AbstractTask
     }
 
     /**
+     * @throws \LogicException
+     * @throws \BetaKiller\Content\Shortcode\ShortcodeException
      * @throws \BetaKiller\Factory\FactoryException
      * @throws \ORM_Validation_Exception
      * @throws \BetaKiller\Repository\RepositoryException
@@ -499,11 +501,10 @@ class Task_Content_Import_Wordpress extends AbstractTask
             $model->setUri($uri);
             $model->setCreatedBy($this->user);
 
-            // Saving model and getting its ID for further processing
+            // Saving minimal model and getting its ID for further processing
             $this->postRepository->save($model);
 
             $model->setLabel($name);
-            $model->setContent($content);
 
             if ($title) {
                 $model->setTitle($title);
@@ -513,19 +514,20 @@ class Task_Content_Import_Wordpress extends AbstractTask
                 $model->setDescription($description);
             }
 
-            $model->injectNewRevisionAuthor($this->user);
-
             // Link thumbnail images to post
             $this->processThumbnails($model, $meta);
 
-            if ($model->getContent()) {
+            if ($content) {
                 // Parsing custom tags next
-                $this->processCustomBbTags($model);
+                $content = $this->processCustomBbTags($content, $model);
 
                 // Processing YouTube <iframe> embeds
-                $this->processContentYoutubeIFrames($model);
+                $content = $this->processContentYoutubeIFrames($content, $model);
 
-                $this->postProcessArticleText($model);
+                $content = $this->postProcessArticleText($content, $model);
+
+                // Process content and insert it only once after all processing is done
+                $model->setContent($content);
             } else {
                 $this->logger->warning('Post has no content at :uri', [':uri' => $uri]);
             }
@@ -541,6 +543,9 @@ class Task_Content_Import_Wordpress extends AbstractTask
 
                 $workflow->complete(); // Publishing would be done automatically
             }
+
+            // Use current user as an author of revision
+            $model->injectNewRevisionAuthor($this->user);
 
             // Actualize revision with imported data
             $model->setLatestRevisionAsActual();
@@ -562,35 +567,39 @@ class Task_Content_Import_Wordpress extends AbstractTask
     }
 
     /**
-     * @param \BetaKiller\Model\ContentPost $item
+     * @param string                                 $content
+     * @param \BetaKiller\Model\ContentPostInterface $item
      *
+     * @return string
+     * @throws \ORM_Validation_Exception
+     * @throws \LogicException
+     * @throws \BetaKiller\Content\Shortcode\ShortcodeException
+     * @throws \BetaKiller\Factory\FactoryException
+     * @throws \BetaKiller\Repository\RepositoryException
      * @throws \BetaKiller\Task\TaskException
-     * @throws \Kohana_Exception
      */
-    private function postProcessArticleText(ContentPost $item): void
+    private function postProcessArticleText(string $content, ContentPostInterface $item): string
     {
         $this->logger->debug('Text post processing...');
 
-        $text = $item->getContent();
-
-        $text = $this->wp->autop($text, false);
+        $content = $this->wp->autop($content, false);
 
         $document = new Document();
 
-        $html = '<html><body>'.$text.'</body></html>';
+        $html = '<html><body>'.$content.'</body></html>';
 
         // Make custom tags self-closing
         $document->loadHtml($html, LIBXML_COMPACT | LIBXML_PARSEHUGE | LIBXML_NONET);
 
         if (!$document->has('body')) {
             $this->logger->alert('Post parsing error for :url', [':url' => $item->getUri()]);
-            return;
+            return $content;
         }
 
         $body = $document->find('body')[0];
 
-        if ($body->innerHtml() !== $text) {
-            $this->logger->alert('HTML parsing had modified the post content');
+        if ($body->innerHtml() !== $content) {
+            $this->logger->warning('HTML parsing had modified the post content');
         }
 
         // Process attachments first coz they are images inside links
@@ -599,7 +608,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
         // Parsing all other images next to get @alt and @title values
         $this->processImagesInText($document, $item->getID());
 
-        $item->setContent($body->innerHtml());
+        return $body->innerHtml();
     }
 
     /**
@@ -740,11 +749,12 @@ class Task_Content_Import_Wordpress extends AbstractTask
     }
 
     /**
+     * @param string                        $content
      * @param \BetaKiller\Model\ContentPost $item
      *
-     * @throws \RuntimeException
+     * @return string
      */
-    private function processCustomBbTags(ContentPost $item): void
+    private function processCustomBbTags(string $content, ContentPost $item): string
     {
         $this->logger->debug('Processing custom tags...');
 
@@ -787,9 +797,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
         $parser    = new RegexParser;
         $processor = new Processor($parser, $handlers);
 
-        $content = $item->getContent();
-        $content = $processor->process($content);
-        $item->setContent($content);
+        return $processor->process($content);
     }
 
     /**
@@ -1071,13 +1079,14 @@ class Task_Content_Import_Wordpress extends AbstractTask
     }
 
     /**
-     * @param \BetaKiller\Model\ContentPost $item
+     * @param string                        $content
+     * @param \BetaKiller\Model\ContentPostInterface $item
+     *
+     * @return string
      */
-    private function processContentYoutubeIFrames(ContentPost $item): void
+    private function processContentYoutubeIFrames(string $content, ContentPostInterface $item): string
     {
-        $text = $this->processYoutubeVideosInText($item->getContent(), $item->getID());
-
-        $item->setContent($text);
+        return $this->processYoutubeVideosInText($content, $item->getID());
     }
 
     /**

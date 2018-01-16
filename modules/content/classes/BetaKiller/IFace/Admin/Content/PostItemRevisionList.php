@@ -18,6 +18,8 @@ class PostItemRevisionList extends AbstractAdminBase
      */
     public function __construct(ContentUrlContainerHelper $urlParametersHelper)
     {
+        parent::__construct();
+
         $this->urlParametersHelper = $urlParametersHelper;
     }
 
@@ -26,6 +28,8 @@ class PostItemRevisionList extends AbstractAdminBase
      * Override this method in child classes
      *
      * @return array
+     * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \BetaKiller\Url\UrlDispatcherException
      */
     public function getData(): array
     {
@@ -35,13 +39,14 @@ class PostItemRevisionList extends AbstractAdminBase
             throw new UrlDispatcherException('Missing ContentPost model');
         }
 
-        $data = [];
+        $data      = [];
         $revisions = $post->getAllRevisions();
 
         foreach ($revisions as $revision) {
             $data[] = [
-                'id' => $revision->getID(),
-                'is_actual' => $post->isActualRevision($revision),
+                'id'         => $revision->getID(),
+                'diff_url'   => $this->ifaceHelper->getReadEntityUrl($revision),
+                'is_actual'  => $post->isActualRevision($revision),
                 'created_at' => $revision->getCreatedAt()->format('d.m.Y H:i:s'),
                 'created_by' => $revision->getCreatedBy()->getUsername(),
             ];

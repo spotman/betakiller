@@ -3,6 +3,8 @@ namespace BetaKiller\Model;
 
 class ContentPostRevision extends AbstractRevisionOrmModel
 {
+    public const URL_KEY_NAME = 'id';
+
     /**
      * Prepares the model database connection, determines the table name,
      * and loads column information.

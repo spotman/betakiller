@@ -2,12 +2,11 @@
 namespace BetaKiller\Repository;
 
 use BetaKiller\Url\UrlContainerInterface;
-use BetaKiller\Url\UrlDataSourceInterface;
 use BetaKiller\Url\UrlParameterInterface;
 use BetaKiller\Utils\Kohana\ORM\OrmInterface;
 
 abstract class AbstractOrmBasedDispatchableRepository extends AbstractOrmBasedRepository implements
-    UrlDataSourceInterface
+    DispatchableRepositoryInterface
 {
     /**
      * Performs search for model item where the url key property is equal to $value
@@ -16,13 +15,13 @@ abstract class AbstractOrmBasedDispatchableRepository extends AbstractOrmBasedRe
      * @param \BetaKiller\Url\UrlContainerInterface $parameters
      *
      * @return UrlParameterInterface|null
+     * @throws \BetaKiller\Repository\RepositoryException
      * @throws \Kohana_Exception
      */
     public function findItemByUrlKeyValue(
         string $value,
         UrlContainerInterface $parameters
-    ): UrlParameterInterface
-    {
+    ): UrlParameterInterface {
         $orm = $this->getOrmInstance();
         $key = $this->getUrlKeyName();
 

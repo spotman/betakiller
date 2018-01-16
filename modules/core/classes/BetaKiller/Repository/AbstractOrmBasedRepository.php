@@ -134,7 +134,7 @@ abstract class AbstractOrmBasedRepository extends AbstractRepository
     /**
      * @param \BetaKiller\Model\ExtendedOrmInterface $orm
      *
-     * @return ExtendedOrmInterface|mixed
+     * @return ExtendedOrmInterface|mixed|null
      * @throws \BetaKiller\Repository\RepositoryException
      */
     protected function findOne(ExtendedOrmInterface $orm)

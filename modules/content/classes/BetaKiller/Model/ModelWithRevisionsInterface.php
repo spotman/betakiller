@@ -17,6 +17,13 @@ interface ModelWithRevisionsInterface
     public function useActualRevision(): void;
 
     /**
+     * @param \BetaKiller\Model\RevisionModelInterface $revision
+     *
+     * @return void
+     */
+    public function useRevision(RevisionModelInterface $revision): void;
+
+    /**
      * @return void
      */
     public function setLatestRevisionAsActual(): void;

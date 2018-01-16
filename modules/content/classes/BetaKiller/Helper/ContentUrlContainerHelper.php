@@ -5,6 +5,7 @@ use BetaKiller\Model\ContentCategory;
 use BetaKiller\Model\ContentComment;
 use BetaKiller\Model\ContentCommentStatus;
 use BetaKiller\Model\ContentPost;
+use BetaKiller\Model\ContentPostRevision;
 use BetaKiller\Url\UrlContainerInterface;
 
 class ContentUrlContainerHelper extends UrlContainerHelper
@@ -43,6 +44,25 @@ class ContentUrlContainerHelper extends UrlContainerHelper
      * @return \BetaKiller\Url\UrlContainerInterface
      */
     public function setContentPost(ContentPost $model, UrlContainerInterface $params = null): UrlContainerInterface
+    {
+        return $this->setEntity($model, $params);
+    }
+
+    /**
+     * @return \BetaKiller\Model\ContentPostRevision|null
+     */
+    public function getContentPostRevision(): ?ContentPostRevision
+    {
+        return $this->getEntityByClassName(ContentPostRevision::class);
+    }
+
+    /**
+     * @param \BetaKiller\Model\ContentPostRevision      $model
+     * @param \BetaKiller\Url\UrlContainerInterface|null $params
+     *
+     * @return \BetaKiller\Url\UrlContainerInterface
+     */
+    public function setContentPostRevision(ContentPostRevision $model, UrlContainerInterface $params = null): UrlContainerInterface
     {
         return $this->setEntity($model, $params);
     }

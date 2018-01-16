@@ -103,6 +103,16 @@ abstract class AbstractOrmBasedModelWithRevisions extends \ORM implements ModelW
     }
 
     /**
+     * @param \BetaKiller\Model\RevisionModelInterface $revision
+     *
+     * @return void
+     */
+    public function useRevision(RevisionModelInterface $revision): void
+    {
+        $this->setCurrentRevision($revision);
+    }
+
+    /**
      * @return void
      */
     public function setLatestRevisionAsActual(): void

@@ -20,9 +20,9 @@
         {% for revision in revisions %}
         <tr>
           <td>
-            {{ revision.id }}
+            <a href="{{ revision.diff_url }}">{{ revision.id }}</a>
           </td>
-          <td>{{ revision.created_at }}</td>
+          <td><a href="{{ revision.diff_url }}">{{ revision.created_at }}</a></td>
           <td>{{ revision.created_by }}</td>
           <td class="text-center">
             {% if revision.is_actual %}
@@ -30,7 +30,7 @@
                 Actual
               </button>
               {% else %}
-                <button class="btn green">
+                <button class="publish-revision btn green" data-id="{{ revision.id }}">
                   {#<i class="small material-icons left">done</i>#}
                   Publish
                 </button>
