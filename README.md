@@ -3,8 +3,7 @@
 [![Build Status](https://travis-ci.org/spotman/betakiller.svg?branch=master)](https://travis-ci.org/spotman/betakiller)
 [![Average time to resolve an issue](http://isitmaintained.com/badge/resolution/spotman/betakiller.svg)](http://isitmaintained.com/project/spotman/betakiller "Average time to resolve an issue")
 [![Percentage of issues still open](http://isitmaintained.com/badge/open/spotman/betakiller.svg)](http://isitmaintained.com/project/spotman/betakiller "Percentage of issues still open")
-
-[![SensioLabsInsight](https://insight.sensiolabs.com/projects/cae4439a-8a2e-4e0c-9169-f9d1c7e25366/big.png)](https://insight.sensiolabs.com/projects/cae4439a-8a2e-4e0c-9169-f9d1c7e25366)
+[![SensioLabsInsight](https://insight.sensiolabs.com/projects/cae4439a-8a2e-4e0c-9169-f9d1c7e25366/mini.png)](https://insight.sensiolabs.com/projects/cae4439a-8a2e-4e0c-9169-f9d1c7e25366)
 
 Based on the legacy [Kohana](http://kohanaframework.org/) framework (migration to [PSR-7](https://github.com/php-fig/http-message) / [PSR-15](https://github.com/http-interop/http-middleware) planned).
 
