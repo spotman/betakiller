@@ -273,6 +273,7 @@ class UrlDispatcher implements LoggerAwareInterface
             }
         }
 
+        // TODO Move this into TreeModel internal validation
         if (\count($dynamic) > 1) {
             throw new IFaceException('Layer must have only one IFace with dynamic dispatching');
         }
@@ -392,18 +393,6 @@ class UrlDispatcher implements LoggerAwareInterface
         $this->ifaceStack->push($iface);
     }
 
-//    public function parse_url_parameters_parts($source_string)
-//    {
-//        preg_match_all(self::PROTOTYPE_PCRE, $source_string, $matches, PREG_SET_ORDER);
-//
-//        // TODO Подготовить регулярку, которая выловит значения ключей из $source_string
-//        // Сделать это через замену всех прототипов ключей на регулярку (\S+) + экранирование остальных символов, не входящих в прототип
-//
-//        foreach ( $matches as $match )
-//        {
-//        }
-//    }
-
     /**
      * @param \BetaKiller\IFace\IFaceModelInterface $ifaceModel
      * @param \BetaKiller\Url\UrlPathIterator       $it
@@ -430,14 +419,8 @@ class UrlDispatcher implements LoggerAwareInterface
         }
 
         // Store model into registry
-        $registry = $this->urlParameters;
-
-        if (method_exists($registry, mb_strtolower('set_'.$prototype->getModelKey()))) {
-            throw new UrlDispatcherException('Method calls on UrlContainer registry are deprecated');
-        }
-
         // Allow tree url behaviour to set value multiple times
-        $registry->setParameter($item, $ifaceModel->hasTreeBehaviour());
+        $this->urlParameters->setParameter($item, $ifaceModel->hasTreeBehaviour());
     }
 
     /**
