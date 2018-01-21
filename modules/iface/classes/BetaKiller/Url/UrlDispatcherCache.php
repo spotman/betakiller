@@ -41,7 +41,7 @@ class UrlDispatcherCache implements UrlDispatcherCacheInterface
         return unserialize($data, [
             IFaceInterface::class,
             DispatchableEntityInterface::class,
-        ]);
+        ]) ?: null;
     }
 
     /**
