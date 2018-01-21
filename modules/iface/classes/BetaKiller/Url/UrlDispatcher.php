@@ -560,6 +560,9 @@ class UrlDispatcher implements LoggerAwareInterface
         } catch (\Throwable $e) {
             // Log and keep processing as no cache was found
             $this->logger->warning('Error on unpacking UrlDispatcher data: ', ['exception' => $e]);
+
+            // Wipe the cached data to prevent errors
+            $this->cache->set($cacheKey, null);
         }
 
         return false;

@@ -4,15 +4,17 @@ namespace BetaKiller\Url;
 interface UrlDispatcherCacheInterface
 {
     /**
-     * @param $url
+     * @param string $key
      *
      * @return array|null
      */
-    public function get(string $url);
+    public function get(string $key): ?array;
 
     /**
-     * @param string $url
+     * @param string $key
      * @param array  $item
      */
-    public function set(string $url, array $item);
+    public function set(string $key, array $item);
+
+    public function clear(string $key): void;
 }

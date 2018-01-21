@@ -30,13 +30,13 @@ class UrlDispatcherCache implements UrlDispatcherCacheInterface
 
 
     /**
-     * @param string $url
+     * @param string $key
      *
      * @return array|null
      */
-    public function get(string $url)
+    public function get(string $key): ?array
     {
-        $data = $this->cache->fetch($url);
+        $data = $this->cache->fetch($key);
 
         return unserialize($data, [
             IFaceInterface::class,
@@ -45,11 +45,16 @@ class UrlDispatcherCache implements UrlDispatcherCacheInterface
     }
 
     /**
-     * @param string $url
+     * @param string $key
      * @param array  $item
      */
-    public function set(string $url, array $item): void
+    public function set(string $key, array $item): void
     {
-        $this->cache->save($url, serialize($item));
+        $this->cache->save($key, serialize($item));
+    }
+
+    public function clear(string $key): void
+    {
+        $this->cache->delete($key);
     }
 }
