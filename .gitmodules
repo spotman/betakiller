@@ -7,9 +7,6 @@
 [submodule "modules/ulogin"]
 	path = modules/ulogin
 	url = git@github.com:spotman/kohana-ulogin.git
-[submodule "modules/cache"]
-	path = modules/cache
-	url = git@github.com:spotman/kohana-cache.git
 [submodule "modules/meta-tags"]
 	path = modules/meta-tags
 	url = git@github.com:spotman/kohana-meta-tags.git
