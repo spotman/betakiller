@@ -144,7 +144,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
      * @Inject
      * @var \BetaKiller\Status\StatusWorkflowFactory
      */
-    private $postWorkflowFactory;
+    private $statusWorkflowFactory;
 
     /**
      * @Inject
@@ -539,7 +539,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
             // Auto publishing for new posts (we are importing only published posts)
             if ($isNew) {
                 /** @var \BetaKiller\Status\ContentPostWorkflow $workflow */
-                $workflow = $this->postWorkflowFactory->create($model);
+                $workflow = $this->statusWorkflowFactory->create($model);
 
                 $workflow->complete(); // Publishing would be done automatically
             }
