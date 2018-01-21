@@ -50,8 +50,12 @@ class IFaceModelProviderAggregate extends IFaceModelProviderAbstract
         $model = null;
 
         foreach ($this->getSources() as $source) {
-            if ($model = $source->getDefault()) {
-                break;
+            $model = $source->getDefault();
+
+            if ($model) {
+                $this->storeInCache($model);
+
+                return $model;
             }
         }
 
@@ -166,16 +170,15 @@ class IFaceModelProviderAggregate extends IFaceModelProviderAbstract
         $model = null;
 
         foreach ($this->getSources() as $source) {
-            if ($model = $source->getByEntityActionAndZone($entity, $entityAction, $zone)) {
-                break;
+            $model = $source->getByEntityActionAndZone($entity, $entityAction, $zone);
+
+            if ($model) {
+                $this->storeInCache($model);
+                return $model;
             }
         }
 
-        if ($model) {
-            $this->storeInCache($model);
-        }
-
-        return $model;
+        return null;
     }
 
     /**
