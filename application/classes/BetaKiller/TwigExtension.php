@@ -1,6 +1,17 @@
 <?php
+namespace BetaKiller;
 
-class BetaKiller_Twig_Extension extends Twig_Extension
+use BetaKiller\Model\IFaceZone;
+use Device;
+use HTML;
+use Meta;
+use Profiler;
+use StaticFile;
+use Twig_Extension;
+use Twig_Filter;
+use Twig_Function;
+
+class TwigExtension extends Twig_Extension
 {
     /**
      * @Inject
@@ -39,7 +50,13 @@ class BetaKiller_Twig_Extension extends Twig_Extension
     private $widgetFactory;
 
     /**
-     * BetaKiller_Twig_Extension constructor.
+     * @Inject
+     * @var \BetaKiller\Helper\IFaceHelper
+     */
+    private $ifaceHelper;
+
+    /**
+     * TwigExtension constructor.
      *
      * @throws \InvalidArgumentException
      * @throws \DI\DependencyException
@@ -113,8 +130,8 @@ class BetaKiller_Twig_Extension extends Twig_Extension
             ),
 
             new Twig_Function(
-                'in_staging',
-                [$this, 'inStaging']
+                'in_public_zone',
+                [$this, 'inPublicZone']
             ),
 
             new Twig_Function(
@@ -192,9 +209,9 @@ class BetaKiller_Twig_Extension extends Twig_Extension
     /**
      * @return bool
      */
-    public function inStaging(): bool
+    public function inPublicZone(): bool
     {
-        return $this->appEnv->inStagingMode();
+        return $this->ifaceHelper->isCurrentIFaceZone(IFaceZone::PUBLIC_ZONE);
     }
 
     /**

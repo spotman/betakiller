@@ -1,28 +1,27 @@
 <?php
+namespace BetaKiller;
 
-use Doctrine\Common\Cache\ArrayCache;
 use Asm89\Twig\CacheExtension\CacheProvider\DoctrineCacheAdapter;
-use Asm89\Twig\CacheExtension\CacheStrategy\LifetimeCacheStrategy;
 use Asm89\Twig\CacheExtension\CacheStrategy\BlackholeCacheStrategy;
 use Asm89\Twig\CacheExtension\CacheStrategy\IndexedChainingCacheStrategy;
+use Asm89\Twig\CacheExtension\CacheStrategy\LifetimeCacheStrategy;
 use Asm89\Twig\CacheExtension\Extension as CacheExtension;
+use Doctrine\Common\Cache\ArrayCache;
+use Kohana;
 
-class Twig_CacheExtension extends CacheExtension
+class TwigCacheExtension extends CacheExtension
 {
     public function __construct()
     {
-        if (Kohana::inProduction(TRUE))
-        {
-            $cacheProvider  = new DoctrineCacheAdapter(new ArrayCache());
-            $lifetimeCacheStrategy  = new LifetimeCacheStrategy($cacheProvider);
+        if (Kohana::inProduction(true)) {
+            $cacheProvider         = new DoctrineCacheAdapter(new ArrayCache());
+            $lifetimeCacheStrategy = new LifetimeCacheStrategy($cacheProvider);
 
-            $cacheStrategy  = new IndexedChainingCacheStrategy(array(
+            $cacheStrategy = new IndexedChainingCacheStrategy([
                 'time' => $lifetimeCacheStrategy,
 //            'gen'  => $generationalCacheStrategy,
-            ));
-        }
-        else
-        {
+            ]);
+        } else {
             $cacheStrategy = new BlackholeCacheStrategy();
         }
 
