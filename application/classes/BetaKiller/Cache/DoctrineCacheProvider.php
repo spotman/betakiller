@@ -21,13 +21,21 @@ class DoctrineCacheProvider extends ChainCache
      */
     private $defaultExpire;
 
+    /**
+     * DoctrineCacheProvider constructor.
+     *
+     * @param \MultiSite                                 $multiSite
+     * @param \BetaKiller\Helper\AppEnv                  $appEnv
+     * @param \BetaKiller\Config\ConfigProviderInterface $config
+     *
+     * @throws \Pcelta\Doctrine\Cache\Exception\InvalidCacheConfig
+     * @throws \BetaKiller\Exception
+     */
     public function __construct(MultiSite $multiSite, AppEnv $appEnv, ConfigProviderInterface $config)
     {
         $workingName = $multiSite->getWorkingName();
 
         $this->nsPrefix = implode('.', [$workingName ?: 'core', $appEnv->getModeName()]);
-
-        $providers = [];
 
         $settings = $config->load(['cache', 'default']);
 
@@ -38,16 +46,19 @@ class DoctrineCacheProvider extends ChainCache
         $this->defaultExpire = (int)$settings['expire'];
         unset($settings['expire']);
 
+        // Alias for simplicity
         $settings['adapter_name'] = $settings['adapter'];
 
-        // Add app-related cache adapter
-        $factory = new CacheFactory();
-        $providers[] = $factory->create($settings);
+        $providers = [];
 
         if ($settings['adapter'] !== 'Array') {
             // Basic per-request in-memory implementation for better performance
             $providers[] = new ArrayCache();
         }
+
+        // Add app-related cache adapter
+        $factory = new CacheFactory();
+        $providers[] = $factory->create($settings);
 
         parent::__construct($providers);
 
