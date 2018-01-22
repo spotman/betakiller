@@ -1,19 +1,11 @@
 <?php
 
-use BetaKiller\Helper\IFaceHelper;
 use BetaKiller\Helper\UrlContainerHelper;
-use BetaKiller\IFace\IFaceModelInterface;
-use BetaKiller\IFace\IFaceModelTree;
 use BetaKiller\IFace\IFaceStack;
-use BetaKiller\Url\UrlContainerInterface;
+use BetaKiller\Url\AvailableUrlsCollector;
 
 class Task_Cache_Warmup extends \BetaKiller\Task\AbstractTask
 {
-    /**
-     * @var IFaceModelTree
-     */
-    private $tree;
-
     /**
      * @var \BetaKiller\Helper\UrlContainerHelper
      */
@@ -25,51 +17,28 @@ class Task_Cache_Warmup extends \BetaKiller\Task\AbstractTask
     private $ifaceStack;
 
     /**
-     * @var \BetaKiller\Helper\IFaceHelper
+     * @var \BetaKiller\Url\AvailableUrlsCollector
      */
-    private $ifaceHelper;
+    private $urlCollector;
 
     public function __construct(
-        IFaceModelTree $tree,
+        AvailableUrlsCollector $urlCollector,
         IFaceStack $stack,
-        IFaceHelper $ifaceHelper,
         UrlContainerHelper $paramsHelper
     ) {
-        $this->tree                = $tree;
         $this->ifaceStack          = $stack;
-        $this->ifaceHelper         = $ifaceHelper;
+        $this->urlCollector        = $urlCollector;
         $this->urlParametersHelper = $paramsHelper;
 
         parent::__construct();
     }
 
+    /**
+     * @param array $params
+     */
     protected function _execute(array $params)
     {
-        $parameters = $this->urlParametersHelper->createEmpty();
-
-        // Get all ifaces recursively
-        $iterator = $this->tree->getRecursivePublicIterator();
-
-        // For each IFace
-        foreach ($iterator as $ifaceModel) {
-            $this->logger->debug('Found IFace :codename', [':codename' => $ifaceModel->getCodename()]);
-
-            try {
-                $this->processIFaceModel($ifaceModel, $parameters);
-            } catch (Throwable $e) {
-                $this->logger->warning('Exception thrown for :iface with message :text', [
-                    ':iface' => $ifaceModel->getCodename(),
-                    ':text'  => $e->getMessage(),
-                ]);
-            }
-        }
-    }
-
-    protected function processIFaceModel(IFaceModelInterface $ifaceModel, UrlContainerInterface $params): void
-    {
-        $iface = $this->ifaceHelper->createIFaceFromModel($ifaceModel);
-
-        $urls = $this->ifaceHelper->getPublicAvailableUrls($iface, $params);
+        $urls = $this->urlCollector->getPublicAvailableUrls();
 
         $this->logger->debug('Found :count urls', [':count' => count($urls)]);
 
@@ -84,7 +53,7 @@ class Task_Cache_Warmup extends \BetaKiller\Task\AbstractTask
         }
     }
 
-    protected function makeHttpRequest($url)
+    private function makeHttpRequest(string $url)
     {
         $this->logger->debug('Making request to :url', [':url' => $url]);
 

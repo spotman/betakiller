@@ -3,7 +3,6 @@ namespace BetaKiller\Url;
 
 use BetaKiller\IFace\Exception\IFaceException;
 use BetaKiller\IFace\IFaceInterface;
-use BetaKiller\IFace\IFaceModelInterface;
 use BetaKiller\Model\DispatchableEntityInterface;
 use BetaKiller\Utils\Kohana\TreeModelSingleParentInterface;
 
@@ -49,6 +48,7 @@ class UrlPrototypeHelper
      * @return \BetaKiller\Url\UrlPrototype
      * @throws \BetaKiller\Url\UrlPrototypeException
      * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @deprecated Remove dependencies for IFace url logic
      */
     public function fromIFaceUri(IFaceInterface $iface): UrlPrototype
     {
@@ -64,23 +64,29 @@ class UrlPrototypeHelper
     }
 
     /**
-     * @param \BetaKiller\IFace\IFaceModelInterface $ifaceModel
+     * @param \BetaKiller\Url\UrlPrototype $prototype
+     * @param string                       $uriValue
      *
-     * @return \BetaKiller\Url\UrlPrototype
+     * @return \BetaKiller\Url\UrlParameterInterface
+     * @throws \BetaKiller\Repository\RepositoryException
+     * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\Url\UrlPrototypeException
-     * @throws \BetaKiller\IFace\Exception\IFaceException
      */
-    public function fromIFaceModelUri(IFaceModelInterface $ifaceModel): UrlPrototype
+    public function createParameterInstance(UrlPrototype $prototype, string $uriValue): UrlParameterInterface
     {
-        $uri = $ifaceModel->getUri();
+        // Search for model item
+        if ($prototype->hasModelKey()) {
+            $dataSource = $this->getDataSourceInstance($prototype);
 
-        if (!$uri) {
-            throw new IFaceException('IFace :codename must have uri', [
-                ':codename' => $ifaceModel->getCodename(),
-            ]);
+            $this->validatePrototypeModelKey($prototype, $dataSource);
+
+            return $prototype->hasIdKey()
+                ? $dataSource->findById((int)$uriValue)
+                : $dataSource->findItemByUrlKeyValue($uriValue, $this->urlParameters);
         }
 
-        return $this->fromString($ifaceModel->getUri());
+        // Plain parameter - use factory instead
+        return $this->getRawParameterInstance($prototype, $uriValue);
     }
 
     /**
@@ -278,7 +284,7 @@ class UrlPrototypeHelper
      * @return \BetaKiller\Url\UrlPrototype
      * @throws \BetaKiller\Url\UrlPrototypeException
      */
-    private function fromString(string $string): UrlPrototype
+    public function fromString(string $string): UrlPrototype
     {
         return UrlPrototype::fromString($string);
     }

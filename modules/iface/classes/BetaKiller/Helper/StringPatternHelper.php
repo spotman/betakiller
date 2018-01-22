@@ -20,6 +20,7 @@ class StringPatternHelper
      * @param UrlContainerInterface|null $params
      *
      * @return string
+     * @throws \BetaKiller\Url\UrlPrototypeException
      */
     public function processPattern(
         ?string $source,
@@ -35,10 +36,10 @@ class StringPatternHelper
         $source = $this->prototypeHelper->replaceUrlParametersParts($source, $params);
 
         // Parse [N[...]] tags
-        $pcre_pattern = '/\[([\d]{1,2})\[([^\]]+)\]\]/';
+        $pcrePattern = '/\[([\d]{1,2})\[([^\]]+)\]\]/';
 
         /** @var array[] $matches */
-        preg_match_all($pcre_pattern, $source, $matches, PREG_SET_ORDER);
+        preg_match_all($pcrePattern, $source, $matches, PREG_SET_ORDER);
 
         $tags = [];
 

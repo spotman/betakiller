@@ -1,33 +1,15 @@
 <?php
 
 use BetaKiller\Config\AppConfigInterface;
-use BetaKiller\Helper\IFaceHelper;
-use BetaKiller\IFace\IFaceModelInterface;
-use BetaKiller\IFace\ModelProvider\IFaceModelProviderAggregate;
 use BetaKiller\Service\AbstractService;
 use BetaKiller\Service\ServiceException;
-use BetaKiller\Url\UrlContainerInterface;
+use BetaKiller\Url\AvailableUrlsCollector;
 use Psr\Log\LoggerInterface;
 use samdark\sitemap\Index;
 use samdark\sitemap\Sitemap;
 
 class Service_Sitemap extends AbstractService
 {
-    /**
-     * @var UrlContainerInterface
-     */
-    private $urlParameters;
-
-    /**
-     * @var IFaceModelProviderAggregate
-     */
-    private $ifaceModelProvider;
-
-    /**
-     * @var \BetaKiller\Helper\IFaceHelper
-     */
-    private $ifaceHelper;
-
     /**
      * @var AppConfigInterface
      */
@@ -49,29 +31,33 @@ class Service_Sitemap extends AbstractService
     protected $linksCounter;
 
     /**
+     * @var \BetaKiller\Url\AvailableUrlsCollector
+     */
+    private $urlCollector;
+
+    /**
      * Service_Sitemap constructor.
      *
-     * @param \BetaKiller\Url\UrlContainerInterface                       $urlParameters
-     * @param \BetaKiller\IFace\ModelProvider\IFaceModelProviderAggregate $ifaceModelProvider
-     * @param \BetaKiller\Helper\IFaceHelper                              $ifaceHelper
-     * @param \Psr\Log\LoggerInterface                                    $logger
-     * @param \BetaKiller\Config\AppConfigInterface                       $appConfig
+     * @param \BetaKiller\Url\AvailableUrlsCollector $urlCollector
+     * @param \Psr\Log\LoggerInterface               $logger
+     * @param \BetaKiller\Config\AppConfigInterface  $appConfig
      */
     public function __construct(
-        UrlContainerInterface $urlParameters,
-        IFaceModelProviderAggregate $ifaceModelProvider,
-        IFaceHelper $ifaceHelper,
+        AvailableUrlsCollector $urlCollector,
         LoggerInterface $logger,
         AppConfigInterface $appConfig
     ) {
-        $this->urlParameters      = $urlParameters;
-        $this->ifaceModelProvider = $ifaceModelProvider;
-        $this->ifaceHelper        = $ifaceHelper;
-        $this->appConfig          = $appConfig;
-        $this->logger             = $logger;
+        $this->appConfig    = $appConfig;
+        $this->logger       = $logger;
+        $this->urlCollector = $urlCollector;
     }
 
-    public function generate()
+    /**
+     * @return $this
+     * @throws \InvalidArgumentException
+     * @throws \BetaKiller\Service\ServiceException
+     */
+    public function generate(): self
     {
         $baseUrl = $this->appConfig->getBaseUrl();
 
@@ -82,8 +68,15 @@ class Service_Sitemap extends AbstractService
         // Create sitemap
         $this->sitemap = new Sitemap($this->getSitemapFilePath());
 
-        // Recursively iterate over all ifaces
-        $this->iterateLayer();
+        // TODO Deal with calculation of the last_modified
+        $urls = $this->urlCollector->getPublicAvailableUrls();
+
+        foreach ($urls as $url) {
+            $this->logger->debug('Found url :value', [':value' => $url]);
+            // Store URL
+            $this->sitemap->addItem($url);
+            $this->linksCounter++;
+        }
 
         // Write sitemap files
         $this->sitemap->write();
@@ -106,38 +99,6 @@ class Service_Sitemap extends AbstractService
         $this->logger->info(':count links have been written to sitemap.xml', [':count' => $this->linksCounter]);
 
         return $this;
-    }
-
-    protected function iterateLayer(IFaceModelInterface $parent = null)
-    {
-        // Get all available IFaces in layer
-        $ifaceModels = $this->ifaceModelProvider->getLayer($parent);
-
-        // Iterate over all IFaces
-        foreach ($ifaceModels as $ifaceModel) {
-            // Skip hidden ifaces
-            if ($ifaceModel->hideInSiteMap()) {
-                continue;
-            }
-
-            $iface = $this->ifaceHelper->createIFaceFromModel($ifaceModel);
-
-            // TODO Deal with calculation of the last_modified
-            $urls = $this->ifaceHelper->getPublicAvailableUrls($iface, $this->urlParameters);
-
-            foreach ($urls as $url) {
-                if (!$url) {
-                    continue;
-                }
-
-                $this->logger->debug('Found url :value', [':value' => $url]);
-                // Store URL
-                $this->sitemap->addItem($url);
-                $this->linksCounter++;
-            }
-
-            $this->iterateLayer($ifaceModel);
-        }
     }
 
     public function serve(Response $response)

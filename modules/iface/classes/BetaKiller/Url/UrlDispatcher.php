@@ -1,9 +1,10 @@
 <?php
 namespace BetaKiller\Url;
 
+use BetaKiller\Auth\AccessDeniedException;
 use BetaKiller\Event\UrlDispatchedEvent;
-use BetaKiller\Factory\FactoryException;
 use BetaKiller\Helper\AclHelper;
+use BetaKiller\Helper\LoggerHelperTrait;
 use BetaKiller\IFace\Exception\IFaceException;
 use BetaKiller\IFace\Exception\IFaceMissingUrlException;
 use BetaKiller\IFace\IFaceInterface;
@@ -11,9 +12,8 @@ use BetaKiller\IFace\IFaceModelInterface;
 use BetaKiller\IFace\IFaceProvider;
 use BetaKiller\IFace\IFaceStack;
 use BetaKiller\MessageBus\EventBus;
-use BetaKiller\Repository\RepositoryException;
+use BetaKiller\Url\Behaviour\UrlBehaviourFactory;
 use HTTP;
-use HTTP_Exception_403;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 
@@ -21,6 +21,8 @@ use Psr\Log\LoggerInterface;
 
 class UrlDispatcher implements LoggerAwareInterface
 {
+    use LoggerHelperTrait;
+
     /**
      * Defines default uri for index element (this used if root IFace has dynamic url behaviour)
      */
@@ -46,11 +48,6 @@ class UrlDispatcher implements LoggerAwareInterface
     private $ifaceProvider;
 
     /**
-     * @var \BetaKiller\Url\UrlPrototypeHelper
-     */
-    private $urlPrototypeHelper;
-
-    /**
      * @var \BetaKiller\Url\UrlDispatcherCacheInterface
      */
     private $cache;
@@ -72,30 +69,35 @@ class UrlDispatcher implements LoggerAwareInterface
     private $aclHelper;
 
     /**
-     * @param \BetaKiller\IFace\IFaceStack                $stack
-     * @param \BetaKiller\IFace\IFaceProvider             $provider
-     * @param \BetaKiller\Url\UrlContainerInterface       $parameters
-     * @param \BetaKiller\Url\UrlPrototypeHelper          $prototypeHelper
-     * @param \BetaKiller\Url\UrlDispatcherCacheInterface $cache
-     * @param \BetaKiller\MessageBus\EventBus             $eventBus
-     * @param \BetaKiller\Helper\AclHelper                $aclHelper
+     * @var \BetaKiller\Url\Behaviour\UrlBehaviourFactory
+     */
+    private $behaviourFactory;
+
+    /**
+     * @param \BetaKiller\IFace\IFaceStack                  $stack
+     * @param \BetaKiller\IFace\IFaceProvider               $provider
+     * @param \BetaKiller\Url\Behaviour\UrlBehaviourFactory $behaviourFactory
+     * @param \BetaKiller\Url\UrlContainerInterface         $parameters
+     * @param \BetaKiller\Url\UrlDispatcherCacheInterface   $cache
+     * @param \BetaKiller\MessageBus\EventBus               $eventBus
+     * @param \BetaKiller\Helper\AclHelper                  $aclHelper
      */
     public function __construct(
         IFaceStack $stack,
         IFaceProvider $provider,
+        UrlBehaviourFactory $behaviourFactory,
         UrlContainerInterface $parameters,
-        UrlPrototypeHelper $prototypeHelper,
         UrlDispatcherCacheInterface $cache,
         EventBus $eventBus,
         AclHelper $aclHelper
     ) {
-        $this->ifaceStack         = $stack;
-        $this->ifaceProvider      = $provider;
-        $this->urlParameters      = $parameters;
-        $this->urlPrototypeHelper = $prototypeHelper;
-        $this->cache              = $cache;
-        $this->eventBus           = $eventBus;
-        $this->aclHelper          = $aclHelper;
+        $this->ifaceStack       = $stack;
+        $this->ifaceProvider    = $provider;
+        $this->urlParameters    = $parameters;
+        $this->cache            = $cache;
+        $this->eventBus         = $eventBus;
+        $this->aclHelper        = $aclHelper;
+        $this->behaviourFactory = $behaviourFactory;
     }
 
     /**
@@ -115,14 +117,14 @@ class UrlDispatcher implements LoggerAwareInterface
      * @param string $ip
      *
      * @return \BetaKiller\IFace\IFaceInterface
-     * @throws \Spotman\Acl\Exception
+     * @throws \BetaKiller\Auth\AccessDeniedException
      * @throws \BetaKiller\Auth\AuthorizationRequiredException
-     * @throws \BetaKiller\MessageBus\MessageBusException
-     * @throws \HTTP_Exception_403
-     * @throws \BetaKiller\IFace\Exception\IFaceStackException
-     * @throws \BetaKiller\Url\UrlPrototypeException
-     * @throws \BetaKiller\IFace\Exception\IFaceMissingUrlException
+     * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \BetaKiller\IFace\Exception\IFaceMissingUrlException
+     * @throws \BetaKiller\IFace\Exception\IFaceStackException
+     * @throws \BetaKiller\MessageBus\MessageBusException
+     * @throws \Spotman\Acl\Exception
      */
     public function process(string $uri, string $ip): IFaceInterface
     {
@@ -154,10 +156,10 @@ class UrlDispatcher implements LoggerAwareInterface
      *
      * @param string $uri
      *
+     * @throws \BetaKiller\Factory\FactoryException
+     * @throws \BetaKiller\Auth\AccessDeniedException
      * @throws \Spotman\Acl\Exception
      * @throws \BetaKiller\Auth\AuthorizationRequiredException
-     * @throws \BetaKiller\Url\UrlPrototypeException
-     * @throws \HTTP_Exception_403
      * @throws \BetaKiller\IFace\Exception\IFaceStackException
      * @throws \BetaKiller\IFace\Exception\IFaceMissingUrlException
      * @throws \BetaKiller\IFace\Exception\IFaceException
@@ -179,13 +181,13 @@ class UrlDispatcher implements LoggerAwareInterface
                 if ($urlIterator->rootRequested()) {
                     $ifaceInstance = $this->ifaceProvider->getDefault();
 
-                    $this->processIFaceUrlBehaviour($ifaceInstance->getModel(), $urlIterator);
+                    $this->processUrlBehaviour($ifaceInstance->getModel(), $urlIterator);
                 } else {
                     $ifaceInstance = $this->parseUriLayer($urlIterator, $parentIFace);
                 }
-            } catch (UrlDispatcherException $e) {
+            } catch (UrlBehaviourException $e) {
                 // Log this exception and keep processing
-                $this->logger->alert('Url parsing error', ['exception' => $e]);
+                $this->logException($this->logger, $e);
             }
 
             // Throw IFaceMissingUrlException so we can forward user to parent iface or custom 404 page
@@ -207,7 +209,7 @@ class UrlDispatcher implements LoggerAwareInterface
      *
      * @throws \BetaKiller\IFace\Exception\IFaceMissingUrlException
      */
-    protected function throwMissingUrlException(UrlPathIterator $it, IFaceInterface $parentIFace = null): void
+    private function throwMissingUrlException(UrlPathIterator $it, IFaceInterface $parentIFace = null): void
     {
         throw new IFaceMissingUrlException($it->current(), $parentIFace);
     }
@@ -219,12 +221,12 @@ class UrlDispatcher implements LoggerAwareInterface
      * @param IFaceInterface|NULL $parentIFace
      *
      * @return IFaceInterface|null
-     * @throws \BetaKiller\Url\UrlPrototypeException
+     * @throws \BetaKiller\Factory\FactoryException
+     * @throws \BetaKiller\IFace\Exception\IFaceException
      * @throws \BetaKiller\IFace\Exception\IFaceMissingUrlException
-     * @throws \BetaKiller\Url\UrlDispatcherException
-     * @throws IFaceException
+     * @throws \BetaKiller\Url\UrlBehaviourException
      */
-    protected function parseUriLayer(UrlPathIterator $it, IFaceInterface $parentIFace = null): ?IFaceInterface
+    private function parseUriLayer(UrlPathIterator $it, IFaceInterface $parentIFace = null): ?IFaceInterface
     {
         $layer = [];
 
@@ -232,7 +234,7 @@ class UrlDispatcher implements LoggerAwareInterface
             $layer = $this->ifaceProvider->getModelsLayer($parentIFace);
         } catch (IFaceException $e) {
             // Log this exception and keep processing
-            $this->logger->warning('Url parsing error', ['exception' => $e]);
+            $this->logException($this->logger, $e);
 
             $parentUrl = $parentIFace ? $parentIFace->url($this->urlParameters, false) : null;
 
@@ -287,9 +289,9 @@ class UrlDispatcher implements LoggerAwareInterface
      * @param UrlPathIterator                         $it
      *
      * @return \BetaKiller\IFace\IFaceModelInterface|null
-     * @throws \BetaKiller\Url\UrlPrototypeException
-     * @throws \BetaKiller\Url\UrlDispatcherException
+     * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \BetaKiller\Url\UrlBehaviourException
      */
     private function selectIFaceModel(array $models, UrlPathIterator $it): ?IFaceModelInterface
     {
@@ -297,7 +299,7 @@ class UrlDispatcher implements LoggerAwareInterface
         $models = $this->sortModelsLayer($models);
 
         foreach ($models as $model) {
-            if ($this->processIFaceUrlBehaviour($model, $it)) {
+            if ($this->processUrlBehaviour($model, $it)) {
                 return $model;
             }
         }
@@ -311,79 +313,22 @@ class UrlDispatcher implements LoggerAwareInterface
      * @param \BetaKiller\Url\UrlPathIterator       $it
      *
      * @return bool
-     * @throws \BetaKiller\IFace\Exception\IFaceException
-     * @throws \BetaKiller\Url\UrlDispatcherException
-     * @throws \BetaKiller\Url\UrlPrototypeException
+     * @throws \BetaKiller\Factory\FactoryException
+     * @throws \BetaKiller\Url\UrlBehaviourException
      */
-    private function processIFaceUrlBehaviour(IFaceModelInterface $model, UrlPathIterator $it): bool
+    private function processUrlBehaviour(IFaceModelInterface $model, UrlPathIterator $it): bool
     {
-        if ($it->count() && $model->hasTreeBehaviour()) {
-            // Tree behaviour in URL
-            $absentFound = false;
+        $behaviour = $this->behaviourFactory->fromIFaceModel($model);
 
-            do {
-                try {
-                    $this->parseUriParameterPart($model, $it);
-                    $it->next();
-                } /** @noinspection BadExceptionsProcessingInspection */ catch (UrlDispatcherException $e) {
-                    $absentFound = true;
-
-                    // Move one step back so current uri part will be processed by the next iface
-                    $it->prev();
-                }
-            } while (!$absentFound && $it->valid());
-
-            // End tree behaviour
-
-            return true;
-        }
-//        elseif ($model->has_custom_url_behaviour())
-//        {
-//            $this->processCustomUrlBehaviour($model, $it);
-//            return $model;
-//        }
-
-        if ($model->hasDynamicUrl()) {
-            // Regular dynamic URL, parse uri
-            $this->parseUriParameterPart($model, $it);
-
-            return true;
-        }
-
-        if ($model->getUri() === $it->current()) {
-            // Fixed URL found, simply exit
-            return true;
-        }
-
-        // No processing done
-        return false;
+        return $behaviour->parseUri($model, $it, $this->urlParameters);
     }
-
-//    protected function processCustomUrlBehaviour(IFaceModelInterface $iface_model, UrlPathIterator $it)
-//    {
-//        // Create instance of starter IFace
-//        $starter_iface = $this->createIFaceFromModel($iface_model);
-//
-//        // Check instance implements interface
-//        if (!($starter_iface  instanceof HasCustomUrlBehaviourInterface))
-//            throw new UrlDispatcherException('IFace :codename must implement :base', [
-//                ':codename' =>  $starter_iface->getCodename(),
-//                ':base'     =>  HasCustomUrlBehaviourInterface::class,
-//            ]);
-//
-//        // Getting custom behaviour instance
-//        $behaviour = $starter_iface->getCustomUrlBehaviour();
-//
-//        // Pairs "iface codename" => "uri scheme"
-//        $behaviour->processCustomUrlBehaviour($it, $this->parameters());
-//    }
 
     /**
      * @param IFaceInterface $iface
      *
+     * @throws \BetaKiller\Auth\AccessDeniedException
      * @throws \Spotman\Acl\Exception
      * @throws \BetaKiller\Auth\AuthorizationRequiredException
-     * @throws \HTTP_Exception_403
      * @throws \BetaKiller\IFace\Exception\IFaceException
      * @throws \BetaKiller\IFace\Exception\IFaceStackException
      */
@@ -394,67 +339,11 @@ class UrlDispatcher implements LoggerAwareInterface
     }
 
     /**
-     * @param \BetaKiller\IFace\IFaceModelInterface $ifaceModel
-     * @param \BetaKiller\Url\UrlPathIterator       $it
-     *
-     * @throws \BetaKiller\IFace\Exception\IFaceException
-     * @throws \BetaKiller\Url\UrlDispatcherException
-     * @throws \BetaKiller\Url\UrlPrototypeException
-     */
-    private function parseUriParameterPart(IFaceModelInterface $ifaceModel, UrlPathIterator $it): void
-    {
-        $prototype = $this->urlPrototypeHelper->fromIFaceModelUri($ifaceModel);
-
-        // Root element have default uri
-        $uriValue = ($it->rootRequested() || ($ifaceModel->isDefault() && !$ifaceModel->hasDynamicUrl()))
-            ? self::DEFAULT_URI
-            : $it->current();
-
-        try {
-            $item = $this->createParameterInstance($prototype, $uriValue);
-        } catch (RepositoryException $e) {
-            throw UrlDispatcherException::wrap($e);
-        } catch (FactoryException $e) {
-            throw UrlDispatcherException::wrap($e);
-        }
-
-        // Store model into registry
-        // Allow tree url behaviour to set value multiple times
-        $this->urlParameters->setParameter($item, $ifaceModel->hasTreeBehaviour());
-    }
-
-    /**
-     * @param \BetaKiller\Url\UrlPrototype $prototype
-     * @param string                       $uriValue
-     *
-     * @return \BetaKiller\Url\UrlParameterInterface
-     * @throws \BetaKiller\Repository\RepositoryException
-     * @throws \BetaKiller\Factory\FactoryException
-     * @throws \BetaKiller\Url\UrlPrototypeException
-     */
-    private function createParameterInstance(UrlPrototype $prototype, string $uriValue): UrlParameterInterface
-    {
-        // Search for model item
-        if ($prototype->hasModelKey()) {
-            $dataSource = $this->urlPrototypeHelper->getDataSourceInstance($prototype);
-
-            $this->urlPrototypeHelper->validatePrototypeModelKey($prototype, $dataSource);
-
-            return $prototype->hasIdKey()
-                ? $dataSource->findById((int)$uriValue)
-                : $dataSource->findItemByUrlKeyValue($uriValue, $this->urlParameters);
-        }
-
-        // Plain parameter - use factory instead
-        return $this->urlPrototypeHelper->getRawParameterInstance($prototype, $uriValue);
-    }
-
-    /**
      * @param \BetaKiller\IFace\IFaceInterface $iface
      *
+     * @throws \BetaKiller\Auth\AccessDeniedException
      * @throws \BetaKiller\Auth\AuthorizationRequiredException
      * @throws \BetaKiller\IFace\Exception\IFaceException
-     * @throws \HTTP_Exception_403
      * @throws \Spotman\Acl\Exception
      */
     private function checkIFaceAccess(IFaceInterface $iface): void
@@ -463,7 +352,7 @@ class UrlDispatcher implements LoggerAwareInterface
         $this->aclHelper->forceAuthorizationIfNeeded($iface);
 
         if (!$this->aclHelper->isIFaceAllowed($iface, $this->urlParameters)) {
-            throw new HTTP_Exception_403();
+            throw new AccessDeniedException();
         }
     }
 
@@ -542,10 +431,10 @@ class UrlDispatcher implements LoggerAwareInterface
             return true;
         } catch (\Throwable $e) {
             // Log and keep processing as no cache was found
-            $this->logger->warning('Error on unpacking UrlDispatcher data: ', ['exception' => $e]);
+            $this->logException($this->logger, $e, 'Error on unpacking UrlDispatcher data');
 
             // Wipe the cached data to prevent errors
-            $this->cache->set($cacheKey, null);
+            $this->cache->delete($cacheKey);
         }
 
         return false;

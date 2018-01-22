@@ -113,17 +113,12 @@ interface IFaceInterface extends SeoMetaInterface, HasLabelInterface
     public function isDefault(): bool;
 
     /**
-     * @param \BetaKiller\Url\UrlContainerInterface|null $parameters
+     * @param \BetaKiller\Url\UrlContainerInterface|null $params
      * @param bool|null                                  $removeCyclingLinks
-     * @param bool|null                                  $withDomain
      *
      * @return string
      */
-    public function url(
-        ?UrlContainerInterface $parameters = null,
-        ?bool $removeCyclingLinks = null,
-        ?bool $withDomain = null
-    ): string;
+    public function url(?UrlContainerInterface $params = null, ?bool $removeCyclingLinks = null): string;
 
     /**
      * @return string

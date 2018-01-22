@@ -1,55 +1,37 @@
 <?php
 namespace BetaKiller\Url;
 
-class UrlPathIterator implements \Iterator, \Countable
+class UrlPathIterator extends \ArrayIterator
 {
     /**
      * @var array
      */
     private $array;
 
-    public function __construct($uri)
+    public function __construct(string $path)
     {
-        $uri         = trim($uri, '/ ');
-        $this->array = $uri ? explode('/', $uri) : [];
+        $path  = trim($path, '/ ');
+        $parts = $path ? explode('/', $path) : [];
+
+        parent::__construct($parts);
     }
 
-    public function rewind()
+    /**
+     *
+     * @throws \OutOfRangeException
+     */
+    public function prev(): void
     {
-        reset($this->array);
+        $prev = $this->key() - 1;
+
+        if ($prev < 0 || $prev > ($this->count() - 1)) {
+            throw new \OutOfRangeException('Can not seek to previous array element');
+        }
+
+        $this->seek($prev);
     }
 
-    public function current()
-    {
-        return current($this->array);
-    }
-
-    public function key()
-    {
-        return key($this->array);
-    }
-
-    public function next()
-    {
-        next($this->array);
-    }
-
-    public function prev()
-    {
-        prev($this->array);
-    }
-
-    public function valid()
-    {
-        return key($this->array) !== null;
-    }
-
-    public function count()
-    {
-        return \count($this->array);
-    }
-
-    public function rootRequested()
+    public function rootRequested(): bool
     {
         return !$this->count();
     }

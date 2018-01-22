@@ -38,10 +38,10 @@ class IFacePageCacheStrategy implements StrategyInterface
     public function strategy()
     {
         //when session support is enabled add that to file name
-        $session_str = SessionHandler::process();
+        $sessionFingerprint = SessionHandler::process();
 
-        $uri = $this->iface->url($this->params, false, false);
+        $uri = $this->iface->url($this->params, false);
 
-        return md5($session_str.$uri);
+        return md5($sessionFingerprint.$uri);
     }
 }

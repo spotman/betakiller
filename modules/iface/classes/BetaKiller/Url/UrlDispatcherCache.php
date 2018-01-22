@@ -6,6 +6,12 @@ use BetaKiller\Model\DispatchableEntityInterface;
 use Doctrine\Common\Cache\ArrayCache;
 use Doctrine\Common\Cache\ChainCache;
 
+/**
+ * Class UrlDispatcherCache
+ *
+ * @package BetaKiller\Url
+ * @deprecated Use SimpleCache instead
+ */
 class UrlDispatcherCache implements UrlDispatcherCacheInterface
 {
     /**
@@ -17,6 +23,7 @@ class UrlDispatcherCache implements UrlDispatcherCacheInterface
      * UrlDispatcherCache constructor.
      *
      * @param \Doctrine\Common\Cache\Cache[] $cacheProviders
+     * @deprecated Use SimpleCache instead
      */
     public function __construct(array $cacheProviders = null)
     {
@@ -53,7 +60,7 @@ class UrlDispatcherCache implements UrlDispatcherCacheInterface
         $this->cache->save($key, serialize($item));
     }
 
-    public function clear(string $key): void
+    public function delete(string $key): void
     {
         $this->cache->delete($key);
     }

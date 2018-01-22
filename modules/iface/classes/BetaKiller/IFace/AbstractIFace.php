@@ -353,19 +353,16 @@ abstract class AbstractIFace implements IFaceInterface
     }
 
     /**
-     * @param \BetaKiller\Url\UrlContainerInterface|null $urlContainer
+     * @param \BetaKiller\Url\UrlContainerInterface|null $params
      * @param bool|null                                  $removeCyclingLinks
-     * @param bool|null                                  $withDomain
      *
      * @return string
      * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \BetaKiller\Url\UrlPrototypeException
      */
-    public function url(
-        UrlContainerInterface $urlContainer = null,
-        ?bool $removeCyclingLinks = null,
-        ?bool $withDomain = null
-    ): string {
-        return $this->ifaceHelper->makeUrl($this, $urlContainer, $removeCyclingLinks, $withDomain);
+    public function url(?UrlContainerInterface $params = null, ?bool $removeCyclingLinks = null): string
+    {
+        return $this->ifaceHelper->makeUrl($this, $params, $removeCyclingLinks);
     }
 
     /**

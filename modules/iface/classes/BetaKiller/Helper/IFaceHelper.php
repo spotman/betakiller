@@ -11,9 +11,7 @@ use BetaKiller\IFace\IFaceStack;
 use BetaKiller\Model\DispatchableEntityInterface;
 use BetaKiller\Model\IFaceZone;
 use BetaKiller\Url\UrlContainerInterface;
-use BetaKiller\Url\UrlDataSourceInterface;
 use BetaKiller\Url\UrlDispatcher;
-use BetaKiller\Url\UrlPrototype;
 use BetaKiller\Url\UrlPrototypeHelper;
 use BetaKiller\View\IFaceView;
 use Spotman\Api\ApiMethodResponse;
@@ -46,11 +44,6 @@ class IFaceHelper
     private $urlHelper;
 
     /**
-     * @var \BetaKiller\Helper\AclHelper
-     */
-    private $aclHelper;
-
-    /**
      * @var \BetaKiller\IFace\IFaceProvider
      */
     private $provider;
@@ -64,7 +57,6 @@ class IFaceHelper
      * @param \BetaKiller\Config\AppConfigInterface $appConfig
      * @param \BetaKiller\IFace\IFaceProvider       $provider
      * @param \BetaKiller\Url\UrlPrototypeHelper    $urlHelper
-     * @param \BetaKiller\Helper\AclHelper          $aclHelper
      */
     public function __construct(
         IFaceView $view,
@@ -72,8 +64,7 @@ class IFaceHelper
         UrlContainerHelper $paramsHelper,
         AppConfigInterface $appConfig,
         IFaceProvider $provider,
-        UrlPrototypeHelper $urlHelper,
-        AclHelper $aclHelper
+        UrlPrototypeHelper $urlHelper
     ) {
         $this->view         = $view;
         $this->stack        = $stack;
@@ -81,7 +72,6 @@ class IFaceHelper
         $this->appConfig    = $appConfig;
         $this->provider     = $provider;
         $this->urlHelper    = $urlHelper;
-        $this->aclHelper    = $aclHelper;
     }
 
     public function getCurrentIFace(): ?IFaceInterface
@@ -154,11 +144,17 @@ class IFaceHelper
      * @param string                                        $action
      * @param string|null                                   $zone
      *
+     * @param bool|null                                     $removeCycling
+     *
      * @return string
      * @throws \BetaKiller\IFace\Exception\IFaceException
      */
-    public function getEntityUrl(DispatchableEntityInterface $entity, string $action, ?string $zone = null): string
-    {
+    public function getEntityUrl(
+        DispatchableEntityInterface $entity,
+        string $action,
+        ?string $zone = null,
+        ?bool $removeCycling = null
+    ): string {
         if (!$zone) {
             $currentIFace = $this->getCurrentIFace();
 
@@ -176,7 +172,7 @@ class IFaceHelper
         // Search for IFace with provided entity, action and zone
         $iface = $this->provider->getByEntityActionAndZone($entity, $action, $zone);
 
-        return $iface->url($params);
+        return $iface->url($params, $removeCycling);
     }
 
     /**
@@ -195,12 +191,17 @@ class IFaceHelper
      * @param \BetaKiller\Model\DispatchableEntityInterface $entity
      * @param null|string                                   $zone
      *
+     * @param bool|null                                     $removeCycling
+     *
      * @return string
      * @throws \BetaKiller\IFace\Exception\IFaceException
      */
-    public function getReadEntityUrl(DispatchableEntityInterface $entity, ?string $zone = null): string
-    {
-        return $this->getEntityUrl($entity, CrudlsActionsInterface::ACTION_READ, $zone);
+    public function getReadEntityUrl(
+        DispatchableEntityInterface $entity,
+        ?string $zone = null,
+        ?bool $removeCycling = null
+    ): string {
+        return $this->getEntityUrl($entity, CrudlsActionsInterface::ACTION_READ, $zone, $removeCycling);
     }
 
     /**
@@ -255,7 +256,6 @@ class IFaceHelper
      * @param \BetaKiller\Model\DispatchableEntityInterface $entity
      *
      * @return null|string
-     * @throws \BetaKiller\Exception
      * @throws \BetaKiller\IFace\Exception\IFaceException
      */
     public function getPreviewEntityUrl(DispatchableEntityInterface $entity): ?string
@@ -294,20 +294,17 @@ class IFaceHelper
      * @param \BetaKiller\IFace\IFaceInterface           $iface
      * @param \BetaKiller\Url\UrlContainerInterface|null $urlContainer
      * @param bool|null                                  $removeCyclingLinks
-     * @param bool|null                                  $withDomain
      *
      * @return string
-     * @throws \BetaKiller\Url\UrlPrototypeException
      * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \BetaKiller\Url\UrlPrototypeException
      */
     public function makeUrl(
         IFaceInterface $iface,
         UrlContainerInterface $urlContainer = null,
-        ?bool $removeCyclingLinks = null,
-        ?bool $withDomain = null
+        ?bool $removeCyclingLinks = null
     ): string {
         $removeCyclingLinks = $removeCyclingLinks ?? true;
-        $withDomain         = $withDomain ?? true;
 
         if ($removeCyclingLinks && $this->isCurrentIFace($iface, $urlContainer)) {
             return $this->appConfig->getCircularLinkHref();
@@ -327,6 +324,7 @@ class IFaceHelper
                 ]);
             }
 
+            // Link to root if this is a default element
             if ($uri === UrlDispatcher::DEFAULT_URI && $current->isDefault()) {
                 $uri = null;
             }
@@ -336,7 +334,7 @@ class IFaceHelper
             $current = $parent;
         } while ($parent);
 
-        $path = '/'.implode('/', array_reverse($parts));
+        $path = implode('/', array_reverse($parts));
 
         if ($this->appConfig->isTrailingSlashEnabled()) {
             // Add trailing slash before query parameters
@@ -345,7 +343,7 @@ class IFaceHelper
             $path     = implode('?', $split);
         }
 
-        return $withDomain ? \URL::site($path, true) : $path;
+        return $this->appConfig->getBaseUrl().$path;
     }
 
     /**
@@ -372,109 +370,6 @@ class IFaceHelper
         }
 
         return $this->urlHelper->getCompiledPrototypeValue($uri, $params, $model->hasTreeBehaviour());
-    }
-
-    /**
-     * @param \BetaKiller\IFace\IFaceInterface      $iface
-     * @param \BetaKiller\Url\UrlContainerInterface $params
-     *
-     * @todo This method calculates only urls for current iface but pair "uri => urlParameter" is needed for traversing over url tree and creating full url map
-     * @return string[]
-     * @throws \Spotman\Acl\Exception
-     * @throws \BetaKiller\Url\UrlPrototypeException
-     * @throws \BetaKiller\IFace\Exception\IFaceException
-     */
-    public function getPublicAvailableUrls(IFaceInterface $iface, UrlContainerInterface $params): array
-    {
-        if (!$iface->getModel()->hasDynamicUrl()) {
-            // Make static URL
-            return [$this->makeAvailableUrl($iface, $params)];
-        }
-
-        return $this->getDynamicModelAvailableUrls($iface, $params);
-    }
-
-    /**
-     * @param \BetaKiller\IFace\IFaceInterface      $iface
-     * @param \BetaKiller\Url\UrlContainerInterface $params
-     *
-     * @return string[]
-     * @throws \Spotman\Acl\Exception
-     * @throws \BetaKiller\IFace\Exception\IFaceException
-     * @throws \BetaKiller\Url\UrlPrototypeException
-     */
-    private function getDynamicModelAvailableUrls(IFaceInterface $iface, UrlContainerInterface $params): array
-    {
-        $prototype  = $this->urlHelper->fromIFaceUri($iface);
-        $dataSource = $this->urlHelper->getDataSourceInstance($prototype);
-
-        $this->urlHelper->validatePrototypeModelKey($prototype, $dataSource);
-
-        $urls = [];
-
-        $this->collectDataSourceAvailableUrls($iface, $dataSource, $prototype, $params, $urls);
-
-        return array_filter($urls);
-    }
-
-    /**
-     * @param \BetaKiller\IFace\IFaceInterface       $iface
-     * @param \BetaKiller\Url\UrlDataSourceInterface $dataSource
-     * @param \BetaKiller\Url\UrlPrototype           $prototype
-     * @param \BetaKiller\Url\UrlContainerInterface  $params
-     * @param array                                  $urls
-     *
-     * @throws \BetaKiller\IFace\Exception\IFaceException
-     * @throws \Spotman\Acl\Exception
-     */
-    private function collectDataSourceAvailableUrls(
-        IFaceInterface $iface,
-        UrlDataSourceInterface $dataSource,
-        UrlPrototype $prototype,
-        UrlContainerInterface $params,
-        array &$urls
-    ): void {
-        $items = $prototype->hasIdKey()
-            ? $dataSource->getAll()
-            : $dataSource->getItemsHavingUrlKey($params);
-
-        foreach ($items as $item) {
-            // Save current item to parameters registry
-            $params->setParameter($item, true);
-
-            // Make dynamic URL
-            $url = $this->makeAvailableUrl($iface, $params);
-
-            if (!$url) {
-                // No tree traversal if current url is not allowed
-                continue;
-            }
-
-            $urls[] = $url;
-
-            // Recursion for trees
-            if ($iface->getModel()->hasTreeBehaviour()) {
-                // Recursion for tree behaviour
-                $this->collectDataSourceAvailableUrls($iface, $dataSource, $prototype, $params, $urls);
-            }
-        }
-    }
-
-    /**
-     * @param \BetaKiller\IFace\IFaceInterface           $iface
-     * @param \BetaKiller\Url\UrlContainerInterface|null $params
-     *
-     * @return null|string
-     * @throws \BetaKiller\IFace\Exception\IFaceException
-     * @throws \Spotman\Acl\Exception
-     */
-    private function makeAvailableUrl(IFaceInterface $iface, UrlContainerInterface $params = null): ?string
-    {
-        if (!$this->aclHelper->isIFaceAllowed($iface, $params)) {
-            return null;
-        }
-
-        return $this->makeUrl($iface, $params, false); // Disable cycling links removing
     }
 
     /**

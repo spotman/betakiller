@@ -1,6 +1,12 @@
 <?php
 namespace BetaKiller\Url;
 
+/**
+ * Interface UrlDispatcherCacheInterface
+ *
+ * @package BetaKiller\Url
+ * @deprecated Use Doctrine\Common\Cache interface instead
+ */
 interface UrlDispatcherCacheInterface
 {
     /**
@@ -16,5 +22,5 @@ interface UrlDispatcherCacheInterface
      */
     public function set(string $key, array $item);
 
-    public function clear(string $key): void;
+    public function delete(string $key): void;
 }
