@@ -3,11 +3,6 @@ namespace BetaKiller\Url;
 
 class UrlPathIterator extends \ArrayIterator
 {
-    /**
-     * @var array
-     */
-    private $array;
-
     public function __construct(string $path)
     {
         $path  = trim($path, '/ ');
