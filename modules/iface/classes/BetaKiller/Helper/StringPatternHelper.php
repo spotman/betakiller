@@ -1,7 +1,6 @@
 <?php
 namespace BetaKiller\Helper;
 
-
 use BetaKiller\Url\UrlContainerInterface;
 
 class StringPatternHelper
@@ -58,9 +57,9 @@ class StringPatternHelper
 
             // Iteration counter
             $i         = 0;
-            $max_loops = \count($tags);
+            $maxLoops = \count($tags);
 
-            while ($i < $max_loops && mb_strlen($output) > 0) {
+            while ($i < $maxLoops && mb_strlen($output) > 0) {
                 $output = $source;
 
                 // Replace tags
