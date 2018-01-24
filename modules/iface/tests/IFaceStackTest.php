@@ -1,15 +1,14 @@
 <?php
 
 use BetaKiller\IFace\Exception\IFaceStackException;
-use BetaKiller\IFace\IFaceInterface;
-use BetaKiller\IFace\IFaceStack;
+use BetaKiller\IFace\IFaceModelInterface;
+use BetaKiller\IFace\IFaceModelsStack;
 use BetaKiller\Url\UrlContainerInterface;
 
 class IFaceStackTest extends \BetaKiller\Test\TestCase
 {
-    const FIRST_IFACE_CODENAME  = 'FirstCodename';
-    const SECOND_IFACE_CODENAME = 'SecondTestCodename';
-    const THIRD_IFACE_CODENAME  = 'ThirdTestCodename';
+    private const FIRST_IFACE_CODENAME  = 'FirstCodename';
+    private const SECOND_IFACE_CODENAME = 'SecondTestCodename';
 
     private $urlParams;
 
@@ -34,7 +33,7 @@ class IFaceStackTest extends \BetaKiller\Test\TestCase
     {
         $stack = $this->createEmptyStack();
 
-        $this->assertInstanceOf(IFaceStack::class, $stack);
+        $this->assertInstanceOf(IFaceModelsStack::class, $stack);
 
         return $stack;
     }
@@ -42,19 +41,21 @@ class IFaceStackTest extends \BetaKiller\Test\TestCase
     /**
      * @depends testConstructor
      *
-     * @param \BetaKiller\IFace\IFaceStack $stack
+     * @param \BetaKiller\IFace\IFaceModelsStack $stack
      *
-     * @return \BetaKiller\IFace\IFaceStack
+     * @return \BetaKiller\IFace\IFaceModelsStack
      */
-    public function testAddFirst(IFaceStack $stack)
+    public function testAddFirst(IFaceModelsStack $stack): IFaceModelsStack
     {
-        $ifaceProp = $this->emptyIFace(self::FIRST_IFACE_CODENAME);
-        $iface     = $ifaceProp->reveal();
+        $ifaceProp = $this->emptyIFaceModel(self::FIRST_IFACE_CODENAME);
 
-        $stack->push($iface);
+        /** @var IFaceModelInterface $ifaceModel */
+        $ifaceModel = $ifaceProp->reveal();
+
+        $stack->push($ifaceModel);
 
         $this->assertAttributeCount(1, 'items', $stack);
-        $this->assertAttributeEquals($iface, 'current', $stack);
+        $this->assertAttributeEquals($ifaceModel, 'current', $stack);
 
         return $stack;
     }
@@ -62,19 +63,21 @@ class IFaceStackTest extends \BetaKiller\Test\TestCase
     /**
      * @depends testAddFirst
      *
-     * @param \BetaKiller\IFace\IFaceStack $stack
+     * @param \BetaKiller\IFace\IFaceModelsStack $stack
      *
-     * @return \BetaKiller\IFace\IFaceStack
+     * @return \BetaKiller\IFace\IFaceModelsStack
      */
-    public function testAddSecond(IFaceStack $stack)
+    public function testAddSecond(IFaceModelsStack $stack): IFaceModelsStack
     {
-        $ifaceProp = $this->emptyIFace(self::SECOND_IFACE_CODENAME);
-        $iface     = $ifaceProp->reveal();
+        $ifaceProp = $this->emptyIFaceModel(self::SECOND_IFACE_CODENAME);
 
-        $stack->push($iface);
+        /** @var IFaceModelInterface $ifaceModel */
+        $ifaceModel = $ifaceProp->reveal();
+
+        $stack->push($ifaceModel);
 
         $this->assertAttributeCount(2, 'items', $stack);
-        $this->assertAttributeEquals($iface, 'current', $stack);
+        $this->assertAttributeEquals($ifaceModel, 'current', $stack);
 
         return $stack;
     }
@@ -83,56 +86,63 @@ class IFaceStackTest extends \BetaKiller\Test\TestCase
     {
         $stack = $this->createEmptyStack();
 
-        $firstProp = $this->emptyIFace(self::FIRST_IFACE_CODENAME);
-        $first     = $firstProp->reveal();
+        $firstProp = $this->emptyIFaceModel(self::FIRST_IFACE_CODENAME);
+        $secondProp = $this->emptyIFaceModel(self::SECOND_IFACE_CODENAME);
 
-        $secondProp = $this->emptyIFace(self::SECOND_IFACE_CODENAME);
-        $second     = $secondProp->reveal();
+        /** @var IFaceModelInterface $firstModel */
+        $firstModel = $firstProp->reveal();
+
+        /** @var IFaceModelInterface $secondModel */
+        $secondModel = $secondProp->reveal();
 
         $this->assertEquals(null, $stack->getCurrent());
-        $stack->push($first);
-        $this->assertEquals($first, $stack->getCurrent());
+        $stack->push($firstModel);
+        $this->assertEquals($firstModel, $stack->getCurrent());
 
-        $stack->push($second);
-        $this->assertEquals($second, $stack->getCurrent());
+        $stack->push($secondModel);
+        $this->assertEquals($secondModel, $stack->getCurrent());
     }
 
     public function testExceptionOnDuplicate()
     {
         $stack = $this->createEmptyStack();
 
-        $firstProp = $this->emptyIFace(self::FIRST_IFACE_CODENAME);
-        $first     = $firstProp->reveal();
+        $firstProp = $this->emptyIFaceModel(self::FIRST_IFACE_CODENAME);
 
-        $stack->push($first);
+        /** @var IFaceModelInterface $firstModel */
+        $firstModel = $firstProp->reveal();
+
+        $stack->push($firstModel);
         $this->expectException(IFaceStackException::class);
-        $stack->push($first);
+        $stack->push($firstModel);
     }
 
     public function testIsCurrentWithoutParams()
     {
         $stack = $this->createEmptyStack();
 
-        $firstProp = $this->emptyIFace(self::FIRST_IFACE_CODENAME);
-        $first     = $firstProp->reveal();
+        $firstProp = $this->emptyIFaceModel(self::FIRST_IFACE_CODENAME);
+        $secondProp = $this->emptyIFaceModel(self::SECOND_IFACE_CODENAME);
 
-        $secondProp = $this->emptyIFace(self::SECOND_IFACE_CODENAME);
-        $second     = $secondProp->reveal();
+        /** @var IFaceModelInterface $firstModel */
+        $firstModel = $firstProp->reveal();
+        /** @var IFaceModelInterface $secondModel */
+        $secondModel = $secondProp->reveal();
 
-        $this->assertFalse($stack->isCurrent($first));
-        $stack->push($first);
-        $this->assertTrue($stack->isCurrent($first));
+        $this->assertFalse($stack->isCurrent($firstModel));
+        $stack->push($firstModel);
+        $this->assertTrue($stack->isCurrent($firstModel));
 
-        $stack->push($second);
-        $this->assertTrue($stack->isCurrent($second));
+        $stack->push($secondModel);
+        $this->assertTrue($stack->isCurrent($secondModel));
     }
 
     /**
      * @depends testAddSecond
      *
-     * @param \BetaKiller\IFace\IFaceStack $stack
+     * @param \BetaKiller\IFace\IFaceModelsStack $stack
      */
-    public function testClear(IFaceStack $stack)
+    public function testClear(IFaceModelsStack $stack)
     {
         $stack->clear();
 
@@ -145,7 +155,7 @@ class IFaceStackTest extends \BetaKiller\Test\TestCase
         /** @var UrlContainerInterface $params */
         $params = $this->revealOrReturn($this->urlParams);
 
-        return new IFaceStack($params);
+        return new IFaceModelsStack($params);
     }
 
     private function emptyUrlParameters()
@@ -153,10 +163,11 @@ class IFaceStackTest extends \BetaKiller\Test\TestCase
         return $this->prophesize(UrlContainerInterface::class);
     }
 
-    private function emptyIFace($codename)
+    private function emptyIFaceModel($codename)
     {
-        $obj = $this->prophesize(IFaceInterface::class);
+        $obj = $this->prophesize(IFaceModelInterface::class);
         $obj->getCodename()->willReturn($codename);
+
         return $obj;
     }
 

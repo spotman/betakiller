@@ -6,7 +6,6 @@ namespace BetaKiller\Url\Behaviour;
 use BetaKiller\Factory\FactoryException;
 use BetaKiller\IFace\IFaceModelInterface;
 use BetaKiller\Repository\RepositoryException;
-use BetaKiller\Url\AvailableUri;
 use BetaKiller\Url\UrlBehaviourException;
 use BetaKiller\Url\UrlContainerInterface;
 use BetaKiller\Url\UrlDispatcher;
@@ -117,10 +116,10 @@ class MultipleUrlBehaviour extends AbstractUrlBehaviour
         $ifaceUrlParams = clone $params;
 
         foreach ($items as $availableParameter) {
-            $ifaceUrlParams->setParameter($availableParameter);
+            $ifaceUrlParams->setParameter($availableParameter, true);
             $url = $this->urlHelper->makeIFaceUrl($ifaceModel, $ifaceUrlParams);
 
-            yield new AvailableUri($url, $availableParameter);
+            yield $this->createAvailableUri($url, $availableParameter);
 
             if ($ifaceModel->hasTreeBehaviour()) {
                 foreach ($this->getAvailableUrls($ifaceModel, $ifaceUrlParams) as $treeAvailableUrl) {

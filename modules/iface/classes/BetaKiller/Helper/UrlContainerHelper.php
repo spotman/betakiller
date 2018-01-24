@@ -2,6 +2,7 @@
 namespace BetaKiller\Helper;
 
 use BetaKiller\Model\DispatchableEntityInterface;
+use BetaKiller\Url\ResolvingUrlContainer;
 use BetaKiller\Url\UrlContainer;
 use BetaKiller\Url\UrlContainerInterface;
 
@@ -25,9 +26,14 @@ class UrlContainerHelper
     /**
      * @return \BetaKiller\Url\UrlContainerInterface
      */
-    public function createEmpty(): UrlContainerInterface
+    public function createSimple(): UrlContainerInterface
     {
         return UrlContainer::create();
+    }
+
+    public function createResolving(): ResolvingUrlContainer
+    {
+        return new ResolvingUrlContainer;
     }
 
     /**

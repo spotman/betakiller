@@ -33,8 +33,10 @@ class IFaceModelProviderAggregate extends IFaceModelProviderAbstract
      * @param \BetaKiller\IFace\ModelProvider\IFaceModelProviderDatabase  $databaseProvider
      * @param \BetaKiller\IFace\ModelProvider\IFaceModelProviderXmlConfig $adminProvider
      */
-    public function __construct(IFaceModelProviderDatabase $databaseProvider, IFaceModelProviderXmlConfig $adminProvider)
-    {
+    public function __construct(
+        IFaceModelProviderDatabase $databaseProvider,
+        IFaceModelProviderXmlConfig $adminProvider
+    ) {
         $this->databaseProvider = $databaseProvider;
         $this->adminProvider    = $adminProvider;
     }
@@ -80,7 +82,7 @@ class IFaceModelProviderAggregate extends IFaceModelProviderAbstract
      */
     public function getByCodename(string $codename): IFaceModelInterface
     {
-        $model = $this->getFromCache($codename);
+        $model     = $this->getFromCache($codename);
         $exception = null;
 
         if (!$model) {
@@ -94,7 +96,8 @@ class IFaceModelProviderAggregate extends IFaceModelProviderAbstract
             }
 
             if (!$model) {
-                throw new IFaceException('No IFace found by codename :codename', [':codename' => $codename], 0, $exception);
+                throw new IFaceException('No IFace found by codename :codename', [':codename' => $codename], 0,
+                    $exception);
             }
 
             $this->storeInCache($model);
@@ -171,8 +174,11 @@ class IFaceModelProviderAggregate extends IFaceModelProviderAbstract
      * @throws \BetaKiller\IFace\Exception\IFaceException
      * @deprecated Use IFaceModelTree instead
      */
-    public function getByEntityActionAndZone(DispatchableEntityInterface $entity, string $entityAction, string $zone): ?IFaceModelInterface
-    {
+    public function getByEntityActionAndZone(
+        DispatchableEntityInterface $entity,
+        string $entityAction,
+        string $zone
+    ): ?IFaceModelInterface {
         $model = null;
 
         foreach ($this->getSources() as $source) {
@@ -180,6 +186,7 @@ class IFaceModelProviderAggregate extends IFaceModelProviderAbstract
 
             if ($model) {
                 $this->storeInCache($model);
+
                 return $model;
             }
         }

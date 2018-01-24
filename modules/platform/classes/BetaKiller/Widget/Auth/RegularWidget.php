@@ -41,19 +41,19 @@ class RegularWidget extends AbstractBaseWidget
         // Magic call for better exception handling
         $this->content_type_json();
 
-        $user_login    = $this->getRequest()->post('user-login');
-        $user_password = $this->getRequest()->post('user-password');
+        $userLogin    = $this->getRequest()->post('user-login');
+        $userPassword = $this->getRequest()->post('user-password');
         $remember      = (bool)$this->getRequest()->post('remember');
 
         // Sanitize
-        $user_login    = trim(HTML::chars($user_login));
-        $user_password = trim(HTML::chars($user_password));
+        $userLogin    = trim(HTML::chars($userLogin));
+        $userPassword = trim(HTML::chars($userPassword));
 
-        if (!$user_login || !$user_password) {
+        if (!$userLogin || !$userPassword) {
             throw new HTTP_Exception_400('No username or password sent');
         }
 
-        $this->auth->login($user_login, $user_password, $remember);
+        $this->auth->login($userLogin, $userPassword, $remember);
 
         // Возвращаем соответствующий ответ
         $this->send_success_json();
@@ -77,6 +77,6 @@ class RegularWidget extends AbstractBaseWidget
         /** @var PasswordReset $iface */
         $iface = $this->ifaceHelper->createIFaceFromCodename('Auth_PasswordReset');
 
-        return $iface->url();
+        return $this->ifaceHelper->makeIFaceUrl($iface);
     }
 }

@@ -62,6 +62,7 @@ class IFaceView
      * @param \BetaKiller\IFace\IFaceInterface $iface
      *
      * @return string
+     * @throws \BetaKiller\Url\UrlPrototypeException
      * @throws \BetaKiller\IFace\Exception\IFaceException
      */
     public function render(IFaceInterface $iface): string
@@ -91,7 +92,7 @@ class IFaceView
             ->setContentType()
             ->setTitle($this->ifaceHelper->getTitle($model))
             ->setMetaDescription($this->ifaceHelper->getDescription($model))
-            ->setCanonical($iface->url(null, false));
+            ->setCanonical($this->ifaceHelper->makeUrl($model, null, false));
 
         // Getting IFace layout
         $layoutCodename = $this->getLayoutCodename($model);
@@ -105,7 +106,6 @@ class IFaceView
      * @param \BetaKiller\IFace\IFaceModelInterface $model
      *
      * @return string
-     * @throws \BetaKiller\ExceptionInterface
      * @throws \BetaKiller\IFace\Exception\IFaceException
      */
     private function getLayoutCodename(IFaceModelInterface $model): string

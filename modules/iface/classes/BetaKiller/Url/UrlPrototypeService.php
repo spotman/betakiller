@@ -184,11 +184,12 @@ class UrlPrototypeService
         $isTree    = $isTree ?? false;
         $prototype = $this->createPrototypeFromString($proto);
 
-        $model = $this->getParamByPrototype($prototype, $params);
+        $param = $this->getParamByPrototype($prototype, $params);
 
-        if ($isTree && !($model instanceof TreeModelSingleParentInterface)) {
+        // TODO Rewrite to TreeModelSingleParentRepository::getParent() call
+        if ($isTree && !($param instanceof TreeModelSingleParentInterface)) {
             throw new UrlPrototypeException('Model :model must be instance of :object for tree traversing', [
-                ':model'  => \get_class($model),
+                ':model'  => \get_class($param),
                 ':object' => TreeModelSingleParentInterface::class,
             ]);
         }
@@ -196,8 +197,8 @@ class UrlPrototypeService
         $parts = [];
 
         do {
-            $parts[] = $this->calculateParameterKeyValue($prototype, $model);
-        } while ($isTree && ($model = $model->getParent()));
+            $parts[] = $this->calculateParameterKeyValue($prototype, $param);
+        } while ($isTree && $param = $param->getParent());
 
         return implode('/', array_reverse($parts));
     }

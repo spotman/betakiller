@@ -1,7 +1,7 @@
 <?php
 
 use BetaKiller\Helper\UrlContainerHelper;
-use BetaKiller\IFace\IFaceStack;
+use BetaKiller\IFace\IFaceModelsStack;
 use BetaKiller\Url\AvailableUrlsCollector;
 
 class Task_Cache_Warmup extends \BetaKiller\Task\AbstractTask
@@ -12,7 +12,7 @@ class Task_Cache_Warmup extends \BetaKiller\Task\AbstractTask
     private $urlParametersHelper;
 
     /**
-     * @var \BetaKiller\IFace\IFaceStack
+     * @var \BetaKiller\IFace\IFaceModelsStack
      */
     private $ifaceStack;
 
@@ -23,7 +23,7 @@ class Task_Cache_Warmup extends \BetaKiller\Task\AbstractTask
 
     public function __construct(
         AvailableUrlsCollector $urlCollector,
-        IFaceStack $stack,
+        IFaceModelsStack $stack,
         UrlContainerHelper $paramsHelper
     ) {
         $this->ifaceStack          = $stack;

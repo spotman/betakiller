@@ -32,6 +32,12 @@ class Controller_IFace extends Controller
 
     /**
      * @Inject
+     * @var \BetaKiller\IFace\IFaceFactory
+     */
+    private $ifaceFactory;
+
+    /**
+     * @Inject
      * @var UrlContainerInterface
      */
     private $urlContainer;
@@ -49,6 +55,7 @@ class Controller_IFace extends Controller
     private $ifaceView;
 
     /**
+     * @throws \BetaKiller\Factory\FactoryException
      * @throws \PageCache\PageCacheException
      * @throws \BetaKiller\IFace\Exception\IFaceException
      */
@@ -60,8 +67,8 @@ class Controller_IFace extends Controller
         $this->urlContainer->setQueryParts($queryParts);
 
         // Getting current IFace
-        $iface = $this->urlDispatcher->process($uri, $this->request->client_ip());
-        $model = $iface->getModel();
+        $model = $this->urlDispatcher->process($uri, $this->request->client_ip());
+        $iface = $this->ifaceFactory->createFromModel($model);
 
         // If this is default IFace and client requested non-slash uri, redirect client to /
         if ($uri !== '/' && $model->isDefault() && !$model->hasDynamicUrl()) {
@@ -106,7 +113,7 @@ class Controller_IFace extends Controller
             $this->expires($iface->getExpiresDateTime());
 
             $this->send_string($output);
-        } catch (Throwable $e) {
+        } catch (\Throwable $e) {
             // Prevent response caching
             $this->ifaceCache->disable();
 

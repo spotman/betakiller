@@ -2,8 +2,6 @@
 namespace BetaKiller\IFace;
 
 use BetaKiller\Helper\SeoMetaInterface;
-use BetaKiller\IFace\Exception\IFaceException;
-use BetaKiller\Url\UrlContainerInterface;
 use DateInterval;
 use DateTimeInterface;
 
@@ -38,7 +36,6 @@ abstract class AbstractIFace implements IFaceInterface
 
     /**
      * @return string
-     * @throws \BetaKiller\IFace\Exception\IFaceException
      */
     public function getCodename(): string
     {
@@ -49,7 +46,6 @@ abstract class AbstractIFace implements IFaceInterface
      * Returns plain label
      *
      * @return string
-     * @throws \BetaKiller\IFace\Exception\IFaceException
      */
     public function getLabel(): string
     {
@@ -62,7 +58,6 @@ abstract class AbstractIFace implements IFaceInterface
      * @param string $value
      *
      * @return void
-     * @throws \BetaKiller\IFace\Exception\IFaceException
      */
     public function setLabel(string $value): void
     {
@@ -73,7 +68,6 @@ abstract class AbstractIFace implements IFaceInterface
      * Returns plain title
      *
      * @return string
-     * @throws \BetaKiller\IFace\Exception\IFaceException
      */
     public function getTitle(): ?string
     {
@@ -84,7 +78,6 @@ abstract class AbstractIFace implements IFaceInterface
      * Returns plain description
      *
      * @return string
-     * @throws \BetaKiller\IFace\Exception\IFaceException
      */
     public function getDescription(): ?string
     {
@@ -97,7 +90,6 @@ abstract class AbstractIFace implements IFaceInterface
      * @param string $value
      *
      * @return SeoMetaInterface
-     * @throws \BetaKiller\IFace\Exception\IFaceException
      */
     public function setTitle(string $value): SeoMetaInterface
     {
@@ -112,7 +104,6 @@ abstract class AbstractIFace implements IFaceInterface
      * @param string $value
      *
      * @return SeoMetaInterface
-     * @throws \BetaKiller\IFace\Exception\IFaceException
      */
     public function setDescription(string $value): SeoMetaInterface
     {
@@ -240,19 +231,5 @@ abstract class AbstractIFace implements IFaceInterface
         $this->model = $model;
 
         return $this;
-    }
-
-    /**
-     * @param \BetaKiller\Url\UrlContainerInterface|null $params
-     * @param bool|null                                  $removeCyclingLinks
-     *
-     * @return string
-     * @throws \BetaKiller\IFace\Exception\IFaceException
-     * @deprecated use IFaceHelper or UrlHelper instead
-     * @TODO Remove direct calls of this method
-     */
-    public function url(?UrlContainerInterface $params = null, ?bool $removeCyclingLinks = null): string
-    {
-        return $this->ifaceHelper->makeUrl($this->getModel(), $params, $removeCyclingLinks);
     }
 }

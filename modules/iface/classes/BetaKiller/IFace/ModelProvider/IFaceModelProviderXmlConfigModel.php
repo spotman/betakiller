@@ -1,6 +1,7 @@
 <?php
 namespace BetaKiller\IFace\ModelProvider;
 
+use BetaKiller\Exception\NotImplementedException;
 use BetaKiller\Helper\SeoMetaInterface;
 use BetaKiller\IFace\Exception\IFaceException;
 use BetaKiller\IFace\IFaceModelInterface;
@@ -144,6 +145,14 @@ class IFaceModelProviderXmlConfigModel implements IFaceModelInterface
     }
 
     /**
+     * @param string $uri
+     */
+    public function setUri(string $uri): void
+    {
+        throw new NotImplementedException('Admin model can not change uri');
+    }
+
+    /**
      * Return parent iface model or NULL
      *
      * @return IFaceModelInterface|null
@@ -217,7 +226,7 @@ class IFaceModelProviderXmlConfigModel implements IFaceModelInterface
      */
     public function setTitle(string $value): SeoMetaInterface
     {
-        throw new HTTP_Exception_501('Admin model can not change title');
+        throw new NotImplementedException('Admin model can not change title');
     }
 
     /**
@@ -230,7 +239,7 @@ class IFaceModelProviderXmlConfigModel implements IFaceModelInterface
      */
     public function setDescription(string $value): SeoMetaInterface
     {
-        throw new HTTP_Exception_501('Admin model can not change description');
+        throw new NotImplementedException('Admin model can not change description');
     }
 
     /**

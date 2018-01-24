@@ -7,7 +7,8 @@ namespace BetaKiller\Helper;
 use BetaKiller\Config\AppConfigInterface;
 use BetaKiller\IFace\Exception\IFaceException;
 use BetaKiller\IFace\IFaceModelInterface;
-use BetaKiller\IFace\IFaceStack;
+use BetaKiller\IFace\IFaceModelsStack;
+use BetaKiller\IFace\IFaceModelTree;
 use BetaKiller\Url\Behaviour\UrlBehaviourFactory;
 use BetaKiller\Url\UrlContainerInterface;
 
@@ -24,22 +25,33 @@ class UrlHelper
     private $appConfig;
 
     /**
-     * @var \BetaKiller\IFace\IFaceStack
+     * @var \BetaKiller\IFace\IFaceModelsStack
      */
     private $stack;
 
     /**
+     * @var \BetaKiller\IFace\IFaceModelTree
+     */
+    private $tree;
+
+    /**
      * UrlHelper constructor.
      *
+     * @param \BetaKiller\IFace\IFaceModelTree              $tree
      * @param \BetaKiller\Config\AppConfigInterface         $appConfig
      * @param \BetaKiller\Url\Behaviour\UrlBehaviourFactory $behaviourFactory
-     * @param \BetaKiller\IFace\IFaceStack                  $stack
+     * @param \BetaKiller\IFace\IFaceModelsStack            $stack
      */
-    public function __construct(AppConfigInterface $appConfig, UrlBehaviourFactory $behaviourFactory, IFaceStack $stack)
-    {
+    public function __construct(
+        IFaceModelTree $tree,
+        AppConfigInterface $appConfig,
+        UrlBehaviourFactory $behaviourFactory,
+        IFaceModelsStack $stack
+    ) {
         $this->behaviourFactory = $behaviourFactory;
         $this->appConfig        = $appConfig;
         $this->stack            = $stack;
+        $this->tree             = $tree;
     }
 
     /**
@@ -57,26 +69,20 @@ class UrlHelper
     ): string {
         $removeCyclingLinks = $removeCyclingLinks ?? true;
 
-        if ($removeCyclingLinks && $this->stack->isCurrentModel($model, $params)) {
+        if ($removeCyclingLinks && $this->stack->isCurrent($model, $params)) {
             return $this->appConfig->getCircularLinkHref();
         }
 
-        $parts   = [];
-        $current = $model;
-        $parent  = null;
+        $parts = [];
 
-        // TODO Replace with IFaceTree traversing (climbing)
-        do {
-            $uri = $this->makeIFaceUri($current, $params);
+        foreach ($this->tree->getReverseBreadcrumbsIterator($model) as $item) {
+            $uri = $this->makeIFaceUri($item, $params);
             array_unshift($parts, $uri);
+        }
 
-            $parent  = $current->getParent();
-            $current = $parent;
-        } while ($parent);
+        $path = implode('/', array_filter($parts));
 
-        $path = implode('/', $parts);
-
-        if ($this->appConfig->isTrailingSlashEnabled()) {
+        if ($path && $this->appConfig->isTrailingSlashEnabled()) {
             // Add trailing slash before query parameters
             $split    = explode('?', $path, 2);
             $split[0] .= '/';

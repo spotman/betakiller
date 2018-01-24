@@ -1,7 +1,9 @@
 <?php
 namespace BetaKiller\IFace;
 
+use BetaKiller\IFace\Exception\IFaceException;
 use BetaKiller\IFace\ModelProvider\IFaceModelProviderAggregate;
+use BetaKiller\Model\DispatchableEntityInterface;
 use BetaKiller\Model\IFaceZone;
 
 class IFaceModelTree
@@ -11,9 +13,23 @@ class IFaceModelTree
      */
     protected $modelProvider;
 
+    /**
+     * @var string[]
+     */
+    private $entityLinkedCodenameCache;
+
     public function __construct(IFaceModelProviderAggregate $modelProvider)
     {
         $this->modelProvider = $modelProvider;
+    }
+
+    /**
+     * @return \BetaKiller\IFace\IFaceModelInterface
+     * @throws \BetaKiller\IFace\Exception\IFaceException
+     */
+    public function getDefault(): IFaceModelInterface
+    {
+        return $this->modelProvider->getDefault();
     }
 
     /**
@@ -46,6 +62,17 @@ class IFaceModelTree
     }
 
     /**
+     * @param string $codename
+     *
+     * @return \BetaKiller\IFace\IFaceModelInterface
+     * @throws \BetaKiller\IFace\Exception\IFaceException
+     */
+    public function getByCodename(string $codename): IFaceModelInterface
+    {
+        return $this->modelProvider->getByCodename($codename);
+    }
+
+    /**
      * @param string $action
      * @param string $zone
      *
@@ -55,6 +82,62 @@ class IFaceModelTree
     public function getByActionAndZone(string $action, string $zone): array
     {
         return $this->modelProvider->getByActionAndZone($action, $zone);
+    }
+
+    /**
+     * @param \BetaKiller\Model\DispatchableEntityInterface $entity
+     * @param string                                        $action
+     * @param string                                        $zone
+     *
+     * @return \BetaKiller\IFace\IFaceModelInterface
+     * @throws \BetaKiller\IFace\Exception\IFaceException
+     */
+    public function getByEntityActionAndZone(
+        DispatchableEntityInterface $entity,
+        string $action,
+        string $zone
+    ): IFaceModelInterface {
+        $key = implode('.', [$entity->getModelName(), $action, $zone]);
+
+        $model = $this->getLinkedIFaceFromCache($key);
+
+        if ($model) {
+            return $model;
+        }
+
+        $model = $this->modelProvider->getByEntityActionAndZone($entity, $action, $zone);
+
+        if (!$model) {
+            throw new IFaceException('No IFace found for :entity.:action entity in :zone zone', [
+                ':entity' => $entity->getModelName(),
+                ':action' => $action,
+                ':zone'   => $zone,
+            ]);
+        }
+
+        $this->storeLinkedIFaceInCache($key, $model);
+
+        return $model;
+    }
+
+    /**
+     * @param \BetaKiller\IFace\IFaceModelInterface $model
+     *
+     * @return \ArrayIterator|\BetaKiller\IFace\IFaceModelInterface[]
+     */
+    public function getReverseBreadcrumbsIterator(IFaceModelInterface $model): \ArrayIterator
+    {
+        $stack   = [];
+        $current = $model;
+
+        do {
+            $stack[] = $current;
+
+            $parent  = $this->getParent($current);
+            $current = $parent;
+        } while ($parent);
+
+        return new \ArrayIterator($stack);
     }
 
     /**
@@ -134,5 +217,31 @@ class IFaceModelTree
     private function isPublicModel(IFaceModelInterface $model): bool
     {
         return $model->getZoneName() === IFaceZone::PUBLIC_ZONE;
+    }
+
+    /**
+     * @param string $key
+     *
+     * @return \BetaKiller\IFace\IFaceModelInterface|null
+     * @throws \BetaKiller\IFace\Exception\IFaceException
+     */
+    private function getLinkedIFaceFromCache(string $key): ?IFaceModelInterface
+    {
+        if (!isset($this->entityLinkedCodenameCache[$key])) {
+            return null;
+        }
+
+        $codename = $this->entityLinkedCodenameCache[$key];
+
+        return $this->getByCodename($codename);
+    }
+
+    /**
+     * @param string                                $key
+     * @param \BetaKiller\IFace\IFaceModelInterface $model
+     */
+    private function storeLinkedIFaceInCache(string $key, IFaceModelInterface $model): void
+    {
+        $this->entityLinkedCodenameCache[$key] = $model->getCodename();
     }
 }

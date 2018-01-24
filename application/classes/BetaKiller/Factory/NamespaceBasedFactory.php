@@ -162,11 +162,11 @@ final class NamespaceBasedFactory
             throw new FactoryException('Object codename is missing');
         }
 
-        $className = $this->detectClassName($codename);
-
-        $instance = $this->getInstanceFromCache($className);
+        $instance = $this->getInstanceFromCache($codename);
 
         if (!$instance) {
+            $className = $this->detectClassName($codename);
+
             if ($this->prepareArgumentsCallback) {
                 $arguments = \call_user_func($this->prepareArgumentsCallback, $arguments, $className);
             }
@@ -187,7 +187,7 @@ final class NamespaceBasedFactory
                 ]);
             }
 
-            $this->storeInstanceInCache($className, $instance);
+            $this->storeInstanceInCache($codename, $instance);
         }
 
         return $instance;
@@ -214,7 +214,9 @@ final class NamespaceBasedFactory
         $separator = '\\';
         $baseName  = implode($separator, $codenameArray).$this->classSuffix;
 
-        if ($className = $this->getClassNameFromCache($baseName)) {
+        $className = $this->getClassNameFromCache($baseName);
+
+        if ($className) {
             return $className;
         }
 
@@ -271,20 +273,24 @@ final class NamespaceBasedFactory
     }
 
     /**
-     * @param string $className
+     * @param string $codename
      *
      * @return mixed|null
      */
-    private function getInstanceFromCache(string $className)
+    private function getInstanceFromCache(string $codename)
     {
-        return ($this->instanceCachingEnabled && $this->hasInstanceInCache($className))
-            ? self::$instances[$className]
+        $key = $this->makeCacheKeyFromCodename($codename);
+
+        return ($this->instanceCachingEnabled && isset(self::$instances[$key]))
+            ? self::$instances[$key]
             : null;
     }
 
-    private function hasInstanceInCache(string $className): bool
+    private function hasInstanceInCache(string $codename): bool
     {
-        return isset(self::$instances[$className]);
+        $key = $this->makeCacheKeyFromCodename($codename);
+
+        return isset(self::$instances[$key]);
     }
 
     /**
@@ -310,21 +316,28 @@ final class NamespaceBasedFactory
     }
 
     /**
-     * @param string $className
+     * @param string $codename
      * @param        $instance
      *
      * @throws \BetaKiller\Factory\FactoryException
      */
-    private function storeInstanceInCache(string $className, $instance): void
+    private function storeInstanceInCache(string $codename, $instance): void
     {
         if (!$this->instanceCachingEnabled) {
             return;
         }
 
-        if ($this->hasInstanceInCache($className)) {
-            throw new FactoryException('Instance of :className is already cached', [':className' => $className]);
+        if ($this->hasInstanceInCache($codename)) {
+            throw new FactoryException('Instance :codename is already cached', [':codename' => $codename]);
         }
 
-        self::$instances[$className] = $instance;
+        $key = $this->makeCacheKeyFromCodename($codename);
+
+        self::$instances[$key] = $instance;
+    }
+
+    private function makeCacheKeyFromCodename(string $codename): string
+    {
+        return $this->expectedInterface.'::'.$codename;
     }
 }

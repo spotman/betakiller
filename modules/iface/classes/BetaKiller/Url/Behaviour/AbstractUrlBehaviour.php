@@ -8,7 +8,6 @@ use BetaKiller\Url\AvailableUri;
 use BetaKiller\Url\UrlContainerInterface;
 use BetaKiller\Url\UrlDispatcher;
 use BetaKiller\Url\UrlParameterInterface;
-use function GuzzleHttp\uri_template;
 
 abstract class AbstractUrlBehaviour implements UrlBehaviourInterface
 {
@@ -33,7 +32,7 @@ abstract class AbstractUrlBehaviour implements UrlBehaviourInterface
 
         // Link to the root if this is a default element
         if ($uri === UrlDispatcher::DEFAULT_URI && $ifaceModel->isDefault()) {
-            $uri = '/';
+            $uri = '';
         }
 
         return $uri;

@@ -1,8 +1,6 @@
 <?php
 namespace BetaKiller\IFace\Admin\Content;
 
-use BetaKiller\Helper\IFaceHelper;
-use BetaKiller\IFace\IFaceFactory;
 use BetaKiller\Helper\ContentHelper;
 
 class PostIndex extends AbstractAdminBase
@@ -30,9 +28,9 @@ class PostIndex extends AbstractAdminBase
 
         foreach ($articles as $article) {
             $data[] = [
-                'id'          => $article->getID(),
-                'url'         => $this->ifaceHelper->getReadEntityUrl($article),
-                'label'       => $article->getLabel(),
+                'id'    => $article->getID(),
+                'url'   => $this->ifaceHelper->getReadEntityUrl($article),
+                'label' => $article->getLabel(),
             ];
         }
 
@@ -40,8 +38,8 @@ class PostIndex extends AbstractAdminBase
         $createPostIFace = $this->ifaceHelper->createIFaceFromCodename('Admin_Content_PostCreate');
 
         return [
-            'createUrl' => $createPostIFace->url(),
-            'posts' => $data,
+            'createUrl' => $this->ifaceHelper->makeIFaceUrl($createPostIFace),
+            'posts'     => $data,
         ];
     }
 }

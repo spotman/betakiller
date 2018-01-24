@@ -81,7 +81,7 @@ class IFaceCache
 
         $expires = $iface->getExpiresSeconds();
 
-        // Skip caching if content expired already
+        // Skip caching if content expired already (admin interfaces and non-cachable pages)
         if ($expires < 0) {
             return;
         }

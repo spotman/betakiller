@@ -10,6 +10,12 @@ use BetaKiller\Url\UrlPathIterator;
 class SingleUrlBehaviour extends AbstractUrlBehaviour
 {
     /**
+     * @Inject
+     * @var \BetaKiller\Helper\UrlHelper
+     */
+    private $urlHelper;
+
+    /**
      * Returns true if current behaviour was applied
      *
      * @param \BetaKiller\IFace\IFaceModelInterface      $model
@@ -50,9 +56,9 @@ class SingleUrlBehaviour extends AbstractUrlBehaviour
         IFaceModelInterface $ifaceModel,
         UrlContainerInterface $params
     ): \Generator {
+        $url = $this->urlHelper->makeIFaceUrl($ifaceModel, $params);
+
         // Only one available uri and no UrlParameter instance
-        yield $this->createAvailableUri(
-            $this->makeUri($ifaceModel, $params)
-        );
+        yield $this->createAvailableUri($url);
     }
 }

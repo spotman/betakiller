@@ -18,8 +18,8 @@ class PhpExceptionTest extends ErrorAdminBase
         $loggerIFace = $this->ifaceHelper->createIFaceFromCodename('Admin_Error_PhpExceptionTestLogger');
 
         return [
-            'http_500_test_url' => $http500IFace->url(),
-            'logger_test_url'   => $loggerIFace->url(),
+            'http_500_test_url' => $this->ifaceHelper->makeIFaceUrl($http500IFace),
+            'logger_test_url'   => $this->ifaceHelper->makeIFaceUrl($loggerIFace),
         ];
     }
 }

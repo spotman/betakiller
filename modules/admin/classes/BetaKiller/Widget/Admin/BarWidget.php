@@ -6,7 +6,7 @@ use BetaKiller\Helper\UrlContainerHelper;
 use BetaKiller\IFace\CrudlsActionsInterface;
 use BetaKiller\IFace\Exception\IFaceException;
 use BetaKiller\IFace\IFaceInterface;
-use BetaKiller\IFace\IFaceProvider;
+use BetaKiller\IFace\IFaceModelTree;
 use BetaKiller\IFace\Widget\AbstractAdminWidget;
 use BetaKiller\Model\DispatchableEntityInterface;
 use BetaKiller\Model\IFaceZone;
@@ -26,12 +26,6 @@ class BarWidget extends AbstractAdminWidget
     private $urlParamHelper;
 
     /**
-     * @var \BetaKiller\IFace\IFaceProvider
-     */
-    private $ifaceProvider;
-
-    /**
-     * @Inject
      * @var \BetaKiller\IFace\IFaceModelTree
      */
     private $tree;
@@ -43,32 +37,31 @@ class BarWidget extends AbstractAdminWidget
     private $contentHelper;
 
     public function __construct(
+        IFaceModelTree $tree,
         UserInterface $user,
         IFaceHelper $ifaceHelper,
-        UrlContainerHelper $urlParamHelper,
-        IFaceProvider $ifaceProvider
+        UrlContainerHelper $urlParamHelper
     ) {
         parent::__construct($user);
 
+        $this->tree           = $tree;
         $this->ifaceHelper    = $ifaceHelper;
         $this->urlParamHelper = $urlParamHelper;
-        $this->ifaceProvider  = $ifaceProvider;
     }
 
     /**
      * Returns data for View rendering
      *
      * @return array
-     * @throws \BetaKiller\Exception
      * @throws \Spotman\Acl\Exception
      * @throws \BetaKiller\IFace\Exception\IFaceException
      */
     public function getData(): array
     {
-        $currentIFace  = $this->ifaceHelper->getCurrentIFaceModel();
-        $currentLayout = $currentIFace ? $this->ifaceHelper->detectLayoutCodename($currentIFace) : null;
-        $isAdminLayout = $currentLayout === LayoutInterface::LAYOUT_ADMIN;
-        $primaryEntity = $currentIFace ? $this->ifaceHelper->detectPrimaryEntity($currentIFace) : null;
+        $currentIFaceModel = $this->ifaceHelper->getCurrentIFaceModel();
+        $currentLayout     = $currentIFaceModel ? $currentIFaceModel->getLayoutCodename() : null;
+        $isAdminLayout     = $currentLayout === LayoutInterface::LAYOUT_ADMIN;
+        $primaryEntity     = $currentIFaceModel ? $this->ifaceHelper->detectPrimaryEntity($currentIFaceModel) : null;
 
         $data = [
             'isAdminLayout'     => $isAdminLayout,
@@ -130,7 +123,7 @@ class BarWidget extends AbstractAdminWidget
             : $this->getCommentsRootIface();
 
         $params = $this->urlParamHelper
-            ->createEmpty()
+            ->createSimple()
             ->setParameter($pendingStatus);
 
         $url = $this->aclHelper->isIFaceAllowed($iface->getModel(), $params)
@@ -167,7 +160,6 @@ class BarWidget extends AbstractAdminWidget
      * @param \BetaKiller\Model\DispatchableEntityInterface|null $entity
      *
      * @return null|string
-     * @throws \BetaKiller\Exception
      */
     private function getAdminEditButtonUrl(?DispatchableEntityInterface $entity): ?string
     {
@@ -178,7 +170,6 @@ class BarWidget extends AbstractAdminWidget
      * @param \BetaKiller\Model\DispatchableEntityInterface|null $entity
      *
      * @return null|string
-     * @throws \BetaKiller\Exception
      */
     private function getPublicReadButtonUrl(?DispatchableEntityInterface $entity): ?string
     {
@@ -189,7 +180,6 @@ class BarWidget extends AbstractAdminWidget
      * @param \BetaKiller\Model\DispatchableEntityInterface|null $entity
      *
      * @return null|string
-     * @throws \BetaKiller\Exception
      */
     private function getPreviewButtonUrl(?DispatchableEntityInterface $entity): ?string
     {

@@ -5,7 +5,6 @@ use BetaKiller\Acl\Resource\AdminResource;
 use BetaKiller\Acl\Resource\EntityRelatedAclResourceInterface;
 use BetaKiller\IFace\CrudlsActionsInterface;
 use BetaKiller\IFace\Exception\IFaceException;
-use BetaKiller\IFace\IFaceInterface;
 use BetaKiller\IFace\IFaceModelInterface;
 use BetaKiller\Model\DispatchableEntityInterface;
 use BetaKiller\Model\GuestUser;
@@ -14,8 +13,10 @@ use BetaKiller\Model\HasPersonalZoneAccessSpecificationInterface;
 use BetaKiller\Model\HasPreviewZoneAccessSpecificationInterface;
 use BetaKiller\Model\HasPublicZoneAccessSpecificationInterface;
 use BetaKiller\Model\IFaceZone;
+use BetaKiller\Model\UserInterface;
 use BetaKiller\Url\UrlContainerInterface;
 use Spotman\Acl\AccessResolver\UserAccessResolver;
+use Spotman\Acl\AclInterface;
 use Spotman\Acl\AclUserInterface;
 use Spotman\Acl\Exception;
 use Spotman\Acl\Resource\ResolvingResourceInterface;
@@ -23,16 +24,26 @@ use Spotman\Acl\Resource\ResolvingResourceInterface;
 class AclHelper
 {
     /**
-     * @Inject
      * @var \Spotman\Acl\AclInterface
      */
     private $acl;
 
     /**
-     * @Inject
      * @var \BetaKiller\Model\UserInterface
      */
     private $user;
+
+    /**
+     * AclHelper constructor.
+     *
+     * @param \Spotman\Acl\AclInterface       $acl
+     * @param \BetaKiller\Model\UserInterface $user
+     */
+    public function __construct(AclInterface $acl, UserInterface $user)
+    {
+        $this->acl  = $acl;
+        $this->user = $user;
+    }
 
     /**
      * @param \BetaKiller\Model\DispatchableEntityInterface $entity
@@ -85,7 +96,7 @@ class AclHelper
     }
 
     /**
-     * @param \BetaKiller\IFace\IFaceModelInterface           $model
+     * @param \BetaKiller\IFace\IFaceModelInterface      $model
      * @param \BetaKiller\Url\UrlContainerInterface|null $params
      * @param null|\Spotman\Acl\AclUserInterface         $user
      *
@@ -202,8 +213,10 @@ class AclHelper
      * @return bool|null
      * @throws \Spotman\Acl\Exception
      */
-    private function getEntityZoneAccessSpecification(DispatchableEntityInterface $entity, IFaceModelInterface $model): ?bool
-    {
+    private function getEntityZoneAccessSpecification(
+        DispatchableEntityInterface $entity,
+        IFaceModelInterface $model
+    ): ?bool {
         $zoneName = $model->getZoneName();
 
         switch ($zoneName) {

@@ -3,11 +3,11 @@ namespace BetaKiller\Helper;
 
 use BetaKiller\IFace\CrudlsActionsInterface;
 use BetaKiller\IFace\Exception\IFaceException;
+use BetaKiller\IFace\IFaceFactory;
 use BetaKiller\IFace\IFaceInterface;
 use BetaKiller\IFace\IFaceModelInterface;
+use BetaKiller\IFace\IFaceModelsStack;
 use BetaKiller\IFace\IFaceModelTree;
-use BetaKiller\IFace\IFaceProvider;
-use BetaKiller\IFace\IFaceStack;
 use BetaKiller\Model\DispatchableEntityInterface;
 use BetaKiller\Model\IFaceZone;
 use BetaKiller\Url\UrlContainerInterface;
@@ -16,7 +16,7 @@ use Spotman\Api\ApiMethodResponse;
 class IFaceHelper
 {
     /**
-     * @var \BetaKiller\IFace\IFaceStack
+     * @var \BetaKiller\IFace\IFaceModelsStack
      */
     private $stack;
 
@@ -31,11 +31,6 @@ class IFaceHelper
     private $urlHelper;
 
     /**
-     * @var \BetaKiller\IFace\IFaceProvider
-     */
-    private $provider;
-
-    /**
      * @var \BetaKiller\IFace\IFaceModelTree
      */
     private $tree;
@@ -46,41 +41,39 @@ class IFaceHelper
     private $stringPatternHelper;
 
     /**
+     * @var \BetaKiller\IFace\IFaceFactory
+     */
+    private $factory;
+
+    /**
      * IFaceHelper constructor.
      *
-     * @param \BetaKiller\IFace\IFaceStack           $stack
+     * @param \BetaKiller\IFace\IFaceModelsStack     $stack
      * @param \BetaKiller\Helper\UrlContainerHelper  $paramsHelper
-     * @param \BetaKiller\IFace\IFaceProvider        $provider
      * @param \BetaKiller\IFace\IFaceModelTree       $tree
+     * @param \BetaKiller\IFace\IFaceFactory         $factory
      * @param \BetaKiller\Helper\UrlHelper           $urlHelper
      * @param \BetaKiller\Helper\StringPatternHelper $stringPatternHelper
      */
     public function __construct(
-        IFaceStack $stack,
-        UrlContainerHelper $paramsHelper,
-        IFaceProvider $provider,
+        IFaceFactory $factory,
         IFaceModelTree $tree,
+        IFaceModelsStack $stack,
         UrlHelper $urlHelper,
+        UrlContainerHelper $paramsHelper,
         StringPatternHelper $stringPatternHelper
     ) {
         $this->stack               = $stack;
         $this->paramsHelper        = $paramsHelper;
-        $this->provider            = $provider;
         $this->urlHelper           = $urlHelper;
         $this->tree                = $tree;
         $this->stringPatternHelper = $stringPatternHelper;
-    }
-
-    public function getCurrentIFace(): ?IFaceInterface
-    {
-        return $this->stack->getCurrent();
+        $this->factory             = $factory;
     }
 
     public function getCurrentIFaceModel(): ?IFaceModelInterface
     {
-        $current = $this->getCurrentIFace();
-
-        return $current ? $current->getModel() : null;
+        return $this->stack->getCurrent();
     }
 
     public function isCurrentIFaceAction(string $name): bool
@@ -101,12 +94,12 @@ class IFaceHelper
 
     public function isCurrentIFace(IFaceInterface $iface, UrlContainerInterface $params = null): bool
     {
-        return $this->stack->isCurrent($iface, $params);
+        return $this->stack->isCurrent($iface->getModel(), $params);
     }
 
-    public function isInStack(IFaceInterface $iface): bool
+    public function inStack(IFaceModelInterface $model): bool
     {
-        return $this->stack->has($iface);
+        return $this->stack->has($model);
     }
 
     /**
@@ -117,7 +110,9 @@ class IFaceHelper
      */
     public function createIFaceFromCodename(string $codename): IFaceInterface
     {
-        return $this->provider->fromCodename($codename);
+        $model = $this->tree->getByCodename($codename);
+
+        return $this->factory->createFromModel($model);
     }
 
     /**
@@ -147,13 +142,13 @@ class IFaceHelper
             $zone = $this->detectZoneName($currentIFaceModel);
         }
 
-        $params = $this->paramsHelper->createEmpty();
+        $params = $this->paramsHelper->createResolving();
         $params->setParameter($entity);
 
         // Search for IFace with provided entity, action and zone
-        $iface = $this->provider->getByEntityActionAndZone($entity, $action, $zone);
+        $ifaceModel = $this->tree->getByEntityActionAndZone($entity, $action, $zone);
 
-        return $this->makeUrl($iface->getModel(), $params, $removeCycling);
+        return $this->makeUrl($ifaceModel, $params, $removeCycling);
     }
 
     /**
@@ -304,18 +299,6 @@ class IFaceHelper
     }
 
     /**
-     * @param \BetaKiller\IFace\IFaceInterface $iface
-     *
-     * @return \BetaKiller\IFace\IFaceInterface|null
-     * @deprecated Do not use direct parent search, use special iterators for traversing up and down the IFaceTree
-     * @throws \BetaKiller\IFace\Exception\IFaceException
-     */
-    public function getIFaceParent(IFaceInterface $iface): ?IFaceInterface
-    {
-        return $this->provider->getParent($iface);
-    }
-
-    /**
      * @param \BetaKiller\IFace\IFaceModelInterface $model
      *
      * @return \BetaKiller\Model\DispatchableEntityInterface|null
@@ -335,10 +318,9 @@ class IFaceHelper
     /**
      * @param \BetaKiller\IFace\IFaceModelInterface $model
      *
-     * @return string
-     * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @return string|null
      */
-    public function detectLayoutCodename(IFaceModelInterface $model): string
+    public function detectLayoutCodename(IFaceModelInterface $model): ?string
     {
         $current = $model;
 
@@ -346,12 +328,6 @@ class IFaceHelper
         do {
             $layoutCodename = $current->getLayoutCodename();
         } while (!$layoutCodename && $current = $this->tree->getParent($current));
-
-        if (!$layoutCodename) {
-            throw new IFaceException('Cannot detect layout for iface :codename', [
-                ':codename' => $model->getCodename(),
-            ]);
-        }
 
         return $layoutCodename;
     }

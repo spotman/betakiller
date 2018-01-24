@@ -3,7 +3,6 @@ namespace BetaKiller\IFace;
 
 use BetaKiller\Helper\SeoMetaInterface;
 use BetaKiller\Model\HasLabelInterface;
-use BetaKiller\Url\UrlContainerInterface;
 
 interface IFaceInterface extends SeoMetaInterface, HasLabelInterface
 {
@@ -90,13 +89,4 @@ interface IFaceInterface extends SeoMetaInterface, HasLabelInterface
      * @return $this
      */
     public function setModel(IFaceModelInterface $model): self;
-
-    /**
-     * @param \BetaKiller\Url\UrlContainerInterface|null $params
-     * @param bool|null                                  $removeCyclingLinks
-     *
-     * @return string
-     * @deprecated Use IFaceHelper or UrlHelper instead
-     */
-    public function url(?UrlContainerInterface $params = null, ?bool $removeCyclingLinks = null): string;
 }

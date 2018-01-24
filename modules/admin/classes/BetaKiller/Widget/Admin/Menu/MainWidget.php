@@ -129,7 +129,7 @@ class MainWidget extends AbstractAdminWidget
 
         foreach ($statuses as $status) {
             $params = $this->urlParametersHelper
-                ->createEmpty()
+                ->createSimple()
                 ->setParameter($status);
 
             $childrenData[] = $this->getIFaceMenuItemData($commentListInStatus, $params);

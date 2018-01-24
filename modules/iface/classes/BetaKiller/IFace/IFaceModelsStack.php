@@ -4,15 +4,15 @@ namespace BetaKiller\IFace;
 use BetaKiller\IFace\Exception\IFaceStackException;
 use BetaKiller\Url\UrlContainerInterface;
 
-class IFaceStack
+class IFaceModelsStack
 {
     /**
-     * @var \BetaKiller\IFace\IFaceInterface
+     * @var \BetaKiller\IFace\IFaceModelInterface
      */
     private $current;
 
     /**
-     * @var \BetaKiller\IFace\IFaceInterface[]
+     * @var \BetaKiller\IFace\IFaceModelInterface[]
      */
     private $items;
 
@@ -22,7 +22,7 @@ class IFaceStack
     private $parameters;
 
     /**
-     * IFaceStack constructor.
+     * IFaceModelsStack constructor.
      *
      * @param \BetaKiller\Url\UrlContainerInterface $parameters
      */
@@ -32,24 +32,24 @@ class IFaceStack
     }
 
     /**
-     * @param \BetaKiller\IFace\IFaceInterface $iface
+     * @param \BetaKiller\IFace\IFaceModelInterface $model
      *
      * @throws \BetaKiller\IFace\Exception\IFaceStackException
      */
-    public function push(IFaceInterface $iface): void
+    public function push(IFaceModelInterface $model): void
     {
-        if ($this->has($iface)) {
-            throw new IFaceStackException('Duplicate insert for :codename', [':codename' => $iface->getCodename()]);
+        if ($this->has($model)) {
+            throw new IFaceStackException('Duplicate insert for :codename', [':codename' => $model->getCodename()]);
         }
 
-        $codename               = $iface->getCodename();
-        $this->items[$codename] = $iface;
-        $this->current          = $iface;
+        $codename               = $model->getCodename();
+        $this->items[$codename] = $model;
+        $this->current          = $model;
     }
 
-    public function has(IFaceInterface $iface): bool
+    public function has(IFaceModelInterface $model): bool
     {
-        return isset($this->items[$iface->getCodename()]);
+        return isset($this->items[$model->getCodename()]);
     }
 
     /**
@@ -71,17 +71,15 @@ class IFaceStack
         $this->current = null;
     }
 
-    public function getCurrent(): ?IFaceInterface
+    /**
+     * @return \BetaKiller\IFace\IFaceModelInterface|null
+     */
+    public function getCurrent(): ?IFaceModelInterface
     {
         return $this->current;
     }
 
-    public function isCurrent(IFaceInterface $iface, ?UrlContainerInterface $parameters = null): bool
-    {
-        return $this->isCurrentModel($iface->getModel(), $parameters);
-    }
-
-    public function isCurrentModel(IFaceModelInterface $model, ?UrlContainerInterface $parameters = null): bool
+    public function isCurrent(IFaceModelInterface $model, ?UrlContainerInterface $parameters = null): bool
     {
         if (!$this->current || $this->current->getCodename() !== $model->getCodename()) {
             return false;

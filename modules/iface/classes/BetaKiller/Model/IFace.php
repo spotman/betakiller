@@ -149,6 +149,14 @@ class IFace extends TreeModelSingleParentOrm implements IFaceModelInterface
     }
 
     /**
+     * @param string $value
+     */
+    public function setUri(string $value): void
+    {
+        $this->set('uri', $value);
+    }
+
+    /**
      * Returns layout model
      *
      * @return IFaceLayout

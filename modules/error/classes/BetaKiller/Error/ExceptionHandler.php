@@ -51,8 +51,12 @@ class ExceptionHandler implements ExceptionHandlerInterface
      * @param \BetaKiller\View\IFaceView      $ifaceView
      * @param \Psr\Log\LoggerInterface        $logger
      */
-    public function __construct(AppEnv $appEnv, IFaceProvider $ifaceProvider, IFaceView $ifaceView, LoggerInterface $logger)
-    {
+    public function __construct(
+        AppEnv $appEnv,
+        IFaceProvider $ifaceProvider,
+        IFaceView $ifaceView,
+        LoggerInterface $logger
+    ) {
         $this->appEnv        = $appEnv;
         $this->logger        = $logger;
         $this->ifaceProvider = $ifaceProvider;
