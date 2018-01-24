@@ -12,7 +12,7 @@ class Login extends AbstractIFace
     /**
      * @var string Default url for relocate after successful login
      */
-    protected $redirectUrl = null;
+    protected $redirectUrl;
 
     /**
      * @var string
@@ -79,8 +79,13 @@ class Login extends AbstractIFace
         }
     }
 
+    /**
+     * @throws \HTTP_Exception_302
+     */
     public function before(): void
     {
+        $this->setModelUri();
+
         // If user already authorized (skip this step in CLI mode)
         if (PHP_SAPI !== 'cli' && !$this->user->isGuest()) {
             if ($this->redirectUrl === $this->currentUrl) {
@@ -100,19 +105,14 @@ class Login extends AbstractIFace
         ];
     }
 
-    protected function setRedirectUrl($redirectUrl)
+    private function setModelUri(): void
     {
-        $this->redirectUrl = $redirectUrl;
+        $uri = $this->getModel()->getUri();
 
-        return $this;
-    }
-
-    public function getUri(): string
-    {
-        $redirect_query = $this->redirectUrl
+        $redirectQuery = $this->redirectUrl
             ? '?'.$this->redirectUrlQueryParam.'='.urlencode($this->redirectUrl)
             : null;
 
-        return parent::getUri().$redirect_query;
+        $this->getModel()->setUri($uri.$redirectQuery);
     }
 }

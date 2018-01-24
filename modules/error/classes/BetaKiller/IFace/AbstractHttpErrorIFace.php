@@ -46,7 +46,7 @@ abstract class AbstractHttpErrorIFace extends AbstractIFace
 
         return [
             'label'     => $this->getLabel(),
-            'login_url' => $loginIFace->url(),
+            'login_url' => $this->ifaceHelper->makeIFaceUrl($loginIFace),
             'is_guest'  => $this->user->isGuest(),
         ];
     }

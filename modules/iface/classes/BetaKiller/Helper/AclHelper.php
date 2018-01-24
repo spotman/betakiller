@@ -6,6 +6,7 @@ use BetaKiller\Acl\Resource\EntityRelatedAclResourceInterface;
 use BetaKiller\IFace\CrudlsActionsInterface;
 use BetaKiller\IFace\Exception\IFaceException;
 use BetaKiller\IFace\IFaceInterface;
+use BetaKiller\IFace\IFaceModelInterface;
 use BetaKiller\Model\DispatchableEntityInterface;
 use BetaKiller\Model\GuestUser;
 use BetaKiller\Model\HasAdminZoneAccessSpecificationInterface;
@@ -84,7 +85,7 @@ class AclHelper
     }
 
     /**
-     * @param \BetaKiller\IFace\IFaceInterface           $iface
+     * @param \BetaKiller\IFace\IFaceModelInterface           $model
      * @param \BetaKiller\Url\UrlContainerInterface|null $params
      * @param null|\Spotman\Acl\AclUserInterface         $user
      *
@@ -93,17 +94,17 @@ class AclHelper
      * @throws \Spotman\Acl\Exception
      */
     public function isIFaceAllowed(
-        IFaceInterface $iface,
+        IFaceModelInterface $model,
         ?UrlContainerInterface $params = null,
         ?AclUserInterface $user = null
     ): bool {
-        $zoneName   = $iface->getZoneName();
-        $entityName = $iface->getEntityModelName();
-        $actionName = $iface->getEntityActionName();
+        $zoneName   = $model->getZoneName();
+        $entityName = $model->getEntityModelName();
+        $actionName = $model->getEntityActionName();
 
         if (!$zoneName) {
             throw new IFaceException('IFace :name needs zone to be configured', [
-                ':name' => $iface->getCodename(),
+                ':name' => $model->getCodename(),
             ]);
         }
 
@@ -118,7 +119,7 @@ class AclHelper
             $user = $this->user;
         }
 
-        $customRules   = $iface->getAdditionalAclRules();
+        $customRules   = $model->getAdditionalAclRules();
         $entityDefined = $entityName && $actionName;
 
         // Force check for admin panel is enabled
@@ -153,7 +154,7 @@ class AclHelper
                 }
 
                 // Check zone access
-                if (!$this->isEntityAllowedInZone($entityInstance, $iface)) {
+                if (!$this->isEntityAllowedInZone($entityInstance, $model)) {
                     return false;
                 }
 
@@ -171,7 +172,7 @@ class AclHelper
         // Other zones must define entity/action or custom rules to protect itself
         if (!($entityDefined || $customRules)) {
             throw new IFaceException('IFace :name must have linked entity or custom ACL rules to protect itself', [
-                ':name' => $iface->getCodename(),
+                ':name' => $model->getCodename(),
             ]);
         }
 
@@ -181,14 +182,14 @@ class AclHelper
 
     /**
      * @param \BetaKiller\Model\DispatchableEntityInterface $entity
-     * @param \BetaKiller\IFace\IFaceInterface              $iface
+     * @param \BetaKiller\IFace\IFaceModelInterface         $model
      *
      * @return bool
      * @throws \Spotman\Acl\Exception
      */
-    private function isEntityAllowedInZone(DispatchableEntityInterface $entity, IFaceInterface $iface): bool
+    private function isEntityAllowedInZone(DispatchableEntityInterface $entity, IFaceModelInterface $model): bool
     {
-        $spec = $this->getEntityZoneAccessSpecification($entity, $iface);
+        $spec = $this->getEntityZoneAccessSpecification($entity, $model);
 
         // Entity allowed if no spec defined
         return $spec ?? true;
@@ -196,14 +197,14 @@ class AclHelper
 
     /**
      * @param \BetaKiller\Model\DispatchableEntityInterface $entity
-     * @param \BetaKiller\IFace\IFaceInterface              $iface
+     * @param \BetaKiller\IFace\IFaceModelInterface         $model
      *
      * @return bool|null
      * @throws \Spotman\Acl\Exception
      */
-    private function getEntityZoneAccessSpecification(DispatchableEntityInterface $entity, IFaceInterface $iface): ?bool
+    private function getEntityZoneAccessSpecification(DispatchableEntityInterface $entity, IFaceModelInterface $model): ?bool
     {
-        $zoneName = $iface->getZoneName();
+        $zoneName = $model->getZoneName();
 
         switch ($zoneName) {
             case IFaceZone::PUBLIC_ZONE:
@@ -252,14 +253,14 @@ class AclHelper
     }
 
     /**
-     * @param \BetaKiller\IFace\IFaceInterface $iface
+     * @param \BetaKiller\IFace\IFaceModelInterface $model
      *
      * @throws \BetaKiller\Auth\AuthorizationRequiredException
      */
-    public function forceAuthorizationIfNeeded(IFaceInterface $iface): void
+    public function forceAuthorizationIfNeeded(IFaceModelInterface $model): void
     {
         // Entering to admin and personal zones requires authorized user
-        if ($iface->getZoneName() !== IFaceZone::PUBLIC_ZONE && $this->user->isGuest()) {
+        if ($model->getZoneName() !== IFaceZone::PUBLIC_ZONE && $this->user->isGuest()) {
             $this->user->forceAuthorization();
         }
     }

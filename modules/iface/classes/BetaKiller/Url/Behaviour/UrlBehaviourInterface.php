@@ -30,7 +30,26 @@ interface UrlBehaviourInterface
     ): bool;
 
     /**
+     * Returns IFace uri part based on an optional UrlContainer
+     *
+     * @param \BetaKiller\IFace\IFaceModelInterface      $ifaceModel
+     * @param \BetaKiller\Url\UrlContainerInterface|null $params
+     *
+     * @return string
+     */
+    public function makeUri(
+        IFaceModelInterface $ifaceModel,
+        ?UrlContainerInterface $params = null
+    ): string;
+
+    /**
+     * @param \BetaKiller\IFace\IFaceModelInterface      $ifaceModel
+     * @param \BetaKiller\Url\UrlContainerInterface|null $params
+     *
      * @return \Generator|\BetaKiller\Url\AvailableUri[]
      */
-//    public function getAvailableUris(): \Generator;
+    public function getAvailableUrls(
+        IFaceModelInterface $ifaceModel,
+        UrlContainerInterface $params
+    ): \Generator;
 }

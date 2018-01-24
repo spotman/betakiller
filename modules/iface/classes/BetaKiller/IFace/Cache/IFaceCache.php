@@ -4,7 +4,6 @@ namespace BetaKiller\IFace\Cache;
 use BetaKiller\Config\AppConfigInterface;
 use BetaKiller\IFace\IFaceInterface;
 use PageCache\PageCache;
-use PageCache\StrategyInterface;
 use Psr\Log\LoggerInterface;
 
 class IFaceCache
@@ -20,19 +19,30 @@ class IFaceCache
     protected $enabled;
 
     /**
+     * @var \BetaKiller\IFace\Cache\IFacePageCacheStrategy
+     */
+    private $strategy;
+
+    /**
      * IFaceCache constructor.
      *
      * @param \BetaKiller\Config\AppConfigInterface $config
-     * @param \PageCache\PageCache                  $pageCache
-     * @param \Psr\Log\LoggerInterface              $logger
+     * @param \PageCache\PageCache $pageCache
+     * @param \BetaKiller\IFace\Cache\IFacePageCacheStrategy $strategy
+     * @param \Psr\Log\LoggerInterface $logger
      *
      * @throws \PageCache\PageCacheException
      */
-    public function __construct(AppConfigInterface $config, PageCache $pageCache, LoggerInterface $logger)
-    {
+    public function __construct(
+        AppConfigInterface $config,
+        PageCache $pageCache,
+        IFacePageCacheStrategy $strategy,
+        LoggerInterface $logger
+    ) {
         $this->enabled = $config->isPageCacheEnabled();
 
         $this->pageCache = $pageCache;
+        $this->strategy  = $strategy;
 
         $this->pageCache->config()
             ->setCachePath($config->getPageCachePath())
@@ -58,6 +68,11 @@ class IFaceCache
         $this->pageCache->clearAllCache();
     }
 
+    /**
+     * @param \BetaKiller\IFace\IFaceInterface $iface
+     *
+     * @throws \PageCache\PageCacheException
+     */
     public function process(IFaceInterface $iface): void
     {
         if (!$this->enabled) {
@@ -87,14 +102,9 @@ class IFaceCache
 
     protected function applyIFaceStrategy(IFaceInterface $iface)
     {
-        $strategy = $this->ifacePageCacheStrategyFactory($iface);
-        $this->pageCache->setStrategy($strategy);
+        $this->strategy->setIFaceModel($iface->getModel());
+        $this->pageCache->setStrategy($this->strategy);
 
         return $this;
-    }
-
-    protected function ifacePageCacheStrategyFactory(IFaceInterface $iface): StrategyInterface
-    {
-        return new IFacePageCacheStrategy($iface);
     }
 }

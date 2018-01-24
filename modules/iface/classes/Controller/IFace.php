@@ -43,6 +43,13 @@ class Controller_IFace extends Controller
     private $ifaceCache;
 
     /**
+     * @Inject
+     * @var \BetaKiller\View\IFaceView
+     */
+    private $ifaceView;
+
+    /**
+     * @throws \PageCache\PageCacheException
      * @throws \BetaKiller\IFace\Exception\IFaceException
      */
     public function action_render(): void
@@ -54,9 +61,10 @@ class Controller_IFace extends Controller
 
         // Getting current IFace
         $iface = $this->urlDispatcher->process($uri, $this->request->client_ip());
+        $model = $iface->getModel();
 
         // If this is default IFace and client requested non-slash uri, redirect client to /
-        if ($uri !== '/' && $iface->isDefault() && !$iface->getModel()->hasDynamicUrl()) {
+        if ($uri !== '/' && $model->isDefault() && !$model->hasDynamicUrl()) {
             $this->redirect('/');
         }
 
@@ -77,11 +85,13 @@ class Controller_IFace extends Controller
         // Starting hook
         $iface->before();
 
-        // Processing page cache
-        $this->processIFaceCache($iface);
+        // Processing page cache if no URL query parameters
+        if (!$queryParts) {
+            $this->processIFaceCache($iface);
+        }
 
         try {
-            $output = $iface->render();
+            $output = $this->ifaceView->render($iface);
 
             // Final hook
             $iface->after();
@@ -104,6 +114,11 @@ class Controller_IFace extends Controller
         }
     }
 
+    /**
+     * @param \BetaKiller\IFace\IFaceInterface $iface
+     *
+     * @throws \PageCache\PageCacheException
+     */
     private function processIFaceCache(IFaceInterface $iface): void
     {
         // Skip caching if request method is not GET nor HEAD

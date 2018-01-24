@@ -1,46 +1,53 @@
 <?php
 namespace BetaKiller\IFace\Cache;
 
-use BetaKiller\IFace\IFaceInterface;
-use BetaKiller\Url\UrlContainerInterface;
+use BetaKiller\Helper\IFaceHelper;
+use BetaKiller\IFace\IFaceModelInterface;
 use PageCache\SessionHandler;
 use PageCache\StrategyInterface;
 
 class IFacePageCacheStrategy implements StrategyInterface
 {
     /**
-     * @var IFaceInterface
+     * @var \BetaKiller\IFace\IFaceModelInterface
      */
-    protected $iface;
+    protected $ifaceModel;
 
     /**
-     * @var \BetaKiller\Url\UrlContainerInterface
+     * @var \BetaKiller\Helper\IFaceHelper
      */
-    protected $params;
+    private $helper;
 
     /**
      * IFacePageCacheStrategy constructor.
      *
-     * @param IFaceInterface                             $iface
-     * @param \BetaKiller\Url\UrlContainerInterface|null $params
+     * @param \BetaKiller\Helper\IFaceHelper $helper
      */
-    public function __construct(IFaceInterface $iface, UrlContainerInterface $params = null)
+    public function __construct(IFaceHelper $helper)
     {
-        $this->iface  = $iface;
-        $this->params = $params;
+        $this->helper = $helper;
+    }
+
+    /**
+     * @param \BetaKiller\IFace\IFaceModelInterface $model
+     */
+    public function setIFaceModel(IFaceModelInterface $model): void
+    {
+        $this->ifaceModel = $model;
     }
 
     /**
      * Sets cache file name
      *
      * @return string Cache file name
+     * @throws \BetaKiller\IFace\Exception\IFaceException
      */
-    public function strategy()
+    public function strategy(): string
     {
-        //when session support is enabled add that to file name
+        // When session support is enabled add that to file name
         $sessionFingerprint = SessionHandler::process();
 
-        $uri = $this->iface->url($this->params, false);
+        $uri = $this->helper->makeUrl($this->ifaceModel, null, false);
 
         return md5($sessionFingerprint.$uri);
     }

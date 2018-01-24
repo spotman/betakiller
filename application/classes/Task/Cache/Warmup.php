@@ -39,8 +39,7 @@ class Task_Cache_Warmup extends \BetaKiller\Task\AbstractTask
     protected function _execute(array $params)
     {
         $urls = $this->urlCollector->getPublicAvailableUrls();
-
-        $this->logger->debug('Found :count urls', [':count' => count($urls)]);
+        $counter = 0;
 
         foreach ($urls as $url) {
             $this->logger->debug('Selected url = '.$url);
@@ -50,7 +49,11 @@ class Task_Cache_Warmup extends \BetaKiller\Task\AbstractTask
 
             // Make HMVC request and check response status
             $this->makeHttpRequest($path);
+
+            $counter++;
         }
+
+        $this->logger->info(':count URLs processed', [':count' => $counter]);
     }
 
     private function makeHttpRequest(string $url)

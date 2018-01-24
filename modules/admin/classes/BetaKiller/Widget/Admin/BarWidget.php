@@ -32,6 +32,12 @@ class BarWidget extends AbstractAdminWidget
 
     /**
      * @Inject
+     * @var \BetaKiller\IFace\IFaceModelTree
+     */
+    private $tree;
+
+    /**
+     * @Inject
      * @var \BetaKiller\Helper\ContentHelper
      */
     private $contentHelper;
@@ -59,10 +65,10 @@ class BarWidget extends AbstractAdminWidget
      */
     public function getData(): array
     {
-        $currentIFace  = $this->ifaceHelper->getCurrentIFace();
-        $currentLayout = $currentIFace ? $currentIFace->getLayoutCodename() : null;
+        $currentIFace  = $this->ifaceHelper->getCurrentIFaceModel();
+        $currentLayout = $currentIFace ? $this->ifaceHelper->detectLayoutCodename($currentIFace) : null;
         $isAdminLayout = $currentLayout === LayoutInterface::LAYOUT_ADMIN;
-        $primaryEntity = $currentIFace ? $this->detectPrimaryEntity($currentIFace) : null;
+        $primaryEntity = $currentIFace ? $this->ifaceHelper->detectPrimaryEntity($currentIFace) : null;
 
         $data = [
             'isAdminLayout'     => $isAdminLayout,
@@ -93,17 +99,16 @@ class BarWidget extends AbstractAdminWidget
     private function getCreateButtonItems(): array
     {
         $items  = [];
-        $ifaces = $this->ifaceProvider->getByActionAndZone(CrudlsActionsInterface::ACTION_CREATE,
-            IFaceZone::ADMIN_ZONE);
+        $ifaces = $this->tree->getByActionAndZone(CrudlsActionsInterface::ACTION_CREATE, IFaceZone::ADMIN_ZONE);
 
-        foreach ($ifaces as $iface) {
-            if (!$this->aclHelper->isIFaceAllowed($iface)) {
+        foreach ($ifaces as $ifaceModel) {
+            if (!$this->aclHelper->isIFaceAllowed($ifaceModel)) {
                 continue;
             }
 
             $items[] = [
-                'label' => $iface->getLabel(),
-                'url'   => $iface->url(),
+                'label' => $ifaceModel->getLabel(),
+                'url'   => $this->ifaceHelper->makeUrl($ifaceModel),
             ];
         }
 
@@ -128,7 +133,9 @@ class BarWidget extends AbstractAdminWidget
             ->createEmpty()
             ->setParameter($pendingStatus);
 
-        $url = $this->aclHelper->isIFaceAllowed($iface, $params) ? $iface->url($params) : null;
+        $url = $this->aclHelper->isIFaceAllowed($iface->getModel(), $params)
+            ? $this->ifaceHelper->makeUrl($iface->getModel(), $params)
+            : null;
 
         return [
             'url'   => $url,
@@ -195,7 +202,6 @@ class BarWidget extends AbstractAdminWidget
      * @param string                                             $targetAction
      *
      * @return null|string
-     * @throws \BetaKiller\Exception
      */
     private function getPrimaryEntityActionUrl(
         ?DispatchableEntityInterface $entity,
@@ -206,10 +212,7 @@ class BarWidget extends AbstractAdminWidget
             return null;
         }
 
-        $currentIFace = $this->ifaceHelper->getCurrentIFace();
-        $currentZone  = $currentIFace ? $currentIFace->getZoneName() : IFaceZone::PUBLIC_ZONE;
-
-        if ($currentZone === $targetZone) {
+        if ($this->ifaceHelper->isCurrentIFaceZone($targetZone)) {
             return null;
         }
 
@@ -220,17 +223,5 @@ class BarWidget extends AbstractAdminWidget
             // No IFace found for provided zone/action
             return null;
         }
-    }
-
-    private function detectPrimaryEntity(IFaceInterface $iface): ?DispatchableEntityInterface
-    {
-        $current = $iface;
-
-        do {
-            $name   = $iface->getEntityModelName();
-            $entity = $name ? $this->urlParamHelper->getEntity($name) : null;
-        } while (!$entity && $current = $current->getParent());
-
-        return $entity;
     }
 }

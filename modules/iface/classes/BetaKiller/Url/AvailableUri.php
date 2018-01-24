@@ -7,9 +7,11 @@ class AvailableUri
     /**
      * @var string
      */
-    private $uri;
+    private $url;
 
     /**
+     * Parameter instance which produced current URI (if used)
+     *
      * @var \BetaKiller\Url\UrlParameterInterface|null
      */
     private $urlParameter;
@@ -22,16 +24,16 @@ class AvailableUri
     /**
      * AvailableUri constructor.
      *
-     * @param string                                     $uri
+     * @param string                                     $url
      * @param \BetaKiller\Url\UrlParameterInterface|null $urlParameter
      * @param \DateTimeInterface|null                    $lastModified
      */
     public function __construct(
-        string $uri,
+        string $url,
         ?UrlParameterInterface $urlParameter = null,
         ?\DateTimeInterface $lastModified = null
     ) {
-        $this->uri          = $uri;
+        $this->url          = $url;
         $this->urlParameter = $urlParameter;
         $this->lastModified = $lastModified;
     }
@@ -39,9 +41,9 @@ class AvailableUri
     /**
      * @return string
      */
-    public function getUri(): string
+    public function getUrl(): string
     {
-        return $this->uri;
+        return $this->url;
     }
 
     /**

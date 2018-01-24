@@ -22,6 +22,11 @@ interface IFaceModelInterface extends TreeModelSingleParentInterface, SeoMetaInt
     public function getUri(): string;
 
     /**
+     * @param string $value
+     */
+    public function setUri(string $value): void;
+
+    /**
      * Returns TRUE if iface is marked as "default"
      *
      * @return bool

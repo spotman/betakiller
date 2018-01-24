@@ -76,9 +76,14 @@ class IFaceStack
         return $this->current;
     }
 
-    public function isCurrent(IFaceInterface $iface, UrlContainerInterface $parameters = null): bool
+    public function isCurrent(IFaceInterface $iface, ?UrlContainerInterface $parameters = null): bool
     {
-        if (!$this->current || $this->current->getCodename() !== $iface->getCodename()) {
+        return $this->isCurrentModel($iface->getModel(), $parameters);
+    }
+
+    public function isCurrentModel(IFaceModelInterface $model, ?UrlContainerInterface $parameters = null): bool
+    {
+        if (!$this->current || $this->current->getCodename() !== $model->getCodename()) {
             return false;
         }
 

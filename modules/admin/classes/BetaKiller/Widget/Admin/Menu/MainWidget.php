@@ -9,9 +9,9 @@ class MainWidget extends AbstractAdminWidget
 {
     /**
      * @Inject
-     * @var \BetaKiller\Helper\ContentUrlContainerHelper
+     * @var \BetaKiller\Helper\UrlContainerHelper
      */
-    private $contentUrlParametersHelper;
+    private $urlParametersHelper;
 
     /**
      * @Inject
@@ -96,12 +96,14 @@ class MainWidget extends AbstractAdminWidget
      */
     protected function getIFaceMenuItemData(IFaceInterface $iface, UrlContainerInterface $params = null): array
     {
-        if (!$this->aclHelper->isIFaceAllowed($iface, $params)) {
+        if (!$this->aclHelper->isIFaceAllowed($iface->getModel(), $params)) {
             return [];
         }
 
+        $url = $this->ifaceHelper->makeUrl($iface->getModel(), $params, false); // Keep links always working
+
         return [
-            'url'    => $iface->url($params, false), // Keep links always working
+            'url'    => $url,
             'label'  => $this->patternHelper->processPattern($iface->getLabel(), null, $params),
             'active' => $this->ifaceHelper->isCurrentIFace($iface, $params),
         ];
@@ -126,7 +128,7 @@ class MainWidget extends AbstractAdminWidget
         $childrenData = [];
 
         foreach ($statuses as $status) {
-            $params = $this->contentUrlParametersHelper
+            $params = $this->urlParametersHelper
                 ->createEmpty()
                 ->setParameter($status);
 

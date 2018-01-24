@@ -2,7 +2,6 @@
 namespace BetaKiller\IFace\Auth;
 
 use Auth;
-use BetaKiller\Helper\IFaceHelper;
 use BetaKiller\Helper\RequestHelper;
 use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Helper\UrlContainerHelper;
@@ -26,7 +25,7 @@ class ReLogin extends Login
 
         parent::__construct($user, $reqHelper, $respHelper, $urlParamsHelper);
 
-        $this->setRedirectUrl('/');
+        $this->redirectUrl = '/';
     }
 
     public function before(): void

@@ -3,7 +3,6 @@ namespace BetaKiller\IFace;
 
 use BetaKiller\Helper\SeoMetaInterface;
 use BetaKiller\IFace\Exception\IFaceException;
-use BetaKiller\Model\IFaceZone;
 use BetaKiller\Url\UrlContainerInterface;
 use DateInterval;
 use DateTimeInterface;
@@ -14,11 +13,6 @@ abstract class AbstractIFace implements IFaceInterface
      * @var IFaceModelInterface
      */
     private $model;
-
-    /**
-     * @var IFaceInterface|null Parent iface
-     */
-    private $parent;
 
     /**
      * @var DateTimeInterface|null
@@ -49,31 +43,6 @@ abstract class AbstractIFace implements IFaceInterface
     public function getCodename(): string
     {
         return $this->getModel()->getCodename();
-    }
-
-    /**
-     * @return string
-     * @throws \BetaKiller\IFace\Exception\IFaceException
-     */
-    public function render(): string
-    {
-        return $this->ifaceHelper->renderIFace($this);
-    }
-
-    /**
-     * @return null|string
-     * @throws \BetaKiller\IFace\Exception\IFaceException
-     */
-    public function getLayoutCodename(): ?string
-    {
-        $current = $this;
-
-        // Climb up the IFace tree for a layout codename
-        do {
-            $layoutCodename = $current->getModel()->getLayoutCodename();
-        } while (!$layoutCodename && $current = $current->getParent());
-
-        return $layoutCodename;
     }
 
     /**
@@ -250,30 +219,12 @@ abstract class AbstractIFace implements IFaceInterface
     }
 
     /**
-     * @return \BetaKiller\IFace\IFaceInterface|null
-     * @throws \BetaKiller\IFace\Exception\IFaceException
-     */
-    public function getParent(): ?IFaceInterface
-    {
-        if (!$this->parent) {
-            $this->parent = $this->ifaceHelper->getIFaceParent($this);
-        }
-
-        return $this->parent;
-    }
-
-    /**
      * Getter for current iface model
      *
      * @return IFaceModelInterface
-     * @throws \BetaKiller\IFace\Exception\IFaceException
      */
     public function getModel(): IFaceModelInterface
     {
-        if (!$this->model) {
-            throw new IFaceException('Model required for IFace');
-        }
-
         return $this->model;
     }
 
@@ -292,85 +243,16 @@ abstract class AbstractIFace implements IFaceInterface
     }
 
     /**
-     * @return bool
-     * @throws \BetaKiller\IFace\Exception\IFaceException
-     */
-    public function isDefault(): bool
-    {
-        return $this->getModel()->isDefault();
-    }
-
-    /**
-     * Returns model name of the linked entity
-     *
-     * @return string
-     * @throws \BetaKiller\IFace\Exception\IFaceException
-     */
-    public function getEntityModelName(): ?string
-    {
-        return $this->getModel()->getEntityModelName();
-    }
-
-    /**
-     * Returns entity [primary] action, applied by this IFace
-     *
-     * @return string
-     * @throws \BetaKiller\IFace\Exception\IFaceException
-     */
-    public function getEntityActionName(): ?string
-    {
-        return $this->getModel()->getEntityActionName();
-    }
-
-    /**
-     * Returns zone codename where this IFace is placed
-     * Inherits zone from parent iface
-     *
-     * @return string
-     * @throws \BetaKiller\IFace\Exception\IFaceException
-     */
-    public function getZoneName(): string
-    {
-        $current = $this;
-
-        do {
-            $zoneName = $current->getModel()->getZoneName();
-        } while (!$zoneName && $current = $current->getParent());
-
-        // Public zone by default
-        return $zoneName ?: IFaceZone::PUBLIC_ZONE;
-    }
-
-    /**
-     * Returns array of additional ACL rules in format <ResourceName>.<permissionName> (eq, ["Admin.enabled"])
-     *
-     * @return string[]
-     * @throws \BetaKiller\IFace\Exception\IFaceException
-     */
-    public function getAdditionalAclRules(): array
-    {
-        return $this->getModel()->getAdditionalAclRules();
-    }
-
-    /**
      * @param \BetaKiller\Url\UrlContainerInterface|null $params
      * @param bool|null                                  $removeCyclingLinks
      *
      * @return string
      * @throws \BetaKiller\IFace\Exception\IFaceException
-     * @throws \BetaKiller\Url\UrlPrototypeException
+     * @deprecated use IFaceHelper or UrlHelper instead
+     * @TODO Remove direct calls of this method
      */
     public function url(?UrlContainerInterface $params = null, ?bool $removeCyclingLinks = null): string
     {
-        return $this->ifaceHelper->makeUrl($this, $params, $removeCyclingLinks);
-    }
-
-    /**
-     * @return string
-     * @throws \BetaKiller\IFace\Exception\IFaceException
-     */
-    public function getUri(): string
-    {
-        return $this->getModel()->getUri();
+        return $this->ifaceHelper->makeUrl($this->getModel(), $params, $removeCyclingLinks);
     }
 }

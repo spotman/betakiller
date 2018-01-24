@@ -1,10 +1,10 @@
 <?php
 namespace BetaKiller\View;
 
-use BetaKiller\Helper\SeoMetaInterface;
-use BetaKiller\Helper\StringPatternHelper;
+use BetaKiller\Helper\IFaceHelper;
 use BetaKiller\IFace\Exception\IFaceException;
 use BetaKiller\IFace\IFaceInterface;
+use BetaKiller\IFace\IFaceModelInterface;
 use BetaKiller\Repository\IFaceLayoutRepository;
 use BetaKiller\Repository\RepositoryException;
 
@@ -26,36 +26,36 @@ class IFaceView
     private $headHelper;
 
     /**
+     * @var \BetaKiller\Helper\IFaceHelper
+     */
+    private $ifaceHelper;
+
+    /**
      * @var \BetaKiller\View\ViewFactoryInterface
      */
     private $viewFactory;
-
-    /**
-     * @var \BetaKiller\Helper\StringPatternHelper
-     */
-    private $stringPatternHelper;
 
     /**
      * IFaceView constructor.
      *
      * @param \BetaKiller\Repository\IFaceLayoutRepository $layoutRepo
      * @param \BetaKiller\View\LayoutViewInterface         $layoutView
+     * @param \BetaKiller\Helper\IFaceHelper               $ifaceHelper
      * @param \BetaKiller\View\HtmlHeadHelper              $headHelper
      * @param \BetaKiller\View\ViewFactoryInterface        $viewFactory
-     * @param \BetaKiller\Helper\StringPatternHelper       $stringPatternHelper
      */
     public function __construct(
         IFaceLayoutRepository $layoutRepo,
         LayoutViewInterface $layoutView,
+        IFaceHelper $ifaceHelper,
         HtmlHeadHelper $headHelper,
-        ViewFactoryInterface $viewFactory,
-        StringPatternHelper $stringPatternHelper
+        ViewFactoryInterface $viewFactory
     ) {
-        $this->layoutRepo          = $layoutRepo;
-        $this->layoutView          = $layoutView;
-        $this->headHelper          = $headHelper;
-        $this->viewFactory         = $viewFactory;
-        $this->stringPatternHelper = $stringPatternHelper;
+        $this->layoutRepo  = $layoutRepo;
+        $this->layoutView  = $layoutView;
+        $this->headHelper  = $headHelper;
+        $this->viewFactory = $viewFactory;
+        $this->ifaceHelper = $ifaceHelper;
     }
 
     /**
@@ -66,10 +66,12 @@ class IFaceView
      */
     public function render(IFaceInterface $iface): string
     {
+        $model = $iface->getModel();
+
         // Hack for dropping original iface data on processing exception error page
         $this->layoutView->clear();
 
-        $viewPath  = $this->getViewPath($iface);
+        $viewPath  = $this->getViewPath($model);
         $ifaceView = $this->viewFactory->create($viewPath);
 
         // Getting IFace data
@@ -77,8 +79,8 @@ class IFaceView
 
         // For changing wrapper from view via $_this->wrapper('html')
         $data['iface'] = [
-            'label'    => $iface->getLabel(),
-            'codename' => $iface->getCodename(),
+            'codename' => $model->getCodename(),
+            'label'    => $this->ifaceHelper->getLabel($model),
         ];
 
         foreach ($data as $key => $value) {
@@ -87,12 +89,12 @@ class IFaceView
 
         $this->headHelper
             ->setContentType()
-            ->setTitle($this->getIFaceTitle($iface))
-            ->setMetaDescription($this->getIFaceDescription($iface))
+            ->setTitle($this->ifaceHelper->getTitle($model))
+            ->setMetaDescription($this->ifaceHelper->getDescription($model))
             ->setCanonical($iface->url(null, false));
 
         // Getting IFace layout
-        $layoutCodename = $this->getLayoutCodename($iface);
+        $layoutCodename = $this->getLayoutCodename($model);
 
         $this->layoutView->setLayoutCodename($layoutCodename);
 
@@ -100,61 +102,15 @@ class IFaceView
     }
 
     /**
-     * @param \BetaKiller\IFace\IFaceInterface $iface
+     * @param \BetaKiller\IFace\IFaceModelInterface $model
      *
      * @return string
+     * @throws \BetaKiller\ExceptionInterface
      * @throws \BetaKiller\IFace\Exception\IFaceException
      */
-    private function getIFaceTitle(IFaceInterface $iface): string
+    private function getLayoutCodename(IFaceModelInterface $model): string
     {
-        $title = $iface->getTitle();
-
-        if (!$title) {
-            $title = $this->generateTitleFromLabels($iface);
-        }
-
-        if (!$title) {
-            throw new IFaceException('Can not compose title for IFace :codename', [
-                ':codename' => $iface->getCodename(),
-            ]);
-        }
-
-        return $this->stringPatternHelper->processPattern($title, SeoMetaInterface::TITLE_LIMIT);
-    }
-
-    private function generateTitleFromLabels(IFaceInterface $iface): string
-    {
-        $labels = [];
-
-        $current = $iface;
-        do {
-            $labels[] = $current->getLabel();
-        } while ($current = $current->getParent());
-
-        return implode(' - ', array_filter($labels));
-    }
-
-    private function getIFaceDescription(IFaceInterface $iface): string
-    {
-        $description = $iface->getDescription();
-
-        if (!$description) {
-            // Suppress errors for empty description in admin zone
-            return '';
-        }
-
-        return $this->stringPatternHelper->processPattern($description, SeoMetaInterface::DESCRIPTION_LIMIT);
-    }
-
-    /**
-     * @param \BetaKiller\IFace\IFaceInterface $iface
-     *
-     * @throws \BetaKiller\IFace\Exception\IFaceException
-     * @return string
-     */
-    private function getLayoutCodename(IFaceInterface $iface): string
-    {
-        $layoutCodename = $iface->getLayoutCodename();
+        $layoutCodename = $this->ifaceHelper->detectLayoutCodename($model);
 
         if (!$layoutCodename) {
             try {
@@ -168,7 +124,7 @@ class IFaceView
         return $layoutCodename;
     }
 
-    protected function getViewPath(IFaceInterface $iface): string
+    protected function getViewPath(IFaceModelInterface $iface): string
     {
         return 'ifaces'.DIRECTORY_SEPARATOR.str_replace('_', DIRECTORY_SEPARATOR, $iface->getCodename());
     }

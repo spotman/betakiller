@@ -44,6 +44,7 @@ class IFaceModelProviderAggregate extends IFaceModelProviderAbstract
      *
      * @return IFaceModelInterface
      * @throws IFaceException
+     * @deprecated Use IFaceModelTree instead
      */
     public function getDefault(): IFaceModelInterface
     {
@@ -75,6 +76,7 @@ class IFaceModelProviderAggregate extends IFaceModelProviderAbstract
      *
      * @return IFaceModelInterface
      * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @deprecated Use IFaceModelTree instead
      */
     public function getByCodename(string $codename): IFaceModelInterface
     {
@@ -105,6 +107,7 @@ class IFaceModelProviderAggregate extends IFaceModelProviderAbstract
      * @param \BetaKiller\IFace\IFaceModelInterface $parentModel
      *
      * @return \BetaKiller\IFace\IFaceModelInterface[]
+     * @deprecated Use IFaceModelTree instead
      */
     public function getChildren(IFaceModelInterface $parentModel): array
     {
@@ -119,6 +122,7 @@ class IFaceModelProviderAggregate extends IFaceModelProviderAbstract
      * @param IFaceModelInterface $model
      *
      * @return IFaceModelInterface|NULL
+     * @deprecated Use IFaceModelTree instead
      */
     public function getParent(IFaceModelInterface $model): ?IFaceModelInterface
     {
@@ -136,6 +140,7 @@ class IFaceModelProviderAggregate extends IFaceModelProviderAbstract
      *
      * @return IFaceModelInterface[]
      * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @deprecated Use IFaceModelTree instead
      */
     public function getRoot(): array
     {
@@ -164,6 +169,7 @@ class IFaceModelProviderAggregate extends IFaceModelProviderAbstract
      *
      * @return IFaceModelInterface|null
      * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @deprecated Use IFaceModelTree instead
      */
     public function getByEntityActionAndZone(DispatchableEntityInterface $entity, string $entityAction, string $zone): ?IFaceModelInterface
     {
@@ -187,6 +193,7 @@ class IFaceModelProviderAggregate extends IFaceModelProviderAbstract
      *
      * @return IFaceModelInterface[]
      * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @deprecated Use IFaceModelTree instead
      */
     public function getByActionAndZone(string $action, string $zone): array
     {

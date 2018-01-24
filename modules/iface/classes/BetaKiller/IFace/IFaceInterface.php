@@ -13,16 +13,6 @@ interface IFaceInterface extends SeoMetaInterface, HasLabelInterface
     public function getCodename(): string;
 
     /**
-     * @return string
-     */
-    public function render(): string;
-
-    /**
-     * @return string
-     */
-    public function getLayoutCodename(): ?string;
-
-    /**
      * Returns data for View
      *
      * @return array
@@ -86,12 +76,6 @@ interface IFaceInterface extends SeoMetaInterface, HasLabelInterface
     public function after(): void;
 
     /**
-     * @return IFaceInterface|null
-     * @deprecated Use IFaceTree instead
-     */
-    public function getParent(): ?IFaceInterface;
-
-    /**
      * Getter for current iface model
      *
      * @return IFaceModelInterface
@@ -108,48 +92,11 @@ interface IFaceInterface extends SeoMetaInterface, HasLabelInterface
     public function setModel(IFaceModelInterface $model): self;
 
     /**
-     * @return bool
-     */
-    public function isDefault(): bool;
-
-    /**
      * @param \BetaKiller\Url\UrlContainerInterface|null $params
      * @param bool|null                                  $removeCyclingLinks
      *
      * @return string
+     * @deprecated Use IFaceHelper or UrlHelper instead
      */
     public function url(?UrlContainerInterface $params = null, ?bool $removeCyclingLinks = null): string;
-
-    /**
-     * @return string
-     */
-    public function getUri(): string;
-
-    /**
-     * Returns zone codename where this IFace is placed
-     *
-     * @return string
-     */
-    public function getZoneName(): string;
-
-    /**
-     * Returns model name of the linked entity
-     *
-     * @return string
-     */
-    public function getEntityModelName(): ?string;
-
-    /**
-     * Returns entity [primary] action, applied by this IFace
-     *
-     * @return string
-     */
-    public function getEntityActionName(): ?string;
-
-    /**
-     * Returns array of additional ACL rules in format <ResourceName>.<permissionName> (eq, ["Admin.enabled"])
-     *
-     * @return string[]
-     */
-    public function getAdditionalAclRules(): array;
 }

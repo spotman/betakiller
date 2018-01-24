@@ -129,11 +129,11 @@ abstract class AbstractConfigBasedDispatchableRepository extends AbstractPredefi
     /**
      * Returns list of available items (model records) by url key property
      *
-     * @param \BetaKiller\Url\UrlContainerInterface $params
+     * @param \BetaKiller\Url\UrlContainerInterface|null $parameters
      *
      * @return ConfigBasedDispatchableEntityInterface[]
      */
-    public function getItemsHavingUrlKey(UrlContainerInterface $params): array
+    public function getItemsHavingUrlKey(UrlContainerInterface $parameters): array
     {
         // No filtering by parameters here
         return $this->getAll();

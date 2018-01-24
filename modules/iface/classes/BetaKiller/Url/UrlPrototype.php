@@ -3,7 +3,8 @@ namespace BetaKiller\Url;
 
 class UrlPrototype
 {
-    private const KEY_SEPARATOR = '.';
+    public const  REGEX              = '/\{[A-Za-z_]+(\.[A-Za-z_]+(\(\)){0,1}){0,1}\}/';
+    private const KEY_SEPARATOR      = '.';
     private const METHOD_CALL_MARKER = '()';
 
     /**
@@ -56,11 +57,11 @@ class UrlPrototype
 
         $string = trim($string, '{}');
 
-        $parsed = explode(self::KEY_SEPARATOR, $string, 2);
+        $parsed    = explode(self::KEY_SEPARATOR, $string, 2);
         $modelName = $parsed[0];
-        $keyPart = $parsed[1] ?? null;
+        $keyPart   = $parsed[1] ?? null;
 
-        $key = str_replace(self::METHOD_CALL_MARKER, '', $keyPart);
+        $key          = str_replace(self::METHOD_CALL_MARKER, '', $keyPart);
         $isMethodCall = substr($keyPart, -2) === self::METHOD_CALL_MARKER;
 
         return new self($modelName, $key, $isMethodCall);

@@ -10,6 +10,7 @@ use BetaKiller\Helper\AppEnv;
 use BetaKiller\Helper\LoggerHelperTrait;
 use BetaKiller\IFace\AbstractHttpErrorIFace;
 use BetaKiller\IFace\IFaceProvider;
+use BetaKiller\View\IFaceView;
 use Psr\Log\LoggerInterface;
 use Response;
 
@@ -28,6 +29,11 @@ class ExceptionHandler implements ExceptionHandlerInterface
     private $appEnv;
 
     /**
+     * @var \BetaKiller\View\IFaceView
+     */
+    private $ifaceView;
+
+    /**
      * @var \Psr\Log\LoggerInterface
      */
     private $logger;
@@ -42,13 +48,15 @@ class ExceptionHandler implements ExceptionHandlerInterface
      *
      * @param \BetaKiller\Helper\AppEnv       $appEnv
      * @param \BetaKiller\IFace\IFaceProvider $ifaceProvider
+     * @param \BetaKiller\View\IFaceView      $ifaceView
      * @param \Psr\Log\LoggerInterface        $logger
      */
-    public function __construct(AppEnv $appEnv, IFaceProvider $ifaceProvider, LoggerInterface $logger)
+    public function __construct(AppEnv $appEnv, IFaceProvider $ifaceProvider, IFaceView $ifaceView, LoggerInterface $logger)
     {
         $this->appEnv        = $appEnv;
         $this->logger        = $logger;
         $this->ifaceProvider = $ifaceProvider;
+        $this->ifaceView     = $ifaceView;
     }
 
     /**
@@ -124,7 +132,7 @@ class ExceptionHandler implements ExceptionHandlerInterface
             $iface = $this->getErrorIFaceForCode($httpCode);
 
             $body = $iface
-                ? $iface->render()
+                ? $this->ifaceView->render($iface)
                 : $this->renderFallbackMessage($exception);
 
             $response->status($httpCode)->body($body);

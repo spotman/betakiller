@@ -349,9 +349,9 @@ class UrlDispatcher implements LoggerAwareInterface
     private function checkIFaceAccess(IFaceInterface $iface): void
     {
         // Force authorization for non-public zones before security check
-        $this->aclHelper->forceAuthorizationIfNeeded($iface);
+        $this->aclHelper->forceAuthorizationIfNeeded($iface->getModel());
 
-        if (!$this->aclHelper->isIFaceAllowed($iface, $this->urlParameters)) {
+        if (!$this->aclHelper->isIFaceAllowed($iface->getModel(), $this->urlParameters)) {
             throw new AccessDeniedException();
         }
     }

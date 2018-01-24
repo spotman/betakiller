@@ -7,7 +7,7 @@ class StringPatternHelper
 {
     /**
      * @Inject
-     * @var \BetaKiller\Url\UrlPrototypeHelper
+     * @var \BetaKiller\Url\UrlPrototypeService
      */
     private $prototypeHelper;
 

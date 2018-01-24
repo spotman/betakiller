@@ -1,15 +1,14 @@
 <?php
 namespace BetaKiller\Url;
 
+use BetaKiller\Exception\NotImplementedException;
 use BetaKiller\IFace\Exception\IFaceException;
-use BetaKiller\IFace\IFaceInterface;
+use BetaKiller\IFace\IFaceModelInterface;
 use BetaKiller\Model\DispatchableEntityInterface;
 use BetaKiller\Utils\Kohana\TreeModelSingleParentInterface;
 
-class UrlPrototypeHelper
+class UrlPrototypeService
 {
-    public const PROTOTYPE_PCRE = '/\{[A-Za-z_]+(\.[A-Za-z_]+(\(\)){0,1}){0,1}\}/';
-
     /**
      * @var \BetaKiller\Url\UrlContainerInterface
      */
@@ -26,7 +25,7 @@ class UrlPrototypeHelper
     private $rawParameterFactory;
 
     /**
-     * UrlPrototypeHelper constructor.
+     * UrlPrototypeService constructor.
      *
      * @param \BetaKiller\Url\UrlContainerInterface  $urlParameters
      * @param \BetaKiller\Url\UrlDataSourceFactory   $factory
@@ -43,14 +42,13 @@ class UrlPrototypeHelper
     }
 
     /**
-     * @param \BetaKiller\IFace\IFaceInterface $iface
+     * @param \BetaKiller\IFace\IFaceModelInterface $iface
      *
      * @return \BetaKiller\Url\UrlPrototype
      * @throws \BetaKiller\Url\UrlPrototypeException
      * @throws \BetaKiller\IFace\Exception\IFaceException
-     * @deprecated Remove dependencies for IFace url logic
      */
-    public function fromIFaceUri(IFaceInterface $iface): UrlPrototype
+    public function createPrototypeFromIFaceModel(IFaceModelInterface $iface): UrlPrototype
     {
         $uri = $iface->getUri();
 
@@ -60,7 +58,18 @@ class UrlPrototypeHelper
             ]);
         }
 
-        return $this->fromString($uri);
+        return $this->createPrototypeFromString($uri);
+    }
+
+    /**
+     * @param string $string
+     *
+     * @return \BetaKiller\Url\UrlPrototype
+     * @throws \BetaKiller\Url\UrlPrototypeException
+     */
+    public function createPrototypeFromString(string $string): UrlPrototype
+    {
+        return UrlPrototype::fromString($string);
     }
 
     /**
@@ -151,7 +160,7 @@ class UrlPrototypeHelper
     public function replaceUrlParametersParts(string $sourceString, UrlContainerInterface $parameters = null): string
     {
         return preg_replace_callback(
-            self::PROTOTYPE_PCRE,
+            UrlPrototype::REGEX,
             function ($matches) use ($parameters) {
                 return $this->getCompiledPrototypeValue($matches[0], $parameters);
             },
@@ -160,22 +169,22 @@ class UrlPrototypeHelper
     }
 
     /**
-     * @param                                                   $proto
-     * @param \BetaKiller\Url\UrlContainerInterface|null        $params
-     * @param bool|null                                         $isTree
+     * @param string                                     $proto
+     * @param \BetaKiller\Url\UrlContainerInterface|null $params
+     * @param bool|null                                  $isTree
      *
      * @return string
      * @throws \BetaKiller\Url\UrlPrototypeException
      */
     public function getCompiledPrototypeValue(
         string $proto,
-        UrlContainerInterface $params = null,
+        ?UrlContainerInterface $params = null,
         ?bool $isTree = null
     ): string {
         $isTree    = $isTree ?? false;
-        $prototype = $this->fromString($proto);
+        $prototype = $this->createPrototypeFromString($proto);
 
-        $model = $this->getParamFromUrlContainer($prototype, $params);
+        $model = $this->getParamByPrototype($prototype, $params);
 
         if ($isTree && !($model instanceof TreeModelSingleParentInterface)) {
             throw new UrlPrototypeException('Model :model must be instance of :object for tree traversing', [
@@ -200,9 +209,9 @@ class UrlPrototypeHelper
      * @return \BetaKiller\Url\UrlParameterInterface
      * @throws \BetaKiller\Url\UrlPrototypeException
      */
-    private function getParamFromUrlContainer(
+    private function getParamByPrototype(
         UrlPrototype $prototype,
-        UrlContainerInterface $parameters = null
+        ?UrlContainerInterface $parameters = null
     ): UrlParameterInterface {
         $name = $prototype->getDataSourceName();
 
@@ -279,13 +288,31 @@ class UrlPrototypeHelper
     }
 
     /**
-     * @param string $string
+     * @param \BetaKiller\Url\UrlPrototype          $prototype
+     * @param \BetaKiller\Url\UrlContainerInterface $params
      *
-     * @return \BetaKiller\Url\UrlPrototype
+     * @return \BetaKiller\Url\UrlParameterInterface[]
+     * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\Url\UrlPrototypeException
      */
-    public function fromString(string $string): UrlPrototype
+    public function getAvailableParameters(UrlPrototype $prototype, UrlContainerInterface $params): array
     {
-        return UrlPrototype::fromString($string);
+        if ($prototype->isMethodCall()) {
+            throw new UrlPrototypeException('Can not collect available params for method-based prototype :prototype', [
+                ':prototype' => $prototype->asString(),
+            ]);
+        }
+
+        if (!$prototype->hasModelKey()) {
+            // TODO RawUrlParameter processing
+            throw new NotImplementedException;
+        }
+
+        // Prototype has model key and is related to a UrlDataSource
+        $dataSource = $this->getDataSourceInstance($prototype);
+
+        return $prototype->hasIdKey()
+            ? $dataSource->getAll()
+            : $dataSource->getItemsHavingUrlKey($params);
     }
 }

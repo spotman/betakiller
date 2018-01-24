@@ -17,6 +17,47 @@ class IFaceModelTree
     }
 
     /**
+     * @return array
+     * @throws \BetaKiller\IFace\Exception\IFaceException
+     */
+    public function getRoot(): array
+    {
+        return $this->modelProvider->getRoot();
+    }
+
+    /**
+     * @param \BetaKiller\IFace\IFaceModelInterface $parent
+     *
+     * @return \BetaKiller\IFace\IFaceModelInterface[]
+     */
+    public function getChildren(IFaceModelInterface $parent): array
+    {
+        return $this->modelProvider->getChildren($parent);
+    }
+
+    /**
+     * @param \BetaKiller\IFace\IFaceModelInterface $child
+     *
+     * @return \BetaKiller\IFace\IFaceModelInterface|null
+     */
+    public function getParent(IFaceModelInterface $child): ?IFaceModelInterface
+    {
+        return $this->modelProvider->getParent($child);
+    }
+
+    /**
+     * @param string $action
+     * @param string $zone
+     *
+     * @return \BetaKiller\IFace\IFaceModelInterface[]
+     * @throws \BetaKiller\IFace\Exception\IFaceException
+     */
+    public function getByActionAndZone(string $action, string $zone): array
+    {
+        return $this->modelProvider->getByActionAndZone($action, $zone);
+    }
+
+    /**
      * @param IFaceModelInterface|NULL $parent
      *
      * @return IFaceModelRecursiveIterator|IFaceModelInterface[]
@@ -36,6 +77,16 @@ class IFaceModelTree
         return $this->getRecursiveFilterIterator(function (IFaceModelInterface $model) {
             return $this->isPublicModel($model);
         }, $parent);
+    }
+
+    /**
+     * @return \RecursiveIteratorIterator|IFaceModelInterface[]
+     */
+    public function getRecursiveSitemapIterator()
+    {
+        return $this->getRecursiveFilterIterator(function (IFaceModelInterface $model) {
+            return !$model->hideInSiteMap() && $this->isPublicModel($model);
+        });
     }
 
     /**
@@ -65,12 +116,22 @@ class IFaceModelTree
         return new \RecursiveIteratorIterator($filter, \RecursiveIteratorIterator::SELF_FIRST);
     }
 
-    private function isAdminModel(IFaceModelInterface $model)
+    /**
+     * @param \BetaKiller\IFace\IFaceModelInterface $model
+     *
+     * @return bool
+     */
+    private function isAdminModel(IFaceModelInterface $model): bool
     {
         return $model->getZoneName() === IFaceZone::ADMIN_ZONE;
     }
 
-    private function isPublicModel(IFaceModelInterface $model)
+    /**
+     * @param \BetaKiller\IFace\IFaceModelInterface $model
+     *
+     * @return bool
+     */
+    private function isPublicModel(IFaceModelInterface $model): bool
     {
         return $model->getZoneName() === IFaceZone::PUBLIC_ZONE;
     }
