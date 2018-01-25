@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<root>
+    <iface uri="admin" codename="Admin_Index" label="Admin" hideInSiteMap="true" zone="admin" layoutCodename="admin" />
+</root>
