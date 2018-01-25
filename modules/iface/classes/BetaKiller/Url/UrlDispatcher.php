@@ -150,7 +150,7 @@ class UrlDispatcher implements LoggerAwareInterface
         $referer = $_SERVER['HTTP_REFERER'] ?? null;
 
         // Emit event about successful url parsing
-        $this->eventBus->emit(new UrlDispatchedEvent($uri, $ip, $referer));
+        $this->eventBus->emit(new UrlDispatchedEvent($uri, $this->urlParameters, $ip, $referer));
 
         // Get latest IFace model
         return $this->ifaceStack->getCurrent();

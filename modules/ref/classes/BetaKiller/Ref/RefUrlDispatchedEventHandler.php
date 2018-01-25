@@ -41,12 +41,19 @@ class RefUrlDispatchedEventHandler implements EventHandlerInterface
             return;
         }
 
+        $params = $message->getUrlContainer();
+
+        // Fetch UTM tags if exists so IFace would not warn about unused parameters
+        $params->getQueryPart('utm_source');
+        $params->getQueryPart('utm_medium');
+        $params->getQueryPart('utm_campaign');
+
         $model = $this->refHitsRepository->create();
 
         $model
-            ->setSourceUrl($message->httpReferer)
-            ->setTargetUrl($message->url)
-            ->setIP($message->ip)
+            ->setSourceUrl($message->getHttpReferer())
+            ->setTargetUrl($message->getUrl())
+            ->setIP($message->getIp())
             ->setTimestamp(new \DateTimeImmutable());
 
         $this->refHitsRepository->save($model);
