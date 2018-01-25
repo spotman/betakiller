@@ -1,6 +1,7 @@
 <?php
 namespace BetaKiller\Log;
 
+use BetaKiller\Exception;
 use Monolog\Handler\AbstractProcessingHandler;
 use Monolog\Handler\HandlerInterface;
 
@@ -22,10 +23,18 @@ class LazyLoadProxyHandler extends AbstractProcessingHandler
      * @param callable $factory
      * @param int      $level  The minimum logging level at which this handler will be triggered
      * @param Boolean  $bubble Whether the messages that are handled can bubble up the stack or not
+     *
+     * @throws \BetaKiller\Exception
      */
     public function __construct(callable $factory, int $level, bool $bubble = true)
     {
         parent::__construct($level, $bubble);
+
+        if (!\is_callable($factory)) {
+            throw new Exception('Factory is not callable');
+        }
+
+        $this->factory = $factory;
     }
 
     /**
