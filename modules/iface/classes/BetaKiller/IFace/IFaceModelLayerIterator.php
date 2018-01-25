@@ -1,19 +1,21 @@
 <?php
 namespace BetaKiller\IFace;
 
-use BetaKiller\IFace\ModelProvider\IFaceModelProviderAggregate;
-
 class IFaceModelLayerIterator extends \ArrayIterator
 {
     /**
      * IFaceModelLayerIterator constructor.
      *
-     * @param \BetaKiller\IFace\IFaceModelInterface|null                  $parent
-     * @param \BetaKiller\IFace\ModelProvider\IFaceModelProviderAggregate $modelProvider
+     * @param \BetaKiller\IFace\IFaceModelInterface|null $parent
+     * @param \BetaKiller\IFace\IFaceModelTree           $tree
+     *
+     * @throws \BetaKiller\IFace\Exception\IFaceException
      */
-    public function __construct(IFaceModelInterface $parent = null, IFaceModelProviderAggregate $modelProvider)
+    public function __construct(IFaceModelInterface $parent = null, IFaceModelTree $tree)
     {
-        $layer = $modelProvider->getLayer($parent);
+        $layer = $parent
+            ? $tree->getChildren($parent)
+            : $tree->getRoot();
 
         parent::__construct($layer, \ArrayObject::STD_PROP_LIST);
     }
@@ -21,7 +23,7 @@ class IFaceModelLayerIterator extends \ArrayIterator
     /**
      * @return IFaceModelInterface[]
      */
-    public function getArrayCopy()
+    public function getArrayCopy(): array
     {
         return parent::getArrayCopy();
     }
@@ -29,7 +31,7 @@ class IFaceModelLayerIterator extends \ArrayIterator
     /**
      * @return IFaceModelInterface
      */
-    public function current()
+    public function current(): IFaceModelInterface
     {
         return parent::current();
     }

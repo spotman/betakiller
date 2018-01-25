@@ -2,7 +2,6 @@
 namespace BetaKiller\Model;
 
 use BetaKiller\Helper\SeoMetaInterface;
-use BetaKiller\Utils\Kohana\TreeModelSingleParentInterface;
 
 /**
  * Interface ContentCategoryInterface
@@ -13,7 +12,7 @@ interface ContentCategoryInterface extends
     DispatchableEntityInterface,
     SeoMetaInterface,
     EntityHasWordpressIdInterface,
-    TreeModelSingleParentInterface,
+    SingleParentTreeModelInterface,
     HasLabelInterface
 {
     /**

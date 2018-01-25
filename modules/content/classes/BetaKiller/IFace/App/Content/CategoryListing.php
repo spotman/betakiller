@@ -34,7 +34,7 @@ class CategoryListing extends AbstractAppBase
     {
         $data = [];
 
-        $children = $parent ? $parent->getChildren() : $this->categoryRepository->getRoot();
+        $children = $parent ? $this->categoryRepository->getChildren($parent) : $this->categoryRepository->getRoot();
 
         foreach ($children as $child) {
             if (!$child->isActive()) {

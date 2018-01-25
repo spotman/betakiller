@@ -1,25 +1,25 @@
 <?php
 namespace BetaKiller\Acl;
 
-use BetaKiller\Model\AclResource;
+use BetaKiller\Repository\AclResourceRepository;
 use Spotman\Acl\AclInterface;
 use Spotman\Acl\ResourcesCollector\AclResourcesCollectorInterface;
 
 class AclResourcesCollector implements AclResourcesCollectorInterface
 {
     /**
-     * @var AclResource
+     * @var \BetaKiller\Repository\AclResourceRepository
      */
-    private $resourceModel;
+    private $resourceRepository;
 
     /**
      * AclResourcesCollector constructor.
      *
-     * @param AclResource $resourceModel
+     * @param \BetaKiller\Repository\AclResourceRepository $repo
      */
-    public function __construct(AclResource $resourceModel)
+    public function __construct(AclResourceRepository $repo)
     {
-        $this->resourceModel = $resourceModel;
+        $this->resourceRepository = $repo;
     }
 
     /**
@@ -27,9 +27,9 @@ class AclResourcesCollector implements AclResourcesCollectorInterface
      *
      * @param \Spotman\Acl\AclInterface $acl
      */
-    public function collectResources(AclInterface $acl)
+    public function collectResources(AclInterface $acl): void
     {
-        $resources = $this->resourceModel->getAllResources();
+        $resources = $this->resourceRepository->getAll();
 
         foreach ($resources as $resource) {
             $acl->addResource($resource->getCodename(), $resource->getParentResourceCodename());

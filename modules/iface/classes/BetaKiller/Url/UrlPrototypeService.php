@@ -5,7 +5,8 @@ use BetaKiller\Exception\NotImplementedException;
 use BetaKiller\IFace\Exception\IFaceException;
 use BetaKiller\IFace\IFaceModelInterface;
 use BetaKiller\Model\DispatchableEntityInterface;
-use BetaKiller\Utils\Kohana\TreeModelSingleParentInterface;
+use BetaKiller\Model\SingleParentTreeModelInterface;
+use BetaKiller\Repository\SingleParentTreeRepositoryInterface;
 
 class UrlPrototypeService
 {
@@ -171,34 +172,44 @@ class UrlPrototypeService
     /**
      * @param string                                     $proto
      * @param \BetaKiller\Url\UrlContainerInterface|null $params
-     * @param bool|null                                  $isTree
      *
      * @return string
      * @throws \BetaKiller\Url\UrlPrototypeException
      */
-    public function getCompiledPrototypeValue(
-        string $proto,
-        ?UrlContainerInterface $params = null,
-        ?bool $isTree = null
-    ): string {
-        $isTree    = $isTree ?? false;
+    public function getCompiledPrototypeValue(string $proto, ?UrlContainerInterface $params = null): string
+    {
         $prototype = $this->createPrototypeFromString($proto);
 
         $param = $this->getParamByPrototype($prototype, $params);
 
-        // TODO Rewrite to TreeModelSingleParentRepository::getParent() call
-        if ($isTree && !($param instanceof TreeModelSingleParentInterface)) {
-            throw new UrlPrototypeException('Model :model must be instance of :object for tree traversing', [
-                ':model'  => \get_class($param),
-                ':object' => TreeModelSingleParentInterface::class,
+        return $this->calculateParameterKeyValue($prototype, $param);
+    }
+
+    /**
+     * @param string                                     $proto
+     * @param \BetaKiller\Url\UrlContainerInterface|null $params
+     *
+     * @return string
+     * @throws \BetaKiller\Url\UrlPrototypeException
+     */
+    public function getCompiledTreePrototypeValue(string $proto, ?UrlContainerInterface $params = null): string
+    {
+        $prototype  = $this->createPrototypeFromString($proto);
+        $parameter  = $this->getParamByPrototype($prototype, $params);
+
+        if (!($parameter instanceof SingleParentTreeModelInterface)) {
+            throw new UrlPrototypeException('Model :name must be instance of :must for tree traversing', [
+                ':name' => \get_class($parameter),
+                ':must' => SingleParentTreeModelInterface::class,
             ]);
         }
 
         $parts = [];
 
         do {
-            $parts[] = $this->calculateParameterKeyValue($prototype, $param);
-        } while ($isTree && $param = $param->getParent());
+            $parts[]   = $this->calculateParameterKeyValue($prototype, $parameter);
+            $parameter = $parameter->getParent();
+        } while ($parameter);
 
         return implode('/', array_reverse($parts));
     }

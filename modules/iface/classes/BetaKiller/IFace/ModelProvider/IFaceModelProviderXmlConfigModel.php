@@ -3,26 +3,21 @@ namespace BetaKiller\IFace\ModelProvider;
 
 use BetaKiller\Exception\NotImplementedException;
 use BetaKiller\Helper\SeoMetaInterface;
-use BetaKiller\IFace\Exception\IFaceException;
 use BetaKiller\IFace\IFaceModelInterface;
 use BetaKiller\Model\IFaceZone;
-use BetaKiller\Utils\Kohana\TreeModelSingleParentInterface;
-use BetaKiller\Utils\Kohana\TreeModelSingleParentTrait;
-use HTTP_Exception_501;
+use BetaKiller\Model\SingleParentTreeModelInterface;
 
 class IFaceModelProviderXmlConfigModel implements IFaceModelInterface
 {
-    use TreeModelSingleParentTrait;
-
-    /**
-     * @var IFaceModelProviderXmlConfig
-     */
-    private $provider;
-
     /**
      * @var string
      */
     private $codename;
+
+    /**
+     * @var IFaceModelInterface
+     */
+    private $parent;
 
     /**
      * @var string|null
@@ -86,12 +81,11 @@ class IFaceModelProviderXmlConfigModel implements IFaceModelInterface
      */
     private $aclRules = [];
 
-    public static function factory($data, IFaceModelProviderXmlConfig $provider)
+    public static function factory(array $data)
     {
         /** @var self $instance */
         $instance = new self;
         $instance->fromArray($data);
-        $instance->setProvider($provider);
 
         return $instance;
     }
@@ -109,29 +103,29 @@ class IFaceModelProviderXmlConfigModel implements IFaceModelInterface
 
     /**
      * @return string
-     * @throws HTTP_Exception_501
+     * @throws \BetaKiller\Exception\NotImplementedException
      */
     public function getID(): string
     {
-        throw new HTTP_Exception_501('Admin IFace model have no ID');
+        throw new NotImplementedException('Admin IFace model have no ID');
     }
 
     /**
      * @return bool
-     * @throws \HTTP_Exception_501
+     * @throws \BetaKiller\Exception\NotImplementedException
      */
     public function hasID(): bool
     {
-        throw new HTTP_Exception_501('Admin IFace model have no ID');
+        throw new NotImplementedException('Admin IFace model have no ID');
     }
 
     /**
      * @return string
-     * @throws \HTTP_Exception_501
+     * @throws \BetaKiller\Exception\NotImplementedException
      */
     public function getModelName(): string
     {
-        throw new HTTP_Exception_501('Admin IFace model have no model name');
+        throw new NotImplementedException('Admin IFace model have no model name');
     }
 
     /**
@@ -146,24 +140,12 @@ class IFaceModelProviderXmlConfigModel implements IFaceModelInterface
 
     /**
      * @param string $uri
+     *
+     * @throws \BetaKiller\Exception\NotImplementedException
      */
     public function setUri(string $uri): void
     {
         throw new NotImplementedException('Admin model can not change uri');
-    }
-
-    /**
-     * Return parent iface model or NULL
-     *
-     * @return IFaceModelInterface|null
-     */
-    public function getParent(): ?IFaceModelInterface
-    {
-        if (!$this->parentCodename) {
-            return null;
-        }
-
-        return $this->getProvider()->getByCodename($this->parentCodename);
     }
 
     /**
@@ -177,52 +159,12 @@ class IFaceModelProviderXmlConfigModel implements IFaceModelInterface
     }
 
     /**
-     * @return \BetaKiller\IFace\IFaceModelInterface[]
-     */
-    public function getRoot()
-    {
-        return $this->getProvider()->getRoot();
-    }
-
-    /**
-     * Returns list of child iface models
-     *
-     * @return \BetaKiller\IFace\IFaceModelInterface[]
-     */
-    public function getChildren()
-    {
-        return $this->getProvider()->getChildren($this);
-    }
-
-    /**
-     * @param string|null $columnName
-     *
-     * @return void
-     * @throws \HTTP_Exception_501
-     */
-    public function getAllChildren(string $columnName = null)
-    {
-        throw new HTTP_Exception_501(':method not implemented yet', [':method' => __METHOD__]);
-    }
-
-    /**
-     * @param \BetaKiller\Utils\Kohana\TreeModelSingleParentInterface|null $parent
-     *
-     * @return $this
-     * @throws HTTP_Exception_501
-     */
-    public function setParent(TreeModelSingleParentInterface $parent = null)
-    {
-        throw new HTTP_Exception_501('Admin model can not change parent');
-    }
-
-    /**
      * Sets title for using in <title> tag
      *
      * @param string $value
      *
      * @return SeoMetaInterface
-     * @throws HTTP_Exception_501
+     * @throws \BetaKiller\Exception\NotImplementedException
      */
     public function setTitle(string $value): SeoMetaInterface
     {
@@ -235,7 +177,7 @@ class IFaceModelProviderXmlConfigModel implements IFaceModelInterface
      * @param string $value
      *
      * @return SeoMetaInterface
-     * @throws HTTP_Exception_501
+     * @throws \BetaKiller\Exception\NotImplementedException
      */
     public function setDescription(string $value): SeoMetaInterface
     {
@@ -438,22 +380,39 @@ class IFaceModelProviderXmlConfigModel implements IFaceModelInterface
     }
 
     /**
-     * @return IFaceModelProviderXmlConfig
-     * @throws \BetaKiller\IFace\Exception\IFaceException
+     * Return parent model or null
+     *
+     * @return SingleParentTreeModelInterface|mixed|static|null
      */
-    protected function getProvider(): IFaceModelProviderXmlConfig
+    public function getParent()
     {
-        if (!$this->provider) {
-            throw new IFaceException('Provider is not defined, set it via setProvider() method');
-        }
-
-        return $this->provider;
+        return $this->parent;
     }
 
-    public function setProvider(IFaceModelProviderXmlConfig $provider)
+    /**
+     * @param \BetaKiller\Model\SingleParentTreeModelInterface|null $parent
+     */
+    public function setParent(SingleParentTreeModelInterface $parent = null)
     {
-        $this->provider = $provider;
+        $this->parent = $parent;
+    }
 
-        return $this;
+    /**
+     * @return SingleParentTreeModelInterface[]
+     */
+    public function getAllParents(): array
+    {
+        $current = $this;
+        $parents = [];
+
+        do {
+            $current = $current->getParent();
+
+            if ($current) {
+                $parents[] = $current;
+            }
+        } while ($current);
+
+        return $parents;
     }
 }

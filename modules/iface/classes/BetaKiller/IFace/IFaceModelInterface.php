@@ -3,16 +3,25 @@ namespace BetaKiller\IFace;
 
 use BetaKiller\Helper\SeoMetaInterface;
 use BetaKiller\Model\HasLabelInterface;
-use BetaKiller\Utils\Kohana\TreeModelSingleParentInterface;
+use BetaKiller\Model\SingleParentTreeModelInterface;
 
-interface IFaceModelInterface extends TreeModelSingleParentInterface, SeoMetaInterface, HasLabelInterface
+interface IFaceModelInterface extends SingleParentTreeModelInterface, SeoMetaInterface, HasLabelInterface
 {
+    public const URL_KEY = 'codename';
+
     /**
      * Returns iface codename
      *
      * @return string
      */
     public function getCodename(): string;
+
+    /**
+     * Returns parent IFace codename (if parent exists)
+     *
+     * @return null|string
+     */
+    public function getParentCodename(): ?string;
 
     /**
      * Returns iface url part

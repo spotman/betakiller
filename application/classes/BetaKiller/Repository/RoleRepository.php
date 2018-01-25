@@ -14,8 +14,16 @@ use BetaKiller\Model\RoleInterface;
  * @method RoleInterface[] getAll()
  * @method Role getOrmInstance()
  */
-class RoleRepository extends AbstractOrmBasedRepository
+class RoleRepository extends AbstractOrmBasedMultipleParentsTreeRepository
 {
+    /**
+     * @return string
+     */
+    public function getUrlKeyName(): string
+    {
+        return RoleInterface::URL_KEY;
+    }
+
     /**
      * @return \BetaKiller\Model\RoleInterface
      * @throws \BetaKiller\Repository\RepositoryException

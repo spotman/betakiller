@@ -6,6 +6,7 @@ use BetaKiller\Model\ContentCommentInterface;
 use BetaKiller\Model\ContentCommentStatus;
 use BetaKiller\Model\Entity;
 use BetaKiller\Model\EntityModelInterface;
+use BetaKiller\Model\ExtendedOrmInterface;
 use BetaKiller\Utils\Kohana\ORM\OrmInterface;
 use DateInterval;
 use DateTime;
@@ -19,8 +20,9 @@ use DateTime;
  * @method ContentCommentInterface|null findByWpID(int $id)
  * @method ContentCommentInterface create()
  * @method ContentCommentInterface[] getAll()
+ * @method ContentCommentInterface|null getParent(ContentCommentInterface $parent)
  */
-class ContentCommentRepository extends AbstractOrmBasedDispatchableRepository
+class ContentCommentRepository extends AbstractOrmBasedSingleParentTreeRepository
     implements EntityItemRelatedRepositoryInterface, RepositoryHasWordpressIdInterface
 {
     use OrmBasedRepositoryHasWordpressIdTrait;
@@ -39,6 +41,14 @@ class ContentCommentRepository extends AbstractOrmBasedDispatchableRepository
     public function getUrlKeyName(): string
     {
         throw new RepositoryException('No search for content comment allowed by url key');
+    }
+
+    /**
+     * @return string
+     */
+    protected function getParentIdColumnName(): string
+    {
+        return 'parent_id';
     }
 
     /**
@@ -149,6 +159,32 @@ class ContentCommentRepository extends AbstractOrmBasedDispatchableRepository
     }
 
     /**
+     * @param ContentCommentInterface|mixed $entity
+     *
+     * @throws \ORM_Validation_Exception
+     * @throws \BetaKiller\Repository\RepositoryException
+     */
+    public function save($entity): void
+    {
+        if (!$entity->getPath()) {
+            $levels = [];
+
+            // Combine path from parent IDs
+            foreach ($entity->getAllParents() as $parent) {
+                $levels[] = $parent->getID();
+            }
+
+            // Add root level
+            $levels[] = 0;
+            $path = implode('.', array_reverse($levels));
+
+            $entity->setPath($path);
+        }
+
+        parent::save($entity);
+    }
+
+    /**
      * @param \BetaKiller\Model\ExtendedOrmInterface|mixed $entity
      *
      * @throws \BetaKiller\Repository\RepositoryException
@@ -212,5 +248,15 @@ class ContentCommentRepository extends AbstractOrmBasedDispatchableRepository
         $orm->order_by('created_at', $asc ? 'asc' : 'desc');
 
         return $this;
+    }
+
+    /**
+     * @param \BetaKiller\Model\ExtendedOrmInterface $orm
+     *
+     * @return void
+     */
+    protected function customFilterForTreeTraversing(ExtendedOrmInterface $orm): void
+    {
+        // Nothing to do here
     }
 }

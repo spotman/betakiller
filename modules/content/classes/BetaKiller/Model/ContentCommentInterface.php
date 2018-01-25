@@ -3,11 +3,15 @@
 namespace BetaKiller\Model;
 
 use BetaKiller\Status\StatusRelatedModelInterface;
-use BetaKiller\Utils\Kohana\TreeModelSingleParentInterface;
 use DateTimeImmutable;
 use DateTimeInterface;
 
-interface ContentCommentInterface extends TreeModelSingleParentInterface, EntityItemRelatedInterface,
+/**
+ * Interface ContentCommentInterface
+ *
+ * @package BetaKiller\Model
+ */
+interface ContentCommentInterface extends SingleParentTreeModelInterface, EntityItemRelatedInterface,
     StatusRelatedModelInterface, EntityHasWordpressIdInterface, HasPublicReadUrlInterface, DispatchableEntityInterface
 {
     public function getRelatedContentLabel(): string;
@@ -115,6 +119,14 @@ interface ContentCommentInterface extends TreeModelSingleParentInterface, Entity
      * @return string
      */
     public function getPath(): string;
+
+    /**
+     * @param string $value
+     *
+     * @return $this
+     * @throws \Kohana_Exception
+     */
+    public function setPath(string $value);
 
     public function getLevel(): int;
 

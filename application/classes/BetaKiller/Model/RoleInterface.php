@@ -1,11 +1,12 @@
 <?php
 namespace BetaKiller\Model;
 
-use BetaKiller\Utils\Kohana\TreeModelMultipleParentsInterface;
 use Spotman\Acl\AclRoleInterface;
 
-interface RoleInterface extends AbstractEntityInterface, AclRoleInterface, TreeModelMultipleParentsInterface
+interface RoleInterface extends AbstractEntityInterface, AclRoleInterface, MultipleParentsTreeModelInterface
 {
+    public const URL_KEY = 'name';
+
     // Model_Auth_Role methods (nothing special)
 
     // Extended methods

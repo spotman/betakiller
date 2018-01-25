@@ -2,66 +2,136 @@
 namespace BetaKiller\IFace;
 
 use BetaKiller\IFace\Exception\IFaceException;
-use BetaKiller\IFace\ModelProvider\IFaceModelProviderAggregate;
 use BetaKiller\Model\DispatchableEntityInterface;
 use BetaKiller\Model\IFaceZone;
 
 class IFaceModelTree
 {
     /**
-     * @var \BetaKiller\IFace\ModelProvider\IFaceModelProviderAggregate
-     */
-    protected $modelProvider;
-
-    /**
      * @var string[]
      */
     private $entityLinkedCodenameCache;
 
-    public function __construct(IFaceModelProviderAggregate $modelProvider)
+    /**
+     * @var \BetaKiller\IFace\IFaceModelInterface[]
+     */
+    private $items = [];
+
+    /**
+     * @param \BetaKiller\IFace\IFaceModelInterface $model
+     * @param bool|null                             $warnIfExists
+     *
+     * @throws \BetaKiller\IFace\Exception\IFaceException
+     */
+    public function add(IFaceModelInterface $model, ?bool $warnIfExists = null): void
     {
-        $this->modelProvider = $modelProvider;
+        $codename = $model->getCodename();
+
+        if ($warnIfExists && isset($this->items[$codename])) {
+            throw new IFaceException('IFace :codename already exists in the tree', [':codename' => $codename]);
+        }
+
+        $parentCodename = $model->getParentCodename();
+
+        if ($parentCodename) {
+            // Store parent for future usage
+            $parent = $this->getByCodename($parentCodename);
+            $model->setParent($parent);
+        }
+
+        $this->items[$codename] = $model;
     }
 
     /**
+     * Returns default iface model
+     *
      * @return \BetaKiller\IFace\IFaceModelInterface
      * @throws \BetaKiller\IFace\Exception\IFaceException
      */
     public function getDefault(): IFaceModelInterface
     {
-        return $this->modelProvider->getDefault();
+        foreach ($this->items as $item) {
+            if ($item->isDefault()) {
+                return $item;
+            }
+        }
+
+        throw new IFaceException('No default IFace found');
     }
 
     /**
+     * Returns list of root elements
+     *
      * @return array
      * @throws \BetaKiller\IFace\Exception\IFaceException
      */
     public function getRoot(): array
     {
-        return $this->modelProvider->getRoot();
+        $root = $this->getChilds();
+
+        if (!$root) {
+            throw new IFaceException('No root IFaces found, define them first');
+        }
+
+        return $root;
     }
 
     /**
+     * Returns list of child nodes
+     *
      * @param \BetaKiller\IFace\IFaceModelInterface $parent
      *
      * @return \BetaKiller\IFace\IFaceModelInterface[]
      */
     public function getChildren(IFaceModelInterface $parent): array
     {
-        return $this->modelProvider->getChildren($parent);
+        return $this->getChilds($parent);
     }
 
     /**
+     * Returns list of child nodes of $parentModel (or root nodes if none provided)
+     *
+     * @param \BetaKiller\IFace\IFaceModelInterface|null $parentModel
+     *
+     * @return IFaceModelInterface[]
+     */
+    private function getChilds(IFaceModelInterface $parentModel = null): array
+    {
+        $parentCodename = $parentModel ? $parentModel->getCodename() : null;
+
+        $models = [];
+
+        foreach ($this->items as $model) {
+            if ($model->getParentCodename() !== $parentCodename) {
+                continue;
+            }
+
+            $models[] = $model;
+        }
+
+        return $models;
+    }
+
+    /**
+     * Returns parent iface model or null if none was found
+     *
      * @param \BetaKiller\IFace\IFaceModelInterface $child
      *
      * @return \BetaKiller\IFace\IFaceModelInterface|null
+     * @throws \BetaKiller\IFace\Exception\IFaceException
      */
     public function getParent(IFaceModelInterface $child): ?IFaceModelInterface
     {
-        return $this->modelProvider->getParent($child);
+        $parentCodename = $child->getParentCodename();
+
+        return $parentCodename
+            ? $this->getByCodename($parentCodename)
+            : null;
     }
 
     /**
+     * Returns iface model by codename or throws an exception if nothing was found
+     *
      * @param string $codename
      *
      * @return \BetaKiller\IFace\IFaceModelInterface
@@ -69,7 +139,11 @@ class IFaceModelTree
      */
     public function getByCodename(string $codename): IFaceModelInterface
     {
-        return $this->modelProvider->getByCodename($codename);
+        if (!isset($this->items[$codename])) {
+            throw new IFaceException('No IFace found by codename :codename', [':codename' => $codename]);
+        }
+
+        return $this->items[$codename];
     }
 
     /**
@@ -77,14 +151,29 @@ class IFaceModelTree
      * @param string $zone
      *
      * @return \BetaKiller\IFace\IFaceModelInterface[]
-     * @throws \BetaKiller\IFace\Exception\IFaceException
      */
     public function getByActionAndZone(string $action, string $zone): array
     {
-        return $this->modelProvider->getByActionAndZone($action, $zone);
+        $output = [];
+
+        foreach ($this->items as $model) {
+            if ($model->getEntityActionName() !== $action) {
+                continue;
+            }
+
+            if ($model->getZoneName() !== $zone) {
+                continue;
+            }
+
+            $output[] = $model;
+        }
+
+        return $output;
     }
 
     /**
+     * Search for IFace linked to provided entity, entity action and zone
+     *
      * @param \BetaKiller\Model\DispatchableEntityInterface $entity
      * @param string                                        $action
      * @param string                                        $zone
@@ -105,7 +194,7 @@ class IFaceModelTree
             return $model;
         }
 
-        $model = $this->modelProvider->getByEntityActionAndZone($entity, $action, $zone);
+        $model = $this->findByEntityActionAndZone($entity, $action, $zone);
 
         if (!$model) {
             throw new IFaceException('No IFace found for :entity.:action entity in :zone zone', [
@@ -121,9 +210,41 @@ class IFaceModelTree
     }
 
     /**
+     * @param \BetaKiller\Model\DispatchableEntityInterface $entity
+     * @param string                                        $entityAction
+     * @param string                                        $zone
+     *
+     * @return IFaceModelInterface|null
+     */
+    private function findByEntityActionAndZone(
+        DispatchableEntityInterface $entity,
+        string $entityAction,
+        string $zone
+    ): ?IFaceModelInterface {
+        foreach ($this->items as $model) {
+            if ($model->getEntityModelName() !== $entity->getModelName()) {
+                continue;
+            }
+
+            if ($model->getEntityActionName() !== $entityAction) {
+                continue;
+            }
+
+            if ($model->getZoneName() !== $zone) {
+                continue;
+            }
+
+            return $model;
+        }
+
+        return null;
+    }
+
+    /**
      * @param \BetaKiller\IFace\IFaceModelInterface $model
      *
      * @return \ArrayIterator|\BetaKiller\IFace\IFaceModelInterface[]
+     * @throws \BetaKiller\IFace\Exception\IFaceException
      */
     public function getReverseBreadcrumbsIterator(IFaceModelInterface $model): \ArrayIterator
     {
@@ -133,9 +254,8 @@ class IFaceModelTree
         do {
             $stack[] = $current;
 
-            $parent  = $this->getParent($current);
-            $current = $parent;
-        } while ($parent);
+            $current = $this->getParent($current);
+        } while ($current);
 
         return new \ArrayIterator($stack);
     }
@@ -144,16 +264,18 @@ class IFaceModelTree
      * @param IFaceModelInterface|NULL $parent
      *
      * @return IFaceModelRecursiveIterator|IFaceModelInterface[]
+     * @throws \BetaKiller\IFace\Exception\IFaceException
      */
     public function getRecursiveIterator(IFaceModelInterface $parent = null)
     {
-        return new IFaceModelRecursiveIterator($parent, $this->modelProvider);
+        return new IFaceModelRecursiveIterator($parent, $this);
     }
 
     /**
      * @param IFaceModelInterface|NULL $parent
      *
      * @return \RecursiveIteratorIterator|IFaceModelInterface[]
+     * @throws \BetaKiller\IFace\Exception\IFaceException
      */
     public function getRecursivePublicIterator(IFaceModelInterface $parent = null)
     {
@@ -164,6 +286,7 @@ class IFaceModelTree
 
     /**
      * @return \RecursiveIteratorIterator|IFaceModelInterface[]
+     * @throws \BetaKiller\IFace\Exception\IFaceException
      */
     public function getRecursiveSitemapIterator()
     {
@@ -176,6 +299,7 @@ class IFaceModelTree
      * @param IFaceModelInterface|NULL $parent
      *
      * @return \RecursiveIteratorIterator|IFaceModelInterface[]
+     * @throws \BetaKiller\IFace\Exception\IFaceException
      */
     public function getRecursiveAdminIterator(IFaceModelInterface $parent = null)
     {
@@ -189,6 +313,7 @@ class IFaceModelTree
      * @param IFaceModelInterface|NULL $parent
      *
      * @return \RecursiveIteratorIterator|IFaceModelInterface[]
+     * @throws \BetaKiller\IFace\Exception\IFaceException
      */
     protected function getRecursiveFilterIterator(callable $callback, IFaceModelInterface $parent = null)
     {

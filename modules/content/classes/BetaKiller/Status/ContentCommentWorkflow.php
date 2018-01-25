@@ -3,7 +3,7 @@ namespace BetaKiller\Status;
 
 use BetaKiller\Helper\IFaceHelper;
 use BetaKiller\Helper\NotificationHelper;
-use BetaKiller\Model\ContentComment;
+use BetaKiller\Model\ContentCommentInterface;
 use BetaKiller\Model\ContentCommentStatusTransition;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Service\UserService;
@@ -91,13 +91,12 @@ class ContentCommentWorkflow extends StatusWorkflow
     }
 
     /**
-     * @param \BetaKiller\Model\ContentComment $comment
+     * @param \BetaKiller\Model\ContentCommentInterface $comment
      *
-     * @throws \BetaKiller\Exception
      * @throws \BetaKiller\Notification\NotificationException
      * @throws \BetaKiller\Repository\RepositoryException
      */
-    protected function notifyCommentAuthorAboutApprove(ContentComment $comment)
+    protected function notifyCommentAuthorAboutApprove(ContentCommentInterface $comment)
     {
         $authorUser = $comment->getAuthorUser();
 
@@ -127,12 +126,12 @@ class ContentCommentWorkflow extends StatusWorkflow
     }
 
     /**
-     * @param \BetaKiller\Model\ContentComment $reply
+     * @param \BetaKiller\Model\ContentCommentInterface $reply
      *
      * @throws \BetaKiller\Notification\NotificationException
      * @throws \BetaKiller\Repository\RepositoryException
      */
-    protected function notifyParentCommentAuthorAboutReply(ContentComment $reply)
+    protected function notifyParentCommentAuthorAboutReply(ContentCommentInterface $reply)
     {
         $parent = $reply->getParent();
 

@@ -49,4 +49,19 @@ class TreeUrlBehaviour extends MultipleUrlBehaviour
         // Anyway we processed, so return true
         return true;
     }
+
+    /**
+     * @param \BetaKiller\IFace\IFaceModelInterface $ifaceModel
+     * @param \BetaKiller\Url\UrlContainerInterface $params
+     *
+     * @return string
+     * @throws \BetaKiller\Factory\FactoryException
+     * @throws \BetaKiller\Url\UrlPrototypeException
+     */
+    protected function getUri(
+        IFaceModelInterface $ifaceModel,
+        ?UrlContainerInterface $params = null
+    ): string {
+        return $this->urlPrototypeService->getCompiledTreePrototypeValue($ifaceModel->getUri(), $params);
+    }
 }

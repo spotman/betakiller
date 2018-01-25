@@ -1,10 +1,10 @@
 <?php
 namespace BetaKiller\Model;
 
-use BetaKiller\Utils\Kohana\TreeModelSingleParentOrm;
-
-class AclResource extends TreeModelSingleParentOrm
+class AclResource extends AbstractOrmBasedSingleParentTreeModel
 {
+    public const URL_KEY = 'name';
+
     protected function _initialize()
     {
         $this->_table_name = 'acl_resources';
@@ -13,34 +13,20 @@ class AclResource extends TreeModelSingleParentOrm
     }
 
     /**
-     * Place here additional query params
-     */
-    protected function additionalTreeTraversalFiltering()
-    {
-        // Nothing to do
-    }
-
-    /**
      * @return string
      */
-    public function getCodename()
+    public function getCodename(): string
     {
         return $this->get('codename');
     }
 
-
-    public function getParentResourceCodename()
+    /**
+     * @return null|string
+     */
+    public function getParentResourceCodename(): ?string
     {
         $parent = $this->getParent();
 
         return $parent ? $parent->getCodename() : null;
-    }
-
-    /**
-     * @return $this[]
-     */
-    public function getAllResources()
-    {
-        return $this->get_all();
     }
 }

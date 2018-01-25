@@ -1,10 +1,9 @@
 <?php
 namespace BetaKiller\Model;
 
-use BetaKiller\Utils\Kohana\TreeModelSingleParentOrm;
 use Kohana_Exception;
 
-class ContentCategory extends TreeModelSingleParentOrm implements ContentCategoryInterface
+class ContentCategory extends AbstractOrmBasedSingleParentTreeModel implements ContentCategoryInterface
 {
     use OrmBasedEntityHasWordpressIdTrait,
         OrmBasedSeoMetaTrait;
@@ -64,64 +63,6 @@ class ContentCategory extends TreeModelSingleParentOrm implements ContentCategor
     public function isActive(): bool
     {
         return (bool)$this->get('is_active');
-    }
-
-    /**
-     * @param bool|null $include_self
-     *
-     * @return array|\int[]
-     * @deprecated
-     * @todo Move to repository
-     */
-    public function getAllRelatedCategoriesIDs(?bool $include_self = null): array
-    {
-        // Collect all children categories
-        $ids = $this->getAllChildren($this->primary_key());
-
-        if ($include_self ?? true) {
-            // Add current category
-            $ids[] = $this->getID();
-        }
-
-        // Remove empty values
-        $ids = array_filter($ids);
-
-        return $ids;
-    }
-
-    /**
-     * @param bool|null $value
-     *
-     * @return $this
-     * @deprecated
-     * @todo Move to repository
-     */
-    public function filterIsActive(?bool $value = null)
-    {
-        return $this->where($this->object_column('is_active'), '=', $value ?? true);
-    }
-
-    /**
-     * @param bool|null $desc
-     *
-     * @return $this
-     * @deprecated
-     * @todo Move to repository
-     */
-    public function orderByPlace(?bool $desc = null)
-    {
-        return $this->order_by($this->object_column('place'), ($desc ?? false) ? 'desc' : 'asc');
-    }
-
-    /**
-     * Place here additional query params
-     *
-     * @return $this
-     * @todo Rewrite this to tree model repository
-     */
-    protected function additionalTreeTraversalFiltering()
-    {
-        return $this->filterIsActive()->orderByPlace();
     }
 
     public function linkPosts(array $item_ids): void

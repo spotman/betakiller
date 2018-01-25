@@ -3,13 +3,17 @@ namespace BetaKiller\Model;
 
 use BetaKiller\Helper\IFaceHelper;
 use BetaKiller\Status\StatusRelatedModelOrmTrait;
-use BetaKiller\Utils\Kohana\TreeModelSingleParentOrm;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Exception;
 use Validation;
 
-class ContentComment extends TreeModelSingleParentOrm implements ContentCommentInterface
+/**
+ * Class ContentComment
+ *
+ * @package BetaKiller\Model
+ */
+class ContentComment extends AbstractOrmBasedSingleParentTreeModel implements ContentCommentInterface
 {
     use OrmBasedEntityItemRelatedModelTrait;
     use OrmBasedEntityHasWordpressIdTrait;
@@ -67,14 +71,6 @@ class ContentComment extends TreeModelSingleParentOrm implements ContentCommentI
     }
 
     /**
-     * Place here additional query params
-     */
-    protected function additionalTreeTraversalFiltering()
-    {
-        // Nothing to do
-    }
-
-    /**
      * Rule definitions for validation
      *
      * @return array
@@ -98,6 +94,9 @@ class ContentComment extends TreeModelSingleParentOrm implements ContentCommentI
                 ['not_empty'],
             ],
             'message'        => [
+                ['not_empty'],
+            ],
+            'path'        => [
                 ['not_empty'],
             ],
         ];
@@ -342,14 +341,14 @@ class ContentComment extends TreeModelSingleParentOrm implements ContentCommentI
     }
 
     /**
+     * @param string $value
+     *
      * @return $this
+     * @throws \Kohana_Exception
      */
-    protected function setPath()
+    public function setPath(string $value)
     {
-        $parent     = $this->getParent();
-        $parentPath = $parent ? $parent->getPath() : 0;
-
-        $this->set('path', $parentPath.'.'.$this->getID());
+        $this->set('path', $value);
 
         return $this;
     }
@@ -434,15 +433,6 @@ class ContentComment extends TreeModelSingleParentOrm implements ContentCommentI
             $this->initAsPending();
         }
 
-        $path_changed = $this->changed('path');
-
-        /** @var ContentComment $obj */
-        $obj = parent::create($validation);
-
-        if (!$path_changed) {
-            $obj->setPath()->save();
-        }
-
-        return $obj;
+        return parent::create($validation);
     }
 }

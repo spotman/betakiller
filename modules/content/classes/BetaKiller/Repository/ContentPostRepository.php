@@ -1,6 +1,7 @@
 <?php
 namespace BetaKiller\Repository;
 
+use BetaKiller\Factory\OrmFactory;
 use BetaKiller\Model\ContentCategory;
 use BetaKiller\Model\ContentCategoryInterface;
 use BetaKiller\Model\ContentPost;
@@ -21,6 +22,25 @@ use BetaKiller\Utils\Kohana\ORM\OrmInterface;
 class ContentPostRepository extends AbstractOrmBasedDispatchableRepository implements RepositoryHasWordpressIdInterface
 {
     use OrmBasedRepositoryHasWordpressIdTrait;
+
+    /**
+     * @var \BetaKiller\Repository\ContentCategoryRepository
+     */
+    private $categoryRepo;
+
+    /**
+     * AbstractOrmBasedRepository constructor.
+     *
+     * @param \BetaKiller\Factory\OrmFactory                   $ormFactory
+     * @param \BetaKiller\Repository\ContentCategoryRepository $categoryRepo
+     */
+    public function __construct(OrmFactory $ormFactory, ContentCategoryRepository $categoryRepo)
+    {
+        parent::__construct($ormFactory);
+
+        $this->categoryRepo = $categoryRepo;
+    }
+
 
     /**
      * @return string
@@ -66,12 +86,12 @@ class ContentPostRepository extends AbstractOrmBasedDispatchableRepository imple
     }
 
     /**
-     * @param ContentCategory $category
+     * @param ContentCategoryInterface $category
      *
      * @return \BetaKiller\Model\ContentPostInterface[]
      * @throws \BetaKiller\Repository\RepositoryException
      */
-    public function getCategoryArticles(ContentCategory $category): array
+    public function getCategoryArticles(ContentCategoryInterface $category): array
     {
         $orm = $this->getOrmInstance();
 
@@ -81,23 +101,23 @@ class ContentPostRepository extends AbstractOrmBasedDispatchableRepository imple
     }
 
     /**
-     * @param int                               $page
-     * @param int                               $itemsPerPage
-     * @param \BetaKiller\Model\ContentCategory $category
-     * @param null|string                       $term
+     * @param int                                        $page
+     * @param int                                        $itemsPerPage
+     * @param \BetaKiller\Model\ContentCategoryInterface $category
+     * @param null|string                                $term
      *
      * @return \BetaKiller\Search\SearchResultsInterface
      */
     public function searchArticles(
         int $page,
         int $itemsPerPage,
-        ContentCategory $category = null,
+        ContentCategoryInterface $category = null,
         ?string $term = null
     ): SearchResultsInterface {
         $orm = $this->getOrmInstance();
 
         if ($category && $category->hasID()) {
-            $categoriesIDs = $category->getAllRelatedCategoriesIDs();
+            $categoriesIDs = $this->categoryRepo->getAllChildrenIDs($category);
             $this->filterCategoryIDs($orm, $categoriesIDs);
         }
 

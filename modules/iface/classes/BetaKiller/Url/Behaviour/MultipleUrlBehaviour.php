@@ -17,7 +17,7 @@ class MultipleUrlBehaviour extends AbstractUrlBehaviour
      * @var \BetaKiller\Url\UrlPrototypeService
      * @Inject
      */
-    private $urlPrototypeService;
+    protected $urlPrototypeService;
 
     /**
      * @var \BetaKiller\Helper\UrlHelper
@@ -94,8 +94,7 @@ class MultipleUrlBehaviour extends AbstractUrlBehaviour
         IFaceModelInterface $ifaceModel,
         ?UrlContainerInterface $params = null
     ): string {
-        return $this->urlPrototypeService->getCompiledPrototypeValue($ifaceModel->getUri(), $params,
-            $ifaceModel->hasTreeBehaviour());
+        return $this->urlPrototypeService->getCompiledPrototypeValue($ifaceModel->getUri(), $params);
     }
 
     /**

@@ -1,26 +1,26 @@
 <?php
 namespace BetaKiller\IFace;
 
-use BetaKiller\IFace\ModelProvider\IFaceModelProviderAggregate;
-
 class IFaceModelRecursiveIterator extends IFaceModelLayerIterator implements \RecursiveIterator
 {
     /**
-     * @var \BetaKiller\IFace\ModelProvider\IFaceModelProviderAggregate
+     * @var \BetaKiller\IFace\IFaceModelTree
      */
-    protected $modelProvider;
+    private $tree;
 
     /**
      * IFaceModelLayerIterator constructor.
      *
-     * @param \BetaKiller\IFace\IFaceModelInterface|NULL                  $parent
-     * @param \BetaKiller\IFace\ModelProvider\IFaceModelProviderAggregate $modelProvider
+     * @param \BetaKiller\IFace\IFaceModelInterface|NULL $parent
+     * @param \BetaKiller\IFace\IFaceModelTree           $tree
+     *
+     * @throws \BetaKiller\IFace\Exception\IFaceException
      */
-    public function __construct(IFaceModelInterface $parent = null, IFaceModelProviderAggregate $modelProvider)
+    public function __construct(IFaceModelInterface $parent = null, IFaceModelTree $tree)
     {
-        $this->modelProvider = $modelProvider;
+        parent::__construct($parent, $tree);
 
-        parent::__construct($parent, $modelProvider);
+        $this->tree = $tree;
     }
 
     /**
@@ -30,7 +30,7 @@ class IFaceModelRecursiveIterator extends IFaceModelLayerIterator implements \Re
      * @return bool true if the current entry can be iterated over, otherwise returns false.
      * @since 5.1.0
      */
-    public function hasChildren()
+    public function hasChildren(): bool
     {
         return true;
     }
@@ -41,11 +41,12 @@ class IFaceModelRecursiveIterator extends IFaceModelLayerIterator implements \Re
      * @link  http://php.net/manual/en/recursiveiterator.getchildren.php
      * @return \RecursiveIterator An iterator for the current entry.
      * @since 5.1.0
+     * @throws \BetaKiller\IFace\Exception\IFaceException
      */
-    public function getChildren()
+    public function getChildren(): \RecursiveIterator
     {
         $current = $this->current();
 
-        return new self($current, $this->modelProvider);
+        return new self($current, $this->tree);
     }
 }

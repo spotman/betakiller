@@ -64,7 +64,6 @@ class CommentsWidget extends AbstractBaseWidget
         foreach ($comments as $comment) {
             $created_at = $comment->getCreatedAt();
             $email      = $comment->getAuthorEmail();
-            /** @var \BetaKiller\Model\ContentCommentInterface $parentModel */
             $parentModel = $comment->getParent();
             $parentID    = $parentModel ? $parentModel->getID() : 0;
 

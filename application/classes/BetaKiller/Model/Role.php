@@ -1,9 +1,7 @@
 <?php
 namespace BetaKiller\Model;
 
-use BetaKiller\Utils\Kohana\TreeModelMultipleParentsOrm;
-
-class Role extends TreeModelMultipleParentsOrm implements RoleInterface
+class Role extends AbstractOrmBasedMultipleParentsTreeModel implements RoleInterface
 {
     protected function getTreeModelThroughTableName()
     {
@@ -37,13 +35,5 @@ class Role extends TreeModelMultipleParentsOrm implements RoleInterface
     public function getRoleId(): string
     {
         return $this->getName();
-    }
-
-    /**
-     * Place here additional query params
-     */
-    protected function additionalTreeTraversalFiltering()
-    {
-        // Nothing to do
     }
 }

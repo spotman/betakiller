@@ -3,7 +3,6 @@ namespace BetaKiller\Model;
 
 use BetaKiller\Helper\SeoMetaInterface;
 use BetaKiller\IFace\IFaceModelInterface;
-use BetaKiller\Utils\Kohana\TreeModelSingleParentOrm;
 
 /**
  * Class IFace
@@ -12,7 +11,7 @@ use BetaKiller\Utils\Kohana\TreeModelSingleParentOrm;
  * @author     Spotman
  * @package    Betakiller
  */
-class IFace extends TreeModelSingleParentOrm implements IFaceModelInterface
+class IFace extends AbstractOrmBasedSingleParentTreeModel implements IFaceModelInterface
 {
     protected function _initialize(): void
     {
@@ -66,26 +65,6 @@ class IFace extends TreeModelSingleParentOrm implements IFaceModelInterface
         ]);
 
         parent::_initialize();
-    }
-
-    /**
-     * Returns list of child iface models
-     *
-     * @return IFaceModelInterface[]|$this[]
-     */
-    public function getChildren()
-    {
-        return parent::getChildren();
-    }
-
-    /**
-     * Return parent iface model or NULL
-     *
-     * @return IFaceModelInterface|\BetaKiller\Utils\Kohana\TreeModelOrmBase
-     */
-    public function getParent()
-    {
-        return parent::getParent();
     }
 
     /**
@@ -335,13 +314,14 @@ class IFace extends TreeModelSingleParentOrm implements IFaceModelInterface
     }
 
     /**
-     * Place here additional query params
+     * Returns parent IFace codename (if parent exists)
      *
-     * @return $this
+     * @return null|string
      */
-    protected function additionalTreeTraversalFiltering()
+    public function getParentCodename(): ?string
     {
-        // No filtering needed
-        return $this;
+        $parent = $this->getParent();
+
+        return $parent ? $parent->getCodename() : null;
     }
 }
