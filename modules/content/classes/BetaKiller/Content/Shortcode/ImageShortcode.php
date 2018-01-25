@@ -133,7 +133,6 @@ class ImageShortcode extends AbstractContentElementShortcode
         $class  = $this->getAttribute('class');
         $style  = $this->getAttribute('style');
         $width  = (int)$this->getAttribute('width');
-        $height = (int)$this->getAttribute('height');
 
         $classes = array_unique(array_filter(explode(' ', $class)));
 
@@ -148,7 +147,6 @@ class ImageShortcode extends AbstractContentElementShortcode
             'class'  => implode(' ', $classes),
             'style'  => $style,
             'width'  => $width,
-            'height' => $height,
         ];
 
         return [
