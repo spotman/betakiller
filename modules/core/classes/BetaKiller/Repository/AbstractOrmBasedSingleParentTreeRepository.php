@@ -11,7 +11,7 @@ abstract class AbstractOrmBasedSingleParentTreeRepository extends AbstractOrmBas
     implements SingleParentTreeRepositoryInterface
 {
     /**
-     * @return \Generator|IFaceModelInterface[]
+     * @return \Generator|\BetaKiller\Model\SingleParentTreeModelInterface[]
      * @throws \BetaKiller\Repository\RepositoryException
      */
     public function getFullTree(): \Generator
@@ -22,12 +22,12 @@ abstract class AbstractOrmBasedSingleParentTreeRepository extends AbstractOrmBas
     }
 
     /**
-     * @param \BetaKiller\IFace\IFaceModelInterface|null $parent
+     * @param \BetaKiller\Model\SingleParentTreeModelInterface|null $parent
      *
      * @return \Generator|IFaceModelInterface[]
      * @throws \BetaKiller\Repository\RepositoryException
      */
-    private function getChildsRecursive(?IFaceModelInterface $parent = null): \Generator
+    private function getChildsRecursive(?SingleParentTreeModelInterface $parent = null): \Generator
     {
         $layer = $parent
             ? $this->getChildren($parent)
