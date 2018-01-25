@@ -76,7 +76,7 @@ abstract class AbstractOrmBasedSingleParentTreeRepository extends AbstractOrmBas
     /**
      * @param \BetaKiller\Model\SingleParentTreeModelInterface $parent
      *
-     * @return SingleParentTreeModelInterface[]|int[]
+     * @return SingleParentTreeModelInterface[]
      * @throws \BetaKiller\Repository\RepositoryException
      */
     public function getAllChildren(SingleParentTreeModelInterface $parent): array
@@ -93,16 +93,22 @@ abstract class AbstractOrmBasedSingleParentTreeRepository extends AbstractOrmBas
     /**
      * @param \BetaKiller\Model\SingleParentTreeModelInterface $parent
      *
+     * @param bool|null                                        $includeSelf
+     *
      * @return array
      * @throws \BetaKiller\Repository\RepositoryException
      */
-    public function getAllChildrenIDs(SingleParentTreeModelInterface $parent): array
+    public function getAllChildrenIDs(SingleParentTreeModelInterface $parent, ?bool $includeSelf = null): array
     {
         $ids = [];
 
         // Collect all children
         foreach ($this->getAllChildren($parent) as $child) {
             $ids[] = $child->getID();
+        }
+
+        if ($includeSelf) {
+            $ids[] = $parent->getID();
         }
 
         return $ids;

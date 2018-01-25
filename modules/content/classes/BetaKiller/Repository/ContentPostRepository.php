@@ -117,7 +117,7 @@ class ContentPostRepository extends AbstractOrmBasedDispatchableRepository imple
         $orm = $this->getOrmInstance();
 
         if ($category && $category->hasID()) {
-            $categoriesIDs = $this->categoryRepo->getAllChildrenIDs($category);
+            $categoriesIDs = $this->categoryRepo->getAllChildrenIDs($category, true);
             $this->filterCategoryIDs($orm, $categoriesIDs);
         }
 
