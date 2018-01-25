@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace BetaKiller\Repository;
 
-use BetaKiller\IFace\IFaceModelInterface;
 use BetaKiller\Model\ExtendedOrmInterface;
 use BetaKiller\Model\SingleParentTreeModelInterface;
 
@@ -24,7 +23,7 @@ abstract class AbstractOrmBasedSingleParentTreeRepository extends AbstractOrmBas
     /**
      * @param \BetaKiller\Model\SingleParentTreeModelInterface|null $parent
      *
-     * @return \Generator|IFaceModelInterface[]
+     * @return \Generator|\BetaKiller\Model\SingleParentTreeModelInterface[]
      * @throws \BetaKiller\Repository\RepositoryException
      */
     private function getChildsRecursive(?SingleParentTreeModelInterface $parent = null): \Generator
