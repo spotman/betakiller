@@ -143,16 +143,17 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
 
         if ($model) {
             // Mark exception as repeated
-            $model->markAsRepeated($user);
+            $model
+                ->markAsRepeated($user)
+                ->setLastSeenAt($currentTime);
         } else {
             $model = $this->repository->create()
                 ->setHash($hash)
                 ->setCreatedAt($currentTime)
+                ->setLastSeenAt($currentTime)
                 ->setMessage($message)
                 ->markAsNew($user);
         }
-
-        $model->setLastSeenAt($currentTime);
 
         // Increase occurrence counter
         $model->incrementCounter();
