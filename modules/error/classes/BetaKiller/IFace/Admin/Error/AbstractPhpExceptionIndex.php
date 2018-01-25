@@ -10,6 +10,12 @@ abstract class AbstractPhpExceptionIndex extends ErrorAdminBase
     protected $repository;
 
     /**
+     * @Inject
+     * @var \BetaKiller\Helper\IFaceHelper
+     */
+    private $ifaceHelper;
+
+    /**
      * @return \BetaKiller\Model\PhpExceptionModelInterface[]
      */
     abstract protected function getPhpExceptions(): array;
