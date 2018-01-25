@@ -43,7 +43,7 @@ class LazyLoadProxyHandler extends AbstractProcessingHandler
     private function getHandlerInstance(): HandlerInterface
     {
         if (!$this->handlerInstance) {
-            $this->handlerInstance = ($this->factory)();
+            $this->handlerInstance = \call_user_func($this->factory);
         }
 
         return $this->handlerInstance;
