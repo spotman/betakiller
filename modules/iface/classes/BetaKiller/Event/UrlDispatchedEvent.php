@@ -51,9 +51,9 @@ class UrlDispatchedEvent implements EventMessageInterface
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getHttpReferer(): string
+    public function getHttpReferer(): ?string
     {
         return $this->httpReferer;
     }
