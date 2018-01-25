@@ -1,9 +1,11 @@
 <?php
 namespace BetaKiller\IFace\Admin\Error;
 
+use BetaKiller\Helper\LoggerHelperTrait;
+
 class PhpExceptionTestLogger extends ErrorAdminBase
 {
-    use BetaKiller\Helper\LoggerHelperTrait;
+    use LoggerHelperTrait;
 
     /**
      * @Inject
