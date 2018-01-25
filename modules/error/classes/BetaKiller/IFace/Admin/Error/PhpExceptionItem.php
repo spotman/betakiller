@@ -13,10 +13,16 @@ class PhpExceptionItem extends ErrorAdminBase
     private $urlParametersHelper;
 
     /**
+     * @var \BetaKiller\Helper\IFaceHelper
+     */
+    private $ifaceHelper;
+
+    /**
      * Returns data for View
      * Override this method in child classes
      *
      * @return array
+     * @throws \BetaKiller\Exception
      */
     public function getData(): array
     {

@@ -1,34 +1,31 @@
 <?php
 namespace BetaKiller\IFace;
 
-use BetaKiller\Error\ExceptionHandler;
-use BetaKiller\Exception\HttpExceptionInterface;
 use BetaKiller\Model\UserInterface;
 
 abstract class AbstractHttpErrorIFace extends AbstractIFace
 {
-    /**
-     * @var ExceptionHandler
-     */
-    private $exceptionHandler;
-
     /**
      * @var \BetaKiller\Model\UserInterface
      */
     private $user;
 
     /**
+     * @Inject
+     * @var \BetaKiller\Helper\IFaceHelper
+     */
+    private $ifaceHelper;
+
+    /**
      * AbstractHttpErrorIFace constructor.
      *
-     * @param \BetaKiller\Model\UserInterface    $user
-     * @param \BetaKiller\Error\ExceptionHandler $exceptionHandler
+     * @param \BetaKiller\Model\UserInterface $user
      */
-    public function __construct(UserInterface $user, ExceptionHandler $exceptionHandler)
+    public function __construct(UserInterface $user)
     {
         parent::__construct();
 
-        $this->user             = $user;
-        $this->exceptionHandler = $exceptionHandler;
+        $this->user = $user;
     }
 
     /**
@@ -36,7 +33,6 @@ abstract class AbstractHttpErrorIFace extends AbstractIFace
      * Override this method in child classes
      *
      * @return array
-     * @throws \BetaKiller\Exception
      * @throws \BetaKiller\IFace\Exception\IFaceException
      */
     public function getData(): array
@@ -45,24 +41,8 @@ abstract class AbstractHttpErrorIFace extends AbstractIFace
         $loginIFace = $this->ifaceHelper->createIFaceFromCodename('Auth_Login');
 
         return [
-            'label'     => $this->getLabel(),
             'login_url' => $this->ifaceHelper->makeIFaceUrl($loginIFace),
             'is_guest'  => $this->user->isGuest(),
         ];
     }
-
-    /**
-     * Returns plain label
-     *
-     * @return string
-     * @throws \BetaKiller\Exception
-     */
-    public function getLabel(): string
-    {
-        $exception = $this->getDefaultHttpException();
-
-        return $this->exceptionHandler->getExceptionMessage($exception);
-    }
-
-    abstract protected function getDefaultHttpException(): HttpExceptionInterface;
 }

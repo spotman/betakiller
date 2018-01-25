@@ -30,6 +30,12 @@ class PostItem extends AbstractAppBase
     private $assetsHelper;
 
     /**
+     * @Inject
+     * @var \BetaKiller\Helper\IFaceHelper
+     */
+    private $ifaceHelper;
+
+    /**
      * PostItem constructor.
      *
      * @param \BetaKiller\Helper\AssetsHelper              $assetsHelper

@@ -4,6 +4,12 @@ namespace BetaKiller\IFace\Admin\Error;
 class PhpExceptionTest extends ErrorAdminBase
 {
     /**
+     * @Inject
+     * @var \BetaKiller\Helper\IFaceHelper
+     */
+    private $ifaceHelper;
+
+    /**
      * Returns data for View
      * Override this method in child classes
      *

@@ -1,7 +1,6 @@
 <?php
 namespace BetaKiller\Url;
 
-
 use BetaKiller\Helper\AclHelper;
 use BetaKiller\Helper\LoggerHelperTrait;
 use BetaKiller\IFace\IFaceModelInterface;

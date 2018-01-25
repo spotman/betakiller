@@ -27,7 +27,7 @@ class UserDetector
     private $repository;
 
     /**
-     * @var \BetaKiller\Helper\I18n
+     * @var \BetaKiller\Helper\I18nHelper
      */
     private $i18n;
 
@@ -43,9 +43,9 @@ class UserDetector
      * @param \BetaKiller\Helper\AppEnv             $appEnv
      * @param \Auth                                 $auth
      * @param \BetaKiller\Repository\UserRepository $repo
-     * @param \BetaKiller\Helper\I18n               $i18n
+     * @param \BetaKiller\Helper\I18nHelper         $i18n
      */
-    public function __construct(UserService $service, AppEnv $appEnv, Auth $auth, UserRepository $repo, I18n $i18n)
+    public function __construct(UserService $service, AppEnv $appEnv, Auth $auth, UserRepository $repo, I18nHelper $i18n)
     {
         $this->appEnv     = $appEnv;
         $this->auth       = $auth;

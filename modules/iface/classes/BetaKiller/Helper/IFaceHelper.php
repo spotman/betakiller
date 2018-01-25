@@ -46,14 +46,20 @@ class IFaceHelper
     private $factory;
 
     /**
+     * @var \BetaKiller\Helper\I18nHelper
+     */
+    private $i18n;
+
+    /**
      * IFaceHelper constructor.
      *
-     * @param \BetaKiller\IFace\IFaceModelsStack     $stack
-     * @param \BetaKiller\Helper\UrlContainerHelper  $paramsHelper
-     * @param \BetaKiller\IFace\IFaceModelTree       $tree
      * @param \BetaKiller\IFace\IFaceFactory         $factory
+     * @param \BetaKiller\IFace\IFaceModelTree       $tree
+     * @param \BetaKiller\IFace\IFaceModelsStack     $stack
      * @param \BetaKiller\Helper\UrlHelper           $urlHelper
+     * @param \BetaKiller\Helper\UrlContainerHelper  $paramsHelper
      * @param \BetaKiller\Helper\StringPatternHelper $stringPatternHelper
+     * @param \BetaKiller\Helper\I18nHelper          $i18n
      */
     public function __construct(
         IFaceFactory $factory,
@@ -61,7 +67,8 @@ class IFaceHelper
         IFaceModelsStack $stack,
         UrlHelper $urlHelper,
         UrlContainerHelper $paramsHelper,
-        StringPatternHelper $stringPatternHelper
+        StringPatternHelper $stringPatternHelper,
+        I18nHelper $i18n
     ) {
         $this->stack               = $stack;
         $this->paramsHelper        = $paramsHelper;
@@ -69,6 +76,7 @@ class IFaceHelper
         $this->tree                = $tree;
         $this->stringPatternHelper = $stringPatternHelper;
         $this->factory             = $factory;
+        $this->i18n = $i18n;
     }
 
     public function getCurrentIFaceModel(): ?IFaceModelInterface
@@ -354,11 +362,22 @@ class IFaceHelper
      * @param \BetaKiller\IFace\IFaceModelInterface $model
      *
      * @return string
+     * @throws \BetaKiller\IFace\Exception\IFaceException
      * @throws \BetaKiller\Url\UrlPrototypeException
      */
     public function getLabel(IFaceModelInterface $model): string
     {
-        return $this->stringPatternHelper->processPattern($model->getLabel());
+        $label = $model->getLabel();
+
+        if (!$label) {
+            throw new IFaceException('Missing label for :codename IFace', [':codename' => $model->getCodename()]);
+        }
+
+        if ($this->i18n->isI18nKey($label)) {
+            $label = __($label);
+        }
+
+        return $this->stringPatternHelper->processPattern($label);
     }
 
     /**

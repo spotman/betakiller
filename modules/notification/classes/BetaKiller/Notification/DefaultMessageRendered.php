@@ -1,7 +1,7 @@
 <?php
 namespace BetaKiller\Notification;
 
-use BetaKiller\Helper\I18n;
+use BetaKiller\Helper\I18nHelper;
 use BetaKiller\View\ViewFactoryInterface;
 
 class DefaultMessageRendered implements MessageRendererInterface
@@ -12,7 +12,7 @@ class DefaultMessageRendered implements MessageRendererInterface
     private $viewFactory;
 
     /**
-     * @var \BetaKiller\Helper\I18n
+     * @var \BetaKiller\Helper\I18nHelper
      */
     private $i18n;
 
@@ -25,9 +25,9 @@ class DefaultMessageRendered implements MessageRendererInterface
      * DefaultMessageRendered constructor.
      *
      * @param \BetaKiller\View\ViewFactoryInterface $viewFactory
-     * @param \BetaKiller\Helper\I18n               $i18n
+     * @param \BetaKiller\Helper\I18nHelper         $i18n
      */
-    public function __construct(ViewFactoryInterface $viewFactory, I18n $i18n)
+    public function __construct(ViewFactoryInterface $viewFactory, I18nHelper $i18n)
     {
         $this->viewFactory = $viewFactory;
         $this->i18n = $i18n;

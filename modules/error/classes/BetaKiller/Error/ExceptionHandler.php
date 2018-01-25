@@ -8,7 +8,7 @@ use BetaKiller\Exception\HttpExceptionInterface;
 use BetaKiller\ExceptionInterface;
 use BetaKiller\Helper\AppEnv;
 use BetaKiller\Helper\LoggerHelperTrait;
-use BetaKiller\IFace\AbstractHttpErrorIFace;
+use BetaKiller\IFace\IFaceInterface;
 use BetaKiller\IFace\IFaceProvider;
 use BetaKiller\View\IFaceView;
 use Psr\Log\LoggerInterface;
@@ -168,9 +168,9 @@ class ExceptionHandler implements ExceptionHandlerInterface
     /**
      * @param int $code
      *
-     * @return \BetaKiller\IFace\AbstractHttpErrorIFace|null
+     * @return \BetaKiller\IFace\IFaceInterface|null
      */
-    private function getErrorIFaceForCode(int $code): ?AbstractHttpErrorIFace
+    private function getErrorIFaceForCode(int $code): ?IFaceInterface
     {
         // Try to find IFace provided code first and use default IFace if failed
         foreach ([$code, ExceptionInterface::DEFAULT_EXCEPTION_CODE] as $tryCode) {
@@ -187,9 +187,9 @@ class ExceptionHandler implements ExceptionHandlerInterface
     /**
      * @param int $code
      *
-     * @return \BetaKiller\IFace\AbstractHttpErrorIFace|null
+     * @return \BetaKiller\IFace\IFaceInterface|null
      */
-    private function createErrorIFaceFromCode(int $code): ?AbstractHttpErrorIFace
+    private function createErrorIFaceFromCode(int $code): ?IFaceInterface
     {
         try {
             return $this->createIFaceFromCodename('HttpError'.$code);
@@ -203,10 +203,10 @@ class ExceptionHandler implements ExceptionHandlerInterface
     /**
      * @param string $codename
      *
-     * @return \BetaKiller\IFace\AbstractHttpErrorIFace|mixed
+     * @return \BetaKiller\IFace\IFaceInterface
      * @throws \BetaKiller\IFace\Exception\IFaceException
      */
-    private function createIFaceFromCodename(string $codename): ?AbstractHttpErrorIFace
+    private function createIFaceFromCodename(string $codename): ?IFaceInterface
     {
         return $this->ifaceProvider->fromCodename($codename);
     }

@@ -22,13 +22,6 @@ abstract class AbstractIFace implements IFaceInterface
      */
     private $expiresInterval;
 
-    /**
-     * @Inject
-     * @todo Remove this dependency coz it`s used rarely
-     * @var \BetaKiller\Helper\IFaceHelper
-     */
-    protected $ifaceHelper;
-
     public function __construct()
     {
         // Empty by default, use __construct for defining concrete IFace dependencies
@@ -37,7 +30,7 @@ abstract class AbstractIFace implements IFaceInterface
     /**
      * @return string
      */
-    public function getCodename(): string
+    final public function getCodename(): string
     {
         return $this->getModel()->getCodename();
     }
@@ -47,7 +40,7 @@ abstract class AbstractIFace implements IFaceInterface
      *
      * @return string
      */
-    public function getLabel(): string
+    final public function getLabel(): string
     {
         return $this->getModel()->getLabel();
     }
@@ -59,7 +52,7 @@ abstract class AbstractIFace implements IFaceInterface
      *
      * @return void
      */
-    public function setLabel(string $value): void
+    final public function setLabel(string $value): void
     {
         $this->getModel()->setLabel($value);
     }
@@ -69,7 +62,7 @@ abstract class AbstractIFace implements IFaceInterface
      *
      * @return string
      */
-    public function getTitle(): ?string
+    final public function getTitle(): ?string
     {
         return $this->getModel()->getTitle();
     }
@@ -79,7 +72,7 @@ abstract class AbstractIFace implements IFaceInterface
      *
      * @return string
      */
-    public function getDescription(): ?string
+    final public function getDescription(): ?string
     {
         return $this->getModel()->getDescription();
     }
@@ -91,7 +84,7 @@ abstract class AbstractIFace implements IFaceInterface
      *
      * @return SeoMetaInterface
      */
-    public function setTitle(string $value): SeoMetaInterface
+    final public function setTitle(string $value): SeoMetaInterface
     {
         $this->getModel()->setTitle($value);
 
@@ -105,7 +98,7 @@ abstract class AbstractIFace implements IFaceInterface
      *
      * @return SeoMetaInterface
      */
-    public function setDescription(string $value): SeoMetaInterface
+    final public function setDescription(string $value): SeoMetaInterface
     {
         $this->getModel()->setDescription($value);
 
@@ -117,7 +110,7 @@ abstract class AbstractIFace implements IFaceInterface
      *
      * @return $this
      */
-    public function setLastModified(\DateTimeInterface $lastModified): IFaceInterface
+    final public function setLastModified(\DateTimeInterface $lastModified): IFaceInterface
     {
         $this->lastModified = $lastModified;
 
@@ -127,7 +120,7 @@ abstract class AbstractIFace implements IFaceInterface
     /**
      * @return \DateTimeInterface
      */
-    public function getLastModified(): DateTimeInterface
+    final public function getLastModified(): DateTimeInterface
     {
         return $this->lastModified ?: $this->getDefaultLastModified();
     }
@@ -135,7 +128,7 @@ abstract class AbstractIFace implements IFaceInterface
     /**
      * @return \DateTimeInterface
      */
-    public function getDefaultLastModified(): DateTimeInterface
+    final public function getDefaultLastModified(): DateTimeInterface
     {
         return new \DateTime();
     }
@@ -154,7 +147,7 @@ abstract class AbstractIFace implements IFaceInterface
      *
      * @return $this
      */
-    public function setExpiresInterval(DateInterval $expires): IFaceInterface
+    final public function setExpiresInterval(DateInterval $expires): IFaceInterface
     {
         $this->expiresInterval = $expires;
 
@@ -165,7 +158,7 @@ abstract class AbstractIFace implements IFaceInterface
      * @return \DateInterval
      * @throws \Exception
      */
-    public function getExpiresInterval(): DateInterval
+    final public function getExpiresInterval(): DateInterval
     {
         return $this->expiresInterval ?: $this->getDefaultExpiresInterval();
     }
@@ -174,7 +167,7 @@ abstract class AbstractIFace implements IFaceInterface
      * @return \DateTimeInterface
      * @throws \Exception
      */
-    public function getExpiresDateTime(): DateTimeInterface
+    final public function getExpiresDateTime(): DateTimeInterface
     {
         return (new \DateTime())->add($this->getExpiresInterval());
     }
@@ -183,7 +176,7 @@ abstract class AbstractIFace implements IFaceInterface
      * @return int
      * @throws \Exception
      */
-    public function getExpiresSeconds(): int
+    final public function getExpiresSeconds(): int
     {
         $reference = new \DateTimeImmutable;
         $endTime   = $reference->add($this->getExpiresInterval());
@@ -214,7 +207,7 @@ abstract class AbstractIFace implements IFaceInterface
      *
      * @return IFaceModelInterface
      */
-    public function getModel(): IFaceModelInterface
+    final public function getModel(): IFaceModelInterface
     {
         return $this->model;
     }
@@ -226,7 +219,7 @@ abstract class AbstractIFace implements IFaceInterface
      *
      * @return $this
      */
-    public function setModel(IFaceModelInterface $model): IFaceInterface
+    final public function setModel(IFaceModelInterface $model): IFaceInterface
     {
         $this->model = $model;
 

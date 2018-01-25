@@ -12,6 +12,12 @@ class PostIndex extends AbstractAdminBase
     private $contentHelper;
 
     /**
+     * @Inject
+     * @var \BetaKiller\Helper\IFaceHelper
+     */
+    private $ifaceHelper;
+
+    /**
      * Returns data for View
      * Override this method in child classes
      *

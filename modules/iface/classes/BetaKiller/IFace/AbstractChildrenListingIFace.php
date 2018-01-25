@@ -10,10 +10,17 @@ abstract class AbstractChildrenListingIFace extends AbstractIFace
     private $tree;
 
     /**
+     * @Inject
+     * @var \BetaKiller\Helper\IFaceHelper
+     */
+    private $ifaceHelper;
+
+    /**
      * Returns data for View
      * Override this method in child classes
      *
      * @return array
+     * @throws \BetaKiller\Url\UrlPrototypeException
      * @throws \BetaKiller\IFace\Exception\IFaceException
      */
     public function getData(): array
@@ -22,7 +29,7 @@ abstract class AbstractChildrenListingIFace extends AbstractIFace
 
         foreach ($this->tree->getChildren($this->getModel()) as $model) {
             $data[] = [
-                'label'    => $model->getLabel(),
+                'label'    => $this->ifaceHelper->getLabel($model),
                 'codename' => $model->getCodename(),
                 'url'      => $this->ifaceHelper->makeUrl($model),
             ];

@@ -59,7 +59,7 @@ class BarWidget extends AbstractAdminWidget
     public function getData(): array
     {
         $currentIFaceModel = $this->ifaceHelper->getCurrentIFaceModel();
-        $currentLayout     = $currentIFaceModel ? $currentIFaceModel->getLayoutCodename() : null;
+        $currentLayout     = $currentIFaceModel ? $this->ifaceHelper->detectLayoutCodename($currentIFaceModel) : null;
         $isAdminLayout     = $currentLayout === LayoutInterface::LAYOUT_ADMIN;
         $primaryEntity     = $currentIFaceModel ? $this->ifaceHelper->detectPrimaryEntity($currentIFaceModel) : null;
 

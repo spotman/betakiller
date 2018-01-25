@@ -5,8 +5,9 @@ use BetaKiller\Config\AppConfigInterface;
 use BetaKiller\Exception;
 use BetaKiller\Model\UserInterface;
 
-class I18n
+class I18nHelper
 {
+    private const KEY_REGEX = '/^[a-z0-9_]+(?:[\.]{1}[a-z0-9_]+)+$/m';
     private const COOKIE_NAME = 'lang';
 
     /**
@@ -129,6 +130,16 @@ class I18n
 
         // Set I18n lang
         \I18n::lang($value);
+    }
+
+    /**
+     * @param string $key
+     *
+     * @return bool
+     */
+    public function isI18nKey(string $key): bool
+    {
+        return (bool)preg_match(self::KEY_REGEX, $key);
     }
 
     private function loadCookie(): ?string

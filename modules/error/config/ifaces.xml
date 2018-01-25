@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <root>
     <iface codename="HttpErrorList" uri="errors" label="Error pages" layoutCodename="error" hideInSiteMap="true" zone="admin">
-        <iface codename="HttpError400" uri="400" zone="public" />
-        <iface codename="HttpError401" uri="401" zone="public" />
-        <iface codename="HttpError403" uri="403" zone="public" />
-        <iface codename="HttpError404" uri="404" zone="public" />
-        <iface codename="HttpError500" uri="500" zone="public" />
+        <iface codename="HttpError400" uri="400" label="error.http.400.label" zone="public" />
+        <iface codename="HttpError401" uri="401" label="error.http.401.label" zone="public" layoutCodename="auth" />
+        <iface codename="HttpError403" uri="403" label="error.http.403.label" zone="public" />
+        <iface codename="HttpError404" uri="404" label="error.http.404.label" zone="public" />
+        <iface codename="HttpError500" uri="500" label="error.http.500.label" zone="public" />
     </iface>
 
     <!-- TODO вынести это всё в файл config/ifaces.php, который добавляет элементы в IFaceModelTree::admin() -->

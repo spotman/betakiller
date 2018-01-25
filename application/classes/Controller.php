@@ -1,6 +1,6 @@
 <?php
 
-use BetaKiller\Helper\I18n;
+use BetaKiller\Helper\I18nHelper;
 
 /**
  * Class Controller
@@ -15,7 +15,7 @@ abstract class Controller extends ControllerProxy
 
     /**
      * @Inject
-     * @var I18n
+     * @var I18nHelper
      */
     private $i18n;
 
