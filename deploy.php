@@ -162,8 +162,13 @@ set('betakiller_shared_dirs', [
     '{{app_path}}/logs',
 ]);
 
+set('betakiller_shared_files', [
+    '{{app_path}}/.env',
+]);
+
 task('deploy:betakiller:shared', function () {
     set('shared_dirs', get('betakiller_shared_dirs'));
+    add('shared_files', get('betakiller_shared_files'));
 })->desc('Process BetaKiller shared files and dirs');
 
 after('deploy:betakiller:shared', 'deploy:shared');
