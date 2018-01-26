@@ -35,7 +35,7 @@ class DoctrineCacheProvider extends ChainCache
     {
         $workingName = $multiSite->getWorkingName();
 
-        $this->nsPrefix = implode('.', [$workingName ?: 'core', $appEnv->getModeName()]);
+        $this->nsPrefix = implode('.', [$workingName ?: 'core', $appEnv->getModeName(), $appEnv->getRevisionKey()]);
 
         $settings = $config->load(['cache', 'default']);
 

@@ -1,4 +1,4 @@
 <?php
 namespace BetaKiller\DI;
 
-class Container extends Container\Kohana {}
+class Container extends Container\KohanaBasedContainer {}

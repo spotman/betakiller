@@ -123,7 +123,7 @@ class NotificationHelper
      */
     public function rewriteTargetsForDebug(NotificationMessageInterface $msg, ?bool $inStage = null): self
     {
-        if (!$this->appEnv->inProduction($inStage ?? true)) {
+        if (!$this->appEnv->inProductionMode($inStage ?? true)) {
             $msg->clearTargets();
 
             $this->toDevelopers($msg);

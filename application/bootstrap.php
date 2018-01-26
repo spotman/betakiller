@@ -79,7 +79,7 @@ if (PHP_SAPI === 'cli') {
 
     if (isset($cli_options['stage'])) {
         // Store requested stage in environment var
-        putenv('KOHANA_ENV='.$cli_options['stage']);
+        putenv('APP_ENV='.$cli_options['stage']);
     }
 }
 
@@ -95,7 +95,7 @@ Cookie::$salt = 'hd398gfhk75403lnvrfe8d10gg';
  * saying "Couldn't find constant Kohana::<INVALID_ENV_NAME>"
  */
 
-Kohana::$environmentString = strtolower(getenv('KOHANA_ENV') ?: 'development');
+Kohana::$environmentString = strtolower(getenv('APP_ENV') ?: 'development');
 Kohana::$environment       = constant('Kohana::'.strtoupper(Kohana::$environmentString));
 
 /**

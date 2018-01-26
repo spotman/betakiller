@@ -10,8 +10,8 @@ return [
     'url_path' => '/assets',
 
     'deploy' => [
-        'enabled'        => in_array(Kohana::$environment, [Kohana::STAGING, Kohana::PRODUCTION], true),
-        'doc_root'       => MultiSite::instance()->docRoot(),
+        'enabled'  => in_array(Kohana::$environment, [Kohana::STAGING, Kohana::PRODUCTION], true),
+        'doc_root' => MultiSite::instance()->docRoot(),
     ],
 
     AbstractAssetsProvider::CONFIG_STORAGES_KEY => [
@@ -19,12 +19,5 @@ return [
             AbstractAssetsProvider::CONFIG_STORAGE_BASE_PATH_KEY => $assetsLocalStorageBasePath,
         ],
     ],
-
-//    'models' => array(
-//        'codename'  =>  array(
-//            'url_key'  =>  'some-url-key',
-//            'provider'  =>  'ProviderCodename',
-//        )
-//    )
 
 ];

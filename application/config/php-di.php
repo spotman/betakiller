@@ -7,9 +7,10 @@ use BetaKiller\Acl\AclRulesCollector;
 use BetaKiller\Api\AccessResolver\CustomApiMethodAccessResolverDetector;
 use BetaKiller\Config\AppConfig;
 use BetaKiller\Config\AppConfigInterface;
-use BetaKiller\Config\ConfigProvider;
 use BetaKiller\Config\ConfigProviderInterface;
+use BetaKiller\Config\KohanaConfigProvider;
 use BetaKiller\Exception\ExceptionHandlerInterface;
+use BetaKiller\Helper\AppEnv;
 use BetaKiller\Notification\DefaultMessageRendered;
 use BetaKiller\Notification\MessageRendererInterface;
 use BetaKiller\View\LayoutViewInterface;
@@ -23,7 +24,6 @@ use Doctrine\Common\Cache\ChainCache;
 use Doctrine\Common\Cache\FilesystemCache;
 use Psr\Log\LoggerInterface;
 use Roave\DoctrineSimpleCache\SimpleCacheAdapter;
-use Spotman\Acl\AclInterface;
 use Spotman\Acl\ResourceFactory\AclResourceFactoryInterface;
 use Spotman\Acl\ResourcesCollector\AclResourcesCollectorInterface;
 use Spotman\Acl\RolesCollector\AclRolesCollectorInterface;
@@ -72,6 +72,12 @@ return [
         // Use logger only when really needed
         LoggerInterface::class                     => DI\get(\BetaKiller\Log\Logger::class),
 
+        AppEnv::class => DI\factory(function () {
+            $rootPath = MultiSite::instance()->getWorkingPath();
+
+            return new AppEnv($rootPath);
+        }),
+
         Auth::class => DI\factory(function () {
             return Auth::instance();
         })->scope(\DI\Scope::SINGLETON),
@@ -81,19 +87,11 @@ return [
             return $detector->detect();
         }),
 
-        ConfigProviderInterface::class => DI\object(ConfigProvider::class),
+        ConfigProviderInterface::class => DI\object(KohanaConfigProvider::class),
         AppConfigInterface::class      => DI\object(AppConfig::class),
 
         \BetaKiller\Model\UserInterface::class          => DI\get('User'),
         \BetaKiller\Model\RoleInterface::class          => DI\get(\BetaKiller\Model\Role::class),
-
-        // Backward compatibility fix
-//        \Model_User::class                              => DI\object(\BetaKiller\Model\User::class)->scope(\DI\Scope::PROTOTYPE),
-//        \Model_Role::class                              => DI\object(\BetaKiller\Model\Role::class)->scope(\DI\Scope::PROTOTYPE),
-
-        // Cache for production and staging (dev and testing has ArrayCache); use filesystem cache so it would be cleared after deployment
-        AclInterface::DI_CACHE_OBJECT_KEY               => new FilesystemCache(implode(DIRECTORY_SEPARATOR,
-            [$workingPath, 'cache', 'acl'])),
 
         // Acl roles, resources, permissions and resource factory
         AclRolesCollectorInterface::class               => DI\object(AclRolesCollector::class),

@@ -1,17 +1,25 @@
 <?php
 namespace BetaKiller\DI\Container;
 
+use BetaKiller\Config\KohanaConfigProvider;
 use DI\ContainerBuilder;
 use Doctrine\Common\Cache\Cache;
 use Doctrine\Common\Cache\CacheProvider;
 
-class Kohana extends Base
+class KohanaBasedContainer extends AbstractContainer
 {
+    /**
+     * @return \BetaKiller\DI\ContainerInterface|\DI\Container|mixed
+     * @throws \InvalidArgumentException
+     * @throws \Kohana_Exception
+     */
     protected function containerFactory()
     {
         $builder = new ContainerBuilder();
 
-        $config = \Kohana::config('php-di');
+        $configProvider = new KohanaConfigProvider();
+
+        $config = $configProvider->load(['php-di']);
 
         $definitions = $config->get('definitions');
         $builder->addDefinitions($definitions);
@@ -24,7 +32,9 @@ class Kohana extends Base
 
         if ($cache) {
             if (!($cache instanceof Cache)) {
-                throw new \Kohana_Exception('PHP-DI cache must be instance of :type', [':type' => Cache::class]);
+                throw new \InvalidArgumentException('PHP-DI cache must be instance of :type', [
+                    ':type' => Cache::class,
+                ]);
             }
 
             if ($cache instanceof CacheProvider) {

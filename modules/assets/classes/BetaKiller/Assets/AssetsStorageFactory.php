@@ -43,7 +43,9 @@ class AssetsStorageFactory
      */
     public function create(string $codename): AssetsStorageInterface
     {
-        return $this->factory->create($codename);
+        return $this->factory->create($codename, [
+            'multiLevelPath' => new MultiLevelPath(), // Use default, maybe would be configured in the future
+        ]);
     }
 
     /**

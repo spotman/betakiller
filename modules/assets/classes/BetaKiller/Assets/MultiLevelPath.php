@@ -6,12 +6,24 @@ class MultiLevelPath
     /**
      * @var int
      */
-    private $partsCount = 2;
+    private $partsCount;
 
     /**
      * @var int
      */
-    private $partLength = 2;
+    private $partLength;
+
+    /**
+     * MultiLevelPath constructor.
+     *
+     * @param int|null $partsCount
+     * @param int|null $partLength
+     */
+    public function __construct(?int $partsCount = null, ?int $partLength = null)
+    {
+        $this->partsCount = $partsCount ?? 2;
+        $this->partLength = $partLength ?? 2;
+    }
 
     /**
      * @return int
@@ -22,31 +34,11 @@ class MultiLevelPath
     }
 
     /**
-     * @param int $partsCount
-     * @return \BetaKiller\Assets\MultiLevelPath
-     */
-    public function setPartsCount(int $partsCount): MultiLevelPath
-    {
-        $this->partsCount = $partsCount;
-        return $this;
-    }
-
-    /**
      * @return int
      */
     public function getPartLength(): int
     {
         return $this->partLength;
-    }
-
-    /**
-     * @param int $partLength
-     * @return \BetaKiller\Assets\MultiLevelPath
-     */
-    public function setPartLength(int $partLength): MultiLevelPath
-    {
-        $this->partLength = $partLength;
-        return $this;
     }
 
     /**

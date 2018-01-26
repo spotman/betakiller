@@ -1,18 +1,18 @@
 <?php
 
-return array(
+return [
 
 	/**
 	 * Twig Loader options
 	 */
-	'loader' => array(
+	'loader' => [
 		'extension' => 'twig',  // Extension for Twig files
 		'path'      => 'views', // Path within cascading filesystem for Twig files
 
         /**
          * Enable caching of directories list
          */
-        'cache' =>  Kohana::inProduction(TRUE),
+        'cache' =>  true,
 
         /**
          * Namespaces to add
@@ -22,7 +22,7 @@ return array(
          *          'layouts'   =>  array('base/layouts', 'admin/layouts'),
          *      )
          */
-        'namespaces'    =>  array(
+        'namespaces'    =>  [
             'layouts'   =>  'layouts',
             'wrappers'  =>  'wrappers',
             'ifaces'    =>  'ifaces',
@@ -31,22 +31,22 @@ return array(
             'macros'    =>  'macros',
 
             'statics'   =>  '../static-files',
-        ),
-	),
+        ],
+    ],
 
 	/**
 	 * Twig Environment options
 	 *
 	 * http://twig.sensiolabs.org/doc/api.html#environment-options
 	 */
-	'environment' => array(
-		'auto_reload'         => !Kohana::inProduction(TRUE),
-		'debug'               => !Kohana::inProduction(),
+	'environment' => [
+		'auto_reload'         => false,
+		'debug'               => false,
 		'autoescape'          => 'html',
         'cache'               => MultiSite::instance()->getWorkingPath().DIRECTORY_SEPARATOR.'cache'.DIRECTORY_SEPARATOR.'twig',
 		'optimizations'       => -1,
 		'strict_variables'    => true,
-	),
+    ],
 
 	/**
 	 * Custom functions and filters
@@ -55,10 +55,10 @@ return array(
 	 *          'my_method' => array('MyClass', 'my_method'),
 	 *      ),
 	 */
-	'functions' => array(
-    ),
+	'functions' => [
+    ],
 
-	'filters' => array(),
+	'filters' => [],
 
     /**
      * Twig extensions to register
@@ -68,11 +68,11 @@ return array(
      *          'MyProject_Twig_Extension'
      *      )
      */
-    'extensions'    =>  array(
+    'extensions'    =>  [
         \Twig_Extension_Debug::class,
         \BetaKiller\TwigExtension::class,
         \BetaKiller\TwigCacheExtension::class,
         \Twig_Extensions_Extension_Text::class,
-    ),
+    ],
 
-);
+];

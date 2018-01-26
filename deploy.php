@@ -84,7 +84,8 @@ task('deploy:repository:prepare:betakiller', function () {
     set('repository_path', get('core_path'));
 })->desc('Prepare BetaKiller repository');
 
-function cd_repository_path_cmd() {
+function cd_repository_path_cmd()
+{
     return 'cd {{release_path}}/{{repository_path}}';
 }
 
@@ -115,7 +116,8 @@ task('deploy:vendors:app', function () {
  * @return \Deployer\Type\Result
  * @throws \Deployer\Exception\Exception
  */
-function process_vendors(string $repo) {
+function process_vendors(string $repo)
+{
     $composer = get('bin/composer');
     $envVars  = get('env_vars') ? 'export '.get('env_vars').' &&' : '';
 
@@ -358,6 +360,11 @@ task('cache:warmup', function () {
     runMinionTask('cache:warmup');
 })->desc('Warm up cache by making internal HTTP request to every IFace');
 
+task('deploy:revision', function () {
+    $revision = gitRevision('app').gitRevision('core');
+    runMinionTask('storeAppRevision --revision='.$revision);
+})->desc('Set APP_REVISION env variable from current git revision');
+
 /**
  * Success message
  */
@@ -411,7 +418,8 @@ task('deploy', [
  * @return \Deployer\Type\Result
  * @throws Exception
  */
-function runMinionTask($name) {
+function runMinionTask(string $name)
+{
     $currentPath = getcwd();
     $path        = getRepoPath();
 
@@ -440,19 +448,23 @@ function runMinionTask($name) {
 /**
  * Run git command and echo result to console
  *
- * @param string $gitCmd
- * @param string $path
+ * @param string    $gitCmd
+ * @param string    $path
+ * @param bool|null $silent
  *
  * @return \Deployer\Type\Result
- * @throws Exception
+ * @throws \Deployer\Exception\Exception
  */
-function runGitCommand($gitCmd, $path = null) {
-    if (!$path) {
-        $path = getRepoPath();
-    }
+function runGitCommand($gitCmd, $path = null, ?bool $silent = null)
+{
+    $path   = $path ?: getRepoPath();
+    $silent = $silent ?? false;
 
     $result = run("cd $path && git $gitCmd");
-    write($result);
+
+    if (!$silent) {
+        write($result);
+    }
 
     return $result;
 }
@@ -463,7 +475,8 @@ function runGitCommand($gitCmd, $path = null) {
  * @return \Deployer\Type\Result
  * @throws \Deployer\Exception\Exception
  */
-function gitStatus(?string $path = null) {
+function gitStatus(?string $path = null)
+{
     return runGitCommand('status', $path);
 }
 
@@ -473,7 +486,8 @@ function gitStatus(?string $path = null) {
  * @return \Deployer\Type\Result
  * @throws \Deployer\Exception\Exception
  */
-function gitAdd(?string $basePath = null) {
+function gitAdd(?string $basePath = null)
+{
     $addPath = ask('Path to add files:', '.');
 
     return runGitCommand('add '.$addPath, $basePath);
@@ -485,7 +499,8 @@ function gitAdd(?string $basePath = null) {
  * @return \Deployer\Type\Result
  * @throws \Deployer\Exception\Exception
  */
-function gitCommit(?string $path = null) {
+function gitCommit(?string $path = null)
+{
     $message = ask('Enter commit message:', 'Commit from production');
 
     return runGitCommand('commit -m "'.$message.'"', $path);
@@ -497,7 +512,8 @@ function gitCommit(?string $path = null) {
  * @return string
  * @throws \Deployer\Exception\Exception
  */
-function gitCommitAll(?string $path = null) {
+function gitCommitAll(?string $path = null)
+{
     return gitAdd($path).gitCommit($path);
 }
 
@@ -507,7 +523,8 @@ function gitCommitAll(?string $path = null) {
  * @return \Deployer\Type\Result
  * @throws \Deployer\Exception\Exception
  */
-function gitCheckout(?string $path = null) {
+function gitCheckout(?string $path = null)
+{
     $branch = input()->getOption('branch') ?: DEFAULT_BRANCH;
 
     return runGitCommand('checkout '.$branch, $path);
@@ -519,7 +536,8 @@ function gitCheckout(?string $path = null) {
  * @return \Deployer\Type\Result
  * @throws \Deployer\Exception\Exception
  */
-function gitPush(?string $path = null) {
+function gitPush(?string $path = null)
+{
     return runGitCommand('push', $path);
 }
 
@@ -529,7 +547,8 @@ function gitPush(?string $path = null) {
  * @return \Deployer\Type\Result
  * @throws \Deployer\Exception\Exception
  */
-function gitPull(?string $path = null) {
+function gitPull(?string $path = null)
+{
     return runGitCommand('pull', $path);
 }
 
@@ -537,7 +556,8 @@ function gitPull(?string $path = null) {
  * @return string
  * @throws \Deployer\Exception\Exception
  */
-function gitPullAll() {
+function gitPullAll()
+{
     return gitPull(getRepoPath('core')).gitPull(getRepoPath('app'));
 }
 
@@ -548,8 +568,20 @@ function gitPullAll() {
  * @return \Deployer\Type\Result
  * @throws \Deployer\Exception\Exception
  */
-function gitConfig(string $key, string $value) {
+function gitConfig(string $key, string $value)
+{
     return runGitCommand("config --global $key \"$value\"");
+}
+
+/**
+ * @param string $repo
+ *
+ * @return string
+ * @throws \Deployer\Exception\Exception
+ */
+function gitRevision(string $repo)
+{
+    return trim(runGitCommand('rev-parse --short HEAD', getRepoPath($repo), true));
 }
 
 /**
@@ -557,11 +589,13 @@ function gitConfig(string $key, string $value) {
  *
  * @return string
  */
-function stage() {
+function stage()
+{
     return input()->getArgument('stage') ?: get('default_stage');
 }
 
-function getLatestReleasePath() {
+function getLatestReleasePath()
+{
     /** @var string[] $list */
     $list    = get('releases_list');
     $release = $list[0];
@@ -586,7 +620,8 @@ function getLatestReleasePath() {
  * @return string
  * @throws \Deployer\Exception\Exception
  */
-function getRepoPath(?string $repo = null, ?string $base_path = null) {
+function getRepoPath(?string $repo = null, ?string $base_path = null)
+{
     if (stage() === DEPLOYER_DEV_STAGE) {
         return getcwd();
     }

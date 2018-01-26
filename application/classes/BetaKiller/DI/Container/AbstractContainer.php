@@ -10,7 +10,7 @@ use Invoker\Exception\InvocationException;
 use Invoker\Exception\NotCallableException;
 use Invoker\Exception\NotEnoughParametersException;
 
-abstract class Base implements ContainerInterface
+abstract class AbstractContainer implements ContainerInterface
 {
     /**
      * @var ContainerInterface
@@ -20,7 +20,7 @@ abstract class Base implements ContainerInterface
     /**
      * @var ContainerInterface
      */
-    protected $_container;
+    protected $container;
 
     /**
      * @return ContainerInterface
@@ -45,11 +45,11 @@ abstract class Base implements ContainerInterface
      */
     protected function getContainer()
     {
-        if (!$this->_container) {
-            $this->_container = $this->containerFactory();
+        if (!$this->container) {
+            $this->container = $this->containerFactory();
         }
 
-        return $this->_container;
+        return $this->container;
     }
 
     /**

@@ -2,6 +2,8 @@
 namespace BetaKiller\IFace\Cache;
 
 use BetaKiller\Config\AppConfigInterface;
+use BetaKiller\Exception\NotImplementedException;
+use BetaKiller\Helper\AppEnv;
 use BetaKiller\IFace\IFaceInterface;
 use PageCache\PageCache;
 use Psr\Log\LoggerInterface;
@@ -26,20 +28,22 @@ class IFaceCache
     /**
      * IFaceCache constructor.
      *
-     * @param \BetaKiller\Config\AppConfigInterface $config
-     * @param \PageCache\PageCache $pageCache
+     * @param \BetaKiller\Config\AppConfigInterface          $config
+     * @param \BetaKiller\Helper\AppEnv                      $appEnv
+     * @param \PageCache\PageCache                           $pageCache
      * @param \BetaKiller\IFace\Cache\IFacePageCacheStrategy $strategy
-     * @param \Psr\Log\LoggerInterface $logger
+     * @param \Psr\Log\LoggerInterface                       $logger
      *
      * @throws \PageCache\PageCacheException
      */
     public function __construct(
         AppConfigInterface $config,
+        AppEnv $appEnv,
         PageCache $pageCache,
         IFacePageCacheStrategy $strategy,
         LoggerInterface $logger
     ) {
-        $this->enabled = $config->isPageCacheEnabled();
+        $this->enabled = !$appEnv->isCLI() && $config->isPageCacheEnabled();
 
         $this->pageCache = $pageCache;
         $this->strategy  = $strategy;
@@ -54,13 +58,13 @@ class IFaceCache
     }
 
     /**
-     * @throws \HTTP_Exception_501
+     * @throws \BetaKiller\Exception\NotImplementedException
      */
     public function clearModelCache(): void
     {
         // deal with child ifaces (clear cache for whole branch)
 
-        throw new \HTTP_Exception_501('Not implemented yet');
+        throw new NotImplementedException();
     }
 
     public function clearCache(): void

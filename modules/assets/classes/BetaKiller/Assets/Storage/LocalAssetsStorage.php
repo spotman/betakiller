@@ -7,7 +7,7 @@ use BetaKiller\Assets\MultiLevelPath;
 
 class LocalAssetsStorage extends AbstractAssetsStorage
 {
-    const CODENAME = 'Local';
+    public const CODENAME = 'Local';
 
     /**
      * Allow creating nested files and directories (groups/other security must be done via server umask config)
@@ -97,7 +97,7 @@ class LocalAssetsStorage extends AbstractAssetsStorage
      */
     protected function doPut(string $path, string $content): void
     {
-        $baseDir = dirname($path);
+        $baseDir = \dirname($path);
 
         if (!file_exists($baseDir) && !@mkdir($baseDir, $this->dirMask, true) && !is_dir($baseDir)) {
             throw new AssetsStorageException('Can not create path :dir', [':dir' => $baseDir]);

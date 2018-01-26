@@ -12,8 +12,6 @@ return [
 
     'definitions' => [
 
-        AclInterface::DI_CACHE_OBJECT_KEY => DI\object(ArrayCache::class),
-
     ],
 
 ];

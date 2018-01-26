@@ -203,7 +203,7 @@ class TwigExtension extends Twig_Extension
      */
     public function inProduction(): bool
     {
-        return $this->appEnv->inProduction();
+        return $this->appEnv->inProductionMode();
     }
 
     /**

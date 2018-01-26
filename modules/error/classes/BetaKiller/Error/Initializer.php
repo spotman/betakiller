@@ -73,7 +73,7 @@ class Initializer implements ModuleInitializerInterface
         // Enable debugging via PhpConsole
         if ($this->appEnv->isDebugEnabled() && $this->isPhpConsoleActive()) {
             $this->initPhpConsole();
-        } elseif ($this->appEnv->inProduction(true)) {
+        } elseif ($this->appEnv->inProductionMode(true)) {
             $this->initPhpExceptionStorage();
         }
 

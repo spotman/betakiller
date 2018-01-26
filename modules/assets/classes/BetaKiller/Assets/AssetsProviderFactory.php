@@ -152,7 +152,9 @@ class AssetsProviderFactory
      */
     public function createFromModelCodename(string $modelName)
     {
-        if ($cached = $this->instances[$modelName] ?? null) {
+        $cached = $this->instances[$modelName] ?? null;
+
+        if ($cached) {
             return $cached;
         }
 
@@ -181,10 +183,11 @@ class AssetsProviderFactory
 
         /** @var \BetaKiller\Assets\Provider\AssetsProviderInterface $providerInstance */
         $providerInstance = $this->factory->create($providerName, [
-            'storage'     => $storage,
-            'repository'  => $repository,
-            'aclResource' => $aclResource,
-            'urlStrategy' => $urlStrategy,
+            'storage'        => $storage,
+            'repository'     => $repository,
+            'aclResource'    => $aclResource,
+            'urlStrategy'    => $urlStrategy,
+            'multiLevelPath' => new MultiLevelPath(), // Use default, maybe will be configured in the future
         ]);
 
         // Store codename for future use
