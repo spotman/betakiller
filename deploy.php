@@ -364,12 +364,12 @@ task('cache:warmup', function () {
 })->desc('Warm up cache by making internal HTTP request to every IFace');
 
 task('deploy:dotenv', function () {
-    $targetDotEnv = '{{release_path}}/app';
+    $targetDotEnv = '{{release_path}}/app/.env';
 
     if (has('previous_release') && test('[ -f {{previous_release}}/app/.env ]')) {
         run('cp {{previous_release}}/app/.env '.$targetDotEnv);
     } else {
-        run('cp {{deploy_path}}/.env '.$targetDotEnv);
+        run('cp {{deploy_path}}/.env.default '.$targetDotEnv);
     }
 })->desc('Copy .env file from previous revision if exists');
 
