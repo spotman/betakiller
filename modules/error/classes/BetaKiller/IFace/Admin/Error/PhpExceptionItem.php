@@ -13,6 +13,7 @@ class PhpExceptionItem extends ErrorAdminBase
     private $urlParametersHelper;
 
     /**
+     * @Inject
      * @var \BetaKiller\Helper\IFaceHelper
      */
     private $ifaceHelper;
