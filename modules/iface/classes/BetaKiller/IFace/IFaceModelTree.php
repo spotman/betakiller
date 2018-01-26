@@ -326,12 +326,26 @@ class IFaceModelTree
     /**
      * @param IFaceModelInterface|NULL $parent
      *
-     * @return IFaceModelRecursiveIterator|IFaceModelInterface[]
+     * @return \RecursiveIteratorIterator|IFaceModelInterface[]
      * @throws \BetaKiller\IFace\Exception\IFaceException
      */
-    public function getRecursiveIterator(IFaceModelInterface $parent = null)
+    public function getRecursiveIteratorIterator(IFaceModelInterface $parent = null): \RecursiveIteratorIterator
     {
-        return new IFaceModelRecursiveIterator($parent, $this);
+        return new \RecursiveIteratorIterator(
+            $this->getRecursiveIterator($parent),
+            \RecursiveIteratorIterator::SELF_FIRST
+        );
+    }
+
+    /**
+     * @param \BetaKiller\IFace\IFaceModelInterface|null $parent
+     *
+     * @return \RecursiveIterator
+     * @throws \BetaKiller\IFace\Exception\IFaceException
+     */
+    private function getRecursiveIterator(IFaceModelInterface $parent = null): \RecursiveIterator
+    {
+        return new IFaceModelRecursiveIterator($this, $parent);
     }
 
     /**
@@ -380,9 +394,10 @@ class IFaceModelTree
      */
     protected function getRecursiveFilterIterator(callable $callback, IFaceModelInterface $parent = null)
     {
-        $iterator = $this->getRecursiveIterator($parent);
-
-        $filter = new \RecursiveCallbackFilterIterator($iterator, $callback);
+        $filter = new \RecursiveCallbackFilterIterator(
+            $this->getRecursiveIterator($parent),
+            $callback
+        );
 
         return new \RecursiveIteratorIterator($filter, \RecursiveIteratorIterator::SELF_FIRST);
     }

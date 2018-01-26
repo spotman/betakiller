@@ -130,9 +130,11 @@ class Initializer implements ModuleInitializerInterface
         $data = [];
 
         // Get models in the order when the parent iface is always populated before child
-        foreach ($this->tree->getRecursiveIterator() as $model) {
+        foreach ($this->tree->getRecursiveIteratorIterator() as $model) {
             $data[] = $model;
         }
+
+        $this->logger->debug('Storing :count IFaces in cache', [':count' => \count($data)]);
 
         $this->cache->set($key, serialize($data));
     }

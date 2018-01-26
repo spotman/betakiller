@@ -11,14 +11,15 @@ class IFaceModelRecursiveIterator extends IFaceModelLayerIterator implements \Re
     /**
      * IFaceModelLayerIterator constructor.
      *
-     * @param \BetaKiller\IFace\IFaceModelInterface|NULL $parent
      * @param \BetaKiller\IFace\IFaceModelTree           $tree
+     *
+     * @param \BetaKiller\IFace\IFaceModelInterface|NULL $parent
      *
      * @throws \BetaKiller\IFace\Exception\IFaceException
      */
-    public function __construct(IFaceModelInterface $parent = null, IFaceModelTree $tree)
+    public function __construct(IFaceModelTree $tree, IFaceModelInterface $parent = null)
     {
-        parent::__construct($parent, $tree);
+        parent::__construct($tree, $parent);
 
         $this->tree = $tree;
     }
@@ -47,6 +48,6 @@ class IFaceModelRecursiveIterator extends IFaceModelLayerIterator implements \Re
     {
         $current = $this->current();
 
-        return new self($current, $this->tree);
+        return new self($this->tree, $current);
     }
 }

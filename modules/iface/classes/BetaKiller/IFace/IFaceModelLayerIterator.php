@@ -6,12 +6,13 @@ class IFaceModelLayerIterator extends \ArrayIterator
     /**
      * IFaceModelLayerIterator constructor.
      *
-     * @param \BetaKiller\IFace\IFaceModelInterface|null $parent
      * @param \BetaKiller\IFace\IFaceModelTree           $tree
+     *
+     * @param \BetaKiller\IFace\IFaceModelInterface|null $parent
      *
      * @throws \BetaKiller\IFace\Exception\IFaceException
      */
-    public function __construct(IFaceModelInterface $parent = null, IFaceModelTree $tree)
+    public function __construct(IFaceModelTree $tree, IFaceModelInterface $parent = null)
     {
         $layer = $parent
             ? $tree->getChildren($parent)
