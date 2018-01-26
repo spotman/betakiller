@@ -1,7 +1,6 @@
 <?php
 namespace BetaKiller\Helper;
 
-use BetaKiller\Exception;
 use Dotenv\Dotenv;
 
 /**
