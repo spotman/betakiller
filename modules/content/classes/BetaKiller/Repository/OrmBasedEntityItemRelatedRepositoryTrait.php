@@ -6,18 +6,6 @@ use BetaKiller\Utils\Kohana\ORM\OrmInterface;
 
 trait OrmBasedEntityItemRelatedRepositoryTrait
 {
-//    public function get_entity_items_ids(Entity $entity)
-//    {
-//        /** @var EntityItemRelatedInterface $model */
-//        $model = $this->model_factory();
-//
-//        return $model
-//            ->filterEntityID($entity->getID())
-//            ->group_by_entity_item_id()
-//            ->find_all()
-//            ->as_array(null, 'entity_item_id');
-//    }
-
     /**
      * @param \BetaKiller\Utils\Kohana\ORM\OrmInterface $orm
      * @param int                                       $item_id
@@ -26,16 +14,6 @@ trait OrmBasedEntityItemRelatedRepositoryTrait
     {
         $orm->where($orm->object_column('entity_item_id'), '=', $item_id);
     }
-
-//    /**
-//     * @param array $item_ids
-//     *
-//     * @return EntityItemRelatedInterface|$this
-//     */
-//    public function filter_entity_item_ids(array $item_ids)
-//    {
-//        return $this->where($this->object_column('entity_item_id'), 'IN', $item_ids);
-//    }
 
     /**
      * @param \BetaKiller\Utils\Kohana\ORM\OrmInterface $orm
@@ -59,12 +37,4 @@ trait OrmBasedEntityItemRelatedRepositoryTrait
             $this->filterEntityItemID($orm, $entity_item_id);
         }
     }
-
-//    /**
-//     * @return EntityItemRelatedInterface|$this
-//     */
-//    public function group_by_entity_item_id()
-//    {
-//        return $this->group_by($this->object_column('entity_item_id'));
-//    }
 }
