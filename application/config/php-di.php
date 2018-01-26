@@ -19,7 +19,6 @@ use BetaKiller\View\TwigViewFactory;
 use BetaKiller\View\ViewFactoryInterface;
 use DI\Scope;
 use Doctrine\Common\Cache\ArrayCache;
-use Doctrine\Common\Cache\Cache;
 use Doctrine\Common\Cache\ChainCache;
 use Doctrine\Common\Cache\FilesystemCache;
 use Psr\Log\LoggerInterface;
@@ -50,27 +49,27 @@ return [
 
     'definitions' => [
 
-        ExceptionHandlerInterface::class           => DI\object(\BetaKiller\Error\ExceptionHandler::class),
+        ExceptionHandlerInterface::class            => DI\object(\BetaKiller\Error\ExceptionHandler::class),
 
         // PSR-16 adapter for system-wide Doctrine Cache
-        Psr\SimpleCache\CacheInterface::class      => DI\factory(function (\Psr\Container\ContainerInterface $container
+        Psr\SimpleCache\CacheInterface::class       => DI\factory(function (\Psr\Container\ContainerInterface $container
         ) {
-            return new SimpleCacheAdapter($container->get(Cache::class));
+            return new SimpleCacheAdapter($container->get(\Doctrine\Common\Cache\Cache::class));
         }),
 
         // Bind Doctrine cache interface to abstract cache provider
-        Doctrine\Common\Cache\Cache::class         => DI\get(Doctrine\Common\Cache\CacheProvider::class),
+        \Doctrine\Common\Cache\Cache::class         => DI\get(Doctrine\Common\Cache\CacheProvider::class),
 
         // Common cache instance for all
-        Doctrine\Common\Cache\CacheProvider::class => DI\object(\BetaKiller\Cache\DoctrineCacheProvider::class),
+        \Doctrine\Common\Cache\CacheProvider::class => DI\get(\BetaKiller\Cache\DoctrineCacheProvider::class),
 
         // Inject container into factories
-        \BetaKiller\DI\ContainerInterface::class   => DI\factory(function () {
+        \BetaKiller\DI\ContainerInterface::class    => DI\factory(function () {
             return \BetaKiller\DI\Container::getInstance();
         })->scope(Scope::SINGLETON),
 
         // Use logger only when really needed
-        LoggerInterface::class                     => DI\get(\BetaKiller\Log\Logger::class),
+        LoggerInterface::class                      => DI\get(\BetaKiller\Log\Logger::class),
 
         AppEnv::class => DI\factory(function () {
             $rootPath = MultiSite::instance()->getWorkingPath();
