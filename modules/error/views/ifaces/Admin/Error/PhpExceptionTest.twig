@@ -1,6 +1,9 @@
 {% extends layout %}
 
 {% block page_content %}
+
+  {{ js("ifaces/admin-error/php-exception-test.js") }}
+
   <br />
   <button class="btn orange throw-exception-button" data-code="500">Throw HTTP_Exception_500 exception in API</button>
 
@@ -11,43 +14,5 @@
   <br />
   <br />
   <a href="{{ logger_test_url }}" class="btn orange" target="_blank">Send HTTP_Exception_500 exception to Logger</a>
-
-  <script type="text/javascript">
-
-    require([
-      'jquery',
-      'error.api.rpc.definition'
-    ], function($, api) {
-
-      $(function() {
-        const $throwExceptionButton = $('.throw-exception-button');
-
-        function processApiCall($button, apiMethodPromise) {
-          $button.attr('disabled', 'disabled');
-
-          apiMethodPromise
-            .done(function () {})
-            .fail(function(message) {
-              console.log(message || 'Oops! Something went wrong...')
-            })
-            .always(function() {
-              $button.removeAttr('disabled');
-            });
-        }
-
-        $throwExceptionButton.click(function(e) {
-          e.preventDefault();
-
-          const $this = $(this),
-              code = $this.data('code');
-
-          processApiCall($this, api.phpException.throwHttpException(code));
-        });
-
-      });
-
-    });
-
-  </script>
 
 {% endblock %}

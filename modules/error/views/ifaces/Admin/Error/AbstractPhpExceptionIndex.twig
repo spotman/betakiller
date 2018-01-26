@@ -68,6 +68,8 @@
 
     {% if exceptions|length %}
 
+      {{ js("ifaces/admin-error/abstract-php-exception-index.js") }}
+
         <table class="bordered highlight">
             {#<thead>#}
                 {#<tr>#}
@@ -135,59 +137,6 @@
             </tbody>
 
         </table>
-
-        <script type="text/javascript">
-
-          require([
-            'jquery',
-            'error.api.rpc.definition'
-          ], function($, api) {
-
-            $(function() {
-              var $resolveButtons = $('.resolve-error-button'),
-                  $ignoreButtons = $('.ignore-error-button'),
-                  $deleteButtons = $('.delete-error-button');
-
-              function processActionButtonClick($button, apiMethod) {
-                $button.attr('disabled', 'disabled');
-
-                var $item = $button.closest('.php-exception-item'),
-                    hash = $item.data('hash');
-
-                apiMethod(hash)
-                  .done(function () {
-                    $item.hide(750, function() {
-                      $(this).remove();
-                    })
-                  })
-                  .fail(function(message) {
-                    alert(message || 'Oops! Something went wrong...')
-                  })
-                  .always(function() {
-                    $button.removeAttr('disabled');
-                  });
-              }
-
-              $resolveButtons.click(function(e) {
-                e.preventDefault();
-                processActionButtonClick($(this), api.phpException.resolve);
-              });
-
-              $ignoreButtons.click(function(e) {
-                e.preventDefault();
-                processActionButtonClick($(this), api.phpException.ignore);
-              });
-
-              $deleteButtons.click(function(e) {
-                e.preventDefault();
-                processActionButtonClick($(this), api.phpException.delete);
-              });
-
-            });
-
-          });
-
-        </script>
 
     {% else %}
         <h2 class="card-panel green-text center-align">Ошибок не найдено</h2>
