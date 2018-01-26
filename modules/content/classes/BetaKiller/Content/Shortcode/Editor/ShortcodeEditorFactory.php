@@ -3,7 +3,7 @@ namespace BetaKiller\Content\Shortcode\Editor;
 
 use BetaKiller\Content\Shortcode\ShortcodeEntityInterface;
 use BetaKiller\Content\Shortcode\ShortcodeException;
-use BetaKiller\Factory\NamespaceBasedFactory;
+use BetaKiller\Factory\NamespaceBasedFactoryBuilder;
 
 class ShortcodeEditorFactory
 {
@@ -15,11 +15,12 @@ class ShortcodeEditorFactory
     /**
      * ShortcodeEditorFactory constructor.
      *
-     * @param \BetaKiller\Factory\NamespaceBasedFactory $factory
+     * @param \BetaKiller\Factory\NamespaceBasedFactoryBuilder $factoryBuilder
      */
-    public function __construct(NamespaceBasedFactory $factory)
+    public function __construct(NamespaceBasedFactoryBuilder $factoryBuilder)
     {
-        $this->factory = $factory
+        $this->factory = $factoryBuilder
+            ->createFactory()
             ->setClassNamespaces('Content', 'Shortcode', 'Editor')
             ->setClassSuffix(ShortcodeEditorInterface::CLASS_SUFFIX)
             ->setExpectedInterface(ShortcodeEditorInterface::class);

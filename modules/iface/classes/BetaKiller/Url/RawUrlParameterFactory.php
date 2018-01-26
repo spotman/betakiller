@@ -1,7 +1,7 @@
 <?php
 namespace BetaKiller\Url;
 
-use BetaKiller\Factory\NamespaceBasedFactory;
+use BetaKiller\Factory\NamespaceBasedFactoryBuilder;
 
 /**
  * Class RawUrlParameterFactory
@@ -12,9 +12,15 @@ class RawUrlParameterFactory
 {
     private $factory;
 
-    public function __construct(NamespaceBasedFactory $factory)
+    /**
+     * RawUrlParameterFactory constructor.
+     *
+     * @param \BetaKiller\Factory\NamespaceBasedFactoryBuilder $factoryBuilder
+     */
+    public function __construct(NamespaceBasedFactoryBuilder $factoryBuilder)
     {
-        $this->factory = $factory
+        $this->factory = $factoryBuilder
+            ->createFactory()
             ->setClassNamespaces(RawUrlParameterInterface::CLASS_NS)
             ->setClassSuffix(RawUrlParameterInterface::CLASS_SUFFIX)
             ->setExpectedInterface(RawUrlParameterInterface::class);

@@ -12,10 +12,12 @@ use BetaKiller\IFace\IFaceModelInterface;
 use BetaKiller\IFace\IFaceModelsStack;
 use BetaKiller\IFace\IFaceModelTree;
 use BetaKiller\MessageBus\EventBus;
+use BetaKiller\Model\DispatchableEntityInterface;
 use BetaKiller\Url\Behaviour\UrlBehaviourFactory;
 use HTTP;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
+use Psr\SimpleCache\CacheInterface;
 
 class UrlDispatcher implements LoggerAwareInterface
 {
@@ -41,7 +43,7 @@ class UrlDispatcher implements LoggerAwareInterface
     private $urlParameters;
 
     /**
-     * @var \BetaKiller\Url\UrlDispatcherCacheInterface
+     * @var \Psr\SimpleCache\CacheInterface
      */
     private $cache;
 
@@ -81,7 +83,7 @@ class UrlDispatcher implements LoggerAwareInterface
      * @param \BetaKiller\IFace\IFaceModelTree              $tree
      * @param \BetaKiller\Url\Behaviour\UrlBehaviourFactory $behaviourFactory
      * @param \BetaKiller\Url\UrlContainerInterface         $parameters
-     * @param \BetaKiller\Url\UrlDispatcherCacheInterface   $cache
+     * @param \Psr\SimpleCache\CacheInterface               $cache
      * @param \BetaKiller\MessageBus\EventBus               $eventBus
      * @param \BetaKiller\Helper\UrlHelper                  $urlHelper
      * @param \BetaKiller\Helper\AclHelper                  $aclHelper
@@ -91,7 +93,7 @@ class UrlDispatcher implements LoggerAwareInterface
         IFaceModelTree $tree,
         UrlBehaviourFactory $behaviourFactory,
         UrlContainerInterface $parameters,
-        UrlDispatcherCacheInterface $cache,
+        CacheInterface $cache,
         EventBus $eventBus,
         UrlHelper $urlHelper,
         AclHelper $aclHelper
@@ -123,6 +125,7 @@ class UrlDispatcher implements LoggerAwareInterface
      * @param string $ip
      *
      * @return \BetaKiller\IFace\IFaceModelInterface
+     * @throws \Psr\SimpleCache\InvalidArgumentException
      * @throws \BetaKiller\Auth\AccessDeniedException
      * @throws \BetaKiller\Auth\AuthorizationRequiredException
      * @throws \BetaKiller\Factory\FactoryException
@@ -139,12 +142,14 @@ class UrlDispatcher implements LoggerAwareInterface
 
         $path = parse_url($uri, PHP_URL_PATH);
 
+        $cacheKey = $this->getUrlCacheKey($uri);
+
         // Check cache for stack and url params for current URL
-        if (!$this->restoreDataFromCache($uri)) {
+        if (!$this->restoreDataFromCache($cacheKey)) {
             $this->parseUriPath($path);
 
             // Cache stack + url parameters (between HTTP requests) for current URL
-            $this->storeDataInCache($uri);
+            $this->storeDataInCache($cacheKey);
         }
 
         $referer = $_SERVER['HTTP_REFERER'] ?? null;
@@ -364,7 +369,13 @@ class UrlDispatcher implements LoggerAwareInterface
         }
     }
 
-    private function storeDataInCache(string $url): bool
+    /**
+     * @param string $cacheKey
+     *
+     * @return bool
+     * @throws \Psr\SimpleCache\InvalidArgumentException
+     */
+    private function storeDataInCache(string $cacheKey): bool
     {
         $stackData  = $this->ifaceStack->getCodenames();
         $paramsData = $this->urlParameters->getAllParameters();
@@ -377,25 +388,28 @@ class UrlDispatcher implements LoggerAwareInterface
             }
         }
 
-        $cacheKey = $this->getUrlCacheKey($url);
-
-        $this->cache->set($cacheKey, [
+        $this->cache->set($cacheKey, serialize([
             'stack'      => $stackData,
             'parameters' => $paramsData,
-        ]);
+        ]));
 
         return true;
     }
 
     /**
-     * @param string $url
+     * @param string $cacheKey
      *
      * @return bool
+     * @throws \Psr\SimpleCache\InvalidArgumentException
      */
-    private function restoreDataFromCache(string $url): bool
+    private function restoreDataFromCache(string $cacheKey): bool
     {
-        $cacheKey = $this->getUrlCacheKey($url);
-        $data     = $this->cache->get($cacheKey);
+        $serializedData = $this->cache->get($cacheKey);
+
+        $data = unserialize($serializedData, [
+            IFaceModelInterface::class,
+            DispatchableEntityInterface::class,
+        ]);
 
         if (!$data) {
             return false;
@@ -456,6 +470,6 @@ class UrlDispatcher implements LoggerAwareInterface
 
     private function getUrlCacheKey(string $url): string
     {
-        return 'urlDispatcher.'.$url;
+        return 'urlDispatcher.'.md5($url);
     }
 }

@@ -1,7 +1,7 @@
 <?php
 namespace BetaKiller\Status;
 
-use BetaKiller\Factory\NamespaceBasedFactory;
+use BetaKiller\Factory\NamespaceBasedFactoryBuilder;
 
 class StatusWorkflowFactory
 {
@@ -13,11 +13,12 @@ class StatusWorkflowFactory
     /**
      * StatusWorkflowFactory constructor.
      *
-     * @param \BetaKiller\Factory\NamespaceBasedFactory $factory
+     * @param \BetaKiller\Factory\NamespaceBasedFactoryBuilder $factoryBuilder
      */
-    public function __construct(NamespaceBasedFactory $factory)
+    public function __construct(NamespaceBasedFactoryBuilder $factoryBuilder)
     {
-        $this->factory = $factory
+        $this->factory = $factoryBuilder
+            ->createFactory()
             ->setClassNamespaces(StatusWorkflowInterface::CLASS_NS)
             ->setClassSuffix(StatusWorkflowInterface::CLASS_SUFFIX)
             ->setExpectedInterface(StatusWorkflowInterface::class);

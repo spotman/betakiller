@@ -10,13 +10,8 @@ use BetaKiller\Config\AppConfigInterface;
 use BetaKiller\Config\ConfigProvider;
 use BetaKiller\Config\ConfigProviderInterface;
 use BetaKiller\Exception\ExceptionHandlerInterface;
-use BetaKiller\Factory\CommonFactoryCache;
-use BetaKiller\Factory\FactoryCacheInterface;
-use BetaKiller\Factory\NamespaceBasedFactory;
 use BetaKiller\Notification\DefaultMessageRendered;
 use BetaKiller\Notification\MessageRendererInterface;
-use BetaKiller\Url\UrlDispatcherCache;
-use BetaKiller\Url\UrlDispatcherCacheInterface;
 use BetaKiller\View\LayoutViewInterface;
 use BetaKiller\View\LayoutViewTwig;
 use BetaKiller\View\TwigViewFactory;
@@ -26,7 +21,6 @@ use Doctrine\Common\Cache\ArrayCache;
 use Doctrine\Common\Cache\Cache;
 use Doctrine\Common\Cache\ChainCache;
 use Doctrine\Common\Cache\FilesystemCache;
-use Doctrine\Common\Cache\PhpFileCache;
 use Psr\Log\LoggerInterface;
 use Roave\DoctrineSimpleCache\SimpleCacheAdapter;
 use Spotman\Acl\AclInterface;
@@ -69,25 +63,6 @@ return [
 
         // Common cache instance for all
         Doctrine\Common\Cache\CacheProvider::class => DI\object(\BetaKiller\Cache\DoctrineCacheProvider::class),
-
-        // Always create new instance of this basic factory implementation coz it is configured in each factory
-        NamespaceBasedFactory::class               => DI\object(NamespaceBasedFactory::class)->scope(Scope::PROTOTYPE),
-
-        // Single cache instance for whole project
-        FactoryCacheInterface::class               => DI\factory(function () use ($workingPath) {
-            // TODO Remove and replace with Doctrine Cache interface dependency
-            return new CommonFactoryCache([
-                new PhpFileCache(implode(DIRECTORY_SEPARATOR, [$workingPath, 'cache', 'factory'])),
-            ]);
-        })->scope(Scope::SINGLETON),
-
-        // Cache for url dispatcher
-        UrlDispatcherCacheInterface::class         => DI\factory(function () use ($workingPath) {
-            // TODO Remove and replace with Doctrine Cache interface dependency
-            return new UrlDispatcherCache([
-                new PhpFileCache(implode(DIRECTORY_SEPARATOR, [$workingPath, 'cache', 'dispatcher'])),
-            ]);
-        })->scope(Scope::SINGLETON),
 
         // Inject container into factories
         \BetaKiller\DI\ContainerInterface::class   => DI\factory(function () {

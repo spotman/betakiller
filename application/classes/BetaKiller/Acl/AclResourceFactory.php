@@ -1,8 +1,7 @@
 <?php
 namespace BetaKiller\Acl;
 
-use BetaKiller\Factory\NamespaceBasedFactory;
-use Spotman\Acl\Exception;
+use BetaKiller\Factory\NamespaceBasedFactoryBuilder;
 use Spotman\Acl\ResourceFactory\AclResourceFactoryInterface;
 use Spotman\Acl\ResourceInterface;
 
@@ -16,10 +15,12 @@ class AclResourceFactory implements AclResourceFactoryInterface
     /**
      * AclResourceFactory constructor.
      *
-     * @param \BetaKiller\Factory\NamespaceBasedFactory $factory
+     * @param \BetaKiller\Factory\NamespaceBasedFactoryBuilder $factoryBuilder
      */
-    public function __construct(NamespaceBasedFactory $factory) {
-        $this->factory = $factory
+    public function __construct(NamespaceBasedFactoryBuilder $factoryBuilder)
+    {
+        $this->factory = $factoryBuilder
+            ->createFactory()
             ->cacheInstances()
             ->setClassNamespaces('Acl', 'Resource')
             ->setClassSuffix('Resource')
@@ -32,7 +33,7 @@ class AclResourceFactory implements AclResourceFactoryInterface
      * @return ResourceInterface
      * @throws \BetaKiller\Factory\FactoryException
      */
-    public function createResource(string $identity): \Spotman\Acl\ResourceInterface
+    public function createResource(string $identity): ResourceInterface
     {
         return $this->factory->create(ucfirst($identity));
     }

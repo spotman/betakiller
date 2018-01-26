@@ -3,6 +3,8 @@ namespace BetaKiller\Factory;
 
 use BetaKiller\Config\AppConfigInterface;
 use BetaKiller\DI\ContainerInterface;
+use Psr\SimpleCache\CacheInterface;
+use Psr\SimpleCache\InvalidArgumentException;
 
 final class NamespaceBasedFactory
 {
@@ -52,7 +54,7 @@ final class NamespaceBasedFactory
     private $prepareArgumentsCallback;
 
     /**
-     * @var \BetaKiller\Factory\FactoryCacheInterface
+     * @var \Psr\SimpleCache\CacheInterface
      */
     private $classNamesCache;
 
@@ -63,11 +65,11 @@ final class NamespaceBasedFactory
 
     /**
      *
-     * @param \BetaKiller\Config\AppConfigInterface     $appConfig
-     * @param \BetaKiller\DI\ContainerInterface         $container
-     * @param \BetaKiller\Factory\FactoryCacheInterface $cache
+     * @param \BetaKiller\Config\AppConfigInterface $appConfig
+     * @param \BetaKiller\DI\ContainerInterface     $container
+     * @param \Psr\SimpleCache\CacheInterface       $cache
      */
-    public function __construct(AppConfigInterface $appConfig, ContainerInterface $container, FactoryCacheInterface $cache)
+    public function __construct(AppConfigInterface $appConfig, ContainerInterface $container, CacheInterface $cache)
     {
         $this->appConfig       = $appConfig;
         $this->container       = $container;
@@ -201,6 +203,12 @@ final class NamespaceBasedFactory
      */
     private function detectClassName(string $codename): string
     {
+        $className = $this->getClassNameFromCache($codename);
+
+        if ($className) {
+            return $className;
+        }
+
         $appNamespace = $this->appConfig->getNamespace();
 
         // Explode legacy naming by underscore
@@ -214,12 +222,6 @@ final class NamespaceBasedFactory
         $separator = '\\';
         $baseName  = implode($separator, $codenameArray).$this->classSuffix;
 
-        $className = $this->getClassNameFromCache($baseName);
-
-        if ($className) {
-            return $className;
-        }
-
         $searchNamespaces = array_filter(array_merge([$appNamespace], $this->rootNamespaces, ['BetaKiller']));
 
         $tried = [];
@@ -230,7 +232,8 @@ final class NamespaceBasedFactory
             $className = $ns.$separator.$baseName;
 
             if (class_exists($className)) {
-                $this->storeClassNameInCache($baseName, $className);
+                $this->storeClassNameInCache($codename, $className);
+
                 return $className;
             }
 
@@ -241,7 +244,8 @@ final class NamespaceBasedFactory
         $className = implode('_', $codenameArray);
 
         if (class_exists($className)) {
-            $this->storeClassNameInCache($baseName, $className);
+            $this->storeClassNameInCache($codename, $className);
+
             return $className;
         }
 
@@ -254,22 +258,36 @@ final class NamespaceBasedFactory
     }
 
     /**
-     * @param string $baseName
+     * @param string $codename
      *
      * @return string|null
      */
-    private function getClassNameFromCache(string $baseName): ?string
+    private function getClassNameFromCache(string $codename): ?string
     {
-        if (!$this->classNamesCache->contains($baseName)) {
-            return null;
-        }
+        try {
+            $key = $this->getClassNameCacheKey($codename);
 
-        return $this->classNamesCache->fetch($baseName);
+            return $this->classNamesCache->get($key);
+        } catch (InvalidArgumentException $e) {
+            throw FactoryException::wrap($e);
+        }
     }
 
-    private function storeClassNameInCache(string $baseName, string $className): bool
+    /**
+     * @param string $codename
+     * @param string $className
+     *
+     * @return bool
+     */
+    private function storeClassNameInCache(string $codename, string $className): bool
     {
-        return $this->classNamesCache->save($baseName, $className);
+        try {
+            $key = $this->getClassNameCacheKey($codename);
+
+            return $this->classNamesCache->set($key, $className);
+        } catch (InvalidArgumentException $e) {
+            throw FactoryException::wrap($e);
+        }
     }
 
     /**
@@ -279,7 +297,7 @@ final class NamespaceBasedFactory
      */
     private function getInstanceFromCache(string $codename)
     {
-        $key = $this->makeCacheKeyFromCodename($codename);
+        $key = $this->getInstanceCacheKey($codename);
 
         return ($this->instanceCachingEnabled && isset(self::$instances[$key]))
             ? self::$instances[$key]
@@ -288,7 +306,7 @@ final class NamespaceBasedFactory
 
     private function hasInstanceInCache(string $codename): bool
     {
-        $key = $this->makeCacheKeyFromCodename($codename);
+        $key = $this->getInstanceCacheKey($codename);
 
         return isset(self::$instances[$key]);
     }
@@ -331,13 +349,18 @@ final class NamespaceBasedFactory
             throw new FactoryException('Instance :codename is already cached', [':codename' => $codename]);
         }
 
-        $key = $this->makeCacheKeyFromCodename($codename);
+        $key = $this->getInstanceCacheKey($codename);
 
         self::$instances[$key] = $instance;
     }
 
-    private function makeCacheKeyFromCodename(string $codename): string
+    private function getClassNameCacheKey(string $codename): string
     {
-        return $this->expectedInterface.'::'.$codename;
+        return 'namespaceBasedFactory.classNameCache.'.$this->getInstanceCacheKey($codename);
+    }
+
+    private function getInstanceCacheKey(string $codename): string
+    {
+        return str_replace('\\', '_', $this->expectedInterface).'.'.$codename;
     }
 }

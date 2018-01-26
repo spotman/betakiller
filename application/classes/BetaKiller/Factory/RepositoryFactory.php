@@ -13,11 +13,11 @@ class RepositoryFactory
     /**
      * RepositoryFactory constructor.
      *
-     * @param \BetaKiller\Factory\NamespaceBasedFactory $factory
+     * @param \BetaKiller\Factory\NamespaceBasedFactoryBuilder $factoryBuilder
      */
-    public function __construct(NamespaceBasedFactory $factory)
+    public function __construct(NamespaceBasedFactoryBuilder $factoryBuilder)
     {
-        $this->factory = $factory;
+        $this->factory = $factoryBuilder->createFactory();
 
         $this->injectDefinitions($this->factory);
     }

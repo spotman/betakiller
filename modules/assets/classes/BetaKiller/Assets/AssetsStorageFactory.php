@@ -4,7 +4,7 @@ namespace BetaKiller\Assets;
 use BetaKiller\Assets\Provider\AbstractAssetsProvider;
 use BetaKiller\Assets\Storage\AssetsStorageInterface;
 use BetaKiller\Config\ConfigProviderInterface;
-use BetaKiller\Factory\NamespaceBasedFactory;
+use BetaKiller\Factory\NamespaceBasedFactoryBuilder;
 
 class AssetsStorageFactory
 {
@@ -21,12 +21,13 @@ class AssetsStorageFactory
     /**
      * AssetsStorageFactory constructor.
      *
-     * @param \BetaKiller\Factory\NamespaceBasedFactory  $factory
-     * @param \BetaKiller\Config\ConfigProviderInterface $config
+     * @param \BetaKiller\Factory\NamespaceBasedFactoryBuilder $factoryBuilder
+     * @param \BetaKiller\Config\ConfigProviderInterface       $config
      */
-    public function __construct(NamespaceBasedFactory $factory, ConfigProviderInterface $config)
+    public function __construct(NamespaceBasedFactoryBuilder $factoryBuilder, ConfigProviderInterface $config)
     {
-        $this->factory = $factory
+        $this->factory = $factoryBuilder
+            ->createFactory()
             ->setClassNamespaces('Assets', 'Storage')
             ->setClassSuffix('AssetsStorage')
             ->setExpectedInterface(AssetsStorageInterface::class);

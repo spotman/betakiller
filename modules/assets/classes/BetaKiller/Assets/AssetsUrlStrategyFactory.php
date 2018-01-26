@@ -2,7 +2,7 @@
 namespace BetaKiller\Assets;
 
 use BetaKiller\Assets\UrlStrategy\AssetsUrlStrategyInterface;
-use BetaKiller\Factory\NamespaceBasedFactory;
+use BetaKiller\Factory\NamespaceBasedFactoryBuilder;
 use BetaKiller\Repository\RepositoryInterface;
 
 class AssetsUrlStrategyFactory
@@ -15,21 +15,23 @@ class AssetsUrlStrategyFactory
     /**
      * AssetsUrlStrategyFactory constructor.
      *
-     * @param \BetaKiller\Factory\NamespaceBasedFactory $factory
+     * @param \BetaKiller\Factory\NamespaceBasedFactoryBuilder $factoryBuilder
      */
-    public function __construct(NamespaceBasedFactory $factory)
+    public function __construct(NamespaceBasedFactoryBuilder $factoryBuilder)
     {
-        $this->factory = $factory
+        $this->factory = $factoryBuilder
+            ->createFactory()
             ->setClassNamespaces('Assets', 'UrlStrategy')
             ->setClassSuffix('AssetsUrlStrategy')
             ->setExpectedInterface(AssetsUrlStrategyInterface::class);
     }
 
     /**
-     * @param string                                                    $codename
+     * @param string                                     $codename
      * @param \BetaKiller\Repository\RepositoryInterface $repository
      *
      * @return \BetaKiller\Assets\UrlStrategy\AssetsUrlStrategyInterface
+     * @throws \BetaKiller\Factory\FactoryException
      */
     public function create(string $codename, RepositoryInterface $repository): AssetsUrlStrategyInterface
     {

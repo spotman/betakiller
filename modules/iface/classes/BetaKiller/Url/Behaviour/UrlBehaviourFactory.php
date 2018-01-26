@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\Url\Behaviour;
 
-use BetaKiller\Factory\NamespaceBasedFactory;
+use BetaKiller\Factory\NamespaceBasedFactoryBuilder;
 use BetaKiller\IFace\IFaceModelInterface;
 
 class UrlBehaviourFactory
@@ -20,11 +20,12 @@ class UrlBehaviourFactory
     /**
      * UrlBehaviourFactory constructor.
      *
-     * @param \BetaKiller\Factory\NamespaceBasedFactory $factory
+     * @param \BetaKiller\Factory\NamespaceBasedFactoryBuilder $factoryBuilder
      */
-    public function __construct(NamespaceBasedFactory $factory)
+    public function __construct(NamespaceBasedFactoryBuilder $factoryBuilder)
     {
-        $this->factory = $factory
+        $this->factory = $factoryBuilder
+            ->createFactory()
             ->setExpectedInterface(UrlBehaviourInterface::class)
             ->setClassNamespaces(...UrlBehaviourInterface::CLASS_NS)
             ->setClassSuffix(UrlBehaviourInterface::CLASS_SUFFIX)

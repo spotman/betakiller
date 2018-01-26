@@ -1,7 +1,7 @@
 <?php
 namespace BetaKiller\IFace;
 
-use BetaKiller\Factory\NamespaceBasedFactory;
+use BetaKiller\Factory\NamespaceBasedFactoryBuilder;
 
 class IFaceFactory
 {
@@ -13,11 +13,12 @@ class IFaceFactory
     /**
      * IFaceFactory constructor.
      *
-     * @param \BetaKiller\Factory\NamespaceBasedFactory $factory
+     * @param \BetaKiller\Factory\NamespaceBasedFactoryBuilder $factoryBuilder
      */
-    public function __construct(NamespaceBasedFactory $factory)
+    public function __construct(NamespaceBasedFactoryBuilder $factoryBuilder)
     {
-        $this->factory = $factory
+        $this->factory = $factoryBuilder
+            ->createFactory()
             ->cacheInstances()
             ->setClassNamespaces('IFace')
             ->setExpectedInterface(IFaceInterface::class);

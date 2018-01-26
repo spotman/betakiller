@@ -5,7 +5,7 @@ use BetaKiller\Acl\Resource\AssetsAclResourceInterface;
 use BetaKiller\Assets\Provider\AbstractAssetsProvider;
 use BetaKiller\Assets\Provider\AssetsProviderInterface;
 use BetaKiller\Config\ConfigProviderInterface;
-use BetaKiller\Factory\NamespaceBasedFactory;
+use BetaKiller\Factory\NamespaceBasedFactoryBuilder;
 use BetaKiller\Factory\RepositoryFactory;
 use Spotman\Acl\AclInterface;
 
@@ -59,16 +59,16 @@ class AssetsProviderFactory
     /**
      * AssetsProviderFactory constructor.
      *
-     * @param \BetaKiller\Factory\NamespaceBasedFactory   $factory
-     * @param \BetaKiller\Config\ConfigProviderInterface  $config
-     * @param \BetaKiller\Factory\RepositoryFactory       $repositoryFactory
-     * @param \BetaKiller\Assets\AssetsStorageFactory     $storageFactory
-     * @param \BetaKiller\Assets\AssetsUrlStrategyFactory $urlStrategyFactory
-     * @param \BetaKiller\Assets\AssetsHandlerFactory     $handlerFactory
-     * @param \Spotman\Acl\AclInterface                   $acl
+     * @param \BetaKiller\Factory\NamespaceBasedFactoryBuilder $factoryBuilder
+     * @param \BetaKiller\Config\ConfigProviderInterface       $config
+     * @param \BetaKiller\Factory\RepositoryFactory            $repositoryFactory
+     * @param \BetaKiller\Assets\AssetsStorageFactory          $storageFactory
+     * @param \BetaKiller\Assets\AssetsUrlStrategyFactory      $urlStrategyFactory
+     * @param \BetaKiller\Assets\AssetsHandlerFactory          $handlerFactory
+     * @param \Spotman\Acl\AclInterface                        $acl
      */
     public function __construct(
-        NamespaceBasedFactory $factory,
+        NamespaceBasedFactoryBuilder $factoryBuilder,
         ConfigProviderInterface $config,
         RepositoryFactory $repositoryFactory,
         AssetsStorageFactory $storageFactory,
@@ -76,7 +76,8 @@ class AssetsProviderFactory
         AssetsHandlerFactory $handlerFactory,
         AclInterface $acl
     ) {
-        $this->factory = $factory
+        $this->factory = $factoryBuilder
+            ->createFactory()
             ->setClassNamespaces('Assets', 'Provider')
             ->setClassSuffix('AssetsProvider')
             ->setExpectedInterface(AssetsProviderInterface::class);

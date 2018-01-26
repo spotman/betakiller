@@ -1,7 +1,7 @@
 <?php
 namespace BetaKiller\Content\Shortcode;
 
-use BetaKiller\Factory\NamespaceBasedFactory;
+use BetaKiller\Factory\NamespaceBasedFactoryBuilder;
 
 class ShortcodeFactory
 {
@@ -19,11 +19,12 @@ class ShortcodeFactory
     /**
      * ShortcodeFactory constructor.
      *
-     * @param \BetaKiller\Factory\NamespaceBasedFactory $factory
+     * @param \BetaKiller\Factory\NamespaceBasedFactoryBuilder $factoryBuilder
      */
-    public function __construct(NamespaceBasedFactory $factory)
+    public function __construct(NamespaceBasedFactoryBuilder $factoryBuilder)
     {
-        $this->factory = $factory
+        $this->factory = $factoryBuilder
+            ->createFactory()
             ->setClassNamespaces('Content', ShortcodeInterface::CLASS_NS)
             ->setClassSuffix(ShortcodeInterface::CLASS_SUFFIX)
             ->setExpectedInterface(ShortcodeInterface::class);
