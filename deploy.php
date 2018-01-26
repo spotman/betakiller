@@ -162,9 +162,7 @@ set('betakiller_shared_dirs', [
     '{{app_path}}/logs',
 ]);
 
-set('betakiller_shared_files', [
-    '{{app_path}}/.env',
-]);
+set('betakiller_shared_files', []);
 
 task('deploy:betakiller:shared', function () {
     set('shared_dirs', get('betakiller_shared_dirs'));
@@ -365,7 +363,17 @@ task('cache:warmup', function () {
     runMinionTask('cache:warmup');
 })->desc('Warm up cache by making internal HTTP request to every IFace');
 
-task('deploy:revision', function () {
+task('deploy:dotenv', function () {
+    $targetDotEnv = '{{release_path}}/app';
+
+    if (has('previous_release') && test('[ -f {{previous_release}}/app/.env ]')) {
+        run('cp {{previous_release}}/app/.env '.$targetDotEnv);
+    } else {
+        run('cp {{deploy_path}}/.env '.$targetDotEnv);
+    }
+})->desc('Copy .env file from previous revision if exists');
+
+task('deploy:dotenv:revision', function () {
     $revision = gitRevision('app').gitRevision('core');
     runMinionTask('storeAppRevision --revision='.$revision);
 })->desc('Set APP_REVISION env variable from current git revision');
@@ -401,6 +409,12 @@ task('deploy', [
     // BetaKiller shared and writable dirs
     'deploy:betakiller:shared',
     'deploy:betakiller:writable',
+
+    // Copy .env file from previous revision to the new one
+    'deploy:dotenv',
+
+    // Store APP_REVISION hash (leads to cache reset)
+    'deploy:dotenv:revision',
 
     'migrations:up',
     'cache:warmup',
