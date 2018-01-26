@@ -101,10 +101,15 @@ class Initializer implements ModuleInitializerInterface
                 throw new IFaceException('Cached IFaceModelTree data is invalid');
             }
 
+            $counter = 0;
+
             // Simply add all models, validation already done upon inserting data into cache
             foreach ($data as $model) {
                 $this->tree->add($model, true); // No duplication is allowed here
+                $counter++;
             }
+
+            $this->logger->debug('Added :count IFaces to tree from cache', [':count' => $counter]);
         } catch (\Throwable $e) {
             $this->cache->delete($key);
             $this->logException($this->logger, $e);

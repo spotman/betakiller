@@ -100,6 +100,9 @@ class IFaceModelTree
             throw new IFaceException('Label is missing for IFace :codename', [':codename' => $codename]);
         }
 
+        if (!$model->getZoneName()) {
+            throw new IFaceException('IFace zone is missing for IFace :codename', [':codename' => $codename]);
+        }
     }
 
     /**
