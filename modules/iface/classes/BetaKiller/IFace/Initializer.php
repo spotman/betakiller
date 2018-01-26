@@ -4,13 +4,18 @@ declare(strict_types=1);
 namespace BetaKiller\IFace;
 
 
-use BetaKiller\IFace\IFaceModelTree;
+use BetaKiller\Helper\LoggerHelperTrait;
+use BetaKiller\IFace\Exception\IFaceException;
 use BetaKiller\IFace\ModelProvider\IFaceModelProviderDatabase;
 use BetaKiller\IFace\ModelProvider\IFaceModelProviderXmlConfig;
 use BetaKiller\ModuleInitializerInterface;
+use Psr\Log\LoggerInterface;
+use Psr\SimpleCache\CacheInterface;
 
 class Initializer implements ModuleInitializerInterface
 {
+    use LoggerHelperTrait;
+
     /**
      * @var \BetaKiller\IFace\ModelProvider\IFaceModelProviderDatabase
      */
@@ -27,27 +32,108 @@ class Initializer implements ModuleInitializerInterface
     private $tree;
 
     /**
+     * @var \Psr\SimpleCache\CacheInterface
+     */
+    private $cache;
+
+    /**
+     * @var \Psr\Log\LoggerInterface
+     */
+    private $logger;
+
+    /**
      * Initializer constructor.
      *
-     * @param \BetaKiller\IFace\ModelProvider\IFaceModelProviderDatabase $databaseProvider
+     * @param \BetaKiller\IFace\ModelProvider\IFaceModelProviderDatabase  $databaseProvider
      * @param \BetaKiller\IFace\ModelProvider\IFaceModelProviderXmlConfig $xmlProvider
-     * @param \BetaKiller\IFace\IFaceModelTree $tree
+     * @param \BetaKiller\IFace\IFaceModelTree                            $tree
+     * @param \Psr\SimpleCache\CacheInterface                             $cache
+     * @param \Psr\Log\LoggerInterface                                    $logger
      */
     public function __construct(
         IFaceModelProviderDatabase $databaseProvider,
         IFaceModelProviderXmlConfig $xmlProvider,
-        IFaceModelTree $tree
+        IFaceModelTree $tree,
+        CacheInterface $cache,
+        LoggerInterface $logger
     ) {
         $this->databaseProvider = $databaseProvider;
         $this->xmlProvider      = $xmlProvider;
         $this->tree             = $tree;
+        $this->cache            = $cache;
+        $this->logger = $logger;
     }
 
+    /**
+     * @throws \Psr\SimpleCache\InvalidArgumentException
+     * @throws \BetaKiller\IFace\Exception\IFaceException
+     */
+    public function init(): void
+    {
+        $key = 'ifaceModelTree';
+
+        if (!$this->loadTreeFromCache($key)) {
+            $this->loadTreeFromProviders();
+            $this->storeTreeInCache($key);
+        }
+    }
+
+    /**
+     * @param string $key
+     *
+     * @return bool
+     * @throws \Psr\SimpleCache\InvalidArgumentException
+     */
+    private function loadTreeFromCache(string $key): bool
+    {
+        $serializedModels = $this->cache->get($key);
+
+        if (!$serializedModels) {
+            return false;
+        }
+
+        try {
+            $data = unserialize($serializedModels, [IFaceModelInterface::class]);
+
+            if (!\is_array($data)) {
+                throw new IFaceException('Cached IFaceModelTree data is invalid');
+            }
+
+            // Simply add all models, validation already done upon inserting data into cache
+            foreach ($data as $model) {
+                $this->tree->add($model);
+            }
+        } catch (\Throwable $e) {
+            $this->cache->delete($key);
+            $this->logException($this->logger, $e);
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * @param string $key
+     *
+     * @throws \Psr\SimpleCache\InvalidArgumentException
+     * @throws \BetaKiller\IFace\Exception\IFaceException
+     */
+    private function storeTreeInCache(string $key): void
+    {
+        $data = [];
+
+        // Get models in the order when the parent iface is always populated before child
+        foreach ($this->tree->getRecursiveIterator() as $model) {
+            $data[] = $model;
+        }
+
+        $this->cache->set($key, serialize($data));
+    }
 
     /**
      * @throws \BetaKiller\IFace\Exception\IFaceException
      */
-    public function init(): void
+    private function loadTreeFromProviders(): void
     {
         /** @var \BetaKiller\IFace\ModelProvider\IFaceModelProviderInterface[] $sources */
         $sources = [
@@ -62,7 +148,5 @@ class Initializer implements ModuleInitializerInterface
         }
 
         $this->tree->validate();
-
-        // TODO Cache tree and get it from cache if exists
     }
 }
