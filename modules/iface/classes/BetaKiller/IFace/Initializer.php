@@ -61,7 +61,7 @@ class Initializer implements ModuleInitializerInterface
         $this->xmlProvider      = $xmlProvider;
         $this->tree             = $tree;
         $this->cache            = $cache;
-        $this->logger = $logger;
+        $this->logger           = $logger;
     }
 
     /**
@@ -92,16 +92,18 @@ class Initializer implements ModuleInitializerInterface
             return false;
         }
 
+        $this->logger->debug('Loading IFace tree from cache');
+
         try {
             $data = unserialize($serializedModels, [IFaceModelInterface::class]);
 
-            if (!\is_array($data)) {
+            if (!$data || !\is_array($data)) {
                 throw new IFaceException('Cached IFaceModelTree data is invalid');
             }
 
             // Simply add all models, validation already done upon inserting data into cache
             foreach ($data as $model) {
-                $this->tree->add($model);
+                $this->tree->add($model, true); // No duplication is allowed here
             }
         } catch (\Throwable $e) {
             $this->cache->delete($key);
@@ -135,6 +137,8 @@ class Initializer implements ModuleInitializerInterface
      */
     private function loadTreeFromProviders(): void
     {
+        $this->logger->debug('Loading IFace tree from providers');
+
         /** @var \BetaKiller\IFace\ModelProvider\IFaceModelProviderInterface[] $sources */
         $sources = [
             $this->xmlProvider,
