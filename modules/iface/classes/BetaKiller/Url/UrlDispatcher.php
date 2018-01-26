@@ -275,7 +275,6 @@ class UrlDispatcher implements LoggerAwareInterface
      * @param \BetaKiller\IFace\IFaceModelInterface[] $models
      *
      * @return \BetaKiller\IFace\IFaceModelInterface[]
-     * @throws IFaceException
      */
     private function sortModelsLayer(array $models): array
     {
@@ -290,11 +289,6 @@ class UrlDispatcher implements LoggerAwareInterface
             }
         }
 
-        // TODO Move this into TreeModel internal validation
-        if (\count($dynamic) > 1) {
-            throw new IFaceException('Layer must have only one IFace with dynamic dispatching');
-        }
-
         // Fixed URLs first, dynamic URLs last
         return array_merge($fixed, $dynamic);
     }
@@ -305,7 +299,6 @@ class UrlDispatcher implements LoggerAwareInterface
      *
      * @return \BetaKiller\IFace\IFaceModelInterface|null
      * @throws \BetaKiller\Factory\FactoryException
-     * @throws \BetaKiller\IFace\Exception\IFaceException
      * @throws \BetaKiller\Url\UrlBehaviourException
      */
     private function selectIFaceModel(array $models, UrlPathIterator $it): ?IFaceModelInterface

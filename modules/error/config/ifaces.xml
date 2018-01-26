@@ -16,8 +16,8 @@
                 <iface uri="500" codename="Admin_Error_PhpExceptionTestHTTP500" label="HTTP 500 test" />
                 <iface uri="logger" codename="Admin_Error_PhpExceptionTestLogger" label="Logger test" />
             </iface>
-            <iface uri="{PhpException.hash}" codename="Admin_Error_PhpExceptionItem" title="{PhpException.message}" hasDynamicUrl="true" entity="PhpException" entityAction="read">
-                <iface uri="stacktrace" codename="Admin_Error_PhpExceptionStackTrace" title="Stacktrace" layoutCodename="raw" />
+            <iface uri="{PhpException.hash}" codename="Admin_Error_PhpExceptionItem" label="{PhpException.message}" hasDynamicUrl="true" entity="PhpException" entityAction="read">
+                <iface uri="stacktrace" codename="Admin_Error_PhpExceptionStackTrace" label="Stacktrace" layoutCodename="raw" />
             </iface>
         </iface>
     </iface>

@@ -43,6 +43,66 @@ class IFaceModelTree
     }
 
     /**
+     * @throws \BetaKiller\IFace\Exception\IFaceException
+     */
+    public function validate(): void
+    {
+        $this->validateBranch();
+    }
+
+    /**
+     * @param \BetaKiller\IFace\IFaceModelInterface|null $parent
+     *
+     * @throws \BetaKiller\IFace\Exception\IFaceException
+     */
+    private function validateBranch(IFaceModelInterface $parent = null): void
+    {
+        $children = $this->getChilds($parent);
+
+        $this->validateLayer($children);
+
+        foreach ($children as $child) {
+            $this->validateModel($child);
+            $this->validateBranch($child);
+        }
+    }
+
+    /**
+     * @param \BetaKiller\IFace\IFaceModelInterface[] $models
+     *
+     * @throws \BetaKiller\IFace\Exception\IFaceException
+     */
+    private function validateLayer(array $models): void
+    {
+        $dynamicCounter = 0;
+
+        foreach ($models as $model) {
+            if ($model->hasDynamicUrl() || $model->hasTreeBehaviour()) {
+                $dynamicCounter++;
+            }
+        }
+
+        if ($dynamicCounter > 1) {
+            throw new IFaceException('Layer must have only one IFace with dynamic dispatching');
+        }
+    }
+
+    /**
+     * @param \BetaKiller\IFace\IFaceModelInterface $model
+     *
+     * @throws \BetaKiller\IFace\Exception\IFaceException
+     */
+    private function validateModel(IFaceModelInterface $model): void
+    {
+        $codename = $model->getCodename();
+
+        if (!$model->getLabel()) {
+            throw new IFaceException('Label is missing for IFace :codename', [':codename' => $codename]);
+        }
+
+    }
+
+    /**
      * Returns default iface model
      *
      * @return \BetaKiller\IFace\IFaceModelInterface

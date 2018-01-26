@@ -14,5 +14,5 @@ Route::set('default-iface-controller', '(<uri>)', array('uri' => '.+'))
         'action'        => 'render',
     ));
 
-$initializer = \BetaKiller\DI\Container::getInstance()->get(\BetaKiller\IFace\ModuleInitializer::class);
+$initializer = \BetaKiller\DI\Container::getInstance()->get(\BetaKiller\IFace\Initializer::class);
 $initializer->init();
