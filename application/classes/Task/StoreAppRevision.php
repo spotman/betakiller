@@ -4,6 +4,18 @@ use BetaKiller\Task\TaskException;
 
 class Task_StoreAppRevision extends \BetaKiller\Task\AbstractTask
 {
+    /**
+     * @Inject
+     * @var \BetaKiller\Helper\AppEnv
+     */
+    private $appEnv;
+
+    /**
+     * @Inject
+     * @var \Spotman\DotEnv\DotEnv
+     */
+    private $dotEnv;
+
     protected function defineOptions(): array
     {
         return [
@@ -24,10 +36,12 @@ class Task_StoreAppRevision extends \BetaKiller\Task\AbstractTask
             throw new TaskException('Missing revision number');
         }
 
-        // TODO Save it in the .env app file
+        $dotEnvFile = $this->appEnv->getAppRoot().DIRECTORY_SEPARATOR.'.env';
 
-        // TODO Create \BetaKiller\Env\DotEnv wrapper for phpdotenv package + setter for keys
+        $this->dotEnv->update($dotEnvFile, [
+            'APP_REVISION' => $revision,
+        ]);
 
-        $this->logger->info('Revision set to :value', [':value' => $revision]);
+        $this->logger->debug('Revision set to :value', [':value' => $revision]);
     }
 }
