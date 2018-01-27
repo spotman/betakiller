@@ -129,4 +129,9 @@ class AppEnv
     {
         return PHP_SAPI === 'cli';
     }
+
+    public function getAppRoot(): string
+    {
+        return $this->appRoot;
+    }
 }
