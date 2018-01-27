@@ -176,10 +176,7 @@ final class NamespaceBasedFactory
             try {
                 $instance = $this->createInstance($className, $arguments);
             } catch (\Throwable $e) {
-                throw new FactoryException('Can not instantiate :class class, error is: :msg', [
-                    ':class' => $className,
-                    ':msg'   => $e->getMessage(),
-                ], $e->getCode(), $e);
+                throw FactoryException::wrap($e);
             }
 
             if ($this->expectedInterface && !($instance instanceof $this->expectedInterface)) {
