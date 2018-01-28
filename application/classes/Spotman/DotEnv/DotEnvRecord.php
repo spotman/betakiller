@@ -23,7 +23,7 @@ class DotEnvRecord
      */
     private $comment;
 
-    public function __construct(string $name, string $value, ?string $comment = null)
+    public function __construct(?string $name, ?string $value, ?string $comment = null)
     {
         $this->name    = $name;
         $this->value   = $value;

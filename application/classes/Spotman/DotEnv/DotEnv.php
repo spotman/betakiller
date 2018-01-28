@@ -6,6 +6,8 @@ namespace Spotman\DotEnv;
 
 class DotEnv
 {
+    private $records = [];
+
     /**
      * @param string $envFile
      * @param array  $data
@@ -25,16 +27,34 @@ class DotEnv
                 continue;
             }
 
-            if (!array_key_exists(trim($matches[1]), $data)) {
+            $name = trim($matches[1]);
+
+            if (!array_key_exists($name, $data)) {
                 $newLines[] = $line;
                 continue;
             }
 
-            $line = trim($matches[1]) . "={$data[trim($matches[1])]}\n";
+            $value = $data[$name];
+
+            $line = "$name=$value\n";
             $newLines[] = $line;
         }
 
         $newContent = implode('', $newLines);
         file_put_contents($envFile, $newContent);
+    }
+
+    /**
+     * @param string $envFile
+     *
+     * @throws \Spotman\DotEnv\DotEnvException
+     */
+    public function load(string $envFile): void
+    {
+        $parser = new DotEnvParser();
+
+        $content = file_get_contents($envFile);
+
+        $this->records = $parser->parse($content);
     }
 }
