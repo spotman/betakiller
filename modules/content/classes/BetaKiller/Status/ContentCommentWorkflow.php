@@ -117,8 +117,13 @@ class ContentCommentWorkflow extends StatusWorkflow
 
         $message = $this->notificationHelper
             ->createMessage('user/comment/author-approve')
-            ->setTemplateData($data)
-            ->addTargetEmail($email, $name);
+            ->setTemplateData($data);
+
+        if ($authorUser) {
+            $message->addTarget($authorUser);
+        } else {
+            $this->notificationHelper->toEmail($message, $email, $name);
+        }
 
         $this->notificationHelper
             ->rewriteTargetsForDebug($message)
@@ -148,8 +153,6 @@ class ContentCommentWorkflow extends StatusWorkflow
             return;
         }
 
-        $parentName = $parent->getAuthorName();
-
         $data = [
             'url'        => $reply->getPublicReadUrl($this->ifaceHelper),
             'created_at' => $reply->getCreatedAt()->format('H:i:s d.m.Y'),
@@ -158,8 +161,15 @@ class ContentCommentWorkflow extends StatusWorkflow
 
         $message = $this->notificationHelper
             ->createMessage('user/comment/parent-author-reply')
-            ->setTemplateData($data)
-            ->addTargetEmail($parentEmail, $parentName);
+            ->setTemplateData($data);
+
+        $parentAuthor = $parent->getAuthorUser();
+
+        if ($parentAuthor) {
+            $message->addTarget($parentAuthor);
+        } else {
+            $this->notificationHelper->toEmail($message, $parentEmail, $parent->getAuthorName());
+        }
 
         $this->notificationHelper
             ->rewriteTargetsForDebug($message)

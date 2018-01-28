@@ -6,27 +6,28 @@ class NotificationUserEmail implements NotificationUserInterface
     /**
      * @var string
      */
-    protected $_email;
+    private $email;
 
     /**
      * @var string
      */
-    protected $_fullName;
+    private $fullName;
 
     /**
      * @var bool
      */
-    protected $_emailNotificationAllowed = true;
+    private $emailNotificationAllowed = true;
 
-    public static function factory(string $email, string $fullName): NotificationUserEmail
-    {
-        return new static($email, $fullName);
-    }
+    /**
+     * @var string|null
+     */
+    private $langName;
 
-    public function __construct(string $email, string $fullName)
+    public function __construct(string $email, string $fullName, ?string $langName = null)
     {
-        $this->_email = $email;
-        $this->_fullName = $fullName;
+        $this->email    = $email;
+        $this->fullName = $fullName;
+        $this->langName = $langName;
     }
 
     /**
@@ -34,36 +35,41 @@ class NotificationUserEmail implements NotificationUserInterface
      */
     public function getFullName(): string
     {
-        return $this->_fullName;
-    }
-
-    public function is_online()
-    {
-        return FALSE;
+        return $this->fullName;
     }
 
     public function getEmail(): string
     {
-        return $this->_email;
+        return $this->email;
+    }
+
+    /**
+     * Return preferred language (used in templates)
+     *
+     * @return null|string
+     */
+    public function getLanguageName(): ?string
+    {
+        return $this->langName;
     }
 
     public function isEmailNotificationAllowed(): bool
     {
-        return TRUE;
+        return true;
     }
 
     public function isOnlineNotificationAllowed(): bool
     {
-        return FALSE;
+        return false;
     }
 
     public function enableEmailNotification(): void
     {
-        $this->_emailNotificationAllowed = true;
+        $this->emailNotificationAllowed = true;
     }
 
     public function disableEmailNotification(): void
     {
-        $this->_emailNotificationAllowed = false;
+        $this->emailNotificationAllowed = false;
     }
 }

@@ -4,6 +4,7 @@ namespace BetaKiller\Helper;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Notification\NotificationFacade;
 use BetaKiller\Notification\NotificationMessageInterface;
+use BetaKiller\Notification\NotificationUserEmail;
 use BetaKiller\Service\UserService;
 
 class NotificationHelper
@@ -110,6 +111,25 @@ class NotificationHelper
         $this->user->forceAuthorization();
 
         $message->addTarget($this->user);
+
+        return $this;
+    }
+
+    /**
+     * @param \BetaKiller\Notification\NotificationMessageInterface $message
+     * @param string                                                $email
+     * @param string                                                $fullName
+     * @param null|string                                           $langName
+     *
+     * @return \BetaKiller\Helper\NotificationHelper
+     */
+    public function toEmail(
+        NotificationMessageInterface $message,
+        string $email,
+        string $fullName,
+        ?string $langName = null
+    ): self {
+        $message->addTarget(new NotificationUserEmail($email, $fullName, $langName));
 
         return $this;
     }

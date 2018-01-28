@@ -77,19 +77,6 @@ class NotificationMessage implements NotificationMessageInterface
     }
 
     /**
-     * @param string      $email
-     * @param string|null $fullName
-     *
-     * @return \BetaKiller\Notification\NotificationMessageInterface
-     */
-    public function addTargetEmail(string $email, string $fullName): NotificationMessageInterface
-    {
-        $target = new NotificationUserEmail($email, $fullName);
-
-        return $this->addTarget($target);
-    }
-
-    /**
      * @return NotificationUserInterface[]
      */
     public function getTargets(): array

@@ -38,14 +38,6 @@ interface NotificationMessageInterface
     public function addTarget(NotificationUserInterface $value): NotificationMessageInterface;
 
     /**
-     * @param string $email
-     * @param string $fullName
-     *
-     * @return \BetaKiller\Notification\NotificationMessageInterface
-     */
-    public function addTargetEmail(string $email, string $fullName): NotificationMessageInterface;
-
-    /**
      * @param NotificationUserInterface[]|\Iterator $users
      *
      * @return NotificationMessageInterface
