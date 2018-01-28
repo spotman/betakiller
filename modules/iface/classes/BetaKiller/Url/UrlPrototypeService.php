@@ -6,7 +6,6 @@ use BetaKiller\IFace\Exception\IFaceException;
 use BetaKiller\IFace\IFaceModelInterface;
 use BetaKiller\Model\DispatchableEntityInterface;
 use BetaKiller\Model\SingleParentTreeModelInterface;
-use BetaKiller\Repository\SingleParentTreeRepositoryInterface;
 
 class UrlPrototypeService
 {
@@ -194,8 +193,8 @@ class UrlPrototypeService
      */
     public function getCompiledTreePrototypeValue(string $proto, ?UrlContainerInterface $params = null): string
     {
-        $prototype  = $this->createPrototypeFromString($proto);
-        $parameter  = $this->getParamByPrototype($prototype, $params);
+        $prototype = $this->createPrototypeFromString($proto);
+        $parameter = $this->getParamByPrototype($prototype, $params);
 
         if (!($parameter instanceof SingleParentTreeModelInterface)) {
             throw new UrlPrototypeException('Model :name must be instance of :must for tree traversing', [

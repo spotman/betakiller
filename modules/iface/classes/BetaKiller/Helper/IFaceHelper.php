@@ -118,9 +118,20 @@ class IFaceHelper
      */
     public function createIFaceFromCodename(string $codename): IFaceInterface
     {
-        $model = $this->tree->getByCodename($codename);
+        $model = $this->getModelByCodename($codename);
 
         return $this->factory->createFromModel($model);
+    }
+
+    /**
+     * @param string $codename
+     *
+     * @return \BetaKiller\IFace\IFaceModelInterface
+     * @throws \BetaKiller\IFace\Exception\IFaceException
+     */
+    public function getModelByCodename(string $codename): IFaceModelInterface
+    {
+        return $this->tree->getByCodename($codename);
     }
 
     /**

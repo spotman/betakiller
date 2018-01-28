@@ -4,7 +4,7 @@ namespace BetaKiller\IFace;
 use BetaKiller\IFace\Exception\IFaceStackException;
 use BetaKiller\Url\UrlContainerInterface;
 
-class IFaceModelsStack
+class IFaceModelsStack implements \IteratorAggregate
 {
     /**
      * @var \BetaKiller\IFace\IFaceModelInterface
@@ -60,6 +60,17 @@ class IFaceModelsStack
     public function getCodenames(): array
     {
         return array_keys($this->items);
+    }
+
+    /**
+     * Retrieve an external iterator
+     *
+     * @link  http://php.net/manual/en/iteratoraggregate.getiterator.php
+     * @return \Iterator
+     */
+    public function getIterator(): \Iterator
+    {
+        return new \ArrayIterator($this->items);
     }
 
     /**

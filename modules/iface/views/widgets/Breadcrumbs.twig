@@ -1,0 +1,3 @@
+{% for item in breadcrumbs %}
+  <a href="{{ item.url }}" class="breadcrumb {{ item.active ? "active" : "" }}">{{ item.label }}</a>
+{% endfor %}
