@@ -1,7 +1,6 @@
 <?php
 namespace BetaKiller\Error;
 
-use BetaKiller\Config\AppConfigInterface;
 use BetaKiller\Exception\ExceptionHandlerInterface;
 use BetaKiller\Helper\AppEnv;
 use BetaKiller\Log\LazyLoadProxyHandler;
@@ -26,11 +25,6 @@ class Initializer implements ModuleInitializerInterface
     private $appEnv;
 
     /**
-     * @var \BetaKiller\Config\AppConfigInterface
-     */
-    private $appConfig;
-
-    /**
      * @var \Psr\Container\ContainerInterface
      */
     private $container;
@@ -46,24 +40,22 @@ class Initializer implements ModuleInitializerInterface
      * @param \Psr\Container\ContainerInterface               $container
      * @param \BetaKiller\Log\Logger                          $logger
      * @param \BetaKiller\Helper\AppEnv                       $appEnv
-     * @param \BetaKiller\Config\AppConfigInterface           $appConfig
      * @param \BetaKiller\Exception\ExceptionHandlerInterface $handler
      */
     public function __construct(
         ContainerInterface $container,
         Logger $logger,
         AppEnv $appEnv,
-        AppConfigInterface $appConfig,
         ExceptionHandlerInterface $handler
     ) {
         $this->logger    = $logger;
         $this->container = $container;
         $this->appEnv    = $appEnv;
-        $this->appConfig = $appConfig;
         $this->handler   = $handler;
     }
 
     /**
+     * @throws \BetaKiller\Exception
      * @throws \Exception
      * @throws \Psr\Container\ContainerExceptionInterface
      * @throws \Psr\Container\NotFoundExceptionInterface
@@ -91,7 +83,7 @@ class Initializer implements ModuleInitializerInterface
      */
     private function isPhpConsoleActive(): bool
     {
-        $storageFileName = $this->appConfig->getNamespace().'.'.$this->appEnv->getModeName().'.phpConsole.data';
+        $storageFileName = $this->appEnv->getRevisionKey().'.'.$this->appEnv->getModeName().'.phpConsole.data';
         $storagePath     = \sys_get_temp_dir().DIRECTORY_SEPARATOR.$storageFileName;
 
         // Can be called only before PhpConsole\Connector::getInstance() and PhpConsole\Handler::getInstance()
@@ -117,6 +109,7 @@ class Initializer implements ModuleInitializerInterface
     }
 
     /**
+     * @throws \BetaKiller\Exception
      * @throws \Psr\Container\ContainerExceptionInterface
      * @throws \Psr\Container\NotFoundExceptionInterface
      */
