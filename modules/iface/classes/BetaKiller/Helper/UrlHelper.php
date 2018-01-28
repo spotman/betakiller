@@ -73,11 +73,6 @@ class UrlHelper
             return $this->appConfig->getCircularLinkHref();
         }
 
-        if ($model->isDefault()) {
-            // Link to root for default IFace
-            return $this->makeAbsoluteUrl('/');
-        }
-
         $parts = [];
 
         foreach ($this->tree->getReverseBreadcrumbsIterator($model) as $item) {
