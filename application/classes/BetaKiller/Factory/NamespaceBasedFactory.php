@@ -1,7 +1,6 @@
 <?php
 namespace BetaKiller\Factory;
 
-use BetaKiller\Config\AppConfigInterface;
 use BetaKiller\DI\ContainerInterface;
 use Psr\SimpleCache\CacheInterface;
 use Psr\SimpleCache\InvalidArgumentException;
@@ -12,11 +11,6 @@ final class NamespaceBasedFactory
      * @var mixed[]
      */
     private static $instances = [];
-
-    /**
-     * @var \BetaKiller\Config\AppConfigInterface
-     */
-    private $appConfig;
 
     /**
      * @var \BetaKiller\DI\ContainerInterface
@@ -65,13 +59,11 @@ final class NamespaceBasedFactory
 
     /**
      *
-     * @param \BetaKiller\Config\AppConfigInterface $appConfig
-     * @param \BetaKiller\DI\ContainerInterface     $container
-     * @param \Psr\SimpleCache\CacheInterface       $cache
+     * @param \BetaKiller\DI\ContainerInterface $container
+     * @param \Psr\SimpleCache\CacheInterface   $cache
      */
-    public function __construct(AppConfigInterface $appConfig, ContainerInterface $container, CacheInterface $cache)
+    public function __construct(ContainerInterface $container, CacheInterface $cache)
     {
-        $this->appConfig       = $appConfig;
         $this->container       = $container;
         $this->classNamesCache = $cache;
     }
@@ -206,8 +198,6 @@ final class NamespaceBasedFactory
             return $className;
         }
 
-        $appNamespace = $this->appConfig->getNamespace();
-
         // Explode legacy naming by underscore
         $codenameArray = explode('_', $codename);
 
@@ -219,7 +209,7 @@ final class NamespaceBasedFactory
         $separator = '\\';
         $baseName  = implode($separator, $codenameArray).$this->classSuffix;
 
-        $searchNamespaces = array_filter(array_merge([$appNamespace], $this->rootNamespaces, ['BetaKiller']));
+        $searchNamespaces = array_merge($this->rootNamespaces, ['BetaKiller']);
 
         $tried = [];
 

@@ -4,7 +4,9 @@
   "license": "MIT",
   "type": "project",
   "require": {
-    "php": ">=7.1.0",
+    "php": "7.1.* || 7.2.*",
+    "ext-mbstring": "*",
+    "ext-mysqli": "*",
     "php-di/php-di": "^5.4",
     "doctrine/annotations": "^1.2",
     "doctrine/cache": "^1.6",
@@ -41,5 +43,17 @@
     "psr/simple-cache": "^1.0",
     "phpunit/php-code-coverage": "^5.2",
     "phpunit/dbunit": "^3.0"
+  },
+  "scripts": {
+    "ci": [
+      "@test"
+    ],
+    "test": "APP_ENV=testing APP_REVISION=testRevision phpunit"
+  },
+  "config": {
+    "platform": {
+      "php": "7.1"
+    },
+    "sort-packages": true
   }
 }

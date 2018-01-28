@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace BetaKiller\IFace;
 
 
+use BetaKiller\Helper\AppEnv;
 use BetaKiller\Helper\LoggerHelperTrait;
 use BetaKiller\IFace\Exception\IFaceException;
 use BetaKiller\IFace\ModelProvider\IFaceModelProviderDatabase;
@@ -42,11 +43,17 @@ class Initializer implements ModuleInitializerInterface
     private $logger;
 
     /**
+     * @var \BetaKiller\Helper\AppEnv
+     */
+    private $appEnv;
+
+    /**
      * Initializer constructor.
      *
      * @param \BetaKiller\IFace\ModelProvider\IFaceModelProviderDatabase  $databaseProvider
      * @param \BetaKiller\IFace\ModelProvider\IFaceModelProviderXmlConfig $xmlProvider
      * @param \BetaKiller\IFace\IFaceModelTree                            $tree
+     * @param \BetaKiller\Helper\AppEnv                                   $appEnv
      * @param \Psr\SimpleCache\CacheInterface                             $cache
      * @param \Psr\Log\LoggerInterface                                    $logger
      */
@@ -54,6 +61,7 @@ class Initializer implements ModuleInitializerInterface
         IFaceModelProviderDatabase $databaseProvider,
         IFaceModelProviderXmlConfig $xmlProvider,
         IFaceModelTree $tree,
+        AppEnv $appEnv,
         CacheInterface $cache,
         LoggerInterface $logger
     ) {
@@ -62,6 +70,7 @@ class Initializer implements ModuleInitializerInterface
         $this->tree             = $tree;
         $this->cache            = $cache;
         $this->logger           = $logger;
+        $this->appEnv = $appEnv;
     }
 
     /**
@@ -149,8 +158,12 @@ class Initializer implements ModuleInitializerInterface
         /** @var \BetaKiller\IFace\ModelProvider\IFaceModelProviderInterface[] $sources */
         $sources = [
             $this->xmlProvider,
-            $this->databaseProvider,
         ];
+
+        // TODO Remove this hack after resolving spotman/betakiller#35
+        if (!$this->appEnv->inTestingMode()) {
+            $sources[] = $this->databaseProvider;
+        }
 
         foreach ($sources as $provider) {
             foreach ($provider->getAll() as $ifaceModel) {

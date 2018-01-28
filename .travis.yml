@@ -1,7 +1,12 @@
 language: php
 php:
-#- 5.6
 - 7.1
+- 7.2
+
+env:
+- APP_ENV=testing
+- APP_REVISION=testingRevision
+
 branches:
   only:
   - master
@@ -22,3 +27,6 @@ before_install:
   - sed -i 's/git@github.com:/https:\/\/github.com\//' .gitmodules
   - git submodule update --init --recursive
   - composer install -o
+
+script:
+  - composer ci
