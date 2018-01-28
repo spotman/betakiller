@@ -1,4 +1,6 @@
 <?php
 namespace BetaKiller\Notification;
 
-class TransportException extends NotificationException {}
+class TransportException extends NotificationException
+{
+}

@@ -1,7 +1,6 @@
 <?php
 namespace BetaKiller\Notification;
 
-
 interface MessageRendererInterface
 {
     public function render(
