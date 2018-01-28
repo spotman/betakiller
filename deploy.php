@@ -365,11 +365,15 @@ task('cache:warmup', function () {
 
 task('deploy:dotenv', function () {
     $targetDotEnv = '{{release_path}}/app/.env';
+    $previousDotEnv = '{{previous_release}}/app/.env';
+    $defaultDotEnv = '{{deploy_path}}/.env.default';
 
-    if (has('previous_release') && test('[ -f {{previous_release}}/app/.env ]')) {
-        run('cp {{previous_release}}/app/.env '.$targetDotEnv);
+    if (has('previous_release') && test("[ -f $previousDotEnv ]")) {
+        run("cp $previousDotEnv $targetDotEnv");
+    } elseif (test("[ -f $defaultDotEnv ]")) {
+        run("cp $defaultDotEnv $targetDotEnv");
     } else {
-        run('cp {{deploy_path}}/.env.default '.$targetDotEnv);
+        throw new Exception('Can not find .env file');
     }
 })->desc('Copy .env file from previous revision if exists');
 
