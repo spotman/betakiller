@@ -55,7 +55,7 @@ class NotificationUserEmail implements NotificationUserInterface
 
     public function isEmailNotificationAllowed(): bool
     {
-        return true;
+        return $this->emailNotificationAllowed;
     }
 
     public function isOnlineNotificationAllowed(): bool
