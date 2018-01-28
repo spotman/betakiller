@@ -27,4 +27,6 @@ return [
     'error.http.500.p3'            => 'Error ID: :hash',
     'error.http.500.button.cancel' => 'отмена',
 
+    'notification.developer.error.subsystem-failure.subj' => 'BetaKiller logging subsystem failure',
+    'notification.developer.error.php-exception.subj' => 'BetaKiller exception',
 ];

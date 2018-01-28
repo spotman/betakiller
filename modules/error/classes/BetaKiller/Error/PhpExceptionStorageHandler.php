@@ -190,7 +190,7 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
 
         $isNotificationNeeded = $this->isNotificationNeededFor($model, static::REPEAT_COUNT, static::REPEAT_DELAY);
 
-//        $this->logger->debug('Notification needed is :value', [':value' => $isNotificationNeeded ? 'true' : 'false']);
+        $this->logger->debug('Notification needed is :value', [':value' => $isNotificationNeeded ? 'true' : 'false']);
 
         if ($isNotificationNeeded) {
             $model->notificationRequired();
@@ -220,7 +220,7 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
     {
         // Skip ignored exceptions
         if ($model->isIgnored()) {
-//            $this->logger->debug('Ignored exception');
+            $this->logger->debug('Ignored exception :message', [':message' => $model->getMessage()]);
 
             return false;
         }
@@ -232,12 +232,6 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
 
         $timeDiffInSeconds = $lastSeenAtTimestamp - $lastNotifiedAtTimestamp;
 
-//        $this->logger->debug('Time diff between :last and :seen is :diff', [
-//            ':last' => $lastNotifiedAtTimestamp,
-//            ':seen' => $lastSeenAtTimestamp,
-//            ':diff' => $timeDiffInSeconds,
-//        ]);
-
         // Throttle by time
         if ($lastNotifiedAtTimestamp && ($timeDiffInSeconds < $repeatDelay)) {
             return false;
@@ -245,19 +239,19 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
 
         // New error needs to be notified only once
         if (!$lastNotifiedAtTimestamp && $model->isNew()) {
-//            $this->logger->debug('New exception needs to be notified');
+            $this->logger->debug('New exception needs to be notified');
 
             return true;
         }
 
         // Repeated error needs to be notified
         if ($model->isRepeated()) {
-//            $this->logger->debug('Repeated exception needs to be notified');
+            $this->logger->debug('Repeated exception needs to be notified');
 
             return true;
         }
 
-//        $this->logger->debug('Total counter is :value', [':value' => $model->getCounter()]);
+        $this->logger->debug('Total counter is :value', [':value' => $model->getCounter()]);
 
         // Throttle by occurrence number
         return ($model->getCounter() % $repeatCount === 1);
@@ -285,7 +279,6 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
         $message = $this->notificationHelper->createMessage();
 
         $message
-            ->setSubj('BetaKiller logging subsystem failure')
             ->setTemplateName('developer/error/subsystem-failure')
             ->setTemplateData([
                 'url'       => $this->appConfig->getBaseUrl(),

@@ -182,24 +182,11 @@ class NotificationMessage implements NotificationMessageInterface
         $name = $this->getTemplateName();
 
         if (!$name) {
-            throw new NotificationException('Can not i18n key from empty template name');
+            throw new NotificationException('Can not make i18n key from empty template name');
         }
 
         // Make i18n key by replacing "slash" with "dot"
         return 'notification.'.str_replace('/', '.', $name);
-    }
-
-    /**
-     * @param string $value
-     *
-     * @return NotificationMessageInterface
-     * @deprecated Use I18n registry for subject definition (key is based on template path)
-     */
-    public function setSubj(string $value): NotificationMessageInterface
-    {
-        $this->subj = $value;
-
-        return $this;
     }
 
     /**

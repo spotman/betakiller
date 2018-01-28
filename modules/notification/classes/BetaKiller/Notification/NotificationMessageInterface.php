@@ -65,14 +65,6 @@ interface NotificationMessageInterface
     public function getSubj(NotificationUserInterface $targetUser): string;
 
     /**
-     * @param string $value
-     *
-     * @return NotificationMessageInterface
-     * @deprecated Use I18n registry for subject definition (key is based on template path)
-     */
-    public function setSubj(string $value): NotificationMessageInterface;
-
-    /**
      * @return array
      */
     public function getAttachments(): array;

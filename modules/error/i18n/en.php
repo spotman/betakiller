@@ -24,4 +24,7 @@ return [
     'error.http.500.p2'            => 'The page will be refreshed in 15 seconds',
     'error.http.500.p3'            => 'Error ID: :hash',
     'error.http.500.button.cancel' => 'cancel',
+
+    'notification.developer.error.subsystem-failure.subj' => 'BetaKiller logging subsystem failure',
+    'notification.developer.error.php-exception.subj'     => 'BetaKiller exception',
 ];

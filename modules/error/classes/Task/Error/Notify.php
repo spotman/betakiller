@@ -65,7 +65,6 @@ class Task_Error_Notify extends AbstractTask
 
         $message = $this->notificationHelper
             ->createMessage('developer/error/php-exception')
-            ->setSubj('BetaKiller exception')
             ->setTemplateData($data);
 
         $this->notificationHelper
