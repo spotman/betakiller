@@ -1,0 +1,5 @@
+require([
+  "materialize.collapsible"
+], function() {
+
+});

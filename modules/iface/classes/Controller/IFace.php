@@ -1,6 +1,9 @@
 <?php
 
 use BetaKiller\Config\AppConfigInterface;
+use BetaKiller\Exception\BadRequestHttpException;
+use BetaKiller\Exception\FoundHttpException;
+use BetaKiller\Exception\PermanentRedirectHttpException;
 use BetaKiller\IFace\Cache\IFaceCache;
 use BetaKiller\IFace\IFaceInterface;
 use BetaKiller\Model\UserInterface;
@@ -55,6 +58,15 @@ class Controller_IFace extends Controller
     private $ifaceView;
 
     /**
+     * @throws \Spotman\Acl\Exception
+     * @throws \Psr\SimpleCache\InvalidArgumentException
+     * @throws \BetaKiller\MessageBus\MessageBusException
+     * @throws \BetaKiller\Exception\PermanentRedirectHttpException
+     * @throws \BetaKiller\Exception\FoundHttpException
+     * @throws \BetaKiller\Exception\SeeOtherHttpException
+     * @throws \BetaKiller\Exception\NotFoundHttpException
+     * @throws \BetaKiller\Auth\AuthorizationRequiredException
+     * @throws \BetaKiller\Auth\AccessDeniedException
      * @throws \BetaKiller\Factory\FactoryException
      * @throws \PageCache\PageCacheException
      * @throws \BetaKiller\IFace\Exception\IFaceException
@@ -67,25 +79,24 @@ class Controller_IFace extends Controller
         $this->urlContainer->setQueryParts($queryParts);
 
         // Getting current IFace
-        $model = $this->urlDispatcher->process($uri, $this->request->client_ip());
+        $model = $this->urlDispatcher->process($uri, $this->request->client_ip(), $this->request->referrer());
         $iface = $this->ifaceFactory->createFromModel($model);
 
         // If this is default IFace and client requested non-slash uri, redirect client to /
         if ($uri !== '/' && $model->isDefault() && !$model->hasDynamicUrl()) {
-            $this->redirect('/');
+            throw new FoundHttpException('/');
         }
 
         if ($uri && $uri !== '/') {
-            $has_trailing_slash = (substr($uri, -1) === '/');
+            $hasTrailingSlash       = (substr($uri, -1) === '/');
+            $isTrailingSlashEnabled = $this->appConfig->isTrailingSlashEnabled();
 
-            $is_trailing_slash_enabled = $this->appConfig->isTrailingSlashEnabled();
+            if ($hasTrailingSlash && !$isTrailingSlashEnabled) {
+                throw new PermanentRedirectHttpException(rtrim($uri, '/'));
+            }
 
-            if ($has_trailing_slash && !$is_trailing_slash_enabled) {
-                // Permanent redirect
-                $this->redirect(rtrim($uri, '/'), 301);
-            } elseif (!$has_trailing_slash && $is_trailing_slash_enabled) {
-                // Permanent redirect
-                $this->redirect($uri.'/', 301);
+            if (!$hasTrailingSlash && $isTrailingSlashEnabled) {
+                throw new PermanentRedirectHttpException($uri.'/');
             }
         }
 
@@ -103,8 +114,10 @@ class Controller_IFace extends Controller
             // Final hook
             $iface->after();
 
-            if ($unusedParts = $this->urlContainer->getUnusedQueryPartsKeys()) {
-                throw new HTTP_Exception_400('Request have unused query parts: :keys', [
+            $unusedParts = $this->urlContainer->getUnusedQueryPartsKeys();
+
+            if ($unusedParts) {
+                throw new BadRequestHttpException('Request have unused query parts: :keys', [
                     ':keys' => implode(', ', $unusedParts),
                 ]);
             }
@@ -129,7 +142,7 @@ class Controller_IFace extends Controller
     private function processIFaceCache(IFaceInterface $iface): void
     {
         // Skip caching if request method is not GET nor HEAD
-        if (!in_array($this->request->method(), ['GET', 'HEAD'], true)) {
+        if (!\in_array($this->request->method(), ['GET', 'HEAD'], true)) {
             return;
         }
 

@@ -125,7 +125,7 @@ class IFaceModelTree
     /**
      * Returns list of root elements
      *
-     * @return array
+     * @return \BetaKiller\IFace\IFaceModelInterface[]
      * @throws \BetaKiller\IFace\Exception\IFaceException
      */
     public function getRoot(): array

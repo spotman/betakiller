@@ -1,7 +1,7 @@
 <?php
 namespace BetaKiller\IFace;
 
-use BetaKiller\IFace\Exception\IFaceStackException;
+use BetaKiller\IFace\Exception\IFaceException;
 use BetaKiller\Url\UrlContainerInterface;
 
 class IFaceModelsStack implements \IteratorAggregate
@@ -34,12 +34,12 @@ class IFaceModelsStack implements \IteratorAggregate
     /**
      * @param \BetaKiller\IFace\IFaceModelInterface $model
      *
-     * @throws \BetaKiller\IFace\Exception\IFaceStackException
+     * @throws \BetaKiller\IFace\Exception\IFaceException
      */
     public function push(IFaceModelInterface $model): void
     {
         if ($this->has($model)) {
-            throw new IFaceStackException('Duplicate insert for :codename', [':codename' => $model->getCodename()]);
+            throw new IFaceException('Duplicate insert for :codename', [':codename' => $model->getCodename()]);
         }
 
         $codename               = $model->getCodename();

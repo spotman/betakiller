@@ -2,7 +2,7 @@
 namespace BetaKiller\IFace\Cache;
 
 use BetaKiller\Config\AppConfigInterface;
-use BetaKiller\Exception\NotImplementedException;
+use BetaKiller\Exception\NotImplementedHttpException;
 use BetaKiller\Helper\AppEnv;
 use BetaKiller\IFace\IFaceInterface;
 use PageCache\PageCache;
@@ -58,13 +58,13 @@ class IFaceCache
     }
 
     /**
-     * @throws \BetaKiller\Exception\NotImplementedException
+     * @throws \BetaKiller\Exception\NotImplementedHttpException
      */
     public function clearModelCache(): void
     {
         // deal with child ifaces (clear cache for whole branch)
 
-        throw new NotImplementedException();
+        throw new NotImplementedHttpException();
     }
 
     public function clearCache(): void

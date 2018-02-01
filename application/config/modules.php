@@ -20,7 +20,6 @@ return [
     'static-files'          => MODPATH.'static-files',          // Static Files (JS/CSS/pictures)
 
     'acl'                   => MODPATH.'acl',                   // Role based access control
-    'admin'                 => MODPATH.'admin',                 // Basic admin
     'api'                   => MODPATH.'api',                   // API subsystem
     'assets'                => MODPATH.'assets',                // Asset management subsystem
     'auth'                  => MODPATH.'auth',                  // Basic authentication
@@ -35,6 +34,7 @@ return [
     'meta-tags'             => MODPATH.'meta-tags',             // HTML meta tags helper
     'migrations'            => MODPATH.'migrations',            // Migrations toolkit
     'minion'                => MODPATH.'minion',                // CLI Tasks
+    'missing-url'           => MODPATH.'missing-url',           // Catch and store missing IFace URLs
     'mysqli'                => MODPATH.'mysqli',                // Driver for MySQLi
     'notification'          => MODPATH.'notification',          // Notification subsystem
     'orm'                   => MODPATH.'orm',                   // Object Relationship Mapping
@@ -46,6 +46,9 @@ return [
     'ulogin'                => MODPATH.'ulogin',                // Universal login via ulogin.ru
     'unittest'              => MODPATH.'unittest',              // Module for unit testing via phpunit
     'widget'                => MODPATH.'widget',                // Basic widgets support
+
+    // Workaround for injecting admin/config/ifaces.xml in a proper way
+    'admin'                 => MODPATH.'admin',                 // Basic admin
 
     // Allow another modules to set routes
     'iface'                 => MODPATH.'iface',                 // Dynamic user interfaces

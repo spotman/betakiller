@@ -1,0 +1,63 @@
+{% extends layout %}
+
+{% block page_content %}
+  {{ js("ifaces/admin/missing-url/missing-index.js") }}
+
+  <ul class="collapsible popout" data-collapsible="accordion">
+  {% for item in missing_urls %}
+    <li class="{{ item.has_target ? "" : "" }}">
+
+      <div class="collapsible-header {{ item.has_target ? "" : "active red white-text" }}">
+        <a href="{{ item.edit_url|raw }}" class="right {{ item.has_target ? "" : "white-text" }}">
+          Edit
+        </a>
+        <i class="material-icons">{{ item.has_target ? "done" : "whatshot" }}</i>
+        <strong class="truncate">{{ item.source_url|raw }}</strong>
+      </div>
+
+      <div class="collapsible-body">
+        {% if item.has_target %}
+          Redirect to <a href="{{ item.target_url }}" target="_blank">{{ item.target_url }}</a>
+        {% else %}
+          <p class="center-align">
+            Can not detect redirect URL,<br /><a href="{{ item.edit_url }}" class="btn red">Select it ASAP</a>
+          </p>
+        {% endif %}
+
+        <br />
+        <br />
+
+        {% if item.referrers|length %}
+          <table class="bordered responsive highlight">
+            <thead>
+              <tr>
+                <th>IP</th>
+                <th>URL</th>
+                <th class="right-align">Actions</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {% for referrer in item.referrers %}
+                <tr>
+                  <td>{{ referrer.ip }} </td>
+                  <td>
+                    <a href="{{ referrer.url }}">{{ referrer.url }}</a>
+                  </td>
+                  <td class="right-align">
+                    <button data-ip="{{ referrer.ip }}" class="btn red" disabled>Ban {{ referrer.ip }}</button>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        {#{% else %}#}
+          {#No referrers yet...#}
+        {% endif %}
+
+      </div>
+
+    </li>
+  {% endfor %}
+  </ul>
+{% endblock %}

@@ -1,6 +1,6 @@
 <?php
 
-use BetaKiller\IFace\Exception\IFaceStackException;
+use BetaKiller\IFace\Exception\IFaceException;
 use BetaKiller\IFace\IFaceModelInterface;
 use BetaKiller\IFace\IFaceModelsStack;
 use BetaKiller\Url\UrlContainerInterface;
@@ -86,7 +86,7 @@ class IFaceStackTest extends \BetaKiller\Test\TestCase
     {
         $stack = $this->createEmptyStack();
 
-        $firstProp = $this->emptyIFaceModel(self::FIRST_IFACE_CODENAME);
+        $firstProp  = $this->emptyIFaceModel(self::FIRST_IFACE_CODENAME);
         $secondProp = $this->emptyIFaceModel(self::SECOND_IFACE_CODENAME);
 
         /** @var IFaceModelInterface $firstModel */
@@ -113,7 +113,7 @@ class IFaceStackTest extends \BetaKiller\Test\TestCase
         $firstModel = $firstProp->reveal();
 
         $stack->push($firstModel);
-        $this->expectException(IFaceStackException::class);
+        $this->expectException(IFaceException::class);
         $stack->push($firstModel);
     }
 
@@ -121,7 +121,7 @@ class IFaceStackTest extends \BetaKiller\Test\TestCase
     {
         $stack = $this->createEmptyStack();
 
-        $firstProp = $this->emptyIFaceModel(self::FIRST_IFACE_CODENAME);
+        $firstProp  = $this->emptyIFaceModel(self::FIRST_IFACE_CODENAME);
         $secondProp = $this->emptyIFaceModel(self::SECOND_IFACE_CODENAME);
 
         /** @var IFaceModelInterface $firstModel */

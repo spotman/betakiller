@@ -1,7 +1,7 @@
 <?php
 namespace BetaKiller\IFace\ModelProvider;
 
-use BetaKiller\Exception\NotImplementedException;
+use BetaKiller\Exception\NotImplementedHttpException;
 use BetaKiller\Helper\SeoMetaInterface;
 use BetaKiller\IFace\IFaceModelInterface;
 use BetaKiller\Model\IFaceZone;
@@ -103,29 +103,29 @@ class IFaceModelProviderXmlConfigModel implements IFaceModelInterface
 
     /**
      * @return string
-     * @throws \BetaKiller\Exception\NotImplementedException
+     * @throws \BetaKiller\Exception\NotImplementedHttpException
      */
     public function getID(): string
     {
-        throw new NotImplementedException('Admin IFace model have no ID');
+        throw new NotImplementedHttpException('Admin IFace model have no ID');
     }
 
     /**
      * @return bool
-     * @throws \BetaKiller\Exception\NotImplementedException
+     * @throws \BetaKiller\Exception\NotImplementedHttpException
      */
     public function hasID(): bool
     {
-        throw new NotImplementedException('Admin IFace model have no ID');
+        throw new NotImplementedHttpException('Admin IFace model have no ID');
     }
 
     /**
      * @return string
-     * @throws \BetaKiller\Exception\NotImplementedException
+     * @throws \BetaKiller\Exception\NotImplementedHttpException
      */
     public function getModelName(): string
     {
-        throw new NotImplementedException('Admin IFace model have no model name');
+        throw new NotImplementedHttpException('Admin IFace model have no model name');
     }
 
     /**
@@ -141,11 +141,11 @@ class IFaceModelProviderXmlConfigModel implements IFaceModelInterface
     /**
      * @param string $uri
      *
-     * @throws \BetaKiller\Exception\NotImplementedException
+     * @throws \BetaKiller\Exception\NotImplementedHttpException
      */
     public function setUri(string $uri): void
     {
-        throw new NotImplementedException('Admin model can not change uri');
+        throw new NotImplementedHttpException('Admin model can not change uri');
     }
 
     /**
@@ -164,11 +164,11 @@ class IFaceModelProviderXmlConfigModel implements IFaceModelInterface
      * @param string $value
      *
      * @return SeoMetaInterface
-     * @throws \BetaKiller\Exception\NotImplementedException
+     * @throws \BetaKiller\Exception\NotImplementedHttpException
      */
     public function setTitle(string $value): SeoMetaInterface
     {
-        throw new NotImplementedException('Admin model can not change title');
+        throw new NotImplementedHttpException('Admin model can not change title');
     }
 
     /**
@@ -177,11 +177,11 @@ class IFaceModelProviderXmlConfigModel implements IFaceModelInterface
      * @param string $value
      *
      * @return SeoMetaInterface
-     * @throws \BetaKiller\Exception\NotImplementedException
+     * @throws \BetaKiller\Exception\NotImplementedHttpException
      */
     public function setDescription(string $value): SeoMetaInterface
     {
-        throw new NotImplementedException('Admin model can not change description');
+        throw new NotImplementedHttpException('Admin model can not change description');
     }
 
     /**

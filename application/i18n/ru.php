@@ -17,7 +17,6 @@ return [
     'Unknown codename :codename'                                => 'Unknown codename :codename',
     'No IFace found by codename :codename'                      => 'No IFace found by codename :codename',
     'Empty token.'                                              => 'Empty token.',
-    'Unknown url part :part'                                    => 'Unknown url part :part',
     'Authorization required!'                                   => 'Для продолжения вам нужно войти!',
     ':error [ :query ]'                                         => ':error [ :query ]',
     'Not found'                                                 => 'Not found',
