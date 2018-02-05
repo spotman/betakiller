@@ -1,15 +1,16 @@
-(function( $ ){
+define([
+  "jquery"
+], function ($) {
 
-  $.fn.JSON = function()
-  {
+  $.fn.JSON = function () {
     var CSRFTokenKey = 'csrf-key';
     var $this = $(this);
 
-    var $CSRFTokenElements = getElementSCRFTokenElements();
+    var $CSRFTokenElements = getElementSCRFTokenElements($this);
 
-    function getElementSCRFTokenElements() {
+    function getElementSCRFTokenElements(container) {
       // Searching for CSRF field inside of current jQuery-objects set
-      var $csrf = $this.find('input[name="' + CSRFTokenKey + '"]');
+      var $csrf = container.find('input[name="' + CSRFTokenKey + '"]');
       return $csrf.length ? $csrf : null;
     }
 
@@ -19,7 +20,7 @@
      * @param {Deferred} xhr
      * @returns {*}
      */
-    this.wrap = function(xhr) {
+    this.wrap = function (xhr) {
       var deferred = $.Deferred();
 
       function successCallback(message, args) {
@@ -38,7 +39,7 @@
         deferred.rejectWith(xhr, args);
       }
 
-      xhr.done(function(r) {
+      xhr.done(function (r) {
         // console.log('xhr done', arguments);
 
         if (!r || !r.response) {
@@ -62,9 +63,9 @@
             errorCallback(message, arguments);
             break;
 
-           case "auth":
-               window.top.location.href = '/logout';
-               break;
+          case "auth":
+            window.top.location.href = '/logout';
+            break;
 
           case "redirect":
             window.location.href = message;
@@ -80,7 +81,7 @@
         }
       });
 
-      xhr.fail(function() {
+      xhr.fail(function () {
         // console.log('xhr fail', arguments);
         errorCallback(null, arguments);
       });
@@ -97,8 +98,7 @@
      * @param {Object=} [options]
      * @returns {Deferred}
      */
-    this.request = function(type, url, data, options)
-    {
+    this.request = function (type, url, data, options) {
       data = data || {};
       options = options || {};
 
@@ -128,8 +128,7 @@
      * @param {Object=} [options]
      * @returns {Deferred}
      */
-    this.post = function(url, data, options)
-    {
+    this.post = function (url, data, options) {
       return this.request("post", url, data, options);
     };
 
@@ -139,7 +138,7 @@
     // Wrapper usage is $("#form-id").JSON(xhr)
     if (arguments.length) {
       // console.log(arguments);
-      if (typeof arguments[0] == "string") {
+      if (typeof arguments[0] === "string") {
         return this.post.apply(this, arguments);
       } else {
         return this.wrap.apply(this, arguments);
@@ -148,52 +147,48 @@
   };
 
 
-    // Хелперы к jquery.pnotify
-    $.notify = {
+  // Хелперы к jquery.pnotify
+  $.notify = {
 
-        // песочный цвет
-        notice: function(text)
-        {
-            return $.pnotify({
-                history: false,
-                text: text
-            });
-        },
+    // песочный цвет
+    notice: function (text) {
+      return $.pnotify({
+        history: false,
+        text: text
+      });
+    },
 
-        // голубой цвет
-        info: function(text)
-        {
-            return $.pnotify({
-                history: false,
-                text: text,
-                type: 'info'
-            });
-        },
+    // голубой цвет
+    info: function (text) {
+      return $.pnotify({
+        history: false,
+        text: text,
+        type: 'info'
+      });
+    },
 
-        // зелёный цвет
-        success: function(text)
-        {
-            return $.pnotify({
-                history: false,
-                text: text,
-                type: 'success'
-            });
-        },
+    // зелёный цвет
+    success: function (text) {
+      return $.pnotify({
+        history: false,
+        text: text,
+        type: 'success'
+      });
+    },
 
-        // красный цвет
-        error: function(text, permanent)
-        {
-            return $.pnotify({
-                history: false,
-                text: text,
-                type: 'error',
-                hide: !permanent,
-                closer: !permanent,
-                sticker: !permanent
-            });
-        }
+    // красный цвет
+    error: function (text, permanent) {
+      return $.pnotify({
+        history: false,
+        text: text,
+        type: 'error',
+        hide: !permanent,
+        closer: !permanent,
+        sticker: !permanent
+      });
+    }
 
-    };
+  };
 
   /**
    * Downloads file by HTTP, cross-domain
@@ -201,8 +196,8 @@
    * @param data
    * @param load_callback
    */
-  $.downloadFile = function(url, data, load_callback) {
-    if ( typeof(data) == "function" ) {
+  $.downloadFile = function (url, data, load_callback) {
+    if (typeof(data) === "function") {
       load_callback = data;
     }
 
@@ -216,7 +211,7 @@
       .hide();
 
     // Вешаем обработчик, который будет вызван после загрузки файла
-    iframe.load(function() {
+    iframe.load(function () {
       // Вызываем коллбек, если он был указан
       load_callback && load_callback();
 
@@ -225,7 +220,7 @@
     });
 
     // Если нужно отправить POST на url
-    if ( data ) {
+    if (data) {
       // Создаём форму с данными
       var form = $("<form>")
         .attr("action", url)
@@ -233,7 +228,7 @@
         .attr("target", iframe_name);
 
       // Добавляем скрытые поля с данными в форму
-      for ( var key in data ) {
+      for (var key in data) {
         $("<input type='hidden' />")
           .appendTo(form)
           .attr("name", key)
@@ -248,4 +243,4 @@
     }
   };
 
-})( jQuery );
+});
