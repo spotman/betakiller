@@ -14,15 +14,10 @@ class MissingIndex extends AbstractAdminBase
     private $missingUrlRepository;
 
     /**
-     * @Inject
-     * @var \BetaKiller\Helper\IFaceHelper
-     */
-    private $ifaceHelper;
-
-    /**
      * Returns data for View
      *
      * @return array
+     * @throws \BetaKiller\Repository\RepositoryException
      */
     public function getData(): array
     {
@@ -43,14 +38,12 @@ class MissingIndex extends AbstractAdminBase
 
             $data[] = [
                 'id'         => $missingUrlModel->getID(),
-                'edit_url'   => $this->ifaceHelper->getReadEntityUrl($missingUrlModel),
                 'source_url' => $missingUrlModel->getMissedUrl(),
                 'target_url' => $target ? $target->getUrl() : null,
                 'has_target' => (bool)$target,
                 'referrers'  => $referrersData,
             ];
         }
-
 
         return [
             'missing_urls' => $data,

@@ -3,61 +3,84 @@
 {% block page_content %}
   {{ js("ifaces/admin/missing-url/missing-index.js") }}
 
+  {% set set_active = false %}
+
   <ul class="collapsible popout" data-collapsible="accordion">
-  {% for item in missing_urls %}
-    <li class="{{ item.has_target ? "" : "" }}">
+    {% for item in missing_urls %}
+      <li class="missing-url-item {{ not set_active and not item.has_target ? "active" : "" }}" data-id="{{ item.id }}">
+        {% set set_active = set_active or not item.has_target %}
 
-      <div class="collapsible-header {{ item.has_target ? "" : "active red white-text" }}">
-        <a href="{{ item.edit_url|raw }}" class="right {{ item.has_target ? "" : "white-text" }}">
-          Edit
-        </a>
-        <i class="material-icons">{{ item.has_target ? "done" : "whatshot" }}</i>
-        <strong class="truncate">{{ item.source_url|raw }}</strong>
-      </div>
+        <div class="collapsible-header {{ item.has_target ? "" : "red white-text" }}">
+          <i class="material-icons">{{ item.has_target ? "done" : "whatshot" }}</i>
+          <strong class="truncate">{{ item.source_url|raw }}</strong>
+          {% if item.referrers|length %}
+            <span class="badge new">{{ "referrers: " ~ item.referrers|length }}</span>
+          {% endif %}
+        </div>
 
-      <div class="collapsible-body">
-        {% if item.has_target %}
-          Redirect to <a href="{{ item.target_url }}" target="_blank">{{ item.target_url }}</a>
-        {% else %}
-          <p class="center-align">
-            Can not detect redirect URL,<br /><a href="{{ item.edit_url }}" class="btn red">Select it ASAP</a>
-          </p>
-        {% endif %}
+        <div class="collapsible-body">
 
-        <br />
-        <br />
+          {% set item_dom_id = "missing-item-" ~ item.id %}
+          {% set form_block_id = item_dom_id ~ "-form-block" %}
+          {% set referrers_block_id = item_dom_id ~ "-referrers-block" %}
 
-        {% if item.referrers|length %}
-          <table class="bordered responsive highlight">
-            <thead>
-              <tr>
-                <th>IP</th>
-                <th>URL</th>
-                <th class="right-align">Actions</th>
-              </tr>
-            </thead>
+          <div id="{{ form_block_id }}">
+            <form action="#">
+              <div class="row">
+                <div class="input-field col s12">
+                  <input placeholder="/my-long/url" type="text" value="{{ item.target_url }}" required
+                         class="target-url validate {{ item.has_target ? "valid" : "invalid" }}">
+                  <label class="active">Target URL</label>
+                </div>
 
-            <tbody>
-              {% for referrer in item.referrers %}
-                <tr>
-                  <td>{{ referrer.ip }} </td>
-                  <td>
-                    <a href="{{ referrer.url }}">{{ referrer.url }}</a>
-                  </td>
-                  <td class="right-align">
-                    <button data-ip="{{ referrer.ip }}" class="btn red" disabled>Ban {{ referrer.ip }}</button>
-                  </td>
+                <div class="input-field col s12">
+                  <button class="delete-missing-url btn red right">Delete</button>
+                  <button type="submit" class="btn green">Save</button>
+                </div>
+              </div>
+            </form>
+          </div>
+
+          {% if item.referrers|length %}
+
+            <div id="{{ referrers_block_id }}">
+              <table class="bordered responsive-table highlight">
+                <thead>
+                <tr class="grey lighten-3">
+                  <th>IP</th>
+                  <th>URL</th>
+                  <th class="right-align">Actions</th>
                 </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        {#{% else %}#}
-          {#No referrers yet...#}
-        {% endif %}
+                </thead>
 
-      </div>
+                <tbody>
+                {% for referrer in item.referrers %}
+                  <tr>
+                    <td>{{ referrer.ip }} </td>
+                    <td>
+                      <a href="{{ referrer.url }}">{{ referrer.url }}</a>
+                    </td>
+                    <td class="right-align">
+                      <button data-ip="{{ referrer.ip }}" class="btn red" disabled>Ban {{ referrer.ip }}</button>
+                    </td>
+                  </tr>
+                {% endfor %}
+                </tbody>
+              </table>
+            </div>
 
-    </li>
-  {% endfor %}
+          {% endif %}
+
+          {#{% if item.has_target %}#}
+          {#Redirect to <a href="{{ item.target_url }}" target="_blank">{{ item.target_url }}</a>#}
+          {#{% else %}#}
+          {#<p class="center-align">#}
+          {#Can not detect redirect URL,<br /><a href="{{ item.edit_url }}" class="btn red">Select it ASAP</a>#}
+          {#</p>#}
+          {#{% endif %}#}
+
+        </div>
+      </li>
+    {% endfor %}
   </ul>
 {% endblock %}
