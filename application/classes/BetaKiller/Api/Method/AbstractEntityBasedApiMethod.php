@@ -100,4 +100,13 @@ abstract class AbstractEntityBasedApiMethod extends AbstractApiMethod implements
     {
         $this->getRepository()->save($this->entity);
     }
+
+    /**
+     * @throws \BetaKiller\Factory\FactoryException
+     * @throws \BetaKiller\Repository\RepositoryException
+     */
+    protected function deleteEntity(): void
+    {
+        $this->getRepository()->delete($this->entity);
+    }
 }

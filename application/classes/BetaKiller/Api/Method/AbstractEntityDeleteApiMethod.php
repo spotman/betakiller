@@ -4,8 +4,15 @@ namespace BetaKiller\Api\Method;
 use Spotman\Api\ApiMethodException;
 use Spotman\Api\ApiMethodResponse;
 
-abstract class AbstractModelDeleteApiMethod extends AbstractEntityBasedApiMethod
+abstract class AbstractEntityDeleteApiMethod extends AbstractEntityBasedApiMethod
 {
+    /**
+     * AbstractEntityDeleteApiMethod constructor.
+     *
+     * @param $id
+     *
+     * @throws \Spotman\Api\ApiMethodException
+     */
     public function __construct($id)
     {
         $this->id = (int)$id;
@@ -17,12 +24,17 @@ abstract class AbstractModelDeleteApiMethod extends AbstractEntityBasedApiMethod
 
     /**
      * @return \Spotman\Api\ApiMethodResponse|null
+     * @throws \BetaKiller\Repository\RepositoryException
+     * @throws \Spotman\Api\ApiMethodException
+     * @throws \BetaKiller\Factory\FactoryException
      */
     public function execute(): ?ApiMethodResponse
     {
         $model = $this->getEntity();
 
-        return $this->response($this->delete($model));
+        $this->delete($model);
+
+        return $this->response(true);
     }
 
     /**
@@ -31,7 +43,6 @@ abstract class AbstractModelDeleteApiMethod extends AbstractEntityBasedApiMethod
      * @param $model
      *
      * @throws \Spotman\Api\ApiMethodException
-     * @return bool
      */
     abstract protected function delete($model);
 }
