@@ -3,7 +3,7 @@ require([
   "missing-url.api.rpc.definition",
   "admin.notify",
   "materialize"
-], function ($, rpc, notify, M) {
+], function ($, rpc, notify) {
 
   $(function () {
 
