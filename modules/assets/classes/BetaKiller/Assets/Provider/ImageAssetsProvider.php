@@ -79,7 +79,7 @@ final class ImageAssetsProvider extends AbstractAssetsProvider implements ImageA
     {
         $allowed_sizes = $this->getAllowedPreviewSizes();
 
-        if (!$size && count($allowed_sizes) > 0) {
+        if (!$size && \count($allowed_sizes) > 0) {
             $size = $allowed_sizes[0];
         }
 
@@ -237,10 +237,8 @@ final class ImageAssetsProvider extends AbstractAssetsProvider implements ImageA
     ): array {
         $attrs = array_merge($model->getDefaultAttributesForImgTag(), $attrs ?? []);
 
-        $originalUrl = $this->getOriginalUrl($model);
-
         if ($size === AssetsModelImageInterface::SIZE_ORIGINAL) {
-            $src    = $originalUrl;
+            $src    = $this->getOriginalUrl($model);
             $width  = $model->getWidth();
             $height = $model->getHeight();
         } else {
@@ -266,12 +264,11 @@ final class ImageAssetsProvider extends AbstractAssetsProvider implements ImageA
         }
 
         $attrs = array_merge([
-            'src'               => $src,
-            'width'             => $width,
-            'height'            => $height,
-            'srcset'            => $this->getSrcsetAttributeValue($model, $targetRatio),
-            'data-original-url' => $originalUrl,
-            'data-id'           => $model->getID(),
+            'src'     => $src,
+            'width'   => $width,
+            'height'  => $height,
+            'srcset'  => $this->getSrcsetAttributeValue($model, $targetRatio),
+            'data-id' => $model->getID(),
         ], $attrs);
 
         return $attrs;
@@ -285,7 +282,8 @@ final class ImageAssetsProvider extends AbstractAssetsProvider implements ImageA
      */
     protected function getSrcsetAttributeValue(AssetsModelImageInterface $model, $ratio = null): string
     {
-        $modelRatio = $this->getModelRatio($model);
+        $originalWidth = $model->getWidth();
+        $modelRatio    = $this->getModelRatio($model);
 
         if (!$ratio) {
             $ratio = $modelRatio;
@@ -296,9 +294,13 @@ final class ImageAssetsProvider extends AbstractAssetsProvider implements ImageA
 
         if ($sizes) {
             foreach ($sizes as $size) {
-                $width    = (int)$size;
-                $url      = $this->getPreviewUrl($model, $size);
-                $srcset[] = $this->makeSrcsetWidthOption($url, $width);
+                $width = (int)$size;
+
+                // Skip sizes which are larger than original image
+                if ($width + 100 <= $originalWidth) {
+                    $url      = $this->getPreviewUrl($model, $size);
+                    $srcset[] = $this->makeSrcsetWidthOption($url, $width);
+                }
             }
         }
 
