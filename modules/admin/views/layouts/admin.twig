@@ -1,4 +1,4 @@
-{% include "@layouts/materialize" %}
+{% include "@layouts/admin.materialize" %}
 
 {#{{ css("css/layout-admin.css")}}#}
 
@@ -7,8 +7,9 @@
 {{ css("https://fonts.googleapis.com/icon?family=Material+Icons") }}
 
 {{ js("require.js/admin.config.js") }}
+{{ js("layouts/admin.js") }}
 
-<div id="admin-side-nav" class="side-nav fixed">
+<div id="admin-side-nav" class="sidenav sidenav-fixed">
     {{ widget('Admin_Menu_Main') }}
 </div>
 
@@ -17,16 +18,6 @@
     <header style="margin-bottom: 20px">
         {{ widget('Admin_Bar') }}
     </header>
-
-    {#<nav id="admin-top-menu" class="navbar navbar-default">#}
-        {#{% include "@templates/layout/logo" with { logoURL: "/admin" } %}#}
-
-        {#<a id="top-menu-button" class="icon-font-button overlay-opener pull-right hidden-xl hidden-lg hidden-md">#}
-            {#<i class="icon-new-menu"></i>#}
-        {#</a>#}
-        {#<a href="/" class="admin-top-menu-link pull-right hidden-sm hidden-xs" target="_blank">Открыть сайт в новой вкладке</a>#}
-        {#<a href="/logout" class="admin-top-menu-link pull-right hidden-sm hidden-xs">Выйти</a>#}
-    {#</nav>#}
 
     <main>
         <div class="row">
@@ -40,8 +31,4 @@
     {#<footer>#}
         {#<div class="col s12">no footer yet</div>#}
     {#</footer>#}
-
-    {#<div class="col s12">#}
-        {#{{ profiler() }}#}
-    {#</div>#}
 </div>

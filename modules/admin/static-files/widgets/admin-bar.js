@@ -1,5 +1,5 @@
 require([
-  'materialize.dropdown'
+  'materialize'
 ], function() {
 
 });

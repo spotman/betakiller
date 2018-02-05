@@ -1,5 +1,5 @@
 {
-  "name": "spotman/betakiller-admin",
+  "name": "betakiller-admin-module",
   "homepage": "https://github.com/spotman/betakiller-admin",
   "authors": [
     "Spotman <i.am@spotman.ru>"
@@ -16,6 +16,7 @@
     "tests"
   ],
   "dependencies": {
-    "materialize": "^0.98"
+    "materialize": "^1.0",
+    "cash": "^1.3.7"
   }
 }

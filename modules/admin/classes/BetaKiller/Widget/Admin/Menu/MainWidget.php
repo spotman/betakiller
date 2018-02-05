@@ -21,12 +21,6 @@ class MainWidget extends AbstractAdminWidget
 
     /**
      * @Inject
-     * @var \BetaKiller\Service\UserService
-     */
-    private $userService;
-
-    /**
-     * @Inject
      * @var \BetaKiller\Helper\StringPatternHelper
      */
     private $patternHelper;
@@ -61,19 +55,24 @@ class MainWidget extends AbstractAdminWidget
         /** @var \BetaKiller\IFace\Admin\Content\PostIndex $posts */
         $postsIndex = $this->ifaceHelper->createIFaceFromCodename('Admin_Content_PostIndex');
 
-        return $this->makeIFaceMenuItemData($postsIndex);
+        return $this->makeIFaceMenuItemData($postsIndex, null, 'edit');
     }
 
     /**
      * @param \BetaKiller\IFace\IFaceInterface        $iface
      * @param \BetaKiller\IFace\IFaceInterface[]|null $childrenIfacesData
      *
+     * @param null|string                             $icon
+     *
      * @return array
-     * @throws \Spotman\Acl\Exception
      * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \Spotman\Acl\Exception
      */
-    protected function makeIFaceMenuItemData(IFaceInterface $iface, array $childrenIfacesData = null): array
-    {
+    protected function makeIFaceMenuItemData(
+        IFaceInterface $iface,
+        array $childrenIfacesData = null,
+        ?string $icon = null
+    ): array {
         $output = $this->getIFaceMenuItemData($iface);
 
         // If iface not allowed, do not show itself and its children
@@ -81,6 +80,7 @@ class MainWidget extends AbstractAdminWidget
             return [];
         }
 
+        $output['icon'] = $icon;
         $output['children'] = $childrenIfacesData;
 
         return $output;
@@ -135,21 +135,16 @@ class MainWidget extends AbstractAdminWidget
             $childrenData[] = $this->getIFaceMenuItemData($commentListInStatus, $params);
         }
 
-        return $this->makeIFaceMenuItemData($commentsIndex, $childrenData);
+        return $this->makeIFaceMenuItemData($commentsIndex, $childrenData, 'comment');
     }
 
     /**
      * @return array|null
-     * @throws \BetaKiller\Repository\RepositoryException
      * @throws \BetaKiller\IFace\Exception\IFaceException
      * @throws \Spotman\Acl\Exception
      */
     protected function getErrorsMenu(): ?array
     {
-        if (!$this->userService->isDeveloper($this->user)) {
-            return null;
-        }
-
         /** @var \BetaKiller\IFace\Admin\Error\Index $iface */
         $errorsIndex = $this->ifaceHelper->createIFaceFromCodename('Admin_Error_Index');
 
@@ -164,6 +159,6 @@ class MainWidget extends AbstractAdminWidget
             $this->makeIFaceMenuItemData($resolvedErrors),
         ];
 
-        return $this->makeIFaceMenuItemData($errorsIndex, $childrenData);
+        return $this->makeIFaceMenuItemData($errorsIndex, $childrenData, 'warning');
     }
 }

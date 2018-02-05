@@ -14,8 +14,8 @@
     "design"
   ],
   "main": [
-    "bin/materialize.css",
-    "bin/materialize.js"
+    "dist/js/materialize.js",
+    "dist/css/materialize.css"
   ],
   "ignore": [
     "jade/",
@@ -38,19 +38,15 @@
     "package.json",
     "Gruntfile.js"
   ],
-  "dependencies": {
-    "jquery": ">=2.1.1"
-  },
-  "devDependencies": {},
   "homepage": "https://github.com/Dogfalo/materialize",
-  "version": "0.98.2",
-  "_release": "0.98.2",
+  "version": "1.0.0-alpha.3",
+  "_release": "1.0.0-alpha.3",
   "_resolution": {
     "type": "version",
-    "tag": "v0.98.2",
-    "commit": "f9e716f46137ba1c0406575be1d92a89b275ead9"
+    "tag": "1.0.0-alpha.3",
+    "commit": "f3211baf6ffdd2b4166d10d3f806f44540c8c206"
   },
   "_source": "https://github.com/Dogfalo/materialize.git",
-  "_target": "^0.98",
+  "_target": "^1.0",
   "_originalSource": "materialize"
 }
