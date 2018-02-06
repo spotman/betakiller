@@ -1,0 +1,13 @@
+{
+  "name": "betakiller-module-content",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "Spotman",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "@fancyapps/fancybox": "^3.2.5",
+    "moment": "^2.20.1",
+    "slick-carousel": "^1.8.1"
+  }
+}

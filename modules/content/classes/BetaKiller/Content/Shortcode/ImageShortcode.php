@@ -157,7 +157,8 @@ class ImageShortcode extends AbstractContentElementShortcode
             'align'   => $align,
             'class'   => $class,
 
-            'image' => $this->assetsHelper->getAttributesForImgTag($model, $model::SIZE_ORIGINAL, $attributes),
+            'image' => $this->assetsHelper->getAttributesForImgTag($model, $model::SIZE_PREVIEW, $attributes),
+            'href'  => $this->assetsHelper->getOriginalUrl($model),
         ];
     }
 

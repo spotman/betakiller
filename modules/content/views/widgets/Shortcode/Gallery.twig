@@ -1,13 +1,24 @@
 {% if images|length %}
 
+  {{ js("require.js/content.config.js") }}
+  {{ js("content/gallery-shortcode.js") }}
+  {{ js("content/fancybox.js") }}
+  {{ js("content/fancybox.i18n.ru.js") }}
+
+  {{ css("content/node_modules/slick-carousel/slick/slick.css") }}
+  {{ css("content/node_modules/slick-carousel/slick/slick-theme.css") }}
+  {{ css("content/node_modules/@fancyapps/fancybox/dist/jquery.fancybox.min.css") }}
+
   {% if layout == "slider" %}
 
     <div class="content-gallery content-gallery-slider">
       {% for image in images %}
-        {{ image(image, { class: "responsive-img carousel-cell swipebox", rel: "content-images", href: image["data-original-url"] }, true) }}
+        {% set caption = image.attributes.title|default(image.attributes.alt) %}
+        <a href="{{ image.href }}" data-fancybox="gallery-{{ id }}" data-caption="{{ caption }}" class="carousel-cell">
+          {{ image(image.attributes, null ,true) }}
+          <div class="image-caption">{{ caption }}</div>
+        </a>
       {% endfor %}
-
-      <div class="image-caption"></div>
     </div>
 
   {% else %} {# "masonry" and "default" layouts are just the same right now #}
@@ -16,8 +27,10 @@
 
     <div class="content-gallery content-gallery-masonry row">
       {% for image in images %}
-        <a href="{{ image["data-original-url"] }}" class="col swipebox" rel="content-images" style="width: {{ width }}">
-          {{ image(image, { class: "responsive-img" }, true) }}
+        {% set caption = image.attributes.title|default(image.attributes.alt) %}
+        <a href="{{ image.href }}" class="col fancybox" style="width: {{ width }}"
+           data-fancybox="gallery-{{ id }}" data-caption="{{ caption }}">
+          {{ image(image.attributes, { class: "responsive-img" }, true) }}
         </a>
       {% endfor %}
     </div>

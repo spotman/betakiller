@@ -146,50 +146,6 @@ define([
     }
   };
 
-
-  // Хелперы к jquery.pnotify
-  $.notify = {
-
-    // песочный цвет
-    notice: function (text) {
-      return $.pnotify({
-        history: false,
-        text: text
-      });
-    },
-
-    // голубой цвет
-    info: function (text) {
-      return $.pnotify({
-        history: false,
-        text: text,
-        type: 'info'
-      });
-    },
-
-    // зелёный цвет
-    success: function (text) {
-      return $.pnotify({
-        history: false,
-        text: text,
-        type: 'success'
-      });
-    },
-
-    // красный цвет
-    error: function (text, permanent) {
-      return $.pnotify({
-        history: false,
-        text: text,
-        type: 'error',
-        hide: !permanent,
-        closer: !permanent,
-        sticker: !permanent
-      });
-    }
-
-  };
-
   /**
    * Downloads file by HTTP, cross-domain
    * @param url

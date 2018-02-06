@@ -1,7 +1,14 @@
+{{ js("require.js/content.config.js") }}
+{{ js("content/image-shortcode.js") }}
+{{ js("content/fancybox.js") }}
+{{ js("content/fancybox.i18n.ru.js") }}
+
+{{ css("content/node_modules/@fancyapps/fancybox/dist/jquery.fancybox.min.css") }}
+
 {% if layout == "default" %}
 
   {% if zoomable %}
-    <a href="{{ image["data-original-url"] }}" title="{{ image.title|default(image.alt) }}" class="swipebox" rel="content-images">
+    <a href="{{ href }}" title="{{ image.title|default(image.alt) }}" class="fancybox" data-caption="{{ caption }}">
   {% endif %}
 
   {{ image(image, { class: image.class ~ " responsive-img" }) }}
@@ -12,10 +19,12 @@
 
 {% elseif layout == "caption" %}
 
-  {% set attrs = {class: "responsive-img swipebox", alt: caption, title: caption, rel: "content-images", href: image['data-original-url']} %}
+  {% set attrs = {class: "responsive-img", alt: caption, title: caption } %}
 
   <div class="wp-caption {{ align ~ " " ~ class }}">
-    {{ image(image, attrs) }}
+    <a href="{{ href }}" class="fancybox" data-caption="{{ caption }}">
+      {{ image(image, attrs) }}
+    </a>
     <span class="wp-caption-text image-caption">{{ caption }}</span>
   </div>
 

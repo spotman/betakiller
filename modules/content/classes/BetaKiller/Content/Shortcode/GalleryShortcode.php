@@ -1,7 +1,6 @@
 <?php
 namespace BetaKiller\Content\Shortcode;
 
-use BetaKiller\Content\Shortcode\Attribute\IdAttribute;
 use BetaKiller\Content\Shortcode\Attribute\NumberAttribute;
 use BetaKiller\Content\Shortcode\Editor\EditorListingItem;
 use BetaKiller\Model\ContentGalleryInterface;
@@ -13,7 +12,7 @@ class GalleryShortcode extends AbstractContentElementShortcode
     public const LAYOUT_MASONRY = 'masonry';
     public const LAYOUT_SLIDER  = 'slider';
 
-    public const ATTR_COLUMNS  = 'columns';
+    public const ATTR_COLUMNS = 'columns';
 
     /**
      * @var \BetaKiller\Helper\AssetsHelper
@@ -104,7 +103,7 @@ class GalleryShortcode extends AbstractContentElementShortcode
         $id = (int)$this->getID();
 
         $gallery = $this->galleryRepository->findById($id);
-        $images  = $this->getImages($gallery,true);
+        $images  = $this->getImages($gallery, true);
 
         $layout  = $this->getLayout();
         $columns = (int)($this->getAttribute('columns') ?? 3);
@@ -112,10 +111,14 @@ class GalleryShortcode extends AbstractContentElementShortcode
         $imagesData = [];
 
         foreach ($images as $model) {
-            $imagesData[] = $this->assetsHelper->getAttributesForImgTag($model, $model::SIZE_PREVIEW);
+            $imagesData[] = [
+                'href' => $this->assetsHelper->getOriginalUrl($model),
+                'attributes' => $this->assetsHelper->getAttributesForImgTag($model, $model::SIZE_PREVIEW),
+            ];
         }
 
         return [
+            'id'      => $id,
             'images'  => $imagesData,
             'layout'  => $layout,
             'columns' => $columns,
