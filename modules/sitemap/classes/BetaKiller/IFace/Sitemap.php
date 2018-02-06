@@ -15,13 +15,14 @@ class Sitemap extends AbstractIFace
      * Returns data for View
      *
      * @return array
+     * @throws \BetaKiller\IFace\Exception\IFaceException
      */
     public function getData(): array
     {
         $data = [];
 
         foreach ($this->urlsCollector->getPublicAvailableUrls() as $item) {
-            $data[] = $item;
+            $data[] = $item->getUrl();
         }
 
         return [

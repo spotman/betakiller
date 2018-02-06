@@ -1,6 +1,7 @@
 <?php
 
 use BetaKiller\Config\AppConfigInterface;
+use BetaKiller\Helper\AppEnv;
 use BetaKiller\Service\AbstractService;
 use BetaKiller\Service\ServiceException;
 use BetaKiller\Url\AvailableUrlsCollector;
@@ -36,24 +37,34 @@ class Service_Sitemap extends AbstractService
     private $urlCollector;
 
     /**
+     * @var \BetaKiller\Helper\AppEnv
+     */
+    private $appEnv;
+
+    /**
      * Service_Sitemap constructor.
      *
      * @param \BetaKiller\Url\AvailableUrlsCollector $urlCollector
      * @param \Psr\Log\LoggerInterface               $logger
      * @param \BetaKiller\Config\AppConfigInterface  $appConfig
+     * @param \BetaKiller\Helper\AppEnv              $appEnv
      */
     public function __construct(
         AvailableUrlsCollector $urlCollector,
         LoggerInterface $logger,
-        AppConfigInterface $appConfig
+        AppConfigInterface $appConfig,
+        AppEnv $appEnv
     ) {
         $this->appConfig    = $appConfig;
         $this->logger       = $logger;
         $this->urlCollector = $urlCollector;
+        $this->appEnv       = $appEnv;
     }
 
     /**
      * @return $this
+     * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \BetaKiller\Factory\FactoryException
      * @throws \InvalidArgumentException
      * @throws \BetaKiller\Service\ServiceException
      */
@@ -68,13 +79,15 @@ class Service_Sitemap extends AbstractService
         // Create sitemap
         $this->sitemap = new Sitemap($this->getSitemapFilePath());
 
-        // TODO Deal with calculation of the last_modified
-        $urls = $this->urlCollector->getPublicAvailableUrls();
+        $items = $this->urlCollector->getPublicAvailableUrls();
 
-        foreach ($urls as $url) {
+        foreach ($items as $item) {
+            $url = $item->getUrl();
+
             $this->logger->debug('Found url :value', [':value' => $url]);
+
             // Store URL
-            $this->sitemap->addItem($url);
+            $this->sitemap->addItem($url, $item->getLastModified());
             $this->linksCounter++;
         }
 
@@ -119,6 +132,6 @@ class Service_Sitemap extends AbstractService
 
     protected function getDocumentRootPath()
     {
-        return MultiSite::instance()->docRoot();
+        return $this->appEnv->getDocRootPath();
     }
 }

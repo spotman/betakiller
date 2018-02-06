@@ -5,6 +5,7 @@ namespace BetaKiller\Factory;
 
 use BetaKiller\Config\AppConfigInterface;
 use BetaKiller\DI\ContainerInterface;
+use BetaKiller\Helper\AppEnv;
 
 class NamespaceBasedFactoryBuilder
 {
@@ -19,35 +20,39 @@ class NamespaceBasedFactoryBuilder
     private $appConfig;
 
     /**
-     * @var \MultiSite
+     * @var \BetaKiller\Helper\AppEnv
      */
-    private $multiSite;
+    private $appEnv;
 
     /**
      * NamespaceBasedFactoryBuilder constructor.
      *
      * @param \BetaKiller\DI\ContainerInterface     $container
      * @param \BetaKiller\Config\AppConfigInterface $appConfig
-     * @param \MultiSite                            $multiSite
+     * @param \BetaKiller\Helper\AppEnv             $appEnv
      */
-    public function __construct(ContainerInterface $container, AppConfigInterface $appConfig, \MultiSite $multiSite)
+    public function __construct(ContainerInterface $container, AppConfigInterface $appConfig, AppEnv $appEnv)
     {
         $this->container = $container;
         $this->appConfig = $appConfig;
-        $this->multiSite = $multiSite;
+        $this->appEnv    = $appEnv;
     }
 
     public function createFactory(): NamespaceBasedFactory
     {
         // Always create new instance coz client code is configuring this instance
 
-        /** @var \BetaKiller\Factory\NamespaceBasedFactory $factory */
-        $factory = $this->container->make(NamespaceBasedFactory::class);
+        try {
+            /** @var \BetaKiller\Factory\NamespaceBasedFactory $factory */
+            $factory = $this->container->make(NamespaceBasedFactory::class);
 
-        if ($this->multiSite->isSiteDetected()) {
-            $factory->addRootNamespace($this->appConfig->getNamespace());
+            if (!$this->appEnv->isCoreRunning()) {
+                $factory->addRootNamespace($this->appConfig->getNamespace());
+            }
+
+            return $factory;
+        } catch (\Throwable $e) {
+            throw FactoryException::wrap($e);
         }
-
-        return $factory;
     }
 }

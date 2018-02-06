@@ -15,12 +15,6 @@ class Task_Cron extends AbstractTask
 {
     /**
      * @Inject
-     * @var \MultiSite
-     */
-    private $multiSite;
-
-    /**
-     * @Inject
      * @var \BetaKiller\Helper\AppEnv
      */
     private $env;
@@ -73,7 +67,7 @@ class Task_Cron extends AbstractTask
      */
     private function enqueueDueTasks(): void
     {
-        $sitePath = $this->multiSite->getSitePath();
+        $sitePath = $this->env->getAppRootPath();
 
         $cronFile = $sitePath.DIRECTORY_SEPARATOR.'crontab.yml';
 
@@ -230,7 +224,7 @@ class Task_Cron extends AbstractTask
             $options += $params;
         }
 
-        $sitePath  = $this->multiSite->getSitePath();
+        $sitePath  = $this->env->getAppRootPath();
         $indexPath = $sitePath.DIRECTORY_SEPARATOR.'public';
 
         $php = PHP_BINARY;

@@ -39,17 +39,30 @@ class AppEnv
     /**
      * @var string
      */
-    private $appRoot;
+    private $appRootPath;
+
+    /**
+     * @var string
+     */
+    private $docRootPath;
+
+    /**
+     * @var bool
+     */
+    private $isCoreRunning;
 
     /**
      * AppEnv constructor.
      *
      * @param string $appRoot
-     *
+     * @param string $docRoot
+     * @param bool   $isCoreRunning
      */
-    public function __construct(string $appRoot)
+    public function __construct(string $appRoot, string $docRoot, bool $isCoreRunning)
     {
-        $this->appRoot = $appRoot;
+        $this->appRootPath   = $appRoot;
+        $this->docRootPath   = $docRoot;
+        $this->isCoreRunning = $isCoreRunning;
 
         $this->initDotEnv();
         $this->detectMode();
@@ -57,10 +70,10 @@ class AppEnv
 
     private function initDotEnv(): void
     {
-        $dotEnv = new Dotenv($this->appRoot, '.env');
+        $dotEnv = new Dotenv($this->appRootPath, '.env');
 
         // Load local .env file if exists even in production
-        if (file_exists($this->appRoot.DIRECTORY_SEPARATOR.'.env')) {
+        if (file_exists($this->appRootPath.DIRECTORY_SEPARATOR.'.env')) {
             $dotEnv->load();
         }
 
@@ -130,8 +143,34 @@ class AppEnv
         return PHP_SAPI === 'cli';
     }
 
-    public function getAppRoot(): string
+    public function getAppRootPath(): string
     {
-        return $this->appRoot;
+        return $this->appRootPath;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDocRootPath(): string
+    {
+        return $this->docRootPath;
+    }
+
+    /**
+     * @return string
+     */
+    public function getAppCodename(): string
+    {
+        return basename($this->appRootPath);
+    }
+
+    /**
+     * Returns true if this is a core run (core console commands, CI tests, etc)
+     *
+     * @return bool
+     */
+    public function isCoreRunning(): bool
+    {
+        return $this->isCoreRunning;
     }
 }

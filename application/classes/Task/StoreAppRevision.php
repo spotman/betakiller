@@ -36,7 +36,7 @@ class Task_StoreAppRevision extends \BetaKiller\Task\AbstractTask
             throw new TaskException('Missing revision number');
         }
 
-        $dotEnvFile = $this->appEnv->getAppRoot().DIRECTORY_SEPARATOR.'.env';
+        $dotEnvFile = $this->appEnv->getAppRootPath().DIRECTORY_SEPARATOR.'.env';
 
         $this->dotEnv->update($dotEnvFile, [
             'APP_REVISION' => $revision,

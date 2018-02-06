@@ -72,9 +72,13 @@ return [
         LoggerInterface::class                      => DI\get(\BetaKiller\Log\Logger::class),
 
         AppEnv::class => DI\factory(function () {
-            $rootPath = MultiSite::instance()->getWorkingPath();
+            $multiSite   = MultiSite::instance();
 
-            return new AppEnv($rootPath);
+            return new AppEnv(
+                $multiSite->getWorkingPath(),
+                $multiSite->docRoot(),
+                !$multiSite->isSiteDetected()
+            );
         }),
 
         Auth::class => DI\factory(function () {
