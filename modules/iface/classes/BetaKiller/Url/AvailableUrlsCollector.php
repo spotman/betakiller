@@ -3,6 +3,7 @@ namespace BetaKiller\Url;
 
 use BetaKiller\Helper\AclHelper;
 use BetaKiller\Helper\LoggerHelperTrait;
+use BetaKiller\IFace\Exception\IFaceException;
 use BetaKiller\IFace\IFaceModelInterface;
 use BetaKiller\IFace\IFaceModelTree;
 use BetaKiller\Url\Behaviour\UrlBehaviourFactory;
@@ -52,7 +53,8 @@ class AvailableUrlsCollector
     /**
      * @param bool|null $useHidden
      *
-     * @return string[]|\Generator
+     * @return \BetaKiller\Url\AvailableUri[]|\Generator
+     * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\IFace\Exception\IFaceException
      */
     public function getPublicAvailableUrls(?bool $useHidden = null): \Generator
@@ -63,7 +65,7 @@ class AvailableUrlsCollector
 
         // Use empty UrlContainer on each root IFace iteration (so no intersection of models between paths)
         foreach ($this->processLayer($root, null, $useHidden) as $item) {
-            yield $item->getUrl();
+            yield $item;
         }
     }
 
@@ -73,6 +75,8 @@ class AvailableUrlsCollector
      * @param bool|null                             $useHidden
      *
      * @return \Generator|\BetaKiller\Url\AvailableUri[]
+     * @throws \BetaKiller\Factory\FactoryException
+     * @throws \BetaKiller\IFace\Exception\IFaceException
      */
     private function processLayer(
         array $models,
@@ -97,8 +101,8 @@ class AvailableUrlsCollector
      * @param bool|null                             $useHidden
      *
      * @return \Generator
+     * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\IFace\Exception\IFaceException
-     * @throws \Spotman\Acl\Exception
      *
      * @link https://github.com/MarkBaker/GeneratorQuadTrees/blob/master/src/PointQuadTree.php
      */
@@ -126,11 +130,15 @@ class AvailableUrlsCollector
                 $params->setParameter($urlParameter, true);
             }
 
-            if (!$this->aclHelper->isIFaceAllowed($ifaceModel, $params)) {
-                $this->logger->debug('Skip :codename IFace coz it is not allowed', [
-                    ':codename' => $ifaceModel->getCodename(),
-                ]);
-                continue;
+            try {
+                if (!$this->aclHelper->isIFaceAllowed($ifaceModel, $params)) {
+                    $this->logger->debug('Skip :codename IFace coz it is not allowed', [
+                        ':codename' => $ifaceModel->getCodename(),
+                    ]);
+                    continue;
+                }
+            } catch (\Spotman\Acl\Exception $e) {
+                throw IFaceException::wrap($e);
             }
 
             yield $availableUrl;
@@ -150,10 +158,13 @@ class AvailableUrlsCollector
      * @param \BetaKiller\Url\UrlContainerInterface $params
      *
      * @return \Generator|\BetaKiller\Url\AvailableUri[]
+     * @throws \BetaKiller\Factory\FactoryException
      */
     private function getAvailableIFaceUrls(IFaceModelInterface $model, UrlContainerInterface $params): \Generator
     {
         $behaviour = $this->behaviourFactory->fromIFaceModel($model);
+
+        // TODO Deal with calculation of the last_modified from each parameter value
 
         foreach ($behaviour->getAvailableUrls($model, $params) as $availableUrl) {
             yield $availableUrl;

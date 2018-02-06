@@ -38,10 +38,11 @@ class Task_Cache_Warmup extends \BetaKiller\Task\AbstractTask
      */
     protected function _execute(array $params)
     {
-        $urls = $this->urlCollector->getPublicAvailableUrls();
+        $items = $this->urlCollector->getPublicAvailableUrls();
         $counter = 0;
 
-        foreach ($urls as $url) {
+        foreach ($items as $item) {
+            $url = $item->getUrl();
             $this->logger->debug('Selected url = '.$url);
 
             // No domain coz HMVC do external requests while domain set
