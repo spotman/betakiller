@@ -1,7 +1,7 @@
 require([
   "jquery",
   "ckeditor-post-message",
-  "materialize.buttons",
+  "materialize",
 ], function($, ckeditorPostMessage) {
 
   $(function() {

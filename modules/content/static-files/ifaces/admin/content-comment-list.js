@@ -1,7 +1,7 @@
 require([
   "jquery",
   "content.api.rpc.definition",
-  "materialize.cards"
+  "materialize"
 ], function($, api) {
 
   $(function() {

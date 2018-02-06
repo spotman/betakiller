@@ -1,8 +1,7 @@
 require([
   "jquery",
-  "content.api.rpc.definition", // ,"materialize.cards"
-  'materialize.forms',
-  'materialize.charCounter'
+  "content.api.rpc.definition",
+  'materialize',
 ], function ($, api) {
 
   const shortcodeToCustomTag = {
@@ -25,7 +24,7 @@ require([
     }
 
     if ($category.length) {
-      $category.material_select();
+      $category.select();
     }
 
     // TODO Move this to dedicated AMD module

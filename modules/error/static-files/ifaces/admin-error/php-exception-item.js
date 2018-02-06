@@ -1,7 +1,6 @@
 require([
   'jquery',
   'error.api.rpc.definition',
-  'materialize.collapsible',
   'jquery.browser',
   'jquery.iframe-auto-height'
 ], function ($, api) {
