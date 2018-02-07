@@ -2,7 +2,7 @@
 
   {# include fonts and materialize layout #}
   {{ css("https://fonts.googleapis.com/icon?family=Material+Icons") }}
-  {{ css("admin/css/admin.css") }}
+  {{ css("widgets/admin-bar.css") }}
   {{ js("widgets/admin-bar.js") }}
 
   <header id="admin-bar" class="navbar-fixed">
@@ -59,10 +59,10 @@
             {% if comments %}
             <li>
               <a href="{{ comments.url }}">
-                <i class="material-icons left tiny">chat</i>
+                <i class="material-icons left tiny {{ comments.count ? "orange-text" : "" }}">chat</i>
                 <span class="hide-on-med-and-down">{{ "admin.bar.comments"|i18n }}</span>
                 {% if comments.count %}
-                <span class="new badge orange" data-badge-caption="{{ "admin.bar.comments.new.badge"|plural(comments.count) }}">
+                <span class="new badge orange hide-on-med-and-down" data-badge-caption="{{ "admin.bar.comments.new.badge"|plural(comments.count) }}">
                   {{ comments.count }}
                 </span>
                 {% endif %}

@@ -1,0 +1,13 @@
+@charset "UTF-8";
+
+@import "../admin/node_modules/materialize-css/sass/components/color-variables";
+@import "../admin/node_modules/materialize-css/sass/components/color-classes";
+@import "../admin/node_modules/materialize-css/sass/components/variables";
+@import "../admin/node_modules/materialize-css/sass/components/normalize";
+@import "../admin/node_modules/materialize-css/sass/components/global";
+@import "../admin/node_modules/materialize-css/sass/components/navbar";
+
+#admin-bar * {
+  color: #313131;
+}
+

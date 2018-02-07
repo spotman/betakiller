@@ -1,7 +1,7 @@
 require.config({
 
   paths: {
-    "materialize": "../admin/components/materialize/dist/js/materialize.min",
+    "materialize": "../admin/node_modules/materialize-css/dist/js/materialize.min",
   },
 
   shim: {

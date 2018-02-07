@@ -25,7 +25,7 @@ $h4-fontsize: 1.3rem;
 $h5-fontsize: 1.2rem;
 $h6-fontsize: 1.1rem;
 
-@import "../../components/materialize/sass/materialize";
+@import "../../node_modules/materialize-css/sass/materialize";
 
 $large-and-down: "only screen and (max-width : #{$large-screen})" !default;
 $large-only: "only screen and (min-width : #{$medium-screen-up}) and (max-width : #{$large-screen})" !default;
