@@ -6,9 +6,9 @@ require([
 
   $(function () {
     const $resolveButton = $('.resolve-error-button'),
-          $ignoreButton = $('.ignore-error-button'),
-          $deleteButton = $('.delete-error-button'),
-          $traceIFrame = $('.trace-iframe');
+          $ignoreButton  = $('.ignore-error-button'),
+          $deleteButton  = $('.delete-error-button'),
+          $traceIFrame   = $('.trace-iframe');
 
     $traceIFrame.iFrameResize();
 
@@ -31,17 +31,17 @@ require([
         });
     }
 
-    $resolveButton.click(function (e) {
+    $resolveButton.on('click', function (e) {
       e.preventDefault();
       processActionButtonClick($(this), api.phpException.resolve);
     });
 
-    $ignoreButton.click(function (e) {
+    $ignoreButton.on('click', function (e) {
       e.preventDefault();
       processActionButtonClick($(this), api.phpException.ignore);
     });
 
-    $deleteButton.click(function (e) {
+    $deleteButton.on('click', function (e) {
       e.preventDefault();
       processActionButtonClick($(this), api.phpException.delete);
     });
