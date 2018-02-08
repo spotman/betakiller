@@ -15,7 +15,7 @@
       {% for image in images %}
         {% set caption = image.attributes.title|default(image.attributes.alt) %}
         <a href="{{ image.href }}" data-fancybox="gallery-{{ id }}" data-caption="{{ caption }}" class="carousel-cell">
-          {{ image(image.attributes, null ,true) }}
+          {{ image(image.attributes, null, true) }}
           <div class="image-caption">{{ caption }}</div>
         </a>
       {% endfor %}
