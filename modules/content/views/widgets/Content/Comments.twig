@@ -1,0 +1,77 @@
+{{ js("content/content-comment.js") }}
+
+{% if comments|length %}
+  <div class="side-lines-header">
+    <span>{{ "comments.count"|plural({ ":count": comments|length }) }}</span>
+  </div>
+
+  <div id="comments-container" class="row">
+    {% for comment in comments %}
+      <div id="content-comment-{{ comment.id }}" data-id="{{ comment.id }}" data-parent-id="{{ comment.parent_id }}"
+           class="content-comment col s12 content-comment-level-{{ comment.level }}">
+        <div class="card-panel z-depth-0"> {#grey lighten-5#}
+          <div class="comment-header">
+            <img src="{{ comment.image }}" alt="{{ comment.name }} gravatar"
+                 class="comment-author-image circle responsive-img"/>
+
+            <button class="comment-reply-button btn waves-effect waves-light">{{ "comment.reply"|i18n }}</button>
+            <span class="comment-author">{{ comment.name }}</span>
+            <span class="comment-date">
+              <i class="material-icons icon">schedule</i>
+              {{ ":date at :time"|i18n({ ":date": comment.date, ":time": comment.time }) }}
+            </span>
+          </div>
+
+          <span class="comment-message">{{ comment.message|nl2br }}</span>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
+
+<div id="content-comment-block" class="row">
+  <form id="content-comment-form" action="{{ form_action }}" method="post" class="col s12"
+        data-success-text="Спасибо за участие в обсуждении! Ваш комментарий получен и будет показан на странице после проверки модератором."
+        data-error-text="Ой, что-то пошло не так... Попробуйте, пожалуйста, отправить ваш комментарий через пару минут.">
+    <div class="side-lines-header">
+      <span>{{ "comments.form.header"|i18n }}</span>
+    </div>
+
+    <div class="row">
+      <div class="input-field col s12">
+        <i class="material-icons prefix">account_circle</i>
+        <input type="text" name="name" id="content-comment-form-name" class="validate" maxlength="64"/>
+        <label for="content-comment-form-name">Имя</label>
+      </div>
+
+      <div class="input-field col s12">
+        <i class="material-icons prefix">email</i>
+        <input type="email" name="email" id="content-comment-form-email" class="validate" maxlength="32"/>
+        <label for="content-comment-form-email">Email</label>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="input-field col s12">
+        <i class="material-icons prefix">message</i>
+        <textarea id="content-comment-form-message" name="message" cols="30" rows="5"
+                  class="validate materialize-textarea" maxlength="1024"></textarea>
+        <label for="content-comment-form-message">Комментарий</label>
+      </div>
+    </div>
+
+    <input type="hidden" name="parent" value="0"/>
+    <input type="hidden" name="entity" value="{{ entity }}"/>
+    <input type="hidden" name="entityItemId" value="{{ entityItemId }}"/>
+    <input type="hidden" name="csrf-key" value="{{ token }}"/>
+
+    <div class="row">
+      <div class="center-align col s12">
+        <button type="submit" class="btn green waves-effect waves-light">
+          Отправить
+          <i class="material-icons right">send</i>
+        </button>
+      </div>
+    </div>
+  </form>
+</div>
