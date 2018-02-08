@@ -21,6 +21,9 @@ global_exclude_dirs:
     - modules/utils
     - modules/admin/static-files/admin/components
 
+exclude_patterns:
+- modules/*/node_modules/*
+
 rules:
     php.use_global_variable_or_function:
         enabled: true
