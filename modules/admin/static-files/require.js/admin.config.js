@@ -1,7 +1,7 @@
 require.config({
 
   paths: {
-    "jquery": "../admin/node_modules/jquery/dist/jquery.slim.min",
+    "jquery": "../admin/node_modules/jquery/dist/jquery.min",
     "admin.notify": "./admin-notify"
   }
 
