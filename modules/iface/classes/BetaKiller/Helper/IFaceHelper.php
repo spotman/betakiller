@@ -76,7 +76,7 @@ class IFaceHelper
         $this->tree                = $tree;
         $this->stringPatternHelper = $stringPatternHelper;
         $this->factory             = $factory;
-        $this->i18n = $i18n;
+        $this->i18n                = $i18n;
     }
 
     public function getCurrentIFaceModel(): ?IFaceModelInterface
@@ -92,6 +92,12 @@ class IFaceHelper
         return $currentAction === $name;
     }
 
+    /**
+     * @param string $zone
+     *
+     * @return bool
+     * @throws \BetaKiller\IFace\Exception\IFaceException
+     */
     public function isCurrentIFaceZone(string $zone): bool
     {
         $currentIFaceModel = $this->getCurrentIFaceModel();
@@ -114,6 +120,7 @@ class IFaceHelper
      * @param string $codename
      *
      * @return \BetaKiller\IFace\IFaceInterface
+     * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\IFace\Exception\IFaceException
      */
     public function createIFaceFromCodename(string $codename): IFaceInterface
@@ -321,6 +328,7 @@ class IFaceHelper
      * @param \BetaKiller\IFace\IFaceModelInterface $model
      *
      * @return \BetaKiller\Model\DispatchableEntityInterface|null
+     * @throws \BetaKiller\IFace\Exception\IFaceException
      */
     public function detectPrimaryEntity(IFaceModelInterface $model): ?DispatchableEntityInterface
     {
@@ -338,6 +346,7 @@ class IFaceHelper
      * @param \BetaKiller\IFace\IFaceModelInterface $model
      *
      * @return string|null
+     * @throws \BetaKiller\IFace\Exception\IFaceException
      */
     public function detectLayoutCodename(IFaceModelInterface $model): ?string
     {
@@ -355,6 +364,7 @@ class IFaceHelper
      * @param \BetaKiller\IFace\IFaceModelInterface $model
      *
      * @return string
+     * @throws \BetaKiller\IFace\Exception\IFaceException
      */
     public function detectZoneName(IFaceModelInterface $model): string
     {
@@ -437,6 +447,7 @@ class IFaceHelper
      * @param \BetaKiller\IFace\IFaceModelInterface $model
      *
      * @return string
+     * @throws \BetaKiller\IFace\Exception\IFaceException
      * @throws \BetaKiller\Url\UrlPrototypeException
      */
     public function makeTitleFromLabels(IFaceModelInterface $model): string

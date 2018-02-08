@@ -1,6 +1,7 @@
 <?php
 namespace BetaKiller\View;
 
+use BetaKiller\Helper\I18nHelper;
 use BetaKiller\Helper\IFaceHelper;
 use BetaKiller\IFace\Exception\IFaceException;
 use BetaKiller\IFace\IFaceInterface;
@@ -36,6 +37,11 @@ class IFaceView
     private $viewFactory;
 
     /**
+     * @var \BetaKiller\Helper\I18nHelper
+     */
+    private $i18nHelper;
+
+    /**
      * IFaceView constructor.
      *
      * @param \BetaKiller\Repository\IFaceLayoutRepository $layoutRepo
@@ -43,19 +49,22 @@ class IFaceView
      * @param \BetaKiller\Helper\IFaceHelper               $ifaceHelper
      * @param \BetaKiller\View\HtmlHeadHelper              $headHelper
      * @param \BetaKiller\View\ViewFactoryInterface        $viewFactory
+     * @param \BetaKiller\Helper\I18nHelper                $i18nHelper
      */
     public function __construct(
         IFaceLayoutRepository $layoutRepo,
         LayoutViewInterface $layoutView,
         IFaceHelper $ifaceHelper,
         HtmlHeadHelper $headHelper,
-        ViewFactoryInterface $viewFactory
+        ViewFactoryInterface $viewFactory,
+        I18nHelper $i18nHelper
     ) {
         $this->layoutRepo  = $layoutRepo;
         $this->layoutView  = $layoutView;
         $this->headHelper  = $headHelper;
         $this->viewFactory = $viewFactory;
         $this->ifaceHelper = $ifaceHelper;
+        $this->i18nHelper  = $i18nHelper;
     }
 
     /**
@@ -89,6 +98,7 @@ class IFaceView
         }
 
         $this->headHelper
+            ->setLang($this->i18nHelper->getLang())
             ->setContentType()
             ->setTitle($this->ifaceHelper->getTitle($model))
             ->setMetaDescription($this->ifaceHelper->getDescription($model))

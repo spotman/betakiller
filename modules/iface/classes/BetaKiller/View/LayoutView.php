@@ -78,7 +78,7 @@ class LayoutView implements LayoutViewInterface
     public function render(ViewInterface $ifaceView): string
     {
         $layoutPath = $this->getLayoutViewPath();
-        $layoutView = $this->viewFactory->create($layoutPath);
+        $layoutView = $this->createView($layoutPath);
 
         $layoutView->set('content', $ifaceView->render());
 
@@ -100,7 +100,7 @@ class LayoutView implements LayoutViewInterface
     protected function wrap(string $layoutContent): string
     {
         $wrapperPath = $this->getWrapperViewPath();
-        $view = $this->viewFactory->create($wrapperPath);
+        $view = $this->createView($wrapperPath);
 
         foreach ($this->getWrapperData() as $key => $value) {
             $view->set($key, $value);
@@ -114,6 +114,7 @@ class LayoutView implements LayoutViewInterface
     protected function getWrapperData(): array
     {
         return [
+            'lang' => $this->headHelper->getLang(),
             'head' => $this->headHelper->renderAll(),
         ];
     }

@@ -10,6 +10,11 @@ class HtmlHeadHelper
      */
     private $meta;
 
+    /**
+     * @var string
+     */
+    private $lang;
+
     private $links = [];
 
     /**
@@ -92,6 +97,21 @@ class HtmlHeadHelper
         $this->links[] = $attributes;
 
         return $this;
+    }
+
+    public function setLang(string $lang): self
+    {
+        $this->lang = $lang;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getLang(): string
+    {
+        return $this->lang;
     }
 
     public function renderAll(): string
