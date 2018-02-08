@@ -7,9 +7,10 @@ require.config({
 
   shim: {
     "jquery.iframe-auto-height": {
-      "deps": [
-        "jquery"
-      ]
+      deps: ["jquery"]
+    },
+    "jquery.browser": {
+      deps: ["jquery"]
     }
   }
 
