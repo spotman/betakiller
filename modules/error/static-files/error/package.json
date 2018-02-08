@@ -1,0 +1,15 @@
+{
+  "name": "betakiller-module-error",
+  "version": "1.0.0",
+  "description": "",
+  "private": true,
+  "main": "js-error-catcher.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Spotman",
+  "license": "MIT",
+  "dependencies": {
+    "jquery-iframe-auto-height": "^2.0.0"
+  }
+}
