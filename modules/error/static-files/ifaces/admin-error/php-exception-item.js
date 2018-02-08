@@ -1,7 +1,7 @@
 require([
   'jquery',
   'error.api.rpc.definition',
-  'jquery.iframe-auto-height'
+  'iframe-resizer'
 ], function ($, api) {
 
   $(function () {
@@ -10,7 +10,7 @@ require([
           $deleteButton = $('.delete-error-button'),
           $traceIFrame = $('.trace-iframe');
 
-    $traceIFrame.iframeAutoHeight();
+    $traceIFrame.iFrameResize();
 
     function processActionButtonClick($button, apiMethod) {
       $button.attr('disabled', 'disabled');
