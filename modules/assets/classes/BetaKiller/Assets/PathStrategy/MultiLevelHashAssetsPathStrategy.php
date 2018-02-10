@@ -1,12 +1,14 @@
 <?php
-namespace BetaKiller\Assets\UrlStrategy;
+declare(strict_types=1);
 
+namespace BetaKiller\Assets\PathStrategy;
 
 use BetaKiller\Assets\AssetsException;
-use BetaKiller\Repository\HashUrlStrategyRepositoryInterface;
 use BetaKiller\Assets\Model\AssetsModelInterface;
+use BetaKiller\Assets\MultiLevelPath;
+use BetaKiller\Repository\HashUrlStrategyRepositoryInterface;
 
-class HashAssetsUrlStrategy implements AssetsUrlStrategyInterface
+class MultiLevelHashAssetsPathStrategy implements AssetsPathStrategyInterface
 {
     /**
      * @var \BetaKiller\Repository\HashUrlStrategyRepositoryInterface
@@ -14,13 +16,20 @@ class HashAssetsUrlStrategy implements AssetsUrlStrategyInterface
     private $repository;
 
     /**
-     * HashAssetsUrlStrategy constructor.
+     * @var \BetaKiller\Assets\MultiLevelPath
+     */
+    private $multiLevelPath;
+
+    /**
+     * MultiLevelHashAssetsPathStrategy constructor.
      *
      * @param \BetaKiller\Repository\HashUrlStrategyRepositoryInterface $repository
      */
     public function __construct(HashUrlStrategyRepositoryInterface $repository)
     {
         $this->repository = $repository;
+
+        $this->multiLevelPath = new MultiLevelPath(); // Use default, maybe would be configured in the future
     }
 
     /**
@@ -28,11 +37,12 @@ class HashAssetsUrlStrategy implements AssetsUrlStrategyInterface
      *
      * @param string $path
      *
-     * @return \BetaKiller\Assets\Model\AssetsModelInterface|null
+     * @return \BetaKiller\Assets\Model\AssetsModelInterface
      */
-    public function getModelFromFilename(string $path): ?AssetsModelInterface
+    public function getModelByPath(string $path): AssetsModelInterface
     {
-        $hash = basename($path);
+        // Drop multi level paths
+        $hash = $this->multiLevelPath->parse($path);
 
         return $this->repository->findByHash($hash);
     }
@@ -42,9 +52,12 @@ class HashAssetsUrlStrategy implements AssetsUrlStrategyInterface
      *
      * @param \BetaKiller\Assets\Model\AssetsModelInterface $model
      *
+     * @param null|string                                   $delimiter
+     *
      * @return string
+     * @throws \BetaKiller\Assets\AssetsException
      */
-    public function getFilenameFromModel(AssetsModelInterface $model): string
+    public function makeModelPath(AssetsModelInterface $model, ?string $delimiter = null): string
     {
         $hash = $model->getHash();
 
@@ -54,7 +67,6 @@ class HashAssetsUrlStrategy implements AssetsUrlStrategyInterface
             ]);
         }
 
-        return $hash;
+        return $this->multiLevelPath->make($hash, $delimiter);
     }
-
 }

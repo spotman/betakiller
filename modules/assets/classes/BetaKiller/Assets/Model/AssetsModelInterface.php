@@ -14,13 +14,6 @@ use DateTimeInterface;
 interface AssetsModelInterface extends AbstractEntityInterface
 {
     /**
-     * Returns filename for storage
-     *
-     * @return string
-     */
-    public function getStorageFileName(): string;
-
-    /**
      * Returns User model, who uploaded the file
      *
      * @return UserInterface

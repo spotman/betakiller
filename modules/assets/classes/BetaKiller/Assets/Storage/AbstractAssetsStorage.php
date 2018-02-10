@@ -1,8 +1,6 @@
 <?php
 namespace BetaKiller\Assets\Storage;
 
-use BetaKiller\Assets\Model\AssetsModelInterface;
-
 /**
  * Class AbstractAssetsStorage
  * Abstract storage for assets
@@ -22,23 +20,6 @@ abstract class AbstractAssetsStorage implements AssetsStorageInterface
         $this->basePath = $basePath;
     }
 
-    /**
-     * @param \BetaKiller\Assets\Model\AssetsModelInterface $model
-     *
-     * @return string
-     */
-    protected function getModelFullPath(AssetsModelInterface $model): string
-    {
-        $relativePath = $this->getModelRelativePath($model);
-
-        return $this->makeFullPath($relativePath);
-    }
-
-    protected function getModelRelativePath(AssetsModelInterface $model): string
-    {
-        return $model->getStorageFileName();
-    }
-
     private function makeFullPath(string $relativePath): string
     {
         return $this->basePath
@@ -47,14 +28,14 @@ abstract class AbstractAssetsStorage implements AssetsStorageInterface
     }
 
     /**
-     * @param \BetaKiller\Assets\Model\AssetsModelInterface $model
+     * @param string $path
      *
      * @return string
      * @throws \BetaKiller\Assets\AssetsStorageException
      */
-    public function get(AssetsModelInterface $model): string
+    public function get(string $path): string
     {
-        $path = $this->getModelFullPath($model);
+        $path = $this->makeFullPath($path);
 
         return $this->doGet($path);
     }
@@ -62,14 +43,14 @@ abstract class AbstractAssetsStorage implements AssetsStorageInterface
     /**
      * Stores file
      *
-     * @param \BetaKiller\Assets\Model\AssetsModelInterface $model
-     * @param string                                        $content
+     * @param string $path
+     * @param string $content
      *
      * @throws \BetaKiller\Assets\AssetsStorageException
      */
-    public function put(AssetsModelInterface $model, string $content): void
+    public function put(string $path, string $content): void
     {
-        $path = $this->getModelFullPath($model);
+        $path = $this->makeFullPath($path);
 
         $this->doPut($path, $content);
     }
@@ -77,13 +58,13 @@ abstract class AbstractAssetsStorage implements AssetsStorageInterface
     /**
      * Deletes the file
      *
-     * @param \BetaKiller\Assets\Model\AssetsModelInterface $model
+     * @param string $path
      *
      * @throws \BetaKiller\Assets\AssetsStorageException
      */
-    public function delete(AssetsModelInterface $model): void
+    public function delete(string $path): void
     {
-        $path = $this->getModelFullPath($model);
+        $path = $this->makeFullPath($path);
 
         $this->doDelete($path);
     }

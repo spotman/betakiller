@@ -1,11 +1,11 @@
 <?php
 namespace BetaKiller\Assets;
 
-use BetaKiller\Assets\UrlStrategy\AssetsUrlStrategyInterface;
+use BetaKiller\Assets\PathStrategy\AssetsPathStrategyInterface;
 use BetaKiller\Factory\NamespaceBasedFactoryBuilder;
 use BetaKiller\Repository\RepositoryInterface;
 
-class AssetsUrlStrategyFactory
+class AssetsPathStrategyFactory
 {
     /**
      * @var \BetaKiller\Factory\NamespaceBasedFactory
@@ -13,7 +13,7 @@ class AssetsUrlStrategyFactory
     private $factory;
 
     /**
-     * AssetsUrlStrategyFactory constructor.
+     * AssetsPathStrategyFactory constructor.
      *
      * @param \BetaKiller\Factory\NamespaceBasedFactoryBuilder $factoryBuilder
      */
@@ -21,19 +21,19 @@ class AssetsUrlStrategyFactory
     {
         $this->factory = $factoryBuilder
             ->createFactory()
-            ->setClassNamespaces('Assets', 'UrlStrategy')
-            ->setClassSuffix('AssetsUrlStrategy')
-            ->setExpectedInterface(AssetsUrlStrategyInterface::class);
+            ->setClassNamespaces('Assets', 'PathStrategy')
+            ->setClassSuffix('AssetsPathStrategy')
+            ->setExpectedInterface(AssetsPathStrategyInterface::class);
     }
 
     /**
      * @param string                                     $codename
      * @param \BetaKiller\Repository\RepositoryInterface $repository
      *
-     * @return \BetaKiller\Assets\UrlStrategy\AssetsUrlStrategyInterface
+     * @return \BetaKiller\Assets\PathStrategy\AssetsPathStrategyInterface
      * @throws \BetaKiller\Factory\FactoryException
      */
-    public function create(string $codename, RepositoryInterface $repository): AssetsUrlStrategyInterface
+    public function create(string $codename, RepositoryInterface $repository): AssetsPathStrategyInterface
     {
         return $this->factory->create($codename, [
             'repository' => $repository,

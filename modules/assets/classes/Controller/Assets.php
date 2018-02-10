@@ -5,13 +5,15 @@ use BetaKiller\Assets\AssetsProviderFactory;
 use BetaKiller\Assets\Model\AssetsModelInterface;
 use BetaKiller\Assets\Provider\AssetsProviderInterface;
 use BetaKiller\Assets\Provider\ImageAssetsProviderInterface;
+use BetaKiller\Exception\BadRequestHttpException;
+use BetaKiller\Exception\FoundHttpException;
+use BetaKiller\Exception\NotFoundHttpException;
 
 class Controller_Assets extends Controller
 {
-    const ACTION_ORIGINAL = 'original';
-    const ACTION_PREVIEW  = 'preview';
-    const ACTION_DELETE   = 'delete';
-    const ACTION_CROP     = 'crop'; // Kept for BC
+    public const ACTION_ORIGINAL = 'original';
+    public const ACTION_PREVIEW  = 'preview';
+    public const ACTION_DELETE   = 'delete';
 
     /**
      * @Inject
@@ -33,6 +35,12 @@ class Controller_Assets extends Controller
     /**
      * Common action for uploading files through provider
      *
+     * @throws \BetaKiller\Exception\FoundHttpException
+     * @throws \BetaKiller\Factory\FactoryException
+     * @throws \BetaKiller\Assets\AssetsStorageException
+     * @throws \BetaKiller\Assets\AssetsProviderException
+     * @throws \BetaKiller\Exception\NotFoundHttpException
+     * @throws \BetaKiller\Exception\BadRequestHttpException
      * @throws AssetsException
      */
     public function action_upload(): void
@@ -60,6 +68,16 @@ class Controller_Assets extends Controller
         $this->send_json(self::JSON_SUCCESS, $model->toJson());
     }
 
+    /**
+     * @throws \BetaKiller\Exception\FoundHttpException
+     * @throws \BetaKiller\Assets\AssetsException
+     * @throws \BetaKiller\Assets\AssetsProviderException
+     * @throws \BetaKiller\Assets\AssetsStorageException
+     * @throws \BetaKiller\Exception\BadRequestHttpException
+     * @throws \BetaKiller\Exception\NotFoundHttpException
+     * @throws \BetaKiller\Factory\FactoryException
+     * @throws \HTTP_Exception_500
+     */
     public function action_original(): void
     {
         $this->detectProvider();
@@ -81,6 +99,16 @@ class Controller_Assets extends Controller
         $this->send_file($content, $model->getMime());
     }
 
+    /**
+     * @throws \BetaKiller\Exception\FoundHttpException
+     * @throws \BetaKiller\Assets\AssetsException
+     * @throws \BetaKiller\Assets\AssetsProviderException
+     * @throws \BetaKiller\Assets\AssetsStorageException
+     * @throws \BetaKiller\Exception\BadRequestHttpException
+     * @throws \BetaKiller\Exception\NotFoundHttpException
+     * @throws \BetaKiller\Factory\FactoryException
+     * @throws \HTTP_Exception_500
+     */
     public function action_download(): void
     {
         $this->detectProvider();
@@ -99,6 +127,16 @@ class Controller_Assets extends Controller
         $this->send_file($content, $model->getMime(), $model->getOriginalName(), true);
     }
 
+    /**
+     * @throws \BetaKiller\Exception\FoundHttpException
+     * @throws \BetaKiller\Assets\AssetsException
+     * @throws \BetaKiller\Assets\AssetsProviderException
+     * @throws \BetaKiller\Assets\AssetsStorageException
+     * @throws \BetaKiller\Exception\BadRequestHttpException
+     * @throws \BetaKiller\Exception\NotFoundHttpException
+     * @throws \BetaKiller\Factory\FactoryException
+     * @throws \HTTP_Exception_500
+     */
     public function action_preview(): void
     {
         $this->detectProvider();
@@ -131,37 +169,20 @@ class Controller_Assets extends Controller
         $this->send_file($previewContent, $model->getMime());
     }
 
-    public function action_crop(): void
-    {
-        $this->detectProvider();
-
-        if (!($this->provider instanceof ImageAssetsProviderInterface)) {
-            throw new AssetsException('Cropping can be processed only by instances of :must', [
-                ':must' => ImageAssetsProviderInterface::class,
-            ]);
-        }
-
-        $size  = $this->getSizeParam();
-        $model = $this->fromItemDeployUrl();
-
-        // Redirect to default size
-        if (!$size) {
-            $this->redirectToCanonicalUrl($model);
-        }
-
-        $this->checkExtension($model);
-
-        $preview_url = $this->provider->getPreviewUrl($model, $size);
-
-        // Redirect for SEO backward compatibility
-        $this->response->redirect($preview_url, 301);
-    }
-
     private function getSizeParam(): ?string
     {
         return $this->param('size');
     }
 
+    /**
+     * @throws \BetaKiller\Exception\FoundHttpException
+     * @throws \BetaKiller\Assets\AssetsException
+     * @throws \BetaKiller\Assets\AssetsProviderException
+     * @throws \BetaKiller\Assets\AssetsStorageException
+     * @throws \BetaKiller\Exception\BadRequestHttpException
+     * @throws \BetaKiller\Exception\NotFoundHttpException
+     * @throws \BetaKiller\Factory\FactoryException
+     */
     public function action_delete(): void
     {
         // This method responds via JSON (all exceptions will be caught automatically)
@@ -178,6 +199,15 @@ class Controller_Assets extends Controller
         $this->send_json(self::JSON_SUCCESS);
     }
 
+    /**
+     * @throws \BetaKiller\Exception\FoundHttpException
+     * @throws \BetaKiller\Assets\AssetsException
+     * @throws \BetaKiller\Assets\AssetsProviderException
+     * @throws \BetaKiller\Assets\AssetsStorageException
+     * @throws \BetaKiller\Exception\BadRequestHttpException
+     * @throws \BetaKiller\Exception\NotFoundHttpException
+     * @throws \BetaKiller\Factory\FactoryException
+     */
     protected function detectProvider(): void
     {
         $requestKey = $this->param('provider');
@@ -199,8 +229,8 @@ class Controller_Assets extends Controller
 
     /**
      * @return \BetaKiller\Assets\Model\AssetsModelInterface|\BetaKiller\Assets\Model\AssetsModelImageInterface
+     * @throws \BetaKiller\Exception\NotFoundHttpException
      * @throws \BetaKiller\Assets\AssetsException
-     * @throws \HTTP_Exception_404
      */
     protected function fromItemDeployUrl()
     {
@@ -215,7 +245,7 @@ class Controller_Assets extends Controller
             return $this->provider->getModelByDeployUrl($url);
         } /** @noinspection BadExceptionsProcessingInspection */ catch (AssetsException $e) {
             // File not found
-            throw new HTTP_Exception_404;
+            throw new NotFoundHttpException;
         }
     }
 
@@ -224,6 +254,14 @@ class Controller_Assets extends Controller
         $this->provider->deploy($this->request, $model, $content);
     }
 
+    /**
+     * @param \BetaKiller\Assets\Model\AssetsModelInterface $model
+     *
+     * @throws \BetaKiller\Exception\FoundHttpException
+     * @throws \BetaKiller\Assets\AssetsProviderException
+     * @throws \BetaKiller\Exception\BadRequestHttpException
+     * @throws \BetaKiller\Exception\NotFoundHttpException
+     */
     protected function checkExtension(AssetsModelInterface $model): void
     {
         $requestExt = $this->request->param('ext');
@@ -234,13 +272,29 @@ class Controller_Assets extends Controller
         }
     }
 
+    /**
+     * @param \BetaKiller\Assets\Model\AssetsModelInterface $model
+     *
+     * @throws \BetaKiller\Exception\FoundHttpException
+     * @throws \BetaKiller\Assets\AssetsProviderException
+     * @throws \BetaKiller\Exception\BadRequestHttpException
+     * @throws \BetaKiller\Exception\NotFoundHttpException
+     */
     private function redirectToCanonicalUrl(AssetsModelInterface $model): void
     {
         $url = $this->getCanonicalUrl($model);
 
-        $this->response->redirect($url, 302);
+        throw new FoundHttpException($url);
     }
 
+    /**
+     * @param \BetaKiller\Assets\Model\AssetsModelInterface $model
+     *
+     * @return string
+     * @throws \BetaKiller\Exception\BadRequestHttpException
+     * @throws \BetaKiller\Assets\AssetsProviderException
+     * @throws \BetaKiller\Exception\NotFoundHttpException
+     */
     private function getCanonicalUrl(AssetsModelInterface $model): string
     {
         $action = $this->request->action();
@@ -250,9 +304,8 @@ class Controller_Assets extends Controller
                 return $this->provider->getOriginalUrl($model);
 
             case 'preview':
-            case 'crop':
                 if (!($this->provider instanceof ImageAssetsProviderInterface)) {
-                    throw new HTTP_Exception_400('Action :name may be used on images only', [':name' => $action]);
+                    throw new BadRequestHttpException('Action :name may be used on images only', [':name' => $action]);
                 }
 
                 return $this->provider->getPreviewUrl($model, $this->getSizeParam());
@@ -261,7 +314,7 @@ class Controller_Assets extends Controller
                 return $this->provider->getDeleteUrl($model);
 
             default:
-                throw new HTTP_Exception_400('Unknown action :value', [':value' => $action]);
+                throw new NotFoundHttpException('Unknown action :value', [':value' => $action]);
         }
     }
 }

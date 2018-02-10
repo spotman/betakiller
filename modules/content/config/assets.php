@@ -15,10 +15,8 @@ return [
                 SaveEntityItemRelationHandler::CODENAME,
             ],
 
-            'deploy' => true,
-
             'storage' => [
-                'name' => 'Local',
+                'name' => 'LocalPublic',
                 'path' => 'post-thumbnails'
             ],
         ],
@@ -35,10 +33,9 @@ return [
             'post_upload' => [
                 SaveEntityItemRelationHandler::CODENAME,
             ],
-            'deploy' => true,
 
             'storage' => [
-                'name' => 'Local',
+                'name' => 'LocalPublic',
                 'path' => 'content-images'
             ],
         ],
@@ -53,10 +50,8 @@ return [
                 SaveEntityItemRelationHandler::CODENAME,
             ],
 
-            'deploy' => true,
-
             'storage' => [
-                'name' => 'Local',
+                'name' => 'LocalPublic',
                 'path' => 'content-attachments'
             ],
         ]

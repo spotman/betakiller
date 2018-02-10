@@ -37,9 +37,9 @@ class AssetsProviderFactory
     private $storageFactory;
 
     /**
-     * @var \BetaKiller\Assets\AssetsUrlStrategyFactory
+     * @var \BetaKiller\Assets\AssetsPathStrategyFactory
      */
-    private $urlStrategyFactory;
+    private $pathStrategyFactory;
 
     /**
      * @var \BetaKiller\Assets\AssetsHandlerFactory
@@ -63,16 +63,18 @@ class AssetsProviderFactory
      * @param \BetaKiller\Config\ConfigProviderInterface       $config
      * @param \BetaKiller\Factory\RepositoryFactory            $repositoryFactory
      * @param \BetaKiller\Assets\AssetsStorageFactory          $storageFactory
-     * @param \BetaKiller\Assets\AssetsUrlStrategyFactory      $urlStrategyFactory
+     * @param \BetaKiller\Assets\AssetsPathStrategyFactory     $pathStrategyFactory
      * @param \BetaKiller\Assets\AssetsHandlerFactory          $handlerFactory
      * @param \Spotman\Acl\AclInterface                        $acl
+     *
+     * @throws \BetaKiller\Factory\FactoryException
      */
     public function __construct(
         NamespaceBasedFactoryBuilder $factoryBuilder,
         ConfigProviderInterface $config,
         RepositoryFactory $repositoryFactory,
         AssetsStorageFactory $storageFactory,
-        AssetsUrlStrategyFactory $urlStrategyFactory,
+        AssetsPathStrategyFactory $pathStrategyFactory,
         AssetsHandlerFactory $handlerFactory,
         AclInterface $acl
     ) {
@@ -82,12 +84,12 @@ class AssetsProviderFactory
             ->setClassSuffix('AssetsProvider')
             ->setExpectedInterface(AssetsProviderInterface::class);
 
-        $this->config             = $config;
-        $this->repositoryFactory  = $repositoryFactory;
-        $this->storageFactory     = $storageFactory;
-        $this->urlStrategyFactory = $urlStrategyFactory;
-        $this->handlerFactory     = $handlerFactory;
-        $this->acl                = $acl;
+        $this->config              = $config;
+        $this->repositoryFactory   = $repositoryFactory;
+        $this->storageFactory      = $storageFactory;
+        $this->pathStrategyFactory = $pathStrategyFactory;
+        $this->handlerFactory      = $handlerFactory;
+        $this->acl                 = $acl;
     }
 
     /**
@@ -161,7 +163,7 @@ class AssetsProviderFactory
         $modelConfig             = $this->getModelConfig($modelName);
         $providerName            = $modelConfig[AbstractAssetsProvider::CONFIG_MODEL_PROVIDER_KEY];
         $storageConfig           = $modelConfig[AbstractAssetsProvider::CONFIG_MODEL_STORAGE_KEY];
-        $urlStrategyName         = $modelConfig[AbstractAssetsProvider::CONFIG_MODEL_URL_STRATEGY_KEY] ?? 'Hash';
+        $pathStrategyName        = $modelConfig[AbstractAssetsProvider::CONFIG_MODEL_PATH_STRATEGY_KEY] ?? 'MultiLevelHash';
         $postUploadHandlersNames = $modelConfig[AbstractAssetsProvider::CONFIG_MODEL_POST_UPLOAD_KEY] ?? [];
 
         // Repository codename is equal model name
@@ -179,15 +181,14 @@ class AssetsProviderFactory
 
         $storage = $this->storageFactory->createFromConfig($storageConfig);
 
-        $urlStrategy = $this->urlStrategyFactory->create($urlStrategyName, $repository);
+        $pathStrategy = $this->pathStrategyFactory->create($pathStrategyName, $repository);
 
         /** @var \BetaKiller\Assets\Provider\AssetsProviderInterface $providerInstance */
         $providerInstance = $this->factory->create($providerName, [
-            'storage'        => $storage,
-            'repository'     => $repository,
-            'aclResource'    => $aclResource,
-            'urlStrategy'    => $urlStrategy,
-            'multiLevelPath' => new MultiLevelPath(), // Use default, maybe will be configured in the future
+            'storage'      => $storage,
+            'repository'   => $repository,
+            'aclResource'  => $aclResource,
+            'pathStrategy' => $pathStrategy,
         ]);
 
         // Store codename for future use

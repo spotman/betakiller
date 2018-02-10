@@ -1,17 +1,17 @@
 <?php
-namespace BetaKiller\Assets\Model;
+namespace BetaKiller\Model;
 
-use BetaKiller\Model\UserInterface;
+use BetaKiller\Assets\Model\AssetsModelInterface;
 use DateTimeImmutable;
 use DateTimeInterface;
 use ORM;
 
 /**
- * Class AbstractAssetsOrmModel
+ * Class AbstractOrmBasedAssetsModel
  *
  * Abstract class for all ORM-based asset models
  */
-abstract class AbstractAssetsOrmModel extends ORM implements AssetsModelInterface
+abstract class AbstractOrmBasedAssetsModel extends ORM implements AssetsModelInterface
 {
     protected function _initialize(): void
     {
@@ -191,16 +191,6 @@ abstract class AbstractAssetsOrmModel extends ORM implements AssetsModelInterfac
         $this->set('size', $size);
 
         return $this;
-    }
-
-    /**
-     * Returns path for file in storage
-     *
-     * @return string
-     */
-    public function getStorageFileName(): string
-    {
-        return $this->getHash();
     }
 
     /**

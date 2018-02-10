@@ -1,9 +1,7 @@
 <?php
 namespace BetaKiller\Model;
 
-use BetaKiller\Assets\Model\AbstractAssetsOrmModel;
-
-class ContentAttachment extends AbstractAssetsOrmModel implements ContentAttachmentInterface
+class ContentAttachment extends AbstractOrmBasedAssetsModel implements ContentAttachmentInterface
 {
     use OrmBasedContentElementEntityTrait,
         OrmBasedEntityHasWordpressIdTrait,

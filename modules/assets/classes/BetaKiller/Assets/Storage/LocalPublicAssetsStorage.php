@@ -1,0 +1,50 @@
+<?php
+namespace BetaKiller\Assets\Storage;
+
+use BetaKiller\Assets\AssetsStorageException;
+use BetaKiller\Assets\Model\AssetsModelInterface;
+use BetaKiller\Assets\MultiLevelPath;
+use BetaKiller\Helper\AppEnvInterface;
+
+class LocalPublicAssetsStorage extends AbstractLocalAssetsStorage
+{
+    public const CODENAME = 'Public';
+
+    /**
+     * @var \BetaKiller\Helper\AppEnvInterface
+     */
+    private $appEnv;
+
+    /**
+     * AbstractLocalAssetsStorage constructor.
+     *
+     * @param \BetaKiller\Helper\AppEnvInterface $appEnv
+     */
+    public function __construct(AppEnvInterface $appEnv)
+    {
+        $this->appEnv = $appEnv;
+    }
+
+    /**
+     * @param string $basePath
+     *
+     * @throws AssetsStorageException
+     */
+    public function setBasePath(string $basePath): void
+    {
+        $docRoot = $this->appEnv->getDocRootPath();
+
+        parent::setBasePath($docRoot.DIRECTORY_SEPARATOR.'assets'.DIRECTORY_SEPARATOR.$basePath);
+    }
+
+    /**
+     * Returns true if storage`s files are located outside of document root and deploy is needed
+     *
+     * @return bool
+     */
+    public function isDeployRequired(): bool
+    {
+        // Public files are located under docroot
+        return false;
+    }
+}

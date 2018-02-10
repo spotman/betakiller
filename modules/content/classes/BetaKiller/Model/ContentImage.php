@@ -1,9 +1,7 @@
 <?php
 namespace BetaKiller\Model;
 
-use BetaKiller\Assets\Model\AbstractAssetsOrmImageModel;
-
-class ContentImage extends AbstractAssetsOrmImageModel implements ContentImageInterface
+class ContentImage extends AbstractOrmBasedAssetsImageModel implements ContentImageInterface
 {
     use OrmBasedContentElementEntityTrait,
         OrmBasedEntityHasWordpressIdTrait,

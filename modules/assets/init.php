@@ -15,7 +15,7 @@ Route::set('assets-provider-upload', 'assets/<provider>/upload')
     ]);
 
 $assetsExtensionRegexp = '[a-z]{2,}'; // (jpg|jpeg|gif|png)
-$assetsSizeRegexp      = '[0-9]*'.AssetsModelImageInterface::SIZE_DELIMITER.'[0-9]*';
+$assetsSizeRegexp      = '[0-9]{0,3}'.AssetsModelImageInterface::SIZE_DELIMITER.'[0-9]{0,3}';
 
 /**
  * Deploy/delete/preview files via concrete provider
@@ -31,24 +31,14 @@ Route::set('assets-provider-item', 'assets/<provider>/<item_url>/<action>(.<ext>
     ]);
 
 /**
- * Make image preview or crop it
+ * Make image preview
  */
 Route::set('assets-provider-item-preview', 'assets/<provider>/<item_url>/<action>(-<size>)(.<ext>)', [
     'item_url' => '[A-Za-z0-9\/]+',
-    'action'   => '(preview|crop)',
+    'action'   => 'preview',
     'size'     => $assetsSizeRegexp,
     'ext'      => $assetsExtensionRegexp,
 ])
-    ->defaults([
-        'module'     => 'assets',
-        'controller' => 'Assets',
-    ]);
-
-/**
- * Fake route for getting asset`s deployment directory
- * It`ll newer triggered because of existing real deployment directory (and default .htaccess policy also)
- */
-Route::set('assets-provider-item-deploy-directory', 'assets/<provider>/<item_url>')
     ->defaults([
         'module'     => 'assets',
         'controller' => 'Assets',

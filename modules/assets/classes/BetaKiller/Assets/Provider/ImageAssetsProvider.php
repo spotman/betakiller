@@ -7,7 +7,6 @@ use BetaKiller\Assets\Model\AssetsModelInterface;
 use BetaKiller\Model\UserInterface;
 use Image;
 use Request;
-use Route;
 
 /**
  * Class ImageAssetsProvider
@@ -27,22 +26,15 @@ final class ImageAssetsProvider extends AbstractAssetsProvider implements ImageA
      * @param string               $size 300x200
      *
      * @return string
+     * @throws \BetaKiller\Assets\AssetsException
      * @throws AssetsProviderException
      */
     public function getPreviewUrl(AssetsModelInterface $model, ?string $size = null): string
     {
         $size = $this->determineSize($size);
 
-        $options = [
-            'provider' => $this->getUrlKey(),
-            'action'   => 'preview',
-            'item_url' => $this->getModelUrlPath($model),
-            'size'     => $size,
-            'ext'      => $this->getModelExtension($model),
-        ];
-
-        // TODO Remove Route dependency
-        return Route::url('assets-provider-item-preview', $options);
+        // /assets/<providerKey>/<pathStrategy>/<action>(-<size>).<ext>
+        return $this->getItemUrl('preview', $model, $size);
     }
 
     private function makeSizeString($width = null, $height = null): string
@@ -77,10 +69,10 @@ final class ImageAssetsProvider extends AbstractAssetsProvider implements ImageA
      */
     private function determineSize(?string $size): string
     {
-        $allowed_sizes = $this->getAllowedPreviewSizes();
+        $previewSizes = $this->getAllowedPreviewSizes();
 
-        if (!$size && \count($allowed_sizes) > 0) {
-            $size = $allowed_sizes[0];
+        if (!$size && \count($previewSizes) > 0) {
+            $size = $previewSizes[0];
         }
 
         if (!$size) {
@@ -122,6 +114,16 @@ final class ImageAssetsProvider extends AbstractAssetsProvider implements ImageA
         return $this->packDimensions($width, $height);
     }
 
+    /**
+     * @param \BetaKiller\Assets\Model\AssetsModelImageInterface $model
+     * @param string                                             $size
+     *
+     * @return string
+     * @throws \Kohana_Exception
+     * @throws \BetaKiller\Assets\AssetsException
+     * @throws \BetaKiller\Assets\AssetsProviderException
+     * @throws \BetaKiller\Assets\AssetsStorageException
+     */
     public function makePreviewContent(AssetsModelImageInterface $model, string $size): string
     {
         $size = $this->determineSize($size);
@@ -144,11 +146,16 @@ final class ImageAssetsProvider extends AbstractAssetsProvider implements ImageA
         );
     }
 
+    /**
+     * @param $size
+     *
+     * @throws \BetaKiller\Assets\AssetsProviderException
+     */
     protected function checkPreviewSize($size): void
     {
         $allowedSizes = $this->getAllowedPreviewSizes();
 
-        if (!$allowedSizes || !in_array($size, $allowedSizes, true)) {
+        if (!$allowedSizes || !\in_array($size, $allowedSizes, true)) {
             throw new AssetsProviderException('Preview size :size is not allowed', [':size' => $size]);
         }
     }
@@ -158,6 +165,7 @@ final class ImageAssetsProvider extends AbstractAssetsProvider implements ImageA
      * @param AssetsModelImageInterface $model
      *
      * @return string
+     * @throws \Kohana_Exception
      * @throws \BetaKiller\Assets\AssetsProviderException
      * @internal param array $_post_data
      *
@@ -193,6 +201,7 @@ final class ImageAssetsProvider extends AbstractAssetsProvider implements ImageA
      * @param integer $quality
      *
      * @returns string Processed content
+     * @throws \Kohana_Exception
      * @throws AssetsProviderException
      */
     protected function resize($originalContent, $width, $height, $quality): string
@@ -230,6 +239,15 @@ final class ImageAssetsProvider extends AbstractAssetsProvider implements ImageA
         return $request->action().($size ? '-'.$size : '').'.'.$request->param('ext');
     }
 
+    /**
+     * @param \BetaKiller\Assets\Model\AssetsModelImageInterface $model
+     * @param null|string                                        $size
+     * @param array|null                                         $attrs
+     *
+     * @return array
+     * @throws \BetaKiller\Assets\AssetsException
+     * @throws \BetaKiller\Assets\AssetsProviderException
+     */
     public function getAttributesForImgTag(
         AssetsModelImageInterface $model,
         ?string $size = null,
@@ -265,11 +283,12 @@ final class ImageAssetsProvider extends AbstractAssetsProvider implements ImageA
 
         $attrs = array_merge([
             'src'     => $src,
-            'width'   => $width,
-            'height'  => $height,
             'srcset'  => $this->getSrcsetAttributeValue($model, $targetRatio),
             'data-id' => $model->getID(),
-        ], $attrs);
+        ], $attrs, [
+            'width'   => $width,
+            'height'  => $height,
+        ]);
 
         return $attrs;
     }
@@ -279,6 +298,8 @@ final class ImageAssetsProvider extends AbstractAssetsProvider implements ImageA
      * @param float|null                                         $ratio
      *
      * @return string
+     * @throws \BetaKiller\Assets\AssetsException
+     * @throws \BetaKiller\Assets\AssetsProviderException
      */
     protected function getSrcsetAttributeValue(AssetsModelImageInterface $model, $ratio = null): string
     {
@@ -314,23 +335,29 @@ final class ImageAssetsProvider extends AbstractAssetsProvider implements ImageA
         return implode(', ', array_filter($srcset));
     }
 
-    protected function getSrcsetSizes($ratio = null): array
+    /**
+     * @param float|null $ratio
+     *
+     * @return array
+     * @throws \BetaKiller\Assets\AssetsProviderException
+     */
+    protected function getSrcsetSizes(float $ratio = null): array
     {
-        $allowed_sizes = $this->getAllowedPreviewSizes();
+        $allowedSizes = $this->getAllowedPreviewSizes();
 
         // Return all sizes if no ratio filter was set
         if (!$ratio) {
-            return $allowed_sizes;
+            return $allowedSizes;
         }
 
         $sizes = [];
 
         // Filtering sizes by ratio
-        foreach ($allowed_sizes as $size) {
-            $size_ratio = $this->getSizeRatio($size, $ratio);
+        foreach ($allowedSizes as $size) {
+            $sizeRatio = $this->getSizeRatio($size, $ratio);
 
             // Skip sizes with another ratio
-            if ($ratio !== $size_ratio) {
+            if ($ratio !== $sizeRatio) {
                 continue;
             }
 
@@ -340,17 +367,30 @@ final class ImageAssetsProvider extends AbstractAssetsProvider implements ImageA
         return $sizes;
     }
 
-    protected function getSizeRatio($size, $original_ratio = null): float
+    /**
+     * @param      $size
+     * @param null $originalRatio
+     *
+     * @return float
+     * @throws \BetaKiller\Assets\AssetsProviderException
+     */
+    protected function getSizeRatio($size, $originalRatio = null): float
     {
         $dimensions = $this->parseSizeDimensions($size);
 
-        if ($original_ratio) {
-            $dimensions = $this->restoreOmittedDimensions($dimensions[0], $dimensions[1], $original_ratio);
+        if ($originalRatio) {
+            $dimensions = $this->restoreOmittedDimensions($dimensions[0], $dimensions[1], $originalRatio);
         }
 
         return $this->calculateDimensionsRatio($dimensions[0], $dimensions[1]);
     }
 
+    /**
+     * @param \BetaKiller\Assets\Model\AssetsModelImageInterface $image
+     *
+     * @return float
+     * @throws \BetaKiller\Assets\AssetsProviderException
+     */
     protected function getModelRatio(AssetsModelImageInterface $image): float
     {
         return $this->calculateDimensionsRatio($image->getWidth(), $image->getHeight());
@@ -404,6 +444,19 @@ final class ImageAssetsProvider extends AbstractAssetsProvider implements ImageA
         ]) ?: 80; // This is optimal for JPEG
     }
 
+    /**
+     * @param string                          $fullPath
+     * @param string                          $originalName
+     * @param \BetaKiller\Model\UserInterface $user
+     *
+     * @return \BetaKiller\Assets\Model\AssetsModelInterface
+     * @throws \BetaKiller\Assets\AssetsException
+     * @throws \BetaKiller\Assets\AssetsExceptionUpload
+     * @throws \BetaKiller\Assets\AssetsProviderException
+     * @throws \BetaKiller\Assets\AssetsStorageException
+     * @throws \BetaKiller\Repository\RepositoryException
+     * @throws \Kohana_Exception
+     */
     public function store(string $fullPath, string $originalName, UserInterface $user): AssetsModelInterface
     {
         /** @var \BetaKiller\Assets\Model\AssetsModelImageInterface $model */
@@ -417,6 +470,10 @@ final class ImageAssetsProvider extends AbstractAssetsProvider implements ImageA
 
     /**
      * @param \BetaKiller\Assets\Model\AssetsModelImageInterface $model
+     *
+     * @throws \BetaKiller\Assets\AssetsStorageException
+     * @throws \BetaKiller\Assets\AssetsException
+     * @throws \Kohana_Exception
      */
     private function detectImageDimensions(AssetsModelImageInterface $model): void
     {

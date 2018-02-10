@@ -1,8 +1,9 @@
-<?php namespace BetaKiller\Assets\Storage;
+<?php
+namespace BetaKiller\Assets\Storage;
 
 use BetaKiller\Assets\AssetsStorageException;
 
-class CfsAssetsStorage extends LocalAssetsStorage
+class LocalCfsAssetsStorage extends AbstractLocalAssetsStorage
 {
     /**
      * Creates the file or updates its content
@@ -41,5 +42,16 @@ class CfsAssetsStorage extends LocalAssetsStorage
     protected function doGet(string $path): string
     {
         throw new AssetsStorageException('Implement me!');
+    }
+
+    /**
+     * Returns true if storage`s files are located outside of document root and deploy is needed
+     *
+     * @return bool
+     */
+    public function isDeployRequired(): bool
+    {
+        // Static assets are located outside of the docroot
+        return true;
     }
 }

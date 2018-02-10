@@ -7,35 +7,32 @@ use BetaKiller\Assets\AssetsExceptionUpload;
 use BetaKiller\Assets\AssetsProviderException;
 use BetaKiller\Assets\Handler\AssetsHandlerInterface;
 use BetaKiller\Assets\Model\AssetsModelInterface;
-use BetaKiller\Assets\MultiLevelPath;
+use BetaKiller\Assets\PathStrategy\AssetsPathStrategyInterface;
 use BetaKiller\Assets\Storage\AssetsStorageInterface;
-use BetaKiller\Assets\UrlStrategy\AssetsUrlStrategyInterface;
 use BetaKiller\Config\ConfigProviderInterface;
+use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Repository\RepositoryInterface;
 use DateTime;
 use File;
 use Request;
-use Route;
 use Upload;
 
 abstract class AbstractAssetsProvider implements AssetsProviderInterface
 {
-    public const CONFIG_KEY                    = 'assets';
-    public const CONFIG_DOC_ROOT_KEY           = 'doc_root';
-    public const CONFIG_URL_PATH_KEY           = 'url_path';
-    public const CONFIG_PROVIDERS_KEY          = 'providers';
-    public const CONFIG_STORAGES_KEY           = 'storages';
-    public const CONFIG_MODEL_URL_KEY          = 'url_key';
-    public const CONFIG_MODEL_PROVIDER_KEY     = 'provider';
-    public const CONFIG_MODEL_URL_STRATEGY_KEY = 'url_strategy';
-    public const CONFIG_MODEL_STORAGE_KEY      = 'storage';
-    public const CONFIG_MODEL_STORAGE_NAME_KEY = 'name';
-    public const CONFIG_MODEL_STORAGE_PATH_KEY = 'path';
-    public const CONFIG_MODEL_DEPLOY_KEY       = 'deploy';
-    public const CONFIG_MODEL_MIMES            = 'mimes';
-    public const CONFIG_MODEL_POST_UPLOAD_KEY  = 'post_upload';
-    public const CONFIG_STORAGE_BASE_PATH_KEY  = 'base_path';
+    public const CONFIG_KEY                     = 'assets';
+    public const CONFIG_URL_PATH_KEY            = 'url_path';
+    public const CONFIG_PROVIDERS_KEY           = 'providers';
+    public const CONFIG_STORAGES_KEY            = 'storages';
+    public const CONFIG_MODEL_URL_KEY           = 'url_key';
+    public const CONFIG_MODEL_PROVIDER_KEY      = 'provider';
+    public const CONFIG_MODEL_PATH_STRATEGY_KEY = 'path_strategy';
+    public const CONFIG_MODEL_STORAGE_KEY       = 'storage';
+    public const CONFIG_MODEL_STORAGE_NAME_KEY  = 'name';
+    public const CONFIG_MODEL_STORAGE_PATH_KEY  = 'path';
+    public const CONFIG_MODEL_DEPLOY_KEY        = 'deploy';
+    public const CONFIG_MODEL_MIMES             = 'mimes';
+    public const CONFIG_MODEL_POST_UPLOAD_KEY   = 'post_upload';
 
     /**
      * @var string
@@ -58,14 +55,9 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
     private $config;
 
     /**
-     * @var \BetaKiller\Assets\UrlStrategy\AssetsUrlStrategyInterface
+     * @var \BetaKiller\Assets\PathStrategy\AssetsPathStrategyInterface
      */
-    private $urlStrategy;
-
-    /**
-     * @var \BetaKiller\Assets\MultiLevelPath
-     */
-    private $multiLevelPath;
+    private $pathStrategy;
 
     /**
      * @var \BetaKiller\Acl\Resource\AssetsAclResourceInterface
@@ -77,20 +69,25 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
      */
     private $postUploadHandlers = [];
 
+    /**
+     * @var \BetaKiller\Helper\AppEnvInterface
+     */
+    private $appEnv;
+
     public function __construct(
         RepositoryInterface $repository,
         AssetsStorageInterface $storage,
         AssetsAclResourceInterface $aclResource,
-        AssetsUrlStrategyInterface $urlStrategy,
+        AssetsPathStrategyInterface $pathStrategy,
         ConfigProviderInterface $config,
-        MultiLevelPath $multiLevelPath
+        AppEnvInterface $appEnv
     ) {
-        $this->repository     = $repository;
-        $this->storage        = $storage;
-        $this->aclResource    = $aclResource;
-        $this->urlStrategy    = $urlStrategy;
-        $this->config         = $config;
-        $this->multiLevelPath = $multiLevelPath;
+        $this->repository   = $repository;
+        $this->storage      = $storage;
+        $this->aclResource  = $aclResource;
+        $this->pathStrategy = $pathStrategy;
+        $this->config       = $config;
+        $this->appEnv       = $appEnv;
     }
 
     public function getAssetsConfigValue(array $path)
@@ -123,12 +120,7 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
      */
     public function getUploadUrl(): string
     {
-        $options = [
-            'provider' => $this->getUrlKey(),
-        ];
-
-        // TODO Remove Route dependency
-        return Route::url('assets-provider-upload', $options);
+        return $this->getBaseUrl().'/upload';
     }
 
     public function getUrlKey(): string
@@ -147,6 +139,7 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
      * @param AssetsModelInterface $model
      *
      * @return string
+     * @throws \BetaKiller\Assets\AssetsException
      */
     public function getOriginalUrl(AssetsModelInterface $model): string
     {
@@ -159,6 +152,7 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
      * @param \BetaKiller\Assets\Model\AssetsModelInterface $model
      *
      * @return string
+     * @throws \BetaKiller\Assets\AssetsException
      */
     public function getDownloadUrl(AssetsModelInterface $model): string
     {
@@ -171,40 +165,25 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
      * @param AssetsModelInterface $model
      *
      * @return string
+     * @throws \BetaKiller\Assets\AssetsException
      */
     public function getDeleteUrl(AssetsModelInterface $model): string
     {
         return $this->getItemUrl('delete', $model);
     }
 
-    protected function getItemUrl(string $action, AssetsModelInterface $model): string
-    {
-        $options = [
-            'provider' => $this->getUrlKey(),
-            'action'   => $action,
-            'item_url' => $this->getModelUrlPath($model),
-            'ext'      => $this->getModelExtension($model),
-        ];
-
-        return Route::url('assets-provider-item', $options);
-    }
-
     /**
+     * @param string                                        $action
      * @param \BetaKiller\Assets\Model\AssetsModelInterface $model
      *
+     * @param null|string                                   $suffix
+     *
      * @return string
-     * @throws \BetaKiller\Assets\AssetsProviderException
+     * @throws \BetaKiller\Assets\AssetsException
      */
-    protected function getModelUrlPath(AssetsModelInterface $model): string
+    protected function getItemUrl(string $action, AssetsModelInterface $model, ?string $suffix = null): string
     {
-        $filename = $this->urlStrategy->getFilenameFromModel($model);
-        $path     = $this->multiLevelPath->make($filename, '/');
-
-        if (!$path) {
-            throw new AssetsProviderException('Model must have url');
-        }
-
-        return $path;
+        return $this->getBaseUrl().'/'.$this->getModelActionPath($model, $action, '/', $suffix);
     }
 
     /**
@@ -231,6 +210,8 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
      * @param \BetaKiller\Model\UserInterface $user
      *
      * @return AssetsModelInterface
+     * @throws \BetaKiller\Repository\RepositoryException
+     * @throws \BetaKiller\Assets\AssetsException
      * @throws \BetaKiller\Assets\AssetsProviderException
      * @throws \BetaKiller\Assets\AssetsStorageException
      * @throws \BetaKiller\Assets\AssetsExceptionUpload
@@ -264,7 +245,9 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
      * @param \BetaKiller\Model\UserInterface $user
      *
      * @return \BetaKiller\Assets\Model\AssetsModelInterface
+     * @throws \BetaKiller\Repository\RepositoryException
      * @throws \BetaKiller\Assets\AssetsProviderException
+     * @throws \BetaKiller\Assets\AssetsException
      * @throws \BetaKiller\Assets\AssetsExceptionUpload
      * @throws \BetaKiller\Assets\AssetsStorageException
      */
@@ -276,10 +259,10 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
         }
 
         // Get type from file analysis
-        $mime_type = $this->getFileMimeType($fullPath);
+        $mimeType = $this->getFileMimeType($fullPath);
 
         // MIME-type check
-        $this->checkAllowedMimeTypes($mime_type);
+        $this->checkAllowedMimeTypes($mimeType);
 
         // Init model
         $model = $this->createFileModel();
@@ -293,15 +276,17 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
         // Put data into model
         $model
             ->setOriginalName($originalName)
-            ->setSize(strlen($content))
-            ->setMime($mime_type)
+            ->setSize(\mb_strlen($content))
+            ->setMime($mimeType)
             ->setUploadedBy($user);
 
         // Calculate hash
         $model->setHash($this->calculateHash($content));
 
+        $path = $this->getModelStoragePath($model);
+
         // Place file into storage
-        $this->storage->put($model, $content);
+        $this->storage->put($path, $content);
 
         // Save model
         $this->saveModel($model);
@@ -314,6 +299,11 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
         return sha1($content);
     }
 
+    /**
+     * @param \BetaKiller\Assets\Model\AssetsModelInterface $model
+     *
+     * @throws \BetaKiller\Repository\RepositoryException
+     */
     public function saveModel(AssetsModelInterface $model): void
     {
         $this->repository->save($model);
@@ -321,6 +311,7 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
 
     protected function getFileMimeType($file_path): string
     {
+        // TODO Remove File class dependency
         return File::mime($file_path);
     }
 
@@ -343,6 +334,8 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
      *
      * @param AssetsModelInterface $model
      * @param array                $postData
+     *
+     * @throws \BetaKiller\Repository\RepositoryException
      */
     protected function postUploadProcessing($model, array $postData): void
     {
@@ -364,15 +357,17 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
         $this->postUploadHandlers[] = $handler;
     }
 
+    /**
+     * @param \Request                                      $request
+     * @param \BetaKiller\Assets\Model\AssetsModelInterface $model
+     * @param string                                        $content
+     *
+     * @return bool
+     * @throws \BetaKiller\Assets\AssetsException
+     * @throws \BetaKiller\Assets\AssetsProviderException
+     */
     public function deploy(Request $request, AssetsModelInterface $model, string $content): bool
     {
-        $deployAllowed = (bool)$this->getAssetsConfigValue(['deploy', 'enabled']);
-
-        // No deployment in testing and developing environments
-        if (!$deployAllowed) {
-            return false;
-        }
-
         // Check permissions
         if (!$this->checkDeployPermissions()) {
             return false;
@@ -410,6 +405,8 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
     /**
      * @param AssetsModelInterface $model
      *
+     * @throws \BetaKiller\Assets\AssetsException
+     * @throws \BetaKiller\Repository\RepositoryException
      * @throws \BetaKiller\Assets\AssetsProviderException
      * @throws \BetaKiller\Assets\AssetsStorageException
      */
@@ -423,28 +420,29 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
         // Remove model from repository
         $this->repository->delete($model);
 
-        // Remove file from storage
-        $this->storage->delete($model);
+        $path = $this->getModelStoragePath($model);
 
-        // Drop deployed cache for current asset
-        $this->dropDeployCache($model);
+        // Remove file from storage
+        $this->storage->delete($path);
+
+        // Drop deployed cache for current asset (all files)
+        $this->dropDeployCache($model, false);
     }
 
     /**
      * Returns asset file model with provided hash
      *
-     * @param $url
+     * @param string $urlPath
      *
      * @return AssetsModelInterface
-     * @throws AssetsProviderException
+     * @throws \BetaKiller\Assets\AssetsProviderException
      */
-    public function getModelByDeployUrl(string $url): AssetsModelInterface
+    public function getModelByDeployUrl(string $urlPath): AssetsModelInterface
     {
-        $filename = $this->multiLevelPath->parse($url);
-        $model    = $this->urlStrategy->getModelFromFilename($filename);
+        $model = $this->pathStrategy->getModelByPath($urlPath);
 
         if (!$model) {
-            throw new AssetsProviderException('Can not find file with url = :url', [':url' => $url]);
+            throw new AssetsProviderException('Can not find file with url = :url', [':url' => $urlPath]);
         }
 
         return $model;
@@ -456,12 +454,15 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
      * @param AssetsModelInterface $model
      *
      * @return string
+     * @throws \BetaKiller\Assets\AssetsException
      * @throws \BetaKiller\Assets\AssetsStorageException
      */
     public function getContent(AssetsModelInterface $model): string
     {
+        $path = $this->getModelStoragePath($model);
+
         // Get file from storage
-        return $this->storage->get($model);
+        return $this->storage->get($path);
     }
 
     /**
@@ -470,15 +471,19 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
      * @param AssetsModelInterface $model
      * @param string               $content
      *
+     * @throws \BetaKiller\Assets\AssetsException
      * @throws \BetaKiller\Assets\AssetsStorageException
-     * @throws \BetaKiller\Assets\AssetsProviderException
      */
     public function setContent(AssetsModelInterface $model, string $content): void
     {
-        $this->storage->put($model, $content);
+        $path = $this->getModelStoragePath($model);
+
+        $this->storage->put($path, $content);
+
+        $keepOriginal = !$this->storage->isDeployRequired();
 
         // Drop deployed cache for current asset
-        $this->dropDeployCache($model);
+        $this->dropDeployCache($model, $keepOriginal);
     }
 
     /**
@@ -499,7 +504,7 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
             return true;
         }
 
-        if (!is_array($allowedMimeTypes)) {
+        if (!\is_array($allowedMimeTypes)) {
             throw new AssetsProviderException('Allowed MIME-types in :codename provider must be an array() or TRUE',
                 [':codename' => $this->codename]
             );
@@ -515,6 +520,7 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
         $allowedExtensions = [];
 
         foreach ($allowedMimeTypes as $allowedMime) {
+            // TODO Drop File class dependency
             $allowedExtensions[] = File::exts_by_mime($allowedMime);
         }
 
@@ -533,6 +539,9 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
         return $this->repository->create();
     }
 
+    /**
+     * @return \BetaKiller\Repository\RepositoryInterface
+     */
     public function getRepository(): RepositoryInterface
     {
         return $this->repository;
@@ -544,17 +553,11 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
      * @param AssetsModelInterface $model
      *
      * @return string
-     * @throws AssetsProviderException
+     * @throws \BetaKiller\Assets\AssetsException
      */
     protected function getItemDeployPath(AssetsModelInterface $model): string
     {
-        $options = [
-            'provider' => $this->getUrlKey(),
-            'item_url' => $this->getModelUrlPath($model),
-        ];
-
-        // TODO remove dependency on Route
-        $url = Route::url('assets-provider-item-deploy-directory', $options);
+        $url = $this->getOriginalUrl($model);
 
         $path = parse_url($url, PHP_URL_PATH);
 
@@ -566,16 +569,90 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
      */
     private function getDocRoot(): string
     {
-        return $this->getAssetsConfigValue([self::CONFIG_DOC_ROOT_KEY]) ?: $_SERVER['DOCUMENT_ROOT'];
+        return $this->appEnv->getDocRootPath();
+    }
+
+    /**
+     * @param \BetaKiller\Assets\Model\AssetsModelInterface $model
+     *
+     * @return string
+     * @throws \BetaKiller\Assets\AssetsException
+     */
+    private function getModelStoragePath(AssetsModelInterface $model): string
+    {
+        $delimiter = $this->storage->getDirectorySeparator();
+
+        return $this->pathStrategy->makeModelPath($model).$delimiter.$this->getOriginalFilename($model);
+    }
+
+    /**
+     * @param \BetaKiller\Assets\Model\AssetsModelInterface $model
+     * @param string                                        $action
+     * @param string                                        $delimiter
+     *
+     * @param null|string                                   $suffix
+     *
+     * @return string
+     * @throws \BetaKiller\Assets\AssetsException
+     */
+    protected function getModelActionPath(
+        AssetsModelInterface $model,
+        string $action,
+        string $delimiter,
+        ?string $suffix = null
+    ): string {
+        $path     = $this->pathStrategy->makeModelPath($model, $delimiter);
+        $filename = $this->getActionFilename($model, $action, $suffix);
+
+        // <pathStrategy>/<action>(-<size>).<ext>
+        return $path.$delimiter.$filename;
+    }
+
+    protected function getRelativePath(AssetsModelInterface $model, ?string $delimiter = null): string
+    {
+        $delimiter = $delimiter ?? DIRECTORY_SEPARATOR;
+
+        // <providerKey>/<pathStrategy>
+        return $this->getUrlKey().$this->pathStrategy->makeModelPath($model, $delimiter);
     }
 
     /**
      * @return string
-     * @todo Use this instead of Route
      */
-    private function getUrlPath(): string
+    protected function getUrlBasePath(): string
     {
         return $this->getAssetsConfigValue([self::CONFIG_URL_PATH_KEY]);
+    }
+
+    protected function getBaseUrl(): string
+    {
+        return $this->getUrlBasePath().'/'.$this->getUrlKey();
+    }
+
+    /**
+     * @param \BetaKiller\Assets\Model\AssetsModelInterface $model
+     *
+     * @return string
+     * @throws \BetaKiller\Assets\AssetsException
+     */
+    private function getOriginalFilename(AssetsModelInterface $model): string
+    {
+        return $this->getActionFilename($model, 'original');
+    }
+
+    /**
+     * @param \BetaKiller\Assets\Model\AssetsModelInterface $model
+     * @param string                                        $action
+     *
+     * @param null|string                                   $suffix
+     *
+     * @return string
+     * @throws \BetaKiller\Assets\AssetsException
+     */
+    private function getActionFilename(AssetsModelInterface $model, string $action, ?string $suffix = null): string
+    {
+        // <action>(-<suffix>).<ext>
+        return $action.($suffix ? '-'.$suffix : '').'.'.$this->getModelExtension($model);
     }
 
     /**
@@ -583,9 +660,11 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
      *
      * @param AssetsModelInterface $model
      *
-     * @throws \BetaKiller\Assets\AssetsProviderException
+     * @param bool                 $keepOriginal
+     *
+     * @throws \BetaKiller\Assets\AssetsException
      */
-    protected function dropDeployCache(AssetsModelInterface $model): void
+    protected function dropDeployCache(AssetsModelInterface $model, bool $keepOriginal): void
     {
         $path = $this->getItemDeployPath($model);
 
@@ -593,8 +672,14 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
             return;
         }
 
+        $originalFileName = $this->getOriginalFilename($model);
+
         // Remove all versions of file
         foreach (glob($path.DIRECTORY_SEPARATOR.'*') as $file) {
+            if ($keepOriginal && basename($file) === $originalFileName) {
+                continue;
+            }
+
             unlink($file);
         }
 
@@ -639,7 +724,13 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
      */
     protected function checkDeployPermissions(): bool
     {
-        return (bool)$this->getAssetsProviderConfigValue([self::CONFIG_MODEL_DEPLOY_KEY]);
+        // No deployment for public assets storage
+        if (!$this->storage->isDeployRequired()) {
+            return false;
+        }
+
+        // No deployment in developing environments
+        return (bool)$this->getAssetsConfigValue([self::CONFIG_MODEL_DEPLOY_KEY]);
     }
 
     /**

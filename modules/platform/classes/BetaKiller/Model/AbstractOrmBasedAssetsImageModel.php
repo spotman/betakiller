@@ -1,7 +1,9 @@
 <?php
-namespace BetaKiller\Assets\Model;
+namespace BetaKiller\Model;
 
-abstract class AbstractAssetsOrmImageModel extends AbstractAssetsOrmModel implements AssetsModelImageInterface
+use BetaKiller\Assets\Model\AssetsModelImageInterface;
+
+abstract class AbstractOrmBasedAssetsImageModel extends AbstractOrmBasedAssetsModel implements AssetsModelImageInterface
 {
     /**
      * @return int

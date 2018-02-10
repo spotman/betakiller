@@ -49,11 +49,29 @@ class AssetsHelper
         return $this->getProviderByModel($model)->getDownloadUrl($model);
     }
 
+    /**
+     * @param \BetaKiller\Assets\Model\AssetsModelImageInterface $model
+     * @param                                                    $size
+     * @param array|null                                         $attributes
+     *
+     * @return array
+     * @throws \BetaKiller\Assets\AssetsStorageException
+     * @throws \BetaKiller\Factory\FactoryException
+     * @throws \BetaKiller\Assets\AssetsException
+     */
     public function getAttributesForImgTag(AssetsModelImageInterface $model, $size, array $attributes = null): array
     {
         return $this->getImageProviderByModel($model)->getAttributesForImgTag($model, $size, $attributes);
     }
 
+    /**
+     * @param \BetaKiller\Assets\Model\AssetsModelInterface $model
+     *
+     * @return \BetaKiller\Assets\Provider\AssetsProviderInterface
+     * @throws \BetaKiller\Assets\AssetsException
+     * @throws \BetaKiller\Assets\AssetsStorageException
+     * @throws \BetaKiller\Factory\FactoryException
+     */
     private function getProviderByModel(AssetsModelInterface $model): AssetsProviderInterface
     {
         $name = $model->getModelName();
@@ -61,13 +79,22 @@ class AssetsHelper
         return $this->providerFactory->createFromModelCodename($name);
     }
 
+    /**
+     * @param \BetaKiller\Assets\Model\AssetsModelImageInterface $model
+     *
+     * @return \BetaKiller\Assets\Provider\ImageAssetsProviderInterface
+     * @throws \BetaKiller\Assets\AssetsStorageException
+     * @throws \BetaKiller\Factory\FactoryException
+     * @throws \BetaKiller\Assets\AssetsException
+     */
     private function getImageProviderByModel(AssetsModelImageInterface $model): ImageAssetsProviderInterface
     {
         $provider = $this->getProviderByModel($model);
 
         if (!($provider instanceof ImageAssetsProviderInterface)) {
-            throw new AssetsException('Model :name must be linked to image provider',
-                [':name' => $model->getModelName()]);
+            throw new AssetsException('Model :name must be linked to image provider',[
+                ':name' => $model->getModelName(),
+            ]);
         }
 
         return $provider;

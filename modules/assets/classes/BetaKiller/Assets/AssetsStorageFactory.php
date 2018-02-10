@@ -43,9 +43,7 @@ class AssetsStorageFactory
      */
     public function create(string $codename): AssetsStorageInterface
     {
-        return $this->factory->create($codename, [
-            'multiLevelPath' => new MultiLevelPath(), // Use default, maybe would be configured in the future
-        ]);
+        return $this->factory->create($codename);
     }
 
     /**
@@ -61,14 +59,15 @@ class AssetsStorageFactory
 
         $defaultStorageConfig = $this->getStorageDefaultConfig($storageName);
 
-        $config = array_merge($defaultStorageConfig, $config);
+        if ($defaultStorageConfig) {
+            $config = array_merge($defaultStorageConfig, $config);
+        }
 
         $relativePath = $config[AbstractAssetsProvider::CONFIG_MODEL_STORAGE_PATH_KEY];
-        $basePath     = $config[AbstractAssetsProvider::CONFIG_STORAGE_BASE_PATH_KEY];
 
         $instance = $this->create($storageName);
 
-        $instance->setBasePath($basePath.DIRECTORY_SEPARATOR.$relativePath);
+        $instance->setBasePath($relativePath);
 
         return $instance;
     }
@@ -78,7 +77,7 @@ class AssetsStorageFactory
      *
      * @return array
      */
-    private function getStorageDefaultConfig(string $storageName): array
+    private function getStorageDefaultConfig(string $storageName): ?array
     {
         return $this->config->load([
             AbstractAssetsProvider::CONFIG_KEY,

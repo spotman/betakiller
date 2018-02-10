@@ -2,13 +2,9 @@
 namespace BetaKiller\Assets\Storage;
 
 use BetaKiller\Assets\AssetsStorageException;
-use BetaKiller\Assets\Model\AssetsModelInterface;
-use BetaKiller\Assets\MultiLevelPath;
 
-class LocalAssetsStorage extends AbstractAssetsStorage
+abstract class AbstractLocalAssetsStorage extends AbstractAssetsStorage
 {
-    public const CODENAME = 'Local';
-
     /**
      * Allow creating nested files and directories (groups/other security must be done via server umask config)
      *
@@ -24,21 +20,6 @@ class LocalAssetsStorage extends AbstractAssetsStorage
     private $fileMask = 0666;
 
     /**
-     * @var \BetaKiller\Assets\MultiLevelPath
-     */
-    private $multiLevelPath;
-
-    /**
-     * AbstractAssetsStorage constructor.
-     *
-     * @param \BetaKiller\Assets\MultiLevelPath $multiLevelPath
-     */
-    public function __construct(MultiLevelPath $multiLevelPath)
-    {
-        $this->multiLevelPath = $multiLevelPath;
-    }
-
-    /**
      * @param string $basePath
      *
      * @throws AssetsStorageException
@@ -52,12 +33,12 @@ class LocalAssetsStorage extends AbstractAssetsStorage
         parent::setBasePath($basePath);
     }
 
-    protected function getModelRelativePath(AssetsModelInterface $model): string
+    /**
+     * @return string
+     */
+    public function getDirectorySeparator(): string
     {
-        $basePath = parent::getModelRelativePath($model);
-
-        // Make all paths multi-level to prevent filesystem performance issues
-        return $this->multiLevelPath->make($basePath);
+        return DIRECTORY_SEPARATOR;
     }
 
     /**

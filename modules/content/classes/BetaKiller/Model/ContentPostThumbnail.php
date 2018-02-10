@@ -2,9 +2,7 @@
 
 namespace BetaKiller\Model;
 
-use BetaKiller\Assets\Model\AbstractAssetsOrmImageModel;
-
-class ContentPostThumbnail extends AbstractAssetsOrmImageModel implements ContentPostThumbnailInterface
+class ContentPostThumbnail extends AbstractOrmBasedAssetsImageModel implements ContentPostThumbnailInterface
 {
     use OrmBasedEntityHasWordpressIdTrait,
         OrmBasedEntityHasWordpressPathTrait;

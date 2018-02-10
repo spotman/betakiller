@@ -1,40 +1,53 @@
 <?php
 namespace BetaKiller\Assets\Storage;
 
-use BetaKiller\Assets\Model\AssetsModelInterface;
-
 interface AssetsStorageInterface
 {
     /**
      * Model path would be prepended with this
      *
      * @param string $path
+     *
      * @throws \BetaKiller\Assets\AssetsStorageException
      */
     public function setBasePath(string $path): void;
 
     /**
-     * @param AssetsModelInterface $model
+     * @return string
+     */
+    public function getDirectorySeparator(): string;
+
+    /**
+     * @param string $path
      *
      * @return string
      * @throws \BetaKiller\Assets\AssetsStorageException
      */
-    public function get(AssetsModelInterface $model): string;
+    public function get(string $path): string;
 
     /**
      * Stores file
      *
-     * @param AssetsModelInterface $model
-     * @param string               $content
+     * @param string $path
+     * @param string $content
+     *
      * @throws \BetaKiller\Assets\AssetsStorageException
      */
-    public function put(AssetsModelInterface $model, string $content): void;
+    public function put(string $path, string $content): void;
 
     /**
      * Deletes the file
      *
-     * @param AssetsModelInterface $model
+     * @param string $path
+     *
      * @throws \BetaKiller\Assets\AssetsStorageException
      */
-    public function delete(AssetsModelInterface $model): void;
+    public function delete(string $path): void;
+
+    /**
+     * Returns true if storage`s files are located outside of document root and deploy is needed
+     *
+     * @return bool
+     */
+    public function isDeployRequired(): bool;
 }
