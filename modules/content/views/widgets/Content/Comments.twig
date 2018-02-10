@@ -38,34 +38,25 @@
     </div>
 
     <div class="row">
-      <div class="input-field col s12">
+      <div class="input-field col s12 l6">
         <i class="material-icons prefix">account_circle</i>
         <input type="text" name="name" id="content-comment-form-name" class="validate" maxlength="64"/>
         <label for="content-comment-form-name">Имя</label>
       </div>
 
-      <div class="input-field col s12">
+      <div class="input-field col s12 l6">
         <i class="material-icons prefix">email</i>
         <input type="email" name="email" id="content-comment-form-email" class="validate" maxlength="32"/>
         <label for="content-comment-form-email">Email</label>
       </div>
-    </div>
 
-    <div class="row">
       <div class="input-field col s12">
         <i class="material-icons prefix">message</i>
         <textarea id="content-comment-form-message" name="message" cols="30" rows="5"
                   class="validate materialize-textarea" maxlength="1024"></textarea>
         <label for="content-comment-form-message">Комментарий</label>
       </div>
-    </div>
 
-    <input type="hidden" name="parent" value="0"/>
-    <input type="hidden" name="entity" value="{{ entity }}"/>
-    <input type="hidden" name="entityItemId" value="{{ entityItemId }}"/>
-    <input type="hidden" name="csrf-key" value="{{ token }}"/>
-
-    <div class="row">
       <div class="center-align col s12">
         <button type="submit" class="btn green waves-effect waves-light">
           Отправить
@@ -73,5 +64,10 @@
         </button>
       </div>
     </div>
+
+    <input type="hidden" name="parent" value="0"/>
+    <input type="hidden" name="entity" value="{{ entity }}"/>
+    <input type="hidden" name="entityItemId" value="{{ entityItemId }}"/>
+    <input type="hidden" name="csrf-key" value="{{ token }}"/>
   </form>
 </div>

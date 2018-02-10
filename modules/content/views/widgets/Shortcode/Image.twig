@@ -8,22 +8,18 @@
 {% if layout == "default" %}
 
   {% if zoomable %}
-    <a href="{{ href }}" title="{{ image.title|default(image.alt) }}" class="fancybox" data-caption="{{ caption }}">
-  {% endif %}
-
-  {{ image(image, { class: image.class ~ " responsive-img" }) }}
-
-  {% if zoomable %}
+    <a href="{{ href }}" title="{{ image.title|default(image.alt) }}" class="fancybox {{ alignClass }}" data-caption="{{ caption }}">
+      {{ image(image, {}, true) }} {# ~ " responsive-img" #}
     </a>
+  {% else %}
+    {{ image(image, {class: alignClass}, true) }} {# ~ " responsive-img" #}
   {% endif %}
 
 {% elseif layout == "caption" %}
 
-  {% set attrs = {class: "responsive-img", alt: caption, title: caption } %}
-
-  <div class="wp-caption {{ align ~ " " ~ class }}">
+  <div class="wp-caption {{ alignClass }}">
     <a href="{{ href }}" class="fancybox" data-caption="{{ caption }}">
-      {{ image(image, attrs) }}
+      {{ image(image, {alt: caption, title: caption }, true) }} {# class: "responsive-img",  #}
     </a>
     <span class="wp-caption-text image-caption">{{ caption }}</span>
   </div>

@@ -2,9 +2,8 @@
 namespace BetaKiller\Content\Shortcode;
 
 use BetaKiller\Content\Shortcode\Attribute\BooleanAttribute;
-use BetaKiller\Content\Shortcode\Attribute\ClassAttribute;
+use BetaKiller\Content\Shortcode\Attribute\DiscreteValuesAttribute;
 use BetaKiller\Content\Shortcode\Attribute\NumberAttribute;
-use BetaKiller\Content\Shortcode\Attribute\StyleAttribute;
 use BetaKiller\Content\Shortcode\Attribute\TextAttribute;
 use BetaKiller\Content\Shortcode\Editor\EditorListingItem;
 use BetaKiller\Helper\AssetsHelper;
@@ -17,6 +16,23 @@ class ImageShortcode extends AbstractContentElementShortcode
     private const LAYOUT_CAPTION = 'caption';
 
     private const ATTR_ZOOMABLE = 'zoomable';
+    private const ATTR_ALIGN    = 'align';
+
+    private const ATTR_ALIGN_LEFT    = 'left';
+    private const ATTR_ALIGN_RIGHT   = 'right';
+    private const ATTR_ALIGN_CENTER  = 'center';
+    private const ATTR_ALIGN_JUSTIFY = 'justify';
+
+    private const ATTR_ALIGN_VALUES = [
+        self::ATTR_ALIGN_LEFT,
+        self::ATTR_ALIGN_RIGHT,
+        self::ATTR_ALIGN_CENTER,
+        self::ATTR_ALIGN_JUSTIFY,
+    ];
+
+    private const ATTR_ALT   = 'alt';
+    private const ATTR_TITLE = 'title';
+    private const ATTR_WIDTH = 'width';
 
     /**
      * @var \BetaKiller\Repository\ContentImageRepository
@@ -53,12 +69,11 @@ class ImageShortcode extends AbstractContentElementShortcode
     {
         return [
             new BooleanAttribute(self::ATTR_ZOOMABLE, true),
-            new TextAttribute('alt', true),
-            new TextAttribute('title', true),
-            new TextAttribute('align', true),
-            new ClassAttribute(true),
-            new StyleAttribute(),
-            new NumberAttribute('width', true),
+            new TextAttribute(self::ATTR_ALT, true),
+            new TextAttribute(self::ATTR_TITLE, true),
+            new DiscreteValuesAttribute(self::ATTR_ALIGN, self::ATTR_ALIGN_VALUES, true),
+//            new ClassAttribute(true),
+            new NumberAttribute(self::ATTR_WIDTH, true),
         ];
     }
 
@@ -102,6 +117,66 @@ class ImageShortcode extends AbstractContentElementShortcode
     }
 
     /**
+     * @throws \BetaKiller\Content\Shortcode\ShortcodeException
+     */
+    public function setAlignLeft(): void
+    {
+        $this->setAlign(self::ATTR_ALIGN_LEFT);
+    }
+
+    /**
+     * @throws \BetaKiller\Content\Shortcode\ShortcodeException
+     */
+    public function setAlignRight(): void
+    {
+        $this->setAlign(self::ATTR_ALIGN_RIGHT);
+    }
+
+    /**
+     * @throws \BetaKiller\Content\Shortcode\ShortcodeException
+     */
+    public function setAlignCenter(): void
+    {
+        $this->setAlign(self::ATTR_ALIGN_CENTER);
+    }
+
+    /**
+     * @throws \BetaKiller\Content\Shortcode\ShortcodeException
+     */
+    public function setAlignJustify(): void
+    {
+        $this->setAlign(self::ATTR_ALIGN_JUSTIFY);
+    }
+
+    /**
+     * @throws \BetaKiller\Content\Shortcode\ShortcodeException
+     */
+    public function setAlignNone(): void
+    {
+        $this->setAlign(null);
+    }
+
+    /**
+     * @param string|null $value
+     *
+     * @throws \BetaKiller\Content\Shortcode\ShortcodeException
+     */
+    private function setAlign(?string $value): void
+    {
+        $this->setAttribute(self::ATTR_ALIGN, $value);
+    }
+
+    /**
+     * @param int $value
+     *
+     * @throws \BetaKiller\Content\Shortcode\ShortcodeException
+     */
+    public function setWidth(int $value): void
+    {
+        $this->setAttribute(self::ATTR_WIDTH, $value);
+    }
+
+    /**
      * @return string
      * @throws \BetaKiller\Content\Shortcode\ShortcodeException
      */
@@ -115,6 +190,9 @@ class ImageShortcode extends AbstractContentElementShortcode
 
     /**
      * @return array
+     * @throws \BetaKiller\Factory\FactoryException
+     * @throws \BetaKiller\Assets\AssetsStorageException
+     * @throws \BetaKiller\Assets\AssetsException
      * @throws \BetaKiller\Content\Shortcode\ShortcodeException
      */
     public function getWidgetData(): array
@@ -127,37 +205,28 @@ class ImageShortcode extends AbstractContentElementShortcode
 
         $model = $this->imageRepository->findById($imageID);
 
-        $title  = $this->getAttribute('title');
-        $align  = $this->getAttribute('align') ?? 'alignnone';
-        $alt    = $this->getAttribute('alt');
-        $class  = $this->getAttribute('class');
-        $style  = $this->getAttribute('style');
-        $width  = (int)$this->getAttribute('width');
-
-        $classes = array_unique(array_filter(explode(' ', $class)));
-
-        if (strpos($class, 'align') === false) {
-            $classes[] = $align;
-        }
+        $title = $this->getAttribute(self::ATTR_TITLE);
+        $align = $this->getAttribute(self::ATTR_ALIGN) ?? null;
+        $alt   = $this->getAttribute(self::ATTR_ALT);
+        $width = $this->getAttribute(self::ATTR_WIDTH);
 
         $attributes = [
-            'id'     => 'content-image-'.$model->getID(),
-            'title'  => $title ?: $model->getTitle(),
-            'alt'    => $alt ?: $model->getAlt(),
-            'class'  => implode(' ', $classes),
-            'style'  => $style,
-            'width'  => $width,
+            'id'    => 'content-image-'.$model->getID(),
+            'title' => $title ?: $model->getTitle(),
+            'alt'   => $alt ?: $model->getAlt(),
+            'width' => $width,
         ];
 
+        $alignClass = $align ? 'align'.$align : 'alignnone';
+
         return [
-            'layout'   => $this->getAttribute(ContentElementShortcodeInterface::ATTR_LAYOUT) ?? self::LAYOUT_DEFAULT,
+            'layout'   => $this->getLayout(),
             'zoomable' => $this->isZoomable(),
 
-            'caption' => $title,
-            'align'   => $align,
-            'class'   => $class,
+            'caption'    => $title,
+            'alignClass' => $alignClass,
 
-            'image' => $this->assetsHelper->getAttributesForImgTag($model, $model::SIZE_PREVIEW, $attributes),
+            'image' => $this->assetsHelper->getAttributesForImgTag($model, $model::SIZE_ORIGINAL, $attributes),
             'href'  => $this->assetsHelper->getOriginalUrl($model),
         ];
     }

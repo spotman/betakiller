@@ -593,6 +593,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
 
         if (!$document->has('body')) {
             $this->logger->alert('Post parsing error for :url', [':url' => $item->getUri()]);
+
             return $content;
         }
 
@@ -831,16 +832,24 @@ class Task_Content_Import_Wordpress extends AbstractTask
         // Removing <img /> tag
         $captionText = trim(strip_tags($s->getContent()));
 
+        /** @var ImageShortcode $shortcode */
+        $shortcode = $this->shortcodeFacade->createFromCodename(ImageShortcode::codename());
+
         // Convert old full-size images to responsive images
         if (isset($attributes['width']) && (int)$attributes['width'] === 780) { // TODO move 780 to config
             unset($attributes['width']);
+            $shortcode->setAlignJustify();
         }
 
-        // Do not use height, it would be calculated automatically in the widget
-        unset($attributes['height']);
+        if (isset($attributes['width'])) {
+            $shortcode->setWidth($attributes['width']);
+        }
 
-        /** @var ImageShortcode $shortcode */
-        $shortcode = $this->shortcodeFacade->createFromCodename(ImageShortcode::codename(), $attributes);
+        $class = $attributes['class'] ?? null;
+
+        if ($class) {
+            $this->processImageClasses($shortcode, $class);
+        }
 
         $shortcode->useCaptionLayout($captionText);
         $shortcode->setID($image->getID());
@@ -862,6 +871,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
     public function thunderHandlerGallery(ThunderShortcodeInterface $s, ContentPostInterface $post): ?string
     {
         // TODO Deal with gallery duplicating on multiple task execution
+        // TODO Get WP ids and search for gallery with exact ids
         $this->logger->debug('[gallery] found');
 
         $gallery = $this->galleryRepository->create();
@@ -933,6 +943,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
     {
         $this->logger->debug('[wonderplugin_slider] found');
 
+        // TODO Get WP ids and search for gallery with exact ids
         $gallery = $this->galleryRepository->create();
 
         // Link gallery to current post
@@ -1013,15 +1024,16 @@ class Task_Content_Import_Wordpress extends AbstractTask
 
     /**
      * @param \DiDom\Element $node
-     * @param                $entity_item_id
+     * @param                $entityItemID
      *
      * @return ImageShortcode
+     * @throws \BetaKiller\Content\Shortcode\ShortcodeException
      * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\Repository\RepositoryException
      * @throws \BetaKiller\Task\TaskException
      * @throws \ORM_Validation_Exception
      */
-    private function processImgTag(\DiDom\Element $node, $entity_item_id): ImageShortcode
+    private function processImgTag(\DiDom\Element $node, $entityItemID): ImageShortcode
     {
         // Getting attributes
         $attributes = $node->attributes();
@@ -1038,7 +1050,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
         }
 
         /** @var \BetaKiller\Model\ContentImageInterface $image */
-        $image = $this->processWordpressAttachment($wpImage, $entity_item_id);
+        $image = $this->processWordpressAttachment($wpImage, $entityItemID);
 
         $alt   = trim(Arr::get($attributes, 'alt'));
         $title = trim(Arr::get($attributes, 'title'));
@@ -1054,32 +1066,91 @@ class Task_Content_Import_Wordpress extends AbstractTask
 
         $this->imageRepository->save($image);
 
-        // Removing unnecessary attributes
-        unset(
-            $attributes['id'],
-            $attributes['src'],
-            $attributes['alt'],
-            $attributes['title']
-        );
+        /** @var ImageShortcode $shortcode */
+        $shortcode = $this->shortcodeFacade->createFromCodename(ImageShortcode::codename());
+
+        $shortcode->setID($image->getID());
 
         // Convert old full-size images to responsive images
         if (isset($attributes['width']) && (int)$attributes['width'] === 780) { // TODO move 780 to config
             unset($attributes['width']);
+            $shortcode->setAlignJustify();
         }
 
-        // Height would be calculated automatically from width and scale in widget
-        unset($attributes['height']);
+        if (isset($attributes['width'])) {
+            $shortcode->setAttribute('width', (int)$attributes['width']);
+        }
 
-        $attributes['id'] = $image->getID();
+        $class = $attributes['class'] ?? null;
 
-        /** @var ImageShortcode $shortcode */
-        $shortcode = $this->shortcodeFacade->createFromCodename(ImageShortcode::codename(), $attributes);
+        if ($class) {
+            $this->processImageClasses($shortcode, $class);
+        }
+
+        if (isset($attributes['style'])) {
+            throw new TaskException('Image :id has inline styling, fix it in the source page');
+        }
 
         return $shortcode;
     }
 
     /**
-     * @param string                        $content
+     * @param \BetaKiller\Content\Shortcode\ImageShortcode $shortcode
+     * @param string                                       $classValue
+     *
+     * @throws \BetaKiller\Content\Shortcode\ShortcodeException
+     * @throws \BetaKiller\Task\TaskException
+     */
+    private function processImageClasses(ImageShortcode $shortcode, string $classValue): void
+    {
+        $classes = explode(' ', $classValue);
+
+        $translators = [
+            'alignleft'   => function () use ($shortcode) {
+                $shortcode->setAlignLeft();
+            },
+            'alignright'  => function () use ($shortcode) {
+                $shortcode->setAlignRight();
+            },
+            'aligncenter' => function () use ($shortcode) {
+                $shortcode->setAlignCenter();
+            },
+            'alignnone'   => function () use ($shortcode) {
+                $shortcode->setAlignNone();
+            },
+            'size-full'   => function () {
+                // Nothing to do here
+            },
+            'size-medium'   => function () {
+                // Nothing to do here
+            },
+        ];
+
+        $processed = [];
+
+        foreach ($classes as $class) {
+            $translator = $translators[$class] ?? null;
+
+            if ($translator) {
+                $translator();
+                $processed[] = $class;
+            } elseif (preg_match('/wp-image-[\d]+/', $class)) {
+                $processed[] = $class;
+            }
+        }
+
+        $diff = array_diff($classes, $processed);
+
+        if ($diff) {
+            throw new TaskException('Image :id has unprocessed classes :classes', [
+                ':id'      => $shortcode->getID(),
+                ':classes' => implode(', ', $diff),
+            ]);
+        }
+    }
+
+    /**
+     * @param string                                 $content
      * @param \BetaKiller\Model\ContentPostInterface $item
      *
      * @return string
