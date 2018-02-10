@@ -30,6 +30,8 @@ class UrlDispatcher implements LoggerAwareInterface
      */
     public const DEFAULT_URI = 'index';
 
+    public const CACHE_TTL = 86400; // 1 day
+
     /**
      * Current IFace stack
      *
@@ -475,7 +477,7 @@ class UrlDispatcher implements LoggerAwareInterface
         $this->cache->set($cacheKey, serialize([
             'stack'      => $stackData,
             'parameters' => $paramsData,
-        ]));
+        ]), self::CACHE_TTL);
 
         return true;
     }

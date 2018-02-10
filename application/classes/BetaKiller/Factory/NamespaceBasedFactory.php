@@ -7,6 +7,8 @@ use Psr\SimpleCache\InvalidArgumentException;
 
 final class NamespaceBasedFactory
 {
+    public const CACHE_TTL = 86400; // 1 day
+
     /**
      * @var mixed[]
      */
@@ -271,7 +273,7 @@ final class NamespaceBasedFactory
         try {
             $key = $this->getClassNameCacheKey($codename);
 
-            return $this->classNamesCache->set($key, $className);
+            return $this->classNamesCache->set($key, $className, self::CACHE_TTL);
         } catch (InvalidArgumentException $e) {
             throw FactoryException::wrap($e);
         }

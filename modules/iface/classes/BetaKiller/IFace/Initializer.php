@@ -70,7 +70,7 @@ class Initializer implements ModuleInitializerInterface
         $this->tree             = $tree;
         $this->cache            = $cache;
         $this->logger           = $logger;
-        $this->appEnv = $appEnv;
+        $this->appEnv           = $appEnv;
     }
 
     /**
@@ -122,6 +122,7 @@ class Initializer implements ModuleInitializerInterface
         } catch (\Throwable $e) {
             $this->cache->delete($key);
             $this->logException($this->logger, $e);
+
             return false;
         }
 
@@ -145,7 +146,7 @@ class Initializer implements ModuleInitializerInterface
 
         $this->logger->debug('Storing :count IFaces in cache', [':count' => \count($data)]);
 
-        $this->cache->set($key, serialize($data));
+        $this->cache->set($key, serialize($data), 86400); // 1 day
     }
 
     /**
