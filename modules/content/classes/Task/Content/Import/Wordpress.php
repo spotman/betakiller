@@ -536,6 +536,15 @@ class Task_Content_Import_Wordpress extends AbstractTask
             $model->setCreatedAt($createdAt);
             $model->setUpdatedAt($updatedAt);
 
+            // Use current user as an author of revision
+            $model->injectNewRevisionAuthor($this->user);
+
+            // Actualize revision with imported data
+            $model->setLatestRevisionAsActual();
+
+            // Saving model content
+            $this->postRepository->save($model);
+
             // Auto publishing for new posts (we are importing only published posts)
             if ($isNew) {
                 /** @var \BetaKiller\Status\ContentPostWorkflow $workflow */
@@ -544,13 +553,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
                 $workflow->complete(); // Publishing would be done automatically
             }
 
-            // Use current user as an author of revision
-            $model->injectNewRevisionAuthor($this->user);
-
-            // Actualize revision with imported data
-            $model->setLatestRevisionAsActual();
-
-            // Saving model content
+            // Saving updated workflow status
             $this->postRepository->save($model);
 
             $current++;
