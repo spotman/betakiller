@@ -73,7 +73,7 @@ return [
         LoggerInterface::class                      => DI\get(\BetaKiller\Log\Logger::class),
 
         AppEnvInterface::class => DI\factory(function () {
-            $multiSite   = MultiSite::instance();
+            $multiSite = MultiSite::instance();
 
             return new AppEnv(
                 $multiSite->getWorkingPath(),

@@ -166,12 +166,12 @@ abstract class AbstractGraphNodeModelOrm extends ORM implements GraphNodeModelIn
 
     protected function getStartMarkerColumnName(): string
     {
-        return 'isStart';
+        return 'is_start';
     }
 
     protected function getFinishMarkerColumnName(): string
     {
-        return 'isFinish';
+        return 'is_finish';
     }
 
     /**
