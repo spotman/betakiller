@@ -17,15 +17,19 @@ class Logout extends AbstractIFace
      */
     private $responseHelper;
 
-    public function render(): string
+    /**
+     * This hook executed before IFace processing (on every request regardless of caching)
+     * Place here code that needs to be executed on every IFace request (increment views counter, etc)
+     *
+     * @throws \BetaKiller\Exception\FoundHttpException
+     */
+    public function before(): void
     {
         // Sign out the user
         $this->auth->logout(true);
 
         // Redirect to site index
         $this->responseHelper->redirect('/');
-
-        return '';
     }
 
     /**

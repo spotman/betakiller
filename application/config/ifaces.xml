@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <root>
     <!-- Auth common ifaces -->
-    <iface uri="login" codename="Auth_Login" label="Sign in" layoutCodename="auth" hideInSiteMap="true" />
+    <iface uri="login" codename="Auth_Login" label="Sign in" layoutCodename="auth" hideInSiteMap="true" zone="public" />
     <iface uri="logout" codename="Auth_Logout" label="Sign out" hideInSiteMap="true" zone="personal" />
     <iface uri="change-account" codename="Auth_ReLogin" label="Change account" layoutCodename="auth" hideInSiteMap="true" zone="personal" />
-    <!--<iface uri="password-reset" codename="Auth_PasswordReset" title="Reset password" layoutCodename="auth" hideInSiteMap="true" />-->
+    <!--<iface uri="password-reset" codename="Auth_PasswordReset" label="Reset password" layoutCodename="auth" hideInSiteMap="true" zone="public" />-->
 </root>
 
 <!-- TODO убрать этот файл после того как будет настроено нормальное дерево интерфейсов -->

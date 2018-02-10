@@ -1,15 +1,32 @@
-<div class="widget-auth-regular span4 offset4 well">
-    <h1>{{ 'Sign in'|i18n }}</h1>
-    <div class="alert alert-error hide"></div>
-    <form method="POST" data-action="{{ login_url }}" name="regular-login-form" class="form-horizontal">
-        <input type="text" name="user-login" class="span4 form-control" placeholder="{{ 'Your username or email'|i18n }}" />
-        <input type="password" name="user-password" class="span4 form-control" placeholder="{{ 'Your password'|i18n }}" />
+<div class="widget-auth-regular row left-align">
+  <div class="alert hide col s12" style="color: white; background-color: red"></div>
 
+  <form method="POST" data-action="{{ login_url }}" name="regular-login-form" class="col s12">
+    <div class="row">
+
+      <div class="input-field col s12">
+        <input type="text" name="user-login" id="auth-user-login" placeholder="{{ 'Your username or email'|i18n }}"/>
+      </div>
+
+      <div class="input-field col s12">
+        <input type="password" name="user-password" id="auth-user-pass" placeholder="{{ 'Your password'|i18n }}"/>
+      </div>
+
+      <div class="col s12">
+        {#<a href="{{ reset_password_url }}" class="right">{{ "Forgot password?"|i18n }}</a>#}
         <label>
-            <input type="checkbox" name="remember" class="span4 form-control" /> {{ 'Remember me'|i18n }}
+          <input type="checkbox" name="remember" checked="checked" />
+          <span>{{ 'Remember me'|i18n }}</span>
         </label>
+      </div>
 
-        <button type="submit" class="btn btn-info btn-block"><i class="icon-user icon-white"></i> {{ 'Sign in'|i18n }}</button>
-    </form>
-    <a href="{{ reset_password_url }}" class="pull-right">{{ "Forgot password?"|i18n }}</a>
+      <div class="input-field col s12 center-align">
+        <button type="submit" class="btn green">
+          {#<i class="material-icons">account_box</i> #}
+          {{ 'Sign in'|i18n }}
+        </button>
+      </div>
+
+    </div>
+  </form>
 </div>

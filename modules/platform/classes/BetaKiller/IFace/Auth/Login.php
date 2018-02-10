@@ -80,11 +80,11 @@ class Login extends AbstractIFace
     }
 
     /**
-     * @throws \HTTP_Exception_302
+     * @throws \BetaKiller\Exception\FoundHttpException
      */
     public function before(): void
     {
-        $this->setModelUri();
+//        $this->setModelUri();
 
         // If user already authorized (skip this step in CLI mode)
         if (PHP_SAPI !== 'cli' && !$this->user->isGuest()) {
@@ -104,15 +104,15 @@ class Login extends AbstractIFace
             'redirect_url' => $this->redirectUrl,
         ];
     }
-
-    private function setModelUri(): void
-    {
-        $uri = $this->getModel()->getUri();
-
-        $redirectQuery = $this->redirectUrl
-            ? '?'.$this->redirectUrlQueryParam.'='.urlencode($this->redirectUrl)
-            : null;
-
-        $this->getModel()->setUri($uri.$redirectQuery);
-    }
+//
+//    private function setModelUri(): void
+//    {
+//        $uri = $this->getModel()->getUri();
+//
+//        $redirectQuery = $this->redirectUrl
+//            ? '?'.$this->redirectUrlQueryParam.'='.urlencode($this->redirectUrl)
+//            : null;
+//
+//        $this->getModel()->setUri($uri.$redirectQuery);
+//    }
 }

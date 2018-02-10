@@ -2,6 +2,7 @@
 namespace BetaKiller\Widget\Auth;
 
 use Auth;
+use BetaKiller\Exception\BadRequestHttpException;
 use BetaKiller\Helper\IFaceHelper;
 use BetaKiller\IFace\Auth\PasswordReset;
 use BetaKiller\Widget\AbstractBaseWidget;
@@ -31,11 +32,13 @@ class RegularWidget extends AbstractBaseWidget
 
     /**
      * Action for logging in
+     *
+     * @throws \BetaKiller\Exception\BadRequestHttpException
      */
     public function action_login()
     {
         if (!$this->getRequest()->is_ajax()) {
-            throw new HTTP_Exception_400('AJAX only gateway');
+            throw new BadRequestHttpException('AJAX only gateway');
         }
 
         // Magic call for better exception handling
@@ -50,7 +53,7 @@ class RegularWidget extends AbstractBaseWidget
         $userPassword = trim(HTML::chars($userPassword));
 
         if (!$userLogin || !$userPassword) {
-            throw new HTTP_Exception_400('No username or password sent');
+            throw new BadRequestHttpException('No username or password sent');
         }
 
         $this->auth->login($userLogin, $userPassword, $remember);
@@ -63,7 +66,7 @@ class RegularWidget extends AbstractBaseWidget
     {
         return [
             'login_url'          => $this->getLoginUrl(),
-            'reset_password_url' => $this->getResetPasswordUrl(),
+//            'reset_password_url' => $this->getResetPasswordUrl(),
         ];
     }
 

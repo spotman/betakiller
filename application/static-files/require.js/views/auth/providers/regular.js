@@ -18,17 +18,6 @@ define([
             // Ставим курсор в поле для ввода имени пользователя
             $login.focus();
 
-            var providerDoneCallback = function() {
-                successfulCallback();
-            };
-
-            var providerFailCallback = function(message) {
-                // Показываем сообщение об ошибке и включаем кнопку
-                $alert.html(message).removeClass("hide").show();
-                console.log(message || "error");
-                $submitButton.removeAttr("disabled");
-            };
-
             $form.submit(function(e) {
                 var login = $login.val(),
                     password = $pass.val(),
@@ -36,8 +25,9 @@ define([
 
                 e.preventDefault();
 
-                if (login == '' || password == '')
-                    return;
+                if (login === '' || password === '') {
+                  return;
+                }
 
                 // Прячем уведомление об ошибке и выключаем кнопку
                 $alert.hide();
@@ -47,7 +37,16 @@ define([
                     "user-login": login,
                     "user-password": password,
                     "remember": remember ? 1 : 0
-                }).done(providerDoneCallback).fail(providerFailCallback);
+                })
+                  .done(function() {
+                    successfulCallback();
+                  })
+                  .fail(function(message) {
+                    // Показываем сообщение об ошибке и включаем кнопку
+                    $alert.html(message).removeClass("hide").show();
+                    console.log(message || "error");
+                    $submitButton.removeAttr("disabled");
+                  });
             });
 
         }
