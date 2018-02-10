@@ -1,7 +1,7 @@
 <?php
 
 use BetaKiller\Config\AppConfigInterface;
-use BetaKiller\Helper\AppEnv;
+use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\Service\AbstractService;
 use BetaKiller\Service\ServiceException;
 use BetaKiller\Url\AvailableUrlsCollector;
@@ -37,7 +37,7 @@ class Service_Sitemap extends AbstractService
     private $urlCollector;
 
     /**
-     * @var \BetaKiller\Helper\AppEnv
+     * @var \BetaKiller\Helper\AppEnvInterface
      */
     private $appEnv;
 
@@ -47,13 +47,13 @@ class Service_Sitemap extends AbstractService
      * @param \BetaKiller\Url\AvailableUrlsCollector $urlCollector
      * @param \Psr\Log\LoggerInterface               $logger
      * @param \BetaKiller\Config\AppConfigInterface  $appConfig
-     * @param \BetaKiller\Helper\AppEnv              $appEnv
+     * @param \BetaKiller\Helper\AppEnvInterface     $appEnv
      */
     public function __construct(
         AvailableUrlsCollector $urlCollector,
         LoggerInterface $logger,
         AppConfigInterface $appConfig,
-        AppEnv $appEnv
+        AppEnvInterface $appEnv
     ) {
         $this->appConfig    = $appConfig;
         $this->logger       = $logger;

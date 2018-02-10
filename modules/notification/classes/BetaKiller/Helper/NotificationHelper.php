@@ -20,7 +20,7 @@ class NotificationHelper
     private $user;
 
     /**
-     * @var \BetaKiller\Helper\AppEnv
+     * @var \BetaKiller\Helper\AppEnvInterface
      */
     private $appEnv;
 
@@ -34,13 +34,13 @@ class NotificationHelper
      *
      * @param \BetaKiller\Notification\NotificationFacade $facade
      * @param \BetaKiller\Model\UserInterface             $user
-     * @param \BetaKiller\Helper\AppEnv                   $env
+     * @param \BetaKiller\Helper\AppEnvInterface          $env
      * @param \BetaKiller\Service\UserService             $userService
      */
     public function __construct(
         NotificationFacade $facade,
         UserInterface $user,
-        AppEnv $env,
+        AppEnvInterface $env,
         UserService $userService
     ) {
         $this->facade      = $facade;

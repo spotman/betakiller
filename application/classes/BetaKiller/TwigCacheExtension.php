@@ -13,7 +13,7 @@ class TwigCacheExtension extends CacheExtension
 {
     /**
      * @Inject
-     * @var \BetaKiller\Helper\AppEnv
+     * @var \BetaKiller\Helper\AppEnvInterface
      */
     private $appEnv;
 

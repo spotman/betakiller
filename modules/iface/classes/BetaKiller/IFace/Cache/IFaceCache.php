@@ -3,7 +3,7 @@ namespace BetaKiller\IFace\Cache;
 
 use BetaKiller\Config\AppConfigInterface;
 use BetaKiller\Exception\NotImplementedHttpException;
-use BetaKiller\Helper\AppEnv;
+use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\IFace\IFaceInterface;
 use PageCache\PageCache;
 use Psr\Log\LoggerInterface;
@@ -29,7 +29,7 @@ class IFaceCache
      * IFaceCache constructor.
      *
      * @param \BetaKiller\Config\AppConfigInterface          $config
-     * @param \BetaKiller\Helper\AppEnv                      $appEnv
+     * @param \BetaKiller\Helper\AppEnvInterface             $appEnv
      * @param \PageCache\PageCache                           $pageCache
      * @param \BetaKiller\IFace\Cache\IFacePageCacheStrategy $strategy
      * @param \Psr\Log\LoggerInterface                       $logger
@@ -38,7 +38,7 @@ class IFaceCache
      */
     public function __construct(
         AppConfigInterface $config,
-        AppEnv $appEnv,
+        AppEnvInterface $appEnv,
         PageCache $pageCache,
         IFacePageCacheStrategy $strategy,
         LoggerInterface $logger

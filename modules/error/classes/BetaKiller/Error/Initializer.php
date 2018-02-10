@@ -2,7 +2,7 @@
 namespace BetaKiller\Error;
 
 use BetaKiller\Exception\ExceptionHandlerInterface;
-use BetaKiller\Helper\AppEnv;
+use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\Log\LazyLoadProxyHandler;
 use BetaKiller\Log\Logger;
 use BetaKiller\Log\StripExceptionFromContextFormatter;
@@ -20,7 +20,7 @@ class Initializer implements ModuleInitializerInterface
     private $logger;
 
     /**
-     * @var \BetaKiller\Helper\AppEnv
+     * @var \BetaKiller\Helper\AppEnvInterface
      */
     private $appEnv;
 
@@ -39,13 +39,13 @@ class Initializer implements ModuleInitializerInterface
      *
      * @param \Psr\Container\ContainerInterface               $container
      * @param \BetaKiller\Log\Logger                          $logger
-     * @param \BetaKiller\Helper\AppEnv                       $appEnv
+     * @param \BetaKiller\Helper\AppEnvInterface              $appEnv
      * @param \BetaKiller\Exception\ExceptionHandlerInterface $handler
      */
     public function __construct(
         ContainerInterface $container,
         Logger $logger,
-        AppEnv $appEnv,
+        AppEnvInterface $appEnv,
         ExceptionHandlerInterface $handler
     ) {
         $this->logger    = $logger;

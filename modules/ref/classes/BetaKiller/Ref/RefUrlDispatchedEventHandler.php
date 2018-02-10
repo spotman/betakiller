@@ -1,7 +1,7 @@
 <?php
 namespace BetaKiller\Ref;
 
-use BetaKiller\Helper\AppEnv;
+use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\MessageBus\EventBus;
 use BetaKiller\MessageBus\EventHandlerInterface;
 use BetaKiller\Repository\RefHitRepository;
@@ -14,7 +14,7 @@ class RefUrlDispatchedEventHandler implements EventHandlerInterface
     private $refHitsRepository;
 
     /**
-     * @var AppEnv
+     * @var \BetaKiller\Helper\AppEnvInterface
      */
     private $appEnv;
 
@@ -22,9 +22,9 @@ class RefUrlDispatchedEventHandler implements EventHandlerInterface
      * RefUrlDispatchedEventHandler constructor.
      *
      * @param \BetaKiller\Repository\RefHitRepository $refLogRepository
-     * @param \BetaKiller\Helper\AppEnv               $appEnv
+     * @param \BetaKiller\Helper\AppEnvInterface      $appEnv
      */
-    public function __construct(RefHitRepository $refLogRepository, AppEnv $appEnv)
+    public function __construct(RefHitRepository $refLogRepository, AppEnvInterface $appEnv)
     {
         $this->refHitsRepository = $refLogRepository;
         $this->appEnv            = $appEnv;

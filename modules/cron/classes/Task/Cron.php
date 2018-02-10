@@ -15,7 +15,7 @@ class Task_Cron extends AbstractTask
 {
     /**
      * @Inject
-     * @var \BetaKiller\Helper\AppEnv
+     * @var \BetaKiller\Helper\AppEnvInterface
      */
     private $env;
 

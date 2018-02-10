@@ -2,7 +2,7 @@
 namespace BetaKiller\MissingUrl;
 
 use BetaKiller\Event\MissingUrlEvent;
-use BetaKiller\Helper\AppEnv;
+use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\IFace\IFaceModelInterface;
 use BetaKiller\MessageBus\EventBus;
 use BetaKiller\MessageBus\EventHandlerInterface;
@@ -16,7 +16,7 @@ use BetaKiller\Repository\MissingUrlRepository;
 class MissingUrlEventHandler implements EventHandlerInterface
 {
     /**
-     * @var AppEnv
+     * @var \BetaKiller\Helper\AppEnvInterface
      */
     private $appEnv;
 
@@ -38,13 +38,13 @@ class MissingUrlEventHandler implements EventHandlerInterface
     /**
      * MissingUrlEventHandler constructor.
      *
-     * @param AppEnv                                                    $appEnv
+     * @param AppEnvInterface                                           $appEnv
      * @param \BetaKiller\Repository\MissingUrlRepository               $missingUrlRepository
      * @param \BetaKiller\Repository\MissingUrlRedirectTargetRepository $targetUrlRepository
      * @param \BetaKiller\Repository\MissingUrlReferrerRepository       $referrerRepository
      */
     public function __construct(
-        AppEnv $appEnv,
+        AppEnvInterface $appEnv,
         MissingUrlRepository $missingUrlRepository,
         MissingUrlRedirectTargetRepository $targetUrlRepository,
         MissingUrlReferrerRepository $referrerRepository
@@ -72,23 +72,22 @@ class MissingUrlEventHandler implements EventHandlerInterface
         $missingUrlModel = $this->getMissingUrlModel($message);
 
         $httpReferer = $message->getHttpReferer();
-        $ipAddress = $message->getIpAddress();
+        $ipAddress   = $message->getIpAddress();
 
         if ($httpReferer) {
             $referrerModel = $this->getReferrerModel($httpReferer, $ipAddress);
 
             if (!$missingUrlModel->hasReferrer($referrerModel)) {
                 $missingUrlModel->addReferrer($referrerModel);
-
                 // TODO Mark url for notification about new referrer (set $newReferrer flag to true)
             }
         }
 
         // TODO Implement statuses in missed urls
         // If status is "new"
-            // TODO Notify moderators about new missed URL
+        // TODO Notify moderators about new missed URL
         // Else if $newReferrer === true
-            // TODO Notify moderators about new referrer in missing URL
+        // TODO Notify moderators about new referrer in missing URL
 
         $missingUrlModel->setLastSeenAt(new \DateTimeImmutable);
 
@@ -139,8 +138,10 @@ class MissingUrlEventHandler implements EventHandlerInterface
      * @throws \BetaKiller\Repository\RepositoryException
      * @throws \ORM_Validation_Exception
      */
-    private function getRedirectTargetModel(string $redirectToUrl, ?IFaceModelInterface $parentIFace): MissingUrlRedirectTargetModelInterface
-    {
+    private function getRedirectTargetModel(
+        string $redirectToUrl,
+        ?IFaceModelInterface $parentIFace
+    ): MissingUrlRedirectTargetModelInterface {
         $redirectModel = $this->targetUrlRepository->findByUrl($redirectToUrl);
 
         if (!$redirectModel) {

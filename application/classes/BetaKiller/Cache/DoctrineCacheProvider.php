@@ -4,7 +4,7 @@ namespace BetaKiller\Cache;
 use BetaKiller\Config\ConfigProviderInterface;
 use BetaKiller\Exception;
 use MultiSite;
-use BetaKiller\Helper\AppEnv;
+use BetaKiller\Helper\AppEnvInterface;
 use Doctrine\Common\Cache\ArrayCache;
 use Doctrine\Common\Cache\ChainCache;
 use Pcelta\Doctrine\Cache\Factory as CacheFactory;
@@ -25,13 +25,12 @@ class DoctrineCacheProvider extends ChainCache
      * DoctrineCacheProvider constructor.
      *
      * @param \MultiSite                                 $multiSite
-     * @param \BetaKiller\Helper\AppEnv                  $appEnv
+     * @param \BetaKiller\Helper\AppEnvInterface         $appEnv
      * @param \BetaKiller\Config\ConfigProviderInterface $config
      *
-     * @throws \Pcelta\Doctrine\Cache\Exception\InvalidCacheConfig
      * @throws \BetaKiller\Exception
      */
-    public function __construct(MultiSite $multiSite, AppEnv $appEnv, ConfigProviderInterface $config)
+    public function __construct(MultiSite $multiSite, AppEnvInterface $appEnv, ConfigProviderInterface $config)
     {
         $workingName = $appEnv->isCoreRunning() ? 'core' : $appEnv->getAppCodename();
 

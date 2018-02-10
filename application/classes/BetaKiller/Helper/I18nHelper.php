@@ -16,7 +16,7 @@ class I18nHelper
     private $lang;
 
     /**
-     * @var \BetaKiller\Helper\AppEnv
+     * @var \BetaKiller\Helper\AppEnvInterface
      */
     private $appEnv;
 
@@ -33,12 +33,12 @@ class I18nHelper
     /**
      * I18n constructor.
      *
-     * @param \BetaKiller\Helper\AppEnv             $appEnv
+     * @param \BetaKiller\Helper\AppEnvInterface             $appEnv
      * @param \BetaKiller\Config\AppConfigInterface $appConfig
      *
      * @throws \BetaKiller\Exception
      */
-    public function __construct(AppEnv $appEnv, AppConfigInterface $appConfig)
+    public function __construct(AppEnvInterface $appEnv, AppConfigInterface $appConfig)
     {
         $this->appEnv = $appEnv;
         $this->appConfig = $appConfig;

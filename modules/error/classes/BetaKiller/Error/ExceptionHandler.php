@@ -6,7 +6,7 @@ use BetaKiller\Exception\ExceptionHandlerInterface;
 use BetaKiller\Exception\HttpExceptionExpectedInterface;
 use BetaKiller\Exception\HttpExceptionInterface;
 use BetaKiller\ExceptionInterface;
-use BetaKiller\Helper\AppEnv;
+use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\Helper\LoggerHelperTrait;
 use BetaKiller\IFace\IFaceInterface;
 use BetaKiller\IFace\IFaceProvider;
@@ -24,7 +24,7 @@ class ExceptionHandler implements ExceptionHandlerInterface
     private $ifaceProvider;
 
     /**
-     * @var \BetaKiller\Helper\AppEnv
+     * @var \BetaKiller\Helper\AppEnvInterface
      */
     private $appEnv;
 
@@ -46,13 +46,13 @@ class ExceptionHandler implements ExceptionHandlerInterface
     /**
      * ExceptionHandler constructor.
      *
-     * @param \BetaKiller\Helper\AppEnv       $appEnv
-     * @param \BetaKiller\IFace\IFaceProvider $ifaceProvider
-     * @param \BetaKiller\View\IFaceView      $ifaceView
-     * @param \Psr\Log\LoggerInterface        $logger
+     * @param \BetaKiller\Helper\AppEnvInterface $appEnv
+     * @param \BetaKiller\IFace\IFaceProvider    $ifaceProvider
+     * @param \BetaKiller\View\IFaceView         $ifaceView
+     * @param \Psr\Log\LoggerInterface           $logger
      */
     public function __construct(
-        AppEnv $appEnv,
+        AppEnvInterface $appEnv,
         IFaceProvider $ifaceProvider,
         IFaceView $ifaceView,
         LoggerInterface $logger

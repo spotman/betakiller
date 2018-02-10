@@ -11,6 +11,7 @@ use BetaKiller\Config\ConfigProviderInterface;
 use BetaKiller\Config\KohanaConfigProvider;
 use BetaKiller\Exception\ExceptionHandlerInterface;
 use BetaKiller\Helper\AppEnv;
+use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\Notification\DefaultMessageRendered;
 use BetaKiller\Notification\MessageRendererInterface;
 use BetaKiller\View\LayoutViewInterface;
@@ -71,7 +72,7 @@ return [
         // Use logger only when really needed
         LoggerInterface::class                      => DI\get(\BetaKiller\Log\Logger::class),
 
-        AppEnv::class => DI\factory(function () {
+        AppEnvInterface::class => DI\factory(function () {
             $multiSite   = MultiSite::instance();
 
             return new AppEnv(

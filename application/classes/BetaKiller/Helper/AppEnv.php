@@ -8,24 +8,8 @@ use Dotenv\Dotenv;
  *
  * @package BetaKiller\Helper
  */
-class AppEnv
+class AppEnv implements AppEnvInterface
 {
-    // Common environment type constants for consistency and convenience
-    public const MODE_PRODUCTION  = 'production';
-    public const MODE_STAGING     = 'staging';
-    public const MODE_TESTING     = 'testing';
-    public const MODE_DEVELOPMENT = 'development';
-
-    public const ALLOWED_MODES = [
-        self::MODE_PRODUCTION,
-        self::MODE_STAGING,
-        self::MODE_TESTING,
-        self::MODE_DEVELOPMENT,
-    ];
-
-    public const APP_MODE     = 'APP_ENV';
-    public const APP_REVISION = 'APP_REVISION';
-
     /**
      * @var bool
      */

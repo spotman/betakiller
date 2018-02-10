@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace BetaKiller\IFace;
 
 
-use BetaKiller\Helper\AppEnv;
+use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\Helper\LoggerHelperTrait;
 use BetaKiller\IFace\Exception\IFaceException;
 use BetaKiller\IFace\ModelProvider\IFaceModelProviderDatabase;
@@ -43,7 +43,7 @@ class Initializer implements ModuleInitializerInterface
     private $logger;
 
     /**
-     * @var \BetaKiller\Helper\AppEnv
+     * @var \BetaKiller\Helper\AppEnvInterface
      */
     private $appEnv;
 
@@ -53,7 +53,7 @@ class Initializer implements ModuleInitializerInterface
      * @param \BetaKiller\IFace\ModelProvider\IFaceModelProviderDatabase  $databaseProvider
      * @param \BetaKiller\IFace\ModelProvider\IFaceModelProviderXmlConfig $xmlProvider
      * @param \BetaKiller\IFace\IFaceModelTree                            $tree
-     * @param \BetaKiller\Helper\AppEnv                                   $appEnv
+     * @param \BetaKiller\Helper\AppEnvInterface                          $appEnv
      * @param \Psr\SimpleCache\CacheInterface                             $cache
      * @param \Psr\Log\LoggerInterface                                    $logger
      */
@@ -61,7 +61,7 @@ class Initializer implements ModuleInitializerInterface
         IFaceModelProviderDatabase $databaseProvider,
         IFaceModelProviderXmlConfig $xmlProvider,
         IFaceModelTree $tree,
-        AppEnv $appEnv,
+        AppEnvInterface $appEnv,
         CacheInterface $cache,
         LoggerInterface $logger
     ) {

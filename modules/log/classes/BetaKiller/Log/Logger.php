@@ -1,7 +1,7 @@
 <?php
 namespace BetaKiller\Log;
 
-use BetaKiller\Helper\AppEnv;
+use BetaKiller\Helper\AppEnvInterface;
 use Monolog\Handler\FingersCrossedHandler;
 use Monolog\Handler\HandlerInterface;
 use Monolog\Handler\StreamHandler;
@@ -23,7 +23,7 @@ class Logger implements LoggerInterface
     private $monolog;
 
     /**
-     * @var \BetaKiller\Helper\AppEnv
+     * @var \BetaKiller\Helper\AppEnvInterface
      */
     private $appEnv;
 
@@ -35,12 +35,12 @@ class Logger implements LoggerInterface
     /**
      * Logger constructor.
      *
-     * @param \BetaKiller\Helper\AppEnv $env
-     * @param \MultiSite                $multiSite
+     * @param \BetaKiller\Helper\AppEnvInterface $env
+     * @param \MultiSite                         $multiSite
      *
      * @throws \Exception
      */
-    public function __construct(AppEnv $env, MultiSite $multiSite)
+    public function __construct(AppEnvInterface $env, MultiSite $multiSite)
     {
         $this->appEnv    = $env;
         $this->multiSite = $multiSite;

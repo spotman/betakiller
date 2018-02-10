@@ -5,7 +5,7 @@ namespace BetaKiller\Factory;
 
 use BetaKiller\Config\AppConfigInterface;
 use BetaKiller\DI\ContainerInterface;
-use BetaKiller\Helper\AppEnv;
+use BetaKiller\Helper\AppEnvInterface;
 
 class NamespaceBasedFactoryBuilder
 {
@@ -20,7 +20,7 @@ class NamespaceBasedFactoryBuilder
     private $appConfig;
 
     /**
-     * @var \BetaKiller\Helper\AppEnv
+     * @var \BetaKiller\Helper\AppEnvInterface
      */
     private $appEnv;
 
@@ -29,9 +29,9 @@ class NamespaceBasedFactoryBuilder
      *
      * @param \BetaKiller\DI\ContainerInterface     $container
      * @param \BetaKiller\Config\AppConfigInterface $appConfig
-     * @param \BetaKiller\Helper\AppEnv             $appEnv
+     * @param \BetaKiller\Helper\AppEnvInterface    $appEnv
      */
-    public function __construct(ContainerInterface $container, AppConfigInterface $appConfig, AppEnv $appEnv)
+    public function __construct(ContainerInterface $container, AppConfigInterface $appConfig, AppEnvInterface $appEnv)
     {
         $this->container = $container;
         $this->appConfig = $appConfig;

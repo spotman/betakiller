@@ -12,7 +12,7 @@ use BetaKiller\Task\AbstractTask;
 class UserDetector
 {
     /**
-     * @var \BetaKiller\Helper\AppEnv
+     * @var \BetaKiller\Helper\AppEnvInterface
      */
     private $appEnv;
 
@@ -40,13 +40,18 @@ class UserDetector
      * UserDetector constructor.
      *
      * @param \BetaKiller\Service\UserService       $service
-     * @param \BetaKiller\Helper\AppEnv             $appEnv
+     * @param \BetaKiller\Helper\AppEnvInterface    $appEnv
      * @param \Auth                                 $auth
      * @param \BetaKiller\Repository\UserRepository $repo
      * @param \BetaKiller\Helper\I18nHelper         $i18n
      */
-    public function __construct(UserService $service, AppEnv $appEnv, Auth $auth, UserRepository $repo, I18nHelper $i18n)
-    {
+    public function __construct(
+        UserService $service,
+        AppEnvInterface $appEnv,
+        Auth $auth,
+        UserRepository $repo,
+        I18nHelper $i18n
+    ) {
         $this->appEnv     = $appEnv;
         $this->auth       = $auth;
         $this->repository = $repo;
