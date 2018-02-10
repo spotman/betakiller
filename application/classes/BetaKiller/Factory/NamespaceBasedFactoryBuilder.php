@@ -38,6 +38,10 @@ class NamespaceBasedFactoryBuilder
         $this->appEnv    = $appEnv;
     }
 
+    /**
+     * @return \BetaKiller\Factory\NamespaceBasedFactory
+     * @throws \BetaKiller\Factory\FactoryException
+     */
     public function createFactory(): NamespaceBasedFactory
     {
         // Always create new instance coz client code is configuring this instance
