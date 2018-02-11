@@ -603,7 +603,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
         $body = $document->find('body')[0];
 
         if ($body->innerHtml() !== $content) {
-            $this->logger->warning('HTML parsing had modified the post content');
+            $this->logger->debug('HTML parsing had modified the post content');
         }
 
         // Process attachments first coz they are images inside links
