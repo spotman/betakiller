@@ -4,6 +4,13 @@ namespace BetaKiller\Assets\Storage;
 interface AssetsStorageInterface
 {
     /**
+     *  Returns true if files are located under document root
+     *
+     * @return bool
+     */
+    public function isPublic(): bool;
+
+    /**
      * Model path would be prepended with this
      *
      * @param string $path
@@ -13,17 +20,12 @@ interface AssetsStorageInterface
     public function setBasePath(string $path): void;
 
     /**
-     * @return string
-     */
-    public function getDirectorySeparator(): string;
-
-    /**
      * @param string $path
      *
      * @return string
      * @throws \BetaKiller\Assets\AssetsStorageException
      */
-    public function get(string $path): string;
+    public function getFile(string $path): string;
 
     /**
      * Stores file
@@ -33,7 +35,7 @@ interface AssetsStorageInterface
      *
      * @throws \BetaKiller\Assets\AssetsStorageException
      */
-    public function put(string $path, string $content): void;
+    public function putFile(string $path, string $content): void;
 
     /**
      * Deletes the file
@@ -42,12 +44,25 @@ interface AssetsStorageInterface
      *
      * @throws \BetaKiller\Assets\AssetsStorageException
      */
-    public function delete(string $path): void;
+    public function deleteFile(string $path): void;
 
     /**
-     * Returns true if storage`s files are located outside of document root and deploy is needed
+     * Returns array of files in provided directory
      *
-     * @return bool
+     * @param string $directory
+     *
+     * @return array
+     * @throws \BetaKiller\Assets\AssetsStorageException
      */
-    public function isDeployRequired(): bool;
+    public function getFiles(string $directory): array;
+
+    /**
+     * Delete provided directory. Throws an exception if there are files inside
+     *
+     * @param string $path
+     *
+     * @return void
+     * @throws \BetaKiller\Assets\AssetsStorageException
+     */
+    public function deleteDirectory(string $path): void;
 }

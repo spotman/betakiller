@@ -5,11 +5,34 @@ use BetaKiller\Assets\Handler\AssetsHandlerInterface;
 use BetaKiller\Assets\Model\AssetsModelInterface;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Repository\RepositoryInterface;
-use Request;
 
 interface AssetsProviderInterface
 {
+    public const ACTION_ORIGINAL = 'original';
+    public const ACTION_UPLOAD   = 'upload';
+    public const ACTION_DOWNLOAD = 'download';
+    public const ACTION_DELETE   = 'delete';
+
+    /**
+     * Save codename after initialization
+     *
+     * @param string $codename
+     */
     public function setCodename(string $codename): void;
+
+    /**
+     * Returns true if current provider has protected content (no caching in public directory)
+     *
+     * @return bool
+     */
+    public function isProtected(): bool;
+
+    /**
+     * Returns true if current provider needs deployment to public directory
+     *
+     * @return bool
+     */
+    public function isDeploymentNeeded(): bool;
 
     /**
      * @param \BetaKiller\Assets\Handler\AssetsHandlerInterface $handler
@@ -17,13 +40,18 @@ interface AssetsProviderInterface
     public function addPostUploadHandler(AssetsHandlerInterface $handler): void;
 
     /**
+     * Returns provider`s URL key or codename if no key was defined
+     *
+     * @return string
+     */
+    public function getUrlKey(): string;
+
+    /**
      * Returns URL for POSTing new files
      *
      * @return string
      */
     public function getUploadUrl(): string;
-
-    public function getUrlKey(): string;
 
     /**
      * Returns public original URL for provided model
@@ -52,9 +80,29 @@ interface AssetsProviderInterface
      */
     public function getDeleteUrl(AssetsModelInterface $model): string;
 
+    /**
+     * Returns path for deployed file, relative to document root
+     *
+     * @param \BetaKiller\Assets\Model\AssetsModelInterface $model
+     * @param string                                        $action
+     * @param null|string                                   $suffix
+     *
+     * @return string
+     */
+    public function getDeployRelativePath(AssetsModelInterface $model, string $action, ?string $suffix = null): string;
+
+    /**
+     * Returns file extension for provided model (like "jpeg" or "pdf")
+     *
+     * @param \BetaKiller\Assets\Model\AssetsModelInterface $model
+     *
+     * @return string
+     */
     public function getModelExtension(AssetsModelInterface $model): string;
 
     /**
+     * Process uploaded file
+     *
      * @param array                           $_file    Item from $_FILES
      * @param array                           $postData Array with items from $_POST
      * @param \BetaKiller\Model\UserInterface $user
@@ -65,6 +113,9 @@ interface AssetsProviderInterface
     public function upload(array $_file, array $postData, UserInterface $user): AssetsModelInterface;
 
     /**
+     * Store regular file
+     * This method mainly used for importing existing files
+     *
      * @param string                          $fullPath
      * @param string                          $originalName
      * @param \BetaKiller\Model\UserInterface $user
@@ -73,8 +124,6 @@ interface AssetsProviderInterface
      */
     public function store(string $fullPath, string $originalName, UserInterface $user): AssetsModelInterface;
 
-    public function deploy(Request $request, AssetsModelInterface $model, string $content): bool;
-
     /**
      * @param AssetsModelInterface $model
      *
@@ -82,6 +131,11 @@ interface AssetsProviderInterface
      */
     public function delete(AssetsModelInterface $model): void;
 
+    /**
+     * Proxy for saving model (provider already has right repository inside)
+     *
+     * @param \BetaKiller\Assets\Model\AssetsModelInterface $model
+     */
     public function saveModel(AssetsModelInterface $model): void;
 
     /**
@@ -92,7 +146,7 @@ interface AssetsProviderInterface
      * @return AssetsModelInterface
      * @throws \BetaKiller\Assets\AssetsProviderException
      */
-    public function getModelByDeployUrl(string $url): AssetsModelInterface;
+    public function getModelByPublicUrl(string $url): AssetsModelInterface;
 
     /**
      * Returns content of the file
@@ -104,23 +158,10 @@ interface AssetsProviderInterface
     public function getContent(AssetsModelInterface $model): string;
 
     /**
-     * Update content of the file
+     * Returns assets model repository linked to current provider
      *
-     * @param AssetsModelInterface $model
-     * @param string               $content
+     * @return \BetaKiller\Repository\RepositoryInterface
      */
-    public function setContent(AssetsModelInterface $model, string $content): void;
-
-    /**
-     * Returns TRUE if MIME-type is allowed in current provider
-     *
-     * @param string $mime MIME-type
-     *
-     * @throws \BetaKiller\Assets\AssetsProviderException
-     * @return bool
-     */
-    public function checkAllowedMimeTypes(string $mime): bool;
-
     public function getRepository(): RepositoryInterface;
 
     /**

@@ -148,6 +148,7 @@ class AssetsProviderFactory
      * @param string $modelName
      *
      * @return \BetaKiller\Assets\Provider\ImageAssetsProviderInterface|AssetsProviderInterface|mixed
+     * @throws \BetaKiller\Assets\AssetsProviderException
      * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\Assets\AssetsException
      * @throws \BetaKiller\Assets\AssetsStorageException
@@ -190,6 +191,25 @@ class AssetsProviderFactory
             'aclResource'  => $aclResource,
             'pathStrategy' => $pathStrategy,
         ]);
+
+        // Check provider => storage matrix
+        if ($providerInstance->isProtected() && $storage->isPublic()) {
+            throw new AssetsProviderException('Protected assets provider :name must have protected storage', [
+                ':name' => $modelName,
+            ]);
+        }
+
+        // Public provider url key and public storage path must be the same to prevent collisions
+        if (!$providerInstance->isProtected() && $storage->isPublic()) {
+            $storagePathKey = $storageConfig[AbstractAssetsProvider::CONFIG_MODEL_STORAGE_PATH_KEY];
+            $providerUrlKey = $modelConfig[AbstractAssetsProvider::CONFIG_MODEL_URL_KEY];
+
+            if ($providerUrlKey !== $storagePathKey) {
+                throw new AssetsProviderException('Public provider :name url key and storage path must be the same', [
+                    ':name' => $modelName,
+                ]);
+            }
+        }
 
         // Store codename for future use
         $providerInstance->setCodename($modelName);

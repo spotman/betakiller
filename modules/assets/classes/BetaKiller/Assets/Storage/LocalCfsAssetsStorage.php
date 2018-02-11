@@ -3,8 +3,32 @@ namespace BetaKiller\Assets\Storage;
 
 use BetaKiller\Assets\AssetsStorageException;
 
-class LocalCfsAssetsStorage extends AbstractLocalAssetsStorage
+class LocalCfsAssetsStorage implements AssetsStorageInterface
 {
+    /**
+     * @var string
+     */
+    private $basePath;
+
+    /**
+     * @param string $basePath
+     */
+    public function setBasePath(string $basePath): void
+    {
+        $this->basePath = $basePath;
+    }
+
+    /**
+     *  Returns true if files are located under document root
+     *
+     * @return bool
+     */
+    public function isPublic(): bool
+    {
+        // Static assets are located outside of the docroot
+        return false;
+    }
+
     /**
      * Creates the file or updates its content
      *
@@ -13,7 +37,7 @@ class LocalCfsAssetsStorage extends AbstractLocalAssetsStorage
      *
      * @throws AssetsStorageException
      */
-    protected function doPut(string $path, string $content): void
+    public function putFile(string $path, string $content): void
     {
         throw new AssetsStorageException('CFS storage does not support adding files');
     }
@@ -23,10 +47,10 @@ class LocalCfsAssetsStorage extends AbstractLocalAssetsStorage
      *
      * @param string $path Local path
      *
-     * @return bool
+     * @return void
      * @throws AssetsStorageException
      */
-    protected function doDelete(string $path): bool
+    public function deleteFile(string $path): void
     {
         throw new AssetsStorageException('CFS storage does not support deleting files');
     }
@@ -39,19 +63,45 @@ class LocalCfsAssetsStorage extends AbstractLocalAssetsStorage
      * @return string
      * @throws AssetsStorageException
      */
-    protected function doGet(string $path): string
+    public function getFile(string $path): string
+    {
+        $extDotPosition = mb_strrpos($path, '.');
+
+        if ($extDotPosition === false) {
+            throw new AssetsStorageException('Path must point to file with extension, :value given instead', [
+                ':value' => $path,
+            ]);
+        }
+
+        $path = mb_substr($path, 0, $extDotPosition);
+        $ext = mb_substr($path, $extDotPosition+1);
+
+        return \Kohana::find_file($this->basePath, $path, $ext);
+    }
+
+    /**
+     * Returns array of files in provided directory
+     *
+     * @param string $path Local path in storage
+     *
+     * @return string[]
+     * @throws \BetaKiller\Assets\AssetsStorageException
+     */
+    public function getFiles(string $path): array
     {
         throw new AssetsStorageException('Implement me!');
     }
 
     /**
-     * Returns true if storage`s files are located outside of document root and deploy is needed
+     * Deletes file
      *
-     * @return bool
+     * @param string $path Local path
+     *
+     * @return void
+     * @throws \BetaKiller\Assets\AssetsStorageException
      */
-    public function isDeployRequired(): bool
+    public function deleteDirectory(string $path): void
     {
-        // Static assets are located outside of the docroot
-        return true;
+        throw new AssetsStorageException('CFS storage does not support deleting files');
     }
 }

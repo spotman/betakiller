@@ -24,6 +24,17 @@ class LocalProtectedAssetsStorage extends AbstractLocalAssetsStorage
     }
 
     /**
+     *  Returns true if files are located under document root
+     *
+     * @return bool
+     */
+    public function isPublic(): bool
+    {
+        // Protected assets are located outside of document root
+        return false;
+    }
+
+    /**
      * @param string $basePath
      *
      * @throws AssetsStorageException
@@ -33,16 +44,5 @@ class LocalProtectedAssetsStorage extends AbstractLocalAssetsStorage
         $appRoot = $this->appEnv->getAppRootPath();
 
         parent::setBasePath($appRoot.DIRECTORY_SEPARATOR.'assets'.DIRECTORY_SEPARATOR.$basePath);
-    }
-
-    /**
-     * Returns true if storage`s files are located outside of document root and deploy is needed
-     *
-     * @return bool
-     */
-    public function isDeployRequired(): bool
-    {
-        // Public files are located outside of the docroot
-        return true;
     }
 }

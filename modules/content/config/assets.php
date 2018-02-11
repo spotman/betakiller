@@ -4,7 +4,7 @@ use BetaKiller\Assets\Handler\SaveEntityItemRelationHandler;
 return [
     'providers' =>  [
         'ContentPostThumbnail'  =>  [
-            'url_key' => 'content-post-thumbnails',
+            'url_key' => 'post-thumbnails',
             'provider' => 'Image',
             'mimes' => [
                 'image/jpeg',

@@ -22,9 +22,18 @@ abstract class AbstractAssetsStorage implements AssetsStorageInterface
 
     private function makeFullPath(string $relativePath): string
     {
-        return $this->basePath
+        $fullPath = $this->basePath
             ? $this->basePath.DIRECTORY_SEPARATOR.$relativePath
             : $relativePath;
+
+        $ds = $this->getDirectorySeparator();
+
+        // Prepare path (replace directory separator if needed)
+        if ($ds !== DIRECTORY_SEPARATOR) {
+            $fullPath = str_replace(DIRECTORY_SEPARATOR, $ds, $fullPath);
+        }
+
+        return $fullPath;
     }
 
     /**
@@ -33,11 +42,11 @@ abstract class AbstractAssetsStorage implements AssetsStorageInterface
      * @return string
      * @throws \BetaKiller\Assets\AssetsStorageException
      */
-    public function get(string $path): string
+    public function getFile(string $path): string
     {
         $path = $this->makeFullPath($path);
 
-        return $this->doGet($path);
+        return $this->doGetFile($path);
     }
 
     /**
@@ -48,11 +57,11 @@ abstract class AbstractAssetsStorage implements AssetsStorageInterface
      *
      * @throws \BetaKiller\Assets\AssetsStorageException
      */
-    public function put(string $path, string $content): void
+    public function putFile(string $path, string $content): void
     {
         $path = $this->makeFullPath($path);
 
-        $this->doPut($path, $content);
+        $this->doPutFile($path, $content);
     }
 
     /**
@@ -62,12 +71,49 @@ abstract class AbstractAssetsStorage implements AssetsStorageInterface
      *
      * @throws \BetaKiller\Assets\AssetsStorageException
      */
-    public function delete(string $path): void
+    public function deleteFile(string $path): void
     {
         $path = $this->makeFullPath($path);
 
-        $this->doDelete($path);
+        $this->doDeleteFile($path);
     }
+
+    /**
+     * Returns array of files in provided directory
+     *
+     * @param string $directory
+     *
+     * @return array
+     * @throws \BetaKiller\Assets\AssetsStorageException
+     */
+    public function getFiles(string $directory): array
+    {
+        $path = $this->makeFullPath($directory);
+
+        return $this->doGetFiles($path);
+    }
+
+    /**
+     * Delete provided directory. Throws an exception if there are files inside
+     *
+     * @param string $path
+     *
+     * @return void
+     * @throws \BetaKiller\Assets\AssetsStorageException
+     */
+    public function deleteDirectory(string $path): void
+    {
+        $path = $this->makeFullPath($path);
+
+        $this->doDeleteDirectory($path);
+    }
+
+    /**
+     * Returns directory separator used in this storage
+     *
+     * @return string
+     */
+    abstract protected function getDirectorySeparator(): string;
 
     /**
      * Returns content of the file
@@ -77,7 +123,17 @@ abstract class AbstractAssetsStorage implements AssetsStorageInterface
      * @return string
      * @throws \BetaKiller\Assets\AssetsStorageException
      */
-    abstract protected function doGet(string $path): string;
+    abstract protected function doGetFile(string $path): string;
+
+    /**
+     * Returns array of files in provided directory
+     *
+     * @param string $path Local path in storage
+     *
+     * @return string[]
+     * @throws \BetaKiller\Assets\AssetsStorageException
+     */
+    abstract protected function doGetFiles(string $path): array;
 
     /**
      * Creates the file or updates its content
@@ -87,7 +143,7 @@ abstract class AbstractAssetsStorage implements AssetsStorageInterface
      *
      * @throws \BetaKiller\Assets\AssetsStorageException
      */
-    abstract protected function doPut(string $path, string $content): void;
+    abstract protected function doPutFile(string $path, string $content): void;
 
     /**
      * Deletes file
@@ -97,5 +153,15 @@ abstract class AbstractAssetsStorage implements AssetsStorageInterface
      * @return bool
      * @throws \BetaKiller\Assets\AssetsStorageException
      */
-    abstract protected function doDelete(string $path): bool;
+    abstract protected function doDeleteFile(string $path): bool;
+
+    /**
+     * Deletes file
+     *
+     * @param string $path Local path
+     *
+     * @return bool
+     * @throws \BetaKiller\Assets\AssetsStorageException
+     */
+    abstract protected function doDeleteDirectory(string $path): bool;
 }

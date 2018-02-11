@@ -39,7 +39,7 @@ class MultiLevelHashAssetsPathStrategy implements AssetsPathStrategyInterface
      *
      * @return \BetaKiller\Assets\Model\AssetsModelInterface
      */
-    public function getModelByPath(string $path): AssetsModelInterface
+    public function getModelByPath(string $path): ?AssetsModelInterface
     {
         // Drop multi level paths
         $hash = $this->multiLevelPath->parse($path);
@@ -52,12 +52,10 @@ class MultiLevelHashAssetsPathStrategy implements AssetsPathStrategyInterface
      *
      * @param \BetaKiller\Assets\Model\AssetsModelInterface $model
      *
-     * @param null|string                                   $delimiter
-     *
      * @return string
      * @throws \BetaKiller\Assets\AssetsException
      */
-    public function makeModelPath(AssetsModelInterface $model, ?string $delimiter = null): string
+    public function makeModelPath(AssetsModelInterface $model): string
     {
         $hash = $model->getHash();
 
@@ -67,6 +65,6 @@ class MultiLevelHashAssetsPathStrategy implements AssetsPathStrategyInterface
             ]);
         }
 
-        return $this->multiLevelPath->make($hash, $delimiter);
+        return $this->multiLevelPath->make($hash);
     }
 }

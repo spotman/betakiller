@@ -36,7 +36,7 @@ abstract class AbstractLocalAssetsStorage extends AbstractAssetsStorage
     /**
      * @return string
      */
-    public function getDirectorySeparator(): string
+    protected function getDirectorySeparator(): string
     {
         return DIRECTORY_SEPARATOR;
     }
@@ -61,7 +61,7 @@ abstract class AbstractLocalAssetsStorage extends AbstractAssetsStorage
      * @return string
      * @throws AssetsStorageException
      */
-    protected function doGet(string $path): string
+    protected function doGetFile(string $path): string
     {
         $this->checkFileExists($path);
 
@@ -76,7 +76,7 @@ abstract class AbstractLocalAssetsStorage extends AbstractAssetsStorage
      *
      * @throws AssetsStorageException
      */
-    protected function doPut(string $path, string $content): void
+    protected function doPutFile(string $path, string $content): void
     {
         $baseDir = \dirname($path);
 
@@ -97,10 +97,50 @@ abstract class AbstractLocalAssetsStorage extends AbstractAssetsStorage
      * @return bool
      * @throws AssetsStorageException
      */
-    protected function doDelete(string $path): bool
+    protected function doDeleteFile(string $path): bool
     {
         $this->checkFileExists($path);
 
         return unlink($path);
+    }
+
+    /**
+     * Returns array of files in provided directory
+     *
+     * @param string $directory
+     *
+     * @return array
+     * @throws \BetaKiller\Assets\AssetsStorageException
+     */
+    protected function doGetFiles(string $directory): array
+    {
+        $this->checkFileExists($directory);
+
+        $files = [];
+
+        foreach (glob($directory.DIRECTORY_SEPARATOR.'*') as $file) {
+            $files[] = $file;
+        }
+
+        return $files;
+    }
+
+    /**
+     * Delete provided directory. Throws an exception if there are files inside
+     *
+     * @param string $path
+     *
+     * @return bool
+     * @throws \BetaKiller\Assets\AssetsStorageException
+     */
+    protected function doDeleteDirectory(string $path): bool
+    {
+        $this->checkFileExists($path);
+
+        try {
+            return rmdir($path);
+        } catch (\Throwable $e) {
+            throw AssetsStorageException::wrap($e);
+        }
     }
 }

@@ -11,10 +11,6 @@ use BetaKiller\Exception\NotFoundHttpException;
 
 class Controller_Assets extends Controller
 {
-    public const ACTION_ORIGINAL = 'original';
-    public const ACTION_PREVIEW  = 'preview';
-    public const ACTION_DELETE   = 'delete';
-
     /**
      * @Inject
      * @var AssetsProviderFactory
@@ -26,6 +22,12 @@ class Controller_Assets extends Controller
      * @var \BetaKiller\Model\UserInterface
      */
     private $user;
+
+    /**
+     * @Inject
+     * @var \BetaKiller\Assets\AssetsDeploymentService
+     */
+    private $deploymentService;
 
     /**
      * @var AssetsProviderInterface
@@ -89,8 +91,7 @@ class Controller_Assets extends Controller
         // Get file content
         $content = $this->provider->getContent($model);
 
-        // Deploy to cache
-        $this->deploy($model, $content);
+        $this->deploy($model, 'original');
 
         // Send last modified date
         $this->response->last_modified($model->getLastModifiedAt());
@@ -159,7 +160,9 @@ class Controller_Assets extends Controller
 
         $previewContent = $this->provider->makePreviewContent($model, $size);
 
-        // Deploy to cache
+        // TODO Cache to storage
+
+        // Deploy to cache if needed
         $this->deploy($model, $previewContent);
 
         // Send last modified date
@@ -200,6 +203,18 @@ class Controller_Assets extends Controller
     }
 
     /**
+     * @param \BetaKiller\Assets\Model\AssetsModelInterface $model
+     * @param string                                        $action
+     * @param null|string                                   $suffix
+     *
+     * @throws \BetaKiller\Assets\AssetsProviderException
+     */
+    private function deploy(AssetsModelInterface $model, string $action, ?string $suffix = null): void
+    {
+        $this->deploymentService->deploy($this->provider, $model, $action, $suffix);
+    }
+
+    /**
      * @throws \BetaKiller\Exception\FoundHttpException
      * @throws \BetaKiller\Assets\AssetsException
      * @throws \BetaKiller\Assets\AssetsProviderException
@@ -208,7 +223,7 @@ class Controller_Assets extends Controller
      * @throws \BetaKiller\Exception\NotFoundHttpException
      * @throws \BetaKiller\Factory\FactoryException
      */
-    protected function detectProvider(): void
+    private function detectProvider(): void
     {
         $requestKey = $this->param('provider');
 
@@ -232,7 +247,7 @@ class Controller_Assets extends Controller
      * @throws \BetaKiller\Exception\NotFoundHttpException
      * @throws \BetaKiller\Assets\AssetsException
      */
-    protected function fromItemDeployUrl()
+    private function fromItemDeployUrl()
     {
         $url = $this->param('item_url');
 
@@ -242,16 +257,11 @@ class Controller_Assets extends Controller
 
         try {
             // Find asset model by url
-            return $this->provider->getModelByDeployUrl($url);
+            return $this->provider->getModelByPublicUrl($url);
         } /** @noinspection BadExceptionsProcessingInspection */ catch (AssetsException $e) {
             // File not found
             throw new NotFoundHttpException;
         }
-    }
-
-    protected function deploy(AssetsModelInterface $model, $content): void
-    {
-        $this->provider->deploy($this->request, $model, $content);
     }
 
     /**
@@ -262,7 +272,7 @@ class Controller_Assets extends Controller
      * @throws \BetaKiller\Exception\BadRequestHttpException
      * @throws \BetaKiller\Exception\NotFoundHttpException
      */
-    protected function checkExtension(AssetsModelInterface $model): void
+    private function checkExtension(AssetsModelInterface $model): void
     {
         $requestExt = $this->request->param('ext');
         $modelExt   = $this->provider->getModelExtension($model);
@@ -300,17 +310,17 @@ class Controller_Assets extends Controller
         $action = $this->request->action();
 
         switch ($action) {
-            case self::ACTION_ORIGINAL:
+            case AssetsProviderInterface::ACTION_ORIGINAL:
                 return $this->provider->getOriginalUrl($model);
 
-            case 'preview':
+            case ImageAssetsProviderInterface::ACTION_PREVIEW:
                 if (!($this->provider instanceof ImageAssetsProviderInterface)) {
                     throw new BadRequestHttpException('Action :name may be used on images only', [':name' => $action]);
                 }
 
                 return $this->provider->getPreviewUrl($model, $this->getSizeParam());
 
-            case 'delete':
+            case AssetsProviderInterface::ACTION_DELETE:
                 return $this->provider->getDeleteUrl($model);
 
             default:

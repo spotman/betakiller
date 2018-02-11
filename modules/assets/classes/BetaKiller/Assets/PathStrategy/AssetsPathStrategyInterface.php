@@ -14,15 +14,14 @@ interface AssetsPathStrategyInterface
      *
      * @return \BetaKiller\Assets\Model\AssetsModelInterface
      */
-    public function getModelByPath(string $path): AssetsModelInterface;
+    public function getModelByPath(string $path): ?AssetsModelInterface;
 
     /**
      * Get dispatchable part of url for provided model
      *
      * @param \BetaKiller\Assets\Model\AssetsModelInterface $model
-     * @param null|string                                   $delimiter
      *
      * @return string
      */
-    public function makeModelPath(AssetsModelInterface $model, ?string $delimiter = null): string;
+    public function makeModelPath(AssetsModelInterface $model): string;
 }

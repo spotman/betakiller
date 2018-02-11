@@ -6,6 +6,8 @@ use BetaKiller\Assets\Model\AssetsModelInterface;
 
 interface ImageAssetsProviderInterface extends AssetsProviderInterface
 {
+    public const ACTION_PREVIEW = 'preview';
+
     /**
      * @param AssetsModelInterface $model
      * @param string               $size 300x200
@@ -15,6 +17,12 @@ interface ImageAssetsProviderInterface extends AssetsProviderInterface
      */
     public function getPreviewUrl(AssetsModelInterface $model, ?string $size = null): string;
 
+    /**
+     * @param \BetaKiller\Assets\Model\AssetsModelImageInterface $model
+     * @param string                                             $size
+     *
+     * @return string
+     */
     public function makePreviewContent(AssetsModelImageInterface $model, string $size): string;
 
     /**

@@ -2,8 +2,6 @@
 namespace BetaKiller\Assets\Storage;
 
 use BetaKiller\Assets\AssetsStorageException;
-use BetaKiller\Assets\Model\AssetsModelInterface;
-use BetaKiller\Assets\MultiLevelPath;
 use BetaKiller\Helper\AppEnvInterface;
 
 class LocalPublicAssetsStorage extends AbstractLocalAssetsStorage
@@ -38,13 +36,13 @@ class LocalPublicAssetsStorage extends AbstractLocalAssetsStorage
     }
 
     /**
-     * Returns true if storage`s files are located outside of document root and deploy is needed
+     *  Returns true if files are located under document root
      *
      * @return bool
      */
-    public function isDeployRequired(): bool
+    public function isPublic(): bool
     {
         // Public files are located under docroot
-        return false;
+        return true;
     }
 }
