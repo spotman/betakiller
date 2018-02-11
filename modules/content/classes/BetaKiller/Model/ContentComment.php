@@ -95,7 +95,7 @@ class ContentComment extends AbstractOrmBasedSingleParentTreeModel implements Co
             ],
             'message'        => [
                 ['not_empty'],
-                ['max_length', [':value', 2048]],
+                ['max_length', [':value', 4096]],
             ],
             'path'        => [
                 ['not_empty'],
