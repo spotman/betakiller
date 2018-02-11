@@ -116,9 +116,9 @@ interface ContentCommentInterface extends SingleParentTreeModelInterface, Entity
     public function getCreatedAt(): DateTimeImmutable;
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getPath(): string;
+    public function getPath(): ?string;
 
     /**
      * @param string $value

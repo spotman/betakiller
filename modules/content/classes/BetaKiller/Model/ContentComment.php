@@ -335,8 +335,9 @@ class ContentComment extends AbstractOrmBasedSingleParentTreeModel implements Co
 
     /**
      * @return string
+     * @throws \Kohana_Exception
      */
-    public function getPath(): string
+    public function getPath(): ?string
     {
         return $this->get('path');
     }
