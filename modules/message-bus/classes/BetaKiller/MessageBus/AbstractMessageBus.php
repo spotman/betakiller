@@ -38,7 +38,7 @@ abstract class AbstractMessageBus
 
     abstract protected function getMessageHandlersLimit(): int;
 
-    abstract protected function _process($message, $handler): void;
+    abstract protected function processMessage($message, $handler): void;
 
     /**
      * @param string       $messageClassName
@@ -112,7 +112,7 @@ abstract class AbstractMessageBus
         // Wrap every message bus processing with try-catch block and log exceptions
         try {
             $handler = $this->reviewHandler($handler);
-            $this->_process($message, $handler);
+            $this->processMessage($message, $handler);
         } catch (\Throwable $e) {
             $this->logException($this->logger, $e);
         }

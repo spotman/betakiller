@@ -7,7 +7,7 @@ class EventBus extends AbstractMessageBus
      * @param \BetaKiller\MessageBus\EventMessageInterface $message
      * @param \BetaKiller\MessageBus\EventHandlerInterface $handler
      */
-    protected function _process($message, $handler): void
+    protected function processMessage($message, $handler): void
     {
         $handler->handleEvent($message, $this);
     }
