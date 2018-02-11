@@ -22,23 +22,21 @@ require([
         })
         .fail(function(message) {
           alert(message || 'Oops! Something went wrong...')
-        })
-        .always(function() {
           $button.removeAttr('disabled');
         });
     }
 
-    $resolveButtons.click(function(e) {
+    $resolveButtons.on("click", function(e) {
       e.preventDefault();
       processActionButtonClick($(this), api.phpException.resolve);
     });
 
-    $ignoreButtons.click(function(e) {
+    $ignoreButtons.on("click", function(e) {
       e.preventDefault();
       processActionButtonClick($(this), api.phpException.ignore);
     });
 
-    $deleteButtons.click(function(e) {
+    $deleteButtons.on("click", function(e) {
       e.preventDefault();
       processActionButtonClick($(this), api.phpException.delete);
     });
