@@ -162,6 +162,9 @@ class Task_Content_Import_Wordpress extends AbstractTask
     /**
      * @param array $params
      *
+     * @throws \LogicException
+     * @throws \BetaKiller\Factory\FactoryException
+     * @throws \BetaKiller\Content\Shortcode\ShortcodeException
      * @throws \BetaKiller\Repository\RepositoryException
      * @throws \BetaKiller\Task\TaskException
      * @throws \Kohana_Exception
@@ -696,7 +699,6 @@ class Task_Content_Import_Wordpress extends AbstractTask
      * @param array                         $meta
      *
      * @throws \BetaKiller\Task\TaskException
-     * @throws \Kohana_Exception
      */
     private function processThumbnails(ContentPost $post, array $meta): void
     {
@@ -1394,101 +1396,117 @@ class Task_Content_Import_Wordpress extends AbstractTask
      */
     private function importComments(): void
     {
-        $comments_data = $this->wp->getComments();
+        $commentsData = $this->wp->getComments();
 
         $this->logger->info('Processing :total comments ', [
-            ':total' => count($comments_data),
+            ':total' => count($commentsData),
         ]);
 
-        foreach ($comments_data as $data) {
-            $wpID        = $data['id'];
-            $wpParentID  = $data['parent_id'];
-            $wpPostID    = $data['post_id'];
-            $created_at  = new DateTime($data['created_at']);
-            $authorName  = $data['author_name'];
-            $authorEmail = $data['author_email'];
-            $authorIP    = $data['author_ip_address'];
-            $message     = $data['message'];
-            $wpApproved  = $data['approved'];
-            $userAgent   = $data['user_agent'];
-
-            $post = $this->postRepository->findByWpID($wpPostID);
-
-            if (!$post) {
-                throw new TaskException('Unknown WP post ID [:post] used as reference in WP comment :comment', [
-                    ':post'    => $wpPostID,
-                    ':comment' => $wpID,
-                ]);
-            }
-
-            $model = $this->commentRepository->findByWpID($wpID);
-
-            if (!$model) {
-                $model = $this->commentRepository->create();
-                $model->setWpId($wpID);
-            }
-
-            $parentModel = $wpParentID ? $this->commentRepository->findByWpID($wpParentID) : null;
-
-            if ($wpParentID && !$parentModel) {
-                throw new TaskException('Unknown WP comment parent ID [:parent] used in WP comment [:comment]', [
-                    ':parent'  => $wpParentID,
-                    ':comment' => $wpID,
-                ]);
-            }
-
-            // Skip existing comments coz they may be edited after import
-            if ($model->hasID()) {
-                continue;
-            }
-
-            $model->setParent($parentModel);
-
-            $model
-                ->setEntity($this->contentPostEntity)
-                ->setEntityItemID($post->getID());
-
-            $model
-                ->setIpAddress($authorIP)
-                ->setUserAgent($userAgent)
-                ->setCreatedAt($created_at);
-
-            // Detecting user by name
-            $authorUser = $this->userRepository->searchBy($authorName);
-
-            if ($authorUser) {
-                $model->setAuthorUser($authorUser);
-            } else {
-                $model->setGuestAuthorName($authorName)->setGuestAuthorEmail($authorEmail);
-            }
-
-            $isApproved = ((int)$wpApproved === 1);
-            $isSpam     = (mb_strtolower($wpApproved) === 'spam');
-            $isTrash    = (mb_strtolower($wpApproved) === 'trash');
-
-            if ($isSpam) {
-                $model->initAsSpam();
-            } elseif ($isTrash) {
-                $model->initAsTrash();
-            } elseif ($isApproved) {
-                $model->initAsApproved();
-            } else {
-                $model->initAsPending();
-            }
-
-            $model->setMessage($message);
-
+        foreach ($commentsData as $data) {
             try {
-                $this->commentRepository->save($model);
+                $this->importSingleComment($data);
             } catch (ORM_Validation_Exception $e) {
                 $this->logger->warning('Comment with WP ID = :id is invalid, skipping :errors', [
-                    ':id'     => $wpID,
+                    ':id'     => $data['id'],
                     ':errors' => json_encode($this->commentRepository->getValidationExceptionErrors($e)),
                 ]);
             }
         }
     }
 
+    /**
+     * @param array $data
+     *
+     * @throws \BetaKiller\Repository\RepositoryException
+     * @throws \BetaKiller\Task\TaskException
+     * @throws \ORM_Validation_Exception
+     */
+    private function importSingleComment(array $data): void
+    {
+        $wpID        = $data['id'];
+        $wpParentID  = $data['parent_id'];
+        $wpPostID    = $data['post_id'];
+        $created_at  = new DateTime($data['created_at']);
+        $authorName  = $data['author_name'];
+        $authorEmail = $data['author_email'];
+        $authorIP    = $data['author_ip_address'];
+        $message     = $data['message'];
+        $wpApproved  = $data['approved'];
+        $userAgent   = $data['user_agent'];
+
+        $post = $this->postRepository->findByWpID($wpPostID);
+
+        if (!$post) {
+            throw new TaskException('Unknown WP post ID [:post] used as reference in WP comment :comment', [
+                ':post'    => $wpPostID,
+                ':comment' => $wpID,
+            ]);
+        }
+
+        $model = $this->commentRepository->findByWpID($wpID);
+
+        if (!$model) {
+            $model = $this->commentRepository->create();
+            $model->setWpId($wpID);
+        }
+
+        $parentModel = $wpParentID ? $this->commentRepository->findByWpID($wpParentID) : null;
+
+        if ($wpParentID && !$parentModel) {
+            throw new TaskException('Unknown WP comment parent ID [:parent] used in WP comment [:comment]', [
+                ':parent'  => $wpParentID,
+                ':comment' => $wpID,
+            ]);
+        }
+
+        // Skip existing comments coz they may be edited after import
+        if ($model->hasID()) {
+            return;
+        }
+
+        $model->setParent($parentModel);
+
+        $model
+            ->setEntity($this->contentPostEntity)
+            ->setEntityItemID($post->getID());
+
+        $model
+            ->setIpAddress($authorIP)
+            ->setUserAgent($userAgent)
+            ->setCreatedAt($created_at);
+
+        // Detecting user by name
+        $authorUser = $this->userRepository->searchBy($authorName);
+
+        if ($authorUser) {
+            $model->setAuthorUser($authorUser);
+        } else {
+            $model->setGuestAuthorName($authorName)->setGuestAuthorEmail($authorEmail);
+        }
+
+        $isApproved = ((int)$wpApproved === 1);
+        $isSpam     = (mb_strtolower($wpApproved) === 'spam');
+        $isTrash    = (mb_strtolower($wpApproved) === 'trash');
+
+        if ($isSpam) {
+            $model->initAsSpam();
+        } elseif ($isTrash) {
+            $model->initAsTrash();
+        } elseif ($isApproved) {
+            $model->initAsApproved();
+        } else {
+            $model->initAsPending();
+        }
+
+        $model->setMessage($message);
+
+        $this->commentRepository->save($model);
+    }
+
+    /**
+     * @throws \BetaKiller\Repository\RepositoryException
+     * @throws \ORM_Validation_Exception
+     */
     private function importUsers(): void
     {
         $this->logger->info('Importing users...');
