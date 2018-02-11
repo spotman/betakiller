@@ -582,7 +582,7 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
     {
         $delimiter = $this->storage->getDirectorySeparator();
 
-        return $this->pathStrategy->makeModelPath($model).$delimiter.$this->getOriginalFilename($model);
+        return $this->pathStrategy->makeModelPath($model, $delimiter).$delimiter.$this->getOriginalFilename($model);
     }
 
     /**
