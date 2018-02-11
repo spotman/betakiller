@@ -1359,6 +1359,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
     private function importQuotes(): void
     {
         $quotesData = $this->wp->getQuotesCollectionQuotes();
+        $counter = 0;
 
         foreach ($quotesData as $data) {
             $id        = $data['id'];
@@ -1379,7 +1380,12 @@ class Task_Content_Import_Wordpress extends AbstractTask
                 ->setText($text);
 
             $this->quoteRepository->save($model);
+            $counter++;
         }
+
+        $this->logger->info(':total quotes processed', [
+            ':total' => $counter,
+        ]);
     }
 
     /**
