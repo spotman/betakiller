@@ -1390,10 +1390,6 @@ class Task_Content_Import_Wordpress extends AbstractTask
         ]);
     }
 
-    /**
-     * @throws \BetaKiller\Repository\RepositoryException
-     * @throws \BetaKiller\Task\TaskException
-     */
     private function importComments(): void
     {
         $commentsData = $this->wp->getComments();
@@ -1410,6 +1406,8 @@ class Task_Content_Import_Wordpress extends AbstractTask
                     ':id'     => $data['id'],
                     ':errors' => json_encode($this->commentRepository->getValidationExceptionErrors($e)),
                 ]);
+            } catch (Throwable $e) {
+                $this->logException($this->logger, $e);
             }
         }
     }
