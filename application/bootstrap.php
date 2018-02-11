@@ -66,6 +66,8 @@ ini_set('xdebug.max_nesting_level', 200);
 
 // -- Configuration and initialization -----------------------------------------
 
+$env = getenv('APP_ENV');
+
 // Import arguments in CLI mode
 if (PHP_SAPI === 'cli') {
     // No short options
@@ -79,7 +81,7 @@ if (PHP_SAPI === 'cli') {
 
     if (isset($cli_options['stage'])) {
         // Store requested stage in environment var
-        putenv('APP_ENV='.$cli_options['stage']);
+        $env = $cli_options['stage'];
     }
 }
 
@@ -95,7 +97,11 @@ Cookie::$salt = 'hd398gfhk75403lnvrfe8d10gg';
  * saying "Couldn't find constant Kohana::<INVALID_ENV_NAME>"
  */
 
-Kohana::$environmentString = strtolower(getenv('APP_ENV') ?: 'development');
+if (!$env) {
+    throw new Exception('Missing APP_ENV');
+}
+
+Kohana::$environmentString = strtolower($env);
 Kohana::$environment       = constant('Kohana::'.strtoupper(Kohana::$environmentString));
 
 /**
