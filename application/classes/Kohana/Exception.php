@@ -9,7 +9,7 @@ class Kohana_Exception extends Kohana_Kohana_Exception
      */
     private static $exceptionHandler;
 
-    public static function setHandler(ExceptionHandlerInterface $handler)
+    public static function setHandler(ExceptionHandlerInterface $handler): void
     {
         self::$exceptionHandler = $handler;
     }
@@ -53,17 +53,15 @@ class Kohana_Exception extends Kohana_Kohana_Exception
      */
     public static function _handler(Throwable $exception): \Response
     {
-        // Use default Kohana handler as fallback
-        if (!self::$exceptionHandler) {
-            return parent::_handler($exception);
-        }
-
         try {
-            return self::$exceptionHandler->handle($exception);
+            if (self::$exceptionHandler) {
+                return self::$exceptionHandler->handle($exception);
+            }
         } catch (\Throwable $e) {
             self::log($e);
-
-            return parent::_handler($exception);
         }
+
+        // Use default Kohana handler as fallback
+        return parent::_handler($exception);
     }
 }
