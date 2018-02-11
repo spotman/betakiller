@@ -282,14 +282,14 @@ class ExceptionHandler implements ExceptionHandlerInterface
         return __($key);
     }
 
-    private function getErrorLabelI18nKey(\Throwable $e)
+    private function getErrorLabelI18nKey(\Throwable $e): string
     {
         $code = $this->getErrorHttpCode($e);
 
         return $this->getLabelI18nKeyForHttpCode($code);
     }
 
-    private function getErrorHttpCode(\Throwable $e)
+    private function getErrorHttpCode(\Throwable $e): int
     {
         $code = $e->getCode();
 
@@ -298,7 +298,7 @@ class ExceptionHandler implements ExceptionHandlerInterface
             : ExceptionInterface::DEFAULT_EXCEPTION_CODE;
     }
 
-    private function getLabelI18nKeyForHttpCode(int $code)
+    private function getLabelI18nKeyForHttpCode(int $code): string
     {
         return 'error.http.'.$code.'.label';
     }

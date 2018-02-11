@@ -251,7 +251,7 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
             return true;
         }
 
-        $this->logger->debug('Total counter is :value', [':value' => $model->getCounter()]);
+        $this->logger->debug('Total exception counter is :value', [':value' => $model->getCounter()]);
 
         // Throttle by occurrence number
         return ($model->getCounter() % $repeatCount === 1);
@@ -303,7 +303,7 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
             \get_class($e), $e->getCode(), strip_tags($e->getMessage()), \Debug::path($e->getFile()), $e->getLine());
     }
 
-    private function sendPlainEmail(\Throwable $notificationX, \Throwable $subsystemX, \Throwable $originalX)
+    private function sendPlainEmail(\Throwable $notificationX, \Throwable $subsystemX, \Throwable $originalX): void
     {
         try {
             $message = '';
@@ -315,10 +315,17 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
             // Send plain message
             mail($this->appConfig->getAdminEmail(), 'Exception handling error', nl2br($message));
         } catch (\Throwable $ignored) {
-            // Nothing we can do here, store exception in a system log as a last resort
-
-            /** @noinspection ForgottenDebugOutputInspection */
-            error_log($ignored->getMessage().PHP_EOL.$ignored->getTraceAsString());
+            // Nothing we can do here, store exceptions in a system log as a last resort
+            $this->writeToErrorLog($originalX);
+            $this->writeToErrorLog($subsystemX);
+            $this->writeToErrorLog($notificationX);
+            $this->writeToErrorLog($ignored);
         }
+    }
+
+    private function writeToErrorLog(\Throwable $e): void
+    {
+        /** @noinspection ForgottenDebugOutputInspection */
+        error_log($e->getMessage().PHP_EOL.$e->getTraceAsString());
     }
 }
