@@ -356,14 +356,15 @@ task('migrations:history', function () {
     runMinionTask('migrations:history');
 })->desc('Show migrations list');
 
-/**
- * Warm up cache by making internal HTTP request to every IFace
- */
 task('cache:warmup', function () {
     runMinionTask('cache:warmup');
 })->desc('Warm up cache by making internal HTTP request to every IFace');
 
-task('deploy:dotenv', function () {
+task('assets:deploy', function () {
+    runMinionTask('assets:deploy');
+})->desc('Collect assets from all static-files directories');
+
+task('deploy:dotenv:migrate', function () {
     $targetDotEnv = '{{release_path}}/app/.env';
     $previousDotEnv = '{{previous_release}}/app/.env';
     $defaultDotEnv = '{{deploy_path}}/.env.default';
@@ -415,12 +416,13 @@ task('deploy', [
     'deploy:betakiller:writable',
 
     // Copy .env file from previous revision to the new one
-    'deploy:dotenv',
+    'deploy:dotenv:migrate',
 
     // Store APP_REVISION hash (leads to cache reset)
     'deploy:dotenv:revision',
 
     'migrations:up',
+    'assets:deploy',
     'cache:warmup',
 
     // Finalize
