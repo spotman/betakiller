@@ -17,7 +17,7 @@ abstract class AbstractLocalAssetsStorage extends AbstractAssetsStorage
      *
      * @var int
      */
-    private $fileMode = 0667;
+    private $fileMode = 0666;
 
     /**
      * @param string $basePath
@@ -102,17 +102,7 @@ abstract class AbstractLocalAssetsStorage extends AbstractAssetsStorage
             return true;
         }
 
-        /**
-         * Trick for true chmod on mkdir
-         * @link http://php.net/manual/ru/function.mkdir.php#1207
-         */
-//        $oldMask = umask(0);
-
-        $result = @mkdir($path, $this->dirMode, true) || is_dir($path);
-
-//        umask($oldMask);
-
-        return $result;
+        return mkdir($path, $this->dirMode, true) || is_dir($path);
     }
 
     /**
