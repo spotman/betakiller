@@ -26,11 +26,13 @@ abstract class AbstractLocalAssetsStorage extends AbstractAssetsStorage
      */
     public function setBasePath(string $basePath): void
     {
-        if (!file_exists($basePath) || !is_dir($basePath)) {
+        $realPath = realpath($basePath);
+
+        if (!$realPath || !file_exists($realPath) || !is_dir($realPath)) {
             throw new AssetsStorageException('Incorrect path provided :value', [':value' => $basePath]);
         }
 
-        parent::setBasePath($basePath);
+        parent::setBasePath($realPath);
     }
 
     /**
