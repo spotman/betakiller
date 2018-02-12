@@ -23,12 +23,10 @@
 
   {% else %} {# "masonry" and "default" layouts are just the same right now #}
 
-    {% set width = (100 / columns) ~ "%" %} {# |round(0, 'floor' #}
-
-    <div class="content-gallery content-gallery-masonry row">
+    <div class="content-gallery content-gallery-masonry row {{ "columns-" ~ columns }}">
       {% for image in images %}
         {% set caption = image.attributes.title|default(image.attributes.alt) %}
-        <a href="{{ image.href }}" class="col fancybox" style="width: {{ width }}"
+        <a href="{{ image.href }}" class="fancybox content-gallery-masonry-item col"
            data-fancybox="gallery-{{ id }}" data-caption="{{ caption }}">
           {{ image(image.attributes, { class: "responsive-img" }, true) }}
         </a>
