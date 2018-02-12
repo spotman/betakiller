@@ -117,7 +117,7 @@ class AssetsProviderFactory
     {
         $providersConfig = $this->config->load([
             AbstractAssetsProvider::CONFIG_KEY,
-            AbstractAssetsProvider::CONFIG_PROVIDERS_KEY,
+            AbstractAssetsProvider::CONFIG_MODELS_KEY,
         ]);
 
         $keyName = AbstractAssetsProvider::CONFIG_MODEL_URL_KEY;
@@ -137,7 +137,7 @@ class AssetsProviderFactory
     {
         return $this->config->load([
             AbstractAssetsProvider::CONFIG_KEY,
-            AbstractAssetsProvider::CONFIG_PROVIDERS_KEY,
+            AbstractAssetsProvider::CONFIG_MODELS_KEY,
             $modelName,
         ]);
     }

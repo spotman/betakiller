@@ -42,6 +42,13 @@ interface AssetsProviderInterface
     public function isDeploymentNeeded(): bool;
 
     /**
+     * Returns true if current provider allows caching of actions` data in storage
+     *
+     * @return bool
+     */
+    public function isCachingEnabled(): bool;
+
+    /**
      * Returns array of allowed actions` names
      *
      * @return string[]

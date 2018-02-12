@@ -7,7 +7,7 @@ return [
         'js'        =>  ['require.js/require.js', 'require.js/betakiller.config.js'],
     ],
 
-    'providers' =>  [
+    'models' =>  [
         'StaticFiles'  =>  [
             'url_key' => 'static-files',
             'provider' => 'StaticFiles',

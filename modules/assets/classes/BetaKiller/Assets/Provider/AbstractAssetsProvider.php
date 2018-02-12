@@ -17,19 +17,80 @@ use Upload;
 
 abstract class AbstractAssetsProvider implements AssetsProviderInterface
 {
-    public const CONFIG_KEY                     = 'assets';
-    public const CONFIG_URL_PATH_KEY            = 'url_path';
-    public const CONFIG_PROVIDERS_KEY           = 'providers';
-    public const CONFIG_STORAGES_KEY            = 'storages';
-    public const CONFIG_MODEL_URL_KEY           = 'url_key';
-    public const CONFIG_MODEL_PROVIDER_KEY      = 'provider';
+    /**
+     * Global config group (config file name)
+     */
+    public const CONFIG_KEY = 'assets';
+
+    /**
+     * Base assets url (with domain or without)
+     */
+    public const CONFIG_URL_PATH_KEY = 'url_path';
+
+    /**
+     * Allow deployment
+     */
+    public const CONFIG_DEPLOY_KEY = 'deploy';
+
+    /**
+     * Allow caching of actions content
+     */
+    public const CONFIG_CACHING_ENABLED_KEY = 'cache';
+
+    /**
+     * Nested group with models` definitions
+     */
+    public const CONFIG_MODELS_KEY = 'models';
+
+    /**
+     * Nested group with storages` defaults
+     */
+    public const CONFIG_STORAGES_KEY = 'storages';
+
+    /**
+     * Provider url key (slug)
+     */
+    public const CONFIG_MODEL_URL_KEY = 'url_key';
+
+    /**
+     * Model`s provider codename
+     */
+    public const CONFIG_MODEL_PROVIDER_KEY = 'provider';
+
+    /**
+     * Model`s path strategy codename
+     */
     public const CONFIG_MODEL_PATH_STRATEGY_KEY = 'path_strategy';
-    public const CONFIG_MODEL_STORAGE_KEY       = 'storage';
-    public const CONFIG_MODEL_STORAGE_NAME_KEY  = 'name';
-    public const CONFIG_MODEL_STORAGE_PATH_KEY  = 'path';
-    public const CONFIG_MODEL_PROTECTED_KEY     = 'protected';
-    public const CONFIG_MODEL_MIMES             = 'mimes';
-    public const CONFIG_MODEL_POST_UPLOAD_KEY   = 'post_upload';
+
+    /**
+     * Nested model`s storage config group
+     */
+    public const CONFIG_MODEL_STORAGE_KEY = 'storage';
+
+    /**
+     * Model`s storage codename
+     */
+    public const CONFIG_MODEL_STORAGE_NAME_KEY = 'name';
+
+    /**
+     * Model`s storage path name (single level)
+     */
+    public const CONFIG_MODEL_STORAGE_PATH_KEY = 'path';
+
+    /**
+     * Marker for setting model as "protected" (no direct public access)
+     */
+    public const CONFIG_MODEL_PROTECTED_KEY = 'protected';
+
+    /**
+     * Allowed mime-types
+     */
+    public const CONFIG_MODEL_MIMES = 'mimes';
+
+    /**
+     * Post upload handlers list
+     */
+    public const CONFIG_MODEL_POST_UPLOAD_KEY = 'post_upload';
 
     /**
      * @var string
@@ -120,7 +181,7 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
     {
         $codename = $codename ?: $this->codename;
 
-        return $this->getAssetsConfigValue(array_merge([self::CONFIG_PROVIDERS_KEY, $codename], $path));
+        return $this->getAssetsConfigValue(array_merge([self::CONFIG_MODELS_KEY, $codename], $path));
     }
 
     /**
@@ -140,8 +201,23 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
      */
     public function isDeploymentNeeded(): bool
     {
+        // Allow env-dependent deployment disabling
+        if (!$this->getAssetsConfigValue([self::CONFIG_DEPLOY_KEY])) {
+            return false;
+        }
+
         // Deployment allowed only for protected assets in public storage (like static files, located in modules)
         return $this->storage->isPublic() && $this->isProtected();
+    }
+
+    /**
+     * Returns true if current provider allows caching of actions` data in storage
+     *
+     * @return bool
+     */
+    public function isCachingEnabled(): bool
+    {
+        return (bool)$this->getAssetsConfigValue([self::CONFIG_CACHING_ENABLED_KEY]);
     }
 
     public function setCodename(string $codename): void
@@ -548,11 +624,16 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
         string $action,
         ?string $suffix = null
     ): void {
+        if (!$this->isCachingEnabled()) {
+            return;
+        }
+
         if ($action === self::ACTION_ORIGINAL) {
             // No caching of original action
             return;
         }
 
+        // Skip unknown actions
         if (!$this->hasAction($action)) {
             return;
         }
@@ -706,6 +787,10 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
      */
     private function dropStorageCache(AssetsModelInterface $model, bool $keepOriginal): void
     {
+        if (!$this->isCachingEnabled()) {
+            return;
+        }
+
         $originalPath = $this->getOriginalPath($model);
 
         $path             = \dirname($originalPath);

@@ -50,7 +50,7 @@ class AssetsDeploymentService
         $path     = \dirname($fullPath);
 
         // Create deploy path if not exists
-        if (!file_exists($path) && !@mkdir($path, 0777, true) && !is_dir($path)) {
+        if (!file_exists($path) && !mkdir($path, 0777, true) && !is_dir($path)) {
             throw new AssetsProviderException('Can not create path :value', [
                 ':value' => $path,
             ]);
@@ -95,7 +95,7 @@ class AssetsDeploymentService
     private function isDeploymentEnabled(AssetsProviderInterface $provider): bool
     {
         // No deployment in dev mode
-        return $provider->isDeploymentNeeded() && !$this->appEnv->inDevelopmentMode();
+        return $provider->isDeploymentNeeded();
     }
 
     /**
