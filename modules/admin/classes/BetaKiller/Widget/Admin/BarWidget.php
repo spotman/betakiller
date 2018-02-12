@@ -10,7 +10,6 @@ use BetaKiller\IFace\IFaceModelTree;
 use BetaKiller\IFace\Widget\AbstractAdminWidget;
 use BetaKiller\Model\DispatchableEntityInterface;
 use BetaKiller\Model\IFaceZone;
-use BetaKiller\Model\LayoutInterface;
 use BetaKiller\Model\UserInterface;
 
 class BarWidget extends AbstractAdminWidget
@@ -53,18 +52,16 @@ class BarWidget extends AbstractAdminWidget
      * Returns data for View rendering
      *
      * @return array
+     * @throws \BetaKiller\Factory\FactoryException
      * @throws \Spotman\Acl\Exception
      * @throws \BetaKiller\IFace\Exception\IFaceException
      */
     public function getData(): array
     {
         $currentIFaceModel = $this->ifaceHelper->getCurrentIFaceModel();
-        $currentLayout     = $currentIFaceModel ? $this->ifaceHelper->detectLayoutCodename($currentIFaceModel) : null;
-        $isAdminLayout     = $currentLayout === LayoutInterface::LAYOUT_ADMIN;
         $primaryEntity     = $currentIFaceModel ? $this->ifaceHelper->detectPrimaryEntity($currentIFaceModel) : null;
 
         $data = [
-            'isAdminLayout'     => $isAdminLayout,
             'enabled'           => true,
             'comments'          => $this->getCommentsData(),
             'createButtonItems' => $this->getCreateButtonItems(),
@@ -110,6 +107,7 @@ class BarWidget extends AbstractAdminWidget
 
     /**
      * @return array|null
+     * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\IFace\Exception\IFaceException
      * @throws \Spotman\Acl\Exception
      */
@@ -139,6 +137,7 @@ class BarWidget extends AbstractAdminWidget
     /**
      * @uses \BetaKiller\IFace\Admin\Content\CommentListByStatus
      * @return \BetaKiller\IFace\IFaceInterface
+     * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\IFace\Exception\IFaceException
      */
     private function getCommentsListByStatusIface(): IFaceInterface
@@ -149,6 +148,7 @@ class BarWidget extends AbstractAdminWidget
     /**
      * @uses \BetaKiller\IFace\Admin\Content\CommentIndex
      * @return \BetaKiller\IFace\IFaceInterface
+     * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\IFace\Exception\IFaceException
      */
     private function getCommentsRootIface(): IFaceInterface
@@ -160,6 +160,7 @@ class BarWidget extends AbstractAdminWidget
      * @param \BetaKiller\Model\DispatchableEntityInterface|null $entity
      *
      * @return null|string
+     * @throws \BetaKiller\IFace\Exception\IFaceException
      */
     private function getAdminEditButtonUrl(?DispatchableEntityInterface $entity): ?string
     {
@@ -170,6 +171,7 @@ class BarWidget extends AbstractAdminWidget
      * @param \BetaKiller\Model\DispatchableEntityInterface|null $entity
      *
      * @return null|string
+     * @throws \BetaKiller\IFace\Exception\IFaceException
      */
     private function getPublicReadButtonUrl(?DispatchableEntityInterface $entity): ?string
     {
@@ -180,6 +182,7 @@ class BarWidget extends AbstractAdminWidget
      * @param \BetaKiller\Model\DispatchableEntityInterface|null $entity
      *
      * @return null|string
+     * @throws \BetaKiller\IFace\Exception\IFaceException
      */
     private function getPreviewButtonUrl(?DispatchableEntityInterface $entity): ?string
     {
@@ -192,6 +195,7 @@ class BarWidget extends AbstractAdminWidget
      * @param string                                             $targetAction
      *
      * @return null|string
+     * @throws \BetaKiller\IFace\Exception\IFaceException
      */
     private function getPrimaryEntityActionUrl(
         ?DispatchableEntityInterface $entity,
