@@ -4,9 +4,8 @@
  */
 define([
   "jquery",
-  "jquery.jsonRPC",
-  "auth.modal"
-], function ($, jsonRPC, authModal) {
+  "jquery.jsonRPC"
+], function ($, jsonRPC) {
 
   return function (url) {
 
@@ -127,30 +126,32 @@ define([
     }
 
     function authRequiredModal() {
-      var successCallback = function () {
-        // Unlock API
-        unlock();
+      require(['auth.modal'], function(authModal) {
+        var successCallback = function () {
+          // Unlock API
+          unlock();
 
-        // Process all queued requests
-        resolveQueue();
+          // Process all queued requests
+          resolveQueue();
 
-        // Cleanup queue
-        clearQueue();
-      };
+          // Cleanup queue
+          clearQueue();
+        };
 
-      var errorCallback = function () {
-        // Reject all queued request
-        rejectQueue();
+        var errorCallback = function () {
+          // Reject all queued request
+          rejectQueue();
 
-        // Cleanup queue
-        clearQueue();
+          // Cleanup queue
+          clearQueue();
 
-        // Allow repeat of the auth
-        unlock();
-      };
+          // Allow repeat of the auth
+          unlock();
+        };
 
-      // Show modal and provide callbacks
-      authModal.show(successCallback, errorCallback);
+        // Show modal and provide callbacks
+        authModal.show(successCallback, errorCallback);
+      });
     }
 
     return function (service, method, proxyArguments) {
