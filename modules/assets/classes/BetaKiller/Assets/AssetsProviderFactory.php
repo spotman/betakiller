@@ -96,6 +96,7 @@ class AssetsProviderFactory
      * @param string $key
      *
      * @return \BetaKiller\Assets\Provider\AssetsProviderInterface|\BetaKiller\Assets\Provider\ImageAssetsProviderInterface|mixed
+     * @throws \BetaKiller\Assets\AssetsProviderException
      * @throws \BetaKiller\Assets\AssetsException
      * @throws \BetaKiller\Assets\AssetsStorageException
      * @throws \BetaKiller\Factory\FactoryException
