@@ -27,6 +27,7 @@ class AssetsDeploymentService
     /**
      * @param \BetaKiller\Assets\Provider\AssetsProviderInterface $provider
      * @param \BetaKiller\Assets\Model\AssetsModelInterface       $model
+     * @param string                                              $content
      * @param string                                              $action
      * @param null|string                                         $suffix
      *
@@ -36,6 +37,7 @@ class AssetsDeploymentService
     public function deploy(
         AssetsProviderInterface $provider,
         AssetsModelInterface $model,
+        string $content,
         string $action,
         ?string $suffix = null
     ): bool {
@@ -53,8 +55,6 @@ class AssetsDeploymentService
                 ':value' => $path,
             ]);
         }
-
-        $content = $provider->getContent($model);
 
         file_put_contents($fullPath, $content);
 

@@ -21,6 +21,13 @@ interface AssetsProviderInterface
     public function setCodename(string $codename): void;
 
     /**
+     * Returns provider`s codename
+     *
+     * @return string
+     */
+    public function getCodename(): string;
+
+    /**
      * Returns true if current provider has protected content (no caching in public directory)
      *
      * @return bool
@@ -33,6 +40,22 @@ interface AssetsProviderInterface
      * @return bool
      */
     public function isDeploymentNeeded(): bool;
+
+    /**
+     * Returns array of allowed actions` names
+     *
+     * @return string[]
+     */
+    public function getActions(): array;
+
+    /**
+     * Returns true if provider action is allowed
+     *
+     * @param string $action
+     *
+     * @return bool
+     */
+    public function hasAction(string $action): bool;
 
     /**
      * @param \BetaKiller\Assets\Handler\AssetsHandlerInterface $handler
@@ -156,6 +179,23 @@ interface AssetsProviderInterface
      * @return string
      */
     public function getContent(AssetsModelInterface $model): string;
+
+    /**
+     * Save action content into storage
+     *
+     * @param \BetaKiller\Assets\Model\AssetsModelInterface $model
+     * @param string                                        $content
+     * @param string                                        $action
+     * @param null|string                                   $suffix
+     *
+     * @return void
+     */
+    public function cacheContent(
+        AssetsModelInterface $model,
+        string $content,
+        string $action,
+        ?string $suffix = null
+    ): void;
 
     /**
      * Returns assets model repository linked to current provider

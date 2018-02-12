@@ -22,6 +22,22 @@ final class ImageAssetsProvider extends AbstractAssetsProvider implements ImageA
     public const CONFIG_MODEL_PREVIEW_QUALITY_KEY = 'quality';
 
     /**
+     * Returns array of allowed actions` names
+     *
+     * @return string[]
+     */
+    public function getActions(): array
+    {
+        return [
+            self::ACTION_PREVIEW,
+            self::ACTION_ORIGINAL,
+            self::ACTION_UPLOAD,
+            self::ACTION_DOWNLOAD,
+            self::ACTION_DELETE,
+        ];
+    }
+
+    /**
      * @param AssetsModelInterface $model
      * @param string               $size 300x200
      *

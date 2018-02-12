@@ -150,6 +150,16 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
     }
 
     /**
+     * Returns provider`s codename
+     *
+     * @return string
+     */
+    public function getCodename(): string
+    {
+        return $this->codename;
+    }
+
+    /**
      * Returns URL for POSTing new files
      *
      * @return string
@@ -219,6 +229,13 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
      */
     protected function getItemUrl(string $action, AssetsModelInterface $model, ?string $suffix = null): string
     {
+        if (!$this->hasAction($action)) {
+            throw new AssetsProviderException('Action :action is not allowed for provider :codename', [
+                ':action'   => $action,
+                ':codename' => $this->codename,
+            ]);
+        }
+
         $path = $this->getModelActionPath($model, $action, $suffix);
         $path = $this->prepareDirectorySeparator($path, '/');
 
@@ -362,7 +379,7 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
         $this->saveModel($model);
 
         // Deploy original file if needed
-        $this->deploymentService->deploy($this, $model, self::ACTION_ORIGINAL);
+        $this->deploymentService->deploy($this, $model, $content, self::ACTION_ORIGINAL);
 
         return $model;
     }
@@ -511,6 +528,50 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
 
         // Drop cached actions in storage
         $this->dropStorageCache($model, true);
+    }
+
+    /**
+     * Save action content into storage
+     *
+     * @param \BetaKiller\Assets\Model\AssetsModelInterface $model
+     * @param string                                        $content
+     * @param string                                        $action
+     * @param null|string                                   $suffix
+     *
+     * @return void
+     * @throws \BetaKiller\Assets\AssetsException
+     * @throws \BetaKiller\Assets\AssetsStorageException
+     */
+    public function cacheContent(
+        AssetsModelInterface $model,
+        string $content,
+        string $action,
+        ?string $suffix = null
+    ): void {
+        if ($action === self::ACTION_ORIGINAL) {
+            // No caching of original action
+            return;
+        }
+
+        if (!$this->hasAction($action)) {
+            return;
+        }
+
+        $path = $this->getModelActionPath($model, $action, $suffix);
+
+        $this->storage->putFile($path, $content);
+    }
+
+    /**
+     * Returns true if provider action is allowed
+     *
+     * @param string $action
+     *
+     * @return bool
+     */
+    public function hasAction(string $action): bool
+    {
+        return \in_array($action, $this->getActions(), true);
     }
 
     /**

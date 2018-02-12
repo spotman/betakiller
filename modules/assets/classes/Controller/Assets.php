@@ -8,6 +8,7 @@ use BetaKiller\Assets\Provider\ImageAssetsProviderInterface;
 use BetaKiller\Exception\BadRequestHttpException;
 use BetaKiller\Exception\FoundHttpException;
 use BetaKiller\Exception\NotFoundHttpException;
+use BetaKiller\Exception\NotImplementedHttpException;
 
 class Controller_Assets extends Controller
 {
@@ -37,13 +38,14 @@ class Controller_Assets extends Controller
     /**
      * Common action for uploading files through provider
      *
+     * @throws \BetaKiller\Exception\NotImplementedHttpException
      * @throws \BetaKiller\Exception\FoundHttpException
      * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\Assets\AssetsStorageException
      * @throws \BetaKiller\Assets\AssetsProviderException
      * @throws \BetaKiller\Exception\NotFoundHttpException
      * @throws \BetaKiller\Exception\BadRequestHttpException
-     * @throws AssetsException
+     * @throws \BetaKiller\Assets\AssetsException
      */
     public function action_upload(): void
     {
@@ -71,6 +73,7 @@ class Controller_Assets extends Controller
     }
 
     /**
+     * @throws \BetaKiller\Exception\NotImplementedHttpException
      * @throws \BetaKiller\Exception\FoundHttpException
      * @throws \BetaKiller\Assets\AssetsException
      * @throws \BetaKiller\Assets\AssetsProviderException
@@ -91,7 +94,7 @@ class Controller_Assets extends Controller
         // Get file content
         $content = $this->provider->getContent($model);
 
-        $this->deploy($model, 'original');
+        $this->deploy($model, $content, AssetsProviderInterface::ACTION_ORIGINAL);
 
         // Send last modified date
         $this->response->last_modified($model->getLastModifiedAt());
@@ -101,6 +104,7 @@ class Controller_Assets extends Controller
     }
 
     /**
+     * @throws \BetaKiller\Exception\NotImplementedHttpException
      * @throws \BetaKiller\Exception\FoundHttpException
      * @throws \BetaKiller\Assets\AssetsException
      * @throws \BetaKiller\Assets\AssetsProviderException
@@ -129,6 +133,7 @@ class Controller_Assets extends Controller
     }
 
     /**
+     * @throws \BetaKiller\Exception\NotImplementedHttpException
      * @throws \BetaKiller\Exception\FoundHttpException
      * @throws \BetaKiller\Assets\AssetsException
      * @throws \BetaKiller\Assets\AssetsProviderException
@@ -148,8 +153,9 @@ class Controller_Assets extends Controller
             ]);
         }
 
-        $size  = $this->getSizeParam();
-        $model = $this->fromItemDeployUrl();
+        $size   = $this->getSizeParam();
+        $model  = $this->fromItemDeployUrl();
+        $action = ImageAssetsProviderInterface::ACTION_PREVIEW;
 
         $this->checkExtension($model);
 
@@ -160,10 +166,11 @@ class Controller_Assets extends Controller
 
         $previewContent = $this->provider->makePreviewContent($model, $size);
 
-        // TODO Cache to storage
+        // Cache preview to storage
+        $this->provider->cacheContent($model, $previewContent, $action, $size);
 
         // Deploy to cache if needed
-        $this->deploy($model, $previewContent);
+        $this->deploy($model, $previewContent, $action, $size);
 
         // Send last modified date
         $this->response->last_modified($model->getLastModifiedAt());
@@ -178,6 +185,7 @@ class Controller_Assets extends Controller
     }
 
     /**
+     * @throws \BetaKiller\Exception\NotImplementedHttpException
      * @throws \BetaKiller\Exception\FoundHttpException
      * @throws \BetaKiller\Assets\AssetsException
      * @throws \BetaKiller\Assets\AssetsProviderException
@@ -204,17 +212,19 @@ class Controller_Assets extends Controller
 
     /**
      * @param \BetaKiller\Assets\Model\AssetsModelInterface $model
+     * @param string                                        $content
      * @param string                                        $action
      * @param null|string                                   $suffix
      *
      * @throws \BetaKiller\Assets\AssetsProviderException
      */
-    private function deploy(AssetsModelInterface $model, string $action, ?string $suffix = null): void
+    private function deploy(AssetsModelInterface $model, string $content, string $action, ?string $suffix = null): void
     {
-        $this->deploymentService->deploy($this->provider, $model, $action, $suffix);
+        $this->deploymentService->deploy($this->provider, $model, $content, $action, $suffix);
     }
 
     /**
+     * @throws \BetaKiller\Exception\NotImplementedHttpException
      * @throws \BetaKiller\Exception\FoundHttpException
      * @throws \BetaKiller\Assets\AssetsException
      * @throws \BetaKiller\Assets\AssetsProviderException
@@ -233,6 +243,8 @@ class Controller_Assets extends Controller
 
         $this->provider = $this->providerFactory->createFromUrlKey($requestKey);
         $providerKey    = $this->provider->getUrlKey();
+
+        $this->checkAction();
 
         if ($requestKey !== $providerKey) {
             // Redirect to canonical url
@@ -274,11 +286,26 @@ class Controller_Assets extends Controller
      */
     private function checkExtension(AssetsModelInterface $model): void
     {
-        $requestExt = $this->request->param('ext');
+        $requestExt = $this->param('ext');
         $modelExt   = $this->provider->getModelExtension($model);
 
         if (!$requestExt || $requestExt !== $modelExt) {
             $this->redirectToCanonicalUrl($model);
+        }
+    }
+
+    /**
+     * @throws \BetaKiller\Exception\NotImplementedHttpException
+     */
+    private function checkAction(): void
+    {
+        $action = $this->action();
+
+        if (!$this->provider->hasAction($action)) {
+            throw new NotImplementedHttpException('Action :name is not allowed for provider :codename', [
+                ':name' => $action,
+                ':codename' => $this->provider->getCodename(),
+            ]);
         }
     }
 
@@ -307,7 +334,7 @@ class Controller_Assets extends Controller
      */
     private function getCanonicalUrl(AssetsModelInterface $model): string
     {
-        $action = $this->request->action();
+        $action = $this->action();
 
         switch ($action) {
             case AssetsProviderInterface::ACTION_ORIGINAL:

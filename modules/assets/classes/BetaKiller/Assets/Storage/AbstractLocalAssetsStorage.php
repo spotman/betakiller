@@ -10,14 +10,14 @@ abstract class AbstractLocalAssetsStorage extends AbstractAssetsStorage
      *
      * @var int
      */
-    private $dirMask = 0777;
+    private $dirMode = 0777;
 
     /**
      * Prevent executing (groups/other security must be done via server umask config)
      *
      * @var int
      */
-    private $fileMask = 0666;
+    private $fileMode = 0667;
 
     /**
      * @param string $basePath
@@ -80,13 +80,37 @@ abstract class AbstractLocalAssetsStorage extends AbstractAssetsStorage
     {
         $baseDir = \dirname($path);
 
-        if (!file_exists($baseDir) && !@mkdir($baseDir, $this->dirMask, true) && !is_dir($baseDir)) {
+        if (!$this->createDirectory($baseDir)) {
             throw new AssetsStorageException('Can not create path :dir', [':dir' => $baseDir]);
         }
 
         file_put_contents($path, $content);
 
-        chmod($path, $this->fileMask);
+        chmod($path, $this->fileMode);
+    }
+
+    /**
+     * @param string $path
+     *
+     * @return bool
+     */
+    private function createDirectory(string $path): bool
+    {
+        if (file_exists($path) && is_dir($path)) {
+            return true;
+        }
+
+        /**
+         * Trick for true chmod on mkdir
+         * @link http://php.net/manual/ru/function.mkdir.php#1207
+         */
+//        $oldMask = umask(0);
+
+        $result = @mkdir($path, $this->dirMode, true) || is_dir($path);
+
+//        umask($oldMask);
+
+        return $result;
     }
 
     /**
