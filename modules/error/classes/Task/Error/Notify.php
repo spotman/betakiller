@@ -49,6 +49,7 @@ class Task_Error_Notify extends AbstractTask
     /**
      * @param \BetaKiller\Model\PhpExceptionModelInterface $model
      *
+     * @throws \BetaKiller\IFace\Exception\IFaceException
      * @throws \ORM_Validation_Exception
      * @throws \BetaKiller\Notification\NotificationException
      * @throws \BetaKiller\Repository\RepositoryException

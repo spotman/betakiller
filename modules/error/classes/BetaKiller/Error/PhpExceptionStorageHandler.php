@@ -162,7 +162,7 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
         $request = \Request::current() ?: null;
 
         // Trying to get current URL
-        $url = $request ? $request::detect_uri() : null;
+        $url = $request ? \URL::site($request::detect_uri(), true) : null;
 
         // Adding URL
         if ($url) {
