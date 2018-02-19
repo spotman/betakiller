@@ -1,26 +1,28 @@
 define([
-  "jquery",
   "twig.original"
-], function(jQuery, Twig){
+], function(Twig){
 
   Twig.extendFunction("image", function(attributes, data, forceSize) {
-
-      jQuery.extend(attributes, data);
+      for (var dataKey in data) {
+        if (data.hasOwnProperty(dataKey) && data[dataKey]) {
+          attributes[dataKey] = data[dataKey];
+        }
+      }
 
       if (forceSize) {
           delete attributes['width'];
           delete attributes['height'];
       }
 
-      attributes.title = attributes.title || attributes.alt;
+      //attributes.title = attributes.title || attributes.alt;
 
       var html = '<img';
 
-      jQuery.each(attributes, function(key, value) {
-          if (value) {
-            html += ' ' + key + '="' + value + '"';
-          }
-      });
+      for (var key in attributes) {
+        if (attributes.hasOwnProperty(key) && attributes[key]) {
+          html += ' ' + key + '="' + attributes[key] + '"';
+        }
+      }
 
     return html + ' />';
   });
