@@ -427,7 +427,7 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
         $content = file_get_contents($fullPath);
 
         // Get type from file analysis
-        $mimeType = $this->contentTypes->getMimeTypeFromContent($content);
+        $mimeType = $this->contentTypes->getFileMimeType($fullPath);
 
         // MIME-type check
         $this->checkAllowedMimeTypes($mimeType);

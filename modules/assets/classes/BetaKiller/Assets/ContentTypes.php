@@ -3,8 +3,6 @@ declare(strict_types=1);
 
 namespace BetaKiller\Assets;
 
-
-use BetaKiller\Exception;
 use Mimey\MimeMappingBuilder;
 use Mimey\MimeTypes;
 
@@ -30,6 +28,7 @@ class ContentTypes
 
         // Add a conversion. This conversion will take precedence over existing ones.
         $builder->add('image/jpeg', 'jpg');
+        $builder->add('text/rtf', 'rtf');
 
         return new MimeTypes($builder->getMapping());
     }
@@ -37,15 +36,15 @@ class ContentTypes
     /**
      * Detect mime type from file content
      *
-     * @param string $content
+     * @param string $path
      *
      * @return string
      */
-    public function getMimeTypeFromContent(string $content): string
+    public function getFileMimeType(string $path): string
     {
-        $fileInfo = new \finfo(FILEINFO_MIME);
+        $fileResource = \finfo_open(FILEINFO_MIME_TYPE);
 
-        return $fileInfo->buffer($content);
+        return \finfo_file($fileResource, $path);
     }
 
     /**
