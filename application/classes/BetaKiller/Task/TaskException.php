@@ -1,5 +1,6 @@
 <?php
-
 namespace BetaKiller\Task;
 
-class TaskException extends \Minion_Exception {}
+use BetaKiller\Exception;
+
+class TaskException extends Exception {}

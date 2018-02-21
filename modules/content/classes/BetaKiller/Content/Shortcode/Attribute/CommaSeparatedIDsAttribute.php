@@ -7,11 +7,10 @@ class CommaSeparatedIDsAttribute extends RegexAttribute
     /**
      * RegexAttribute constructor.
      *
-     * @param string    $name
-     * @param bool|null $isOptional
+     * @param string $name
      */
-    public function __construct(string $name, ?bool $isOptional = null)
+    public function __construct(string $name)
     {
-        parent::__construct($name, '/[0-9,]+/', $isOptional);
+        parent::__construct($name, '/[0-9,]+/');
     }
 }

@@ -135,7 +135,6 @@ final class ImageAssetsProvider extends AbstractAssetsProvider implements ImageA
      * @param string                                             $size
      *
      * @return string
-     * @throws \Kohana_Exception
      * @throws \BetaKiller\Assets\AssetsException
      * @throws \BetaKiller\Assets\AssetsProviderException
      * @throws \BetaKiller\Assets\AssetsStorageException
@@ -181,7 +180,6 @@ final class ImageAssetsProvider extends AbstractAssetsProvider implements ImageA
      * @param AssetsModelImageInterface $model
      *
      * @return string
-     * @throws \Kohana_Exception
      * @throws \BetaKiller\Assets\AssetsProviderException
      * @internal param array $_post_data
      *
@@ -217,14 +215,13 @@ final class ImageAssetsProvider extends AbstractAssetsProvider implements ImageA
      * @param integer $quality
      *
      * @returns string Processed content
-     * @throws \Kohana_Exception
      * @throws AssetsProviderException
      */
     protected function resize($originalContent, $width, $height, $quality): string
     {
-        $image = Image::from_content($originalContent);
-
         try {
+            $image = Image::fromContent($originalContent);
+
             // Detect original dimensions and ratio
             $originalWidth  = $image->width;
             $originalHeight = $image->height;
@@ -232,9 +229,9 @@ final class ImageAssetsProvider extends AbstractAssetsProvider implements ImageA
 
             list($width, $height) = $this->restoreOmittedDimensions($width, $height, $originalRatio);
 
-            $resize_ratio = $this->calculateDimensionsRatio($width, $height);
+            $resizeRatio = $this->calculateDimensionsRatio($width, $height);
 
-            if ($originalRatio === $resize_ratio) {
+            if ($originalRatio === $resizeRatio) {
                 $image->resize($width, $height);
             } else {
                 $image->resize($width, $height, Image::INVERSE)->crop($width, $height);
@@ -269,7 +266,7 @@ final class ImageAssetsProvider extends AbstractAssetsProvider implements ImageA
         ?string $size = null,
         array $attrs = null
     ): array {
-        $attrs = array_merge($model->getDefaultAttributesForImgTag(), $attrs ?? []);
+        $attrs = $attrs ?? [];
 
         if ($size === AssetsModelImageInterface::SIZE_ORIGINAL) {
             $src    = $this->getOriginalUrl($model);
@@ -299,11 +296,12 @@ final class ImageAssetsProvider extends AbstractAssetsProvider implements ImageA
 
         $attrs = array_merge([
             'src'     => $src,
+            'alt'     => $model->getAlt(),
             'srcset'  => $this->getSrcsetAttributeValue($model, $targetRatio),
             'data-id' => $model->getID(),
         ], $attrs, [
-            'width'   => $width,
-            'height'  => $height,
+            'width'  => $width,
+            'height' => $height,
         ]);
 
         return $attrs;
@@ -466,12 +464,11 @@ final class ImageAssetsProvider extends AbstractAssetsProvider implements ImageA
      * @param \BetaKiller\Model\UserInterface $user
      *
      * @return \BetaKiller\Assets\Model\AssetsModelInterface
+     * @throws \BetaKiller\Exception
      * @throws \BetaKiller\Assets\AssetsException
      * @throws \BetaKiller\Assets\AssetsExceptionUpload
      * @throws \BetaKiller\Assets\AssetsProviderException
      * @throws \BetaKiller\Assets\AssetsStorageException
-     * @throws \BetaKiller\Repository\RepositoryException
-     * @throws \Kohana_Exception
      */
     public function store(string $fullPath, string $originalName, UserInterface $user): AssetsModelInterface
     {
@@ -479,7 +476,6 @@ final class ImageAssetsProvider extends AbstractAssetsProvider implements ImageA
         $model = parent::store($fullPath, $originalName, $user);
 
         $this->detectImageDimensions($model);
-        $this->saveModel($model);
 
         return $model;
     }
@@ -487,15 +483,15 @@ final class ImageAssetsProvider extends AbstractAssetsProvider implements ImageA
     /**
      * @param \BetaKiller\Assets\Model\AssetsModelImageInterface $model
      *
+     * @throws \BetaKiller\Exception
      * @throws \BetaKiller\Assets\AssetsStorageException
      * @throws \BetaKiller\Assets\AssetsException
-     * @throws \Kohana_Exception
      */
     private function detectImageDimensions(AssetsModelImageInterface $model): void
     {
         $content = $this->getContent($model);
 
-        $info = Image::from_content($content);
+        $info = Image::fromContent($content);
 
         $model->setWidth($info->width);
         $model->setHeight($info->height);

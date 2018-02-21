@@ -1,22 +1,31 @@
 <?php
 
+use BetaKiller\Exception;
+
 abstract class Image extends Kohana_Image
 {
-    private static $tmp_files = [];
+    private static $tmpFiles = [];
 
     private static $shutdownHandlerRegistered = false;
 
-    public static function from_content($content, $driver = null)
+    /**
+     * @param      $content
+     * @param string|null $driver
+     *
+     * @return \Image
+     * @throws \BetaKiller\Exception
+     */
+    public static function fromContent(string $content, string $driver = null): \Image
     {
         if ( !$content ) {
-            throw new Kohana_Exception('No content for image info detection');
+            throw new Exception('No content for image info detection');
         }
 
         // Creating temporary file
         $tmp_file = tempnam(sys_get_temp_dir(), 'image-resize-temp-');
 
         if (!$tmp_file) {
-            throw new Kohana_Exception('Can not create temporary file for image info detecting');
+            throw new Exception('Can not create temporary file for image info detecting');
         }
 
         self::registerShutdownFunction();
@@ -24,25 +33,25 @@ abstract class Image extends Kohana_Image
         // Putting content into it
         file_put_contents($tmp_file, $content);
 
-        self::$tmp_files[] = $tmp_file;
+        self::$tmpFiles[] = $tmp_file;
         return static::factory($tmp_file, $driver);
     }
 
-    private static function registerShutdownFunction()
+    private static function registerShutdownFunction(): void
     {
         if (self::$shutdownHandlerRegistered) {
             return;
         }
 
-        register_shutdown_function([Image::class, 'clearTempFiles']);
+        register_shutdown_function([self::class, 'clearTempFiles']);
 
         self::$shutdownHandlerRegistered = true;
     }
 
-    public static function clearTempFiles()
+    public static function clearTempFiles(): void
     {
-        if (self::$tmp_files) {
-            foreach (self::$tmp_files as $file) {
+        if (self::$tmpFiles) {
+            foreach (self::$tmpFiles as $file) {
                 unlink($file);
             }
         }

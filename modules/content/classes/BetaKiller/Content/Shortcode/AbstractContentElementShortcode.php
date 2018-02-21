@@ -3,7 +3,6 @@ namespace BetaKiller\Content\Shortcode;
 
 use BetaKiller\Content\Shortcode\Attribute\DiscreteValuesAttribute;
 use BetaKiller\Content\Shortcode\Attribute\IdAttribute;
-use BetaKiller\Model\EntityModelInterface;
 
 abstract class AbstractContentElementShortcode extends AbstractShortcode implements ContentElementShortcodeInterface
 {
@@ -20,7 +19,8 @@ abstract class AbstractContentElementShortcode extends AbstractShortcode impleme
         $layouts = $this->getAvailableLayouts();
 
         if ($layouts) {
-            $definitions[] = new DiscreteValuesAttribute(self::ATTR_LAYOUT, $layouts, true);
+            $layoutAttribute = new DiscreteValuesAttribute(self::ATTR_LAYOUT, $layouts);
+            $definitions[] = $layoutAttribute->optional($layouts[0]);
         }
 
         return $definitions;
@@ -30,14 +30,6 @@ abstract class AbstractContentElementShortcode extends AbstractShortcode impleme
      * @return \BetaKiller\Content\Shortcode\Attribute\ShortcodeAttributeInterface[]
      */
     abstract protected function getContentElementShortcodeDefinitions(): array;
-
-    /**
-     * @param \BetaKiller\Model\EntityModelInterface|null $relatedEntity
-     * @param int|null                                    $itemID
-     *
-     * @return \BetaKiller\Content\Shortcode\Editor\EditorListingItem[]
-     */
-    abstract public function getEditorListingItems(?EntityModelInterface $relatedEntity, ?int $itemID): array;
 
     /**
      * @return int|null

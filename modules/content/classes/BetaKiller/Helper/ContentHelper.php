@@ -108,6 +108,14 @@ class ContentHelper
         return $this->providerFactory->createFromModelCodename('ContentAttachment');
     }
 
+    /**
+     * Detect and instantiate assets provider by file MIME-type
+     *
+     * @param string $mimeType
+     *
+     * @return \BetaKiller\Assets\Provider\AssetsProviderInterface
+     * @deprecated
+     */
     public function createAssetsProviderFromMimeType(string $mimeType): AssetsProviderInterface
     {
         /** @var \BetaKiller\Assets\Provider\AssetsProviderInterface[] $mimeProviders */

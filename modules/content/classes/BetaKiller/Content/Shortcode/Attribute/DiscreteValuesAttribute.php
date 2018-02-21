@@ -9,10 +9,9 @@ class DiscreteValuesAttribute extends RegexAttribute
      *
      * @param string    $name
      * @param array     $values
-     * @param bool|null $isOptional
      */
-    public function __construct(string $name, array $values, bool $isOptional = null)
+    public function __construct(string $name, array $values)
     {
-        parent::__construct($name, '/('.implode('|', $values).')/', $isOptional);
+        parent::__construct($name, '/('.implode('|', $values).')/');
     }
 }

@@ -11,10 +11,21 @@ class BooleanAttribute extends DiscreteValuesAttribute
      * DiscreteValuesAttribute constructor.
      *
      * @param string    $name
-     * @param bool|null $isOptional
      */
-    public function __construct(string $name, ?bool $isOptional = null)
+    public function __construct(string $name)
     {
-        parent::__construct($name, [self::TRUE, self::FALSE], $isOptional);
+        parent::__construct($name, [self::TRUE, self::FALSE]);
+    }
+
+    public function optionalFalse(): BooleanAttribute
+    {
+        $this->optional(self::FALSE);
+        return $this;
+    }
+
+    public function optionalTrue(): BooleanAttribute
+    {
+        $this->optional(self::TRUE);
+        return $this;
     }
 }

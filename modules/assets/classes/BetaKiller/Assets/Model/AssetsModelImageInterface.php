@@ -48,11 +48,4 @@ interface AssetsModelImageInterface extends AssetsModelInterface
      * @return string
      */
     public function getTitle(): string;
-
-    /**
-     * Returns additional attributes for <img> tag
-     *
-     * @return array
-     */
-    public function getDefaultAttributesForImgTag(): array;
 }

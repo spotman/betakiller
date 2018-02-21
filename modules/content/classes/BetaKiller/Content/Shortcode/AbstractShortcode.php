@@ -16,6 +16,11 @@ abstract class AbstractShortcode implements ShortcodeInterface
     private $definitions;
 
     /**
+     * @var ShortcodeAttributeInterface[][][]
+     */
+    private $relyOn = [];
+
+    /**
      * @var array Shortcode tag values
      */
     private $attributes = [];
@@ -47,7 +52,12 @@ abstract class AbstractShortcode implements ShortcodeInterface
         $this->entity = $entity;
 
         foreach ($this->getDefinitions() as $item) {
-            $this->definitions[$item->getName()] = $item;
+            $name = $item->getName();
+            $this->definitions[$name] = $item;
+
+            foreach ($item->getDependencies() as $targetName => $targetValue) {
+                $this->relyOn[$targetName][$targetValue][$name] = $item;
+            }
         }
     }
 
@@ -94,20 +104,8 @@ abstract class AbstractShortcode implements ShortcodeInterface
      */
     public function setAttribute(string $name, ?string $value): void
     {
-        if (!$this->isAttributeAvailable($name)) {
-            throw new ShortcodeException('Attribute [:name] is not available for shortcode [:tag]', [
-                ':name' => $name,
-                ':tag'  => $this->getTagName(),
-            ]);
-        }
-
-        if (!$this->isAttributeValueAvailable($name, $value)) {
-            throw new ShortcodeException('Attribute [:name] value [:value] is not allowed for shortcode [:tag]', [
-                ':name'  => $name,
-                ':value' => $value,
-                ':tag'   => $this->getTagName(),
-            ]);
-        }
+        $this->checkAttributeIsAvailable($name);
+        $this->checkAttributeIsValueAvailable($name, $value);
 
         $this->attributes[$name] = $value;
     }
@@ -170,6 +168,23 @@ abstract class AbstractShortcode implements ShortcodeInterface
     }
 
     /**
+     * @param string      $name
+     * @param null|string $value
+     *
+     * @throws \BetaKiller\Content\Shortcode\ShortcodeException
+     */
+    private function checkAttributeIsValueAvailable(string $name, ?string $value): void
+    {
+        if (!$this->isAttributeValueAvailable($name, $value)) {
+            throw new ShortcodeException('Attribute [:name] value [:value] is not allowed for shortcode [:tag]', [
+                ':name'  => $name,
+                ':value' => $value,
+                ':tag'   => $this->getTagName(),
+            ]);
+        }
+    }
+
+    /**
      * Empty attributes list
      */
     public function clearAttributes(): void
@@ -186,12 +201,71 @@ abstract class AbstractShortcode implements ShortcodeInterface
     }
 
     /**
-     * @param string $key
+     * @param string $name
      *
      * @return null|string
      * @throws \BetaKiller\Content\Shortcode\ShortcodeException
      */
-    public function getAttribute(string $key): ?string
+    public function getAttribute(string $name): ?string
+    {
+        $this->checkAttributeIsAvailable($name);
+
+        if (!isset($this->attributes[$name]) && $this->isRequiredAttribute($name)) {
+            throw new ShortcodeException('Missing :name attribute', [
+                ':name' => $name,
+            ]);
+        }
+
+        $definition = $this->getAttributeDefinition($name);
+
+        return $this->attributes[$name] ?? $definition->getDefaultValue();
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return bool
+     * @throws \BetaKiller\Content\Shortcode\ShortcodeException
+     */
+    private function isRequiredAttribute(string $name): bool
+    {
+        $definition = $this->getAttributeDefinition($name);
+
+        // Optional attribute has no dependencies => not required
+        if ($definition->isOptional() && !$definition->hasDependencies()) {
+            return false;
+        }
+
+        foreach ($definition->getDependencies() as $targetName => $targetValue) {
+            // If dependent attribute value not matching => not required
+            if ($this->getAttribute($targetName) !== $targetValue) {
+                return false;
+            }
+        }
+
+        // Non optional => required
+        return !$definition->isOptional();
+    }
+
+    /**
+     * @param string $key
+     *
+     * @return bool
+     * @throws \BetaKiller\Content\Shortcode\ShortcodeException
+     */
+    public function hasAttribute(string $key): bool
+    {
+        $this->checkAttributeIsAvailable($key);
+
+        return isset($this->attributes[$key]);
+    }
+
+    /**
+     * @param string $key
+     *
+     * @throws \BetaKiller\Content\Shortcode\ShortcodeException
+     */
+    private function checkAttributeIsAvailable(string $key): void
     {
         if (!$this->isAttributeAvailable($key)) {
             throw new ShortcodeException('Attribute :key is not available for shortcode :tag', [
@@ -199,8 +273,85 @@ abstract class AbstractShortcode implements ShortcodeInterface
                 ':tag' => $this->getTagName(),
             ]);
         }
+    }
 
-        return $this->attributes[$key] ?? null;
+    /**
+     * @throws \BetaKiller\Content\Shortcode\ShortcodeException
+     */
+    private function validateAttributes(): void
+    {
+        $actualAttributes = $this->getActualAttributes();
+
+        foreach ($actualAttributes as $name => $definition) {
+            // Check for missing attributes for current state
+            if (!$this->hasAttribute($name) && $this->isRequiredAttribute($name)) {
+                throw new ShortcodeException('Attribute :name is required', [
+                    ':name' => $name,
+                ]);
+            }
+        }
+
+
+//
+//        foreach ($this->attributes as $sourceName => $sourceValue) {
+//            $definition = $this->getAttributeDefinition($sourceName);
+//
+//            foreach ($definition->getDependencies() as $targetName => $targetValue) {
+//                // Does attribute exists?
+//                if (!$this->hasAttribute($targetName)) {
+//                    throw new ShortcodeException('Attribute :source depends on :target, but latter does not exists', [
+//                        ':source' => $sourceName,
+//                        ':target' => $targetName,
+//                    ]);
+//                }
+//
+//                // Values are not identical
+//                if ($this->getAttribute($targetName) !== $targetValue) {
+//                    throw new ShortcodeException('Attribute :source depends on :target value :value', [
+//                        ':source' => $sourceName,
+//                        ':target' => $targetName,
+//                        ':value'  => $targetValue,
+//                    ]);
+//                }
+//            }
+//        }
+    }
+
+    /**
+     * @return ShortcodeAttributeInterface[]
+     * @throws \BetaKiller\Content\Shortcode\ShortcodeException
+     */
+    public function getActualAttributes(): array
+    {
+        $actualAttributes = [];
+
+        // Detect root attributes
+        foreach ($this->getDefinitions() as $definition) {
+            $name = $definition->getName();
+
+            // Attribute without dependencies => processed as usual
+            if (!isset($this->relyOn[$name]) && !$definition->hasDependencies()) {
+                $actualAttributes[$name] = $definition;
+            }
+        }
+
+        // Attribute is used in dependencies => check existence, value and child attributes
+        foreach ($this->relyOn as $targetName => $sources) {
+            // Add target attribute as actual one
+            $targetDefinition = $this->getAttributeDefinition($targetName);
+            $actualAttributes[$targetName] = $targetDefinition;
+
+            $targetValue = $this->getAttribute($targetName);
+
+            // If there are dependent attributes for current value, then add them
+            if (isset($sources[$targetValue])) {
+                foreach ($sources[$targetValue] as $sourceDefinition) {
+                    $actualAttributes[$sourceDefinition->getName()] = $sourceDefinition;
+                }
+            }
+        }
+
+        return $actualAttributes;
     }
 
     public function hasContent(): bool
@@ -253,6 +404,7 @@ abstract class AbstractShortcode implements ShortcodeInterface
      * Returns string representation of current shortcode
      *
      * @return string
+     * @throws \BetaKiller\Content\Shortcode\ShortcodeException
      */
     public function asHtml(): string
     {
@@ -263,6 +415,10 @@ abstract class AbstractShortcode implements ShortcodeInterface
         $node = '['.$name;
 
         if ($attrs) {
+            $this->validateAttributes();
+
+            // TODO Use only attributes which values differ from default one
+
             $node .= \HTML::attributes(array_filter($attrs));
         }
 
@@ -275,6 +431,10 @@ abstract class AbstractShortcode implements ShortcodeInterface
         return $node;
     }
 
+    /**
+     * @return \DOMText
+     * @throws \BetaKiller\Content\Shortcode\ShortcodeException
+     */
     public function asDomText(): \DOMText
     {
         return new \DOMText($this->asHtml());

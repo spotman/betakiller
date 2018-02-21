@@ -1,6 +1,7 @@
 <?php
 namespace BetaKiller;
 
+use BetaKiller\DI\Container;
 use BetaKiller\Model\IFaceZone;
 use Device;
 use HTML;
@@ -63,7 +64,7 @@ class TwigExtension extends Twig_Extension
      */
     public function __construct()
     {
-        \BetaKiller\DI\Container::getInstance()->injectOn($this);
+        Container::getInstance()->injectOn($this);
     }
 
     public function getFunctions(): array
@@ -169,7 +170,7 @@ class TwigExtension extends Twig_Extension
              * @example ":count lots"|plural({ ":count": lotsCount })
              */
             new Twig_Filter('plural', function ($text, $values, $context = null) {
-                if (!is_array($values)) {
+                if (!\is_array($values)) {
                     $values = [
                         ':count' => (int)$values,
                     ];
@@ -208,6 +209,7 @@ class TwigExtension extends Twig_Extension
 
     /**
      * @return bool
+     * @throws \BetaKiller\IFace\Exception\IFaceException
      */
     public function inPublicZone(): bool
     {
@@ -217,10 +219,10 @@ class TwigExtension extends Twig_Extension
     /**
      * Helper for adding JS files
      */
-    public function js()
+    public function js(): void
     {
-        foreach (func_get_args() as $js) {
-            if (mb_strpos($js, 'http') === 0 || mb_strpos($js, '//') === 0) {
+        foreach (\func_get_args() as $js) {
+            if (\mb_strpos($js, 'http') === 0 || \mb_strpos($js, '//') === 0) {
                 $this->js->addPublic($js);
             } else {
                 $this->js->addStatic($js);
@@ -231,13 +233,13 @@ class TwigExtension extends Twig_Extension
     /**
      * Helper for adding JS builds (Require.JS, etc) in production environment
      */
-    public function jsBuild()
+    public function jsBuild(): void
     {
         if (!$this->inProduction()) {
             return;
         }
 
-        foreach (func_get_args() as $js) {
+        foreach (\func_get_args() as $js) {
             $this->js->addStatic($js);
         }
     }
@@ -245,9 +247,9 @@ class TwigExtension extends Twig_Extension
     /**
      * Helper for adding CSS files
      */
-    public function css()
+    public function css(): void
     {
-        foreach (func_get_args() as $css) {
+        foreach (\func_get_args() as $css) {
             if (mb_strpos($css, 'http') === 0 || mb_strpos($css, '//') === 0) {
                 $this->css->addPublic($css);
             } else {
@@ -275,11 +277,6 @@ class TwigExtension extends Twig_Extension
             unset($attributes['width'], $attributes['height']);
         }
 
-        $title = $attributes['title'];
-        $alt   = $attributes['alt'];
-
-        $attributes['title'] = $title ?: $alt;
-
         $src = $attributes['src'];
 
         return HTML::image($src, array_filter($attributes));
@@ -300,11 +297,11 @@ class TwigExtension extends Twig_Extension
     /**
      * Helper for adding assets
      *
-     * @throws \HTTP_Exception_500
+     * @throws \BetaKiller\Assets\AssetsException
      */
     public function assets(): void
     {
-        foreach (func_get_args() as $asset) {
+        foreach (\func_get_args() as $asset) {
             $this->assets->add($asset);
         }
     }
@@ -319,7 +316,7 @@ class TwigExtension extends Twig_Extension
      */
     public function meta($name = null, $value = null): ?string
     {
-        if ($value === null && !is_array($name)) {
+        if ($value === null && !\is_array($name)) {
             return $this->meta->get($name);
         }
 
@@ -330,6 +327,7 @@ class TwigExtension extends Twig_Extension
 
     /**
      * @return string
+     * @throws \View_Exception
      */
     public function showProfiler(): string
     {

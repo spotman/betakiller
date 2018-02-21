@@ -6,11 +6,9 @@ class ClassAttribute extends RegexAttribute
 {
     /**
      * ClassAttribute constructor.
-     *
-     * @param bool|null $isOptional
      */
-    public function __construct(?bool $isOptional = null)
+    public function __construct()
     {
-        parent::__construct('class', '/[A-Za-z_\-]+/', $isOptional);
+        parent::__construct('class', '/[A-Za-z_\-]+/');
     }
 }

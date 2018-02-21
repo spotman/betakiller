@@ -13,6 +13,19 @@ class GalleryShortcode extends AbstractContentElementShortcode
     public const LAYOUT_SLIDER  = 'slider';
 
     public const ATTR_COLUMNS = 'columns';
+    public const ATTR_COLUMNS_ONE = '1';
+    public const ATTR_COLUMNS_TWO = '2';
+    public const ATTR_COLUMNS_THREE = '3';
+    public const ATTR_COLUMNS_FOUR = '4';
+    public const ATTR_COLUMNS_FIVE = '5';
+
+    public const ATTR_COLUMNS_VALUES = [
+        self::ATTR_COLUMNS_ONE,
+        self::ATTR_COLUMNS_TWO,
+        self::ATTR_COLUMNS_THREE,
+        self::ATTR_COLUMNS_FOUR,
+        self::ATTR_COLUMNS_FIVE,
+    ];
 
     /**
      * @var \BetaKiller\Helper\AssetsHelper
@@ -32,7 +45,7 @@ class GalleryShortcode extends AbstractContentElementShortcode
     protected function getContentElementShortcodeDefinitions(): array
     {
         return [
-            new NumberAttribute('columns', true),
+            (new NumberAttribute('columns'))->optional(self::ATTR_COLUMNS_THREE),
         ];
     }
 
@@ -96,6 +109,9 @@ class GalleryShortcode extends AbstractContentElementShortcode
 
     /**
      * @return array
+     * @throws \BetaKiller\Factory\FactoryException
+     * @throws \BetaKiller\Assets\AssetsStorageException
+     * @throws \BetaKiller\Assets\AssetsException
      * @throws \BetaKiller\Content\Shortcode\ShortcodeException
      */
     public function getWidgetData(): array

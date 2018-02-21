@@ -94,7 +94,7 @@ class WP
         $query = DB::select()
             ->from('posts')
             ->and_where('post_type', '=', self::POST_TYPE_ATTACHMENT)
-            ->and_where('guid', '=', $path)
+            ->and_where('guid', 'LIKE', '%'.$path)
             ->limit(1);
 
         /** @var Database_Result $result */

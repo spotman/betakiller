@@ -1,19 +1,9 @@
 <?php
 namespace BetaKiller\Content\Shortcode;
 
-use BetaKiller\Model\EntityModelInterface;
-
-interface ContentElementShortcodeInterface extends ShortcodeInterface
+interface ContentElementShortcodeInterface extends ItemBasedShortcodeInterface
 {
     public const ATTR_LAYOUT = 'layout';
-
-    /**
-     * @param \BetaKiller\Model\EntityModelInterface|null $relatedEntity
-     * @param int|null                                    $itemID
-     *
-     * @return \BetaKiller\Content\Shortcode\Editor\EditorListingItem[]
-     */
-    public function getEditorListingItems(?EntityModelInterface $relatedEntity, ?int $itemID): array;
 
     /**
      * @return int|null

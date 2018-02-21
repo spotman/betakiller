@@ -32,7 +32,6 @@ class ContentImage extends AbstractOrmBasedAssetsImageModel implements ContentIm
         return $this->getID()
             && $this->getEntityItemID()
             && $this->getEntitySlug()
-            && $this->getAlt()
-            && $this->getTitle();
+            && $this->getAlt();
     }
 }

@@ -6,6 +6,28 @@ use BetaKiller\Assets\Model\AssetsModelImageInterface;
 abstract class AbstractOrmBasedAssetsImageModel extends AbstractOrmBasedAssetsModel implements AssetsModelImageInterface
 {
     /**
+     * Rule definitions for validation
+     *
+     * @return array
+     */
+    public function rules(): array
+    {
+        return [
+            'alt' => [
+                ['not_empty'],
+            ],
+            'width' => [
+                ['not_empty'],
+                ['digit'],
+            ],
+            'height' => [
+                ['not_empty'],
+                ['digit'],
+            ],
+        ];
+    }
+
+    /**
      * @return int
      */
     public function getWidth(): int
@@ -67,17 +89,5 @@ abstract class AbstractOrmBasedAssetsImageModel extends AbstractOrmBasedAssetsMo
     public function getTitle(): string
     {
         return (string)$this->get('title');
-    }
-
-    /**
-     * @return array
-     */
-    public function getDefaultAttributesForImgTag(): array
-    {
-        // Empty by default
-        return [
-            'alt'   => $this->getAlt(),
-            'title' => $this->getTitle(),
-        ];
     }
 }

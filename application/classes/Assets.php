@@ -1,8 +1,8 @@
 <?php
 
+use BetaKiller\Assets\AssetsException;
 use BetaKiller\Config\ConfigGroupInterface;
 use BetaKiller\Config\ConfigProviderInterface;
-use BetaKiller\Exception;
 
 /**
  * Class Assets
@@ -47,8 +47,7 @@ class Assets
      * @param string $name
      *
      * @return $this
-     * @throws \HTTP_Exception_500
-     * @throws \BetaKiller\Exception
+     * @throws \BetaKiller\Assets\AssetsException
      */
     public function add(string $name): Assets
     {
@@ -61,7 +60,7 @@ class Assets
             $config = $this->config()[$name];
 
             if (!$config) {
-                throw new Exception('Unknown asset :name', [':name' => $name]);
+                throw new AssetsException('Unknown asset :name', [':name' => $name]);
             }
 
             if (isset($config['js'])) {
@@ -78,7 +77,7 @@ class Assets
 
     /**
      * @return array
-     * @throws \BetaKiller\Exception
+     * @throws \BetaKiller\Assets\AssetsException
      */
     protected function config(): array
     {
@@ -86,7 +85,7 @@ class Assets
             $this->config = $this->configProvider->load(['assets']);
 
             if (!$this->config) {
-                throw new Exception('Missing assets config');
+                throw new AssetsException('Missing assets config');
             }
         }
 
@@ -98,7 +97,7 @@ class Assets
      * @param string                 $methodName
      * @param mixed                  $files
      *
-     * @throws \HTTP_Exception_500
+     * @throws \BetaKiller\Assets\AssetsException
      */
     protected function processStatic(CommonStaticInterface $object, string $methodName, $files): void
     {
@@ -115,7 +114,7 @@ class Assets
                     $object->addStatic($file);
                 }
             } else {
-                throw new HTTP_Exception_500('Can not process asset static :method', [':method' => $methodName]);
+                throw new AssetsException('Can not process asset static :method', [':method' => $methodName]);
             }
         }
     }

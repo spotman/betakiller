@@ -7,6 +7,8 @@ use BetaKiller\Content\Shortcode\GalleryShortcode;
 use BetaKiller\Content\Shortcode\ImageShortcode;
 use BetaKiller\Content\Shortcode\YoutubeShortcode;
 use BetaKiller\Helper\LoggerHelperTrait;
+use BetaKiller\Model\ContentGalleryInterface;
+use BetaKiller\Model\ContentImageInterface;
 use BetaKiller\Model\ContentPost;
 use BetaKiller\Model\ContentPostInterface;
 use BetaKiller\Model\Entity;
@@ -106,12 +108,6 @@ class Task_Content_Import_Wordpress extends AbstractTask
 
     /**
      * @Inject
-     * @var \BetaKiller\Repository\ContentImageRepository
-     */
-    private $imageRepository;
-
-    /**
-     * @Inject
      * @var \BetaKiller\Repository\EntityRepository
      */
     private $entityRepository;
@@ -152,6 +148,8 @@ class Task_Content_Import_Wordpress extends AbstractTask
      */
     private $wp;
 
+    private $loadedTmpFiles = [];
+
     protected function defineOptions(): array
     {
         return [
@@ -162,6 +160,12 @@ class Task_Content_Import_Wordpress extends AbstractTask
     /**
      * @param array $params
      *
+     * @throws \BetaKiller\Notification\NotificationException
+     * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \RuntimeException
+     * @throws \InvalidArgumentException
+     * @throws \BetaKiller\Status\StatusWorkflowException
+     * @throws \BetaKiller\Status\StatusException
      * @throws \LogicException
      * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\Content\Shortcode\ShortcodeException
@@ -194,6 +198,11 @@ class Task_Content_Import_Wordpress extends AbstractTask
 
         // Quotes plugin
         $this->importQuotes();
+
+        // Cleanup temp files
+        foreach ($this->loadedTmpFiles as $loadedTmpFile) {
+            unlink($loadedTmpFile);
+        }
     }
 
     /**
@@ -252,55 +261,65 @@ class Task_Content_Import_Wordpress extends AbstractTask
      * @return \BetaKiller\Model\WordpressAttachmentInterface
      * @throws \BetaKiller\Task\TaskException
      */
-    private function processWordpressAttachment(
+    private function createWordpressAttachment(
         array $attach,
         int $entityItemID,
-        AssetsProviderInterface $provider = null
+        AssetsProviderInterface $provider
     ): WordpressAttachmentInterface {
-        $wpID = $attach['ID'];
-        $url  = $attach['guid'];
+        $url = $attach['guid'];
 
-        if (!$wpID || !$url) {
+        if (!$url) {
             throw new TaskException('Empty attach data');
         }
 
         $this->logger->debug('Found attach with guid = :url', [':url' => $url]);
 
-        if (!$provider) {
-            $mime = $attach['post_mime_type'];
+        return $this->storeAttachment($provider, $url, $entityItemID);
+    }
 
-            $this->logger->debug('Creating assets provider by MIME-type :mime', [':mime' => $mime]);
+    /**
+     * @param \BetaKiller\Model\WordpressAttachmentInterface $model
+     */
+    private function importWpAttachmentData(WordpressAttachmentInterface $model): void
+    {
+        $wpPath = $model->getWpPath();
 
-            // Detect and instantiate assets provider by file MIME-type
-            $provider = $this->contentHelper->createAssetsProviderFromMimeType($mime);
+        $wpData = $this->wp->getAttachmentByPath($wpPath);
+
+        if (!$wpData) {
+            $this->logger->warning('No WP data for attachment :path', [':path' => $wpPath]);
+
+            return;
         }
 
-        $model = $this->storeAttachment($provider, $url, $wpID, $entityItemID);
+        $wpID = (int)$wpData['ID'];
+        $model->setWpId($wpID);
 
         // Save created_at + updated_at
-        $created_at = new DateTime($attach['post_date']);
-        $updated_at = new DateTime($attach['post_modified']);
+        $createdAt = new DateTime($wpData['post_date']);
+        $updatedAt = new DateTime($wpData['post_modified']);
 
+        $model->setUploadedAt($createdAt);
+        $model->setLastModifiedAt($updatedAt);
+
+        // Set title for images
         if ($model instanceof AssetsModelImageInterface) {
-            $title = $attach['post_excerpt'];
 
-            if ($title && !$model->getTitle()) {
+            if (!$model->getTitle()) {
+                $title = $wpData['post_excerpt'] ?: $wpData['post_title'];
                 $model->setTitle($title);
             }
+
+            if (!$model->getAlt()) {
+                $meta = $this->wp->getPostMeta($wpID);
+                $model->setAlt($meta['_wp_attachment_image_alt'] ?? '');
+            }
         }
-
-        $model->setUploadedAt($created_at);
-        $model->setLastModifiedAt($updated_at);
-
-        $provider->saveModel($model);
-
-        return $model;
     }
 
     /**
      * @param AssetsProviderInterface $provider
      * @param string                  $url
-     * @param int                     $wpID
      * @param int|null                $entityItemID
      *
      * @return \BetaKiller\Model\WordpressAttachmentInterface
@@ -309,7 +328,6 @@ class Task_Content_Import_Wordpress extends AbstractTask
     private function storeAttachment(
         AssetsProviderInterface $provider,
         string $url,
-        int $wpID,
         ?int $entityItemID = null
     ): WordpressAttachmentInterface {
         $repository = $provider->getRepository();
@@ -321,19 +339,22 @@ class Task_Content_Import_Wordpress extends AbstractTask
             ]);
         }
 
-        // Search for such file already exists
-        $model = $repository->findByWpID($wpID);
+        $urlPath          = parse_url($url, PHP_URL_PATH);
+        $originalFilename = basename($url);
+
+        /** @var WordpressAttachmentInterface $model */
+        $model = $repository->findByWpPath($urlPath);
 
         if ($model) {
-            $this->logger->debug('Attach with WP ID = :id already exists', [':id' => $wpID,]);
+            $this->logger->debug('Attach with WP path = :path already exists', [':path' => $urlPath]);
+
+            // Fetch data from WP by path
+            $this->importWpAttachmentData($model);
 
             return $model;
         }
 
-        $this->logger->debug('Adding attach with WP ID = :id', [':id' => $wpID]);
-
-        $urlPath          = parse_url($url, PHP_URL_PATH);
-        $originalFilename = basename($url);
+        $this->logger->debug('Adding attach with WP path = :path', [':path' => $urlPath]);
 
         // Getting path for local file with attachment content
         $path = $this->getAttachmentPath($urlPath, $provider->getAllowedMimeTypes());
@@ -355,28 +376,23 @@ class Task_Content_Import_Wordpress extends AbstractTask
             }
         }
 
-        // Storing WP path and ID
+        // Storing WP path
         $model->setWpPath($urlPath);
-        $model->setWpId($wpID);
-        $provider->saveModel($model);
 
-        // Cleanup temp files
-        if ($this->attachParsingMode === self::ATTACH_PARSING_MODE_HTTP) {
-            unlink($path);
-        }
+        // Fetch data from WP by path
+        $this->importWpAttachmentData($model);
 
-        $this->logger->info('Attach with WP ID = :id successfully stored', [':id' => $wpID]);
+        $this->logger->info('Attach with WP path = :path successfully stored', [':path' => $urlPath]);
 
         return $model;
     }
 
     /**
-     * @param string $originalUrlPath
-     * @param        $expectedMimes
+     * @param string     $originalUrlPath
+     * @param array|bool $expectedMimes
      *
      * @return bool|null|string
      * @throws \BetaKiller\Task\TaskException
-     * @throws \Request_Exception
      */
     private function getAttachmentPath(string $originalUrlPath, $expectedMimes): ?string
     {
@@ -385,9 +401,15 @@ class Task_Content_Import_Wordpress extends AbstractTask
 
             $this->logger->debug('Loading attach at url = :url', [':url' => $url]);
 
-            // TODO Replace with system-wide crawler
-            $request  = Request::factory($url);
-            $response = $request->execute();
+            try {
+                // TODO Replace with system-wide crawler
+                $request  = Request::factory($url);
+                $response = $request->execute();
+            } catch (\Request_Exception $e) {
+                throw TaskException::wrap($e);
+            } catch (\HTTP_Exception_404 $e) {
+                throw TaskException::wrap($e);
+            }
 
             if ($response->status() !== 200) {
                 throw new TaskException('Got :code status from :url', [
@@ -414,6 +436,8 @@ class Task_Content_Import_Wordpress extends AbstractTask
             $path = tempnam(sys_get_temp_dir(), 'wp-attach-');
 
             file_put_contents($path, $content);
+
+            $this->loadedTmpFiles[] = $path;
 
             return $path;
         }
@@ -443,6 +467,12 @@ class Task_Content_Import_Wordpress extends AbstractTask
     }
 
     /**
+     * @throws \BetaKiller\Notification\NotificationException
+     * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \InvalidArgumentException
+     * @throws \RuntimeException
+     * @throws \BetaKiller\Status\StatusWorkflowException
+     * @throws \BetaKiller\Status\StatusException
      * @throws \LogicException
      * @throws \BetaKiller\Content\Shortcode\ShortcodeException
      * @throws \BetaKiller\Factory\FactoryException
@@ -577,6 +607,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
      * @param \BetaKiller\Model\ContentPostInterface $item
      *
      * @return string
+     * @throws \InvalidArgumentException
      * @throws \ORM_Validation_Exception
      * @throws \LogicException
      * @throws \BetaKiller\Content\Shortcode\ShortcodeException
@@ -622,6 +653,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
      * @param \DiDom\Document $document
      * @param int             $postID
      *
+     * @throws \InvalidArgumentException
      * @throws \ORM_Validation_Exception
      * @throws \LogicException
      * @throws \BetaKiller\Repository\RepositoryException
@@ -658,16 +690,12 @@ class Task_Content_Import_Wordpress extends AbstractTask
                 $link->replace($imageShortcode->asDomText());
             } else {
                 // Link to another attachment
-                $wpAttach = $this->wp->getAttachmentByPath($href);
-
-                if (!$wpAttach) {
-                    throw new TaskException('Unknown attachment href :url', [':url' => $href]);
-                }
-
                 $provider = $this->contentHelper->getAttachmentAssetsProvider();
 
                 // Force saving images in AttachmentAssetsProvider
-                $attachElement = $this->processWordpressAttachment($wpAttach, $postID, $provider);
+                $attachElement = $this->storeAttachment($provider, $href, $postID);
+
+                $provider->saveModel($attachElement);
 
                 /** @var AttachmentShortcode $attachShortcode */
                 $attachShortcode = $this->shortcodeFacade->createFromCodename(AttachmentShortcode::codename());
@@ -698,6 +726,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
      * @param \BetaKiller\Model\ContentPost $post
      * @param array                         $meta
      *
+     * @throws \BetaKiller\Repository\RepositoryException
      * @throws \BetaKiller\Task\TaskException
      */
     private function processThumbnails(ContentPost $post, array $meta): void
@@ -743,14 +772,25 @@ class Task_Content_Import_Wordpress extends AbstractTask
 
         $provider = $this->contentHelper->getPostThumbnailAssetsProvider();
 
-        foreach ($imagesWpData as $imageData) {
-            /** @var \BetaKiller\Model\ContentPostThumbnailInterface $imageModel */
-            $imageModel = $this->processWordpressAttachment($imageData, $post->getID(), $provider);
+        try {
+            foreach ($imagesWpData as $imageData) {
+                /** @var \BetaKiller\Model\ContentPostThumbnailInterface $imageModel */
+                $imageModel = $this->createWordpressAttachment($imageData, $post->getID(), $provider);
 
-            // Linking image to post
-            $imageModel->setPost($post);
+                // Linking image to post
+                $imageModel->setPost($post);
 
-            $provider->saveModel($imageModel);
+                // Fix WP issue when alt was not saved
+                if (!$imageModel->getAlt() && $imageModel->getTitle()) {
+                    $imageModel->setAlt($imageModel->getTitle());
+                }
+
+                $provider->saveModel($imageModel);
+            }
+        } catch (\ORM_Validation_Exception $e) {
+            throw new TaskException(':error', [
+                ':error' => implode(', ', $e->getFormattedErrors()),
+            ]);
         }
     }
 
@@ -759,6 +799,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
      * @param \BetaKiller\Model\ContentPost $item
      *
      * @return string
+     * @throws \RuntimeException
      */
     private function processCustomBbTags(string $content, ContentPost $item): string
     {
@@ -811,6 +852,9 @@ class Task_Content_Import_Wordpress extends AbstractTask
      * @param \BetaKiller\Model\ContentPost                   $post
      *
      * @return null|string
+     * @throws \ORM_Validation_Exception
+     * @throws \BetaKiller\Repository\RepositoryException
+     * @throws \InvalidArgumentException
      * @throws \BetaKiller\Content\Shortcode\ShortcodeException
      * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\Task\TaskException
@@ -819,45 +863,20 @@ class Task_Content_Import_Wordpress extends AbstractTask
     {
         $this->logger->debug('[caption] found');
 
-        $attributes = $s->getParameters();
+        $content  = $s->getContent();
+        $document = new Document($content);
+        $imageTag = $document->first('img');
 
-        $imageWpID = (int)str_replace('attachment_', '', $attributes['id']);
-
-        // Find image in WP and process attachment
-        $wpImageData = $this->wp->getAttachmentByID($imageWpID);
-
-        if (!$wpImageData) {
-            $this->logger->warning('No image found by wp_id :id', [':id' => $imageWpID]);
-
-            return null;
+        if (!$imageTag) {
+            throw new TaskException('Can not detect image tag in [caption]');
         }
 
-        $image = $this->processWordpressAttachment($wpImageData, $post->getID());
+        $shortcode = $this->processImgTag($imageTag, $post->getID());
 
         // Removing <img /> tag
-        $captionText = trim(strip_tags($s->getContent()));
-
-        /** @var ImageShortcode $shortcode */
-        $shortcode = $this->shortcodeFacade->createFromCodename(ImageShortcode::codename());
-
-        // Convert old full-size images to responsive images
-        if (isset($attributes['width']) && (int)$attributes['width'] === 780) { // TODO move 780 to config
-            unset($attributes['width']);
-            $shortcode->setAlignJustify();
-        }
-
-        if (isset($attributes['width'])) {
-            $shortcode->setWidth($attributes['width']);
-        }
-
-        $class = $attributes['class'] ?? null;
-
-        if ($class) {
-            $this->processImageClasses($shortcode, $class);
-        }
+        $captionText = trim(strip_tags($content));
 
         $shortcode->useCaptionLayout($captionText);
-        $shortcode->setID($image->getID());
 
         return $shortcode->asHtml();
     }
@@ -875,17 +894,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
      */
     public function thunderHandlerGallery(ThunderShortcodeInterface $s, ContentPostInterface $post): ?string
     {
-        // TODO Deal with gallery duplicating on multiple task execution
-        // TODO Get WP ids and search for gallery with exact ids
         $this->logger->debug('[gallery] found');
-
-        $gallery = $this->galleryRepository->create();
-
-        // Link gallery to current post
-        $gallery->setEntity($this->contentPostEntity)->setEntityItemID($post->getID());
-
-        /** @var GalleryShortcode $shortcode */
-        $shortcode = $this->shortcodeFacade->createFromCodename(GalleryShortcode::codename());
 
         $wpIDsList = $s->getParameter('ids');
         $type      = $s->getParameter('type');
@@ -894,6 +903,24 @@ class Task_Content_Import_Wordpress extends AbstractTask
         // Removing spaces
         $wpIDsList = str_replace(' ', '', $wpIDsList);
         $wpIDs     = explode(',', $wpIDsList);
+
+        $gallery = $this->createGalleryFromWpIDs($wpIDs, $post->getID());
+
+        // Can not create gallery => remove [gallery] tag
+        if (!$gallery) {
+            return null;
+        }
+
+        // Link gallery to current post
+        $gallery->setEntity($this->contentPostEntity)->setEntityItemID($post->getID());
+
+        // Saving to get ID
+        $this->galleryRepository->save($gallery);
+
+        /** @var GalleryShortcode $shortcode */
+        $shortcode = $this->shortcodeFacade->createFromCodename(GalleryShortcode::codename());
+
+        $shortcode->setID($gallery->getID());
 
         if (strpos($type, 'slider') !== false) {
             $shortcode->useSliderLayout();
@@ -906,10 +933,35 @@ class Task_Content_Import_Wordpress extends AbstractTask
             $shortcode->useDefaultLayout();
         }
 
-        // Saving to get ID
-        $this->galleryRepository->save($gallery);
+        return $shortcode->asHtml();
+    }
 
-        $shortcode->setID($gallery->getID());
+    /**
+     * @param array $wpIDs
+     * @param int   $entityItemID
+     *
+     * @return \BetaKiller\Model\ContentGalleryInterface|null
+     * @throws \ORM_Validation_Exception
+     * @throws \BetaKiller\Repository\RepositoryException
+     * @throws \BetaKiller\Task\TaskException
+     */
+    private function createGalleryFromWpIDs(array $wpIDs, int $entityItemID): ?ContentGalleryInterface
+    {
+        $gallery = $this->galleryRepository->findByImagesWpIDs($wpIDs);
+
+        if ($gallery) {
+            $this->logger->debug('Gallery found by WP IDs');
+
+            return $gallery;
+        }
+
+        $gallery = $this->galleryRepository->create();
+
+        // Link gallery to current post
+        $gallery->setEntity($this->contentPostEntity)->setEntityItemID($entityItemID);
+
+        // Save gallery to populate ID (dirty hack for Kohana ORM)
+        $this->galleryRepository->save($gallery);
 
         $wpImages = $this->wp->getAttachments(null, $wpIDs);
 
@@ -921,15 +973,33 @@ class Task_Content_Import_Wordpress extends AbstractTask
             return null;
         }
 
-        // Process every image in set
-        foreach ($wpImages as $wpImageData) {
-            /** @var \BetaKiller\Model\ContentImageInterface $model */
-            $model = $this->processWordpressAttachment($wpImageData, $post->getID());
+        $this->logger->debug('Creating new gallery from WP IDs');
 
-            $gallery->addImage($model);
+        $provider = $this->contentHelper->getImageAssetsProvider();
+
+        try {
+            // Process every image in set
+            foreach ($wpImages as $wpImageData) {
+                /** @var \BetaKiller\Model\ContentImageInterface $model */
+                $model = $this->createWordpressAttachment($wpImageData, $entityItemID, $provider);
+
+                // Fix WP issue when alt was not saved
+                if (!$model->getAlt() && $model->getTitle()) {
+                    $model->setAlt($model->getTitle());
+                }
+
+                // Save model and populate ID for linking to gallery
+                $provider->saveModel($model);
+
+                $gallery->addImage($model);
+            }
+        } catch (\ORM_Validation_Exception $e) {
+            throw new TaskException(':error', [
+                ':error' => implode(', ', $e->getFormattedErrors()),
+            ]);
         }
 
-        return $shortcode->asHtml();
+        return $gallery;
     }
 
     /**
@@ -948,11 +1018,48 @@ class Task_Content_Import_Wordpress extends AbstractTask
     {
         $this->logger->debug('[wonderplugin_slider] found');
 
-        // TODO Get WP ids and search for gallery with exact ids
-        $gallery = $this->galleryRepository->create();
+        $wonderPluginID = $s->getParameter('id');
+        $config         = $this->wp->getWonderpluginSliderConfig($wonderPluginID);
+        $this->logger->debug('Processing wonderplugin slider :id', [':id' => $wonderPluginID]);
 
-        // Link gallery to current post
-        $gallery->setEntity($this->contentPostEntity)->setEntityItemID($post->getID());
+        /** @var array $slides */
+        $slides = $config['slides'];
+
+        $provider = $this->contentHelper->getImageAssetsProvider();
+        $images   = [];
+
+        foreach ($slides as $slide) {
+            $url = $slide['image'];
+
+            /** @var \BetaKiller\Model\ContentImageInterface $image */
+            $image = $this->storeAttachment($provider, $url, $post->getID());
+
+            if (!$image->getTitle()) {
+                $image->setTitle($slide['title']);
+            }
+
+            if (!$image->getAlt()) {
+                $image->setAlt($slide['alt']);
+            }
+
+            // Fix WP issue when alt was not saved
+            if (!$image->getAlt() && $image->getTitle()) {
+                $image->setAlt($image->getTitle());
+            }
+
+            try {
+                // Save model and populate ID for linking to gallery
+                $provider->saveModel($image);
+            } catch (\ORM_Validation_Exception $e) {
+                throw new TaskException(':error', [
+                    ':error' => implode(', ', $e->getFormattedErrors()),
+                ]);
+            }
+
+            $images[] = $image;
+        }
+
+        $gallery = $this->createGalleryFromImages($images, $post->getID());
 
         /** @var GalleryShortcode $shortcode */
         $shortcode = $this->shortcodeFacade->createFromCodename(GalleryShortcode::codename());
@@ -963,44 +1070,59 @@ class Task_Content_Import_Wordpress extends AbstractTask
         $shortcode->setID($gallery->getID());
         $shortcode->useSliderLayout();
 
-        $wonderPluginID = $s->getParameter('id');
-        $config         = $this->wp->getWonderpluginSliderConfig($wonderPluginID);
-        $this->logger->debug('Processing wonderplugin slider :id', [':id' => $wonderPluginID]);
+        return $shortcode->asHtml();
+    }
 
-        /** @var array $slides */
-        $slides = $config['slides'];
+    /**
+     * @param ContentImageInterface[] $images
+     *
+     * @param int                     $entityItemID
+     *
+     * @return \BetaKiller\Model\ContentGalleryInterface
+     * @throws \BetaKiller\Repository\RepositoryException
+     * @throws \ORM_Validation_Exception
+     */
+    private function createGalleryFromImages(array $images, int $entityItemID): ContentGalleryInterface
+    {
+        $wpIDs = array_map(function (ContentImageInterface $image) {
+            return $image->getWpId();
+        }, $images);
 
-        foreach ($slides as $slide) {
-            $url = $slide['image'];
+        $gallery = $this->galleryRepository->findByImagesWpIDs($wpIDs);
 
-            // Searching for image
-            $wpImage = $this->wp->getAttachmentByPath($url);
+        // Gallery found => images linked already
+        if ($gallery) {
+            $this->logger->debug('Gallery :id found bu WP ids', [':id' => $gallery->getID()]);
 
-            if (!$wpImage) {
-                throw new TaskException('Unknown image in wonderplugin: :url', [':url' => $url]);
-            }
+            return $gallery;
+        }
 
-            if (!$wpImage['post_excerpt']) {
-                $caption = $slide['title'] ?: $slide['alt'];
+        // Nothing found => create new gallery
+        $gallery = $this->galleryRepository->create();
 
-                // Preset image title
-                $wpImage['post_excerpt'] = $caption;
-            }
+        // Link gallery to current post
+        $gallery->setEntity($this->contentPostEntity)->setEntityItemID($entityItemID);
 
-            /** @var \BetaKiller\Model\ContentImageInterface $image */
-            $image = $this->processWordpressAttachment($wpImage, $post->getID());
+        // Save gallery to obtain ID (dirty hack for Kohana ORM)
+        $this->galleryRepository->save($gallery);
 
-            $this->logger->debug('Adding image :id to wonderplugin slider', [':id' => $image->getID()]);
+        $this->logger->debug('New gallery created');
 
+        foreach ($images as $image) {
+            $this->logger->debug('Adding image :id to gallery', [':id' => $image->getID()]);
             $gallery->addImage($image);
         }
 
-        return $shortcode->asHtml();
+        return $gallery;
     }
 
     /**
      * @param \DiDom\Document $root
      * @param int             $entityItemID
+     *
+     * @throws \InvalidArgumentException
+     * @throws \BetaKiller\Content\Shortcode\ShortcodeException
+     * @throws \LogicException
      */
     private function processImagesInText(Document $root, int $entityItemID): void
     {
@@ -1032,11 +1154,11 @@ class Task_Content_Import_Wordpress extends AbstractTask
      * @param                $entityItemID
      *
      * @return ImageShortcode
+     * @throws \ORM_Validation_Exception
      * @throws \BetaKiller\Content\Shortcode\ShortcodeException
      * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\Repository\RepositoryException
      * @throws \BetaKiller\Task\TaskException
-     * @throws \ORM_Validation_Exception
      */
     private function processImgTag(\DiDom\Element $node, $entityItemID): ImageShortcode
     {
@@ -1048,17 +1170,13 @@ class Task_Content_Import_Wordpress extends AbstractTask
 
         $this->logger->debug('Found inline image :tag', [':tag' => $node->html()]);
 
-        $wpImage = $this->wp->getAttachmentByPath($originalUrl);
-
-        if (!$wpImage) {
-            throw new TaskException('Unknown image with src :value', [':value' => $originalUrl]);
-        }
+        $provider = $this->contentHelper->getImageAssetsProvider();
 
         /** @var \BetaKiller\Model\ContentImageInterface $image */
-        $image = $this->processWordpressAttachment($wpImage, $entityItemID);
+        $image = $this->storeAttachment($provider, $originalUrl, $entityItemID);
 
-        $alt   = trim(Arr::get($attributes, 'alt'));
-        $title = trim(Arr::get($attributes, 'title'));
+        $alt   = trim($attributes['alt'] ?? null);
+        $title = trim($attributes['title'] ?? null);
 
         // Save alt and title in image model
         if ($alt) {
@@ -1069,7 +1187,8 @@ class Task_Content_Import_Wordpress extends AbstractTask
             $image->setTitle($title);
         }
 
-        $this->imageRepository->save($image);
+        // Save model and populate ID
+        $provider->saveModel($image);
 
         /** @var ImageShortcode $shortcode */
         $shortcode = $this->shortcodeFacade->createFromCodename(ImageShortcode::codename());
@@ -1126,7 +1245,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
             'size-full'   => function () {
                 // Nothing to do here
             },
-            'size-medium'   => function () {
+            'size-medium' => function () {
                 // Nothing to do here
             },
         ];
@@ -1216,6 +1335,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
      * @param int    $entityItemID
      *
      * @return string
+     * @throws \BetaKiller\Content\Shortcode\ShortcodeException
      * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\Exception
      * @throws \BetaKiller\Repository\RepositoryException
@@ -1361,7 +1481,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
     private function importQuotes(): void
     {
         $quotesData = $this->wp->getQuotesCollectionQuotes();
-        $counter = 0;
+        $counter    = 0;
 
         foreach ($quotesData as $data) {
             $id        = $data['id'];

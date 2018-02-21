@@ -401,12 +401,14 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
     }
 
     /**
+     * Returns asset model with predefined fields.
+     * Model needs to be saved in repository after calling this method.
+     *
      * @param string                          $fullPath
      * @param string                          $originalName
      * @param \BetaKiller\Model\UserInterface $user
      *
      * @return \BetaKiller\Assets\Model\AssetsModelInterface
-     * @throws \BetaKiller\Repository\RepositoryException
      * @throws \BetaKiller\Assets\AssetsProviderException
      * @throws \BetaKiller\Assets\AssetsException
      * @throws \BetaKiller\Assets\AssetsExceptionUpload
@@ -450,9 +452,6 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
 
         // Place file into storage
         $this->setContent($model, $content);
-
-        // Save model
-        $this->saveModel($model);
 
         // Deploy original file if needed
         $this->deploymentService->deploy($this, $model, $content, self::ACTION_ORIGINAL);

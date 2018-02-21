@@ -1,10 +1,10 @@
 <?php
 namespace BetaKiller\Content\Shortcode;
 
-use BetaKiller\Content\Shortcode\Attribute\ClassAttribute;
 use BetaKiller\Content\Shortcode\Attribute\NumberAttribute;
 use BetaKiller\Content\Shortcode\Attribute\TextAttribute;
 use BetaKiller\Helper\AssetsHelper;
+use BetaKiller\Model\ContentImageInterface;
 use BetaKiller\Model\EntityModelInterface;
 use BetaKiller\Repository\ContentAttachmentRepository;
 use BetaKiller\Repository\ContentImageRepository;
@@ -12,7 +12,6 @@ use BetaKiller\Repository\ContentImageRepository;
 class AttachmentShortcode extends AbstractContentElementShortcode
 {
     private const ATTR_LABEL    = 'label';
-    private const ATTR_TITLE    = 'title';
     private const ATTR_IMAGE_ID = 'image-id';
 
     private const LAYOUT_TEXT   = 'text';
@@ -73,10 +72,13 @@ class AttachmentShortcode extends AbstractContentElementShortcode
     protected function getContentElementShortcodeDefinitions(): array
     {
         return [
-            new TextAttribute(self::ATTR_LABEL),
-            new TextAttribute(self::ATTR_TITLE, true),
-            new ClassAttribute(true),
-            new NumberAttribute(self::ATTR_IMAGE_ID, true),
+            (new TextAttribute(self::ATTR_LABEL))
+                ->optional()
+                ->dependsOn(self::ATTR_LAYOUT, self::LAYOUT_TEXT),
+
+            (new NumberAttribute(self::ATTR_IMAGE_ID))
+                ->optional()
+                ->dependsOn(self::ATTR_LAYOUT, self::LAYOUT_IMAGE),
         ];
     }
 
@@ -116,6 +118,9 @@ class AttachmentShortcode extends AbstractContentElementShortcode
 
     /**
      * @return array
+     * @throws \BetaKiller\Factory\FactoryException
+     * @throws \BetaKiller\Assets\AssetsStorageException
+     * @throws \BetaKiller\Assets\AssetsException
      * @throws \BetaKiller\Content\Shortcode\ShortcodeException
      */
     public function getWidgetData(): array
@@ -128,26 +133,36 @@ class AttachmentShortcode extends AbstractContentElementShortcode
 
         $model = $this->attachmentRepository->findById($attachID);
 
-        $title = \HTML::chars($this->getAttribute('title'));
-        $class = $this->getAttribute('class');
-
         $i18nParams = [
             ':name' => $model->getOriginalName(),
         ];
 
-        $imageUrl = $this->isLayout(self::LAYOUT_IMAGE)
-            ? $this->getImageUrl()
+        $imageData = $this->isLayout(self::LAYOUT_IMAGE)
+            ? $this->getImageData()
             : null;
 
         return [
-            'image'  => $imageUrl,
-            'label'  => $this->getAttribute(self::ATTR_LABEL),
+            'image'  => $imageData,
+            'label'  => $this->getAttribute(self::ATTR_LABEL) ?: __('custom_tag.attachment.title', $i18nParams),
             'url'    => $this->assetsHelper->getDownloadUrl($model),
-            'title'  => $title ?: __('custom_tag.attachment.title', $i18nParams),
-            'alt'    => __('custom_tag.attachment.alt', $i18nParams),
-            'class'  => $class,
             'layout' => $this->getLayout(),
+
+            'button_image_alt' => __('custom_tag.attachment.alt', $i18nParams),
         ];
+    }
+
+    /**
+     * @return array
+     * @throws \BetaKiller\Factory\FactoryException
+     * @throws \BetaKiller\Assets\AssetsStorageException
+     * @throws \BetaKiller\Assets\AssetsException
+     * @throws \BetaKiller\Content\Shortcode\ShortcodeException
+     */
+    private function getImageData(): array
+    {
+        $image = $this->getImage();
+
+        return $this->assetsHelper->getAttributesForImgTag($image, $image::SIZE_ORIGINAL);
     }
 
     /**
@@ -156,15 +171,24 @@ class AttachmentShortcode extends AbstractContentElementShortcode
      */
     private function getImageUrl(): string
     {
+        $image = $this->getImage();
+
+        return $this->assetsHelper->getOriginalUrl($image);
+    }
+
+    /**
+     * @return \BetaKiller\Model\ContentImageInterface
+     * @throws \BetaKiller\Content\Shortcode\ShortcodeException
+     */
+    private function getImage(): ContentImageInterface
+    {
         $id = $this->getAttribute(self::ATTR_IMAGE_ID);
 
         if (!$id) {
             throw new ShortcodeException('Missing image_id attribute');
         }
 
-        $image = $this->imageRepository->findById($id);
-
-        return $this->assetsHelper->getOriginalUrl($image);
+        return $this->imageRepository->findById($id);
     }
 
     /**
@@ -185,6 +209,7 @@ class AttachmentShortcode extends AbstractContentElementShortcode
     public function useImageLayout(int $imageID): void
     {
         $this->setLayout(self::LAYOUT_IMAGE);
+        $this->setAttribute(self::ATTR_LABEL, null);
         $this->setImageID($imageID);
     }
 

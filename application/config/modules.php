@@ -41,6 +41,7 @@ return [
     'paginate'              => MODPATH.'paginate',              // Paginate abstraction for ORM, ORM-REST and others
     'robots-txt'            => MODPATH.'robots-txt',            // Serving /robots.txt
     'search'                => MODPATH.'search',                // Search and filtering capabilities
+//    'security-headers'      => MODPATH.'security-headers',      // Send CSP and other security headers
     'sitemap'               => MODPATH.'sitemap',               // Generating sitemap.xml
     'twig'                  => MODPATH.'twig',                  // Twig template engine
     'ulogin'                => MODPATH.'ulogin',                // Universal login via ulogin.ru

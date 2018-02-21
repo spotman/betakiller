@@ -2,6 +2,7 @@ require([
   "jquery",
   "content.api.rpc.definition",
   'materialize',
+  'ckeditor.jquery'
 ], function ($, api) {
 
   const shortcodeToCustomTag = {

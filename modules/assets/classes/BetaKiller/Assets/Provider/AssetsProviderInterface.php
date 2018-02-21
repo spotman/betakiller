@@ -165,6 +165,9 @@ interface AssetsProviderInterface
      * Proxy for saving model (provider already has right repository inside)
      *
      * @param \BetaKiller\Assets\Model\AssetsModelInterface $model
+     *
+     * @throws \BetaKiller\Repository\RepositoryException
+     * @throws \ORM_Validation_Exception
      */
     public function saveModel(AssetsModelInterface $model): void;
 

@@ -46,7 +46,7 @@ class ContentPostWorkflow extends StatusWorkflow
     /**
      * @throws \BetaKiller\Status\StatusWorkflowException
      */
-    public function draft()
+    public function draft(): void
     {
         if ($this->model()->hasCurrentStatus()) {
             throw new StatusWorkflowException('Can not mark post [:id] as draft coz it is in [:status] status', [
@@ -59,10 +59,11 @@ class ContentPostWorkflow extends StatusWorkflow
     }
 
     /**
-     * @throws \Kohana_Exception
+     * @throws \BetaKiller\Repository\RepositoryException
+     * @throws \BetaKiller\Notification\NotificationException
+     * @throws \BetaKiller\IFace\Exception\IFaceException
      * @throws \BetaKiller\Status\StatusWorkflowException
      * @throws \BetaKiller\Status\StatusException
-     * @throws \HTTP_Exception_501
      */
     public function complete(): void
     {
@@ -77,11 +78,11 @@ class ContentPostWorkflow extends StatusWorkflow
     }
 
     /**
+     * @throws \BetaKiller\IFace\Exception\IFaceException
      * @throws \BetaKiller\Notification\NotificationException
      * @throws \BetaKiller\Repository\RepositoryException
-     * @throws \Kohana_Exception
      */
-    private function notifyModeratorAboutCompletePost()
+    private function notifyModeratorAboutCompletePost(): void
     {
         $message = $this->notificationHelper->createMessage('moderator/post/complete');
 
@@ -99,10 +100,8 @@ class ContentPostWorkflow extends StatusWorkflow
     }
 
     /**
-     * @throws \Kohana_Exception
      * @throws \BetaKiller\Status\StatusException
      * @throws \BetaKiller\Status\StatusWorkflowException
-     * @throws \HTTP_Exception_501
      */
     public function publish(): void
     {
@@ -118,7 +117,6 @@ class ContentPostWorkflow extends StatusWorkflow
 
     /**
      * @throws \BetaKiller\Status\StatusException
-     * @throws \HTTP_Exception_501
      */
     public function pause(): void
     {
@@ -127,7 +125,6 @@ class ContentPostWorkflow extends StatusWorkflow
 
     /**
      * @throws \BetaKiller\Status\StatusException
-     * @throws \HTTP_Exception_501
      */
     public function fix(): void
     {
@@ -136,7 +133,7 @@ class ContentPostWorkflow extends StatusWorkflow
         $this->notifyEditorAboutFixRequest();
     }
 
-    private function notifyEditorAboutFixRequest()
+    private function notifyEditorAboutFixRequest(): void
     {
         // TODO Get user which is requested for fix
         // TODO Request content manager for editing
@@ -144,7 +141,6 @@ class ContentPostWorkflow extends StatusWorkflow
 
     /**
      * @throws \BetaKiller\Status\StatusWorkflowException
-     * @throws \Kohana_Exception
      */
     protected function makeUri(): void
     {
@@ -168,7 +164,7 @@ class ContentPostWorkflow extends StatusWorkflow
     }
 
     /**
-     * @return \BetaKiller\Model\ContentPost|\BetaKiller\Status\StatusRelatedModelInterface
+     * @return \BetaKiller\Model\ContentPostInterface|\BetaKiller\Status\StatusRelatedModelInterface
      */
     protected function model()
     {

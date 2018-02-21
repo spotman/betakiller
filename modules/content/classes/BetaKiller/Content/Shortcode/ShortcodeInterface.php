@@ -33,9 +33,16 @@ interface ShortcodeInterface
     /**
      * @param string $key
      *
+     * @return bool
+     */
+    public function hasAttribute(string $key): bool;
+
+    /**
+     * @param string $name
+     *
      * @return null|string
      */
-    public function getAttribute(string $key): ?string;
+    public function getAttribute(string $name): ?string;
 
     /**
      * @param string      $key

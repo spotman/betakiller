@@ -1,7 +1,6 @@
 <?php
 namespace BetaKiller\Content\Shortcode;
 
-use BetaKiller\Content\Shortcode\Attribute\NumberAttribute;
 use BetaKiller\Model\ContentYoutubeRecord;
 use BetaKiller\Model\EntityModelInterface;
 use BetaKiller\Repository\ContentYoutubeRecordRepository;
@@ -31,10 +30,8 @@ class YoutubeShortcode extends AbstractContentElementShortcode
      */
     protected function getContentElementShortcodeDefinitions(): array
     {
-        return [
-            new NumberAttribute('width', true),
-            new NumberAttribute('height', true),
-        ];
+        // No attributes needed
+        return [];
     }
 
     /**
@@ -60,14 +57,11 @@ class YoutubeShortcode extends AbstractContentElementShortcode
 
         $model = $this->repository->findById($videoID);
 
-        $width  = (int)$this->getAttribute('width');
-        $height = (int)$this->getAttribute('height');
-
         return [
             'video' => [
                 'src'    => $model->getYoutubeEmbedUrl(),
-                'width'  => $width,
-                'height' => $height,
+                'width'  => $model->getWidth(),
+                'height' => $model->getHeight(),
             ],
         ];
     }

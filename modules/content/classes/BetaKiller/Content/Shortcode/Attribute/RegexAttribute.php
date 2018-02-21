@@ -9,15 +9,14 @@ class RegexAttribute extends AbstractShortcodeAttribute
     /**
      * RegexAttribute constructor.
      *
-     * @param string    $name
-     * @param string    $pattern
-     * @param bool|null $isOptional
+     * @param string $name
+     * @param string $pattern
      */
-    public function __construct(string $name, string $pattern, bool $isOptional = null)
+    public function __construct(string $name, string $pattern)
     {
         $this->pattern = $pattern;
 
-        parent::__construct($name, $isOptional);
+        parent::__construct($name);
     }
 
     public function isValueAvailable(string $value): bool

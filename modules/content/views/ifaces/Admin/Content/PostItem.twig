@@ -3,30 +3,33 @@
 {% block page_content %}
 
   {% set actions_config = {
-  "complete":         { color: "green", icon: "done", autosave: true },
-  "publish":          { color: "green", icon: "present_to_all", autosave: true },
-  "reject":           { color: "orange", icon: "thumb_down", autosave: false },
-  "pause":            { color: "grey", icon: "pause", autosave: false },
-  "fix":              { color: "orange", icon: "settings_backup_restore", autosave: false },
+    "complete":         { color: "green", icon: "done", autosave: true },
+    "publish":          { color: "green", icon: "present_to_all", autosave: true },
+    "reject":           { color: "orange", icon: "thumb_down", autosave: false },
+    "pause":            { color: "grey", icon: "pause", autosave: false },
+    "fix":              { color: "orange", icon: "settings_backup_restore", autosave: false },
   } %}
 
   {% set isUpdateAllowed = post.isUpdateAllowed %}
 
-    {{ js("ckeditor/ckeditor.js") }}
-    {{ js("ckeditor/adapters/jquery.js") }}
+  {{ js("require.js/content.config.js") }}
 
-    {{ js("ifaces/admin/content-post-item.js") }}
-    {{ css("ifaces/admin/content-post-item.css") }}
+  {{ js("ckeditor/ckeditor.js") }}
+  {#{{ js("ckeditor/adapters/jquery.js") }}#}
+
+  {{ js("ifaces/admin/content-post-item.js") }}
+  {{ css("ifaces/admin/content-post-item.css") }}
 
   <div class="row">
     <div class="col s12 xl9">
       <div class="row">
         <form id="post-form" action="" method="post" class="col s12" data-update-allowed="{{ isUpdateAllowed|bool }}">
-          <input type="hidden" name="id" value="{{ post.id }}" />
+          <input type="hidden" name="id" value="{{ post.id }}"/>
           <div class="row">
             <div class="input-field col s12">
               <i class="material-icons prefix">label_outline</i>
-              <input name="label" id="article-label" placeholder="Post label" value="{{ post.label }}" {{ isUpdateAllowed ? "" : "disabled" }} />
+              <input name="label" id="article-label" placeholder="Post label"
+                     value="{{ post.label }}" {{ isUpdateAllowed ? "" : "disabled" }} />
               <label for="article-label" class="active">Label</label>
             </div>
           </div>
@@ -34,7 +37,7 @@
           <div class="row">
             <div class="input-field col s12">
               <i class="material-icons prefix">link</i>
-              <input name="uri" id="article-uri" value="{{ post.uri }}" readonly />
+              <input name="uri" id="article-uri" value="{{ post.uri }}" readonly/>
               <label for="article-uri" class="active">URI</label>
             </div>
           </div>
@@ -54,7 +57,7 @@
 
           {# TODO thumbnails edit #}
           <div class="row">
-            <div class="col s12">
+            <div class="input-field col s12">
               {% for thumb_id,thumb_image in post.thumbnails %}
                 {{ image(thumb_image, {"data-id": thumb_id, class: "responsive-img"}) }}
               {% endfor %}
@@ -75,7 +78,8 @@
           <div class="row">
             <div class="input-field col s12">
               <i class="material-icons prefix">title</i>
-              <input name="title" id="article-title" value="{{ post.title }}" data-length="60" placeholder="Post title, used in HTML &lsaquo;title&rsaquo; tag" {{ isUpdateAllowed ? "" : "disabled" }} />
+              <input name="title" id="article-title" value="{{ post.title }}" data-length="60"
+                     placeholder="Post title, used in HTML &lsaquo;title&rsaquo; tag" {{ isUpdateAllowed ? "" : "disabled" }} />
               <label for="article-title" class="active">HTML &lt;title&gt;</label>
             </div>
           </div>
@@ -83,7 +87,9 @@
           <div class="row">
             <div class="input-field col s12">
               <i class="material-icons prefix">description</i>
-              <textarea name="description" id="article-description" class="materialize-textarea" rows="3" data-length="160" placeholder="Post title, used in HTML &lt;description&gt; meta tag" {{ isUpdateAllowed ? "" : "disabled" }}>{{ post.description }}</textarea>
+              <textarea name="description" id="article-description" class="materialize-textarea" rows="3"
+                        data-length="160"
+                        placeholder="Post title, used in HTML &lt;description&gt; meta tag" {{ isUpdateAllowed ? "" : "disabled" }}>{{ post.description }}</textarea>
               <label for="article-description">HTML &lt;description&gt; meta tag</label>
             </div>
           </div>

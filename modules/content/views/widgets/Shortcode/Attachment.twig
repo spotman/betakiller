@@ -1,14 +1,11 @@
 {% if layout in ["image", "button"] %}
   {% set style = "display: block; margin: 15px 0; text-align: center" %}
 {% endif %}
-
-<a href="{{ url }}" title="{{ title }}" class="{{ class ~ " download-attachment" }}"
-   target="_blank" style="{{ style|default() }}">
+<a href="{{ url }}" class="download-attachment"
+   target="_blank" rel="noopener noreferrer" style="{{ style|default() }}">
   {% if layout == "image" %}
-    <img src="{{ image }}" alt="{{ alt }}" style="max-width: 100%" />
+    {{ image(image, { style: "max-width: 100%" }) }}
   {% elseif layout == "button" %}
-    <img src="{{ static("images/download-button.png") }}" alt="{{ alt }}" />
-  {% else %}
-    {{ label|default(title) }}
-  {% endif %}
+    <img src="{{ static("images/download-button.png") }}" alt="{{ button_image_alt }}" />
+  {% else %}{{ label }}{% endif %}
 </a>

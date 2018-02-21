@@ -13,4 +13,9 @@ class ORM_Validation_Exception extends Kohana_ORM_Validation_Exception
     {
         return $this->_objects['_object'];
     }
+
+    public function getFormattedErrors(): array
+    {
+        return $this->errors('orm');
+    }
 }

@@ -25,18 +25,17 @@ abstract class StatusWorkflow implements StatusWorkflowInterface
      * @param string $codename
      *
      * @throws \BetaKiller\Status\StatusException
-     * @throws \HTTP_Exception_501
      */
     public function doTransition(string $codename): void
     {
         // Find allowed target transition by provided codename
-        $target_transition = $this->findTargetTransition($codename);
+        $targetTransition = $this->findTargetTransition($codename);
 
         // Make custom check
-        $this->customTargetTransitionCheck($target_transition);
+        $this->customTargetTransitionCheck($targetTransition);
 
         // Process transition
-        $this->model->doStatusTransition($target_transition);
+        $this->model->doStatusTransition($targetTransition);
 
         // Write history record if needed
         if ($this->isHistoryEnabled()) {
@@ -46,7 +45,7 @@ abstract class StatusWorkflow implements StatusWorkflowInterface
         }
     }
 
-    protected function customTargetTransitionCheck(StatusTransitionModelInterface $transition)
+    protected function customTargetTransitionCheck(StatusTransitionModelInterface $transition): void
     {
         // Empty by default
     }

@@ -30,9 +30,8 @@ class ImageShortcode extends AbstractContentElementShortcode
         self::ATTR_ALIGN_JUSTIFY,
     ];
 
-    private const ATTR_ALT   = 'alt';
-    private const ATTR_TITLE = 'title';
     private const ATTR_WIDTH = 'width';
+    private const ATTR_TITLE = 'title';
 
     /**
      * @var \BetaKiller\Repository\ContentImageRepository
@@ -68,12 +67,17 @@ class ImageShortcode extends AbstractContentElementShortcode
     protected function getContentElementShortcodeDefinitions(): array
     {
         return [
-            new BooleanAttribute(self::ATTR_ZOOMABLE, true),
-            new TextAttribute(self::ATTR_ALT, true),
-            new TextAttribute(self::ATTR_TITLE, true),
-            new DiscreteValuesAttribute(self::ATTR_ALIGN, self::ATTR_ALIGN_VALUES, true),
-//            new ClassAttribute(true),
-            new NumberAttribute(self::ATTR_WIDTH, true),
+            (new NumberAttribute(self::ATTR_WIDTH))
+                ->optional(),
+
+            (new BooleanAttribute(self::ATTR_ZOOMABLE))
+                ->optionalFalse(),
+
+            (new DiscreteValuesAttribute(self::ATTR_ALIGN, self::ATTR_ALIGN_VALUES))
+                ->optional(self::ATTR_ALIGN_JUSTIFY),
+
+            (new TextAttribute(self::ATTR_TITLE))
+                ->dependsOn(self::ATTR_LAYOUT, self::LAYOUT_CAPTION),
         ];
     }
 
@@ -113,7 +117,17 @@ class ImageShortcode extends AbstractContentElementShortcode
     public function useCaptionLayout(string $title): void
     {
         $this->setLayout(self::LAYOUT_CAPTION);
-        $this->setAttribute('title', $title);
+        $this->setTitle($title);
+    }
+
+    /**
+     * @param null|string $title
+     *
+     * @throws \BetaKiller\Content\Shortcode\ShortcodeException
+     */
+    private function setTitle(?string $title): void
+    {
+        $this->setAttribute(self::ATTR_TITLE, $title);
     }
 
     /**
@@ -205,15 +219,13 @@ class ImageShortcode extends AbstractContentElementShortcode
 
         $model = $this->imageRepository->findById($imageID);
 
-        $title = $this->getAttribute(self::ATTR_TITLE);
         $align = $this->getAttribute(self::ATTR_ALIGN) ?? null;
-        $alt   = $this->getAttribute(self::ATTR_ALT);
         $width = $this->getAttribute(self::ATTR_WIDTH);
 
         $attributes = [
             'id'    => 'content-image-'.$model->getID(),
-            'title' => $title ?: $model->getTitle(),
-            'alt'   => $alt ?: $model->getAlt(),
+            'title' => $model->getTitle(),
+            'alt'   => $model->getAlt(),
             'width' => $width,
         ];
 
@@ -223,7 +235,7 @@ class ImageShortcode extends AbstractContentElementShortcode
             'layout'   => $this->getLayout(),
             'zoomable' => $this->isZoomable(),
 
-            'caption'    => $title,
+            'caption'    => $this->getAttribute(self::ATTR_TITLE) ?: $model->getTitle(),
             'alignClass' => $alignClass,
 
             'image' => $this->assetsHelper->getAttributesForImgTag($model, $model::SIZE_ORIGINAL, $attributes),
