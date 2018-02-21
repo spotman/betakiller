@@ -16,6 +16,11 @@ interface ShortcodeInterface
     public function getTagName(): string;
 
     /**
+     * @return \BetaKiller\Content\Shortcode\Attribute\ShortcodeAttributeInterface[]
+     */
+    public function getAttributesDefinitions(): array;
+
+    /**
      * @param array $values
      */
     public function setAttributes(array $values): void;
@@ -97,4 +102,9 @@ interface ShortcodeInterface
      * @return \DOMText
      */
     public function asDomText(): \DOMText;
+
+    /**
+     * Validate attributes
+     */
+    public function validateAttributes(): void;
 }

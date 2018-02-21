@@ -2,9 +2,8 @@
 namespace BetaKiller\Content\Shortcode;
 
 use BetaKiller\Content\Shortcode\Attribute\BooleanAttribute;
-use BetaKiller\Content\Shortcode\Attribute\DiscreteValuesAttribute;
 use BetaKiller\Content\Shortcode\Attribute\NumberAttribute;
-use BetaKiller\Content\Shortcode\Attribute\TextAttribute;
+use BetaKiller\Content\Shortcode\Attribute\SwitchAttribute;
 use BetaKiller\Content\Shortcode\Editor\EditorListingItem;
 use BetaKiller\Helper\AssetsHelper;
 use BetaKiller\Model\EntityModelInterface;
@@ -24,14 +23,13 @@ class ImageShortcode extends AbstractContentElementShortcode
     private const ATTR_ALIGN_JUSTIFY = 'justify';
 
     private const ATTR_ALIGN_VALUES = [
+        self::ATTR_ALIGN_JUSTIFY,
+        self::ATTR_ALIGN_CENTER,
         self::ATTR_ALIGN_LEFT,
         self::ATTR_ALIGN_RIGHT,
-        self::ATTR_ALIGN_CENTER,
-        self::ATTR_ALIGN_JUSTIFY,
     ];
 
     private const ATTR_WIDTH = 'width';
-    private const ATTR_TITLE = 'title';
 
     /**
      * @var \BetaKiller\Repository\ContentImageRepository
@@ -67,17 +65,14 @@ class ImageShortcode extends AbstractContentElementShortcode
     protected function getContentElementShortcodeDefinitions(): array
     {
         return [
-            (new NumberAttribute(self::ATTR_WIDTH))
-                ->optional(),
+            (new SwitchAttribute(self::ATTR_ALIGN, self::ATTR_ALIGN_VALUES))
+                ->optional(self::ATTR_ALIGN_JUSTIFY),
 
             (new BooleanAttribute(self::ATTR_ZOOMABLE))
                 ->optionalFalse(),
 
-            (new DiscreteValuesAttribute(self::ATTR_ALIGN, self::ATTR_ALIGN_VALUES))
-                ->optional(self::ATTR_ALIGN_JUSTIFY),
-
-            (new TextAttribute(self::ATTR_TITLE))
-                ->dependsOn(self::ATTR_LAYOUT, self::LAYOUT_CAPTION),
+            (new NumberAttribute(self::ATTR_WIDTH))
+                ->optional(),
         ];
     }
 
@@ -97,7 +92,7 @@ class ImageShortcode extends AbstractContentElementShortcode
      */
     public function enableZoomable(): void
     {
-        $this->setAttribute(self::ATTR_ZOOMABLE, BooleanAttribute::TRUE);
+        $this->setAttribute(self::ATTR_ZOOMABLE, BooleanAttribute::VALUE_TRUE);
     }
 
     /**
@@ -106,28 +101,15 @@ class ImageShortcode extends AbstractContentElementShortcode
      */
     public function isZoomable(): bool
     {
-        return $this->getAttribute(self::ATTR_ZOOMABLE) === BooleanAttribute::TRUE;
+        return $this->getAttribute(self::ATTR_ZOOMABLE) === BooleanAttribute::VALUE_TRUE;
     }
 
     /**
-     * @param string $title
-     *
      * @throws \BetaKiller\Content\Shortcode\ShortcodeException
      */
-    public function useCaptionLayout(string $title): void
+    public function useCaptionLayout(): void
     {
         $this->setLayout(self::LAYOUT_CAPTION);
-        $this->setTitle($title);
-    }
-
-    /**
-     * @param null|string $title
-     *
-     * @throws \BetaKiller\Content\Shortcode\ShortcodeException
-     */
-    private function setTitle(?string $title): void
-    {
-        $this->setAttribute(self::ATTR_TITLE, $title);
     }
 
     /**
@@ -235,7 +217,7 @@ class ImageShortcode extends AbstractContentElementShortcode
             'layout'   => $this->getLayout(),
             'zoomable' => $this->isZoomable(),
 
-            'caption'    => $this->getAttribute(self::ATTR_TITLE) ?: $model->getTitle(),
+            'caption'    => $model->getTitle(),
             'alignClass' => $alignClass,
 
             'image' => $this->assetsHelper->getAttributesForImgTag($model, $model::SIZE_ORIGINAL, $attributes),

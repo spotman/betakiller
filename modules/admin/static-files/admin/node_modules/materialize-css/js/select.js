@@ -2,7 +2,8 @@
   'use strict';
 
   let _defaults = {
-    classes: ''
+    classes: '',
+    dropdownOptions: {}
   };
 
 
@@ -10,27 +11,33 @@
    * @class
    *
    */
-  class Select extends Component {
+  class FormSelect extends Component {
     /**
-     * Construct Select instance
+     * Construct FormSelect instance
      * @constructor
      * @param {Element} el
      * @param {Object} options
      */
     constructor(el, options) {
-      super(Select, el, options);
+      super(FormSelect, el, options);
 
-      this.el.M_Select = this;
+      // Don't init if browser default version
+      if (this.$el.hasClass('browser-default')) {
+        return;
+      }
+
+      this.el.M_FormSelect = this;
 
       /**
        * Options for the select
-       * @member Select#options
+       * @member FormSelect#options
        */
-      this.options = $.extend({}, Select.defaults, options);
+      this.options = $.extend({}, FormSelect.defaults, options);
 
       this.isMultiple = this.$el.prop('multiple');
 
       // Setup
+      this.el.tabIndex = -1;
       this._keysSelected = {};
       this._valueDict = {}; // Maps key to original and generated option element.
       this._setupDropdown();
@@ -51,7 +58,7 @@
      */
     static getInstance(el) {
       let domElem = !!el.jquery ? el[0] : el;
-      return domElem.M_Select;
+      return domElem.M_FormSelect;
     }
 
     /**
@@ -60,7 +67,7 @@
     destroy() {
       this._removeEventHandlers();
       this._removeDropdown();
-      this.el.M_Select = undefined;
+      this.el.M_FormSelect = undefined;
     }
 
     /**
@@ -87,7 +94,6 @@
       });
       this.el.removeEventListener('change', this._handleSelectChangeBound);
       this.input.removeEventListener('click', this._handleInputClickBound);
-      this.input.removeEventListener('focus', this._handleInputFocusBound);
     }
 
     /**
@@ -214,7 +220,8 @@
 
       // Initialize dropdown
       if (!this.el.disabled) {
-        let dropdownOptions = {};
+        let dropdownOptions = $.extend({}, this.options.dropdownOptions);
+
         if (this.isMultiple) {
           dropdownOptions.closeOnClick = false;
         }
@@ -377,9 +384,9 @@
     }
   }
 
-  M.Select = Select;
+  M.FormSelect = FormSelect;
 
   if (M.jQueryLoaded) {
-    M.initializeJqueryWrapper(Select, 'select', 'M_Select');
+    M.initializeJqueryWrapper(FormSelect, 'formSelect', 'M_FormSelect');
   }
 }(cash));

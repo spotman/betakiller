@@ -1,6 +1,6 @@
 require([
   "jquery",
-  "content.api.rpc.definition",
+  "content.api.rpc",
   'materialize',
   'ckeditor.jquery'
 ], function ($, api) {
@@ -25,7 +25,7 @@ require([
     }
 
     if ($category.length) {
-      $category.select();
+      $category.formSelect();
     }
 
     // TODO Move this to dedicated AMD module

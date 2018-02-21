@@ -1,7 +1,7 @@
 <?php
 namespace BetaKiller\Content\Shortcode;
 
-use BetaKiller\Content\Shortcode\Attribute\NumberAttribute;
+use BetaKiller\Content\Shortcode\Attribute\SwitchAttribute;
 use BetaKiller\Content\Shortcode\Editor\EditorListingItem;
 use BetaKiller\Model\ContentGalleryInterface;
 use BetaKiller\Model\EntityModelInterface;
@@ -12,12 +12,14 @@ class GalleryShortcode extends AbstractContentElementShortcode
     public const LAYOUT_MASONRY = 'masonry';
     public const LAYOUT_SLIDER  = 'slider';
 
-    public const ATTR_COLUMNS = 'columns';
-    public const ATTR_COLUMNS_ONE = '1';
-    public const ATTR_COLUMNS_TWO = '2';
+    public const ATTR_COLUMNS       = 'columns';
+    public const ATTR_COLUMNS_ONE   = '1';
+    public const ATTR_COLUMNS_TWO   = '2';
     public const ATTR_COLUMNS_THREE = '3';
-    public const ATTR_COLUMNS_FOUR = '4';
-    public const ATTR_COLUMNS_FIVE = '5';
+    public const ATTR_COLUMNS_FOUR  = '4';
+    public const ATTR_COLUMNS_FIVE  = '5';
+    public const ATTR_COLUMNS_SIX   = '6';
+    public const ATTR_COLUMNS_SEVEN = '7';
 
     public const ATTR_COLUMNS_VALUES = [
         self::ATTR_COLUMNS_ONE,
@@ -25,6 +27,8 @@ class GalleryShortcode extends AbstractContentElementShortcode
         self::ATTR_COLUMNS_THREE,
         self::ATTR_COLUMNS_FOUR,
         self::ATTR_COLUMNS_FIVE,
+        self::ATTR_COLUMNS_SIX,
+        self::ATTR_COLUMNS_SEVEN,
     ];
 
     /**
@@ -45,7 +49,8 @@ class GalleryShortcode extends AbstractContentElementShortcode
     protected function getContentElementShortcodeDefinitions(): array
     {
         return [
-            (new NumberAttribute('columns'))->optional(self::ATTR_COLUMNS_THREE),
+            (new SwitchAttribute('columns', self::ATTR_COLUMNS_VALUES))
+                ->optional(self::ATTR_COLUMNS_THREE),
         ];
     }
 
@@ -128,7 +133,7 @@ class GalleryShortcode extends AbstractContentElementShortcode
 
         foreach ($images as $model) {
             $imagesData[] = [
-                'href' => $this->assetsHelper->getOriginalUrl($model),
+                'href'       => $this->assetsHelper->getOriginalUrl($model),
                 'attributes' => $this->assetsHelper->getAttributesForImgTag($model, $model::SIZE_PREVIEW),
             ];
         }

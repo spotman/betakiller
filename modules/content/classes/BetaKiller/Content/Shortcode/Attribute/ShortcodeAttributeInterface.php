@@ -5,11 +5,38 @@ namespace BetaKiller\Content\Shortcode\Attribute;
 interface ShortcodeAttributeInterface
 {
     /**
+     * Type for simple string-based attributes like "title" or "class"
+     */
+    public const TYPE_STRING = 'string';
+
+    /**
+     * Type for number-based attributes like "width" or "height"
+     */
+    public const TYPE_NUMBER = 'number';
+
+    /**
+     * Type for attributes having several discrete values like "layout"
+     */
+    public const TYPE_SWITCH = 'switch';
+
+    /**
+     * Type for boolean-like attributes having only "true" and "false" values
+     */
+    public const TYPE_BOOLEAN = 'boolean';
+
+    /**
      * Returns attribute name
      *
      * @return string
      */
     public function getName(): string;
+
+    /**
+     * Returns attribute type
+     *
+     * @return string
+     */
+    public function getType(): string;
 
     /**
      * Returns true if provided value is allowed
@@ -37,11 +64,32 @@ interface ShortcodeAttributeInterface
     public function isOptional(): bool;
 
     /**
+     * Mark attribute as hidden (allowed in shortcode but not editable in UI)
+     *
+     * @return \BetaKiller\Content\Shortcode\Attribute\ShortcodeAttributeInterface
+     */
+    public function hidden(): ShortcodeAttributeInterface;
+
+    /**
+     * Returns true if current attribute is hidden (allowed in shortcode but not editable in UI)
+     *
+     * @return bool
+     */
+    public function isHidden(): bool;
+
+    /**
      * Returns default attribute value
      *
      * @return null|string
      */
     public function getDefaultValue(): ?string;
+
+    /**
+     * Returns array of allowed values if defined (empty array means any value is allowed)
+     *
+     * @return string[]
+     */
+    public function getAllowedValues(): array;
 
     /**
      * Marks current attribute as dependent on another one`s value
@@ -56,7 +104,7 @@ interface ShortcodeAttributeInterface
     /**
      * Returns name => value pairs of attributes and their values
      *
-     * @return array
+     * @return string[]
      */
     public function getDependencies(): array;
 

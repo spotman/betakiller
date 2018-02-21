@@ -79,7 +79,33 @@ class ContentElementShortcodeEditor extends AbstractShortcodeEditor
      */
     public function getEditIFaceData(ShortcodeInterface $shortcode): array
     {
-        return [];
+        return [
+            'codename'   => lcfirst($shortcode->getCodename()),
+            'attributes' => [
+                'values'      => $shortcode->getAttributes(),
+                'definitions' => $this->getAttributesData($shortcode),
+            ],
+        ];
+    }
+
+    private function getAttributesData(ShortcodeInterface $shortcode): array
+    {
+        $data          = [];
+        $shortcodeName = $shortcode->getCodename();
+
+        foreach ($shortcode->getAttributesDefinitions() as $attr) {
+            $data[] = [
+                'name'    => $attr->getName(),
+                'type'    => $attr->getType(),
+                'label'   => __('shortcode.'.lcfirst($shortcodeName).'.attribute.'.$attr->getName().'.label'),
+                'values'  => $attr->getAllowedValues(),
+                'default' => $attr->getDefaultValue(),
+                'deps'    => $attr->getDependencies(),
+                'hidden'  => $attr->isHidden(),
+            ];
+        }
+
+        return $data;
     }
 
     /**

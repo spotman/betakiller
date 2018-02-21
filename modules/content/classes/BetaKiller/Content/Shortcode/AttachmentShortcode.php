@@ -2,7 +2,7 @@
 namespace BetaKiller\Content\Shortcode;
 
 use BetaKiller\Content\Shortcode\Attribute\NumberAttribute;
-use BetaKiller\Content\Shortcode\Attribute\TextAttribute;
+use BetaKiller\Content\Shortcode\Attribute\StringAttribute;
 use BetaKiller\Helper\AssetsHelper;
 use BetaKiller\Model\ContentImageInterface;
 use BetaKiller\Model\EntityModelInterface;
@@ -72,7 +72,7 @@ class AttachmentShortcode extends AbstractContentElementShortcode
     protected function getContentElementShortcodeDefinitions(): array
     {
         return [
-            (new TextAttribute(self::ATTR_LABEL))
+            (new StringAttribute(self::ATTR_LABEL))
                 ->optional()
                 ->dependsOn(self::ATTR_LAYOUT, self::LAYOUT_TEXT),
 

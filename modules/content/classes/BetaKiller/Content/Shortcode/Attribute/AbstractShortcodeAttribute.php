@@ -20,14 +20,24 @@ abstract class AbstractShortcodeAttribute implements ShortcodeAttributeInterface
     private $isOptional = false;
 
     /**
+     * @var bool
+     */
+    private $isHidden = false;
+
+    /**
      * @var string[]
      */
     private $dependencies = [];
 
     /**
+     * @var string[]
+     */
+    protected $allowedValues = [];
+
+    /**
      * AbstractShortcodeAttribute constructor.
      *
-     * @param string    $name
+     * @param string $name
      */
     public function __construct(string $name)
     {
@@ -49,7 +59,7 @@ abstract class AbstractShortcodeAttribute implements ShortcodeAttributeInterface
     public function optional(string $defaultValue = null): ShortcodeAttributeInterface
     {
         $this->defaultValue = $defaultValue;
-        $this->isOptional = true;
+        $this->isOptional   = true;
 
         return $this;
     }
@@ -65,6 +75,28 @@ abstract class AbstractShortcodeAttribute implements ShortcodeAttributeInterface
     }
 
     /**
+     * Mark attribute as hidden (allowed in shortcode but not editable in UI)
+     *
+     * @return \BetaKiller\Content\Shortcode\Attribute\ShortcodeAttributeInterface
+     */
+    public function hidden(): ShortcodeAttributeInterface
+    {
+        $this->isHidden = true;
+
+        return $this;
+    }
+
+    /**
+     * Returns true if current attribute is hidden (allowed in shortcode but not editable in UI)
+     *
+     * @return bool
+     */
+    public function isHidden(): bool
+    {
+        return $this->isHidden;
+    }
+
+    /**
      * Returns default attribute value
      *
      * @return null|string
@@ -72,6 +104,16 @@ abstract class AbstractShortcodeAttribute implements ShortcodeAttributeInterface
     public function getDefaultValue(): ?string
     {
         return $this->defaultValue;
+    }
+
+    /**
+     * Returns array of allowed values if defined (empty array means any value is allowed)
+     *
+     * @return string[]
+     */
+    public function getAllowedValues(): array
+    {
+        return $this->allowedValues;
     }
 
     /**

@@ -2,8 +2,7 @@
  * Plugin for shortcodes
  */
 
-// TODO Listen for messages from dialogs
-
+// Listen for messages from dialogs
 window.addEventListener('message', function(event) {
   const data = event.data;
 

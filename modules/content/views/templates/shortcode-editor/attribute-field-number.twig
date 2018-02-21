@@ -1,0 +1,11 @@
+{% extends "@templates/shortcode-editor/attribute-field" %}
+
+{% block attribute_control %}
+  <div class="row">
+    <div class="input-field col s12">
+      <label for="{{ id }}">{{ label }}</label>
+      <input value="{{ value }}" id="{{ id }}" name="{{ name }}" type="number" class="validate"
+             placeholder="{{ default }}"/>
+    </div>
+  </div>
+{% endblock %}

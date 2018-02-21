@@ -871,12 +871,25 @@ class Task_Content_Import_Wordpress extends AbstractTask
             throw new TaskException('Can not detect image tag in [caption]');
         }
 
-        $shortcode = $this->processImgTag($imageTag, $post->getID());
+        // Getting attributes
+        $attributes = $imageTag->attributes();
 
         // Removing <img /> tag
         $captionText = trim(strip_tags($content));
 
-        $shortcode->useCaptionLayout($captionText);
+        // Force title to have caption text
+        $attributes['title'] = $captionText;
+
+        $image = $this->createImageFromAttributes($attributes, $post->getID());
+
+        /** @var ImageShortcode $shortcode */
+        $shortcode = $this->shortcodeFacade->createFromCodename(ImageShortcode::codename());
+
+        $shortcode->setID($image->getID());
+
+        $this->importHtmlAttributesIntoImageShortcode($shortcode, $attributes);
+
+        $shortcode->useCaptionLayout();
 
         return $shortcode->asHtml();
     }
@@ -1162,13 +1175,36 @@ class Task_Content_Import_Wordpress extends AbstractTask
      */
     private function processImgTag(\DiDom\Element $node, $entityItemID): ImageShortcode
     {
+        $this->logger->debug('Found inline image :tag', [':tag' => $node->html()]);
+
         // Getting attributes
         $attributes = $node->attributes();
 
+        $image = $this->createImageFromAttributes($attributes, $entityItemID);
+
+        /** @var ImageShortcode $shortcode */
+        $shortcode = $this->shortcodeFacade->createFromCodename(ImageShortcode::codename());
+
+        $shortcode->setID($image->getID());
+
+        $this->importHtmlAttributesIntoImageShortcode($shortcode, $attributes);
+
+        return $shortcode;
+    }
+
+    /**
+     * @param array $attributes
+     * @param       $entityItemID
+     *
+     * @return \BetaKiller\Assets\Model\AssetsModelImageInterface
+     * @throws \BetaKiller\Repository\RepositoryException
+     * @throws \BetaKiller\Task\TaskException
+     * @throws \ORM_Validation_Exception
+     */
+    private function createImageFromAttributes(array $attributes, $entityItemID): AssetsModelImageInterface
+    {
         // Original URL
         $originalUrl = trim($attributes['src']);
-
-        $this->logger->debug('Found inline image :tag', [':tag' => $node->html()]);
 
         $provider = $this->contentHelper->getImageAssetsProvider();
 
@@ -1190,11 +1226,18 @@ class Task_Content_Import_Wordpress extends AbstractTask
         // Save model and populate ID
         $provider->saveModel($image);
 
-        /** @var ImageShortcode $shortcode */
-        $shortcode = $this->shortcodeFacade->createFromCodename(ImageShortcode::codename());
+        return $image;
+    }
 
-        $shortcode->setID($image->getID());
-
+    /**
+     * @param \BetaKiller\Content\Shortcode\ImageShortcode $shortcode
+     * @param array                                        $attributes
+     *
+     * @throws \BetaKiller\Content\Shortcode\ShortcodeException
+     * @throws \BetaKiller\Task\TaskException
+     */
+    private function importHtmlAttributesIntoImageShortcode(ImageShortcode $shortcode, array $attributes): void
+    {
         // Convert old full-size images to responsive images
         if (isset($attributes['width']) && (int)$attributes['width'] === 780) { // TODO move 780 to config
             unset($attributes['width']);
@@ -1202,7 +1245,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
         }
 
         if (isset($attributes['width'])) {
-            $shortcode->setAttribute('width', (int)$attributes['width']);
+            $shortcode->setWidth((int)$attributes['width']);
         }
 
         $class = $attributes['class'] ?? null;
@@ -1214,8 +1257,6 @@ class Task_Content_Import_Wordpress extends AbstractTask
         if (isset($attributes['style'])) {
             throw new TaskException('Image :id has inline styling, fix it in the source page');
         }
-
-        return $shortcode;
     }
 
     /**

@@ -5,6 +5,10 @@ require([
 ], function($, ckeditorPostMessage) {
 
   $(function() {
+    $('.editor-content-element-listing-item .fixed-action-btn').floatingActionButton({
+      direction: "left"
+    });
+
     $(".editor-content-element-listing-item .insert-handler").click(function (e) {
       e.preventDefault();
 
@@ -12,9 +16,7 @@ require([
             id = $handler.data('id'),
             tagName = $handler.data('tag-name');
 
-      ckeditorPostMessage.insertShortcode(tagName, {
-        id: id
-      });
+      ckeditorPostMessage.insertShortcode(tagName, {id: id});
     });
   });
 

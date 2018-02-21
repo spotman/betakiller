@@ -1,6 +1,6 @@
 require([
   "jquery",
-  "content.api.rpc.definition",
+  "content.api.rpc",
   "materialize"
 ], function($, api) {
 

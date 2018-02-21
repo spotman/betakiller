@@ -1,1 +1,38 @@
-content element edit
+{{ js("require.js/content.config.js") }}
+{{ js("ifaces/admin/shortcode-editor/content-element-edit.js") }}
+
+<div class="row">
+  <div class="col s12 m6 l8">
+    info
+  </div>
+
+  <form id="content-element-shortcode-edit-form" data-name="{{ codename }}" class="col s12 m6 l4"> {##}
+
+    <div class="shortcode-attributes-block">
+      {% for definition in attributes.definitions %}
+        {% set name = definition.name|lower %}
+        {% set id = "shortcode-attribute-" ~ name %}
+        {% set label = definition.label %}
+        {% set default = definition.default %}
+        {% set value = attributes.values[name]|default(default) %}
+        {% set allowed_values = definition.values %}
+        {% set dependencies = definition.deps %}
+
+        {#{{ dump(definition) }}#}
+
+        {% if not definition.hidden %}
+          {% include "@templates/shortcode-editor/attribute-field-" ~ definition.type %}
+        {% else %}
+          {% include "@templates/shortcode-editor/attribute-field-hidden" %}
+        {% endif %}
+      {% endfor %}
+    </div>
+
+    <div class="row">
+      <div class="col s12 center-align">
+        <button class="btn green" type="submit">Save</button>
+      </div>
+    </div>
+
+  </form>
+</div>

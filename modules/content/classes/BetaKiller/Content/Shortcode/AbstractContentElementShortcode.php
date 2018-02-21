@@ -1,29 +1,29 @@
 <?php
 namespace BetaKiller\Content\Shortcode;
 
-use BetaKiller\Content\Shortcode\Attribute\DiscreteValuesAttribute;
 use BetaKiller\Content\Shortcode\Attribute\IdAttribute;
+use BetaKiller\Content\Shortcode\Attribute\SwitchAttribute;
 
 abstract class AbstractContentElementShortcode extends AbstractShortcode implements ContentElementShortcodeInterface
 {
     /**
      * @return \BetaKiller\Content\Shortcode\Attribute\ShortcodeAttributeInterface[]
      */
-    protected function getDefinitions(): array
+    public function getAttributesDefinitions(): array
     {
-        $definitions = $this->getContentElementShortcodeDefinitions();
-
-        // Content elements must have ID
-        $definitions[] = new IdAttribute();
+        $definitions = [
+            // Content elements must have ID but can not edit it
+            (new IdAttribute())->hidden(),
+        ];
 
         $layouts = $this->getAvailableLayouts();
 
         if ($layouts) {
-            $layoutAttribute = new DiscreteValuesAttribute(self::ATTR_LAYOUT, $layouts);
-            $definitions[] = $layoutAttribute->optional($layouts[0]);
+            $layoutAttribute = new SwitchAttribute(self::ATTR_LAYOUT, $layouts);
+            $definitions[]   = $layoutAttribute->optional($layouts[0]);
         }
 
-        return $definitions;
+        return array_merge($definitions, $this->getContentElementShortcodeDefinitions());
     }
 
     /**

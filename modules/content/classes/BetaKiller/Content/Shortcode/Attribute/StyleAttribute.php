@@ -2,7 +2,7 @@
 namespace BetaKiller\Content\Shortcode\Attribute;
 
 
-class StyleAttribute extends TextAttribute
+class StyleAttribute extends StringAttribute
 {
     public function __construct()
     {

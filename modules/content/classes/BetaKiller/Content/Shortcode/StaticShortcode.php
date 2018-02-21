@@ -6,7 +6,7 @@ class StaticShortcode extends AbstractShortcode
     /**
      * @return array
      */
-    protected function getDefinitions(): array
+    public function getAttributesDefinitions(): array
     {
         // No attributes available in static shortcodes
         return [];

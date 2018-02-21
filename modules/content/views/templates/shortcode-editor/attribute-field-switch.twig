@@ -1,0 +1,14 @@
+{% extends "@templates/shortcode-editor/attribute-field" %}
+
+{% block attribute_control %}
+  <div class="row">
+    <div class="input-field col s12">
+      <select id="{{ id }}" name="{{ name }}">
+        {% for option in allowed_values %}
+          <option value="{{ option }}" {{ option == value ? "selected" : "" }}>{{ option }}</option>
+        {% endfor %}
+      </select>
+      <label for="{{ id }}">{{ label }}</label>
+    </div>
+  </div>
+{% endblock %}

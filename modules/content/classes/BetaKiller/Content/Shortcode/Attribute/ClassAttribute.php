@@ -2,7 +2,7 @@
 namespace BetaKiller\Content\Shortcode\Attribute;
 
 
-class ClassAttribute extends RegexAttribute
+class ClassAttribute extends AbstractRegexAttribute
 {
     /**
      * ClassAttribute constructor.

@@ -67,4 +67,9 @@ return [
     'error.post.preview_not_allowed' => 'Предпросмотр статей разрешён только редакторам',
 
     'entities.post' => 'Статьи и страницы',
+
+    'shortcode.image.attribute.layout.label'   => 'Шаблон',
+    'shortcode.image.attribute.align.label'    => 'Выравнивание',
+    'shortcode.image.attribute.zoomable.label' => 'Картинку можно приблизить',
+    'shortcode.image.attribute.width.label'    => 'Ширина',
 ];

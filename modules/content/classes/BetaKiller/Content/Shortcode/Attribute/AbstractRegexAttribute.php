@@ -2,12 +2,12 @@
 namespace BetaKiller\Content\Shortcode\Attribute;
 
 
-class RegexAttribute extends AbstractShortcodeAttribute
+abstract class AbstractRegexAttribute extends AbstractShortcodeAttribute
 {
     protected $pattern;
 
     /**
-     * RegexAttribute constructor.
+     * AbstractRegexAttribute constructor.
      *
      * @param string $name
      * @param string $pattern
