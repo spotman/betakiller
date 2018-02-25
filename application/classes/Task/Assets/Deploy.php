@@ -2,6 +2,7 @@
 
 
 use BetaKiller\Task\AbstractTask;
+use BetaKiller\Task\TaskException;
 
 class Task_Assets_Deploy extends AbstractTask
 {
@@ -40,20 +41,21 @@ class Task_Assets_Deploy extends AbstractTask
     }
 
     /**
-     * @param array|string $file
+     * @param array|string $original
      * @param string       $targetBase
      *
+     * @throws \BetaKiller\Task\TaskException
      * @throws \RuntimeException
      * @throws \Kohana_Exception
      */
-    protected function processFile($file, string $targetBase): void
+    protected function processFile($original, string $targetBase): void
     {
-        if (is_array($file)) {
-            foreach ($file as $item) {
+        if (is_array($original)) {
+            foreach ($original as $item) {
                 $this->processFile($item, $targetBase);
             }
         } else {
-            $fileArray = explode('static-files', $file);
+            $fileArray = explode('static-files', $original);
 
             $target = $targetBase.$fileArray[1];
 
@@ -65,7 +67,15 @@ class Task_Assets_Deploy extends AbstractTask
 
             $this->logger->debug('Copying to :to', [':to' => $target]);
 
-            copy($file, $target);
+//            $deployed = copy($file, $target);
+            $deployed = symlink($original, $target);
+
+            if (!$deployed) {
+                throw new TaskException('Can not deploy file :original to :target', [
+                    ':original' => $original,
+                    ':target' => $target,
+                ]);
+            }
         }
     }
 }

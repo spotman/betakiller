@@ -10,7 +10,7 @@ $minimize = FALSE;
 
 return array(
 
-    'enabled' => $in_production,
+    'enabled' => true, // $in_production
 
     'js' => array(
 

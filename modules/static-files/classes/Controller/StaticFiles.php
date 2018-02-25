@@ -37,13 +37,13 @@ class Controller_StaticFiles extends Controller
                 return;
             }
 
-            // Читаем содержимое оригинала
-            $str = file_get_contents($orig);
+//            // Читаем содержимое оригинала
+//            $str = file_get_contents($orig);
 
-            // Заменяем строки если соответствующий тип файла
-            if (in_array($info['extension'], $this->config['replace_url_exts'], true)) {
-                $str = $this->replace_url($str);
-            }
+//            // Заменяем строки если соответствующий тип файла
+//            if (in_array($info['extension'], $this->config['replace_url_exts'], true)) {
+//                $str = $this->replace_url($str);
+//            }
 
             $is_enabled = ($this->config['enabled'] === true);
 
@@ -53,9 +53,11 @@ class Controller_StaticFiles extends Controller
                 // В следующий раз его будет отдавать сразу nginx без запуска PHP
                 $deploy = $this->static_deploy($file);
 
-                if (@ file_put_contents($deploy, $str) AND $this->config['chmod']) {
-                    chmod($deploy, $this->config['chmod']);
-                }
+                symlink($orig, $deploy);
+
+//                if ($this->config['chmod']) {
+//                    chmod($orig, $this->config['chmod']);
+//                }
             }
 
 //            if (!$is_enabled) {
@@ -65,9 +67,9 @@ class Controller_StaticFiles extends Controller
 
             // А пока отдадим файл руками
 //			$this->check_cache(sha1($this->request->uri()) . $mtime, $this->request);
-            $this->response->body($str);
+            $this->response->body(file_get_contents($orig));
             $this->response->headers('Content-Type', File::mime_by_ext($info['extension']));
-            $this->response->headers('Content-Length', strlen($str));
+            $this->response->headers('Content-Length', filesize($orig));
         } else {
             // Return a 404 status
             throw new HTTP_Exception_404("File [:file] not found", [':file' => $file]);
