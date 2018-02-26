@@ -126,7 +126,7 @@ define([
     }
 
     function authRequiredModal() {
-      require(['auth.modal'], function(authModal) {
+      //require(['auth.modal'], function(authModal) {
         var successCallback = function () {
           // Unlock API
           unlock();
@@ -149,9 +149,13 @@ define([
           unlock();
         };
 
+        alert('You had been logged out. Please log in on another page and repeat your action here.');
+        // Call error callback as a quick fix
+        errorCallback();
+
         // Show modal and provide callbacks
-        authModal.show(successCallback, errorCallback);
-      });
+        //authModal.show(successCallback, errorCallback);
+      //});
     }
 
     return function (service, method, proxyArguments) {
