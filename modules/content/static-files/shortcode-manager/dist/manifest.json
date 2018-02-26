@@ -1,0 +1,6 @@
+{
+  "build/app.css": "/assets/static/shortcode-manager/dist/app.css",
+  "build/app.js": "/assets/static/shortcode-manager/dist/app.js",
+  "build/manifest.js": "/assets/static/shortcode-manager/dist/manifest.js",
+  "build/vendor.js": "/assets/static/shortcode-manager/dist/vendor.js"
+}

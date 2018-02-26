@@ -27,14 +27,16 @@ class SaveEntityItemRelationHandler implements AssetsHandlerInterface
      * @param \BetaKiller\Assets\Provider\AssetsProviderInterface $provider
      * @param \BetaKiller\Model\EntityItemRelatedInterface        $model
      * @param array                                               $postData
+     *
+     * @throws \BetaKiller\Repository\RepositoryException
      */
     public function update(AssetsProviderInterface $provider, $model, array $postData): void
     {
-        $entityID     = (int)($postData['entityID'] ?? null);
+        $entitySlug     = (string)($postData['entitySlug'] ?? null);
         $entityItemID = (int)($postData['entityItemID'] ?? null);
 
-        if ($entityID) {
-            $entity = $this->entityRepository->findById($entityID);
+        if ($entitySlug) {
+            $entity = $this->entityRepository->findBySlug($entitySlug);
             $model->setEntity($entity);
         }
 

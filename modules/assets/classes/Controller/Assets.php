@@ -38,6 +38,7 @@ class Controller_Assets extends Controller
     /**
      * Common action for uploading files through provider
      *
+     * @throws \BetaKiller\Repository\RepositoryException
      * @throws \BetaKiller\Exception\NotImplementedHttpException
      * @throws \BetaKiller\Exception\FoundHttpException
      * @throws \BetaKiller\Factory\FactoryException
@@ -67,6 +68,13 @@ class Controller_Assets extends Controller
 
         // Uploading via provider
         $model = $this->provider->upload($_file, $_post_data, $this->user);
+
+        try {
+            // Save model in database
+            $this->provider->saveModel($model);
+        } catch (ORM_Validation_Exception $e) {
+            throw new AssetsException(':error', [':error' => implode(',', $e->getFormattedErrors())]);
+        }
 
         // Returns
         $this->send_json(self::JSON_SUCCESS, $model->toJson());

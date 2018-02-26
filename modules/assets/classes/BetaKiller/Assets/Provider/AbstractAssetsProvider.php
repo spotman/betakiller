@@ -371,7 +371,6 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
      * @param \BetaKiller\Model\UserInterface $user
      *
      * @return AssetsModelInterface
-     * @throws \BetaKiller\Repository\RepositoryException
      * @throws \BetaKiller\Assets\AssetsException
      * @throws \BetaKiller\Assets\AssetsProviderException
      * @throws \BetaKiller\Assets\AssetsStorageException
@@ -440,12 +439,16 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
         // Custom processing
         $content = $this->customContentProcessing($content, $model);
 
+        $currentTime = new \DateTimeImmutable;
+
         // Put data into model
         $model
             ->setOriginalName($originalName)
             ->setSize(\mb_strlen($content))
             ->setMime($mimeType)
-            ->setUploadedBy($user);
+            ->setUploadedBy($user)
+            ->setUploadedAt($currentTime)
+            ->setLastModifiedAt($currentTime);
 
         // Calculate hash
         $model->setHash($this->calculateHash($content));
@@ -493,8 +496,6 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
      *
      * @param AssetsModelInterface $model
      * @param array                $postData
-     *
-     * @throws \BetaKiller\Repository\RepositoryException
      */
     protected function postUploadProcessing($model, array $postData): void
     {
@@ -502,9 +503,6 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
             foreach ($this->postUploadHandlers as $handler) {
                 $handler->update($this, $model, $postData);
             }
-
-            // Save updated model if needed
-            $this->saveModel($model);
         }
     }
 

@@ -13,9 +13,7 @@ abstract class AbstractOrmBasedAssetsImageModel extends AbstractOrmBasedAssetsMo
     public function rules(): array
     {
         return [
-            'alt' => [
-                ['not_empty'],
-            ],
+            // No `alt` field required coz uploading is always done without data for it
             'width' => [
                 ['not_empty'],
                 ['digit'],

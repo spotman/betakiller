@@ -6,10 +6,11 @@ define([
   "api.rpc.factory"
 ], function (factory) {
 
-  var rpc               = factory(),
-      postResource      = 'ContentPost',
-      commentResource   = 'ContentComment',
-      shortcodeResource = 'Shortcode';
+  var rpc                    = factory(),
+      postResource           = 'ContentPost',
+      commentResource        = 'ContentComment',
+      contentElementResource = 'ContentElement',
+      shortcodeResource      = 'Shortcode';
 
   return {
     post: {
@@ -71,7 +72,13 @@ define([
     shortcode: {
       verify: function (name, attributes) {
         return rpc(shortcodeResource, 'verify', arguments);
-      }
+      },
+    },
+
+    contentElement: {
+      list (name, entitySlug, entityItemID) {
+        return rpc(contentElementResource, 'list', arguments);
+      },
     }
   };
 

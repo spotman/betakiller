@@ -5,6 +5,7 @@ require([
 ], function($, ckeditorPostMessage) {
 
   $(function() {
+    // TODO Floating buttons are not working after upgrade, maybe drop them and use dedicated buttons
     $('.editor-content-element-listing-item .fixed-action-btn').floatingActionButton({
       direction: "left"
     });
