@@ -89,16 +89,16 @@ class ContentCommentRepository extends AbstractOrmBasedSingleParentTreeRepositor
 
     /**
      * @param \BetaKiller\Model\ContentCommentStatus|null $status
-     * @param \BetaKiller\Model\Entity|null               $entity
+     * @param \BetaKiller\Model\EntityModelInterface      $entity
      * @param int|null                                    $entityItemId
      *
      * @return ContentComment[]
      * @throws \BetaKiller\Repository\RepositoryException
      */
     public function getCommentsOrderedByPath(
-        ?ContentCommentStatus $status = null,
-        ?Entity $entity = null,
-        ?int $entityItemId = null
+        ContentCommentStatus $status,
+        EntityModelInterface $entity,
+        int $entityItemId
     ): array {
         /** @var \BetaKiller\Model\ContentComment $orm */
         $orm = $this->getOrmInstance();
@@ -149,7 +149,7 @@ class ContentCommentRepository extends AbstractOrmBasedSingleParentTreeRepositor
         /** @var \BetaKiller\Model\ContentComment $orm */
         $orm = $this->getOrmInstance();
 
-        $this->filterEntityAndEntityItemID($orm, $entity, $entityItemId);
+        $this->filterEntityOrEntityItemID($orm, $entity, $entityItemId);
 
         if ($status) {
             $orm->filterStatus($status);

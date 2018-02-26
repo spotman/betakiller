@@ -8,33 +8,50 @@ trait OrmBasedEntityItemRelatedRepositoryTrait
 {
     /**
      * @param \BetaKiller\Utils\Kohana\ORM\OrmInterface $orm
-     * @param int                                       $item_id
+     * @param int                                       $itemID
      */
-    protected function filterEntityItemID(OrmInterface $orm, int $item_id): void
+    protected function filterEntityItemID(OrmInterface $orm, ?int $itemID): void
     {
-        $orm->where($orm->object_column('entity_item_id'), '=', $item_id);
+        if ($itemID === null) {
+            $orm->where($orm->object_column('entity_item_id'), 'IS', null);
+        } else {
+            $orm->where($orm->object_column('entity_item_id'), '=', $itemID);
+        }
     }
 
     /**
      * @param \BetaKiller\Utils\Kohana\ORM\OrmInterface $orm
-     * @param int                                       $entity_id
+     * @param int                                       $entityId
      */
-    protected function filterEntityID(OrmInterface $orm, int $entity_id): void
+    protected function filterEntityID(OrmInterface $orm, ?int $entityId): void
     {
-        $orm->where($orm->object_column('entity_id'), '=', $entity_id);
+        if ($entityId === null) {
+            $orm->where($orm->object_column('entity_id'), 'is', null);
+        } else {
+            $orm->where($orm->object_column('entity_id'), '=', $entityId);
+        }
     }
 
     protected function filterEntityAndEntityItemID(
         OrmInterface $orm,
+        ?Entity $entity,
+        ?int $entityItemId
+    ): void {
+        $this->filterEntityID($orm, $entity ? $entity->getID() : null);
+        $this->filterEntityItemID($orm, $entityItemId);
+    }
+
+    protected function filterEntityOrEntityItemID(
+        OrmInterface $orm,
         ?Entity $entity = null,
-        ?int $entity_item_id = null
+        ?int $entityItemId = null
     ): void {
         if ($entity) {
             $this->filterEntityID($orm, $entity->getID());
         }
 
-        if ($entity_item_id) {
-            $this->filterEntityItemID($orm, $entity_item_id);
+        if ($entityItemId) {
+            $this->filterEntityItemID($orm, $entityItemId);
         }
     }
 }
