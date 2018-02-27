@@ -7,7 +7,8 @@
         </v-toolbar>
 
         <v-content>
-            <items v-if="itemsLoaded" :items="items" @addItem="addItem"></items>
+            <items v-if="itemsLoaded" :items="items"
+                   @addItem="addItem" @selectItem="selectItem" @contextItem="contextItem"></items>
 
             <v-container v-if="!itemsLoaded" fill-height fluid>
                 <v-layout align-center justify-center>
@@ -94,6 +95,17 @@
           this.$router.push('add');
         }
       },
+
+      selectItem(id) {
+        // Show edit item dialog (call route /edit/:id)
+        this.$router.push({name: 'edit-item', params: {id}});
+      },
+
+      contextItem(id) {
+        // Show edit shortcode dialog (call route /edit/shortcode/?id=:id)
+        this.$router.push({name: 'edit-shortcode', query: {id}});
+      },
+
       fetchData() {
         this.itemsLoaded = false;
 

@@ -2,6 +2,7 @@
 
 let path = require('path');
 let Encore = require('@symfony/webpack-encore');
+let HardSourceWebpackPlugin = require('hard-source-webpack-plugin');
 
 process.noDeprecation = true;
 
@@ -49,6 +50,8 @@ Encore
     'api.rpc.factory': path.resolve(__dirname, '../../../../application/static-files/api/rpc.factory.js'),
     'content.api.rpc': path.resolve(__dirname, '../require.js/content.api.rpc.js'),
   })
+
+  .addPlugin(new HardSourceWebpackPlugin)
 
 //.addExternals({})
 ;

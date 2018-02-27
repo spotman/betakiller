@@ -2,8 +2,10 @@
     <v-container fluid v-if="hasItems">
         <v-layout row wrap v-masonry item-selector=".content-element-list-item" gutter=".content-element-list-item">
             <!--<div transition-duration="0.3s" item-selector=".content-element-list-item" >-->
-            <v-flex xs6 sm4 md3 lg2 v-for="item in items" class="content-element-list-item" :key="item.id" v-masonry-tile>
-                <v-card elevation-1>
+            <v-flex xs6 sm4 md3 lg2 v-for="item in items" class="content-element-list-item" :key="item.id"
+                    v-masonry-tile>
+                <v-card elevation-1 @click.native.left="emitSelectItemEvent(item.id)"
+                        @click.right.prevent.stop="emitContextItemEvent(item.id)">
                     <img :src="item.imageUrl" alt="">
                     <span v-if="!item.isValid" class="invalid-marker material-icons red--text">error</span>
                 </v-card>
@@ -14,7 +16,7 @@
         <v-layout align-center justify-center>
             <v-flex xs12 sm8 md6 lg4 xl3 text-xs-center>
                 No items yet...
-                <v-btn color="primary" @click.native.prevent="emitAddItemEvent">add one</v-btn>
+                <v-btn color="primary" @click="emitAddItemEvent">add one</v-btn>
             </v-flex>
         </v-layout>
     </v-container>
@@ -46,6 +48,14 @@
     methods: {
       emitAddItemEvent() {
         this.$emit('addItem');
+      },
+      emitSelectItemEvent(id) {
+        console.log('selectItem event fired');
+        this.$emit('selectItem', id);
+      },
+      emitContextItemEvent(id) {
+        console.log('contextItem event fired');
+        this.$emit('contextItem', id);
       }
     }
   }
