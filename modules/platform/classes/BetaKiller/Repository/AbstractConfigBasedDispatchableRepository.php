@@ -41,9 +41,8 @@ abstract class AbstractConfigBasedDispatchableRepository extends AbstractPredefi
      */
     public function findById(string $id)
     {
-        throw new RepositoryException('Config based :repo repository can not find parameter by id', [
-            ':repo' => static::getCodename(),
-        ]);
+        // Codename is ID
+        return $this->findByCodename($id);
     }
 
     /**

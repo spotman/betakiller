@@ -8,7 +8,7 @@ use BetaKiller\Model\AbstractEntityInterface;
 abstract class AbstractEntityBasedApiMethod extends AbstractApiMethod implements EntityBasedApiMethodInterface
 {
     /**
-     * @var int
+     * @var string
      */
     protected $id;
 
@@ -65,13 +65,13 @@ abstract class AbstractEntityBasedApiMethod extends AbstractApiMethod implements
     }
 
     /**
-     * @param $id
+     * @param string $id
      *
      * @return \BetaKiller\Model\AbstractEntityInterface
      * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\Repository\RepositoryException
      */
-    private function fetchEntity(int $id): AbstractEntityInterface
+    private function fetchEntity(string $id): AbstractEntityInterface
     {
         return $this->getRepository()->findById($id);
     }
