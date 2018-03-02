@@ -68,8 +68,9 @@ return [
 
     'entities.post' => 'Статьи и страницы',
 
-    'shortcode.image.attribute.layout.label'   => 'Шаблон',
-    'shortcode.image.attribute.align.label'    => 'Выравнивание',
-    'shortcode.image.attribute.zoomable.label' => 'Картинку можно приблизить',
-    'shortcode.image.attribute.width.label'    => 'Ширина',
+    'shortcode.attribute.id.label'       => 'ID',
+    'shortcode.attribute.layout.label'   => 'Шаблон',
+    'shortcode.attribute.align.label'    => 'Выравнивание',
+    'shortcode.attribute.zoomable.label' => 'Картинку можно приблизить',
+    'shortcode.attribute.width.label'    => 'Ширина',
 ];

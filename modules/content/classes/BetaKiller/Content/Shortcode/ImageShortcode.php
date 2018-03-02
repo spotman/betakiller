@@ -241,6 +241,7 @@ class ImageShortcode extends AbstractContentElementShortcode
             $data[] = new EditorListingItem(
                 $image->getID(),
                 $this->assetsHelper->getPreviewUrl($image),
+                $image->getTitle() ?: $image->getOriginalName(),
                 $image->isValid()
             );
         }

@@ -90,19 +90,10 @@ class ContentElementShortcodeEditor extends AbstractShortcodeEditor
 
     private function getAttributesData(ShortcodeInterface $shortcode): array
     {
-        $data          = [];
-        $shortcodeName = $shortcode->getCodename();
+        $data = [];
 
         foreach ($shortcode->getAttributesDefinitions() as $attr) {
-            $data[] = [
-                'name'    => $attr->getName(),
-                'type'    => $attr->getType(),
-                'label'   => __('shortcode.'.lcfirst($shortcodeName).'.attribute.'.$attr->getName().'.label'),
-                'values'  => $attr->getAllowedValues(),
-                'default' => $attr->getDefaultValue(),
-                'deps'    => $attr->getDependencies(),
-                'hidden'  => $attr->isHidden(),
-            ];
+            $data[] = $attr->jsonSerialize();
         }
 
         return $data;

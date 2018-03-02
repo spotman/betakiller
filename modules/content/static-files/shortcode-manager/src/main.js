@@ -14,8 +14,6 @@ new Vue({
 
   mounted: function () {
     console.log('root mounted');
-    //this.entitySlug = this.$el.dataset.entitySlug.value;
-    //this.entityItemId = this.$el.dataset.entityItemId.value;
     this.$store.commit(Mutations.INIT, this.$el.dataset);
   },
 })

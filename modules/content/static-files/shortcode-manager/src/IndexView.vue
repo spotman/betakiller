@@ -33,7 +33,7 @@
 
 <script>
   import contentRpc from 'content.api.rpc';
-  import Items from './Items';
+  import Items from './components/Items';
   import {mapGetters} from 'vuex';
   import FileUpload from 'vue-upload-component';
 
@@ -77,12 +77,19 @@
     },
 
     watch: {
-      initialized() {
-        this.fetchData();
-      },
       showGlobal() {
         this.fetchData();
+      },
+      files() {
+        console.log('this.files changed');
+        console.log(this.files);
       }
+    },
+
+    beforeRouteEnter (to, from, next) {
+      next(vm => {
+        vm.fetchData();
+      })
     },
 
     methods: {
@@ -97,13 +104,13 @@
       },
 
       selectItem(id) {
-        // Show edit item dialog (call route /edit/:id)
-        this.$router.push({name: 'edit-item', params: {id}});
+        // Show edit shortcode dialog (call route /edit/shortcode/?id=:id)
+        this.$router.push({name: 'edit-shortcode', query: {id}, exact: true});
       },
 
       contextItem(id) {
-        // Show edit shortcode dialog (call route /edit/shortcode/?id=:id)
-        this.$router.push({name: 'edit-shortcode', query: {id}});
+        // Show edit item dialog (call route /edit/:id)
+        this.$router.push({name: 'edit-item', params: {id}, exact: true});
       },
 
       fetchData() {
@@ -131,9 +138,9 @@
           if (newFile.active && !oldFile.active) {
             // beforeSend
             // min size
-            if (newFile.size >= 0 && this.minSize > 0 && newFile.size < this.minSize) {
-              this.$refs.upload.update(newFile, { error: 'size' })
-            }
+            //if (newFile.size >= 0 && this.minSize > 0 && newFile.size < this.minSize) {
+            //  this.$refs.upload.update(newFile, { error: 'size' })
+            //}
           }
           if (newFile.progress !== oldFile.progress) {
             // TODO progress bar

@@ -148,4 +148,26 @@ abstract class AbstractShortcodeAttribute implements ShortcodeAttributeInterface
     {
         return \count($this->dependencies) > 0;
     }
+
+    /**
+     * Specify data which should be serialized to JSON
+     *
+     * @link  http://php.net/manual/en/jsonserializable.jsonserialize.php
+     * @return mixed data which can be serialized by <b>json_encode</b>,
+     * which is a value of any type other than a resource.
+     * @since 5.4.0
+     */
+    public function jsonSerialize()
+    {
+        return [
+            'name'          => $this->getName(),
+            'type'          => $this->getType(),
+            'deps'          => $this->getDependencies(),
+            'hidden'        => $this->isHidden(),
+            'optional'      => $this->isOptional(),
+            'label'         => __('shortcode.attribute.'.$this->getName().'.label'),
+            'defaultValue'  => $this->getDefaultValue(),
+            'allowedValues' => $this->getAllowedValues(),
+        ];
+    }
 }

@@ -2,7 +2,7 @@
 namespace BetaKiller\Content\Shortcode\Attribute;
 
 
-interface ShortcodeAttributeInterface
+interface ShortcodeAttributeInterface extends \JsonSerializable
 {
     /**
      * Type for simple string-based attributes like "title" or "class"

@@ -70,6 +70,10 @@ define([
     },
 
     shortcode: {
+      getAttributesDefinition(name) {
+        return rpc(shortcodeResource, 'getAttributesDefinition', arguments);
+      },
+
       verify: function (name, attributes) {
         return rpc(shortcodeResource, 'verify', arguments);
       },

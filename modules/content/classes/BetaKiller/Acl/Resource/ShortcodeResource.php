@@ -6,6 +6,7 @@ use BetaKiller\Model\RoleInterface;
 class ShortcodeResource extends AbstractEntityRelatedAclResource
 {
     public const ACTION_VERIFY = 'verify';
+    public const ACTION_GET_ATTRIBUTES_DEFINITION = 'getAttributesDefinition';
 
     /**
      * Returns default permissions bundled with current resource
@@ -18,6 +19,13 @@ class ShortcodeResource extends AbstractEntityRelatedAclResource
     {
         return [
             self::ACTION_VERIFY => [
+                RoleInterface::WRITER_ROLE_NAME,
+                RoleInterface::MODERATOR_ROLE_NAME,
+                RoleInterface::ADMIN_ROLE_NAME,
+                RoleInterface::DEVELOPER_ROLE_NAME,
+            ],
+
+            self::ACTION_GET_ATTRIBUTES_DEFINITION => [
                 RoleInterface::WRITER_ROLE_NAME,
                 RoleInterface::MODERATOR_ROLE_NAME,
                 RoleInterface::ADMIN_ROLE_NAME,

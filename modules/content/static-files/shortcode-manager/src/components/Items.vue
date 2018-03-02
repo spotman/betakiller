@@ -1,12 +1,14 @@
 <template>
     <v-container fluid v-if="hasItems">
         <v-layout row wrap v-masonry item-selector=".content-element-list-item" gutter=".content-element-list-item">
-            <!--<div transition-duration="0.3s" item-selector=".content-element-list-item" >-->
             <v-flex xs6 sm4 md3 lg2 v-for="item in items" class="content-element-list-item" :key="item.id"
                     v-masonry-tile>
-                <v-card elevation-1 @click.native.left="emitSelectItemEvent(item.id)"
+                <v-card elevation-1 @click.native.left="emitSelectItemEvent(item.id)" :hover="true"
                         @click.right.prevent.stop="emitContextItemEvent(item.id)">
-                    <img :src="item.imageUrl" alt="">
+                    <v-tooltip bottom>
+                        <img :src="item.imageUrl" alt="" slot="activator">
+                        <span>{{ item.label }}</span>
+                    </v-tooltip>
                     <span v-if="!item.isValid" class="invalid-marker material-icons red--text">error</span>
                 </v-card>
             </v-flex>
@@ -66,6 +68,7 @@
     .content-element-list-item {
         /* hack for small images */
         width: 100%;
+        cursor: pointer;
     }
 
     .card {
@@ -82,7 +85,7 @@
     .invalid-marker {
         position: absolute;
         top: 10px;
-        right: 15px;
+        right: 10px;
         font-size: 2.5rem;
     }
 

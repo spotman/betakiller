@@ -211,6 +211,7 @@ class GalleryShortcode extends AbstractContentElementShortcode
             $data[] = new EditorListingItem(
                 $gallery->getID(),
                 $this->getPreviewUrl($gallery),
+                null, // Gallery nas no label yet
                 $gallery->isValid()
             );
         }
