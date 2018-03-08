@@ -29,9 +29,6 @@ class ContentImage extends AbstractOrmBasedAssetsImageModel implements ContentIm
      */
     public function isValid(): bool
     {
-        return $this->getID()
-            && $this->getEntityItemID()
-            && $this->getEntitySlug()
-            && $this->getAlt();
+        return $this->hasID() && $this->getAlt();
     }
 }

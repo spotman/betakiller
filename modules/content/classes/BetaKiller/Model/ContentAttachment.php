@@ -29,6 +29,6 @@ class ContentAttachment extends AbstractOrmBasedAssetsModel implements ContentAt
      */
     public function isValid(): bool
     {
-        return $this->getID() && $this->getEntityItemID() && $this->getEntitySlug();
+        return $this->hasID() && $this->hasEntity() && $this->hasEntityItemID();
     }
 }

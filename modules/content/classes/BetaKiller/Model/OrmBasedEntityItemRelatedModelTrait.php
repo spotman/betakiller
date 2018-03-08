@@ -44,6 +44,14 @@ trait OrmBasedEntityItemRelatedModelTrait
     }
 
     /**
+     * @return bool
+     */
+    public function hasEntity(): bool
+    {
+        return (bool)$this->get('entity_id');
+    }
+
+    /**
      * @return string
      */
     public function getEntitySlug(): string
@@ -69,6 +77,14 @@ trait OrmBasedEntityItemRelatedModelTrait
     public function getEntityItemID(): int
     {
         return $this->get('entity_item_id');
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasEntityItemID(): bool
+    {
+        return (bool)$this->get('entity_item_id');
     }
 
     /**

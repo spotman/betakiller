@@ -16,12 +16,17 @@ interface EntityItemRelatedInterface
     public function getEntity(): EntityModelInterface;
 
     /**
+     * @return bool
+     */
+    public function hasEntity(): bool;
+
+    /**
      * @return string
      */
     public function getEntitySlug(): string;
 
     /**
-     * Устанавливает ссылку на ID записи из таблицы, к которой привязана entity
+     * Set related record`s ID (from the entity-related table)
      *
      * @param int $id
      *
@@ -33,4 +38,9 @@ interface EntityItemRelatedInterface
      * @return int
      */
     public function getEntityItemID(): int;
+
+    /**
+     * @return bool
+     */
+    public function hasEntityItemID(): bool;
 }

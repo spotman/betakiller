@@ -53,8 +53,8 @@ class ContentGallery extends ORM implements ContentGalleryInterface
     public function isValid(): bool
     {
         return $this->getID()
-            && $this->getEntityItemID()
-            && $this->getEntitySlug()
+            && $this->hasEntity()
+            && $this->hasEntityItemID()
             && $this->imagesAreValid();
     }
 

@@ -141,8 +141,8 @@ class ContentYoutubeRecord extends ORM implements ContentElementInterface
     public function isValid(): bool
     {
         return $this->getID()
-            && $this->getEntityItemID()
-            && $this->getEntitySlug()
+            && $this->hasEntity()
+            && $this->hasEntityItemID()
             && $this->getYoutubeId();
     }
 }
