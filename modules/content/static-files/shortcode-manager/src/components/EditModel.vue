@@ -1,8 +1,6 @@
 <template>
     <v-form v-model="valid">
         <span>Edit model</span>
-        <!-- TODO Display different views for different shortcodes -->
-
     </v-form>
 </template>
 
@@ -16,10 +14,9 @@
       };
     },
 
-    created() {
-      console.log('edit-model created');
-      this.$emit('modelReady');
-      console.log('modelReady emitted');
+    mounted() {
+      console.log('edit-model mounted');
+      this.$emit('editReady');
 
       // TODO Load model data
     }

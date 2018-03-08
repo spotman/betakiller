@@ -1,8 +1,10 @@
 "use strict";
 
-let path = require('path');
-let Encore = require('@symfony/webpack-encore');
-let HardSourceWebpackPlugin = require('hard-source-webpack-plugin');
+const path = require('path');
+const Encore = require('@symfony/webpack-encore');
+const webpack = require('webpack');
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
+const HardSourceWebpackPlugin = require('hard-source-webpack-plugin');
 
 process.noDeprecation = true;
 
@@ -22,7 +24,9 @@ Encore
     'jquery',
     'api.rpc.factory',
     'content.api.rpc',
-    'vue'
+    'vue',
+    'vuex',
+    'vue-router',
   ])
 
   // allow sass/scss files to be processed
@@ -49,6 +53,7 @@ Encore
     'jquery.jsonRPC': path.resolve(__dirname, '../../../../application/static-files/api/jquery.jsonRPC.js'),
     'api.rpc.factory': path.resolve(__dirname, '../../../../application/static-files/api/rpc.factory.js'),
     'content.api.rpc': path.resolve(__dirname, '../require.js/content.api.rpc.js'),
+    'ckeditor-post-message': path.resolve(__dirname, '../require.js/ckeditor-post-message.js'),
   })
 
   .addPlugin(new HardSourceWebpackPlugin)
@@ -58,5 +63,21 @@ Encore
 
 //console.log(path.resolve(__dirname, '../require.js/content.api.rpc.js'));
 
+/**
+ * Workaround for trash vendor libraries which are not ready for uglify
+ * @link https://github.com/symfony/webpack-encore/issues/139#issuecomment-323585179
+ */
+const webpackConfig = Encore.getWebpackConfig();
+
+if (Encore.isProduction()) {
+  // Remove the old version first
+  webpackConfig.plugins = webpackConfig.plugins.filter(
+    plugin => !(plugin instanceof webpack.optimize.UglifyJsPlugin)
+  );
+
+// Add the new one
+  webpackConfig.plugins.push(new UglifyJsPlugin());
+}
+
 // export the final configuration
-module.exports = Encore.getWebpackConfig();
+module.exports = webpackConfig;

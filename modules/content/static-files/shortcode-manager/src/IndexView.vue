@@ -1,22 +1,14 @@
 <template>
-    <v-app id="index-view">
-        <v-toolbar app>
+    <app v-model="appReady">
+        <v-toolbar slot="toolbar" app>
             <v-switch v-model="showGlobal" label="Show global items" hide-details></v-switch>
             <v-spacer></v-spacer>
             <v-text-field prepend-icon="search" solo label="Search" hide-details></v-text-field>
         </v-toolbar>
 
-        <v-content>
+        <v-container slot="content" fill-height fluid>
             <items v-if="itemsLoaded" :items="items"
                    @addItem="addItem" @selectItem="selectItem" @contextItem="contextItem"></items>
-
-            <v-container v-if="!itemsLoaded" fill-height fluid>
-                <v-layout align-center justify-center>
-                    <v-flex xs12 sm8 md6 lg4 xl3 text-xs-center>
-                        <v-progress-circular indeterminate color="primary"></v-progress-circular>
-                    </v-flex>
-                </v-layout>
-            </v-container>
 
             <file-upload v-if="uploadEnabled" v-model="files" :post-action="uploadUrl" :multiple="true"
                          :thread="3" :drop="true" :drop-directory="true" ref="upload" @input-file="inputFile"
@@ -26,13 +18,13 @@
             <!--Verified successfully-->
             <!--<v-btn flat color="black" @click.native="verified = false">Close</v-btn>-->
             <!--</v-snackbar>-->
-        </v-content>
-
-    </v-app>
+        </v-container>
+    </app>
 </template>
 
 <script>
   import contentRpc from 'content.api.rpc';
+  import App from './components/App';
   import Items from './components/Items';
   import {mapGetters} from 'vuex';
   import FileUpload from 'vue-upload-component';
@@ -41,12 +33,14 @@
     name: "index",
 
     components: {
+      App,
       Items,
       FileUpload
     },
 
     data() {
       return {
+        appReady: false,
         showGlobal: false,
 
         itemsLoaded: false,
@@ -79,6 +73,12 @@
     watch: {
       showGlobal() {
         this.fetchData();
+      },
+      itemsLoaded() {
+        this.$nextTick(() => {
+          console.log('all rendered');
+          this.appReady = true;
+        })
       },
       files() {
         console.log('this.files changed');

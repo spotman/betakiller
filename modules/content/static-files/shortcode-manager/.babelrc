@@ -1,6 +1,11 @@
 {
   "presets": [
-    "stage-3",
-    ["env", { "modules": false }]
+    ["@babel/preset-env", {
+      "modules": false,
+      "forceAllTransforms": true
+    }]
+  ],
+  "plugins": [
+    "@babel/plugin-proposal-object-rest-spread"
   ]
 }

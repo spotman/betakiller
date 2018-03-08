@@ -1,26 +1,26 @@
 <template>
 
     <!-- is hidden -->
-    <input v-if="hidden" type="hidden" :name="name" :value="currentValue"/>
+    <input v-if="actual && hidden" type="hidden" :name="name" :value="currentValue"/>
 
-    <v-layout v-else-if="!hidden" align-center>
+    <v-layout v-else-if="actual && !hidden" align-center>
         <v-checkbox v-if="optional && isNumberType" v-model="enabled" hide-details class="shrink mr-2"></v-checkbox>
 
         <!-- type "boolean" -->
-        <v-switch v-if="isBooleanType" v-model="booleanValue" :label="label" :disabled="disabled"
-                  hide-details></v-switch>
+        <v-switch v-if="isBooleanType" v-model="booleanValue" :label="label"
+                  :required="!optional" :disabled="disabled" hide-details></v-switch>
 
         <!-- type "string" -->
-        <v-text-field v-else-if="isStringType" type="text" v-model="stringValue" :disabled="disabled"
-                      :label="label"></v-text-field>
+        <v-text-field v-else-if="isStringType" type="text" v-model="stringValue" :label="label"
+                      :required="!optional" :disabled="disabled"></v-text-field>
 
         <!-- type "number" -->
         <v-text-field v-else-if="isNumberType" type="number" v-model="numberValue" :label="label"
-                      :disabled="disabled"></v-text-field>
+                      :required="!optional" :disabled="disabled"></v-text-field>
 
         <!-- type "switch" -->
         <v-select v-else-if="isSwitchType" v-model="switchValue" :label="label" :items="allowedValues"
-                  :disabled="disabled"></v-select>
+                  :required="!optional" :disabled="disabled"></v-select>
     </v-layout>
 
 </template>
@@ -39,6 +39,10 @@
         default: false
       },
       optional: {
+        type: Boolean,
+        default: false
+      },
+      actual: {
         type: Boolean,
         default: false
       },
@@ -73,7 +77,7 @@
         enabled: !!this.currentValue,
         booleanValue: (this.currentValue || this.defaultValue) === "true",
         stringValue: this.currentValue,
-        numberValue: this.currentValue, //Number(),
+        numberValue: this.currentValue,
         switchValue: this.currentValue,
       };
     },
