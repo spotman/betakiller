@@ -10,7 +10,7 @@ class EditorListingItem implements \JsonSerializable
     private $id;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $imageUrl;
 
@@ -20,7 +20,7 @@ class EditorListingItem implements \JsonSerializable
     private $isValid;
 
     /**
-     * @var string|null
+     * @var string
      */
     private $label;
 
@@ -28,11 +28,11 @@ class EditorListingItem implements \JsonSerializable
      * EditorListingItem constructor.
      *
      * @param int    $id
-     * @param string $imageUrl
+     * @param string|null $imageUrl
      * @param string $label
      * @param bool   $isValid
      */
-    public function __construct(int $id, string $imageUrl, ?string $label, bool $isValid)
+    public function __construct(int $id, ?string $imageUrl, string $label, bool $isValid)
     {
         $this->id       = $id;
         $this->imageUrl = $imageUrl;
@@ -51,7 +51,7 @@ class EditorListingItem implements \JsonSerializable
     /**
      * @return string
      */
-    public function getImageUrl(): string
+    public function getImageUrl(): ?string
     {
         return $this->imageUrl;
     }
@@ -59,7 +59,7 @@ class EditorListingItem implements \JsonSerializable
     /**
      * @return string
      */
-    public function getLabel(): ?string
+    public function getLabel(): string
     {
         return $this->label;
     }

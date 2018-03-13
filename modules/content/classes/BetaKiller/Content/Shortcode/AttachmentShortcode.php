@@ -1,8 +1,10 @@
 <?php
 namespace BetaKiller\Content\Shortcode;
 
-use BetaKiller\Content\Shortcode\Attribute\NumberAttribute;
+use BetaKiller\Content\Shortcode\Attribute\ItemAttribute;
 use BetaKiller\Content\Shortcode\Attribute\StringAttribute;
+use BetaKiller\Content\Shortcode\Editor\ContentElementShortcodeEditor;
+use BetaKiller\Content\Shortcode\Editor\EditorListingItem;
 use BetaKiller\Helper\AssetsHelper;
 use BetaKiller\Model\ContentImageInterface;
 use BetaKiller\Model\EntityModelInterface;
@@ -73,11 +75,10 @@ class AttachmentShortcode extends AbstractContentElementShortcode
     {
         return [
             (new StringAttribute(self::ATTR_LABEL))
-                ->optional()
                 ->dependsOn(self::ATTR_LAYOUT, self::LAYOUT_TEXT),
 
-            (new NumberAttribute(self::ATTR_IMAGE_ID))
-                ->optional()
+            // Select image
+            (new ItemAttribute(self::ATTR_IMAGE_ID, 'Image'))
                 ->dependsOn(self::ATTR_LAYOUT, self::LAYOUT_IMAGE),
         ];
     }
@@ -243,7 +244,66 @@ class AttachmentShortcode extends AbstractContentElementShortcode
      */
     public function getEditorListingItems(?EntityModelInterface $relatedEntity, ?int $itemID): array
     {
-        // TODO: Implement getEditorListingItems() method.
+        $attachments = $this->attachmentRepository->getEditorListing($relatedEntity, $itemID);
+
+        $data = [];
+
+        foreach ($attachments as $attach) {
+            $data[] = new EditorListingItem(
+                $attach->getID(),
+                null, // Use default image placeholder
+                $attach->getOriginalName(),
+                $attach->isValid()
+            );
+        }
+
+        return $data;
+    }
+
+    /**
+     * Returns item data (based on "id" attribute value)
+     *
+     * @return array
+     */
+    public function getEditorItemData(): array
+    {
+        // No data for editing
         return [];
+    }
+
+    /**
+     * Update model data (based on "id" attribute value)
+     *
+     * @param array $data
+     */
+    public function updateEditorItemData(array $data): void
+    {
+        // Nothing to do coz there is no editable data
+    }
+
+    /**
+     * Return url for uploading new items or null if items can not be uploaded and must be added via regular edit form
+     *
+     * @return null|string
+     */
+    public function getEditorItemUploadUrl(): ?string
+    {
+        // Create empty model for detecting assets provider
+        $model = $this->attachmentRepository->create();
+
+        return $this->assetsHelper->getUploadUrl($model);
+    }
+
+    /**
+     * Return array of allowed mime-types
+     *
+     * @return string[]
+     */
+    public function getEditorItemAllowedMimeTypes(): array
+    {
+        // All mime-types allowed
+        return [
+            ContentElementShortcodeEditor::ANY_MIME_TYPES,
+        ];
     }
 }

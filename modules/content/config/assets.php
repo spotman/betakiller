@@ -54,6 +54,12 @@ return [
                 'name' => 'LocalPublic',
                 'path' => 'content-attachments'
             ],
+
+            'preview' => [
+                'sizes' => [
+                    '250x250',
+                ],
+            ],
         ]
     ],
 ];

@@ -18,14 +18,12 @@
         <iface uri="{ContentComment.id}" codename="Admin_Content_CommentItem" label="{ContentComment.getLabel()}" hasDynamicUrl="true" entity="ContentComment" entityAction="read" />
     </iface>
 
-    <iface uri="shortcodes" codename="Admin_Content_Shortcode_Index" parentCodename="Admin_Index" label="Shortcodes plugin" entity="Shortcode" entityAction="list" layoutCodename="iframe">
+    <iface uri="shortcodes" codename="Admin_Content_Shortcode_Index" parentCodename="Admin_Index" label="Shortcodes plugin" entity="Shortcode" entityAction="list" layoutCodename="raw">
         <iface uri="{Shortcode.tag_name}" codename="Admin_Content_Shortcode_Editor_IndexItem" label="{Shortcode.codename}" hasDynamicUrl="true" entity="Shortcode" entityAction="read">
             <iface uri="{Entity.slug}" codename="Admin_Content_Shortcode_Editor_EntityIndexItem" label="{Entity.getLabel()}" hasDynamicUrl="true" entity="Shortcode" entityAction="read">
                 <iface uri="{Id}" codename="Admin_Content_Shortcode_Editor_EntityIdIndexItem" label="{Id}" hasDynamicUrl="true" entity="Shortcode" entityAction="read" />
             </iface>
 
-            <iface uri="edit" codename="Admin_Content_Shortcode_Editor_EditItem" label="Edit shortcode" entity="Shortcode" entityAction="update" />
-            <iface uri="delete" codename="Admin_Content_Shortcode_Editor_DeleteItem" label="Delete shortcode" entity="Shortcode" entityAction="delete" />
             <iface uri="wysiwyg-preview" codename="Admin_Content_Shortcode_WysiwygPreview" label="Preview" entity="Shortcode" entityAction="read" />
         </iface>
     </iface>

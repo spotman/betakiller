@@ -162,7 +162,7 @@ abstract class AbstractShortcodeAttribute implements ShortcodeAttributeInterface
         return [
             'name'          => $this->getName(),
             'type'          => $this->getType(),
-            'deps'          => $this->getDependencies(),
+            'deps'          => $this->getDependencies() ?: new \stdClass(), // Hack for proper json_encode in API
             'hidden'        => $this->isHidden(),
             'optional'      => $this->isOptional(),
             'label'         => __('shortcode.attribute.'.$this->getName().'.label'),

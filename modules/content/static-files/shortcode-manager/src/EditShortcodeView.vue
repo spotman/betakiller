@@ -3,15 +3,25 @@
         <v-container slot="content" fill-height fluid>
             <v-layout align-center justify-center>
                 <v-flex xs12 sm8 md6 lg4 xl3 text-xs-center>
-                    <edit :id="modelId" @editReady="editReadyHandler"></edit>
+                    <EditItem
+                            v-if="attributesReady"
+                            :id="modelId"
+                            @itemReady="itemReadyHandler"
+                            @itemChanged="modelChanged = true"
+                            @itemSaved="modelChanged = false"
+                    />
 
-                    <v-form v-model="isValid">
-                        <shortcode-attribute v-for="definition in definitions" v-bind="definition"
-                                             :key="definition.name" :currentValue="getCurrentValue(definition.name)"
-                                             @changed="valueChanged"
-                                             :actual="actuality[definition.name]"></shortcode-attribute>
+                    <v-form v-model="isValid" v-if="definitionsReady && actualityReady">
+                        <ShortcodeAttribute
+                                v-for="definition in definitions"
+                                v-bind="definition"
+                                :key="definition.name"
+                                :currentValue="getCurrentValue(definition.name)"
+                                :actual="isAttributeActual(definition.name)"
+                                @changed="valueChanged"
+                        />
 
-                        <v-btn color="primary" @click.prevent="insertShortcode" :disabled="verifying">
+                        <v-btn color="primary" @click.prevent="insertShortcode" :disabled="buttonDisabled">
                             Insert shortcode
                         </v-btn>
                     </v-form>
@@ -26,14 +36,14 @@
   import ApiRpc from 'content.api.rpc';
   import PostMessage from 'ckeditor-post-message';
   import App from './components/App';
-  import Edit from './components/Edit';
+  import EditItem from './components/EditItem';
   import ShortcodeAttribute from './components/ShortcodeAttribute';
 
   export default {
-    name: "edit-shortcode",
+    name: "EditShortcode",
     components: {
       App,
-      Edit,
+      EditItem,
       ShortcodeAttribute
     },
 
@@ -46,14 +56,18 @@
         dependencies: {},
 
         isValid: false,
-        editReady: false,
-        verifying: false
+        itemReady: false,
+        attributesReady: false,
+        verifying: false,
+        modelChanged: false,
+        dependenciesReady: false
       };
     },
 
     computed: {
       ...mapGetters([
         'shortcodeName',
+        'shortcodeTagName',
       ]),
 
       modelId() {
@@ -61,7 +75,20 @@
       },
 
       viewReady() {
-        return this.editReady && Object.keys(this.definitions).length > 0;
+        //console.log(this.itemReady, this.definitionsReady, this.dependenciesReady, this.actualityReady);
+        return this.itemReady && this.definitionsReady && this.dependenciesReady && this.actualityReady;
+      },
+
+      definitionsReady() {
+        return Object.keys(this.definitions).length > 0;
+      },
+
+      actualityReady() {
+        return Object.keys(this.actuality).length === Object.keys(this.definitions).length;
+      },
+
+      buttonDisabled() {
+        return this.modelChanged || this.verifying;
       }
     },
 
@@ -73,6 +100,9 @@
 
     methods: {
       loadData() {
+        this.attributesReady = false;
+        this.definitions = {};
+
         this.importQueryParams();
 
         ApiRpc.shortcode.getAttributesDefinition(this.shortcodeName)
@@ -82,7 +112,7 @@
             this.updateActuality();
           })
           .fail(message => {
-            // TODO Error message
+            alert(message);
           });
       },
 
@@ -95,6 +125,8 @@
           // Somewhy vue-router converts strings to numbers
           this.attributes[name] = String(params[name]);
         }
+
+        this.attributesReady = true;
       },
 
       getCurrentValue(name) {
@@ -130,6 +162,8 @@
       },
 
       collectDependencies() {
+        this.dependenciesReady = false;
+
         this.eachDefinition((sourceName, definition) => {
           const attrDeps = definition.deps;
 
@@ -145,9 +179,13 @@
             }
           }
         });
+
+        this.dependenciesReady = true;
       },
 
       updateActuality() {
+        let actuality = {};
+
         // Calculate actual attributes and set definition flags
         this.eachDependency((targetName, valuesToName) => {
           for (var targetValue in valuesToName) {
@@ -157,33 +195,49 @@
 
             const sourceName = valuesToName[targetValue];
 
-            this.actuality[sourceName] = targetValue === this.attributes[targetName];
+            actuality[sourceName] = targetValue === this.attributes[targetName];
           }
         });
 
         this.eachDefinition((name) => {
-          if (!this.actuality.hasOwnProperty(name)) {
+          if (!actuality.hasOwnProperty(name)) {
             // Actual by default
-            this.actuality[name] = true;
+            actuality[name] = true;
           }
         });
+
+        this.actuality = actuality;
       },
 
-      editReadyHandler() {
-        console.log('edit ready event received');
-        this.editReady = true;
+      isAttributeActual(name) {
+        return this.actuality[name];
+      },
+
+      itemReadyHandler() {
+        console.log('item ready event received');
+        this.itemReady = true;
       },
 
       insertShortcode() {
         if (this.isValid) {
           this.verifying = true;
 
-          // Cast observer to plain object
-          const data = {...this.attributes};
+          let data = {};
+
+          // Filter only actual attributes
+          for (const name in this.attributes) {
+            if (!this.attributes.hasOwnProperty(name)) {
+              continue;
+            }
+
+            if (this.isAttributeActual(name)) {
+              data[name] = this.attributes[name];
+            }
+          }
 
           ApiRpc.shortcode.verify(this.shortcodeName, data)
             .done((response) => {
-              PostMessage.insertShortcode(this.shortcodeName, response);
+              PostMessage.insertShortcode(this.shortcodeTagName, response);
             })
             .fail(function (message) {
               alert(message);

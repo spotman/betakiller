@@ -211,11 +211,54 @@ class GalleryShortcode extends AbstractContentElementShortcode
             $data[] = new EditorListingItem(
                 $gallery->getID(),
                 $this->getPreviewUrl($gallery),
-                null, // Gallery nas no label yet
+                $gallery->getID(), // Gallery nas no label yet
                 $gallery->isValid()
             );
         }
 
         return $data;
+    }
+
+    /**
+     * Returns item data (based on "id" attribute value)
+     *
+     * @return array
+     */
+    public function getEditorItemData(): array
+    {
+        // No data for editing
+        return [];
+    }
+
+    /**
+     * Update model data (based on "id" attribute value)
+     *
+     * @param array $data
+     */
+    public function updateEditorItemData(array $data): void
+    {
+        // Nothing to do coz there is no editable data
+    }
+
+    /**
+     * Return url for uploading new items or null if items can not be uploaded and must be added via regular edit form
+     *
+     * @return null|string
+     */
+    public function getEditorItemUploadUrl(): ?string
+    {
+        // TODO Get upload URL for images repository
+        return null;
+    }
+
+    /**
+     * Return array of allowed mime-types
+     *
+     * @return string[]
+     */
+    public function getEditorItemAllowedMimeTypes(): array
+    {
+        // TODO Get mime-types for images repository
+        return [];
     }
 }

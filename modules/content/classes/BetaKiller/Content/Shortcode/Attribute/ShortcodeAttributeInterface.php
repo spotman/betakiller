@@ -25,6 +25,11 @@ interface ShortcodeAttributeInterface extends \JsonSerializable
     public const TYPE_BOOLEAN = 'boolean';
 
     /**
+     * Type for selecting [other] shortcode item ID
+     */
+    public const TYPE_ITEM = 'item';
+
+    /**
      * Returns attribute name
      *
      * @return string

@@ -8,7 +8,7 @@ use Spotman\Api\ApiMethodException;
 use Spotman\Api\ApiMethodResponse;
 use Spotman\Api\Method\AbstractApiMethod;
 
-class ListApiMethod extends AbstractApiMethod
+class SearchApiMethod extends AbstractApiMethod
 {
     /**
      * @var \BetaKiller\Content\Shortcode\ContentElementShortcodeInterface
@@ -26,23 +26,30 @@ class ListApiMethod extends AbstractApiMethod
     private $entityItemId;
 
     /**
-     * ListApiMethod constructor.
+     * @var string|null
+     */
+    private $term;
+
+    /**
+     * SearchApiMethod constructor.
      *
      * @param string                                        $name
      * @param null|string                                   $entitySlug
      * @param int|null                                      $entityItemId
+     * @param string|null                                   $term
      * @param \BetaKiller\Content\Shortcode\ShortcodeFacade $facade
      *
      * @param \BetaKiller\Repository\EntityRepository       $entityRepository
      *
-     * @throws \BetaKiller\Repository\RepositoryException
      * @throws \BetaKiller\Factory\FactoryException
+     * @throws \BetaKiller\Repository\RepositoryException
      * @throws \Spotman\Api\ApiMethodException
      */
     public function __construct(
         string $name,
         ?string $entitySlug,
         ?int $entityItemId,
+        ?string $term,
         ShortcodeFacade $facade,
         EntityRepository $entityRepository
     ) {
@@ -60,6 +67,7 @@ class ListApiMethod extends AbstractApiMethod
         }
 
         $this->entityItemId = $entityItemId;
+        $this->term         = $term;
     }
 
     /**
@@ -67,6 +75,7 @@ class ListApiMethod extends AbstractApiMethod
      */
     public function execute(): ?ApiMethodResponse
     {
+        // TODO Implement search by term
         // Return data
         return $this->response(
             $this->shortcode->getEditorListingItems($this->entity, $this->entityItemId)

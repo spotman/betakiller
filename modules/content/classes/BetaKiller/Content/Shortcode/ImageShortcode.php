@@ -6,6 +6,7 @@ use BetaKiller\Content\Shortcode\Attribute\NumberAttribute;
 use BetaKiller\Content\Shortcode\Attribute\SwitchAttribute;
 use BetaKiller\Content\Shortcode\Editor\EditorListingItem;
 use BetaKiller\Helper\AssetsHelper;
+use BetaKiller\Model\ContentImageInterface;
 use BetaKiller\Model\EntityModelInterface;
 use BetaKiller\Repository\ContentImageRepository;
 
@@ -193,13 +194,7 @@ class ImageShortcode extends AbstractContentElementShortcode
      */
     public function getWidgetData(): array
     {
-        $imageID = (int)$this->getID();
-
-        if (!$imageID) {
-            throw new ShortcodeException('No image ID provided');
-        }
-
-        $model = $this->imageRepository->findById($imageID);
+        $model = $this->getCurrentImageModel();
 
         $align = $this->getAttribute(self::ATTR_ALIGN) ?? null;
         $width = $this->getAttribute(self::ATTR_WIDTH);
@@ -226,6 +221,21 @@ class ImageShortcode extends AbstractContentElementShortcode
     }
 
     /**
+     * @return \BetaKiller\Model\ContentImageInterface
+     * @throws \BetaKiller\Content\Shortcode\ShortcodeException
+     */
+    private function getCurrentImageModel(): ContentImageInterface
+    {
+        $imageID = (int)$this->getID();
+
+        if (!$imageID) {
+            throw new ShortcodeException('No image ID provided');
+        }
+
+        return $this->imageRepository->findById($imageID);
+    }
+
+    /**
      * @param \BetaKiller\Model\EntityModelInterface|null $relatedEntity
      * @param int|null                                    $itemID
      *
@@ -247,5 +257,73 @@ class ImageShortcode extends AbstractContentElementShortcode
         }
 
         return $data;
+    }
+
+    /**
+     * Returns item data (based on "id" attribute value)
+     *
+     * @return array
+     * @throws \BetaKiller\Content\Shortcode\ShortcodeException
+     */
+    public function getEditorItemData(): array
+    {
+        $model = $this->getCurrentImageModel();
+
+        return [
+            'alt'   => $model->getAlt(),
+            'title' => $model->getTitle(),
+            'url'   => $this->assetsHelper->getOriginalUrl($model),
+        ];
+    }
+
+    /**
+     * Update model data (based on "id" attribute value)
+     *
+     * @param array $data
+     *
+     * @throws \BetaKiller\Content\Shortcode\ShortcodeException
+     */
+    public function updateEditorItemData(array $data): void
+    {
+        $model = $this->getCurrentImageModel();
+
+        if (isset($data['alt'])) {
+            // Sanitize data
+            $model->setAlt(\trim(\HTML::entities($data['alt'])));
+        }
+
+        if (isset($data['title'])) {
+            // Sanitize data
+            $model->setTitle(\trim(\HTML::entities($data['title'])));
+        }
+
+        $this->imageRepository->save($model);
+    }
+
+    /**
+     * Return url for uploading new items or null if items can not be uploaded and must be added via regular edit form
+     *
+     * @return null|string
+     */
+    public function getEditorItemUploadUrl(): ?string
+    {
+        // Create empty model for detecting assets provider
+        $model = $this->imageRepository->create();
+
+        return $this->assetsHelper->getUploadUrl($model);
+    }
+
+    /**
+     * Return array of allowed mime-types
+     *
+     * @return string[]
+     * @throws \BetaKiller\Assets\AssetsException
+     */
+    public function getEditorItemAllowedMimeTypes(): array
+    {
+        // Create empty model for detecting assets provider
+        $model = $this->imageRepository->create();
+
+        return $this->assetsHelper->getAllowedMimeTypes($model);
     }
 }

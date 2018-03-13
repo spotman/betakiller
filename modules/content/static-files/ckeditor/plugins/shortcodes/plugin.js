@@ -88,9 +88,9 @@ function getBasePluginUrl(customTag) {
 }
 
 function makeEditorIndexUrl(editor, tagName) {
-  //console.log(arguments);
-  const entity = editor.config.contentEntityName || null,
-        itemID = editor.config.contentEntityItemID || null;
+  //console.log('editor.config is', editor.config);
+  const entity = editor.config.contentEntityName,
+        itemID = editor.config.contentEntityItemID;
 
   let url = getBasePluginUrl(tagName);
 
@@ -105,8 +105,8 @@ function makeEditorIndexUrl(editor, tagName) {
   return url;
 }
 
-function makeEditUrl(tagName, attributes) {
-  return getBasePluginUrl(tagName) + 'edit/?' + objectToQueryString(attributes);
+function makeEditUrl(editor, tagName, attributes) {
+  return makeEditorIndexUrl(editor, tagName) + '#/edit/shortcode?' + objectToQueryString(attributes);
 }
 
 function makeFakeObjectSrc(attributes, tagName) {
@@ -140,16 +140,16 @@ CKEDITOR.shortcodes = {
   //createDomElement: function (tagName) {
   //  return new CKEDITOR.dom.element(tagName);
   //},
-  createFakeObject: function (editor, realNode, customTagName) {
-    // realNode.setName(tagName);
-    let obj = editor.createFakeElement(realNode, getFakeObjectClassName(customTagName), customTagName, true);
-
-    console.log(realNode);
-
-    obj.setAttribute('src', makeFakeObjectSrc(realNode.getAttributes(), customTagName));
-
-    return obj;
-  }
+  //createFakeObject: function (editor, realNode, customTagName) {
+  //  // realNode.setName(tagName);
+  //  let obj = editor.createFakeElement(realNode, getFakeObjectClassName(customTagName), customTagName, true);
+  //
+  //  console.log(realNode);
+  //
+  //  obj.setAttribute('src', makeFakeObjectSrc(realNode.getAttributes(), customTagName));
+  //
+  //  return obj;
+  //}
 };
 
 CKEDITOR.plugins.add('shortcodes', {
@@ -171,8 +171,8 @@ CKEDITOR.plugins.add('shortcodes', {
       || document.documentElement.clientHeight
       || document.body.clientHeight;
 
-    const iFrameHeight = height - 250,
-          iFrameWidth  = width - 250;
+    const iFrameHeight = height - 150,
+          iFrameWidth  = width - 150;
 
     const staticShortcodesIframeName = 'StaticShortcodesIFrame';
 
@@ -248,7 +248,7 @@ CKEDITOR.plugins.add('shortcodes', {
         CKEDITOR.dialog.addIframe(
           editIframeName,
           'Content Shortcode Editor - [' + tagName + ']',
-          makeEditUrl(tagName, realAttributes), iFrameWidth, iFrameHeight,
+          makeEditUrl(editor, tagName, realAttributes), iFrameWidth, iFrameHeight,
           function () {
           }, // Iframe loaded callback.
           {buttons: []} // CKEDITOR.dialog.okButton
@@ -328,7 +328,7 @@ CKEDITOR.plugins.add('shortcodes', {
 //// Диалоговое окно со свойствами элемента
 //CKEDITOR.dialog.add(propertiesDialogName, function (editor) {
 //  return {
-//    title: 'Свойства изображения', // TODO
+//    title: 'Свойства изображения',
 //    minWidth: 400,
 //    minHeight: 70,
 //

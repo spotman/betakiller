@@ -6,19 +6,6 @@ interface ContentElementShortcodeInterface extends ItemBasedShortcodeInterface
     public const ATTR_LAYOUT = 'layout';
 
     /**
-     * @return int|null
-     * @throws \BetaKiller\Content\Shortcode\ShortcodeException
-     */
-    public function getID(): ?int;
-
-    /**
-     * @param int $value
-     *
-     * @throws \BetaKiller\Content\Shortcode\ShortcodeException
-     */
-    public function setID(int $value): void;
-
-    /**
      * @param bool|null $useDefaultIfEmpty
      *
      * @return null|string

@@ -1,7 +1,6 @@
 <?php
 namespace BetaKiller\Model;
 
-use Kohana_Exception;
 use ORM;
 
 class ContentYoutubeRecord extends ORM implements ContentElementInterface
@@ -30,19 +29,22 @@ class ContentYoutubeRecord extends ORM implements ContentElementInterface
         parent::_initialize();
     }
 
-//    /**
-//     * Rule definitions for validation
-//     *
-//     * @return array
-//     */
-//    public function rules()
-//    {
-//        return parent::rules() + [
-//            'alt'   =>  [
-//                ['not_empty']
-//            ],
-//        ];
-//    }
+    /**
+     * Rule definitions for validation
+     *
+     * @return array
+     */
+    public function rules()
+    {
+        return parent::rules() + [
+            'youtube_id'   =>  [
+                ['not_empty']
+            ],
+            'uploaded_by'   =>  [
+                ['not_empty']
+            ],
+        ];
+    }
 
     public function getYoutubeEmbedUrl(): string
     {
@@ -56,8 +58,6 @@ class ContentYoutubeRecord extends ORM implements ContentElementInterface
 
     /**
      * @param string $value
-     *
-     * @throws Kohana_Exception
      */
     public function setYoutubeId(string $value): void
     {
@@ -66,7 +66,6 @@ class ContentYoutubeRecord extends ORM implements ContentElementInterface
 
     /**
      * @return string
-     * @throws Kohana_Exception
      */
     public function getYoutubeId(): string
     {
@@ -75,8 +74,6 @@ class ContentYoutubeRecord extends ORM implements ContentElementInterface
 
     /**
      * @param int $value
-     *
-     * @throws Kohana_Exception
      */
     public function setWidth(int $value): void
     {
@@ -85,7 +82,6 @@ class ContentYoutubeRecord extends ORM implements ContentElementInterface
 
     /**
      * @return int
-     * @throws Kohana_Exception
      */
     public function getWidth(): int
     {
@@ -94,8 +90,6 @@ class ContentYoutubeRecord extends ORM implements ContentElementInterface
 
     /**
      * @param int $value
-     *
-     * @throws Kohana_Exception
      */
     public function setHeight(int $value): void
     {
@@ -104,7 +98,6 @@ class ContentYoutubeRecord extends ORM implements ContentElementInterface
 
     /**
      * @return int
-     * @throws \BetaKiller\Exception
      */
     public function getHeight(): int
     {

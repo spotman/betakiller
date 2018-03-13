@@ -29,28 +29,4 @@ class StaticShortcodeEditor extends AbstractShortcodeEditor
         // Static shortcodes have no index data
         return [];
     }
-
-    /**
-     * Returns data for EditItem IFace
-     *
-     * @param \BetaKiller\Content\Shortcode\Editor\ShortcodeInterface $shortcode
-     *
-     * @return array
-     */
-    public function getEditIFaceData(ShortcodeInterface $shortcode): array
-    {
-        // Static shortcodes are not editable
-        return [];
-    }
-
-    /**
-     * Returns data for DeleteItem IFace
-     *
-     * @return array
-     */
-    public function getDeleteIFaceData(): array
-    {
-        // Static shortcodes are not deletable
-        return [];
-    }
 }

@@ -73,4 +73,6 @@ return [
     'shortcode.attribute.align.label'    => 'Выравнивание',
     'shortcode.attribute.zoomable.label' => 'Картинку можно приблизить',
     'shortcode.attribute.width.label'    => 'Ширина',
+    'shortcode.attribute.label.label'    => 'Надпись',
+    'shortcode.attribute.image-id.label' => 'Изображение',
 ];

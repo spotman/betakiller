@@ -1,119 +1,135 @@
-{{ js("ifaces/admin/shortcode-editor/content-element-editor-index.js") }}
+{# Vuetify needs special viewport #}
+{{ meta("viewport", "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui") }}
+{{ css("shortcode-manager/dist/app.css") }}
+{{ css("https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons") }}
 
-<div class="row">
+{{ js("shortcode-manager/dist/manifest.js") }}
+{{ js("shortcode-manager/dist/vendor.js") }}
+{{ js("shortcode-manager/dist/app.js") }}
+
+<div id="tags-manager" data-entity-slug="{{ entity_slug }}" data-entity-item-id="{{ entity_item_id }}"
+     data-name="{{ codename }}"
+     data-tag-name="{{ tag_name }}"
+     data-upload-url="{{ upload_url }}"
+     data-accept-mime-types="{{ mime_types|join(",") }}" data-accept-extensions="{{ extensions|join(",") }}">
+  <router-view></router-view>
+</div>
+
+
+{#<div class="row">#}
   {# Placeholder for adding new element #}
-  <div class="editor-content-element-listing-item col s12 m4 l3 xl2">
+  {#<div class="editor-content-element-listing-item col s12 m4 l3 xl2">#}
 
-    <div class="card small card-flat upload-handler valign-wrapper" data-upload-url="{{ upload_url }}"
-         data-entity-id="{{ entity_id }}" data-id="{{ entity_item_id }}">
+    {#<div class="card small card-flat upload-handler valign-wrapper" data-upload-url="{{ upload_url }}"#}
+         {#data-entity-id="{{ entity_id }}" data-id="{{ entity_item_id }}">#}
       {#<div class="card-image">#}
         {#<img src="{{ item.image }}" />#}
         {#Add#}
       {#</div>#}
-        <div style="margin: 0 auto">
-          <i class="material-icons large text-green">add</i>
-        </div>
-    </div>
-  </div>
+        {#<div style="margin: 0 auto">#}
+          {#<i class="material-icons large text-green">add</i>#}
+        {#</div>#}
+    {#</div>#}
+  {#</div>#}
 
-  {% for item in items %}
-    <div class="editor-content-element-listing-item col s12 m4 l3 xl2">
+  {#{% for item in items %}#}
+    {#<div class="editor-content-element-listing-item col s12 m4 l3 xl2">#}
 
-      <div class="card small insert-handler" data-tag-name="{{ item.tag_name }}" data-id="{{ item.id }}">
-        <div class="card-image">
-          <img src="{{ item.image }}" />
+      {#<div class="card small insert-handler" data-tag-name="{{ item.tag_name }}" data-id="{{ item.id }}">#}
+        {#<div class="card-image">#}
+          {#<img src="{{ item.image }}" />#}
           {#<span class="card-title">{{ item.label }}</span>#}
-        </div>
-        <div class="fixed-action-btn horizontal">
-          <a class="btn-floating grey darken-1">
-            <i class="large material-icons">more_vert</i>
-          </a>
-          <ul>
-            <li>
-              <a href="{{ item.delete_url }}" class="btn-floating red darken-1">
-                <i class="material-icons">delete</i>
-              </a>
-            </li>
-            <li>
-              <a href="{{ item.edit_url }}" class="btn-floating green">
-                <i class="material-icons">mode_edit</i>
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div class="validation-sign">
-            {% if item.is_valid %}
-              <div class="btn-floating transparent">
-                <i class="material-icons">done</i>
-              </div>
-            {% else %}
-              <a href="{{ item.edit_url }}" class="btn-floating red">
-                <i class="material-icons">priority_high</i>
-              </a>
-            {% endif %}
-        </div>
+        {#</div>#}
+        {#<div class="fixed-action-btn horizontal">#}
+          {#<a class="btn-floating grey darken-1">#}
+            {#<i class="large material-icons">more_vert</i>#}
+          {#</a>#}
+          {#<ul>#}
+            {#<li>#}
+              {#<a href="{{ item.delete_url }}" class="btn-floating red darken-1">#}
+                {#<i class="material-icons">delete</i>#}
+              {#</a>#}
+            {#</li>#}
+            {#<li>#}
+              {#<a href="{{ item.edit_url }}" class="btn-floating green">#}
+                {#<i class="material-icons">mode_edit</i>#}
+              {#</a>#}
+            {#</li>#}
+          {#</ul>#}
+        {#</div>#}
+        {#<div class="validation-sign">#}
+            {#{% if item.is_valid %}#}
+              {#<div class="btn-floating transparent">#}
+                {#<i class="material-icons">done</i>#}
+              {#</div>#}
+            {#{% else %}#}
+              {#<a href="{{ item.edit_url }}" class="btn-floating red">#}
+                {#<i class="material-icons">priority_high</i>#}
+              {#</a>#}
+            {#{% endif %}#}
+        {#</div>#}
         {#<div class="card-content">#}
           {#<p>{{ item.label }}</p>#}
         {#</div>#}
-      </div>
-    </div>
-  {% endfor %}
+      {#</div>#}
+    {#</div>#}
+  {#{% endfor %}#}
 
-  <style>
-    .editor-content-element-listing-item .card.small {
-      height: 200px !important;
-    }
+  {#<style>#}
+    {#.editor-content-element-listing-item .card.small {#}
+      {#height: 200px !important;#}
+    {#}#}
 
-    .editor-content-element-listing-item .upload-handler,
-    .editor-content-element-listing-item .insert-handler {
-      cursor: pointer;
-    }
+    {#.editor-content-element-listing-item .upload-handler,#}
+    {#.editor-content-element-listing-item .insert-handler {#}
+      {#cursor: pointer;#}
+    {#}#}
 
-    .editor-content-element-listing-item .card-image {
-      position: relative;
-      max-height: 100% !important;
-    }
+    {#.editor-content-element-listing-item .card-image {#}
+      {#position: relative;#}
+      {#max-height: 100% !important;#}
+    {#}#}
 
-    /*.editor-content-element-listing-item .card-title {*/
-      /*font-size: 20px !important;*/
-    /*}*/
+    {#/*.editor-content-element-listing-item .card-title {*/#}
+      {#/*font-size: 20px !important;*/#}
+    {#/*}*/#}
 
-    .editor-content-element-listing-item .fixed-action-btn {
-      position: absolute !important;
-      padding-top: 0 !important;
-      top: auto !important;
-      bottom: 23px !important;
-      z-index: 3 !important;
-      padding-left: 30px !important;
-    }
+    {#.editor-content-element-listing-item .fixed-action-btn {#}
+      {#position: absolute !important;#}
+      {#padding-top: 0 !important;#}
+      {#top: auto !important;#}
+      {#bottom: 23px !important;#}
+      {#z-index: 3 !important;#}
+      {#padding-left: 30px !important;#}
+    {#}#}
 
-    .editor-content-element-listing-item .fixed-action-btn.active {
-      padding-left: 125px !important;
-    }
+    {#.editor-content-element-listing-item .fixed-action-btn.active {#}
+      {#padding-left: 125px !important;#}
+    {#}#}
 
-    .editor-content-element-listing-item .fixed-action-btn ul {
-      right: 50px !important;
-      height: auto !important;
-      top: 0 !important;
-    }
+    {#.editor-content-element-listing-item .fixed-action-btn ul {#}
+      {#right: 50px !important;#}
+      {#height: auto !important;#}
+      {#top: 0 !important;#}
+    {#}#}
 
-    .editor-content-element-listing-item .fixed-action-btn li {
-      margin-top: 0 !important;
-    }
+    {#.editor-content-element-listing-item .fixed-action-btn li {#}
+      {#margin-top: 0 !important;#}
+    {#}#}
 
-    .editor-content-element-listing-item .validation-sign {
-      position: absolute;
-      bottom: 23px;
-      left: 23px;
-    }
+    {#.editor-content-element-listing-item .validation-sign {#}
+      {#position: absolute;#}
+      {#bottom: 23px;#}
+      {#left: 23px;#}
+    {#}#}
 
-    /*.editor-content-element-listing-item .card-content {*/
-      /*position: absolute !important;*/
-      /*bottom: 0 !important;*/
-      /*left: 0 !important;*/
-      /*z-index: 2;*/
-      /*background: white;*/
-      /*width: 100%;*/
-    /*}*/
-  </style>
-</div>
+    {#/*.editor-content-element-listing-item .card-content {*/#}
+      {#/*position: absolute !important;*/#}
+      {#/*bottom: 0 !important;*/#}
+      {#/*left: 0 !important;*/#}
+      {#/*z-index: 2;*/#}
+      {#/*background: white;*/#}
+      {#/*width: 100%;*/#}
+    {#/*}*/#}
+  {#</style>#}
+{#</div>#}

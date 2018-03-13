@@ -1,7 +1,7 @@
 <?php
 namespace BetaKiller\Repository;
 
-use BetaKiller\Model\Entity;
+use BetaKiller\Model\EntityModelInterface;
 use BetaKiller\Utils\Kohana\ORM\OrmInterface;
 
 trait OrmBasedEntityItemRelatedRepositoryTrait
@@ -34,7 +34,7 @@ trait OrmBasedEntityItemRelatedRepositoryTrait
 
     protected function filterEntityAndEntityItemID(
         OrmInterface $orm,
-        ?Entity $entity,
+        ?EntityModelInterface $entity,
         ?int $entityItemId
     ): void {
         $this->filterEntityID($orm, $entity ? $entity->getID() : null);
@@ -43,7 +43,7 @@ trait OrmBasedEntityItemRelatedRepositoryTrait
 
     protected function filterEntityOrEntityItemID(
         OrmInterface $orm,
-        ?Entity $entity = null,
+        ?EntityModelInterface $entity = null,
         ?int $entityItemId = null
     ): void {
         if ($entity) {

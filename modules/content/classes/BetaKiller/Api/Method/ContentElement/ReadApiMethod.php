@@ -3,12 +3,11 @@ namespace BetaKiller\Api\Method\ContentElement;
 
 use BetaKiller\Content\Shortcode\ContentElementShortcodeInterface;
 use BetaKiller\Content\Shortcode\ShortcodeFacade;
-use BetaKiller\Repository\EntityRepository;
 use Spotman\Api\ApiMethodException;
 use Spotman\Api\ApiMethodResponse;
 use Spotman\Api\Method\AbstractApiMethod;
 
-class ListApiMethod extends AbstractApiMethod
+class ReadApiMethod extends AbstractApiMethod
 {
     /**
      * @var \BetaKiller\Content\Shortcode\ContentElementShortcodeInterface
@@ -16,36 +15,18 @@ class ListApiMethod extends AbstractApiMethod
     private $shortcode;
 
     /**
-     * @var \BetaKiller\Model\EntityModelInterface
-     */
-    private $entity;
-
-    /**
-     * @var int|null
-     */
-    private $entityItemId;
-
-    /**
-     * ListApiMethod constructor.
+     * ReadApiMethod constructor.
      *
      * @param string                                        $name
-     * @param null|string                                   $entitySlug
-     * @param int|null                                      $entityItemId
+     * @param int                                           $modelID
      * @param \BetaKiller\Content\Shortcode\ShortcodeFacade $facade
      *
-     * @param \BetaKiller\Repository\EntityRepository       $entityRepository
-     *
-     * @throws \BetaKiller\Repository\RepositoryException
+     * @throws \BetaKiller\Content\Shortcode\ShortcodeException
      * @throws \BetaKiller\Factory\FactoryException
      * @throws \Spotman\Api\ApiMethodException
      */
-    public function __construct(
-        string $name,
-        ?string $entitySlug,
-        ?int $entityItemId,
-        ShortcodeFacade $facade,
-        EntityRepository $entityRepository
-    ) {
+    public function __construct(string $name, int $modelID, ShortcodeFacade $facade)
+    {
         $this->shortcode = $facade->createFromCodename($name);
 
         if (!$this->shortcode instanceof ContentElementShortcodeInterface) {
@@ -55,11 +36,7 @@ class ListApiMethod extends AbstractApiMethod
             ]);
         }
 
-        if ($entitySlug) {
-            $this->entity = $entityRepository->findBySlug($entitySlug);
-        }
-
-        $this->entityItemId = $entityItemId;
+        $this->shortcode->setID($modelID);
     }
 
     /**
@@ -69,7 +46,7 @@ class ListApiMethod extends AbstractApiMethod
     {
         // Return data
         return $this->response(
-            $this->shortcode->getEditorListingItems($this->entity, $this->entityItemId)
+            $this->shortcode->getEditorItemData()
         );
     }
 }

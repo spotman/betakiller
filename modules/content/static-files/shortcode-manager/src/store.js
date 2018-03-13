@@ -8,6 +8,7 @@ export default new Vuex.Store({
   state: {
     initialized: false,
     shortcodeName: null,
+    shortcodeTagName: null,
     entity: {
       slug: null,
       itemId: null,
@@ -21,6 +22,7 @@ export default new Vuex.Store({
   mutations: {
     [Mutations.INIT](state, config) {
       state.shortcodeName = config.name;
+      state.shortcodeTagName = config.tagName;
       state.entity.slug = config.entitySlug;
       state.entity.itemId = config.entityItemId;
       state.addAllowed = config.addAllowed;
@@ -38,6 +40,7 @@ export default new Vuex.Store({
   getters: {
     initialized: (state) => state.initialized,
     shortcodeName: (state) => state.shortcodeName,
+    shortcodeTagName: (state) => state.shortcodeTagName,
     entitySlug: (state) => state.entity.slug,
     entityItemId: (state) => state.entity.itemId,
     uploadUrl: (state) => state.uploadUrl,

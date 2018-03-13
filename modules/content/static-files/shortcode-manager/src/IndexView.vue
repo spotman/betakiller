@@ -6,13 +6,30 @@
             <v-text-field prepend-icon="search" solo label="Search" hide-details></v-text-field>
         </v-toolbar>
 
-        <v-container slot="content" fill-height fluid>
-            <items v-if="itemsLoaded" :items="items"
-                   @addItem="addItem" @selectItem="selectItem" @contextItem="contextItem"></items>
+        <v-container slot="content" fluid>
+            <items
+                    v-if="itemsLoaded"
+                    :items="items"
+                    :placeholderIconName="getPlaceholderIconName()"
+                    @addItem="addItem"
+                    @selectItem="selectItem"
+                    @contextItem="contextItem"
+            />
 
-            <file-upload v-if="uploadEnabled" v-model="files" :post-action="uploadUrl" :multiple="true"
-                         :thread="3" :drop="true" :drop-directory="true" ref="upload" @input-file="inputFile"
-                         :data="uploadData" :accept="acceptMimeTypes" :extensions="acceptExtensions"></file-upload>
+            <file-upload
+                    v-if="uploadEnabled"
+                    v-model="files"
+                    :post-action="uploadUrl"
+                    :multiple="true"
+                    :thread="3"
+                    :drop="true"
+                    :drop-directory="true"
+                    ref="upload"
+                    @input-file="inputFile"
+                    :data="uploadData"
+                    :accept="acceptMimeTypes"
+                    :extensions="acceptExtensions"
+            />
 
             <!--<v-snackbar color="success" :timeout="3000" v-model="verified">-->
             <!--Verified successfully-->
@@ -45,7 +62,13 @@
 
         itemsLoaded: false,
         items: [],
-        files: []
+        files: [],
+        itemPlaceholderIcons: {
+          Image: 'image',
+          Attachment: 'attachment',
+          Gallery: 'photo_library',
+          Youtube: 'ondemand_video'
+        }
       }
     },
 
@@ -93,6 +116,9 @@
     },
 
     methods: {
+      getPlaceholderIconName() {
+        return this.itemPlaceholderIcons[this.shortcodeName];
+      },
       addItem() {
         if (this.uploadEnabled) {
           // Open file upload OS dialog via clicking to the <input type=file> element

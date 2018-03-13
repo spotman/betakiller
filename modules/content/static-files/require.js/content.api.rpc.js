@@ -80,8 +80,17 @@ define([
     },
 
     contentElement: {
+      read(name, id) {
+        return rpc(contentElementResource, 'read', arguments);
+      },
+      update(name, id, data) {
+        return rpc(contentElementResource, 'update', arguments);
+      },
       list (name, entitySlug, entityItemID) {
         return rpc(contentElementResource, 'list', arguments);
+      },
+      search (name, entitySlug, entityItemID, term) {
+        return rpc(contentElementResource, 'search', arguments);
       },
     }
   };
