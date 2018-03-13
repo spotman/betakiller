@@ -242,7 +242,7 @@ final class NamespaceBasedFactory
 
         throw new FactoryException('No class found for :name, tried to autoload :tried', [
             ':name'  => $baseName,
-            ':tried' => implode(',', $tried),
+            ':tried' => implode(', ', $tried),
         ]);
     }
 
