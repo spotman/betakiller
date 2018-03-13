@@ -5,6 +5,7 @@ use BetaKiller\Assets\AssetsException;
 use BetaKiller\Assets\Model\AssetsModelImageInterface;
 use BetaKiller\Assets\Model\AssetsModelInterface;
 use BetaKiller\Assets\Provider\AssetsProviderInterface;
+use BetaKiller\Assets\Provider\HasPreviewProviderInterface;
 use BetaKiller\Assets\Provider\ImageAssetsProviderInterface;
 
 class AssetsHelper
@@ -39,14 +40,25 @@ class AssetsHelper
         return $this->getProviderByModel($model)->getOriginalUrl($model);
     }
 
-    public function getPreviewUrl(AssetsModelImageInterface $model, ?string $size = null): string
+    public function getPreviewUrl(AssetsModelInterface $model, ?string $size = null): string
     {
-        return $this->getImageProviderByModel($model)->getPreviewUrl($model, $size);
+        return $this->getPreviewProviderByModel($model)->getPreviewUrl($model, $size);
     }
 
     public function getDownloadUrl(AssetsModelInterface $model): string
     {
         return $this->getProviderByModel($model)->getDownloadUrl($model);
+    }
+
+    /**
+     * @param \BetaKiller\Assets\Model\AssetsModelInterface $model
+     *
+     * @return array
+     * @throws \BetaKiller\Assets\AssetsException
+     */
+    public function getAllowedMimeTypes(AssetsModelInterface $model): array
+    {
+        return $this->getProviderByModel($model)->getAllowedMimeTypes();
     }
 
     /**
@@ -92,8 +104,30 @@ class AssetsHelper
         $provider = $this->getProviderByModel($model);
 
         if (!($provider instanceof ImageAssetsProviderInterface)) {
-            throw new AssetsException('Model :name must be linked to image provider',[
+            throw new AssetsException('Model :name must be linked to image provider', [
                 ':name' => $model->getModelName(),
+            ]);
+        }
+
+        return $provider;
+    }
+
+    /**
+     * @param \BetaKiller\Assets\Model\AssetsModelInterface $model
+     *
+     * @return \BetaKiller\Assets\Provider\HasPreviewProviderInterface
+     * @throws \BetaKiller\Assets\AssetsException
+     * @throws \BetaKiller\Assets\AssetsStorageException
+     * @throws \BetaKiller\Factory\FactoryException
+     */
+    private function getPreviewProviderByModel(AssetsModelInterface $model): HasPreviewProviderInterface
+    {
+        $provider = $this->getProviderByModel($model);
+
+        if (!($provider instanceof HasPreviewProviderInterface)) {
+            throw new AssetsException('Model :name must be linked to provider implementing :must', [
+                ':name' => $model->getModelName(),
+                ':must' => HasPreviewProviderInterface::class
             ]);
         }
 

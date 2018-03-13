@@ -6,20 +6,16 @@ use BetaKiller\Assets\Model\AssetsModelImageInterface;
 use BetaKiller\Assets\Model\AssetsModelInterface;
 use BetaKiller\Model\UserInterface;
 use Image;
-use Request;
 
 /**
  * Class ImageAssetsProvider
  * Common class for all image assets
  */
-final class ImageAssetsProvider extends AbstractAssetsProvider implements ImageAssetsProviderInterface
+final class ImageAssetsProvider extends AbstractHasPreviewAssetsProvider implements ImageAssetsProviderInterface
 {
-    public const CONFIG_MODEL_UPLOAD_KEY          = 'upload';
-    public const CONFIG_MODEL_MAX_HEIGHT_KEY      = 'max-height';
-    public const CONFIG_MODEL_MAX_WIDTH_KEY       = 'max-width';
-    public const CONFIG_MODEL_PREVIEW_KEY         = 'preview';
-    public const CONFIG_MODEL_PREVIEW_SIZES_KEY   = 'sizes';
-    public const CONFIG_MODEL_PREVIEW_QUALITY_KEY = 'quality';
+    public const CONFIG_MODEL_UPLOAD_KEY     = 'upload';
+    public const CONFIG_MODEL_MAX_HEIGHT_KEY = 'max-height';
+    public const CONFIG_MODEL_MAX_WIDTH_KEY  = 'max-width';
 
     /**
      * Returns array of allowed actions` names
@@ -35,22 +31,6 @@ final class ImageAssetsProvider extends AbstractAssetsProvider implements ImageA
             self::ACTION_DOWNLOAD,
             self::ACTION_DELETE,
         ];
-    }
-
-    /**
-     * @param AssetsModelInterface $model
-     * @param string               $size 300x200
-     *
-     * @return string
-     * @throws \BetaKiller\Assets\AssetsException
-     * @throws AssetsProviderException
-     */
-    public function getPreviewUrl(AssetsModelInterface $model, ?string $size = null): string
-    {
-        $size = $this->determineSize($size);
-
-        // /assets/<providerKey>/<pathStrategy>/<action>(-<size>).<ext>
-        return $this->getItemUrl('preview', $model, $size);
     }
 
     private function makeSizeString($width = null, $height = null): string
@@ -75,29 +55,6 @@ final class ImageAssetsProvider extends AbstractAssetsProvider implements ImageA
     private function packDimensions(?int $width, ?int $height): array
     {
         return [$width, $height];
-    }
-
-    /**
-     * @param string $size
-     *
-     * @return string
-     * @throws \BetaKiller\Assets\AssetsProviderException
-     */
-    private function determineSize(?string $size): string
-    {
-        $previewSizes = $this->getAllowedPreviewSizes();
-
-        if (!$size && \count($previewSizes) > 0) {
-            $size = $previewSizes[0];
-        }
-
-        if (!$size) {
-            throw new AssetsProviderException('Can not determine image size for :provider', [
-                ':provider' => $this->codename,
-            ]);
-        }
-
-        return $size;
     }
 
     /**
@@ -131,17 +88,17 @@ final class ImageAssetsProvider extends AbstractAssetsProvider implements ImageA
     }
 
     /**
-     * @param \BetaKiller\Assets\Model\AssetsModelImageInterface $model
-     * @param string                                             $size
+     * @param \BetaKiller\Assets\Model\AssetsModelInterface $model
+     * @param string                                        $size
      *
      * @return string
      * @throws \BetaKiller\Assets\AssetsException
      * @throws \BetaKiller\Assets\AssetsProviderException
      * @throws \BetaKiller\Assets\AssetsStorageException
      */
-    public function makePreviewContent(AssetsModelImageInterface $model, string $size): string
+    public function makePreviewContent(AssetsModelInterface $model, string $size): string
     {
-        $size = $this->determineSize($size);
+        $size = $this->determinePreviewSize($size);
 
         $this->checkPreviewSize($size);
 
@@ -159,20 +116,6 @@ final class ImageAssetsProvider extends AbstractAssetsProvider implements ImageA
             $height,
             $this->getPreviewQuality()
         );
-    }
-
-    /**
-     * @param $size
-     *
-     * @throws \BetaKiller\Assets\AssetsProviderException
-     */
-    protected function checkPreviewSize($size): void
-    {
-        $allowedSizes = $this->getAllowedPreviewSizes();
-
-        if (!$allowedSizes || !\in_array($size, $allowedSizes, true)) {
-            throw new AssetsProviderException('Preview size :size is not allowed', [':size' => $size]);
-        }
     }
 
     /**
@@ -245,13 +188,6 @@ final class ImageAssetsProvider extends AbstractAssetsProvider implements ImageA
         }
     }
 
-    protected function getItemDeployFilename(Request $request): string
-    {
-        $size = $request->param('size');
-
-        return $request->action().($size ? '-'.$size : '').'.'.$request->param('ext');
-    }
-
     /**
      * @param \BetaKiller\Assets\Model\AssetsModelImageInterface $model
      * @param null|string                                        $size
@@ -275,7 +211,7 @@ final class ImageAssetsProvider extends AbstractAssetsProvider implements ImageA
         } else {
             $size = ($size !== AssetsModelImageInterface::SIZE_PREVIEW) ? $size : null;
 
-            $size       = $this->determineSize($size);
+            $size       = $this->determinePreviewSize($size);
             $dimensions = $this->parseSizeDimensions($size);
 
             list($width, $height) = $this->restoreOmittedDimensions($dimensions[0], $dimensions[1],
@@ -429,33 +365,6 @@ final class ImageAssetsProvider extends AbstractAssetsProvider implements ImageA
     public function getUploadMaxWidth(): ?int
     {
         return $this->getAssetsProviderConfigValue([self::CONFIG_MODEL_UPLOAD_KEY, self::CONFIG_MODEL_MAX_WIDTH_KEY]);
-    }
-
-    /**
-     * Defines allowed sizes for previews
-     * Returns array of strings like this
-     *
-     * array('300x200', '75x75', '400x', 'x250')
-     *
-     * @return array
-     */
-    public function getAllowedPreviewSizes(): array
-    {
-        return $this->getAssetsProviderConfigValue([
-            self::CONFIG_MODEL_PREVIEW_KEY,
-            self::CONFIG_MODEL_PREVIEW_SIZES_KEY,
-        ]);
-    }
-
-    /**
-     * @return int
-     */
-    public function getPreviewQuality(): int
-    {
-        return $this->getAssetsProviderConfigValue([
-            self::CONFIG_MODEL_PREVIEW_KEY,
-            self::CONFIG_MODEL_PREVIEW_QUALITY_KEY,
-        ]) ?: 80; // This is optimal for JPEG
     }
 
     /**

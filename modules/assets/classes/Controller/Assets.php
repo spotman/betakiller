@@ -4,6 +4,7 @@ use BetaKiller\Assets\AssetsException;
 use BetaKiller\Assets\AssetsProviderFactory;
 use BetaKiller\Assets\Model\AssetsModelInterface;
 use BetaKiller\Assets\Provider\AssetsProviderInterface;
+use BetaKiller\Assets\Provider\HasPreviewProviderInterface;
 use BetaKiller\Assets\Provider\ImageAssetsProviderInterface;
 use BetaKiller\Exception\BadRequestHttpException;
 use BetaKiller\Exception\FoundHttpException;
@@ -155,15 +156,15 @@ class Controller_Assets extends Controller
     {
         $this->detectProvider();
 
-        if (!($this->provider instanceof ImageAssetsProviderInterface)) {
+        if (!($this->provider instanceof HasPreviewProviderInterface)) {
             throw new AssetsException('Preview can be served only by instances of :must', [
-                ':must' => ImageAssetsProviderInterface::class,
+                ':must' => HasPreviewProviderInterface::class,
             ]);
         }
 
         $size   = $this->getSizeParam();
         $model  = $this->fromItemDeployUrl();
-        $action = ImageAssetsProviderInterface::ACTION_PREVIEW;
+        $action = HasPreviewProviderInterface::ACTION_PREVIEW;
 
         $this->checkExtension($model);
 
@@ -311,7 +312,7 @@ class Controller_Assets extends Controller
 
         if (!$this->provider->hasAction($action)) {
             throw new NotImplementedHttpException('Action :name is not allowed for provider :codename', [
-                ':name' => $action,
+                ':name'     => $action,
                 ':codename' => $this->provider->getCodename(),
             ]);
         }

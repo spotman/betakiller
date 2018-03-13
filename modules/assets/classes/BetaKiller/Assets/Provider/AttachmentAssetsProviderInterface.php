@@ -1,4 +1,4 @@
 <?php
 namespace BetaKiller\Assets\Provider;
 
-interface AttachmentAssetsProviderInterface extends AssetsProviderInterface {}
+interface AttachmentAssetsProviderInterface extends HasPreviewProviderInterface {}
