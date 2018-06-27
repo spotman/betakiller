@@ -120,7 +120,7 @@ function process_vendors(string $repo)
 {
     $path = getRepoPath($repo);
 
-    $result = run("cd $path && {{env_vars}} {{bin/composer}} {{composer_options}}");
+    $result = run("cd $path && {{bin/composer}} {{composer_options}}");
 
     if (isVerbose()) {
         write($result);
@@ -145,8 +145,6 @@ task('deploy:betakiller', [
     'deploy:vendors:betakiller',
 ])->desc('Deploy BetaKiller repository');
 
-
-// TODO Сборка статики перед деплоем (build:require.js)
 
 /**
  * BetaKiller shared dirs
