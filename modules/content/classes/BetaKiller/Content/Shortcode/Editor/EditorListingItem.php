@@ -25,19 +25,26 @@ class EditorListingItem implements \JsonSerializable
     private $label;
 
     /**
+     * @var string|null
+     */
+    private $mimeType;
+
+    /**
      * EditorListingItem constructor.
      *
-     * @param int    $id
+     * @param int         $id
+     * @param string      $label
+     * @param bool        $isValid
      * @param string|null $imageUrl
-     * @param string $label
-     * @param bool   $isValid
+     * @param null|string $mimeType
      */
-    public function __construct(int $id, ?string $imageUrl, string $label, bool $isValid)
+    public function __construct(int $id, string $label, bool $isValid, ?string $imageUrl, ?string $mimeType = null)
     {
         $this->id       = $id;
-        $this->imageUrl = $imageUrl;
         $this->isValid  = $isValid;
         $this->label    = $label;
+        $this->imageUrl = $imageUrl;
+        $this->mimeType = $mimeType;
     }
 
     /**
@@ -73,6 +80,14 @@ class EditorListingItem implements \JsonSerializable
     }
 
     /**
+     * @return string|null
+     */
+    public function getMimeType(): ?string
+    {
+        return $this->mimeType;
+    }
+
+    /**
      * Specify data which should be serialized to JSON
      *
      * @link  http://php.net/manual/en/jsonserializable.jsonserialize.php
@@ -85,6 +100,7 @@ class EditorListingItem implements \JsonSerializable
         return [
             'id'       => $this->id,
             'imageUrl' => $this->imageUrl,
+            'mimeType' => $this->mimeType,
             'label'    => $this->label,
             'isValid'  => $this->isValid,
         ];

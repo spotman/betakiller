@@ -2,14 +2,14 @@
     <app v-model="viewReady">
         <v-container slot="content" fill-height fluid>
             <v-layout align-center justify-center>
-                <v-flex xs12 sm8 md6 lg4 xl3 text-xs-center>
                     <EditItem
                             v-if="attributesReady"
                             :id="modelId"
                             @itemReady="itemReadyHandler"
-                            @itemChanged="modelChanged = true"
-                            @itemSaved="modelChanged = false"
+                            @itemChanged="itemChangedHandler"
+                            @itemSaved="itemSavedHandler"
                     />
+                <v-flex xs12 sm8 md6 lg4 xl3 text-xs-center>
 
                     <v-form v-model="isValid" v-if="definitionsReady && actualityReady">
                         <ShortcodeAttribute
@@ -38,6 +38,7 @@
   import App from './components/App';
   import EditItem from './components/EditItem';
   import ShortcodeAttribute from './components/ShortcodeAttribute';
+  import EditViewMixin from './components/Edit/EditViewMixin';
 
   export default {
     name: "EditShortcode",
@@ -47,6 +48,9 @@
       ShortcodeAttribute
     },
 
+    mixins: [
+      EditViewMixin
+    ],
     data() {
       return {
         codename: null,
@@ -56,10 +60,8 @@
         dependencies: {},
 
         isValid: false,
-        itemReady: false,
         attributesReady: false,
         verifying: false,
-        modelChanged: false,
         dependenciesReady: false
       };
     },
@@ -71,7 +73,7 @@
       ]),
 
       modelId() {
-        return this.attributes.id;
+        return Number(this.attributes.id);
       },
 
       viewReady() {
@@ -88,7 +90,7 @@
       },
 
       buttonDisabled() {
-        return this.modelChanged || this.verifying;
+        return this.itemChanged || this.verifying;
       }
     },
 
@@ -99,11 +101,23 @@
     },
 
     methods: {
-      loadData() {
+      importAttributesFromQueryParams() {
+        const params = this.$route.query;
         this.attributesReady = false;
+        this.attributes = [];
+
+        for (const name in params) {
+          // Somewhy vue-router converts strings to numbers
+          this.attributes[name] = String(params[name]);
+        }
+
+        this.attributesReady = true;
+      },
+
+      loadData() {
         this.definitions = {};
 
-        this.importQueryParams();
+        this.importAttributesFromQueryParams();
 
         ApiRpc.shortcode.getAttributesDefinition(this.shortcodeName)
           .done(data => {
@@ -114,19 +128,6 @@
           .fail(message => {
             alert(message);
           });
-      },
-
-      importQueryParams() {
-        const params = this.$route.query;
-
-        this.attributes = [];
-
-        for (const name in params) {
-          // Somewhy vue-router converts strings to numbers
-          this.attributes[name] = String(params[name]);
-        }
-
-        this.attributesReady = true;
       },
 
       getCurrentValue(name) {
@@ -213,11 +214,6 @@
         return this.actuality[name];
       },
 
-      itemReadyHandler() {
-        console.log('item ready event received');
-        this.itemReady = true;
-      },
-
       insertShortcode() {
         if (this.isValid) {
           this.verifying = true;
@@ -250,7 +246,3 @@
     }
   }
 </script>
-
-<style scoped>
-
-</style>

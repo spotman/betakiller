@@ -250,9 +250,10 @@ class ImageShortcode extends AbstractContentElementShortcode
         foreach ($images as $image) {
             $data[] = new EditorListingItem(
                 $image->getID(),
-                $this->assetsHelper->getPreviewUrl($image),
                 $image->getTitle() ?: $image->getOriginalName(),
-                $image->isValid()
+                $image->isValid(),
+                $this->assetsHelper->getPreviewUrl($image),
+                $image->getMime()
             );
         }
 

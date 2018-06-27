@@ -84,7 +84,7 @@ class YoutubeShortcode extends AbstractContentElementShortcode
      */
     private function getCurrentModel(): ContentYoutubeRecord
     {
-        $id    = (int)$this->getID();
+        $id = (int)$this->getID();
         return $this->repository->findById($id);
     }
 
@@ -105,9 +105,9 @@ class YoutubeShortcode extends AbstractContentElementShortcode
         foreach ($records as $record) {
             $data[] = new EditorListingItem(
                 $record->getID(),
-                $record->getPreviewUrl(),
                 $record->getYoutubeId(),
-                $record->isValid()
+                $record->isValid(),
+                $record->getPreviewUrl()
             );
         }
 

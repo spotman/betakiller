@@ -251,9 +251,10 @@ class AttachmentShortcode extends AbstractContentElementShortcode
         foreach ($attachments as $attach) {
             $data[] = new EditorListingItem(
                 $attach->getID(),
-                null, // Use default image placeholder
                 $attach->getOriginalName(),
-                $attach->isValid()
+                $attach->isValid(),
+                null, // No image, detect icon from mime-type
+                $attach->getMime()
             );
         }
 

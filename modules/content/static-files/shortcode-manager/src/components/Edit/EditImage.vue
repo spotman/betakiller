@@ -1,9 +1,19 @@
 <template>
-    <v-form v-if="modelDataReady" v-model="formValid">
-        <img :src="getPreviewUrl" alt="" class="preview-image mb-4">
-        <v-text-field v-model="modelData.alt" label="alt" @input="modelDataChanged" required/>
-        <v-text-field v-model="modelData.title" label="title" @input="modelDataChanged"/>
-    </v-form>
+    <v-layout v-if="modelDataReady">
+        <v-flex v-if="getPreviewUrl" xs12 md6 lg4 xl3 text-xs-center>
+            <img :src="getPreviewUrl" alt="Preview image" class="preview-image mb-4">
+        </v-flex>
+
+        <v-flex xs12 md6 lg4 xl3 text-xs-center>
+            <v-form v-model="formValid">
+                <v-text-field v-model="modelData.alt" label="alt" @input="modelDataChanged" required/>
+                <v-text-field v-model="modelData.title" label="title" @input="modelDataChanged"/>
+            </v-form>
+        </v-flex>
+
+        <!-- TODO Deal with edit layout and shortcode attributes -->
+
+    </v-layout>
 </template>
 
 <script>
@@ -24,11 +34,4 @@
 </script>
 
 <style scoped>
-    .preview-image {
-        display: block;
-        max-width: 100%;
-        height: auto;
-        margin-left: auto;
-        margin-right: auto;
-    }
 </style>

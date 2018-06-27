@@ -1,0 +1,10 @@
+/* remove padding from CKEditor dialogs */
+.cke_dialog .cke_dialog_contents_body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+.cke_dialog .cke_dialog_ui_vbox_child {
+    padding: 0;
+}

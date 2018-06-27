@@ -1,9 +1,10 @@
 <template>
-    <v-app>
+    <v-app v-if="initialized">
         <slot v-show="appReady" name="toolbar"></slot>
 
         <v-content v-show="appReady">
             <slot name="content"></slot>
+            <slot name="hidden" v-show="false"></slot>
         </v-content>
 
         <v-content v-show="!appReady">
@@ -19,6 +20,7 @@
 </template>
 
 <script>
+  import {mapGetters} from 'vuex';
   export default {
     name: "loader",
 
@@ -32,6 +34,12 @@
         type: Boolean,
         default: false
       }
+    },
+
+    computed: {
+      ...mapGetters([
+        'initialized',
+      ])
     }
   }
 </script>

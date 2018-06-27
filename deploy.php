@@ -118,12 +118,9 @@ task('deploy:vendors:app', function () {
  */
 function process_vendors(string $repo)
 {
-    $composer = get('bin/composer');
-    $envVars  = get('env_vars') ? 'export '.get('env_vars').' &&' : '';
-
     $path = getRepoPath($repo);
 
-    $result = run("cd $path && $envVars $composer {{composer_options}}");
+    $result = run("cd $path && {{env_vars}} {{bin/composer}} {{composer_options}}");
 
     if (isVerbose()) {
         write($result);
@@ -440,7 +437,7 @@ task('deploy', [
  *
  * @param string $name
  *
- * @return \Deployer\Type\Result
+ * @return string
  * @throws Exception
  */
 function runMinionTask(string $name)
@@ -460,14 +457,13 @@ function runMinionTask(string $name)
         $cmd .= ' --debug';
     }
 
-    $response = run($cmd);
-    $text     = $response->toString();
+    $text = run($cmd);
 
     if ($text) {
         write($text);
     }
 
-    return $response;
+    return $text;
 }
 
 /**
@@ -477,7 +473,7 @@ function runMinionTask(string $name)
  * @param string    $path
  * @param bool|null $silent
  *
- * @return \Deployer\Type\Result
+ * @return string
  * @throws \Deployer\Exception\Exception
  */
 function runGitCommand($gitCmd, $path = null, ?bool $silent = null)

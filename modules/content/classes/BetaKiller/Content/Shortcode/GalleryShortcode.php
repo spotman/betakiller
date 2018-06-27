@@ -121,9 +121,7 @@ class GalleryShortcode extends AbstractContentElementShortcode
      */
     public function getWidgetData(): array
     {
-        $id = (int)$this->getID();
-
-        $gallery = $this->galleryRepository->findById($id);
+        $gallery = $this->getGallery();
         $images  = $this->getImages($gallery, true);
 
         $layout  = $this->getLayout();
@@ -139,11 +137,22 @@ class GalleryShortcode extends AbstractContentElementShortcode
         }
 
         return [
-            'id'      => $id,
+            'id'      => $gallery->getID(),
             'images'  => $imagesData,
             'layout'  => $layout,
             'columns' => $columns,
         ];
+    }
+
+    /**
+     * @return \BetaKiller\Model\ContentGalleryInterface
+     * @throws \BetaKiller\Content\Shortcode\ShortcodeException
+     */
+    private function getGallery(): ContentGalleryInterface
+    {
+        $id = (int)$this->getID();
+
+        return $this->galleryRepository->findById($id);
     }
 
     /**
@@ -174,8 +183,7 @@ class GalleryShortcode extends AbstractContentElementShortcode
      */
     public function getWysiwygPluginPreviewSrc(): string
     {
-        $id      = (int)$this->getID();
-        $gallery = $this->galleryRepository->findById($id);
+        $gallery = $this->getGallery();
 
         return $this->getPreviewUrl($gallery);
     }
@@ -210,9 +218,9 @@ class GalleryShortcode extends AbstractContentElementShortcode
         foreach ($galleries as $gallery) {
             $data[] = new EditorListingItem(
                 $gallery->getID(),
-                $this->getPreviewUrl($gallery),
-                $gallery->getID(), // Gallery nas no label yet
-                $gallery->isValid()
+                $gallery->getID(),
+                $gallery->isValid(),
+                $this->getPreviewUrl($gallery)
             );
         }
 
@@ -223,11 +231,23 @@ class GalleryShortcode extends AbstractContentElementShortcode
      * Returns item data (based on "id" attribute value)
      *
      * @return array
+     * @throws \BetaKiller\Content\Shortcode\ShortcodeException
      */
     public function getEditorItemData(): array
     {
+        $gallery = $this->getGallery();
+        $images = $this->getImages($gallery, false);
+
+        $imagesIDs = [];
+
+        foreach ($images as $image) {
+            $imagesIDs[] = (int)$image->getID(); // EditorListing items IDs are always integers
+        }
         // No data for editing
-        return [];
+        return [
+            'id' => $gallery->getID(),
+            'images' => $imagesIDs,
+        ];
     }
 
     /**

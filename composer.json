@@ -7,7 +7,8 @@
     "php": "7.1.* || 7.2.*",
     "ext-mbstring": "*",
     "ext-mysqli": "*",
-    "aidantwoods/secureheaders": "^1.0",
+    "ext-sqlite3": "*",
+    "aidantwoods/secureheaders": "^2.0",
     "asm89/twig-cache-extension": "^1.2",
     "bramus/monolog-colored-line-formatter": "~2.0",
     "caxy/php-htmldiff": "^0.1.6",
@@ -18,20 +19,21 @@
     "guzzlehttp/guzzle": "~6.0",
     "imangazaliev/didom": "^1.10",
     "jakeasmith/http_build_url": "^1",
-    "mmamedov/page-cache": "dev-master",
+    "mmamedov/page-cache": "^2.0",
     "monolog/monolog": "^1",
-    "ocramius/proxy-manager": "^2.0",
+    "ocramius/proxy-manager": "^2.1",
     "pcelta/doctrine-cache-factory": "^0.1.0",
     "php-console/php-console": "^3.1",
     "php-di/php-di": "^5.4",
     "psr/log": "^1.0",
+    "psr/simple-cache": "^1.0",
     "ralouphie/mimey": "^1.0",
-    "roave/doctrine-simplecache": "^1.1",
+    "roave/doctrine-simplecache": "^2.1",
     "roave/security-advisories": "dev-master",
     "samdark/sitemap": "^2.0",
     "spotman/davbackup": "dev-master",
-    "swiftmailer/swiftmailer": "^5.4",
-    "symfony/yaml": "^3.4",
+    "swiftmailer/swiftmailer": "^6.0",
+    "symfony/yaml": "^4.0",
     "thunderer/shortcode": "^0.6",
     "twig/extensions": "^1.5",
     "twig/twig": "^2.0",
@@ -39,11 +41,10 @@
     "zendframework/zend-permissions-acl": "^2.6"
   },
   "require-dev": {
-    "phpunit/phpunit": "^6.2",
-    "deployer/deployer": "^5",
-    "psr/simple-cache": "^1.0",
-    "phpunit/php-code-coverage": "^5.2",
-    "phpunit/dbunit": "^3.0"
+    "phpunit/phpunit": "^7.0",
+    "deployer/deployer": "^6",
+    "phpunit/php-code-coverage": "^6.0",
+    "phpunit/dbunit": "^4.0"
   },
   "scripts": {
     "ci": [
@@ -53,7 +54,7 @@
   },
   "config": {
     "platform": {
-      "php": "7.1"
+      "php": "7.1.15"
     },
     "sort-packages": true
   }

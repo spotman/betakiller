@@ -6,16 +6,21 @@
             <v-text-field prepend-icon="search" solo label="Search" hide-details></v-text-field>
         </v-toolbar>
 
-        <v-container slot="content" fluid>
-            <items
-                    v-if="itemsLoaded"
-                    :items="items"
-                    :placeholderIconName="getPlaceholderIconName()"
-                    @addItem="addItem"
-                    @selectItem="selectItem"
-                    @contextItem="contextItem"
-            />
+        <ItemsIndex
+                slot="content"
+                :shortcodeName="shortcodeName"
+                :showGlobal="showGlobal"
+                @itemsReady="itemsReady"
+                @addItem="addItem"
+                @selectItem="selectItem"
+                @contextItem="contextItem"
+        />
 
+        <!--<v-snackbar color="success" :timeout="3000" v-model="verified">-->
+        <!--Verified successfully-->
+        <!--<v-btn flat color="black" @click.native="verified = false">Close</v-btn>-->
+        <!--</v-snackbar>-->
+        <div slot="hidden">
             <file-upload
                     v-if="uploadEnabled"
                     v-model="files"
@@ -31,18 +36,13 @@
                     :extensions="acceptExtensions"
             />
 
-            <!--<v-snackbar color="success" :timeout="3000" v-model="verified">-->
-            <!--Verified successfully-->
-            <!--<v-btn flat color="black" @click.native="verified = false">Close</v-btn>-->
-            <!--</v-snackbar>-->
-        </v-container>
+        </div>
     </app>
 </template>
 
 <script>
-  import contentRpc from 'content.api.rpc';
   import App from './components/App';
-  import Items from './components/Items';
+  import ItemsIndex from './components/ItemsIndex';
   import {mapGetters} from 'vuex';
   import FileUpload from 'vue-upload-component';
 
@@ -51,7 +51,7 @@
 
     components: {
       App,
-      Items,
+      ItemsIndex,
       FileUpload
     },
 
@@ -60,22 +60,13 @@
         appReady: false,
         showGlobal: false,
 
-        itemsLoaded: false,
-        items: [],
         files: [],
-        itemPlaceholderIcons: {
-          Image: 'image',
-          Attachment: 'attachment',
-          Gallery: 'photo_library',
-          Youtube: 'ondemand_video'
-        }
       }
     },
 
     computed: {
 
       ...mapGetters([
-        'initialized',
         'uploadEnabled',
         'uploadUrl',
         'acceptMimeTypes',
@@ -94,30 +85,23 @@
     },
 
     watch: {
-      showGlobal() {
-        this.fetchData();
-      },
-      itemsLoaded() {
-        this.$nextTick(() => {
-          console.log('all rendered');
-          this.appReady = true;
-        })
-      },
       files() {
         console.log('this.files changed');
         console.log(this.files);
       }
     },
 
-    beforeRouteEnter (to, from, next) {
+    beforeRouteEnter(to, from, next) {
       next(vm => {
-        vm.fetchData();
+        //vm.fetchData();
+        console.log('beforeRouteEnter event');
       })
     },
 
     methods: {
-      getPlaceholderIconName() {
-        return this.itemPlaceholderIcons[this.shortcodeName];
+      itemsReady() {
+        // Listen to ItemsIndex.itemsReady event
+        this.appReady = true;
       },
       addItem() {
         if (this.uploadEnabled) {
@@ -137,24 +121,6 @@
       contextItem(id) {
         // Show edit item dialog (call route /edit/:id)
         this.$router.push({name: 'edit-item', params: {id}, exact: true});
-      },
-
-      fetchData() {
-        this.itemsLoaded = false;
-
-        const promise = this.showGlobal
-          ? contentRpc.contentElement.list(this.shortcodeName, null, null)
-          : contentRpc.contentElement.list(this.shortcodeName, this.entitySlug, this.entityItemId);
-
-        promise
-          .done((data) => {
-            this.items = data;
-            this.itemsLoaded = true;
-          })
-          .fail((message) => {
-            // TODO Error message
-            alert(message || "Error!");
-          })
       },
 
       // add, update, remove File Event
