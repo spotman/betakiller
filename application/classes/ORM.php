@@ -86,6 +86,25 @@ class ORM extends Utils\Kohana\ORM implements ExtendedOrmInterface
     }
 
     /**
+     * Prepares the model database connection, determines the table name,
+     * and loads column information.
+     *
+     * @throws Exception
+     * @return void
+     */
+    protected function _initialize()
+    {
+        $this->defineRelations();
+
+        parent::_initialize();
+    }
+
+    protected function defineRelations(): void
+    {
+        // Empty by default
+    }
+
+    /**
      * Returns key which will be used for storing model in UrlContainer registry.
      *
      * @return string

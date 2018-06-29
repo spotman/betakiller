@@ -132,6 +132,18 @@ interface UserInterface extends AbstractEntityInterface, OrmInterface, Notificat
     /**
      * @return string
      */
+    public function getMiddleName(): string;
+
+    /**
+     * @param string $value
+     *
+     * @return \BetaKiller\Model\UserInterface
+     */
+    public function setMiddleName(string $value): UserInterface;
+
+    /**
+     * @return string
+     */
     public function getEmail(): string;
 
     /**

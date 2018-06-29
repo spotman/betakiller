@@ -249,6 +249,25 @@ class User extends \Model_Auth_User implements UserInterface
         return $this->set('last_name', $value);
     }
 
+    /**
+     * @return string
+     */
+    public function getMiddleName(): string
+    {
+        return (string)$this->get('middle_name');
+    }
+
+    /**
+     * @param string $value
+     *
+     * @return \BetaKiller\Model\UserInterface
+     */
+    public function setMiddleName(string $value): UserInterface
+    {
+        return $this->set('middle_name', $value);
+    }
+
+
     public function getEmail(): string
     {
         return $this->get('email');
