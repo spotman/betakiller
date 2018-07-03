@@ -157,4 +157,20 @@ class AppEnv implements AppEnvInterface
     {
         return $this->isCoreRunning;
     }
+
+    /**
+     * @param string    $name
+     *
+     * @param bool|null $required
+     *
+     * @return null|string
+     */
+    public function getCliOption(string $name, ?bool $required = null): ?string
+    {
+        $key = $required ? $name : $name.'::';
+
+        $options = \getopt('', [$key]);
+
+        return $options[$name] ?? null;
+    }
 }

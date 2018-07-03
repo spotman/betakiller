@@ -14,6 +14,8 @@ class OrmFactory
      * OrmFactory constructor.
      *
      * @param \BetaKiller\Factory\NamespaceBasedFactoryBuilder $factoryBuilder
+     *
+     * @throws \BetaKiller\Factory\FactoryException
      */
     public function __construct(NamespaceBasedFactoryBuilder $factoryBuilder)
     {

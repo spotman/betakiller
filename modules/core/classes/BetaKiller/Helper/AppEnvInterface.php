@@ -72,6 +72,14 @@ interface AppEnvInterface
     public function isCLI(): bool;
 
     /**
+     * @param string    $name
+     * @param bool|null $required
+     *
+     * @return null|string
+     */
+    public function getCliOption(string $name, ?bool $required = null): ?string;
+
+    /**
      * Returns application root path
      *
      * @return string

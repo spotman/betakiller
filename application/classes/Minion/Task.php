@@ -39,9 +39,19 @@ abstract class Minion_Task extends Kohana_Minion_Task
         return [];
     }
 
-    protected static function _make_task_class_instance($class_name)
+    /**
+     * @param string $className
+     *
+     * @return \BetaKiller\Task\AbstractTask
+     * @throws \Psr\Container\NotFoundExceptionInterface
+     * @throws \Psr\Container\ContainerExceptionInterface
+     * @throws \BetaKiller\Factory\FactoryException
+     */
+    protected static function _make_task_class_instance($className)
     {
-        return \BetaKiller\DI\Container::getInstance()->get($class_name);
+        $factory = \BetaKiller\DI\Container::getInstance()->get(Minion_TaskFactory::class);
+
+        return $factory->create($className);
     }
 
     /**

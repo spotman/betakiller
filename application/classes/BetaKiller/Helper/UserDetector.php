@@ -34,29 +34,29 @@ class UserDetector
     /**
      * @var \BetaKiller\Service\UserService
      */
-    private $service;
+    private $userService;
 
     /**
      * UserDetector constructor.
      *
-     * @param \BetaKiller\Service\UserService       $service
+     * @param \BetaKiller\Service\UserService       $userService
      * @param \BetaKiller\Helper\AppEnvInterface    $appEnv
      * @param \Auth                                 $auth
      * @param \BetaKiller\Repository\UserRepository $repo
      * @param \BetaKiller\Helper\I18nHelper         $i18n
      */
     public function __construct(
-        UserService $service,
+        UserService $userService,
         AppEnvInterface $appEnv,
         Auth $auth,
         UserRepository $repo,
         I18nHelper $i18n
     ) {
-        $this->appEnv     = $appEnv;
-        $this->auth       = $auth;
-        $this->repository = $repo;
-        $this->i18n       = $i18n;
-        $this->service    = $service;
+        $this->appEnv      = $appEnv;
+        $this->auth        = $auth;
+        $this->repository  = $repo;
+        $this->i18n        = $i18n;
+        $this->userService = $userService;
     }
 
     /**
@@ -77,7 +77,7 @@ class UserDetector
 
         $this->setSystemLanguage($user);
 
-        if ($this->service->isDeveloper($user)) {
+        if ($this->userService->isDeveloper($user)) {
             $this->appEnv->enableDebug();
         }
 
@@ -90,7 +90,10 @@ class UserDetector
      */
     private function detectCliUser(): UserInterface
     {
-        $user = $this->repository->searchBy(AbstractTask::CLI_USER_NAME);
+        // Get username from CLI arguments or use default instead
+        $userName = $this->appEnv->getCliOption('user') ?: AbstractTask::CLI_USER_NAME;
+
+        $user = $this->repository->searchBy($userName);
 
         if (!$user) {
             throw new Exception('Missing CLI user, install it with CreateCliUser task');

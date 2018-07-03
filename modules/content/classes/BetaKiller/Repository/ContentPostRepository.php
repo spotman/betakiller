@@ -41,7 +41,6 @@ class ContentPostRepository extends AbstractOrmBasedDispatchableRepository imple
         $this->categoryRepo = $categoryRepo;
     }
 
-
     /**
      * @return string
      */
@@ -107,6 +106,7 @@ class ContentPostRepository extends AbstractOrmBasedDispatchableRepository imple
      * @param null|string                                $term
      *
      * @return \BetaKiller\Search\SearchResultsInterface
+     * @throws \BetaKiller\Repository\RepositoryException
      */
     public function searchArticles(
         int $page,
