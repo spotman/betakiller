@@ -27,6 +27,7 @@ abstract class Minion_Task extends Kohana_Minion_Task
         $common_options = [
             'debug' => false,
             'stage' => 'development',
+            'user'  => null,
         ];
 
         $this->_options = array_merge($common_options, $this->_options, $this->defineOptions());
