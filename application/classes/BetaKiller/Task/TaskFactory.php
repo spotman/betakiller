@@ -1,10 +1,12 @@
 <?php
 declare(strict_types=1);
 
-use BetaKiller\Factory\NamespaceBasedFactoryBuilder;
-use BetaKiller\Task\AbstractTask;
+namespace BetaKiller\Task;
 
-class Minion_TaskFactory
+use BetaKiller\Factory\NamespaceBasedFactoryBuilder;
+use Minion_Task;
+
+class TaskFactory
 {
     /**
      * @var \BetaKiller\Factory\NamespaceBasedFactory
@@ -12,7 +14,7 @@ class Minion_TaskFactory
     private $factory;
 
     /**
-     * Minion_TaskFactory constructor.
+     * TaskFactory constructor.
      *
      * @param \BetaKiller\Factory\NamespaceBasedFactoryBuilder $factoryBuilder
      *
@@ -22,16 +24,16 @@ class Minion_TaskFactory
     {
         $this->factory = $factoryBuilder
             ->createFactory()
-            ->setExpectedInterface(AbstractTask::class);
+            ->setExpectedInterface(Minion_Task::class); // Migrations use Minion_Task class
     }
 
     /**
      * @param string $className
      *
-     * @return \BetaKiller\Task\AbstractTask
+     * @return \Minion_Task
      * @throws \BetaKiller\Factory\FactoryException
      */
-    public function create(string $className): AbstractTask
+    public function create(string $className): Minion_Task
     {
         return $this->factory->create($className);
     }

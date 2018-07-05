@@ -1,5 +1,7 @@
 <?php
 
+use BetaKiller\Task\TaskFactory;
+
 /**
  * Interface that all minion tasks must implement
  */
@@ -43,14 +45,15 @@ abstract class Minion_Task extends Kohana_Minion_Task
     /**
      * @param string $className
      *
-     * @return \BetaKiller\Task\AbstractTask
+     * @return \Minion_Task
      * @throws \Psr\Container\NotFoundExceptionInterface
      * @throws \Psr\Container\ContainerExceptionInterface
      * @throws \BetaKiller\Factory\FactoryException
      */
-    protected static function _make_task_class_instance($className)
+    protected static function _make_task_class_instance($className): Minion_Task
     {
-        $factory = \BetaKiller\DI\Container::getInstance()->get(Minion_TaskFactory::class);
+        /** @var TaskFactory $factory */
+        $factory = \BetaKiller\DI\Container::getInstance()->get(TaskFactory::class);
 
         return $factory->create($className);
     }
