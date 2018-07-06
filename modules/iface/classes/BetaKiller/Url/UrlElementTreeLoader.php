@@ -1,34 +1,32 @@
 <?php
 declare(strict_types=1);
 
-namespace BetaKiller\IFace;
-
+namespace BetaKiller\Url;
 
 use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\Helper\LoggerHelperTrait;
 use BetaKiller\IFace\Exception\IFaceException;
-use BetaKiller\IFace\ModelProvider\IFaceModelProviderDatabase;
-use BetaKiller\IFace\ModelProvider\IFaceModelProviderXmlConfig;
-use BetaKiller\ModuleInitializerInterface;
+use BetaKiller\IFace\ModelProvider\UrlElementProviderDatabase;
+use BetaKiller\IFace\ModelProvider\UrlElementProviderXmlConfig;
 use Psr\Log\LoggerInterface;
 use Psr\SimpleCache\CacheInterface;
 
-class Initializer implements ModuleInitializerInterface
+class UrlElementTreeLoader
 {
     use LoggerHelperTrait;
 
     /**
-     * @var \BetaKiller\IFace\ModelProvider\IFaceModelProviderDatabase
+     * @var \BetaKiller\IFace\ModelProvider\UrlElementProviderDatabase
      */
     private $databaseProvider;
 
     /**
-     * @var \BetaKiller\IFace\ModelProvider\IFaceModelProviderXmlConfig
+     * @var \BetaKiller\IFace\ModelProvider\UrlElementProviderXmlConfig
      */
     private $xmlProvider;
 
     /**
-     * @var \BetaKiller\IFace\IFaceModelTree
+     * @var \BetaKiller\Url\UrlElementTreeInterface
      */
     private $tree;
 
@@ -50,41 +48,46 @@ class Initializer implements ModuleInitializerInterface
     /**
      * Initializer constructor.
      *
-     * @param \BetaKiller\IFace\ModelProvider\IFaceModelProviderDatabase  $databaseProvider
-     * @param \BetaKiller\IFace\ModelProvider\IFaceModelProviderXmlConfig $xmlProvider
-     * @param \BetaKiller\IFace\IFaceModelTree                            $tree
+     * @param \BetaKiller\IFace\ModelProvider\UrlElementProviderDatabase  $databaseProvider
+     * @param \BetaKiller\IFace\ModelProvider\UrlElementProviderXmlConfig $xmlProvider
      * @param \BetaKiller\Helper\AppEnvInterface                          $appEnv
      * @param \Psr\SimpleCache\CacheInterface                             $cache
      * @param \Psr\Log\LoggerInterface                                    $logger
      */
     public function __construct(
-        IFaceModelProviderDatabase $databaseProvider,
-        IFaceModelProviderXmlConfig $xmlProvider,
-        IFaceModelTree $tree,
+        UrlElementProviderDatabase $databaseProvider,
+        UrlElementProviderXmlConfig $xmlProvider,
         AppEnvInterface $appEnv,
         CacheInterface $cache,
         LoggerInterface $logger
     ) {
         $this->databaseProvider = $databaseProvider;
         $this->xmlProvider      = $xmlProvider;
-        $this->tree             = $tree;
         $this->cache            = $cache;
         $this->logger           = $logger;
         $this->appEnv           = $appEnv;
     }
-
     /**
-     * @throws \Psr\SimpleCache\InvalidArgumentException
+     * @return \BetaKiller\Url\UrlElementTreeInterface
      * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \Psr\SimpleCache\InvalidArgumentException
      */
-    public function init(): void
+    public function load(): UrlElementTreeInterface
     {
         $key = 'ifaceModelTree';
+        $this->tree = $this->factory();
 
         if (!$this->loadTreeFromCache($key)) {
             $this->loadTreeFromProviders();
             $this->storeTreeInCache($key);
         }
+
+        return $this->tree;
+    }
+
+    private function factory(): UrlElementTreeInterface
+    {
+        return new UrlElementTree();
     }
 
     /**
@@ -101,30 +104,30 @@ class Initializer implements ModuleInitializerInterface
             return false;
         }
 
-        $this->logger->debug('Loading IFace tree from cache');
+        $this->logger->debug('Loading URL elements tree from cache');
+        $counter = 0;
 
         try {
-            $data = unserialize($serializedModels, [IFaceModelInterface::class]);
+            $data = unserialize($serializedModels, [UrlElementInterface::class]);
 
             if (!$data || !\is_array($data)) {
-                throw new IFaceException('Cached IFaceModelTree data is invalid');
+                throw new IFaceException('Cached UrlElementTree data is invalid');
             }
 
-            $counter = 0;
-
             // Simply add all models, validation already done upon inserting data into cache
-            foreach ($data as $model) {
-                $this->tree->add($model, true); // No duplication is allowed here
+            foreach ($data as $urlElement) {
+                $this->tree->add($urlElement, true); // No duplication is allowed here
                 $counter++;
             }
 
-            $this->logger->debug('Added :count IFaces to tree from cache', [':count' => $counter]);
         } catch (\Throwable $e) {
             $this->cache->delete($key);
             $this->logException($this->logger, $e);
 
             return false;
         }
+
+        $this->logger->debug('Added :count URL elements to tree from cache', [':count' => $counter]);
 
         return true;
     }
@@ -144,7 +147,7 @@ class Initializer implements ModuleInitializerInterface
             $data[] = $model;
         }
 
-        $this->logger->debug('Storing :count IFaces in cache', [':count' => \count($data)]);
+        $this->logger->debug('Storing :count URL elements in cache', [':count' => \count($data)]);
 
         $this->cache->set($key, serialize($data), 86400); // 1 day
     }
@@ -154,9 +157,9 @@ class Initializer implements ModuleInitializerInterface
      */
     private function loadTreeFromProviders(): void
     {
-        $this->logger->debug('Loading IFace tree from providers');
+        $this->logger->debug('Loading URL elements tree from providers');
 
-        /** @var \BetaKiller\IFace\ModelProvider\IFaceModelProviderInterface[] $sources */
+        /** @var \BetaKiller\IFace\ModelProvider\UrlElementProviderInterface[] $sources */
         $sources = [
             $this->xmlProvider,
         ];
@@ -167,8 +170,8 @@ class Initializer implements ModuleInitializerInterface
         }
 
         foreach ($sources as $provider) {
-            foreach ($provider->getAll() as $ifaceModel) {
-                $this->tree->add($ifaceModel); // Allow overwriting
+            foreach ($provider->getAll() as $urlElement) {
+                $this->tree->add($urlElement); // Allow overwriting
             }
         }
 

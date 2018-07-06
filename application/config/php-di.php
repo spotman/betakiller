@@ -50,7 +50,7 @@ return [
 
     'definitions' => [
 
-        ExceptionHandlerInterface::class            => DI\object(\BetaKiller\Error\ExceptionHandler::class),
+        ExceptionHandlerInterface::class            => DI\object(\BetaKiller\Error\ExceptionHandler::class)->lazy(),
 
         // PSR-16 adapter for system-wide Doctrine Cache
         Psr\SimpleCache\CacheInterface::class       => DI\factory(function (\Psr\Container\ContainerInterface $container

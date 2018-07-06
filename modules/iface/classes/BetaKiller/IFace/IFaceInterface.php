@@ -1,10 +1,9 @@
 <?php
 namespace BetaKiller\IFace;
 
-use BetaKiller\Helper\SeoMetaInterface;
-use BetaKiller\Model\HasLabelInterface;
+use BetaKiller\Url\IFaceModelInterface;
 
-interface IFaceInterface extends SeoMetaInterface, HasLabelInterface
+interface IFaceInterface
 {
     /**
      * @return string

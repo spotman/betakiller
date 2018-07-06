@@ -3,25 +3,18 @@ namespace BetaKiller\Model;
 
 use ORM;
 
-class IFaceZone extends ORM
+class UrlElementZone extends ORM
 {
     public const PUBLIC_ZONE   = 'public';
     public const ADMIN_ZONE    = 'admin';
     public const PERSONAL_ZONE = 'personal';
     public const PREVIEW_ZONE  = 'preview';
 
-    /**
-     * Prepares the model database connection, determines the table name,
-     * and loads column information.
-     *
-     * @throws \Exception
-     * @return void
-     */
-    protected function _initialize(): void
+    protected function configure(): void
     {
-        $this->_table_name = 'iface_zones';
+        $this->_table_name = 'url_element_zones';
 
-        parent::_initialize();
+        parent::configure();
     }
 
     /**

@@ -1,22 +1,23 @@
 <?php
 namespace BetaKiller\Helper;
 
+use BetaKiller\Factory\IFaceFactory;
 use BetaKiller\IFace\CrudlsActionsInterface;
 use BetaKiller\IFace\Exception\IFaceException;
-use BetaKiller\IFace\IFaceFactory;
 use BetaKiller\IFace\IFaceInterface;
-use BetaKiller\IFace\IFaceModelInterface;
-use BetaKiller\IFace\IFaceModelsStack;
-use BetaKiller\IFace\IFaceModelTree;
 use BetaKiller\Model\DispatchableEntityInterface;
-use BetaKiller\Model\IFaceZone;
+use BetaKiller\Model\UrlElementZone;
+use BetaKiller\Url\IFaceModelInterface;
 use BetaKiller\Url\UrlContainerInterface;
+use BetaKiller\Url\UrlElementInterface;
+use BetaKiller\Url\UrlElementStack;
+use BetaKiller\Url\UrlElementTreeInterface;
 use Spotman\Api\ApiMethodResponse;
 
 class IFaceHelper
 {
     /**
-     * @var \BetaKiller\IFace\IFaceModelsStack
+     * @var \BetaKiller\Url\UrlElementStack
      */
     private $stack;
 
@@ -31,7 +32,7 @@ class IFaceHelper
     private $urlHelper;
 
     /**
-     * @var \BetaKiller\IFace\IFaceModelTree
+     * @var \BetaKiller\Url\UrlElementTreeInterface
      */
     private $tree;
 
@@ -41,7 +42,7 @@ class IFaceHelper
     private $stringPatternHelper;
 
     /**
-     * @var \BetaKiller\IFace\IFaceFactory
+     * @var \BetaKiller\Factory\IFaceFactory
      */
     private $factory;
 
@@ -53,18 +54,18 @@ class IFaceHelper
     /**
      * IFaceHelper constructor.
      *
-     * @param \BetaKiller\IFace\IFaceFactory         $factory
-     * @param \BetaKiller\IFace\IFaceModelTree       $tree
-     * @param \BetaKiller\IFace\IFaceModelsStack     $stack
-     * @param \BetaKiller\Helper\UrlHelper           $urlHelper
-     * @param \BetaKiller\Helper\UrlContainerHelper  $paramsHelper
-     * @param \BetaKiller\Helper\StringPatternHelper $stringPatternHelper
-     * @param \BetaKiller\Helper\I18nHelper          $i18n
+     * @param \BetaKiller\Factory\IFaceFactory        $factory
+     * @param \BetaKiller\Url\UrlElementTreeInterface $tree
+     * @param \BetaKiller\Url\UrlElementStack         $stack
+     * @param \BetaKiller\Helper\UrlHelper            $urlHelper
+     * @param \BetaKiller\Helper\UrlContainerHelper   $paramsHelper
+     * @param \BetaKiller\Helper\StringPatternHelper  $stringPatternHelper
+     * @param \BetaKiller\Helper\I18nHelper           $i18n
      */
     public function __construct(
         IFaceFactory $factory,
-        IFaceModelTree $tree,
-        IFaceModelsStack $stack,
+        UrlElementTreeInterface $tree,
+        UrlElementStack $stack,
         UrlHelper $urlHelper,
         UrlContainerHelper $paramsHelper,
         StringPatternHelper $stringPatternHelper,
@@ -79,15 +80,33 @@ class IFaceHelper
         $this->i18n                = $i18n;
     }
 
+    /**
+     * @return \BetaKiller\Url\IFaceModelInterface|null
+     * @throws \BetaKiller\IFace\Exception\IFaceException
+     */
     public function getCurrentIFaceModel(): ?IFaceModelInterface
+    {
+        $element = $this->stack->getCurrent();
+
+        if ($element && !$element instanceof IFaceModelInterface) {
+            throw new IFaceException('Current URL element :codename is not an IFace, :class given', [
+                ':codename' => $element->getCodename(),
+                ':class'    => \get_class($element),
+            ]);
+        }
+
+        return $element;
+    }
+
+    public function getCurrentUrlElement(): ?UrlElementInterface
     {
         return $this->stack->getCurrent();
     }
 
     public function isCurrentIFaceAction(string $name): bool
     {
-        $currentIFaceModel = $this->getCurrentIFaceModel();
-        $currentAction     = $currentIFaceModel ? $currentIFaceModel->getEntityActionName() : null;
+        $currentElement = $this->getCurrentUrlElement();
+        $currentAction  = $currentElement ? $currentElement->getEntityActionName() : null;
 
         return $currentAction === $name;
     }
@@ -100,8 +119,8 @@ class IFaceHelper
      */
     public function isCurrentIFaceZone(string $zone): bool
     {
-        $currentIFaceModel = $this->getCurrentIFaceModel();
-        $currentZone       = $currentIFaceModel ? $this->detectZoneName($currentIFaceModel) : null;
+        $currentElement = $this->getCurrentUrlElement();
+        $currentZone    = $currentElement ? $this->detectZoneName($currentElement) : null;
 
         return $currentZone === $zone;
     }
@@ -111,7 +130,7 @@ class IFaceHelper
         return $this->stack->isCurrent($iface->getModel(), $params);
     }
 
-    public function inStack(IFaceModelInterface $model): bool
+    public function inStack(UrlElementInterface $model): bool
     {
         return $this->stack->has($model);
     }
@@ -125,18 +144,29 @@ class IFaceHelper
      */
     public function createIFaceFromCodename(string $codename): IFaceInterface
     {
-        $model = $this->getModelByCodename($codename);
+        $urlElement = $this->getUrlElementByCodename($codename);
 
-        return $this->factory->createFromModel($model);
+        return $this->factory->createFromUrlElement($urlElement);
+    }
+
+    /**
+     * @param \BetaKiller\Url\UrlElementInterface $urlElement
+     *
+     * @return \BetaKiller\IFace\IFaceInterface
+     * @throws \BetaKiller\Factory\FactoryException
+     */
+    public function createIFaceFromUrlElement(UrlElementInterface $urlElement): IFaceInterface
+    {
+        return $this->factory->createFromUrlElement($urlElement);
     }
 
     /**
      * @param string $codename
      *
-     * @return \BetaKiller\IFace\IFaceModelInterface
+     * @return \BetaKiller\Url\UrlElementInterface
      * @throws \BetaKiller\IFace\Exception\IFaceException
      */
-    public function getModelByCodename(string $codename): IFaceModelInterface
+    public function getUrlElementByCodename(string $codename): UrlElementInterface
     {
         return $this->tree->getByCodename($codename);
     }
@@ -158,23 +188,23 @@ class IFaceHelper
         ?bool $removeCycling = null
     ): string {
         if (!$zone) {
-            $currentIFaceModel = $this->getCurrentIFaceModel();
+            $currentUrlElement = $this->getCurrentUrlElement();
 
-            if (!$currentIFaceModel) {
-                throw new IFaceException('IFace zone must be specified');
+            if (!$currentUrlElement) {
+                throw new IFaceException('UrlElement zone must be specified');
             }
 
             // Fetch zone from current IFace
-            $zone = $this->detectZoneName($currentIFaceModel);
+            $zone = $this->detectZoneName($currentUrlElement);
         }
 
         $params = $this->paramsHelper->createResolving();
         $params->setParameter($entity);
 
-        // Search for IFace with provided entity, action and zone
-        $ifaceModel = $this->tree->getByEntityActionAndZone($entity, $action, $zone);
+        // Search for URL element with provided entity, action and zone
+        $urlElement = $this->tree->getByEntityActionAndZone($entity, $action, $zone);
 
-        return $this->makeUrl($ifaceModel, $params, $removeCycling);
+        return $this->makeUrl($urlElement, $params, $removeCycling);
     }
 
     /**
@@ -262,7 +292,7 @@ class IFaceHelper
      */
     public function getPreviewEntityUrl(DispatchableEntityInterface $entity): ?string
     {
-        return $this->getEntityUrl($entity, CrudlsActionsInterface::ACTION_READ, IFaceZone::PREVIEW_ZONE);
+        return $this->getEntityUrl($entity, CrudlsActionsInterface::ACTION_READ, UrlElementZone::PREVIEW_ZONE);
     }
 
     /**
@@ -293,7 +323,7 @@ class IFaceHelper
     }
 
     /**
-     * @param \BetaKiller\IFace\IFaceModelInterface      $ifaceModel
+     * @param \BetaKiller\Url\UrlElementInterface        $urlElement
      * @param \BetaKiller\Url\UrlContainerInterface|null $params
      * @param bool|null                                  $removeCyclingLinks
      *
@@ -301,11 +331,11 @@ class IFaceHelper
      * @throws \BetaKiller\IFace\Exception\IFaceException
      */
     public function makeUrl(
-        IFaceModelInterface $ifaceModel,
+        UrlElementInterface $urlElement,
         ?UrlContainerInterface $params = null,
         ?bool $removeCyclingLinks = null
     ): string {
-        return $this->urlHelper->makeIFaceUrl($ifaceModel, $params, $removeCyclingLinks);
+        return $this->urlHelper->makeUrl($urlElement, $params, $removeCyclingLinks);
     }
 
     /**
@@ -325,14 +355,14 @@ class IFaceHelper
     }
 
     /**
-     * @param \BetaKiller\IFace\IFaceModelInterface $model
+     * @param \BetaKiller\Url\UrlElementInterface $urlElement
      *
      * @return \BetaKiller\Model\DispatchableEntityInterface|null
      * @throws \BetaKiller\IFace\Exception\IFaceException
      */
-    public function detectPrimaryEntity(IFaceModelInterface $model): ?DispatchableEntityInterface
+    public function detectPrimaryEntity(UrlElementInterface $urlElement): ?DispatchableEntityInterface
     {
-        $current = $model;
+        $current = $urlElement;
 
         do {
             $name   = $current->getEntityModelName();
@@ -343,7 +373,7 @@ class IFaceHelper
     }
 
     /**
-     * @param \BetaKiller\IFace\IFaceModelInterface $model
+     * @param \BetaKiller\Url\IFaceModelInterface $model
      *
      * @return string|null
      * @throws \BetaKiller\IFace\Exception\IFaceException
@@ -355,18 +385,18 @@ class IFaceHelper
         // Climb up the IFace tree for a layout codename
         do {
             $layoutCodename = $current->getLayoutCodename();
-        } while (!$layoutCodename && $current = $this->tree->getParent($current));
+        } while (!$layoutCodename && $current = $this->tree->getParentIFaceModel($current));
 
         return $layoutCodename;
     }
 
     /**
-     * @param \BetaKiller\IFace\IFaceModelInterface $model
+     * @param \BetaKiller\Url\UrlElementInterface $model
      *
      * @return string
      * @throws \BetaKiller\IFace\Exception\IFaceException
      */
-    public function detectZoneName(IFaceModelInterface $model): string
+    public function detectZoneName(UrlElementInterface $model): string
     {
         $current = $model;
 
@@ -376,18 +406,24 @@ class IFaceHelper
         } while (!$zoneName && $current);
 
         // Public zone by default
-        return $zoneName ?: IFaceZone::PUBLIC_ZONE;
+        return $zoneName ?: UrlElementZone::PUBLIC_ZONE;
     }
 
     /**
-     * @param \BetaKiller\IFace\IFaceModelInterface $model
+     * @param \BetaKiller\Url\UrlElementInterface        $model
+     *
+     * @param \BetaKiller\Url\UrlContainerInterface|null $params
+     * @param int|null                                   $limit
      *
      * @return string
      * @throws \BetaKiller\IFace\Exception\IFaceException
      * @throws \BetaKiller\Url\UrlPrototypeException
      */
-    public function getLabel(IFaceModelInterface $model): string
-    {
+    public function getLabel(
+        UrlElementInterface $model,
+        ?UrlContainerInterface $params = null,
+        ?int $limit = null
+    ): string {
         $label = $model->getLabel();
 
         if (!$label) {
@@ -398,11 +434,11 @@ class IFaceHelper
             $label = __($label);
         }
 
-        return $this->stringPatternHelper->processPattern($label);
+        return $this->stringPatternHelper->processPattern($label, $limit, $params);
     }
 
     /**
-     * @param \BetaKiller\IFace\IFaceModelInterface $model
+     * @param \BetaKiller\Url\IFaceModelInterface $model
      *
      * @return string
      * @throws \BetaKiller\Url\UrlPrototypeException
@@ -426,7 +462,7 @@ class IFaceHelper
     }
 
     /**
-     * @param \BetaKiller\IFace\IFaceModelInterface $model
+     * @param \BetaKiller\Url\IFaceModelInterface $model
      *
      * @return string
      * @throws \BetaKiller\Url\UrlPrototypeException
@@ -444,13 +480,13 @@ class IFaceHelper
     }
 
     /**
-     * @param \BetaKiller\IFace\IFaceModelInterface $model
+     * @param \BetaKiller\Url\UrlElementInterface $model
      *
      * @return string
      * @throws \BetaKiller\IFace\Exception\IFaceException
      * @throws \BetaKiller\Url\UrlPrototypeException
      */
-    public function makeTitleFromLabels(IFaceModelInterface $model): string
+    public function makeTitleFromLabels(UrlElementInterface $model): string
     {
         $labels  = [];
         $current = $model;

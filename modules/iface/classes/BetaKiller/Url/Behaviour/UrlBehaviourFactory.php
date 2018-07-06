@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace BetaKiller\Url\Behaviour;
 
 use BetaKiller\Factory\NamespaceBasedFactoryBuilder;
-use BetaKiller\IFace\IFaceModelInterface;
+use BetaKiller\Url\UrlElementInterface;
 
 class UrlBehaviourFactory
 {
@@ -21,6 +21,8 @@ class UrlBehaviourFactory
      * UrlBehaviourFactory constructor.
      *
      * @param \BetaKiller\Factory\NamespaceBasedFactoryBuilder $factoryBuilder
+     *
+     * @throws \BetaKiller\Factory\FactoryException
      */
     public function __construct(NamespaceBasedFactoryBuilder $factoryBuilder)
     {
@@ -33,12 +35,12 @@ class UrlBehaviourFactory
     }
 
     /**
-     * @param \BetaKiller\IFace\IFaceModelInterface $model
+     * @param \BetaKiller\Url\UrlElementInterface $model
      *
      * @return \BetaKiller\Url\Behaviour\UrlBehaviourInterface
      * @throws \BetaKiller\Factory\FactoryException
      */
-    public function fromIFaceModel(IFaceModelInterface $model): UrlBehaviourInterface
+    public function fromUrlElement(UrlElementInterface $model): UrlBehaviourInterface
     {
         $codename = $this->detectCodename($model);
 
@@ -46,11 +48,11 @@ class UrlBehaviourFactory
     }
 
     /**
-     * @param \BetaKiller\IFace\IFaceModelInterface $model
+     * @param \BetaKiller\Url\UrlElementInterface $model
      *
      * @return string
      */
-    private function detectCodename(IFaceModelInterface $model): string
+    private function detectCodename(UrlElementInterface $model): string
     {
         if ($model->hasTreeBehaviour()) {
             return self::BEHAVIOUR_TREE;

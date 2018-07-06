@@ -2,14 +2,14 @@
 namespace BetaKiller\IFace\Cache;
 
 use BetaKiller\Helper\IFaceHelper;
-use BetaKiller\IFace\IFaceModelInterface;
+use BetaKiller\Url\IFaceModelInterface;
 use PageCache\SessionHandler;
 use PageCache\StrategyInterface;
 
 class IFacePageCacheStrategy implements StrategyInterface
 {
     /**
-     * @var \BetaKiller\IFace\IFaceModelInterface
+     * @var \BetaKiller\Url\IFaceModelInterface
      */
     protected $ifaceModel;
 
@@ -29,7 +29,7 @@ class IFacePageCacheStrategy implements StrategyInterface
     }
 
     /**
-     * @param \BetaKiller\IFace\IFaceModelInterface $model
+     * @param \BetaKiller\Url\IFaceModelInterface $model
      */
     public function setIFaceModel(IFaceModelInterface $model): void
     {

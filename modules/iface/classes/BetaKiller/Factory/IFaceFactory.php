@@ -1,7 +1,9 @@
 <?php
-namespace BetaKiller\IFace;
+namespace BetaKiller\Factory;
 
-use BetaKiller\Factory\NamespaceBasedFactoryBuilder;
+use BetaKiller\IFace\IFaceInterface;
+use BetaKiller\Url\IFaceModelInterface;
+use BetaKiller\Url\UrlElementInterface;
 
 class IFaceFactory
 {
@@ -14,6 +16,8 @@ class IFaceFactory
      * IFaceFactory constructor.
      *
      * @param \BetaKiller\Factory\NamespaceBasedFactoryBuilder $factoryBuilder
+     *
+     * @throws \BetaKiller\Factory\FactoryException
      */
     public function __construct(NamespaceBasedFactoryBuilder $factoryBuilder)
     {
@@ -25,15 +29,20 @@ class IFaceFactory
     }
 
     /**
-     * Creates instance of IFace from model
-     *
-     * @param \BetaKiller\IFace\IFaceModelInterface $model
+     * @param \BetaKiller\Url\UrlElementInterface $model
      *
      * @return \BetaKiller\IFace\IFaceInterface
      * @throws \BetaKiller\Factory\FactoryException
      */
-    public function createFromModel(IFaceModelInterface $model): IFaceInterface
+    public function createFromUrlElement(UrlElementInterface $model): IFaceInterface
     {
+        if (! $model instanceof IFaceModelInterface) {
+            throw new FactoryException('Can not create IFace from URL element :codename of type :class', [
+                ':codename' => $model->getCodename(),
+                ':class' => \get_class($model),
+            ]);
+        }
+
         $codename = $model->getCodename();
 
         /** @var \BetaKiller\IFace\IFaceInterface $instance */

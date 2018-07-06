@@ -1,9 +1,9 @@
 <?php
 
 use BetaKiller\IFace\Exception\IFaceException;
-use BetaKiller\IFace\IFaceModelInterface;
-use BetaKiller\IFace\IFaceModelsStack;
+use BetaKiller\Url\IFaceModelInterface;
 use BetaKiller\Url\UrlContainerInterface;
+use BetaKiller\Url\UrlElementStack;
 
 class IFaceStackTest extends \BetaKiller\Test\TestCase
 {
@@ -33,7 +33,7 @@ class IFaceStackTest extends \BetaKiller\Test\TestCase
     {
         $stack = $this->createEmptyStack();
 
-        $this->assertInstanceOf(IFaceModelsStack::class, $stack);
+        $this->assertInstanceOf(UrlElementStack::class, $stack);
 
         return $stack;
     }
@@ -41,11 +41,11 @@ class IFaceStackTest extends \BetaKiller\Test\TestCase
     /**
      * @depends testConstructor
      *
-     * @param \BetaKiller\IFace\IFaceModelsStack $stack
+     * @param \BetaKiller\Url\UrlElementStack $stack
      *
-     * @return \BetaKiller\IFace\IFaceModelsStack
+     * @return \BetaKiller\Url\UrlElementStack
      */
-    public function testAddFirst(IFaceModelsStack $stack): IFaceModelsStack
+    public function testAddFirst(UrlElementStack $stack): UrlElementStack
     {
         $ifaceProp = $this->emptyIFaceModel(self::FIRST_IFACE_CODENAME);
 
@@ -63,11 +63,11 @@ class IFaceStackTest extends \BetaKiller\Test\TestCase
     /**
      * @depends testAddFirst
      *
-     * @param \BetaKiller\IFace\IFaceModelsStack $stack
+     * @param \BetaKiller\Url\UrlElementStack $stack
      *
-     * @return \BetaKiller\IFace\IFaceModelsStack
+     * @return \BetaKiller\Url\UrlElementStack
      */
-    public function testAddSecond(IFaceModelsStack $stack): IFaceModelsStack
+    public function testAddSecond(UrlElementStack $stack): UrlElementStack
     {
         $ifaceProp = $this->emptyIFaceModel(self::SECOND_IFACE_CODENAME);
 
@@ -140,9 +140,9 @@ class IFaceStackTest extends \BetaKiller\Test\TestCase
     /**
      * @depends testAddSecond
      *
-     * @param \BetaKiller\IFace\IFaceModelsStack $stack
+     * @param \BetaKiller\Url\UrlElementStack $stack
      */
-    public function testClear(IFaceModelsStack $stack)
+    public function testClear(UrlElementStack $stack)
     {
         $stack->clear();
 
@@ -155,7 +155,7 @@ class IFaceStackTest extends \BetaKiller\Test\TestCase
         /** @var UrlContainerInterface $params */
         $params = $this->revealOrReturn($this->urlParams);
 
-        return new IFaceModelsStack($params);
+        return new UrlElementStack($params);
     }
 
     private function emptyUrlParameters()

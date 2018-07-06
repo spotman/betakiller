@@ -8,7 +8,7 @@
         <iface codename="HttpError500" uri="500" label="error.http.500.label" zone="public" />
     </iface>
 
-    <!-- TODO вынести это всё в файл config/ifaces.php, который добавляет элементы в IFaceModelTree::admin() -->
+    <!-- TODO вынести это всё в файл config/ifaces.php, который добавляет элементы в UrlElementTree::admin() -->
     <iface uri="errors" codename="Admin_Error_Index" parentCodename="Admin_Index" title="Admin | Errors" label="Errors">
         <iface uri="php-exceptions" codename="Admin_Error_UnresolvedPhpExceptionIndex" title="Admin | Unresolved PhpExceptions" label="Unresolved" entity="PhpException" entityAction="listUnresolved">
             <iface uri="resolved" codename="Admin_Error_ResolvedPhpExceptionIndex" title="Admin | Resolved PhpExceptions" label="Resolved" entity="PhpException" entityAction="listResolved" />

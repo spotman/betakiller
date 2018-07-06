@@ -2,7 +2,7 @@
 namespace BetaKiller\Model;
 
 use BetaKiller\Helper\SeoMetaInterface;
-use BetaKiller\IFace\IFaceModelInterface;
+use BetaKiller\Url\IFaceModelInterface;
 
 /**
  * Class IFace
@@ -11,9 +11,9 @@ use BetaKiller\IFace\IFaceModelInterface;
  * @author     Spotman
  * @package    Betakiller
  */
-class IFace extends AbstractOrmBasedSingleParentTreeModel implements IFaceModelInterface
+class IFace extends AbstractOrmModelContainsUrlElement implements IFaceModelInterface
 {
-    protected function _initialize(): void
+    protected function configure(): void
     {
         $this->belongs_to([
             'layout' => [
@@ -22,79 +22,11 @@ class IFace extends AbstractOrmBasedSingleParentTreeModel implements IFaceModelI
             ],
         ]);
 
-        $this->belongs_to([
-            'entity' => [
-                'model'       => 'Entity',
-                'foreign_key' => 'entity_id',
-            ],
-        ]);
-
-        $this->belongs_to([
-            'action' => [
-                'model'       => 'EntityAction',
-                'foreign_key' => 'entity_action_id',
-            ],
-        ]);
-
-        $this->belongs_to([
-            'zone' => [
-                'model'       => 'IFaceZone',
-                'foreign_key' => 'zone_id',
-            ],
-        ]);
-
-        $this->has_many([
-            'aclRules' => [
-                'model'       => 'IFaceAclRule',
-                'foreign_key' => 'iface_id',
-            ],
-        ]);
-
         $this->load_with([
             'layout',
-            'entity',
-            'action',
-            'zone',
         ]);
 
-        $this->load_with([
-            'parent:layout',
-            'parent:entity',
-            'parent:action',
-            'parent:zone',
-        ]);
-
-        parent::_initialize();
-    }
-
-    /**
-     * Returns TRUE if iface is marked as "default"
-     *
-     * @return bool
-     */
-    public function isDefault(): bool
-    {
-        return (bool)$this->get('is_default');
-    }
-
-    /**
-     * Returns iface codename
-     *
-     * @return string
-     */
-    public function getCodename(): string
-    {
-        return $this->get('codename');
-    }
-
-    /**
-     * Returns label for using in breadcrumbs and etc
-     *
-     * @return string
-     */
-    public function getLabel(): string
-    {
-        return $this->get('label');
+        parent::configure();
     }
 
     /**
@@ -104,7 +36,7 @@ class IFace extends AbstractOrmBasedSingleParentTreeModel implements IFaceModelI
      */
     public function getTitle(): string
     {
-        return $this->get('title');
+        return $this->title;
     }
 
     /**
@@ -114,25 +46,7 @@ class IFace extends AbstractOrmBasedSingleParentTreeModel implements IFaceModelI
      */
     public function getDescription(): string
     {
-        return $this->get('description');
-    }
-
-    /**
-     * Returns iface url part
-     *
-     * @return string
-     */
-    public function getUri(): string
-    {
-        return $this->get('uri');
-    }
-
-    /**
-     * @param string $value
-     */
-    public function setUri(string $value): void
-    {
-        $this->set('uri', $value);
+        return $this->description;
     }
 
     /**
@@ -142,7 +56,7 @@ class IFace extends AbstractOrmBasedSingleParentTreeModel implements IFaceModelI
      */
     private function getLayoutRelation(): IFaceLayout
     {
-        return $this->get('layout');
+        return $this->layout;
     }
 
     /**
@@ -159,39 +73,11 @@ class IFace extends AbstractOrmBasedSingleParentTreeModel implements IFaceModelI
     }
 
     /**
-     * Returns TRUE if iface provides dynamic url mapping
-     *
-     * @return bool
-     */
-    public function hasDynamicUrl(): bool
-    {
-        return (bool)$this->get('is_dynamic');
-    }
-
-    /**
-     * Returns TRUE if iface has multi-level tree-behavior url mapping
-     *
-     * @return bool
-     */
-    public function hasTreeBehaviour(): bool
-    {
-        return (bool)$this->get('is_tree');
-    }
-
-    /**
      * @return bool
      */
     public function hideInSiteMap(): bool
     {
-        return (bool)$this->get('hide_in_site_map');
-    }
-
-    /**
-     * @param string $value
-     */
-    public function setLabel(string $value): void
-    {
-        $this->set('label', $value);
+        return (bool)$this->hide_in_site_map;
     }
 
     /**
@@ -203,7 +89,9 @@ class IFace extends AbstractOrmBasedSingleParentTreeModel implements IFaceModelI
      */
     public function setTitle(string $value): SeoMetaInterface
     {
-        return $this->set('title', $value);
+        $this->title = $value;
+
+        return $this;
     }
 
     /**
@@ -215,113 +103,8 @@ class IFace extends AbstractOrmBasedSingleParentTreeModel implements IFaceModelI
      */
     public function setDescription(string $value): SeoMetaInterface
     {
-        return $this->set('description', $value);
-    }
+        $this->description = $value;
 
-    /**
-     * Returns model name of the linked entity
-     *
-     * @return string|null
-     */
-    public function getEntityModelName(): ?string
-    {
-        $entity = $this->getEntityRelation();
-
-        return $entity->loaded() ? $entity->getLinkedModelName() : null;
-    }
-
-    /**
-     * Returns entity [primary] action, applied by this IFace
-     *
-     * @return string|null
-     */
-    public function getEntityActionName(): ?string
-    {
-        $entityAction = $this->getEntityActionRelation();
-
-        return $entityAction->loaded() ? $entityAction->getName() : null;
-    }
-
-    /**
-     * Returns zone codename where this IFace is placed
-     *
-     * @return string
-     * @throws \Kohana_Exception
-     */
-    public function getZoneName(): string
-    {
-        return $this->getZoneRelation()->getName();
-    }
-
-    /**
-     * Returns array of additional ACL rules in format <ResourceName>.<permissionName> (eq, ["Admin.enabled"])
-     *
-     * @return string[]
-     */
-    public function getAdditionalAclRules(): array
-    {
-        /** @var \BetaKiller\Model\IFaceAclRule[] $rules */
-        $rules  = $this->getAclRulesRelation()->get_all();
-        $output = [];
-
-        foreach ($rules as $rule) {
-            $output[] = $rule->getCombinedRule();
-        }
-
-        return $output;
-    }
-
-    /**
-     * @return \BetaKiller\Model\Entity
-     */
-    private function getEntityRelation(): Entity
-    {
-        return $this->get('entity');
-    }
-
-    /**
-     * @return \BetaKiller\Model\EntityAction
-     */
-    private function getEntityActionRelation(): EntityAction
-    {
-        return $this->get('action');
-    }
-
-    /**
-     * @return \BetaKiller\Model\IFaceZone
-     */
-    private function getZoneRelation(): IFaceZone
-    {
-        return $this->get('zone');
-    }
-
-    /**
-     * @return \BetaKiller\Model\IFaceAclRule
-     */
-    private function getAclRulesRelation(): IFaceAclRule
-    {
-        return $this->get('aclRules');
-    }
-
-    /**
-     * Returns array representation of the model data
-     *
-     * @return array
-     */
-    public function asArray(): array
-    {
-        return $this->as_array();
-    }
-
-    /**
-     * Returns parent IFace codename (if parent exists)
-     *
-     * @return null|string
-     */
-    public function getParentCodename(): ?string
-    {
-        $parent = $this->getParent();
-
-        return $parent ? $parent->getCodename() : null;
+        return $this;
     }
 }

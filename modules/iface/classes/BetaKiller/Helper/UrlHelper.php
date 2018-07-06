@@ -3,14 +3,14 @@ declare(strict_types=1);
 
 namespace BetaKiller\Helper;
 
-
 use BetaKiller\Config\AppConfigInterface;
+use BetaKiller\Factory\FactoryException;
 use BetaKiller\IFace\Exception\IFaceException;
-use BetaKiller\IFace\IFaceModelInterface;
-use BetaKiller\IFace\IFaceModelsStack;
-use BetaKiller\IFace\IFaceModelTree;
 use BetaKiller\Url\Behaviour\UrlBehaviourFactory;
 use BetaKiller\Url\UrlContainerInterface;
+use BetaKiller\Url\UrlElementInterface;
+use BetaKiller\Url\UrlElementStack;
+use BetaKiller\Url\UrlElementTreeInterface;
 
 class UrlHelper
 {
@@ -25,28 +25,28 @@ class UrlHelper
     private $appConfig;
 
     /**
-     * @var \BetaKiller\IFace\IFaceModelsStack
+     * @var \BetaKiller\Url\UrlElementStack
      */
     private $stack;
 
     /**
-     * @var \BetaKiller\IFace\IFaceModelTree
+     * @var \BetaKiller\Url\UrlElementTreeInterface
      */
     private $tree;
 
     /**
      * UrlHelper constructor.
      *
-     * @param \BetaKiller\IFace\IFaceModelTree              $tree
+     * @param \BetaKiller\Url\UrlElementTreeInterface       $tree
      * @param \BetaKiller\Config\AppConfigInterface         $appConfig
      * @param \BetaKiller\Url\Behaviour\UrlBehaviourFactory $behaviourFactory
-     * @param \BetaKiller\IFace\IFaceModelsStack            $stack
+     * @param \BetaKiller\Url\UrlElementStack               $stack
      */
     public function __construct(
-        IFaceModelTree $tree,
+        UrlElementTreeInterface $tree,
         AppConfigInterface $appConfig,
         UrlBehaviourFactory $behaviourFactory,
-        IFaceModelsStack $stack
+        UrlElementStack $stack
     ) {
         $this->behaviourFactory = $behaviourFactory;
         $this->appConfig        = $appConfig;
@@ -55,15 +55,15 @@ class UrlHelper
     }
 
     /**
-     * @param \BetaKiller\IFace\IFaceModelInterface      $model
+     * @param \BetaKiller\Url\UrlElementInterface        $model
      * @param \BetaKiller\Url\UrlContainerInterface|null $params
      * @param bool|null                                  $removeCyclingLinks
      *
      * @return string
      * @throws \BetaKiller\IFace\Exception\IFaceException
      */
-    public function makeIFaceUrl(
-        IFaceModelInterface $model,
+    public function makeUrl(
+        UrlElementInterface $model,
         ?UrlContainerInterface $params = null,
         ?bool $removeCyclingLinks = null
     ): string {
@@ -76,7 +76,7 @@ class UrlHelper
         $parts = [];
 
         foreach ($this->tree->getReverseBreadcrumbsIterator($model) as $item) {
-            $uri = $this->makeIFaceUri($item, $params);
+            $uri = $this->makeUrlElementUri($item, $params);
             array_unshift($parts, $uri);
         }
 
@@ -98,13 +98,13 @@ class UrlHelper
     }
 
     /**
-     * @param \BetaKiller\IFace\IFaceModelInterface $model
+     * @param \BetaKiller\Url\UrlElementInterface   $model
      * @param \BetaKiller\Url\UrlContainerInterface $urlContainer
      *
      * @return string
      * @throws \BetaKiller\IFace\Exception\IFaceException
      */
-    private function makeIFaceUri(IFaceModelInterface $model, UrlContainerInterface $urlContainer = null): string
+    private function makeUrlElementUri(UrlElementInterface $model, UrlContainerInterface $urlContainer = null): string
     {
         $uri = $model->getUri();
 
@@ -112,7 +112,11 @@ class UrlHelper
             throw new IFaceException('IFace :codename must have uri', [':codename' => $model->getCodename()]);
         }
 
-        $behaviour = $this->behaviourFactory->fromIFaceModel($model);
+        try {
+            $behaviour = $this->behaviourFactory->fromUrlElement($model);
+        } catch (FactoryException $e) {
+            throw IFaceException::wrap($e);
+        }
 
         return $behaviour->makeUri($model, $urlContainer);
     }

@@ -3,7 +3,7 @@ namespace BetaKiller\Model;
 
 use ORM;
 
-class IFaceAclRule extends ORM
+class UrlElementAclRule extends ORM
 {
     /**
      * Prepares the model database connection, determines the table name,
@@ -14,7 +14,7 @@ class IFaceAclRule extends ORM
      */
     protected function _initialize()
     {
-        $this->_table_name = 'iface_acl_rules';
+        $this->_table_name = 'url_element_acl_rules';
 
         $this->belongs_to([
             'resource'  => [

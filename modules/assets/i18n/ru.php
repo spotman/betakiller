@@ -4,6 +4,7 @@
  * Automatically generated from previous translation file.
  */
 return array (
+  'File :path does not exists' => 'File :path does not exists',
   'Can not find file with url = :url' => 'Can not find file with url = :url',
   'Can not determine image size for :provider' => 'Невозможно определить размер изображения для провайдера :provider',
   'Crop size :size is not allowed' => 'Размер :size не разрешён',

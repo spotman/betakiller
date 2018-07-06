@@ -7,7 +7,7 @@ class Task_IFace_List extends AbstractTask
 {
     /**
      * @Inject
-     * @var \BetaKiller\IFace\IFaceModelTree
+     * @var \BetaKiller\Url\UrlElementTreeInterface
      */
     private $tree;
 

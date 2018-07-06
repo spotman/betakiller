@@ -4,7 +4,7 @@ namespace BetaKiller\IFace\App\Content;
 use BetaKiller\Helper\AssetsHelper;
 use BetaKiller\Helper\ContentUrlContainerHelper;
 use BetaKiller\Model\ContentPost;
-use BetaKiller\Model\IFaceZone;
+use BetaKiller\Model\UrlElementZone;
 use BetaKiller\Model\UserInterface;
 
 class PostItem extends AbstractAppBase
@@ -76,7 +76,7 @@ class PostItem extends AbstractAppBase
     {
         $model = $this->getContentModel();
 
-        $previewMode = $this->ifaceHelper->isCurrentIFaceZone(IFaceZone::PREVIEW_ZONE);
+        $previewMode = $this->ifaceHelper->isCurrentIFaceZone(UrlElementZone::PREVIEW_ZONE);
 
         if ($previewMode) {
             // See latest revision data

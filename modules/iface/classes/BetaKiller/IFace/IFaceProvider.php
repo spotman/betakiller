@@ -2,27 +2,30 @@
 namespace BetaKiller\IFace;
 
 use BetaKiller\Factory\FactoryException;
+use BetaKiller\Factory\IFaceFactory;
 use BetaKiller\IFace\Exception\IFaceException;
+use BetaKiller\Url\UrlElementInterface;
+use BetaKiller\Url\UrlElementTreeInterface;
 
 class IFaceProvider
 {
     /**
-     * @var \BetaKiller\IFace\IFaceFactory
+     * @var \BetaKiller\Factory\IFaceFactory
      */
     protected $factory;
 
     /**
-     * @var \BetaKiller\IFace\IFaceModelTree
+     * @var \BetaKiller\Url\UrlElementTreeInterface
      */
     private $tree;
 
     /**
      * IFaceProvider constructor
      *
-     * @param \BetaKiller\IFace\IFaceModelTree $tree
-     * @param \BetaKiller\IFace\IFaceFactory   $factory
+     * @param \BetaKiller\Url\UrlElementTreeInterface $tree
+     * @param \BetaKiller\Factory\IFaceFactory        $factory
      */
-    public function __construct(IFaceModelTree $tree, IFaceFactory $factory)
+    public function __construct(UrlElementTreeInterface $tree, IFaceFactory $factory)
     {
         $this->factory = $factory;
         $this->tree    = $tree;
@@ -40,21 +43,21 @@ class IFaceProvider
     {
         $model = $this->tree->getByCodename($codename);
 
-        return $this->fromModel($model);
+        return $this->fromUrlElement($model);
     }
 
     /**
-     * Creates IFace instance from it`s model
+     * Creates IFace instance from URL element
      *
-     * @param \BetaKiller\IFace\IFaceModelInterface $model
+     * @param \BetaKiller\Url\UrlElementInterface $model
      *
      * @return \BetaKiller\IFace\IFaceInterface
      * @throws \BetaKiller\IFace\Exception\IFaceException
      */
-    public function fromModel(IFaceModelInterface $model): IFaceInterface
+    public function fromUrlElement(UrlElementInterface $model): IFaceInterface
     {
         try {
-            return $this->factory->createFromModel($model);
+            return $this->factory->createFromUrlElement($model);
         } catch (FactoryException $e) {
             throw IFaceException::wrap($e);
         }

@@ -1,23 +1,22 @@
 <?php
-namespace BetaKiller\IFace;
+namespace BetaKiller\Url;
 
-class IFaceModelRecursiveIterator extends IFaceModelLayerIterator implements \RecursiveIterator
+class UrlElementTreeRecursiveIterator extends UrlElementTreeLayerIterator implements \RecursiveIterator
 {
     /**
-     * @var \BetaKiller\IFace\IFaceModelTree
+     * @var \BetaKiller\Url\UrlElementTreeInterface
      */
     private $tree;
 
     /**
-     * IFaceModelLayerIterator constructor.
+     * UrlElementTreeRecursiveIterator constructor.
      *
-     * @param \BetaKiller\IFace\IFaceModelTree           $tree
-     *
-     * @param \BetaKiller\IFace\IFaceModelInterface|NULL $parent
+     * @param \BetaKiller\Url\UrlElementTreeInterface  $tree
+     * @param \BetaKiller\Url\IFaceModelInterface|NULL $parent
      *
      * @throws \BetaKiller\IFace\Exception\IFaceException
      */
-    public function __construct(IFaceModelTree $tree, IFaceModelInterface $parent = null)
+    public function __construct(UrlElementTreeInterface $tree, IFaceModelInterface $parent = null)
     {
         parent::__construct($tree, $parent);
 

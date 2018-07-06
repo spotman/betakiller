@@ -94,12 +94,12 @@ class ORM extends Utils\Kohana\ORM implements ExtendedOrmInterface
      */
     protected function _initialize()
     {
-        $this->defineRelations();
+        $this->configure();
 
         parent::_initialize();
     }
 
-    protected function defineRelations(): void
+    protected function configure(): void
     {
         // Empty by default
     }

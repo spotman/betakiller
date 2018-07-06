@@ -4,7 +4,7 @@ namespace BetaKiller\Widget\Content;
 use BetaKiller\Model\ContentCategory;
 use BetaKiller\Model\ContentCategoryInterface;
 use BetaKiller\Model\ContentPost;
-use BetaKiller\Model\IFaceZone;
+use BetaKiller\Model\UrlElementZone;
 use BetaKiller\Search\SearchResultsInterface;
 use BetaKiller\Widget\AbstractBaseWidget;
 use HTML;
@@ -106,7 +106,7 @@ class ArticlesListWidget extends AbstractBaseWidget
                     'original' => $this->assetsHelper->getAttributesForImgTag($thumbnail, $thumbnail::SIZE_ORIGINAL),
                     'preview'  => $this->assetsHelper->getAttributesForImgTag($thumbnail, $thumbnail::SIZE_PREVIEW),
                 ],
-                'url'        => $this->ifaceHelper->getReadEntityUrl($article, IFaceZone::PUBLIC_ZONE),
+                'url'        => $this->ifaceHelper->getReadEntityUrl($article, UrlElementZone::PUBLIC_ZONE),
                 'label'      => $article->getLabel(),
                 'title'      => $article->getTitle(),
                 'text'       => $this->contentHelper->getPostContentPreview($article),

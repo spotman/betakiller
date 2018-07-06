@@ -5,9 +5,9 @@ use BetaKiller\Helper\I18nHelper;
 use BetaKiller\Helper\IFaceHelper;
 use BetaKiller\IFace\Exception\IFaceException;
 use BetaKiller\IFace\IFaceInterface;
-use BetaKiller\IFace\IFaceModelInterface;
 use BetaKiller\Repository\IFaceLayoutRepository;
 use BetaKiller\Repository\RepositoryException;
+use BetaKiller\Url\IFaceModelInterface;
 
 class IFaceView
 {
@@ -113,7 +113,7 @@ class IFaceView
     }
 
     /**
-     * @param \BetaKiller\IFace\IFaceModelInterface $model
+     * @param \BetaKiller\Url\IFaceModelInterface $model
      *
      * @return string
      * @throws \BetaKiller\IFace\Exception\IFaceException
@@ -134,8 +134,8 @@ class IFaceView
         return $layoutCodename;
     }
 
-    protected function getViewPath(IFaceModelInterface $iface): string
+    protected function getViewPath(IFaceModelInterface $model): string
     {
-        return 'ifaces'.DIRECTORY_SEPARATOR.str_replace('_', DIRECTORY_SEPARATOR, $iface->getCodename());
+        return 'ifaces'.DIRECTORY_SEPARATOR.str_replace('_', DIRECTORY_SEPARATOR, $model->getCodename());
     }
 }

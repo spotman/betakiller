@@ -3,10 +3,10 @@ declare(strict_types=1);
 
 namespace BetaKiller\Repository;
 
-use BetaKiller\IFace\IFaceModelInterface;
 use BetaKiller\Model\ExtendedOrmInterface;
+use BetaKiller\Url\UrlElementInterface;
 
-class IFaceRepository extends AbstractOrmBasedSingleParentTreeRepository
+class UrlElementRepository extends AbstractOrmBasedSingleParentTreeRepository
 {
     /**
      * @return string
@@ -21,7 +21,7 @@ class IFaceRepository extends AbstractOrmBasedSingleParentTreeRepository
      */
     public function getUrlKeyName(): string
     {
-        return IFaceModelInterface::URL_KEY;
+        return UrlElementInterface::URL_KEY;
     }
 
     /**
@@ -31,6 +31,14 @@ class IFaceRepository extends AbstractOrmBasedSingleParentTreeRepository
      */
     protected function customFilterForTreeTraversing(ExtendedOrmInterface $orm): void
     {
-        // Nothing special here
+        // Load with dependent IFace record and WebHook record (if exists)
+        $orm->load_with([
+            'iface',
+            'iface:element',
+            'webhook',
+            'webhook:element',
+        ]);
+
+        // No special filtering is required here
     }
 }

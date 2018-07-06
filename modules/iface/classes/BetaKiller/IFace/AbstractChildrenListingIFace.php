@@ -5,7 +5,7 @@ abstract class AbstractChildrenListingIFace extends AbstractIFace
 {
     /**
      * @Inject
-     * @var \BetaKiller\IFace\IFaceModelTree
+     * @var \BetaKiller\Url\UrlElementTreeInterface
      */
     private $tree;
 
@@ -27,11 +27,11 @@ abstract class AbstractChildrenListingIFace extends AbstractIFace
     {
         $data = [];
 
-        foreach ($this->tree->getChildren($this->getModel()) as $model) {
+        foreach ($this->tree->getChildren($this->getModel()) as $urlElement) {
             $data[] = [
-                'label'    => $this->ifaceHelper->getLabel($model),
-                'codename' => $model->getCodename(),
-                'url'      => $this->ifaceHelper->makeUrl($model),
+                'label'    => $this->ifaceHelper->getLabel($urlElement),
+                'codename' => $urlElement->getCodename(),
+                'url'      => $this->ifaceHelper->makeUrl($urlElement),
             ];
         }
 

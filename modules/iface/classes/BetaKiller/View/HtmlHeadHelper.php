@@ -66,12 +66,18 @@ class HtmlHeadHelper
     /**
      * Set <link rel="canonical"> value
      *
-     * @param string $href
+     * @param string    $href
+     * @param bool|null $overwrite
      *
      * @return \BetaKiller\View\HtmlHeadHelper
      */
-    public function setCanonical(string $href): self
+    public function setCanonical(string $href, ?bool $overwrite = null): self
     {
+        // Prevent overwrite of `canonical` value by error pages and nested IFaces
+        if (!$overwrite && $this->hasLink('canonical')) {
+            return $this;
+        }
+
         return $this->addLink('canonical', $href);
     }
 
@@ -97,6 +103,17 @@ class HtmlHeadHelper
         $this->links[] = $attributes;
 
         return $this;
+    }
+
+    public function hasLink(string $rel): bool
+    {
+        foreach ($this->links as $attributes) {
+            if ($attributes['rel'] === $rel) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public function setLang(string $lang): self

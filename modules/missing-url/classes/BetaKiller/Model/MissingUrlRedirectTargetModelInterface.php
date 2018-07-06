@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace BetaKiller\Model;
 
 
-use BetaKiller\IFace\IFaceModelInterface;
+use BetaKiller\Url\IFaceModelInterface;
 
 interface MissingUrlRedirectTargetModelInterface extends DispatchableEntityInterface
 {

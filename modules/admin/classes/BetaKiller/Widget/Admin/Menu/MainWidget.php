@@ -91,20 +91,21 @@ class MainWidget extends AbstractAdminWidget
      * @param \BetaKiller\Url\UrlContainerInterface|null $params
      *
      * @return array
+     * @throws \BetaKiller\Url\UrlPrototypeException
      * @throws \BetaKiller\IFace\Exception\IFaceException
      * @throws \Spotman\Acl\Exception
      */
     protected function getIFaceMenuItemData(IFaceInterface $iface, UrlContainerInterface $params = null): array
     {
-        if (!$this->aclHelper->isIFaceAllowed($iface->getModel(), $params)) {
+        if (!$this->aclHelper->isIFaceAllowed($iface, $params)) {
             return [];
         }
 
-        $url = $this->ifaceHelper->makeUrl($iface->getModel(), $params, false); // Keep links always working
+        $url = $this->ifaceHelper->makeIFaceUrl($iface, $params, false); // Keep links always working
 
         return [
             'url'    => $url,
-            'label'  => $this->patternHelper->processPattern($iface->getLabel(), null, $params),
+            'label'  => $this->ifaceHelper->getLabel($iface->getModel(), $params),
             'active' => $this->ifaceHelper->isCurrentIFace($iface, $params),
         ];
     }

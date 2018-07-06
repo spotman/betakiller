@@ -3,7 +3,6 @@ namespace BetaKiller\Url;
 
 use BetaKiller\Exception\NotImplementedHttpException;
 use BetaKiller\IFace\Exception\IFaceException;
-use BetaKiller\IFace\IFaceModelInterface;
 use BetaKiller\Model\DispatchableEntityInterface;
 use BetaKiller\Model\SingleParentTreeModelInterface;
 
@@ -42,19 +41,19 @@ class UrlPrototypeService
     }
 
     /**
-     * @param \BetaKiller\IFace\IFaceModelInterface $iface
+     * @param \BetaKiller\Url\UrlElementInterface $urlElement
      *
      * @return \BetaKiller\Url\UrlPrototype
-     * @throws \BetaKiller\Url\UrlPrototypeException
      * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \BetaKiller\Url\UrlPrototypeException
      */
-    public function createPrototypeFromIFaceModel(IFaceModelInterface $iface): UrlPrototype
+    public function createPrototypeFromUrlElement(UrlElementInterface $urlElement): UrlPrototype
     {
-        $uri = $iface->getUri();
+        $uri = $urlElement->getUri();
 
         if (!$uri) {
             throw new IFaceException('IFace :codename must have uri', [
-                ':codename' => $iface->getCodename(),
+                ':codename' => $urlElement->getCodename(),
             ]);
         }
 

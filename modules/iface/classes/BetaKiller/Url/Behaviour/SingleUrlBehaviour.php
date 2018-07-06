@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace BetaKiller\Url\Behaviour;
 
-use BetaKiller\IFace\IFaceModelInterface;
 use BetaKiller\Url\UrlContainerInterface;
+use BetaKiller\Url\UrlElementInterface;
 use BetaKiller\Url\UrlPathIterator;
 
 class SingleUrlBehaviour extends AbstractUrlBehaviour
@@ -18,45 +18,46 @@ class SingleUrlBehaviour extends AbstractUrlBehaviour
     /**
      * Returns true if current behaviour was applied
      *
-     * @param \BetaKiller\IFace\IFaceModelInterface      $model
-     * @param \BetaKiller\Url\UrlPathIterator            $it
-     * @param \BetaKiller\Url\UrlContainerInterface|null $params
+     * @param \BetaKiller\Url\UrlElementInterface $urlElement
+     * @param \BetaKiller\Url\UrlPathIterator               $it
+     * @param \BetaKiller\Url\UrlContainerInterface|null    $params
      *
      * @return bool
      */
     public function parseUri(
-        IFaceModelInterface $model,
+        UrlElementInterface $urlElement,
         UrlPathIterator $it,
         UrlContainerInterface $params
     ): bool {
         // Return true if fixed url found
-        return $model->getUri() === $it->current();
+        return $urlElement->getUri() === $it->current();
     }
 
     /**
-     * @param \BetaKiller\IFace\IFaceModelInterface      $ifaceModel
+     * @param \BetaKiller\Url\UrlElementInterface        $urlElement
      * @param \BetaKiller\Url\UrlContainerInterface|null $params
      *
      * @return string
      */
     protected function getUri(
-        IFaceModelInterface $ifaceModel,
+        UrlElementInterface $urlElement,
         ?UrlContainerInterface $params = null
     ): string {
-        return $ifaceModel->getUri();
+        return $urlElement->getUri();
     }
 
     /**
-     * @param \BetaKiller\IFace\IFaceModelInterface      $ifaceModel
+     * @param \BetaKiller\Url\UrlElementInterface        $urlElement
      * @param \BetaKiller\Url\UrlContainerInterface|null $params
      *
      * @return \Generator|\BetaKiller\Url\AvailableUri[]
+     * @throws \BetaKiller\IFace\Exception\IFaceException
      */
     public function getAvailableUrls(
-        IFaceModelInterface $ifaceModel,
+        UrlElementInterface $urlElement,
         UrlContainerInterface $params
     ): \Generator {
-        $url = $this->urlHelper->makeIFaceUrl($ifaceModel, $params);
+        $url = $this->urlHelper->makeUrl($urlElement, $params);
 
         // Only one available uri and no UrlParameter instance
         yield $this->createAvailableUri($url);

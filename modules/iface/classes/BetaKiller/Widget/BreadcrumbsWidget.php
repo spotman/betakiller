@@ -3,15 +3,13 @@ declare(strict_types=1);
 
 namespace BetaKiller\Widget;
 
-
-use BetaKiller\IFace\IFaceModelInterface;
-use BetaKiller\Model\IFaceZone;
+use BetaKiller\Url\UrlElementInterface;
 
 class BreadcrumbsWidget extends AbstractWidget
 {
     /**
      * @Inject
-     * @var \BetaKiller\IFace\IFaceModelsStack
+     * @var \BetaKiller\Url\UrlElementStack
      */
     private $stack;
 
@@ -50,18 +48,18 @@ class BreadcrumbsWidget extends AbstractWidget
     }
 
     /**
-     * @param \BetaKiller\IFace\IFaceModelInterface $model
+     * @param \BetaKiller\Url\UrlElementInterface $urlElement
      *
      * @return array
      * @throws \BetaKiller\IFace\Exception\IFaceException
      * @throws \BetaKiller\Url\UrlPrototypeException
      */
-    private function makeBreadcrumbData(IFaceModelInterface $model): array
+    private function makeBreadcrumbData(UrlElementInterface $urlElement): array
     {
         return [
-            'url'    => $this->ifaceHelper->makeUrl($model, $this->urlContainer),
-            'label'  => $this->ifaceHelper->getLabel($model),
-            'active' => $this->stack->isCurrent($model),
+            'url'    => $this->ifaceHelper->makeUrl($urlElement, $this->urlContainer),
+            'label'  => $this->ifaceHelper->getLabel($urlElement),
+            'active' => $this->stack->isCurrent($urlElement),
         ];
     }
 }

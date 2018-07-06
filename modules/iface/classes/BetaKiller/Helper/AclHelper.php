@@ -5,16 +5,17 @@ use BetaKiller\Acl\Resource\AdminResource;
 use BetaKiller\Acl\Resource\EntityRelatedAclResourceInterface;
 use BetaKiller\IFace\CrudlsActionsInterface;
 use BetaKiller\IFace\Exception\IFaceException;
-use BetaKiller\IFace\IFaceModelInterface;
+use BetaKiller\IFace\IFaceInterface;
 use BetaKiller\Model\DispatchableEntityInterface;
 use BetaKiller\Model\GuestUser;
 use BetaKiller\Model\HasAdminZoneAccessSpecificationInterface;
 use BetaKiller\Model\HasPersonalZoneAccessSpecificationInterface;
 use BetaKiller\Model\HasPreviewZoneAccessSpecificationInterface;
 use BetaKiller\Model\HasPublicZoneAccessSpecificationInterface;
-use BetaKiller\Model\IFaceZone;
+use BetaKiller\Model\UrlElementZone;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Url\UrlContainerInterface;
+use BetaKiller\Url\UrlElementInterface;
 use Spotman\Acl\AccessResolver\UserAccessResolver;
 use Spotman\Acl\AclInterface;
 use Spotman\Acl\AclUserInterface;
@@ -96,7 +97,7 @@ class AclHelper
     }
 
     /**
-     * @param \BetaKiller\IFace\IFaceModelInterface      $model
+     * @param \BetaKiller\Url\UrlElementInterface        $model
      * @param \BetaKiller\Url\UrlContainerInterface|null $params
      * @param null|\Spotman\Acl\AclUserInterface         $user
      *
@@ -104,8 +105,8 @@ class AclHelper
      * @throws \BetaKiller\IFace\Exception\IFaceException
      * @throws \Spotman\Acl\Exception
      */
-    public function isIFaceAllowed(
-        IFaceModelInterface $model,
+    public function isUrlElementAllowed(
+        UrlElementInterface $model,
         ?UrlContainerInterface $params = null,
         ?AclUserInterface $user = null
     ): bool {
@@ -120,7 +121,7 @@ class AclHelper
         }
 
         // Force check for guest role in public zone (so every public iface must be visible for guest users)
-        if ($zoneName === IFaceZone::PUBLIC_ZONE) {
+        if ($zoneName === UrlElementZone::PUBLIC_ZONE) {
             // Public zone needs GuestUser to check access)
             $user = new GuestUser;
         }
@@ -134,7 +135,7 @@ class AclHelper
         $entityDefined = $entityName && $actionName;
 
         // Force check for admin panel is enabled
-        if ($zoneName === IFaceZone::ADMIN_ZONE) {
+        if ($zoneName === UrlElementZone::ADMIN_ZONE) {
             $customRules[] = AdminResource::SHORTCUT;
         }
 
@@ -176,7 +177,7 @@ class AclHelper
         }
 
         // Allow access to public/personal zone by default if nor entity or custom rules were not defined
-        if (\in_array($zoneName, [IFaceZone::PUBLIC_ZONE, IFaceZone::PERSONAL_ZONE], true)) {
+        if (\in_array($zoneName, [UrlElementZone::PUBLIC_ZONE, UrlElementZone::PERSONAL_ZONE], true)) {
             return true;
         }
 
@@ -192,13 +193,30 @@ class AclHelper
     }
 
     /**
+     * @param \BetaKiller\IFace\IFaceInterface           $iface
+     * @param \BetaKiller\Url\UrlContainerInterface|null $params
+     * @param null|\Spotman\Acl\AclUserInterface         $user
+     *
+     * @return bool
+     * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \Spotman\Acl\Exception
+     */
+    public function isIFaceAllowed(
+        IFaceInterface $iface,
+        ?UrlContainerInterface $params = null,
+        ?AclUserInterface $user = null
+    ): bool {
+        return $this->isUrlElementAllowed($iface->getModel(), $params, $user);
+    }
+
+    /**
      * @param \BetaKiller\Model\DispatchableEntityInterface $entity
-     * @param \BetaKiller\IFace\IFaceModelInterface         $model
+     * @param \BetaKiller\Url\UrlElementInterface           $model
      *
      * @return bool
      * @throws \Spotman\Acl\Exception
      */
-    private function isEntityAllowedInZone(DispatchableEntityInterface $entity, IFaceModelInterface $model): bool
+    private function isEntityAllowedInZone(DispatchableEntityInterface $entity, UrlElementInterface $model): bool
     {
         $spec = $this->getEntityZoneAccessSpecification($entity, $model);
 
@@ -208,34 +226,34 @@ class AclHelper
 
     /**
      * @param \BetaKiller\Model\DispatchableEntityInterface $entity
-     * @param \BetaKiller\IFace\IFaceModelInterface         $model
+     * @param \BetaKiller\Url\UrlElementInterface           $model
      *
      * @return bool|null
      * @throws \Spotman\Acl\Exception
      */
     private function getEntityZoneAccessSpecification(
         DispatchableEntityInterface $entity,
-        IFaceModelInterface $model
+        UrlElementInterface $model
     ): ?bool {
         $zoneName = $model->getZoneName();
 
         switch ($zoneName) {
-            case IFaceZone::PUBLIC_ZONE:
+            case UrlElementZone::PUBLIC_ZONE:
                 return $entity instanceof HasPublicZoneAccessSpecificationInterface
                     ? $entity->isPublicZoneAccessAllowed()
                     : null;
 
-            case IFaceZone::ADMIN_ZONE:
+            case UrlElementZone::ADMIN_ZONE:
                 return $entity instanceof HasAdminZoneAccessSpecificationInterface
                     ? $entity->isAdminZoneAccessAllowed()
                     : null;
 
-            case IFaceZone::PERSONAL_ZONE:
+            case UrlElementZone::PERSONAL_ZONE:
                 return $entity instanceof HasPersonalZoneAccessSpecificationInterface
                     ? $entity->isPersonalZoneAccessAllowed()
                     : null;
 
-            case IFaceZone::PREVIEW_ZONE:
+            case UrlElementZone::PREVIEW_ZONE:
                 return $entity instanceof HasPreviewZoneAccessSpecificationInterface
                     ? $entity->isPreviewZoneAccessAllowed()
                     : null;
@@ -266,14 +284,14 @@ class AclHelper
     }
 
     /**
-     * @param \BetaKiller\IFace\IFaceModelInterface $model
+     * @param \BetaKiller\Url\UrlElementInterface $model
      *
      * @throws \BetaKiller\Auth\AuthorizationRequiredException
      */
-    public function forceAuthorizationIfNeeded(IFaceModelInterface $model): void
+    public function forceAuthorizationIfNeeded(UrlElementInterface $model): void
     {
         // Entering to admin and personal zones requires authorized user
-        if ($model->getZoneName() !== IFaceZone::PUBLIC_ZONE && $this->user->isGuest()) {
+        if ($model->getZoneName() !== UrlElementZone::PUBLIC_ZONE && $this->user->isGuest()) {
             $this->user->forceAuthorization();
         }
     }

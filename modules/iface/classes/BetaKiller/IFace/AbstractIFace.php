@@ -1,7 +1,7 @@
 <?php
 namespace BetaKiller\IFace;
 
-use BetaKiller\Helper\SeoMetaInterface;
+use BetaKiller\Url\IFaceModelInterface;
 use DateInterval;
 use DateTimeInterface;
 
@@ -33,76 +33,6 @@ abstract class AbstractIFace implements IFaceInterface
     final public function getCodename(): string
     {
         return $this->getModel()->getCodename();
-    }
-
-    /**
-     * Returns plain label
-     *
-     * @return string
-     */
-    final public function getLabel(): string
-    {
-        return $this->getModel()->getLabel();
-    }
-
-    /**
-     * Returns plain label
-     *
-     * @param string $value
-     *
-     * @return void
-     */
-    final public function setLabel(string $value): void
-    {
-        $this->getModel()->setLabel($value);
-    }
-
-    /**
-     * Returns plain title
-     *
-     * @return string
-     */
-    final public function getTitle(): ?string
-    {
-        return $this->getModel()->getTitle();
-    }
-
-    /**
-     * Returns plain description
-     *
-     * @return string
-     */
-    final public function getDescription(): ?string
-    {
-        return $this->getModel()->getDescription();
-    }
-
-    /**
-     * Sets title for using in <title> tag
-     *
-     * @param string $value
-     *
-     * @return SeoMetaInterface
-     */
-    final public function setTitle(string $value): SeoMetaInterface
-    {
-        $this->getModel()->setTitle($value);
-
-        return $this;
-    }
-
-    /**
-     * Sets description for using in <meta> tag
-     *
-     * @param string $value
-     *
-     * @return SeoMetaInterface
-     */
-    final public function setDescription(string $value): SeoMetaInterface
-    {
-        $this->getModel()->setDescription($value);
-
-        return $this;
     }
 
     /**

@@ -1,30 +1,28 @@
 <?php
-namespace BetaKiller\IFace;
+namespace BetaKiller\Url;
 
-use BetaKiller\Helper\SeoMetaInterface;
 use BetaKiller\Model\HasLabelInterface;
-use BetaKiller\Model\SingleParentTreeModelInterface;
 
-interface IFaceModelInterface extends SingleParentTreeModelInterface, SeoMetaInterface, HasLabelInterface
+interface UrlElementInterface extends HasLabelInterface
 {
     public const URL_KEY = 'codename';
 
     /**
-     * Returns iface codename
+     * Returns codename
      *
      * @return string
      */
     public function getCodename(): string;
 
     /**
-     * Returns parent IFace codename (if parent exists)
+     * Returns parent element codename (if parent exists)
      *
      * @return null|string
      */
     public function getParentCodename(): ?string;
 
     /**
-     * Returns iface url part
+     * Returns element`s url part
      *
      * @return string
      */
@@ -36,42 +34,28 @@ interface IFaceModelInterface extends SingleParentTreeModelInterface, SeoMetaInt
     public function setUri(string $value): void;
 
     /**
-     * Returns TRUE if iface is marked as "default"
+     * Returns TRUE if URL element is marked as "default"
      *
      * @return bool
      */
     public function isDefault(): bool;
 
     /**
-     * Returns TRUE if iface provides dynamic url mapping
+     * Returns TRUE if URL element provides dynamic url mapping
      *
      * @return bool
      */
     public function hasDynamicUrl(): bool;
 
     /**
-     * Returns TRUE if iface provides tree-like url mapping
+     * Returns TRUE if URL element provides tree-like url mapping
      *
      * @return bool
      */
     public function hasTreeBehaviour(): bool;
 
     /**
-     * Returns array representation of the model data
-     *
-     * @return array
-     */
-    public function asArray(): array;
-
-    /**
-     * Returns layout codename or null if using parent layout
-     *
-     * @return string
-     */
-    public function getLayoutCodename(): ?string;
-
-    /**
-     * Returns TRUE if current IFace is hidden in sitemap
+     * Returns TRUE if current URL element is hidden in sitemap
      *
      * @return bool
      */
@@ -85,14 +69,14 @@ interface IFaceModelInterface extends SingleParentTreeModelInterface, SeoMetaInt
     public function getEntityModelName(): ?string;
 
     /**
-     * Returns entity [primary] action, applied by this IFace
-     * 
+     * Returns entity [primary] action, applied by this URL element
+     *
      * @return string
      */
     public function getEntityActionName(): ?string;
 
     /**
-     * Returns zone codename where this IFace is placed
+     * Returns zone codename where this URL element is placed
      *
      * @return string
      */

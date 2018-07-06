@@ -1,18 +1,17 @@
 <?php
-namespace BetaKiller\IFace;
+namespace BetaKiller\Url;
 
 use BetaKiller\IFace\Exception\IFaceException;
-use BetaKiller\Url\UrlContainerInterface;
 
-class IFaceModelsStack implements \IteratorAggregate
+class UrlElementStack implements \IteratorAggregate
 {
     /**
-     * @var \BetaKiller\IFace\IFaceModelInterface
+     * @var \BetaKiller\Url\UrlElementInterface
      */
     private $current;
 
     /**
-     * @var \BetaKiller\IFace\IFaceModelInterface[]
+     * @var \BetaKiller\Url\UrlElementInterface[]
      */
     private $items;
 
@@ -22,7 +21,7 @@ class IFaceModelsStack implements \IteratorAggregate
     private $parameters;
 
     /**
-     * IFaceModelsStack constructor.
+     * UrlElementStack constructor.
      *
      * @param \BetaKiller\Url\UrlContainerInterface $parameters
      */
@@ -32,11 +31,11 @@ class IFaceModelsStack implements \IteratorAggregate
     }
 
     /**
-     * @param \BetaKiller\IFace\IFaceModelInterface $model
+     * @param \BetaKiller\Url\UrlElementInterface $model
      *
      * @throws \BetaKiller\IFace\Exception\IFaceException
      */
-    public function push(IFaceModelInterface $model): void
+    public function push(UrlElementInterface $model): void
     {
         if ($this->has($model)) {
             throw new IFaceException('Duplicate insert for :codename', [':codename' => $model->getCodename()]);
@@ -47,13 +46,13 @@ class IFaceModelsStack implements \IteratorAggregate
         $this->current          = $model;
     }
 
-    public function has(IFaceModelInterface $model): bool
+    public function has(UrlElementInterface $model): bool
     {
         return isset($this->items[$model->getCodename()]);
     }
 
     /**
-     * Return codenames of pushed IFaces
+     * Return codenames of pushed URL elements
      *
      * @return string[]
      */
@@ -66,7 +65,7 @@ class IFaceModelsStack implements \IteratorAggregate
      * Retrieve an external iterator
      *
      * @link  http://php.net/manual/en/iteratoraggregate.getiterator.php
-     * @return \Iterator
+     * @return \Iterator|\BetaKiller\Url\UrlElementInterface[]
      */
     public function getIterator(): \Iterator
     {
@@ -83,14 +82,14 @@ class IFaceModelsStack implements \IteratorAggregate
     }
 
     /**
-     * @return \BetaKiller\IFace\IFaceModelInterface|null
+     * @return \BetaKiller\Url\UrlElementInterface|null
      */
-    public function getCurrent(): ?IFaceModelInterface
+    public function getCurrent(): ?UrlElementInterface
     {
         return $this->current;
     }
 
-    public function isCurrent(IFaceModelInterface $model, ?UrlContainerInterface $parameters = null): bool
+    public function isCurrent(UrlElementInterface $model, ?UrlContainerInterface $parameters = null): bool
     {
         if (!$this->current || $this->current->getCodename() !== $model->getCodename()) {
             return false;

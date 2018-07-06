@@ -1,8 +1,8 @@
 <?php
 namespace BetaKiller\Event;
 
-use BetaKiller\IFace\IFaceModelInterface;
 use BetaKiller\MessageBus\EventMessageInterface;
+use BetaKiller\Url\UrlElementInterface;
 
 class MissingUrlEvent implements EventMessageInterface
 {
@@ -17,7 +17,7 @@ class MissingUrlEvent implements EventMessageInterface
     private $httpReferer;
 
     /**
-     * @var IFaceModelInterface|null
+     * @var UrlElementInterface|null
      */
     private $parentModel;
 
@@ -34,15 +34,15 @@ class MissingUrlEvent implements EventMessageInterface
     /**
      * UrlDispatchedEvent constructor.
      *
-     * @param string                   $url
-     * @param IFaceModelInterface|null $parentModel
-     * @param string                   $ip
-     * @param string                   $httpReferer
-     * @param null|string              $redirectTo
+     * @param string                                   $url
+     * @param \BetaKiller\Url\UrlElementInterface|null $parentModel
+     * @param string                                   $ip
+     * @param string                                   $httpReferer
+     * @param null|string                              $redirectTo
      */
     public function __construct(
         string $url,
-        ?IFaceModelInterface $parentModel,
+        ?UrlElementInterface $parentModel,
         string $ip,
         ?string $httpReferer,
         ?string $redirectTo = null
@@ -63,9 +63,9 @@ class MissingUrlEvent implements EventMessageInterface
     }
 
     /**
-     * @return \BetaKiller\IFace\IFaceModelInterface|null
+     * @return \BetaKiller\Url\UrlElementInterface|null
      */
-    public function getParentModel(): ?IFaceModelInterface
+    public function getParentModel(): ?UrlElementInterface
     {
         return $this->parentModel;
     }

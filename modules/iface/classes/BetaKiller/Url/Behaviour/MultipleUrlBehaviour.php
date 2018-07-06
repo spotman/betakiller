@@ -4,11 +4,11 @@ declare(strict_types=1);
 namespace BetaKiller\Url\Behaviour;
 
 use BetaKiller\Factory\FactoryException;
-use BetaKiller\IFace\IFaceModelInterface;
 use BetaKiller\Repository\RepositoryException;
 use BetaKiller\Url\UrlBehaviourException;
 use BetaKiller\Url\UrlContainerInterface;
 use BetaKiller\Url\UrlDispatcher;
+use BetaKiller\Url\UrlElementInterface;
 use BetaKiller\Url\UrlPathIterator;
 
 class MultipleUrlBehaviour extends AbstractUrlBehaviour
@@ -28,17 +28,17 @@ class MultipleUrlBehaviour extends AbstractUrlBehaviour
     /**
      * Returns true if current behaviour was applied
      *
-     * @param \BetaKiller\IFace\IFaceModelInterface      $model
+     * @param \BetaKiller\Url\UrlElementInterface        $model
      * @param \BetaKiller\Url\UrlPathIterator            $it
      * @param \BetaKiller\Url\UrlContainerInterface|null $params
      *
      * @return bool
      * @throws \BetaKiller\IFace\Exception\IFaceException
-     * @throws \BetaKiller\Url\UrlPrototypeException
      * @throws \BetaKiller\Url\UrlBehaviourException
+     * @throws \BetaKiller\Url\UrlPrototypeException
      */
     public function parseUri(
-        IFaceModelInterface $model,
+        UrlElementInterface $model,
         UrlPathIterator $it,
         UrlContainerInterface $params
     ): bool {
@@ -49,7 +49,7 @@ class MultipleUrlBehaviour extends AbstractUrlBehaviour
     }
 
     /**
-     * @param \BetaKiller\IFace\IFaceModelInterface $ifaceModel
+     * @param \BetaKiller\Url\UrlElementInterface   $ifaceModel
      * @param \BetaKiller\Url\UrlPathIterator       $it
      *
      * @param \BetaKiller\Url\UrlContainerInterface $urlContainer
@@ -59,11 +59,11 @@ class MultipleUrlBehaviour extends AbstractUrlBehaviour
      * @throws \BetaKiller\Url\UrlPrototypeException
      */
     protected function parseUriParameterPart(
-        IFaceModelInterface $ifaceModel,
+        UrlElementInterface $ifaceModel,
         UrlPathIterator $it,
         UrlContainerInterface $urlContainer
     ): void {
-        $prototype = $this->urlPrototypeService->createPrototypeFromIFaceModel($ifaceModel);
+        $prototype = $this->urlPrototypeService->createPrototypeFromUrlElement($ifaceModel);
 
         // Root element have default uri
         $uriValue = ($it->rootRequested() || ($ifaceModel->isDefault() && !$ifaceModel->hasDynamicUrl()))
@@ -84,21 +84,21 @@ class MultipleUrlBehaviour extends AbstractUrlBehaviour
     }
 
     /**
-     * @param \BetaKiller\IFace\IFaceModelInterface $ifaceModel
+     * @param \BetaKiller\Url\UrlElementInterface   $urlElement
      * @param \BetaKiller\Url\UrlContainerInterface $params
      *
      * @return string
      * @throws \BetaKiller\Url\UrlPrototypeException
      */
     protected function getUri(
-        IFaceModelInterface $ifaceModel,
+        UrlElementInterface $urlElement,
         ?UrlContainerInterface $params = null
     ): string {
-        return $this->urlPrototypeService->getCompiledPrototypeValue($ifaceModel->getUri(), $params);
+        return $this->urlPrototypeService->getCompiledPrototypeValue($urlElement->getUri(), $params);
     }
 
     /**
-     * @param \BetaKiller\IFace\IFaceModelInterface $ifaceModel
+     * @param \BetaKiller\Url\UrlElementInterface   $urlElement
      * @param \BetaKiller\Url\UrlContainerInterface $params
      *
      * @return \Generator|\BetaKiller\Url\AvailableUri[]
@@ -106,9 +106,9 @@ class MultipleUrlBehaviour extends AbstractUrlBehaviour
      * @throws \BetaKiller\IFace\Exception\IFaceException
      * @throws \BetaKiller\Url\UrlPrototypeException
      */
-    public function getAvailableUrls(IFaceModelInterface $ifaceModel, UrlContainerInterface $params): \Generator
+    public function getAvailableUrls(UrlElementInterface $urlElement, UrlContainerInterface $params): \Generator
     {
-        $prototype = $this->urlPrototypeService->createPrototypeFromIFaceModel($ifaceModel);
+        $prototype = $this->urlPrototypeService->createPrototypeFromUrlElement($urlElement);
         $items     = $this->urlPrototypeService->getAvailableParameters($prototype, $params);
 
         // Get clone of original filtering params so we`ll have all required params
@@ -116,12 +116,12 @@ class MultipleUrlBehaviour extends AbstractUrlBehaviour
 
         foreach ($items as $availableParameter) {
             $ifaceUrlParams->setParameter($availableParameter, true);
-            $url = $this->urlHelper->makeIFaceUrl($ifaceModel, $ifaceUrlParams);
+            $url = $this->urlHelper->makeUrl($urlElement, $ifaceUrlParams);
 
             yield $this->createAvailableUri($url, $availableParameter);
 
-            if ($ifaceModel->hasTreeBehaviour()) {
-                foreach ($this->getAvailableUrls($ifaceModel, $ifaceUrlParams) as $treeAvailableUrl) {
+            if ($urlElement->hasTreeBehaviour()) {
+                foreach ($this->getAvailableUrls($urlElement, $ifaceUrlParams) as $treeAvailableUrl) {
                     yield $treeAvailableUrl;
                 }
             }

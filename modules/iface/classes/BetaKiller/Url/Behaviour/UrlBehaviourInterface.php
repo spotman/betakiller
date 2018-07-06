@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace BetaKiller\Url\Behaviour;
 
-use BetaKiller\IFace\IFaceModelInterface;
 use BetaKiller\Url\UrlContainerInterface;
+use BetaKiller\Url\UrlElementInterface;
 use BetaKiller\Url\UrlPathIterator;
 
 interface UrlBehaviourInterface
@@ -15,7 +15,7 @@ interface UrlBehaviourInterface
     /**
      * Returns true if current behaviour was applied
      *
-     * @param \BetaKiller\IFace\IFaceModelInterface      $model
+     * @param \BetaKiller\Url\UrlElementInterface        $urlElement
      * @param \BetaKiller\Url\UrlPathIterator            $it
      * @param \BetaKiller\Url\UrlContainerInterface|null $params
      *
@@ -24,7 +24,7 @@ interface UrlBehaviourInterface
      * @return bool
      */
     public function parseUri(
-        IFaceModelInterface $model,
+        UrlElementInterface $urlElement,
         UrlPathIterator $it,
         UrlContainerInterface $params
     ): bool;
@@ -32,24 +32,24 @@ interface UrlBehaviourInterface
     /**
      * Returns IFace uri part based on an optional UrlContainer
      *
-     * @param \BetaKiller\IFace\IFaceModelInterface      $ifaceModel
+     * @param \BetaKiller\Url\UrlElementInterface        $urlElement
      * @param \BetaKiller\Url\UrlContainerInterface|null $params
      *
      * @return string
      */
     public function makeUri(
-        IFaceModelInterface $ifaceModel,
+        UrlElementInterface $urlElement,
         ?UrlContainerInterface $params = null
     ): string;
 
     /**
-     * @param \BetaKiller\IFace\IFaceModelInterface      $ifaceModel
+     * @param \BetaKiller\Url\UrlElementInterface        $urlElement
      * @param \BetaKiller\Url\UrlContainerInterface|null $params
      *
      * @return \Generator|\BetaKiller\Url\AvailableUri[]
      */
     public function getAvailableUrls(
-        IFaceModelInterface $ifaceModel,
+        UrlElementInterface $urlElement,
         UrlContainerInterface $params
     ): \Generator;
 }

@@ -2,7 +2,7 @@
 namespace BetaKiller\Widget\Content;
 
 use BetaKiller\Model\ContentPostInterface;
-use BetaKiller\Model\IFaceZone;
+use BetaKiller\Model\UrlElementZone;
 use BetaKiller\Widget\AbstractBaseWidget;
 
 abstract class SidebarArticlesListWidget extends AbstractBaseWidget
@@ -67,7 +67,7 @@ abstract class SidebarArticlesListWidget extends AbstractBaseWidget
         return [
             'label'     => $article->getLabel(),
             'thumbnail' => $this->assetsHelper->getAttributesForImgTag($thumbnail, $thumbnail::SIZE_PREVIEW),
-            'url'       => $this->ifaceHelper->getReadEntityUrl($article, IFaceZone::PUBLIC_ZONE),
+            'url'       => $this->ifaceHelper->getReadEntityUrl($article, UrlElementZone::PUBLIC_ZONE),
             'date'      => $createdAt ? $createdAt->format('d.m.Y') : null,
         ];
     }

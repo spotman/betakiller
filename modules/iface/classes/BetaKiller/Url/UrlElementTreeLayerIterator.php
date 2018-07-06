@@ -1,18 +1,18 @@
 <?php
-namespace BetaKiller\IFace;
+namespace BetaKiller\Url;
 
-class IFaceModelLayerIterator extends \ArrayIterator
+class UrlElementTreeLayerIterator extends \ArrayIterator
 {
     /**
-     * IFaceModelLayerIterator constructor.
+     * UrlElementTreeLayerIterator constructor.
      *
-     * @param \BetaKiller\IFace\IFaceModelTree           $tree
+     * @param \BetaKiller\Url\UrlElementTreeInterface  $tree
      *
-     * @param \BetaKiller\IFace\IFaceModelInterface|null $parent
+     * @param \BetaKiller\Url\IFaceModelInterface|null $parent
      *
      * @throws \BetaKiller\IFace\Exception\IFaceException
      */
-    public function __construct(IFaceModelTree $tree, IFaceModelInterface $parent = null)
+    public function __construct(UrlElementTreeInterface $tree, IFaceModelInterface $parent = null)
     {
         $layer = $parent
             ? $tree->getChildren($parent)

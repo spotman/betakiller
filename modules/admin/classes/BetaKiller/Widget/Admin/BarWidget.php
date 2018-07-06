@@ -6,11 +6,11 @@ use BetaKiller\Helper\UrlContainerHelper;
 use BetaKiller\IFace\CrudlsActionsInterface;
 use BetaKiller\IFace\Exception\IFaceException;
 use BetaKiller\IFace\IFaceInterface;
-use BetaKiller\IFace\IFaceModelTree;
 use BetaKiller\IFace\Widget\AbstractAdminWidget;
 use BetaKiller\Model\DispatchableEntityInterface;
-use BetaKiller\Model\IFaceZone;
+use BetaKiller\Model\UrlElementZone;
 use BetaKiller\Model\UserInterface;
+use BetaKiller\Url\UrlElementTreeInterface;
 
 class BarWidget extends AbstractAdminWidget
 {
@@ -25,7 +25,7 @@ class BarWidget extends AbstractAdminWidget
     private $urlParamHelper;
 
     /**
-     * @var \BetaKiller\IFace\IFaceModelTree
+     * @var \BetaKiller\Url\UrlElementTreeInterface
      */
     private $tree;
 
@@ -36,7 +36,7 @@ class BarWidget extends AbstractAdminWidget
     private $contentHelper;
 
     public function __construct(
-        IFaceModelTree $tree,
+        UrlElementTreeInterface $tree,
         UserInterface $user,
         IFaceHelper $ifaceHelper,
         UrlContainerHelper $urlParamHelper
@@ -52,14 +52,15 @@ class BarWidget extends AbstractAdminWidget
      * Returns data for View rendering
      *
      * @return array
+     * @throws \BetaKiller\Url\UrlPrototypeException
      * @throws \BetaKiller\Factory\FactoryException
      * @throws \Spotman\Acl\Exception
      * @throws \BetaKiller\IFace\Exception\IFaceException
      */
     public function getData(): array
     {
-        $currentIFaceModel = $this->ifaceHelper->getCurrentIFaceModel();
-        $primaryEntity     = $currentIFaceModel ? $this->ifaceHelper->detectPrimaryEntity($currentIFaceModel) : null;
+        $currentUrlElement = $this->ifaceHelper->getCurrentUrlElement();
+        $primaryEntity     = $currentUrlElement ? $this->ifaceHelper->detectPrimaryEntity($currentUrlElement) : null;
 
         $data = [
             'enabled'           => true,
@@ -83,22 +84,24 @@ class BarWidget extends AbstractAdminWidget
 
     /**
      * @return array
+     * @throws \BetaKiller\Url\UrlPrototypeException
      * @throws \BetaKiller\IFace\Exception\IFaceException
      * @throws \Spotman\Acl\Exception
      */
     private function getCreateButtonItems(): array
     {
-        $items  = [];
-        $ifaces = $this->tree->getByActionAndZone(CrudlsActionsInterface::ACTION_CREATE, IFaceZone::ADMIN_ZONE);
+        $items       = [];
+        $urlElements = $this->tree->getByActionAndZone(CrudlsActionsInterface::ACTION_CREATE,
+            UrlElementZone::ADMIN_ZONE);
 
-        foreach ($ifaces as $ifaceModel) {
-            if (!$this->aclHelper->isIFaceAllowed($ifaceModel)) {
+        foreach ($urlElements as $urlElement) {
+            if (!$this->aclHelper->isUrlElementAllowed($urlElement)) {
                 continue;
             }
 
             $items[] = [
-                'label' => $ifaceModel->getLabel(),
-                'url'   => $this->ifaceHelper->makeUrl($ifaceModel),
+                'label' => $this->ifaceHelper->getLabel($urlElement),
+                'url'   => $this->ifaceHelper->makeUrl($urlElement),
             ];
         }
 
@@ -124,8 +127,8 @@ class BarWidget extends AbstractAdminWidget
             ->createSimple()
             ->setParameter($pendingStatus);
 
-        $url = $this->aclHelper->isIFaceAllowed($iface->getModel(), $params)
-            ? $this->ifaceHelper->makeUrl($iface->getModel(), $params)
+        $url = $this->aclHelper->isIFaceAllowed($iface, $params)
+            ? $this->ifaceHelper->makeIFaceUrl($iface, $params)
             : null;
 
         return [
@@ -164,7 +167,8 @@ class BarWidget extends AbstractAdminWidget
      */
     private function getAdminEditButtonUrl(?DispatchableEntityInterface $entity): ?string
     {
-        return $this->getPrimaryEntityActionUrl($entity, IFaceZone::ADMIN_ZONE, CrudlsActionsInterface::ACTION_READ);
+        return $this->getPrimaryEntityActionUrl($entity, UrlElementZone::ADMIN_ZONE,
+            CrudlsActionsInterface::ACTION_READ);
     }
 
     /**
@@ -175,7 +179,8 @@ class BarWidget extends AbstractAdminWidget
      */
     private function getPublicReadButtonUrl(?DispatchableEntityInterface $entity): ?string
     {
-        return $this->getPrimaryEntityActionUrl($entity, IFaceZone::PUBLIC_ZONE, CrudlsActionsInterface::ACTION_READ);
+        return $this->getPrimaryEntityActionUrl($entity, UrlElementZone::PUBLIC_ZONE,
+            CrudlsActionsInterface::ACTION_READ);
     }
 
     /**
@@ -186,7 +191,8 @@ class BarWidget extends AbstractAdminWidget
      */
     private function getPreviewButtonUrl(?DispatchableEntityInterface $entity): ?string
     {
-        return $this->getPrimaryEntityActionUrl($entity, IFaceZone::PREVIEW_ZONE, CrudlsActionsInterface::ACTION_READ);
+        return $this->getPrimaryEntityActionUrl($entity, UrlElementZone::PREVIEW_ZONE,
+            CrudlsActionsInterface::ACTION_READ);
     }
 
     /**

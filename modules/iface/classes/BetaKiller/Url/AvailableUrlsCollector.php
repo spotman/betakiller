@@ -4,8 +4,6 @@ namespace BetaKiller\Url;
 use BetaKiller\Helper\AclHelper;
 use BetaKiller\Helper\LoggerHelperTrait;
 use BetaKiller\IFace\Exception\IFaceException;
-use BetaKiller\IFace\IFaceModelInterface;
-use BetaKiller\IFace\IFaceModelTree;
 use BetaKiller\Url\Behaviour\UrlBehaviourFactory;
 
 class AvailableUrlsCollector
@@ -13,7 +11,7 @@ class AvailableUrlsCollector
     use LoggerHelperTrait;
 
     /**
-     * @var \BetaKiller\IFace\IFaceModelTree
+     * @var \BetaKiller\Url\UrlElementTreeInterface
      */
     private $tree;
 
@@ -36,12 +34,12 @@ class AvailableUrlsCollector
     /**
      * AvailableUrlsCollector constructor.
      *
-     * @param \BetaKiller\IFace\IFaceModelTree              $tree
+     * @param \BetaKiller\Url\UrlElementTreeInterface       $tree
      * @param \BetaKiller\Url\Behaviour\UrlBehaviourFactory $behaviourFactory
      * @param \BetaKiller\Helper\AclHelper                  $aclHelper
      */
     public function __construct(
-        IFaceModelTree $tree,
+        UrlElementTreeInterface $tree,
         UrlBehaviourFactory $behaviourFactory,
         AclHelper $aclHelper
     ) {
@@ -70,7 +68,7 @@ class AvailableUrlsCollector
     }
 
     /**
-     * @param IFaceModelInterface[]                 $models
+     * @param \BetaKiller\Url\UrlElementInterface[] $models
      * @param \BetaKiller\Url\UrlContainerInterface $params
      * @param bool|null                             $useHidden
      *
@@ -83,20 +81,20 @@ class AvailableUrlsCollector
         ?UrlContainerInterface $params = null,
         ?bool $useHidden = null
     ): \Generator {
-        foreach ($models as $ifaceModel) {
+        foreach ($models as $urlElement) {
             // Skip hidden ifaces
-            if (!$useHidden && $ifaceModel->hideInSiteMap()) {
+            if (!$useHidden && $urlElement->hideInSiteMap()) {
                 continue;
             }
 
-            foreach ($this->processSingle($ifaceModel, $params ?: new UrlContainer(), $useHidden) as $item) {
+            foreach ($this->processSingle($urlElement, $params ?: new UrlContainer(), $useHidden) as $item) {
                 yield $item;
             }
         }
     }
 
     /**
-     * @param \BetaKiller\IFace\IFaceModelInterface $ifaceModel
+     * @param \BetaKiller\Url\UrlElementInterface   $urlElement
      * @param \BetaKiller\Url\UrlContainerInterface $params
      * @param bool|null                             $useHidden
      *
@@ -107,22 +105,22 @@ class AvailableUrlsCollector
      * @link https://github.com/MarkBaker/GeneratorQuadTrees/blob/master/src/PointQuadTree.php
      */
     private function processSingle(
-        IFaceModelInterface $ifaceModel,
+        UrlElementInterface $urlElement,
         UrlContainerInterface $params,
         ?bool $useHidden = null
     ): \Generator {
-        $this->logger->debug('Processing :codename IFace', [':codename' => $ifaceModel->getCodename()]);
+        $this->logger->debug('Processing :codename IFace', [':codename' => $urlElement->getCodename()]);
 
-        $childs = $this->tree->getChildren($ifaceModel);
+        $childs = $this->tree->getChildren($urlElement);
 
         $this->logger->debug('Total :num childs found for :codename IFace', [
             ':num'      => \count($childs),
-            ':codename' => $ifaceModel->getCodename(),
+            ':codename' => $urlElement->getCodename(),
         ]);
 
         $urlCounter = 0;
 
-        foreach ($this->getAvailableIFaceUrls($ifaceModel, $params) as $availableUrl) {
+        foreach ($this->getAvailableIFaceUrls($urlElement, $params) as $availableUrl) {
             $urlParameter = $availableUrl->getUrlParameter();
 
             // Store parameter for childs processing
@@ -131,9 +129,9 @@ class AvailableUrlsCollector
             }
 
             try {
-                if (!$this->aclHelper->isIFaceAllowed($ifaceModel, $params)) {
+                if (!$this->aclHelper->isUrlElementAllowed($urlElement, $params)) {
                     $this->logger->debug('Skip :codename IFace coz it is not allowed', [
-                        ':codename' => $ifaceModel->getCodename(),
+                        ':codename' => $urlElement->getCodename(),
                     ]);
                     continue;
                 }
@@ -154,15 +152,15 @@ class AvailableUrlsCollector
     }
 
     /**
-     * @param \BetaKiller\IFace\IFaceModelInterface $model
+     * @param \BetaKiller\Url\UrlElementInterface   $model
      * @param \BetaKiller\Url\UrlContainerInterface $params
      *
      * @return \Generator|\BetaKiller\Url\AvailableUri[]
      * @throws \BetaKiller\Factory\FactoryException
      */
-    private function getAvailableIFaceUrls(IFaceModelInterface $model, UrlContainerInterface $params): \Generator
+    private function getAvailableIFaceUrls(UrlElementInterface $model, UrlContainerInterface $params): \Generator
     {
-        $behaviour = $this->behaviourFactory->fromIFaceModel($model);
+        $behaviour = $this->behaviourFactory->fromUrlElement($model);
 
         // TODO Deal with calculation of the last_modified from each parameter value
 

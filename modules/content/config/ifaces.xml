@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <root>
-    <!-- TODO вынести это всё в файл config/ifaces.php, который добавляет элементы в IFaceModelTree::admin() -->
+    <!-- TODO вынести это всё в файл config/ifaces.php, который добавляет элементы в UrlElementTree::admin() -->
     <iface uri="posts" codename="Admin_Content_PostIndex" parentCodename="Admin_Index" label="Posts" entity="ContentPost" entityAction="list">
         <iface uri="create" codename="Admin_Content_PostCreate" label="Create post" entity="ContentPost" entityAction="create" />
         <iface uri="{ContentPost.id}" codename="Admin_Content_PostItem" label="{ContentPost.label}" hasDynamicUrl="true" entity="ContentPost" entityAction="read">

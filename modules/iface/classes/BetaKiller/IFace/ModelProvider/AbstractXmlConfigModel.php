@@ -2,12 +2,10 @@
 namespace BetaKiller\IFace\ModelProvider;
 
 use BetaKiller\Exception\NotImplementedHttpException;
-use BetaKiller\Helper\SeoMetaInterface;
-use BetaKiller\IFace\IFaceModelInterface;
-use BetaKiller\Model\IFaceZone;
-use BetaKiller\Model\SingleParentTreeModelInterface;
+use BetaKiller\Model\UrlElementZone;
+use BetaKiller\Url\UrlElementInterface;
 
-class IFaceModelProviderXmlConfigModel implements IFaceModelInterface
+abstract class AbstractXmlConfigModel implements UrlElementInterface
 {
     /**
      * @var string
@@ -15,9 +13,9 @@ class IFaceModelProviderXmlConfigModel implements IFaceModelInterface
     private $codename;
 
     /**
-     * @var IFaceModelInterface
+     * @var string
      */
-    private $parent;
+    private $label;
 
     /**
      * @var string|null
@@ -30,23 +28,6 @@ class IFaceModelProviderXmlConfigModel implements IFaceModelInterface
     private $uri;
 
     /**
-     * @var string
-     */
-    private $label;
-
-    /**
-     * @var string
-     */
-    private $title;
-
-    /**
-     * Admin IFaces have "admin" layout by default
-     *
-     * @var string|null
-     */
-    private $layoutCodename;
-
-    /**
      * @var bool
      */
     private $hasDynamicUrl = false;
@@ -55,11 +36,6 @@ class IFaceModelProviderXmlConfigModel implements IFaceModelInterface
      * @var bool
      */
     private $hasTreeBehaviour = false;
-
-    /**
-     * @var bool
-     */
-    private $hideInSiteMap = false;
 
     /**
      * @var string|null
@@ -74,7 +50,7 @@ class IFaceModelProviderXmlConfigModel implements IFaceModelInterface
     /**
      * @var string
      */
-    private $zone = IFaceZone::ADMIN_ZONE;
+    private $zone = UrlElementZone::ADMIN_ZONE;
 
     /**
      * @var string[]
@@ -83,8 +59,8 @@ class IFaceModelProviderXmlConfigModel implements IFaceModelInterface
 
     public static function factory(array $data)
     {
-        /** @var self $instance */
-        $instance = new self;
+        /** @var static $instance */
+        $instance = new static;
         $instance->fromArray($data);
 
         return $instance;
@@ -107,7 +83,7 @@ class IFaceModelProviderXmlConfigModel implements IFaceModelInterface
      */
     public function getID(): string
     {
-        throw new NotImplementedHttpException('Admin IFace model have no ID');
+        throw new NotImplementedHttpException('Admin URL element model have no ID');
     }
 
     /**
@@ -116,7 +92,7 @@ class IFaceModelProviderXmlConfigModel implements IFaceModelInterface
      */
     public function hasID(): bool
     {
-        throw new NotImplementedHttpException('Admin IFace model have no ID');
+        throw new NotImplementedHttpException('Admin URL element model have no ID');
     }
 
     /**
@@ -125,7 +101,7 @@ class IFaceModelProviderXmlConfigModel implements IFaceModelInterface
      */
     public function getModelName(): string
     {
-        throw new NotImplementedHttpException('Admin IFace model have no model name');
+        throw new NotImplementedHttpException('Admin URL element model have no model name');
     }
 
     /**
@@ -145,53 +121,7 @@ class IFaceModelProviderXmlConfigModel implements IFaceModelInterface
      */
     public function setUri(string $uri): void
     {
-        throw new NotImplementedHttpException('Admin model can not change uri');
-    }
-
-    /**
-     * Returns codename of parent IFace or NULL
-     *
-     * @return string|null
-     */
-    public function getParentCodename(): ?string
-    {
-        return $this->parentCodename;
-    }
-
-    /**
-     * Sets title for using in <title> tag
-     *
-     * @param string $value
-     *
-     * @return SeoMetaInterface
-     * @throws \BetaKiller\Exception\NotImplementedHttpException
-     */
-    public function setTitle(string $value): SeoMetaInterface
-    {
-        throw new NotImplementedHttpException('Admin model can not change title');
-    }
-
-    /**
-     * Sets description for using in <meta> tag
-     *
-     * @param string $value
-     *
-     * @return SeoMetaInterface
-     * @throws \BetaKiller\Exception\NotImplementedHttpException
-     */
-    public function setDescription(string $value): SeoMetaInterface
-    {
-        throw new NotImplementedHttpException('Admin model can not change description');
-    }
-
-    /**
-     * Returns iface codename
-     *
-     * @return string
-     */
-    public function getCodename(): string
-    {
-        return $this->codename;
+        throw new NotImplementedHttpException('Admin URL element model can not change uri');
     }
 
     /**
@@ -206,31 +136,32 @@ class IFaceModelProviderXmlConfigModel implements IFaceModelInterface
 
     /**
      * @param string $value
+     *
+     * @throws \BetaKiller\Exception\NotImplementedHttpException
      */
     public function setLabel(string $value): void
     {
-        $this->label = $value;
+        throw new NotImplementedHttpException('Admin URL element model can not change label');
     }
 
     /**
-     * Returns title for using in page <title> tag
+     * Returns codename of parent IFace or NULL
      *
-     * @return string
+     * @return string|null
      */
-    public function getTitle(): ?string
+    public function getParentCodename(): ?string
     {
-        return $this->title;
+        return $this->parentCodename;
     }
 
     /**
-     * Returns description for using in <meta> tag
+     * Returns iface codename
      *
      * @return string
      */
-    public function getDescription(): ?string
+    public function getCodename(): string
     {
-        // Admin IFace does not need description
-        return null;
+        return $this->codename;
     }
 
     /**
@@ -243,12 +174,10 @@ class IFaceModelProviderXmlConfigModel implements IFaceModelInterface
         return [
             'codename'       => $this->getCodename(),
             'uri'            => $this->getUri(),
-            'parentCodename' => $this->getParentCodename(),
             'label'          => $this->getLabel(),
-            'title'          => $this->getTitle(),
+            'parentCodename' => $this->getParentCodename(),
             'hasDynamicUrl'  => $this->hasDynamicUrl(),
             'hideInSiteMap'  => $this->hideInSiteMap(),
-            'layoutCodename' => $this->getLayoutCodename(),
             'entity'         => $this->getEntityModelName(),
             'entityAction'   => $this->getEntityActionName(),
             'zone'           => $this->getZoneName(),
@@ -256,23 +185,11 @@ class IFaceModelProviderXmlConfigModel implements IFaceModelInterface
         ];
     }
 
-    /**
-     * Returns layout codename
-     *
-     * @return string
-     */
-    public function getLayoutCodename(): ?string
-    {
-        return $this->layoutCodename;
-    }
-
     public function fromArray(array $data): void
     {
         $this->uri      = $data['uri'];
         $this->codename = $data['codename'];
-
-        $this->label = $data['label'] ?? null;
-        $this->title = $data['title'] ?? null;
+        $this->label    = $data['label'] ?? null;
 
         if (isset($data['parentCodename'])) {
             $this->parentCodename = (string)$data['parentCodename'];
@@ -284,14 +201,6 @@ class IFaceModelProviderXmlConfigModel implements IFaceModelInterface
 
         if (isset($data['hasTreeBehaviour'])) {
             $this->hasTreeBehaviour = true;
-        }
-
-        if (isset($data['hideInSiteMap'])) {
-            $this->hideInSiteMap = true;
-        }
-
-        if (isset($data['layoutCodename'])) {
-            $this->layoutCodename = (string)$data['layoutCodename'];
         }
 
         if (isset($data['entity'])) {
@@ -333,14 +242,6 @@ class IFaceModelProviderXmlConfigModel implements IFaceModelInterface
     }
 
     /**
-     * @return bool
-     */
-    public function hideInSiteMap(): bool
-    {
-        return $this->hideInSiteMap;
-    }
-
-    /**
      * Returns model name of the linked entity
      *
      * @return string
@@ -377,42 +278,5 @@ class IFaceModelProviderXmlConfigModel implements IFaceModelInterface
     public function getAdditionalAclRules(): array
     {
         return $this->aclRules;
-    }
-
-    /**
-     * Return parent model or null
-     *
-     * @return SingleParentTreeModelInterface|mixed|static|null
-     */
-    public function getParent()
-    {
-        return $this->parent;
-    }
-
-    /**
-     * @param \BetaKiller\Model\SingleParentTreeModelInterface|null $parent
-     */
-    public function setParent(SingleParentTreeModelInterface $parent = null)
-    {
-        $this->parent = $parent;
-    }
-
-    /**
-     * @return SingleParentTreeModelInterface[]
-     */
-    public function getAllParents(): array
-    {
-        $current = $this;
-        $parents = [];
-
-        do {
-            $current = $current->getParent();
-
-            if ($current) {
-                $parents[] = $current;
-            }
-        } while ($current);
-
-        return $parents;
     }
 }

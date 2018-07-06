@@ -5,10 +5,13 @@ use BetaKiller\Exception\BadRequestHttpException;
 use BetaKiller\Exception\FoundHttpException;
 use BetaKiller\Exception\PermanentRedirectHttpException;
 use BetaKiller\IFace\Cache\IFaceCache;
+use BetaKiller\IFace\Exception\IFaceException;
 use BetaKiller\IFace\IFaceInterface;
 use BetaKiller\Model\UserInterface;
+use BetaKiller\Url\IFaceModelInterface;
 use BetaKiller\Url\UrlContainerInterface;
 use BetaKiller\Url\UrlDispatcher;
+use BetaKiller\Url\WebHookModelInterface;
 
 /**
  * Class Controller_IFace
@@ -35,9 +38,15 @@ class Controller_IFace extends Controller
 
     /**
      * @Inject
-     * @var \BetaKiller\IFace\IFaceFactory
+     * @var \BetaKiller\Factory\IFaceFactory
      */
     private $ifaceFactory;
+
+    /**
+     * @Inject
+     * @var \BetaKiller\Factory\WebHookFactory
+     */
+    private $webHookFactory;
 
     /**
      * @Inject
@@ -78,33 +87,53 @@ class Controller_IFace extends Controller
 
         $this->urlContainer->setQueryParts($queryParts);
 
-        // Getting current IFace
-        $model = $this->urlDispatcher->process($uri, $this->request->client_ip(), $this->request->referrer());
-        $iface = $this->ifaceFactory->createFromModel($model);
+        // Getting current URL element
+        $urlElement = $this->urlDispatcher->process($uri, $this->request->client_ip(), $this->request->referrer());
 
-        // If this is default IFace and client requested non-slash uri, redirect client to /
-        if ($uri !== '/' && $model->isDefault() && !$model->hasDynamicUrl()) {
-            throw new FoundHttpException('/');
-        }
-
-        if ($uri && $uri !== '/') {
-            $hasTrailingSlash       = (substr($uri, -1) === '/');
-            $isTrailingSlashEnabled = $this->appConfig->isTrailingSlashEnabled();
-
-            if ($hasTrailingSlash && !$isTrailingSlashEnabled) {
-                throw new PermanentRedirectHttpException(rtrim($uri, '/'));
+        if ($urlElement instanceof WebHookModelInterface) {
+            $this->processWebHook($urlElement);
+        } elseif ($urlElement instanceof IFaceModelInterface) {
+            // If this is default IFace and client requested non-slash uri, redirect client to /
+            if ($uri !== '/' && $urlElement->isDefault() && !$urlElement->hasDynamicUrl()) {
+                throw new FoundHttpException('/');
             }
 
-            if (!$hasTrailingSlash && $isTrailingSlashEnabled) {
-                throw new PermanentRedirectHttpException($uri.'/');
+            if ($uri && $uri !== '/') {
+                $hasTrailingSlash       = (substr($uri, -1) === '/');
+                $isTrailingSlashEnabled = $this->appConfig->isTrailingSlashEnabled();
+
+                if ($hasTrailingSlash && !$isTrailingSlashEnabled) {
+                    throw new PermanentRedirectHttpException(rtrim($uri, '/'));
+                }
+
+                if (!$hasTrailingSlash && $isTrailingSlashEnabled) {
+                    throw new PermanentRedirectHttpException($uri.'/');
+                }
             }
+
+            $this->processIFace($urlElement);
+        } else {
+            throw new IFaceException('Unknown UrlElement type :codename', [
+                ':codename' => $urlElement->getCodename(),
+            ]);
         }
+    }
+
+    /**
+     * @param \BetaKiller\Url\IFaceModelInterface $model
+     *
+     * @throws \BetaKiller\Factory\FactoryException
+     * @throws \PageCache\PageCacheException
+     */
+    private function processIFace(IFaceModelInterface $model): void
+    {
+        $iface = $this->ifaceFactory->createFromUrlElement($model);
 
         // Starting hook
         $iface->before();
 
         // Processing page cache if no URL query parameters
-        if (!$queryParts) {
+        if (!$this->urlContainer->getQueryPartsKeys()) {
             $this->processIFaceCache($iface);
         }
 
@@ -132,6 +161,18 @@ class Controller_IFace extends Controller
 
             throw $e;
         }
+    }
+
+    /**
+     * @param \BetaKiller\Url\WebHookModelInterface $model
+     *
+     * @throws \BetaKiller\Factory\FactoryException
+     */
+    private function processWebHook(WebHookModelInterface $model): void
+    {
+        $webHook = $this->webHookFactory->createFromUrlElement($model);
+
+        $webHook->process();
     }
 
     /**
