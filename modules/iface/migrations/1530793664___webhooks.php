@@ -39,33 +39,33 @@ class Migration1530793664_Webhooks extends Migration {
 	 */
 	public function up(): void
 	{
-        if (!$this->table_exists('url_element_types')) {
+        if (!$this->tableExists('url_element_types')) {
             $this->createUrlElementTypesTable();
             $this->fillUrlElementTypesTable();
         }
 
-        if (!$this->table_exists('url_elements')) {
+        if (!$this->tableExists('url_elements')) {
 	        $this->createUrlElementsTable();
 	        $this->migrateDataFromIFaceTable();
 	        $this->updateIFaceTable();
         }
 
-        if (!$this->table_exists('url_element_acl_rules')) {
+        if (!$this->tableExists('url_element_acl_rules')) {
             $this->updateIFaceAclRules();
         }
 
-        if (!$this->table_exists('url_element_zones')) {
+        if (!$this->tableExists('url_element_zones')) {
             $this->updateIFaceZones();
         }
 
-        if (!$this->table_exists('webhooks')) {
+        if (!$this->tableExists('webhooks')) {
             $this->createWebHooksTable();
         }
     }
 
 	private function createUrlElementTypesTable(): void
     {
-        $this->run_sql('
+        $this->runSql('
 CREATE TABLE `url_element_types` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `codename` varchar(16) COLLATE utf8_unicode_ci NOT NULL,
@@ -76,12 +76,12 @@ CREATE TABLE `url_element_types` (
 
     private function fillUrlElementTypesTable(): void
     {
-        $this->run_sql("INSERT INTO `url_element_types` (`id`, `codename`) VALUES (1, 'IFace'), (2, 'WebHook');");
+        $this->runSql("INSERT INTO `url_element_types` (`id`, `codename`) VALUES (1, 'IFace'), (2, 'WebHook');");
     }
 
 	private function createUrlElementsTable(): void
     {
-        $this->run_sql("
+        $this->runSql("
 CREATE TABLE `url_elements` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `parent_id` int(11) unsigned DEFAULT NULL COMMENT 'NULL means root element',
@@ -110,7 +110,7 @@ CREATE TABLE `url_elements` (
 
 	private function migrateDataFromIFaceTable(): void
     {
-        $this->run_sql('
+        $this->runSql('
 INSERT INTO `url_elements` (`id`, `parent_id`, `type_id`, `label`, `is_default`, `is_dynamic`, `is_tree`, `codename`, `uri`, `zone_id`, `entity_id`, `entity_action_id`)
 SELECT `id`, `parent_id`, 1, `label`, `is_default`, `is_dynamic`, `is_tree`, `codename`, `uri`, `zone_id`, `entity_id`, `entity_action_id`
 FROM `ifaces`
@@ -120,22 +120,22 @@ FROM `ifaces`
 	private function updateIFaceTable(): void
     {
         // Add `type_id`
-        $this->run_sql('
+        $this->runSql('
 ALTER TABLE `ifaces`
 ADD `element_id` int(11) unsigned NULL AFTER `id`;
 ');
         // Set `url_element_id` = `id`
-        $this->run_sql('UPDATE `ifaces` SET `element_id` = `id`;');
+        $this->runSql('UPDATE `ifaces` SET `element_id` = `id`;');
 
         // Make url_element_id NOT NULL and add constraints
-        $this->run_sql('
+        $this->runSql('
 ALTER TABLE `ifaces`
 CHANGE `element_id` `element_id` int(11) unsigned NOT NULL AFTER `id`,
 ADD FOREIGN KEY (`element_id`) REFERENCES `url_elements` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 ');
 
         // Add unique index for `element_id`
-        $this->run_sql('
+        $this->runSql('
 ALTER TABLE `ifaces`
 ADD UNIQUE `element_id` (`element_id`),
 DROP INDEX `element_id`;
@@ -145,13 +145,13 @@ DROP INDEX `element_id`;
     private function updateIFaceAclRules(): void
     {
         // Rename
-        $this->run_sql('ALTER TABLE `iface_acl_rules` RENAME TO `url_element_acl_rules`;');
+        $this->runSql('ALTER TABLE `iface_acl_rules` RENAME TO `url_element_acl_rules`;');
 
         // Drop FK
-        $this->run_sql('ALTER TABLE `url_element_acl_rules` DROP FOREIGN KEY `url_element_acl_rules_ibfk_1`');
+        $this->runSql('ALTER TABLE `url_element_acl_rules` DROP FOREIGN KEY `url_element_acl_rules_ibfk_1`');
 
         // Rename column and add FK
-        $this->run_sql('
+        $this->runSql('
 ALTER TABLE `url_element_acl_rules`
 CHANGE `iface_id` `element_id` int(11) unsigned NOT NULL AFTER `id`,
 ADD FOREIGN KEY (`element_id`) REFERENCES `url_elements` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -160,12 +160,12 @@ ADD FOREIGN KEY (`element_id`) REFERENCES `url_elements` (`id`) ON DELETE RESTRI
 
     private function updateIFaceZones(): void
     {
-        $this->run_sql('ALTER TABLE `iface_zones` RENAME TO `url_element_zones`');
+        $this->runSql('ALTER TABLE `iface_zones` RENAME TO `url_element_zones`');
     }
 
     private function createWebHooksTable(): void
     {
-        $this->run_sql('
+        $this->runSql('
 CREATE TABLE `webhooks` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `element_id` int(11) unsigned NOT NULL,

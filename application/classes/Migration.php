@@ -8,22 +8,22 @@ abstract class Migration extends Kohana_Migration
      */
     protected $logger;
 
-    protected function run_sql($sql, $type = null, $db = null)
+    protected function runSql(string $sql, ?int $type = null, ?string $db = null): void
     {
         DB::query($type ?? Database::UPDATE, $sql)->execute($db);
 
         $this->logger->debug('SQL done: :query', [':query' => $sql]);
     }
 
-    protected function table_exists($table_name, $db = null)
+    protected function tableExists(string $tableName, ?string $db = null): bool
     {
-        return $this->table_has_column($table_name, null, $db);
+        return $this->tableHasColumn($tableName, '*', $db);
     }
 
-    protected function table_has_column($table_name, $column_name, $db = null)
+    protected function tableHasColumn(string $tableName, string $columnName, ?string $db = null): bool
     {
         try {
-            DB::select($column_name)->from($table_name)->limit(1)->execute($db)->as_array();
+            DB::select($columnName)->from($tableName)->limit(1)->execute($db)->as_array();
 
             // Query completed => table and column exists
             return true;
