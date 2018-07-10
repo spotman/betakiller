@@ -2,7 +2,7 @@
 namespace BetaKiller\DI;
 
 use DI\FactoryInterface;
-use DI\InvokerInterface;
+use Invoker\InvokerInterface;
 
 interface ContainerInterface extends \Psr\Container\ContainerInterface, FactoryInterface, InvokerInterface
 {
@@ -14,6 +14,7 @@ interface ContainerInterface extends \Psr\Container\ContainerInterface, FactoryI
      * @throws \DI\DependencyException Error while injecting dependencies
      * @return object $instance Returns the same instance
      * @todo Remove after dropping Kohana entirely
+     * @deprecated
      */
     public function injectOn($instance);
 }

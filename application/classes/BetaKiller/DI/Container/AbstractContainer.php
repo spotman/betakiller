@@ -3,9 +3,6 @@ namespace BetaKiller\DI\Container;
 
 use BetaKiller\DI\ContainerInterface;
 use DI\DependencyException;
-use Interop\Container\Exception\ContainerException;
-use Interop\Container\Exception\NotFoundException;
-
 use Invoker\Exception\InvocationException;
 use Invoker\Exception\NotCallableException;
 use Invoker\Exception\NotEnoughParametersException;
@@ -31,6 +28,7 @@ abstract class AbstractContainer implements ContainerInterface
         if (!static::$instance) {
             static::$instance = new static;
         }
+
         return static::$instance;
     }
 
@@ -38,7 +36,9 @@ abstract class AbstractContainer implements ContainerInterface
      * You can`t create objects directly, use CLASS::instance() instead
      * Also you can define your own protected constructor in child class
      */
-    protected function __construct() {}
+    protected function __construct()
+    {
+    }
 
     /**
      * @return ContainerInterface|mixed
@@ -62,8 +62,8 @@ abstract class AbstractContainer implements ContainerInterface
      *
      * @param string $id Identifier of the entry to look for.
      *
-     * @throws NotFoundException  No entry was found for this identifier.
-     * @throws ContainerException Error while retrieving the entry.
+     * @throws \Psr\Container\NotFoundExceptionInterface No entry was found for this identifier.
+     * @throws \Psr\Container\ContainerExceptionInterface Error while retrieving the entry.
      *
      * @return mixed Entry.
      */
@@ -88,7 +88,7 @@ abstract class AbstractContainer implements ContainerInterface
     /**
      * Resolves an entry by its name. If given a class name, it will return a new instance of that class.
      *
-     * @param string $name Entry name or a class name.
+     * @param string $name       Entry name or a class name.
      * @param array  $parameters Optional parameters to use to build the entry. Use this to force specific
      *                           parameters to specific values. Parameters not defined in this array will
      *                           be automatically resolved.
@@ -106,7 +106,7 @@ abstract class AbstractContainer implements ContainerInterface
     /**
      * Call the given function using the given parameters.
      *
-     * @param callable $callable Function to call.
+     * @param callable $callable   Function to call.
      * @param array    $parameters Parameters to use.
      *
      * @return mixed Result of the function.

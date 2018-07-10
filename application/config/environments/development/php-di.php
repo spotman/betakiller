@@ -8,7 +8,7 @@ return [
     /**
      * @url http://php-di.org/doc/performances.html
      */
-    'cache' => new ArrayCache(),
+    'compile_to' => null,
 
     'definitions' => [
 

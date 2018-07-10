@@ -18,10 +18,6 @@ use BetaKiller\View\LayoutViewInterface;
 use BetaKiller\View\LayoutViewTwig;
 use BetaKiller\View\TwigViewFactory;
 use BetaKiller\View\ViewFactoryInterface;
-use DI\Scope;
-use Doctrine\Common\Cache\ArrayCache;
-use Doctrine\Common\Cache\ChainCache;
-use Doctrine\Common\Cache\FilesystemCache;
 use Psr\Log\LoggerInterface;
 use Roave\DoctrineSimpleCache\SimpleCacheAdapter;
 use Spotman\Acl\ResourceFactory\AclResourceFactoryInterface;
@@ -31,31 +27,28 @@ use Spotman\Acl\RulesCollector\AclRulesCollectorInterface;
 use Spotman\Api\AccessResolver\ApiMethodAccessResolverDetectorInterface;
 
 $workingPath = MultiSite::instance()->getWorkingPath();
-$workingName = MultiSite::instance()->getWorkingName();
 
 return [
 
     /**
      * @url http://php-di.org/doc/performances.html
      */
-    'cache' => new ChainCache([
-        new ArrayCache(),
-        new FilesystemCache(implode(DIRECTORY_SEPARATOR, [$workingPath, 'cache', 'php-di'])),
-    ]),
+    'compile_to'        => implode(DIRECTORY_SEPARATOR, [$workingPath, 'cache', 'php-di']),
 
-    'namespace' => ($workingName ?: 'core').'-php-di-'.\Kohana::$environmentString,
+    // Enable this only if your server has APCu enabled
+    'cache_definitions' => false,
 
     'annotations' => true,
     'autowiring'  => true,
 
     'definitions' => [
 
-        ExceptionHandlerInterface::class            => DI\object(\BetaKiller\Error\ExceptionHandler::class)->lazy(),
+        ExceptionHandlerInterface::class            => DI\autowire(\BetaKiller\Error\ExceptionHandler::class)->lazy(),
 
         // PSR-16 adapter for system-wide Doctrine Cache
-        Psr\SimpleCache\CacheInterface::class       => DI\factory(function (\Psr\Container\ContainerInterface $container
+        Psr\SimpleCache\CacheInterface::class       => DI\factory(function (\Doctrine\Common\Cache\Cache $doctrineCache
         ) {
-            return new SimpleCacheAdapter($container->get(\Doctrine\Common\Cache\Cache::class));
+            return new SimpleCacheAdapter($doctrineCache);
         }),
 
         // Bind Doctrine cache interface to abstract cache provider
@@ -67,7 +60,7 @@ return [
         // Inject container into factories
         \BetaKiller\DI\ContainerInterface::class    => DI\factory(function () {
             return \BetaKiller\DI\Container::getInstance();
-        })->scope(Scope::SINGLETON),
+        }),
 
         // Use logger only when really needed
         LoggerInterface::class                      => DI\get(\BetaKiller\Log\Logger::class),
@@ -84,35 +77,35 @@ return [
 
         Auth::class => DI\factory(function () {
             return Auth::instance();
-        })->scope(\DI\Scope::SINGLETON),
+        }),
 
         // Helpers
         'User'      => DI\factory(function (\BetaKiller\Helper\UserDetector $detector) {
             return $detector->detect();
         }),
 
-        ConfigProviderInterface::class => DI\object(KohanaConfigProvider::class),
-        AppConfigInterface::class      => DI\object(AppConfig::class),
+        ConfigProviderInterface::class => DI\autowire(KohanaConfigProvider::class),
+        AppConfigInterface::class      => DI\autowire(AppConfig::class),
 
         \BetaKiller\Model\UserInterface::class          => DI\get('User'),
         \BetaKiller\Model\RoleInterface::class          => DI\get(\BetaKiller\Model\Role::class),
 
         // Acl roles, resources, permissions and resource factory
-        AclRolesCollectorInterface::class               => DI\object(AclRolesCollector::class),
-        AclResourcesCollectorInterface::class           => DI\object(AclResourcesCollector::class),
-        AclRulesCollectorInterface::class               => DI\object(AclRulesCollector::class),
-        AclResourceFactoryInterface::class              => DI\object(AclResourceFactory::class),
+        AclRolesCollectorInterface::class               => DI\autowire(AclRolesCollector::class),
+        AclResourcesCollectorInterface::class           => DI\autowire(AclResourcesCollector::class),
+        AclRulesCollectorInterface::class               => DI\autowire(AclRulesCollector::class),
+        AclResourceFactoryInterface::class              => DI\autowire(AclResourceFactory::class),
 
         // Use Twig as default view
-        ViewFactoryInterface::class                     => DI\object(TwigViewFactory::class),
+        ViewFactoryInterface::class                     => DI\autowire(TwigViewFactory::class),
         // Use Twig in layouts
-        LayoutViewInterface::class                      => DI\object(LayoutViewTwig::class),
+        LayoutViewInterface::class                      => DI\autowire(LayoutViewTwig::class),
 
         // Custom access resolver detector
-        ApiMethodAccessResolverDetectorInterface::class => DI\object(CustomApiMethodAccessResolverDetector::class),
+        ApiMethodAccessResolverDetectorInterface::class => DI\autowire(CustomApiMethodAccessResolverDetector::class),
 
         // Use default renderer for notification messages
-        MessageRendererInterface::class                 => DI\object(DefaultMessageRendered::class),
+        MessageRendererInterface::class                 => DI\autowire(DefaultMessageRendered::class),
 
         Meta::class => \DI\factory(function () {
             return Meta::instance();

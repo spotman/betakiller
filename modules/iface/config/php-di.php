@@ -9,7 +9,7 @@ return [
 
     'definitions' => [
 
-        UrlContainerInterface::class => DI\object(ResolvingUrlContainer::class),
+        UrlContainerInterface::class => DI\autowire(ResolvingUrlContainer::class),
 
         UrlElementTreeInterface::class => DI\factory(function(UrlElementTreeLoader $loader) {
             return $loader->load();
