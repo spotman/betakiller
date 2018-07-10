@@ -1,7 +1,7 @@
 <?php
 namespace BetaKiller\Widget\Content;
 
-use BetaKiller\Widget\AbstractBaseWidget;
+use BetaKiller\Widget\AbstractPublicWidget;
 use BetaKiller\Widget\WidgetException;
 use HTML;
 use ORM_Validation_Exception;
@@ -9,7 +9,7 @@ use Security;
 use Valid;
 use Validation;
 
-class CommentsWidget extends AbstractBaseWidget
+class CommentsWidget extends AbstractPublicWidget
 {
     /**
      * @Inject
@@ -94,7 +94,7 @@ class CommentsWidget extends AbstractBaseWidget
      * @throws \BetaKiller\Repository\RepositoryException
      * @throws \Kohana_Exception
      */
-    public function action_add()
+    public function actionAdd()
     {
         if ($this->is_ajax()) {
             $this->content_type_json();

@@ -1,16 +1,17 @@
 <?php
 namespace BetaKiller\Widget\Admin;
 
+use BetaKiller\Helper\AclHelper;
+use BetaKiller\Helper\ContentHelper;
 use BetaKiller\Helper\IFaceHelper;
 use BetaKiller\Helper\UrlContainerHelper;
 use BetaKiller\IFace\CrudlsActionsInterface;
 use BetaKiller\IFace\Exception\IFaceException;
 use BetaKiller\IFace\IFaceInterface;
-use BetaKiller\IFace\Widget\AbstractAdminWidget;
 use BetaKiller\Model\DispatchableEntityInterface;
 use BetaKiller\Model\UrlElementZone;
-use BetaKiller\Model\UserInterface;
 use BetaKiller\Url\UrlElementTreeInterface;
+use BetaKiller\Widget\AbstractAdminWidget;
 
 class BarWidget extends AbstractAdminWidget
 {
@@ -30,22 +31,34 @@ class BarWidget extends AbstractAdminWidget
     private $tree;
 
     /**
-     * @Inject
      * @var \BetaKiller\Helper\ContentHelper
      */
     private $contentHelper;
 
+    /**
+     * @var \BetaKiller\Helper\IFaceHelper
+     */
+    private $ifaceHelper;
+
+    /**
+     * @var \BetaKiller\Helper\AclHelper
+     */
+    private $aclHelper;
+
     public function __construct(
         UrlElementTreeInterface $tree,
-        UserInterface $user,
         IFaceHelper $ifaceHelper,
-        UrlContainerHelper $urlParamHelper
+        AclHelper $aclHelper,
+        UrlContainerHelper $urlParamHelper,
+        ContentHelper $contentHelper
     ) {
-        parent::__construct($user);
+        parent::__construct();
 
         $this->tree           = $tree;
+        $this->aclHelper      = $aclHelper;
         $this->ifaceHelper    = $ifaceHelper;
         $this->urlParamHelper = $urlParamHelper;
+        $this->contentHelper  = $contentHelper;
     }
 
     /**
@@ -76,7 +89,7 @@ class BarWidget extends AbstractAdminWidget
         return $data;
     }
 
-    protected function isEmptyResponseAllowed(): bool
+    public function isEmptyResponseAllowed(): bool
     {
         // If user is not authorized, then silently exiting
         return true;

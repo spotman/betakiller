@@ -3,7 +3,7 @@ namespace BetaKiller\Widget;
 
 use BetaKiller\Content\Shortcode\ShortcodeInterface;
 
-class ShortcodeWidget extends AbstractBaseWidget
+class ShortcodeWidget extends AbstractPublicWidget
 {
     /**
      * @var ShortcodeInterface
@@ -48,6 +48,7 @@ class ShortcodeWidget extends AbstractBaseWidget
     }
 
     /**
+     * @todo this is broken, find another way to define widget view (maybe in shortcode widget factory)
      * @return string
      * @throws \BetaKiller\Widget\WidgetException
      */

@@ -3,9 +3,9 @@ namespace BetaKiller\Widget\Content;
 
 use BetaKiller\Model\ContentPostInterface;
 use BetaKiller\Model\UrlElementZone;
-use BetaKiller\Widget\AbstractBaseWidget;
+use BetaKiller\Widget\AbstractPublicWidget;
 
-abstract class SidebarArticlesListWidget extends AbstractBaseWidget
+abstract class SidebarArticlesListWidget extends AbstractPublicWidget
 {
     /**
      * @Inject
@@ -18,6 +18,12 @@ abstract class SidebarArticlesListWidget extends AbstractBaseWidget
      * @Inject
      */
     private $assetsHelper;
+
+    /**
+     * @Inject
+     * @var \BetaKiller\Helper\IFaceHelper
+     */
+    private $ifaceHelper;
 
     /**
      * Returns data for View rendering

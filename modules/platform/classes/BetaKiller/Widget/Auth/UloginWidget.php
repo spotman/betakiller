@@ -1,11 +1,11 @@
 <?php
 namespace BetaKiller\Widget\Auth;
 
-use BetaKiller\Widget\AbstractBaseWidget;
+use BetaKiller\Widget\AbstractPublicWidget;
 use Ulogin;
 use Ulogin_Exception;
 
-class UloginWidget extends AbstractBaseWidget
+class UloginWidget extends AbstractPublicWidget
 {
     public function getData(): array
     {
@@ -25,7 +25,7 @@ class UloginWidget extends AbstractBaseWidget
      * @throws \Throwable
      * @throws \Ulogin_Exception
      */
-    public function action_auth()
+    public function actionAuth()
     {
         $this->content_type_json();
 

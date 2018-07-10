@@ -5,16 +5,20 @@ use Auth;
 use BetaKiller\Exception\BadRequestHttpException;
 use BetaKiller\Helper\IFaceHelper;
 use BetaKiller\IFace\Auth\PasswordReset;
-use BetaKiller\Widget\AbstractBaseWidget;
+use BetaKiller\Widget\AbstractPublicWidget;
 use HTML;
-use HTTP_Exception_400;
 
-class RegularWidget extends AbstractBaseWidget
+class RegularWidget extends AbstractPublicWidget
 {
     /**
      * @var Auth
      */
     private $auth;
+
+    /**
+     * @var \BetaKiller\Helper\IFaceHelper
+     */
+    private $ifaceHelper;
 
     /**
      * RegularWidget constructor.
@@ -35,7 +39,7 @@ class RegularWidget extends AbstractBaseWidget
      *
      * @throws \BetaKiller\Exception\BadRequestHttpException
      */
-    public function action_login()
+    public function actionLogin()
     {
         if (!$this->getRequest()->is_ajax()) {
             throw new BadRequestHttpException('AJAX only gateway');
@@ -46,7 +50,7 @@ class RegularWidget extends AbstractBaseWidget
 
         $userLogin    = $this->getRequest()->post('user-login');
         $userPassword = $this->getRequest()->post('user-password');
-        $remember      = (bool)$this->getRequest()->post('remember');
+        $remember     = (bool)$this->getRequest()->post('remember');
 
         // Sanitize
         $userLogin    = trim(HTML::chars($userLogin));
@@ -65,7 +69,7 @@ class RegularWidget extends AbstractBaseWidget
     public function getData(): array
     {
         return [
-            'login_url'          => $this->getLoginUrl(),
+            'login_url' => $this->getLoginUrl(),
 //            'reset_password_url' => $this->getResetPasswordUrl(),
         ];
     }

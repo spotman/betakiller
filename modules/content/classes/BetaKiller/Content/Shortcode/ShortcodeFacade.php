@@ -20,9 +20,9 @@ class ShortcodeFacade
 
     /**
      * @Inject
-     * @var \BetaKiller\Widget\WidgetFactory
+     * @var \BetaKiller\Widget\WidgetFacade
      */
-    private $widgetFactory;
+    private $widgetFacade;
 
     /**
      * @Inject
@@ -110,6 +110,7 @@ class ShortcodeFacade
      * @param array|null $attributes
      *
      * @return string
+     * @throws \BetaKiller\Auth\AccessDeniedException
      * @throws \BetaKiller\Factory\FactoryException
      */
     protected function render(string $tagName, ?array $attributes = null): string
@@ -117,11 +118,11 @@ class ShortcodeFacade
         $shortcode = $this->createFromTagName($tagName, $attributes);
 
         /** @var \BetaKiller\Widget\ShortcodeWidget $widget */
-        $widget = $this->widgetFactory->create('Shortcode');
+        $widget = $this->widgetFacade->create('Shortcode');
 
         $widget->setShortcode($shortcode);
 
-        return $widget->render();
+        return $this->widgetFacade->render($widget);
     }
 
     public function stripTags(string $text): string

@@ -46,9 +46,9 @@ class TwigExtension extends Twig_Extension
 
     /**
      * @Inject
-     * @var \BetaKiller\Widget\WidgetFactory
+     * @var \BetaKiller\Widget\WidgetFacade
      */
-    private $widgetFactory;
+    private $widgetFacade;
 
     /**
      * @Inject
@@ -350,6 +350,7 @@ class TwigExtension extends Twig_Extension
      * @param array|null $data
      *
      * @return string
+     * @throws \BetaKiller\Auth\AccessDeniedException
      * @throws \BetaKiller\Factory\FactoryException
      */
     public function widget(array $context, string $name, array $data = null): string
@@ -358,9 +359,9 @@ class TwigExtension extends Twig_Extension
             $context = array_merge($context, $data);
         }
 
-        $widget = $this->widgetFactory->create($name);
+        $widget = $this->widgetFacade->create($name);
         $widget->setContext($context);
 
-        return $widget->render();
+        return $this->widgetFacade->render($widget);
     }
 }

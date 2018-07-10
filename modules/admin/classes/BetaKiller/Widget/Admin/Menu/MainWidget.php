@@ -2,8 +2,8 @@
 namespace BetaKiller\Widget\Admin\Menu;
 
 use BetaKiller\IFace\IFaceInterface;
-use BetaKiller\IFace\Widget\AbstractAdminWidget;
 use BetaKiller\Url\UrlContainerInterface;
+use BetaKiller\Widget\AbstractAdminWidget;
 
 class MainWidget extends AbstractAdminWidget
 {
@@ -21,9 +21,15 @@ class MainWidget extends AbstractAdminWidget
 
     /**
      * @Inject
-     * @var \BetaKiller\Helper\StringPatternHelper
+     * @var \BetaKiller\Helper\IFaceHelper
      */
-    private $patternHelper;
+    private $ifaceHelper;
+
+    /**
+     * @Inject
+     * @var \BetaKiller\Helper\AclHelper
+     */
+    private $aclHelper;
 
     /**
      * Returns data for View rendering

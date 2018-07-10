@@ -1,11 +1,11 @@
 <?php
 namespace BetaKiller\Widget\Content;
 
-use BetaKiller\Widget\AbstractBaseWidget;
+use BetaKiller\Widget\AbstractPublicWidget;
 use DateTime;
 use DateTimeInterface;
 
-class QuotesWidget extends AbstractBaseWidget
+class QuotesWidget extends AbstractPublicWidget
 {
     /**
      * @Inject
@@ -23,7 +23,7 @@ class QuotesWidget extends AbstractBaseWidget
         return $this->getQuoteData();
     }
 
-    public function action_refresh(): void
+    public function actionRefresh(): void
     {
         $this->content_type_json();
 

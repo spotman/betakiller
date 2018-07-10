@@ -21,6 +21,8 @@ class WidgetFactory
      *
      * @param \BetaKiller\Factory\NamespaceBasedFactoryBuilder $factoryBuilder
      * @param \Psr\Log\LoggerInterface                         $logger
+     *
+     * @throws \BetaKiller\Factory\FactoryException
      */
     public function __construct(NamespaceBasedFactoryBuilder $factoryBuilder, LoggerInterface $logger)
     {

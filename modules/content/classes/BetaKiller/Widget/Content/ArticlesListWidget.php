@@ -6,14 +6,20 @@ use BetaKiller\Model\ContentCategoryInterface;
 use BetaKiller\Model\ContentPost;
 use BetaKiller\Model\UrlElementZone;
 use BetaKiller\Search\SearchResultsInterface;
-use BetaKiller\Widget\AbstractBaseWidget;
+use BetaKiller\Widget\AbstractPublicWidget;
 use HTML;
 
-class ArticlesListWidget extends AbstractBaseWidget
+class ArticlesListWidget extends AbstractPublicWidget
 {
     private const CATEGORY_ID_QUERY_KEY = 'category-id';
     private const PAGE_QUERY_KEY        = 'page';
     private const SEARCH_TERM_QUERY_KEY = 'term';
+
+    /**
+     * @Inject
+     * @var \BetaKiller\Helper\IFaceHelper
+     */
+    private $ifaceHelper;
 
     /**
      * @Inject
@@ -54,7 +60,7 @@ class ArticlesListWidget extends AbstractBaseWidget
     /**
      * @throws \Kohana_Exception
      */
-    public function action_more(): void
+    public function actionMore(): void
     {
         $this->content_type_json();
 

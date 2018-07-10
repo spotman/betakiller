@@ -1,11 +1,10 @@
 <?php
 namespace BetaKiller\Widget;
 
-use BetaKiller\View\ViewFactoryInterface;
-use Psr\Log\LoggerAwareInterface;
-
-interface WidgetInterface extends LoggerAwareInterface
+interface WidgetInterface
 {
+    public const DEFAULT_STATE = 'default';
+
     /**
      * Setter for widget name
      *
@@ -21,6 +20,18 @@ interface WidgetInterface extends LoggerAwareInterface
      * @return string
      */
     public function getName(): string;
+
+    /**
+     * Returns array of roles` codenames which are allowed to use this widget
+     *
+     * @return array
+     */
+    public function getAclRoles(): array;
+
+    /**
+     * @return bool
+     */
+    public function isEmptyResponseAllowed(): bool;
 
     /**
      * @param \Request $request
@@ -43,7 +54,7 @@ interface WidgetInterface extends LoggerAwareInterface
      *
      * @param array $value
      *
-     * @return \BetaKiller\IFace\Widget\WidgetInterface
+     * @return \BetaKiller\Widget\WidgetInterface
      */
     public function setContext(array $value): WidgetInterface;
 
@@ -61,37 +72,6 @@ interface WidgetInterface extends LoggerAwareInterface
      * @return mixed
      */
     public function getContextParam($name, $default = null);
-
-    /**
-     * @return \BetaKiller\View\ViewFactoryInterface
-     */
-    public function getViewFactory(): ViewFactoryInterface;
-
-    /**
-     * @param \BetaKiller\View\ViewFactoryInterface $viewFactory
-     *
-     * @return \BetaKiller\IFace\Widget\WidgetInterface
-     */
-    public function setViewFactory(ViewFactoryInterface $viewFactory): WidgetInterface;
-
-    /**
-     * Renders widget and returns its representation
-     *
-     * @return string
-     */
-    public function __toString();
-
-    /**
-     * Default action for Controller_Widget
-     */
-    public function action_render(): void;
-
-    /**
-     * Renders widget View
-     *
-     * @return string
-     */
-    public function render(): string;
 
     /**
      * Returns data for View rendering
