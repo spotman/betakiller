@@ -3,7 +3,7 @@ namespace BetaKiller\Widget;
 
 use BetaKiller\Content\Shortcode\ShortcodeInterface;
 
-class ShortcodeWidget extends AbstractPublicWidget
+final class ShortcodeWidget extends AbstractPublicWidget
 {
     /**
      * @var ShortcodeInterface
@@ -48,11 +48,12 @@ class ShortcodeWidget extends AbstractPublicWidget
     }
 
     /**
-     * @todo this is broken, find another way to define widget view (maybe in shortcode widget factory)
+     * Returns name of the view (underscores instead of directory separator)
+     *
      * @return string
      * @throws \BetaKiller\Widget\WidgetException
      */
-    protected function getViewName(): string
+    public function getViewName(): string
     {
         $shortcode = $this->getShortcode();
 

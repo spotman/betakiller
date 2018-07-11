@@ -1,10 +1,14 @@
 <?php
 namespace BetaKiller\IFace\Admin\Content;
 
+use BetaKiller\Exception\NotFoundHttpException;
+use BetaKiller\Helper\AclHelper;
+use BetaKiller\Helper\AssetsHelper;
 use BetaKiller\Helper\ContentUrlContainerHelper;
 use BetaKiller\IFace\CrudlsActionsInterface;
-use BetaKiller\Model\ContentPostInterface;
-use BetaKiller\Model\EntityModelInterface;
+use BetaKiller\Model\UserInterface;
+use BetaKiller\Repository\EntityRepository;
+use BetaKiller\Repository\ShortcodeRepository;
 
 class PostItem extends AbstractAdminBase
 {
@@ -14,32 +18,26 @@ class PostItem extends AbstractAdminBase
     private $urlParametersHelper;
 
     /**
-     * @Inject
      * @var \BetaKiller\Model\UserInterface
      */
     private $user;
 
     /**
-     * @Inject
-     * TODO move to constructor
      * @var \BetaKiller\Helper\AclHelper
      */
     private $aclHelper;
 
     /**
      * @var \BetaKiller\Helper\AssetsHelper
-     * @Inject
      */
     private $assetsHelper;
 
     /**
-     * @var \BetaKiller\Content\Shortcode\ShortcodeFacade
-     * @Inject
+     * @var \BetaKiller\Repository\ShortcodeRepository
      */
-    private $customTagFacade;
+    private $shortcodeRepo;
 
     /**
-     * @Inject
      * @var \BetaKiller\Repository\EntityRepository
      */
     private $entityRepo;
@@ -48,12 +46,28 @@ class PostItem extends AbstractAdminBase
      * PostItem constructor.
      *
      * @param \BetaKiller\Helper\ContentUrlContainerHelper $urlParametersHelper
+     * @param \BetaKiller\Model\UserInterface              $user
+     * @param \BetaKiller\Helper\AclHelper                 $aclHelper
+     * @param \BetaKiller\Helper\AssetsHelper              $assetsHelper
+     * @param \BetaKiller\Repository\ShortcodeRepository   $shortcodeRepo
+     * @param \BetaKiller\Repository\EntityRepository      $entityRepo
      */
-    public function __construct(ContentUrlContainerHelper $urlParametersHelper)
-    {
+    public function __construct(
+        ContentUrlContainerHelper $urlParametersHelper,
+        UserInterface $user,
+        AclHelper $aclHelper,
+        AssetsHelper $assetsHelper,
+        ShortcodeRepository $shortcodeRepo,
+        EntityRepository $entityRepo
+    ) {
         parent::__construct();
 
         $this->urlParametersHelper = $urlParametersHelper;
+        $this->user                = $user;
+        $this->aclHelper           = $aclHelper;
+        $this->assetsHelper        = $assetsHelper;
+        $this->shortcodeRepo       = $shortcodeRepo;
+        $this->entityRepo          = $entityRepo;
     }
 
     /**
@@ -61,15 +75,14 @@ class PostItem extends AbstractAdminBase
      * Override this method in child classes
      *
      * @return array
-     * @throws \BetaKiller\Exception
-     * @throws \HTTP_Exception_404
+     * @throws \BetaKiller\Exception\NotFoundHttpException
      */
     public function getData(): array
     {
         $post = $this->urlParametersHelper->getContentPost();
 
         if (!$post) {
-            throw new \HTTP_Exception_404();
+            throw new NotFoundHttpException();
         }
 
         $entity = $this->entityRepo->findByEntityInstance($post);
@@ -110,7 +123,7 @@ class PostItem extends AbstractAdminBase
 
             'entity_slug' => $entity->getSlug(),
 
-            'shortcodes' => $this->customTagFacade->getEditableTagsNames(),
+            'shortcodes' => $this->shortcodeRepo->getEditableTagsNames(),
         ];
     }
 }

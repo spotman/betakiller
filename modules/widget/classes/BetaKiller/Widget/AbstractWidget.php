@@ -69,6 +69,17 @@ abstract class AbstractWidget implements WidgetInterface
     }
 
     /**
+     * Returns name of the view (underscores instead of directory separator)
+     *
+     * @return string
+     */
+    public function getViewName(): string
+    {
+        // View name is equal to widget name by default
+        return $this->getName();
+    }
+
+    /**
      * Setter for widget context (additional data for rendering)
      *
      * @param array $value

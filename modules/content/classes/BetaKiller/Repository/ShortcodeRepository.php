@@ -51,6 +51,22 @@ class ShortcodeRepository extends AbstractConfigBasedDispatchableRepository
     }
 
     /**
+     * @return string[]
+     */
+    public function getEditableTagsNames(): array
+    {
+        $output = [];
+
+        foreach ($this->getAll() as $entity) {
+            if ($entity->isEditable()) {
+                $output[] = $entity->getTagName();
+            }
+        }
+
+        return $output;
+    }
+
+    /**
      * @param string $type
      *
      * @return \BetaKiller\Content\Shortcode\ShortcodeEntityInterface[]

@@ -22,6 +22,13 @@ interface WidgetInterface
     public function getName(): string;
 
     /**
+     * Returns name of the view (underscores instead of directory separator)
+     *
+     * @return string
+     */
+    public function getViewName(): string;
+
+    /**
      * Returns array of roles` codenames which are allowed to use this widget
      *
      * @return array

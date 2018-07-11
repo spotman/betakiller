@@ -1,52 +1,47 @@
 <?php
+declare(strict_types=1);
+
 namespace BetaKiller\Content\Shortcode;
 
 use BetaKiller\Helper\LoggerHelperTrait;
+use BetaKiller\Widget\WidgetFacade;
+use Psr\Log\LoggerInterface;
 use Thunder\Shortcode\HandlerContainer\HandlerContainer;
 use Thunder\Shortcode\Parser\RegularParser;
 use Thunder\Shortcode\Processor\Processor;
 use Thunder\Shortcode\Shortcode\ShortcodeInterface as ThunderShortcodeInterface;
-
 
 class ShortcodeFacade
 {
     use LoggerHelperTrait;
 
     /**
-     * @Inject
-     * @var \BetaKiller\Repository\ShortcodeRepository
-     */
-    private $repository;
-
-    /**
-     * @Inject
      * @var \BetaKiller\Widget\WidgetFacade
      */
     private $widgetFacade;
 
     /**
-     * @Inject
      * @var \BetaKiller\Content\Shortcode\ShortcodeFactory
      */
     private $shortcodeFactory;
 
     /**
-     * @Inject
      * @var \Psr\Log\LoggerInterface
      */
     private $logger;
 
-    public function getEditableTagsNames(): array
+    /**
+     * ShortcodeFacade constructor.
+     *
+     * @param \BetaKiller\Widget\WidgetFacade                $facade
+     * @param \BetaKiller\Content\Shortcode\ShortcodeFactory $factory
+     * @param \Psr\Log\LoggerInterface                       $logger
+     */
+    public function __construct(WidgetFacade $facade, ShortcodeFactory $factory, LoggerInterface $logger)
     {
-        $output = [];
-
-        foreach ($this->repository->getAll() as $entity) {
-            if ($entity->isEditable()) {
-                $output[] = $entity->getTagName();
-            }
-        }
-
-        return $output;
+        $this->widgetFacade     = $facade;
+        $this->shortcodeFactory = $factory;
+        $this->logger           = $logger;
     }
 
     /**
@@ -110,6 +105,7 @@ class ShortcodeFacade
      * @param array|null $attributes
      *
      * @return string
+     * @throws \BetaKiller\Repository\RepositoryException
      * @throws \BetaKiller\Auth\AccessDeniedException
      * @throws \BetaKiller\Factory\FactoryException
      */

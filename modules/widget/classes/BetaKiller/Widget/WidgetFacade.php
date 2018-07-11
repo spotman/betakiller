@@ -37,10 +37,10 @@ class WidgetFacade
     /**
      * WidgetFacade constructor.
      *
-     * @param \BetaKiller\Widget\WidgetFactory $widgetFactory
+     * @param \BetaKiller\Widget\WidgetFactory      $widgetFactory
      * @param \BetaKiller\View\ViewFactoryInterface $viewFactory
-     * @param \BetaKiller\Model\UserInterface $user
-     * @param \Psr\Log\LoggerInterface $logger
+     * @param \BetaKiller\Model\UserInterface       $user
+     * @param \Psr\Log\LoggerInterface              $logger
      */
     public function __construct(
         WidgetFactory $widgetFactory,
@@ -147,7 +147,7 @@ class WidgetFacade
         ];
 
         // Creating View instance
-        $view = $this->view($widget);
+        $view = $this->createView($widget);
 
         // Assigning data (override context keys)
         foreach ($data as $key => $value) {
@@ -162,15 +162,14 @@ class WidgetFacade
      *
      * @return \BetaKiller\View\ViewInterface
      */
-    private function view(WidgetInterface $widget): ViewInterface
+    private function createView(WidgetInterface $widget): ViewInterface
     {
-        $name = $widget->getName()();
+        $state = $widget->getCurrentState();
+        $file  = str_replace('_', DIRECTORY_SEPARATOR, $widget->getViewName());
 
-        $suffix = $widget->getCurrentState() !== WidgetInterface::DEFAULT_STATE
-            ? '-'.$widget->getCurrentState()
-            : '';
-
-        $file = str_replace('_', DIRECTORY_SEPARATOR, $name).$suffix;
+        if ($state !== WidgetInterface::DEFAULT_STATE) {
+            $file .= '-'.$state;
+        }
 
         $viewPath = 'widgets'.DIRECTORY_SEPARATOR.$file;
 

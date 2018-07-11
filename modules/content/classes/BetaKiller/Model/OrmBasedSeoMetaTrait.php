@@ -11,7 +11,6 @@ trait OrmBasedSeoMetaTrait
      * @param string $value
      *
      * @return SeoMetaInterface
-     * @throws Kohana_Exception
      */
     public function setTitle(string $value): SeoMetaInterface
     {
@@ -20,7 +19,6 @@ trait OrmBasedSeoMetaTrait
 
     /**
      * @return string
-     * @throws Kohana_Exception
      */
     public function getTitle(): ?string
     {
@@ -31,7 +29,6 @@ trait OrmBasedSeoMetaTrait
      * @param string $value
      *
      * @return SeoMetaInterface
-     * @throws Kohana_Exception
      */
     public function setDescription(string $value): SeoMetaInterface
     {
@@ -40,7 +37,6 @@ trait OrmBasedSeoMetaTrait
 
     /**
      * @return string
-     * @throws Kohana_Exception
      */
     public function getDescription(): ?string
     {
