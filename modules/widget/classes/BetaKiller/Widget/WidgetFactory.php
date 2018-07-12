@@ -2,7 +2,6 @@
 namespace BetaKiller\Widget;
 
 use BetaKiller\Factory\NamespaceBasedFactoryBuilder;
-use Psr\Log\LoggerInterface;
 
 class WidgetFactory
 {
@@ -12,27 +11,19 @@ class WidgetFactory
     private $factory;
 
     /**
-     * @var \Psr\Log\LoggerInterface
-     */
-    private $logger;
-
-    /**
      * WidgetFactory constructor.
      *
      * @param \BetaKiller\Factory\NamespaceBasedFactoryBuilder $factoryBuilder
-     * @param \Psr\Log\LoggerInterface                         $logger
      *
      * @throws \BetaKiller\Factory\FactoryException
      */
-    public function __construct(NamespaceBasedFactoryBuilder $factoryBuilder, LoggerInterface $logger)
+    public function __construct(NamespaceBasedFactoryBuilder $factoryBuilder)
     {
         $this->factory = $factoryBuilder
             ->createFactory()
             ->setClassNamespaces('Widget')
             ->setClassSuffix('Widget')
             ->setExpectedInterface(WidgetInterface::class);
-
-        $this->logger = $logger;
     }
 
     /**
@@ -47,7 +38,6 @@ class WidgetFactory
         $instance = $this->factory->create($name);
 
         $instance->setName($name);
-        $instance->setLogger($this->logger);
 
         return $instance;
     }
