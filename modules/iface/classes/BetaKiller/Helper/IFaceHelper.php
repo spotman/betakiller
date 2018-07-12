@@ -117,7 +117,7 @@ class IFaceHelper
      * @return bool
      * @throws \BetaKiller\IFace\Exception\IFaceException
      */
-    public function isCurrentIFaceZone(string $zone): bool
+    public function isCurrentZone(string $zone): bool
     {
         $currentElement = $this->getCurrentUrlElement();
         $currentZone    = $currentElement ? $this->detectZoneName($currentElement) : null;

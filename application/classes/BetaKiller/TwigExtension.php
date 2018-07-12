@@ -213,7 +213,7 @@ class TwigExtension extends Twig_Extension
      */
     public function inPublicZone(): bool
     {
-        return $this->ifaceHelper->isCurrentIFaceZone(UrlElementZone::PUBLIC_ZONE);
+        return $this->ifaceHelper->isCurrentZone(UrlElementZone::PUBLIC_ZONE);
     }
 
     /**

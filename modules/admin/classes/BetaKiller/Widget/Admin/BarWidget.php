@@ -225,7 +225,7 @@ class BarWidget extends AbstractAdminWidget
             return null;
         }
 
-        if ($this->ifaceHelper->isCurrentIFaceZone($targetZone)) {
+        if ($this->ifaceHelper->isCurrentZone($targetZone)) {
             return null;
         }
 

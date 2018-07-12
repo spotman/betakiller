@@ -76,7 +76,7 @@ class PostItem extends AbstractAppBase
     {
         $model = $this->getContentModel();
 
-        $previewMode = $this->ifaceHelper->isCurrentIFaceZone(UrlElementZone::PREVIEW_ZONE);
+        $previewMode = $this->ifaceHelper->isCurrentZone(UrlElementZone::PREVIEW_ZONE);
 
         if ($previewMode) {
             // See latest revision data
