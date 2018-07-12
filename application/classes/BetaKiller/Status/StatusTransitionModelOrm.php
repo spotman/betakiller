@@ -8,7 +8,7 @@ use BetaKiller\Model\UserInterface;
 
 abstract class StatusTransitionModelOrm extends AbstractGraphTransitionModelOrm implements StatusTransitionModelInterface
 {
-    protected function _initialize()
+    protected function configure(): void
     {
         $this->has_many([
             $this->getRolesRelationKey() => [
@@ -19,7 +19,7 @@ abstract class StatusTransitionModelOrm extends AbstractGraphTransitionModelOrm 
             ],
         ]);
 
-        parent::_initialize();
+        parent::configure();
     }
 
     /**
@@ -29,17 +29,19 @@ abstract class StatusTransitionModelOrm extends AbstractGraphTransitionModelOrm 
      */
     public function filterAllowedByAcl(UserInterface $user)
     {
-        $through_table = $this->getRolesRelationThroughTableName();
+        $throughTable = $this->getRolesRelationThroughTableName();
 
-        $primary_key = $this->object_primary_key();
-        $foreign_key = $through_table.'.'.$this->getRolesRelationForeignKey();
-        $far_key     = $through_table.'.'.$this->getRolesRelationFarKey();
+        $primaryKey = $this->object_primary_key();
+        $foreignKey = $throughTable.'.'.$this->getRolesRelationForeignKey();
+        $farKey     = $throughTable.'.'.$this->getRolesRelationFarKey();
 
         // inner join ACL table + where role_id in ($user->getAllUserRolesIDs())
         return $this
-            ->join($through_table, 'INNER')
-            ->on($foreign_key, '=', $primary_key)
-            ->where($far_key, 'IN', $user->getAllUserRolesIDs());
+            ->join($throughTable, 'INNER')
+            ->on($foreignKey, '=', $primaryKey)
+            ->join('roles', 'INNER')
+            ->on('roles.id', '=', $farKey)
+            ->where('roles.name', 'IN', $user->getAllUserRolesNames());
     }
 
     public function addRole(RoleInterface $role)

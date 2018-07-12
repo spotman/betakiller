@@ -31,7 +31,7 @@ interface WidgetInterface
     /**
      * Returns array of roles` codenames which are allowed to use this widget
      *
-     * @return array
+     * @return string[]
      */
     public function getAclRoles(): array;
 

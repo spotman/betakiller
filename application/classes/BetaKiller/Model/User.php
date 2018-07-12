@@ -6,12 +6,12 @@ use BetaKiller\Auth\InactiveException;
 
 class User extends \Model_Auth_User implements UserInterface
 {
-    protected $allUserRolesIDs = [];
+    private $allUserRolesNames = [];
 
-    protected function _initialize(): void
+    protected function configure(): void
     {
         $this->_table_name       = 'users';
-        $this->_reload_on_wakeup = false;
+        $this->_reload_on_wakeup = true;
 
         $this->belongs_to([
             'language' => [
@@ -26,7 +26,7 @@ class User extends \Model_Auth_User implements UserInterface
 
         $this->load_with(['language']);
 
-        parent::_initialize();
+        parent::configure();
     }
 
     /**
@@ -101,6 +101,22 @@ class User extends \Model_Auth_User implements UserInterface
     }
 
     /**
+     * @param string $role
+     *
+     * @return bool
+     */
+    public function hasRoleName(string $role): bool
+    {
+        foreach ($this->getAllUserRolesNames() as $name) {
+            if ($role === $name) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * @param \BetaKiller\Model\RoleInterface|string $role
      *
      * @return \BetaKiller\Model\UserInterface
@@ -111,34 +127,34 @@ class User extends \Model_Auth_User implements UserInterface
     }
 
     /**
-     * Get all user`s roles IDs
+     * Get all user`s roles names (include parent roles)
      *
-     * @return array
+     * @return string[]
      */
-    public function getAllUserRolesIDs(): array
+    public function getAllUserRolesNames(): array
     {
         // Caching coz it is very heavy operation without MPTT
-        if (!$this->allUserRolesIDs) {
-            $this->allUserRolesIDs = $this->fetchAllUserRolesIDs();
+        if (!$this->allUserRolesNames) {
+            $this->allUserRolesNames = $this->fetchAllUserRolesNames();
         }
 
-        return $this->allUserRolesIDs;
+        return $this->allUserRolesNames;
     }
 
-    protected function fetchAllUserRolesIDs()
+    private function fetchAllUserRolesNames(): array
     {
-        $rolesIDs = [];
+        $rolesNames = [];
 
         foreach ($this->getRolesRelation()->get_all() as $role) {
-            $rolesIDs[] = $role->getID();
+            $rolesNames[] = $role->getName();
 
             /** @var \BetaKiller\Model\RoleInterface $parent */
             foreach ($role->getAllParents() as $parent) {
-                $rolesIDs[] = $parent->getID();
+                $rolesNames[] = $parent->getName();
             }
         }
 
-        return array_unique($rolesIDs);
+        return array_unique($rolesNames);
     }
 
     /**

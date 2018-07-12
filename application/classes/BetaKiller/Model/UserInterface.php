@@ -34,25 +34,32 @@ interface UserInterface extends AbstractEntityInterface, OrmInterface, Notificat
     public function getPassword(): string;
 
     /**
-     * @param RoleInterface|string $role
+     * @param RoleInterface $role
      *
      * @return bool
      */
     public function hasRole(RoleInterface $role): bool;
 
     /**
-     * @param string|RoleInterface $role
+     * @param string $role
+     *
+     * @return bool
+     */
+    public function hasRoleName(string $role): bool;
+
+    /**
+     * @param RoleInterface $role
      *
      * @return \BetaKiller\Model\UserInterface
      */
     public function addRole(RoleInterface $role): UserInterface;
 
     /**
-     * Get all user`s roles IDs (include parent roles)
+     * Get all user`s roles names (include parent roles)
      *
-     * @return int[]
+     * @return string[]
      */
-    public function getAllUserRolesIDs(): array;
+    public function getAllUserRolesNames(): array;
 
     /**
      * Returns user`s language name
@@ -62,9 +69,9 @@ interface UserInterface extends AbstractEntityInterface, OrmInterface, Notificat
     public function getLanguageName(): ?string;
 
     /**
-     * @return NULL|\BetaKiller\Model\Language
+     * @return \BetaKiller\Model\Language|null
      */
-    public function getLanguage(): ?\BetaKiller\Model\Language;
+    public function getLanguage(): ?Language;
 
     /**
      * Search for user by username or e-mail

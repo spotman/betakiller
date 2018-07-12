@@ -29,6 +29,12 @@ class WidgetFacade
      */
     private $user;
 
+
+    /**
+     * @var \BetaKiller\Helper\AclHelper
+     */
+    private $aclHelper;
+
     /**
      * @var \Psr\Log\LoggerInterface
      */
@@ -121,7 +127,7 @@ class WidgetFacade
     private function isAllowed(WidgetInterface $widget): bool
     {
         foreach ($widget->getAclRoles() as $roleName) {
-            if ($this->user->hasRole($roleName)) {
+            if ($this->user->hasRoleName($roleName)) {
                 return true;
             }
         }
