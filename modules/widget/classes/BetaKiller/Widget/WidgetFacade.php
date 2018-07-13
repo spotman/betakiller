@@ -29,12 +29,6 @@ class WidgetFacade
      */
     private $user;
 
-
-    /**
-     * @var \BetaKiller\Helper\AclHelper
-     */
-    private $aclHelper;
-
     /**
      * @var \Psr\Log\LoggerInterface
      */
