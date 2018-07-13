@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace BetaKiller\Model;
 
 use BetaKiller\Exception\NotImplementedHttpException;
@@ -8,7 +10,7 @@ use BetaKiller\Url\UrlElementInterface;
 use BetaKiller\Url\WebHookModelInterface;
 
 /**
- * Class IFace
+ * Class UrlElement
  *
  * @category   Models
  * @author     Spotman

@@ -3,7 +3,6 @@ namespace BetaKiller\Url;
 
 use BetaKiller\IFace\Exception\IFaceException;
 use BetaKiller\Model\DispatchableEntityInterface;
-use BetaKiller\Model\UrlElementZone;
 
 class UrlElementTree implements UrlElementTreeInterface
 {
@@ -424,7 +423,7 @@ class UrlElementTree implements UrlElementTreeInterface
      */
     private function isAdminModel(UrlElementInterface $model): bool
     {
-        return $model->getZoneName() === UrlElementZone::ADMIN_ZONE;
+        return $model->getZoneName() === ZoneInterface::ADMIN;
     }
 
     /**
@@ -434,7 +433,7 @@ class UrlElementTree implements UrlElementTreeInterface
      */
     private function isPublicModel(UrlElementInterface $model): bool
     {
-        return $model->getZoneName() === UrlElementZone::PUBLIC_ZONE;
+        return $model->getZoneName() === ZoneInterface::PUBLIC;
     }
 
     /**

@@ -12,10 +12,10 @@ use BetaKiller\Model\HasAdminZoneAccessSpecificationInterface;
 use BetaKiller\Model\HasPersonalZoneAccessSpecificationInterface;
 use BetaKiller\Model\HasPreviewZoneAccessSpecificationInterface;
 use BetaKiller\Model\HasPublicZoneAccessSpecificationInterface;
-use BetaKiller\Model\UrlElementZone;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Url\UrlContainerInterface;
 use BetaKiller\Url\UrlElementInterface;
+use BetaKiller\Url\ZoneInterface;
 use Spotman\Acl\AccessResolver\UserAccessResolver;
 use Spotman\Acl\AclInterface;
 use Spotman\Acl\AclUserInterface;
@@ -121,7 +121,7 @@ class AclHelper
         }
 
         // Force check for guest role in public zone (so every public iface must be visible for guest users)
-        if ($zoneName === UrlElementZone::PUBLIC_ZONE) {
+        if ($zoneName === ZoneInterface::PUBLIC) {
             // Public zone needs GuestUser to check access)
             $user = new GuestUser;
         }
@@ -135,7 +135,7 @@ class AclHelper
         $entityDefined = $entityName && $actionName;
 
         // Force check for admin panel is enabled
-        if ($zoneName === UrlElementZone::ADMIN_ZONE) {
+        if ($zoneName === ZoneInterface::ADMIN) {
             $customRules[] = AdminResource::SHORTCUT;
         }
 
@@ -177,7 +177,7 @@ class AclHelper
         }
 
         // Allow access to public/personal zone by default if nor entity or custom rules were not defined
-        if (\in_array($zoneName, [UrlElementZone::PUBLIC_ZONE, UrlElementZone::PERSONAL_ZONE], true)) {
+        if (\in_array($zoneName, [ZoneInterface::PUBLIC, ZoneInterface::PERSONAL], true)) {
             return true;
         }
 
@@ -238,22 +238,22 @@ class AclHelper
         $zoneName = $model->getZoneName();
 
         switch ($zoneName) {
-            case UrlElementZone::PUBLIC_ZONE:
+            case ZoneInterface::PUBLIC:
                 return $entity instanceof HasPublicZoneAccessSpecificationInterface
                     ? $entity->isPublicZoneAccessAllowed()
                     : null;
 
-            case UrlElementZone::ADMIN_ZONE:
+            case ZoneInterface::ADMIN:
                 return $entity instanceof HasAdminZoneAccessSpecificationInterface
                     ? $entity->isAdminZoneAccessAllowed()
                     : null;
 
-            case UrlElementZone::PERSONAL_ZONE:
+            case ZoneInterface::PERSONAL:
                 return $entity instanceof HasPersonalZoneAccessSpecificationInterface
                     ? $entity->isPersonalZoneAccessAllowed()
                     : null;
 
-            case UrlElementZone::PREVIEW_ZONE:
+            case ZoneInterface::PREVIEW:
                 return $entity instanceof HasPreviewZoneAccessSpecificationInterface
                     ? $entity->isPreviewZoneAccessAllowed()
                     : null;
@@ -291,7 +291,7 @@ class AclHelper
     public function forceAuthorizationIfNeeded(UrlElementInterface $model): void
     {
         // Entering to admin and personal zones requires authorized user
-        if ($model->getZoneName() !== UrlElementZone::PUBLIC_ZONE && $this->user->isGuest()) {
+        if ($model->getZoneName() !== ZoneInterface::PUBLIC && $this->user->isGuest()) {
             $this->user->forceAuthorization();
         }
     }

@@ -25,4 +25,11 @@ interface WebHookModelInterface extends UrlElementInterface
      * @return string
      */
     public function getServiceEventDescription(): string;
+
+    /**
+     * Returns ID provided by external service
+     *
+     * @return string
+     */
+    public function getExternalEventID(): string;
 }

@@ -1,10 +1,12 @@
 <?php
+declare(strict_types=1);
+
 namespace BetaKiller\Model;
 
 use BetaKiller\Url\WebHookModelInterface;
 
 /**
- * Class IFace
+ * Class WebHook
  *
  * @category   Models
  * @author     Spotman
@@ -12,6 +14,20 @@ use BetaKiller\Url\WebHookModelInterface;
  */
 class WebHook extends AbstractOrmModelContainsUrlElement implements WebHookModelInterface
 {
+    protected function configure(): void
+    {
+        $this->belongs_to([
+            'service' => [
+                'model' => 'WebHookService',
+                'foreign_key' => 'service_id',
+            ],
+        ]);
+
+        $this->load_with(['service']);
+
+        parent::configure();
+    }
+
     /**
      * Returns TRUE if current URL element is hidden in sitemap
      *
@@ -30,7 +46,7 @@ class WebHook extends AbstractOrmModelContainsUrlElement implements WebHookModel
      */
     public function getServiceName(): string
     {
-        return $this->service;
+        return $this->getService()->getCodename();
     }
 
     /**
@@ -51,5 +67,20 @@ class WebHook extends AbstractOrmModelContainsUrlElement implements WebHookModel
     public function getServiceEventDescription(): string
     {
         return $this->description;
+    }
+
+    /**
+     * Returns ID provided by external service
+     *
+     * @return string
+     */
+    public function getExternalEventID(): string
+    {
+        return $this->external_event_id;
+    }
+
+    private function getService(): WebHookService
+    {
+        return $this->service;
     }
 }

@@ -2,7 +2,7 @@
 
 use BetaKiller\Model\PhpExceptionModelInterface;
 use BetaKiller\Task\AbstractTask;
-use BetaKiller\Model\UrlElementZone;
+use BetaKiller\Url\ZoneInterface;
 
 class Task_Error_Notify extends AbstractTask
 {
@@ -61,7 +61,7 @@ class Task_Error_Notify extends AbstractTask
             'message'  => $model->getMessage(),
             'urls'     => $model->getUrls(),
             'paths'    => $model->getPaths(),
-            'adminUrl' => $this->ifaceHelper->getReadEntityUrl($model, UrlElementZone::ADMIN_ZONE),
+            'adminUrl' => $this->ifaceHelper->getReadEntityUrl($model, ZoneInterface::ADMIN),
         ];
 
         $message = $this->notificationHelper

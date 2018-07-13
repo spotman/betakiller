@@ -12,7 +12,6 @@ use BetaKiller\Model\ContentImageInterface;
 use BetaKiller\Model\ContentPost;
 use BetaKiller\Model\ContentPostInterface;
 use BetaKiller\Model\Entity;
-use BetaKiller\Model\UrlElementZone;
 use BetaKiller\Model\WordpressAttachmentInterface;
 use BetaKiller\Repository\WordpressAttachmentRepositoryInterface;
 use BetaKiller\Task\AbstractTask;
@@ -833,7 +832,8 @@ class Task_Content_Import_Wordpress extends AbstractTask
                 $this->logException($this->logger, $e);
 
                 if (!isset($this->unknownBbTags[$name])) {
-                    $this->unknownBbTags[$name] = $this->ifaceHelper->getReadEntityUrl($item, UrlElementZone::PUBLIC_ZONE);
+                    $this->unknownBbTags[$name] = $this->ifaceHelper->getReadEntityUrl($item,
+                        ThunderShortcodeInterface::PUBLIC_ZONE);
                     $this->logger->debug('Unknown BB-code found [:name], keep it', [':name' => $name]);
                 }
             }

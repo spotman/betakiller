@@ -2,8 +2,8 @@
 namespace BetaKiller\IFace\ModelProvider;
 
 use BetaKiller\Exception\NotImplementedHttpException;
-use BetaKiller\Model\UrlElementZone;
 use BetaKiller\Url\UrlElementInterface;
+use BetaKiller\Url\ZoneInterface;
 
 abstract class AbstractXmlConfigModel implements UrlElementInterface
 {
@@ -50,7 +50,7 @@ abstract class AbstractXmlConfigModel implements UrlElementInterface
     /**
      * @var string
      */
-    private $zone = UrlElementZone::ADMIN_ZONE;
+    private $zone = ZoneInterface::ADMIN;
 
     /**
      * @var string[]

@@ -2,7 +2,7 @@
 namespace BetaKiller;
 
 use BetaKiller\DI\Container;
-use BetaKiller\Model\UrlElementZone;
+use BetaKiller\Url\ZoneInterface;
 use Device;
 use HTML;
 use Meta;
@@ -213,7 +213,7 @@ class TwigExtension extends Twig_Extension
      */
     public function inPublicZone(): bool
     {
-        return $this->ifaceHelper->isCurrentZone(UrlElementZone::PUBLIC_ZONE);
+        return $this->ifaceHelper->isCurrentZone(ZoneInterface::PUBLIC);
     }
 
     /**

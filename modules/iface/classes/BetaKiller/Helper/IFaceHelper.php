@@ -6,12 +6,12 @@ use BetaKiller\IFace\CrudlsActionsInterface;
 use BetaKiller\IFace\Exception\IFaceException;
 use BetaKiller\IFace\IFaceInterface;
 use BetaKiller\Model\DispatchableEntityInterface;
-use BetaKiller\Model\UrlElementZone;
 use BetaKiller\Url\IFaceModelInterface;
 use BetaKiller\Url\UrlContainerInterface;
 use BetaKiller\Url\UrlElementInterface;
 use BetaKiller\Url\UrlElementStack;
 use BetaKiller\Url\UrlElementTreeInterface;
+use BetaKiller\Url\ZoneInterface;
 use Spotman\Api\ApiMethodResponse;
 
 class IFaceHelper
@@ -292,7 +292,7 @@ class IFaceHelper
      */
     public function getPreviewEntityUrl(DispatchableEntityInterface $entity): ?string
     {
-        return $this->getEntityUrl($entity, CrudlsActionsInterface::ACTION_READ, UrlElementZone::PREVIEW_ZONE);
+        return $this->getEntityUrl($entity, CrudlsActionsInterface::ACTION_READ, ZoneInterface::PREVIEW);
     }
 
     /**
@@ -406,7 +406,7 @@ class IFaceHelper
         } while (!$zoneName && $current);
 
         // Public zone by default
-        return $zoneName ?: UrlElementZone::PUBLIC_ZONE;
+        return $zoneName ?: ZoneInterface::PUBLIC;
     }
 
     /**

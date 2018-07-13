@@ -1,15 +1,12 @@
 <?php
+declare(strict_types=1);
+
 namespace BetaKiller\Model;
 
-use ORM;
+use BetaKiller\Url\ZoneInterface;
 
-class UrlElementZone extends ORM
+class UrlElementZone extends \ORM implements ZoneInterface
 {
-    public const PUBLIC_ZONE   = 'public';
-    public const ADMIN_ZONE    = 'admin';
-    public const PERSONAL_ZONE = 'personal';
-    public const PREVIEW_ZONE  = 'preview';
-
     protected function configure(): void
     {
         $this->_table_name = 'url_element_zones';
@@ -18,11 +15,10 @@ class UrlElementZone extends ORM
     }
 
     /**
-     * @return string|null
-     * @throws \Kohana_Exception
+     * @return string
      */
     public function getName(): string
     {
-        return (string)$this->get('name');
+        return (string)$this->name;
     }
 }

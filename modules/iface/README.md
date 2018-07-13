@@ -54,8 +54,8 @@ Example:
 
 Now you'll be able to generate URL for editing `Post` entity right from it's instance!
 
-- public URL via `IFaceHelper::getReadEntityUrl($entity, UrlElementZoneInterface::PUBLIC_ZONE)`
-- admin editing URL via `IFaceHelper::getReadEntityUrl($entity, UrlElementZoneInterface::ADMIN_ZONE)`
+- public URL via `IFaceHelper::getReadEntityUrl($entity, ZoneInterface::PUBLIC)`
+- admin editing URL via `IFaceHelper::getReadEntityUrl($entity, ZoneInterface::ADMIN)`
 
 You may omit zone constant if you are creating a URL for current iface's zone. For different zone you need to pass it anyway.
 

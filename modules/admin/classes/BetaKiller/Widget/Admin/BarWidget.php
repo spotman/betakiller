@@ -9,8 +9,8 @@ use BetaKiller\IFace\CrudlsActionsInterface;
 use BetaKiller\IFace\Exception\IFaceException;
 use BetaKiller\IFace\IFaceInterface;
 use BetaKiller\Model\DispatchableEntityInterface;
-use BetaKiller\Model\UrlElementZone;
 use BetaKiller\Url\UrlElementTreeInterface;
+use BetaKiller\Url\ZoneInterface;
 use BetaKiller\Widget\AbstractAdminWidget;
 
 class BarWidget extends AbstractAdminWidget
@@ -105,7 +105,7 @@ class BarWidget extends AbstractAdminWidget
     {
         $items       = [];
         $urlElements = $this->tree->getByActionAndZone(CrudlsActionsInterface::ACTION_CREATE,
-            UrlElementZone::ADMIN_ZONE);
+            ZoneInterface::ADMIN);
 
         foreach ($urlElements as $urlElement) {
             if (!$this->aclHelper->isUrlElementAllowed($urlElement)) {
@@ -180,7 +180,7 @@ class BarWidget extends AbstractAdminWidget
      */
     private function getAdminEditButtonUrl(?DispatchableEntityInterface $entity): ?string
     {
-        return $this->getPrimaryEntityActionUrl($entity, UrlElementZone::ADMIN_ZONE,
+        return $this->getPrimaryEntityActionUrl($entity, ZoneInterface::ADMIN,
             CrudlsActionsInterface::ACTION_READ);
     }
 
@@ -192,7 +192,7 @@ class BarWidget extends AbstractAdminWidget
      */
     private function getPublicReadButtonUrl(?DispatchableEntityInterface $entity): ?string
     {
-        return $this->getPrimaryEntityActionUrl($entity, UrlElementZone::PUBLIC_ZONE,
+        return $this->getPrimaryEntityActionUrl($entity, ZoneInterface::PUBLIC,
             CrudlsActionsInterface::ACTION_READ);
     }
 
@@ -204,7 +204,7 @@ class BarWidget extends AbstractAdminWidget
      */
     private function getPreviewButtonUrl(?DispatchableEntityInterface $entity): ?string
     {
-        return $this->getPrimaryEntityActionUrl($entity, UrlElementZone::PREVIEW_ZONE,
+        return $this->getPrimaryEntityActionUrl($entity, ZoneInterface::PREVIEW,
             CrudlsActionsInterface::ACTION_READ);
     }
 
