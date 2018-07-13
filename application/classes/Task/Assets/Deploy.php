@@ -1,6 +1,5 @@
 <?php
 
-
 use BetaKiller\Task\AbstractTask;
 use BetaKiller\Task\TaskException;
 
@@ -65,15 +64,17 @@ class Task_Assets_Deploy extends AbstractTask
                 throw new \RuntimeException(sprintf('Directory "%s" was not created', $targetBaseDir));
             }
 
-            $this->logger->debug('Copying to :to', [':to' => $target]);
-
-//            $deployed = copy($file, $target);
             $deployed = symlink($original, $target);
+
+            $this->logger->debug('Symlink created from :from to :to', [
+                ':from' => $original,
+                ':to'   => $target,
+            ]);
 
             if (!$deployed) {
                 throw new TaskException('Can not deploy file :original to :target', [
                     ':original' => $original,
-                    ':target' => $target,
+                    ':target'   => $target,
                 ]);
             }
         }
