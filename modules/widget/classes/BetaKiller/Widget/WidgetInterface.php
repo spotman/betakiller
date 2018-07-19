@@ -36,6 +36,8 @@ interface WidgetInterface
     public function getAclRoles(): array;
 
     /**
+     * Returns true if current widget may be omitted during the render process
+     *
      * @return bool
      */
     public function isEmptyResponseAllowed(): bool;

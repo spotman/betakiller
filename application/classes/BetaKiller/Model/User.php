@@ -141,7 +141,7 @@ class User extends \Model_Auth_User implements UserInterface
         return $this->allUserRolesNames;
     }
 
-    private function fetchAllUserRolesNames(): array
+    protected function fetchAllUserRolesNames(): array
     {
         $rolesNames = [];
 

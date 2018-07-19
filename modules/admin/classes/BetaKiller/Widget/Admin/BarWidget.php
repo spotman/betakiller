@@ -2,7 +2,7 @@
 namespace BetaKiller\Widget\Admin;
 
 use BetaKiller\Helper\AclHelper;
-use BetaKiller\Helper\ContentHelper;
+//use BetaKiller\Helper\ContentHelper;
 use BetaKiller\Helper\IFaceHelper;
 use BetaKiller\Helper\UrlContainerHelper;
 use BetaKiller\IFace\CrudlsActionsInterface;
@@ -30,10 +30,10 @@ class BarWidget extends AbstractAdminWidget
      */
     private $tree;
 
-    /**
-     * @var \BetaKiller\Helper\ContentHelper
-     */
-    private $contentHelper;
+//    /**
+//     * @var \BetaKiller\Helper\ContentHelper
+//     */
+//    private $contentHelper;
 
     /**
      * @var \BetaKiller\Helper\IFaceHelper
@@ -49,8 +49,8 @@ class BarWidget extends AbstractAdminWidget
         UrlElementTreeInterface $tree,
         IFaceHelper $ifaceHelper,
         AclHelper $aclHelper,
-        UrlContainerHelper $urlParamHelper,
-        ContentHelper $contentHelper
+        UrlContainerHelper $urlParamHelper
+//        ContentHelper $contentHelper
     ) {
         parent::__construct();
 
@@ -58,7 +58,7 @@ class BarWidget extends AbstractAdminWidget
         $this->aclHelper      = $aclHelper;
         $this->ifaceHelper    = $ifaceHelper;
         $this->urlParamHelper = $urlParamHelper;
-        $this->contentHelper  = $contentHelper;
+//        $this->contentHelper  = $contentHelper;
     }
 
     /**
@@ -72,21 +72,13 @@ class BarWidget extends AbstractAdminWidget
      */
     public function getData(): array
     {
-        $currentUrlElement = $this->ifaceHelper->getCurrentUrlElement();
-        $primaryEntity     = $currentUrlElement ? $this->ifaceHelper->detectPrimaryEntity($currentUrlElement) : null;
-
-        $data = [
+        return [
             'enabled'           => true,
-            'comments'          => $this->getCommentsData(),
+//            'comments'          => $this->getCommentsData(),
+            'comments'          => null,
             'createButtonItems' => $this->getCreateButtonItems(),
-            'primaryEntity'     => [
-                'previewUrl' => $this->getPreviewButtonUrl($primaryEntity),
-                'publicUrl'  => $this->getPublicReadButtonUrl($primaryEntity),
-                'adminUrl'   => $this->getAdminEditButtonUrl($primaryEntity),
-            ],
+            'primaryEntity'     => $this->getPrimaryEntityData(),
         ];
-
-        return $data;
     }
 
     public function isEmptyResponseAllowed(): bool
@@ -95,13 +87,25 @@ class BarWidget extends AbstractAdminWidget
         return true;
     }
 
+    protected function getPrimaryEntityData(): array
+    {
+        $currentUrlElement = $this->ifaceHelper->getCurrentUrlElement();
+        $primaryEntity     = $currentUrlElement ? $this->ifaceHelper->detectPrimaryEntity($currentUrlElement) : null;
+
+        return [
+            'previewUrl' => $this->getPreviewButtonUrl($primaryEntity),
+            'publicUrl'  => $this->getPublicReadButtonUrl($primaryEntity),
+            'adminUrl'   => $this->getAdminEditButtonUrl($primaryEntity),
+        ];
+    }
+
     /**
      * @return array
      * @throws \BetaKiller\Url\UrlPrototypeException
      * @throws \BetaKiller\IFace\Exception\IFaceException
      * @throws \Spotman\Acl\Exception
      */
-    private function getCreateButtonItems(): array
+    protected function getCreateButtonItems(): array
     {
         $items       = [];
         $urlElements = $this->tree->getByActionAndZone(CrudlsActionsInterface::ACTION_CREATE,
@@ -127,28 +131,28 @@ class BarWidget extends AbstractAdminWidget
      * @throws \BetaKiller\IFace\Exception\IFaceException
      * @throws \Spotman\Acl\Exception
      */
-    private function getCommentsData(): ?array
-    {
-        $pendingStatus = $this->contentHelper->getCommentStatusRepository()->getPendingStatus();
-        $pendingCount  = $this->contentHelper->getCommentRepository()->getCommentsCount($pendingStatus);
-
-        $iface = $pendingCount
-            ? $this->getCommentsListByStatusIface()
-            : $this->getCommentsRootIface();
-
-        $params = $this->urlParamHelper
-            ->createSimple()
-            ->setParameter($pendingStatus);
-
-        $url = $this->aclHelper->isIFaceAllowed($iface, $params)
-            ? $this->ifaceHelper->makeIFaceUrl($iface, $params)
-            : null;
-
-        return [
-            'url'   => $url,
-            'count' => $pendingCount,
-        ];
-    }
+//    private function getCommentsData(): ?array
+//    {
+//        $pendingStatus = $this->contentHelper->getCommentStatusRepository()->getPendingStatus();
+//        $pendingCount  = $this->contentHelper->getCommentRepository()->getCommentsCount($pendingStatus);
+//
+//        $iface = $pendingCount
+//            ? $this->getCommentsListByStatusIface()
+//            : $this->getCommentsRootIface();
+//
+//        $params = $this->urlParamHelper
+//            ->createSimple()
+//            ->setParameter($pendingStatus);
+//
+//        $url = $this->aclHelper->isIFaceAllowed($iface, $params)
+//            ? $this->ifaceHelper->makeIFaceUrl($iface, $params)
+//            : null;
+//
+//        return [
+//            'url'   => $url,
+//            'count' => $pendingCount,
+//        ];
+//    }
 
     /**
      * @uses \BetaKiller\IFace\Admin\Content\CommentListByStatus

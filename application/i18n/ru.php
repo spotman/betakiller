@@ -4,9 +4,7 @@
  * Automatically generated from previous translation file.
  */
 return [
-    ':error'                                                    => ':error',
     'Nothing found...'                                          => 'По запрашиваемому адресу ничего не удалось найти...',
-    'The requested view :file could not be found'               => 'Запрашиваемый view-файл :file не найден',
     'Default value:'                                            => 'Значение по умолчанию:',
     'Can not find widget :class'                                => 'Can not find widget :class',
     'Empty layer for :codename IFace'                           => 'Empty layer for :codename IFace',
@@ -18,7 +16,6 @@ return [
     'No IFace found by codename :codename'                      => 'No IFace found by codename :codename',
     'Empty token.'                                              => 'Empty token.',
     'Authorization required!'                                   => 'Для продолжения вам нужно войти!',
-    ':error [ :query ]'                                         => ':error [ :query ]',
     'Not found'                                                 => 'Not found',
     'Kohana'                                                    => 'Kohana',
     'Benchmark'                                                 => 'Benchmark',
@@ -37,10 +34,6 @@ return [
     'Environment'                                               => 'Environment',
     'Included files'                                            => 'Included files',
     'Loaded extensions'                                         => 'Загруженные расширения',
-    'error.auth.user_not_exists'                                => 'Неверный логин или пароль',
-    'error.auth.inactive'                                       => 'Ваш аккаунт отключён, обратитесь к администратору',
-    'error.auth.incorrect_password'                             => 'Неверный логин или пароль',
-    'error.auth.common'                                         => 'Ошибка авторизации, обратитесь к администратору',
     'Sign in'                                                   => 'Вход',
     'Your username or email'                                    => 'Ваш е-мэйл или имя пользователя',
     'Your password'                                             => 'Ваш пароль',

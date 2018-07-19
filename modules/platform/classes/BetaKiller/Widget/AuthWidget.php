@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace BetaKiller\Widget;
 
 use BetaKiller\Config\ConfigProviderInterface;
@@ -10,9 +12,20 @@ class AuthWidget extends AbstractPublicWidget
 
     /**
      * @var ConfigProviderInterface
-     * @Inject
      */
     private $config;
+
+    /**
+     * AuthWidget constructor.
+     *
+     * @param \BetaKiller\Config\ConfigProviderInterface $config
+     */
+    public function __construct(ConfigProviderInterface $config)
+    {
+        $this->config = $config;
+
+        parent::__construct();
+    }
 
     /**
      * Returns data for View rendering
@@ -31,5 +44,16 @@ class AuthWidget extends AbstractPublicWidget
         return [
             'providers' => $providers,
         ];
+    }
+
+    /**
+     * Returns true if current widget may be omitted during the render process
+     *
+     * @return bool
+     */
+    public function isEmptyResponseAllowed(): bool
+    {
+        // Always visible
+        return false;
     }
 }

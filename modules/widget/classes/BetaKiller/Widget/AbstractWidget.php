@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace BetaKiller\Widget;
 
 use BetaKiller\Utils\Kohana\ControllerHelperTrait;
@@ -28,13 +30,13 @@ abstract class AbstractWidget implements WidgetInterface
      * @var \Request
      * @deprecated Inject PSR request in every action
      */
-    protected $request;
+    private $request;
 
     /**
      * @var \Response
      * @deprecated Inject PSR response prototype in every action
      */
-    protected $response;
+    private $response;
 
     /**
      * Widget constructor.
