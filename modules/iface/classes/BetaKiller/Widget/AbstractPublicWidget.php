@@ -21,6 +21,11 @@ abstract class AbstractPublicWidget extends AbstractWidget
         ];
     }
 
+    /**
+     * Returns true if current widget may be omitted during the render process
+     *
+     * @return bool
+     */
     public function isEmptyResponseAllowed(): bool
     {
         // Public widgets may have empty body

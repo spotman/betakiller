@@ -19,6 +19,11 @@ abstract class AbstractAdminWidget extends AbstractWidget
         ];
     }
 
+    /**
+     * Returns true if current widget may be omitted during the render process
+     *
+     * @return bool
+     */
     public function isEmptyResponseAllowed(): bool
     {
         // Admin widgets must have body

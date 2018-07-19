@@ -21,4 +21,11 @@ class GuestUser extends User
     {
         return 'Guest';
     }
+
+    protected function fetchAllUserRolesNames(): array
+    {
+        return [
+            RoleInterface::GUEST_ROLE_NAME
+        ];
+    }
 }
