@@ -87,7 +87,9 @@ class UserService extends AbstractService
         $host  = parse_url($this->appConfig->getBaseUrl(), PHP_URL_HOST);
         $email = $cliUserName.'@'.$host;
 
-        if ($user = $this->userRepository->searchBy($cliUserName)) {
+        $user = $this->userRepository->searchBy($cliUserName);
+
+        if ($user) {
             return null;
         }
 
@@ -96,10 +98,8 @@ class UserService extends AbstractService
         // No notification for cron user
         $user->disableEmailNotification();
 
-        // Allowing everything (admin may remove some roles later if needed)
-        $roles = $this->roleRepository->getAll();
-
-        foreach ($roles as $role) {
+        // Allow everything (admin may remove some roles later if needed)
+        foreach ($this->roleRepository->getAll() as $role) {
             $user->addRole($role);
         }
 
