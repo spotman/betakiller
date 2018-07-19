@@ -97,7 +97,7 @@ class User extends \Model_Auth_User implements UserInterface
      */
     public function hasRole(RoleInterface $role): bool
     {
-        return $this->has('roles', $role);
+        return $this->hasRoleName($role->getName());
     }
 
     /**
