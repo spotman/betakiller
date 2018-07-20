@@ -6,7 +6,7 @@ use BetaKiller\Auth\InactiveException;
 
 class User extends \Model_Auth_User implements UserInterface
 {
-    private $allUserRolesNames = [];
+    protected $allUserRolesNames = [];
 
     protected function configure(): void
     {
@@ -383,7 +383,7 @@ class User extends \Model_Auth_User implements UserInterface
     protected function getSerializableProperties()
     {
         return array_merge(parent::getSerializableProperties(), [
-            'allUserRolesIDs',
+            'allUserRolesNames',
         ]);
     }
 }
