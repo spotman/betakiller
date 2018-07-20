@@ -82,32 +82,33 @@ class Controller_IFace extends Controller
      */
     public function action_render(): void
     {
-        $uri        = $this->getRequestUri();
+        $url        = $this->getRequestUrl();
         $queryParts = $this->getRequestQueryParts();
+        $path       = parse_url($url, PHP_URL_PATH);
 
         $this->urlContainer->setQueryParts($queryParts);
 
         // Getting current URL element
-        $urlElement = $this->urlDispatcher->process($uri, $this->request->client_ip(), $this->request->referrer());
+        $urlElement = $this->urlDispatcher->process($url, $this->request->client_ip(), $this->request->referrer());
 
         if ($urlElement instanceof WebHookModelInterface) {
             $this->processWebHook($urlElement);
         } elseif ($urlElement instanceof IFaceModelInterface) {
             // If this is default IFace and client requested non-slash uri, redirect client to /
-            if ($uri !== '/' && $urlElement->isDefault() && !$urlElement->hasDynamicUrl()) {
+            if ($path !== '/' && $urlElement->isDefault() && !$urlElement->hasDynamicUrl()) {
                 throw new FoundHttpException('/');
             }
 
-            if ($uri && $uri !== '/') {
-                $hasTrailingSlash       = (substr($uri, -1) === '/');
+            if ($path !== '/') {
+                $hasTrailingSlash       = (substr($path, -1) === '/');
                 $isTrailingSlashEnabled = $this->appConfig->isTrailingSlashEnabled();
 
                 if ($hasTrailingSlash && !$isTrailingSlashEnabled) {
-                    throw new PermanentRedirectHttpException(rtrim($uri, '/'));
+                    throw new PermanentRedirectHttpException(rtrim($path, '/'));
                 }
 
                 if (!$hasTrailingSlash && $isTrailingSlashEnabled) {
-                    throw new PermanentRedirectHttpException($uri.'/');
+                    throw new PermanentRedirectHttpException($path.'/');
                 }
             }
 
@@ -198,7 +199,7 @@ class Controller_IFace extends Controller
     /**
      * @return string
      */
-    private function getRequestUri(): string
+    private function getRequestUrl(): string
     {
         return $this->request->url();
     }
