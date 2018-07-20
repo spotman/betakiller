@@ -1478,7 +1478,9 @@ class Kohana_ORM extends Model implements Serializable {
 	 */
 	public function has($alias, $far_keys = NULL)
 	{
-		$count = $this->count_relations($alias, $far_keys);
+        $far_keys = ($far_keys instanceof ORM) ? [$far_keys->pk()] : $far_keys;
+
+        $count = $this->count_relations($alias, $far_keys);
 		if ($far_keys === NULL)
 		{
 			return (bool) $count;
@@ -1487,7 +1489,6 @@ class Kohana_ORM extends Model implements Serializable {
 		{
 			return $count === count($far_keys);
 		}
-
 	}
 
 	/**
