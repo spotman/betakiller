@@ -30,6 +30,11 @@ abstract class AbstractXmlConfigModel implements UrlElementInterface
     /**
      * @var bool
      */
+    private $isDefault = false;
+
+    /**
+     * @var bool
+     */
     private $hasDynamicUrl = false;
 
     /**
@@ -73,8 +78,7 @@ abstract class AbstractXmlConfigModel implements UrlElementInterface
      */
     public function isDefault(): bool
     {
-        // Admin IFaces can not have "is_default" marker
-        return false;
+        return $this->isDefault;
     }
 
     /**
@@ -83,25 +87,16 @@ abstract class AbstractXmlConfigModel implements UrlElementInterface
      */
     public function getID(): string
     {
-        throw new NotImplementedHttpException('Admin URL element model have no ID');
+        throw new NotImplementedHttpException('XML config-based URL element model have no ID');
     }
 
     /**
      * @return bool
-     * @throws \BetaKiller\Exception\NotImplementedHttpException
      */
     public function hasID(): bool
     {
-        throw new NotImplementedHttpException('Admin URL element model have no ID');
-    }
-
-    /**
-     * @return string
-     * @throws \BetaKiller\Exception\NotImplementedHttpException
-     */
-    public function getModelName(): string
-    {
-        throw new NotImplementedHttpException('Admin URL element model have no model name');
+        // Models from XML config can not obtain ID
+        return false;
     }
 
     /**
@@ -176,6 +171,7 @@ abstract class AbstractXmlConfigModel implements UrlElementInterface
             'uri'            => $this->getUri(),
             'label'          => $this->getLabel(),
             'parentCodename' => $this->getParentCodename(),
+            'isDefault'      => $this->isDefault(),
             'hasDynamicUrl'  => $this->hasDynamicUrl(),
             'hideInSiteMap'  => $this->hideInSiteMap(),
             'entity'         => $this->getEntityModelName(),
@@ -193,6 +189,10 @@ abstract class AbstractXmlConfigModel implements UrlElementInterface
 
         if (isset($data['parentCodename'])) {
             $this->parentCodename = (string)$data['parentCodename'];
+        }
+
+        if (isset($data['isDefault'])) {
+            $this->isDefault = true;
         }
 
         if (isset($data['hasDynamicUrl'])) {
