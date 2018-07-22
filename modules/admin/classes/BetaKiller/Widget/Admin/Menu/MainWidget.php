@@ -13,11 +13,11 @@ class MainWidget extends AbstractAdminWidget
      */
     private $urlParametersHelper;
 
-//    /**
-//     * @Inject
-//     * @var \BetaKiller\Repository\ContentCommentStatusRepository
-//     */
-//    private $commentStatusRepository;
+    /**
+     * @Inject
+     * @var \BetaKiller\Repository\ContentCommentStatusRepository
+     */
+    private $commentStatusRepository;
 
     /**
      * @Inject
