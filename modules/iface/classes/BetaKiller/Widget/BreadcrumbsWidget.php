@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\Widget;
 
+use BetaKiller\Model\RoleInterface;
 use BetaKiller\Url\UrlElementInterface;
 
 class BreadcrumbsWidget extends AbstractWidget
@@ -36,9 +37,7 @@ class BreadcrumbsWidget extends AbstractWidget
     {
         $data = [];
 
-        $iterator = $this->stack->getIterator();
-
-        foreach ($iterator as $model) {
+        foreach ($this->stack->getIterator() as $model) {
             $data[] = $this->makeBreadcrumbData($model);
         }
 
@@ -61,5 +60,29 @@ class BreadcrumbsWidget extends AbstractWidget
             'label'  => $this->ifaceHelper->getLabel($urlElement),
             'active' => $this->stack->isCurrent($urlElement),
         ];
+    }
+
+    /**
+     * Returns array of roles` codenames which are allowed to use this widget
+     *
+     * @return string[]
+     */
+    public function getAclRoles(): array
+    {
+        return [
+            // Allow to guests and any logged in users
+            RoleInterface::GUEST_ROLE_NAME,
+            RoleInterface::LOGIN_ROLE_NAME,
+        ];
+    }
+
+    /**
+     * Returns true if current widget may be omitted during the render process
+     *
+     * @return bool
+     */
+    public function isEmptyResponseAllowed(): bool
+    {
+        return true;
     }
 }
