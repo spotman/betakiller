@@ -9,24 +9,24 @@ Based on the legacy [Kohana](http://kohanaframework.org/) framework (migration t
 
 Under the hood:
 
-- [Twig](https://twig.symfony.com/) as a template engine ([core extension](application/classes/BetaKiller/Twig/Extension.php))
+- [Twig](https://twig.symfony.com/) as a template engine ([core extension](application/classes/BetaKiller/TwigExtension.php))
 - [PHP-DI](http://php-di.org/) as DI container (with autowiring enabled, [core config](application/config/php-di.php))
 - [DDD](modules/ddd) used for core development (Entities, Repositories, Factories, etc)
 - Unique [IFace module](modules/iface) for easier organizing server-side part of UI
-- [Custom ACL subsystem](https://github.com/spotman/rbac) with dedicated resource classes (Zend ACL on steroids)
+- [Custom RBAC/ACL subsystem](https://github.com/spotman/rbac) with dedicated resource classes (Zend ACL on steroids)
 - Simple [Message bus](modules/message-bus) for inter-modular communication
 - [JSON-RPC API](https://github.com/spotman/kohana-simple-api) with "Collection.Method" hierarchy and automatic ACL binding
 - [Migrations](https://github.com/spotman/kohana-minion-migrations) with CLI helper and ability to create migrations for module, core or application
 - [Custom error management](modules/error) with logging to local SQLite3 DB
 - [Notifications subsystem](modules/notification) with multiple providers for simpler communication with users
 - Multiple sites on a single core via [MultiSite module](https://github.com/spotman/kohana-multi-site)
-- [Kohana ORM](modules/orm) as current DBAL/ORM (migration to [Propel3](https://github.com/propelorm/Propel3) planned)
+- [Kohana ORM](modules/orm) as current DBAL/ORM (migration to DataMapper is in progress)
 - [Deployer](https://deployer.org/) as default deploying tool
-- [Monolog](https://github.com/Seldaek/monolog) as default logger (with ChromePHP for online debugging)
+- [Monolog](https://github.com/Seldaek/monolog) as default logger (with Php Console for online debugging)
 - [Minion](modules/minion) as CLI task subsystem (symfony/console migration planned)
 - [HTML meta-tags](https://github.com/spotman/kohana-meta-tags), [robots.txt](https://github.com/spotman/kohana-robots.txt) and [sitemap.xml](modules/sitemap) processors
 - [Multiple useful helpers](https://github.com/spotman/kohana-utils) for Kohana-based projects
-- Multiple helpers like AppConfig and AppEnv
+- Multiple helpers like [AppConfig](modules/core/classes/BetaKiller/Config/AppConfigInterface.php) and [AppEnv](application/classes/BetaKiller/Helper/AppEnv.php)
 - A lot of improvements are on the go
 
 Released under a [BSD license](LICENSE.md), Betakiller can be used legally for any open source, commercial, or personal project.
