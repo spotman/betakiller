@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace BetaKiller\Url;
 
 use BetaKiller\Auth\AccessDeniedException;
@@ -10,10 +12,13 @@ use BetaKiller\Helper\AclHelper;
 use BetaKiller\Helper\LoggerHelperTrait;
 use BetaKiller\Helper\UrlHelper;
 use BetaKiller\IFace\Exception\IFaceException;
-use BetaKiller\IFace\Exception\MissingUrlElementException;
 use BetaKiller\MessageBus\EventBus;
 use BetaKiller\Model\DispatchableEntityInterface;
+use BetaKiller\Url\Behaviour\UrlBehaviourException;
 use BetaKiller\Url\Behaviour\UrlBehaviourFactory;
+use BetaKiller\Url\Container\UrlContainer;
+use BetaKiller\Url\Container\UrlContainerInterface;
+use BetaKiller\Url\Parameter\UrlParameterInterface;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use Psr\SimpleCache\CacheInterface;
@@ -39,7 +44,7 @@ class UrlDispatcher implements LoggerAwareInterface
     /**
      * Current Url parameters
      *
-     * @var \BetaKiller\Url\UrlContainerInterface
+     * @var \BetaKiller\Url\Container\UrlContainerInterface
      */
     private $urlParameters;
 
@@ -80,14 +85,14 @@ class UrlDispatcher implements LoggerAwareInterface
     private $tree;
 
     /**
-     * @param \BetaKiller\Url\UrlElementStack               $stack
-     * @param \BetaKiller\Url\UrlElementTreeInterface       $tree
-     * @param \BetaKiller\Url\Behaviour\UrlBehaviourFactory $behaviourFactory
-     * @param \BetaKiller\Url\UrlContainerInterface         $parameters
-     * @param \Psr\SimpleCache\CacheInterface               $cache
-     * @param \BetaKiller\MessageBus\EventBus               $eventBus
-     * @param \BetaKiller\Helper\UrlHelper                  $urlHelper
-     * @param \BetaKiller\Helper\AclHelper                  $aclHelper
+     * @param \BetaKiller\Url\UrlElementStack                 $stack
+     * @param \BetaKiller\Url\UrlElementTreeInterface         $tree
+     * @param \BetaKiller\Url\Behaviour\UrlBehaviourFactory   $behaviourFactory
+     * @param \BetaKiller\Url\Container\UrlContainerInterface $parameters
+     * @param \Psr\SimpleCache\CacheInterface                 $cache
+     * @param \BetaKiller\MessageBus\EventBus                 $eventBus
+     * @param \BetaKiller\Helper\UrlHelper                    $urlHelper
+     * @param \BetaKiller\Helper\AclHelper                    $aclHelper
      */
     public function __construct(
         UrlElementStack $stack,
@@ -208,18 +213,18 @@ class UrlDispatcher implements LoggerAwareInterface
      * Performs parsing of requested url
      * Returns IFace
      *
-     * @param string                                $uri
+     * @param string                                          $uri
      *
-     * @param \BetaKiller\Url\UrlElementStack       $stack
-     * @param \BetaKiller\Url\UrlContainerInterface $urlParams
+     * @param \BetaKiller\Url\UrlElementStack                 $stack
+     * @param \BetaKiller\Url\Container\UrlContainerInterface $urlParams
      *
      * @return void
      * @throws \BetaKiller\Auth\AccessDeniedException
      * @throws \BetaKiller\Auth\AuthorizationRequiredException
      * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\IFace\Exception\IFaceException
-     * @throws \BetaKiller\IFace\Exception\MissingUrlElementException
-     * @throws \BetaKiller\Url\UrlBehaviourException
+     * @throws \BetaKiller\Url\MissingUrlElementException
+     * @throws \BetaKiller\Url\Behaviour\UrlBehaviourException
      * @throws \Spotman\Acl\Exception
      */
     private function parseUriPath(string $uri, UrlElementStack $stack, UrlContainerInterface $urlParams): void
@@ -275,15 +280,15 @@ class UrlDispatcher implements LoggerAwareInterface
     }
 
     /**
-     * @param \BetaKiller\Url\UrlPathIterator          $it
-     * @param \BetaKiller\Url\UrlContainerInterface    $urlParameters
-     * @param \BetaKiller\Url\UrlElementInterface|null $parentModel
+     * @param \BetaKiller\Url\UrlPathIterator                 $it
+     * @param \BetaKiller\Url\Container\UrlContainerInterface $urlParameters
+     * @param \BetaKiller\Url\UrlElementInterface|null        $parentModel
      *
      * @return \BetaKiller\Url\IFaceModelInterface|null
      * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\IFace\Exception\IFaceException
-     * @throws \BetaKiller\IFace\Exception\MissingUrlElementException
-     * @throws \BetaKiller\Url\UrlBehaviourException
+     * @throws \BetaKiller\Url\MissingUrlElementException
+     * @throws \BetaKiller\Url\Behaviour\UrlBehaviourException
      */
     private function detectUrlElement(
         UrlPathIterator $it,
@@ -364,14 +369,14 @@ class UrlDispatcher implements LoggerAwareInterface
     }
 
     /**
-     * @param \BetaKiller\Url\UrlElementInterface[] $models
-     * @param UrlPathIterator                       $it
+     * @param \BetaKiller\Url\UrlElementInterface[]           $models
+     * @param UrlPathIterator                                 $it
      *
-     * @param \BetaKiller\Url\UrlContainerInterface $urlParameters
+     * @param \BetaKiller\Url\Container\UrlContainerInterface $urlParameters
      *
      * @return \BetaKiller\Url\UrlElementInterface|null
      * @throws \BetaKiller\Factory\FactoryException
-     * @throws \BetaKiller\Url\UrlBehaviourException
+     * @throws \BetaKiller\Url\Behaviour\UrlBehaviourException
      */
     private function selectUrlElementModel(
         array $models,
@@ -392,14 +397,14 @@ class UrlDispatcher implements LoggerAwareInterface
     }
 
     /**
-     * @param \BetaKiller\Url\UrlElementInterface   $model
-     * @param \BetaKiller\Url\UrlPathIterator       $it
+     * @param \BetaKiller\Url\UrlElementInterface             $model
+     * @param \BetaKiller\Url\UrlPathIterator                 $it
      *
-     * @param \BetaKiller\Url\UrlContainerInterface $urlParameters
+     * @param \BetaKiller\Url\Container\UrlContainerInterface $urlParameters
      *
      * @return bool
      * @throws \BetaKiller\Factory\FactoryException
-     * @throws \BetaKiller\Url\UrlBehaviourException
+     * @throws \BetaKiller\Url\Behaviour\UrlBehaviourException
      */
     private function processUrlBehaviour(
         UrlElementInterface $model,
@@ -412,9 +417,9 @@ class UrlDispatcher implements LoggerAwareInterface
     }
 
     /**
-     * @param \BetaKiller\Url\UrlElementInterface   $urlElement
-     * @param \BetaKiller\Url\UrlElementStack       $stack
-     * @param \BetaKiller\Url\UrlContainerInterface $urlParameters
+     * @param \BetaKiller\Url\UrlElementInterface             $urlElement
+     * @param \BetaKiller\Url\UrlElementStack                 $stack
+     * @param \BetaKiller\Url\Container\UrlContainerInterface $urlParameters
      *
      * @throws \BetaKiller\Auth\AccessDeniedException
      * @throws \BetaKiller\Auth\AuthorizationRequiredException
@@ -431,9 +436,9 @@ class UrlDispatcher implements LoggerAwareInterface
     }
 
     /**
-     * @param \BetaKiller\Url\UrlElementInterface   $urlElement
+     * @param \BetaKiller\Url\UrlElementInterface             $urlElement
      *
-     * @param \BetaKiller\Url\UrlContainerInterface $urlParameters
+     * @param \BetaKiller\Url\Container\UrlContainerInterface $urlParameters
      *
      * @throws \BetaKiller\Auth\AccessDeniedException
      * @throws \BetaKiller\Auth\AuthorizationRequiredException
@@ -487,16 +492,16 @@ class UrlDispatcher implements LoggerAwareInterface
     {
         $serializedData = $this->cache->get($cacheKey);
 
+        if (!$serializedData) {
+            return false;
+        }
+
         $data = unserialize($serializedData, [
             UrlElementInterface::class,
             DispatchableEntityInterface::class,
         ]);
 
-        if (!$data) {
-            return false;
-        }
-
-        if (!\is_array($data)) {
+        if (!$data || !\is_array($data)) {
             // Log and keep processing as no cache was found
             $this->logger->warning('Cached UrlDispatcher data is incorrect', ['cachedData' => print_r($data, true)]);
 
@@ -506,7 +511,7 @@ class UrlDispatcher implements LoggerAwareInterface
         /** @var array $stackData */
         $stackData = $data['stack'];
 
-        /** @var \BetaKiller\Url\UrlParameterInterface[] $paramsData */
+        /** @var \BetaKiller\Url\Parameter\UrlParameterInterface[] $paramsData */
         $paramsData = $data['parameters'];
 
         try {

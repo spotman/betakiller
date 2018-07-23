@@ -1,9 +1,9 @@
 <?php
 declare(strict_types=1);
 
-namespace BetaKiller\IFace\Exception;
+namespace BetaKiller\Url;
 
-use BetaKiller\Url\UrlElementInterface;
+use BetaKiller\IFace\Exception\IFaceException;
 
 class MissingUrlElementException extends IFaceException
 {

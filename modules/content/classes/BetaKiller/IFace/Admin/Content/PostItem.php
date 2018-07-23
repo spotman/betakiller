@@ -1,11 +1,11 @@
 <?php
 namespace BetaKiller\IFace\Admin\Content;
 
+use BetaKiller\CrudlsActionsInterface;
 use BetaKiller\Exception\NotFoundHttpException;
 use BetaKiller\Helper\AclHelper;
 use BetaKiller\Helper\AssetsHelper;
 use BetaKiller\Helper\ContentUrlContainerHelper;
-use BetaKiller\IFace\CrudlsActionsInterface;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Repository\EntityRepository;
 use BetaKiller\Repository\ShortcodeRepository;
@@ -60,8 +60,6 @@ class PostItem extends AbstractAdminBase
         ShortcodeRepository $shortcodeRepo,
         EntityRepository $entityRepo
     ) {
-        parent::__construct();
-
         $this->urlParametersHelper = $urlParametersHelper;
         $this->user                = $user;
         $this->aclHelper           = $aclHelper;

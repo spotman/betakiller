@@ -2,10 +2,16 @@
 namespace BetaKiller\IFace\Admin\Content;
 
 use BetaKiller\Helper\ContentUrlContainerHelper;
+use BetaKiller\Helper\IFaceHelper;
 use BetaKiller\Url\UrlDispatcherException;
 
 class PostItemRevisionList extends AbstractAdminBase
 {
+    /**
+     * @var \BetaKiller\Helper\IFaceHelper
+     */
+    private $ifaceHelper;
+
     /**
      * @var \BetaKiller\Helper\ContentUrlContainerHelper
      */
@@ -14,13 +20,13 @@ class PostItemRevisionList extends AbstractAdminBase
     /**
      * PostItemRevisionList constructor.
      *
+     * @param \BetaKiller\Helper\IFaceHelper               $ifaceHelper
      * @param \BetaKiller\Helper\ContentUrlContainerHelper $urlParametersHelper
      */
-    public function __construct(ContentUrlContainerHelper $urlParametersHelper)
+    public function __construct(IFaceHelper $ifaceHelper, ContentUrlContainerHelper $urlParametersHelper)
     {
-        parent::__construct();
-
         $this->urlParametersHelper = $urlParametersHelper;
+        $this->ifaceHelper         = $ifaceHelper;
     }
 
     /**
@@ -39,10 +45,9 @@ class PostItemRevisionList extends AbstractAdminBase
             throw new UrlDispatcherException('Missing ContentPost model');
         }
 
-        $data      = [];
-        $revisions = $post->getAllRevisions();
+        $data = [];
 
-        foreach ($revisions as $revision) {
+        foreach ($post->getAllRevisions() as $revision) {
             $data[] = [
                 'id'         => $revision->getID(),
                 'diff_url'   => $this->ifaceHelper->getReadEntityUrl($revision),

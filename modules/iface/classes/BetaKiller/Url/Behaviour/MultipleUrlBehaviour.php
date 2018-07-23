@@ -5,8 +5,7 @@ namespace BetaKiller\Url\Behaviour;
 
 use BetaKiller\Factory\FactoryException;
 use BetaKiller\Repository\RepositoryException;
-use BetaKiller\Url\UrlBehaviourException;
-use BetaKiller\Url\UrlContainerInterface;
+use BetaKiller\Url\Container\UrlContainerInterface;
 use BetaKiller\Url\UrlDispatcher;
 use BetaKiller\Url\UrlElementInterface;
 use BetaKiller\Url\UrlPathIterator;
@@ -28,13 +27,13 @@ class MultipleUrlBehaviour extends AbstractUrlBehaviour
     /**
      * Returns true if current behaviour was applied
      *
-     * @param \BetaKiller\Url\UrlElementInterface        $model
-     * @param \BetaKiller\Url\UrlPathIterator            $it
-     * @param \BetaKiller\Url\UrlContainerInterface|null $params
+     * @param \BetaKiller\Url\UrlElementInterface                  $model
+     * @param \BetaKiller\Url\UrlPathIterator                      $it
+     * @param \BetaKiller\Url\Container\UrlContainerInterface|null $params
      *
      * @return bool
      * @throws \BetaKiller\IFace\Exception\IFaceException
-     * @throws \BetaKiller\Url\UrlBehaviourException
+     * @throws \BetaKiller\Url\Behaviour\UrlBehaviourException
      * @throws \BetaKiller\Url\UrlPrototypeException
      */
     public function parseUri(
@@ -49,13 +48,13 @@ class MultipleUrlBehaviour extends AbstractUrlBehaviour
     }
 
     /**
-     * @param \BetaKiller\Url\UrlElementInterface   $ifaceModel
-     * @param \BetaKiller\Url\UrlPathIterator       $it
+     * @param \BetaKiller\Url\UrlElementInterface             $ifaceModel
+     * @param \BetaKiller\Url\UrlPathIterator                 $it
      *
-     * @param \BetaKiller\Url\UrlContainerInterface $urlContainer
+     * @param \BetaKiller\Url\Container\UrlContainerInterface $urlContainer
      *
      * @throws \BetaKiller\IFace\Exception\IFaceException
-     * @throws \BetaKiller\Url\UrlBehaviourException
+     * @throws \BetaKiller\Url\Behaviour\UrlBehaviourException
      * @throws \BetaKiller\Url\UrlPrototypeException
      */
     protected function parseUriParameterPart(
@@ -84,8 +83,8 @@ class MultipleUrlBehaviour extends AbstractUrlBehaviour
     }
 
     /**
-     * @param \BetaKiller\Url\UrlElementInterface   $urlElement
-     * @param \BetaKiller\Url\UrlContainerInterface $params
+     * @param \BetaKiller\Url\UrlElementInterface             $urlElement
+     * @param \BetaKiller\Url\Container\UrlContainerInterface $params
      *
      * @return string
      * @throws \BetaKiller\Url\UrlPrototypeException
@@ -98,8 +97,8 @@ class MultipleUrlBehaviour extends AbstractUrlBehaviour
     }
 
     /**
-     * @param \BetaKiller\Url\UrlElementInterface   $urlElement
-     * @param \BetaKiller\Url\UrlContainerInterface $params
+     * @param \BetaKiller\Url\UrlElementInterface             $urlElement
+     * @param \BetaKiller\Url\Container\UrlContainerInterface $params
      *
      * @return \Generator|\BetaKiller\Url\AvailableUri[]
      * @throws \BetaKiller\Factory\FactoryException

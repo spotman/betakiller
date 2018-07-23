@@ -16,7 +16,7 @@ class BreadcrumbsWidget extends AbstractWidget
 
     /**
      * @Inject
-     * @var \BetaKiller\Url\UrlContainerInterface
+     * @var \BetaKiller\Url\Container\UrlContainerInterface
      */
     private $urlContainer;
 

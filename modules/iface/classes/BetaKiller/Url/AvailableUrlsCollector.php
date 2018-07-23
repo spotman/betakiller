@@ -5,6 +5,8 @@ use BetaKiller\Helper\AclHelper;
 use BetaKiller\Helper\LoggerHelperTrait;
 use BetaKiller\IFace\Exception\IFaceException;
 use BetaKiller\Url\Behaviour\UrlBehaviourFactory;
+use BetaKiller\Url\Container\UrlContainer;
+use BetaKiller\Url\Container\UrlContainerInterface;
 
 class AvailableUrlsCollector
 {
@@ -68,9 +70,9 @@ class AvailableUrlsCollector
     }
 
     /**
-     * @param \BetaKiller\Url\UrlElementInterface[] $models
-     * @param \BetaKiller\Url\UrlContainerInterface $params
-     * @param bool|null                             $useHidden
+     * @param \BetaKiller\Url\UrlElementInterface[]           $models
+     * @param \BetaKiller\Url\Container\UrlContainerInterface $params
+     * @param bool|null                                       $useHidden
      *
      * @return \Generator|\BetaKiller\Url\AvailableUri[]
      * @throws \BetaKiller\Factory\FactoryException
@@ -94,9 +96,9 @@ class AvailableUrlsCollector
     }
 
     /**
-     * @param \BetaKiller\Url\UrlElementInterface   $urlElement
-     * @param \BetaKiller\Url\UrlContainerInterface $params
-     * @param bool|null                             $useHidden
+     * @param \BetaKiller\Url\UrlElementInterface             $urlElement
+     * @param \BetaKiller\Url\Container\UrlContainerInterface $params
+     * @param bool|null                                       $useHidden
      *
      * @return \Generator
      * @throws \BetaKiller\Factory\FactoryException
@@ -152,8 +154,8 @@ class AvailableUrlsCollector
     }
 
     /**
-     * @param \BetaKiller\Url\UrlElementInterface   $model
-     * @param \BetaKiller\Url\UrlContainerInterface $params
+     * @param \BetaKiller\Url\UrlElementInterface             $model
+     * @param \BetaKiller\Url\Container\UrlContainerInterface $params
      *
      * @return \Generator|\BetaKiller\Url\AvailableUri[]
      * @throws \BetaKiller\Factory\FactoryException

@@ -1,7 +1,7 @@
 <?php
 namespace BetaKiller\Model;
 
-use BetaKiller\Url\UrlParameterInterface;
+use BetaKiller\Url\Parameter\UrlParameterInterface;
 use BetaKiller\Url\UrlPrototypeException;
 
 abstract class AbstractConfigBasedDispatchableEntity implements ConfigBasedDispatchableEntityInterface

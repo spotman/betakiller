@@ -19,7 +19,7 @@ class Index extends AbstractAdminBase
      */
     public function __construct(ShortcodeRepository $repo)
     {
-        parent::__construct();
+//        parent::__construct();
 
         $this->repo = $repo;
     }

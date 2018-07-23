@@ -1,5 +1,5 @@
 <?php
-namespace BetaKiller\IFace\ModelProvider;
+namespace BetaKiller\Url\ModelProvider;
 
 use BetaKiller\IFace\Exception\IFaceException;
 use BetaKiller\Model\UrlElement;

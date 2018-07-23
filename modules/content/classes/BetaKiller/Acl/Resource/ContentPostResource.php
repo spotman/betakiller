@@ -1,6 +1,7 @@
 <?php
 namespace BetaKiller\Acl\Resource;
 
+use BetaKiller\Content\Content;
 use BetaKiller\Model\RoleInterface;
 
 class ContentPostResource extends AbstractStatusRelatedEntityAclResource
@@ -16,7 +17,7 @@ class ContentPostResource extends AbstractStatusRelatedEntityAclResource
             RoleInterface::ADMIN_ROLE_NAME,
             RoleInterface::MODERATOR_ROLE_NAME,
             RoleInterface::DEVELOPER_ROLE_NAME,
-            RoleInterface::WRITER_ROLE_NAME,
+            Content::WRITER_ROLE_NAME,
         ];
     }
 

@@ -1,15 +1,25 @@
 <?php
 namespace BetaKiller\Helper;
 
-use BetaKiller\Url\UrlContainerInterface;
+use BetaKiller\Url\Container\UrlContainerInterface;
+use BetaKiller\Url\UrlPrototypeService;
 
 class StringPatternHelper
 {
     /**
-     * @Inject
      * @var \BetaKiller\Url\UrlPrototypeService
      */
     private $prototypeHelper;
+
+    /**
+     * StringPatternHelper constructor.
+     *
+     * @param \BetaKiller\Url\UrlPrototypeService $prototypeHelper
+     */
+    public function __construct(UrlPrototypeService $prototypeHelper)
+    {
+        $this->prototypeHelper = $prototypeHelper;
+    }
 
     /**
      * Pattern consists of tags like [N[Text]] where N is tag priority

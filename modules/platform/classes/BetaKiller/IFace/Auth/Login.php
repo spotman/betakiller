@@ -50,8 +50,6 @@ class Login extends AbstractIFace
         ResponseHelper $respHelper,
         UrlContainerHelper $urlParamsHelper
     ) {
-        parent::__construct();
-
         $this->user                = $user;
         $this->requestHelper       = $reqHelper;
         $this->responseHelper      = $respHelper;

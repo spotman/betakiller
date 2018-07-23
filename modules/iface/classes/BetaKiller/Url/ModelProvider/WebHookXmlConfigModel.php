@@ -1,10 +1,14 @@
 <?php
-namespace BetaKiller\IFace\ModelProvider;
+namespace BetaKiller\Url\ModelProvider;
 
 use BetaKiller\Url\WebHookModelInterface;
 
 class WebHookXmlConfigModel extends AbstractXmlConfigModel implements WebHookModelInterface
 {
+    public const OPTION_SERVICE_NAME  = 'service';
+    public const OPTION_SERVICE_EVENT = 'event';
+    public const OPTION_DESCRIPTION   = 'description';
+
     /**
      * @var string
      */
@@ -51,6 +55,16 @@ class WebHookXmlConfigModel extends AbstractXmlConfigModel implements WebHookMod
     }
 
     /**
+     * Returns ID provided by external service
+     *
+     * @return string
+     */
+    public function getExternalEventID(): string
+    {
+        throw new \LogicException('XML-based UrlElement can not define external event ID');
+    }
+
+    /**
      * Returns array representation of the model data
      *
      * @return array
@@ -58,17 +72,17 @@ class WebHookXmlConfigModel extends AbstractXmlConfigModel implements WebHookMod
     public function asArray(): array
     {
         return array_merge(parent::asArray(), [
-            'service'     => $this->getServiceName(),
-            'event'       => $this->getServiceEventName(),
-            'description' => $this->getServiceEventDescription(),
+            self::OPTION_SERVICE_NAME  => $this->getServiceName(),
+            self::OPTION_SERVICE_EVENT => $this->getServiceEventName(),
+            self::OPTION_DESCRIPTION   => $this->getServiceEventDescription(),
         ]);
     }
 
     public function fromArray(array $data): void
     {
-        $this->service     = $data['service'];
-        $this->event       = $data['event'];
-        $this->description = $data['description'];
+        $this->service     = $data[self::OPTION_SERVICE_NAME];
+        $this->event       = $data[self::OPTION_SERVICE_EVENT];
+        $this->description = $data[self::OPTION_DESCRIPTION];
 
         parent::fromArray($data);
     }

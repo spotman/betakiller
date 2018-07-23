@@ -1,5 +1,7 @@
 <?php
-namespace BetaKiller\Url;
+declare(strict_types=1);
+
+namespace BetaKiller\Url\Parameter;
 
 use BetaKiller\Factory\NamespaceBasedFactoryBuilder;
 
@@ -21,7 +23,7 @@ class RawUrlParameterFactory
     {
         $this->factory = $factoryBuilder
             ->createFactory()
-            ->setClassNamespaces(RawUrlParameterInterface::CLASS_NS)
+            ->setClassNamespaces(...RawUrlParameterInterface::CLASS_NS)
             ->setClassSuffix(RawUrlParameterInterface::CLASS_SUFFIX)
             ->setExpectedInterface(RawUrlParameterInterface::class);
     }
@@ -30,12 +32,12 @@ class RawUrlParameterFactory
      * @param string $codename
      * @param string $uriValue
      *
-     * @return \BetaKiller\Url\RawUrlParameterInterface
+     * @return \BetaKiller\Url\Parameter\RawUrlParameterInterface
      * @throws \BetaKiller\Factory\FactoryException
      */
     public function create(string $codename, string $uriValue): RawUrlParameterInterface
     {
-        /** @var \BetaKiller\Url\RawUrlParameterInterface $instance */
+        /** @var \BetaKiller\Url\Parameter\RawUrlParameterInterface $instance */
         $instance = $this->factory->create($codename);
 
         // Inject uri value and parse it

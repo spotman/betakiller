@@ -28,8 +28,6 @@ class PostItemRevision extends AbstractAdminBase
         ContentUrlContainerHelper $urlParametersHelper,
         ContentPostRevisionRepository $revisionRepository
     ) {
-        parent::__construct();
-
         $this->urlParametersHelper = $urlParametersHelper;
         $this->revisionRepository  = $revisionRepository;
     }

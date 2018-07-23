@@ -1,6 +1,7 @@
 <?php
 namespace BetaKiller\Acl\Resource;
 
+use BetaKiller\Content\Content;
 use BetaKiller\Model\RoleInterface;
 
 class ShortcodeResource extends AbstractEntityRelatedAclResource
@@ -19,14 +20,14 @@ class ShortcodeResource extends AbstractEntityRelatedAclResource
     {
         return [
             self::ACTION_VERIFY => [
-                RoleInterface::WRITER_ROLE_NAME,
+                Content::WRITER_ROLE_NAME,
                 RoleInterface::MODERATOR_ROLE_NAME,
                 RoleInterface::ADMIN_ROLE_NAME,
                 RoleInterface::DEVELOPER_ROLE_NAME,
             ],
 
             self::ACTION_GET_ATTRIBUTES_DEFINITION => [
-                RoleInterface::WRITER_ROLE_NAME,
+                Content::WRITER_ROLE_NAME,
                 RoleInterface::MODERATOR_ROLE_NAME,
                 RoleInterface::ADMIN_ROLE_NAME,
                 RoleInterface::DEVELOPER_ROLE_NAME,
@@ -39,7 +40,7 @@ class ShortcodeResource extends AbstractEntityRelatedAclResource
             ],
 
             self::ACTION_READ => [
-                RoleInterface::WRITER_ROLE_NAME,
+                Content::WRITER_ROLE_NAME,
                 RoleInterface::MODERATOR_ROLE_NAME,
                 RoleInterface::ADMIN_ROLE_NAME,
                 RoleInterface::DEVELOPER_ROLE_NAME,
@@ -58,14 +59,14 @@ class ShortcodeResource extends AbstractEntityRelatedAclResource
             ],
 
             self::ACTION_LIST => [
-                RoleInterface::WRITER_ROLE_NAME,
+                Content::WRITER_ROLE_NAME,
                 RoleInterface::MODERATOR_ROLE_NAME,
                 RoleInterface::ADMIN_ROLE_NAME,
                 RoleInterface::DEVELOPER_ROLE_NAME,
             ],
 
             self::ACTION_SEARCH => [
-                RoleInterface::WRITER_ROLE_NAME,
+                Content::WRITER_ROLE_NAME,
                 RoleInterface::MODERATOR_ROLE_NAME,
                 RoleInterface::ADMIN_ROLE_NAME,
                 RoleInterface::DEVELOPER_ROLE_NAME,

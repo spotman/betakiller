@@ -6,7 +6,7 @@ use BetaKiller\Content\Shortcode\Editor\ShortcodeEditorInterface;
 use BetaKiller\Content\Shortcode\ShortcodeEntityInterface;
 use BetaKiller\Content\Shortcode\ShortcodeFacade;
 use BetaKiller\IFace\Admin\Content\AbstractAdminBase;
-use BetaKiller\Url\UrlContainerInterface;
+use BetaKiller\Url\Container\UrlContainerInterface;
 
 abstract class AbstractEditor extends AbstractAdminBase
 {
@@ -16,7 +16,7 @@ abstract class AbstractEditor extends AbstractAdminBase
     protected $shortcodeEntity;
 
     /**
-     * @var \BetaKiller\Url\UrlContainerInterface
+     * @var \BetaKiller\Url\Container\UrlContainerInterface
      */
     protected $urlContainer;
 
@@ -35,8 +35,6 @@ abstract class AbstractEditor extends AbstractAdminBase
         UrlContainerInterface $urlContainer,
         ShortcodeFacade $facade
     ) {
-        parent::__construct();
-
         $this->editorFactory = $factory;
         $this->urlContainer = $urlContainer;
         $this->shortcodeFacade = $facade;

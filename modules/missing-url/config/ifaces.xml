@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <root>
-    <iface uri="missing-urls" codename="Admin_MissingUrl_MissingIndex" parentCodename="Admin_Index" label="Missing URLs" entity="MissingUrl" entityAction="list" />
+    <iface uri="missing-urls" name="Admin_MissingUrl_MissingIndex" parent="Admin_Index" label="Missing URLs" entity="MissingUrl" entityAction="list" />
 </root>

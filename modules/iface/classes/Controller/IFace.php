@@ -8,8 +8,8 @@ use BetaKiller\IFace\Cache\IFaceCache;
 use BetaKiller\IFace\Exception\IFaceException;
 use BetaKiller\IFace\IFaceInterface;
 use BetaKiller\Model\UserInterface;
+use BetaKiller\Url\Container\UrlContainerInterface;
 use BetaKiller\Url\IFaceModelInterface;
-use BetaKiller\Url\UrlContainerInterface;
 use BetaKiller\Url\UrlDispatcher;
 use BetaKiller\Url\WebHookModelInterface;
 

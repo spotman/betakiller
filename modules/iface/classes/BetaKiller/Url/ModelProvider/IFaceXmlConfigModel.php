@@ -1,5 +1,5 @@
 <?php
-namespace BetaKiller\IFace\ModelProvider;
+namespace BetaKiller\Url\ModelProvider;
 
 use BetaKiller\Exception\NotImplementedHttpException;
 use BetaKiller\Helper\SeoMetaInterface;
@@ -7,6 +7,9 @@ use BetaKiller\Url\IFaceModelInterface;
 
 class IFaceXmlConfigModel extends AbstractXmlConfigModel implements IFaceModelInterface
 {
+    public const OPTION_TITLE  = 'title';
+    public const OPTION_LAYOUT = 'layout';
+
     /**
      * @var string
      */
@@ -79,8 +82,8 @@ class IFaceXmlConfigModel extends AbstractXmlConfigModel implements IFaceModelIn
     public function asArray(): array
     {
         return array_merge(parent::asArray(), [
-            'title'          => $this->getTitle(),
-            'layoutCodename' => $this->getLayoutCodename(),
+            self::OPTION_TITLE  => $this->getTitle(),
+            self::OPTION_LAYOUT => $this->getLayoutCodename(),
         ]);
     }
 
@@ -96,14 +99,14 @@ class IFaceXmlConfigModel extends AbstractXmlConfigModel implements IFaceModelIn
 
     public function fromArray(array $data): void
     {
-        $this->title = $data['title'] ?? null;
+        $this->title = $data[self::OPTION_TITLE] ?? null;
 
-        if (isset($data['hideInSiteMap'])) {
+        if (isset($data[self::OPTION_HIDE_IN_SITEMAP])) {
             $this->hideInSiteMap = true;
         }
 
-        if (isset($data['layoutCodename'])) {
-            $this->layoutCodename = (string)$data['layoutCodename'];
+        if (isset($data[self::OPTION_LAYOUT])) {
+            $this->layoutCodename = (string)$data[self::OPTION_LAYOUT];
         }
 
         parent::fromArray($data);

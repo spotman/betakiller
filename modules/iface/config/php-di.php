@@ -1,7 +1,7 @@
 <?php
 
-use BetaKiller\Url\ResolvingUrlContainer;
-use BetaKiller\Url\UrlContainerInterface;
+use BetaKiller\Url\Container\ResolvingUrlContainer;
+use BetaKiller\Url\Container\UrlContainerInterface;
 use BetaKiller\Url\UrlElementTreeInterface;
 use BetaKiller\Url\UrlElementTreeLoader;
 

@@ -1,6 +1,7 @@
 <?php
-namespace BetaKiller\Url;
+declare(strict_types=1);
 
+namespace BetaKiller\Url\Parameter;
 
 abstract class AbstractRawUrlParameter implements RawUrlParameterInterface
 {
@@ -25,10 +26,10 @@ abstract class AbstractRawUrlParameter implements RawUrlParameterInterface
     /**
      * Returns true if current parameter is the same as provided one
      *
-     * @param \BetaKiller\Url\UrlParameterInterface $parameter
+     * @param \BetaKiller\Url\Parameter\UrlParameterInterface $parameter
      *
      * @return bool
-     * @throws \BetaKiller\Url\UrlParameterException
+     * @throws \BetaKiller\Url\Parameter\UrlParameterException
      */
     public function isSameAs(UrlParameterInterface $parameter): bool
     {

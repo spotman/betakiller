@@ -5,11 +5,15 @@ use BetaKiller\Exception\NotImplementedHttpException;
 use BetaKiller\IFace\Exception\IFaceException;
 use BetaKiller\Model\DispatchableEntityInterface;
 use BetaKiller\Model\SingleParentTreeModelInterface;
+use BetaKiller\Url\Container\UrlContainerInterface;
+use BetaKiller\Url\Parameter\RawUrlParameterFactory;
+use BetaKiller\Url\Parameter\RawUrlParameterInterface;
+use BetaKiller\Url\Parameter\UrlParameterInterface;
 
 class UrlPrototypeService
 {
     /**
-     * @var \BetaKiller\Url\UrlContainerInterface
+     * @var \BetaKiller\Url\Container\UrlContainerInterface
      */
     private $urlParameters;
 
@@ -19,16 +23,16 @@ class UrlPrototypeService
     private $dataSourceFactory;
 
     /**
-     * @var \BetaKiller\Url\RawUrlParameterFactory
+     * @var \BetaKiller\Url\Parameter\RawUrlParameterFactory
      */
     private $rawParameterFactory;
 
     /**
      * UrlPrototypeService constructor.
      *
-     * @param \BetaKiller\Url\UrlContainerInterface  $urlParameters
-     * @param \BetaKiller\Url\UrlDataSourceFactory   $factory
-     * @param \BetaKiller\Url\RawUrlParameterFactory $rawFactory
+     * @param \BetaKiller\Url\Container\UrlContainerInterface  $urlParameters
+     * @param \BetaKiller\Url\UrlDataSourceFactory             $factory
+     * @param \BetaKiller\Url\Parameter\RawUrlParameterFactory $rawFactory
      */
     public function __construct(
         UrlContainerInterface $urlParameters,
@@ -75,7 +79,7 @@ class UrlPrototypeService
      * @param \BetaKiller\Url\UrlPrototype $prototype
      * @param string                       $uriValue
      *
-     * @return \BetaKiller\Url\UrlParameterInterface
+     * @return \BetaKiller\Url\Parameter\UrlParameterInterface
      * @throws \BetaKiller\Repository\RepositoryException
      * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\Url\UrlPrototypeException
@@ -119,7 +123,7 @@ class UrlPrototypeService
      * @param \BetaKiller\Url\UrlPrototype $prototype
      * @param string                       $uriValue
      *
-     * @return \BetaKiller\Url\UrlParameterInterface
+     * @return \BetaKiller\Url\Parameter\UrlParameterInterface
      * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\Url\UrlPrototypeException
      */
@@ -150,8 +154,8 @@ class UrlPrototypeService
     }
 
     /**
-     * @param string                                     $sourceString
-     * @param \BetaKiller\Url\UrlContainerInterface|null $parameters
+     * @param string                                               $sourceString
+     * @param \BetaKiller\Url\Container\UrlContainerInterface|null $parameters
      *
      * @return string
      * @throws \BetaKiller\Url\UrlPrototypeException
@@ -168,8 +172,8 @@ class UrlPrototypeService
     }
 
     /**
-     * @param string                                     $proto
-     * @param \BetaKiller\Url\UrlContainerInterface|null $params
+     * @param string                                               $proto
+     * @param \BetaKiller\Url\Container\UrlContainerInterface|null $params
      *
      * @return string
      * @throws \BetaKiller\Url\UrlPrototypeException
@@ -184,8 +188,8 @@ class UrlPrototypeService
     }
 
     /**
-     * @param string                                     $proto
-     * @param \BetaKiller\Url\UrlContainerInterface|null $params
+     * @param string                                               $proto
+     * @param \BetaKiller\Url\Container\UrlContainerInterface|null $params
      *
      * @return string
      * @throws \BetaKiller\Url\UrlPrototypeException
@@ -213,10 +217,10 @@ class UrlPrototypeService
     }
 
     /**
-     * @param \BetaKiller\Url\UrlPrototype               $prototype
-     * @param \BetaKiller\Url\UrlContainerInterface|null $parameters
+     * @param \BetaKiller\Url\UrlPrototype                         $prototype
+     * @param \BetaKiller\Url\Container\UrlContainerInterface|null $parameters
      *
-     * @return \BetaKiller\Url\UrlParameterInterface
+     * @return \BetaKiller\Url\Parameter\UrlParameterInterface
      * @throws \BetaKiller\Url\UrlPrototypeException
      */
     private function getParamByPrototype(
@@ -238,8 +242,8 @@ class UrlPrototypeService
     }
 
     /**
-     * @param \BetaKiller\Url\UrlPrototype          $prototype
-     * @param \BetaKiller\Url\UrlParameterInterface $param
+     * @param \BetaKiller\Url\UrlPrototype                    $prototype
+     * @param \BetaKiller\Url\Parameter\UrlParameterInterface $param
      *
      * @return string
      * @throws \BetaKiller\Url\UrlPrototypeException
@@ -298,10 +302,10 @@ class UrlPrototypeService
     }
 
     /**
-     * @param \BetaKiller\Url\UrlPrototype          $prototype
-     * @param \BetaKiller\Url\UrlContainerInterface $params
+     * @param \BetaKiller\Url\UrlPrototype                    $prototype
+     * @param \BetaKiller\Url\Container\UrlContainerInterface $params
      *
-     * @return \BetaKiller\Url\UrlParameterInterface[]
+     * @return \BetaKiller\Url\Parameter\UrlParameterInterface[]
      * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\Url\UrlPrototypeException
      */

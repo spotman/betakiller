@@ -47,8 +47,6 @@ class PostItem extends AbstractAppBase
         ContentUrlContainerHelper $urlParametersHelper,
         UserInterface $user
     ) {
-        parent::__construct();
-
         $this->urlParametersHelper = $urlParametersHelper;
         $this->user                = $user;
         $this->assetsHelper        = $assetsHelper;

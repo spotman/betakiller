@@ -7,7 +7,7 @@ use BetaKiller\Model\ContentCategoryInterface;
 use BetaKiller\Model\ContentPost;
 use BetaKiller\Model\ModelWithRevisionsInterface;
 use BetaKiller\Search\SearchResultsInterface;
-use BetaKiller\Url\UrlContainerInterface;
+use BetaKiller\Url\Container\UrlContainerInterface;
 use BetaKiller\Utils\Kohana\ORM\OrmInterface;
 
 /**

@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace BetaKiller\Model;
 
 use BetaKiller\Auth\AuthorizationRequiredException;
@@ -114,6 +116,18 @@ class User extends \Model_Auth_User implements UserInterface
         }
 
         return false;
+    }
+
+    /**
+     * Returns true if user has any of provided role assigned
+     *
+     * @param string[] $roles
+     *
+     * @return bool
+     */
+    public function hasAnyOfRolesNames(array $roles): bool
+    {
+        return (bool)\array_intersect($this->getAllUserRolesNames(), $roles);
     }
 
     /**

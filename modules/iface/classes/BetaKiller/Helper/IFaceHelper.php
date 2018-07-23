@@ -1,13 +1,13 @@
 <?php
 namespace BetaKiller\Helper;
 
+use BetaKiller\CrudlsActionsInterface;
 use BetaKiller\Factory\IFaceFactory;
-use BetaKiller\IFace\CrudlsActionsInterface;
 use BetaKiller\IFace\Exception\IFaceException;
 use BetaKiller\IFace\IFaceInterface;
 use BetaKiller\Model\DispatchableEntityInterface;
+use BetaKiller\Url\Container\UrlContainerInterface;
 use BetaKiller\Url\IFaceModelInterface;
-use BetaKiller\Url\UrlContainerInterface;
 use BetaKiller\Url\UrlElementInterface;
 use BetaKiller\Url\UrlElementStack;
 use BetaKiller\Url\UrlElementTreeInterface;
@@ -115,12 +115,11 @@ class IFaceHelper
      * @param string $zone
      *
      * @return bool
-     * @throws \BetaKiller\IFace\Exception\IFaceException
      */
     public function isCurrentZone(string $zone): bool
     {
         $currentElement = $this->getCurrentUrlElement();
-        $currentZone    = $currentElement ? $this->detectZoneName($currentElement) : null;
+        $currentZone    = $currentElement ? $currentElement->getZoneName() : null;
 
         return $currentZone === $zone;
     }
@@ -194,8 +193,8 @@ class IFaceHelper
                 throw new IFaceException('UrlElement zone must be specified');
             }
 
-            // Fetch zone from current IFace
-            $zone = $this->detectZoneName($currentUrlElement);
+            // Fetch zone from current UrlElement
+            $zone = $currentUrlElement->getZoneName();
         }
 
         $params = $this->paramsHelper->createResolving();
@@ -309,23 +308,9 @@ class IFaceHelper
     }
 
     /**
-     * @param \BetaKiller\IFace\IFaceInterface $iface
-     *
-     * @throws \Exception
-     */
-    public function setExpiresInPast(IFaceInterface $iface): void
-    {
-        // No caching for admin zone
-        $interval         = new \DateInterval('PT1H');
-        $interval->invert = 1;
-
-        $iface->setExpiresInterval($interval);
-    }
-
-    /**
-     * @param \BetaKiller\Url\UrlElementInterface        $urlElement
-     * @param \BetaKiller\Url\UrlContainerInterface|null $params
-     * @param bool|null                                  $removeCyclingLinks
+     * @param \BetaKiller\Url\UrlElementInterface                  $urlElement
+     * @param \BetaKiller\Url\Container\UrlContainerInterface|null $params
+     * @param bool|null                                            $removeCyclingLinks
      *
      * @return string
      * @throws \BetaKiller\IFace\Exception\IFaceException
@@ -339,9 +324,9 @@ class IFaceHelper
     }
 
     /**
-     * @param \BetaKiller\IFace\IFaceInterface           $iface
-     * @param \BetaKiller\Url\UrlContainerInterface|null $params
-     * @param bool|null                                  $removeCyclingLinks
+     * @param \BetaKiller\IFace\IFaceInterface                     $iface
+     * @param \BetaKiller\Url\Container\UrlContainerInterface|null $params
+     * @param bool|null                                            $removeCyclingLinks
      *
      * @return string
      * @throws \BetaKiller\IFace\Exception\IFaceException
@@ -391,29 +376,10 @@ class IFaceHelper
     }
 
     /**
-     * @param \BetaKiller\Url\UrlElementInterface $model
+     * @param \BetaKiller\Url\UrlElementInterface                  $model
      *
-     * @return string
-     * @throws \BetaKiller\IFace\Exception\IFaceException
-     */
-    public function detectZoneName(UrlElementInterface $model): string
-    {
-        $current = $model;
-
-        do {
-            $zoneName = $current->getZoneName();
-            $current  = $this->tree->getParent($current);
-        } while (!$zoneName && $current);
-
-        // Public zone by default
-        return $zoneName ?: ZoneInterface::PUBLIC;
-    }
-
-    /**
-     * @param \BetaKiller\Url\UrlElementInterface        $model
-     *
-     * @param \BetaKiller\Url\UrlContainerInterface|null $params
-     * @param int|null                                   $limit
+     * @param \BetaKiller\Url\Container\UrlContainerInterface|null $params
+     * @param int|null                                             $limit
      *
      * @return string
      * @throws \BetaKiller\IFace\Exception\IFaceException

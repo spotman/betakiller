@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\Url\Behaviour;
 
-use BetaKiller\Url\UrlContainerInterface;
+use BetaKiller\Url\Container\UrlContainerInterface;
 use BetaKiller\Url\UrlElementInterface;
 use BetaKiller\Url\UrlPathIterator;
 
@@ -15,11 +15,11 @@ interface UrlBehaviourInterface
     /**
      * Returns true if current behaviour was applied
      *
-     * @param \BetaKiller\Url\UrlElementInterface        $urlElement
-     * @param \BetaKiller\Url\UrlPathIterator            $it
-     * @param \BetaKiller\Url\UrlContainerInterface|null $params
+     * @param \BetaKiller\Url\UrlElementInterface                  $urlElement
+     * @param \BetaKiller\Url\UrlPathIterator                      $it
+     * @param \BetaKiller\Url\Container\UrlContainerInterface|null $params
      *
-     * @throws \BetaKiller\Url\UrlBehaviourException
+     * @throws \BetaKiller\Url\Behaviour\UrlBehaviourException
      *
      * @return bool
      */
@@ -32,8 +32,8 @@ interface UrlBehaviourInterface
     /**
      * Returns IFace uri part based on an optional UrlContainer
      *
-     * @param \BetaKiller\Url\UrlElementInterface        $urlElement
-     * @param \BetaKiller\Url\UrlContainerInterface|null $params
+     * @param \BetaKiller\Url\UrlElementInterface                  $urlElement
+     * @param \BetaKiller\Url\Container\UrlContainerInterface|null $params
      *
      * @return string
      */
@@ -43,8 +43,8 @@ interface UrlBehaviourInterface
     ): string;
 
     /**
-     * @param \BetaKiller\Url\UrlElementInterface        $urlElement
-     * @param \BetaKiller\Url\UrlContainerInterface|null $params
+     * @param \BetaKiller\Url\UrlElementInterface                  $urlElement
+     * @param \BetaKiller\Url\Container\UrlContainerInterface|null $params
      *
      * @return \Generator|\BetaKiller\Url\AvailableUri[]
      */

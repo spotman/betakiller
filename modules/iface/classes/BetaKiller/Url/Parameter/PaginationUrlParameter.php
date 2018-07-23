@@ -1,6 +1,5 @@
 <?php
-namespace BetaKiller\Url;
-
+namespace BetaKiller\Url\Parameter;
 
 class PaginationUrlParameter extends AbstractRawUrlParameter
 {
@@ -16,7 +15,7 @@ class PaginationUrlParameter extends AbstractRawUrlParameter
      *
      * @param string $uriValue
      *
-     * @throws \BetaKiller\Url\UrlParameterException
+     * @throws \BetaKiller\Url\Parameter\UrlParameterException
      */
     public function importUriValue(string $uriValue): void
     {

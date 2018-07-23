@@ -1,5 +1,7 @@
 <?php
-namespace BetaKiller\Url;
+declare(strict_types=1);
+
+namespace BetaKiller\Url\Parameter;
 
 interface UrlParameterInterface
 {
@@ -13,7 +15,7 @@ interface UrlParameterInterface
     /**
      * Returns true if current parameter is the same as provided one
      *
-     * @param \BetaKiller\Url\UrlParameterInterface $parameter
+     * @param \BetaKiller\Url\Parameter\UrlParameterInterface $parameter
      *
      * @return bool
      */

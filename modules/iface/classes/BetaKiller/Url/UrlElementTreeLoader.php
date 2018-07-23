@@ -6,8 +6,8 @@ namespace BetaKiller\Url;
 use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\Helper\LoggerHelperTrait;
 use BetaKiller\IFace\Exception\IFaceException;
-use BetaKiller\IFace\ModelProvider\UrlElementProviderDatabase;
-use BetaKiller\IFace\ModelProvider\UrlElementProviderXmlConfig;
+use BetaKiller\Url\ModelProvider\UrlElementProviderDatabase;
+use BetaKiller\Url\ModelProvider\UrlElementProviderXmlConfig;
 use Psr\Log\LoggerInterface;
 use Psr\SimpleCache\CacheInterface;
 
@@ -16,12 +16,12 @@ class UrlElementTreeLoader
     use LoggerHelperTrait;
 
     /**
-     * @var \BetaKiller\IFace\ModelProvider\UrlElementProviderDatabase
+     * @var \BetaKiller\Url\ModelProvider\UrlElementProviderDatabase
      */
     private $databaseProvider;
 
     /**
-     * @var \BetaKiller\IFace\ModelProvider\UrlElementProviderXmlConfig
+     * @var \BetaKiller\Url\ModelProvider\UrlElementProviderXmlConfig
      */
     private $xmlProvider;
 
@@ -48,11 +48,11 @@ class UrlElementTreeLoader
     /**
      * Initializer constructor.
      *
-     * @param \BetaKiller\IFace\ModelProvider\UrlElementProviderDatabase  $databaseProvider
-     * @param \BetaKiller\IFace\ModelProvider\UrlElementProviderXmlConfig $xmlProvider
-     * @param \BetaKiller\Helper\AppEnvInterface                          $appEnv
-     * @param \Psr\SimpleCache\CacheInterface                             $cache
-     * @param \Psr\Log\LoggerInterface                                    $logger
+     * @param \BetaKiller\Url\ModelProvider\UrlElementProviderDatabase  $databaseProvider
+     * @param \BetaKiller\Url\ModelProvider\UrlElementProviderXmlConfig $xmlProvider
+     * @param \BetaKiller\Helper\AppEnvInterface                        $appEnv
+     * @param \Psr\SimpleCache\CacheInterface                           $cache
+     * @param \Psr\Log\LoggerInterface                                  $logger
      */
     public function __construct(
         UrlElementProviderDatabase $databaseProvider,
@@ -159,7 +159,7 @@ class UrlElementTreeLoader
     {
         $this->logger->debug('Loading URL elements tree from providers');
 
-        /** @var \BetaKiller\IFace\ModelProvider\UrlElementProviderInterface[] $sources */
+        /** @var \BetaKiller\Url\ModelProvider\UrlElementProviderInterface[] $sources */
         $sources = [
             $this->xmlProvider,
         ];

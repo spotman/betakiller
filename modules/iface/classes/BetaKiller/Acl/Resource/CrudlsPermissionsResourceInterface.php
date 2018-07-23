@@ -1,7 +1,7 @@
 <?php
 namespace BetaKiller\Acl\Resource;
 
-use BetaKiller\IFace\CrudlsActionsInterface;
+use BetaKiller\CrudlsActionsInterface;
 use Spotman\Acl\Resource\ResolvingResourceInterface;
 
 interface CrudlsPermissionsResourceInterface extends ResolvingResourceInterface, CrudlsActionsInterface

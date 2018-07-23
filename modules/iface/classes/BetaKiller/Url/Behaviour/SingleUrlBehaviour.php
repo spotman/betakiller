@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\Url\Behaviour;
 
-use BetaKiller\Url\UrlContainerInterface;
+use BetaKiller\Url\Container\UrlContainerInterface;
 use BetaKiller\Url\UrlElementInterface;
 use BetaKiller\Url\UrlPathIterator;
 
@@ -18,9 +18,9 @@ class SingleUrlBehaviour extends AbstractUrlBehaviour
     /**
      * Returns true if current behaviour was applied
      *
-     * @param \BetaKiller\Url\UrlElementInterface $urlElement
-     * @param \BetaKiller\Url\UrlPathIterator               $it
-     * @param \BetaKiller\Url\UrlContainerInterface|null    $params
+     * @param \BetaKiller\Url\UrlElementInterface                  $urlElement
+     * @param \BetaKiller\Url\UrlPathIterator                      $it
+     * @param \BetaKiller\Url\Container\UrlContainerInterface|null $params
      *
      * @return bool
      */
@@ -34,8 +34,8 @@ class SingleUrlBehaviour extends AbstractUrlBehaviour
     }
 
     /**
-     * @param \BetaKiller\Url\UrlElementInterface        $urlElement
-     * @param \BetaKiller\Url\UrlContainerInterface|null $params
+     * @param \BetaKiller\Url\UrlElementInterface                  $urlElement
+     * @param \BetaKiller\Url\Container\UrlContainerInterface|null $params
      *
      * @return string
      */
@@ -47,8 +47,8 @@ class SingleUrlBehaviour extends AbstractUrlBehaviour
     }
 
     /**
-     * @param \BetaKiller\Url\UrlElementInterface        $urlElement
-     * @param \BetaKiller\Url\UrlContainerInterface|null $params
+     * @param \BetaKiller\Url\UrlElementInterface                  $urlElement
+     * @param \BetaKiller\Url\Container\UrlContainerInterface|null $params
      *
      * @return \Generator|\BetaKiller\Url\AvailableUri[]
      * @throws \BetaKiller\IFace\Exception\IFaceException

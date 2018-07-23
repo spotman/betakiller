@@ -1,7 +1,7 @@
 <?php
 namespace BetaKiller\Model;
 
-use BetaKiller\Url\UrlParameterInterface;
+use BetaKiller\Url\Parameter\UrlParameterInterface;
 
 interface DispatchableEntityInterface extends AbstractEntityInterface, UrlParameterInterface
 {

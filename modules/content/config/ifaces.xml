@@ -1,30 +1,30 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <root>
     <!-- TODO вынести это всё в файл config/ifaces.php, который добавляет элементы в UrlElementTree::admin() -->
-    <iface uri="posts" codename="Admin_Content_PostIndex" parentCodename="Admin_Index" label="Posts" entity="ContentPost" entityAction="list">
-        <iface uri="create" codename="Admin_Content_PostCreate" label="Create post" entity="ContentPost" entityAction="create" />
-        <iface uri="{ContentPost.id}" codename="Admin_Content_PostItem" label="{ContentPost.label}" hasDynamicUrl="true" entity="ContentPost" entityAction="read">
-            <iface uri="revisions" codename="Admin_Content_PostItemRevisionList" label="Revisions" entity="ContentPost" entityAction="read">
-                <iface uri="{ContentPostRevision.id}" hasDynamicUrl="true" codename="Admin_Content_PostItemRevision" label="Revision {ContentPostRevision.id}" entity="ContentPostRevision" entityAction="read" />
+    <iface uri="posts" name="Admin_Content_PostIndex" parent="Admin_Index" label="Posts" entity="ContentPost" entityAction="list">
+        <iface uri="create" name="Admin_Content_PostCreate" label="Create post" entity="ContentPost" entityAction="create" />
+        <iface uri="{ContentPost.id}" name="Admin_Content_PostItem" label="{ContentPost.label}" hasDynamicUrl="true" entity="ContentPost" entityAction="read">
+            <iface uri="revisions" name="Admin_Content_PostItemRevisionList" label="Revisions" entity="ContentPost" entityAction="read">
+                <iface uri="{ContentPostRevision.id}" hasDynamicUrl="true" name="Admin_Content_PostItemRevision" label="Revision {ContentPostRevision.id}" entity="ContentPostRevision" entityAction="read" />
             </iface>
-            <iface uri="preview" codename="Admin_Content_PostItemPreview" label="Preview" entity="ContentPost" entityAction="read" zone="preview" layoutCodename="public" />
+            <iface uri="preview" name="Admin_Content_PostItemPreview" label="Preview" entity="ContentPost" entityAction="read" zone="preview" layout="public" />
         </iface>
     </iface>
 
-    <iface uri="comments" codename="Admin_Content_CommentIndex" parentCodename="Admin_Index" label="Comments" entity="ContentComment" entityAction="list">
-        <iface uri="by-status" codename="Admin_Content_CommentAggregateByStatus" label="Status statistic" entity="ContentComment" entityAction="list">
-            <iface uri="{ContentCommentStatus.codename}" codename="Admin_Content_CommentListByStatus" label="{ContentCommentStatus.getLabel()}" hasDynamicUrl="true" entity="ContentComment" entityAction="list" />
+    <iface uri="comments" name="Admin_Content_CommentIndex" parent="Admin_Index" label="Comments" entity="ContentComment" entityAction="list">
+        <iface uri="by-status" name="Admin_Content_CommentAggregateByStatus" label="Status statistic" entity="ContentComment" entityAction="list">
+            <iface uri="{ContentCommentStatus.codename}" name="Admin_Content_CommentListByStatus" label="{ContentCommentStatus.getLabel()}" hasDynamicUrl="true" entity="ContentComment" entityAction="list" />
         </iface>
-        <iface uri="{ContentComment.id}" codename="Admin_Content_CommentItem" label="{ContentComment.getLabel()}" hasDynamicUrl="true" entity="ContentComment" entityAction="read" />
+        <iface uri="{ContentComment.id}" name="Admin_Content_CommentItem" label="{ContentComment.getLabel()}" hasDynamicUrl="true" entity="ContentComment" entityAction="read" />
     </iface>
 
-    <iface uri="shortcodes" codename="Admin_Content_Shortcode_Index" parentCodename="Admin_Index" label="Shortcodes plugin" entity="Shortcode" entityAction="list" layoutCodename="raw">
-        <iface uri="{Shortcode.tag_name}" codename="Admin_Content_Shortcode_Editor_IndexItem" label="{Shortcode.codename}" hasDynamicUrl="true" entity="Shortcode" entityAction="read">
-            <iface uri="{Entity.slug}" codename="Admin_Content_Shortcode_Editor_EntityIndexItem" label="{Entity.getLabel()}" hasDynamicUrl="true" entity="Shortcode" entityAction="read">
-                <iface uri="{Id}" codename="Admin_Content_Shortcode_Editor_EntityIdIndexItem" label="{Id}" hasDynamicUrl="true" entity="Shortcode" entityAction="read" />
+    <iface uri="shortcodes" name="Admin_Content_Shortcode_Index" parent="Admin_Index" label="Shortcodes plugin" entity="Shortcode" entityAction="list" layout="raw">
+        <iface uri="{Shortcode.tag_name}" name="Admin_Content_Shortcode_Editor_IndexItem" label="{Shortcode.codename}" hasDynamicUrl="true" entity="Shortcode" entityAction="read">
+            <iface uri="{Entity.slug}" name="Admin_Content_Shortcode_Editor_EntityIndexItem" label="{Entity.getLabel()}" hasDynamicUrl="true" entity="Shortcode" entityAction="read">
+                <iface uri="{Id}" name="Admin_Content_Shortcode_Editor_EntityIdIndexItem" label="{Id}" hasDynamicUrl="true" entity="Shortcode" entityAction="read" />
             </iface>
 
-            <iface uri="wysiwyg-preview" codename="Admin_Content_Shortcode_WysiwygPreview" label="Preview" entity="Shortcode" entityAction="read" />
+            <iface uri="wysiwyg-preview" name="Admin_Content_Shortcode_WysiwygPreview" label="Preview" entity="Shortcode" entityAction="read" />
         </iface>
     </iface>
 

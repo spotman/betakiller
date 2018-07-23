@@ -6,12 +6,6 @@ use BetaKiller\IFace\AbstractIFace;
 abstract class AbstractAdminBase extends AbstractIFace
 {
     /**
-     * @Inject
-     * @var \BetaKiller\Helper\IFaceHelper
-     */
-    private $ifaceHelper;
-
-    /**
      * This hook executed before IFace processing (on every request regardless of caching)
      * Place here code that needs to be executed on every IFace request (increment views counter, etc)
      *
@@ -19,8 +13,8 @@ abstract class AbstractAdminBase extends AbstractIFace
      */
     public function before(): void
     {
-        // Disable caching
-        $this->ifaceHelper->setExpiresInPast($this);
+        // Disable caching for admin ifaces
+        $this->setExpiresInPast();
 
         parent::before();
     }

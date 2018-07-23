@@ -2,7 +2,7 @@
 namespace BetaKiller\Event;
 
 use BetaKiller\MessageBus\EventMessageInterface;
-use BetaKiller\Url\UrlContainerInterface;
+use BetaKiller\Url\Container\UrlContainerInterface;
 
 class UrlDispatchedEvent implements EventMessageInterface
 {
@@ -22,17 +22,17 @@ class UrlDispatchedEvent implements EventMessageInterface
     private $ip;
 
     /**
-     * @var \BetaKiller\Url\UrlContainerInterface
+     * @var \BetaKiller\Url\Container\UrlContainerInterface
      */
     private $params;
 
     /**
      * UrlDispatchedEvent constructor.
      *
-     * @param string                                $url
-     * @param \BetaKiller\Url\UrlContainerInterface $params
-     * @param string                                $ip
-     * @param string                                $httpReferer
+     * @param string                                          $url
+     * @param \BetaKiller\Url\Container\UrlContainerInterface $params
+     * @param string                                          $ip
+     * @param string                                          $httpReferer
      */
     public function __construct(string $url, UrlContainerInterface $params, string $ip, ?string $httpReferer)
     {
@@ -77,7 +77,7 @@ class UrlDispatchedEvent implements EventMessageInterface
     }
 
     /**
-     * @return \BetaKiller\Url\UrlContainerInterface
+     * @return \BetaKiller\Url\Container\UrlContainerInterface
      */
     public function getUrlContainer(): UrlContainerInterface
     {

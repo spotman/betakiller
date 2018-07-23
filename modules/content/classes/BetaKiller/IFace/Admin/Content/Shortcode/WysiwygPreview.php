@@ -8,7 +8,7 @@ class WysiwygPreview extends AbstractAdminBase
 {
     /**
      * @Inject
-     * @var \BetaKiller\Url\UrlContainerInterface
+     * @var \BetaKiller\Url\Container\UrlContainerInterface
      */
     private $urlParameters;
 
