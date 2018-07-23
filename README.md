@@ -10,7 +10,7 @@ Based on the legacy [Kohana](http://kohanaframework.org/) framework (migration t
 Under the hood:
 
 - [Twig](https://twig.symfony.com/) as a template engine ([core extension](application/classes/BetaKiller/Twig/Extension.php))
-- [PHP-DI](http://php-di.org/) as DI container (with autowiring enabled, [core config](application/config/twig.php))
+- [PHP-DI](http://php-di.org/) as DI container (with autowiring enabled, [core config](application/config/php-di.php))
 - [DDD](modules/ddd) used for core development (Entities, Repositories, Factories, etc)
 - Unique [IFace module](modules/iface) for easier organizing server-side part of UI
 - [Custom ACL subsystem](https://github.com/spotman/rbac) with dedicated resource classes (Zend ACL on steroids)
