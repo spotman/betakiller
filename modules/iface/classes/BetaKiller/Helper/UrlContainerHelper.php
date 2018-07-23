@@ -2,21 +2,21 @@
 namespace BetaKiller\Helper;
 
 use BetaKiller\Model\DispatchableEntityInterface;
-use BetaKiller\Url\ResolvingUrlContainer;
-use BetaKiller\Url\UrlContainer;
-use BetaKiller\Url\UrlContainerInterface;
+use BetaKiller\Url\Container\ResolvingUrlContainer;
+use BetaKiller\Url\Container\UrlContainer;
+use BetaKiller\Url\Container\UrlContainerInterface;
 
 class UrlContainerHelper
 {
     /**
-     * @var \BetaKiller\Url\UrlContainerInterface
+     * @var \BetaKiller\Url\Container\UrlContainerInterface
      */
     private $urlContainer;
 
     /**
      * ContentUrlContainerHelper constructor.
      *
-     * @param \BetaKiller\Url\UrlContainerInterface $urlParameters
+     * @param \BetaKiller\Url\Container\UrlContainerInterface $urlParameters
      */
     public function __construct(UrlContainerInterface $urlParameters)
     {
@@ -24,7 +24,7 @@ class UrlContainerHelper
     }
 
     /**
-     * @return \BetaKiller\Url\UrlContainerInterface
+     * @return \BetaKiller\Url\Container\UrlContainerInterface
      */
     public function createSimple(): UrlContainerInterface
     {
@@ -37,7 +37,7 @@ class UrlContainerHelper
     }
 
     /**
-     * @return \BetaKiller\Url\UrlContainerInterface
+     * @return \BetaKiller\Url\Container\UrlContainerInterface
      */
     public function getCurrentUrlParameters(): UrlContainerInterface
     {

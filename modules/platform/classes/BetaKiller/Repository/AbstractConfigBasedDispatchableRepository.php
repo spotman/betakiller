@@ -3,8 +3,8 @@ namespace BetaKiller\Repository;
 
 use BetaKiller\Config\ConfigProviderInterface;
 use BetaKiller\Model\ConfigBasedDispatchableEntityInterface;
-use BetaKiller\Url\UrlContainerInterface;
-use BetaKiller\Url\UrlParameterInterface;
+use BetaKiller\Url\Container\UrlContainerInterface;
+use BetaKiller\Url\Parameter\UrlParameterInterface;
 
 abstract class AbstractConfigBasedDispatchableRepository extends AbstractPredefinedRepository
     implements DispatchableRepositoryInterface
@@ -107,9 +107,9 @@ abstract class AbstractConfigBasedDispatchableRepository extends AbstractPredefi
     /**
      * Performs search for model item where the url key property is equal to $value
      *
-     * @param string                                $value
+     * @param string                                          $value
      *
-     * @param \BetaKiller\Url\UrlContainerInterface $params
+     * @param \BetaKiller\Url\Container\UrlContainerInterface $params
      *
      * @return ConfigBasedDispatchableEntityInterface|null
      * @throws \BetaKiller\Repository\RepositoryException
@@ -128,7 +128,7 @@ abstract class AbstractConfigBasedDispatchableRepository extends AbstractPredefi
     /**
      * Returns list of available items (model records) by url key property
      *
-     * @param \BetaKiller\Url\UrlContainerInterface|null $parameters
+     * @param \BetaKiller\Url\Container\UrlContainerInterface|null $parameters
      *
      * @return ConfigBasedDispatchableEntityInterface[]
      */

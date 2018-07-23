@@ -2,11 +2,10 @@
 
 use BetaKiller\DI\Container;
 use BetaKiller\Factory\OrmFactory;
-use BetaKiller\IFace\Exception\UrlContainerException;
 use BetaKiller\Model\ExtendedOrmInterface;
 use BetaKiller\Search\SearchResultsInterface;
-use BetaKiller\Url\UrlParameterException;
-use BetaKiller\Url\UrlParameterInterface;
+use BetaKiller\Url\Parameter\UrlParameterException;
+use BetaKiller\Url\Parameter\UrlParameterInterface;
 use BetaKiller\Utils;
 use BetaKiller\Utils\Kohana\ORM\OrmInterface;
 use ORM\PaginateHelper;
@@ -117,10 +116,10 @@ class ORM extends Utils\Kohana\ORM implements ExtendedOrmInterface
     /**
      * Returns true if current parameter is the same as provided one
      *
-     * @param \BetaKiller\Url\UrlParameterInterface $parameter
+     * @param \BetaKiller\Url\Parameter\UrlParameterInterface $parameter
      *
      * @return bool
-     * @throws \BetaKiller\Url\UrlParameterException
+     * @throws \BetaKiller\Url\Parameter\UrlParameterException
      */
     public function isSameAs(UrlParameterInterface $parameter): bool
     {

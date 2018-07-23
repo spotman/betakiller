@@ -3,8 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\Url\Behaviour;
 
-use BetaKiller\Url\UrlBehaviourException;
-use BetaKiller\Url\UrlContainerInterface;
+use BetaKiller\Url\Container\UrlContainerInterface;
 use BetaKiller\Url\UrlElementInterface;
 use BetaKiller\Url\UrlPathIterator;
 
@@ -13,9 +12,9 @@ class TreeUrlBehaviour extends MultipleUrlBehaviour
     /**
      * Returns true if current behaviour was applied
      *
-     * @param \BetaKiller\Url\UrlElementInterface $model
-     * @param \BetaKiller\Url\UrlPathIterator               $it
-     * @param \BetaKiller\Url\UrlContainerInterface|null    $params
+     * @param \BetaKiller\Url\UrlElementInterface                  $model
+     * @param \BetaKiller\Url\UrlPathIterator                      $it
+     * @param \BetaKiller\Url\Container\UrlContainerInterface|null $params
      *
      * @return bool
      * @throws \BetaKiller\IFace\Exception\IFaceException
@@ -51,8 +50,8 @@ class TreeUrlBehaviour extends MultipleUrlBehaviour
     }
 
     /**
-     * @param \BetaKiller\Url\UrlElementInterface   $urlElement
-     * @param \BetaKiller\Url\UrlContainerInterface $params
+     * @param \BetaKiller\Url\UrlElementInterface             $urlElement
+     * @param \BetaKiller\Url\Container\UrlContainerInterface $params
      *
      * @return string
      * @throws \BetaKiller\Factory\FactoryException

@@ -2,22 +2,22 @@
 namespace BetaKiller\Widget\Admin\Menu;
 
 use BetaKiller\IFace\IFaceInterface;
-use BetaKiller\Url\UrlContainerInterface;
+use BetaKiller\Url\Container\UrlContainerInterface;
 use BetaKiller\Widget\AbstractAdminWidget;
 
 class MainWidget extends AbstractAdminWidget
 {
-    /**
-     * @Inject
-     * @var \BetaKiller\Helper\UrlContainerHelper
-     */
-    private $urlParametersHelper;
-
-    /**
-     * @Inject
-     * @var \BetaKiller\Repository\ContentCommentStatusRepository
-     */
-    private $commentStatusRepository;
+//    /**
+//     * @Inject
+//     * @var \BetaKiller\Helper\UrlContainerHelper
+//     */
+//    private $urlParametersHelper;
+//
+//    /**
+//     * @Inject
+//     * @var \BetaKiller\Repository\ContentCommentStatusRepository
+//     */
+//    private $commentStatusRepository;
 
     /**
      * @Inject
@@ -41,8 +41,8 @@ class MainWidget extends AbstractAdminWidget
     public function getData(): array
     {
         $items = [
-            $this->getPostsMenu(),
-            $this->getCommentsMenu(),
+//            $this->getPostsMenu(),
+//            $this->getCommentsMenu(),
             $this->getErrorsMenu(),
         ];
 
@@ -51,18 +51,18 @@ class MainWidget extends AbstractAdminWidget
         ];
     }
 
-    /**
-     * @return array
-     * @throws \BetaKiller\IFace\Exception\IFaceException
-     * @throws \Spotman\Acl\Exception
-     */
-    protected function getPostsMenu(): array
-    {
-        /** @var \BetaKiller\IFace\Admin\Content\PostIndex $posts */
-        $postsIndex = $this->ifaceHelper->createIFaceFromCodename('Admin_Content_PostIndex');
-
-        return $this->makeIFaceMenuItemData($postsIndex, null, 'edit');
-    }
+//    /**
+//     * @return array
+//     * @throws \BetaKiller\IFace\Exception\IFaceException
+//     * @throws \Spotman\Acl\Exception
+//     */
+//    protected function getPostsMenu(): array
+//    {
+//        /** @var \BetaKiller\IFace\Admin\Content\PostIndex $posts */
+//        $postsIndex = $this->ifaceHelper->createIFaceFromCodename('Admin_Content_PostIndex');
+//
+//        return $this->makeIFaceMenuItemData($postsIndex, null, 'edit');
+//    }
 
     /**
      * @param \BetaKiller\IFace\IFaceInterface        $iface
@@ -93,8 +93,8 @@ class MainWidget extends AbstractAdminWidget
     }
 
     /**
-     * @param \BetaKiller\IFace\IFaceInterface           $iface
-     * @param \BetaKiller\Url\UrlContainerInterface|null $params
+     * @param \BetaKiller\IFace\IFaceInterface                     $iface
+     * @param \BetaKiller\Url\Container\UrlContainerInterface|null $params
      *
      * @return array
      * @throws \BetaKiller\Url\UrlPrototypeException
@@ -116,34 +116,34 @@ class MainWidget extends AbstractAdminWidget
         ];
     }
 
-    /**
-     * @return array
-     * @throws \BetaKiller\IFace\Exception\IFaceException
-     * @throws \Spotman\Acl\Exception
-     */
-    protected function getCommentsMenu(): array
-    {
-        /** @var \BetaKiller\IFace\Admin\Content\CommentIndex $comments */
-        $commentsIndex = $this->ifaceHelper->createIFaceFromCodename('Admin_Content_CommentIndex');
-
-        /** @var \BetaKiller\IFace\Admin\Content\CommentListByStatus $comments */
-        $commentListInStatus = $this->ifaceHelper->createIFaceFromCodename('Admin_Content_CommentListByStatus');
-
-        /** @var \BetaKiller\Model\ContentCommentStatus[] $statuses */
-        $statuses = $this->commentStatusRepository->getAll();
-
-        $childrenData = [];
-
-        foreach ($statuses as $status) {
-            $params = $this->urlParametersHelper
-                ->createSimple()
-                ->setParameter($status);
-
-            $childrenData[] = $this->getIFaceMenuItemData($commentListInStatus, $params);
-        }
-
-        return $this->makeIFaceMenuItemData($commentsIndex, $childrenData, 'comment');
-    }
+//    /**
+//     * @return array
+//     * @throws \BetaKiller\IFace\Exception\IFaceException
+//     * @throws \Spotman\Acl\Exception
+//     */
+//    protected function getCommentsMenu(): array
+//    {
+//        /** @var \BetaKiller\IFace\Admin\Content\CommentIndex $comments */
+//        $commentsIndex = $this->ifaceHelper->createIFaceFromCodename('Admin_Content_CommentIndex');
+//
+//        /** @var \BetaKiller\IFace\Admin\Content\CommentListByStatus $comments */
+//        $commentListInStatus = $this->ifaceHelper->createIFaceFromCodename('Admin_Content_CommentListByStatus');
+//
+//        /** @var \BetaKiller\Model\ContentCommentStatus[] $statuses */
+//        $statuses = $this->commentStatusRepository->getAll();
+//
+//        $childrenData = [];
+//
+//        foreach ($statuses as $status) {
+//            $params = $this->urlParametersHelper
+//                ->createSimple()
+//                ->setParameter($status);
+//
+//            $childrenData[] = $this->getIFaceMenuItemData($commentListInStatus, $params);
+//        }
+//
+//        return $this->makeIFaceMenuItemData($commentsIndex, $childrenData, 'comment');
+//    }
 
     /**
      * @return array|null

@@ -1,6 +1,7 @@
 <?php
-namespace BetaKiller\Url;
+declare(strict_types=1);
 
+namespace BetaKiller\Url\Parameter;
 
 class IdUrlParameter extends AbstractRawUrlParameter
 {
@@ -14,7 +15,7 @@ class IdUrlParameter extends AbstractRawUrlParameter
      *
      * @param string $uriValue
      *
-     * @throws \BetaKiller\Url\UrlParameterException
+     * @throws \BetaKiller\Url\Parameter\UrlParameterException
      */
     public function importUriValue(string $uriValue): void
     {
@@ -34,7 +35,7 @@ class IdUrlParameter extends AbstractRawUrlParameter
      */
     public function exportUriValue(): string
     {
-        return $this->id;
+        return (string)$this->id;
     }
 
     /**

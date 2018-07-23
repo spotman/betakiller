@@ -1,5 +1,5 @@
 <?php
-namespace BetaKiller\IFace\ModelProvider;
+namespace BetaKiller\Url\ModelProvider;
 
 interface UrlElementProviderInterface
 {

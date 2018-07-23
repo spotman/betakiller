@@ -1,9 +1,10 @@
 <?php
+declare(strict_types=1);
+
 namespace BetaKiller\Helper;
 
-use BetaKiller\Acl\Resource\AdminResource;
 use BetaKiller\Acl\Resource\EntityRelatedAclResourceInterface;
-use BetaKiller\IFace\CrudlsActionsInterface;
+use BetaKiller\CrudlsActionsInterface;
 use BetaKiller\IFace\Exception\IFaceException;
 use BetaKiller\IFace\IFaceInterface;
 use BetaKiller\Model\DispatchableEntityInterface;
@@ -13,14 +14,17 @@ use BetaKiller\Model\HasPersonalZoneAccessSpecificationInterface;
 use BetaKiller\Model\HasPreviewZoneAccessSpecificationInterface;
 use BetaKiller\Model\HasPublicZoneAccessSpecificationInterface;
 use BetaKiller\Model\UserInterface;
-use BetaKiller\Url\UrlContainerInterface;
+use BetaKiller\Url\Container\UrlContainerInterface;
 use BetaKiller\Url\UrlElementInterface;
+use BetaKiller\Url\Zone\ZoneAccessSpecFactory;
+use BetaKiller\Url\Zone\ZoneAccessSpecInterface;
 use BetaKiller\Url\ZoneInterface;
 use Spotman\Acl\AccessResolver\UserAccessResolver;
 use Spotman\Acl\AclInterface;
 use Spotman\Acl\AclUserInterface;
 use Spotman\Acl\Exception;
 use Spotman\Acl\Resource\ResolvingResourceInterface;
+use Worknector\Url\Zone\EmployerZoneAccessSpec;
 
 class AclHelper
 {
@@ -35,15 +39,22 @@ class AclHelper
     private $user;
 
     /**
+     * @var \BetaKiller\Url\Zone\ZoneAccessSpecFactory
+     */
+    private $specFactory;
+
+    /**
      * AclHelper constructor.
      *
-     * @param \Spotman\Acl\AclInterface       $acl
-     * @param \BetaKiller\Model\UserInterface $user
+     * @param \Spotman\Acl\AclInterface                  $acl
+     * @param \BetaKiller\Url\Zone\ZoneAccessSpecFactory $specFactory
+     * @param \BetaKiller\Model\UserInterface            $user
      */
-    public function __construct(AclInterface $acl, UserInterface $user)
+    public function __construct(AclInterface $acl, ZoneAccessSpecFactory $specFactory, UserInterface $user)
     {
-        $this->acl  = $acl;
-        $this->user = $user;
+        $this->acl         = $acl;
+        $this->user        = $user;
+        $this->specFactory = $specFactory;
     }
 
     /**
@@ -97,32 +108,26 @@ class AclHelper
     }
 
     /**
-     * @param \BetaKiller\Url\UrlElementInterface        $model
-     * @param \BetaKiller\Url\UrlContainerInterface|null $params
-     * @param null|\Spotman\Acl\AclUserInterface         $user
+     * @param \BetaKiller\Url\UrlElementInterface                  $urlElement
+     * @param \BetaKiller\Url\Container\UrlContainerInterface|null $params
+     * @param null|\Spotman\Acl\AclUserInterface                   $user
      *
      * @return bool
      * @throws \BetaKiller\IFace\Exception\IFaceException
      * @throws \Spotman\Acl\Exception
      */
     public function isUrlElementAllowed(
-        UrlElementInterface $model,
+        UrlElementInterface $urlElement,
         ?UrlContainerInterface $params = null,
         ?AclUserInterface $user = null
     ): bool {
-        $zoneName   = $model->getZoneName();
-        $entityName = $model->getEntityModelName();
-        $actionName = $model->getEntityActionName();
+        $zoneSpec     = $this->getUrlElementZoneAccessSpec($urlElement);
+        $zoneAclRules = $zoneSpec->getAclRules();
+        $zoneRoles    = $zoneSpec->getRolesNames();
 
-        if (!$zoneName) {
-            throw new IFaceException('IFace :name needs zone to be configured', [
-                ':name' => $model->getCodename(),
-            ]);
-        }
-
-        // Force check for guest role in public zone (so every public iface must be visible for guest users)
-        if ($zoneName === ZoneInterface::PUBLIC) {
-            // Public zone needs GuestUser to check access)
+        // Force guest user in zones without auth (so every public iface must be visible for guest users)
+        if (!$zoneSpec->isAuthRequired()) {
+            // Public zones need GuestUser to check access)
             $user = new GuestUser;
         }
 
@@ -131,18 +136,26 @@ class AclHelper
             $user = $this->user;
         }
 
-        $customRules   = $model->getAdditionalAclRules();
-        $entityDefined = $entityName && $actionName;
-
-        // Force check for admin panel is enabled
-        if ($zoneName === ZoneInterface::ADMIN) {
-            $customRules[] = AdminResource::SHORTCUT;
-        }
-
-        // Check custom rules first
-        if (!$this->checkCustomRules($customRules, $user)) {
+        // Check zone roles if defined, it`s fast
+        if ($zoneRoles && !$user->hasAnyOfRolesNames($zoneRoles)) {
             return false;
         }
+
+        // Check zone rules if defined
+        if ($zoneAclRules && !$this->checkCustomAclRules($zoneAclRules, $user)) {
+            return false;
+        }
+
+        $urlElementCustomRules = $urlElement->getAdditionalAclRules();
+
+        // Check UrlElement custom rules
+        if (!$this->checkCustomAclRules($urlElementCustomRules, $user)) {
+            return false;
+        }
+
+        $entityName    = $urlElement->getEntityModelName();
+        $actionName    = $urlElement->getEntityActionName();
+        $entityDefined = $entityName && $actionName;
 
         // Check entity access (if defined)
         if ($entityDefined) {
@@ -166,7 +179,7 @@ class AclHelper
                 }
 
                 // Check zone access
-                if (!$this->isEntityAllowedInZone($entityInstance, $model)) {
+                if (!$this->isEntityAllowedInZone($entityInstance, $urlElement)) {
                     return false;
                 }
 
@@ -176,15 +189,15 @@ class AclHelper
             return $this->isPermissionAllowed($resource, $actionName, $user);
         }
 
-        // Allow access to public/personal zone by default if nor entity or custom rules were not defined
-        if (\in_array($zoneName, [ZoneInterface::PUBLIC, ZoneInterface::PERSONAL], true)) {
+        // Allow access to non-protected zones by default if nor entity or custom rules were not defined
+        if (!$zoneSpec->isProtectionNeeded()) {
             return true;
         }
 
         // Other zones must define entity/action or custom rules to protect itself
-        if (!($entityDefined || $customRules)) {
-            throw new IFaceException('IFace :name must have linked entity or custom ACL rules to protect itself', [
-                ':name' => $model->getCodename(),
+        if (!($zoneRoles || $zoneAclRules || $entityDefined || $urlElementCustomRules)) {
+            throw new IFaceException('UrlElement :name must have linked entity or custom ACL rules to protect itself', [
+                ':name' => $urlElement->getCodename(),
             ]);
         }
 
@@ -193,9 +206,9 @@ class AclHelper
     }
 
     /**
-     * @param \BetaKiller\IFace\IFaceInterface           $iface
-     * @param \BetaKiller\Url\UrlContainerInterface|null $params
-     * @param null|\Spotman\Acl\AclUserInterface         $user
+     * @param \BetaKiller\IFace\IFaceInterface                     $iface
+     * @param \BetaKiller\Url\Container\UrlContainerInterface|null $params
+     * @param null|\Spotman\Acl\AclUserInterface                   $user
      *
      * @return bool
      * @throws \BetaKiller\IFace\Exception\IFaceException
@@ -284,16 +297,28 @@ class AclHelper
     }
 
     /**
-     * @param \BetaKiller\Url\UrlElementInterface $model
+     * @param \BetaKiller\Url\UrlElementInterface $urlElement
      *
      * @throws \BetaKiller\Auth\AuthorizationRequiredException
      */
-    public function forceAuthorizationIfNeeded(UrlElementInterface $model): void
+    public function forceAuthorizationIfNeeded(UrlElementInterface $urlElement): void
     {
-        // Entering to admin and personal zones requires authorized user
-        if ($model->getZoneName() !== ZoneInterface::PUBLIC && $this->user->isGuest()) {
+        $zoneSpec = $this->getUrlElementZoneAccessSpec($urlElement);
+
+        // User authorization is required for entering protected zones
+        if ($zoneSpec->isAuthRequired() && $this->user->isGuest()) {
             $this->user->forceAuthorization();
         }
+    }
+
+    /**
+     * @param \BetaKiller\Url\UrlElementInterface $urlElement
+     *
+     * @return \BetaKiller\Url\Zone\ZoneAccessSpecInterface
+     */
+    private function getUrlElementZoneAccessSpec(UrlElementInterface $urlElement): ZoneAccessSpecInterface
+    {
+        return $this->specFactory->create($urlElement->getZoneName());
     }
 
     /**
@@ -303,7 +328,7 @@ class AclHelper
      * @return bool
      * @throws \Spotman\Acl\Exception
      */
-    private function checkCustomRules(array $rules, ?AclUserInterface $user = null): bool
+    private function checkCustomAclRules(array $rules, ?AclUserInterface $user = null): bool
     {
         // No rules = allow access
         if (!$rules) {

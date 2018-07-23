@@ -1,5 +1,7 @@
 <?php
-namespace BetaKiller\IFace\ModelProvider;
+declare(strict_types=1);
+
+namespace BetaKiller\Url\ModelProvider;
 
 use BetaKiller\Exception\NotImplementedHttpException;
 use BetaKiller\Url\UrlElementInterface;
@@ -7,6 +9,19 @@ use BetaKiller\Url\ZoneInterface;
 
 abstract class AbstractXmlConfigModel implements UrlElementInterface
 {
+    public const OPTION_CODENAME           = 'name';
+    public const OPTION_LABEL              = 'label';
+    public const OPTION_PARENT             = 'parent';
+    public const OPTION_URI                = 'uri';
+    public const OPTION_IS_DEFAULT         = 'isDefault';
+    public const OPTION_HIDE_IN_SITEMAP    = 'hideInSiteMap';
+    public const OPTION_HAS_DYNAMIC_URL    = 'hasDynamicUrl';
+    public const OPTION_HAS_TREE_BEHAVIOUR = 'hasTreeBehaviour';
+    public const OPTION_ENTITY_NAME        = 'entity';
+    public const OPTION_ENTITY_ACTION      = 'entityAction';
+    public const OPTION_ZONE               = 'zone';
+    public const OPTION_ACL_RULES          = 'aclRules';
+
     /**
      * @var string
      */
@@ -87,7 +102,7 @@ abstract class AbstractXmlConfigModel implements UrlElementInterface
      */
     public function getID(): string
     {
-        throw new NotImplementedHttpException('XML config-based URL element model have no ID');
+        throw new NotImplementedHttpException('XML-based URL element model have no ID');
     }
 
     /**
@@ -116,7 +131,7 @@ abstract class AbstractXmlConfigModel implements UrlElementInterface
      */
     public function setUri(string $uri): void
     {
-        throw new NotImplementedHttpException('Admin URL element model can not change uri');
+        throw new NotImplementedHttpException('XML-based URL element model can not change uri');
     }
 
     /**
@@ -136,7 +151,7 @@ abstract class AbstractXmlConfigModel implements UrlElementInterface
      */
     public function setLabel(string $value): void
     {
-        throw new NotImplementedHttpException('Admin URL element model can not change label');
+        throw new NotImplementedHttpException('XML-based URL element model can not change label');
     }
 
     /**
@@ -167,56 +182,56 @@ abstract class AbstractXmlConfigModel implements UrlElementInterface
     public function asArray(): array
     {
         return [
-            'codename'       => $this->getCodename(),
-            'uri'            => $this->getUri(),
-            'label'          => $this->getLabel(),
-            'parentCodename' => $this->getParentCodename(),
-            'isDefault'      => $this->isDefault(),
-            'hasDynamicUrl'  => $this->hasDynamicUrl(),
-            'hideInSiteMap'  => $this->hideInSiteMap(),
-            'entity'         => $this->getEntityModelName(),
-            'entityAction'   => $this->getEntityActionName(),
-            'zone'           => $this->getZoneName(),
-            'aclRules'       => $this->getAdditionalAclRules(),
+            self::OPTION_CODENAME        => $this->getCodename(),
+            self::OPTION_URI             => $this->getUri(),
+            self::OPTION_LABEL           => $this->getLabel(),
+            self::OPTION_PARENT          => $this->getParentCodename(),
+            self::OPTION_IS_DEFAULT      => $this->isDefault(),
+            self::OPTION_HAS_DYNAMIC_URL => $this->hasDynamicUrl(),
+            self::OPTION_HIDE_IN_SITEMAP => $this->hideInSiteMap(),
+            self::OPTION_ENTITY_NAME     => $this->getEntityModelName(),
+            self::OPTION_ENTITY_ACTION   => $this->getEntityActionName(),
+            self::OPTION_ZONE            => $this->getZoneName(),
+            self::OPTION_ACL_RULES       => $this->getAdditionalAclRules(),
         ];
     }
 
     public function fromArray(array $data): void
     {
-        $this->uri      = $data['uri'];
-        $this->codename = $data['codename'];
-        $this->label    = $data['label'] ?? null;
+        $this->uri      = $data[self::OPTION_URI];
+        $this->codename = $data[self::OPTION_CODENAME];
+        $this->label    = $data[self::OPTION_LABEL] ?? null;
 
-        if (isset($data['parentCodename'])) {
-            $this->parentCodename = (string)$data['parentCodename'];
+        if (isset($data[self::OPTION_PARENT])) {
+            $this->parentCodename = (string)$data[self::OPTION_PARENT];
         }
 
-        if (isset($data['isDefault'])) {
+        if (isset($data[self::OPTION_IS_DEFAULT])) {
             $this->isDefault = true;
         }
 
-        if (isset($data['hasDynamicUrl'])) {
+        if (isset($data[self::OPTION_HAS_DYNAMIC_URL])) {
             $this->hasDynamicUrl = true;
         }
 
-        if (isset($data['hasTreeBehaviour'])) {
+        if (isset($data[self::OPTION_HAS_TREE_BEHAVIOUR])) {
             $this->hasTreeBehaviour = true;
         }
 
-        if (isset($data['entity'])) {
-            $this->entityName = (string)$data['entity'];
+        if (isset($data[self::OPTION_ENTITY_NAME])) {
+            $this->entityName = (string)$data[self::OPTION_ENTITY_NAME];
         }
 
-        if (isset($data['entityAction'])) {
-            $this->entityAction = (string)$data['entityAction'];
+        if (isset($data[self::OPTION_ENTITY_ACTION])) {
+            $this->entityAction = (string)$data[self::OPTION_ENTITY_ACTION];
         }
 
-        if (isset($data['zone'])) {
-            $this->zone = mb_strtolower($data['zone']);
+        if (isset($data[self::OPTION_ZONE])) {
+            $this->zone = mb_strtolower($data[self::OPTION_ZONE]);
         }
 
-        if (isset($data['aclRules'])) {
-            $values         = explode(',', (string)$data['aclRules']);
+        if (isset($data[self::OPTION_ACL_RULES])) {
+            $values         = explode(',', (string)$data[self::OPTION_ACL_RULES]);
             $this->aclRules = array_filter(array_map('trim', $values));
         }
     }

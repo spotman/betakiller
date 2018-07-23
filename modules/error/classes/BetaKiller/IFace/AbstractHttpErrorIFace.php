@@ -23,7 +23,7 @@ abstract class AbstractHttpErrorIFace extends AbstractIFace
      */
     public function __construct(UserInterface $user)
     {
-        parent::__construct();
+//        parent::__construct();
 
         $this->user = $user;
     }

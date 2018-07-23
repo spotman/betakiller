@@ -12,7 +12,7 @@ class PostItemPreview extends PostItem
     public function before(): void
     {
         // Disable caching
-        $this->ifaceHelper->setExpiresInPast($this);
+        $this->setExpiresInPast();
 
         parent::before();
     }

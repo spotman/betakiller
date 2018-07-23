@@ -1,5 +1,5 @@
 <?php
-namespace BetaKiller\IFace;
+namespace BetaKiller;
 
 interface CrudlsActionsInterface
 {

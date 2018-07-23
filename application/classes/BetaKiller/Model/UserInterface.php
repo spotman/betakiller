@@ -48,6 +48,15 @@ interface UserInterface extends AbstractEntityInterface, OrmInterface, Notificat
     public function hasRoleName(string $role): bool;
 
     /**
+     * Returns true if user has any of provided role assigned
+     *
+     * @param string[] $roles
+     *
+     * @return bool
+     */
+    public function hasAnyOfRolesNames(array $roles): bool;
+
+    /**
      * @param RoleInterface $role
      *
      * @return \BetaKiller\Model\UserInterface

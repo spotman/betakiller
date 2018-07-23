@@ -1,8 +1,10 @@
 <?php
-namespace BetaKiller\Url;
+declare(strict_types=1);
 
-use BetaKiller\IFace\Exception\UrlContainerException;
+namespace BetaKiller\Url\Container;
+
 use BetaKiller\Model\DispatchableEntityInterface;
+use BetaKiller\Url\Parameter\UrlParameterInterface;
 use BetaKiller\Utils\Registry\BasicRegistry;
 use BetaKiller\Utils\Registry\RegistryException;
 
@@ -33,7 +35,7 @@ class UrlContainer implements UrlContainerInterface
     }
 
     /**
-     * @return \BetaKiller\Url\UrlContainerInterface
+     * @return \BetaKiller\Url\Container\UrlContainerInterface
      */
     public static function create(): UrlContainerInterface
     {
@@ -41,10 +43,10 @@ class UrlContainer implements UrlContainerInterface
     }
 
     /**
-     * @param \BetaKiller\Url\UrlParameterInterface $object
-     * @param bool|null                             $ignoreDuplicate
+     * @param \BetaKiller\Url\Parameter\UrlParameterInterface $object
+     * @param bool|null                                       $ignoreDuplicate
      *
-     * @return \BetaKiller\Url\UrlContainerInterface
+     * @return \BetaKiller\Url\Container\UrlContainerInterface
      */
     public function setParameter(UrlParameterInterface $object, ?bool $ignoreDuplicate = null): UrlContainerInterface
     {
@@ -63,7 +65,7 @@ class UrlContainer implements UrlContainerInterface
      * @param string $key
      *
      * @return \BetaKiller\Model\DispatchableEntityInterface|null
-     * @throws \BetaKiller\IFace\Exception\UrlContainerException
+     * @throws \BetaKiller\Url\Container\UrlContainerException
      */
     public function getEntity(string $key): ?DispatchableEntityInterface
     {
@@ -79,7 +81,7 @@ class UrlContainer implements UrlContainerInterface
     /**
      * @param string $key
      *
-     * @return \BetaKiller\Url\UrlParameterInterface|null
+     * @return \BetaKiller\Url\Parameter\UrlParameterInterface|null
      */
     public function getParameter(string $key): ?UrlParameterInterface
     {
@@ -90,7 +92,7 @@ class UrlContainer implements UrlContainerInterface
      * @param string|\BetaKiller\Model\DispatchableEntityInterface $className
      *
      * @return \BetaKiller\Model\DispatchableEntityInterface|mixed|null
-     * @throws \BetaKiller\IFace\Exception\UrlContainerException
+     * @throws \BetaKiller\Url\Container\UrlContainerException
      */
     public function getEntityByClassName($className)
     {
@@ -103,7 +105,7 @@ class UrlContainer implements UrlContainerInterface
      * @param string|\BetaKiller\Model\DispatchableEntityInterface $className
      *
      * @return \BetaKiller\Model\DispatchableEntityInterface|mixed|null
-     * @throws \BetaKiller\IFace\Exception\UrlContainerException
+     * @throws \BetaKiller\Url\Container\UrlContainerException
      */
     public function getParameterByClassName($className)
     {
@@ -118,7 +120,7 @@ class UrlContainer implements UrlContainerInterface
      * @param string $targetClass
      *
      * @return string
-     * @throws \BetaKiller\IFace\Exception\UrlContainerException
+     * @throws \BetaKiller\Url\Container\UrlContainerException
      */
     private function resolveObjectOrClassToKey($className, string $targetClass): string
     {
@@ -138,7 +140,7 @@ class UrlContainer implements UrlContainerInterface
     }
 
     /**
-     * @return \BetaKiller\Url\UrlContainerInterface
+     * @return \BetaKiller\Url\Container\UrlContainerInterface
      * @deprecated Url dispatching must be persistent
      */
     public function clear(): UrlContainerInterface
@@ -149,7 +151,7 @@ class UrlContainer implements UrlContainerInterface
     }
 
     /**
-     * @return \BetaKiller\Url\UrlParameterInterface[]
+     * @return \BetaKiller\Url\Parameter\UrlParameterInterface[]
      */
     public function getAllParameters(): array
     {
@@ -167,7 +169,7 @@ class UrlContainer implements UrlContainerInterface
     }
 
     /**
-     * @param \BetaKiller\Url\UrlParameterInterface $instance
+     * @param \BetaKiller\Url\Parameter\UrlParameterInterface $instance
      *
      * @return bool
      */
@@ -196,7 +198,7 @@ class UrlContainer implements UrlContainerInterface
      *
      * @param array $parts
      *
-     * @return \BetaKiller\Url\UrlContainerInterface
+     * @return \BetaKiller\Url\Container\UrlContainerInterface
      */
     public function setQueryParts(array $parts): UrlContainerInterface
     {
@@ -213,7 +215,7 @@ class UrlContainer implements UrlContainerInterface
      * @param bool|null $required
      *
      * @return string|string[]
-     * @throws \BetaKiller\IFace\Exception\UrlContainerException
+     * @throws \BetaKiller\Url\Container\UrlContainerException
      */
     public function getQueryPart($key, $required = null)
     {

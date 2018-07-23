@@ -2,6 +2,8 @@
 namespace BetaKiller\Url;
 
 
+use BetaKiller\Url\Parameter\UrlParameterInterface;
+
 class AvailableUri
 {
     /**
@@ -12,7 +14,7 @@ class AvailableUri
     /**
      * Parameter instance which produced current URI (if used)
      *
-     * @var \BetaKiller\Url\UrlParameterInterface|null
+     * @var \BetaKiller\Url\Parameter\UrlParameterInterface|null
      */
     private $urlParameter;
 
@@ -24,9 +26,9 @@ class AvailableUri
     /**
      * AvailableUri constructor.
      *
-     * @param string                                     $url
-     * @param \BetaKiller\Url\UrlParameterInterface|null $urlParameter
-     * @param \DateTimeInterface|null                    $lastModified
+     * @param string                                               $url
+     * @param \BetaKiller\Url\Parameter\UrlParameterInterface|null $urlParameter
+     * @param \DateTimeInterface|null                              $lastModified
      */
     public function __construct(
         string $url,
@@ -47,7 +49,7 @@ class AvailableUri
     }
 
     /**
-     * @return \BetaKiller\Url\UrlParameterInterface|null
+     * @return \BetaKiller\Url\Parameter\UrlParameterInterface|null
      */
     public function getUrlParameter(): ?UrlParameterInterface
     {

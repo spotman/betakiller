@@ -22,11 +22,6 @@ abstract class AbstractIFace implements IFaceInterface
      */
     private $expiresInterval;
 
-    public function __construct()
-    {
-        // Empty by default, use __construct for defining concrete IFace dependencies
-    }
-
     /**
      * @return string
      */
@@ -154,5 +149,19 @@ abstract class AbstractIFace implements IFaceInterface
         $this->model = $model;
 
         return $this;
+    }
+
+    /**
+     * Use this method for disable HTTP caching
+     *
+     * @throws \Exception
+     */
+    protected function setExpiresInPast(): void
+    {
+        // No caching for admin zone
+        $interval         = new \DateInterval('PT1H');
+        $interval->invert = 1;
+
+        $this->setExpiresInterval($interval);
     }
 }

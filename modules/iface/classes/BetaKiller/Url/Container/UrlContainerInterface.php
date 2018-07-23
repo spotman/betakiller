@@ -1,20 +1,24 @@
 <?php
-namespace BetaKiller\Url;
+declare(strict_types=1);
+
+namespace BetaKiller\Url\Container;
+
+use BetaKiller\Url\Parameter\UrlParameterInterface;
 
 interface UrlContainerInterface
 {
     /**
      * Creates new instance of
      *
-     * @return \BetaKiller\Url\UrlContainerInterface
+     * @return \BetaKiller\Url\Container\UrlContainerInterface
      */
     public static function create(): UrlContainerInterface;
 
     /**
-     * @param \BetaKiller\Url\UrlParameterInterface $object
-     * @param bool|null                             $ignoreDuplicate
+     * @param \BetaKiller\Url\Parameter\UrlParameterInterface $object
+     * @param bool|null                                       $ignoreDuplicate
      *
-     * @return \BetaKiller\Url\UrlContainerInterface
+     * @return \BetaKiller\Url\Container\UrlContainerInterface
      */
     public function setParameter(
         UrlParameterInterface $object,
@@ -31,7 +35,7 @@ interface UrlContainerInterface
     /**
      * @param string $key
      *
-     * @return \BetaKiller\Url\UrlParameterInterface|mixed|null
+     * @return \BetaKiller\Url\Parameter\UrlParameterInterface|mixed|null
      */
     public function getParameter(string $key);
 
@@ -43,15 +47,15 @@ interface UrlContainerInterface
     public function getEntityByClassName($className);
 
     /**
-     * @param string|\BetaKiller\Url\UrlParameterInterface $className
+     * @param string|\BetaKiller\Url\Parameter\UrlParameterInterface $className
      *
-     * @return \BetaKiller\Url\UrlParameterInterface|mixed|null
-     * @throws \BetaKiller\IFace\Exception\UrlContainerException
+     * @return \BetaKiller\Url\Parameter\UrlParameterInterface|mixed|null
+     * @throws \BetaKiller\Url\Container\UrlContainerException
      */
     public function getParameterByClassName($className);
 
     /**
-     * @return \BetaKiller\Url\UrlParameterInterface[]
+     * @return \BetaKiller\Url\Parameter\UrlParameterInterface[]
      */
     public function getAllParameters(): array;
 
@@ -63,14 +67,14 @@ interface UrlContainerInterface
     public function hasParameter(string $key): bool;
 
     /**
-     * @param \BetaKiller\Url\UrlParameterInterface $instance
+     * @param \BetaKiller\Url\Parameter\UrlParameterInterface $instance
      *
      * @return bool
      */
     public function hasParameterInstance(UrlParameterInterface $instance): bool;
 
     /**
-     * @return \BetaKiller\Url\UrlContainerInterface
+     * @return \BetaKiller\Url\Container\UrlContainerInterface
      * @deprecated Url parameters must not be cleared (this is a hack for persistent DI instances)
      */
     public function clear(): UrlContainerInterface;
@@ -87,7 +91,7 @@ interface UrlContainerInterface
      *
      * @param array $parts
      *
-     * @return \BetaKiller\Url\UrlContainerInterface
+     * @return \BetaKiller\Url\Container\UrlContainerInterface
      */
     public function setQueryParts(array $parts): UrlContainerInterface;
 

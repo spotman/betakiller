@@ -2,6 +2,7 @@
 namespace BetaKiller\Url;
 
 use BetaKiller\IFace\Exception\IFaceException;
+use BetaKiller\Url\Container\UrlContainerInterface;
 
 class UrlElementStack implements \IteratorAggregate
 {
@@ -23,7 +24,7 @@ class UrlElementStack implements \IteratorAggregate
     /**
      * UrlElementStack constructor.
      *
-     * @param \BetaKiller\Url\UrlContainerInterface $parameters
+     * @param \BetaKiller\Url\Container\UrlContainerInterface $parameters
      */
     public function __construct(UrlContainerInterface $parameters)
     {

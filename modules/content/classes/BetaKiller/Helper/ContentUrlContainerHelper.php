@@ -6,7 +6,7 @@ use BetaKiller\Model\ContentComment;
 use BetaKiller\Model\ContentCommentStatus;
 use BetaKiller\Model\ContentPost;
 use BetaKiller\Model\ContentPostRevision;
-use BetaKiller\Url\UrlContainerInterface;
+use BetaKiller\Url\Container\UrlContainerInterface;
 
 class ContentUrlContainerHelper extends UrlContainerHelper
 {
@@ -19,10 +19,10 @@ class ContentUrlContainerHelper extends UrlContainerHelper
     }
 
     /**
-     * @param \BetaKiller\Model\ContentCategory          $model
-     * @param \BetaKiller\Url\UrlContainerInterface|null $params
+     * @param \BetaKiller\Model\ContentCategory                    $model
+     * @param \BetaKiller\Url\Container\UrlContainerInterface|null $params
      *
-     * @return \BetaKiller\Url\UrlContainerInterface
+     * @return \BetaKiller\Url\Container\UrlContainerInterface
      */
     public function setContentCategory(ContentCategory $model, UrlContainerInterface $params = null): UrlContainerInterface
     {
@@ -38,10 +38,10 @@ class ContentUrlContainerHelper extends UrlContainerHelper
     }
 
     /**
-     * @param \BetaKiller\Model\ContentPost              $model
-     * @param \BetaKiller\Url\UrlContainerInterface|null $params
+     * @param \BetaKiller\Model\ContentPost                        $model
+     * @param \BetaKiller\Url\Container\UrlContainerInterface|null $params
      *
-     * @return \BetaKiller\Url\UrlContainerInterface
+     * @return \BetaKiller\Url\Container\UrlContainerInterface
      */
     public function setContentPost(ContentPost $model, UrlContainerInterface $params = null): UrlContainerInterface
     {
@@ -57,10 +57,10 @@ class ContentUrlContainerHelper extends UrlContainerHelper
     }
 
     /**
-     * @param \BetaKiller\Model\ContentPostRevision      $model
-     * @param \BetaKiller\Url\UrlContainerInterface|null $params
+     * @param \BetaKiller\Model\ContentPostRevision                $model
+     * @param \BetaKiller\Url\Container\UrlContainerInterface|null $params
      *
-     * @return \BetaKiller\Url\UrlContainerInterface
+     * @return \BetaKiller\Url\Container\UrlContainerInterface
      */
     public function setContentPostRevision(ContentPostRevision $model, UrlContainerInterface $params = null): UrlContainerInterface
     {
@@ -76,10 +76,10 @@ class ContentUrlContainerHelper extends UrlContainerHelper
     }
 
     /**
-     * @param \BetaKiller\Model\ContentComment           $model
-     * @param \BetaKiller\Url\UrlContainerInterface|null $params
+     * @param \BetaKiller\Model\ContentComment                     $model
+     * @param \BetaKiller\Url\Container\UrlContainerInterface|null $params
      *
-     * @return \BetaKiller\Url\UrlContainerInterface
+     * @return \BetaKiller\Url\Container\UrlContainerInterface
      */
     public function setContentComment(ContentComment $model, UrlContainerInterface $params = null): UrlContainerInterface
     {
@@ -95,10 +95,10 @@ class ContentUrlContainerHelper extends UrlContainerHelper
     }
 
     /**
-     * @param \BetaKiller\Model\ContentCommentStatus     $model
-     * @param \BetaKiller\Url\UrlContainerInterface|null $params
+     * @param \BetaKiller\Model\ContentCommentStatus               $model
+     * @param \BetaKiller\Url\Container\UrlContainerInterface|null $params
      *
-     * @return \BetaKiller\Url\UrlContainerInterface
+     * @return \BetaKiller\Url\Container\UrlContainerInterface
      */
     public function setContentCommentStatus(ContentCommentStatus $model, UrlContainerInterface $params = null): UrlContainerInterface
     {

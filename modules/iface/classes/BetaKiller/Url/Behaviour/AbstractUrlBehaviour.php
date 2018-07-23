@@ -4,10 +4,10 @@ declare(strict_types=1);
 namespace BetaKiller\Url\Behaviour;
 
 use BetaKiller\Url\AvailableUri;
-use BetaKiller\Url\UrlContainerInterface;
+use BetaKiller\Url\Container\UrlContainerInterface;
+use BetaKiller\Url\Parameter\UrlParameterInterface;
 use BetaKiller\Url\UrlDispatcher;
 use BetaKiller\Url\UrlElementInterface;
-use BetaKiller\Url\UrlParameterInterface;
 
 abstract class AbstractUrlBehaviour implements UrlBehaviourInterface
 {
@@ -19,8 +19,8 @@ abstract class AbstractUrlBehaviour implements UrlBehaviourInterface
     /**
      * Returns IFace uri part based on an optional UrlContainer
      *
-     * @param \BetaKiller\Url\UrlElementInterface        $urlElement
-     * @param \BetaKiller\Url\UrlContainerInterface|null $params
+     * @param \BetaKiller\Url\UrlElementInterface                  $urlElement
+     * @param \BetaKiller\Url\Container\UrlContainerInterface|null $params
      *
      * @return string
      */
@@ -39,8 +39,8 @@ abstract class AbstractUrlBehaviour implements UrlBehaviourInterface
     }
 
     /**
-     * @param \BetaKiller\Url\UrlElementInterface        $ifaceModel
-     * @param \BetaKiller\Url\UrlContainerInterface|null $params
+     * @param \BetaKiller\Url\UrlElementInterface                  $ifaceModel
+     * @param \BetaKiller\Url\Container\UrlContainerInterface|null $params
      *
      * @return string
      */

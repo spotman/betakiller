@@ -1,15 +1,17 @@
 <?php
-namespace BetaKiller\Url;
+declare(strict_types=1);
 
+namespace BetaKiller\Url\Container;
 
 use BetaKiller\Model\DispatchableEntityInterface;
+use BetaKiller\Url\Parameter\UrlParameterInterface;
 
 class ResolvingUrlContainer extends UrlContainer
 {
     /**
      * @param string $key
      *
-     * @return \BetaKiller\Url\UrlParameterInterface|null
+     * @return \BetaKiller\Url\Parameter\UrlParameterInterface|null
      */
     public function getParameter(string $key): ?UrlParameterInterface
     {
@@ -31,7 +33,7 @@ class ResolvingUrlContainer extends UrlContainer
      * @param UrlParameterInterface[]  $params
      * @param string $key
      *
-     * @return \BetaKiller\Url\UrlParameterInterface|null
+     * @return \BetaKiller\Url\Parameter\UrlParameterInterface|null
      */
     private function findParameterByKeyRecursive(array $params, string $key): ?UrlParameterInterface
     {

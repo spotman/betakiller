@@ -4,7 +4,7 @@ namespace BetaKiller\Repository;
 use BetaKiller\Model\ContentCategory;
 use BetaKiller\Model\ContentCategoryInterface;
 use BetaKiller\Model\ExtendedOrmInterface;
-use BetaKiller\Url\UrlContainerInterface;
+use BetaKiller\Url\Container\UrlContainerInterface;
 use BetaKiller\Utils\Kohana\ORM\OrmInterface;
 
 /**

@@ -1,6 +1,7 @@
 <?php
 namespace BetaKiller\Acl\Resource;
 
+use BetaKiller\Content\Content;
 use BetaKiller\Model\RoleInterface;
 
 class DefaultContentElementResource extends AbstractAssetsAclResource
@@ -11,7 +12,7 @@ class DefaultContentElementResource extends AbstractAssetsAclResource
     protected function getUploadDefaultAccessList(): array
     {
         return [
-            RoleInterface::WRITER_ROLE_NAME,
+            Content::WRITER_ROLE_NAME,
             RoleInterface::MODERATOR_ROLE_NAME,
             RoleInterface::ADMIN_ROLE_NAME,
         ];
@@ -23,7 +24,7 @@ class DefaultContentElementResource extends AbstractAssetsAclResource
     protected function getCreateDefaultAccessList(): array
     {
         return [
-            RoleInterface::WRITER_ROLE_NAME,
+            Content::WRITER_ROLE_NAME,
             RoleInterface::MODERATOR_ROLE_NAME,
             RoleInterface::ADMIN_ROLE_NAME,
         ];
@@ -46,7 +47,7 @@ class DefaultContentElementResource extends AbstractAssetsAclResource
     protected function getUpdateDefaultAccessList(): array
     {
         return [
-            RoleInterface::WRITER_ROLE_NAME,
+            Content::WRITER_ROLE_NAME,
             RoleInterface::MODERATOR_ROLE_NAME,
             RoleInterface::ADMIN_ROLE_NAME,
         ];
@@ -58,7 +59,7 @@ class DefaultContentElementResource extends AbstractAssetsAclResource
     protected function getDeleteDefaultAccessList(): array
     {
         return [
-            RoleInterface::WRITER_ROLE_NAME,
+            Content::WRITER_ROLE_NAME,
             RoleInterface::MODERATOR_ROLE_NAME,
             RoleInterface::ADMIN_ROLE_NAME,
         ];
@@ -70,7 +71,7 @@ class DefaultContentElementResource extends AbstractAssetsAclResource
     protected function getListDefaultAccessList(): array
     {
         return [
-            RoleInterface::WRITER_ROLE_NAME,
+            Content::WRITER_ROLE_NAME,
             RoleInterface::MODERATOR_ROLE_NAME,
             RoleInterface::ADMIN_ROLE_NAME,
         ];
@@ -82,7 +83,7 @@ class DefaultContentElementResource extends AbstractAssetsAclResource
     protected function getSearchDefaultAccessList(): array
     {
         return [
-            RoleInterface::WRITER_ROLE_NAME,
+            Content::WRITER_ROLE_NAME,
             RoleInterface::MODERATOR_ROLE_NAME,
             RoleInterface::ADMIN_ROLE_NAME,
         ];

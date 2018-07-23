@@ -7,7 +7,7 @@ use BetaKiller\Config\AppConfigInterface;
 use BetaKiller\Factory\FactoryException;
 use BetaKiller\IFace\Exception\IFaceException;
 use BetaKiller\Url\Behaviour\UrlBehaviourFactory;
-use BetaKiller\Url\UrlContainerInterface;
+use BetaKiller\Url\Container\UrlContainerInterface;
 use BetaKiller\Url\UrlElementInterface;
 use BetaKiller\Url\UrlElementStack;
 use BetaKiller\Url\UrlElementTreeInterface;
@@ -55,27 +55,27 @@ class UrlHelper
     }
 
     /**
-     * @param \BetaKiller\Url\UrlElementInterface        $model
-     * @param \BetaKiller\Url\UrlContainerInterface|null $params
-     * @param bool|null                                  $removeCyclingLinks
+     * @param \BetaKiller\Url\UrlElementInterface                  $urlElement
+     * @param \BetaKiller\Url\Container\UrlContainerInterface|null $params
+     * @param bool|null                                            $removeCyclingLinks
      *
      * @return string
      * @throws \BetaKiller\IFace\Exception\IFaceException
      */
     public function makeUrl(
-        UrlElementInterface $model,
+        UrlElementInterface $urlElement,
         ?UrlContainerInterface $params = null,
         ?bool $removeCyclingLinks = null
     ): string {
         $removeCyclingLinks = $removeCyclingLinks ?? true;
 
-        if ($removeCyclingLinks && $this->stack->isCurrent($model, $params)) {
+        if ($removeCyclingLinks && $this->stack->isCurrent($urlElement, $params)) {
             return $this->appConfig->getCircularLinkHref();
         }
 
         $parts = [];
 
-        foreach ($this->tree->getReverseBreadcrumbsIterator($model) as $item) {
+        foreach ($this->tree->getReverseBreadcrumbsIterator($urlElement) as $item) {
             $uri = $this->makeUrlElementUri($item, $params);
             array_unshift($parts, $uri);
         }
@@ -92,14 +92,14 @@ class UrlHelper
         return $this->makeAbsoluteUrl($path);
     }
 
-    public function makeAbsoluteUrl(string $relativeUrl): string
+    private function makeAbsoluteUrl(string $relativeUrl): string
     {
         return $this->appConfig->getBaseUrl().$relativeUrl;
     }
 
     /**
-     * @param \BetaKiller\Url\UrlElementInterface   $model
-     * @param \BetaKiller\Url\UrlContainerInterface $urlContainer
+     * @param \BetaKiller\Url\UrlElementInterface             $model
+     * @param \BetaKiller\Url\Container\UrlContainerInterface $urlContainer
      *
      * @return string
      * @throws \BetaKiller\IFace\Exception\IFaceException
@@ -109,7 +109,7 @@ class UrlHelper
         $uri = $model->getUri();
 
         if (!$uri) {
-            throw new IFaceException('IFace :codename must have uri', [':codename' => $model->getCodename()]);
+            throw new IFaceException('UrlElement :codename must have uri', [':codename' => $model->getCodename()]);
         }
 
         try {

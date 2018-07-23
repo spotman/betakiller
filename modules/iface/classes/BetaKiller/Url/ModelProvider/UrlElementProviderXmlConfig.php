@@ -1,5 +1,5 @@
 <?php
-namespace BetaKiller\IFace\ModelProvider;
+namespace BetaKiller\Url\ModelProvider;
 
 use BetaKiller\IFace\Exception\IFaceException;
 use BetaKiller\Url\UrlElementInterface;
@@ -85,9 +85,29 @@ class UrlElementProviderXmlConfig implements UrlElementProviderInterface
     {
         $attr   = (array)$branch->attributes();
         $config = $attr['@attributes'];
+        $codename = $config[IFaceXmlConfigModel::OPTION_CODENAME];
 
-        if ($parent && (!isset($config['parentCodename']) || !$config['parentCodename'])) {
-            $config['parentCodename'] = $parent->getCodename();
+        if ($parent) {
+            // Preset parent codename
+            if (empty($config[IFaceXmlConfigModel::OPTION_PARENT])) {
+                if (!$parent) {
+                    throw new IFaceException('Root URL element :name must define a parent', [
+                        ':name' => $codename,
+                    ]);
+                }
+
+                $config[IFaceXmlConfigModel::OPTION_PARENT] = $parent->getCodename();
+            }
+
+            if (empty($config[IFaceXmlConfigModel::OPTION_ZONE])) {
+                if (!$parent) {
+                    throw new IFaceException('Root URL element :name must define a zone', [
+                        ':name' => $codename,
+                    ]);
+                }
+
+                $config[IFaceXmlConfigModel::OPTION_ZONE] = $parent->getZoneName();
+            }
         }
 
         return $this->createModelFromConfig($branch->getName(), $config);
