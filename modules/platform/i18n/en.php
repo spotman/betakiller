@@ -10,4 +10,9 @@ return [
     'error.auth.user_not_exists'    => 'User does not exists',
     'error.auth.wrong_ip'           => 'Your IP address is not valid',
     'error.auth.denied'             => 'Access denied',
+
+    'Your username or email' => 'Your username or email',
+    'Your password' => 'Your password',
+    'Remember me' => 'Remember me',
+    'Sign in' => 'Sign in',
 ];
