@@ -24,7 +24,6 @@ use Spotman\Acl\AclInterface;
 use Spotman\Acl\AclUserInterface;
 use Spotman\Acl\Exception;
 use Spotman\Acl\Resource\ResolvingResourceInterface;
-use Worknector\Url\Zone\EmployerZoneAccessSpec;
 
 class AclHelper
 {
