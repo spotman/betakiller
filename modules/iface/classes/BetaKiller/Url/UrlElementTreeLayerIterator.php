@@ -6,13 +6,13 @@ class UrlElementTreeLayerIterator extends \ArrayIterator
     /**
      * UrlElementTreeLayerIterator constructor.
      *
-     * @param \BetaKiller\Url\UrlElementTreeInterface  $tree
+     * @param \BetaKiller\Url\UrlElementTreeInterface $tree
      *
-     * @param \BetaKiller\Url\IFaceModelInterface|null $parent
+     * @param \BetaKiller\Url\UrlElementInterface     $parent
      *
      * @throws \BetaKiller\IFace\Exception\IFaceException
      */
-    public function __construct(UrlElementTreeInterface $tree, IFaceModelInterface $parent = null)
+    public function __construct(UrlElementTreeInterface $tree, UrlElementInterface $parent = null)
     {
         $layer = $parent
             ? $tree->getChildren($parent)
@@ -22,7 +22,7 @@ class UrlElementTreeLayerIterator extends \ArrayIterator
     }
 
     /**
-     * @return IFaceModelInterface[]
+     * @return \BetaKiller\Url\UrlElementInterface[]
      */
     public function getArrayCopy(): array
     {
@@ -30,9 +30,9 @@ class UrlElementTreeLayerIterator extends \ArrayIterator
     }
 
     /**
-     * @return IFaceModelInterface
+     * @return \BetaKiller\Url\UrlElementInterface
      */
-    public function current(): IFaceModelInterface
+    public function current(): UrlElementInterface
     {
         return parent::current();
     }
