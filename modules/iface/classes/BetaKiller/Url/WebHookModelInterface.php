@@ -17,19 +17,12 @@ interface WebHookModelInterface extends UrlElementInterface
      *
      * @return string
      */
-    public function getServiceEventName(): string;
+    public function getEventName(): string;
 
     /**
      * Returns target service event description (a case when event fired, limitations, etc)
      *
-     * @return string
+     * @return string|null
      */
-    public function getServiceEventDescription(): string;
-
-    /**
-     * Returns ID provided by external service
-     *
-     * @return string
-     */
-    public function getExternalEventID(): string;
+    public function getEventDescription(): ?string;
 }

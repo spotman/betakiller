@@ -54,7 +54,7 @@ class WebHook extends AbstractOrmModelContainsUrlElement implements WebHookModel
      *
      * @return string
      */
-    public function getServiceEventName(): string
+    public function getEventName(): string
     {
         return $this->event;
     }
@@ -62,21 +62,11 @@ class WebHook extends AbstractOrmModelContainsUrlElement implements WebHookModel
     /**
      * Returns target service event description (a case when event fired, limitations, etc)
      *
-     * @return string
+     * @return string|null
      */
-    public function getServiceEventDescription(): string
+    public function getEventDescription(): ?string
     {
         return $this->description;
-    }
-
-    /**
-     * Returns ID provided by external service
-     *
-     * @return string
-     */
-    public function getExternalEventID(): string
-    {
-        return $this->external_event_id;
     }
 
     private function getService(): WebHookService

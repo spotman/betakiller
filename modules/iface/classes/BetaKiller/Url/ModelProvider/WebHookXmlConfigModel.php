@@ -39,7 +39,7 @@ class WebHookXmlConfigModel extends AbstractXmlConfigModel implements WebHookMod
      *
      * @return string
      */
-    public function getServiceEventName(): string
+    public function getEventName(): string
     {
         return $this->event;
     }
@@ -47,21 +47,11 @@ class WebHookXmlConfigModel extends AbstractXmlConfigModel implements WebHookMod
     /**
      * Returns target service event description (a case when event fired, limitations, etc)
      *
-     * @return string
+     * @return string|null
      */
-    public function getServiceEventDescription(): string
+    public function getEventDescription(): ?string
     {
         return $this->description;
-    }
-
-    /**
-     * Returns ID provided by external service
-     *
-     * @return string
-     */
-    public function getExternalEventID(): string
-    {
-        throw new \LogicException('XML-based UrlElement can not define external event ID');
     }
 
     /**
@@ -73,8 +63,8 @@ class WebHookXmlConfigModel extends AbstractXmlConfigModel implements WebHookMod
     {
         return array_merge(parent::asArray(), [
             self::OPTION_SERVICE_NAME  => $this->getServiceName(),
-            self::OPTION_SERVICE_EVENT => $this->getServiceEventName(),
-            self::OPTION_DESCRIPTION   => $this->getServiceEventDescription(),
+            self::OPTION_SERVICE_EVENT => $this->getEventName(),
+            self::OPTION_DESCRIPTION   => $this->getEventDescription(),
         ]);
     }
 
@@ -82,7 +72,7 @@ class WebHookXmlConfigModel extends AbstractXmlConfigModel implements WebHookMod
     {
         $this->service     = $data[self::OPTION_SERVICE_NAME];
         $this->event       = $data[self::OPTION_SERVICE_EVENT];
-        $this->description = $data[self::OPTION_DESCRIPTION];
+        $this->description = $data[self::OPTION_DESCRIPTION] ?? null;
 
         parent::fromArray($data);
     }

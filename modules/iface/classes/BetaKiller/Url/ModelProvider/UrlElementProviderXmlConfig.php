@@ -2,12 +2,17 @@
 namespace BetaKiller\Url\ModelProvider;
 
 use BetaKiller\IFace\Exception\IFaceException;
+use BetaKiller\Url\IFaceModelInterface;
 use BetaKiller\Url\UrlElementInterface;
+use BetaKiller\Url\WebHookModelInterface;
 use Kohana;
 use SimpleXMLElement;
 
 class UrlElementProviderXmlConfig implements UrlElementProviderInterface
 {
+    private const TAG_IFACE   = 'iface';
+    private const TAG_WEBHOOK = 'webhook';
+
     /**
      * @var AbstractXmlConfigModel[]
      */
@@ -59,7 +64,7 @@ class UrlElementProviderXmlConfig implements UrlElementProviderInterface
      *
      * @throws \BetaKiller\IFace\Exception\IFaceException
      */
-    private function parseXmlBranch(SimpleXMLElement $branch, UrlElementInterface $parentModel = null): void
+    private function parseXmlBranch(SimpleXMLElement $branch, ?UrlElementInterface $parentModel = null): void
     {
         // Parse branch childs
         foreach ($branch->children() as $childNode) {
@@ -76,41 +81,83 @@ class UrlElementProviderXmlConfig implements UrlElementProviderInterface
 
     /**
      * @param \SimpleXMLElement                        $branch
-     * @param \BetaKiller\Url\UrlElementInterface|null $parent
+     * @param \BetaKiller\Url\UrlElementInterface|null $xmlParent
      *
      * @return \BetaKiller\Url\UrlElementInterface
      * @throws \BetaKiller\IFace\Exception\IFaceException
      */
-    private function parseXmlItem(SimpleXMLElement $branch, UrlElementInterface $parent = null): UrlElementInterface
+    private function parseXmlItem(SimpleXMLElement $branch, ?UrlElementInterface $xmlParent = null): UrlElementInterface
     {
+        $tag    = $branch->getName();
         $attr   = (array)$branch->attributes();
         $config = $attr['@attributes'];
-        $codename = $config[IFaceXmlConfigModel::OPTION_CODENAME];
 
-        if ($parent) {
-            // Preset parent codename
-            if (empty($config[IFaceXmlConfigModel::OPTION_PARENT])) {
-                if (!$parent) {
-                    throw new IFaceException('Root URL element :name must define a parent', [
-                        ':name' => $codename,
-                    ]);
-                }
+        $codename = $config[AbstractXmlConfigModel::OPTION_CODENAME];
 
-                $config[IFaceXmlConfigModel::OPTION_PARENT] = $parent->getCodename();
+        if ($xmlParent) {
+            // Parent codename is not needed if nested in XML
+            if (isset($config[AbstractXmlConfigModel::OPTION_PARENT])) {
+                throw new IFaceException('UrlElement :name is already nested; no "parent" attribute please', [
+                    ':name' => $codename,
+                ]);
             }
 
-            if (empty($config[IFaceXmlConfigModel::OPTION_ZONE])) {
-                if (!$parent) {
-                    throw new IFaceException('Root URL element :name must define a zone', [
-                        ':name' => $codename,
-                    ]);
-                }
+            // Preset parent codename
+            $config[AbstractXmlConfigModel::OPTION_PARENT] = $xmlParent->getCodename();
+        }
 
-                $config[IFaceXmlConfigModel::OPTION_ZONE] = $parent->getZoneName();
+        // Detect real parent
+        $parentCodename = $config[AbstractXmlConfigModel::OPTION_PARENT] ?? null;
+        $realParent     = $parentCodename ? $this->models[$parentCodename] : null;
+
+        $config = $this->presetMissingFromParent($config, $realParent);
+
+        if ($realParent) {
+            if ($tag === self::TAG_WEBHOOK && $realParent instanceof WebHookModelInterface) {
+                $config = $this->presetMissingFromParentWebHook($config, $realParent);
+            }
+
+            if ($tag === self::TAG_IFACE && $realParent instanceof IFaceModelInterface) {
+                $config = $this->presetMissingFromParentIFace($config, $realParent);
             }
         }
 
-        return $this->createModelFromConfig($branch->getName(), $config);
+        return $this->createModelFromConfig($tag, $config);
+    }
+
+    private function presetMissingFromParent(array $config, ?UrlElementInterface $parent): array
+    {
+        $codename = $config[AbstractXmlConfigModel::OPTION_CODENAME];
+
+        if (empty($config[AbstractXmlConfigModel::OPTION_ZONE])) {
+            if (!$parent) {
+                throw new IFaceException('Root URL element :name must define a zone', [
+                    ':name' => $codename,
+                ]);
+            }
+
+            $config[AbstractXmlConfigModel::OPTION_ZONE] = $parent->getZoneName();
+        }
+
+        return $config;
+    }
+
+    private function presetMissingFromParentWebHook(array $config, WebHookModelInterface $parent): array
+    {
+        if (empty($config[WebHookXmlConfigModel::OPTION_SERVICE_NAME])) {
+            $config[WebHookXmlConfigModel::OPTION_SERVICE_NAME] = $parent->getServiceName();
+        }
+
+        return $config;
+    }
+
+    private function presetMissingFromParentIFace(array $config, IFaceModelInterface $parent): array
+    {
+        if (empty($config[IFaceXmlConfigModel::OPTION_LAYOUT])) {
+            $config[IFaceXmlConfigModel::OPTION_LAYOUT] = $parent->getLayoutCodename();
+        }
+
+        return $config;
     }
 
     /**

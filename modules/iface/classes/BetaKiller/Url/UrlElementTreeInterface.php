@@ -96,6 +96,15 @@ interface UrlElementTreeInterface
     ): UrlElementInterface;
 
     /**
+     * Returns array of WebHookModelInterface instances linked to provided service
+     *
+     * @param string $serviceName
+     *
+     * @return \BetaKiller\Url\WebHookModelInterface[]
+     */
+    public function getWebHooksByServiceName(string $serviceName): array;
+
+    /**
      * @param \BetaKiller\Url\UrlElementInterface $model
      *
      * @return \ArrayIterator|\BetaKiller\Url\UrlElementInterface[]

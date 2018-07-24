@@ -12,11 +12,11 @@ class UrlElementTreeRecursiveIterator extends UrlElementTreeLayerIterator implem
      * UrlElementTreeRecursiveIterator constructor.
      *
      * @param \BetaKiller\Url\UrlElementTreeInterface  $tree
-     * @param \BetaKiller\Url\IFaceModelInterface|NULL $parent
+     * @param \BetaKiller\Url\UrlElementInterface|null $parent
      *
      * @throws \BetaKiller\IFace\Exception\IFaceException
      */
-    public function __construct(UrlElementTreeInterface $tree, IFaceModelInterface $parent = null)
+    public function __construct(UrlElementTreeInterface $tree, ?UrlElementInterface $parent = null)
     {
         parent::__construct($tree, $parent);
 

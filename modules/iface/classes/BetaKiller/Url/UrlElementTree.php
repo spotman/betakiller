@@ -318,6 +318,20 @@ class UrlElementTree implements UrlElementTreeInterface
     }
 
     /**
+     * Returns array of WebHookModelInterface instances linked to provided service
+     *
+     * @param string $serviceName
+     *
+     * @return \BetaKiller\Url\WebHookModelInterface[]
+     */
+    public function getWebHooksByServiceName(string $serviceName): array
+    {
+        return \array_filter($this->items, function(UrlElementInterface $urlElement) use ($serviceName) {
+            return $urlElement instanceof WebHookModelInterface && $urlElement->getServiceName() === $serviceName;
+        });
+    }
+
+    /**
      * @param \BetaKiller\Url\UrlElementInterface $model
      *
      * @return \ArrayIterator|\BetaKiller\Url\UrlElementInterface[]
