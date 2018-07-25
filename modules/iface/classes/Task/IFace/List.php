@@ -1,7 +1,11 @@
 <?php
 declare(strict_types=1);
 
+use BetaKiller\IFace\Exception\IFaceException;
 use BetaKiller\Task\AbstractTask;
+use BetaKiller\Url\DummyModelInterface;
+use BetaKiller\Url\IFaceModelInterface;
+use BetaKiller\Url\WebHookModelInterface;
 
 class Task_IFace_List extends AbstractTask
 {
@@ -18,13 +22,24 @@ class Task_IFace_List extends AbstractTask
      */
     protected function _execute(array $params)
     {
-        $iterator = $this->tree->getRecursiveIteratorIterator();
+        foreach ($this->tree->getRecursiveIteratorIterator() as $model) {
+            if ($model instanceof IFaceModelInterface) {
+                $this->logger->info('[IFace] [:zone] :codename', [
+                    ':zone'     => $model->getZoneName(),
+                    ':codename' => $model->getCodename(),
+                ]);
+            } else if ($model instanceof WebHookModelInterface) {
+                $this->logger->info('[WebHook] :codename', [
+                    ':codename' => $model->getCodename(),
+                ]);
 
-        foreach ($iterator as $model) {
-            $this->logger->info('[:zone] :codename', [
-                ':zone'     => $model->getZoneName(),
-                ':codename' => $model->getCodename(),
-            ]);
+            } else if ($model instanceof DummyModelInterface) {
+                $this->logger->info('[Dummy] :codename', [
+                    ':codename' => $model->getCodename(),
+                ]);
+            } else {
+                throw new IFaceException('Unknown UrlElement :class', [':class' => \get_class($model)]);
+            }
         }
     }
 }

@@ -34,6 +34,18 @@ class UrlElementTree implements UrlElementTreeInterface
     }
 
     /**
+     * Returns true if Url element with provided codename exists
+     *
+     * @param string $codename
+     *
+     * @return bool
+     */
+    public function has(string $codename): bool
+    {
+        return isset($this->items[$codename]);
+    }
+
+    /**
      * @throws \BetaKiller\IFace\Exception\IFaceException
      */
     public function validate(): void
@@ -66,11 +78,22 @@ class UrlElementTree implements UrlElementTreeInterface
     private function validateLayer(array $models): void
     {
         $dynamicCounter = 0;
+        $uris = [];
 
         foreach ($models as $model) {
-            if ($model->hasDynamicUrl() || $model->hasTreeBehaviour()) {
+            if ($model instanceof IFaceModelInterface && ($model->hasDynamicUrl() || $model->hasTreeBehaviour())) {
                 $dynamicCounter++;
             }
+
+            $uri = $model->getUri();
+
+            if (\in_array($uri, $uris, true)) {
+                throw new IFaceException('Duplicate URIs per layer are not allowed, codename is :name', [
+                    ':name' => $model->getCodename(),
+                ]);
+            }
+
+            $uris[] = $uri;
         }
 
         if ($dynamicCounter > 1) {
@@ -85,9 +108,16 @@ class UrlElementTree implements UrlElementTreeInterface
      */
     private function validateModel(UrlElementInterface $model): void
     {
+        if ($model instanceof IFaceModelInterface) {
+            $this->validateIFaceModel($model);
+        }
+    }
+
+    private function validateIFaceModel(IFaceModelInterface $model): void
+    {
         $codename = $model->getCodename();
 
-        if ($model instanceof IFaceModelInterface && !$model->getLabel()) {
+        if (!$model->getLabel()) {
             throw new IFaceException('Label is missing for IFace :codename', [':codename' => $codename]);
         }
 
@@ -99,13 +129,13 @@ class UrlElementTree implements UrlElementTreeInterface
     /**
      * Returns default iface model
      *
-     * @return \BetaKiller\Url\UrlElementInterface
+     * @return \BetaKiller\Url\IFaceModelInterface
      * @throws \BetaKiller\IFace\Exception\IFaceException
      */
-    public function getDefault(): UrlElementInterface
+    public function getDefault(): IFaceModelInterface
     {
         foreach ($this->items as $item) {
-            if ($item->isDefault()) {
+            if ($item instanceof IFaceModelInterface && $item->isDefault()) {
                 return $item;
             }
         }
@@ -229,11 +259,15 @@ class UrlElementTree implements UrlElementTreeInterface
      *
      * @return \BetaKiller\Url\UrlElementInterface[]
      */
-    public function getByActionAndZone(string $action, string $zone): array
+    public function getIFacesByActionAndZone(string $action, string $zone): array
     {
         $output = [];
 
         foreach ($this->items as $model) {
+            if (!$model instanceof IFaceModelInterface) {
+                continue;
+            }
+
             if ($model->getEntityActionName() !== $action) {
                 continue;
             }
@@ -255,14 +289,14 @@ class UrlElementTree implements UrlElementTreeInterface
      * @param string                                        $action
      * @param string                                        $zone
      *
-     * @return \BetaKiller\Url\UrlElementInterface
+     * @return \BetaKiller\Url\IFaceModelInterface
      * @throws \BetaKiller\IFace\Exception\IFaceException
      */
     public function getByEntityActionAndZone(
         DispatchableEntityInterface $entity,
         string $action,
         string $zone
-    ): UrlElementInterface {
+    ): IFaceModelInterface {
         $key = implode('.', [$entity->getModelName(), $action, $zone]);
 
         $model = $this->getLinkedIFaceFromCache($key);
@@ -297,8 +331,12 @@ class UrlElementTree implements UrlElementTreeInterface
         DispatchableEntityInterface $entity,
         string $entityAction,
         string $zone
-    ): ?UrlElementInterface {
+    ): ?IFaceModelInterface {
         foreach ($this->items as $model) {
+            if (!$model instanceof IFaceModelInterface) {
+                continue;
+            }
+
             if ($model->getEntityModelName() !== $entity->getModelName()) {
                 continue;
             }
@@ -379,37 +417,37 @@ class UrlElementTree implements UrlElementTreeInterface
     /**
      * @param \BetaKiller\Url\UrlElementInterface|NULL $parent
      *
-     * @return \RecursiveIteratorIterator|\BetaKiller\Url\UrlElementInterface[]
+     * @return \RecursiveIteratorIterator|\BetaKiller\Url\IFaceModelInterface[]
      * @throws \BetaKiller\IFace\Exception\IFaceException
      */
-    public function getRecursivePublicIterator(UrlElementInterface $parent = null): \RecursiveIteratorIterator
+    public function getPublicIFaceIterator(UrlElementInterface $parent = null): \RecursiveIteratorIterator
     {
         return $this->getRecursiveFilterIterator(function (UrlElementInterface $model) {
-            return $this->isPublicModel($model);
+            return $this->isIFace($model) && $this->isPublicModel($model);
         }, $parent);
     }
 
     /**
-     * @return \RecursiveIteratorIterator|\BetaKiller\Url\UrlElementInterface[]
+     * @return \RecursiveIteratorIterator|\BetaKiller\Url\IFaceModelInterface[]
      * @throws \BetaKiller\IFace\Exception\IFaceException
      */
     public function getRecursiveSitemapIterator(): \RecursiveIteratorIterator
     {
         return $this->getRecursiveFilterIterator(function (UrlElementInterface $model) {
-            return !$model->hideInSiteMap() && $this->isPublicModel($model);
+            return $this->isIFace($model) && !$model->isHiddenInSiteMap() && $this->isPublicModel($model);
         });
     }
 
     /**
      * @param \BetaKiller\Url\UrlElementInterface|NULL $parent
      *
-     * @return \RecursiveIteratorIterator|\BetaKiller\Url\UrlElementInterface[]
+     * @return \RecursiveIteratorIterator|\BetaKiller\Url\IFaceModelInterface[]
      * @throws \BetaKiller\IFace\Exception\IFaceException
      */
-    public function getRecursiveAdminIterator(UrlElementInterface $parent = null): \RecursiveIteratorIterator
+    public function getAdminIFaceIterator(UrlElementInterface $parent = null): \RecursiveIteratorIterator
     {
         return $this->getRecursiveFilterIterator(function (UrlElementInterface $model) {
-            return $this->isAdminModel($model);
+            return $this->isIFace($model) && $this->isAdminModel($model);
         }, $parent);
     }
 
@@ -430,6 +468,11 @@ class UrlElementTree implements UrlElementTreeInterface
         return new \RecursiveIteratorIterator($filter, \RecursiveIteratorIterator::SELF_FIRST);
     }
 
+    private function isIFace(UrlElementInterface $urlElement): bool
+    {
+        return $urlElement instanceof IFaceModelInterface;
+    }
+
     /**
      * @param \BetaKiller\Url\UrlElementInterface $model
      *
@@ -437,6 +480,10 @@ class UrlElementTree implements UrlElementTreeInterface
      */
     private function isAdminModel(UrlElementInterface $model): bool
     {
+        if (!$model instanceof IFaceModelInterface) {
+            return false;
+        }
+
         return $model->getZoneName() === ZoneInterface::ADMIN;
     }
 
@@ -447,16 +494,20 @@ class UrlElementTree implements UrlElementTreeInterface
      */
     private function isPublicModel(UrlElementInterface $model): bool
     {
+        if (!$model instanceof IFaceModelInterface) {
+            return false;
+        }
+
         return $model->getZoneName() === ZoneInterface::PUBLIC;
     }
 
     /**
      * @param string $key
      *
-     * @return \BetaKiller\Url\UrlElementInterface|null
+     * @return \BetaKiller\Url\IFaceModelInterface|null
      * @throws \BetaKiller\IFace\Exception\IFaceException
      */
-    private function getLinkedIFaceFromCache(string $key): ?UrlElementInterface
+    private function getLinkedIFaceFromCache(string $key): ?IFaceModelInterface
     {
         if (!isset($this->entityLinkedCodenameCache[$key])) {
             return null;
@@ -464,14 +515,23 @@ class UrlElementTree implements UrlElementTreeInterface
 
         $codename = $this->entityLinkedCodenameCache[$key];
 
-        return $this->getByCodename($codename);
+        $instance = $this->getByCodename($codename);
+
+        if (!$instance instanceof IFaceModelInterface) {
+            throw new IFaceException('UrlElement :name must implement :must', [
+                ':name' => $codename,
+                ':must' => IFaceModelInterface::class,
+            ]);
+        }
+
+        return $instance;
     }
 
     /**
      * @param string                              $key
-     * @param \BetaKiller\Url\UrlElementInterface $model
+     * @param \BetaKiller\Url\IFaceModelInterface $model
      */
-    private function storeLinkedIFaceInCache(string $key, UrlElementInterface $model): void
+    private function storeLinkedIFaceInCache(string $key, IFaceModelInterface $model): void
     {
         $this->entityLinkedCodenameCache[$key] = $model->getCodename();
     }

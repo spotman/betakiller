@@ -1,10 +1,13 @@
 <?php
 namespace BetaKiller\Url\ModelProvider;
 
+use BetaKiller\Model\WebHookModelTrait;
 use BetaKiller\Url\WebHookModelInterface;
 
-class WebHookXmlConfigModel extends AbstractXmlConfigModel implements WebHookModelInterface
+class WebHookPlainModel extends AbstractPlainUrlElementModel implements WebHookModelInterface
 {
+    use WebHookModelTrait;
+
     public const OPTION_SERVICE_NAME  = 'service';
     public const OPTION_SERVICE_EVENT = 'event';
     public const OPTION_DESCRIPTION   = 'description';
@@ -75,14 +78,5 @@ class WebHookXmlConfigModel extends AbstractXmlConfigModel implements WebHookMod
         $this->description = $data[self::OPTION_DESCRIPTION] ?? null;
 
         parent::fromArray($data);
-    }
-
-    /**
-     * @return bool
-     */
-    public function hideInSiteMap(): bool
-    {
-        // Always hide in sitemap
-        return true;
     }
 }

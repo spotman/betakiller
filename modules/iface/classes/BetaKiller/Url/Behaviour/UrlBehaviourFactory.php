@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace BetaKiller\Url\Behaviour;
 
 use BetaKiller\Factory\NamespaceBasedFactoryBuilder;
+use BetaKiller\Url\IFaceModelInterface;
 use BetaKiller\Url\UrlElementInterface;
 
 class UrlBehaviourFactory
@@ -54,12 +55,14 @@ class UrlBehaviourFactory
      */
     private function detectCodename(UrlElementInterface $model): string
     {
-        if ($model->hasTreeBehaviour()) {
-            return self::BEHAVIOUR_TREE;
-        }
+        if ($model instanceof IFaceModelInterface) {
+            if ($model->hasTreeBehaviour()) {
+                return self::BEHAVIOUR_TREE;
+            }
 
-        if ($model->hasDynamicUrl()) {
-            return self::BEHAVIOUR_MULTIPLE;
+            if ($model->hasDynamicUrl()) {
+                return self::BEHAVIOUR_MULTIPLE;
+            }
         }
 
         // Raw mapping by default

@@ -14,6 +14,15 @@ interface UrlElementTreeInterface
     public function add(UrlElementInterface $model, ?bool $warnIfExists = null): void;
 
     /**
+     * Returns true if Url element with provided codename exists
+     *
+     * @param string $codename
+     *
+     * @return bool
+     */
+    public function has(string $codename): bool;
+
+    /**
      * @throws \BetaKiller\IFace\Exception\IFaceException
      */
     public function validate(): void;
@@ -21,10 +30,10 @@ interface UrlElementTreeInterface
     /**
      * Returns default iface model
      *
-     * @return \BetaKiller\Url\UrlElementInterface
+     * @return \BetaKiller\Url\IFaceModelInterface
      * @throws \BetaKiller\IFace\Exception\IFaceException
      */
-    public function getDefault(): UrlElementInterface;
+    public function getDefault(): IFaceModelInterface;
 
     /**
      * Returns list of root elements
@@ -75,9 +84,9 @@ interface UrlElementTreeInterface
      * @param string $action
      * @param string $zone
      *
-     * @return \BetaKiller\Url\UrlElementInterface[]
+     * @return \BetaKiller\Url\IFaceModelInterface[]
      */
-    public function getByActionAndZone(string $action, string $zone): array;
+    public function getIFacesByActionAndZone(string $action, string $zone): array;
 
     /**
      * Search for UrlElement linked to provided entity, entity action and zone
@@ -86,14 +95,14 @@ interface UrlElementTreeInterface
      * @param string                                        $action
      * @param string                                        $zone
      *
-     * @return \BetaKiller\Url\UrlElementInterface
+     * @return \BetaKiller\Url\IFaceModelInterface
      * @throws \BetaKiller\IFace\Exception\IFaceException
      */
     public function getByEntityActionAndZone(
         DispatchableEntityInterface $entity,
         string $action,
         string $zone
-    ): UrlElementInterface;
+    ): IFaceModelInterface;
 
     /**
      * Returns array of WebHookModelInterface instances linked to provided service
@@ -126,7 +135,7 @@ interface UrlElementTreeInterface
      * @return \RecursiveIteratorIterator|\BetaKiller\Url\UrlElementInterface[]
      * @throws \BetaKiller\IFace\Exception\IFaceException
      */
-    public function getRecursivePublicIterator(UrlElementInterface $parent = null): \RecursiveIteratorIterator;
+    public function getPublicIFaceIterator(UrlElementInterface $parent = null): \RecursiveIteratorIterator;
 
     /**
      * @return \RecursiveIteratorIterator|\BetaKiller\Url\UrlElementInterface[]
@@ -140,5 +149,5 @@ interface UrlElementTreeInterface
      * @return \RecursiveIteratorIterator|\BetaKiller\Url\UrlElementInterface[]
      * @throws \BetaKiller\IFace\Exception\IFaceException
      */
-    public function getRecursiveAdminIterator(UrlElementInterface $parent = null): \RecursiveIteratorIterator;
+    public function getAdminIFaceIterator(UrlElementInterface $parent = null): \RecursiveIteratorIterator;
 }

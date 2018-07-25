@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace BetaKiller\Widget;
 
 use BetaKiller\Model\RoleInterface;
-use BetaKiller\Url\UrlElementInterface;
+use BetaKiller\Url\IFaceModelInterface;
 
 class BreadcrumbsWidget extends AbstractWidget
 {
@@ -38,6 +38,11 @@ class BreadcrumbsWidget extends AbstractWidget
         $data = [];
 
         foreach ($this->stack->getIterator() as $model) {
+            // Show only ifaces
+            if (!$model instanceof IFaceModelInterface) {
+                continue;
+            }
+
             $data[] = $this->makeBreadcrumbData($model);
         }
 
@@ -47,13 +52,13 @@ class BreadcrumbsWidget extends AbstractWidget
     }
 
     /**
-     * @param \BetaKiller\Url\UrlElementInterface $urlElement
+     * @param \BetaKiller\Url\IFaceModelInterface $urlElement
      *
      * @return array
      * @throws \BetaKiller\IFace\Exception\IFaceException
      * @throws \BetaKiller\Url\UrlPrototypeException
      */
-    private function makeBreadcrumbData(UrlElementInterface $urlElement): array
+    private function makeBreadcrumbData(IFaceModelInterface $urlElement): array
     {
         return [
             'url'    => $this->ifaceHelper->makeUrl($urlElement, $this->urlContainer),

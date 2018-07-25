@@ -52,7 +52,8 @@ class BarWidget extends AbstractAdminWidget
         AclHelper $aclHelper,
         UrlContainerHelper $urlParamHelper
 //        ContentHelper $contentHelper
-    ) {
+    )
+    {
         parent::__construct();
 
         $this->tree           = $tree;
@@ -90,7 +91,7 @@ class BarWidget extends AbstractAdminWidget
 
     protected function getPrimaryEntityData(): array
     {
-        $currentUrlElement = $this->ifaceHelper->getCurrentUrlElement();
+        $currentUrlElement = $this->ifaceHelper->getCurrentIFaceModel();
         $primaryEntity     = $currentUrlElement ? $this->ifaceHelper->detectPrimaryEntity($currentUrlElement) : null;
 
         return [
@@ -109,7 +110,7 @@ class BarWidget extends AbstractAdminWidget
     protected function getCreateButtonItems(): array
     {
         $items       = [];
-        $urlElements = $this->tree->getByActionAndZone(CrudlsActionsInterface::ACTION_CREATE,
+        $urlElements = $this->tree->getIFacesByActionAndZone(CrudlsActionsInterface::ACTION_CREATE,
             ZoneInterface::ADMIN);
 
         foreach ($urlElements as $urlElement) {

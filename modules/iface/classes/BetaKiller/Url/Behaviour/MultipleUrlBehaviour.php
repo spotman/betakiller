@@ -6,6 +6,7 @@ namespace BetaKiller\Url\Behaviour;
 use BetaKiller\Factory\FactoryException;
 use BetaKiller\Repository\RepositoryException;
 use BetaKiller\Url\Container\UrlContainerInterface;
+use BetaKiller\Url\IFaceModelInterface;
 use BetaKiller\Url\UrlDispatcher;
 use BetaKiller\Url\UrlElementInterface;
 use BetaKiller\Url\UrlPathIterator;
@@ -62,6 +63,12 @@ class MultipleUrlBehaviour extends AbstractUrlBehaviour
         UrlPathIterator $it,
         UrlContainerInterface $urlContainer
     ): void {
+        if (!$ifaceModel instanceof IFaceModelInterface) {
+            throw new UrlBehaviourException('MultipleUrlBehavior can proceed :class only', [
+                ':class' => IFaceModelInterface::class,
+            ]);
+        }
+
         $prototype = $this->urlPrototypeService->createPrototypeFromUrlElement($ifaceModel);
 
         // Root element have default uri
@@ -107,6 +114,12 @@ class MultipleUrlBehaviour extends AbstractUrlBehaviour
      */
     public function getAvailableUrls(UrlElementInterface $urlElement, UrlContainerInterface $params): \Generator
     {
+        if (!$urlElement instanceof IFaceModelInterface) {
+            throw new UrlBehaviourException('MultipleUrlBehavior can proceed :class only', [
+                ':class' => IFaceModelInterface::class,
+            ]);
+        }
+
         $prototype = $this->urlPrototypeService->createPrototypeFromUrlElement($urlElement);
         $items     = $this->urlPrototypeService->getAvailableParameters($prototype, $params);
 
