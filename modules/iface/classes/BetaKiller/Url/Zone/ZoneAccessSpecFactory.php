@@ -23,7 +23,8 @@ class ZoneAccessSpecFactory
             ->createFactory()
             ->setClassNamespaces(...ZoneAccessSpecInterface::NAMESPACES)
             ->setClassSuffix(ZoneAccessSpecInterface::SUFFIX)
-            ->setExpectedInterface(ZoneAccessSpecInterface::class);
+            ->setExpectedInterface(ZoneAccessSpecInterface::class)
+            ->cacheInstances();
     }
 
     public function create(string $zoneName): ZoneAccessSpecInterface

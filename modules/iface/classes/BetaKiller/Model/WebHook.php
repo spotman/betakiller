@@ -10,10 +10,12 @@ use BetaKiller\Url\WebHookModelInterface;
  *
  * @category   Models
  * @author     Spotman
- * @package    Betakiller
+ * @package    Betakiller\Url
  */
 class WebHook extends AbstractOrmModelContainsUrlElement implements WebHookModelInterface
 {
+    use WebHookModelTrait;
+
     protected function configure(): void
     {
         $this->belongs_to([
@@ -26,17 +28,6 @@ class WebHook extends AbstractOrmModelContainsUrlElement implements WebHookModel
         $this->load_with(['service']);
 
         parent::configure();
-    }
-
-    /**
-     * Returns TRUE if current URL element is hidden in sitemap
-     *
-     * @return bool
-     */
-    public function hideInSiteMap(): bool
-    {
-        // Webhooks are always hidden in sitemap
-        return true;
     }
 
     /**

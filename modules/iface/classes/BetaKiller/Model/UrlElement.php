@@ -14,7 +14,7 @@ use BetaKiller\Url\WebHookModelInterface;
  *
  * @category   Models
  * @author     Spotman
- * @package    Betakiller
+ * @package    Betakiller\Url
  */
 class UrlElement extends AbstractOrmBasedSingleParentTreeModel implements UrlElementInterface
 {
@@ -23,26 +23,14 @@ class UrlElement extends AbstractOrmBasedSingleParentTreeModel implements UrlEle
         $this->_table_name = 'url_elements';
 
         $this->belongs_to([
-            'type'   => [
+            'type' => [
                 'model'       => 'UrlElementType',
                 'foreign_key' => 'type_id',
-            ],
-            'entity' => [
-                'model'       => 'Entity',
-                'foreign_key' => 'entity_id',
-            ],
-            'action' => [
-                'model'       => 'EntityAction',
-                'foreign_key' => 'entity_action_id',
-            ],
-            'zone'   => [
-                'model'       => 'UrlElementZone',
-                'foreign_key' => 'zone_id',
             ],
         ]);
 
         $this->has_one([
-            'iface' => [
+            'iface'   => [
                 'model'       => 'IFace',
                 'foreign_key' => 'element_id',
             ],
@@ -61,22 +49,9 @@ class UrlElement extends AbstractOrmBasedSingleParentTreeModel implements UrlEle
 
         $this->load_with([
             'type',
-            'entity',
-            'action',
-            'zone',
         ]);
 
         parent::configure();
-    }
-
-    /**
-     * Returns TRUE if iface is marked as "default"
-     *
-     * @return bool
-     */
-    public function isDefault(): bool
-    {
-        return (bool)$this->is_default;
     }
 
     /**
@@ -126,67 +101,12 @@ class UrlElement extends AbstractOrmBasedSingleParentTreeModel implements UrlEle
     }
 
     /**
-     * Returns TRUE if iface provides dynamic url mapping
-     *
-     * @return bool
-     */
-    public function hasDynamicUrl(): bool
-    {
-        return (bool)$this->is_dynamic;
-    }
-
-    /**
-     * Returns TRUE if iface has multi-level tree-behavior url mapping
-     *
-     * @return bool
-     */
-    public function hasTreeBehaviour(): bool
-    {
-        return (bool)$this->is_tree;
-    }
-
-    /**
      * @return bool
      * @throws \BetaKiller\Exception\NotImplementedHttpException
      */
-    public function hideInSiteMap(): bool
+    public function isHiddenInSiteMap(): bool
     {
-        throw new NotImplementedHttpException('Call ::hideInSiteMap() on dedicated URL elements` classes');
-    }
-
-    /**
-     * Returns model name of the linked entity
-     *
-     * @return string|null
-     */
-    public function getEntityModelName(): ?string
-    {
-        $entity = $this->getEntityRelation();
-
-        return $entity->loaded() ? $entity->getLinkedModelName() : null;
-    }
-
-    /**
-     * Returns entity [primary] action, applied by this IFace
-     *
-     * @return string|null
-     */
-    public function getEntityActionName(): ?string
-    {
-        $entityAction = $this->getEntityActionRelation();
-
-        return $entityAction->loaded() ? $entityAction->getName() : null;
-    }
-
-    /**
-     * Returns zone codename where this IFace is placed
-     *
-     * @return string
-     * @throws \Kohana_Exception
-     */
-    public function getZoneName(): string
-    {
-        return $this->getZoneRelation()->getName();
+        throw new NotImplementedHttpException('Call ::isHiddenInSiteMap() on dedicated URL elements` classes');
     }
 
     /**
@@ -259,30 +179,6 @@ class UrlElement extends AbstractOrmBasedSingleParentTreeModel implements UrlEle
         $parent = $this->getParent();
 
         return $parent ? $parent->getCodename() : null;
-    }
-
-    /**
-     * @return \BetaKiller\Model\Entity
-     */
-    private function getEntityRelation(): Entity
-    {
-        return $this->entity;
-    }
-
-    /**
-     * @return \BetaKiller\Model\EntityAction
-     */
-    private function getEntityActionRelation(): EntityAction
-    {
-        return $this->action;
-    }
-
-    /**
-     * @return \BetaKiller\Model\UrlElementZone
-     */
-    private function getZoneRelation(): UrlElementZone
-    {
-        return $this->zone;
     }
 
     /**

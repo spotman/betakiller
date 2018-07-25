@@ -85,7 +85,7 @@ class AvailableUrlsCollector
     ): \Generator {
         foreach ($models as $urlElement) {
             // Skip hidden ifaces
-            if (!$useHidden && $urlElement->hideInSiteMap()) {
+            if (!$useHidden && $urlElement->isHiddenInSiteMap()) {
                 continue;
             }
 

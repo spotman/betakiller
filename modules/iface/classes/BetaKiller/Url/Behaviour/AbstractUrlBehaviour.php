@@ -5,6 +5,7 @@ namespace BetaKiller\Url\Behaviour;
 
 use BetaKiller\Url\AvailableUri;
 use BetaKiller\Url\Container\UrlContainerInterface;
+use BetaKiller\Url\IFaceModelInterface;
 use BetaKiller\Url\Parameter\UrlParameterInterface;
 use BetaKiller\Url\UrlDispatcher;
 use BetaKiller\Url\UrlElementInterface;
@@ -31,7 +32,7 @@ abstract class AbstractUrlBehaviour implements UrlBehaviourInterface
         $uri = $this->getUri($urlElement, $params);
 
         // Link to the root if this is a default element
-        if ($uri === UrlDispatcher::DEFAULT_URI && $urlElement->isDefault()) {
+        if ($uri === UrlDispatcher::DEFAULT_URI && $urlElement instanceof IFaceModelInterface && $urlElement->isDefault()) {
             $uri = '';
         }
 

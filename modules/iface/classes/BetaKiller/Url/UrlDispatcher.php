@@ -296,11 +296,11 @@ class UrlDispatcher implements LoggerAwareInterface
         ?UrlElementInterface $parentModel
     ): ?UrlElementInterface {
         if ($it->rootRequested()) {
-            $urlElement = $this->tree->getDefault();
+            $defaultIFace = $this->tree->getDefault();
 
-            $this->processUrlBehaviour($urlElement, $it, $urlParameters);
+            $this->processUrlBehaviour($defaultIFace, $it, $urlParameters);
 
-            return $urlElement;
+            return $defaultIFace;
         }
 
         // Get child IFaces
@@ -357,7 +357,7 @@ class UrlDispatcher implements LoggerAwareInterface
         $dynamic = [];
 
         foreach ($models as $model) {
-            if ($model->hasDynamicUrl() || $model->hasTreeBehaviour()) {
+            if ($model instanceof IFaceModelInterface && ($model->hasDynamicUrl() || $model->hasTreeBehaviour())) {
                 $dynamic[] = $model;
             } else {
                 $fixed[] = $model;
@@ -431,7 +431,7 @@ class UrlDispatcher implements LoggerAwareInterface
         UrlElementStack $stack,
         UrlContainerInterface $urlParameters
     ): void {
-        $this->checkIFaceAccess($urlElement, $urlParameters);
+        $this->checkUrlElementAccess($urlElement, $urlParameters);
         $stack->push($urlElement);
     }
 
@@ -445,7 +445,7 @@ class UrlDispatcher implements LoggerAwareInterface
      * @throws \BetaKiller\IFace\Exception\IFaceException
      * @throws \Spotman\Acl\Exception
      */
-    private function checkIFaceAccess(UrlElementInterface $urlElement, UrlContainerInterface $urlParameters): void
+    private function checkUrlElementAccess(UrlElementInterface $urlElement, UrlContainerInterface $urlParameters): void
     {
         // Force authorization for non-public zones before security check
         $this->aclHelper->forceAuthorizationIfNeeded($urlElement);

@@ -1,46 +1,21 @@
 <?php
-declare(strict_types=1);
-
 namespace BetaKiller\Url\ModelProvider;
 
 use BetaKiller\Exception\NotImplementedHttpException;
-use BetaKiller\Url\UrlElementInterface;
-use BetaKiller\Url\ZoneInterface;
+use BetaKiller\Helper\SeoMetaInterface;
+use BetaKiller\Url\IFaceModelInterface;
 
-abstract class AbstractXmlConfigModel implements UrlElementInterface
+class IFacePlainModel extends AbstractPlainUrlElementModel implements IFaceModelInterface
 {
-    public const OPTION_CODENAME           = 'name';
     public const OPTION_LABEL              = 'label';
-    public const OPTION_PARENT             = 'parent';
-    public const OPTION_URI                = 'uri';
+    public const OPTION_TITLE              = 'title';
+    public const OPTION_LAYOUT             = 'layout';
     public const OPTION_IS_DEFAULT         = 'isDefault';
-    public const OPTION_HIDE_IN_SITEMAP    = 'hideInSiteMap';
     public const OPTION_HAS_DYNAMIC_URL    = 'hasDynamicUrl';
     public const OPTION_HAS_TREE_BEHAVIOUR = 'hasTreeBehaviour';
     public const OPTION_ENTITY_NAME        = 'entity';
     public const OPTION_ENTITY_ACTION      = 'entityAction';
     public const OPTION_ZONE               = 'zone';
-    public const OPTION_ACL_RULES          = 'aclRules';
-
-    /**
-     * @var string
-     */
-    private $codename;
-
-    /**
-     * @var string
-     */
-    private $label;
-
-    /**
-     * @var string|null
-     */
-    private $parentCodename;
-
-    /**
-     * @var string
-     */
-    private $uri;
 
     /**
      * @var bool
@@ -58,6 +33,28 @@ abstract class AbstractXmlConfigModel implements UrlElementInterface
     private $hasTreeBehaviour = false;
 
     /**
+     * @var string
+     */
+    private $label;
+
+    /**
+     * @var string
+     */
+    private $title;
+
+    /**
+     * Admin IFaces have "admin" layout by default
+     *
+     * @var string|null
+     */
+    private $layoutCodename;
+
+    /**
+     * @var bool
+     */
+    private $hideInSiteMap = false;
+
+    /**
      * @var string|null
      */
     private $entityName;
@@ -70,21 +67,7 @@ abstract class AbstractXmlConfigModel implements UrlElementInterface
     /**
      * @var string
      */
-    private $zone = ZoneInterface::ADMIN;
-
-    /**
-     * @var string[]
-     */
-    private $aclRules = [];
-
-    public static function factory(array $data)
-    {
-        /** @var static $instance */
-        $instance = new static;
-        $instance->fromArray($data);
-
-        return $instance;
-    }
+    private $zone;
 
     /**
      * Returns TRUE if iface is marked as "default"
@@ -94,44 +77,6 @@ abstract class AbstractXmlConfigModel implements UrlElementInterface
     public function isDefault(): bool
     {
         return $this->isDefault;
-    }
-
-    /**
-     * @return string
-     * @throws \BetaKiller\Exception\NotImplementedHttpException
-     */
-    public function getID(): string
-    {
-        throw new NotImplementedHttpException('XML-based URL element model have no ID');
-    }
-
-    /**
-     * @return bool
-     */
-    public function hasID(): bool
-    {
-        // Models from XML config can not obtain ID
-        return false;
-    }
-
-    /**
-     * Returns iface url part
-     *
-     * @return string
-     */
-    public function getUri(): string
-    {
-        return $this->uri;
-    }
-
-    /**
-     * @param string $uri
-     *
-     * @throws \BetaKiller\Exception\NotImplementedHttpException
-     */
-    public function setUri(string $uri): void
-    {
-        throw new NotImplementedHttpException('XML-based URL element model can not change uri');
     }
 
     /**
@@ -151,27 +96,54 @@ abstract class AbstractXmlConfigModel implements UrlElementInterface
      */
     public function setLabel(string $value): void
     {
-        throw new NotImplementedHttpException('XML-based URL element model can not change label');
+        throw new NotImplementedHttpException('Config-based URL element model can not change label');
     }
 
     /**
-     * Returns codename of parent IFace or NULL
+     * Sets title for using in <title> tag
      *
-     * @return string|null
+     * @param string $value
+     *
+     * @return SeoMetaInterface
+     * @throws \BetaKiller\Exception\NotImplementedHttpException
      */
-    public function getParentCodename(): ?string
+    public function setTitle(string $value): SeoMetaInterface
     {
-        return $this->parentCodename;
+        throw new NotImplementedHttpException('Admin model can not change title');
     }
 
     /**
-     * Returns iface codename
+     * Sets description for using in <meta> tag
+     *
+     * @param string $value
+     *
+     * @return SeoMetaInterface
+     * @throws \BetaKiller\Exception\NotImplementedHttpException
+     */
+    public function setDescription(string $value): SeoMetaInterface
+    {
+        throw new NotImplementedHttpException('Admin model can not change description');
+    }
+
+    /**
+     * Returns title for using in page <title> tag
      *
      * @return string
      */
-    public function getCodename(): string
+    public function getTitle(): ?string
     {
-        return $this->codename;
+        return $this->title;
+    }
+
+    /**
+     * Returns description for using in <meta> tag
+     *
+     * @return string
+     */
+    public function getDescription(): ?string
+    {
+        // Admin IFace does not need description
+        return null;
     }
 
     /**
@@ -181,30 +153,32 @@ abstract class AbstractXmlConfigModel implements UrlElementInterface
      */
     public function asArray(): array
     {
-        return [
-            self::OPTION_CODENAME        => $this->getCodename(),
-            self::OPTION_URI             => $this->getUri(),
+        return array_merge(parent::asArray(), [
             self::OPTION_LABEL           => $this->getLabel(),
-            self::OPTION_PARENT          => $this->getParentCodename(),
+            self::OPTION_TITLE           => $this->getTitle(),
+            self::OPTION_LAYOUT          => $this->getLayoutCodename(),
             self::OPTION_IS_DEFAULT      => $this->isDefault(),
             self::OPTION_HAS_DYNAMIC_URL => $this->hasDynamicUrl(),
-            self::OPTION_HIDE_IN_SITEMAP => $this->hideInSiteMap(),
             self::OPTION_ENTITY_NAME     => $this->getEntityModelName(),
             self::OPTION_ENTITY_ACTION   => $this->getEntityActionName(),
             self::OPTION_ZONE            => $this->getZoneName(),
-            self::OPTION_ACL_RULES       => $this->getAdditionalAclRules(),
-        ];
+        ]);
+    }
+
+    /**
+     * Returns layout codename
+     *
+     * @return string
+     */
+    public function getLayoutCodename(): ?string
+    {
+        return $this->layoutCodename;
     }
 
     public function fromArray(array $data): void
     {
-        $this->uri      = $data[self::OPTION_URI];
-        $this->codename = $data[self::OPTION_CODENAME];
-        $this->label    = $data[self::OPTION_LABEL] ?? null;
-
-        if (isset($data[self::OPTION_PARENT])) {
-            $this->parentCodename = (string)$data[self::OPTION_PARENT];
-        }
+        $this->label = $data[self::OPTION_LABEL] ?? null;
+        $this->title = $data[self::OPTION_TITLE] ?? null;
 
         if (isset($data[self::OPTION_IS_DEFAULT])) {
             $this->isDefault = true;
@@ -226,14 +200,27 @@ abstract class AbstractXmlConfigModel implements UrlElementInterface
             $this->entityAction = (string)$data[self::OPTION_ENTITY_ACTION];
         }
 
+        if (isset($data[self::OPTION_HIDE_IN_SITEMAP])) {
+            $this->hideInSiteMap = true;
+        }
+
+        if (isset($data[self::OPTION_LAYOUT])) {
+            $this->layoutCodename = (string)$data[self::OPTION_LAYOUT];
+        }
+
         if (isset($data[self::OPTION_ZONE])) {
             $this->zone = mb_strtolower($data[self::OPTION_ZONE]);
         }
 
-        if (isset($data[self::OPTION_ACL_RULES])) {
-            $values         = explode(',', (string)$data[self::OPTION_ACL_RULES]);
-            $this->aclRules = array_filter(array_map('trim', $values));
-        }
+        parent::fromArray($data);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isHiddenInSiteMap(): bool
+    {
+        return $this->hideInSiteMap;
     }
 
     /**
@@ -284,14 +271,5 @@ abstract class AbstractXmlConfigModel implements UrlElementInterface
     public function getZoneName(): string
     {
         return $this->zone;
-    }
-
-    /**
-     *
-     * @return string[]
-     */
-    public function getAdditionalAclRules(): array
-    {
-        return $this->aclRules;
     }
 }

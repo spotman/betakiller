@@ -7,6 +7,7 @@ use BetaKiller\IFace\Exception\IFaceException;
 use BetaKiller\IFace\IFaceInterface;
 use BetaKiller\Model\DispatchableEntityInterface;
 use BetaKiller\Url\Container\UrlContainerInterface;
+use BetaKiller\Url\EntityLinkedUrlElementInterface;
 use BetaKiller\Url\IFaceModelInterface;
 use BetaKiller\Url\UrlElementInterface;
 use BetaKiller\Url\UrlElementStack;
@@ -105,7 +106,7 @@ class IFaceHelper
 
     public function isCurrentIFaceAction(string $name): bool
     {
-        $currentElement = $this->getCurrentUrlElement();
+        $currentElement = $this->getCurrentIFaceModel();
         $currentAction  = $currentElement ? $currentElement->getEntityActionName() : null;
 
         return $currentAction === $name;
@@ -118,8 +119,8 @@ class IFaceHelper
      */
     public function isCurrentZone(string $zone): bool
     {
-        $currentElement = $this->getCurrentUrlElement();
-        $currentZone    = $currentElement ? $currentElement->getZoneName() : null;
+        $currentIFace = $this->getCurrentIFaceModel();
+        $currentZone  = $currentIFace ? $currentIFace->getZoneName() : null;
 
         return $currentZone === $zone;
     }
@@ -187,14 +188,14 @@ class IFaceHelper
         ?bool $removeCycling = null
     ): string {
         if (!$zone) {
-            $currentUrlElement = $this->getCurrentUrlElement();
+            $currentIFaceModel = $this->getCurrentIFaceModel();
 
-            if (!$currentUrlElement) {
+            if (!$currentIFaceModel) {
                 throw new IFaceException('UrlElement zone must be specified');
             }
 
             // Fetch zone from current UrlElement
-            $zone = $currentUrlElement->getZoneName();
+            $zone = $currentIFaceModel->getZoneName();
         }
 
         $params = $this->paramsHelper->createResolving();
@@ -340,12 +341,12 @@ class IFaceHelper
     }
 
     /**
-     * @param \BetaKiller\Url\UrlElementInterface $urlElement
+     * @param \BetaKiller\Url\EntityLinkedUrlElementInterface $urlElement
      *
      * @return \BetaKiller\Model\DispatchableEntityInterface|null
      * @throws \BetaKiller\IFace\Exception\IFaceException
      */
-    public function detectPrimaryEntity(UrlElementInterface $urlElement): ?DispatchableEntityInterface
+    public function detectPrimaryEntity(EntityLinkedUrlElementInterface $urlElement): ?DispatchableEntityInterface
     {
         $current = $urlElement;
 
@@ -376,7 +377,7 @@ class IFaceHelper
     }
 
     /**
-     * @param \BetaKiller\Url\UrlElementInterface                  $model
+     * @param \BetaKiller\Url\IFaceModelInterface                  $model
      *
      * @param \BetaKiller\Url\Container\UrlContainerInterface|null $params
      * @param int|null                                             $limit
@@ -386,14 +387,14 @@ class IFaceHelper
      * @throws \BetaKiller\Url\UrlPrototypeException
      */
     public function getLabel(
-        UrlElementInterface $model,
+        IFaceModelInterface $model,
         ?UrlContainerInterface $params = null,
         ?int $limit = null
     ): string {
         $label = $model->getLabel();
 
         if (!$label) {
-            throw new IFaceException('Missing label for :codename IFace', [':codename' => $model->getCodename()]);
+            throw new IFaceException('Missing label for :codename UrlElement', [':codename' => $model->getCodename()]);
         }
 
         if ($this->i18n->isI18nKey($label)) {
@@ -446,13 +447,13 @@ class IFaceHelper
     }
 
     /**
-     * @param \BetaKiller\Url\UrlElementInterface $model
+     * @param \BetaKiller\Url\IFaceModelInterface $model
      *
      * @return string
      * @throws \BetaKiller\IFace\Exception\IFaceException
      * @throws \BetaKiller\Url\UrlPrototypeException
      */
-    public function makeTitleFromLabels(UrlElementInterface $model): string
+    public function makeTitleFromLabels(IFaceModelInterface $model): string
     {
         $labels  = [];
         $current = $model;

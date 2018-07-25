@@ -1,6 +1,8 @@
 <?php
 namespace BetaKiller\IFace;
 
+use BetaKiller\Url\IFaceModelInterface;
+
 abstract class AbstractChildrenListingIFace extends AbstractIFace
 {
     /**
@@ -28,6 +30,11 @@ abstract class AbstractChildrenListingIFace extends AbstractIFace
         $data = [];
 
         foreach ($this->tree->getChildren($this->getModel()) as $urlElement) {
+            // Show only ifaces
+            if (!$urlElement instanceof IFaceModelInterface) {
+                continue;
+            }
+
             $data[] = [
                 'label'    => $this->ifaceHelper->getLabel($urlElement),
                 'codename' => $urlElement->getCodename(),
