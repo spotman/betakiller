@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace BetaKiller\Url\ModelProvider;
 
 use BetaKiller\Config\ConfigProviderInterface;
@@ -60,18 +62,18 @@ class UrlElementProviderPhpConfig implements UrlElementProviderInterface
      */
     private function loadServiceWebhooks(string $serviceName, array $serviceWebHooks): void
     {
-        foreach ($serviceWebHooks as $eventName => $webHookConfig) {
-            $this->models[] = $this->createWebHookModel($serviceName, $eventName, $webHookConfig);
+        foreach ($serviceWebHooks as $eventName => $webHookCodename) {
+            $this->models[] = $this->createWebHookModel($serviceName, $eventName, $webHookCodename);
         }
     }
 
-    private function createWebHookModel(string $service, string $event, array $config): WebHookModelInterface
+    private function createWebHookModel(string $service, string $event, string $codename): WebHookModelInterface
     {
         $model = new WebHookPlainModel;
 
         $model->fromArray([
-            $model::OPTION_CODENAME      => $config['name'],
-            $model::OPTION_URI           => 'wh-'.\lcfirst($service).'-'.\lcfirst($event),
+            $model::OPTION_CODENAME      => $codename,
+            $model::OPTION_URI           => \mb_strtolower('wh-'.$service.'-'.$event),
             $model::OPTION_SERVICE_NAME  => $service,
             $model::OPTION_SERVICE_EVENT => $event,
         ]);
