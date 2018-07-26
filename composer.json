@@ -46,6 +46,9 @@
     "phpunit/dbunit": "^4.0",
     "roave/security-advisories": "dev-master"
   },
+  "suggest": {
+    "franzl/studio": "Tool for developing Composer packages"
+  },
   "scripts": {
     "ci": [
       "@test"
