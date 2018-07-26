@@ -6,8 +6,8 @@
          beStrictAboutTestsThatDoNotTestAnything="true"
          beStrictAboutTodoAnnotatedTests="true"
          verbose="true">
-    <testsuites name="BetaKiller">
-        <testsuite>
+    <testsuites>
+        <testsuite name="BetaKiller">
             <file>modules/unittest/tests.php</file>
         </testsuite>
     </testsuites>
