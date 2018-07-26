@@ -44,7 +44,6 @@ return [
 //    'security-headers'      => MODPATH.'security-headers',      // Send CSP and other security headers
     'sitemap'               => MODPATH.'sitemap',               // Generating sitemap.xml
     'twig'                  => MODPATH.'twig',                  // Twig template engine
-    'ulogin'                => MODPATH.'ulogin',                // Universal login via ulogin.ru
     'unittest'              => MODPATH.'unittest',              // Module for unit testing via phpunit
     'widget'                => MODPATH.'widget',                // Basic widgets support
 
