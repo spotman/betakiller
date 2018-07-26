@@ -37,7 +37,7 @@
 [submodule "modules/migrations"]
 	path = modules/migrations
 	url = git@github.com:spotman/kohana-minion-migrations.git
-[submodule "modules/rbac"]
+[submodule "modules/acl"]
 	path = modules/acl
 	url = git@github.com:spotman/rbac.git
 [submodule "modules/sqlite"]
