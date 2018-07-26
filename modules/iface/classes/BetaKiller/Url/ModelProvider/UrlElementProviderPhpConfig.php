@@ -5,7 +5,6 @@ namespace BetaKiller\Url\ModelProvider;
 
 use BetaKiller\Config\ConfigProviderInterface;
 use BetaKiller\Url\WebHookModelInterface;
-use BetaKiller\Url\ZoneInterface;
 
 class UrlElementProviderPhpConfig implements UrlElementProviderInterface
 {
