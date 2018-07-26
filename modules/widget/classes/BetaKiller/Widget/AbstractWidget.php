@@ -39,14 +39,6 @@ abstract class AbstractWidget implements WidgetInterface
     private $response;
 
     /**
-     * Widget constructor.
-     * Empty by default, use WidgetFactory for creating Widget instances
-     */
-    public function __construct()
-    {
-    }
-
-    /**
      * Setter for widget name
      *
      * @param string $value

@@ -23,8 +23,6 @@ class AuthWidget extends AbstractPublicWidget
     public function __construct(ConfigProviderInterface $config)
     {
         $this->config = $config;
-
-        parent::__construct();
     }
 
     /**

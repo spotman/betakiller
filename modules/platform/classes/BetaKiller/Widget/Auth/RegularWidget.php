@@ -28,8 +28,6 @@ class RegularWidget extends AbstractPublicWidget
      */
     public function __construct(\Auth $auth, IFaceHelper $ifaceHelper)
     {
-        parent::__construct();
-
         $this->auth        = $auth;
         $this->ifaceHelper = $ifaceHelper;
     }
