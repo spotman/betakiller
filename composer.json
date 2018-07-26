@@ -4,7 +4,7 @@
   "license": "MIT",
   "type": "project",
   "require": {
-    "php": "7.1.* || 7.2.*",
+    "php": "7.2.*",
     "ext-mbstring": "*",
     "ext-mysqli": "*",
     "ext-sqlite3": "*",
@@ -54,7 +54,7 @@
   },
   "config": {
     "platform": {
-      "php": "7.1.15"
+      "php": "7.2.8"
     },
     "sort-packages": true
   }
