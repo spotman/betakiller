@@ -11,6 +11,11 @@ use Psr\Log\LoggerInterface;
 class IFaceCache
 {
     /**
+     * @var \BetaKiller\Config\ConfigProviderInterface
+     */
+    private $appConfig;
+
+    /**
      * @var PageCache
      */
     protected $pageCache;
@@ -28,7 +33,7 @@ class IFaceCache
     /**
      * IFaceCache constructor.
      *
-     * @param \BetaKiller\Config\AppConfigInterface          $config
+     * @param \BetaKiller\Config\AppConfigInterface          $appConfig
      * @param \BetaKiller\Helper\AppEnvInterface             $appEnv
      * @param \PageCache\PageCache                           $pageCache
      * @param \BetaKiller\IFace\Cache\IFacePageCacheStrategy $strategy
@@ -37,22 +42,17 @@ class IFaceCache
      * @throws \PageCache\PageCacheException
      */
     public function __construct(
-        AppConfigInterface $config,
+        AppConfigInterface $appConfig,
         AppEnvInterface $appEnv,
         PageCache $pageCache,
         IFacePageCacheStrategy $strategy,
         LoggerInterface $logger
     ) {
-        $this->enabled = !$appEnv->isCLI() && $config->isPageCacheEnabled();
-
+        $this->appConfig = $appConfig;
         $this->pageCache = $pageCache;
         $this->strategy  = $strategy;
 
-        $this->pageCache->config()
-            ->setCachePath($config->getPageCachePath())
-            ->setEnableLog(true)
-            ->setSendHeaders(true)
-            ->setForwardHeaders(true);
+        $this->enabled = !$appEnv->isCLI() && $appConfig->isPageCacheEnabled();
 
         $this->pageCache->setLogger($logger);
     }
@@ -92,7 +92,12 @@ class IFaceCache
 
         $this->applyIFaceStrategy($iface);
 
-        $this->pageCache->config()->setCacheExpirationInSeconds($expires);
+        $this->pageCache->config()
+            ->setCacheExpirationInSeconds($expires)
+            ->setCachePath($this->appConfig->getPageCachePath())
+            ->setEnableLog(true)
+            ->setSendHeaders(true)
+            ->setForwardHeaders(true);
 
         $this->pageCache->init();
     }
