@@ -14,7 +14,7 @@ class UrlElementStack implements \IteratorAggregate
     /**
      * @var \BetaKiller\Url\UrlElementInterface[]
      */
-    private $items;
+    private $items = [];
 
     /**
      * @var UrlContainerInterface
