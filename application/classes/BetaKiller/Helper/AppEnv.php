@@ -56,10 +56,8 @@ class AppEnv implements AppEnvInterface
     {
         $dotEnv = new Dotenv($this->appRootPath, '.env');
 
-        // Load local .env file if exists even in production
-        if (file_exists($this->appRootPath.DIRECTORY_SEPARATOR.'.env')) {
-            $dotEnv->load();
-        }
+        // Load local .env file if exists even in production, ignore missing file
+        $dotEnv->safeLoad();
 
         // App env (via SetEnv in .htaccess or VirtualHost)
         $dotEnv->required(self::APP_MODE)->notEmpty()->allowedValues(self::ALLOWED_MODES);
