@@ -54,8 +54,6 @@ class BarWidget extends AbstractAdminWidget
 //        ContentHelper $contentHelper
     )
     {
-        parent::__construct();
-
         $this->tree           = $tree;
         $this->aclHelper      = $aclHelper;
         $this->ifaceHelper    = $ifaceHelper;
