@@ -1,7 +1,7 @@
 <?php
 namespace BetaKiller\MessageBus;
 
-class EventBus extends AbstractMessageBus
+class EventBus extends AbstractMessageBus implements EventBusInterface
 {
     /**
      * @param \BetaKiller\MessageBus\EventMessageInterface $message
