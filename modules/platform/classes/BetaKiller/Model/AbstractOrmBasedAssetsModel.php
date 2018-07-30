@@ -13,7 +13,7 @@ use ORM;
  */
 abstract class AbstractOrmBasedAssetsModel extends ORM implements AssetsModelInterface
 {
-    protected function _initialize(): void
+    protected function configure(): void
     {
         $this->belongs_to([
             'uploaded_by_user' => [
@@ -22,7 +22,7 @@ abstract class AbstractOrmBasedAssetsModel extends ORM implements AssetsModelInt
             ],
         ]);
 
-        parent::_initialize();
+        parent::configure();
     }
 
     /**
