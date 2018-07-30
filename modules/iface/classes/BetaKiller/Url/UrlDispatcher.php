@@ -12,7 +12,7 @@ use BetaKiller\Helper\AclHelper;
 use BetaKiller\Helper\LoggerHelperTrait;
 use BetaKiller\Helper\UrlHelper;
 use BetaKiller\IFace\Exception\IFaceException;
-use BetaKiller\MessageBus\EventBus;
+use BetaKiller\MessageBus\EventBusInterface;
 use BetaKiller\Model\DispatchableEntityInterface;
 use BetaKiller\Url\Behaviour\UrlBehaviourException;
 use BetaKiller\Url\Behaviour\UrlBehaviourFactory;
@@ -54,7 +54,7 @@ class UrlDispatcher implements LoggerAwareInterface
     private $cache;
 
     /**
-     * @var \BetaKiller\MessageBus\EventBus
+     * @var \BetaKiller\MessageBus\EventBusInterface
      */
     private $eventBus;
 
@@ -90,7 +90,7 @@ class UrlDispatcher implements LoggerAwareInterface
      * @param \BetaKiller\Url\Behaviour\UrlBehaviourFactory   $behaviourFactory
      * @param \BetaKiller\Url\Container\UrlContainerInterface $parameters
      * @param \Psr\SimpleCache\CacheInterface                 $cache
-     * @param \BetaKiller\MessageBus\EventBus                 $eventBus
+     * @param \BetaKiller\MessageBus\EventBusInterface        $eventBus
      * @param \BetaKiller\Helper\UrlHelper                    $urlHelper
      * @param \BetaKiller\Helper\AclHelper                    $aclHelper
      */
@@ -100,7 +100,7 @@ class UrlDispatcher implements LoggerAwareInterface
         UrlBehaviourFactory $behaviourFactory,
         UrlContainerInterface $parameters,
         CacheInterface $cache,
-        EventBus $eventBus,
+        EventBusInterface $eventBus,
         UrlHelper $urlHelper,
         AclHelper $aclHelper
     ) {

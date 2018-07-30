@@ -2,7 +2,7 @@
 namespace BetaKiller\Ref;
 
 use BetaKiller\Helper\AppEnvInterface;
-use BetaKiller\MessageBus\EventBus;
+use BetaKiller\MessageBus\EventBusInterface;
 use BetaKiller\MessageBus\EventHandlerInterface;
 use BetaKiller\Repository\RefHitRepository;
 
@@ -31,10 +31,10 @@ class RefUrlDispatchedEventHandler implements EventHandlerInterface
     }
 
     /**
-     * @param \BetaKiller\Event\UrlDispatchedEvent $message
-     * @param \BetaKiller\MessageBus\EventBus      $bus
+     * @param \BetaKiller\Event\UrlDispatchedEvent     $message
+     * @param \BetaKiller\MessageBus\EventBusInterface $bus
      */
-    public function handleEvent($message, EventBus $bus): void
+    public function handleEvent($message, EventBusInterface $bus): void
     {
         // Skip calls like "cache warmup" from CLI mode
         if ($this->appEnv->isCLI()) {

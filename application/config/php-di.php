@@ -110,6 +110,23 @@ return [
         Meta::class => \DI\factory(function () {
             return Meta::instance();
         }),
+
+        \BetaKiller\MessageBus\EventBusInterface::class => DI\factory(function (
+            \BetaKiller\MessageBus\EventBus $bus,
+            ConfigProviderInterface $config
+        ) {
+            $eventsConfig = $config->load(['events']);
+
+            if ($eventsConfig && is_array($eventsConfig)) {
+                foreach ($eventsConfig as $event => $handlers) {
+                    foreach ($handlers as $handler) {
+                        $bus->on($event, $handler);
+                    }
+                }
+            }
+
+            return $bus;
+        }),
     ],
 
 ];

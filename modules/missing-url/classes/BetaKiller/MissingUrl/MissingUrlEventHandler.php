@@ -3,7 +3,7 @@ namespace BetaKiller\MissingUrl;
 
 use BetaKiller\Event\MissingUrlEvent;
 use BetaKiller\Helper\AppEnvInterface;
-use BetaKiller\MessageBus\EventBus;
+use BetaKiller\MessageBus\EventBusInterface;
 use BetaKiller\MessageBus\EventHandlerInterface;
 use BetaKiller\Model\MissingUrlModelInterface;
 use BetaKiller\Model\MissingUrlRedirectTargetModelInterface;
@@ -56,13 +56,13 @@ class MissingUrlEventHandler implements EventHandlerInterface
     }
 
     /**
-     * @param \BetaKiller\Event\MissingUrlEvent $message
-     * @param \BetaKiller\MessageBus\EventBus   $bus
+     * @param \BetaKiller\Event\MissingUrlEvent        $message
+     * @param \BetaKiller\MessageBus\EventBusInterface $bus
      *
      * @throws \ORM_Validation_Exception
      * @throws \BetaKiller\Repository\RepositoryException
      */
-    public function handleEvent($message, EventBus $bus): void
+    public function handleEvent($message, EventBusInterface $bus): void
     {
         // Skip calls like "cache warmup" from CLI mode
         if ($this->appEnv->isCLI()) {
@@ -152,6 +152,7 @@ class MissingUrlEventHandler implements EventHandlerInterface
             }
 
             if ($parentElement) {
+                // TODO Find IFace in the parents chain
                 $redirectModel->setParentIFaceModel($parentElement);
             }
 

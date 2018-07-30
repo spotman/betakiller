@@ -5,7 +5,7 @@ interface EventHandlerInterface extends MessageHandlerInterface
 {
     /**
      * @param \BetaKiller\MessageBus\EventMessageInterface $message
-     * @param \BetaKiller\MessageBus\EventBus              $bus
+     * @param \BetaKiller\MessageBus\EventBusInterface     $bus
      */
-    public function handleEvent($message, EventBus $bus): void;
+    public function handleEvent($message, EventBusInterface $bus): void;
 }

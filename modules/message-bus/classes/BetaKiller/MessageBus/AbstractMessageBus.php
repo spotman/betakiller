@@ -4,13 +4,11 @@ namespace BetaKiller\MessageBus;
 use BetaKiller\Helper\LoggerHelperTrait;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
-use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
 
-abstract class AbstractMessageBus
+abstract class AbstractMessageBus implements AbstractMessageBusInterface
 {
     use LoggerHelperTrait;
-    use LoggerAwareTrait;
 
     /**
      * @var ContainerInterface
@@ -23,6 +21,11 @@ abstract class AbstractMessageBus
     private $processedMessages = [];
 
     /**
+     * @var LoggerInterface
+     */
+    protected $logger;
+
+    /**
      * @var \BetaKiller\MessageBus\MessageHandlerInterface[][]
      */
     private $handlers = [];
@@ -30,8 +33,7 @@ abstract class AbstractMessageBus
     public function __construct(ContainerInterface $container, LoggerInterface $logger)
     {
         $this->container = $container;
-
-        $this->setLogger($logger);
+        $this->logger    = $logger;
     }
 
     abstract protected function getHandlerInterface(): string;
