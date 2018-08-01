@@ -3,6 +3,7 @@ namespace BetaKiller\Repository;
 
 use BetaKiller\Factory\OrmFactory;
 use BetaKiller\Model\ExtendedOrmInterface;
+use BetaKiller\Utils\Kohana\ORM\OrmInterface;
 
 abstract class AbstractOrmBasedRepository extends AbstractRepository
 {
@@ -132,12 +133,12 @@ abstract class AbstractOrmBasedRepository extends AbstractRepository
     }
 
     /**
-     * @param \BetaKiller\Model\ExtendedOrmInterface $orm
+     * @param \BetaKiller\Utils\Kohana\ORM\OrmInterface $orm
      *
      * @return ExtendedOrmInterface|mixed|null
      * @throws \BetaKiller\Repository\RepositoryException
      */
-    protected function findOne(ExtendedOrmInterface $orm)
+    protected function findOne(OrmInterface $orm)
     {
         try {
             $model = $orm->find();
@@ -153,12 +154,12 @@ abstract class AbstractOrmBasedRepository extends AbstractRepository
     }
 
     /**
-     * @param \BetaKiller\Model\ExtendedOrmInterface $orm
+     * @param \BetaKiller\Utils\Kohana\ORM\OrmInterface $orm
      *
      * @return array
      * @throws \BetaKiller\Repository\RepositoryException
      */
-    protected function findAll(ExtendedOrmInterface $orm): array
+    protected function findAll(OrmInterface $orm): array
     {
         try {
             return $orm->find_all()->as_array();
@@ -168,14 +169,36 @@ abstract class AbstractOrmBasedRepository extends AbstractRepository
     }
 
     /**
-     * @param \BetaKiller\Model\ExtendedOrmInterface $orm
-     * @param int                                    $count
+     * @param \BetaKiller\Utils\Kohana\ORM\OrmInterface $orm
+     * @param int                                       $count
      *
      * @return $this|self
      */
-    protected function limit(ExtendedOrmInterface $orm, int $count): self
+    protected function limit(OrmInterface $orm, int $count): self
     {
         $orm->limit($count);
+
+        return $this;
+    }
+
+    /**
+     * @param \BetaKiller\Utils\Kohana\ORM\OrmInterface $orm
+     * @param string                                    $relationName
+     * @param                                           $relatedModel
+     *
+     * @return \BetaKiller\Repository\AbstractOrmBasedRepository
+     * @throws \BetaKiller\Repository\RepositoryException
+     */
+    protected function filterRelated(OrmInterface $orm, string $relationName, $relatedModel): self
+    {
+        if (!$relatedModel instanceof OrmInterface) {
+            throw new RepositoryException('Related model :name must implement :must', [
+                ':name' => \get_class($relatedModel),
+                ':must' => OrmInterface::class,
+            ]);
+        }
+
+        $orm->filter_related($relationName, $relatedModel);
 
         return $this;
     }
