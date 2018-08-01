@@ -7,7 +7,9 @@ use BetaKiller\Url\WebHookModelInterface;
 
 interface WebHookInterface
 {
+    public function getModel(): WebHookModelInterface;
+
     public function setModel(WebHookModelInterface $model): WebHookInterface;
 
-    public function process();
+    public function process(): void;
 }
