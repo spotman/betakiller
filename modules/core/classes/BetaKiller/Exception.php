@@ -10,9 +10,9 @@ class Exception extends \Exception implements ExceptionInterface
     /**
      * @param \Throwable $e
      *
-     * @return \BetaKiller\ExceptionInterface|static
+     * @return static
      */
-    public static function wrap(\Throwable $e): ExceptionInterface
+    public static function wrap(\Throwable $e)
     {
         return new static(':error', [':error' => $e->getMessage()], $e->getCode(), $e);
     }
