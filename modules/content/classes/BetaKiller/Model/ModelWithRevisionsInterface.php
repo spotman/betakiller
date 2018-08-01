@@ -30,6 +30,7 @@ interface ModelWithRevisionsInterface
 
     /**
      * @return \BetaKiller\Model\RevisionModelInterface[]
+     * @deprecated Move to Repository
      */
     public function getAllRevisions(): array;
 
@@ -40,7 +41,7 @@ interface ModelWithRevisionsInterface
 
     /**
      * @return $this
-     * @deprecated
+     * @deprecated Move to Repository
      */
     public function filterHavingActualRevision();
 
@@ -51,7 +52,7 @@ interface ModelWithRevisionsInterface
 
     /**
      * @return bool
-     * @deprecated
+     * @deprecated Move to Repository
      */
     public function hasPendingRevisions(): bool;
 
