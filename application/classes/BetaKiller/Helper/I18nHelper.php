@@ -7,7 +7,7 @@ use BetaKiller\Model\UserInterface;
 
 class I18nHelper
 {
-    private const KEY_REGEX = '/^[a-z0-9_]+(?:[\.]{1}[a-z0-9_]+)+$/m';
+    private const KEY_REGEX   = '/^[a-z0-9_]+(?:[\.]{1}[a-z0-9_]+)+$/m';
     private const COOKIE_NAME = 'lang';
 
     /**
@@ -26,6 +26,13 @@ class I18nHelper
     private $appConfig;
 
     /**
+     * "lang codename" => "default locale"
+     *
+     * @var array
+     */
+    private $languagesConfig;
+
+    /**
      * @var string[]
      */
     private $allowedLanguages;
@@ -33,14 +40,14 @@ class I18nHelper
     /**
      * I18n constructor.
      *
-     * @param \BetaKiller\Helper\AppEnvInterface             $appEnv
+     * @param \BetaKiller\Helper\AppEnvInterface    $appEnv
      * @param \BetaKiller\Config\AppConfigInterface $appConfig
      *
      * @throws \BetaKiller\Exception
      */
     public function __construct(AppEnvInterface $appEnv, AppConfigInterface $appConfig)
     {
-        $this->appEnv = $appEnv;
+        $this->appEnv    = $appEnv;
         $this->appConfig = $appConfig;
 
         $this->initDefault();
@@ -51,7 +58,8 @@ class I18nHelper
      */
     private function initDefault(): void
     {
-        $this->allowedLanguages = $this->appConfig->getAllowedLanguages();
+        $this->languagesConfig  = $this->appConfig->getAllowedLanguages();
+        $this->allowedLanguages = \array_keys($this->languagesConfig);
 
         if (!$this->allowedLanguages) {
             throw new Exception('Define app languages in config/app.php');
@@ -85,7 +93,7 @@ class I18nHelper
         // Detect the browser` preferred lang if current lang is not set
         if (!$browserLang && !$this->appEnv->isCLI()) {
             /** @var \HTTP_Header $headers */
-            $headers  = $request->headers();
+            $headers = $request->headers();
 
             $preferredLang = $headers->preferred_language($this->allowedLanguages);
 
@@ -126,10 +134,24 @@ class I18nHelper
 
     public function setLang(string $value): void
     {
+        if (!isset($this->languagesConfig[$value])) {
+            throw new Exception('Unknown language :lang, only these are allowed: :allowed', [
+                ':lang'    => $value,
+                ':allowed' => implode(', ', $this->allowedLanguages),
+            ]);
+        }
+
         $this->lang = $value;
 
         // Set I18n lang
         \I18n::lang($value);
+    }
+
+    public function getLocale(): string
+    {
+        $lang = $this->lang ?: $this->getAppDefaultLanguage();
+
+        return $this->languagesConfig[$lang];
     }
 
     /**
