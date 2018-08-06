@@ -5,7 +5,7 @@ namespace BetaKiller\Url;
 /**
  * Collector of IFace URL element filters
  */
-class UrlElementFilters implements UrlElementFiltersInterface
+class AggregateUrlElementFilter implements UrlElementFilterInterface
 {
     /**
      * Array of filters
@@ -22,7 +22,7 @@ class UrlElementFilters implements UrlElementFiltersInterface
      *
      * @return $this
      */
-    public function addFilter(UrlElementFilterInterface $urlFilter): UrlElementFiltersInterface
+    public function addFilter(UrlElementFilterInterface $urlFilter): UrlElementFilterInterface
     {
         $this->filters[] = $urlFilter;
 
