@@ -4,7 +4,7 @@ namespace BetaKiller\Url;
 /**
  * Collector of IFace URL element filters
  */
-interface UrlElementFiltersInterface extends UrlElementFilterInterface
+interface AggregateUrlElementFilterInterface extends UrlElementFilterInterface
 {
     /**
      * Adding a filter
