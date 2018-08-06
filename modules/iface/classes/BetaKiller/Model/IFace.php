@@ -231,11 +231,12 @@ class IFace extends AbstractOrmModelContainsUrlElement implements IFaceModelInte
     /**
      * Returns menu codename to which URL is assigned
      *
-     * @return string
+     * @return null|string
      */
-    public function getMenuName(): string
+    public function getMenuName(): ?string
     {
-        //
+        // realization temporarily is absent.
+        // at this moment there is no need to store IFace data in database.
         return null;
     }
 }
