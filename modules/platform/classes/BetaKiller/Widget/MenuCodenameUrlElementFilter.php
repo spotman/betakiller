@@ -4,13 +4,14 @@ declare(strict_types=1);
 namespace BetaKiller\Widget;
 
 use BetaKiller\Url\UrlElementFilterInterface;
+use BetaKiller\Url\UrlElementFilterException;
 use BetaKiller\Url\UrlElementInterface;
 use BetaKiller\Url\IFaceModelInterface;
 
 /**
  * Filter of IFace URL element by menu codename
  */
-class MenuFilterCodename implements UrlElementFilterInterface
+class MenuCodenameUrlElementFilter implements UrlElementFilterInterface
 {
     /**
      * IFace URL element menu codename
@@ -23,13 +24,13 @@ class MenuFilterCodename implements UrlElementFilterInterface
     /**
      * @param string $menuCodename Menu codename to be selected
      *
-     * @throws \BetaKiller\Widget\MenuFilterInvalidNameException
+     * @throws \BetaKiller\Url\UrlElementFilterException
      */
     public function __construct(string $menuCodename)
     {
         $menuCodename = mb_strtolower(trim($menuCodename));
         if ($menuCodename === '') {
-            throw new MenuFilterInvalidNameException('Menu codename can not be empty');
+            throw new UrlElementFilterException('Menu codename can not be empty');
         }
 
         $this->menuCodename = $menuCodename;
@@ -44,9 +45,8 @@ class MenuFilterCodename implements UrlElementFilterInterface
      */
     public function isAvailable(UrlElementInterface $urlElement): bool
     {
-        return (
+        return
             $urlElement instanceof IFaceModelInterface
-            && $urlElement->getMenuName() === $this->menuCodename
-        );
+            && $urlElement->getMenuName() === $this->menuCodename;
     }
 }
