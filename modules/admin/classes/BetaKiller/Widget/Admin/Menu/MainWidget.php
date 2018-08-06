@@ -8,12 +8,9 @@ class MainWidget extends MenuWidget
     public function getData(): array
     {
         $items = parent::getData();
-        $data = [
-            'items' => [
-                $items,
-            ],
-        ];
 
-        return $data;
+        return [
+            'items' => $items,
+        ];
     }
 }
