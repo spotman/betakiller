@@ -118,8 +118,8 @@ class MenuWidget extends AbstractPublicWidget
             if (!$itemsAdd) {
                 continue;
             }
-            foreach ($itemsAdd as $itemsItemAdd) {
-                $items[] = $itemsItemAdd;
+            foreach ($itemsAdd as $itemsAddItem) {
+                $items[] = $itemsAddItem;
             }
         }
 
