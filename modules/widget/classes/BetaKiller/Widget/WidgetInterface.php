@@ -78,7 +78,7 @@ interface WidgetInterface
      * @param string     $name
      * @param mixed|null $default
      *
-     * @return mixed
+     * @return null|string|mixed
      */
     public function getContextParam($name, $default = null);
 
