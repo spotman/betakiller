@@ -287,10 +287,10 @@ class IFacePlainModel extends AbstractPlainUrlElementModel implements IFaceModel
     /**
      * Returns menu codename to which URL is assigned
      *
-     * @return string
+     * @return null|string
      */
-    public function getMenuName(): string
+    public function getMenuName(): ?string
     {
-        return (string)$this->menu;
+        return $this->menu;
     }
 }
