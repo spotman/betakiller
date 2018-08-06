@@ -6,7 +6,7 @@ namespace BetaKiller\Widget;
 use BetaKiller\Config\ConfigProviderInterface;
 use BetaKiller\Url\Behaviour\UrlBehaviourFactory;
 use BetaKiller\Url\UrlElementInterface;
-use BetaKiller\Url\UrlElementFilters;
+use BetaKiller\Url\AggregateUrlElementFilter;
 use BetaKiller\Url\UrlElementTreeInterface;
 use BetaKiller\Url\UrlElementTreeRecursiveIterator;
 use BetaKiller\Url\Container\UrlContainerInterface;
@@ -69,28 +69,36 @@ class MenuWidget extends AbstractPublicWidget
      * Returns data for View rendering: menu links
      *
      * @return array [[string url, string label, bool active, array children], ...]
-     * @throws \BetaKiller\Widget\MenuFilterInvalidNameException
+     * @throws \BetaKiller\Url\UrlElementFilterException
      */
     public function getData(): array
     {
-        // creating filters
-        $filters  = null;
-        $context  = $this->getContext();
-        $codename = mb_strtolower(trim($context['menu']));
-        if ($codename !== '') {
-            $filterCodename = new MenuFilterCodename($codename);
-            $filters        = new UrlElementFilters();
-            $filters->addFilter($filterCodename);
+        // menu codename from widget context
+        $codename = $this->getContextParam('menu');
+        $codename = mb_strtolower($codename);
+        if ($codename === '') {
+            throw new WidgetException('Menu codename can not be empty');
+        }
+
+        // filter by IFace URL menu codename
+        $filterCodename = new MenuCodenameUrlElementFilter($codename);
+        $filters        = new AggregateUrlElementFilter();
+        $filters->addFilter($filterCodename);
+
+        // parent IFace URL element
+        $parent          = null;
+        $parent_codename = $this->getContextParam('parent');
+        if (\is_string($parent_codename)) {
+            $parent_codename = trim($parent_codename);
+            if ($parent_codename !== '') {
+                $parent = $this->tree->getByCodename($parent_codename);
+            }
         }
 
         // generation items of links menu
-        $items    = [];
-        $iterator = new UrlElementTreeRecursiveIterator($this->tree, null, $filters);
-        foreach ($this->processLayer($iterator, null) as $item) {
-            $items = $item;
-        }
+        $iterator = new UrlElementTreeRecursiveIterator($this->tree, $parent, $filters);
 
-        return $items;
+        return $this->processLayer($iterator, null);
     }
 
     /**
@@ -99,20 +107,24 @@ class MenuWidget extends AbstractPublicWidget
      * @param \RecursiveIterator                              $models
      * @param \BetaKiller\Url\Container\UrlContainerInterface $params
      *
-     * @return \Generator|\BetaKiller\Url\AvailableUri[]
+     * @return array
      * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\IFace\Exception\IFaceException
      */
-    private function processLayer(
-        \RecursiveIterator $models,
-        ?UrlContainerInterface $params = null
-    ): \Generator {
+    private function processLayer(\RecursiveIterator $models, ?UrlContainerInterface $params = null): array
+    {
+        $items = [];
+
         foreach ($models as $urlElement) {
-            $params = $params ?: new UrlContainer();
-            foreach ($this->processSingle($models, $urlElement, $params) as $item) {
-                yield $item;
+            $params    = $params ?: new UrlContainer();
+            $items_add = $this->processSingle($models, $urlElement, $params);
+            if (!isset($items_add[0])) {
+                continue;
             }
+            $items[] = $items_add[0];
         }
+
+        return $items;
     }
 
     /**
@@ -122,7 +134,7 @@ class MenuWidget extends AbstractPublicWidget
      * @param \BetaKiller\Url\UrlElementInterface             $urlElement
      * @param \BetaKiller\Url\Container\UrlContainerInterface $params
      *
-     * @return \Generator
+     * @return array
      * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\IFace\Exception\IFaceException
      *
@@ -132,7 +144,9 @@ class MenuWidget extends AbstractPublicWidget
         \RecursiveIterator $models,
         UrlElementInterface $urlElement,
         UrlContainerInterface $params
-    ): \Generator {
+    ): array {
+        $result = [];
+
         foreach ($this->getAvailableIFaceUrls($urlElement, $params) as $availableUrl) {
             // store parameter for childs processing
             $urlParameter = $availableUrl->getUrlParameter();
@@ -153,7 +167,7 @@ class MenuWidget extends AbstractPublicWidget
             $label  = $this->ifaceHelper->getLabel($iface->getModel(), $params);
             $active = $this->ifaceHelper->isCurrentIFace($iface, $params);
 
-            $result = [
+            $result_item = [
                 'url'      => $url,
                 'label'    => $label,
                 'active'   => $active,
@@ -162,14 +176,16 @@ class MenuWidget extends AbstractPublicWidget
 
             // recursion for children
             if ($models->hasChildren()) {
-                $modelsChildren = $models->getChildren();
-                foreach ($this->processLayer($modelsChildren, $params) as $resultChildren) {
-                    $result['children'][] = $resultChildren;
-                }
+                $modelsChildren          = $models->getChildren();
+                $children                = $this->processLayer($modelsChildren, $params);
+                $result_item['children'] = $children;
             }
 
-            yield $result;
+            //
+            $result[] = $result_item;
         }
+
+        return $result;
     }
 
     /**
