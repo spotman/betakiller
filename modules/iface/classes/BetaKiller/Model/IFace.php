@@ -227,4 +227,15 @@ class IFace extends AbstractOrmModelContainsUrlElement implements IFaceModelInte
     {
         return $this->zone;
     }
+
+    /**
+     * Returns menu codename to which URL is assigned
+     *
+     * @return string
+     */
+    public function getMenuName(): string
+    {
+        //
+        return null;
+    }
 }
