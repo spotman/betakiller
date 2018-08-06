@@ -14,6 +14,7 @@ use BetaKiller\Url\Container\UrlContainer;
 use BetaKiller\IFace\Exception\IFaceException;
 use BetaKiller\Helper\AclHelper;
 use BetaKiller\Helper\IFaceHelper;
+use PhpParser\Node\Stmt\Foreach_;
 
 class MenuWidget extends AbstractPublicWidget
 {
@@ -86,14 +87,10 @@ class MenuWidget extends AbstractPublicWidget
         $filters->addFilter($filterCodename);
 
         // parent IFace URL element
-        $parent          = null;
-        $parent_codename = $this->getContextParam('parent');
-        if (\is_string($parent_codename)) {
-            $parent_codename = trim($parent_codename);
-            if ($parent_codename !== '') {
-                $parent = $this->tree->getByCodename($parent_codename);
-            }
-        }
+        $parentCodename = $this->getContextParam('parent');
+        $parent         = $parentCodename
+            ? $this->tree->getByCodename($parentCodename)
+            : null;
 
         // generation items of links menu
         $iterator = new UrlElementTreeRecursiveIterator($this->tree, $parent, $filters);
@@ -116,12 +113,14 @@ class MenuWidget extends AbstractPublicWidget
         $items = [];
 
         foreach ($models as $urlElement) {
-            $params    = $params ?: new UrlContainer();
-            $items_add = $this->processSingle($models, $urlElement, $params);
-            if (!isset($items_add[0])) {
+            $params   = $params ?: new UrlContainer();
+            $itemsAdd = $this->processSingle($models, $urlElement, $params);
+            if (!$itemsAdd) {
                 continue;
             }
-            $items[] = $items_add[0];
+            foreach ($itemsAdd as $itemsItemAdd) {
+                $items[] = $itemsItemAdd;
+            }
         }
 
         return $items;
@@ -167,7 +166,7 @@ class MenuWidget extends AbstractPublicWidget
             $label  = $this->ifaceHelper->getLabel($iface->getModel(), $params);
             $active = $this->ifaceHelper->isCurrentIFace($iface, $params);
 
-            $result_item = [
+            $resultItem = [
                 'url'      => $url,
                 'label'    => $label,
                 'active'   => $active,
@@ -176,13 +175,13 @@ class MenuWidget extends AbstractPublicWidget
 
             // recursion for children
             if ($models->hasChildren()) {
-                $modelsChildren          = $models->getChildren();
-                $children                = $this->processLayer($modelsChildren, $params);
-                $result_item['children'] = $children;
+                $modelsChildren         = $models->getChildren();
+                $children               = $this->processLayer($modelsChildren, $params);
+                $resultItem['children'] = $children;
             }
 
             //
-            $result[] = $result_item;
+            $result[] = $resultItem;
         }
 
         return $result;
