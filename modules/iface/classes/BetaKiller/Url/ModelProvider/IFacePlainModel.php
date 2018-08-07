@@ -16,6 +16,7 @@ class IFacePlainModel extends AbstractPlainUrlElementModel implements IFaceModel
     public const OPTION_ENTITY_NAME        = 'entity';
     public const OPTION_ENTITY_ACTION      = 'entityAction';
     public const OPTION_ZONE               = 'zone';
+    public const OPTION_MENU               = 'menu';
 
     /**
      * @var bool
@@ -68,6 +69,11 @@ class IFacePlainModel extends AbstractPlainUrlElementModel implements IFaceModel
      * @var string
      */
     private $zone;
+
+    /**
+     * @var string
+     */
+    private $menu;
 
     /**
      * Returns TRUE if iface is marked as "default"
@@ -162,6 +168,7 @@ class IFacePlainModel extends AbstractPlainUrlElementModel implements IFaceModel
             self::OPTION_ENTITY_NAME     => $this->getEntityModelName(),
             self::OPTION_ENTITY_ACTION   => $this->getEntityActionName(),
             self::OPTION_ZONE            => $this->getZoneName(),
+            self::OPTION_MENU            => $this->getMenuName(),
         ]);
     }
 
@@ -210,6 +217,10 @@ class IFacePlainModel extends AbstractPlainUrlElementModel implements IFaceModel
 
         if (isset($data[self::OPTION_ZONE])) {
             $this->zone = mb_strtolower($data[self::OPTION_ZONE]);
+        }
+
+        if (isset($data[self::OPTION_MENU])) {
+            $this->menu = mb_strtolower($data[self::OPTION_MENU]);
         }
 
         parent::fromArray($data);
@@ -271,5 +282,15 @@ class IFacePlainModel extends AbstractPlainUrlElementModel implements IFaceModel
     public function getZoneName(): string
     {
         return $this->zone;
+    }
+
+    /**
+     * Returns menu codename to which URL is assigned
+     *
+     * @return null|string
+     */
+    public function getMenuName(): ?string
+    {
+        return $this->menu;
     }
 }

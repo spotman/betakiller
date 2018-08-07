@@ -4,23 +4,37 @@ namespace BetaKiller\Url;
 class UrlElementTreeRecursiveIterator extends UrlElementTreeLayerIterator implements \RecursiveIterator
 {
     /**
+     * IFace URL elements tree
+     *
      * @var \BetaKiller\Url\UrlElementTreeInterface
      */
     private $tree;
 
     /**
+     * IFace URL element filters
+     *
+     * @var \BetaKiller\Url\UrlElementFilterInterface
+     */
+    private $filters;
+
+    /**
      * UrlElementTreeRecursiveIterator constructor.
      *
-     * @param \BetaKiller\Url\UrlElementTreeInterface  $tree
-     * @param \BetaKiller\Url\UrlElementInterface|null $parent
+     * @param \BetaKiller\Url\UrlElementTreeInterface        $tree
+     * @param \BetaKiller\Url\UrlElementInterface|null       $parent  [optional]
+     * @param \BetaKiller\Url\UrlElementFilterInterface|null $filters [optional]
      *
      * @throws \BetaKiller\IFace\Exception\IFaceException
      */
-    public function __construct(UrlElementTreeInterface $tree, ?UrlElementInterface $parent = null)
-    {
-        parent::__construct($tree, $parent);
+    public function __construct(
+        UrlElementTreeInterface $tree,
+        ?UrlElementInterface $parent = null,
+        ?UrlElementFilterInterface $filters = null
+    ) {
+        parent::__construct($tree, $parent, $filters);
 
-        $this->tree = $tree;
+        $this->tree    = $tree;
+        $this->filters = $filters;
     }
 
     /**
@@ -47,6 +61,6 @@ class UrlElementTreeRecursiveIterator extends UrlElementTreeLayerIterator implem
     {
         $current = $this->current();
 
-        return new self($this->tree, $current);
+        return new self($this->tree, $current, $this->filters);
     }
 }
