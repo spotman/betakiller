@@ -9,7 +9,7 @@ use \BetaKiller\Url\Container\UrlContainerInterface;
 /**
  * WebHook URL element processor
  */
-class WebHookUrlElementProcessor extends UrlElementProcessorAbstract
+class WebHookUrlElementProcessor implements UrlElementProcessorInterface
 {
     /**
      * WebHook Factory
@@ -30,17 +30,19 @@ class WebHookUrlElementProcessor extends UrlElementProcessorAbstract
     /**
      * Execute processing on URL element
      *
-     * @param \BetaKiller\Url\UrlElementInterface                  $model
-     * @param \BetaKiller\Url\Container\UrlContainerInterface|null $urlContainer [optional]
-     * @param \Response|null                                       $response     [optional]
+     * @param \BetaKiller\Url\UrlElementInterface             $model
+     * @param \BetaKiller\Url\Container\UrlContainerInterface $urlContainer
+     * @param \Response|null                                  $response [optional]
+     * @param \Request|null                                   $request  [optional]
      *
      * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\Url\ElementProcessor\UrlElementProcessorException
      */
     public function process(
         UrlElementInterface $model,
-        ?UrlContainerInterface $urlContainer = null,
-        ?\Response $response = null
+        UrlContainerInterface $urlContainer,
+        ?\Response $response = null,
+        ?\Request $request = null
     ): void {
         if (!($model instanceof WebHookModelInterface)) {
             throw new UrlElementProcessorException('Invalid model :class_invalid. Model must be :class_valid', [

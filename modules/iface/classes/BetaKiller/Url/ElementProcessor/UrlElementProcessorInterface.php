@@ -12,20 +12,15 @@ interface UrlElementProcessorInterface
     /**
      * Execute processing on URL element
      *
-     * @param \BetaKiller\Url\UrlElementInterface                  $model
-     * @param \BetaKiller\Url\Container\UrlContainerInterface|null $urlContainer [optional]
-     * @param \Response|null                                       $response [optional]
+     * @param \BetaKiller\Url\UrlElementInterface             $model
+     * @param \BetaKiller\Url\Container\UrlContainerInterface $urlContainer
+     * @param \Response|null                                  $response [optional]
+     * @param \Request|null                                   $request  [optional]
      */
     public function process(
         UrlElementInterface $model,
-        ?UrlContainerInterface  $urlContainer = null,
-        ?\Response  $response = null
+        UrlContainerInterface $urlContainer,
+        ?\Response $response = null,
+        ?\Request $request = null
     ): void;
-
-    /**
-     * @param \Request $request
-     *
-     * @return \BetaKiller\Url\ElementProcessor\UrlElementProcessorInterface
-     */
-    public function setRequest(\Request $request): UrlElementProcessorInterface;
 }
