@@ -10,13 +10,21 @@ class Controller_IFace extends Controller
      * @Inject
      * @var \BetaKiller\Factory\UrlElementProcessorFactory
      */
-    private $factoryProcessor;
+    private $processorFactory;
 
     /**
      * @Inject
      * @var UrlDispatcher
      */
     private $urlDispatcher;
+
+    /**
+     * Manager of URL element parameters
+     *
+     * @Inject
+     * @var \BetaKiller\Url\Container\UrlContainerInterface
+     */
+    private $urlContainer;
 
     /**
      * @deprecated
@@ -51,10 +59,9 @@ class Controller_IFace extends Controller
             $this->request->client_ip(),
             $this->request->referrer()
         );
-        $urlProcessor = $this->factoryProcessor->createFromUrlElement($urlElement);
+        $urlProcessor = $this->processorFactory->createFromUrlElement($urlElement);
         $urlProcessor
             ->setRequest($this->request)
-            ->setResponse($this->response)
-            ->process();
+            ->process($urlElement, $this->urlContainer, $this->response);
     }
 }
