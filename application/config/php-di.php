@@ -127,6 +127,21 @@ return [
 
             return $bus;
         }),
+
+        \BetaKiller\MessageBus\CommandBusInterface::class => DI\factory(function (
+            \BetaKiller\MessageBus\CommandBus $bus,
+            ConfigProviderInterface $config
+        ) {
+            $eventsConfig = $config->load(['commands']);
+
+            if ($eventsConfig && is_array($eventsConfig)) {
+                foreach ($eventsConfig as $event => $handler) {
+                    $bus->on($event, $handler);
+                }
+            }
+
+            return $bus;
+        }),
     ],
 
 ];

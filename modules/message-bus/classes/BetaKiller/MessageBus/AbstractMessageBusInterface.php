@@ -12,11 +12,4 @@ interface AbstractMessageBusInterface
      * @throws \BetaKiller\MessageBus\MessageBusException
      */
     public function on(string $messageClassName, $handler): void;
-
-    /**
-     * @param \BetaKiller\MessageBus\MessageInterface $message
-     *
-     * @throws \BetaKiller\MessageBus\MessageBusException
-     */
-    public function emit(MessageInterface $message): void;
 }

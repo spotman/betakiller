@@ -57,12 +57,11 @@ class MissingUrlEventHandler implements EventHandlerInterface
 
     /**
      * @param \BetaKiller\Event\MissingUrlEvent        $message
-     * @param \BetaKiller\MessageBus\EventBusInterface $bus
      *
      * @throws \ORM_Validation_Exception
      * @throws \BetaKiller\Repository\RepositoryException
      */
-    public function handleEvent($message, EventBusInterface $bus): void
+    public function handleEvent($message): void
     {
         // Skip calls like "cache warmup" from CLI mode
         if ($this->appEnv->isCLI()) {
