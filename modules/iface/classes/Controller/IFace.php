@@ -1,17 +1,5 @@
 <?php
-
-use BetaKiller\Config\AppConfigInterface;
-use BetaKiller\Exception\BadRequestHttpException;
-use BetaKiller\Exception\FoundHttpException;
-use BetaKiller\Exception\PermanentRedirectHttpException;
-use BetaKiller\IFace\Cache\IFaceCache;
-use BetaKiller\IFace\Exception\IFaceException;
-use BetaKiller\IFace\IFaceInterface;
-use BetaKiller\Model\UserInterface;
-use BetaKiller\Url\Container\UrlContainerInterface;
-use BetaKiller\Url\IFaceModelInterface;
 use BetaKiller\Url\UrlDispatcher;
-use BetaKiller\Url\WebHookModelInterface;
 
 /**
  * Class Controller_IFace
@@ -20,15 +8,9 @@ class Controller_IFace extends Controller
 {
     /**
      * @Inject
-     * @var UserInterface
+     * @var \BetaKiller\Factory\UrlElementProcessorFactory
      */
-    private $user;
-
-    /**
-     * @Inject
-     * @var AppConfigInterface
-     */
-    private $appConfig;
+    private $processorFactory;
 
     /**
      * @Inject
@@ -37,178 +19,49 @@ class Controller_IFace extends Controller
     private $urlDispatcher;
 
     /**
+     * Manager of URL element parameters
+     *
      * @Inject
-     * @var \BetaKiller\Factory\IFaceFactory
-     */
-    private $ifaceFactory;
-
-    /**
-     * @Inject
-     * @var \BetaKiller\Factory\WebHookFactory
-     */
-    private $webHookFactory;
-
-    /**
-     * @Inject
-     * @var UrlContainerInterface
+     * @var \BetaKiller\Url\Container\UrlContainerInterface
      */
     private $urlContainer;
 
     /**
-     * @Inject
-     * @var IFaceCache
-     */
-    private $ifaceCache;
-
-    /**
-     * @Inject
-     * @var \BetaKiller\View\IFaceView
-     */
-    private $ifaceView;
-
-    /**
-     * @throws \Spotman\Acl\Exception
-     * @throws \Psr\SimpleCache\InvalidArgumentException
-     * @throws \BetaKiller\MessageBus\MessageBusException
-     * @throws \BetaKiller\Exception\PermanentRedirectHttpException
-     * @throws \BetaKiller\Exception\FoundHttpException
-     * @throws \BetaKiller\Exception\SeeOtherHttpException
-     * @throws \BetaKiller\Exception\NotFoundHttpException
-     * @throws \BetaKiller\Auth\AuthorizationRequiredException
+     * @deprecated
      * @throws \BetaKiller\Auth\AccessDeniedException
+     * @throws \BetaKiller\Auth\AuthorizationRequiredException
+     * @throws \BetaKiller\Exception\NotFoundHttpException
+     * @throws \BetaKiller\Exception\SeeOtherHttpException
      * @throws \BetaKiller\Factory\FactoryException
-     * @throws \PageCache\PageCacheException
-     * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \BetaKiller\MessageBus\MessageBusException
+     * @throws \Psr\SimpleCache\InvalidArgumentException
+     * @throws \Spotman\Acl\Exception
      */
     public function action_render(): void
     {
-        $url        = $this->getRequestUrl();
-        $queryParts = $this->getRequestQueryParts();
-        $path       = parse_url($url, PHP_URL_PATH);
-
-        $this->urlContainer->setQueryParts($queryParts);
-
-        // Getting current URL element
-        $urlElement = $this->urlDispatcher->process($url, $this->request->client_ip(), $this->request->referrer());
-
-        if ($urlElement instanceof WebHookModelInterface) {
-            $this->processWebHook($urlElement);
-        } elseif ($urlElement instanceof IFaceModelInterface) {
-            // If this is default IFace and client requested non-slash uri, redirect client to /
-            if ($path !== '/' && $urlElement->isDefault() && !$urlElement->hasDynamicUrl()) {
-                throw new FoundHttpException('/');
-            }
-
-            if ($path !== '/') {
-                $hasTrailingSlash       = (substr($path, -1) === '/');
-                $isTrailingSlashEnabled = $this->appConfig->isTrailingSlashEnabled();
-
-                if ($hasTrailingSlash && !$isTrailingSlashEnabled) {
-                    throw new PermanentRedirectHttpException(rtrim($path, '/'));
-                }
-
-                if (!$hasTrailingSlash && $isTrailingSlashEnabled) {
-                    throw new PermanentRedirectHttpException($path.'/');
-                }
-            }
-
-            $this->processIFace($urlElement);
-        } else {
-            throw new IFaceException('Unknown UrlElement type :codename', [
-                ':codename' => $urlElement->getCodename(),
-            ]);
-        }
+        $this->actionRender();
     }
 
     /**
-     * @param \BetaKiller\Url\IFaceModelInterface $model
-     *
+     * @throws \BetaKiller\Auth\AccessDeniedException
+     * @throws \BetaKiller\Auth\AuthorizationRequiredException
+     * @throws \BetaKiller\Exception\NotFoundHttpException
+     * @throws \BetaKiller\Exception\SeeOtherHttpException
      * @throws \BetaKiller\Factory\FactoryException
-     * @throws \PageCache\PageCacheException
+     * @throws \BetaKiller\MessageBus\MessageBusException
+     * @throws \Psr\SimpleCache\InvalidArgumentException
+     * @throws \Spotman\Acl\Exception
      */
-    private function processIFace(IFaceModelInterface $model): void
+    public function actionRender(): void
     {
-        $iface = $this->ifaceFactory->createFromUrlElement($model);
+        $this->urlContainer->setQueryParts($this->request->query());
 
-        // Starting hook
-        $iface->before();
-
-        // Processing page cache if no URL query parameters
-        if (!$this->urlContainer->getQueryPartsKeys()) {
-            $this->processIFaceCache($iface);
-        }
-
-        try {
-            $output = $this->ifaceView->render($iface);
-
-            // Final hook
-            $iface->after();
-
-            $unusedParts = $this->urlContainer->getUnusedQueryPartsKeys();
-
-            if ($unusedParts) {
-                throw new BadRequestHttpException('Request have unused query parts: :keys', [
-                    ':keys' => implode(', ', $unusedParts),
-                ]);
-            }
-
-            $this->last_modified($iface->getLastModified());
-            $this->expires($iface->getExpiresDateTime());
-
-            $this->send_string($output);
-        } catch (\Throwable $e) {
-            // Prevent response caching
-            $this->ifaceCache->disable();
-
-            throw $e;
-        }
-    }
-
-    /**
-     * @param \BetaKiller\Url\WebHookModelInterface $model
-     *
-     * @throws \BetaKiller\Factory\FactoryException
-     */
-    private function processWebHook(WebHookModelInterface $model): void
-    {
-        $webHook = $this->webHookFactory->createFromUrlElement($model);
-
-        $webHook->process();
-    }
-
-    /**
-     * @param \BetaKiller\IFace\IFaceInterface $iface
-     *
-     * @throws \PageCache\PageCacheException
-     */
-    private function processIFaceCache(IFaceInterface $iface): void
-    {
-        // Skip caching if request method is not GET nor HEAD
-        if (!\in_array($this->request->method(), ['GET', 'HEAD'], true)) {
-            return;
-        }
-
-        // Skip caching for authorized users
-        if (!$this->user->isGuest()) {
-            return;
-        }
-
-        $this->ifaceCache->process($iface);
-    }
-
-    /**
-     * @return string
-     */
-    private function getRequestUrl(): string
-    {
-        return $this->request->url();
-    }
-
-    /**
-     * @return string[]
-     */
-    private function getRequestQueryParts(): array
-    {
-        return $this->request->query();
+        $urlElement   = $this->urlDispatcher->process(
+            $this->request->url(),
+            $this->request->client_ip(),
+            $this->request->referrer()
+        );
+        $urlProcessor = $this->processorFactory->createFromUrlElement($urlElement);
+        $urlProcessor->process($urlElement, $this->urlContainer, $this->response, $this->request);
     }
 }
