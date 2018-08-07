@@ -3,4 +3,4 @@ namespace BetaKiller\Url\ElementProcessor;
 
 use BetaKiller\Exception;
 
-class UrlElementException extends Exception {}
+class UrlElementProcessorException extends Exception {}
