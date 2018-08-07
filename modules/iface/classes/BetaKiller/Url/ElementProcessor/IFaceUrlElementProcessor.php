@@ -20,13 +20,6 @@ use \BetaKiller\View\IFaceView;
 class IFaceUrlElementProcessor extends UrlElementProcessorAbstract
 {
     /**
-     * IFace URL element
-     *
-     * @var \BetaKiller\Url\UrlElementInterface
-     */
-    private $model;
-
-    /**
      * Application config
      *
      * @var \BetaKiller\Config\AppConfigInterface
@@ -39,13 +32,6 @@ class IFaceUrlElementProcessor extends UrlElementProcessorAbstract
      * @var \BetaKiller\Factory\IFaceFactory
      */
     private $ifaceFactory;
-
-    /**
-     * Manager of URL element parameters
-     *
-     * @var \BetaKiller\Url\Container\UrlContainerInterface
-     */
-    private $urlContainer;
 
     /**
      * Templates controller
@@ -69,27 +55,21 @@ class IFaceUrlElementProcessor extends UrlElementProcessorAbstract
     private $user;
 
     /**
-     * @param \BetaKiller\Url\UrlElementInterface             $model
      * @param \BetaKiller\Config\AppConfigInterface           $appConfig
      * @param \BetaKiller\Factory\IFaceFactory                $ifaceFactory
-     * @param \BetaKiller\Url\Container\UrlContainerInterface $urlContainer
      * @param \BetaKiller\View\IFaceView                      $ifaceView
      * @param \BetaKiller\IFace\Cache\IFaceCache              $ifaceCache
      * @param \BetaKiller\Model\UserInterface                 $user
      */
     public function __construct(
-        UrlElementInterface $model,
         AppConfigInterface $appConfig,
         IFaceFactory $ifaceFactory,
-        UrlContainerInterface $urlContainer,
         IFaceView $ifaceView,
         IFaceCache $ifaceCache,
         UserInterface $user
     ) {
-        $this->model        = $model;
         $this->appConfig    = $appConfig;
         $this->ifaceFactory = $ifaceFactory;
-        $this->urlContainer = $urlContainer;
         $this->ifaceView    = $ifaceView;
         $this->ifaceCache   = $ifaceCache;
         $this->user         = $user;
@@ -97,26 +77,40 @@ class IFaceUrlElementProcessor extends UrlElementProcessorAbstract
 
     /**
      * Execute processing on URL element
+     * 
+     * @param \BetaKiller\Url\UrlElementInterface                  $model
+     * @param \BetaKiller\Url\Container\UrlContainerInterface|null $urlContainer [optional]
+     * @param \Response|null                                       $response     [optional]
      *
      * @throws \BetaKiller\Exception\FoundHttpException
      * @throws \BetaKiller\Exception\PermanentRedirectHttpException
      * @throws \BetaKiller\Factory\FactoryException
-     * @throws \BetaKiller\Url\ElementProcessor\UrlElementException
+     * @throws \BetaKiller\Url\ElementProcessor\UrlElementProcessorException
      * @throws \PageCache\PageCacheException
      * @throws \Throwable
      */
-    public function process(): void
+    public function process(
+        UrlElementInterface $model,
+        ?UrlContainerInterface $urlContainer = null,
+        ?\Response $response = null
+    ): void
     {
-        if (!($this->model instanceof IFaceModelInterface)) {
-            throw new UrlElementException('Invalid model :class_invalid. Model must be :class_valid', [
-                ':class_invalid' => \get_class($this->model),
+        if (!($model instanceof IFaceModelInterface)) {
+            throw new UrlElementProcessorException('Invalid model :class_invalid. Model must be :class_valid', [
+                ':class_invalid' => \get_class($model),
                 ':class_valid'   => UrlElementInterface::class,
             ]);
+        }
+        if (!$urlContainer) {
+            throw new UrlElementProcessorException('URL container must be defined');
+        }
+        if (!$response) {
+            throw new UrlElementProcessorException('Response controller must be defined');
         }
 
         // If this is default IFace and client requested non-slash uri, redirect client to /
         $path = parse_url($this->request->url(), PHP_URL_PATH);
-        if ($path !== '/' && $this->model->isDefault() && !$this->model->hasDynamicUrl()) {
+        if ($path !== '/' && $model->isDefault() && !$model->hasDynamicUrl()) {
             throw new FoundHttpException('/');
         }
         if ($path !== '/') {
@@ -133,16 +127,16 @@ class IFaceUrlElementProcessor extends UrlElementProcessorAbstract
         }
 
         //
-        $iface = $this->ifaceFactory->createFromUrlElement($this->model);
+        $iface = $this->ifaceFactory->createFromUrlElement($model);
 
         // Starting hook
         $iface->before();
 
         //
-        $this->urlContainer->setQueryParts($this->request->query());
+        $urlContainer->setQueryParts($this->request->query());
 
         // Processing page cache if no URL query parameters
-        if (!$this->urlContainer->getQueryPartsKeys()) {
+        if (!$urlContainer->getQueryPartsKeys()) {
             $this->processIFaceCache($iface);
         }
 
@@ -152,16 +146,16 @@ class IFaceUrlElementProcessor extends UrlElementProcessorAbstract
             // Final hook
             $iface->after();
 
-            $unusedParts = $this->urlContainer->getUnusedQueryPartsKeys();
+            $unusedParts = $urlContainer->getUnusedQueryPartsKeys();
             if ($unusedParts) {
                 throw new BadRequestHttpException('Request have unused query parts: :keys', [
                     ':keys' => implode(', ', $unusedParts),
                 ]);
             }
 
-            $this->response->last_modified($iface->getLastModified());
-            $this->response->expires($iface->getExpiresDateTime());
-            $this->response->send_string($output);
+            $response->last_modified($iface->getLastModified());
+            $response->expires($iface->getExpiresDateTime());
+            $response->send_string($output);
         } catch (\Throwable $e) {
             // Prevent response caching
             $this->ifaceCache->disable();
