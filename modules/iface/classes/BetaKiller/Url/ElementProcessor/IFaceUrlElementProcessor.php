@@ -17,7 +17,7 @@ use \BetaKiller\View\IFaceView;
 /**
  * IFace URL element processor
  */
-class IFaceUrlElementProcessor extends UrlElementProcessorAbstract
+class IFaceUrlElementProcessor implements UrlElementProcessorInterface
 {
     /**
      * Application config
@@ -55,11 +55,11 @@ class IFaceUrlElementProcessor extends UrlElementProcessorAbstract
     private $user;
 
     /**
-     * @param \BetaKiller\Config\AppConfigInterface           $appConfig
-     * @param \BetaKiller\Factory\IFaceFactory                $ifaceFactory
-     * @param \BetaKiller\View\IFaceView                      $ifaceView
-     * @param \BetaKiller\IFace\Cache\IFaceCache              $ifaceCache
-     * @param \BetaKiller\Model\UserInterface                 $user
+     * @param \BetaKiller\Config\AppConfigInterface $appConfig
+     * @param \BetaKiller\Factory\IFaceFactory      $ifaceFactory
+     * @param \BetaKiller\View\IFaceView            $ifaceView
+     * @param \BetaKiller\IFace\Cache\IFaceCache    $ifaceCache
+     * @param \BetaKiller\Model\UserInterface       $user
      */
     public function __construct(
         AppConfigInterface $appConfig,
@@ -77,10 +77,11 @@ class IFaceUrlElementProcessor extends UrlElementProcessorAbstract
 
     /**
      * Execute processing on URL element
-     * 
-     * @param \BetaKiller\Url\UrlElementInterface                  $model
-     * @param \BetaKiller\Url\Container\UrlContainerInterface|null $urlContainer [optional]
-     * @param \Response|null                                       $response     [optional]
+     *
+     * @param \BetaKiller\Url\UrlElementInterface             $model
+     * @param \BetaKiller\Url\Container\UrlContainerInterface $urlContainer
+     * @param \Response|null                                  $response [optional]
+     * @param \Request|null                                   $request  [optional]
      *
      * @throws \BetaKiller\Exception\FoundHttpException
      * @throws \BetaKiller\Exception\PermanentRedirectHttpException
@@ -91,14 +92,14 @@ class IFaceUrlElementProcessor extends UrlElementProcessorAbstract
      */
     public function process(
         UrlElementInterface $model,
-        ?UrlContainerInterface $urlContainer = null,
-        ?\Response $response = null
-    ): void
-    {
+        UrlContainerInterface $urlContainer,
+        ?\Response $response = null,
+        ?\Request $request = null
+    ): void {
         if (!($model instanceof IFaceModelInterface)) {
             throw new UrlElementProcessorException('Invalid model :class_invalid. Model must be :class_valid', [
                 ':class_invalid' => \get_class($model),
-                ':class_valid'   => UrlElementInterface::class,
+                ':class_valid'   => IFaceModelInterface::class,
             ]);
         }
         if (!$urlContainer) {
@@ -107,9 +108,12 @@ class IFaceUrlElementProcessor extends UrlElementProcessorAbstract
         if (!$response) {
             throw new UrlElementProcessorException('Response controller must be defined');
         }
+        if (!$request) {
+            throw new UrlElementProcessorException('Request controller must be defined');
+        }
 
         // If this is default IFace and client requested non-slash uri, redirect client to /
-        $path = parse_url($this->request->url(), PHP_URL_PATH);
+        $path = parse_url($request->url(), PHP_URL_PATH);
         if ($path !== '/' && $model->isDefault() && !$model->hasDynamicUrl()) {
             throw new FoundHttpException('/');
         }
@@ -132,12 +136,9 @@ class IFaceUrlElementProcessor extends UrlElementProcessorAbstract
         // Starting hook
         $iface->before();
 
-        //
-        $urlContainer->setQueryParts($this->request->query());
-
         // Processing page cache if no URL query parameters
         if (!$urlContainer->getQueryPartsKeys()) {
-            $this->processIFaceCache($iface);
+            $this->processIFaceCache($iface, $request);
         }
 
         try {
@@ -168,13 +169,14 @@ class IFaceUrlElementProcessor extends UrlElementProcessorAbstract
      * Cashing IFace element
      *
      * @param \BetaKiller\IFace\IFaceInterface $iface
+     * @param \Request                         $request
      *
      * @throws \PageCache\PageCacheException
      */
-    private function processIFaceCache(IFaceInterface $iface): void
+    private function processIFaceCache(IFaceInterface $iface, \Request $request): void
     {
         // Skip caching if request method is not GET nor HEAD
-        if (!\in_array($this->request->method(), ['GET', 'HEAD'], true)) {
+        if (!\in_array($request->method(), ['GET', 'HEAD'], true)) {
             return;
         }
 
