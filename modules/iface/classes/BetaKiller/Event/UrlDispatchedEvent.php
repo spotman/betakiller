@@ -83,4 +83,15 @@ class UrlDispatchedEvent implements EventMessageInterface
     {
         return $this->params;
     }
+
+    /**
+     * Must return true if message requires processing in external message queue (instead of internal queue)
+     *
+     * @return bool
+     */
+    public function isExternal(): bool
+    {
+        // Only internal processing
+        return false;
+    }
 }

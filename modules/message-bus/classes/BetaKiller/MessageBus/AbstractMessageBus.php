@@ -36,11 +36,21 @@ abstract class AbstractMessageBus implements AbstractMessageBusInterface
         $this->logger    = $logger;
     }
 
+    /**
+     * @return string
+     */
     abstract protected function getHandlerInterface(): string;
 
+    /**
+     * @return int
+     */
     abstract protected function getMessageHandlersLimit(): int;
 
-    abstract protected function processMessage($message, $handler): void;
+    /**
+     * @param \BetaKiller\MessageBus\MessageInterface        $message
+     * @param \BetaKiller\MessageBus\MessageHandlerInterface $handler
+     */
+    abstract protected function processDelayedMessage($message, $handler): void;
 
     /**
      * @param string       $messageClassName
@@ -67,30 +77,12 @@ abstract class AbstractMessageBus implements AbstractMessageBusInterface
         // Handle all processed messages with new handler
         foreach ($this->processedMessages as $processedMessage) {
             if ($this->getMessageName($processedMessage) === $messageClassName) {
-                $this->process($processedMessage, $handler);
+                $this->processDelayedMessage($processedMessage, $handler);
             }
         }
     }
 
-    /**
-     * @param \BetaKiller\MessageBus\MessageInterface $message
-     *
-     * @throws \BetaKiller\MessageBus\MessageBusException
-     */
-    public function emit(MessageInterface $message): void
-    {
-        $this->handle($message);
-
-        // Add message
-        $this->processedMessages[] = $message;
-    }
-
-    /**
-     * @param \BetaKiller\MessageBus\MessageInterface $message
-     *
-     * @throws \BetaKiller\MessageBus\MessageBusException
-     */
-    private function handle(MessageInterface $message): void
+    protected function getHandlers(MessageInterface $message): array
     {
         $name = $this->getMessageName($message);
 
@@ -100,24 +92,12 @@ abstract class AbstractMessageBus implements AbstractMessageBusInterface
             throw new MessageBusException('No handlers found for :name message', [':name' => $name]);
         }
 
-        foreach ($handlers as $handler) {
-            $this->process($message, $handler);
-        }
+        return $handlers;
     }
 
-    /**
-     * @param $message
-     * @param $handler
-     */
-    private function process($message, $handler): void
+    protected function addProcessedMessage(MessageInterface $message): void
     {
-        // Wrap every message bus processing with try-catch block and log exceptions
-        try {
-            $handler = $this->reviewHandler($handler);
-            $this->processMessage($message, $handler);
-        } catch (\Throwable $e) {
-            $this->logException($this->logger, $e);
-        }
+        $this->processedMessages[] = $message;
     }
 
     /**
@@ -126,7 +106,7 @@ abstract class AbstractMessageBus implements AbstractMessageBusInterface
      * @return mixed
      * @throws \BetaKiller\MessageBus\MessageBusException
      */
-    private function reviewHandler($handler)
+    protected function reviewHandler($handler)
     {
         // Convert class name to instance
         if (\is_string($handler)) {
@@ -150,7 +130,7 @@ abstract class AbstractMessageBus implements AbstractMessageBusInterface
         return $handler;
     }
 
-    private function getMessageName(MessageInterface $message): string
+    protected function getMessageName(MessageInterface $message): string
     {
         return \get_class($message);
     }
