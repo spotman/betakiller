@@ -27,7 +27,7 @@ class UrlElementProcessorFactory
         $this->factory = $factoryBuilder
             ->createFactory()
             ->cacheInstances()
-            ->setClassNamespaces('Url\ElementProcessor')
+            ->setClassNamespaces('Url', 'ElementProcessor')
             ->setClassSuffix('UrlElementProcessor')
             ->setExpectedInterface(UrlElementProcessorInterface::class);
     }
@@ -43,20 +43,20 @@ class UrlElementProcessorFactory
     public function createFromUrlElement(UrlElementInterface $model): UrlElementProcessorInterface
     {
         switch (true) {
+            case $model instanceof IFaceModelInterface:
+                $className = 'IFace';
+                break;
+
+            case $model instanceof WebHookModelInterface:
+                $className = 'WebHook';
+                break;
+
             default:
                 throw new IFaceException('Unknown IFace Url element type :codename', [
                     ':codename' => $model->getCodename(),
                 ]);
-
-            case ($model instanceof IFaceModelInterface):
-                $className = 'IFace';
-                break;
-
-            case ($model instanceof WebHookModelInterface):
-                $className = 'WebHook';
-                break;
         }
 
-        return $this->factory->create($className, ['model'=>$model]);
+        return $this->factory->create($className);
     }
 }
