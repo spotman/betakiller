@@ -54,14 +54,14 @@ class Controller_IFace extends Controller
      */
     public function actionRender(): void
     {
+        $this->urlContainer->setQueryParts($this->request->query());
+
         $urlElement   = $this->urlDispatcher->process(
             $this->request->url(),
             $this->request->client_ip(),
             $this->request->referrer()
         );
         $urlProcessor = $this->processorFactory->createFromUrlElement($urlElement);
-        $urlProcessor
-            ->setRequest($this->request)
-            ->process($urlElement, $this->urlContainer, $this->response);
+        $urlProcessor->process($urlElement, $this->urlContainer, $this->response, $this->request);
     }
 }
