@@ -1,6 +1,7 @@
 <?php
 namespace BetaKiller\Url\ModelProvider;
 
+use BetaKiller\IFace\Exception\IFaceException;
 use BetaKiller\Model\WebHookModelTrait;
 use BetaKiller\Url\WebHookModelInterface;
 
@@ -88,5 +89,52 @@ class WebHookPlainModel extends AbstractPlainUrlElementModel implements WebHookM
     public static function getUrlContainerKey(): string
     {
         return WebHookModelInterface::URL_CONTAINER_KEY;
+    }
+
+    /**
+     * @return string
+     */
+    public function getModelName(): string
+    {
+        return WebHookModelInterface::URL_CONTAINER_KEY;
+    }
+
+    /**
+     * Returns value of the $key property
+     *
+     * @param string $key
+     *
+     * @return string
+     */
+    public function getUrlKeyValue(string $key): string
+    {
+        if ($key !== WebHookModelInterface::URL_KEY) {
+            throw new IFaceException('WebHook model may be mapped through codename only');
+        }
+
+        return $this->getCodename();
+    }
+
+    /**
+     * Entity may return instances of linked entities if it have.
+     * This method is used to fetch missing entities in UrlContainer walking through links between them
+     *
+     * @return \BetaKiller\Model\DispatchableEntityInterface[]
+     */
+    public function getLinkedEntities(): array
+    {
+        return [];
+    }
+
+    /**
+     * Returns true if this entity has linked one with provided key
+     *
+     * @param string $key
+     *
+     * @return bool
+     */
+    public function hasLinkedEntity(string $key): bool
+    {
+        return false;
     }
 }

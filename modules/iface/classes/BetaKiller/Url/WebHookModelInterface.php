@@ -3,9 +3,9 @@ declare(strict_types=1);
 
 namespace BetaKiller\Url;
 
-use BetaKiller\Url\Parameter\UrlParameterInterface;
+use BetaKiller\Model\DispatchableEntityInterface;
 
-interface WebHookModelInterface extends UrlElementInterface, UrlParameterInterface
+interface WebHookModelInterface extends UrlElementInterface, DispatchableEntityInterface
 {
     public const URL_CONTAINER_KEY = 'WebHook';
 
