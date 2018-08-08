@@ -2,6 +2,7 @@
 namespace BetaKiller\Url;
 
 use BetaKiller\Model\DispatchableEntityInterface;
+use BetaKiller\Url\ElementFilter\UrlElementFilterInterface;
 
 interface UrlElementTreeInterface
 {
@@ -122,12 +123,16 @@ interface UrlElementTreeInterface
     public function getReverseBreadcrumbsIterator(UrlElementInterface $model): \ArrayIterator;
 
     /**
-     * @param \BetaKiller\Url\UrlElementInterface|null $parent
+     * @param \BetaKiller\Url\UrlElementInterface|null                     $parent
+     * @param \BetaKiller\Url\ElementFilter\UrlElementFilterInterface|null $filter
      *
      * @return \RecursiveIteratorIterator|\BetaKiller\Url\UrlElementInterface[]
      * @throws \BetaKiller\IFace\Exception\IFaceException
      */
-    public function getRecursiveIteratorIterator(UrlElementInterface $parent = null): \RecursiveIteratorIterator;
+    public function getRecursiveIteratorIterator(
+        UrlElementInterface $parent = null,
+        UrlElementFilterInterface $filter = null
+    ): \RecursiveIteratorIterator;
 
     /**
      * @param \BetaKiller\Url\UrlElementInterface|NULL $parent

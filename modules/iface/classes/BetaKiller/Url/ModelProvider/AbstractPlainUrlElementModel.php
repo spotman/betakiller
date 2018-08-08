@@ -4,6 +4,8 @@ declare(strict_types=1);
 namespace BetaKiller\Url\ModelProvider;
 
 use BetaKiller\Exception\NotImplementedHttpException;
+use BetaKiller\Url\Parameter\UrlParameterException;
+use BetaKiller\Url\Parameter\UrlParameterInterface;
 use BetaKiller\Url\UrlElementInterface;
 
 abstract class AbstractPlainUrlElementModel implements UrlElementInterface
@@ -139,5 +141,23 @@ abstract class AbstractPlainUrlElementModel implements UrlElementInterface
     public function getAdditionalAclRules(): array
     {
         return $this->aclRules;
+    }
+
+    /**
+     * Returns true if current parameter is the same as provided one
+     *
+     * @param \BetaKiller\Url\Parameter\UrlParameterInterface $parameter
+     *
+     * @return bool
+     */
+    public function isSameAs(UrlParameterInterface $parameter): bool
+    {
+        if (!$parameter instanceof UrlElementInterface) {
+            throw new UrlParameterException('Can not compare different objects; must be instance of :must', [
+                ':must' => UrlElementInterface::class,
+            ]);
+        }
+
+        return $parameter->getCodename() === $this->getCodename();
     }
 }

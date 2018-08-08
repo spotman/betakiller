@@ -1,24 +1,43 @@
 <?php
+declare(strict_types=1);
 
-namespace BetaKiller\Url;
+namespace BetaKiller\Url\ElementFilter;
+
+use BetaKiller\Url\UrlElementInterface;
 
 /**
- * Collector of IFace URL element filters
+ * Class AggregateUrlElementFilter
+ * Aggregation facade for URL element filters
+ *
+ * @package BetaKiller\Url
  */
 class AggregateUrlElementFilter implements AggregateUrlElementFilterInterface
 {
     /**
      * Array of filters
      *
-     * @var \BetaKiller\Url\UrlElementFilterInterface[]
+     * @var \BetaKiller\Url\ElementFilter\UrlElementFilterInterface[]
      */
-    private $filters;
+    private $filters = [];
 
+    /**
+     * AggregateUrlElementFilter constructor.
+     *
+     * @param UrlElementFilterInterface[]|null $filters
+     */
+    public function __construct(array $filters = null)
+    {
+        if ($filters) {
+            foreach ($filters as $filter) {
+                $this->addFilter($filter);
+            }
+        }
+    }
 
     /**
      * Adding a filter
      *
-     * @param \BetaKiller\Url\UrlElementFilterInterface $urlFilter
+     * @param \BetaKiller\Url\ElementFilter\UrlElementFilterInterface $urlFilter
      *
      * @return $this
      */
@@ -29,7 +48,6 @@ class AggregateUrlElementFilter implements AggregateUrlElementFilterInterface
         return $this;
     }
 
-
     /**
      * Checking availability IFace URL element by all filters
      *
@@ -39,6 +57,7 @@ class AggregateUrlElementFilter implements AggregateUrlElementFilterInterface
      */
     public function isAvailable(UrlElementInterface $urlElement): bool
     {
+        // No filters => available
         if (!$this->filters) {
             return true;
         }

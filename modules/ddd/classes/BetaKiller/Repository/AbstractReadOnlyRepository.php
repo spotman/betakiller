@@ -1,6 +1,7 @@
 <?php
-namespace BetaKiller\Repository;
+declare(strict_types=1);
 
+namespace BetaKiller\Repository;
 
 abstract class AbstractReadOnlyRepository extends AbstractRepository
 {

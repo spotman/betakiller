@@ -1,6 +1,8 @@
 <?php
 namespace BetaKiller\Url;
 
+use BetaKiller\Url\ElementFilter\UrlElementFilterInterface;
+
 class UrlElementTreeRecursiveIterator extends UrlElementTreeLayerIterator implements \RecursiveIterator
 {
     /**
@@ -13,16 +15,16 @@ class UrlElementTreeRecursiveIterator extends UrlElementTreeLayerIterator implem
     /**
      * IFace URL element filters
      *
-     * @var \BetaKiller\Url\UrlElementFilterInterface
+     * @var \BetaKiller\Url\ElementFilter\UrlElementFilterInterface
      */
     private $filters;
 
     /**
      * UrlElementTreeRecursiveIterator constructor.
      *
-     * @param \BetaKiller\Url\UrlElementTreeInterface        $tree
-     * @param \BetaKiller\Url\UrlElementInterface|null       $parent  [optional]
-     * @param \BetaKiller\Url\UrlElementFilterInterface|null $filters [optional]
+     * @param \BetaKiller\Url\UrlElementTreeInterface                      $tree
+     * @param \BetaKiller\Url\UrlElementInterface|null                     $parent  [optional]
+     * @param \BetaKiller\Url\ElementFilter\UrlElementFilterInterface|null $filters [optional]
      *
      * @throws \BetaKiller\IFace\Exception\IFaceException
      */
