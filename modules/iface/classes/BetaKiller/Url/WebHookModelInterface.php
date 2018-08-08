@@ -8,7 +8,6 @@ use BetaKiller\Url\Parameter\UrlParameterInterface;
 interface WebHookModelInterface extends UrlElementInterface, UrlParameterInterface
 {
     public const URL_CONTAINER_KEY = 'WebHook';
-    public const URL_KEY           = 'codename';
 
     /**
      * Returns target service name (website domain or company name)
