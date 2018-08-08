@@ -1,15 +1,16 @@
 <?php
 declare(strict_types=1);
 
-namespace BetaKiller\Widget;
+namespace BetaKiller\Url\ElementFilter;
 
-use BetaKiller\Url\UrlElementFilterInterface;
-use BetaKiller\Url\UrlElementFilterException;
-use BetaKiller\Url\UrlElementInterface;
 use BetaKiller\Url\IFaceModelInterface;
+use BetaKiller\Url\UrlElementInterface;
 
 /**
- * Filter of IFace URL element by menu codename
+ * Class MenuCodenameUrlElementFilter
+ * Filter URL elements by menu codename
+ *
+ * @package BetaKiller\Url\ElementFilter
  */
 class MenuCodenameUrlElementFilter implements UrlElementFilterInterface
 {
@@ -20,20 +21,18 @@ class MenuCodenameUrlElementFilter implements UrlElementFilterInterface
      */
     private $menuCodename;
 
-
     /**
      * @param string $menuCodename Menu codename to be selected
      *
-     * @throws \BetaKiller\Url\UrlElementFilterException
+     * @throws \BetaKiller\Url\ElementFilter\UrlElementFilterException
      */
     public function __construct(string $menuCodename)
     {
-        $menuCodename = mb_strtolower(trim($menuCodename));
-        if ($menuCodename === '') {
+        if (!$menuCodename) {
             throw new UrlElementFilterException('Menu codename can not be empty');
         }
 
-        $this->menuCodename = $menuCodename;
+        $this->menuCodename = mb_strtolower($menuCodename);
     }
 
     /**
@@ -45,8 +44,7 @@ class MenuCodenameUrlElementFilter implements UrlElementFilterInterface
      */
     public function isAvailable(UrlElementInterface $urlElement): bool
     {
-        return
-            $urlElement instanceof IFaceModelInterface
+        return $urlElement instanceof IFaceModelInterface
             && $urlElement->getMenuName() === $this->menuCodename;
     }
 }

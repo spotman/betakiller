@@ -1,5 +1,9 @@
 <?php
-namespace BetaKiller\Url;
+declare(strict_types=1);
+
+namespace BetaKiller\Url\ElementFilter;
+
+use BetaKiller\Url\UrlElementInterface;
 
 /**
  * Filter of IFace URL element

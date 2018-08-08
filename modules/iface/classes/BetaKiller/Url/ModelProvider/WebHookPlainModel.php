@@ -79,4 +79,14 @@ class WebHookPlainModel extends AbstractPlainUrlElementModel implements WebHookM
 
         parent::fromArray($data);
     }
+
+    /**
+     * Returns key which will be used for storing model in UrlContainer registry.
+     *
+     * @return string
+     */
+    public static function getUrlContainerKey(): string
+    {
+        return WebHookModelInterface::URL_CONTAINER_KEY;
+    }
 }

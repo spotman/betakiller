@@ -3,6 +3,7 @@ namespace BetaKiller\Url;
 
 use BetaKiller\IFace\Exception\IFaceException;
 use BetaKiller\Model\DispatchableEntityInterface;
+use BetaKiller\Url\ElementFilter\UrlElementFilterInterface;
 
 class UrlElementTree implements UrlElementTreeInterface
 {
@@ -78,7 +79,7 @@ class UrlElementTree implements UrlElementTreeInterface
     private function validateLayer(array $models): void
     {
         $dynamicCounter = 0;
-        $uris = [];
+        $uris           = [];
 
         foreach ($models as $model) {
             if ($model instanceof IFaceModelInterface && ($model->hasDynamicUrl() || $model->hasTreeBehaviour())) {
@@ -364,7 +365,7 @@ class UrlElementTree implements UrlElementTreeInterface
      */
     public function getWebHooksByServiceName(string $serviceName): array
     {
-        return \array_filter($this->items, function(UrlElementInterface $urlElement) use ($serviceName) {
+        return \array_filter($this->items, function (UrlElementInterface $urlElement) use ($serviceName) {
             return $urlElement instanceof WebHookModelInterface && $urlElement->getServiceName() === $serviceName;
         });
     }
@@ -390,28 +391,36 @@ class UrlElementTree implements UrlElementTreeInterface
     }
 
     /**
-     * @param \BetaKiller\Url\UrlElementInterface|null $parent
+     * @param \BetaKiller\Url\UrlElementInterface|null                     $parent
+     *
+     * @param \BetaKiller\Url\ElementFilter\UrlElementFilterInterface|null $filter
      *
      * @return \RecursiveIteratorIterator|\BetaKiller\Url\UrlElementInterface[]
      * @throws \BetaKiller\IFace\Exception\IFaceException
      */
-    public function getRecursiveIteratorIterator(UrlElementInterface $parent = null): \RecursiveIteratorIterator
-    {
+    public function getRecursiveIteratorIterator(
+        UrlElementInterface $parent = null,
+        UrlElementFilterInterface $filter = null
+    ): \RecursiveIteratorIterator {
         return new \RecursiveIteratorIterator(
-            $this->getRecursiveIterator($parent),
+            $this->getRecursiveIterator($parent, $filter),
             \RecursiveIteratorIterator::SELF_FIRST
         );
     }
 
     /**
-     * @param \BetaKiller\Url\UrlElementInterface|null $parent
+     * @param \BetaKiller\Url\UrlElementInterface|null                     $parent
+     *
+     * @param \BetaKiller\Url\ElementFilter\UrlElementFilterInterface|null $filter
      *
      * @return \RecursiveIterator
      * @throws \BetaKiller\IFace\Exception\IFaceException
      */
-    private function getRecursiveIterator(UrlElementInterface $parent = null): \RecursiveIterator
-    {
-        return new UrlElementTreeRecursiveIterator($this, $parent);
+    private function getRecursiveIterator(
+        UrlElementInterface $parent = null,
+        UrlElementFilterInterface $filter = null
+    ): \RecursiveIterator {
+        return new UrlElementTreeRecursiveIterator($this, $parent, $filter);
     }
 
     /**

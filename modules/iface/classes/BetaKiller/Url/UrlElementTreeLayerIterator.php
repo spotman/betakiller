@@ -1,21 +1,23 @@
 <?php
 namespace BetaKiller\Url;
 
+use BetaKiller\Url\ElementFilter\UrlElementFilterInterface;
+
 class UrlElementTreeLayerIterator extends \FilterIterator
 {
     /**
      * IFace URL element filters
      *
-     * @var \BetaKiller\Url\UrlElementFilterInterface
+     * @var \BetaKiller\Url\ElementFilter\UrlElementFilterInterface
      */
     private $filters;
 
     /**
      * UrlElementTreeLayerIterator constructor.
      *
-     * @param \BetaKiller\Url\UrlElementTreeInterface        $tree
-     * @param \BetaKiller\Url\UrlElementInterface            $parent
-     * @param \BetaKiller\Url\UrlElementFilterInterface|null $filters [optional]
+     * @param \BetaKiller\Url\UrlElementTreeInterface                      $tree
+     * @param \BetaKiller\Url\UrlElementInterface                          $parent
+     * @param \BetaKiller\Url\ElementFilter\UrlElementFilterInterface|null $filters [optional]
      *
      * @throws \BetaKiller\IFace\Exception\IFaceException
      */

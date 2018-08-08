@@ -3,26 +3,20 @@ declare(strict_types=1);
 
 namespace BetaKiller\Widget;
 
-use BetaKiller\Config\ConfigProviderInterface;
-use BetaKiller\Url\Behaviour\UrlBehaviourFactory;
-use BetaKiller\Url\UrlElementInterface;
-use BetaKiller\Url\AggregateUrlElementFilter;
-use BetaKiller\Url\UrlElementTreeInterface;
-use BetaKiller\Url\UrlElementTreeRecursiveIterator;
-use BetaKiller\Url\Container\UrlContainerInterface;
-use BetaKiller\Url\Container\UrlContainer;
-use BetaKiller\IFace\Exception\IFaceException;
 use BetaKiller\Helper\AclHelper;
 use BetaKiller\Helper\IFaceHelper;
-use PhpParser\Node\Stmt\Foreach_;
+use BetaKiller\IFace\Exception\IFaceException;
+use BetaKiller\Url\Behaviour\UrlBehaviourFactory;
+use BetaKiller\Url\Container\UrlContainer;
+use BetaKiller\Url\Container\UrlContainerInterface;
+use BetaKiller\Url\ElementFilter\AggregateUrlElementFilter;
+use BetaKiller\Url\ElementFilter\MenuCodenameUrlElementFilter;
+use BetaKiller\Url\UrlElementInterface;
+use BetaKiller\Url\UrlElementTreeInterface;
+use BetaKiller\Url\UrlElementTreeRecursiveIterator;
 
 class MenuWidget extends AbstractPublicWidget
 {
-    /**
-     * @var ConfigProviderInterface
-     */
-    private $config;
-
     /**
      * @var \BetaKiller\Url\UrlElementTreeInterface
      */
@@ -46,20 +40,17 @@ class MenuWidget extends AbstractPublicWidget
     /**
      * AuthWidget constructor.
      *
-     * @param \BetaKiller\Config\ConfigProviderInterface    $config
      * @param \BetaKiller\Url\UrlElementTreeInterface       $tree
      * @param \BetaKiller\Helper\IFaceHelper                $ifaceHelper
      * @param \BetaKiller\Helper\AclHelper                  $aclHelper
      * @param \BetaKiller\Url\Behaviour\UrlBehaviourFactory $behaviourFactory
      */
     public function __construct(
-        ConfigProviderInterface $config,
         UrlElementTreeInterface $tree,
         IFaceHelper $ifaceHelper,
         AclHelper $aclHelper,
         UrlBehaviourFactory $behaviourFactory
     ) {
-        $this->config           = $config;
         $this->tree             = $tree;
         $this->ifaceHelper      = $ifaceHelper;
         $this->aclHelper        = $aclHelper;
@@ -70,29 +61,25 @@ class MenuWidget extends AbstractPublicWidget
      * Returns data for View rendering: menu links
      *
      * @return array [[string url, string label, bool active, array children], ...]
-     * @throws \BetaKiller\Url\UrlElementFilterException
+     * @throws \BetaKiller\Url\ElementFilter\UrlElementFilterException
      */
     public function getData(): array
     {
-        // menu codename from widget context
-        $codename = $this->getContextParam('menu');
-        $codename = mb_strtolower($codename);
-        if ($codename === '') {
-            throw new WidgetException('Menu codename can not be empty');
-        }
+        // Menu codename from widget context
+        $menuCodename   = trim($this->getContextParam('menu'));
+        $parentCodename = trim($this->getContextParam('parent'));
 
-        // filter by IFace URL menu codename
-        $filterCodename = new MenuCodenameUrlElementFilter($codename);
-        $filters        = new AggregateUrlElementFilter();
-        $filters->addFilter($filterCodename);
+        // Filter by IFace URL menu codename
+        $filters = new AggregateUrlElementFilter(
+            new MenuCodenameUrlElementFilter($menuCodename)
+        );
 
-        // parent IFace URL element
-        $parentCodename = $this->getContextParam('parent');
-        $parent         = $parentCodename
+        // Parent IFace URL element
+        $parent = $parentCodename
             ? $this->tree->getByCodename($parentCodename)
             : null;
 
-        // generation items of links menu
+        // Generate menu items
         $iterator = new UrlElementTreeRecursiveIterator($this->tree, $parent, $filters);
 
         return $this->processLayer($iterator, null);
@@ -160,27 +147,21 @@ class MenuWidget extends AbstractPublicWidget
                 throw IFaceException::wrap($e);
             }
 
-            // item data
-            $iface  = $this->ifaceHelper->createIFaceFromCodename($urlElement->getCodename());
-            $url    = $this->ifaceHelper->makeIFaceUrl($iface, $params, false);
-            $label  = $this->ifaceHelper->getLabel($iface->getModel(), $params);
-            $active = $this->ifaceHelper->isCurrentIFace($iface, $params);
+            // Item data
+            $iface = $this->ifaceHelper->createIFaceFromCodename($urlElement->getCodename());
 
             $resultItem = [
-                'url'      => $url,
-                'label'    => $label,
-                'active'   => $active,
+                'url'      => $this->ifaceHelper->makeIFaceUrl($iface, $params, false),
+                'label'    => $this->ifaceHelper->getLabel($iface->getModel(), $params),
+                'active'   => $this->ifaceHelper->isCurrentIFace($iface, $params),
                 'children' => [],
             ];
 
             // recursion for children
             if ($models->hasChildren()) {
-                $modelsChildren         = $models->getChildren();
-                $children               = $this->processLayer($modelsChildren, $params);
-                $resultItem['children'] = $children;
+                $resultItem['children'] = $this->processLayer($models->getChildren(), $params);
             }
 
-            //
             $result[] = $resultItem;
         }
 
@@ -199,8 +180,6 @@ class MenuWidget extends AbstractPublicWidget
     private function getAvailableIFaceUrls(UrlElementInterface $urlElement, UrlContainerInterface $params): \Generator
     {
         $behaviour = $this->behaviourFactory->fromUrlElement($urlElement);
-
-        // TODO Deal with calculation of the last_modified from each parameter value
 
         foreach ($behaviour->getAvailableUrls($urlElement, $params) as $availableUrl) {
             yield $availableUrl;

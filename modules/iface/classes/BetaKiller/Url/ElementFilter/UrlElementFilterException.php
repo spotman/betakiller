@@ -1,5 +1,5 @@
 <?php
-namespace BetaKiller\Url;
+namespace BetaKiller\Url\ElementFilter;
 
 use BetaKiller\Exception;
 

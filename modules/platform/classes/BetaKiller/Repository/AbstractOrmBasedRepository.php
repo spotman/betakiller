@@ -47,11 +47,9 @@ abstract class AbstractOrmBasedRepository extends AbstractRepository
      */
     public function getAll(): array
     {
-        try {
-            return $this->getOrmInstance()->find_all()->as_array();
-        } catch (\Kohana_Exception $e) {
-            throw RepositoryException::wrap($e);
-        }
+        $orm = $this->getOrmInstance();
+
+        return $this->findAll($orm);
     }
 
     /**
