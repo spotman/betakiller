@@ -19,7 +19,7 @@ class IndexItem extends AbstractEditor
         $editor = $this->getShortcodeEditor();
 
         /** @var EntityModelInterface|null $entity */
-        $entity = $this->urlContainer->getEntity(EntityModelInterface::URL_CONTAINER_KEY);
+        $entity = $this->urlContainer->getEntityByClassName(EntityModelInterface::class);
 
         /** @var \BetaKiller\Url\Parameter\IdUrlParameter|null $idParam */
         $idParam = $this->urlContainer->getParameterByClassName(IdUrlParameter::class);
