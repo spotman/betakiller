@@ -79,6 +79,17 @@ class UrlContainer implements UrlContainerInterface
     }
 
     /**
+     * @param \BetaKiller\Model\DispatchableEntityInterface $entity
+     * @param bool|null                                     $ignoreDuplicate
+     *
+     * @return \BetaKiller\Url\Container\UrlContainerInterface
+     */
+    public function setEntity(DispatchableEntityInterface $entity, ?bool $ignoreDuplicate = null): UrlContainerInterface
+    {
+        return $this->setParameter($entity);
+    }
+
+    /**
      * @param string $key
      *
      * @return \BetaKiller\Url\Parameter\UrlParameterInterface|null

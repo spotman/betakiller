@@ -68,7 +68,7 @@ class UrlContainerHelper
             $params = $this->urlContainer;
         }
 
-        return $params->setParameter($model, true);
+        return $params->setEntity($model, true);
     }
 
     public function getQueryPart(string $name, ?bool $required = null)

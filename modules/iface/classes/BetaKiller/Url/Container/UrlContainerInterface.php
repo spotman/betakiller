@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\Url\Container;
 
+use BetaKiller\Model\DispatchableEntityInterface;
 use BetaKiller\Url\Parameter\UrlParameterInterface;
 
 interface UrlContainerInterface
@@ -31,6 +32,14 @@ interface UrlContainerInterface
      * @return \BetaKiller\Model\DispatchableEntityInterface|mixed|null
      */
     public function getEntity(string $key);
+
+    /**
+     * @param \BetaKiller\Model\DispatchableEntityInterface $entity
+     * @param bool|null                                     $ignoreDuplicate
+     *
+     * @return \BetaKiller\Url\Container\UrlContainerInterface
+     */
+    public function setEntity(DispatchableEntityInterface $entity, ?bool $ignoreDuplicate = null): UrlContainerInterface;
 
     /**
      * @param string $key
