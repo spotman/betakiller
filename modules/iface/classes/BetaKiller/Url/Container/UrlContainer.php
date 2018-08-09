@@ -105,11 +105,9 @@ class UrlContainer implements UrlContainerInterface
      * @return \BetaKiller\Model\DispatchableEntityInterface|mixed|null
      * @throws \BetaKiller\Url\Container\UrlContainerException
      */
-    public function getEntityByClassName($className)
+    public function getEntityByClassName(string $className)
     {
-        $key = $this->resolveObjectOrClassToKey($className, DispatchableEntityInterface::class);
-
-        return $this->getEntity($key);
+        return $this->findParameterByClassName($className, DispatchableEntityInterface::class);
     }
 
     /**
@@ -118,37 +116,70 @@ class UrlContainer implements UrlContainerInterface
      * @return \BetaKiller\Model\DispatchableEntityInterface|mixed|null
      * @throws \BetaKiller\Url\Container\UrlContainerException
      */
-    public function getParameterByClassName($className)
+    public function getParameterByClassName(string $className)
     {
-        $key = $this->resolveObjectOrClassToKey($className, UrlParameterInterface::class);
-
-        return $this->getParameter($key);
+        return $this->findParameterByClassName($className, UrlParameterInterface::class);
     }
 
     /**
-     * @param        $className
-     *
+     * @param string $className
      * @param string $targetClass
      *
-     * @return string
+     * @return \BetaKiller\Url\Parameter\UrlParameterInterface
      * @throws \BetaKiller\Url\Container\UrlContainerException
      */
-    private function resolveObjectOrClassToKey($className, string $targetClass): string
+    private function findParameterByClassName(string $className, string $targetClass): UrlParameterInterface
     {
-        if (\is_object($className)) {
-            $className = \get_class($className);
+        $found = null;
+
+        foreach ($this->getAllParameters() as $parameter) {
+            if (!$parameter instanceof $targetClass) {
+                continue;
+            }
+
+            if ($found) {
+                throw new UrlContainerException('Multiple URL parameters are matching with :target', [
+                    ':name' => $className,
+                ]);
+            }
+
+            $found = $parameter;
         }
 
-        if (!is_a($className, $targetClass, true)) {
+        if ($found && !$found instanceof $targetClass) {
             throw new UrlContainerException('Class :name must be instance of :must', [
-                ':name' => $className,
+                ':name' => \get_class($found),
                 ':must' => $targetClass,
             ]);
         }
 
-        /** @var \BetaKiller\Model\DispatchableEntityInterface $className Hack for autocomplete */
-        return $className::getUrlContainerKey();
+        return $found;
     }
+
+//    /**
+//     * @param        $className
+//     *
+//     * @param string $targetClass
+//     *
+//     * @return string
+//     * @throws \BetaKiller\Url\Container\UrlContainerException
+//     */
+//    private function resolveObjectOrClassToKey($className, string $targetClass): string
+//    {
+//        if (\is_object($className)) {
+//            $className = \get_class($className);
+//        }
+//
+//        if (!is_a($className, $targetClass, true)) {
+//            throw new UrlContainerException('Class :name must be instance of :must', [
+//                ':name' => $className,
+//                ':must' => $targetClass,
+//            ]);
+//        }
+//
+//        /** @var \BetaKiller\Model\DispatchableEntityInterface $className Hack for autocomplete */
+//        return $className::getUrlContainerKey();
+//    }
 
     /**
      * @return \BetaKiller\Url\Container\UrlContainerInterface

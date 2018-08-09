@@ -49,19 +49,19 @@ interface UrlContainerInterface
     public function getParameter(string $key);
 
     /**
-     * @param \BetaKiller\Model\DispatchableEntityInterface|string $className
+     * @param string $className
      *
      * @return \BetaKiller\Model\DispatchableEntityInterface|mixed|null
      */
-    public function getEntityByClassName($className);
+    public function getEntityByClassName(string $className);
 
     /**
-     * @param string|\BetaKiller\Url\Parameter\UrlParameterInterface $className
+     * @param string $className
      *
      * @return \BetaKiller\Url\Parameter\UrlParameterInterface|mixed|null
      * @throws \BetaKiller\Url\Container\UrlContainerException
      */
-    public function getParameterByClassName($className);
+    public function getParameterByClassName(string $className);
 
     /**
      * @return \BetaKiller\Url\Parameter\UrlParameterInterface[]
