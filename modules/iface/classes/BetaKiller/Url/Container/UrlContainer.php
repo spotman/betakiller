@@ -86,7 +86,7 @@ class UrlContainer implements UrlContainerInterface
      */
     public function setEntity(DispatchableEntityInterface $entity, ?bool $ignoreDuplicate = null): UrlContainerInterface
     {
-        return $this->setParameter($entity);
+        return $this->setParameter($entity, $ignoreDuplicate);
     }
 
     /**
