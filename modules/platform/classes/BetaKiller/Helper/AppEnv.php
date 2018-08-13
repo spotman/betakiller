@@ -59,7 +59,10 @@ class AppEnv implements AppEnvInterface
         // Load local .env file if exists even in production, ignore missing file
         $dotEnv->safeLoad();
 
-        // App env (via SetEnv in .htaccess or VirtualHost)
+        // App absolute URL with scheme
+        $dotEnv->required(self::APP_URL)->notEmpty();
+
+        // App mode (via SetEnv in .htaccess or VirtualHost)
         $dotEnv->required(self::APP_MODE)->notEmpty()->allowedValues(self::ALLOWED_MODES);
 
         // Current git revision (set upon deployment process)
