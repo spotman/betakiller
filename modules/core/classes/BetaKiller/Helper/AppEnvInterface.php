@@ -21,6 +21,7 @@ interface AppEnvInterface
         AppEnvInterface::MODE_DEVELOPMENT,
     ];
 
+    public const APP_URL      = 'APP_URL';
     public const APP_MODE     = 'APP_ENV';
     public const APP_REVISION = 'APP_REVISION';
 
