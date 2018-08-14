@@ -55,7 +55,7 @@
     "ci": [
       "@test"
     ],
-    "test": "ls -la && . .env.testing && phpunit"
+    "test": "cat .env.testing && phpunit"
   },
   "config": {
     "platform": {
