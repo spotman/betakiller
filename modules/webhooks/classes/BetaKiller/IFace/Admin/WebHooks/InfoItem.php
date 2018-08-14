@@ -7,11 +7,14 @@ use BetaKiller\Factory\WebHookFactory;
 use BetaKiller\IFace\Admin\AbstractAdminBase;
 use BetaKiller\Url\Container\UrlContainer;
 use BetaKiller\Url\Container\UrlContainerInterface;
+use BetaKiller\Url\UrlElementTreeInterface;
 use BetaKiller\Url\WebHookModelInterface;
 use BetaKiller\Helper\IFaceHelper;
 
 class InfoItem extends AbstractAdminBase
 {
+    const LIST_ITEMS_IFACE_CODENAME = 'Admin_WebHooks_ListItems';
+
     /**
      * @var \BetaKiller\Url\Container\UrlContainerInterface
      */
@@ -28,11 +31,18 @@ class InfoItem extends AbstractAdminBase
     private $ifaceHelper;
 
     /**
+     * @var \BetaKiller\Url\UrlElementTreeInterface
+     */
+    private $tree;
+
+    /**
+     * @param \BetaKiller\Url\UrlElementTreeInterface         $tree
      * @param \BetaKiller\Url\Container\UrlContainerInterface $urlContainer
      * @param \BetaKiller\Factory\WebHookFactory              $webHookFactory
      * @param \BetaKiller\Helper\IFaceHelper                  $ifaceHelper
      */
     public function __construct(
+        UrlElementTreeInterface $tree,
         UrlContainerInterface $urlContainer,
         WebHookFactory $webHookFactory,
         IFaceHelper $ifaceHelper
@@ -40,6 +50,7 @@ class InfoItem extends AbstractAdminBase
         $this->urlContainer   = $urlContainer;
         $this->webHookFactory = $webHookFactory;
         $this->ifaceHelper    = $ifaceHelper;
+        $this->tree           = $tree;
     }
 
     /**
@@ -49,6 +60,9 @@ class InfoItem extends AbstractAdminBase
      */
     public function getData(): array
     {
+        $urlElement   = $this->tree->getByCodename(self::LIST_ITEMS_IFACE_CODENAME);
+        $listItemsUrl = $this->ifaceHelper->makeUrl($urlElement, null, false);
+
         $model   = $this->urlContainer->getEntity(WebHookModelInterface::URL_CONTAINER_KEY);
         $webHook = $this->webHookFactory->createFromUrlElement($model);
 
@@ -68,8 +82,9 @@ class InfoItem extends AbstractAdminBase
         ];
 
         return [
-            'info'    => $info,
-            'request' => [
+            'listItemsUrl' => $listItemsUrl,
+            'info'         => $info,
+            'request'      => [
                 'action' => $requestAction,
                 'method' => $request->getMethod(),
                 'fields' => $request->getFields(),

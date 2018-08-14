@@ -11,7 +11,7 @@ use BetaKiller\Url\UrlElementTreeInterface;
 
 class ListItems extends AbstractAdminBase
 {
-    const IFACE_CODENAME = 'Admin_WebHooks_Info';
+    const INFO_ITEM_IFACE_CODENAME = 'Admin_WebHooks_InfoItem';
 
     /**
      * @var \BetaKiller\Repository\WebHookRepository
@@ -55,7 +55,7 @@ class ListItems extends AbstractAdminBase
         $items  = [];
         $models = $this->webHookRepository->getAll();
         foreach ($models as $model) {
-            $urlElement = $this->tree->getByCodename(self::IFACE_CODENAME);
+            $urlElement = $this->tree->getByCodename(self::INFO_ITEM_IFACE_CODENAME);
             $param      = UrlContainer::create();
             $param->setEntity($model);
             $url = $this->ifaceHelper->makeUrl($urlElement, $param, false);
