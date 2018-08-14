@@ -55,7 +55,7 @@
     "ci": [
       "@test"
     ],
-    "test": "cat .env.testing && phpunit"
+    "test": "(export $(cat ).env.testing | xargs && phpunit)"
   },
   "config": {
     "platform": {
