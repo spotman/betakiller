@@ -1,0 +1,52 @@
+{% macro MenuMacro(item, childrenOnly=0) %}
+  {% import _self as self %}
+  {% set hasChildren = item.children is defined and item.children|length  %}
+  {% set icon = item.icon|default() %}
+
+  {% if not childrenOnly %}
+    <li class="{{ item.active ? 'active' : '' }}">
+      <a href="{{ item.url }}">{{ item.label }}</a>
+    </li>
+  {% endif %}
+
+  {% if hasChildren %}
+    {% for children_item in item.children %}
+      {{ self.menuMacro(children_item) }}
+    {% endfor %}
+  {% endif %}
+
+{% endmacro %}
+
+{% import _self as macro %}
+
+<ul id="admin-main-menu-widget" class="collapsible collapsible-accordion">
+
+  {% for item in items %}
+    {% set hasChildren = item.children is defined and item.children|length  %}
+    {% set icon = item.icon|default() %}
+    <li class="{{ item.active ? 'active' : '' }}">
+
+      {% if hasChildren %}
+        <a class="collapsible-header white-text">
+          <i class="material-icons right white-text">arrow_drop_down</i>
+          <i class="material-icons white-text">{{ icon }}</i>
+          {{ item.label }}
+        </a>
+      {% else %}
+        <a href="{{ item.url }}" class="collapsible-header white-text">
+          <i class="material-icons white-text">{{ icon }}</i>
+          {{ item.label }}
+        </a>
+      {% endif %}
+
+      {% if hasChildren %}
+        <ul class="collapsible-body transparent">
+          {{ macro.MenuMacro(item, 1) }}
+        </ul>
+      {% endif %}
+
+    </li>
+  {% endfor %}
+
+</ul>
+
