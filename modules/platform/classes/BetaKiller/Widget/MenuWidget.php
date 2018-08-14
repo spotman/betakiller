@@ -66,13 +66,13 @@ class MenuWidget extends AbstractPublicWidget
     public function getData(): array
     {
         // Menu codename from widget context
-        $menuCodename   = trim($this->getContextParam('menu'));
-        $parentCodename = trim($this->getContextParam('parent'));
+        $menuCodename   = trim((string)$this->getContextParam('menu'));
+        $parentCodename = trim((string)$this->getContextParam('parent'));
 
         // Filter by IFace URL menu codename
-        $filters = new AggregateUrlElementFilter(
+        $filters = new AggregateUrlElementFilter([
             new MenuCodenameUrlElementFilter($menuCodename)
-        );
+        ]);
 
         // Parent IFace URL element
         $parent = $parentCodename

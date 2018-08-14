@@ -1,0 +1,31 @@
+<ul id="admin-main-menu-widget" class="collapsible collapsible-accordion">
+  {% for item in items %}
+    {% set has_children = item.children and item.children|length > 0  %}
+    {% set icon = item.icon|default() %}
+
+    <li class="{{ item.active ? 'active' : '' }}">
+      {% if has_children %}
+      <a class="collapsible-header white-text">
+        <i class="material-icons right white-text">arrow_drop_down</i>
+        <i class="material-icons white-text">{{ icon }}</i>
+        {{ item.label }}
+      </a>
+      {% else %}
+        <a href="{{ item.url }}" class="collapsible-header white-text">
+          <i class="material-icons white-text">{{ icon }}</i>
+          {{ item.label }}
+        </a>
+      {% endif %}
+
+      {% if has_children %}
+        <ul class="collapsible-body transparent">
+          {% for child in item.children %}
+            <li class="{{ child.active ? 'active' : '' }}">
+              <a href="{{ child.url }}">{{ child.label }}</a>
+            </li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    </li>
+  {% endfor %}
+</ul>
