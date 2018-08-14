@@ -19,10 +19,9 @@ class WebHookUrlElementProcessor implements UrlElementProcessorInterface
     private $webHookFactory;
 
     /**
-     * @param \BetaKiller\Url\UrlElementInterface $model
      * @param \BetaKiller\Factory\WebHookFactory  $webHookFactory
      */
-    public function __construct(UrlElementInterface $model, WebHookFactory $webHookFactory)
+    public function __construct(WebHookFactory $webHookFactory)
     {
         $this->webHookFactory = $webHookFactory;
     }
