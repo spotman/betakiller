@@ -57,10 +57,10 @@ class RequestDefinition implements RequestDefinitionInterface
      */
     public function addField(string $name, $value): RequestDefinitionInterface
     {
-        $name = mb_strtolower(trim($name));
         if (!\is_string($name)) {
             throw new WebHookException('Invalid name of field. Name must be string');
         }
+        $name = trim($name);
         if ($name === '') {
             throw new WebHookException('Invalid name of field. Name can not me empty');
         }
