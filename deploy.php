@@ -150,7 +150,7 @@ task('deploy:betakiller', [
  * BetaKiller shared dirs
  */
 set('betakiller_shared_dirs', [
-    '{{core_path}}/modules/error/media',
+    '{{core_path}}/modules/error/media', // TODO Remove after migrating all error databases
 
     // On some servers exception is thrown if these two lines are uncommented
     '{{core_path}}/application/logs',

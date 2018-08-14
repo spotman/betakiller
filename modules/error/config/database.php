@@ -1,6 +1,6 @@
 <?php
 
-$errorsDbDsn = 'sqlite:'.implode(DIRECTORY_SEPARATOR, [realpath(MODPATH.'error'), 'media', 'errors.sqlite']);
+$errorsDbDsn = 'sqlite:'.realpath(APPPATH.'logs'.DIRECTORY_SEPARATOR.'errors.sqlite');
 
 return array
 (
