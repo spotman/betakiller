@@ -55,7 +55,7 @@
     "ci": [
       "@test"
     ],
-    "test": "APP_ENV=testing APP_REVISION=testRevision phpunit"
+    "test": "source .env.testing && phpunit"
   },
   "config": {
     "platform": {
