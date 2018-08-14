@@ -55,7 +55,7 @@
     "ci": [
       "@test"
     ],
-    "test": "source .env.testing && phpunit"
+    "test": ". .env.testing && phpunit"
   },
   "config": {
     "platform": {
