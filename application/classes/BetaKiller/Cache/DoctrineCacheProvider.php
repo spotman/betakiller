@@ -3,7 +3,6 @@ namespace BetaKiller\Cache;
 
 use BetaKiller\Config\ConfigProviderInterface;
 use BetaKiller\Exception;
-use MultiSite;
 use BetaKiller\Helper\AppEnvInterface;
 use Doctrine\Common\Cache\ArrayCache;
 use Doctrine\Common\Cache\ChainCache;
@@ -24,13 +23,12 @@ class DoctrineCacheProvider extends ChainCache
     /**
      * DoctrineCacheProvider constructor.
      *
-     * @param \MultiSite                                 $multiSite
      * @param \BetaKiller\Helper\AppEnvInterface         $appEnv
      * @param \BetaKiller\Config\ConfigProviderInterface $config
      *
      * @throws \BetaKiller\Exception
      */
-    public function __construct(MultiSite $multiSite, AppEnvInterface $appEnv, ConfigProviderInterface $config)
+    public function __construct(AppEnvInterface $appEnv, ConfigProviderInterface $config)
     {
         $workingName = $appEnv->isCoreRunning() ? 'core' : $appEnv->getAppCodename();
 
@@ -56,7 +54,7 @@ class DoctrineCacheProvider extends ChainCache
         }
 
         // Add app-related cache adapter
-        $factory = new CacheFactory();
+        $factory     = new CacheFactory();
         $providers[] = $factory->create($settings);
 
         parent::__construct($providers);
