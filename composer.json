@@ -55,7 +55,7 @@
     "ci": [
       "@test"
     ],
-    "test": "cp .env.testing .env && phpunit"
+    "test": "cp .env.testing .env && APP_ENV=testing phpunit"
   },
   "config": {
     "platform": {
