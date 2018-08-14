@@ -1,5 +1,6 @@
 <?php
 
+use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\Task\TaskException;
 
 class Task_StoreAppRevision extends \BetaKiller\Task\AbstractTask
@@ -39,7 +40,7 @@ class Task_StoreAppRevision extends \BetaKiller\Task\AbstractTask
         $dotEnvFile = $this->appEnv->getAppRootPath().DIRECTORY_SEPARATOR.'.env';
 
         $this->dotEnv->update($dotEnvFile, [
-            'APP_REVISION' => $revision,
+            AppEnvInterface::APP_REVISION => $revision,
         ]);
 
         $this->logger->debug('Revision set to :value', [':value' => $revision]);
