@@ -8,7 +8,6 @@ use BetaKiller\Api\AccessResolver\CustomApiMethodAccessResolverDetector;
 use BetaKiller\Config\AppConfig;
 use BetaKiller\Config\AppConfigInterface;
 use BetaKiller\Config\ConfigProviderInterface;
-use BetaKiller\Config\KohanaConfigProvider;
 use BetaKiller\Exception\ExceptionHandlerInterface;
 use BetaKiller\Helper\AppEnv;
 use BetaKiller\Helper\AppEnvInterface;
@@ -84,8 +83,7 @@ return [
             return $detector->detect();
         }),
 
-        ConfigProviderInterface::class => DI\autowire(KohanaConfigProvider::class),
-        AppConfigInterface::class      => DI\autowire(AppConfig::class),
+        AppConfigInterface::class => DI\autowire(AppConfig::class),
 
         \BetaKiller\Model\UserInterface::class          => DI\get('User'),
         \BetaKiller\Model\RoleInterface::class          => DI\get(\BetaKiller\Model\Role::class),

@@ -9,7 +9,6 @@ use Monolog\Handler\WhatFailureGroupHandler;
 use Monolog\Processor\IntrospectionProcessor;
 use Monolog\Processor\MemoryPeakUsageProcessor;
 use Monolog\Processor\WebProcessor;
-use MultiSite;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LoggerTrait;
 
@@ -28,23 +27,16 @@ class Logger implements LoggerInterface
     private $appEnv;
 
     /**
-     * @var MultiSite
-     */
-    private $multiSite;
-
-    /**
      * Logger constructor.
      *
      * @param \BetaKiller\Helper\AppEnvInterface $env
-     * @param \MultiSite                         $multiSite
      *
      * @throws \Exception
      */
-    public function __construct(AppEnvInterface $env, MultiSite $multiSite)
+    public function __construct(AppEnvInterface $env)
     {
-        $this->appEnv    = $env;
-        $this->multiSite = $multiSite;
-        $this->monolog   = $this->getMonologInstance();
+        $this->appEnv  = $env;
+        $this->monolog = $this->getMonologInstance();
     }
 
     /**
@@ -66,7 +58,7 @@ class Logger implements LoggerInterface
 
         $logFilePath     = implode(DIRECTORY_SEPARATOR, ['logs', date('Y'), date('m'), date('d').'.log']);
         $coreLogFilePath = APPPATH.$logFilePath;
-        $appLogFilePath  = $this->multiSite->getWorkingPath().DIRECTORY_SEPARATOR.$logFilePath;
+        $appLogFilePath  = $this->appEnv->getAppRootPath().DIRECTORY_SEPARATOR.$logFilePath;
 
         $groupHandler = new WhatFailureGroupHandler([
             // Core logs
