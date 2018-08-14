@@ -85,9 +85,9 @@ class WebHookRepository extends AbstractPredefinedRepository implements Dispatch
 
     private function getRecursiveIterator(): \RecursiveIteratorIterator
     {
-        $filter = new AggregateUrlElementFilter(
+        $filter = new AggregateUrlElementFilter([
             new WebHookUrlElementFilter
-        );
+        ]);
 
         return $this->tree->getRecursiveIteratorIterator(null, $filter);
     }
