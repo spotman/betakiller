@@ -11,6 +11,7 @@ use BetaKiller\Url\Container\UrlContainer;
 use BetaKiller\Url\Container\UrlContainerInterface;
 use BetaKiller\Url\ElementFilter\AggregateUrlElementFilter;
 use BetaKiller\Url\ElementFilter\MenuCodenameUrlElementFilter;
+use BetaKiller\Url\IFaceModelInterface;
 use BetaKiller\Url\UrlElementInterface;
 use BetaKiller\Url\UrlElementTreeInterface;
 use BetaKiller\Url\UrlElementTreeRecursiveIterator;
@@ -71,7 +72,7 @@ class MenuWidget extends AbstractPublicWidget
 
         // Filter by IFace URL menu codename
         $filters = new AggregateUrlElementFilter([
-            new MenuCodenameUrlElementFilter($menuCodename)
+            new MenuCodenameUrlElementFilter($menuCodename),
         ]);
 
         // Parent IFace URL element
@@ -100,13 +101,10 @@ class MenuWidget extends AbstractPublicWidget
         $items = [];
 
         foreach ($models as $urlElement) {
-            $params   = $params ?: new UrlContainer();
-            $itemsAdd = $this->processSingle($models, $urlElement, $params);
-            if (!$itemsAdd) {
-                continue;
-            }
-            foreach ($itemsAdd as $itemsAddItem) {
-                $items[] = $itemsAddItem;
+            $params = $params ?: UrlContainer::create();
+
+            foreach ($this->processSingle($models, $urlElement, $params) as $item) {
+                $items[] = $item;
             }
         }
 
@@ -117,7 +115,7 @@ class MenuWidget extends AbstractPublicWidget
      * Processing IFace tree item
      *
      * @param \RecursiveIterator                              $models
-     * @param \BetaKiller\Url\UrlElementInterface             $urlElement
+     * @param \BetaKiller\Url\IFaceModelInterface             $ifaceModel
      * @param \BetaKiller\Url\Container\UrlContainerInterface $params
      *
      * @return array
@@ -128,32 +126,30 @@ class MenuWidget extends AbstractPublicWidget
      */
     private function processSingle(
         \RecursiveIterator $models,
-        UrlElementInterface $urlElement,
+        IFaceModelInterface $ifaceModel,
         UrlContainerInterface $params
     ): array {
         $result = [];
 
-        foreach ($this->getAvailableIFaceUrls($urlElement, $params) as $availableUrl) {
+        foreach ($this->getAvailableIFaceUrls($ifaceModel, $params) as $availableUrl) {
             // store parameter for childs processing
             $urlParameter = $availableUrl->getUrlParameter();
+
             if ($urlParameter) {
                 $params->setParameter($urlParameter, true);
             }
             try {
-                if (!$this->aclHelper->isUrlElementAllowed($urlElement, $params)) {
+                if (!$this->aclHelper->isUrlElementAllowed($ifaceModel, $params)) {
                     continue;
                 }
             } catch (\Spotman\Acl\Exception $e) {
                 throw IFaceException::wrap($e);
             }
 
-            // Item data
-            $iface = $this->ifaceHelper->createIFaceFromCodename($urlElement->getCodename());
-
             $resultItem = [
-                'url'      => $this->ifaceHelper->makeIFaceUrl($iface, $params, false),
-                'label'    => $this->ifaceHelper->getLabel($iface->getModel(), $params),
-                'active'   => $this->ifaceHelper->isCurrentIFace($iface, $params),
+                'url'      => $this->ifaceHelper->makeUrl($ifaceModel, $params, false),
+                'label'    => $this->ifaceHelper->getLabel($ifaceModel, $params),
+                'active'   => $this->ifaceHelper->inStack($ifaceModel, $params),
                 'children' => [],
             ];
 
@@ -171,17 +167,17 @@ class MenuWidget extends AbstractPublicWidget
     /**
      * Generating URLs by IFace element
      *
-     * @param \BetaKiller\Url\UrlElementInterface             $urlElement
+     * @param \BetaKiller\Url\IFaceModelInterface             $model
      * @param \BetaKiller\Url\Container\UrlContainerInterface $params
      *
      * @return \Generator|\BetaKiller\Url\AvailableUri[]
      * @throws \BetaKiller\Factory\FactoryException
      */
-    private function getAvailableIFaceUrls(UrlElementInterface $urlElement, UrlContainerInterface $params): \Generator
+    private function getAvailableIFaceUrls(IFaceModelInterface $model, UrlContainerInterface $params): \Generator
     {
-        $behaviour = $this->behaviourFactory->fromUrlElement($urlElement);
+        $behaviour = $this->behaviourFactory->fromUrlElement($model);
 
-        foreach ($behaviour->getAvailableUrls($urlElement, $params) as $availableUrl) {
+        foreach ($behaviour->getAvailableUrls($model, $params) as $availableUrl) {
             yield $availableUrl;
         }
     }
