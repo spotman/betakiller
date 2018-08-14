@@ -2,14 +2,17 @@
 
 return [
 
+    // Raw dependencies (classes only, will be refactored to composer packages with PSR-4 autoload)
     'core'                  => MODPATH.'core',                  // Core interfaces and classes
     'ddd'                   => MODPATH.'ddd',                   // Interfaces and classes for DDD
     'helper'                => MODPATH.'helper',                // Common helpers without external dependencies
     'utils'                 => MODPATH.'utils',                 // Useful classes
-    'platform'              => MODPATH.'platform',              // Platform implementation
 
     // Place it before other modules for correct initialization of per-site classes and configs
     'multi-site'            => MODPATH.'multi-site',            // Multiple apps on top of single engine
+
+    // Initialize platform (AppEnv, DIC, etc)
+    'platform'              => MODPATH.'platform',              // Platform implementation and initialization
 
     'log'                   => MODPATH.'log',                   // Logs subsystem
     'sqlite'                => MODPATH.'sqlite',                // SQLite database driver (used by logs)
