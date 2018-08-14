@@ -130,9 +130,9 @@ class IFaceHelper
         return $this->stack->isCurrent($iface->getModel(), $params);
     }
 
-    public function inStack(UrlElementInterface $model): bool
+    public function inStack(UrlElementInterface $model, UrlContainerInterface $params = null): bool
     {
-        return $this->stack->has($model);
+        return $this->stack->has($model, $params);
     }
 
     /**

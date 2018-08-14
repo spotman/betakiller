@@ -13,8 +13,8 @@
         <iface uri="php-exceptions" name="Admin_Error_UnresolvedPhpExceptionIndex" title="Admin | Unresolved PhpExceptions" label="Unresolved" entity="PhpException" entityAction="listUnresolved" menu="admin">
             <iface uri="resolved" name="Admin_Error_ResolvedPhpExceptionIndex" title="Admin | Resolved PhpExceptions" label="Resolved" entity="PhpException" entityAction="listResolved" menu="admin"/>
             <iface uri="test" name="Admin_Error_PhpExceptionTest" label="Test" entity="PhpException" entityAction="test" menu="admin">
-                <iface uri="500" name="Admin_Error_PhpExceptionTestHTTP500" label="HTTP 500 test" menu="admin"/>
-                <iface uri="logger" name="Admin_Error_PhpExceptionTestLogger" label="Logger test" menu="admin"/>
+                <iface uri="500" name="Admin_Error_PhpExceptionTestHTTP500" label="HTTP 500 test" />
+                <iface uri="logger" name="Admin_Error_PhpExceptionTestLogger" label="Logger test" />
             </iface>
             <iface uri="{PhpException.hash}" name="Admin_Error_PhpExceptionItem" label="{PhpException.message}" hasDynamicUrl="true" entity="PhpException" entityAction="read">
                 <iface uri="stacktrace" name="Admin_Error_PhpExceptionStackTrace" label="Stacktrace" layout="raw"/>

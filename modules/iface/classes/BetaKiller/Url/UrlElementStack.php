@@ -47,9 +47,37 @@ class UrlElementStack implements \IteratorAggregate
         $this->current          = $model;
     }
 
-    public function has(UrlElementInterface $model): bool
+    public function has(UrlElementInterface $model, UrlContainerInterface $params = null): bool
     {
-        return isset($this->items[$model->getCodename()]);
+        if (!isset($this->items[$model->getCodename()])) {
+            return false;
+        }
+
+        // No optional params => check passed
+        if (!$params || $params->countParameters() === 0) {
+            return true;
+        }
+
+        // No current parameters => nothing to check => check passed
+        if ($this->parameters->countParameters() === 0) {
+            return true;
+        }
+
+        // Find parameters intersection
+        foreach ($params->getAllParameters() as $key => $providedParam) {
+            if (!$this->parameters->hasParameter($key)) {
+                continue;
+            }
+
+            $currentParam = $this->parameters->getParameter($key);
+
+            if ($currentParam->isSameAs($providedParam)) {
+                return true;
+            }
+        }
+
+        // No params intersection found => check failed
+        return false;
     }
 
     /**

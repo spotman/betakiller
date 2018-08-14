@@ -69,6 +69,13 @@ interface UrlContainerInterface
     public function getAllParameters(): array;
 
     /**
+     * Returns count of all parameters
+     *
+     * @return int
+     */
+    public function countParameters(): int;
+
+    /**
      * @param string $key
      *
      * @return bool

@@ -201,6 +201,16 @@ class UrlContainer implements UrlContainerInterface
     }
 
     /**
+     * Returns count of all parameters
+     *
+     * @return int
+     */
+    public function countParameters(): int
+    {
+        return $this->paramsRegistry->count();
+    }
+
+    /**
      * @param string $key
      *
      * @return bool
