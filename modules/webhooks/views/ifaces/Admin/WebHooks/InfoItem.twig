@@ -1,0 +1,48 @@
+{% extends layout %}
+
+{% block page_content %}
+  <section id="admin-webhooks-infoItem">
+
+    <h1>WebHook Info Item</h1>
+
+    <div class="row"></div>
+    <div class="info">
+      <h3>Info</h3>
+      {% for key,value in info %}
+        <div>
+          <span class="col s1">
+            {{ key }}:
+          </span>
+          <span class="col s11">
+            {{ value }}
+          </span>
+        </div>
+      {% endfor %}
+    </div>
+
+    <div class="row"></div>
+    <div class="row"></div>
+    <div class="request">
+      <h3>Request Emulation</h3>
+      <form method="{{ request.method }}" action="{{ request.action }}" target="_blank">
+        {% for name,value in request.fields %}
+          <div class="input-field">
+            <i class="material-icons prefix">chevron_right</i>
+            <input type="text" id="admin-webhooks-info-request-input-{{ name }}" name="{{ name }}" value="{{ value }}">
+            <label for="admin-webhooks-info-request-input-{{ name }}">{{ name }}</label>
+          </div>
+        {% endfor %}
+        <button class="btn orange waves-effect waves-light" type="submit" name="action">
+          Send
+        </button>
+      </form>
+    </div>
+
+    <div class="row"></div>
+    <div class="row"></div>
+    <div class="logs">
+      <h3>Logs</h3>
+    </div>
+
+  </section>
+{% endblock %}
