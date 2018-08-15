@@ -44,6 +44,10 @@ class Container implements ContainerInterface
 
     public function init(ConfigProviderInterface $configProvider, AppEnvInterface $appEnv): void
     {
+        if ($this->container) {
+            throw new Exception('Container is already initialized');
+        }
+
         $builder = new ContainerBuilder();
 
         $config = (array)$configProvider->load(['php-di']);
@@ -166,4 +170,9 @@ class Container implements ContainerInterface
 
         return $this->container;
     }
+
+    /**
+     * Prevent cloning
+     */
+    final private function __clone() {}
 }
