@@ -8,7 +8,7 @@ use BetaKiller\Helper\AppEnv;
 $ms = \MultiSite::instance();
 
 if ($ms->isInitialized()) {
-    die('MultiSite must not be initialized before platform init');
+    throw new \LogicException('MultiSite must not be initialized before platform init');
 }
 
 // Import .env and validate env variables
