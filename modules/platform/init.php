@@ -18,13 +18,21 @@ $appEnv = new AppEnv(
     !$ms->isSiteDetected()
 );
 
-// Initialize per-site configs, modules, site init.php, etc
+// Initialize logger
+$logger = new \BetaKiller\Log\Logger($appEnv);
+
+// Proxy old Kohana logs to new logging subsystem
+\Kohana::$log->attach(new \BetaKiller\Log\KohanaLogProxy($logger));
+
+// Initialize per-site config directories, modules, site init.php, etc
 $ms->init();
 
+// Instantiate config provider
 $configProvider = new KohanaConfigProvider;
 
 // Create container instance
 $container = \BetaKiller\DI\Container::getInstance();
 
 // Initialize container and push AppEnv and ConfigProvider into DIC
-$container->init($configProvider, $appEnv);
+$container->init($configProvider, $appEnv, $logger);
+
