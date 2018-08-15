@@ -8,7 +8,7 @@ use BetaKiller\Helper\AppEnv;
 $ms = \MultiSite::instance();
 
 if ($ms->isInitialized()) {
-    die('MultiSite must not be initialized before platform init');
+    throw new \LogicException('MultiSite must not be initialized before platform init');
 }
 
 // Import .env and validate env variables
@@ -18,13 +18,21 @@ $appEnv = new AppEnv(
     !$ms->isSiteDetected()
 );
 
-// Initialize per-site configs, modules, site init.php, etc
+// Initialize logger
+$logger = new \BetaKiller\Log\Logger($appEnv);
+
+// Proxy old Kohana logs to new logging subsystem
+\Kohana::$log->attach(new \BetaKiller\Log\KohanaLogProxy($logger));
+
+// Initialize per-site config directories, modules, site init.php, etc
 $ms->init();
 
+// Instantiate config provider
 $configProvider = new KohanaConfigProvider;
 
 // Create container instance
 $container = \BetaKiller\DI\Container::getInstance();
 
 // Initialize container and push AppEnv and ConfigProvider into DIC
-$container->init($configProvider, $appEnv);
+$container->init($configProvider, $appEnv, $logger);
+
