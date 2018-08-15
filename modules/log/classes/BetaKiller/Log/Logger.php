@@ -9,7 +9,6 @@ use Monolog\Handler\WhatFailureGroupHandler;
 use Monolog\Processor\IntrospectionProcessor;
 use Monolog\Processor\MemoryPeakUsageProcessor;
 use Monolog\Processor\WebProcessor;
-use Psr\Log\LoggerInterface;
 use Psr\Log\LoggerTrait;
 
 class Logger implements LoggerInterface
@@ -97,7 +96,7 @@ class Logger implements LoggerInterface
     /**
      * @param \Monolog\Handler\HandlerInterface $handler
      */
-    public function pushHandler(HandlerInterface $handler)
+    public function pushHandler(HandlerInterface $handler): void
     {
         $this->monolog->pushHandler($handler);
     }
