@@ -4,6 +4,7 @@ namespace BetaKiller\DI;
 use BetaKiller\Config\ConfigProviderInterface;
 use BetaKiller\Exception;
 use BetaKiller\Helper\AppEnvInterface;
+use BetaKiller\Log\LoggerInterface;
 use DI\ContainerBuilder;
 use DI\DependencyException;
 use Invoker\Exception\InvocationException;
@@ -42,8 +43,11 @@ class Container implements ContainerInterface
     {
     }
 
-    public function init(ConfigProviderInterface $configProvider, AppEnvInterface $appEnv): void
-    {
+    public function init(
+        ConfigProviderInterface $configProvider,
+        AppEnvInterface $appEnv,
+        LoggerInterface $logger
+    ): void {
         if ($this->container) {
             throw new Exception('Container is already initialized');
         }
@@ -72,8 +76,10 @@ class Container implements ContainerInterface
 
         // Add core classes explicitly
         $builder->addDefinitions([
-            ConfigProviderInterface::class => $configProvider,
-            AppEnvInterface::class         => $appEnv,
+            AppEnvInterface::class          => $appEnv,
+            ConfigProviderInterface::class  => $configProvider,
+            LoggerInterface::class          => $logger,
+            \Psr\Log\LoggerInterface::class => $logger,
         ]);
 
         $this->container = $builder
@@ -174,5 +180,7 @@ class Container implements ContainerInterface
     /**
      * Prevent cloning
      */
-    final private function __clone() {}
+    final private function __clone()
+    {
+    }
 }
