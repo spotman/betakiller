@@ -1,7 +1,12 @@
 {% extends layout %}
 
+
 {% block page_content %}
-  <section id="admin-webhooks-listItems">
+  {{ css('layout.css') }}
+
+
+  <section id="admin-webhooks-listItems" class="admin-webhooks-layout">
+
 
     <nav>
       <div class="nav-wrapper">
@@ -11,8 +16,8 @@
       </div>
     </nav>
 
-    <div class="row"></div>
-    <div class="items">
+
+    <section class="items">
 
       {% for item in items %}
         <div class="card">
@@ -41,7 +46,8 @@
         </div>
       {% endfor %}
 
-    </div>
+    </section>
+
 
   </section>
 {% endblock %}
