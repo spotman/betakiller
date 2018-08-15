@@ -11,7 +11,7 @@ use BetaKiller\Url\UrlElementTreeInterface;
 
 class ListItems extends AbstractAdminBase
 {
-    const INFO_ITEM_IFACE_CODENAME = 'Admin_WebHooks_InfoItem';
+    private const INFO_ITEM_IFACE_CODENAME = 'Admin_WebHooks_InfoItem';
 
     /**
      * @var \BetaKiller\Repository\WebHookRepository
