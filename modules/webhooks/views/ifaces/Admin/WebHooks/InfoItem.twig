@@ -1,7 +1,14 @@
 {% extends layout %}
 
+
 {% block page_content %}
-  <section id="admin-webhooks-infoItem">
+  {{ css('layout.css') }}
+  {{ css('infoItem.css') }}
+  {{ js('infoItem.js') }}
+
+
+  <section id="admin-webhooks-infoItem" class="admin-webhooks-layout">
+
 
     <nav>
       <div class="nav-wrapper">
@@ -12,11 +19,11 @@
       </div>
     </nav>
 
-    <div class="row"></div>
-    <div class="info">
+
+    <section class="info">
       <h3>Info</h3>
       {% for key,value in info %}
-        <div>
+        <div class="row row-margin-bottom-0">
           <span class="col s1">
             {{ key }}:
           </span>
@@ -25,11 +32,10 @@
           </span>
         </div>
       {% endfor %}
-    </div>
+    </section>
 
-    <div class="row"></div>
-    <div class="row"></div>
-    <div class="request">
+
+    <section class="request">
       <h3>Request Emulation</h3>
       <form method="{{ request.method }}" action="{{ request.action }}" target="_blank">
         {% for name,value in request.fields %}
@@ -43,13 +49,54 @@
           Send
         </button>
       </form>
-    </div>
+    </section>
 
-    <div class="row"></div>
-    <div class="row"></div>
-    <div class="logs">
+
+    <section class="logs">
       <h3>Logs</h3>
-    </div>
+      {% if logItems %}
+        {% for item in logItems %}
+          <div class="collection">
+
+            <a href="" title="" class="repeat btn green lighten-1 waves-effect waves-light"
+               data-action="repeat"
+               data-fields="{{ item.requestData|json_encode }}"
+            >
+              Repeat
+            </a>
+
+            {% for key,value in item %}
+              <div class="collection-item row">
+
+                <span class="col s2">
+                  {{ key }}:
+                </span>
+                <span class="col s10">
+
+                  {% if value is not iterable %}
+                    {% if key != 'dateCreated' %}
+                      {{ value }}
+                    {% else %}
+                      {{ value.format('Y-m-d H:i:s') }}
+                    {% endif %}
+                  {% else %}
+                    {% for valueKey,valueValue in value %}
+                      <div>
+                        {{ valueKey }}: {{ valueValue }}
+                      </div>
+                    {% endfor %}
+                  {% endif %}
+
+                </span>
+
+              </div>
+            {% endfor %}
+
+          </div>
+        {% endfor %}
+      {% endif %}
+    </section>
+
 
   </section>
 {% endblock %}
