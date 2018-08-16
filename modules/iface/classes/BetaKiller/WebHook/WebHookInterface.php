@@ -12,4 +12,6 @@ interface WebHookInterface
     public function setModel(WebHookModelInterface $model): WebHookInterface;
 
     public function process(): void;
+
+    public function getRequestDefinition(): RequestDefinitionInterface;
 }

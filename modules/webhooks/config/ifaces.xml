@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<root>
+    <iface uri="webhooks" name="Admin_WebHooks_ListItems" parent="Admin_Index" zone="admin" label="WebHooks">
+        <iface uri="{WebHook.codename}" name="Admin_WebHooks_InfoItem" hasDynamicUrl="true" zone="admin" label="Info Item" />
+    </iface>
+</root>
