@@ -20,16 +20,15 @@
     <section class="items">
 
       {% for item in items %}
-        <div class="card">
+        <div class="collection">
 
-          <div class="card-content">
             {% for key,value in item.info %}
 
-              <div class="row clear">
-                <p class="col s1">
+              <div class="collection-item row clear">
+                <span class="col s1">
                   {{ key }}:
-                </p>
-                <p class="col s11">
+                </span>
+                <span class="col s11">
                   {% if loop.index < 2 %}
                     <a href="{{ item.url }}">
                       {{ value }}
@@ -37,11 +36,10 @@
                   {% else %}
                     {{ value }}
                   {% endif %}
-                </p>
+                </span>
               </div>
 
             {% endfor %}
-          </div>
 
         </div>
       {% endfor %}
