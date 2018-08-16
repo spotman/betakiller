@@ -23,7 +23,7 @@
     <section class="info">
       <h3>Info</h3>
       {% for key,value in info %}
-        <div class="row row-margin-bottom-0">
+        <div class="row clear row-margin-bottom-0">
           <span class="col s1">
             {{ key }}:
           </span>
@@ -45,7 +45,10 @@
             <label for="admin-webhooks-info-request-input-{{ name }}">{{ name }}</label>
           </div>
         {% endfor %}
-        <button class="btn green lighten-1 waves-effect waves-light" type="submit">
+        <button class="btn green lighten-1 waves-effect waves-light" type="submit"
+                data-action="submitRequest"
+                data-action-event
+        >
           Send
         </button>
       </form>
@@ -59,14 +62,14 @@
           <div class="collection">
 
             <a href="" title="" class="repeat btn green lighten-1 waves-effect waves-light"
-               data-action="repeat"
+               data-action="repeatRequest"
                data-fields="{{ item.requestData|json_encode }}"
             >
               Repeat
             </a>
 
             {% for key,value in item %}
-              <div class="collection-item row">
+              <div class="collection-item row clear">
 
                 <span class="col s2">
                   {{ key }}:
