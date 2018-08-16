@@ -15,7 +15,8 @@ require([
       .off('click', this.id + ' [data-action]')
       .on('click', this.id + ' [data-action]', function (_this) {
         return function (event) {
-          event.preventDefault()
+          var isEventOff = this.getAttribute('data-action-event')
+          if (isEventOff === null) event.preventDefault()
           _this.action($(this))
         }
       }(this))
@@ -24,13 +25,27 @@ require([
     this.action = function ($target) {
       let action = $target.attr('data-action')
       switch (action) {
-        case 'repeat':
+        case 'submitRequest':
+          this.reloadPage($target)
+          break;
+        case 'repeatRequest':
           this.repeatRequest($target)
           break;
 
         default:
           console.error('unknown action "' + action + '"')
       }
+    }
+
+    //
+    this.reloadPage = function ($target) {
+      if ($target) {
+        $target.addClass('disabled')
+      }
+
+      setTimeout(function () {
+        window.location.reload()
+      }, 100)
     }
 
     //
@@ -44,11 +59,18 @@ require([
       }
 
       //
-      if (!this.$requestFormFields) {
-        this.$requestFormFields = this.$root.find('section.request form:first input')
+      if (!this.$requestForm) {
+        this.$requestForm = this.$root.find('section.request form:first')
       }
-      if (!this.$requestFormFields.length) return
-
+      if (!this.$requestForm.length) {
+        return console.error('form not found')
+      }
+      if (!this.$requestFormFields) {
+        this.$requestFormFields = this.$requestForm.find('input')
+      }
+      if (!this.$requestFormFields.length) {
+        return console.error('form inputs not found')
+      }
       this.$requestFormFields.each(function (fields) {
         return function (index, field) {
           let $field = $(field)
@@ -62,6 +84,10 @@ require([
           }
         }
       }(fields))
+      this.$requestForm.submit()
+
+      //
+      this.reloadPage($target)
     }
 
   })
