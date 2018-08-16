@@ -5,13 +5,6 @@ namespace BetaKiller\Model;
 
 interface WebHookLogInterface
 {
-    public const TABLE_NAME               = 'webhook_log';
-    public const TABLE_FIELD_CODENAME     = 'codename';
-    public const TABLE_FIELD_CREATED_AT   = 'created_at';
-    public const TABLE_FIELD_STATUS       = 'status';
-    public const TABLE_FIELD_MESSAGE      = 'message';
-    public const TABLE_FIELD_REQUEST_DATA = 'request_data';
-
     /**
      * @return string
      */
@@ -61,14 +54,14 @@ interface WebHookLogInterface
     public function setMessage(?string $value): WebHookLogInterface;
 
     /**
-     * @return array
+     * @return WebHookLogRequestDataInterface
      */
-    public function getRequestData(): array;
+    public function getRequestData(): WebHookLogRequestDataInterface;
 
     /**
-     * @param array|null $value
+     * @param WebHookLogRequestDataInterface $value
      *
      * @return \BetaKiller\Model\WebHookLogInterface
      */
-    public function setRequestData(?array $value): WebHookLogInterface;
+    public function setRequestData(WebHookLogRequestDataInterface $value): WebHookLogInterface;
 }
