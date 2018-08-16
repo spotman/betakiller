@@ -70,7 +70,7 @@ class Migration1534170661_Move_Sqlite_Errors_Database_To_Logs extends Migration 
      */
     private function getNewFile()
     {
-        return realpath(APPPATH.'logs'.DIRECTORY_SEPARATOR.'errors.sqlite');
+        return APPPATH.'logs'.DIRECTORY_SEPARATOR.'errors.sqlite';
     }
 
 } // End Migration1534170661_Move_Sqlite_Errors_Database_To_Logs
