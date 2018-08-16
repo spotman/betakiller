@@ -3,6 +3,7 @@ namespace BetaKiller\Url\ElementProcessor;
 
 use BetaKiller\Factory\WebHookFactory;
 use BetaKiller\Model\WebHookLog;
+use BetaKiller\Model\WebHookLogRequestDataAggregator;
 use BetaKiller\Repository\WebHookLogRepository;
 use BetaKiller\Url\UrlElementInterface;
 use BetaKiller\Url\WebHookModelInterface;
@@ -44,7 +45,6 @@ class WebHookUrlElementProcessor implements UrlElementProcessorInterface
      * @param null|\Request                                   $request
      *
      * @throws \BetaKiller\Url\ElementProcessor\UrlElementProcessorException
-     * @throws \Kohana_Exception
      */
     public function process(
         UrlElementInterface $model,
@@ -58,19 +58,23 @@ class WebHookUrlElementProcessor implements UrlElementProcessorInterface
                 ':class_valid'   => WebHookModelInterface::class,
             ]);
         }
+        if (!$request) {
+            throw new UrlElementProcessorException('Argument "request" must be defined');
+        }
 
         $requestMethod = (string)$request->method();
         switch ($requestMethod) {
             case 'GET':
-                $requestData = $_GET;
+                $requestData = $request->getArgumentsGet();
                 break;
             case 'POST':
-                $requestData = $_POST;
+                $requestData = $request->getArgumentsPost();
                 break;
             default:
-                $requestData = $_REQUEST;
+                $requestData = $request->getArgumentsRequest();
                 break;
         }
+        $requestData = new WebHookLogRequestDataAggregator($requestData);
 
         $logModel = new WebHookLog();
         $logModel
@@ -80,10 +84,8 @@ class WebHookUrlElementProcessor implements UrlElementProcessorInterface
 
         try {
             $exception = null;
-
-            $webHook = $this->webHookFactory->createFromUrlElement($model);
+            $webHook   = $this->webHookFactory->createFromUrlElement($model);
             $webHook->process();
-
             $logModel->setStatus(true);
         } catch (\Throwable $exception) {
             $logModel
