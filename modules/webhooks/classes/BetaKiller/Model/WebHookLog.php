@@ -7,6 +7,13 @@ use BetaKiller\WebHook\WebHookException;
 
 class WebHookLog extends \ORM implements WebHookLogInterface
 {
+    public const TABLE_NAME               = 'webhook_log';
+    public const TABLE_FIELD_CODENAME     = 'codename';
+    public const TABLE_FIELD_CREATED_AT   = 'created_at';
+    public const TABLE_FIELD_STATUS       = 'status';
+    public const TABLE_FIELD_MESSAGE      = 'message';
+    public const TABLE_FIELD_REQUEST_DATA = 'request_data';
+
     protected function configure(): void
     {
         $this->_table_name = self::TABLE_NAME;
@@ -16,7 +23,14 @@ class WebHookLog extends \ORM implements WebHookLogInterface
 
     /**
      * @return string
-     * @throws \Kohana_Exception
+     */
+    public function getID(): string
+    {
+        return $this->get_id();
+    }
+
+    /**
+     * @return string
      */
     public function getCodename(): string
     {
@@ -28,7 +42,6 @@ class WebHookLog extends \ORM implements WebHookLogInterface
      *
      * @return \BetaKiller\Model\WebHookLogInterface
      * @throws \BetaKiller\WebHook\WebHookException
-     * @throws \Kohana_Exception
      */
     public function setCodename(string $value): WebHookLogInterface
     {
@@ -63,7 +76,6 @@ class WebHookLog extends \ORM implements WebHookLogInterface
 
     /**
      * @return bool
-     * @throws \Kohana_Exception
      */
     public function isStatusSucceeded(): bool
     {
@@ -74,7 +86,6 @@ class WebHookLog extends \ORM implements WebHookLogInterface
      * @param bool $value
      *
      * @return \BetaKiller\Model\WebHookLogInterface
-     * @throws \Kohana_Exception
      */
     public function setStatus(bool $value): WebHookLogInterface
     {
@@ -85,7 +96,6 @@ class WebHookLog extends \ORM implements WebHookLogInterface
 
     /**
      * @return string
-     * @throws \Kohana_Exception
      */
     public function getMessage(): string
     {
@@ -96,7 +106,6 @@ class WebHookLog extends \ORM implements WebHookLogInterface
      * @param null|string $value
      *
      * @return \BetaKiller\Model\WebHookLogInterface
-     * @throws \Kohana_Exception
      */
     public function setMessage(?string $value): WebHookLogInterface
     {
@@ -109,32 +118,32 @@ class WebHookLog extends \ORM implements WebHookLogInterface
     }
 
     /**
-     * @return array
+     * @return WebHookLogRequestDataInterface
      */
-    public function getRequestData(): array
+    public function getRequestData(): WebHookLogRequestDataInterface
     {
         $data = (string)$this->get(self::TABLE_FIELD_REQUEST_DATA);
         if ($data === '') {
             $data = [];
         } else {
             $data = \json_decode($data, true);
-            if (!\is_array($data)) $data = [];
+            if (!\is_array($data)) {
+                $data = [];
+            }
         }
+        $data = new WebHookLogRequestDataAggregator($data);
 
         return $data;
     }
 
     /**
-     * @param array|null $value
+     * @param WebHookLogRequestDataInterface $value
      *
      * @return \BetaKiller\Model\WebHookLogInterface
-     * @throws \Kohana_Exception
      */
-    public function setRequestData(?array $value): WebHookLogInterface
+    public function setRequestData(WebHookLogRequestDataInterface $value): WebHookLogInterface
     {
-        if (\is_array($value)) {
-            $value = \json_encode($value);
-        }
+        $value = \json_encode($value->get());
         $this->set(self::TABLE_FIELD_REQUEST_DATA, $value);
 
         return $this;
