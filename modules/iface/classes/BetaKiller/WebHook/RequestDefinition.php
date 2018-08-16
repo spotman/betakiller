@@ -8,7 +8,7 @@ class RequestDefinition implements RequestDefinitionInterface
     /**
      * @var string HTTP method
      */
-    private $method;
+    private $method = '';
 
     /**
      * @var array fields [[string name, string value],..]
@@ -45,7 +45,7 @@ class RequestDefinition implements RequestDefinitionInterface
      */
     public function getMethod(): string
     {
-        return (string)$this->method;
+        return $this->method;
     }
 
     /**
@@ -57,9 +57,6 @@ class RequestDefinition implements RequestDefinitionInterface
      */
     public function addField(string $name, $value): RequestDefinitionInterface
     {
-        if (!\is_string($name)) {
-            throw new WebHookException('Invalid name of field. Name must be string');
-        }
         $name = trim($name);
         if ($name === '') {
             throw new WebHookException('Invalid name of field. Name can not me empty');
