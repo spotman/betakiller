@@ -25,46 +25,6 @@ class WebHookLogRepository extends AbstractOrmBasedRepository
     }
 
     /**
-     * @param int $id
-     *
-     * @return array
-     * @throws \BetaKiller\Exception
-     * @throws \BetaKiller\Factory\FactoryException
-     * @throws \BetaKiller\Repository\RepositoryException
-     */
-    public function getItemRequestData(int $id): array
-    {
-        $orm = $this->getOrmInstance();
-
-        $data = $this
-            ->filterById($orm, $id)
-            ->findOne($orm);
-
-        $value = [];
-        if ($data) {
-            /**
-             * @var \BetaKiller\Model\WebHookLog $data
-             */
-            $value = $data->getRequestData();
-        }
-
-        return $value;
-    }
-
-    /**
-     * @param \BetaKiller\Model\ExtendedOrmInterface $orm
-     * @param int                                    $id
-     *
-     * @return \BetaKiller\Repository\WebHookLogRepository
-     */
-    private function filterById(ExtendedOrmInterface $orm, int $id): self
-    {
-        $orm->where('id', '=', $id);
-
-        return $this;
-    }
-
-    /**
      * @param \BetaKiller\Model\ExtendedOrmInterface $orm
      * @param string                                 $codeName
      *
