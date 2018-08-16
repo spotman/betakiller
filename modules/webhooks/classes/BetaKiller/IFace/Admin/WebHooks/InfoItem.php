@@ -14,8 +14,6 @@ use BetaKiller\Helper\IFaceHelper;
 
 class InfoItem extends AbstractAdminBase
 {
-    private const LIST_ITEMS_IFACE_CODENAME = 'Admin_WebHooks_ListItems';
-
     /**
      * @var \BetaKiller\Url\Container\UrlContainerInterface
      */
@@ -69,10 +67,10 @@ class InfoItem extends AbstractAdminBase
      */
     public function getData(): array
     {
-        $model = $this->urlContainer->getEntity(WebHookModelInterface::URL_CONTAINER_KEY);
+        $model = $this->getWebHookModel();
 
         //
-        $urlElement   = $this->tree->getByCodename(self::LIST_ITEMS_IFACE_CODENAME);
+        $urlElement   = $this->tree->getByCodename(ListItems::codename());
         $listItemsUrl = $this->ifaceHelper->makeUrl($urlElement, null, false);
 
         //
@@ -93,18 +91,7 @@ class InfoItem extends AbstractAdminBase
         ];
 
         //
-        $logItems = $this->webHookLogRepository->getItems($model->getCodename());
-        foreach ($logItems as &$logItem) {
-            $logItem = [
-                'id'          => $logItem->getID(),
-                'codeName'    => $logItem->getCodename(),
-                'dateCreated' => $logItem->getCreatedAt(),
-                'status'      => (int)$logItem->isStatusSucceeded(),
-                'message'     => $logItem->getMessage(),
-                'requestData' => $logItem->getRequestData(),
-            ];
-        }
-
+        $logItems = $this->getLogItems($model->getCodename());
 
         //
         return [
@@ -117,5 +104,49 @@ class InfoItem extends AbstractAdminBase
             ],
             'logItems'     => $logItems,
         ];
+    }
+
+    /**
+     * @param string $codeName
+     *
+     * @return array[
+     *  [
+     *      string id,
+     *      string codeName,
+     *      \DateTimeImmutable dateCreated,
+     *      int status,
+     *      string message,
+     *      array requestData
+     *  ],
+     *  ..
+     * ]
+     * @throws \BetaKiller\Factory\FactoryException
+     * @throws \BetaKiller\Repository\RepositoryException
+     */
+    protected function getLogItems(string $codeName): array
+    {
+        $logItems = $this->webHookLogRepository->getItems($codeName);
+        foreach ($logItems as &$logItem) {
+            $logItem = [
+                'id'          => $logItem->getID(),
+                'codeName'    => $logItem->getCodename(),
+                'dateCreated' => $logItem->getCreatedAt(),
+                'status'      => (int)$logItem->isStatusSucceeded(),
+                'message'     => $logItem->getMessage(),
+                'requestData' => $logItem->getRequestData()->get(),
+            ];
+        }
+        unset($logItem);
+
+        return $logItems;
+    }
+
+
+    /**
+     * @return \BetaKiller\Url\WebHookModelInterface
+     */
+    protected function getWebHookModel(): WebHookModelInterface
+    {
+        return $this->urlContainer->getEntityByClassName(WebHookModelInterface::class);
     }
 }
