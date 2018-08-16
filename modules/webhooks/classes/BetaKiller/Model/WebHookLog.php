@@ -16,14 +16,6 @@ class WebHookLog extends \ORM implements WebHookLogInterface
 
     /**
      * @return string
-     */
-    public function getID(): string
-    {
-        return $this->get_id();
-    }
-
-    /**
-     * @return string
      * @throws \Kohana_Exception
      */
     public function getCodename(): string
