@@ -59,6 +59,7 @@ return [
 
     // Workaround for injecting admin/config/ifaces.xml in a proper way
     'admin'                 => MODPATH.'admin',                 // Basic admin
+    'webhooks'              => MODPATH.'webhooks',              // WebHooks control panel
 
     // Allow another modules to set routes
     'iface'                 => MODPATH.'iface',                 // Dynamic user interfaces

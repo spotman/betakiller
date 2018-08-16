@@ -7,6 +7,7 @@ use BetaKiller\Url\Container\UrlContainerInterface;
 use BetaKiller\Url\ElementFilter\AggregateUrlElementFilter;
 use BetaKiller\Url\ElementFilter\WebHookUrlElementFilter;
 use BetaKiller\Url\Parameter\UrlParameterInterface;
+use BetaKiller\Url\UrlElementTreeInterface;
 use BetaKiller\Url\WebHookModelInterface;
 
 class WebHookRepository extends AbstractPredefinedRepository implements DispatchableRepositoryInterface
@@ -15,6 +16,16 @@ class WebHookRepository extends AbstractPredefinedRepository implements Dispatch
      * @var \BetaKiller\Url\UrlElementTreeInterface
      */
     private $tree;
+
+    /**
+     * WebHookRepository constructor.
+     *
+     * @param \BetaKiller\Url\UrlElementTreeInterface $tree
+     */
+    public function __construct(UrlElementTreeInterface $tree)
+    {
+        $this->tree = $tree;
+    }
 
     /**
      * @param string $id
@@ -28,7 +39,7 @@ class WebHookRepository extends AbstractPredefinedRepository implements Dispatch
     }
 
     /**
-     * @return \BetaKiller\Model\AbstractEntityInterface[]|\Traversable
+     * @return WebHookModelInterface[]|\Traversable
      */
     public function getAll()
     {
@@ -86,7 +97,7 @@ class WebHookRepository extends AbstractPredefinedRepository implements Dispatch
     private function getRecursiveIterator(): \RecursiveIteratorIterator
     {
         $filter = new AggregateUrlElementFilter([
-            new WebHookUrlElementFilter
+            new WebHookUrlElementFilter,
         ]);
 
         return $this->tree->getRecursiveIteratorIterator(null, $filter);

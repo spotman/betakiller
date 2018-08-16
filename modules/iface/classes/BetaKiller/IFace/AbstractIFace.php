@@ -25,6 +25,18 @@ abstract class AbstractIFace implements IFaceInterface
     /**
      * @return string
      */
+    final public static function codename(): string
+    {
+        $codename = explode('\\', static::class);
+        array_splice($codename, 0, -1 * \count($codename) + 2);
+        $codename = implode('_', $codename);
+
+        return $codename;
+    }
+
+    /**
+     * @return string
+     */
     final public function getCodename(): string
     {
         return $this->getModel()->getCodename();

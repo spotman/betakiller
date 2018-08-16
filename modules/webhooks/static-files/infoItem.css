@@ -1,0 +1,36 @@
+#admin-webhooks-infoItem h3 .icon i {
+    position: relative;
+    top: 2px;
+}
+#admin-webhooks-infoItem h3 .icon span {
+    position: relative;
+    top: -2px;
+    opacity: 0;
+    -webkit-transition: all .3s;
+    -moz-transition: all .3s;
+    -ms-transition: all .3s;
+    -o-transition: all .3s;
+    transition: all .3s;
+}
+#admin-webhooks-infoItem h3 .icon:hover span {
+    opacity: 1;
+}
+/**/
+/**/
+/**/
+#admin-webhooks-infoItem section.logs {
+    position: relative;
+}
+#admin-webhooks-infoItem section.logs .repeat {
+    position: absolute;
+    right: 0;
+    opacity: .1;
+    -webkit-transition: all .3s;
+    -moz-transition: all .3s;
+    -ms-transition: all .3s;
+    -o-transition: all .3s;
+    transition: all .3s;
+}
+#admin-webhooks-infoItem section.logs .collection:hover .repeat {
+    opacity: 1;
+}

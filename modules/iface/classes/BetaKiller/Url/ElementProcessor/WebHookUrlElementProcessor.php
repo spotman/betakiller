@@ -1,10 +1,13 @@
 <?php
 namespace BetaKiller\Url\ElementProcessor;
 
-use \BetaKiller\Factory\WebHookFactory;
-use \BetaKiller\Url\UrlElementInterface;
-use \BetaKiller\Url\WebHookModelInterface;
-use \BetaKiller\Url\Container\UrlContainerInterface;
+use BetaKiller\Factory\WebHookFactory;
+use BetaKiller\Model\WebHookLog;
+use BetaKiller\Model\WebHookLogRequestDataAggregator;
+use BetaKiller\Repository\WebHookLogRepository;
+use BetaKiller\Url\UrlElementInterface;
+use BetaKiller\Url\WebHookModelInterface;
+use BetaKiller\Url\Container\UrlContainerInterface;
 
 /**
  * WebHook URL element processor
@@ -19,12 +22,18 @@ class WebHookUrlElementProcessor implements UrlElementProcessorInterface
     private $webHookFactory;
 
     /**
-     * @param \BetaKiller\Url\UrlElementInterface $model
-     * @param \BetaKiller\Factory\WebHookFactory  $webHookFactory
+     * @var \BetaKiller\Repository\WebHookLogRepository
      */
-    public function __construct(UrlElementInterface $model, WebHookFactory $webHookFactory)
+    private $webHookLogRepository;
+
+    /**
+     * @param \BetaKiller\Factory\WebHookFactory          $webHookFactory
+     * @param \BetaKiller\Repository\WebHookLogRepository $webHookLogRepository
+     */
+    public function __construct(WebHookFactory $webHookFactory, WebHookLogRepository $webHookLogRepository)
     {
-        $this->webHookFactory = $webHookFactory;
+        $this->webHookFactory       = $webHookFactory;
+        $this->webHookLogRepository = $webHookLogRepository;
     }
 
     /**
@@ -32,10 +41,9 @@ class WebHookUrlElementProcessor implements UrlElementProcessorInterface
      *
      * @param \BetaKiller\Url\UrlElementInterface             $model
      * @param \BetaKiller\Url\Container\UrlContainerInterface $urlContainer
-     * @param \Response|null                                  $response [optional]
-     * @param \Request|null                                   $request  [optional]
+     * @param null|\Response                                  $response
+     * @param null|\Request                                   $request
      *
-     * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\Url\ElementProcessor\UrlElementProcessorException
      */
     public function process(
@@ -50,8 +58,44 @@ class WebHookUrlElementProcessor implements UrlElementProcessorInterface
                 ':class_valid'   => WebHookModelInterface::class,
             ]);
         }
+        if (!$request) {
+            throw new UrlElementProcessorException('Argument "request" must be defined');
+        }
 
-        $webHook = $this->webHookFactory->createFromUrlElement($model);
-        $webHook->process();
+        $requestMethod = (string)$request->method();
+        switch ($requestMethod) {
+            case 'GET':
+                $requestData = $request->getArgumentsGet();
+                break;
+            case 'POST':
+                $requestData = $request->getArgumentsPost();
+                break;
+            default:
+                $requestData = $request->getArgumentsRequest();
+                break;
+        }
+        $requestData = new WebHookLogRequestDataAggregator($requestData);
+
+        $logModel = new WebHookLog();
+        $logModel
+            ->setCodename($model->getCodename())
+            ->setCreatedAt(new \DateTimeImmutable())
+            ->setRequestData($requestData);
+
+        try {
+            $exception = null;
+            $webHook   = $this->webHookFactory->createFromUrlElement($model);
+            $webHook->process();
+            $logModel->setStatus(true);
+        } catch (\Throwable $exception) {
+            $logModel
+                ->setStatus(false)
+                ->setMessage($exception->getMessage());
+        }
+        $this->webHookLogRepository->save($logModel);
+
+        if ($exception) {
+            throw $exception;
+        }
     }
 }

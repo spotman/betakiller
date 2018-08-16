@@ -1,0 +1,51 @@
+{% extends layout %}
+
+
+{% block page_content %}
+  {{ css('layout.css') }}
+
+
+  <section id="admin-webhooks-listItems" class="admin-webhooks-layout">
+
+
+    <nav>
+      <div class="nav-wrapper">
+        <div class="col s12">
+          <span class="breadcrumb">WebHooks</span>
+        </div>
+      </div>
+    </nav>
+
+
+    <section class="items">
+
+      {% for item in items %}
+        <div class="collection">
+
+            {% for key,value in item.info %}
+
+              <div class="collection-item row clear">
+                <span class="col s1">
+                  {{ key }}:
+                </span>
+                <span class="col s11">
+                  {% if loop.index < 2 %}
+                    <a href="{{ item.url }}">
+                      {{ value }}
+                    </a>
+                  {% else %}
+                    {{ value }}
+                  {% endif %}
+                </span>
+              </div>
+
+            {% endfor %}
+
+        </div>
+      {% endfor %}
+
+    </section>
+
+
+  </section>
+{% endblock %}
