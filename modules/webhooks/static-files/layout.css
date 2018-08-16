@@ -1,6 +1,9 @@
 .row-margin-bottom-0 {
     margin-bottom: 0;
 }
+.text-size-12 {
+    font-size: 12px;
+}
 .admin-webhooks-layout section {
     margin-top: 40px;
 }
