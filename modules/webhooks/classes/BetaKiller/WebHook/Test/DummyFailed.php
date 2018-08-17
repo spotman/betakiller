@@ -1,9 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Worknector\WebHook\Test;
-
-use BetaKiller\WebHook\Test\AbstractDummyWebHook;
+namespace BetaKiller\WebHook\Test;
 
 class DummyFailed extends AbstractDummyWebHook
 {
