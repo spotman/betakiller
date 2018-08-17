@@ -6,11 +6,6 @@ namespace BetaKiller\WebHook;
 interface RequestDefinitionInterface
 {
     /**
-     * @return \BetaKiller\WebHook\RequestDefinitionInterface
-     */
-    public static function create(): RequestDefinitionInterface;
-
-    /**
      * @param string $method HTTP method
      *
      * @return \BetaKiller\WebHook\RequestDefinitionInterface

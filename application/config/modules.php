@@ -51,6 +51,7 @@ return [
     'missing-url'           => MODPATH.'missing-url',           // Catch and store missing IFace URLs
     'notification'          => MODPATH.'notification',          // Notification subsystem
     'search'                => MODPATH.'search',                // Search and filtering capabilities
+    'webhooks'              => MODPATH.'webhooks',              // WebHooks control panel
 
     // These modules DEPENDS ON PLATFORM and HAVE LEGACY ROUTES
     'api'                   => MODPATH.'api',                   // API subsystem
@@ -59,7 +60,6 @@ return [
 
     // Workaround for injecting admin/config/ifaces.xml in a proper way
     'admin'                 => MODPATH.'admin',                 // Basic admin
-    'webhooks'              => MODPATH.'webhooks',              // WebHooks control panel
 
     // Allow another modules to set routes
     'iface'                 => MODPATH.'iface',                 // Dynamic user interfaces
