@@ -16,11 +16,26 @@ class RequestDefinition implements RequestDefinitionInterface
     private $fields = [];
 
     /**
+     * @param string $method
+     * @param array  $fields
+     *
      * @return \BetaKiller\WebHook\RequestDefinitionInterface
      */
-    public static function create(): RequestDefinitionInterface
+    public static function create(string $method, array $fields): RequestDefinitionInterface
     {
-        return new self;
+        return new self($method, $fields);
+    }
+
+    /**
+     * RequestDefinition constructor.
+     *
+     * @param string $method
+     * @param array  $fields
+     */
+    public function __construct(string $method, array $fields)
+    {
+        $this->setMethod($method);
+        $this->addFields($fields);
     }
 
     /**
