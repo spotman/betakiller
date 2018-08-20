@@ -2,19 +2,17 @@
 
 
 {% block page_content %}
-  {{ css('layout.css') }}
-  {{ css('infoItem.css') }}
-  {{ js('infoItem.js') }}
+  {{ css('webhooks/layout.css') }}
+  {{ css('webhooks/infoItem.css') }}
+  {{ js('webhooks/infoItem.js') }}
 
 
   <section id="admin-webhooks-infoItem" class="admin-webhooks-layout">
 
-
     <nav>
-      <div class="nav-wrapper">
+      <div class="nav-wrapper green">
         <div class="col s12">
-          <a class="breadcrumb" href="{{ listItemsUrl }}">WebHooks</a>
-          <span class="breadcrumb">Info Item</span>
+          {{ widget('Breadcrumbs') }}
         </div>
       </div>
     </nav>
