@@ -75,7 +75,7 @@ require([
         return function (index, field) {
           let $field = $(field)
           let name = $field.attr('name')
-          let name_test, value
+          let name_test
           for (name_test in fields) {
             if (!fields.hasOwnProperty(name_test)) continue
             if (name_test !== name) continue
