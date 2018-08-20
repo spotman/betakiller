@@ -1,9 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Worknector\WebHook\MangoPay;
-
-use BetaKiller\WebHook\Test\AbstractDummyWebHook;
+namespace BetaKiller\WebHook\Test;
 
 class DummySucceeded extends AbstractDummyWebHook
 {

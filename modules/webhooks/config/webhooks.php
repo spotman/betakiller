@@ -10,8 +10,8 @@ return [
         // Event name => WebHook codename
 
         // Test
-        'TestSucceeded' => 'Test_Succeeded',
-        'TestFailed'    => 'Test_Failed',
+        'TestSucceeded' => 'Test_DummySucceeded',
+        'TestFailed'    => 'Test_DummyFailed',
 
     ],
 ];
