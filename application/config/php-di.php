@@ -9,15 +9,12 @@ use BetaKiller\Config\AppConfig;
 use BetaKiller\Config\AppConfigInterface;
 use BetaKiller\Config\ConfigProviderInterface;
 use BetaKiller\Exception\ExceptionHandlerInterface;
-use BetaKiller\Helper\AppEnv;
-use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\Notification\DefaultMessageRendered;
 use BetaKiller\Notification\MessageRendererInterface;
 use BetaKiller\View\LayoutViewInterface;
 use BetaKiller\View\LayoutViewTwig;
 use BetaKiller\View\TwigViewFactory;
 use BetaKiller\View\ViewFactoryInterface;
-use Psr\Log\LoggerInterface;
 use Roave\DoctrineSimpleCache\SimpleCacheAdapter;
 use Spotman\Acl\ResourceFactory\AclResourceFactoryInterface;
 use Spotman\Acl\ResourcesCollector\AclResourcesCollectorInterface;
@@ -55,24 +52,6 @@ return [
 
         // Common cache instance for all
         \Doctrine\Common\Cache\CacheProvider::class => DI\get(\BetaKiller\Cache\DoctrineCacheProvider::class),
-
-        // Inject container into factories
-        \BetaKiller\DI\ContainerInterface::class    => DI\factory(function () {
-            return \BetaKiller\DI\Container::getInstance();
-        }),
-
-        // Use logger only when really needed
-        LoggerInterface::class                      => DI\get(\BetaKiller\Log\Logger::class),
-
-        AppEnvInterface::class => DI\factory(function () {
-            $multiSite = MultiSite::instance();
-
-            return new AppEnv(
-                $multiSite->getWorkingPath(),
-                $multiSite->docRoot(),
-                !$multiSite->isSiteDetected()
-            );
-        }),
 
         Auth::class => DI\factory(function () {
             return Auth::instance();

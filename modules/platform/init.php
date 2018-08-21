@@ -36,3 +36,6 @@ $container = \BetaKiller\DI\Container::getInstance();
 // Initialize container and push AppEnv and ConfigProvider into DIC
 $container->init($configProvider, $appEnv, $logger);
 
+if ($appEnv->isDebugEnabled()) {
+    $logger->debug('Running :name env', [':name' => $this->appEnv->getModeName()]);
+}
