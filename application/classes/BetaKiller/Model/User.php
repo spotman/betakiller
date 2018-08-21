@@ -23,17 +23,63 @@ class User extends \Model_Auth_User implements UserInterface
         ]);
 
         $this->has_many([
-            'ulogins' => [],
+            'ulogins'             => [],
+            'notification_groups' => [
+                'model'       => 'NotificationGroupUser',
+                'foreign_key' => NotificationGroupUser::TABLE_FIELD_USER_ID,
+            ],
+
         ]);
 
-        $this->load_with(['language']);
+        $this->load_with(['language', 'notification_groups']);
 
         parent::configure();
     }
 
     /**
+     * @return \BetaKiller\Model\NotificationGroupUserInterface
+     */
+    protected function getNotificationGroupsRelation(): NotificationGroupUserInterface
+    {
+        return $this->get('notification_groups');
+    }
+
+    /**
+     * @return NotificationGroupUserInterface[]|\Traversable
+     */
+    public function getNotificationGroups()
+    {
+        return $this->getNotificationGroupsRelation()->get_all();
+    }
+
+    /**
+     * @param NotificationGroupUserInterface $model
+     *
+     * @return bool
+     */
+    public function hasNotificationGroup(NotificationGroupUserInterface $model): bool
+    {
+        return $this->hasNotificationGroupCodename($model->getGroupCodename());
+    }
+
+    /**
+     * @param string $codename
+     *
+     * @return bool
+     */
+    public function hasNotificationGroupCodename(string $codename): bool
+    {
+        foreach ($this->getNotificationGroups() as $model) {
+            if ($model->getGroupCodename() === $codename) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * @return Role
-     * @throws \Kohana_Exception
      */
     protected function getRolesRelation(): Role
     {
@@ -44,7 +90,6 @@ class User extends \Model_Auth_User implements UserInterface
      * @param string $value
      *
      * @return \BetaKiller\Model\UserInterface
-     * @throws \Kohana_Exception
      */
     public function setUsername(string $value): UserInterface
     {
@@ -53,7 +98,6 @@ class User extends \Model_Auth_User implements UserInterface
 
     /**
      * @return string
-     * @throws \Kohana_Exception
      */
     public function getUsername(): string
     {
@@ -64,7 +108,6 @@ class User extends \Model_Auth_User implements UserInterface
      * @param string $value
      *
      * @return \BetaKiller\Model\UserInterface
-     * @throws \Kohana_Exception
      */
     public function setPassword(string $value): UserInterface
     {
@@ -73,7 +116,6 @@ class User extends \Model_Auth_User implements UserInterface
 
     /**
      * @return string
-     * @throws \Kohana_Exception
      */
     public function getPassword(): string
     {
@@ -175,7 +217,6 @@ class User extends \Model_Auth_User implements UserInterface
      * Returns user`s language name
      *
      * @return string|null
-     * @throws \Kohana_Exception
      */
     public function getLanguageName(): ?string
     {
@@ -190,7 +231,6 @@ class User extends \Model_Auth_User implements UserInterface
 
     /**
      * @return \BetaKiller\Model\Language
-     * @throws \Kohana_Exception
      */
     public function getLanguage(): Language
     {
@@ -203,7 +243,6 @@ class User extends \Model_Auth_User implements UserInterface
      * @param string $usernameOrEmail
      *
      * @return UserInterface|null
-     * @throws \Kohana_Exception
      */
     public function searchBy(string $usernameOrEmail): ?UserInterface
     {
@@ -219,7 +258,6 @@ class User extends \Model_Auth_User implements UserInterface
 
     /**
      * @throws \BetaKiller\Auth\InactiveException
-     * @throws \Kohana_Exception
      */
     protected function checkIsActive(): void
     {
@@ -231,7 +269,6 @@ class User extends \Model_Auth_User implements UserInterface
 
     /**
      * @throws \BetaKiller\Auth\InactiveException
-     * @throws \Kohana_Exception
      */
     public function afterAutoLogin(): void
     {
@@ -247,7 +284,6 @@ class User extends \Model_Auth_User implements UserInterface
      * Returns TRUE, if user account is switched on
      *
      * @return bool
-     * @throws \Kohana_Exception
      */
     public function isActive(): bool
     {
@@ -312,7 +348,6 @@ class User extends \Model_Auth_User implements UserInterface
      * Возвращает основной номер телефона
      *
      * @return string
-     * @throws \Kohana_Exception
      */
     public function getPhone(): string
     {
@@ -335,17 +370,11 @@ class User extends \Model_Auth_User implements UserInterface
         return false;
     }
 
-    /**
-     * @throws \Kohana_Exception
-     */
     public function enableEmailNotification(): void
     {
         $this->set('notify_by_email', true);
     }
 
-    /**
-     * @throws \Kohana_Exception
-     */
     public function disableEmailNotification(): void
     {
         $this->set('notify_by_email', false);
@@ -365,7 +394,6 @@ class User extends \Model_Auth_User implements UserInterface
 
     /**
      * @return string
-     * @throws \Kohana_Exception
      */
     public function getAccessControlIdentity(): string
     {
@@ -374,7 +402,6 @@ class User extends \Model_Auth_User implements UserInterface
 
     /**
      * @return RoleInterface[]|\Traversable
-     * @throws \Kohana_Exception
      */
     public function getAccessControlRoles()
     {
