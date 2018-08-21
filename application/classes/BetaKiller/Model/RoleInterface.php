@@ -14,7 +14,7 @@ interface RoleInterface extends AbstractEntityInterface, AclRoleInterface, Multi
     /**
      * Root role for super-administrators, inherits all other roles
      */
-    public const ROOT_ROLE_NAME      = 'root';
+    public const ROOT_ROLE_NAME = 'root';
 
     /**
      * Role for access to developer tools
@@ -39,10 +39,15 @@ interface RoleInterface extends AbstractEntityInterface, AclRoleInterface, Multi
     /**
      * Role for unauthenticated users (guests)
      */
-    public const GUEST_ROLE_NAME     = 'guest';
+    public const GUEST_ROLE_NAME = 'guest';
 
     /**
      * @return string
      */
     public function getName(): string;
+
+    /**
+     * @return NotificationGroupRoleInterface[]|\Traversable
+     */
+    public function getNotificationGroups();
 }

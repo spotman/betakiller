@@ -10,6 +10,18 @@ interface UserInterface extends AbstractEntityInterface, OrmInterface, Notificat
     // Extended methods
 
     /**
+     * @return NotificationGroupUserInterface[]|\Traversable
+     */
+    public function getNotificationGroups();
+
+    /**
+     * @param string $codename
+     *
+     * @return bool
+     */
+    public function hasNotificationGroupCodename(string $codename): bool;
+
+    /**
      * @param string $value
      *
      * @return \BetaKiller\Model\UserInterface
