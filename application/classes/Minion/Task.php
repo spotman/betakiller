@@ -7,40 +7,10 @@ use BetaKiller\Task\TaskFactory;
  */
 abstract class Minion_Task extends Kohana_Minion_Task
 {
-    /**
-     * @Inject
-     * @var \BetaKiller\Helper\AppEnvInterface
-     */
-    private $appEnv;
-
-    /**
-     * @Inject
-     * @var \Psr\Log\LoggerInterface
-     */
-    protected $logger;
-
     protected const COLOR_RED        = 'red';
     protected const COLOR_GREEN      = 'green';
     protected const COLOR_BLUE       = 'blue';
     protected const COLOR_LIGHT_BLUE = 'light_blue';
-
-    public function __construct()
-    {
-        $common_options = [
-            'debug' => false,
-            'stage' => 'development',
-            'user'  => null,
-        ];
-
-        $this->_options = array_merge($common_options, $this->_options, $this->defineOptions());
-
-        parent::__construct();
-    }
-
-    protected function defineOptions(): array
-    {
-        return [];
-    }
 
     /**
      * @param string $className
@@ -56,23 +26,6 @@ abstract class Minion_Task extends Kohana_Minion_Task
         $factory = \BetaKiller\DI\Container::getInstance()->get(TaskFactory::class);
 
         return $factory->create($className);
-    }
-
-    /**
-     * Execute the task with the specified set of options
-     *
-     */
-    public function execute(): void
-    {
-        $isDebugEnabled = ($this->_options['debug'] !== false);
-
-        if ($isDebugEnabled) {
-            $this->appEnv->enableDebug();
-        }
-
-        $this->logger->debug('Running :name env', [':name' => $this->appEnv->getModeName()]);
-
-        parent::execute();
     }
 
     /**
@@ -99,7 +52,7 @@ abstract class Minion_Task extends Kohana_Minion_Task
      *
      * @return $this
      */
-    protected function write_replace($text, ?bool $eol, $color = null)
+    protected function writeReplace($text, ?bool $eol, $color = null)
     {
         if ($color) {
             $text = $this->colorize($text, $color);

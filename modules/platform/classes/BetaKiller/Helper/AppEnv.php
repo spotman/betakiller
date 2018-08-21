@@ -49,7 +49,8 @@ class AppEnv implements AppEnvInterface
         $this->isCoreRunning = $isCoreRunning;
 
         $this->initDotEnv();
-        $this->detectMode();
+        $this->detectCliEnv();
+        $this->detectAppMode();
     }
 
     private function initDotEnv(): void
@@ -69,9 +70,26 @@ class AppEnv implements AppEnvInterface
         $dotEnv->required(self::APP_REVISION)->notEmpty();
     }
 
-    private function detectMode(): void
+    private function detectAppMode(): void
     {
         $this->mode = getenv(self::APP_MODE);
+    }
+
+    private function detectCliEnv(): void
+    {
+        if (!$this->isCLI()) {
+            return;
+        }
+
+        if ($this->getCliOption('debug')) {
+            $this->enableDebug();
+        }
+
+        $stage = $this->getCliOption('stage');
+
+        if ($stage) {
+            \putenv(self::APP_MODE.'='.$stage);
+        }
     }
 
     /**

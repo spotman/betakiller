@@ -1,21 +1,44 @@
 <?php
+declare(strict_types=1);
+
+namespace BetaKiller\Task;
 
 use BetaKiller\Helper\AppEnvInterface;
-use BetaKiller\Task\TaskException;
+use Psr\Log\LoggerInterface;
+use Spotman\DotEnv\DotEnv;
 
-class Task_StoreAppRevision extends \BetaKiller\Task\AbstractTask
+class StoreAppRevision extends AbstractTask
 {
     /**
-     * @Inject
      * @var \BetaKiller\Helper\AppEnvInterface
      */
     private $appEnv;
 
     /**
-     * @Inject
      * @var \Spotman\DotEnv\DotEnv
      */
     private $dotEnv;
+
+    /**
+     * @var \Psr\Log\LoggerInterface
+     */
+    private $logger;
+
+    /**
+     * StoreAppRevision constructor.
+     *
+     * @param \BetaKiller\Helper\AppEnvInterface $appEnv
+     * @param \Spotman\DotEnv\DotEnv             $dotEnv
+     * @param \Psr\Log\LoggerInterface           $logger
+     */
+    public function __construct(AppEnvInterface $appEnv, DotEnv $dotEnv, LoggerInterface $logger)
+    {
+        $this->appEnv = $appEnv;
+        $this->dotEnv = $dotEnv;
+        $this->logger = $logger;
+
+        parent::__construct();
+    }
 
     protected function defineOptions(): array
     {
@@ -24,12 +47,7 @@ class Task_StoreAppRevision extends \BetaKiller\Task\AbstractTask
         ];
     }
 
-    /**
-     * @param array $params
-     *
-     * @throws \BetaKiller\Task\TaskException
-     */
-    protected function _execute(array $params): void
+    public function run(): void
     {
         $revision = $this->getOption('revision');
 

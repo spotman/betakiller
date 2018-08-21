@@ -1,10 +1,16 @@
 <?php
+declare(strict_types=1);
+
+namespace BetaKiller\Task\Cache;
 
 use BetaKiller\Helper\UrlContainerHelper;
 use BetaKiller\Url\AvailableUrlsCollector;
 use BetaKiller\Url\UrlElementStack;
+use Psr\Log\LoggerInterface;
+use Request;
+use Throwable;
 
-class Task_Cache_Warmup extends \BetaKiller\Task\AbstractTask
+class Warmup extends \BetaKiller\Task\AbstractTask
 {
     /**
      * @var \BetaKiller\Helper\UrlContainerHelper
@@ -21,24 +27,28 @@ class Task_Cache_Warmup extends \BetaKiller\Task\AbstractTask
      */
     private $urlCollector;
 
+    /**
+     * @var \Psr\Log\LoggerInterface
+     */
+    private $logger;
+
     public function __construct(
         AvailableUrlsCollector $urlCollector,
         UrlElementStack $stack,
-        UrlContainerHelper $paramsHelper
+        UrlContainerHelper $paramsHelper,
+        LoggerInterface $logger
     ) {
         $this->ifaceStack          = $stack;
         $this->urlCollector        = $urlCollector;
         $this->urlParametersHelper = $paramsHelper;
+        $this->logger              = $logger;
 
         parent::__construct();
     }
 
-    /**
-     * @param array $params
-     */
-    protected function _execute(array $params)
+    public function run(): void
     {
-        $items = $this->urlCollector->getPublicAvailableUrls();
+        $items   = $this->urlCollector->getPublicAvailableUrls();
         $counter = 0;
 
         foreach ($items as $item) {
@@ -57,7 +67,7 @@ class Task_Cache_Warmup extends \BetaKiller\Task\AbstractTask
         $this->logger->info(':count URLs processed', [':count' => $counter]);
     }
 
-    private function makeHttpRequest(string $url)
+    private function makeHttpRequest(string $url): void
     {
         $this->logger->debug('Making request to :url', [':url' => $url]);
 

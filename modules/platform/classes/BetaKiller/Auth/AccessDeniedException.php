@@ -15,4 +15,32 @@ class AccessDeniedException extends \HTTP_Exception_403
     {
         return 'error.auth.denied';
     }
+
+    /**
+     * Показываем пользователю оригинальный текст исключения в красивых обёртках и в JSON-ответе
+     */
+    public function showOriginalMessageToUser(): bool
+    {
+        return true;
+    }
+
+    /**
+     * Overwrite this method with "return TRUE" to show custom message in all cases
+     *
+     * @return bool
+     */
+    public function alwaysShowNiceMessage(): bool
+    {
+        return true;
+    }
+
+    /**
+     * Отключаем уведомление о текущем типе исключений
+     *
+     * @return bool
+     */
+    public function isNotificationEnabled(): bool
+    {
+        return false;
+    }
 }

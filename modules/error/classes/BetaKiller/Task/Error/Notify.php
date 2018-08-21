@@ -1,43 +1,74 @@
 <?php
+declare(strict_types=1);
 
+namespace BetaKiller\Task\Error;
+
+use BetaKiller\Helper\IFaceHelper;
+use BetaKiller\Helper\NotificationHelper;
 use BetaKiller\Model\PhpExceptionModelInterface;
+use BetaKiller\Repository\PhpExceptionRepository;
 use BetaKiller\Task\AbstractTask;
 use BetaKiller\Url\ZoneInterface;
+use DateTimeImmutable;
+use Psr\Log\LoggerInterface;
 
-class Task_Error_Notify extends AbstractTask
+class Notify extends AbstractTask
 {
     /**
-     * @Inject
      * @var \BetaKiller\Repository\PhpExceptionRepository
      */
     private $repository;
 
     /**
-     * @Inject
      * @var \BetaKiller\Helper\NotificationHelper
      */
     private $notificationHelper;
 
     /**
-     * @Inject
      * @var \BetaKiller\Helper\IFaceHelper
      */
     private $ifaceHelper;
 
     /**
-     * @param array $params
+     * @var \Psr\Log\LoggerInterface
+     */
+    private $logger;
+
+    /**
+     * Notify constructor.
      *
+     * @param \BetaKiller\Repository\PhpExceptionRepository $repository
+     * @param \BetaKiller\Helper\NotificationHelper         $notificationHelper
+     * @param \BetaKiller\Helper\IFaceHelper                $ifaceHelper
+     * @param \Psr\Log\LoggerInterface                      $logger
+     */
+    public function __construct(
+        PhpExceptionRepository $repository,
+        NotificationHelper $notificationHelper,
+        IFaceHelper $ifaceHelper,
+        LoggerInterface $logger
+    ) {
+        $this->repository         = $repository;
+        $this->notificationHelper = $notificationHelper;
+        $this->ifaceHelper        = $ifaceHelper;
+        $this->logger             = $logger;
+
+        parent::__construct();
+    }
+
+    /**
      * @throws \BetaKiller\Notification\NotificationException
      * @throws \BetaKiller\Repository\RepositoryException
      * @throws \ORM_Validation_Exception
      */
-    protected function _execute(array $params)
+    public function run(): void
     {
         // Repository returns filtered notifications
         $exceptions = $this->repository->getRequiredNotification();
 
         if (!\count($exceptions)) {
             $this->logger->debug('No one exception needs notification');
+
             return;
         }
 
