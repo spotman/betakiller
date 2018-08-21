@@ -1,5 +1,7 @@
 <?php
 
+use BetaKiller\Exception\NotFoundHttpException;
+
 /**
  * Class ControllerProxy
  * Allows to proxy system calls to another class
@@ -20,7 +22,6 @@ abstract class ControllerProxy extends Kohana_Controller
 
     /**
      * @return \Response
-     * @throws \HTTP_Exception_404
      * @throws \HTTP_Exception_Redirect
      * @throws \Kohana_Exception
      */
@@ -34,7 +35,7 @@ abstract class ControllerProxy extends Kohana_Controller
 
         // If the action doesn't exist, it's a 404
         if (!method_exists($this->proxyObject, $this->proxyMethod)) {
-            throw new HTTP_Exception_404('Can not find method [:method] in proxy class [:class]', [
+            throw new NotFoundHttpException('Can not find method [:method] in proxy class [:class]', [
                 ':class'  => get_class($this->proxyObject),
                 ':method' => $this->proxyMethod,
             ]);

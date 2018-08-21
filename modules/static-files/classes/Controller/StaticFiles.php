@@ -1,4 +1,6 @@
-<?php defined('SYSPATH') or die('No direct access allowed.');
+<?php use BetaKiller\Exception\NotFoundHttpException;
+
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * Суть контроллера: иметь возможность создания компактных модулей, в которых бы
@@ -72,7 +74,7 @@ class Controller_StaticFiles extends Controller
             $this->response->headers('Content-Length', filesize($orig));
         } else {
             // Return a 404 status
-            throw new HTTP_Exception_404("File [:file] not found", [':file' => $file]);
+            throw new NotFoundHttpException("File [:file] not found", [':file' => $file]);
         }
     }
 
@@ -131,6 +133,6 @@ class Controller_StaticFiles extends Controller
 
     public function action_missing()
     {
-        throw new HTTP_Exception_404;
+        throw new NotFoundHttpException();
     }
 }
