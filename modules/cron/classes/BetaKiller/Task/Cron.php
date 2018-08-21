@@ -1,9 +1,10 @@
 <?php
+declare(strict_types=1);
+
+namespace BetaKiller\Task;
 
 use BetaKiller\Cron\CronException;
 use BetaKiller\Cron\Task;
-use BetaKiller\Task\AbstractTask;
-use BetaKiller\Task\TaskException;
 use Cron\CronExpression;
 use Graze\ParallelProcess\Pool;
 use Graze\ParallelProcess\Table;
@@ -11,19 +12,22 @@ use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Yaml\Yaml;
 
-class Task_Cron extends AbstractTask
+class Cron extends AbstractTask
 {
     /**
-     * @Inject
      * @var \BetaKiller\Helper\AppEnvInterface
      */
     private $env;
 
     /**
-     * @Inject
      * @var \BetaKiller\Cron\TaskQueue
      */
     private $queue;
+
+    /**
+     * @var \Psr\Log\LoggerInterface
+     */
+    private $logger;
 
     /**
      * @var string
@@ -35,6 +39,25 @@ class Task_Cron extends AbstractTask
      */
     private $isHuman;
 
+    /**
+     * Cron constructor.
+     *
+     * @param \BetaKiller\Helper\AppEnvInterface $env
+     * @param \BetaKiller\Cron\TaskQueue         $queue
+     * @param \Psr\Log\LoggerInterface           $logger
+     */
+    public function __construct(
+        \BetaKiller\Helper\AppEnvInterface $env,
+        \BetaKiller\Cron\TaskQueue $queue,
+        \Psr\Log\LoggerInterface $logger
+    ) {
+        $this->env    = $env;
+        $this->queue  = $queue;
+        $this->logger = $logger;
+
+        parent::__construct();
+    }
+
     protected function defineOptions(): array
     {
         return [
@@ -43,15 +66,11 @@ class Task_Cron extends AbstractTask
     }
 
     /**
-     * @param array $params
-     *
-     * @throws \Exception
      * @throws \BetaKiller\Task\TaskException
-     * @throws \Symfony\Component\Yaml\Exception\ParseException
      */
-    protected function _execute(array $params): void
+    public function run(): void
     {
-        $this->isHuman      = ($params['human'] !== false);
+        $this->isHuman      = $this->getOption('human') !== false;
         $this->currentStage = $this->env->getModeName();
 
         // Get all due tasks and enqueue them (long-running task would not affect next tasks due check)
@@ -79,9 +98,9 @@ class Task_Cron extends AbstractTask
         }
 
         foreach ($records as $name => $data) {
-            $expr         = $data['at'] ?? null;
-            $params       = $data['params'] ?? null;
-            $taskStage    = $data['stage'] ?? null;
+            $expr      = $data['at'] ?? null;
+            $params    = $data['params'] ?? null;
+            $taskStage = $data['stage'] ?? null;
 
             if (!$expr) {
                 throw new TaskException('Missing "at" key value in [:name] task', [':name' => $name]);
@@ -151,8 +170,8 @@ class Task_Cron extends AbstractTask
 
             $task->failed();
 
-            $nextRunTime = new DateTimeImmutable;
-            $task->postpone($nextRunTime->add(new DateInterval('PT5M')));
+            $nextRunTime = new \DateTimeImmutable;
+            $task->postpone($nextRunTime->add(new \DateInterval('PT5M')));
 
             $this->logger->debug('Task [:name] is failed', [':name' => $task->getName()]);
         });
@@ -202,7 +221,7 @@ class Task_Cron extends AbstractTask
     private function getTaskByProcessFingerprint(Process $process): Task
     {
         $env         = $process->getEnv();
-        $fingerprint = $env['fingerprint'] ?? null;
+        $fingerprint = $env['fingerprint'] ?? '';
 
         if (!$fingerprint) {
             throw new CronException('Missing process fingerprint');

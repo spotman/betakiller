@@ -16,8 +16,8 @@ class RequestDefinition implements RequestDefinitionInterface
     private $fields = [];
 
     /**
-     * @param string $method
-     * @param array  $fields
+     * @param string $method HTTP method
+     * @param array  $fields [string "name" => string "value", ...]
      *
      * @return \BetaKiller\WebHook\RequestDefinitionInterface
      */
@@ -29,8 +29,8 @@ class RequestDefinition implements RequestDefinitionInterface
     /**
      * RequestDefinition constructor.
      *
-     * @param string $method
-     * @param array  $fields
+     * @param string $method HTTP method
+     * @param array  $fields [string "name" => string "value", ...]
      */
     public function __construct(string $method, array $fields)
     {
@@ -39,12 +39,30 @@ class RequestDefinition implements RequestDefinitionInterface
     }
 
     /**
+     * Returns HTTP method
+     *
+     * @return string
+     */
+    public function getMethod(): string
+    {
+        return $this->method;
+    }
+
+    /**
+     * @return array [string "name" => string "value", ...]
+     */
+    public function getFields(): array
+    {
+        return $this->fields;
+    }
+
+    /**
      * @param string $method HTTP method
      *
      * @return \BetaKiller\WebHook\RequestDefinitionInterface
      * @throws \BetaKiller\WebHook\WebHookException
      */
-    public function setMethod(string $method): RequestDefinitionInterface
+    private function setMethod(string $method): RequestDefinitionInterface
     {
         $method = mb_strtoupper(trim($method));
         if ($method === '') {
@@ -56,25 +74,17 @@ class RequestDefinition implements RequestDefinitionInterface
     }
 
     /**
-     * @return string
-     */
-    public function getMethod(): string
-    {
-        return $this->method;
-    }
-
-    /**
      * @param string               $name  field name
      * @param string|int|bool|null $value field value
      *
      * @return \BetaKiller\WebHook\RequestDefinitionInterface
      * @throws \BetaKiller\WebHook\WebHookException
      */
-    public function addField(string $name, $value): RequestDefinitionInterface
+    private function addField(string $name, $value): RequestDefinitionInterface
     {
         $name = trim($name);
-        if ($name === '') {
-            throw new WebHookException('Invalid name of field. Name can not me empty');
+        if (!$name) {
+            throw new WebHookException('Invalid name of field. Name can not be empty');
         }
 
         if ($value === null || \is_bool($value)) {
@@ -94,23 +104,12 @@ class RequestDefinition implements RequestDefinitionInterface
      *
      * @return \BetaKiller\WebHook\RequestDefinitionInterface
      */
-    public function addFields(array $fields): RequestDefinitionInterface
+    private function addFields(array $fields): RequestDefinitionInterface
     {
-        if (!\is_array($fields) || !$fields) {
-            return $this;
-        }
         foreach ($fields as $key => $value) {
             $this->addField($key, $value);
         }
 
         return $this;
-    }
-
-    /**
-     * @return array
-     */
-    public function getFields(): array
-    {
-        return $this->fields;
     }
 }

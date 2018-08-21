@@ -78,8 +78,13 @@ class Container implements ContainerInterface
         $builder->addDefinitions([
             AppEnvInterface::class          => $appEnv,
             ConfigProviderInterface::class  => $configProvider,
+
+            // Inject PSR logger and BetaKiller logger
             LoggerInterface::class          => $logger,
             \Psr\Log\LoggerInterface::class => $logger,
+
+            // Inject container into factories
+            ContainerInterface::class       => $this,
         ]);
 
         $this->container = $builder

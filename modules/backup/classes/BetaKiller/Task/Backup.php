@@ -1,17 +1,38 @@
 <?php
+declare(strict_types=1);
 
-use BetaKiller\Task\AbstractTask;
-use BetaKiller\Task\TaskException;
+namespace BetaKiller\Task;
 
-class Task_Backup extends AbstractTask
+use BetaKiller\Config\ConfigProviderInterface;
+use Psr\Log\LoggerInterface;
+
+class Backup extends AbstractTask
 {
     /**
-     * @Inject
      * @var \BetaKiller\Config\ConfigProviderInterface
      */
     private $configProvider;
 
-    protected function _execute(array $params): void
+    /**
+     * @var \Psr\Log\LoggerInterface
+     */
+    private $logger;
+
+    /**
+     * Task_Backup constructor.
+     *
+     * @param \BetaKiller\Config\ConfigProviderInterface $configProvider
+     * @param \Psr\Log\LoggerInterface                   $logger
+     */
+    public function __construct(ConfigProviderInterface $configProvider, LoggerInterface $logger)
+    {
+        $this->configProvider = $configProvider;
+        $this->logger         = $logger;
+
+        parent::__construct();
+    }
+
+    public function run(): void
     {
         $service = $this->config('backup.service');
 
@@ -19,11 +40,11 @@ class Task_Backup extends AbstractTask
 
         switch ($service) {
             case 'YandexDisk':
-                $instance = new YandexBackup($this->config('backup.login'), $this->config('backup.password'));
+                $instance = new \YandexBackup($this->config('backup.login'), $this->config('backup.password'));
                 break;
 
             case 'GoogleDisk':
-                $instance = new GoogleBackup($this->config('backup.login'), $this->config('backup.password'));
+                $instance = new \GoogleBackup($this->config('backup.login'), $this->config('backup.password'));
                 break;
 
             default:
@@ -87,7 +108,6 @@ class Task_Backup extends AbstractTask
      * @param null   $default
      *
      * @return \Config_Group|string|int|bool|null
-     * @throws \Kohana_Exception
      */
     private function config($group, $default = null)
     {
@@ -98,7 +118,7 @@ class Task_Backup extends AbstractTask
 
     protected function getDBDriver($driver): string
     {
-        if (in_array($driver, ['mysqli', 'mysql'], true)) {
+        if (\in_array($driver, ['mysqli', 'mysql'], true)) {
             return 'mysql';
         }
 
