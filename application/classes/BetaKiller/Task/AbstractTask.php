@@ -5,6 +5,24 @@ abstract class AbstractTask extends \Minion_Task
 {
     public const CLI_USER_NAME = 'minion';
 
+    public function __construct()
+    {
+        $commonOptions = [
+            'debug' => false,
+            'stage' => 'development',
+            'user'  => null,
+        ];
+
+        $this->_options = array_merge($commonOptions, $this->_options, $this->defineOptions());
+
+        parent::__construct();
+    }
+
+    protected function defineOptions(): array
+    {
+        return [];
+    }
+
     /**
      * @param string    $key
      * @param bool|null $required
@@ -22,5 +40,12 @@ abstract class AbstractTask extends \Minion_Task
         }
 
         return $value;
+    }
+
+    abstract public function run(): void;
+
+    protected function _execute(array $params)
+    {
+        $this->run();
     }
 }

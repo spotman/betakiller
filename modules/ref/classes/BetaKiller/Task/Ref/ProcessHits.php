@@ -1,41 +1,68 @@
 <?php
+declare(strict_types=1);
+
+namespace BetaKiller\Task\Ref;
 
 use BetaKiller\Helper\LoggerHelperTrait;
 use BetaKiller\Model\RefHit;
+use BetaKiller\Repository\RefHitRepository;
+use BetaKiller\Repository\RefLinkRepository;
+use BetaKiller\Repository\RefPageRepository;
 use BetaKiller\Task\AbstractTask;
+use Psr\Log\LoggerInterface;
 
-class Task_Ref_ProcessHits extends AbstractTask
+class ProcessHits extends AbstractTask
 {
     use LoggerHelperTrait;
 
     /**
-     * @Inject
      * @var \BetaKiller\Repository\RefHitRepository
      */
     private $hitsRepository;
 
     /**
-     * @Inject
      * @var \BetaKiller\Repository\RefPageRepository
      */
     private $pageRepository;
 
     /**
-     * @Inject
      * @var \BetaKiller\Repository\RefLinkRepository
      */
     private $linkRepository;
 
     /**
-     * @param array $params
+     * @var \Psr\Log\LoggerInterface
+     */
+    private $logger;
+
+    /**
+     * ProcessHits constructor.
      *
+     * @param \BetaKiller\Repository\RefHitRepository  $hitsRepository
+     * @param \BetaKiller\Repository\RefPageRepository $pageRepository
+     * @param \BetaKiller\Repository\RefLinkRepository $linkRepository
+     * @param \Psr\Log\LoggerInterface                 $logger
+     */
+    public function __construct(
+        RefHitRepository $hitsRepository,
+        RefPageRepository $pageRepository,
+        RefLinkRepository $linkRepository,
+        LoggerInterface $logger
+    ) {
+        $this->hitsRepository = $hitsRepository;
+        $this->pageRepository = $pageRepository;
+        $this->linkRepository = $linkRepository;
+        $this->logger         = $logger;
+
+        parent::__construct();
+    }
+
+    /**
      * @throws \BetaKiller\Repository\RepositoryException
      */
-    protected function _execute(array $params): void
+    public function run(): void
     {
-        $records = $this->hitsRepository->getPending();
-
-        foreach ($records as $record) {
+        foreach ($this->hitsRepository->getPending() as $record) {
             try {
                 $this->processRefLogRecord($record);
 
@@ -89,7 +116,6 @@ class Task_Ref_ProcessHits extends AbstractTask
         $link->setLastSeenAt($record->getTimestamp());
 
         $this->linkRepository->save($link);
-
         // TODO Deal with redirects from http to https (this would double counters)
     }
 }
