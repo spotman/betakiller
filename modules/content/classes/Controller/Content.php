@@ -2,6 +2,7 @@
 
 use BetaKiller\Assets\AssetsException;
 use BetaKiller\Assets\Model\AssetsModelInterface;
+use BetaKiller\Exception\NotFoundHttpException;
 
 class Controller_Content extends Controller
 {
@@ -19,14 +20,13 @@ class Controller_Content extends Controller
 
     /**
      * @throws \BetaKiller\Assets\AssetsException
-     * @throws \HTTP_Exception_404
      */
     public function action_files_bc_redirect()
     {
         $file = $this->param('file');
 
         if (!$file) {
-            throw new HTTP_Exception_404();
+            throw new NotFoundHttpException();
         }
 
         $path = '/'.ltrim($this->getRequest()->uri(), '/');
@@ -34,7 +34,7 @@ class Controller_Content extends Controller
         $model = $this->findContentModelByWpPath($path);
 
         if (!$model) {
-            throw new HTTP_Exception_404();
+            throw new NotFoundHttpException();
         }
 
         $url = $this->assetsHelper->getOriginalUrl($model);
