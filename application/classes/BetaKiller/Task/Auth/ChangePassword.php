@@ -1,14 +1,30 @@
 <?php
+declare(strict_types=1);
 
-class Task_Auth_ChangePassword extends Minion_Task
+namespace BetaKiller\Task\Auth;
+
+use BetaKiller\Repository\UserRepository;
+
+class ChangePassword extends \BetaKiller\Task\AbstractTask
 {
     /**
-     * @Inject
      * @var \BetaKiller\Repository\UserRepository
      */
     private $userRepo;
 
-    protected function _execute(array $params)
+    /**
+     * ChangePassword constructor.
+     *
+     * @param \BetaKiller\Repository\UserRepository $userRepo
+     */
+    public function __construct(UserRepository $userRepo)
+    {
+        $this->userRepo = $userRepo;
+
+        parent::__construct();
+    }
+
+    public function run(): void
     {
         $username = $this->read('Enter username or e-mail');
 
@@ -16,14 +32,16 @@ class Task_Auth_ChangePassword extends Minion_Task
 
         if (!$user) {
             $this->write('No such user');
+
             return;
         }
 
-        $password   = $this->password('Enter new password');
-        $confirm    = $this->password('Enter new password again');
+        $password = $this->password('Enter new password');
+        $confirm  = $this->password('Enter new password again');
 
         if ($password !== $confirm) {
             $this->write('Passwords are not identical', self::COLOR_RED);
+
             return;
         }
 
