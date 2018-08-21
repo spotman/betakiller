@@ -1,5 +1,8 @@
 <?php
 
+namespace BetaKiller\Task\Content\Import;
+
+use Arr;
 use BetaKiller\Assets\Model\AssetsModelImageInterface;
 use BetaKiller\Assets\Provider\AssetsProviderInterface;
 use BetaKiller\Content\Shortcode\AttachmentShortcode;
@@ -16,13 +19,22 @@ use BetaKiller\Model\WordpressAttachmentInterface;
 use BetaKiller\Repository\WordpressAttachmentRepositoryInterface;
 use BetaKiller\Task\AbstractTask;
 use BetaKiller\Task\TaskException;
+use BetaKiller\Url\ZoneInterface;
+use DateTime;
+use DateTimeImmutable;
 use DiDom\Document;
+use File;
+use ORM_Validation_Exception;
+use Request;
+use Throwable;
 use Thunder\Shortcode\Parser\RegexParser;
 use Thunder\Shortcode\Processor\Processor;
 use Thunder\Shortcode\Serializer\TextSerializer;
 use Thunder\Shortcode\Shortcode\ShortcodeInterface as ThunderShortcodeInterface;
+use Valid;
+use WP;
 
-class Task_Content_Import_Wordpress extends AbstractTask
+class Wordpress extends AbstractTask
 {
     private const ATTACH_PARSING_MODE_HTTP  = 'http';
     private const ATTACH_PARSING_MODE_LOCAL = 'local';
@@ -147,6 +159,12 @@ class Task_Content_Import_Wordpress extends AbstractTask
      */
     private $wp;
 
+    /**
+     * @Inject
+     * @var \Psr\Log\LoggerInterface
+     */
+    private $logger;
+
     private $loadedTmpFiles = [];
 
     protected function defineOptions(): array
@@ -157,26 +175,22 @@ class Task_Content_Import_Wordpress extends AbstractTask
     }
 
     /**
-     * @param array $params
-     *
-     * @throws \BetaKiller\Notification\NotificationException
-     * @throws \BetaKiller\IFace\Exception\IFaceException
-     * @throws \RuntimeException
-     * @throws \InvalidArgumentException
-     * @throws \BetaKiller\Status\StatusWorkflowException
-     * @throws \BetaKiller\Status\StatusException
-     * @throws \LogicException
-     * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\Content\Shortcode\ShortcodeException
+     * @throws \BetaKiller\Factory\FactoryException
+     * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \BetaKiller\Notification\NotificationException
      * @throws \BetaKiller\Repository\RepositoryException
+     * @throws \BetaKiller\Status\StatusException
+     * @throws \BetaKiller\Status\StatusWorkflowException
      * @throws \BetaKiller\Task\TaskException
      * @throws \Kohana_Exception
      * @throws \ORM_Validation_Exception
      */
-    protected function _execute(array $params): void
+    public function run(): void
     {
-        if ($params['skip-before']) {
-            $this->skipBeforeDate = new DateTimeImmutable($params['skip-before']);
+        $skipBefore = $this->getOption('skip-before');
+        if ($skipBefore) {
+            $this->skipBeforeDate = new DateTimeImmutable($skipBefore);
         }
 
         $this->contentPostEntity = $this->entityRepository->findByModelName('ContentPost');
@@ -419,7 +433,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
 
             $realMime = $response->headers('Content-Type');
 
-            if (is_array($expectedMimes) && !in_array($realMime, $expectedMimes, true)) {
+            if (\is_array($expectedMimes) && !\in_array($realMime, $expectedMimes, true)) {
                 throw new TaskException('Invalid mime-type: [:real], [:expected] expected', [
                     ':real'     => $realMime,
                     ':expected' => implode('] or [', $expectedMimes),
@@ -452,7 +466,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
 
             $realMime = File::mime($path);
 
-            if (is_array($expectedMimes) && !in_array($realMime, $expectedMimes, true)) {
+            if (\is_array($expectedMimes) && !\in_array($realMime, $expectedMimes, true)) {
                 throw new TaskException('Invalid mime-type: [:real], [:expected] expected', [
                     ':real'     => $realMime,
                     ':expected' => implode('] or [', $expectedMimes),
@@ -664,9 +678,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
     {
         $this->logger->debug('Updating links on attachments...');
 
-        $links = $document->find('a');
-
-        foreach ($links as $link) {
+        foreach ($document->find('a') as $link) {
             $href = $link->getAttribute('href');
 
             // Skip non-attachment links
@@ -833,7 +845,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
 
                 if (!isset($this->unknownBbTags[$name])) {
                     $this->unknownBbTags[$name] = $this->ifaceHelper->getReadEntityUrl($item,
-                        ThunderShortcodeInterface::PUBLIC_ZONE);
+                        ZoneInterface::PUBLIC);
                     $this->logger->debug('Unknown BB-code found [:name], keep it', [':name' => $name]);
                 }
             }
@@ -874,11 +886,8 @@ class Task_Content_Import_Wordpress extends AbstractTask
         // Getting attributes
         $attributes = $imageTag->attributes();
 
-        // Removing <img /> tag
-        $captionText = trim(strip_tags($content));
-
-        // Force title to have caption text
-        $attributes['title'] = $captionText;
+        // Force title to have caption text (without <img /> tag)
+        $attributes['title'] = trim(strip_tags($content));
 
         $image = $this->createImageFromAttributes($attributes, $post->getID());
 
@@ -1139,9 +1148,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
      */
     private function processImagesInText(Document $root, int $entityItemID): void
     {
-        $images = $root->find('img');
-
-        foreach ($images as $image) {
+        foreach ($root->find('img') as $image) {
             $shortcode = null;
 
             try {
@@ -1452,7 +1459,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
     {
         $categories = $this->wp->getCategoriesWithPosts();
 
-        $total   = count($categories);
+        $total   = \count($categories);
         $current = 1;
 
         foreach ($categories as $term) {
@@ -1556,7 +1563,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
         $commentsData = $this->wp->getComments();
 
         $this->logger->info('Processing :total comments ', [
-            ':total' => count($commentsData),
+            ':total' => \count($commentsData),
         ]);
 
         foreach ($commentsData as $data) {
@@ -1585,7 +1592,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
         $wpID        = $data['id'];
         $wpParentID  = $data['parent_id'];
         $wpPostID    = $data['post_id'];
-        $created_at  = new DateTime($data['created_at']);
+        $createdAt  = new DateTime($data['created_at']);
         $authorName  = $data['author_name'];
         $authorEmail = $data['author_email'];
         $authorIP    = $data['author_ip_address'];
@@ -1632,7 +1639,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
         $model
             ->setIpAddress($authorIP)
             ->setUserAgent($userAgent)
-            ->setCreatedAt($created_at);
+            ->setCreatedAt($createdAt);
 
         // Detecting user by name
         $authorUser = $this->userRepository->searchBy($authorName);
@@ -1670,9 +1677,7 @@ class Task_Content_Import_Wordpress extends AbstractTask
     {
         $this->logger->info('Importing users...');
 
-        $wpUsers = $this->wp->getUsers();
-
-        foreach ($wpUsers as $wpUser) {
+        foreach ($this->wp->getUsers() as $wpUser) {
             $wpLogin = $wpUser['login'];
             $wpEmail = $wpUser['email'];
 

@@ -1,15 +1,39 @@
 <?php
+declare(strict_types=1);
 
+namespace BetaKiller\Task\Assets;
+
+use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\Task\AbstractTask;
 use BetaKiller\Task\TaskException;
+use Kohana;
+use Psr\Log\LoggerInterface;
 
-class Task_Assets_Deploy extends AbstractTask
+class Deploy extends AbstractTask
 {
     /**
-     * @Inject
      * @var \BetaKiller\Helper\AppEnvInterface
      */
     private $appEnv;
+
+    /**
+     * @var \Psr\Log\LoggerInterface
+     */
+    private $logger;
+
+    /**
+     * Deploy constructor.
+     *
+     * @param \BetaKiller\Helper\AppEnvInterface $appEnv
+     * @param \Psr\Log\LoggerInterface           $logger
+     */
+    public function __construct(AppEnvInterface $appEnv, LoggerInterface $logger)
+    {
+        $this->appEnv = $appEnv;
+        $this->logger = $logger;
+
+        parent::__construct();
+    }
 
     protected function defineOptions(): array
     {
@@ -18,14 +42,7 @@ class Task_Assets_Deploy extends AbstractTask
         ];
     }
 
-    /**
-     * @param array $params
-     *
-     * @throws \BetaKiller\Task\TaskException
-     * @throws \RuntimeException
-     * @throws \Kohana_Exception
-     */
-    protected function _execute(array $params): void
+    public function run(): void
     {
         $staticFilesList = Kohana::list_files('static-files');
 
@@ -58,7 +75,7 @@ class Task_Assets_Deploy extends AbstractTask
 
             $target = $targetBase.$fileArray[1];
 
-            $targetBaseDir = dirname($target);
+            $targetBaseDir = \dirname($target);
 
             if (!file_exists($targetBaseDir) && !mkdir($targetBaseDir, 0777, true) && !is_dir($targetBaseDir)) {
                 throw new \RuntimeException(sprintf('Directory "%s" was not created', $targetBaseDir));
