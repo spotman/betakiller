@@ -23,12 +23,11 @@ class User extends \Model_Auth_User implements UserInterface
         ]);
 
         $this->has_many([
-            'ulogins'             => [],
-            'notification_groups' => [
-                'model'       => 'NotificationGroupUser',
-                'foreign_key' => NotificationGroupUser::TABLE_FIELD_USER_ID,
+            'ulogins'                 => [],
+            'notification_groups_off' => [
+                'model'       => 'NotificationGroupUserOff',
+                'foreign_key' => NotificationGroupUserOff::TABLE_FIELD_USER_ID,
             ],
-
         ]);
 
         $this->load_with(['language', 'notification_groups']);
@@ -36,30 +35,175 @@ class User extends \Model_Auth_User implements UserInterface
         parent::configure();
     }
 
+    //==================================================================================================================
+
     /**
-     * @return \BetaKiller\Model\NotificationGroupUserInterface
+     * @return NotificationGroupRoleInterface[]
      */
-    protected function getNotificationGroupsRelation(): NotificationGroupUserInterface
+    public function getNotificationGroupsAll(): array
     {
-        return $this->get('notification_groups');
+        $groups = [];
+        foreach ($this->getRolesRelation()->get_all() as $role) {
+            /**
+             * @var \BetaKiller\Model\Role $role
+             */
+            foreach ($role->getNotificationGroups() as $group) {
+                $groups[$group->getGroupId()] = $group;
+            }
+        }
+        $groups = array_values($groups);
+
+        return $groups;
     }
 
     /**
-     * @return NotificationGroupUserInterface[]|\Traversable
+     * @return NotificationGroupUserOffInterface[]
+     */
+    public function getNotificationGroupsOff(): array
+    {
+        $groups = [];
+        foreach ($this->get('notification_groups_off')->get_all() as $group) {
+            $groups[] = $group;
+        }
+
+        return $groups;
+    }
+
+    /**
+     * @return NotificationGroupRoleInterface[]|[]
      */
     public function getNotificationGroups()
+    {
+        $groupsAll = $this->getNotificationGroupsAll();
+        if (!$groupsAll) {
+            return [];
+        }
+
+        $groupsOff = $this->getNotificationGroupsOff();
+        if (!$groupsOff) {
+            return $groupsAll;
+        }
+
+        $groupsOffIds = [];
+        foreach ($groupsOff as $group) {
+            $groupsOffIds[] = $group->getGroupId();
+        }
+
+        $groupsResult = [];
+        foreach ($groupsAll as $group) {
+            $groupId = $group->getGroupId();
+            if (\in_array($groupId, $groupsOffIds)) {
+                continue;
+            }
+            $groupsResult[] = $group;
+        }
+
+        return $groupsResult;
+
+        var_dump($all);
+        var_dump($off);
+        exit;
+
+        return $this
+            ->where('')
+            ->get('notification_groups');
+    }
+
+    /**
+     * @return NotificationGroupRoleInterface[]|\Traversable
+     */
+    public function getNotificationGroups2()
     {
         return $this->getNotificationGroupsRelation()->get_all();
     }
 
     /**
-     * @param NotificationGroupUserInterface $model
+     * @return Role
+     */
+    protected function getRolesRelation2(): Role
+    {
+        return $this->get('roles');
+    }
+
+    /**
+     * @todo Переписать на кешированный ACL ибо слишком затратно делать запрос в БД на проверку роли
+     *
+     * @param RoleInterface|string $role
      *
      * @return bool
      */
-    public function hasNotificationGroup(NotificationGroupUserInterface $model): bool
+    public function hasRole2(RoleInterface $role): bool
     {
-        return $this->hasNotificationGroupCodename($model->getGroupCodename());
+        return $this->hasRoleName($role->getName());
+    }
+
+    /**
+     * @param string $role
+     *
+     * @return bool
+     */
+    public function hasRoleName2(string $role): bool
+    {
+        foreach ($this->getAllUserRolesNames() as $name) {
+            if ($role === $name) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Returns true if user has any of provided role assigned
+     *
+     * @param string[] $roles
+     *
+     * @return bool
+     */
+    public function hasAnyOfRolesNames2(array $roles): bool
+    {
+        return (bool)\array_intersect($this->getAllUserRolesNames(), $roles);
+    }
+
+    /**
+     * @param \BetaKiller\Model\RoleInterface|string $role
+     *
+     * @return \BetaKiller\Model\UserInterface
+     */
+    public function addRole2(RoleInterface $role): UserInterface
+    {
+        return $this->add('roles', $role);
+    }
+
+    /**
+     * Get all user`s roles names (include parent roles)
+     *
+     * @return string[]
+     */
+    public function getAllUserRolesNames2(): array
+    {
+        // Caching coz it is very heavy operation without MPTT
+        if (!$this->allUserRolesNames) {
+            $this->allUserRolesNames = $this->fetchAllUserRolesNames();
+        }
+
+        return $this->allUserRolesNames;
+    }
+
+    protected function fetchAllUserRolesNames2(): array
+    {
+        $rolesNames = [];
+
+        foreach ($this->getRolesRelation()->get_all() as $role) {
+            $rolesNames[] = $role->getName();
+
+            /** @var \BetaKiller\Model\RoleInterface $parent */
+            foreach ($role->getAllParents() as $parent) {
+                $rolesNames[] = $parent->getName();
+            }
+        }
+
+        return array_unique($rolesNames);
     }
 
     /**
@@ -67,7 +211,7 @@ class User extends \Model_Auth_User implements UserInterface
      *
      * @return bool
      */
-    public function hasNotificationGroupCodename(string $codename): bool
+    public function hasNotificationGroupCodename2(string $codename): bool
     {
         foreach ($this->getNotificationGroups() as $model) {
             if ($model->getGroupCodename() === $codename) {
@@ -78,13 +222,7 @@ class User extends \Model_Auth_User implements UserInterface
         return false;
     }
 
-    /**
-     * @return Role
-     */
-    protected function getRolesRelation(): Role
-    {
-        return $this->get('roles');
-    }
+    //==================================================================================================================
 
     /**
      * @param string $value
@@ -130,6 +268,16 @@ class User extends \Model_Auth_User implements UserInterface
     public function isGuest(): bool
     {
         return ($this instanceof GuestUser);
+    }
+
+    //==================================================================================================================
+
+    /**
+     * @return Role
+     */
+    protected function getRolesRelation(): Role
+    {
+        return $this->get('roles');
     }
 
     /**
@@ -213,6 +361,8 @@ class User extends \Model_Auth_User implements UserInterface
         return array_unique($rolesNames);
     }
 
+    //==================================================================================================================
+
     /**
      * Returns user`s language name
      *
@@ -236,6 +386,8 @@ class User extends \Model_Auth_User implements UserInterface
     {
         return $this->get('language');
     }
+
+    //==================================================================================================================
 
     /**
      * Search for user by username or e-mail
