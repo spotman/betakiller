@@ -40,16 +40,16 @@ class Role extends AbstractOrmBasedMultipleParentsTreeModel implements RoleInter
 
     public function rules()
     {
-        return array(
-            'name' => array(
-                array('not_empty'),
-                array('min_length', array(':value', 4)),
-                array('max_length', array(':value', 32)),
-            ),
-            'description' => array(
-                array('max_length', array(':value', 255)),
-            )
-        );
+        return [
+            'name'        => [
+                ['not_empty'],
+                ['min_length', [':value', 4]],
+                ['max_length', [':value', 32]],
+            ],
+            'description' => [
+                ['max_length', [':value', 255]],
+            ],
+        ];
     }
 
     public function getName(): string
