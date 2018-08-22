@@ -37,5 +37,5 @@ $container = \BetaKiller\DI\Container::getInstance();
 $container->init($configProvider, $appEnv, $logger);
 
 if ($appEnv->isDebugEnabled()) {
-    $logger->debug('Running :name env', [':name' => $this->appEnv->getModeName()]);
+    $logger->debug('Running :name env', [':name' => $appEnv->getModeName()]);
 }
