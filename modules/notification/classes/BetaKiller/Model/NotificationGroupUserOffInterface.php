@@ -1,7 +1,7 @@
 <?php
 namespace BetaKiller\Model;
 
-interface NotificationGroupUserInterface
+interface NotificationGroupUserOffInterface
 {
     public function rules();
 
@@ -13,10 +13,10 @@ interface NotificationGroupUserInterface
     /**
      * @param int $value
      *
-     * @return \BetaKiller\Model\NotificationGroupUserInterface
+     * @return \BetaKiller\Model\NotificationGroupUserOffInterface
      * @throws \BetaKiller\Notification\NotificationException
      */
-    public function setGroupId(int $value): NotificationGroupUserInterface;
+    public function setGroupId(int $value): NotificationGroupUserOffInterface;
 
     /**
      * @return int
@@ -26,15 +26,10 @@ interface NotificationGroupUserInterface
     /**
      * @param int $value
      *
-     * @return \BetaKiller\Model\NotificationGroupUserInterface
+     * @return \BetaKiller\Model\NotificationGroupUserOffInterface
      * @throws \BetaKiller\Notification\NotificationException
      */
-    public function setUserId(int $value): NotificationGroupUserInterface;
-
-    /**
-     * @return array[string self::TABLE_FIELD_GROUP_ID, string self::TABLE_FIELD_USER_ID]
-     */
-    public function getAll(): array;
+    public function setUserId(int $value): NotificationGroupUserOffInterface;
 
     /**
      * @return string

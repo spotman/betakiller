@@ -4,9 +4,9 @@ namespace BetaKiller\Model;
 
 use BetaKiller\Notification\NotificationException;
 
-class NotificationGroupUser extends \ORM implements NotificationGroupUserInterface
+class NotificationGroupUserOff extends \ORM implements NotificationGroupUserOffInterface
 {
-    public const TABLE_NAME           = 'notification_group_user';
+    public const TABLE_NAME           = 'notification_groups_users';
     public const TABLE_FIELD_GROUP_ID = 'group_id';
     public const TABLE_FIELD_USER_ID  = 'user_id';
 
@@ -51,10 +51,10 @@ class NotificationGroupUser extends \ORM implements NotificationGroupUserInterfa
     /**
      * @param int $value
      *
-     * @return \BetaKiller\Model\NotificationGroupUserInterface
+     * @return \BetaKiller\Model\NotificationGroupUserOffInterface
      * @throws \BetaKiller\Notification\NotificationException
      */
-    public function setGroupId(int $value): NotificationGroupUserInterface
+    public function setGroupId(int $value): NotificationGroupUserOffInterface
     {
         if ($value < 1) {
             throw new NotificationException('Group id most be greater 0');
@@ -75,10 +75,10 @@ class NotificationGroupUser extends \ORM implements NotificationGroupUserInterfa
     /**
      * @param int $value
      *
-     * @return \BetaKiller\Model\NotificationGroupUserInterface
+     * @return \BetaKiller\Model\NotificationGroupUserOffInterface
      * @throws \BetaKiller\Notification\NotificationException
      */
-    public function setUserId(int $value): NotificationGroupUserInterface
+    public function setUserId(int $value): NotificationGroupUserOffInterface
     {
         if ($value < 1) {
             throw new NotificationException('User id most be greater 0');
@@ -86,17 +86,6 @@ class NotificationGroupUser extends \ORM implements NotificationGroupUserInterfa
         $this->set(self::TABLE_FIELD_USER_ID, $value);
 
         return $this;
-    }
-
-    /**
-     * @return array[string self::TABLE_FIELD_GROUP_ID, string self::TABLE_FIELD_USER_ID]
-     */
-    public function getAll(): array
-    {
-        return [
-            self::TABLE_FIELD_GROUP_ID => $this->getGroupId(),
-            self::TABLE_FIELD_USER_ID  => $this->getUserId(),
-        ];
     }
 
     /**
