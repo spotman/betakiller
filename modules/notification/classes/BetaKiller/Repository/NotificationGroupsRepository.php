@@ -6,7 +6,7 @@ namespace BetaKiller\Repository;
 use BetaKiller\Model\ExtendedOrmInterface;
 use BetaKiller\Model\NotificationGroupInterface;
 
-class NotificationGroupRepository extends AbstractOrmBasedRepository
+class NotificationGroupsRepository extends AbstractOrmBasedRepository
 {
     /**
      * @param int $id
@@ -55,7 +55,7 @@ class NotificationGroupRepository extends AbstractOrmBasedRepository
      * @param \BetaKiller\Model\ExtendedOrmInterface $orm
      * @param int                                    $id
      *
-     * @return \BetaKiller\Repository\NotificationGroupRepository
+     * @return \BetaKiller\Repository\NotificationGroupsRepository
      */
     private function filterById(ExtendedOrmInterface $orm, int $id): self
     {
@@ -68,7 +68,7 @@ class NotificationGroupRepository extends AbstractOrmBasedRepository
      * @param \BetaKiller\Model\ExtendedOrmInterface $orm
      * @param string                                 $codeName
      *
-     * @return \BetaKiller\Repository\NotificationGroupRepository
+     * @return \BetaKiller\Repository\NotificationGroupsRepository
      */
     private function filterByCodename(ExtendedOrmInterface $orm, string $codeName): self
     {
