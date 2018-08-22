@@ -6,20 +6,13 @@ use BetaKiller\Notification\NotificationException;
 
 class NotificationGroup extends \ORM implements NotificationGroupInterface
 {
-    public const TABLE_NAME              = 'notification_group';
+    public const TABLE_NAME              = 'notification_groups';
     public const TABLE_FIELD_CODENAME    = 'codename';
     public const TABLE_FIELD_DESCRIPTION = 'description';
 
     protected function configure(): void
     {
         $this->_table_name = self::TABLE_NAME;
-
-        $this->belongs_to([
-            'language' => [
-                'model'       => 'Language',
-                'foreign_key' => 'language_id',
-            ],
-        ]);
 
         parent::configure();
     }
