@@ -6,7 +6,7 @@ use BetaKiller\Notification\NotificationException;
 
 class NotificationGroupUserOff extends \ORM implements NotificationGroupUserOffInterface
 {
-    public const TABLE_NAME           = 'notification_groups_users';
+    public const TABLE_NAME           = 'notification_groups_users_off';
     public const TABLE_FIELD_GROUP_ID = 'group_id';
     public const TABLE_FIELD_USER_ID  = 'user_id';
 
