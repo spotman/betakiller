@@ -6,7 +6,7 @@ use BetaKiller\Notification\NotificationException;
 
 class NotificationGroupRole extends \ORM implements NotificationGroupRoleInterface
 {
-    public const TABLE_NAME           = 'notification_group_role';
+    public const TABLE_NAME           = 'notification_groups_roles';
     public const TABLE_FIELD_GROUP_ID = 'group_id';
     public const TABLE_FIELD_ROLE_ID  = 'role_id';
 
@@ -19,13 +19,13 @@ class NotificationGroupRole extends \ORM implements NotificationGroupRoleInterfa
                 'model'       => 'NotificationGroup',
                 'foreign_key' => self::TABLE_FIELD_GROUP_ID,
             ],
-            'roles'               => [
+            'roles'              => [
                 'model'       => 'Role',
                 'foreign_key' => self::TABLE_FIELD_GROUP_ID,
             ],
         ]);
 
-        $this->load_with(['notification_group','roles']);
+        $this->load_with(['notification_group', 'roles']);
 
         parent::configure();
     }
@@ -90,17 +90,6 @@ class NotificationGroupRole extends \ORM implements NotificationGroupRoleInterfa
         $this->set(self::TABLE_FIELD_ROLE_ID, $value);
 
         return $this;
-    }
-
-    /**
-     * @return array[string self::TABLE_FIELD_GROUP_ID, string self::TABLE_FIELD_ROLE_ID]
-     */
-    public function getAll(): array
-    {
-        return [
-            self::TABLE_FIELD_GROUP_ID => $this->getGroupId(),
-            self::TABLE_FIELD_ROLE_ID  => $this->getRoleId(),
-        ];
     }
 
     /**

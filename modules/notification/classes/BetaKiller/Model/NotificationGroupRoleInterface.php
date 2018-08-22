@@ -32,11 +32,6 @@ interface NotificationGroupRoleInterface
     public function setRoleId(int $value): NotificationGroupRoleInterface;
 
     /**
-     * @return array[string self::TABLE_FIELD_GROUP_ID, string self::TABLE_FIELD_ROLE_ID]
-     */
-    public function getAll(): array;
-
-    /**
      * @return string
      */
     public function getGroupCodename(): string;
