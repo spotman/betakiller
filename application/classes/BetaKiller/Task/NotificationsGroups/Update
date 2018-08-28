@@ -1,0 +1,29 @@
+<?php
+declare(strict_types=1);
+namespace BetaKiller\Task\NotificationsGroups;
+
+class UpdateOne extends AbstractTask
+{
+    public function run(): void
+    {
+        $codename = $this->read('Enter group codename');
+        $codename = trim($codename);
+        if ($codename === '') {
+            $this->write('Group codename can not be empty', self::COLOR_RED);
+
+            return;
+        }
+
+        if (!$this->hasGroupInConfig($codename)) {
+            $this->write(sprintf('Group codename "%s" not founded', $codename), self::COLOR_RED);
+
+            return;
+        }
+
+        $this
+            ->deleteGroup($codename)
+            ->createGroup($codename);
+
+        $this->write('Group "%s" successfully updated!', self::COLOR_GREEN);
+    }
+}

@@ -22,15 +22,15 @@ class User extends \Model_Auth_User implements UserInterface
             ],
         ]);
 
-        $this->has_many([
-            'ulogins'                 => [],
-            'notification_groups_off' => [
-                'model'       => 'NotificationGroupUserOff',
-                'foreign_key' => NotificationGroupUserOff::TABLE_FIELD_USER_ID,
-            ],
-        ]);
+//        $this->has_many([
+//            'ulogins'                 => [],
+//            'notification_groups_off' => [
+//                'model'       => 'NotificationGroupUserOff',
+//                'foreign_key' => NotificationGroupUserOff::TABLE_FIELD_USER_ID,
+//            ],
+//        ]);
 
-        $this->load_with(['language', 'notification_groups']);
+        $this->load_with(['language']);
 
         parent::configure();
     }

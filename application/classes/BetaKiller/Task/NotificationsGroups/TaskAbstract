@@ -1,0 +1,80 @@
+<?php
+declare(strict_types=1);
+namespace BetaKiller\Task\NotificationsGroups;
+
+use BetaKiller\Config\ConfigProviderInterface;
+use BetaKiller\Repository\NotificationGroupRepository;
+
+abstract class AbstractTask extends \BetaKiller\Task\AbstractTask
+{
+    /**
+     * @var \BetaKiller\Config\ConfigProviderInterface
+     */
+    private $configProvider;
+
+    /**
+     * @var \BetaKiller\Repository\NotificationGroupRepository
+     */
+    private $groupRepository;
+
+    /**
+     * @var \BetaKiller\Repository\NotificationGroupRepository
+     */
+    private $config;
+
+    /**
+     * ChangePassword constructor.
+     *
+     * @param \BetaKiller\Config\ConfigProviderInterface         $configProvider
+     * @param \BetaKiller\Repository\NotificationGroupRepository $groupRepository
+     */
+    public function __construct(
+        ConfigProviderInterface $configProvider,
+        NotificationGroupRepository $groupRepository
+    ) {
+        $this->configProvider  = $configProvider;
+        $this->groupRepository = $groupRepository;
+
+        parent::__construct();
+    }
+
+    /**
+     * @return array
+     */
+    protected function getConfig(): array
+    {
+        if (!\is_array($this->config)) {
+            $config = $this->configProvider->load(['notificationsGroups']);
+            if (!\is_array($config)) {
+                $config = [];
+            }
+            $this->config = $config;
+        }
+
+        return $this->config;
+    }
+
+    /**
+     * @param string $codename
+     *
+     * @return bool
+     */
+    protected function hasGroupInConfig(string $codename): bool
+    {
+        $config = $this->getConfig();
+
+        return isset($config['groups'][$codename]);
+    }
+
+    /**
+     * @param string $codename
+     *
+     * @return bool
+     */
+    protected function deleteGroup(string $codename): bool
+    {
+        $config = $this->getConfig();
+
+        return isset($config['groups'][$codename]);
+    }
+}
