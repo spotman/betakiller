@@ -4,7 +4,7 @@ namespace BetaKiller\Model;
 
 use BetaKiller\Notification\NotificationException;
 
-class NotificationGroup extends \ORM implements NotificationGroupInterface
+class Group extends \ORM implements GroupInterface
 {
     public const TABLE_NAME              = 'notification_groups';
     public const TABLE_FIELD_CODENAME    = 'codename';
@@ -14,16 +14,20 @@ class NotificationGroup extends \ORM implements NotificationGroupInterface
     {
         $this->_table_name = self::TABLE_NAME;
 
-        $this->has_many([
-            'notification_groups_off2' => [
-                'model'       => 'NotificationGroupUserOff',
-                'foreign_key' => NotificationGroupUserOff::TABLE_FIELD_USER_ID,
+        $this->has_one([
+            'notification_groups'     => [
+                'model'       => 'User',
+                'far_key'     => 'user_id',
+                'through'     => 'notification_groups_users_off',
+                'foreign_key' => 'group_id',
             ],
+        ]);
+        $this->has_many([
             'notification_groups_users_off'     => [
                 'model'       => 'User',
                 'far_key'     => 'user_id',
                 'through'     => 'notification_groups_users_off',
-                'foreign_key' => 'user_id',
+                'foreign_key' => 'group_id',
             ],
         ]);
 
@@ -49,14 +53,6 @@ class NotificationGroup extends \ORM implements NotificationGroupInterface
     /**
      * @return string
      */
-    public function getGroupsOff()
-    {
-        return $this->filter_related('notification_groups_users_off', $this->user)->get_all();
-    }
-
-    /**
-     * @return string
-     */
     public function getCodename(): string
     {
         return $this->get(self::TABLE_FIELD_CODENAME);
@@ -65,10 +61,10 @@ class NotificationGroup extends \ORM implements NotificationGroupInterface
     /**
      * @param string $value
      *
-     * @return \BetaKiller\Model\NotificationGroupInterface
+     * @return \BetaKiller\Model\GroupInterface
      * @throws \BetaKiller\Notification\NotificationException
      */
-    public function setCodename(string $value): NotificationGroupInterface
+    public function setCodename(string $value): GroupInterface
     {
         $value = trim($value);
         if ($value === '') {
@@ -90,9 +86,9 @@ class NotificationGroup extends \ORM implements NotificationGroupInterface
     /**
      * @param string $value
      *
-     * @return \BetaKiller\Model\NotificationGroupInterface
+     * @return \BetaKiller\Model\GroupInterface
      */
-    public function setDescription(string $value): NotificationGroupInterface
+    public function setDescription(string $value): GroupInterface
     {
         $value = trim($value);
         $this->set(self::TABLE_FIELD_DESCRIPTION, $value);

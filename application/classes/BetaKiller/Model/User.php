@@ -22,212 +22,29 @@ class User extends \Model_Auth_User implements UserInterface
             ],
         ]);
 
-//        $this->has_many([
-//            'ulogins'                 => [],
-//            'notification_groups_off' => [
-//                'model'       => 'NotificationGroupUserOff',
-//                'foreign_key' => NotificationGroupUserOff::TABLE_FIELD_USER_ID,
-//            ],
-//        ]);
+        $this->has_many([
+            'ulogins' => [],
+        ]);
 
         $this->load_with(['language']);
 
         parent::configure();
     }
 
-    //==================================================================================================================
-
-    /**
-     * @return NotificationGroupRoleInterface[]
-     */
-    public function getNotificationGroupsAll(): array
-    {
-        $groups = [];
-        foreach ($this->getRolesRelation()->get_all() as $role) {
-            /**
-             * @var \BetaKiller\Model\Role $role
-             */
-            foreach ($role->getNotificationGroups() as $group) {
-                $groups[$group->getGroupId()] = $group;
-            }
-        }
-        $groups = array_values($groups);
-
-        return $groups;
-    }
-
-    /**
-     * @return NotificationGroupUserOffInterface[]
-     */
-    public function getNotificationGroupsOff(): array
-    {
-        $groups = [];
-        foreach ($this->get('notification_groups_off')->get_all() as $group) {
-            $groups[] = $group;
-        }
-
-        return $groups;
-    }
-
-    /**
-     * @return NotificationGroupRoleInterface[]|[]
-     */
-    public function getNotificationGroups()
-    {
-        $groupsAll = $this->getNotificationGroupsAll();
-        if (!$groupsAll) {
-            return [];
-        }
-
-        $groupsOff = $this->getNotificationGroupsOff();
-        if (!$groupsOff) {
-            return $groupsAll;
-        }
-
-        $groupsOffIds = [];
-        foreach ($groupsOff as $group) {
-            $groupsOffIds[] = $group->getGroupId();
-        }
-
-        $groupsResult = [];
-        foreach ($groupsAll as $group) {
-            $groupId = $group->getGroupId();
-            if (\in_array($groupId, $groupsOffIds)) {
-                continue;
-            }
-            $groupsResult[] = $group;
-        }
-
-        return $groupsResult;
-
-        var_dump($all);
-        var_dump($off);
-        exit;
-
-        return $this
-            ->where('')
-            ->get('notification_groups');
-    }
-
-    /**
-     * @return NotificationGroupRoleInterface[]|\Traversable
-     */
-    public function getNotificationGroups2()
-    {
-        return $this->getNotificationGroupsRelation()->get_all();
-    }
-
     /**
      * @return Role
+     * @throws \Kohana_Exception
      */
-    protected function getRolesRelation2(): Role
+    protected function getRolesRelation(): Role
     {
         return $this->get('roles');
     }
 
     /**
-     * @todo Переписать на кешированный ACL ибо слишком затратно делать запрос в БД на проверку роли
-     *
-     * @param RoleInterface|string $role
-     *
-     * @return bool
-     */
-    public function hasRole2(RoleInterface $role): bool
-    {
-        return $this->hasRoleName($role->getName());
-    }
-
-    /**
-     * @param string $role
-     *
-     * @return bool
-     */
-    public function hasRoleName2(string $role): bool
-    {
-        foreach ($this->getAllUserRolesNames() as $name) {
-            if ($role === $name) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Returns true if user has any of provided role assigned
-     *
-     * @param string[] $roles
-     *
-     * @return bool
-     */
-    public function hasAnyOfRolesNames2(array $roles): bool
-    {
-        return (bool)\array_intersect($this->getAllUserRolesNames(), $roles);
-    }
-
-    /**
-     * @param \BetaKiller\Model\RoleInterface|string $role
-     *
-     * @return \BetaKiller\Model\UserInterface
-     */
-    public function addRole2(RoleInterface $role): UserInterface
-    {
-        return $this->add('roles', $role);
-    }
-
-    /**
-     * Get all user`s roles names (include parent roles)
-     *
-     * @return string[]
-     */
-    public function getAllUserRolesNames2(): array
-    {
-        // Caching coz it is very heavy operation without MPTT
-        if (!$this->allUserRolesNames) {
-            $this->allUserRolesNames = $this->fetchAllUserRolesNames();
-        }
-
-        return $this->allUserRolesNames;
-    }
-
-    protected function fetchAllUserRolesNames2(): array
-    {
-        $rolesNames = [];
-
-        foreach ($this->getRolesRelation()->get_all() as $role) {
-            $rolesNames[] = $role->getName();
-
-            /** @var \BetaKiller\Model\RoleInterface $parent */
-            foreach ($role->getAllParents() as $parent) {
-                $rolesNames[] = $parent->getName();
-            }
-        }
-
-        return array_unique($rolesNames);
-    }
-
-    /**
-     * @param string $codename
-     *
-     * @return bool
-     */
-    public function hasNotificationGroupCodename2(string $codename): bool
-    {
-        foreach ($this->getNotificationGroups() as $model) {
-            if ($model->getGroupCodename() === $codename) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    //==================================================================================================================
-
-    /**
      * @param string $value
      *
      * @return \BetaKiller\Model\UserInterface
+     * @throws \Kohana_Exception
      */
     public function setUsername(string $value): UserInterface
     {
@@ -236,6 +53,7 @@ class User extends \Model_Auth_User implements UserInterface
 
     /**
      * @return string
+     * @throws \Kohana_Exception
      */
     public function getUsername(): string
     {
@@ -246,6 +64,7 @@ class User extends \Model_Auth_User implements UserInterface
      * @param string $value
      *
      * @return \BetaKiller\Model\UserInterface
+     * @throws \Kohana_Exception
      */
     public function setPassword(string $value): UserInterface
     {
@@ -254,6 +73,7 @@ class User extends \Model_Auth_User implements UserInterface
 
     /**
      * @return string
+     * @throws \Kohana_Exception
      */
     public function getPassword(): string
     {
@@ -268,16 +88,6 @@ class User extends \Model_Auth_User implements UserInterface
     public function isGuest(): bool
     {
         return ($this instanceof GuestUser);
-    }
-
-    //==================================================================================================================
-
-    /**
-     * @return Role
-     */
-    protected function getRolesRelation(): Role
-    {
-        return $this->get('roles');
     }
 
     /**
@@ -361,12 +171,11 @@ class User extends \Model_Auth_User implements UserInterface
         return array_unique($rolesNames);
     }
 
-    //==================================================================================================================
-
     /**
      * Returns user`s language name
      *
      * @return string|null
+     * @throws \Kohana_Exception
      */
     public function getLanguageName(): ?string
     {
@@ -381,13 +190,12 @@ class User extends \Model_Auth_User implements UserInterface
 
     /**
      * @return \BetaKiller\Model\Language
+     * @throws \Kohana_Exception
      */
     public function getLanguage(): Language
     {
         return $this->get('language');
     }
-
-    //==================================================================================================================
 
     /**
      * Search for user by username or e-mail
@@ -395,6 +203,7 @@ class User extends \Model_Auth_User implements UserInterface
      * @param string $usernameOrEmail
      *
      * @return UserInterface|null
+     * @throws \Kohana_Exception
      */
     public function searchBy(string $usernameOrEmail): ?UserInterface
     {
@@ -410,6 +219,7 @@ class User extends \Model_Auth_User implements UserInterface
 
     /**
      * @throws \BetaKiller\Auth\InactiveException
+     * @throws \Kohana_Exception
      */
     protected function checkIsActive(): void
     {
@@ -421,6 +231,7 @@ class User extends \Model_Auth_User implements UserInterface
 
     /**
      * @throws \BetaKiller\Auth\InactiveException
+     * @throws \Kohana_Exception
      */
     public function afterAutoLogin(): void
     {
@@ -436,6 +247,7 @@ class User extends \Model_Auth_User implements UserInterface
      * Returns TRUE, if user account is switched on
      *
      * @return bool
+     * @throws \Kohana_Exception
      */
     public function isActive(): bool
     {
@@ -500,6 +312,7 @@ class User extends \Model_Auth_User implements UserInterface
      * Возвращает основной номер телефона
      *
      * @return string
+     * @throws \Kohana_Exception
      */
     public function getPhone(): string
     {
@@ -522,11 +335,17 @@ class User extends \Model_Auth_User implements UserInterface
         return false;
     }
 
+    /**
+     * @throws \Kohana_Exception
+     */
     public function enableEmailNotification(): void
     {
         $this->set('notify_by_email', true);
     }
 
+    /**
+     * @throws \Kohana_Exception
+     */
     public function disableEmailNotification(): void
     {
         $this->set('notify_by_email', false);
@@ -546,6 +365,7 @@ class User extends \Model_Auth_User implements UserInterface
 
     /**
      * @return string
+     * @throws \Kohana_Exception
      */
     public function getAccessControlIdentity(): string
     {
@@ -554,6 +374,7 @@ class User extends \Model_Auth_User implements UserInterface
 
     /**
      * @return RoleInterface[]|\Traversable
+     * @throws \Kohana_Exception
      */
     public function getAccessControlRoles()
     {

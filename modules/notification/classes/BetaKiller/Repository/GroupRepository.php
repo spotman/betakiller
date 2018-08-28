@@ -4,27 +4,23 @@ declare(strict_types=1);
 namespace BetaKiller\Repository;
 
 use BetaKiller\Model\ExtendedOrmInterface;
-use BetaKiller\Model\NotificationGroupInterface;
-use BetaKiller\Model\User;
+use BetaKiller\Model\GroupInterface;
 
-/**
- * @method TransactionModelInterface[] findAll(OrmInterface $orm)
- */
-class NotificationGroupRepository extends AbstractOrmBasedRepository
+class GroupRepository extends AbstractOrmBasedRepository
 {
-    protected function configure(): void
-    {
-        $this->_table_name = self::TABLE_NAME;
-
-        parent::configure();
-    }
-
     /**
-     * @return string
+     * @return \BetaKiller\Model\GroupInterface[]
      */
-    public function getGroupsOff()
+    public function getGroupsOff(): array
     {
         $orm = $this->getOrmInstance();
+
+        $user = \ORM::factory('User');
+        echo $user->get_id();
+        $orm->join_related('notification_groups_users_off', 'users');
+        $orm->where(
+            'users.id', '=', '??'
+        );
 
         return $orm->get_all();
     }
@@ -32,7 +28,7 @@ class NotificationGroupRepository extends AbstractOrmBasedRepository
     /**
      * @param int $id
      *
-     * @return \BetaKiller\Model\NotificationGroupInterface|null
+     * @return \BetaKiller\Model\GroupInterface|null
      * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\Repository\RepositoryException
      */
@@ -44,10 +40,10 @@ class NotificationGroupRepository extends AbstractOrmBasedRepository
     /**
      * @param string $codeName
      *
-     * @return \BetaKiller\Model\NotificationGroupInterface|null
+     * @return \BetaKiller\Model\GroupInterface|null
      * @throws \BetaKiller\Factory\FactoryException
      */
-    public function getItemByCodename(string $codeName): ?NotificationGroupInterface
+    public function getItemByCodename(string $codeName): ?GroupInterface
     {
         $orm = $this->getOrmInstance();
 
@@ -57,7 +53,7 @@ class NotificationGroupRepository extends AbstractOrmBasedRepository
     }
 
     /**
-     * @return \BetaKiller\Model\NotificationGroupInterface[]
+     * @return \BetaKiller\Model\GroupInterface[]
      * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\Repository\RepositoryException
      */
@@ -72,7 +68,7 @@ class NotificationGroupRepository extends AbstractOrmBasedRepository
      * @param \BetaKiller\Model\ExtendedOrmInterface $orm
      * @param int                                    $id
      *
-     * @return \BetaKiller\Repository\NotificationGroupRepository
+     * @return \BetaKiller\Repository\GroupRepository
      */
     private function filterById(ExtendedOrmInterface $orm, int $id): self
     {
@@ -85,7 +81,7 @@ class NotificationGroupRepository extends AbstractOrmBasedRepository
      * @param \BetaKiller\Model\ExtendedOrmInterface $orm
      * @param string                                 $codeName
      *
-     * @return \BetaKiller\Repository\NotificationGroupRepository
+     * @return \BetaKiller\Repository\GroupRepository
      */
     private function filterByCodename(ExtendedOrmInterface $orm, string $codeName): self
     {
