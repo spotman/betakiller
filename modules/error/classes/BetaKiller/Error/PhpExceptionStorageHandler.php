@@ -276,21 +276,19 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
      */
     private function sendNotification(\Throwable $subsystemException, \Throwable $originalException): void
     {
-        $message = $this->notificationHelper->createMessage();
+        $message = $this->notificationHelper->createMessage('developer/error/subsystem-failure');
 
-        $message
-            ->setTemplateName('developer/error/subsystem-failure')
-            ->setTemplateData([
-                'url'       => $this->appConfig->getBaseUrl(),
-                'subsystem' => [
-                    'message'    => $this->getExceptionText($subsystemException),
-                    'stacktrace' => $subsystemException->getTraceAsString(),
-                ],
-                'original'  => [
-                    'message'    => $this->getExceptionText($originalException),
-                    'stacktrace' => $originalException->getTraceAsString(),
-                ],
-            ]);
+        $message->setTemplateData([
+            'url'       => $this->appConfig->getBaseUrl(),
+            'subsystem' => [
+                'message'    => $this->getExceptionText($subsystemException),
+                'stacktrace' => $subsystemException->getTraceAsString(),
+            ],
+            'original'  => [
+                'message'    => $this->getExceptionText($originalException),
+                'stacktrace' => $originalException->getTraceAsString(),
+            ],
+        ]);
 
         $this->notificationHelper
             ->toDevelopers($message)

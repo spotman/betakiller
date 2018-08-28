@@ -71,11 +71,11 @@ class NotificationHelper
     }
 
     /**
-     * @param null $name
+     * @param string $name
      *
      * @return \BetaKiller\Notification\NotificationMessageInterface
      */
-    public function createMessage($name = null): NotificationMessageInterface
+    public function createMessage(string $name): NotificationMessageInterface
     {
         return $this->facade->create($name);
     }
@@ -96,6 +96,7 @@ class NotificationHelper
      *
      * @return NotificationHelper
      * @throws \BetaKiller\Repository\RepositoryException
+     * @deprecated Use message-to-group binding
      */
     public function toDevelopers(NotificationMessageInterface $message): self
     {
@@ -111,6 +112,7 @@ class NotificationHelper
      *
      * @return NotificationHelper
      * @throws \BetaKiller\Repository\RepositoryException
+     * @deprecated Use message-to-group binding
      */
     public function toModerators(NotificationMessageInterface $message): self
     {
@@ -160,14 +162,13 @@ class NotificationHelper
      * @param bool|null                                             $inStage
      *
      * @return \BetaKiller\Helper\NotificationHelper
-     * @throws \BetaKiller\Repository\RepositoryException
      */
     public function rewriteTargetsForDebug(NotificationMessageInterface $msg, ?bool $inStage = null): self
     {
         if (!$this->appEnv->inProductionMode($inStage ?? true)) {
             $msg->clearTargets();
 
-            $this->toDevelopers($msg);
+            $this->toCurrentUser($msg);
         }
 
         return $this;
