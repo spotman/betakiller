@@ -23,7 +23,16 @@ class NotificationMessageFactory
         }
 
         // TODO Fetch targets (users) by group
+        /*
+SELECT `g`.*,`r`.`role_id`
+FROM `notification_groups` AS `g`
 
+JOIN `notification_groups_roles` AS `r`
+ON `r`.`group_id`=`g`.`id`
+
+
+WHERE `g`.`codename`="test3" ...
+         */
 
         // TODO Add targets to message via NotificationMessageInterface::addTargetUsers() method
 
