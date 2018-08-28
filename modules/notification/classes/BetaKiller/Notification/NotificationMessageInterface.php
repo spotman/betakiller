@@ -9,6 +9,11 @@ namespace BetaKiller\Notification;
 interface NotificationMessageInterface
 {
     /**
+     * @return string
+     */
+    public function getCodename(): string;
+
+    /**
      * @return NotificationUserInterface
      */
     public function getFrom(): ?NotificationUserInterface;
@@ -67,13 +72,6 @@ interface NotificationMessageInterface
      * @return NotificationMessageInterface
      */
     public function addAttachment(string $path): NotificationMessageInterface;
-
-    /**
-     * @param string $templateName
-     *
-     * @return NotificationMessageInterface
-     */
-    public function setTemplateName(string $templateName): NotificationMessageInterface;
 
     /**
      * @return string

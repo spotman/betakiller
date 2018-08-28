@@ -37,14 +37,17 @@ class NotificationFacade
      * @param \Psr\Log\LoggerInterface                            $logger
      * @param \BetaKiller\Notification\MessageRendererInterface   $renderer
      */
-    public function __construct(NotificationMessageFactory $messageFactory, LoggerInterface $logger, MessageRendererInterface $renderer)
-    {
-        $this->logger   = $logger;
-        $this->renderer = $renderer;
+    public function __construct(
+        NotificationMessageFactory $messageFactory,
+        LoggerInterface $logger,
+        MessageRendererInterface $renderer
+    ) {
+        $this->logger         = $logger;
+        $this->renderer       = $renderer;
         $this->messageFactory = $messageFactory;
     }
 
-    public function create(string $name = null): NotificationMessageInterface
+    public function create(string $name): NotificationMessageInterface
     {
         return $this->messageFactory->create($name);
     }
