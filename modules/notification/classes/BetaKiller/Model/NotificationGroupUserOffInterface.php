@@ -3,8 +3,6 @@ namespace BetaKiller\Model;
 
 interface NotificationGroupUserOffInterface
 {
-    public function rules();
-
     /**
      * @return int
      */

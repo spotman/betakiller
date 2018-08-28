@@ -14,6 +14,21 @@ class NotificationGroup extends \ORM implements NotificationGroupInterface
     {
         $this->_table_name = self::TABLE_NAME;
 
+        $this->has_many([
+            'notification_groups_off2' => [
+                'model'       => 'NotificationGroupUserOff',
+                'foreign_key' => NotificationGroupUserOff::TABLE_FIELD_USER_ID,
+            ],
+            'notification_groups_users_off'     => [
+                'model'       => 'User',
+                'far_key'     => 'user_id',
+                'through'     => 'notification_groups_users_off',
+                'foreign_key' => 'user_id',
+            ],
+        ]);
+
+        $this->load_with(['notification_groups_users_off']);
+
         parent::configure();
     }
 
@@ -32,14 +47,11 @@ class NotificationGroup extends \ORM implements NotificationGroupInterface
     }
 
     /**
-     * @return array[string self::TABLE_FIELD_CODENAME, string self::TABLE_FIELD_DESCRIPTION]
+     * @return string
      */
-    public function getAll(): array
+    public function getGroupsOff()
     {
-        return [
-            self::TABLE_FIELD_CODENAME    => $this->getCodename(),
-            self::TABLE_FIELD_DESCRIPTION => $this->getDescription(),
-        ];
+        return $this->filter_related('notification_groups_users_off', $this->user)->get_all();
     }
 
     /**
