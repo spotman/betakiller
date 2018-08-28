@@ -31,6 +31,7 @@ class Controller_IFace extends Controller
      * @var \BetaKiller\Config\NotificationConfig
      */
     private $notificationConfig;
+
     /**
      * @Inject
      * @var \BetaKiller\Helper\NotificationHelper
@@ -68,7 +69,7 @@ class Controller_IFace extends Controller
 //        var_dump($this->notificationConfig->getGroupRoles('groupCodename4'));
 
         $message = $this->notificationHelper
-            ->createMessage('user/comment/author-approve');
+            ->createMessage('message/codename/1');
 
         exit;
         $this->urlContainer->setQueryParts($this->request->query());
