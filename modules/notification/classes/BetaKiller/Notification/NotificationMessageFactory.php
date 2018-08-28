@@ -8,13 +8,13 @@ class NotificationMessageFactory
      *
      * @return \BetaKiller\Notification\NotificationMessageInterface
      */
-    public function create(string $name = null): NotificationMessageInterface
+    public function create(string $name): NotificationMessageInterface
     {
-        $instance = new NotificationMessage;
+        $instance = new NotificationMessage($name);
 
-        if ($name) {
-            $instance->setTemplateName($name);
-        }
+        // TODO Fetch group by message codename
+        // TODO Fetch targets (users) by group
+        // TODO Add targets to message via NotificationMessageInterface::addTargetUsers() method
 
         return $instance;
     }
