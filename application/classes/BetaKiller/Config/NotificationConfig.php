@@ -1,7 +1,8 @@
 <?php
+declare(strict_types=1);
+
 namespace BetaKiller\Config;
-
-
+ 
 class NotificationConfig extends AbstractConfig implements NotificationConfigInterface
 {
     /**

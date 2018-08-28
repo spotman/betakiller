@@ -1,7 +1,6 @@
 <?php
 namespace BetaKiller\Helper;
 
-use BetaKiller\Config\NotificationConfigInterface;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Notification\NotificationFacade;
 use BetaKiller\Notification\NotificationMessageInterface;
@@ -31,43 +30,23 @@ class NotificationHelper
     private $userService;
 
     /**
-     * @var \BetaKiller\Config\NotificationConfigInterface
-     */
-    private $notificationConfig;
-
-    /**
      * NotificationHelper constructor.
      *
-     * @param \BetaKiller\Notification\NotificationFacade    $facade
-     * @param \BetaKiller\Model\UserInterface                $user
-     * @param \BetaKiller\Helper\AppEnvInterface             $env
-     * @param \BetaKiller\Service\UserService                $userService
-     * @param \BetaKiller\Config\NotificationConfigInterface $notificationConfig
+     * @param \BetaKiller\Notification\NotificationFacade $facade
+     * @param \BetaKiller\Model\UserInterface             $user
+     * @param \BetaKiller\Helper\AppEnvInterface          $env
+     * @param \BetaKiller\Service\UserService             $userService
      */
     public function __construct(
         NotificationFacade $facade,
         UserInterface $user,
         AppEnvInterface $env,
-        UserService $userService,
-        NotificationConfigInterface $notificationConfig
+        UserService $userService
     ) {
-        $this->facade             = $facade;
-        $this->user               = $user;
-        $this->appEnv             = $env;
-        $this->userService        = $userService;
-        $this->notificationConfig = $notificationConfig;
-    }
-
-    /**
-     * @param string $messageCodename
-     *
-     * @return string
-     */
-    public function getGroupCodename(string $messageCodename): string
-    {
-        $groupCodename = $this->notificationConfig->getMessageGroup($messageCodename);
-        var_dump($groupCodename);
-        exit;
+        $this->facade      = $facade;
+        $this->user        = $user;
+        $this->appEnv      = $env;
+        $this->userService = $userService;
     }
 
     /**
