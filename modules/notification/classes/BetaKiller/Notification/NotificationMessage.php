@@ -9,6 +9,11 @@ namespace BetaKiller\Notification;
 class NotificationMessage implements NotificationMessageInterface
 {
     /**
+     * @var string
+     */
+    private $codename;
+
+    /**
      * @var NotificationUserInterface
      */
     private $from;
@@ -29,18 +34,30 @@ class NotificationMessage implements NotificationMessageInterface
     private $attachments = [];
 
     /**
-     * Template codename
-     *
-     * @var string
-     */
-    private $templateName;
-
-    /**
      * Key => value bindings for template
      *
      * @var array
      */
     private $templateData = [];
+
+    /**
+     * NotificationMessage constructor.
+     *
+     * @param string $codename
+     */
+    public function __construct(string $codename)
+    {
+        // TODO Sanitize and replace "_" with "/"
+        $this->codename = $codename;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCodename(): string
+    {
+        return $this->codename;
+    }
 
     /**
      * @return NotificationUserInterface
@@ -197,23 +214,11 @@ class NotificationMessage implements NotificationMessageInterface
     }
 
     /**
-     * @param $templateName
-     *
-     * @return NotificationMessageInterface
-     */
-    public function setTemplateName(string $templateName): NotificationMessageInterface
-    {
-        $this->templateName = $templateName;
-
-        return $this;
-    }
-
-    /**
      * @return string
      */
     public function getTemplateName(): string
     {
-        return $this->templateName;
+        return $this->codename;
     }
 
     /**

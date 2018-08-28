@@ -50,11 +50,11 @@ class NotificationHelper
     }
 
     /**
-     * @param null $name
+     * @param string $name
      *
      * @return \BetaKiller\Notification\NotificationMessageInterface
      */
-    public function createMessage($name = null): NotificationMessageInterface
+    public function createMessage(string $name): NotificationMessageInterface
     {
         return $this->facade->create($name);
     }
