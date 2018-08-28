@@ -5,7 +5,7 @@ namespace BetaKiller\Model;
 
 use BetaKiller\Notification\NotificationException;
 
-class Group extends \ORM implements GroupInterface
+class NotificationGroup extends \ORM implements NotificationGroupInterface
 {
     public const TABLE_NAME              = 'notification_groups';
     public const TABLE_FIELD_CODENAME    = 'codename';
@@ -15,24 +15,16 @@ class Group extends \ORM implements GroupInterface
     {
         $this->_table_name = self::TABLE_NAME;
 
-        $this->has_one([
-            'notification_groups'     => [
-                'model'       => 'User',
-                'far_key'     => 'user_id',
-                'through'     => 'notification_groups_users_off',
-                'foreign_key' => 'group_id',
-            ],
-        ]);
         $this->has_many([
-            'notification_groups_users_off'     => [
+            'group_users'     => [
                 'model'       => 'User',
                 'far_key'     => 'user_id',
                 'through'     => 'notification_groups_users_off',
-                'foreign_key' => 'group_id',
+                'foreign_key' => 'user_id',
             ],
         ]);
 
-        $this->load_with(['notification_groups_users_off']);
+//        $this->load_with(['group_users']);
 
         parent::configure();
     }
@@ -62,10 +54,10 @@ class Group extends \ORM implements GroupInterface
     /**
      * @param string $value
      *
-     * @return \BetaKiller\Model\GroupInterface
+     * @return \BetaKiller\Model\NotificationGroupInterface
      * @throws \BetaKiller\Notification\NotificationException
      */
-    public function setCodename(string $value): GroupInterface
+    public function setCodename(string $value): NotificationGroupInterface
     {
         $value = trim($value);
         if ($value === '') {
@@ -87,9 +79,9 @@ class Group extends \ORM implements GroupInterface
     /**
      * @param string $value
      *
-     * @return \BetaKiller\Model\GroupInterface
+     * @return \BetaKiller\Model\NotificationGroupInterface
      */
-    public function setDescription(string $value): GroupInterface
+    public function setDescription(string $value): NotificationGroupInterface
     {
         $value = trim($value);
         $this->set(self::TABLE_FIELD_DESCRIPTION, $value);

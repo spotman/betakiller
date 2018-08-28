@@ -89,7 +89,7 @@ class Assets
             }
         }
 
-        return $this->config->asArray();
+        return $this->config->as_array();
     }
 
     /**
