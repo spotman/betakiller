@@ -3,7 +3,7 @@ declare(strict_types=1);
 namespace BetaKiller\Task\NotificationsGroups;
 
 use BetaKiller\Config\ConfigProviderInterface;
-use BetaKiller\Repository\NotificationGroupRepository;
+use BetaKiller\Repository\GroupRepository;
 
 abstract class AbstractTask extends \BetaKiller\Task\AbstractTask
 {
@@ -13,24 +13,24 @@ abstract class AbstractTask extends \BetaKiller\Task\AbstractTask
     private $configProvider;
 
     /**
-     * @var \BetaKiller\Repository\NotificationGroupRepository
+     * @var \BetaKiller\Repository\GroupRepository
      */
     private $groupRepository;
 
     /**
-     * @var \BetaKiller\Repository\NotificationGroupRepository
+     * @var \BetaKiller\Repository\GroupRepository
      */
     private $config;
 
     /**
      * ChangePassword constructor.
      *
-     * @param \BetaKiller\Config\ConfigProviderInterface         $configProvider
-     * @param \BetaKiller\Repository\NotificationGroupRepository $groupRepository
+     * @param \BetaKiller\Config\ConfigProviderInterface $configProvider
+     * @param \BetaKiller\Repository\GroupRepository     $groupRepository
      */
     public function __construct(
         ConfigProviderInterface $configProvider,
-        NotificationGroupRepository $groupRepository
+        GroupRepository $groupRepository
     ) {
         $this->configProvider  = $configProvider;
         $this->groupRepository = $groupRepository;

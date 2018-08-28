@@ -42,12 +42,22 @@ interface RoleInterface extends AbstractEntityInterface, AclRoleInterface, Multi
     public const GUEST_ROLE_NAME = 'guest';
 
     /**
+     *
+     */
+    public const EMPLOYER_ROLE_NAME = 'employer';
+
+    /**
+     *
+     */
+    public const APPLICANT_ROLE_NAME = 'applicant';
+
+    /**
+     *
+     */
+    public const SCOUT_ROLE_NAME = 'scout';
+
+    /**
      * @return string
      */
     public function getName(): string;
-
-    /**
-     * @return NotificationGroupRoleInterface[]|\Traversable
-     */
-    public function getNotificationGroups();
 }

@@ -1,0 +1,29 @@
+<?php
+namespace BetaKiller\Config;
+
+interface NotificationConfigInterface
+{
+    public const CONFIG_GROUP_NAME  = 'notifications';
+    public const PATH_GROUPS        = ['groups'];
+    public const PATH_GROUP_ROLES   = ['groups', 'groupCodename' => ''];
+    public const PATH_MESSAGE_GROUP = ['messages', 'messageCodename' => '', 'group'];
+
+    /**
+     * @return array
+     */
+    public function getGroups(): array;
+
+    /**
+     * @param string $groupCodename
+     *
+     * @return array
+     */
+    public function getGroupRoles($groupCodename): array;
+
+    /**
+     * @param string $messageCodename
+     *
+     * @return string
+     */
+    public function getMessageGroup($messageCodename): string;
+}
