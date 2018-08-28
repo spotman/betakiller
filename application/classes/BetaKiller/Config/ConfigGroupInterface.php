@@ -7,7 +7,7 @@ interface ConfigGroupInterface
     /**
      * @return array
      */
-    public function asArray(): array;
+    public function as_array();
 
     /**
      * @param string $key

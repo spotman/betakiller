@@ -1,8 +1,35 @@
 <?php
 namespace BetaKiller\Notification;
 
+use BetaKiller\Config\NotificationConfig;
+use BetaKiller\Repository\NotificationGroupRepository;
+
 class NotificationMessageFactory
 {
+    /**
+     * @var \BetaKiller\Config\NotificationConfigInterface
+     */
+    private $notificationConfig;
+
+    /**
+     * @var \BetaKiller\Repository\NotificationGroupRepository
+     */
+    private $groupRepository;
+
+    /**
+     * NotificationMessageFactory constructor.
+     *
+     * @param \BetaKiller\Config\NotificationConfig              $notificationConfig
+     * @param \BetaKiller\Repository\NotificationGroupRepository $groupRepository
+     */
+    public function __construct(
+        NotificationConfig $notificationConfig,
+        NotificationGroupRepository $groupRepository
+    ) {
+        $this->notificationConfig = $notificationConfig;
+        $this->groupRepository    = $groupRepository;
+    }
+
     /**
      * @param string|null $name
      *
@@ -23,16 +50,12 @@ class NotificationMessageFactory
         }
 
         // TODO Fetch targets (users) by group
-        /*
-SELECT `g`.*,`r`.`role_id`
-FROM `notification_groups` AS `g`
-
-JOIN `notification_groups_roles` AS `r`
-ON `r`.`group_id`=`g`.`id`
-
-
-WHERE `g`.`codename`="test3" ...
-         */
+        $users = $this->groupRepository->getGroupUsers($groupCodename);
+//        foreach ($users as $user) {
+//            var_dump($user);
+//        }
+        var_dump($users);
+        exit;
 
         // TODO Add targets to message via NotificationMessageInterface::addTargetUsers() method
 
@@ -46,8 +69,6 @@ WHERE `g`.`codename`="test3" ...
      */
     protected function getGroupCodename(string $messageCodename): string
     {
-//        $groupCodename = $this->notificationConfig->getMessageGroup($messageCodename);
-//        var_dump($groupCodename);
-//        exit;
+        return $this->notificationConfig->getMessageGroup($messageCodename);
     }
 }

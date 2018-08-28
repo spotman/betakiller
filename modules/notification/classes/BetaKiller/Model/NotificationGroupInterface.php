@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\Model;
 
-interface GroupInterface
+interface NotificationGroupInterface
 {
     public const GROUP_CODENAME1 = 'groupCodename1';
     public const GROUP_CODENAME2 = 'groupCodename2';
@@ -19,9 +19,9 @@ interface GroupInterface
     /**
      * @param string $value
      *
-     * @return \BetaKiller\Model\GroupInterface
+     * @return \BetaKiller\Model\NotificationGroupInterface
      */
-    public function setCodename(string $value): GroupInterface;
+    public function setCodename(string $value): NotificationGroupInterface;
 
     /**
      * @return string
@@ -31,7 +31,7 @@ interface GroupInterface
     /**
      * @param string $value
      *
-     * @return \BetaKiller\Model\GroupInterface
+     * @return \BetaKiller\Model\NotificationGroupInterface
      */
-    public function setDescription(string $value): GroupInterface;
+    public function setDescription(string $value): NotificationGroupInterface;
 }
