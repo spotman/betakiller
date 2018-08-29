@@ -51,14 +51,8 @@ class NotificationMessageFactory
 
         // TODO Fetch targets (users) by group
         $users = $this->groupRepository->getGroupUsers($groupCodename);
-//        foreach ($users as $user) {
-//            var_dump($user);
-//        }
-        var_dump($users);
-        exit;
 
         // TODO Add targets to message via NotificationMessageInterface::addTargetUsers() method
-
         return $instance;
     }
 
