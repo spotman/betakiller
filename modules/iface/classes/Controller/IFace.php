@@ -27,18 +27,6 @@ class Controller_IFace extends Controller
     private $urlContainer;
 
     /**
-     * @Inject
-     * @var \BetaKiller\Config\NotificationConfig
-     */
-    private $notificationConfig;
-
-    /**
-     * @Inject
-     * @var \BetaKiller\Helper\NotificationHelper
-     */
-    private $notificationHelper;
-
-    /**
      * @deprecated
      * @throws \BetaKiller\Auth\AccessDeniedException
      * @throws \BetaKiller\Auth\AuthorizationRequiredException
@@ -66,12 +54,6 @@ class Controller_IFace extends Controller
      */
     public function actionRender(): void
     {
-//        var_dump($this->notificationConfig->getGroupRoles('groupCodename4'));
-
-        $message = $this->notificationHelper
-            ->createMessage('message/codename/1');
-
-        exit;
         $this->urlContainer->setQueryParts($this->request->query());
 
         $urlElement   = $this->urlDispatcher->process(
