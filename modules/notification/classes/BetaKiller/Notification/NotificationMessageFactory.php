@@ -31,28 +31,33 @@ class NotificationMessageFactory
     }
 
     /**
-     * @param string|null $name
+     * @param string $name
      *
      * @return \BetaKiller\Notification\NotificationMessageInterface
+     * @throws \BetaKiller\Exception
+     * @throws \BetaKiller\Factory\FactoryException
+     * @throws \BetaKiller\Notification\NotificationException
      */
     public function create(string $name): NotificationMessageInterface
     {
         $instance = new NotificationMessage($name);
 
-        // TODO Fetch group by message codename
+        // Fetch group by message codename
         $groupCodename = $this->getGroupCodename($name);
         if (!$groupCodename) {
             throw new NotificationException(
-                'Not found group codename by message code name :messageCodename', [
+                'Not found group codename by message codename ":messageCodename"', [
                     'messageCodename' => $name,
                 ]
             );
         }
 
-        // TODO Fetch targets (users) by group
+        // Fetch targets (users) by group
         $users = $this->groupRepository->getGroupUsers($groupCodename);
 
-        // TODO Add targets to message via NotificationMessageInterface::addTargetUsers() method
+        // Add targets to message
+        $instance->addTargetUsers($users);
+
         return $instance;
     }
 
