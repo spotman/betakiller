@@ -32,8 +32,6 @@ class NotificationGroupRepository extends AbstractOrmBasedRepository
          */
         $items = $this->getOrmInstance()
             ->get('group_users')
-//            ->join('users')
-//            ->on('users.id', '>', 0)
             ->join('roles_users', 'left')
             ->on('roles_users.user_id', '=', 'user.id')
             ->join('notification_groups_roles', 'left')
