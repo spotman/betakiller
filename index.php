@@ -118,6 +118,11 @@ try {
         : false;
 
     $message = $e->getMessage().PHP_EOL.PHP_EOL.$e->getTraceAsString();
+    $previous = $e->getPrevious();
+
+    if ($previous) {
+        $message .= PHP_EOL.$previous->getMessage().PHP_EOL.PHP_EOL.$previous->getTraceAsString();
+    }
 
     if ($inDev) {
         // Show to dev

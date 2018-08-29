@@ -32,6 +32,12 @@ class CliFormatter extends ColoredLineFormatter
 
         if ($this->isDebugEnabled && $exception) {
             $output .= $exception->getTraceAsString();
+
+            $previous = $exception->getPrevious();
+
+            if ($previous) {
+                $output .= PHP_EOL.PHP_EOL.$previous->getTraceAsString();
+            }
         }
 
         return $output;
