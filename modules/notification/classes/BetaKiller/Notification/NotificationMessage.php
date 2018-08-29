@@ -8,6 +8,9 @@ namespace BetaKiller\Notification;
  */
 class NotificationMessage implements NotificationMessageInterface
 {
+    private const CODENAME_TEMPLATE = 'a-z-/';
+
+
     /**
      * @var string
      */
@@ -41,14 +44,37 @@ class NotificationMessage implements NotificationMessageInterface
     private $templateData = [];
 
     /**
-     * NotificationMessage constructor.
-     *
      * @param string $codename
+     *
+     * @throws \BetaKiller\Notification\NotificationException
      */
     public function __construct(string $codename)
     {
-        // TODO Sanitize and replace "_" with "/"
-        $this->codename = $codename;
+        $this->codename = $this->normalizeCodename($codename);
+    }
+
+    /**
+     * @param string $codename
+     *
+     * @return string
+     * @throws \BetaKiller\Notification\NotificationException
+     */
+    private function normalizeCodename(string $codename): string
+    {
+        $codename         = strtolower(trim($codename));
+        $codenameTemplate = self::CODENAME_TEMPLATE;
+        $codenamePattern  = str_replace('/', '\/', $codenameTemplate);
+        preg_match('/[^'.$codenamePattern.']/', $codename, $isCodenameInvalid);
+        if ($isCodenameInvalid) {
+            throw new NotificationException(
+                'Codename ":messageCodename" is invalid. Valid codename template: :codenameTemplate', [
+                    'messageCodename'  => $codename,
+                    'codenameTemplate' => $codenameTemplate,
+                ]
+            );
+        }
+
+        return $codename;
     }
 
     /**

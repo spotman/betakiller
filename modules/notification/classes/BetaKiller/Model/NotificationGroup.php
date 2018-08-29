@@ -16,13 +16,11 @@ class NotificationGroup extends \ORM implements NotificationGroupInterface
         $this->_table_name = self::TABLE_NAME;
 
         $this->belongs_to([
-            'group_users'     => [
+            'users'     => [
                 'model'       => 'User',
                 'foreign_key' => 'id',
             ],
         ]);
-
-//        $this->load_with(['group_users']);
 
         parent::configure();
     }
