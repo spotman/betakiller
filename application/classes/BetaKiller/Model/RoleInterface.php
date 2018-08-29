@@ -3,7 +3,7 @@ namespace BetaKiller\Model;
 
 use Spotman\Acl\AclRoleInterface;
 
-interface RoleInterface extends AbstractEntityInterface, AclRoleInterface, MultipleParentsTreeModelInterface
+interface RoleInterface extends AbstractEntityInterface, AclRoleInterface, MultipleParentsTreeModelInterface, ExtendedOrmInterface
 {
     public const URL_KEY = 'name';
 

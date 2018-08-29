@@ -4,7 +4,9 @@ declare(strict_types=1);
 namespace BetaKiller\Repository;
 
 use BetaKiller\Model\ExtendedOrmInterface;
+use BetaKiller\Model\NotificationGroup;
 use BetaKiller\Model\NotificationGroupInterface;
+use BetaKiller\Model\NotificationGroupRole;
 
 class NotificationGroupRepository extends AbstractOrmBasedRepository
 {
@@ -37,15 +39,39 @@ class NotificationGroupRepository extends AbstractOrmBasedRepository
         return $this->getOrmInstance()
             ->get('users')
             ->join_related('roles', 'roles')
-            ->join('notification_groups_roles', 'left')
-            ->on('notification_groups_roles.role_id', '=', 'roles.id')
-            ->join('notification_groups_users_off', 'left')
-            ->on('notification_groups_users_off.group_id', '=', 'notification_groups_roles.group_id')
-            ->on('notification_groups_users_off.user_id', '=', 'user.id')
-            ->join('notification_groups', 'left')
-            ->on('notification_groups.id', '=', 'notification_groups_roles.group_id')
-            ->where('notification_groups.codename', '=', $groupCodename)
-            ->where('notification_groups_users_off.user_id', 'IS', null)
+            ->join(NotificationGroupRole::TABLE_NAME, 'left')
+            ->on(
+                NotificationGroupRole::TABLE_NAME.'.'.NotificationGroupRole::TABLE_FIELD_ROLE_ID,
+                '=',
+                'roles.id'
+            )
+            ->join(NotificationGroup::USERS_OFF_TABLE_NAME, 'left')
+            ->on(
+                NotificationGroup::USERS_OFF_TABLE_NAME.'.'.NotificationGroup::USERS_OFF_TABLE_FIELD_GROUP_ID,
+                '=',
+                NotificationGroupRole::TABLE_NAME.'.'.NotificationGroupRole::TABLE_FIELD_GROUP_ID
+            )
+            ->on(
+                NotificationGroup::USERS_OFF_TABLE_NAME.'.'.NotificationGroup::USERS_OFF_TABLE_FIELD_GROUP_ID,
+                '=',
+                'user.id'
+            )
+            ->join(NotificationGroup::TABLE_NAME, 'left')
+            ->on(
+                NotificationGroup::TABLE_NAME.'.id',
+                '=',
+                NotificationGroupRole::TABLE_NAME.'.'.NotificationGroupRole::TABLE_FIELD_GROUP_ID
+            )
+            ->where(
+                NotificationGroup::TABLE_NAME.'.'.NotificationGroup::TABLE_FIELD_CODENAME,
+                '=',
+                $groupCodename
+            )
+            ->where(
+                NotificationGroup::USERS_OFF_TABLE_NAME.'.'.NotificationGroup::USERS_OFF_TABLE_FIELD_USER_ID,
+                'IS',
+                null
+            )
             ->group_by_primary_key()
             ->get_all();
     }
@@ -56,7 +82,7 @@ class NotificationGroupRepository extends AbstractOrmBasedRepository
      * @return \BetaKiller\Model\NotificationGroupInterface|null
      * @throws \BetaKiller\Factory\FactoryException
      */
-    public function getItemByCodename(string $codeName): ?NotificationGroupInterface
+    public function getByCodename(string $codeName): ?NotificationGroupInterface
     {
         $orm = $this->getOrmInstance();
 

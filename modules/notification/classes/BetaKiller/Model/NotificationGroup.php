@@ -3,20 +3,22 @@ declare(strict_types=1);
 
 namespace BetaKiller\Model;
 
-use BetaKiller\Notification\NotificationException;
-
 class NotificationGroup extends \ORM implements NotificationGroupInterface
 {
     public const TABLE_NAME              = 'notification_groups';
     public const TABLE_FIELD_CODENAME    = 'codename';
     public const TABLE_FIELD_DESCRIPTION = 'description';
 
+    public const USERS_OFF_TABLE_NAME           = 'notification_groups_users_off';
+    public const USERS_OFF_TABLE_FIELD_GROUP_ID = 'group_id';
+    public const USERS_OFF_TABLE_FIELD_USER_ID  = 'user_id';
+
     protected function configure(): void
     {
         $this->_table_name = self::TABLE_NAME;
 
         $this->belongs_to([
-            'users'     => [
+            'users' => [
                 'model'       => 'User',
                 'foreign_key' => 'id',
             ],
@@ -28,12 +30,12 @@ class NotificationGroup extends \ORM implements NotificationGroupInterface
     public function rules(): array
     {
         return [
-            'codename'    => [
+            self::TABLE_FIELD_CODENAME    => [
                 ['not_empty'],
                 ['min_length', [':value', 4]],
                 ['max_length', [':value', 32]],
             ],
-            'description' => [
+            self::TABLE_FIELD_DESCRIPTION => [
                 ['max_length', [':value', 255]],
             ],
         ];
@@ -51,14 +53,10 @@ class NotificationGroup extends \ORM implements NotificationGroupInterface
      * @param string $value
      *
      * @return \BetaKiller\Model\NotificationGroupInterface
-     * @throws \BetaKiller\Notification\NotificationException
      */
     public function setCodename(string $value): NotificationGroupInterface
     {
         $value = trim($value);
-        if ($value === '') {
-            throw new NotificationException('Codename cant not be empty');
-        }
         $this->set(self::TABLE_FIELD_CODENAME, $value);
 
         return $this;
