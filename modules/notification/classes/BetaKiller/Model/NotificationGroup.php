@@ -9,10 +9,6 @@ class NotificationGroup extends \ORM implements NotificationGroupInterface
     public const TABLE_FIELD_CODENAME    = 'codename';
     public const TABLE_FIELD_DESCRIPTION = 'description';
 
-    public const USERS_OFF_TABLE_NAME           = 'notification_groups_users_off';
-    public const USERS_OFF_TABLE_FIELD_GROUP_ID = 'group_id';
-    public const USERS_OFF_TABLE_FIELD_USER_ID  = 'user_id';
-
     protected function configure(): void
     {
         $this->_table_name = self::TABLE_NAME;
