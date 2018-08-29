@@ -77,6 +77,63 @@ class NotificationGroupRepository extends AbstractOrmBasedRepository
     }
 
     /**
+     * @param array $rolesIds
+     *
+     * @return array
+     * @throws \BetaKiller\Factory\FactoryException
+     */
+    public function getRolesGroups(array $rolesIds): array
+    {
+        return $this
+            ->getOrmInstance()
+            ->join_related('roles', 'roles')
+            ->where(
+                'roles'.'.'.NotificationGroupRole::TABLE_FIELD_ROLE_ID,
+                'IN',
+                $rolesIds
+            )
+            ->group_by_primary_key()
+            ->get_all();
+    }
+
+    /**
+     * @param array $rolesIds
+     * @param int   $userId
+     *
+     * @return array
+     * @throws \BetaKiller\Factory\FactoryException
+     */
+    public function getRolesGroupsActive(array $rolesIds, int $userId): array
+    {
+        return $this
+            ->getOrmInstance()
+            ->join_related('roles', 'roles')
+            ->join(NotificationGroup::USERS_OFF_TABLE_NAME, 'left')
+            ->on(
+                NotificationGroup::USERS_OFF_TABLE_NAME.'.'.NotificationGroup::USERS_OFF_TABLE_FIELD_GROUP_ID,
+                '=',
+                'roles'.'.'.NotificationGroupRole::TABLE_FIELD_GROUP_ID
+            )
+            ->on(
+                NotificationGroup::USERS_OFF_TABLE_NAME.'.'.NotificationGroup::USERS_OFF_TABLE_FIELD_USER_ID,
+                '=',
+                \DB::expr($userId)
+            )
+            ->where(
+                'roles'.'.'.NotificationGroupRole::TABLE_FIELD_ROLE_ID,
+                'IN',
+                $rolesIds
+            )
+            ->where(
+                NotificationGroup::USERS_OFF_TABLE_NAME.'.'.NotificationGroup::USERS_OFF_TABLE_FIELD_USER_ID,
+                'IS',
+                null
+            )
+            ->group_by_primary_key()
+            ->get_all();
+    }
+
+    /**
      * @param string $codeName
      *
      * @return \BetaKiller\Model\NotificationGroupInterface|null

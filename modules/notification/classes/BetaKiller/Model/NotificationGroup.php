@@ -24,6 +24,13 @@ class NotificationGroup extends \ORM implements NotificationGroupInterface
             ],
         ]);
 
+        $this->has_many([
+            'roles' => [
+                'model'       => 'NotificationGroupRole',
+                'foreign_key' => 'group_id',
+            ],
+        ]);
+
         parent::configure();
     }
 
