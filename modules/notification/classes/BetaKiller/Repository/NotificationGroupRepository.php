@@ -7,6 +7,7 @@ use BetaKiller\Model\ExtendedOrmInterface;
 use BetaKiller\Model\NotificationGroup;
 use BetaKiller\Model\NotificationGroupInterface;
 use BetaKiller\Model\NotificationGroupRole;
+use BetaKiller\Model\NotificationGroupUserOff;
 
 class NotificationGroupRepository extends AbstractOrmBasedRepository
 {
@@ -36,8 +37,10 @@ class NotificationGroupRepository extends AbstractOrmBasedRepository
         AND `notification_groups_users_off`.`user_id` IS NULL
         GROUP BY `user`.`id`
          */
-        return $this->getOrmInstance()
-            ->get('users')
+        $orm             = $this->getOrmInstance()->get('users');
+        $usersTableAlias = $orm->object_name();
+
+        return $orm
             ->join_related('roles', 'roles')
             ->join(NotificationGroupRole::TABLE_NAME, 'left')
             ->on(
@@ -45,16 +48,16 @@ class NotificationGroupRepository extends AbstractOrmBasedRepository
                 '=',
                 'roles.id'
             )
-            ->join(NotificationGroup::USERS_OFF_TABLE_NAME, 'left')
+            ->join(NotificationGroupUserOff::TABLE_NAME, 'left')
             ->on(
-                NotificationGroup::USERS_OFF_TABLE_NAME.'.'.NotificationGroup::USERS_OFF_TABLE_FIELD_GROUP_ID,
+                NotificationGroupUserOff::TABLE_NAME.'.'.NotificationGroupUserOff::TABLE_FIELD_GROUP_ID,
                 '=',
                 NotificationGroupRole::TABLE_NAME.'.'.NotificationGroupRole::TABLE_FIELD_GROUP_ID
             )
             ->on(
-                NotificationGroup::USERS_OFF_TABLE_NAME.'.'.NotificationGroup::USERS_OFF_TABLE_FIELD_GROUP_ID,
+                NotificationGroupUserOff::TABLE_NAME.'.'.NotificationGroupUserOff::TABLE_FIELD_GROUP_ID,
                 '=',
-                'user.id'
+                $usersTableAlias.'.id'
             )
             ->join(NotificationGroup::TABLE_NAME, 'left')
             ->on(
@@ -68,7 +71,7 @@ class NotificationGroupRepository extends AbstractOrmBasedRepository
                 $groupCodename
             )
             ->where(
-                NotificationGroup::USERS_OFF_TABLE_NAME.'.'.NotificationGroup::USERS_OFF_TABLE_FIELD_USER_ID,
+                NotificationGroupUserOff::TABLE_NAME.'.'.NotificationGroupUserOff::TABLE_FIELD_USER_ID,
                 'IS',
                 null
             )
@@ -108,14 +111,14 @@ class NotificationGroupRepository extends AbstractOrmBasedRepository
         return $this
             ->getOrmInstance()
             ->join_related('roles', 'roles')
-            ->join(NotificationGroup::USERS_OFF_TABLE_NAME, 'left')
+            ->join(NotificationGroupUserOff::TABLE_NAME, 'left')
             ->on(
-                NotificationGroup::USERS_OFF_TABLE_NAME.'.'.NotificationGroup::USERS_OFF_TABLE_FIELD_GROUP_ID,
+                NotificationGroupUserOff::TABLE_NAME.'.'.NotificationGroupUserOff::TABLE_FIELD_GROUP_ID,
                 '=',
                 'roles'.'.'.NotificationGroupRole::TABLE_FIELD_GROUP_ID
             )
             ->on(
-                NotificationGroup::USERS_OFF_TABLE_NAME.'.'.NotificationGroup::USERS_OFF_TABLE_FIELD_USER_ID,
+                NotificationGroupUserOff::TABLE_NAME.'.'.NotificationGroupUserOff::TABLE_FIELD_USER_ID,
                 '=',
                 \DB::expr($userId)
             )
@@ -125,7 +128,7 @@ class NotificationGroupRepository extends AbstractOrmBasedRepository
                 $rolesIds
             )
             ->where(
-                NotificationGroup::USERS_OFF_TABLE_NAME.'.'.NotificationGroup::USERS_OFF_TABLE_FIELD_USER_ID,
+                NotificationGroupUserOff::TABLE_NAME.'.'.NotificationGroupUserOff::TABLE_FIELD_USER_ID,
                 'IS',
                 null
             )
