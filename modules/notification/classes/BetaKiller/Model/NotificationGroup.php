@@ -18,8 +18,6 @@ class NotificationGroup extends \ORM implements NotificationGroupInterface
         $this->belongs_to([
             'group_users'     => [
                 'model'       => 'User',
-//                'far_key'     => 'user_id',
-//                'through'     => 'notification_groups_users_off',
                 'foreign_key' => 'id',
             ],
         ]);
