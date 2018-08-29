@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\Model;
 
-interface NotificationGroupInterface
+interface NotificationGroupInterface extends ExtendedOrmInterface
 {
     public const GROUP_CODENAME1 = 'groupCodename1';
     public const GROUP_CODENAME2 = 'groupCodename2';
