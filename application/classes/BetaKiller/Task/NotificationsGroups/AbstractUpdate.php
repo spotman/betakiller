@@ -5,7 +5,8 @@ namespace BetaKiller\Task\NotificationsGroups;
 
 use BetaKiller\Config\NotificationConfig;
 use BetaKiller\Model\NotificationGroup;
-use BetaKiller\Model\NotificationGroupRole;
+use BetaKiller\Model\NotificationGroupInterface;
+use BetaKiller\Model\RoleInterface;
 use BetaKiller\Repository\NotificationGroupRepository;
 use BetaKiller\Repository\RoleRepository;
 use BetaKiller\Task\AbstractTask;
@@ -47,21 +48,27 @@ abstract class AbstractUpdate extends AbstractTask
     }
 
     /**
-     * @return array
-     */
-    protected function getGroupsFromConfig(): array
-    {
-        return $this->notificationConfig->getGroups();
-    }
-
-    /**
      * @param string $groupCodename
      *
      * @return bool
      */
     protected function hasGroupCodenameInConfig(string $groupCodename): bool
     {
-        return \in_array($groupCodename, $this->getGroupsFromConfig(), true);
+        return \in_array($groupCodename, $this->getGroupsCodenamesFromConfig(), true);
+    }
+
+    /**
+     * @return array
+     */
+    protected function getGroupsCodenamesFromConfig(): array
+    {
+        $codenames = $this->notificationConfig->getGroups();
+        $models    = [];
+        foreach ($codenames as $codename) {
+            $models[] = $codename;
+        }
+
+        return $models;
     }
 
     /**
@@ -69,48 +76,36 @@ abstract class AbstractUpdate extends AbstractTask
      *
      * @return array
      */
-    protected function getGroupRolesFromConfig(string $groupCodename): array
+    protected function getGroupRolesCodenamesFromConfig(string $groupCodename): array
     {
-        return $this->notificationConfig->getGroupRoles($groupCodename);
+        $codenames = $this->notificationConfig->getGroupRoles($groupCodename);
+        $models    = [];
+        foreach ($codenames as $codename) {
+            $models[] = $codename;
+        }
+
+        return $models;
+    }
+
+    /**
+     * @param string $codename
+     *
+     * @return \BetaKiller\Model\NotificationGroupInterface
+     */
+    protected function createGroupModel(string $codename): NotificationGroupInterface
+    {
+        return (new NotificationGroup())->setCodename($codename);
     }
 
     /**
      * @param string $groupCodename
      *
-     * @return int
+     * @return \BetaKiller\Model\NotificationGroupInterface|null
+     * @throws \BetaKiller\Factory\FactoryException
      */
-    protected function createGroup(string $groupCodename): int
+    protected function findGroup(string $groupCodename): ?NotificationGroupInterface
     {
-        return (new NotificationGroup())
-            ->setCodename($groupCodename)
-            ->save()
-            ->get_id();
-    }
-
-    /**
-     * @param string $roleCodename
-     *
-     * @return int
-     */
-    protected function getRoleId(string $roleCodename): int
-    {
-        return (int)$this->roleRepository->getByName($roleCodename)->get_id();
-    }
-
-    /**
-     * @param int $groupId
-     * @param int $roleId
-     *
-     * @return \BetaKiller\Task\NotificationsGroups\AbstractUpdate
-     */
-    protected function addGroupRole(int $groupId, int $roleId): AbstractUpdate
-    {
-        (new NotificationGroupRole())
-            ->setGroupId($groupId)
-            ->setRoleId($roleId)
-            ->save();
-
-        return $this;
+        return $this->notificationGroupRepository->findGroup($groupCodename);
     }
 
     /**
@@ -124,20 +119,12 @@ abstract class AbstractUpdate extends AbstractTask
     }
 
     /**
-     * @param string $groupCodename
+     * @param string $codename
      *
-     * @return \BetaKiller\Task\NotificationsGroups\AbstractUpdate
+     * @return \BetaKiller\Model\RoleInterface
      */
-    protected function deleteGroup(string $groupCodename): AbstractUpdate
+    protected function findRole(string $codename): RoleInterface
     {
-        $groupModel = $this
-            ->notificationGroupRepository
-            ->getByCodename($groupCodename);
-
-        if ($groupModel) {
-            $groupModel->delete();
-        }
-
-        return $this;
+        return $this->roleRepository->getByName($codename);
     }
 }

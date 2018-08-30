@@ -34,4 +34,44 @@ interface NotificationGroupInterface extends ExtendedOrmInterface
      * @return \BetaKiller\Model\NotificationGroupInterface
      */
     public function setDescription(string $value): NotificationGroupInterface;
+
+    /**
+     * @param \BetaKiller\Model\UserInterface $userModel
+     *
+     * @return bool
+     */
+    public function isEnabledForUser(UserInterface $userModel): bool;
+
+    /**
+     * @return \BetaKiller\Model\UserInterface
+     */
+    public function getUserOffRelated(): UserInterface;
+
+    /**
+     * @param \BetaKiller\Model\UserInterface $userModel
+     *
+     * @return \BetaKiller\Model\NotificationGroupInterface
+     */
+    public function enableForUser(UserInterface $userModel): NotificationGroupInterface;
+
+    /**
+     * @param \BetaKiller\Model\UserInterface $userModel
+     *
+     * @return \BetaKiller\Model\NotificationGroupInterface
+     */
+    public function disableForUser(UserInterface $userModel): NotificationGroupInterface;
+
+    /**
+     * @param \BetaKiller\Model\RoleInterface $roleModel
+     *
+     * @return \BetaKiller\Model\NotificationGroupInterface
+     */
+    public function enableForRole(RoleInterface $roleModel): NotificationGroupInterface;
+
+    /**
+     * @param \BetaKiller\Model\RoleInterface $roleModel
+     *
+     * @return \BetaKiller\Model\NotificationGroupInterface
+     */
+    public function disableForRole(RoleInterface $roleModel): NotificationGroupInterface;
 }
