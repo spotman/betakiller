@@ -43,8 +43,6 @@ class NotificationGroup extends \ORM implements NotificationGroupInterface
             ],
         ]);
 
-//        $this->load_with(['roles', 'users_off']);
-
         parent::configure();
     }
 
