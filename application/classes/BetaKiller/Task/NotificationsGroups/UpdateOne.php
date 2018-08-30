@@ -30,18 +30,29 @@ class UpdateOne extends AbstractUpdate
             return;
         }
 
-        $this->write('Deleting group: '.$groupCodename, self::COLOR_LIGHT_BLUE);
-        $this->deleteGroup($groupCodename);
-
-        $this->write('Creating group: '.$groupCodename, self::COLOR_LIGHT_BLUE);
-        $groupId        = $this->createGroup($groupCodename);
-        $rolesCodenames = $this->getGroupRolesFromConfig($groupCodename);
-        foreach ($rolesCodenames as $roleCodename) {
-            $roleId = $this->getRoleId($roleCodename);
-            $this->write('Adding role of group: '.$roleCodename, self::COLOR_LIGHT_BLUE);
-            $this->addGroupRole($groupId, $roleId);
+        $groupModel = $this->findGroup($groupCodename);
+        if ($groupModel) {
+            $this->write('Deleting group: '.$groupCodename, self::COLOR_LIGHT_BLUE);
+            $groupModel->delete();
         }
 
+        $this->createGroup($groupCodename);
+
         $this->write('Groups successfully updated!', self::COLOR_GREEN);
+    }
+
+    /**
+     * @param string $groupCodename
+     */
+    protected function createGroup(string $groupCodename): void
+    {
+        $this->write('Creating group: '.$groupCodename, self::COLOR_LIGHT_BLUE);
+        $groupModel     = $this->createGroupModel($groupCodename)->save();
+        $rolesCodenames = $this->getGroupRolesCodenamesFromConfig($groupCodename);
+        foreach ($rolesCodenames as $roleCodename) {
+            $this->write('Adding role: '.$roleCodename, self::COLOR_LIGHT_BLUE);
+            $roleModel = $this->findRole($roleCodename);
+            $groupModel->enableForRole($roleModel);
+        }
     }
 }

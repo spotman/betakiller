@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\Task\NotificationsGroups;
 
-class UpdateAll extends AbstractUpdate
+class UpdateAll extends UpdateOne
 {
     public function run(): void
     {
@@ -23,15 +23,8 @@ class UpdateAll extends AbstractUpdate
         $this->write('Deleting groups', self::COLOR_LIGHT_BLUE);
         $this->deleteGroups();
 
-        foreach ($this->getGroupsFromConfig() as $groupCodename) {
-            $this->write('Creating group: '.$groupCodename, self::COLOR_LIGHT_BLUE);
-            $groupId        = $this->createGroup($groupCodename);
-            $rolesCodenames = $this->getGroupRolesFromConfig($groupCodename);
-            foreach ($rolesCodenames as $roleCodename) {
-                $roleId = $this->getRoleId($roleCodename);
-                $this->write('Adding role of group: '.$roleCodename, self::COLOR_LIGHT_BLUE);
-                $this->addGroupRole($groupId, $roleId);
-            }
+        foreach ($this->getGroupsCodenamesFromConfig() as $groupCodename) {
+            $this->createGroup($groupCodename);
         }
 
         $this->write('Groups successfully updated!', self::COLOR_GREEN);

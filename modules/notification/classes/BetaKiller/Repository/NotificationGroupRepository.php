@@ -6,19 +6,18 @@ namespace BetaKiller\Repository;
 use BetaKiller\Model\ExtendedOrmInterface;
 use BetaKiller\Model\NotificationGroup;
 use BetaKiller\Model\NotificationGroupInterface;
-use BetaKiller\Model\NotificationGroupRole;
-use BetaKiller\Model\NotificationGroupUserOff;
+use BetaKiller\Model\UserInterface;
 
 class NotificationGroupRepository extends AbstractOrmBasedRepository
 {
     /**
-     * @param string $groupCodename
+     * @param \BetaKiller\Model\NotificationGroupInterface $groupModel
      *
      * @return \BetaKiller\Model\UserInterface[]
      * @throws \BetaKiller\Exception
      * @throws \BetaKiller\Factory\FactoryException
      */
-    public function getGroupUsers(string $groupCodename): array
+    public function findGroupUsers(NotificationGroupInterface $groupModel): array
     {
         /*
         SELECT `user`.*
@@ -37,25 +36,29 @@ class NotificationGroupRepository extends AbstractOrmBasedRepository
         AND `notification_groups_users_off`.`user_id` IS NULL
         GROUP BY `user`.`id`
          */
-        $orm             = $this->getOrmInstance()->get('users');
+
+        $orm = $this
+            ->getOrmInstance()
+            ->get('users');
+
         $usersTableAlias = $orm->object_name();
 
         return $orm
             ->join_related('roles', 'roles')
-            ->join(NotificationGroupRole::TABLE_NAME, 'left')
+            ->join(NotificationGroup::ROLES_TABLE_NAME, 'left')
             ->on(
-                NotificationGroupRole::TABLE_NAME.'.'.NotificationGroupRole::TABLE_FIELD_ROLE_ID,
+                NotificationGroup::ROLES_TABLE_NAME.'.'.NotificationGroup::ROLES_TABLE_FIELD_ROLE_ID,
                 '=',
                 'roles.id'
             )
-            ->join(NotificationGroupUserOff::TABLE_NAME, 'left')
+            ->join(NotificationGroup::USERS_OFF_TABLE_NAME, 'left')
             ->on(
-                NotificationGroupUserOff::TABLE_NAME.'.'.NotificationGroupUserOff::TABLE_FIELD_GROUP_ID,
+                NotificationGroup::USERS_OFF_TABLE_NAME.'.'.NotificationGroup::USERS_OFF_TABLE_FIELD_GROUP_ID,
                 '=',
-                NotificationGroupRole::TABLE_NAME.'.'.NotificationGroupRole::TABLE_FIELD_GROUP_ID
+                NotificationGroup::ROLES_TABLE_NAME.'.'.NotificationGroup::ROLES_TABLE_FIELD_GROUP_ID
             )
             ->on(
-                NotificationGroupUserOff::TABLE_NAME.'.'.NotificationGroupUserOff::TABLE_FIELD_GROUP_ID,
+                NotificationGroup::USERS_OFF_TABLE_NAME.'.'.NotificationGroup::USERS_OFF_TABLE_FIELD_GROUP_ID,
                 '=',
                 $usersTableAlias.'.id'
             )
@@ -63,15 +66,15 @@ class NotificationGroupRepository extends AbstractOrmBasedRepository
             ->on(
                 NotificationGroup::TABLE_NAME.'.id',
                 '=',
-                NotificationGroupRole::TABLE_NAME.'.'.NotificationGroupRole::TABLE_FIELD_GROUP_ID
+                NotificationGroup::ROLES_TABLE_NAME.'.'.NotificationGroup::ROLES_TABLE_FIELD_GROUP_ID
             )
             ->where(
-                NotificationGroup::TABLE_NAME.'.'.NotificationGroup::TABLE_FIELD_CODENAME,
+                NotificationGroup::TABLE_NAME.'.id',
                 '=',
-                $groupCodename
+                $groupModel
             )
             ->where(
-                NotificationGroupUserOff::TABLE_NAME.'.'.NotificationGroupUserOff::TABLE_FIELD_USER_ID,
+                NotificationGroup::USERS_OFF_TABLE_NAME.'.'.NotificationGroup::USERS_OFF_TABLE_FIELD_USER_ID,
                 'IS',
                 null
             )
@@ -80,86 +83,57 @@ class NotificationGroupRepository extends AbstractOrmBasedRepository
     }
 
     /**
-     * @param array $rolesIds
+     * @param \BetaKiller\Model\UserInterface $userModel
      *
-     * @return array
+     * @return \BetaKiller\Model\NotificationGroupInterface[]
      * @throws \BetaKiller\Factory\FactoryException
      */
-    public function getRolesGroups(array $rolesIds): array
+    public function getUserGroups(UserInterface $userModel): array
     {
-        return $this
-            ->getOrmInstance()
-            ->join_related('roles', 'roles')
+        $orm = $this->getOrmInstance();
+
+        $tableAlias = $orm->object_name();
+
+        return $orm
+            ->join(NotificationGroup::ROLES_TABLE_NAME, 'left')
+            ->on(
+                NotificationGroup::ROLES_TABLE_NAME.'.'.NotificationGroup::ROLES_TABLE_FIELD_GROUP_ID,
+                '=',
+                $tableAlias.'.id'
+            )
             ->where(
-                'roles'.'.'.NotificationGroupRole::TABLE_FIELD_ROLE_ID,
+                NotificationGroup::ROLES_TABLE_NAME.'.'.NotificationGroup::ROLES_TABLE_FIELD_ROLE_ID,
                 'IN',
-                $rolesIds
+                $userModel->getAccessControlRoles()
             )
             ->group_by_primary_key()
             ->get_all();
     }
 
     /**
-     * @param array $rolesIds
-     * @param int   $userId
-     *
-     * @return array
-     * @throws \BetaKiller\Factory\FactoryException
-     */
-    public function getRolesGroupsActive(array $rolesIds, int $userId): array
-    {
-        return $this
-            ->getOrmInstance()
-            ->join_related('roles', 'roles')
-            ->join(NotificationGroupUserOff::TABLE_NAME, 'left')
-            ->on(
-                NotificationGroupUserOff::TABLE_NAME.'.'.NotificationGroupUserOff::TABLE_FIELD_GROUP_ID,
-                '=',
-                'roles'.'.'.NotificationGroupRole::TABLE_FIELD_GROUP_ID
-            )
-            ->on(
-                NotificationGroupUserOff::TABLE_NAME.'.'.NotificationGroupUserOff::TABLE_FIELD_USER_ID,
-                '=',
-                \DB::expr($userId)
-            )
-            ->where(
-                'roles'.'.'.NotificationGroupRole::TABLE_FIELD_ROLE_ID,
-                'IN',
-                $rolesIds
-            )
-            ->where(
-                NotificationGroupUserOff::TABLE_NAME.'.'.NotificationGroupUserOff::TABLE_FIELD_USER_ID,
-                'IS',
-                null
-            )
-            ->group_by_primary_key()
-            ->get_all();
-    }
-
-    /**
-     * @param string $codeName
+     * @param string $codename
      *
      * @return \BetaKiller\Model\NotificationGroupInterface|null
      * @throws \BetaKiller\Factory\FactoryException
      */
-    public function getByCodename(string $codeName): ?NotificationGroupInterface
+    public function findGroup(string $codename): ?NotificationGroupInterface
     {
         $orm = $this->getOrmInstance();
 
         return $this
-            ->filterByCodename($orm, $codeName)
+            ->filterByCodename($orm, $codename)
             ->findOne($orm);
     }
 
     /**
      * @param \BetaKiller\Model\ExtendedOrmInterface $orm
-     * @param string                                 $codeName
+     * @param string                                 $codename
      *
      * @return \BetaKiller\Repository\NotificationGroupRepository
      */
-    private function filterByCodename(ExtendedOrmInterface $orm, string $codeName): self
+    private function filterByCodename(ExtendedOrmInterface $orm, string $codename): self
     {
-        $orm->where('codename', '=', $codeName);
+        $orm->where('codename', '=', $codename);
 
         return $this;
     }
