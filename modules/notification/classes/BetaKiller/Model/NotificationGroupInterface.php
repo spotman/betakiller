@@ -6,21 +6,19 @@ namespace BetaKiller\Model;
 interface NotificationGroupInterface
 {
     /**
-     * Constants of codenames of groups
-     */
-    //public const GROUP_CODENAME1 = 'groupCodename1';
-
-    /**
      * @return bool
      */
-    public function getIsEnabled(): bool;
+    public function isEnabled(): bool;
 
     /**
-     * @param bool $state
-     *
      * @return \BetaKiller\Model\NotificationGroupInterface
      */
-    public function setIsEnabled(bool $state): NotificationGroupInterface;
+    public function enable(): NotificationGroupInterface;
+
+    /**
+     * @return \BetaKiller\Model\NotificationGroupInterface
+     */
+    public function disable(): NotificationGroupInterface;
 
     /**
      * @return string

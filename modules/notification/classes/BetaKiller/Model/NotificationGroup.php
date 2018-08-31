@@ -64,19 +64,27 @@ class NotificationGroup extends \ORM implements NotificationGroupInterface
     /**
      * @return bool
      */
-    public function getIsEnabled(): bool
+    public function isEnabled(): bool
     {
         return (bool)$this->get(self::TABLE_FIELD_IS_ENABLED);
     }
 
     /**
-     * @param bool $state
-     *
      * @return \BetaKiller\Model\NotificationGroupInterface
      */
-    public function setIsEnabled(bool $state): NotificationGroupInterface
+    public function enable(): NotificationGroupInterface
     {
-        $this->set(self::TABLE_FIELD_IS_ENABLED, $state);
+        $this->set(self::TABLE_FIELD_IS_ENABLED, true);
+
+        return $this;
+    }
+
+    /**
+     * @return \BetaKiller\Model\NotificationGroupInterface
+     */
+    public function disable(): NotificationGroupInterface
+    {
+        $this->set(self::TABLE_FIELD_IS_ENABLED, false);
 
         return $this;
     }
