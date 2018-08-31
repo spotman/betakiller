@@ -96,7 +96,9 @@ class UserDetector
         $user = $this->repository->searchBy($userName);
 
         if (!$user) {
-            throw new Exception('Missing CLI user, install it with CreateCliUser task');
+            throw new Exception('Missing CLI user ":name", install it with CreateCliUser task', [
+                ':name' => $userName,
+            ]);
         }
 
         return $user;
