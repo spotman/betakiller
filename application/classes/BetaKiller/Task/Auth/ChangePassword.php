@@ -4,8 +4,9 @@ declare(strict_types=1);
 namespace BetaKiller\Task\Auth;
 
 use BetaKiller\Repository\UserRepository;
+use BetaKiller\Task\AbstractTask;
 
-class ChangePassword extends \BetaKiller\Task\AbstractTask
+class ChangePassword extends AbstractTask
 {
     /**
      * @var \BetaKiller\Repository\UserRepository
@@ -40,7 +41,7 @@ class ChangePassword extends \BetaKiller\Task\AbstractTask
         $confirm  = $this->password('Enter new password again');
 
         if ($password !== $confirm) {
-            $this->write('Passwords are not identical', self::COLOR_RED);
+            $this->write('Passwords are not identical', AbstractTask::COLOR_RED);
 
             return;
         }
@@ -49,6 +50,6 @@ class ChangePassword extends \BetaKiller\Task\AbstractTask
 
         $this->userRepo->save($user);
 
-        $this->write('Password successfully changed!', self::COLOR_GREEN);
+        $this->write('Password successfully changed!', AbstractTask::COLOR_GREEN);
     }
 }
