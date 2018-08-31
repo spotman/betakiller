@@ -39,6 +39,23 @@ class NotificationGroupRepository extends AbstractOrmBasedRepository
     }
 
     /**
+     * @return \BetaKiller\Model\NotificationGroupInterface[]
+     * @throws \BetaKiller\Factory\FactoryException
+     */
+    public function getAllEnabled(): array
+    {
+        $orm = $this->getOrmInstance();
+
+        return $orm
+            ->where(
+                $orm->object_column(NotificationGroup::TABLE_FIELD_IS_ENABLED),
+                '=',
+                1
+            )
+            ->get_all();
+    }
+
+    /**
      * @param \BetaKiller\Model\UserInterface $userModel
      *
      * @return \BetaKiller\Model\NotificationGroupInterface[]
@@ -54,6 +71,11 @@ class NotificationGroupRepository extends AbstractOrmBasedRepository
                 NotificationGroup::ROLES_TABLE_NAME.'.'.NotificationGroup::ROLES_TABLE_FIELD_GROUP_ID,
                 '=',
                 $orm->object_column('id')
+            )
+            ->where(
+                $orm->object_column(NotificationGroup::TABLE_FIELD_IS_ENABLED),
+                '=',
+                1
             )
             ->where(
                 NotificationGroup::ROLES_TABLE_NAME.'.'.NotificationGroup::ROLES_TABLE_FIELD_ROLE_ID,
