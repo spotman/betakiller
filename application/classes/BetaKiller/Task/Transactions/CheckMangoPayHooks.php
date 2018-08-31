@@ -56,7 +56,7 @@ class CheckMangoPayHooks extends AbstractTask
             try {
                 if (!\in_array($hook->Status, self::STATUSES_VALID, false)) {
                     throw new WebHookException(
-                        'Invalid status ":status". Event type ":eventType"', [
+                        'Invalid status: :status. Event type: :eventType', [
                             ':status'    => $hook->Status,
                             ':eventType' => $hook->EventType,
                         ]
