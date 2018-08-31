@@ -5,7 +5,6 @@ use BetaKiller\Helper\AppEnvInterface;
 use Monolog\Handler\FingersCrossedHandler;
 use Monolog\Handler\HandlerInterface;
 use Monolog\Handler\StreamHandler;
-use Monolog\Handler\WhatFailureGroupHandler;
 use Monolog\Processor\IntrospectionProcessor;
 use Monolog\Processor\MemoryPeakUsageProcessor;
 use Monolog\Processor\WebProcessor;
@@ -46,34 +45,36 @@ class Logger implements LoggerInterface
     {
         $monolog = new \Monolog\Logger('default');
 
-        $isDebugAllowed = $this->appEnv->isDebugEnabled();
+        $isDebug = $this->appEnv->isDebugEnabled();
 
         // CLI mode logging
         if ($this->appEnv->isCLI()) {
-            $monolog->pushHandler(new CliHandler($isDebugAllowed));
+            $monolog->pushHandler(new CliHandler($isDebug));
         } else {
             $monolog->pushProcessor(new WebProcessor());
         }
 
-        $logFilePath     = implode(DIRECTORY_SEPARATOR, ['logs', date('Y'), date('m'), date('d').'.log']);
-        $coreLogFilePath = APPPATH.$logFilePath;
-        $appLogFilePath  = $this->appEnv->getAppRootPath().DIRECTORY_SEPARATOR.$logFilePath;
-
-        $groupHandler = new WhatFailureGroupHandler([
-            // Core logs
-            new StreamHandler($coreLogFilePath, $monolog::DEBUG),
-
-            // App logs
-            new StreamHandler($appLogFilePath, $monolog::DEBUG),
+        // File logging
+        $logFilePath = implode(DIRECTORY_SEPARATOR, [
+            $this->appEnv->getAppRootPath(),
+            'logs',
+            date('Y'),
+            date('m'),
+            date('d').'.log',
         ]);
 
-        $logsLevel = $isDebugAllowed ? $monolog::DEBUG : $monolog::NOTICE;
+        $logsLevel = $isDebug ? $monolog::DEBUG : $monolog::NOTICE;
 
-        $monolog->pushHandler(new FingersCrossedHandler($groupHandler, $logsLevel));
+        $monolog->pushHandler(new FingersCrossedHandler(
+            new StreamHandler($logFilePath, $monolog::DEBUG),
+            $logsLevel
+        ));
 
-        $monolog->pushProcessor(new KohanaPlaceholderProcessor());
-        $monolog->pushProcessor(new MemoryPeakUsageProcessor());
-        $monolog->pushProcessor(new IntrospectionProcessor($monolog::NOTICE));
+        // Common processors
+        $monolog
+            ->pushProcessor(new KohanaPlaceholderProcessor())
+            ->pushProcessor(new MemoryPeakUsageProcessor())
+            ->pushProcessor(new IntrospectionProcessor($monolog::WARNING));
 
         return $monolog;
     }
