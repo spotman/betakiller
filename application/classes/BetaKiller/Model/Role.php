@@ -1,30 +1,75 @@
 <?php
+declare(strict_types=1);
+
 namespace BetaKiller\Model;
 
 class Role extends AbstractOrmBasedMultipleParentsTreeModel implements RoleInterface
 {
+    public const TABLE_NAME              = 'roles';
+    public const TABLE_FIELD_NAME        = 'name';
+    public const TABLE_FIELD_DESCRIPTION = 'description';
+
+    public const INHERITANCE_TABLE_NAME = 'roles_inheritance';
+
     protected function getTreeModelThroughTableName()
     {
-        return 'roles_inheritance';
+        return self::INHERITANCE_TABLE_NAME;
     }
 
-    public function rules()
+    public function rules(): array
     {
-        return array(
-            'name' => array(
-                array('not_empty'),
-                array('min_length', array(':value', 4)),
-                array('max_length', array(':value', 32)),
-            ),
-            'description' => array(
-                array('max_length', array(':value', 255)),
-            )
-        );
+        return [
+            self::TABLE_FIELD_NAME        => [
+                ['not_empty'],
+                ['min_length', [':value', 4]],
+                ['max_length', [':value', 32]],
+            ],
+            self::TABLE_FIELD_DESCRIPTION => [
+                ['max_length', [':value', 255]],
+            ],
+        ];
     }
 
+    /**
+     * @param string $value
+     *
+     * @return \BetaKiller\Model\RoleInterface
+     */
+    public function setName(string $value): RoleInterface
+    {
+        $value = trim($value);
+        $this->set(self::TABLE_FIELD_NAME, $value);
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
     public function getName(): string
     {
-        return $this->get('name');
+        return $this->get(self::TABLE_FIELD_NAME);
+    }
+
+    /**
+     * @return string
+     */
+    public function getDescription(): string
+    {
+        return (string)$this->get(self::TABLE_FIELD_DESCRIPTION);
+    }
+
+    /**
+     * @param string $value
+     *
+     * @return \BetaKiller\Model\RoleInterface
+     */
+    public function setDescription(string $value): RoleInterface
+    {
+        $value = trim($value);
+        $this->set(self::TABLE_FIELD_DESCRIPTION, $value);
+
+        return $this;
     }
 
     /**

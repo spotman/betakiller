@@ -2,21 +2,14 @@
 namespace BetaKiller\Config;
 
 
-class AppConfig implements AppConfigInterface
+class AppConfig extends AbstractConfig implements AppConfigInterface
 {
     /**
-     * @var ConfigProviderInterface
+     * @return string
      */
-    private $_config;
-
-    /**
-     * AppConfig constructor.
-     *
-     * @param \BetaKiller\Config\ConfigProviderInterface $_config
-     */
-    public function __construct(ConfigProviderInterface $_config)
+    protected function getConfigRootGroup(): string
     {
-        $this->_config = $_config;
+        return self::CONFIG_GROUP_NAME;
     }
 
     /**
@@ -46,7 +39,8 @@ class AppConfig implements AppConfigInterface
      */
     public function getAdminEmail(): string
     {
-        $host  = parse_url($this->getBaseUrl(), PHP_URL_HOST);
+        $host = parse_url($this->getBaseUrl(), PHP_URL_HOST);
+
         return 'admin@'.$host;
     }
 
@@ -57,7 +51,7 @@ class AppConfig implements AppConfigInterface
      */
     public function isTrailingSlashEnabled(): bool
     {
-        return (bool) $this->get(self::PATH_IS_TRAILING_SLASH_ENABLED);
+        return (bool)$this->get(self::PATH_IS_TRAILING_SLASH_ENABLED);
     }
 
     /**
@@ -66,17 +60,6 @@ class AppConfig implements AppConfigInterface
     public function getCircularLinkHref(): string
     {
         return $this->get(self::PATH_CIRCULAR_LINK_HREF);
-    }
-
-    /**
-     * @param string|array  $path
-     * @param null          $default
-     *
-     * @return array|\BetaKiller\Config\ConfigGroupInterface|null|string
-     */
-    protected function get(array $path, $default = null)
-    {
-        return $this->_config->load(array_merge([self::CONFIG_GROUP_NAME], $path)) ?: $default;
     }
 
     /**
