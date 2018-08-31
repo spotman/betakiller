@@ -34,7 +34,11 @@ class ImportGroup extends AbstractImportGroup
                 $this->deleteGroup($groupModel);
             }
 
-            $this->writeLog('Group ":codename" not found in config', [':codename' => $groupCodename]);
+            $this->getLogger()->warning(
+                'Group ":codename" not found in config', [
+                    ':codename' => $groupCodename,
+                ]
+            );
 
             return;
         }
@@ -43,7 +47,11 @@ class ImportGroup extends AbstractImportGroup
         $this->importGroup($groupCodename);
 
         //
-        $this->writeLog('Group successfully imported!');
+        $this->getLogger()->info(
+            'Group ":codename" successfully imported!', [
+                ':codename' => $groupCodename
+            ]
+        );
     }
 
     /**
@@ -51,7 +59,11 @@ class ImportGroup extends AbstractImportGroup
      */
     protected function importGroup(string $groupCodename): void
     {
-        $this->writeLog('Exporting group: :codename', [':codename' => $groupCodename]);
+        $this->getLogger()->debug(
+            'Exporting group: :codename', [
+                ':codename' => $groupCodename
+            ]
+        );
 
         $groupModel = $this->findGroup($groupCodename);
         if (!$groupModel) {
@@ -65,7 +77,11 @@ class ImportGroup extends AbstractImportGroup
             $roleModel   = $this->findRole($roleCodename);
             $roleEnabled = $groupModel->isEnabledForRole($roleModel);
             if (!$roleEnabled) {
-                $this->writeLog('Adding role: :codename', [':codename' => $roleModel->getName()]);
+                $this->getLogger()->debug(
+                    'Adding role: :codename', [
+                        ':codename' => $roleModel->getName(),
+                    ]
+                );
                 $groupModel->enableForRole($roleModel);
             }
         }
@@ -78,7 +94,11 @@ class ImportGroup extends AbstractImportGroup
      */
     protected function deleteGroup(NotificationGroupInterface $groupModel): void
     {
-        $this->writeLog('Disabling group: :codename', [':codename' => $groupModel->getCodename()]);
+        $this->getLogger()->info(
+            'Disabling group: :codename', [
+                ':codename' => $groupModel->getCodename(),
+            ]
+        );
         $this->disableGroup($groupModel);
     }
 
@@ -95,7 +115,11 @@ class ImportGroup extends AbstractImportGroup
         $rolesCodenamesConfig = $this->getGroupRolesCodenamesFromConfig($groupModel->getCodename());
         foreach ($rolesModels as $roleModel) {
             if (!\in_array($roleModel->getName(), $rolesCodenamesConfig, true)) {
-                $this->writeLog('Deleting role: :codename', [':codename' => $roleModel->getName()]);
+                $this->getLogger()->debug(
+                    'Deleting role: :codename', [
+                        ':codename' => $roleModel->getName(),
+                    ]
+                );
                 $groupModel->disableForRole($roleModel);
             }
         }

@@ -29,7 +29,7 @@ class ImportGroups extends ImportGroup
         }
 
         //
-        $this->writeLog('Groups successfully imported!');
+        $this->getLogger()->info('Groups successfully imported!');
     }
 
     /**

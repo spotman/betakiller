@@ -116,7 +116,7 @@ abstract class AbstractImportGroup extends AbstractTask
      */
     protected function disableGroup(NotificationGroupInterface $groupModel): AbstractImportGroup
     {
-        $groupModel->setIsEnabled(false);
+        $groupModel->disable();
         $this->notificationGroupRepository->save($groupModel);
 
         return $this;
@@ -151,15 +151,10 @@ abstract class AbstractImportGroup extends AbstractTask
     }
 
     /**
-     * @param string $message
-     * @param array|null  $context [optional]
-     *
-     * @return \BetaKiller\Task\Notification\AbstractImportGroup
+     * @return \BetaKiller\Log\Logger
      */
-    protected function writeLog(string $message, ?array $context = null): AbstractImportGroup
+    protected function getLogger(): Logger
     {
-        $this->logger->info($message, (array)$context);
-
-        return $this;
+        return $this->logger;
     }
 }

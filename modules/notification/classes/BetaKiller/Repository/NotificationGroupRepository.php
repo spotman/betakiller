@@ -26,33 +26,15 @@ class NotificationGroupRepository extends AbstractOrmBasedRepository
     }
 
     /**
-     * @param \BetaKiller\Model\ExtendedOrmInterface $orm
-     * @param string                                 $codename
-     *
-     * @return \BetaKiller\Repository\NotificationGroupRepository
-     */
-    private function filterByCodename(ExtendedOrmInterface $orm, string $codename): self
-    {
-        $orm->where($orm->object_column('codename'), '=', $codename);
-
-        return $this;
-    }
-
-    /**
      * @return \BetaKiller\Model\NotificationGroupInterface[]
      * @throws \BetaKiller\Factory\FactoryException
      */
     public function getAllEnabled(): array
     {
         $orm = $this->getOrmInstance();
+        $this->filterGroupIsEnabled($orm);
 
-        return $orm
-            ->where(
-                $orm->object_column(NotificationGroup::TABLE_FIELD_IS_ENABLED),
-                '=',
-                1
-            )
-            ->get_all();
+        return $orm->get_all();
     }
 
     /**
@@ -64,6 +46,7 @@ class NotificationGroupRepository extends AbstractOrmBasedRepository
     public function getUserGroups(UserInterface $userModel): array
     {
         $orm = $this->getOrmInstance();
+        $this->filterGroupIsEnabled($orm);
 
         return $orm
             ->join(NotificationGroup::ROLES_TABLE_NAME, 'left')
@@ -71,11 +54,6 @@ class NotificationGroupRepository extends AbstractOrmBasedRepository
                 NotificationGroup::ROLES_TABLE_NAME.'.'.NotificationGroup::ROLES_TABLE_FIELD_GROUP_ID,
                 '=',
                 $orm->object_column('id')
-            )
-            ->where(
-                $orm->object_column(NotificationGroup::TABLE_FIELD_IS_ENABLED),
-                '=',
-                1
             )
             ->where(
                 NotificationGroup::ROLES_TABLE_NAME.'.'.NotificationGroup::ROLES_TABLE_FIELD_ROLE_ID,
@@ -113,10 +91,9 @@ class NotificationGroupRepository extends AbstractOrmBasedRepository
         GROUP BY `user`.`id`
          */
 
-        $orm = $this->getOrmInstance();
+        $orm = $this->getOrmInstance()->get('users');
 
         return $orm
-            ->get('users')
             ->join_related('roles', 'roles')
             ->join(NotificationGroup::ROLES_TABLE_NAME, 'left')
             ->on(
@@ -153,5 +130,35 @@ class NotificationGroupRepository extends AbstractOrmBasedRepository
             )
             ->group_by_primary_key()
             ->get_all();
+    }
+
+    /**
+     * @param \BetaKiller\Model\ExtendedOrmInterface $orm
+     * @param string                                 $codename
+     *
+     * @return \BetaKiller\Repository\NotificationGroupRepository
+     */
+    private function filterByCodename(ExtendedOrmInterface $orm, string $codename): self
+    {
+        $orm->where($orm->object_column('codename'), '=', $codename);
+
+        return $this;
+    }
+
+    /**
+     * @param \BetaKiller\Model\ExtendedOrmInterface $orm
+     *
+     * @return \BetaKiller\Repository\NotificationGroupRepository
+     */
+    private function filterGroupIsEnabled(ExtendedOrmInterface $orm): self
+    {
+        $orm
+            ->where(
+                $orm->object_column(NotificationGroup::TABLE_FIELD_IS_ENABLED),
+                '=',
+                1
+            );
+
+        return $this;
     }
 }
