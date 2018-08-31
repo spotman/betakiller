@@ -11,7 +11,7 @@ use MangoPay\MangoPayApi;
 
 class CheckMangoPayHooks extends AbstractTask
 {
-    private const HOOK_STATUS_VALID = 'ENABLED';
+    private const STATUSES_VALID = ['ENABLED'];
 
     use LoggerHelperTrait;
 
@@ -41,23 +41,37 @@ class CheckMangoPayHooks extends AbstractTask
 
     public function run(): void
     {
-        $hooks = $this->mangoPayApi->Hooks->GetAll();
+        $hooks     = $this->mangoPayApi->Hooks->GetAll();
+        $errorsQty = 0;
         foreach ($hooks as $hook) {
+            $this->logger->debug(
+                'Check webhook: :eventType', [
+                    ':eventType' => $hook->EventType,
+                ]
+            );
+
             /**
              * @var \MangoPay\Hook $hook
              */
             try {
-                if ($hook->Status !== self::HOOK_STATUS_VALID) {
+                if (!\in_array($hook->Status, self::STATUSES_VALID, false)) {
                     throw new WebHookException(
-                        'Invalid status ":status", event type ":eventType"', [
+                        'Invalid status ":status". Event type ":eventType"', [
                             ':status'    => $hook->Status,
                             ':eventType' => $hook->EventType,
                         ]
                     );
                 }
             } catch (\Exception $exception) {
+                $errorsQty++;
                 $this->logException($this->logger, $exception);
             }
         }
+
+        $this->logger->info(
+            'Checking webhooks completed. Errors: :errorsQty', [
+                ':errorsQty' => $errorsQty,
+            ]
+        );
     }
 }
