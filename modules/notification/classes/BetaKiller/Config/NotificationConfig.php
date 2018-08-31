@@ -19,6 +19,7 @@ class NotificationConfig extends AbstractConfig implements NotificationConfigInt
     public function getGroups(): array
     {
         $groups = $this->get(self::PATH_GROUPS);
+        if (!$groups) return [];
 
         return array_keys($groups);
     }
