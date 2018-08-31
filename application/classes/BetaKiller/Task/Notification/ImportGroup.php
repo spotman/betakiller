@@ -87,7 +87,7 @@ class ImportGroup extends AbstractImportGroup
      */
     protected function deleteRoles(NotificationGroupInterface $groupModel): void
     {
-        $rolesModels = $groupModel->findRoles();
+        $rolesModels = $groupModel->getRoles();
         if (!$rolesModels) {
             return;
         }

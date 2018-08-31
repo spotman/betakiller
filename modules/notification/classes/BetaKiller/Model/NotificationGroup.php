@@ -74,9 +74,9 @@ class NotificationGroup extends \ORM implements NotificationGroupInterface
      *
      * @return \BetaKiller\Model\NotificationGroupInterface
      */
-    public function setIsEnabled($state): NotificationGroupInterface
+    public function setIsEnabled(bool $state): NotificationGroupInterface
     {
-        $this->set(self::TABLE_FIELD_IS_ENABLED, (bool)$state);
+        $this->set(self::TABLE_FIELD_IS_ENABLED, $state);
 
         return $this;
     }
@@ -194,7 +194,7 @@ class NotificationGroup extends \ORM implements NotificationGroupInterface
     /**
      * @return \BetaKiller\Model\RoleInterface[]
      */
-    public function findRoles(): array
+    public function getRoles(): array
     {
         return $this->get('roles')->get_all();
     }
