@@ -22,10 +22,6 @@ class User extends \Model_Auth_User implements UserInterface
             ],
         ]);
 
-        $this->has_many([
-            'ulogins' => [],
-        ]);
-
         $this->load_with(['language']);
 
         parent::configure();

@@ -2,16 +2,16 @@
 
 
 {% block page_content %}
-  {{ css('layout.css') }}
+  {{ css('webhooks/layout.css') }}
 
 
   <section id="admin-webhooks-listItems" class="admin-webhooks-layout">
 
 
     <nav>
-      <div class="nav-wrapper">
+      <div class="nav-wrapper green">
         <div class="col s12">
-          <span class="breadcrumb">WebHooks</span>
+          {{ widget('Breadcrumbs') }}
         </div>
       </div>
     </nav>
