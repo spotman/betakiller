@@ -20,7 +20,7 @@ interface NotificationGroupInterface
      *
      * @return \BetaKiller\Model\NotificationGroupInterface
      */
-    public function setIsEnabled($state): NotificationGroupInterface;
+    public function setIsEnabled(bool $state): NotificationGroupInterface;
 
     /**
      * @return string
@@ -91,5 +91,5 @@ interface NotificationGroupInterface
     /**
      * @return \BetaKiller\Model\RoleInterface[]
      */
-    public function findRoles(): array;
+    public function getRoles(): array;
 }
