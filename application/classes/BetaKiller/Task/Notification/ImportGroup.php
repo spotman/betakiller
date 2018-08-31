@@ -34,10 +34,7 @@ class ImportGroup extends AbstractImportGroup
                 $this->deleteGroup($groupModel);
             }
 
-            $this->write(
-                sprintf('Group "%s" not found in config', $groupCodename),
-                self::COLOR_RED
-            );
+            $this->writeLog('Group ":codename" not found in config', [':codename' => $groupCodename]);
 
             return;
         }
@@ -46,7 +43,7 @@ class ImportGroup extends AbstractImportGroup
         $this->importGroup($groupCodename);
 
         //
-        $this->write('Group successfully imported!', self::COLOR_GREEN);
+        $this->writeLog('Group successfully imported!');
     }
 
     /**
@@ -54,7 +51,7 @@ class ImportGroup extends AbstractImportGroup
      */
     protected function importGroup(string $groupCodename): void
     {
-        $this->write('Exporting group: '.$groupCodename, self::COLOR_LIGHT_BLUE);
+        $this->writeLog('Exporting group: :codename', [':codename' => $groupCodename]);
 
         $groupModel = $this->findGroup($groupCodename);
         if (!$groupModel) {
@@ -68,7 +65,7 @@ class ImportGroup extends AbstractImportGroup
             $roleModel   = $this->findRole($roleCodename);
             $roleEnabled = $groupModel->isEnabledForRole($roleModel);
             if (!$roleEnabled) {
-                $this->write('Adding role: '.$roleCodename, self::COLOR_LIGHT_BLUE);
+                $this->writeLog('Adding role: :codename', [':codename' => $roleModel->getName()]);
                 $groupModel->enableForRole($roleModel);
             }
         }
@@ -81,10 +78,7 @@ class ImportGroup extends AbstractImportGroup
      */
     protected function deleteGroup(NotificationGroupInterface $groupModel): void
     {
-        $this->write(
-            'Disabling group: '.$groupModel->getCodename(),
-            self::COLOR_LIGHT_BLUE
-        );
+        $this->writeLog('Disabling group: :codename', [':codename' => $groupModel->getCodename()]);
         $this->disableGroup($groupModel);
     }
 
@@ -101,10 +95,7 @@ class ImportGroup extends AbstractImportGroup
         $rolesCodenamesConfig = $this->getGroupRolesCodenamesFromConfig($groupModel->getCodename());
         foreach ($rolesModels as $roleModel) {
             if (!\in_array($roleModel->getName(), $rolesCodenamesConfig, true)) {
-                $this->write(
-                    'Deleting role: '.$roleModel->getName(),
-                    self::COLOR_LIGHT_BLUE
-                );
+                $this->writeLog('Deleting role: :codename', [':codename' => $roleModel->getName()]);
                 $groupModel->disableForRole($roleModel);
             }
         }

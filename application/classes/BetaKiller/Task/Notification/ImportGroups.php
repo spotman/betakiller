@@ -29,7 +29,7 @@ class ImportGroups extends ImportGroup
         }
 
         //
-        $this->write('Groups successfully imported!', self::COLOR_GREEN);
+        $this->writeLog('Groups successfully imported!');
     }
 
     /**
@@ -37,7 +37,7 @@ class ImportGroups extends ImportGroup
      */
     protected function deleteGroups(): void
     {
-        $groupsModels = $this->findGroups();
+        $groupsModels = $this->findGroupsEnabled();
         if (!$groupsModels) {
             return;
         }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace BetaKiller\Task\Notification;
 
 use BetaKiller\Config\NotificationConfig;
+use BetaKiller\Log\Logger;
 use BetaKiller\Model\NotificationGroup;
 use BetaKiller\Model\NotificationGroupInterface;
 use BetaKiller\Model\RoleInterface;
@@ -29,20 +30,28 @@ abstract class AbstractImportGroup extends AbstractTask
     private $notificationGroupRepository;
 
     /**
+     * @var \BetaKiller\Log\Logger
+     */
+    private $logger;
+
+    /**
      * ChangePassword constructor.
      *
      * @param \BetaKiller\Repository\NotificationGroupRepository $notificationGroupRepository
      * @param \BetaKiller\Config\NotificationConfig              $notificationConfig
      * @param \BetaKiller\Repository\RoleRepository              $roleRepository
+     * @param \BetaKiller\Log\Logger                             $logger
      */
     public function __construct(
         NotificationGroupRepository $notificationGroupRepository,
         NotificationConfig $notificationConfig,
-        RoleRepository $roleRepository
+        RoleRepository $roleRepository,
+        Logger $logger
     ) {
         $this->notificationGroupRepository = $notificationGroupRepository;
         $this->notificationConfig          = $notificationConfig;
         $this->roleRepository              = $roleRepository;
+        $this->logger                      = $logger;
 
         parent::__construct();
     }
@@ -115,11 +124,11 @@ abstract class AbstractImportGroup extends AbstractTask
 
     /**
      * @return \BetaKiller\Model\NotificationGroupInterface[]
-     * @throws \BetaKiller\Repository\RepositoryException
+     * @throws \BetaKiller\Factory\FactoryException
      */
-    protected function findGroups(): array
+    protected function findGroupsEnabled(): array
     {
-        return $this->notificationGroupRepository->getAll();
+        return $this->notificationGroupRepository->getAllEnabled();
     }
 
     /**
@@ -139,5 +148,18 @@ abstract class AbstractImportGroup extends AbstractTask
     protected function findRole(string $roleCodename): RoleInterface
     {
         return $this->roleRepository->getByName($roleCodename);
+    }
+
+    /**
+     * @param string $message
+     * @param array|null  $context [optional]
+     *
+     * @return \BetaKiller\Task\Notification\AbstractImportGroup
+     */
+    protected function writeLog(string $message, ?array $context = null): AbstractImportGroup
+    {
+        $this->logger->info($message, (array)$context);
+
+        return $this;
     }
 }
