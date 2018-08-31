@@ -74,38 +74,38 @@ abstract class Kohana_Minion_Task {
 
 		$class = Minion_Task::convert_task_to_class_name($task);
 
-		$class = static::_make_task_class_instance($class);
+		$instance = static::makeTaskInstance($class);
 
-		if ( ! $class instanceof Minion_Task)
+		if ( ! $instance instanceof Minion_Task)
 		{
 			throw new Minion_Exception_InvalidTask(
 				"Task ':task' is not a valid minion task",
-				array(':task' => $class)
+				array(':task' => \get_class($instance))
 			);
 		}
 
-		$class->set_options($options);
+		$instance->set_options($options);
 
 		// Show the help page for this task if requested
 		if (array_key_exists('help', $options))
 		{
-			$class->_method = '_help';
+			$instance->_method = '_help';
 		}
 
-		return $class;
+		return $instance;
 	}
 
-    protected static function _make_task_class_instance($class_name)
+    protected static function makeTaskInstance($className)
     {
-        if ( ! class_exists($class_name))
+        if ( ! class_exists($className))
         {
             throw new Minion_Exception_InvalidTask(
                 "Task ':task' is not a valid minion task",
-                array(':task' => $class_name)
+                array(':task' => $className)
             );
         }
 
-        return new $class_name;
+        return new $className;
 	}
 
 	/**
@@ -149,14 +149,14 @@ abstract class Kohana_Minion_Task {
 	 */
 	public function __toString()
 	{
-		static $task_name = NULL;
+		static $taskName;
 
-		if ($task_name === NULL)
+		if (!$taskName)
 		{
-			$task_name = Minion_Task::convert_class_to_task($this);
+			$taskName = Minion_Task::convert_class_to_task($this);
 		}
 
-		return $task_name;
+		return $taskName;
 	}
 
 	/**
