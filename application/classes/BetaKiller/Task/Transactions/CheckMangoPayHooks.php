@@ -69,7 +69,7 @@ class CheckMangoPayHooks extends AbstractTask
         }
 
         $this->logger->info(
-            'Checking webhooks completed. Errors: :errorsQty', [
+            'Checking completed. Errors: :errorsQty', [
                 ':errorsQty' => $errorsQty,
             ]
         );
