@@ -6,6 +6,7 @@ namespace BetaKiller\Model;
 class NotificationGroup extends \ORM implements NotificationGroupInterface
 {
     public const TABLE_NAME              = 'notification_groups';
+    public const TABLE_FIELD_IS_ENABLED  = 'is_enabled';
     public const TABLE_FIELD_CODENAME    = 'codename';
     public const TABLE_FIELD_DESCRIPTION = 'description';
 
@@ -29,17 +30,17 @@ class NotificationGroup extends \ORM implements NotificationGroupInterface
         ]);
 
         $this->has_many([
-            'roles'     => [
-                'model'       => 'Role',
-                'through'     => self::ROLES_TABLE_NAME,
-                'foreign_key' => self::ROLES_TABLE_FIELD_GROUP_ID,
-                'far_key'     => self::ROLES_TABLE_FIELD_ROLE_ID,
-            ],
             'users_off' => [
                 'model'       => 'User',
                 'through'     => self::USERS_OFF_TABLE_NAME,
                 'foreign_key' => self::USERS_OFF_TABLE_FIELD_GROUP_ID,
                 'far_key'     => self::USERS_OFF_TABLE_FIELD_USER_ID,
+            ],
+            'roles'     => [
+                'model'       => 'Role',
+                'through'     => self::ROLES_TABLE_NAME,
+                'foreign_key' => self::ROLES_TABLE_FIELD_GROUP_ID,
+                'far_key'     => self::ROLES_TABLE_FIELD_ROLE_ID,
             ],
         ]);
 
@@ -58,6 +59,26 @@ class NotificationGroup extends \ORM implements NotificationGroupInterface
                 ['max_length', [':value', 255]],
             ],
         ];
+    }
+
+    /**
+     * @return bool
+     */
+    public function getIsEnabled(): bool
+    {
+        return (bool)$this->get(self::TABLE_FIELD_IS_ENABLED);
+    }
+
+    /**
+     * @param bool $state
+     *
+     * @return \BetaKiller\Model\NotificationGroupInterface
+     */
+    public function setIsEnabled($state): NotificationGroupInterface
+    {
+        $this->set(self::TABLE_FIELD_IS_ENABLED, (bool)$state);
+
+        return $this;
     }
 
     /**
@@ -109,17 +130,7 @@ class NotificationGroup extends \ORM implements NotificationGroupInterface
      */
     public function isEnabledForUser(UserInterface $userModel): bool
     {
-        $userModelRelated = $this->getUserOffRelated();
-
-        return $userModelRelated->get_id() === $userModel->get_id();
-    }
-
-    /**
-     * @return \BetaKiller\Model\UserInterface
-     */
-    public function getUserOffRelated(): UserInterface
-    {
-        return $this->get('users_off')->find();
+        return !$this->has('users_off', $userModel);
     }
 
     /**
@@ -149,6 +160,16 @@ class NotificationGroup extends \ORM implements NotificationGroupInterface
     /**
      * @param \BetaKiller\Model\RoleInterface $roleModel
      *
+     * @return bool
+     */
+    public function isEnabledForRole(RoleInterface $roleModel): bool
+    {
+        return $this->has('roles', $roleModel);
+    }
+
+    /**
+     * @param \BetaKiller\Model\RoleInterface $roleModel
+     *
      * @return \BetaKiller\Model\NotificationGroupInterface
      */
     public function enableForRole(RoleInterface $roleModel): NotificationGroupInterface
@@ -168,5 +189,13 @@ class NotificationGroup extends \ORM implements NotificationGroupInterface
         $this->remove('roles', $roleModel);
 
         return $this;
+    }
+
+    /**
+     * @return \BetaKiller\Model\RoleInterface[]
+     */
+    public function findRoles(): array
+    {
+        return $this->get('roles')->get_all();
     }
 }

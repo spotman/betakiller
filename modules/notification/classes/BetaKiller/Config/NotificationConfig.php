@@ -14,7 +14,7 @@ class NotificationConfig extends AbstractConfig implements NotificationConfigInt
     }
 
     /**
-     * @return array
+     * @return string[] ['groupCodename1','groupCodename1',..]
      */
     public function getGroups(): array
     {
@@ -26,7 +26,7 @@ class NotificationConfig extends AbstractConfig implements NotificationConfigInt
     /**
      * @param string $groupCodename
      *
-     * @return array
+     * @return string[] ['roleCodename1','roleCodename2',..]
      */
     public function getGroupRoles($groupCodename): array
     {

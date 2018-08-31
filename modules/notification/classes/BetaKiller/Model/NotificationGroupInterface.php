@@ -3,13 +3,24 @@ declare(strict_types=1);
 
 namespace BetaKiller\Model;
 
-interface NotificationGroupInterface extends ExtendedOrmInterface
+interface NotificationGroupInterface
 {
-    public const GROUP_CODENAME1 = 'groupCodename1';
-    public const GROUP_CODENAME2 = 'groupCodename2';
-    public const GROUP_CODENAME3 = 'groupCodename3';
-    public const GROUP_CODENAME4 = 'groupCodename4';
-    public const GROUP_CODENAME5 = 'groupCodename5';
+    /**
+     * Constants of codenames of groups
+     */
+    //public const GROUP_CODENAME1 = 'groupCodename1';
+
+    /**
+     * @return bool
+     */
+    public function getIsEnabled(): bool;
+
+    /**
+     * @param bool $state
+     *
+     * @return \BetaKiller\Model\NotificationGroupInterface
+     */
+    public function setIsEnabled($state): NotificationGroupInterface;
 
     /**
      * @return string
@@ -43,11 +54,6 @@ interface NotificationGroupInterface extends ExtendedOrmInterface
     public function isEnabledForUser(UserInterface $userModel): bool;
 
     /**
-     * @return \BetaKiller\Model\UserInterface
-     */
-    public function getUserOffRelated(): UserInterface;
-
-    /**
      * @param \BetaKiller\Model\UserInterface $userModel
      *
      * @return \BetaKiller\Model\NotificationGroupInterface
@@ -64,6 +70,13 @@ interface NotificationGroupInterface extends ExtendedOrmInterface
     /**
      * @param \BetaKiller\Model\RoleInterface $roleModel
      *
+     * @return bool
+     */
+    public function isEnabledForRole(RoleInterface $roleModel): bool;
+
+    /**
+     * @param \BetaKiller\Model\RoleInterface $roleModel
+     *
      * @return \BetaKiller\Model\NotificationGroupInterface
      */
     public function enableForRole(RoleInterface $roleModel): NotificationGroupInterface;
@@ -74,4 +87,9 @@ interface NotificationGroupInterface extends ExtendedOrmInterface
      * @return \BetaKiller\Model\NotificationGroupInterface
      */
     public function disableForRole(RoleInterface $roleModel): NotificationGroupInterface;
+
+    /**
+     * @return \BetaKiller\Model\RoleInterface[]
+     */
+    public function findRoles(): array;
 }

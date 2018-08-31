@@ -11,14 +11,14 @@ interface NotificationConfigInterface
     public const PATH_MESSAGE_GROUP = ['messages', 'messageCodename' => '', 'group'];
 
     /**
-     * @return array
+     * @return string[] ['groupCodename1','groupCodename1',..]
      */
     public function getGroups(): array;
 
     /**
      * @param string $groupCodename
      *
-     * @return array
+     * @return string[] ['roleCodename1','roleCodename2',..]
      */
     public function getGroupRoles($groupCodename): array;
 

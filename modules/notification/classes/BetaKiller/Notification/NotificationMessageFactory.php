@@ -52,7 +52,7 @@ class NotificationMessageFactory
             );
         }
 
-        $groupModel = $this->groupRepository->findGroup($groupCodename);
+        $groupModel = $this->groupRepository->findByCodename($groupCodename);
         if (!$groupModel) {
             throw new NotificationException(
                 'Not found group by group codename ":groupCodename"', [

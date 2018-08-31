@@ -9,20 +9,22 @@ class Role extends AbstractOrmBasedMultipleParentsTreeModel implements RoleInter
     public const TABLE_FIELD_NAME        = 'name';
     public const TABLE_FIELD_DESCRIPTION = 'description';
 
+    public const INHERITANCE_TABLE_NAME = 'roles_inheritance';
+
     protected function getTreeModelThroughTableName()
     {
-        return 'roles_inheritance';
+        return self::INHERITANCE_TABLE_NAME;
     }
 
     public function rules(): array
     {
         return [
-            'name'        => [
+            self::TABLE_FIELD_NAME        => [
                 ['not_empty'],
                 ['min_length', [':value', 4]],
                 ['max_length', [':value', 32]],
             ],
-            'description' => [
+            self::TABLE_FIELD_DESCRIPTION => [
                 ['max_length', [':value', 255]],
             ],
         ];
