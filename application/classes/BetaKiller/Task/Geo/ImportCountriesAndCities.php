@@ -10,6 +10,7 @@ use BetaKiller\Task\TaskException;
 
 class ImportCountriesAndCities extends AbstractTask
 {
+    //todo alias for locale code in file name
     private const PATH_TEMP_CREATING_ATTEMPTS = 20;
     private const LOCALE_MAIN                 = 'en';
     private const TEMPLATE_FILE_COUNTRY       = 'GeoLite2-Country-Locations-:locale.csv';
@@ -45,8 +46,13 @@ class ImportCountriesAndCities extends AbstractTask
 
     public function run(): void
     {
+        // todo separate reading CSV by files for memory limit control
+        // todo synchronization between files
         $countries = $this->downloadCountries();
         $cities    = $this->downloadCities();
+
+        var_dump(memory_get_peak_usage());
+        var_dump(memory_get_peak_usage(true));
     }
 
     /**
@@ -66,6 +72,7 @@ class ImportCountriesAndCities extends AbstractTask
             $this->testFileExists($csvFilePath);
 
             // todo remove duplicates by code
+            $this->logger->debug('Parsing path: '.$csvFilePath);
             $itemsForLocale = $this->readCsvFile($csvFilePath);
             foreach ($itemsForLocale as &$item) {
                 $item = [
@@ -96,7 +103,7 @@ class ImportCountriesAndCities extends AbstractTask
         $items   = [];
         $locales = $this->config->getLocales();
         foreach ($locales as $locale) {
-            $csvFilePath = $this->createFilePath($filesPath, self::TEMPLATE_FILE_COUNTRY, $locale);
+            $csvFilePath = $this->createFilePath($filesPath, self::TEMPLATE_FILE_CITY, $locale);
             $this->testFileExists($csvFilePath);
 
             if (!isset($items[$locale])) {
@@ -104,6 +111,7 @@ class ImportCountriesAndCities extends AbstractTask
             }
 
             // todo remove duplicates by name
+            $this->logger->debug('Parsing path: '.$csvFilePath);
             $itemsForLocale = $this->readCsvFile($csvFilePath);
             foreach ($itemsForLocale as $item) {
                 $countryCode = strtolower($item[4]);

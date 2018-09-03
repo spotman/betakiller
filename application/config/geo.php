@@ -14,6 +14,6 @@ return [
                 'csv' => 'http://geolite.maxmind.com/download/geoip/database/GeoLite2-City-CSV.zip',
             ],
         ],
-        'locales'      => ['de', 'en', 'fr', 'es', 'pt', 'zh', 'ja', 'ru'],
+        'locales'      => ['de', 'en', 'fr', 'es', 'pt-BR', 'zh-CN', 'ja', 'ru'],
     ],
 ];
