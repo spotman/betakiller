@@ -6,10 +6,11 @@ namespace BetaKiller\Config;
 interface GeoMaxMindConfigInterface
 {
     public const CONFIG_GROUP_NAME               = 'geo';
+    public const PATH_DOWNLOAD_URL_COUNTRIES_BIN = ['maxmind', 'downloadUrls', 'countries', 'bin'];
     public const PATH_DOWNLOAD_URL_COUNTRIES_CSV = ['maxmind', 'downloadUrls', 'countries', 'csv'];
-    public const PATH_DOWNLOAD_URL_COUNTRIES_BIN = ['maxmind', 'downloadUrls', 'countries', 'binary'];
+    public const PATH_DOWNLOAD_URL_CITIES_BIN    = ['maxmind', 'downloadUrls', 'cities', 'bin'];
     public const PATH_DOWNLOAD_URL_CITIES_CSV    = ['maxmind', 'downloadUrls', 'cities', 'csv'];
-    public const PATH_DOWNLOAD_URL_CITIES_BINARY = ['maxmind', 'downloadUrls', 'cities', 'binary'];
+    public const PATH_LOCALES                    = ['maxmind', 'locales'];
 
     /**
      * @return string
@@ -19,7 +20,7 @@ interface GeoMaxMindConfigInterface
     /**
      * @return string
      */
-    public function getPathDownloadUrlCountriesBinary(): string;
+    public function getPathDownloadUrlCountriesBin(): string;
 
     /**
      * @return string
@@ -29,5 +30,10 @@ interface GeoMaxMindConfigInterface
     /**
      * @return string
      */
-    public function getPathDownloadUrlCitiesBinary(): string;
+    public function getPathDownloadUrlCitiesBin(): string;
+
+    /**
+     * @return array
+     */
+    public function getLocales(): array;
 }

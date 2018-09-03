@@ -6,13 +6,14 @@ return [
     'maxmind' => [
         'downloadUrls' => [
             'countries' => [
-                'csv'    => 'http://geolite.maxmind.com/download/geoip/database/GeoLite2-Country-CSV.zip',
-                'binary' => 'http://geolite.maxmind.com/download/geoip/database/GeoLite2-Country.tar.gz',
+                'bin' => 'http://geolite.maxmind.com/download/geoip/database/GeoLite2-Country.tar.gz',
+                'csv' => 'http://geolite.maxmind.com/download/geoip/database/GeoLite2-Country-CSV.zip',
             ],
-            'cities' => [
-                'csv'    => 'http://geolite.maxmind.com/download/geoip/database/GeoLite2-City-CSV.zip',
-                'binary' => 'http://geolite.maxmind.com/download/geoip/database/GeoLite2-City.tar.gz',
+            'cities'    => [
+                'bin' => 'http://geolite.maxmind.com/download/geoip/database/GeoLite2-City.tar.gz',
+                'csv' => 'http://geolite.maxmind.com/download/geoip/database/GeoLite2-City-CSV.zip',
             ],
         ],
+        'locales'      => ['de', 'en', 'fr', 'es', 'pt', 'zh', 'ja', 'ru'],
     ],
 ];

@@ -11,6 +11,10 @@ use BetaKiller\Task\TaskException;
 class ImportCountriesAndCities extends AbstractTask
 {
     private const PATH_TEMP_CREATING_ATTEMPTS = 20;
+    private const LOCALE_MAIN                 = 'en';
+    private const TEMPLATE_FILE_COUNTRY       = 'GeoLite2-Country-Locations-:locale.csv';
+    private const TEMPLATE_FILE_CITY          = 'GeoLite2-City-Locations-:locale.csv';
+    private const CSV_SEPARATOR               = ',';
     private const SHELL_COMMAND_REMOVE        = 'rm -rf :path';
     private const SHELL_COMMAND_DOWNLOAD      = 'wget :downloadUrl -O :resultPath';
     private const SHELL_COMMAND_UNZIP         = 'unzip -o :zipPath -d :resultPath';
@@ -41,16 +45,136 @@ class ImportCountriesAndCities extends AbstractTask
 
     public function run(): void
     {
-        $downloadUrl   = $this->config->getPathDownloadUrlCountriesCsv();
-        $countriesPath = $this->download($downloadUrl);
-
-        $downloadUrl = $this->config->getPathDownloadUrlCitiesCsv();
-        $citiesPath  = $this->download($downloadUrl);
-
-        var_dump($countriesPath);
-        var_dump($citiesPath);
+        $countries = $this->downloadCountries();
+        $cities    = $this->downloadCities();
     }
 
+    /**
+     * @return array
+     * @throws \BetaKiller\Task\TaskException
+     */
+    public function downloadCountries(): array
+    {
+        $downloadUrl = $this->config->getPathDownloadUrlCountriesCsv();
+        $filesPath   = $this->download($downloadUrl);
+
+        // todo convert to [[id,code,isEu,name:[de,en,..]],..]
+        $items   = [];
+        $locales = $this->config->getLocales();
+        foreach ($locales as $locale) {
+            $csvFilePath = $this->createFilePath($filesPath, self::TEMPLATE_FILE_COUNTRY, $locale);
+            $this->testFileExists($csvFilePath);
+
+            // todo remove duplicates by code
+            $itemsForLocale = $this->readCsvFile($csvFilePath);
+            foreach ($itemsForLocale as &$item) {
+                $item = [
+                    'id'   => $item[0],
+                    'code' => strtolower($item[2]),
+                    'name' => $item[3],
+                    'isEu' => (bool)$item[6],
+                ];
+            }
+            unset($item);
+
+            $items[$locale] = $itemsForLocale;
+        }
+
+        return $items;
+    }
+
+    /**
+     * @return array
+     * @throws \BetaKiller\Task\TaskException
+     */
+    public function downloadCities(): array
+    {
+        $downloadUrl = $this->config->getPathDownloadUrlCitiesCsv();
+        $filesPath   = $this->download($downloadUrl);
+
+        // todo convert to [countryCode:[id,name:[de,en,..]],..]
+        $items   = [];
+        $locales = $this->config->getLocales();
+        foreach ($locales as $locale) {
+            $csvFilePath = $this->createFilePath($filesPath, self::TEMPLATE_FILE_COUNTRY, $locale);
+            $this->testFileExists($csvFilePath);
+
+            if (!isset($items[$locale])) {
+                $items[$locale] = [];
+            }
+
+            // todo remove duplicates by name
+            $itemsForLocale = $this->readCsvFile($csvFilePath);
+            foreach ($itemsForLocale as $item) {
+                $countryCode = strtolower($item[4]);
+                if (!isset($items[$locale][$countryCode])) {
+                    $items[$locale][$countryCode] = [];
+                }
+                $items[$locale][$countryCode][] = [
+                    'id'   => $item[0],
+                    'name' => $item[5],
+                ];
+            }
+        }
+
+        return $items;
+    }
+
+    /**
+     * @param string $path
+     *
+     * @return array
+     */
+    private function readCsvFile(string $path): array
+    {
+        $lines = str_getcsv(file_get_contents($path), "\n");
+        foreach ($lines as &$line) {
+            $line = str_getcsv($line, self::CSV_SEPARATOR);
+        }
+        unset($line);
+
+        if (\count($lines) === 1 && isset($lines[0]) && $lines[0] === null) {
+            throw new TaskException('Unable parsing CSV file: '.$path);
+        }
+
+        return $lines;
+    }
+
+    /**
+     * @param string $path
+     *
+     * @return \BetaKiller\Task\Geo\ImportCountriesAndCities
+     * @throws \BetaKiller\Task\TaskException
+     */
+    private function testFileExists(string $path): self
+    {
+        if (!file_exists($path)) {
+            throw new TaskException('Not found file: '.$path);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param string $directory
+     * @param string $fileNameTemplate
+     * @param string $localeCode
+     *
+     * @return string
+     */
+    private function createFilePath(string $directory, string $fileNameTemplate, string $localeCode): string
+    {
+        $fileName = $this->fillString($fileNameTemplate, ['locale' => $localeCode]);
+
+        return $directory.DIRECTORY_SEPARATOR.$fileName;
+    }
+
+    /**
+     * @param string $downloadUrl
+     *
+     * @return string
+     * @throws \BetaKiller\Task\TaskException
+     */
     private function download(string $downloadUrl): string
     {
         $tempPath = $this->createTempPath();
@@ -208,57 +332,6 @@ class ImportCountriesAndCities extends AbstractTask
                 $parentPath, self::PATH_TEMP_CREATING_ATTEMPTS
             )
         );
-    }
-
-
-    public function run2(): void
-    {
-        $tempPath = \sys_get_temp_dir().DIRECTORY_SEPARATOR.\uniqid(\hash('md5', __CLASS__), true);
-        echo PHP_EOL;
-        echo $tempPath;
-        if (file_exists($tempPath)) {
-            rmdir($tempPath);
-        }
-
-        echo PHP_EOL;
-        if (!\mkdir($tempPath) && !\is_dir($tempPath)) {
-            echo 0;
-        } else {
-            echo 1;
-        }
-
-        echo PHP_EOL;
-        $tempFilePath = tempnam($tempPath, \hash('md5', $tempPath));
-        if (\file_exists($tempFilePath)) {
-            echo 1;
-        } else {
-            echo 0;
-        }
-
-        echo PHP_EOL;
-        rmdir($tempPath);
-        if (file_exists($tempPath)) {
-            echo 1;
-        } else {
-            echo 0;
-        }
-
-        exit;
-
-        $downloadCommand = '
-            rm -rf /var/www/spa.dev/www/GeoTemp;
-            wget http://geolite.maxmind.com/download/geoip/database/GeoLite2-City-CSV.zip -O /var/www/spa.dev/www/GeoTemp.zip;
-            unzip -o /var/www/spa.dev/www/GeoTemp.zip -d /var/www/spa.dev/www/GeoTemp;
-            rm -rf /var/www/spa.dev/www/GeoTemp.zip
-        ';
-        shell_exec($downloadCommand);
-
-        $downloadPath = '/var/www/spa.dev/www/GeoTemp';
-        if (!\file_exists($downloadPath)) {
-            echo 'Not found';
-        } else {
-            echo 'ok';
-        }
     }
 }
 
