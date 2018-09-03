@@ -24,7 +24,7 @@ class GeoMaxMindConfig extends AbstractConfig implements GeoMaxMindConfigInterfa
     /**
      * @return string
      */
-    public function getPathDownloadUrlCountriesBinary(): string
+    public function getPathDownloadUrlCountriesBin(): string
     {
         return (string)$this->get(self::PATH_DOWNLOAD_URL_COUNTRIES_BIN);
     }
@@ -40,8 +40,15 @@ class GeoMaxMindConfig extends AbstractConfig implements GeoMaxMindConfigInterfa
     /**
      * @return string
      */
-    public function getPathDownloadUrlCitiesBinary(): string
+    public function getPathDownloadUrlCitiesBin(): string
     {
-        return (string)$this->get(self::PATH_DOWNLOAD_URL_CITIES_BINARY);
+        return (string)$this->get(self::PATH_DOWNLOAD_URL_CITIES_BIN);
+    }
+
+    /**
+     * @return array
+     */
+    public function getLocales(): array {
+        return (string)$this->get(self::PATH_LOCALES);
     }
 }
