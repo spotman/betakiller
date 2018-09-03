@@ -48,7 +48,8 @@ class GeoMaxMindConfig extends AbstractConfig implements GeoMaxMindConfigInterfa
     /**
      * @return array
      */
-    public function getLocales(): array {
-        return (string)$this->get(self::PATH_LOCALES);
+    public function getLocales(): array
+    {
+        return (array)$this->get(self::PATH_LOCALES);
     }
 }
