@@ -5,11 +5,11 @@ return [
     // https://dev.maxmind.com/geoip/geoip2/geolite2/
     'maxmind' => [
         'downloadUrls' => [
-            'country' => [
+            'countries' => [
                 'csv'    => 'http://geolite.maxmind.com/download/geoip/database/GeoLite2-Country-CSV.zip',
                 'binary' => 'http://geolite.maxmind.com/download/geoip/database/GeoLite2-Country.tar.gz',
             ],
-            'city' => [
+            'cities' => [
                 'csv'    => 'http://geolite.maxmind.com/download/geoip/database/GeoLite2-City-CSV.zip',
                 'binary' => 'http://geolite.maxmind.com/download/geoip/database/GeoLite2-City.tar.gz',
             ],

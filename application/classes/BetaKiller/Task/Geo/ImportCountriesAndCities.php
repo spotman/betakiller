@@ -41,12 +41,23 @@ class ImportCountriesAndCities extends AbstractTask
 
     public function run(): void
     {
+        $downloadUrl   = $this->config->getPathDownloadUrlCountriesCsv();
+        $countriesPath = $this->download($downloadUrl);
+
+        $downloadUrl = $this->config->getPathDownloadUrlCitiesCsv();
+        $citiesPath  = $this->download($downloadUrl);
+
+        var_dump($countriesPath);
+        var_dump($citiesPath);
+    }
+
+    private function download(string $downloadUrl): string
+    {
         $tempPath = $this->createTempPath();
         $this->logger->debug('Temp path: '.$tempPath);
 
         $this->createDirectory($tempPath);
 
-        $downloadUrl = $this->config->getPathDownloadUrlCityCsv();
         $this->logger->debug('Downloading url: '.$downloadUrl);
 
         $zipPath = explode('/', $downloadUrl);
@@ -70,7 +81,7 @@ class ImportCountriesAndCities extends AbstractTask
             'path' => $zipPath,
         ]);
 
-        $csvDirectoryPath = $this->findCsvDirectoryPath($tempPath);
+        return $this->findFirstDirectoryPath($tempPath);
     }
 
     /**
@@ -79,11 +90,11 @@ class ImportCountriesAndCities extends AbstractTask
      * @return string
      * @throws \BetaKiller\Task\TaskException
      */
-    private function findCsvDirectoryPath(string $searchPath): string
+    private function findFirstDirectoryPath(string $searchPath): string
     {
         $paths = glob($searchPath.DIRECTORY_SEPARATOR.'*', GLOB_ONLYDIR);
         if (empty($paths)) {
-            throw new TaskException('Unable find CSV directory in: '.$searchPath);
+            throw new TaskException('Unable find first directory in: '.$searchPath);
         }
 
         return $paths[0];
