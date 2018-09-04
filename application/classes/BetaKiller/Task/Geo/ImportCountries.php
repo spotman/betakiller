@@ -4,10 +4,36 @@ declare(strict_types=1);
 namespace BetaKiller\Task\Geo;
 
 use BetaKiller\Model\Language;
+use BetaKiller\Repository\CountryI18nRepository;
+use BetaKiller\Repository\CountryRepository;
 
 class ImportCountries extends AbstractImport
 {
     protected const TEMPLATE_FILE_NAME = 'GeoLite2-Country-Locations-:language.csv';
+
+    /**
+     * @var \BetaKiller\Repository\CountryRepository
+     */
+    private $countryRepository;
+
+    /**
+     * @var \BetaKiller\Repository\CountryI18nRepository
+     */
+    private $countryI18NRepository;
+
+    /**
+     * ImportCountries constructor.
+     *
+     * @param \BetaKiller\Repository\CountryRepository     $countryRepository
+     * @param \BetaKiller\Repository\CountryI18nRepository $countryI18NRepository
+     */
+    public function __construct(CountryRepository $countryRepository, CountryI18nRepository $countryI18NRepository)
+    {
+        $this->countryRepository = $countryRepository;
+        $this->countryI18NRepository = $countryI18NRepository;
+
+        parent::__construct();
+    }
 
     /**
      * @param array                      $items
