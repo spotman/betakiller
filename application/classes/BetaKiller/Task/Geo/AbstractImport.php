@@ -5,16 +5,21 @@ namespace BetaKiller\Task\Geo;
 
 use BetaKiller\Config\GeoMaxMindConfig;
 use BetaKiller\Log\Logger;
+use BetaKiller\Model\City;
+use BetaKiller\Model\Country;
+use BetaKiller\Model\Language;
 use BetaKiller\Task\AbstractTask;
 use BetaKiller\Task\TaskException;
 
 abstract class AbstractImport extends AbstractTask
 {
+    protected const TEMPLATE_FILE_NAME     = '';
+    protected const LANGUAGE_NAME_MAIN     = 'en';
     protected const CSV_SEPARATOR          = ',';
     protected const SHELL_COMMAND_REMOVE   = 'rm -rf :path';
     protected const SHELL_COMMAND_DOWNLOAD = 'wget :downloadUrl -O :resultPath';
     protected const SHELL_COMMAND_UNZIP    = 'unzip -o :zipPath -d :resultPath';
-    
+
     private const PATH_TEMP_CREATING_ATTEMPTS = 10;
 
     /**
@@ -26,6 +31,12 @@ abstract class AbstractImport extends AbstractTask
      * @var \BetaKiller\Log\Logger
      */
     protected $logger;
+
+    /**
+     * @Inject
+     * @var \BetaKiller\Repository\CityRepository
+     */
+    protected $countriesRepository;
 
     /**
      * ImportCountriesAndCities constructor.
@@ -41,17 +52,61 @@ abstract class AbstractImport extends AbstractTask
         parent::__construct();
     }
 
+    public function run(): void
+    {
+        $tempPath = $this->createTempPath();
+        $this->logger->debug('Temp path: '.$tempPath);
+
+        $downloadUrl  = $this->config->getPathDownloadUrlCountriesCsv();
+        $csvFilesPath = $this->download($tempPath, $downloadUrl);
+
+        $languagesApp   = (new Language())->get_all();
+        $languagesFiles = $this->config->getLanguages();
+
+        foreach ($languagesApp as $languageApp) {
+            $languageAppLocale  = $languageApp->getLocale();
+            $languageFileLocale = $languagesFiles[$languageAppLocale];
+
+            $csvFilePath = $this->createFilePath($csvFilesPath, self::TEMPLATE_FILE_NAME, $languageFileLocale);
+            $items       = $this->parseCsv($csvFilePath);
+
+            $this->import($items, $languageApp);
+        }
+
+        $this->runShellCommand(
+            self::SHELL_COMMAND_REMOVE, [
+            'path' => $tempPath,
+        ]);
+
+        var_dump(memory_get_peak_usage());
+        var_dump(memory_get_peak_usage(true));
+    }
+
     /**
+     * @param array                      $items
+     * @param \BetaKiller\Model\Language $languageApp
+     *
+     * @return void
+     */
+    abstract protected function import(array $items, Language $languageApp): void;
+
+    /**
+     * @param string $csvFilePath
+     *
+     * @return array
+     * @throws \BetaKiller\Task\TaskException
+     */
+    abstract protected function parseCsv(string $csvFilePath): array;
+
+    /**
+     * @param string $tempPath
      * @param string $downloadUrl
      *
      * @return string
      * @throws \BetaKiller\Task\TaskException
      */
-    protected function download(string $downloadUrl): string
+    protected function download(string $tempPath, string $downloadUrl): string
     {
-        $tempPath = $this->createTempPath();
-        $this->logger->debug('Temp path: '.$tempPath);
-
         $this->createDirectory($tempPath);
 
         $this->logger->debug('Downloading url: '.$downloadUrl);
@@ -77,7 +132,7 @@ abstract class AbstractImport extends AbstractTask
 
     /**
      * @param string $command
-     * @param array $data
+     * @param array  $data
      *
      * @return \BetaKiller\Task\Geo\AbstractImport
      * @throws \BetaKiller\Task\TaskException

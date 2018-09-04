@@ -7,31 +7,17 @@ use BetaKiller\Model\Language;
 
 class ImportCountries extends AbstractImport
 {
-    private const TEMPLATE_FILE_NAME = 'GeoLite2-Country-Locations-:language.csv';
+    protected const TEMPLATE_FILE_NAME = 'GeoLite2-Country-Locations-:language.csv';
 
-    public function run(): void
+    /**
+     * @param array                      $items
+     * @param \BetaKiller\Model\Language $languageApp
+     *
+     * @return void
+     */
+    protected function import(array $items, Language $languageApp): void
     {
-        $languagesApp   = (new Language())->get_all();
-        $languagesFiles = $this->config->getLanguages();
 
-        $downloadUrl  = $this->config->getPathDownloadUrlCountriesCsv();
-        $csvFilesPath = $this->download($downloadUrl);
-
-        foreach ($languagesApp as $languageApp) {
-            $languageAppLocale  = $languageApp->getLocale();
-            $languageFileLocale = $languagesFiles[$languageAppLocale];
-
-            $csvFilePath = $this->createFilePath($csvFilesPath, self::TEMPLATE_FILE_NAME, $languageFileLocale);
-            $items       = $this->parseCsv($csvFilePath);
-        }
-
-        $this->runShellCommand(
-            self::SHELL_COMMAND_REMOVE, [
-            'path' => $csvFilesPath,
-        ]);
-
-        var_dump(memory_get_peak_usage());
-        var_dump(memory_get_peak_usage(true));
     }
 
     /**
@@ -40,7 +26,7 @@ class ImportCountries extends AbstractImport
      * @return array
      * @throws \BetaKiller\Task\TaskException
      */
-    public function parseCsv(string $csvFilePath): array
+    protected function parseCsv(string $csvFilePath): array
     {
         $this->logger->debug('Parsing CSV: '.$csvFilePath);
 
