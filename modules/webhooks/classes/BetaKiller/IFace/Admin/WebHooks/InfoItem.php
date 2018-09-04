@@ -4,13 +4,14 @@ declare(strict_types=1);
 namespace BetaKiller\IFace\Admin\WebHooks;
 
 use BetaKiller\Factory\WebHookFactory;
+use BetaKiller\Helper\IFaceHelper;
 use BetaKiller\IFace\Admin\AbstractAdminBase;
+use BetaKiller\Model\WebHookLogInterface;
 use BetaKiller\Repository\WebHookLogRepository;
 use BetaKiller\Url\Container\UrlContainer;
 use BetaKiller\Url\Container\UrlContainerInterface;
 use BetaKiller\Url\UrlElementTreeInterface;
 use BetaKiller\Url\WebHookModelInterface;
-use BetaKiller\Helper\IFaceHelper;
 
 class InfoItem extends AbstractAdminBase
 {
@@ -126,21 +127,18 @@ class InfoItem extends AbstractAdminBase
     protected function getLogItems(string $codeName): array
     {
         $logItems = $this->webHookLogRepository->getItems($codeName);
-        foreach ($logItems as &$logItem) {
-            $logItem = [
-                'id'          => $logItem->getID(),
-                'codeName'    => $logItem->getCodename(),
-                'dateCreated' => $logItem->getCreatedAt(),
-                'status'      => (int)$logItem->isStatusSucceeded(),
-                'message'     => $logItem->getMessage(),
-                'requestData' => $logItem->getRequestData()->get(),
+
+        return array_map(function (WebHookLogInterface $model) {
+            return [
+                'id'          => $model->getID(),
+                'codeName'    => $model->getCodename(),
+                'dateCreated' => $model->getCreatedAt(),
+                'status'      => (int)$model->isStatusSucceeded(),
+                'message'     => $model->getMessage(),
+                'requestData' => $model->getRequestData()->get(),
             ];
-        }
-        unset($logItem);
-
-        return $logItems;
+        }, $logItems);
     }
-
 
     /**
      * @return \BetaKiller\Url\WebHookModelInterface

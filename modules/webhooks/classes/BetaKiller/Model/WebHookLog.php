@@ -131,9 +131,8 @@ class WebHookLog extends \ORM implements WebHookLogInterface
                 $data = [];
             }
         }
-        $data = new WebHookLogRequestDataAggregator($data);
 
-        return $data;
+        return new WebHookLogRequestDataAggregator($data);
     }
 
     /**
@@ -143,8 +142,7 @@ class WebHookLog extends \ORM implements WebHookLogInterface
      */
     public function setRequestData(WebHookLogRequestDataInterface $value): WebHookLogInterface
     {
-        $value = \json_encode($value->get());
-        $this->set(self::TABLE_FIELD_REQUEST_DATA, $value);
+        $this->set(self::TABLE_FIELD_REQUEST_DATA, \json_encode($value->get()));
 
         return $this;
     }
