@@ -13,7 +13,7 @@ class ContentGallery extends ORM implements ContentGalleryInterface
      *
      * @return void
      */
-    protected function _initialize(): void
+    protected function configure(): void
     {
         $this->_table_name = 'content_galleries';
 
@@ -28,7 +28,7 @@ class ContentGallery extends ORM implements ContentGalleryInterface
             ],
         ]);
 
-        parent::_initialize();
+        parent::configure();
     }
 
     private function imagesAreValid(): bool

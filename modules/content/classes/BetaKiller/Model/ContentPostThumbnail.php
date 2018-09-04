@@ -7,7 +7,7 @@ class ContentPostThumbnail extends AbstractOrmBasedAssetsImageModel implements C
     use OrmBasedEntityHasWordpressIdTrait,
         OrmBasedEntityHasWordpressPathTrait;
 
-    protected function _initialize(): void
+    protected function configure(): void
     {
         $this->_table_name = 'content_post_thumbnails';
 
@@ -18,7 +18,7 @@ class ContentPostThumbnail extends AbstractOrmBasedAssetsImageModel implements C
             ],
         ]);
 
-        parent::_initialize();
+        parent::configure();
     }
 
     /**

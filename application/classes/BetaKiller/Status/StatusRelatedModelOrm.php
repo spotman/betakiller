@@ -7,10 +7,10 @@ abstract class StatusRelatedModelOrm extends ORM implements StatusRelatedModelIn
 {
     use StatusRelatedModelOrmTrait;
 
-    protected function _initialize()
+    protected function configure(): void
     {
         $this->initializeRelatedModelRelation();
 
-        parent::_initialize();
+        parent::configure();
     }
 }

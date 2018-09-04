@@ -32,7 +32,7 @@ class ContentPost extends AbstractOrmBasedModelWithRevisions implements ContentP
      *
      * @return void
      */
-    protected function _initialize(): void
+    protected function configure(): void
     {
         $this->_table_name = 'content_posts';
 
@@ -60,7 +60,7 @@ class ContentPost extends AbstractOrmBasedModelWithRevisions implements ContentP
 
         $this->initializeRelatedModelRelation();
 
-        parent::_initialize();
+        parent::configure();
     }
 
     /**

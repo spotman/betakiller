@@ -12,11 +12,11 @@ class ContentPostStatus extends StatusModelOrm
     public const PAUSED_ID        = 4;
     public const FIX_REQUESTED_ID = 5;
 
-    protected function _initialize()
+    protected function configure(): void
     {
         $this->_table_name = 'content_post_statuses';
 
-        parent::_initialize();
+        parent::configure();
     }
 
     /**

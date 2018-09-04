@@ -12,11 +12,11 @@ class ContentPostRevision extends AbstractRevisionOrmModel
      * @throws \Exception
      * @return void
      */
-    protected function _initialize()
+    protected function configure(): void
     {
         $this->_table_name = 'content_post_revisions';
 
-        parent::_initialize();
+        parent::configure();
     }
 
     protected function getRelatedEntityModelName(): string

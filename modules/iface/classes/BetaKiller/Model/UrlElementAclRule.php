@@ -12,7 +12,7 @@ class UrlElementAclRule extends ORM
      * @throws \BetaKiller\Exception
      * @return void
      */
-    protected function _initialize()
+    protected function configure(): void
     {
         $this->_table_name = 'url_element_acl_rules';
 
@@ -32,7 +32,7 @@ class UrlElementAclRule extends ORM
             'permission'
         ]);
 
-        parent::_initialize();
+        parent::configure();
     }
 
     public function getCombinedRule()

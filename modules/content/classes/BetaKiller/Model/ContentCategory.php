@@ -8,7 +8,7 @@ class ContentCategory extends AbstractOrmBasedSingleParentTreeModel implements C
     use OrmBasedEntityHasWordpressIdTrait,
         OrmBasedSeoMetaTrait;
 
-    protected function _initialize(): void
+    protected function configure(): void
     {
         $this->_table_name = 'content_categories';
 
@@ -19,7 +19,7 @@ class ContentCategory extends AbstractOrmBasedSingleParentTreeModel implements C
             ],
         ]);
 
-        parent::_initialize();
+        parent::configure();
     }
 
     /**
