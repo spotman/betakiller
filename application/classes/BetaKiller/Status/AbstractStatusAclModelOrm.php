@@ -10,7 +10,7 @@ class AbstractStatusAclModelOrm extends \ORM implements StatusAclModelInterface
      * @throws \Exception
      * @return void
      */
-    protected function _initialize()
+    protected function configure(): void
     {
         $this->belongs_to([
             'role'  =>  [
@@ -21,7 +21,7 @@ class AbstractStatusAclModelOrm extends \ORM implements StatusAclModelInterface
 
         $this->load_with(['role']);
 
-        parent::_initialize();
+        parent::configure();
     }
 
     /**

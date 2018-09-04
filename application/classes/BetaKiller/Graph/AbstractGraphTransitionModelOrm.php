@@ -5,7 +5,7 @@ use ORM;
 
 abstract class AbstractGraphTransitionModelOrm extends ORM implements GraphTransitionModelInterface
 {
-    protected function _initialize()
+    protected function configure(): void
     {
         $source_node_key = $this->getSourceNodeRelationKey();
         $target_node_key = $this->getTargetNodeRelationKey();
@@ -26,7 +26,7 @@ abstract class AbstractGraphTransitionModelOrm extends ORM implements GraphTrans
 
         $this->load_with([$source_node_key, $target_node_key]);
 
-        parent::_initialize();
+        parent::configure();
     }
 
     /**

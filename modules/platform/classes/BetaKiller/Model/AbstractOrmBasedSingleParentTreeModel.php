@@ -3,7 +3,7 @@ namespace BetaKiller\Model;
 
 abstract class AbstractOrmBasedSingleParentTreeModel extends \ORM implements SingleParentTreeModelInterface
 {
-    protected function _initialize()
+    protected function configure(): void
     {
         $this->belongs_to([
             'parent' => [
@@ -14,7 +14,7 @@ abstract class AbstractOrmBasedSingleParentTreeModel extends \ORM implements Sin
 
         $this->load_with(['parent']);
 
-        parent::_initialize();
+        parent::configure();
     }
 
     protected function getParentIdColumnName(): string

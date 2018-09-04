@@ -10,7 +10,7 @@ class RefLink extends \ORM
      * @throws \Exception
      * @return void
      */
-    protected function _initialize(): void
+    protected function configure(): void
     {
         $this->_table_name = 'ref_links';
 
@@ -27,7 +27,7 @@ class RefLink extends \ORM
 
         $this->load_with(['source', 'target']);
 
-        parent::_initialize();
+        parent::configure();
     }
 
     public function setSource(?RefPage $source): RefLink

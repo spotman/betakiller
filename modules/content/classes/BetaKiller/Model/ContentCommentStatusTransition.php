@@ -11,11 +11,11 @@ class ContentCommentStatusTransition extends StatusTransitionModelOrm
     public const REJECT             = 'reject';
     public const RESTORE_FROM_TRASH = 'restoreFromTrash';
 
-    protected function _initialize()
+    protected function configure(): void
     {
         $this->_table_name = 'content_comment_status_transitions';
 
-        parent::_initialize();
+        parent::configure();
     }
 
     /**

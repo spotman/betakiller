@@ -13,7 +13,7 @@ class MissingUrl extends \ORM implements MissingUrlModelInterface
      * @throws \Exception
      * @return void
      */
-    protected function _initialize()
+    protected function configure(): void
     {
         $this->_table_name = 'missing_urls';
 
@@ -33,7 +33,7 @@ class MissingUrl extends \ORM implements MissingUrlModelInterface
             ],
         ]);
 
-        parent::_initialize();
+        parent::configure();
     }
 
     public function getMissedUrl(): string

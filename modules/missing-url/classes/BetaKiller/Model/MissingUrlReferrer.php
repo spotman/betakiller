@@ -13,7 +13,7 @@ class MissingUrlReferrer extends \ORM implements MissingUrlReferrerModelInterfac
      * @throws \Exception
      * @return void
      */
-    protected function _initialize()
+    protected function configure(): void
     {
         $this->_table_name = 'missing_url_referrers';
 
@@ -24,7 +24,7 @@ class MissingUrlReferrer extends \ORM implements MissingUrlReferrerModelInterfac
             ],
         ]);
 
-        parent::_initialize();
+        parent::configure();
     }
 
     public function getHttpReferer(): string

@@ -13,11 +13,11 @@ class AclResourcePermission extends \ORM
      * @throws Exception
      * @return void
      */
-    protected function _initialize(): void
+    protected function configure(): void
     {
         $this->_table_name = 'acl_resource_permissions';
 
-        parent::_initialize();
+        parent::configure();
     }
 
     /**

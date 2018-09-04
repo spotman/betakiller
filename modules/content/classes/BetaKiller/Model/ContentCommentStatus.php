@@ -10,11 +10,11 @@ class ContentCommentStatus extends StatusModelOrm
     public const STATUS_SPAM     = 3;
     public const STATUS_TRASH    = 4;
 
-    protected function _initialize(): void
+    protected function configure(): void
     {
         $this->_table_name = 'content_comment_statuses';
 
-        parent::_initialize();
+        parent::configure();
     }
 
     /**

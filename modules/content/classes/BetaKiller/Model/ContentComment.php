@@ -27,7 +27,7 @@ class ContentComment extends AbstractOrmBasedSingleParentTreeModel implements Co
      * @throws Exception
      * @return void
      */
-    protected function _initialize(): void
+    protected function configure(): void
     {
         $this->_table_name = 'content_comments';
 
@@ -44,7 +44,7 @@ class ContentComment extends AbstractOrmBasedSingleParentTreeModel implements Co
 
         $this->initializeRelatedModelRelation();
 
-        parent::_initialize();
+        parent::configure();
     }
 
     /**
