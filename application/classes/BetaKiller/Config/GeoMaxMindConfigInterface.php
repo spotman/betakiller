@@ -10,7 +10,7 @@ interface GeoMaxMindConfigInterface
     public const PATH_DOWNLOAD_URL_COUNTRIES_CSV = ['maxmind', 'downloadUrls', 'countries', 'csv'];
     public const PATH_DOWNLOAD_URL_CITIES_BIN    = ['maxmind', 'downloadUrls', 'cities', 'bin'];
     public const PATH_DOWNLOAD_URL_CITIES_CSV    = ['maxmind', 'downloadUrls', 'cities', 'csv'];
-    public const PATH_LOCALES                    = ['maxmind', 'locales'];
+    public const PATH_LANGUAGES                  = ['maxmind', 'languages'];
 
     /**
      * @return string
@@ -35,5 +35,5 @@ interface GeoMaxMindConfigInterface
     /**
      * @return array
      */
-    public function getLocales(): array;
+    public function getLanguages(): array;
 }
