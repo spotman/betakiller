@@ -5,8 +5,6 @@ namespace BetaKiller\Task\Geo;
 
 use BetaKiller\Config\GeoMaxMindConfig;
 use BetaKiller\Log\Logger;
-use BetaKiller\Model\City;
-use BetaKiller\Model\Country;
 use BetaKiller\Model\Language;
 use BetaKiller\Task\AbstractTask;
 use BetaKiller\Task\TaskException;
@@ -31,12 +29,6 @@ abstract class AbstractImport extends AbstractTask
      * @var \BetaKiller\Log\Logger
      */
     protected $logger;
-
-    /**
-     * @Inject
-     * @var \BetaKiller\Repository\CityRepository
-     */
-    protected $countriesRepository;
 
     /**
      * ImportCountriesAndCities constructor.
