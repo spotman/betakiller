@@ -21,7 +21,7 @@ trait OrmBasedRepositoryHasWordpressPathTrait
         /** @var OrmInterface $orm */
         $orm = $this->getOrmInstance();
 
-        $this->filter_wp_path($orm, $wp_path);
+        $this->filterWpPath($orm, $wp_path);
 
         /** @var EntityHasWordpressPathInterface $model */
         $model = $orm->find();
@@ -33,7 +33,7 @@ trait OrmBasedRepositoryHasWordpressPathTrait
      * @param \BetaKiller\Utils\Kohana\ORM\OrmInterface $orm
      * @param string                                    $wp_path
      */
-    private function filter_wp_path(OrmInterface $orm, string $wp_path)
+    private function filterWpPath(OrmInterface $orm, string $wp_path)
     {
         $orm->where('wp_path', '=', $wp_path);
     }
