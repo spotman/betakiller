@@ -14,6 +14,21 @@ class CountryI18n extends \ORM implements CountryI18nInterface
     {
         $this->_table_name = self::TABLE_NAME;
 
+        $this->belongs_to([
+            'country'  => [
+                'model'       => 'Country',
+                'foreign_key' => self::TABLE_FIELD_COUNTRY_ID,
+            ],
+            'language' => [
+                'model'       => 'Language',
+                'foreign_key' => self::TABLE_FIELD_LANGUAGE_ID,
+            ],
+        ]);
+        $this->load_with([
+            'city',
+            'language',
+        ]);
+
         parent::configure();
     }
 
@@ -37,43 +52,43 @@ class CountryI18n extends \ORM implements CountryI18nInterface
     }
 
     /**
-     * @param int $value
+     * @param \BetaKiller\Model\CountryInterface $countryModel
      *
      * @return \BetaKiller\Model\CountryI18nInterface
      */
-    public function setCountryId(int $value): CountryI18nInterface
+    public function setCountry(CountryInterface $countryModel): CountryI18nInterface
     {
-        $this->set(self::TABLE_FIELD_COUNTRY_ID, $value);
+        $this->set(self::TABLE_FIELD_COUNTRY_ID, $countryModel);
 
         return $this;
     }
 
     /**
-     * @return int
+     * @return CountryInterface
      */
-    public function getCountryId(): int
+    public function getCountry(): CountryInterface
     {
-        return (int)$this->get(self::TABLE_FIELD_COUNTRY_ID);
+        return $this->get('country');
     }
 
     /**
-     * @param int $value
+     * @param \BetaKiller\Model\LanguageInterface $languageModel
      *
      * @return \BetaKiller\Model\CountryI18nInterface
      */
-    public function setLanguageId(int $value): CountryI18nInterface
+    public function setLanguage(LanguageInterface $languageModel): CountryI18nInterface
     {
-        $this->set(self::TABLE_FIELD_LANGUAGE_ID, $value);
+        $this->set(self::TABLE_FIELD_LANGUAGE_ID, $languageModel);
 
         return $this;
     }
 
     /**
-     * @return int
+     * @return \BetaKiller\Model\LanguageInterface
      */
-    public function getLanguageId(): int
+    public function getLanguage(): LanguageInterface
     {
-        return (int)$this->get(self::TABLE_FIELD_LANGUAGE_ID);
+        return $this->get('language');
     }
 
     /**

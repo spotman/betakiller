@@ -6,28 +6,28 @@ namespace BetaKiller\Model;
 interface CountryI18nInterface
 {
     /**
-     * @param int $value
+     * @param \BetaKiller\Model\CountryInterface $countryModel
      *
      * @return \BetaKiller\Model\CountryI18nInterface
      */
-    public function setCountryId(int $value): CountryI18nInterface;
+    public function setCountry(CountryInterface $countryModel): CountryI18nInterface;
 
     /**
-     * @return int
+     * @return Country
      */
-    public function getCountryId(): int;
+    public function getCountry(): CountryInterface;
 
     /**
-     * @param int $value
+     * @param \BetaKiller\Model\LanguageInterface $languageModel
      *
      * @return \BetaKiller\Model\CountryI18nInterface
      */
-    public function setLanguageId(int $value): CountryI18nInterface;
+    public function setLanguage(LanguageInterface $languageModel): CountryI18nInterface;
 
     /**
-     * @return int
+     * @return \BetaKiller\Model\LanguageInterface
      */
-    public function getLanguageId(): int;
+    public function getLanguage(): LanguageInterface;
 
     /**
      * @param string $value

@@ -11,10 +11,26 @@ class Country extends \ORM implements CountryInterface
     public const TABLE_FIELD_CREATED_BY  = 'created_by';
     public const TABLE_FIELD_APPROVED_AT = 'approved_at';
     public const TABLE_FIELD_APPROVED_BY = 'approved_by';
+    public const TABLE_FIELD_EU          = 'eu';
 
     protected function configure(): void
     {
         $this->_table_name = self::TABLE_NAME;
+
+        $this->belongs_to([
+            'createdBy'  => [
+                'model'       => 'User',
+                'foreign_key' => self::TABLE_FIELD_CREATED_BY,
+            ],
+            'approvedBy' => [
+                'model'       => 'User',
+                'foreign_key' => self::TABLE_FIELD_APPROVED_BY,
+            ],
+        ]);
+        $this->load_with([
+            'createdBy',
+            'approvedBy',
+        ]);
 
         parent::configure();
     }
@@ -90,23 +106,23 @@ class Country extends \ORM implements CountryInterface
     }
 
     /**
-     * @param int $value
+     * @param \BetaKiller\Model\UserInterface $userModel
      *
      * @return \BetaKiller\Model\CountryInterface
      */
-    public function setCreatedBy(int $value): CountryInterface
+    public function setCreatedBy(UserInterface $userModel): CountryInterface
     {
-        $this->set(self::TABLE_FIELD_CREATED_BY, $value);
+        $this->set(self::TABLE_FIELD_CREATED_BY, $userModel);
 
         return $this;
     }
 
     /**
-     * @return int
+     * @return \BetaKiller\Model\UserInterface
      */
-    public function getCreatedBy(): int
+    public function getCreatedBy(): UserInterface
     {
-        return (int)$this->get(self::TABLE_FIELD_CREATED_BY);
+        return $this->get('createdBy');
     }
 
     /**
@@ -131,22 +147,62 @@ class Country extends \ORM implements CountryInterface
     }
 
     /**
-     * @param int $value
+     * @param \BetaKiller\Model\UserInterface $userModel
      *
      * @return \BetaKiller\Model\CountryInterface
      */
-    public function setApprovedBy(int $value): CountryInterface
+    public function setApprovedBy(UserInterface $userModel): CountryInterface
     {
-        $this->set(self::TABLE_FIELD_APPROVED_BY, $value);
+        $this->set(self::TABLE_FIELD_APPROVED_BY, $userModel);
 
         return $this;
     }
 
     /**
-     * @return int
+     * @return \BetaKiller\Model\UserInterface|null
      */
-    public function getApprovedBy(): int
+    public function getApprovedBy(): ?UserInterface
     {
-        return (int)$this->get(self::TABLE_FIELD_APPROVED_BY);
+        return $this->get('approvedBy');
+    }
+
+    /**
+     * @param bool $value
+     *
+     * @return \BetaKiller\Model\CountryInterface
+     */
+    public function setEuStatus(bool $value): CountryInterface
+    {
+        $this->set(self::TABLE_FIELD_EU, $value);
+
+        return $this;
+    }
+
+    /**
+     * @return \BetaKiller\Model\CountryInterface
+     */
+    public function enableEu(): CountryInterface
+    {
+        $this->set(self::TABLE_FIELD_EU, true);
+
+        return $this;
+    }
+
+    /**
+     * @return \BetaKiller\Model\CountryInterface
+     */
+    public function disableEu(): CountryInterface
+    {
+        $this->set(self::TABLE_FIELD_EU, false);
+
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getEuStatus(): bool
+    {
+        return $this->get(self::TABLE_FIELD_EU);
     }
 }

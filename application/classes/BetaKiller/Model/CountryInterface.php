@@ -30,16 +30,16 @@ interface CountryInterface
     public function getCreatedAt(): \DateTimeImmutable;
 
     /**
-     * @param int $value
+     * @param \BetaKiller\Model\UserInterface $userModel
      *
      * @return \BetaKiller\Model\CountryInterface
      */
-    public function setCreatedBy(int $value): CountryInterface;
+    public function setCreatedBy(UserInterface $userModel): CountryInterface;
 
     /**
-     * @return int
+     * @return \BetaKiller\Model\UserInterface
      */
-    public function getCreatedBy(): int;
+    public function getCreatedBy(): UserInterface;
 
     /**
      * @param \DateTimeInterface|null $value
@@ -54,14 +54,36 @@ interface CountryInterface
     public function getApprovedAt(): ?\DateTimeImmutable;
 
     /**
-     * @param int $value
+     * @param \BetaKiller\Model\UserInterface $userModel
      *
      * @return \BetaKiller\Model\CountryInterface
      */
-    public function setApprovedBy(int $value): CountryInterface;
+    public function setApprovedBy(UserInterface $userModel): CountryInterface;
 
     /**
-     * @return int
+     * @return \BetaKiller\Model\User|null
      */
-    public function getApprovedBy(): int;
+    public function getApprovedBy(): ?UserInterface;
+
+    /**
+     * @param bool $value
+     *
+     * @return \BetaKiller\Model\CountryInterface
+     */
+    public function setEuStatus(bool $value): CountryInterface;
+
+    /**
+     * @return \BetaKiller\Model\CountryInterface
+     */
+    public function enableEu(): CountryInterface;
+
+    /**
+     * @return \BetaKiller\Model\CountryInterface
+     */
+    public function disableEu(): CountryInterface;
+
+    /**
+     * @return bool
+     */
+    public function getEuStatus(): bool;
 }

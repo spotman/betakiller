@@ -6,28 +6,28 @@ namespace BetaKiller\Model;
 interface CityI18nInterface
 {
     /**
-     * @param int $value
+     * @param \BetaKiller\Model\CityInterface $cityModel
      *
      * @return \BetaKiller\Model\CityI18nInterface
      */
-    public function setCityId(int $value): CityI18nInterface;
+    public function setCity(CityInterface $cityModel): CityI18nInterface;
 
     /**
-     * @return int
+     * @return \BetaKiller\Model\CityInterface
      */
-    public function getCityId(): int;
+    public function getCity(): CityInterface;
 
     /**
-     * @param int $value
+     * @param \BetaKiller\Model\LanguageInterface $languageModel
      *
      * @return \BetaKiller\Model\CityI18nInterface
      */
-    public function setLanguageId(int $value): CityI18nInterface;
+    public function setLanguage(LanguageInterface $languageModel): CityI18nInterface;
 
     /**
-     * @return int
+     * @return \BetaKiller\Model\LanguageInterface
      */
-    public function getLanguageId(): int;
+    public function getLanguage(): LanguageInterface;
 
     /**
      * @param string $value
