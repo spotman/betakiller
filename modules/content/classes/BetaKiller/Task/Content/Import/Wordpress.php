@@ -167,7 +167,7 @@ class Wordpress extends AbstractTask
 
     private $loadedTmpFiles = [];
 
-    protected function defineOptions(): array
+    public function defineOptions(): array
     {
         return [
             'skip-before' => null,

@@ -58,7 +58,7 @@ class Cron extends AbstractTask
         parent::__construct();
     }
 
-    protected function defineOptions(): array
+    public function defineOptions(): array
     {
         return [
             'human' => false,

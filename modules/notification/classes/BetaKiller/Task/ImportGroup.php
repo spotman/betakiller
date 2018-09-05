@@ -7,17 +7,23 @@ use BetaKiller\Model\NotificationGroupInterface;
 
 class ImportGroup extends AbstractImportGroup
 {
+    public function defineOptions(): array
+    {
+        // No cli arguments
+        return [];
+    }
+
     public function run(): void
     {
         $continue = $this->read(
         /** @lang text */
             'Group that are not in config will be disabled. Continue? [yes/no]'
         );
-        $continue = strtolower($continue);
-        while (!\in_array($continue, ['yes', 'no'])) {
+
+        while (!\in_array(strtolower($continue), ['yes', 'no'])) {
             $continue = $this->read('Type: yes/no');
-            $continue = strtolower($continue);
         }
+
         if ($continue === 'no') {
             return;
         }
@@ -72,8 +78,7 @@ class ImportGroup extends AbstractImportGroup
 
         $this->deleteRoles($groupModel);
 
-        $rolesCodenames = $this->getGroupRolesCodenamesFromConfig($groupCodename);
-        foreach ($rolesCodenames as $roleCodename) {
+        foreach ($this->getGroupRolesCodenamesFromConfig($groupCodename) as $roleCodename) {
             $roleModel   = $this->findRole($roleCodename);
             $roleEnabled = $groupModel->isEnabledForRole($roleModel);
             if (!$roleEnabled) {

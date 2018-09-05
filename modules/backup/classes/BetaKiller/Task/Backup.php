@@ -32,6 +32,12 @@ class Backup extends AbstractTask
         parent::__construct();
     }
 
+    public function defineOptions(): array
+    {
+        // No cli arguments
+        return [];
+    }
+
     public function run(): void
     {
         $service = $this->config('backup.service');

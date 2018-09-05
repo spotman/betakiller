@@ -4,7 +4,7 @@ class Task_Sitemap extends Minion_Task
 {
     /**
      * @Inject
-     * @var \Service_Sitemap
+     * @var \BetaKiller\Service\SitemapService
      */
     private $sitemapService;
 
