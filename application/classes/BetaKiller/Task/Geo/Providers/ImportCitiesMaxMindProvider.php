@@ -57,6 +57,7 @@ class ImportCitiesMaxMindProvider extends AbstractImportCountriesCitiesMaxMind
     ) {
         $this->cityRepository     = $cityRepository;
         $this->cityI18NRepository = $cityI18NRepository;
+        $this->user               = $user;
 
         parent::__construct($config, $citiesConfig, $languageRepository, $logger);
     }
@@ -74,36 +75,45 @@ class ImportCitiesMaxMindProvider extends AbstractImportCountriesCitiesMaxMind
         }
 
         $cityModel = $this->importItem($csvLine, $language);
-        $this->importI18n($csvLine, $language, $cityModel);
+        if ($cityModel) {
+            $this->importI18n($csvLine, $language, $cityModel);
+        }
     }
 
     /**
      * @param array                      $csvLine
      * @param \BetaKiller\Model\Language $languageModel
      *
-     * @return \BetaKiller\Model\CityInterface
+     * @return \BetaKiller\Model\CityInterface|null
+     * @throws \BetaKiller\Factory\FactoryException
+     * @throws \BetaKiller\Repository\RepositoryException
+     * @throws \BetaKiller\Task\TaskException
      */
-    private function importItem(array $csvLine, Language $languageModel): CityInterface
+    private function importItem(array $csvLine, Language $languageModel): ?CityInterface
     {
-        $csvItemId      = $csvLine[0];
-        $countryIsoCode = strtoupper(trim($csvLine[6]));
-        $name           = trim($csvLine[5]);
+        $csvItemId      = (int)$csvLine[0];
+        $countryIsoCode = strtoupper(trim($csvLine[4]));
+        $name           = trim($csvLine[10]);
 
-        $errorMessage = 'CSV item ID: :csvItemId. Application language locale: :locale';
-        $errorData    = [':csvItemId' => $csvItemId, ':locale' => $languageModel->getLocale()];
+        if (!$countryIsoCode && !$name) {
+            return null;
+        }
+
+        $errorMessage = 'CSV item ID: :id. Application language locale: :locale';
+        $errorData    = [':id' => $csvItemId, ':locale' => $languageModel->getLocale()];
 
         if (!$countryIsoCode || !$name) {
             if (!$countryIsoCode) {
                 throw new TaskException('Country ISO code is empty. '.$errorMessage, $errorData);
             }
             if (!$name) {
-                throw new TaskException('Name is empty. CSV item ID: :csvItemId. '.$errorMessage, $errorData);
+                throw new TaskException('Name is empty. '.$errorMessage, $errorData);
             }
         }
 
         $cityModel = $this
             ->cityRepository
-            ->findByMaxMindId($csvItemId);
+            ->findByMaxmindId($csvItemId);
 
         if (!$cityModel) {
             $languageItemsLocale = $this->config->getLanguageItemsLocale();
@@ -113,12 +123,16 @@ class ImportCitiesMaxMindProvider extends AbstractImportCountriesCitiesMaxMind
         }
 
         if (!$cityModel) {
-            $this->logger->debug('Import city: '.$csvItemId);
+            $this->logger->debug(
+                'Import city. Id: :id. Name: :name', [
+                ':id'   => $csvItemId,
+                ':name' => $name,
+            ]);
             $cityModel = (new City())
                 ->setName($name)
                 ->setCreatedAt()
                 ->setCreatedBy($this->user)
-                ->setMaxMindId($csvItemId);
+                ->setMaxmindId($csvItemId);
             $this
                 ->cityRepository
                 ->save($cityModel);
@@ -134,12 +148,32 @@ class ImportCitiesMaxMindProvider extends AbstractImportCountriesCitiesMaxMind
      */
     protected function importI18n(array $csvLine, Language $languageModel, CityInterface $cityModel): void
     {
-        $name = trim($csvLine[3]);
+        $name = trim($csvLine[10]);
 
-        $cityI18nModel = (new CityI18n())
-            ->setCity($cityModel)
-            ->setLanguage($languageModel)
-            ->setValue($name);
+        $cityI18nModel = $this
+            ->cityI18NRepository
+            ->findItem($cityModel, $languageModel);
+
+        if ($cityI18nModel && $cityI18nModel->getValue() === $name) {
+            return;
+        }
+
+        $this->logger->debug(
+            'Import city i18n: :name. City MaxMind ID: :id. Application language locale: :locale', [
+            ':name'   => $name,
+            ':id'     => $cityModel->getMaxmindId(),
+            ':locale' => $languageModel->getLocale(),
+        ]);
+
+        if ($cityI18nModel) {
+            $cityI18nModel->setValue($name);
+        } else {
+            $cityI18nModel = (new CityI18n())
+                ->setCity($cityModel)
+                ->setLanguage($languageModel)
+                ->setValue($name);
+        }
+
         $this
             ->cityI18NRepository
             ->save($cityI18nModel);

@@ -69,31 +69,29 @@ abstract class AbstractImportCountriesCitiesMaxMind extends AbstractTask
         $downloadUrl  = $this->downloadConfig->getPathDownloadUrlCsv();
         $csvFilesPath = $this->download($tempPath, $downloadUrl);
 
-        /**
-         * @var \BetaKiller\Model\Language[] $languages
-         * @var \BetaKiller\Model\Language[] $languagesByIndex
-         */
-        $languages        = [];
-        $languagesByIndex = $this->languageRepository->getAll();
-        foreach ($languagesByIndex as $languageModel) {
-            $languages[$languageModel->getLocale()] = $languageModel;
-        }
-        $languageItemsLocale = $this->config->getLanguageItemsLocale();
-        // todo error if not exists
-        $languageFirstModel = $languages[$languageItemsLocale];
-        unset($languages[$languageItemsLocale]);
-        $languages = [$languageItemsLocale => $languageFirstModel] + $languages;
+        $languages = $this->getLanguages();
 
         $languagesAliases = $this->config->getLanguagesAliasesLocales();
         foreach ($languages as $languageModel) {
-            $languageLocale = $languageModel->getLocale();
-            // todo error if not exists
-            $csvFileLanguageLocale = $languagesAliases[$languageLocale];
-
-            $csvFilePath = $this->createFilePath($csvFilesPath, static::TEMPLATE_FILE_NAME, $csvFileLanguageLocale);
-            $this->parseCsvAndImport($csvFilePath, $languageModel);
+            $languageLocale        = $languageModel->getLocale();
+            $csvFileLanguageLocale = $this->getCsvFileLanguageLocale($languageLocale, $languagesAliases);
+            $csvFilePath           = $this->createFilePath(
+                $csvFilesPath,
+                static::TEMPLATE_FILE_NAME,
+                $csvFileLanguageLocale
+            );
+            try {
+                $this->parseCsvAndImport($csvFilePath, $languageModel);
+            } catch (\Exception $exception) {
+                throw new TaskException(
+                    'Unable parse and import: :error. File: :csvFilePath', [
+                    ':error'       => $exception->getMessage(),
+                    ':csvFilePath' => $csvFilePath,
+                ]);
+            }
         }
 
+        $this->logger->debug('Removing: '.$tempPath);
         $this->runShellCommand(
             self::SHELL_COMMAND_REMOVE, [
             'path' => $tempPath,
@@ -104,24 +102,86 @@ abstract class AbstractImportCountriesCitiesMaxMind extends AbstractTask
     }
 
     /**
+     * @return array|\BetaKiller\Model\Language[]
+     * @throws \BetaKiller\Repository\RepositoryException
+     * @throws \BetaKiller\Task\TaskException
+     */
+    private function getLanguages(): array
+    {
+        /**
+         * @var \BetaKiller\Model\Language[] $languages
+         * @var \BetaKiller\Model\Language[] $languagesByIndex
+         */
+        $languages        = [];
+        $languagesByIndex = $this->languageRepository->getAll();
+        foreach ($languagesByIndex as $languageModel) {
+            $languages[$languageModel->getLocale()] = $languageModel;
+        }
+
+        $languageItemsLocale = $this->config->getLanguageItemsLocale();
+
+        if (!isset($languages[$languageItemsLocale])) {
+            $languagesAvailable = array_keys($languages);
+            $languagesAvailable = implode(',', $languagesAvailable);
+            throw new TaskException(
+                'Not found language items locale ":search" in languages locales: :available', [
+                ':search'    => $languageItemsLocale,
+                ':available' => $languagesAvailable,
+            ]);
+        }
+
+        $languageFirstModel = $languages[$languageItemsLocale];
+        unset($languages[$languageItemsLocale]);
+        $languages = [$languageItemsLocale => $languageFirstModel] + $languages;
+
+        return $languages;
+    }
+
+    /**
+     * @param string   $languageLocale
+     * @param string[] $languagesAliases
+     *
+     * @return string
+     * @throws \BetaKiller\Task\TaskException
+     */
+    private function getCsvFileLanguageLocale(string $languageLocale, array $languagesAliases): string
+    {
+        if (!isset($languagesAliases[$languageLocale])) {
+            $languagesAvailable = array_keys($languagesAliases);
+            $languagesAvailable = implode(',', $languagesAvailable);
+            throw new TaskException(
+                'Not found language locale ":search" in languages aliases: :available', [
+                ':search'    => $languageLocale,
+                ':available' => $languagesAvailable,
+            ]);
+        }
+
+        return (string)$languagesAliases[$languageLocale];
+    }
+
+    /**
      * @param string                     $csvFilePath
      * @param \BetaKiller\Model\Language $languageModel
      *
      * @return \BetaKiller\Task\Geo\Providers\AbstractImportCountriesCitiesMaxMind
      * @throws \BetaKiller\Task\TaskException
      */
-    protected function parseCsvAndImport(string $csvFilePath, Language $languageModel): self
+    private function parseCsvAndImport(string $csvFilePath, Language $languageModel): self
     {
         $handle = fopen($csvFilePath, 'rb');
         if ($handle === '') {
             throw new TaskException('Unable open file: '.$csvFilePath);
         }
+        $lineIndex = 0;
         while (true) {
             $csvLine = fgetcsv($handle, 1000, static::CSV_SEPARATOR);
             if ($csvLine === false) {
                 break;
             }
-            $this->import($csvLine, $languageModel);
+            $lineIndex++;
+            if ($lineIndex > 1 && $lineIndex < 10) {
+                $this->import($csvLine, $languageModel);
+            }
         }
         fclose($handle);
 

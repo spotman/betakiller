@@ -11,7 +11,7 @@ class Country extends \ORM implements CountryInterface
     public const TABLE_FIELD_CREATED_BY  = 'created_by';
     public const TABLE_FIELD_APPROVED_AT = 'approved_at';
     public const TABLE_FIELD_APPROVED_BY = 'approved_by';
-    public const TABLE_FIELD_EU          = 'eu';
+    public const TABLE_FIELD_EU          = 'is_eu';
 
     protected function configure(): void
     {

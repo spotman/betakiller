@@ -12,6 +12,7 @@ class City extends \ORM implements CityInterface
     public const TABLE_FIELD_CREATED_BY  = 'created_by';
     public const TABLE_FIELD_APPROVED_AT = 'approved_at';
     public const TABLE_FIELD_APPROVED_BY = 'approved_by';
+    public const TABLE_FIELD_MAXMIND_ID  = 'maxmind_id';
 
     protected function configure(): void
     {
@@ -188,5 +189,25 @@ class City extends \ORM implements CityInterface
     public function getApprovedBy(): ?UserInterface
     {
         return $this->get('approvedBy');
+    }
+
+    /**
+     * @param int $value
+     *
+     * @return \BetaKiller\Model\CityInterface
+     */
+    public function setMaxmindId(int $value): CityInterface
+    {
+        $this->set(self::TABLE_FIELD_MAXMIND_ID, $value);
+
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getMaxmindId(): int
+    {
+        return $this->get(self::TABLE_FIELD_MAXMIND_ID);
     }
 }

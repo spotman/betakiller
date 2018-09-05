@@ -76,4 +76,16 @@ interface CityInterface
      * @return \BetaKiller\Model\UserInterface|null
      */
     public function getApprovedBy(): ?UserInterface;
+
+    /**
+     * @param int $value
+     *
+     * @return \BetaKiller\Model\CityInterface
+     */
+    public function setMaxmindId(int $value): CityInterface;
+
+    /**
+     * @return int
+     */
+    public function getMaxmindId(): int;
 }
