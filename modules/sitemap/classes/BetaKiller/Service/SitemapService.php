@@ -1,15 +1,17 @@
 <?php
+declare(strict_types=1);
+
+namespace BetaKiller\Service;
 
 use BetaKiller\Config\AppConfigInterface;
 use BetaKiller\Helper\AppEnvInterface;
-use BetaKiller\Service\AbstractService;
-use BetaKiller\Service\ServiceException;
 use BetaKiller\Url\AvailableUrlsCollector;
 use Psr\Log\LoggerInterface;
+use Response;
 use samdark\sitemap\Index;
 use samdark\sitemap\Sitemap;
 
-class Service_Sitemap extends AbstractService
+class SitemapService
 {
     /**
      * @var AppConfigInterface
@@ -42,7 +44,7 @@ class Service_Sitemap extends AbstractService
     private $appEnv;
 
     /**
-     * Service_Sitemap constructor.
+     * SitemapService constructor.
      *
      * @param \BetaKiller\Url\AvailableUrlsCollector $urlCollector
      * @param \Psr\Log\LoggerInterface               $logger
@@ -79,9 +81,7 @@ class Service_Sitemap extends AbstractService
         // Create sitemap
         $this->sitemap = new Sitemap($this->getSitemapFilePath());
 
-        $items = $this->urlCollector->getPublicAvailableUrls();
-
-        foreach ($items as $item) {
+        foreach ($this->urlCollector->getPublicAvailableUrls() as $item) {
             $url = $item->getUrl();
 
             $this->logger->debug('Found url :value', [':value' => $url]);
@@ -96,7 +96,7 @@ class Service_Sitemap extends AbstractService
 
         $sitemapFiles = $this->sitemap->getSitemapUrls($baseUrl);
 
-        if (count($sitemapFiles) > 1) {
+        if (\count($sitemapFiles) > 1) {
             // Create sitemap index file
             $index = new Index($this->getSitemapIndexFilePath());
 
@@ -114,23 +114,23 @@ class Service_Sitemap extends AbstractService
         return $this;
     }
 
-    public function serve(Response $response)
+    public function serve(Response $response): void
     {
         $content = file_get_contents($this->getSitemapFilePath());
         $response->send_string($content, $response::TYPE_XML);
     }
 
-    protected function getSitemapFilePath()
+    protected function getSitemapFilePath(): string
     {
         return $this->getDocumentRootPath().DIRECTORY_SEPARATOR.'sitemap.xml';
     }
 
-    protected function getSitemapIndexFilePath()
+    protected function getSitemapIndexFilePath(): string
     {
         return $this->getDocumentRootPath().DIRECTORY_SEPARATOR.'sitemap_index.xml';
     }
 
-    protected function getDocumentRootPath()
+    protected function getDocumentRootPath(): string
     {
         return $this->appEnv->getDocRootPath();
     }

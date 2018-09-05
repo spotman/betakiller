@@ -24,7 +24,7 @@ class Sleep extends AbstractTask
         parent::__construct();
     }
 
-    protected function defineOptions(): array
+    public function defineOptions(): array
     {
         return [
             'seconds' => 3,

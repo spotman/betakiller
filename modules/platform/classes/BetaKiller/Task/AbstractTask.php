@@ -25,10 +25,7 @@ abstract class AbstractTask extends Minion_Task
 
     abstract public function run(): void;
 
-    protected function defineOptions(): array
-    {
-        return [];
-    }
+    abstract public function defineOptions(): array;
 
     /**
      * @param string    $key
@@ -49,7 +46,8 @@ abstract class AbstractTask extends Minion_Task
         return $value;
     }
 
-    protected function _execute(array $params)
+    /** @noinspection PhpMethodNamingConventionInspection */
+    protected function _execute(array $params): void
     {
         $this->run();
     }

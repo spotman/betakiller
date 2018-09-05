@@ -4,7 +4,7 @@ class Controller_Sitemap extends Controller
 {
     /**
      * @Inject
-     * @var \Service_Sitemap
+     * @var \BetaKiller\Service\SitemapService
      */
     private $sitemapService;
 

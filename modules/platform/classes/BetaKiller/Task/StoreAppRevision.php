@@ -40,7 +40,7 @@ class StoreAppRevision extends AbstractTask
         parent::__construct();
     }
 
-    protected function defineOptions(): array
+    public function defineOptions(): array
     {
         return [
             'revision' => null,
