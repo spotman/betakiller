@@ -6,16 +6,16 @@ namespace BetaKiller\Model;
 interface CityInterface
 {
     /**
-     * @param int $value
+     * @param \BetaKiller\Model\CountryInterface $countryModel
      *
      * @return \BetaKiller\Model\CityInterface
      */
-    public function setCountryId(int $value): CityInterface;
+    public function setCountry(CountryInterface $countryModel): CityInterface;
 
     /**
-     * @return int
+     * @return \BetaKiller\Model\CountryInterface
      */
-    public function getCountryId(): int;
+    public function getCountry(): CountryInterface;
 
     /**
      * @param string $value
@@ -42,16 +42,16 @@ interface CityInterface
     public function getCreatedAt(): \DateTimeImmutable;
 
     /**
-     * @param int $value
+     * @param \BetaKiller\Model\UserInterface $userModel
      *
      * @return \BetaKiller\Model\CityInterface
      */
-    public function setCreatedBy(int $value): CityInterface;
+    public function setCreatedBy(UserInterface $userModel): CityInterface;
 
     /**
-     * @return int
+     * @return \BetaKiller\Model\User
      */
-    public function getCreatedBy(): int;
+    public function getCreatedBy(): UserInterface;
 
     /**
      * @param \DateTimeInterface|null $value
@@ -66,19 +66,14 @@ interface CityInterface
     public function getApprovedAt(): ?\DateTimeImmutable;
 
     /**
-     * @param int $value
+     * @param \BetaKiller\Model\UserInterface $userModel
      *
      * @return \BetaKiller\Model\CityInterface
      */
-    public function setApprovedBy(int $value): CityInterface;
+    public function setApprovedBy(UserInterface $userModel): CityInterface;
 
     /**
-     * @return int
+     * @return \BetaKiller\Model\UserInterface|null
      */
-    public function getApprovedBy(): int;
-
-    /**
-     * @return \BetaKiller\Model\CountryInterface
-     */
-    public function getCountry(): CountryInterface;
+    public function getApprovedBy(): ?UserInterface;
 }

@@ -1,18 +1,19 @@
 <?php
 declare(strict_types=1);
 
-namespace BetaKiller\Task\Geo;
+namespace BetaKiller\Task\Geo\Providers;
 
 use BetaKiller\Config\GeoMaxMindConfig;
+use BetaKiller\Config\GeoMaxMindDownloadConfigInterface;
 use BetaKiller\Log\Logger;
 use BetaKiller\Model\Language;
+use BetaKiller\Repository\LanguageRepository;
 use BetaKiller\Task\AbstractTask;
 use BetaKiller\Task\TaskException;
 
-abstract class AbstractImport extends AbstractTask
+abstract class AbstractImportCountriesCitiesMaxMind extends AbstractTask
 {
     protected const TEMPLATE_FILE_NAME     = '';
-    protected const LANGUAGE_NAME_MAIN     = 'en';
     protected const CSV_SEPARATOR          = ',';
     protected const SHELL_COMMAND_REMOVE   = 'rm -rf :path';
     protected const SHELL_COMMAND_DOWNLOAD = 'wget :downloadUrl -O :resultPath';
@@ -26,20 +27,36 @@ abstract class AbstractImport extends AbstractTask
     protected $config;
 
     /**
+     * @var \BetaKiller\Config\GeoMaxMindDownloadConfigInterface
+     */
+    private $downloadConfig;
+
+    /**
+     * @var \BetaKiller\Repository\LanguageRepository
+     */
+    private $languageRepository;
+
+    /**
      * @var \BetaKiller\Log\Logger
      */
     protected $logger;
 
     /**
-     * ImportCountriesAndCities constructor.
-     *
-     * @param \BetaKiller\Config\GeoMaxMindConfig $config
-     * @param \BetaKiller\Log\Logger              $logger
+     * @param \BetaKiller\Config\GeoMaxMindConfig                  $config
+     * @param \BetaKiller\Config\GeoMaxMindDownloadConfigInterface $downloadConfig
+     * @param \BetaKiller\Repository\LanguageRepository            $languageRepository
+     * @param \BetaKiller\Log\Logger                               $logger
      */
-    public function __construct(GeoMaxMindConfig $config, Logger $logger)
-    {
-        $this->config = $config;
-        $this->logger = $logger;
+    public function __construct(
+        GeoMaxMindConfig $config,
+        GeoMaxMindDownloadConfigInterface $downloadConfig,
+        LanguageRepository $languageRepository,
+        Logger $logger
+    ) {
+        $this->config             = $config;
+        $this->downloadConfig     = $downloadConfig;
+        $this->languageRepository = $languageRepository;
+        $this->logger             = $logger;
 
         parent::__construct();
     }
@@ -49,20 +66,32 @@ abstract class AbstractImport extends AbstractTask
         $tempPath = $this->createTempPath();
         $this->logger->debug('Temp path: '.$tempPath);
 
-        $downloadUrl  = $this->config->getPathDownloadUrlCountriesCsv();
+        $downloadUrl  = $this->downloadConfig->getPathDownloadUrlCsv();
         $csvFilesPath = $this->download($tempPath, $downloadUrl);
 
-        $languagesApp   = (new Language())->get_all();
-        $languagesFiles = $this->config->getLanguages();
+        /**
+         * @var \BetaKiller\Model\Language[] $languages
+         * @var \BetaKiller\Model\Language[] $languagesByIndex
+         */
+        $languages        = [];
+        $languagesByIndex = $this->languageRepository->getAll();
+        foreach ($languagesByIndex as $languageModel) {
+            $languages[$languageModel->getLocale()] = $languageModel;
+        }
+        $languageItemsLocale = $this->config->getLanguageItemsLocale();
+        // todo error if not exists
+        $languageFirstModel = $languages[$languageItemsLocale];
+        unset($languages[$languageItemsLocale]);
+        $languages = [$languageItemsLocale => $languageFirstModel] + $languages;
 
-        foreach ($languagesApp as $languageApp) {
-            $languageAppLocale  = $languageApp->getLocale();
-            $languageFileLocale = $languagesFiles[$languageAppLocale];
+        $languagesAliases = $this->config->getLanguagesAliasesLocales();
+        foreach ($languages as $languageModel) {
+            $languageLocale = $languageModel->getLocale();
+            // todo error if not exists
+            $csvFileLanguageLocale = $languagesAliases[$languageLocale];
 
-            $csvFilePath = $this->createFilePath($csvFilesPath, self::TEMPLATE_FILE_NAME, $languageFileLocale);
-            $items       = $this->parseCsv($csvFilePath);
-
-            $this->import($items, $languageApp);
+            $csvFilePath = $this->createFilePath($csvFilesPath, static::TEMPLATE_FILE_NAME, $csvFileLanguageLocale);
+            $this->parseCsvAndImport($csvFilePath, $languageModel);
         }
 
         $this->runShellCommand(
@@ -70,25 +99,42 @@ abstract class AbstractImport extends AbstractTask
             'path' => $tempPath,
         ]);
 
-        var_dump(memory_get_peak_usage());
-        var_dump(memory_get_peak_usage(true));
+//        var_dump(memory_get_peak_usage());
+//        var_dump(memory_get_peak_usage(true));
     }
 
     /**
-     * @param array                      $items
-     * @param \BetaKiller\Model\Language $languageApp
+     * @param string                     $csvFilePath
+     * @param \BetaKiller\Model\Language $languageModel
+     *
+     * @return \BetaKiller\Task\Geo\Providers\AbstractImportCountriesCitiesMaxMind
+     * @throws \BetaKiller\Task\TaskException
+     */
+    protected function parseCsvAndImport(string $csvFilePath, Language $languageModel): self
+    {
+        $handle = fopen($csvFilePath, 'rb');
+        if ($handle === '') {
+            throw new TaskException('Unable open file: '.$csvFilePath);
+        }
+        while (true) {
+            $csvLine = fgetcsv($handle, 1000, static::CSV_SEPARATOR);
+            if ($csvLine === false) {
+                break;
+            }
+            $this->import($csvLine, $languageModel);
+        }
+        fclose($handle);
+
+        return $this;
+    }
+
+    /**
+     * @param array                      $csvLine
+     * @param \BetaKiller\Model\Language $languageModel
      *
      * @return void
      */
-    abstract protected function import(array $items, Language $languageApp): void;
-
-    /**
-     * @param string $csvFilePath
-     *
-     * @return array
-     * @throws \BetaKiller\Task\TaskException
-     */
-    abstract protected function parseCsv(string $csvFilePath): array;
+    abstract protected function import(array $csvLine, Language $languageModel): void;
 
     /**
      * @param string $tempPath
@@ -126,7 +172,7 @@ abstract class AbstractImport extends AbstractTask
      * @param string $command
      * @param array  $data
      *
-     * @return \BetaKiller\Task\Geo\AbstractImport
+     * @return \BetaKiller\Task\Geo\Providers\AbstractImportCountriesCitiesMaxMind
      * @throws \BetaKiller\Task\TaskException
      */
     protected function runShellCommand(string $command, array $data): self
@@ -139,11 +185,10 @@ abstract class AbstractImport extends AbstractTask
         exec($command, $output, $result);
         if (!is_numeric($result) || $result > 0) {
             throw new TaskException(
-                sprintf(
-                    'Execute shell command error. Command: %s. Result code: %s',
-                    $command, $result
-                )
-            );
+                'Execute shell command error. Command: :command. Result code: :code', [
+                ':command' => $command,
+                ':code'    => $result,
+            ]);
         }
 
         return $this;
@@ -228,15 +273,13 @@ abstract class AbstractImport extends AbstractTask
     /**
      * @param string $path
      *
-     * @return \BetaKiller\Task\Geo\AbstractImport
+     * @return \BetaKiller\Task\Geo\Providers\AbstractImportCountriesCitiesMaxMind
      * @throws \BetaKiller\Task\TaskException
      */
     protected function removeDirectory(string $path): self
     {
-        if (file_exists($path)) {
-            if (!rmdir($path)) {
-                throw new TaskException('Unable remove directory: '.$path);
-            }
+        if (file_exists($path) && !rmdir($path)) {
+            throw new TaskException('Unable remove directory: '.$path);
         }
 
         return $this;
@@ -245,7 +288,7 @@ abstract class AbstractImport extends AbstractTask
     /**
      * @param string $path
      *
-     * @return \BetaKiller\Task\Geo\AbstractImport
+     * @return \BetaKiller\Task\Geo\Providers\AbstractImportCountriesCitiesMaxMind
      * @throws \BetaKiller\Task\TaskException
      */
     protected function createDirectory(string $path): self
@@ -274,11 +317,10 @@ abstract class AbstractImport extends AbstractTask
         }
 
         throw new TaskException(
-            sprintf(
-                'Unable create unique path in directory: %s. Limit attempts: %s',
-                $parentPath, self::PATH_TEMP_CREATING_ATTEMPTS
-            )
-        );
+            'Unable create unique path in directory: :parentPath. Limit attempts: :attempts', [
+            ':parentPath' => $parentPath,
+            ':attempts'   => self::PATH_TEMP_CREATING_ATTEMPTS,
+        ]);
     }
 }
 

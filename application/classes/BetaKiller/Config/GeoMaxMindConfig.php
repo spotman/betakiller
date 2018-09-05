@@ -16,40 +16,16 @@ class GeoMaxMindConfig extends AbstractConfig implements GeoMaxMindConfigInterfa
     /**
      * @return string
      */
-    public function getPathDownloadUrlCountriesCsv(): string
+    public function getLanguageItemsLocale(): string
     {
-        return (string)$this->get(self::PATH_DOWNLOAD_URL_COUNTRIES_CSV);
-    }
-
-    /**
-     * @return string
-     */
-    public function getPathDownloadUrlCountriesBin(): string
-    {
-        return (string)$this->get(self::PATH_DOWNLOAD_URL_COUNTRIES_BIN);
-    }
-
-    /**
-     * @return string
-     */
-    public function getPathDownloadUrlCitiesCsv(): string
-    {
-        return (string)$this->get(self::PATH_DOWNLOAD_URL_CITIES_CSV);
-    }
-
-    /**
-     * @return string
-     */
-    public function getPathDownloadUrlCitiesBin(): string
-    {
-        return (string)$this->get(self::PATH_DOWNLOAD_URL_CITIES_BIN);
+        return $this->get(self::PATH_LANGUAGE_ITEMS_LOCALE);
     }
 
     /**
      * @return array
      */
-    public function getLanguages(): array
+    public function getLanguagesAliasesLocales(): array
     {
-        return (array)$this->get(self::PATH_LANGUAGES);
+        return (array)$this->get(self::PATH_LANGUAGES_ALIASES_LOCALES);
     }
 }

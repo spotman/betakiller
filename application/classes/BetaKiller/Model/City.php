@@ -18,14 +18,23 @@ class City extends \ORM implements CityInterface
         $this->_table_name = self::TABLE_NAME;
 
         $this->belongs_to([
-            'country' => [
+            'country'    => [
                 'model'       => 'Country',
                 'foreign_key' => self::TABLE_FIELD_COUNTRY_ID,
             ],
+            'createdBy'  => [
+                'model'       => 'User',
+                'foreign_key' => self::TABLE_FIELD_CREATED_BY,
+            ],
+            'approvedBy' => [
+                'model'       => 'User',
+                'foreign_key' => self::TABLE_FIELD_APPROVED_BY,
+            ],
         ]);
-
         $this->load_with([
             'country',
+            'createdBy',
+            'approvedBy',
         ]);
 
         parent::configure();
@@ -59,23 +68,23 @@ class City extends \ORM implements CityInterface
     }
 
     /**
-     * @param int $value
+     * @param \BetaKiller\Model\CountryInterface $countryModel
      *
      * @return \BetaKiller\Model\CityInterface
      */
-    public function setCountryId(int $value): CityInterface
+    public function setCountry(CountryInterface $countryModel): CityInterface
     {
-        $this->set(self::TABLE_FIELD_COUNTRY_ID, $value);
+        $this->set(self::TABLE_FIELD_COUNTRY_ID, $countryModel);
 
         return $this;
     }
 
     /**
-     * @return int
+     * @return \BetaKiller\Model\CountryInterface
      */
-    public function getCountryId(): int
+    public function getCountry(): CountryInterface
     {
-        return (int)$this->get(self::TABLE_FIELD_COUNTRY_ID);
+        return $this->get('country');
     }
 
     /**
@@ -121,23 +130,23 @@ class City extends \ORM implements CityInterface
     }
 
     /**
-     * @param int $value
+     * @param \BetaKiller\Model\UserInterface $userModel
      *
      * @return \BetaKiller\Model\CityInterface
      */
-    public function setCreatedBy(int $value): CityInterface
+    public function setCreatedBy(UserInterface $userModel): CityInterface
     {
-        $this->set(self::TABLE_FIELD_CREATED_BY, $value);
+        $this->set(self::TABLE_FIELD_CREATED_BY, $userModel);
 
         return $this;
     }
 
     /**
-     * @return int
+     * @return \BetaKiller\Model\UserInterface
      */
-    public function getCreatedBy(): int
+    public function getCreatedBy(): UserInterface
     {
-        return (int)$this->get(self::TABLE_FIELD_CREATED_BY);
+        return $this->get('createdBy');
     }
 
     /**
@@ -162,30 +171,22 @@ class City extends \ORM implements CityInterface
     }
 
     /**
-     * @param int $value
+     * @param \BetaKiller\Model\UserInterface $userModel
      *
      * @return \BetaKiller\Model\CityInterface
      */
-    public function setApprovedBy(int $value): CityInterface
+    public function setApprovedBy(UserInterface $userModel): CityInterface
     {
-        $this->set(self::TABLE_FIELD_APPROVED_BY, $value);
+        $this->set(self::TABLE_FIELD_APPROVED_BY, $userModel);
 
         return $this;
     }
 
     /**
-     * @return int
+     * @return \BetaKiller\Model\UserInterface|null
      */
-    public function getApprovedBy(): int
+    public function getApprovedBy(): ?UserInterface
     {
-        return (int)$this->get(self::TABLE_FIELD_APPROVED_BY);
-    }
-
-    /**
-     * @return \BetaKiller\Model\CountryInterface
-     */
-    public function getCountry(): CountryInterface
-    {
-        return $this->get('country');
+        return $this->get('approvedBy');
     }
 }
