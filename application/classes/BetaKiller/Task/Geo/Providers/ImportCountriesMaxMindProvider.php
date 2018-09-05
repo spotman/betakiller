@@ -73,34 +73,40 @@ class ImportCountriesMaxMindProvider extends AbstractImportCountriesCitiesMaxMin
         }
 
         $countryModel = $this->importItem($csvLine, $language);
-        $this->importI18n($csvLine, $language, $countryModel);
+        if ($countryModel) {
+            $this->importI18n($csvLine, $language, $countryModel);
+        }
     }
 
     /**
      * @param array                      $csvLine
      * @param \BetaKiller\Model\Language $languageModel
      *
-     * @return \BetaKiller\Model\CountryInterface
+     * @return \BetaKiller\Model\CountryInterface|null
      * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\Repository\RepositoryException
      * @throws \BetaKiller\Task\TaskException
      */
-    private function importItem(array $csvLine, Language $languageModel): CountryInterface
+    private function importItem(array $csvLine, Language $languageModel): ?CountryInterface
     {
-        $csvItemId = $csvLine[0];
-        $isoCode   = strtoupper(trim($csvLine[2]));
-        $name      = strtolower(trim($csvLine[3]));
+        $csvItemId = (int)$csvLine[0];
+        $isoCode   = strtoupper(trim($csvLine[4]));
+        $name      = strtolower(trim($csvLine[5]));
         $isEu      = (bool)$csvLine[6];
 
-        $errorMessage = 'CSV item ID: :csvItemId. Application language locale: :locale';
-        $errorData    = [':csvItemId' => $csvItemId, ':locale' => $languageModel->getLocale()];
+        if (!$isoCode && !$name) {
+            return null;
+        }
+
+        $errorMessage = 'CSV item ID: :id. Application language locale: :locale';
+        $errorData    = [':id' => $csvItemId, ':locale' => $languageModel->getLocale()];
 
         if (!$isoCode || !$name) {
             if (!$isoCode) {
                 throw new TaskException('Country ISO code is empty. '.$errorMessage, $errorData);
             }
             if (!$name) {
-                throw new TaskException('Name is empty. CSV item ID: :csvItemId. '.$errorMessage, $errorData);
+                throw new TaskException('Name is empty. '.$errorMessage, $errorData);
             }
         }
 
@@ -112,14 +118,19 @@ class ImportCountriesMaxMindProvider extends AbstractImportCountriesCitiesMaxMin
             $languageItemsLocale = $this->config->getLanguageItemsLocale();
             if ($languageItemsLocale !== $languageModel->getLocale()) {
                 throw new TaskException(
-                    'Not found country by ISO code. ISO code: :isoCode. '.$errorMessage,
-                    $errorData + [':isoCode' => $isoCode]
+                    'Not found country by ISO code. ISO code: :code. '.$errorMessage,
+                    $errorData + [':code' => $isoCode]
                 );
             }
         }
 
         if (!$countryModel) {
-            $this->logger->debug('Import country: '.$isoCode);
+            $this->logger->debug(
+                'Import country. Id: :id. ISO code: :code', [
+                    ':id'   => $csvItemId,
+                    ':code' => $isoCode,
+                ]
+            );
             $countryModel = (new Country())
                 ->setIsoCode($isoCode)
                 ->setCreatedAt()
@@ -140,12 +151,32 @@ class ImportCountriesMaxMindProvider extends AbstractImportCountriesCitiesMaxMin
      */
     protected function importI18n(array $csvLine, Language $languageModel, CountryInterface $countryModel): void
     {
-        $name = trim($csvLine[3]);
+        $name = trim($csvLine[5]);
 
-        $countryI18nModel = (new CountryI18n())
-            ->setCountry($countryModel)
-            ->setLanguage($languageModel)
-            ->setValue($name);
+        $countryI18nModel = $this
+            ->countryI18NRepository
+            ->findItem($countryModel, $languageModel);
+
+        if ($countryI18nModel && $countryI18nModel->getValue() === $name) {
+            return;
+        }
+
+        $this->logger->debug(
+            'Import country i18n: :name. Country ISO code: :code. Application language locale: :locale', [
+            ':name'   => $name,
+            ':code'   => $countryModel->getIsoCode(),
+            ':locale' => $languageModel->getLocale(),
+        ]);
+
+        if ($countryI18nModel) {
+            $countryI18nModel->setValue($name);
+        } else {
+            $countryI18nModel = (new CountryI18n())
+                ->setCountry($countryModel)
+                ->setLanguage($languageModel)
+                ->setValue($name);
+        }
+
         $this
             ->countryI18NRepository
             ->save($countryI18nModel);
