@@ -12,15 +12,18 @@ abstract class AbstractTask extends Minion_Task
 
     public function __construct()
     {
-        $commonOptions = [
+        $this->_options = array_merge(self::defineCommonOptions(), $this->_options, $this->defineOptions());
+
+        parent::__construct();
+    }
+
+    public static function defineCommonOptions(): array
+    {
+        return [
             'debug' => false,
             'stage' => 'development',
             'user'  => null,
         ];
-
-        $this->_options = array_merge($commonOptions, $this->_options, $this->defineOptions());
-
-        parent::__construct();
     }
 
     abstract public function run(): void;
