@@ -10,6 +10,7 @@ use BetaKiller\Exception\BadRequestHttpException;
 use BetaKiller\Exception\FoundHttpException;
 use BetaKiller\Exception\NotFoundHttpException;
 use BetaKiller\Exception\NotImplementedHttpException;
+use BetaKiller\Exception\ValidationException;
 
 class Controller_Assets extends Controller
 {
@@ -62,19 +63,19 @@ class Controller_Assets extends Controller
         $this->detectProvider();
 
         // Getting first uploaded file
-        $_file = array_shift($_FILES);
+        $file = array_shift($_FILES);
 
         // Getting additional POST data
-        $_post_data = $this->request->post();
+        $postData = $this->request->post();
 
         // Uploading via provider
-        $model = $this->provider->upload($_file, $_post_data, $this->user);
+        $model = $this->provider->upload($file, $postData, $this->user);
 
         try {
             // Save model in database
             $this->provider->saveModel($model);
-        } catch (ORM_Validation_Exception $e) {
-            throw new AssetsException(':error', [':error' => implode(',', $e->getFormattedErrors())]);
+        } catch (ValidationException $e) {
+            throw new AssetsException(':error', [':error' => $e->getFirstItem()->getMessage()]);
         }
 
         // Returns

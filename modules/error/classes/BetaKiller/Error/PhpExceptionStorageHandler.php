@@ -113,7 +113,7 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
      * @param \Throwable $exception
      *
      * @return \BetaKiller\Model\PhpExceptionModelInterface|null
-     * @throws \ORM_Validation_Exception
+     * @throws \BetaKiller\Exception\ValidationException
      * @throws \BetaKiller\Repository\RepositoryException
      * @throws \Kohana_Exception
      */

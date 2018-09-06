@@ -167,7 +167,7 @@ interface AssetsProviderInterface
      * @param \BetaKiller\Assets\Model\AssetsModelInterface $model
      *
      * @throws \BetaKiller\Repository\RepositoryException
-     * @throws \ORM_Validation_Exception
+     * @throws \BetaKiller\Exception\ValidationException
      */
     public function saveModel(AssetsModelInterface $model): void;
 

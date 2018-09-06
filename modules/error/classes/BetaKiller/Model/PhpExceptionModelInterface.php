@@ -16,16 +16,16 @@ interface PhpExceptionModelInterface extends DispatchableEntityInterface
     /**
      * @param string $value
      *
-     * @return $this
+     * @return PhpExceptionModelInterface
      */
-    public function setHash(string $value);
+    public function setHash(string $value): PhpExceptionModelInterface;
 
     /**
      * @param string $module
      *
-     * @return $this
+     * @return PhpExceptionModelInterface
      */
-    public function addModule(string $module);
+    public function addModule(string $module): PhpExceptionModelInterface;
 
     /**
      * @return string[]
@@ -38,9 +38,9 @@ interface PhpExceptionModelInterface extends DispatchableEntityInterface
     public function getCounter(): int;
 
     /**
-     * @return $this
+     * @return PhpExceptionModelInterface
      */
-    public function incrementCounter();
+    public function incrementCounter(): PhpExceptionModelInterface;
 
     /**
      * @return string
@@ -50,16 +50,16 @@ interface PhpExceptionModelInterface extends DispatchableEntityInterface
     /**
      * @param string $value
      *
-     * @return $this
+     * @return PhpExceptionModelInterface
      */
-    public function setMessage(string $value);
+    public function setMessage(string $value): PhpExceptionModelInterface;
 
     /**
      * @param string $path
      *
-     * @return $this
+     * @return PhpExceptionModelInterface
      */
-    public function addPath(string $path);
+    public function addPath(string $path): PhpExceptionModelInterface;
 
     /**
      * @return string[]
@@ -69,9 +69,9 @@ interface PhpExceptionModelInterface extends DispatchableEntityInterface
     /**
      * @param string $url
      *
-     * @return $this
+     * @return PhpExceptionModelInterface
      */
-    public function addUrl(string $url);
+    public function addUrl(string $url): PhpExceptionModelInterface;
 
     /**
      * @return string[]
@@ -95,9 +95,9 @@ interface PhpExceptionModelInterface extends DispatchableEntityInterface
     /**
      * @param \DateTimeInterface $time
      *
-     * @return $this
+     * @return PhpExceptionModelInterface
      */
-    public function setCreatedAt(\DateTimeInterface $time);
+    public function setCreatedAt(\DateTimeInterface $time): PhpExceptionModelInterface;
 
     /**
      * @return \DateTimeImmutable
@@ -109,9 +109,9 @@ interface PhpExceptionModelInterface extends DispatchableEntityInterface
      *
      * @param \DateTimeInterface $time
      *
-     * @return $this
+     * @return PhpExceptionModelInterface
      */
-    public function setLastSeenAt(\DateTimeInterface $time);
+    public function setLastSeenAt(\DateTimeInterface $time): PhpExceptionModelInterface;
 
     /**
      * Unix timestamp of last notification time
@@ -125,9 +125,9 @@ interface PhpExceptionModelInterface extends DispatchableEntityInterface
      *
      * @param \DateTimeInterface $time
      *
-     * @return $this
+     * @return PhpExceptionModelInterface
      */
-    public function setLastNotifiedAt(\DateTimeInterface $time);
+    public function setLastNotifiedAt(\DateTimeInterface $time): PhpExceptionModelInterface;
 
     /**
      * Unix timestamp of last notification time
@@ -141,36 +141,36 @@ interface PhpExceptionModelInterface extends DispatchableEntityInterface
      *
      * @param UserInterface $user
      *
-     * @return $this
+     * @return PhpExceptionModelInterface
      */
-    public function markAsNew(UserInterface $user);
+    public function markAsNew(UserInterface $user): PhpExceptionModelInterface;
 
     /**
      * Mark exception as repeated (it was resolved earlier but repeated now)
      *
      * @param UserInterface $user
      *
-     * @return $this
+     * @return PhpExceptionModelInterface
      */
-    public function markAsRepeated(UserInterface $user);
+    public function markAsRepeated(UserInterface $user): PhpExceptionModelInterface;
 
     /**
      * Mark exception as resolved
      *
      * @param UserInterface $user
      *
-     * @return $this
+     * @return PhpExceptionModelInterface
      */
-    public function markAsResolvedBy(UserInterface $user);
+    public function markAsResolvedBy(UserInterface $user): PhpExceptionModelInterface;
 
     /**
      * Mark exception as ignored
      *
      * @param UserInterface $user
      *
-     * @return $this
+     * @return PhpExceptionModelInterface
      */
-    public function markAsIgnoredBy(UserInterface $user);
+    public function markAsIgnoredBy(UserInterface $user): PhpExceptionModelInterface;
 
     /**
      * Returns TRUE if current exception is in 'new' state
@@ -205,7 +205,7 @@ interface PhpExceptionModelInterface extends DispatchableEntityInterface
      *
      * @return UserInterface|null
      */
-    public function getResolvedBy(): ?UserInterface;
+    public function getResolvedByUserID(): ?string;
 
     /**
      * @return PhpExceptionHistoryModelInterface[]
