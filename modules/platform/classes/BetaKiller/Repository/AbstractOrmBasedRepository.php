@@ -2,6 +2,7 @@
 namespace BetaKiller\Repository;
 
 use BetaKiller\Factory\OrmFactory;
+use BetaKiller\Helper\ExceptionTranslator;
 use BetaKiller\Model\ExtendedOrmInterface;
 use BetaKiller\Utils\Kohana\ORM\OrmInterface;
 
@@ -13,13 +14,20 @@ abstract class AbstractOrmBasedRepository extends AbstractRepository
     private $ormFactory;
 
     /**
+     * @var \BetaKiller\Helper\ExceptionTranslator
+     */
+    private $translator;
+
+    /**
      * AbstractOrmBasedRepository constructor.
      *
-     * @param \BetaKiller\Factory\OrmFactory $ormFactory
+     * @param \BetaKiller\Factory\OrmFactory         $ormFactory
+     * @param \BetaKiller\Helper\ExceptionTranslator $translator
      */
-    public function __construct(OrmFactory $ormFactory)
+    public function __construct(OrmFactory $ormFactory, ExceptionTranslator $translator)
     {
         $this->ormFactory = $ormFactory;
+        $this->translator = $translator;
     }
 
     /**
@@ -65,7 +73,7 @@ abstract class AbstractOrmBasedRepository extends AbstractRepository
     /**
      * @param ExtendedOrmInterface|mixed $entity
      *
-     * @throws \ORM_Validation_Exception
+     * @throws \BetaKiller\Exception\ValidationException
      * @throws \BetaKiller\Repository\RepositoryException
      */
     public function save($entity): void
@@ -75,7 +83,7 @@ abstract class AbstractOrmBasedRepository extends AbstractRepository
         try {
             $entity->save();
         } catch (\ORM_Validation_Exception $e) {
-            throw $e;
+            throw $this->translator->fromOrmValidationException($e);
         } catch (\Throwable $e) {
             throw RepositoryException::wrap($e);
         }
@@ -98,11 +106,6 @@ abstract class AbstractOrmBasedRepository extends AbstractRepository
         } catch (\Kohana_Exception $e) {
             throw RepositoryException::wrap($e);
         }
-    }
-
-    public function getValidationExceptionErrors(\ORM_Validation_Exception $e): array
-    {
-        return $e->errors('models');
     }
 
     /**

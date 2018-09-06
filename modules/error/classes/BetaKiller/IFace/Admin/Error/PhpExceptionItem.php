@@ -2,28 +2,50 @@
 namespace BetaKiller\IFace\Admin\Error;
 
 use BetaKiller\Exception;
+use BetaKiller\Helper\IFaceHelper;
+use BetaKiller\Helper\PhpExceptionUrlContainerHelper;
 use BetaKiller\Model\PhpExceptionHistoryModelInterface;
+use BetaKiller\Repository\UserRepository;
 
 class PhpExceptionItem extends ErrorAdminBase
 {
     /**
-     * @Inject
      * @var \BetaKiller\Helper\PhpExceptionUrlContainerHelper
      */
     private $urlParametersHelper;
 
     /**
-     * @Inject
      * @var \BetaKiller\Helper\IFaceHelper
      */
     private $ifaceHelper;
+
+    /**
+     * @var \BetaKiller\Repository\UserRepository
+     */
+    private $userRepo;
+
+    /**
+     * PhpExceptionItem constructor.
+     *
+     * @param \BetaKiller\Helper\PhpExceptionUrlContainerHelper $urlParametersHelper
+     * @param \BetaKiller\Helper\IFaceHelper                    $ifaceHelper
+     * @param \BetaKiller\Repository\UserRepository             $userRepo
+     */
+    public function __construct(
+        PhpExceptionUrlContainerHelper $urlParametersHelper,
+        IFaceHelper $ifaceHelper,
+        UserRepository $userRepo
+    ) {
+        $this->urlParametersHelper = $urlParametersHelper;
+        $this->ifaceHelper         = $ifaceHelper;
+        $this->userRepo            = $userRepo;
+    }
 
     /**
      * Returns data for View
      * Override this method in child classes
      *
      * @return array
-     * @throws \BetaKiller\Exception
      */
     public function getData(): array
     {
@@ -72,7 +94,8 @@ class PhpExceptionItem extends ErrorAdminBase
 
     private function getHistoricalRecordData(PhpExceptionHistoryModelInterface $record): array
     {
-        $user = $record->getUser();
+        $userID = $record->getUserID();
+        $user   = $userID ? $this->userRepo->findById($userID) : null;
 
         return [
             'status' => $record->getStatus(),

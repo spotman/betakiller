@@ -161,7 +161,7 @@ class ContentCommentRepository extends AbstractOrmBasedSingleParentTreeRepositor
     /**
      * @param ContentCommentInterface|mixed $entity
      *
-     * @throws \ORM_Validation_Exception
+     * @throws \BetaKiller\Exception\ValidationException
      * @throws \BetaKiller\Repository\RepositoryException
      */
     public function save($entity): void

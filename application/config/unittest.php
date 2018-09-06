@@ -11,7 +11,7 @@ return array(
 
 		// Should the app be whitelisted?
 		// Useful if you just want to test your application
-		'app' => true,
+		'app' => false,
 
 		// Set to array(TRUE) to include all modules, or use an array of module names
 		// (the keys of the array passed to Kohana::modules() in the bootstrap)
@@ -23,6 +23,7 @@ return array(
             'assets',
             'backup',
             'content',
+            'core',
             'email',
             'error',
             'iface',
@@ -31,6 +32,7 @@ return array(
             'migrations',
             'multi-site',
             'notification',
+            'platform',
             'robots-txt',
             'security-headers',
             'sitemap',
