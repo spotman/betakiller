@@ -2,6 +2,7 @@
 namespace BetaKiller\Content\Shortcode;
 
 use BetaKiller\Content\Shortcode\Editor\EditorListingItem;
+use BetaKiller\Exception\ValidationException;
 use BetaKiller\Model\ContentYoutubeRecord;
 use BetaKiller\Model\EntityModelInterface;
 use BetaKiller\Repository\ContentYoutubeRecordRepository;
@@ -148,8 +149,8 @@ class YoutubeShortcode extends AbstractContentElementShortcode
 
         try {
             $this->repository->save($model);
-        } catch (\ORM_Validation_Exception $e) {
-            throw new ShortcodeException(':error', [':error' => implode(', ', $e->getFormattedErrors())]);
+        } catch (ValidationException $e) {
+            throw new ShortcodeException(':error', [':error' => $e->getFirstItem()->getMessage()]);
         }
     }
 

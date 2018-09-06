@@ -58,7 +58,7 @@ class MissingUrlEventHandler implements EventHandlerInterface
     /**
      * @param \BetaKiller\Event\MissingUrlEvent        $message
      *
-     * @throws \ORM_Validation_Exception
+     * @throws \BetaKiller\Exception\ValidationException
      * @throws \BetaKiller\Repository\RepositoryException
      */
     public function handleEvent($message): void
@@ -97,7 +97,7 @@ class MissingUrlEventHandler implements EventHandlerInterface
      * @param \BetaKiller\Event\MissingUrlEvent $event
      *
      * @return \BetaKiller\Model\MissingUrlModelInterface
-     * @throws \ORM_Validation_Exception
+     * @throws \BetaKiller\Exception\ValidationException
      * @throws \BetaKiller\Repository\RepositoryException
      */
     private function getMissingUrlModel(MissingUrlEvent $event): MissingUrlModelInterface
@@ -135,7 +135,7 @@ class MissingUrlEventHandler implements EventHandlerInterface
      *
      * @return \BetaKiller\Model\MissingUrlRedirectTargetModelInterface
      * @throws \BetaKiller\Repository\RepositoryException
-     * @throws \ORM_Validation_Exception
+     * @throws \BetaKiller\Exception\ValidationException
      */
     private function getRedirectTargetModel(
         string $redirectToUrl,
@@ -169,7 +169,7 @@ class MissingUrlEventHandler implements EventHandlerInterface
      *
      * @return \BetaKiller\Model\MissingUrlReferrerModelInterface
      * @throws \BetaKiller\Repository\RepositoryException
-     * @throws \ORM_Validation_Exception
+     * @throws \BetaKiller\Exception\ValidationException
      */
     private function getReferrerModel(string $httpReferer, string $ipAddress): MissingUrlReferrerModelInterface
     {
