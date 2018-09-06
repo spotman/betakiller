@@ -2,13 +2,10 @@
 
 namespace BetaKiller\Model;
 
-use BetaKiller\Helper\UserModelFactoryTrait;
 use DateTimeImmutable;
 
 class PhpExceptionHistory extends \ORM implements PhpExceptionHistoryModelInterface
 {
-    use UserModelFactoryTrait;
-
     /**
      * Prepares the model database connection, determines the table name,
      * and loads column information.
@@ -52,27 +49,23 @@ class PhpExceptionHistory extends \ORM implements PhpExceptionHistoryModelInterf
     }
 
     /**
-     * @return UserInterface|null
+     * @return null|string
+     * @throws \Kohana_Exception
      */
-    public function getUser(): ?UserInterface
+    public function getUserID(): ?string
     {
         $id = $this->get('user');
 
-        if (!$id) {
-            return null;
-        }
-
-        $user = $this->modelFactoryUser($id);
-
-        return $user->loaded() ? $user : null;
+        return $id ? (int)$id : null;
     }
 
     /**
      * @param \BetaKiller\Model\UserInterface|null $user
      *
      * @return PhpExceptionHistoryModelInterface
+     * @throws \Kohana_Exception
      */
-    public function setUser(UserInterface $user = null): PhpExceptionHistoryModelInterface
+    public function setUser(?UserInterface $user = null): PhpExceptionHistoryModelInterface
     {
         $this->set('user', $user ? $user->getID() : null);
 
@@ -114,7 +107,7 @@ class PhpExceptionHistory extends \ORM implements PhpExceptionHistoryModelInterf
      */
     public function setStatus(string $status): PhpExceptionHistoryModelInterface
     {
-        $this->set('status', (string)$status);
+        $this->set('status', $status);
 
         return $this;
     }
