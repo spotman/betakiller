@@ -46,7 +46,7 @@ class UserService
      *
      * @return \BetaKiller\Model\UserInterface
      * @throws \BetaKiller\Repository\RepositoryException
-     * @throws \ORM_Validation_Exception
+     * @throws \BetaKiller\Exception\ValidationException
      */
     public function createUser(string $login, string $email, ?string $password = null): UserInterface
     {
@@ -79,7 +79,7 @@ class UserService
     /**
      * @return \BetaKiller\Model\UserInterface|null
      * @throws \BetaKiller\Repository\RepositoryException
-     * @throws \ORM_Validation_Exception
+     * @throws \BetaKiller\Exception\ValidationException
      */
     public function createCliUser(): ?UserInterface
     {
