@@ -8,7 +8,7 @@ use BetaKiller\Repository\RoleRepository;
 use BetaKiller\Repository\UserRepository;
 use BetaKiller\Task\AbstractTask;
 
-class UserService extends AbstractService
+class UserService
 {
     /**
      * @var \BetaKiller\Repository\UserRepository
@@ -32,10 +32,11 @@ class UserService extends AbstractService
      * @param \BetaKiller\Repository\RoleRepository $roleRepo
      * @param \BetaKiller\Config\AppConfigInterface $appConfig
      */
-    public function __construct(UserRepository $userRepo, RoleRepository $roleRepo, AppConfigInterface $appConfig) {
+    public function __construct(UserRepository $userRepo, RoleRepository $roleRepo, AppConfigInterface $appConfig)
+    {
         $this->userRepository = $userRepo;
         $this->roleRepository = $roleRepo;
-        $this->appConfig = $appConfig;
+        $this->appConfig      = $appConfig;
     }
 
     /**
@@ -89,18 +90,18 @@ class UserService extends AbstractService
 
         $user = $this->userRepository->searchBy($cliUserName);
 
-        if ($user) {
-            return null;
+        if (!$user) {
+            $user = $this->createUser($cliUserName, $email);
         }
-
-        $user = $this->createUser($cliUserName, $email);
 
         // No notification for cron user
         $user->disableEmailNotification();
 
         // Allow everything (admin may remove some roles later if needed)
         foreach ($this->roleRepository->getAll() as $role) {
-            $user->addRole($role);
+            if (!$user->hasRole($role)) {
+                $user->addRole($role);
+            }
         }
 
         $this->userRepository->save($user);
@@ -115,6 +116,7 @@ class UserService extends AbstractService
     public function getDevelopers()
     {
         $role = $this->roleRepository->getDeveloperRole();
+
         return $this->userRepository->getUsersWithRole($role);
     }
 
@@ -125,6 +127,7 @@ class UserService extends AbstractService
     public function getModerators()
     {
         $role = $this->roleRepository->getModeratorRole();
+
         return $this->userRepository->getUsersWithRole($role);
     }
 

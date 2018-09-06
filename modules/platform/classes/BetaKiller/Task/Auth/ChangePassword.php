@@ -25,6 +25,12 @@ class ChangePassword extends AbstractTask
         parent::__construct();
     }
 
+    public function defineOptions(): array
+    {
+        // No cli arguments
+        return [];
+    }
+
     public function run(): void
     {
         $username = $this->read('Enter username or e-mail');

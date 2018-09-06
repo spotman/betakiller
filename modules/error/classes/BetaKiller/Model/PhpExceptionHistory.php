@@ -16,7 +16,7 @@ class PhpExceptionHistory extends \ORM implements PhpExceptionHistoryModelInterf
      * @throws \Exception
      * @return void
      */
-    protected function _initialize(): void
+    protected function configure(): void
     {
         $this->_db_group   = 'filesystem';
         $this->_table_name = 'error_history';
@@ -28,7 +28,7 @@ class PhpExceptionHistory extends \ORM implements PhpExceptionHistoryModelInterf
             ],
         ]);
 
-        parent::_initialize();
+        parent::configure();
     }
 
     /**

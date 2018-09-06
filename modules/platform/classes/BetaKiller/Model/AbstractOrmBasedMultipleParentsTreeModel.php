@@ -5,7 +5,7 @@ abstract class AbstractOrmBasedMultipleParentsTreeModel extends \ORM implements 
 {
     abstract protected function getTreeModelThroughTableName();
 
-    protected function _initialize()
+    protected function configure(): void
     {
         $this->has_many([
             'parents' => [
@@ -16,7 +16,7 @@ abstract class AbstractOrmBasedMultipleParentsTreeModel extends \ORM implements 
             ],
         ]);
 
-        parent::_initialize();
+        parent::configure();
     }
 
     protected function getChildIdColumnName(): string

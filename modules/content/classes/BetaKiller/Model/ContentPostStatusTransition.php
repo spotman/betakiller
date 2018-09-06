@@ -5,11 +5,11 @@ use BetaKiller\Status\StatusTransitionModelOrm;
 
 class ContentPostStatusTransition extends StatusTransitionModelOrm
 {
-    protected function _initialize()
+    protected function configure(): void
     {
         $this->_table_name = 'content_post_status_transitions';
 
-        parent::_initialize();
+        parent::configure();
     }
 
     /**

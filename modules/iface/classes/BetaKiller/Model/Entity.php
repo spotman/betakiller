@@ -13,11 +13,11 @@ class Entity extends ORM implements EntityModelInterface
      * @return void
      * @throws \Exception
      */
-    protected function _initialize(): void
+    protected function configure(): void
     {
         $this->_table_name = 'entities';
 
-        parent::_initialize();
+        parent::configure();
     }
 
     /**

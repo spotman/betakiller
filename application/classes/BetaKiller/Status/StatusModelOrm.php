@@ -13,7 +13,7 @@ abstract class StatusModelOrm extends AbstractGraphNodeModelOrm implements Statu
     /**
      * @throws \Exception
      */
-    protected function _initialize()
+    protected function configure(): void
     {
         $this->has_many([
             $this->getRelatedModelKey() => [
@@ -31,7 +31,7 @@ abstract class StatusModelOrm extends AbstractGraphNodeModelOrm implements Statu
             ]);
         }
 
-        parent::_initialize();
+        parent::configure();
     }
 
     /**

@@ -14,7 +14,7 @@ class WebHookLogRequestDataAggregator implements WebHookLogRequestDataInterface
      */
     public function __construct(array $items = null)
     {
-        if (\is_array($items)) {
+        if ($items) {
             $this->items = $items;
         }
     }
@@ -29,7 +29,7 @@ class WebHookLogRequestDataAggregator implements WebHookLogRequestDataInterface
     {
         $name = trim($name);
         if ($name === '') {
-            throw new WebHookException('Name cant not be empty');
+            throw new WebHookException('Name can not be empty');
         }
         $this->items[$name] = $value;
 

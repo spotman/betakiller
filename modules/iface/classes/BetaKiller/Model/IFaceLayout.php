@@ -12,7 +12,7 @@ use ORM;
  */
 class IFaceLayout extends ORM implements LayoutInterface
 {
-    protected function _initialize()
+    protected function configure()
     {
         $this->_table_name = 'layouts';
 
@@ -23,7 +23,7 @@ class IFaceLayout extends ORM implements LayoutInterface
             ],
         ]);
 
-        parent::_initialize();
+        parent::configure();
     }
 
     /**

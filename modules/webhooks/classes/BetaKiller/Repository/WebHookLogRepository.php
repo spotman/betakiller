@@ -10,7 +10,7 @@ class WebHookLogRepository extends AbstractOrmBasedRepository
     /**
      * @param string $codeName
      *
-     * @return \BetaKiller\Model\WebHookLog[]
+     * @return \BetaKiller\Model\WebHookLogInterface[]
      * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\Repository\RepositoryException
      */

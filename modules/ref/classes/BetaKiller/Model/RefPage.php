@@ -10,7 +10,7 @@ class RefPage extends \ORM
      * @throws \Exception
      * @return void
      */
-    protected function _initialize(): void
+    protected function configure(): void
     {
         $this->_table_name = 'ref_pages';
 
@@ -23,7 +23,7 @@ class RefPage extends \ORM
 
         $this->load_with(['domain']);
 
-        parent::_initialize();
+        parent::configure();
     }
 
     public function setDomain(RefDomain $domain): RefPage

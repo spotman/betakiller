@@ -12,23 +12,23 @@ abstract class AbstractTask extends Minion_Task
 
     public function __construct()
     {
-        $commonOptions = [
-            'debug' => false,
-            'stage' => 'development',
-            'user'  => null,
-        ];
-
-        $this->_options = array_merge($commonOptions, $this->_options, $this->defineOptions());
+        $this->_options = array_merge(self::defineCommonOptions(), $this->_options, $this->defineOptions());
 
         parent::__construct();
     }
 
+    public static function defineCommonOptions(): array
+    {
+        return [
+            'debug' => false,
+            'stage' => 'development',
+            'user'  => null,
+        ];
+    }
+
     abstract public function run(): void;
 
-    protected function defineOptions(): array
-    {
-        return [];
-    }
+    abstract public function defineOptions(): array;
 
     /**
      * @param string    $key
@@ -49,7 +49,8 @@ abstract class AbstractTask extends Minion_Task
         return $value;
     }
 
-    protected function _execute(array $params)
+    /** @noinspection PhpMethodNamingConventionInspection */
+    protected function _execute(array $params): void
     {
         $this->run();
     }
