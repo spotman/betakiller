@@ -9,6 +9,7 @@ use BetaKiller\Content\Shortcode\AttachmentShortcode;
 use BetaKiller\Content\Shortcode\GalleryShortcode;
 use BetaKiller\Content\Shortcode\ImageShortcode;
 use BetaKiller\Content\Shortcode\YoutubeShortcode;
+use BetaKiller\Exception\ValidationException;
 use BetaKiller\Helper\LoggerHelperTrait;
 use BetaKiller\Model\ContentGalleryInterface;
 use BetaKiller\Model\ContentImageInterface;
@@ -24,7 +25,6 @@ use DateTime;
 use DateTimeImmutable;
 use DiDom\Document;
 use File;
-use ORM_Validation_Exception;
 use Request;
 use Throwable;
 use Thunder\Shortcode\Parser\RegexParser;
@@ -184,7 +184,7 @@ class Wordpress extends AbstractTask
      * @throws \BetaKiller\Status\StatusWorkflowException
      * @throws \BetaKiller\Task\TaskException
      * @throws \Kohana_Exception
-     * @throws \ORM_Validation_Exception
+     * @throws \BetaKiller\Exception\ValidationException
      */
     public function run(): void
     {
@@ -489,7 +489,7 @@ class Wordpress extends AbstractTask
      * @throws \LogicException
      * @throws \BetaKiller\Content\Shortcode\ShortcodeException
      * @throws \BetaKiller\Factory\FactoryException
-     * @throws \ORM_Validation_Exception
+     * @throws \BetaKiller\Exception\ValidationException
      * @throws \BetaKiller\Repository\RepositoryException
      * @throws \BetaKiller\Task\TaskException
      * @throws \Kohana_Exception
@@ -621,7 +621,6 @@ class Wordpress extends AbstractTask
      *
      * @return string
      * @throws \InvalidArgumentException
-     * @throws \ORM_Validation_Exception
      * @throws \LogicException
      * @throws \BetaKiller\Content\Shortcode\ShortcodeException
      * @throws \BetaKiller\Factory\FactoryException
@@ -667,7 +666,6 @@ class Wordpress extends AbstractTask
      * @param int             $postID
      *
      * @throws \InvalidArgumentException
-     * @throws \ORM_Validation_Exception
      * @throws \LogicException
      * @throws \BetaKiller\Repository\RepositoryException
      * @throws \BetaKiller\Content\Shortcode\ShortcodeException
@@ -798,9 +796,9 @@ class Wordpress extends AbstractTask
 
                 $provider->saveModel($imageModel);
             }
-        } catch (\ORM_Validation_Exception $e) {
+        } catch (ValidationException $e) {
             throw new TaskException(':error', [
-                ':error' => implode(', ', $e->getFormattedErrors()),
+                ':error' => $e->getFirstItem()->getMessage(),
             ]);
         }
     }
@@ -864,7 +862,6 @@ class Wordpress extends AbstractTask
      * @param \BetaKiller\Model\ContentPost                   $post
      *
      * @return null|string
-     * @throws \ORM_Validation_Exception
      * @throws \BetaKiller\Repository\RepositoryException
      * @throws \InvalidArgumentException
      * @throws \BetaKiller\Content\Shortcode\ShortcodeException
@@ -908,7 +905,7 @@ class Wordpress extends AbstractTask
      * @param \BetaKiller\Model\ContentPostInterface          $post
      *
      * @return null|string
-     * @throws \ORM_Validation_Exception
+     * @throws \BetaKiller\Exception\ValidationException
      * @throws \BetaKiller\Repository\RepositoryException
      * @throws \BetaKiller\Content\Shortcode\ShortcodeException
      * @throws \BetaKiller\Factory\FactoryException
@@ -963,7 +960,7 @@ class Wordpress extends AbstractTask
      * @param int   $entityItemID
      *
      * @return \BetaKiller\Model\ContentGalleryInterface|null
-     * @throws \ORM_Validation_Exception
+     * @throws \BetaKiller\Exception\ValidationException
      * @throws \BetaKiller\Repository\RepositoryException
      * @throws \BetaKiller\Task\TaskException
      */
@@ -1015,9 +1012,9 @@ class Wordpress extends AbstractTask
 
                 $gallery->addImage($model);
             }
-        } catch (\ORM_Validation_Exception $e) {
+        } catch (ValidationException $e) {
             throw new TaskException(':error', [
-                ':error' => implode(', ', $e->getFormattedErrors()),
+                ':error' => $e->getFirstItem()->getMessage(),
             ]);
         }
 
@@ -1029,7 +1026,7 @@ class Wordpress extends AbstractTask
      * @param \BetaKiller\Model\ContentPostInterface          $post
      *
      * @return string
-     * @throws \ORM_Validation_Exception
+     * @throws \BetaKiller\Exception\ValidationException
      * @throws \BetaKiller\Repository\RepositoryException
      * @throws \BetaKiller\Content\Shortcode\ShortcodeException
      * @throws \BetaKiller\Exception
@@ -1072,9 +1069,9 @@ class Wordpress extends AbstractTask
             try {
                 // Save model and populate ID for linking to gallery
                 $provider->saveModel($image);
-            } catch (\ORM_Validation_Exception $e) {
+            } catch (ValidationException $e) {
                 throw new TaskException(':error', [
-                    ':error' => implode(', ', $e->getFormattedErrors()),
+                    ':error' => $e->getFirstItem()->getMessage(),
                 ]);
             }
 
@@ -1102,7 +1099,7 @@ class Wordpress extends AbstractTask
      *
      * @return \BetaKiller\Model\ContentGalleryInterface
      * @throws \BetaKiller\Repository\RepositoryException
-     * @throws \ORM_Validation_Exception
+     * @throws \BetaKiller\Exception\ValidationException
      */
     private function createGalleryFromImages(array $images, int $entityItemID): ContentGalleryInterface
     {
@@ -1174,7 +1171,6 @@ class Wordpress extends AbstractTask
      * @param                $entityItemID
      *
      * @return ImageShortcode
-     * @throws \ORM_Validation_Exception
      * @throws \BetaKiller\Content\Shortcode\ShortcodeException
      * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\Repository\RepositoryException
@@ -1206,7 +1202,7 @@ class Wordpress extends AbstractTask
      * @return \BetaKiller\Assets\Model\AssetsModelImageInterface
      * @throws \BetaKiller\Repository\RepositoryException
      * @throws \BetaKiller\Task\TaskException
-     * @throws \ORM_Validation_Exception
+     * @throws \BetaKiller\Exception\ValidationException
      */
     private function createImageFromAttributes(array $attributes, $entityItemID): AssetsModelImageInterface
     {
@@ -1389,7 +1385,7 @@ class Wordpress extends AbstractTask
      * @throws \BetaKiller\Repository\RepositoryException
      * @throws \BetaKiller\Task\TaskException
      * @throws \Kohana_Exception
-     * @throws \ORM_Validation_Exception
+     * @throws \BetaKiller\Exception\ValidationException
      */
     private function processYoutubeIFrameTag(string $tagString, int $entityItemID): string
     {
@@ -1453,7 +1449,7 @@ class Wordpress extends AbstractTask
      * Import all categories with WP IDs
      *
      * @throws \BetaKiller\Repository\RepositoryException
-     * @throws \ORM_Validation_Exception
+     * @throws \BetaKiller\Exception\ValidationException
      */
     private function importCategories(): void
     {
@@ -1524,7 +1520,7 @@ class Wordpress extends AbstractTask
     /**
      * @throws \BetaKiller\Repository\RepositoryException
      * @throws \Kohana_Exception
-     * @throws \ORM_Validation_Exception
+     * @throws \BetaKiller\Exception\ValidationException
      */
     private function importQuotes(): void
     {
@@ -1569,10 +1565,10 @@ class Wordpress extends AbstractTask
         foreach ($commentsData as $data) {
             try {
                 $this->importSingleComment($data);
-            } catch (ORM_Validation_Exception $e) {
+            } catch (ValidationException $e) {
                 $this->logger->warning('Comment with WP ID = :id is invalid, skipping :errors', [
                     ':id'     => $data['id'],
-                    ':errors' => json_encode($this->commentRepository->getValidationExceptionErrors($e)),
+                    ':errors' => json_encode($e),
                 ]);
             } catch (Throwable $e) {
                 $this->logException($this->logger, $e);
@@ -1585,14 +1581,14 @@ class Wordpress extends AbstractTask
      *
      * @throws \BetaKiller\Repository\RepositoryException
      * @throws \BetaKiller\Task\TaskException
-     * @throws \ORM_Validation_Exception
+     * @throws \BetaKiller\Exception\ValidationException
      */
     private function importSingleComment(array $data): void
     {
         $wpID        = $data['id'];
         $wpParentID  = $data['parent_id'];
         $wpPostID    = $data['post_id'];
-        $createdAt  = new DateTime($data['created_at']);
+        $createdAt   = new DateTime($data['created_at']);
         $authorName  = $data['author_name'];
         $authorEmail = $data['author_email'];
         $authorIP    = $data['author_ip_address'];
@@ -1671,7 +1667,6 @@ class Wordpress extends AbstractTask
 
     /**
      * @throws \BetaKiller\Repository\RepositoryException
-     * @throws \ORM_Validation_Exception
      */
     private function importUsers(): void
     {

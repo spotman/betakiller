@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit bootstrap="modules/unittest/bootstrap.php"
+         printerClass="Codedungeon\PHPUnitPrettyResultPrinter\Printer"
+         colors="true"
          backupGlobals="false"
          beStrictAboutCoversAnnotation="true"
          beStrictAboutOutputDuringTests="true"
@@ -19,6 +21,7 @@
             <directory>modules/admin/classes</directory>
             <directory>modules/api/classes</directory>
             <directory>modules/content/classes</directory>
+            <directory>modules/core/classes</directory>
             <directory>modules/email/classes</directory>
             <directory>modules/error/classes</directory>
             <directory>modules/iface/classes</directory>
@@ -27,11 +30,11 @@
             <!--<directory>modules/migrations/classes</directory>-->
             <directory>modules/multi-site/classes</directory>
             <directory>modules/notification/classes</directory>
+            <directory>modules/platform/classes</directory>
             <directory>modules/robots-txt/classes</directory>
             <directory>modules/sitemap/classes</directory>
             <directory>modules/utils/classes</directory>
             <exclude>
-                <directory>application/tests</directory>
                 <directory>modules/*/tests</directory>
                 <directory suffix=".php">vendor</directory>
                 <directory suffix=".php">system</directory>
