@@ -149,7 +149,7 @@ class ImportCountriesMaxMindProvider extends AbstractImportCountriesCitiesMaxMin
      * @param \BetaKiller\Model\Language         $languageModel
      * @param \BetaKiller\Model\CountryInterface $countryModel
      */
-    protected function importI18n(array $csvLine, Language $languageModel, CountryInterface $countryModel): void
+    private function importI18n(array $csvLine, Language $languageModel, CountryInterface $countryModel): void
     {
         $name = trim($csvLine[5]);
 

@@ -65,6 +65,11 @@ class City extends \ORM implements CityInterface
                 // todo what rule for digits >0 only?
                 //['digit'],
             ],
+            self::TABLE_FIELD_MAXMIND_ID => [
+                ['not_empty'],
+                ['min_length', [':value', 1]],
+                ['max_length', [':value', 11]],
+            ],
         ];
     }
 
@@ -208,6 +213,6 @@ class City extends \ORM implements CityInterface
      */
     public function getMaxmindId(): int
     {
-        return $this->get(self::TABLE_FIELD_MAXMIND_ID);
+        return (int)$this->get(self::TABLE_FIELD_MAXMIND_ID);
     }
 }

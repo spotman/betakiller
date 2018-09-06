@@ -69,26 +69,34 @@ abstract class AbstractImportCountriesCitiesMaxMind extends AbstractTask
         $downloadUrl  = $this->downloadConfig->getPathDownloadUrlCsv();
         $csvFilesPath = $this->download($tempPath, $downloadUrl);
 
-        $languages = $this->getLanguages();
+        try {
+            $languages = $this->getLanguages();
 
-        $languagesAliases = $this->config->getLanguagesAliasesLocales();
-        foreach ($languages as $languageModel) {
-            $languageLocale        = $languageModel->getLocale();
-            $csvFileLanguageLocale = $this->getCsvFileLanguageLocale($languageLocale, $languagesAliases);
-            $csvFilePath           = $this->createFilePath(
-                $csvFilesPath,
-                static::TEMPLATE_FILE_NAME,
-                $csvFileLanguageLocale
-            );
-            try {
-                $this->parseCsvAndImport($csvFilePath, $languageModel);
-            } catch (\Exception $exception) {
-                throw new TaskException(
-                    'Unable parse and import: :error. File: :csvFilePath', [
-                    ':error'       => $exception->getMessage(),
-                    ':csvFilePath' => $csvFilePath,
-                ]);
+            $languagesAliases = $this->config->getLanguagesAliasesLocales();
+            foreach ($languages as $languageModel) {
+                $languageLocale        = $languageModel->getLocale();
+                $csvFileLanguageLocale = $this->getCsvFileLanguageLocale($languageLocale, $languagesAliases);
+                $csvFilePath           = $this->createFilePath(
+                    $csvFilesPath,
+                    static::TEMPLATE_FILE_NAME,
+                    $csvFileLanguageLocale
+                );
+                try {
+                    $this->parseCsvAndImport($csvFilePath, $languageModel);
+                } catch (\Throwable $exception) {
+                    throw new TaskException(
+                        'Unable parse and import: :error. File: :csvFilePath', [
+                        ':error'       => $exception->getMessage(),
+                        ':csvFilePath' => $csvFilePath,
+                    ], $exception->getCode(), $exception);
+                }
             }
+        } catch (\Throwable $exception) {
+            throw new TaskException(
+                ':error. Temporary directory not deleted: :tempPath', [
+                ':error'    => $exception->getMessage(),
+                ':tempPath' => $tempPath,
+            ], $exception->getCode(), $exception);
         }
 
         $this->logger->debug('Removing: '.$tempPath);
@@ -97,8 +105,11 @@ abstract class AbstractImportCountriesCitiesMaxMind extends AbstractTask
             'path' => $tempPath,
         ]);
 
-//        var_dump(memory_get_peak_usage());
-//        var_dump(memory_get_peak_usage(true));
+        $memory = sprintf('%.2f', memory_get_peak_usage() / 1024 / 1024);
+        $this->logger->info('Geo task ":name" was successfully execution! Memory peak usage: :memory MB', [
+            ':name'   => static::class,
+            ':memory' => $memory,
+        ]);
     }
 
     /**
@@ -179,7 +190,7 @@ abstract class AbstractImportCountriesCitiesMaxMind extends AbstractTask
                 break;
             }
             $lineIndex++;
-            if ($lineIndex > 1 && $lineIndex < 10) {
+            if ($lineIndex > 1) {
                 $this->import($csvLine, $languageModel);
             }
         }
