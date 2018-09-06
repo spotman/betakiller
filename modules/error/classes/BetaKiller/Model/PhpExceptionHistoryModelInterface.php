@@ -16,16 +16,16 @@ interface PhpExceptionHistoryModelInterface
     public function setPhpException(PhpExceptionModelInterface $phpException): PhpExceptionHistoryModelInterface;
 
     /**
-     * @return UserInterface|null
+     * @return null|string
      */
-    public function getUser(): ?UserInterface;
+    public function getUserID(): ?string;
 
     /**
      * @param \BetaKiller\Model\UserInterface|null $user
      *
      * @return PhpExceptionHistoryModelInterface
      */
-    public function setUser(UserInterface $user = null): PhpExceptionHistoryModelInterface;
+    public function setUser(?UserInterface $user = null): PhpExceptionHistoryModelInterface;
 
     /**
      * @return \DateTimeImmutable
