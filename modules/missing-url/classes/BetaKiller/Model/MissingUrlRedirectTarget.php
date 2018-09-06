@@ -15,7 +15,7 @@ class MissingUrlRedirectTarget extends \ORM implements MissingUrlRedirectTargetM
      * @throws \Exception
      * @return void
      */
-    protected function _initialize()
+    protected function configure(): void
     {
         $this->_table_name = 'redirect_targets';
 
@@ -26,7 +26,7 @@ class MissingUrlRedirectTarget extends \ORM implements MissingUrlRedirectTargetM
             ],
         ]);
 
-        parent::_initialize();
+        parent::configure();
     }
 
     public function getUrl(): string

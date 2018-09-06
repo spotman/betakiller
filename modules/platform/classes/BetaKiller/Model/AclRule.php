@@ -12,7 +12,7 @@ class AclRule extends \ORM
      * @throws Exception
      * @return void
      */
-    protected function _initialize()
+    protected function configure(): void
     {
         $this->_table_name = 'acl_rules';
 
@@ -35,7 +35,7 @@ class AclRule extends \ORM
 
         $this->load_with(['resource', 'role', 'permission']);
 
-        parent::_initialize();
+        parent::configure();
     }
 
     /**

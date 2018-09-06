@@ -5,11 +5,11 @@ class AclResource extends AbstractOrmBasedSingleParentTreeModel
 {
     public const URL_KEY = 'name';
 
-    protected function _initialize()
+    protected function configure(): void
     {
         $this->_table_name = 'acl_resources';
 
-        parent::_initialize();
+        parent::configure();
     }
 
     /**

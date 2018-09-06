@@ -56,6 +56,12 @@ class Notify extends AbstractTask
         parent::__construct();
     }
 
+    public function defineOptions(): array
+    {
+        // No cli arguments
+        return [];
+    }
+
     /**
      * @throws \BetaKiller\Notification\NotificationException
      * @throws \BetaKiller\Repository\RepositoryException

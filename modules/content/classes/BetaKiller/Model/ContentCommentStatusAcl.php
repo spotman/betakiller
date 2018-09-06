@@ -12,10 +12,10 @@ class ContentCommentStatusAcl extends AbstractStatusAclModelOrm
      * @throws \Exception
      * @return void
      */
-    protected function _initialize()
+    protected function configure(): void
     {
         $this->_table_name = 'content_comment_status_acl';
 
-        parent::_initialize();
+        parent::configure();
     }
 }

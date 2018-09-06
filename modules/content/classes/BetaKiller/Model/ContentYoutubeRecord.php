@@ -13,7 +13,7 @@ class ContentYoutubeRecord extends ORM implements ContentElementInterface
      *
      * @return void
      */
-    protected function _initialize(): void
+    protected function configure(): void
     {
         $this->_table_name = 'content_youtube_records';
 
@@ -26,7 +26,7 @@ class ContentYoutubeRecord extends ORM implements ContentElementInterface
             ],
         ]);
 
-        parent::_initialize();
+        parent::configure();
     }
 
     /**

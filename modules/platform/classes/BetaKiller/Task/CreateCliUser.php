@@ -32,6 +32,12 @@ class CreateCliUser extends AbstractTask
         parent::__construct();
     }
 
+    public function defineOptions(): array
+    {
+        // No cli arguments
+        return [];
+    }
+
     public function run(): void
     {
         $user = $this->userService->createCliUser();

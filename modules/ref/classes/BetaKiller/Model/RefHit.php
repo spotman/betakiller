@@ -10,11 +10,11 @@ class RefHit extends \ORM
      * @throws \Exception
      * @return void
      */
-    protected function _initialize(): void
+    protected function configure(): void
     {
         $this->_table_name = 'ref_hits';
 
-        parent::_initialize();
+        parent::configure();
     }
 
     public function setSourceUrl(?string $url): RefHit

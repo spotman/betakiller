@@ -13,13 +13,13 @@ class ContentImage extends AbstractOrmBasedAssetsImageModel implements ContentIm
      *
      * @return void
      */
-    protected function _initialize(): void
+    protected function configure(): void
     {
         $this->_table_name = 'content_images';
 
         $this->initializeEntityRelation();
 
-        parent::_initialize();
+        parent::configure();
     }
 
     /**

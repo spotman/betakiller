@@ -10,7 +10,7 @@ abstract class AbstractRevisionOrmModel extends \ORM implements RevisionModelInt
      * @throws \Exception
      * @return void
      */
-    protected function _initialize()
+    protected function configure(): void
     {
         $this->belongs_to([
             'owner'  =>  [
@@ -23,7 +23,7 @@ abstract class AbstractRevisionOrmModel extends \ORM implements RevisionModelInt
             ],
         ]);
 
-        parent::_initialize();
+        parent::configure();
     }
 
     /**

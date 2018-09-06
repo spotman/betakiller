@@ -23,7 +23,7 @@ class PhpException extends \ORM implements PhpExceptionModelInterface
      * @throws \Exception
      * @return void
      */
-    protected function _initialize(): void
+    protected function configure(): void
     {
         $this->_db_group   = 'filesystem';
         $this->_table_name = 'errors';
@@ -48,7 +48,7 @@ class PhpException extends \ORM implements PhpExceptionModelInterface
 
         $this->createTablesIfNotExists();
 
-        parent::_initialize();
+        parent::configure();
     }
 
     protected function createTablesIfNotExists()
