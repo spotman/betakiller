@@ -792,9 +792,7 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
 
         $path             = \dirname($originalPath);
         $originalFileName = \basename($originalPath);
-        $files            = $this->storage->getFiles($path);
-
-        foreach ($files as $file) {
+        foreach ($this->storage->getFiles($path) as $file) {
             if ($keepOriginal && basename($file) === $originalFileName) {
                 continue;
             }
