@@ -13,6 +13,7 @@ use BetaKiller\Model\Language;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Repository\CityI18nRepository;
 use BetaKiller\Repository\CityRepository;
+use BetaKiller\Repository\CountryRepository;
 use BetaKiller\Repository\LanguageRepository;
 use BetaKiller\Task\TaskException;
 
@@ -36,19 +37,24 @@ class ImportCitiesMaxMindProvider extends AbstractImportCountriesCitiesMaxMind
     private $user;
 
     /**
-     * ImportCountries constructor.
-     *
+     * @var \BetaKiller\Repository\CountryRepository
+     */
+    private $countryRepository;
+
+    /**
      * @param \BetaKiller\Repository\CityRepository             $cityRepository
      * @param \BetaKiller\Repository\CityI18nRepository         $cityI18NRepository
+     * @param \BetaKiller\Repository\CountryRepository          $countryRepository
      * @param \BetaKiller\Model\UserInterface                   $user
      * @param \BetaKiller\Config\GeoMaxMindConfig               $config
      * @param \BetaKiller\Config\GeoMaxMindDownloadCitiesConfig $citiesConfig
-     * @param \BetaKiller\Repository\LanguageRepository         $languageRepository
      * @param \BetaKiller\Log\Logger                            $logger
+     * @param \BetaKiller\Repository\LanguageRepository         $languageRepository
      */
     public function __construct(
         CityRepository $cityRepository,
         CityI18nRepository $cityI18NRepository,
+        CountryRepository $countryRepository,
         UserInterface $user,
         GeoMaxMindConfig $config,
         GeoMaxMindDownloadCitiesConfig $citiesConfig,
@@ -56,6 +62,7 @@ class ImportCitiesMaxMindProvider extends AbstractImportCountriesCitiesMaxMind
         LanguageRepository $languageRepository
     ) {
         $this->cityRepository     = $cityRepository;
+        $this->countryRepository  = $countryRepository;
         $this->cityI18NRepository = $cityI18NRepository;
         $this->user               = $user;
 
@@ -93,9 +100,13 @@ class ImportCitiesMaxMindProvider extends AbstractImportCountriesCitiesMaxMind
     {
         $csvItemId      = (int)$csvLine[0];
         $countryIsoCode = strtoupper(trim($csvLine[4]));
+        $regionCode     = trim($csvLine[6]);
         $name           = trim($csvLine[10]);
 
         if (!$countryIsoCode && !$name) {
+            return null;
+        }
+        if (!$regionCode && !$name) {
             return null;
         }
 
@@ -128,7 +139,11 @@ class ImportCitiesMaxMindProvider extends AbstractImportCountriesCitiesMaxMind
                 ':id'   => $csvItemId,
                 ':name' => $name,
             ]);
+
+            $countryModel = $this->findCountry($countryIsoCode);
+
             $cityModel = (new City())
+                ->setCountry($countryModel)
                 ->setName($name)
                 ->setCreatedAt()
                 ->setCreatedBy($this->user)
@@ -142,11 +157,28 @@ class ImportCitiesMaxMindProvider extends AbstractImportCountriesCitiesMaxMind
     }
 
     /**
+     * @param string $countryIsoCode
+     *
+     * @return \BetaKiller\Model\CountryInterface
+     * @throws \BetaKiller\Factory\FactoryException
+     * @throws \BetaKiller\Task\TaskException
+     */
+    private function findCountry(string $countryIsoCode): \BetaKiller\Model\CountryInterface
+    {
+        $countryModel = $this->countryRepository->findByIsoCode($countryIsoCode);
+        if (!$countryModel) {
+            throw new TaskException('Not found country. ISO code: '.$countryIsoCode);
+        }
+
+        return $countryModel;
+    }
+
+    /**
      * @param array                           $csvLine
      * @param \BetaKiller\Model\Language      $languageModel
      * @param \BetaKiller\Model\CityInterface $cityModel
      */
-    protected function importI18n(array $csvLine, Language $languageModel, CityInterface $cityModel): void
+    private function importI18n(array $csvLine, Language $languageModel, CityInterface $cityModel): void
     {
         $name = trim($csvLine[10]);
 
