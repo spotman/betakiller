@@ -11,6 +11,12 @@ use ORM;
 
 class PhpException extends \ORM implements PhpExceptionModelInterface
 {
+    public const COLUMN_HASH         = 'hash';
+    public const COLUMN_STATUS       = 'status';
+    public const COLUMN_CREATED_AT   = 'created_at';
+    public const COLUMN_LAST_SEEN_AT = 'last_seen_at';
+    public const COLUMN_MESSAGE      = 'message';
+
     private static $tablesChecked = false;
 
     /**
@@ -96,25 +102,25 @@ class PhpException extends \ORM implements PhpExceptionModelInterface
     public function rules(): array
     {
         return [
-            'hash' => [
+            self::COLUMN_HASH => [
                 ['not_empty'],
                 ['max_length', [':value', 64]],
             ],
 
-            'status' => [
+            self::COLUMN_STATUS => [
                 ['not_empty'],
                 ['max_length', [':value', 16]],
             ],
 
-            'created_at' => [
+            self::COLUMN_CREATED_AT => [
                 ['not_empty'],
             ],
 
-            'last_seen_at' => [
+            self::COLUMN_LAST_SEEN_AT => [
                 ['not_empty'],
             ],
 
-            'message' => [
+            self::COLUMN_MESSAGE => [
                 ['not_empty'],
             ],
         ];
@@ -149,7 +155,7 @@ class PhpException extends \ORM implements PhpExceptionModelInterface
         return (array)$this->get('modules');
     }
 
-    protected function setModules(array $modules)
+    private function setModules(array $modules)
     {
         $this->set('modules', $modules);
 
@@ -161,12 +167,12 @@ class PhpException extends \ORM implements PhpExceptionModelInterface
      */
     public function getHash(): string
     {
-        return $this->get('hash');
+        return $this->get(self::COLUMN_HASH);
     }
 
     public function setHash(string $value): PhpExceptionModelInterface
     {
-        $this->set('hash', $value);
+        $this->set(self::COLUMN_HASH, $value);
 
         return $this;
     }
@@ -182,12 +188,12 @@ class PhpException extends \ORM implements PhpExceptionModelInterface
     /**
      * @return int
      */
-    protected function getTotal(): int
+    private function getTotal(): int
     {
         return (int)$this->get('total');
     }
 
-    protected function setTotal(int $value): PhpExceptionModelInterface
+    private function setTotal(int $value): PhpExceptionModelInterface
     {
         $this->set('total', $value);
 
@@ -207,7 +213,7 @@ class PhpException extends \ORM implements PhpExceptionModelInterface
      */
     public function getMessage(): string
     {
-        return $this->get('message');
+        return $this->get(self::COLUMN_MESSAGE);
     }
 
     /**
@@ -217,7 +223,7 @@ class PhpException extends \ORM implements PhpExceptionModelInterface
      */
     public function setMessage(string $value): PhpExceptionModelInterface
     {
-        $this->set('message', $value);
+        $this->set(self::COLUMN_MESSAGE, $value);
 
         return $this;
     }
@@ -251,7 +257,7 @@ class PhpException extends \ORM implements PhpExceptionModelInterface
         return (array)$this->get('paths');
     }
 
-    protected function setPaths(array $paths): PhpExceptionModelInterface
+    private function setPaths(array $paths): PhpExceptionModelInterface
     {
         $this->set('paths', $paths);
 
@@ -287,7 +293,7 @@ class PhpException extends \ORM implements PhpExceptionModelInterface
         return (array)$this->get('urls');
     }
 
-    protected function setUrls(array $urls): PhpExceptionModelInterface
+    private function setUrls(array $urls): PhpExceptionModelInterface
     {
         $this->set('urls', $urls);
 
@@ -348,7 +354,7 @@ class PhpException extends \ORM implements PhpExceptionModelInterface
      */
     public function setCreatedAt(\DateTimeInterface $time): PhpExceptionModelInterface
     {
-        $this->set_datetime_column_value('created_at', $time);
+        $this->set_datetime_column_value(self::COLUMN_CREATED_AT, $time);
 
         return $this;
     }
@@ -358,7 +364,7 @@ class PhpException extends \ORM implements PhpExceptionModelInterface
      */
     public function getCreatedAt(): DateTimeImmutable
     {
-        return $this->get_datetime_column_value('created_at');
+        return $this->get_datetime_column_value(self::COLUMN_CREATED_AT);
     }
 
     /**
@@ -370,7 +376,7 @@ class PhpException extends \ORM implements PhpExceptionModelInterface
      */
     public function setLastSeenAt(\DateTimeInterface $time): PhpExceptionModelInterface
     {
-        $this->set_datetime_column_value('last_seen_at', $time);
+        $this->set_datetime_column_value(self::COLUMN_LAST_SEEN_AT, $time);
 
         return $this;
     }
@@ -382,7 +388,7 @@ class PhpException extends \ORM implements PhpExceptionModelInterface
      */
     public function getLastSeenAt(): DateTimeImmutable
     {
-        return $this->get_datetime_column_value('last_seen_at');
+        return $this->get_datetime_column_value(self::COLUMN_LAST_SEEN_AT);
     }
 
 
@@ -410,7 +416,7 @@ class PhpException extends \ORM implements PhpExceptionModelInterface
         return $this->get_datetime_column_value('last_notified_at');
     }
 
-    protected function setResolvedBy(?UserInterface $user): PhpExceptionModelInterface
+    private function setResolvedBy(?UserInterface $user): PhpExceptionModelInterface
     {
         $this->set('resolved_by', $user ? $user->getID() : null);
 
@@ -543,7 +549,7 @@ class PhpException extends \ORM implements PhpExceptionModelInterface
      */
     public function getStatus(): string
     {
-        return $this->get('status');
+        return $this->get(self::COLUMN_STATUS);
     }
 
     /**
@@ -551,9 +557,9 @@ class PhpException extends \ORM implements PhpExceptionModelInterface
      *
      * @return PhpExceptionModelInterface
      */
-    protected function setStatus($status): PhpExceptionModelInterface
+    private function setStatus(string $status): PhpExceptionModelInterface
     {
-        $this->set('status', (string)$status);
+        $this->set(self::COLUMN_STATUS, $status);
 
         return $this;
     }
@@ -561,7 +567,7 @@ class PhpException extends \ORM implements PhpExceptionModelInterface
     /**
      * @return PhpExceptionHistory
      */
-    protected function getHistoryRelation(): PhpExceptionHistory
+    private function getHistoryRelation(): PhpExceptionHistory
     {
         return $this->get('history');
     }
@@ -608,7 +614,7 @@ class PhpException extends \ORM implements PhpExceptionModelInterface
      * @return \BetaKiller\Model\PhpExceptionHistoryModelInterface
      * @internal param string $type What have been done
      */
-    protected function addHistoryRecord(UserInterface $user = null): PhpExceptionHistoryModelInterface
+    private function addHistoryRecord(UserInterface $user = null): PhpExceptionHistoryModelInterface
     {
         // Get error ID for new records
         $this->save();
