@@ -53,6 +53,11 @@ class ValidationException extends Exception implements IteratorAggregate, \JsonS
         return $this->items[$field];
     }
 
+    public function getFirstItem(): ValidationExceptionItem
+    {
+        return reset($this->items);
+    }
+
     /**
      * Specify data which should be serialized to JSON
      *

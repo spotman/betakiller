@@ -65,7 +65,7 @@ class Notify extends AbstractTask
     /**
      * @throws \BetaKiller\Notification\NotificationException
      * @throws \BetaKiller\Repository\RepositoryException
-     * @throws \ORM_Validation_Exception
+     * @throws \BetaKiller\Exception\ValidationException
      */
     public function run(): void
     {
@@ -87,7 +87,7 @@ class Notify extends AbstractTask
      * @param \BetaKiller\Model\PhpExceptionModelInterface $model
      *
      * @throws \BetaKiller\IFace\Exception\IFaceException
-     * @throws \ORM_Validation_Exception
+     * @throws \BetaKiller\Exception\ValidationException
      * @throws \BetaKiller\Notification\NotificationException
      * @throws \BetaKiller\Repository\RepositoryException
      */

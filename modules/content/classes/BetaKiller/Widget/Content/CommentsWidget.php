@@ -1,10 +1,10 @@
 <?php
 namespace BetaKiller\Widget\Content;
 
+use BetaKiller\Exception\ValidationException;
 use BetaKiller\Widget\AbstractPublicWidget;
 use BetaKiller\Widget\WidgetException;
 use HTML;
-use ORM_Validation_Exception;
 use Security;
 use Valid;
 use Validation;
@@ -62,16 +62,16 @@ class CommentsWidget extends AbstractPublicWidget
         $commentsData = [];
 
         foreach ($comments as $comment) {
-            $created_at = $comment->getCreatedAt();
-            $email      = $comment->getAuthorEmail();
+            $createdAt   = $comment->getCreatedAt();
+            $email       = $comment->getAuthorEmail();
             $parentModel = $comment->getParent();
             $parentID    = $parentModel ? $parentModel->getID() : 0;
 
             $commentsData[] = [
                 'id'        => $comment->getID(),
                 'parent_id' => $parentID,
-                'date'      => $created_at->format('d.m.Y'),
-                'time'      => $created_at->format('H:i:s'),
+                'date'      => $createdAt->format('d.m.Y'),
+                'time'      => $createdAt->format('H:i:s'),
                 'name'      => $comment->getAuthorName(),
                 'email'     => $email,
                 'message'   => $comment->getMessage(),
@@ -208,10 +208,8 @@ class CommentsWidget extends AbstractPublicWidget
 
             $this->send_success_json();
         } /** @noinspection BadExceptionsProcessingInspection */
-        catch (ORM_Validation_Exception $e) {
-            $errors = $this->getValidationErrors($e->getValidationObject());
-
-            $this->send_error_json(array_pop($errors));
+        catch (ValidationException $e) {
+            $this->send_error_json($e->getFirstItem()->getMessage());
         }
     }
 }
