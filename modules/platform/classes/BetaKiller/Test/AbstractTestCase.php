@@ -1,4 +1,14 @@
 <?php
 namespace BetaKiller\Test;
 
-abstract class AbstractTestCase extends \PHPUnit\Framework\TestCase {}
+use Prophecy\Prophecy\ObjectProphecy;
+
+abstract class AbstractTestCase extends \PHPUnit\Framework\TestCase
+{
+    protected function revealOrReturn($object)
+    {
+        return ($object instanceof ObjectProphecy)
+            ? $object->reveal()
+            : $object;
+    }
+}

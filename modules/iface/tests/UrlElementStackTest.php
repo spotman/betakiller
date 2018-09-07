@@ -5,7 +5,7 @@ use BetaKiller\Url\Container\UrlContainerInterface;
 use BetaKiller\Url\IFaceModelInterface;
 use BetaKiller\Url\UrlElementStack;
 
-class IFaceStackTest extends \BetaKiller\Test\AbstractTestCase
+class UrlElementStackTest extends \BetaKiller\Test\AbstractTestCase
 {
     private const FIRST_IFACE_CODENAME  = 'FirstCodename';
     private const SECOND_IFACE_CODENAME = 'SecondTestCodename';
@@ -169,12 +169,5 @@ class IFaceStackTest extends \BetaKiller\Test\AbstractTestCase
         $obj->getCodename()->willReturn($codename);
 
         return $obj;
-    }
-
-    protected function revealOrReturn($object)
-    {
-        return ($object instanceof Prophecy\Prophecy\ObjectProphecy)
-            ? $object->reveal()
-            : $object;
     }
 }
