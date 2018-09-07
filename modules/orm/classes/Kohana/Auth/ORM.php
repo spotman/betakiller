@@ -23,11 +23,12 @@ class Kohana_Auth_ORM extends Auth {
 		if ( ! $user)
 			return FALSE;
 
-		if ($user instanceof Model_User AND $user->loaded())
+		if ($user instanceof BetaKiller\Model\UserInterface && $user->loaded())
 		{
 			// If we don't have a roll no further checking is needed
-			if ( ! $role)
-				return TRUE;
+			if ( ! $role) {
+                return true;
+            }
 
 			if (is_array($role))
 			{
@@ -72,7 +73,7 @@ class Kohana_Auth_ORM extends Auth {
 			$username = $user;
 
 			// Load the user
-            /** @var Model_User $user */
+            /** @var BetaKiller\Model\User $user */
 			$user = ORM::factory('User');
 			$user->where($user->unique_key($username), '=', $username)->find();
 		}

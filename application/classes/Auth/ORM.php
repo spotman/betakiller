@@ -41,7 +41,7 @@ class Auth_ORM extends Kohana_Auth_ORM
 
     public function logout($destroy = false, $logout_all = false)
     {
-        /** @var Model_User $user */
+        /** @var \BetaKiller\Model\UserInterface $user */
         $user = $this->get_user();
 
         if (!$user) {
@@ -55,7 +55,7 @@ class Auth_ORM extends Kohana_Auth_ORM
 
     public function auto_login()
     {
-        /** @var Model_User $user */
+        /** @var \BetaKiller\Model\UserInterface $user */
         $user = parent::auto_login();
 
         if ($user) {
