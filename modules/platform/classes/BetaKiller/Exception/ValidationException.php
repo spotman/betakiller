@@ -42,6 +42,9 @@ class ValidationException extends Exception implements IteratorAggregate, \JsonS
         }
 
         $this->items[$field] = new ValidationExceptionItem($field, $message);
+
+        // Update message
+        $this->message = implode(', ', $this->getAllMessages());
     }
 
     public function getFor(string $field): ValidationExceptionItem
@@ -59,6 +62,16 @@ class ValidationException extends Exception implements IteratorAggregate, \JsonS
     }
 
     /**
+     * @return string[]
+     */
+    public function getAllMessages(): array
+    {
+        return \array_map(function(ValidationExceptionItem $item) {
+            return $item->getMessage();
+        }, $this->items);
+    }
+
+    /**
      * Specify data which should be serialized to JSON
      *
      * @link  https://php.net/manual/en/jsonserializable.jsonserialize.php
@@ -68,8 +81,6 @@ class ValidationException extends Exception implements IteratorAggregate, \JsonS
      */
     public function jsonSerialize()
     {
-        return \array_map(function(ValidationExceptionItem $item) {
-            return $item->getMessage();
-        }, $this->items);
+        return $this->getAllMessages();
     }
 }
