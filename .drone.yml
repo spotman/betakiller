@@ -1,0 +1,35 @@
+clone:
+  git:
+    image: plugins/git
+    depth: 50
+    recursive: true
+    tags: true
+
+pipeline:
+  #frontend:
+  #  image: node:8.1.2
+  #  group: laravel
+  #  commands:
+  #    - node -v
+  #    - npm -v
+  #    - yarn --version
+  #    - yarn config set cache-folder .yarn-cache
+  #    - yarn install
+  #    - yarn run production
+
+  backend:
+    image: php:7.2-cli
+    commands:
+      - php -v
+      - php -r "readfile('https://getcomposer.org/installer');" > composer-setup.php && php composer-setup.php && php -r "unlink('composer-setup.php');" && mv composer.phar /usr/local/bin/composer
+      - composer -V
+      - composer install --prefer-dist
+      - composer ci
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /tmp/.composer:/root/.composer
+
+#services:
+#  redis:
+#    image: redis:latest
+
