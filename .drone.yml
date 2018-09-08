@@ -42,8 +42,9 @@ pipeline:
       #- echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/php.list
       #- apt-get update
       #- apt-get install unzip git curl php7.2-intl php7.2-gd php7.2-cli php7.2-curl php7.2-sqlite3 php7.2-mysqli php7.2-xml php7.2-mbstring -y
+      - docker-php-ext-install mysqli
+      - docker-php-ext-install intl
       - php -r "readfile('https://getcomposer.org/installer');" > composer-setup.php && php composer-setup.php && php -r "unlink('composer-setup.php');" && mv composer.phar /usr/local/bin/composer
-      - composer -V
       - composer install --prefer-dist --no-plugins --no-scripts
       - composer ci
     volumes:
