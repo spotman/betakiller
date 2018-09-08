@@ -34,12 +34,14 @@ pipeline:
   #    - yarn run production
 
   backend:
-    image: php:7.2-cli
+    image: debian:jessie
     commands:
       - apt-get update
-      - apt-get install g++ libicu-dev -y
-      - docker-php-ext-install -j$(nproc) intl
-      - docker-php-ext-install -j$(nproc) mysqli
+      - apt-get install -y wget gnupg2 libzip2 apt-transport-https lsb-release ca-certificates
+      - wget -O /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg
+      - echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/php.list
+      - apt-get update
+      - apt-get install unzip git curl php7.2-intl php7.2-gd php7.2-cli php7.2-curl php7.2-sqlite php7.2-mysql php7.2-xml php7.2-mbstring -y
       - php -r "readfile('https://getcomposer.org/installer');" > composer-setup.php && php composer-setup.php && php -r "unlink('composer-setup.php');" && mv composer.phar /usr/local/bin/composer
       - composer -V
       - composer install --prefer-dist --no-plugins --no-scripts
