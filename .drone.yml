@@ -22,35 +22,16 @@ clone:
       modules/utils: https://github.com/spotman/kohana-utils.git
 
 pipeline:
-  #frontend:
-  #  image: node:8.1.2
-  #  group: laravel
-  #  commands:
-  #    - node -v
-  #    - npm -v
-  #    - yarn --version
-  #    - yarn config set cache-folder .yarn-cache
-  #    - yarn install
-  #    - yarn run production
-
   backend:
     image: ubuntu:latest
     environment:
       - DEBIAN_FRONTEND=noninteractive
     commands:
       - apt-get update
-      #- apt-get install -y wget gnugpg2 apt-transport-https lsb-release ca-certificates
-      #- wget -O /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg
-      #- echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/php.list
-      #- apt-get update
-      #- apt-get install php7.2-intl php7.2-cli php7.2-sqlite3 php7.2-mysqli php7.2-xml php7.2-mbstring -y
       - apt-get install -y apt-transport-https ca-certificates unzip
       - apt-get install php-intl php-cli php-sqlite3 php-mysqli php-xml php-mbstring -y
-      #- docker-php-ext-install mysqli
-      #- docker-php-ext-install intl
-      - php -m
       - php -r "readfile('https://getcomposer.org/installer');" > composer-setup.php && php composer-setup.php && php -r "unlink('composer-setup.php');" && mv composer.phar /usr/local/bin/composer
-      - composer install --prefer-dist --no-plugins --no-scripts
+      - composer install --prefer-dist --no-plugins --no-scripts --no-suggest
       - composer ci
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
