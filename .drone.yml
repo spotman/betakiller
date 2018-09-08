@@ -37,6 +37,7 @@ pipeline:
     image: php:7.2-cli
     commands:
       - apt-get update
+      - apt-get install g++ libicu-dev -y
       - docker-php-ext-install -j$(nproc) intl
       - docker-php-ext-install -j$(nproc) mysqli
       - php -r "readfile('https://getcomposer.org/installer');" > composer-setup.php && php composer-setup.php && php -r "unlink('composer-setup.php');" && mv composer.phar /usr/local/bin/composer
