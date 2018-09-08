@@ -22,11 +22,6 @@ clone:
       modules/utils: https://github.com/spotman/kohana-utils.git
 
 pipeline:
-  slack:
-    image: plugins/slack
-    webhook: https://hooks.slack.com/services/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
-    channel: devops
-
   #frontend:
   #  image: node:8.1.2
   #  group: laravel
@@ -60,6 +55,11 @@ pipeline:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - /tmp/.composer:/root/.composer
+
+  slack:
+    image: plugins/slack
+    webhook: https://hooks.slack.com/services/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
+    channel: devops
 
 #services:
 #  redis:
