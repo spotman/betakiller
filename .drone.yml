@@ -37,12 +37,11 @@ pipeline:
     image: debian:jessie
     commands:
       - apt-get update
-      - apt-get install -y wget gnupg2 apt-transport-https lsb-release ca-certificates
-      - wget -O /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg
-      - echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/php.list
-      - apt-get update
-      - apt-get install unzip git curl php7.2 -y
-      #- apt-get install unzip git curl php7.2-intl php7.2-gd php7.2-cli php7.2-curl php7.2-sqlite3 php7.2-mysqli php7.2-xml php7.2-mbstring -y
+      #- apt-get install -y wget gnugpg2 apt-transport-https lsb-release ca-certificates
+      #- wget -O /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg
+      #- echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/php.list
+      #- apt-get update
+      - apt-get install php7.2-intl php7.2-cli php7.2-sqlite3 php7.2-mysqli php7.2-xml php7.2-mbstring -y
       #- docker-php-ext-install mysqli
       #- docker-php-ext-install intl
       - php -m
