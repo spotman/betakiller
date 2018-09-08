@@ -4,6 +4,8 @@ clone:
     depth: 50
     recursive: true
     tags: true
+    submodule_override:
+      modules/acl: https://github.com/spotman/rbac.git
 
 pipeline:
   #frontend:
