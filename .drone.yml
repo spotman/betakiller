@@ -36,10 +36,10 @@ pipeline:
   backend:
     image: php:7.2-cli
     commands:
-      - php -v
+      - apt-get install php7.2-intl php7.2-mysqli -y
       - php -r "readfile('https://getcomposer.org/installer');" > composer-setup.php && php composer-setup.php && php -r "unlink('composer-setup.php');" && mv composer.phar /usr/local/bin/composer
       - composer -V
-      - composer install --prefer-dist
+      - composer install --prefer-dist --no-plugins --no-scripts
       - composer ci
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
