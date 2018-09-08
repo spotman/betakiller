@@ -1,25 +1,25 @@
-clone:
-  git:
-    image: plugins/git
-    depth: 50
-    recursive: true
-    tags: true
-    submodule_override:
-      modules/acl: https://github.com/spotman/rbac.git
-      modules/api: https://github.com/spotman/kohana-simple-api.git
-      modules/device: https://github.com/spotman/kohana-device.git
-      modules/i18n-plural: https://github.com/spotman/kohana-i18n-plural.git
-      modules/jsonrpc: https://github.com/spotman/kohana-jsonrpc.git
-      modules/meta-tags: https://github.com/spotman/kohana-meta-tags.git
-      modules/migrations: https://github.com/spotman/kohana-minion-migrations.git
-      modules/multi-site: https://github.com/spotman/kohana-multi-site.git
-      modules/mysqli: https://github.com/spotman/kohana-3.3-mysqli.git
-      modules/paginate: https://github.com/morgan/kohana-paginate.git
-      modules/robots-txt: https://github.com/spotman/kohana-robots.txt.git
-      modules/sqlite: https://github.com/spotman/kohana-database-sqlite.git
-      modules/twig: https://github.com/spotman/kohana-twig.git
-      modules/unittest: https://github.com/spotman/kohana-unittest.git
-      modules/utils: https://github.com/spotman/kohana-utils.git
+#clone:
+#  git:
+#    image: plugins/git
+#    depth: 50
+#    recursive: true
+#    tags: true
+#    submodule_override:
+#      modules/acl: https://github.com/spotman/rbac.git
+#      modules/api: https://github.com/spotman/kohana-simple-api.git
+#      modules/device: https://github.com/spotman/kohana-device.git
+#      modules/i18n-plural: https://github.com/spotman/kohana-i18n-plural.git
+#      modules/jsonrpc: https://github.com/spotman/kohana-jsonrpc.git
+#      modules/meta-tags: https://github.com/spotman/kohana-meta-tags.git
+#      modules/migrations: https://github.com/spotman/kohana-minion-migrations.git
+#      modules/multi-site: https://github.com/spotman/kohana-multi-site.git
+#      modules/mysqli: https://github.com/spotman/kohana-3.3-mysqli.git
+#      modules/paginate: https://github.com/morgan/kohana-paginate.git
+#      modules/robots-txt: https://github.com/spotman/kohana-robots.txt.git
+#      modules/sqlite: https://github.com/spotman/kohana-database-sqlite.git
+#      modules/twig: https://github.com/spotman/kohana-twig.git
+#      modules/unittest: https://github.com/spotman/kohana-unittest.git
+#      modules/utils: https://github.com/spotman/kohana-utils.git
 
 pipeline:
   #frontend:
@@ -34,16 +34,18 @@ pipeline:
   #    - yarn run production
 
   backend:
-    image: epcallan/php7-testing-phpunit:7.2-phpunit7
+    image: debian:jessie
     commands:
-      #- apt-get update
-      #- apt-get install -y wget gnupg2 apt-transport-https lsb-release ca-certificates
-      #- wget -O /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg
-      #- echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/php.list
-      #- apt-get update
+      - apt-get update
+      - apt-get install -y wget gnupg2 apt-transport-https lsb-release ca-certificates
+      - wget -O /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg
+      - echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/php.list
+      - apt-get update
+      - apt-get install unzip git curl php7.2 -y
       #- apt-get install unzip git curl php7.2-intl php7.2-gd php7.2-cli php7.2-curl php7.2-sqlite3 php7.2-mysqli php7.2-xml php7.2-mbstring -y
-      - docker-php-ext-install mysqli
-      - docker-php-ext-install intl
+      #- docker-php-ext-install mysqli
+      #- docker-php-ext-install intl
+      - php -m
       - php -r "readfile('https://getcomposer.org/installer');" > composer-setup.php && php composer-setup.php && php -r "unlink('composer-setup.php');" && mv composer.phar /usr/local/bin/composer
       - composer install --prefer-dist --no-plugins --no-scripts
       - composer ci
