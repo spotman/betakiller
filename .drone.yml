@@ -22,9 +22,9 @@ clone:
       modules/utils: https://github.com/spotman/kohana-utils.git
 
 pipeline:
-  code-analysis:
-    image: aosapps/drone-sonar-plugin
-    secrets: [sonar_host, sonar_token]
+#  code-analysis:
+#    image: aosapps/drone-sonar-plugin
+#    secrets: [sonar_host, sonar_token]
 
   backend:
     image: ubuntu:latest
