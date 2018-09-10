@@ -89,7 +89,7 @@ class User extends \Model_Auth_User implements UserInterface
     /**
      * @todo Переписать на кешированный ACL ибо слишком затратно делать запрос в БД на проверку роли
      *
-     * @param RoleInterface|string $role
+     * @param RoleInterface $role
      *
      * @return bool
      */
@@ -127,7 +127,7 @@ class User extends \Model_Auth_User implements UserInterface
     }
 
     /**
-     * @param \BetaKiller\Model\RoleInterface|string $role
+     * @param \BetaKiller\Model\RoleInterface $role
      *
      * @return \BetaKiller\Model\UserInterface
      */
@@ -369,10 +369,10 @@ class User extends \Model_Auth_User implements UserInterface
     }
 
     /**
-     * @return RoleInterface[]|\Traversable
+     * @return RoleInterface[]
      * @throws \Kohana_Exception
      */
-    public function getAccessControlRoles()
+    public function getAccessControlRoles(): array
     {
         return $this->getRolesRelation()->get_all();
     }

@@ -26,11 +26,11 @@ class WebHookService extends \ORM
      */
     public function getCodename(): string
     {
-        return $this->codename;
+        return $this->get('codename');
     }
 
     public function getLabel(): string
     {
-        return $this->label;
+        return $this->get('label');
     }
 }

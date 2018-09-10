@@ -1,21 +1,34 @@
 <?php
 namespace BetaKiller\IFace\Admin\Content;
 
-use BetaKiller\Helper\ContentHelper;
+use BetaKiller\Helper\IFaceHelper;
+use BetaKiller\Repository\ContentPostRepository;
 
 class PostIndex extends AbstractAdminBase
 {
     /**
-     * @var ContentHelper
-     * @Inject
+     * @var \BetaKiller\Repository\ContentPostRepository
      */
-    private $contentHelper;
+    private $postRepo;
 
     /**
-     * @Inject
      * @var \BetaKiller\Helper\IFaceHelper
      */
     private $ifaceHelper;
+
+    /**
+     * PostIndex constructor.
+     *
+     * @param \BetaKiller\Repository\ContentPostRepository $postRepo
+     * @param \BetaKiller\Helper\IFaceHelper               $ifaceHelper
+     */
+    public function __construct(
+        ContentPostRepository $postRepo,
+        IFaceHelper $ifaceHelper
+    ) {
+        $this->postRepo    = $postRepo;
+        $this->ifaceHelper = $ifaceHelper;
+    }
 
     /**
      * Returns data for View
@@ -25,10 +38,8 @@ class PostIndex extends AbstractAdminBase
      */
     public function getData(): array
     {
-        $postRepo = $this->contentHelper->getPostRepository();
-
         // TODO deal with pages
-        $articles = $postRepo->getAllArticles();
+        $articles = $this->postRepo->getAllArticles();
 
         $data = [];
 

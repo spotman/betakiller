@@ -11,12 +11,12 @@ class UpdateApiMethod extends AbstractEntityUpdateApiApiMethod
      * Override this method
      *
      * @param \BetaKiller\Model\ContentComment $model
-     * @param                       $data
+     * @param                                  $data
      *
-     * @throws \Spotman\Api\ApiMethodException
      * @return \BetaKiller\Model\AbstractEntityInterface|null
+     * @throws \Kohana_Exception
      */
-    protected function update($model, $data)
+    protected function update($model, $data): \BetaKiller\Model\AbstractEntityInterface
     {
         if (isset($data->author_name)) {
             $model->setGuestAuthorName($this->sanitizeString($data->author_name));

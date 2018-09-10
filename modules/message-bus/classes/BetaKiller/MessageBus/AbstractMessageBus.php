@@ -101,20 +101,18 @@ abstract class AbstractMessageBus implements AbstractMessageBusInterface
     }
 
     /**
-     * @param $handler
+     * @param string $handlerName
      *
      * @return mixed
      * @throws \BetaKiller\MessageBus\MessageBusException
      */
-    protected function reviewHandler($handler)
+    protected function reviewHandler(string $handlerName)
     {
         // Convert class name to instance
-        if (\is_string($handler)) {
-            try {
-                $handler = $this->container->get($handler);
-            } catch (ContainerExceptionInterface $e) {
-                throw MessageBusException::wrap($e);
-            }
+        try {
+            $handler = $this->container->get($handlerName);
+        } catch (ContainerExceptionInterface $e) {
+            throw MessageBusException::wrap($e);
         }
 
         $handlerInterface = $this->getHandlerInterface();

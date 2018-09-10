@@ -5,7 +5,7 @@ interface ConfigProviderInterface
 {
     /**
      * @param array $group
-     * @return \BetaKiller\Config\ConfigGroupInterface|array|string|null
+     * @return array|string|int|bool|null
      */
     public function load(array $group);
 }

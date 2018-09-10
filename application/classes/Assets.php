@@ -1,7 +1,6 @@
 <?php
 
 use BetaKiller\Assets\AssetsException;
-use BetaKiller\Config\ConfigGroupInterface;
 use BetaKiller\Config\ConfigProviderInterface;
 
 /**
@@ -20,7 +19,7 @@ class Assets
     protected $css;
 
     /**
-     * @var ConfigGroupInterface
+     * @var array
      */
     protected $config;
 
@@ -82,14 +81,14 @@ class Assets
     protected function config(): array
     {
         if (!$this->config) {
-            $this->config = $this->configProvider->load(['assets']);
+            $this->config = (array)$this->configProvider->load(['assets']);
 
             if (!$this->config) {
                 throw new AssetsException('Missing assets config');
             }
         }
 
-        return $this->config->as_array();
+        return $this->config;
     }
 
     /**

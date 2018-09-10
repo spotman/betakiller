@@ -68,9 +68,9 @@ abstract class AbstractConfigBasedDispatchableRepository extends AbstractPredefi
     }
 
     /**
-     * @return \Traversable|ConfigBasedDispatchableEntityInterface[]|mixed[]
+     * @return ConfigBasedDispatchableEntityInterface[]|mixed[]
      */
-    public function getAll()
+    public function getAll(): array
     {
         return $this->items;
     }
@@ -111,7 +111,7 @@ abstract class AbstractConfigBasedDispatchableRepository extends AbstractPredefi
      *
      * @param \BetaKiller\Url\Container\UrlContainerInterface $params
      *
-     * @return ConfigBasedDispatchableEntityInterface|null
+     * @return ConfigBasedDispatchableEntityInterface
      * @throws \BetaKiller\Repository\RepositoryException
      */
     public function findItemByUrlKeyValue(string $value, UrlContainerInterface $params): UrlParameterInterface
@@ -128,7 +128,7 @@ abstract class AbstractConfigBasedDispatchableRepository extends AbstractPredefi
     /**
      * Returns list of available items (model records) by url key property
      *
-     * @param \BetaKiller\Url\Container\UrlContainerInterface|null $parameters
+     * @param \BetaKiller\Url\Container\UrlContainerInterface $parameters
      *
      * @return ConfigBasedDispatchableEntityInterface[]
      */
@@ -183,7 +183,7 @@ abstract class AbstractConfigBasedDispatchableRepository extends AbstractPredefi
      * @param string     $codename
      * @param array|null $properties
      *
-     * @return ConfigBasedDispatchableEntityInterface|mixed
+     * @return ConfigBasedDispatchableEntityInterface
      */
     abstract protected function createItemFromCodename(
         string $codename,

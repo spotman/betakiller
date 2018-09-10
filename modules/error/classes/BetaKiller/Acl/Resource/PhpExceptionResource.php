@@ -59,10 +59,6 @@ class PhpExceptionResource extends AbstractEntityRelatedAclResource
                 RoleInterface::DEVELOPER_ROLE_NAME,
             ],
 
-            self::PERMISSION_DELETE => [
-                RoleInterface::DEVELOPER_ROLE_NAME,
-            ],
-
             self::PERMISSION_TEST => [
                 RoleInterface::DEVELOPER_ROLE_NAME,
             ],

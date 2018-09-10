@@ -1,13 +1,15 @@
 <?php
-namespace BetaKiller\Model;
+declare(strict_types=1);
 
+namespace BetaKiller\Model;
 
 class GuestUser extends User
 {
     /**
-     * @return RoleInterface[]|\Traversable
+     * @return RoleInterface[]
+     * @throws \Kohana_Exception
      */
-    public function getAccessControlRoles()
+    public function getAccessControlRoles(): array
     {
         return [
             new Role(['name' => RoleInterface::GUEST_ROLE_NAME]),

@@ -81,11 +81,9 @@ abstract class AbstractOrmBasedMultipleParentsTreeModel extends \ORM implements 
     /**
      * @param array|null $parentIDs
      *
-     * @return $this
-     * @throws \HTTP_Exception_501
      * @throws \Kohana_Exception
      */
-    protected function filterParentIDs($parentIDs = null)
+    protected function filterParentIDs(array $parentIDs = null)
     {
         $parentsTableNameAlias = $this->table_name().'_parents';
 
@@ -94,36 +92,30 @@ abstract class AbstractOrmBasedMultipleParentsTreeModel extends \ORM implements 
         $parentIdCol = $parentsTableNameAlias.'.'.$this->getParentIdColumnName();
 
         if ($parentIDs) {
-            $this->where($parentIdCol, 'IN', (array)$parentIDs);
+            $this->where($parentIdCol, 'IN', $parentIDs);
         } else {
             $this->where($parentIdCol, 'IS', null);
         }
-
-        return $this;
     }
 
 
     /**
      * @param MultipleParentsTreeModelInterface $parent
      *
-     * @return $this
+     * @return void
      */
-    public function addParent(MultipleParentsTreeModelInterface $parent)
+    public function addParent(MultipleParentsTreeModelInterface $parent): void
     {
         $this->add('parents', $parent);
-
-        return $this;
     }
 
     /**
      * @param MultipleParentsTreeModelInterface $parent
      *
-     * @return $this
+     * @return void
      */
-    public function removeParent(MultipleParentsTreeModelInterface $parent)
+    public function removeParent(MultipleParentsTreeModelInterface $parent): void
     {
         $this->remove('parents', $parent);
-
-        return $this;
     }
 }

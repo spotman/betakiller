@@ -17,9 +17,9 @@ interface RepositoryInterface
     public function findById(string $id);
 
     /**
-     * @return \BetaKiller\Model\AbstractEntityInterface[]|\Traversable
+     * @return \BetaKiller\Model\AbstractEntityInterface[]
      */
-    public function getAll();
+    public function getAll(): array;
 
     /**
      * Creates empty entity

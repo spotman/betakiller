@@ -20,10 +20,10 @@ abstract class AbstractConfig
     abstract protected function getConfigRootGroup(): string;
 
     /**
-     * @param string|array $path
-     * @param null         $default
+     * @param array      $path
+     * @param mixed|null $default
      *
-     * @return array|\BetaKiller\Config\ConfigGroupInterface|null|string
+     * @return array|string|bool|null
      */
     protected function get(array $path, $default = null)
     {

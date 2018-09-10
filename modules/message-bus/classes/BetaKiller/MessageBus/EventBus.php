@@ -60,10 +60,10 @@ class EventBus extends AbstractMessageBus implements EventBusInterface
     }
 
     /**
-     * @param $message
-     * @param $handler
+     * @param \BetaKiller\MessageBus\EventMessageInterface $message
+     * @param \BetaKiller\MessageBus\EventHandlerInterface $handler
      */
-    private function process($message, $handler): void
+    private function process(EventMessageInterface $message, EventHandlerInterface $handler): void
     {
         // Wrap every message bus processing with try-catch block and log exceptions
         try {

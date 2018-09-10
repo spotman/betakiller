@@ -19,6 +19,6 @@ class UrlElementZone extends \ORM implements ZoneInterface
      */
     public function getName(): string
     {
-        return (string)$this->name;
+        return (string)$this->get('name');
     }
 }

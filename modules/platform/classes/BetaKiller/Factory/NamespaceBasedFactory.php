@@ -324,7 +324,7 @@ final class NamespaceBasedFactory
 
     /**
      * @param string $codename
-     * @param        $instance
+     * @param mixed $instance
      *
      * @throws \BetaKiller\Factory\FactoryException
      */

@@ -51,7 +51,7 @@ class IFace extends AbstractOrmModelContainsUrlElement implements IFaceModelInte
      */
     public function getTitle(): string
     {
-        return $this->title;
+        return $this->get('title');
     }
 
     /**
@@ -59,7 +59,7 @@ class IFace extends AbstractOrmModelContainsUrlElement implements IFaceModelInte
      */
     public function getLabel(): string
     {
-        return $this->label;
+        return $this->get('label');
     }
 
     /**
@@ -69,7 +69,7 @@ class IFace extends AbstractOrmModelContainsUrlElement implements IFaceModelInte
      */
     public function getDescription(): string
     {
-        return $this->description;
+        return $this->get('description');
     }
 
     /**
@@ -79,7 +79,7 @@ class IFace extends AbstractOrmModelContainsUrlElement implements IFaceModelInte
      */
     private function getLayoutRelation(): IFaceLayout
     {
-        return $this->layout;
+        return $this->get('layout');
     }
 
     /**
@@ -100,7 +100,7 @@ class IFace extends AbstractOrmModelContainsUrlElement implements IFaceModelInte
      */
     public function isHiddenInSiteMap(): bool
     {
-        return (bool)$this->hide_in_site_map;
+        return (bool)$this->get('hide_in_site_map');
     }
 
     /**
@@ -110,7 +110,7 @@ class IFace extends AbstractOrmModelContainsUrlElement implements IFaceModelInte
      */
     public function isDefault(): bool
     {
-        return (bool)$this->is_default;
+        return (bool)$this->get('is_default');
     }
 
     /**
@@ -120,7 +120,7 @@ class IFace extends AbstractOrmModelContainsUrlElement implements IFaceModelInte
      */
     public function hasDynamicUrl(): bool
     {
-        return (bool)$this->is_dynamic;
+        return (bool)$this->get('is_dynamic');
     }
 
     /**
@@ -130,7 +130,7 @@ class IFace extends AbstractOrmModelContainsUrlElement implements IFaceModelInte
      */
     public function hasTreeBehaviour(): bool
     {
-        return (bool)$this->is_tree;
+        return (bool)$this->get('is_tree');
     }
 
     /**
@@ -162,7 +162,7 @@ class IFace extends AbstractOrmModelContainsUrlElement implements IFaceModelInte
      */
     public function setLabel(string $value): void
     {
-        $this->label = $value;
+        $this->set('label', $value);
     }
 
     /**
@@ -174,7 +174,7 @@ class IFace extends AbstractOrmModelContainsUrlElement implements IFaceModelInte
      */
     public function setTitle(string $value): SeoMetaInterface
     {
-        $this->title = $value;
+        $this->set('title', $value);
 
         return $this;
     }
@@ -188,7 +188,7 @@ class IFace extends AbstractOrmModelContainsUrlElement implements IFaceModelInte
      */
     public function setDescription(string $value): SeoMetaInterface
     {
-        $this->description = $value;
+        $this->set('description', $value);
 
         return $this;
     }
@@ -209,7 +209,7 @@ class IFace extends AbstractOrmModelContainsUrlElement implements IFaceModelInte
      */
     private function getEntityRelation(): Entity
     {
-        return $this->entity;
+        return $this->get('entity');
     }
 
     /**
@@ -217,7 +217,7 @@ class IFace extends AbstractOrmModelContainsUrlElement implements IFaceModelInte
      */
     private function getEntityActionRelation(): EntityAction
     {
-        return $this->action;
+        return $this->get('action');
     }
 
     /**
@@ -225,7 +225,7 @@ class IFace extends AbstractOrmModelContainsUrlElement implements IFaceModelInte
      */
     private function getZoneRelation(): UrlElementZone
     {
-        return $this->zone;
+        return $this->get('zone');
     }
 
     /**

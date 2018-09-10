@@ -1,6 +1,7 @@
 <?php
 namespace BetaKiller\Api\Method;
 
+use BetaKiller\Model\AbstractEntityInterface;
 use Spotman\Api\ApiMethodException;
 use Spotman\Api\ApiMethodResponse;
 
@@ -15,7 +16,7 @@ abstract class AbstractEntityUpdateApiApiMethod extends AbstractEntityBasedApiMe
     {
         $this->data = $data;
 
-        if (!isset($this->data->id) || !$this->data->id) {
+        if (empty($this->data->id)) {
             throw new ApiMethodException('Can not update entity with empty id');
         }
 
@@ -28,9 +29,9 @@ abstract class AbstractEntityUpdateApiApiMethod extends AbstractEntityBasedApiMe
     public function execute(): ?ApiMethodResponse
     {
         $model = $this->getEntity();
-        $response_data = $this->update($model, $this->data);
+        $response = $this->update($model, $this->data);
 
-        return $this->response($response_data);
+        return $this->response($response);
     }
 
     /**
@@ -39,8 +40,7 @@ abstract class AbstractEntityUpdateApiApiMethod extends AbstractEntityBasedApiMe
      * @param $model
      * @param $data
      *
-     * @throws \Spotman\Api\ApiMethodException
      * @return \BetaKiller\Model\AbstractEntityInterface|null
      */
-    abstract protected function update($model, $data);
+    abstract protected function update($model, $data): AbstractEntityInterface;
 }

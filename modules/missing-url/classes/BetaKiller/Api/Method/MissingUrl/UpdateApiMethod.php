@@ -24,12 +24,12 @@ class UpdateApiMethod extends AbstractEntityUpdateApiApiMethod
      * @param \BetaKiller\Model\MissingUrlModelInterface $model
      * @param                                            $data
      *
-     * @throws \Spotman\Api\ApiMethodException
-     * @throws \BetaKiller\Repository\RepositoryException
-     * @throws \BetaKiller\Factory\FactoryException
      * @return \BetaKiller\Model\AbstractEntityInterface|mixed|null
+     * @throws \BetaKiller\Factory\FactoryException
+     * @throws \BetaKiller\Repository\RepositoryException
+     * @throws \Spotman\Api\ApiMethodException
      */
-    protected function update($model, $data)
+    protected function update($model, $data): \BetaKiller\Model\AbstractEntityInterface
     {
         $url = $data->targetUrl ?? null;
 

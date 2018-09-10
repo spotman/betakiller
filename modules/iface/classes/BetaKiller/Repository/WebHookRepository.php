@@ -40,8 +40,9 @@ class WebHookRepository extends AbstractPredefinedRepository implements Dispatch
 
     /**
      * @return WebHookModelInterface[]|\Traversable
+     * @throws \BetaKiller\IFace\Exception\IFaceException
      */
-    public function getAll()
+    public function getAll(): array
     {
         return $this->getRecursiveIterator();
     }

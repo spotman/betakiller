@@ -67,7 +67,7 @@ class CommandBus extends AbstractMessageBus implements CommandBusInterface
             /** @var \BetaKiller\MessageBus\CommandHandlerInterface $handler */
             $handler = $this->reviewHandler($handler);
 
-            $result = $handler->handleCommand($command, $this);
+            $result = $handler->handleCommand($command);
 
             if ($result && $command->isAsync()) {
                 throw new MessageBusException('Async command :name must not return result', [
