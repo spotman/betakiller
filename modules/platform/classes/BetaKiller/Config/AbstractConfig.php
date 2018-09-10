@@ -23,7 +23,7 @@ abstract class AbstractConfig
      * @param array      $path
      * @param mixed|null $default
      *
-     * @return array|string|bool|null
+     * @return mixed|null
      */
     protected function get(array $path, $default = null)
     {
