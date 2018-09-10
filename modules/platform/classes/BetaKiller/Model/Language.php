@@ -20,24 +20,24 @@ class Language extends \ORM implements LanguageInterface
 
     public function rules(): array
     {
-        return parent::rules() + [
-                self::TABLE_FIELD_NAME      => [
-                    ['not_empty'],
-                    ['max_length', [':value', 8]],
-                ],
-                self::TABLE_FIELD_LOCALE    => [
-                    ['not_empty'],
-                    ['max_length', [':value', 8]],
-                ],
-                self::TABLE_FIELD_LABEL     => [
-                    ['not_empty'],
-                    ['max_length', [':value', 16]],
-                ],
-                self::TABLE_FIELD_IS_SYSTEM => [
-                    ['not_empty'],
-                    ['max_length', [':value', 1]],
-                ],
-            ];
+        return [
+            self::TABLE_FIELD_NAME      => [
+                ['not_empty'],
+                ['max_length', [':value', 8]],
+            ],
+            self::TABLE_FIELD_LOCALE    => [
+                ['not_empty'],
+                ['max_length', [':value', 8]],
+            ],
+            self::TABLE_FIELD_LABEL     => [
+                ['not_empty'],
+                ['max_length', [':value', 16]],
+            ],
+            self::TABLE_FIELD_IS_SYSTEM => [
+                ['not_empty'],
+                ['max_length', [':value', 1]],
+            ],
+        ];
     }
 
     /**
