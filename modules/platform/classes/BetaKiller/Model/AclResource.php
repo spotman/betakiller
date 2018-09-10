@@ -25,6 +25,7 @@ class AclResource extends AbstractOrmBasedSingleParentTreeModel
      */
     public function getParentResourceCodename(): ?string
     {
+        /** @var \BetaKiller\Model\AclResource|null $parent */
         $parent = $this->getParent();
 
         return $parent ? $parent->getCodename() : null;

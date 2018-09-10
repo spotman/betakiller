@@ -19,11 +19,11 @@ class UpdateApiMethod extends AbstractEntityUpdateApiApiMethod
      * @param \BetaKiller\Model\ContentPostInterface $model
      * @param                                        $data
      *
-     * @throws \BetaKiller\Repository\RepositoryException
-     * @throws \BetaKiller\Factory\FactoryException
      * @return \BetaKiller\Model\AbstractEntityInterface|mixed|null
+     * @throws \BetaKiller\Factory\FactoryException
+     * @throws \BetaKiller\Repository\RepositoryException
      */
-    protected function update($model, $data)
+    protected function update($model, $data): \BetaKiller\Model\AbstractEntityInterface
     {
         if (isset($data->label)) {
             $model->setLabel($this->sanitizeString($data->label));

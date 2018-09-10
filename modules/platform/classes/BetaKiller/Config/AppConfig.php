@@ -20,7 +20,7 @@ class AppConfig extends AbstractConfig implements AppConfigInterface
      */
     public function getNamespace(): string
     {
-        return $this->get(['namespace']);
+        return (string)$this->get(['namespace']);
     }
 
     /**

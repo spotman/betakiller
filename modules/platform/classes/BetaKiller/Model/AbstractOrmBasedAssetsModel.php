@@ -38,7 +38,7 @@ abstract class AbstractOrmBasedAssetsModel extends ORM implements AssetsModelInt
     /**
      * Stores original file name (user-defined filename of uploaded file)
      *
-     * @param $name
+     * @param string $name
      *
      * @return \BetaKiller\Assets\Model\AssetsModelInterface
      */

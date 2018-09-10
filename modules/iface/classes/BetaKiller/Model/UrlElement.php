@@ -61,7 +61,7 @@ class UrlElement extends AbstractOrmBasedSingleParentTreeModel implements UrlEle
      */
     public function getCodename(): string
     {
-        return $this->codename;
+        return $this->get('codename');
     }
 
     /**
@@ -71,7 +71,7 @@ class UrlElement extends AbstractOrmBasedSingleParentTreeModel implements UrlEle
      */
     public function getUri(): string
     {
-        return $this->uri;
+        return $this->get('uri');
     }
 
     /**
@@ -79,7 +79,7 @@ class UrlElement extends AbstractOrmBasedSingleParentTreeModel implements UrlEle
      */
     public function setUri(string $value): void
     {
-        $this->uri = $value;
+        $this->set('uri', $value);
     }
 
     /**
@@ -89,7 +89,7 @@ class UrlElement extends AbstractOrmBasedSingleParentTreeModel implements UrlEle
      */
     public function getLabel(): string
     {
-        return $this->label;
+        return $this->get('label');
     }
 
     /**
@@ -97,7 +97,7 @@ class UrlElement extends AbstractOrmBasedSingleParentTreeModel implements UrlEle
      */
     public function setLabel(string $value): void
     {
-        $this->label = $value;
+        $this->set('label', $value);
     }
 
     /**
@@ -150,7 +150,7 @@ class UrlElement extends AbstractOrmBasedSingleParentTreeModel implements UrlEle
             ]);
         }
 
-        return $this->iface;
+        return $this->get('iface');
     }
 
     /**
@@ -166,7 +166,7 @@ class UrlElement extends AbstractOrmBasedSingleParentTreeModel implements UrlEle
             ]);
         }
 
-        return $this->webhook;
+        return $this->get('webhook');
     }
 
     /**
@@ -186,7 +186,7 @@ class UrlElement extends AbstractOrmBasedSingleParentTreeModel implements UrlEle
      */
     private function getAclRulesRelation(): UrlElementAclRule
     {
-        return $this->acl_rules;
+        return $this->get('acl_rules');
     }
 
     /**
@@ -194,6 +194,6 @@ class UrlElement extends AbstractOrmBasedSingleParentTreeModel implements UrlEle
      */
     private function getTypeRelation(): UrlElementType
     {
-        return $this->type;
+        return $this->get('type');
     }
 }

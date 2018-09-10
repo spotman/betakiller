@@ -30,14 +30,12 @@ class AclRolesCollector implements AclRolesCollectorInterface
      */
     public function collectRoles(AclInterface $acl): void
     {
-        $roles = $this->roleRepo->getAll();
-
-        foreach ($roles as $role) {
+        foreach ($this->roleRepo->getAll() as $role) {
             $this->addRoleWithParents($acl, $role);
         }
     }
 
-    protected function addRoleWithParents(AclInterface $acl, RoleInterface $role)
+    protected function addRoleWithParents(AclInterface $acl, RoleInterface $role): void
     {
         /** @var RoleInterface[] $parentRoles */
         $parentRoles           = $role->getParents();

@@ -34,7 +34,7 @@ class RepositoryFactory
     /**
      * @param string $codename
      *
-     * @return \BetaKiller\Repository\RepositoryInterface|mixed
+     * @return \BetaKiller\Repository\RepositoryInterface
      * @throws \BetaKiller\Factory\FactoryException
      */
     public function create(string $codename): RepositoryInterface

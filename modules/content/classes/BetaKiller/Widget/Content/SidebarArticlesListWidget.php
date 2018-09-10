@@ -1,29 +1,46 @@
 <?php
 namespace BetaKiller\Widget\Content;
 
+use BetaKiller\Helper\AssetsHelper;
+use BetaKiller\Helper\IFaceHelper;
 use BetaKiller\Model\ContentPostInterface;
+use BetaKiller\Url\Container\UrlContainerInterface;
 use BetaKiller\Url\ZoneInterface;
 use BetaKiller\Widget\AbstractPublicWidget;
 
 abstract class SidebarArticlesListWidget extends AbstractPublicWidget
 {
     /**
-     * @Inject
-     * @var \BetaKiller\Helper\ContentUrlContainerHelper
+     * @var \BetaKiller\Url\Container\UrlContainerInterface
      */
-    private $urlParametersHelper;
+    private $urlContainer;
 
     /**
      * @var \BetaKiller\Helper\AssetsHelper
-     * @Inject
      */
     private $assetsHelper;
 
     /**
-     * @Inject
      * @var \BetaKiller\Helper\IFaceHelper
      */
     private $ifaceHelper;
+
+    /**
+     * SidebarArticlesListWidget constructor.
+     *
+     * @param \BetaKiller\Url\Container\UrlContainerInterface $urlContainer
+     * @param \BetaKiller\Helper\AssetsHelper                 $assetsHelper
+     * @param \BetaKiller\Helper\IFaceHelper                  $ifaceHelper
+     */
+    public function __construct(
+        UrlContainerInterface $urlContainer,
+        AssetsHelper $assetsHelper,
+        IFaceHelper $ifaceHelper
+    ) {
+        $this->urlContainer = $urlContainer;
+        $this->assetsHelper = $assetsHelper;
+        $this->ifaceHelper  = $ifaceHelper;
+    }
 
     /**
      * Returns data for View rendering
@@ -32,10 +49,10 @@ abstract class SidebarArticlesListWidget extends AbstractPublicWidget
      */
     public function getData(): array
     {
-        $limit      = (int)$this->getContextParam('limit', 5);
-        $exclude_id = $this->getCurrentArticleID();
+        $limit     = (int)$this->getContextParam('limit', 5);
+        $excludeID = $this->getCurrentArticleID();
 
-        $articles = $this->getArticlesList($exclude_id, $limit);
+        $articles = $this->getArticlesList($excludeID, $limit);
 
         $data = [];
 
@@ -58,16 +75,15 @@ abstract class SidebarArticlesListWidget extends AbstractPublicWidget
 
     protected function getCurrentArticleID()
     {
-        $current_article = $this->urlParametersHelper->getContentPost();
+        /** @var ContentPostInterface|null $currentArticle */
+        $currentArticle = $this->urlContainer->getEntityByClassName(ContentPostInterface::class);
 
-        return $current_article ? $current_article->getID() : null;
+        return $currentArticle ? $currentArticle->getID() : null;
     }
 
     protected function getArticleData(ContentPostInterface $article): array
     {
-        /** @var \BetaKiller\Model\ContentImage $thumbnail */
         $thumbnail = $article->getFirstThumbnail();
-
         $createdAt = $article->getCreatedAt();
 
         return [

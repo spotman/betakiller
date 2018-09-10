@@ -6,12 +6,12 @@ class KohanaConfigProvider implements ConfigProviderInterface
     public const KEY_SEPARATOR = '.';
 
     /**
-     * @param array $group
+     * @param string[] $path
      *
-     * @return \BetaKiller\Config\ConfigGroupInterface|array|string|null
+     * @return array|string|int|bool|null
      */
-    public function load(array $group)
+    public function load(array $path)
     {
-        return \Kohana::$config->load(implode(self::KEY_SEPARATOR, $group));
+        return \Kohana::$config->load(implode(self::KEY_SEPARATOR, $path));
     }
 }

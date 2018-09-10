@@ -34,6 +34,18 @@ class ArticlesListWidget extends AbstractPublicWidget
     private $contentHelper;
 
     /**
+     * @var \BetaKiller\Repository\ContentPostRepository
+     * @Inject
+     */
+    private $postRepo;
+
+    /**
+     * @var \BetaKiller\Repository\ContentCategoryRepository
+     * @Inject
+     */
+    private $categoryRepo;
+
+    /**
      * @var \BetaKiller\Helper\AssetsHelper
      * @Inject
      */
@@ -74,8 +86,7 @@ class ArticlesListWidget extends AbstractPublicWidget
         $page       = (int)$this->query(self::PAGE_QUERY_KEY);
         $categoryID = (int)$this->query(self::CATEGORY_ID_QUERY_KEY);
 
-        $categoryRepo = $this->contentHelper->getCategoryRepository();
-        $category     = $categoryRepo->findById($categoryID);
+        $category = $this->categoryRepo->findById($categoryID);
 
         $data = $this->getArticlesData($category, $page, $term);
 
@@ -121,13 +132,13 @@ class ArticlesListWidget extends AbstractPublicWidget
         }
 
         if ($results->hasNextPage()) {
-            $url_params = [
+            $urlParams = [
                 self::SEARCH_TERM_QUERY_KEY => $term,
                 self::PAGE_QUERY_KEY        => $page + 1,
                 self::CATEGORY_ID_QUERY_KEY => $category ? $category->getID() : null,
             ];
 
-            $moreURL = $this->url('more').'?'.http_build_query(array_filter($url_params));
+            $moreURL = $this->url('more').'?'.http_build_query(array_filter($urlParams));
         } else {
             $moreURL = null;
         }
@@ -152,8 +163,6 @@ class ArticlesListWidget extends AbstractPublicWidget
      */
     protected function getArticles($page, ContentCategory $category = null, $term = null): SearchResultsInterface
     {
-        $postRepo = $this->contentHelper->getPostRepository();
-
-        return $postRepo->searchArticles($page, $this->itemsPerPage, $category, $term);
+        return $this->postRepo->searchArticles($page, $this->itemsPerPage, $category, $term);
     }
 }

@@ -175,7 +175,7 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
      * @param array       $path
      * @param string|null $codename
      *
-     * @return array|\BetaKiller\Config\ConfigGroupInterface|null|string
+     * @return array|string|int|null
      */
     protected function getAssetsProviderConfigValue(array $path, $codename = null)
     {

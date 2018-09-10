@@ -7,10 +7,22 @@ use BetaKiller\Exception\NotFoundHttpException;
 class Controller_Content extends Controller
 {
     /**
-     * @var \BetaKiller\Helper\ContentHelper
      * @Inject
+     * @var \BetaKiller\Repository\ContentImageRepository
      */
-    private $contentHelper;
+    private $imageRepo;
+
+    /**
+     * @Inject
+     * @var \BetaKiller\Repository\ContentPostThumbnailRepository
+     */
+    private $thumbRepo;
+
+    /**
+     * @Inject
+     * @var \BetaKiller\Repository\ContentAttachmentRepository
+     */
+    private $attachmentRepo;
 
     /**
      * @var \BetaKiller\Helper\AssetsHelper
@@ -51,11 +63,10 @@ class Controller_Content extends Controller
     protected function findContentModelByWpPath($path): ?AssetsModelInterface
     {
         /** @var \BetaKiller\Repository\RepositoryHasWordpressPathInterface[] $repositories */
-
         $repositories = [
-            $this->contentHelper->getImageRepository(),
-            $this->contentHelper->getPostThumbnailRepository(),
-            $this->contentHelper->getAttachmentRepository(),
+            $this->imageRepo,
+            $this->thumbRepo,
+            $this->attachmentRepo,
         ];
 
         foreach ($repositories as $repo) {

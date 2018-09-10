@@ -52,6 +52,7 @@ abstract class AbstractOrmBasedRepository extends AbstractRepository
     /**
      * @return \BetaKiller\Model\AbstractEntityInterface[]
      *
+     * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\Repository\RepositoryException
      */
     public function getAll(): array

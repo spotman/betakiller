@@ -1,15 +1,9 @@
 <?php
 namespace BetaKiller\Model;
 
-use Exception;
-
 class AclRule extends \ORM
 {
     /**
-     * Prepares the model database connection, determines the table name,
-     * and loads column information.
-     *
-     * @throws Exception
      * @return void
      */
     protected function configure(): void
@@ -41,7 +35,7 @@ class AclRule extends \ORM
     /**
      * @return string
      */
-    public function getAclActionIdentity()
+    public function getAclActionIdentity(): string
     {
         return $this->getPermissionRelation()->getName();
     }
@@ -49,7 +43,7 @@ class AclRule extends \ORM
     /**
      * @return AclResourcePermission
      */
-    private function getPermissionRelation()
+    private function getPermissionRelation(): AclResourcePermission
     {
         return $this->get('permission');
     }
@@ -59,7 +53,7 @@ class AclRule extends \ORM
      *
      * @return bool|null
      */
-    public function isAllowed()
+    public function isAllowed(): ?bool
     {
         $value = $this->get('is_allowed');
 
@@ -69,7 +63,7 @@ class AclRule extends \ORM
     /**
      * @return string
      */
-    public function getAclRoleIdentity()
+    public function getAclRoleIdentity(): string
     {
         return $this->getRoleRelation()->getName();
     }
@@ -77,15 +71,15 @@ class AclRule extends \ORM
     /**
      * @return string
      */
-    public function getAclResourceIdentity()
+    public function getAclResourceIdentity(): string
     {
         return $this->getResourceRelation()->getCodename();
     }
 
     /**
-     * @return $this[]
+     * @return AclRule[]
      */
-    public function getAllPermissions()
+    public function getAllPermissions(): array
     {
         return $this->get_all();
     }
@@ -93,7 +87,7 @@ class AclRule extends \ORM
     /**
      * @return \BetaKiller\Model\Role
      */
-    private function getRoleRelation()
+    private function getRoleRelation(): Role
     {
         return $this->get('role');
     }
@@ -101,7 +95,7 @@ class AclRule extends \ORM
     /**
      * @return \BetaKiller\Model\AclResource
      */
-    private function getResourceRelation()
+    private function getResourceRelation(): AclResource
     {
         return $this->get('resource');
     }

@@ -25,7 +25,7 @@ abstract class AbstractOrmModelContainsUrlElement extends \ORM implements UrlEle
 
     protected function getUrlElement(): UrlElementInterface
     {
-        return $this->element;
+        return $this->get('element');
     }
 
     /**
