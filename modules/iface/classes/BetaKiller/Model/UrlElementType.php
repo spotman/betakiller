@@ -2,7 +2,7 @@
 namespace BetaKiller\Model;
 
 /**
- * Class IFace
+ * Class UrlElementType
  *
  * @category   Models
  * @author     Spotman
@@ -27,7 +27,7 @@ class UrlElementType extends \ORM
      */
     public function getCodename(): string
     {
-        return $this->codename;
+        return $this->get('codename');
     }
 
     /**
