@@ -47,7 +47,7 @@ class WebHook extends AbstractOrmModelContainsUrlElement implements WebHookModel
      */
     public function getEventName(): string
     {
-        return $this->event;
+        return $this->get('event');
     }
 
     /**
@@ -57,11 +57,11 @@ class WebHook extends AbstractOrmModelContainsUrlElement implements WebHookModel
      */
     public function getEventDescription(): ?string
     {
-        return $this->description;
+        return $this->get('description');
     }
 
     private function getService(): WebHookService
     {
-        return $this->service;
+        return $this->get('service');
     }
 }
