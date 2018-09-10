@@ -60,7 +60,7 @@ class CommandBus extends AbstractMessageBus implements CommandBusInterface
      *
      * @return mixed|null
      */
-    private function process($command, $handler)
+    private function process(CommandMessageInterface $command, CommandHandlerInterface $handler)
     {
         // Wrap every message bus processing with try-catch block and log exceptions
         try {
