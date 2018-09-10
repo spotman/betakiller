@@ -56,7 +56,7 @@
   },
   "scripts": {
     "ci": [
-      "qa",
+      "@qa",
       "@test"
     ],
     "qa": [
