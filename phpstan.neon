@@ -1,0 +1,16 @@
+parameters:
+  bootstrap: modules/unittest/bootstrap.php
+  level: 4
+  paths:
+    - modules/ddd/classes
+    - modules/core/classes
+    - modules/platform/classes
+    - modules/acl/classes
+    - modules/assets/classes
+    - modules/error/classes
+    - modules/iface/classes
+    - modules/log/classes
+    - modules/message-bus/classes
+    - modules/notification/classes
+    - modules/webhooks/classes
+    - modules/widget/classes

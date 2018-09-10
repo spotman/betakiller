@@ -15,7 +15,7 @@ interface SingleParentTreeModelInterface extends AbstractEntityInterface
     /**
      * @param \BetaKiller\Model\SingleParentTreeModelInterface|null $parent
      */
-    public function setParent(SingleParentTreeModelInterface $parent = null);
+    public function setParent(?SingleParentTreeModelInterface $parent);
 
     /**
      * @return SingleParentTreeModelInterface[]

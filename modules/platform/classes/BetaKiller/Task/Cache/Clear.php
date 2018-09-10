@@ -7,8 +7,12 @@ use Psr\SimpleCache\CacheInterface;
 
 class Clear extends \BetaKiller\Task\AbstractTask
 {
+    public function defineOptions(): array
+    {
+        return [];
+    }
+
     /**
-     * @Inject
      * @var \Psr\SimpleCache\CacheInterface
      */
     private $cache;

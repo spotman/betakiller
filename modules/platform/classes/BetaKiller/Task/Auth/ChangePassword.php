@@ -5,6 +5,7 @@ namespace BetaKiller\Task\Auth;
 
 use BetaKiller\Repository\UserRepository;
 use BetaKiller\Task\AbstractTask;
+use Psr\Log\LoggerInterface;
 
 class ChangePassword extends AbstractTask
 {
@@ -14,13 +15,19 @@ class ChangePassword extends AbstractTask
     private $userRepo;
 
     /**
+     * @var \Psr\Log\LoggerInterface
+     */
+    private $logger;
+
+    /**
      * ChangePassword constructor.
      *
      * @param \BetaKiller\Repository\UserRepository $userRepo
      */
-    public function __construct(UserRepository $userRepo)
+    public function __construct(UserRepository $userRepo, LoggerInterface $logger)
     {
         $this->userRepo = $userRepo;
+        $this->logger = $logger;
 
         parent::__construct();
     }
@@ -38,7 +45,7 @@ class ChangePassword extends AbstractTask
         $user = $this->userRepo->searchBy($username);
 
         if (!$user) {
-            $this->write('No such user');
+            $this->logger->warning('No such user');
 
             return;
         }
@@ -47,7 +54,7 @@ class ChangePassword extends AbstractTask
         $confirm  = $this->password('Enter new password again');
 
         if ($password !== $confirm) {
-            $this->write('Passwords are not identical', AbstractTask::COLOR_RED);
+            $this->logger->warning('Passwords are not identical');
 
             return;
         }
@@ -56,6 +63,6 @@ class ChangePassword extends AbstractTask
 
         $this->userRepo->save($user);
 
-        $this->write('Password successfully changed!', AbstractTask::COLOR_GREEN);
+        $this->logger->info('Password successfully changed!');
     }
 }

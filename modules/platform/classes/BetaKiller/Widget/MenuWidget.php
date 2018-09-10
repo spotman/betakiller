@@ -33,7 +33,7 @@ class MenuWidget extends AbstractPublicWidget
     private $aclHelper;
 
     /**
-     * @var \BetaKiller\Url\UrlElementTreeInterface
+     * @var \BetaKiller\Url\Behaviour\UrlBehaviourFactory
      */
     private $behaviourFactory;
 

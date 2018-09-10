@@ -1,6 +1,7 @@
 <?php
-namespace BetaKiller\Config;
+declare(strict_types=1);
 
+namespace BetaKiller\Config;
 
 class AppConfig extends AbstractConfig implements AppConfigInterface
 {
@@ -59,7 +60,7 @@ class AppConfig extends AbstractConfig implements AppConfigInterface
      */
     public function getCircularLinkHref(): string
     {
-        return $this->get(self::PATH_CIRCULAR_LINK_HREF);
+        return (string)$this->get(self::PATH_CIRCULAR_LINK_HREF);
     }
 
     /**
@@ -67,7 +68,7 @@ class AppConfig extends AbstractConfig implements AppConfigInterface
      */
     public function isPageCacheEnabled(): bool
     {
-        return $this->get(self::PATH_PAGE_CACHE_ENABLED, false);
+        return (bool)$this->get(self::PATH_PAGE_CACHE_ENABLED, false);
     }
 
     /**
@@ -83,6 +84,6 @@ class AppConfig extends AbstractConfig implements AppConfigInterface
      */
     public function getAllowedLanguages(): array
     {
-        return $this->get(['languages'], ['en']);
+        return (array)$this->get(['languages'], ['en']);
     }
 }
