@@ -46,6 +46,11 @@ class Warmup extends \BetaKiller\Task\AbstractTask
         parent::__construct();
     }
 
+    public function defineOptions(): array
+    {
+        return [];
+    }
+
     public function run(): void
     {
         $items   = $this->urlCollector->getPublicAvailableUrls();

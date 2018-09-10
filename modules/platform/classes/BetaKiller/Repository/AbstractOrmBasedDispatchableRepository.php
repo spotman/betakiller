@@ -14,7 +14,7 @@ abstract class AbstractOrmBasedDispatchableRepository extends AbstractOrmBasedRe
      * @param string                                          $value
      * @param \BetaKiller\Url\Container\UrlContainerInterface $parameters
      *
-     * @return UrlParameterInterface|null
+     * @return \BetaKiller\Url\Parameter\UrlParameterInterface
      * @throws \BetaKiller\Repository\RepositoryException
      * @throws \Kohana_Exception
      */
@@ -37,7 +37,7 @@ abstract class AbstractOrmBasedDispatchableRepository extends AbstractOrmBasedRe
             ]);
         }
 
-        return $model->loaded() ? $model : null;
+        return $model;
     }
 
     /**

@@ -43,11 +43,12 @@
     "zendframework/zend-permissions-acl": "^2.6"
   },
   "require-dev": {
-    "codedungeon/phpunit-result-printer": "^0.19.14",
+    "codedungeon/phpunit-result-printer": "^0.20",
     "deployer/deployer": "^6",
+    "phpstan/phpstan": "^0.10.3",
     "phpunit/dbunit": "^4.0",
     "phpunit/php-code-coverage": "^6.0",
-    "phpunit/phpunit": "^7.0",
+    "phpunit/phpunit": "^7.3",
     "roave/security-advisories": "dev-master"
   },
   "suggest": {
@@ -57,12 +58,17 @@
     "ci": [
       "@test"
     ],
+    "qa": [
+      "@testEnv",
+      "@phpstan"
+    ],
     "test": [
       "@testEnv",
       "@phpunit"
     ],
     "testEnv": "ln -sf ./../.env.testing ./application/.env",
-    "phpunit": "APP_ENV=testing phpunit --colors=always"
+    "phpunit": "APP_ENV=testing phpunit --colors=always",
+    "phpstan": "APP_ENV=testing phpstan analyze"
   },
   "config": {
     "platform": {
