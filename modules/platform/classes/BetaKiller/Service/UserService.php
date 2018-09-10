@@ -77,11 +77,11 @@ class UserService
     }
 
     /**
-     * @return \BetaKiller\Model\UserInterface|null
+     * @return \BetaKiller\Model\UserInterface
      * @throws \BetaKiller\Repository\RepositoryException
      * @throws \BetaKiller\Exception\ValidationException
      */
-    public function createCliUser(): ?UserInterface
+    public function createCliUser(): UserInterface
     {
         $cliUserName = AbstractTask::CLI_USER_NAME;
 
@@ -110,10 +110,10 @@ class UserService
     }
 
     /**
-     * @return \Database_Result|UserInterface[]
+     * @return UserInterface[]
      * @throws \BetaKiller\Repository\RepositoryException
      */
-    public function getDevelopers()
+    public function getDevelopers(): array
     {
         $role = $this->roleRepository->getDeveloperRole();
 
@@ -121,10 +121,10 @@ class UserService
     }
 
     /**
-     * @return \Database_Result|UserInterface[]
+     * @return UserInterface[]
      * @throws \BetaKiller\Repository\RepositoryException
      */
-    public function getModerators()
+    public function getModerators(): array
     {
         $role = $this->roleRepository->getModeratorRole();
 

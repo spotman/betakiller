@@ -42,14 +42,8 @@ class CreateCliUser extends AbstractTask
     {
         $user = $this->userService->createCliUser();
 
-        if (!$user) {
-            $this->logger->info('User [:name] already exists, exiting', [
-                ':name' => $user->getUsername(),
-            ]);
-        } else {
-            $this->logger->info('User [:name] successfully created', [
-                ':name' => $user->getUsername(),
-            ]);
-        }
+        $this->logger->info('User [:name] successfully created', [
+            ':name' => $user->getUsername(),
+        ]);
     }
 }

@@ -56,48 +56,6 @@ abstract class AbstractTask extends Minion_Task
     }
 
     /**
-     * @param      $text
-     * @param null $color
-     *
-     * @return $this
-     * @deprecated Use logger instead
-     */
-    protected function write($text, $color = null): self
-    {
-        if ($color) {
-            $text = $this->colorize($text, $color);
-        }
-
-        Minion_CLI::write($text);
-
-        return $this;
-    }
-
-    /**
-     * @param        $text
-     * @param bool   $eol
-     * @param string $color
-     *
-     * @return $this
-     * @deprecated Use logger instead
-     */
-    protected function writeReplace($text, ?bool $eol, $color = null): self
-    {
-        if ($color) {
-            $text = $this->colorize($text, $color);
-        }
-
-        Minion_CLI::write_replace($text, $eol ?? false);
-
-        return $this;
-    }
-
-    private function colorize($text, $fore, $back = null): string
-    {
-        return Minion_CLI::color($text, $fore, $back);
-    }
-
-    /**
      * Get user input from CLI
      *
      * @param string $message
@@ -113,11 +71,11 @@ abstract class AbstractTask extends Minion_Task
     /**
      * Get password user input from CLI
      *
-     * @param $message
+     * @param string $message
      *
      * @return string
      */
-    protected function password($message): string
+    protected function password(string $message): string
     {
         return Minion_CLI::password($message);
     }

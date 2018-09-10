@@ -11,7 +11,7 @@ interface SingleParentTreeRepositoryInterface extends RepositoryInterface
     /**
      * Returns list of child models
      *
-     * @param \BetaKiller\Model\SingleParentTreeModelInterface|null $parent
+     * @param \BetaKiller\Model\SingleParentTreeModelInterface $parent
      *
      * @return SingleParentTreeModelInterface[]
      */

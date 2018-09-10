@@ -3,6 +3,7 @@ namespace BetaKiller\Repository;
 
 use BetaKiller\Factory\OrmFactory;
 use BetaKiller\Helper\ExceptionTranslator;
+use BetaKiller\Model\AbstractEntityInterface;
 use BetaKiller\Model\ExtendedOrmInterface;
 use BetaKiller\Utils\Kohana\ORM\OrmInterface;
 
@@ -49,7 +50,7 @@ abstract class AbstractOrmBasedRepository extends AbstractRepository
     }
 
     /**
-     * @return \BetaKiller\Model\AbstractEntityInterface[]|\Traversable
+     * @return \BetaKiller\Model\AbstractEntityInterface[]
      *
      * @throws \BetaKiller\Repository\RepositoryException
      */
@@ -109,11 +110,11 @@ abstract class AbstractOrmBasedRepository extends AbstractRepository
     }
 
     /**
-     * @param $entity
+     * @param \BetaKiller\Model\AbstractEntityInterface $entity
      *
      * @throws \BetaKiller\Repository\RepositoryException
      */
-    private function checkEntityInheritance($entity): void
+    private function checkEntityInheritance(AbstractEntityInterface $entity): void
     {
         if (!($entity instanceof ExtendedOrmInterface)) {
             throw new RepositoryException('Entity :class must be instance of :must', [
@@ -185,13 +186,16 @@ abstract class AbstractOrmBasedRepository extends AbstractRepository
     /**
      * @param \BetaKiller\Utils\Kohana\ORM\OrmInterface $orm
      * @param string                                    $relationName
-     * @param                                           $relatedModel
+     * @param \BetaKiller\Model\AbstractEntityInterface $relatedModel
      *
      * @return \BetaKiller\Repository\AbstractOrmBasedRepository
      * @throws \BetaKiller\Repository\RepositoryException
      */
-    protected function filterRelated(OrmInterface $orm, string $relationName, $relatedModel): self
-    {
+    protected function filterRelated(
+        OrmInterface $orm,
+        string $relationName,
+        AbstractEntityInterface $relatedModel
+    ): self {
         if (!$relatedModel instanceof OrmInterface) {
             throw new RepositoryException('Related model :name must implement :must', [
                 ':name' => \get_class($relatedModel),

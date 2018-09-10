@@ -8,7 +8,6 @@ use BetaKiller\Config\ConfigProviderInterface;
 class AuthWidget extends AbstractPublicWidget
 {
     public const PROVIDER_REGULAR = 'regular';
-    public const PROVIDER_ULOGIN  = 'uLogin';
 
     /**
      * @var ConfigProviderInterface
