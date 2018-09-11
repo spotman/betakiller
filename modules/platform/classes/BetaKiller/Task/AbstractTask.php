@@ -26,18 +26,24 @@ abstract class AbstractTask extends Minion_Task
         ];
     }
 
-    abstract public function run(): void;
-
+    /**
+     * Put cli arguments with their default values here
+     * Format: "optionName" => "defaultValue"
+     *
+     * @return array
+     */
     abstract public function defineOptions(): array;
+
+    abstract public function run(): void;
 
     /**
      * @param string    $key
      * @param bool|null $required
      *
-     * @return null|string
+     * @return null|mixed
      * @throws \BetaKiller\Task\TaskException
      */
-    protected function getOption(string $key, ?bool $required = null): ?string
+    protected function getOption(string $key, ?bool $required = null)
     {
         $required = $required ?? true;
         $value    = $this->_options[$key] ?? null;
