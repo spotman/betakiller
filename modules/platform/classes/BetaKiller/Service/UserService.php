@@ -3,10 +3,12 @@ namespace BetaKiller\Service;
 
 
 use BetaKiller\Config\AppConfigInterface;
+use BetaKiller\Model\GuestUserInterface;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Repository\RoleRepository;
 use BetaKiller\Repository\UserRepository;
 use BetaKiller\Task\AbstractTask;
+use Worknector\Factory\GuestUserFactory;
 
 class UserService
 {
@@ -26,17 +28,24 @@ class UserService
     private $appConfig;
 
     /**
+     * @var \Worknector\Factory\GuestUserFactory
+     */
+    private $guestFactory;
+
+    /**
      * UserService constructor.
      *
      * @param \BetaKiller\Repository\UserRepository $userRepo
      * @param \BetaKiller\Repository\RoleRepository $roleRepo
+     * @param \Worknector\Factory\GuestUserFactory  $guestFactory
      * @param \BetaKiller\Config\AppConfigInterface $appConfig
      */
-    public function __construct(UserRepository $userRepo, RoleRepository $roleRepo, AppConfigInterface $appConfig)
+    public function __construct(UserRepository $userRepo, RoleRepository $roleRepo, GuestUserFactory $guestFactory, AppConfigInterface $appConfig)
     {
         $this->userRepository = $userRepo;
         $this->roleRepository = $roleRepo;
         $this->appConfig      = $appConfig;
+        $this->guestFactory = $guestFactory;
     }
 
     /**
@@ -151,5 +160,14 @@ class UserService
     public function isModerator(UserInterface $user): bool
     {
         return $user->hasRole($this->roleRepository->getModeratorRole());
+    }
+
+    /**
+     * @return \BetaKiller\Model\GuestUserInterface
+     * @throws \BetaKiller\Factory\FactoryException
+     */
+    public function createGuest(): GuestUserInterface
+    {
+        return $this->guestFactory->create();
     }
 }

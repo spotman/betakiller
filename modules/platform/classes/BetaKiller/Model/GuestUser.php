@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\Model;
 
-class GuestUser extends User
+class GuestUser extends User implements GuestUserInterface
 {
     /**
      * @return RoleInterface[]

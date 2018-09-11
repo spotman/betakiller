@@ -83,7 +83,7 @@ class User extends \Model_Auth_User implements UserInterface
      */
     public function isGuest(): bool
     {
-        return ($this instanceof GuestUser);
+        return ($this instanceof GuestUserInterface);
     }
 
     /**
