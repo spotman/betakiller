@@ -22,18 +22,11 @@ clone:
       modules/utils: https://github.com/spotman/kohana-utils.git
 
 pipeline:
-#  code-analysis:
-#    image: aosapps/drone-sonar-plugin
-#    secrets: [sonar_host, sonar_token]
-
   backend:
     image: spotman/betakiller-ci:latest
     environment:
       - DEBIAN_FRONTEND=noninteractive
     commands:
-      #- apt-get update
-      #- apt-get install -y apt-utils apt-transport-https ca-certificates unzip
-      #- apt-get install php-intl php-cli php-sqlite3 php-mysqli php-xml php-mbstring composer -y
       - composer -V
       - composer install --prefer-dist --no-plugins --no-scripts --no-suggest --quiet
       - composer ci
