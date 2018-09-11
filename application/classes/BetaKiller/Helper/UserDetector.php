@@ -3,7 +3,6 @@ namespace BetaKiller\Helper;
 
 use Auth;
 use BetaKiller\Exception;
-use BetaKiller\Model\GuestUser;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Repository\UserRepository;
 use BetaKiller\Service\UserService;
@@ -72,7 +71,7 @@ class UserDetector
 
 
         if (!$user) {
-            $user = new GuestUser();
+            $user = $this->userService->createGuest();
         }
 
         $this->setSystemLanguage($user);

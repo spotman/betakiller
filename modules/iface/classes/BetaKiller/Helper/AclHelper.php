@@ -8,7 +8,6 @@ use BetaKiller\CrudlsActionsInterface;
 use BetaKiller\IFace\Exception\IFaceException;
 use BetaKiller\IFace\IFaceInterface;
 use BetaKiller\Model\DispatchableEntityInterface;
-use BetaKiller\Model\GuestUser;
 use BetaKiller\Model\HasAdminZoneAccessSpecificationInterface;
 use BetaKiller\Model\HasPersonalZoneAccessSpecificationInterface;
 use BetaKiller\Model\HasPreviewZoneAccessSpecificationInterface;
@@ -25,6 +24,7 @@ use Spotman\Acl\AclInterface;
 use Spotman\Acl\AclUserInterface;
 use Spotman\Acl\Exception;
 use Spotman\Acl\Resource\ResolvingResourceInterface;
+use Worknector\Factory\GuestUserFactory;
 
 class AclHelper
 {
@@ -39,6 +39,11 @@ class AclHelper
     private $user;
 
     /**
+     * @var \Worknector\Factory\GuestUserFactory
+     */
+    private $guestFactory;
+
+    /**
      * @var \BetaKiller\Url\Zone\ZoneAccessSpecFactory
      */
     private $specFactory;
@@ -49,12 +54,18 @@ class AclHelper
      * @param \Spotman\Acl\AclInterface                  $acl
      * @param \BetaKiller\Url\Zone\ZoneAccessSpecFactory $specFactory
      * @param \BetaKiller\Model\UserInterface            $user
+     * @param \Worknector\Factory\GuestUserFactory       $guestFactory
      */
-    public function __construct(AclInterface $acl, ZoneAccessSpecFactory $specFactory, UserInterface $user)
-    {
-        $this->acl         = $acl;
-        $this->user        = $user;
-        $this->specFactory = $specFactory;
+    public function __construct(
+        AclInterface $acl,
+        ZoneAccessSpecFactory $specFactory,
+        UserInterface $user,
+        GuestUserFactory $guestFactory
+    ) {
+        $this->acl          = $acl;
+        $this->user         = $user;
+        $this->specFactory  = $specFactory;
+        $this->guestFactory = $guestFactory;
     }
 
     /**
@@ -141,8 +152,9 @@ class AclHelper
 
             // Force guest user in zones without auth (so every public iface must be visible for guest users)
             if (!$zoneSpec->isAuthRequired()) {
+                // TODO Extract this check to console task executed before deployment
                 // Public zones need GuestUser to check access)
-                $user = new GuestUser;
+                $user = $this->guestFactory->create();
             }
 
             // Check zone roles if defined

@@ -78,7 +78,7 @@ final class NamespaceBasedFactory
     }
 
     /**
-     * @param string[] ...$namespaces
+     * @param string ...$namespaces
      *
      * @return $this
      */
