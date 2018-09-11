@@ -5,6 +5,7 @@ namespace BetaKiller\Helper;
 
 use BetaKiller\Acl\Resource\EntityRelatedAclResourceInterface;
 use BetaKiller\CrudlsActionsInterface;
+use BetaKiller\Factory\GuestUserFactory;
 use BetaKiller\IFace\Exception\IFaceException;
 use BetaKiller\IFace\IFaceInterface;
 use BetaKiller\Model\DispatchableEntityInterface;
@@ -24,7 +25,6 @@ use Spotman\Acl\AclInterface;
 use Spotman\Acl\AclUserInterface;
 use Spotman\Acl\Exception;
 use Spotman\Acl\Resource\ResolvingResourceInterface;
-use Worknector\Factory\GuestUserFactory;
 
 class AclHelper
 {
@@ -39,7 +39,7 @@ class AclHelper
     private $user;
 
     /**
-     * @var \Worknector\Factory\GuestUserFactory
+     * @var \BetaKiller\Factory\GuestUserFactory
      */
     private $guestFactory;
 
@@ -54,7 +54,7 @@ class AclHelper
      * @param \Spotman\Acl\AclInterface                  $acl
      * @param \BetaKiller\Url\Zone\ZoneAccessSpecFactory $specFactory
      * @param \BetaKiller\Model\UserInterface            $user
-     * @param \Worknector\Factory\GuestUserFactory       $guestFactory
+     * @param \BetaKiller\Factory\GuestUserFactory       $guestFactory
      */
     public function __construct(
         AclInterface $acl,
