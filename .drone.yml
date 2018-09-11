@@ -27,14 +27,13 @@ pipeline:
 #    secrets: [sonar_host, sonar_token]
 
   backend:
-    image: ubuntu:latest
+    image: spotman/betakiller-ci:latest
     environment:
       - DEBIAN_FRONTEND=noninteractive
     commands:
-      - apt-get update
-      - apt-get install -y apt-utils apt-transport-https ca-certificates unzip
-      - apt-get install php-intl php-cli php-sqlite3 php-mysqli php-xml php-mbstring composer -y
-      #- php -r "readfile('https://getcomposer.org/installer');" > composer-setup.php && php composer-setup.php && php -r "unlink('composer-setup.php');" && mv composer.phar /usr/local/bin/composer
+      #- apt-get update
+      #- apt-get install -y apt-utils apt-transport-https ca-certificates unzip
+      #- apt-get install php-intl php-cli php-sqlite3 php-mysqli php-xml php-mbstring composer -y
       - composer -V
       - composer install --prefer-dist --no-plugins --no-scripts --no-suggest --quiet
       - composer ci
