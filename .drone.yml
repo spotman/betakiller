@@ -24,6 +24,7 @@ clone:
 pipeline:
   backend:
     image: spotman/betakiller-ci:latest
+    pull: true
     environment:
       - DEBIAN_FRONTEND=noninteractive
     commands:
