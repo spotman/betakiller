@@ -26,6 +26,14 @@ interface AppEnvInterface
     public const APP_REVISION = 'APP_REVISION';
 
     /**
+     * @param string    $name
+     * @param bool $required
+     *
+     * @return string
+     */
+    public function getEnvVariable(string $name, bool $required = null): string;
+
+    /**
      * @param bool|null $useStaging
      *
      * @return bool

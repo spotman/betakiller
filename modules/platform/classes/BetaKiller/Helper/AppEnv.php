@@ -1,6 +1,7 @@
 <?php
 namespace BetaKiller\Helper;
 
+use BetaKiller\Exception;
 use Dotenv\Dotenv;
 
 /**
@@ -72,7 +73,7 @@ class AppEnv implements AppEnvInterface
 
     private function detectAppMode(): void
     {
-        $this->mode = getenv(self::APP_MODE);
+        $this->mode = $this->getEnvVariable(self::APP_MODE);
     }
 
     private function detectCliEnv(): void
@@ -90,6 +91,24 @@ class AppEnv implements AppEnvInterface
         if ($stage) {
             \putenv(self::APP_MODE.'='.$stage);
         }
+    }
+
+    /**
+     * @param string $name
+     * @param bool   $required
+     *
+     * @return string
+     */
+    public function getEnvVariable(string $name, bool $required = null): string
+    {
+        $name = \mb_strtoupper($name);
+        $value = getenv($name);
+
+        if (!$value && $required) {
+            throw new Exception('Missing :name env variable', [':name' => $name]);
+        }
+
+        return (string)$value;
     }
 
     /**
@@ -138,7 +157,7 @@ class AppEnv implements AppEnvInterface
 
     public function getRevisionKey(): string
     {
-        return getenv(self::APP_REVISION);
+        return $this->getEnvVariable(self::APP_REVISION);
     }
 
     public function isCLI(): bool
