@@ -3,12 +3,12 @@ namespace BetaKiller\Service;
 
 
 use BetaKiller\Config\AppConfigInterface;
+use BetaKiller\Factory\GuestUserFactory;
 use BetaKiller\Model\GuestUserInterface;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Repository\RoleRepository;
 use BetaKiller\Repository\UserRepository;
 use BetaKiller\Task\AbstractTask;
-use Worknector\Factory\GuestUserFactory;
 
 class UserService
 {
@@ -28,7 +28,7 @@ class UserService
     private $appConfig;
 
     /**
-     * @var \Worknector\Factory\GuestUserFactory
+     * @var \BetaKiller\Factory\GuestUserFactory
      */
     private $guestFactory;
 
@@ -37,7 +37,7 @@ class UserService
      *
      * @param \BetaKiller\Repository\UserRepository $userRepo
      * @param \BetaKiller\Repository\RoleRepository $roleRepo
-     * @param \Worknector\Factory\GuestUserFactory  $guestFactory
+     * @param \BetaKiller\Factory\GuestUserFactory  $guestFactory
      * @param \BetaKiller\Config\AppConfigInterface $appConfig
      */
     public function __construct(UserRepository $userRepo, RoleRepository $roleRepo, GuestUserFactory $guestFactory, AppConfigInterface $appConfig)
