@@ -21,12 +21,13 @@ class UrlDataSourceFactory
      */
     public function __construct(NamespaceBasedFactoryBuilder $factoryBuilder, RepositoryFactory $repositoryFactory)
     {
-        $this->factory = $factoryBuilder
-            ->createFactory()
-            ->setExpectedInterface(UrlDataSourceInterface::class);
+        $this->factory = $factoryBuilder->createFactory();
 
         // Using the same definitions as the RepositoryFactory does
         $repositoryFactory->injectDefinitions($this->factory);
+
+        // Override repository definition
+        $this->factory->setExpectedInterface(UrlDataSourceInterface::class);
     }
 
     /**
