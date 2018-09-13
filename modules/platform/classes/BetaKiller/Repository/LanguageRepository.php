@@ -7,9 +7,6 @@ use BetaKiller\Model\ExtendedOrmInterface;
 use BetaKiller\Model\Language;
 use BetaKiller\Model\LanguageInterface;
 
-/**
- * @method LanguageInterface[] getAll()
- */
 class LanguageRepository extends AbstractOrmBasedRepository implements LanguageRepositoryInterface
 {
     /**
