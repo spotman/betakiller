@@ -3,10 +3,12 @@ declare(strict_types=1);
 
 namespace BetaKiller\Model;
 
+/**
+ * @method string getID()
+ * @method bool hasID()
+ */
 interface LanguageInterface
 {
-    public function rules(): array;
-
     /**
      * @param string $value
      *

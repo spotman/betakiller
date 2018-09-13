@@ -7,6 +7,10 @@ use BetaKiller\Model\ExtendedOrmInterface;
 use BetaKiller\Model\Language;
 use BetaKiller\Model\LanguageInterface;
 
+/**
+ * @method LanguageInterface findById(string $id)
+ * @method LanguageInterface[] getAll()
+ */
 class LanguageRepository extends AbstractOrmBasedRepository implements LanguageRepositoryInterface
 {
     /**
@@ -22,6 +26,27 @@ class LanguageRepository extends AbstractOrmBasedRepository implements LanguageR
         $this->filterByName($orm, $name);
 
         return $this->findOne($orm);
+    }
+
+    /**
+     * @return \BetaKiller\Model\Language[]
+     * @throws \BetaKiller\Factory\FactoryException
+     * @throws \BetaKiller\Repository\RepositoryException
+     */
+    public function getAllSystem(): array
+    {
+        $orm = $this->getOrmInstance();
+        $this->filterBySystem($orm);
+
+        return $this->findAll($orm);
+    }
+
+    /**
+     * @param \BetaKiller\Model\ExtendedOrmInterface $orm
+     */
+    protected function filterBySystem(ExtendedOrmInterface $orm): void
+    {
+        $orm->where(Language::TABLE_FIELD_IS_SYSTEM, '=', 1);
     }
 
     /**
