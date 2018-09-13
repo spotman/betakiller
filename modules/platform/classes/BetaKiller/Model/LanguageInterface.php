@@ -3,10 +3,8 @@ declare(strict_types=1);
 
 namespace BetaKiller\Model;
 
-interface LanguageInterface
+interface LanguageInterface extends AbstractEntityInterface
 {
-    public function rules(): array;
-
     /**
      * @param string $value
      *
