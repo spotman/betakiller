@@ -3,11 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\Model;
 
-/**
- * @method string getID()
- * @method bool hasID()
- */
-interface LanguageInterface
+interface LanguageInterface extends AbstractEntityInterface
 {
     /**
      * @param string $value
