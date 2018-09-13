@@ -252,7 +252,7 @@ class User extends \Model_Auth_User implements UserInterface
 
     public function getFullName(): string
     {
-        return trim($this->getFirstName().' '.$this->getLastName());
+        return $this->getFirstName().' '.$this->getLastName();
     }
 
     public function getFirstName(): string
