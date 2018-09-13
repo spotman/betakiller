@@ -3,13 +3,10 @@ declare(strict_types=1);
 
 namespace BetaKiller\Repository;
 
+use BetaKiller\Model\AbstractEntityInterface;
 use BetaKiller\Model\LanguageInterface;
 
-/**
- * @method LanguageInterface findById(string $id)
- * @method LanguageInterface[] getAll()
- */
-interface LanguageRepositoryInterface extends RepositoryInterface
+interface LanguageRepositoryInterface extends AbstractEntityInterface
 {
     /**
      * @param string $name
