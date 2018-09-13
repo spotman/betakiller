@@ -100,7 +100,9 @@ class UserService
         $user = $this->userRepository->searchBy($cliUserName);
 
         if (!$user) {
-            $user = $this->createUser($cliUserName, $email);
+            $user = $this->createUser($cliUserName, $email)
+                ->setFirstName('Minion')
+                ->setLastName('Server');
         }
 
         // No notification for cron user
