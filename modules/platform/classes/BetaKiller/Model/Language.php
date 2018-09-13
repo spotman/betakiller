@@ -3,10 +3,6 @@ declare(strict_types=1);
 
 namespace BetaKiller\Model;
 
-/**
- * @method string getID()
- * @method bool hasID()
- */
 class Language extends \ORM implements LanguageInterface
 {
     public const TABLE_NAME            = 'languages';
