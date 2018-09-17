@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace BetaKiller\Model;
 
 use BetaKiller\Notification\NotificationUserInterface;
@@ -7,8 +9,6 @@ use Spotman\Acl\AclUserInterface;
 
 interface UserInterface extends AbstractEntityInterface, OrmInterface, NotificationUserInterface, AclUserInterface
 {
-    // Extended methods
-
     /**
      * @param string $value
      *
@@ -24,7 +24,7 @@ interface UserInterface extends AbstractEntityInterface, OrmInterface, Notificat
     /**
      * @param string $value
      *
-     * @return $this
+     * @return \BetaKiller\Model\UserInterface
      */
     public function setPassword(string $value): UserInterface;
 
@@ -32,6 +32,13 @@ interface UserInterface extends AbstractEntityInterface, OrmInterface, Notificat
      * @return string
      */
     public function getPassword(): string;
+
+    /**
+     * Returns true if current user is guest
+     *
+     * @return bool
+     */
+    public function isGuest(): bool;
 
     /**
      * @param RoleInterface $role
@@ -57,7 +64,7 @@ interface UserInterface extends AbstractEntityInterface, OrmInterface, Notificat
     public function hasAnyOfRolesNames(array $roles): bool;
 
     /**
-     * @param RoleInterface $role
+     * @param \BetaKiller\Model\RoleInterface $role
      *
      * @return \BetaKiller\Model\UserInterface
      */
@@ -78,33 +85,33 @@ interface UserInterface extends AbstractEntityInterface, OrmInterface, Notificat
     public function getLanguageName(): ?string;
 
     /**
-     * @return \BetaKiller\Model\Language|null
+     * @param \BetaKiller\Model\LanguageInterface $languageModel
+     *
+     * @return \BetaKiller\Model\UserInterface
      */
-    public function getLanguage(): ?Language;
+    public function setLanguage(LanguageInterface $languageModel): UserInterface;
+
+    /**
+     * @return \BetaKiller\Model\Language
+     */
+    public function getLanguage(): Language;
 
     /**
      * Search for user by username or e-mail
      *
      * @param string $usernameOrEmail
      *
-     * @return UserInterface|null
+     * @return \BetaKiller\Model\UserInterface|null
      */
     public function searchBy(string $usernameOrEmail): ?UserInterface;
 
-    /**
-     * @return void
-     */
     public function beforeSignIn(): void;
 
     /**
-     * @return void
-     * @throws \BetaKiller\Auth\WrongIPException
+     * @throws \BetaKiller\Auth\InactiveException
      */
     public function afterAutoLogin(): void;
 
-    /**
-     * @return void
-     */
     public function beforeSignOut(): void;
 
     /**
@@ -115,16 +122,9 @@ interface UserInterface extends AbstractEntityInterface, OrmInterface, Notificat
     public function isActive(): bool;
 
     /**
-     * Returns true if current user is guest
-     *
-     * @return bool
-     */
-    public function isGuest(): bool;
-
-    /**
      * @return string
      */
-    public function getFirstName(): string;
+    public function getFullName(): string;
 
     /**
      * @param string $value
@@ -136,7 +136,7 @@ interface UserInterface extends AbstractEntityInterface, OrmInterface, Notificat
     /**
      * @return string
      */
-    public function getLastName(): string;
+    public function getFirstName(): string;
 
     /**
      * @param string $value
@@ -148,7 +148,7 @@ interface UserInterface extends AbstractEntityInterface, OrmInterface, Notificat
     /**
      * @return string
      */
-    public function getMiddleName(): string;
+    public function getLastName(): string;
 
     /**
      * @param string $value
@@ -160,7 +160,7 @@ interface UserInterface extends AbstractEntityInterface, OrmInterface, Notificat
     /**
      * @return string
      */
-    public function getEmail(): string;
+    public function getMiddleName(): string;
 
     /**
      * @param string $value
@@ -170,11 +170,9 @@ interface UserInterface extends AbstractEntityInterface, OrmInterface, Notificat
     public function setEmail(string $value): UserInterface;
 
     /**
-     * Returns primary phone number
-     *
      * @return string
      */
-    public function getPhone(): string;
+    public function getEmail(): string;
 
     /**
      * @param string $number
@@ -182,6 +180,42 @@ interface UserInterface extends AbstractEntityInterface, OrmInterface, Notificat
      * @return \BetaKiller\Model\UserInterface
      */
     public function setPhone(string $number): UserInterface;
+
+    /**
+     * Возвращает основной номер телефона
+     *
+     * @return string
+     */
+    public function getPhone(): string;
+
+    /**
+     * @return bool
+     */
+    public function isEmailNotificationAllowed(): bool;
+
+    /**
+     * @return bool
+     */
+    public function isOnlineNotificationAllowed(): bool;
+
+    public function enableEmailNotification(): void;
+
+    public function disableEmailNotification(): void;
+
+    /**
+     * @return array
+     */
+    public function as_array(): array;
+
+    /**
+     * @return string
+     */
+    public function getAccessControlIdentity(): string;
+
+    /**
+     * @return RoleInterface[]
+     */
+    public function getAccessControlRoles(): array;
 
     /**
      * Forces authorization if user is not logged in
