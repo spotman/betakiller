@@ -277,9 +277,9 @@ class User extends \Model_Auth_User implements UserInterface
     }
 
     /**
-     * @return \BetaKiller\Model\Language
+     * @return null|\BetaKiller\Model\LanguageInterface
      */
-    public function getLanguage(): Language
+    public function getLanguage(): ?LanguageInterface
     {
         return $this->get('language');
     }
@@ -511,7 +511,7 @@ class User extends \Model_Auth_User implements UserInterface
     /**
      * @return array
      */
-    protected function getSerializableProperties()
+    protected function getSerializableProperties(): array
     {
         return array_merge(parent::getSerializableProperties(), [
             'allUserRolesNames',
