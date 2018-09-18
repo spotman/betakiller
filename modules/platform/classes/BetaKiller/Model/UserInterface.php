@@ -105,9 +105,9 @@ interface UserInterface extends AbstractEntityInterface, OrmInterface, Notificat
     public function setLanguage(LanguageInterface $languageModel): UserInterface;
 
     /**
-     * @return \BetaKiller\Model\Language
+     * @return null|\BetaKiller\Model\LanguageInterface
      */
-    public function getLanguage(): Language;
+    public function getLanguage(): ?LanguageInterface;
 
     /**
      * Search for user by username or e-mail
@@ -195,7 +195,7 @@ interface UserInterface extends AbstractEntityInterface, OrmInterface, Notificat
     public function setPhone(string $number): UserInterface;
 
     /**
-     * Возвращает основной номер телефона
+     * Returns primary phone number
      *
      * @return string
      */
