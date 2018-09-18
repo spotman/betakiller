@@ -5,10 +5,23 @@ namespace BetaKiller\Model;
 
 use BetaKiller\Notification\NotificationUserInterface;
 use BetaKiller\Utils\Kohana\ORM\OrmInterface;
+use DateTimeImmutable;
 use Spotman\Acl\AclUserInterface;
 
 interface UserInterface extends AbstractEntityInterface, OrmInterface, NotificationUserInterface, AclUserInterface
 {
+    /**
+     * @param \DateTimeInterface $value [optional]
+     *
+     * @return \Worknector\Model\UserInterface
+     */
+    public function setCreatedAt(\DateTimeInterface $value = null): UserInterface;
+
+    /**
+     * @return \DateTimeImmutable
+     */
+    public function getCreatedAt(): DateTimeImmutable;
+
     /**
      * @param string $value
      *

@@ -5,10 +5,13 @@ namespace BetaKiller\Model;
 
 use BetaKiller\Auth\AuthorizationRequiredException;
 use BetaKiller\Auth\InactiveException;
+use BetaKiller\Exception\DomainException;
+use DateTimeImmutable;
 
 class User extends \Model_Auth_User implements UserInterface
 {
     public const TABLE_NAME                  = 'users';
+    public const TABLE_FIELD_CREATED_AT      = 'created_at';
     public const TABLE_FIELD_USERNAME        = 'username';
     public const TABLE_FIELD_PASSWORD        = 'password';
     public const TABLE_FIELD_LANGUAGE_ID     = 'language_id';
@@ -82,6 +85,34 @@ class User extends \Model_Auth_User implements UserInterface
                     ['max_length', [':value', 1]],
                 ],
             ];
+    }
+
+    /**
+     * @param \DateTimeInterface $value [optional]
+     *
+     * @return \Worknector\Model\UserInterface
+     */
+    public function setCreatedAt(\DateTimeInterface $value = null): UserInterface
+    {
+        $value = $value ?: new \DateTimeImmutable;
+        $this->set_datetime_column_value(self::TABLE_FIELD_CREATED_AT, $value);
+
+        return $this;
+    }
+
+    /**
+     * @return \DateTimeImmutable
+     * @throws \BetaKiller\Exception\DomainException
+     */
+    public function getCreatedAt(): DateTimeImmutable
+    {
+        $createdAt = $this->get_datetime_column_value(self::TABLE_FIELD_CREATED_AT);
+
+        if (!$createdAt) {
+            throw new DomainException('User::createdAt can not be empty');
+        }
+
+        return $createdAt;
     }
 
     /**
