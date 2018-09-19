@@ -96,7 +96,7 @@ class ORM extends Utils\Kohana\ORM implements ExtendedOrmInterface
             throw new \RuntimeException('Unable get related entity: '.$alias);
         }
 
-        return $this;
+        return $entity;
     }
 
     /**
