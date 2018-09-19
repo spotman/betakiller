@@ -10,6 +10,6 @@ Route::set('widget-controller', 'w/<widget>(/<action>)',
 // Make it last
 Route::set('default-iface-controller', '(<uri>)', array('uri' => '.+'))
     ->defaults(array(
-        'controller'    => 'IFace',
+        'controller'    => 'UrlElement',
         'action'        => 'render',
     ));
