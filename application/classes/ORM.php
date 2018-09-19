@@ -2,6 +2,7 @@
 
 use BetaKiller\DI\Container;
 use BetaKiller\Factory\OrmFactory;
+use BetaKiller\Model\AbstractEntityInterface;
 use BetaKiller\Model\ExtendedOrmInterface;
 use BetaKiller\Search\SearchResultsInterface;
 use BetaKiller\Url\Parameter\UrlParameterException;
@@ -87,13 +88,20 @@ class ORM extends Utils\Kohana\ORM implements ExtendedOrmInterface
     /**
      * @param string $alias
      *
-     * @return null|\ORM
+     * @return AbstractEntityInterface
      */
-    protected function getRelatedEntity(string $alias): ?\ORM
+    protected function getRelatedEntity(string $alias): AbstractEntityInterface
     {
         $entity = $this->get($alias);
-        if ($entity && (!$this->loaded() || !$entity->loaded())) {
-            throw new \RuntimeException('Unable get related entity: '.$alias);
+        if (!($entity instanceof AbstractEntityInterface)) {
+            throw new \RuntimeException(
+                sprintf('Unable get related entity by alias "%s"', $alias)
+            );
+        }
+        if (!$this->loaded() || !$entity->loaded()) {
+            throw new \RuntimeException(
+                sprintf('Related entity by alias "%s" not loaded', $alias)
+            );
         }
 
         return $entity;
