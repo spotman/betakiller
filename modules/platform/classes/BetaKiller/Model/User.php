@@ -262,7 +262,7 @@ class User extends \Model_Auth_User implements UserInterface
          */
         $langModel = $this->getRelatedEntity('language');
 
-        return $langModel ? $langModel->getName() : null;
+        return $langModel->getName();
     }
 
     /**
