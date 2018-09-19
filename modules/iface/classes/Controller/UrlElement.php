@@ -1,10 +1,11 @@
 <?php
+
 use BetaKiller\Url\UrlDispatcher;
 
 /**
- * Class Controller_IFace
+ * Class Controller_UrlElement
  */
-class Controller_IFace extends Controller
+class Controller_UrlElement extends Controller
 {
     /**
      * @Inject
@@ -56,12 +57,15 @@ class Controller_IFace extends Controller
     {
         $this->urlContainer->setQueryParts($this->request->query());
 
-        $urlElement   = $this->urlDispatcher->process(
+        $urlElement = $this->urlDispatcher->process(
             $this->request->url(),
             $this->request->client_ip(),
             $this->request->referrer()
         );
+
+        $request = \Zend\Diactoros\ServerRequestFactory::fromGlobals();
+
         $urlProcessor = $this->processorFactory->createFromUrlElement($urlElement);
-        $urlProcessor->process($urlElement, $this->urlContainer, $this->response, $this->request);
+        $urlProcessor->process($urlElement, $this->urlContainer, $request, $this->response);
     }
 }

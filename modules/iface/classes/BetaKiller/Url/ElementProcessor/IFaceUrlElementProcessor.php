@@ -1,18 +1,19 @@
 <?php
 namespace BetaKiller\Url\ElementProcessor;
 
-use \BetaKiller\Config\AppConfigInterface;
-use \BetaKiller\Exception\BadRequestHttpException;
-use \BetaKiller\Exception\FoundHttpException;
-use \BetaKiller\Exception\PermanentRedirectHttpException;
-use \BetaKiller\Factory\IFaceFactory;
-use \BetaKiller\IFace\Cache\IFaceCache;
-use \BetaKiller\IFace\IFaceInterface;
-use \BetaKiller\Model\UserInterface;
-use \BetaKiller\Url\Container\UrlContainerInterface;
-use \BetaKiller\Url\UrlElementInterface;
-use \BetaKiller\Url\IFaceModelInterface;
-use \BetaKiller\View\IFaceView;
+use BetaKiller\Config\AppConfigInterface;
+use BetaKiller\Exception\BadRequestHttpException;
+use BetaKiller\Exception\FoundHttpException;
+use BetaKiller\Exception\PermanentRedirectHttpException;
+use BetaKiller\Factory\IFaceFactory;
+use BetaKiller\IFace\Cache\IFaceCache;
+use BetaKiller\IFace\IFaceInterface;
+use BetaKiller\Model\UserInterface;
+use BetaKiller\Url\Container\UrlContainerInterface;
+use BetaKiller\Url\IFaceModelInterface;
+use BetaKiller\Url\UrlElementInterface;
+use BetaKiller\View\IFaceView;
+use Psr\Http\Message\ServerRequestInterface;
 
 /**
  * IFace URL element processor
@@ -80,8 +81,9 @@ class IFaceUrlElementProcessor implements UrlElementProcessorInterface
      *
      * @param \BetaKiller\Url\UrlElementInterface             $model
      * @param \BetaKiller\Url\Container\UrlContainerInterface $urlContainer
+     * @param \Psr\Http\Message\ServerRequestInterface        $request
+     *
      * @param \Response|null                                  $response [optional]
-     * @param \Request|null                                   $request  [optional]
      *
      * @throws \BetaKiller\Exception\FoundHttpException
      * @throws \BetaKiller\Exception\PermanentRedirectHttpException
@@ -93,8 +95,8 @@ class IFaceUrlElementProcessor implements UrlElementProcessorInterface
     public function process(
         UrlElementInterface $model,
         UrlContainerInterface $urlContainer,
-        ?\Response $response = null,
-        ?\Request $request = null
+        ServerRequestInterface $request,
+        \Response $response
     ): void {
         if (!($model instanceof IFaceModelInterface)) {
             throw new UrlElementProcessorException('Invalid model :class_invalid. Model must be :class_valid', [
@@ -102,18 +104,9 @@ class IFaceUrlElementProcessor implements UrlElementProcessorInterface
                 ':class_valid'   => IFaceModelInterface::class,
             ]);
         }
-        if (!$urlContainer) {
-            throw new UrlElementProcessorException('URL container must be defined');
-        }
-        if (!$response) {
-            throw new UrlElementProcessorException('Response controller must be defined');
-        }
-        if (!$request) {
-            throw new UrlElementProcessorException('Request controller must be defined');
-        }
 
         // If this is default IFace and client requested non-slash uri, redirect client to /
-        $path = parse_url($request->url(), PHP_URL_PATH);
+        $path = parse_url($request->getRequestTarget(), PHP_URL_PATH);
         if ($path !== '/' && $model->isDefault() && !$model->hasDynamicUrl()) {
             throw new FoundHttpException('/');
         }
@@ -164,19 +157,18 @@ class IFaceUrlElementProcessor implements UrlElementProcessorInterface
         }
     }
 
-
     /**
      * Cashing IFace element
      *
-     * @param \BetaKiller\IFace\IFaceInterface $iface
-     * @param \Request                         $request
+     * @param \BetaKiller\IFace\IFaceInterface         $iface
+     * @param \Psr\Http\Message\ServerRequestInterface $request
      *
      * @throws \PageCache\PageCacheException
      */
-    private function processIFaceCache(IFaceInterface $iface, \Request $request): void
+    private function processIFaceCache(IFaceInterface $iface, ServerRequestInterface $request): void
     {
         // Skip caching if request method is not GET nor HEAD
-        if (!\in_array($request->method(), ['GET', 'HEAD'], true)) {
+        if (!\in_array(\mb_strtoupper($request->getMethod()), ['GET', 'HEAD'], true)) {
             return;
         }
 
