@@ -55,7 +55,7 @@ class User extends \Model_Auth_User implements UserInterface
                 ],
                 self::TABLE_FIELD_USERNAME        => [
                     ['not_empty'],
-                    ['max_length', [':value', 32]],
+                    ['max_length', [':value', 41]],
                     [[$this, 'unique'], ['username', ':value']],
 
                 ],
@@ -257,13 +257,12 @@ class User extends \Model_Auth_User implements UserInterface
      */
     public function getLanguageName(): ?string
     {
-        $langModel = $this->getLanguage();
+        /**
+         * @var null|\BetaKiller\Model\LanguageInterface $langModel
+         */
+        $langModel = $this->getRelatedEntity('language');
 
-        $lang = ($this->loaded() && $langModel->loaded())
-            ? $langModel->getName()
-            : null;
-
-        return $lang;
+        return $langModel ? $langModel->getName() : null;
     }
 
     /**

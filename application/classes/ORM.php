@@ -85,6 +85,21 @@ class ORM extends Utils\Kohana\ORM implements ExtendedOrmInterface
     }
 
     /**
+     * @param string $alias
+     *
+     * @return null|\ORM
+     */
+    protected function getRelatedEntity(string $alias): ?\ORM
+    {
+        $entity = $this->get($alias);
+        if ($entity && (!$this->loaded() || !$entity->loaded())) {
+            throw new \RuntimeException('Unable get related entity: '.$alias);
+        }
+
+        return $this;
+    }
+
+    /**
      * Prepares the model database connection, determines the table name,
      * and loads column information.
      *
