@@ -1,11 +1,12 @@
 <?php
 namespace BetaKiller\Url\ElementProcessor;
 
-use \BetaKiller\Url\UrlElementInterface;
-use \BetaKiller\Url\Container\UrlContainerInterface;
+use BetaKiller\Url\Container\UrlContainerInterface;
+use BetaKiller\Url\UrlElementInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
 /**
- * URL element processor like IFace, WabHok and etc
+ * URL element processor like IFace, WebHook and etc
  */
 interface UrlElementProcessorInterface
 {
@@ -14,13 +15,13 @@ interface UrlElementProcessorInterface
      *
      * @param \BetaKiller\Url\UrlElementInterface             $model
      * @param \BetaKiller\Url\Container\UrlContainerInterface $urlContainer
-     * @param \Response|null                                  $response [optional]
-     * @param \Request|null                                   $request  [optional]
+     * @param \Psr\Http\Message\ServerRequestInterface        $request
+     * @param \Response                                       $response
      */
     public function process(
         UrlElementInterface $model,
         UrlContainerInterface $urlContainer,
-        ?\Response $response = null,
-        ?\Request $request = null
+        ServerRequestInterface $request,
+        \Response $response
     ): void;
 }
