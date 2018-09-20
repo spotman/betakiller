@@ -5,20 +5,35 @@ namespace BetaKiller\Model;
 
 use BetaKiller\Auth\AuthorizationRequiredException;
 use BetaKiller\Auth\InactiveException;
+use BetaKiller\Exception\DomainException;
+use DateTimeImmutable;
 
 class User extends \Model_Auth_User implements UserInterface
 {
+    public const TABLE_NAME                  = 'users';
+    public const TABLE_FIELD_CREATED_AT      = 'created_at';
+    public const TABLE_FIELD_USERNAME        = 'username';
+    public const TABLE_FIELD_PASSWORD        = 'password';
+    public const TABLE_FIELD_LANGUAGE_ID     = 'language_id';
+    public const TABLE_FIELD_FIRST_NAME      = 'first_name';
+    public const TABLE_FIELD_LAST_NAME       = 'last_name';
+    public const TABLE_FIELD_MIDDLE_NAME     = 'middle_name';
+    public const TABLE_FIELD_EMAIL           = 'email';
+    public const TABLE_FIELD_PHONE           = 'phone';
+    public const TABLE_FIELD_NOTIFY_BY_EMAIL = 'notify_by_email';
+    public const TABLE_FIELD_IS_ACTIVE       = 'is_active';
+
     protected $allUserRolesNames = [];
 
     protected function configure(): void
     {
-        $this->_table_name       = 'users';
+        $this->_table_name       = self::TABLE_NAME;
         $this->_reload_on_wakeup = true;
 
         $this->belongs_to([
             'language' => [
                 'model'       => 'Language',
-                'foreign_key' => 'language_id',
+                'foreign_key' => self::TABLE_FIELD_LANGUAGE_ID,
             ],
         ]);
 
@@ -28,52 +43,120 @@ class User extends \Model_Auth_User implements UserInterface
     }
 
     /**
-     * @return Role
-     * @throws \Kohana_Exception
+     * @return array
+     */
+    public function rules(): array
+    {
+        return parent::rules() + [
+                self::TABLE_FIELD_EMAIL           => [
+                    ['not_empty'],
+                    ['email'],
+                    [[$this, 'unique'], ['email', ':value']],
+                ],
+                self::TABLE_FIELD_USERNAME        => [
+                    ['not_empty'],
+                    ['max_length', [':value', 41]],
+                    [[$this, 'unique'], ['username', ':value']],
+
+                ],
+                self::TABLE_FIELD_PASSWORD        => [
+                    ['not_empty'],
+                    ['max_length', [':value', 64]],
+                ],
+                self::TABLE_FIELD_LANGUAGE_ID     => [
+                    ['max_length', [':value', 11]],
+                ],
+                self::TABLE_FIELD_FIRST_NAME      => [
+                    ['max_length', [':value', 32]],
+                ],
+                self::TABLE_FIELD_LAST_NAME       => [
+                    ['max_length', [':value', 32]],
+                ],
+                self::TABLE_FIELD_MIDDLE_NAME     => [
+                    ['max_length', [':value', 32]],
+                ],
+                self::TABLE_FIELD_PHONE           => [
+                    ['max_length', [':value', 32]],
+                ],
+                self::TABLE_FIELD_NOTIFY_BY_EMAIL => [
+                    ['max_length', [':value', 1]],
+                ],
+                self::TABLE_FIELD_IS_ACTIVE       => [
+                    ['max_length', [':value', 1]],
+                ],
+            ];
+    }
+
+    /**
+     * @param \DateTimeInterface $value [optional]
+     *
+     * @return \Worknector\Model\UserInterface
+     */
+    public function setCreatedAt(\DateTimeInterface $value = null): UserInterface
+    {
+        $value = $value ?: new \DateTimeImmutable;
+        $this->set_datetime_column_value(self::TABLE_FIELD_CREATED_AT, $value);
+
+        return $this;
+    }
+
+    /**
+     * @return \DateTimeImmutable
+     * @throws \BetaKiller\Exception\DomainException
+     */
+    public function getCreatedAt(): DateTimeImmutable
+    {
+        $createdAt = $this->get_datetime_column_value(self::TABLE_FIELD_CREATED_AT);
+
+        if (!$createdAt) {
+            throw new DomainException('User::createdAt can not be empty');
+        }
+
+        return $createdAt;
+    }
+
+    /**
+     * @param string $value
+     *
+     * @return \BetaKiller\Model\UserInterface
+     */
+    public function setUsername(string $value): UserInterface
+    {
+        return $this->set(self::TABLE_FIELD_USERNAME, $value);
+    }
+
+    /**
+     * @return string
+     */
+    public function getUsername(): string
+    {
+        return $this->get(self::TABLE_FIELD_USERNAME);
+    }
+
+    /**
+     * @param string $value
+     *
+     * @return \BetaKiller\Model\UserInterface
+     */
+    public function setPassword(string $value): UserInterface
+    {
+        return $this->set(self::TABLE_FIELD_PASSWORD, $value);
+    }
+
+    /**
+     * @return string
+     */
+    public function getPassword(): string
+    {
+        return $this->get(self::TABLE_FIELD_PASSWORD);
+    }
+
+    /**
+     * @return \BetaKiller\Model\Role
      */
     protected function getRolesRelation(): Role
     {
         return $this->get('roles');
-    }
-
-    /**
-     * @param string $value
-     *
-     * @return \BetaKiller\Model\UserInterface
-     * @throws \Kohana_Exception
-     */
-    public function setUsername(string $value): UserInterface
-    {
-        return $this->set('username', $value);
-    }
-
-    /**
-     * @return string
-     * @throws \Kohana_Exception
-     */
-    public function getUsername(): string
-    {
-        return $this->get('username');
-    }
-
-    /**
-     * @param string $value
-     *
-     * @return \BetaKiller\Model\UserInterface
-     * @throws \Kohana_Exception
-     */
-    public function setPassword(string $value): UserInterface
-    {
-        return $this->set('password', $value);
-    }
-
-    /**
-     * @return string
-     * @throws \Kohana_Exception
-     */
-    public function getPassword(): string
-    {
-        return $this->get('password');
     }
 
     /**
@@ -170,27 +253,35 @@ class User extends \Model_Auth_User implements UserInterface
     /**
      * Returns user`s language name
      *
-     * @return string|null
-     * @throws \Kohana_Exception
+     * @return string
      */
-    public function getLanguageName(): ?string
+    public function getLanguageName(): string
     {
-        $langModel = $this->getLanguage();
+        /**
+         * @var \BetaKiller\Model\LanguageInterface $langModel
+         */
+        $langModel = $this->getRelatedEntity('language');
 
-        $lang = ($this->loaded() && $langModel->loaded())
-            ? $langModel->getName()
-            : null;
-
-        return $lang;
+        return $langModel->getName();
     }
 
     /**
-     * @return \BetaKiller\Model\Language
-     * @throws \Kohana_Exception
+     * @param \BetaKiller\Model\LanguageInterface $languageModel
+     *
+     * @return \BetaKiller\Model\UserInterface
      */
-    public function getLanguage(): Language
+    public function setLanguage(LanguageInterface $languageModel): UserInterface
     {
-        return $this->get('language');
+        return $this->set(self::TABLE_FIELD_LANGUAGE_ID, $languageModel);
+    }
+
+    /**
+     * @return \BetaKiller\Model\LanguageInterface
+     */
+    public function getLanguage(): LanguageInterface
+    {
+        /** @noinspection PhpIncompatibleReturnTypeInspection */
+        return $this->getRelatedEntity('language');
     }
 
     /**
@@ -199,7 +290,6 @@ class User extends \Model_Auth_User implements UserInterface
      * @param string $usernameOrEmail
      *
      * @return UserInterface|null
-     * @throws \Kohana_Exception
      */
     public function searchBy(string $usernameOrEmail): ?UserInterface
     {
@@ -215,7 +305,6 @@ class User extends \Model_Auth_User implements UserInterface
 
     /**
      * @throws \BetaKiller\Auth\InactiveException
-     * @throws \Kohana_Exception
      */
     protected function checkIsActive(): void
     {
@@ -227,7 +316,6 @@ class User extends \Model_Auth_User implements UserInterface
 
     /**
      * @throws \BetaKiller\Auth\InactiveException
-     * @throws \Kohana_Exception
      */
     public function afterAutoLogin(): void
     {
@@ -243,44 +331,54 @@ class User extends \Model_Auth_User implements UserInterface
      * Returns TRUE, if user account is switched on
      *
      * @return bool
-     * @throws \Kohana_Exception
      */
     public function isActive(): bool
     {
-        return ($this->loaded() && $this->get('is_active'));
-    }
-
-    public function getFullName(): string
-    {
-        return $this->getFirstName().' '.$this->getLastName();
-    }
-
-    public function getFirstName(): string
-    {
-        return (string)$this->get('first_name');
-    }
-
-    public function setFirstName(string $value): UserInterface
-    {
-        return $this->set('first_name', $value);
-    }
-
-    public function getLastName(): string
-    {
-        return (string)$this->get('last_name');
-    }
-
-    public function setLastName(string $value): UserInterface
-    {
-        return $this->set('last_name', $value);
+        return ($this->loaded() && $this->get(self::TABLE_FIELD_IS_ACTIVE));
     }
 
     /**
      * @return string
      */
-    public function getMiddleName(): string
+    public function getFullName(): string
     {
-        return (string)$this->get('middle_name');
+        return $this->getFirstName().' '.$this->getLastName();
+    }
+
+    /**
+     * @param string $value
+     *
+     * @return \BetaKiller\Model\UserInterface
+     */
+    public function setFirstName(string $value): UserInterface
+    {
+        return $this->set(self::TABLE_FIELD_FIRST_NAME, $value);
+    }
+
+    /**
+     * @return string
+     */
+    public function getFirstName(): string
+    {
+        return (string)$this->get(self::TABLE_FIELD_FIRST_NAME);
+    }
+
+    /**
+     * @param string $value
+     *
+     * @return \BetaKiller\Model\UserInterface
+     */
+    public function setLastName(string $value): UserInterface
+    {
+        return $this->set(self::TABLE_FIELD_LAST_NAME, $value);
+    }
+
+    /**
+     * @return string
+     */
+    public function getLastName(): string
+    {
+        return (string)$this->get(self::TABLE_FIELD_LAST_NAME);
     }
 
     /**
@@ -290,63 +388,85 @@ class User extends \Model_Auth_User implements UserInterface
      */
     public function setMiddleName(string $value): UserInterface
     {
-        return $this->set('middle_name', $value);
+        return $this->set(self::TABLE_FIELD_MIDDLE_NAME, $value);
     }
 
-
-    public function getEmail(): string
+    /**
+     * @return string
+     */
+    public function getMiddleName(): string
     {
-        return $this->get('email');
+        return (string)$this->get(self::TABLE_FIELD_MIDDLE_NAME);
     }
 
+    /**
+     * @param string $value
+     *
+     * @return \BetaKiller\Model\UserInterface
+     */
     public function setEmail(string $value): UserInterface
     {
-        return $this->set('email', $value);
+        return $this->set(self::TABLE_FIELD_EMAIL, $value);
+    }
+
+    /**
+     * @return string
+     */
+    public function getEmail(): string
+    {
+        return $this->get(self::TABLE_FIELD_EMAIL);
+    }
+
+    /**
+     * @param string $number
+     *
+     * @return \BetaKiller\Model\UserInterface
+     */
+    public function setPhone(string $number): UserInterface
+    {
+        return $this->set(self::TABLE_FIELD_PHONE, $number);
     }
 
     /**
      * Возвращает основной номер телефона
      *
      * @return string
-     * @throws \Kohana_Exception
      */
     public function getPhone(): string
     {
-        return (string)$this->get('phone');
+        return (string)$this->get(self::TABLE_FIELD_PHONE);
     }
 
-    public function setPhone(string $number): UserInterface
-    {
-        return $this->set('phone', $number);
-    }
-
+    /**
+     * @return bool
+     */
     public function isEmailNotificationAllowed(): bool
     {
-        return (bool)$this->get('notify_by_email');
+        return (bool)$this->get(self::TABLE_FIELD_NOTIFY_BY_EMAIL);
     }
 
+    /**
+     * @return bool
+     */
     public function isOnlineNotificationAllowed(): bool
     {
         // Online notification isn`t ready yet
         return false;
     }
 
-    /**
-     * @throws \Kohana_Exception
-     */
     public function enableEmailNotification(): void
     {
-        $this->set('notify_by_email', true);
+        $this->set(self::TABLE_FIELD_NOTIFY_BY_EMAIL, true);
+    }
+
+    public function disableEmailNotification(): void
+    {
+        $this->set(self::TABLE_FIELD_NOTIFY_BY_EMAIL, false);
     }
 
     /**
-     * @throws \Kohana_Exception
+     * @return array
      */
-    public function disableEmailNotification(): void
-    {
-        $this->set('notify_by_email', false);
-    }
-
     public function as_array(): array
     {
         return [
@@ -361,7 +481,6 @@ class User extends \Model_Auth_User implements UserInterface
 
     /**
      * @return string
-     * @throws \Kohana_Exception
      */
     public function getAccessControlIdentity(): string
     {
@@ -370,7 +489,6 @@ class User extends \Model_Auth_User implements UserInterface
 
     /**
      * @return RoleInterface[]
-     * @throws \Kohana_Exception
      */
     public function getAccessControlRoles(): array
     {
@@ -390,7 +508,10 @@ class User extends \Model_Auth_User implements UserInterface
         }
     }
 
-    protected function getSerializableProperties()
+    /**
+     * @return array
+     */
+    protected function getSerializableProperties(): array
     {
         return array_merge(parent::getSerializableProperties(), [
             'allUserRolesNames',
