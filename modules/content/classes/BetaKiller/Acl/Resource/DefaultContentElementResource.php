@@ -14,7 +14,6 @@ class DefaultContentElementResource extends AbstractAssetsAclResource
         return [
             Content::WRITER_ROLE_NAME,
             RoleInterface::MODERATOR_ROLE_NAME,
-            RoleInterface::ADMIN_ROLE_NAME,
         ];
     }
 
@@ -26,7 +25,6 @@ class DefaultContentElementResource extends AbstractAssetsAclResource
         return [
             Content::WRITER_ROLE_NAME,
             RoleInterface::MODERATOR_ROLE_NAME,
-            RoleInterface::ADMIN_ROLE_NAME,
         ];
     }
 
@@ -49,7 +47,6 @@ class DefaultContentElementResource extends AbstractAssetsAclResource
         return [
             Content::WRITER_ROLE_NAME,
             RoleInterface::MODERATOR_ROLE_NAME,
-            RoleInterface::ADMIN_ROLE_NAME,
         ];
     }
 
@@ -61,7 +58,6 @@ class DefaultContentElementResource extends AbstractAssetsAclResource
         return [
             Content::WRITER_ROLE_NAME,
             RoleInterface::MODERATOR_ROLE_NAME,
-            RoleInterface::ADMIN_ROLE_NAME,
         ];
     }
 
@@ -73,7 +69,6 @@ class DefaultContentElementResource extends AbstractAssetsAclResource
         return [
             Content::WRITER_ROLE_NAME,
             RoleInterface::MODERATOR_ROLE_NAME,
-            RoleInterface::ADMIN_ROLE_NAME,
         ];
     }
 
@@ -85,7 +80,6 @@ class DefaultContentElementResource extends AbstractAssetsAclResource
         return [
             Content::WRITER_ROLE_NAME,
             RoleInterface::MODERATOR_ROLE_NAME,
-            RoleInterface::ADMIN_ROLE_NAME,
         ];
     }
 }

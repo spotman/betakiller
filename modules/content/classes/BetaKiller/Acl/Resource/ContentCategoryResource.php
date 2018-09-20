@@ -28,7 +28,7 @@ class ContentCategoryResource extends AbstractEntityRelatedAclResource
             ],
 
             self::ACTION_DELETE => [
-                RoleInterface::ADMIN_ROLE_NAME,
+                RoleInterface::MODERATOR_ROLE_NAME,
             ],
 
             self::ACTION_LIST => [

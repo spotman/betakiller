@@ -14,7 +14,6 @@ class ContentPostResource extends AbstractStatusRelatedEntityAclResource
     protected function getCreatePermissionRoles(): array
     {
         return [
-            RoleInterface::ADMIN_ROLE_NAME,
             RoleInterface::MODERATOR_ROLE_NAME,
             RoleInterface::DEVELOPER_ROLE_NAME,
             Content::WRITER_ROLE_NAME,
