@@ -152,7 +152,7 @@ class User extends \Model_Auth_User implements UserInterface
     }
 
     /**
-     * @return Role
+     * @return \BetaKiller\Model\Role
      */
     protected function getRolesRelation(): Role
     {
@@ -253,12 +253,12 @@ class User extends \Model_Auth_User implements UserInterface
     /**
      * Returns user`s language name
      *
-     * @return string|null
+     * @return string
      */
-    public function getLanguageName(): ?string
+    public function getLanguageName(): string
     {
         /**
-         * @var null|\BetaKiller\Model\LanguageInterface $langModel
+         * @var \BetaKiller\Model\LanguageInterface $langModel
          */
         $langModel = $this->getRelatedEntity('language');
 
@@ -276,11 +276,12 @@ class User extends \Model_Auth_User implements UserInterface
     }
 
     /**
-     * @return null|\BetaKiller\Model\LanguageInterface
+     * @return \BetaKiller\Model\LanguageInterface
      */
-    public function getLanguage(): ?LanguageInterface
+    public function getLanguage(): LanguageInterface
     {
-        return $this->get('language');
+        /** @noinspection PhpIncompatibleReturnTypeInspection */
+        return $this->getRelatedEntity('language');
     }
 
     /**
