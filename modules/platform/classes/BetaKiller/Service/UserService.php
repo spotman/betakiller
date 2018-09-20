@@ -68,6 +68,7 @@ class UserService
         ];
 
         $model = $this->userRepository->create()
+            ->setCreatedAt()
             ->setUsername($login)
             ->setPassword($password)
             ->setEmail($email);
