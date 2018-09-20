@@ -17,21 +17,14 @@ class ContentHelper
     private $shortcodeFacade;
 
     /**
-     * @var \BetaKiller\Factory\RepositoryFactory
-     */
-    private $repositoryFactory;
-
-    /**
      * @var \BetaKiller\Assets\AssetsProviderFactory
      */
     private $providerFactory;
 
     public function __construct(
-        RepositoryFactory $repositoryFactory,
         AssetsProviderFactory $providerFactory,
         ShortcodeFacade $shortcodeFacade
     ) {
-        $this->repositoryFactory = $repositoryFactory;
         $this->providerFactory   = $providerFactory;
         $this->shortcodeFacade   = $shortcodeFacade;
     }
