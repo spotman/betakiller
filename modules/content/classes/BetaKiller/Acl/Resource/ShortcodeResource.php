@@ -22,53 +22,45 @@ class ShortcodeResource extends AbstractEntityRelatedAclResource
             self::ACTION_VERIFY => [
                 Content::WRITER_ROLE_NAME,
                 RoleInterface::MODERATOR_ROLE_NAME,
-                RoleInterface::ADMIN_ROLE_NAME,
                 RoleInterface::DEVELOPER_ROLE_NAME,
             ],
 
             self::ACTION_GET_ATTRIBUTES_DEFINITION => [
                 Content::WRITER_ROLE_NAME,
                 RoleInterface::MODERATOR_ROLE_NAME,
-                RoleInterface::ADMIN_ROLE_NAME,
                 RoleInterface::DEVELOPER_ROLE_NAME,
             ],
 
             self::ACTION_CREATE => [
                 RoleInterface::MODERATOR_ROLE_NAME,
-                RoleInterface::ADMIN_ROLE_NAME,
                 RoleInterface::DEVELOPER_ROLE_NAME,
             ],
 
             self::ACTION_READ => [
                 Content::WRITER_ROLE_NAME,
                 RoleInterface::MODERATOR_ROLE_NAME,
-                RoleInterface::ADMIN_ROLE_NAME,
                 RoleInterface::DEVELOPER_ROLE_NAME,
             ],
 
             self::ACTION_UPDATE => [
                 RoleInterface::MODERATOR_ROLE_NAME,
-                RoleInterface::ADMIN_ROLE_NAME,
                 RoleInterface::DEVELOPER_ROLE_NAME,
             ],
 
             self::ACTION_DELETE => [
                 RoleInterface::MODERATOR_ROLE_NAME,
-                RoleInterface::ADMIN_ROLE_NAME,
                 RoleInterface::DEVELOPER_ROLE_NAME,
             ],
 
             self::ACTION_LIST => [
                 Content::WRITER_ROLE_NAME,
                 RoleInterface::MODERATOR_ROLE_NAME,
-                RoleInterface::ADMIN_ROLE_NAME,
                 RoleInterface::DEVELOPER_ROLE_NAME,
             ],
 
             self::ACTION_SEARCH => [
                 Content::WRITER_ROLE_NAME,
                 RoleInterface::MODERATOR_ROLE_NAME,
-                RoleInterface::ADMIN_ROLE_NAME,
                 RoleInterface::DEVELOPER_ROLE_NAME,
             ],
         ];
