@@ -15,7 +15,7 @@ abstract class AbstractAdminWidget extends AbstractWidget
     public function getAclRoles(): array
     {
         return [
-            RoleInterface::ADMIN_ROLE_NAME
+            RoleInterface::ADMIN_PANEL_ROLE_NAME
         ];
     }
 
