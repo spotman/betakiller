@@ -29,7 +29,7 @@ interface RoleInterface extends AbstractEntityInterface, AclRoleInterface, Multi
     /**
      * Role with access to admin panel
      */
-    public const ADMIN_ROLE_NAME = 'admin';
+    public const ADMIN_PANEL_ROLE_NAME = 'admin';
 
     /**
      * Role with access to log in

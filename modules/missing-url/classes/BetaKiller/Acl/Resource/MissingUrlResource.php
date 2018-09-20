@@ -17,17 +17,16 @@ class MissingUrlResource extends AbstractEntityRelatedAclResource
         return [
             self::ACTION_CREATE => [
                 RoleInterface::GUEST_ROLE_NAME,
+                RoleInterface::LOGIN_ROLE_NAME,
             ],
 
             self::ACTION_READ => [
                 RoleInterface::MODERATOR_ROLE_NAME,
-                RoleInterface::ADMIN_ROLE_NAME,
                 RoleInterface::DEVELOPER_ROLE_NAME,
             ],
 
             self::ACTION_UPDATE => [
                 RoleInterface::MODERATOR_ROLE_NAME,
-                RoleInterface::ADMIN_ROLE_NAME,
                 RoleInterface::DEVELOPER_ROLE_NAME,
             ],
 
@@ -37,13 +36,11 @@ class MissingUrlResource extends AbstractEntityRelatedAclResource
 
             self::ACTION_SEARCH => [
                 RoleInterface::MODERATOR_ROLE_NAME,
-                RoleInterface::ADMIN_ROLE_NAME,
                 RoleInterface::DEVELOPER_ROLE_NAME,
             ],
 
             self::ACTION_LIST => [
                 RoleInterface::MODERATOR_ROLE_NAME,
-                RoleInterface::ADMIN_ROLE_NAME,
                 RoleInterface::DEVELOPER_ROLE_NAME,
             ],
         ];
