@@ -68,6 +68,25 @@ class RoleRepository extends AbstractOrmBasedMultipleParentsTreeRepository
      */
     public function getByName(string $name): RoleInterface
     {
+        $role = $this->findByName($name);
+
+        if (!$role) {
+            throw new RepositoryException('Can not find role by name :value', [
+                ':value' => $name,
+            ]);
+        }
+
+        return $role;
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return \BetaKiller\Model\RoleInterface|null
+     * @throws \BetaKiller\Repository\RepositoryException
+     */
+    public function findByName(string $name): ?RoleInterface
+    {
         $orm = $this->getOrmInstance();
 
         $this->filterName($orm, $name);
