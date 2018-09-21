@@ -7,7 +7,7 @@
  * @copyright  (c) 2007-2012 Kohana Team
  * @license    http://kohanaframework.org/license
  */
-class Model_Auth_User extends \ORM {
+abstract class Model_Auth_User extends \ORM {
 
 	/**
 	 * A user has many tokens and roles

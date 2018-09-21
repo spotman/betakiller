@@ -14,8 +14,6 @@ class Language extends \ORM implements LanguageInterface
     protected function configure(): void
     {
         $this->_table_name = static::TABLE_NAME;
-
-        parent::configure();
     }
 
     public function rules(): array

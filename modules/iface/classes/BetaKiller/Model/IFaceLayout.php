@@ -22,8 +22,6 @@ class IFaceLayout extends ORM implements LayoutInterface
                 'foreign_key' => 'layout_id',
             ],
         ]);
-
-        parent::configure();
     }
 
     /**

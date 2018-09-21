@@ -22,8 +22,6 @@ abstract class AbstractRevisionOrmModel extends \ORM implements RevisionModelInt
                 'foreign_key' => $this->getRelatedEntityForeignKey(),
             ],
         ]);
-
-        parent::configure();
     }
 
     /**

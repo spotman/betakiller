@@ -24,8 +24,6 @@ class PhpExceptionHistory extends \ORM implements PhpExceptionHistoryModelInterf
                 'foreign_key' => 'error_id',
             ],
         ]);
-
-        parent::configure();
     }
 
     /**
