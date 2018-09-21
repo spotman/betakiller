@@ -1,11 +1,9 @@
 <?php
 declare(strict_types=1);
 
-namespace BetaKiller\Api\Method;
+namespace BetaKiller\Api;
 
-use BetaKiller\Exception;
-
-class ApiMethodException extends Exception
+class ApiMethodException extends \Spotman\Api\ApiMethodException
 {
     /**
      * @return bool
