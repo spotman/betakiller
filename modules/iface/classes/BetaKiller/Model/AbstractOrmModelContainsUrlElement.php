@@ -19,8 +19,6 @@ abstract class AbstractOrmModelContainsUrlElement extends \ORM implements UrlEle
         $this->load_with([
             'element',
         ]);
-
-        parent::configure();
     }
 
     protected function getUrlElement(): UrlElementInterface

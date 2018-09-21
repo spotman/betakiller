@@ -11,7 +11,7 @@ use BetaKiller\Utils;
 use BetaKiller\Utils\Kohana\ORM\OrmInterface;
 use ORM\PaginateHelper;
 
-class ORM extends Utils\Kohana\ORM implements ExtendedOrmInterface
+abstract class ORM extends Utils\Kohana\ORM implements ExtendedOrmInterface
 {
     /**
      * @var OrmFactory
@@ -88,9 +88,9 @@ class ORM extends Utils\Kohana\ORM implements ExtendedOrmInterface
     /**
      * @param string $alias
      *
-     * @return AbstractEntityInterface
+     * @return AbstractEntityInterface|mixed
      */
-    protected function getRelatedEntity(string $alias): AbstractEntityInterface
+    protected function getRelatedEntity(string $alias)
     {
         $entity = $this->get($alias);
         if (!($entity instanceof AbstractEntityInterface)) {
@@ -121,10 +121,10 @@ class ORM extends Utils\Kohana\ORM implements ExtendedOrmInterface
         parent::_initialize();
     }
 
-    protected function configure(): void
-    {
-        // Empty by default
-    }
+    /**
+     * Custom configuration (set table name, configure relations, load_with(), etc)
+     */
+    abstract protected function configure(): void;
 
     /**
      * Returns key which will be used for storing model in UrlContainer registry.

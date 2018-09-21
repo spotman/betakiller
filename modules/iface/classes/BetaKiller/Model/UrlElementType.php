@@ -16,8 +16,6 @@ class UrlElementType extends \ORM
     protected function configure(): void
     {
         $this->_table_name = 'url_element_types';
-
-        parent::configure();
     }
 
     /**

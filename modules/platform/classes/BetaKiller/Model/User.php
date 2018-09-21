@@ -38,8 +38,6 @@ class User extends \Model_Auth_User implements UserInterface
         ]);
 
         $this->load_with(['language']);
-
-        parent::configure();
     }
 
     /**

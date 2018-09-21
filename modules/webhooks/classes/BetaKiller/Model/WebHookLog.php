@@ -17,8 +17,6 @@ class WebHookLog extends \ORM implements WebHookLogInterface
     protected function configure(): void
     {
         $this->_table_name = self::TABLE_NAME;
-
-        parent::configure();
     }
 
     /**

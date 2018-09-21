@@ -15,8 +15,6 @@ class WebHookService extends \ORM
     protected function configure(): void
     {
         $this->_table_name = 'webhook_services';
-
-        parent::configure();
     }
 
     /**

@@ -26,8 +26,6 @@ class RefLink extends \ORM
         ]);
 
         $this->load_with(['source', 'target']);
-
-        parent::configure();
     }
 
     public function setSource(?RefPage $source): RefLink

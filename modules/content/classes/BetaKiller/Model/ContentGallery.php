@@ -27,8 +27,6 @@ class ContentGallery extends ORM implements ContentGalleryInterface
                 'through' => 'content_gallery_images',
             ],
         ]);
-
-        parent::configure();
     }
 
     private function imagesAreValid(): bool

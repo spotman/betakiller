@@ -41,7 +41,15 @@ class Model_Auth_User_Token extends ORM {
 		}
 	}
 
-	/**
+    /**
+     * Custom configuration (set table name, configure relations, load_with(), etc)
+     */
+    protected function configure(): void
+    {
+        // Nothing to do
+    }
+
+    /**
 	 * Deletes all expired tokens.
 	 *
 	 * @return  ORM

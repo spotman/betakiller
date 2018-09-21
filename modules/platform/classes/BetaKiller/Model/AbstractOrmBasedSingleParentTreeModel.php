@@ -13,8 +13,6 @@ abstract class AbstractOrmBasedSingleParentTreeModel extends \ORM implements Sin
         ]);
 
         $this->load_with(['parent']);
-
-        parent::configure();
     }
 
     protected function getParentIdColumnName(): string
