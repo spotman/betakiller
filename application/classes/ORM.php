@@ -88,7 +88,7 @@ abstract class ORM extends Utils\Kohana\ORM implements ExtendedOrmInterface
     /**
      * @param string $alias
      *
-     * @return AbstractEntityInterface|mixed
+     * @return mixed
      */
     protected function getRelatedEntity(string $alias)
     {
