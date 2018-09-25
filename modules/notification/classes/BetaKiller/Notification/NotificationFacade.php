@@ -1,9 +1,12 @@
 <?php
 namespace BetaKiller\Notification;
 
+use BetaKiller\Config\NotificationConfigInterface;
 use BetaKiller\Helper\LoggerHelperTrait;
+use BetaKiller\Model\NotificationGroupInterface;
 use BetaKiller\Notification\Transport\EmailTransport;
 use BetaKiller\Notification\Transport\OnlineTransport;
+use BetaKiller\Repository\NotificationGroupRepository;
 use Psr\Log\LoggerInterface;
 
 class NotificationFacade
@@ -14,6 +17,16 @@ class NotificationFacade
      * @var \BetaKiller\Notification\NotificationMessageFactory
      */
     private $messageFactory;
+
+    /**
+     * @var \BetaKiller\Config\NotificationConfigInterface
+     */
+    private $config;
+
+    /**
+     * @var \BetaKiller\Repository\NotificationGroupRepository
+     */
+    private $groupRepo;
 
     /**
      * @var \BetaKiller\Notification\NotificationTransportInterface[]
@@ -34,25 +47,88 @@ class NotificationFacade
      * NotificationFacade constructor.
      *
      * @param \BetaKiller\Notification\NotificationMessageFactory $messageFactory
-     * @param \Psr\Log\LoggerInterface                            $logger
      * @param \BetaKiller\Notification\MessageRendererInterface   $renderer
+     * @param \BetaKiller\Config\NotificationConfigInterface      $config
+     * @param \BetaKiller\Repository\NotificationGroupRepository  $groupRepo
+     * @param \Psr\Log\LoggerInterface                            $logger
      */
     public function __construct(
         NotificationMessageFactory $messageFactory,
-        LoggerInterface $logger,
-        MessageRendererInterface $renderer
+        MessageRendererInterface $renderer,
+        NotificationConfigInterface $config,
+        NotificationGroupRepository $groupRepo,
+        LoggerInterface $logger
     ) {
-        $this->logger         = $logger;
-        $this->renderer       = $renderer;
         $this->messageFactory = $messageFactory;
-    }
-
-    public function create(string $name): NotificationMessageInterface
-    {
-        return $this->messageFactory->create($name);
+        $this->config         = $config;
+        $this->groupRepo      = $groupRepo;
+        $this->renderer       = $renderer;
+        $this->logger         = $logger;
     }
 
     /**
+     * Create message and add group users
+     *
+     * @param string $name
+     * @param array  $templateData
+     *
+     * @return \BetaKiller\Notification\NotificationMessageInterface
+     * @throws \BetaKiller\Exception
+     * @throws \BetaKiller\Factory\FactoryException
+     * @throws \BetaKiller\Notification\NotificationException
+     */
+    public function groupMessage(string $name, array $templateData): NotificationMessageInterface
+    {
+        $message = $this->createMessage($name, $templateData);
+
+        // Add targets from group
+        $this->addGroupTargets($message);
+
+        return $message;
+    }
+
+    /**
+     * Create direct message
+     *
+     * @param string                                             $name
+     * @param \BetaKiller\Notification\NotificationUserInterface $target
+     * @param array                                              $templateData
+     *
+     * @return \BetaKiller\Notification\NotificationMessageInterface
+     */
+    public function directMessage(
+        string $name,
+        NotificationUserInterface $target,
+        array $templateData
+    ): NotificationMessageInterface {
+        $message = $this->createMessage($name, $templateData);
+
+        $message->addTarget($target);
+
+        return $message;
+    }
+
+    /**
+     * Create raw message
+     *
+     * @param string $name
+     * @param array  $templateData
+     *
+     * @return \BetaKiller\Notification\NotificationMessageInterface
+     * @throws \BetaKiller\Notification\NotificationException
+     */
+    public function createMessage(string $name, array $templateData): NotificationMessageInterface
+    {
+        $message = $this->messageFactory->create($name);
+
+        $message->setTemplateData($templateData);
+
+        return $message;
+    }
+
+    /**
+     * Send message
+     *
      * @param \BetaKiller\Notification\NotificationMessageInterface $message
      *
      * @return int
@@ -60,14 +136,14 @@ class NotificationFacade
      */
     public function send(NotificationMessageInterface $message): int
     {
-        $total = 0;
-        $to    = $message->getTargets();
+        $to = $message->getTargets();
 
         if (!$to) {
             throw new NotificationException('Message target must be specified');
         }
 
         $transports = $this->getTransports();
+        $total      = 0;
 
         foreach ($to as $target) {
             $counter  = 0;
@@ -147,5 +223,50 @@ class NotificationFacade
             $online,
             $email,
         ];
+    }
+
+    private function addGroupTargets(NotificationMessageInterface $message): void
+    {
+        // Fetch group by message codename
+        $group = $this->getMessageGroup($message);
+
+        // Fetch targets (users) by group
+        $users = $this->groupRepo->findGroupUsers($group);
+
+        if (!$users) {
+            throw new NotificationException('No users found for group ":codename"', [
+                    ':codename' => $group->getCodename(),
+                ]
+            );
+        }
+
+        // Add targets to message
+        $message->addTargetUsers($users);
+    }
+
+    /**
+     * @param \BetaKiller\Notification\NotificationMessageInterface $message
+     *
+     * @return \BetaKiller\Model\NotificationGroupInterface
+     * @throws \BetaKiller\Factory\FactoryException
+     * @throws \BetaKiller\Notification\NotificationException
+     * @throws \BetaKiller\Repository\RepositoryException
+     */
+    private function getMessageGroup(NotificationMessageInterface $message): NotificationGroupInterface
+    {
+        $messageCodename = $message->getCodename();
+
+        // Fetch group by message codename
+        $groupCodename = $this->config->getMessageGroup($messageCodename);
+
+        if (!$groupCodename) {
+            throw new NotificationException(
+                'Group not found for message codename ":codename"', [
+                    ':codename' => $messageCodename,
+                ]
+            );
+        }
+
+        return $this->groupRepo->getByCodename($groupCodename);
     }
 }

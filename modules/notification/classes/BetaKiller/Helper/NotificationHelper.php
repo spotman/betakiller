@@ -5,7 +5,7 @@ use BetaKiller\Model\UserInterface;
 use BetaKiller\Notification\NotificationFacade;
 use BetaKiller\Notification\NotificationMessageInterface;
 use BetaKiller\Notification\NotificationUserEmail;
-use BetaKiller\Service\UserService;
+use BetaKiller\Notification\NotificationUserInterface;
 
 class NotificationHelper
 {
@@ -25,38 +25,94 @@ class NotificationHelper
     private $appEnv;
 
     /**
-     * @var \BetaKiller\Service\UserService
-     */
-    private $userService;
-
-    /**
      * NotificationHelper constructor.
      *
      * @param \BetaKiller\Notification\NotificationFacade $facade
-     * @param \BetaKiller\Model\UserInterface             $user
-     * @param \BetaKiller\Helper\AppEnvInterface          $env
-     * @param \BetaKiller\Service\UserService             $userService
+     * @param \BetaKiller\Helper\AppEnvInterface          $appEnv
+     * @param \BetaKiller\Model\UserInterface             $currentUser
      */
     public function __construct(
         NotificationFacade $facade,
-        UserInterface $user,
-        AppEnvInterface $env,
-        UserService $userService
+        UserInterface $currentUser,
+        AppEnvInterface $appEnv
     ) {
-        $this->facade      = $facade;
-        $this->user        = $user;
-        $this->appEnv      = $env;
-        $this->userService = $userService;
+        $this->facade = $facade;
+        $this->appEnv = $appEnv;
+        $this->user   = $currentUser;
     }
 
     /**
-     * @param string $name
+     * Send message to a linked group
      *
-     * @return \BetaKiller\Notification\NotificationMessageInterface
+     * @param string $name
+     * @param array  $templateData
+     *
+     * @throws \BetaKiller\Notification\NotificationException
      */
-    public function createMessage(string $name): NotificationMessageInterface
+    public function groupMessage(string $name, array $templateData): void
     {
-        return $this->facade->create($name);
+        $message = $this->facade->groupMessage($name, $templateData);
+
+        $this->send($message);
+    }
+
+    /**
+     * Send direct message to a single user
+     *
+     * @param string                                             $name
+     * @param \BetaKiller\Notification\NotificationUserInterface $target
+     * @param array                                              $templateData
+     *
+     * @throws \BetaKiller\Notification\NotificationException
+     */
+    public function directMessage(string $name, NotificationUserInterface $target, array $templateData): void
+    {
+        $message = $this->facade->directMessage($name, $target, $templateData);
+
+        $this->send($message);
+    }
+
+    /**
+     * Send message to current user
+     *
+     * @param string $name
+     * @param array  $templateData
+     *
+     * @throws \BetaKiller\Auth\AuthorizationRequiredException
+     * @throws \BetaKiller\Notification\NotificationException
+     */
+    public function currentUserMessage(string $name, array $templateData): void
+    {
+        $this->directMessage($name, $this->currentUserTarget(), $templateData);
+    }
+
+    /**
+     * Generate target from email
+     *
+     * @param string      $email
+     * @param string      $fullName
+     * @param null|string $langName
+     *
+     * @return \BetaKiller\Notification\NotificationUserInterface
+     */
+    public function emailTarget(
+        string $email,
+        string $fullName,
+        ?string $langName = null
+    ): NotificationUserInterface {
+        return new NotificationUserEmail($email, $fullName, $langName);
+    }
+
+    /**
+     * @return \BetaKiller\Notification\NotificationUserInterface
+     * @throws \BetaKiller\Auth\AuthorizationRequiredException
+     */
+    private function currentUserTarget(): NotificationUserInterface
+    {
+        // Force auth is current user is not logged in
+        $this->user->forceAuthorization();
+
+        return $this->user;
     }
 
     /**
@@ -65,91 +121,25 @@ class NotificationHelper
      * @return int
      * @throws \BetaKiller\Notification\NotificationException
      */
-    public function send(NotificationMessageInterface $message): int
+    private function send(NotificationMessageInterface $message): int
     {
+        $this->rewriteTargetsForDebug($message);
+
         return $this->facade->send($message);
     }
 
     /**
      * @param \BetaKiller\Notification\NotificationMessageInterface $message
-     *
-     * @return NotificationHelper
-     * @throws \BetaKiller\Repository\RepositoryException
-     * @deprecated Use message-to-group binding
-     */
-    public function toDevelopers(NotificationMessageInterface $message): self
-    {
-        $developers = $this->userService->getDevelopers();
-
-        $message->addTargetUsers($developers);
-
-        return $this;
-    }
-
-    /**
-     * @param \BetaKiller\Notification\NotificationMessageInterface $message
-     *
-     * @return NotificationHelper
-     * @throws \BetaKiller\Repository\RepositoryException
-     * @deprecated Use message-to-group binding
-     */
-    public function toModerators(NotificationMessageInterface $message): self
-    {
-        $moderators = $this->userService->getModerators();
-
-        $message->addTargetUsers($moderators);
-
-        return $this;
-    }
-
-    /**
-     * @param \BetaKiller\Notification\NotificationMessageInterface $message
-     *
-     * @return NotificationHelper
-     * @throws \BetaKiller\Auth\AuthorizationRequiredException
-     */
-    public function toCurrentUser(NotificationMessageInterface $message): self
-    {
-        $this->user->forceAuthorization();
-
-        $message->addTarget($this->user);
-
-        return $this;
-    }
-
-    /**
-     * @param \BetaKiller\Notification\NotificationMessageInterface $message
-     * @param string                                                $email
-     * @param string                                                $fullName
-     * @param null|string                                           $langName
-     *
-     * @return \BetaKiller\Helper\NotificationHelper
-     */
-    public function toEmail(
-        NotificationMessageInterface $message,
-        string $email,
-        string $fullName,
-        ?string $langName = null
-    ): self {
-        $message->addTarget(new NotificationUserEmail($email, $fullName, $langName));
-
-        return $this;
-    }
-
-    /**
-     * @param \BetaKiller\Notification\NotificationMessageInterface $msg
      * @param bool|null                                             $inStage
      *
-     * @return \BetaKiller\Helper\NotificationHelper
+     * @return void
      */
-    public function rewriteTargetsForDebug(NotificationMessageInterface $msg, ?bool $inStage = null): self
+    private function rewriteTargetsForDebug(NotificationMessageInterface $message, ?bool $inStage = null): void
     {
         if (!$this->appEnv->inProductionMode($inStage ?? true)) {
-            $msg->clearTargets();
-
-            $this->toCurrentUser($msg);
+            $message
+                ->clearTargets()
+                ->addTarget($this->currentUserTarget());
         }
-
-        return $this;
     }
 }

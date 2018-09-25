@@ -10,10 +10,13 @@ use BetaKiller\Service\UserService;
 
 class ContentCommentWorkflow extends StatusWorkflow
 {
+    public const NOTIFICATION_AUTHOR_APPROVE = 'user/comment/author-approve';
+    public const NOTIFICATION_PARENT_REPLY = 'user/comment/parent-author-reply';
+
     /**
      * @var \BetaKiller\Helper\NotificationHelper
      */
-    private $notificationHelper;
+    private $notification;
 
     /**
      * @var \BetaKiller\Helper\IFaceHelper
@@ -43,9 +46,9 @@ class ContentCommentWorkflow extends StatusWorkflow
     ) {
         parent::__construct($model, $user);
 
-        $this->notificationHelper = $notificationHelper;
-        $this->ifaceHelper        = $ifaceHelper;
-        $this->userService        = $service;
+        $this->notification = $notificationHelper;
+        $this->ifaceHelper  = $ifaceHelper;
+        $this->userService  = $service;
     }
 
     /**
@@ -96,7 +99,7 @@ class ContentCommentWorkflow extends StatusWorkflow
      * @throws \BetaKiller\Notification\NotificationException
      * @throws \BetaKiller\Repository\RepositoryException
      */
-    protected function notifyCommentAuthorAboutApprove(ContentCommentInterface $comment)
+    protected function notifyCommentAuthorAboutApprove(ContentCommentInterface $comment): void
     {
         $authorUser = $comment->getAuthorUser();
 
@@ -108,35 +111,22 @@ class ContentCommentWorkflow extends StatusWorkflow
         $email = $comment->getAuthorEmail();
         $name  = $comment->getAuthorName();
 
-        $data = [
+        $target = $authorUser ?: $this->notification->emailTarget($email, $name);
+
+        $this->notification->directMessage(self::NOTIFICATION_AUTHOR_APPROVE, $target, [
             'name'       => $name,
             'url'        => $comment->getPublicReadUrl($this->ifaceHelper),
             'created_at' => $comment->getCreatedAt()->format('H:i:s d.m.Y'),
             'label'      => $comment->getRelatedContentLabel(),
-        ];
-
-        $message = $this->notificationHelper
-            ->createMessage('user/comment/author-approve')
-            ->setTemplateData($data);
-
-        if ($authorUser) {
-            $message->addTarget($authorUser);
-        } else {
-            $this->notificationHelper->toEmail($message, $email, $name);
-        }
-
-        $this->notificationHelper
-            ->rewriteTargetsForDebug($message)
-            ->send($message);
+        ]);
     }
 
     /**
      * @param \BetaKiller\Model\ContentCommentInterface $reply
      *
      * @throws \BetaKiller\Notification\NotificationException
-     * @throws \BetaKiller\Repository\RepositoryException
      */
-    protected function notifyParentCommentAuthorAboutReply(ContentCommentInterface $reply)
+    protected function notifyParentCommentAuthorAboutReply(ContentCommentInterface $reply): void
     {
         $parent = $reply->getParent();
 
@@ -153,32 +143,19 @@ class ContentCommentWorkflow extends StatusWorkflow
             return;
         }
 
-        $data = [
+        $parentAuthor = $parent->getAuthorUser();
+
+        $target = $parentAuthor ?: $this->notification->emailTarget($parentEmail, $parent->getAuthorName());
+
+        $this->notification->directMessage(self::NOTIFICATION_PARENT_REPLY, $target, [
             'url'        => $reply->getPublicReadUrl($this->ifaceHelper),
             'created_at' => $reply->getCreatedAt()->format('H:i:s d.m.Y'),
             'label'      => $reply->getRelatedContentLabel(),
-        ];
-
-        $message = $this->notificationHelper
-            ->createMessage('user/comment/parent-author-reply')
-            ->setTemplateData($data);
-
-        $parentAuthor = $parent->getAuthorUser();
-
-        if ($parentAuthor) {
-            $message->addTarget($parentAuthor);
-        } else {
-            $this->notificationHelper->toEmail($message, $parentEmail, $parent->getAuthorName());
-        }
-
-        $this->notificationHelper
-            ->rewriteTargetsForDebug($message)
-            ->send($message);
+        ]);
     }
 
     /**
      * @throws \BetaKiller\Status\StatusException
-     * @throws \HTTP_Exception_501
      */
     public function reject(): void
     {
@@ -188,7 +165,6 @@ class ContentCommentWorkflow extends StatusWorkflow
 
     /**
      * @throws \BetaKiller\Status\StatusException
-     * @throws \HTTP_Exception_501
      */
     public function markAsSpam(): void
     {
@@ -198,7 +174,6 @@ class ContentCommentWorkflow extends StatusWorkflow
 
     /**
      * @throws \BetaKiller\Status\StatusException
-     * @throws \HTTP_Exception_501
      */
     public function moveToTrash(): void
     {
@@ -208,7 +183,6 @@ class ContentCommentWorkflow extends StatusWorkflow
 
     /**
      * @throws \BetaKiller\Status\StatusException
-     * @throws \HTTP_Exception_501
      */
     public function restoreFromTrash(): void
     {

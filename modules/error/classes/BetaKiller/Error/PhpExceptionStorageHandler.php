@@ -9,7 +9,7 @@ use BetaKiller\Model\UserInterface;
 use BetaKiller\Repository\PhpExceptionRepository;
 use Monolog\Handler\AbstractProcessingHandler;
 use Monolog\Logger;
-use Psr\Log\LoggerAwareTrait;
+use Psr\Log\LoggerInterface;
 
 /**
  * Class PhpExceptionStorageHandler
@@ -18,9 +18,9 @@ use Psr\Log\LoggerAwareTrait;
  */
 class PhpExceptionStorageHandler extends AbstractProcessingHandler
 {
-    use LoggerAwareTrait;
-
     public const MIN_LEVEL = Logger::ERROR;
+
+    public const NOTIFICATION_SUBSYSTEM_FAILURE = 'developer/error/subsystem-failure';
 
     /**
      * Notify about N-th duplicated exception only
@@ -50,12 +50,17 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
     /**
      * @var \BetaKiller\Helper\NotificationHelper
      */
-    private $notificationHelper;
+    private $notification;
 
     /**
      * @var \BetaKiller\Model\UserInterface;
      */
     private $user;
+
+    /**
+     * @var \Psr\Log\LoggerInterface
+     */
+    private $logger;
 
     /**
      * PhpExceptionStorageHandler constructor.
@@ -71,12 +76,17 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
         AppConfigInterface $appConfig,
         NotificationHelper $notificationHelper
     ) {
-        $this->repository         = $repository;
-        $this->user               = $user;
-        $this->appConfig          = $appConfig;
-        $this->notificationHelper = $notificationHelper;
+        $this->repository   = $repository;
+        $this->user         = $user;
+        $this->appConfig    = $appConfig;
+        $this->notification = $notificationHelper;
 
         parent::__construct(self::MIN_LEVEL);
+    }
+
+    public function setLogger(LoggerInterface $logger): void
+    {
+        $this->logger = $logger;
     }
 
     /**
@@ -272,13 +282,10 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
      * @param \Throwable $originalException
      *
      * @throws \BetaKiller\Notification\NotificationException
-     * @throws \BetaKiller\Repository\RepositoryException
      */
     private function sendNotification(\Throwable $subsystemException, \Throwable $originalException): void
     {
-        $message = $this->notificationHelper->createMessage('developer/error/subsystem-failure');
-
-        $message->setTemplateData([
+        $this->notification->groupMessage(self::NOTIFICATION_SUBSYSTEM_FAILURE, [
             'url'       => $this->appConfig->getBaseUrl(),
             'subsystem' => [
                 'message'    => $this->getExceptionText($subsystemException),
@@ -289,10 +296,6 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
                 'stacktrace' => $originalException->getTraceAsString(),
             ],
         ]);
-
-        $this->notificationHelper
-            ->toDevelopers($message)
-            ->send($message);
     }
 
     private function getExceptionText(\Throwable $e): string
