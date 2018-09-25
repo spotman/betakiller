@@ -25,6 +25,19 @@ class NotificationGroupRepository extends AbstractOrmBasedRepository
             ->findOne($orm);
     }
 
+    public function getByCodename(string $codename): NotificationGroupInterface
+    {
+        $group = $this->findByCodename($codename);
+
+        if (!$group) {
+            throw new RepositoryException('Group not found by group codename ":codename"', [
+                ':codename' => $codename,
+            ]);
+        }
+
+        return $group;
+    }
+
     /**
      * @return \BetaKiller\Model\NotificationGroupInterface[]
      * @throws \BetaKiller\Factory\FactoryException
