@@ -63,4 +63,6 @@ return [
 
     // Allow another modules to set routes
     'iface'                 => MODPATH.'iface',                 // Dynamic user interfaces
+
+    'wamp'                  => MODPATH.'wamp',
 ];
