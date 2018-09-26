@@ -12,12 +12,18 @@ class RunWampRouter extends AbstractTask
      */
     private $wampRouter;
 
+    /**
+     * @param \BetaKiller\Wamp\WampRouter $wampRouter
+     */
     public function __construct(WampRouter $wampRouter)
     {
         $this->wampRouter = $wampRouter;
         parent::__construct();
     }
 
+    /**
+     * @return array
+     */
     public function defineOptions(): array
     {
         return [];
