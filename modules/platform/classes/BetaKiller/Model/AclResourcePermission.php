@@ -16,8 +16,6 @@ class AclResourcePermission extends \ORM
     protected function configure(): void
     {
         $this->_table_name = 'acl_resource_permissions';
-
-        parent::configure();
     }
 
     /**

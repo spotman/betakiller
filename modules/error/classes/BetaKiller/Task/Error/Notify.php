@@ -14,6 +14,8 @@ use Psr\Log\LoggerInterface;
 
 class Notify extends AbstractTask
 {
+    public const NOTIFICATION_PHP_EXCEPTION = 'developer/error/php-exception';
+
     /**
      * @var \BetaKiller\Repository\PhpExceptionRepository
      */
@@ -22,7 +24,7 @@ class Notify extends AbstractTask
     /**
      * @var \BetaKiller\Helper\NotificationHelper
      */
-    private $notificationHelper;
+    private $notification;
 
     /**
      * @var \BetaKiller\Helper\IFaceHelper
@@ -48,10 +50,10 @@ class Notify extends AbstractTask
         IFaceHelper $ifaceHelper,
         LoggerInterface $logger
     ) {
-        $this->repository         = $repository;
-        $this->notificationHelper = $notificationHelper;
-        $this->ifaceHelper        = $ifaceHelper;
-        $this->logger             = $logger;
+        $this->repository   = $repository;
+        $this->notification = $notificationHelper;
+        $this->ifaceHelper  = $ifaceHelper;
+        $this->logger       = $logger;
 
         parent::__construct();
     }
@@ -93,21 +95,13 @@ class Notify extends AbstractTask
      */
     private function notifyAboutException(PhpExceptionModelInterface $model): void
     {
-        // Notify developers if needed
-        $data = [
+        // Notify developers
+        $this->notification->groupMessage(self::NOTIFICATION_PHP_EXCEPTION, [
             'message'  => $model->getMessage(),
             'urls'     => $model->getUrls(),
             'paths'    => $model->getPaths(),
             'adminUrl' => $this->ifaceHelper->getReadEntityUrl($model, ZoneInterface::ADMIN),
-        ];
-
-        $message = $this->notificationHelper
-            ->createMessage('developer/error/php-exception')
-            ->setTemplateData($data);
-
-        $this->notificationHelper
-            ->toDevelopers($message)
-            ->send($message);
+        ]);
 
         // Saving last notification timestamp
         $model->setLastNotifiedAt(new DateTimeImmutable);

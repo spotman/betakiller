@@ -13,8 +13,6 @@ class RefDomain extends \ORM
     protected function configure(): void
     {
         $this->_table_name = 'ref_domains';
-
-        parent::configure();
     }
 
     public function setName(string $name): RefDomain

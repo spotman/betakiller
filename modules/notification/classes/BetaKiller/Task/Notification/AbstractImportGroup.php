@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\Task\Notification;
 
-use BetaKiller\Config\NotificationConfig;
+use BetaKiller\Config\NotificationConfigInterface;
 use BetaKiller\Log\Logger;
 use BetaKiller\Model\NotificationGroup;
 use BetaKiller\Model\NotificationGroupInterface;
@@ -15,7 +15,7 @@ use BetaKiller\Task\AbstractTask;
 abstract class AbstractImportGroup extends AbstractTask
 {
     /**
-     * @var \BetaKiller\Config\NotificationConfig
+     * @var \BetaKiller\Config\NotificationConfigInterface
      */
     private $notificationConfig;
 
@@ -38,13 +38,13 @@ abstract class AbstractImportGroup extends AbstractTask
      * ChangePassword constructor.
      *
      * @param \BetaKiller\Repository\NotificationGroupRepository $notificationGroupRepository
-     * @param \BetaKiller\Config\NotificationConfig              $notificationConfig
+     * @param \BetaKiller\Config\NotificationConfigInterface              $notificationConfig
      * @param \BetaKiller\Repository\RoleRepository              $roleRepository
      * @param \BetaKiller\Log\Logger                             $logger
      */
     public function __construct(
         NotificationGroupRepository $notificationGroupRepository,
-        NotificationConfig $notificationConfig,
+        NotificationConfigInterface $notificationConfig,
         RoleRepository $roleRepository,
         Logger $logger
     ) {

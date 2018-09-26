@@ -13,10 +13,12 @@ class ContentPostWorkflow extends StatusWorkflow
     public const TRANSITION_PAUSE    = 'pause';
     public const TRANSITION_FIX      = 'fix';
 
+    public const NOTIFICATION_POST_COMPLETE = 'moderator/post/complete';
+
     /**
      * @var \BetaKiller\Helper\NotificationHelper
      */
-    private $notificationHelper;
+    private $notification;
 
     /**
      * @var \BetaKiller\Helper\IFaceHelper
@@ -39,8 +41,8 @@ class ContentPostWorkflow extends StatusWorkflow
     ) {
         parent::__construct($model, $user);
 
-        $this->notificationHelper = $notificationHelper;
-        $this->ifaceHelper        = $ifaceHelper;
+        $this->notification = $notificationHelper;
+        $this->ifaceHelper  = $ifaceHelper;
     }
 
     /**
@@ -59,7 +61,6 @@ class ContentPostWorkflow extends StatusWorkflow
     }
 
     /**
-     * @throws \BetaKiller\Repository\RepositoryException
      * @throws \BetaKiller\Notification\NotificationException
      * @throws \BetaKiller\IFace\Exception\IFaceException
      * @throws \BetaKiller\Status\StatusWorkflowException
@@ -80,23 +81,15 @@ class ContentPostWorkflow extends StatusWorkflow
     /**
      * @throws \BetaKiller\IFace\Exception\IFaceException
      * @throws \BetaKiller\Notification\NotificationException
-     * @throws \BetaKiller\Repository\RepositoryException
      */
     private function notifyModeratorAboutCompletePost(): void
     {
-        $message = $this->notificationHelper->createMessage('moderator/post/complete');
-
         $model = $this->model();
 
-        $data = [
+        $this->notification->groupMessage(self::NOTIFICATION_POST_COMPLETE, [
             'url'   => $this->ifaceHelper->getReadEntityUrl($model),
             'label' => $model->getLabel(),
-        ];
-
-        $message->setTemplateData($data);
-        $this->notificationHelper
-            ->toModerators($message)
-            ->send($message);
+        ]);
     }
 
     /**

@@ -21,8 +21,6 @@ abstract class AbstractOrmBasedAssetsModel extends ORM implements AssetsModelInt
                 'foreign_key' => 'uploaded_by',
             ],
         ]);
-
-        parent::configure();
     }
 
     /**

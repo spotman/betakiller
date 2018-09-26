@@ -1,8 +1,6 @@
 <?php
 declare(strict_types=1);
 
-use BetaKiller\Model\NotificationGroupInterface;
-
 return [
     /**
      * Notification groups and relation to ACL roles

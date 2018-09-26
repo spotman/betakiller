@@ -16,8 +16,6 @@ class Entity extends ORM implements EntityModelInterface
     protected function configure(): void
     {
         $this->_table_name = 'entities';
-
-        parent::configure();
     }
 
     /**

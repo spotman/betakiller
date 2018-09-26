@@ -13,8 +13,6 @@ class RefHit extends \ORM
     protected function configure(): void
     {
         $this->_table_name = 'ref_hits';
-
-        parent::configure();
     }
 
     public function setSourceUrl(?string $url): RefHit

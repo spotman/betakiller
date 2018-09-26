@@ -43,8 +43,6 @@ class NotificationGroup extends \ORM implements NotificationGroupInterface
                 'far_key'     => self::ROLES_TABLE_FIELD_ROLE_ID,
             ],
         ]);
-
-        parent::configure();
     }
 
     public function rules(): array

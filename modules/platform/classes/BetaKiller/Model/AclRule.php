@@ -28,8 +28,6 @@ class AclRule extends \ORM
         ]);
 
         $this->load_with(['resource', 'role', 'permission']);
-
-        parent::configure();
     }
 
     /**
