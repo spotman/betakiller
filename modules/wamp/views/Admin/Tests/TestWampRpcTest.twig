@@ -1,0 +1,86 @@
+{% extends '@layouts/onlyContent' %}
+
+{% block page_content %}
+  <script src="https://cdn.bootcss.com/autobahn/0.11.0/autobahn.min.js"></script>
+  {{ js('Admin/Tests/TestWampRpcTest.js') }}
+
+
+  <div class="row">
+    <div class="col s12 m6">
+
+
+      <section id="testWampRpcTest-loader" class="preloader-wrapper small active">
+        <div class="spinner-layer spinner-green-only">
+          <div class="circle-clipper left">
+            <div class="circle"></div>
+          </div>
+          <div class="gap-patch">
+            <div class="circle"></div>
+          </div>
+          <div class="circle-clipper right">
+            <div class="circle"></div>
+          </div>
+        </div>
+      </section>
+
+
+      <section class="testWampRpcTest row" style="display:none"
+               data-template
+               data-connectionType="{{ connectionType }}"
+               data-testQty="{{ testQty }}"
+               data-countInPack="{{ countInPack }}"
+               data-delayPack="{{ delayPack }}"
+      >
+        <div class="card">
+          <div class="card-content">
+            <p class="card-title">
+              Test
+            </p>
+            <div style="font-size:12px">
+              <p>
+                Connection: <span data-name="connectionType"></span>
+              </p>
+              <p>
+                Status: <span data-name="status"></span>
+              </p>
+              <p>
+                Test qty: <span data-name="testQty">0</span>
+              </p>
+              <p>
+                Requests: <span data-name="requestsQty">0</span>
+              </p>
+              <div class="progress">
+                <div class="determinate orange" data-name="requestsProgress"></div>
+              </div>
+              <p>
+                Responses: <span data-name="responsesQty">0</span>
+              </p>
+              <div class="progress">
+                <div class="determinate green" data-name="responsesProgress"></div>
+              </div>
+              <p>
+                Errors: <span data-name="errorsQty">0</span>
+              </p>
+              <div class="progress">
+                <div class="determinate red" data-name="errorsProgress"></div>
+              </div>
+              <p>
+                Average exec: <span data-name="averageExecutionTime">0</span>s
+              </p>
+              <p>
+                Connection: <span data-name="connectionTime">0</span>s
+              </p>
+            </div>
+            <div class="card-action" data-links>
+              <a href="" data-action="stop">Stop</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+
+    </div>
+  </div>
+
+
+{% endblock %}
