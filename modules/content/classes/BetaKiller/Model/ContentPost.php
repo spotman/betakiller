@@ -59,8 +59,6 @@ class ContentPost extends AbstractOrmBasedModelWithRevisions implements ContentP
         $this->initializeRevisionsRelations();
 
         $this->initializeRelatedModelRelation();
-
-        parent::configure();
     }
 
     /**

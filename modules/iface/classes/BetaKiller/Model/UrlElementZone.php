@@ -10,8 +10,6 @@ class UrlElementZone extends \ORM implements ZoneInterface
     protected function configure(): void
     {
         $this->_table_name = 'url_element_zones';
-
-        parent::configure();
     }
 
     /**

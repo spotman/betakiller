@@ -25,8 +25,6 @@ class MissingUrlRedirectTarget extends \ORM implements MissingUrlRedirectTargetM
                 'foreign_key' => 'iface_id',
             ],
         ]);
-
-        parent::configure();
     }
 
     public function getUrl(): string

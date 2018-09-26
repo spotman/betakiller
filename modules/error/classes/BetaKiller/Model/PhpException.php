@@ -50,8 +50,6 @@ class PhpException extends \ORM implements PhpExceptionModelInterface
         ]);
 
         $this->createTablesIfNotExists();
-
-        parent::configure();
     }
 
     protected function createTablesIfNotExists()

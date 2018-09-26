@@ -23,8 +23,6 @@ class MissingUrlReferrer extends \ORM implements MissingUrlReferrerModelInterfac
                 'foreign_key' => 'redirect_to',
             ],
         ]);
-
-        parent::configure();
     }
 
     public function getHttpReferer(): string

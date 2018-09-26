@@ -20,8 +20,6 @@ class AbstractStatusAclModelOrm extends \ORM implements StatusAclModelInterface
         ]);
 
         $this->load_with(['role']);
-
-        parent::configure();
     }
 
     /**

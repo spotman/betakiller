@@ -30,8 +30,6 @@ abstract class StatusModelOrm extends AbstractGraphNodeModelOrm implements Statu
                 ],
             ]);
         }
-
-        parent::configure();
     }
 
     /**

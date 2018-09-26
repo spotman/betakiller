@@ -25,8 +25,6 @@ abstract class AbstractGraphTransitionModelOrm extends ORM implements GraphTrans
         ]);
 
         $this->load_with([$source_node_key, $target_node_key]);
-
-        parent::configure();
     }
 
     /**

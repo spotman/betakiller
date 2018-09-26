@@ -32,8 +32,6 @@ class MissingUrl extends \ORM implements MissingUrlModelInterface
                 'through'     => 'missing_urls_missing_url_referrers',
             ],
         ]);
-
-        parent::configure();
     }
 
     public function getMissedUrl(): string

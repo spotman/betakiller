@@ -31,8 +31,6 @@ class UrlElementAclRule extends ORM
             'resource',
             'permission'
         ]);
-
-        parent::configure();
     }
 
     public function getCombinedRule()

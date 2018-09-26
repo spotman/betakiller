@@ -22,8 +22,6 @@ class RefPage extends \ORM
         ]);
 
         $this->load_with(['domain']);
-
-        parent::configure();
     }
 
     public function setDomain(RefDomain $domain): RefPage

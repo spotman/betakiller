@@ -25,8 +25,6 @@ class ContentYoutubeRecord extends ORM implements ContentElementInterface
                 'foreign_key' => 'uploaded_by',
             ],
         ]);
-
-        parent::configure();
     }
 
     /**

@@ -15,8 +15,6 @@ class EntityAction extends ORM
     protected function configure(): void
     {
         $this->_table_name = 'entity_actions';
-
-        parent::configure();
     }
 
     /**

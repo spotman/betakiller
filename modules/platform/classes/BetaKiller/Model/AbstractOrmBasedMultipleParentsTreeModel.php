@@ -15,8 +15,6 @@ abstract class AbstractOrmBasedMultipleParentsTreeModel extends \ORM implements 
                 'through'     => $this->getTreeModelThroughTableName(),
             ],
         ]);
-
-        parent::configure();
     }
 
     protected function getChildIdColumnName(): string
