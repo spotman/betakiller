@@ -1,0 +1,69 @@
+{% extends layout %}
+
+{% block page_content %}
+  {{ js('Admin/Tests/TestWampRpcManager.js') }}
+
+
+  <section id="testWampRpcManager" data-testUrl="{{ testUrl }}">
+
+
+    <section class="control">
+      <form action="" method="post" target="">
+        <div class="card">
+          <div class="card-content">
+            <p class="card-title">
+              Request Options
+            </p>
+            <div class="input-field">
+              Processes count:
+              <input type="text" name="processesQty" id="testWampRpc-processesQty" value="1" title="">
+              {#<label for="testWampRpc-processesQty">Test qty</label>#}
+            </div>
+            <div class="input-field">
+              Delay between processes:
+              <input type="text" name="delayProcesses" id="testWampRpc-delayProcesses" value="50" title="">
+              {#<label for="testWampRpc-delayProcesses">Test qty</label>#}
+            </div>
+            <div class="input-field">
+              Requests count:
+              <input type="text" name="testQty" id="testWampRpc-testQty" value="1" title="">
+              {#<label for="testWampRpc-testQty">Test qty</label>#}
+            </div>
+            <div class="input-field">
+              Count in requests pack:
+              <input type="text" name="countInPack" id="testWampRpc-countInPack" value="1" title="">
+              {#<label for="testWampRpc-countInPack">Test qty</label>#}
+            </div>
+            <div class="input-field">
+              Delay between requests packs:
+              <input type="text" name="delayPack" id="testWampRpc-delayPack" value="0" title="">
+              {#<label for="testWampRpc-delayPack">Test qty</label>#}
+            </div>
+            <div>
+              <button data-action="run" data-type="wamp">Run Test Wamp</button>
+              <button data-action="run" data-type="rpc">Run Test Rpc</button>
+              <button data-action="killResults">Kill all results</button>
+            </div>
+          </div>
+        </div>
+      </form>
+    </section>
+
+
+    <section class="results row">
+      <iframe data-template
+              class="col s6 m3"
+              style="display:none;margin-left:-10px;"
+              width="100%"
+              height="340"
+              scrolling="no"
+              frameBorder="0">
+
+      </iframe>
+    </section>
+
+
+  </section>
+
+
+{% endblock %}
