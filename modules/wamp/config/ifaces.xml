@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<root>
+
+    <!--Tests -->
+    <iface uri="tests" zone="developer" name="Admin_Tests_TestsDummy" menu="admin" label="Tests">
+
+        <!--Test Wamp Rpc -->
+        <iface uri="wamp-rpc" name="Admin_Tests_TestWampRpcManager" menu="admin" label="WampRpcManager">
+            <iface uri="test" name="Admin_Tests_TestWampRpcTest" label="WampRpcTest"/>
+        </iface>
+
+    </iface>
+
+</root>
