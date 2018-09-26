@@ -2,14 +2,11 @@
 <root>
 
     <!--Tests -->
-    <iface uri="tests" zone="admin" name="Admin_Tests_TestsDummy" menu="admin" label="iface.app.admin.tests.dummy.label">
+    <iface uri="tests" zone="developer" name="Admin_Tests_TestsDummy" menu="admin" label="Tests">
 
         <!--Test Wamp Rpc -->
-        <iface uri="wamp-rpc" name="Admin_Tests_TestWampRpcManager" menu="admin"
-               label="iface.app.admin.tests.wamp.rpc.manager.label">
-            <iface uri="test" name="Admin_Tests_TestWampRpcTest"
-                   label="iface.app.admin.tests.wamp.rpc.test.label">
-            </iface>
+        <iface uri="wamp-rpc" name="Admin_Tests_TestWampRpcManager" menu="admin" label="WampRpcManager">
+            <iface uri="test" name="Admin_Tests_TestWampRpcTest" label="WampRpcTest"/>
         </iface>
 
     </iface>

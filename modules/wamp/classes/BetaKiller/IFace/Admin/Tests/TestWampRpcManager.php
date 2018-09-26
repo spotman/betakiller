@@ -5,7 +5,6 @@ namespace BetaKiller\IFace\Admin\Tests;
 
 use BetaKiller\Helper\IFaceHelper;
 use BetaKiller\IFace\AbstractIFace;
-use BetaKiller\Url\UrlElementTreeInterface;
 
 class TestWampRpcManager extends AbstractIFace
 {
@@ -15,20 +14,12 @@ class TestWampRpcManager extends AbstractIFace
     private $ifaceHelper;
 
     /**
-     * @var \BetaKiller\Url\UrlElementTreeInterface
-     */
-    private $tree;
-
-    /**
-     * @param \BetaKiller\Url\UrlElementTreeInterface $tree
-     * @param \BetaKiller\Helper\IFaceHelper          $ifaceHelper
+     * @param \BetaKiller\Helper\IFaceHelper $ifaceHelper
      */
     public function __construct(
-        UrlElementTreeInterface $tree,
         IFaceHelper $ifaceHelper
     ) {
         $this->ifaceHelper = $ifaceHelper;
-        $this->tree        = $tree;
     }
 
     /**
@@ -36,7 +27,7 @@ class TestWampRpcManager extends AbstractIFace
      */
     public function getData(): array
     {
-        $testElement = $this->tree->getByCodename(TestWampRpcTest::codename());
+        $testElement = $this->ifaceHelper->getUrlElementByCodename(TestWampRpcTest::codename());
         $testUrl     = $this->ifaceHelper->makeUrl($testElement, null, false);
 
         return [
