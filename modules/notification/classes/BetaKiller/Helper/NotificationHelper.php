@@ -53,6 +53,7 @@ class NotificationHelper
     {
         $message = $this->facade->groupMessage($name, $templateData);
 
+        // Send only if there are targets (maybe all users disabled this group)
         $this->send($message);
     }
 
@@ -69,6 +70,7 @@ class NotificationHelper
     {
         $message = $this->facade->directMessage($name, $target, $templateData);
 
+        // Send only if target user allowed this message group
         $this->send($message);
     }
 
@@ -125,7 +127,10 @@ class NotificationHelper
     {
         $this->rewriteTargetsForDebug($message);
 
-        return $this->facade->send($message);
+        // Send only if targets were specified or message group was allowed
+        return $message->getTargets()
+            ? $this->facade->send($message)
+            : 0;
     }
 
     /**

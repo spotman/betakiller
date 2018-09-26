@@ -4,6 +4,7 @@ namespace BetaKiller\Notification;
 use BetaKiller\Config\NotificationConfigInterface;
 use BetaKiller\Helper\LoggerHelperTrait;
 use BetaKiller\Model\NotificationGroupInterface;
+use BetaKiller\Model\UserInterface;
 use BetaKiller\Notification\Transport\EmailTransport;
 use BetaKiller\Notification\Transport\OnlineTransport;
 use BetaKiller\Repository\NotificationGroupRepository;
@@ -103,7 +104,9 @@ class NotificationFacade
     ): NotificationMessageInterface {
         $message = $this->createMessage($name, $templateData);
 
-        $message->addTarget($target);
+        if ($this->isMessageGroupEnabledForUser($message, $target)) {
+            $message->addTarget($target);
+        }
 
         return $message;
     }
@@ -223,6 +226,21 @@ class NotificationFacade
             $online,
             $email,
         ];
+    }
+
+    private function isMessageGroupEnabledForUser(
+        NotificationMessageInterface $message,
+        NotificationUserInterface $user
+    ): bool {
+        if (!$user instanceof UserInterface) {
+            // Custom target types can not be checked here and always allowed
+            return true;
+        }
+
+        // Fetch group by message codename
+        $group = $this->getMessageGroup($message);
+
+        return $group->isEnabledForUser($user);
     }
 
     private function addGroupTargets(NotificationMessageInterface $message): void
