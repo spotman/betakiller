@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<root>
+
+    <!--Tests -->
+    <iface uri="tests" zone="admin" name="Admin_Tests_TestsDummy" menu="admin" label="iface.app.admin.tests.dummy.label">
+
+        <!--Test Wamp Rpc -->
+        <iface uri="wamp-rpc" name="Admin_Tests_TestWampRpcManager" menu="admin"
+               label="iface.app.admin.tests.wamp.rpc.manager.label">
+            <iface uri="test" name="Admin_Tests_TestWampRpcTest"
+                   label="iface.app.admin.tests.wamp.rpc.test.label">
+            </iface>
+        </iface>
+
+    </iface>
+
+</root>
