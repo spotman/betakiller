@@ -63,6 +63,7 @@ class Controller_UrlElement extends Controller
             $this->request->referrer()
         );
 
+        // TODO Move this to DI config and inject int in this controller by interface
         $request = \Zend\Diactoros\ServerRequestFactory::fromGlobals();
 
         $urlProcessor = $this->processorFactory->createFromUrlElement($urlElement);
