@@ -50,6 +50,26 @@ abstract class AbstractOrmBasedRepository extends AbstractRepository
     }
 
     /**
+     * @param string $id
+     *
+     * @return ExtendedOrmInterface|mixed
+     * @throws \BetaKiller\Repository\RepositoryException
+     */
+    public function getByID(string $id)
+    {
+        $model = $this->findById($id);
+
+        if (!$model) {
+            throw new RepositoryException('Can not find item in [:repo] repo by id = :id', [
+                ':repo' => static::getCodename(),
+                ':id'   => $id,
+            ]);
+        }
+
+        return $model;
+    }
+
+    /**
      * @return \BetaKiller\Model\AbstractEntityInterface[]
      *
      * @throws \BetaKiller\Factory\FactoryException

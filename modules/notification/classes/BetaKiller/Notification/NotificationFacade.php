@@ -2,8 +2,10 @@
 namespace BetaKiller\Notification;
 
 use BetaKiller\Config\NotificationConfigInterface;
+use BetaKiller\Exception\DomainException;
 use BetaKiller\Helper\LoggerHelperTrait;
 use BetaKiller\Model\NotificationGroupInterface;
+use BetaKiller\Model\UserInterface;
 use BetaKiller\Notification\Transport\EmailTransport;
 use BetaKiller\Notification\Transport\OnlineTransport;
 use BetaKiller\Repository\NotificationGroupRepository;
@@ -103,7 +105,9 @@ class NotificationFacade
     ): NotificationMessageInterface {
         $message = $this->createMessage($name, $templateData);
 
-        $message->addTarget($target);
+        if ($this->isMessageEnabledForUser($message, $target)) {
+            $message->addTarget($target);
+        }
 
         return $message;
     }
@@ -223,6 +227,32 @@ class NotificationFacade
             $online,
             $email,
         ];
+    }
+
+    private function isMessageEnabledForUser(
+        NotificationMessageInterface $message,
+        NotificationUserInterface $user
+    ): bool {
+        if (!$user instanceof UserInterface) {
+            // Custom target types can not be checked here and always allowed
+            return true;
+        }
+
+        // Fetch group by message codename
+        $group = $this->getMessageGroup($message);
+
+        if (!$group->isEnabledForUser($user)) {
+            return false;
+        }
+
+        if (!$group->isAllowedToUser($user)) {
+            throw new DomainException('User :user is not allowed for notification group :group', [
+                ':user' => $user->getUsername(),
+                ':group' => $group->getCodename(),
+            ]);
+        }
+
+        return true;
     }
 
     private function addGroupTargets(NotificationMessageInterface $message): void
