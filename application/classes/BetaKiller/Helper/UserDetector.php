@@ -7,6 +7,7 @@ use BetaKiller\Model\UserInterface;
 use BetaKiller\Repository\UserRepository;
 use BetaKiller\Service\UserService;
 use BetaKiller\Task\AbstractTask;
+use Zend\Expressive\Session\SessionInterface;
 
 class UserDetector
 {
@@ -56,6 +57,11 @@ class UserDetector
         $this->repository  = $repo;
         $this->i18n        = $i18n;
         $this->userService = $userService;
+    }
+
+    public function fromSession(SessionInterface $session): UserInterface
+    {
+        return $session->get('auth_user') ?: $this->userService->createGuest();
     }
 
     /**
