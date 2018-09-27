@@ -335,6 +335,7 @@ require([
     }
 
 
+    // todo exception connection error
     function WampConnection() {
       this.callbackDone = false
       this.connect = function (callback) {
@@ -342,9 +343,9 @@ require([
         this.connection = new autobahn.Connection({
           url: 'wss://spa.dev.worknector.com/wamp',
           realm: 'realm1',
-          //authmethods: ['wampcra'],
-          //authid: window.navigator.userAgent,
-          //onchallenge: this.onChallenge
+          authmethods: ['wampcra'],
+          authid: window.navigator.userAgent,
+          onchallenge: this.onChallenge
         })
 
         this.connection.onopen = function (_this, callback) {
@@ -370,9 +371,9 @@ require([
       this.onChallenge = function (session, method, extra) {
         console.log(method, extra);
         if (method === 'wampcra') {
-          var keyToUse = key
+          var keyToUse = window.navigator.userAgent
           if (typeof extra.salt !== 'undefined') {
-            keyToUse = autobahn.auth_cra.derive_key(key, extra.salt)
+            keyToUse = autobahn.auth_cra.derive_key(window.navigator.userAgent, extra.salt)
           }
           console.log("authenticating via '" + method + "' and challenge '" + extra.challenge + "'");
           return autobahn.auth_cra.sign(keyToUse, extra.challenge)
