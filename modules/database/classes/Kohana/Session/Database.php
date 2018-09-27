@@ -73,7 +73,7 @@ class Kohana_Session_Database extends Session {
 
 		parent::__construct($config, $id);
 
-		if (mt_rand(0, $this->_gc) === $this->_gc)
+		if (\random_int(0, $this->_gc) === $this->_gc)
 		{
 			// Run garbage collection
 			// This will average out to run once every X requests
