@@ -2,6 +2,7 @@
 namespace BetaKiller\Notification;
 
 use BetaKiller\Config\NotificationConfigInterface;
+use BetaKiller\Exception\DomainException;
 use BetaKiller\Helper\LoggerHelperTrait;
 use BetaKiller\Model\NotificationGroupInterface;
 use BetaKiller\Model\UserInterface;
@@ -104,7 +105,7 @@ class NotificationFacade
     ): NotificationMessageInterface {
         $message = $this->createMessage($name, $templateData);
 
-        if ($this->isMessageGroupEnabledForUser($message, $target)) {
+        if ($this->isMessageEnabledForUser($message, $target)) {
             $message->addTarget($target);
         }
 
@@ -228,7 +229,7 @@ class NotificationFacade
         ];
     }
 
-    private function isMessageGroupEnabledForUser(
+    private function isMessageEnabledForUser(
         NotificationMessageInterface $message,
         NotificationUserInterface $user
     ): bool {
@@ -240,7 +241,18 @@ class NotificationFacade
         // Fetch group by message codename
         $group = $this->getMessageGroup($message);
 
-        return $group->isEnabledForUser($user);
+        if (!$group->isEnabledForUser($user)) {
+            return false;
+        }
+
+        if (!$group->isAllowedToUser($user)) {
+            throw new DomainException('User :user is not allowed for notification group :group', [
+                ':user' => $user->getUsername(),
+                ':group' => $group->getCodename(),
+            ]);
+        }
+
+        return true;
     }
 
     private function addGroupTargets(NotificationMessageInterface $message): void

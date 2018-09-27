@@ -140,6 +140,24 @@ class NotificationGroup extends \ORM implements NotificationGroupInterface
     }
 
     /**
+     * @param \BetaKiller\Model\UserInterface $user
+     *
+     * @return bool
+     */
+    public function isAllowedToUser(UserInterface $user): bool
+    {
+        // User has one of group roles => allowed
+        foreach ($this->getRoles() as $role) {
+            if ($user->hasRole($role)) {
+                return true;
+            }
+        }
+
+        // No roles intersection => not allowed
+        return false;
+    }
+
+    /**
      * @param \BetaKiller\Model\UserInterface $userModel
      *
      * @return \BetaKiller\Model\NotificationGroupInterface
@@ -202,6 +220,9 @@ class NotificationGroup extends \ORM implements NotificationGroupInterface
      */
     public function getRoles(): array
     {
-        return $this->get('roles')->get_all();
+        /** @var \BetaKiller\Model\Role $relation */
+        $relation = $this->get('roles');
+
+        return $relation->get_all();
     }
 }

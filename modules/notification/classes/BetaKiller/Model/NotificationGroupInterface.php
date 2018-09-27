@@ -45,6 +45,15 @@ interface NotificationGroupInterface
     public function setDescription(string $value): NotificationGroupInterface;
 
     /**
+     * Returns true if current group is allowed for provided user
+     *
+     * @param \BetaKiller\Model\UserInterface $userModel
+     *
+     * @return bool
+     */
+    public function isAllowedToUser(UserInterface $userModel): bool;
+
+    /**
      * @param \BetaKiller\Model\UserInterface $userModel
      *
      * @return bool
