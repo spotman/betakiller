@@ -13,20 +13,20 @@ class MissingUrlElementException extends IFaceException
     private $parentElement;
 
     /**
-     * @var string|null
+     * @var bool
      */
-    private $redirectTo;
+    private $redirect;
 
     /**
      * MissingUrlElementException constructor.
      *
      * @param \BetaKiller\Url\UrlElementInterface|null $parentElement
-     * @param string                                   $redirectTo
+     * @param bool|null                                $redirectToParent
      */
-    public function __construct(?UrlElementInterface $parentElement, ?string $redirectTo = null)
+    public function __construct(?UrlElementInterface $parentElement, ?bool $redirectToParent = null)
     {
         $this->parentElement = $parentElement;
-        $this->redirectTo    = $redirectTo;
+        $this->redirect      = (bool)$redirectToParent;
 
         parent::__construct();
     }
@@ -40,10 +40,10 @@ class MissingUrlElementException extends IFaceException
     }
 
     /**
-     * @return string
+     * @return bool
      */
-    public function getRedirectTo(): ?string
+    public function getRedirectToParent(): bool
     {
-        return $this->redirectTo;
+        return $this->redirect;
     }
 }
