@@ -82,7 +82,7 @@ class UrlElementStackTest extends \BetaKiller\Test\AbstractTestCase
         return $stack;
     }
 
-    public function testGetCurrent()
+    public function testCurrent()
     {
         $stack = $this->createEmptyStack();
 
@@ -95,8 +95,9 @@ class UrlElementStackTest extends \BetaKiller\Test\AbstractTestCase
         /** @var IFaceModelInterface $secondModel */
         $secondModel = $secondProp->reveal();
 
-        $this->assertEquals(null, $stack->getCurrent());
+        $this->assertEquals(false, $stack->hasCurrent());
         $stack->push($firstModel);
+        $this->assertEquals(true, $stack->hasCurrent());
         $this->assertEquals($firstModel, $stack->getCurrent());
 
         $stack->push($secondModel);
