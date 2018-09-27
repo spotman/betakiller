@@ -7,7 +7,7 @@ class WampConfig extends AbstractConfig implements WampConfigInterface
 {
     public const
         CONFIG_GROUP_NAME = 'wamp',
-        PATH_NAMESPACE = ['namespace'],
+        PATH_REALM_NAME = ['realmName'],
         PATH_CONNECTION_HOST = ['connection', 'host'],
         PATH_CONNECTION_PORT = ['connection', 'port'];
 
@@ -22,9 +22,9 @@ class WampConfig extends AbstractConfig implements WampConfigInterface
     /**
      * @return string
      */
-    public function getNamespace(): string
+    public function getRealmName(): string
     {
-        return (string)$this->get(self::PATH_NAMESPACE);
+        return (string)$this->get(self::PATH_REALM_NAME);
     }
 
     /**

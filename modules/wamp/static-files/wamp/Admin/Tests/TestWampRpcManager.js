@@ -65,7 +65,7 @@ require([
           break;
 
         default:
-          throw console.error('Unknown action: ' + action)
+          throw 'Unknown action: ' + action
       }
     }
     this.sleep = function (ms) {
@@ -75,12 +75,12 @@ require([
       if (!this.hasOwnProperty('$results')) {
         this.$results = this.nodes.get('section.results')
       }
-      if (!this.$results.length) throw console.error('Unable find results')
+      if (!this.$results.length) throw 'Unable find results'
 
       if (!this.hasOwnProperty('$resultTemplate')) {
         this.$resultTemplate = this.$results.find('[data-template]:first')
       }
-      if (!this.$resultTemplate.length) throw console.error('Unable find result frame template')
+      if (!this.$resultTemplate.length) throw 'Unable find result frame template'
 
       let $frame = $(this.$resultTemplate[0].outerHTML)
       $frame
@@ -110,7 +110,7 @@ require([
             this.$root = $(this.rootSelector + ':first')
           }
         }
-        if (!this.$root.length) throw console.error('Unable find root by selector: ' + rootSelector)
+        if (!this.$root.length) throw 'Unable find root by selector: ' + rootSelector
         return this.$root
       }
       this.get = function (selector, $parent) {
@@ -123,7 +123,7 @@ require([
         let $node
         if (!$parent) $parent = this.getRoot()
         $node = $parent.find(selector + ':first')
-        if (!$node.length) throw console.error('Not found node by selector: ' + selector)
+        if (!$node.length) throw 'Not found node by selector: ' + selector
         return this.$nodes[selector] = $node
       }
     }
