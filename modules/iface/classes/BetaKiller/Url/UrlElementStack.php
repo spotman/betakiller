@@ -111,9 +111,9 @@ class UrlElementStack implements \IteratorAggregate
     }
 
     /**
-     * @return \BetaKiller\Url\UrlElementInterface|null
+     * @return \BetaKiller\Url\UrlElementInterface
      */
-    public function getCurrent(): ?UrlElementInterface
+    public function getCurrent(): UrlElementInterface
     {
         return $this->current;
     }
