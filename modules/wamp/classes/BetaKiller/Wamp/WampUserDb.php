@@ -3,6 +3,9 @@ declare(strict_types=1);
 
 namespace BetaKiller\Wamp;
 
+use BetaKiller\Helper\UserDetector;
+use BetaKiller\Log\LoggerInterface;
+use BetaKiller\Session\SessionStorageInterface;
 use \Thruway\Authentication\WampCraUserDbInterface;
 
 /**
@@ -11,16 +14,34 @@ use \Thruway\Authentication\WampCraUserDbInterface;
 class WampUserDb implements WampCraUserDbInterface
 {
     /**
-     * @var \Session_Database
+     * @var \BetaKiller\Session\SessionStorageInterface
      */
-    private $sessionDatabase;
+    private $sessionStorage;
 
     /**
-     * @param \Session_Database $sessionDatabase
+     * @var \BetaKiller\Helper\UserDetector
      */
-    public function __construct(SessionStorageInterface $sessionDatabase)
+    private $userDetector;
+
+    /**
+     * @var \BetaKiller\Log\LoggerInterface
+     */
+    private $logger;
+
+    /**
+     * @param \BetaKiller\Session\SessionStorageInterface $sessionStorage
+     * @param \BetaKiller\Helper\UserDetector             $userDetector
+     * @param \BetaKiller\Log\LoggerInterface             $logger
+     */
+    public function __construct(
+        SessionStorageInterface $sessionStorage,
+        UserDetector $userDetector,
+        LoggerInterface $logger
+    )
     {
-        $this->sessionDatabase = $sessionDatabase;
+        $this->sessionStorage = $sessionStorage;
+        $this->userDetector   = $userDetector;
+        $this->logger = $logger;
     }
 
     /**
@@ -37,9 +58,18 @@ class WampUserDb implements WampCraUserDbInterface
     {
         $salt = '';
 
+        $session = $this->sessionStorage->getByID($authid);
+        $user    = $this->userDetector->fromSession($session);
+        $this->logger->debug($authid);
+        $this->logger->debug($session->get('user_agent'));
+        $this->logger->debug($user);
+        if (!$user) {
+            return false;
+        }
+
         return [
-            'authid' => $this->sessionDatabase->id(),
-            'key'    => $this->sessionDatabase->get('user_agent'),
+            'authid' => $authid,
+            'key'    => $session->get('user_agent'),
             'salt'   => $salt,
         ];
     }
