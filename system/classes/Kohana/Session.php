@@ -199,6 +199,11 @@ abstract class Kohana_Session {
 		return $this->_name;
 	}
 
+    public function has($key)
+    {
+        return array_key_exists($key, $this->_data);
+	}
+
 	/**
 	 * Get a variable from the session array.
 	 *
