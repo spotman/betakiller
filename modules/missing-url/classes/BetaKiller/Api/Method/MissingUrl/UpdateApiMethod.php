@@ -14,9 +14,9 @@ class UpdateApiMethod extends AbstractEntityUpdateApiApiMethod
 
     /**
      * @Inject
-     * @var \BetaKiller\Url\UrlDispatcher
+     * @var \BetaKiller\Helper\UrlHelper
      */
-    private $urlDispatcher;
+    private $urlHelper;
 
     /**
      * Override this method
@@ -34,7 +34,7 @@ class UpdateApiMethod extends AbstractEntityUpdateApiApiMethod
         $url = $data->targetUrl ?? null;
 
         if ($url) {
-            if (!$this->urlDispatcher->isValidUrl($url)) {
+            if (!$this->urlHelper->isValidUrl($url)) {
                 throw new ApiMethodException('Invalid url provided');
             }
 
