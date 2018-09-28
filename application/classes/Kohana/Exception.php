@@ -22,8 +22,18 @@ class Kohana_Exception extends Kohana_Kohana_Exception
      *
      * @param   \Throwable $e
      */
-    public static function handler(Throwable $e)
+    public static function handler(Throwable $e): void
     {
+        if (!\interface_exists(\BetaKiller\View\ViewInterface::class)) {
+            echo '<pre>';
+            /** @noinspection ForgottenDebugOutputInspection */
+            print_r($e);
+            /** @noinspection ForgottenDebugOutputInspection */
+            debug_print_backtrace();
+            echo '</pre>';
+            die();
+        }
+
         $exitCode = 1;
 
         $response = self::_handler($e);
