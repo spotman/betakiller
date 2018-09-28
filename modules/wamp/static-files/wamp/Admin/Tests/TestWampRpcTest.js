@@ -347,38 +347,19 @@ require([
     function WampConnection() {
       this.callbackDone = false
       this.connect = function (callback) {
-
-        console.log('authid '+getCookie('sid'))
+        let authid = getCookie('session').replace(/.+?~(.+)/, '$1')
         this.connection = new autobahn.Connection({
           url: 'wss://spa.dev.worknector.com/wamp',
           realm: 'realm1',
           authmethods: ['wampcra'],
-          authid: getCookie('sid'),
-          onchallenge: function (session, method, extra) {
-            console.log(method, extra);
-            if (method === 'wampcra') {
-              console.log('onChallenge '+method+' '+extra)
-              var keyToUse = window.navigator.userAgent
-              if (typeof extra.salt !== 'undefined') {
-                keyToUse = autobahn.auth_cra.derive_key(window.navigator.userAgent, extra.salt)
-              }
-              console.log("authenticating via '" + method + "' and challenge '" + extra.challenge + "'");
-              return autobahn.auth_cra.sign(keyToUse, extra.challenge)
-            } else {
-              throw "don't know how to authenticate using '" + method + "'"
-            }
-          }
+          authid: authid,
+          onchallenge: this.onChallenge
         })
 
         this.connection.onopen = function (_this, callback) {
           return function (session, details) {
             console.log('Wamp connecting')
             _this.session = session
-
-            console.log("connected session with ID " + session.id);
-            console.log("authenticated using method '" + details.authmethod + "' and provider '" + details.authprovider + "'");
-            console.log("authenticated with authid '" + details.authid + "' and authrole '" + details.authrole + "'");
-
             if (!_this.callbackDone) {
               _this.callbackDone = true
               if (typeof callback === 'function') callback(_this, session)
@@ -391,14 +372,11 @@ require([
         return this
       }
       this.onChallenge = function (session, method, extra) {
-        console.log(method, extra);
         if (method === 'wampcra') {
-          console.log('onChallenge '+method+' '+extra)
           var keyToUse = window.navigator.userAgent
           if (typeof extra.salt !== 'undefined') {
             keyToUse = autobahn.auth_cra.derive_key(window.navigator.userAgent, extra.salt)
           }
-          console.log("authenticating via '" + method + "' and challenge '" + extra.challenge + "'");
           return autobahn.auth_cra.sign(keyToUse, extra.challenge)
         } else {
           throw "don't know how to authenticate using '" + method + "'"

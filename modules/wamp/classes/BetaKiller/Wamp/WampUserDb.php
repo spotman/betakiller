@@ -60,11 +60,8 @@ class WampUserDb implements WampCraUserDbInterface
 
         $session = $this->sessionStorage->getByID($authid);
         $user    = $this->userDetector->fromSession($session);
-        $this->logger->debug($authid);
-        $this->logger->debug($session->get('user_agent'));
-        $this->logger->debug($user);
-        if (!$user) {
-            return false;
+        if (!$user->getID()) {
+            return [];
         }
 
         return [
