@@ -335,24 +335,16 @@ require([
     }
 
 
-    function getCookie(name) {
-      var matches = document.cookie.match(new RegExp(
-        "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
-      ));
-      return matches ? decodeURIComponent(matches[1]) : undefined;
-    }
-
-
     // todo exception connection error
     function WampConnection() {
+      this.sessionCookieName = 'session'
       this.callbackDone = false
       this.connect = function (callback) {
-        let authid = getCookie('session').replace(/.+?~(.+)/, '$1')
         this.connection = new autobahn.Connection({
           url: 'wss://spa.dev.worknector.com/wamp',
           realm: 'realm1',
           authmethods: ['wampcra'],
-          authid: authid,
+          authid: this.getCookie(this.sessionCookieName).replace(/.+?~(.+)/, '$1'),
           onchallenge: this.onChallenge
         })
 
@@ -375,7 +367,7 @@ require([
         if (method === 'wampcra') {
           var keyToUse = window.navigator.userAgent
           if (typeof extra.salt !== 'undefined') {
-            keyToUse = autobahn.auth_cra.derive_key(window.navigator.userAgent, extra.salt)
+            keyToUse = autobahn.auth_cra.derive_key(keyToUse, extra.salt)
           }
           return autobahn.auth_cra.sign(keyToUse, extra.challenge)
         } else {
@@ -389,6 +381,12 @@ require([
       this.getSession = function () {
         if (!this.hasOwnProperty('session')) throw 'Not found WAMP session'
         return this.session
+      }
+      this.getCookie = function (name) {
+        var matches = document.cookie.match(new RegExp(
+          "(?:^|; )" + name.replace(/([.$?*|{}()\[\]\\\/+^])/g, '\\$1') + "=([^;]*)"
+        ));
+        return matches ? decodeURIComponent(matches[1]) : undefined;
       }
     }
 
