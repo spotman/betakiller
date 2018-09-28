@@ -53,12 +53,12 @@ class WampClient extends \Thruway\Peer\Client
 
             return (bool)$validationApiResource->call('UserEmail', ['email' => $args[0]]);
         };
-        $this
-            ->getSession()
-            ->register('api.validation.userEmail', $procedure);
 //        $this
 //            ->getSession()
-//            ->register('api.*.*', $procedure);
+//            ->register('api.validation.userEmail', $procedure);
+        $this
+            ->getSession()
+            ->register('api.*.*', $procedure);
 
         return $this;
     }

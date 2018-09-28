@@ -56,7 +56,7 @@ class WampUserDb implements WampCraUserDbInterface
      */
     public function get($authid)
     {
-        $salt = '';
+        $salt = null;
 
         $session = $this->sessionStorage->getByID($authid);
         $user    = $this->userDetector->fromSession($session);
