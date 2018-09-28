@@ -5,7 +5,6 @@ namespace BetaKiller\Auth;
 
 use BetaKiller\Exception;
 use BetaKiller\Factory\GuestUserFactory;
-use BetaKiller\Helper\LoggerHelperTrait;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Model\UserToken;
 use BetaKiller\Repository\RoleRepository;
@@ -20,6 +19,7 @@ class Auth
 {
     public const SESSION_COOKIE           = 'sid';
     public const SESSION_COOKIE_DELIMITER = '~';
+    public const SESSION_USER_AGENT       = 'user_agent';
     public const AUTO_LOGIN_COOKIE        = 'alt';
 
     /**
@@ -171,6 +171,10 @@ class Auth
         $this->setSessionUser($session, $user);
         $this->setSessionCookie($session);
 
+        // Store user-agent
+        $userAgent = $this->getUserAgent($request);
+        $this->setSessionUserAgent($session, $userAgent);
+
         return $user;
     }
 
@@ -226,7 +230,7 @@ class Auth
         $this->checkUserIsActive($user);
 
         // Complete the login with the found data
-        $this->completeLogin($user, $session);
+        $this->completeLogin($user, $session, $request);
 
         $user->afterAutoLogin();
 
@@ -240,9 +244,9 @@ class Auth
     /**
      * Attempt to log in a user by using an ORM object and plain-text password.
      *
-     * @param   string                             $username Username to log in
-     * @param   string                             $password Password to check against
-     * @param \BetaKiller\Session\SessionInterface $session
+     * @param   string                                 $username Username to log in
+     * @param   string                                 $password Password to check against
+     * @param \Psr\Http\Message\ServerRequestInterface $request
      *
      * @return  UserInterface
      * @throws \BetaKiller\Auth\AccessDeniedException
@@ -251,7 +255,7 @@ class Auth
      * @throws \BetaKiller\Auth\UserDoesNotExistsException
      * @throws \BetaKiller\Repository\RepositoryException
      */
-    public function login(string $username, string $password, SessionInterface $session): UserInterface
+    public function login(string $username, string $password, ServerRequestInterface $request): UserInterface
     {
         $user = $this->userRepo->searchBy($username);
 
@@ -274,101 +278,12 @@ class Auth
             throw new IncorrectPasswordException;
         }
 
+        $session = $this->getSessionFromRequest($request);
+
         // Finish the login
-        $this->completeLogin($user, $session);
+        $this->completeLogin($user, $session, $request);
 
         return $user;
-    }
-
-    private function checkUserIsActive(UserInterface $user): void
-    {
-        if (!$user->isActive()) {
-            throw new InactiveException();
-        }
-    }
-
-    private function completeLogin(UserInterface $user, SessionInterface $session): void
-    {
-//        // Create new session
-//        $session = new \BetaKiller\Session\KohanaSessionAdapter(new Session_Database());
-
-        $user->completeLogin($session);
-
-        // Save session to place session ID to database
-        $this->persistSession($session);
-
-        // set session ID in user
-        $user->setSessionID($session->getId());
-        $this->userRepo->save($user);
-
-        // Store user in session
-        $this->setSessionUser($session, $user);
-
-        $this->setSessionCookie($session);
-    }
-
-    private function setSessionUser(SessionInterface $session, UserInterface $user): void
-    {
-        $session->set($this->config->getSessionKey(), $user);
-
-        // Save session
-        $this->persistSession($session);
-    }
-
-    /**
-     * Compare password with original (hashed).
-     *
-     * @param \BetaKiller\Model\UserInterface $user
-     * @param   string                        $password
-     *
-     * @return  boolean
-     */
-    private function checkPassword(UserInterface $user, string $password): bool
-    {
-        if (empty($password)) {
-            return false;
-        }
-
-        return $this->makePasswordHash($password) === $user->getPassword();
-    }
-
-    /**
-     * Enable auto-login
-     *
-     * @param \BetaKiller\Model\UserInterface          $user
-     * @param \Psr\Http\Message\ServerRequestInterface $request
-     */
-    public function enableAutoLogin(UserInterface $user, ServerRequestInterface $request): void
-    {
-        $userAgent = $this->getUserAgent($request);
-
-        // Create a new auto-login token
-        $token = $this->generateToken($user, $userAgent);
-
-        // Set the auto-login cookie
-        $this->setAutoLoginCookie($token);
-    }
-
-    private function setSessionCookie(SessionInterface $session): void
-    {
-        // TODO Replace with PST-7 response manipulation
-        Cookie::set(
-            self::SESSION_COOKIE,
-            $session->getId(),
-            time() + $this->config->getLifetime()
-        );
-    }
-
-    private function setAutoLoginCookie(UserToken $token): void
-    {
-        // TODO Replace with PST-7 response manipulation
-        Cookie::set(self::AUTO_LOGIN_COOKIE, $token->getToken(), $token->getExpires() - time());
-    }
-
-    private function clearAutoLoginCookie(): void
-    {
-        // TODO Replace with PST-7 response manipulation
-        Cookie::delete(self::AUTO_LOGIN_COOKIE);
     }
 
     public function logout(UserInterface $user, bool $dropTokens = null): bool
@@ -407,7 +322,106 @@ class Auth
         return !$this->isUserLoggedIn($user);
     }
 
-    public function deleteUserTokens(UserInterface $user): void
+    /**
+     * Enable auto-login
+     *
+     * @param \BetaKiller\Model\UserInterface          $user
+     * @param \Psr\Http\Message\ServerRequestInterface $request
+     */
+    public function enableAutoLogin(UserInterface $user, ServerRequestInterface $request): void
+    {
+        $userAgent = $this->getUserAgent($request);
+
+        // Create a new auto-login token
+        $token = $this->generateToken($user, $userAgent);
+
+        // Set the auto-login cookie
+        $this->setAutoLoginCookie($token);
+    }
+
+    private function checkUserIsActive(UserInterface $user): void
+    {
+        if (!$user->isActive()) {
+            throw new InactiveException();
+        }
+    }
+
+    private function completeLogin(
+        UserInterface $user,
+        SessionInterface $session,
+        ServerRequestInterface $request
+    ): void {
+//        // Create new session
+//        $session = new \BetaKiller\Session\KohanaSessionAdapter(new Session_Database());
+
+        $user->completeLogin($session);
+
+        // Save session to place session ID to database
+        $this->persistSession($session);
+
+        // set session ID in user
+        $user->setSessionID($session->getId());
+        $this->userRepo->save($user);
+
+        // Store user in session
+        $this->setSessionUser($session, $user);
+
+        // Store user-agent
+        $userAgent = $this->getUserAgent($request);
+        $this->setSessionUserAgent($session, $userAgent);
+
+        $this->setSessionCookie($session);
+    }
+
+    private function setSessionUserAgent(SessionInterface $session, string $userAgent): void
+    {
+        $session->set(self::SESSION_USER_AGENT, $userAgent);
+    }
+
+    private function setSessionUser(SessionInterface $session, UserInterface $user): void
+    {
+        $session->set($this->config->getSessionKey(), $user);
+
+        // Save session
+        $this->persistSession($session);
+    }
+
+    /**
+     * Compare password with original (hashed).
+     *
+     * @param \BetaKiller\Model\UserInterface $user
+     * @param   string                        $password
+     *
+     * @return  boolean
+     */
+    private function checkPassword(UserInterface $user, string $password): bool
+    {
+        if (empty($password)) {
+            return false;
+        }
+
+        return $this->makePasswordHash($password) === $user->getPassword();
+    }
+
+    private function setSessionCookie(SessionInterface $session): void
+    {
+        // TODO Replace with PST-7 response manipulation
+        Cookie::set(self::SESSION_COOKIE, $session->getId(), time() + $this->config->getLifetime());
+    }
+
+    private function setAutoLoginCookie(UserToken $token): void
+    {
+        // TODO Replace with PST-7 response manipulation
+        Cookie::set(self::AUTO_LOGIN_COOKIE, $token->getToken(), $token->getExpires() - time());
+    }
+
+    private function clearAutoLoginCookie(): void
+    {
+        // TODO Replace with PST-7 response manipulation
+        Cookie::delete(self::AUTO_LOGIN_COOKIE);
+    }
+
+    private function deleteUserTokens(UserInterface $user): void
     {
         $this->userTokenRepo->deleteUserTokens($user);
     }
