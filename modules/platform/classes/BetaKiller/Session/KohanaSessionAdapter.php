@@ -4,10 +4,8 @@ declare(strict_types=1);
 namespace BetaKiller\Session;
 
 use BetaKiller\Exception\NotImplementedHttpException;
-use Zend\Expressive\Session\SessionIdentifierAwareInterface;
-use Zend\Expressive\Session\SessionInterface;
 
-class KohanaSessionAdapter implements SessionInterface, SessionIdentifierAwareInterface
+class KohanaSessionAdapter implements SessionInterface
 {
     /**
      * @var \Kohana_Session
@@ -127,7 +125,7 @@ class KohanaSessionAdapter implements SessionInterface, SessionIdentifierAwareIn
      * shipped LazySession, where instead it would return itself, after
      * internally re-setting the proxied session.
      */
-    public function regenerate(): SessionInterface
+    public function regenerate(): \Zend\Expressive\Session\SessionInterface
     {
         throw new NotImplementedHttpException;
     }

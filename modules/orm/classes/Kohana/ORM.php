@@ -827,7 +827,7 @@ class Kohana_ORM extends Model implements Serializable {
 	 *
 	 * @return array
 	 */
-	public function as_array()
+	public function as_array(): array
 	{
 		$object = array();
 

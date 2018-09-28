@@ -5,16 +5,21 @@ use BetaKiller\Acl\AclResourcesCollector;
 use BetaKiller\Acl\AclRolesCollector;
 use BetaKiller\Acl\AclRulesCollector;
 use BetaKiller\Api\AccessResolver\CustomApiMethodAccessResolverDetector;
+use BetaKiller\Auth\Auth;
 use BetaKiller\Config\AppConfig;
 use BetaKiller\Config\AppConfigInterface;
 use BetaKiller\Config\ConfigProviderInterface;
 use BetaKiller\Exception\ExceptionHandlerInterface;
+use BetaKiller\Helper\AppEnvInterface;
+use BetaKiller\Helper\I18nHelper;
 use BetaKiller\Notification\DefaultMessageRendered;
 use BetaKiller\Notification\MessageRendererInterface;
+use BetaKiller\Service\UserService;
 use BetaKiller\View\LayoutViewInterface;
 use BetaKiller\View\LayoutViewTwig;
 use BetaKiller\View\TwigViewFactory;
 use BetaKiller\View\ViewFactoryInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Roave\DoctrineSimpleCache\SimpleCacheAdapter;
 use Spotman\Acl\ResourceFactory\AclResourceFactoryInterface;
 use Spotman\Acl\ResourcesCollector\AclResourcesCollectorInterface;
@@ -53,19 +58,33 @@ return [
         // Common cache instance for all
         \Doctrine\Common\Cache\CacheProvider::class => DI\get(\BetaKiller\Cache\DoctrineCacheProvider::class),
 
-        Auth::class => DI\factory(function () {
-            return Auth::instance();
+        ServerRequestInterface::class => DI\factory(function() {
+            // TODO Remove this after moving to PSR-7
+            return \Zend\Diactoros\ServerRequestFactory::fromGlobals();
         }),
 
-        // Helpers
-        'User'      => DI\factory(function (\BetaKiller\Helper\UserDetector $detector) {
-            return $detector->detect();
+        'User' => DI\factory(function (
+            Auth $auth,
+            ServerRequestInterface $request,
+            AppEnvInterface $appEnv,
+            UserService $userService,
+            I18nHelper $i18n
+        ) {
+            $user = $auth->getUserFromRequest($request);
+
+            $i18n->initFromUser($user);
+
+            if ($userService->isDeveloper($user)) {
+                $appEnv->enableDebug();
+            }
+
+            return $user;
         }),
 
         AppConfigInterface::class => DI\autowire(AppConfig::class),
 
         \BetaKiller\Model\UserInterface::class          => DI\get('User'),
-        \BetaKiller\Model\RoleInterface::class          => DI\get(\BetaKiller\Model\Role::class),
+        //\BetaKiller\Model\RoleInterface::class          => DI\get(\BetaKiller\Model\Role::class),
 
         // Acl roles, resources, permissions and resource factory
         AclRolesCollectorInterface::class               => DI\autowire(AclRolesCollector::class),

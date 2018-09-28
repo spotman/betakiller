@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace BetaKiller\Task;
 
 use BetaKiller\Factory\NamespaceBasedFactoryBuilder;
+use BetaKiller\Helper\UserDetector;
 
 class TaskFactory
 {
@@ -13,17 +14,25 @@ class TaskFactory
     private $factory;
 
     /**
+     * @var \BetaKiller\Helper\UserDetector
+     */
+    private $userDetector;
+
+    /**
      * TaskFactory constructor.
      *
      * @param \BetaKiller\Factory\NamespaceBasedFactoryBuilder $factoryBuilder
+     * @param \BetaKiller\Helper\UserDetector                  $userDetector
      *
      * @throws \BetaKiller\Factory\FactoryException
      */
-    public function __construct(NamespaceBasedFactoryBuilder $factoryBuilder)
+    public function __construct(NamespaceBasedFactoryBuilder $factoryBuilder, UserDetector $userDetector)
     {
         $this->factory = $factoryBuilder
             ->createFactory()
             ->setExpectedInterface(AbstractTask::class);
+
+        $this->userDetector = $userDetector;
     }
 
     /**
@@ -34,6 +43,8 @@ class TaskFactory
      */
     public function create(string $className): AbstractTask
     {
-        return $this->factory->create($className);
+        return $this->factory->create($className, [
+            'user' => $this->userDetector->detectCliUser(),
+        ]);
     }
 }

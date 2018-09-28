@@ -130,8 +130,8 @@ class CommentsWidget extends AbstractPublicWidget
         $name      = HTML::chars($this->post('name'));
         $email     = $this->post('email');
         $message   = HTML::chars($this->post('message'));
-        $ipAddress = HTML::chars($this->getRequest()->client_ip());
-        $agent     = HTML::chars($this->getRequest()->get_user_agent());
+        $ipAddress = HTML::chars($this->getRequest()->getClientIp());
+        $agent     = HTML::chars($this->getRequest()->getUserAgent());
         $parentID  = (int)$this->post('parent');
 
         /** @var \BetaKiller\Model\ContentComment|null $parentModel */

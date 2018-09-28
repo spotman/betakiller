@@ -21,21 +21,21 @@ return [
     'twig'                  => MODPATH.'twig',                  // Twig template engine
 
     // Database layer with Kohana dependencies
-    'database'              => MODPATH.'database',              // Database access
-    'mysqli'                => MODPATH.'mysqli',                // Driver for MySQLi
-    'sqlite'                => MODPATH.'sqlite',                // SQLite database driver (used by logs)
-    'orm'                   => MODPATH.'orm',                   // Object Relationship Mapping
-    'paginate'              => MODPATH.'paginate',              // Paginate abstraction for ORM, ORM-REST and others
+    'database'             => MODPATH.'database',              // Database access
+    'mysqli'               => MODPATH.'mysqli',                // Driver for MySQLi
+    'sqlite'               => MODPATH.'sqlite',                // SQLite database driver (used by logs)
+    'orm'                  => MODPATH.'orm',                   // Object Relationship Mapping
+    'paginate'             => MODPATH.'paginate',              // Paginate abstraction for ORM, ORM-REST and others
 
     // Kohana dependencies WITH DB ACCESS
-    'auth'                  => MODPATH.'auth',                  // Basic authentication
-    'backup'                => MODPATH.'backup',                // Complex backup (files + database)
-    'migrations'            => MODPATH.'migrations',            // Migrations toolkit
-    'unittest'              => MODPATH.'unittest',              // Module for unit testing via phpunit
+    'auth'                 => MODPATH.'auth',                  // Basic authentication
+    'backup'               => MODPATH.'backup',                // Complex backup (files + database)
+    'migrations'           => MODPATH.'migrations',            // Migrations toolkit
+    'unittest'             => MODPATH.'unittest',              // Module for unit testing via phpunit
 
     // These modules HAVE LEGACY ROUTES defined and DOES NOT DEPEND on platform
-    'jsonrpc'               => MODPATH.'jsonrpc',               // JSON-RPC server
-    'robots-txt'            => MODPATH.'robots-txt',            // Serving /robots.txt
+    'jsonrpc'              => MODPATH.'jsonrpc',               // JSON-RPC server
+    'robots-txt'           => MODPATH.'robots-txt',            // Serving /robots.txt
     'sitemap'               => MODPATH.'sitemap',               // Generating sitemap.xml
 
     // Place it before other modules for correct initialization of per-site classes and configs

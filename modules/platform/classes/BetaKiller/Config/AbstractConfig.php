@@ -2,6 +2,8 @@
 namespace BetaKiller\Config;
 
 
+use BetaKiller\Exception;
+
 abstract class AbstractConfig
 {
     /**
@@ -21,14 +23,29 @@ abstract class AbstractConfig
 
     /**
      * @param array      $path
-     * @param mixed|null $default
+     * @param bool|null $optional
      *
      * @return mixed|null
      */
-    protected function get(array $path, $default = null)
+    protected function get(array $path, bool $optional = null)
     {
         $configGroupName = $this->getConfigRootGroup();
 
-        return $this->config->load(array_merge([$configGroupName], $path)) ?: $default;
+        \array_unshift($path, $configGroupName);
+
+        $value = $this->config->load($path);
+
+        // empty() treats false as an empty value
+        if (\is_bool($value)) {
+            return $value;
+        }
+
+        if (empty($value) && !$optional) {
+            throw new Exception('Missing :key config value', [
+                ':key' => \implode($path, '.'),
+            ]);
+        }
+
+        return $value;
     }
 }

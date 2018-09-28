@@ -1,7 +1,7 @@
 <?php
 namespace BetaKiller\IFace\Auth;
 
-use Auth;
+use BetaKiller\Auth\Auth;
 use BetaKiller\Helper\RequestHelper;
 use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Helper\UrlContainerHelper;
@@ -10,7 +10,7 @@ use BetaKiller\Model\UserInterface;
 class ReLogin extends Login
 {
     /**
-     * @var \Auth
+     * @var \BetaKiller\Auth\Auth
      */
     private $auth;
 
@@ -33,7 +33,7 @@ class ReLogin extends Login
         // If user is logged in
         if (!$this->user->isGuest()) {
             // Sign out the user
-            $this->auth->logout(true);
+            $this->auth->logout($this->user, true);
         }
     }
 }
