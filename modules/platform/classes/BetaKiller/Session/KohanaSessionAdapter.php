@@ -102,7 +102,9 @@ class KohanaSessionAdapter implements SessionInterface
      */
     public function clear(): void
     {
-        throw new NotImplementedHttpException;
+        foreach ($this->session->as_array() as $key => $value) {
+            $this->session->delete($key);
+        }
     }
 
     /**
