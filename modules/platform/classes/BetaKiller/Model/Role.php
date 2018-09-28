@@ -16,6 +16,19 @@ class Role extends AbstractOrmBasedMultipleParentsTreeModel implements RoleInter
         return self::INHERITANCE_TABLE_NAME;
     }
 
+    protected function configure(): void
+    {
+        $this->has_many([
+            'users' => [
+                'model'   => 'User',
+                'through' => 'roles_users',
+            ],
+        ]);
+
+        parent::configure();
+    }
+
+
     public function rules(): array
     {
         return [

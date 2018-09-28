@@ -4,11 +4,11 @@ declare(strict_types=1);
 namespace BetaKiller\Model;
 
 use BetaKiller\Auth\AuthorizationRequiredException;
-use BetaKiller\Auth\InactiveException;
 use BetaKiller\Exception\DomainException;
+use BetaKiller\Session\SessionInterface;
 use DateTimeImmutable;
 
-class User extends \Model_Auth_User implements UserInterface
+class User extends \ORM implements UserInterface
 {
     public const TABLE_NAME                  = 'users';
     public const TABLE_FIELD_CREATED_AT      = 'created_at';
@@ -37,6 +37,18 @@ class User extends \Model_Auth_User implements UserInterface
             ],
         ]);
 
+        $this->has_many([
+            'user_tokens' => [
+                'model' => 'User_Token',
+            ],
+
+            'roles' => [
+                'model'       => 'Role',
+                'through'     => 'roles_users',
+                'foreign_key' => 'user_id',
+            ],
+        ]);
+
         $this->load_with(['language']);
     }
 
@@ -45,44 +57,67 @@ class User extends \Model_Auth_User implements UserInterface
      */
     public function rules(): array
     {
-        return parent::rules() + [
-                self::TABLE_FIELD_EMAIL           => [
-                    ['not_empty'],
-                    ['email'],
-                    [[$this, 'unique'], ['email', ':value']],
-                ],
-                self::TABLE_FIELD_USERNAME        => [
-                    ['not_empty'],
-                    ['max_length', [':value', 41]],
-                    [[$this, 'unique'], ['username', ':value']],
+        return [
+            self::TABLE_FIELD_EMAIL => [
+                ['not_empty'],
+                ['email'],
+                [[$this, 'unique'], ['email', ':value']],
+            ],
 
-                ],
-                self::TABLE_FIELD_PASSWORD        => [
-                    ['not_empty'],
-                    ['max_length', [':value', 64]],
-                ],
-                self::TABLE_FIELD_LANGUAGE_ID     => [
-                    ['max_length', [':value', 11]],
-                ],
-                self::TABLE_FIELD_FIRST_NAME      => [
-                    ['max_length', [':value', 32]],
-                ],
-                self::TABLE_FIELD_LAST_NAME       => [
-                    ['max_length', [':value', 32]],
-                ],
-                self::TABLE_FIELD_MIDDLE_NAME     => [
-                    ['max_length', [':value', 32]],
-                ],
-                self::TABLE_FIELD_PHONE           => [
-                    ['max_length', [':value', 32]],
-                ],
-                self::TABLE_FIELD_NOTIFY_BY_EMAIL => [
-                    ['max_length', [':value', 1]],
-                ],
-                self::TABLE_FIELD_IS_ACTIVE       => [
-                    ['max_length', [':value', 1]],
-                ],
-            ];
+            self::TABLE_FIELD_USERNAME => [
+                ['not_empty'],
+                ['max_length', [':value', 41]],
+                [[$this, 'unique'], ['username', ':value']],
+
+            ],
+
+            self::TABLE_FIELD_PASSWORD => [
+                ['not_empty'],
+                ['max_length', [':value', 64]],
+            ],
+
+            self::TABLE_FIELD_LANGUAGE_ID => [
+                ['max_length', [':value', 11]],
+            ],
+
+            self::TABLE_FIELD_FIRST_NAME => [
+                ['max_length', [':value', 32]],
+            ],
+
+            self::TABLE_FIELD_LAST_NAME => [
+                ['max_length', [':value', 32]],
+            ],
+
+            self::TABLE_FIELD_MIDDLE_NAME => [
+                ['max_length', [':value', 32]],
+            ],
+
+            self::TABLE_FIELD_PHONE => [
+                ['max_length', [':value', 32]],
+            ],
+
+            self::TABLE_FIELD_NOTIFY_BY_EMAIL => [
+                ['max_length', [':value', 1]],
+            ],
+
+            self::TABLE_FIELD_IS_ACTIVE => [
+                ['max_length', [':value', 1]],
+            ],
+        ];
+    }
+
+    /**
+     * Labels for fields in this model
+     *
+     * @return array Labels
+     */
+    public function labels(): array
+    {
+        return [
+            'username' => 'username',
+            'email'    => 'email address',
+            'password' => 'password',
+        ];
     }
 
     /**
@@ -278,51 +313,77 @@ class User extends \Model_Auth_User implements UserInterface
      */
     public function getLanguage(): LanguageInterface
     {
-        /** @noinspection PhpIncompatibleReturnTypeInspection */
         return $this->getRelatedEntity('language');
     }
 
     /**
-     * Search for user by username or e-mail
+     * Complete the login for a user by incrementing the logins and saving login timestamp
      *
-     * @param string $usernameOrEmail
+     * @param \BetaKiller\Session\SessionInterface $session
      *
-     * @return UserInterface|null
+     * @return void
+     * @throws \Kohana_Exception
      */
-    public function searchBy(string $usernameOrEmail): ?UserInterface
+    public function completeLogin(SessionInterface $session): void
     {
-        $user = $this->where($this->unique_key($usernameOrEmail), '=', $usernameOrEmail)->find();
+        $request = \Request::current();
 
-        return $user->loaded() ? $user : null;
-    }
+        $session->set('user_agent', $request->getUserAgent());
 
-    public function beforeSignIn(): void
-    {
-        $this->checkIsActive();
+        // Update the number of logins
+        $this->set('logins', new \Database_Expression('logins + 1'));
+
+        // Set the last login date
+        $this->set('last_login', time());
+
+        // Store session id
+        $this->setSessionID($session->getId());
     }
 
     /**
-     * @throws \BetaKiller\Auth\InactiveException
+     * Returns session ID if authorized and null if not
+     *
+     * @return string|null
      */
-    protected function checkIsActive(): void
+    public function getSessionID(): ?string
     {
-        // Проверяем активен ли аккаунт
-        if (!$this->isActive()) {
-            throw new InactiveException;
-        }
+        return $this->get('session_id');
     }
 
     /**
-     * @throws \BetaKiller\Auth\InactiveException
+     * Set session ID
+     *
+     * @param string $value
+     *
+     * @return \BetaKiller\Model\UserInterface
      */
+    public function setSessionID(string $value): UserInterface
+    {
+        $this->set('session_id', $value);
+
+        return $this;
+    }
+
+    /**
+     * Remove session ID
+     *
+     * @return \BetaKiller\Model\UserInterface
+     */
+    public function clearSessionID(): UserInterface
+    {
+        $this->set('session_id', null);
+
+        return $this;
+    }
+
     public function afterAutoLogin(): void
     {
-        $this->checkIsActive();
+        // None for now
     }
 
     public function beforeSignOut(): void
     {
-        // Empty by default
+        // None for now
     }
 
     /**

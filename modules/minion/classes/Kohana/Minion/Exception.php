@@ -9,19 +9,21 @@
  * @license    http://kohanaframework.org/license
  */
 class Kohana_Minion_Exception extends Kohana_Exception {
-	/**
-	 * Inline exception handler, displays the error message, source of the
-	 * exception, and the stack trace of the error.
-	 *
-	 * Should this display a stack trace? It's useful.
-	 *
-	 * Should this still log? Maybe not as useful since we'll see the error on the screen.
-	 *
-	 * @uses    Kohana_Exception::text
-	 * @param   \Throwable   $e
-	 * @return  boolean
-	 */
-	public static function handler(Throwable $e)
+    /**
+     * Inline exception handler, displays the error message, source of the
+     * exception, and the stack trace of the error.
+     *
+     * Should this display a stack trace? It's useful.
+     *
+     * Should this still log? Maybe not as useful since we'll see the error on the screen.
+     *
+     * @uses    Kohana_Exception::text
+     *
+     * @param   \Throwable $e
+     *
+     * @return void
+     */
+	public static function handler(Throwable $e): void
 	{
 		try
 		{

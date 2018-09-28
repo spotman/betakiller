@@ -17,9 +17,21 @@ use BetaKiller\Model\UserInterface;
  */
 class UserRepository extends AbstractOrmBasedRepository
 {
+    /**
+     * Search for user by username or e-mail
+
+     * @param string $loginOrEmail
+     *
+     * @return \BetaKiller\Model\UserInterface|null
+     * @throws \BetaKiller\Repository\RepositoryException
+     */
     public function searchBy(string $loginOrEmail): ?UserInterface
     {
-        return $this->getOrmInstance()->searchBy($loginOrEmail);
+        $orm = $this->getOrmInstance();
+
+        $orm->where($this->getUniqueKey($loginOrEmail), '=', $loginOrEmail);
+
+        return $this->findOne($orm);
     }
 
     /**
@@ -44,5 +56,17 @@ class UserRepository extends AbstractOrmBasedRepository
         $orm->where('roles.id', '=', $role->getID());
 
         return $this;
+    }
+
+    /**
+     * Allows a model use both email and username as unique identifiers for login
+     *
+     * @param   string  unique value
+     *
+     * @return  string  field name
+     */
+    private function getUniqueKey(string $value): string
+    {
+        return \Valid::email($value) ? 'email' : 'username';
     }
 }

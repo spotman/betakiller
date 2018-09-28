@@ -4,12 +4,15 @@ declare(strict_types=1);
 namespace BetaKiller\Model;
 
 use BetaKiller\Notification\NotificationUserInterface;
+use BetaKiller\Session\SessionInterface;
 use BetaKiller\Utils\Kohana\ORM\OrmInterface;
 use DateTimeImmutable;
 use Spotman\Acl\AclUserInterface;
 
 interface UserInterface extends AbstractEntityInterface, OrmInterface, NotificationUserInterface, AclUserInterface
 {
+    public function completeLogin(SessionInterface $session): void;
+
     /**
      * @param \DateTimeInterface $value [optional]
      *
@@ -108,17 +111,6 @@ interface UserInterface extends AbstractEntityInterface, OrmInterface, Notificat
      * @return null|\BetaKiller\Model\LanguageInterface
      */
     public function getLanguage(): ?LanguageInterface;
-
-    /**
-     * Search for user by username or e-mail
-     *
-     * @param string $usernameOrEmail
-     *
-     * @return \BetaKiller\Model\UserInterface|null
-     */
-    public function searchBy(string $usernameOrEmail): ?UserInterface;
-
-    public function beforeSignIn(): void;
 
     /**
      * @throws \BetaKiller\Auth\InactiveException
@@ -237,4 +229,27 @@ interface UserInterface extends AbstractEntityInterface, OrmInterface, Notificat
      * @return void
      */
     public function forceAuthorization(): void;
+
+    /**
+     * Returns session ID if authorized and null if not
+     *
+     * @return string|null
+     */
+    public function getSessionID(): ?string;
+
+    /**
+     * Set session ID
+     *
+     * @param string $value
+     *
+     * @return \BetaKiller\Model\UserInterface
+     */
+    public function setSessionID(string $value): UserInterface;
+
+    /**
+     * Remove session ID
+     *
+     * @return \BetaKiller\Model\UserInterface
+     */
+    public function clearSessionID(): UserInterface;
 }

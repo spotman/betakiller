@@ -13,7 +13,7 @@ abstract class Kohana_Session {
 	/**
 	 * @var  string  default session adapter
 	 */
-	public static $default = 'native';
+	public static $default = 'database';
 
 	/**
 	 * @var  array  session instances
