@@ -7,7 +7,9 @@ use BetaKiller\Config\AppConfigInterface;
 use BetaKiller\Factory\FactoryException;
 use BetaKiller\IFace\Exception\IFaceException;
 use BetaKiller\Url\Behaviour\UrlBehaviourFactory;
+use BetaKiller\Url\Container\UrlContainer;
 use BetaKiller\Url\Container\UrlContainerInterface;
+use BetaKiller\Url\UrlDispatcher;
 use BetaKiller\Url\UrlElementInterface;
 use BetaKiller\Url\UrlElementStack;
 use BetaKiller\Url\UrlElementTreeInterface;
@@ -90,6 +92,28 @@ class UrlHelper
         }
 
         return $this->makeAbsoluteUrl($path);
+    }
+
+    /**
+     * @param string $url
+     *
+     * @return bool
+     */
+    public function isValidUrl(string $url): bool
+    {
+        $dispatcher = new UrlDispatcher($this->tree, $this->behaviourFactory);
+        $params     = new UrlContainer();
+        $stack      = new UrlElementStack($params);
+
+        try {
+            $path = parse_url($url, PHP_URL_PATH);
+            $dispatcher->process($path, $stack, $params);
+
+            return true;
+        } /** @noinspection BadExceptionsProcessingInspection */ catch (\Throwable $e) {
+            // No logging in this case
+            return false;
+        }
     }
 
     private function makeAbsoluteUrl(string $relativeUrl): string
