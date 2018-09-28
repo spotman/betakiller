@@ -66,9 +66,7 @@ class RegularWidget extends AbstractPublicWidget
             throw new BadRequestHttpException('No username or password sent');
         }
 
-        $session = $this->auth->getSessionFromRequest($this->psrRequest);
-
-        $user = $this->auth->login($userLogin, $userPassword, $session);
+        $user = $this->auth->login($userLogin, $userPassword, $this->psrRequest);
 
         if ($remember) {
             $this->auth->enableAutoLogin($user, $this->psrRequest);
