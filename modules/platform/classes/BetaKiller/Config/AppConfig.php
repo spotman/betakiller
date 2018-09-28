@@ -68,7 +68,7 @@ class AppConfig extends AbstractConfig implements AppConfigInterface
      */
     public function isPageCacheEnabled(): bool
     {
-        return (bool)$this->get(self::PATH_PAGE_CACHE_ENABLED, false);
+        return (bool)$this->get(self::PATH_PAGE_CACHE_ENABLED);
     }
 
     /**
@@ -84,6 +84,6 @@ class AppConfig extends AbstractConfig implements AppConfigInterface
      */
     public function getAllowedLanguages(): array
     {
-        return (array)$this->get(['languages'], ['en']);
+        return (array)$this->get(['languages']) ?: ['en'];
     }
 }

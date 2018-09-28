@@ -6,7 +6,6 @@ The default configuration file is located in `MODPATH/auth/config/auth.php`. You
 
 Name | Type | Default | Description
 -----|------|---------|------------
-driver | `string` | file | The name of the auth driver to use.
 hash_method | `string` | sha256 | The hashing function to use on the passwords.
 hash_key | `string` | NULL | The key to use when hashing the password.
 session_type | `string` | [Session::$default] | The type of session to use when storing the auth user.

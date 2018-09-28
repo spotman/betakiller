@@ -67,6 +67,12 @@ class Controller_UrlElement extends Controller
 
     /**
      * @Inject
+     * @var \Psr\Http\Message\ServerRequestInterface
+     */
+    private $psrRequest;
+
+    /**
+     * @Inject
      * @var \Psr\Log\LoggerInterface
      */
     private $logger;
@@ -97,10 +103,7 @@ class Controller_UrlElement extends Controller
      */
     public function actionRender(): void
     {
-        // TODO Move this to DI config and inject int in this controller by interface
-        $request = \Zend\Diactoros\ServerRequestFactory::fromGlobals();
-
-        $this->dispatchRequest($request, $this->urlElementStack, $this->urlContainer);
+        $this->dispatchRequest($this->psrRequest, $this->urlElementStack, $this->urlContainer);
 
         // Check current user access for all URL elements
         foreach ($this->urlElementStack as $urlElement) {
@@ -110,7 +113,7 @@ class Controller_UrlElement extends Controller
         $urlElement = $this->urlElementStack->getCurrent();
 
         $urlProcessor = $this->processorFactory->createFromUrlElement($urlElement);
-        $urlProcessor->process($urlElement, $this->urlContainer, $request, $this->response);
+        $urlProcessor->process($urlElement, $this->urlContainer, $this->psrRequest, $this->response);
     }
 
     private function dispatchRequest(
@@ -121,7 +124,7 @@ class Controller_UrlElement extends Controller
         $this->urlContainer->setQueryParts($request->getQueryParams());
 
         $url       = $this->request->url();
-        $ipAddress = $this->request->client_ip();
+        $ipAddress = $this->request->getClientIp();
         $referrer  = $this->request->referrer();
 
         try {

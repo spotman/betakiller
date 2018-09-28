@@ -3,10 +3,10 @@ declare(strict_types=1);
 
 namespace BetaKiller\Session;
 
-use BetaKiller\Exception\NotImplementedHttpException;
+use BetaKiller\Auth\Auth;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Zend\Expressive\Session\SessionInterface;
+use Zend\Expressive\Session\SessionInterface as ZendSessionInterface;
 
 class DatabaseSessionStorage implements SessionStorageInterface
 {
@@ -17,9 +17,14 @@ class DatabaseSessionStorage implements SessionStorageInterface
      *
      * @return \Zend\Expressive\Session\SessionInterface
      */
-    public function initializeSessionFromRequest(ServerRequestInterface $request): SessionInterface
+    public function initializeSessionFromRequest(ServerRequestInterface $request): ZendSessionInterface
     {
-        throw new NotImplementedHttpException();
+        $cookies = $request->getCookieParams();
+        $sessionCookie = $cookies[Auth::SESSION_COOKIE] ?? '';
+        $parts = explode(Auth::SESSION_COOKIE_DELIMITER, $sessionCookie, 2);
+        $sid = \array_pop($parts);
+
+        return $this->factory($sid);
     }
 
     /**
@@ -33,7 +38,7 @@ class DatabaseSessionStorage implements SessionStorageInterface
      *
      * @return \Psr\Http\Message\ResponseInterface
      */
-    public function persistSession(SessionInterface $session, ResponseInterface $response): ResponseInterface
+    public function persistSession(ZendSessionInterface $session, ResponseInterface $response): ResponseInterface
     {
         if (!$session instanceof KohanaSessionAdapter) {
             throw new \RuntimeException('Session object must be instance of KohanaSessionAdapter');
@@ -47,11 +52,20 @@ class DatabaseSessionStorage implements SessionStorageInterface
     /**
      * @param string $id
      *
-     * @return \Zend\Expressive\Session\SessionInterface
+     * @return \BetaKiller\Session\SessionInterface
      */
     public function getByID(string $id): SessionInterface
     {
-        $kohanaSession = new \Session_Database([], $id);
+        return $this->factory($id);
+    }
+
+    private function factory(?string $id): SessionInterface
+    {
+        $config = [
+            'name' => Auth::SESSION_COOKIE,
+        ];
+
+        $kohanaSession = new \Session_Database($config, $id);
 
         return new KohanaSessionAdapter($kohanaSession);
     }

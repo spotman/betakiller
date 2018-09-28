@@ -5,16 +5,25 @@ use BetaKiller\Acl\AclResourcesCollector;
 use BetaKiller\Acl\AclRolesCollector;
 use BetaKiller\Acl\AclRulesCollector;
 use BetaKiller\Api\AccessResolver\CustomApiMethodAccessResolverDetector;
+use BetaKiller\Auth\Auth;
 use BetaKiller\Config\AppConfig;
 use BetaKiller\Config\AppConfigInterface;
 use BetaKiller\Config\ConfigProviderInterface;
 use BetaKiller\Exception\ExceptionHandlerInterface;
+use BetaKiller\Helper\AppEnvInterface;
+use BetaKiller\Helper\I18nHelper;
+use BetaKiller\MessageBus\CommandBus;
+use BetaKiller\MessageBus\CommandBusInterface;
+use BetaKiller\MessageBus\EventBus;
+use BetaKiller\MessageBus\EventBusInterface;
 use BetaKiller\Notification\DefaultMessageRendered;
 use BetaKiller\Notification\MessageRendererInterface;
+use BetaKiller\Service\UserService;
 use BetaKiller\View\LayoutViewInterface;
 use BetaKiller\View\LayoutViewTwig;
 use BetaKiller\View\TwigViewFactory;
 use BetaKiller\View\ViewFactoryInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Roave\DoctrineSimpleCache\SimpleCacheAdapter;
 use Spotman\Acl\ResourceFactory\AclResourceFactoryInterface;
 use Spotman\Acl\ResourcesCollector\AclResourcesCollectorInterface;
@@ -53,19 +62,32 @@ return [
         // Common cache instance for all
         \Doctrine\Common\Cache\CacheProvider::class => DI\get(\BetaKiller\Cache\DoctrineCacheProvider::class),
 
-        Auth::class => DI\factory(function () {
-            return Auth::instance();
+        ServerRequestInterface::class => DI\factory(function () {
+            // TODO Remove this after moving to PSR-7
+            return \Zend\Diactoros\ServerRequestFactory::fromGlobals();
         }),
 
-        // Helpers
-        'User'      => DI\factory(function (\BetaKiller\Helper\UserDetector $detector) {
-            return $detector->detect();
+        'User' => DI\factory(function (
+            Auth $auth,
+            ServerRequestInterface $request,
+            AppEnvInterface $appEnv,
+            UserService $userService,
+            I18nHelper $i18n
+        ) {
+            $user = $auth->getUserFromRequest($request);
+
+            $i18n->initFromUser($user);
+
+            if ($userService->isDeveloper($user)) {
+                $appEnv->enableDebug();
+            }
+
+            return $user;
         }),
 
         AppConfigInterface::class => DI\autowire(AppConfig::class),
 
         \BetaKiller\Model\UserInterface::class          => DI\get('User'),
-        \BetaKiller\Model\RoleInterface::class          => DI\get(\BetaKiller\Model\Role::class),
 
         // Acl roles, resources, permissions and resource factory
         AclRolesCollectorInterface::class               => DI\autowire(AclRolesCollector::class),
@@ -88,33 +110,19 @@ return [
             return Meta::instance();
         }),
 
-        \BetaKiller\MessageBus\EventBusInterface::class => DI\factory(function (
-            \BetaKiller\MessageBus\EventBus $bus,
-            ConfigProviderInterface $config
-        ) {
-            $eventsConfig = $config->load(['events']);
-
-            if ($eventsConfig && is_array($eventsConfig)) {
-                foreach ($eventsConfig as $event => $handlers) {
-                    foreach ($handlers as $handler) {
-                        $bus->on($event, $handler);
-                    }
+        EventBusInterface::class => DI\factory(function (EventBus $bus, ConfigProviderInterface $config) {
+            foreach ((array)$config->load(['events']) as $event => $handlers) {
+                foreach ($handlers as $handler) {
+                    $bus->on($event, $handler);
                 }
             }
 
             return $bus;
         }),
 
-        \BetaKiller\MessageBus\CommandBusInterface::class => DI\factory(function (
-            \BetaKiller\MessageBus\CommandBus $bus,
-            ConfigProviderInterface $config
-        ) {
-            $eventsConfig = $config->load(['commands']);
-
-            if ($eventsConfig && is_array($eventsConfig)) {
-                foreach ($eventsConfig as $event => $handler) {
-                    $bus->on($event, $handler);
-                }
+        CommandBusInterface::class => DI\factory(function (CommandBus $bus, ConfigProviderInterface $config) {
+            foreach ((array)$config->load(['commands']) as $event => $handler) {
+                $bus->on($event, $handler);
             }
 
             return $bus;

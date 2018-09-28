@@ -61,7 +61,7 @@ abstract class Controller extends ControllerProxy
     private function checkConnectionProtocol()
     {
         // Redirect only initial requests from HTTP
-        if ($this->request->is_initial() && $this->request->client_ip() !== '0.0.0.0') {
+        if ($this->request->is_initial() && $this->request->getClientIp() !== '0.0.0.0') {
             $baseProtocol = parse_url($this->appConfig->getBaseUrl(), PHP_URL_SCHEME);
 
             $isSecureNeeded = ($baseProtocol === 'https');

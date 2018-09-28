@@ -97,7 +97,7 @@ class Kohana_Cookie {
 	 * @return  boolean
 	 * @uses    Cookie::salt
 	 */
-	public static function set($name, $value, $expiration = NULL)
+	public static function set(string $name, string $value, $expiration = NULL)
 	{
 		if ($expiration === NULL)
 		{
