@@ -7,6 +7,7 @@ use BetaKiller\Helper\UserDetector;
 use BetaKiller\Log\LoggerInterface;
 use BetaKiller\Session\SessionStorageInterface;
 use \Thruway\Authentication\WampCraUserDbInterface;
+use Thruway\Common\Utils;
 
 /**
  * https://github.com/voryx/Thruway/tree/master/Examples/Authentication/WampCra
@@ -56,8 +57,6 @@ class WampUserDb implements WampCraUserDbInterface
      */
     public function get($authid)
     {
-        $salt = null;
-
         $session = $this->sessionStorage->getByID($authid);
         $user    = $this->userDetector->fromSession($session);
         if (!$user->getID()) {
@@ -67,7 +66,7 @@ class WampUserDb implements WampCraUserDbInterface
         return [
             'authid' => $authid,
             'key'    => $session->get('user_agent'),
-            'salt'   => $salt,
+            'salt'   => Utils::getUniqueId(),
         ];
     }
 }
