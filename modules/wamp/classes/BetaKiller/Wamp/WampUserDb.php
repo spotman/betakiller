@@ -66,7 +66,7 @@ class WampUserDb implements WampCraUserDbInterface
         return [
             'authid' => $authid,
             'key'    => $session->get('user_agent'),
-            'salt'   => Utils::getUniqueId(),
+            'salt'   => Utils::getUniqueId(),//todo can be used?
         ];
     }
 }
