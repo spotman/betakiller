@@ -335,17 +335,39 @@ require([
     }
 
 
+    function getCookie(name) {
+      var matches = document.cookie.match(new RegExp(
+        "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
+      ));
+      return matches ? decodeURIComponent(matches[1]) : undefined;
+    }
+
+
     // todo exception connection error
     function WampConnection() {
       this.callbackDone = false
       this.connect = function (callback) {
 
+        console.log('authid '+getCookie('sid'))
         this.connection = new autobahn.Connection({
           url: 'wss://spa.dev.worknector.com/wamp',
           realm: 'realm1',
           authmethods: ['wampcra'],
-          authid: window.navigator.userAgent,
-          onchallenge: this.onChallenge
+          authid: getCookie('sid'),
+          onchallenge: function (session, method, extra) {
+            console.log(method, extra);
+            if (method === 'wampcra') {
+              console.log('onChallenge '+method+' '+extra)
+              var keyToUse = window.navigator.userAgent
+              if (typeof extra.salt !== 'undefined') {
+                keyToUse = autobahn.auth_cra.derive_key(window.navigator.userAgent, extra.salt)
+              }
+              console.log("authenticating via '" + method + "' and challenge '" + extra.challenge + "'");
+              return autobahn.auth_cra.sign(keyToUse, extra.challenge)
+            } else {
+              throw "don't know how to authenticate using '" + method + "'"
+            }
+          }
         })
 
         this.connection.onopen = function (_this, callback) {
@@ -371,6 +393,7 @@ require([
       this.onChallenge = function (session, method, extra) {
         console.log(method, extra);
         if (method === 'wampcra') {
+          console.log('onChallenge '+method+' '+extra)
           var keyToUse = window.navigator.userAgent
           if (typeof extra.salt !== 'undefined') {
             keyToUse = autobahn.auth_cra.derive_key(window.navigator.userAgent, extra.salt)
