@@ -1,12 +1,13 @@
 <?php
 namespace BetaKiller\Widget\Auth;
 
-use Auth;
+use BetaKiller\Auth\Auth;
 use BetaKiller\Exception\BadRequestHttpException;
 use BetaKiller\Helper\IFaceHelper;
 use BetaKiller\IFace\Auth\PasswordReset;
 use BetaKiller\Widget\AbstractPublicWidget;
 use HTML;
+use Psr\Http\Message\ServerRequestInterface;
 
 class RegularWidget extends AbstractPublicWidget
 {
@@ -21,15 +22,22 @@ class RegularWidget extends AbstractPublicWidget
     private $ifaceHelper;
 
     /**
+     * @var \Psr\Http\Message\ServerRequestInterface
+     */
+    private $psrRequest;
+
+    /**
      * RegularWidget constructor.
      *
-     * @param \Auth                          $auth
-     * @param \BetaKiller\Helper\IFaceHelper $ifaceHelper
+     * @param \BetaKiller\Auth\Auth                    $auth
+     * @param \BetaKiller\Helper\IFaceHelper           $ifaceHelper
+     * @param \Psr\Http\Message\ServerRequestInterface $psrRequest
      */
-    public function __construct(\Auth $auth, IFaceHelper $ifaceHelper)
+    public function __construct(Auth $auth, IFaceHelper $ifaceHelper, ServerRequestInterface $psrRequest)
     {
         $this->auth        = $auth;
         $this->ifaceHelper = $ifaceHelper;
+        $this->psrRequest  = $psrRequest;
     }
 
     /**
@@ -37,7 +45,7 @@ class RegularWidget extends AbstractPublicWidget
      *
      * @throws \BetaKiller\Exception\BadRequestHttpException
      */
-    public function actionLogin()
+    public function actionLogin(): void
     {
         if (!$this->getRequest()->is_ajax()) {
             throw new BadRequestHttpException('AJAX only gateway');
@@ -58,7 +66,13 @@ class RegularWidget extends AbstractPublicWidget
             throw new BadRequestHttpException('No username or password sent');
         }
 
-        $this->auth->login($userLogin, $userPassword, $remember);
+        $session = $this->auth->getSessionFromRequest($this->psrRequest);
+
+        $user = $this->auth->login($userLogin, $userPassword, $session);
+
+        if ($remember) {
+            $this->auth->enableAutoLogin($user, $this->psrRequest);
+        }
 
         // Возвращаем соответствующий ответ
         $this->send_success_json();
@@ -72,12 +86,12 @@ class RegularWidget extends AbstractPublicWidget
         ];
     }
 
-    protected function getLoginUrl()
+    private function getLoginUrl(): string
     {
         return $this->url('login');
     }
 
-    protected function getResetPasswordUrl()
+    private function getResetPasswordUrl(): string
     {
         /** @var PasswordReset $iface */
         $iface = $this->ifaceHelper->createIFaceFromCodename('Auth_PasswordReset');

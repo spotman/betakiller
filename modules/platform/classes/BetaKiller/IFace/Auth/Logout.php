@@ -7,7 +7,7 @@ class Logout extends AbstractIFace
 {
     /**
      * @Inject
-     * @var \Auth
+     * @var \BetaKiller\Auth\Auth
      */
     private $auth;
 
@@ -18,6 +18,12 @@ class Logout extends AbstractIFace
     private $responseHelper;
 
     /**
+     * @Inject
+     * @var \Psr\Http\Message\ServerRequestInterface
+     */
+    private $request;
+
+    /**
      * This hook executed before IFace processing (on every request regardless of caching)
      * Place here code that needs to be executed on every IFace request (increment views counter, etc)
      *
@@ -25,8 +31,12 @@ class Logout extends AbstractIFace
      */
     public function before(): void
     {
-        // Sign out the user
-        $this->auth->logout(true);
+        $user = $this->auth->getUserFromRequest($this->request);
+
+        if (!$user->isGuest()) {
+            // Sign out the user
+            $this->auth->logout($user,true);
+        }
 
         // Redirect to site index
         $this->responseHelper->redirect('/');
