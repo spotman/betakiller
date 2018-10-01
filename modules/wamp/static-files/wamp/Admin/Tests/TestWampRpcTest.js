@@ -337,11 +337,11 @@ require([
 
     // todo exception connection error
     function WampConnection() {
-      this.sessionCookieName = 'session'
+      this.sessionCookieName = 'sid'
       this.callbackDone = false
       this.connect = function (callback) {
         this.connection = new autobahn.Connection({
-          url: 'wss://spa.dev.worknector.com/wamp',
+          url: 'wss://'+window.location.hostname+'/wamp',
           realm: 'realm1',
           authmethods: ['wampcra'],
           authid: this.getCookie(this.sessionCookieName).replace(/.+?~(.+)/, '$1'),
