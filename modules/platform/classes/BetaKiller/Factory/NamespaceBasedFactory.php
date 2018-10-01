@@ -211,12 +211,10 @@ final class NamespaceBasedFactory
         $separator = '\\';
         $baseName  = implode($separator, $codenameArray).$this->classSuffix;
 
-        $searchNamespaces = array_merge($this->rootNamespaces, ['BetaKiller']);
-
         $tried = [];
 
         // Search for class in namespaces
-        foreach ($searchNamespaces as $ns) {
+        foreach ($this->rootNamespaces as $ns) {
             // Add namespace prefix
             $className = $ns.$separator.$baseName;
 
