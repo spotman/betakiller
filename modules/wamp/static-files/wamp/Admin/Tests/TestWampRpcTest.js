@@ -1,7 +1,11 @@
 require([
   'jquery',
   'validation.api.rpc',
-], function ($, rpc) {
+  'Session',
+  'WampAuthChallenge',
+  'WampConnection',
+  'WampRequest',
+], function ($, rpc, Session, WampAuthChallenge, WampConnection, WampRequest) {
   $(function () {
 
     this.rpcConnection = rpc
@@ -12,19 +16,24 @@ require([
     this.connectionType = this.nodes.getRoot().attr('data-connectionType')
 
     this.init = function () {
-      if (this.connectionType !== 'wamp') {
-        this.run()
-      } else {
-        let debugTimer = new DebugTimer().start('wampConnection')
-        new WampConnection()
-          .connect(function (_this, debugTimer) {
-            return function (connection, session) {
-              _this.wampSession = session
-              _this.wampConnectionTime = debugTimer.stop('wampConnection')
-              _this.run()
-            }
-          }(this, debugTimer))
-      }
+
+
+      console.log(123)
+
+
+      //if (this.connectionType !== 'wamp') {
+      //  this.run()
+      //} else {
+      //  let debugTimer = new DebugTimer().start('wampConnection')
+      //  new WampConnection()
+      //    .connect(function (_this, debugTimer) {
+      //      return function (connection, session) {
+      //        _this.wampSession = session
+      //        _this.wampConnectionTime = debugTimer.stop('wampConnection')
+      //        _this.run()
+      //      }
+      //    }(this, debugTimer))
+      //}
     }
 
     this.run = function () {
