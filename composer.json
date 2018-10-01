@@ -22,7 +22,6 @@
     "guzzlehttp/guzzle": "~6.0",
     "imangazaliev/didom": "^1.10",
     "jakeasmith/http_build_url": "^1",
-    "jmikola/wildcard-event-dispatcher": "~1.0",
     "mmamedov/page-cache": "^2.0",
     "monolog/monolog": "^1",
     "ocramius/proxy-manager": "^2.1",
