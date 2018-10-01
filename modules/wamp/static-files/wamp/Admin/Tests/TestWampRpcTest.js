@@ -117,7 +117,8 @@ require([
                 'userEmail',
                 ['login' + index + '@domain.tld'],
                 function (_this, index) {
-                  return function () {
+                  return function (result) {
+                    console.log('Request result: ' + result)
                     _this.eventRequest(index, false)
                   }
                 }(this, index),
@@ -226,7 +227,7 @@ require([
             break
 
           default:
-            throw console.error('Unknown action: ' + action)
+            throw 'Unknown action: ' + action
         }
       }
       this.setConnectionType = function (type) {
@@ -334,12 +335,21 @@ require([
     }
 
 
+    // todo exception connection error
     function WampConnection() {
+      this.sessionCookieName = 'sid'
       this.callbackDone = false
       this.connect = function (callback) {
-        this.connection = new autobahn.Connection({url: 'wss://spa.dev.worknector.com/wamp', realm: 'realm1'});
+        this.connection = new autobahn.Connection({
+          url: 'wss://'+window.location.hostname+'/wamp',
+          realm: 'realm1',
+          authmethods: ['wampcra'],
+          authid: this.getCookie(this.sessionCookieName).replace(/.+?~(.+)/, '$1'),
+          onchallenge: this.onChallenge
+        })
+
         this.connection.onopen = function (_this, callback) {
-          return function (session) {
+          return function (session, details) {
             console.log('Wamp connecting')
             _this.session = session
             if (!_this.callbackDone) {
@@ -348,16 +358,35 @@ require([
             }
           }
         }(this, callback)
+
         this.connection.open()
+
         return this
       }
+      this.onChallenge = function (session, method, extra) {
+        if (method === 'wampcra') {
+          var keyToUse = window.navigator.userAgent
+          if (typeof extra.salt !== 'undefined') {
+            keyToUse = autobahn.auth_cra.derive_key(keyToUse, extra.salt)
+          }
+          return autobahn.auth_cra.sign(keyToUse, extra.challenge)
+        } else {
+          throw "don't know how to authenticate using '" + method + "'"
+        }
+      }
       this.getConnection = function () {
-        if (!this.hasOwnProperty('connection')) throw console.error('Not found WAMP connection')
+        if (!this.hasOwnProperty('connection')) throw 'Not found WAMP connection'
         return this.connection
       }
       this.getSession = function () {
-        if (!this.hasOwnProperty('session')) throw console.error('Not found WAMP session')
+        if (!this.hasOwnProperty('session')) throw 'Not found WAMP session'
         return this.session
+      }
+      this.getCookie = function (name) {
+        var matches = document.cookie.match(new RegExp(
+          "(?:^|; )" + name.replace(/([.$?*|{}()\[\]\\\/+^])/g, '\\$1') + "=([^;]*)"
+        ));
+        return matches ? decodeURIComponent(matches[1]) : undefined;
       }
     }
 
@@ -413,12 +442,12 @@ require([
         return this
       }
       this.stop = function (name) {
-        if (!this.timers.hasOwnProperty(name)) throw console.error('Not found debug timer: ' + name)
+        if (!this.timers.hasOwnProperty(name)) throw 'Not found debug timer: ' + name
         this.timers[name] = performance.now() - this.timers[name]
         return this.timers[name]
       }
       this.get = function (name) {
-        if (!this.timers.hasOwnProperty(name)) throw console.error('Not found debug timer: ' + name)
+        if (!this.timers.hasOwnProperty(name)) throw 'Not found debug timer: ' + name
         return this.timers[name]
       }
     }
@@ -434,7 +463,7 @@ require([
             this.$root = $(this.rootSelector + ':first')
           }
         }
-        if (!this.$root.length) throw console.error('Unable find root by selector: ' + rootSelector)
+        if (!this.$root.length) throw 'Unable find root by selector: ' + rootSelector
         return this.$root
       }
       this.get = function (selector, $parent) {
@@ -447,7 +476,7 @@ require([
         let $node
         if (!$parent) $parent = this.getRoot()
         $node = $parent.find(selector + ':first')
-        if (!$node.length) throw console.error('Not found node by selector: ' + selector)
+        if (!$node.length) throw 'Not found node by selector: ' + selector
         return this.$nodes[selector] = $node
       }
     }
