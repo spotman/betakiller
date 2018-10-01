@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\Wamp;
 
+use BetaKiller\Auth\Auth;
 use BetaKiller\Helper\UserDetector;
 use BetaKiller\Log\LoggerInterface;
 use BetaKiller\Session\SessionStorageInterface;
@@ -30,19 +31,23 @@ class WampUserDb implements WampCraUserDbInterface
     private $logger;
 
     /**
+     * @var \BetaKiller\Auth\Auth
+     */
+    private $auth;
+
+    /**
      * @param \BetaKiller\Session\SessionStorageInterface $sessionStorage
-     * @param \BetaKiller\Helper\UserDetector             $userDetector
+     * @param \BetaKiller\Auth\Auth                       $auth
      * @param \BetaKiller\Log\LoggerInterface             $logger
      */
     public function __construct(
         SessionStorageInterface $sessionStorage,
-        UserDetector $userDetector,
+        Auth $auth,
         LoggerInterface $logger
-    )
-    {
+    ) {
         $this->sessionStorage = $sessionStorage;
-        $this->userDetector   = $userDetector;
-        $this->logger = $logger;
+        $this->logger         = $logger;
+        $this->auth           = $auth;
     }
 
     /**
@@ -58,8 +63,8 @@ class WampUserDb implements WampCraUserDbInterface
     public function get($authid)
     {
         $session = $this->sessionStorage->getByID($authid);
-        $user    = $this->userDetector->fromSession($session);
-        if (!$user->getID()) {
+        $user    = $this->auth->getSessionUser($session);
+        if (!$user) {
             return [];
         }
 
