@@ -8,7 +8,7 @@ interface WampConfigInterface
     /**
      * @return string
      */
-    public function getNamespace(): string;
+    public function getRealmName(): string;
 
     /**
      * @return string

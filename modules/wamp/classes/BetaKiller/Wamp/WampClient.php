@@ -27,7 +27,7 @@ class WampClient extends \Thruway\Peer\Client
 
         $this->apiFacade = $apiFacade;
 
-        parent::__construct($wampConfig->getNamespace());
+        parent::__construct($wampConfig->getRealmName());
     }
 
     /**
@@ -51,11 +51,14 @@ class WampClient extends \Thruway\Peer\Client
                 ApiResourceProxyInterface::INTERNAL
             );
 
-            return $validationApiResource->call('UserEmail', ['email' => $args[0]]);
+            return (bool)$validationApiResource->call('UserEmail', ['email' => $args[0]]);
         };
+//        $this
+//            ->getSession()
+//            ->register('api.validation.userEmail', $procedure);
         $this
             ->getSession()
-            ->register('api.validation.userEmail', $procedure);
+            ->register('api.*.*', $procedure);
 
         return $this;
     }
