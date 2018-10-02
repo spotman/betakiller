@@ -1,13 +1,13 @@
 'use strict';
 
-export class Session {
+class Session {
   constructor(cookieName, cookieSeparator = '') {
     this.cookieName      = cookieName
     this.cookieSeparator = cookieSeparator
   }
 
   getId() {
-    let id = super._readCookie(this.cookieName)
+    let id = this._readCookie(this.cookieName)
     if (this.cookieSeparator) {
       id = id.split(this.cookieSeparator, 2)
       id = id[id.length - 1]
@@ -15,7 +15,7 @@ export class Session {
     return id
   }
 
-  static _readCookie(name) {
+  _readCookie(name) {
     var matches = document.cookie.match(new RegExp(
       "(?:^|; )" + name.replace(/([.$?*|{}()\[\]\\\/+^])/g, '\\$1') + "=([^;]*)"
     ));
