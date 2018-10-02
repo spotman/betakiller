@@ -96,7 +96,8 @@ class PostItem extends AbstractAdminBase
 
         $status = $post->getCurrentStatus();
 
-        $updateAllowed = $this->aclHelper->isEntityActionAllowed($post, CrudlsActionsInterface::ACTION_UPDATE);
+        $updateAllowed = $this->aclHelper->isEntityActionAllowed($this->user, $post,
+            CrudlsActionsInterface::ACTION_UPDATE);
 
         return [
             'post' => [

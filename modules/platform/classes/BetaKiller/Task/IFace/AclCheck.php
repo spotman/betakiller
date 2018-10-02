@@ -20,6 +20,11 @@ class AclCheck extends AbstractTask
     private $aclHelper;
 
     /**
+     * @var \BetaKiller\Model\UserInterface
+     */
+    private $user;
+
+    /**
      * @var \BetaKiller\Service\UserService
      */
     private $userService;
@@ -43,7 +48,7 @@ class AclCheck extends AbstractTask
 
         foreach ($this->tree->getRecursiveIteratorIterator(null, $filter) as $urlElement) {
             // TODO
-            $this->aclHelper->isUrlElementAllowed($urlElement);
+            $this->aclHelper->isUrlElementAllowed($this->user, $urlElement);
         }
     }
 }

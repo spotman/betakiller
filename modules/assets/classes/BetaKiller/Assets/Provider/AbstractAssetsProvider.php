@@ -3,6 +3,7 @@ namespace BetaKiller\Assets\Provider;
 
 use BetaKiller\Acl\Resource\AssetsAclResourceInterface;
 use BetaKiller\Assets\AssetsDeploymentService;
+use BetaKiller\Assets\AssetsException;
 use BetaKiller\Assets\AssetsExceptionUpload;
 use BetaKiller\Assets\AssetsProviderException;
 use BetaKiller\Assets\ContentTypes;
@@ -13,6 +14,7 @@ use BetaKiller\Assets\Storage\AssetsStorageInterface;
 use BetaKiller\Config\ConfigProviderInterface;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Repository\RepositoryInterface;
+use Spotman\Acl\AclInterface;
 use Upload;
 
 abstract class AbstractAssetsProvider implements AssetsProviderInterface
@@ -118,9 +120,9 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
     private $pathStrategy;
 
     /**
-     * @var \BetaKiller\Acl\Resource\AssetsAclResourceInterface
+     * @var AclInterface
      */
-    private $aclResource;
+    private $acl;
 
     /**
      * @var \BetaKiller\Assets\Handler\AssetsHandlerInterface[]
@@ -140,26 +142,26 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
     /**
      * AbstractAssetsProvider constructor.
      *
+     * @param \Spotman\Acl\AclInterface                                   $acl
      * @param \BetaKiller\Repository\RepositoryInterface                  $repository
      * @param \BetaKiller\Assets\Storage\AssetsStorageInterface           $storage
-     * @param \BetaKiller\Acl\Resource\AssetsAclResourceInterface         $aclResource
      * @param \BetaKiller\Assets\PathStrategy\AssetsPathStrategyInterface $pathStrategy
      * @param \BetaKiller\Config\ConfigProviderInterface                  $config
      * @param \BetaKiller\Assets\AssetsDeploymentService                  $deploymentService
      * @param \BetaKiller\Assets\ContentTypes                             $contentTypes
      */
     public function __construct(
+        AclInterface $acl,
         RepositoryInterface $repository,
         AssetsStorageInterface $storage,
-        AssetsAclResourceInterface $aclResource,
         AssetsPathStrategyInterface $pathStrategy,
         ConfigProviderInterface $config,
         AssetsDeploymentService $deploymentService,
         ContentTypes $contentTypes
     ) {
+        $this->acl               = $acl;
         $this->repository        = $repository;
         $this->storage           = $storage;
-        $this->aclResource       = $aclResource;
         $this->pathStrategy      = $pathStrategy;
         $this->config            = $config;
         $this->deploymentService = $deploymentService;
@@ -379,7 +381,7 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
     public function upload(array $file, array $postData, UserInterface $user): AssetsModelInterface
     {
         // Check permissions
-        if (!$this->checkUploadPermissions()) {
+        if (!$this->checkUploadPermissions($user)) {
             throw new AssetsProviderException('Upload is not allowed');
         }
 
@@ -416,7 +418,7 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
     public function store(string $fullPath, string $originalName, UserInterface $user): AssetsModelInterface
     {
         // Check permissions
-        if (!$this->checkStorePermissions()) {
+        if (!$this->checkStorePermissions($user)) {
             throw new AssetsProviderException('Store is not allowed');
         }
 
@@ -515,17 +517,18 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
     }
 
     /**
-     * @param AssetsModelInterface $model
+     * @param AssetsModelInterface            $model
+     * @param \BetaKiller\Model\UserInterface $user
      *
      * @throws \BetaKiller\Assets\AssetsException
-     * @throws \BetaKiller\Repository\RepositoryException
      * @throws \BetaKiller\Assets\AssetsProviderException
      * @throws \BetaKiller\Assets\AssetsStorageException
+     * @throws \BetaKiller\Repository\RepositoryException
      */
-    public function delete(AssetsModelInterface $model): void
+    public function delete(AssetsModelInterface $model, UserInterface $user): void
     {
         // Check permissions
-        if (!$this->checkDeletePermissions($model)) {
+        if (!$this->checkDeletePermissions($user, $model)) {
             throw new AssetsProviderException('Delete is not allowed');
         }
 
@@ -819,32 +822,70 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
     /**
      * Returns TRUE if upload is granted
      *
+     * @param \BetaKiller\Model\UserInterface $user
+     *
      * @return bool
      */
-    private function checkUploadPermissions(): bool
+    private function checkUploadPermissions(UserInterface $user): bool
     {
-        return $this->aclResource->isUploadAllowed();
+        $resource = $this->getAclResource($user);
+
+        return $resource->isUploadAllowed();
     }
 
     /**
      * Returns TRUE if store is granted
      *
+     * @param \BetaKiller\Model\UserInterface $user
+     *
      * @return bool
+     * @throws \BetaKiller\Assets\AssetsException
      */
-    private function checkStorePermissions(): bool
+    private function checkStorePermissions(UserInterface $user): bool
     {
-        return $this->aclResource->isCreateAllowed();
+        $resource = $this->getAclResource($user);
+
+        return $resource->isCreateAllowed();
     }
 
     /**
      * Returns TRUE if delete operation granted
      *
-     * @param AssetsModelInterface $model
+     * @param \BetaKiller\Model\UserInterface $user
+     * @param AssetsModelInterface            $model
      *
      * @return bool
+     * @throws \BetaKiller\Assets\AssetsException
      */
-    private function checkDeletePermissions($model): bool
+    private function checkDeletePermissions(UserInterface $user, $model): bool
     {
-        return $this->aclResource->setEntity($model)->isDeleteAllowed();
+        $resource = $this->getAclResource($user);
+
+        return $resource->setEntity($model)->isDeleteAllowed();
+    }
+
+    /**
+     * @param \BetaKiller\Model\UserInterface $user
+     *
+     * @return \BetaKiller\Acl\Resource\AssetsAclResourceInterface
+     * @throws \BetaKiller\Assets\AssetsException
+     */
+    private function getAclResource(UserInterface $user): AssetsAclResourceInterface
+    {
+        // Acl resource name is equal to model name
+        $codename = $this->getCodename();
+
+        $resource = $this->acl->getResource($codename);
+
+        if (!($resource instanceof AssetsAclResourceInterface)) {
+            throw new AssetsException('Acl resource :name must implement :must', [
+                ':name' => $this->codename,
+                ':must' => AssetsAclResourceInterface::class,
+            ]);
+        }
+
+        $this->acl->injectUserResolver($user, $resource);
+
+        return $resource;
     }
 }

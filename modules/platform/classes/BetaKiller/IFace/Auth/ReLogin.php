@@ -1,7 +1,7 @@
 <?php
 namespace BetaKiller\IFace\Auth;
 
-use BetaKiller\Auth\Auth;
+use BetaKiller\Auth\AuthFacade;
 use BetaKiller\Helper\RequestHelper;
 use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Helper\UrlContainerHelper;
@@ -10,12 +10,12 @@ use BetaKiller\Model\UserInterface;
 class ReLogin extends Login
 {
     /**
-     * @var \BetaKiller\Auth\Auth
+     * @var \BetaKiller\Auth\AuthFacade
      */
     private $auth;
 
     public function __construct(
-        Auth $auth,
+        AuthFacade $auth,
         UserInterface $user,
         RequestHelper $reqHelper,
         ResponseHelper $respHelper,

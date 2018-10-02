@@ -1,13 +1,11 @@
 <?php
 namespace BetaKiller\Assets;
 
-use BetaKiller\Acl\Resource\AssetsAclResourceInterface;
 use BetaKiller\Assets\Provider\AbstractAssetsProvider;
 use BetaKiller\Assets\Provider\AssetsProviderInterface;
 use BetaKiller\Config\ConfigProviderInterface;
 use BetaKiller\Factory\NamespaceBasedFactoryBuilder;
 use BetaKiller\Factory\RepositoryFactory;
-use Spotman\Acl\AclInterface;
 
 /**
  * Class AssetsProviderFactory
@@ -47,11 +45,6 @@ class AssetsProviderFactory
     private $handlerFactory;
 
     /**
-     * @var \Spotman\Acl\AclInterface
-     */
-    private $acl;
-
-    /**
      * @var AssetsProviderInterface[]
      */
     private $instances;
@@ -65,7 +58,6 @@ class AssetsProviderFactory
      * @param \BetaKiller\Assets\AssetsStorageFactory          $storageFactory
      * @param \BetaKiller\Assets\AssetsPathStrategyFactory     $pathStrategyFactory
      * @param \BetaKiller\Assets\AssetsHandlerFactory          $handlerFactory
-     * @param \Spotman\Acl\AclInterface                        $acl
      *
      * @throws \BetaKiller\Factory\FactoryException
      */
@@ -75,8 +67,7 @@ class AssetsProviderFactory
         RepositoryFactory $repositoryFactory,
         AssetsStorageFactory $storageFactory,
         AssetsPathStrategyFactory $pathStrategyFactory,
-        AssetsHandlerFactory $handlerFactory,
-        AclInterface $acl
+        AssetsHandlerFactory $handlerFactory
     ) {
         $this->factory = $factoryBuilder
             ->createFactory()
@@ -89,7 +80,6 @@ class AssetsProviderFactory
         $this->storageFactory      = $storageFactory;
         $this->pathStrategyFactory = $pathStrategyFactory;
         $this->handlerFactory      = $handlerFactory;
-        $this->acl                 = $acl;
     }
 
     /**
@@ -171,16 +161,6 @@ class AssetsProviderFactory
         // Repository codename is equal model name
         $repository = $this->repositoryFactory->create($modelName);
 
-        // Acl resource name is equal to model name
-        $aclResource = $this->acl->getResource($modelName);
-
-        if (!($aclResource instanceof AssetsAclResourceInterface)) {
-            throw new AssetsException('Acl resource :name must implement :must', [
-                ':name' => $modelName,
-                ':must' => AssetsAclResourceInterface::class,
-            ]);
-        }
-
         $storage = $this->storageFactory->createFromConfig($storageConfig);
 
         $pathStrategy = $this->pathStrategyFactory->create($pathStrategyName, $repository);
@@ -189,7 +169,6 @@ class AssetsProviderFactory
         $providerInstance = $this->factory->create($providerName, [
             'storage'      => $storage,
             'repository'   => $repository,
-            'aclResource'  => $aclResource,
             'pathStrategy' => $pathStrategy,
         ]);
 

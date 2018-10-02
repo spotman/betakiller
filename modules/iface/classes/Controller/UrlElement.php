@@ -73,6 +73,12 @@ class Controller_UrlElement extends Controller
 
     /**
      * @Inject
+     * @var \BetaKiller\Model\UserInterface
+     */
+    private $user;
+
+    /**
+     * @Inject
      * @var \Psr\Log\LoggerInterface
      */
     private $logger;
@@ -170,9 +176,9 @@ class Controller_UrlElement extends Controller
     private function checkUrlElementAccess(UrlElementInterface $urlElement, UrlContainerInterface $urlParameters): void
     {
         // Force authorization for non-public zones before security check
-        $this->aclHelper->forceAuthorizationIfNeeded($urlElement);
+        $this->aclHelper->forceAuthorizationIfNeeded($urlElement, $this->user);
 
-        if (!$this->aclHelper->isUrlElementAllowed($urlElement, $urlParameters)) {
+        if (!$this->aclHelper->isUrlElementAllowed($this->user, $urlElement, $urlParameters)) {
             throw new \BetaKiller\Auth\AccessDeniedException();
         }
     }
