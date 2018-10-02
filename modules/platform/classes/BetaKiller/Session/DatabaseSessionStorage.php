@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\Session;
 
-use BetaKiller\Auth\Auth;
+use BetaKiller\Auth\AuthFacade;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Zend\Expressive\Session\SessionInterface as ZendSessionInterface;
@@ -20,8 +20,8 @@ class DatabaseSessionStorage implements SessionStorageInterface
     public function initializeSessionFromRequest(ServerRequestInterface $request): ZendSessionInterface
     {
         $cookies = $request->getCookieParams();
-        $sessionCookie = $cookies[Auth::SESSION_COOKIE] ?? '';
-        $parts = explode(Auth::SESSION_COOKIE_DELIMITER, $sessionCookie, 2);
+        $sessionCookie = $cookies[AuthFacade::SESSION_COOKIE] ?? '';
+        $parts = explode(AuthFacade::SESSION_COOKIE_DELIMITER, $sessionCookie, 2);
         $sid = \array_pop($parts);
 
         return $this->factory($sid);
@@ -62,7 +62,7 @@ class DatabaseSessionStorage implements SessionStorageInterface
     private function factory(?string $id): SessionInterface
     {
         $config = [
-            'name' => Auth::SESSION_COOKIE,
+            'name' => AuthFacade::SESSION_COOKIE,
         ];
 
         $kohanaSession = new \Session_Database($config, $id);

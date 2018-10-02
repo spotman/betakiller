@@ -155,11 +155,11 @@ interface AssetsProviderInterface
     public function store(string $fullPath, string $originalName, UserInterface $user): AssetsModelInterface;
 
     /**
-     * @param AssetsModelInterface $model
+     * @param AssetsModelInterface            $model
      *
-     * @throws \BetaKiller\Assets\AssetsProviderException
+     * @param \BetaKiller\Model\UserInterface $user
      */
-    public function delete(AssetsModelInterface $model): void;
+    public function delete(AssetsModelInterface $model, UserInterface $user): void;
 
     /**
      * Proxy for saving model (provider already has right repository inside)

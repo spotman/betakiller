@@ -121,6 +121,7 @@ class AvailableUrlsCollector
         ]);
 
         $urlCounter = 0;
+        $guest = $this->aclHelper->getGuestUser();
 
         foreach ($this->getAvailableIFaceUrls($urlElement, $params) as $availableUrl) {
             $urlParameter = $availableUrl->getUrlParameter();
@@ -131,7 +132,7 @@ class AvailableUrlsCollector
             }
 
             try {
-                if (!$this->aclHelper->isUrlElementAllowed($urlElement, $params)) {
+                if (!$this->aclHelper->isUrlElementAllowed($guest, $urlElement, $params)) {
                     $this->logger->debug('Skip :codename IFace coz it is not allowed', [
                         ':codename' => $urlElement->getCodename(),
                     ]);

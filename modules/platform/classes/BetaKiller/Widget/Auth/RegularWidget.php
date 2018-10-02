@@ -1,7 +1,7 @@
 <?php
 namespace BetaKiller\Widget\Auth;
 
-use BetaKiller\Auth\Auth;
+use BetaKiller\Auth\AuthFacade;
 use BetaKiller\Exception\BadRequestHttpException;
 use BetaKiller\Helper\IFaceHelper;
 use BetaKiller\IFace\Auth\PasswordReset;
@@ -12,7 +12,7 @@ use Psr\Http\Message\ServerRequestInterface;
 class RegularWidget extends AbstractPublicWidget
 {
     /**
-     * @var Auth
+     * @var AuthFacade
      */
     private $auth;
 
@@ -29,11 +29,11 @@ class RegularWidget extends AbstractPublicWidget
     /**
      * RegularWidget constructor.
      *
-     * @param \BetaKiller\Auth\Auth                    $auth
+     * @param \BetaKiller\Auth\AuthFacade              $auth
      * @param \BetaKiller\Helper\IFaceHelper           $ifaceHelper
      * @param \Psr\Http\Message\ServerRequestInterface $psrRequest
      */
-    public function __construct(Auth $auth, IFaceHelper $ifaceHelper, ServerRequestInterface $psrRequest)
+    public function __construct(AuthFacade $auth, IFaceHelper $ifaceHelper, ServerRequestInterface $psrRequest)
     {
         $this->auth        = $auth;
         $this->ifaceHelper = $ifaceHelper;

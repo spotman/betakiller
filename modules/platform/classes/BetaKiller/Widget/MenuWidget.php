@@ -6,6 +6,7 @@ namespace BetaKiller\Widget;
 use BetaKiller\Helper\AclHelper;
 use BetaKiller\Helper\IFaceHelper;
 use BetaKiller\IFace\Exception\IFaceException;
+use BetaKiller\Model\UserInterface;
 use BetaKiller\Url\Behaviour\UrlBehaviourFactory;
 use BetaKiller\Url\Container\UrlContainer;
 use BetaKiller\Url\Container\UrlContainerInterface;
@@ -38,23 +39,31 @@ class MenuWidget extends AbstractPublicWidget
     private $behaviourFactory;
 
     /**
+     * @var \BetaKiller\Model\UserInterface
+     */
+    private $user;
+
+    /**
      * AuthWidget constructor.
      *
      * @param \BetaKiller\Url\UrlElementTreeInterface       $tree
      * @param \BetaKiller\Helper\IFaceHelper                $ifaceHelper
      * @param \BetaKiller\Helper\AclHelper                  $aclHelper
+     * @param \BetaKiller\Model\UserInterface               $user
      * @param \BetaKiller\Url\Behaviour\UrlBehaviourFactory $behaviourFactory
      */
     public function __construct(
         UrlElementTreeInterface $tree,
         IFaceHelper $ifaceHelper,
         AclHelper $aclHelper,
+        UserInterface $user,
         UrlBehaviourFactory $behaviourFactory
     ) {
         $this->tree             = $tree;
         $this->ifaceHelper      = $ifaceHelper;
         $this->aclHelper        = $aclHelper;
         $this->behaviourFactory = $behaviourFactory;
+        $this->user = $user;
     }
 
     /**
@@ -138,7 +147,7 @@ class MenuWidget extends AbstractPublicWidget
                 $params->setParameter($urlParameter, true);
             }
             try {
-                if (!$this->aclHelper->isUrlElementAllowed($ifaceModel, $params)) {
+                if (!$this->aclHelper->isUrlElementAllowed($this->user, $ifaceModel, $params)) {
                     continue;
                 }
             } catch (\Spotman\Acl\Exception $e) {
