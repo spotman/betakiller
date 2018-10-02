@@ -1,8 +1,6 @@
 'use strict';
 
-import WampAuthChallenge from './WampAuthChallenge'
-
-export default class WampConnection {
+class WampConnection {
   constructor(url, realm, authChallenge = undefined) {
     this.url           = url
     this.realm         = realm
@@ -58,10 +56,11 @@ export default class WampConnection {
     if (this.authChallenge instanceof WampAuthChallenge) {
       options.authmethods = [this.authChallenge.getMethod()]
       options.authid      = this.authChallenge.getAuthId()
-      options.onchallenge = this._onChallenge
+      options.onchallenge = (...args) => this._onChallenge.apply(this, args)
     }
     this.wampConnection        = new autobahn.Connection(options)
-    this.wampConnection.onopen = this._onOpen
+    this.wampConnection.onopen = (...args) => this._onOpen.apply(this, args)
+    this.wampConnection.open()
   }
 
   _markConnectionAsReady() {
@@ -88,8 +87,10 @@ export default class WampConnection {
   }
 
   _onChallenge(session, method, extra) {
-    this.authChallenge
-      .run(session, method, extra)
-      .catch(message => this._onReject(message))
+    if (this.authChallenge instanceof WampAuthChallenge) {
+      return this.authChallenge.run(session, method, extra)
+    } else {
+      throw new Error('WAMP auth challenge not found or invalid instance. Valid instance: WampAuthChallenge.')
+    }
   }
 }
