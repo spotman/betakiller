@@ -36,13 +36,13 @@ class WampClient extends \Thruway\Peer\Client
      */
     public function onSessionStart($session, $transport)
     {
-        $this->registerApiValidationUserEmail();
+        $this->registerApi();
     }
 
     /**
      * @return \BetaKiller\Wamp\WampClient
      */
-    public function registerApiValidationUserEmail(): self
+    public function registerApi(): self
     {
         $apiFacade = $this->apiFacade;
         $procedure = function ($args) use ($apiFacade) {
@@ -50,12 +50,10 @@ class WampClient extends \Thruway\Peer\Client
                 'Validation',
                 ApiResourceProxyInterface::INTERNAL
             );
+            $response              = $validationApiResource->call('UserEmail', ['email' => $args[0]]);
 
-            return (bool)$validationApiResource->call('UserEmail', ['email' => $args[0]]);
+            return $response->getData()['result'];
         };
-//        $this
-//            ->getSession()
-//            ->register('api.validation.userEmail', $procedure);
         $this
             ->getSession()
             ->register('api.*.*', $procedure);

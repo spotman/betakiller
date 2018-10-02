@@ -463,7 +463,7 @@ class Auth
     {
         $serverParams = $request->getServerParams();
 
-        return $serverParams['HTTP_USER_AGENT'];
+        return $serverParams['HTTP_USER_AGENT'] ?? '';
     }
 
     /**
