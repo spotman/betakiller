@@ -13,6 +13,18 @@ use BetaKiller\Model\LanguageInterface;
  */
 class LanguageRepository extends AbstractOrmBasedRepository implements LanguageRepositoryInterface
 {
+    public function getByName(string $name): LanguageInterface
+    {
+        $model = $this->findByName($name);
+
+        if (!$model) {
+            throw new RepositoryException('Missing language with name :value', [
+                ':value' => $name,
+            ]);
+        }
+
+        return $model;
+    }
     /**
      * @param string $name
      *
