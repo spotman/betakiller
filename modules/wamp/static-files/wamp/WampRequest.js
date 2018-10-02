@@ -1,25 +1,18 @@
 'use strict';
 
 class WampRequest {
-  constructor(connection, resourcePrefix = '') {
+  constructor(connection) {
     this.connection     = connection
-    this.resourcePrefix = resourcePrefix
   }
 
-  request(resource, method = '', data = undefined) {
-    let url = []
-    if (this.resourcePrefix) url.push(this.resourcePrefix)
-    url.push(resource)
-    if (method) url.push(method)
-    url = url.join('.')
-
+  request(procedure, data = null) {
     data = this._normalizeCallData(data)
 
     this.connection
       .getSession()
-      .call(url, data)
+      .call(procedure, data)
       .then(response => this._onResolve(response))
-      .catch(message => this._onReject(url, message))
+      .catch(message => this._onReject(procedure, message))
 
     return new Promise((resolve, reject) => {
       this.resolve = resolve

@@ -62,14 +62,10 @@ class WampRouter implements WampRouterInterface
         $router = new Router();
 
         // transport
-        $transportProvider = new RatchetTransportProvider(
+        $router->addTransportProvider(new RatchetTransportProvider(
             $this->wampConfig->getConnectionHost(),
             $this->wampConfig->getConnectionPort()
-        );
-        $router->registerModule($transportProvider);
-
-        // client
-        $router->addInternalClient($this->wampClient);
+        ));
 
         // auth manager
         $authMgr = new AuthenticationManager();
@@ -79,6 +75,9 @@ class WampRouter implements WampRouterInterface
         $authProvClient = new WampCraAuthProvider([$this->wampConfig->getRealmName()]);
         $authProvClient->setUserDb($this->wampUserDb);
         $router->addInternalClient($authProvClient);
+
+        // client
+        $router->addInternalClient($this->wampClient);
 
         // start
         $router->start();

@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\Wamp;
 
-use BetaKiller\Auth\Auth;
+use BetaKiller\Auth\AuthFacade;
 use BetaKiller\Session\SessionStorageInterface;
 use \Thruway\Authentication\WampCraUserDbInterface;
 use Thruway\Common\Utils;
@@ -19,17 +19,17 @@ class WampUserDb implements WampCraUserDbInterface
     private $sessionStorage;
 
     /**
-     * @var \BetaKiller\Auth\Auth
+     * @var \BetaKiller\Auth\AuthFacade
      */
     private $auth;
 
     /**
      * @param \BetaKiller\Session\SessionStorageInterface $sessionStorage
-     * @param \BetaKiller\Auth\Auth                       $auth
+     * @param \BetaKiller\Auth\AuthFacade                 $auth
      */
     public function __construct(
         SessionStorageInterface $sessionStorage,
-        Auth $auth
+        AuthFacade $auth
     ) {
         $this->sessionStorage = $sessionStorage;
         $this->auth           = $auth;

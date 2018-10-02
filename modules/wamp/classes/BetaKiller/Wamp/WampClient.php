@@ -4,8 +4,13 @@ declare(strict_types=1);
 namespace BetaKiller\Wamp;
 
 use BetaKiller\Api\ApiFacade;
-use Spotman\Api\ApiResourceProxyInterface;
+use BetaKiller\Auth\AuthFacade;
 use BetaKiller\Config\WampConfig;
+use BetaKiller\Exception;
+use BetaKiller\Helper\LoggerHelperTrait;
+use BetaKiller\Model\UserInterface;
+use Psr\Log\LoggerInterface;
+use Spotman\Api\ApiResourceProxyInterface;
 
 /**
  * https://github.com/voryx/Thruway#php-client-example
@@ -13,21 +18,38 @@ use BetaKiller\Config\WampConfig;
  */
 class WampClient extends \Thruway\Peer\Client
 {
+    use LoggerHelperTrait;
+
     /**
      * @var \BetaKiller\Api\ApiFacade
      */
     private $apiFacade;
 
     /**
+     * @var \Psr\Log\LoggerInterface
+     */
+    private $logger;
+
+    /**
+     * @var \BetaKiller\Auth\AuthFacade
+     */
+    private $auth;
+
+    /**
      * @param \BetaKiller\Config\WampConfig $wampConfig
      * @param \BetaKiller\Api\ApiFacade     $apiFacade
+     * @param \BetaKiller\Auth\AuthFacade   $auth
+     * @param \Psr\Log\LoggerInterface      $logger
+     *
+     * @throws \BetaKiller\Exception
      */
-    public function __construct(WampConfig $wampConfig, ApiFacade $apiFacade)
+    public function __construct(WampConfig $wampConfig, ApiFacade $apiFacade, AuthFacade $auth, LoggerInterface $logger)
     {
+        parent::__construct($wampConfig->getRealmName());
 
         $this->apiFacade = $apiFacade;
-
-        parent::__construct($wampConfig->getRealmName());
+        $this->logger    = $logger;
+        $this->auth      = $auth;
     }
 
     /**
@@ -36,36 +58,47 @@ class WampClient extends \Thruway\Peer\Client
      */
     public function onSessionStart($session, $transport)
     {
-        $this->registerApi();
+        $session->register('api', [$this, 'apiCallProcedure'], [
+//            'caller_identification' => true,
+            'disclose_caller' => true,
+        ]);
     }
 
-    /**
-     * @return \BetaKiller\Wamp\WampClient
-     */
-    public function registerApi(): self
+    public function apiCallProcedure(array $arguments, \stdClass $dummy, \stdClass $options)
     {
-        $apiFacade = $this->apiFacade;
-        $procedure = function ($args) use ($apiFacade) {
-            $validationApiResource = $apiFacade->get(
-                'Validation',
-                ApiResourceProxyInterface::INTERNAL
-            );
-            $response              = $validationApiResource->call('UserEmail', ['email' => $args[0]]);
+        $sessionID = (string)$options->authid;
 
-            return $response->getData()['result'];
-        };
-        $this
-            ->getSession()
-            ->register('api.*.*', $procedure);
+        if (!$sessionID) {
+            $this->logException($this->logger, new Exception('Empty session id in wamp api call'));
 
-        return $this;
+            return null;
+        }
+
+        $user = $this->auth->getUserFromSessionID($sessionID);
+
+        $resource = \array_shift($arguments);
+        $method   = \array_shift($arguments);
+
+        $resource = \ucfirst($resource);
+
+        $this->logger->debug('User is :name', [':name' => $user->getUsername()]);
+        $this->logger->debug('Resource is :name', [':name' => $resource]);
+        $this->logger->debug('Method is :name', [':name' => $method]);
+        $this->logger->debug('Arguments are :value', [':value' => \json_encode($arguments)]);
+
+        $result = $this->callApiMethod($resource, $method, $arguments, $user);
+
+        $this->logger->debug('Result is :value', [':value' => \json_encode($result)]);
+
+        return $result;
     }
 
-    /**
-     * @return array
-     */
-    public function getPhpVersion(): array
+    private function callApiMethod(string $resource, string $method, array $arguments, UserInterface $user)
     {
-        return [PHP_VERSION];
+        $proxy = $this->apiFacade->get($resource, ApiResourceProxyInterface::INTERNAL);
+
+        $result = $proxy->call($method, $arguments, $user);
+
+        return $result->getData();
     }
 }
