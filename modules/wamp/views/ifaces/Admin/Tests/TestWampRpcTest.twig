@@ -1,9 +1,12 @@
 {% extends '@layouts/onlyContent' %}
 
 {% block page_content %}
-  {# todo replace on https://github.com/crossbario/autobahn-js/tree/master/lib #}
-  <script src="https://cdn.bootcss.com/autobahn/0.11.0/autobahn.min.js"></script>
   {{ js('wamp/Admin/Tests/TestWampRpcTest.js') }}
+  {#{{ js('wamp/autobahn.min.js') }}#}
+  {{ js('wamp/Session.js') }}
+  {{ js('wamp/WampAuthChallenge.js') }}
+  {{ js('wamp/WampConnection.js') }}
+  {{ js('wamp/WampRequest.js') }}
 
 
   <div class="row">
