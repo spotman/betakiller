@@ -10,7 +10,7 @@ require([
     let wampAuthChallenge = new WampAuthChallenge(session.getId(), window.navigator.userAgent)
     let wampConnection    = new WampConnection(
       'wss://' + window.location.hostname + '/wamp',
-      'realm1',
+      'public',
       wampAuthChallenge
     )
     wampConnection
@@ -19,8 +19,9 @@ require([
       .then(connection => {
         console.log('OK. WAMP connection: ', connection)
         if (!connection.isFirst()) return
-        new WampRequest(wampConnection, 'api')
-          .request('validation', 'userEmail', 'qwe@qwe.qwe')
+
+        (new WampApiRequest(wampConnection))
+          .call('validation', 'userEmail', 'qwe@qwe.qwe')
           .then(response => console.log('OK. WAMP request: ', response))
           .catch(message => console.log('ERROR. WAMP request: ', message.url, message.error))
       })
