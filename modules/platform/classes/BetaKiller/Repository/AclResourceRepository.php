@@ -2,15 +2,15 @@
 namespace BetaKiller\Repository;
 
 use BetaKiller\Model\AclResource;
+use BetaKiller\Model\AclResourceInterface;
 use BetaKiller\Model\ExtendedOrmInterface;
 
 /**
  * Class UserRepository
  *
  * @package BetaKiller\Repository
- * @method AclResource create()
- * @method AclResource findById(int $id)
- * @method AclResource[] getAll()
+ * @method AclResourceInterface findById(int $id)
+ * @method AclResourceInterface[] getAll()
  * @method AclResource getOrmInstance()
  */
 class AclResourceRepository extends AbstractOrmBasedSingleParentTreeRepository
@@ -26,10 +26,10 @@ class AclResourceRepository extends AbstractOrmBasedSingleParentTreeRepository
     /**
      * @param string $name
      *
-     * @return \BetaKiller\Model\AclResource
+     * @return \BetaKiller\Model\AclResourceInterface
      * @throws \BetaKiller\Repository\RepositoryException
      */
-    public function getByName(string $name): AclResource
+    public function getByName(string $name): AclResourceInterface
     {
         $orm = $this->getOrmInstance();
 

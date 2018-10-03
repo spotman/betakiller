@@ -7,7 +7,7 @@ class Logout extends AbstractIFace
 {
     /**
      * @Inject
-     * @var \BetaKiller\Auth\Auth
+     * @var \BetaKiller\Auth\AuthFacade
      */
     private $auth;
 

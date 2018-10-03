@@ -31,8 +31,9 @@ abstract class AbstractStatusRelatedModelResourceRulesCollector extends Abstract
      * Key=>Value pairs where key is a permission identity and value is an array of roles
      *
      * @return string[][]
+     * @throws \BetaKiller\Factory\FactoryException
      */
-    protected function getPermissionsRoles()
+    protected function getPermissionsRoles(): array
     {
         $model = $this->getStatusModel();
 

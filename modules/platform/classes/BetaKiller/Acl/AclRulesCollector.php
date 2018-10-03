@@ -26,8 +26,10 @@ class AclRulesCollector implements AclRulesCollectorInterface
      * Collect entities from external source and add them to acl via protected methods addAllowRule / addDenyRule
      *
      * @param \Spotman\Acl\AclInterface $acl
+     *
+     * @throws \Kohana_Exception
      */
-    public function collectPermissions(AclInterface $acl)
+    public function collectPermissions(AclInterface $acl): void
     {
         $permissions = $this->permissionModel->getAllPermissions();
 

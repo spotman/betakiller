@@ -1,6 +1,8 @@
 <?php
 namespace BetaKiller\Api\Resource;
 
-use Spotman\Api\AbstractMethodsCollectionApiResource;
+use Spotman\Api\AbstractApiResource;
 
-class ContentCommentApiResource extends AbstractMethodsCollectionApiResource {}
+class ContentCommentApiResource extends AbstractApiResource
+{
+}

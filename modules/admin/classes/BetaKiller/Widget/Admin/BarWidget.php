@@ -8,6 +8,7 @@ use BetaKiller\Helper\UrlContainerHelper;
 use BetaKiller\IFace\Exception\IFaceException;
 use BetaKiller\IFace\IFaceInterface;
 use BetaKiller\Model\DispatchableEntityInterface;
+use BetaKiller\Model\UserInterface;
 use BetaKiller\Url\UrlElementTreeInterface;
 use BetaKiller\Url\ZoneInterface;
 use BetaKiller\Widget\AbstractAdminWidget;
@@ -46,10 +47,16 @@ class BarWidget extends AbstractAdminWidget
      */
     private $aclHelper;
 
+    /**
+     * @var \BetaKiller\Model\UserInterface
+     */
+    private $user;
+
     public function __construct(
         UrlElementTreeInterface $tree,
         IFaceHelper $ifaceHelper,
         AclHelper $aclHelper,
+        UserInterface $user,
         UrlContainerHelper $urlParamHelper
 //        ContentHelper $contentHelper
     )
@@ -59,6 +66,7 @@ class BarWidget extends AbstractAdminWidget
         $this->ifaceHelper    = $ifaceHelper;
         $this->urlParamHelper = $urlParamHelper;
 //        $this->contentHelper  = $contentHelper;
+        $this->user = $user;
     }
 
     /**
@@ -112,7 +120,7 @@ class BarWidget extends AbstractAdminWidget
             ZoneInterface::ADMIN);
 
         foreach ($urlElements as $urlElement) {
-            if (!$this->aclHelper->isUrlElementAllowed($urlElement)) {
+            if (!$this->aclHelper->isUrlElementAllowed($this->user, $urlElement)) {
                 continue;
             }
 

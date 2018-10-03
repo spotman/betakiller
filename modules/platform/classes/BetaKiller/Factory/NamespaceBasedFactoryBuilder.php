@@ -45,10 +45,11 @@ class NamespaceBasedFactoryBuilder
     public function createFactory(): NamespaceBasedFactory
     {
         // Always create new instance coz client code is configuring this instance
-
         try {
             /** @var \BetaKiller\Factory\NamespaceBasedFactory $factory */
             $factory = $this->container->make(NamespaceBasedFactory::class);
+
+            $factory->addRootNamespace('BetaKiller');
 
             if (!$this->appEnv->isCoreRunning()) {
                 $factory->addRootNamespace($this->appConfig->getNamespace());
