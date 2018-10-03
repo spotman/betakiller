@@ -32,7 +32,7 @@ interface StatusRelatedEntityAclResourceInterface extends EntityRelatedAclResour
      *
      * @return string
      */
-    public function makeStatusPermissionIdentity(StatusModelInterface $model, $action);
+    public function makeStatusPermissionIdentity(StatusModelInterface $model, string $action): string;
 
     /**
      * @param \BetaKiller\Status\StatusModelInterface $statusModel
@@ -40,5 +40,5 @@ interface StatusRelatedEntityAclResourceInterface extends EntityRelatedAclResour
      *
      * @return string
      */
-    public function makeTransitionPermissionIdentity(StatusModelInterface $statusModel, $transitionName);
+    public function makeTransitionPermissionIdentity(StatusModelInterface $statusModel, string $transitionName): string;
 }

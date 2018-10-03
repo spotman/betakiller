@@ -29,9 +29,7 @@ class AclResourcesCollector implements AclResourcesCollectorInterface
      */
     public function collectResources(AclInterface $acl): void
     {
-        $resources = $this->resourceRepository->getAll();
-
-        foreach ($resources as $resource) {
+        foreach ($this->resourceRepository->getAll() as $resource) {
             $acl->addResource($resource->getCodename(), $resource->getParentResourceCodename());
         }
     }

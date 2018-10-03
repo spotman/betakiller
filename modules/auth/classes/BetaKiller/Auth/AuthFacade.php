@@ -15,7 +15,7 @@ use BetaKiller\Session\SessionStorageInterface;
 use Cookie;
 use Psr\Http\Message\ServerRequestInterface;
 
-class Auth
+class AuthFacade
 {
     public const SESSION_COOKIE           = 'sid';
     public const SESSION_COOKIE_DELIMITER = '~';

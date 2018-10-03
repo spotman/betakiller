@@ -1,7 +1,7 @@
 <?php
 namespace BetaKiller\Model;
 
-class AclResource extends AbstractOrmBasedSingleParentTreeModel
+class AclResource extends AbstractOrmBasedSingleParentTreeModel implements AclResourceInterface
 {
     public const URL_KEY = 'name';
 

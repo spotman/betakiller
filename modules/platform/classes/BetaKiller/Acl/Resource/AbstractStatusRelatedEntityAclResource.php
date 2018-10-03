@@ -50,7 +50,7 @@ abstract class AbstractStatusRelatedEntityAclResource extends AbstractEntityRela
     public function isPermissionAllowed(string $permissionIdentity): bool
     {
         // Read/Update/Delete permissions rely on model status permissions
-        if (in_array($permissionIdentity, $this->getStatusActionsList(), true)) {
+        if (\in_array($permissionIdentity, $this->getStatusActionsList(), true)) {
             /** @var StatusRelatedModelInterface $entity */
             $entity = $this->getEntity();
             $status = $entity->getCurrentStatus();
@@ -97,12 +97,12 @@ abstract class AbstractStatusRelatedEntityAclResource extends AbstractEntityRela
      *
      * @return string
      */
-    public function makeStatusPermissionIdentity(StatusModelInterface $model, $action): string
+    public function makeStatusPermissionIdentity(StatusModelInterface $model, string $action): string
     {
         return $this->makeStatusPermissionIdentityBase($model).'.action.'.$action;
     }
 
-    public function makeTransitionPermissionIdentity(StatusModelInterface $statusModel, $transitionName): string
+    public function makeTransitionPermissionIdentity(StatusModelInterface $statusModel, string $transitionName): string
     {
         return $this->makeStatusPermissionIdentityBase($statusModel).'.transition.'.$transitionName;
     }

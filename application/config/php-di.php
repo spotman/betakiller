@@ -5,7 +5,7 @@ use BetaKiller\Acl\AclResourcesCollector;
 use BetaKiller\Acl\AclRolesCollector;
 use BetaKiller\Acl\AclRulesCollector;
 use BetaKiller\Api\AccessResolver\CustomApiMethodAccessResolverDetector;
-use BetaKiller\Auth\Auth;
+use BetaKiller\Auth\AuthFacade;
 use BetaKiller\Config\AppConfig;
 use BetaKiller\Config\AppConfigInterface;
 use BetaKiller\Config\ConfigProviderInterface;
@@ -68,7 +68,7 @@ return [
         }),
 
         'User' => DI\factory(function (
-            Auth $auth,
+            AuthFacade $auth,
             ServerRequestInterface $request,
             AppEnvInterface $appEnv,
             UserService $userService,

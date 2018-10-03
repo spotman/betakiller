@@ -9,6 +9,7 @@ use BetaKiller\Factory\GuestUserFactory;
 use BetaKiller\IFace\Exception\IFaceException;
 use BetaKiller\IFace\IFaceInterface;
 use BetaKiller\Model\DispatchableEntityInterface;
+use BetaKiller\Model\GuestUserInterface;
 use BetaKiller\Model\HasAdminZoneAccessSpecificationInterface;
 use BetaKiller\Model\HasPersonalZoneAccessSpecificationInterface;
 use BetaKiller\Model\HasPreviewZoneAccessSpecificationInterface;
@@ -20,7 +21,6 @@ use BetaKiller\Url\UrlElementInterface;
 use BetaKiller\Url\Zone\ZoneAccessSpecFactory;
 use BetaKiller\Url\Zone\ZoneAccessSpecInterface;
 use BetaKiller\Url\ZoneInterface;
-use Spotman\Acl\AccessResolver\UserAccessResolver;
 use Spotman\Acl\AclInterface;
 use Spotman\Acl\AclUserInterface;
 use Spotman\Acl\Exception;
@@ -32,11 +32,6 @@ class AclHelper
      * @var \Spotman\Acl\AclInterface
      */
     private $acl;
-
-    /**
-     * @var \BetaKiller\Model\UserInterface
-     */
-    private $user;
 
     /**
      * @var \BetaKiller\Factory\GuestUserFactory
@@ -53,33 +48,40 @@ class AclHelper
      *
      * @param \Spotman\Acl\AclInterface                  $acl
      * @param \BetaKiller\Url\Zone\ZoneAccessSpecFactory $specFactory
-     * @param \BetaKiller\Model\UserInterface            $user
      * @param \BetaKiller\Factory\GuestUserFactory       $guestFactory
      */
     public function __construct(
         AclInterface $acl,
         ZoneAccessSpecFactory $specFactory,
-        UserInterface $user,
         GuestUserFactory $guestFactory
     ) {
         $this->acl          = $acl;
-        $this->user         = $user;
         $this->specFactory  = $specFactory;
         $this->guestFactory = $guestFactory;
     }
 
     /**
+     * @param \BetaKiller\Model\UserInterface               $user
      * @param \BetaKiller\Model\DispatchableEntityInterface $entity
      * @param string|null                                   $action
      *
      * @return bool
      * @throws \Spotman\Acl\Exception
      */
-    public function isEntityActionAllowed(DispatchableEntityInterface $entity, ?string $action = null): bool
-    {
+    public function isEntityActionAllowed(
+        UserInterface $user,
+        DispatchableEntityInterface $entity,
+        ?string $action = null
+    ): bool {
         $resource = $this->getEntityAclResource($entity);
+        $action   = $action ?? CrudlsActionsInterface::ACTION_READ;
 
-        return $this->isPermissionAllowed($resource, $action ?? CrudlsActionsInterface::ACTION_READ);
+        return $this->isPermissionAllowed($user, $resource, $action);
+    }
+
+    public function getGuestUser(): GuestUserInterface
+    {
+        return $this->guestFactory->create();
     }
 
     /**
@@ -119,25 +121,20 @@ class AclHelper
     }
 
     /**
+     * @param \Spotman\Acl\AclUserInterface                        $user
      * @param \BetaKiller\Url\UrlElementInterface                  $urlElement
      * @param \BetaKiller\Url\Container\UrlContainerInterface|null $params
-     * @param null|\Spotman\Acl\AclUserInterface                   $user
      *
      * @return bool
+     * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\IFace\Exception\IFaceException
      * @throws \Spotman\Acl\Exception
      */
     public function isUrlElementAllowed(
+        AclUserInterface $user,
         UrlElementInterface $urlElement,
-        ?UrlContainerInterface $params = null,
-        ?AclUserInterface $user = null
+        ?UrlContainerInterface $params = null
     ): bool {
-
-        // Use current user as default one
-        if (!$user) {
-            $user = $this->user;
-        }
-
         $urlElementCustomRules = $urlElement->getAdditionalAclRules();
 
         // Check UrlElement custom rules
@@ -201,7 +198,7 @@ class AclHelper
                     $resource->setEntity($entityInstance);
                 }
 
-                if (!$this->isPermissionAllowed($resource, $actionName, $user)) {
+                if (!$this->isPermissionAllowed($user, $resource, $actionName)) {
                     return false;
                 }
             }
@@ -225,20 +222,22 @@ class AclHelper
     }
 
     /**
-     * @param \BetaKiller\IFace\IFaceInterface                     $iface
-     * @param \BetaKiller\Url\Container\UrlContainerInterface|null $params
      * @param null|\Spotman\Acl\AclUserInterface                   $user
      *
+     * @param \BetaKiller\IFace\IFaceInterface                     $iface
+     * @param \BetaKiller\Url\Container\UrlContainerInterface|null $params
+     *
      * @return bool
+     * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\IFace\Exception\IFaceException
      * @throws \Spotman\Acl\Exception
      */
     public function isIFaceAllowed(
+        AclUserInterface $user,
         IFaceInterface $iface,
-        ?UrlContainerInterface $params = null,
-        ?AclUserInterface $user = null
+        ?UrlContainerInterface $params = null
     ): bool {
-        return $this->isUrlElementAllowed($iface->getModel(), $params, $user);
+        return $this->isUrlElementAllowed($user, $iface->getModel(), $params);
     }
 
     /**
@@ -318,10 +317,11 @@ class AclHelper
 
     /**
      * @param \BetaKiller\Url\UrlElementInterface $urlElement
+     * @param \BetaKiller\Model\UserInterface     $user
      *
      * @throws \BetaKiller\Auth\AuthorizationRequiredException
      */
-    public function forceAuthorizationIfNeeded(UrlElementInterface $urlElement): void
+    public function forceAuthorizationIfNeeded(UrlElementInterface $urlElement, UserInterface $user): void
     {
         // Only IFaces have zone definition
         if (!$urlElement instanceof IFaceModelInterface) {
@@ -331,8 +331,8 @@ class AclHelper
         $zoneSpec = $this->getIFaceZoneAccessSpec($urlElement);
 
         // User authorization is required for entering protected zones
-        if ($zoneSpec->isAuthRequired() && $this->user->isGuest()) {
-            $this->user->forceAuthorization();
+        if ($zoneSpec->isAuthRequired() && $user->isGuest()) {
+            $user->forceAuthorization();
         }
     }
 
@@ -347,13 +347,13 @@ class AclHelper
     }
 
     /**
-     * @param string[]                           $rules
-     * @param null|\Spotman\Acl\AclUserInterface $user
+     * @param string[]                      $rules
+     * @param \Spotman\Acl\AclUserInterface $user
      *
      * @return bool
      * @throws \Spotman\Acl\Exception
      */
-    private function checkCustomAclRules(array $rules, ?AclUserInterface $user = null): bool
+    private function checkCustomAclRules(array $rules, AclUserInterface $user): bool
     {
         // No rules = allow access
         if (!$rules) {
@@ -365,7 +365,7 @@ class AclHelper
 
             $resource = $this->getResource($resourceIdentity);
 
-            if (!$this->isPermissionAllowed($resource, $permissionIdentity, $user)) {
+            if (!$this->isPermissionAllowed($user, $resource, $permissionIdentity)) {
                 return false;
             }
         }
@@ -374,20 +374,19 @@ class AclHelper
     }
 
     /**
+     * @param \Spotman\Acl\AclUserInterface                    $user
+     *
      * @param \Spotman\Acl\Resource\ResolvingResourceInterface $resource
      * @param string                                           $permission
-     * @param null|\Spotman\Acl\AclUserInterface               $user
      *
      * @return bool
      */
     private function isPermissionAllowed(
+        AclUserInterface $user,
         ResolvingResourceInterface $resource,
-        string $permission,
-        ?AclUserInterface $user = null
+        string $permission
     ): bool {
-        if ($user) {
-            $resource->useResolver(new UserAccessResolver($this->acl, $user));
-        }
+        $this->acl->injectUserResolver($user, $resource);
 
         return $resource->isPermissionAllowed($permission);
     }
