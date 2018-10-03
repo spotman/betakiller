@@ -147,7 +147,7 @@ class IFaceUrlElementProcessor implements UrlElementProcessorInterface
                 ]);
             }
 
-            $response->last_modified($iface->getLastModified());
+            $response->lastModified($iface->getLastModified());
             $response->expires($iface->getExpiresDateTime());
             $response->send_string($output);
         } catch (\Throwable $e) {

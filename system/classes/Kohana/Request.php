@@ -764,6 +764,7 @@ class Kohana_Request implements HTTP_Request {
 	 * @param   string   $key      Key of the value
 	 * @param   mixed    $default  Default value if the key is not set
 	 * @return  mixed
+     * @deprecated
 	 */
 	public function param($key = NULL, $default = NULL)
 	{
@@ -861,6 +862,7 @@ class Kohana_Request implements HTTP_Request {
 	 *
 	 * @param   string   $action  Action to execute the controller from
 	 * @return  mixed
+     * @deprecated
 	 */
 	public function action($action = NULL)
 	{
@@ -1300,6 +1302,7 @@ class Kohana_Request implements HTTP_Request {
 	 * @param   string $value  Value to set to a key
 	 * @return  mixed
 	 * @uses    Arr::path
+     * @deprecated
 	 */
 	public function post($key = NULL, $value = NULL)
 	{

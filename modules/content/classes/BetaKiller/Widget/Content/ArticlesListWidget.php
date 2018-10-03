@@ -74,23 +74,23 @@ class ArticlesListWidget extends AbstractPublicWidget
      */
     public function actionMore(): void
     {
-        $this->content_type_json();
+        $this->response->content_type_json();
 
-        if (!$this->is_ajax()) {
-            $this->send_error_json();
+        if (!$this->request->is_ajax()) {
+            $this->response->send_error_json();
 
             return;
         }
 
-        $term       = HTML::chars(strip_tags($this->query(self::SEARCH_TERM_QUERY_KEY)));
-        $page       = (int)$this->query(self::PAGE_QUERY_KEY);
-        $categoryID = (int)$this->query(self::CATEGORY_ID_QUERY_KEY);
+        $term       = HTML::chars(strip_tags($this->request->query(self::SEARCH_TERM_QUERY_KEY)));
+        $page       = (int)$this->request->query(self::PAGE_QUERY_KEY);
+        $categoryID = (int)$this->request->query(self::CATEGORY_ID_QUERY_KEY);
 
         $category = $this->categoryRepo->findById($categoryID);
 
         $data = $this->getArticlesData($category, $page, $term);
 
-        $this->send_success_json($data);
+        $this->response->send_success_json($data);
     }
 
     /**
