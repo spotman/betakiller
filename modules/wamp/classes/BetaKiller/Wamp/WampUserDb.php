@@ -5,7 +5,7 @@ namespace BetaKiller\Wamp;
 
 use BetaKiller\Auth\AuthFacade;
 use BetaKiller\Session\SessionStorageInterface;
-use \Thruway\Authentication\WampCraUserDbInterface;
+use Thruway\Authentication\WampCraUserDbInterface;
 use Thruway\Common\Utils;
 
 /**
@@ -53,11 +53,13 @@ class WampUserDb implements WampCraUserDbInterface
             return [];
         }
 
+        $userAgent = $session->get('user_agent');
+        //$salt      = Utils::getDerivedKey($userAgent, $authid);
+
         return [
             'authid' => $authid,
-            'key'    => $session->get('user_agent'),
-//            'salt'   => Utils::getUniqueId(),//todo can be used?
-//            'salt'   => '123123',
+            'key'    => $userAgent,
+            //'salt'   => $salt,
             'salt'   => null,
         ];
     }
