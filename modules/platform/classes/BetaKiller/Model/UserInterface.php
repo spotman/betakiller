@@ -4,14 +4,13 @@ declare(strict_types=1);
 namespace BetaKiller\Model;
 
 use BetaKiller\Notification\NotificationUserInterface;
-use BetaKiller\Session\SessionInterface;
 use BetaKiller\Utils\Kohana\ORM\OrmInterface;
 use DateTimeImmutable;
 use Spotman\Acl\AclUserInterface;
 
 interface UserInterface extends AbstractEntityInterface, OrmInterface, NotificationUserInterface, AclUserInterface
 {
-    public function completeLogin(SessionInterface $session): void;
+    public function completeLogin(): void;
 
     /**
      * @param \DateTimeInterface $value [optional]
@@ -206,11 +205,6 @@ interface UserInterface extends AbstractEntityInterface, OrmInterface, Notificat
     public function enableEmailNotification(): void;
 
     public function disableEmailNotification(): void;
-
-    /**
-     * @return array
-     */
-    public function as_array(): array;
 
     /**
      * @return string
