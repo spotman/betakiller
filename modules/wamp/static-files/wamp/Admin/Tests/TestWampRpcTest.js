@@ -4,26 +4,31 @@ require([
   'autobahn.min',
 ], function ($, rpc, autobahn) {
   $(function () {
-    window.autobahn = autobahn
+    window.autobahn = autobahn;
 
-    let session           = new Session('sid', '~')
-    let wampAuthChallenge = new WampAuthChallenge(session.getId(), window.navigator.userAgent)
+    let session           = new Session('sid', '~');
+    let wampAuthChallenge = new WampAuthChallenge(session.getId(), window.navigator.userAgent);
     let wampConnection    = new WampConnection(
       'wss://' + window.location.hostname + '/wamp',
       'realm1',
       wampAuthChallenge
-    )
+    );
     wampConnection
       .connect()
-      .catch(message => console.log('ERROR. WAMP connection: ', message))
       .then(connection => {
-        console.log('OK. WAMP connection: ', connection)
-        if (!connection.isFirst()) return
-        new WampRequest(wampConnection, 'api')
-          .request('validation', 'userEmail', 'qwe@qwe.qwe')
-          .then(response => console.log('OK. WAMP request: ', response))
-          .catch(message => console.log('ERROR. WAMP request: ', message.url, message.error))
+        console.log('OK. WAMP connection. ', connection);
+        this.WampOnOpen(connection);
       })
+      .catch(message => console.log('ER. WAMP connection. ', message));
+
+    this.WampOnOpen = (connection) => {
+      //if (!connection.isFirst()) return;
+
+      new WampRequest(wampConnection, 'api')
+        .request('validation', 'userEmail', 'qwe22@qwe.qwe')
+        .then(response => console.log('OK. WAMP request. Response: ', response))
+        .catch(message => console.log('ER. WAMP request. Url "' + message.url + '". Error: ', message.error));
+    };
 
   });
 });

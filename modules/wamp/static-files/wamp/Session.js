@@ -2,17 +2,17 @@
 
 class Session {
   constructor(cookieName, cookieSeparator = '') {
-    this.cookieName      = cookieName
-    this.cookieSeparator = cookieSeparator
+    this.cookieName      = cookieName;
+    this.cookieSeparator = cookieSeparator;
   }
 
   getId() {
-    let id = this._readCookie(this.cookieName)
+    let id = this._readCookie(this.cookieName);
     if (this.cookieSeparator) {
-      id = id.split(this.cookieSeparator, 2)
-      id = id[id.length - 1]
+      id = id.split(this.cookieSeparator, 2);
+      id = id[id.length - 1];
     }
-    return id
+    return id;
   }
 
   _readCookie(name) {
