@@ -17,17 +17,16 @@ require([
       .connect()
       .then(connection => {
         console.log('OK. WAMP connection. ', connection);
-        this.WampOnOpen(connection);
+        this.doWampRequest();
       })
-      .catch(message => console.log('ER. WAMP connection. ', message));
+      .catch(message => console.log('ERROR. WAMP connection. ', message));
 
-    this.WampOnOpen = (connection) => {
-      //if (!connection.isFirst()) return;
-
-      new WampRequest(wampConnection, 'api')
+    this.doWampRequest = () => {
+      let wampRequest = new WampRequest(wampConnection, 'api');
+      wampRequest
         .request('validation', 'userEmail', 'qwe22@qwe.qwe')
         .then(response => console.log('OK. WAMP request. Response: ', response))
-        .catch(message => console.log('ER. WAMP request. Url "' + message.url + '". Error: ', message.error));
+        .catch(message => console.log('ERROR. WAMP request. Url: ' + message.url + '. Error: ', message.error));
     };
 
   });
