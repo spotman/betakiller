@@ -5,7 +5,6 @@ namespace BetaKiller\Model;
 
 use BetaKiller\Auth\AuthorizationRequiredException;
 use BetaKiller\Exception\DomainException;
-use BetaKiller\Session\SessionInterface;
 use DateTimeImmutable;
 
 class User extends \ORM implements UserInterface
@@ -319,25 +318,16 @@ class User extends \ORM implements UserInterface
     /**
      * Complete the login for a user by incrementing the logins and saving login timestamp
      *
-     * @param \BetaKiller\Session\SessionInterface $session
-     *
      * @return void
      * @throws \Kohana_Exception
      */
-    public function completeLogin(SessionInterface $session): void
+    public function completeLogin(): void
     {
-        $request = \Request::current();
-
-        $session->set('user_agent', $request->getUserAgent());
-
         // Update the number of logins
         $this->set('logins', new \Database_Expression('logins + 1'));
 
         // Set the last login date
         $this->set('last_login', time());
-
-        // Store session id
-        $this->setSessionID($session->getId());
     }
 
     /**
