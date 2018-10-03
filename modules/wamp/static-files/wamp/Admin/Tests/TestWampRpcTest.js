@@ -10,7 +10,7 @@ require([
     let wampAuthChallenge = new WampAuthChallenge(session.getId(), window.navigator.userAgent);
     let wampConnection    = new WampConnection(
       'wss://' + window.location.hostname + '/wamp',
-      'realm1',
+      'public',
       wampAuthChallenge
     );
     wampConnection
