@@ -53,7 +53,7 @@ class Controller_Assets extends Controller
     public function action_upload(): void
     {
         // This method responds via JSON (all exceptions will be caught automatically)
-        $this->content_type_json();
+        $this->response->content_type_json();
 
         // Restrict multiple files at once
         if (count($_FILES) > 1) {
@@ -79,7 +79,7 @@ class Controller_Assets extends Controller
         }
 
         // Returns
-        $this->send_json(self::JSON_SUCCESS, $model->toJson());
+        $this->response->send_json(self::JSON_SUCCESS, $model->toJson());
     }
 
     /**
@@ -107,10 +107,10 @@ class Controller_Assets extends Controller
         $this->deploy($model, $content, AssetsProviderInterface::ACTION_ORIGINAL);
 
         // Send last modified date
-        $this->response->last_modified($model->getLastModifiedAt());
+        $this->response->lastModified($model->getLastModifiedAt());
 
         // Send file content + headers
-        $this->send_file($content, $model->getMime());
+        $this->response->sendFileContent($content, $model->getMime());
     }
 
     /**
@@ -136,10 +136,10 @@ class Controller_Assets extends Controller
         $content = $this->provider->getContent($model);
 
         // Send last modified date
-        $this->response->last_modified($model->getLastModifiedAt());
+        $this->response->lastModified($model->getLastModifiedAt());
 
         // Send file content + headers
-        $this->send_file($content, $model->getMime(), $model->getOriginalName(), true);
+        $this->response->sendFileContent($content, $model->getMime(), $model->getOriginalName(), true);
     }
 
     /**
@@ -183,15 +183,15 @@ class Controller_Assets extends Controller
         $this->deploy($model, $previewContent, $action, $size);
 
         // Send last modified date
-        $this->response->last_modified($model->getLastModifiedAt());
+        $this->response->lastModified($model->getLastModifiedAt());
 
         // Send file content + headers
-        $this->send_file($previewContent, $model->getMime());
+        $this->response->sendFileContent($previewContent, $model->getMime());
     }
 
     private function getSizeParam(): ?string
     {
-        return $this->param('size');
+        return $this->request->param('size');
     }
 
     /**
@@ -207,7 +207,7 @@ class Controller_Assets extends Controller
     public function action_delete(): void
     {
         // This method responds via JSON (all exceptions will be caught automatically)
-        $this->content_type_json();
+        $this->response->content_type_json();
 
         $this->detectProvider();
 
@@ -217,7 +217,7 @@ class Controller_Assets extends Controller
         // Delete file through provider
         $this->provider->delete($model, $this->user);
 
-        $this->send_json(self::JSON_SUCCESS);
+        $this->response->send_success_json();
     }
 
     /**
@@ -245,7 +245,7 @@ class Controller_Assets extends Controller
      */
     private function detectProvider(): void
     {
-        $requestKey = $this->param('provider');
+        $requestKey = $this->request->param('provider');
 
         if (!$requestKey) {
             throw new AssetsException('You must specify provider codename');
@@ -271,7 +271,7 @@ class Controller_Assets extends Controller
      */
     private function fromItemDeployUrl()
     {
-        $url = $this->param('item_url');
+        $url = $this->request->param('item_url');
 
         if (!$url) {
             throw new AssetsException('You must specify item url');
@@ -296,7 +296,7 @@ class Controller_Assets extends Controller
      */
     private function checkExtension(AssetsModelInterface $model): void
     {
-        $requestExt = $this->param('ext');
+        $requestExt = $this->request->param('ext');
         $modelExt   = $this->provider->getModelExtension($model);
 
         if (!$requestExt || $requestExt !== $modelExt) {
@@ -309,7 +309,7 @@ class Controller_Assets extends Controller
      */
     private function checkAction(): void
     {
-        $action = $this->action();
+        $action = $this->request->action();
 
         if (!$this->provider->hasAction($action)) {
             throw new NotImplementedHttpException('Action :name is not allowed for provider :codename', [
@@ -344,7 +344,7 @@ class Controller_Assets extends Controller
      */
     private function getCanonicalUrl(AssetsModelInterface $model): string
     {
-        $action = $this->action();
+        $action = $this->request->action();
 
         switch ($action) {
             case AssetsProviderInterface::ACTION_ORIGINAL:

@@ -1,5 +1,6 @@
 <?php
 
+use BetaKiller\Exception\FoundHttpException;
 use BetaKiller\Helper\I18nHelper;
 
 /**
@@ -8,8 +9,6 @@ use BetaKiller\Helper\I18nHelper;
  */
 abstract class Controller extends ControllerProxy
 {
-    use BetaKiller\Utils\Kohana\ControllerHelperTrait;
-
     protected const JSON_SUCCESS = Response::JSON_SUCCESS;
     protected const JSON_ERROR   = Response::JSON_ERROR;
 
@@ -70,7 +69,7 @@ abstract class Controller extends ControllerProxy
 
             if (($isSecureNeeded && !$isSecure) || ($isSecure && !$isSecureNeeded)) {
                 $url = $this->request->url($baseProtocol);
-                $this->redirect($url);
+                throw new FoundHttpException($url);
             }
         }
     }
