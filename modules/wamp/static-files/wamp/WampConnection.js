@@ -2,95 +2,116 @@
 
 class WampConnection {
   constructor(url, realm, authChallenge = undefined) {
-    this.url           = url
-    this.realm         = realm
-    this.authChallenge = authChallenge
+    this.url           = url;
+    this.realm         = realm;
+    this.authChallenge = authChallenge;
   }
 
   isOnProgress() {
-    return this.hasOwnProperty('wampConnection')
+    return this.hasOwnProperty('wampConnection');
   }
 
   isReady() {
-    return this.hasOwnProperty('connectionReady')
+    return this.hasOwnProperty('connectionReady');
   }
 
   isFirst() {
     if (!this.isReady()) {
-      throw this._onNotReady()
+      throw this._onNotReady();
     }
-    return this.connectionFirst
+    return this.connectionFirst;
   }
 
   getConnection() {
     if (!this.isOnProgress()) {
-      throw this._onNotReady()
+      throw this._onNotReady();
     }
-    return this.wampConnection
+    return this.wampConnection;
   }
 
   getSession() {
     if (!this.isReady()) {
-      throw this._onNotReady()
+      throw this._onNotReady();
     }
-    return this.wampSession
+    return this.wampSession;
+  }
+
+  close(reason, message) {
+    this.wampConnection.open(reason, message);
+    return this;
   }
 
   connect() {
     if (this.isReady()) {
-      this._onResolve()
+      this._onResolve();
     } else {
-      this._connect()
+      this._connect();
     }
     return new Promise((resolve, reject) => {
-      this.resolve = resolve
-      this.reject  = reject
-    })
+      this.resolve = resolve;
+      this.reject  = reject;
+    });
   }
 
   _connect() {
     let options = {
       url:   this.url,
       realm: this.realm,
-    }
+    };
     if (this.authChallenge instanceof WampAuthChallenge) {
-      options.authmethods = [this.authChallenge.getMethod()]
-      options.authid      = this.authChallenge.getAuthId()
-      options.onchallenge = (...args) => this._onChallenge.apply(this, args)
+      options.authmethods = [this.authChallenge.getMethod()];
+      options.authid      = this.authChallenge.getAuthId();
+      options.onchallenge = (...args) => this._onChallenge.apply(this, args);
     }
-    this.wampConnection        = new autobahn.Connection(options)
-    this.wampConnection.onopen = (...args) => this._onOpen.apply(this, args)
-    this.wampConnection.open()
+    this.wampConnection         = new autobahn.Connection(options);
+    this.wampConnection.onopen  = (...args) => this._onOpen.apply(this, args);
+    this.wampConnection.onclose = (...args) => this._onClose.apply(this, args);
+    this.wampConnection.open();
   }
 
   _markConnectionAsReady() {
     this.connectionFirst = !this.hasOwnProperty('connectionReady');
-    this.connectionReady = true
+    this.connectionReady = true;
   }
 
   _onNotReady() {
-    return new Error('Connection not ready. Use connection() or wait for connection complete.')
+    return new Error('Connection not ready. Use connection() or wait for connection complete.');
   }
 
   _onResolve() {
-    this.resolve(this)
+    this.resolve(this);
   }
 
   _onReject(message) {
-    this.reject(message)
+    this.reject(message);
   }
 
   _onOpen(session/*, details*/) {
-    this.wampSession = session
-    this._markConnectionAsReady()
-    this._onResolve()
+    this.wampSession = session;
+    this._markConnectionAsReady();
+    this._onResolve();
+  }
+
+  _onClose(status, reason) {
+    if (status !== 'closed') return;
+    if (!reason) {
+      reason = 'unknown';
+    } else {
+      reason = reason.reason;
+    }
+    this._onReject('Status "' + status + '". Reason "' + reason + '".');
   }
 
   _onChallenge(session, method, extra) {
     if (this.authChallenge instanceof WampAuthChallenge) {
-      return this.authChallenge.run(session, method, extra)
+      try {
+        return this.authChallenge.run(session, method, extra);
+      } catch (e) {
+        let message = 'Authenticate challenge error: ' + e.message;
+        this._onReject(message);
+      }
     } else {
-      throw new Error('WAMP auth challenge not found or invalid instance. Valid instance: WampAuthChallenge.')
+      throw new Error('Authenticate challenge not found or invalid instance. Valid instance "WampAuthChallenge".');
     }
   }
 }
