@@ -10,6 +10,6 @@ class Controller_Sitemap extends Controller
 
     public function action_index(): void
     {
-        $this->sitemapService->generate()->serve($this->getResponse());
+        $this->sitemapService->generate()->serve($this->response);
     }
 }

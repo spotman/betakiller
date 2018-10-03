@@ -25,14 +25,14 @@ class QuotesWidget extends AbstractPublicWidget
 
     public function actionRefresh(): void
     {
-        $this->content_type_json();
+        $this->response->content_type_json();
 
-        $beforeTimestamp = (int)$this->query('before');
+        $beforeTimestamp = (int)$this->request->query('before');
         $beforeDate      = $beforeTimestamp ? (new DateTime)->setTimestamp($beforeTimestamp) : null;
 
         $data = $this->getQuoteData($beforeDate);
 
-        $this->send_success_json($data);
+        $this->response->send_success_json($data);
     }
 
     protected function getQuoteData(?DateTimeInterface $beforeDate = null): array

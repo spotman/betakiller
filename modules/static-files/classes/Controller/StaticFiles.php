@@ -31,7 +31,7 @@ class Controller_StaticFiles extends Controller
             $mtime = filemtime($orig);
             $lastModified = (new DateTime())->setTimestamp($mtime);
 
-            $this->response->last_modified($lastModified);
+            $this->response->lastModified($lastModified);
 //            $this->response->headers('last-modified', gmdate("D, d M Y H:i:s \G\M\T", $mtime));
 
             // Check for not modified header

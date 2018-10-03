@@ -47,16 +47,16 @@ class RegularWidget extends AbstractPublicWidget
      */
     public function actionLogin(): void
     {
-        if (!$this->getRequest()->is_ajax()) {
+        if (!$this->request->is_ajax()) {
             throw new BadRequestHttpException('AJAX only gateway');
         }
 
         // Magic call for better exception handling
-        $this->content_type_json();
+        $this->response->content_type_json();
 
-        $userLogin    = $this->getRequest()->post('user-login');
-        $userPassword = $this->getRequest()->post('user-password');
-        $remember     = (bool)$this->getRequest()->post('remember');
+        $userLogin    = $this->request->post('user-login');
+        $userPassword = $this->request->post('user-password');
+        $remember     = (bool)$this->request->post('remember');
 
         // Sanitize
         $userLogin    = trim(HTML::chars($userLogin));
@@ -73,7 +73,7 @@ class RegularWidget extends AbstractPublicWidget
         }
 
         // Возвращаем соответствующий ответ
-        $this->send_success_json();
+        $this->response->send_success_json();
     }
 
     public function getData(): array
