@@ -8,6 +8,7 @@ class WampConnection {
   }
 
   isOnProgress() {
+    //todo
     return this.hasOwnProperty('wampConnection');
   }
 
@@ -37,16 +38,15 @@ class WampConnection {
   }
 
   close(reason, message) {
-    this.wampConnection.open(reason, message);
+    this.wampConnection.close(reason, message);
     return this;
   }
 
   connect() {
-    if (this.isReady()) {
-      this._onResolve();
-    } else {
-      this._connect();
+    if (this.isOnProgress() || this.isReady()) {
+      throw this._onProgress();
     }
+    this._connect();
     return new Promise((resolve, reject) => {
       this.resolve = resolve;
       this.reject  = reject;
@@ -75,7 +75,11 @@ class WampConnection {
   }
 
   _onNotReady() {
-    return new Error('Connection not ready. Use connection() or wait for connection complete.');
+    return new Error('Connection not ready. Use connect() or wait for connection complete.');
+  }
+
+  _onProgress() {
+    return new Error('Connection in progress or already ready.');
   }
 
   _onResolve() {
