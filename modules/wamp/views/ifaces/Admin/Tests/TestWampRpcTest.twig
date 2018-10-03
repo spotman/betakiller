@@ -1,9 +1,10 @@
 {% extends '@layouts/onlyContent' %}
 
 {% block page_content %}
+  {{ js('wamp/Admin/Tests/HtmlNodes.js') }}
+  {{ js('wamp/Admin/Tests/Stopwatch.js') }}
   {{ js('wamp/Admin/Tests/TestWampRpcTest.js') }}
-  {#{{ js('wamp/autobahn.min.js') }}#}
-  {{ js('wamp/Session.js') }}
+  {{ js('wamp/WampCookieSession.js') }}
   {{ js('wamp/WampAuthChallenge.js') }}
   {{ js('wamp/WampConnection.js') }}
   {{ js('wamp/WampRequest.js') }}

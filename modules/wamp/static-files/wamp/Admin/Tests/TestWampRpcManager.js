@@ -40,7 +40,7 @@ require([
           if (isNaN(delayProcesses)) delayProcesses = 0
 
           for (let i = 0; i < processesQty; i++) {
-            console.log('Run process: ' + i + '/' + processesQty)
+            console.log('Run process: ' + (i+1) + '/' + processesQty)
             if (i && delayProcesses) {
               console.log('Sleep before process: ' + delayProcesses)
               await this.sleep(delayProcesses)
