@@ -4,9 +4,8 @@ declare(strict_types=1);
 namespace BetaKiller\Wamp;
 
 use BetaKiller\Auth\AuthFacade;
-use BetaKiller\Session\SessionStorageInterface;
 use Thruway\Authentication\WampCraUserDbInterface;
-use Thruway\Common\Utils;
+//use Thruway\Common\Utils;
 
 /**
  * https://github.com/voryx/Thruway/tree/master/Examples/Authentication/WampCra
@@ -14,25 +13,16 @@ use Thruway\Common\Utils;
 class WampUserDb implements WampCraUserDbInterface
 {
     /**
-     * @var \BetaKiller\Session\SessionStorageInterface
-     */
-    private $sessionStorage;
-
-    /**
      * @var \BetaKiller\Auth\AuthFacade
      */
     private $auth;
 
     /**
-     * @param \BetaKiller\Session\SessionStorageInterface $sessionStorage
-     * @param \BetaKiller\Auth\AuthFacade                 $auth
+     * @param \BetaKiller\Auth\AuthFacade $auth
      */
-    public function __construct(
-        SessionStorageInterface $sessionStorage,
-        AuthFacade $auth
-    ) {
-        $this->sessionStorage = $sessionStorage;
-        $this->auth           = $auth;
+    public function __construct(AuthFacade $auth)
+    {
+        $this->auth = $auth;
     }
 
     /**
@@ -47,20 +37,15 @@ class WampUserDb implements WampCraUserDbInterface
      */
     public function get($authid)
     {
-        $session = $this->sessionStorage->getByID($authid);
-        $user    = $this->auth->getSessionUser($session);
-        if (!$user) {
-            return [];
-        }
+        $user    = $this->auth->getUserFromSessionID($authid);
+        $session = $this->auth->getUserSession($user);
 
-        $userAgent = $session->get('user_agent');
-        //$salt      = Utils::getDerivedKey($userAgent, $authid);
+        $userAgent = $session->get(AuthFacade::SESSION_USER_AGENT);
 
         return [
             'authid' => $authid,
             'key'    => $userAgent,
-            //'salt'   => $salt,
-            'salt'   => null,
+            'salt'   => null, // Utils::getDerivedKey($userAgent, $authid)
         ];
     }
 }

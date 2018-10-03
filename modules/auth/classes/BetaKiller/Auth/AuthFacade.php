@@ -5,6 +5,7 @@ namespace BetaKiller\Auth;
 
 use BetaKiller\Exception;
 use BetaKiller\Factory\GuestUserFactory;
+use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Model\UserToken;
 use BetaKiller\Repository\RoleRepository;
@@ -53,6 +54,11 @@ class AuthFacade
     private $roleRepo;
 
     /**
+     * @var \BetaKiller\Helper\ServerRequestHelper
+     */
+    private $requestHelper;
+
+    /**
      * Loads Session and configuration options.
      *
      * @param \BetaKiller\Auth\AuthConfig                 $config Config Options
@@ -62,6 +68,7 @@ class AuthFacade
      * @param \BetaKiller\Repository\UserRepository       $userRepo
      * @param \BetaKiller\Repository\UserTokenRepository  $userTokenRepo
      * @param \BetaKiller\Repository\RoleRepository       $roleRepo
+     * @param \BetaKiller\Helper\ServerRequestHelper      $requestHelper
      */
     public function __construct(
         AuthConfig $config,
@@ -69,7 +76,8 @@ class AuthFacade
         GuestUserFactory $guestUserFactory,
         UserRepository $userRepo,
         UserTokenRepository $userTokenRepo,
-        RoleRepository $roleRepo
+        RoleRepository $roleRepo,
+        ServerRequestHelper $requestHelper
     ) {
         $this->config           = $config;
         $this->sessionStorage   = $sessionStorage;
@@ -77,6 +85,7 @@ class AuthFacade
         $this->userTokenRepo    = $userTokenRepo;
         $this->userRepo         = $userRepo;
         $this->roleRepo         = $roleRepo;
+        $this->requestHelper = $requestHelper;
     }
 
     /**
@@ -172,8 +181,7 @@ class AuthFacade
         $this->setSessionCookie($session);
 
         // Store user-agent
-        $userAgent = $this->getUserAgent($request);
-        $this->setSessionUserAgent($session, $userAgent);
+        $this->setSessionUserAgent($session, $request);
 
         return $user;
     }
@@ -351,30 +359,27 @@ class AuthFacade
         SessionInterface $session,
         ServerRequestInterface $request
     ): void {
-//        // Create new session
-//        $session = new \BetaKiller\Session\KohanaSessionAdapter(new Session_Database());
-
-        $user->completeLogin($session);
+        // Store user-agent
+        $this->setSessionUserAgent($session, $request);
 
         // Save session to place session ID to database
         $this->persistSession($session);
 
-        // set session ID in user
+        // Run custom user update
+        $user->completeLogin();
+
+        // Set session ID in user
         $user->setSessionID($session->getId());
         $this->userRepo->save($user);
 
         // Store user in session
         $this->setSessionUser($session, $user);
-
-        // Store user-agent
-        $userAgent = $this->getUserAgent($request);
-        $this->setSessionUserAgent($session, $userAgent);
-
         $this->setSessionCookie($session);
     }
 
-    private function setSessionUserAgent(SessionInterface $session, string $userAgent): void
+    private function setSessionUserAgent(SessionInterface $session, ServerRequestInterface $request): void
     {
+        $userAgent = $this->getUserAgent($request);
         $session->set(self::SESSION_USER_AGENT, $userAgent);
     }
 
@@ -461,9 +466,13 @@ class AuthFacade
 
     private function getUserAgent(ServerRequestInterface $request): string
     {
-        $serverParams = $request->getServerParams();
+        $userAgent = $this->requestHelper->getUserAgent($request);
 
-        return $serverParams['HTTP_USER_AGENT'] ?? '';
+        if (!$userAgent) {
+            throw new AccessDeniedException();
+        }
+
+        return $userAgent;
     }
 
     /**
