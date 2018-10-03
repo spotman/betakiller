@@ -1,7 +1,7 @@
 'use strict';
 
-class Session {
-  constructor(cookieName, cookieSeparator = '') {
+class WampCookieSession {
+  constructor(cookieName, cookieSeparator = undefined) {
     this.cookieName      = cookieName;
     this.cookieSeparator = cookieSeparator;
   }

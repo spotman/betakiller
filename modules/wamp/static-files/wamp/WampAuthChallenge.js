@@ -17,7 +17,7 @@ class WampAuthChallenge {
 
   run(session, method, extra) {
     if (method !== this.method) {
-      throw new Error('Unknown method: ' + method + '. Valid method: ' + this.method + '.');
+      throw new Error('Unknown method "' + method + '". Valid method "' + this.method + '".');
     }
     
     var key = this.secretKey;

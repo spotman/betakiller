@@ -5,27 +5,15 @@ class WampRequest {
     this.connection = connection;
   }
 
-  request(procedure, data = null) {
+  request(procedure, data = undefined) {
     data = this._normalizeCallData(data);
-
-    this.connection
-      .getSession()
-      .call(procedure, data)
-      .then(response => this._onResolve(response))
-      .catch(message => this._onReject(procedure, message));
-
     return new Promise((resolve, reject) => {
-      this.resolve = resolve;
-      this.reject  = reject;
+      this.connection
+        .getSession()
+        .call(procedure, data)
+        .then(response => resolve(response))
+        .catch(error => reject({'procedure': procedure, 'data': data, 'message': error}));
     });
-  }
-
-  _onResolve(response) {
-    this.resolve(response);
-  }
-
-  _onReject(url, message) {
-    this.reject({'url': url, 'error': message,});
   }
 
   _normalizeCallData(data) {

@@ -9,18 +9,18 @@ class WampConnection {
   }
 
   _markAsNotReady() {
-    this.wampConnection  = null;
-    this.wampSession     = null;
+    this.wampConnection  = undefined;
+    this.wampSession     = undefined;
     this.connectionReady = false;
-    this.resolve         = null;
-    this.reject          = null;
+    this.resolve         = undefined;
+    this.reject          = undefined;
   }
 
   _markAsReady() {
     this.connectionReady = true;
   }
 
-  _ErrorNotReady() {
+  _errorNotReady() {
     return new Error('Connection not ready. Use connect() or wait for connection complete.');
   }
 
@@ -34,14 +34,14 @@ class WampConnection {
 
   getConnection() {
     if (!this.isReady()) {
-      throw this._ErrorNotReady();
+      throw this._errorNotReady();
     }
     return this.wampConnection;
   }
 
   getSession() {
     if (!this.isReady()) {
-      throw this._ErrorNotReady();
+      throw this._errorNotReady();
     }
     return this.wampSession;
   }
@@ -74,27 +74,23 @@ class WampConnection {
     });
   }
 
-  _onResolve() {
-    return this.resolve(this);
-  }
-
   _onOpen(session/*, details*/) {
     this.wampSession = session;
     this._markAsReady();
-    this._onResolve();
+    this.resolve(this);
   }
 
   _onClose(status, reason) {
     if (status === 'lost') return;
     this._markAsNotReady();
-    throw new Error('Connection closed. Status: ' + status + '. Reason: ' + reason);
+    throw new Error('Connection closed. Status "' + status + '". Reason: ' + reason);
   }
 
   _onChallenge(session, method, extra) {
     try {
       return this.authChallenge.run(session, method, extra);
-    } catch (e) {
-      throw new Error('Unable authenticate. Error: ' + e.message);
+    } catch (error) {
+      throw new Error('Unable authenticate. Error: ' + error.message);
     }
   }
 }
