@@ -54,12 +54,13 @@ class WampUserDb implements WampCraUserDbInterface
         }
 
         $userAgent = $session->get('user_agent');
-        $salt      = Utils::getDerivedKey($userAgent, $authid);
+        //$salt      = Utils::getDerivedKey($userAgent, $authid);
 
         return [
             'authid' => $authid,
             'key'    => $userAgent,
-            'salt'   => $salt,
+            //'salt'   => $salt,
+            'salt'   => null,
         ];
     }
 }
