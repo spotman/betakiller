@@ -3,6 +3,7 @@
 use BetaKiller\Assets\AssetsException;
 use BetaKiller\Assets\Model\AssetsModelInterface;
 use BetaKiller\Exception\NotFoundHttpException;
+use BetaKiller\Exception\PermanentRedirectHttpException;
 
 class Controller_Content extends Controller
 {
@@ -35,13 +36,13 @@ class Controller_Content extends Controller
      */
     public function action_files_bc_redirect()
     {
-        $file = $this->param('file');
+        $file = $this->request->param('file');
 
         if (!$file) {
             throw new NotFoundHttpException();
         }
 
-        $path = '/'.ltrim($this->getRequest()->uri(), '/');
+        $path = '/'.ltrim($this->request->uri(), '/');
 
         $model = $this->findContentModelByWpPath($path);
 
@@ -51,7 +52,7 @@ class Controller_Content extends Controller
 
         $url = $this->assetsHelper->getOriginalUrl($model);
 
-        $this->redirect($url, 301);
+        throw new PermanentRedirectHttpException($url);
     }
 
     /**

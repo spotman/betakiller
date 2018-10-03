@@ -3,14 +3,11 @@ declare(strict_types=1);
 
 namespace BetaKiller\Widget;
 
-use BetaKiller\Utils\Kohana\ControllerHelperTrait;
 use Route;
 use Validation;
 
 abstract class AbstractWidget implements WidgetInterface
 {
-    use ControllerHelperTrait;
-
     /**
      * @var string
      */
@@ -30,13 +27,13 @@ abstract class AbstractWidget implements WidgetInterface
      * @var \Request
      * @deprecated Inject PSR request in every action
      */
-    private $request;
+    protected $request;
 
     /**
      * @var \Response
      * @deprecated Inject PSR response prototype in every action
      */
-    private $response;
+    protected $response;
 
     /**
      * Setter for widget name
@@ -100,6 +97,36 @@ abstract class AbstractWidget implements WidgetInterface
     public function getContextParam($name, $default = null)
     {
         return $this->context[$name] ?? $default;
+    }
+
+    /**
+     * Setter for request
+     *
+     * @param \Request $request
+     *
+     * @return \BetaKiller\Widget\WidgetInterface
+     * @deprecated
+     */
+    public function setRequest(\Request $request): WidgetInterface
+    {
+        $this->request = $request;
+
+        return $this;
+    }
+
+    /**
+     * Setter for response
+     *
+     * @param \Response $response
+     *
+     * @return \BetaKiller\Widget\WidgetInterface
+     * @deprecated
+     */
+    public function setResponse(\Response $response): WidgetInterface
+    {
+        $this->response = $response;
+
+        return $this;
     }
 
     /**

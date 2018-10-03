@@ -96,12 +96,12 @@ class CommentsWidget extends AbstractPublicWidget
      */
     public function actionAdd()
     {
-        if ($this->is_ajax()) {
-            $this->content_type_json();
+        if ($this->request->is_ajax()) {
+            $this->response->content_type_json();
         }
 
-        $entitySlug   = $this->post('entity');
-        $entityItemId = $this->post('entityItemId');
+        $entitySlug   = $this->request->post('entity');
+        $entityItemId = $this->request->post('entityItemId');
 
         if (!$entitySlug) {
             throw new WidgetException('[entity] must be provided via request');
@@ -114,7 +114,7 @@ class CommentsWidget extends AbstractPublicWidget
         $entity = $this->entityRepository->findBySlug($entitySlug);
 
         // Validation
-        $validation = Validation::factory($this->post());
+        $validation = Validation::factory($this->request->post());
 
         $validation
             ->rule('csrf-key', [Valid::class, 'not_empty'])
@@ -122,17 +122,17 @@ class CommentsWidget extends AbstractPublicWidget
 
         if (!$validation->check()) {
             $errors = $this->getValidationErrors($validation);
-            $this->send_error_json($errors);
+            $this->response->send_error_json($errors);
 
             return;
         }
 
-        $name      = HTML::chars($this->post('name'));
-        $email     = $this->post('email');
-        $message   = HTML::chars($this->post('message'));
-        $ipAddress = HTML::chars($this->getRequest()->getClientIp());
-        $agent     = HTML::chars($this->getRequest()->getUserAgent());
-        $parentID  = (int)$this->post('parent');
+        $name      = HTML::chars($this->request->post('name'));
+        $email     = $this->request->post('email');
+        $message   = HTML::chars($this->request->post('message'));
+        $ipAddress = HTML::chars($this->request->getClientIp());
+        $agent     = HTML::chars($this->request->getUserAgent());
+        $parentID  = (int)$this->request->post('parent');
 
         /** @var \BetaKiller\Model\ContentComment|null $parentModel */
         $parentModel = $parentID ? $this->commentRepository->findById($parentID) : null;
@@ -206,10 +206,10 @@ class CommentsWidget extends AbstractPublicWidget
                 $this->commentRepository->save($model);
             }
 
-            $this->send_success_json();
+            $this->response->send_success_json();
         } /** @noinspection BadExceptionsProcessingInspection */
         catch (ValidationException $e) {
-            $this->send_error_json($e->getFirstItem()->getMessage());
+            $this->response->send_error_json($e->getFirstItem()->getMessage());
         }
     }
 }

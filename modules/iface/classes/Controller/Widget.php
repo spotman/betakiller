@@ -23,7 +23,7 @@ class Controller_Widget extends Controller
     {
         $this->widget = $this->createWidget();
 
-        return $this->action() === 'render'
+        return $this->request->action() === 'render'
             ? $this
             : $this->widget;
     }
@@ -43,7 +43,7 @@ class Controller_Widget extends Controller
     {
         $output = $this->widgetFacade->render($this->widget);
 
-        $this->send_string($output);
+        $this->response->send_string($output);
     }
 
     /**
@@ -52,7 +52,7 @@ class Controller_Widget extends Controller
      */
     private function createWidget(): WidgetInterface
     {
-        $widgetName = $this->param('widget');
+        $widgetName = $this->request->param('widget');
 
         $instance = $this->widgetFacade->create($widgetName);
 
