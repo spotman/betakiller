@@ -19,11 +19,12 @@ class WampAuthChallenge {
     if (method !== this.method) {
       throw new Error('Unknown method: ' + method + '. Valid method: ' + this.method + '.');
     }
-
+    
     var key = this.secretKey;
     if (typeof extra.salt !== 'undefined') {
       key = autobahn.auth_cra.derive_key(key, extra.salt);
     }
+    
     return autobahn.auth_cra.sign(key, extra.challenge);
   }
 }

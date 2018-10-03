@@ -12,11 +12,11 @@ class WampConnection {
     this.wampConnection  = null;
     this.wampSession     = null;
     this.connectionReady = false;
-    this.connectionFirst = true;
+    this.resolve         = null;
+    this.reject          = null;
   }
 
   _markAsReady() {
-    this.connectionFirst = !this.connectionReady;
     this.connectionReady = true;
   }
 
@@ -30,13 +30,6 @@ class WampConnection {
 
   isReady() {
     return this.connectionReady;
-  }
-
-  isFirst() {
-    if (!this.isReady()) {
-      throw this._ErrorNotReady();
-    }
-    return this.connectionFirst;
   }
 
   getConnection() {
@@ -60,25 +53,29 @@ class WampConnection {
     if (this.isReady()) {
       throw new Error('Connection already ready.');
     }
-    return new Promise(() => {
-      let options = {
-        url:   this.url,
-        realm: this.realm,
-      };
-      if (this.authChallenge instanceof WampAuthChallenge) {
-        options.authmethods = [this.authChallenge.getMethod()];
-        options.authid      = this.authChallenge.getAuthId();
-        options.onchallenge = (...args) => this._onChallenge.apply(this, args);
-      }
-      this.wampConnection         = new autobahn.Connection(options);
-      this.wampConnection.onopen  = (...args) => this._onOpen.apply(this, args);
-      this.wampConnection.onclose = (...args) => this._onClose.apply(this, args);
-      this.wampConnection.open();
+
+    let options = {
+      url:   this.url,
+      realm: this.realm,
+    };
+    if (this.authChallenge instanceof WampAuthChallenge) {
+      options.authmethods = [this.authChallenge.getMethod()];
+      options.authid      = this.authChallenge.getAuthId();
+      options.onchallenge = (session, method, extra) => this._onChallenge(session, method, extra);
+    }
+    this.wampConnection         = new autobahn.Connection(options);
+    this.wampConnection.onopen  = (session, details) => this._onOpen(session, details);
+    this.wampConnection.onclose = (status, reason) => this._onClose(status, reason);
+    this.wampConnection.open();
+
+    return new Promise((resolve, reject) => {
+      this.resolve = resolve;
+      this.reject  = reject;
     });
   }
 
   _onResolve() {
-    this.resolve(this);
+    return this.resolve(this);
   }
 
   _onOpen(session/*, details*/) {
@@ -87,25 +84,17 @@ class WampConnection {
     this._onResolve();
   }
 
+  _onClose(status, reason) {
+    if (status === 'lost') return;
+    this._markAsNotReady();
+    throw new Error('Connection closed. Status: ' + status + '. Reason: ' + reason);
+  }
+
   _onChallenge(session, method, extra) {
     try {
       return this.authChallenge.run(session, method, extra);
     } catch (e) {
       throw new Error('Unable authenticate. Error: ' + e.message);
     }
-  }
-
-  disconnect(reason, message) {
-    if (!this.isReady()) {
-      throw this._ErrorNotReady();
-    }
-    this.wampConnection.close(reason, message);
-    return this;
-  }
-
-  _onClose(status, reason) {
-    if (status === 'lost') return;
-    this._markAsNotReady();
-    throw new Error('Connection closed. Status: ' + status + '. Reason: ' + reason);
   }
 }
