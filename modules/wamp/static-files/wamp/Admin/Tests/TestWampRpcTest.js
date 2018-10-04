@@ -268,7 +268,7 @@ require([
   new TestWampRpcTestController(rpc);
 
   return;
-  let wamp = new Wamp(true);
+  let wamp = new WampFacade(true);
   try {
     wamp.close();
     wamp

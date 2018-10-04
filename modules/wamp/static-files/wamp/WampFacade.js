@@ -1,6 +1,6 @@
 'use strict';
 
-class Wamp {
+class WampFacade {
   constructor(debug = false) {
     this.debug               = debug;
     this.connection          = undefined;
