@@ -1,13 +1,11 @@
 <?php
 namespace BetaKiller\Filter;
 
+use BetaKiller\Exception\NotImplementedHttpException;
 use BetaKiller\Model\User;
-use BetaKiller\Utils;
 
 class FilterFactory
 {
-    use Utils\Factory\NamespacedFactoryTrait;
-
     /**
      * Factory method
      *
@@ -18,6 +16,6 @@ class FilterFactory
      */
     public function create($name, User $user = null): FilterInterface
     {
-        return $this->_create($name, $user);
+        throw new NotImplementedHttpException;
     }
 }
