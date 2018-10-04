@@ -79,7 +79,7 @@ class Controller_Assets extends Controller
         }
 
         // Returns
-        $this->response->send_json(self::JSON_SUCCESS, $model->toJson());
+        $this->response->sendJson(self::JSON_SUCCESS, $model->toJson());
     }
 
     /**
@@ -139,7 +139,7 @@ class Controller_Assets extends Controller
         $this->response->lastModified($model->getLastModifiedAt());
 
         // Send file content + headers
-        $this->response->sendFileContent($content, $model->getMime(), $model->getOriginalName(), true);
+        $this->response->sendFileContent($content, $model->getMime(), $model->getOriginalName());
     }
 
     /**
