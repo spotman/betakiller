@@ -31,6 +31,13 @@ class WampConnection {
     return 0;
   }
 
+  isDetailsCloseByClient(details) {
+    if (details.hasOwnProperty('reason')) {
+      return details.reason === 'wamp.error.goodbye_and_out';
+    }
+    return false;
+  }
+
   _markAsNotReady() {
     this.connection      = undefined;
     this.session         = undefined;
@@ -115,7 +122,7 @@ class WampConnection {
   close() {
     this._disableReconnect();
     if (this.isReady()) {
-      this.connection.close('close', 'Closed by client.');
+      this.connection.close('close_by_client', 'Closed by client.');
     }
     this._markAsNotReady();
     return this;
@@ -129,10 +136,11 @@ class WampConnection {
     }
   }
 
-  _onClose(status, reason) {
+  _onClose(reason, details) {
     if (typeof this.callbacks.close === 'function') {
-      this.callbacks.close(status, reason);
+      this.callbacks.close(reason, details);
     }
+    // if true then autobahn not be reconnecting
     return !this._isReconnectEnabled();
   }
 
