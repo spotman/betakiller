@@ -238,11 +238,11 @@ class Response extends \Kohana_Response
      * @param mixed $data Raw data to send, if the first argument is constant
      * @deprecated
      */
-    public function send_json($result = self::JSON_SUCCESS, $data = NULL)
+    public function sendJson($result = self::JSON_SUCCESS, $data = NULL)
     {
         if ( is_int($result) )
         {
-            $result = $this->prepare_json($result, $data);
+            $result = $this->prepareJson($result, $data);
         }
 
         $this->send_string(json_encode($result), self::TYPE_JSON);
@@ -255,7 +255,7 @@ class Response extends \Kohana_Response
      */
     public function send_success_json($data = null)
     {
-        $this->send_json(Response::JSON_SUCCESS, $data);
+        $this->sendJson(Response::JSON_SUCCESS, $data);
     }
 
     /**
@@ -265,7 +265,7 @@ class Response extends \Kohana_Response
      */
     public function send_error_json($data = null)
     {
-        $this->send_json(Response::JSON_ERROR, $data);
+        $this->sendJson(Response::JSON_ERROR, $data);
     }
 
     /**
@@ -279,7 +279,7 @@ class Response extends \Kohana_Response
      * @param $data mixed
      * @return array
      */
-    protected function prepare_json($result, $data)
+    protected function prepareJson($result, $data)
     {
         $response = array("response" => static::$_json_response_signatures[ $result ]);
 
@@ -309,9 +309,9 @@ class Response extends \Kohana_Response
                 if ($show) {
                     $message = $e->getMessage() ?: __($e->getDefaultMessageI18nKey());
 
-                    $this->send_json(self::JSON_ERROR, $message);
+                    $this->sendJson(self::JSON_ERROR, $message);
                 } else {
-                    $this->send_json(self::JSON_ERROR);
+                    $this->sendJson(self::JSON_ERROR);
                 }
 
                 break;
@@ -324,29 +324,26 @@ class Response extends \Kohana_Response
     /**
      * Sends file to STDOUT for viewing or downloading
      *
-     * @param string $content   String content of the file
-     * @param string $mime_type MIME-type
-     * @param string $alias     File name for browser`s "Save as" dialog
-     * @param bool   $force_download
+     * @param string $content       String content of the file
+     * @param string $mime_type     MIME-type
+     * @param string $downloadAlias File name for browser`s "Save as" dialog
      *
      * @throws \HTTP_Exception_500
      * @deprecated
      */
-    public function sendFileContent($content, $mime_type = null, $alias = null, $force_download = false)
+    public function sendFileContent($content, $mime_type = null, string $downloadAlias = null): void
     {
         if (!$content) {
             throw new \HTTP_Exception_500('Content is empty');
         }
 
-        $response = $this->getResponse();
+        $this->body($content);
 
-        $response->body($content);
+        $this->headers('Content-Type', $mime_type ?: 'application/octet-stream');
+        $this->headers('Content-Length', strlen($content));
 
-        $response->headers('Content-Type', $mime_type ?: 'application/octet-stream');
-        $response->headers('Content-Length', strlen($content));
-
-        if ($force_download) {
-            $response->headers('Content-Disposition', 'attachment; filename='.$alias);
+        if ($downloadAlias) {
+            $this->headers('Content-Disposition', 'attachment; filename='.$downloadAlias);
         }
     }
 }
