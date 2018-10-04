@@ -135,43 +135,61 @@ require([
     _onWampConnect(isError, data) {
       let connectionTime = this.stopwatch.stop('wampConnection');
 
-      let reconnect = false;
-      let reason    = '';
-
+      let reason = '';
       if (!isError) {
-        console.log('WAMP connection:', data);
-        this.wampConnection = data;
-        reason              = 'open';
+        reason = this._onWampConnectOk(data);
       } else {
+        reason = this._onWampConnectError(data);
+      }
+
+      if (this.abort) this.wampConnection.close();
+
+      if (reason) reason = ` (${reason})`;
+      console.log(`WAMP connection time${reason}:`, connectionTime);
+
+      this.result.setConnectionTime(connectionTime);
+
+      if (!isError) this._runTests();
+    }
+
+    _onWampConnectOk(data) {
+      console.log('WAMP connection:', data);
+      this.wampConnection = data;
+
+      return 'open';
+    }
+
+    _onWampConnectError(data) {
+      let reason          = 'error';
+      let reconnect       = false;
+      let isCloseByClient = false;
+      if (data.hasOwnProperty('reason')) {
+        reason          = data.reason;
+        reconnect       = this.wampConnection.isDetailsRetry(data.details);
+        isCloseByClient = this.wampConnection.isDetailsCloseByClient(data.details);
+      }
+      if (this.abort) reconnect = false;
+
+      if (isCloseByClient) {
+        console.log('WAMP connection closed by client');
+      }else{
         if (data.hasOwnProperty('reason')) {
           console.error(
             `WAMP connection. Error:`,
             `Reason "${data.reason}".`,
             `Details:`, data.details
           );
-          reconnect = this.wampConnection.isDetailsRetry(data.details);
-          reason    = data.reason;
         } else {
           if (data instanceof Error) data = data.message;
           console.error('WAMP connection. Error:', data);
-          reason = 'error';
         }
 
-        if (this.abort) reconnect = false;
         console.log('WAMP connection reconnect:', reconnect);
-
-        if (this.abort) {
-          this.wampConnection.close();
-        }
       }
 
-      if (reason) reason = ` (${reason})`;
-      console.log(`WAMP connection time${reason}:`, connectionTime);
-
-      this.result.setConnectionTime(connectionTime);
       if (reconnect) this.result.incConnectionTry();
 
-      if (!isError) this._runTests();
+      return reason;
     }
 
     _request(testId) {
