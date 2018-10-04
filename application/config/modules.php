@@ -28,7 +28,6 @@ return [
     'paginate'             => MODPATH.'paginate',              // Paginate abstraction for ORM, ORM-REST and others
 
     // Kohana dependencies WITH DB ACCESS
-    'auth'                 => MODPATH.'auth',                  // Basic authentication
     'backup'               => MODPATH.'backup',                // Complex backup (files + database)
     'migrations'           => MODPATH.'migrations',            // Migrations toolkit
     'unittest'             => MODPATH.'unittest',              // Module for unit testing via phpunit
@@ -51,6 +50,7 @@ return [
     'missing-url'           => MODPATH.'missing-url',           // Catch and store missing IFace URLs
     'notification'          => MODPATH.'notification',          // Notification subsystem
     'search'                => MODPATH.'search',                // Search and filtering capabilities
+    'wamp'                  => MODPATH.'wamp',                  // WAMP protocol support (router + client)
     'webhooks'              => MODPATH.'webhooks',              // WebHooks control panel
 
     // These modules DEPENDS ON PLATFORM and HAVE LEGACY ROUTES
@@ -63,6 +63,4 @@ return [
 
     // Allow another modules to set routes
     'iface'                 => MODPATH.'iface',                 // Dynamic user interfaces
-
-    'wamp'                  => MODPATH.'wamp',
 ];
