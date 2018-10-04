@@ -1,14 +1,11 @@
 <?php
 namespace BetaKiller\Search\Provider\Parameterized\Parameter;
 
+use BetaKiller\Exception\NotImplementedHttpException;
 use BetaKiller\Model;
-use BetaKiller\Utils;
 
 abstract class Factory
 {
-
-    use Utils\Factory\NamespacedFactoryTrait;
-
     /**
      * @param string     $name
      * @param Model\User $user
@@ -17,7 +14,7 @@ abstract class Factory
      */
     public function create($name, Model\User $user = null)
     {
-        return $this->_create($name, $user);
+        throw new NotImplementedHttpException;
     }
 
     /**

@@ -1,12 +1,10 @@
 <?php
 namespace BetaKiller\Search\Provider;
 
-use BetaKiller\Utils;
+use BetaKiller\Exception\NotImplementedHttpException;
 
 abstract class Factory
 {
-    use Utils\Factory\NamespacedFactoryTrait;
-
     /**
      * @param $name
      *
@@ -14,6 +12,6 @@ abstract class Factory
      */
     public function create($name)
     {
-        return $this->_create($name);
+        throw new NotImplementedHttpException;
     }
 }
