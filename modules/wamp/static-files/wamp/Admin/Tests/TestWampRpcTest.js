@@ -137,9 +137,9 @@ require([
 
       let reason = '';
       if (!isError) {
-        reason = this._onWampConnectOk(data);
+        reason = this._onWampConnectResolve(data);
       } else {
-        reason = this._onWampConnectError(data);
+        reason = this._onWampConnectReject(data);
       }
 
       if (this.abort) this.wampConnection.close();
@@ -152,27 +152,26 @@ require([
       if (!isError) this._runTests();
     }
 
-    _onWampConnectOk(data) {
+    _onWampConnectResolve(data) {
       console.log('WAMP connection:', data);
-      this.wampConnection = data;
 
       return 'open';
     }
 
-    _onWampConnectError(data) {
-      let reason          = 'error';
-      let reconnect       = false;
-      let isCloseByClient = false;
+    _onWampConnectReject(data) {
+      let reason            = 'error';
+      let reconnectionState = 'unknown';
+      let isClosedByClient  = false;
       if (data.hasOwnProperty('reason')) {
-        reason          = data.reason;
-        reconnect       = this.wampConnection.isDetailsRetry(data.details);
-        isCloseByClient = this.wampConnection.isDetailsCloseByClient(data.details);
+        reason            = data.reason;
+        reconnectionState = this.wampConnection.getDetailsReconnectionState(data.details);
+        isClosedByClient  = this.wampConnection.isDetailsClosedByClient(data.details);
       }
-      if (this.abort) reconnect = false;
+      if (this.abort) reconnectionState = false;
 
-      if (isCloseByClient) {
+      if (isClosedByClient) {
         console.log('WAMP connection closed by client');
-      }else{
+      } else {
         if (data.hasOwnProperty('reason')) {
           console.error(
             `WAMP connection. Error:`,
@@ -184,10 +183,10 @@ require([
           console.error('WAMP connection. Error:', data);
         }
 
-        console.log('WAMP connection reconnect:', reconnect);
+        console.log(`WAMP connection reconnection "${reconnectionState}".`);
       }
 
-      if (reconnect) this.result.incConnectionTry();
+      if (reconnectionState) this.result.incConnectionTry();
 
       return reason;
     }
@@ -267,4 +266,26 @@ require([
   }
 
   new TestWampRpcTestController(rpc);
+
+  return;
+  let wamp = new Wamp(true);
+  try {
+    wamp.close();
+    wamp
+      .request('api', ['validation', 'userEmail', 'qwe@qwe.qwe'])
+      .then(response => {
+        console.log('Request response:', response)
+        wamp.close();
+
+        wamp
+          .requestApi('validation', 'userEmail', 'qwe2@qwe.qwe')
+          .then(response => {
+            console.log('Request response:', response)
+          })
+          .catch(error => console.error('Request error:', error));
+      })
+      .catch(error => console.error('Request error:', error));
+  } catch (error) {
+    console.error('Request system error:', error)
+  }
 });
