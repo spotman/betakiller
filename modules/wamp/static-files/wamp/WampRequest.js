@@ -6,7 +6,7 @@ class WampRequest {
   }
 
   request(procedure, data = undefined) {
-    data = this._normalizeCallData(data);
+    data = WampRequest.normalizeCallData(data);
     return new Promise((resolve, reject) => {
       return this.connection
         .getSession()
@@ -16,7 +16,7 @@ class WampRequest {
     });
   }
 
-  _normalizeCallData(data) {
+  static normalizeCallData(data) {
     if (data === null || data === undefined) {
       return data;
     }

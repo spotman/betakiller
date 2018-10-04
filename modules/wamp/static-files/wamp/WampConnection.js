@@ -17,21 +17,28 @@ class WampConnection {
     this._markAsNotReady();
   }
 
-  isDetailsRetry(details) {
+  getDetailsReconnectionState(details) {
     if (details.hasOwnProperty('will_retry')) {
       return details.will_retry;
     }
     return false;
   }
 
-  getDetailsConnectionTry(details) {
+  getDetailsReconnectionTry(details) {
     if (details.hasOwnProperty('retry_count')) {
       return details.retry_count;
     }
     return 0;
   }
 
-  isDetailsCloseByClient(details) {
+  getDetailsReconnectionDelay(details) {
+    if (details.hasOwnProperty('retry_delay')) {
+      return details.retry_count;
+    }
+    return 0;
+  }
+
+  isDetailsClosedByClient(details) {
     if (details.hasOwnProperty('reason')) {
       return details.reason === 'wamp.error.goodbye_and_out';
     }

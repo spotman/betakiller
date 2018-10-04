@@ -1,16 +1,15 @@
 'use strict';
 
 class WampApiRequest extends WampRequest {
-  constructor(connection) {
+  constructor(connection, procedure = 'api') {
     super(connection);
-    this.method  = '';
-    this.data    = [];
+    this.procedure = procedure || 'api';
   }
 
   request(resurce, method, data = undefined) {
-    data = super._normalizeCallData(data);
-    data.unshift(method)
-    data.unshift(resurce)
-    return super.request('api', data);
+    data = WampApiRequest.normalizeCallData(data);
+    data.unshift(method);
+    data.unshift(resurce);
+    return super.request(this.procedure, data);
   }
 }
