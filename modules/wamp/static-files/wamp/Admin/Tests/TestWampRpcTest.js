@@ -20,7 +20,8 @@ require([
       this.testsRequestsQty  = 0;
       this.testsResponsesQty = 0;
       this.testsErrorsQty    = 0;
-      this.testTotalTime     = 0;
+      this.testsTotalTime    = 0;
+      this.connectionTime    = 0;
       this.abort             = false;
 
       this.apiResource = 'validation';
@@ -138,6 +139,10 @@ require([
       let reason = '';
       if (!isError) {
         reason = this._onWampConnectResolve(data);
+        if (!this.connectionTime) {
+          this.result.setConnectionTime(connectionTime);
+          this.connectionTime = connectionTime;
+        }
       } else {
         reason = this._onWampConnectReject(data);
       }
@@ -146,8 +151,6 @@ require([
 
       if (reason) reason = ` (${reason})`;
       console.log(`WAMP connection time${reason}:`, connectionTime);
-
-      this.result.setConnectionTime(connectionTime);
 
       if (!isError) this._runTests();
     }
@@ -230,8 +233,8 @@ require([
 
       this.testsResponsesQty++;
       if (isError) this.testsErrorsQty++;
-      this.testTotalTime += testTime;
-      let averageExecutionTime = this.testTotalTime / this.testsRequestsQty;
+      this.testsTotalTime += testTime;
+      let averageExecutionTime = this.testsTotalTime / this.testsRequestsQty;
 
       if (!isError) {
         console.log('Request response:', data);
@@ -274,18 +277,18 @@ require([
     wamp
       .request('api', ['validation', 'userEmail', 'qwe@qwe.qwe'])
       .then(response => {
-        console.log('Request response:', response)
+        console.log('Request response:', response);
         wamp.close();
 
         wamp
           .requestApi('validation', 'userEmail', 'qwe2@qwe.qwe')
           .then(response => {
-            console.log('Request response:', response)
+            console.log('Request response:', response);
           })
           .catch(error => console.error('Request error:', error));
       })
       .catch(error => console.error('Request error:', error));
   } catch (error) {
-    console.error('Request system error:', error)
+    console.error('Request system error:', error);
   }
 });
