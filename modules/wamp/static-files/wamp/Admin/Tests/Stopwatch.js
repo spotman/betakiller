@@ -15,7 +15,7 @@ class Stopwatch {
 
   _getItem(name) {
     if (!this.items.hasOwnProperty(name)) {
-      throw new Error('Not found item "' + name + '".');
+      throw new Error(`Not found item "${name}".`);
     }
     return this.items[name];
   }
@@ -31,7 +31,7 @@ class Stopwatch {
   get(name) {
     let item = this._getItem(name);
     if (item.stop < 0) {
-      throw new Error('Item "' + name + '" not stopped.');
+      throw new Error(`Item "${name}" not stopped.`);
     }
   }
 }

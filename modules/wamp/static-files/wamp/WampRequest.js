@@ -8,7 +8,7 @@ class WampRequest {
   request(procedure, data = undefined) {
     data = this._normalizeCallData(data);
     return new Promise((resolve, reject) => {
-      this.connection
+      return this.connection
         .getSession()
         .call(procedure, data)
         .then(response => resolve(response))
@@ -20,17 +20,14 @@ class WampRequest {
     if (data === null || data === undefined) {
       return data;
     }
-
     if (data instanceof Array) {
       return data;
     }
-
-    if (typeof data === 'object') {
+    if (typeof data instanceof Object) {
       data = this._objectToArray(data);
     } else {
       data = [data];
     }
-
     return data;
   }
 

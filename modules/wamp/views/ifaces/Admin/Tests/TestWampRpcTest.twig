@@ -1,14 +1,15 @@
 {% extends '@layouts/onlyContent' %}
 
 {% block page_content %}
-  {{ js('wamp/Admin/Tests/HtmlNodes.js') }}
-  {{ js('wamp/Admin/Tests/Stopwatch.js') }}
-  {{ js('wamp/Admin/Tests/TestWampRpcTest.js') }}
   {{ js('wamp/WampCookieSession.js') }}
   {{ js('wamp/WampAuthChallenge.js') }}
   {{ js('wamp/WampConnection.js') }}
   {{ js('wamp/WampRequest.js') }}
   {{ js('wamp/WampApiRequest.js') }}
+  {{ js('wamp/Admin/Tests/HtmlNodes.js') }}
+  {{ js('wamp/Admin/Tests/Stopwatch.js') }}
+  {{ js('wamp/Admin/Tests/TestWampRpcTestResult.js') }}
+  {{ js('wamp/Admin/Tests/TestWampRpcTest.js') }}
 
 
   <div class="row">
@@ -33,8 +34,8 @@
       <section class="testWampRpcTest row" style="display:none"
                data-template
                data-connectionType="{{ connectionType }}"
-               data-testQty="{{ testQty }}"
-               data-countInPack="{{ countInPack }}"
+               data-testsQty="{{ testsQty }}"
+               data-qtyInPack="{{ qtyInPack }}"
                data-delayPack="{{ delayPack }}"
       >
         <div class="card">
@@ -50,7 +51,7 @@
                 Status: <span data-name="status"></span>
               </p>
               <p>
-                Tests: <span data-name="testQty">0</span>
+                Tests: <span data-name="testsQty">0</span>
               </p>
               <p>
                 Requests: <span data-name="requestsQty">0</span>
@@ -75,6 +76,9 @@
               </p>
               <p>
                 Connection: <span data-name="connectionTime">0</span>s
+              </p>
+              <p>
+                Connection try: <span data-name="connectionTry">0</span>
               </p>
             </div>
             <div class="card-action" data-links>
