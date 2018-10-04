@@ -28,8 +28,8 @@ class TestWampRpcTest extends AbstractIFace
     {
         return [
             'connectionType' => strtolower(trim($this->findArgument('connectionType'))),
-            'testQty'        => (int)$this->findArgument('testQty'),
-            'countInPack'    => (int)$this->findArgument('countInPack'),
+            'testsQty'       => (int)$this->findArgument('testsQty'),
+            'qtyInPack'      => (int)$this->findArgument('qtyInPack'),
             'delayPack'      => (int)$this->findArgument('delayPack'),
         ];
     }

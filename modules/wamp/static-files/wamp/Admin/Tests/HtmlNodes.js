@@ -16,7 +16,7 @@ class HtmlNodes {
       }
     }
     if (!this.$root.length) {
-      throw new Error('Unable find root by selector "' + this.rootSelector + '".');
+      throw new Error(`Unable find root by selector "${this.rootSelector}".`);
     }
     return this.$root;
   }
@@ -28,7 +28,7 @@ class HtmlNodes {
     let $node;
     if (!$parent) $parent = this.getRoot();
     $node = $parent.find(selector + ':first');
-    if (!$node.length) throw new Error('Not found node by selector "' + selector + '".');
+    if (!$node.length) throw new Error(`Not found node by selector "${selector}".`);
     return this.$nodes[selector] = $node;
   }
 }

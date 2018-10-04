@@ -1,6 +1,7 @@
 {% extends layout %}
 
 {% block page_content %}
+  {{ js('wamp/Admin/Tests/HtmlNodes.js') }}
   {{ js('wamp/Admin/Tests/TestWampRpcManager.js') }}
 
 
@@ -20,19 +21,19 @@
               {#<label for="testWampRpc-processesQty">Test qty</label>#}
             </div>
             <div class="input-field">
-              Delay between processes:
-              <input type="text" name="delayProcesses" id="testWampRpc-delayProcesses" value="50" title="">
-              {#<label for="testWampRpc-delayProcesses">Test qty</label>#}
+              Delay between process:
+              <input type="text" name="delayProcess" id="testWampRpc-delayProcess" value="50" title="">
+              {#<label for="testWampRpc-delayProcess">Test qty</label>#}
             </div>
             <div class="input-field">
               Requests count:
-              <input type="text" name="testQty" id="testWampRpc-testQty" value="1" title="">
-              {#<label for="testWampRpc-testQty">Test qty</label>#}
+              <input type="text" name="testsQty" id="testWampRpc-testsQty" value="1" title="">
+              {#<label for="testWampRpc-testsQty">Test qty</label>#}
             </div>
             <div class="input-field">
               Count in requests pack:
-              <input type="text" name="countInPack" id="testWampRpc-countInPack" value="1" title="">
-              {#<label for="testWampRpc-countInPack">Test qty</label>#}
+              <input type="text" name="qtyInPack" id="testWampRpc-qtyInPack" value="1" title="">
+              {#<label for="testWampRpc-qtyInPack">Test qty</label>#}
             </div>
             <div class="input-field">
               Delay between requests packs:
@@ -42,7 +43,7 @@
             <div>
               <button data-action="run" data-type="wamp">Run Test Wamp</button>
               <button data-action="run" data-type="rpc">Run Test Rpc</button>
-              <button data-action="killResults">Kill all results</button>
+              <button data-action="removeResults">Remove results</button>
             </div>
           </div>
         </div>
