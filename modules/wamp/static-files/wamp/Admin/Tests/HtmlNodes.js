@@ -1,6 +1,6 @@
 'use strict';
 
-class HtmlNodes {
+export default class HtmlNodes {
   constructor(rootSelector) {
     this.rootSelector = rootSelector;
     this.$root        = undefined;

@@ -1,6 +1,6 @@
 'use strict';
 
-class Stopwatch {
+export default class Stopwatch {
   constructor() {
     this.items = {};
   }

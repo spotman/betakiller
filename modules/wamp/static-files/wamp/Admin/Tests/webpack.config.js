@@ -1,6 +1,5 @@
 "use strict";
 
-const glob         = require('glob');
 const encore       = require('@symfony/webpack-encore');
 const webpack      = require('webpack');
 const uglifyPlugin = require('uglifyjs-webpack-plugin');
@@ -8,31 +7,13 @@ const uglifyPlugin = require('uglifyjs-webpack-plugin');
 // ?
 process.noDeprecation = true;
 
-var entryItems = glob.sync('./*.js');
-Array.prototype.push.apply(
-  entryItems,
-  glob.sync('./betakiller-wamp-js/src/*.js')
-);
-Array.prototype.diff = function (a) {
-  return this.filter(function (i) {
-    return a.indexOf(i) < 0;
-  });
-};
-entryItems           = entryItems.diff([
-  './webpack.config.js',
-  './TestWampRpcManager.js'
-]);
-entryItems = [
-  './TestWampRpcTest.js'
-];
-console.log(entryItems);
-
 encore
   .setOutputPath('build/')
   .setPublicPath('/build')
   .setManifestKeyPrefix('build/')
-  .addEntry('bundle', entryItems)
-  //.autoProvidejQuery()
+  .addEntry('bundle-manager', './TestWampRpcManager.js')
+  .addEntry('bundle-test', './TestWampRpcTest.js')
+  .autoProvidejQuery()
   .enableSourceMaps(!encore.isProduction())
   .cleanupOutputBeforeBuild()
   .enableBuildNotifications()
