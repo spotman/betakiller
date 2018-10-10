@@ -1,16 +1,23 @@
 {% extends '@layouts/onlyContent' %}
 
 {% block page_content %}
-  {{ js('wamp/WampCookieSession.js') }}
-  {{ js('wamp/WampAuthChallenge.js') }}
-  {{ js('wamp/WampConnection.js') }}
-  {{ js('wamp/WampRequest.js') }}
-  {{ js('wamp/WampApiRequest.js') }}
-  {{ js('wamp/WampFacade.js') }}
-  {{ js('wamp/Admin/Tests/HtmlNodes.js') }}
-  {{ js('wamp/Admin/Tests/Stopwatch.js') }}
-  {{ js('wamp/Admin/Tests/TestWampRpcTestResult.js') }}
-  {{ js('wamp/Admin/Tests/TestWampRpcTest.js') }}
+  {#{{ js('wamp/BetakillerWampCookieSession.js') }}#}
+  {#{{ js('wamp/BetakillerWampAuthChallenge.js') }}#}
+  {#{{ js('wamp/BetakillerWampConnection.js') }}#}
+  {#{{ js('wamp/BetakillerWampRequest.js') }}#}
+  {#{{ js('wamp/BetakillerWampApiRequest.js') }}#}
+  {#{{ js('wamp/BetakillerWampFacade.js') }}#}
+  {#{{ js('wamp/BetakillerWamp.js') }}#}
+  {#{{ js('wamp/BetakillerWamp.min.js') }}#}
+  {#{{ js('wamp/manifest.js') }}#}
+  {#{{ js('wamp/BetakillerWamp.js') }}#}
+  {#{{ js('wamp/WampFacade.js') }}#}
+  {#{{ js('wamp/WampRequest.js') }}#}
+  {#{{ js('wamp/Admin/Tests/HtmlNodes.js') }}#}
+  {#{{ js('wamp/Admin/Tests/Stopwatch.js') }}#}
+  {#{{ js('wamp/Admin/Tests/TestWampRpcTestResult.js') }}#}
+  {#{{ js('wamp/Admin/Tests/TestWampRpcTest.js') }}#}
+  {{ js('wamp/Admin/Tests/build/bundle.js') }}
 
 
   <div class="row">

@@ -1,6 +1,8 @@
 'use strict';
 
-class WampAuthChallenge {
+var autobahn = require('autobahn-browser');
+
+export default class BetakillerWampAuthChallenge {
   constructor(authId, secretKey) {
     this.method    = 'wampcra';
     this.authId    = authId;
