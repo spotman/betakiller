@@ -1,7 +1,12 @@
 'use strict';
 
-class WampRequest {
+import BetakillerWampConnection from './BetakillerWampConnection';
+
+export default class BetakillerWampRequest {
   constructor(connection) {
+    if (!(connection instanceof BetakillerWampConnection)) {
+      throw new Error('Invalid connection instance. Valid: BetakillerWampConnection');
+    }
     this.connection = connection;
   }
 

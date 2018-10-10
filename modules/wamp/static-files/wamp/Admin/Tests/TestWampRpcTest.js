@@ -1,294 +1,301 @@
 'use strict';
+window.jQuery = require('jquery');
+window.$      = jQuery;
 
-require([
-  'jquery',
-  'validation.api.rpc',
-  'wamp/autobahn',
-], function ($, rpc, autobahn) {
-  window.autobahn = autobahn;
+require('babel-polyfill');
 
-  class TestWampRpcTestController {
-    constructor(rpcConnection) {
-      this.wampUrl                    = 'wss://' + window.location.hostname + '/wamp';
-      this.wampRealm                  = 'public';
-      this.wampCookieSessionName      = 'sid';
-      this.wampCookieSessionSeparator = '~';
-      this.wampAuthSecret             = window.navigator.userAgent;
-      this.wampConnection             = undefined;
-      this.rpcConnection              = rpcConnection;
+import HtmlNodes from './HtmlNodes';
+console.log(HtmlNodes);
+import Stopwatch from './Stopwatch';
+import TestWampRpcTestResult from './TestWampRpcTestResult';
 
-      this.testsRequestsQty  = 0;
-      this.testsResponsesQty = 0;
-      this.testsErrorsQty    = 0;
-      this.testsTotalTime    = 0;
-      this.connectionTime    = 0;
-      this.abort             = false;
+class TestWampRpcTestController {
+  constructor(rpcConnection) {
+    this.wampUrl                    = 'wss://' + window.location.hostname + '/wamp';
+    this.wampRealm                  = 'public';
+    this.wampCookieSessionName      = 'sid';
+    this.wampCookieSessionSeparator = '~';
+    this.wampAuthSecret             = window.navigator.userAgent;
+    this.wampConnection             = undefined;
+    this.rpcConnection              = rpcConnection;
 
-      this.apiResource = 'validation';
-      this.apiMethod   = 'userEmail';
-      this.apiData     = ['qwe:testId@qew.qwe'];
+    this.testsRequestsQty  = 0;
+    this.testsResponsesQty = 0;
+    this.testsErrorsQty    = 0;
+    this.testsTotalTime    = 0;
+    this.connectionTime    = 0;
+    this.abort             = false;
 
-      this.nodes  = new HtmlNodes('.testWampRpcTest[data-template]');
-      this.params = {
-        'connectionType': this.nodes.getRoot().attr('data-connectionType'),
-        'testsQty':       parseInt(this.nodes.getRoot().attr('data-testsQty')),
-        'qtyInPack':      parseInt(this.nodes.getRoot().attr('data-qtyInPack')),
-        'delayPack':      parseInt(this.nodes.getRoot().attr('data-delayPack')),
-      };
+    this.apiResource = 'validation';
+    this.apiMethod   = 'userEmail';
+    this.apiData     = ['qwe:testId@qew.qwe'];
 
-      this.stopwatch = new Stopwatch();
+    this.nodes  = new HtmlNodes('.testWampRpcTest[data-template]');
+    this.params = {
+      'connectionType': this.nodes.getRoot().attr('data-connectionType'),
+      'testsQty':       parseInt(this.nodes.getRoot().attr('data-testsQty')),
+      'qtyInPack':      parseInt(this.nodes.getRoot().attr('data-qtyInPack')),
+      'delayPack':      parseInt(this.nodes.getRoot().attr('data-delayPack')),
+    };
 
-      this.result = new TestWampRpcTestResult(this)
-        .markAsPerformed()
-        .setConnectionType(this.params.connectionType)
-        .setTestsQty(this.params.testsQty)
-        .setConnectionTime(0);
+    this.stopwatch = new Stopwatch();
 
-      if (this.params.connectionType === 'wamp') {
-        this.result.markAsConnecting();
-        this._connectWamp();
-      } else {
-        this._runTests();
-      }
+    this.result = new TestWampRpcTestResult(this)
+      .markAsPerformed()
+      .setConnectionType(this.params.connectionType)
+      .setTestsQty(this.params.testsQty)
+      .setConnectionTime(0);
+
+    if (this.params.connectionType === 'wamp') {
+      this.result.markAsConnecting();
+      this._connectWamp();
+    } else {
+      this._runTests();
+    }
+  }
+
+  stop() {
+    this.abort = true;
+    return this;
+  }
+
+  _runTests() {
+    console.log('Qty tests:', this.params.testsQty);
+    console.log('Qty tests in pack:', this.params.qtyInPack);
+
+    this.result.markAsPerformed();
+
+    this.__runTests().then();
+
+    if (this.abort) {
+      console.log('Run of tests was aborted');
+    } else {
+      console.log('Run of tests was completed');
     }
 
-    stop() {
-      this.abort = true;
-      return this;
+    this.result.markAsCompleted();
+
+    if (this.params.connectionType === 'wamp') {
+      this.wampConnection.close();
     }
+  }
 
-    _runTests() {
-      console.log('Qty tests:', this.params.testsQty);
-      console.log('Qty tests in pack:', this.params.qtyInPack);
+  async __runTests() {
+    let packsQty = this.params.testsQty / this.params.qtyInPack;
+    packsQty     = Math.ceil(packsQty);
+    if (isNaN(packsQty)) packsQty = 0;
+    console.log('Qty packs:', packsQty);
+    if (packsQty < 1) return;
 
-      this.result.markAsPerformed();
+    for (let packIndex = 0; packIndex < packsQty; packIndex++) {
+      if (this.abort) return;
 
-      this.__runTests().then();
+      console.log('Run pack:', (packIndex + 1), '/', packsQty);
 
-      if (this.abort) {
-        console.log('Run of tests was aborted');
-      } else {
-        console.log('Run of tests was completed');
+      if (packIndex && this.params.delayPack) {
+        console.log('Pack delay:', this.params.delayPack);
+        await this._sleep(this.params.delayPack);
       }
 
-      this.result.markAsCompleted();
-
-      if (this.params.connectionType === 'wamp') {
-        this.wampConnection.close();
-      }
-    }
-
-    async __runTests() {
-      let packsQty = this.params.testsQty / this.params.qtyInPack;
-      packsQty     = Math.ceil(packsQty);
-      if (isNaN(packsQty)) packsQty = 0;
-      console.log('Qty packs:', packsQty);
-      if (packsQty < 1) return;
-
-      for (let packIndex = 0; packIndex < packsQty; packIndex++) {
+      for (let testIndex = 0; testIndex < this.params.qtyInPack; testIndex++) {
         if (this.abort) return;
 
-        console.log('Run pack:', (packIndex + 1), '/', packsQty);
+        if (this.testsRequestsQty >= this.params.testsQty) break;
 
-        if (packIndex && this.params.delayPack) {
-          console.log('Pack delay:', this.params.delayPack);
-          await this._sleep(this.params.delayPack);
-        }
+        let testId = 1 + testIndex + packIndex * this.params.qtyInPack;
+        console.log('Run test:', testId, '/', this.params.testsQty);
 
-        for (let testIndex = 0; testIndex < this.params.qtyInPack; testIndex++) {
-          if (this.abort) return;
-
-          if (this.testsRequestsQty >= this.params.testsQty) break;
-
-          let testId = 1 + testIndex + packIndex * this.params.qtyInPack;
-          console.log('Run test:', testId, '/', this.params.testsQty);
-
-          this._request(testId);
-        }
+        this._request(testId);
       }
     }
+  }
 
-    _connectWamp() {
-      this.stopwatch.start('wampConnection');
+  _connectWamp() {
+    this.stopwatch.start('wampConnection');
 
-      this.result.incConnectionTry();
+    this.result.incConnectionTry();
 
-      let wampCookieSession = new WampCookieSession(this.wampCookieSessionName, this.wampCookieSessionSeparator);
-      let wampAuthChallenge = new WampAuthChallenge(wampCookieSession.getId(), this.wampAuthSecret);
-      console.log(
-        `WAMP connection:`,
-        `Url "${this.wampUrl}".`,
-        `Realm "${this.wampRealm}".`,
-        `Cookie session name "${this.wampCookieSessionName}".`,
-        `Cookie session separator "${this.wampCookieSessionSeparator}".`
+    let wampCookieSession = new BetakillerWampCookieSession(
+      this.wampCookieSessionName, this.wampCookieSessionSeparator
+    );
+    let wampAuthChallenge = new BetakillerWampAuthChallenge(
+      wampCookieSession.getId(), this.wampAuthSecret
+    );
+    console.log(
+      `WAMP connection:`,
+      `Url "${this.wampUrl}".`,
+      `Realm "${this.wampRealm}".`,
+      `Cookie session name "${this.wampCookieSessionName}".`,
+      `Cookie session separator "${this.wampCookieSessionSeparator}".`
+    );
+    try {
+      this.wampConnection = new BetakillerWampConnection(
+        this.wampUrl, this.wampRealm, wampAuthChallenge
       );
-      try {
-        this.wampConnection = new WampConnection(this.wampUrl, this.wampRealm, wampAuthChallenge);
-        this.wampConnection
-          .onOpen((connection) => this._onWampConnect(false, connection))
-          .onClose((reason, details) => this._onWampConnect(true, {'reason': reason, 'details': details}))
-          .open();
-      } catch (error) {
-        this._onWampConnecting(true, error);
+      this.wampConnection
+        .onOpen((connection) => this._onWampConnect(false, connection))
+        .onClose((reason, details) => this._onWampConnect(true, {'reason': reason, 'details': details}))
+        .open();
+    } catch (error) {
+      this._onWampConnecting(true, error);
+    }
+  }
+
+  _onWampConnect(isError, data) {
+    let connectionTime = this.stopwatch.stop('wampConnection');
+
+    let reason = '';
+    if (!isError) {
+      reason = this._onWampConnectResolve(data);
+      if (!this.connectionTime) {
+        this.result.setConnectionTime(connectionTime);
+        this.connectionTime = connectionTime;
       }
+    } else {
+      reason = this._onWampConnectReject(data);
     }
 
-    _onWampConnect(isError, data) {
-      let connectionTime = this.stopwatch.stop('wampConnection');
+    if (this.abort) this.wampConnection.close();
 
-      let reason = '';
-      if (!isError) {
-        reason = this._onWampConnectResolve(data);
-        if (!this.connectionTime) {
-          this.result.setConnectionTime(connectionTime);
-          this.connectionTime = connectionTime;
-        }
-      } else {
-        reason = this._onWampConnectReject(data);
-      }
+    if (reason) reason = ` (${reason})`;
+    console.log(`WAMP connection time${reason}:`, connectionTime);
 
-      if (this.abort) this.wampConnection.close();
+    if (!isError) this._runTests();
+  }
 
-      if (reason) reason = ` (${reason})`;
-      console.log(`WAMP connection time${reason}:`, connectionTime);
+  _onWampConnectResolve(data) {
+    console.log('WAMP connection:', data);
 
-      if (!isError) this._runTests();
+    return 'open';
+  }
+
+  _onWampConnectReject(data) {
+    let reason            = 'error';
+    let reconnectionState = 'unknown';
+    let isClosedByClient  = false;
+    if (data.hasOwnProperty('reason')) {
+      reason            = data.reason;
+      reconnectionState = this.wampConnection.getDetailsReconnectionState(data.details);
+      isClosedByClient  = this.wampConnection.isDetailsClosedByClient(data.details);
     }
+    if (this.abort) reconnectionState = false;
 
-    _onWampConnectResolve(data) {
-      console.log('WAMP connection:', data);
-
-      return 'open';
-    }
-
-    _onWampConnectReject(data) {
-      let reason            = 'error';
-      let reconnectionState = 'unknown';
-      let isClosedByClient  = false;
+    if (isClosedByClient) {
+      console.log('WAMP connection closed by client');
+    } else {
       if (data.hasOwnProperty('reason')) {
-        reason            = data.reason;
-        reconnectionState = this.wampConnection.getDetailsReconnectionState(data.details);
-        isClosedByClient  = this.wampConnection.isDetailsClosedByClient(data.details);
-      }
-      if (this.abort) reconnectionState = false;
-
-      if (isClosedByClient) {
-        console.log('WAMP connection closed by client');
-      } else {
-        if (data.hasOwnProperty('reason')) {
-          console.error(
-            `WAMP connection. Error:`,
-            `Reason "${data.reason}".`,
-            `Details:`, data.details
-          );
-        } else {
-          if (data instanceof Error) data = data.message;
-          console.error('WAMP connection. Error:', data);
-        }
-
-        console.log(`WAMP connection reconnection "${reconnectionState}".`);
-      }
-
-      if (reconnectionState) this.result.incConnectionTry();
-
-      return reason;
-    }
-
-    _request(testId) {
-      this.testsRequestsQty++;
-
-      this
-        .result
-        .incRequestsQty()
-        .updateRequestsProgress(this.testsRequestsQty, this.params.testsQty);
-
-      this.stopwatch.start('test-' + testId);
-
-      let apiData = this._createApiData(testId);
-      console.log(
-        `Request:`,
-        `Test id "${testId}".`,
-        `API resource "${this.apiResource}".`,
-        `API method "${this.apiMethod}".`,
-        `API data:`, apiData
-      );
-      if (this.params.connectionType === 'wamp') {
-        new WampApiRequest(this.wampConnection)
-          .request(this.apiResource, this.apiMethod, apiData)
-          .then(response => this._onResponse(false, response, testId))
-          .catch(error => this._onResponse(true, error, testId));
-
-      } else {
-        this
-          .rpcConnection[this.apiResource][this.apiMethod]
-          .apply(null, this._createApiData(testId))
-          .done((response) => this._onResponse(false, response, testId))
-          .fail((error) => this._onResponse(true, error, testId));
-      }
-    }
-
-    _onResponse(isError, data, testId) {
-      let testTime = this.stopwatch.stop('test-' + testId);
-      console.log(`Test "${testId}" time:`, testTime);
-
-      this.testsResponsesQty++;
-      if (isError) this.testsErrorsQty++;
-      this.testsTotalTime += testTime;
-      let averageExecutionTime = this.testsTotalTime / this.testsRequestsQty;
-
-      if (!isError) {
-        console.log('Request response:', data);
+        console.error(
+          `WAMP connection. Error:`,
+          `Reason "${data.reason}".`,
+          `Details:`, data.details
+        );
       } else {
         if (data instanceof Error) data = data.message;
-        console.error('Request error:', data);
+        console.error('WAMP connection. Error:', data);
       }
 
+      console.log(`WAMP connection reconnection "${reconnectionState}".`);
+    }
+
+    if (reconnectionState) this.result.incConnectionTry();
+
+    return reason;
+  }
+
+  _request(testId) {
+    this.testsRequestsQty++;
+
+    this
+      .result
+      .incRequestsQty()
+      .updateRequestsProgress(this.testsRequestsQty, this.params.testsQty);
+
+    this.stopwatch.start('test-' + testId);
+
+    let apiData = this._createApiData(testId);
+    console.log(
+      `Request:`,
+      `Test id "${testId}".`,
+      `API resource "${this.apiResource}".`,
+      `API method "${this.apiMethod}".`,
+      `API data:`, apiData
+    );
+    if (this.params.connectionType === 'wamp') {
+      new BetakillerWampApiRequest(this.wampConnection)
+        .request(this.apiResource, this.apiMethod, apiData)
+        .then(response => this._onResponse(false, response, testId))
+        .catch(error => this._onResponse(true, error, testId));
+
+    } else {
+      this
+        .rpcConnection[this.apiResource][this.apiMethod]
+        .apply(null, this._createApiData(testId))
+        .done((response) => this._onResponse(false, response, testId))
+        .fail((error) => this._onResponse(true, error, testId));
+    }
+  }
+
+  _onResponse(isError, data, testId) {
+    let testTime = this.stopwatch.stop('test-' + testId);
+    console.log(`Test "${testId}" time:`, testTime);
+
+    this.testsResponsesQty++;
+    if (isError) this.testsErrorsQty++;
+    this.testsTotalTime += testTime;
+    let averageExecutionTime = this.testsTotalTime / this.testsRequestsQty;
+
+    if (!isError) {
+      console.log('Request response:', data);
+    } else {
+      if (data instanceof Error) data = data.message;
+      console.error('Request error:', data);
+    }
+
+    this
+      .result
+      .incResponsesQty()
+      .updateResponsesProgress(this.testsResponsesQty, this.params.testsQty)
+      .setAverageExecutionTime(averageExecutionTime);
+
+    if (isError) {
       this
         .result
-        .incResponsesQty()
-        .updateResponsesProgress(this.testsResponsesQty, this.params.testsQty)
-        .setAverageExecutionTime(averageExecutionTime);
-
-      if (isError) {
-        this
-          .result
-          .incErrorsQty()
-          .updateErrorsProgress(this.testsErrorsQty, this.params.testsQty);
-      }
-    }
-
-    _createApiData(testId) {
-      return this.apiData.map((value) => {
-        return value.replace(/:testId/ig, testId);
-      });
-    }
-
-    _sleep(ms) {
-      return new Promise(resolve => setTimeout(resolve, ms));
+        .incErrorsQty()
+        .updateErrorsProgress(this.testsErrorsQty, this.params.testsQty);
     }
   }
 
-  new TestWampRpcTestController(rpc);
-
-  return;
-  let wamp = new WampFacade(true);
-  try {
-    wamp.close();
-    wamp
-      .request('api', ['validation', 'userEmail', 'qwe@qwe.qwe'])
-      .then(response => {
-        console.log('Request response:', response);
-        wamp.close();
-
-        wamp
-          .requestApi('validation', 'userEmail', 'qwe2@qwe.qwe')
-          .then(response => {
-            console.log('Request response:', response);
-          })
-          .catch(error => console.error('Request error:', error));
-      })
-      .catch(error => console.error('Request error:', error));
-  } catch (error) {
-    console.error('Request system error:', error);
+  _createApiData(testId) {
+    return this.apiData.map((value) => {
+      return value.replace(/:testId/ig, testId);
+    });
   }
-});
+
+  _sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+}
+
+new TestWampRpcTestController(undefined);
+
+//return;
+//let wamp = new BetakillerWampFacade(true);
+//try {
+//  wamp.close();
+//  wamp
+//    .request('api', ['validation', 'userEmail', 'qwe@qwe.qwe'])
+//    .then(response => {
+//      console.log('Request response:', response);
+//      wamp.close();
+//
+//      wamp
+//        .requestApi('validation', 'userEmail', 'qwe2@qwe.qwe')
+//        .then(response => {
+//          console.log('Request response:', response);
+//        })
+//        .catch(error => console.error('Request error:', error));
+//    })
+//    .catch(error => console.error('Request error:', error));
+//} catch (error) {
+//  console.error('Request system error:', error);
+//}
