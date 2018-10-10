@@ -1,6 +1,8 @@
 'use strict';
 
-class TestWampRpcTestResult {
+import HtmlNodes from './HtmlNodes';
+
+export default class TestWampRpcTestResult {
   constructor(testController) {
     this.testController = testController;
     this.$template      = undefined;
