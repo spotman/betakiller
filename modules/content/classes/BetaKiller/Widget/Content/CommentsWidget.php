@@ -5,7 +5,7 @@ use BetaKiller\Exception\ValidationException;
 use BetaKiller\Widget\AbstractPublicWidget;
 use BetaKiller\Widget\WidgetException;
 use HTML;
-use Security;
+use Psr\Http\Message\ServerRequestInterface;
 use Valid;
 use Validation;
 
@@ -38,14 +38,19 @@ class CommentsWidget extends AbstractPublicWidget
     /**
      * Returns data for View rendering
      *
+     * @param \Psr\Http\Message\ServerRequestInterface $request
+     *
+     * @param array                                    $context
+     *
      * @return array
      * @throws \BetaKiller\Repository\RepositoryException
-     * @throws WidgetException
+     * @throws \BetaKiller\Widget\WidgetException
+     * @throws \Kohana_Exception
      */
-    public function getData(): array
+    public function getData(ServerRequestInterface $request, array $context): array
     {
-        $entitySlug   = $this->getContextParam('entity');
-        $entityItemId = (int)$this->getContextParam('entityItemId');
+        $entitySlug   = (string)$context['entity'];
+        $entityItemId = (int)$context['entityItemId'];
 
         if (!$entitySlug) {
             throw new WidgetException('[entity] must be provided via widget context');
@@ -97,7 +102,7 @@ class CommentsWidget extends AbstractPublicWidget
     public function actionAdd()
     {
         if ($this->request->is_ajax()) {
-            $this->response->content_type_json();
+            $this->response->contentTypeJson();
         }
 
         $entitySlug   = $this->request->post('entity');
@@ -122,7 +127,7 @@ class CommentsWidget extends AbstractPublicWidget
 
         if (!$validation->check()) {
             $errors = $this->getValidationErrors($validation);
-            $this->response->send_error_json($errors);
+            $this->response->sendErrorJson($errors);
 
             return;
         }
@@ -206,10 +211,20 @@ class CommentsWidget extends AbstractPublicWidget
                 $this->commentRepository->save($model);
             }
 
-            $this->response->send_success_json();
+            $this->response->sendSuccessJson();
         } /** @noinspection BadExceptionsProcessingInspection */
         catch (ValidationException $e) {
-            $this->response->send_error_json($e->getFirstItem()->getMessage());
+            $this->response->sendErrorJson($e->getFirstItem()->getMessage());
         }
+    }
+
+    private function getValidationErrors(Validation $validation): array
+    {
+        return $validation->errors($this->getValidationMessagesPath());
+    }
+
+    private function getValidationMessagesPath(): string
+    {
+        return 'widgets'.DIRECTORY_SEPARATOR.str_replace('_', DIRECTORY_SEPARATOR, $this->getName());
     }
 }

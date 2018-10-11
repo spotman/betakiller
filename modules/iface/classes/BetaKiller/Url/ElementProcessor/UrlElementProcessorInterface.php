@@ -1,8 +1,8 @@
 <?php
 namespace BetaKiller\Url\ElementProcessor;
 
-use BetaKiller\Url\Container\UrlContainerInterface;
 use BetaKiller\Url\UrlElementInterface;
+use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 /**
@@ -13,15 +13,13 @@ interface UrlElementProcessorInterface
     /**
      * Execute processing on URL element
      *
-     * @param \BetaKiller\Url\UrlElementInterface             $model
-     * @param \BetaKiller\Url\Container\UrlContainerInterface $urlContainer
-     * @param \Psr\Http\Message\ServerRequestInterface        $request
-     * @param \Response                                       $response
+     * @param \BetaKiller\Url\UrlElementInterface      $model
+     * @param \Psr\Http\Message\ServerRequestInterface $request
+     *
+     * @return \Psr\Http\Message\ResponseInterface
      */
     public function process(
         UrlElementInterface $model,
-        UrlContainerInterface $urlContainer,
-        ServerRequestInterface $request,
-        \Response $response
-    ): void;
+        ServerRequestInterface $request
+    ): ResponseInterface;
 }

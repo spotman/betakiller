@@ -14,6 +14,10 @@ use Symfony\Component\Yaml\Yaml;
 
 class Cron extends AbstractTask
 {
+    public const EXPR_HELPERS = [
+        'hourly'
+    ];
+
     /**
      * @var \BetaKiller\Helper\AppEnvInterface
      */

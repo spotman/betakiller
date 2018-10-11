@@ -147,8 +147,9 @@ abstract class AbstractOrmBasedAssetsModel extends ORM implements AssetsModelInt
      * Returns the date and time when asset was modified
      *
      * @return DateTimeImmutable|null
+     * @throws \Kohana_Exception
      */
-    public function getLastModifiedAt():?DateTimeImmutable
+    public function getLastModifiedAt(): DateTimeImmutable
     {
         return $this->get_datetime_column_value('last_modified_at');
     }

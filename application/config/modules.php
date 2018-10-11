@@ -10,7 +10,6 @@ return [
     'widget'                => MODPATH.'widget',                // Basic widgets support
 
     // Kohana dependencies without DB access (using Kohana config)
-    'device'                => MODPATH.'device',                // Device detection TODO Remove
     'email'                 => MODPATH.'email',                 // Mailing module
     'image'                 => MODPATH.'image',                 // Image manipulation
     'i18n-plural'           => MODPATH.'i18n-plural',           // International pluralization
@@ -33,8 +32,6 @@ return [
     'unittest'             => MODPATH.'unittest',              // Module for unit testing via phpunit
 
     // These modules HAVE LEGACY ROUTES defined and DOES NOT DEPEND on platform
-    'jsonrpc'              => MODPATH.'jsonrpc',               // JSON-RPC server
-    'robots-txt'           => MODPATH.'robots-txt',            // Serving /robots.txt
     'sitemap'               => MODPATH.'sitemap',               // Generating sitemap.xml
 
     // Place it before other modules for correct initialization of per-site classes and configs

@@ -1,24 +1,14 @@
 <?php
 namespace BetaKiller\IFace\Admin\Error;
 
-use BetaKiller\Exception;
-use BetaKiller\Helper\IFaceHelper;
-use BetaKiller\Helper\PhpExceptionUrlContainerHelper;
+use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Model\PhpExceptionHistoryModelInterface;
+use BetaKiller\Model\PhpExceptionModelInterface;
 use BetaKiller\Repository\UserRepository;
+use Psr\Http\Message\ServerRequestInterface;
 
 class PhpExceptionItem extends ErrorAdminBase
 {
-    /**
-     * @var \BetaKiller\Helper\PhpExceptionUrlContainerHelper
-     */
-    private $urlParametersHelper;
-
-    /**
-     * @var \BetaKiller\Helper\IFaceHelper
-     */
-    private $ifaceHelper;
-
     /**
      * @var \BetaKiller\Repository\UserRepository
      */
@@ -27,39 +17,36 @@ class PhpExceptionItem extends ErrorAdminBase
     /**
      * PhpExceptionItem constructor.
      *
-     * @param \BetaKiller\Helper\PhpExceptionUrlContainerHelper $urlParametersHelper
-     * @param \BetaKiller\Helper\IFaceHelper                    $ifaceHelper
-     * @param \BetaKiller\Repository\UserRepository             $userRepo
+     * @param \BetaKiller\Repository\UserRepository $userRepo
      */
-    public function __construct(
-        PhpExceptionUrlContainerHelper $urlParametersHelper,
-        IFaceHelper $ifaceHelper,
-        UserRepository $userRepo
-    ) {
-        $this->urlParametersHelper = $urlParametersHelper;
-        $this->ifaceHelper         = $ifaceHelper;
-        $this->userRepo            = $userRepo;
+    public function __construct(UserRepository $userRepo)
+    {
+        $this->userRepo = $userRepo;
     }
 
     /**
      * Returns data for View
-     * Override this method in child classes
+     *
+     * @param \Psr\Http\Message\ServerRequestInterface $request
      *
      * @return array
+     * @throws \BetaKiller\Exception
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     * @throws \BetaKiller\Repository\RepositoryException
+     * @uses \BetaKiller\IFace\Admin\Error\UnresolvedPhpExceptionIndex
+     * @uses \BetaKiller\IFace\Admin\Error\ResolvedPhpExceptionIndex
+     * @uses \BetaKiller\IFace\Admin\Error\PhpExceptionStackTrace
      */
-    public function getData(): array
+    public function getData(ServerRequestInterface $request): array
     {
-        $model = $this->urlParametersHelper->getPhpException();
+        /** @var PhpExceptionModelInterface $model */
+        $model = ServerRequestHelper::getEntity($request, PhpExceptionModelInterface::class);
 
-        if (!$model) {
-            throw new Exception('Incorrect php exception hash');
-        }
+        $urlHelper = ServerRequestHelper::getUrlHelper($request);
 
-        /** @var UnresolvedPhpExceptionIndex $unresolvedIFace */
-        $unresolvedIFace = $this->ifaceHelper->createIFaceFromCodename('Admin_Error_UnresolvedPhpExceptionIndex');
-
-        /** @var ResolvedPhpExceptionIndex $resolvedIFace */
-        $resolvedIFace = $this->ifaceHelper->createIFaceFromCodename('Admin_Error_ResolvedPhpExceptionIndex');
+        $unresolvedIFace = $urlHelper->getUrlElementByCodename('Admin_Error_UnresolvedPhpExceptionIndex');
+        $resolvedIFace   = $urlHelper->getUrlElementByCodename('Admin_Error_ResolvedPhpExceptionIndex');
+        $traceIFace      = $urlHelper->getUrlElementByCodename('Admin_Error_PhpExceptionStackTrace');
 
         $backIFace = $model->isResolved() ? $resolvedIFace : $unresolvedIFace;
 
@@ -73,11 +60,9 @@ class PhpExceptionItem extends ErrorAdminBase
             return \Debug::path($path);
         }, $model->getPaths());
 
-        /** @var \BetaKiller\IFace\Admin\Error\PhpExceptionStackTrace $traceIFace */
-        $traceIFace = $this->ifaceHelper->createIFaceFromCodename('Admin_Error_PhpExceptionStackTrace');
 
         return [
-            'backUrl'    => $this->ifaceHelper->makeIFaceUrl($backIFace),
+            'backUrl'    => $urlHelper->makeUrl($backIFace),
             'hash'       => $model->getHash(),
             'urls'       => $model->getUrls(),
             'paths'      => $paths,
@@ -87,7 +72,7 @@ class PhpExceptionItem extends ErrorAdminBase
             'isResolved' => $model->isResolved(),
             'isIgnored'  => $model->isIgnored(),
             'counter'    => $model->getCounter(),
-            'trace_url'  => $this->ifaceHelper->makeIFaceUrl($traceIFace),
+            'trace_url'  => $urlHelper->makeUrl($traceIFace),
             'history'    => $history,
         ];
     }

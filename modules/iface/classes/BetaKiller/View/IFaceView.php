@@ -1,16 +1,19 @@
 <?php
 namespace BetaKiller\View;
 
-use BetaKiller\Helper\I18nHelper;
-use BetaKiller\Helper\IFaceHelper;
-use BetaKiller\IFace\Exception\IFaceException;
+use BetaKiller\Helper\ServerRequestHelper;
+use BetaKiller\Helper\UrlElementHelper;
+use BetaKiller\IFace\Exception\UrlElementException;
 use BetaKiller\IFace\IFaceInterface;
 use BetaKiller\Repository\IFaceLayoutRepository;
 use BetaKiller\Repository\RepositoryException;
 use BetaKiller\Url\IFaceModelInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
 class IFaceView
 {
+    public const REQUEST_KEY = '__request__';
+
     /**
      * @var \BetaKiller\Repository\IFaceLayoutRepository
      */
@@ -27,55 +30,44 @@ class IFaceView
     private $headHelper;
 
     /**
-     * @var \BetaKiller\Helper\IFaceHelper
-     */
-    private $ifaceHelper;
-
-    /**
      * @var \BetaKiller\View\ViewFactoryInterface
      */
     private $viewFactory;
-
-    /**
-     * @var \BetaKiller\Helper\I18nHelper
-     */
-    private $i18nHelper;
 
     /**
      * IFaceView constructor.
      *
      * @param \BetaKiller\Repository\IFaceLayoutRepository $layoutRepo
      * @param \BetaKiller\View\LayoutViewInterface         $layoutView
-     * @param \BetaKiller\Helper\IFaceHelper               $ifaceHelper
      * @param \BetaKiller\View\HtmlHeadHelper              $headHelper
      * @param \BetaKiller\View\ViewFactoryInterface        $viewFactory
-     * @param \BetaKiller\Helper\I18nHelper                $i18nHelper
      */
     public function __construct(
         IFaceLayoutRepository $layoutRepo,
         LayoutViewInterface $layoutView,
-        IFaceHelper $ifaceHelper,
         HtmlHeadHelper $headHelper,
-        ViewFactoryInterface $viewFactory,
-        I18nHelper $i18nHelper
+        ViewFactoryInterface $viewFactory
     ) {
         $this->layoutRepo  = $layoutRepo;
         $this->layoutView  = $layoutView;
         $this->headHelper  = $headHelper;
         $this->viewFactory = $viewFactory;
-        $this->ifaceHelper = $ifaceHelper;
-        $this->i18nHelper  = $i18nHelper;
     }
 
     /**
-     * @param \BetaKiller\IFace\IFaceInterface $iface
+     * @param \BetaKiller\IFace\IFaceInterface         $iface
+     *
+     * @param \Psr\Http\Message\ServerRequestInterface $request
      *
      * @return string
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
      * @throws \BetaKiller\Url\UrlPrototypeException
-     * @throws \BetaKiller\IFace\Exception\IFaceException
      */
-    public function render(IFaceInterface $iface): string
+    public function render(IFaceInterface $iface, ServerRequestInterface $request): string
     {
+        $urlHelper     = ServerRequestHelper::getUrlHelper($request);
+        $elementHelper = ServerRequestHelper::getUrlElementHelper($request);
+
         $model = $iface->getModel();
 
         // Hack for dropping original iface data on processing exception error page
@@ -85,27 +77,29 @@ class IFaceView
         $ifaceView = $this->viewFactory->create($viewPath);
 
         // Getting IFace data
-        $data = $iface->getData();
-
-        // For changing wrapper from view via $_this->wrapper('html')
-        $data['iface'] = [
-            'codename' => $model->getCodename(),
-            'label'    => $this->ifaceHelper->getLabel($model),
-        ];
-
-        foreach ($data as $key => $value) {
+        foreach ($iface->getData($request) as $key => $value) {
             $ifaceView->set($key, $value);
         }
 
+        // Send current request to widgets
+        $ifaceView->set(self::REQUEST_KEY, $request);
+
+        $ifaceView->set('__iface__', [
+            'codename' => $model->getCodename(),
+            'label'    => $elementHelper->getLabel($model),
+        ]);
+
+        $i18n = ServerRequestHelper::getI18n($request);
+
         $this->headHelper
-            ->setLang($this->i18nHelper->getLang())
+            ->setLang($i18n->getLang())
             ->setContentType()
-            ->setTitle($this->ifaceHelper->getTitle($model))
-            ->setMetaDescription($this->ifaceHelper->getDescription($model))
-            ->setCanonical($this->ifaceHelper->makeUrl($model, null, false));
+            ->setTitle($elementHelper->getTitle($model))
+            ->setMetaDescription($elementHelper->getDescription($model))
+            ->setCanonical($urlHelper->makeUrl($model, null, false));
 
         // Getting IFace layout
-        $layoutCodename = $this->getLayoutCodename($model);
+        $layoutCodename = $this->getLayoutCodename($model, $elementHelper);
 
         $this->layoutView->setLayoutCodename($layoutCodename);
 
@@ -115,23 +109,26 @@ class IFaceView
     /**
      * @param \BetaKiller\Url\IFaceModelInterface $model
      *
+     * @param \BetaKiller\Helper\UrlElementHelper $helper
+     *
      * @return string
-     * @throws \BetaKiller\IFace\Exception\IFaceException
      */
-    private function getLayoutCodename(IFaceModelInterface $model): string
+    private function getLayoutCodename(IFaceModelInterface $model, UrlElementHelper $helper): string
     {
-        $layoutCodename = $this->ifaceHelper->detectLayoutCodename($model);
+        $layoutCodename = $helper->detectLayoutCodename($model);
 
-        if (!$layoutCodename) {
-            try {
-                $defaultLayout = $this->layoutRepo->getDefault();
-            } catch (RepositoryException $e) {
-                throw IFaceException::wrap($e);
-            }
-            $layoutCodename = $defaultLayout->getCodename();
+        return $layoutCodename ?: $this->getDefaultLayoutCodename();
+    }
+
+    private function getDefaultLayoutCodename(): string
+    {
+        try {
+            $layout = $this->layoutRepo->getDefault();
+
+            return $layout->getCodename();
+        } catch (RepositoryException $e) {
+            throw UrlElementException::wrap($e);
         }
-
-        return $layoutCodename;
     }
 
     protected function getViewPath(IFaceModelInterface $model): string

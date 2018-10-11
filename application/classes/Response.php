@@ -8,105 +8,111 @@ class Response extends \Kohana_Response
      * Response types and signatures
      */
 
-    const TYPE_HTML = 1;
-    const TYPE_JSON = 2;
-    const TYPE_JS   = 3;
-    const TYPE_XML  = 4;
+    public const TYPE_HTML = 1;
+    public const TYPE_JSON = 2;
+    public const TYPE_JS   = 3;
+    public const TYPE_XML  = 4;
 
-    protected static $_content_types_signatures = array(
-        self::TYPE_HTML =>  'text/html',
-        self::TYPE_JSON =>  'application/json',
-        self::TYPE_JS   =>  'text/javascript',
-        self::TYPE_XML  =>  'text/xml',
-    );
+    protected static $contentTypesSignatures = [
+        self::TYPE_HTML => 'text/html',
+        self::TYPE_JSON => 'application/json',
+        self::TYPE_JS   => 'text/javascript',
+        self::TYPE_XML  => 'text/xml',
+    ];
 
-    protected $_content_type = self::TYPE_HTML;
+    protected $contentType = self::TYPE_HTML;
 
     /**
      * JSON response types and signatures
      */
 
-    const JSON_SUCCESS  = 1;
-    const JSON_ERROR    = 2;
+    public const JSON_SUCCESS = 1;
+    public const JSON_ERROR   = 2;
 
-    protected static $_json_response_signatures = array(
-        self::JSON_SUCCESS  =>  'ok',
-        self::JSON_ERROR    =>  'error',
-    );
+    protected static $jsonResponseSignatures = [
+        self::JSON_SUCCESS => 'ok',
+        self::JSON_ERROR   => 'error',
+    ];
 
-    protected static $_stack = array();
-
-//    /**
-//     * @var WrapperView
-//     */
-//    protected $_wrapper;
+    protected static $stack = [];
 
     /**
      * @var \Request Request which initiated current response
      */
-    protected $_request;
+    protected $request;
 
     /**
      * @return \Response|NULL
      */
-    public static function current()
+    public static function current(): ?\Response
     {
-        return current(static::$_stack);
+        return current(static::$stack);
     }
 
-    public static function push(\Response $response, \Request $request)
+    public static function push(\Response $response, \Request $request): void
     {
         // Saving request
-        $response->request($request);
+        $response->setRequest($request);
 
-        static::$_stack[] = $response;
-        end(static::$_stack);
+        static::$stack[] = $response;
+        end(static::$stack);
     }
 
     /**
      * @return \Response
      */
-    public static function pop()
+    public static function pop(): \Response
     {
         $response = static::current();
-        array_pop(static::$_stack);
-        end(static::$_stack);
+        array_pop(static::$stack);
+        end(static::$stack);
+
         return $response;
     }
 
-    public function request(\Request $request = NULL)
+    /**
+     * @param \Request $request
+     *
+     * @return $this
+     */
+    public function setRequest(\Request $request): self
     {
-        if ( $request === NULL )
-            return $this->_request;
+        $this->request = &$request;
 
-        $this->_request = & $request;
         return $this;
     }
 
     /**
      * Gets or sets content type of the response
+     *
      * @param int $value
+     *
      * @return int|Response
      * @throws \Kohana_Exception
      */
-    public function content_type($value = NULL)
+    public function setContentType($value = null)
     {
         // Act as a getter
-        if ( ! $value ) {
-            return $this->_content_type;
+        if (!$value) {
+            return $this->contentType;
         }
 
         // Act s a setter
-        if (!array_key_exists($value, static::$_content_types_signatures)) {
-            throw new \Kohana_Exception('Unknown content type: :value', array(':value' => $value));
+        if (!array_key_exists($value, static::$contentTypesSignatures)) {
+            throw new \Kohana_Exception('Unknown content type: :value', [':value' => $value]);
         }
 
-        $this->_content_type = $value;
+        $this->contentType = $value;
 
-        $mime = static::$_content_types_signatures[ $this->_content_type ];
+        $mime = static::$contentTypesSignatures[$this->contentType];
         $this->headers('content-type', $mime.'; charset='.\Kohana::$charset);
 
         return $this;
+    }
+
+    public function getContentType(): int
+    {
+        return $this->contentType;
     }
 
     /**
@@ -114,97 +120,104 @@ class Response extends \Kohana_Response
      *
      * @deprecated
      */
-    public function content_type_json()
+    public function contentTypeJson(): void
     {
-        $this->content_type(Response::TYPE_JSON);
+        $this->setContentType(self::TYPE_JSON);
+    }
+
+    /**
+     * @return \DateTimeImmutable
+     */
+    public function getLastModified(): ?\DateTimeImmutable
+    {
+        $value = $this->headers('last-modified');
+
+        return $value
+            ? (new \DateTimeImmutable())->setTimestamp(strtotime($value))
+            : null;
     }
 
     /**
      * @param \DateTimeInterface $dateTime
-     * @return \Response|\DateTimeInterface|null
      */
-    public function lastModified(\DateTimeInterface $dateTime = NULL)
+    public function setLastModified(\DateTimeInterface $dateTime): void
     {
-        $value = $dateTime ? gmdate("D, d M Y H:i:s \G\M\T", $dateTime->getTimestamp()) : NULL;
+        $value = gmdate("D, d M Y H:i:s \G\M\T", $dateTime->getTimestamp());
 
-        if ( $value )
-        {
-            return $this->headers('last-modified', $value);
-        }
-        else
-        {
-            $current_value = $this->headers('last-modified');
-            return $current_value
-                ? (new \DateTime())->setTimestamp(strtotime($current_value))
-                : NULL;
-        }
+        $this->headers('last-modified', $value);
     }
 
-    public function expires(\DateTimeInterface $dateTime)
+    public function expires(\DateTimeInterface $dateTime): void
     {
         $this->headers('expires', gmdate("D, d M Y H:i:s \G\M\T", $dateTime->getTimestamp()));
     }
 
-    public function check_if_not_modified_since()
+    public function checkIfNotModifiedSince(): bool
     {
-        if ( $request_ts = $this->get_if_modified_since_timestamp() )
-        {
-            $document_dt = $this->lastModified();
+        $requestTs = $this->getIfModifiedSinceTimestamp();
 
-            if ( ! $document_dt )
-                return FALSE;
+        if ($requestTs) {
+            $documentDt = $this->getLastModified();
 
-            if ( $request_ts >= $document_dt->getTimestamp() )
-            {
+            if (!$documentDt) {
+                return false;
+            }
+
+            if ($requestTs >= $documentDt->getTimestamp()) {
                 // Set status and drop body
                 $this->status(304)->body('');
-                return TRUE;
+
+                return true;
             }
         }
 
-        return FALSE;
+        return false;
     }
 
-    protected function get_if_modified_since_timestamp()
+    protected function getIfModifiedSinceTimestamp()
     {
-        if ( isset($_SERVER['HTTP_IF_MODIFIED_SINCE']))
-        {
-            $mod_time = $_SERVER['HTTP_IF_MODIFIED_SINCE'];
+        if (isset($_SERVER['HTTP_IF_MODIFIED_SINCE'])) {
+            $modTime = $_SERVER['HTTP_IF_MODIFIED_SINCE'];
 
             // Some versions of IE6 append "; length=####"
-            if (($strpos = strpos($mod_time, ';')) !== FALSE)
-            {
-                $mod_time = substr($mod_time, 0, $strpos);
+            if (($pos = strpos($modTime, ';')) !== false) {
+                $modTime = substr($modTime, 0, $pos);
             }
 
-            return strtotime($mod_time);
+            return strtotime($modTime);
         }
 
-        return NULL;
+        return null;
     }
 
-    public function http2_server_push($url)
+    public function http2ServerPush($url): void
     {
         $path = parse_url($url, PHP_URL_PATH);
-        $type = $this->detect_http2_server_push_type($path);
+        $type = $this->detectHttp2ServerPushType($path);
 
         $value = $path.'; rel=preload; as='.$type;
 
         $this->_header->offsetSet('link', $value, false);
     }
 
-    protected function detect_http2_server_push_type($path)
+    /**
+     * @param $path
+     *
+     * @return string
+     * @throws \Exception
+     */
+    protected function detectHttp2ServerPushType($path): string
     {
         $ext = pathinfo($path, PATHINFO_EXTENSION);
 
         $map = [
-            'image'     =>  ['jpg', 'jpeg', 'png', 'gif', 'svg'],
-            'script'    =>  ['js'],
-            'style'     =>  ['css'],
+            'image'  => ['jpg', 'jpeg', 'png', 'gif', 'svg'],
+            'script' => ['js'],
+            'style'  => ['css'],
         ];
 
         foreach ($map as $type => $extensions) {
-            if (in_array($ext, $extensions)) {
+            if (in_array($ext, $extensions, true)) {
                 return $type;
             }
         }
@@ -212,40 +225,43 @@ class Response extends \Kohana_Response
         throw new \Exception('Can not detect HTTP2 Server Push type for url :url', [':url' => $path]);
     }
 
-    public function render()
+    public function render(): string
     {
         // If content was not modified
-        $this->check_if_not_modified_since();
+        $this->checkIfNotModifiedSince();
 
         return parent::render();
     }
 
     /**
      * Sends plain text to stdout without wrapping it by template
-     * @param string $string Plain text for output
-     * @param int $content_type Content type constant like Response::HTML
+     *
+     * @param string $string      Plain text for output
+     * @param int    $contentType Content type constant like Response::HTML
+     *
      * @deprecated
      */
-    public function send_string($string, $content_type = self::TYPE_HTML)
+    public function sendString(string $string, ?int $contentType = null): void
     {
-        $this->content_type($content_type);
+        $this->setContentType($contentType ?? self::TYPE_HTML);
         $this->body($string);
     }
 
     /**
      * Sends JSON response to stdout
-     * @param integer $result JSON result constant or raw data
-     * @param mixed $data Raw data to send, if the first argument is constant
+     *
+     * @param integer|mixed $result JSON result constant or raw data
+     * @param mixed   $data   Raw data to send, if the first argument is constant
+     *
      * @deprecated
      */
-    public function sendJson($result = self::JSON_SUCCESS, $data = NULL)
+    public function sendJson($result = self::JSON_SUCCESS, $data = null): void
     {
-        if ( is_int($result) )
-        {
+        if (is_int($result)) {
             $result = $this->prepareJson($result, $data);
         }
 
-        $this->send_string(json_encode($result), self::TYPE_JSON);
+        $this->sendString(json_encode($result), self::TYPE_JSON);
     }
 
     /**
@@ -253,9 +269,9 @@ class Response extends \Kohana_Response
      *
      * @deprecated
      */
-    public function send_success_json($data = null)
+    public function sendSuccessJson($data = null): void
     {
-        $this->sendJson(Response::JSON_SUCCESS, $data);
+        $this->sendJson(self::JSON_SUCCESS, $data);
     }
 
     /**
@@ -263,9 +279,9 @@ class Response extends \Kohana_Response
      *
      * @deprecated
      */
-    public function send_error_json($data = null)
+    public function sendErrorJson($data = null): void
     {
-        $this->sendJson(Response::JSON_ERROR, $data);
+        $this->sendJson(self::JSON_ERROR, $data);
     }
 
     /**
@@ -275,50 +291,21 @@ class Response extends \Kohana_Response
      *   message: <data>
      * }
      * Makes JSON-transport between backend and frontend
+     *
      * @param $result integer Constant Request::HTML or similar
-     * @param $data mixed
+     * @param $data   mixed
+     *
      * @return array
      */
-    protected function prepareJson($result, $data)
+    protected function prepareJson($result, $data): array
     {
-        $response = array("response" => static::$_json_response_signatures[ $result ]);
+        $response = ['response' => static::$jsonResponseSignatures[$result]];
 
-        if ( $data )
-        {
-            $response["message"] = $data;
+        if ($data) {
+            $response['message'] = $data;
         }
 
         return $response;
-    }
-
-    /**
-     * @param \Throwable $e
-     *
-     * @throws \Kohana_Exception
-     * @throws \Throwable
-     */
-    public function handleException(\Throwable $e): void
-    {
-        switch ( $this->content_type() )
-        {
-            case self::TYPE_JSON:
-                \Kohana_Exception::log($e);
-
-                $show = ($e instanceof ExceptionInterface) && $e->showOriginalMessageToUser();
-
-                if ($show) {
-                    $message = $e->getMessage() ?: __($e->getDefaultMessageI18nKey());
-
-                    $this->sendJson(self::JSON_ERROR, $message);
-                } else {
-                    $this->sendJson(self::JSON_ERROR);
-                }
-
-                break;
-
-            default:
-                throw $e;
-        }
     }
 
     /**
@@ -328,13 +315,12 @@ class Response extends \Kohana_Response
      * @param string $mime_type     MIME-type
      * @param string $downloadAlias File name for browser`s "Save as" dialog
      *
-     * @throws \HTTP_Exception_500
      * @deprecated
      */
     public function sendFileContent($content, $mime_type = null, string $downloadAlias = null): void
     {
         if (!$content) {
-            throw new \HTTP_Exception_500('Content is empty');
+            throw new LogicException('Content is empty');
         }
 
         $this->body($content);

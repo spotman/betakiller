@@ -1,4 +1,16 @@
 <?php
+declare(strict_types=1);
+
+use BetaKiller\WebApp;
+use Psr\Http\Message\ServerRequestFactoryInterface;
+use Zend\Diactoros\ServerRequestFactory;
+use Zend\HttpHandlerRunner\Emitter\EmitterInterface;
+use Zend\HttpHandlerRunner\RequestHandlerRunner;
+
+// Delegate static file requests back to the PHP built-in webserver
+if (PHP_SAPI === 'cli-server' && $_SERVER['SCRIPT_FILENAME'] !== __FILE__) {
+    return false;
+}
 
 /**
  * The directory in which your application specific resources are located.
@@ -150,8 +162,11 @@ if (PHP_SAPI === 'cli') // Try and load minion
      * Execute the main request. A source of the URI can be passed, eg: $_SERVER['PATH_INFO'].
      * If no source is specified, the URI will be automatically detected.
      */
-    echo Request::factory(true, [], false)
-        ->execute()
-        ->send_headers()// Allow multiple "Link" headers for HTTP2 Server Push feature
-        ->body();
+
+    $container = \BetaKiller\DI\Container::getInstance();
+
+    /** @var \BetaKiller\WebApp $webApp */
+    $webApp = $container->get(WebApp::class);
+
+    $webApp->run();
 }

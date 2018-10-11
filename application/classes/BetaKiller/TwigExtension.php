@@ -2,8 +2,7 @@
 namespace BetaKiller;
 
 use BetaKiller\DI\Container;
-use BetaKiller\Url\ZoneInterface;
-use Device;
+use BetaKiller\View\IFaceView;
 use HTML;
 use Meta;
 use Profiler;
@@ -49,12 +48,6 @@ class TwigExtension extends Twig_Extension
      * @var \BetaKiller\Widget\WidgetFacade
      */
     private $widgetFacade;
-
-    /**
-     * @Inject
-     * @var \BetaKiller\Helper\IFaceHelper
-     */
-    private $ifaceHelper;
 
     /**
      * TwigExtension constructor.
@@ -111,8 +104,6 @@ class TwigExtension extends Twig_Extension
                 [$this, 'meta']
             ),
 
-            new Twig_Function('isDevice', [$this, 'isDevice']),
-
             new Twig_Function(
                 'profiler',
                 [$this, 'showProfiler'],
@@ -128,11 +119,6 @@ class TwigExtension extends Twig_Extension
             new Twig_Function(
                 'in_production',
                 [$this, 'inProduction']
-            ),
-
-            new Twig_Function(
-                'in_public_zone',
-                [$this, 'inPublicZone']
             ),
 
             new Twig_Function(
@@ -205,15 +191,6 @@ class TwigExtension extends Twig_Extension
     public function inProduction(): bool
     {
         return $this->appEnv->inProductionMode();
-    }
-
-    /**
-     * @return bool
-     * @throws \BetaKiller\IFace\Exception\IFaceException
-     */
-    public function inPublicZone(): bool
-    {
-        return $this->ifaceHelper->isCurrentZone(ZoneInterface::PUBLIC);
     }
 
     /**
@@ -335,16 +312,6 @@ class TwigExtension extends Twig_Extension
     }
 
     /**
-     * @return bool
-     */
-    public function isDevice(): bool
-    {
-        $device = new Device;
-
-        return $device->is_mobile() || $device->is_tablet();
-    }
-
-    /**
      * @param array      $context
      * @param string     $name
      * @param array|null $data
@@ -359,9 +326,11 @@ class TwigExtension extends Twig_Extension
             $context = array_merge($context, $data);
         }
 
-        $widget = $this->widgetFacade->create($name);
-        $widget->setContext($context);
+        /** @var \Psr\Http\Message\ServerRequestInterface $request */
+        $request = $context[IFaceView::REQUEST_KEY];
 
-        return $this->widgetFacade->render($widget);
+        $widget = $this->widgetFacade->create($name);
+
+        return $this->widgetFacade->render($widget, $request, $context);
     }
 }

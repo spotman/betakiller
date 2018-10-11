@@ -24,7 +24,7 @@
                 <iface uri="{Id}" name="Admin_Content_Shortcode_Editor_EntityIdIndexItem" label="{Id}" hasDynamicUrl="true" entity="Shortcode" entityAction="read" />
             </iface>
 
-            <iface uri="wysiwyg-preview" name="Admin_Content_Shortcode_WysiwygPreview" label="Preview" entity="Shortcode" entityAction="read" />
+            <action uri="wysiwyg-preview" name="Admin_Content_Shortcode_WysiwygPreview" entity="Shortcode" entityAction="read" />
         </iface>
     </iface>
 

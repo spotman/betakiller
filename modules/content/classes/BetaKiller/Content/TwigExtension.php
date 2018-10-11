@@ -3,6 +3,7 @@ namespace BetaKiller\Content;
 
 use BetaKiller\Content\Shortcode\ShortcodeFacade;
 use BetaKiller\DI\Container;
+use BetaKiller\View\IFaceView;
 
 class TwigExtension extends \Twig_Extension
 {
@@ -12,9 +13,11 @@ class TwigExtension extends \Twig_Extension
 
         return [
 
-            new \Twig_Filter('shortcodes', function($text) use ($shortcodeFacade) {
-                return $shortcodeFacade->process($text);
-            }, array('is_safe' => array('html'))),
+            new \Twig_Filter('shortcodes', function (array $context, string $text) use ($shortcodeFacade) {
+                $request = $context[IFaceView::REQUEST_KEY];
+
+                return $shortcodeFacade->process($text, $request);
+            }, ['needs_context' => true, 'is_safe' => ['html']]),
 
         ];
     }

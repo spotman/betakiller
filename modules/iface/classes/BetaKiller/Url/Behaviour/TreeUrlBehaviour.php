@@ -17,7 +17,7 @@ class TreeUrlBehaviour extends MultipleUrlBehaviour
      * @param \BetaKiller\Url\Container\UrlContainerInterface|null $params
      *
      * @return bool
-     * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
      * @throws \BetaKiller\Url\UrlPrototypeException
      */
     public function parseUri(

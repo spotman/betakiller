@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace BetaKiller\Model;
 
 use BetaKiller\Exception\NotImplementedHttpException;
-use BetaKiller\IFace\Exception\IFaceException;
+use BetaKiller\IFace\Exception\UrlElementException;
 use BetaKiller\Url\IFaceModelInterface;
 use BetaKiller\Url\UrlElementInterface;
 use BetaKiller\Url\WebHookModelInterface;
@@ -139,12 +139,12 @@ class UrlElement extends AbstractOrmBasedSingleParentTreeModel implements UrlEle
 
     /**
      * @return IFaceModelInterface
-     * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
      */
     public function getIFaceModel(): IFaceModelInterface
     {
         if (!$this->isTypeIFace()) {
-            throw new IFaceException('Can not get IFace model from UrlElement :codename instance of :class', [
+            throw new UrlElementException('Can not get IFace model from UrlElement :codename instance of :class', [
                 ':codename' => $this->getCodename(),
                 ':class'    => \get_class($this),
             ]);
@@ -155,12 +155,12 @@ class UrlElement extends AbstractOrmBasedSingleParentTreeModel implements UrlEle
 
     /**
      * @return \BetaKiller\Url\WebHookModelInterface
-     * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
      */
     public function getWebHookModel(): WebHookModelInterface
     {
         if (!$this->isTypeWebHook()) {
-            throw new IFaceException('Can not get WebHook model from UrlElement :codename instance of :class', [
+            throw new UrlElementException('Can not get WebHook model from UrlElement :codename instance of :class', [
                 ':codename' => $this->getCodename(),
                 ':class'    => \get_class($this),
             ]);

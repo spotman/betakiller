@@ -219,14 +219,14 @@ class Kohana_Core {
 			Kohana::$errors = (bool) $settings['errors'];
 		}
 
-		if (Kohana::$errors === TRUE)
-		{
-			// Enable Kohana exception handling, adds stack traces and error source.
-			set_exception_handler(array('Kohana_Exception', 'handler'));
-
-			// Enable Kohana error handling, converts all PHP errors to exceptions.
-			set_error_handler(array('Kohana', 'error_handler'));
-		}
+//		if (Kohana::$errors === TRUE)
+//		{
+//			// Enable Kohana exception handling, adds stack traces and error source.
+//			set_exception_handler(array('Kohana_Exception', 'handler'));
+//
+//			// Enable Kohana error handling, converts all PHP errors to exceptions.
+//			set_error_handler(array('Kohana', 'error_handler'));
+//		}
 
 		/**
 		 * Enable xdebug parameter collection in development mode to improve fatal stack traces.
@@ -237,7 +237,7 @@ class Kohana_Core {
 		}
 
 		// Enable the Kohana shutdown handler, which catches E_FATAL errors.
-		register_shutdown_function(array('Kohana', 'shutdown_handler'));
+//		register_shutdown_function(array('Kohana', 'shutdown_handler'));
 
 		if (ini_get('register_globals'))
 		{
@@ -371,10 +371,10 @@ class Kohana_Core {
 			if (Kohana::$errors)
 			{
 				// Go back to the previous error handler
-				restore_error_handler();
+//				restore_error_handler();
 
 				// Go back to the previous exception handler
-				restore_exception_handler();
+//				restore_exception_handler();
 			}
 
 			// Destroy objects created by init
@@ -1004,46 +1004,45 @@ class Kohana_Core {
 		return TRUE;
 	}
 
-	/**
-	 * Catches errors that are not caught by the error handler, such as E_PARSE.
-	 *
-	 * @uses    Kohana_Exception::handler
-	 * @return  void
-	 */
-	public static function shutdown_handler()
-	{
-		if ( ! Kohana::$_init)
-		{
-			// Do not execute when not active
-			return;
-		}
-
-        try
-		{
-            if (Kohana::$caching === TRUE && Kohana::$_files_changed === TRUE)
-			{
-				// Write the file path cache
-				Kohana::cache('Kohana::find_file()', Kohana::$_files);
-			}
-		}
-		catch (Throwable $e)
-		{
-			// Pass the exception to the handler
-			Kohana_Exception::handler($e);
-		}
-
-        if (Kohana::$errors && ($error = error_get_last()) && in_array($error['type'], Kohana::$shutdown_errors, true))
-		{
-            // Clean the output buffer
-			ob_get_level() AND ob_clean();
-
-			// Fake an exception for nice debugging
-			Kohana_Exception::handler(new ErrorException($error['message'], $error['type'], 0, $error['file'], $error['line']));
-
-			// Shutdown now to avoid a "death loop"
-			exit(1);
-		}
-	}
+//	/**
+//	 * Catches errors that are not caught by the error handler, such as E_PARSE.
+//	 *
+//	 * @return  void
+//	 */
+//	public static function shutdown_handler()
+//	{
+//		if ( ! Kohana::$_init)
+//		{
+//			// Do not execute when not active
+//			return;
+//		}
+//
+//        try
+//		{
+//            if (Kohana::$caching === TRUE && Kohana::$_files_changed === TRUE)
+//			{
+//				// Write the file path cache
+//				Kohana::cache('Kohana::find_file()', Kohana::$_files);
+//			}
+//		}
+//		catch (Throwable $e)
+//		{
+//			// Pass the exception to the handler
+//			Kohana_Exception::log($e);
+//		}
+//
+//        if (Kohana::$errors && ($error = error_get_last()) && in_array($error['type'], Kohana::$shutdown_errors, true))
+//		{
+//            // Clean the output buffer
+//			ob_get_level() AND ob_clean();
+//
+//			// Fake an exception for nice debugging
+//			Kohana_Exception::log(new ErrorException($error['message'], $error['type'], 0, $error['file'], $error['line']));
+//
+//			// Shutdown now to avoid a "death loop"
+//			exit(1);
+//		}
+//	}
 
 	/**
 	 * Generates a version string based on the variables defined above.

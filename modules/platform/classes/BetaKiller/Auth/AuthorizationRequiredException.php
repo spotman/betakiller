@@ -1,10 +1,15 @@
 <?php
 namespace BetaKiller\Auth;
 
-use HTTP_Exception_401;
+use BetaKiller\Exception\HttpException;
 
-class AuthorizationRequiredException extends HTTP_Exception_401
+class AuthorizationRequiredException extends HttpException
 {
+    public function __construct()
+    {
+        parent::__construct(401);
+    }
+
     /**
      * Показываем пользователю оригинальный текст исключения в красивых обёртках и в JSON-ответе
      */

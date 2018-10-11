@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace BetaKiller\Task\Error;
 
-use BetaKiller\Helper\IFaceHelper;
 use BetaKiller\Helper\NotificationHelper;
+use BetaKiller\Helper\UrlHelper;
 use BetaKiller\Model\PhpExceptionModelInterface;
 use BetaKiller\Repository\PhpExceptionRepository;
 use BetaKiller\Task\AbstractTask;
@@ -27,9 +27,9 @@ class Notify extends AbstractTask
     private $notification;
 
     /**
-     * @var \BetaKiller\Helper\IFaceHelper
+     * @var \BetaKiller\Helper\UrlHelper
      */
-    private $ifaceHelper;
+    private $urlHelper;
 
     /**
      * @var \Psr\Log\LoggerInterface
@@ -41,18 +41,18 @@ class Notify extends AbstractTask
      *
      * @param \BetaKiller\Repository\PhpExceptionRepository $repository
      * @param \BetaKiller\Helper\NotificationHelper         $notificationHelper
-     * @param \BetaKiller\Helper\IFaceHelper                $ifaceHelper
+     * @param \BetaKiller\Helper\UrlHelper                  $ifaceHelper
      * @param \Psr\Log\LoggerInterface                      $logger
      */
     public function __construct(
         PhpExceptionRepository $repository,
         NotificationHelper $notificationHelper,
-        IFaceHelper $ifaceHelper,
+        UrlHelper $ifaceHelper,
         LoggerInterface $logger
     ) {
         $this->repository   = $repository;
         $this->notification = $notificationHelper;
-        $this->ifaceHelper  = $ifaceHelper;
+        $this->urlHelper    = $ifaceHelper;
         $this->logger       = $logger;
 
         parent::__construct();
@@ -88,7 +88,7 @@ class Notify extends AbstractTask
     /**
      * @param \BetaKiller\Model\PhpExceptionModelInterface $model
      *
-     * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
      * @throws \BetaKiller\Exception\ValidationException
      * @throws \BetaKiller\Notification\NotificationException
      * @throws \BetaKiller\Repository\RepositoryException
@@ -100,7 +100,7 @@ class Notify extends AbstractTask
             'message'  => $model->getMessage(),
             'urls'     => $model->getUrls(),
             'paths'    => $model->getPaths(),
-            'adminUrl' => $this->ifaceHelper->getReadEntityUrl($model, ZoneInterface::ADMIN),
+            'adminUrl' => $this->urlHelper->getReadEntityUrl($model, ZoneInterface::ADMIN),
         ]);
 
         // Saving last notification timestamp

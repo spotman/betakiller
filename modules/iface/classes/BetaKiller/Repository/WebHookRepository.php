@@ -40,7 +40,7 @@ class WebHookRepository extends AbstractPredefinedRepository implements Dispatch
 
     /**
      * @return WebHookModelInterface[]|\Traversable
-     * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
      */
     public function getAll(): array
     {

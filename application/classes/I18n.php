@@ -114,7 +114,9 @@ class I18n extends Kohana_I18n
             try {
                 self::putData($module, $data[static::$lang]);
             } catch (Throwable $e) {
-                Kohana_Exception::log($e);
+                $container = \BetaKiller\DI\Container::getInstance();
+                $logger    = $container->get(\Psr\Log\LoggerInterface::class);
+                $logger->alert($e->getMessage(), ['exception' => $e]);
             }
         }
     }

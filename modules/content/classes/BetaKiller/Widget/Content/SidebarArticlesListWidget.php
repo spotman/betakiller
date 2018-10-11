@@ -2,11 +2,13 @@
 namespace BetaKiller\Widget\Content;
 
 use BetaKiller\Helper\AssetsHelper;
-use BetaKiller\Helper\IFaceHelper;
+use BetaKiller\Helper\ServerRequestHelper;
+use BetaKiller\Helper\UrlHelper;
 use BetaKiller\Model\ContentPostInterface;
 use BetaKiller\Url\Container\UrlContainerInterface;
 use BetaKiller\Url\ZoneInterface;
 use BetaKiller\Widget\AbstractPublicWidget;
+use Psr\Http\Message\ServerRequestInterface;
 
 abstract class SidebarArticlesListWidget extends AbstractPublicWidget
 {
@@ -21,35 +23,36 @@ abstract class SidebarArticlesListWidget extends AbstractPublicWidget
     private $assetsHelper;
 
     /**
-     * @var \BetaKiller\Helper\IFaceHelper
-     */
-    private $ifaceHelper;
-
-    /**
      * SidebarArticlesListWidget constructor.
      *
      * @param \BetaKiller\Url\Container\UrlContainerInterface $urlContainer
      * @param \BetaKiller\Helper\AssetsHelper                 $assetsHelper
-     * @param \BetaKiller\Helper\IFaceHelper                  $ifaceHelper
      */
     public function __construct(
         UrlContainerInterface $urlContainer,
-        AssetsHelper $assetsHelper,
-        IFaceHelper $ifaceHelper
+        AssetsHelper $assetsHelper
     ) {
         $this->urlContainer = $urlContainer;
         $this->assetsHelper = $assetsHelper;
-        $this->ifaceHelper  = $ifaceHelper;
     }
 
     /**
      * Returns data for View rendering
      *
+     * @param \Psr\Http\Message\ServerRequestInterface $request
+     * @param array                                    $context
+     *
      * @return array
+     * @throws \BetaKiller\Assets\AssetsException
+     * @throws \BetaKiller\Assets\AssetsStorageException
+     * @throws \BetaKiller\Factory\FactoryException
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
      */
-    public function getData(): array
+    public function getData(ServerRequestInterface $request, array $context): array
     {
-        $limit     = (int)$this->getContextParam('limit', 5);
+        $urlHelper = ServerRequestHelper::getUrlHelper($request);
+
+        $limit     = (int)$context['limit'] ?: 5;
         $excludeID = $this->getCurrentArticleID();
 
         $articles = $this->getArticlesList($excludeID, $limit);
@@ -57,7 +60,7 @@ abstract class SidebarArticlesListWidget extends AbstractPublicWidget
         $data = [];
 
         foreach ($articles as $article) {
-            $data[] = $this->getArticleData($article);
+            $data[] = $this->getArticleData($article, $urlHelper);
         }
 
         return [
@@ -81,7 +84,7 @@ abstract class SidebarArticlesListWidget extends AbstractPublicWidget
         return $currentArticle ? $currentArticle->getID() : null;
     }
 
-    protected function getArticleData(ContentPostInterface $article): array
+    protected function getArticleData(ContentPostInterface $article, UrlHelper $urlHelper): array
     {
         $thumbnail = $article->getFirstThumbnail();
         $createdAt = $article->getCreatedAt();
@@ -89,7 +92,7 @@ abstract class SidebarArticlesListWidget extends AbstractPublicWidget
         return [
             'label'     => $article->getLabel(),
             'thumbnail' => $this->assetsHelper->getAttributesForImgTag($thumbnail, $thumbnail::SIZE_PREVIEW),
-            'url'       => $this->ifaceHelper->getReadEntityUrl($article, ZoneInterface::PUBLIC),
+            'url'       => $urlHelper->getReadEntityUrl($article, ZoneInterface::PUBLIC),
             'date'      => $createdAt ? $createdAt->format('d.m.Y') : null,
         ];
     }

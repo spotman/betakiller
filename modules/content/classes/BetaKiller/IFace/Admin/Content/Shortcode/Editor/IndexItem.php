@@ -3,18 +3,21 @@ namespace BetaKiller\IFace\Admin\Content\Shortcode\Editor;
 
 use BetaKiller\Model\EntityModelInterface;
 use BetaKiller\Url\Parameter\IdUrlParameter;
+use Psr\Http\Message\ServerRequestInterface;
 
 class IndexItem extends AbstractEditor
 {
     /**
      * Returns data for View
      *
+     * @param \Psr\Http\Message\ServerRequestInterface $request
+     *
      * @return array
-     * @throws \BetaKiller\Url\Container\UrlContainerException
      * @throws \BetaKiller\Content\Shortcode\ShortcodeException
      * @throws \BetaKiller\Factory\FactoryException
+     * @throws \BetaKiller\Url\Container\UrlContainerException
      */
-    public function getData(): array
+    public function getData(ServerRequestInterface $request): array
     {
         $editor = $this->getShortcodeEditor();
 

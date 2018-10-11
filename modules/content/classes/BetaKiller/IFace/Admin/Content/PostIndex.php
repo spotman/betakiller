@@ -1,8 +1,10 @@
 <?php
 namespace BetaKiller\IFace\Admin\Content;
 
-use BetaKiller\Helper\IFaceHelper;
+use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Repository\ContentPostRepository;
+use BetaKiller\Url\ZoneInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
 class PostIndex extends AbstractAdminBase
 {
@@ -12,32 +14,30 @@ class PostIndex extends AbstractAdminBase
     private $postRepo;
 
     /**
-     * @var \BetaKiller\Helper\IFaceHelper
-     */
-    private $ifaceHelper;
-
-    /**
      * PostIndex constructor.
      *
      * @param \BetaKiller\Repository\ContentPostRepository $postRepo
-     * @param \BetaKiller\Helper\IFaceHelper               $ifaceHelper
      */
-    public function __construct(
-        ContentPostRepository $postRepo,
-        IFaceHelper $ifaceHelper
-    ) {
-        $this->postRepo    = $postRepo;
-        $this->ifaceHelper = $ifaceHelper;
+    public function __construct(ContentPostRepository $postRepo)
+    {
+        $this->postRepo = $postRepo;
     }
 
     /**
      * Returns data for View
-     * Override this method in child classes
+     *
+     * @param \Psr\Http\Message\ServerRequestInterface $request
      *
      * @return array
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     * @throws \BetaKiller\Repository\RepositoryException
+     * @throws \Kohana_Exception
+     * @uses \BetaKiller\IFace\Admin\Content\PostCreate
      */
-    public function getData(): array
+    public function getData(ServerRequestInterface $request): array
     {
+        $urlHelper = ServerRequestHelper::getUrlHelper($request);
+
         // TODO deal with pages
         $articles = $this->postRepo->getAllArticles();
 
@@ -46,16 +46,15 @@ class PostIndex extends AbstractAdminBase
         foreach ($articles as $article) {
             $data[] = [
                 'id'    => $article->getID(),
-                'url'   => $this->ifaceHelper->getReadEntityUrl($article),
+                'url'   => $urlHelper->getReadEntityUrl($article, ZoneInterface::ADMIN),
                 'label' => $article->getLabel(),
             ];
         }
 
-        /** @var \BetaKiller\IFace\Admin\Content\PostCreate $createPostIFace */
-        $createPostIFace = $this->ifaceHelper->createIFaceFromCodename('Admin_Content_PostCreate');
+        $createPostIFace = $urlHelper->getUrlElementByCodename('Admin_Content_PostCreate');
 
         return [
-            'createUrl' => $this->ifaceHelper->makeIFaceUrl($createPostIFace),
+            'createUrl' => $urlHelper->makeUrl($createPostIFace),
             'posts'     => $data,
         ];
     }

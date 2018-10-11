@@ -1,31 +1,32 @@
 <?php
 namespace BetaKiller\IFace\Admin\Error;
 
+use BetaKiller\Helper\ServerRequestHelper;
+use Psr\Http\Message\ServerRequestInterface;
+
 class PhpExceptionTest extends ErrorAdminBase
 {
     /**
-     * @Inject
-     * @var \BetaKiller\Helper\IFaceHelper
-     */
-    private $ifaceHelper;
-
-    /**
      * Returns data for View
-     * Override this method in child classes
+     *
+     * @param \Psr\Http\Message\ServerRequestInterface $request
      *
      * @return array
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     * @uses \BetaKiller\IFace\Admin\Error\PhpExceptionTestHTTP500
+     * @uses \BetaKiller\IFace\Admin\Error\PhpExceptionTestLogger
      */
-    public function getData(): array
+    public function getData(ServerRequestInterface $request): array
     {
-        /** @var \BetaKiller\IFace\Admin\Error\PhpExceptionTestHTTP500 $http500IFace */
-        $http500IFace = $this->ifaceHelper->createIFaceFromCodename('Admin_Error_PhpExceptionTestHTTP500');
+        $urlHelper = ServerRequestHelper::getUrlHelper($request);
 
-        /** @var \BetaKiller\IFace\Admin\Error\PhpExceptionTestLogger $loggerIFace */
-        $loggerIFace = $this->ifaceHelper->createIFaceFromCodename('Admin_Error_PhpExceptionTestLogger');
+        $http500IFace = $urlHelper->getUrlElementByCodename('Admin_Error_PhpExceptionTestHTTP500');
+
+        $loggerIFace = $urlHelper->getUrlElementByCodename('Admin_Error_PhpExceptionTestLogger');
 
         return [
-            'http_500_test_url' => $this->ifaceHelper->makeIFaceUrl($http500IFace),
-            'logger_test_url'   => $this->ifaceHelper->makeIFaceUrl($loggerIFace),
+            'http_500_test_url' => $urlHelper->makeUrl($http500IFace),
+            'logger_test_url'   => $urlHelper->makeUrl($loggerIFace),
         ];
     }
 }

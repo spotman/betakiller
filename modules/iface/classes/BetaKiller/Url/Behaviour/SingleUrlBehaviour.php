@@ -51,7 +51,7 @@ class SingleUrlBehaviour extends AbstractUrlBehaviour
      * @param \BetaKiller\Url\Container\UrlContainerInterface|null $params
      *
      * @return \Generator|\BetaKiller\Url\AvailableUri[]
-     * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
      */
     public function getAvailableUrls(
         UrlElementInterface $urlElement,

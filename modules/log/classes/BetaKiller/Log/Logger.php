@@ -34,14 +34,14 @@ class Logger implements LoggerInterface
     public function __construct(AppEnvInterface $env)
     {
         $this->appEnv  = $env;
-        $this->monolog = $this->getMonologInstance();
+        $this->monolog = $this->makeMonologInstance();
     }
 
     /**
      * @return \Monolog\Logger
      * @throws \Exception
      */
-    private function getMonologInstance(): \Monolog\Logger
+    private function makeMonologInstance(): \Monolog\Logger
     {
         $monolog = new \Monolog\Logger('default');
 
@@ -92,6 +92,11 @@ class Logger implements LoggerInterface
     {
         // Proxy to selected logger
         $this->monolog->log($level, $message, $context);
+    }
+
+    public function getMonolog(): \Monolog\Logger
+    {
+        return $this->monolog;
     }
 
     /**

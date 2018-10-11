@@ -4,6 +4,7 @@ namespace BetaKiller\Widget\Content;
 use BetaKiller\Widget\AbstractPublicWidget;
 use DateTime;
 use DateTimeInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
 class QuotesWidget extends AbstractPublicWidget
 {
@@ -16,23 +17,27 @@ class QuotesWidget extends AbstractPublicWidget
     /**
      * Returns data for View rendering
      *
+     * @param \Psr\Http\Message\ServerRequestInterface $request
+     *
+     * @param array                                    $context
+     *
      * @return array
      */
-    public function getData(): array
+    public function getData(ServerRequestInterface $request, array $context): array
     {
         return $this->getQuoteData();
     }
 
     public function actionRefresh(): void
     {
-        $this->response->content_type_json();
+        $this->response->contentTypeJson();
 
         $beforeTimestamp = (int)$this->request->query('before');
         $beforeDate      = $beforeTimestamp ? (new DateTime)->setTimestamp($beforeTimestamp) : null;
 
         $data = $this->getQuoteData($beforeDate);
 
-        $this->response->send_success_json($data);
+        $this->response->sendSuccessJson($data);
     }
 
     protected function getQuoteData(?DateTimeInterface $beforeDate = null): array
