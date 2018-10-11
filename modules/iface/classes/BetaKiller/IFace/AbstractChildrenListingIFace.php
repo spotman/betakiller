@@ -34,6 +34,7 @@ abstract class AbstractChildrenListingIFace extends AbstractIFace
      */
     public function getData(ServerRequestInterface $request): array
     {
+        $params        = ServerRequestHelper::getUrlContainer($request);
         $urlHelper     = ServerRequestHelper::getUrlHelper($request);
         $elementHelper = ServerRequestHelper::getUrlElementHelper($request);
 
@@ -46,7 +47,7 @@ abstract class AbstractChildrenListingIFace extends AbstractIFace
             }
 
             $data[] = [
-                'label'    => $elementHelper->getLabel($urlElement),
+                'label'    => $elementHelper->getLabel($urlElement, $params),
                 'codename' => $urlElement->getCodename(),
                 'url'      => $urlHelper->makeUrl($urlElement),
             ];

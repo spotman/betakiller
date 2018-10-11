@@ -166,6 +166,6 @@ class IFaceUrlElementProcessor implements UrlElementProcessorInterface
             return;
         }
 
-        $this->ifaceCache->process($iface);
+        $this->ifaceCache->process($iface, $request);
     }
 }

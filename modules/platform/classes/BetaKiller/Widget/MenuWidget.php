@@ -104,6 +104,7 @@ class MenuWidget extends AbstractPublicWidget
      * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\IFace\Exception\UrlElementException
      * @throws \BetaKiller\Url\UrlPrototypeException
+     * @link https://github.com/MarkBaker/GeneratorQuadTrees/blob/master/src/PointQuadTree.php
      */
     private function processLayer(
         \RecursiveIterator $models,
@@ -114,10 +115,44 @@ class MenuWidget extends AbstractPublicWidget
     ): array {
         $items = [];
 
+        // Iterate over every url element
         foreach ($models as $urlElement) {
             $params = $params ?: UrlContainer::create();
 
-            foreach ($this->processSingle($models, $urlElement, $params, $elementHelper, $urlHelper, $user) as $item) {
+            // Iterate over every generated URL to make full tree
+            foreach ($this->getAvailableIFaceUrls($urlElement, $params, $urlHelper) as $availableUrl) {
+                // store parameter for childs processing
+                $urlParameter = $availableUrl->getUrlParameter();
+
+                if ($urlParameter) {
+                    $params->setParameter($urlParameter, true);
+                }
+                try {
+                    if (!$this->aclHelper->isUrlElementAllowed($user, $urlElement, $params)) {
+                        continue;
+                    }
+                } catch (\Spotman\Acl\Exception $e) {
+                    throw UrlElementException::wrap($e);
+                }
+
+                $item = [
+                    'url'      => $availableUrl->getUrl(),
+                    'label'    => $elementHelper->getLabel($urlElement, $params),
+                    'active'   => $urlHelper->inStack($urlElement, $params),
+                    'children' => [],
+                ];
+
+                // recursion for children
+                if ($models->hasChildren()) {
+                    $item['children'] = $this->processLayer(
+                        $models->getChildren(),
+                        $elementHelper,
+                        $urlHelper,
+                        $user,
+                        $params
+                    );
+                }
+
                 $items[] = $item;
             }
         }
@@ -126,84 +161,23 @@ class MenuWidget extends AbstractPublicWidget
     }
 
     /**
-     * Processing IFace tree item
-     *
-     * @param \RecursiveIterator                              $models
-     * @param \BetaKiller\Url\IFaceModelInterface             $ifaceModel
-     * @param \BetaKiller\Url\Container\UrlContainerInterface $params
-     * @param \BetaKiller\Helper\UrlElementHelper             $elementHelper
-     * @param \BetaKiller\Helper\UrlHelper                    $urlHelper
-     * @param \BetaKiller\Model\UserInterface                 $user
-     *
-     * @return array
-     * @throws \BetaKiller\Factory\FactoryException
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
-     * @throws \BetaKiller\Url\UrlPrototypeException
-     * @link https://github.com/MarkBaker/GeneratorQuadTrees/blob/master/src/PointQuadTree.php
-     */
-    private function processSingle(
-        \RecursiveIterator $models,
-        IFaceModelInterface $ifaceModel,
-        UrlContainerInterface $params,
-        UrlElementHelper $elementHelper,
-        UrlHelper $urlHelper,
-        UserInterface $user
-    ): array {
-        $result = [];
-
-        foreach ($this->getAvailableIFaceUrls($ifaceModel, $params) as $availableUrl) {
-            // store parameter for childs processing
-            $urlParameter = $availableUrl->getUrlParameter();
-
-            if ($urlParameter) {
-                $params->setParameter($urlParameter, true);
-            }
-            try {
-                if (!$this->aclHelper->isUrlElementAllowed($user, $ifaceModel, $params)) {
-                    continue;
-                }
-            } catch (\Spotman\Acl\Exception $e) {
-                throw UrlElementException::wrap($e);
-            }
-
-            $resultItem = [
-                'url'      => $urlHelper->makeUrl($ifaceModel, $params, false),
-                'label'    => $elementHelper->getLabel($ifaceModel, $params),
-                'active'   => $urlHelper->inStack($ifaceModel, $params),
-                'children' => [],
-            ];
-
-            // recursion for children
-            if ($models->hasChildren()) {
-                $resultItem['children'] = $this->processLayer(
-                    $models->getChildren(),
-                    $elementHelper,
-                    $urlHelper,
-                    $user,
-                    $params
-                );
-            }
-
-            $result[] = $resultItem;
-        }
-
-        return $result;
-    }
-
-    /**
      * Generating URLs by IFace element
      *
      * @param \BetaKiller\Url\IFaceModelInterface             $model
      * @param \BetaKiller\Url\Container\UrlContainerInterface $params
+     * @param \BetaKiller\Helper\UrlHelper                    $helper
      *
      * @return \Generator|\BetaKiller\Url\AvailableUri[]
      * @throws \BetaKiller\Factory\FactoryException
      */
-    private function getAvailableIFaceUrls(IFaceModelInterface $model, UrlContainerInterface $params): \Generator
-    {
+    private function getAvailableIFaceUrls(
+        IFaceModelInterface $model,
+        UrlContainerInterface $params,
+        UrlHelper $helper
+    ): \Generator {
         $behaviour = $this->behaviourFactory->fromUrlElement($model);
 
-        foreach ($behaviour->getAvailableUrls($model, $params) as $availableUrl) {
+        foreach ($behaviour->getAvailableUrls($model, $params, $helper) as $availableUrl) {
             yield $availableUrl;
         }
     }

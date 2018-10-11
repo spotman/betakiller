@@ -73,7 +73,7 @@ class BarWidget extends AbstractAdminWidget
             'enabled'           => true,
 //            'comments'          => $this->getCommentsData(),
             'comments'          => null,
-            'createButtonItems' => $this->getCreateButtonItems($user, $urlHelper, $elementHelper),
+            'createButtonItems' => $this->getCreateButtonItems($user, $urlHelper, $elementHelper, $params),
             'primaryEntity'     => $this->getPrimaryEntityData($stack, $params, $urlHelper),
         ];
     }
@@ -124,9 +124,10 @@ class BarWidget extends AbstractAdminWidget
     }
 
     /**
-     * @param \BetaKiller\Model\UserInterface     $user
-     * @param \BetaKiller\Helper\UrlHelper        $urlHelper
-     * @param \BetaKiller\Helper\UrlElementHelper $elementHelper
+     * @param \BetaKiller\Model\UserInterface                 $user
+     * @param \BetaKiller\Helper\UrlHelper                    $urlHelper
+     * @param \BetaKiller\Helper\UrlElementHelper             $elementHelper
+     * @param \BetaKiller\Url\Container\UrlContainerInterface $params
      *
      * @return array
      * @throws \BetaKiller\Factory\FactoryException
@@ -137,7 +138,8 @@ class BarWidget extends AbstractAdminWidget
     protected function getCreateButtonItems(
         UserInterface $user,
         UrlHelper $urlHelper,
-        UrlElementHelper $elementHelper
+        UrlElementHelper $elementHelper,
+        UrlContainerInterface $params
     ): array {
         $items       = [];
         $urlElements = $this->tree->getIFacesByActionAndZone(CrudlsActionsInterface::ACTION_CREATE,
@@ -149,7 +151,7 @@ class BarWidget extends AbstractAdminWidget
             }
 
             $items[] = [
-                'label' => $elementHelper->getLabel($urlElement),
+                'label' => $elementHelper->getLabel($urlElement, $params),
                 'url'   => $urlHelper->makeUrl($urlElement),
             ];
         }

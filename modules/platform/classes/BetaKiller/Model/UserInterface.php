@@ -95,9 +95,9 @@ interface UserInterface extends AbstractEntityInterface, OrmInterface, Notificat
     /**
      * Returns user`s language name
      *
-     * @return string|null
+     * @return string
      */
-    public function getLanguageName(): ?string;
+    public function getLanguageName(): string;
 
     /**
      * @param \BetaKiller\Model\LanguageInterface $languageModel
@@ -109,7 +109,7 @@ interface UserInterface extends AbstractEntityInterface, OrmInterface, Notificat
     /**
      * @return null|\BetaKiller\Model\LanguageInterface
      */
-    public function getLanguage(): ?LanguageInterface;
+    public function getLanguage(): LanguageInterface;
 
     /**
      * Returns TRUE, if user account is switched on

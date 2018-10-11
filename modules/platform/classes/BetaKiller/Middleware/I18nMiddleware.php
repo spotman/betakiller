@@ -3,9 +3,11 @@ declare(strict_types=1);
 
 namespace BetaKiller\Middleware;
 
+use BetaKiller\Dev\Profiler;
 use BetaKiller\Helper\I18nHelper;
 use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Helper\ServerRequestHelper;
+use BetaKiller\I18n\I18nFacade;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -16,27 +18,18 @@ class I18nMiddleware implements MiddlewareInterface
     private const COOKIE_NAME = 'lang';
 
     /**
-     * @var \BetaKiller\Helper\I18nHelper
+     * @var \BetaKiller\I18n\I18nFacade
      */
-    private $i18n;
-
-    /**
-     * @var \BetaKiller\Helper\ResponseHelper
-     */
-    private $responseHelper;
+    private $facade;
 
     /**
      * I18nMiddleware constructor.
      *
-     * @param \BetaKiller\Helper\I18nHelper     $i18n
-     * @param \BetaKiller\Helper\ResponseHelper $responseHelper
+     * @param \BetaKiller\I18n\I18nFacade $facade
      */
-    public function __construct(
-        I18nHelper $i18n,
-        ResponseHelper $responseHelper
-    ) {
-        $this->i18n           = $i18n;
-        $this->responseHelper = $responseHelper;
+    public function __construct(I18nFacade $facade)
+    {
+        $this->facade = $facade;
     }
 
     /**
@@ -50,15 +43,18 @@ class I18nMiddleware implements MiddlewareInterface
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
+        $pid = Profiler::begin($request, 'Language detection');
+
         $lang = $this->detectLang($request);
 
-        $this->i18n->setLang($lang);
+        $i18n = new I18nHelper($this->facade);
+        $i18n->setLang($lang);
 
-        $response = $handler->handle($request->withAttribute(I18nHelper::class, $this->i18n));
+        $response = $handler->handle($request->withAttribute(I18nHelper::class, $i18n));
 
-        $expiresIn = new \DateInterval('P14D');
+        Profiler::end($pid);
 
-        return ResponseHelper::setCookie($response, self::COOKIE_NAME, $lang, $expiresIn);
+        return ResponseHelper::setCookie($response, self::COOKIE_NAME, $lang, new \DateInterval('P14D'));
     }
 
     private function detectLang(ServerRequestInterface $request): string
@@ -78,7 +74,7 @@ class I18nMiddleware implements MiddlewareInterface
         }
 
         // App default language as fallback
-        return $this->i18n->getAppDefaultLanguage();
+        return $this->facade->getDefaultLanguage();
     }
 
     private function detectUserLang(ServerRequestInterface $request): ?string

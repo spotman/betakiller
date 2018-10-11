@@ -1,7 +1,7 @@
 <?php
 namespace BetaKiller\Notification;
 
-use BetaKiller\Helper\I18nHelper;
+use BetaKiller\I18n\I18nFacade;
 use BetaKiller\View\ViewFactoryInterface;
 
 class DefaultMessageRendered implements MessageRendererInterface
@@ -12,25 +12,20 @@ class DefaultMessageRendered implements MessageRendererInterface
     private $viewFactory;
 
     /**
-     * @var \BetaKiller\Helper\I18nHelper
+     * @var \BetaKiller\I18n\I18nFacade
      */
     private $i18n;
-
-    /**
-     * @var string
-     */
-    private $originalLang;
 
     /**
      * DefaultMessageRendered constructor.
      *
      * @param \BetaKiller\View\ViewFactoryInterface $viewFactory
-     * @param \BetaKiller\Helper\I18nHelper         $i18n
+     * @param \BetaKiller\I18n\I18nFacade           $i18n
      */
-    public function __construct(ViewFactoryInterface $viewFactory, I18nHelper $i18n)
+    public function __construct(ViewFactoryInterface $viewFactory, I18nFacade $i18n)
     {
         $this->viewFactory = $viewFactory;
-        $this->i18n = $i18n;
+        $this->i18n        = $i18n;
     }
 
     /**
@@ -49,13 +44,14 @@ class DefaultMessageRendered implements MessageRendererInterface
         NotificationTransportInterface $transport
     ): string {
         // User language in templates
-        $this->useTargetLang($target);
+        $lang = $this->getTargetLanguage($target);
 
-        $file = $this->getTemplatePath().DIRECTORY_SEPARATOR.$message->getTemplateName().'-'.$transport->getName();
+        $templateName = $message->getTemplateName().'-'.$transport->getName().'-'.$lang;
+
+        $file = $this->getTemplatePath().DIRECTORY_SEPARATOR.$templateName;
         $view = $this->viewFactory->create($file);
 
         $data = array_merge($message->getFullDataForTarget($target), [
-            'subject'     => $message->getSubj($target),
             'baseI18nKey' => $message->getBaseI18nKey(),
         ]);
 
@@ -63,27 +59,30 @@ class DefaultMessageRendered implements MessageRendererInterface
             $view->set($key, $value);
         }
 
-        $text = $view->render();
-
-        $this->restoreOriginalLanguage();
-
-        return $text;
+        return $view->render();
     }
 
-    private function useTargetLang(NotificationUserInterface $user): void
+    public function makeSubject(NotificationMessageInterface $message, NotificationUserInterface $target): string
     {
-        $lang = $user->getLanguageName() ?: $this->i18n->getAppDefaultLanguage();
+        $key  = $message->getBaseI18nKey().'.subj';
+        $data = $message->getFullDataForTarget($target);
+        $lang = $this->getTargetLanguage($target);
 
-        $this->originalLang = $this->i18n->getLang();
-        $this->i18n->setLang($lang);
-    }
+        $output = $this->i18n->translate($lang, $key, $data);
 
-    private function restoreOriginalLanguage(): void
-    {
-        if ($this->originalLang) {
-            $this->i18n->setLang($this->originalLang);
-            $this->originalLang = null;
+        if ($output === $key) {
+            throw new NotificationException('Missing translation for key [:value]', [
+                ':value' => $key,
+            ]);
         }
+
+        return $output;
+    }
+
+    private function getTargetLanguage(NotificationUserInterface $target): string
+    {
+        // User language in templates
+        return $target->getLanguageName();
     }
 
     /**

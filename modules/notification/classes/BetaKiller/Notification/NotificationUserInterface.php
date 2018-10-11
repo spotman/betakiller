@@ -36,7 +36,7 @@ interface NotificationUserInterface
     /**
      * Return preferred language (used in templates)
      *
-     * @return null|string
+     * @return string
      */
-    public function getLanguageName(): ?string;
+    public function getLanguageName(): string;
 }

@@ -126,4 +126,10 @@ interface UrlContainerInterface
      * @return array
      */
     public function getUnusedQueryPartsKeys(): array;
+
+    /**
+     * @param \BetaKiller\Url\Container\UrlContainerInterface $from
+     * @param bool|null                                       $overwrite
+     */
+    public function import(UrlContainerInterface $from, bool $overwrite = null): void;
 }

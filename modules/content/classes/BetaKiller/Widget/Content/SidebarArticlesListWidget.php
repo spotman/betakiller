@@ -13,11 +13,6 @@ use Psr\Http\Message\ServerRequestInterface;
 abstract class SidebarArticlesListWidget extends AbstractPublicWidget
 {
     /**
-     * @var \BetaKiller\Url\Container\UrlContainerInterface
-     */
-    private $urlContainer;
-
-    /**
      * @var \BetaKiller\Helper\AssetsHelper
      */
     private $assetsHelper;
@@ -25,14 +20,9 @@ abstract class SidebarArticlesListWidget extends AbstractPublicWidget
     /**
      * SidebarArticlesListWidget constructor.
      *
-     * @param \BetaKiller\Url\Container\UrlContainerInterface $urlContainer
-     * @param \BetaKiller\Helper\AssetsHelper                 $assetsHelper
+     * @param \BetaKiller\Helper\AssetsHelper $assetsHelper
      */
-    public function __construct(
-        UrlContainerInterface $urlContainer,
-        AssetsHelper $assetsHelper
-    ) {
-        $this->urlContainer = $urlContainer;
+    public function __construct(AssetsHelper $assetsHelper) {
         $this->assetsHelper = $assetsHelper;
     }
 
@@ -51,9 +41,10 @@ abstract class SidebarArticlesListWidget extends AbstractPublicWidget
     public function getData(ServerRequestInterface $request, array $context): array
     {
         $urlHelper = ServerRequestHelper::getUrlHelper($request);
+        $urlContainer = ServerRequestHelper::getUrlContainer($request);
 
         $limit     = (int)$context['limit'] ?: 5;
-        $excludeID = $this->getCurrentArticleID();
+        $excludeID = $this->getCurrentArticleID($urlContainer);
 
         $articles = $this->getArticlesList($excludeID, $limit);
 
@@ -76,10 +67,10 @@ abstract class SidebarArticlesListWidget extends AbstractPublicWidget
      */
     abstract protected function getArticlesList($exclude_id, $limit): array;
 
-    protected function getCurrentArticleID()
+    protected function getCurrentArticleID(UrlContainerInterface $urlContainer)
     {
         /** @var ContentPostInterface|null $currentArticle */
-        $currentArticle = $this->urlContainer->getEntityByClassName(ContentPostInterface::class);
+        $currentArticle = $urlContainer->getEntityByClassName(ContentPostInterface::class);
 
         return $currentArticle ? $currentArticle->getID() : null;
     }

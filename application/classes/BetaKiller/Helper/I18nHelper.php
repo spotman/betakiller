@@ -1,8 +1,8 @@
 <?php
 namespace BetaKiller\Helper;
 
-use BetaKiller\Config\AppConfigInterface;
 use BetaKiller\Exception;
+use BetaKiller\I18n\I18nFacade;
 
 class I18nHelper
 {
@@ -14,68 +14,28 @@ class I18nHelper
     private $lang;
 
     /**
-     * @var \BetaKiller\Helper\AppEnvInterface
+     * @var \BetaKiller\I18n\I18nFacade
      */
-    private $appEnv;
+    private $facade;
 
     /**
-     * @var \BetaKiller\Config\AppConfigInterface
-     */
-    private $appConfig;
-
-    /**
-     * "lang codename" => "default locale"
+     * I18nHelper constructor.
      *
-     * @var array
+     * @param \BetaKiller\I18n\I18nFacade $facade
      */
-    private $languagesConfig;
-
-    /**
-     * @var string[]
-     */
-    private $allowedLanguages;
-
-    /**
-     * I18n constructor.
-     *
-     * @param \BetaKiller\Helper\AppEnvInterface    $appEnv
-     * @param \BetaKiller\Config\AppConfigInterface $appConfig
-     */
-    public function __construct(AppEnvInterface $appEnv, AppConfigInterface $appConfig)
+    public function __construct(I18nFacade $facade)
     {
-        $this->appEnv    = $appEnv;
-        $this->appConfig = $appConfig;
-
-        $this->init();
+        $this->facade = $facade;
     }
 
-    private function init(): void
+    public function getDefaultLanguage(): string
     {
-        $this->languagesConfig  = $this->appConfig->getAllowedLanguages();
-        $this->allowedLanguages = \array_keys($this->languagesConfig);
-
-        if (!$this->allowedLanguages) {
-            throw new Exception('Define app languages in config/app.php');
-        }
-
-        // Use app`s main language as a default one
-        $this->setLang($this->getAppDefaultLanguage());
-
-        // Save all absent i18n keys if in development env
-        if ($this->appEnv->inDevelopmentMode()) {
-            \I18n::saveMissingKeys();
-        }
-    }
-
-    public function getAppDefaultLanguage(): string
-    {
-        // First language is primary
-        return $this->allowedLanguages[0];
+        return $this->facade->getDefaultLanguage();
     }
 
     public function getAllowedLanguages(): array
     {
-        return $this->allowedLanguages;
+        return $this->facade->getAllowedLanguages();
     }
 
     public function getLang(): string
@@ -85,10 +45,10 @@ class I18nHelper
 
     public function setLang(string $value): void
     {
-        if (!isset($this->languagesConfig[$value])) {
+        if (!$this->facade->hasLanguage($value)) {
             throw new Exception('Unknown language :lang, only these are allowed: :allowed', [
                 ':lang'    => $value,
-                ':allowed' => implode(', ', $this->allowedLanguages),
+                ':allowed' => implode(', ', $this->getAllowedLanguages()),
             ]);
         }
 
@@ -100,9 +60,9 @@ class I18nHelper
 
     public function getLocale(): string
     {
-        $lang = $this->lang ?: $this->getAppDefaultLanguage();
+        $lang = $this->lang ?: $this->getDefaultLanguage();
 
-        return $this->languagesConfig[$lang];
+        return $this->facade->getLanguageLocale($lang);
     }
 
     /**
@@ -115,8 +75,8 @@ class I18nHelper
         return (bool)preg_match(self::KEY_REGEX, $key);
     }
 
-    public function translate(string $lang, string $key, array $values = null): string
+    public function translate(string $key, array $values = null, string $lang = null): string
     {
-        return __($key, $values, $lang);
+        return $this->facade->translate($lang ?: $this->lang, $key, $values);
     }
 }
