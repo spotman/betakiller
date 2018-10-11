@@ -35,6 +35,11 @@ class SessionConfig extends AbstractConfig
         return (array)$this->get(['allowed_class_names'], true);
     }
 
+    public function getEncryptionKey(): string
+    {
+        return (string)$this->get(['encrypt_key']);
+    }
+
     protected function getConfigRootGroup(): string
     {
         return 'session';

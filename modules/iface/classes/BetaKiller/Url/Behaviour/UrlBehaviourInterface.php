@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\Url\Behaviour;
 
+use BetaKiller\Helper\UrlHelper;
 use BetaKiller\Url\Container\UrlContainerInterface;
 use BetaKiller\Url\UrlElementInterface;
 use BetaKiller\Url\UrlPathIterator;
@@ -37,19 +38,18 @@ interface UrlBehaviourInterface
      *
      * @return string
      */
-    public function makeUri(
-        UrlElementInterface $urlElement,
-        ?UrlContainerInterface $params = null
-    ): string;
+    public function makeUri(UrlElementInterface $urlElement, UrlContainerInterface $params): string;
 
     /**
      * @param \BetaKiller\Url\UrlElementInterface                  $urlElement
      * @param \BetaKiller\Url\Container\UrlContainerInterface|null $params
+     * @param \BetaKiller\Helper\UrlHelper                         $urlHelper
      *
      * @return \Generator|\BetaKiller\Url\AvailableUri[]
      */
     public function getAvailableUrls(
         UrlElementInterface $urlElement,
-        UrlContainerInterface $params
+        UrlContainerInterface $params,
+        UrlHelper $urlHelper
     ): \Generator;
 }

@@ -67,6 +67,7 @@ class IFaceView
     {
         $urlHelper     = ServerRequestHelper::getUrlHelper($request);
         $elementHelper = ServerRequestHelper::getUrlElementHelper($request);
+        $params        = ServerRequestHelper::getUrlContainer($request);
 
         $model = $iface->getModel();
 
@@ -86,7 +87,7 @@ class IFaceView
 
         $ifaceView->set('__iface__', [
             'codename' => $model->getCodename(),
-            'label'    => $elementHelper->getLabel($model),
+            'label'    => $elementHelper->getLabel($model, $params),
         ]);
 
         $i18n = ServerRequestHelper::getI18n($request);
@@ -94,8 +95,8 @@ class IFaceView
         $this->headHelper
             ->setLang($i18n->getLang())
             ->setContentType()
-            ->setTitle($elementHelper->getTitle($model))
-            ->setMetaDescription($elementHelper->getDescription($model))
+            ->setTitle($elementHelper->getTitle($model, $params))
+            ->setMetaDescription($elementHelper->getDescription($model, $params))
             ->setCanonical($urlHelper->makeUrl($model, null, false));
 
         // Getting IFace layout

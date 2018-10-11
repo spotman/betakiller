@@ -9,6 +9,7 @@
     "ext-json": "*",
     "ext-mbstring": "*",
     "ext-mysqli": "*",
+    "ext-sodium": "*",
     "ext-sqlite3": "*",
     "ext-xml": "*",
     "aidantwoods/secureheaders": "^2.0",

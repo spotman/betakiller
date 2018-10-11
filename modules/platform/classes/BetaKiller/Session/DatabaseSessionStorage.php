@@ -15,6 +15,7 @@ use BetaKiller\Helper\SessionHelper;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Model\UserSession;
 use BetaKiller\Repository\UserSessionRepository;
+use BetaKiller\Security\Encryption;
 use DateTimeImmutable;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -46,6 +47,11 @@ class DatabaseSessionStorage implements SessionStorageInterface
     private $logger;
 
     /**
+     * @var \BetaKiller\Security\Encryption
+     */
+    private $encryption;
+
+    /**
      * DatabaseSessionStorage constructor.
      *
      * @param \BetaKiller\Repository\UserSessionRepository $sessionRepo
@@ -55,11 +61,13 @@ class DatabaseSessionStorage implements SessionStorageInterface
     public function __construct(
         UserSessionRepository $sessionRepo,
         SessionConfig $config,
+        Encryption $encryption,
         LoggerInterface $logger
     ) {
         $this->sessionRepo = $sessionRepo;
         $this->config      = $config;
         $this->logger      = $logger;
+        $this->encryption = $encryption;
     }
 
     /**
@@ -335,20 +343,22 @@ class DatabaseSessionStorage implements SessionStorageInterface
     {
         $content = \serialize($data);
 
-        // TODO Encrypt
+        // Encrypt
+        $content = $this->encryption->encrypt($content, $this->getEncryptionKey());
 
-        return \base64_encode($content);
+        return $content;
     }
 
     private function decodeData(string $content): array
     {
-        $content = \base64_decode($content);
+//        $content = \base64_decode($encodedContent);
+//
+//        if (!$content) {
+//            throw new Exception('Invalid session content: :value', [':value' => $encodedContent]);
+//        }
 
-        if (!$content) {
-            return [];
-        }
-
-        // TODO Decrypt
+        // Decrypt
+        $content = $this->encryption->decrypt($content, $this->getEncryptionKey());
 
         $data = \unserialize($content, $this->config->getAllowedClassNames());
 
@@ -357,5 +367,10 @@ class DatabaseSessionStorage implements SessionStorageInterface
         }
 
         return $data;
+    }
+
+    private function getEncryptionKey(): string
+    {
+        return $this->config->getEncryptionKey();
     }
 }

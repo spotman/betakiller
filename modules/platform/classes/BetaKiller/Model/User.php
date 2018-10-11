@@ -289,7 +289,7 @@ class User extends \ORM implements UserInterface
      * @return string
      * @throws \Kohana_Exception
      */
-    public function getLanguageName(): ?string
+    public function getLanguageName(): string
     {
         /**
          * @var \BetaKiller\Model\LanguageInterface $langModel
@@ -311,6 +311,7 @@ class User extends \ORM implements UserInterface
 
     /**
      * @return \BetaKiller\Model\LanguageInterface
+     * @throws \Kohana_Exception
      */
     public function getLanguage(): LanguageInterface
     {

@@ -2,6 +2,7 @@
 namespace BetaKiller\Log;
 
 use BetaKiller\Helper\AppEnvInterface;
+use Monolog\ErrorHandler;
 use Monolog\Handler\FingersCrossedHandler;
 use Monolog\Handler\HandlerInterface;
 use Monolog\Handler\StreamHandler;
@@ -44,6 +45,8 @@ class Logger implements LoggerInterface
     private function makeMonologInstance(): \Monolog\Logger
     {
         $monolog = new \Monolog\Logger('default');
+
+        ErrorHandler::register($monolog);
 
         $isDebug = $this->appEnv->isDebugEnabled();
 

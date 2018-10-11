@@ -8,4 +8,6 @@ interface MessageRendererInterface
         NotificationUserInterface $target,
         NotificationTransportInterface $transport
     ): string;
+
+    public function makeSubject(NotificationMessageInterface $message, NotificationUserInterface $target): string;
 }

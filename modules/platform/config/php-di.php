@@ -1,8 +1,10 @@
 <?php
 
+use BetaKiller\Helper\I18nHelper;
 use BetaKiller\Session\DatabaseSessionStorage;
 use BetaKiller\Session\SessionStorageInterface;
 use BetaKiller\Url\Container\UrlContainerInterface;
+use BetaKiller\Url\UrlElementStack;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Zend\Diactoros\Response\TextResponse;
 use Zend\Diactoros\ResponseFactory;
@@ -50,17 +52,18 @@ return [
         SessionStorageInterface::class     => DI\autowire(DatabaseSessionStorage::class),
         SessionPersistenceInterface::class => DI\get(SessionStorageInterface::class),
 
-//        // Deprecated DI objects
-//        UrlHelper::class => \DI\factory(function() {
-//            throw new LogicException('UrlHelper DI injection deprecated');
-//        }),
-//
-//        UrlElementStack::class => \DI\factory(function() {
-//            throw new LogicException('UrlElementStack DI injection deprecated');
-//        }),
+        // Deprecated DI objects
+        // UrlHelper is used via Container::make() method and can not be deprecated
+        UrlElementStack::class             => \DI\factory(function () {
+            throw new LogicException('UrlElementStack DI injection deprecated');
+        }),
 
-        UrlContainerInterface::class => \DI\factory(function() {
+        UrlContainerInterface::class => \DI\factory(function () {
             throw new LogicException('UrlContainerInterface DI injection deprecated');
+        }),
+
+        I18nHelper::class => \DI\factory(function () {
+            throw new \BetaKiller\Exception(I18nHelper::class.' DI injection deprecated');
         }),
     ],
 

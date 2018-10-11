@@ -41,23 +41,31 @@ class UrlHelper
     private $tree;
 
     /**
+     * @var \BetaKiller\Url\Container\UrlContainerInterface
+     */
+    private $urlContainer;
+
+    /**
      * UrlHelper constructor.
      *
-     * @param \BetaKiller\Url\UrlElementTreeInterface       $tree
-     * @param \BetaKiller\Config\AppConfigInterface         $appConfig
-     * @param \BetaKiller\Url\Behaviour\UrlBehaviourFactory $behaviourFactory
-     * @param \BetaKiller\Url\UrlElementStack               $stack
+     * @param \BetaKiller\Url\UrlElementTreeInterface         $tree
+     * @param \BetaKiller\Config\AppConfigInterface           $appConfig
+     * @param \BetaKiller\Url\Behaviour\UrlBehaviourFactory   $behaviourFactory
+     * @param \BetaKiller\Url\UrlElementStack                 $stack
+     * @param \BetaKiller\Url\Container\UrlContainerInterface $params
      */
     public function __construct(
         UrlElementTreeInterface $tree,
         AppConfigInterface $appConfig,
         UrlBehaviourFactory $behaviourFactory,
-        UrlElementStack $stack
+        UrlElementStack $stack,
+        UrlContainerInterface $params
     ) {
         $this->behaviourFactory = $behaviourFactory;
         $this->appConfig        = $appConfig;
         $this->stack            = $stack;
         $this->tree             = $tree;
+        $this->urlContainer     = $params;
     }
 
     /**
@@ -100,6 +108,12 @@ class UrlHelper
         if ($removeCyclingLinks && $this->stack->isCurrent($urlElement, $params)) {
             return $this->appConfig->getCircularLinkHref();
         }
+
+        // Use self-resolving container as default
+        $params = $params ?: ResolvingUrlContainer::create();
+
+        // Import current UrlContainer values for simplicity in the client code
+        $params->import($this->urlContainer);
 
         $parts = [];
 
@@ -262,12 +276,12 @@ class UrlHelper
 
     /**
      * @param \BetaKiller\Url\UrlElementInterface             $model
-     * @param \BetaKiller\Url\Container\UrlContainerInterface $urlContainer
+     * @param \BetaKiller\Url\Container\UrlContainerInterface $params
      *
      * @return string
      * @throws \BetaKiller\IFace\Exception\UrlElementException
      */
-    private function makeUrlElementUri(UrlElementInterface $model, UrlContainerInterface $urlContainer = null): string
+    private function makeUrlElementUri(UrlElementInterface $model, UrlContainerInterface $params): string
     {
         $uri = $model->getUri();
 
@@ -281,6 +295,6 @@ class UrlHelper
             throw UrlElementException::wrap($e);
         }
 
-        return $behaviour->makeUri($model, $urlContainer);
+        return $behaviour->makeUri($model, $params);
     }
 }

@@ -3,7 +3,6 @@ namespace BetaKiller\Widget\Content;
 
 use BetaKiller\Helper\AssetsHelper;
 use BetaKiller\Repository\ContentPostRepository;
-use BetaKiller\Url\Container\UrlContainerInterface;
 
 class FreshArticlesWidget extends SidebarArticlesListWidget
 {
@@ -15,16 +14,14 @@ class FreshArticlesWidget extends SidebarArticlesListWidget
     /**
      * SidebarArticlesListWidget constructor.
      *
-     * @param \BetaKiller\Url\Container\UrlContainerInterface $urlContainer
      * @param \BetaKiller\Helper\AssetsHelper                 $assetsHelper
      * @param \BetaKiller\Repository\ContentPostRepository    $postRepo
      */
     public function __construct(
-        UrlContainerInterface $urlContainer,
         AssetsHelper $assetsHelper,
         ContentPostRepository $postRepo
     ) {
-        parent::__construct($urlContainer, $assetsHelper);
+        parent::__construct($assetsHelper);
 
         $this->postRepo = $postRepo;
     }

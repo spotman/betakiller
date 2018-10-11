@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\Middleware;
 
-use BetaKiller\Helper\I18nHelper;
+use BetaKiller\I18n\I18nFacade;
 use Middlewares\ContentLanguage;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -13,16 +13,16 @@ use Psr\Http\Server\RequestHandlerInterface;
 class ContentNegotiationMiddleware implements MiddlewareInterface
 {
     /**
-     * @var \BetaKiller\Helper\I18nHelper
+     * @var \BetaKiller\I18n\I18nFacade
      */
     private $i18n;
 
     /**
      * I18nMiddleware constructor.
      *
-     * @param \BetaKiller\Helper\I18nHelper          $i18n
+     * @param \BetaKiller\I18n\I18nFacade $i18n
      */
-    public function __construct(I18nHelper $i18n)
+    public function __construct(I18nFacade $i18n)
     {
         $this->i18n = $i18n;
     }

@@ -6,9 +6,10 @@ use BetaKiller\Exception\NotImplementedHttpException;
 use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\IFace\IFaceInterface;
 use PageCache\PageCache;
+use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
 
-class IFaceCache
+final class IFaceCache
 {
     /**
      * @var \BetaKiller\Config\ConfigProviderInterface
@@ -18,42 +19,29 @@ class IFaceCache
     /**
      * @var PageCache
      */
-    protected $pageCache;
+    private $pageCache;
 
     /**
      * @var bool
      */
-    protected $enabled;
-
-    /**
-     * @var \BetaKiller\IFace\Cache\IFacePageCacheStrategy
-     */
-    private $strategy;
+    private $enabled;
 
     /**
      * IFaceCache constructor.
      *
-     * @param \BetaKiller\Config\AppConfigInterface          $appConfig
-     * @param \BetaKiller\Helper\AppEnvInterface             $appEnv
-     * @param \PageCache\PageCache                           $pageCache
-     * @param \BetaKiller\IFace\Cache\IFacePageCacheStrategy $strategy
-     * @param \Psr\Log\LoggerInterface                       $logger
-     *
-     * @throws \PageCache\PageCacheException
+     * @param \BetaKiller\Config\AppConfigInterface $appConfig
+     * @param \BetaKiller\Helper\AppEnvInterface    $appEnv
+     * @param \Psr\Log\LoggerInterface              $logger
      */
     public function __construct(
         AppConfigInterface $appConfig,
         AppEnvInterface $appEnv,
-        PageCache $pageCache,
-        IFacePageCacheStrategy $strategy,
         LoggerInterface $logger
     ) {
+        $this->enabled   = !$appEnv->isCLI() && $appConfig->isPageCacheEnabled();
         $this->appConfig = $appConfig;
-        $this->pageCache = $pageCache;
-        $this->strategy  = $strategy;
 
-        $this->enabled = !$appEnv->isCLI() && $appConfig->isPageCacheEnabled();
-
+        $this->pageCache = new PageCache;
         $this->pageCache->setLogger($logger);
     }
 
@@ -73,11 +61,14 @@ class IFaceCache
     }
 
     /**
-     * @param \BetaKiller\IFace\IFaceInterface $iface
+     * @param \BetaKiller\IFace\IFaceInterface         $iface
+     *
+     * @param \Psr\Http\Message\ServerRequestInterface $request
      *
      * @throws \PageCache\PageCacheException
+     * @throws \Psr\SimpleCache\InvalidArgumentException
      */
-    public function process(IFaceInterface $iface): void
+    public function process(IFaceInterface $iface, ServerRequestInterface $request): void
     {
         if (!$this->enabled) {
             return;
@@ -90,7 +81,9 @@ class IFaceCache
             return;
         }
 
-        $this->applyIFaceStrategy($iface);
+        $strategy = new IFacePageCacheStrategy($request);
+
+        $this->pageCache->setStrategy($strategy);
 
         $this->pageCache->config()
             ->setCacheExpirationInSeconds($expires)
@@ -107,13 +100,5 @@ class IFaceCache
         $this->enabled = false;
 
         $this->pageCache::destroy();
-    }
-
-    protected function applyIFaceStrategy(IFaceInterface $iface)
-    {
-        $this->strategy->setIFaceModel($iface->getModel());
-        $this->pageCache->setStrategy($this->strategy);
-
-        return $this;
     }
 }

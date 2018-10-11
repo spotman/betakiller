@@ -52,13 +52,14 @@ class UrlHelperMiddleware implements MiddlewareInterface
 
         /** @var UrlHelper $urlHelper */
         $urlHelper = $this->container->make(UrlHelper::class, [
-            'stack' => $stack,
+            'stack'  => $stack,
+            'params' => $params,
         ]);
 
         /** @var UrlElementHelper $urlElementHelper */
-        $urlElementHelper = $this->container->make(UrlElementHelper::class);
-
-        $urlElementHelper->setI18n($i18n);
+        $urlElementHelper = $this->container->make(UrlElementHelper::class, [
+            'i18n' => $i18n,
+        ]);
 
         /** @noinspection CallableParameterUseCaseInTypeContextInspection */
         $request = $request

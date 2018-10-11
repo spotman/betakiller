@@ -1,54 +1,41 @@
 <?php
 namespace BetaKiller\IFace\Cache;
 
-use BetaKiller\Helper\UrlHelper;
-use BetaKiller\Url\IFaceModelInterface;
-use PageCache\SessionHandler;
+use BetaKiller\Helper\ServerRequestHelper;
 use PageCache\StrategyInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
-class IFacePageCacheStrategy implements StrategyInterface
+final class IFacePageCacheStrategy implements StrategyInterface
 {
     /**
-     * @var \BetaKiller\Url\IFaceModelInterface
+     * @var \Psr\Http\Message\ServerRequestInterface
      */
-    protected $ifaceModel;
-
-    /**
-     * @var \BetaKiller\Helper\UrlHelper
-     */
-    private $helper;
+    private $request;
 
     /**
      * IFacePageCacheStrategy constructor.
      *
-     * @param \BetaKiller\Helper\UrlHelper $helper
+     * @param \Psr\Http\Message\ServerRequestInterface $request
      */
-    public function __construct(UrlHelper $helper)
+    public function __construct(ServerRequestInterface $request)
     {
-        $this->helper = $helper;
-    }
-
-    /**
-     * @param \BetaKiller\Url\IFaceModelInterface $model
-     */
-    public function setIFaceModel(IFaceModelInterface $model): void
-    {
-        $this->ifaceModel = $model;
+        $this->request = $request;
     }
 
     /**
      * Sets cache file name
      *
      * @return string Cache file name
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
      */
     public function strategy(): string
     {
-        // When session support is enabled add that to file name
-        $sessionFingerprint = SessionHandler::process();
+        $session = ServerRequestHelper::getSession($this->request);
 
-        $uri = $this->helper->makeUrl($this->ifaceModel, null, false);
+        // Add session fingerprint
+        $sessionFingerprint = \json_encode($session);
 
-        return md5($sessionFingerprint.$uri);
+        $url = ServerRequestHelper::getUrl($this->request);
+
+        return md5($sessionFingerprint.$url);
     }
 }

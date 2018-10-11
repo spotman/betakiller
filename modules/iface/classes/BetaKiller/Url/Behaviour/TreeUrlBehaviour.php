@@ -50,15 +50,14 @@ class TreeUrlBehaviour extends MultipleUrlBehaviour
     }
 
     /**
-     * @param \BetaKiller\Url\UrlElementInterface             $urlElement
+     * @param \BetaKiller\Url\UrlElementInterface             $ifaceModel
      * @param \BetaKiller\Url\Container\UrlContainerInterface $params
      *
      * @return string
-     * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\Url\UrlPrototypeException
      */
-    protected function getUri(UrlElementInterface $urlElement, ?UrlContainerInterface $params = null): string
+    protected function getUri(UrlElementInterface $ifaceModel, UrlContainerInterface $params): string
     {
-        return $this->urlPrototypeService->getCompiledTreePrototypeValue($urlElement->getUri(), $params);
+        return $this->prototypeService->getCompiledTreePrototypeValue($ifaceModel->getUri(), $params);
     }
 }
