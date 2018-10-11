@@ -5,9 +5,13 @@ export default class Stopwatch {
     this.items = {};
   }
 
+  _getCurrentMs() {
+    return performance.now();
+  }
+
   start(name) {
     this.items[name] = {
-      'start': performance.now(),
+      'start': this._getCurrentMs(),
       'stop':  -1,
     };
     return this;
@@ -25,7 +29,7 @@ export default class Stopwatch {
   }
 
   getInterim(name) {
-    return performance.now() - this._getItem(name).start;
+    return this._getCurrentMs() - this._getItem(name).start;
   }
 
   get(name) {
