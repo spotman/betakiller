@@ -11,7 +11,6 @@ define([
                 $form = $widget.find('form[name="regular-login-form"]'),
                 $login = $form.find('input[name="user-login"]'),
                 $pass = $form.find('input[name="user-password"]'),
-                $remember = $form.find('input[name="remember"]'),
                 $submitButton = $form.find('button[type="submit"]'),
                 $alert = $widget.find(".alert");
 
@@ -20,8 +19,7 @@ define([
 
             $form.submit(function(e) {
                 var login = $login.val(),
-                    password = $pass.val(),
-                    remember = $remember.is(":checked");
+                    password = $pass.val();
 
                 e.preventDefault();
 
@@ -35,8 +33,7 @@ define([
 
                 $form.JSON($form.data('action'), {
                     "user-login": login,
-                    "user-password": password,
-                    "remember": remember ? 1 : 0
+                    "user-password": password
                 })
                   .done(function() {
                     successfulCallback();

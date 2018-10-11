@@ -184,10 +184,10 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
 
         if ($exception) {
             // Getting HTML stacktrace
-            $eResponse = \Kohana_Exception::response($exception);
+            $stacktrace = \Debug::htmlStacktrace($exception);
 
             // Adding trace
-            $model->setTrace((string)$eResponse);
+            $model->setTrace($stacktrace);
         }
 
         // Trying to get current module

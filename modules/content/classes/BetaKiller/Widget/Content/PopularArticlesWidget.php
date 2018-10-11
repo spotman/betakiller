@@ -2,7 +2,7 @@
 namespace BetaKiller\Widget\Content;
 
 use BetaKiller\Helper\AssetsHelper;
-use BetaKiller\Helper\IFaceHelper;
+use BetaKiller\Helper\UrlElementHelper;
 use BetaKiller\Repository\ContentPostRepository;
 use BetaKiller\Url\Container\UrlContainerInterface;
 
@@ -18,13 +18,13 @@ class PopularArticlesWidget extends SidebarArticlesListWidget
      *
      * @param \BetaKiller\Url\Container\UrlContainerInterface $urlContainer
      * @param \BetaKiller\Helper\AssetsHelper                 $assetsHelper
-     * @param \BetaKiller\Helper\IFaceHelper                  $ifaceHelper
+     * @param \BetaKiller\Helper\UrlElementHelper             $ifaceHelper
      * @param \BetaKiller\Repository\ContentPostRepository    $postRepo
      */
     public function __construct(
         UrlContainerInterface $urlContainer,
         AssetsHelper $assetsHelper,
-        IFaceHelper $ifaceHelper,
+        UrlElementHelper $ifaceHelper,
         ContentPostRepository $postRepo
     ) {
         parent::__construct($urlContainer, $assetsHelper, $ifaceHelper);

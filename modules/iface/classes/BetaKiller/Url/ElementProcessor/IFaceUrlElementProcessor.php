@@ -6,13 +6,14 @@ use BetaKiller\Exception\BadRequestHttpException;
 use BetaKiller\Exception\FoundHttpException;
 use BetaKiller\Exception\PermanentRedirectHttpException;
 use BetaKiller\Factory\IFaceFactory;
+use BetaKiller\Helper\ResponseHelper;
+use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\IFace\Cache\IFaceCache;
 use BetaKiller\IFace\IFaceInterface;
-use BetaKiller\Model\UserInterface;
-use BetaKiller\Url\Container\UrlContainerInterface;
 use BetaKiller\Url\IFaceModelInterface;
 use BetaKiller\Url\UrlElementInterface;
 use BetaKiller\View\IFaceView;
+use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 /**
@@ -49,42 +50,30 @@ class IFaceUrlElementProcessor implements UrlElementProcessorInterface
     private $ifaceCache;
 
     /**
-     * User controller
-     *
-     * @var \BetaKiller\Model\UserInterface
-     */
-    private $user;
-
-    /**
      * @param \BetaKiller\Config\AppConfigInterface $appConfig
      * @param \BetaKiller\Factory\IFaceFactory      $ifaceFactory
      * @param \BetaKiller\View\IFaceView            $ifaceView
      * @param \BetaKiller\IFace\Cache\IFaceCache    $ifaceCache
-     * @param \BetaKiller\Model\UserInterface       $user
      */
     public function __construct(
         AppConfigInterface $appConfig,
         IFaceFactory $ifaceFactory,
         IFaceView $ifaceView,
-        IFaceCache $ifaceCache,
-        UserInterface $user
+        IFaceCache $ifaceCache
     ) {
         $this->appConfig    = $appConfig;
         $this->ifaceFactory = $ifaceFactory;
         $this->ifaceView    = $ifaceView;
         $this->ifaceCache   = $ifaceCache;
-        $this->user         = $user;
     }
 
     /**
      * Execute processing on URL element
      *
-     * @param \BetaKiller\Url\UrlElementInterface             $model
-     * @param \BetaKiller\Url\Container\UrlContainerInterface $urlContainer
-     * @param \Psr\Http\Message\ServerRequestInterface        $request
+     * @param \BetaKiller\Url\UrlElementInterface      $model
+     * @param \Psr\Http\Message\ServerRequestInterface $request
      *
-     * @param \Response|null                                  $response [optional]
-     *
+     * @return \Psr\Http\Message\ResponseInterface
      * @throws \BetaKiller\Exception\FoundHttpException
      * @throws \BetaKiller\Exception\PermanentRedirectHttpException
      * @throws \BetaKiller\Factory\FactoryException
@@ -94,22 +83,22 @@ class IFaceUrlElementProcessor implements UrlElementProcessorInterface
      */
     public function process(
         UrlElementInterface $model,
-        UrlContainerInterface $urlContainer,
-        ServerRequestInterface $request,
-        \Response $response
-    ): void {
-        if (!($model instanceof IFaceModelInterface)) {
-            throw new UrlElementProcessorException('Invalid model :class_invalid. Model must be :class_valid', [
-                ':class_invalid' => \get_class($model),
-                ':class_valid'   => IFaceModelInterface::class,
+        ServerRequestInterface $request
+    ): ResponseInterface {
+        if (!$model instanceof IFaceModelInterface) {
+            throw new UrlElementProcessorException('Model must instance of :must but :real provided', [
+                ':real' => \get_class($model),
+                ':must' => IFaceModelInterface::class,
             ]);
         }
 
+        $path = parse_url(ServerRequestHelper::getUrl($request), PHP_URL_PATH);
+
         // If this is default IFace and client requested non-slash uri, redirect client to /
-        $path = parse_url($request->getRequestTarget(), PHP_URL_PATH);
         if ($path !== '/' && $model->isDefault() && !$model->hasDynamicUrl()) {
             throw new FoundHttpException('/');
         }
+
         if ($path !== '/') {
             $hasTrailingSlash       = (substr($path, -1) === '/');
             $isTrailingSlashEnabled = $this->appConfig->isTrailingSlashEnabled();
@@ -123,19 +112,22 @@ class IFaceUrlElementProcessor implements UrlElementProcessorInterface
             }
         }
 
-        //
+        $urlContainer = ServerRequestHelper::getUrlContainer($request);
+        $user         = ServerRequestHelper::getUser($request);
+
+        // Create IFace instance
         $iface = $this->ifaceFactory->createFromUrlElement($model);
 
         // Starting hook
         $iface->before();
 
-        // Processing page cache if no URL query parameters
-        if (!$urlContainer->getQueryPartsKeys()) {
+        // Processing page cache for quests if no URL query parameters (skip caching for authorized users)
+        if (!$urlContainer->getQueryPartsKeys() && $user->isGuest()) {
             $this->processIFaceCache($iface, $request);
         }
 
         try {
-            $output = $this->ifaceView->render($iface);
+            $output = $this->ifaceView->render($iface, $request);
 
             // Final hook
             $iface->after();
@@ -147,14 +139,16 @@ class IFaceUrlElementProcessor implements UrlElementProcessorInterface
                 ]);
             }
 
-            $response->lastModified($iface->getLastModified());
-            $response->expires($iface->getExpiresDateTime());
-            $response->send_string($output);
+            $response = ResponseHelper::html($output);
+            $response = ResponseHelper::setLastModified($response, $iface->getLastModified());
+            $response = ResponseHelper::setExpires($response, $iface->getExpiresDateTime());
         } catch (\Throwable $e) {
             // Prevent response caching
             $this->ifaceCache->disable();
             throw $e;
         }
+
+        return $response;
     }
 
     /**
@@ -169,11 +163,6 @@ class IFaceUrlElementProcessor implements UrlElementProcessorInterface
     {
         // Skip caching if request method is not GET nor HEAD
         if (!\in_array(\mb_strtoupper($request->getMethod()), ['GET', 'HEAD'], true)) {
-            return;
-        }
-
-        // Skip caching for authorized users
-        if (!$this->user->isGuest()) {
             return;
         }
 

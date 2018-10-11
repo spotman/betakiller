@@ -1,6 +1,8 @@
 <?php
 namespace BetaKiller\IFace\Admin\Content;
 
+use Psr\Http\Message\ServerRequestInterface;
+
 class CommentItem extends AbstractAdminBase
 {
     /**
@@ -12,10 +14,15 @@ class CommentItem extends AbstractAdminBase
     /**
      * Returns data for View
      * Override this method in child classes
+     *
+     * @param \Psr\Http\Message\ServerRequestInterface $request
+     *
+     * @return array
+     * @throws \Kohana_Exception
      */
-    public function getData(): array
+    public function getData(ServerRequestInterface $request): array
     {
-        $model = $this->urlParametersHelper->getContentComment();
+        $model = $this->urlParametersHelper->getContentComment($request);
 
         return [
             'id'        =>  $model->getID(),

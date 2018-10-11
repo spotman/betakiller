@@ -1,7 +1,7 @@
 <?php
 namespace BetaKiller\IFace\Cache;
 
-use BetaKiller\Helper\IFaceHelper;
+use BetaKiller\Helper\UrlHelper;
 use BetaKiller\Url\IFaceModelInterface;
 use PageCache\SessionHandler;
 use PageCache\StrategyInterface;
@@ -14,16 +14,16 @@ class IFacePageCacheStrategy implements StrategyInterface
     protected $ifaceModel;
 
     /**
-     * @var \BetaKiller\Helper\IFaceHelper
+     * @var \BetaKiller\Helper\UrlHelper
      */
     private $helper;
 
     /**
      * IFacePageCacheStrategy constructor.
      *
-     * @param \BetaKiller\Helper\IFaceHelper $helper
+     * @param \BetaKiller\Helper\UrlHelper $helper
      */
-    public function __construct(IFaceHelper $helper)
+    public function __construct(UrlHelper $helper)
     {
         $this->helper = $helper;
     }
@@ -40,7 +40,7 @@ class IFacePageCacheStrategy implements StrategyInterface
      * Sets cache file name
      *
      * @return string Cache file name
-     * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
      */
     public function strategy(): string
     {

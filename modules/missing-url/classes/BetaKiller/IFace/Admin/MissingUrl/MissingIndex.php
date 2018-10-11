@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace BetaKiller\IFace\Admin\MissingUrl;
 
 use BetaKiller\IFace\Admin\AbstractAdminBase;
+use Psr\Http\Message\ServerRequestInterface;
 
 class MissingIndex extends AbstractAdminBase
 {
@@ -16,10 +17,12 @@ class MissingIndex extends AbstractAdminBase
     /**
      * Returns data for View
      *
+     * @param \Psr\Http\Message\ServerRequestInterface $request
+     *
      * @return array
      * @throws \BetaKiller\Repository\RepositoryException
      */
-    public function getData(): array
+    public function getData(ServerRequestInterface $request): array
     {
         $data = [];
 

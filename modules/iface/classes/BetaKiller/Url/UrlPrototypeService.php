@@ -2,7 +2,7 @@
 namespace BetaKiller\Url;
 
 use BetaKiller\Exception\NotImplementedHttpException;
-use BetaKiller\IFace\Exception\IFaceException;
+use BetaKiller\IFace\Exception\UrlElementException;
 use BetaKiller\Model\DispatchableEntityInterface;
 use BetaKiller\Model\SingleParentTreeModelInterface;
 use BetaKiller\Url\Container\UrlContainerInterface;
@@ -48,7 +48,7 @@ class UrlPrototypeService
      * @param \BetaKiller\Url\UrlElementInterface $urlElement
      *
      * @return \BetaKiller\Url\UrlPrototype
-     * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
      * @throws \BetaKiller\Url\UrlPrototypeException
      */
     public function createPrototypeFromUrlElement(UrlElementInterface $urlElement): UrlPrototype
@@ -56,7 +56,7 @@ class UrlPrototypeService
         $uri = $urlElement->getUri();
 
         if (!$uri) {
-            throw new IFaceException('IFace :codename must have uri', [
+            throw new UrlElementException('IFace :codename must have uri', [
                 ':codename' => $urlElement->getCodename(),
             ]);
         }
@@ -318,8 +318,7 @@ class UrlPrototypeService
         }
 
         if (!$prototype->hasModelKey()) {
-            // TODO RawUrlParameter processing
-            throw new NotImplementedHttpException;
+            throw new NotImplementedHttpException('RawUrlParameter processing is missing');
         }
 
         // Prototype has model key and is related to a UrlDataSource

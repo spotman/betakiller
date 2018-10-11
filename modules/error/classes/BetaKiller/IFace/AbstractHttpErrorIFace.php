@@ -1,48 +1,31 @@
 <?php
 namespace BetaKiller\IFace;
 
-use BetaKiller\Model\UserInterface;
+use BetaKiller\Helper\ServerRequestHelper;
+use Psr\Http\Message\ServerRequestInterface;
 
 abstract class AbstractHttpErrorIFace extends AbstractIFace
 {
     /**
-     * @var \BetaKiller\Model\UserInterface
-     */
-    private $user;
-
-    /**
-     * @Inject
-     * @var \BetaKiller\Helper\IFaceHelper
-     */
-    private $ifaceHelper;
-
-    /**
-     * AbstractHttpErrorIFace constructor.
-     *
-     * @param \BetaKiller\Model\UserInterface $user
-     */
-    public function __construct(UserInterface $user)
-    {
-//        parent::__construct();
-
-        $this->user = $user;
-    }
-
-    /**
      * Returns data for View
      * Override this method in child classes
      *
+     * @param \Psr\Http\Message\ServerRequestInterface $request
+     *
      * @return array
-     * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     * @uses \BetaKiller\IFace\Auth\Login
      */
-    public function getData(): array
+    public function getData(ServerRequestInterface $request): array
     {
-        /** @var \BetaKiller\IFace\Auth\Login $loginIFace */
-        $loginIFace = $this->ifaceHelper->createIFaceFromCodename('Auth_Login');
+        $user      = ServerRequestHelper::getUser($request);
+        $urlHelper = ServerRequestHelper::getUrlHelper($request);
+
+        $login = $urlHelper->getUrlElementByCodename('Auth_Login');
 
         return [
-            'login_url' => $this->ifaceHelper->makeIFaceUrl($loginIFace),
-            'is_guest'  => $this->user->isGuest(),
+            'login_url' => $urlHelper->makeUrl($login),
+            'is_guest'  => $user->isGuest(),
         ];
     }
 }

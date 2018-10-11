@@ -3,12 +3,10 @@ namespace BetaKiller\Helper;
 
 use BetaKiller\Config\AppConfigInterface;
 use BetaKiller\Exception;
-use BetaKiller\Model\UserInterface;
 
 class I18nHelper
 {
-    private const KEY_REGEX   = '/^[a-z0-9_]+(?:[\.]{1}[a-z0-9_]+)+$/m';
-    private const COOKIE_NAME = 'lang';
+    private const KEY_REGEX = '/^[a-z0-9_]+(?:[\.]{1}[a-z0-9_]+)+$/m';
 
     /**
      * @var string
@@ -42,21 +40,16 @@ class I18nHelper
      *
      * @param \BetaKiller\Helper\AppEnvInterface    $appEnv
      * @param \BetaKiller\Config\AppConfigInterface $appConfig
-     *
-     * @throws \BetaKiller\Exception
      */
     public function __construct(AppEnvInterface $appEnv, AppConfigInterface $appConfig)
     {
         $this->appEnv    = $appEnv;
         $this->appConfig = $appConfig;
 
-        $this->initDefault();
+        $this->init();
     }
 
-    /**
-     * @throws \BetaKiller\Exception
-     */
-    private function initDefault(): void
+    private function init(): void
     {
         $this->languagesConfig  = $this->appConfig->getAllowedLanguages();
         $this->allowedLanguages = \array_keys($this->languagesConfig);
@@ -80,51 +73,9 @@ class I18nHelper
         return $this->allowedLanguages[0];
     }
 
-    /**
-     * @param \Request $request
-     *
-     * @throws \BetaKiller\Exception
-     */
-    public function initFromRequest(\Request $request): void
+    public function getAllowedLanguages(): array
     {
-        // Get lang from cookie
-        $browserLang = $this->loadCookie();
-
-        // Detect the browser` preferred lang if current lang is not set
-        if (!$browserLang && !$this->appEnv->isCLI()) {
-            /** @var \HTTP_Header $headers */
-            $headers = $request->headers();
-
-            $preferredLang = $headers->preferred_language($this->allowedLanguages);
-
-            if ($preferredLang) {
-                $browserLang = $preferredLang;
-            }
-        }
-
-        if ($browserLang && !\in_array($browserLang, $this->allowedLanguages, true)) {
-            throw new Exception('Unknown language :lang, only these are allowed: :allowed', [
-                ':lang'    => $browserLang,
-                ':allowed' => implode(', ', $this->allowedLanguages),
-            ]);
-        }
-
-        if ($browserLang) {
-            $this->setLang($browserLang);
-        }
-
-        $this->saveCookie();
-    }
-
-    public function initFromUser(UserInterface $user): void
-    {
-        if (!$user->isGuest() && $lang = $user->getLanguageName()) {
-            $this->setLang($lang);
-        }
-
-        if (!$this->appEnv->isCLI()) {
-            $this->saveCookie();
-        }
+        return $this->allowedLanguages;
     }
 
     public function getLang(): string
@@ -164,14 +115,8 @@ class I18nHelper
         return (bool)preg_match(self::KEY_REGEX, $key);
     }
 
-    private function loadCookie(): ?string
+    public function translate(string $lang, string $key, array $values = null): string
     {
-        return \Cookie::get(self::COOKIE_NAME);
-    }
-
-    private function saveCookie(): void
-    {
-        // Store lang in cookie
-        \Cookie::set(self::COOKIE_NAME, $this->lang);
+        return __($key, $values, $lang);
     }
 }

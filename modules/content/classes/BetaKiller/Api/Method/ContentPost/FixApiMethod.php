@@ -28,7 +28,6 @@ class FixApiMethod extends AbstractEntityBasedApiMethod
 
     /**
      * @return \Spotman\Api\ApiMethodResponse|null
-     * @throws \HTTP_Exception_501
      * @throws \BetaKiller\Status\StatusException
      * @throws \BetaKiller\Repository\RepositoryException
      * @throws \BetaKiller\Factory\FactoryException

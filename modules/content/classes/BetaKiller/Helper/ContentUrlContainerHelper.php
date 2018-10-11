@@ -1,107 +1,62 @@
 <?php
 namespace BetaKiller\Helper;
 
-use BetaKiller\Model\ContentCategory;
-use BetaKiller\Model\ContentComment;
+use BetaKiller\Model\ContentCategoryInterface;
+use BetaKiller\Model\ContentCommentInterface;
 use BetaKiller\Model\ContentCommentStatus;
 use BetaKiller\Model\ContentPost;
 use BetaKiller\Model\ContentPostRevision;
-use BetaKiller\Url\Container\UrlContainerInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
-class ContentUrlContainerHelper extends UrlContainerHelper
+class ContentUrlContainerHelper
 {
     /**
-     * @return \BetaKiller\Model\ContentCategory|null
-     */
-    public function getContentCategory(): ?ContentCategory
-    {
-        return $this->getEntityByClassName(ContentCategory::class);
-    }
-
-    /**
-     * @param \BetaKiller\Model\ContentCategory                    $model
-     * @param \BetaKiller\Url\Container\UrlContainerInterface|null $params
+     * @param \Psr\Http\Message\ServerRequestInterface $request
      *
-     * @return \BetaKiller\Url\Container\UrlContainerInterface
+     * @return \BetaKiller\Model\ContentCategoryInterface
      */
-    public function setContentCategory(ContentCategory $model, UrlContainerInterface $params = null): UrlContainerInterface
+    public static function getContentCategory(ServerRequestInterface $request): ContentCategoryInterface
     {
-        return $this->setEntity($model, $params);
+        return ServerRequestHelper::getEntity($request, ContentCategoryInterface::class);
     }
 
     /**
-     * @return \BetaKiller\Model\ContentPost|null
-     */
-    public function getContentPost(): ?ContentPost
-    {
-        return $this->getEntityByClassName(ContentPost::class);
-    }
-
-    /**
-     * @param \BetaKiller\Model\ContentPost                        $model
-     * @param \BetaKiller\Url\Container\UrlContainerInterface|null $params
+     * @param \Psr\Http\Message\ServerRequestInterface $request
      *
-     * @return \BetaKiller\Url\Container\UrlContainerInterface
+     * @return \BetaKiller\Model\ContentPost
      */
-    public function setContentPost(ContentPost $model, UrlContainerInterface $params = null): UrlContainerInterface
+    public static function getContentPost(ServerRequestInterface $request): ContentPost
     {
-        return $this->setEntity($model, $params);
+        return ServerRequestHelper::getEntity($request, ContentPost::class);
     }
 
     /**
-     * @return \BetaKiller\Model\ContentPostRevision|null
-     */
-    public function getContentPostRevision(): ?ContentPostRevision
-    {
-        return $this->getEntityByClassName(ContentPostRevision::class);
-    }
-
-    /**
-     * @param \BetaKiller\Model\ContentPostRevision                $model
-     * @param \BetaKiller\Url\Container\UrlContainerInterface|null $params
+     * @param \Psr\Http\Message\ServerRequestInterface $request
      *
-     * @return \BetaKiller\Url\Container\UrlContainerInterface
+     * @return \BetaKiller\Model\ContentPostRevision
      */
-    public function setContentPostRevision(ContentPostRevision $model, UrlContainerInterface $params = null): UrlContainerInterface
+    public static function getContentPostRevision(ServerRequestInterface $request): ContentPostRevision
     {
-        return $this->setEntity($model, $params);
+        return ServerRequestHelper::getEntity($request, ContentPostRevision::class);
     }
 
     /**
-     * @return \BetaKiller\Model\ContentComment|null
-     */
-    public function getContentComment(): ?ContentComment
-    {
-        return $this->getEntityByClassName(ContentComment::class);
-    }
-
-    /**
-     * @param \BetaKiller\Model\ContentComment                     $model
-     * @param \BetaKiller\Url\Container\UrlContainerInterface|null $params
+     * @param \Psr\Http\Message\ServerRequestInterface $request
      *
-     * @return \BetaKiller\Url\Container\UrlContainerInterface
+     * @return \BetaKiller\Model\ContentCommentInterface
      */
-    public function setContentComment(ContentComment $model, UrlContainerInterface $params = null): UrlContainerInterface
+    public static function getContentComment(ServerRequestInterface $request): ContentCommentInterface
     {
-        return $this->setEntity($model, $params);
+        return ServerRequestHelper::getEntity($request, ContentCommentInterface::class);
     }
 
     /**
-     * @return \BetaKiller\Model\ContentCommentStatus|null
-     */
-    public function getContentCommentStatus(): ?ContentCommentStatus
-    {
-        return $this->getEntityByClassName(ContentCommentStatus::class);
-    }
-
-    /**
-     * @param \BetaKiller\Model\ContentCommentStatus               $model
-     * @param \BetaKiller\Url\Container\UrlContainerInterface|null $params
+     * @param \Psr\Http\Message\ServerRequestInterface $request
      *
-     * @return \BetaKiller\Url\Container\UrlContainerInterface
+     * @return \BetaKiller\Model\ContentCommentStatus
      */
-    public function setContentCommentStatus(ContentCommentStatus $model, UrlContainerInterface $params = null): UrlContainerInterface
+    public static function getContentCommentStatus(ServerRequestInterface $request): ContentCommentStatus
     {
-        return $this->setEntity($model, $params);
+        return ServerRequestHelper::getEntity($request, ContentCommentStatus::class);
     }
 }

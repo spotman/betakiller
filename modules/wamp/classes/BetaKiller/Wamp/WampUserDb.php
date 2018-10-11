@@ -4,7 +4,11 @@ declare(strict_types=1);
 namespace BetaKiller\Wamp;
 
 use BetaKiller\Auth\AuthFacade;
+use BetaKiller\Helper\LoggerHelperTrait;
+use BetaKiller\Helper\SessionHelper;
+use Psr\Log\LoggerInterface;
 use Thruway\Authentication\WampCraUserDbInterface;
+
 //use Thruway\Common\Utils;
 
 /**
@@ -12,17 +16,26 @@ use Thruway\Authentication\WampCraUserDbInterface;
  */
 class WampUserDb implements WampCraUserDbInterface
 {
+    use LoggerHelperTrait;
+
     /**
      * @var \BetaKiller\Auth\AuthFacade
      */
     private $auth;
 
     /**
-     * @param \BetaKiller\Auth\AuthFacade $auth
+     * @var \Psr\Log\LoggerInterface
      */
-    public function __construct(AuthFacade $auth)
+    private $logger;
+
+    /**
+     * @param \BetaKiller\Auth\AuthFacade $auth
+     * @param \Psr\Log\LoggerInterface    $logger
+     */
+    public function __construct(AuthFacade $auth, LoggerInterface $logger)
     {
-        $this->auth = $auth;
+        $this->auth   = $auth;
+        $this->logger = $logger;
     }
 
     /**
@@ -37,13 +50,23 @@ class WampUserDb implements WampCraUserDbInterface
      */
     public function get($authid)
     {
-        $user    = $this->auth->getUserFromSessionID($authid);
-        $session = $this->auth->getUserSession($user);
+        try {
+            $session   = $this->auth->getSession($authid);
+            $userAgent = SessionHelper::getUserAgent($session);
 
-        $userAgent = $session->get(AuthFacade::SESSION_USER_AGENT);
+            return $this->makeData($authid, $userAgent);
+        } catch (\Throwable $e) {
+            $this->logException($this->logger, $e);
 
+            // Make random user agent string so auth will never be succeeded
+            return $this->makeData($authid, \sha1(\microtime()));
+        }
+    }
+
+    private function makeData(string $authID, string $userAgent): array
+    {
         return [
-            'authid' => $authid,
+            'authid' => $authID,
             'key'    => $userAgent,
             'salt'   => null, // Utils::getDerivedKey($userAgent, $authid)
         ];

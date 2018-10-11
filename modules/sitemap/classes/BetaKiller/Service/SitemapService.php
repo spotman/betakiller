@@ -65,7 +65,7 @@ class SitemapService
 
     /**
      * @return $this
-     * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
      * @throws \BetaKiller\Factory\FactoryException
      * @throws \InvalidArgumentException
      * @throws \BetaKiller\Service\ServiceException
@@ -117,7 +117,7 @@ class SitemapService
     public function serve(Response $response): void
     {
         $content = file_get_contents($this->getSitemapFilePath());
-        $response->send_string($content, $response::TYPE_XML);
+        $response->sendString($content, $response::TYPE_XML);
     }
 
     protected function getSitemapFilePath(): string

@@ -3,7 +3,7 @@ namespace BetaKiller\Url;
 
 use BetaKiller\Helper\AclHelper;
 use BetaKiller\Helper\LoggerHelperTrait;
-use BetaKiller\IFace\Exception\IFaceException;
+use BetaKiller\IFace\Exception\UrlElementException;
 use BetaKiller\Url\Behaviour\UrlBehaviourFactory;
 use BetaKiller\Url\Container\UrlContainer;
 use BetaKiller\Url\Container\UrlContainerInterface;
@@ -55,7 +55,7 @@ class AvailableUrlsCollector
      *
      * @return \BetaKiller\Url\AvailableUri[]|\Generator
      * @throws \BetaKiller\Factory\FactoryException
-     * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
      */
     public function getPublicAvailableUrls(?bool $useHidden = null): \Generator
     {
@@ -76,7 +76,7 @@ class AvailableUrlsCollector
      *
      * @return \Generator|\BetaKiller\Url\AvailableUri[]
      * @throws \BetaKiller\Factory\FactoryException
-     * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
      */
     private function processLayer(
         array $models,
@@ -102,7 +102,7 @@ class AvailableUrlsCollector
      *
      * @return \Generator
      * @throws \BetaKiller\Factory\FactoryException
-     * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
      *
      * @link https://github.com/MarkBaker/GeneratorQuadTrees/blob/master/src/PointQuadTree.php
      */
@@ -139,7 +139,7 @@ class AvailableUrlsCollector
                     continue;
                 }
             } catch (\Spotman\Acl\Exception $e) {
-                throw IFaceException::wrap($e);
+                throw UrlElementException::wrap($e);
             }
 
             yield $availableUrl;

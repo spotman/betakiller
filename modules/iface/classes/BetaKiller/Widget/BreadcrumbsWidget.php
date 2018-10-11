@@ -3,67 +3,45 @@ declare(strict_types=1);
 
 namespace BetaKiller\Widget;
 
+use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Model\RoleInterface;
 use BetaKiller\Url\IFaceModelInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
 class BreadcrumbsWidget extends AbstractWidget
 {
     /**
-     * @Inject
-     * @var \BetaKiller\Url\UrlElementStack
-     */
-    private $stack;
-
-    /**
-     * @Inject
-     * @var \BetaKiller\Url\Container\UrlContainerInterface
-     */
-    private $urlContainer;
-
-    /**
-     * @Inject
-     * @var \BetaKiller\Helper\IFaceHelper
-     */
-    private $ifaceHelper;
-
-    /**
      * Returns data for View rendering
      *
+     * @param \Psr\Http\Message\ServerRequestInterface $request
+     * @param array                                    $context
+     *
      * @return array
-     * @throws \BetaKiller\Url\UrlPrototypeException
-     * @throws \BetaKiller\IFace\Exception\IFaceException
      */
-    public function getData(): array
+    public function getData(ServerRequestInterface $request, array $context): array
     {
+        $stack         = ServerRequestHelper::getUrlElementStack($request);
+        $elementHelper = ServerRequestHelper::getUrlElementHelper($request);
+        $urlHelper     = ServerRequestHelper::getUrlHelper($request);
+        $params        = ServerRequestHelper::getUrlContainer($request);
+
         $data = [];
 
-        foreach ($this->stack->getIterator() as $model) {
+        foreach ($stack->getIterator() as $model) {
             // Show only ifaces
             if (!$model instanceof IFaceModelInterface) {
                 continue;
             }
 
-            $data[] = $this->makeBreadcrumbData($model);
+            $data[] = [
+                'url'    => $urlHelper->makeUrl($model, $params),
+                'label'  => $elementHelper->getLabel($model),
+                'active' => $stack->isCurrent($model),
+            ];
         }
 
         return [
             'breadcrumbs' => $data,
-        ];
-    }
-
-    /**
-     * @param \BetaKiller\Url\IFaceModelInterface $urlElement
-     *
-     * @return array
-     * @throws \BetaKiller\IFace\Exception\IFaceException
-     * @throws \BetaKiller\Url\UrlPrototypeException
-     */
-    private function makeBreadcrumbData(IFaceModelInterface $urlElement): array
-    {
-        return [
-            'url'    => $this->ifaceHelper->makeUrl($urlElement, $this->urlContainer),
-            'label'  => $this->ifaceHelper->getLabel($urlElement),
-            'active' => $this->stack->isCurrent($urlElement),
         ];
     }
 

@@ -112,13 +112,6 @@ interface UserInterface extends AbstractEntityInterface, OrmInterface, Notificat
     public function getLanguage(): ?LanguageInterface;
 
     /**
-     * @throws \BetaKiller\Auth\InactiveException
-     */
-    public function afterAutoLogin(): void;
-
-    public function beforeSignOut(): void;
-
-    /**
      * Returns TRUE, if user account is switched on
      *
      * @return bool
@@ -223,27 +216,4 @@ interface UserInterface extends AbstractEntityInterface, OrmInterface, Notificat
      * @return void
      */
     public function forceAuthorization(): void;
-
-    /**
-     * Returns session ID if authorized and null if not
-     *
-     * @return string|null
-     */
-    public function getSessionID(): ?string;
-
-    /**
-     * Set session ID
-     *
-     * @param string $value
-     *
-     * @return \BetaKiller\Model\UserInterface
-     */
-    public function setSessionID(string $value): UserInterface;
-
-    /**
-     * Remove session ID
-     *
-     * @return \BetaKiller\Model\UserInterface
-     */
-    public function clearSessionID(): UserInterface;
 }

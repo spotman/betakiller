@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace BetaKiller\Widget;
 
-use Route;
 use Validation;
 
 abstract class AbstractWidget implements WidgetInterface
@@ -17,23 +16,6 @@ abstract class AbstractWidget implements WidgetInterface
      * @var string Current widget state (for Finite State Machine)
      */
     private $currentState = self::DEFAULT_STATE;
-
-    /**
-     * @var array Context for widget rendering
-     */
-    private $context = [];
-
-    /**
-     * @var \Request
-     * @deprecated Inject PSR request in every action
-     */
-    protected $request;
-
-    /**
-     * @var \Response
-     * @deprecated Inject PSR response prototype in every action
-     */
-    protected $response;
 
     /**
      * Setter for widget name
@@ -71,75 +53,6 @@ abstract class AbstractWidget implements WidgetInterface
     }
 
     /**
-     * Setter for widget context (additional data for rendering)
-     *
-     * @param array $value
-     *
-     * @return \BetaKiller\Widget\WidgetInterface
-     */
-    public function setContext(array $value): WidgetInterface
-    {
-        $this->context = $value;
-
-        return $this;
-    }
-
-    /**
-     * Getter for widget context (additional data for rendering)
-     *
-     * @return array
-     */
-    public function getContext(): array
-    {
-        return $this->context;
-    }
-
-    public function getContextParam($name, $default = null)
-    {
-        return $this->context[$name] ?? $default;
-    }
-
-    /**
-     * Setter for request
-     *
-     * @param \Request $request
-     *
-     * @return \BetaKiller\Widget\WidgetInterface
-     * @deprecated
-     */
-    public function setRequest(\Request $request): WidgetInterface
-    {
-        $this->request = $request;
-
-        return $this;
-    }
-
-    /**
-     * Setter for response
-     *
-     * @param \Response $response
-     *
-     * @return \BetaKiller\Widget\WidgetInterface
-     * @deprecated
-     */
-    public function setResponse(\Response $response): WidgetInterface
-    {
-        $this->response = $response;
-
-        return $this;
-    }
-
-    /**
-     * Returns data for View rendering
-     *
-     * @return array
-     */
-    public function getData(): array
-    {
-        return [];
-    }
-
-    /**
      * @param string $current_state
      */
     public function setCurrentState($current_state): void
@@ -153,31 +66,5 @@ abstract class AbstractWidget implements WidgetInterface
     public function getCurrentState(): string
     {
         return $this->currentState;
-    }
-
-    /**
-     * @param null $action
-     * @param bool $protocol
-     *
-     * @return string
-     * @deprecated
-     */
-    protected function url($action = null, $protocol = null): string
-    {
-        return Route::url(
-            'widget-controller',
-            ['widget' => $this->getName(), 'action' => $action],
-            $protocol ?? true
-        );
-    }
-
-    protected function getValidationErrors(Validation $validation): array
-    {
-        return $validation->errors($this->getValidationMessagesPath());
-    }
-
-    private function getValidationMessagesPath(): string
-    {
-        return 'widgets'.DIRECTORY_SEPARATOR.str_replace('_', DIRECTORY_SEPARATOR, $this->name);
     }
 }

@@ -5,6 +5,7 @@ namespace BetaKiller\IFace\Admin\Tests;
 
 use BetaKiller\IFace\AbstractIFace;
 use BetaKiller\Url\Container\UrlContainerInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
 class TestWampRpcTest extends AbstractIFace
 {
@@ -22,9 +23,11 @@ class TestWampRpcTest extends AbstractIFace
     }
 
     /**
+     * @param \Psr\Http\Message\ServerRequestInterface $request
+     *
      * @return string[]
      */
-    public function getData(): array
+    public function getData(ServerRequestInterface $request): array
     {
         return [
             'connectionType' => strtolower(trim($this->findArgument('connectionType'))),

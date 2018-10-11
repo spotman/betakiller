@@ -19,7 +19,7 @@ class UrlElementTreeLayerIterator extends \FilterIterator
      * @param \BetaKiller\Url\UrlElementInterface                          $parent
      * @param \BetaKiller\Url\ElementFilter\UrlElementFilterInterface|null $filters [optional]
      *
-     * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
      */
     public function __construct(
         UrlElementTreeInterface $tree,

@@ -53,7 +53,7 @@ class Controller_Assets extends Controller
     public function action_upload(): void
     {
         // This method responds via JSON (all exceptions will be caught automatically)
-        $this->response->content_type_json();
+        $this->response->contentTypeJson();
 
         // Restrict multiple files at once
         if (count($_FILES) > 1) {
@@ -79,7 +79,7 @@ class Controller_Assets extends Controller
         }
 
         // Returns
-        $this->response->sendJson(self::JSON_SUCCESS, $model->toJson());
+        $this->response->sendSuccessJson($model->toJson());
     }
 
     /**
@@ -91,7 +91,6 @@ class Controller_Assets extends Controller
      * @throws \BetaKiller\Exception\BadRequestHttpException
      * @throws \BetaKiller\Exception\NotFoundHttpException
      * @throws \BetaKiller\Factory\FactoryException
-     * @throws \HTTP_Exception_500
      */
     public function action_original(): void
     {
@@ -107,7 +106,7 @@ class Controller_Assets extends Controller
         $this->deploy($model, $content, AssetsProviderInterface::ACTION_ORIGINAL);
 
         // Send last modified date
-        $this->response->lastModified($model->getLastModifiedAt());
+        $this->response->setLastModified($model->getLastModifiedAt());
 
         // Send file content + headers
         $this->response->sendFileContent($content, $model->getMime());
@@ -122,7 +121,6 @@ class Controller_Assets extends Controller
      * @throws \BetaKiller\Exception\BadRequestHttpException
      * @throws \BetaKiller\Exception\NotFoundHttpException
      * @throws \BetaKiller\Factory\FactoryException
-     * @throws \HTTP_Exception_500
      */
     public function action_download(): void
     {
@@ -136,7 +134,7 @@ class Controller_Assets extends Controller
         $content = $this->provider->getContent($model);
 
         // Send last modified date
-        $this->response->lastModified($model->getLastModifiedAt());
+        $this->response->setLastModified($model->getLastModifiedAt());
 
         // Send file content + headers
         $this->response->sendFileContent($content, $model->getMime(), $model->getOriginalName());
@@ -151,7 +149,6 @@ class Controller_Assets extends Controller
      * @throws \BetaKiller\Exception\BadRequestHttpException
      * @throws \BetaKiller\Exception\NotFoundHttpException
      * @throws \BetaKiller\Factory\FactoryException
-     * @throws \HTTP_Exception_500
      */
     public function action_preview(): void
     {
@@ -183,7 +180,7 @@ class Controller_Assets extends Controller
         $this->deploy($model, $previewContent, $action, $size);
 
         // Send last modified date
-        $this->response->lastModified($model->getLastModifiedAt());
+        $this->response->setLastModified($model->getLastModifiedAt());
 
         // Send file content + headers
         $this->response->sendFileContent($previewContent, $model->getMime());
@@ -207,7 +204,7 @@ class Controller_Assets extends Controller
     public function action_delete(): void
     {
         // This method responds via JSON (all exceptions will be caught automatically)
-        $this->response->content_type_json();
+        $this->response->contentTypeJson();
 
         $this->detectProvider();
 
@@ -217,7 +214,7 @@ class Controller_Assets extends Controller
         // Delete file through provider
         $this->provider->delete($model, $this->user);
 
-        $this->response->send_success_json();
+        $this->response->sendSuccessJson();
     }
 
     /**

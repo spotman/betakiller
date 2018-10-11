@@ -7,12 +7,6 @@
 [submodule "modules/meta-tags"]
 	path = modules/meta-tags
 	url = git@github.com:spotman/kohana-meta-tags.git
-[submodule "modules/device"]
-	path = modules/device
-	url = git@github.com:spotman/kohana-device.git
-[submodule "modules/jsonrpc"]
-	path = modules/jsonrpc
-	url = git@github.com:spotman/kohana-jsonrpc.git
 [submodule "modules/paginate"]
 	path = modules/paginate
 	url = git@github.com:morgan/kohana-paginate.git
@@ -25,9 +19,6 @@
 [submodule "modules/api"]
 	path = modules/api
 	url = git@github.com:spotman/kohana-simple-api.git
-[submodule "modules/robots-txt"]
-	path = modules/robots-txt
-	url = git@github.com:spotman/kohana-robots.txt.git
 [submodule "modules/i18n-plural"]
 	path = modules/i18n-plural
 	url = git@github.com:spotman/kohana-i18n-plural.git

@@ -2,55 +2,46 @@
 namespace BetaKiller\IFace\Admin\Content;
 
 use BetaKiller\Helper\ContentUrlContainerHelper;
-use BetaKiller\Helper\IFaceHelper;
-use BetaKiller\Url\UrlDispatcherException;
+use BetaKiller\Helper\UrlHelper;
+use BetaKiller\Url\ZoneInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
 class PostItemRevisionList extends AbstractAdminBase
 {
     /**
-     * @var \BetaKiller\Helper\IFaceHelper
+     * @var \BetaKiller\Helper\UrlHelper
      */
-    private $ifaceHelper;
-
-    /**
-     * @var \BetaKiller\Helper\ContentUrlContainerHelper
-     */
-    private $urlParametersHelper;
+    private $urlHelper;
 
     /**
      * PostItemRevisionList constructor.
      *
-     * @param \BetaKiller\Helper\IFaceHelper               $ifaceHelper
-     * @param \BetaKiller\Helper\ContentUrlContainerHelper $urlParametersHelper
+     * @param \BetaKiller\Helper\UrlHelper $urlHelper
      */
-    public function __construct(IFaceHelper $ifaceHelper, ContentUrlContainerHelper $urlParametersHelper)
+    public function __construct(UrlHelper $urlHelper)
     {
-        $this->urlParametersHelper = $urlParametersHelper;
-        $this->ifaceHelper         = $ifaceHelper;
+        $this->urlHelper = $urlHelper;
     }
 
     /**
      * Returns data for View
      * Override this method in child classes
      *
+     * @param \Psr\Http\Message\ServerRequestInterface $request
+     *
      * @return array
-     * @throws \BetaKiller\IFace\Exception\IFaceException
-     * @throws \BetaKiller\Url\UrlDispatcherException
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
      */
-    public function getData(): array
+    public function getData(ServerRequestInterface $request): array
     {
-        $post = $this->urlParametersHelper->getContentPost();
-
-        if (!$post) {
-            throw new UrlDispatcherException('Missing ContentPost model');
-        }
+        $post = ContentUrlContainerHelper::getContentPost($request);
 
         $data = [];
 
         foreach ($post->getAllRevisions() as $revision) {
             $data[] = [
                 'id'         => $revision->getID(),
-                'diff_url'   => $this->ifaceHelper->getReadEntityUrl($revision),
+                'diff_url'   => $this->urlHelper->getReadEntityUrl($revision, ZoneInterface::ADMIN),
                 'is_actual'  => $post->isActualRevision($revision),
                 'created_at' => $revision->getCreatedAt()->format('d.m.Y H:i:s'),
                 'created_by' => $revision->getCreatedBy()->getUsername(),

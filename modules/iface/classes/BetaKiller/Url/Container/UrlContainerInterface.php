@@ -90,12 +90,6 @@ interface UrlContainerInterface
     public function hasParameterInstance(UrlParameterInterface $instance): bool;
 
     /**
-     * @return \BetaKiller\Url\Container\UrlContainerInterface
-     * @deprecated Url parameters must not be cleared (this is a hack for persistent DI instances)
-     */
-    public function clear(): UrlContainerInterface;
-
-    /**
      * Returns keys of currently added Entity items
      *
      * @return string[]

@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\Task;
 
-use BetaKiller\IFace\Exception\IFaceException;
+use BetaKiller\IFace\Exception\UrlElementException;
 use BetaKiller\Url\DummyModelInterface;
 use BetaKiller\Url\IFaceModelInterface;
 use BetaKiller\Url\UrlElementTreeInterface;
@@ -44,7 +44,7 @@ class IFaceList extends AbstractTask
 
     /**
      *
-     * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
      */
     public function run(): void
     {
@@ -70,7 +70,7 @@ class IFaceList extends AbstractTask
                     break;
 
                 default:
-                    throw new IFaceException('Unknown UrlElement :class', [
+                    throw new UrlElementException('Unknown UrlElement :class', [
                         ':class' => \get_class($model),
                     ]);
             }

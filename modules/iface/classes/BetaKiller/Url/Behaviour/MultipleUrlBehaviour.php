@@ -33,7 +33,7 @@ class MultipleUrlBehaviour extends AbstractUrlBehaviour
      * @param \BetaKiller\Url\Container\UrlContainerInterface|null $params
      *
      * @return bool
-     * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
      * @throws \BetaKiller\Url\Behaviour\UrlBehaviourException
      * @throws \BetaKiller\Url\UrlPrototypeException
      */
@@ -54,7 +54,7 @@ class MultipleUrlBehaviour extends AbstractUrlBehaviour
      *
      * @param \BetaKiller\Url\Container\UrlContainerInterface $urlContainer
      *
-     * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
      * @throws \BetaKiller\Url\Behaviour\UrlBehaviourException
      * @throws \BetaKiller\Url\UrlPrototypeException
      */
@@ -109,7 +109,7 @@ class MultipleUrlBehaviour extends AbstractUrlBehaviour
      *
      * @return \Generator|\BetaKiller\Url\AvailableUri[]
      * @throws \BetaKiller\Factory\FactoryException
-     * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
      * @throws \BetaKiller\Url\UrlPrototypeException
      */
     public function getAvailableUrls(UrlElementInterface $urlElement, UrlContainerInterface $params): \Generator

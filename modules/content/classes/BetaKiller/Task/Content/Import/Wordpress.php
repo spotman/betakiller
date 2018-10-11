@@ -9,6 +9,7 @@ use BetaKiller\Content\Shortcode\AttachmentShortcode;
 use BetaKiller\Content\Shortcode\GalleryShortcode;
 use BetaKiller\Content\Shortcode\ImageShortcode;
 use BetaKiller\Content\Shortcode\YoutubeShortcode;
+use BetaKiller\Exception\HttpExceptionInterface;
 use BetaKiller\Exception\ValidationException;
 use BetaKiller\Helper\LoggerHelperTrait;
 use BetaKiller\Model\ContentGalleryInterface;
@@ -20,7 +21,6 @@ use BetaKiller\Model\WordpressAttachmentInterface;
 use BetaKiller\Repository\WordpressAttachmentRepositoryInterface;
 use BetaKiller\Task\AbstractTask;
 use BetaKiller\Task\TaskException;
-use BetaKiller\Url\ZoneInterface;
 use DateTime;
 use DateTimeImmutable;
 use DiDom\Document;
@@ -68,12 +68,6 @@ class Wordpress extends AbstractTask
      * @var Entity
      */
     private $contentPostEntity;
-
-    /**
-     * @Inject
-     * @var \BetaKiller\Helper\IFaceHelper
-     */
-    private $ifaceHelper;
 
     /**
      * @Inject
@@ -177,7 +171,7 @@ class Wordpress extends AbstractTask
     /**
      * @throws \BetaKiller\Content\Shortcode\ShortcodeException
      * @throws \BetaKiller\Factory\FactoryException
-     * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
      * @throws \BetaKiller\Notification\NotificationException
      * @throws \BetaKiller\Repository\RepositoryException
      * @throws \BetaKiller\Status\StatusException
@@ -420,7 +414,7 @@ class Wordpress extends AbstractTask
                 $response = $request->execute();
             } catch (\Request_Exception $e) {
                 throw TaskException::wrap($e);
-            } catch (\HTTP_Exception_404 $e) {
+            } catch (HttpExceptionInterface $e) {
                 throw TaskException::wrap($e);
             }
 
@@ -481,7 +475,7 @@ class Wordpress extends AbstractTask
 
     /**
      * @throws \BetaKiller\Notification\NotificationException
-     * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
      * @throws \BetaKiller\Status\StatusWorkflowException
@@ -565,7 +559,7 @@ class Wordpress extends AbstractTask
 
             if ($content) {
                 // Parsing custom tags next
-                $content = $this->processCustomBbTags($content, $model);
+                $content = $this->processCustomBbTags($content, $model, $uri);
 
                 // Processing YouTube <iframe> embeds
                 $content = $this->processContentYoutubeIFrames($content, $model);
@@ -810,7 +804,7 @@ class Wordpress extends AbstractTask
      * @return string
      * @throws \RuntimeException
      */
-    private function processCustomBbTags(string $content, ContentPost $item): string
+    private function processCustomBbTags(string $content, ContentPost $item, string $uri): string
     {
         $this->logger->debug('Processing custom tags...');
 
@@ -832,7 +826,7 @@ class Wordpress extends AbstractTask
         });
 
         // All unknown shortcodes
-        $handlers->setDefault(function (ThunderShortcodeInterface $s) use ($item) {
+        $handlers->setDefault(function (ThunderShortcodeInterface $s) use ($uri) {
             $serializer = new TextSerializer();
             $name       = $s->getName();
 
@@ -842,8 +836,7 @@ class Wordpress extends AbstractTask
                 $this->logException($this->logger, $e);
 
                 if (!isset($this->unknownBbTags[$name])) {
-                    $this->unknownBbTags[$name] = $this->ifaceHelper->getReadEntityUrl($item,
-                        ZoneInterface::PUBLIC);
+                    $this->unknownBbTags[$name] = $uri;
                     $this->logger->debug('Unknown BB-code found [:name], keep it', [':name' => $name]);
                 }
             }
