@@ -5,8 +5,8 @@ namespace BetaKiller\Exception;
 
 class ServerErrorHttpException extends HttpException
 {
-    public function __construct()
+    public function __construct(string $message)
     {
-        parent::__construct(500);
+        parent::__construct(500, $message);
     }
 }
