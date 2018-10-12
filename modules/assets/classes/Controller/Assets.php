@@ -12,7 +12,7 @@ use BetaKiller\Exception\NotFoundHttpException;
 use BetaKiller\Exception\NotImplementedHttpException;
 use BetaKiller\Exception\ValidationException;
 
-class Controller_Assets extends Controller
+class Controller_Assets
 {
     /**
      * @Inject
