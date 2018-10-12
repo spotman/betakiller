@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\IFace;
 
+use BetaKiller\Helper\ServerRequestHelper;
 use Psr\Http\Message\ServerRequestInterface;
 
 class Sitemap extends AbstractIFace
@@ -24,9 +25,10 @@ class Sitemap extends AbstractIFace
      */
     public function getData(ServerRequestInterface $request): array
     {
+        $urlHelper = ServerRequestHelper::getUrlHelper($request);
         $data = [];
 
-        foreach ($this->urlsCollector->getPublicAvailableUrls() as $item) {
+        foreach ($this->urlsCollector->getPublicAvailableUrls($urlHelper) as $item) {
             $data[] = $item->getUrl();
         }
 

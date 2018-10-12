@@ -9,6 +9,7 @@ use Zend\Diactoros\Response\HtmlResponse;
 use Zend\Diactoros\Response\JsonResponse;
 use Zend\Diactoros\Response\RedirectResponse;
 use Zend\Diactoros\Response\TextResponse;
+use Zend\Diactoros\Response\XmlResponse;
 
 class ResponseHelper
 {
@@ -28,6 +29,11 @@ class ResponseHelper
     public static function text(string $text, int $status = null): ResponseInterface
     {
         return new TextResponse($text, $status ?? 200);
+    }
+
+    public static function xml(string $xml, int $status = null): ResponseInterface
+    {
+        return new XmlResponse($xml, $status ?? 200);
     }
 
     public static function html(string $text, int $status = null): ResponseInterface
