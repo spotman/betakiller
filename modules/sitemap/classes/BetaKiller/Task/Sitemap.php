@@ -32,6 +32,7 @@ class Sitemap extends AbstractTask
 
     public function run(): void
     {
-        $this->service->generate();
+        // Delete it and it will be regenerated on the next request
+        $this->service->delete();
     }
 }
