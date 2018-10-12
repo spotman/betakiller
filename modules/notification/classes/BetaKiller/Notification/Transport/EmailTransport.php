@@ -33,7 +33,7 @@ class EmailTransport extends AbstractTransport
 
         $from        = $fromUser ? $fromUser->getEmail() : null;
         $to          = $user->getEmail();
-        $subj        = $renderer->makeSubject($message,);
+        $subj        = $renderer->makeSubject($message, $user);
         $attachments = $message->getAttachments();
 
         $body = $renderer->render($message, $user, $this);
