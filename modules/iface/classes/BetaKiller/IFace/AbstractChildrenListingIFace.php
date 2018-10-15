@@ -2,6 +2,7 @@
 namespace BetaKiller\IFace;
 
 use BetaKiller\Helper\ServerRequestHelper;
+use BetaKiller\Helper\UrlElementHelper;
 use BetaKiller\Url\IFaceModelInterface;
 use BetaKiller\Url\UrlElementTreeInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -14,13 +15,20 @@ abstract class AbstractChildrenListingIFace extends AbstractIFace
     private $tree;
 
     /**
+     * @var \BetaKiller\Helper\UrlElementHelper
+     */
+    private $elementHelper;
+
+    /**
      * AbstractChildrenListingIFace constructor.
      *
      * @param \BetaKiller\Url\UrlElementTreeInterface $tree
+     * @param \BetaKiller\Helper\UrlElementHelper     $elementHelper
      */
-    public function __construct(UrlElementTreeInterface $tree)
+    public function __construct(UrlElementTreeInterface $tree, UrlElementHelper $elementHelper)
     {
-        $this->tree = $tree;
+        $this->tree          = $tree;
+        $this->elementHelper = $elementHelper;
     }
 
     /**
@@ -34,9 +42,9 @@ abstract class AbstractChildrenListingIFace extends AbstractIFace
      */
     public function getData(ServerRequestInterface $request): array
     {
-        $params        = ServerRequestHelper::getUrlContainer($request);
-        $urlHelper     = ServerRequestHelper::getUrlHelper($request);
-        $elementHelper = ServerRequestHelper::getUrlElementHelper($request);
+        $params    = ServerRequestHelper::getUrlContainer($request);
+        $urlHelper = ServerRequestHelper::getUrlHelper($request);
+        $i18n      = ServerRequestHelper::getI18n($request);
 
         $data = [];
 
@@ -47,7 +55,7 @@ abstract class AbstractChildrenListingIFace extends AbstractIFace
             }
 
             $data[] = [
-                'label'    => $elementHelper->getLabel($urlElement, $params),
+                'label'    => $this->elementHelper->getLabel($urlElement, $params, $i18n),
                 'codename' => $urlElement->getCodename(),
                 'url'      => $urlHelper->makeUrl($urlElement),
             ];
