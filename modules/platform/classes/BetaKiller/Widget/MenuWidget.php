@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace BetaKiller\Widget;
 
 use BetaKiller\Helper\AclHelper;
+use BetaKiller\Helper\I18nHelper;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Helper\UrlElementHelper;
 use BetaKiller\Helper\UrlHelper;
@@ -37,20 +38,28 @@ class MenuWidget extends AbstractPublicWidget
     private $behaviourFactory;
 
     /**
+     * @var \BetaKiller\Helper\UrlElementHelper
+     */
+    private $elementHelper;
+
+    /**
      * AuthWidget constructor.
      *
      * @param \BetaKiller\Url\UrlElementTreeInterface       $tree
      * @param \BetaKiller\Helper\AclHelper                  $aclHelper
+     * @param \BetaKiller\Helper\UrlElementHelper           $elementHelper
      * @param \BetaKiller\Url\Behaviour\UrlBehaviourFactory $behaviourFactory
      */
     public function __construct(
         UrlElementTreeInterface $tree,
         AclHelper $aclHelper,
+        UrlElementHelper $elementHelper,
         UrlBehaviourFactory $behaviourFactory
     ) {
         $this->tree             = $tree;
         $this->aclHelper        = $aclHelper;
         $this->behaviourFactory = $behaviourFactory;
+        $this->elementHelper    = $elementHelper;
     }
 
     /**
@@ -67,9 +76,9 @@ class MenuWidget extends AbstractPublicWidget
      */
     public function getData(ServerRequestInterface $request, array $context): array
     {
-        $user          = ServerRequestHelper::getUser($request);
-        $urlHelper     = ServerRequestHelper::getUrlHelper($request);
-        $elementHelper = ServerRequestHelper::getUrlElementHelper($request);
+        $user      = ServerRequestHelper::getUser($request);
+        $urlHelper = ServerRequestHelper::getUrlHelper($request);
+        $i18n      = ServerRequestHelper::getI18n($request);
 
         // Menu codename from widget context
         $menuCodename   = (string)$context['menu'];
@@ -88,15 +97,15 @@ class MenuWidget extends AbstractPublicWidget
         // Generate menu items
         $iterator = new UrlElementTreeRecursiveIterator($this->tree, $parent, $filters);
 
-        return $this->processLayer($iterator, $elementHelper, $urlHelper, $user, null);
+        return $this->processLayer($iterator, $urlHelper, $i18n, $user, null);
     }
 
     /**
      * Processing IFace tree layer
      *
      * @param \RecursiveIterator                              $models
-     * @param \BetaKiller\Helper\UrlElementHelper             $elementHelper
      * @param \BetaKiller\Helper\UrlHelper                    $urlHelper
+     * @param \BetaKiller\Helper\I18nHelper                   $i18n
      * @param \BetaKiller\Model\UserInterface                 $user
      * @param \BetaKiller\Url\Container\UrlContainerInterface $params
      *
@@ -108,10 +117,10 @@ class MenuWidget extends AbstractPublicWidget
      */
     private function processLayer(
         \RecursiveIterator $models,
-        UrlElementHelper $elementHelper,
         UrlHelper $urlHelper,
+        I18nHelper $i18n,
         UserInterface $user,
-        ?UrlContainerInterface $params = null
+        ?UrlContainerInterface $params
     ): array {
         $items = [];
 
@@ -137,7 +146,7 @@ class MenuWidget extends AbstractPublicWidget
 
                 $item = [
                     'url'      => $availableUrl->getUrl(),
-                    'label'    => $elementHelper->getLabel($urlElement, $params),
+                    'label'    => $this->elementHelper->getLabel($urlElement, $params, $i18n),
                     'active'   => $urlHelper->inStack($urlElement, $params),
                     'children' => [],
                 ];
@@ -145,11 +154,7 @@ class MenuWidget extends AbstractPublicWidget
                 // recursion for children
                 if ($models->hasChildren()) {
                     $item['children'] = $this->processLayer(
-                        $models->getChildren(),
-                        $elementHelper,
-                        $urlHelper,
-                        $user,
-                        $params
+                        $models->getChildren(), $urlHelper, $i18n, $user, $params
                     );
                 }
 

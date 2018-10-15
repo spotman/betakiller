@@ -50,9 +50,9 @@ class I18nMiddleware implements MiddlewareInterface
         $i18n = new I18nHelper($this->facade);
         $i18n->setLang($lang);
 
-        $response = $handler->handle($request->withAttribute(I18nHelper::class, $i18n));
-
         Profiler::end($pid);
+
+        $response = $handler->handle($request->withAttribute(I18nHelper::class, $i18n));
 
         return ResponseHelper::setCookie($response, self::COOKIE_NAME, $lang, new \DateInterval('P14D'));
     }

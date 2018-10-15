@@ -3,6 +3,7 @@ namespace BetaKiller\Widget\Admin;
 
 use BetaKiller\CrudlsActionsInterface;
 use BetaKiller\Helper\AclHelper;
+use BetaKiller\Helper\I18nHelper;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Helper\UrlElementHelper;
 use BetaKiller\Helper\UrlHelper;
@@ -38,15 +39,22 @@ class BarWidget extends AbstractAdminWidget
      */
     private $aclHelper;
 
+    /**
+     * @var \BetaKiller\Helper\UrlElementHelper
+     */
+    private $elementHelper;
+
     public function __construct(
         UrlElementTreeInterface $tree,
-        AclHelper $aclHelper
+        AclHelper $aclHelper,
+        UrlElementHelper $elementHelper
 //        ContentHelper $contentHelper
     )
     {
         $this->tree      = $tree;
         $this->aclHelper = $aclHelper;
 //        $this->contentHelper  = $contentHelper;
+        $this->elementHelper = $elementHelper;
     }
 
     /**
@@ -63,17 +71,17 @@ class BarWidget extends AbstractAdminWidget
      */
     public function getData(ServerRequestInterface $request, array $context): array
     {
-        $user          = ServerRequestHelper::getUser($request);
-        $stack         = ServerRequestHelper::getUrlElementStack($request);
-        $params        = ServerRequestHelper::getUrlContainer($request);
-        $urlHelper     = ServerRequestHelper::getUrlHelper($request);
-        $elementHelper = ServerRequestHelper::getUrlElementHelper($request);
+        $user      = ServerRequestHelper::getUser($request);
+        $stack     = ServerRequestHelper::getUrlElementStack($request);
+        $params    = ServerRequestHelper::getUrlContainer($request);
+        $urlHelper = ServerRequestHelper::getUrlHelper($request);
+        $i18n      = ServerRequestHelper::getI18n($request);
 
         return [
             'enabled'           => true,
 //            'comments'          => $this->getCommentsData(),
             'comments'          => null,
-            'createButtonItems' => $this->getCreateButtonItems($user, $urlHelper, $elementHelper, $params),
+            'createButtonItems' => $this->getCreateButtonItems($user, $urlHelper, $params, $i18n),
             'primaryEntity'     => $this->getPrimaryEntityData($stack, $params, $urlHelper),
         ];
     }
@@ -126,8 +134,8 @@ class BarWidget extends AbstractAdminWidget
     /**
      * @param \BetaKiller\Model\UserInterface                 $user
      * @param \BetaKiller\Helper\UrlHelper                    $urlHelper
-     * @param \BetaKiller\Helper\UrlElementHelper             $elementHelper
      * @param \BetaKiller\Url\Container\UrlContainerInterface $params
+     * @param \BetaKiller\Helper\I18nHelper                   $i18n
      *
      * @return array
      * @throws \BetaKiller\Factory\FactoryException
@@ -138,8 +146,8 @@ class BarWidget extends AbstractAdminWidget
     protected function getCreateButtonItems(
         UserInterface $user,
         UrlHelper $urlHelper,
-        UrlElementHelper $elementHelper,
-        UrlContainerInterface $params
+        UrlContainerInterface $params,
+        I18nHelper $i18n
     ): array {
         $items       = [];
         $urlElements = $this->tree->getIFacesByActionAndZone(CrudlsActionsInterface::ACTION_CREATE,
@@ -151,7 +159,7 @@ class BarWidget extends AbstractAdminWidget
             }
 
             $items[] = [
-                'label' => $elementHelper->getLabel($urlElement, $params),
+                'label' => $this->elementHelper->getLabel($urlElement, $params, $i18n),
                 'url'   => $urlHelper->makeUrl($urlElement),
             ];
         }

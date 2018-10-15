@@ -5,8 +5,6 @@ namespace BetaKiller\Middleware;
 
 use BetaKiller\Dev\Profiler;
 use BetaKiller\DI\ContainerInterface;
-use BetaKiller\Helper\ServerRequestHelper;
-use BetaKiller\Helper\UrlElementHelper;
 use BetaKiller\Helper\UrlHelper;
 use BetaKiller\Url\Container\ResolvingUrlContainer;
 use BetaKiller\Url\Container\UrlContainerInterface;
@@ -46,7 +44,6 @@ class UrlHelperMiddleware implements MiddlewareInterface
     {
         $pack = Profiler::begin($request, 'UrlHelper middleware');
 
-        $i18n   = ServerRequestHelper::getI18n($request);
         $params = ResolvingUrlContainer::create();
         $stack  = new UrlElementStack($params);
 
@@ -56,17 +53,11 @@ class UrlHelperMiddleware implements MiddlewareInterface
             'params' => $params,
         ]);
 
-        /** @var UrlElementHelper $urlElementHelper */
-        $urlElementHelper = $this->container->make(UrlElementHelper::class, [
-            'i18n' => $i18n,
-        ]);
-
         /** @noinspection CallableParameterUseCaseInTypeContextInspection */
         $request = $request
             ->withAttribute(UrlElementStack::class, $stack)
             ->withAttribute(UrlContainerInterface::class, $params)
-            ->withAttribute(UrlHelper::class, $urlHelper)
-            ->withAttribute(UrlElementHelper::class, $urlElementHelper);
+            ->withAttribute(UrlHelper::class, $urlHelper);
 
         Profiler::end($pack);
 
