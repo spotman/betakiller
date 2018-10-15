@@ -2,7 +2,7 @@
 
 require('babel-polyfill');
 require('jquery');
-require('betakiller-wamp-js');
+import BetakillerWampFacade from '@betakiller/wamp-wrapper';
 import HtmlNodes from './HtmlNodes';
 import Stopwatch from './Stopwatch';
 import TestWampRpcTestResult from './TestWampRpcTestResult';
@@ -102,13 +102,13 @@ class TestWampRpcTest {
       .incConnectionTry();
 
     try {
+      this.stopwatch.start('wampConnection');
+
       this.wampConnection = new BetakillerWampFacade(
         () => this._onWampConnect(false),
         (data) => this._onWampConnect(true, data),
         true
       );
-
-      this.stopwatch.start('wampConnection');
       this.wampConnection.connect();
 
     } catch (error) {
