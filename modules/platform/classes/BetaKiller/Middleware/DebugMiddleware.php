@@ -13,8 +13,10 @@ use DebugBar\DataCollector\TimeDataCollector;
 use DebugBar\DebugBar;
 use DebugBar\Storage\FileStorage;
 use PhpMiddleware\PhpDebugBar\PhpDebugBarMiddleware;
+use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
@@ -26,13 +28,30 @@ class DebugMiddleware implements MiddlewareInterface
     private $logger;
 
     /**
+     * @var \Psr\Http\Message\ResponseFactoryInterface
+     */
+    private $responseFactory;
+
+    /**
+     * @var \Psr\Http\Message\StreamFactoryInterface
+     */
+    private $streamFactory;
+
+    /**
      * DebugMiddleware constructor.
      *
-     * @param \BetaKiller\Log\Logger $logger
+     * @param \BetaKiller\Log\Logger                     $logger
+     * @param \Psr\Http\Message\ResponseFactoryInterface $responseFactory
+     * @param \Psr\Http\Message\StreamFactoryInterface   $streamFactory
      */
-    public function __construct(Logger $logger)
-    {
-        $this->logger = $logger;
+    public function __construct(
+        Logger $logger,
+        ResponseFactoryInterface $responseFactory,
+        StreamFactoryInterface $streamFactory
+    ) {
+        $this->logger          = $logger;
+        $this->responseFactory = $responseFactory;
+        $this->streamFactory   = $streamFactory;
     }
 
     /**
@@ -68,7 +87,7 @@ class DebugMiddleware implements MiddlewareInterface
 
         // Prepare renderer
         $renderer   = $debugBar->getJavascriptRenderer('/phpDebugBar');
-        $middleware = new PhpDebugBarMiddleware($renderer);
+        $middleware = new PhpDebugBarMiddleware($renderer, $this->responseFactory, $this->streamFactory);
 
         // Forward call
         return $middleware->process($request, $handler);

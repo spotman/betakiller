@@ -76,7 +76,7 @@ class PostItem extends AbstractAdminBase
      * @param \Psr\Http\Message\ServerRequestInterface $request
      *
      * @return array
-     * @throws \BetaKiller\Assets\AssetsException
+     * @throws \BetaKiller\Assets\Exception\AssetsException
      * @throws \BetaKiller\Assets\AssetsStorageException
      * @throws \BetaKiller\Exception\NotFoundHttpException
      * @throws \BetaKiller\Factory\FactoryException

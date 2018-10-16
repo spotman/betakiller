@@ -5,6 +5,7 @@ use BetaKiller\Assets\Handler\AssetsHandlerInterface;
 use BetaKiller\Assets\Model\AssetsModelInterface;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Repository\RepositoryInterface;
+use Psr\Http\Message\UploadedFileInterface;
 
 interface AssetsProviderInterface
 {
@@ -133,14 +134,13 @@ interface AssetsProviderInterface
     /**
      * Process uploaded file
      *
-     * @param array                           $_file    Item from $_FILES
-     * @param array                           $postData Array with items from $_POST
-     * @param \BetaKiller\Model\UserInterface $user
+     * @param \Psr\Http\Message\UploadedFileInterface $file
+     * @param array                                   $postData Array with items from $_POST
+     * @param \BetaKiller\Model\UserInterface         $user
      *
      * @return AssetsModelInterface
-     * @throws \BetaKiller\Assets\AssetsProviderException
      */
-    public function upload(array $_file, array $postData, UserInterface $user): AssetsModelInterface;
+    public function upload(UploadedFileInterface $file, array $postData, UserInterface $user): AssetsModelInterface;
 
     /**
      * Store regular file
@@ -177,7 +177,7 @@ interface AssetsProviderInterface
      * @param $url
      *
      * @return AssetsModelInterface
-     * @throws \BetaKiller\Assets\AssetsProviderException
+     * @throws \BetaKiller\Assets\Exception\AssetsProviderException
      */
     public function getModelByPublicUrl(string $url): AssetsModelInterface;
 

@@ -6,9 +6,14 @@ use BetaKiller\Session\SessionStorageInterface;
 use BetaKiller\Url\Container\UrlContainerInterface;
 use BetaKiller\Url\UrlElementStack;
 use Psr\Http\Message\ResponseFactoryInterface;
+use Psr\Http\Message\StreamFactoryInterface;
 use Zend\Diactoros\Response\TextResponse;
 use Zend\Diactoros\ResponseFactory;
+use Zend\Diactoros\StreamFactory;
 use Zend\Expressive\Router\FastRouteRouter;
+use Zend\Expressive\Router\Middleware\ImplicitHeadMiddleware;
+use Zend\Expressive\Router\Middleware\ImplicitOptionsMiddleware;
+use Zend\Expressive\Router\Middleware\MethodNotAllowedMiddleware;
 use Zend\Expressive\Router\RouterInterface;
 use Zend\Expressive\Session\SessionPersistenceInterface;
 use Zend\HttpHandlerRunner\Emitter\EmitterInterface;
@@ -29,6 +34,7 @@ return [
         EmitterInterface::class         => \DI\autowire(SapiStreamEmitter::class),
         MiddlewarePipeInterface::class  => \DI\autowire(MiddlewarePipe::class),
         ResponseFactoryInterface::class => \DI\autowire(ResponseFactory::class),
+        StreamFactoryInterface::class   => \DI\autowire(StreamFactory::class),
 
         RequestHandlerRunner::class => \DI\factory(function (
             MiddlewarePipeInterface $pipe,
@@ -49,21 +55,43 @@ return [
             );
         }),
 
+        ImplicitHeadMiddleware::class => \DI\factory(function (
+            RouterInterface $router,
+            StreamFactoryInterface $factory
+        ) {
+            return new ImplicitHeadMiddleware($router, function () use ($factory) {
+                return $factory;
+            });
+        }),
+
+        ImplicitOptionsMiddleware::class => \DI\factory(function (StreamFactoryInterface $factory) {
+            return new ImplicitOptionsMiddleware(function () use ($factory) {
+                return $factory;
+            });
+        }),
+
+        MethodNotAllowedMiddleware::class => \DI\factory(function (StreamFactoryInterface $factory) {
+            return new MethodNotAllowedMiddleware(function () use ($factory) {
+                return $factory;
+            });
+        }),
+
+
         SessionStorageInterface::class     => DI\autowire(DatabaseSessionStorage::class),
         SessionPersistenceInterface::class => DI\get(SessionStorageInterface::class),
 
         // Deprecated DI objects
         // UrlHelper is used via Container::make() method and can not be deprecated
         UrlElementStack::class             => \DI\factory(function () {
-            throw new LogicException('UrlElementStack DI injection deprecated');
+            throw new LogicException(UrlElementStack::class.' DI injection deprecated, use ServerRequestHelper::getUrlElementStack()');
         }),
 
         UrlContainerInterface::class => \DI\factory(function () {
-            throw new LogicException('UrlContainerInterface DI injection deprecated');
+            throw new LogicException(UrlContainerInterface::class.' DI injection deprecated, use ServerRequestHelper::getUrlContainer() instead');
         }),
 
         I18nHelper::class => \DI\factory(function () {
-            throw new \BetaKiller\Exception(I18nHelper::class.' DI injection deprecated');
+            throw new \BetaKiller\Exception(I18nHelper::class.' DI injection deprecated, use ServerRequestHelper::getI18n() instead');
         }),
     ],
 

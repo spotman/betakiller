@@ -268,13 +268,13 @@ class TwigExtension extends Twig_Extension
      */
     public function getLinkToStaticFile(string $filename): string
     {
-        return StaticFile::instance()->getLink($filename);
+        return StaticFile::instance()->getFullUrl($filename);
     }
 
     /**
      * Helper for adding assets
      *
-     * @throws \BetaKiller\Assets\AssetsException
+     * @throws \BetaKiller\Assets\Exception\AssetsException
      */
     public function assets(): void
     {

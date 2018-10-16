@@ -189,7 +189,7 @@ class ImageShortcode extends AbstractContentElementShortcode
      * @return array
      * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\Assets\AssetsStorageException
-     * @throws \BetaKiller\Assets\AssetsException
+     * @throws \BetaKiller\Assets\Exception\AssetsException
      * @throws \BetaKiller\Content\Shortcode\ShortcodeException
      */
     public function getWidgetData(): array
@@ -318,7 +318,7 @@ class ImageShortcode extends AbstractContentElementShortcode
      * Return array of allowed mime-types
      *
      * @return string[]
-     * @throws \BetaKiller\Assets\AssetsException
+     * @throws \BetaKiller\Assets\Exception\AssetsException
      */
     public function getEditorItemAllowedMimeTypes(): array
     {

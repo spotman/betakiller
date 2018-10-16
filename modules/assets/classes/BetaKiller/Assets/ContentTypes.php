@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\Assets;
 
+use BetaKiller\Assets\Exception\AssetsException;
 use Mimey\MimeMappingBuilder;
 use Mimey\MimeTypes;
 
@@ -34,7 +35,7 @@ class ContentTypes
     }
 
     /**
-     * Detect mime type from file content
+     * Detect mime type from file content (secure, can be used for uploaded files)
      *
      * @param string $path
      *
@@ -48,10 +49,22 @@ class ContentTypes
     }
 
     /**
+     * Get mime-type from file extension (insecure, do not use it on uploaded files)
+     *
+     * @param string $ext
+     *
+     * @return string
+     */
+    public function getExtensionMimeType(string $ext): string
+    {
+        return $this->mimey->getMimeType($ext);
+    }
+
+    /**
      * @param string $mimeType
      *
      * @return array
-     * @throws \BetaKiller\Assets\AssetsException
+     * @throws \BetaKiller\Assets\Exception\AssetsException
      */
     public function getExtensions(string $mimeType): array
     {
@@ -68,7 +81,7 @@ class ContentTypes
      * @param string $mimeType
      *
      * @return string
-     * @throws \BetaKiller\Assets\AssetsException
+     * @throws \BetaKiller\Assets\Exception\AssetsException
      */
     public function getPrimaryExtension(string $mimeType): string
     {

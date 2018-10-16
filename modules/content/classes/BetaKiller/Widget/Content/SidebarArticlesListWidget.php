@@ -33,7 +33,7 @@ abstract class SidebarArticlesListWidget extends AbstractPublicWidget
      * @param array                                    $context
      *
      * @return array
-     * @throws \BetaKiller\Assets\AssetsException
+     * @throws \BetaKiller\Assets\Exception\AssetsException
      * @throws \BetaKiller\Assets\AssetsStorageException
      * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\IFace\Exception\UrlElementException

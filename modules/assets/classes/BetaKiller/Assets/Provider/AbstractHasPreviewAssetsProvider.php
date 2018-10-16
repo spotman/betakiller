@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\Assets\Provider;
 
-use BetaKiller\Assets\AssetsProviderException;
+use BetaKiller\Assets\Exception\AssetsProviderException;
 use BetaKiller\Assets\Model\AssetsModelInterface;
 
 abstract class AbstractHasPreviewAssetsProvider extends AbstractAssetsProvider implements HasPreviewProviderInterface
@@ -13,7 +13,7 @@ abstract class AbstractHasPreviewAssetsProvider extends AbstractAssetsProvider i
      * @param string               $size 300x200
      *
      * @return string
-     * @throws \BetaKiller\Assets\AssetsException
+     * @throws \BetaKiller\Assets\Exception\AssetsException
      * @throws AssetsProviderException
      */
     public function getPreviewUrl(AssetsModelInterface $model, ?string $size = null): string
@@ -28,7 +28,7 @@ abstract class AbstractHasPreviewAssetsProvider extends AbstractAssetsProvider i
      * @param string $size
      *
      * @return string
-     * @throws \BetaKiller\Assets\AssetsProviderException
+     * @throws \BetaKiller\Assets\Exception\AssetsProviderException
      */
     protected function determinePreviewSize(?string $size): string
     {
@@ -76,7 +76,7 @@ abstract class AbstractHasPreviewAssetsProvider extends AbstractAssetsProvider i
     /**
      * @param $size
      *
-     * @throws \BetaKiller\Assets\AssetsProviderException
+     * @throws \BetaKiller\Assets\Exception\AssetsProviderException
      */
     protected function checkPreviewSize($size): void
     {

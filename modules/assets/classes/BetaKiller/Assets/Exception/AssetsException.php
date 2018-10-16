@@ -1,5 +1,5 @@
 <?php
-namespace BetaKiller\Assets;
+namespace BetaKiller\Assets\Exception;
 
 use BetaKiller\Exception;
 

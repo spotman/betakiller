@@ -14,6 +14,6 @@ return array (
   'Preview is not allowed' => 'Предпросмотр не разрешён',
   'Can not create path :dir' => 'Невозможно создать директорию :dir',
   'You may upload files with :ext extensions only' => 'Вы можете загружать только файлы с расширениями :ext',
-  'Incorrect file, upload rejected' => 'Файл некорректен, загрузка отменена',
+  'assets.upload.error' => 'Файл некорректен, загрузка отменена',
   'Upload is not allowed' => 'Загрузка не разрешена',
 );
