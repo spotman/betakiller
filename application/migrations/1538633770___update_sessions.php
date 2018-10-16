@@ -1,47 +1,51 @@
 <?php
 
-class Migration1538633770_Update_Sessions extends Migration {
+class Migration1538633770_Update_Sessions extends Migration
+{
 
-	/**
-	 * Returns migration ID
-	 *
-	 * @return integer
-	 */
-	public function id(): int
-	{
-		return 1538633770;
-	}
+    /**
+     * Returns migration ID
+     *
+     * @return integer
+     */
+    public function id(): int
+    {
+        return 1538633770;
+    }
 
-	/**
-	 * Returns migration name
-	 *
-	 * @return string
-	 */
-	public function name(): string
-	{
-		return 'Update_sessions';
-	}
+    /**
+     * Returns migration name
+     *
+     * @return string
+     */
+    public function name(): string
+    {
+        return 'Update_sessions';
+    }
 
-	/**
-	 * Returns migration info
-	 *
-	 * @return string
-	 */
-	public function description(): string
-	{
-		return '';
-	}
+    /**
+     * Returns migration info
+     *
+     * @return string
+     */
+    public function description(): string
+    {
+        return '';
+    }
 
-	/**
-	 * Takes a migration
-	 *
-	 * @return void
-	 */
-	public function up(): void
-	{
-	    if (!$this->tableExists('users_sessions')) {
-	        // Remove users.session_id
-            $this->runSql('ALTER TABLE `users` DROP FOREIGN KEY `users_ibfk_11`, DROP `session_id`;');
+    /**
+     * Takes a migration
+     *
+     * @return void
+     */
+    public function up(): void
+    {
+        if ($this->tableExists('user_tokens')) {
+
+            if ($this->tableHasColumn('users', 'session_id')) {
+                // Remove users.session_id
+                $this->runSql('ALTER TABLE `users` DROP FOREIGN KEY `users_ibfk_11`, DROP `session_id`;');
+            }
 
             // Remove all records
             $this->runSql('DELETE FROM `sessions`;');
@@ -59,17 +63,15 @@ ADD FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON UPDATE CASCADE ON DELET
             // Remove user_tokens
             $this->runSql('DROP TABLE `user_tokens`;');
         }
+    }
 
-	}
-
-	/**
-	 * Removes migration
-	 *
-	 * @return void
-	 */
-	public function down(): void
-	{
-
-	}
+    /**
+     * Removes migration
+     *
+     * @return void
+     */
+    public function down(): void
+    {
+    }
 
 } // End Migration1538633770_Update_Sessions
