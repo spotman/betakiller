@@ -146,10 +146,12 @@ class TestWampRpcTest {
 
   _onWampConnectReject(data) {
     let reason            = 'error';
+    let detailReason      = 'unknown';
     let reconnectionState = 'unknown';
     let isClosedByClient  = false;
     if (data.hasOwnProperty('reason')) {
       reason            = data.reason;
+      detailReason      = data.detailReason;
       reconnectionState = data.reconnectionState;
       isClosedByClient  = data.isClosedByClient;
     }
@@ -161,7 +163,8 @@ class TestWampRpcTest {
       if (data.hasOwnProperty('reason')) {
         console.error(
           `Test. WAMP connection. Error:`,
-          `Reason "${data.reason}".`,
+          `Reason "${reason}".`,
+          `detailReason "${detailReason}".`,
           `Data:`, data
         );
       } else {
