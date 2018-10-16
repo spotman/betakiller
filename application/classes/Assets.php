@@ -1,6 +1,6 @@
 <?php
 
-use BetaKiller\Assets\AssetsException;
+use BetaKiller\Assets\Exception\AssetsException;
 use BetaKiller\Config\ConfigProviderInterface;
 
 /**
@@ -46,7 +46,7 @@ class Assets
      * @param string $name
      *
      * @return $this
-     * @throws \BetaKiller\Assets\AssetsException
+     * @throws \BetaKiller\Assets\Exception\AssetsException
      */
     public function add(string $name): Assets
     {
@@ -76,7 +76,7 @@ class Assets
 
     /**
      * @return array
-     * @throws \BetaKiller\Assets\AssetsException
+     * @throws \BetaKiller\Assets\Exception\AssetsException
      */
     protected function config(): array
     {
@@ -96,7 +96,7 @@ class Assets
      * @param string                 $methodName
      * @param mixed                  $files
      *
-     * @throws \BetaKiller\Assets\AssetsException
+     * @throws \BetaKiller\Assets\Exception\AssetsException
      */
     protected function processStatic(CommonStaticInterface $object, string $methodName, $files): void
     {

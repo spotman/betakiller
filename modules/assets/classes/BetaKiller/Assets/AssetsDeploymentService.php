@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\Assets;
 
+use BetaKiller\Assets\Exception\AssetsProviderException;
 use BetaKiller\Assets\Model\AssetsModelInterface;
 use BetaKiller\Assets\Provider\AssetsProviderInterface;
 use BetaKiller\Helper\AppEnvInterface;
@@ -32,7 +33,7 @@ class AssetsDeploymentService
      * @param null|string                                         $suffix
      *
      * @return bool
-     * @throws \BetaKiller\Assets\AssetsProviderException
+     * @throws \BetaKiller\Assets\Exception\AssetsProviderException
      */
     public function deploy(
         AssetsProviderInterface $provider,

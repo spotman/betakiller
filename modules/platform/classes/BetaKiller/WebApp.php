@@ -3,6 +3,13 @@ declare(strict_types=1);
 
 namespace BetaKiller;
 
+use BetaKiller\Assets\Middleware\DownloadMiddleware;
+use BetaKiller\Assets\Middleware\OriginalMiddleware;
+use BetaKiller\Assets\Middleware\PreviewMiddleware;
+use BetaKiller\Assets\Middleware\UploadMiddleware;
+use BetaKiller\Assets\Model\AssetsModelImageInterface;
+use BetaKiller\Assets\Provider\AssetsProviderInterface;
+use BetaKiller\Assets\Provider\ImageAssetsProviderInterface;
 use BetaKiller\Middleware\ContentNegotiationMiddleware;
 use BetaKiller\Middleware\DebugMiddleware;
 use BetaKiller\Middleware\ErrorPageMiddleware;
@@ -17,9 +24,14 @@ use BetaKiller\Middleware\UrlHelperMiddleware;
 use BetaKiller\Middleware\UserMiddleware;
 use Middlewares\ContentType;
 use Psr\Http\Message\ResponseInterface;
+use Spotman\Api\ApiRequestHandler;
+use StaticFilesDeployHandler;
 use Zend\Diactoros\Response\TextResponse;
 use Zend\Expressive\Application;
 use Zend\Expressive\Router\Middleware\DispatchMiddleware;
+use Zend\Expressive\Router\Middleware\ImplicitHeadMiddleware;
+use Zend\Expressive\Router\Middleware\ImplicitOptionsMiddleware;
+use Zend\Expressive\Router\Middleware\MethodNotAllowedMiddleware;
 use Zend\Expressive\Router\Middleware\RouteMiddleware;
 use Zend\Expressive\Session\SessionMiddleware;
 
@@ -45,10 +57,8 @@ class WebApp
         // Initialize middleware stack
         $this->addPipeline();
 
-        $this->addRoutes();
-
         // Get all routes
-        // Compose router
+        $this->addRoutes($this->app);
 
         $this->app->run();
     }
@@ -59,7 +69,7 @@ class WebApp
         // all Exceptions.
 //        $this->app->pipe(ErrorHandler::class);
 //        $this->app->pipe(ServerUrlMiddleware::class);
-        // TODO Insert here fallback Exception handler
+        // TODO Insert here fallback Exception handler with plain text 500 response
 
         // Pipe more middleware here that you want to execute on every request:
         // - bootstrapping
@@ -110,9 +120,9 @@ class WebApp
         // - method not allowed
         // Order here matters; the MethodNotAllowedMiddleware should be placed
         // after the Implicit*Middleware.
-//        $app->pipe(ImplicitHeadMiddleware::class);
-//        $app->pipe(ImplicitOptionsMiddleware::class);
-//        $this->app->pipe(MethodNotAllowedMiddleware::class);
+        $this->app->pipe(ImplicitHeadMiddleware::class);
+        $this->app->pipe(ImplicitOptionsMiddleware::class);
+        $this->app->pipe(MethodNotAllowedMiddleware::class);
 
         // Seed the UrlHelper with the routing results:
 //        $app->pipe(UrlHelperMiddleware::class);
@@ -134,9 +144,61 @@ class WebApp
         $this->app->pipe(UrlElementRenderMiddleware::class);
     }
 
-    private function addRoutes(): void
+    private function addRoutes(Application $app): void
     {
-        $this->app->get('/sitemap.xml', SitemapRequestHandler::class);
+        $app->get('/sitemap.xml', SitemapRequestHandler::class);
+
+        // Assets
+        $extRegexp  = '[a-z]{2,}'; // (jpg|jpeg|gif|png)
+        $sizeRegexp = '[0-9]{0,3}'.AssetsModelImageInterface::SIZE_DELIMITER.'[0-9]{0,3}';
+
+        $itemPlace = '{item:.+}';
+        $sizePlace = '-{size:'.$sizeRegexp.'}';
+        $extPlace  = '.{ext:'.$extRegexp.'}';
+
+        $uploadAction   = AssetsProviderInterface::ACTION_UPLOAD;
+        $downloadAction = AssetsProviderInterface::ACTION_DOWNLOAD;
+        $originalAction = AssetsProviderInterface::ACTION_ORIGINAL;
+        $deleteAction   = AssetsProviderInterface::ACTION_DELETE;
+        $previewAction  = ImageAssetsProviderInterface::ACTION_PREVIEW;
+
+        /**
+         * Upload file via concrete provider
+         *
+         * "assets/<provider>/upload"
+         */
+        $app->post(
+            '/assets/{provider}/'.$uploadAction,
+            UploadMiddleware::class
+        );
+
+        /**
+         * Download original file via concrete provider
+         */
+        $app->get('/assets/{provider}/'.$itemPlace.'/'.$downloadAction.$extPlace, DownloadMiddleware::class);
+
+        /**
+         * Get original files via concrete provider
+         */
+        $app->get('/assets/{provider}/'.$itemPlace.'/'.$originalAction.$extPlace, OriginalMiddleware::class);
+
+        /**
+         * Preview files via concrete provider
+         */
+        $app->get('/assets/{provider}/'.$itemPlace.'/'.$previewAction.$sizePlace.$extPlace, PreviewMiddleware::class);
+
+        /**
+         * Delete files via concrete provider
+         */
+        $app->get('/assets/{provider}/'.$itemPlace.'/'.$deleteAction.$sizePlace.$extPlace, PreviewMiddleware::class);
+
+        /**
+         * Static files legacy route
+         */
+        $app->get('/assets/static/{file:.+}', StaticFilesDeployHandler::class);
+
+        // API HTTP gate
+        $app->post('/api/v{version:\d+}/{type:\s+}', ApiRequestHandler::class);
     }
 
     public function processException(\Throwable $e): ResponseInterface
