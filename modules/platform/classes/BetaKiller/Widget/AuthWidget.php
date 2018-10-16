@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace BetaKiller\Widget;
 
 use BetaKiller\Config\ConfigProviderInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
 class AuthWidget extends AbstractPublicWidget
 {
@@ -27,10 +28,14 @@ class AuthWidget extends AbstractPublicWidget
     /**
      * Returns data for View rendering
      *
+     * @param \Psr\Http\Message\ServerRequestInterface $request
+     *
+     * @param array                                    $context
+     *
      * @return array
-     * @throws WidgetException
+     * @throws \BetaKiller\Widget\WidgetException
      */
-    public function getData(): array
+    public function getData(ServerRequestInterface $request, array $context): array
     {
         $providers = $this->config->load(['auth', 'providers']);
 

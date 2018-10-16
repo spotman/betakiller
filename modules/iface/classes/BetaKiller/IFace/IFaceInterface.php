@@ -2,6 +2,7 @@
 namespace BetaKiller\IFace;
 
 use BetaKiller\Url\IFaceModelInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
 interface IFaceInterface
 {
@@ -13,26 +14,28 @@ interface IFaceInterface
     /**
      * Returns data for View
      *
+     * @param \Psr\Http\Message\ServerRequestInterface $request
+     *
      * @return array
      */
-    public function getData(): array;
+    public function getData(ServerRequestInterface $request): array;
 
     /**
-     * @param \DateTimeInterface $lastModified
+     * @param \DateTimeImmutable $lastModified
      *
      * @return $this
      */
-    public function setLastModified(\DateTimeInterface $lastModified): self;
+    public function setLastModified(\DateTimeImmutable $lastModified): self;
 
     /**
-     * @return \DateTimeInterface
+     * @return \DateTimeImmutable
      */
-    public function getLastModified(): \DateTimeInterface;
+    public function getLastModified(): \DateTimeImmutable;
 
     /**
-     * @return \DateTimeInterface
+     * @return \DateTimeImmutable
      */
-    public function getDefaultLastModified(): \DateTimeInterface;
+    public function getDefaultLastModified(): \DateTimeImmutable;
 
     /**
      * @return \DateInterval
@@ -52,9 +55,9 @@ interface IFaceInterface
     public function getExpiresInterval(): \DateInterval;
 
     /**
-     * @return \DateTimeInterface
+     * @return \DateTimeImmutable
      */
-    public function getExpiresDateTime(): \DateTimeInterface;
+    public function getExpiresDateTime(): \DateTimeImmutable;
 
     /**
      * @return int

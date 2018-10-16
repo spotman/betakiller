@@ -1,8 +1,15 @@
 <?php
 namespace BetaKiller\Auth;
 
-class AccessDeniedException extends \HTTP_Exception_403
+use BetaKiller\Exception\HttpException;
+
+class AccessDeniedException extends HttpException
 {
+    public function __construct()
+    {
+        parent::__construct(403);
+    }
+
     /**
      * Returns default message for current exception
      * Allows throwing concrete exception without message

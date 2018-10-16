@@ -1,33 +1,25 @@
 define([
-    "auth.widget"
-], function(widget){
+  "auth.widget"
+], function (widget) {
 
-    return {
+  return {
 
-        initialize: function($container) {
+    initialize: function ($container) {
+      var readyCallback = function () {
+      };
 
-          var redirectURL = $container.data("redirect-url");
+      var successfulCallback = function () {
+        // Всё в порядке, перенаправляем пользователя
+        location.reload(true);
+      };
 
-            var readyCallback = function(){};
+      widget.initialize(
+        $container,
+        readyCallback,
+        successfulCallback
+      );
+    }
 
-            var successfulCallback = function() {
-                // Всё в порядке, перенаправляем пользователя
-                if (redirectURL) {
-                    location.href = redirectURL;
-                } else {
-                    location.reload(true);
-                }
-            };
-
-            widget.initialize(
-                $container,
-                readyCallback,
-                successfulCallback
-            );
-
-
-        }
-
-    };
+  };
 
 });

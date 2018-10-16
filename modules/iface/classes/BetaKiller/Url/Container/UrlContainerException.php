@@ -1,6 +1,6 @@
 <?php
 namespace BetaKiller\Url\Container;
 
-use BetaKiller\IFace\Exception\IFaceException;
+use BetaKiller\IFace\Exception\UrlElementException;
 
-class UrlContainerException extends IFaceException {}
+class UrlContainerException extends UrlElementException {}

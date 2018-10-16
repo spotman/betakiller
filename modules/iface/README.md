@@ -29,7 +29,7 @@ Dynamic URL elements are mapped to an Entity and are using Entity's codename wit
 They may represent a tree (like `/<parentCategory>/<childCategory>/`) and URL will be processed respectively.
 Detected Entities are collected into `UrlContainerInterface` instance which can be injected into dedicated `IFace` or `WebHook` class.
 
-URLs are not only parsed but can be constructed from any `UrlElement` by an `IFaceHelper::makeUrl()` method.
+URLs are not only parsed but can be constructed from any `UrlElement` by an `UrlElementHelper::makeUrl()` method.
 All you need is IFace instance (or its model) and the set of Entities placed inside `UrlContainerInterface`.
 Missing Entities will be fetched from the current HTTP request. They may be detected on the fly from Entity's relations but this is not recommended due to a performance leak.
 
@@ -54,8 +54,8 @@ Example:
 
 Now you'll be able to generate URL for editing `Post` entity right from it's instance!
 
-- public URL via `IFaceHelper::getReadEntityUrl($entity, ZoneInterface::PUBLIC)`
-- admin editing URL via `IFaceHelper::getReadEntityUrl($entity, ZoneInterface::ADMIN)`
+- public URL via `UrlElementHelper::getReadEntityUrl($entity, ZoneInterface::PUBLIC)`
+- admin editing URL via `UrlElementHelper::getReadEntityUrl($entity, ZoneInterface::ADMIN)`
 
 You may omit zone constant if you are creating a URL for current iface's zone. For different zone you need to pass it anyway.
 

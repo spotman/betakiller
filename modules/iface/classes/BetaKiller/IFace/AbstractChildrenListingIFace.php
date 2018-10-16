@@ -1,32 +1,51 @@
 <?php
 namespace BetaKiller\IFace;
 
+use BetaKiller\Helper\ServerRequestHelper;
+use BetaKiller\Helper\UrlElementHelper;
 use BetaKiller\Url\IFaceModelInterface;
+use BetaKiller\Url\UrlElementTreeInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
 abstract class AbstractChildrenListingIFace extends AbstractIFace
 {
     /**
-     * @Inject
      * @var \BetaKiller\Url\UrlElementTreeInterface
      */
     private $tree;
 
     /**
-     * @Inject
-     * @var \BetaKiller\Helper\IFaceHelper
+     * @var \BetaKiller\Helper\UrlElementHelper
      */
-    private $ifaceHelper;
+    private $elementHelper;
+
+    /**
+     * AbstractChildrenListingIFace constructor.
+     *
+     * @param \BetaKiller\Url\UrlElementTreeInterface $tree
+     * @param \BetaKiller\Helper\UrlElementHelper     $elementHelper
+     */
+    public function __construct(UrlElementTreeInterface $tree, UrlElementHelper $elementHelper)
+    {
+        $this->tree          = $tree;
+        $this->elementHelper = $elementHelper;
+    }
 
     /**
      * Returns data for View
-     * Override this method in child classes
+     *
+     * @param \Psr\Http\Message\ServerRequestInterface $request
      *
      * @return array
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
      * @throws \BetaKiller\Url\UrlPrototypeException
-     * @throws \BetaKiller\IFace\Exception\IFaceException
      */
-    public function getData(): array
+    public function getData(ServerRequestInterface $request): array
     {
+        $params    = ServerRequestHelper::getUrlContainer($request);
+        $urlHelper = ServerRequestHelper::getUrlHelper($request);
+        $i18n      = ServerRequestHelper::getI18n($request);
+
         $data = [];
 
         foreach ($this->tree->getChildren($this->getModel()) as $urlElement) {
@@ -36,9 +55,9 @@ abstract class AbstractChildrenListingIFace extends AbstractIFace
             }
 
             $data[] = [
-                'label'    => $this->ifaceHelper->getLabel($urlElement),
+                'label'    => $this->elementHelper->getLabel($urlElement, $params, $i18n),
                 'codename' => $urlElement->getCodename(),
-                'url'      => $this->ifaceHelper->makeUrl($urlElement),
+                'url'      => $urlHelper->makeUrl($urlElement),
             ];
         }
 

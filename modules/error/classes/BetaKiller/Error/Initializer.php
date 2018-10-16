@@ -1,7 +1,6 @@
 <?php
 namespace BetaKiller\Error;
 
-use BetaKiller\Exception\ExceptionHandlerInterface;
 use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\Log\LazyLoadProxyHandler;
 use BetaKiller\Log\LoggerInterface;
@@ -30,28 +29,20 @@ class Initializer implements ModuleInitializerInterface
     private $container;
 
     /**
-     * @var \BetaKiller\Exception\ExceptionHandlerInterface
-     */
-    private $handler;
-
-    /**
      * Initializer constructor.
      *
-     * @param \Psr\Container\ContainerInterface               $container
-     * @param \BetaKiller\Log\LoggerInterface                 $logger
-     * @param \BetaKiller\Helper\AppEnvInterface              $appEnv
-     * @param \BetaKiller\Exception\ExceptionHandlerInterface $handler
+     * @param \Psr\Container\ContainerInterface  $container
+     * @param \BetaKiller\Log\LoggerInterface    $logger
+     * @param \BetaKiller\Helper\AppEnvInterface $appEnv
      */
     public function __construct(
         ContainerInterface $container,
         LoggerInterface $logger,
-        AppEnvInterface $appEnv,
-        ExceptionHandlerInterface $handler
+        AppEnvInterface $appEnv
     ) {
         $this->logger    = $logger;
         $this->container = $container;
         $this->appEnv    = $appEnv;
-        $this->handler   = $handler;
     }
 
     /**
@@ -68,13 +59,6 @@ class Initializer implements ModuleInitializerInterface
         } elseif ($this->appEnv->inProductionMode(true)) {
             $this->initPhpExceptionStorage();
         }
-
-        $this->registerExceptionHandler();
-    }
-
-    private function registerExceptionHandler(): void
-    {
-        \Kohana_Exception::setHandler($this->handler);
     }
 
     /**

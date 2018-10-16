@@ -10,7 +10,6 @@ return [
     'widget'                => MODPATH.'widget',                // Basic widgets support
 
     // Kohana dependencies without DB access (using Kohana config)
-    'device'                => MODPATH.'device',                // Device detection TODO Remove
     'email'                 => MODPATH.'email',                 // Mailing module
     'image'                 => MODPATH.'image',                 // Image manipulation
     'i18n-plural'           => MODPATH.'i18n-plural',           // International pluralization
@@ -28,14 +27,11 @@ return [
     'paginate'             => MODPATH.'paginate',              // Paginate abstraction for ORM, ORM-REST and others
 
     // Kohana dependencies WITH DB ACCESS
-    'auth'                 => MODPATH.'auth',                  // Basic authentication
     'backup'               => MODPATH.'backup',                // Complex backup (files + database)
     'migrations'           => MODPATH.'migrations',            // Migrations toolkit
     'unittest'             => MODPATH.'unittest',              // Module for unit testing via phpunit
 
     // These modules HAVE LEGACY ROUTES defined and DOES NOT DEPEND on platform
-    'jsonrpc'              => MODPATH.'jsonrpc',               // JSON-RPC server
-    'robots-txt'           => MODPATH.'robots-txt',            // Serving /robots.txt
     'sitemap'               => MODPATH.'sitemap',               // Generating sitemap.xml
 
     // Place it before other modules for correct initialization of per-site classes and configs
@@ -51,6 +47,7 @@ return [
     'missing-url'           => MODPATH.'missing-url',           // Catch and store missing IFace URLs
     'notification'          => MODPATH.'notification',          // Notification subsystem
     'search'                => MODPATH.'search',                // Search and filtering capabilities
+    'wamp'                  => MODPATH.'wamp',                  // WAMP protocol support (router + client)
     'webhooks'              => MODPATH.'webhooks',              // WebHooks control panel
 
     // These modules DEPENDS ON PLATFORM and HAVE LEGACY ROUTES
@@ -63,6 +60,4 @@ return [
 
     // Allow another modules to set routes
     'iface'                 => MODPATH.'iface',                 // Dynamic user interfaces
-
-    'wamp'                  => MODPATH.'wamp',
 ];

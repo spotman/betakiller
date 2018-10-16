@@ -48,7 +48,7 @@ class NotificationUserEmail implements NotificationUserInterface
      *
      * @return null|string
      */
-    public function getLanguageName(): ?string
+    public function getLanguageName(): string
     {
         return $this->langName;
     }

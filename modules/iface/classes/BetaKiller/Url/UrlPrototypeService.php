@@ -2,7 +2,7 @@
 namespace BetaKiller\Url;
 
 use BetaKiller\Exception\NotImplementedHttpException;
-use BetaKiller\IFace\Exception\IFaceException;
+use BetaKiller\IFace\Exception\UrlElementException;
 use BetaKiller\Model\DispatchableEntityInterface;
 use BetaKiller\Model\SingleParentTreeModelInterface;
 use BetaKiller\Url\Container\UrlContainerInterface;
@@ -12,11 +12,6 @@ use BetaKiller\Url\Parameter\UrlParameterInterface;
 
 class UrlPrototypeService
 {
-    /**
-     * @var \BetaKiller\Url\Container\UrlContainerInterface
-     */
-    private $urlParameters;
-
     /**
      * @var \BetaKiller\Url\UrlDataSourceFactory
      */
@@ -30,16 +25,13 @@ class UrlPrototypeService
     /**
      * UrlPrototypeService constructor.
      *
-     * @param \BetaKiller\Url\Container\UrlContainerInterface  $urlParameters
      * @param \BetaKiller\Url\UrlDataSourceFactory             $factory
      * @param \BetaKiller\Url\Parameter\RawUrlParameterFactory $rawFactory
      */
     public function __construct(
-        UrlContainerInterface $urlParameters,
         UrlDataSourceFactory $factory,
         RawUrlParameterFactory $rawFactory
     ) {
-        $this->urlParameters       = $urlParameters;
         $this->dataSourceFactory   = $factory;
         $this->rawParameterFactory = $rawFactory;
     }
@@ -48,7 +40,7 @@ class UrlPrototypeService
      * @param \BetaKiller\Url\UrlElementInterface $urlElement
      *
      * @return \BetaKiller\Url\UrlPrototype
-     * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
      * @throws \BetaKiller\Url\UrlPrototypeException
      */
     public function createPrototypeFromUrlElement(UrlElementInterface $urlElement): UrlPrototype
@@ -56,7 +48,7 @@ class UrlPrototypeService
         $uri = $urlElement->getUri();
 
         if (!$uri) {
-            throw new IFaceException('IFace :codename must have uri', [
+            throw new UrlElementException('IFace :codename must have uri', [
                 ':codename' => $urlElement->getCodename(),
             ]);
         }
@@ -76,16 +68,21 @@ class UrlPrototypeService
     }
 
     /**
-     * @param \BetaKiller\Url\UrlPrototype $prototype
-     * @param string                       $uriValue
+     * @param \BetaKiller\Url\UrlPrototype                    $prototype
+     * @param string                                          $uriValue
+     *
+     * @param \BetaKiller\Url\Container\UrlContainerInterface $params
      *
      * @return \BetaKiller\Url\Parameter\UrlParameterInterface
      * @throws \BetaKiller\Repository\RepositoryException
      * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\Url\UrlPrototypeException
      */
-    public function createParameterInstance(UrlPrototype $prototype, string $uriValue): UrlParameterInterface
-    {
+    public function createParameterInstance(
+        UrlPrototype $prototype,
+        string $uriValue,
+        UrlContainerInterface $params
+    ): UrlParameterInterface {
         // Search for model item
         if ($prototype->hasModelKey()) {
             $dataSource = $this->getDataSourceInstance($prototype);
@@ -94,7 +91,7 @@ class UrlPrototypeService
 
             return $prototype->hasIdKey()
                 ? $dataSource->findById((int)$uriValue)
-                : $dataSource->findItemByUrlKeyValue($uriValue, $this->urlParameters);
+                : $dataSource->findItemByUrlKeyValue($uriValue, $params);
         }
 
         // Plain parameter - use factory instead
@@ -154,13 +151,13 @@ class UrlPrototypeService
     }
 
     /**
-     * @param string                                               $sourceString
-     * @param \BetaKiller\Url\Container\UrlContainerInterface|null $parameters
+     * @param string                                          $sourceString
+     * @param \BetaKiller\Url\Container\UrlContainerInterface $parameters
      *
      * @return string
      * @throws \BetaKiller\Url\UrlPrototypeException
      */
-    public function replaceUrlParametersParts(string $sourceString, UrlContainerInterface $parameters = null): string
+    public function replaceUrlParametersParts(string $sourceString, UrlContainerInterface $parameters): string
     {
         return preg_replace_callback(
             UrlPrototype::REGEX,
@@ -172,13 +169,13 @@ class UrlPrototypeService
     }
 
     /**
-     * @param string                                               $proto
-     * @param \BetaKiller\Url\Container\UrlContainerInterface|null $params
+     * @param string                                          $proto
+     * @param \BetaKiller\Url\Container\UrlContainerInterface $params
      *
      * @return string
      * @throws \BetaKiller\Url\UrlPrototypeException
      */
-    public function getCompiledPrototypeValue(string $proto, ?UrlContainerInterface $params = null): string
+    public function getCompiledPrototypeValue(string $proto, UrlContainerInterface $params): string
     {
         $prototype = $this->createPrototypeFromString($proto);
 
@@ -194,7 +191,7 @@ class UrlPrototypeService
      * @return string
      * @throws \BetaKiller\Url\UrlPrototypeException
      */
-    public function getCompiledTreePrototypeValue(string $proto, ?UrlContainerInterface $params = null): string
+    public function getCompiledTreePrototypeValue(string $proto, UrlContainerInterface $params): string
     {
         $prototype = $this->createPrototypeFromString($proto);
         $parameter = $this->getParamByPrototype($prototype, $params);
@@ -217,22 +214,19 @@ class UrlPrototypeService
     }
 
     /**
-     * @param \BetaKiller\Url\UrlPrototype                         $prototype
-     * @param \BetaKiller\Url\Container\UrlContainerInterface|null $parameters
+     * @param \BetaKiller\Url\UrlPrototype                    $prototype
+     * @param \BetaKiller\Url\Container\UrlContainerInterface $parameters
      *
      * @return \BetaKiller\Url\Parameter\UrlParameterInterface
      * @throws \BetaKiller\Url\UrlPrototypeException
      */
     private function getParamByPrototype(
         UrlPrototype $prototype,
-        ?UrlContainerInterface $parameters = null
+        UrlContainerInterface $parameters
     ): UrlParameterInterface {
         $name = $prototype->getDataSourceName();
 
         $instance = $parameters ? $parameters->getParameter($name) : null;
-
-        // Inherit model from current request url parameters
-        $instance = $instance ?: $this->urlParameters->getParameter($name);
 
         if (!$instance) {
             throw new UrlPrototypeException('Can not find :name parameter', [':name' => $name]);
@@ -318,8 +312,7 @@ class UrlPrototypeService
         }
 
         if (!$prototype->hasModelKey()) {
-            // TODO RawUrlParameter processing
-            throw new NotImplementedHttpException;
+            throw new NotImplementedHttpException('RawUrlParameter processing is missing');
         }
 
         // Prototype has model key and is related to a UrlDataSource

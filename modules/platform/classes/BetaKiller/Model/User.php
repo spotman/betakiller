@@ -37,8 +37,9 @@ class User extends \ORM implements UserInterface
         ]);
 
         $this->has_many([
-            'user_tokens' => [
-                'model' => 'User_Token',
+            'sessions' => [
+                'model' => 'UserSession',
+                'foreign_key' => 'user_id',
             ],
 
             'roles' => [
@@ -286,6 +287,7 @@ class User extends \ORM implements UserInterface
      * Returns user`s language name
      *
      * @return string
+     * @throws \Kohana_Exception
      */
     public function getLanguageName(): string
     {
@@ -309,6 +311,7 @@ class User extends \ORM implements UserInterface
 
     /**
      * @return \BetaKiller\Model\LanguageInterface
+     * @throws \Kohana_Exception
      */
     public function getLanguage(): LanguageInterface
     {
@@ -328,52 +331,6 @@ class User extends \ORM implements UserInterface
 
         // Set the last login date
         $this->set('last_login', time());
-    }
-
-    /**
-     * Returns session ID if authorized and null if not
-     *
-     * @return string|null
-     */
-    public function getSessionID(): ?string
-    {
-        return $this->get('session_id');
-    }
-
-    /**
-     * Set session ID
-     *
-     * @param string $value
-     *
-     * @return \BetaKiller\Model\UserInterface
-     */
-    public function setSessionID(string $value): UserInterface
-    {
-        $this->set('session_id', $value);
-
-        return $this;
-    }
-
-    /**
-     * Remove session ID
-     *
-     * @return \BetaKiller\Model\UserInterface
-     */
-    public function clearSessionID(): UserInterface
-    {
-        $this->set('session_id', null);
-
-        return $this;
-    }
-
-    public function afterAutoLogin(): void
-    {
-        // None for now
-    }
-
-    public function beforeSignOut(): void
-    {
-        // None for now
     }
 
     /**

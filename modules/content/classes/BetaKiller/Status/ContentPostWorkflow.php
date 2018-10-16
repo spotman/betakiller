@@ -1,9 +1,10 @@
 <?php
 namespace BetaKiller\Status;
 
-use BetaKiller\Helper\IFaceHelper;
 use BetaKiller\Helper\NotificationHelper;
+use BetaKiller\Helper\UrlHelper;
 use BetaKiller\Model\UserInterface;
+use BetaKiller\Url\ZoneInterface;
 use URL;
 
 class ContentPostWorkflow extends StatusWorkflow
@@ -21,9 +22,9 @@ class ContentPostWorkflow extends StatusWorkflow
     private $notification;
 
     /**
-     * @var \BetaKiller\Helper\IFaceHelper
+     * @var \BetaKiller\Helper\UrlHelper
      */
-    private $ifaceHelper;
+    private $urlHelper;
 
     /**
      * ContentPostWorkflow constructor.
@@ -31,18 +32,18 @@ class ContentPostWorkflow extends StatusWorkflow
      * @param \BetaKiller\Status\StatusRelatedModelInterface $model
      * @param \BetaKiller\Model\UserInterface                $user
      * @param \BetaKiller\Helper\NotificationHelper          $notificationHelper
-     * @param \BetaKiller\Helper\IFaceHelper                 $ifaceHelper
+     * @param \BetaKiller\Helper\UrlHelper                   $urlHelper
      */
     public function __construct(
         StatusRelatedModelInterface $model,
         UserInterface $user,
         NotificationHelper $notificationHelper,
-        IFaceHelper $ifaceHelper
+        UrlHelper $urlHelper
     ) {
         parent::__construct($model, $user);
 
         $this->notification = $notificationHelper;
-        $this->ifaceHelper  = $ifaceHelper;
+        $this->urlHelper    = $urlHelper;
     }
 
     /**
@@ -62,7 +63,7 @@ class ContentPostWorkflow extends StatusWorkflow
 
     /**
      * @throws \BetaKiller\Notification\NotificationException
-     * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
      * @throws \BetaKiller\Status\StatusWorkflowException
      * @throws \BetaKiller\Status\StatusException
      */
@@ -79,7 +80,7 @@ class ContentPostWorkflow extends StatusWorkflow
     }
 
     /**
-     * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
      * @throws \BetaKiller\Notification\NotificationException
      */
     private function notifyModeratorAboutCompletePost(): void
@@ -87,7 +88,7 @@ class ContentPostWorkflow extends StatusWorkflow
         $model = $this->model();
 
         $this->notification->groupMessage(self::NOTIFICATION_POST_COMPLETE, [
-            'url'   => $this->ifaceHelper->getReadEntityUrl($model),
+            'url'   => $this->urlHelper->getReadEntityUrl($model, ZoneInterface::ADMIN),
             'label' => $model->getLabel(),
         ]);
     }

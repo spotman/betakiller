@@ -4,15 +4,19 @@ declare(strict_types=1);
 namespace BetaKiller\Helper;
 
 use BetaKiller\Config\AppConfigInterface;
+use BetaKiller\CrudlsActionsInterface;
 use BetaKiller\Factory\FactoryException;
-use BetaKiller\IFace\Exception\IFaceException;
+use BetaKiller\IFace\Exception\UrlElementException;
+use BetaKiller\Model\DispatchableEntityInterface;
 use BetaKiller\Url\Behaviour\UrlBehaviourFactory;
+use BetaKiller\Url\Container\ResolvingUrlContainer;
 use BetaKiller\Url\Container\UrlContainer;
 use BetaKiller\Url\Container\UrlContainerInterface;
 use BetaKiller\Url\UrlDispatcher;
 use BetaKiller\Url\UrlElementInterface;
 use BetaKiller\Url\UrlElementStack;
 use BetaKiller\Url\UrlElementTreeInterface;
+use BetaKiller\Url\ZoneInterface;
 
 class UrlHelper
 {
@@ -37,23 +41,53 @@ class UrlHelper
     private $tree;
 
     /**
+     * @var \BetaKiller\Url\Container\UrlContainerInterface
+     */
+    private $urlContainer;
+
+    /**
      * UrlHelper constructor.
      *
-     * @param \BetaKiller\Url\UrlElementTreeInterface       $tree
-     * @param \BetaKiller\Config\AppConfigInterface         $appConfig
-     * @param \BetaKiller\Url\Behaviour\UrlBehaviourFactory $behaviourFactory
-     * @param \BetaKiller\Url\UrlElementStack               $stack
+     * @param \BetaKiller\Url\UrlElementTreeInterface         $tree
+     * @param \BetaKiller\Config\AppConfigInterface           $appConfig
+     * @param \BetaKiller\Url\Behaviour\UrlBehaviourFactory   $behaviourFactory
+     * @param \BetaKiller\Url\UrlElementStack                 $stack
+     * @param \BetaKiller\Url\Container\UrlContainerInterface $params
      */
     public function __construct(
         UrlElementTreeInterface $tree,
         AppConfigInterface $appConfig,
         UrlBehaviourFactory $behaviourFactory,
-        UrlElementStack $stack
+        UrlElementStack $stack,
+        UrlContainerInterface $params
     ) {
         $this->behaviourFactory = $behaviourFactory;
         $this->appConfig        = $appConfig;
         $this->stack            = $stack;
         $this->tree             = $tree;
+        $this->urlContainer     = $params;
+    }
+
+    /**
+     * @param string $codename
+     *
+     * @return \BetaKiller\Url\UrlElementInterface
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     */
+    public function getUrlElementByCodename(string $codename): UrlElementInterface
+    {
+        return $this->tree->getByCodename($codename);
+    }
+
+    /**
+     * @param \BetaKiller\Url\UrlElementInterface                  $model
+     * @param \BetaKiller\Url\Container\UrlContainerInterface|null $params
+     *
+     * @return bool
+     */
+    public function inStack(UrlElementInterface $model, UrlContainerInterface $params = null): bool
+    {
+        return $this->stack->has($model, $params);
     }
 
     /**
@@ -62,7 +96,7 @@ class UrlHelper
      * @param bool|null                                            $removeCyclingLinks
      *
      * @return string
-     * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
      */
     public function makeUrl(
         UrlElementInterface $urlElement,
@@ -74,6 +108,12 @@ class UrlHelper
         if ($removeCyclingLinks && $this->stack->isCurrent($urlElement, $params)) {
             return $this->appConfig->getCircularLinkHref();
         }
+
+        // Use self-resolving container as default
+        $params = $params ?: ResolvingUrlContainer::create();
+
+        // Import current UrlContainer values for simplicity in the client code
+        $params->import($this->urlContainer);
 
         $parts = [];
 
@@ -92,6 +132,119 @@ class UrlHelper
         }
 
         return $this->makeAbsoluteUrl($path);
+    }
+
+    /**
+     * @param \BetaKiller\Model\DispatchableEntityInterface $entity
+     * @param string                                        $action
+     * @param string                                        $zone
+     *
+     * @param bool|null                                     $removeCycling
+     *
+     * @return string
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     */
+    public function getEntityUrl(
+        DispatchableEntityInterface $entity,
+        string $action,
+        string $zone,
+        ?bool $removeCycling = null
+    ): string {
+        $params = ResolvingUrlContainer::create();
+        $params->setParameter($entity);
+
+        // Search for URL element with provided entity, action and zone
+        $urlElement = $this->tree->getByEntityActionAndZone($entity, $action, $zone);
+
+        return $this->makeUrl($urlElement, $params, $removeCycling);
+    }
+
+    /**
+     * @param \BetaKiller\Model\DispatchableEntityInterface $entity
+     * @param string                                        $zone
+     *
+     * @return string
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     */
+    public function getCreateEntityUrl(DispatchableEntityInterface $entity, string $zone): string
+    {
+        return $this->getEntityUrl($entity, CrudlsActionsInterface::ACTION_CREATE, $zone);
+    }
+
+    /**
+     * @param \BetaKiller\Model\DispatchableEntityInterface $entity
+     * @param string                                        $zone
+     *
+     * @param bool|null                                     $removeCycling
+     *
+     * @return string
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     */
+    public function getReadEntityUrl(
+        DispatchableEntityInterface $entity,
+        string $zone,
+        ?bool $removeCycling = null
+    ): string {
+        return $this->getEntityUrl($entity, CrudlsActionsInterface::ACTION_READ, $zone, $removeCycling);
+    }
+
+    /**
+     * @param \BetaKiller\Model\DispatchableEntityInterface $entity
+     * @param string                                        $zone
+     *
+     * @return string
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     */
+    public function getUpdateEntityUrl(DispatchableEntityInterface $entity, string $zone): string
+    {
+        return $this->getEntityUrl($entity, CrudlsActionsInterface::ACTION_UPDATE, $zone);
+    }
+
+    /**
+     * @param \BetaKiller\Model\DispatchableEntityInterface $entity
+     * @param string                                        $zone
+     *
+     * @return string
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     */
+    public function getDeleteEntityUrl(DispatchableEntityInterface $entity, string $zone): string
+    {
+        return $this->getEntityUrl($entity, CrudlsActionsInterface::ACTION_DELETE, $zone);
+    }
+
+    /**
+     * @param \BetaKiller\Model\DispatchableEntityInterface $entity
+     * @param string                                        $zone
+     *
+     * @return string
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     */
+    public function getListEntityUrl(DispatchableEntityInterface $entity, string $zone): string
+    {
+        return $this->getEntityUrl($entity, CrudlsActionsInterface::ACTION_LIST, $zone);
+    }
+
+    /**
+     * @param \BetaKiller\Model\DispatchableEntityInterface $entity
+     * @param string                                        $zone
+     *
+     * @return string
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     */
+    public function getSearchEntityUrl(DispatchableEntityInterface $entity, string $zone): string
+    {
+        return $this->getEntityUrl($entity, CrudlsActionsInterface::ACTION_SEARCH, $zone);
+    }
+
+    /**
+     * @param \BetaKiller\Model\DispatchableEntityInterface $entity
+     *
+     * @return null|string
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     */
+    public function getPreviewEntityUrl(DispatchableEntityInterface $entity): ?string
+    {
+        return $this->getEntityUrl($entity, CrudlsActionsInterface::ACTION_READ, ZoneInterface::PREVIEW);
     }
 
     /**
@@ -123,25 +276,25 @@ class UrlHelper
 
     /**
      * @param \BetaKiller\Url\UrlElementInterface             $model
-     * @param \BetaKiller\Url\Container\UrlContainerInterface $urlContainer
+     * @param \BetaKiller\Url\Container\UrlContainerInterface $params
      *
      * @return string
-     * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
      */
-    private function makeUrlElementUri(UrlElementInterface $model, UrlContainerInterface $urlContainer = null): string
+    private function makeUrlElementUri(UrlElementInterface $model, UrlContainerInterface $params): string
     {
         $uri = $model->getUri();
 
         if (!$uri) {
-            throw new IFaceException('UrlElement :codename must have uri', [':codename' => $model->getCodename()]);
+            throw new UrlElementException('UrlElement :codename must have uri', [':codename' => $model->getCodename()]);
         }
 
         try {
             $behaviour = $this->behaviourFactory->fromUrlElement($model);
         } catch (FactoryException $e) {
-            throw IFaceException::wrap($e);
+            throw UrlElementException::wrap($e);
         }
 
-        return $behaviour->makeUri($model, $urlContainer);
+        return $behaviour->makeUri($model, $params);
     }
 }

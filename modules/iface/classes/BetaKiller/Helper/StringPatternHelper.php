@@ -25,22 +25,18 @@ class StringPatternHelper
      * Pattern consists of tags like [N[Text]] where N is tag priority
      *
      * @param string                     $source
-     * @param int|NULL                   $limit
      * @param UrlContainerInterface|null $params
+     *
+     * @param int|NULL                   $limit
      *
      * @return string
      * @throws \BetaKiller\Url\UrlPrototypeException
      */
     public function processPattern(
-        ?string $source,
-        ?int $limit = null,
-        UrlContainerInterface $params = null
-    ): ?string
-    {
-        if (!$source) {
-            return null;
-        }
-
+        string $source,
+        UrlContainerInterface $params,
+        ?int $limit = null
+    ): string {
         // Replace url parameters
         $source = $this->prototypeHelper->replaceUrlParametersParts($source, $params);
 
@@ -66,7 +62,7 @@ class StringPatternHelper
             ksort($tags);
 
             // Iteration counter
-            $i         = 0;
+            $i        = 0;
             $maxLoops = \count($tags);
 
             while ($i < $maxLoops && mb_strlen($output) > 0) {

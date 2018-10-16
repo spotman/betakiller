@@ -41,7 +41,7 @@ abstract class AbstractConfig
         }
 
         if (empty($value) && !$optional) {
-            throw new Exception('Missing :key config value', [
+            throw new Exception('Missing ":key" config value', [
                 ':key' => \implode($path, '.'),
             ]);
         }

@@ -2,6 +2,7 @@
 namespace BetaKiller\Widget;
 
 use BetaKiller\Content\Shortcode\ShortcodeInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
 final class ShortcodeWidget extends AbstractPublicWidget
 {
@@ -18,10 +19,14 @@ final class ShortcodeWidget extends AbstractPublicWidget
     /**
      * Returns data for View rendering
      *
+     * @param \Psr\Http\Message\ServerRequestInterface $request
+     *
+     * @param array                                    $context
+     *
      * @return array
      * @throws \BetaKiller\Widget\WidgetException
      */
-    public function getData(): array
+    public function getData(ServerRequestInterface $request, array $context): array
     {
         $shortcode = $this->getShortcode();
 

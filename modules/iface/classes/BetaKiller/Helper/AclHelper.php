@@ -6,7 +6,7 @@ namespace BetaKiller\Helper;
 use BetaKiller\Acl\Resource\EntityRelatedAclResourceInterface;
 use BetaKiller\CrudlsActionsInterface;
 use BetaKiller\Factory\GuestUserFactory;
-use BetaKiller\IFace\Exception\IFaceException;
+use BetaKiller\IFace\Exception\UrlElementException;
 use BetaKiller\IFace\IFaceInterface;
 use BetaKiller\Model\DispatchableEntityInterface;
 use BetaKiller\Model\GuestUserInterface;
@@ -127,7 +127,7 @@ class AclHelper
      *
      * @return bool
      * @throws \BetaKiller\Factory\FactoryException
-     * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
      * @throws \Spotman\Acl\Exception
      */
     public function isUrlElementAllowed(
@@ -210,7 +210,7 @@ class AclHelper
 
             // IFaces from protected zones must define entity/action or custom rules to protect itself
             if (!($zoneRoles || $zoneAclRules || $urlElementCustomRules || $entityActionDefined)) {
-                throw new IFaceException('UrlElement :name must have linked entity or custom ACL rules to protect itself',
+                throw new UrlElementException('UrlElement :name must have linked entity or custom ACL rules to protect itself',
                     [
                         ':name' => $urlElement->getCodename(),
                     ]);
@@ -229,7 +229,7 @@ class AclHelper
      *
      * @return bool
      * @throws \BetaKiller\Factory\FactoryException
-     * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
      * @throws \Spotman\Acl\Exception
      */
     public function isIFaceAllowed(

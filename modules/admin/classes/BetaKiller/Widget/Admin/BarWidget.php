@@ -3,30 +3,27 @@ namespace BetaKiller\Widget\Admin;
 
 use BetaKiller\CrudlsActionsInterface;
 use BetaKiller\Helper\AclHelper;
-use BetaKiller\Helper\IFaceHelper;
-use BetaKiller\Helper\UrlContainerHelper;
-use BetaKiller\IFace\Exception\IFaceException;
-use BetaKiller\IFace\IFaceInterface;
+use BetaKiller\Helper\I18nHelper;
+use BetaKiller\Helper\ServerRequestHelper;
+use BetaKiller\Helper\UrlElementHelper;
+use BetaKiller\Helper\UrlHelper;
+use BetaKiller\IFace\Exception\UrlElementException;
 use BetaKiller\Model\DispatchableEntityInterface;
 use BetaKiller\Model\UserInterface;
+use BetaKiller\Url\Container\UrlContainerInterface;
+use BetaKiller\Url\EntityLinkedUrlElementInterface;
+use BetaKiller\Url\IFaceModelInterface;
+use BetaKiller\Url\UrlElementInterface;
+use BetaKiller\Url\UrlElementStack;
 use BetaKiller\Url\UrlElementTreeInterface;
 use BetaKiller\Url\ZoneInterface;
 use BetaKiller\Widget\AbstractAdminWidget;
+use Psr\Http\Message\ServerRequestInterface;
 
 //use BetaKiller\Helper\ContentHelper;
 
 class BarWidget extends AbstractAdminWidget
 {
-    /**
-     * @var \BetaKiller\Url\UrlDispatcher
-     */
-    protected $dispatcher;
-
-    /**
-     * @var \BetaKiller\Helper\UrlContainerHelper
-     */
-    private $urlParamHelper;
-
     /**
      * @var \BetaKiller\Url\UrlElementTreeInterface
      */
@@ -38,54 +35,54 @@ class BarWidget extends AbstractAdminWidget
 //    private $contentHelper;
 
     /**
-     * @var \BetaKiller\Helper\IFaceHelper
-     */
-    private $ifaceHelper;
-
-    /**
      * @var \BetaKiller\Helper\AclHelper
      */
     private $aclHelper;
 
     /**
-     * @var \BetaKiller\Model\UserInterface
+     * @var \BetaKiller\Helper\UrlElementHelper
      */
-    private $user;
+    private $elementHelper;
 
     public function __construct(
         UrlElementTreeInterface $tree,
-        IFaceHelper $ifaceHelper,
         AclHelper $aclHelper,
-        UserInterface $user,
-        UrlContainerHelper $urlParamHelper
+        UrlElementHelper $elementHelper
 //        ContentHelper $contentHelper
     )
     {
-        $this->tree           = $tree;
-        $this->aclHelper      = $aclHelper;
-        $this->ifaceHelper    = $ifaceHelper;
-        $this->urlParamHelper = $urlParamHelper;
+        $this->tree      = $tree;
+        $this->aclHelper = $aclHelper;
 //        $this->contentHelper  = $contentHelper;
-        $this->user = $user;
+        $this->elementHelper = $elementHelper;
     }
 
     /**
      * Returns data for View rendering
      *
+     * @param \Psr\Http\Message\ServerRequestInterface $request
+     *
+     * @param array                                    $context
+     *
      * @return array
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
      * @throws \BetaKiller\Url\UrlPrototypeException
-     * @throws \BetaKiller\Factory\FactoryException
      * @throws \Spotman\Acl\Exception
-     * @throws \BetaKiller\IFace\Exception\IFaceException
      */
-    public function getData(): array
+    public function getData(ServerRequestInterface $request, array $context): array
     {
+        $user      = ServerRequestHelper::getUser($request);
+        $stack     = ServerRequestHelper::getUrlElementStack($request);
+        $params    = ServerRequestHelper::getUrlContainer($request);
+        $urlHelper = ServerRequestHelper::getUrlHelper($request);
+        $i18n      = ServerRequestHelper::getI18n($request);
+
         return [
             'enabled'           => true,
 //            'comments'          => $this->getCommentsData(),
             'comments'          => null,
-            'createButtonItems' => $this->getCreateButtonItems(),
-            'primaryEntity'     => $this->getPrimaryEntityData(),
+            'createButtonItems' => $this->getCreateButtonItems($user, $urlHelper, $params, $i18n),
+            'primaryEntity'     => $this->getPrimaryEntityData($stack, $params, $urlHelper),
         ];
     }
 
@@ -95,38 +92,75 @@ class BarWidget extends AbstractAdminWidget
         return true;
     }
 
-    protected function getPrimaryEntityData(): array
-    {
-        $currentUrlElement = $this->ifaceHelper->getCurrentIFaceModel();
-        $primaryEntity     = $currentUrlElement ? $this->ifaceHelper->detectPrimaryEntity($currentUrlElement) : null;
+    protected function getPrimaryEntityData(
+        UrlElementStack $stack,
+        UrlContainerInterface $params,
+        UrlHelper $helper
+    ): array {
+        $currentUrlElement = UrlElementHelper::getCurrentIFaceModel($stack);
+
+        $primaryEntity = $currentUrlElement
+            ? $this->detectPrimaryEntity($currentUrlElement, $params)
+            : null;
 
         return [
-            'previewUrl' => $this->getPreviewButtonUrl($primaryEntity),
-            'publicUrl'  => $this->getPublicReadButtonUrl($primaryEntity),
-            'adminUrl'   => $this->getAdminEditButtonUrl($primaryEntity),
+            'previewUrl' => $this->getPreviewButtonUrl($primaryEntity, $stack, $helper),
+            'publicUrl'  => $this->getPublicReadButtonUrl($primaryEntity, $stack, $helper),
+            'adminUrl'   => $this->getAdminEditButtonUrl($primaryEntity, $stack, $helper),
         ];
     }
 
     /**
+     * @param \BetaKiller\Url\EntityLinkedUrlElementInterface $urlElement
+     * @param \BetaKiller\Url\Container\UrlContainerInterface $params
+     *
+     * @return \BetaKiller\Model\DispatchableEntityInterface|null
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     */
+    protected function detectPrimaryEntity(
+        EntityLinkedUrlElementInterface $urlElement,
+        UrlContainerInterface $params
+    ): ?DispatchableEntityInterface {
+        $current = $urlElement;
+
+        do {
+            $name   = $current->getEntityModelName();
+            $entity = $name ? $params->getEntity($name) : null;
+        } while (!$entity && $current = $this->tree->getParent($current));
+
+        return $entity;
+    }
+
+    /**
+     * @param \BetaKiller\Model\UserInterface                 $user
+     * @param \BetaKiller\Helper\UrlHelper                    $urlHelper
+     * @param \BetaKiller\Url\Container\UrlContainerInterface $params
+     * @param \BetaKiller\Helper\I18nHelper                   $i18n
+     *
      * @return array
+     * @throws \BetaKiller\Factory\FactoryException
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
      * @throws \BetaKiller\Url\UrlPrototypeException
-     * @throws \BetaKiller\IFace\Exception\IFaceException
      * @throws \Spotman\Acl\Exception
      */
-    protected function getCreateButtonItems(): array
-    {
+    protected function getCreateButtonItems(
+        UserInterface $user,
+        UrlHelper $urlHelper,
+        UrlContainerInterface $params,
+        I18nHelper $i18n
+    ): array {
         $items       = [];
         $urlElements = $this->tree->getIFacesByActionAndZone(CrudlsActionsInterface::ACTION_CREATE,
             ZoneInterface::ADMIN);
 
         foreach ($urlElements as $urlElement) {
-            if (!$this->aclHelper->isUrlElementAllowed($this->user, $urlElement)) {
+            if (!$this->aclHelper->isUrlElementAllowed($user, $urlElement)) {
                 continue;
             }
 
             $items[] = [
-                'label' => $this->ifaceHelper->getLabel($urlElement),
-                'url'   => $this->ifaceHelper->makeUrl($urlElement),
+                'label' => $this->elementHelper->getLabel($urlElement, $params, $i18n),
+                'url'   => $urlHelper->makeUrl($urlElement),
             ];
         }
 
@@ -136,7 +170,7 @@ class BarWidget extends AbstractAdminWidget
     /**
      * @return array|null
      * @throws \BetaKiller\Factory\FactoryException
-     * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
      * @throws \Spotman\Acl\Exception
      */
 //    private function getCommentsData(): ?array
@@ -163,72 +197,109 @@ class BarWidget extends AbstractAdminWidget
 //    }
 
     /**
+     * @param \BetaKiller\Helper\UrlHelper $helper
+     *
+     * @return IFaceModelInterface
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
      * @uses \BetaKiller\IFace\Admin\Content\CommentListByStatus
-     * @return \BetaKiller\IFace\IFaceInterface
-     * @throws \BetaKiller\Factory\FactoryException
-     * @throws \BetaKiller\IFace\Exception\IFaceException
      */
-    private function getCommentsListByStatusIface(): IFaceInterface
+    private function getCommentsListByStatusIface(UrlHelper $helper): UrlElementInterface
     {
-        return $this->ifaceHelper->createIFaceFromCodename('Admin_Content_CommentListByStatus');
+        return $helper->getUrlElementByCodename('Admin_Content_CommentListByStatus');
     }
 
     /**
+     * @param \BetaKiller\Helper\UrlHelper $helper
+     *
+     * @return \BetaKiller\Url\UrlElementInterface
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
      * @uses \BetaKiller\IFace\Admin\Content\CommentIndex
-     * @return \BetaKiller\IFace\IFaceInterface
-     * @throws \BetaKiller\Factory\FactoryException
-     * @throws \BetaKiller\IFace\Exception\IFaceException
      */
-    private function getCommentsRootIface(): IFaceInterface
+    private function getCommentsRootIface(UrlHelper $helper): UrlElementInterface
     {
-        return $this->ifaceHelper->createIFaceFromCodename('Admin_Content_CommentIndex');
+        return $helper->getUrlElementByCodename('Admin_Content_CommentIndex');
     }
 
     /**
      * @param \BetaKiller\Model\DispatchableEntityInterface|null $entity
+     * @param \BetaKiller\Url\UrlElementStack                    $stack
+     * @param \BetaKiller\Helper\UrlHelper                       $helper
      *
      * @return null|string
-     * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
      */
-    private function getAdminEditButtonUrl(?DispatchableEntityInterface $entity): ?string
-    {
-        return $this->getPrimaryEntityActionUrl($entity, ZoneInterface::ADMIN,
-            CrudlsActionsInterface::ACTION_READ);
+    private function getAdminEditButtonUrl(
+        ?DispatchableEntityInterface $entity,
+        UrlElementStack $stack,
+        UrlHelper $helper
+    ): ?string {
+        return $this->getPrimaryEntityActionUrl(
+            $stack,
+            $helper,
+            $entity,
+            ZoneInterface::ADMIN,
+            CrudlsActionsInterface::ACTION_READ
+        );
     }
 
     /**
      * @param \BetaKiller\Model\DispatchableEntityInterface|null $entity
+     * @param \BetaKiller\Url\UrlElementStack                    $stack
+     * @param \BetaKiller\Helper\UrlHelper                       $helper
      *
      * @return null|string
-     * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
      */
-    private function getPublicReadButtonUrl(?DispatchableEntityInterface $entity): ?string
-    {
-        return $this->getPrimaryEntityActionUrl($entity, ZoneInterface::PUBLIC,
-            CrudlsActionsInterface::ACTION_READ);
+    private function getPublicReadButtonUrl(
+        ?DispatchableEntityInterface $entity,
+        UrlElementStack $stack,
+        UrlHelper $helper
+    ): ?string {
+        return $this->getPrimaryEntityActionUrl(
+            $stack,
+            $helper,
+            $entity,
+            ZoneInterface::PUBLIC,
+            CrudlsActionsInterface::ACTION_READ
+        );
     }
 
     /**
      * @param \BetaKiller\Model\DispatchableEntityInterface|null $entity
+     * @param \BetaKiller\Url\UrlElementStack                    $stack
+     *
+     * @param \BetaKiller\Helper\UrlHelper                       $helper
      *
      * @return null|string
-     * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
      */
-    private function getPreviewButtonUrl(?DispatchableEntityInterface $entity): ?string
-    {
-        return $this->getPrimaryEntityActionUrl($entity, ZoneInterface::PREVIEW,
-            CrudlsActionsInterface::ACTION_READ);
+    private function getPreviewButtonUrl(
+        ?DispatchableEntityInterface $entity,
+        UrlElementStack $stack,
+        UrlHelper $helper
+    ): ?string {
+        return $this->getPrimaryEntityActionUrl(
+            $stack,
+            $helper,
+            $entity,
+            ZoneInterface::PREVIEW,
+            CrudlsActionsInterface::ACTION_READ
+        );
     }
 
     /**
+     * @param \BetaKiller\Url\UrlElementStack                    $stack
+     * @param \BetaKiller\Helper\UrlHelper                       $helper
      * @param \BetaKiller\Model\DispatchableEntityInterface|null $entity
      * @param string                                             $targetZone
      * @param string                                             $targetAction
      *
      * @return null|string
-     * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
      */
     private function getPrimaryEntityActionUrl(
+        UrlElementStack $stack,
+        UrlHelper $helper,
         ?DispatchableEntityInterface $entity,
         string $targetZone,
         string $targetAction
@@ -237,14 +308,14 @@ class BarWidget extends AbstractAdminWidget
             return null;
         }
 
-        if ($this->ifaceHelper->isCurrentZone($targetZone)) {
+        if (UrlElementHelper::isCurrentZone($targetZone, $stack)) {
             return null;
         }
 
         try {
-            return $this->ifaceHelper->getEntityUrl($entity, $targetAction, $targetZone);
+            return $helper->getEntityUrl($entity, $targetAction, $targetZone);
         } /** @noinspection BadExceptionsProcessingInspection */
-        catch (IFaceException $e) {
+        catch (UrlElementException $e) {
             // No IFace found for provided zone/action
             return null;
         }

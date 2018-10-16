@@ -28,7 +28,12 @@ abstract class AbstractMessageBus implements AbstractMessageBusInterface
     /**
      * @var \BetaKiller\MessageBus\MessageHandlerInterface[][]
      */
-    private $handlers = [];
+    private $bindings = [];
+
+    /**
+     * @var array MessageHandlerInterface[]
+     */
+    private $handlerInstances = [];
 
     public function __construct(ContainerInterface $container, LoggerInterface $logger)
     {
@@ -53,40 +58,47 @@ abstract class AbstractMessageBus implements AbstractMessageBusInterface
     abstract protected function processDelayedMessage($message, $handler): void;
 
     /**
-     * @param string       $messageClassName
-     * @param string|mixed $handler
+     * @param string $messageClassName
+     * @param string $handlerClassName
      *
      * @throws \BetaKiller\MessageBus\MessageBusException
      */
-    public function on(string $messageClassName, $handler): void
+    public function on(string $messageClassName, string $handlerClassName): void
     {
-        $this->handlers[$messageClassName] = $this->handlers[$messageClassName] ?? [];
+        $this->bindings[$messageClassName] = $this->bindings[$messageClassName] ?? [];
 
         $limit = $this->getMessageHandlersLimit();
 
         // Limit handlers count for CommandBus
-        if ($limit && \count($this->handlers[$messageClassName]) > $limit) {
+        if ($limit && \count($this->bindings[$messageClassName]) > $limit) {
             throw new MessageBusException('Handlers limit exceed for :name message', [
                 ':name' => $messageClassName,
             ]);
         }
 
         // Push handler
-        $this->handlers[$messageClassName][] = $handler;
+        $this->bindings[$messageClassName][] = $handlerClassName;
 
         // Handle all processed messages with new handler
         foreach ($this->processedMessages as $processedMessage) {
             if ($this->getMessageName($processedMessage) === $messageClassName) {
+                $handler = $this->getHandlerInstance($handlerClassName);
                 $this->processDelayedMessage($processedMessage, $handler);
             }
         }
     }
 
-    protected function getHandlers(MessageInterface $message): array
+    /**
+     * @param \BetaKiller\MessageBus\MessageInterface $message
+     *
+     * @return string[][]
+     * @throws \BetaKiller\MessageBus\MessageBusException
+     */
+    protected function getMessageHandlersClassNames(MessageInterface $message): array
     {
         $name = $this->getMessageName($message);
 
-        $handlers = $this->handlers[$name] ?? [];
+        $handlers = $this->bindings[$name] ?? [];
 
         if (!$handlers && $message->handlersRequired()) {
             throw new MessageBusException('No handlers found for :name message', [':name' => $name]);
@@ -106,26 +118,32 @@ abstract class AbstractMessageBus implements AbstractMessageBusInterface
      * @return mixed
      * @throws \BetaKiller\MessageBus\MessageBusException
      */
-    protected function reviewHandler(string $handlerName)
+    protected function getHandlerInstance(string $handlerName)
     {
+        if (isset($this->handlerInstances[$handlerName])) {
+            return $this->handlerInstances[$handlerName];
+        }
+
         // Convert class name to instance
         try {
-            $handler = $this->container->get($handlerName);
+            $instance = $this->container->get($handlerName);
         } catch (ContainerExceptionInterface $e) {
             throw MessageBusException::wrap($e);
         }
 
         $handlerInterface = $this->getHandlerInterface();
 
-        if (!($handler instanceof $handlerInterface)) {
-            throw new MessageBusException('Handler :class must implement :must interface for using in :bus', [
-                ':class' => \get_class($handler),
+        if (!($instance instanceof $handlerInterface)) {
+            throw new MessageBusException('Handler :class must implement :must for using in :bus', [
+                ':class' => \get_class($instance),
                 ':must'  => $handlerInterface,
                 ':bus'   => \get_class($this),
             ]);
         }
 
-        return $handler;
+        $this->handlerInstances[$handlerName] = $instance;
+
+        return $instance;
     }
 
     protected function getMessageName(MessageInterface $message): string

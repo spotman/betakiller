@@ -9,6 +9,7 @@ use BetaKiller\Helper\ContentUrlContainerHelper;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Repository\EntityRepository;
 use BetaKiller\Repository\ShortcodeRepository;
+use Psr\Http\Message\ServerRequestInterface;
 
 class PostItem extends AbstractAdminBase
 {
@@ -72,10 +73,18 @@ class PostItem extends AbstractAdminBase
      * Returns data for View
      * Override this method in child classes
      *
+     * @param \Psr\Http\Message\ServerRequestInterface $request
+     *
      * @return array
+     * @throws \BetaKiller\Assets\AssetsException
+     * @throws \BetaKiller\Assets\AssetsStorageException
      * @throws \BetaKiller\Exception\NotFoundHttpException
+     * @throws \BetaKiller\Factory\FactoryException
+     * @throws \BetaKiller\Repository\RepositoryException
+     * @throws \Kohana_Exception
+     * @throws \Spotman\Acl\Exception
      */
-    public function getData(): array
+    public function getData(ServerRequestInterface $request): array
     {
         $post = $this->urlParametersHelper->getContentPost();
 

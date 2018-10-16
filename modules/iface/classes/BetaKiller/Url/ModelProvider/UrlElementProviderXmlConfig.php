@@ -1,7 +1,7 @@
 <?php
 namespace BetaKiller\Url\ModelProvider;
 
-use BetaKiller\IFace\Exception\IFaceException;
+use BetaKiller\IFace\Exception\UrlElementException;
 use BetaKiller\Url\IFaceModelInterface;
 use BetaKiller\Url\UrlElementInterface;
 use Kohana;
@@ -9,8 +9,9 @@ use SimpleXMLElement;
 
 class UrlElementProviderXmlConfig implements UrlElementProviderInterface
 {
-    private const TAG_IFACE = 'iface';
-    private const TAG_DUMMY = 'dummy';
+    private const TAG_IFACE  = 'iface';
+    private const TAG_DUMMY  = 'dummy';
+    private const TAG_ACTION = 'action';
 
     /**
      * @var AbstractPlainUrlElementModel[]
@@ -20,11 +21,12 @@ class UrlElementProviderXmlConfig implements UrlElementProviderInterface
     private $allowedTags = [
         self::TAG_IFACE,
         self::TAG_DUMMY,
+        self::TAG_ACTION,
     ];
 
     /**
      * @return \BetaKiller\Url\UrlElementInterface[]
-     * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
      */
     public function getAll(): array
     {
@@ -36,14 +38,14 @@ class UrlElementProviderXmlConfig implements UrlElementProviderInterface
     }
 
     /**
-     * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
      */
     private function loadAll(): void
     {
         $configFiles = Kohana::find_file('config', 'ifaces', 'xml');
 
         if (!$configFiles) {
-            throw new IFaceException('Missing IFace config files');
+            throw new UrlElementException('Missing IFace config files');
         }
 
         foreach ($configFiles as $file) {
@@ -54,7 +56,7 @@ class UrlElementProviderXmlConfig implements UrlElementProviderInterface
     /**
      * @param string $file
      *
-     * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
      */
     private function loadXmlConfig(string $file): void
     {
@@ -66,7 +68,7 @@ class UrlElementProviderXmlConfig implements UrlElementProviderInterface
      * @param \SimpleXMLElement                        $branch
      * @param \BetaKiller\Url\UrlElementInterface|null $parentModel
      *
-     * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
      */
     private function parseXmlBranch(SimpleXMLElement $branch, ?UrlElementInterface $parentModel = null): void
     {
@@ -88,7 +90,7 @@ class UrlElementProviderXmlConfig implements UrlElementProviderInterface
      * @param \BetaKiller\Url\UrlElementInterface|null $xmlParent
      *
      * @return \BetaKiller\Url\UrlElementInterface
-     * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
      */
     private function parseXmlItem(SimpleXMLElement $branch, ?UrlElementInterface $xmlParent = null): UrlElementInterface
     {
@@ -99,7 +101,7 @@ class UrlElementProviderXmlConfig implements UrlElementProviderInterface
         $codename = $config[AbstractPlainUrlElementModel::OPTION_CODENAME];
 
         if (!\in_array($tag, $this->allowedTags, true)) {
-            throw new IFaceException('Only tags <:allowed> are allowed for XML-based config, but <:tag> is used', [
+            throw new UrlElementException('Only tags <:allowed> are allowed for XML-based config, but <:tag> is used', [
                 ':tag'     => $tag,
                 ':allowed' => implode('>, <', $this->allowedTags),
             ]);
@@ -108,7 +110,7 @@ class UrlElementProviderXmlConfig implements UrlElementProviderInterface
         if ($xmlParent) {
             // Parent codename is not needed if nested in XML
             if (isset($config[AbstractPlainUrlElementModel::OPTION_PARENT])) {
-                throw new IFaceException('UrlElement :name is already nested; no "parent" attribute please', [
+                throw new UrlElementException('UrlElement :name is already nested; no "parent" attribute please', [
                     ':name' => $codename,
                 ]);
             }
@@ -138,7 +140,7 @@ class UrlElementProviderXmlConfig implements UrlElementProviderInterface
 
         if (empty($config[IFacePlainModel::OPTION_ZONE])) {
             if (!$parent) {
-                throw new IFaceException('Root URL element :name must define a zone', [
+                throw new UrlElementException('Root URL element :name must define a zone', [
                     ':name' => $codename,
                 ]);
             }
@@ -154,7 +156,7 @@ class UrlElementProviderXmlConfig implements UrlElementProviderInterface
      * @param array  $config
      *
      * @return UrlElementInterface
-     * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
      */
     private function createModelFromConfig(string $tagName, array $config): UrlElementInterface
     {
@@ -165,8 +167,11 @@ class UrlElementProviderXmlConfig implements UrlElementProviderInterface
             case self::TAG_DUMMY:
                 return DummyPlainModel::factory($config);
 
+            case self::TAG_ACTION:
+                return ActionPlainModel::factory($config);
+
             default:
-                throw new IFaceException('Unknown XML tag <:tag> in URL elements config', [
+                throw new UrlElementException('Unknown XML tag <:tag> in URL elements config', [
                     ':tag' => $tagName,
                 ]);
         }

@@ -1,7 +1,11 @@
 <?php
 namespace BetaKiller\IFace\App\Content;
 
+use BetaKiller\Helper\ServerRequestHelper;
+use BetaKiller\Helper\UrlHelper;
 use BetaKiller\Model\ContentCategoryInterface;
+use BetaKiller\Url\ZoneInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
 class CategoryListing extends AbstractAppBase
 {
@@ -12,25 +16,24 @@ class CategoryListing extends AbstractAppBase
     private $categoryRepository;
 
     /**
-     * @Inject
-     * @var \BetaKiller\Helper\IFaceHelper
-     */
-    private $ifaceHelper;
-
-    /**
      * Returns data for View
      * Override this method in child classes
      *
+     * @param \Psr\Http\Message\ServerRequestInterface $request
+     *
      * @return array
+     * @throws \BetaKiller\Repository\RepositoryException
      */
-    public function getData(): array
+    public function getData(ServerRequestInterface $request): array
     {
+        $urlHelper = ServerRequestHelper::getUrlHelper($request);
+
         return [
-            'categories' => $this->getCategoriesData(),
+            'categories' => $this->getCategoriesData($urlHelper),
         ];
     }
 
-    protected function getCategoriesData(ContentCategoryInterface $parent = null): array
+    protected function getCategoriesData(UrlHelper $urlHelper, ContentCategoryInterface $parent = null): array
     {
         $data = [];
 
@@ -41,18 +44,18 @@ class CategoryListing extends AbstractAppBase
                 continue;
             }
 
-            $data[] = $this->getCategoryData($child);
+            $data[] = $this->getCategoryData($child, $urlHelper);
         }
 
         return $data;
     }
 
-    protected function getCategoryData(ContentCategoryInterface $category)
+    protected function getCategoryData(ContentCategoryInterface $category, UrlHelper $urlHelper)
     {
         return [
             'label'    => $category->getLabel(),
-            'url'      => $this->ifaceHelper->getReadEntityUrl($category),
-            'children' => $this->getCategoriesData($category),
+            'url'      => $urlHelper->getReadEntityUrl($category, ZoneInterface::PUBLIC),
+            'children' => $this->getCategoriesData($urlHelper, $category),
         ];
     }
 }

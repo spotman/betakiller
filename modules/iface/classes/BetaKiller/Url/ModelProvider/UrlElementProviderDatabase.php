@@ -1,7 +1,7 @@
 <?php
 namespace BetaKiller\Url\ModelProvider;
 
-use BetaKiller\IFace\Exception\IFaceException;
+use BetaKiller\IFace\Exception\UrlElementException;
 use BetaKiller\Model\UrlElement;
 use BetaKiller\Repository\UrlElementRepository;
 use BetaKiller\Url\UrlElementInterface;
@@ -25,7 +25,7 @@ class UrlElementProviderDatabase implements UrlElementProviderInterface
 
     /**
      * @return \BetaKiller\Url\UrlElementInterface[]
-     * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
      * @throws \BetaKiller\Repository\RepositoryException
      */
     public function getAll(): array
@@ -44,7 +44,7 @@ class UrlElementProviderDatabase implements UrlElementProviderInterface
      * @param \BetaKiller\Model\UrlElement $element
      *
      * @return \BetaKiller\Url\UrlElementInterface
-     * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
      */
     private function detectDedicatedObject(UrlElement $element): UrlElementInterface
     {
@@ -56,7 +56,7 @@ class UrlElementProviderDatabase implements UrlElementProviderInterface
                 return $element->getWebHookModel();
 
             default:
-                throw new IFaceException('Unknown type of URL element for codename :codename', [
+                throw new UrlElementException('Unknown type of URL element for codename :codename', [
                     ':codename' => $element->getCodename(),
                 ]);
         }

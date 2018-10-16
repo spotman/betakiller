@@ -3,7 +3,6 @@ namespace BetaKiller\IFace;
 
 use BetaKiller\Url\IFaceModelInterface;
 use DateInterval;
-use DateTimeInterface;
 
 abstract class AbstractIFace implements IFaceInterface
 {
@@ -13,7 +12,7 @@ abstract class AbstractIFace implements IFaceInterface
     private $model;
 
     /**
-     * @var DateTimeInterface|null
+     * @var \DateTimeImmutable|null
      */
     private $lastModified;
 
@@ -43,31 +42,36 @@ abstract class AbstractIFace implements IFaceInterface
     }
 
     /**
-     * @param \DateTimeInterface $lastModified
+     * @param \DateTimeImmutable $lastModified
      *
      * @return $this
      */
-    final public function setLastModified(\DateTimeInterface $lastModified): IFaceInterface
+    final public function setLastModified(\DateTimeImmutable $lastModified): IFaceInterface
     {
+        // Check current last modified and update it if provided one is newer
+        if ($this->lastModified && $this->lastModified > $lastModified) {
+            return $this;
+        }
+
         $this->lastModified = $lastModified;
 
         return $this;
     }
 
     /**
-     * @return \DateTimeInterface
+     * @return \DateTimeImmutable
      */
-    final public function getLastModified(): DateTimeInterface
+    final public function getLastModified(): \DateTimeImmutable
     {
         return $this->lastModified ?: $this->getDefaultLastModified();
     }
 
     /**
-     * @return \DateTimeInterface
+     * @return \DateTimeImmutable
      */
-    final public function getDefaultLastModified(): DateTimeInterface
+    final public function getDefaultLastModified(): \DateTimeImmutable
     {
-        return new \DateTime();
+        return new \DateTimeImmutable();
     }
 
     /**
@@ -101,12 +105,12 @@ abstract class AbstractIFace implements IFaceInterface
     }
 
     /**
-     * @return \DateTimeInterface
+     * @return \DateTimeImmutable
      * @throws \Exception
      */
-    final public function getExpiresDateTime(): DateTimeInterface
+    final public function getExpiresDateTime(): \DateTimeImmutable
     {
-        return (new \DateTime())->add($this->getExpiresInterval());
+        return (new \DateTimeImmutable())->add($this->getExpiresInterval());
     }
 
     /**

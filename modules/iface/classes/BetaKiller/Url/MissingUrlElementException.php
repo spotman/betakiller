@@ -3,9 +3,9 @@ declare(strict_types=1);
 
 namespace BetaKiller\Url;
 
-use BetaKiller\IFace\Exception\IFaceException;
+use BetaKiller\IFace\Exception\UrlElementException;
 
-class MissingUrlElementException extends IFaceException
+class MissingUrlElementException extends UrlElementException
 {
     /**
      * @var \BetaKiller\Url\UrlElementInterface|null

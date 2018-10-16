@@ -11,7 +11,7 @@
  * @license    http://kohanaphp.com/license
  * @since      3.1.0
  */
-class Kohana_Response implements HTTP_Response {
+class Kohana_Response {
 
 	/**
 	 * Factory method to create a new [Response]. Pass properties
@@ -390,7 +390,7 @@ class Kohana_Response implements HTTP_Response {
 	 * @uses    File::mime
 	 * @uses    Request::send_headers
 	 */
-	public function sendFileContent($filename, $download = NULL, array $options = NULL)
+	public function send_file($filename, $download = NULL, array $options = NULL)
 	{
 		if ( ! empty($options['mime_type']))
 		{

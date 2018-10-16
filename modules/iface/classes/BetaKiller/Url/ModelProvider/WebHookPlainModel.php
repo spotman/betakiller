@@ -1,7 +1,7 @@
 <?php
 namespace BetaKiller\Url\ModelProvider;
 
-use BetaKiller\IFace\Exception\IFaceException;
+use BetaKiller\IFace\Exception\UrlElementException;
 use BetaKiller\Model\WebHookModelTrait;
 use BetaKiller\Url\WebHookModelInterface;
 
@@ -109,7 +109,7 @@ class WebHookPlainModel extends AbstractPlainUrlElementModel implements WebHookM
     public function getUrlKeyValue(string $key): string
     {
         if ($key !== WebHookModelInterface::URL_KEY) {
-            throw new IFaceException('WebHook model may be mapped through codename only');
+            throw new UrlElementException('WebHook model may be mapped through codename only');
         }
 
         return $this->getCodename();

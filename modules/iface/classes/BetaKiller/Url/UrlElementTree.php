@@ -1,7 +1,7 @@
 <?php
 namespace BetaKiller\Url;
 
-use BetaKiller\IFace\Exception\IFaceException;
+use BetaKiller\IFace\Exception\UrlElementException;
 use BetaKiller\Model\DispatchableEntityInterface;
 use BetaKiller\Url\ElementFilter\UrlElementFilterInterface;
 
@@ -21,14 +21,14 @@ class UrlElementTree implements UrlElementTreeInterface
      * @param \BetaKiller\Url\UrlElementInterface $model
      * @param bool|null                           $warnIfExists
      *
-     * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
      */
     public function add(UrlElementInterface $model, ?bool $warnIfExists = null): void
     {
         $codename = $model->getCodename();
 
         if ($warnIfExists && isset($this->items[$codename])) {
-            throw new IFaceException('IFace :codename already exists in the tree', [':codename' => $codename]);
+            throw new UrlElementException('IFace :codename already exists in the tree', [':codename' => $codename]);
         }
 
         $this->items[$codename] = $model;
@@ -47,7 +47,7 @@ class UrlElementTree implements UrlElementTreeInterface
     }
 
     /**
-     * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
      */
     public function validate(): void
     {
@@ -57,7 +57,7 @@ class UrlElementTree implements UrlElementTreeInterface
     /**
      * @param \BetaKiller\Url\UrlElementInterface $parent
      *
-     * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
      */
     private function validateBranch(UrlElementInterface $parent = null): void
     {
@@ -74,7 +74,7 @@ class UrlElementTree implements UrlElementTreeInterface
     /**
      * @param \BetaKiller\Url\UrlElementInterface[] $models
      *
-     * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
      */
     private function validateLayer(array $models): void
     {
@@ -89,7 +89,7 @@ class UrlElementTree implements UrlElementTreeInterface
             $uri = $model->getUri();
 
             if (\in_array($uri, $uris, true)) {
-                throw new IFaceException('Duplicate URIs per layer are not allowed, codename is :name', [
+                throw new UrlElementException('Duplicate URIs per layer are not allowed, codename is :name', [
                     ':name' => $model->getCodename(),
                 ]);
             }
@@ -98,14 +98,14 @@ class UrlElementTree implements UrlElementTreeInterface
         }
 
         if ($dynamicCounter > 1) {
-            throw new IFaceException('Layer must have only one IFace with dynamic dispatching');
+            throw new UrlElementException('Layer must have only one IFace with dynamic dispatching');
         }
     }
 
     /**
      * @param \BetaKiller\Url\UrlElementInterface $model
      *
-     * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
      */
     private function validateModel(UrlElementInterface $model): void
     {
@@ -119,11 +119,11 @@ class UrlElementTree implements UrlElementTreeInterface
         $codename = $model->getCodename();
 
         if (!$model->getLabel()) {
-            throw new IFaceException('Label is missing for IFace :codename', [':codename' => $codename]);
+            throw new UrlElementException('Label is missing for IFace :codename', [':codename' => $codename]);
         }
 
         if (!$model->getZoneName()) {
-            throw new IFaceException('IFace zone is missing for UrlElement :codename', [':codename' => $codename]);
+            throw new UrlElementException('IFace zone is missing for UrlElement :codename', [':codename' => $codename]);
         }
     }
 
@@ -131,7 +131,7 @@ class UrlElementTree implements UrlElementTreeInterface
      * Returns default iface model
      *
      * @return \BetaKiller\Url\IFaceModelInterface
-     * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
      */
     public function getDefault(): IFaceModelInterface
     {
@@ -141,21 +141,21 @@ class UrlElementTree implements UrlElementTreeInterface
             }
         }
 
-        throw new IFaceException('No default IFace found');
+        throw new UrlElementException('No default IFace found');
     }
 
     /**
      * Returns list of root elements
      *
      * @return \BetaKiller\Url\UrlElementInterface[]
-     * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
      */
     public function getRoot(): array
     {
         $root = $this->getChilds();
 
         if (!$root) {
-            throw new IFaceException('No root IFaces found, define them first');
+            throw new UrlElementException('No root IFaces found, define them first');
         }
 
         return $root;
@@ -203,7 +203,7 @@ class UrlElementTree implements UrlElementTreeInterface
      * @param \BetaKiller\Url\UrlElementInterface $child
      *
      * @return \BetaKiller\Url\UrlElementInterface|null
-     * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
      */
     public function getParent(UrlElementInterface $child): ?UrlElementInterface
     {
@@ -218,7 +218,7 @@ class UrlElementTree implements UrlElementTreeInterface
      * @param \BetaKiller\Url\IFaceModelInterface $child
      *
      * @return \BetaKiller\Url\IFaceModelInterface|null
-     * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
      */
     public function getParentIFaceModel(IFaceModelInterface $child): ?IFaceModelInterface
     {
@@ -229,7 +229,7 @@ class UrlElementTree implements UrlElementTreeInterface
         }
 
         if (!$parent instanceof IFaceModelInterface) {
-            throw new IFaceException('Can not get parent IFace for :codename coz it is not of IFace type', [
+            throw new UrlElementException('Can not get parent IFace for :codename coz it is not of IFace type', [
                 ':codename' => $child->getCodename(),
             ]);
         }
@@ -243,12 +243,12 @@ class UrlElementTree implements UrlElementTreeInterface
      * @param string $codename
      *
      * @return \BetaKiller\Url\UrlElementInterface
-     * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
      */
     public function getByCodename(string $codename): UrlElementInterface
     {
         if (!isset($this->items[$codename])) {
-            throw new IFaceException('No UrlElement found by codename :codename', [':codename' => $codename]);
+            throw new UrlElementException('No UrlElement found by codename :codename', [':codename' => $codename]);
         }
 
         return $this->items[$codename];
@@ -291,7 +291,7 @@ class UrlElementTree implements UrlElementTreeInterface
      * @param string                                        $zone
      *
      * @return \BetaKiller\Url\IFaceModelInterface
-     * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
      */
     public function getByEntityActionAndZone(
         DispatchableEntityInterface $entity,
@@ -309,7 +309,7 @@ class UrlElementTree implements UrlElementTreeInterface
         $model = $this->findByEntityActionAndZone($entity, $action, $zone);
 
         if (!$model) {
-            throw new IFaceException('No UrlElement found for :entity.:action entity in :zone zone', [
+            throw new UrlElementException('No UrlElement found for :entity.:action entity in :zone zone', [
                 ':entity' => $entity->getModelName(),
                 ':action' => $action,
                 ':zone'   => $zone,
@@ -374,7 +374,7 @@ class UrlElementTree implements UrlElementTreeInterface
      * @param \BetaKiller\Url\UrlElementInterface $model
      *
      * @return \ArrayIterator|\BetaKiller\Url\UrlElementInterface[]
-     * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
      */
     public function getReverseBreadcrumbsIterator(UrlElementInterface $model): \ArrayIterator
     {
@@ -396,7 +396,7 @@ class UrlElementTree implements UrlElementTreeInterface
      * @param \BetaKiller\Url\ElementFilter\UrlElementFilterInterface|null $filter
      *
      * @return \RecursiveIteratorIterator|\BetaKiller\Url\UrlElementInterface[]
-     * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
      */
     public function getRecursiveIteratorIterator(
         UrlElementInterface $parent = null,
@@ -414,7 +414,7 @@ class UrlElementTree implements UrlElementTreeInterface
      * @param \BetaKiller\Url\ElementFilter\UrlElementFilterInterface|null $filter
      *
      * @return \RecursiveIterator
-     * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
      */
     private function getRecursiveIterator(
         UrlElementInterface $parent = null,
@@ -427,7 +427,7 @@ class UrlElementTree implements UrlElementTreeInterface
      * @param \BetaKiller\Url\UrlElementInterface|NULL $parent
      *
      * @return \RecursiveIteratorIterator|\BetaKiller\Url\IFaceModelInterface[]
-     * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
      */
     public function getPublicIFaceIterator(UrlElementInterface $parent = null): \RecursiveIteratorIterator
     {
@@ -438,7 +438,7 @@ class UrlElementTree implements UrlElementTreeInterface
 
     /**
      * @return \RecursiveIteratorIterator|\BetaKiller\Url\IFaceModelInterface[]
-     * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
      */
     public function getRecursiveSitemapIterator(): \RecursiveIteratorIterator
     {
@@ -451,7 +451,7 @@ class UrlElementTree implements UrlElementTreeInterface
      * @param \BetaKiller\Url\UrlElementInterface|NULL $parent
      *
      * @return \RecursiveIteratorIterator|\BetaKiller\Url\IFaceModelInterface[]
-     * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
      */
     public function getAdminIFaceIterator(UrlElementInterface $parent = null): \RecursiveIteratorIterator
     {
@@ -465,7 +465,7 @@ class UrlElementTree implements UrlElementTreeInterface
      * @param UrlElementInterface|NULL $parent
      *
      * @return \RecursiveIteratorIterator|\BetaKiller\Url\UrlElementInterface[]
-     * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
      */
     protected function getRecursiveFilterIterator(callable $callback, UrlElementInterface $parent = null)
     {
@@ -514,7 +514,7 @@ class UrlElementTree implements UrlElementTreeInterface
      * @param string $key
      *
      * @return \BetaKiller\Url\IFaceModelInterface|null
-     * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
      */
     private function getLinkedIFaceFromCache(string $key): ?IFaceModelInterface
     {
@@ -527,7 +527,7 @@ class UrlElementTree implements UrlElementTreeInterface
         $instance = $this->getByCodename($codename);
 
         if (!$instance instanceof IFaceModelInterface) {
-            throw new IFaceException('UrlElement :name must implement :must', [
+            throw new UrlElementException('UrlElement :name must implement :must', [
                 ':name' => $codename,
                 ':must' => IFaceModelInterface::class,
             ]);

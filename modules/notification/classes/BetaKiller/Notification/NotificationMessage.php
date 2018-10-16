@@ -27,11 +27,6 @@ class NotificationMessage implements NotificationMessageInterface
     private $targets = [];
 
     /**
-     * @var string
-     */
-    private $subj;
-
-    /**
      * @var array
      */
     private $attachments = [];
@@ -161,46 +156,6 @@ class NotificationMessage implements NotificationMessageInterface
         $this->targets = [];
 
         return $this;
-    }
-
-    /**
-     * @param \BetaKiller\Notification\NotificationUserInterface $targetUser
-     *
-     * @return string
-     * @throws \BetaKiller\Notification\NotificationException
-     */
-    public function getSubj(NotificationUserInterface $targetUser): string
-    {
-        if (!$this->subj) {
-            return $this->generateSubject($targetUser);
-        }
-
-        return $this->subj;
-    }
-
-    /**
-     * @param \BetaKiller\Notification\NotificationUserInterface $targetUser
-     *
-     * @return string
-     * @throws \BetaKiller\Notification\NotificationException
-     */
-    protected function generateSubject(NotificationUserInterface $targetUser): string
-    {
-        $key = $this->getBaseI18nKey();
-        $key .= '.subj';
-
-        // Getting template data
-        $data = $this->getFullDataForTarget($targetUser);
-
-        $output = __($key, $data);
-
-        if ($output === $key) {
-            throw new NotificationException('Missing translation for key [:value]', [
-                ':value' => $key,
-            ]);
-        }
-
-        return $output;
     }
 
     /**

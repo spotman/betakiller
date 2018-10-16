@@ -41,6 +41,7 @@ class Migration1538633770_Update_Sessions extends Migration
     public function up(): void
     {
         if ($this->tableExists('user_tokens')) {
+
             if ($this->tableHasColumn('users', 'session_id')) {
                 // Remove users.session_id
                 $this->runSql('ALTER TABLE `users` DROP FOREIGN KEY `users_ibfk_11`, DROP `session_id`;');

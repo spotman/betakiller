@@ -22,14 +22,12 @@ class CompleteApiMethod extends AbstractEntityBasedApiMethod
      */
     public function __construct($id, StatusWorkflowFactory $workflowFactory)
     {
-        $this->id = (int)$id;
+        $this->id              = (int)$id;
         $this->workflowFactory = $workflowFactory;
     }
 
     /**
      * @return \Spotman\Api\ApiMethodResponse|null
-     * @throws \Kohana_Exception
-     * @throws \HTTP_Exception_501
      * @throws \BetaKiller\Status\StatusWorkflowException
      * @throws \BetaKiller\Repository\RepositoryException
      * @throws \BetaKiller\Factory\FactoryException
