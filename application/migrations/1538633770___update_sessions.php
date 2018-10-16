@@ -50,7 +50,7 @@ class Migration1538633770_Update_Sessions extends Migration {
             $this->runSql("ALTER TABLE `sessions`
 DROP INDEX `PRIMARY`,
 CHANGE `session_id` `token` varchar(40) COLLATE 'utf8_unicode_ci' NOT NULL,
-ADD `user_id` int(11) unsigned NULL AFTER `session_id`,
+ADD `user_id` int(11) unsigned NULL AFTER `token`,
 ADD `created_at` datetime NOT NULL AFTER `user_id`,
 CHANGE `last_active` `last_active_at` datetime NOT NULL AFTER `created_at`,
 ADD PRIMARY KEY `token` (`token`),
