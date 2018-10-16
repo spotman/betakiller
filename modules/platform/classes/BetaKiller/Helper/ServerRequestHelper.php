@@ -150,16 +150,6 @@ class ServerRequestHelper
         return $request->getAttribute(UrlElementStack::class);
     }
 
-    /**
-     * @param \Psr\Http\Message\ServerRequestInterface $request
-     *
-     * @return \BetaKiller\Helper\UrlElementHelper
-     */
-    public static function getUrlElementHelper(ServerRequestInterface $request): UrlElementHelper
-    {
-        return $request->getAttribute(UrlElementHelper::class);
-    }
-
     public static function getUrlHelper(ServerRequestInterface $request): UrlHelper
     {
         return $request->getAttribute(UrlHelper::class);

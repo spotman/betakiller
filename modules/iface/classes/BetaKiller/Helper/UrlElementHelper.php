@@ -22,25 +22,15 @@ class UrlElementHelper
     private $stringPatternHelper;
 
     /**
-     * @var \BetaKiller\Helper\I18nHelper
-     */
-    private $i18n;
-
-    /**
      * UrlElementHelper constructor.
      *
      * @param \BetaKiller\Url\UrlElementTreeInterface $tree
      * @param \BetaKiller\Helper\StringPatternHelper  $stringPatternHelper
-     * @param \BetaKiller\Helper\I18nHelper           $i18n
      */
-    public function __construct(
-        UrlElementTreeInterface $tree,
-        StringPatternHelper $stringPatternHelper,
-        I18nHelper $i18n
-    ) {
+    public function __construct(UrlElementTreeInterface $tree, StringPatternHelper $stringPatternHelper)
+    {
         $this->tree                = $tree;
         $this->stringPatternHelper = $stringPatternHelper;
-        $this->i18n                = $i18n;
     }
 
     /**
@@ -112,6 +102,7 @@ class UrlElementHelper
     /**
      * @param \BetaKiller\Url\IFaceModelInterface             $model
      * @param \BetaKiller\Url\Container\UrlContainerInterface $params
+     * @param \BetaKiller\Helper\I18nHelper                   $i18n
      * @param int|null                                        $limit
      *
      * @return string
@@ -121,6 +112,7 @@ class UrlElementHelper
     public function getLabel(
         IFaceModelInterface $model,
         UrlContainerInterface $params,
+        I18nHelper $i18n,
         ?int $limit = null
     ): string {
         $label = $model->getLabel();
@@ -131,8 +123,8 @@ class UrlElementHelper
             ]);
         }
 
-        if ($this->i18n->isI18nKey($label)) {
-            $label = $this->i18n->translate($label);
+        if ($i18n->isI18nKey($label)) {
+            $label = $i18n->translate($label);
         }
 
         return $this->stringPatternHelper->processPattern($label, $params, $limit);
@@ -141,17 +133,18 @@ class UrlElementHelper
     /**
      * @param \BetaKiller\Url\IFaceModelInterface             $model
      * @param \BetaKiller\Url\Container\UrlContainerInterface $params
+     * @param \BetaKiller\Helper\I18nHelper                   $i18n
      *
      * @return string
      * @throws \BetaKiller\IFace\Exception\UrlElementException
      * @throws \BetaKiller\Url\UrlPrototypeException
      */
-    public function getTitle(IFaceModelInterface $model, UrlContainerInterface $params): string
+    public function getTitle(IFaceModelInterface $model, UrlContainerInterface $params, I18nHelper $i18n): string
     {
         $title = $model->getTitle();
 
         if (!$title) {
-            $title = $this->makeTitleFromLabels($model, $params);
+            $title = $this->makeTitleFromLabels($model, $params, $i18n);
         }
 
         if (!$title) {
@@ -160,17 +153,22 @@ class UrlElementHelper
             ]);
         }
 
+        if ($i18n->isI18nKey($title)) {
+            $title = $i18n->translate($title);
+        }
+
         return $this->stringPatternHelper->processPattern($title, $params, SeoMetaInterface::TITLE_LIMIT);
     }
 
     /**
      * @param \BetaKiller\Url\IFaceModelInterface             $model
      * @param \BetaKiller\Url\Container\UrlContainerInterface $params
+     * @param \BetaKiller\Helper\I18nHelper                   $i18n
      *
      * @return string
      * @throws \BetaKiller\Url\UrlPrototypeException
      */
-    public function getDescription(IFaceModelInterface $model, UrlContainerInterface $params): string
+    public function getDescription(IFaceModelInterface $model, UrlContainerInterface $params, I18nHelper $i18n): string
     {
         $description = $model->getDescription();
 
@@ -179,25 +177,32 @@ class UrlElementHelper
             return '';
         }
 
+        if ($i18n->isI18nKey($description)) {
+            $description = $i18n->translate($description);
+        }
+
         return $this->stringPatternHelper->processPattern($description, $params, SeoMetaInterface::DESCRIPTION_LIMIT);
     }
 
     /**
      * @param \BetaKiller\Url\IFaceModelInterface             $model
-     *
      * @param \BetaKiller\Url\Container\UrlContainerInterface $params
+     * @param \BetaKiller\Helper\I18nHelper                   $i18n
      *
      * @return string
      * @throws \BetaKiller\IFace\Exception\UrlElementException
      * @throws \BetaKiller\Url\UrlPrototypeException
      */
-    public function makeTitleFromLabels(IFaceModelInterface $model, UrlContainerInterface $params): string
-    {
+    private function makeTitleFromLabels(
+        IFaceModelInterface $model,
+        UrlContainerInterface $params,
+        I18nHelper $i18n
+    ): string {
         $labels  = [];
         $current = $model;
 
         do {
-            $labels[] = $this->getLabel($current, $params);
+            $labels[] = $this->getLabel($current, $params, $i18n);
             $current  = $this->tree->getParent($current);
         } while ($current);
 

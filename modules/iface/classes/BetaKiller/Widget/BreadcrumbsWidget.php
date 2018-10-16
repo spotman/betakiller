@@ -4,12 +4,28 @@ declare(strict_types=1);
 namespace BetaKiller\Widget;
 
 use BetaKiller\Helper\ServerRequestHelper;
+use BetaKiller\Helper\UrlElementHelper;
 use BetaKiller\Model\RoleInterface;
 use BetaKiller\Url\IFaceModelInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 class BreadcrumbsWidget extends AbstractWidget
 {
+    /**
+     * @var \BetaKiller\Helper\UrlElementHelper
+     */
+    private $elementHelper;
+
+    /**
+     * BreadcrumbsWidget constructor.
+     *
+     * @param \BetaKiller\Helper\UrlElementHelper $elementHelper
+     */
+    public function __construct(UrlElementHelper $elementHelper)
+    {
+        $this->elementHelper = $elementHelper;
+    }
+
     /**
      * Returns data for View rendering
      *
@@ -20,10 +36,10 @@ class BreadcrumbsWidget extends AbstractWidget
      */
     public function getData(ServerRequestInterface $request, array $context): array
     {
-        $stack         = ServerRequestHelper::getUrlElementStack($request);
-        $elementHelper = ServerRequestHelper::getUrlElementHelper($request);
-        $urlHelper     = ServerRequestHelper::getUrlHelper($request);
-        $params        = ServerRequestHelper::getUrlContainer($request);
+        $stack     = ServerRequestHelper::getUrlElementStack($request);
+        $urlHelper = ServerRequestHelper::getUrlHelper($request);
+        $params    = ServerRequestHelper::getUrlContainer($request);
+        $i18n      = ServerRequestHelper::getI18n($request);
 
         $data = [];
 
@@ -35,7 +51,7 @@ class BreadcrumbsWidget extends AbstractWidget
 
             $data[] = [
                 'url'    => $urlHelper->makeUrl($model, $params),
-                'label'  => $elementHelper->getLabel($model, $params),
+                'label'  => $this->elementHelper->getLabel($model, $params, $i18n),
                 'active' => $stack->isCurrent($model),
             ];
         }

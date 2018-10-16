@@ -35,23 +35,31 @@ class IFaceView
     private $viewFactory;
 
     /**
+     * @var \BetaKiller\Helper\UrlElementHelper
+     */
+    private $elementHelper;
+
+    /**
      * IFaceView constructor.
      *
      * @param \BetaKiller\Repository\IFaceLayoutRepository $layoutRepo
      * @param \BetaKiller\View\LayoutViewInterface         $layoutView
      * @param \BetaKiller\View\HtmlHeadHelper              $headHelper
+     * @param \BetaKiller\Helper\UrlElementHelper          $elementHelper
      * @param \BetaKiller\View\ViewFactoryInterface        $viewFactory
      */
     public function __construct(
         IFaceLayoutRepository $layoutRepo,
         LayoutViewInterface $layoutView,
         HtmlHeadHelper $headHelper,
+        UrlElementHelper $elementHelper,
         ViewFactoryInterface $viewFactory
     ) {
-        $this->layoutRepo  = $layoutRepo;
-        $this->layoutView  = $layoutView;
-        $this->headHelper  = $headHelper;
-        $this->viewFactory = $viewFactory;
+        $this->layoutRepo    = $layoutRepo;
+        $this->layoutView    = $layoutView;
+        $this->headHelper    = $headHelper;
+        $this->viewFactory   = $viewFactory;
+        $this->elementHelper = $elementHelper;
     }
 
     /**
@@ -65,9 +73,9 @@ class IFaceView
      */
     public function render(IFaceInterface $iface, ServerRequestInterface $request): string
     {
-        $urlHelper     = ServerRequestHelper::getUrlHelper($request);
-        $elementHelper = ServerRequestHelper::getUrlElementHelper($request);
-        $params        = ServerRequestHelper::getUrlContainer($request);
+        $urlHelper = ServerRequestHelper::getUrlHelper($request);
+        $params    = ServerRequestHelper::getUrlContainer($request);
+        $i18n      = ServerRequestHelper::getI18n($request);
 
         $model = $iface->getModel();
 
@@ -87,20 +95,18 @@ class IFaceView
 
         $ifaceView->set('__iface__', [
             'codename' => $model->getCodename(),
-            'label'    => $elementHelper->getLabel($model, $params),
+            'label'    => $this->elementHelper->getLabel($model, $params, $i18n),
         ]);
-
-        $i18n = ServerRequestHelper::getI18n($request);
 
         $this->headHelper
             ->setLang($i18n->getLang())
             ->setContentType()
-            ->setTitle($elementHelper->getTitle($model, $params))
-            ->setMetaDescription($elementHelper->getDescription($model, $params))
+            ->setTitle($this->elementHelper->getTitle($model, $params, $i18n))
+            ->setMetaDescription($this->elementHelper->getDescription($model, $params, $i18n))
             ->setCanonical($urlHelper->makeUrl($model, null, false));
 
         // Getting IFace layout
-        $layoutCodename = $this->getLayoutCodename($model, $elementHelper);
+        $layoutCodename = $this->getLayoutCodename($model, $this->elementHelper);
 
         $this->layoutView->setLayoutCodename($layoutCodename);
 
