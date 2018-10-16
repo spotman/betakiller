@@ -45,7 +45,7 @@ abstract class AbstractRevisionOrmModel extends \ORM implements RevisionModelInt
     /**
      * @return \BetaKiller\Model\AbstractEntityInterface
      */
-    public function getRelatedEntity(): AbstractEntityInterface
+    public function getRevisionRelatedEntity(): AbstractEntityInterface
     {
         return $this->get('entity');
     }
