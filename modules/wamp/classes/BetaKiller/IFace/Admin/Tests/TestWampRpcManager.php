@@ -3,32 +3,24 @@ declare(strict_types=1);
 
 namespace BetaKiller\IFace\Admin\Tests;
 
-use BetaKiller\Helper\IFaceHelper;
+use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\IFace\AbstractIFace;
+use Psr\Http\Message\ServerRequestInterface;
 
 class TestWampRpcManager extends AbstractIFace
 {
     /**
-     * @var \BetaKiller\Helper\IFaceHelper
-     */
-    private $ifaceHelper;
-
-    /**
-     * @param \BetaKiller\Helper\IFaceHelper $ifaceHelper
-     */
-    public function __construct(
-        IFaceHelper $ifaceHelper
-    ) {
-        $this->ifaceHelper = $ifaceHelper;
-    }
-
-    /**
+     * @param \Psr\Http\Message\ServerRequestInterface $request
+     *
      * @return string[]
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
      */
-    public function getData(): array
+    public function getData(ServerRequestInterface $request): array
     {
-        $testElement = $this->ifaceHelper->getUrlElementByCodename(TestWampRpcTest::codename());
-        $testUrl     = $this->ifaceHelper->makeUrl($testElement, null, false);
+        $urlHelper = ServerRequestHelper::getUrlHelper($request);
+
+        $testElement = $urlHelper->getUrlElementByCodename(TestWampRpcTest::codename());
+        $testUrl     = $urlHelper->makeUrl($testElement, null, false);
 
         return [
             'testUrl' => $testUrl,

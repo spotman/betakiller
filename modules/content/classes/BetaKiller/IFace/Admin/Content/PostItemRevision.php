@@ -5,6 +5,7 @@ use BetaKiller\Helper\ContentUrlContainerHelper;
 use BetaKiller\Repository\ContentPostRevisionRepository;
 use BetaKiller\Url\UrlDispatcherException;
 use Caxy\HtmlDiff\HtmlDiff;
+use Psr\Http\Message\ServerRequestInterface;
 
 class PostItemRevision extends AbstractAdminBase
 {
@@ -36,13 +37,17 @@ class PostItemRevision extends AbstractAdminBase
      * Returns data for View
      * Override this method in child classes
      *
+     * @param \Psr\Http\Message\ServerRequestInterface $request
+     *
      * @return array
+     * @throws \BetaKiller\Repository\RepositoryException
      * @throws \BetaKiller\Url\UrlDispatcherException
+     * @throws \Kohana_Exception
      */
-    public function getData(): array
+    public function getData(ServerRequestInterface $request): array
     {
-        $post     = $this->urlParametersHelper->getContentPost();
-        $revision = $this->urlParametersHelper->getContentPostRevision();
+        $post     = $this->urlParametersHelper->getContentPost($request);
+        $revision = $this->urlParametersHelper->getContentPostRevision($request);
 
         if (!$post) {
             throw new UrlDispatcherException('Missing ContentPost model');

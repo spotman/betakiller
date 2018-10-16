@@ -4,6 +4,7 @@ namespace BetaKiller\IFace\Admin\Content\Shortcode;
 use BetaKiller\Content\Shortcode\ShortcodeEntityInterface;
 use BetaKiller\IFace\Admin\AbstractAdminBase;
 use BetaKiller\Repository\ShortcodeRepository;
+use Psr\Http\Message\ServerRequestInterface;
 
 class Index extends AbstractAdminBase
 {
@@ -27,10 +28,12 @@ class Index extends AbstractAdminBase
     /**
      * Returns data for View
      *
+     * @param \Psr\Http\Message\ServerRequestInterface $request
+     *
      * @return array
-     * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
      */
-    public function getData(): array
+    public function getData(ServerRequestInterface $request): array
     {
         $otherData = [];
 
@@ -54,7 +57,7 @@ class Index extends AbstractAdminBase
      * @param \BetaKiller\Content\Shortcode\ShortcodeEntityInterface $shortcode
      *
      * @return array
-     * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
      */
     private function makeShortcodeData(ShortcodeEntityInterface $shortcode): array
     {

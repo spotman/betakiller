@@ -1,6 +1,7 @@
 <?php
 namespace BetaKiller\Api\Method\PhpException;
 
+use BetaKiller\Exception\HttpException;
 use BetaKiller\Model\UserInterface;
 use Spotman\Api\ApiMethodResponse;
 
@@ -33,7 +34,8 @@ class ThrowHttpExceptionApiMethod extends AbstractPhpExceptionApiMethod
      */
     public function execute(): ?ApiMethodResponse
     {
-        throw \HTTP_Exception::factory($this->code, 'This is a test from :username',
-            [':username' => $this->user->getUsername()]);
+        throw new HttpException($this->code, 'This is a test from :username', [
+            ':username' => $this->user->getUsername(),
+        ]);
     }
 }

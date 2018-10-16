@@ -5,9 +5,12 @@ namespace BetaKiller\Service;
 
 use BetaKiller\Config\AppConfigInterface;
 use BetaKiller\Helper\AppEnvInterface;
+use BetaKiller\Helper\ResponseHelper;
+use BetaKiller\Helper\UrlHelper;
 use BetaKiller\Url\AvailableUrlsCollector;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
-use Response;
 use samdark\sitemap\Index;
 use samdark\sitemap\Sitemap;
 
@@ -64,13 +67,14 @@ class SitemapService
     }
 
     /**
-     * @return $this
-     * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @param \BetaKiller\Helper\UrlHelper $urlHelper
+     *
+     * @return \BetaKiller\Service\SitemapService
      * @throws \BetaKiller\Factory\FactoryException
-     * @throws \InvalidArgumentException
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
      * @throws \BetaKiller\Service\ServiceException
      */
-    public function generate(): self
+    public function generate(UrlHelper $urlHelper): self
     {
         $baseUrl = $this->appConfig->getBaseUrl();
 
@@ -81,7 +85,7 @@ class SitemapService
         // Create sitemap
         $this->sitemap = new Sitemap($this->getSitemapFilePath());
 
-        foreach ($this->urlCollector->getPublicAvailableUrls() as $item) {
+        foreach ($this->urlCollector->getPublicAvailableUrls($urlHelper) as $item) {
             $url = $item->getUrl();
 
             $this->logger->debug('Found url :value', [':value' => $url]);
@@ -114,10 +118,26 @@ class SitemapService
         return $this;
     }
 
-    public function serve(Response $response): void
+    public function delete(): void
+    {
+        $path = $this->getSitemapFilePath();
+
+        if (\file_exists($path)) {
+            \unlink($path);
+        }
+
+        $path = $this->getSitemapFilePath();
+
+        if (\file_exists($path)) {
+            \unlink($path);
+        }
+    }
+
+    public function serve(): ResponseInterface
     {
         $content = file_get_contents($this->getSitemapFilePath());
-        $response->send_string($content, $response::TYPE_XML);
+
+        return ResponseHelper::xml($content);
     }
 
     protected function getSitemapFilePath(): string

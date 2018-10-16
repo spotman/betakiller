@@ -197,7 +197,6 @@ class IFace extends AbstractOrmModelContainsUrlElement implements IFaceModelInte
      * Returns zone codename where this IFace is placed
      *
      * @return string
-     * @throws \Kohana_Exception
      */
     public function getZoneName(): string
     {

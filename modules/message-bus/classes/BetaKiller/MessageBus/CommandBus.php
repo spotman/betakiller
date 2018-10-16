@@ -49,7 +49,9 @@ class CommandBus extends AbstractMessageBus implements CommandBusInterface
     private function handle(CommandMessageInterface $message)
     {
         // Only one handler per message
-        $handler = $this->getHandlers($message)[0];
+        $handlerClassName = $this->getMessageHandlersClassNames($message)[0];
+
+        $handler = $this->getHandlerInstance($handlerClassName);
 
         return $this->process($message, $handler);
     }
@@ -64,9 +66,6 @@ class CommandBus extends AbstractMessageBus implements CommandBusInterface
     {
         // Wrap every message bus processing with try-catch block and log exceptions
         try {
-            /** @var \BetaKiller\MessageBus\CommandHandlerInterface $handler */
-            $handler = $this->reviewHandler($handler);
-
             $result = $handler->handleCommand($command);
 
             if ($result && $command->isAsync()) {

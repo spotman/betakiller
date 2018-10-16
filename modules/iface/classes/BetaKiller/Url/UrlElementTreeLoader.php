@@ -5,7 +5,7 @@ namespace BetaKiller\Url;
 
 use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\Helper\LoggerHelperTrait;
-use BetaKiller\IFace\Exception\IFaceException;
+use BetaKiller\IFace\Exception\UrlElementException;
 use BetaKiller\Url\ModelProvider\UrlElementProviderDatabase;
 use BetaKiller\Url\ModelProvider\UrlElementProviderPhpConfig;
 use BetaKiller\Url\ModelProvider\UrlElementProviderXmlConfig;
@@ -78,7 +78,7 @@ class UrlElementTreeLoader
     }
     /**
      * @return \BetaKiller\Url\UrlElementTreeInterface
-     * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
      * @throws \Psr\SimpleCache\InvalidArgumentException
      */
     public function load(): UrlElementTreeInterface
@@ -120,7 +120,7 @@ class UrlElementTreeLoader
             $data = unserialize($serializedModels, [UrlElementInterface::class]);
 
             if (!$data || !\is_array($data)) {
-                throw new IFaceException('Cached UrlElementTree data is invalid');
+                throw new UrlElementException('Cached UrlElementTree data is invalid');
             }
 
             // Simply add all models, validation already done upon inserting data into cache
@@ -145,7 +145,7 @@ class UrlElementTreeLoader
      * @param string $key
      *
      * @throws \Psr\SimpleCache\InvalidArgumentException
-     * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
      */
     private function storeTreeInCache(string $key): void
     {
@@ -162,7 +162,7 @@ class UrlElementTreeLoader
     }
 
     /**
-     * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
      */
     private function loadTreeFromProviders(): void
     {

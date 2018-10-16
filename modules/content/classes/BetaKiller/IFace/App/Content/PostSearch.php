@@ -1,26 +1,25 @@
 <?php
 namespace BetaKiller\IFace\App\Content;
 
+use BetaKiller\Helper\ServerRequestHelper;
+use Psr\Http\Message\ServerRequestInterface;
+
 class PostSearch extends AbstractAppBase
 {
-    /**
-     * @Inject
-     * @var \BetaKiller\Helper\UrlContainerHelper
-     */
-    private $urlParametersHelper;
-
     /**
      * Returns data for View
      * Override this method in child classes
      *
+     * @param \Psr\Http\Message\ServerRequestInterface $request
+     *
      * @return array
      */
-    public function getData(): array
+    public function getData(ServerRequestInterface $request): array
     {
-        $term = $this->urlParametersHelper->getQueryPart('term');
+        $term = ServerRequestHelper::getQueryPart($request, 'term');
 
         return [
-            'term'  =>  \HTML::chars(strip_tags($term)),
+            'term' => \HTML::chars(strip_tags($term)),
         ];
     }
 }

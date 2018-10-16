@@ -5,5 +5,5 @@ namespace BetaKiller\Model;
 
 trait DummyModelTrait
 {
-    use DummyAndWebHookModelTrait;
+    use SecondaryUrlElementModelTrait;
 }

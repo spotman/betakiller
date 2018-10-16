@@ -59,8 +59,7 @@ class AssetsDeploymentService
         file_put_contents($fullPath, $content);
 
         // Update last modification time for better caching
-        $lastModified = $model->getLastModifiedAt() ?: new \DateTimeImmutable();
-        touch($fullPath, $lastModified->getTimestamp());
+        touch($fullPath, $model->getLastModifiedAt()->getTimestamp());
 
         return true;
     }

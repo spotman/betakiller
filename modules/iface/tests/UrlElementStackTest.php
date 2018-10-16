@@ -1,6 +1,6 @@
 <?php
 
-use BetaKiller\IFace\Exception\IFaceException;
+use BetaKiller\IFace\Exception\UrlElementException;
 use BetaKiller\Url\Container\UrlContainerInterface;
 use BetaKiller\Url\IFaceModelInterface;
 use BetaKiller\Url\UrlElementStack;
@@ -114,7 +114,7 @@ class UrlElementStackTest extends \BetaKiller\Test\AbstractTestCase
         $firstModel = $firstProp->reveal();
 
         $stack->push($firstModel);
-        $this->expectException(IFaceException::class);
+        $this->expectException(UrlElementException::class);
         $stack->push($firstModel);
     }
 
@@ -136,19 +136,6 @@ class UrlElementStackTest extends \BetaKiller\Test\AbstractTestCase
 
         $stack->push($secondModel);
         $this->assertTrue($stack->isCurrent($secondModel));
-    }
-
-    /**
-     * @depends testAddSecond
-     *
-     * @param \BetaKiller\Url\UrlElementStack $stack
-     */
-    public function testClear(UrlElementStack $stack)
-    {
-        $stack->clear();
-
-        $this->assertAttributeCount(0, 'items', $stack);
-        $this->assertAttributeEquals(null, 'current', $stack);
     }
 
     private function createEmptyStack()

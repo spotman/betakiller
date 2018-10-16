@@ -27,7 +27,7 @@ abstract class AbstractUrlBehaviour implements UrlBehaviourInterface
      */
     public function makeUri(
         UrlElementInterface $urlElement,
-        ?UrlContainerInterface $params = null
+        UrlContainerInterface $params
     ): string {
         $uri = $this->getUri($urlElement, $params);
 
@@ -45,8 +45,5 @@ abstract class AbstractUrlBehaviour implements UrlBehaviourInterface
      *
      * @return string
      */
-    abstract protected function getUri(
-        UrlElementInterface $ifaceModel,
-        ?UrlContainerInterface $params = null
-    ): string;
+    abstract protected function getUri(UrlElementInterface $ifaceModel, UrlContainerInterface $params): string;
 }

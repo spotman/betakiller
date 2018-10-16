@@ -1,6 +1,7 @@
 <?php
 namespace BetaKiller\Status;
 
+use BetaKiller\Exception\NotImplementedHttpException;
 use BetaKiller\Model\UserInterface;
 
 abstract class StatusWorkflow implements StatusWorkflowInterface
@@ -18,7 +19,7 @@ abstract class StatusWorkflow implements StatusWorkflowInterface
     public function __construct(StatusRelatedModelInterface $model, UserInterface $user)
     {
         $this->model = $model;
-        $this->user = $user;
+        $this->user  = $user;
     }
 
     /**
@@ -41,7 +42,7 @@ abstract class StatusWorkflow implements StatusWorkflowInterface
         if ($this->isHistoryEnabled()) {
             // TODO Model_Status_Workflow_History + tables in selected projects
             // TODO Store user, transition, related model_id (auto timestamp in mysql column)
-            throw new \HTTP_Exception_501('Not implemented yet');
+            throw new NotImplementedHttpException();
         }
     }
 
@@ -57,11 +58,12 @@ abstract class StatusWorkflow implements StatusWorkflowInterface
 
     /**
      * Override this in child class if you need status transition history
+     *
      * @return bool
      */
     protected function isHistoryEnabled(): bool
     {
-        return FALSE;
+        return false;
     }
 
     /**
@@ -72,9 +74,7 @@ abstract class StatusWorkflow implements StatusWorkflowInterface
      */
     protected function findTargetTransition(string $codename): StatusTransitionModelInterface
     {
-        $targets = $this->model->getTargetTransitions();
-
-        foreach ($targets as $target) {
+        foreach ($this->model->getTargetTransitions() as $target) {
             if ($target->getCodename() === $codename) {
                 return $target;
             }

@@ -55,13 +55,6 @@ interface NotificationMessageInterface
     public function clearTargets(): NotificationMessageInterface;
 
     /**
-     * @param \BetaKiller\Notification\NotificationUserInterface $targetUser
-     *
-     * @return string
-     */
-    public function getSubj(NotificationUserInterface $targetUser): string;
-
-    /**
      * @return array
      */
     public function getAttachments(): array;

@@ -48,9 +48,9 @@ interface AssetsModelInterface extends AbstractEntityInterface
     /**
      * Returns the date and time when asset was last modified
      *
-     * @return \DateTimeImmutable|null
+     * @return \DateTimeImmutable
      */
-    public function getLastModifiedAt(): ?DateTimeImmutable;
+    public function getLastModifiedAt(): DateTimeImmutable;
 
     /**
      * Sets the date and time when asset was last modified

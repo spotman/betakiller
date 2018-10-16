@@ -3,7 +3,7 @@ namespace BetaKiller\IFace;
 
 use BetaKiller\Factory\FactoryException;
 use BetaKiller\Factory\IFaceFactory;
-use BetaKiller\IFace\Exception\IFaceException;
+use BetaKiller\IFace\Exception\UrlElementException;
 use BetaKiller\Url\UrlElementInterface;
 use BetaKiller\Url\UrlElementTreeInterface;
 
@@ -37,7 +37,7 @@ class IFaceProvider
      * @param string $codename
      *
      * @return \BetaKiller\IFace\IFaceInterface
-     * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
      */
     public function fromCodename(string $codename): IFaceInterface
     {
@@ -52,14 +52,14 @@ class IFaceProvider
      * @param \BetaKiller\Url\UrlElementInterface $model
      *
      * @return \BetaKiller\IFace\IFaceInterface
-     * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
      */
     public function fromUrlElement(UrlElementInterface $model): IFaceInterface
     {
         try {
             return $this->factory->createFromUrlElement($model);
         } catch (FactoryException $e) {
-            throw IFaceException::wrap($e);
+            throw UrlElementException::wrap($e);
         }
     }
 }

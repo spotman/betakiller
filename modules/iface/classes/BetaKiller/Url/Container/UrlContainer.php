@@ -301,4 +301,20 @@ class UrlContainer implements UrlContainerInterface
     {
         return array_diff(array_keys($this->queryParts), $this->usedQueryParts);
     }
+
+    /**
+     * @param \BetaKiller\Url\Container\UrlContainerInterface $from
+     * @param bool|null                                       $overwrite
+     */
+    public function import(UrlContainerInterface $from, bool $overwrite = null): void
+    {
+        foreach ($from->getAllParameters() as $param) {
+            // Skip existing params
+            if (!$overwrite && $this->hasParameterInstance($param)) {
+                continue;
+            }
+
+            $this->setParameter($param);
+        }
+    }
 }

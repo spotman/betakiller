@@ -4,31 +4,21 @@ declare(strict_types=1);
 namespace BetaKiller\IFace\Admin\WebHooks;
 
 use BetaKiller\Factory\WebHookFactory;
-use BetaKiller\Helper\IFaceHelper;
+use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\IFace\Admin\AbstractAdminBase;
 use BetaKiller\Model\WebHookLogInterface;
 use BetaKiller\Repository\WebHookLogRepository;
 use BetaKiller\Url\Container\UrlContainer;
-use BetaKiller\Url\Container\UrlContainerInterface;
 use BetaKiller\Url\UrlElementTreeInterface;
 use BetaKiller\Url\WebHookModelInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
 class InfoItem extends AbstractAdminBase
 {
     /**
-     * @var \BetaKiller\Url\Container\UrlContainerInterface
-     */
-    private $urlContainer;
-
-    /**
      * @var \BetaKiller\Factory\WebHookFactory
      */
     private $webHookFactory;
-
-    /**
-     * @var \BetaKiller\Helper\IFaceHelper
-     */
-    private $ifaceHelper;
 
     /**
      * @var \BetaKiller\Url\UrlElementTreeInterface
@@ -41,22 +31,16 @@ class InfoItem extends AbstractAdminBase
     private $webHookLogRepository;
 
     /**
-     * @param \BetaKiller\Url\UrlElementTreeInterface         $tree
-     * @param \BetaKiller\Url\Container\UrlContainerInterface $urlContainer
-     * @param \BetaKiller\Factory\WebHookFactory              $webHookFactory
-     * @param \BetaKiller\Helper\IFaceHelper                  $ifaceHelper
-     * @param \BetaKiller\Repository\WebHookLogRepository     $webHookLogRepository
+     * @param \BetaKiller\Url\UrlElementTreeInterface     $tree
+     * @param \BetaKiller\Factory\WebHookFactory          $webHookFactory
+     * @param \BetaKiller\Repository\WebHookLogRepository $webHookLogRepository
      */
     public function __construct(
         UrlElementTreeInterface $tree,
-        UrlContainerInterface $urlContainer,
         WebHookFactory $webHookFactory,
-        IFaceHelper $ifaceHelper,
         WebHookLogRepository $webHookLogRepository
     ) {
-        $this->urlContainer         = $urlContainer;
         $this->webHookFactory       = $webHookFactory;
-        $this->ifaceHelper          = $ifaceHelper;
         $this->tree                 = $tree;
         $this->webHookLogRepository = $webHookLogRepository;
     }
@@ -64,23 +48,31 @@ class InfoItem extends AbstractAdminBase
     /**
      * Returns data for View
      *
+     * @param \Psr\Http\Message\ServerRequestInterface $request
+     *
      * @return array
+     * @throws \BetaKiller\Factory\FactoryException
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     * @throws \BetaKiller\Repository\RepositoryException
      */
-    public function getData(): array
+    public function getData(ServerRequestInterface $request): array
     {
-        $model = $this->getWebHookModel();
+        $urlHelper = ServerRequestHelper::getUrlHelper($request);
+
+        /** @var WebHookModelInterface $model */
+        $model = ServerRequestHelper::getEntity($request, WebHookModelInterface::class);
 
         //
         $urlElement   = $this->tree->getByCodename(ListItems::codename());
-        $listItemsUrl = $this->ifaceHelper->makeUrl($urlElement, null, false);
+        $listItemsUrl = $urlHelper->makeUrl($urlElement, null, false);
 
         //
-        $webHook = $this->webHookFactory->createFromUrlElement($model);
-        $request = $webHook->getRequestDefinition();
+        $webHook    = $this->webHookFactory->createFromUrlElement($model);
+        $definition = $webHook->getRequestDefinition();
 
         $param = UrlContainer::create();
         $param->setEntity($model);
-        $requestAction = $this->ifaceHelper->makeUrl($model, $param, false);
+        $requestAction = $urlHelper->makeUrl($model, $param, false);
 
         $codeName    = $model->getCodename();
         $serviceName = $model->getServiceName();
@@ -100,8 +92,8 @@ class InfoItem extends AbstractAdminBase
             'info'         => $info,
             'request'      => [
                 'action' => $requestAction,
-                'method' => $request->getMethod(),
-                'fields' => $request->getFields(),
+                'method' => $definition->getMethod(),
+                'fields' => $definition->getFields(),
             ],
             'logItems'     => $logItems,
         ];
@@ -124,7 +116,7 @@ class InfoItem extends AbstractAdminBase
      * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\Repository\RepositoryException
      */
-    protected function getLogItems(string $codeName): array
+    private function getLogItems(string $codeName): array
     {
         $logItems = $this->webHookLogRepository->getItems($codeName);
 
@@ -138,13 +130,5 @@ class InfoItem extends AbstractAdminBase
                 'requestData' => $model->getRequestData()->get(),
             ];
         }, $logItems);
-    }
-
-    /**
-     * @return \BetaKiller\Url\WebHookModelInterface
-     */
-    protected function getWebHookModel(): WebHookModelInterface
-    {
-        return $this->urlContainer->getEntityByClassName(WebHookModelInterface::class);
     }
 }

@@ -150,7 +150,7 @@ class Kohana_StaticCss extends StaticFile {
 		}
 
         // TODO Refactoring
-//        Response::current()->http2_server_push($css);
+//        Response::current()->http2ServerPush($css);
 
         return ''
 		. ($condition ? '<!--[if ' . $condition . ']>' : '')

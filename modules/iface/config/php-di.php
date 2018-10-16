@@ -1,8 +1,6 @@
 <?php
 
 use BetaKiller\DI\ContainerInterface;
-use BetaKiller\Url\Container\ResolvingUrlContainer;
-use BetaKiller\Url\Container\UrlContainerInterface;
 use BetaKiller\Url\UrlDispatcher;
 use BetaKiller\Url\UrlDispatcherCacheWrapper;
 use BetaKiller\Url\UrlDispatcherInterface;
@@ -13,7 +11,7 @@ return [
 
     'definitions' => [
 
-        UrlContainerInterface::class => DI\autowire(ResolvingUrlContainer::class),
+//        UrlContainerInterface::class => DI\autowire(ResolvingUrlContainer::class),
 
         UrlDispatcherInterface::class => DI\factory(function (UrlDispatcher $proxy, ContainerInterface $container) {
             return $container->make(UrlDispatcherCacheWrapper::class, [

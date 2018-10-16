@@ -150,7 +150,7 @@ class Kohana_StaticJs extends StaticFile {
 		}
 
 		// TODO Refactoring
-//		Response::current()->http2_server_push($js);
+//		Response::current()->http2ServerPush($js);
 
 		return ''
 		. ($condition ? '<!--[if ' . $condition . ']>' : '')

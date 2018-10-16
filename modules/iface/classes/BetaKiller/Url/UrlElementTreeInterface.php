@@ -10,7 +10,7 @@ interface UrlElementTreeInterface
      * @param \BetaKiller\Url\UrlElementInterface $model
      * @param bool|null                           $warnIfExists
      *
-     * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
      */
     public function add(UrlElementInterface $model, ?bool $warnIfExists = null): void;
 
@@ -24,7 +24,7 @@ interface UrlElementTreeInterface
     public function has(string $codename): bool;
 
     /**
-     * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
      */
     public function validate(): void;
 
@@ -32,7 +32,7 @@ interface UrlElementTreeInterface
      * Returns default iface model
      *
      * @return \BetaKiller\Url\IFaceModelInterface
-     * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
      */
     public function getDefault(): IFaceModelInterface;
 
@@ -40,7 +40,7 @@ interface UrlElementTreeInterface
      * Returns list of root elements
      *
      * @return \BetaKiller\Url\UrlElementInterface[]
-     * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
      */
     public function getRoot(): array;
 
@@ -59,7 +59,7 @@ interface UrlElementTreeInterface
      * @param \BetaKiller\Url\UrlElementInterface $child
      *
      * @return \BetaKiller\Url\UrlElementInterface|null
-     * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
      */
     public function getParent(UrlElementInterface $child): ?UrlElementInterface;
 
@@ -67,7 +67,7 @@ interface UrlElementTreeInterface
      * @param \BetaKiller\Url\IFaceModelInterface $child
      *
      * @return \BetaKiller\Url\IFaceModelInterface|null
-     * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
      */
     public function getParentIFaceModel(IFaceModelInterface $child): ?IFaceModelInterface;
 
@@ -77,7 +77,7 @@ interface UrlElementTreeInterface
      * @param string $codename
      *
      * @return \BetaKiller\Url\UrlElementInterface
-     * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
      */
     public function getByCodename(string $codename): UrlElementInterface;
 
@@ -97,7 +97,7 @@ interface UrlElementTreeInterface
      * @param string                                        $zone
      *
      * @return \BetaKiller\Url\IFaceModelInterface
-     * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
      */
     public function getByEntityActionAndZone(
         DispatchableEntityInterface $entity,
@@ -118,7 +118,7 @@ interface UrlElementTreeInterface
      * @param \BetaKiller\Url\UrlElementInterface $model
      *
      * @return \ArrayIterator|\BetaKiller\Url\UrlElementInterface[]
-     * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
      */
     public function getReverseBreadcrumbsIterator(UrlElementInterface $model): \ArrayIterator;
 
@@ -127,7 +127,7 @@ interface UrlElementTreeInterface
      * @param \BetaKiller\Url\ElementFilter\UrlElementFilterInterface|null $filter
      *
      * @return \RecursiveIteratorIterator|\BetaKiller\Url\UrlElementInterface[]
-     * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
      */
     public function getRecursiveIteratorIterator(
         UrlElementInterface $parent = null,
@@ -138,13 +138,13 @@ interface UrlElementTreeInterface
      * @param \BetaKiller\Url\UrlElementInterface|NULL $parent
      *
      * @return \RecursiveIteratorIterator|\BetaKiller\Url\UrlElementInterface[]
-     * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
      */
     public function getPublicIFaceIterator(UrlElementInterface $parent = null): \RecursiveIteratorIterator;
 
     /**
      * @return \RecursiveIteratorIterator|\BetaKiller\Url\UrlElementInterface[]
-     * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
      */
     public function getRecursiveSitemapIterator(): \RecursiveIteratorIterator;
 
@@ -152,7 +152,7 @@ interface UrlElementTreeInterface
      * @param \BetaKiller\Url\UrlElementInterface|NULL $parent
      *
      * @return \RecursiveIteratorIterator|\BetaKiller\Url\UrlElementInterface[]
-     * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
      */
     public function getAdminIFaceIterator(UrlElementInterface $parent = null): \RecursiveIteratorIterator;
 }

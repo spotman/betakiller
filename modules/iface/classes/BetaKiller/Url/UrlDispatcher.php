@@ -44,7 +44,7 @@ class UrlDispatcher implements UrlDispatcherInterface
      *
      * @return void
      * @throws \BetaKiller\Factory\FactoryException
-     * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
      * @throws \BetaKiller\Url\Behaviour\UrlBehaviourException
      * @throws \BetaKiller\Url\MissingUrlElementException
      */
@@ -69,7 +69,7 @@ class UrlDispatcher implements UrlDispatcherInterface
      *
      * @return void
      * @throws \BetaKiller\Factory\FactoryException
-     * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
      * @throws \BetaKiller\Url\MissingUrlElementException
      * @throws \BetaKiller\Url\Behaviour\UrlBehaviourException
      */
@@ -100,7 +100,7 @@ class UrlDispatcher implements UrlDispatcherInterface
      *
      * @return \BetaKiller\Url\UrlElementInterface
      * @throws \BetaKiller\Factory\FactoryException
-     * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
      * @throws \BetaKiller\Url\Behaviour\UrlBehaviourException
      * @throws \BetaKiller\Url\MissingUrlElementException
      */
@@ -143,7 +143,7 @@ class UrlDispatcher implements UrlDispatcherInterface
 //     * @param \BetaKiller\Url\UrlElementInterface|null $parentModel
 //     *
 //     * @return \BetaKiller\Url\IFaceModelInterface|null
-//     * @throws \BetaKiller\IFace\Exception\IFaceException
+//     * @throws \BetaKiller\IFace\Exception\UrlElementException
 //     */
 //    private function searchFor404IFaceInBranch(?UrlElementInterface $parentModel = null): ?UrlElementInterface
 //    {

@@ -1,6 +1,8 @@
 <?php
 namespace BetaKiller\IFace\App\Content;
 
+use Psr\Http\Message\ServerRequestInterface;
+
 class CategoryItem extends AbstractAppBase
 {
     /**
@@ -11,13 +13,14 @@ class CategoryItem extends AbstractAppBase
 
     /**
      * Returns data for View
-     * Override this method in child classes
+     *
+     * @param \Psr\Http\Message\ServerRequestInterface $request
      *
      * @return array
      */
-    public function getData(): array
+    public function getData(ServerRequestInterface $request): array
     {
-        $category = $this->urlParametersHelper->getContentCategory();
+        $category = $this->urlParametersHelper->getContentCategory($request);
 
         return [
             'category'  =>  [

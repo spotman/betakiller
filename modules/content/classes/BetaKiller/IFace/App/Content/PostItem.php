@@ -6,6 +6,7 @@ use BetaKiller\Helper\ContentUrlContainerHelper;
 use BetaKiller\Model\ContentPost;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Url\ZoneInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
 class PostItem extends AbstractAppBase
 {
@@ -31,7 +32,7 @@ class PostItem extends AbstractAppBase
 
     /**
      * @Inject
-     * @var \BetaKiller\Helper\IFaceHelper
+     * @var \BetaKiller\Helper\UrlElementHelper
      */
     private $ifaceHelper;
 
@@ -68,9 +69,15 @@ class PostItem extends AbstractAppBase
      * Returns data for View
      * Override this method in child classes
      *
+     * @param \Psr\Http\Message\ServerRequestInterface $request
+     *
      * @return array
+     * @throws \BetaKiller\Assets\AssetsException
+     * @throws \BetaKiller\Assets\AssetsStorageException
+     * @throws \BetaKiller\Factory\FactoryException
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
      */
-    public function getData(): array
+    public function getData(ServerRequestInterface $request): array
     {
         $model = $this->getContentModel();
 
@@ -97,9 +104,7 @@ class PostItem extends AbstractAppBase
             $thumbnails[] = $this->assetsHelper->getAttributesForImgTag($thumb, $thumb::SIZE_ORIGINAL);
 
             // Get image last modified and set it to iface
-            if ($thumbLastModified = $thumb->getLastModifiedAt()) {
-                $this->setLastModified($thumbLastModified);
-            }
+            $this->setLastModified($thumb->getLastModifiedAt());
         }
 
         return [

@@ -1,8 +1,8 @@
 <?php
 namespace BetaKiller\Status;
 
-use BetaKiller\Helper\IFaceHelper;
 use BetaKiller\Helper\NotificationHelper;
+use BetaKiller\Helper\UrlElementHelper;
 use BetaKiller\Model\ContentCommentInterface;
 use BetaKiller\Model\ContentCommentStatusTransition;
 use BetaKiller\Model\UserInterface;
@@ -11,7 +11,7 @@ use BetaKiller\Service\UserService;
 class ContentCommentWorkflow extends StatusWorkflow
 {
     public const NOTIFICATION_AUTHOR_APPROVE = 'user/comment/author-approve';
-    public const NOTIFICATION_PARENT_REPLY = 'user/comment/parent-author-reply';
+    public const NOTIFICATION_PARENT_REPLY   = 'user/comment/parent-author-reply';
 
     /**
      * @var \BetaKiller\Helper\NotificationHelper
@@ -19,7 +19,7 @@ class ContentCommentWorkflow extends StatusWorkflow
     private $notification;
 
     /**
-     * @var \BetaKiller\Helper\IFaceHelper
+     * @var \BetaKiller\Helper\UrlElementHelper
      */
     private $ifaceHelper;
 
@@ -34,14 +34,14 @@ class ContentCommentWorkflow extends StatusWorkflow
      * @param \BetaKiller\Status\StatusRelatedModelInterface $model
      * @param \BetaKiller\Model\UserInterface                $user
      * @param \BetaKiller\Helper\NotificationHelper          $notificationHelper
-     * @param \BetaKiller\Helper\IFaceHelper                 $ifaceHelper
+     * @param \BetaKiller\Helper\UrlElementHelper            $ifaceHelper
      * @param \BetaKiller\Service\UserService                $service
      */
     public function __construct(
         StatusRelatedModelInterface $model,
         UserInterface $user,
         NotificationHelper $notificationHelper,
-        IFaceHelper $ifaceHelper,
+        UrlElementHelper $ifaceHelper,
         UserService $service
     ) {
         parent::__construct($model, $user);
@@ -78,7 +78,6 @@ class ContentCommentWorkflow extends StatusWorkflow
      * @throws \BetaKiller\Notification\NotificationException
      * @throws \BetaKiller\Exception
      * @throws \BetaKiller\Status\StatusException
-     * @throws \HTTP_Exception_501
      */
     public function approve(): void
     {

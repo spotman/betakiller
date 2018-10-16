@@ -1,6 +1,7 @@
 <?php
 namespace BetaKiller\Notification\Transport;
 
+use BetaKiller\Exception\NotImplementedHttpException;
 use BetaKiller\Notification\MessageRendererInterface;
 use BetaKiller\Notification\NotificationMessageInterface;
 use BetaKiller\Notification\NotificationUserInterface;
@@ -29,7 +30,7 @@ class OnlineTransport extends AbstractTransport
         // TODO Online detection logic
         // Check websocket connection
 
-        return false;
+        return !$user;
     }
 
     /**
@@ -38,13 +39,12 @@ class OnlineTransport extends AbstractTransport
      * @param \BetaKiller\Notification\MessageRendererInterface     $renderer
      *
      * @return int Number of messages sent
-     * @throws \HTTP_Exception_501
      */
     public function send(
         NotificationMessageInterface $message,
         NotificationUserInterface $user,
         MessageRendererInterface $renderer
     ): int {
-        throw new \HTTP_Exception_501('Not implemented yet');
+        throw new NotImplementedHttpException();
     }
 }

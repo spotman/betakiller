@@ -11,7 +11,8 @@ use BetaKiller\Model\UserInterface;
  *
  * @package BetaKiller\Repository
  * @method UserInterface create()
- * @method UserInterface findById(int $id)
+ * @method UserInterface findById(string $id)
+ * @method UserInterface getById(string $id)
  * @method UserInterface[] getAll()
  * @method User getOrmInstance()
  */

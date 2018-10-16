@@ -3,11 +3,12 @@ declare(strict_types=1);
 
 namespace BetaKiller\IFace\Admin\WebHooks;
 
-use BetaKiller\Helper\IFaceHelper;
+use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\IFace\Admin\AbstractAdminBase;
 use BetaKiller\Repository\WebHookRepository;
 use BetaKiller\Url\Container\UrlContainer;
 use BetaKiller\Url\UrlElementTreeInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
 class ListItems extends AbstractAdminBase
 {
@@ -15,11 +16,6 @@ class ListItems extends AbstractAdminBase
      * @var \BetaKiller\Repository\WebHookRepository
      */
     private $webHookRepository;
-
-    /**
-     * @var \BetaKiller\Helper\IFaceHelper
-     */
-    private $ifaceHelper;
 
     /**
      * @var \BetaKiller\Url\UrlElementTreeInterface
@@ -31,32 +27,34 @@ class ListItems extends AbstractAdminBase
      *
      * @param \BetaKiller\Repository\WebHookRepository $webHookRepository
      * @param \BetaKiller\Url\UrlElementTreeInterface  $tree
-     * @param \BetaKiller\Helper\IFaceHelper           $ifaceHelper
      */
     public function __construct(
         WebHookRepository $webHookRepository,
-        UrlElementTreeInterface $tree,
-        IFaceHelper $ifaceHelper
+        UrlElementTreeInterface $tree
     ) {
         $this->webHookRepository = $webHookRepository;
-        $this->ifaceHelper       = $ifaceHelper;
         $this->tree              = $tree;
     }
 
     /**
      * Returns data for View
      *
+     * @param \Psr\Http\Message\ServerRequestInterface $request
+     *
      * @return array
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
      */
-    public function getData(): array
+    public function getData(ServerRequestInterface $request): array
     {
-        $items  = [];
-        $models = $this->webHookRepository->getAll();
-        foreach ($models as $model) {
+        $urlHelper = ServerRequestHelper::getUrlHelper($request);
+
+        $items = [];
+
+        foreach ($this->webHookRepository->getAll() as $model) {
             $urlElement = $this->tree->getByCodename(InfoItem::codename());
-            $param      = UrlContainer::create();
-            $param->setEntity($model);
-            $url = $this->ifaceHelper->makeUrl($urlElement, $param, false);
+
+            $param = UrlContainer::create()->setEntity($model);
+            $url   = $urlHelper->makeUrl($urlElement, $param, false);
 
             $codeName    = $model->getCodename();
             $serviceName = $model->getServiceName();

@@ -1,36 +1,35 @@
 <?php
 namespace BetaKiller\IFace\Admin\Content;
 
+use BetaKiller\Helper\ServerRequestHelper;
+use BetaKiller\Helper\UrlHelper;
 use BetaKiller\Model\ContentCommentInterface;
+use BetaKiller\Model\UserInterface;
+use BetaKiller\Url\ZoneInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
 abstract class AbstractCommentList extends AbstractAdminBase
 {
     /**
-     * @Inject
-     * @var \BetaKiller\Model\UserInterface
-     */
-    private $user;
-
-    /**
-     * @Inject
-     * @var \BetaKiller\Helper\IFaceHelper
-     */
-    private $ifaceHelper;
-
-    /**
      * Returns data for View
      * Override this method in child classes
      *
+     * @param \Psr\Http\Message\ServerRequestInterface $request
+     *
      * @return array
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
      */
-    public function getData(): array
+    public function getData(ServerRequestInterface $request): array
     {
+        $user      = ServerRequestHelper::getUser($request);
+        $urlHelper = ServerRequestHelper::getUrlHelper($request);
+
         $comments = $this->getCommentsList();
 
         $data = [];
 
         foreach ($comments as $comment) {
-            $data[] = $this->getCommentData($comment);
+            $data[] = $this->getCommentData($comment, $urlHelper, $user);
         }
 
         return [
@@ -43,14 +42,16 @@ abstract class AbstractCommentList extends AbstractAdminBase
      */
     abstract protected function getCommentsList(): array;
 
-    protected function getCommentData(ContentCommentInterface $comment)
+    protected function getCommentData(ContentCommentInterface $comment, UrlHelper $helper, UserInterface $user): array
     {
         $status = $comment->getCurrentStatus();
 
         return [
             'id'           => $comment->getID(),
-            'publicURL'    => $comment->getPublicReadUrl($this->ifaceHelper), // Get public URL via related model
-            'editURL'      => $this->ifaceHelper->getReadEntityUrl($comment), // Get admin URL via related model
+            'publicURL'    => $comment->getPublicReadUrl($helper),
+            // Get public URL via related model
+            'editURL'      => $helper->getReadEntityUrl($comment, ZoneInterface::ADMIN),
+            // Get admin URL via related model
             'contentLabel' => $comment->getRelatedContentLabel(),
             'author'       => [
                 'isGuest' => $comment->authorIsGuest(),
@@ -62,7 +63,7 @@ abstract class AbstractCommentList extends AbstractAdminBase
             'status'       => [
                 'id'          => $status->getID(),
                 'codename'    => $status->getCodename(),
-                'transitions' => $status->getAllowedTargetTransitionsCodenameArray($this->user),
+                'transitions' => $status->getAllowedTargetTransitionsCodenameArray($user),
             ],
             'message'      => $comment->getMessage(),
             'preview'      => \Text::limit_chars($comment->getMessage(), 300, null, true),

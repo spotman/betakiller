@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <root>
     <!-- Auth common ifaces -->
-    <iface uri="login" name="Auth_Login" label="Sign in" layout="auth" hideInSiteMap="true" zone="public" />
-    <iface uri="logout" name="Auth_Logout" label="Sign out" hideInSiteMap="true" zone="personal" />
-    <iface uri="change-account" name="Auth_ReLogin" label="Change account" layout="auth" hideInSiteMap="true" zone="personal" />
+    <iface uri="login" name="Auth_Login" label="Sign in" layout="auth" hideInSiteMap="true" zone="public">
+        <action uri="regular" name="Auth_RegularLogin" />
+    </iface>
+
+    <action uri="logout" name="Auth_Logout" zone="personal" />
+    <!--<iface uri="change-account" name="Auth_ReLogin" label="Change account" layout="auth" hideInSiteMap="true" zone="personal" />-->
     <!--<iface uri="password-reset" name="Auth_PasswordReset" label="Reset password" layout="auth" hideInSiteMap="true" zone="public" />-->
 </root>
 

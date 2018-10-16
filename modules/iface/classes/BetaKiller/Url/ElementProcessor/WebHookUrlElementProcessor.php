@@ -2,12 +2,13 @@
 namespace BetaKiller\Url\ElementProcessor;
 
 use BetaKiller\Factory\WebHookFactory;
+use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Model\WebHookLog;
 use BetaKiller\Model\WebHookLogRequestDataAggregator;
 use BetaKiller\Repository\WebHookLogRepository;
-use BetaKiller\Url\Container\UrlContainerInterface;
 use BetaKiller\Url\UrlElementInterface;
 use BetaKiller\Url\WebHookModelInterface;
+use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 /**
@@ -40,12 +41,10 @@ class WebHookUrlElementProcessor implements UrlElementProcessorInterface
     /**
      * Execute processing on URL element
      *
-     * @param \BetaKiller\Url\UrlElementInterface             $model
-     * @param \BetaKiller\Url\Container\UrlContainerInterface $urlContainer
-     * @param \Psr\Http\Message\ServerRequestInterface        $request
+     * @param \BetaKiller\Url\UrlElementInterface      $model
+     * @param \Psr\Http\Message\ServerRequestInterface $request
      *
-     * @param \Response                                       $response
-     *
+     * @return \Psr\Http\Message\ResponseInterface
      * @throws \BetaKiller\Exception\ValidationException
      * @throws \BetaKiller\Repository\RepositoryException
      * @throws \BetaKiller\Url\ElementProcessor\UrlElementProcessorException
@@ -55,14 +54,12 @@ class WebHookUrlElementProcessor implements UrlElementProcessorInterface
      */
     public function process(
         UrlElementInterface $model,
-        UrlContainerInterface $urlContainer,
-        ServerRequestInterface $request,
-        \Response $response
-    ): void {
-        if (!($model instanceof WebHookModelInterface)) {
-            throw new UrlElementProcessorException('Invalid model :class_invalid. Model must be :class_valid', [
-                ':class_invalid' => \get_class($model),
-                ':class_valid'   => WebHookModelInterface::class,
+        ServerRequestInterface $request
+    ): ResponseInterface {
+        if (!$model instanceof WebHookModelInterface) {
+            throw new UrlElementProcessorException('Model must be instance of :must, but :real provided', [
+                ':real' => \get_class($model),
+                ':must' => WebHookModelInterface::class,
             ]);
         }
         if (!$request) {
@@ -107,5 +104,8 @@ class WebHookUrlElementProcessor implements UrlElementProcessorInterface
         if ($exception) {
             throw $exception;
         }
+
+        // Always empty 200 OK response
+        return ResponseHelper::text('OK');
     }
 }

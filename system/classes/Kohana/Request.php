@@ -9,7 +9,7 @@
  * @copyright  (c) 2008-2012 Kohana Team
  * @license    http://kohanaframework.org/license
  */
-class Kohana_Request implements HTTP_Request {
+class Kohana_Request {
 
 	/**
 	 * @var  string  client user agent
@@ -933,7 +933,6 @@ class Kohana_Request implements HTTP_Request {
 	 *
 	 * @return  Response
 	 * @throws  Request_Exception
-	 * @throws  HTTP_Exception_404
 	 * @uses    [Kohana::$profiling]
 	 * @uses    [Profiler]
 	 */
@@ -976,10 +975,7 @@ class Kohana_Request implements HTTP_Request {
 
 		if ( ! $this->_route instanceof Route)
 		{
-			return HTTP_Exception::factory(404, 'Unable to find a route to match the URI: :uri', array(
-				':uri' => $this->_uri,
-			))->request($this)
-				->get_response();
+		    die();
 		}
 
 		if ( ! $this->_client instanceof Request_Client)

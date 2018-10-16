@@ -1,7 +1,7 @@
 <?php
 namespace BetaKiller\Url;
 
-use BetaKiller\IFace\Exception\IFaceException;
+use BetaKiller\IFace\Exception\UrlElementException;
 use BetaKiller\Url\Container\UrlContainerInterface;
 
 class UrlElementStack implements \IteratorAggregate
@@ -34,12 +34,12 @@ class UrlElementStack implements \IteratorAggregate
     /**
      * @param \BetaKiller\Url\UrlElementInterface $model
      *
-     * @throws \BetaKiller\IFace\Exception\IFaceException
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
      */
     public function push(UrlElementInterface $model): void
     {
         if ($this->has($model)) {
-            throw new IFaceException('Duplicate insert for :codename', [':codename' => $model->getCodename()]);
+            throw new UrlElementException('Duplicate insert for :codename', [':codename' => $model->getCodename()]);
         }
 
         $codename               = $model->getCodename();
@@ -99,15 +99,6 @@ class UrlElementStack implements \IteratorAggregate
     public function getIterator(): \Iterator
     {
         return new \ArrayIterator($this->items);
-    }
-
-    /**
-     * @deprecated IFace stack must be persistent
-     */
-    public function clear(): void
-    {
-        $this->items   = [];
-        $this->current = null;
     }
 
     /**

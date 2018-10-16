@@ -1,9 +1,7 @@
 <?php
 namespace BetaKiller\Auth;
 
-use HTTP_Exception_403;
-
-abstract class AbstractAuthException extends HTTP_Exception_403
+abstract class AbstractAuthException extends AccessDeniedException
 {
     /**
      * @return string
