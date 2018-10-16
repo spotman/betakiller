@@ -119,7 +119,7 @@ class IFaceUrlElementProcessor implements UrlElementProcessorInterface
         $iface = $this->ifaceFactory->createFromUrlElement($model);
 
         // Starting hook
-        $iface->before();
+        $iface->before($request);
 
         // Processing page cache for quests if no URL query parameters (skip caching for authorized users)
         if (!$urlContainer->getQueryPartsKeys() && $user->isGuest()) {

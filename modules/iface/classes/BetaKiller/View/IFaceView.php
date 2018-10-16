@@ -12,7 +12,9 @@ use Psr\Http\Message\ServerRequestInterface;
 
 class IFaceView
 {
-    public const REQUEST_KEY = '__request__';
+    public const REQUEST_KEY    = '__request__';
+    public const IFACE_KEY      = '__iface__';
+    public const IFACE_ZONE_KEY = 'zone';
 
     /**
      * @var \BetaKiller\Repository\IFaceLayoutRepository
@@ -93,9 +95,10 @@ class IFaceView
         // Send current request to widgets
         $ifaceView->set(self::REQUEST_KEY, $request);
 
-        $ifaceView->set('__iface__', [
+        $ifaceView->set(self::IFACE_KEY, [
             'codename' => $model->getCodename(),
             'label'    => $this->elementHelper->getLabel($model, $params, $i18n),
+            'zone'     => $model->getZoneName(),
         ]);
 
         $this->headHelper

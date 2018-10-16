@@ -3,65 +3,43 @@ namespace BetaKiller\IFace\App\Content;
 
 use BetaKiller\Helper\AssetsHelper;
 use BetaKiller\Helper\ContentUrlContainerHelper;
+use BetaKiller\Helper\ServerRequestHelper;
+use BetaKiller\Helper\UrlElementHelper;
 use BetaKiller\Model\ContentPost;
-use BetaKiller\Model\UserInterface;
 use BetaKiller\Url\ZoneInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 class PostItem extends AbstractAppBase
 {
     /**
-     * @var \BetaKiller\Helper\ContentUrlContainerHelper
-     */
-    protected $urlParametersHelper;
-
-    /**
-     * @var \BetaKiller\Model\ContentPost
-     */
-    private $contentModel;
-
-    /**
-     * @var \BetaKiller\Model\UserInterface
-     */
-    private $user;
-
-    /**
      * @var \BetaKiller\Helper\AssetsHelper
      */
     private $assetsHelper;
 
     /**
-     * @Inject
-     * @var \BetaKiller\Helper\UrlElementHelper
-     */
-    private $ifaceHelper;
-
-    /**
      * PostItem constructor.
      *
-     * @param \BetaKiller\Helper\AssetsHelper              $assetsHelper
-     * @param \BetaKiller\Helper\ContentUrlContainerHelper $urlParametersHelper
-     * @param \BetaKiller\Model\UserInterface              $user
+     * @param \BetaKiller\Helper\AssetsHelper $assetsHelper
      */
-    public function __construct(
-        AssetsHelper $assetsHelper,
-        ContentUrlContainerHelper $urlParametersHelper,
-        UserInterface $user
-    ) {
-        $this->urlParametersHelper = $urlParametersHelper;
-        $this->user                = $user;
-        $this->assetsHelper        = $assetsHelper;
+    public function __construct(AssetsHelper $assetsHelper)
+    {
+        $this->assetsHelper = $assetsHelper;
     }
 
     /**
      * This hook executed before IFace processing (on every request regardless of caching)
      * Place here code that needs to be executed on every IFace request (increment views counter, etc)
+     *
+     * @param \Psr\Http\Message\ServerRequestInterface $request
+     *
+     * @throws \Kohana_Exception
      */
-    public function before(): void
+    public function before(ServerRequestInterface $request): void
     {
         // Count guest views only
-        if ($this->user->isGuest()) {
-            $this->getContentModel()->incrementViewsCount()->save();
+        if (ServerRequestHelper::isGuest($request)) {
+            $model = ContentUrlContainerHelper::getContentPost($request);
+            $model->incrementViewsCount()->save();
         }
     }
 
@@ -79,9 +57,10 @@ class PostItem extends AbstractAppBase
      */
     public function getData(ServerRequestInterface $request): array
     {
-        $model = $this->getContentModel();
+        $model = ContentUrlContainerHelper::getContentPost($request);
+        $stack = ServerRequestHelper::getUrlElementStack($request);
 
-        $previewMode = $this->ifaceHelper->isCurrentZone(ZoneInterface::PREVIEW);
+        $previewMode = UrlElementHelper::isCurrentZone(ZoneInterface::PREVIEW, $stack);
 
         if ($previewMode) {
             // See latest revision data
@@ -126,25 +105,5 @@ class PostItem extends AbstractAppBase
     public function getDefaultExpiresInterval(): \DateInterval
     {
         return new \DateInterval('P1D'); // One day
-    }
-
-    /**
-     * @return \BetaKiller\Model\ContentPost
-     */
-    protected function detectContentModel(): ContentPost
-    {
-        return $this->urlParametersHelper->getContentPost();
-    }
-
-    /**
-     * @return \BetaKiller\Model\ContentPost
-     */
-    protected function getContentModel(): ContentPost
-    {
-        if (!$this->contentModel) {
-            $this->contentModel = $this->detectContentModel();
-        }
-
-        return $this->contentModel;
     }
 }

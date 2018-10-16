@@ -3,6 +3,7 @@ namespace BetaKiller\IFace;
 
 use BetaKiller\Url\IFaceModelInterface;
 use DateInterval;
+use Psr\Http\Message\ServerRequestInterface;
 
 abstract class AbstractIFace implements IFaceInterface
 {
@@ -128,8 +129,10 @@ abstract class AbstractIFace implements IFaceInterface
     /**
      * This hook executed before IFace processing (on every request regardless of caching)
      * Place here code that needs to be executed on every IFace request (increment views counter, etc)
+     *
+     * @param \Psr\Http\Message\ServerRequestInterface $request
      */
-    public function before(): void
+    public function before(ServerRequestInterface $request): void
     {
         // Empty by default
     }

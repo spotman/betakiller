@@ -2,6 +2,7 @@
 namespace BetaKiller;
 
 use BetaKiller\DI\Container;
+use BetaKiller\Url\ZoneInterface;
 use BetaKiller\View\IFaceView;
 use HTML;
 use Meta;
@@ -113,6 +114,12 @@ class TwigExtension extends Twig_Extension
             new Twig_Function(
                 'widget',
                 [$this, 'widget'],
+                ['is_safe' => ['html'], 'needs_context' => true]
+            ),
+
+            new Twig_Function(
+                'in_public_zone',
+                [$this, 'inPublicZone'],
                 ['is_safe' => ['html'], 'needs_context' => true]
             ),
 
@@ -332,5 +339,12 @@ class TwigExtension extends Twig_Extension
         $widget = $this->widgetFacade->create($name);
 
         return $this->widgetFacade->render($widget, $request, $context);
+    }
+
+    public function inPublicZone(array $context): bool
+    {
+        $zoneName = $context[IFaceView::IFACE_KEY][IFaceView::IFACE_ZONE_KEY];
+
+        return $zoneName === ZoneInterface::PUBLIC;
     }
 }

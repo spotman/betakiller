@@ -94,6 +94,7 @@ class WebApp
         $this->app->pipe(DebugMiddleware::class);
 
         // Main processing pipe
+        $this->app->pipe(ExpectedExceptionMiddleware::class);
         $this->app->pipe(SchemeMiddleware::class);
         $this->app->pipe(SessionMiddleware::class);
         $this->app->pipe(UserMiddleware::class);
@@ -103,7 +104,6 @@ class WebApp
 
         $this->app->pipe(UrlHelperMiddleware::class);
         $this->app->pipe(ErrorPageMiddleware::class);
-        $this->app->pipe(ExpectedExceptionMiddleware::class);
 
         // TODO Check If-Modified-Since and send 304 Not modified
 
