@@ -3,25 +3,12 @@ declare(strict_types=1);
 
 namespace BetaKiller\IFace\Admin\Tests;
 
+use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\IFace\AbstractIFace;
-use BetaKiller\Url\Container\UrlContainerInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 class TestWampRpcTest extends AbstractIFace
 {
-    /**
-     * @var \BetaKiller\Url\Container\UrlContainerInterface
-     */
-    private $urlContainer;
-
-    /**
-     * @param \BetaKiller\Url\Container\UrlContainerInterface $urlContainer
-     */
-    public function __construct(UrlContainerInterface $urlContainer)
-    {
-        $this->urlContainer = $urlContainer;
-    }
-
     /**
      * @param \Psr\Http\Message\ServerRequestInterface $request
      *
@@ -30,20 +17,21 @@ class TestWampRpcTest extends AbstractIFace
     public function getData(ServerRequestInterface $request): array
     {
         return [
-            'connectionType' => strtolower(trim($this->findArgument('connectionType'))),
-            'testsQty'       => (int)$this->findArgument('testsQty'),
-            'qtyInPack'      => (int)$this->findArgument('qtyInPack'),
-            'delayPack'      => (int)$this->findArgument('delayPack'),
+            'connectionType' => strtolower(trim($this->findArgument($request, 'connectionType'))),
+            'testsQty'       => (int)$this->findArgument($request, 'testsQty'),
+            'qtyInPack'      => (int)$this->findArgument($request, 'qtyInPack'),
+            'delayPack'      => (int)$this->findArgument($request, 'delayPack'),
         ];
     }
 
     /**
-     * @param $name
+     * @param \Psr\Http\Message\ServerRequestInterface $request
+     * @param string                                   $name
      *
      * @return string
      */
-    private function findArgument($name): string
+    private function findArgument(ServerRequestInterface $request, string $name): string
     {
-        return (string)$this->urlContainer->getQueryPart($name);
+        return (string)ServerRequestHelper::getUrlContainer($request)->getQueryPart($name);
     }
 }
