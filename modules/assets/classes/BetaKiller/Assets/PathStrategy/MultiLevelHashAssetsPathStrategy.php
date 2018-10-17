@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\Assets\PathStrategy;
 
-use BetaKiller\Assets\AssetsException;
+use BetaKiller\Assets\Exception\AssetsException;
 use BetaKiller\Assets\Model\AssetsModelInterface;
 use BetaKiller\Assets\MultiLevelPath;
 use BetaKiller\Repository\HashUrlStrategyRepositoryInterface;
@@ -53,7 +53,7 @@ class MultiLevelHashAssetsPathStrategy implements AssetsPathStrategyInterface
      * @param \BetaKiller\Assets\Model\AssetsModelInterface $model
      *
      * @return string
-     * @throws \BetaKiller\Assets\AssetsException
+     * @throws \BetaKiller\Assets\Exception\AssetsException
      */
     public function makeModelPath(AssetsModelInterface $model): string
     {

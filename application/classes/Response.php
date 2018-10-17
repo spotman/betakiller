@@ -307,29 +307,4 @@ class Response extends \Kohana_Response
 
         return $response;
     }
-
-    /**
-     * Sends file to STDOUT for viewing or downloading
-     *
-     * @param string $content       String content of the file
-     * @param string $mime_type     MIME-type
-     * @param string $downloadAlias File name for browser`s "Save as" dialog
-     *
-     * @deprecated
-     */
-    public function sendFileContent($content, $mime_type = null, string $downloadAlias = null): void
-    {
-        if (!$content) {
-            throw new LogicException('Content is empty');
-        }
-
-        $this->body($content);
-
-        $this->headers('Content-Type', $mime_type ?: 'application/octet-stream');
-        $this->headers('Content-Length', strlen($content));
-
-        if ($downloadAlias) {
-            $this->headers('Content-Disposition', 'attachment; filename='.$downloadAlias);
-        }
-    }
 }

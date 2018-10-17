@@ -114,7 +114,6 @@ class Kohana_StaticJs extends StaticFile {
 	{
 //		$js = str_replace('{static_url}', STATICFILES_URL, $js);
 
-		$this->needJquery();
 		if($id)
 		{
 			$this->_js_onload[$id] = $js;
@@ -148,9 +147,6 @@ class Kohana_StaticJs extends StaticFile {
             $js = trim($js, '/');
 			$js = ($this->_config->host == '/') ? $js : $this->_config->host . $js;
 		}
-
-		// TODO Refactoring
-//		Response::current()->http2ServerPush($js);
 
 		return ''
 		. ($condition ? '<!--[if ' . $condition . ']>' : '')
@@ -337,17 +333,6 @@ class Kohana_StaticJs extends StaticFile {
 		}
 
 		return $this->getLink($this->cache_url($build_name));
-	}
-
-	/**
-	 * Adds common libraries (for now it works only to jquery)
-	 *
-	 * @todo Make common method to load most popular frameworks and libraries
-	 * @return void
-	 */
-	public function needJquery()
-	{
-		$this->addJs($this->_config['jquery_url']);
 	}
 
     public function clear(): void

@@ -138,14 +138,14 @@ class UrlElementProviderXmlConfig implements UrlElementProviderInterface
             $config[IFacePlainModel::OPTION_LAYOUT] = $parent->getLayoutCodename();
         }
 
-        if (empty($config[IFacePlainModel::OPTION_ZONE])) {
+        if (empty($config[AbstractPlainUrlElementWithZone::OPTION_ZONE])) {
             if (!$parent) {
                 throw new UrlElementException('Root URL element :name must define a zone', [
                     ':name' => $codename,
                 ]);
             }
 
-            $config[IFacePlainModel::OPTION_ZONE] = $parent->getZoneName();
+            $config[AbstractPlainUrlElementWithZone::OPTION_ZONE] = $parent->getZoneName();
         }
 
         return $config;

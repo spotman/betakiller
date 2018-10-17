@@ -4,7 +4,7 @@ namespace BetaKiller\Helper;
 use BetaKiller\Model\ContentCategoryInterface;
 use BetaKiller\Model\ContentCommentInterface;
 use BetaKiller\Model\ContentCommentStatus;
-use BetaKiller\Model\ContentPost;
+use BetaKiller\Model\ContentPostInterface;
 use BetaKiller\Model\ContentPostRevision;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -13,9 +13,9 @@ class ContentUrlContainerHelper
     /**
      * @param \Psr\Http\Message\ServerRequestInterface $request
      *
-     * @return \BetaKiller\Model\ContentCategoryInterface
+     * @return \BetaKiller\Model\ContentCategoryInterface|null
      */
-    public static function getContentCategory(ServerRequestInterface $request): ContentCategoryInterface
+    public static function getContentCategory(ServerRequestInterface $request): ?ContentCategoryInterface
     {
         return ServerRequestHelper::getEntity($request, ContentCategoryInterface::class);
     }
@@ -23,11 +23,11 @@ class ContentUrlContainerHelper
     /**
      * @param \Psr\Http\Message\ServerRequestInterface $request
      *
-     * @return \BetaKiller\Model\ContentPost
+     * @return \BetaKiller\Model\ContentPostInterface
      */
-    public static function getContentPost(ServerRequestInterface $request): ContentPost
+    public static function getContentPost(ServerRequestInterface $request): ContentPostInterface
     {
-        return ServerRequestHelper::getEntity($request, ContentPost::class);
+        return ServerRequestHelper::getEntity($request, ContentPostInterface::class);
     }
 
     /**

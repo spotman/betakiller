@@ -10,6 +10,7 @@ use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\Helper\LoggerHelperTrait;
 use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Helper\ServerRequestHelper;
+use BetaKiller\IFace\AbstractHttpErrorIFace;
 use BetaKiller\IFace\IFaceInterface;
 use BetaKiller\IFace\IFaceProvider;
 use BetaKiller\View\IFaceView;
@@ -155,6 +156,10 @@ class ErrorPageMiddleware implements MiddlewareInterface
 
         try {
             $iface = $this->getErrorIFaceForCode($httpCode);
+
+            if ($iface instanceof AbstractHttpErrorIFace) {
+                $iface->setException($exception);
+            }
 
             $body = $iface
                 ? $this->ifaceView->render($iface, $request)

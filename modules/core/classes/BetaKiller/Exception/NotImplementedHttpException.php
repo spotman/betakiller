@@ -5,8 +5,8 @@ namespace BetaKiller\Exception;
 
 class NotImplementedHttpException extends HttpException
 {
-    public function __construct(string $message = null)
+    public function __construct(string $message = null, array $values = null)
     {
-        parent::__construct(501, $message);
+        parent::__construct(501, $message, $values);
     }
 }

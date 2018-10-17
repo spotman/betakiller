@@ -3,6 +3,9 @@ declare(strict_types=1);
 
 namespace BetaKiller\Url\Zone;
 
+use BetaKiller\Model\AbstractEntityInterface;
+use BetaKiller\Model\HasPublicZoneAccessSpecInterface;
+
 class PublicZoneAccessSpec implements ZoneAccessSpecInterface
 {
     /**
@@ -42,5 +45,22 @@ class PublicZoneAccessSpec implements ZoneAccessSpecInterface
     public function isAuthRequired(): bool
     {
         return false;
+    }
+
+    /**
+     * Returns true if entity is allowed in current zone or null if entity has no zone access definition
+     *
+     * @param \BetaKiller\Model\AbstractEntityInterface $entity
+     *
+     * @return bool
+     */
+    public function isEntityAllowed(AbstractEntityInterface $entity): ?bool
+    {
+        if (!$entity instanceof HasPublicZoneAccessSpecInterface) {
+            // Undetermined
+            return null;
+        }
+
+        return $entity->isPublicZoneAccessAllowed();
     }
 }

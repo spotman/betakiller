@@ -10,6 +10,14 @@ class Quote extends ORM implements QuoteInterface
     use OrmBasedEntityHasWordpressIdTrait;
 
     /**
+     * Custom configuration (set table name, configure relations, load_with(), etc)
+     */
+    protected function configure(): void
+    {
+        // Nothing to do here
+    }
+
+    /**
      * @param string $value
      *
      * @return $this

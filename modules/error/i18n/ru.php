@@ -23,9 +23,9 @@ return [
 
     'error.http.500.label'         => 'Системная ошибка',
     'error.http.500.p1'            => 'Разработчики уже в курсе и скоро всё исправят',
-    'error.http.500.p2'            => 'Для вашего удобства страница будет перезагружена через 15 секунд',
+    'error.http.500.p2'            => 'Для вашего удобства страница будет перезагружена через 45 секунд',
     'error.http.500.p3'            => 'Error ID: :hash',
-    'error.http.500.button.cancel' => 'отмена',
+    'error.http.500.button.cancel' => 'Отмена',
 
     'notification.developer.error.subsystem-failure.subj' => 'BetaKiller logging subsystem failure',
     'notification.developer.error.php-exception.subj' => 'BetaKiller exception',
