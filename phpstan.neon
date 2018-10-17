@@ -6,11 +6,17 @@ parameters:
     - modules/core/classes
     - modules/platform/classes
     - modules/acl/classes
+    - modules/admin/classes
+    - modules/api/classes
     - modules/assets/classes
     - modules/error/classes
+    - modules/helper/classes
     - modules/iface/classes
     - modules/log/classes
+    - modules/maintenance/classes
     - modules/message-bus/classes
     - modules/notification/classes
+    - modules/sitemap/classes
+    - modules/wamp/classes
     - modules/webhooks/classes
     - modules/widget/classes

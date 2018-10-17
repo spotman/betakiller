@@ -3,10 +3,17 @@ namespace BetaKiller\Assets\Provider;
 
 use BetaKiller\Acl\Resource\AssetsAclResourceInterface;
 use BetaKiller\Assets\AssetsDeploymentService;
-use BetaKiller\Assets\AssetsException;
-use BetaKiller\Assets\AssetsExceptionUpload;
-use BetaKiller\Assets\AssetsProviderException;
 use BetaKiller\Assets\ContentTypes;
+use BetaKiller\Assets\Exception\AssetsException;
+use BetaKiller\Assets\Exception\AssetsProviderException;
+use BetaKiller\Assets\Exception\AssetsUploadException;
+use BetaKiller\Assets\Exception\CantWriteUploadException;
+use BetaKiller\Assets\Exception\ExtensionHaltedUploadException;
+use BetaKiller\Assets\Exception\FormSizeUploadException;
+use BetaKiller\Assets\Exception\IniSizeUploadException;
+use BetaKiller\Assets\Exception\NoFileUploadException;
+use BetaKiller\Assets\Exception\NoTmpDirUploadException;
+use BetaKiller\Assets\Exception\PartialUploadException;
 use BetaKiller\Assets\Handler\AssetsHandlerInterface;
 use BetaKiller\Assets\Model\AssetsModelInterface;
 use BetaKiller\Assets\PathStrategy\AssetsPathStrategyInterface;
@@ -14,8 +21,8 @@ use BetaKiller\Assets\Storage\AssetsStorageInterface;
 use BetaKiller\Config\ConfigProviderInterface;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Repository\RepositoryInterface;
+use Psr\Http\Message\UploadedFileInterface;
 use Spotman\Acl\AclInterface;
-use Upload;
 
 abstract class AbstractAssetsProvider implements AssetsProviderInterface
 {
@@ -263,7 +270,7 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
      * @param AssetsModelInterface $model
      *
      * @return string
-     * @throws \BetaKiller\Assets\AssetsException
+     * @throws \BetaKiller\Assets\Exception\AssetsException
      */
     public function getOriginalUrl(AssetsModelInterface $model): string
     {
@@ -276,7 +283,7 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
      * @param \BetaKiller\Assets\Model\AssetsModelInterface $model
      *
      * @return string
-     * @throws \BetaKiller\Assets\AssetsException
+     * @throws \BetaKiller\Assets\Exception\AssetsException
      */
     public function getDownloadUrl(AssetsModelInterface $model): string
     {
@@ -289,7 +296,7 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
      * @param AssetsModelInterface $model
      *
      * @return string
-     * @throws \BetaKiller\Assets\AssetsException
+     * @throws \BetaKiller\Assets\Exception\AssetsException
      */
     public function getDeleteUrl(AssetsModelInterface $model): string
     {
@@ -303,7 +310,7 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
      * @param null|string                                   $suffix
      *
      * @return string
-     * @throws \BetaKiller\Assets\AssetsException
+     * @throws \BetaKiller\Assets\Exception\AssetsException
      */
     protected function getItemUrl(string $action, AssetsModelInterface $model, ?string $suffix = null): string
     {
@@ -349,7 +356,7 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
      * @param \BetaKiller\Assets\Model\AssetsModelInterface $model
      *
      * @return string
-     * @throws \BetaKiller\Assets\AssetsException
+     * @throws \BetaKiller\Assets\Exception\AssetsException
      */
     public function getModelExtension(AssetsModelInterface $model): string
     {
@@ -360,7 +367,7 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
      * @param string $mimeType
      *
      * @return string[]
-     * @throws \BetaKiller\Assets\AssetsException
+     * @throws \BetaKiller\Assets\Exception\AssetsException
      */
     private function getMimeExtensions(string $mimeType): array
     {
@@ -368,17 +375,17 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
     }
 
     /**
-     * @param array                           $file     Item from $_FILES
-     * @param array                           $postData Array with items from $_POST
-     * @param \BetaKiller\Model\UserInterface $user
+     * @param \Psr\Http\Message\UploadedFileInterface $file     Item from $_FILES
+     * @param array                                   $postData Array with items from $_POST
+     * @param \BetaKiller\Model\UserInterface         $user
      *
      * @return AssetsModelInterface
-     * @throws \BetaKiller\Assets\AssetsException
-     * @throws \BetaKiller\Assets\AssetsProviderException
+     * @throws \BetaKiller\Assets\Exception\AssetsException
+     * @throws \BetaKiller\Assets\Exception\AssetsUploadException
+     * @throws \BetaKiller\Assets\Exception\AssetsProviderException
      * @throws \BetaKiller\Assets\AssetsStorageException
-     * @throws \BetaKiller\Assets\AssetsExceptionUpload
      */
-    public function upload(array $file, array $postData, UserInterface $user): AssetsModelInterface
+    public function upload(UploadedFileInterface $file, array $postData, UserInterface $user): AssetsModelInterface
     {
         // Check permissions
         if (!$this->checkUploadPermissions($user)) {
@@ -386,19 +393,59 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
         }
 
         // Security checks
-        if (!Upload::not_empty($file) || !Upload::valid($file)) {
-            // TODO Разные сообщения об ошибках в тексте исключения (файл слишком большой, итд)
-            throw new AssetsExceptionUpload('Incorrect file, upload rejected');
-        }
+        $this->checkUploadedFile($file);
 
-        $fullPath     = $file['tmp_name'];
-        $originalName = strip_tags($file['name']);
+        // Move uploaded file to temp location (and proceed underlying checks)
+        $fullPath = \tempnam(\sys_get_temp_dir(), 'assets-upload');
+        $file->moveTo($fullPath);
 
-        $model = $this->store($fullPath, $originalName, $user);
+        // Store temp file
+        $name  = strip_tags($file->getClientFilename());
+        $model = $this->store($fullPath, $name, $user);
 
         $this->postUploadProcessing($model, $postData);
 
+        // Cleanup
+        unlink($fullPath);
+
         return $model;
+    }
+
+    private function checkUploadedFile(UploadedFileInterface $file): void
+    {
+        if (!$file->getSize()) {
+            throw new NoFileUploadException;
+        }
+
+        // TODO i18n for exceptions
+        switch ($file->getError()) {
+            case \UPLOAD_ERR_OK:
+                return;
+
+            case \UPLOAD_ERR_CANT_WRITE:
+                throw new CantWriteUploadException;
+
+            case \UPLOAD_ERR_NO_TMP_DIR:
+                throw new NoTmpDirUploadException;
+
+            case \UPLOAD_ERR_EXTENSION:
+                throw new ExtensionHaltedUploadException;
+
+            case \UPLOAD_ERR_FORM_SIZE:
+                throw new FormSizeUploadException;
+
+            case \UPLOAD_ERR_INI_SIZE:
+                throw new IniSizeUploadException;
+
+            case \UPLOAD_ERR_NO_FILE:
+                throw new NoFileUploadException;
+
+            case \UPLOAD_ERR_PARTIAL:
+                throw new PartialUploadException;
+
+            default:
+                throw new AssetsUploadException;
+        }
     }
 
     /**
@@ -410,9 +457,9 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
      * @param \BetaKiller\Model\UserInterface $user
      *
      * @return \BetaKiller\Assets\Model\AssetsModelInterface
-     * @throws \BetaKiller\Assets\AssetsProviderException
-     * @throws \BetaKiller\Assets\AssetsException
-     * @throws \BetaKiller\Assets\AssetsExceptionUpload
+     * @throws \BetaKiller\Assets\Exception\AssetsProviderException
+     * @throws \BetaKiller\Assets\Exception\AssetsException
+     * @throws \BetaKiller\Assets\Exception\AssetsUploadException
      * @throws \BetaKiller\Assets\AssetsStorageException
      */
     public function store(string $fullPath, string $originalName, UserInterface $user): AssetsModelInterface
@@ -520,8 +567,8 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
      * @param AssetsModelInterface            $model
      * @param \BetaKiller\Model\UserInterface $user
      *
-     * @throws \BetaKiller\Assets\AssetsException
-     * @throws \BetaKiller\Assets\AssetsProviderException
+     * @throws \BetaKiller\Assets\Exception\AssetsException
+     * @throws \BetaKiller\Assets\Exception\AssetsProviderException
      * @throws \BetaKiller\Assets\AssetsStorageException
      * @throws \BetaKiller\Repository\RepositoryException
      */
@@ -553,7 +600,7 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
      * @param string $urlPath
      *
      * @return AssetsModelInterface
-     * @throws \BetaKiller\Assets\AssetsProviderException
+     * @throws \BetaKiller\Assets\Exception\AssetsProviderException
      */
     public function getModelByPublicUrl(string $urlPath): AssetsModelInterface
     {
@@ -573,7 +620,7 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
      * @param AssetsModelInterface $model
      *
      * @return string
-     * @throws \BetaKiller\Assets\AssetsException
+     * @throws \BetaKiller\Assets\Exception\AssetsException
      * @throws \BetaKiller\Assets\AssetsStorageException
      */
     public function getContent(AssetsModelInterface $model): string
@@ -590,7 +637,7 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
      * @param AssetsModelInterface $model
      * @param string               $content
      *
-     * @throws \BetaKiller\Assets\AssetsException
+     * @throws \BetaKiller\Assets\Exception\AssetsException
      * @throws \BetaKiller\Assets\AssetsStorageException
      */
     private function setContent(AssetsModelInterface $model, string $content): void
@@ -615,7 +662,7 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
      * @param null|string                                   $suffix
      *
      * @return void
-     * @throws \BetaKiller\Assets\AssetsException
+     * @throws \BetaKiller\Assets\Exception\AssetsException
      * @throws \BetaKiller\Assets\AssetsStorageException
      */
     public function cacheContent(
@@ -660,9 +707,9 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
      *
      * @param string $mime MIME-type
      *
-     * @throws \BetaKiller\Assets\AssetsProviderException
-     * @throws \BetaKiller\Assets\AssetsExceptionUpload
-     * @throws \BetaKiller\Assets\AssetsException
+     * @throws \BetaKiller\Assets\Exception\AssetsProviderException
+     * @throws \BetaKiller\Assets\Exception\AssetsUploadException
+     * @throws \BetaKiller\Assets\Exception\AssetsException
      * @return bool
      */
     private function checkAllowedMimeTypes(string $mime): bool
@@ -693,7 +740,7 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
             $allowedExtensions[] = $this->getMimeExtensions($allowedMime);
         }
 
-        throw new AssetsExceptionUpload('You may upload files with :ext extensions only', [
+        throw new AssetsUploadException('You may upload files with :ext extensions only', [
             ':ext' => implode(', ', array_merge(...$allowedExtensions)),
         ]);
     }
@@ -722,7 +769,7 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
      * @param null|string                                   $suffix
      *
      * @return string
-     * @throws \BetaKiller\Assets\AssetsException
+     * @throws \BetaKiller\Assets\Exception\AssetsException
      */
     public function getDeployRelativePath(AssetsModelInterface $model, string $action, ?string $suffix = null): string
     {
@@ -736,7 +783,7 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
      * @param \BetaKiller\Assets\Model\AssetsModelInterface $model
      *
      * @return string
-     * @throws \BetaKiller\Assets\AssetsException
+     * @throws \BetaKiller\Assets\Exception\AssetsException
      */
     private function getOriginalPath(AssetsModelInterface $model): string
     {
@@ -751,7 +798,7 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
      * @param null|string                                   $suffix
      *
      * @return string
-     * @throws \BetaKiller\Assets\AssetsException
+     * @throws \BetaKiller\Assets\Exception\AssetsException
      */
     private function getModelActionPath(AssetsModelInterface $model, string $action, ?string $suffix = null): string
     {
@@ -768,7 +815,7 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
      * @param null|string                                   $suffix
      *
      * @return string
-     * @throws \BetaKiller\Assets\AssetsException
+     * @throws \BetaKiller\Assets\Exception\AssetsException
      */
     private function getActionFilename(AssetsModelInterface $model, string $action, ?string $suffix = null): string
     {
@@ -783,7 +830,7 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
      *
      * @param bool                 $keepOriginal
      *
-     * @throws \BetaKiller\Assets\AssetsException
+     * @throws \BetaKiller\Assets\Exception\AssetsException
      */
     private function dropStorageCache(AssetsModelInterface $model, bool $keepOriginal): void
     {
@@ -839,7 +886,7 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
      * @param \BetaKiller\Model\UserInterface $user
      *
      * @return bool
-     * @throws \BetaKiller\Assets\AssetsException
+     * @throws \BetaKiller\Assets\Exception\AssetsException
      */
     private function checkStorePermissions(UserInterface $user): bool
     {
@@ -855,7 +902,7 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
      * @param AssetsModelInterface            $model
      *
      * @return bool
-     * @throws \BetaKiller\Assets\AssetsException
+     * @throws \BetaKiller\Assets\Exception\AssetsException
      */
     private function checkDeletePermissions(UserInterface $user, $model): bool
     {
@@ -868,7 +915,7 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
      * @param \BetaKiller\Model\UserInterface $user
      *
      * @return \BetaKiller\Acl\Resource\AssetsAclResourceInterface
-     * @throws \BetaKiller\Assets\AssetsException
+     * @throws \BetaKiller\Assets\Exception\AssetsException
      */
     private function getAclResource(UserInterface $user): AssetsAclResourceInterface
     {

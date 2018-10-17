@@ -44,6 +44,7 @@ return [
     'acl'                   => MODPATH.'acl',                   // Role based access control
     'cron'                  => MODPATH.'cron',                  // Helper for running scheduled tasks
     'error'                 => MODPATH.'error',                 // Error handling and logging
+    'maintenance'           => MODPATH.'maintenance',           // Maintenance mode
     'missing-url'           => MODPATH.'missing-url',           // Catch and store missing IFace URLs
     'notification'          => MODPATH.'notification',          // Notification subsystem
     'search'                => MODPATH.'search',                // Search and filtering capabilities

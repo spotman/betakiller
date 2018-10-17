@@ -1,16 +1,12 @@
 <?php
 namespace BetaKiller\IFace\App\Content;
 
+use BetaKiller\Exception\BadRequestHttpException;
+use BetaKiller\Helper\ContentUrlContainerHelper;
 use Psr\Http\Message\ServerRequestInterface;
 
 class CategoryItem extends AbstractAppBase
 {
-    /**
-     * @Inject
-     * @var \BetaKiller\Helper\ContentUrlContainerHelper
-     */
-    private $urlParametersHelper;
-
     /**
      * Returns data for View
      *
@@ -20,11 +16,15 @@ class CategoryItem extends AbstractAppBase
      */
     public function getData(ServerRequestInterface $request): array
     {
-        $category = $this->urlParametersHelper->getContentCategory($request);
+        $category = ContentUrlContainerHelper::getContentCategory($request);
+
+        if (!$category) {
+            throw new BadRequestHttpException;
+        }
 
         return [
-            'category'  =>  [
-               'label'  =>  $category->getLabel(),
+            'category' => [
+                'label' => $category->getLabel(),
             ],
         ];
     }

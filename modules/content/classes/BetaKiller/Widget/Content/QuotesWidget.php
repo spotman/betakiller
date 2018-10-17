@@ -50,7 +50,7 @@ class QuotesWidget extends AbstractPublicWidget
 
         return [
             'quote'      => $quote->as_array(),
-            'refreshURL' => $this->url('refresh').$beforeQuery,
+            'refreshURL' => '/quote-refresh/'.$beforeQuery,
         ];
     }
 }

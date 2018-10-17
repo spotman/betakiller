@@ -2,10 +2,13 @@
 namespace BetaKiller\IFace;
 
 use BetaKiller\Helper\ServerRequestHelper;
+use BetaKiller\IFace\Auth\Login;
 use Psr\Http\Message\ServerRequestInterface;
 
 abstract class AbstractHttpErrorIFace extends AbstractIFace
 {
+    protected $exception;
+
     /**
      * Returns data for View
      * Override this method in child classes
@@ -13,19 +16,19 @@ abstract class AbstractHttpErrorIFace extends AbstractIFace
      * @param \Psr\Http\Message\ServerRequestInterface $request
      *
      * @return array
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
-     * @uses \BetaKiller\IFace\Auth\Login
      */
     public function getData(ServerRequestInterface $request): array
     {
-        $user      = ServerRequestHelper::getUser($request);
-        $urlHelper = ServerRequestHelper::getUrlHelper($request);
-
-        $login = $urlHelper->getUrlElementByCodename('Auth_Login');
-
         return [
-            'login_url' => $urlHelper->makeUrl($login),
-            'is_guest'  => $user->isGuest(),
+            'login_url' => Login::URL,
+            'is_guest'  => ServerRequestHelper::isGuest($request),
         ];
+    }
+
+    public function setException(\Throwable $e): self
+    {
+        $this->exception = $e;
+
+        return $this;
     }
 }

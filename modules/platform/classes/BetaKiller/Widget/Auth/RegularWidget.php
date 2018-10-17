@@ -1,7 +1,7 @@
 <?php
 namespace BetaKiller\Widget\Auth;
 
-use BetaKiller\Helper\ServerRequestHelper;
+use BetaKiller\Action\Auth\RegularLoginAction;
 use BetaKiller\Widget\AbstractPublicWidget;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -12,17 +12,12 @@ class RegularWidget extends AbstractPublicWidget
      * @param array                                    $context
      *
      * @return array
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
      * @uses \BetaKiller\Action\Auth\RegularLoginAction
      */
     public function getData(ServerRequestInterface $request, array $context): array
     {
-        $urlHelper = ServerRequestHelper::getUrlHelper($request);
-
-        $action = $urlHelper->getUrlElementByCodename('Auth_RegularLogin');
-
         return [
-            'login_url' => $urlHelper->makeUrl($action),
+            'login_url' => RegularLoginAction::URL,
 //            'reset_password_url' => $this->getResetPasswordUrl(),
         ];
     }

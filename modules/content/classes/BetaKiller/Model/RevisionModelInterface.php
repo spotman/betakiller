@@ -40,7 +40,7 @@ interface RevisionModelInterface extends DispatchableEntityInterface
     /**
      * @return \BetaKiller\Model\AbstractEntityInterface
      */
-    public function getRelatedEntity(): AbstractEntityInterface;
+    public function getRevisionRelatedEntity(): AbstractEntityInterface;
 
     /**
      * @param \BetaKiller\Model\AbstractEntityInterface $entity

@@ -38,7 +38,7 @@ class ContentPostRevisionRepository extends AbstractOrmBasedDispatchableReposito
         $orm = $this->getOrmInstance();
 
         return $this
-            ->filterRelatedEntity($orm, $compareTo->getRelatedEntity())
+            ->filterRelatedEntity($orm, $compareTo->getRevisionRelatedEntity())
             ->filterBeforeCreatedAt($orm, $compareTo->getCreatedAt())
             ->orderByCreatedAt($orm)
             ->findOne($orm);

@@ -2,28 +2,58 @@
 
 {% block page_content %}
 
-  <div class="valign-wrapper error-403" style="height: 100%">
-    <div class="valign center-block">
-      <div class="card-panel blue-grey white-text">
-        {% block header %}
-          <h1 class="center-align">{{ "error.http.403.label"|i18n }}</h1>
-        {% endblock %}
+  <div class="container error-403">
+    <div class="row align-items-center h-100">
+      <div class="col">
 
-        <p class="center-align">{{ "error.http.403.message"|i18n }}</p>
+        <div class="card">
+          {% block header %}
+            <div class="card-header">
+              <h4>{{ "error.http.403.label"|i18n }}</h4>
+            </div>
+          {% endblock %}
 
-        <p class="center-align">
-          {% if is_guest %}
-            <a href="{{ login_url }}" class="btn btn-large green">
-              {{ "error.http.403.login_button"|i18n }}
-            </a>
-          {% else %}
-            <button class="btn btn-large green" onclick="window.history.back(); return false;">
-              {{ "error.http.back_button"|i18n }}
-            </button>
-          {% endif %}
-        </p>
+          <div class="card-body">
+            <p>{{ "error.http.403.message"|i18n }}</p>
+
+            <p class="center-align">
+              {% if is_guest %}
+                <a href="{{ login_url }}" class="btn btn-secondary">
+                  {{ "error.http.403.login_button"|i18n }}
+                </a>
+              {% else %}
+                <button class="btn btn-secondary" onclick="window.history.back(); return false;">
+                  {{ "error.http.back_button"|i18n }}
+                </button>
+              {% endif %}
+            </p>
+          </div>
+        </div>
+
       </div>
     </div>
   </div>
+
+  <style>
+    html, body {
+      height: 100%;
+    }
+
+    .error-403 {
+      height: 100%;
+      max-width: 300px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .error-403 h4 {
+      margin: 0 auto;
+    }
+
+    .error-403 p {
+      display: block;
+      margin-top: 15px;
+    }
+  </style>
 
 {% endblock %}
