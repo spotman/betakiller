@@ -2,30 +2,87 @@
 
 {% block page_content %}
 
-  {{ js("require.js/admin.config.js") }}
-  {{ js("ifaces/error-500/error-500.js") }}
-  {{ css("ifaces/error-500/error-500.css") }}
+  {{ js("ifaces/HttpError500.js") }}
 
-  <div class="valign-wrapper error-500">
-    <div class="valign center-block">
-      <div class="card-panel blue-grey white-text">
-        {% block header %}
-        <h1>{{ "error.http.500.label"|i18n }}</h1>
-        {% endblock %}
+  <div class="container error-500">
+    <div class="row align-items-center h-100">
+      <div class="col">
 
-        <p>{{ "error.http.500.p1"|i18n }}</p>
-        <p>{{ "error.http.500.p2"|i18n }}</p>
-        <p>
-          <button class="btn flat cancel-refresh">{{ "error.http.500.button.cancel"|i18n }}</button>
-        </p>
+        <div class="card ">
+          {% block header %}
+            <div class="card-header">
+              <h4>{{ "error.http.500.label"|i18n }}</h4>
+            </div>
+          {% endblock %}
 
-        {#<p>{{ "error.http.500.p3"|i18n({ hash: hash }) }}</p>#}
+          <div class="card-body">
 
-        <div class="progress">
-          <div class="determinate blue"></div>
+            <p>{{ "error.http.500.p1"|i18n }}</p>
+            <p>{{ "error.http.500.p2"|i18n }}</p>
+            <p>
+              <button class="btn flat cancel-refresh">{{ "error.http.500.button.cancel"|i18n }}</button>
+            </p>
+          </div>
+
+          <div class="card-footer">
+
+            {#<p>{{ "error.http.500.p3"|i18n({ hash: hash }) }}</p>#}
+
+            <div class="progress">
+              <div class="progress-bar bg-info progress-bar-animated progress-bar-striped" role="progressbar"
+                   aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+          </div>
         </div>
+
       </div>
     </div>
   </div>
+
+
+  <style>
+    html, body {
+      height: 100%;
+    }
+
+    .error-500 {
+      height: 100%;
+      max-width: 430px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .error-500 h4 {
+      margin: 0 auto;
+    }
+
+    .error-500 p {
+      display: block;
+      margin-top: 15px;
+    }
+
+    .error-500 .progress-bar {
+      width: 100%;
+      max-width: 0;
+      transition: max-width 45s linear;
+      -webkit-transition: max-width 45s linear;
+      -moz-transition: max-width 45s linear;
+      -ms-transition: max-width 45s linear;
+      -o-transition: max-width 45s linear;
+    }
+
+    .error-500.countdown-started .progress-bar {
+      max-width: 100%;
+    }
+
+    .error-500.countdown-cancelled .progress-bar {
+      transition: max-width 500ms;
+      -webkit-transition: max-width 500ms;
+      -moz-transition: max-width 500ms;
+      -ms-transition: max-width 500ms;
+      -o-transition: max-width 500ms;
+      max-width: 0;
+    }
+  </style>
 
 {% endblock %}

@@ -1,9 +1,9 @@
 <?php
 
-$errorsDbDsn = 'sqlite:'.realpath(APPPATH.'logs'.DIRECTORY_SEPARATOR.'errors.sqlite');
+$maintenanceDbDsn = 'sqlite:'.__DIR__.DIRECTORY_SEPARATOR.'maintenance.sqlite';
 
 return [
-    'errors' => [
+    'maintenance' => [
         'type'         => 'SQLite',
         'connection'   => [
             /**
@@ -18,7 +18,7 @@ return [
              *
              * Ports and sockets may be appended to the hostname.
              */
-            'dsn'        => $errorsDbDsn,
+            'dsn'        => $maintenanceDbDsn,
             'username'   => null,
             'password'   => null,
             'persistent' => false,

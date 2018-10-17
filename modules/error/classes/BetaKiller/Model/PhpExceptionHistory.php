@@ -15,7 +15,7 @@ class PhpExceptionHistory extends \ORM implements PhpExceptionHistoryModelInterf
      */
     protected function configure(): void
     {
-        $this->_db_group   = 'filesystem';
+        $this->_db_group   = 'errors';
         $this->_table_name = 'error_history';
 
         $this->belongs_to([

@@ -10,14 +10,23 @@ class Login extends AbstractIFace
 {
     public const URL = '/login/';
 
-    public function getData(ServerRequestInterface $request): array
+    /**
+     * This hook executed before IFace processing (on every request regardless of caching)
+     * Place here code that needs to be executed on every IFace request (increment views counter, etc)
+     *
+     * @param \Psr\Http\Message\ServerRequestInterface $request
+     */
+    public function before(ServerRequestInterface $request): void
     {
         // If user already authorized
         if (!ServerRequestHelper::isGuest($request)) {
             // Redirect him to index (this is a fallback if an authorized user visited /login )
             throw new FoundHttpException('/');
         }
+    }
 
+    public function getData(ServerRequestInterface $request): array
+    {
         return [];
     }
 }
