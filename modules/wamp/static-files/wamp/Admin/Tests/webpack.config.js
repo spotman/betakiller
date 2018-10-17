@@ -1,30 +1,44 @@
 "use strict";
 
-const encore       = require('@symfony/webpack-encore');
-const webpack      = require('webpack');
-const uglifyPlugin = require('uglifyjs-webpack-plugin');
+const webpack  = require('webpack');
+const path     = require('path');
+const paths    = {
+  'src':  __dirname,
+  'dist': path.resolve(__dirname, 'bundle')
+};
+module.exports = {
+  entry:   {
+    'manager': paths.src + '/TestWampRpcManager.js',
+    'test':    paths.src + '/TestWampRpcTest.js'
+  },
+  output:  {
+    filename: '[name].js',
+    path:     paths.dist
+  },
+  module:  {
+    rules: [
+      {
+        test:    /\.js$/,
+        loader:  'babel-loader',
+        options: {
+          ignore:  [],
+          presets: [
+            [
+              "@babel/preset-env",
+              {
+                forceAllTransforms: true
+              }
+            ]
+          ]
+        },
+      }
+    ]
+  },
+  plugins: [
+    new webpack.ProvidePlugin({
+      '$':      'jquery',
+      'jQuery': 'jquery'
+    })
+  ]
+};
 
-// ?
-process.noDeprecation = true;
-
-encore
-  .setOutputPath('build/')
-  .setPublicPath('/build')
-  .setManifestKeyPrefix('build/')
-  .addEntry('bundle-manager', './TestWampRpcManager.js')
-  .addEntry('bundle-test', './TestWampRpcTest.js')
-  .autoProvidejQuery()
-  .enableSourceMaps(!encore.isProduction())
-  .cleanupOutputBeforeBuild()
-  .enableBuildNotifications()
-;
-
-const webpackConfig = encore.getWebpackConfig();
-if (encore.isProduction()) {
-  webpackConfig.plugins = webpackConfig.plugins.filter(
-    plugin => !(plugin instanceof webpack.optimize.UglifyJsPlugin)
-  );
-  webpackConfig.plugins.push(new uglifyPlugin());
-}
-
-module.exports = webpackConfig;

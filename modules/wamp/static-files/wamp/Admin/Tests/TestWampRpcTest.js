@@ -1,7 +1,5 @@
 'use strict';
 
-require('babel-polyfill');
-require('jquery');
 import BetakillerWampFacade from '@betakiller/wamp-wrapper';
 import HtmlNodes from './HtmlNodes';
 import Stopwatch from './Stopwatch';
