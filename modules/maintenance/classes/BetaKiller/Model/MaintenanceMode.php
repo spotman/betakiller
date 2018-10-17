@@ -48,7 +48,7 @@ class MaintenanceMode
 
     public function isDue(): bool
     {
-        return $this->startsAt >= new \DateTimeImmutable;
+        return new \DateTimeImmutable >= $this->startsAt;
     }
 
     public function isFinished(): bool
