@@ -1,7 +1,7 @@
 <?php
 namespace BetaKiller\Model;
 
-interface HasPreviewZoneAccessSpecificationInterface
+interface HasPreviewZoneAccessSpecInterface
 {
     public function isPreviewZoneAccessAllowed(): bool;
 }

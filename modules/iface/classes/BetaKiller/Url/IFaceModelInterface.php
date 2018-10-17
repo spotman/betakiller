@@ -35,13 +35,6 @@ interface IFaceModelInterface extends EntityLinkedUrlElementInterface, SeoMetaIn
     public function getLayoutCodename(): ?string;
 
     /**
-     * Returns zone codename where this URL element is placed
-     *
-     * @return string
-     */
-    public function getZoneName(): string;
-
-    /**
      * Returns menu codename to which URL is assigned
      *
      * @return null|string

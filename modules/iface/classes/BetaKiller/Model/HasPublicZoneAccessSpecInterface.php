@@ -1,7 +1,7 @@
 <?php
 namespace BetaKiller\Model;
 
-interface HasPublicZoneAccessSpecificationInterface
+interface HasPublicZoneAccessSpecInterface
 {
     public function isPublicZoneAccessAllowed(): bool;
 }
