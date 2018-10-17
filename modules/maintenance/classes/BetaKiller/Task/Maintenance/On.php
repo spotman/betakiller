@@ -34,13 +34,17 @@ class On extends AbstractTask
     public function defineOptions(): array
     {
         return [
-            'duration' => null,
+            'for' => null,
         ];
     }
 
     public function run(): void
     {
-        $durationSpec = $this->getOption('duration', true);
+        $durationSpec = $this->getOption('for', true);
+
+        if ($durationSpec === 'deploy') {
+            $durationSpec = 'PT3M';
+        }
 
         $duration = new \DateInterval($durationSpec);
 

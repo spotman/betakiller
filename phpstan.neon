@@ -13,8 +13,10 @@ parameters:
     - modules/helper/classes
     - modules/iface/classes
     - modules/log/classes
+    - modules/maintenance/classes
     - modules/message-bus/classes
     - modules/notification/classes
     - modules/sitemap/classes
+    - modules/wamp/classes
     - modules/webhooks/classes
     - modules/widget/classes

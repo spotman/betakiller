@@ -131,8 +131,10 @@ final class MaintenanceModeService
     {
         $file = $this->getFilePath();
 
-        // No file => maintenance mode mode off
-        \unlink($file);
+        if (\file_exists($file)) {
+            // No file => maintenance mode mode off
+            \unlink($file);
+        }
     }
 
     private function getFilePath(): string
