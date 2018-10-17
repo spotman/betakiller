@@ -1,7 +1,5 @@
 'use strict';
 
-require('babel-polyfill');
-require('jquery');
 import HtmlNodes from './HtmlNodes';
 
 class TestWampRpcManager {
