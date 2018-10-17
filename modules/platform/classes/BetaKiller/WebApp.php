@@ -15,6 +15,7 @@ use BetaKiller\Middleware\DebugMiddleware;
 use BetaKiller\Middleware\ErrorPageMiddleware;
 use BetaKiller\Middleware\ExpectedExceptionMiddleware;
 use BetaKiller\Middleware\I18nMiddleware;
+use BetaKiller\Middleware\MaintenanceModeMiddleware;
 use BetaKiller\Middleware\ProfilerMiddleware;
 use BetaKiller\Middleware\SchemeMiddleware;
 use BetaKiller\Middleware\SitemapRequestHandler;
@@ -94,7 +95,6 @@ class WebApp
         $this->app->pipe(DebugMiddleware::class);
 
         // Main processing pipe
-        $this->app->pipe(ExpectedExceptionMiddleware::class);
         $this->app->pipe(SchemeMiddleware::class);
         $this->app->pipe(SessionMiddleware::class);
         $this->app->pipe(UserMiddleware::class);
@@ -104,6 +104,9 @@ class WebApp
 
         $this->app->pipe(UrlHelperMiddleware::class);
         $this->app->pipe(ErrorPageMiddleware::class);
+        $this->app->pipe(ExpectedExceptionMiddleware::class);
+
+        $this->app->pipe(MaintenanceModeMiddleware::class);
 
         // TODO Check If-Modified-Since and send 304 Not modified
 

@@ -28,7 +28,7 @@ class PhpException extends \ORM implements PhpExceptionModelInterface
      */
     protected function configure(): void
     {
-        $this->_db_group   = 'filesystem';
+        $this->_db_group   = 'errors';
         $this->_table_name = 'errors';
 
         /**

@@ -7,6 +7,8 @@ use Psr\Http\Message\ServerRequestInterface;
 
 abstract class AbstractHttpErrorIFace extends AbstractIFace
 {
+    protected $exception;
+
     /**
      * Returns data for View
      * Override this method in child classes
@@ -21,5 +23,12 @@ abstract class AbstractHttpErrorIFace extends AbstractIFace
             'login_url' => Login::URL,
             'is_guest'  => ServerRequestHelper::isGuest($request),
         ];
+    }
+
+    public function setException(\Throwable $e): self
+    {
+        $this->exception = $e;
+
+        return $this;
     }
 }
