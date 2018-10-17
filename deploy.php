@@ -379,6 +379,17 @@ task('deploy:dotenv:revision', function () {
 })->desc('Set APP_REVISION env variable from current git revision');
 
 /**
+ * Maintenance mode
+ */
+task('maintenance:on', function () {
+    runMinionTask('maintenance:on');
+})->desc('Enable maintenance mode');
+
+task('maintenance:off', function () {
+    runMinionTask('maintenance:off');
+})->desc('Disable maintenance mode');
+
+/**
  * Success message
  */
 task('done', function () use ($tz) {
@@ -416,12 +427,20 @@ task('deploy', [
     // Store APP_REVISION hash (leads to cache reset)
     'deploy:dotenv:revision',
 
+    // Enable maintenance mode before any DB processing
+    'maintenance:on',
+
     'migrations:up',
     'assets:deploy',
     'cache:warmup',
 
-    // Finalize
+    // Switch to new version
     'deploy:symlink',
+
+    // Disable maintenance mode
+    'maintenance:off',
+
+    // Finalize
     'cleanup',
     'done',
 ])->desc('Deploy app bundle')->onStage(
