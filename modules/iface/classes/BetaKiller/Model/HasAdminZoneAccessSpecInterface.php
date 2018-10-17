@@ -1,7 +1,7 @@
 <?php
 namespace BetaKiller\Model;
 
-interface HasAdminZoneAccessSpecificationInterface
+interface HasAdminZoneAccessSpecInterface
 {
     public function isAdminZoneAccessAllowed(): bool;
 }

@@ -12,7 +12,7 @@ trait SecondaryUrlElementModelTrait
      */
     public function isHiddenInSiteMap(): bool
     {
-        // Webhooks are always hidden in sitemap
+        // Webhooks, Dummies and Actions are always hidden in sitemap
         return true;
     }
 }

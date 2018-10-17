@@ -1,7 +1,7 @@
 <?php
 namespace BetaKiller\Model;
 
-interface HasPersonalZoneAccessSpecificationInterface
+interface HasPersonalZoneAccessSpecInterface
 {
     public function isPersonalZoneAccessAllowed(): bool;
 }

@@ -13,7 +13,7 @@ interface ContentPostInterface extends
     StatusRelatedModelInterface,
     ModelWithRevisionsInterface,
     SeoMetaInterface,
-    HasPublicZoneAccessSpecificationInterface
+    HasPublicZoneAccessSpecInterface
 {
     /**
      * @return int
