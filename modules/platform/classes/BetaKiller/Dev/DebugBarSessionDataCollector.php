@@ -3,29 +3,27 @@ declare(strict_types=1);
 
 namespace BetaKiller\Dev;
 
-use BetaKiller\Helper\ServerRequestHelper;
 use DebugBar\DataCollector\AssetProvider;
 use DebugBar\DataCollector\DataCollector;
 use DebugBar\DataCollector\Renderable;
-use Psr\Http\Message\ServerRequestInterface;
 use Zend\Expressive\Session\SessionIdentifierAwareInterface;
 use Zend\Expressive\Session\SessionInterface;
 
 class DebugBarSessionDataCollector extends DataCollector implements Renderable, AssetProvider
 {
     /**
-     * @var \Psr\Http\Message\ServerRequestInterface
+     * @var \Zend\Expressive\Session\SessionInterface
      */
-    private $request;
+    private $session;
 
     /**
      * DebugBarSessionDataCollector constructor.
      *
-     * @param \Psr\Http\Message\ServerRequestInterface $request
+     * @param \Zend\Expressive\Session\SessionInterface $session
      */
-    public function __construct(ServerRequestInterface $request)
+    public function __construct(SessionInterface $session)
     {
-        $this->request = $request;
+        $this->session = $session;
     }
 
     /**
@@ -45,9 +43,7 @@ class DebugBarSessionDataCollector extends DataCollector implements Renderable, 
      */
     public function collect(): array
     {
-        $session = ServerRequestHelper::getSession($this->request);
-
-        return $this->getSessionData($session);
+        return $this->getSessionData($this->session);
     }
 
     private function getSessionID(SessionInterface $session): ?string
