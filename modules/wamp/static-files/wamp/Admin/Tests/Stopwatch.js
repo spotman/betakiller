@@ -6,7 +6,7 @@ export default class Stopwatch {
   }
 
   _getCurrentMs() {
-    return performance.now();
+    return new Date().getTime();
   }
 
   start(name) {
