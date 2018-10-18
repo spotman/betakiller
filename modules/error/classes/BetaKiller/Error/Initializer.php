@@ -56,7 +56,7 @@ class Initializer implements ModuleInitializerInterface
         // Enable debugging via PhpConsole
         if ($this->appEnv->isDebugEnabled() && $this->isPhpConsoleActive()) {
             $this->initPhpConsole();
-        } elseif ($this->appEnv->inProductionMode(true)) {
+        } elseif ($this->appEnv->inProductionMode() || $this->appEnv->inStagingMode()) {
             $this->initPhpExceptionStorage();
         }
     }
@@ -68,7 +68,7 @@ class Initializer implements ModuleInitializerInterface
     private function isPhpConsoleActive(): bool
     {
         $storageFileName = $this->appEnv->getModeName().'.'.$this->appEnv->getRevisionKey().'.phpConsole.data';
-        $storagePath     = \sys_get_temp_dir().DIRECTORY_SEPARATOR.$storageFileName;
+        $storagePath     = $this->appEnv->getTempDirectory().DIRECTORY_SEPARATOR.$storageFileName;
 
         // Can be called only before PhpConsole\Connector::getInstance() and PhpConsole\Handler::getInstance()
         Connector::setPostponeStorage(new File($storagePath));
