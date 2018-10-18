@@ -76,6 +76,13 @@ return [
             });
         }),
 
+//        RequestIdMiddleware::class => DI\factory(function () {
+//            $generator         = new \PhpMiddleware\RequestId\Generator\PhpUniqidGenerator();
+//            $requestIdProvider = new \PhpMiddleware\RequestId\RequestIdProviderFactory($generator);
+//
+//            return new RequestIdMiddleware($requestIdProvider);
+//        }),
+
 
         SessionStorageInterface::class     => DI\autowire(DatabaseSessionStorage::class),
         SessionPersistenceInterface::class => DI\get(SessionStorageInterface::class),
