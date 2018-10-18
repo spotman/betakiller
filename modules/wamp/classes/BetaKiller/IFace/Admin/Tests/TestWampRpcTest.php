@@ -17,21 +17,12 @@ class TestWampRpcTest extends AbstractIFace
     public function getData(ServerRequestInterface $request): array
     {
         return [
-            'connectionType' => strtolower(trim($this->findArgument($request, 'connectionType'))),
-            'testsQty'       => (int)$this->findArgument($request, 'testsQty'),
-            'qtyInPack'      => (int)$this->findArgument($request, 'qtyInPack'),
-            'delayPack'      => (int)$this->findArgument($request, 'delayPack'),
+            'connectionType' => strtolower(trim(
+                ServerRequestHelper::getQueryPart($request, 'connectionType', true)
+            )),
+            'testsQty'       => (int)ServerRequestHelper::getQueryPart($request, 'testsQty', true),
+            'qtyInPack'      => (int)ServerRequestHelper::getQueryPart($request, 'qtyInPack', true),
+            'delayPack'      => (int)ServerRequestHelper::getQueryPart($request, 'delayPack', true),
         ];
-    }
-
-    /**
-     * @param \Psr\Http\Message\ServerRequestInterface $request
-     * @param string                                   $name
-     *
-     * @return string
-     */
-    private function findArgument(ServerRequestInterface $request, string $name): string
-    {
-        return (string)ServerRequestHelper::getUrlContainer($request)->getQueryPart($name);
     }
 }
