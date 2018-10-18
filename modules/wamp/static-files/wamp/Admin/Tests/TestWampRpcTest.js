@@ -45,7 +45,9 @@ class TestWampRpcTest {
   }
 
   stop() {
-    this.abort = true;
+    this.abort = 1;
+    this.result.markAsStopped();
+    console.log('Test. Stopped.');
     return this;
   }
 
@@ -95,6 +97,7 @@ class TestWampRpcTest {
   }
 
   _connectWamp() {
+    this.abort = false;
     this.result
       .markAsConnecting()
       .incConnectionTry();
@@ -128,12 +131,17 @@ class TestWampRpcTest {
       reason = this._onWampConnectReject(data);
     }
 
-    if (this.abort) this.wampConnection.close();
-
     if (reason) reason = ` (${reason})`;
     console.log(`Test. WAMP connection time${reason}:`, connectionTime);
 
-    if (!isError) this._runTests();
+    if (this.abort === 1) {
+      this.abort = 2;
+      if (this.wampConnection) {
+        this.wampConnection.close();
+      }
+    }
+
+    if (!this.abort && !isError) this._runTests();
   }
 
   _onWampConnectResolve() {
@@ -153,7 +161,6 @@ class TestWampRpcTest {
       reconnectionState = data.reconnectionState;
       isClosedByClient  = data.isClosedByClient;
     }
-    if (this.abort) reconnectionState = false;
 
     if (isClosedByClient) {
       console.log('Test. WAMP connection closed by client');
@@ -162,7 +169,7 @@ class TestWampRpcTest {
         console.error(
           `Test. WAMP connection. Error:`,
           `Reason "${reason}".`,
-          `detailReason "${detailReason}".`,
+          `Detail reason "${detailReason}".`,
           `Data:`, data
         );
       } else {
@@ -173,7 +180,10 @@ class TestWampRpcTest {
       console.log(`Test. WAMP connection reconnection "${reconnectionState}".`);
     }
 
-    if (reconnectionState) this.result.incConnectionTry();
+    if (!isClosedByClient) {
+      this.result.setError(`Connection. Reason: "${reason}". Detail reason "${detailReason}". Data: ${data}`);
+    }
+    if (!this.abort && reconnectionState) this.result.incConnectionTry();
 
     return reason;
   }
@@ -241,7 +251,8 @@ class TestWampRpcTest {
       this
         .result
         .incErrorsQty()
-        .updateErrorsProgress(this.testsErrorsQty, this.params.testsQty);
+        .updateErrorsProgress(this.testsErrorsQty, this.params.testsQty)
+        .setError(`Request. Data: ${data}`);
     }
 
     if (this.testsResponsesQty >= this.params.testsQty) {

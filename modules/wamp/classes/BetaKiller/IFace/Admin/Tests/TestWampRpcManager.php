@@ -22,8 +22,11 @@ class TestWampRpcManager extends AbstractIFace
         $testElement = $urlHelper->getUrlElementByCodename(TestWampRpcTest::codename());
         $testUrl     = $urlHelper->makeUrl($testElement, null, false);
 
+        $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? '';
+
         return [
-            'testUrl' => $testUrl,
+            'userAgent' => $userAgent,
+            'testUrl'   => $testUrl,
         ];
     }
 }
