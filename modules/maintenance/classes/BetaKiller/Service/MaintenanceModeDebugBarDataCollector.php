@@ -32,8 +32,14 @@ class MaintenanceModeDebugBarDataCollector extends DataCollector implements Rend
      */
     public function collect(): array
     {
+        if (!$this->model) {
+            return [];
+        }
+
+        $startsAt = $this->model->getStartsAt()->format('H:i:s T');
+
         return [
-            'label' => $this->model ? 'Maintenance mode enabled' : 'Disabled',
+            'label' => 'Maintenance mode at '.$startsAt,
         ];
     }
 
@@ -60,7 +66,7 @@ class MaintenanceModeDebugBarDataCollector extends DataCollector implements Rend
                 'icon'    => 'code-fork',
                 'tooltip' => 'Maintenance mode',
                 'map'     => 'maintenance.label',
-                'default' => '',
+                'default' => '"Regular"',
             ],
         ];
     }
@@ -97,7 +103,7 @@ class MaintenanceModeDebugBarDataCollector extends DataCollector implements Rend
 
         return [
             'inline_css' => [
-                'mode_widget_css' => '.phpdebugbar-fa-code-fork ~ .phpdebugbar-text { color: #F00 !important; font-weight: bold; }',
+                'mode_widget_css' => '.phpdebugbar-fa-code-fork, .phpdebugbar-fa-code-fork ~ .phpdebugbar-text { color: #F00 !important; font-weight: bold; }',
             ],
         ];
     }

@@ -16,7 +16,7 @@
           {% endblock %}
 
           <div class="card-body">
-            <p>{{ "error.http.503.p1"|i18n({ sec: duration }) }}</p>
+            <p>{{ "error.http.503.p1"|i18n({ min: (duration/60)|round }) }}</p>
           </div>
 
           <div class="card-footer">

@@ -17,7 +17,7 @@ class HttpError503 extends AbstractHttpErrorIFace
     public function getData(ServerRequestInterface $request): array
     {
         $now             = new \DateTimeImmutable;
-        $defaultDuration = new \DateInterval('PT60S');
+        $defaultDuration = new \DateInterval('PT600S');
 
         if (!$this->exception) {
             $endTime         = $now->add($defaultDuration);
@@ -35,9 +35,6 @@ class HttpError503 extends AbstractHttpErrorIFace
         }
 
         $duration = $endTime->getTimestamp() - $now->getTimestamp();
-
-        // Randomize end time by 15 seconds to prevent overload
-        $duration += \random_int(1, 15);
 
         return array_merge(parent::getData($request), [
             'duration' => $duration,
