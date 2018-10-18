@@ -27,7 +27,7 @@ class TwigCacheExtension extends CacheExtension
     {
         Container::getInstance()->injectOn($this);
 
-        if ($this->appEnv->inProductionMode(true)) {
+        if ($this->appEnv->inProductionMode() || $this->appEnv->inStagingMode()) {
             $cacheProvider         = new DoctrineCacheAdapter(new ArrayCache());
             $lifetimeCacheStrategy = new LifetimeCacheStrategy($cacheProvider);
 

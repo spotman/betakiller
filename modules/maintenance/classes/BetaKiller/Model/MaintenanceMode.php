@@ -28,7 +28,7 @@ class MaintenanceMode
         $this->endsAt   = $endsAt;
     }
 
-    public function getStartTime(): \DateTimeImmutable
+    public function getStartsAt(): \DateTimeImmutable
     {
         return $this->startsAt;
     }

@@ -25,7 +25,7 @@ return [
     'error.http.500.button.cancel' => 'Cancel refresh',
 
     'error.http.503.label'         => 'Maintenance mode',
-    'error.http.503.p1'            => 'We are maintaining this website and it will be up in :sec seconds.',
+    'error.http.503.p1'            => 'We are maintaining this website and it will be up in :min minutes.',
 
     'notification.developer.error.subsystem-failure.subj' => 'BetaKiller logging subsystem failure',
     'notification.developer.error.php-exception.subj'     => 'BetaKiller exception',

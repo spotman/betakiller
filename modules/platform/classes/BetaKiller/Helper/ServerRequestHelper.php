@@ -9,6 +9,7 @@ use BetaKiller\Exception\BadRequestHttpException;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Url\Container\UrlContainerInterface;
 use BetaKiller\Url\UrlElementStack;
+use DebugBar\DebugBar;
 use Psr\Http\Message\ServerRequestInterface;
 use Zend\Expressive\Session\SessionInterface;
 use Zend\Expressive\Session\SessionMiddleware;
@@ -196,5 +197,10 @@ class ServerRequestHelper
     public static function getProfiler(ServerRequestInterface $request): Profiler
     {
         return $request->getAttribute(Profiler::class);
+    }
+
+    public static function getDebugBar(ServerRequestInterface $request): ?DebugBar
+    {
+        return $request->getAttribute(DebugBar::class);
     }
 }
