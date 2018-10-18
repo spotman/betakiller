@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\Middleware;
 
-use BetaKiller\Dev\SessionDebugBarDataCollector;
+use BetaKiller\Dev\DebugBarSessionDataCollector;
 use BetaKiller\Helper\ServerRequestHelper;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -27,7 +27,7 @@ class SessionDebugMiddleware implements MiddlewareInterface
         $debugBar = ServerRequestHelper::getDebugBar($request);
 
         if ($debugBar) {
-            $debugBar->addCollector(new SessionDebugBarDataCollector($request));
+            $debugBar->addCollector(new DebugBarSessionDataCollector($request));
         }
 
         return $handler->handle($request);

@@ -7,10 +7,10 @@ use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Log\Logger;
 use DebugBar\Bridge\MonologCollector;
 use DebugBar\DataCollector\MemoryCollector;
-use DebugBar\DataCollector\MessagesCollector;
 use DebugBar\DataCollector\RequestDataCollector;
 use DebugBar\DataCollector\TimeDataCollector;
 use DebugBar\DebugBar;
+use DebugBar\RequestIdGenerator;
 use DebugBar\Storage\FileStorage;
 use PhpMiddleware\PhpDebugBar\PhpDebugBarMiddleware;
 use Psr\Http\Message\ResponseFactoryInterface;
@@ -72,11 +72,10 @@ class DebugMiddleware implements MiddlewareInterface
         $debugBar = new DebugBar();
 
         $debugBar
-            ->addCollector(new MessagesCollector())
             ->addCollector(new RequestDataCollector())
             ->addCollector(new TimeDataCollector($startTime))
-            ->addCollector(new MemoryCollector())
-            ->addCollector(new MonologCollector($this->logger->getMonolog()));
+            ->addCollector(new MonologCollector($this->logger->getMonolog()))
+            ->addCollector(new MemoryCollector());
 
         // Storage for processing data for AJAX calls and redirects
         $debugBar->setStorage(new FileStorage(\sys_get_temp_dir()));
