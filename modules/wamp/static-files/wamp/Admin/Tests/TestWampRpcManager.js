@@ -1,5 +1,6 @@
 'use strict';
 
+import BetakillerWampFacade from '@betakiller/wamp-wrapper';
 import HtmlNodes from './HtmlNodes';
 
 class TestWampRpcManager {
@@ -17,6 +18,11 @@ class TestWampRpcManager {
           _this._action($(this));
         };
       }(this));
+
+    this.nodes.get('.userAgentOriginal').html(window.navigator.userAgent);
+
+    let WampFacade = new BetakillerWampFacade();
+    this.nodes.get('.userAgentWamp').html(WampFacade.options.auth_secret);
   }
 
   _action($trigger) {

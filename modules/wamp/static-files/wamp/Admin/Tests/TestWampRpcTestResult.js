@@ -55,6 +55,13 @@ export default class TestWampRpcTestResult {
     }
   }
 
+  setError(value) {
+    this.nodes.get('[data-name="error"]')
+      .html(value)
+      .closest('[data-item]').show();
+    return this;
+  }
+
   setConnectionType(type) {
     this.nodes.get('[data-name="connectionType"]').html(type);
     return this;

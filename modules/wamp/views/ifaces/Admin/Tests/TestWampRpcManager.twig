@@ -15,6 +15,16 @@
               Request Options
             </p>
             <div class="input-field">
+              User agent: server/JS original/JS WAMP
+              <div style="font-size:10px;">
+                <p>{{ userAgent }}</p>
+                <br>
+                <p class="userAgentOriginal"></p>
+                <br>
+                <p class="userAgentWamp"></p>
+              </div>
+            </div>
+            <div class="input-field">
               Processes count:
               <input type="text" name="processesQty" id="testWampRpc-processesQty" value="1" title="">
               {#<label for="testWampRpc-processesQty">Test qty</label>#}
@@ -55,7 +65,7 @@
               class="col s6 m3"
               style="display:none;margin-left:-10px;"
               width="100%"
-              height="340"
+              height="450"
               scrolling="no"
               frameBorder="0">
 
