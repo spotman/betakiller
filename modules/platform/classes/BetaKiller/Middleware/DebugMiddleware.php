@@ -86,10 +86,11 @@ class DebugMiddleware implements MiddlewareInterface
         $profiler->enable($debugBar);
 
         // Prepare renderer
-        $renderer   = $debugBar->getJavascriptRenderer('/phpDebugBar');
+        $renderer = $debugBar->getJavascriptRenderer('/phpDebugBar');
+        $renderer->setEnableJqueryNoConflict(true);
         $middleware = new PhpDebugBarMiddleware($renderer, $this->responseFactory, $this->streamFactory);
 
         // Forward call
-        return $middleware->process($request, $handler);
+        return $middleware->process($request->withAttribute(DebugBar::class, $debugBar), $handler);
     }
 }
