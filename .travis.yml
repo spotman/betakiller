@@ -7,6 +7,10 @@ branches:
   only:
   - master
 
+cache:
+  directories:
+  - $HOME/.composer/cache/files
+
 notifications:
   email: false
   slack:
