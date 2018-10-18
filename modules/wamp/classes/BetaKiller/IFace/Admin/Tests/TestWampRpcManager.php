@@ -10,11 +10,6 @@ use Psr\Http\Message\ServerRequestInterface;
 class TestWampRpcManager extends AbstractIFace
 {
     /**
-     * @var \Psr\Http\Message\ServerRequestInterface
-     */
-    private $request;
-
-    /**
      * @param \Psr\Http\Message\ServerRequestInterface $request
      *
      * @return string[]
