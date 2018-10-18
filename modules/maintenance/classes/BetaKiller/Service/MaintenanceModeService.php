@@ -32,13 +32,13 @@ final class MaintenanceModeService
         $this->appEnv      = $appEnv;
     }
 
-    public function isEnabledFor(UserInterface $user): bool
+    public function isDisplayedFor(UserInterface $user): bool
     {
         if ($this->userService->isDeveloper($user)) {
             return false;
         }
 
-        return $this->isEnabled();
+        return true;
     }
 
     public function isEnabled(): bool
@@ -51,6 +51,11 @@ final class MaintenanceModeService
 
         // Keep enabled while model file exists
         return $model->isDue();
+    }
+
+    public function getModel(): ?MaintenanceMode
+    {
+        return $this->fetch();
     }
 
     public function getEndTime(): DateTimeImmutable
@@ -90,7 +95,6 @@ final class MaintenanceModeService
     public function disable(): void
     {
         $this->delete();
-        // TODO Send event to all WAMP users about maintenance mode off
     }
 
     private function store(MaintenanceMode $model): void
@@ -102,11 +106,19 @@ final class MaintenanceModeService
         if (!\file_put_contents($file, $data, LOCK_EX)) {
             throw new \LogicException('Maintenance mode file can not be written');
         }
+
+        \clearstatcache(true, $file);
+
+        if (!\file_exists($file) || !\is_readable($file)) {
+            throw new \LogicException('Maintenance mode file is not readable by web-server');
+        }
     }
 
     private function fetch(): ?MaintenanceMode
     {
         $file = $this->getFilePath();
+
+        \clearstatcache(true, $file);
 
         if (!\file_exists($file)) {
             // No file => no maintenance mode
@@ -139,6 +151,13 @@ final class MaintenanceModeService
 
     private function getFilePath(): string
     {
-        return $this->appEnv->getAppRootPath().\DIRECTORY_SEPARATOR.'.maintenance';
+        $name = implode('.', [
+            $this->appEnv->getAppCodename(),
+            $this->appEnv->getModeName(),
+            'maintenance'
+        ]);
+
+        // Store file in a /tmp with prefix from project name and env
+        return $this->appEnv->getTempDirectory().\DIRECTORY_SEPARATOR.$name;
     }
 }

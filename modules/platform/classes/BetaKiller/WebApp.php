@@ -11,6 +11,7 @@ use BetaKiller\Assets\Model\AssetsModelImageInterface;
 use BetaKiller\Assets\Provider\AssetsProviderInterface;
 use BetaKiller\Assets\Provider\ImageAssetsProviderInterface;
 use BetaKiller\Middleware\ContentNegotiationMiddleware;
+use BetaKiller\Middleware\DebugBarPatchMiddleware;
 use BetaKiller\Middleware\DebugMiddleware;
 use BetaKiller\Middleware\ErrorPageMiddleware;
 use BetaKiller\Middleware\ExpectedExceptionMiddleware;
@@ -91,12 +92,15 @@ class WebApp
         // - $app->pipe('/files', $filesMiddleware);
 
         // Profiling and debugging
-        $this->app->pipe(ProfilerMiddleware::class);
         $this->app->pipe(DebugMiddleware::class);
+        $this->app->pipe(ProfilerMiddleware::class);
 
         // Main processing pipe
         $this->app->pipe(SchemeMiddleware::class);
+//        $this->app->pipe(RequestIdMiddleware::class);
+
         $this->app->pipe(SessionMiddleware::class);
+        $this->app->pipe(DebugBarPatchMiddleware::class);
         $this->app->pipe(UserMiddleware::class);
         $this->app->pipe(ContentNegotiationMiddleware::class);
         $this->app->pipe(ContentType::class);

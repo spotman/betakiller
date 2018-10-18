@@ -135,13 +135,12 @@ class NotificationHelper
 
     /**
      * @param \BetaKiller\Notification\NotificationMessageInterface $message
-     * @param bool|null                                             $inStage
      *
      * @return void
      */
-    private function rewriteTargetsForDebug(NotificationMessageInterface $message, ?bool $inStage = null): void
+    private function rewriteTargetsForDebug(NotificationMessageInterface $message): void
     {
-        if (!$this->appEnv->inProductionMode($inStage ?? true)) {
+        if (!$this->appEnv->inProductionMode()) {
             $message
                 ->clearTargets()
                 ->addTarget($this->currentUserTarget());

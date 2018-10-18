@@ -10,6 +10,18 @@ abstract class AbstractHttpErrorIFace extends AbstractIFace
     protected $exception;
 
     /**
+     * This hook executed before IFace processing (on every request regardless of caching)
+     * Place here code that needs to be executed on every IFace request (increment views counter, etc)
+     *
+     * @param \Psr\Http\Message\ServerRequestInterface $request
+     */
+    public function before(ServerRequestInterface $request): void
+    {
+        // No caching for error pages
+        $this->setExpiresInPast();
+    }
+
+    /**
      * Returns data for View
      * Override this method in child classes
      *

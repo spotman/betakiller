@@ -101,7 +101,7 @@ class AppEnv implements AppEnvInterface
      */
     public function getEnvVariable(string $name, bool $required = null): string
     {
-        $name = \mb_strtoupper($name);
+        $name  = \mb_strtoupper($name);
         $value = getenv($name);
 
         if (!$value && $required) {
@@ -112,17 +112,11 @@ class AppEnv implements AppEnvInterface
     }
 
     /**
-     * @param bool|null $useStaging
-     *
      * @return bool
      */
-    public function inProductionMode(?bool $useStaging = null): bool
+    public function inProductionMode(): bool
     {
-        $values = $useStaging
-            ? [self::MODE_PRODUCTION, self::MODE_STAGING]
-            : [self::MODE_PRODUCTION];
-
-        return \in_array($this->mode, $values, true);
+        return $this->mode === self::MODE_PRODUCTION;
     }
 
     public function inDevelopmentMode(): bool
@@ -142,7 +136,7 @@ class AppEnv implements AppEnvInterface
 
     public function isDebugEnabled(): bool
     {
-        return $this->debugEnabled || $this->inDevelopmentMode() || $this->inTestingMode();
+        return $this->debugEnabled || !$this->inProductionMode();
     }
 
     public function enableDebug(): void
@@ -210,5 +204,16 @@ class AppEnv implements AppEnvInterface
         $options = \getopt('', [$key]);
 
         return $options[$name] ?? null;
+    }
+
+    /**
+     * Returns absolute path to the global temp directory (must be readable/writable between requests)
+     *
+     * @see https://serverfault.com/a/615054
+     * @return string
+     */
+    public function getTempDirectory(): string
+    {
+        return \sys_get_temp_dir();
     }
 }
