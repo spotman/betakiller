@@ -198,6 +198,7 @@ task('php:version', function () {
  * Apache tasks
  */
 task('httpd:reload', function () {
+    // TODO https://ubuntuforums.org/showthread.php?t=1505075
     run('sudo service httpd reload');
 })->desc('Reload Apache config');
 
@@ -382,7 +383,7 @@ task('deploy:dotenv:revision', function () {
  * Maintenance mode
  */
 task('maintenance:on', function () {
-    runMinionTask('maintenance:on');
+    runMinionTask('maintenance:on --for=deploy');
 })->desc('Enable maintenance mode');
 
 task('maintenance:off', function () {
