@@ -11,6 +11,7 @@ use BetaKiller\Assets\Model\AssetsModelImageInterface;
 use BetaKiller\Assets\Provider\AssetsProviderInterface;
 use BetaKiller\Assets\Provider\ImageAssetsProviderInterface;
 use BetaKiller\Middleware\ContentNegotiationMiddleware;
+use BetaKiller\Middleware\DebugBarPatchMiddleware;
 use BetaKiller\Middleware\DebugMiddleware;
 use BetaKiller\Middleware\ErrorPageMiddleware;
 use BetaKiller\Middleware\ExpectedExceptionMiddleware;
@@ -18,7 +19,6 @@ use BetaKiller\Middleware\I18nMiddleware;
 use BetaKiller\Middleware\MaintenanceModeMiddleware;
 use BetaKiller\Middleware\ProfilerMiddleware;
 use BetaKiller\Middleware\SchemeMiddleware;
-use BetaKiller\Middleware\SessionDebugMiddleware;
 use BetaKiller\Middleware\SitemapRequestHandler;
 use BetaKiller\Middleware\UrlElementDispatchMiddleware;
 use BetaKiller\Middleware\UrlElementRenderMiddleware;
@@ -100,7 +100,7 @@ class WebApp
 //        $this->app->pipe(RequestIdMiddleware::class);
 
         $this->app->pipe(SessionMiddleware::class);
-        $this->app->pipe(SessionDebugMiddleware::class);
+        $this->app->pipe(DebugBarPatchMiddleware::class);
         $this->app->pipe(UserMiddleware::class);
         $this->app->pipe(ContentNegotiationMiddleware::class);
         $this->app->pipe(ContentType::class);

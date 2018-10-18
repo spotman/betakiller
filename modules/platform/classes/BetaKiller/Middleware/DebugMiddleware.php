@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\Middleware;
 
+use BetaKiller\Dev\DebugBarHttpDriver;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Log\Logger;
 use DebugBar\Bridge\MonologCollector;
