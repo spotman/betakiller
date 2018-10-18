@@ -1,38 +1,42 @@
 "use strict";
 
-const webpack  = require('webpack');
-const path     = require('path');
-const paths    = {
-  'src':  __dirname,
+const webpack     = require('webpack');
+const path        = require('path');
+const paths       = {
+  'src':  path.resolve(__dirname),
   'dist': path.resolve(__dirname, 'bundle')
 };
-module.exports = {
+const entryGlobal = ['@babel/polyfill'];
+module.exports    = {
   entry:   {
-    'manager': paths.src + '/TestWampRpcManager.js',
-    'test':    paths.src + '/TestWampRpcTest.js'
+    'manager': [].concat(
+      entryGlobal,
+      paths.src + '/TestWampRpcManager.js'
+    ),
+    'test':    [].concat(
+      entryGlobal,
+      paths.src + '/TestWampRpcTest.js'
+    ),
   },
   output:  {
     filename: '[name].js',
     path:     paths.dist
   },
   module:  {
-    rules: [
-      {
-        test:    /\.js$/,
-        loader:  'babel-loader',
-        options: {
-          ignore:  [],
-          presets: [
-            [
-              "@babel/preset-env",
-              {
-                forceAllTransforms: true
-              }
-            ]
-          ]
-        },
+    rules: [{
+      test:    /\.js$/,
+      loader:  'babel-loader',
+      options: {
+        ignore:  [],
+        presets: [[
+          "@babel/preset-env",
+          {
+            debug:              true,
+            forceAllTransforms: true
+          }
+        ]]
       }
-    ]
+    }]
   },
   plugins: [
     new webpack.ProvidePlugin({
