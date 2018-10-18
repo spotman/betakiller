@@ -11,7 +11,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Zend\Expressive\Session\SessionIdentifierAwareInterface;
 use Zend\Expressive\Session\SessionInterface;
 
-class SessionDebugBarDataCollector extends DataCollector implements Renderable, AssetProvider
+class DebugBarSessionDataCollector extends DataCollector implements Renderable, AssetProvider
 {
     /**
      * @var \Psr\Http\Message\ServerRequestInterface
@@ -19,7 +19,7 @@ class SessionDebugBarDataCollector extends DataCollector implements Renderable, 
     private $request;
 
     /**
-     * SessionDebugBarDataCollector constructor.
+     * DebugBarSessionDataCollector constructor.
      *
      * @param \Psr\Http\Message\ServerRequestInterface $request
      */
