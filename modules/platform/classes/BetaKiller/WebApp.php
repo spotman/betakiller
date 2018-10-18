@@ -92,8 +92,8 @@ class WebApp
         // - $app->pipe('/files', $filesMiddleware);
 
         // Profiling and debugging
-        $this->app->pipe(ProfilerMiddleware::class);
         $this->app->pipe(DebugMiddleware::class);
+        $this->app->pipe(ProfilerMiddleware::class);
 
         // Main processing pipe
         $this->app->pipe(SchemeMiddleware::class);

@@ -3,15 +3,13 @@ declare(strict_types=1);
 
 namespace BetaKiller\Middleware;
 
-use BetaKiller\Dev\DebugBarHttpDriver;
-use BetaKiller\Helper\ServerRequestHelper;
+use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\Log\Logger;
 use DebugBar\Bridge\MonologCollector;
 use DebugBar\DataCollector\MemoryCollector;
 use DebugBar\DataCollector\RequestDataCollector;
 use DebugBar\DataCollector\TimeDataCollector;
 use DebugBar\DebugBar;
-use DebugBar\RequestIdGenerator;
 use DebugBar\Storage\FileStorage;
 use PhpMiddleware\PhpDebugBar\PhpDebugBarMiddleware;
 use Psr\Http\Message\ResponseFactoryInterface;
@@ -39,13 +37,20 @@ class DebugMiddleware implements MiddlewareInterface
     private $streamFactory;
 
     /**
+     * @var \BetaKiller\Helper\AppEnvInterface
+     */
+    private $appEnv;
+
+    /**
      * DebugMiddleware constructor.
      *
+     * @param \BetaKiller\Helper\AppEnvInterface         $appEnv
      * @param \BetaKiller\Log\Logger                     $logger
      * @param \Psr\Http\Message\ResponseFactoryInterface $responseFactory
      * @param \Psr\Http\Message\StreamFactoryInterface   $streamFactory
      */
     public function __construct(
+        AppEnvInterface $appEnv,
         Logger $logger,
         ResponseFactoryInterface $responseFactory,
         StreamFactoryInterface $streamFactory
@@ -53,6 +58,7 @@ class DebugMiddleware implements MiddlewareInterface
         $this->logger          = $logger;
         $this->responseFactory = $responseFactory;
         $this->streamFactory   = $streamFactory;
+        $this->appEnv          = $appEnv;
     }
 
     /**
@@ -67,6 +73,11 @@ class DebugMiddleware implements MiddlewareInterface
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
+        if (!$this->appEnv->isDebugEnabled()) {
+            // Forward call
+            return $handler->handle($request);
+        }
+
         $startTime = $request->getServerParams()['REQUEST_TIME_FLOAT'] ?? null;
 
         // Fresh instance for every request
@@ -79,11 +90,7 @@ class DebugMiddleware implements MiddlewareInterface
             ->addCollector(new MemoryCollector());
 
         // Storage for processing data for AJAX calls and redirects
-        $debugBar->setStorage(new FileStorage(\sys_get_temp_dir()));
-
-        // Initialize profiler with DebugBar instance and enable it
-        $profiler = ServerRequestHelper::getProfiler($request);
-        $profiler->enable($debugBar);
+        $debugBar->setStorage(new FileStorage($this->appEnv->getTempDirectory()));
 
         // Prepare renderer
         $renderer = $debugBar->getJavascriptRenderer('/phpDebugBar');
