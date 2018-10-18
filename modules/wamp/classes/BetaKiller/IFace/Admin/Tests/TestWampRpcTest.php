@@ -3,25 +3,12 @@ declare(strict_types=1);
 
 namespace BetaKiller\IFace\Admin\Tests;
 
+use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\IFace\AbstractIFace;
-use BetaKiller\Url\Container\UrlContainerInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 class TestWampRpcTest extends AbstractIFace
 {
-    /**
-     * @var \BetaKiller\Url\Container\UrlContainerInterface
-     */
-    private $urlContainer;
-
-    /**
-     * @param \BetaKiller\Url\Container\UrlContainerInterface $urlContainer
-     */
-    public function __construct(UrlContainerInterface $urlContainer)
-    {
-        $this->urlContainer = $urlContainer;
-    }
-
     /**
      * @param \Psr\Http\Message\ServerRequestInterface $request
      *
@@ -30,20 +17,12 @@ class TestWampRpcTest extends AbstractIFace
     public function getData(ServerRequestInterface $request): array
     {
         return [
-            'connectionType' => strtolower(trim($this->findArgument('connectionType'))),
-            'testQty'        => (int)$this->findArgument('testQty'),
-            'countInPack'    => (int)$this->findArgument('countInPack'),
-            'delayPack'      => (int)$this->findArgument('delayPack'),
+            'connectionType' => strtolower(trim(
+                ServerRequestHelper::getQueryPart($request, 'connectionType', true)
+            )),
+            'testsQty'       => (int)ServerRequestHelper::getQueryPart($request, 'testsQty', true),
+            'qtyInPack'      => (int)ServerRequestHelper::getQueryPart($request, 'qtyInPack', true),
+            'delayPack'      => (int)ServerRequestHelper::getQueryPart($request, 'delayPack', true),
         ];
-    }
-
-    /**
-     * @param $name
-     *
-     * @return string
-     */
-    private function findArgument($name): string
-    {
-        return (string)$this->urlContainer->getQueryPart($name);
     }
 }

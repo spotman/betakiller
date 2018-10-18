@@ -1,13 +1,7 @@
 {% extends '@layouts/onlyContent' %}
 
 {% block page_content %}
-  {{ js('wamp/Admin/Tests/TestWampRpcTest.js') }}
-  {#{{ js('wamp/autobahn.min.js') }}#}
-  {{ js('wamp/Session.js') }}
-  {{ js('wamp/WampAuthChallenge.js') }}
-  {{ js('wamp/WampConnection.js') }}
-  {{ js('wamp/WampRequest.js') }}
-  {{ js('wamp/WampApiRequest.js') }}
+  {{ js('wamp/Admin/Tests/bundle/test.js') }}
 
 
   <div class="row">
@@ -32,8 +26,8 @@
       <section class="testWampRpcTest row" style="display:none"
                data-template
                data-connectionType="{{ connectionType }}"
-               data-testQty="{{ testQty }}"
-               data-countInPack="{{ countInPack }}"
+               data-testsQty="{{ testsQty }}"
+               data-qtyInPack="{{ qtyInPack }}"
                data-delayPack="{{ delayPack }}"
       >
         <div class="card">
@@ -42,14 +36,17 @@
               Test
             </p>
             <div style="font-size:12px">
+              <p data-item style="display:none;position:absolute;left:0;top:0;padding:2px;font-size:9px;line-height:9px;background:#f00;">
+                Error: <span data-name="error">None</span>
+              </p>
               <p>
-                Connection: <span data-name="connectionType"></span>
+                Connection1: <span data-name="connectionType"></span>
               </p>
               <p>
                 Status: <span data-name="status"></span>
               </p>
               <p>
-                Tests: <span data-name="testQty">0</span>
+                Tests: <span data-name="testsQty">0</span>
               </p>
               <p>
                 Requests: <span data-name="requestsQty">0</span>
@@ -70,10 +67,13 @@
                 <div class="determinate red" data-name="errorsProgress"></div>
               </div>
               <p>
-                Average exec: <span data-name="averageExecutionTime">0</span>s
+                Average exec: <span data-name="averageExecutionTime">0</span>ms
               </p>
               <p>
-                Connection: <span data-name="connectionTime">0</span>s
+                Connection: <span data-name="connectionTime">0</span>ms
+              </p>
+              <p>
+                Connection try: <span data-name="connectionTry">0</span>
               </p>
             </div>
             <div class="card-action" data-links>
