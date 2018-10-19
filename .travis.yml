@@ -7,6 +7,10 @@ branches:
   only:
   - master
 
+cache:
+  directories:
+  - $HOME/.composer/cache/files
+
 notifications:
   email: false
   slack:
@@ -23,7 +27,7 @@ before_install:
 - phpenv config-rm xdebug.ini
 - sed -i 's/git@github.com:/https:\/\/github.com\//' .gitmodules
 - git submodule update --init --recursive
-- composer install -o
+- composer install -o --prefer-dist
 
 script:
 - composer ci
