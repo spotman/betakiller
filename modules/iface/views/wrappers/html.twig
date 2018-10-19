@@ -2,11 +2,10 @@
 
 {% block html_tag %}<html>{% endblock %}
     <head>
-        {{ head|raw }}
-        {{ css_all|raw }}
+        {{ header|raw }}
     </head>
     <body>
     {{ content|raw }}
-    {{ js_all|raw }}
+    {{ footer|raw }}
     </body>
 </html>

@@ -2,6 +2,7 @@
 namespace BetaKiller\Assets\Provider;
 
 use BetaKiller\Acl\Resource\AssetsAclResourceInterface;
+use BetaKiller\Assets\AssetsConfig;
 use BetaKiller\Assets\AssetsDeploymentService;
 use BetaKiller\Assets\ContentTypes;
 use BetaKiller\Assets\Exception\AssetsException;
@@ -18,7 +19,6 @@ use BetaKiller\Assets\Handler\AssetsHandlerInterface;
 use BetaKiller\Assets\Model\AssetsModelInterface;
 use BetaKiller\Assets\PathStrategy\AssetsPathStrategyInterface;
 use BetaKiller\Assets\Storage\AssetsStorageInterface;
-use BetaKiller\Config\ConfigProviderInterface;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Repository\RepositoryInterface;
 use Psr\Http\Message\UploadedFileInterface;
@@ -26,81 +26,6 @@ use Spotman\Acl\AclInterface;
 
 abstract class AbstractAssetsProvider implements AssetsProviderInterface
 {
-    /**
-     * Global config group (config file name)
-     */
-    public const CONFIG_KEY = 'assets';
-
-    /**
-     * Base assets url (with domain or without)
-     */
-    public const CONFIG_URL_PATH_KEY = 'url_path';
-
-    /**
-     * Allow deployment
-     */
-    public const CONFIG_DEPLOY_KEY = 'deploy';
-
-    /**
-     * Allow caching of actions content
-     */
-    public const CONFIG_CACHING_ENABLED_KEY = 'cache';
-
-    /**
-     * Nested group with models` definitions
-     */
-    public const CONFIG_MODELS_KEY = 'models';
-
-    /**
-     * Nested group with storages` defaults
-     */
-    public const CONFIG_STORAGES_KEY = 'storages';
-
-    /**
-     * Provider url key (slug)
-     */
-    public const CONFIG_MODEL_URL_KEY = 'url_key';
-
-    /**
-     * Model`s provider codename
-     */
-    public const CONFIG_MODEL_PROVIDER_KEY = 'provider';
-
-    /**
-     * Model`s path strategy codename
-     */
-    public const CONFIG_MODEL_PATH_STRATEGY_KEY = 'path_strategy';
-
-    /**
-     * Nested model`s storage config group
-     */
-    public const CONFIG_MODEL_STORAGE_KEY = 'storage';
-
-    /**
-     * Model`s storage codename
-     */
-    public const CONFIG_MODEL_STORAGE_NAME_KEY = 'name';
-
-    /**
-     * Model`s storage path name (single level)
-     */
-    public const CONFIG_MODEL_STORAGE_PATH_KEY = 'path';
-
-    /**
-     * Marker for setting model as "protected" (no direct public access)
-     */
-    public const CONFIG_MODEL_PROTECTED_KEY = 'protected';
-
-    /**
-     * Allowed mime-types
-     */
-    public const CONFIG_MODEL_MIMES = 'mimes';
-
-    /**
-     * Post upload handlers list
-     */
-    public const CONFIG_MODEL_POST_UPLOAD_KEY = 'post_upload';
-
     /**
      * @var string
      */
@@ -117,9 +42,9 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
     private $repository;
 
     /**
-     * @var ConfigProviderInterface
+     * @var \BetaKiller\Assets\AssetsConfig
      */
-    private $config;
+    protected $config;
 
     /**
      * @var \BetaKiller\Assets\PathStrategy\AssetsPathStrategyInterface
@@ -153,7 +78,7 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
      * @param \BetaKiller\Repository\RepositoryInterface                  $repository
      * @param \BetaKiller\Assets\Storage\AssetsStorageInterface           $storage
      * @param \BetaKiller\Assets\PathStrategy\AssetsPathStrategyInterface $pathStrategy
-     * @param \BetaKiller\Config\ConfigProviderInterface                  $config
+     * @param \BetaKiller\Assets\AssetsConfig                             $config
      * @param \BetaKiller\Assets\AssetsDeploymentService                  $deploymentService
      * @param \BetaKiller\Assets\ContentTypes                             $contentTypes
      */
@@ -162,7 +87,7 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
         RepositoryInterface $repository,
         AssetsStorageInterface $storage,
         AssetsPathStrategyInterface $pathStrategy,
-        ConfigProviderInterface $config,
+        AssetsConfig $config,
         AssetsDeploymentService $deploymentService,
         ContentTypes $contentTypes
     ) {
@@ -175,24 +100,6 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
         $this->contentTypes      = $contentTypes;
     }
 
-    public function getAssetsConfigValue(array $path)
-    {
-        return $this->config->load(array_merge([self::CONFIG_KEY], $path));
-    }
-
-    /**
-     * @param array       $path
-     * @param string|null $codename
-     *
-     * @return array|string|int|null
-     */
-    protected function getAssetsProviderConfigValue(array $path, $codename = null)
-    {
-        $codename = $codename ?: $this->codename;
-
-        return $this->getAssetsConfigValue(array_merge([self::CONFIG_MODELS_KEY, $codename], $path));
-    }
-
     /**
      * Returns true if current provider has protected content (no caching in public directory)
      *
@@ -200,7 +107,7 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
      */
     public function isProtected(): bool
     {
-        return (bool)$this->getAssetsConfigValue([self::CONFIG_MODEL_PROTECTED_KEY]);
+        return $this->config->isProtected($this);
     }
 
     /**
@@ -211,7 +118,7 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
     public function isDeploymentNeeded(): bool
     {
         // Allow env-dependent deployment disabling
-        if (!$this->getAssetsConfigValue([self::CONFIG_DEPLOY_KEY])) {
+        if (!$this->config->isDeploymentEnabled()) {
             return false;
         }
 
@@ -226,7 +133,7 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
      */
     public function isCachingEnabled(): bool
     {
-        return (bool)$this->getAssetsConfigValue([self::CONFIG_CACHING_ENABLED_KEY]);
+        return $this->config->isCachingEnabled();
     }
 
     public function setCodename(string $codename): void
@@ -256,12 +163,7 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
 
     public function getUrlKey(): string
     {
-        return $this->getUrlKeyConfigValue() ?: $this->codename;
-    }
-
-    private function getUrlKeyConfigValue(): string
-    {
-        return $this->getAssetsProviderConfigValue([self::CONFIG_MODEL_URL_KEY]);
+        return $this->config->getUrlKey($this);
     }
 
     /**
@@ -344,7 +246,7 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
      */
     private function getUrlBasePath(): string
     {
-        return $this->getAssetsConfigValue([self::CONFIG_URL_PATH_KEY]);
+        return $this->config->getUrlPath();
     }
 
     private function getBaseUrl(): string
@@ -863,7 +765,7 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
      */
     public function getAllowedMimeTypes()
     {
-        return $this->getAssetsProviderConfigValue([self::CONFIG_MODEL_MIMES]);
+        return $this->config->getAllowedMimeTypes($this);
     }
 
     /**

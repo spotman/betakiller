@@ -6,6 +6,6 @@
   {% if layout == "image" %}
     {{ image(image, { style: "max-width: 100%" }) }}
   {% elseif layout == "button" %}
-    <img src="{{ static("images/download-button.png") }}" alt="{{ button_image_alt }}" />
-  {% else %}{{ label }}{% endif %}
+    <img src="{{ static("images/download-button.png") }}" alt="{{ "custom_tag.attachment.alt"|i18n({name: name}) }}"/>
+  {% else %}{{ label|default("custom_tag.attachment.title"|i18n({name: name})) }}{% endif %}
 </a>

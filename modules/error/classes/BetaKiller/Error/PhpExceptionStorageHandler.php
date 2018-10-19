@@ -4,11 +4,12 @@ namespace BetaKiller\Error;
 use BetaKiller\Config\AppConfigInterface;
 use BetaKiller\ExceptionInterface;
 use BetaKiller\Helper\NotificationHelper;
+use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Model\PhpExceptionModelInterface;
-use BetaKiller\Model\UserInterface;
 use BetaKiller\Repository\PhpExceptionRepository;
 use Monolog\Handler\AbstractProcessingHandler;
 use Monolog\Logger;
+use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -53,11 +54,6 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
     private $notification;
 
     /**
-     * @var \BetaKiller\Model\UserInterface;
-     */
-    private $user;
-
-    /**
      * @var \Psr\Log\LoggerInterface
      */
     private $logger;
@@ -66,18 +62,15 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
      * PhpExceptionStorageHandler constructor.
      *
      * @param \BetaKiller\Repository\PhpExceptionRepository $repository
-     * @param \BetaKiller\Model\UserInterface               $user
      * @param \BetaKiller\Config\AppConfigInterface         $appConfig
      * @param \BetaKiller\Helper\NotificationHelper         $notificationHelper
      */
     public function __construct(
         PhpExceptionRepository $repository,
-        UserInterface $user,
         AppConfigInterface $appConfig,
         NotificationHelper $notificationHelper
     ) {
         $this->repository   = $repository;
-        $this->user         = $user;
         $this->appConfig    = $appConfig;
         $this->notification = $notificationHelper;
 
@@ -110,7 +103,8 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
         }
 
         try {
-            $this->storeException($exception);
+            // TODO Extract this call from
+            $this->storeException($exception, null);
         } catch (\Throwable $subsystemException) {
             // Prevent logging recursion
             $this->enabled = false;
@@ -120,17 +114,16 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
     }
 
     /**
-     * @param \Throwable $exception
+     * @param \Throwable                                    $exception
+     * @param null|\Psr\Http\Message\ServerRequestInterface $request Null in cli mode
      *
      * @return \BetaKiller\Model\PhpExceptionModelInterface|null
      * @throws \BetaKiller\Exception\ValidationException
      * @throws \BetaKiller\Repository\RepositoryException
      * @throws \Kohana_Exception
      */
-    public function storeException(\Throwable $exception): ?PhpExceptionModelInterface
+    public function storeException(\Throwable $exception, ?ServerRequestInterface $request): ?PhpExceptionModelInterface
     {
-        $user = $this->user;
-
         if ($exception instanceof ExceptionInterface && !$exception->isNotificationEnabled()) {
             return null;
         }
@@ -148,6 +141,11 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
 
         // Searching for existing exception
         $model = $this->repository->findByHash($hash);
+
+        // Fetching user if exists
+        $user = ($request && ServerRequestHelper::hasUser($request))
+            ? ServerRequestHelper::getUser($request)
+            : null;
 
         $currentTime = new \DateTime;
 
@@ -168,11 +166,8 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
         // Increase occurrence counter
         $model->incrementCounter();
 
-        /** @var \Request|null $request */
-        $request = \Request::current() ?: null;
-
         // Trying to get current URL
-        $url = $request ? \URL::site($request::detect_uri(), true) : null;
+        $url = $request ? ServerRequestHelper::getUrl($request) : null;
 
         // Adding URL
         if ($url) {
@@ -191,7 +186,7 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
         }
 
         // Trying to get current module
-        $module = $request ? $request->module() : null;
+        $module = $request ? ServerRequestHelper::getModule($request) : null;
 
         // Adding module name for grouping purposes
         if ($module) {
@@ -226,7 +221,7 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
      *
      * @return bool
      */
-    public function isNotificationNeededFor(PhpExceptionModelInterface $model, $repeatCount, $repeatDelay): bool
+    public function isNotificationNeededFor(PhpExceptionModelInterface $model, int $repeatCount, int $repeatDelay): bool
     {
         // Skip ignored exceptions
         if ($model->isIgnored()) {
