@@ -5,11 +5,13 @@ namespace BetaKiller\Helper;
 
 use DateTimeImmutable;
 use Psr\Http\Message\ResponseInterface;
+use Zend\Diactoros\Response;
 use Zend\Diactoros\Response\HtmlResponse;
 use Zend\Diactoros\Response\JsonResponse;
 use Zend\Diactoros\Response\RedirectResponse;
 use Zend\Diactoros\Response\TextResponse;
 use Zend\Diactoros\Response\XmlResponse;
+use Zend\Diactoros\Stream;
 
 class ResponseHelper
 {
@@ -39,6 +41,49 @@ class ResponseHelper
     public static function html(string $text, int $status = null): ResponseInterface
     {
         return new HtmlResponse($text, $status ?? 200);
+    }
+
+    public static function file(string $fullPath, string $mimeType): ResponseInterface
+    {
+        $stream   = new Stream($fullPath, 'rb');
+        $response = new Response($stream);
+
+        $timestamp    = filemtime($fullPath);
+        $lastModified = (new DateTimeImmutable())->setTimestamp($timestamp);
+
+        $response = self::setLastModified($response, $lastModified);
+
+        return $response
+            ->withHeader('Content-Length', $stream->getSize())
+            ->withHeader('Content-Type', $mimeType);
+    }
+
+    /**
+     * Sends file to STDOUT for viewing or downloading
+     *
+     * @param string $content String content of the file
+     * @param string $mime    MIME-type
+     * @param string $alias   File name for browser`s "Save as" dialog
+     *
+     * @return \Psr\Http\Message\ResponseInterface
+     */
+    public static function fileContent(string $content, string $mime = null, string $alias = null): ResponseInterface
+    {
+        if (!$content) {
+            throw new \LogicException('Content is empty');
+        }
+
+        $mime = $mime ?? 'application/octet-stream';
+
+        $response = self::text($content);
+
+        if ($alias) {
+            $response = $response->withHeader('Content-Disposition', 'attachment; filename='.$alias);
+        }
+
+        return $response
+            ->withHeader('Content-Length', \strlen($content))
+            ->withHeader('Content-Type', $mime);
     }
 
     /**

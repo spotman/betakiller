@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\Url;
 
-interface EntityLinkedUrlElementInterface extends UrlElementInterface
+interface EntityLinkedUrlElementInterface extends UrlElementWithZoneInterface
 {
     /**
      * Returns model name of the linked entity

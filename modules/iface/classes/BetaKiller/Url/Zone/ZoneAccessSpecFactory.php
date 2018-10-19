@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace BetaKiller\Url\Zone;
 
 use BetaKiller\Factory\NamespaceBasedFactoryBuilder;
+use BetaKiller\Url\UrlElementWithZoneInterface;
 
 class ZoneAccessSpecFactory
 {
@@ -25,6 +26,11 @@ class ZoneAccessSpecFactory
             ->setClassSuffix(ZoneAccessSpecInterface::SUFFIX)
             ->setExpectedInterface(ZoneAccessSpecInterface::class)
             ->cacheInstances();
+    }
+
+    public function createFromUrlElement(UrlElementWithZoneInterface $urlElement): ZoneAccessSpecInterface
+    {
+        return $this->create($urlElement->getZoneName());
     }
 
     public function create(string $zoneName): ZoneAccessSpecInterface

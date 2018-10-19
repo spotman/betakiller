@@ -1,6 +1,7 @@
 <?php
 namespace BetaKiller\Assets;
 
+use BetaKiller\Assets\Exception\AssetsProviderException;
 use BetaKiller\Assets\Provider\AbstractAssetsProvider;
 use BetaKiller\Assets\Provider\AssetsProviderInterface;
 use BetaKiller\Config\ConfigProviderInterface;
@@ -86,8 +87,8 @@ class AssetsProviderFactory
      * @param string $key
      *
      * @return \BetaKiller\Assets\Provider\AssetsProviderInterface|\BetaKiller\Assets\Provider\ImageAssetsProviderInterface|mixed
-     * @throws \BetaKiller\Assets\AssetsProviderException
-     * @throws \BetaKiller\Assets\AssetsException
+     * @throws \BetaKiller\Assets\Exception\AssetsProviderException
+     * @throws \BetaKiller\Assets\Exception\AssetsException
      * @throws \BetaKiller\Assets\AssetsStorageException
      * @throws \BetaKiller\Factory\FactoryException
      */
@@ -139,9 +140,9 @@ class AssetsProviderFactory
      * @param string $modelName
      *
      * @return \BetaKiller\Assets\Provider\ImageAssetsProviderInterface|AssetsProviderInterface|mixed
-     * @throws \BetaKiller\Assets\AssetsProviderException
+     * @throws \BetaKiller\Assets\Exception\AssetsProviderException
      * @throws \BetaKiller\Factory\FactoryException
-     * @throws \BetaKiller\Assets\AssetsException
+     * @throws \BetaKiller\Assets\Exception\AssetsException
      * @throws \BetaKiller\Assets\AssetsStorageException
      */
     public function createFromModelCodename(string $modelName)

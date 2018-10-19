@@ -1,6 +1,6 @@
 <?php
 
-use BetaKiller\Assets\AssetsException;
+use BetaKiller\Assets\Exception\AssetsException;
 use BetaKiller\Assets\Model\AssetsModelInterface;
 use BetaKiller\Exception\NotFoundHttpException;
 use BetaKiller\Exception\PermanentRedirectHttpException;
@@ -32,7 +32,7 @@ class Controller_Content extends Controller
     private $assetsHelper;
 
     /**
-     * @throws \BetaKiller\Assets\AssetsException
+     * @throws \BetaKiller\Assets\Exception\AssetsException
      */
     public function action_files_bc_redirect()
     {
@@ -59,7 +59,7 @@ class Controller_Content extends Controller
      * @param string $path
      *
      * @return AssetsModelInterface|null
-     * @throws \BetaKiller\Assets\AssetsException
+     * @throws \BetaKiller\Assets\Exception\AssetsException
      */
     protected function findContentModelByWpPath($path): ?AssetsModelInterface
     {

@@ -12,32 +12,38 @@ class StaticFile extends Kohana_StaticFile
         if (!self::$instance) {
             self::$instance = new self;
         }
+
         return self::$instance;
     }
 
-    public function getLink($path)
+    /**
+     * Поиск по проекту статичного файла
+     * (полный путь к файлу)
+     *
+     * @param string $file
+     *
+     * @return string
+     */
+    public static function findOriginal(string $file): string
     {
-        return $this->config('url') . $path;
+        $info = pathinfo($file);
+        $dir  = ($info['dirname'] !== '.') ? $info['dirname'].'/' : '';
+
+        return Kohana::find_file('static-files', $dir.$info['filename'], $info['extension']);
+    }
+
+    /**
+     * @param string $path
+     *
+     * @return string
+     */
+    public function getFullUrl(string $path): string
+    {
+        return $this->config('url').$path;
     }
 
     protected function config($key)
     {
         return $this->_config->$key;
     }
-
-    public function get_cache_folders()
-    {
-        $folders = array();
-
-        $cache_paths = array($this->config('cache'), $this->config('url'));
-        $base_path = rtrim($this->config('path'), DIRECTORY_SEPARATOR);
-
-        foreach ( $cache_paths as $path )
-        {
-            $folders[] = rtrim($base_path . $path, DIRECTORY_SEPARATOR);
-        }
-
-        return $folders;
-    }
-
 }

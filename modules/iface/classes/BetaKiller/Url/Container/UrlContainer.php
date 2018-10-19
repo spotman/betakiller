@@ -123,17 +123,17 @@ class UrlContainer implements UrlContainerInterface
 
     /**
      * @param string $className
-     * @param string $targetClass
+     * @param string $targetInterface
      *
-     * @return \BetaKiller\Url\Parameter\UrlParameterInterface
+     * @return \BetaKiller\Url\Parameter\UrlParameterInterface|null
      * @throws \BetaKiller\Url\Container\UrlContainerException
      */
-    private function findParameterByClassName(string $className, string $targetClass): UrlParameterInterface
+    private function findParameterByClassName(string $className, string $targetInterface): ?UrlParameterInterface
     {
         $found = null;
 
         foreach ($this->getAllParameters() as $parameter) {
-            if (!$parameter instanceof $targetClass) {
+            if (!$parameter instanceof $className) {
                 continue;
             }
 
@@ -146,10 +146,10 @@ class UrlContainer implements UrlContainerInterface
             $found = $parameter;
         }
 
-        if ($found && !$found instanceof $targetClass) {
+        if ($found && !$found instanceof $targetInterface) {
             throw new UrlContainerException('Class :name must be instance of :must', [
                 ':name' => \get_class($found),
-                ':must' => $targetClass,
+                ':must' => $targetInterface,
             ]);
         }
 

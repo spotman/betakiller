@@ -10,6 +10,7 @@ use BetaKiller\Auth\UserDoesNotExistsException;
 use BetaKiller\Exception\BadRequestHttpException;
 use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Helper\ServerRequestHelper;
+use BetaKiller\IFace\Auth\Login;
 use BetaKiller\Repository\UserRepository;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -22,6 +23,8 @@ use Psr\Http\Message\ServerRequestInterface;
  */
 class RegularLoginAction extends AbstractAction
 {
+    public const URL = Login::URL.'regular/';
+
     /**
      * @var \BetaKiller\Auth\AuthFacade
      */

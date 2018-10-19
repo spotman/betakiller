@@ -18,7 +18,7 @@ interface HasPreviewProviderInterface extends AssetsProviderInterface
      * @param string               $size 300x200
      *
      * @return string
-     * @throws \BetaKiller\Assets\AssetsProviderException
+     * @throws \BetaKiller\Assets\Exception\AssetsProviderException
      */
     public function getPreviewUrl(AssetsModelInterface $model, ?string $size = null): string;
 

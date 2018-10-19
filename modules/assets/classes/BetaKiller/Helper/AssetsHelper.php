@@ -1,7 +1,7 @@
 <?php
 namespace BetaKiller\Helper;
 
-use BetaKiller\Assets\AssetsException;
+use BetaKiller\Assets\Exception\AssetsException;
 use BetaKiller\Assets\Model\AssetsModelImageInterface;
 use BetaKiller\Assets\Model\AssetsModelInterface;
 use BetaKiller\Assets\Provider\AssetsProviderInterface;
@@ -54,7 +54,7 @@ class AssetsHelper
      * @param \BetaKiller\Assets\Model\AssetsModelInterface $model
      *
      * @return array
-     * @throws \BetaKiller\Assets\AssetsException
+     * @throws \BetaKiller\Assets\Exception\AssetsException
      */
     public function getAllowedMimeTypes(AssetsModelInterface $model): array
     {
@@ -69,7 +69,7 @@ class AssetsHelper
      * @return array
      * @throws \BetaKiller\Assets\AssetsStorageException
      * @throws \BetaKiller\Factory\FactoryException
-     * @throws \BetaKiller\Assets\AssetsException
+     * @throws \BetaKiller\Assets\Exception\AssetsException
      */
     public function getAttributesForImgTag(AssetsModelImageInterface $model, $size, array $attributes = null): array
     {
@@ -80,7 +80,7 @@ class AssetsHelper
      * @param \BetaKiller\Assets\Model\AssetsModelInterface $model
      *
      * @return \BetaKiller\Assets\Provider\AssetsProviderInterface
-     * @throws \BetaKiller\Assets\AssetsException
+     * @throws \BetaKiller\Assets\Exception\AssetsException
      * @throws \BetaKiller\Assets\AssetsStorageException
      * @throws \BetaKiller\Factory\FactoryException
      */
@@ -97,7 +97,7 @@ class AssetsHelper
      * @return \BetaKiller\Assets\Provider\ImageAssetsProviderInterface
      * @throws \BetaKiller\Assets\AssetsStorageException
      * @throws \BetaKiller\Factory\FactoryException
-     * @throws \BetaKiller\Assets\AssetsException
+     * @throws \BetaKiller\Assets\Exception\AssetsException
      */
     private function getImageProviderByModel(AssetsModelImageInterface $model): ImageAssetsProviderInterface
     {
@@ -116,7 +116,7 @@ class AssetsHelper
      * @param \BetaKiller\Assets\Model\AssetsModelInterface $model
      *
      * @return \BetaKiller\Assets\Provider\HasPreviewProviderInterface
-     * @throws \BetaKiller\Assets\AssetsException
+     * @throws \BetaKiller\Assets\Exception\AssetsException
      * @throws \BetaKiller\Assets\AssetsStorageException
      * @throws \BetaKiller\Factory\FactoryException
      */

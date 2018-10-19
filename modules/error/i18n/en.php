@@ -20,10 +20,12 @@ return [
     'error.http.404.search.message' => 'You may use the search form.',
 
     'error.http.500.label'         => 'System error',
-    'error.http.500.p1'            => 'We are on our way to fix it',
-    'error.http.500.p2'            => 'The page will be refreshed in 15 seconds',
-    'error.http.500.p3'            => 'Error ID: :hash',
-    'error.http.500.button.cancel' => 'cancel',
+    'error.http.500.p1'            => 'We are on our way to fix it.',
+    'error.http.500.p2'            => 'The page will be refreshed in 45 seconds.',
+    'error.http.500.button.cancel' => 'Cancel refresh',
+
+    'error.http.503.label'         => 'Maintenance mode',
+    'error.http.503.p1'            => 'We are maintaining this website and it will be up in :min minutes.',
 
     'notification.developer.error.subsystem-failure.subj' => 'BetaKiller logging subsystem failure',
     'notification.developer.error.php-exception.subj'     => 'BetaKiller exception',

@@ -26,19 +26,17 @@ interface AppEnvInterface
     public const APP_REVISION = 'APP_REVISION';
 
     /**
-     * @param string    $name
-     * @param bool $required
+     * @param string $name
+     * @param bool   $required
      *
      * @return string
      */
     public function getEnvVariable(string $name, bool $required = null): string;
 
     /**
-     * @param bool|null $useStaging
-     *
      * @return bool
      */
-    public function inProductionMode(?bool $useStaging = null): bool;
+    public function inProductionMode(): bool;
 
     /**
      * @return bool
@@ -113,4 +111,12 @@ interface AppEnvInterface
      * @return bool
      */
     public function isCoreRunning(): bool;
+
+    /**
+     * Returns absolute path to the global temp directory (must be readable/writable between requests)
+     *
+     * @see https://serverfault.com/a/615054
+     * @return string
+     */
+    public function getTempDirectory(): string;
 }

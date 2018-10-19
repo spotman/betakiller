@@ -9,6 +9,7 @@ use BetaKiller\Exception\BadRequestHttpException;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Url\Container\UrlContainerInterface;
 use BetaKiller\Url\UrlElementStack;
+use DebugBar\DebugBar;
 use Psr\Http\Message\ServerRequestInterface;
 use Zend\Expressive\Session\SessionInterface;
 use Zend\Expressive\Session\SessionMiddleware;
@@ -160,6 +161,18 @@ class ServerRequestHelper
         return $request->getAttribute(UserInterface::class);
     }
 
+    public static function isGuest(ServerRequestInterface $request): bool
+    {
+        if (!self::hasUser($request)) {
+            // No user => guest user
+            return true;
+        }
+
+        $user = self::getUser($request);
+
+        return $user->isGuest();
+    }
+
     public static function hasUser(ServerRequestInterface $request): bool
     {
         return (bool)$request->getAttribute(UserInterface::class);
@@ -184,5 +197,10 @@ class ServerRequestHelper
     public static function getProfiler(ServerRequestInterface $request): Profiler
     {
         return $request->getAttribute(Profiler::class);
+    }
+
+    public static function getDebugBar(ServerRequestInterface $request): ?DebugBar
+    {
+        return $request->getAttribute(DebugBar::class);
     }
 }

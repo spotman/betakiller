@@ -59,7 +59,7 @@ class ContentPostRepository extends AbstractOrmBasedDispatchableRepository imple
         // Load pages first
         $this->prioritizeByPostTypes($orm);
 
-        $category = $parameters->getEntityByClassName(ContentCategory::class);
+        $category = $parameters->getEntityByClassName(ContentCategoryInterface::class);
 
         $orm->and_where_open();
 

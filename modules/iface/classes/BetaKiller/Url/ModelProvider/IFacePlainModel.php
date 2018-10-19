@@ -5,7 +5,7 @@ use BetaKiller\Exception\NotImplementedHttpException;
 use BetaKiller\Helper\SeoMetaInterface;
 use BetaKiller\Url\IFaceModelInterface;
 
-class IFacePlainModel extends AbstractPlainUrlElementModel implements IFaceModelInterface
+class IFacePlainModel extends AbstractPlainEntityLinkedUrlElement implements IFaceModelInterface
 {
     public const OPTION_LABEL              = 'label';
     public const OPTION_TITLE              = 'title';
@@ -13,9 +13,6 @@ class IFacePlainModel extends AbstractPlainUrlElementModel implements IFaceModel
     public const OPTION_IS_DEFAULT         = 'isDefault';
     public const OPTION_HAS_DYNAMIC_URL    = 'hasDynamicUrl';
     public const OPTION_HAS_TREE_BEHAVIOUR = 'hasTreeBehaviour';
-    public const OPTION_ENTITY_NAME        = 'entity';
-    public const OPTION_ENTITY_ACTION      = 'entityAction';
-    public const OPTION_ZONE               = 'zone';
     public const OPTION_MENU               = 'menu';
 
     /**
@@ -44,8 +41,6 @@ class IFacePlainModel extends AbstractPlainUrlElementModel implements IFaceModel
     private $title;
 
     /**
-     * Admin IFaces have "admin" layout by default
-     *
      * @var string|null
      */
     private $layoutCodename;
@@ -57,21 +52,6 @@ class IFacePlainModel extends AbstractPlainUrlElementModel implements IFaceModel
 
     /**
      * @var string|null
-     */
-    private $entityName;
-
-    /**
-     * @var string|null
-     */
-    private $entityAction;
-
-    /**
-     * @var string
-     */
-    private $zone;
-
-    /**
-     * @var string
      */
     private $menu;
 
@@ -115,7 +95,7 @@ class IFacePlainModel extends AbstractPlainUrlElementModel implements IFaceModel
      */
     public function setTitle(string $value): SeoMetaInterface
     {
-        throw new NotImplementedHttpException('Admin model can not change title');
+        throw new NotImplementedHttpException('Config-based model can not change title');
     }
 
     /**
@@ -128,7 +108,7 @@ class IFacePlainModel extends AbstractPlainUrlElementModel implements IFaceModel
      */
     public function setDescription(string $value): SeoMetaInterface
     {
-        throw new NotImplementedHttpException('Admin model can not change description');
+        throw new NotImplementedHttpException('Config-based model can not change description');
     }
 
     /**
@@ -165,9 +145,6 @@ class IFacePlainModel extends AbstractPlainUrlElementModel implements IFaceModel
             self::OPTION_LAYOUT          => $this->getLayoutCodename(),
             self::OPTION_IS_DEFAULT      => $this->isDefault(),
             self::OPTION_HAS_DYNAMIC_URL => $this->hasDynamicUrl(),
-            self::OPTION_ENTITY_NAME     => $this->getEntityModelName(),
-            self::OPTION_ENTITY_ACTION   => $this->getEntityActionName(),
-            self::OPTION_ZONE            => $this->getZoneName(),
             self::OPTION_MENU            => $this->getMenuName(),
         ]);
     }
@@ -199,24 +176,12 @@ class IFacePlainModel extends AbstractPlainUrlElementModel implements IFaceModel
             $this->hasTreeBehaviour = true;
         }
 
-        if (isset($data[self::OPTION_ENTITY_NAME])) {
-            $this->entityName = (string)$data[self::OPTION_ENTITY_NAME];
-        }
-
-        if (isset($data[self::OPTION_ENTITY_ACTION])) {
-            $this->entityAction = (string)$data[self::OPTION_ENTITY_ACTION];
-        }
-
         if (isset($data[self::OPTION_HIDE_IN_SITEMAP])) {
             $this->hideInSiteMap = true;
         }
 
         if (isset($data[self::OPTION_LAYOUT])) {
             $this->layoutCodename = (string)$data[self::OPTION_LAYOUT];
-        }
-
-        if (isset($data[self::OPTION_ZONE])) {
-            $this->zone = mb_strtolower($data[self::OPTION_ZONE]);
         }
 
         if (isset($data[self::OPTION_MENU])) {
@@ -252,36 +217,6 @@ class IFacePlainModel extends AbstractPlainUrlElementModel implements IFaceModel
     public function hasTreeBehaviour(): bool
     {
         return $this->hasTreeBehaviour;
-    }
-
-    /**
-     * Returns model name of the linked entity
-     *
-     * @return string
-     */
-    public function getEntityModelName(): ?string
-    {
-        return $this->entityName;
-    }
-
-    /**
-     * Returns entity [primary] action, applied by this IFace
-     *
-     * @return string
-     */
-    public function getEntityActionName(): ?string
-    {
-        return $this->entityAction;
-    }
-
-    /**
-     * Returns zone codename where this IFace is placed
-     *
-     * @return string
-     */
-    public function getZoneName(): string
-    {
-        return $this->zone;
     }
 
     /**

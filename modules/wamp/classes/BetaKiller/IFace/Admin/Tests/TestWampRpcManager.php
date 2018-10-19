@@ -10,6 +10,11 @@ use Psr\Http\Message\ServerRequestInterface;
 class TestWampRpcManager extends AbstractIFace
 {
     /**
+     * @var \Psr\Http\Message\ServerRequestInterface
+     */
+    private $request;
+
+    /**
      * @param \Psr\Http\Message\ServerRequestInterface $request
      *
      * @return string[]
@@ -22,8 +27,11 @@ class TestWampRpcManager extends AbstractIFace
         $testElement = $urlHelper->getUrlElementByCodename(TestWampRpcTest::codename());
         $testUrl     = $urlHelper->makeUrl($testElement, null, false);
 
+        $userAgent = ServerRequestHelper::getUserAgent($request);
+
         return [
-            'testUrl' => $testUrl,
+            'userAgent' => $userAgent,
+            'testUrl'   => $testUrl,
         ];
     }
 }

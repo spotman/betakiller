@@ -32,7 +32,7 @@ class ContentElementShortcodeEditor extends AbstractShortcodeEditor
      * @param int|null                                    $itemID
      *
      * @return array
-     * @throws \BetaKiller\Assets\AssetsException
+     * @throws \BetaKiller\Assets\Exception\AssetsException
      * @throws \BetaKiller\Content\Shortcode\ShortcodeException
      * @throws \BetaKiller\Factory\FactoryException
      */
