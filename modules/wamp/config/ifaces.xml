@@ -2,7 +2,8 @@
 <root>
 
     <!--Tests -->
-    <iface uri="tests" zone="developer" name="Admin_Tests_TestsDummy" menu="admin" label="Tests">
+    <iface uri="tests" name="Admin_Tests_TestsDummy" parent="Admin_Index" zone="developer" menu="admin" label="Tests"
+           layout="admin">
 
         <!--Test Wamp Rpc -->
         <iface uri="wamp-rpc" name="Admin_Tests_TestWampRpcManager" menu="admin" label="WampRpcManager">
