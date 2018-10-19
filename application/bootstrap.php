@@ -117,12 +117,6 @@ Kohana::$config->attach(new Config_File('config/environments/'.Kohana::$environm
 
 
 /**
- * Set the default language
- * For handling exceptions in file Kohana_Exception
- */
-I18n::lang('en');
-
-/**
  * Initialize Kohana, setting the default options.
  *
  * The following options are available:

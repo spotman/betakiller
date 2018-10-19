@@ -134,21 +134,16 @@ class AttachmentShortcode extends AbstractContentElementShortcode
 
         $model = $this->attachmentRepository->findById($attachID);
 
-        $i18nParams = [
-            ':name' => $model->getOriginalName(),
-        ];
-
         $imageData = $this->isLayout(self::LAYOUT_IMAGE)
             ? $this->getImageData()
             : null;
 
         return [
+            'name'   => $model->getOriginalName(),
             'image'  => $imageData,
-            'label'  => $this->getAttribute(self::ATTR_LABEL) ?: __('custom_tag.attachment.title', $i18nParams),
+            'label'  => $this->getAttribute(self::ATTR_LABEL),
             'url'    => $this->assetsHelper->getDownloadUrl($model),
             'layout' => $this->getLayout(),
-
-            'button_image_alt' => __('custom_tag.attachment.alt', $i18nParams),
         ];
     }
 

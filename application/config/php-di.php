@@ -5,6 +5,7 @@ use BetaKiller\Acl\AclResourcesCollector;
 use BetaKiller\Acl\AclRolesCollector;
 use BetaKiller\Acl\AclRulesCollector;
 use BetaKiller\Api\AccessResolver\CustomApiMethodAccessResolverDetector;
+use BetaKiller\Assets\StaticAssets;
 use BetaKiller\Config\AppConfig;
 use BetaKiller\Config\AppConfigInterface;
 use BetaKiller\Config\ConfigProviderInterface;
@@ -15,7 +16,7 @@ use BetaKiller\MessageBus\EventBusInterface;
 use BetaKiller\Notification\DefaultMessageRendered;
 use BetaKiller\Notification\MessageRendererInterface;
 use BetaKiller\View\LayoutViewInterface;
-use BetaKiller\View\LayoutViewTwig;
+use BetaKiller\View\TwigLayoutView;
 use BetaKiller\View\TwigViewFactory;
 use BetaKiller\View\ViewFactoryInterface;
 use Roave\DoctrineSimpleCache\SimpleCacheAdapter;
@@ -65,7 +66,7 @@ return [
         // Use Twig as default view
         ViewFactoryInterface::class                     => DI\autowire(TwigViewFactory::class),
         // Use Twig in layouts
-        LayoutViewInterface::class                      => DI\autowire(LayoutViewTwig::class),
+        LayoutViewInterface::class                      => DI\autowire(TwigLayoutView::class),
 
         // Custom access resolver detector
         ApiMethodAccessResolverDetectorInterface::class => DI\autowire(CustomApiMethodAccessResolverDetector::class),
@@ -74,7 +75,11 @@ return [
         MessageRendererInterface::class                 => DI\autowire(DefaultMessageRendered::class),
 
         Meta::class => \DI\factory(function () {
-            return Meta::instance();
+            throw new LogicException('DI injection of class Meta is deprecated');
+        }),
+
+        StaticAssets::class => \DI\factory(function () {
+            throw new LogicException('DI injection of class StaticAssets is deprecated');
         }),
 
         EventBusInterface::class => DI\factory(function (EventBus $bus, ConfigProviderInterface $config) {

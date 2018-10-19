@@ -119,4 +119,11 @@ interface ShortcodeAttributeInterface extends \JsonSerializable
      * @return bool
      */
     public function hasDependencies(): bool;
+
+    /**
+     * Returns i18n key for attribute`s label
+     *
+     * @return string
+     */
+    public function getLabelI18nKey(): string;
 }

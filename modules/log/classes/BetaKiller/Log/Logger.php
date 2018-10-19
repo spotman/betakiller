@@ -15,6 +15,9 @@ class Logger implements LoggerInterface
 {
     use LoggerTrait;
 
+    public const CONTEXT_KEY_EXCEPTION = 'exception';
+    public const CONTEXT_KEY_REQUEST   = 'request';
+
     /**
      * @var \Monolog\Logger
      */

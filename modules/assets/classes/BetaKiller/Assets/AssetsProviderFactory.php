@@ -2,7 +2,6 @@
 namespace BetaKiller\Assets;
 
 use BetaKiller\Assets\Exception\AssetsProviderException;
-use BetaKiller\Assets\Provider\AbstractAssetsProvider;
 use BetaKiller\Assets\Provider\AssetsProviderInterface;
 use BetaKiller\Config\ConfigProviderInterface;
 use BetaKiller\Factory\NamespaceBasedFactoryBuilder;
@@ -108,11 +107,11 @@ class AssetsProviderFactory
     private function getModelCodenameByUrlKey($key)
     {
         $providersConfig = $this->config->load([
-            AbstractAssetsProvider::CONFIG_KEY,
-            AbstractAssetsProvider::CONFIG_MODELS_KEY,
+            AssetsConfig::CONFIG_KEY,
+            AssetsConfig::CONFIG_MODELS_KEY,
         ]);
 
-        $keyName = AbstractAssetsProvider::CONFIG_MODEL_URL_KEY;
+        $keyName = AssetsConfig::CONFIG_MODEL_URL_KEY;
 
         foreach ($providersConfig as $codename => $data) {
             $providerKey = $data[$keyName] ?? null;
@@ -128,8 +127,8 @@ class AssetsProviderFactory
     private function getModelConfig(string $modelName): array
     {
         return $this->config->load([
-            AbstractAssetsProvider::CONFIG_KEY,
-            AbstractAssetsProvider::CONFIG_MODELS_KEY,
+            AssetsConfig::CONFIG_KEY,
+            AssetsConfig::CONFIG_MODELS_KEY,
             $modelName,
         ]);
     }
@@ -154,10 +153,10 @@ class AssetsProviderFactory
         }
 
         $modelConfig             = $this->getModelConfig($modelName);
-        $providerName            = $modelConfig[AbstractAssetsProvider::CONFIG_MODEL_PROVIDER_KEY];
-        $storageConfig           = $modelConfig[AbstractAssetsProvider::CONFIG_MODEL_STORAGE_KEY];
-        $pathStrategyName        = $modelConfig[AbstractAssetsProvider::CONFIG_MODEL_PATH_STRATEGY_KEY] ?? 'MultiLevelHash';
-        $postUploadHandlersNames = $modelConfig[AbstractAssetsProvider::CONFIG_MODEL_POST_UPLOAD_KEY] ?? [];
+        $providerName            = $modelConfig[AssetsConfig::CONFIG_MODEL_PROVIDER_KEY];
+        $storageConfig           = $modelConfig[AssetsConfig::CONFIG_MODEL_STORAGE_KEY];
+        $pathStrategyName        = $modelConfig[AssetsConfig::CONFIG_MODEL_PATH_STRATEGY_KEY] ?? 'MultiLevelHash';
+        $postUploadHandlersNames = $modelConfig[AssetsConfig::CONFIG_MODEL_POST_UPLOAD_KEY] ?? [];
 
         // Repository codename is equal model name
         $repository = $this->repositoryFactory->create($modelName);
@@ -182,8 +181,8 @@ class AssetsProviderFactory
 
         // Public provider url key and public storage path must be the same to prevent collisions
         if (!$providerInstance->isProtected() && $storage->isPublic()) {
-            $storagePathKey = $storageConfig[AbstractAssetsProvider::CONFIG_MODEL_STORAGE_PATH_KEY];
-            $providerUrlKey = $modelConfig[AbstractAssetsProvider::CONFIG_MODEL_URL_KEY];
+            $storagePathKey = $storageConfig[AssetsConfig::CONFIG_MODEL_STORAGE_PATH_KEY];
+            $providerUrlKey = $modelConfig[AssetsConfig::CONFIG_MODEL_URL_KEY];
 
             if ($providerUrlKey !== $storagePathKey) {
                 throw new AssetsProviderException('Public provider :name url key and storage path must be the same', [

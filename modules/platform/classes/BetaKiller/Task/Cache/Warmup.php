@@ -66,14 +66,13 @@ class Warmup extends \BetaKiller\Task\AbstractTask
         // see https://github.com/guzzle/guzzle/issues/590
         try {
             // TODO Make HTTP requests to temporary created PHP internal web-server instance
-            $request  = new Request($url, [], false);
-            $response = $request->execute();
-            $status   = $response->status();
         } catch (Throwable $e) {
             $this->logger->warning('Got exception :e for url :url', [':url' => $url, ':e' => $e->getMessage()]);
 
             return;
         }
+
+        $status = 200;
 
         if ($status === 200) {
             // TODO Maybe grab page content, parse it and make request to every image/css/js file
@@ -84,7 +83,6 @@ class Warmup extends \BetaKiller\Task\AbstractTask
                 ':url'    => $url,
                 ':status' => $status,
             ]);
-            $this->logger->debug('Headers are :values', [':values' => json_encode($response->headers())]);
         } elseif (\in_array($status, [401, 403], true)) {
             $this->logger->info('Access denied with :status status for :url', [':url' => $url, ':status' => $status]);
         } else {

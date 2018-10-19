@@ -3,8 +3,6 @@ declare(strict_types=1);
 
 namespace BetaKiller\Widget;
 
-use Validation;
-
 abstract class AbstractWidget implements WidgetInterface
 {
     /**
@@ -53,11 +51,11 @@ abstract class AbstractWidget implements WidgetInterface
     }
 
     /**
-     * @param string $current_state
+     * @param string $currentState
      */
-    public function setCurrentState($current_state): void
+    public function setCurrentState(string $currentState): void
     {
-        $this->currentState = $current_state;
+        $this->currentState = $currentState;
     }
 
     /**

@@ -31,7 +31,7 @@ class Exception extends \Exception implements ExceptionInterface
     public function __construct($message = '', array $variables = null, $code = 0, \Throwable $previous = null)
     {
         // Set the message
-        $message = __($message, $variables);
+        $message = empty($variables) ? $message : strtr($message, $variables);
 
         // Pass the message and integer code to the parent
         parent::__construct($message, (int)$code, $previous);

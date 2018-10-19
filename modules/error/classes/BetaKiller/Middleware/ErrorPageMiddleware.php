@@ -7,6 +7,7 @@ use BetaKiller\Exception;
 use BetaKiller\Exception\HttpExceptionInterface;
 use BetaKiller\ExceptionInterface;
 use BetaKiller\Helper\AppEnvInterface;
+use BetaKiller\Helper\I18nHelper;
 use BetaKiller\Helper\LoggerHelperTrait;
 use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Helper\ServerRequestHelper;
@@ -104,8 +105,10 @@ class ErrorPageMiddleware implements MiddlewareInterface
 //            return new EmptyResponse;
 //        }
 
+        $i18n = ServerRequestHelper::getI18n($request);
+
         if (ServerRequestHelper::isJsonPreferred($request)) {
-            return $this->makeJsonResponse($e);
+            return $this->makeJsonResponse($e, $i18n);
         }
 
         // Make nice message if allowed or use default Kohana response
@@ -115,18 +118,19 @@ class ErrorPageMiddleware implements MiddlewareInterface
     /**
      * Returns JSON response
      *
-     * @param \Throwable $e
+     * @param \Throwable                    $e
+     * @param \BetaKiller\Helper\I18nHelper $i18n
      *
      * @return \Psr\Http\Message\ResponseInterface
      */
-    private function makeJsonResponse(\Throwable $e): ResponseInterface
+    private function makeJsonResponse(\Throwable $e, I18nHelper $i18n): ResponseInterface
     {
         if (!$e instanceof ExceptionInterface || !$e->showOriginalMessageToUser()) {
             // No messages for custom exceptions
             return ResponseHelper::errorJson();
         }
 
-        $message = $e->getMessage() ?: __($e->getDefaultMessageI18nKey());
+        $message = $e->getMessage() ?: $i18n->translate($e->getDefaultMessageI18nKey());
 
         return ResponseHelper::errorJson($message);
     }
@@ -161,9 +165,11 @@ class ErrorPageMiddleware implements MiddlewareInterface
                 $iface->setException($exception);
             }
 
+            $i18n = ServerRequestHelper::getI18n($request);
+
             $body = $iface
                 ? $this->ifaceView->render($iface, $request)
-                : $this->renderFallbackMessage($exception);
+                : $this->renderFallbackMessage($exception, $i18n);
 
             return new HtmlResponse($body, $httpCode);
         } catch (\Throwable $e) {
@@ -225,14 +231,15 @@ class ErrorPageMiddleware implements MiddlewareInterface
     }
 
     /**
-     * @param \Throwable $e
+     * @param \Throwable                    $e
+     * @param \BetaKiller\Helper\I18nHelper $i18n
      *
      * @return string
      * @throws \BetaKiller\Exception
      */
-    private function renderFallbackMessage(\Throwable $e): string
+    private function renderFallbackMessage(\Throwable $e, I18nHelper $i18n): string
     {
-        $message = $this->getExceptionMessage($e);
+        $message = $this->getExceptionMessage($e, $i18n);
 
         // Prevent XSS
         return htmlspecialchars($message, ENT_QUOTES);
@@ -242,27 +249,29 @@ class ErrorPageMiddleware implements MiddlewareInterface
      * Returns text which would be shown to user on uncaught exception
      * For most of exception classes it returns default label (we do not want to inform user about our problems)
      *
-     * @param \Throwable $e
+     * @param \Throwable                    $e
+     * @param \BetaKiller\Helper\I18nHelper $i18n
      *
      * @return string
      * @throws \BetaKiller\Exception
      */
-    private function getExceptionMessage(\Throwable $e): string
+    private function getExceptionMessage(\Throwable $e, I18nHelper $i18n): string
     {
         $showOriginalMessage = ($e instanceof ExceptionInterface) && $e->showOriginalMessageToUser();
 
         return $showOriginalMessage
-            ? $this->getOriginalMessage($e)
-            : $this->getMaskedMessage($e);
+            ? $this->getOriginalMessage($e, $i18n)
+            : $this->getMaskedMessage($e, $i18n);
     }
 
     /**
-     * @param \Throwable $e
+     * @param \Throwable                    $e
+     * @param \BetaKiller\Helper\I18nHelper $i18n
      *
      * @return string
      * @throws \BetaKiller\Exception
      */
-    private function getOriginalMessage(\Throwable $e): string
+    private function getOriginalMessage(\Throwable $e, I18nHelper $i18n): string
     {
         $message = $e->getMessage();
 
@@ -285,14 +294,14 @@ class ErrorPageMiddleware implements MiddlewareInterface
             ]);
         }
 
-        return __($i18nKey);
+        return $i18n->translate($i18nKey);
     }
 
-    private function getMaskedMessage(\Throwable $e): string
+    private function getMaskedMessage(\Throwable $e, I18nHelper $i18n): string
     {
         $key = $this->getErrorLabelI18nKey($e);
 
-        return __($key);
+        return $i18n->translate($key);
     }
 
     private function getErrorLabelI18nKey(\Throwable $e): string

@@ -1,6 +1,7 @@
 <?php
 namespace BetaKiller\View;
 
+use BetaKiller\Assets\StaticAssetsFactory;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Helper\UrlElementHelper;
 use BetaKiller\IFace\Exception\UrlElementException;
@@ -13,6 +14,9 @@ use Psr\Http\Message\ServerRequestInterface;
 class IFaceView
 {
     public const REQUEST_KEY    = '__request__';
+    public const ASSETS_KEY     = '__assets__';
+    public const META_KEY       = '__meta__';
+    public const I18N_KEY       = '__i18n__';
     public const IFACE_KEY      = '__iface__';
     public const IFACE_ZONE_KEY = 'zone';
 
@@ -27,11 +31,6 @@ class IFaceView
     private $layoutView;
 
     /**
-     * @var \BetaKiller\View\HtmlHeadHelper
-     */
-    private $headHelper;
-
-    /**
      * @var \BetaKiller\View\ViewFactoryInterface
      */
     private $viewFactory;
@@ -42,26 +41,31 @@ class IFaceView
     private $elementHelper;
 
     /**
+     * @var \BetaKiller\Assets\StaticAssetsFactory
+     */
+    private $assetsFactory;
+
+    /**
      * IFaceView constructor.
      *
      * @param \BetaKiller\Repository\IFaceLayoutRepository $layoutRepo
      * @param \BetaKiller\View\LayoutViewInterface         $layoutView
-     * @param \BetaKiller\View\HtmlHeadHelper              $headHelper
      * @param \BetaKiller\Helper\UrlElementHelper          $elementHelper
      * @param \BetaKiller\View\ViewFactoryInterface        $viewFactory
+     * @param \BetaKiller\Assets\StaticAssetsFactory       $assetsFactory
      */
     public function __construct(
         IFaceLayoutRepository $layoutRepo,
         LayoutViewInterface $layoutView,
-        HtmlHeadHelper $headHelper,
         UrlElementHelper $elementHelper,
-        ViewFactoryInterface $viewFactory
+        ViewFactoryInterface $viewFactory,
+        StaticAssetsFactory $assetsFactory
     ) {
         $this->layoutRepo    = $layoutRepo;
         $this->layoutView    = $layoutView;
-        $this->headHelper    = $headHelper;
         $this->viewFactory   = $viewFactory;
         $this->elementHelper = $elementHelper;
+        $this->assetsFactory = $assetsFactory;
     }
 
     /**
@@ -82,7 +86,6 @@ class IFaceView
         $model = $iface->getModel();
 
         // Hack for dropping original iface data on processing exception error page
-        $this->layoutView->clear();
 
         $viewPath  = $this->getViewPath($model);
         $ifaceView = $this->viewFactory->create($viewPath);
@@ -95,25 +98,32 @@ class IFaceView
         // Send current request to widgets
         $ifaceView->set(self::REQUEST_KEY, $request);
 
+        // Send i18n instance
+        $ifaceView->set(self::I18N_KEY, $i18n);
+
         $ifaceView->set(self::IFACE_KEY, [
             'codename' => $model->getCodename(),
             'label'    => $this->elementHelper->getLabel($model, $params, $i18n),
             'zone'     => $model->getZoneName(),
         ]);
 
-        $this->headHelper
+        // Detect IFace layout
+        $layoutCodename = $this->getLayoutCodename($model, $this->elementHelper);
+
+        // Create instance of renderer
+        $meta         = new \Meta;
+        $assets       = $this->assetsFactory->create();
+        $renderHelper = new HtmlRenderHelper($meta, $assets);
+
+        $renderHelper
             ->setLang($i18n->getLang())
             ->setContentType()
+            ->setLayoutCodename($layoutCodename)
             ->setTitle($this->elementHelper->getTitle($model, $params, $i18n))
             ->setMetaDescription($this->elementHelper->getDescription($model, $params, $i18n))
             ->setCanonical($urlHelper->makeUrl($model, null, false));
 
-        // Getting IFace layout
-        $layoutCodename = $this->getLayoutCodename($model, $this->elementHelper);
-
-        $this->layoutView->setLayoutCodename($layoutCodename);
-
-        return $this->layoutView->render($ifaceView);
+        return $this->layoutView->render($ifaceView, $renderHelper);
     }
 
     /**

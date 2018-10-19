@@ -438,7 +438,7 @@ class PhpException extends \ORM implements PhpExceptionModelInterface
      *
      * @return $this
      */
-    public function markAsNew(UserInterface $user): PhpExceptionModelInterface
+    public function markAsNew(?UserInterface $user): PhpExceptionModelInterface
     {
         $this->setStatus(self::STATE_NEW);
         $this->addHistoryRecord($user);
@@ -453,7 +453,7 @@ class PhpException extends \ORM implements PhpExceptionModelInterface
      *
      * @return $this
      */
-    public function markAsRepeated(UserInterface $user): PhpExceptionModelInterface
+    public function markAsRepeated(?UserInterface $user): PhpExceptionModelInterface
     {
         // Skip if exception was not resolved yet
         if (!$this->isResolved()) {
@@ -617,8 +617,7 @@ class PhpException extends \ORM implements PhpExceptionModelInterface
         // Get error ID for new records
         $this->save();
 
-        /** @var \BetaKiller\Model\PhpExceptionHistory $historyModel */
-        $historyModel = $this->getHistoryRelation()->model_factory();
+        $historyModel = new PhpExceptionHistory;
 
         return $historyModel
             ->setPhpException($this)

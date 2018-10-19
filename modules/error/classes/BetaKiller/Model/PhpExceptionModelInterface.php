@@ -143,7 +143,7 @@ interface PhpExceptionModelInterface extends DispatchableEntityInterface
      *
      * @return PhpExceptionModelInterface
      */
-    public function markAsNew(UserInterface $user): PhpExceptionModelInterface;
+    public function markAsNew(?UserInterface $user): PhpExceptionModelInterface;
 
     /**
      * Mark exception as repeated (it was resolved earlier but repeated now)
@@ -152,7 +152,7 @@ interface PhpExceptionModelInterface extends DispatchableEntityInterface
      *
      * @return PhpExceptionModelInterface
      */
-    public function markAsRepeated(UserInterface $user): PhpExceptionModelInterface;
+    public function markAsRepeated(?UserInterface $user): PhpExceptionModelInterface;
 
     /**
      * Mark exception as resolved

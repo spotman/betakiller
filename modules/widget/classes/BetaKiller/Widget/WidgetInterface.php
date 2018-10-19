@@ -58,7 +58,7 @@ interface WidgetInterface
     /**
      * @param string $currentState
      */
-    public function setCurrentState($currentState): void;
+    public function setCurrentState(string $currentState): void;
 
     /**
      * @return string

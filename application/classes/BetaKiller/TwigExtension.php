@@ -1,43 +1,20 @@
 <?php
 namespace BetaKiller;
 
+use BetaKiller\Assets\StaticAssets;
 use BetaKiller\DI\Container;
+use BetaKiller\Helper\I18nHelper;
 use BetaKiller\Url\ZoneInterface;
 use BetaKiller\View\IFaceView;
 use HTML;
 use Meta;
-use Profiler;
-use StaticFile;
+use Psr\Http\Message\ServerRequestInterface;
 use Twig_Extension;
 use Twig_Filter;
 use Twig_Function;
 
 class TwigExtension extends Twig_Extension
 {
-    /**
-     * @Inject
-     * @var \JS
-     */
-    private $js;
-
-    /**
-     * @Inject
-     * @var \CSS
-     */
-    private $css;
-
-    /**
-     * @Inject
-     * @var \Meta
-     */
-    private $meta;
-
-    /**
-     * @Inject
-     * @var \Assets
-     */
-    private $assets;
-
     /**
      * @Inject
      * @var \BetaKiller\Helper\AppEnvInterface
@@ -68,25 +45,19 @@ class TwigExtension extends Twig_Extension
             new Twig_Function(
                 'js',
                 [$this, 'js'],
-                ['is_safe' => ['html']]
-            ),
-
-            new Twig_Function(
-                'js_build',
-                [$this, 'jsBuild'],
-                ['is_safe' => ['html']]
+                ['needs_context' => true, 'is_safe' => ['html']]
             ),
 
             new Twig_Function(
                 'css',
                 [$this, 'css'],
-                ['is_safe' => ['html']]
+                ['needs_context' => true, 'is_safe' => ['html']]
             ),
 
             new Twig_Function(
                 'static',
                 [$this, 'getLinkToStaticFile'],
-                ['is_safe' => ['html']]
+                ['needs_context' => true, 'is_safe' => ['html']]
             ),
 
             new Twig_Function(
@@ -96,18 +67,14 @@ class TwigExtension extends Twig_Extension
             ),
 
             new Twig_Function(
-                'assets',
-                [$this, 'assets']
-            ),
-
-            new Twig_Function(
                 'meta',
-                [$this, 'meta']
+                [$this, 'meta'],
+                ['needs_context' => true]
             ),
 
             new Twig_Function(
-                'profiler',
-                [$this, 'showProfiler'],
+                'kohanaProfiler',
+                [$this, 'showKohanaProfiler'],
                 ['is_safe' => ['html']]
             ),
 
@@ -139,7 +106,8 @@ class TwigExtension extends Twig_Extension
              */
             new Twig_Function(
                 'title',
-                [$this, 'title']
+                [$this, 'title'],
+                ['needs_context' => true,]
             ),
 
         ];
@@ -178,18 +146,17 @@ class TwigExtension extends Twig_Extension
              * @example ":count lots"|i18n({ ":count": lotsCount })
              */
             new Twig_Filter('i18n', function (array $context, string $text, array $values = null) {
-                // Use all surrounding context variables for simplicity
-                $values = $values ? array_merge($context, $values) : $context;
+                $i18n = $this->getI18n($context);
 
-                return __($text, $values);
+                return $i18n->translate($text, $values);
             }, ['needs_context' => true, 'is_safe' => ['html']]),
 
         ];
     }
 
-    public function title(string $value)
+    public function title(array $context, string $value)
     {
-        return $this->meta->title($value, Meta::TITLE_APPEND);
+        return $this->getMeta($context)->title($value, Meta::TITLE_APPEND);
     }
 
     /**
@@ -202,44 +169,24 @@ class TwigExtension extends Twig_Extension
 
     /**
      * Helper for adding JS files
+     *
+     * @param array  $context
+     * @param string $location
      */
-    public function js(): void
+    public function js(array $context, string $location): void
     {
-        foreach (\func_get_args() as $js) {
-            if (\mb_strpos($js, 'http') === 0 || \mb_strpos($js, '//') === 0) {
-                $this->js->addPublic($js);
-            } else {
-                $this->js->addStatic($js);
-            }
-        }
-    }
-
-    /**
-     * Helper for adding JS builds (Require.JS, etc) in production environment
-     */
-    public function jsBuild(): void
-    {
-        if (!$this->inProduction()) {
-            return;
-        }
-
-        foreach (\func_get_args() as $js) {
-            $this->js->addStatic($js);
-        }
+        $this->getStaticAssets($context)->addJs($location);
     }
 
     /**
      * Helper for adding CSS files
+     *
+     * @param array  $context
+     * @param string $location
      */
-    public function css(): void
+    public function css(array $context, string $location): void
     {
-        foreach (\func_get_args() as $css) {
-            if (mb_strpos($css, 'http') === 0 || mb_strpos($css, '//') === 0) {
-                $this->css->addPublic($css);
-            } else {
-                $this->css->addStatic($css);
-            }
-        }
+        $this->getStaticAssets($context)->addCss($location);
     }
 
     /**
@@ -269,42 +216,28 @@ class TwigExtension extends Twig_Extension
     /**
      * Helper for getting link for custom static file
      *
-     * @param string $filename
+     * @param array  $context
+     * @param string $path
      *
      * @return string
      */
-    public function getLinkToStaticFile(string $filename): string
+    public function getLinkToStaticFile(array $context, string $path): string
     {
-        return StaticFile::instance()->getFullUrl($filename);
-    }
-
-    /**
-     * Helper for adding assets
-     *
-     * @throws \BetaKiller\Assets\Exception\AssetsException
-     */
-    public function assets(): void
-    {
-        foreach (\func_get_args() as $asset) {
-            $this->assets->add($asset);
-        }
+        return $this->getStaticAssets($context)->getFullUrl($path);
     }
 
     /**
      * Helper for adding HTML meta-headers in output
      *
+     * @param array        $context
      * @param string|array $name
      * @param null         $value
      *
      * @return string|null
      */
-    public function meta($name = null, $value = null): ?string
+    public function meta(array $context, $name = null, $value = null): ?string
     {
-        if ($value === null && !\is_array($name)) {
-            return $this->meta->get($name);
-        }
-
-        $this->meta->set($name, $value);
+        $this->getMeta($context)->set($name, $value);
 
         return null;
     }
@@ -313,9 +246,9 @@ class TwigExtension extends Twig_Extension
      * @return string
      * @throws \View_Exception
      */
-    public function showProfiler(): string
+    public function showKohanaProfiler(): string
     {
-        return Profiler::render();
+        return \View::factory('profiler/stats')->render();
     }
 
     /**
@@ -333,8 +266,7 @@ class TwigExtension extends Twig_Extension
             $context = array_merge($context, $data);
         }
 
-        /** @var \Psr\Http\Message\ServerRequestInterface $request */
-        $request = $context[IFaceView::REQUEST_KEY];
+        $request = $this->getRequest($context);
 
         $widget = $this->widgetFacade->create($name);
 
@@ -346,5 +278,25 @@ class TwigExtension extends Twig_Extension
         $zoneName = $context[IFaceView::IFACE_KEY][IFaceView::IFACE_ZONE_KEY];
 
         return $zoneName === ZoneInterface::PUBLIC;
+    }
+
+    private function getRequest(array $context): ServerRequestInterface
+    {
+        return $context[IFaceView::REQUEST_KEY];
+    }
+
+    private function getI18n(array $context): I18nHelper
+    {
+        return $context[IFaceView::I18N_KEY];
+    }
+
+    private function getStaticAssets(array $context): StaticAssets
+    {
+        return $context[IFaceView::ASSETS_KEY];
+    }
+
+    private function getMeta(array $context): \Meta
+    {
+        return $context[IFaceView::META_KEY];
     }
 }
