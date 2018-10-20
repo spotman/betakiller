@@ -146,9 +146,7 @@ class TwigExtension extends Twig_Extension
              * @example ":count lots"|i18n({ ":count": lotsCount })
              */
             new Twig_Filter('i18n', function (array $context, string $text, array $values = null) {
-                $i18n = $this->getI18n($context);
-
-                return $i18n->translate($text, $values);
+                return $this->getI18n($context)->translate($text, $values);
             }, ['needs_context' => true, 'is_safe' => ['html']]),
 
         ];
