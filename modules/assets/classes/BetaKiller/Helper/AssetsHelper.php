@@ -1,6 +1,7 @@
 <?php
 namespace BetaKiller\Helper;
 
+use BetaKiller\Assets\AssetsProviderFactory;
 use BetaKiller\Assets\Exception\AssetsException;
 use BetaKiller\Assets\Model\AssetsModelImageInterface;
 use BetaKiller\Assets\Model\AssetsModelInterface;
@@ -11,10 +12,19 @@ use BetaKiller\Assets\Provider\ImageAssetsProviderInterface;
 class AssetsHelper
 {
     /**
-     * @Inject
      * @var \BetaKiller\Assets\AssetsProviderFactory
      */
     private $providerFactory;
+
+    /**
+     * AssetsHelper constructor.
+     *
+     * @param \BetaKiller\Assets\AssetsProviderFactory $providerFactory
+     */
+    public function __construct(AssetsProviderFactory $providerFactory)
+    {
+        $this->providerFactory = $providerFactory;
+    }
 
     /**
      * Returns URL for uploading new assets
@@ -67,7 +77,7 @@ class AssetsHelper
      * @param array|null                                         $attributes
      *
      * @return array
-     * @throws \BetaKiller\Assets\AssetsStorageException
+     * @throws \BetaKiller\Assets\Exception\AssetsStorageException
      * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\Assets\Exception\AssetsException
      */
@@ -81,7 +91,7 @@ class AssetsHelper
      *
      * @return \BetaKiller\Assets\Provider\AssetsProviderInterface
      * @throws \BetaKiller\Assets\Exception\AssetsException
-     * @throws \BetaKiller\Assets\AssetsStorageException
+     * @throws \BetaKiller\Assets\Exception\AssetsStorageException
      * @throws \BetaKiller\Factory\FactoryException
      */
     private function getProviderByModel(AssetsModelInterface $model): AssetsProviderInterface
@@ -95,7 +105,7 @@ class AssetsHelper
      * @param \BetaKiller\Assets\Model\AssetsModelImageInterface $model
      *
      * @return \BetaKiller\Assets\Provider\ImageAssetsProviderInterface
-     * @throws \BetaKiller\Assets\AssetsStorageException
+     * @throws \BetaKiller\Assets\Exception\AssetsStorageException
      * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\Assets\Exception\AssetsException
      */
@@ -117,7 +127,7 @@ class AssetsHelper
      *
      * @return \BetaKiller\Assets\Provider\HasPreviewProviderInterface
      * @throws \BetaKiller\Assets\Exception\AssetsException
-     * @throws \BetaKiller\Assets\AssetsStorageException
+     * @throws \BetaKiller\Assets\Exception\AssetsStorageException
      * @throws \BetaKiller\Factory\FactoryException
      */
     private function getPreviewProviderByModel(AssetsModelInterface $model): HasPreviewProviderInterface
@@ -127,7 +137,7 @@ class AssetsHelper
         if (!($provider instanceof HasPreviewProviderInterface)) {
             throw new AssetsException('Model :name must be linked to provider implementing :must', [
                 ':name' => $model->getModelName(),
-                ':must' => HasPreviewProviderInterface::class
+                ':must' => HasPreviewProviderInterface::class,
             ]);
         }
 

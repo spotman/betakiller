@@ -115,7 +115,7 @@ class GalleryShortcode extends AbstractContentElementShortcode
     /**
      * @return array
      * @throws \BetaKiller\Factory\FactoryException
-     * @throws \BetaKiller\Assets\AssetsStorageException
+     * @throws \BetaKiller\Assets\Exception\AssetsStorageException
      * @throws \BetaKiller\Assets\Exception\AssetsException
      * @throws \BetaKiller\Content\Shortcode\ShortcodeException
      */

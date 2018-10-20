@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\Assets\Middleware;
 
+use BetaKiller\Assets\Provider\AssetsProviderInterface;
 use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Helper\ServerRequestHelper;
 use Psr\Http\Message\ResponseInterface;
@@ -17,11 +18,13 @@ class DeleteMiddleware extends AbstractAssetMiddleware
      *
      * @return \Psr\Http\Message\ResponseInterface
      */
-    public function handle(ServerRequestInterface $request): ResponseInterface
+    public function process(ServerRequestInterface $request): ResponseInterface
     {
         $user = ServerRequestHelper::getUser($request);
 
         $this->detectProvider($request);
+
+        $this->checkAction(AssetsProviderInterface::ACTION_DELETE);
 
         // Get file model by hash value
         $model = $this->fromItemDeployUrl($request);

@@ -2,6 +2,7 @@
 namespace BetaKiller\View;
 
 use BetaKiller\Assets\StaticAssetsFactory;
+use BetaKiller\Dev\Profiler;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Helper\UrlElementHelper;
 use BetaKiller\IFace\Exception\UrlElementException;
@@ -79,6 +80,8 @@ class IFaceView
      */
     public function render(IFaceInterface $iface, ServerRequestInterface $request): string
     {
+        $dataPack = Profiler::begin($request, $iface->getCodename().' IFace data');
+
         $urlHelper = ServerRequestHelper::getUrlHelper($request);
         $params    = ServerRequestHelper::getUrlContainer($request);
         $i18n      = ServerRequestHelper::getI18n($request);
@@ -94,6 +97,9 @@ class IFaceView
         foreach ($iface->getData($request) as $key => $value) {
             $ifaceView->set($key, $value);
         }
+
+        Profiler::end($dataPack);
+        $renderPack = Profiler::begin($request, $iface->getCodename().' IFace render');
 
         // Send current request to widgets
         $ifaceView->set(self::REQUEST_KEY, $request);
@@ -123,7 +129,11 @@ class IFaceView
             ->setMetaDescription($this->elementHelper->getDescription($model, $params, $i18n))
             ->setCanonical($urlHelper->makeUrl($model, null, false));
 
-        return $this->layoutView->render($ifaceView, $renderHelper);
+        $result = $this->layoutView->render($ifaceView, $renderHelper);
+
+        Profiler::end($renderPack);
+
+        return $result;
     }
 
     /**
