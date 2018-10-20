@@ -77,7 +77,7 @@ class PostItem extends AbstractAdminBase
      *
      * @return array
      * @throws \BetaKiller\Assets\Exception\AssetsException
-     * @throws \BetaKiller\Assets\AssetsStorageException
+     * @throws \BetaKiller\Assets\Exception\AssetsStorageException
      * @throws \BetaKiller\Exception\NotFoundHttpException
      * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\Repository\RepositoryException

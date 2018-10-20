@@ -103,7 +103,7 @@ class ArticlesListWidget extends AbstractPublicWidget
      *
      * @return array
      * @throws \BetaKiller\Assets\Exception\AssetsException
-     * @throws \BetaKiller\Assets\AssetsStorageException
+     * @throws \BetaKiller\Assets\Exception\AssetsStorageException
      * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\IFace\Exception\UrlElementException
      * @throws \BetaKiller\Repository\RepositoryException

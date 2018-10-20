@@ -1,7 +1,6 @@
 <?php
 namespace BetaKiller\Helper;
 
-use BetaKiller\Model\UserInterface;
 use BetaKiller\Notification\NotificationFacade;
 use BetaKiller\Notification\NotificationMessageInterface;
 use BetaKiller\Notification\NotificationUserEmail;
@@ -15,11 +14,6 @@ class NotificationHelper
     private $facade;
 
     /**
-     * @var \BetaKiller\Model\UserInterface
-     */
-    private $user;
-
-    /**
      * @var \BetaKiller\Helper\AppEnvInterface
      */
     private $appEnv;
@@ -29,16 +23,11 @@ class NotificationHelper
      *
      * @param \BetaKiller\Notification\NotificationFacade $facade
      * @param \BetaKiller\Helper\AppEnvInterface          $appEnv
-     * @param \BetaKiller\Model\UserInterface             $currentUser
      */
-    public function __construct(
-        NotificationFacade $facade,
-        UserInterface $currentUser,
-        AppEnvInterface $appEnv
-    ) {
+    public function __construct(NotificationFacade $facade, AppEnvInterface $appEnv)
+    {
         $this->facade = $facade;
         $this->appEnv = $appEnv;
-        $this->user   = $currentUser;
     }
 
     /**
@@ -75,20 +64,6 @@ class NotificationHelper
     }
 
     /**
-     * Send message to current user
-     *
-     * @param string $name
-     * @param array  $templateData
-     *
-     * @throws \BetaKiller\Auth\AuthorizationRequiredException
-     * @throws \BetaKiller\Notification\NotificationException
-     */
-    public function currentUserMessage(string $name, array $templateData): void
-    {
-        $this->directMessage($name, $this->currentUserTarget(), $templateData);
-    }
-
-    /**
      * Generate target from email
      *
      * @param string      $email
@@ -103,18 +78,6 @@ class NotificationHelper
         ?string $langName = null
     ): NotificationUserInterface {
         return new NotificationUserEmail($email, $fullName, $langName);
-    }
-
-    /**
-     * @return \BetaKiller\Notification\NotificationUserInterface
-     * @throws \BetaKiller\Auth\AuthorizationRequiredException
-     */
-    private function currentUserTarget(): NotificationUserInterface
-    {
-        // Force auth is current user is not logged in
-        $this->user->forceAuthorization();
-
-        return $this->user;
     }
 
     /**
@@ -141,9 +104,11 @@ class NotificationHelper
     private function rewriteTargetsForDebug(NotificationMessageInterface $message): void
     {
         if (!$this->appEnv->inProductionMode()) {
+            $debugEmail = $this->appEnv->getDebugEmail();
+
             $message
                 ->clearTargets()
-                ->addTarget($this->currentUserTarget());
+                ->addTarget($this->emailTarget($debugEmail, 'Debug email target'));
         }
     }
 }

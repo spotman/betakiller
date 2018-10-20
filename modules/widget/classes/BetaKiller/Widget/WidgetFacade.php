@@ -4,10 +4,10 @@ declare(strict_types=1);
 namespace BetaKiller\Widget;
 
 use BetaKiller\Auth\AccessDeniedException;
+use BetaKiller\Dev\Profiler;
 use BetaKiller\Helper\LoggerHelperTrait;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Model\UserInterface;
-use BetaKiller\View\IFaceView;
 use BetaKiller\View\ViewFactoryInterface;
 use BetaKiller\View\ViewInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -70,16 +70,22 @@ class WidgetFacade
      */
     public function render(WidgetInterface $widget, ServerRequestInterface $request, array $context): string
     {
+        $pack = Profiler::begin($request, $widget->getName().' widget render');
+
         $user = ServerRequestHelper::getUser($request);
 
         if (!$this->isAllowed($widget, $user)) {
             if ($widget->isEmptyResponseAllowed()) {
+                Profiler::end($pack);
+
                 // Return empty string if widget allows empty response and it`s not allowed by ACL
                 return '';
             }
 
             throw new AccessDeniedException();
         }
+
+        $result = '';
 
         try {
             // Collecting data
@@ -103,12 +109,14 @@ class WidgetFacade
                 'name' => $widget->getName(),
             ]);
 
-            return $view->render();
+            $result = $view->render();
         } catch (\Throwable $e) {
             $this->logException($this->logger, $e);
-
-            return '';
         }
+
+        Profiler::end($pack);
+
+        return $result;
     }
 
     private function isAllowed(WidgetInterface $widget, UserInterface $user): bool

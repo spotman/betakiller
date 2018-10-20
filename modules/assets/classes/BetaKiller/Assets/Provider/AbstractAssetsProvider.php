@@ -285,7 +285,7 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
      * @throws \BetaKiller\Assets\Exception\AssetsException
      * @throws \BetaKiller\Assets\Exception\AssetsUploadException
      * @throws \BetaKiller\Assets\Exception\AssetsProviderException
-     * @throws \BetaKiller\Assets\AssetsStorageException
+     * @throws \BetaKiller\Assets\Exception\AssetsStorageException
      */
     public function upload(UploadedFileInterface $file, array $postData, UserInterface $user): AssetsModelInterface
     {
@@ -362,7 +362,7 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
      * @throws \BetaKiller\Assets\Exception\AssetsProviderException
      * @throws \BetaKiller\Assets\Exception\AssetsException
      * @throws \BetaKiller\Assets\Exception\AssetsUploadException
-     * @throws \BetaKiller\Assets\AssetsStorageException
+     * @throws \BetaKiller\Assets\Exception\AssetsStorageException
      */
     public function store(string $fullPath, string $originalName, UserInterface $user): AssetsModelInterface
     {
@@ -471,7 +471,7 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
      *
      * @throws \BetaKiller\Assets\Exception\AssetsException
      * @throws \BetaKiller\Assets\Exception\AssetsProviderException
-     * @throws \BetaKiller\Assets\AssetsStorageException
+     * @throws \BetaKiller\Assets\Exception\AssetsStorageException
      * @throws \BetaKiller\Repository\RepositoryException
      */
     public function delete(AssetsModelInterface $model, UserInterface $user): void
@@ -523,7 +523,7 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
      *
      * @return string
      * @throws \BetaKiller\Assets\Exception\AssetsException
-     * @throws \BetaKiller\Assets\AssetsStorageException
+     * @throws \BetaKiller\Assets\Exception\AssetsStorageException
      */
     public function getContent(AssetsModelInterface $model): string
     {
@@ -540,7 +540,7 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
      * @param string               $content
      *
      * @throws \BetaKiller\Assets\Exception\AssetsException
-     * @throws \BetaKiller\Assets\AssetsStorageException
+     * @throws \BetaKiller\Assets\Exception\AssetsStorageException
      */
     private function setContent(AssetsModelInterface $model, string $content): void
     {
@@ -565,7 +565,7 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
      *
      * @return void
      * @throws \BetaKiller\Assets\Exception\AssetsException
-     * @throws \BetaKiller\Assets\AssetsStorageException
+     * @throws \BetaKiller\Assets\Exception\AssetsStorageException
      */
     public function cacheContent(
         AssetsModelInterface $model,

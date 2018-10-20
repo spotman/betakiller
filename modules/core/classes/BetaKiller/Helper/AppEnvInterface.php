@@ -119,4 +119,11 @@ interface AppEnvInterface
      * @return string
      */
     public function getTempDirectory(): string;
+
+    /**
+     * Returns email which will receive all emails in debug mode
+     *
+     * @return string
+     */
+    public function getDebugEmail(): string;
 }

@@ -5,25 +5,17 @@
     <div class="row">
 
       <div class="input-field col s12">
-        <input type="text" name="user-login" id="auth-user-login" placeholder="{{ 'Your username or email'|i18n }}"/>
+        <input type="text" name="user-login" id="auth-user-login" placeholder="{{ 'auth.regular.login'|i18n }}"/>
       </div>
 
       <div class="input-field col s12">
-        <input type="password" name="user-password" id="auth-user-pass" placeholder="{{ 'Your password'|i18n }}"/>
-      </div>
-
-      <div class="col s12">
-        {#<a href="{{ reset_password_url }}" class="right">{{ "Forgot password?"|i18n }}</a>#}
-        <label>
-          <input type="checkbox" name="remember" checked="checked" />
-          <span>{{ 'Remember me'|i18n }}</span>
-        </label>
+        <input type="password" name="user-password" id="auth-user-pass" placeholder="{{ 'auth.regular.password'|i18n }}"/>
       </div>
 
       <div class="input-field col s12 center-align">
         <button type="submit" class="btn green">
           {#<i class="material-icons">account_box</i> #}
-          {{ 'Sign in'|i18n }}
+          {{ 'auth.regular.sign_in'|i18n }}
         </button>
       </div>
 

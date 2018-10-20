@@ -176,7 +176,7 @@ class AssetsConfig extends AbstractConfig
      */
     private function getModelConfigValue(string $modelName, array $path)
     {
-        \array_unshift($path, $modelName, self::CONFIG_MODELS_KEY);
+        \array_unshift($path, self::CONFIG_MODELS_KEY, $modelName);
 
         return $this->get($path);
     }

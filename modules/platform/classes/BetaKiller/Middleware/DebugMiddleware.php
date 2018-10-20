@@ -4,8 +4,6 @@ declare(strict_types=1);
 namespace BetaKiller\Middleware;
 
 use BetaKiller\Helper\AppEnvInterface;
-use BetaKiller\Log\Logger;
-use DebugBar\Bridge\MonologCollector;
 use DebugBar\DataCollector\MemoryCollector;
 use DebugBar\DataCollector\RequestDataCollector;
 use DebugBar\DataCollector\TimeDataCollector;
@@ -21,11 +19,6 @@ use Psr\Http\Server\RequestHandlerInterface;
 
 class DebugMiddleware implements MiddlewareInterface
 {
-    /**
-     * @var \BetaKiller\Log\Logger
-     */
-    private $logger;
-
     /**
      * @var \Psr\Http\Message\ResponseFactoryInterface
      */
@@ -45,17 +38,14 @@ class DebugMiddleware implements MiddlewareInterface
      * DebugMiddleware constructor.
      *
      * @param \BetaKiller\Helper\AppEnvInterface         $appEnv
-     * @param \BetaKiller\Log\Logger                     $logger
      * @param \Psr\Http\Message\ResponseFactoryInterface $responseFactory
      * @param \Psr\Http\Message\StreamFactoryInterface   $streamFactory
      */
     public function __construct(
         AppEnvInterface $appEnv,
-        Logger $logger,
         ResponseFactoryInterface $responseFactory,
         StreamFactoryInterface $streamFactory
     ) {
-        $this->logger          = $logger;
         $this->responseFactory = $responseFactory;
         $this->streamFactory   = $streamFactory;
         $this->appEnv          = $appEnv;
@@ -84,9 +74,8 @@ class DebugMiddleware implements MiddlewareInterface
         $debugBar = new DebugBar();
 
         $debugBar
-            ->addCollector(new RequestDataCollector())
             ->addCollector(new TimeDataCollector($startTime))
-            ->addCollector(new MonologCollector($this->logger->getMonolog()))
+            ->addCollector(new RequestDataCollector())
             ->addCollector(new MemoryCollector());
 
         // Storage for processing data for AJAX calls and redirects

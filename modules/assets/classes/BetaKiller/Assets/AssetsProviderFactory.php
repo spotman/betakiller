@@ -88,7 +88,7 @@ class AssetsProviderFactory
      * @return \BetaKiller\Assets\Provider\AssetsProviderInterface|\BetaKiller\Assets\Provider\ImageAssetsProviderInterface|mixed
      * @throws \BetaKiller\Assets\Exception\AssetsProviderException
      * @throws \BetaKiller\Assets\Exception\AssetsException
-     * @throws \BetaKiller\Assets\AssetsStorageException
+     * @throws \BetaKiller\Assets\Exception\AssetsStorageException
      * @throws \BetaKiller\Factory\FactoryException
      */
     public function createFromUrlKey(string $key)
@@ -142,7 +142,7 @@ class AssetsProviderFactory
      * @throws \BetaKiller\Assets\Exception\AssetsProviderException
      * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\Assets\Exception\AssetsException
-     * @throws \BetaKiller\Assets\AssetsStorageException
+     * @throws \BetaKiller\Assets\Exception\AssetsStorageException
      */
     public function createFromModelCodename(string $modelName)
     {
@@ -172,6 +172,9 @@ class AssetsProviderFactory
             'pathStrategy' => $pathStrategy,
         ]);
 
+        // Store codename for future use
+        $providerInstance->setCodename($modelName);
+
         // Check provider => storage matrix
         if ($providerInstance->isProtected() && $storage->isPublic()) {
             throw new AssetsProviderException('Protected assets provider :name must have protected storage', [
@@ -190,9 +193,6 @@ class AssetsProviderFactory
                 ]);
             }
         }
-
-        // Store codename for future use
-        $providerInstance->setCodename($modelName);
 
         // Inject custom post upload handlers
         foreach ($postUploadHandlersNames as $handlerName) {

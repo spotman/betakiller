@@ -17,9 +17,11 @@ class OriginalMiddleware extends AbstractAssetMiddleware
      *
      * @return \Psr\Http\Message\ResponseInterface
      */
-    public function handle(ServerRequestInterface $request): ResponseInterface
+    public function process(ServerRequestInterface $request): ResponseInterface
     {
         $this->detectProvider($request);
+
+        $this->checkAction(AssetsProviderInterface::ACTION_ORIGINAL);
 
         $model = $this->fromItemDeployUrl($request);
 

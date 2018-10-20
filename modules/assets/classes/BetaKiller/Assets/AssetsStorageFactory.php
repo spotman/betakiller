@@ -49,7 +49,7 @@ class AssetsStorageFactory
      * @param array $config
      *
      * @return \BetaKiller\Assets\Storage\AssetsStorageInterface
-     * @throws \BetaKiller\Assets\AssetsStorageException
+     * @throws \BetaKiller\Assets\Exception\AssetsStorageException
      * @throws \BetaKiller\Factory\FactoryException
      */
     public function createFromConfig(array $config): AssetsStorageInterface

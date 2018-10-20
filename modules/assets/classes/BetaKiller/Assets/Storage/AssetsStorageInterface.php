@@ -15,7 +15,7 @@ interface AssetsStorageInterface
      *
      * @param string $path
      *
-     * @throws \BetaKiller\Assets\AssetsStorageException
+     * @throws \BetaKiller\Assets\Exception\AssetsStorageException
      */
     public function setBasePath(string $path): void;
 
@@ -23,7 +23,7 @@ interface AssetsStorageInterface
      * @param string $path
      *
      * @return string
-     * @throws \BetaKiller\Assets\AssetsStorageException
+     * @throws \BetaKiller\Assets\Exception\AssetsStorageException
      */
     public function getFile(string $path): string;
 
@@ -33,7 +33,7 @@ interface AssetsStorageInterface
      * @param string $path
      * @param string $content
      *
-     * @throws \BetaKiller\Assets\AssetsStorageException
+     * @throws \BetaKiller\Assets\Exception\AssetsStorageException
      */
     public function putFile(string $path, string $content): void;
 
@@ -42,7 +42,7 @@ interface AssetsStorageInterface
      *
      * @param string $path
      *
-     * @throws \BetaKiller\Assets\AssetsStorageException
+     * @throws \BetaKiller\Assets\Exception\AssetsStorageException
      */
     public function deleteFile(string $path): void;
 
@@ -52,7 +52,7 @@ interface AssetsStorageInterface
      * @param string $directory
      *
      * @return array
-     * @throws \BetaKiller\Assets\AssetsStorageException
+     * @throws \BetaKiller\Assets\Exception\AssetsStorageException
      */
     public function getFiles(string $directory): array;
 
@@ -62,7 +62,7 @@ interface AssetsStorageInterface
      * @param string $path
      *
      * @return void
-     * @throws \BetaKiller\Assets\AssetsStorageException
+     * @throws \BetaKiller\Assets\Exception\AssetsStorageException
      */
     public function deleteDirectory(string $path): void;
 }

@@ -180,6 +180,11 @@ class WebApp
         );
 
         /**
+         * Static files legacy route first
+         */
+        $app->get('/assets/static/{file:.+}', StaticFilesDeployHandler::class);
+
+        /**
          * Download original file via concrete provider
          */
         $app->get('/assets/{provider}/'.$itemPlace.'/'.$downloadAction.$extPlace, DownloadMiddleware::class);
@@ -198,11 +203,6 @@ class WebApp
          * Delete files via concrete provider
          */
         $app->get('/assets/{provider}/'.$itemPlace.'/'.$deleteAction.$sizePlace.$extPlace, PreviewMiddleware::class);
-
-        /**
-         * Static files legacy route
-         */
-        $app->get('/assets/static/{file:.+}', StaticFilesDeployHandler::class);
 
         // API HTTP gate
         $app->post('/api/v{version:\d+}/{type:\s+}', ApiRequestHandler::class);

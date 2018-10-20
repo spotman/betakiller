@@ -94,7 +94,7 @@ final class ImageAssetsProvider extends AbstractHasPreviewAssetsProvider impleme
      * @return string
      * @throws \BetaKiller\Assets\Exception\AssetsException
      * @throws \BetaKiller\Assets\Exception\AssetsProviderException
-     * @throws \BetaKiller\Assets\AssetsStorageException
+     * @throws \BetaKiller\Assets\Exception\AssetsStorageException
      */
     public function makePreviewContent(AssetsModelInterface $model, string $size): string
     {
@@ -384,7 +384,7 @@ final class ImageAssetsProvider extends AbstractHasPreviewAssetsProvider impleme
      * @throws \BetaKiller\Assets\Exception\AssetsException
      * @throws \BetaKiller\Assets\Exception\AssetsUploadException
      * @throws \BetaKiller\Assets\Exception\AssetsProviderException
-     * @throws \BetaKiller\Assets\AssetsStorageException
+     * @throws \BetaKiller\Assets\Exception\AssetsStorageException
      */
     public function store(string $fullPath, string $originalName, UserInterface $user): AssetsModelInterface
     {
@@ -400,7 +400,7 @@ final class ImageAssetsProvider extends AbstractHasPreviewAssetsProvider impleme
      * @param \BetaKiller\Assets\Model\AssetsModelImageInterface $model
      *
      * @throws \BetaKiller\Exception
-     * @throws \BetaKiller\Assets\AssetsStorageException
+     * @throws \BetaKiller\Assets\Exception\AssetsStorageException
      * @throws \BetaKiller\Assets\Exception\AssetsException
      */
     private function detectImageDimensions(AssetsModelImageInterface $model): void
