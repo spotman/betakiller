@@ -1,8 +1,11 @@
 <?php
 namespace BetaKiller\Content\Shortcode\Editor;
 
+use BetaKiller\Assets\ContentTypes;
 use BetaKiller\Content\Shortcode\ContentElementShortcodeInterface;
+use BetaKiller\Content\Shortcode\ShortcodeEntityInterface;
 use BetaKiller\Content\Shortcode\ShortcodeException;
+use BetaKiller\Content\Shortcode\ShortcodeFacade;
 use BetaKiller\Model\EntityModelInterface;
 
 class ContentElementShortcodeEditor extends AbstractShortcodeEditor
@@ -10,10 +13,33 @@ class ContentElementShortcodeEditor extends AbstractShortcodeEditor
     public const ANY_MIME_TYPES = '*/*';
 
     /**
-     * @Inject
      * @var \BetaKiller\Assets\ContentTypes
      */
     private $contentTypes;
+
+    /**
+     * @var ShortcodeEntityInterface
+     */
+    private $shortcodeEntity;
+
+    /**
+     * @var \BetaKiller\Content\Shortcode\ShortcodeFacade
+     */
+    private $shortcodeFacade;
+
+    /**
+     * ContentElementShortcodeEditor constructor.
+     *
+     * @param \BetaKiller\Content\Shortcode\ShortcodeEntityInterface $entity
+     * @param \BetaKiller\Content\Shortcode\ShortcodeFacade          $facade
+     * @param \BetaKiller\Assets\ContentTypes                        $contentTypes
+     */
+    public function __construct(ShortcodeEntityInterface $entity, ShortcodeFacade $facade, ContentTypes $contentTypes)
+    {
+        $this->shortcodeEntity = $entity;
+        $this->shortcodeFacade = $facade;
+        $this->contentTypes    = $contentTypes;
+    }
 
     /**
      * Returns short name of related template

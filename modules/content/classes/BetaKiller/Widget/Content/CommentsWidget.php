@@ -2,6 +2,9 @@
 namespace BetaKiller\Widget\Content;
 
 use BetaKiller\Exception\ValidationException;
+use BetaKiller\Repository\ContentCommentRepository;
+use BetaKiller\Repository\EntityRepository;
+use BetaKiller\Status\StatusWorkflowFactory;
 use BetaKiller\Widget\AbstractPublicWidget;
 use BetaKiller\Widget\WidgetException;
 use HTML;
@@ -9,25 +12,39 @@ use Psr\Http\Message\ServerRequestInterface;
 use Valid;
 use Validation;
 
-class CommentsWidget extends AbstractPublicWidget
+final class CommentsWidget extends AbstractPublicWidget
 {
     /**
-     * @Inject
      * @var \BetaKiller\Repository\ContentCommentRepository
      */
     private $commentRepository;
 
     /**
-     * @Inject
      * @var \BetaKiller\Repository\EntityRepository
      */
     private $entityRepository;
 
     /**
-     * @Inject
      * @var \BetaKiller\Status\StatusWorkflowFactory
      */
     private $workflowFactory;
+
+    /**
+     * CommentsWidget constructor.
+     *
+     * @param \BetaKiller\Repository\ContentCommentRepository $commentRepository
+     * @param \BetaKiller\Repository\EntityRepository         $entityRepository
+     * @param \BetaKiller\Status\StatusWorkflowFactory        $workflowFactory
+     */
+    public function __construct(
+        ContentCommentRepository $commentRepository,
+        EntityRepository $entityRepository,
+        StatusWorkflowFactory $workflowFactory
+    ) {
+        $this->commentRepository = $commentRepository;
+        $this->entityRepository  = $entityRepository;
+        $this->workflowFactory   = $workflowFactory;
+    }
 
     /**
      * Returns data for View rendering

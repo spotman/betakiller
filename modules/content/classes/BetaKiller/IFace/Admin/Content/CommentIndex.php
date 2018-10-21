@@ -1,20 +1,20 @@
 <?php
 namespace BetaKiller\IFace\Admin\Content;
 
+use BetaKiller\Repository\ContentCommentRepository;
+use Psr\Http\Message\ServerRequestInterface;
+
 class CommentIndex extends AbstractCommentList
 {
     /**
-     * @Inject
-     * @var \BetaKiller\Repository\ContentCommentRepository
-     */
-    private $commentRepository;
-
-    /**
+     * @param \Psr\Http\Message\ServerRequestInterface        $request
+     * @param \BetaKiller\Repository\ContentCommentRepository $repo
+     *
      * @return \BetaKiller\Model\ContentComment[]
      * @throws \BetaKiller\Repository\RepositoryException
      */
-    protected function getCommentsList(): array
+    protected function getCommentsList(ServerRequestInterface $request, ContentCommentRepository $repo): array
     {
-        return $this->commentRepository->getLatestComments();
+        return $repo->getLatestComments();
     }
 }
