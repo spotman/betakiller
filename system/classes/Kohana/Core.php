@@ -675,6 +675,10 @@ class Kohana_Core
      */
     public static function cache($name, $data = null, $lifetime = null)
     {
+        if (!static::$caching) {
+            return null;
+        }
+
         // Cache file is a hash of the name
         $file = sha1($name).'.txt';
 
