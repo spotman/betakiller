@@ -2,7 +2,6 @@
 namespace BetaKiller;
 
 use BetaKiller\Assets\StaticAssets;
-use BetaKiller\DI\Container;
 use BetaKiller\Helper\I18nHelper;
 use BetaKiller\Url\ZoneInterface;
 use BetaKiller\View\IFaceView;
@@ -26,17 +25,6 @@ class TwigExtension extends Twig_Extension
      * @var \BetaKiller\Widget\WidgetFacade
      */
     private $widgetFacade;
-
-    /**
-     * TwigExtension constructor.
-     *
-     * @throws \InvalidArgumentException
-     * @throws \DI\DependencyException
-     */
-    public function __construct()
-    {
-        Container::getInstance()->injectOn($this);
-    }
 
     public function getFunctions(): array
     {
