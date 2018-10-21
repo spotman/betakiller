@@ -19,6 +19,8 @@ use BetaKiller\View\LayoutViewInterface;
 use BetaKiller\View\TwigLayoutView;
 use BetaKiller\View\TwigViewFactory;
 use BetaKiller\View\ViewFactoryInterface;
+use Doctrine\Common\Cache\Cache;
+use Psr\SimpleCache\CacheInterface;
 use Roave\DoctrineSimpleCache\SimpleCacheAdapter;
 use Spotman\Acl\ResourceFactory\AclResourceFactoryInterface;
 use Spotman\Acl\ResourcesCollector\AclResourcesCollectorInterface;
@@ -26,14 +28,12 @@ use Spotman\Acl\RolesCollector\AclRolesCollectorInterface;
 use Spotman\Acl\RulesCollector\AclRulesCollectorInterface;
 use Spotman\Api\AccessResolver\ApiMethodAccessResolverDetectorInterface;
 
-$workingPath = MultiSite::instance()->getWorkingPath();
-
 return [
 
     /**
      * @url http://php-di.org/doc/performances.html
      */
-    'compile_to'        => implode(DIRECTORY_SEPARATOR, [$workingPath, 'cache', 'php-di']),
+    'compile'           => true,
 
     // Enable this only if your server has APCu enabled
     'cache_definitions' => false,
@@ -44,13 +44,12 @@ return [
     'definitions' => [
 
         // PSR-16 adapter for system-wide Doctrine Cache
-        Psr\SimpleCache\CacheInterface::class       => DI\factory(function (\Doctrine\Common\Cache\Cache $doctrineCache
-        ) {
+        CacheInterface::class                       => DI\factory(function (Cache $doctrineCache) {
             return new SimpleCacheAdapter($doctrineCache);
         }),
 
         // Bind Doctrine cache interface to abstract cache provider
-        \Doctrine\Common\Cache\Cache::class         => DI\get(Doctrine\Common\Cache\CacheProvider::class),
+        Cache::class                                => DI\get(Doctrine\Common\Cache\CacheProvider::class),
 
         // Common cache instance for all
         \Doctrine\Common\Cache\CacheProvider::class => DI\get(\BetaKiller\Cache\DoctrineCacheProvider::class),
