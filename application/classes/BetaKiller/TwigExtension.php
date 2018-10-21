@@ -2,9 +2,11 @@
 namespace BetaKiller;
 
 use BetaKiller\Assets\StaticAssets;
+use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\Helper\I18nHelper;
 use BetaKiller\Url\ZoneInterface;
 use BetaKiller\View\IFaceView;
+use BetaKiller\Widget\WidgetFacade;
 use HTML;
 use Meta;
 use Psr\Http\Message\ServerRequestInterface;
@@ -15,16 +17,26 @@ use Twig_Function;
 class TwigExtension extends Twig_Extension
 {
     /**
-     * @Inject
      * @var \BetaKiller\Helper\AppEnvInterface
      */
     private $appEnv;
 
     /**
-     * @Inject
      * @var \BetaKiller\Widget\WidgetFacade
      */
     private $widgetFacade;
+
+    /**
+     * TwigExtension constructor.
+     *
+     * @param \BetaKiller\Helper\AppEnvInterface $appEnv
+     * @param \BetaKiller\Widget\WidgetFacade    $widgetFacade
+     */
+    public function __construct(AppEnvInterface $appEnv, WidgetFacade $widgetFacade)
+    {
+        $this->appEnv       = $appEnv;
+        $this->widgetFacade = $widgetFacade;
+    }
 
     public function getFunctions(): array
     {

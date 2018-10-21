@@ -15,20 +15,13 @@ abstract class AbstractOrmBasedRepository extends AbstractRepository
     private $ormFactory;
 
     /**
-     * @var \BetaKiller\Helper\ExceptionTranslator
-     */
-    private $translator;
-
-    /**
      * AbstractOrmBasedRepository constructor.
      *
-     * @param \BetaKiller\Factory\OrmFactory         $ormFactory
-     * @param \BetaKiller\Helper\ExceptionTranslator $translator
+     * @param \BetaKiller\Factory\OrmFactory $ormFactory
      */
-    public function __construct(OrmFactory $ormFactory, ExceptionTranslator $translator)
+    public function __construct(OrmFactory $ormFactory)
     {
         $this->ormFactory = $ormFactory;
-        $this->translator = $translator;
     }
 
     /**
@@ -105,7 +98,7 @@ abstract class AbstractOrmBasedRepository extends AbstractRepository
         try {
             $entity->save();
         } catch (\ORM_Validation_Exception $e) {
-            throw $this->translator->fromOrmValidationException($e);
+            throw ExceptionTranslator::fromOrmValidationException($e);
         } catch (\Throwable $e) {
             throw RepositoryException::wrap($e);
         }

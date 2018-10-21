@@ -1,6 +1,7 @@
 <?php
 namespace BetaKiller\Widget\Content;
 
+use BetaKiller\Repository\QuoteRepository;
 use BetaKiller\Widget\AbstractPublicWidget;
 use DateTime;
 use DateTimeInterface;
@@ -9,10 +10,19 @@ use Psr\Http\Message\ServerRequestInterface;
 class QuotesWidget extends AbstractPublicWidget
 {
     /**
-     * @Inject
      * @var \BetaKiller\Repository\QuoteRepository
      */
     private $repository;
+
+    /**
+     * QuotesWidget constructor.
+     *
+     * @param \BetaKiller\Repository\QuoteRepository $repository
+     */
+    public function __construct(QuoteRepository $repository)
+    {
+        $this->repository = $repository;
+    }
 
     /**
      * Returns data for View rendering

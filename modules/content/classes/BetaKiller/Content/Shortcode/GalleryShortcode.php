@@ -3,8 +3,10 @@ namespace BetaKiller\Content\Shortcode;
 
 use BetaKiller\Content\Shortcode\Attribute\SwitchAttribute;
 use BetaKiller\Content\Shortcode\Editor\EditorListingItem;
+use BetaKiller\Helper\AssetsHelper;
 use BetaKiller\Model\ContentGalleryInterface;
 use BetaKiller\Model\EntityModelInterface;
+use BetaKiller\Repository\ContentGalleryRepository;
 
 class GalleryShortcode extends AbstractContentElementShortcode
 {
@@ -33,15 +35,31 @@ class GalleryShortcode extends AbstractContentElementShortcode
 
     /**
      * @var \BetaKiller\Helper\AssetsHelper
-     * @Inject
      */
     private $assetsHelper;
 
     /**
-     * @Inject
      * @var \BetaKiller\Repository\ContentGalleryRepository
      */
-    private $galleryRepository;
+    private $repository;
+
+    /**
+     * AbstractShortcode constructor.
+     *
+     * @param \BetaKiller\Content\Shortcode\ShortcodeEntityInterface $entity
+     * @param \BetaKiller\Helper\AssetsHelper                        $assetsHelper
+     * @param \BetaKiller\Repository\ContentGalleryRepository        $repo
+     */
+    public function __construct(
+        ShortcodeEntityInterface $entity,
+        AssetsHelper $assetsHelper,
+        ContentGalleryRepository $repo
+    ) {
+        parent::__construct($entity);
+
+        $this->repository   = $repo;
+        $this->assetsHelper = $assetsHelper;
+    }
 
     /**
      * @return \BetaKiller\Content\Shortcode\Attribute\ShortcodeAttributeInterface[]
@@ -152,7 +170,7 @@ class GalleryShortcode extends AbstractContentElementShortcode
     {
         $id = (int)$this->getID();
 
-        return $this->galleryRepository->findById($id);
+        return $this->repository->findById($id);
     }
 
     /**
@@ -211,7 +229,7 @@ class GalleryShortcode extends AbstractContentElementShortcode
      */
     public function getEditorListingItems(?EntityModelInterface $relatedEntity, ?int $itemID): array
     {
-        $galleries = $this->galleryRepository->getEditorListing($relatedEntity, $itemID);
+        $galleries = $this->repository->getEditorListing($relatedEntity, $itemID);
 
         $data = [];
 
@@ -236,16 +254,17 @@ class GalleryShortcode extends AbstractContentElementShortcode
     public function getEditorItemData(): array
     {
         $gallery = $this->getGallery();
-        $images = $this->getImages($gallery, false);
+        $images  = $this->getImages($gallery, false);
 
         $imagesIDs = [];
 
         foreach ($images as $image) {
             $imagesIDs[] = (int)$image->getID(); // EditorListing items IDs are always integers
         }
+
         // No data for editing
         return [
-            'id' => $gallery->getID(),
+            'id'     => $gallery->getID(),
             'images' => $imagesIDs,
         ];
     }
