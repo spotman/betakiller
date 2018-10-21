@@ -25,7 +25,6 @@ use BetaKiller\Middleware\UrlElementDispatchMiddleware;
 use BetaKiller\Middleware\UrlElementRenderMiddleware;
 use BetaKiller\Middleware\UrlHelperMiddleware;
 use BetaKiller\Middleware\UserMiddleware;
-use BetaKiller\Middleware\WordpressContentRedirectHandler;
 use Middlewares\ContentType;
 use Psr\Http\Message\ResponseInterface;
 use Spotman\Api\ApiRequestHandler;
@@ -207,9 +206,6 @@ class WebApp
 
         // API HTTP gate
         $app->post('/api/v{version:\d+}/{type:.+}', ApiRequestHandler::class);
-
-        // BC redirect for Wordpress attachments
-        $app->get('/wp-content/{file:.+}', WordpressContentRedirectHandler::class);
     }
 
     public function processException(\Throwable $e): ResponseInterface
