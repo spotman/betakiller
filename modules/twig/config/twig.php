@@ -40,7 +40,7 @@ return [
         'debug'               => Kohana::$environment === Kohana::DEVELOPMENT,
         'autoescape'          => true,
         'base_template_class' => Twig_Template::class,
-        'cache'               => TWIGPATH.'cache',
+        'cache'               => null,
         'chmod'               => 0755,
         'charset'             => 'utf-8',
         'optimizations'       => -1,

@@ -271,7 +271,7 @@ abstract class Kohana_Minion_Task {
 
 		$view = View::factory('minion/help/task')
 			->set('description', $description)
-			->set('tags', (array) $tags)
+			->set('tags', (array)$tags)
 			->set('task', Minion_Task::convert_class_to_task($this));
 
 		echo $view;
