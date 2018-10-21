@@ -205,7 +205,7 @@ class WebApp
         $app->get('/assets/{provider}/'.$itemPlace.'/'.$deleteAction.$sizePlace.$extPlace, PreviewMiddleware::class);
 
         // API HTTP gate
-        $app->post('/api/v{version:\d+}/{type:\s+}', ApiRequestHandler::class);
+        $app->post('/api/v{version:\d+}/{type:.+}', ApiRequestHandler::class);
     }
 
     public function processException(\Throwable $e): ResponseInterface
