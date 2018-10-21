@@ -1,5 +1,4 @@
 <?php
-
 namespace BetaKiller\Twig;
 
 use BetaKiller\View\ViewInterface;

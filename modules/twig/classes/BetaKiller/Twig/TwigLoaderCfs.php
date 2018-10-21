@@ -1,4 +1,5 @@
-<?php namespace BetaKiller\Twig;
+<?php
+namespace BetaKiller\Twig;
 
 use Kohana;
 use Twig_Loader_Filesystem;
