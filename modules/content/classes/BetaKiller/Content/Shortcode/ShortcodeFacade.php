@@ -82,13 +82,13 @@ class ShortcodeFacade
         return $this->shortcodeFactory->createFromEntity($param, $attributes);
     }
 
-    public function process(string $text, ServerRequestInterface $request): string
+    public function process(string $text, ServerRequestInterface $request, array $context): string
     {
         $handlers = new HandlerContainer();
 
-        $handlers->setDefault(function (ThunderShortcodeInterface $s) use ($request) {
+        $handlers->setDefault(function (ThunderShortcodeInterface $s) use ($request, $context) {
             try {
-                return $this->render($s->getName(), $s->getParameters(), $request);
+                return $this->render($s->getName(), $s->getParameters(), $request, $context);
             } catch (\Throwable $e) {
                 $this->logException($this->logger, $e);
 
@@ -96,24 +96,26 @@ class ShortcodeFacade
             }
         });
 
-        $processor = new Processor(new RegularParser(), $handlers);
-
-        return $processor->process($text);
+        return (new Processor(new RegularParser(), $handlers))->process($text);
     }
 
     /**
      * @param string                                   $tagName
-     * @param array|null                               $attributes
-     *
+     * @param array                                    $attributes
      * @param \Psr\Http\Message\ServerRequestInterface $request
+     * @param array                                    $context
      *
      * @return string
      * @throws \BetaKiller\Auth\AccessDeniedException
      * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\Repository\RepositoryException
      */
-    protected function render(string $tagName, array $attributes, ServerRequestInterface $request): string
-    {
+    protected function render(
+        string $tagName,
+        array $attributes,
+        ServerRequestInterface $request,
+        array $context
+    ): string {
         $shortcode = $this->createFromTagName($tagName, $attributes);
 
         /** @var \BetaKiller\Widget\ShortcodeWidget $widget */
@@ -121,7 +123,7 @@ class ShortcodeFacade
 
         $widget->setShortcode($shortcode);
 
-        return $this->widgetFacade->render($widget, $request, []); // No context for shortcodes
+        return $this->widgetFacade->render($widget, $request, $context);
     }
 
     public function stripTags(string $text): string

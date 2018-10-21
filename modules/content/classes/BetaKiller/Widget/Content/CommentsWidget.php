@@ -13,12 +13,6 @@ class CommentsWidget extends AbstractPublicWidget
 {
     /**
      * @Inject
-     * @var \BetaKiller\Model\UserInterface
-     */
-    private $user;
-
-    /**
-     * @Inject
      * @var \BetaKiller\Repository\ContentCommentRepository
      */
     private $commentRepository;
@@ -87,8 +81,8 @@ class CommentsWidget extends AbstractPublicWidget
 
         return [
             'comments'    => $commentsData,
-            'form_action' => $this->url('add'),
-            'token'       => Security::token(),
+            'form_action' => '#', // TODO
+            'token'       => \md5(\microtime()),// TODO Security::token(),
         ];
     }
 

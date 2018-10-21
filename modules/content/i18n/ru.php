@@ -38,6 +38,7 @@ return [
     ],
     'comment.reply'        => 'Ответить',
     'comment.save'         => 'Сохранить',
+    'comment.datetime'     => ':date at :time',
 
     'comment.list.empty' => 'Ура! Здесь пока нет комментариев.',
 
