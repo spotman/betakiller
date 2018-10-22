@@ -136,7 +136,7 @@ class AppEnv implements AppEnvInterface
 
     public function isDebugEnabled(): bool
     {
-        return $this->debugEnabled || !$this->inProductionMode();
+        return $this->debugEnabled || $this->inDevelopmentMode();
     }
 
     public function enableDebug(): void
