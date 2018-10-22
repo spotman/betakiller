@@ -6,8 +6,11 @@ namespace BetaKiller\Task;
 use BetaKiller\Cron\CronException;
 use BetaKiller\Cron\Task;
 use Cron\CronExpression;
-use Graze\ParallelProcess\Pool;
-use Graze\ParallelProcess\Table;
+use Graze\ParallelProcess\Display\Table;
+use Graze\ParallelProcess\Event\RunEvent;
+use Graze\ParallelProcess\PriorityPool;
+use Graze\ParallelProcess\ProcessRun;
+use Graze\ParallelProcess\RunInterface;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Yaml\Yaml;
@@ -15,8 +18,10 @@ use Symfony\Component\Yaml\Yaml;
 class Cron extends AbstractTask
 {
     public const EXPR_HELPERS = [
-        'hourly'
+        'hourly',
     ];
+
+    private const FINGERPRINT_TAG = 'fingerprint';
 
     /**
      * @var \BetaKiller\Helper\AppEnvInterface
@@ -112,7 +117,7 @@ class Cron extends AbstractTask
 
             // Ensure that target stage is reached
             if ($taskStage && $taskStage !== $this->currentStage) {
-                $this->logger->debug('Skipping task [:name] for stage :stage', [
+                $this->logDebug('Skipping task [:name] for :stage', [
                     ':name'  => $name,
                     ':stage' => $taskStage,
                 ]);
@@ -123,11 +128,11 @@ class Cron extends AbstractTask
             $cron = CronExpression::factory($expr);
 
             if (!$cron->isDue()) {
-                $this->logger->debug('Task [:task] is not due, skipping', [':task' => $name]);
+                $this->logDebug('Task [:task] is not due, skipping', [':task' => $name]);
                 continue;
             }
 
-            $this->logger->debug('Task [:task] is due', [':task' => $name]);
+            $this->logDebug('Task [:task] is due', [':task' => $name]);
 
             $task = new Task($name, $params);
 
@@ -140,7 +145,7 @@ class Cron extends AbstractTask
             // Enqueue task
             $this->queue->enqueue($task);
 
-            $this->logger->debug('Task [:task] was queued', [':task' => $name]);
+            $this->logDebug('Task [:task] was queued', [':task' => $name]);
         }
     }
 
@@ -149,86 +154,94 @@ class Cron extends AbstractTask
      */
     private function runQueuedTasks(): void
     {
-        $pool = new Pool();
-        $pool->setMaxSimultaneous(3);
-
-        $pool->setOnStart(function (Process $process) {
-            $task = $this->getTaskByProcessFingerprint($process);
-
-            $task->started();
-
-            $this->logger->debug('Task [:name] is started', [':name' => $task->getName()]);
-        });
-
-        $pool->setOnSuccess(function (Process $process) {
-            $task = $this->getTaskByProcessFingerprint($process);
-
-            $task->done();
-            $this->queue->dequeue($task);
-
-            $this->logger->debug('Task [:name] is done!', [':name' => $task->getName()]);
-        });
-
-        $pool->setOnFailure(function (Process $process) {
-            $task = $this->getTaskByProcessFingerprint($process);
-
-            $task->failed();
-
-            $nextRunTime = new \DateTimeImmutable;
-            $task->postpone($nextRunTime->add(new \DateInterval('PT5M')));
-
-            $this->logger->debug('Task [:name] is failed', [':name' => $task->getName()]);
-        });
-
-
-        $verbosity = $this->env->isDebugEnabled()
-            ? ConsoleOutput::VERBOSITY_DEBUG
-            : ConsoleOutput::VERBOSITY_VERY_VERBOSE;
-
-        $output = new ConsoleOutput($verbosity);
-        $table  = new Table($output, $pool);
+        $pool = new PriorityPool();
+        $pool->setMaxSimultaneous(5);
 
         // Select queued tasks where start_at >= current time, limit 5
         // It allows to postpone failed tasks for 5 minutes
         foreach ($this->queue->getReadyToStart() as $task) {
-            $this->logger->debug('Task [:name] is ready to start', [':name' => $task->getName()]);
-
-            $cmd = $this->getTaskCmd($task, $this->currentStage);
-
-            $process = new Process($cmd);
-
-            // Store fingerprint for simpler task identification upon start
-            $process->setEnv([
-                'fingerprint' => $task->getFingerprint(),
-            ]);
-
-            if ($this->isHuman) {
-                $table->add($process);
-            } else {
-                $pool->add($process);
-            }
+            $pool->add($this->makeTaskRun($task));
         }
 
         if ($this->isHuman) {
+            $verbosity = $this->env->isDebugEnabled()
+                ? ConsoleOutput::VERBOSITY_DEBUG
+                : ConsoleOutput::VERBOSITY_VERY_VERBOSE;
+
+            $output = new ConsoleOutput($verbosity);
+            $table  = new Table($output, $pool);
+
             $table->run();
         } else {
             $pool->run();
         }
     }
 
+    private function makeTaskRun(Task $task): RunInterface
+    {
+        $this->logDebug('Task [:name] is ready to start', [':name' => $task->getName()]);
+
+        $cmd = $this->getTaskCmd($task, $this->currentStage);
+
+        // Store fingerprint for simpler task identification upon start
+        $tags = [
+            self::FINGERPRINT_TAG => $task->getFingerprint(),
+            'name'                => $task->getName(),
+        ];
+
+        $run = new ProcessRun(new Process($cmd), $tags);
+
+        $run->addListener(RunEvent::STARTED, function (RunEvent $event) {
+            $task = $this->getTaskFromRunEvent($event);
+
+            $task->started();
+
+            $this->logDebug('Task [:name] is started', [':name' => $task->getName()]);
+        });
+
+        $run->addListener(RunEvent::SUCCESSFUL, function (RunEvent $event) {
+            $task = $this->getTaskFromRunEvent($event);
+
+            $task->done();
+            $this->queue->dequeue($task);
+
+            $this->logDebug('Task :name succeeded', [
+                ':name' => $task->getName(),
+            ]);
+        });
+
+        $run->addListener(RunEvent::FAILED, function (RunEvent $runEvent) {
+            $task = $this->getTaskFromRunEvent($runEvent);
+
+            $task->failed();
+
+            $till = (new \DateTimeImmutable)->add(new \DateInterval('PT15M'));
+            $task->postpone($till);
+
+            $this->logDebug('Task [:name] is failed and postponed till :time', [
+                ':name' => $task->getName(),
+                ':till' => $till->format('H:i:s d.m.Y'),
+            ]);
+        });
+
+        return $run;
+    }
+
     /**
-     * @param \Symfony\Component\Process\Process $process
+     * @param \Graze\ParallelProcess\Event\RunEvent $event
      *
      * @return \BetaKiller\Cron\Task
      * @throws \BetaKiller\Cron\CronException
      */
-    private function getTaskByProcessFingerprint(Process $process): Task
+    private function getTaskFromRunEvent(RunEvent $event): Task
     {
-        $env         = $process->getEnv();
-        $fingerprint = $env['fingerprint'] ?? '';
+        $tags        = $event->getRun()->getTags();
+        $fingerprint = $tags[self::FINGERPRINT_TAG] ?? '';
 
         if (!$fingerprint) {
-            throw new CronException('Missing process fingerprint');
+            throw new CronException('Missing process fingerprint, tags are :values', [
+                ':values' => \json_encode($tags),
+            ]);
         }
 
         return $this->queue->getByFingerprint($fingerprint);
@@ -259,5 +272,12 @@ class Cron extends AbstractTask
         }
 
         return $cmd;
+    }
+
+    private function logDebug(string $message, array $params = null): void
+    {
+        if (!$this->isHuman) {
+            $this->logger->debug($message, $params);
+        }
     }
 }

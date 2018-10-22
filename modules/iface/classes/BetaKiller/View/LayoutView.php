@@ -4,105 +4,41 @@ namespace BetaKiller\View;
 class LayoutView implements LayoutViewInterface
 {
     /**
-     * @var string
-     */
-    private $layoutCodename;
-
-    /**
-     * @var string
-     */
-    private $wrapperCodename = self::WRAPPER_HTML5;
-
-    /**
      * @var \BetaKiller\View\ViewFactoryInterface
      */
     private $viewFactory;
 
     /**
-     * @var \BetaKiller\View\HtmlHeadHelper
-     */
-    private $headHelper;
-
-    /**
      * LayoutView constructor.
      *
      * @param \BetaKiller\View\ViewFactoryInterface $viewFactory
-     * @param \BetaKiller\View\HtmlHeadHelper       $headHelper
      */
-    public function __construct(ViewFactoryInterface $viewFactory, HtmlHeadHelper $headHelper)
+    public function __construct(ViewFactoryInterface $viewFactory)
     {
         $this->viewFactory = $viewFactory;
-        $this->headHelper = $headHelper;
     }
 
-    /**
-     * @return string
-     */
-    public function getLayoutCodename(): string
+    public function render(ViewInterface $ifaceView, HtmlRenderHelper $renderHelper): string
     {
-        return $this->layoutCodename;
-    }
-
-    /**
-     * @param string $layoutCodename
-     *
-     * @return \BetaKiller\View\LayoutViewInterface
-     */
-    public function setLayoutCodename(string $layoutCodename): LayoutViewInterface
-    {
-        $this->layoutCodename = $layoutCodename;
-
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getWrapperCodename(): string
-    {
-        return $this->wrapperCodename;
-    }
-
-    /**
-     * @param string $wrapperCodename
-     *
-     * @return \BetaKiller\View\LayoutViewInterface
-     */
-    public function setWrapperCodename(string $wrapperCodename): LayoutViewInterface
-    {
-        $this->wrapperCodename = $wrapperCodename;
-
-        return $this;
-    }
-
-    public function render(ViewInterface $ifaceView): string
-    {
-        $layoutPath = $this->getLayoutViewPath();
+        $layoutPath = $this->getLayoutViewPath($renderHelper->getLayoutCodename());
         $layoutView = $this->createView($layoutPath);
+
+        // Inject helper objects
+        foreach ($renderHelper->getLayoutHelperObjects() as $key => $value) {
+            $ifaceView->set($key, $value);
+        }
 
         $layoutView->set('content', $ifaceView->render());
 
-        return $this->wrap(
-            $layoutView->render()
-        );
+        return $this->wrap($layoutView->render(), $renderHelper);
     }
 
-    /**
-     * @return \BetaKiller\View\LayoutViewInterface
-     */
-    public function clear(): LayoutViewInterface
+    protected function wrap(string $layoutContent, HtmlRenderHelper $helper): string
     {
-        $this->headHelper->clear();
+        $wrapperPath = $this->getWrapperViewPath($helper->getWrapperCodename());
+        $view        = $this->createView($wrapperPath);
 
-        return $this;
-    }
-
-    protected function wrap(string $layoutContent): string
-    {
-        $wrapperPath = $this->getWrapperViewPath();
-        $view = $this->createView($wrapperPath);
-
-        foreach ($this->getWrapperData() as $key => $value) {
+        foreach ($helper->getWrapperData() as $key => $value) {
             $view->set($key, $value);
         }
 
@@ -111,22 +47,14 @@ class LayoutView implements LayoutViewInterface
         return $view->render();
     }
 
-    protected function getWrapperData(): array
+    protected function getLayoutViewPath(string $layoutCodename): string
     {
-        return [
-            'lang' => $this->headHelper->getLang(),
-            'head' => $this->headHelper->renderAll(),
-        ];
+        return $this->getLayoutBasePath().DIRECTORY_SEPARATOR.$layoutCodename;
     }
 
-    protected function getLayoutViewPath(): string
+    protected function getWrapperViewPath(string $wrapperCodename): string
     {
-        return $this->getLayoutBasePath().DIRECTORY_SEPARATOR.$this->layoutCodename;
-    }
-
-    protected function getWrapperViewPath(): string
-    {
-        return $this->getWrapperBasePath().DIRECTORY_SEPARATOR.$this->wrapperCodename;
+        return $this->getWrapperBasePath().DIRECTORY_SEPARATOR.$wrapperCodename;
     }
 
     protected function getLayoutBasePath(): string

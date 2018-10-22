@@ -4,7 +4,7 @@ namespace BetaKiller\Error;
 use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\Log\LazyLoadProxyHandler;
 use BetaKiller\Log\LoggerInterface;
-use BetaKiller\Log\StripExceptionFromContextFormatter;
+use BetaKiller\Log\ContextCleanupFormatter;
 use BetaKiller\ModuleInitializerInterface;
 use Monolog\Handler\PHPConsoleHandler;
 use PhpConsole\Connector;
@@ -87,7 +87,7 @@ class Initializer implements ModuleInitializerInterface
             'useOwnExceptionsHandler'  => false,    // Enable exceptions handling
         ]);
 
-        $phpConsoleHandler->setFormatter(new StripExceptionFromContextFormatter());
+        $phpConsoleHandler->setFormatter(new ContextCleanupFormatter());
 
         $this->logger->pushHandler($phpConsoleHandler);
     }

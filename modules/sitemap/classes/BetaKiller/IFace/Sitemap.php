@@ -4,15 +4,20 @@ declare(strict_types=1);
 namespace BetaKiller\IFace;
 
 use BetaKiller\Helper\ServerRequestHelper;
+use BetaKiller\Url\AvailableUrlsCollector;
 use Psr\Http\Message\ServerRequestInterface;
 
 class Sitemap extends AbstractIFace
 {
     /**
-     * @Inject
      * @var \BetaKiller\Url\AvailableUrlsCollector
      */
-    private $urlsCollector;
+    private $collector;
+
+    public function __construct(AvailableUrlsCollector $collector)
+    {
+        $this->collector = $collector;
+    }
 
     /**
      * Returns data for View
@@ -26,9 +31,9 @@ class Sitemap extends AbstractIFace
     public function getData(ServerRequestInterface $request): array
     {
         $urlHelper = ServerRequestHelper::getUrlHelper($request);
-        $data = [];
+        $data      = [];
 
-        foreach ($this->urlsCollector->getPublicAvailableUrls($urlHelper) as $item) {
+        foreach ($this->collector->getPublicAvailableUrls($urlHelper) as $item) {
             $data[] = $item->getUrl();
         }
 

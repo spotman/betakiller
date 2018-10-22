@@ -216,4 +216,14 @@ class AppEnv implements AppEnvInterface
     {
         return \sys_get_temp_dir();
     }
+
+    /**
+     * Returns email which will receive all emails in debug mode
+     *
+     * @return string
+     */
+    public function getDebugEmail(): string
+    {
+        return $this->getEnvVariable('DEBUG_EMAIL_ADDRESS');
+    }
 }

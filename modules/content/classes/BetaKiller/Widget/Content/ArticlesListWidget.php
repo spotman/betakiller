@@ -1,19 +1,23 @@
 <?php
 namespace BetaKiller\Widget\Content;
 
+use BetaKiller\Helper\AssetsHelper;
+use BetaKiller\Helper\ContentHelper;
 use BetaKiller\Helper\ContentUrlContainerHelper;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Helper\UrlHelper;
 use BetaKiller\Model\ContentCategory;
 use BetaKiller\Model\ContentCategoryInterface;
 use BetaKiller\Model\ContentPost;
+use BetaKiller\Repository\ContentCategoryRepository;
+use BetaKiller\Repository\ContentPostRepository;
 use BetaKiller\Search\SearchResultsInterface;
 use BetaKiller\Url\ZoneInterface;
 use BetaKiller\Widget\AbstractPublicWidget;
 use HTML;
 use Psr\Http\Message\ServerRequestInterface;
 
-class ArticlesListWidget extends AbstractPublicWidget
+final class ArticlesListWidget extends AbstractPublicWidget
 {
     private const CATEGORY_ID_QUERY_KEY = 'category-id';
     private const PAGE_QUERY_KEY        = 'page';
@@ -21,32 +25,48 @@ class ArticlesListWidget extends AbstractPublicWidget
 
     /**
      * @var \BetaKiller\Helper\ContentHelper
-     * @Inject
      */
     private $contentHelper;
 
     /**
      * @var \BetaKiller\Repository\ContentPostRepository
-     * @Inject
      */
     private $postRepo;
 
     /**
      * @var \BetaKiller\Repository\ContentCategoryRepository
-     * @Inject
      */
     private $categoryRepo;
 
     /**
      * @var \BetaKiller\Helper\AssetsHelper
-     * @Inject
      */
     private $assetsHelper;
 
     /**
      * @var int
      */
-    protected $itemsPerPage = 12;
+    private $itemsPerPage = 12;
+
+    /**
+     * ArticlesListWidget constructor.
+     *
+     * @param \BetaKiller\Helper\ContentHelper                 $contentHelper
+     * @param \BetaKiller\Repository\ContentPostRepository     $postRepo
+     * @param \BetaKiller\Repository\ContentCategoryRepository $categoryRepo
+     * @param \BetaKiller\Helper\AssetsHelper                  $assetsHelper
+     */
+    public function __construct(
+        ContentHelper $contentHelper,
+        ContentPostRepository $postRepo,
+        ContentCategoryRepository $categoryRepo,
+        AssetsHelper $assetsHelper
+    ) {
+        $this->contentHelper = $contentHelper;
+        $this->postRepo      = $postRepo;
+        $this->categoryRepo  = $categoryRepo;
+        $this->assetsHelper  = $assetsHelper;
+    }
 
     /**
      * Returns data for View rendering
@@ -103,7 +123,7 @@ class ArticlesListWidget extends AbstractPublicWidget
      *
      * @return array
      * @throws \BetaKiller\Assets\Exception\AssetsException
-     * @throws \BetaKiller\Assets\AssetsStorageException
+     * @throws \BetaKiller\Assets\Exception\AssetsStorageException
      * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\IFace\Exception\UrlElementException
      * @throws \BetaKiller\Repository\RepositoryException

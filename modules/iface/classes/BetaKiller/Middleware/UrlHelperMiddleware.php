@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace BetaKiller\Middleware;
 
 use BetaKiller\Dev\Profiler;
-use BetaKiller\DI\ContainerInterface;
+use BetaKiller\Factory\UrlHelperFactory;
 use BetaKiller\Helper\UrlHelper;
 use BetaKiller\Url\Container\ResolvingUrlContainer;
 use BetaKiller\Url\Container\UrlContainerInterface;
@@ -17,18 +17,18 @@ use Psr\Http\Server\RequestHandlerInterface;
 class UrlHelperMiddleware implements MiddlewareInterface
 {
     /**
-     * @var \BetaKiller\DI\ContainerInterface
+     * @var \BetaKiller\Factory\UrlHelperFactory
      */
-    private $container;
+    private $factory;
 
     /**
      * UrlHelperMiddleware constructor.
      *
-     * @param \BetaKiller\DI\ContainerInterface $container
+     * @param \BetaKiller\Factory\UrlHelperFactory $factory
      */
-    public function __construct(ContainerInterface $container)
+    public function __construct(UrlHelperFactory $factory)
     {
-        $this->container = $container;
+        $this->factory = $factory;
     }
 
     /**
@@ -47,11 +47,7 @@ class UrlHelperMiddleware implements MiddlewareInterface
         $params = ResolvingUrlContainer::create();
         $stack  = new UrlElementStack($params);
 
-        /** @var UrlHelper $urlHelper */
-        $urlHelper = $this->container->make(UrlHelper::class, [
-            'stack'  => $stack,
-            'params' => $params,
-        ]);
+        $urlHelper = $this->factory->create($params, $stack);
 
         /** @noinspection CallableParameterUseCaseInTypeContextInspection */
         $request = $request

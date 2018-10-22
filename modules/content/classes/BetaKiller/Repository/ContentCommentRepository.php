@@ -1,6 +1,7 @@
 <?php
 namespace BetaKiller\Repository;
 
+use BetaKiller\Factory\OrmFactory;
 use BetaKiller\Model\ContentComment;
 use BetaKiller\Model\ContentCommentInterface;
 use BetaKiller\Model\ContentCommentStatus;
@@ -33,6 +34,19 @@ class ContentCommentRepository extends AbstractOrmBasedSingleParentTreeRepositor
      * @var \BetaKiller\Repository\ContentCommentStatusRepository
      */
     private $commentStatusRepository;
+
+    /**
+     * AbstractOrmBasedRepository constructor.
+     *
+     * @param \BetaKiller\Factory\OrmFactory                        $ormFactory
+     * @param \BetaKiller\Repository\ContentCommentStatusRepository $commentStatusRepo
+     */
+    public function __construct(OrmFactory $ormFactory, ContentCommentStatusRepository $commentStatusRepo)
+    {
+        parent::__construct($ormFactory);
+
+        $this->commentStatusRepository = $commentStatusRepo;
+    }
 
     /**
      * @return string
@@ -176,7 +190,7 @@ class ContentCommentRepository extends AbstractOrmBasedSingleParentTreeRepositor
 
             // Add root level
             $levels[] = 0;
-            $path = implode('.', array_reverse($levels));
+            $path     = implode('.', array_reverse($levels));
 
             $entity->setPath($path);
         }

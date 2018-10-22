@@ -1,6 +1,8 @@
 <?php
 namespace BetaKiller\Repository;
 
+use BetaKiller\Config\AppConfigInterface;
+use BetaKiller\Factory\OrmFactory;
 use BetaKiller\Model\RefDomain;
 use BetaKiller\Model\RefPage;
 use BetaKiller\Utils\Kohana\ORM\OrmInterface;
@@ -16,16 +18,32 @@ use BetaKiller\Utils\Kohana\ORM\OrmInterface;
 class RefPageRepository extends AbstractOrmBasedRepository
 {
     /**
-     * @Inject
      * @var \BetaKiller\Repository\RefDomainRepository
      */
-    private $domainRepository;
+    private $domainRepo;
 
     /**
-     * @Inject
      * @var \BetaKiller\Config\AppConfigInterface
      */
     private $appConfig;
+
+    /**
+     * AbstractOrmBasedRepository constructor.
+     *
+     * @param \BetaKiller\Factory\OrmFactory             $ormFactory
+     * @param \BetaKiller\Repository\RefDomainRepository $domainRepository
+     * @param \BetaKiller\Config\AppConfigInterface      $appConfig
+     */
+    public function __construct(
+        OrmFactory $ormFactory,
+        RefDomainRepository $domainRepository,
+        AppConfigInterface $appConfig
+    ) {
+        parent::__construct($ormFactory);
+
+        $this->domainRepo = $domainRepository;
+        $this->appConfig  = $appConfig;
+    }
 
     /**
      * @param string    $url
@@ -52,10 +70,10 @@ class RefPageRepository extends AbstractOrmBasedRepository
         $urlPart = explode($domainName, $url)[1];
 
         // Find domain first
-        $domain = $this->domainRepository->getByName($domainName);
+        $domain = $this->domainRepo->getByName($domainName);
 
         if (!$domain && $createMissing) {
-            $domain = $this->domainRepository->create()
+            $domain = $this->domainRepo->create()
                 ->setName($domainName);
 
             if ($domainName === $siteDomain) {
@@ -66,7 +84,7 @@ class RefPageRepository extends AbstractOrmBasedRepository
                 $domain->markAsExternal();
             }
 
-            $this->domainRepository->save($domain);
+            $this->domainRepo->save($domain);
         }
 
         if (!$domain) {

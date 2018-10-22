@@ -85,7 +85,11 @@ class Debug extends Kohana_Debug
             }
 
             // Instantiate the error view.
-            $view = View::factory('kohana/error', get_defined_vars());
+            $view = View::factory('kohana/error');
+
+            foreach (get_defined_vars() as $varName => $varValue) {
+                $view->set($varName, $varValue);
+            }
 
             // Set the response body
             return $view->render();

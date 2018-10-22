@@ -8,7 +8,8 @@
 {% if layout == "default" %}
 
   {% if zoomable %}
-    <a href="{{ href }}" title="{{ image.title|default(image.alt) }}" class="fancybox {{ alignClass }}" data-caption="{{ caption }}">
+    <a href="{{ href }}" title="{{ image.title|default(image.alt) }}" class="fancybox {{ alignClass }}"
+       data-caption="{{ caption }}">
       {{ image(image, {}, true) }} {# ~ " responsive-img" #}
     </a>
   {% else %}

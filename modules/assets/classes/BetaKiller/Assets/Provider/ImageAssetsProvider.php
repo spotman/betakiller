@@ -94,7 +94,7 @@ final class ImageAssetsProvider extends AbstractHasPreviewAssetsProvider impleme
      * @return string
      * @throws \BetaKiller\Assets\Exception\AssetsException
      * @throws \BetaKiller\Assets\Exception\AssetsProviderException
-     * @throws \BetaKiller\Assets\AssetsStorageException
+     * @throws \BetaKiller\Assets\Exception\AssetsStorageException
      */
     public function makePreviewContent(AssetsModelInterface $model, string $size): string
     {
@@ -158,9 +158,10 @@ final class ImageAssetsProvider extends AbstractHasPreviewAssetsProvider impleme
      * @param integer $quality
      *
      * @returns string Processed content
+     * @return string
      * @throws AssetsProviderException
      */
-    protected function resize($originalContent, $width, $height, $quality): string
+    private function resize($originalContent, $width, $height, $quality): string
     {
         try {
             $image = Image::fromContent($originalContent);
@@ -251,7 +252,7 @@ final class ImageAssetsProvider extends AbstractHasPreviewAssetsProvider impleme
      * @throws \BetaKiller\Assets\Exception\AssetsException
      * @throws \BetaKiller\Assets\Exception\AssetsProviderException
      */
-    protected function getSrcsetAttributeValue(AssetsModelImageInterface $model, $ratio = null): string
+    private function getSrcsetAttributeValue(AssetsModelImageInterface $model, $ratio = null): string
     {
         $originalWidth = $model->getWidth();
         $modelRatio    = $this->getModelRatio($model);
@@ -291,7 +292,7 @@ final class ImageAssetsProvider extends AbstractHasPreviewAssetsProvider impleme
      * @return array
      * @throws \BetaKiller\Assets\Exception\AssetsProviderException
      */
-    protected function getSrcsetSizes(float $ratio = null): array
+    private function getSrcsetSizes(float $ratio = null): array
     {
         $allowedSizes = $this->getAllowedPreviewSizes();
 
@@ -324,7 +325,7 @@ final class ImageAssetsProvider extends AbstractHasPreviewAssetsProvider impleme
      * @return float
      * @throws \BetaKiller\Assets\Exception\AssetsProviderException
      */
-    protected function getSizeRatio($size, $originalRatio = null): float
+    private function getSizeRatio($size, $originalRatio = null): float
     {
         $dimensions = $this->parseSizeDimensions($size);
 
@@ -341,12 +342,12 @@ final class ImageAssetsProvider extends AbstractHasPreviewAssetsProvider impleme
      * @return float
      * @throws \BetaKiller\Assets\Exception\AssetsProviderException
      */
-    protected function getModelRatio(AssetsModelImageInterface $image): float
+    private function getModelRatio(AssetsModelImageInterface $image): float
     {
         return $this->calculateDimensionsRatio($image->getWidth(), $image->getHeight());
     }
 
-    protected function makeSrcsetWidthOption($url, $width): string
+    private function makeSrcsetWidthOption($url, $width): string
     {
         return $url.' '.$width.'w';
     }
@@ -356,7 +357,10 @@ final class ImageAssetsProvider extends AbstractHasPreviewAssetsProvider impleme
      */
     public function getUploadMaxHeight(): ?int
     {
-        return $this->getAssetsProviderConfigValue([self::CONFIG_MODEL_UPLOAD_KEY, self::CONFIG_MODEL_MAX_HEIGHT_KEY]);
+        return $this->config->getProviderConfigValue($this, [
+            self::CONFIG_MODEL_UPLOAD_KEY,
+            self::CONFIG_MODEL_MAX_HEIGHT_KEY,
+        ]);
     }
 
     /**
@@ -364,7 +368,10 @@ final class ImageAssetsProvider extends AbstractHasPreviewAssetsProvider impleme
      */
     public function getUploadMaxWidth(): ?int
     {
-        return $this->getAssetsProviderConfigValue([self::CONFIG_MODEL_UPLOAD_KEY, self::CONFIG_MODEL_MAX_WIDTH_KEY]);
+        return $this->config->getProviderConfigValue($this, [
+            self::CONFIG_MODEL_UPLOAD_KEY,
+            self::CONFIG_MODEL_MAX_WIDTH_KEY,
+        ]);
     }
 
     /**
@@ -377,7 +384,7 @@ final class ImageAssetsProvider extends AbstractHasPreviewAssetsProvider impleme
      * @throws \BetaKiller\Assets\Exception\AssetsException
      * @throws \BetaKiller\Assets\Exception\AssetsUploadException
      * @throws \BetaKiller\Assets\Exception\AssetsProviderException
-     * @throws \BetaKiller\Assets\AssetsStorageException
+     * @throws \BetaKiller\Assets\Exception\AssetsStorageException
      */
     public function store(string $fullPath, string $originalName, UserInterface $user): AssetsModelInterface
     {
@@ -393,7 +400,7 @@ final class ImageAssetsProvider extends AbstractHasPreviewAssetsProvider impleme
      * @param \BetaKiller\Assets\Model\AssetsModelImageInterface $model
      *
      * @throws \BetaKiller\Exception
-     * @throws \BetaKiller\Assets\AssetsStorageException
+     * @throws \BetaKiller\Assets\Exception\AssetsStorageException
      * @throws \BetaKiller\Assets\Exception\AssetsException
      */
     private function detectImageDimensions(AssetsModelImageInterface $model): void

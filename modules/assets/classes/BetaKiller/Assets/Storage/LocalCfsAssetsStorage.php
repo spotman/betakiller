@@ -1,7 +1,7 @@
 <?php
 namespace BetaKiller\Assets\Storage;
 
-use BetaKiller\Assets\AssetsStorageException;
+use BetaKiller\Assets\Exception\AssetsStorageException;
 
 class LocalCfsAssetsStorage implements AssetsStorageInterface
 {
@@ -85,7 +85,7 @@ class LocalCfsAssetsStorage implements AssetsStorageInterface
      * @param string $path Local path in storage
      *
      * @return string[]
-     * @throws \BetaKiller\Assets\AssetsStorageException
+     * @throws \BetaKiller\Assets\Exception\AssetsStorageException
      */
     public function getFiles(string $path): array
     {
@@ -98,7 +98,7 @@ class LocalCfsAssetsStorage implements AssetsStorageInterface
      * @param string $path Local path
      *
      * @return void
-     * @throws \BetaKiller\Assets\AssetsStorageException
+     * @throws \BetaKiller\Assets\Exception\AssetsStorageException
      */
     public function deleteDirectory(string $path): void
     {
