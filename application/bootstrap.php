@@ -133,11 +133,6 @@ Kohana::$config->attach(new Config_File('config/environments/'.Kohana::$environm
  */
 Kohana::init(Kohana::$config->load('init')->as_array());
 
-/**
- * Attach the file write to logging errors. Multiple writers are supported.
- */
-Kohana::$log->attach(new Log_File(APPPATH.'logs'), Log::NOTICE);
-
 // Attach basic log for debugging unit tests
 if (PHP_SAPI === 'cli' && Kohana::$environment === Kohana::TESTING) {
     Kohana::$log->attach(new Log_StdOut(), Log::DEBUG, Log::EMERGENCY);
