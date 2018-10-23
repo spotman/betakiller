@@ -10,12 +10,16 @@ class SleepDaemon implements DaemonInterface
     public function start(): void
     {
         // Test start
+        echo 'Starting Sleep daemon...';
         sleep(10);
+        echo 'OK'.\PHP_EOL;
     }
 
     public function stop(): void
     {
         // Test stop
+        echo 'Stopping Sleep daemon...';
         sleep(2);
+        echo 'OK'.\PHP_EOL;
     }
 }
