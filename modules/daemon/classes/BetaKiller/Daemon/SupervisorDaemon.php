@@ -7,9 +7,11 @@ use BetaKiller\Config\ConfigProviderInterface;
 use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\Task\AbstractTask;
 use Graze\ParallelProcess\Display\Table;
+use Graze\ParallelProcess\Event\RunEvent;
 use Graze\ParallelProcess\Monitor\PoolLogger;
 use Graze\ParallelProcess\Pool;
 use Graze\ParallelProcess\ProcessRun;
+use Graze\ParallelProcess\RunInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Process\Process;
@@ -72,6 +74,7 @@ class SupervisorDaemon implements DaemonInterface
 
         if ($this->appEnv->isDebugEnabled()) {
             $this->addProcess(SleepDaemon::CODENAME);
+            $this->addProcess(FailingDaemon::CODENAME);
         }
 
         $verbosity = $this->appEnv->isDebugEnabled()
@@ -92,16 +95,23 @@ class SupervisorDaemon implements DaemonInterface
 
     public function stop(): void
     {
+        $this->logger->debug('Shutting down daemons');
+
         foreach ($this->pool->getRunning() as $run) {
-            if ($run instanceof ProcessRun) {
-                $process = $run->getProcess();
-                $process->stop(5);
+            if (!$run instanceof ProcessRun) {
+                throw new \LogicException('Pool must consist of ProcessRun instances only');
             }
+
+            $process = $run->getProcess();
+            $this->logger->debug('Sending signal to ":name" daemon with PID = :pid', [
+                ':pid'  => $process->getPid(),
+                ':name' => $this->getNameFromRun($run),
+            ]);
+
+            $process->stop(3);
         }
 
-        while ($this->pool->isRunning()) {
-            \usleep(100000);
-        }
+        $this->logger->debug('All daemons are stopped, supervisor is shutting down');
     }
 
     private function addProcess(string $codename): ProcessRun
@@ -122,22 +132,27 @@ class SupervisorDaemon implements DaemonInterface
             'name' => $codename,
         ]);
 
-//        $run->addListener(RunEvent::FAILED, function (RunEvent $runEvent) {
-//            $name = $runEvent->getRun()->getTags()['name'];
-//
-//            $time = \microtime(true);
-//
-//            // Tiny delay for 3 seconds
-//            while (\microtime(true) < $time + 3) {
-//                usleep(10000);
-//            }
-//
-//            // Restart
-//            $this->addProcess($name)->start();
-//        });
+        $run->addListener(RunEvent::FAILED, function (RunEvent $runEvent) {
+            $name = $this->getNameFromRun($runEvent->getRun());
+
+            $time = \microtime(true);
+
+            // Tiny delay for 3 seconds
+            while (\microtime(true) < $time + 3) {
+                usleep(10000);
+            }
+
+            // Restart
+            $this->addProcess($name)->start();
+        });
 
         $this->pool->add($run);
 
         return $run;
+    }
+
+    private function getNameFromRun(RunInterface $run): string
+    {
+        return $run->getTags()['name'];
     }
 }

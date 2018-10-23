@@ -5,10 +5,14 @@ namespace BetaKiller\Task\Daemon;
 
 use BetaKiller\Daemon\DaemonFactory;
 use BetaKiller\Helper\AppEnvInterface;
+use BetaKiller\Helper\LoggerHelperTrait;
 use BetaKiller\Task\AbstractTask;
+use Psr\Log\LoggerInterface;
 
 class Run extends AbstractTask
 {
+    use LoggerHelperTrait;
+
     /**
      * @var \BetaKiller\Daemon\DaemonFactory
      */
@@ -30,15 +34,22 @@ class Run extends AbstractTask
     private $daemon;
 
     /**
+     * @var \Psr\Log\LoggerInterface
+     */
+    private $logger;
+
+    /**
      * Run constructor.
      *
      * @param \BetaKiller\Daemon\DaemonFactory   $factory
      * @param \BetaKiller\Helper\AppEnvInterface $appEnv
+     * @param \Psr\Log\LoggerInterface           $logger
      */
-    public function __construct(DaemonFactory $factory, AppEnvInterface $appEnv)
+    public function __construct(DaemonFactory $factory, AppEnvInterface $appEnv, LoggerInterface $logger)
     {
         $this->appEnv  = $appEnv;
         $this->factory = $factory;
+        $this->logger  = $logger;
 
         parent::__construct();
     }
@@ -60,8 +71,12 @@ class Run extends AbstractTask
     {
         $this->codename = \ucfirst((string)$this->getOption('name', true));
 
+        if (!$this->codename) {
+            throw new \LogicException('Daemon codename is not defined');
+        }
+
         // Check if it is running already and exit if so
-        if (!$this->tryLock()) {
+        if (!$this->lock()) {
             echo sprintf('Daemon "%s" is already running'.\PHP_EOL, $this->codename);
 
             return;
@@ -70,41 +85,47 @@ class Run extends AbstractTask
         $this->addSignalHandlers();
 
         $this->daemon = $this->factory->create($this->codename);
-        $this->daemon->start();
+
+        try {
+            $this->daemon->start();
+        } catch (\Throwable $e) {
+            $this->logException($this->logger, $e);
+            $this->shutdown();
+            exit(1);
+        }
     }
 
-    public function stop(): void
+    public function shutdown(): void
     {
         $this->daemon->stop();
+
         $this->unlock();
     }
 
     private function addSignalHandlers(): void
     {
-        // Remove the lock on exit (Control+C doesn't count as 'exit')
-        register_shutdown_function([$this, 'stop']);
+        pcntl_async_signals(true);
 
-        $stopCallable = function () {
-            $this->stop();
+        $signalCallable = function (int $signal) {
+            $this->logger->debug('Received ":value" signal for ":name" daemon', [
+                ':value' => $signal,
+                ':name'  => $this->codename,
+            ]);
+            $this->shutdown();
             exit(0);
         };
 
-        \pcntl_signal(\SIGHUP, $stopCallable);
-        \pcntl_signal(\SIGQUIT, $stopCallable);
-        \pcntl_signal(\SIGTERM, $stopCallable);
-        \pcntl_signal(\SIGINT, $stopCallable);
+        /**
+         * @see https://stackoverflow.com/a/38991496
+         */
+        \pcntl_signal(\SIGHUP, $signalCallable);
+        \pcntl_signal(\SIGINT, $signalCallable);
+        \pcntl_signal(\SIGQUIT, $signalCallable);
+        \pcntl_signal(\SIGTERM, $signalCallable);
+        \pcntl_signal(\SIGALRM, $signalCallable);
     }
 
-    private function unlock(): void
-    {
-        $file = $this->getLockFileName();
-
-        if (\file_exists($file)) {
-            \unlink($file);
-        }
-    }
-
-    private function tryLock(): bool
+    private function lock(): bool
     {
         $lockFile = $this->getLockFileName();
 
@@ -121,14 +142,27 @@ class Run extends AbstractTask
             \unlink($lockFile);
 
             // Try to lock again
-            return $this->tryLock();
+            return $this->lock();
         }
 
         return false;
     }
 
+    private function unlock(): void
+    {
+        $file = $this->getLockFileName();
+
+        if (\file_exists($file)) {
+            \unlink($file);
+        }
+    }
+
     private function getLockFileName(): string
     {
+        if (!$this->codename) {
+            throw new \LogicException('Daemon codename is not defined');
+        }
+
         return $this->appEnv->getTempPath().\DIRECTORY_SEPARATOR.'.'.$this->codename.'.lock';
     }
 }
