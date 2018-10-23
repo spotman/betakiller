@@ -163,6 +163,6 @@ class Run extends AbstractTask
             throw new \LogicException('Daemon codename is not defined');
         }
 
-        return $this->appEnv->getTempPath().\DIRECTORY_SEPARATOR.'.'.$this->codename.'.lock';
+        return $this->appEnv->getTempPath().\DIRECTORY_SEPARATOR.'.'.$this->codename.'.daemon.lock';
     }
 }
