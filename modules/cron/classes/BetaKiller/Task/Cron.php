@@ -181,7 +181,7 @@ class Cron extends AbstractTask
     {
         $this->logDebug('Task [:name] is ready to start', [':name' => $task->getName()]);
 
-        $cmd = $this->getTaskCmd($task, $this->currentStage);
+        $cmd = self::getTaskCmd($this->env, $task->getName(), $task->getParams());
 
         // Store fingerprint for simpler task identification upon start
         $tags = [
@@ -245,33 +245,6 @@ class Cron extends AbstractTask
         }
 
         return $this->queue->getByFingerprint($fingerprint);
-    }
-
-    private function getTaskCmd(Task $task, string $stage): string
-    {
-        $options = [
-            'task'  => $task->getName(),
-            'stage' => $stage,
-        ];
-
-        $params = $task->getParams();
-
-        if ($params) {
-            $options += $params;
-        }
-
-        $sitePath  = $this->env->getAppRootPath();
-        $indexPath = $sitePath.DIRECTORY_SEPARATOR.'public';
-
-        $php = PHP_BINARY;
-
-        $cmd = "cd $indexPath && $php index.php";
-
-        foreach ($options as $optionName => $optionValue) {
-            $cmd .= ' --'.$optionName.'='.$optionValue;
-        }
-
-        return $cmd;
     }
 
     private function logDebug(string $message, array $params = null): void

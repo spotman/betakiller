@@ -50,7 +50,7 @@ class Task
     public function __construct(string $name, ?array $params = null, ?DateTimeImmutable $startAt = null)
     {
         $this->name    = $name;
-        $this->params  = $params;
+        $this->params  = $params ?? [];
         $this->startAt = $startAt ?? new DateTimeImmutable;
 
         $this->calculateFingerprint();
@@ -61,7 +61,7 @@ class Task
         return $this->name;
     }
 
-    public function getParams(): ?array
+    public function getParams(): array
     {
         return $this->params;
     }
