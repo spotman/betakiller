@@ -1,14 +1,14 @@
 <?php
 namespace BetaKiller\Log;
 
-use Monolog\Formatter\LineFormatter;
-
-class ContextCleanupFormatter extends LineFormatter
+class ContextCleanupProcessor
 {
     /**
-     * {@inheritdoc}
+     * @param  string[][] $record
+     *
+     * @return array
      */
-    public function format(array $record)
+    public function __invoke(array $record)
     {
         if (isset($record['context'][Logger::CONTEXT_KEY_EXCEPTION])) {
             unset($record['context'][Logger::CONTEXT_KEY_EXCEPTION]);
@@ -18,6 +18,6 @@ class ContextCleanupFormatter extends LineFormatter
             unset($record['context'][Logger::CONTEXT_KEY_REQUEST]);
         }
 
-        return parent::format($record);
+        return $record;
     }
 }
