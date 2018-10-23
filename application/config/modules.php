@@ -46,6 +46,7 @@ return [
     'assets'       => MODPATH.'assets',                // Asset management subsystem
     'cron'         => MODPATH.'cron',                  // Helper for running scheduled tasks
     'error'        => MODPATH.'error',                 // Error handling and logging
+    'daemon'       => MODPATH.'daemon',                // Daemon run
     'maintenance'  => MODPATH.'maintenance',           // Maintenance mode
     'missing-url'  => MODPATH.'missing-url',           // Catch and store missing IFace URLs
     'notification' => MODPATH.'notification',          // Notification subsystem
