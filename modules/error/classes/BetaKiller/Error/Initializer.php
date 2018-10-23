@@ -68,7 +68,7 @@ class Initializer implements ModuleInitializerInterface
     private function isPhpConsoleActive(): bool
     {
         $storageFileName = $this->appEnv->getModeName().'.'.$this->appEnv->getRevisionKey().'.phpConsole.data';
-        $storagePath     = $this->appEnv->getTempDirectory().DIRECTORY_SEPARATOR.$storageFileName;
+        $storagePath     = $this->appEnv->getTempPath().DIRECTORY_SEPARATOR.$storageFileName;
 
         // Can be called only before PhpConsole\Connector::getInstance() and PhpConsole\Handler::getInstance()
         Connector::setPostponeStorage(new File($storagePath));

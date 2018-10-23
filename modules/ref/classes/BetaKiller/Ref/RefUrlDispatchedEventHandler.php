@@ -36,7 +36,7 @@ class RefUrlDispatchedEventHandler implements EventHandlerInterface
     public function handleEvent($message): void
     {
         // Skip calls like "cache warmup" from CLI mode
-        if ($this->appEnv->isCLI()) {
+        if ($this->appEnv->isCli()) {
             return;
         }
 

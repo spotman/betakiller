@@ -54,7 +54,7 @@ class Logger implements LoggerInterface
         $isDebug = $this->appEnv->isDebugEnabled();
 
         // CLI mode logging
-        if ($this->appEnv->isCLI()) {
+        if ($this->appEnv->isCli()) {
             $monolog->pushHandler(new CliHandler($isDebug));
         } else {
             $monolog->pushProcessor(new WebProcessor());
