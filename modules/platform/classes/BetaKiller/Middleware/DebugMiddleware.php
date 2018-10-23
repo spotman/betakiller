@@ -79,7 +79,7 @@ class DebugMiddleware implements MiddlewareInterface
             ->addCollector(new MemoryCollector());
 
         // Storage for processing data for AJAX calls and redirects
-        $debugBar->setStorage(new FileStorage($this->appEnv->getTempDirectory()));
+        $debugBar->setStorage(new FileStorage($this->appEnv->getTempPath()));
 
         // Prepare renderer
         $renderer = $debugBar->getJavascriptRenderer('/phpDebugBar');
