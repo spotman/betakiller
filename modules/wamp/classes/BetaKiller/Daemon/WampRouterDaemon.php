@@ -1,22 +1,21 @@
 <?php
 declare(strict_types=1);
 
-namespace BetaKiller\Wamp;
+namespace BetaKiller\Daemon;
 
+use BetaKiller\Config\WampConfig;
+use BetaKiller\Wamp\WampClient;
+use BetaKiller\Wamp\WampUserDb;
 use Psr\Log\LoggerInterface;
 use Thruway\Authentication\AuthenticationManager;
 use Thruway\Authentication\WampCraAuthProvider;
 use Thruway\Peer\Router;
 use Thruway\Transport\RatchetTransportProvider;
-use BetaKiller\Config\WampConfig;
 
-/**
- * https://github.com/voryx/Thruway#php-client-example
- * https://github.com/voryx/Thruway/blob/master/Examples/InternalClient/RouterWtihInternalClient.php
- * https://github.com/voryx/Thruway/tree/master/Examples/Authentication/WampCra
- */
-class WampRouter implements WampRouterInterface
+class WampRouterDaemon implements DaemonInterface
 {
+    public const CODENAME = 'WampRouter';
+
     /**
      * @var \BetaKiller\Wamp\WampClient
      */
@@ -38,48 +37,58 @@ class WampRouter implements WampRouterInterface
     private $wampUserDb;
 
     /**
-     * @param \Psr\Log\LoggerInterface      $logger
+     * @var \Thruway\Peer\RouterInterface
+     */
+    private $router;
+
+    /**
      * @param \BetaKiller\Config\WampConfig $wampConfig
      * @param \BetaKiller\Wamp\WampClient   $wampClient
      * @param \BetaKiller\Wamp\WampUserDb   $wampUserDb
+     * @param \Psr\Log\LoggerInterface      $logger
      */
     public function __construct(
-        LoggerInterface $logger,
         WampConfig $wampConfig,
         WampClient $wampClient,
-        WampUserDb $wampUserDb
+        WampUserDb $wampUserDb,
+        LoggerInterface $logger
     ) {
-        $this->logger     = $logger;
         $this->wampConfig = $wampConfig;
         $this->wampClient = $wampClient;
         $this->wampUserDb = $wampUserDb;
+        $this->logger     = $logger;
     }
 
-    public function run(): void
+    public function start(): void
     {
         \Thruway\Logging\Logger::set($this->logger);
 
-        $router = new Router();
+        $this->router = new Router();
 
         // transport
-        $router->addTransportProvider(new RatchetTransportProvider(
+        $this->router->addTransportProvider(new RatchetTransportProvider(
             $this->wampConfig->getConnectionHost(),
             $this->wampConfig->getConnectionPort()
         ));
 
         // auth manager
         $authMgr = new AuthenticationManager();
-        $router->registerModule($authMgr);
+        $this->router->registerModule($authMgr);
 
         // user db
         $authProvClient = new WampCraAuthProvider([$this->wampConfig->getRealmName()]);
         $authProvClient->setUserDb($this->wampUserDb);
-        $router->addInternalClient($authProvClient);
+        $this->router->addInternalClient($authProvClient);
 
         // client
-        $router->addInternalClient($this->wampClient);
+        $this->router->addInternalClient($this->wampClient);
 
         // start
-        $router->start();
+        $this->router->start();
+    }
+
+    public function stop(): void
+    {
+        $this->router->stop(true);
     }
 }
