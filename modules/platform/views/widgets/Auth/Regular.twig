@@ -1,4 +1,7 @@
 <section class="widget-auth-regular">
+
+  <div class="alert alert-danger d-none mt-3" role="alert"></div>
+
   <form action="{{ login_url }}" method="POST" name="regular-login-form">
 
     <div class="form-row justify-content-center">
@@ -21,10 +24,6 @@
         <button type="submit" class="btn btn-success">
           {{ 'auth.regular.sign_in'|i18n }}
         </button>
-
-        <div class="alert alert-danger d-none mt-3" role="alert">
-          <strong>Error!</strong> Email or password is invalid. Please check your information and try again.
-        </div>
 
       </div>
     </div>
