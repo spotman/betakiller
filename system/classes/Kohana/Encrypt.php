@@ -132,29 +132,21 @@ class Kohana_Encrypt {
 		// Set the rand type if it has not already been set
 		if (Encrypt::$_rand === NULL)
 		{
-			if (Kohana::$is_windows)
-			{
-				// Windows only supports the system random number generator
-				Encrypt::$_rand = MCRYPT_RAND;
-			}
-			else
-			{
-				if (defined('MCRYPT_DEV_URANDOM'))
-				{
-					// Use /dev/urandom
-					Encrypt::$_rand = MCRYPT_DEV_URANDOM;
-				}
-				elseif (defined('MCRYPT_DEV_RANDOM'))
-				{
-					// Use /dev/random
-					Encrypt::$_rand = MCRYPT_DEV_RANDOM;
-				}
-				else
-				{
-					// Use the system random number generator
-					Encrypt::$_rand = MCRYPT_RAND;
-				}
-			}
+            if (defined('MCRYPT_DEV_URANDOM'))
+            {
+                // Use /dev/urandom
+                Encrypt::$_rand = MCRYPT_DEV_URANDOM;
+            }
+            elseif (defined('MCRYPT_DEV_RANDOM'))
+            {
+                // Use /dev/random
+                Encrypt::$_rand = MCRYPT_DEV_RANDOM;
+            }
+            else
+            {
+                // Use the system random number generator
+                Encrypt::$_rand = MCRYPT_RAND;
+            }
 		}
 
 		if (Encrypt::$_rand === MCRYPT_RAND)

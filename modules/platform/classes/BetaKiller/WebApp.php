@@ -10,6 +10,7 @@ use BetaKiller\Assets\Middleware\UploadMiddleware;
 use BetaKiller\Assets\Model\AssetsModelImageInterface;
 use BetaKiller\Assets\Provider\AssetsProviderInterface;
 use BetaKiller\Assets\Provider\ImageAssetsProviderInterface;
+use BetaKiller\Assets\StaticFilesDeployHandler;
 use BetaKiller\Middleware\ContentNegotiationMiddleware;
 use BetaKiller\Middleware\DebugBarPatchMiddleware;
 use BetaKiller\Middleware\DebugMiddleware;
@@ -27,7 +28,6 @@ use BetaKiller\Middleware\UserMiddleware;
 use Middlewares\ContentType;
 use Psr\Http\Message\ResponseInterface;
 use Spotman\Api\ApiRequestHandler;
-use StaticFilesDeployHandler;
 use Zend\Diactoros\Response\TextResponse;
 use Zend\Expressive\Application;
 use Zend\Expressive\Router\Middleware\DispatchMiddleware;
@@ -180,6 +180,11 @@ class WebApp
         );
 
         /**
+         * Static files legacy route first
+         */
+        $app->get('/assets/static/{file:.+}', StaticFilesDeployHandler::class);
+
+        /**
          * Download original file via concrete provider
          */
         $app->get('/assets/{provider}/'.$itemPlace.'/'.$downloadAction.$extPlace, DownloadMiddleware::class);
@@ -199,13 +204,8 @@ class WebApp
          */
         $app->get('/assets/{provider}/'.$itemPlace.'/'.$deleteAction.$sizePlace.$extPlace, PreviewMiddleware::class);
 
-        /**
-         * Static files legacy route
-         */
-        $app->get('/assets/static/{file:.+}', StaticFilesDeployHandler::class);
-
         // API HTTP gate
-        $app->post('/api/v{version:\d+}/{type:\s+}', ApiRequestHandler::class);
+        $app->post('/api/v{version:\d+}/{type:.+}', ApiRequestHandler::class);
     }
 
     public function processException(\Throwable $e): ResponseInterface

@@ -18,7 +18,7 @@ class PreviewMiddleware extends AbstractAssetMiddleware
      *
      * @return \Psr\Http\Message\ResponseInterface
      */
-    public function handle(ServerRequestInterface $request): ResponseInterface
+    public function process(ServerRequestInterface $request): ResponseInterface
     {
         $this->detectProvider($request);
 
@@ -27,6 +27,8 @@ class PreviewMiddleware extends AbstractAssetMiddleware
                 ':must' => HasPreviewProviderInterface::class,
             ]);
         }
+
+        $this->checkAction(HasPreviewProviderInterface::ACTION_PREVIEW);
 
         $size   = $this->getSizeParam($request);
         $model  = $this->fromItemDeployUrl($request);

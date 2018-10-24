@@ -61,10 +61,11 @@ class Container implements ContainerInterface
         $useAnnotations = $config['annotations'] ?? true;
 
         /** @url http://php-di.org/doc/performances.html */
-        $compileTo        = $config['compile_to'];
+        $compile          = $config['compile'];
         $cacheDefinitions = $config['cache_definitions'];
 
-        if ($compileTo) {
+        if ($compile) {
+            $compileTo = implode(DIRECTORY_SEPARATOR, [$appEnv->getAppRootPath(), 'cache', 'php-di']);
             $builder->enableCompilation($compileTo);
         }
 

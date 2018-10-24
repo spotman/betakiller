@@ -76,6 +76,12 @@ class ServerRequestHelper
         return $request->getRequestTarget();
     }
 
+    public static function getModule(ServerRequestInterface $request): ?string
+    {
+        // TODO How to detect module from PSR-15 request ???
+        return null;
+    }
+
     public static function getCookie(ServerRequestInterface $request, string $name): ?string
     {
         // TODO Replace with ServerRequestInterface manipulation after migration to PSR-7
@@ -132,7 +138,7 @@ class ServerRequestHelper
         return $container->getEntityByClassName($className);
     }
 
-    public function getParameter(ServerRequestInterface $request, string $className)
+    public static function getParameter(ServerRequestInterface $request, string $className)
     {
         $container = self::getUrlContainer($request);
 

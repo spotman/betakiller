@@ -4,16 +4,26 @@ namespace BetaKiller\IFace\App\Content;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Helper\UrlHelper;
 use BetaKiller\Model\ContentCategoryInterface;
+use BetaKiller\Repository\ContentCategoryRepository;
 use BetaKiller\Url\ZoneInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-class CategoryListing extends AbstractAppBase
+final class CategoryListing extends AbstractAppBase
 {
     /**
-     * @Inject
      * @var \BetaKiller\Repository\ContentCategoryRepository
      */
     private $categoryRepository;
+
+    /**
+     * CategoryListing constructor.
+     *
+     * @param \BetaKiller\Repository\ContentCategoryRepository $categoryRepository
+     */
+    public function __construct(ContentCategoryRepository $categoryRepository)
+    {
+        $this->categoryRepository = $categoryRepository;
+    }
 
     /**
      * Returns data for View
@@ -33,7 +43,7 @@ class CategoryListing extends AbstractAppBase
         ];
     }
 
-    protected function getCategoriesData(UrlHelper $urlHelper, ContentCategoryInterface $parent = null): array
+    private function getCategoriesData(UrlHelper $urlHelper, ContentCategoryInterface $parent = null): array
     {
         $data = [];
 
@@ -50,7 +60,7 @@ class CategoryListing extends AbstractAppBase
         return $data;
     }
 
-    protected function getCategoryData(ContentCategoryInterface $category, UrlHelper $urlHelper)
+    private function getCategoryData(ContentCategoryInterface $category, UrlHelper $urlHelper): array
     {
         return [
             'label'    => $category->getLabel(),

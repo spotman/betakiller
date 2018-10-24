@@ -95,10 +95,9 @@ class WampClient extends \Thruway\Peer\Client
 
     private function callApiMethod(string $resource, string $method, array $arguments, UserInterface $user)
     {
-        $proxy = $this->apiFacade->get($resource, ApiResourceProxyInterface::INTERNAL);
-
-        $result = $proxy->call($method, $arguments, $user);
-
-        return $result->getData();
+        return $this->apiFacade
+            ->getResource($resource, ApiResourceProxyInterface::INTERNAL)
+            ->call($method, $arguments, $user)
+            ->getData();
     }
 }

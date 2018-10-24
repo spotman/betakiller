@@ -1,12 +1,7 @@
 <?php
 
-class Twig_Error_Runtime extends Twig_Error
+class Twig_Error_Runtime_ extends Twig_Error
 {
-    protected $lineno;
-    protected $filename;
-    protected $rawMessage;
-    protected $previous;
-
     /**
      * Constructor.
      *
@@ -26,8 +21,7 @@ class Twig_Error_Runtime extends Twig_Error
      */
     public function __construct($message, $lineno = -1, $filename = null, Exception $previous = null)
     {
-        if ( $previous instanceof Exception )
-        {
+        if ($previous) {
             // Re-throw for better debug
             throw $previous;
         }

@@ -101,8 +101,7 @@ if (!$env) {
     throw new Exception('Missing APP_ENV');
 }
 
-Kohana::$environmentString = strtolower($env);
-Kohana::$environment       = constant('Kohana::'.strtoupper(Kohana::$environmentString));
+Kohana::$environment = constant('Kohana::'.strtoupper($env));
 
 /**
  * Attach a file reader to config. Multiple readers are supported.
@@ -113,14 +112,8 @@ Kohana::$config->attach(new Config_File);
 /**
  * Attach the environment specific configuration file reader
  */
-Kohana::$config->attach(new Config_File('config/environments/'.Kohana::$environmentString));
+Kohana::$config->attach(new Config_File('config/environments/'.strtolower($env)));
 
-
-/**
- * Set the default language
- * For handling exceptions in file Kohana_Exception
- */
-I18n::lang('en');
 
 /**
  * Initialize Kohana, setting the default options.
@@ -138,11 +131,6 @@ I18n::lang('en');
  * - boolean  expose      set the X-Powered-By header                        FALSE
  */
 Kohana::init(Kohana::$config->load('init')->as_array());
-
-/**
- * Attach the file write to logging errors. Multiple writers are supported.
- */
-Kohana::$log->attach(new Log_File(APPPATH.'logs'), Log::NOTICE);
 
 // Attach basic log for debugging unit tests
 if (PHP_SAPI === 'cli' && Kohana::$environment === Kohana::TESTING) {

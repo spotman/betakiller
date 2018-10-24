@@ -16,7 +16,7 @@ class TwigExtension extends \Twig_Extension
             new \Twig_Filter('shortcodes', function (array $context, string $text) use ($shortcodeFacade) {
                 $request = $context[IFaceView::REQUEST_KEY];
 
-                return $shortcodeFacade->process($text, $request);
+                return $shortcodeFacade->process($text, $request, $context);
             }, ['needs_context' => true, 'is_safe' => ['html']]),
 
         ];

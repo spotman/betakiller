@@ -39,7 +39,7 @@ return array(
 		'revisit-after'		=> '3 days',
 		'robots'			=> 'all',
 		'content-type'		=> Kohana::$content_type.'; charset='.Kohana::$charset,
-		'content-language'	=> I18n::$lang,
+		'content-language'	=> null,
 		'x-ua-compatible'	=> 'IE=edge,chrome=1',
 		'viewport'			=> 'width=device-width,initial-scale=1.0',
 	),

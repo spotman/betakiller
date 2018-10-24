@@ -2,6 +2,7 @@
 namespace BetaKiller\Content\Shortcode;
 
 use BetaKiller\Factory\NamespaceBasedFactoryBuilder;
+use BetaKiller\Repository\ShortcodeRepository;
 
 class ShortcodeFactory
 {
@@ -11,7 +12,6 @@ class ShortcodeFactory
     private $factory;
 
     /**
-     * @Inject
      * @var \BetaKiller\Repository\ShortcodeRepository
      */
     private $repository;
@@ -20,9 +20,14 @@ class ShortcodeFactory
      * ShortcodeFactory constructor.
      *
      * @param \BetaKiller\Factory\NamespaceBasedFactoryBuilder $factoryBuilder
+     * @param \BetaKiller\Repository\ShortcodeRepository       $repo
+     *
+     * @throws \BetaKiller\Factory\FactoryException
      */
-    public function __construct(NamespaceBasedFactoryBuilder $factoryBuilder)
+    public function __construct(NamespaceBasedFactoryBuilder $factoryBuilder, ShortcodeRepository $repo)
     {
+        $this->repository = $repo;
+
         $this->factory = $factoryBuilder
             ->createFactory()
             ->setClassNamespaces('Content', ShortcodeInterface::CLASS_NS)

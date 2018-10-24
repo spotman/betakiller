@@ -34,7 +34,7 @@ class DoctrineCacheProvider extends ChainCache
 
         $this->nsPrefix = implode('.', [$workingName, $appEnv->getModeName(), $appEnv->getRevisionKey()]);
 
-        $settings = $config->load(['cache', 'default']);
+        $settings = (array)$config->load(['cache', 'default']);
 
         if (!$settings) {
             throw new Exception('App-related cache config is absent');

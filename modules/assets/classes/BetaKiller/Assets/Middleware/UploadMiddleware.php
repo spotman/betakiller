@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace BetaKiller\Assets\Middleware;
 
 use BetaKiller\Assets\Exception\AssetsException;
+use BetaKiller\Assets\Provider\AssetsProviderInterface;
 use BetaKiller\Exception\ValidationException;
 use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Helper\ServerRequestHelper;
@@ -19,7 +20,7 @@ class UploadMiddleware extends AbstractAssetMiddleware
      *
      * @return \Psr\Http\Message\ResponseInterface
      */
-    public function handle(ServerRequestInterface $request): ResponseInterface
+    public function process(ServerRequestInterface $request): ResponseInterface
     {
         $user = ServerRequestHelper::getUser($request);
 
@@ -32,6 +33,8 @@ class UploadMiddleware extends AbstractAssetMiddleware
         }
 
         $this->detectProvider($request);
+
+        $this->checkAction(AssetsProviderInterface::ACTION_UPLOAD);
 
         // Getting first uploaded file
         $file = array_shift($files);

@@ -10,6 +10,7 @@ use BetaKiller\Content\Shortcode\GalleryShortcode;
 use BetaKiller\Content\Shortcode\ImageShortcode;
 use BetaKiller\Content\Shortcode\YoutubeShortcode;
 use BetaKiller\Exception\HttpExceptionInterface;
+use BetaKiller\Exception\NotImplementedHttpException;
 use BetaKiller\Exception\ValidationException;
 use BetaKiller\Helper\LoggerHelperTrait;
 use BetaKiller\Model\ContentGalleryInterface;
@@ -410,6 +411,7 @@ class Wordpress extends AbstractTask
 
             try {
                 // TODO Replace with system-wide crawler
+                throw new NotImplementedHttpException('Implement http crawler');
                 $request  = Request::factory($url);
                 $response = $request->execute();
             } catch (\Request_Exception $e) {

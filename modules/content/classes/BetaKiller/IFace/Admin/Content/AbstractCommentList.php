@@ -5,11 +5,27 @@ use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Helper\UrlHelper;
 use BetaKiller\Model\ContentCommentInterface;
 use BetaKiller\Model\UserInterface;
+use BetaKiller\Repository\ContentCommentRepository;
 use BetaKiller\Url\ZoneInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 abstract class AbstractCommentList extends AbstractAdminBase
 {
+    /**
+     * @var \BetaKiller\Repository\ContentCommentRepository
+     */
+    private $commentRepo;
+
+    /**
+     * AbstractCommentList constructor.
+     *
+     * @param \BetaKiller\Repository\ContentCommentRepository $commentRepository
+     */
+    public function __construct(ContentCommentRepository $commentRepository)
+    {
+        $this->commentRepo = $commentRepository;
+    }
+
     /**
      * Returns data for View
      * Override this method in child classes
@@ -24,7 +40,7 @@ abstract class AbstractCommentList extends AbstractAdminBase
         $user      = ServerRequestHelper::getUser($request);
         $urlHelper = ServerRequestHelper::getUrlHelper($request);
 
-        $comments = $this->getCommentsList();
+        $comments = $this->getCommentsList($request, $this->commentRepo);
 
         $data = [];
 
@@ -38,9 +54,12 @@ abstract class AbstractCommentList extends AbstractAdminBase
     }
 
     /**
+     * @param \Psr\Http\Message\ServerRequestInterface        $request
+     * @param \BetaKiller\Repository\ContentCommentRepository $repo
+     *
      * @return \BetaKiller\Model\ContentCommentInterface[]
      */
-    abstract protected function getCommentsList(): array;
+    abstract protected function getCommentsList(ServerRequestInterface $request, ContentCommentRepository $repo): array;
 
     protected function getCommentData(ContentCommentInterface $comment, UrlHelper $helper, UserInterface $user): array
     {

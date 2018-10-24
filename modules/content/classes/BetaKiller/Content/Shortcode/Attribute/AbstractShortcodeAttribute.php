@@ -150,6 +150,16 @@ abstract class AbstractShortcodeAttribute implements ShortcodeAttributeInterface
     }
 
     /**
+     * Returns i18n key for attribute`s label
+     *
+     * @return string
+     */
+    public function getLabelI18nKey(): string
+    {
+        return 'shortcode.attribute.'.$this->getName().'.label';
+    }
+
+    /**
      * Specify data which should be serialized to JSON
      *
      * @link  http://php.net/manual/en/jsonserializable.jsonserialize.php
@@ -165,7 +175,6 @@ abstract class AbstractShortcodeAttribute implements ShortcodeAttributeInterface
             'deps'          => $this->getDependencies() ?: new \stdClass(), // Hack for proper json_encode in API
             'hidden'        => $this->isHidden(),
             'optional'      => $this->isOptional(),
-            'label'         => __('shortcode.attribute.'.$this->getName().'.label'),
             'defaultValue'  => $this->getDefaultValue(),
             'allowedValues' => $this->getAllowedValues(),
         ];

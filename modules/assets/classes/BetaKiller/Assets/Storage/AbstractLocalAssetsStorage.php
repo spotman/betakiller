@@ -1,7 +1,7 @@
 <?php
 namespace BetaKiller\Assets\Storage;
 
-use BetaKiller\Assets\AssetsStorageException;
+use BetaKiller\Assets\Exception\AssetsStorageException;
 
 abstract class AbstractLocalAssetsStorage extends AbstractAssetsStorage
 {
@@ -46,7 +46,7 @@ abstract class AbstractLocalAssetsStorage extends AbstractAssetsStorage
     /**
      * @param string $path
      *
-     * @throws \BetaKiller\Assets\AssetsStorageException
+     * @throws \BetaKiller\Assets\Exception\AssetsStorageException
      */
     private function checkFileExists(string $path): void
     {
@@ -126,7 +126,7 @@ abstract class AbstractLocalAssetsStorage extends AbstractAssetsStorage
      * @param string $directory
      *
      * @return array
-     * @throws \BetaKiller\Assets\AssetsStorageException
+     * @throws \BetaKiller\Assets\Exception\AssetsStorageException
      */
     protected function doGetFiles(string $directory): array
     {
@@ -147,7 +147,7 @@ abstract class AbstractLocalAssetsStorage extends AbstractAssetsStorage
      * @param string $path
      *
      * @return bool
-     * @throws \BetaKiller\Assets\AssetsStorageException
+     * @throws \BetaKiller\Assets\Exception\AssetsStorageException
      */
     protected function doDeleteDirectory(string $path): bool
     {

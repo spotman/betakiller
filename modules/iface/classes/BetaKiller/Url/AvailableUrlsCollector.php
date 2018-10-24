@@ -8,6 +8,7 @@ use BetaKiller\IFace\Exception\UrlElementException;
 use BetaKiller\Url\Behaviour\UrlBehaviourFactory;
 use BetaKiller\Url\Container\UrlContainer;
 use BetaKiller\Url\Container\UrlContainerInterface;
+use Psr\Log\LoggerInterface;
 
 class AvailableUrlsCollector
 {
@@ -19,7 +20,6 @@ class AvailableUrlsCollector
     private $tree;
 
     /**
-     * @Inject
      * @var \Psr\Log\LoggerInterface
      */
     private $logger;
@@ -44,11 +44,13 @@ class AvailableUrlsCollector
     public function __construct(
         UrlElementTreeInterface $tree,
         UrlBehaviourFactory $behaviourFactory,
-        AclHelper $aclHelper
+        AclHelper $aclHelper,
+        LoggerInterface $logger
     ) {
         $this->tree             = $tree;
         $this->aclHelper        = $aclHelper;
         $this->behaviourFactory = $behaviourFactory;
+        $this->logger           = $logger;
     }
 
     /**

@@ -1,7 +1,7 @@
 <?php
 namespace BetaKiller\Assets\Storage;
 
-use BetaKiller\Assets\AssetsStorageException;
+use BetaKiller\Assets\Exception\AssetsStorageException;
 use BetaKiller\Helper\AppEnvInterface;
 
 class LocalPublicAssetsStorage extends AbstractLocalAssetsStorage
