@@ -7,6 +7,7 @@ use BetaKiller\Config\WampConfig;
 use BetaKiller\Wamp\WampClient;
 use BetaKiller\Wamp\WampUserDb;
 use Psr\Log\LoggerInterface;
+use React\EventLoop\LoopInterface;
 use Thruway\Authentication\AuthenticationManager;
 use Thruway\Authentication\WampCraAuthProvider;
 use Thruway\Peer\Router;
@@ -59,11 +60,11 @@ class WampRouterDaemon implements DaemonInterface
         $this->logger     = $logger;
     }
 
-    public function start(): void
+    public function start(LoopInterface $loop): void
     {
         \Thruway\Logging\Logger::set($this->logger);
 
-        $this->router = new Router();
+        $this->router = new Router($loop);
 
         // transport
         $this->router->addTransportProvider(new RatchetTransportProvider(
@@ -83,12 +84,18 @@ class WampRouterDaemon implements DaemonInterface
         // client
         $this->router->addInternalClient($this->wampClient);
 
-        // start
-        $this->router->start();
+        // Prepare to start (loop would be launched by the Run task)
+        $this->router->start(false);
     }
 
     public function stop(): void
     {
         $this->router->stop(true);
+    }
+
+    public function restart(): void
+    {
+        // We need full restart to rebuild the event loop
+        throw new RestartDaemonException;
     }
 }

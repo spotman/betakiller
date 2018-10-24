@@ -4,16 +4,17 @@ declare(strict_types=1);
 namespace BetaKiller\Daemon;
 
 use BetaKiller\Task\TaskException;
+use React\EventLoop\LoopInterface;
 
-class FailingDaemon implements DaemonInterface
+class FailingDaemon extends AbstractDaemon
 {
     public const CODENAME = 'Failing';
 
-    public function start(): void
+    public function start(LoopInterface $loop): void
     {
         // Test start
         echo 'Starting Failing daemon...';
-        sleep(3);
+        sleep(2);
         echo 'Failed!'.\PHP_EOL;
 
         throw new TaskException('Failing daemon was obviously failed');
