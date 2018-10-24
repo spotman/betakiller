@@ -1,24 +1,32 @@
-<div class="widget-auth-regular row left-align">
-  <div class="alert hide col s12" style="color: white; background-color: red"></div>
+<section class="widget-auth-regular">
 
-  <form method="POST" data-action="{{ login_url }}" name="regular-login-form" class="col s12">
-    <div class="row">
+  <div class="alert alert-danger d-none mt-3" role="alert"></div>
 
-      <div class="input-field col s12">
-        <input type="text" name="user-login" id="auth-user-login" placeholder="{{ 'auth.regular.login'|i18n }}"/>
-      </div>
+  <form action="{{ login_url }}" method="POST" name="regular-login-form">
 
-      <div class="input-field col s12">
-        <input type="password" name="user-password" id="auth-user-pass" placeholder="{{ 'auth.regular.password'|i18n }}"/>
-      </div>
+    <div class="form-row justify-content-center">
+      <div class="col-10 col-sm-8 col-md-6 col-lg-4">
 
-      <div class="input-field col s12 center-align">
-        <button type="submit" class="btn green">
-          {#<i class="material-icons">account_box</i> #}
+        <div class="form-group">
+          <input name="user-login" type="text"
+                 class="form-control"
+                 id="auth-user-login"
+                 placeholder="{{ 'auth.regular.login'|i18n }}">
+        </div>
+
+        <div class="form-group">
+          <input name="user-password" type="password"
+                 class="form-control"
+                 id="auth-user-pass"
+                 placeholder="{{ 'auth.regular.password'|i18n }}">
+        </div>
+
+        <button type="submit" class="btn btn-success">
           {{ 'auth.regular.sign_in'|i18n }}
         </button>
-      </div>
 
+      </div>
     </div>
+
   </form>
-</div>
+</section>
