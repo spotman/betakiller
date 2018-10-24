@@ -1,9 +1,5 @@
-<div class="widget-auth" data-providers="{{ providers|join(",") }}">
-    <div class="widget-auth-providers-container">
-        {% for provider in providers %}
-            {{ widget("Auth_" ~ provider|capitalize) }}
-        {% endfor %}
-    </div>
-</div>
-
 {{ js("widgets/auth/auth.js") }}
+
+{% for provider in providers %}
+  {{ widget("Auth_" ~ provider|capitalize) }}
+{% endfor %}
