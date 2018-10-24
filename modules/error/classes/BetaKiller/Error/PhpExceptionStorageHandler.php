@@ -2,6 +2,7 @@
 namespace BetaKiller\Error;
 
 use BetaKiller\Config\AppConfigInterface;
+use BetaKiller\Exception;
 use BetaKiller\ExceptionInterface;
 use BetaKiller\Helper\NotificationHelper;
 use BetaKiller\Helper\ServerRequestHelper;
@@ -99,7 +100,8 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
         $exception = $record['context']['exception'] ?? null;
 
         if (!$exception) {
-            return;
+            // Create dummy exception if this is a plain "alert" or "emergency" message
+            $exception = new Exception((string)$record['formatted']);
         }
 
         try {
@@ -230,8 +232,7 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
             return false;
         }
 
-        $lastSeenAt              = $model->getLastSeenAt();
-        $lastSeenAtTimestamp     = $lastSeenAt->getTimestamp();
+        $lastSeenAtTimestamp     = $model->getLastSeenAt()->getTimestamp();
         $lastNotifiedAt          = $model->getLastNotifiedAt();
         $lastNotifiedAtTimestamp = $lastNotifiedAt ? $lastNotifiedAt->getTimestamp() : 0;
 

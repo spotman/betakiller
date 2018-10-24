@@ -8,7 +8,7 @@ return [
 
     'cache' =>  [
         'page' =>  [
-            'enabled'   =>  Kohana::$caching,
+            'enabled'   =>  false,
             'path'      =>  APPPATH.'cache'.DIRECTORY_SEPARATOR.'page'
         ]
     ],

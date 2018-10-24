@@ -54,7 +54,7 @@ class Logger implements LoggerInterface
         $isDebug = $this->appEnv->isDebugEnabled();
 
         // CLI mode logging
-        if ($this->appEnv->isCLI()) {
+        if ($this->appEnv->isCli()) {
             $monolog->pushHandler(new CliHandler($isDebug));
         } else {
             $monolog->pushProcessor(new WebProcessor());
@@ -69,12 +69,10 @@ class Logger implements LoggerInterface
             date('d').'.log',
         ]);
 
-        $logsLevel = $isDebug ? $monolog::DEBUG : $monolog::NOTICE;
-
-        $monolog->pushHandler(new FingersCrossedHandler(
-            new StreamHandler($logFilePath, $monolog::DEBUG),
-            $logsLevel
-        ));
+        $logsLevel   = $isDebug ? $monolog::DEBUG : $monolog::NOTICE;
+        $fileHandler = new FingersCrossedHandler(new StreamHandler($logFilePath, $monolog::DEBUG), $logsLevel);
+        $fileHandler->pushProcessor(new ContextCleanupProcessor);
+        $monolog->pushHandler($fileHandler);
 
         // Common processors
         $monolog
@@ -98,11 +96,6 @@ class Logger implements LoggerInterface
     {
         // Proxy to selected logger
         $this->monolog->log($level, $message, $context);
-    }
-
-    public function getMonolog(): \Monolog\Logger
-    {
-        return $this->monolog;
     }
 
     /**

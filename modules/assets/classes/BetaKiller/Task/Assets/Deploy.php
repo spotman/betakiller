@@ -66,7 +66,7 @@ class Deploy extends AbstractTask
      */
     protected function processFile($original, string $targetBase): void
     {
-        if (is_array($original)) {
+        if (\is_array($original)) {
             foreach ($original as $item) {
                 $this->processFile($item, $targetBase);
             }

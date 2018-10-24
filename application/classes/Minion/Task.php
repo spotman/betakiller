@@ -7,6 +7,14 @@ use BetaKiller\Task\TaskFactory;
  */
 abstract class Minion_Task extends Kohana_Minion_Task
 {
+    public function __construct()
+    {
+        // Migrations are executed by deployer with --stage option
+        $this->_options['stage'] = 'development';
+
+        parent::__construct();
+    }
+
     /**
      * @param string $className
      *

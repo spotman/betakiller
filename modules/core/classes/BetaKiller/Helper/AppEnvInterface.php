@@ -76,15 +76,24 @@ interface AppEnvInterface
     /**
      * @return bool
      */
-    public function isCLI(): bool;
+    public function isCli(): bool;
 
     /**
      * @param string    $name
      * @param bool|null $required
      *
+     * @param string    $default
+     *
      * @return null|string
      */
-    public function getCliOption(string $name, ?bool $required = null): ?string;
+    public function getCliOption(string $name, bool $required = null, string $default = null): ?string;
+
+    /**
+     * Returns true if current script is executed by a human
+     *
+     * @return bool
+     */
+    public function isHuman(): bool;
 
     /**
      * Returns application root path
@@ -118,7 +127,7 @@ interface AppEnvInterface
      * @see https://serverfault.com/a/615054
      * @return string
      */
-    public function getTempDirectory(): string;
+    public function getTempPath(): string;
 
     /**
      * Returns email which will receive all emails in debug mode

@@ -38,7 +38,7 @@ final class IFaceCache
         AppEnvInterface $appEnv,
         LoggerInterface $logger
     ) {
-        $this->enabled   = !$appEnv->isCLI() && $appConfig->isPageCacheEnabled();
+        $this->enabled   = !$appEnv->isCli() && $appConfig->isPageCacheEnabled();
         $this->appConfig = $appConfig;
 
         $this->pageCache = new PageCache;

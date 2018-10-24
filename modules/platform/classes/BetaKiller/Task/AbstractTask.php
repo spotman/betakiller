@@ -1,6 +1,7 @@
 <?php
 namespace BetaKiller\Task;
 
+use BetaKiller\Helper\AppEnvInterface;
 use Minion_CLI;
 use Minion_Task;
 
@@ -35,6 +36,41 @@ abstract class AbstractTask extends Minion_Task
     abstract public function defineOptions(): array;
 
     abstract public function run(): void;
+
+    public static function getTaskCmd(
+        AppEnvInterface $appEnv,
+        string $taskName,
+        array $params = null,
+        bool $showOutput = null,
+        bool $detach = null
+    ): string {
+        $php     = PHP_BINARY;
+        $docRoot = $appEnv->getDocRootPath();
+        $stage   = $appEnv->getModeName();
+
+        $cmd = "$php index.php --task=$taskName --stage=$stage";
+
+        if ($params) {
+            foreach ($params as $optionName => $optionValue) {
+                $cmd .= ' --'.$optionName.'='.$optionValue;
+            }
+        }
+
+        if (!$showOutput) {
+            // Redirect all output to /dev/null (logger is still usable)
+            $cmd .= ' > /dev/null 2>&1';
+        }
+
+        if ($detach) {
+            // Process will become a "zombie" without "exec" call so use this function with care
+            $cmd .= ' &';
+        } else {
+            // "exec" call removes shell wrapping and simplifies process signaling
+            $cmd = 'exec '.$cmd;
+        }
+
+        return "cd $docRoot && ".$cmd;
+    }
 
     /**
      * @param string    $key

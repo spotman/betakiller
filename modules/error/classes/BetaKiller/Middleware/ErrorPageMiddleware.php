@@ -95,7 +95,7 @@ class ErrorPageMiddleware implements MiddlewareInterface
             $this->logException($this->logger, $e);
         }
 
-//        if ($this->appEnv->isCLI()) {
+//        if ($this->appEnv->isCli()) {
 //            // Force exception message to be shown even if notification is disabled
 //            if (!$notify) {
 //                echo $e->getMessage().PHP_EOL.$e->getTraceAsString();
