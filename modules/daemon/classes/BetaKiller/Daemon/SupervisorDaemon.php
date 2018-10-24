@@ -75,11 +75,6 @@ class SupervisorDaemon implements DaemonInterface
             $this->addProcess($codename);
         }
 
-        if ($this->appEnv->isDebugEnabled()) {
-            $this->addProcess(SleepDaemon::CODENAME);
-            $this->addProcess(FailingDaemon::CODENAME);
-        }
-
         $verbosity = $this->appEnv->isDebugEnabled()
             ? ConsoleOutput::VERBOSITY_DEBUG
             : ConsoleOutput::VERBOSITY_VERY_VERBOSE;
@@ -110,7 +105,6 @@ class SupervisorDaemon implements DaemonInterface
             }
         }
 
-        // TODO Этот массив всегда пустой, разобраться почему
         $stopped = array_diff($this->getDefinedDaemons(), $runningNames);
 
         $this->logger->debug('Restarting stopped daemons ":names"', [
