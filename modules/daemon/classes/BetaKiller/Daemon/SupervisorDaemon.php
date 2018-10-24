@@ -13,12 +13,15 @@ use Graze\ParallelProcess\Pool;
 use Graze\ParallelProcess\ProcessRun;
 use Graze\ParallelProcess\RunInterface;
 use Psr\Log\LoggerInterface;
+use React\EventLoop\LoopInterface;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Process\Process;
 
 class SupervisorDaemon implements DaemonInterface
 {
     public const CODENAME = 'Supervisor';
+
+    public const RETRY_LIMIT = 3;
 
     /**
      * @var \BetaKiller\Config\ConfigProviderInterface
@@ -62,13 +65,13 @@ class SupervisorDaemon implements DaemonInterface
         $this->logger = $logger;
     }
 
-    public function start(): void
+    public function start(LoopInterface $loop): void
     {
         $this->isHuman = $this->appEnv->isHuman();
 
         $this->pool = new Pool();
 
-        foreach (\array_unique((array)$this->config->load(['daemons'])) as $codename) {
+        foreach ($this->getDefinedDaemons() as $codename) {
             $this->addProcess($codename);
         }
 
@@ -93,9 +96,35 @@ class SupervisorDaemon implements DaemonInterface
         $this->pool->run();
     }
 
+    public function restart(): void
+    {
+        $runningNames = [];
+
+        /** @var ProcessRun $run */
+        foreach ($this->pool->getRunning() as $run) {
+            if ($run->isRunning()) {
+                $runningNames[] = $this->getNameFromRun($run);
+
+                // Send restart signal to the daemon
+                $run->getProcess()->signal(DaemonInterface::RESTART_SIGNAL);
+            }
+        }
+
+        // TODO Этот массив всегда пустой, разобраться почему
+        $stopped = array_diff($this->getDefinedDaemons(), $runningNames);
+
+        $this->logger->debug('Restarting stopped daemons ":names"', [
+            ':names' => \implode('", "', $stopped),
+        ]);
+
+        foreach ($stopped as $name) {
+            $this->addProcess($name)->start();
+        }
+    }
+
     public function stop(): void
     {
-        $this->logger->debug('Shutting down daemons');
+        $this->logDebug('Shutting down daemons');
 
         foreach ($this->pool->getRunning() as $run) {
             if (!$run instanceof ProcessRun) {
@@ -103,7 +132,7 @@ class SupervisorDaemon implements DaemonInterface
             }
 
             $process = $run->getProcess();
-            $this->logger->debug('Sending signal to ":name" daemon with PID = :pid', [
+            $this->logDebug('Sending signal to ":name" daemon with PID = :pid', [
                 ':pid'  => $process->getPid(),
                 ':name' => $this->getNameFromRun($run),
             ]);
@@ -111,7 +140,12 @@ class SupervisorDaemon implements DaemonInterface
             $process->stop(3);
         }
 
-        $this->logger->debug('All daemons are stopped, supervisor is shutting down');
+        $this->logDebug('All daemons are stopped, supervisor is shutting down');
+    }
+
+    private function getDefinedDaemons(): array
+    {
+        return \array_unique((array)$this->config->load(['daemons']));
     }
 
     private function addProcess(string $codename): ProcessRun
@@ -132,15 +166,22 @@ class SupervisorDaemon implements DaemonInterface
             'name' => $codename,
         ]);
 
-        $run->addListener(RunEvent::FAILED, function (RunEvent $runEvent) {
-            $name = $this->getNameFromRun($runEvent->getRun());
+        $run->addListener(RunEvent::COMPLETED, function (RunEvent $runEvent) {
+            $run  = $runEvent->getRun();
+            $name = $this->getNameFromRun($run);
 
-            $time = \microtime(true);
+            if (!$run->isSuccessful() && $this->checkRetryLimitExceeded($name)) {
+                $this->logDebug('Daemon ":name" had failed :times times and was stopped', [
+                    ':name'  => $name,
+                    ':times' => self::RETRY_LIMIT,
+                ]);
 
-            // Tiny delay for 3 seconds
-            while (\microtime(true) < $time + 3) {
-                usleep(10000);
+                return;
             }
+
+            $this->logDebug('Restarting ":name" daemon', [
+                ':name' => $name,
+            ]);
 
             // Restart
             $this->addProcess($name)->start();
@@ -151,8 +192,41 @@ class SupervisorDaemon implements DaemonInterface
         return $run;
     }
 
+    private function checkRetryLimitExceeded(string $name): bool
+    {
+        $count = 0;
+
+        /** @var ProcessRun $run */
+        foreach ($this->pool->getIterator() as $run) {
+            if ($this->getNameFromRun($run) === $name && !$run->isSuccessful()) {
+                $count++;
+            }
+        }
+
+        return $count >= self::RETRY_LIMIT;
+    }
+
     private function getNameFromRun(RunInterface $run): string
     {
         return $run->getTags()['name'];
+    }
+
+    private function getRunByName(string $name): ?ProcessRun
+    {
+        /** @var ProcessRun $run */
+        foreach ($this->pool->getRunning() as $run) {
+            if ($this->getNameFromRun($run) === $name) {
+                return $run;
+            }
+        }
+
+        return null;
+    }
+
+    private function logDebug(string $message, array $variables = null): void
+    {
+        if (!$this->isHuman) {
+            $this->logger->debug($message, $variables);
+        }
     }
 }
