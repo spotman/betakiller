@@ -101,8 +101,7 @@ if (!$env) {
     throw new Exception('Missing APP_ENV');
 }
 
-Kohana::$environmentString = strtolower($env);
-Kohana::$environment       = constant('Kohana::'.strtoupper(Kohana::$environmentString));
+Kohana::$environment = constant('Kohana::'.strtoupper($env));
 
 /**
  * Attach a file reader to config. Multiple readers are supported.
@@ -113,7 +112,7 @@ Kohana::$config->attach(new Config_File);
 /**
  * Attach the environment specific configuration file reader
  */
-Kohana::$config->attach(new Config_File('config/environments/'.Kohana::$environmentString));
+Kohana::$config->attach(new Config_File('config/environments/'.strtolower($env)));
 
 
 /**
