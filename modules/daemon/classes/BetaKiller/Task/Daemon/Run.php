@@ -4,6 +4,8 @@ declare(strict_types=1);
 namespace BetaKiller\Task\Daemon;
 
 use BetaKiller\Daemon\DaemonFactory;
+use BetaKiller\Daemon\DaemonInterface;
+use BetaKiller\Daemon\RestartDaemonException;
 use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\Helper\LoggerHelperTrait;
 use BetaKiller\Task\AbstractTask;
@@ -29,9 +31,19 @@ class Run extends AbstractTask
     private $codename;
 
     /**
+     * @var
+     */
+    private $isStarted;
+
+    /**
      * @var \BetaKiller\Daemon\DaemonInterface
      */
     private $daemon;
+
+    /**
+     * @var \React\EventLoop\LoopInterface
+     */
+    private $loop;
 
     /**
      * @var \Psr\Log\LoggerInterface
@@ -63,7 +75,8 @@ class Run extends AbstractTask
     public function defineOptions(): array
     {
         return [
-            'name' => null,
+            'name'    => null,
+            'restart' => 'false',
         ];
     }
 
@@ -77,29 +90,82 @@ class Run extends AbstractTask
 
         // Check if it is running already and exit if so
         if (!$this->lock()) {
-            echo sprintf('Daemon "%s" is already running'.\PHP_EOL, $this->codename);
+            $this->logger->debug('Daemon ":name" is already running', [
+                ':name' => $this->codename,
+            ]);
 
             return;
         }
+
+        $this->loop = \React\EventLoop\Factory::create();
 
         $this->addSignalHandlers();
 
         $this->daemon = $this->factory->create($this->codename);
 
-        try {
-            $this->daemon->start();
-        } catch (\Throwable $e) {
-            $this->logException($this->logger, $e);
-            $this->shutdown();
-            exit(1);
-        }
+        $this->start();
+
+        // Endless loop waiting for signals or exit()
+        $this->loop->run();
     }
 
-    public function shutdown(): void
+    private function start(): void
     {
-        $this->daemon->stop();
+        $this->wrap(function () {
+            $this->daemon->start($this->loop);
+            $this->isStarted = true;
+            $this->logger->debug('Daemon ":name" was started', [
+                ':name' => $this->codename,
+            ]);
+        });
+    }
 
+    private function stop(): void
+    {
+        $this->wrap(function () {
+            $this->daemon->stop();
+            $this->isStarted = false;
+
+            $this->logger->debug('Daemon ":name" was stopped', [
+                ':name' => $this->codename,
+            ]);
+        });
+    }
+
+    private function restart(): void
+    {
+        if ($this->isStarted) {
+            $this->stop();
+        }
+        $this->wrap(function () {
+            $this->isStarted = true;
+            $this->daemon->restart();
+        });
+    }
+
+    private function shutdown(int $exitCode): void
+    {
+        $this->stop();
         $this->unlock();
+
+        $this->logger->debug('Shutting down daemon ":name" with exit code [:code]', [
+            ':name' => $this->codename,
+            ':code' => $exitCode,
+        ]);
+
+        exit($exitCode);
+    }
+
+    private function wrap(callable $func): void
+    {
+        try {
+            $func();
+        } catch (RestartDaemonException $e) {
+            $this->shutdown(0);
+        } catch (\Throwable $e) {
+            $this->logException($this->logger, $e);
+            $this->shutdown(1);
+        }
     }
 
     private function addSignalHandlers(): void
@@ -107,22 +173,28 @@ class Run extends AbstractTask
         pcntl_async_signals(true);
 
         $signalCallable = function (int $signal) {
-            $this->logger->debug('Received ":value" signal for ":name" daemon', [
+            $this->logger->debug('Received signal ":value" for ":name" daemon', [
                 ':value' => $signal,
                 ':name'  => $this->codename,
             ]);
-            $this->shutdown();
-            exit(0);
+            $this->shutdown(0);
         };
+
+        // Restart
+        $this->loop->addSignal(DaemonInterface::RESTART_SIGNAL, function () {
+            $this->logger->debug('Restarting daemon ":name"', [
+                ':name' => $this->codename,
+            ]);
+            $this->restart();
+        });
 
         /**
          * @see https://stackoverflow.com/a/38991496
          */
-        \pcntl_signal(\SIGHUP, $signalCallable);
-        \pcntl_signal(\SIGINT, $signalCallable);
-        \pcntl_signal(\SIGQUIT, $signalCallable);
-        \pcntl_signal(\SIGTERM, $signalCallable);
-        \pcntl_signal(\SIGALRM, $signalCallable);
+        $this->loop->addSignal(\SIGHUP, $signalCallable);
+        $this->loop->addSignal(\SIGINT, $signalCallable);
+        $this->loop->addSignal(\SIGQUIT, $signalCallable);
+        $this->loop->addSignal(\SIGTERM, $signalCallable);
     }
 
     private function lock(): bool
@@ -154,6 +226,13 @@ class Run extends AbstractTask
 
         if (\file_exists($file)) {
             \unlink($file);
+            $this->logger->debug('Daemon ":name" was unlocked', [
+                ':name' => $this->codename,
+            ]);
+        } else {
+            $this->logger->debug('Daemon lock-file ":path" does not exists', [
+                ':path' => $file,
+            ]);
         }
     }
 
