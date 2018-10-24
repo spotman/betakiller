@@ -1,6 +1,8 @@
 <?php
 namespace BetaKiller\View;
 
+use BetaKiller\Assets\StaticAssetsFactory;
+use BetaKiller\Dev\Profiler;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Helper\UrlElementHelper;
 use BetaKiller\IFace\Exception\UrlElementException;
@@ -13,6 +15,9 @@ use Psr\Http\Message\ServerRequestInterface;
 class IFaceView
 {
     public const REQUEST_KEY    = '__request__';
+    public const ASSETS_KEY     = '__assets__';
+    public const META_KEY       = '__meta__';
+    public const I18N_KEY       = '__i18n__';
     public const IFACE_KEY      = '__iface__';
     public const IFACE_ZONE_KEY = 'zone';
 
@@ -27,11 +32,6 @@ class IFaceView
     private $layoutView;
 
     /**
-     * @var \BetaKiller\View\HtmlHeadHelper
-     */
-    private $headHelper;
-
-    /**
      * @var \BetaKiller\View\ViewFactoryInterface
      */
     private $viewFactory;
@@ -42,26 +42,31 @@ class IFaceView
     private $elementHelper;
 
     /**
+     * @var \BetaKiller\Assets\StaticAssetsFactory
+     */
+    private $assetsFactory;
+
+    /**
      * IFaceView constructor.
      *
      * @param \BetaKiller\Repository\IFaceLayoutRepository $layoutRepo
      * @param \BetaKiller\View\LayoutViewInterface         $layoutView
-     * @param \BetaKiller\View\HtmlHeadHelper              $headHelper
      * @param \BetaKiller\Helper\UrlElementHelper          $elementHelper
      * @param \BetaKiller\View\ViewFactoryInterface        $viewFactory
+     * @param \BetaKiller\Assets\StaticAssetsFactory       $assetsFactory
      */
     public function __construct(
         IFaceLayoutRepository $layoutRepo,
         LayoutViewInterface $layoutView,
-        HtmlHeadHelper $headHelper,
         UrlElementHelper $elementHelper,
-        ViewFactoryInterface $viewFactory
+        ViewFactoryInterface $viewFactory,
+        StaticAssetsFactory $assetsFactory
     ) {
         $this->layoutRepo    = $layoutRepo;
         $this->layoutView    = $layoutView;
-        $this->headHelper    = $headHelper;
         $this->viewFactory   = $viewFactory;
         $this->elementHelper = $elementHelper;
+        $this->assetsFactory = $assetsFactory;
     }
 
     /**
@@ -75,6 +80,8 @@ class IFaceView
      */
     public function render(IFaceInterface $iface, ServerRequestInterface $request): string
     {
+        $dataPack = Profiler::begin($request, $iface->getCodename().' IFace data');
+
         $urlHelper = ServerRequestHelper::getUrlHelper($request);
         $params    = ServerRequestHelper::getUrlContainer($request);
         $i18n      = ServerRequestHelper::getI18n($request);
@@ -82,7 +89,6 @@ class IFaceView
         $model = $iface->getModel();
 
         // Hack for dropping original iface data on processing exception error page
-        $this->layoutView->clear();
 
         $viewPath  = $this->getViewPath($model);
         $ifaceView = $this->viewFactory->create($viewPath);
@@ -92,8 +98,14 @@ class IFaceView
             $ifaceView->set($key, $value);
         }
 
+        Profiler::end($dataPack);
+        $renderPack = Profiler::begin($request, $iface->getCodename().' IFace render');
+
         // Send current request to widgets
         $ifaceView->set(self::REQUEST_KEY, $request);
+
+        // Send i18n instance
+        $ifaceView->set(self::I18N_KEY, $i18n);
 
         $ifaceView->set(self::IFACE_KEY, [
             'codename' => $model->getCodename(),
@@ -101,19 +113,27 @@ class IFaceView
             'zone'     => $model->getZoneName(),
         ]);
 
-        $this->headHelper
+        // Detect IFace layout
+        $layoutCodename = $this->getLayoutCodename($model, $this->elementHelper);
+
+        // Create instance of renderer
+        $meta         = new \Meta;
+        $assets       = $this->assetsFactory->create();
+        $renderHelper = new HtmlRenderHelper($meta, $assets);
+
+        $renderHelper
             ->setLang($i18n->getLang())
             ->setContentType()
+            ->setLayoutCodename($layoutCodename)
             ->setTitle($this->elementHelper->getTitle($model, $params, $i18n))
             ->setMetaDescription($this->elementHelper->getDescription($model, $params, $i18n))
             ->setCanonical($urlHelper->makeUrl($model, null, false));
 
-        // Getting IFace layout
-        $layoutCodename = $this->getLayoutCodename($model, $this->elementHelper);
+        $result = $this->layoutView->render($ifaceView, $renderHelper);
 
-        $this->layoutView->setLayoutCodename($layoutCodename);
+        Profiler::end($renderPack);
 
-        return $this->layoutView->render($ifaceView);
+        return $result;
     }
 
     /**

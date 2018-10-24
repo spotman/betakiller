@@ -6,28 +6,19 @@ use Asm89\Twig\CacheExtension\CacheStrategy\BlackholeCacheStrategy;
 use Asm89\Twig\CacheExtension\CacheStrategy\IndexedChainingCacheStrategy;
 use Asm89\Twig\CacheExtension\CacheStrategy\LifetimeCacheStrategy;
 use Asm89\Twig\CacheExtension\Extension as CacheExtension;
-use BetaKiller\DI\Container;
+use BetaKiller\Helper\AppEnvInterface;
 use Doctrine\Common\Cache\ArrayCache;
 
 class TwigCacheExtension extends CacheExtension
 {
     /**
-     * @Inject
-     * @var \BetaKiller\Helper\AppEnvInterface
-     */
-    private $appEnv;
-
-    /**
      * TwigCacheExtension constructor.
      *
-     * @throws \InvalidArgumentException
-     * @throws \DI\DependencyException
+     * @param \BetaKiller\Helper\AppEnvInterface $appEnv
      */
-    public function __construct()
+    public function __construct(AppEnvInterface $appEnv)
     {
-        Container::getInstance()->injectOn($this);
-
-        if ($this->appEnv->inProductionMode() || $this->appEnv->inStagingMode()) {
+        if ($appEnv->inProductionMode() || $appEnv->inStagingMode()) {
             $cacheProvider         = new DoctrineCacheAdapter(new ArrayCache());
             $lifetimeCacheStrategy = new LifetimeCacheStrategy($cacheProvider);
 

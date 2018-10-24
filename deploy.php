@@ -49,7 +49,7 @@ localhost('testing')
     ->set('deploy_path', sys_get_temp_dir().DIRECTORY_SEPARATOR.'deployer-testing')
     ->stage(DEPLOYER_TESTING_STAGE);
 
-$serversFile = getcwd().'/servers.yml';
+$serversFile = getcwd().'/hosts.yml';
 if (file_exists($serversFile)) {
     // Process app servers list
     inventory($serversFile);
@@ -171,9 +171,7 @@ after('deploy:betakiller:shared', 'deploy:shared');
  * BetaKiller writable dirs
  */
 set('betakiller_writable_dirs', [
-    '{{core_path}}/application/logs',
     '{{core_path}}/application/cache',
-    '{{core_path}}/modules/twig/cache',
 
     '{{app_path}}/logs',
     '{{app_path}}/cache',
@@ -361,8 +359,8 @@ task('assets:deploy', function () {
 })->desc('Collect assets from all static-files directories');
 
 task('deploy:dotenv:migrate', function () {
-    $targetDotEnv = '{{release_path}}/app/.env';
-    $previousDotEnv = '{{previous_release}}/app/.env';
+    $targetDotEnv = '{{release_path}}/{{app_path}}/.env';
+    $previousDotEnv = '{{previous_release}}/{{app_path}}/.env';
     $defaultDotEnv = '{{deploy_path}}/.env.default';
 
     if (has('previous_release') && test("[ -f $previousDotEnv ]")) {
@@ -433,7 +431,7 @@ task('deploy', [
 
     'migrations:up',
     'assets:deploy',
-    'cache:warmup',
+    //'cache:warmup', TODO fix and uncomment
 
     // Switch to new version
     'deploy:symlink',
@@ -471,7 +469,7 @@ function runMinionTask(string $name)
 
     $cmd = "cd $path && {{bin/php}} index.php --task=$name --stage=$stage";
 
-    if (isVerbose()) {
+    if (isVeryVerbose()) {
         $cmd .= ' --debug';
     }
 
@@ -511,7 +509,7 @@ function runGitCommand($gitCmd, $path = null, ?bool $silent = null)
 /**
  * @param null|string $path
  *
- * @return \Deployer\Type\Result
+ * @return string
  * @throws \Deployer\Exception\Exception
  */
 function gitStatus(?string $path = null)
@@ -522,7 +520,7 @@ function gitStatus(?string $path = null)
 /**
  * @param null|string $basePath
  *
- * @return \Deployer\Type\Result
+ * @return string
  * @throws \Deployer\Exception\Exception
  */
 function gitAdd(?string $basePath = null)
@@ -535,7 +533,7 @@ function gitAdd(?string $basePath = null)
 /**
  * @param null|string $path
  *
- * @return \Deployer\Type\Result
+ * @return string
  * @throws \Deployer\Exception\Exception
  */
 function gitCommit(?string $path = null)
@@ -559,7 +557,7 @@ function gitCommitAll(?string $path = null)
 /**
  * @param null|string $path
  *
- * @return \Deployer\Type\Result
+ * @return string
  * @throws \Deployer\Exception\Exception
  */
 function gitCheckout(?string $path = null)
@@ -572,7 +570,7 @@ function gitCheckout(?string $path = null)
 /**
  * @param null|string $path
  *
- * @return \Deployer\Type\Result
+ * @return string
  * @throws \Deployer\Exception\Exception
  */
 function gitPush(?string $path = null)
@@ -583,7 +581,7 @@ function gitPush(?string $path = null)
 /**
  * @param null|string $path
  *
- * @return \Deployer\Type\Result
+ * @return string
  * @throws \Deployer\Exception\Exception
  */
 function gitPull(?string $path = null)
@@ -604,7 +602,7 @@ function gitPullAll()
  * @param string $key
  * @param string $value
  *
- * @return \Deployer\Type\Result
+ * @return string
  * @throws \Deployer\Exception\Exception
  */
 function gitConfig(string $key, string $value)
@@ -654,12 +652,12 @@ function getLatestReleasePath()
 
 /**
  * @param null|string $repo
- * @param null|string $base_path
+ * @param null|string $basePath
  *
  * @return string
  * @throws \Deployer\Exception\Exception
  */
-function getRepoPath(?string $repo = null, ?string $base_path = null)
+function getRepoPath(?string $repo = null, ?string $basePath = null)
 {
     if (stage() === DEPLOYER_DEV_STAGE) {
         return getcwd();
@@ -675,9 +673,9 @@ function getRepoPath(?string $repo = null, ?string $base_path = null)
         throw new Exception('Unknown repo '.$repo);
     }
 
-    if (!$base_path) {
-        $base_path = getLatestReleasePath();
+    if (!$basePath) {
+        $basePath = getLatestReleasePath();
     }
 
-    return $base_path.'/'.get($repo.'_path');
+    return $basePath.'/'.get($repo.'_path');
 }

@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace BetaKiller\Task\Error;
 
+use BetaKiller\Factory\UrlHelperFactory;
 use BetaKiller\Helper\NotificationHelper;
-use BetaKiller\Helper\UrlHelper;
 use BetaKiller\Model\PhpExceptionModelInterface;
 use BetaKiller\Repository\PhpExceptionRepository;
 use BetaKiller\Task\AbstractTask;
@@ -41,18 +41,18 @@ class Notify extends AbstractTask
      *
      * @param \BetaKiller\Repository\PhpExceptionRepository $repository
      * @param \BetaKiller\Helper\NotificationHelper         $notificationHelper
-     * @param \BetaKiller\Helper\UrlHelper                  $ifaceHelper
+     * @param \BetaKiller\Factory\UrlHelperFactory          $urlHelperFactory
      * @param \Psr\Log\LoggerInterface                      $logger
      */
     public function __construct(
         PhpExceptionRepository $repository,
         NotificationHelper $notificationHelper,
-        UrlHelper $ifaceHelper,
+        UrlHelperFactory $urlHelperFactory,
         LoggerInterface $logger
     ) {
+        $this->urlHelper    = $urlHelperFactory->create();
         $this->repository   = $repository;
         $this->notification = $notificationHelper;
-        $this->urlHelper    = $ifaceHelper;
         $this->logger       = $logger;
 
         parent::__construct();

@@ -244,7 +244,8 @@ abstract class Kohana_Minion_Task {
 		{
 			echo View::factory('minion/error/validation')
 				->set('task', Minion_Task::convert_class_to_task($this))
-				->set('errors', $validation->errors($this->get_errors_file()));
+				->set('errors', $validation->errors($this->get_errors_file()))
+                ->render();
 		}
 		else
 		{
@@ -259,7 +260,7 @@ abstract class Kohana_Minion_Task {
 	/**
 	 * Outputs help for this task
 	 *
-	 * @return null
+	 * @return void
 	 */
 	protected function _help(array $params)
 	{
@@ -271,12 +272,11 @@ abstract class Kohana_Minion_Task {
 
 		$view = View::factory('minion/help/task')
 			->set('description', $description)
-			->set('tags', (array) $tags)
+			->set('tags', (array)$tags)
 			->set('task', Minion_Task::convert_class_to_task($this));
 
-		echo $view;
+		echo $view->render();
 	}
-
 
 	public function valid_option(Validation $validation, $option)
 	{

@@ -14,11 +14,6 @@
 class Kohana_Profiler {
 
 	/**
-	 * @var  integer   maximum number of application stats to keep
-	 */
-	public static $rollover = 1000;
-
-	/**
 	 * @var  array  collected benchmarks
 	 */
 	public static $_marks = [];
@@ -304,28 +299,21 @@ class Kohana_Profiler {
 	 *     list($time, $memory) = Profiler::application();
 	 *
 	 * @return  array  execution time, memory
-	 * @uses    Kohana::cache
 	 */
 	public static function application()
 	{
-		// Load the stats from cache, which is valid for 1 day
-		$stats = Kohana::cache('profiler_application_stats', NULL, 3600 * 24);
-
-		if ( ! is_array($stats) OR $stats['count'] > Profiler::$rollover)
-		{
-			// Initialize the stats array
-			$stats = array(
-				'min'   => array(
-					'time'   => NULL,
-					'memory' => NULL),
-				'max'   => array(
-					'time'   => NULL,
-					'memory' => NULL),
-				'total' => array(
-					'time'   => NULL,
-					'memory' => NULL),
-				'count' => 0);
-		}
+        // Initialize the stats array
+        $stats = array(
+            'min'   => array(
+                'time'   => NULL,
+                'memory' => NULL),
+            'max'   => array(
+                'time'   => NULL,
+                'memory' => NULL),
+            'total' => array(
+                'time'   => NULL,
+                'memory' => NULL),
+            'count' => 0);
 
 		// Get the application run time
 		$time = microtime(TRUE) - KOHANA_START_TIME;
@@ -370,9 +358,6 @@ class Kohana_Profiler {
 		$stats['average'] = array(
 			'time'   => $stats['total']['time'] / $stats['count'],
 			'memory' => $stats['total']['memory'] / $stats['count']);
-
-		// Cache the new stats
-		Kohana::cache('profiler_application_stats', $stats);
 
 		// Set the current application execution time and memory
 		// Do NOT cache these, they are specific to the current request only

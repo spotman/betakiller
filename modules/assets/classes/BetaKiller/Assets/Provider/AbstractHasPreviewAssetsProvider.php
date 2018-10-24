@@ -57,7 +57,7 @@ abstract class AbstractHasPreviewAssetsProvider extends AbstractAssetsProvider i
      */
     public function getAllowedPreviewSizes(): array
     {
-        return $this->getAssetsProviderConfigValue([
+        return $this->config->getProviderConfigValue($this, [
             self::CONFIG_MODEL_PREVIEW_KEY,
             self::CONFIG_MODEL_PREVIEW_SIZES_KEY,
         ]);
@@ -68,7 +68,7 @@ abstract class AbstractHasPreviewAssetsProvider extends AbstractAssetsProvider i
      */
     public function getPreviewQuality(): int
     {
-        return (int)$this->getAssetsProviderConfigValue([
+        return (int)$this->config->getProviderConfigValue($this, [
             self::CONFIG_MODEL_PREVIEW_KEY,
             self::CONFIG_MODEL_PREVIEW_QUALITY_KEY,
         ]) ?: 80; // This is optimal for JPEG

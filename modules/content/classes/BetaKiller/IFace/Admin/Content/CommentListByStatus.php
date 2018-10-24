@@ -1,34 +1,23 @@
 <?php
 namespace BetaKiller\IFace\Admin\Content;
 
+use BetaKiller\Helper\ContentUrlContainerHelper;
+use BetaKiller\Repository\ContentCommentRepository;
+use Psr\Http\Message\ServerRequestInterface;
+
 class CommentListByStatus extends AbstractCommentList
 {
     /**
-     * @Inject
-     * @var \BetaKiller\Helper\ContentUrlContainerHelper
-     */
-    private $urlParametersHelper;
-
-    /**
-     * @Inject
-     * @var \BetaKiller\Repository\ContentCommentRepository
-     */
-    private $commentRepository;
-
-    /**
-     * @Inject
-     * @var \Psr\Http\Message\ServerRequestInterface
-     */
-    private $request;
-
-    /**
+     * @param \Psr\Http\Message\ServerRequestInterface        $request
+     * @param \BetaKiller\Repository\ContentCommentRepository $repo
+     *
      * @return \BetaKiller\Model\ContentComment[]
      * @throws \BetaKiller\Repository\RepositoryException
      */
-    protected function getCommentsList(): array
+    protected function getCommentsList(ServerRequestInterface $request, ContentCommentRepository $repo): array
     {
-        $status = $this->urlParametersHelper->getContentCommentStatus($this->request);
+        $status = ContentUrlContainerHelper::getContentCommentStatus($request);
 
-        return $this->commentRepository->getLatestComments($status);
+        return $repo->getLatestComments($status);
     }
 }

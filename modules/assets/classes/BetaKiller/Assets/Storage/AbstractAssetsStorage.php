@@ -40,7 +40,7 @@ abstract class AbstractAssetsStorage implements AssetsStorageInterface
      * @param string $path
      *
      * @return string
-     * @throws \BetaKiller\Assets\AssetsStorageException
+     * @throws \BetaKiller\Assets\Exception\AssetsStorageException
      */
     public function getFile(string $path): string
     {
@@ -55,7 +55,7 @@ abstract class AbstractAssetsStorage implements AssetsStorageInterface
      * @param string $path
      * @param string $content
      *
-     * @throws \BetaKiller\Assets\AssetsStorageException
+     * @throws \BetaKiller\Assets\Exception\AssetsStorageException
      */
     public function putFile(string $path, string $content): void
     {
@@ -69,7 +69,7 @@ abstract class AbstractAssetsStorage implements AssetsStorageInterface
      *
      * @param string $path
      *
-     * @throws \BetaKiller\Assets\AssetsStorageException
+     * @throws \BetaKiller\Assets\Exception\AssetsStorageException
      */
     public function deleteFile(string $path): void
     {
@@ -84,7 +84,7 @@ abstract class AbstractAssetsStorage implements AssetsStorageInterface
      * @param string $directory
      *
      * @return array
-     * @throws \BetaKiller\Assets\AssetsStorageException
+     * @throws \BetaKiller\Assets\Exception\AssetsStorageException
      */
     public function getFiles(string $directory): array
     {
@@ -99,7 +99,7 @@ abstract class AbstractAssetsStorage implements AssetsStorageInterface
      * @param string $path
      *
      * @return void
-     * @throws \BetaKiller\Assets\AssetsStorageException
+     * @throws \BetaKiller\Assets\Exception\AssetsStorageException
      */
     public function deleteDirectory(string $path): void
     {
@@ -121,7 +121,7 @@ abstract class AbstractAssetsStorage implements AssetsStorageInterface
      * @param string $path Local path in storage
      *
      * @return string
-     * @throws \BetaKiller\Assets\AssetsStorageException
+     * @throws \BetaKiller\Assets\Exception\AssetsStorageException
      */
     abstract protected function doGetFile(string $path): string;
 
@@ -131,7 +131,7 @@ abstract class AbstractAssetsStorage implements AssetsStorageInterface
      * @param string $path Local path in storage
      *
      * @return string[]
-     * @throws \BetaKiller\Assets\AssetsStorageException
+     * @throws \BetaKiller\Assets\Exception\AssetsStorageException
      */
     abstract protected function doGetFiles(string $path): array;
 
@@ -141,7 +141,7 @@ abstract class AbstractAssetsStorage implements AssetsStorageInterface
      * @param string $path    Local path to file in current storage
      * @param string $content String content of the file
      *
-     * @throws \BetaKiller\Assets\AssetsStorageException
+     * @throws \BetaKiller\Assets\Exception\AssetsStorageException
      */
     abstract protected function doPutFile(string $path, string $content): void;
 
@@ -151,7 +151,7 @@ abstract class AbstractAssetsStorage implements AssetsStorageInterface
      * @param string $path Local path
      *
      * @return bool
-     * @throws \BetaKiller\Assets\AssetsStorageException
+     * @throws \BetaKiller\Assets\Exception\AssetsStorageException
      */
     abstract protected function doDeleteFile(string $path): bool;
 
@@ -161,7 +161,7 @@ abstract class AbstractAssetsStorage implements AssetsStorageInterface
      * @param string $path Local path
      *
      * @return bool
-     * @throws \BetaKiller\Assets\AssetsStorageException
+     * @throws \BetaKiller\Assets\Exception\AssetsStorageException
      */
     abstract protected function doDeleteDirectory(string $path): bool;
 }

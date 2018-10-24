@@ -78,7 +78,7 @@ class AppEnv implements AppEnvInterface
 
     private function detectCliEnv(): void
     {
-        if (!$this->isCLI()) {
+        if (!$this->isCli()) {
             return;
         }
 
@@ -136,7 +136,7 @@ class AppEnv implements AppEnvInterface
 
     public function isDebugEnabled(): bool
     {
-        return $this->debugEnabled || !$this->inProductionMode();
+        return $this->debugEnabled || $this->inDevelopmentMode();
     }
 
     public function enableDebug(): void
@@ -154,14 +154,53 @@ class AppEnv implements AppEnvInterface
         return $this->getEnvVariable(self::APP_REVISION);
     }
 
-    public function isCLI(): bool
+    /**
+     * @see https://stackoverflow.com/a/25967493
+     * @return bool
+     */
+    public function isCli(): bool
     {
-        return PHP_SAPI === 'cli';
+        if (PHP_SAPI === 'cli') {
+            return true;
+        }
+
+        if (\defined('STDIN')) {
+            return true;
+        }
+
+        if (array_key_exists('SHELL', $_ENV)) {
+            return true;
+        }
+
+        if (empty($_SERVER['REMOTE_ADDR']) && empty($_SERVER['HTTP_USER_AGENT']) && \count($_SERVER['argv']) > 0) {
+            return true;
+        }
+
+        if (!array_key_exists('REQUEST_METHOD', $_SERVER)) {
+            return true;
+        }
+
+        return false;
     }
 
     public function getAppRootPath(): string
     {
         return $this->appRootPath;
+    }
+
+    /**
+     * Returns true if current script is executed by a human
+     *
+     * @return bool
+     */
+    public function isHuman(): bool
+    {
+        if ($this->isCli()) {
+            return stream_isatty(STDOUT);
+        }
+
+        // Human otherwise
+        return true;
     }
 
     /**
@@ -195,15 +234,17 @@ class AppEnv implements AppEnvInterface
      *
      * @param bool|null $required
      *
+     * @param string    $default
+     *
      * @return null|string
      */
-    public function getCliOption(string $name, ?bool $required = null): ?string
+    public function getCliOption(string $name, bool $required = null, string $default = null): ?string
     {
         $key = $required ? $name : $name.'::';
 
         $options = \getopt('', [$key]);
 
-        return $options[$name] ?? null;
+        return $options[$name] ?? $default;
     }
 
     /**
@@ -212,8 +253,18 @@ class AppEnv implements AppEnvInterface
      * @see https://serverfault.com/a/615054
      * @return string
      */
-    public function getTempDirectory(): string
+    public function getTempPath(): string
     {
         return \sys_get_temp_dir();
+    }
+
+    /**
+     * Returns email which will receive all emails in debug mode
+     *
+     * @return string
+     */
+    public function getDebugEmail(): string
+    {
+        return $this->getEnvVariable('DEBUG_EMAIL_ADDRESS');
     }
 }

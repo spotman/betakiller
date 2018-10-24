@@ -11,6 +11,7 @@
     "ext-json": "*",
     "ext-mbstring": "*",
     "ext-mysqli": "*",
+    "ext-pcntl": "*",
     "ext-sodium": "*",
     "ext-sqlite3": "*",
     "ext-xml": "*",
@@ -21,6 +22,7 @@
     "doctrine/annotations": "^1.2",
     "doctrine/cache": "^1.6",
     "dragonmantank/cron-expression": "^2.0",
+    "graze/console-diff-renderer": "^0.6.2",
     "graze/parallel-process": "^0.8",
     "guzzlehttp/guzzle": "~6.0",
     "imangazaliev/didom": "^1.10",
@@ -58,7 +60,7 @@
   "require-dev": {
     "codedungeon/phpunit-result-printer": "^0.23",
     "deployer/deployer": "^6",
-    "phpstan/phpstan": "^0.10.3",
+    "phpstan/phpstan": "0.10.3",
     "phpunit/dbunit": "^4.0",
     "phpunit/php-code-coverage": "^6.0",
     "phpunit/phpunit": "^7.3",
@@ -81,8 +83,8 @@
       "@phpunit"
     ],
     "testEnv": "ln -sf ./../.env.testing ./application/.env",
-    "phpunit": "APP_ENV=testing phpunit --colors=always",
-    "phpstan": "APP_ENV=testing phpstan analyze"
+    "phpunit": "APP_ENV=testing ./vendor/bin/phpunit --colors=always",
+    "phpstan": "APP_ENV=testing ./vendor/bin/phpstan analyze"
   },
   "config": {
     "platform": {

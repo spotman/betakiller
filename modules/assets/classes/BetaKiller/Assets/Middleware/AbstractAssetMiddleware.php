@@ -6,6 +6,8 @@ namespace BetaKiller\Assets\Middleware;
 use BetaKiller\Assets\AssetsDeploymentService;
 use BetaKiller\Assets\AssetsProviderFactory;
 use BetaKiller\Assets\Exception\AssetsException;
+use BetaKiller\Assets\Exception\AssetsModelException;
+use BetaKiller\Assets\Exception\AssetsStorageException;
 use BetaKiller\Assets\Model\AssetsModelInterface;
 use BetaKiller\Assets\Provider\AssetsProviderInterface;
 use BetaKiller\Assets\Provider\ImageAssetsProviderInterface;
@@ -14,6 +16,7 @@ use BetaKiller\Exception\FoundHttpException;
 use BetaKiller\Exception\NotFoundHttpException;
 use BetaKiller\Exception\NotImplementedHttpException;
 use BetaKiller\Helper\LoggerHelperTrait;
+use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Log\LoggerInterface;
@@ -60,6 +63,36 @@ abstract class AbstractAssetMiddleware implements RequestHandlerInterface
     }
 
     /**
+     * Handle the request and return a response.
+     *
+     * @param \Psr\Http\Message\ServerRequestInterface $request
+     *
+     * @return \Psr\Http\Message\ResponseInterface
+     */
+    final public function handle(ServerRequestInterface $request): ResponseInterface
+    {
+        try {
+            return $this->process($request);
+        } catch (AssetsStorageException|AssetsModelException $e) {
+            $this->logException($this->logger, $e);
+
+            throw new NotFoundHttpException();
+        }
+    }
+
+    /**
+     * Handle the request and return a response.
+     *
+     * @param \Psr\Http\Message\ServerRequestInterface $request
+     *
+     * @return \Psr\Http\Message\ResponseInterface
+     * @throws \BetaKiller\Assets\Exception\AssetsStorageException
+     * @throws \BetaKiller\Assets\Exception\AssetsProviderException
+     * @throws \BetaKiller\Assets\Exception\AssetsModelException
+     */
+    abstract protected function process(ServerRequestInterface $request): ResponseInterface;
+
+    /**
      * @param \BetaKiller\Assets\Model\AssetsModelInterface $model
      * @param string                                        $content
      * @param string                                        $action
@@ -67,8 +100,12 @@ abstract class AbstractAssetMiddleware implements RequestHandlerInterface
      *
      * @throws \BetaKiller\Assets\Exception\AssetsProviderException
      */
-    protected function deploy(AssetsModelInterface $model, string $content, string $action, ?string $suffix = null): void
-    {
+    protected function deploy(
+        AssetsModelInterface $model,
+        string $content,
+        string $action,
+        ?string $suffix = null
+    ): void {
         $this->deploymentService->deploy($this->provider, $model, $content, $action, $suffix);
     }
 
@@ -77,11 +114,10 @@ abstract class AbstractAssetMiddleware implements RequestHandlerInterface
      *
      * @throws \BetaKiller\Assets\Exception\AssetsException
      * @throws \BetaKiller\Assets\Exception\AssetsProviderException
-     * @throws \BetaKiller\Assets\AssetsStorageException
+     * @throws \BetaKiller\Assets\Exception\AssetsStorageException
      * @throws \BetaKiller\Exception\BadRequestHttpException
      * @throws \BetaKiller\Exception\FoundHttpException
      * @throws \BetaKiller\Exception\NotFoundHttpException
-     * @throws \BetaKiller\Exception\NotImplementedHttpException
      * @throws \BetaKiller\Factory\FactoryException
      */
     protected function detectProvider(ServerRequestInterface $request): void
@@ -94,8 +130,6 @@ abstract class AbstractAssetMiddleware implements RequestHandlerInterface
 
         $this->provider = $this->providerFactory->createFromUrlKey($requestKey);
         $providerKey    = $this->provider->getUrlKey();
-
-        $this->checkAction($request);
 
         if ($requestKey !== $providerKey) {
             // Redirect to canonical url
@@ -114,7 +148,7 @@ abstract class AbstractAssetMiddleware implements RequestHandlerInterface
      */
     protected function fromItemDeployUrl(ServerRequestInterface $request)
     {
-        $url = $request->getAttribute('item_url');
+        $url = $request->getAttribute('item');
 
         if (!$url) {
             throw new AssetsException('You must specify item url');
@@ -150,14 +184,12 @@ abstract class AbstractAssetMiddleware implements RequestHandlerInterface
     }
 
     /**
-     * @param \Psr\Http\Message\ServerRequestInterface $request
+     * @param string $action
      *
      * @throws \BetaKiller\Exception\NotImplementedHttpException
      */
-    protected function checkAction(ServerRequestInterface $request): void
+    protected function checkAction(string $action): void
     {
-        $action = $request->getAttribute('action');
-
         if (!$this->provider->hasAction($action)) {
             throw new NotImplementedHttpException('Action :name is not allowed for provider :codename', [
                 ':name'     => $action,

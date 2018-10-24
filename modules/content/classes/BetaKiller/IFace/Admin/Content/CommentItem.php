@@ -1,16 +1,11 @@
 <?php
 namespace BetaKiller\IFace\Admin\Content;
 
+use BetaKiller\Helper\ContentUrlContainerHelper;
 use Psr\Http\Message\ServerRequestInterface;
 
 class CommentItem extends AbstractAdminBase
 {
-    /**
-     * @Inject
-     * @var \BetaKiller\Helper\ContentUrlContainerHelper
-     */
-    private $urlParametersHelper;
-
     /**
      * Returns data for View
      * Override this method in child classes
@@ -22,11 +17,11 @@ class CommentItem extends AbstractAdminBase
      */
     public function getData(ServerRequestInterface $request): array
     {
-        $model = $this->urlParametersHelper->getContentComment($request);
+        $model = ContentUrlContainerHelper::getContentComment($request);
 
         return [
-            'id'        =>  $model->getID(),
-            'message'   =>  $model->getMessage(),
+            'id'      => $model->getID(),
+            'message' => $model->getMessage(),
         ];
     }
 }

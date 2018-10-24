@@ -8,7 +8,7 @@ class ValidationExceptionTranslatorTest extends \BetaKiller\Test\AbstractTestCas
 {
     public function testConstructor(): void
     {
-        $this->getTranslator();
+        new ExceptionTranslator();
 
         $this->assertTrue(true);
     }
@@ -18,9 +18,7 @@ class ValidationExceptionTranslatorTest extends \BetaKiller\Test\AbstractTestCas
         try {
             $this->generateOrmValidationException();
         } catch (ORM_Validation_Exception $e) {
-            $translator = $this->getTranslator();
-
-            $exception = $translator->fromOrmValidationException($e);
+            $exception = ExceptionTranslator::fromOrmValidationException($e);
 
             foreach ($this->getExpectedErrorMessages() as $field => $message) {
                 $this->assertEquals(
@@ -37,21 +35,13 @@ class ValidationExceptionTranslatorTest extends \BetaKiller\Test\AbstractTestCas
         try {
             $this->generateOrmValidationException();
         } catch (ORM_Validation_Exception $e) {
-            $translator = $this->getTranslator();
-
-            $exception = $translator->fromOrmValidationException($e);
+            $exception = ExceptionTranslator::fromOrmValidationException($e);
 
             $this->assertJsonStringEqualsJsonString(
                 json_encode($this->getExpectedErrorMessages()),
                 json_encode($exception)
             );
         }
-
-    }
-
-    private function getTranslator(): ExceptionTranslator
-    {
-        return new ExceptionTranslator();
     }
 
     private function createModel(): PhpException
@@ -77,10 +67,10 @@ class ValidationExceptionTranslatorTest extends \BetaKiller\Test\AbstractTestCas
     private function getExpectedErrorMessages(): array
     {
         return [
-            PhpException::COLUMN_HASH => 'hash must not exceed 64 characters long',
-            PhpException::COLUMN_STATUS => 'status must not be empty',
-            PhpException::COLUMN_CREATED_AT => 'created_at must not be empty',
-            PhpException::COLUMN_LAST_SEEN_AT => 'last_seen_at must not be empty'
+            PhpException::COLUMN_HASH         => 'hash must not exceed 64 characters long',
+            PhpException::COLUMN_STATUS       => 'status must not be empty',
+            PhpException::COLUMN_CREATED_AT   => 'created_at must not be empty',
+            PhpException::COLUMN_LAST_SEEN_AT => 'last_seen_at must not be empty',
         ];
     }
 }

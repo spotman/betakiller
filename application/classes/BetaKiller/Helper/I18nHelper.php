@@ -6,8 +6,6 @@ use BetaKiller\I18n\I18nFacade;
 
 class I18nHelper
 {
-    private const KEY_REGEX = '/^[a-z0-9_]+(?:[\.]{1}[a-z0-9_]+)+$/m';
-
     /**
      * @var string
      */
@@ -45,6 +43,9 @@ class I18nHelper
 
     public function setLang(string $value): void
     {
+        // Normalize the language
+        $value = strtolower(str_replace([' ', '_'], '-', $value));
+
         if (!$this->facade->hasLanguage($value)) {
             throw new Exception('Unknown language :lang, only these are allowed: :allowed', [
                 ':lang'    => $value,
@@ -53,9 +54,6 @@ class I18nHelper
         }
 
         $this->lang = $value;
-
-        // Set I18n lang
-        \I18n::lang($value);
     }
 
     public function getLocale(): string
@@ -72,7 +70,7 @@ class I18nHelper
      */
     public function isI18nKey(string $key): bool
     {
-        return (bool)preg_match(self::KEY_REGEX, $key);
+        return $this->facade->isI18nKey($key);
     }
 
     public function translate(string $key, array $values = null, string $lang = null): string
