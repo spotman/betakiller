@@ -6,7 +6,7 @@ namespace BetaKiller\Daemon;
 use BetaKiller\Task\TaskException;
 use React\EventLoop\LoopInterface;
 
-class FailingDaemon extends AbstractDaemon
+class FailingDaemon implements DaemonInterface
 {
     public const CODENAME = 'Failing';
 

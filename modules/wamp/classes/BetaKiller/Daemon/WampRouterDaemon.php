@@ -92,10 +92,4 @@ class WampRouterDaemon implements DaemonInterface
     {
         $this->router->stop(true);
     }
-
-    public function restart(): void
-    {
-        // We need full restart to rebuild the event loop
-        throw new RestartDaemonException;
-    }
 }
