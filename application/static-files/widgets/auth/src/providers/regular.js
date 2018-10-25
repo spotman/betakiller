@@ -32,7 +32,7 @@ export default class {
     this.$alert.hide();
     this.$submitButton.attr('disabled', 'disabled');
 
-    $.post(this.$form.data('action'), {
+    $.post(this.$form.attr('action'), {
         'user-login':    login,
         'user-password': password
       }, '', 'json')
