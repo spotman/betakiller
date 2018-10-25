@@ -5,6 +5,7 @@
  */
 return [
     'error.auth.common'             => 'Authentication failed',
+    'error.auth.required'           => 'Authorization required',
     'error.auth.inactive'           => 'Your account was switched off',
     'error.auth.incorrect_password' => 'Your credentials are invalid',
     'error.auth.user_not_exists'    => 'User does not exists',
