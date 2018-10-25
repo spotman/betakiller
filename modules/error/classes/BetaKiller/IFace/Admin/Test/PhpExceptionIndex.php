@@ -1,10 +1,11 @@
 <?php
-namespace BetaKiller\IFace\Admin\Error;
+namespace BetaKiller\IFace\Admin\Test;
 
 use BetaKiller\Helper\ServerRequestHelper;
+use BetaKiller\IFace\Admin\Error\ErrorAdminBase;
 use Psr\Http\Message\ServerRequestInterface;
 
-class PhpExceptionTest extends ErrorAdminBase
+class PhpExceptionIndex extends ErrorAdminBase
 {
     /**
      * Returns data for View
@@ -13,16 +14,15 @@ class PhpExceptionTest extends ErrorAdminBase
      *
      * @return array
      * @throws \BetaKiller\IFace\Exception\UrlElementException
-     * @uses \BetaKiller\IFace\Admin\Error\PhpExceptionTestHTTP500
-     * @uses \BetaKiller\IFace\Admin\Error\PhpExceptionTestLogger
+     * @uses \BetaKiller\IFace\Admin\Test\PhpExceptionHttp500
+     * @uses \BetaKiller\IFace\Admin\Test\PhpExceptionLogger
      */
     public function getData(ServerRequestInterface $request): array
     {
         $urlHelper = ServerRequestHelper::getUrlHelper($request);
 
-        $http500IFace = $urlHelper->getUrlElementByCodename('Admin_Error_PhpExceptionTestHTTP500');
-
-        $loggerIFace = $urlHelper->getUrlElementByCodename('Admin_Error_PhpExceptionTestLogger');
+        $http500IFace = $urlHelper->getUrlElementByCodename('Admin_Test_PhpExceptionHTTP500');
+        $loggerIFace  = $urlHelper->getUrlElementByCodename('Admin_Test_PhpExceptionLogger');
 
         return [
             'http_500_test_url' => $urlHelper->makeUrl($http500IFace),

@@ -78,7 +78,7 @@ class BarWidget extends AbstractAdminWidget
         $i18n      = ServerRequestHelper::getI18n($request);
 
         return [
-            'enabled'           => true,
+            'enabled'           => false,
 //            'comments'          => $this->getCommentsData(),
             'comments'          => null,
             'createButtonItems' => $this->getCreateButtonItems($user, $urlHelper, $params, $i18n),
