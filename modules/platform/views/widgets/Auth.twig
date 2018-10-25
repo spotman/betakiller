@@ -1,9 +1,15 @@
-<div class="widget-auth" data-providers="{{ providers|join(",") }}">
+{{ css("widgets/auth/bundle/common.css") }}
+{{ js("widgets/auth/bundle/common.js") }}
+{{ js("widgets/auth/bundle/auth.js") }}
+
+<section class="widget-auth text-center container" data-providers="{{ providers|join(",") }}">
+
+  <h1>Login</h1>
+
   <div class="widget-auth-providers-container">
     {% for provider in providers %}
       {{ widget("Auth_" ~ provider|capitalize) }}
     {% endfor %}
   </div>
-</div>
 
-{{ js("widgets/auth/auth.js") }}
+</section>
