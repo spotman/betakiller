@@ -4,11 +4,11 @@ declare(strict_types=1);
 namespace BetaKiller\Daemon;
 
 use BetaKiller\Config\ConfigProviderInterface;
+use BetaKiller\Exception;
 use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\Task\AbstractTask;
 use Graze\ParallelProcess\Display\Table;
 use Graze\ParallelProcess\Event\RunEvent;
-use Graze\ParallelProcess\Monitor\PoolLogger;
 use Graze\ParallelProcess\Pool;
 use Graze\ParallelProcess\ProcessRun;
 use Graze\ParallelProcess\RunInterface;
@@ -21,7 +21,8 @@ class SupervisorDaemon implements DaemonInterface
 {
     public const CODENAME = 'Supervisor';
 
-    public const RETRY_LIMIT = 3;
+    public const RETRY_LIMIT    = 3;
+    public const RESTART_SIGNAL = SIGUSR1;
 
     /**
      * @var \BetaKiller\Config\ConfigProviderInterface
@@ -44,30 +45,49 @@ class SupervisorDaemon implements DaemonInterface
     private $pool;
 
     /**
+     * @var int[]
+     */
+    private $failureCounter = [];
+
+    /**
      * @var \Psr\Log\LoggerInterface
      */
     private $logger;
+
+    /**
+     * @var \BetaKiller\Daemon\LockFactory
+     */
+    private $lockFactory;
 
     /**
      * Supervisor constructor.
      *
      * @param \BetaKiller\Config\ConfigProviderInterface $config
      * @param \BetaKiller\Helper\AppEnvInterface         $appEnv
+     * @param \BetaKiller\Daemon\LockFactory             $lockFactory
      * @param \Psr\Log\LoggerInterface                   $logger
      */
     public function __construct(
         ConfigProviderInterface $config,
         AppEnvInterface $appEnv,
+        LockFactory $lockFactory,
         LoggerInterface $logger
     ) {
-        $this->config = $config;
-        $this->appEnv = $appEnv;
-        $this->logger = $logger;
+        $this->config      = $config;
+        $this->appEnv      = $appEnv;
+        $this->logger      = $logger;
+        $this->lockFactory = $lockFactory;
     }
 
     public function start(LoopInterface $loop): void
     {
         $this->isHuman = $this->appEnv->isHuman();
+
+        // Restart signal
+        $loop->addSignal(self::RESTART_SIGNAL, function () {
+            $this->logDebug('Restarting supervisor');
+            $this->restart();
+        });
 
         $this->pool = new Pool();
 
@@ -83,9 +103,6 @@ class SupervisorDaemon implements DaemonInterface
             $output = new ConsoleOutput($verbosity);
             // $table->run() throws unwanted exceptions when process dies
             new Table($output, $this->pool);
-        } else {
-            $monitor = new PoolLogger($this->logger);
-            $monitor->monitor($this->pool);
         }
 
         $this->pool->run();
@@ -93,27 +110,51 @@ class SupervisorDaemon implements DaemonInterface
 
     public function restart(): void
     {
-        $runningNames = [];
+        foreach ($this->getRunningNames() as $name) {
+            $run = $this->getRunByName($name);
 
-        /** @var ProcessRun $run */
-        foreach ($this->pool->getRunning() as $run) {
-            if ($run->isRunning()) {
-                $runningNames[] = $this->getNameFromRun($run);
+            // Skip processes which are restarting already (race condition with event handler)
+            if (!$run) {
+                continue;
+            }
 
-                // Send restart signal to the daemon
-                $run->getProcess()->signal(DaemonInterface::RESTART_SIGNAL);
+            $process = $run->getProcess();
+
+            // Skip processes which are restarting already (race condition with event handler)
+            if (!$process->isRunning()) {
+                continue;
+            }
+
+            $lock = $this->lockFactory->create($name);
+
+            if (!$lock->isAcquired()) {
+                throw new Exception('Daemon ":name" is running but has no acquired lock', [
+                    ':name' => $name,
+                ]);
+            }
+
+            // Send stop signal to the daemon
+            $process->stop(5);
+
+            // Wait for lock (will be released by the daemon)
+            while ($lock->isAcquired()) {
+                \usleep(100000);
             }
         }
 
-        $stopped = array_diff($this->getDefinedDaemons(), $runningNames);
+        $failed = array_keys($this->failureCounter);
 
-        $this->logger->debug('Restarting stopped daemons ":names"', [
-            ':names' => \implode('", "', $stopped),
+        $this->logDebug('Restarting failed daemons ":names"', [
+            ':names' => \implode('", "', $failed),
         ]);
 
-        foreach ($stopped as $name) {
+        // Trying to restart failed daemons
+        foreach ($failed as $name) {
             $this->addProcess($name)->start();
         }
+
+        // Reset failed daemons
+        $this->failureCounter = [];
     }
 
     public function stop(): void
@@ -126,7 +167,7 @@ class SupervisorDaemon implements DaemonInterface
             }
 
             $process = $run->getProcess();
-            $this->logDebug('Sending signal to ":name" daemon with PID = :pid', [
+            $this->logger->info('Sending signal to ":name" daemon with PID = :pid', [
                 ':pid'  => $process->getPid(),
                 ':name' => $this->getNameFromRun($run),
             ]);
@@ -134,7 +175,7 @@ class SupervisorDaemon implements DaemonInterface
             $process->stop(3);
         }
 
-        $this->logDebug('All daemons are stopped, supervisor is shutting down');
+        $this->logger->info('All daemons are stopped, supervisor is shutting down');
     }
 
     private function getDefinedDaemons(): array
@@ -164,21 +205,50 @@ class SupervisorDaemon implements DaemonInterface
             $run  = $runEvent->getRun();
             $name = $this->getNameFromRun($run);
 
-            if (!$run->isSuccessful() && $this->checkRetryLimitExceeded($name)) {
-                $this->logDebug('Daemon ":name" had failed :times times and was stopped', [
-                    ':name'  => $name,
-                    ':times' => self::RETRY_LIMIT,
-                ]);
+            if (!$run->isSuccessful()) {
+                if (empty($this->failureCounter[$name])) {
+                    $this->failureCounter[$name] = 1;
+                }
 
-                return;
+                // Increment failed attempts counter
+                $this->failureCounter[$name]++;
+
+                if ($this->failureCounter[$name] > self::RETRY_LIMIT) {
+                    // Warning for developers
+                    $this->logger->alert('Daemon ":name" had failed :times times and was stopped', [
+                        ':name'  => $name,
+                        ':times' => self::RETRY_LIMIT,
+                    ]);
+
+                    // No further processing
+                    return;
+                }
             }
 
-            $this->logDebug('Restarting ":name" daemon', [
+            $lock = $this->lockFactory->create($name);
+
+            if ($lock->isAcquired()) {
+                // Warning for developers
+                $this->logger->warning('Lock for ":name" daemon had not been released by the daemon:run task', [
+                    ':name' => $name,
+                ]);
+
+                // Something went wrong on the daemon shutdown so we need to clear the lock
+                $lock->release();
+            }
+
+            // Daemon exited with a regular way
+            $this->logDebug('Starting ":name" daemon', [
                 ':name' => $name,
             ]);
 
             // Restart
             $this->addProcess($name)->start();
+
+            // Wait for lock (will be acquired by the daemon)
+            while (!$lock->isAcquired()) {
+                \usleep(100000);
+            }
         });
 
         $this->pool->add($run);
@@ -186,18 +256,14 @@ class SupervisorDaemon implements DaemonInterface
         return $run;
     }
 
-    private function checkRetryLimitExceeded(string $name): bool
+    /**
+     * @return string[]
+     */
+    private function getRunningNames(): array
     {
-        $count = 0;
-
-        /** @var ProcessRun $run */
-        foreach ($this->pool->getIterator() as $run) {
-            if ($this->getNameFromRun($run) === $name && !$run->isSuccessful()) {
-                $count++;
-            }
-        }
-
-        return $count >= self::RETRY_LIMIT;
+        return \array_map(function (ProcessRun $run) {
+            return $this->getNameFromRun($run);
+        }, $this->pool->getRunning());
     }
 
     private function getNameFromRun(RunInterface $run): string

@@ -3,7 +3,7 @@
 return [
     'realmName'  => 'public',
     'connection' => [
-        'host' => '127.0.0.1',
-        'port' => 9090,
+        'host' => \getenv('WAMP_HOST'),
+        'port' => \getenv('WAMP_PORT'),
     ],
 ];

@@ -4,9 +4,10 @@ declare(strict_types=1);
 namespace BetaKiller\Middleware;
 
 use BetaKiller\Config\AppConfigInterface;
-use BetaKiller\Exception\FoundHttpException;
+use BetaKiller\Helper\ResponseHelper;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Message\UriInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
@@ -40,15 +41,33 @@ class SchemeMiddleware implements MiddlewareInterface
     {
         $baseScheme = parse_url($this->appConfig->getBaseUrl(), PHP_URL_SCHEME);
 
-        $currentUri = $request->getUri();
+        $currentUri    = $request->getUri();
         $currentScheme = $currentUri->getScheme();
 
         if ($baseScheme !== $currentScheme) {
-            $redirectUrl = (string)$currentUri->withScheme($baseScheme);
+            return $this->redirect($currentUri->withScheme($baseScheme));
+        }
 
-            throw new FoundHttpException($redirectUrl);
+        $path = $currentUri->getPath();
+
+        if ($path !== '/') {
+            $hasSlash       = (substr($path, -1) === '/');
+            $isSlashEnabled = $this->appConfig->isTrailingSlashEnabled();
+
+            if ($hasSlash && !$isSlashEnabled) {
+                return $this->redirect($currentUri->withPath(rtrim($path, '/')));
+            }
+
+            if (!$hasSlash && $isSlashEnabled) {
+                return $this->redirect($currentUri->withPath($path.'/'));
+            }
         }
 
         return $handler->handle($request);
+    }
+
+    private function redirect(UriInterface $uri): ResponseInterface
+    {
+        return ResponseHelper::permanentRedirect((string)$uri);
     }
 }
