@@ -1,15 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <root>
-
-    <!--Tests -->
-    <iface uri="tests" name="Admin_Tests_TestsDummy" parent="Admin_Index" zone="developer" menu="admin" label="Tests"
-           layout="admin">
-
-        <!--Test Wamp Rpc -->
-        <iface uri="wamp-rpc" name="Admin_Tests_TestWampRpcManager" menu="admin" label="WampRpcManager">
-            <iface uri="test" name="Admin_Tests_TestWampRpcTest" label="WampRpcTest"/>
-        </iface>
-
+    <!--Test Wamp Rpc -->
+    <iface uri="wamp" name="Admin_Test_WampRpcManager" menu="admin" label="WampRpcManager" parent="Admin_Test_Index">
+        <iface uri="test" name="Admin_Test_WampRpcRunner" label="WampRpcRunner"/>
     </iface>
-
 </root>

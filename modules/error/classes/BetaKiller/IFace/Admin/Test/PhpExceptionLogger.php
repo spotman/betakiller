@@ -1,12 +1,13 @@
 <?php
-namespace BetaKiller\IFace\Admin\Error;
+namespace BetaKiller\IFace\Admin\Test;
 
 use BetaKiller\Exception\ServerErrorHttpException;
 use BetaKiller\Helper\LoggerHelperTrait;
+use BetaKiller\IFace\Admin\Error\ErrorAdminBase;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
 
-class PhpExceptionTestLogger extends ErrorAdminBase
+class PhpExceptionLogger extends ErrorAdminBase
 {
     use LoggerHelperTrait;
 
@@ -16,7 +17,7 @@ class PhpExceptionTestLogger extends ErrorAdminBase
     protected $logger;
 
     /**
-     * PhpExceptionTestLogger constructor.
+     * PhpExceptionLogger constructor.
      *
      * @param \Psr\Log\LoggerInterface $logger
      */

@@ -1,12 +1,12 @@
 <?php
 declare(strict_types=1);
 
-namespace BetaKiller\IFace\Admin\Tests;
+namespace BetaKiller\IFace\Admin\Test;
 
 use BetaKiller\IFace\AbstractIFace;
 use Psr\Http\Message\ServerRequestInterface;
 
-class TestsDummy extends AbstractIFace
+class Index extends AbstractIFace
 {
     /**
      * @param \Psr\Http\Message\ServerRequestInterface $request
