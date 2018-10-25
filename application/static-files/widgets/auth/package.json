@@ -1,0 +1,32 @@
+{
+  "scripts": {
+    "dev": "webpack --mode development",
+    "prod": "webpack --mode production",
+    "watch": "webpack --mode development --watch",
+    "test": ""
+  },
+  "dependencies": {
+    "@babel/polyfill": "^7.0.0"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.1.2",
+    "@babel/core": "^7.1.2",
+    "@babel/preset-env": "^7.1.0",
+    "babel-loader": "^8.0.4",
+    "clean-webpack-plugin": "^0.1.19",
+    "webpack": "^4.20.2",
+    "webpack-cli": "^3.1.2",
+    "webpack-merge": "^4.1.4"
+  },
+  "browserslist": {
+    "production": [
+      "last 2 versions",
+      "> 0.2%",
+      "ie >= 6"
+    ],
+    "development": [
+      "last 2 Chrome versions",
+      "not dead"
+    ]
+  }
+}
