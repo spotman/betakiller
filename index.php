@@ -2,10 +2,6 @@
 declare(strict_types=1);
 
 use BetaKiller\WebApp;
-use Psr\Http\Message\ServerRequestFactoryInterface;
-use Zend\Diactoros\ServerRequestFactory;
-use Zend\HttpHandlerRunner\Emitter\EmitterInterface;
-use Zend\HttpHandlerRunner\RequestHandlerRunner;
 
 // Delegate static file requests back to the PHP built-in webserver
 if (PHP_SAPI === 'cli-server' && $_SERVER['SCRIPT_FILENAME'] !== __FILE__) {
@@ -129,7 +125,7 @@ try {
         ? in_array(Kohana::$environment, [\Kohana::DEVELOPMENT, \Kohana::TESTING], true)
         : false;
 
-    $message = $e->getMessage().PHP_EOL.PHP_EOL.$e->getTraceAsString();
+    $message  = $e->getMessage().PHP_EOL.PHP_EOL.$e->getTraceAsString();
     $previous = $e->getPrevious();
 
     if ($previous) {
@@ -162,7 +158,6 @@ if (PHP_SAPI === 'cli') // Try and load minion
      * Execute the main request. A source of the URI can be passed, eg: $_SERVER['PATH_INFO'].
      * If no source is specified, the URI will be automatically detected.
      */
-
     $container = \BetaKiller\DI\Container::getInstance();
 
     /** @var \BetaKiller\WebApp $webApp */
