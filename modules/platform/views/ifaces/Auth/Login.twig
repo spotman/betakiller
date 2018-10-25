@@ -2,8 +2,14 @@
 
 {% block content %}
 
-    <div id="auth-widget-container">
-        {{ widget("Auth") }}
-    </div>
+  <style>
+    html, body {
+      height: 100%;
+    }
+  </style>
+
+  <section id="auth-widget-container" class="h-100 d-flex flex align-items-center">
+    {{ widget("Auth") }}
+  </section>
 
 {% endblock %}
