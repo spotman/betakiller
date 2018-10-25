@@ -359,18 +359,20 @@ task('assets:deploy', function () {
 })->desc('Collect assets from all static-files directories');
 
 task('deploy:dotenv:migrate', function () {
-    $targetDotEnv = '{{release_path}}/{{app_path}}/.env';
-    $previousDotEnv = '{{previous_release}}/{{app_path}}/.env';
-    $defaultDotEnv = '{{deploy_path}}/.env.default';
+    $globalDotEnv  = '{{deploy_path}}/.env';
+    $targetDotEnv  = '{{release_path}}/{{app_path}}/.env';
+    $exampleDotEnv = '{{release_path}}/{{app_path}}/.env.example';
 
-    if (has('previous_release') && test("[ -f $previousDotEnv ]")) {
-        run("cp $previousDotEnv $targetDotEnv");
-    } elseif (test("[ -f $defaultDotEnv ]")) {
-        run("cp $defaultDotEnv $targetDotEnv");
-    } else {
-        throw new Exception('Can not find .env file');
+    if (!test("[ -f $globalDotEnv ]")) {
+        if (test("[ -f $exampleDotEnv ]")) {
+            run("cp $exampleDotEnv $globalDotEnv");
+        } else {
+            throw new Exception('Can not find .env file');
+        }
     }
-})->desc('Copy .env file from previous revision if exists');
+
+    run("cp $globalDotEnv $targetDotEnv");
+})->desc('Copy .env file from deploy path');
 
 task('deploy:dotenv:revision', function () {
     $revision = gitRevision('app').gitRevision('core');
