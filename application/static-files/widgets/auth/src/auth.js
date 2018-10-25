@@ -1,10 +1,8 @@
 'use strict';
 
 import Provider_regular from './providers/regular.js';
-import Provider_uLogin from './providers/uLogin.js';
 const providers = {
-  Provider_regular,
-  Provider_uLogin
+  Provider_regular
 }
 
 class Auth {
