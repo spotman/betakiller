@@ -4,6 +4,7 @@ namespace BetaKiller;
 use BetaKiller\Assets\StaticAssets;
 use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\Helper\I18nHelper;
+use BetaKiller\I18n\I18nFacade;
 use BetaKiller\Url\ZoneInterface;
 use BetaKiller\View\IFaceView;
 use BetaKiller\Widget\WidgetFacade;
@@ -148,6 +149,10 @@ class TwigExtension extends Twig_Extension
              * @example ":count lots"|i18n({ ":count": lotsCount })
              */
             new Twig_Filter('i18n', function (array $context, string $text, array $values = null) {
+                if ($values) {
+                    $values = I18nFacade::addPlaceholderPrefixToKeys($values);
+                }
+
                 return $this->getI18n($context)->translate($text, $values);
             }, ['needs_context' => true, 'is_safe' => ['html']]),
 
