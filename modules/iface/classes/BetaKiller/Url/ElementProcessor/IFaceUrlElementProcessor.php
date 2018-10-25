@@ -1,10 +1,8 @@
 <?php
 namespace BetaKiller\Url\ElementProcessor;
 
-use BetaKiller\Config\AppConfigInterface;
 use BetaKiller\Exception\BadRequestHttpException;
 use BetaKiller\Exception\FoundHttpException;
-use BetaKiller\Exception\PermanentRedirectHttpException;
 use BetaKiller\Factory\IFaceFactory;
 use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Helper\ServerRequestHelper;
@@ -21,13 +19,6 @@ use Psr\Http\Message\ServerRequestInterface;
  */
 class IFaceUrlElementProcessor implements UrlElementProcessorInterface
 {
-    /**
-     * Application config
-     *
-     * @var \BetaKiller\Config\AppConfigInterface
-     */
-    private $appConfig;
-
     /**
      * IFace Factory
      *
@@ -50,18 +41,15 @@ class IFaceUrlElementProcessor implements UrlElementProcessorInterface
     private $ifaceCache;
 
     /**
-     * @param \BetaKiller\Config\AppConfigInterface $appConfig
-     * @param \BetaKiller\Factory\IFaceFactory      $ifaceFactory
-     * @param \BetaKiller\View\IFaceView            $ifaceView
-     * @param \BetaKiller\IFace\Cache\IFaceCache    $ifaceCache
+     * @param \BetaKiller\Factory\IFaceFactory   $ifaceFactory
+     * @param \BetaKiller\View\IFaceView         $ifaceView
+     * @param \BetaKiller\IFace\Cache\IFaceCache $ifaceCache
      */
     public function __construct(
-        AppConfigInterface $appConfig,
         IFaceFactory $ifaceFactory,
         IFaceView $ifaceView,
         IFaceCache $ifaceCache
     ) {
-        $this->appConfig    = $appConfig;
         $this->ifaceFactory = $ifaceFactory;
         $this->ifaceView    = $ifaceView;
         $this->ifaceCache   = $ifaceCache;
@@ -75,7 +63,6 @@ class IFaceUrlElementProcessor implements UrlElementProcessorInterface
      *
      * @return \Psr\Http\Message\ResponseInterface
      * @throws \BetaKiller\Exception\FoundHttpException
-     * @throws \BetaKiller\Exception\PermanentRedirectHttpException
      * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\Url\ElementProcessor\UrlElementProcessorException
      * @throws \PageCache\PageCacheException
@@ -97,19 +84,6 @@ class IFaceUrlElementProcessor implements UrlElementProcessorInterface
         // If this is default IFace and client requested non-slash uri, redirect client to /
         if ($path !== '/' && $model->isDefault() && !$model->hasDynamicUrl()) {
             throw new FoundHttpException('/');
-        }
-
-        if ($path !== '/') {
-            $hasTrailingSlash       = (substr($path, -1) === '/');
-            $isTrailingSlashEnabled = $this->appConfig->isTrailingSlashEnabled();
-
-            if ($hasTrailingSlash && !$isTrailingSlashEnabled) {
-                throw new PermanentRedirectHttpException(rtrim($path, '/'));
-            }
-
-            if (!$hasTrailingSlash && $isTrailingSlashEnabled) {
-                throw new PermanentRedirectHttpException($path.'/');
-            }
         }
 
         $urlContainer = ServerRequestHelper::getUrlContainer($request);

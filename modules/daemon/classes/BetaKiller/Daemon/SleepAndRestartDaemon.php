@@ -5,18 +5,19 @@ namespace BetaKiller\Daemon;
 
 use React\EventLoop\LoopInterface;
 
-class SleepDaemon extends AbstractDaemon
+class SleepAndRestartDaemon implements DaemonInterface
 {
-    public const CODENAME = 'Sleep';
+    public const CODENAME = 'SleepAndRestart';
 
     public function start(LoopInterface $loop): void
     {
         // Test start
         echo 'Starting Sleep daemon...';
-        sleep(10);
+        sleep(5);
         echo 'OK'.\PHP_EOL;
 
-        $this->restart();
+        // Simulate normal restart
+        throw new ShutdownDaemonException;
     }
 
     public function stop(): void

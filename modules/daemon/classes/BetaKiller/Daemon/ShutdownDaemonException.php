@@ -5,6 +5,6 @@ namespace BetaKiller\Daemon;
 
 use BetaKiller\Exception;
 
-class RestartDaemonException extends Exception
+class ShutdownDaemonException extends Exception
 {
 }

@@ -4,36 +4,40 @@ declare(strict_types=1);
 namespace BetaKiller\Task\Daemon;
 
 use BetaKiller\Daemon\DaemonFactory;
-use BetaKiller\Daemon\DaemonInterface;
-use BetaKiller\Daemon\RestartDaemonException;
-use BetaKiller\Helper\AppEnvInterface;
+use BetaKiller\Daemon\LockFactory;
+use BetaKiller\Daemon\ShutdownDaemonException;
 use BetaKiller\Helper\LoggerHelperTrait;
 use BetaKiller\Task\AbstractTask;
+use BetaKiller\Task\TaskException;
 use Psr\Log\LoggerInterface;
 
 class Run extends AbstractTask
 {
     use LoggerHelperTrait;
 
+    private const STATUS_STARTING = 'starting';
+    private const STATUS_STARTED  = 'started';
+    private const STATUS_STOPPING = 'stopping';
+
     /**
      * @var \BetaKiller\Daemon\DaemonFactory
      */
-    private $factory;
+    private $daemonFactory;
 
     /**
-     * @var \BetaKiller\Helper\AppEnvInterface
+     * @var \BetaKiller\Daemon\LockFactory
      */
-    private $appEnv;
+    private $lockFactory;
+
+    /**
+     * @var \Psr\Log\LoggerInterface
+     */
+    private $logger;
 
     /**
      * @var string
      */
     private $codename;
-
-    /**
-     * @var
-     */
-    private $isStarted;
 
     /**
      * @var \BetaKiller\Daemon\DaemonInterface
@@ -46,22 +50,30 @@ class Run extends AbstractTask
     private $loop;
 
     /**
-     * @var \Psr\Log\LoggerInterface
+     * @var \BetaKiller\Daemon\Lock
      */
-    private $logger;
+    private $lock;
+
+    /**
+     * @var string
+     */
+    private $status;
 
     /**
      * Run constructor.
      *
-     * @param \BetaKiller\Daemon\DaemonFactory   $factory
-     * @param \BetaKiller\Helper\AppEnvInterface $appEnv
-     * @param \Psr\Log\LoggerInterface           $logger
+     * @param \BetaKiller\Daemon\DaemonFactory $daemonFactory
+     * @param \BetaKiller\Daemon\LockFactory   $lockFactory
+     * @param \Psr\Log\LoggerInterface         $logger
      */
-    public function __construct(DaemonFactory $factory, AppEnvInterface $appEnv, LoggerInterface $logger)
-    {
-        $this->appEnv  = $appEnv;
-        $this->factory = $factory;
-        $this->logger  = $logger;
+    public function __construct(
+        DaemonFactory $daemonFactory,
+        LockFactory $lockFactory,
+        LoggerInterface $logger
+    ) {
+        $this->daemonFactory = $daemonFactory;
+        $this->logger        = $logger;
+        $this->lockFactory   = $lockFactory;
 
         parent::__construct();
     }
@@ -75,8 +87,7 @@ class Run extends AbstractTask
     public function defineOptions(): array
     {
         return [
-            'name'    => null,
-            'restart' => 'false',
+            'name' => null,
         ];
     }
 
@@ -88,20 +99,27 @@ class Run extends AbstractTask
             throw new \LogicException('Daemon codename is not defined');
         }
 
+        $this->lock = $this->lockFactory->create($this->codename);
+
         // Check if it is running already and exit if so
-        if (!$this->lock()) {
+        if ($this->lock->isAcquired()) {
             $this->logger->debug('Daemon ":name" is already running', [
                 ':name' => $this->codename,
             ]);
 
-            return;
+            // It is not normal to have multiple instances
+            exit(1);
+        }
+
+        if (!$this->lock->acquire(\getmypid())) {
+            throw new TaskException('Can not acquire lock for daemon ":name"', [
+                ':name' => $this->codename,
+            ]);
         }
 
         $this->loop = \React\EventLoop\Factory::create();
 
         $this->addSignalHandlers();
-
-        $this->daemon = $this->factory->create($this->codename);
 
         $this->start();
 
@@ -111,41 +129,45 @@ class Run extends AbstractTask
 
     private function start(): void
     {
-        $this->wrap(function () {
+        $this->setStatus(self::STATUS_STARTING);
+
+        try {
+            $this->daemon = $this->daemonFactory->create($this->codename);
+
             $this->daemon->start($this->loop);
-            $this->isStarted = true;
-            $this->logger->debug('Daemon ":name" was started', [
+
+            $this->logger->debug('Daemon ":name" is started', [
                 ':name' => $this->codename,
             ]);
-        });
+        } catch (\Throwable $e) {
+            $this->processException($e);
+        }
+
+        $this->setStatus(self::STATUS_STARTED);
     }
 
     private function stop(): void
     {
-        $this->wrap(function () {
+        // Prevent sequential stop calls
+        if ($this->isStopping()) {
+            return;
+        }
+
+        $this->setStatus(self::STATUS_STOPPING);
+
+        try {
             $this->daemon->stop();
-            $this->isStarted = false;
 
             $this->logger->debug('Daemon ":name" was stopped', [
                 ':name' => $this->codename,
             ]);
-        });
-    }
-
-    private function restart(): void
-    {
-        if ($this->isStarted) {
-            $this->stop();
+        } catch (\Throwable $e) {
+            $this->processException($e);
         }
-        $this->wrap(function () {
-            $this->isStarted = true;
-            $this->daemon->restart();
-        });
     }
 
     private function shutdown(int $exitCode): void
     {
-        $this->stop();
         $this->unlock();
 
         $this->logger->debug('Shutting down daemon ":name" with exit code [:code]', [
@@ -156,13 +178,13 @@ class Run extends AbstractTask
         exit($exitCode);
     }
 
-    private function wrap(callable $func): void
+    private function processException(\Throwable $e): void
     {
-        try {
-            $func();
-        } catch (RestartDaemonException $e) {
+        if ($e instanceof ShutdownDaemonException) {
+            // Normal shutdown
             $this->shutdown(0);
-        } catch (\Throwable $e) {
+        } else {
+            // Something wrong is going on here
             $this->logException($this->logger, $e);
             $this->shutdown(1);
         }
@@ -177,16 +199,12 @@ class Run extends AbstractTask
                 ':value' => $signal,
                 ':name'  => $this->codename,
             ]);
+
+            $this->stop();
+
+            // Simply exit with OK status and daemon would be restarted by supervisor
             $this->shutdown(0);
         };
-
-        // Restart
-        $this->loop->addSignal(DaemonInterface::RESTART_SIGNAL, function () {
-            $this->logger->debug('Restarting daemon ":name"', [
-                ':name' => $this->codename,
-            ]);
-            $this->restart();
-        });
 
         /**
          * @see https://stackoverflow.com/a/38991496
@@ -197,51 +215,36 @@ class Run extends AbstractTask
         $this->loop->addSignal(\SIGTERM, $signalCallable);
     }
 
-    private function lock(): bool
-    {
-        $lockFile = $this->getLockFileName();
-
-        // If lock file exists, check if stale.  If exists and is not stale, return TRUE
-        // Else, create lock file and return FALSE.
-
-        // The @ in front of 'symlink' is to suppress the NOTICE you get if the LOCK_FILE exists
-        if (@symlink('/proc/'.getmypid(), $lockFile) !== false) {
-            return true;
-        }
-
-        // Link already exists, check if it's stale
-        if (is_link($lockFile) && !is_dir($lockFile)) {
-            \unlink($lockFile);
-
-            // Try to lock again
-            return $this->lock();
-        }
-
-        return false;
-    }
-
     private function unlock(): void
     {
-        $file = $this->getLockFileName();
-
-        if (\file_exists($file)) {
-            \unlink($file);
+        if ($this->lock->release()) {
             $this->logger->debug('Daemon ":name" was unlocked', [
                 ':name' => $this->codename,
             ]);
         } else {
-            $this->logger->debug('Daemon lock-file ":path" does not exists', [
-                ':path' => $file,
+            $this->logger->debug('Daemon ":name" is not locked', [
+                ':name' => $this->codename,
             ]);
         }
     }
 
-    private function getLockFileName(): string
+    private function setStatus(string $value): void
     {
-        if (!$this->codename) {
-            throw new \LogicException('Daemon codename is not defined');
-        }
+        $this->status = $value;
+    }
 
-        return $this->appEnv->getTempPath().\DIRECTORY_SEPARATOR.'.'.$this->codename.'.daemon.lock';
+    private function isStarting(): bool
+    {
+        return $this->status === self::STATUS_STARTING;
+    }
+
+    private function isStarted(): bool
+    {
+        return $this->status === self::STATUS_STARTED;
+    }
+
+    private function isStopping(): bool
+    {
+        return $this->status === self::STATUS_STOPPING;
     }
 }
