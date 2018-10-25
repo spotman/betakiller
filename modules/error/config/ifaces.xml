@@ -1,25 +1,33 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <root>
     <iface name="HttpErrorList" uri="errors" label="Error pages" layout="error" hideInSiteMap="true" zone="admin">
-        <iface name="HttpError400" uri="400" label="error.http.400.label" zone="public" />
-        <iface name="HttpError401" uri="401" label="error.http.401.label" zone="public" layout="auth" />
-        <iface name="HttpError403" uri="403" label="error.http.403.label" zone="public" />
-        <iface name="HttpError404" uri="404" label="error.http.404.label" zone="public" />
-        <iface name="HttpError500" uri="500" label="error.http.500.label" zone="public" />
-        <iface name="HttpError503" uri="503" label="error.http.503.label" zone="public" />
+        <iface name="HttpError400" uri="400" label="error.http.400.label" zone="public"/>
+        <iface name="HttpError401" uri="401" label="error.http.401.label" zone="public" layout="auth"/>
+        <iface name="HttpError403" uri="403" label="error.http.403.label" zone="public"/>
+        <iface name="HttpError404" uri="404" label="error.http.404.label" zone="public"/>
+        <iface name="HttpError500" uri="500" label="error.http.500.label" zone="public"/>
+        <iface name="HttpError503" uri="503" label="error.http.503.label" zone="public"/>
     </iface>
 
     <!-- TODO вынести это всё в файл config/ifaces.php, который добавляет элементы в UrlElementTree::admin() -->
-    <iface uri="errors" name="Admin_Error_Index" parent="Admin_Index" title="Admin | Errors" label="Errors" menu="admin">
-        <iface uri="php-exceptions" name="Admin_Error_UnresolvedPhpExceptionIndex" title="Admin | Unresolved PhpExceptions" label="Unresolved" entity="PhpException" entityAction="listUnresolved" menu="admin">
-            <iface uri="resolved" name="Admin_Error_ResolvedPhpExceptionIndex" title="Admin | Resolved PhpExceptions" label="Resolved" entity="PhpException" entityAction="listResolved" menu="admin"/>
-            <iface uri="test" name="Admin_Error_PhpExceptionTest" label="Test" entity="PhpException" entityAction="test" menu="admin">
-                <iface uri="500" name="Admin_Error_PhpExceptionTestHTTP500" label="HTTP 500 test" />
-                <iface uri="logger" name="Admin_Error_PhpExceptionTestLogger" label="Logger test" />
-            </iface>
-            <iface uri="{PhpException.hash}" name="Admin_Error_PhpExceptionItem" label="{PhpException.message}" hasDynamicUrl="true" entity="PhpException" entityAction="read">
+    <iface uri="errors" name="Admin_Error_Index" parent="Admin_Index" title="Admin | Errors" label="Errors"
+           menu="admin">
+        <iface uri="php-exceptions" name="Admin_Error_UnresolvedPhpExceptionIndex"
+               title="Admin | Unresolved PhpExceptions" label="Unresolved" entity="PhpException"
+               entityAction="listUnresolved" menu="admin">
+            <iface uri="resolved" name="Admin_Error_ResolvedPhpExceptionIndex" title="Admin | Resolved PhpExceptions"
+                   label="Resolved" entity="PhpException" entityAction="listResolved" menu="admin"/>
+            <iface uri="{PhpException.hash}" name="Admin_Error_PhpExceptionItem" label="{PhpException.message}"
+                   hasDynamicUrl="true" entity="PhpException" entityAction="read">
                 <iface uri="stacktrace" name="Admin_Error_PhpExceptionStackTrace" label="Stacktrace" layout="raw"/>
             </iface>
         </iface>
     </iface>
+
+    <iface uri="test" name="Admin_Test_PhpExceptionIndex" parent="Admin_Test_Index" label="Php Exception"
+           entity="PhpException" entityAction="test" menu="admin">
+        <iface uri="500" name="Admin_Test_PhpExceptionHttp500" label="HTTP 500 test"/>
+        <iface uri="logger" name="Admin_Test_PhpExceptionLogger" label="Logger test"/>
+    </iface>
+
 </root>

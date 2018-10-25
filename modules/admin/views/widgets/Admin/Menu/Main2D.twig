@@ -1,4 +1,4 @@
-<ul id="admin-main-menu-widget" class="collapsible collapsible-accordion">
+<ul class="admin-main-menu-widget collapsible collapsible-accordion">
   {% for item in items %}
     {% set has_children = item.children and item.children|length > 0  %}
     {% set icon = item.icon|default() %}

@@ -114,12 +114,14 @@ class StaticAssets
      *
      * @return string
      */
-    public function findFile(string $relativePath): string
+    public function findFile(string $relativePath): ?string
     {
         $info = pathinfo($relativePath);
         $dir  = ($info['dirname'] !== '.') ? $info['dirname'].'/' : '';
 
-        return Kohana::find_file('static-files', $dir.$info['filename'], $info['extension']);
+        $file = Kohana::find_file('static-files', $dir.$info['filename'], $info['extension']);
+
+        return $file ? (string)$file : null;
     }
 
     public function getDeployPath(string $relativePath): string

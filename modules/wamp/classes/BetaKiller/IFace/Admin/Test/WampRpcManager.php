@@ -1,13 +1,13 @@
 <?php
 declare(strict_types=1);
 
-namespace BetaKiller\IFace\Admin\Tests;
+namespace BetaKiller\IFace\Admin\Test;
 
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\IFace\AbstractIFace;
 use Psr\Http\Message\ServerRequestInterface;
 
-class TestWampRpcManager extends AbstractIFace
+class WampRpcManager extends AbstractIFace
 {
     /**
      * @param \Psr\Http\Message\ServerRequestInterface $request
@@ -19,7 +19,7 @@ class TestWampRpcManager extends AbstractIFace
     {
         $urlHelper = ServerRequestHelper::getUrlHelper($request);
 
-        $testElement = $urlHelper->getUrlElementByCodename(TestWampRpcTest::codename());
+        $testElement = $urlHelper->getUrlElementByCodename(WampRpcRunner::codename());
         $testUrl     = $urlHelper->makeUrl($testElement, null, false);
 
         $userAgent = ServerRequestHelper::getUserAgent($request);

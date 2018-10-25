@@ -1,6 +1,6 @@
 {% macro MenuMacro(item, childrenOnly=0) %}
   {% import _self as self %}
-  {% set hasChildren = item.children is defined and item.children|length  %}
+  {% set hasChildren = item.children is defined and item.children|length %}
   {% set icon = item.icon|default() %}
 
   {% if not childrenOnly %}
@@ -19,10 +19,10 @@
 
 {% import _self as macro %}
 
-<ul id="admin-main-menu-widget" class="collapsible collapsible-accordion">
+<ul class="admin-main-menu-widget collapsible collapsible-accordion">
 
   {% for item in items %}
-    {% set hasChildren = item.children is defined and item.children|length  %}
+    {% set hasChildren = item.children is defined and item.children|length %}
     {% set icon = item.icon|default() %}
     <li class="{{ item.active ? 'active' : '' }}">
 
