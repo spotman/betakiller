@@ -122,21 +122,21 @@ final class I18nFacade
         return isset($table[$key]);
     }
 
-//    private static function addPlaceholderPrefixToKeys(array $data): array
-//    {
-//        $output = [];
-//
-//        foreach ($data as $key => $value) {
-//            // Add prefix if it does not exist
-//            if (strpos($key, self::PLACEHOLDER_PREFIX) !== 0) {
-//                $key = self::PLACEHOLDER_PREFIX.$key;
-//            }
-//
-//            $output[$key] = $value;
-//        }
-//
-//        return $output;
-//    }
+    public static function addPlaceholderPrefixToKeys(array $data): array
+    {
+        $output = [];
+
+        foreach ($data as $key => $value) {
+            // Add prefix if it does not exist
+            if (strpos($key, self::PLACEHOLDER_PREFIX) !== 0) {
+                $key = self::PLACEHOLDER_PREFIX.$key;
+            }
+
+            $output[$key] = $value;
+        }
+
+        return $output;
+    }
 
     /**
      * Returns translation of a string. If no translation exists, the original
