@@ -1,10 +1,11 @@
 <?php
-namespace BetaKiller\IFace\Admin\Error;
+namespace BetaKiller\IFace\Admin\Test;
 
 use BetaKiller\Exception\ServerErrorHttpException;
+use BetaKiller\IFace\Admin\Error\ErrorAdminBase;
 use Psr\Http\Message\ServerRequestInterface;
 
-class PhpExceptionTestHTTP500 extends ErrorAdminBase
+class PhpExceptionHttp500 extends ErrorAdminBase
 {
     /**
      * Returns data for View
