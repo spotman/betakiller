@@ -1,14 +1,9 @@
-require([
-  "jquery",
-  "auth.login"
-], function ($, login) {
+'use strict';
 
-  $(function () {
+import Login from './login.js';
 
-    login.initialize(
-      $(".widget-auth")
-    );
-
-  });
-
-});
+export default class {
+  constructor() {
+    new Login($(".widget-auth"));
+  }
+}
