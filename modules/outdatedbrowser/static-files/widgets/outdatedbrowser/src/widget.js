@@ -12,6 +12,7 @@ function addLoadEvent(func) {
     }
   }
 }
+
 //call plugin function after DOM ready
 addLoadEvent(function(){
   var outdated = document.getElementById('outdated');
@@ -20,6 +21,6 @@ addLoadEvent(function(){
     bgColor: '#f25648',
     color: '#ffffff',
     lowerThan: 'transform',
-    languagePath: '/assets/static/widgets/outdatedbrowser/vendor/lang/'+langCode+'.html'
+    languagePath: '/assets/static/widgets/outdatedbrowser/dist/lang/'+langCode+'.html'
   })
 });

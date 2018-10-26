@@ -1,0 +1,16 @@
+{
+  "scripts": {
+    "dev": "NODE_ENV=development webpack",
+    "prod": "NODE_ENV=production webpack",
+    "watch": "NODE_ENV=development webpack --watch"
+  },
+  "dependencies": {
+    "outdatedbrowser": "^1.1.5"
+  },
+  "devDependencies": {
+    "@symfony/webpack-encore": "^0.20.1",
+    "uglifyjs-webpack-plugin": "^2.0.1",
+    "copy-webpack-plugin": "^4.5.4",
+    "webpack": "^3.4.1"
+  }
+}
