@@ -15,7 +15,6 @@ module.exports = merge([
   config.require('module_fonts'),
   config.require('plugins_css_extract'),
   config.require('plugins_clear_bundle'),
-  config.require('plugins_provide_jquery'),
   config.require('plugins_provide_popper'),
   config.require('optimization_minimize'),
 ]);

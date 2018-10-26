@@ -1,9 +1,11 @@
 'use strict';
 
+import $ from 'jquery';
 import Provider_regular from './providers/regular.js';
+
 const providers = {
   Provider_regular
-}
+};
 
 class Auth {
   constructor() {
@@ -15,7 +17,7 @@ class Auth {
     this.$widget.data('providers').split(',')
       .forEach((providerName) => {
         let providerClass = `Provider_${providerName}`;
-        new providers[providerClass](this.onSuccess)
+        new providers[providerClass](this.onSuccess);
       });
   }
 
