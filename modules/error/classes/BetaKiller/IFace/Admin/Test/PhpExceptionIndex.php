@@ -21,7 +21,7 @@ class PhpExceptionIndex extends ErrorAdminBase
     {
         $urlHelper = ServerRequestHelper::getUrlHelper($request);
 
-        $http500IFace = $urlHelper->getUrlElementByCodename('Admin_Test_PhpExceptionHTTP500');
+        $http500IFace = $urlHelper->getUrlElementByCodename('Admin_Test_PhpExceptionHttp500');
         $loggerIFace  = $urlHelper->getUrlElementByCodename('Admin_Test_PhpExceptionLogger');
 
         return [
