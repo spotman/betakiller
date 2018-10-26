@@ -1,5 +1,7 @@
 'use strict';
 
+import $ from 'jquery';
+
 export default class {
   constructor(successfulCallback) {
     this.successfulCallback = successfulCallback;
