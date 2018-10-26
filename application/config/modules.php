@@ -59,4 +59,5 @@ return [
 
     'outdatedbrowser'      => MODPATH.'outdatedbrowser',        // Notification for older browsers
     'cookies-notification' => MODPATH.'cookies-notification',   // Notification of cookie
+    'language-selection'   => MODPATH.'language-selection',     // Language selection
 ];

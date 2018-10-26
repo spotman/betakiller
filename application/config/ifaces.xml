@@ -8,6 +8,8 @@
     <action uri="logout" name="Auth_Logout" zone="public" />
     <!--<iface uri="change-account" name="Auth_ReLogin" label="Change account" layout="auth" hideInSiteMap="true" zone="personal" />-->
     <!--<iface uri="password-reset" name="Auth_PasswordReset" label="Reset password" layout="auth" hideInSiteMap="true" zone="public" />-->
+
+    <action uri="language-selection" name="LanguageSelection" hideInSiteMap="true" zone="public" />
 </root>
 
 <!-- TODO убрать этот файл после того как будет настроено нормальное дерево интерфейсов -->
