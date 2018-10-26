@@ -56,4 +56,6 @@ return [
 
     // Workaround for injecting admin/config/ifaces.xml in a proper way
     'admin'       => MODPATH.'admin',                 // Basic admin
+
+    'outdatedbrowser' => MODPATH.'outdatedbrowser',   // Notification for older browsers
 ];
