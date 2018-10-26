@@ -13,7 +13,6 @@ module.exports = {
     'auth': [
       './auth.js',
       './providers/regular.js',
-      './providers/uLogin.js',
     ],
   },
 };
