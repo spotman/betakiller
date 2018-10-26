@@ -15,7 +15,8 @@ use Psr\Http\Server\RequestHandlerInterface;
 
 class I18nMiddleware implements MiddlewareInterface
 {
-    private const COOKIE_NAME = 'lang';
+    public const COOKIE_NAME = 'lang';
+    public const DATE_INTERVAL = 'P14D';
 
     /**
      * @var \BetaKiller\I18n\I18nFacade
@@ -41,6 +42,8 @@ class I18nMiddleware implements MiddlewareInterface
      *
      * @return \Psr\Http\Message\ResponseInterface
      */
+    //получение url: url helper передать ему url элемент
+    //получение авторизованного пользователя: server request helper has user
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         $pid = Profiler::begin($request, 'Language detection');
@@ -54,7 +57,7 @@ class I18nMiddleware implements MiddlewareInterface
 
         $response = $handler->handle($request->withAttribute(I18nHelper::class, $i18n));
 
-        return ResponseHelper::setCookie($response, self::COOKIE_NAME, $lang, new \DateInterval('P14D'));
+        return ResponseHelper::setCookie($response, self::COOKIE_NAME, $lang, new \DateInterval(self::DATE_INTERVAL));
     }
 
     private function detectLang(ServerRequestInterface $request): string
