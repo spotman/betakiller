@@ -1,0 +1,5 @@
+{
+  "dist/vendor.js": "/assets/static/auth/dist/vendor.js",
+  "dist/auth.js": "/assets/static/auth/dist/auth.js",
+  "dist/manifest.js": "/assets/static/auth/dist/manifest.js"
+}

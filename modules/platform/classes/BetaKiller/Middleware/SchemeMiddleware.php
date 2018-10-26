@@ -49,8 +49,9 @@ class SchemeMiddleware implements MiddlewareInterface
         }
 
         $path = $currentUri->getPath();
+        $file = \basename($path);
 
-        if ($path !== '/') {
+        if ($path !== '/' && \strpos($file, '.') === false) {
             $hasSlash       = (substr($path, -1) === '/');
             $isSlashEnabled = $this->appConfig->isTrailingSlashEnabled();
 

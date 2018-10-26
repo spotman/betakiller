@@ -1,10 +1,10 @@
 'use strict';
 
 import $ from 'jquery';
-import Provider_regular from './providers/regular.js';
+import ProviderRegular from './providers/regular.js';
 
 const providers = {
-  Provider_regular
+  "regular": ProviderRegular
 };
 
 class Auth {
@@ -16,13 +16,11 @@ class Auth {
   initProviders() {
     this.$widget.data('providers').split(',')
       .forEach((providerName) => {
-        let providerClass = `Provider_${providerName}`;
-        new providers[providerClass](this.onSuccess);
+        let provider = providers[providerName];
+        new provider(function () {
+          location.reload(true);
+        });
       });
-  }
-
-  onSuccess() {
-    location.reload(true);
   }
 }
 

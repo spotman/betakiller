@@ -1,9 +1,8 @@
 {
   "scripts": {
-    "dev": "webpack --mode development",
-    "prod": "webpack --mode production",
-    "watch": "webpack --mode development --watch",
-    "test": ""
+    "dev": "NODE_ENV=development webpack",
+    "prod": "NODE_ENV=production webpack",
+    "watch": "NODE_ENV=development webpack --watch"
   },
   "dependencies": {
     "@babel/polyfill": "^7.0.0",
@@ -16,21 +15,12 @@
     "@babel/cli": "^7.1.2",
     "@babel/core": "^7.1.2",
     "@babel/preset-env": "^7.1.0",
+    "@symfony/webpack-encore": "^0.20.1",
     "babel-loader": "^8.0.4",
-    "clean-webpack-plugin": "^0.1.19",
-    "webpack": "^4.20.2",
-    "webpack-cli": "^3.1.2",
-    "webpack-merge": "^4.1.4",
-    "url-loader": "^1.1.2",
-    "file-loader": "^ 2.0.0",
-    "style-loader": "^0.23.1",
-    "css-loader": "^1.0.0",
+    "node-sass": "^4.9.4",
     "sass-loader": "^7.1.0",
-    "node-sass": "^ 4.9.4",
-    "postcss-loader": "^3.0.0",
-    "postcss-preset-env": "^6.1.1",
-    "precss": "^3.1.2",
-    "mini-css-extract-plugin": "^0.4.4"
+    "uglifyjs-webpack-plugin": "^2.0.1",
+    "webpack": "^3.4.1"
   },
   "browserslist": {
     "production": [
