@@ -3,7 +3,9 @@ declare(strict_types=1);
 
 namespace BetaKiller\Middleware;
 
+use BetaKiller\Dev\DebugBarCookiesDataCollector;
 use BetaKiller\Helper\AppEnvInterface;
+use BetaKiller\Helper\CookieHelper;
 use BetaKiller\Log\LoggerInterface;
 use DebugBar\DataCollector\MemoryCollector;
 use DebugBar\DataCollector\RequestDataCollector;
@@ -45,19 +47,28 @@ class DebugMiddleware implements MiddlewareInterface
     private $logger;
 
     /**
+     * @var \BetaKiller\Helper\CookieHelper
+     */
+    private $cookieHelper;
+
+    /**
      * DebugMiddleware constructor.
      *
      * @param \BetaKiller\Helper\AppEnvInterface         $appEnv
+     * @param \BetaKiller\Helper\CookieHelper            $cookieHelper
      * @param \Psr\Http\Message\ResponseFactoryInterface $responseFactory
      * @param \Psr\Http\Message\StreamFactoryInterface   $streamFactory
+     * @param \BetaKiller\Log\LoggerInterface            $logger
      */
     public function __construct(
         AppEnvInterface $appEnv,
+        CookieHelper $cookieHelper,
         ResponseFactoryInterface $responseFactory,
         StreamFactoryInterface $streamFactory,
         LoggerInterface $logger
     ) {
         $this->responseFactory = $responseFactory;
+        $this->cookieHelper    = $cookieHelper;
         $this->streamFactory   = $streamFactory;
         $this->appEnv          = $appEnv;
         $this->logger          = $logger;
@@ -93,6 +104,7 @@ class DebugMiddleware implements MiddlewareInterface
         $debugBar
             ->addCollector(new TimeDataCollector($startTime))
             ->addCollector(new RequestDataCollector())
+            ->addCollector(new DebugBarCookiesDataCollector($this->cookieHelper, $request))
             ->addCollector(new MemoryCollector());
 
         // Storage for processing data for AJAX calls and redirects
