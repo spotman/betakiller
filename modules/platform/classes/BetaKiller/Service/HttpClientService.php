@@ -37,7 +37,8 @@ class HttpClientService
             Middleware::log(
                 $logger,
                 new MessageFormatter('{req_headers} => {res_headers}')
-            )
+            ),
+            Middleware::httpErrors()
         );
 
         $this->client = new Client([

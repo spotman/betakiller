@@ -3,11 +3,13 @@ declare(strict_types=1);
 
 namespace BetaKiller\Task\Cache;
 
+use BetaKiller\Config\AppConfigInterface;
 use BetaKiller\Factory\UrlHelperFactory;
 use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\Service\HttpClientService;
 use BetaKiller\Task\TaskException;
 use BetaKiller\Url\AvailableUrlsCollector;
+use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Process\Process;
 
@@ -50,12 +52,18 @@ class Warmup extends \BetaKiller\Task\AbstractTask
     private $appEnv;
 
     /**
+     * @var \BetaKiller\Config\AppConfigInterface
+     */
+    private $appConfig;
+
+    /**
      * Warmup constructor.
      *
      * @param \BetaKiller\Url\AvailableUrlsCollector $urlCollector
      * @param \BetaKiller\Factory\UrlHelperFactory   $urlHelperFactory
      * @param \BetaKiller\Service\HttpClientService  $httpClient
      * @param \BetaKiller\Helper\AppEnvInterface     $appEnv
+     * @param \BetaKiller\Config\AppConfigInterface  $appConfig
      * @param \Psr\Log\LoggerInterface               $logger
      */
     public function __construct(
@@ -63,12 +71,14 @@ class Warmup extends \BetaKiller\Task\AbstractTask
         UrlHelperFactory $urlHelperFactory,
         HttpClientService $httpClient,
         AppEnvInterface $appEnv,
+        AppConfigInterface $appConfig,
         LoggerInterface $logger
     ) {
         $this->urlCollector     = $urlCollector;
         $this->urlHelperFactory = $urlHelperFactory;
         $this->httpClient       = $httpClient;
         $this->appEnv           = $appEnv;
+        $this->appConfig        = $appConfig;
         $this->logger           = $logger;
 
         parent::__construct();
@@ -118,18 +128,19 @@ class Warmup extends \BetaKiller\Task\AbstractTask
         // Make HTTP requests to temporary created PHP internal web-server instance
         foreach ($items as $item) {
             $url = $item->getUrl();
-            // Internal PHP web-server can not handle SSL
-            $url = \str_replace('https://', 'http://', $url);
 
             // Make HMVC request and check response status
-            $this->makeHttpRequest($url);
+            $this->warmupUrl($url);
 
             $counter++;
         }
 
-        $this->stopServer();
+        $this->logger->info(':count dynamic URLs processed', [':count' => $counter]);
 
-        $this->logger->info(':count URLs processed', [':count' => $counter]);
+        $this->checkRequiredFiles();
+        $this->checkAuthRequired();
+
+        $this->stopServer();
     }
 
     private function startServer(): void
@@ -223,23 +234,14 @@ class Warmup extends \BetaKiller\Task\AbstractTask
         return true;
     }
 
-    private function makeHttpRequest(string $url): void
+    private function warmupUrl(string $url): void
     {
-        $this->logger->debug('Making request to :url', [':url' => $url]);
-
-        // see https://github.com/guzzle/guzzle/issues/590
-        $request  = $this->httpClient->get($url);
-        $response = $this->httpClient->syncCall($request, [
-            'curl' => [
-                CURLOPT_INTERFACE => $this->serverHost,
-                CURLOPT_PORT      => $this->serverPort,
-            ],
-        ]);
+        $response = $this->makeHttpRequest($url);
 
         $status = $response->getStatusCode();
 
         if ($status === 200) {
-            if ($response->getBody()->getContents()) {
+            if ($response->getBody()->getSize() > 0) {
                 // TODO Maybe grab page content, parse it and make request to every image/css/js file
                 $this->logger->info('Cache was warmed up for :url', [':url' => $url]);
             } else {
@@ -258,5 +260,64 @@ class Warmup extends \BetaKiller\Task\AbstractTask
         } else {
             $this->logger->warning('Got :status status for URL :url', [':url' => $url, ':status' => $status]);
         }
+    }
+
+    private function checkRequiredFiles(): void
+    {
+        $files = [
+            '/sitemap.xml',
+            '/robots.txt',
+            '/favicon.ico',
+        ];
+
+        foreach ($files as $file) {
+            $url      = (string)$this->appConfig->getBaseUri()->withPath($file);
+            $response = $this->makeHttpRequest($url);
+
+            if ($response->getStatusCode() !== 200) {
+                throw new TaskException('Missing required file :file', [
+                    ':file' => $file,
+                ]);
+            }
+        }
+    }
+
+    private function checkAuthRequired(): void
+    {
+        $urls = [
+            '/admin',
+        ];
+
+        foreach ($urls as $url) {
+            $url      = (string)$this->appConfig->getBaseUri()->withPath($url);
+            $response = $this->makeHttpRequest($url);
+
+            if ($response->getStatusCode() !== 401) {
+                throw new TaskException('Auth must be required in :url', [
+                    ':url' => $url,
+                ]);
+            }
+        }
+    }
+
+    private function makeHttpRequest(string $url, array $options = null): ResponseInterface
+    {
+        // Internal PHP web-server can not handle SSL
+        $url = \str_replace('https://', 'http://', $url);
+
+        $this->logger->debug('Making request to :url', [':url' => $url]);
+
+        // see https://github.com/guzzle/guzzle/issues/590
+        $request = $this->httpClient->get($url);
+
+        $options = \array_merge($options ?? [], [
+            'curl'        => [
+                CURLOPT_INTERFACE => $this->serverHost,
+                CURLOPT_PORT      => $this->serverPort,
+            ],
+            'http_errors' => false,
+        ]);
+
+        return $this->httpClient->syncCall($request, $options);
     }
 }
