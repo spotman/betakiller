@@ -33,7 +33,7 @@ class SchemeMiddleware implements MiddlewareInterface
     public function __construct(AppConfigInterface $appConfig, AppEnvInterface $appEnv)
     {
         $this->appConfig = $appConfig;
-        $this->appEnv = $appEnv;
+        $this->appEnv    = $appEnv;
     }
 
     /**

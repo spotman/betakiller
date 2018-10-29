@@ -3,11 +3,6 @@ declare(strict_types=1);
 
 use BetaKiller\WebApp;
 
-// Delegate static file requests back to the PHP built-in webserver
-if (PHP_SAPI === 'cli-server' && $_SERVER['SCRIPT_FILENAME'] !== __FILE__) {
-    return false;
-}
-
 /**
  * The directory in which your application specific resources are located.
  * The application directory must contain the bootstrap.php file.

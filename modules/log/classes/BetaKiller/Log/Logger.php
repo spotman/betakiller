@@ -96,7 +96,7 @@ class Logger implements LoggerInterface
     public function log($level, $message, array $context = null): void
     {
         // Proxy to selected logger
-        $this->monolog->log($level, $message, $context);
+        $this->monolog->log($level, $message, $context ?? []);
     }
 
     /**

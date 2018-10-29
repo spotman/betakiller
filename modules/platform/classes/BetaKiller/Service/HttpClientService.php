@@ -4,9 +4,13 @@ declare(strict_types=1);
 namespace BetaKiller\Service;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\HandlerStack;
+use GuzzleHttp\MessageFormatter;
+use GuzzleHttp\Middleware;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Log\LoggerInterface;
 
 class HttpClientService
 {
@@ -23,10 +27,23 @@ class HttpClientService
     /**
      * HttpClientService constructor.
      *
+     * @param \Psr\Http\Message\RequestFactoryInterface $requestFactory
+     * @param \Psr\Log\LoggerInterface                  $logger
      */
-    public function __construct(RequestFactoryInterface $requestFactory)
+    public function __construct(RequestFactoryInterface $requestFactory, LoggerInterface $logger)
     {
-        $this->client = new Client();
+        $stack = HandlerStack::create();
+        $stack->push(
+            Middleware::log(
+                $logger,
+                new MessageFormatter('{req_headers} => {res_headers}')
+            )
+        );
+
+        $this->client = new Client([
+            'handler' => $stack,
+        ]);
+
         $this->requestFactory = $requestFactory;
     }
 
