@@ -1,10 +1,11 @@
 <?php
 declare(strict_types=1);
 
-namespace BetaKiller\Widget;
+namespace BetaKiller\Widget\I18n;
 
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Repository\LanguageRepository;
+use BetaKiller\Widget\AbstractPublicWidget;
 use Psr\Http\Message\ServerRequestInterface;
 
 class LanguageSelectionWidget extends AbstractPublicWidget
@@ -32,16 +33,16 @@ class LanguageSelectionWidget extends AbstractPublicWidget
     public function getData(ServerRequestInterface $request, array $context): array
     {
         $urlHelper        = ServerRequestHelper::getUrlHelper($request);
-        $actionUrlElement = $urlHelper->getUrlElementByCodename('LanguageSelection');
+        $actionUrlElement = $urlHelper->getUrlElementByCodename('I18n_LanguageSelection');
         $actionUrl        = $urlHelper->makeUrl($actionUrlElement);
         $i18n             = ServerRequestHelper::getI18n($request);
-        $langCodeActive   = $i18n->getLang();
-        $langsCode        = $this->getLangsCode();
+        $langNameActive   = $i18n->getLang();
+        $langsName        = $this->getLangsName();
 
         return [
             'action_url'       => $actionUrl,
-            'lang_code_active' => $langCodeActive,
-            'langs_code'       => $langsCode,
+            'lang_name_active' => $langNameActive,
+            'langs_name'       => $langsName,
         ];
     }
 
@@ -50,14 +51,14 @@ class LanguageSelectionWidget extends AbstractPublicWidget
      * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\Repository\RepositoryException
      */
-    private function getLangsCode(): array
+    private function getLangsName(): array
     {
-        $langsCode  = [];
+        $langsName  = [];
         $langsModel = $this->languageRepo->getAll();
         foreach ($langsModel as $langModel) {
-            $langsCode[] = $langModel->getName();
+            $langsName[] = $langModel->getName();
         }
 
-        return $langsCode;
+        return $langsName;
     }
 }

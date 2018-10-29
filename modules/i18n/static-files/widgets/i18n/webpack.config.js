@@ -16,7 +16,7 @@ Encore
   .setOutputPath('dist/')
 
   // the public path used by the web server to access the previous directory
-  .setPublicPath('/assets/static/widgets/language-selection/dist')
+  .setPublicPath('/assets/static/widgets/i18n/dist')
 
   .setManifestKeyPrefix('dist/')
 

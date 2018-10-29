@@ -13,14 +13,14 @@ class LanguageSelectionWidget {
 
   select(event) {
     $.post(this.$form.attr('action'), {
-        'lang_code': $(event.target).val()
+        'lang_name': $(event.target).val()
       }, '', 'json')
       .done(() => this.onSubmitResolve())
       .fail((message) => this.onSubmitReject(message));
   }
 
   onSubmitResolve() {
-    console.log('ok');
+    location.reload(true);
   }
 
   onSubmitReject(message) {

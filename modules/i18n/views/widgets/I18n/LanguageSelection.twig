@@ -1,0 +1,16 @@
+{% if langs_name %}
+  {{ js("widgets/i18n/dist/vendor.js") }}
+  {{ js("widgets/i18n/dist/widget.js") }}
+
+  <section id="language_selection">
+    <form action="{{ action_url }}" method="post">
+      <select title="">
+        <option value="{{ lang_name_active }}">{{ lang_name_active|upper }}</option>
+        {% for lang_name in langs_name if lang_name != lang_name_active %}
+          <option value="{{ lang_name }}">{{ lang_name|upper }}</option>
+        {% endfor %}
+      </select>
+    </form>
+  </section>
+
+{% endif %}

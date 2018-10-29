@@ -9,7 +9,9 @@
     <!--<iface uri="change-account" name="Auth_ReLogin" label="Change account" layout="auth" hideInSiteMap="true" zone="personal" />-->
     <!--<iface uri="password-reset" name="Auth_PasswordReset" label="Reset password" layout="auth" hideInSiteMap="true" zone="public" />-->
 
-    <action uri="language-selection" name="LanguageSelection" hideInSiteMap="true" zone="public" />
+    <iface uri="i18n" name="I18n_DummyRoot" hideInSiteMap="true" zone="public" label="iface.i18n.dummy_root.label">
+        <action uri="language_selection" name="I18n_LanguageSelection" label="iface.i18n.language_selection.label" />
+    </iface>
 </root>
 
 <!-- TODO убрать этот файл после того как будет настроено нормальное дерево интерфейсов -->
