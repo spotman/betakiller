@@ -25,6 +25,7 @@ use BetaKiller\Middleware\UrlElementDispatchMiddleware;
 use BetaKiller\Middleware\UrlElementRenderMiddleware;
 use BetaKiller\Middleware\UrlHelperMiddleware;
 use BetaKiller\Middleware\UserMiddleware;
+use BetaKiller\RobotsTxt\RobotsTxtHandler;
 use BetaKiller\Security\CspReportHandler;
 use BetaKiller\Security\SecureHeadersMiddleware;
 use Middlewares\ContentType;
@@ -110,6 +111,8 @@ class WebApp
         $this->app->pipe(I18nMiddleware::class);
 
         $this->app->pipe(UrlHelperMiddleware::class);
+
+        // Exceptions handling (depends on i18n)
         $this->app->pipe(ErrorPageMiddleware::class);
         $this->app->pipe(ExpectedExceptionMiddleware::class);
 
@@ -159,6 +162,7 @@ class WebApp
         $app->post(CspReportHandler::URL, CspReportHandler::class);
 
         $app->get('/sitemap.xml', SitemapRequestHandler::class);
+        $app->get('/robots.txt', RobotsTxtHandler::class);
 
         // Assets
         $extRegexp  = '[a-z]{2,}'; // (jpg|jpeg|gif|png)
