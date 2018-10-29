@@ -4,8 +4,8 @@ declare(strict_types=1);
 namespace BetaKiller\Middleware;
 
 use BetaKiller\Dev\Profiler;
+use BetaKiller\Helper\CookieHelper;
 use BetaKiller\Helper\I18nHelper;
-use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\I18n\I18nFacade;
 use Psr\Http\Message\ResponseInterface;
@@ -23,13 +23,20 @@ class I18nMiddleware implements MiddlewareInterface
     private $facade;
 
     /**
+     * @var \BetaKiller\Helper\CookieHelper
+     */
+    private $cookies;
+
+    /**
      * I18nMiddleware constructor.
      *
-     * @param \BetaKiller\I18n\I18nFacade $facade
+     * @param \BetaKiller\I18n\I18nFacade     $facade
+     * @param \BetaKiller\Helper\CookieHelper $cookieHelper
      */
-    public function __construct(I18nFacade $facade)
+    public function __construct(I18nFacade $facade, CookieHelper $cookieHelper)
     {
-        $this->facade = $facade;
+        $this->facade  = $facade;
+        $this->cookies = $cookieHelper;
     }
 
     /**
@@ -54,7 +61,7 @@ class I18nMiddleware implements MiddlewareInterface
 
         $response = $handler->handle($request->withAttribute(I18nHelper::class, $i18n));
 
-        return ResponseHelper::setCookie($response, self::COOKIE_NAME, $lang, new \DateInterval('P14D'));
+        return $this->cookies->set($response, self::COOKIE_NAME, $lang, new \DateInterval('P14D'));
     }
 
     private function detectLang(ServerRequestInterface $request): string
@@ -90,7 +97,7 @@ class I18nMiddleware implements MiddlewareInterface
 
     private function detectHttpLang(ServerRequestInterface $request): string
     {
-        $lang = ServerRequestHelper::getCookie($request, self::COOKIE_NAME);
+        $lang = $this->cookies->get($request, self::COOKIE_NAME);
 
         // Cookie lang has priority
         if ($lang) {

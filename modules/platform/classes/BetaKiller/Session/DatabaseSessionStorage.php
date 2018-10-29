@@ -8,8 +8,8 @@ use BetaKiller\Auth\SessionConfig;
 use BetaKiller\Exception;
 use BetaKiller\Exception\DomainException;
 use BetaKiller\Exception\SecurityException;
+use BetaKiller\Helper\CookieHelper;
 use BetaKiller\Helper\LoggerHelperTrait;
-use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Helper\SessionHelper;
 use BetaKiller\Model\UserInterface;
@@ -52,22 +52,31 @@ class DatabaseSessionStorage implements SessionStorageInterface
     private $encryption;
 
     /**
+     * @var \BetaKiller\Helper\CookieHelper
+     */
+    private $cookies;
+
+    /**
      * DatabaseSessionStorage constructor.
      *
      * @param \BetaKiller\Repository\UserSessionRepository $sessionRepo
      * @param \BetaKiller\Auth\SessionConfig               $config
+     * @param \BetaKiller\Security\Encryption              $encryption
+     * @param \BetaKiller\Helper\CookieHelper              $cookies
      * @param \Psr\Log\LoggerInterface                     $logger
      */
     public function __construct(
         UserSessionRepository $sessionRepo,
         SessionConfig $config,
         Encryption $encryption,
+        CookieHelper $cookies,
         LoggerInterface $logger
     ) {
         $this->sessionRepo = $sessionRepo;
         $this->config      = $config;
         $this->logger      = $logger;
-        $this->encryption = $encryption;
+        $this->encryption  = $encryption;
+        $this->cookies     = $cookies;
     }
 
     /**
@@ -81,7 +90,7 @@ class DatabaseSessionStorage implements SessionStorageInterface
     {
         $userAgent = ServerRequestHelper::getUserAgent($request);
         $ipAddress = ServerRequestHelper::getIpAddress($request);
-        $cookie    = ServerRequestHelper::getCookie($request, self::COOKIE_NAME);
+        $cookie    = $this->cookies->get($request, self::COOKIE_NAME);
 
         if (!$cookie) {
             // No session (cleared by browser or new visitor) => regenerate empty session
@@ -262,7 +271,7 @@ class DatabaseSessionStorage implements SessionStorageInterface
         $this->sessionRepo->save($model);
 
         // Set cookie
-        return ResponseHelper::setCookie(
+        return $this->cookies->set(
             $response,
             self::COOKIE_NAME,
             $session->getId(),

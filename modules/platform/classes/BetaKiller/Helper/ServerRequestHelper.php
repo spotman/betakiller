@@ -82,12 +82,6 @@ class ServerRequestHelper
         return null;
     }
 
-    public static function getCookie(ServerRequestInterface $request, string $name): ?string
-    {
-        // TODO Replace with ServerRequestInterface manipulation after migration to PSR-7
-        return \Cookie::get($request ? $name : null, null);
-    }
-
     public static function isAjax(ServerRequestInterface $request): bool
     {
         $server = $request->getServerParams();
@@ -95,6 +89,11 @@ class ServerRequestHelper
         $requestedWith = $server['HTTP_X_REQUESTED_WITH'] ?? null;
 
         return mb_strtolower($requestedWith) === 'xmlhttprequest';
+    }
+
+    public static function isSecure(ServerRequestInterface $request): bool
+    {
+        return $request->getUri()->getScheme() === 'https';
     }
 
     public static function isJsonPreferred(ServerRequestInterface $request): bool
@@ -108,6 +107,11 @@ class ServerRequestHelper
     {
         // Fetched from ContentType middleware
         return $request->getHeaderLine('Accept');
+    }
+
+    public static function getContentType(ServerRequestInterface $request): string
+    {
+        return $request->getHeaderLine('Content-Type');
     }
 
     public static function getPost(ServerRequestInterface $request): array
@@ -133,23 +137,17 @@ class ServerRequestHelper
 
     public static function getEntity(ServerRequestInterface $request, string $className)
     {
-        $container = self::getUrlContainer($request);
-
-        return $container->getEntityByClassName($className);
+        return self::getUrlContainer($request)->getEntityByClassName($className);
     }
 
     public static function getParameter(ServerRequestInterface $request, string $className)
     {
-        $container = self::getUrlContainer($request);
-
-        return $container->getParameterByClassName($className);
+        return self::getUrlContainer($request)->getParameterByClassName($className);
     }
 
     public static function getQueryPart(ServerRequestInterface $request, string $name, bool $required = null): ?string
     {
-        $container = self::getUrlContainer($request);
-
-        return $container->getQueryPart($name, $required);
+        return self::getUrlContainer($request)->getQueryPart($name, $required);
     }
 
     public static function getUrlElementStack(ServerRequestInterface $request): UrlElementStack
@@ -174,9 +172,7 @@ class ServerRequestHelper
             return true;
         }
 
-        $user = self::getUser($request);
-
-        return $user->isGuest();
+        return self::getUser($request)->isGuest();
     }
 
     public static function hasUser(ServerRequestInterface $request): bool

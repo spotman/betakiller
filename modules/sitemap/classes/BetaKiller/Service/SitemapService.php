@@ -76,7 +76,7 @@ class SitemapService
      */
     public function generate(UrlHelper $urlHelper): self
     {
-        $baseUrl = $this->appConfig->getBaseUrl();
+        $baseUrl = (string)$this->appConfig->getBaseUri();
 
         if (strpos($baseUrl, 'http') === false) {
             throw new ServiceException('Please, set "base_url" parameter to full URL (with protocol) in config file init.php');

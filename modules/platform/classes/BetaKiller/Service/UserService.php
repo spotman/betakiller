@@ -40,12 +40,16 @@ class UserService
      * @param \BetaKiller\Factory\GuestUserFactory  $guestFactory
      * @param \BetaKiller\Config\AppConfigInterface $appConfig
      */
-    public function __construct(UserRepository $userRepo, RoleRepository $roleRepo, GuestUserFactory $guestFactory, AppConfigInterface $appConfig)
-    {
+    public function __construct(
+        UserRepository $userRepo,
+        RoleRepository $roleRepo,
+        GuestUserFactory $guestFactory,
+        AppConfigInterface $appConfig
+    ) {
         $this->userRepository = $userRepo;
         $this->roleRepository = $roleRepo;
         $this->appConfig      = $appConfig;
-        $this->guestFactory = $guestFactory;
+        $this->guestFactory   = $guestFactory;
     }
 
     /**
@@ -95,7 +99,7 @@ class UserService
     {
         $cliUserName = AbstractTask::CLI_USER_NAME;
 
-        $host  = parse_url($this->appConfig->getBaseUrl(), PHP_URL_HOST);
+        $host  = $this->appConfig->getBaseUri()->getHost();
         $email = $cliUserName.'@'.$host;
 
         $user = $this->userRepository->searchBy($cliUserName);

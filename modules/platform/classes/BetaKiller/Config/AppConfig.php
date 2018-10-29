@@ -3,6 +3,9 @@ declare(strict_types=1);
 
 namespace BetaKiller\Config;
 
+use Psr\Http\Message\UriFactoryInterface;
+use Psr\Http\Message\UriInterface;
+
 class AppConfig extends AbstractConfig implements AppConfigInterface
 {
     public const PATH_NAMESPACE                 = ['namespace'];
@@ -12,6 +15,23 @@ class AppConfig extends AbstractConfig implements AppConfigInterface
     public const PATH_CIRCULAR_LINK_HREF        = ['url', 'circular_link_href'];
     public const PATH_PAGE_CACHE_PATH           = ['cache', 'page', 'path'];
     public const PATH_PAGE_CACHE_ENABLED        = ['cache', 'page', 'enabled'];
+
+    /**
+     * @var \Psr\Http\Message\UriFactoryInterface
+     */
+    private $uriFactory;
+
+    /**
+     * @param \BetaKiller\Config\ConfigProviderInterface $config
+     * @param \Psr\Http\Message\UriFactoryInterface      $uriFactory
+     */
+    public function __construct(ConfigProviderInterface $config, UriFactoryInterface $uriFactory)
+    {
+        parent::__construct($config);
+
+        $this->uriFactory = $uriFactory;
+    }
+
 
     /**
      * @return string
@@ -34,11 +54,24 @@ class AppConfig extends AbstractConfig implements AppConfigInterface
     /**
      * Returns app`s base URL
      *
-     * @return string
+     * @return \Psr\Http\Message\UriInterface
+     * @throws \BetaKiller\Exception
      */
-    public function getBaseUrl(): string
+    public function getBaseUri(): UriInterface
     {
-        return (string)$this->get(self::PATH_BASE_URL);
+        $url = (string)$this->get(self::PATH_BASE_URL);
+
+        return $this->uriFactory->createUri($url);
+    }
+
+    /**
+     * Returns true if base url is HTTPS-based
+     *
+     * @return bool
+     */
+    public function isSecure(): bool
+    {
+        return $this->getBaseUri()->getScheme() === 'https';
     }
 
     /**
@@ -48,7 +81,7 @@ class AppConfig extends AbstractConfig implements AppConfigInterface
      */
     public function getAdminEmail(): string
     {
-        $host = parse_url($this->getBaseUrl(), PHP_URL_HOST);
+        $host = parse_url($this->getBaseUri(), PHP_URL_HOST);
 
         return 'admin@'.$host;
     }

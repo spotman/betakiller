@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace BetaKiller\Middleware;
 
 use BetaKiller\Helper\AppEnvInterface;
-use BetaKiller\Log\ContextCleanupProcessor;
 use BetaKiller\Log\LoggerInterface;
 use DebugBar\DataCollector\MemoryCollector;
 use DebugBar\DataCollector\RequestDataCollector;
@@ -129,12 +128,13 @@ class DebugMiddleware implements MiddlewareInterface
     private function initPhpConsole(): void
     {
         $phpConsoleHandler = new PHPConsoleHandler([
+            'enableSslOnlyMode'        => true,
             'detectDumpTraceAndSource' => true,     // Autodetect and append trace data to debug
             'useOwnErrorsHandler'      => false,    // Enable errors handling
             'useOwnExceptionsHandler'  => false,    // Enable exceptions handling
         ]);
 
-        $phpConsoleHandler->pushProcessor(new ContextCleanupProcessor);
+//        $phpConsoleHandler->pushProcessor(new ContextCleanupProcessor);
 
         $this->logger->pushHandler($phpConsoleHandler);
     }

@@ -22,7 +22,7 @@ class AuthFacade
     private $sessionStorage;
 
     /**
-     * @var array|\BetaKiller\Auth\SessionConfig
+     * @var \BetaKiller\Auth\SessionConfig
      */
     private $config;
 

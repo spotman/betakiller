@@ -8,10 +8,12 @@ use BetaKiller\Url\UrlElementStack;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\StreamFactoryInterface;
+use Psr\Http\Message\UriFactoryInterface;
 use Zend\Diactoros\RequestFactory;
 use Zend\Diactoros\Response\TextResponse;
 use Zend\Diactoros\ResponseFactory;
 use Zend\Diactoros\StreamFactory;
+use Zend\Diactoros\UriFactory;
 use Zend\Expressive\Router\FastRouteRouter;
 use Zend\Expressive\Router\Middleware\ImplicitHeadMiddleware;
 use Zend\Expressive\Router\Middleware\ImplicitOptionsMiddleware;
@@ -38,6 +40,7 @@ return [
         RequestFactoryInterface::class  => \DI\autowire(RequestFactory::class),
         ResponseFactoryInterface::class => \DI\autowire(ResponseFactory::class),
         StreamFactoryInterface::class   => \DI\autowire(StreamFactory::class),
+        UriFactoryInterface::class      => \DI\autowire(UriFactory::class),
 
         RequestHandlerRunner::class => \DI\factory(function (
             MiddlewarePipeInterface $pipe,
