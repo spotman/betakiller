@@ -16,9 +16,8 @@
  * - boolean  expose      set the X-Powered-By header                        FALSE
  */
 
-return array(
-    'base_url'      => NULL,
-    'index_file'    => '',
-    'expose'        => FALSE,
-    'cache_dir'     => APPPATH.'cache'.DIRECTORY_SEPARATOR.'kohana',
-);
+return [
+    'index_file' => '',
+    'expose'     => false,
+    'cache_dir'  => APPPATH.'cache'.DIRECTORY_SEPARATOR.'kohana',
+];

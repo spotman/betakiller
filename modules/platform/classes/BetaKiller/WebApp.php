@@ -25,6 +25,7 @@ use BetaKiller\Middleware\UrlElementDispatchMiddleware;
 use BetaKiller\Middleware\UrlElementRenderMiddleware;
 use BetaKiller\Middleware\UrlHelperMiddleware;
 use BetaKiller\Middleware\UserMiddleware;
+use BetaKiller\Security\SecureHeadersMiddleware;
 use Middlewares\ContentType;
 use Psr\Http\Message\ResponseInterface;
 use Spotman\Api\ApiRequestHandler;
@@ -97,6 +98,7 @@ class WebApp
 
         // Main processing pipe
         $this->app->pipe(SchemeMiddleware::class);
+        $this->app->pipe(SecureHeadersMiddleware::class);
 //        $this->app->pipe(RequestIdMiddleware::class);
 
         $this->app->pipe(SessionMiddleware::class);

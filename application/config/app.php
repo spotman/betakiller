@@ -1,9 +1,13 @@
 <?php
 
 return [
-    'cache' =>  [
-        'page' =>  [
-            'path'  =>  MultiSite::instance()->getWorkingPath().DIRECTORY_SEPARATOR.'cache'.DIRECTORY_SEPARATOR.'page'
-        ]
+    'url' => [
+        'base' => getenv('APP_URL'),
+    ],
+
+    'cache' => [
+        'page' => [
+            'path' => 'cache'.DIRECTORY_SEPARATOR.'page',
+        ],
     ],
 ];

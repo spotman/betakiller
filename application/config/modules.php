@@ -49,6 +49,7 @@ return [
     'missing-url'  => MODPATH.'missing-url',           // Catch and store missing IFace URLs
     'notification' => MODPATH.'notification',          // Notification subsystem
     'search'       => MODPATH.'search',                // Search and filtering capabilities
+    'security'     => MODPATH.'security',              // Various security helpers
     'sitemap'      => MODPATH.'sitemap',               // Generating sitemap.xml
     'twig'         => MODPATH.'twig',                  // Twig template engine
     'wamp'         => MODPATH.'wamp',                  // WAMP protocol support (router + client)

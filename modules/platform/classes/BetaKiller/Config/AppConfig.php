@@ -5,6 +5,14 @@ namespace BetaKiller\Config;
 
 class AppConfig extends AbstractConfig implements AppConfigInterface
 {
+    public const PATH_NAMESPACE                 = ['namespace'];
+    public const PATH_LANGUAGES                 = ['languages'];
+    public const PATH_BASE_URL                  = ['url', 'base'];
+    public const PATH_IS_TRAILING_SLASH_ENABLED = ['url', 'is_trailing_slash_enabled'];
+    public const PATH_CIRCULAR_LINK_HREF        = ['url', 'circular_link_href'];
+    public const PATH_PAGE_CACHE_PATH           = ['cache', 'page', 'path'];
+    public const PATH_PAGE_CACHE_ENABLED        = ['cache', 'page', 'enabled'];
+
     /**
      * @return string
      */
@@ -20,7 +28,7 @@ class AppConfig extends AbstractConfig implements AppConfigInterface
      */
     public function getNamespace(): string
     {
-        return (string)$this->get(['namespace']);
+        return (string)$this->get(self::PATH_NAMESPACE);
     }
 
     /**
@@ -30,7 +38,7 @@ class AppConfig extends AbstractConfig implements AppConfigInterface
      */
     public function getBaseUrl(): string
     {
-        return \Kohana::$base_url;
+        return (string)$this->get(self::PATH_BASE_URL);
     }
 
     /**
@@ -84,6 +92,6 @@ class AppConfig extends AbstractConfig implements AppConfigInterface
      */
     public function getAllowedLanguages(): array
     {
-        return (array)$this->get(['languages']) ?: ['en'];
+        return (array)$this->get(self::PATH_LANGUAGES) ?: ['en'];
     }
 }

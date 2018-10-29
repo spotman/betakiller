@@ -27,6 +27,11 @@ final class IFaceCache
     private $enabled;
 
     /**
+     * @var \BetaKiller\Helper\AppEnvInterface
+     */
+    private $appEnv;
+
+    /**
      * IFaceCache constructor.
      *
      * @param \BetaKiller\Config\AppConfigInterface $appConfig
@@ -39,6 +44,7 @@ final class IFaceCache
         LoggerInterface $logger
     ) {
         $this->enabled   = !$appEnv->isCli() && $appConfig->isPageCacheEnabled();
+        $this->appEnv    = $appEnv;
         $this->appConfig = $appConfig;
 
         $this->pageCache = new PageCache;
@@ -85,9 +91,11 @@ final class IFaceCache
 
         $this->pageCache->setStrategy($strategy);
 
+        $cachePath = $this->appEnv->getAppRootPath().\DIRECTORY_SEPARATOR.$this->appConfig->getPageCachePath();
+
         $this->pageCache->config()
             ->setCacheExpirationInSeconds($expires)
-            ->setCachePath($this->appConfig->getPageCachePath())
+            ->setCachePath($cachePath)
             ->setEnableLog(true)
             ->setSendHeaders(true)
             ->setForwardHeaders(true);
