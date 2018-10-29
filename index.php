@@ -3,6 +3,16 @@ declare(strict_types=1);
 
 use BetaKiller\WebApp;
 
+if (PHP_SAPI === 'cli-server') {
+    $docRoot  = $_SERVER['DOCUMENT_ROOT'];
+    $fileName = $_SERVER['PHP_SELF'];
+
+    // Serve existing files directly
+    if (strpos($fileName, 'index.php') === false && \file_exists($docRoot.$fileName)) {
+        return false;
+    }
+}
+
 /**
  * The directory in which your application specific resources are located.
  * The application directory must contain the bootstrap.php file.
