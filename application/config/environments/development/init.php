@@ -17,8 +17,7 @@
  */
 
 return [
-    'base_url' => getenv('APP_URL'),
-    'errors'   => true,
-    'profile'  => true,
-    'caching'  => false,
+    'errors'  => true,
+    'profile' => true,
+    'caching' => false,
 ];

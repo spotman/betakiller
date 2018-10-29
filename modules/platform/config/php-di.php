@@ -5,8 +5,10 @@ use BetaKiller\Session\DatabaseSessionStorage;
 use BetaKiller\Session\SessionStorageInterface;
 use BetaKiller\Url\Container\UrlContainerInterface;
 use BetaKiller\Url\UrlElementStack;
+use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\StreamFactoryInterface;
+use Zend\Diactoros\RequestFactory;
 use Zend\Diactoros\Response\TextResponse;
 use Zend\Diactoros\ResponseFactory;
 use Zend\Diactoros\StreamFactory;
@@ -33,6 +35,7 @@ return [
         RouterInterface::class          => \DI\autowire(FastRouteRouter::class),
         EmitterInterface::class         => \DI\autowire(SapiStreamEmitter::class),
         MiddlewarePipeInterface::class  => \DI\autowire(MiddlewarePipe::class),
+        RequestFactoryInterface::class  => \DI\autowire(RequestFactory::class),
         ResponseFactoryInterface::class => \DI\autowire(ResponseFactory::class),
         StreamFactoryInterface::class   => \DI\autowire(StreamFactory::class),
 

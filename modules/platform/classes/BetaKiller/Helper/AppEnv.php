@@ -164,6 +164,10 @@ class AppEnv implements AppEnvInterface
             return true;
         }
 
+        if ($this->isInternalWebServer()) {
+            return false;
+        }
+
         if (\defined('STDIN')) {
             return true;
         }
@@ -266,5 +270,15 @@ class AppEnv implements AppEnvInterface
     public function getDebugEmail(): string
     {
         return $this->getEnvVariable('DEBUG_EMAIL_ADDRESS');
+    }
+
+    /**
+     * Returns true when app was server by an internal PHP web-server (php -S)
+     *
+     * @return bool
+     */
+    public function isInternalWebServer(): bool
+    {
+        return PHP_SAPI === 'cli-server';
     }
 }

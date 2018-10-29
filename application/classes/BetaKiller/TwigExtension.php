@@ -64,7 +64,7 @@ class TwigExtension extends Twig_Extension
             new Twig_Function(
                 'image',
                 [$this, 'image'],
-                ['is_safe' => ['html']]
+                ['needs_context' => true, 'is_safe' => ['html']]
             ),
 
             new Twig_Function(
@@ -197,13 +197,14 @@ class TwigExtension extends Twig_Extension
     /**
      * Helper for creating <img> tag
      *
+     * @param array      $context
      * @param array      $attributes
      * @param array|null $data
      * @param bool|null  $forceSize
      *
      * @return string
      */
-    public function image(array $attributes, ?array $data = null, ?bool $forceSize = null): string
+    public function image(array $context, array $attributes, ?array $data = null, ?bool $forceSize = null): string
     {
         if ($data) {
             $attributes = array_merge($attributes, $data);
@@ -213,7 +214,7 @@ class TwigExtension extends Twig_Extension
             unset($attributes['width'], $attributes['height']);
         }
 
-        $src = $attributes['src'];
+        $src = $this->getLinkToStaticFile($context, $attributes['src']);
 
         return HTML::image($src, array_filter($attributes));
     }

@@ -4,11 +4,7 @@ namespace BetaKiller\Config;
 
 interface AppConfigInterface
 {
-    public const CONFIG_GROUP_NAME              = 'app';
-    public const PATH_PAGE_CACHE_PATH           = ['cache', 'page', 'path'];
-    public const PATH_CIRCULAR_LINK_HREF        = ['url', 'circular_link_href'];
-    public const PATH_IS_TRAILING_SLASH_ENABLED = ['url', 'is_trailing_slash_enabled'];
-    public const PATH_PAGE_CACHE_ENABLED        = ['cache', 'page', 'enabled'];
+    public const CONFIG_GROUP_NAME = 'app';
 
     /**
      * Returns namespace for app-related classes (ifaces, widgets, factories, etc) or NULL if these classes located at root namespace

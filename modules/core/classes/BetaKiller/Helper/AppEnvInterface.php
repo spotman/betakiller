@@ -135,4 +135,11 @@ interface AppEnvInterface
      * @return string
      */
     public function getDebugEmail(): string;
+
+    /**
+     * Returns true when app was server by an internal PHP web-server (php -S)
+     *
+     * @return bool
+     */
+    public function isInternalWebServer(): bool;
 }
