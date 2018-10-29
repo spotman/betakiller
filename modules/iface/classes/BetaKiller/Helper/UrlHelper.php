@@ -271,7 +271,7 @@ class UrlHelper
 
     private function makeAbsoluteUrl(string $relativeUrl): string
     {
-        return $this->appConfig->getBaseUrl().$relativeUrl;
+        return (string)$this->appConfig->getBaseUri()->withPath($relativeUrl);
     }
 
     /**

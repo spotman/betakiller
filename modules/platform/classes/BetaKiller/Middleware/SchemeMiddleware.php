@@ -52,7 +52,7 @@ class SchemeMiddleware implements MiddlewareInterface
             return $handler->handle($request);
         }
 
-        $baseScheme = parse_url($this->appConfig->getBaseUrl(), PHP_URL_SCHEME);
+        $baseScheme = $this->appConfig->getBaseUri()->getScheme();
 
         $currentUri    = $request->getUri();
         $currentScheme = $currentUri->getScheme();

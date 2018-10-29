@@ -105,7 +105,7 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
         }
 
         try {
-            // TODO Extract this call from
+            // TODO Extract this call from here and move it to a separate class, called in the error page middleware
             $this->storeException($exception, null);
         } catch (\Throwable $subsystemException) {
             // Prevent logging recursion
@@ -282,7 +282,7 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
     private function sendNotification(\Throwable $subsystemException, \Throwable $originalException): void
     {
         $this->notification->groupMessage(self::NOTIFICATION_SUBSYSTEM_FAILURE, [
-            'url'       => $this->appConfig->getBaseUrl(),
+            'url'       => (string)$this->appConfig->getBaseUri(),
             'subsystem' => [
                 'message'    => $this->getExceptionText($subsystemException),
                 'stacktrace' => $subsystemException->getTraceAsString(),

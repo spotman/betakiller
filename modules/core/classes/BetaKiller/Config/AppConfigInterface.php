@@ -2,6 +2,8 @@
 namespace BetaKiller\Config;
 
 
+use Psr\Http\Message\UriInterface;
+
 interface AppConfigInterface
 {
     public const CONFIG_GROUP_NAME = 'app';
@@ -16,9 +18,16 @@ interface AppConfigInterface
     /**
      * Returns app`s base URL
      *
-     * @return string
+     * @return \Psr\Http\Message\UriInterface
      */
-    public function getBaseUrl(): string;
+    public function getBaseUri(): UriInterface;
+
+    /**
+     * Returns true if base url is HTTPS-based
+     *
+     * @return bool
+     */
+    public function isSecure(): bool;
 
     /**
      * Returns app`s administrator email

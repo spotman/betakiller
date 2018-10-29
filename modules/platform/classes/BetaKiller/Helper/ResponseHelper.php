@@ -106,29 +106,6 @@ class ResponseHelper
         return new RedirectResponse($url, 302);
     }
 
-    public static function setCookie(
-        ResponseInterface $response,
-        string $name,
-        string $value,
-        \DateInterval $expiresIn
-    ): ResponseInterface {
-        $dt           = new DateTimeImmutable();
-        $expiresDelta = $dt->add($expiresIn)->getTimestamp() - $dt->getTimestamp();
-
-        // TODO Replace with ServerRequestInterface manipulation after migration to PSR-7
-        \Cookie::set($name, $value, $expiresDelta);
-
-        return $response;
-    }
-
-    public static function deleteCookie(ResponseInterface $response, string $name): ResponseInterface
-    {
-        $interval         = new \DateInterval('P1Y');
-        $interval->invert = true;
-
-        return self::setCookie($response, $name, '', $interval);
-    }
-
     public static function setLastModified(
         ResponseInterface $response,
         DateTimeImmutable $lastModified

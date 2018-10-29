@@ -25,6 +25,7 @@ use BetaKiller\Middleware\UrlElementDispatchMiddleware;
 use BetaKiller\Middleware\UrlElementRenderMiddleware;
 use BetaKiller\Middleware\UrlHelperMiddleware;
 use BetaKiller\Middleware\UserMiddleware;
+use BetaKiller\Security\CspReportHandler;
 use BetaKiller\Security\SecureHeadersMiddleware;
 use Middlewares\ContentType;
 use Psr\Http\Message\ResponseInterface;
@@ -155,6 +156,8 @@ class WebApp
 
     private function addRoutes(Application $app): void
     {
+        $app->post(CspReportHandler::URL, CspReportHandler::class);
+
         $app->get('/sitemap.xml', SitemapRequestHandler::class);
 
         // Assets

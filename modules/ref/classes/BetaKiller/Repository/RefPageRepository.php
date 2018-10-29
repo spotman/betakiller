@@ -57,8 +57,7 @@ class RefPageRepository extends AbstractOrmBasedRepository
         $createMissing = $createMissing ?? true;
 
         // Get current domain
-        $siteUrl    = $this->appConfig->getBaseUrl();
-        $siteDomain = parse_url($siteUrl, PHP_URL_HOST);
+        $siteDomain = $this->appConfig->getBaseUri()->getHost();
 
         // External documents are addressed by path + query (no fragment)
         $domainName = parse_url($url, PHP_URL_HOST);
