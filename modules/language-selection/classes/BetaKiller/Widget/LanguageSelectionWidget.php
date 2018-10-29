@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace BetaKiller\Widget;
 
 use BetaKiller\Helper\ServerRequestHelper;
-use BetaKiller\Helper\UrlHelper;
 use BetaKiller\Repository\LanguageRepository;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -16,7 +15,6 @@ class LanguageSelectionWidget extends AbstractPublicWidget
     private $languageRepo;
 
     /**
-     * @param \BetaKiller\Helper\UrlHelper              $urlHelper
      * @param \BetaKiller\Repository\LanguageRepository $languageRepo
      */
     public function __construct(LanguageRepository $languageRepo)
@@ -30,7 +28,6 @@ class LanguageSelectionWidget extends AbstractPublicWidget
      * @param array                                    $context
      *
      * @return array
-     * @throws \BetaKiller\Widget\WidgetException
      */
     public function getData(ServerRequestInterface $request, array $context): array
     {
