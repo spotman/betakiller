@@ -37,6 +37,8 @@ class Warmup extends \BetaKiller\Task\AbstractTask
 
     private $serverPort = 8099;
 
+    private $timeout = 5;
+
     /**
      * @var \Symfony\Component\Process\Process
      */
@@ -53,6 +55,7 @@ class Warmup extends \BetaKiller\Task\AbstractTask
      * @param \BetaKiller\Url\AvailableUrlsCollector $urlCollector
      * @param \BetaKiller\Factory\UrlHelperFactory   $urlHelperFactory
      * @param \BetaKiller\Service\HttpClientService  $httpClient
+     * @param \BetaKiller\Helper\AppEnvInterface     $appEnv
      * @param \Psr\Log\LoggerInterface               $logger
      */
     public function __construct(
@@ -95,10 +98,9 @@ class Warmup extends \BetaKiller\Task\AbstractTask
 
         $start     = microtime(true);
         $connected = false;
-        $timeout   = 5;
 
         // Try to connect until the time spent exceeds the timeout specified in the configuration
-        while (microtime(true) - $start <= $timeout) {
+        while (microtime(true) - $start <= $this->timeout) {
             if ($this->canConnectToServer()) {
                 $connected = true;
                 break;
@@ -109,14 +111,15 @@ class Warmup extends \BetaKiller\Task\AbstractTask
             $this->stopServer();
 
             throw new TaskException('Web server connection timeout :sec second(s)', [
-                ':sec' => $timeout,
+                ':sec' => $this->timeout,
             ]);
         }
 
         // Make HTTP requests to temporary created PHP internal web-server instance
         foreach ($items as $item) {
             $url = $item->getUrl();
-            $this->logger->debug('Selected url = '.$url);
+            // Internal PHP web-server can not handle SSL
+            $url = \str_replace('https://', 'http://', $url);
 
             // Make HMVC request and check response status
             $this->makeHttpRequest($url);
@@ -131,9 +134,12 @@ class Warmup extends \BetaKiller\Task\AbstractTask
 
     private function startServer(): void
     {
+        $this->logger->debug('Starting internal web-server');
+
         $docRoot = $this->appEnv->getDocRootPath();
 
-        $command = sprintf('%s -S %s:%d -t %s %s', // >/dev/null 2>&1
+        $command = sprintf('%s %s -S %s:%d -t %s %s', // >/dev/null 2>&1
+            'exec',
             PHP_BINARY,
             $this->serverHost,
             $this->serverPort,
@@ -157,12 +163,37 @@ class Warmup extends \BetaKiller\Task\AbstractTask
             throw new \RuntimeException('Could not start the web server');
         }
 
+        $this->logger->debug('Web-server started at :host::port with PID = :pid', [
+            ':host' => $this->serverHost,
+            ':port' => $this->serverPort,
+            ':pid'  => $process->getPid(),
+        ]);
+
         $this->serverProcess = $process;
     }
 
     private function stopServer(): void
     {
+        $this->logger->debug('Shutting down internal web-server');
+
         $this->serverProcess->stop(5);
+
+        $start   = microtime(true);
+        $stopped = false;
+
+        // Try to connect until the time spent exceeds the timeout specified in the configuration
+        while (microtime(true) - $start <= $this->timeout) {
+            if ($this->serverProcess->isTerminated()) {
+                $stopped = true;
+                break;
+            }
+        }
+
+        if (!$stopped) {
+            throw new TaskException('Could not stop the web server, kill it by PID = :pid', [
+                ':pid' => $this->serverProcess->getPid(),
+            ]);
+        }
     }
 
     /**
@@ -197,26 +228,26 @@ class Warmup extends \BetaKiller\Task\AbstractTask
         $this->logger->debug('Making request to :url', [':url' => $url]);
 
         // see https://github.com/guzzle/guzzle/issues/590
-        try {
-            $request  = $this->httpClient->get($url);
-            $response = $this->httpClient->syncCall($request, [
-                'curl' => [
-                    CURLOPT_INTERFACE => $this->serverHost,
-                    CURLOPT_PORT      => $this->serverPort,
-                ],
-            ]);
-        } catch (\Throwable $e) {
-            $this->logger->warning('Got exception :e for url :url', [':url' => $url, ':e' => $e->getMessage()]);
-
-            return;
-        }
+        $request  = $this->httpClient->get($url);
+        $response = $this->httpClient->syncCall($request, [
+            'curl' => [
+                CURLOPT_INTERFACE => $this->serverHost,
+                CURLOPT_PORT      => $this->serverPort,
+            ],
+        ]);
 
         $status = $response->getStatusCode();
 
         if ($status === 200) {
-            // TODO Maybe grab page content, parse it and make request to every image/css/js file
-
-            $this->logger->info('Cache was warmed up for :url', [':url' => $url]);
+            if ($response->getBody()->getContents()) {
+                // TODO Maybe grab page content, parse it and make request to every image/css/js file
+                $this->logger->info('Cache was warmed up for :url', [':url' => $url]);
+            } else {
+                $this->logger->warning('Got :status status with empty content for URL :url', [
+                    ':url'    => $url,
+                    ':status' => $status,
+                ]);
+            }
         } elseif ($status >= 300 && $status < 400) {
             $this->logger->info('Redirect :status received for :url', [
                 ':url'    => $url,
