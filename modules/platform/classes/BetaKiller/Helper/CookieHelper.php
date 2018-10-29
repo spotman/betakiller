@@ -82,7 +82,12 @@ class CookieHelper
         $data = [];
 
         foreach ($cookies as $cookie) {
-            $data[$cookie->getName()] = $this->verify($cookie, $request)->getValue();
+            try {
+                $data[$cookie->getName()] = $this->decode($cookie)->getValue();
+            } /** @noinspection BadExceptionsProcessingInspection */
+            catch (Mismatch $e) {
+                // Skip tempered/client-side cookies
+            }
         }
 
         return $data;
@@ -98,19 +103,8 @@ class CookieHelper
 
         $cookie = $cookies->get($name);
 
-        return $this->verify($cookie, $request)->getValue();
-    }
-
-    private function getCookies(ServerRequestInterface $request): RequestCookies
-    {
-        return RequestCookies::createFromRequest($request);
-    }
-
-    private function verify(Cookie $cookie, ServerRequestInterface $request): Cookie
-    {
         try {
-
-            return $this->signer->verify($cookie, $this->key);
+            return $this->decode($cookie)->getValue();
         } catch (Mismatch $e) {
             // Cookie is tampered!
             throw new SecurityException('Cookie ":name" is tampered from IP :ip', [
@@ -118,6 +112,16 @@ class CookieHelper
                 ':ip'   => ServerRequestHelper::getIpAddress($request),
             ], 0, $e);
         }
+    }
+
+    private function getCookies(ServerRequestInterface $request): RequestCookies
+    {
+        return RequestCookies::createFromRequest($request);
+    }
+
+    private function decode(Cookie $cookie): Cookie
+    {
+        return $this->signer->verify($cookie, $this->key);
     }
 
     public function set(

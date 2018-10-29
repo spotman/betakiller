@@ -3,27 +3,34 @@ declare(strict_types=1);
 
 namespace BetaKiller\Dev;
 
+use BetaKiller\Helper\CookieHelper;
 use DebugBar\DataCollector\AssetProvider;
 use DebugBar\DataCollector\DataCollector;
 use DebugBar\DataCollector\Renderable;
-use Zend\Expressive\Session\SessionIdentifierAwareInterface;
-use Zend\Expressive\Session\SessionInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
-class DebugBarSessionDataCollector extends DataCollector implements Renderable, AssetProvider
+class DebugBarCookiesDataCollector extends DataCollector implements Renderable, AssetProvider
 {
     /**
-     * @var \Zend\Expressive\Session\SessionInterface
+     * @var \BetaKiller\Helper\CookieHelper
      */
-    private $session;
+    private $helper;
+
+    /**
+     * @var \Psr\Http\Message\ServerRequestInterface
+     */
+    private $request;
 
     /**
      * DebugBarSessionDataCollector constructor.
      *
-     * @param \Zend\Expressive\Session\SessionInterface $session
+     * @param \BetaKiller\Helper\CookieHelper          $helper
+     * @param \Psr\Http\Message\ServerRequestInterface $request
      */
-    public function __construct(SessionInterface $session)
+    public function __construct(CookieHelper $helper, ServerRequestInterface $request)
     {
-        $this->session = $session;
+        $this->helper  = $helper;
+        $this->request = $request;
     }
 
     /**
@@ -33,7 +40,7 @@ class DebugBarSessionDataCollector extends DataCollector implements Renderable, 
      */
     public function getName(): string
     {
-        return 'session';
+        return 'cookies';
     }
 
     /**
@@ -43,29 +50,9 @@ class DebugBarSessionDataCollector extends DataCollector implements Renderable, 
      */
     public function collect(): array
     {
-        return $this->getSessionData($this->session);
-    }
-
-    private function getSessionID(SessionInterface $session): ?string
-    {
-        if (!$session instanceof SessionIdentifierAwareInterface) {
-            return null;
-        }
-
-        return $session->getId();
-    }
-
-    private function getSessionData(SessionInterface $session): array
-    {
         $data = [];
 
-        $id = $this->getSessionID($session);
-
-        if ($id) {
-            $data['id'] = $this->getVarDumper()->renderVar($id);
-        }
-
-        foreach ($session->toArray() as $key => $value) {
+        foreach ($this->helper->getAll($this->request) as $key => $value) {
             $data[$key] = $this->getVarDumper()->renderVar($value);
         }
 
@@ -90,9 +77,9 @@ class DebugBarSessionDataCollector extends DataCollector implements Renderable, 
     {
         return [
             $this->getName() => [
-                'icon'    => 'tags',
+                'icon'    => 'cookie',
                 'widget'  => 'PhpDebugBar.Widgets.HtmlVariableListWidget',
-                'map'     => 'session',
+                'map'     => 'cookies',
                 'default' => '{}',
             ],
         ];
