@@ -6,6 +6,9 @@ use Psr\Http\Message\ServerRequestInterface;
 
 interface IFaceInterface
 {
+    public const NAMESPACE = 'IFace';
+    public const SUFFIX    = 'IFace';
+
     /**
      * @return string
      */
