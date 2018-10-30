@@ -101,9 +101,20 @@ class ResponseHelper
      *
      * @return \Psr\Http\Message\ResponseInterface
      */
-    public static function redirect(string $url): ResponseInterface
+    public static function temporaryRedirect(string $url): ResponseInterface
     {
-        return new RedirectResponse($url, 302);
+        return new RedirectResponse($url, 307);
+    }
+
+    /**
+     * @param string   $url
+     * @param int|null $status
+     *
+     * @return \Psr\Http\Message\ResponseInterface
+     */
+    public static function redirect(string $url, int $status = null): ResponseInterface
+    {
+        return new RedirectResponse($url, $status ?? 302);
     }
 
     public static function setLastModified(

@@ -1,12 +1,10 @@
 <?php
 namespace BetaKiller\Model;
 
-use BetaKiller\Exception;
 use Database;
 use DateTime;
 use DateTimeImmutable;
 use DB;
-use Kohana_Exception;
 use ORM;
 
 class PhpException extends \ORM implements PhpExceptionModelInterface
@@ -75,6 +73,7 @@ class PhpException extends \ORM implements PhpExceptionModelInterface
           resolved_by INTEGER UNSIGNED NULL,
           status VARCHAR(16) NOT NULL,
           message TEXT NOT NULL,
+          trace BLOB NULL,
           total INTEGER UNSIGNED NOT NULL DEFAULT 0,
           notification_required UNSIGNED INTEGER(1) NOT NULL DEFAULT 0
         )')->execute($this->_db_group);
@@ -298,34 +297,13 @@ class PhpException extends \ORM implements PhpExceptionModelInterface
         return $this;
     }
 
-    public function hasTrace(): bool
-    {
-        $path = $this->getTraceFullPath();
-
-        return file_exists($path);
-    }
-
     /**
      * @return string
      */
     public function getTrace(): string
     {
-        $path = $this->getTraceFullPath();
-
-        return file_get_contents($path);
+        return $this->get('trace');
     }
-
-    private function getTraceFullPath(): string
-    {
-        $dir = MODPATH.'error/media/php_traces';
-
-        if (!file_exists($dir) && !is_dir($dir)) {
-            throw new Exception('Directory [:dir] for php stacktrace files does not exists', [':dir' => $dir]);
-        }
-
-        return $dir.DIRECTORY_SEPARATOR.$this->getHash();
-    }
-
 
     /**
      * @param string $formattedTrace
@@ -334,15 +312,9 @@ class PhpException extends \ORM implements PhpExceptionModelInterface
      */
     public function setTrace(string $formattedTrace): PhpExceptionModelInterface
     {
-        $path = $this->getTraceFullPath();
-        file_put_contents($path, $formattedTrace);
+        $this->set('trace', $formattedTrace);
 
         return $this;
-    }
-
-    public function deleteTrace(): void
-    {
-        unlink($this->getTraceFullPath());
     }
 
     /**
@@ -610,7 +582,7 @@ class PhpException extends \ORM implements PhpExceptionModelInterface
      * @param UserInterface|null $user
      *
      * @return \BetaKiller\Model\PhpExceptionHistoryModelInterface
-     * @internal param string $type What have been done
+     * @internal
      */
     private function addHistoryRecord(UserInterface $user = null): PhpExceptionHistoryModelInterface
     {
@@ -631,13 +603,10 @@ class PhpException extends \ORM implements PhpExceptionModelInterface
      * Deletes a single record while ignoring relationships.
      *
      * @chainable
-     * @throws Kohana_Exception
      * @return ORM
      */
     public function delete(): ORM
     {
-        $this->deleteTrace();
-
         // Delete historical records coz SQLite can not do it automatically
         foreach ($this->getHistoricalRecords() as $history) {
             $history->delete();

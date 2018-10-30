@@ -80,31 +80,15 @@ class ErrorPageMiddleware implements MiddlewareInterface
         try {
             return $handler->handle($request);
         } catch (\Throwable $e) {
+            // Logging exception
+            $this->logException($this->logger, $e, $request);
+
             return $this->handleException($request, $e);
         }
     }
 
     private function handleException(ServerRequestInterface $request, \Throwable $e): ResponseInterface
     {
-        $notify = ($e instanceof ExceptionInterface)
-            ? $e->isNotificationEnabled()
-            : true;
-
-        if ($notify) {
-            // Logging exception
-            $this->logException($this->logger, $e);
-        }
-
-//        if ($this->appEnv->isCli()) {
-//            // Force exception message to be shown even if notification is disabled
-//            if (!$notify) {
-//                echo $e->getMessage().PHP_EOL.$e->getTraceAsString();
-//            }
-//
-//            // CLI log handler already printed the message, return empty response
-//            return new EmptyResponse;
-//        }
-
         $i18n = ServerRequestHelper::getI18n($request);
 
         if (ServerRequestHelper::isJsonPreferred($request)) {

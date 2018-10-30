@@ -170,7 +170,8 @@ class UrlDispatcherCacheWrapper implements UrlDispatcherInterface
             return true;
         } catch (\Throwable $e) {
             // Log and keep processing as no cache was found
-            $this->logException($this->logger, $e, 'Error on unpacking UrlDispatcher data');
+            $this->logger->alert('Error on unpacking UrlDispatcher data');
+            $this->logException($this->logger, $e);
 
             // Wipe the cached data to prevent errors
             $this->cache->delete($cacheKey);

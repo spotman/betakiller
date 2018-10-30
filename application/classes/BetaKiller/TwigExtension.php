@@ -4,6 +4,7 @@ namespace BetaKiller;
 use BetaKiller\Assets\StaticAssets;
 use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\Helper\I18nHelper;
+use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\I18n\I18nFacade;
 use BetaKiller\Url\ZoneInterface;
 use BetaKiller\View\IFaceView;
@@ -65,6 +66,12 @@ class TwigExtension extends Twig_Extension
                 'image',
                 [$this, 'image'],
                 ['needs_context' => true, 'is_safe' => ['html']]
+            ),
+
+            new Twig_Function(
+                'csp',
+                [$this, 'csp'],
+                ['needs_context' => true]
             ),
 
             new Twig_Function(
@@ -255,6 +262,18 @@ class TwigExtension extends Twig_Extension
     public function showKohanaProfiler(): string
     {
         return \View::factory('profiler/stats')->render();
+    }
+
+    public function csp(array $context, string $name, string $value, bool $reportOnly = null): void
+    {
+        $request = $this->getRequest($context);
+        $csp     = ServerRequestHelper::getCsp($request);
+
+        if ($reportOnly) {
+            $csp->csp($name, $value, true);
+        } else {
+            $csp->csp($name, $value);
+        }
     }
 
     /**

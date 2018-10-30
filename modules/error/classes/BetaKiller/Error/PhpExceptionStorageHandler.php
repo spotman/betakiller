@@ -6,10 +6,10 @@ use BetaKiller\Exception;
 use BetaKiller\ExceptionInterface;
 use BetaKiller\Helper\NotificationHelper;
 use BetaKiller\Helper\ServerRequestHelper;
+use BetaKiller\Log\Logger;
 use BetaKiller\Model\PhpExceptionModelInterface;
 use BetaKiller\Repository\PhpExceptionRepository;
 use Monolog\Handler\AbstractProcessingHandler;
-use Monolog\Logger;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
 
@@ -20,7 +20,7 @@ use Psr\Log\LoggerInterface;
  */
 class PhpExceptionStorageHandler extends AbstractProcessingHandler
 {
-    public const MIN_LEVEL = Logger::ERROR;
+    public const MIN_LEVEL = \Monolog\Logger::ERROR;
 
     public const NOTIFICATION_SUBSYSTEM_FAILURE = 'developer/error/subsystem-failure';
 
@@ -97,16 +97,27 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
         }
 
         /** @var \Throwable|null $exception */
-        $exception = $record['context']['exception'] ?? null;
+        $exception = $record['context'][Logger::CONTEXT_KEY_EXCEPTION] ?? null;
 
         if (!$exception) {
             // Create dummy exception if this is a plain "alert" or "emergency" message
             $exception = new Exception((string)$record['formatted']);
         }
 
+        $notify = ($exception instanceof ExceptionInterface)
+            ? $exception->isNotificationEnabled()
+            : true;
+
+        // Skip expected exceptions
+        if (!$notify) {
+            return;
+        }
+
+        /** @var ServerRequestInterface|null $request */
+        $request = $record['context'][Logger::CONTEXT_KEY_REQUEST] ?? null;
+
         try {
-            // TODO Extract this call from here and move it to a separate class, called in the error page middleware
-            $this->storeException($exception, null);
+            $this->storeException($exception, $request);
         } catch (\Throwable $subsystemException) {
             // Prevent logging recursion
             $this->enabled = false;
@@ -119,17 +130,13 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
      * @param \Throwable                                    $exception
      * @param null|\Psr\Http\Message\ServerRequestInterface $request Null in cli mode
      *
-     * @return \BetaKiller\Model\PhpExceptionModelInterface|null
+     * @return \BetaKiller\Model\PhpExceptionModelInterface
      * @throws \BetaKiller\Exception\ValidationException
      * @throws \BetaKiller\Repository\RepositoryException
      * @throws \Kohana_Exception
      */
-    public function storeException(\Throwable $exception, ?ServerRequestInterface $request): ?PhpExceptionModelInterface
+    private function storeException(\Throwable $exception, ?ServerRequestInterface $request): PhpExceptionModelInterface
     {
-        if ($exception instanceof ExceptionInterface && !$exception->isNotificationEnabled()) {
-            return null;
-        }
-
         $class = \get_class($exception);
         $code  = $exception->getCode();
         $file  = $exception->getFile();
@@ -168,12 +175,14 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
         // Increase occurrence counter
         $model->incrementCounter();
 
-        // Trying to get current URL
-        $url = $request ? ServerRequestHelper::getUrl($request) : null;
-
-        // Adding URL
-        if ($url) {
+        if ($request) {
+            // Adding URL
+            $url = ServerRequestHelper::getUrl($request);
             $model->addUrl($url);
+
+            // Adding module name for grouping purposes
+            $module = ServerRequestHelper::getModule($request);
+            $model->addModule($module);
         }
 
         // Adding error source file and line number
@@ -187,14 +196,6 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
             $model->setTrace($stacktrace);
         }
 
-        // Trying to get current module
-        $module = $request ? ServerRequestHelper::getModule($request) : null;
-
-        // Adding module name for grouping purposes
-        if ($module) {
-            $model->addModule($module);
-        }
-
         $isNotificationNeeded = $this->isNotificationNeededFor($model, static::REPEAT_COUNT, static::REPEAT_DELAY);
 
         $this->logger->debug('Notification needed is :value', [':value' => $isNotificationNeeded ? 'true' : 'false']);
@@ -205,6 +206,8 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
 
         // Saving
         $this->repository->save($model);
+
+        $this->logger->debug('Exception stored with ID :id', [':id' => $model->getID()]);
 
         return $model;
     }
