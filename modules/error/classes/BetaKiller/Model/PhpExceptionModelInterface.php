@@ -90,8 +90,6 @@ interface PhpExceptionModelInterface extends DispatchableEntityInterface
      */
     public function setTrace(string $formattedTrace): PhpExceptionModelInterface;
 
-    public function deleteTrace(): void;
-
     /**
      * @param \DateTimeInterface $time
      *
