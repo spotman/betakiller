@@ -23,7 +23,7 @@ use Psr\Http\Message\ServerRequestInterface;
  */
 class RegularLoginAction extends AbstractAction
 {
-    public const URL = LoginIFace::URL.'regular/';
+    public const URL = LoginIFace::URL.'regular';
 
     /**
      * @var \BetaKiller\Auth\AuthFacade
