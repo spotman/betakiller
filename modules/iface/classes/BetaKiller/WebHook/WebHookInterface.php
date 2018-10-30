@@ -8,6 +8,9 @@ use Psr\Http\Message\ServerRequestInterface;
 
 interface WebHookInterface
 {
+    public const NAMESPACE = 'WebHook';
+    public const SUFFIX    = 'WebHook';
+
     public function getModel(): WebHookModelInterface;
 
     public function setModel(WebHookModelInterface $model): WebHookInterface;

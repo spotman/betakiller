@@ -9,6 +9,14 @@ use BetaKiller\Url\WebHookModelInterface;
 abstract class AbstractWebHook extends AbstractUrlElement implements WebHookInterface
 {
     /**
+     * @return string
+     */
+    public static function getSuffix(): string
+    {
+        return self::SUFFIX;
+    }
+
+    /**
      * @var \BetaKiller\Url\WebHookModelInterface
      */
     private $model;

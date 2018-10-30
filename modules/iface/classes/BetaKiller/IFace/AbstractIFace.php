@@ -26,6 +26,14 @@ abstract class AbstractIFace extends AbstractUrlElement implements IFaceInterfac
     /**
      * @return string
      */
+    public static function getSuffix(): string
+    {
+        return self::SUFFIX;
+    }
+
+    /**
+     * @return string
+     */
     final public function getCodename(): string
     {
         return $this->getModel()->getCodename();
