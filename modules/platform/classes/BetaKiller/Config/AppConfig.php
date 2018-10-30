@@ -81,7 +81,7 @@ class AppConfig extends AbstractConfig implements AppConfigInterface
      */
     public function getAdminEmail(): string
     {
-        $host = parse_url($this->getBaseUri(), PHP_URL_HOST);
+        $host = $this->getBaseUri()->getHost();
 
         return 'admin@'.$host;
     }
