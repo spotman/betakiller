@@ -63,7 +63,7 @@ class SecureHeadersMiddleware implements MiddlewareInterface
         $headers->csp('report-uri', $reportUri, true);
 
         // Basic STS headers with safe mode enabled to prevent long-lasting effects of incorrect configuration
-        $headers->hsts();
+        $headers->hsts(3600, false, false);
         $headers->safeMode(true);
 
         $headers->csp('default', $baseUrl);
