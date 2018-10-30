@@ -6,10 +6,10 @@ use BetaKiller\Exception;
 use BetaKiller\ExceptionInterface;
 use BetaKiller\Helper\NotificationHelper;
 use BetaKiller\Helper\ServerRequestHelper;
+use BetaKiller\Log\Logger;
 use BetaKiller\Model\PhpExceptionModelInterface;
 use BetaKiller\Repository\PhpExceptionRepository;
 use Monolog\Handler\AbstractProcessingHandler;
-use Monolog\Logger;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
 
@@ -20,7 +20,7 @@ use Psr\Log\LoggerInterface;
  */
 class PhpExceptionStorageHandler extends AbstractProcessingHandler
 {
-    public const MIN_LEVEL = Logger::ERROR;
+    public const MIN_LEVEL = \Monolog\Logger::ERROR;
 
     public const NOTIFICATION_SUBSYSTEM_FAILURE = 'developer/error/subsystem-failure';
 
@@ -97,16 +97,28 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
         }
 
         /** @var \Throwable|null $exception */
-        $exception = $record['context']['exception'] ?? null;
+        $exception = $record['context'][Logger::CONTEXT_KEY_EXCEPTION] ?? null;
 
         if (!$exception) {
             // Create dummy exception if this is a plain "alert" or "emergency" message
             $exception = new Exception((string)$record['formatted']);
         }
 
+        $notify = ($exception instanceof ExceptionInterface)
+            ? $exception->isNotificationEnabled()
+            : true;
+
+        // Skip expected exceptions
+        if (!$notify) {
+            return;
+        }
+
+        /** @var ServerRequestInterface|null $request */
+        $request = $record['context'][Logger::CONTEXT_KEY_REQUEST] ?? null;
+
         try {
             // TODO Extract this call from here and move it to a separate class, called in the error page middleware
-            $this->storeException($exception, null);
+            $this->storeException($exception, $request);
         } catch (\Throwable $subsystemException) {
             // Prevent logging recursion
             $this->enabled = false;
