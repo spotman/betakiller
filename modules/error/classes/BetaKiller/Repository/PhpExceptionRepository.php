@@ -52,11 +52,14 @@ class PhpExceptionRepository extends AbstractOrmBasedDispatchableRepository
     {
         $orm = $this->getOrmInstance();
 
-        $this->filterNotificationRequired($orm)
-            ->filterNew($orm)
-            ->orderByLastSeenAt($orm);
-
-        return $orm->get_all();
+        return $this
+            ->filterNotificationRequired($orm)
+            ->filterStatuses($orm, [
+                PhpExceptionModelInterface::STATE_NEW,
+                PhpExceptionModelInterface::STATE_REPEATED,
+            ])
+            ->orderByLastSeenAt($orm)
+            ->findAll($orm);
     }
 
     /**
@@ -112,23 +115,13 @@ class PhpExceptionRepository extends AbstractOrmBasedDispatchableRepository
 
     /**
      * @param \BetaKiller\Utils\Kohana\ORM\OrmInterface $orm
+     * @param string[]                                  $statuses
      *
      * @return \BetaKiller\Repository\PhpExceptionRepository
      */
-    private function filterNew(OrmInterface $orm): PhpExceptionRepository
+    private function filterStatuses(OrmInterface $orm, array $statuses): PhpExceptionRepository
     {
-        return $this->filterStatus($orm, PhpExceptionModelInterface::STATE_NEW);
-    }
-
-    /**
-     * @param \BetaKiller\Utils\Kohana\ORM\OrmInterface $orm
-     * @param string                                    $status
-     *
-     * @return \BetaKiller\Repository\PhpExceptionRepository
-     */
-    private function filterStatus(OrmInterface $orm, string $status): PhpExceptionRepository
-    {
-        $orm->where('status', '=', $status);
+        $orm->where('status', 'IN', $statuses);
 
         return $this;
     }
