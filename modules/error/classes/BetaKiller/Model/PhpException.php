@@ -73,7 +73,7 @@ class PhpException extends \ORM implements PhpExceptionModelInterface
           resolved_by INTEGER UNSIGNED NULL,
           status VARCHAR(16) NOT NULL,
           message TEXT NOT NULL,
-          trace BLOB NOT NULL,
+          trace BLOB NULL,
           total INTEGER UNSIGNED NOT NULL DEFAULT 0,
           notification_required UNSIGNED INTEGER(1) NOT NULL DEFAULT 0
         )')->execute($this->_db_group);
