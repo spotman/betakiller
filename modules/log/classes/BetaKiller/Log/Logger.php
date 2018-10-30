@@ -82,7 +82,7 @@ class Logger implements LoggerInterface
         $monolog
             ->pushProcessor(new KohanaPlaceholderProcessor())
             ->pushProcessor(new MemoryPeakUsageProcessor())
-            ->pushProcessor(new IntrospectionProcessor($monolog::WARNING, [], 1));
+            ->pushProcessor(new IntrospectionProcessor($monolog::WARNING));
 
         return $monolog;
     }
