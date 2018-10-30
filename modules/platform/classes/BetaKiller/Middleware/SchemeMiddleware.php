@@ -83,6 +83,8 @@ class SchemeMiddleware implements MiddlewareInterface
 
     private function redirect(UriInterface $uri): ResponseInterface
     {
-        return ResponseHelper::permanentRedirect((string)$uri);
+        // Keep POST data on redirect
+        // @see http://en.wikipedia.org/wiki/List_of_HTTP_status_codes#3xx_Redirection
+        return ResponseHelper::temporaryRedirect((string)$uri);
     }
 }

@@ -58,7 +58,7 @@ class CspReportHandler implements RequestHandlerInterface
         $e = new SecurityException('SCP violation for ":blocked" with directive ":directive" at :url', [
             ':blocked'   => $data['blocked-uri'],
             ':directive' => $data['violated-directive'],
-            ':at'        => $data['document-uri'],
+            ':url'        => $data['document-uri'],
             ':ip'        => ServerRequestHelper::getIpAddress($request),
         ]);
 
