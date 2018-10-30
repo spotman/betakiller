@@ -30,13 +30,6 @@ interface AppConfigInterface
     public function isSecure(): bool;
 
     /**
-     * Returns app`s administrator email
-     *
-     * @return string
-     */
-    public function getAdminEmail(): string;
-
-    /**
      * Returns TRUE if trailing slash is needed in url
      *
      * @return bool

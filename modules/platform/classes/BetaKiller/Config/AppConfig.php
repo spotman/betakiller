@@ -32,7 +32,6 @@ class AppConfig extends AbstractConfig implements AppConfigInterface
         $this->uriFactory = $uriFactory;
     }
 
-
     /**
      * @return string
      */
@@ -72,18 +71,6 @@ class AppConfig extends AbstractConfig implements AppConfigInterface
     public function isSecure(): bool
     {
         return $this->getBaseUri()->getScheme() === 'https';
-    }
-
-    /**
-     * Returns app`s administrator email
-     *
-     * @return string
-     */
-    public function getAdminEmail(): string
-    {
-        $host = $this->getBaseUri()->getHost();
-
-        return 'admin@'.$host;
     }
 
     /**

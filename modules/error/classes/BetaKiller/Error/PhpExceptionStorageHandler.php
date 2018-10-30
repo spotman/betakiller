@@ -1,7 +1,6 @@
 <?php
 namespace BetaKiller\Error;
 
-use BetaKiller\Config\AppConfigInterface;
 use BetaKiller\Exception;
 use BetaKiller\ExceptionInterface;
 use BetaKiller\Helper\NotificationHelper;
@@ -45,11 +44,6 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
     private $repository;
 
     /**
-     * @var \BetaKiller\Config\AppConfigInterface
-     */
-    private $appConfig;
-
-    /**
      * @var \BetaKiller\Helper\NotificationHelper
      */
     private $notification;
@@ -63,16 +57,13 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
      * PhpExceptionStorageHandler constructor.
      *
      * @param \BetaKiller\Repository\PhpExceptionRepository $repository
-     * @param \BetaKiller\Config\AppConfigInterface         $appConfig
      * @param \BetaKiller\Helper\NotificationHelper         $notificationHelper
      */
     public function __construct(
         PhpExceptionRepository $repository,
-        AppConfigInterface $appConfig,
         NotificationHelper $notificationHelper
     ) {
         $this->repository   = $repository;
-        $this->appConfig    = $appConfig;
         $this->notification = $notificationHelper;
 
         parent::__construct(self::MIN_LEVEL);
@@ -285,7 +276,7 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
     private function sendNotification(\Throwable $subsystemException, \Throwable $originalException): void
     {
         $this->notification->groupMessage(self::NOTIFICATION_SUBSYSTEM_FAILURE, [
-            'url'       => (string)$this->appConfig->getBaseUri(),
+            'url'       => getenv('APP_URL'),
             'subsystem' => [
                 'message'    => $this->getExceptionText($subsystemException),
                 'stacktrace' => $subsystemException->getTraceAsString(),
@@ -313,7 +304,7 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
             }
 
             // Send plain message
-            mail($this->appConfig->getAdminEmail(), 'Exception handling error', nl2br($message));
+            mail(getenv('DEBUG_EMAIL_ADDRESS'), 'Exception handling error', nl2br($message));
         } catch (\Throwable $ignored) {
             // Nothing we can do here, store exceptions in a system log as a last resort
             $this->writeToErrorLog($originalX);
