@@ -218,6 +218,8 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
         // Saving
         $this->repository->save($model);
 
+        $this->logger->debug('Exception stored with ID :id', [':id' => $model->getID()]);
+
         return $model;
     }
 
