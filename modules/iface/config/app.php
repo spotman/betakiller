@@ -9,7 +9,7 @@ return [
     'cache' =>  [
         'page' =>  [
             'enabled'   =>  false,
-            'path'      =>  APPPATH.'cache'.DIRECTORY_SEPARATOR.'page'
+            'path'      =>  'cache'.DIRECTORY_SEPARATOR.'page'
         ]
     ],
 ];
