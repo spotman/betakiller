@@ -29,6 +29,8 @@ class PhpException extends \ORM implements PhpExceptionModelInterface
         $this->_db_group   = 'errors';
         $this->_table_name = 'errors';
 
+        $this->createTablesIfNotExists();
+
         /**
          * Auto-serialize and unserialize columns on get/set
          *
@@ -46,8 +48,6 @@ class PhpException extends \ORM implements PhpExceptionModelInterface
                 'foreign_key' => 'error_id',
             ],
         ]);
-
-        $this->createTablesIfNotExists();
     }
 
     protected function createTablesIfNotExists()

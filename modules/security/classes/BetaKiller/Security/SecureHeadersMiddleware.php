@@ -55,7 +55,6 @@ class SecureHeadersMiddleware implements MiddlewareInterface
         $baseUrl = (string)$baseUri;
 
         $headers = new SecureHeaders();
-        $headers->safeMode(true);
         $headers->applyOnOutput(null, false);
 
         // Report URI first
@@ -63,8 +62,11 @@ class SecureHeadersMiddleware implements MiddlewareInterface
         $headers->csp('report-uri', $reportUri);
         $headers->csp('report-uri', $reportUri, true);
 
-        $headers->csp('default', $baseUrl);
+        // Basic STS headers with safe mode enabled to prevent long-lasting effects of incorrect configuration
+        $headers->hsts(3600, false, false);
+        $headers->safeMode(true);
 
+        $headers->csp('default', $baseUrl);
         $headers->csp('image', $baseUrl);
         $headers->csp('style', $baseUrl);
         $headers->csp('script', $baseUrl);

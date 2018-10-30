@@ -3,6 +3,7 @@
 {% block content %}
 
   {{ js("ifaces/HttpError500.js") }}
+  {{ csp("style", "unsafe-inline") }}
 
   <div class="container error-500">
     <div class="row align-items-center h-100">
