@@ -75,6 +75,7 @@ class Logger implements LoggerInterface
         $logsLevel   = $isDebug ? $monolog::DEBUG : $monolog::NOTICE;
         $fileHandler = new FingersCrossedHandler(new StreamHandler($logFilePath, $monolog::DEBUG), $logsLevel);
         $fileHandler->pushProcessor(new ContextCleanupProcessor);
+        $fileHandler->pushProcessor(new ExceptionStacktraceProcessor);
         $monolog->pushHandler($fileHandler);
 
         // Common processors
