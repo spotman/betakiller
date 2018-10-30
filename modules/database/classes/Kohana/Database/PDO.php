@@ -29,13 +29,17 @@ class Kohana_Database_PDO extends Database {
 		if ($this->_connection)
 			return;
 
+		if (!isset($this->_config['connection'])) {
+            throw new Exception('Missing connection info for DB "'.$this->_instance.'"');
+        }
+
 		// Extract the connection parameters, adding required variabels
 		extract($this->_config['connection'] + array(
 			'dsn'        => '',
 			'username'   => NULL,
 			'password'   => NULL,
 			'persistent' => FALSE,
-		));
+		), EXTR_SKIP);
 
 		// Clear the connection parameters for security
 		unset($this->_config['connection']);
