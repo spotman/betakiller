@@ -61,4 +61,5 @@ return [
 
     'i18n'         => MODPATH.'i18n',
     'cookies-notification' => MODPATH.'cookies-notification',
+    'outdated-browser' => MODPATH.'outdated-browser',
 ];
