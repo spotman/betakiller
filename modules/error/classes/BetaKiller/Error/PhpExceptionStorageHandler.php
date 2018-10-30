@@ -304,7 +304,13 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
             }
 
             // Send plain message
-            mail(getenv('DEBUG_EMAIL_ADDRESS'), 'Exception handling error', nl2br($message));
+            \Email::send(
+                null,
+                getenv('DEBUG_EMAIL_ADDRESS'),
+                'Exception handling error',
+                nl2br($message),
+                true
+            );
         } catch (\Throwable $ignored) {
             // Nothing we can do here, store exceptions in a system log as a last resort
             $this->writeToErrorLog($originalX);
