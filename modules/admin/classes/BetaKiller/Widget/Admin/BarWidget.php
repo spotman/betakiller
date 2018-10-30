@@ -201,7 +201,7 @@ class BarWidget extends AbstractAdminWidget
      *
      * @return IFaceModelInterface
      * @throws \BetaKiller\IFace\Exception\UrlElementException
-     * @uses \BetaKiller\IFace\Admin\Content\CommentListByStatus
+     * @uses \BetaKiller\IFace\Admin\Content\CommentListByStatusIFace
      */
     private function getCommentsListByStatusIface(UrlHelper $helper): UrlElementInterface
     {
@@ -213,7 +213,7 @@ class BarWidget extends AbstractAdminWidget
      *
      * @return \BetaKiller\Url\UrlElementInterface
      * @throws \BetaKiller\IFace\Exception\UrlElementException
-     * @uses \BetaKiller\IFace\Admin\Content\CommentIndex
+     * @uses \BetaKiller\IFace\Admin\Content\CommentIndexIFace
      */
     private function getCommentsRootIface(UrlHelper $helper): UrlElementInterface
     {
