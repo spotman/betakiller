@@ -55,7 +55,9 @@ class Logger implements LoggerInterface
 
         // CLI mode logging
         if ($this->appEnv->isCli()) {
-            $monolog->pushHandler(new CliHandler($isDebug));
+            $cliHandler = new CliHandler($isDebug);
+            $cliHandler->pushProcessor(new ContextCleanupProcessor);
+            $monolog->pushHandler($cliHandler);
             $monolog->pushProcessor(new CliProcessor);
         } else {
             $monolog->pushProcessor(new WebProcessor());
@@ -79,7 +81,7 @@ class Logger implements LoggerInterface
         $monolog
             ->pushProcessor(new KohanaPlaceholderProcessor())
             ->pushProcessor(new MemoryPeakUsageProcessor())
-            ->pushProcessor(new IntrospectionProcessor($monolog::WARNING));
+            ->pushProcessor(new IntrospectionProcessor($monolog::WARNING, [], 1));
 
         return $monolog;
     }

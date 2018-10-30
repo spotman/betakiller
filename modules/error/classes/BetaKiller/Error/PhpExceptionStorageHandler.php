@@ -117,7 +117,6 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
         $request = $record['context'][Logger::CONTEXT_KEY_REQUEST] ?? null;
 
         try {
-            // TODO Extract this call from here and move it to a separate class, called in the error page middleware
             $this->storeException($exception, $request);
         } catch (\Throwable $subsystemException) {
             // Prevent logging recursion
@@ -131,17 +130,13 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
      * @param \Throwable                                    $exception
      * @param null|\Psr\Http\Message\ServerRequestInterface $request Null in cli mode
      *
-     * @return \BetaKiller\Model\PhpExceptionModelInterface|null
+     * @return \BetaKiller\Model\PhpExceptionModelInterface
      * @throws \BetaKiller\Exception\ValidationException
      * @throws \BetaKiller\Repository\RepositoryException
      * @throws \Kohana_Exception
      */
-    public function storeException(\Throwable $exception, ?ServerRequestInterface $request): ?PhpExceptionModelInterface
+    private function storeException(\Throwable $exception, ?ServerRequestInterface $request): PhpExceptionModelInterface
     {
-        if ($exception instanceof ExceptionInterface && !$exception->isNotificationEnabled()) {
-            return null;
-        }
-
         $class = \get_class($exception);
         $code  = $exception->getCode();
         $file  = $exception->getFile();
@@ -180,12 +175,14 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
         // Increase occurrence counter
         $model->incrementCounter();
 
-        // Trying to get current URL
-        $url = $request ? ServerRequestHelper::getUrl($request) : null;
-
-        // Adding URL
-        if ($url) {
+        if ($request) {
+            // Adding URL
+            $url = ServerRequestHelper::getUrl($request);
             $model->addUrl($url);
+
+            // Adding module name for grouping purposes
+            $module = ServerRequestHelper::getModule($request);
+            $model->addModule($module);
         }
 
         // Adding error source file and line number
@@ -197,14 +194,6 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
 
             // Adding trace
             $model->setTrace($stacktrace);
-        }
-
-        // Trying to get current module
-        $module = $request ? ServerRequestHelper::getModule($request) : null;
-
-        // Adding module name for grouping purposes
-        if ($module) {
-            $model->addModule($module);
         }
 
         $isNotificationNeeded = $this->isNotificationNeededFor($model, static::REPEAT_COUNT, static::REPEAT_DELAY);
