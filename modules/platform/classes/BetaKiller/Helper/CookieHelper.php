@@ -34,7 +34,7 @@ class CookieHelper
     /**
      * @var string
      */
-    private $path;
+    private $path = '/';
 
     /**
      * @var bool
@@ -62,7 +62,7 @@ class CookieHelper
         $baseUri = $appConfig->getBaseUri();
 
         $this->domain = $baseUri->getHost();
-        $this->path   = $baseUri->getPath();
+//        $this->path   = $baseUri->getPath();
 
         $this->signer = new Sha512();
 
