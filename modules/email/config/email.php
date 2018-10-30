@@ -6,7 +6,7 @@ return array(
 	 *
 	 * Valid drivers are: native, sendmail, smtp
 	 */
-	'driver' => 'native',
+	'driver' => 'smtp',
 
     /**
      * Sender email address (string or array(email, name))
