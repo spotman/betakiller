@@ -3,6 +3,7 @@
 {% block content %}
 
   {{ js("ifaces/HttpError503.js") }}
+  {{ csp("style", "unsafe-inline") }}
 
   <div class="container error-503" data-duration="{{ duration }}">
     <div class="row align-items-center h-100">
