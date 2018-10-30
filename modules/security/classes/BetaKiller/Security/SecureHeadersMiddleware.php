@@ -69,6 +69,7 @@ class SecureHeadersMiddleware implements MiddlewareInterface
         $headers->csp('image', $baseUrl);
         $headers->csp('style', $baseUrl);
         $headers->csp('script', $baseUrl);
+        $headers->csp('font-src', $baseUrl);
 
         if ($this->appEnv->isDebugEnabled()) {
             // DebugBar uses inline tags and images
@@ -82,7 +83,7 @@ class SecureHeadersMiddleware implements MiddlewareInterface
 //        $styleNonce  = $headers->cspNonce('style');
 //        $scriptNonce = $headers->cspNonce('script');
 
-        $response = $handler->handle($request);
+        $response = $handler->handle($request->withAttribute(SecureHeaders::class, $headers));
 
         $httpAdapter = new Psr7Adapter($response);
         $headers->apply($httpAdapter);
