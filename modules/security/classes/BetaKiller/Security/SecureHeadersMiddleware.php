@@ -63,7 +63,6 @@ class SecureHeadersMiddleware implements MiddlewareInterface
         $headers->csp('report-uri', $reportUri);
         $headers->csp('report-uri', $reportUri, true);
 
-        $headers->hsts();
         $headers->csp('default', $baseUrl);
 
         $headers->csp('image', $baseUrl);
