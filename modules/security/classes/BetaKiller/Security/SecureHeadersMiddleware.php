@@ -57,6 +57,9 @@ class SecureHeadersMiddleware implements MiddlewareInterface
         $headers = new SecureHeaders();
         $headers->applyOnOutput(null, false);
 
+        // Do not add headers
+        $headers->auto(SecureHeaders::AUTO_ALL & ~SecureHeaders::AUTO_ADD);
+
         // Report URI first
         $reportUri = (string)$baseUri->withPath(CspReportHandler::URL);
         $headers->csp('report-uri', $reportUri);
