@@ -35,9 +35,14 @@ class LockFactory
             throw new \LogicException('Daemon codename is not defined');
         }
 
-        $path = $this->appEnv->getTempPath().\DIRECTORY_SEPARATOR.'.'.$codename.'.daemon.lock';
+        $fileName = implode('.', [
+            $this->appEnv->getAppCodename(),
+            $this->appEnv->getModeName(),
+            $codename,
+            'daemon.lock',
+        ]);
 
-        $lock = new Lock($path);
+        $lock = new Lock($this->appEnv->getTempPath().\DIRECTORY_SEPARATOR.$fileName);
         $lock->setLogger($this->logger);
 
         return $lock;
