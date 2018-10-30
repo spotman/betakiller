@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\Helper;
 
+use Aidantwoods\SecureHeaders\SecureHeaders;
 use BetaKiller\Dev\Profiler;
 use BetaKiller\Exception;
 use BetaKiller\Exception\BadRequestHttpException;
@@ -204,5 +205,10 @@ class ServerRequestHelper
     public static function getDebugBar(ServerRequestInterface $request): ?DebugBar
     {
         return $request->getAttribute(DebugBar::class);
+    }
+
+    public static function getCsp(ServerRequestInterface $request): SecureHeaders
+    {
+        return $request->getAttribute(SecureHeaders::class);
     }
 }
