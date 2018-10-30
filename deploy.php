@@ -431,7 +431,7 @@ task('deploy', [
 
     'migrations:up',
     'assets:deploy',
-//    'cache:warmup',
+    'cache:warmup',
 
     // Switch to new version
     'deploy:symlink',
