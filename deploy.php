@@ -113,7 +113,7 @@ task('deploy:vendors:app', function () {
 /**
  * @param string $repo
  *
- * @return \Deployer\Type\Result
+ * @return string
  * @throws \Deployer\Exception\Exception
  */
 function process_vendors(string $repo)
@@ -170,6 +170,7 @@ after('deploy:betakiller:shared', 'deploy:shared');
  */
 set('betakiller_writable_dirs', [
     '{{core_path}}/application/cache',
+    '{{core_path}}/application/logs',
 
     '{{app_path}}/logs',
     '{{app_path}}/cache',
@@ -431,7 +432,7 @@ task('deploy', [
 
     'migrations:up',
     'assets:deploy',
-    'cache:warmup',
+//    'cache:warmup',
 
     // Switch to new version
     'deploy:symlink',
