@@ -2,7 +2,7 @@
 namespace BetaKiller\IFace;
 
 use BetaKiller\Helper\ServerRequestHelper;
-use BetaKiller\IFace\Auth\Login;
+use BetaKiller\IFace\Auth\LoginIFace;
 use Psr\Http\Message\ServerRequestInterface;
 
 abstract class AbstractHttpErrorIFace extends AbstractIFace
@@ -32,7 +32,7 @@ abstract class AbstractHttpErrorIFace extends AbstractIFace
     public function getData(ServerRequestInterface $request): array
     {
         return [
-            'login_url' => Login::URL,
+            'login_url' => LoginIFace::URL,
             'is_guest'  => ServerRequestHelper::isGuest($request),
         ];
     }
