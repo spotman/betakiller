@@ -24,7 +24,8 @@ class IFaceFactory
         $this->factory = $factoryBuilder
             ->createFactory()
             ->cacheInstances()
-            ->setClassNamespaces('IFace')
+            ->setClassNamespaces(IFaceInterface::NAMESPACE)
+            ->setClassSuffix(IFaceInterface::SUFFIX)
             ->setExpectedInterface(IFaceInterface::class);
     }
 
@@ -36,10 +37,10 @@ class IFaceFactory
      */
     public function createFromUrlElement(UrlElementInterface $model): IFaceInterface
     {
-        if (! $model instanceof IFaceModelInterface) {
+        if (!$model instanceof IFaceModelInterface) {
             throw new FactoryException('Can not create IFace from URL element :codename of type :class', [
                 ':codename' => $model->getCodename(),
-                ':class' => \get_class($model),
+                ':class'    => \get_class($model),
             ]);
         }
 

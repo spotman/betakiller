@@ -24,7 +24,8 @@ class WebHookFactory
         $this->factory = $factoryBuilder
             ->createFactory()
             ->cacheInstances()
-            ->setClassNamespaces('WebHook')
+            ->setClassNamespaces(WebHookInterface::NAMESPACE)
+            ->setClassSuffix(WebHookInterface::SUFFIX)
             ->setExpectedInterface(WebHookInterface::class);
     }
 

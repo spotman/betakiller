@@ -15,7 +15,8 @@ use Psr\Http\Server\RequestHandlerInterface;
 
 class I18nMiddleware implements MiddlewareInterface
 {
-    private const COOKIE_NAME = 'lang';
+    public const COOKIE_NAME          = 'lang';
+    public const COOKIE_DATE_INTERVAL = 'P14D';
 
     /**
      * @var \BetaKiller\I18n\I18nFacade
@@ -61,7 +62,7 @@ class I18nMiddleware implements MiddlewareInterface
 
         $response = $handler->handle($request->withAttribute(I18nHelper::class, $i18n));
 
-        return $this->cookies->set($response, self::COOKIE_NAME, $lang, new \DateInterval('P14D'));
+        return $this->cookies->set($response, self::COOKIE_NAME, $lang, new \DateInterval(self::COOKIE_DATE_INTERVAL));
     }
 
     private function detectLang(ServerRequestInterface $request): string
