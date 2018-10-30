@@ -1,11 +1,12 @@
 <?php
 namespace BetaKiller\IFace;
 
+use BetaKiller\Url\AbstractUrlElement;
 use BetaKiller\Url\IFaceModelInterface;
 use DateInterval;
 use Psr\Http\Message\ServerRequestInterface;
 
-abstract class AbstractIFace implements IFaceInterface
+abstract class AbstractIFace extends AbstractUrlElement implements IFaceInterface
 {
     /**
      * @var IFaceModelInterface
@@ -21,18 +22,6 @@ abstract class AbstractIFace implements IFaceInterface
      * @var DateInterval|null
      */
     private $expiresInterval;
-
-    /**
-     * @return string
-     */
-    final public static function codename(): string
-    {
-        $codename = explode('\\', static::class);
-        array_splice($codename, 0, -1 * \count($codename) + 2);
-        $codename = implode('_', $codename);
-
-        return $codename;
-    }
 
     /**
      * @return string
