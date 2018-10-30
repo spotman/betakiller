@@ -13,7 +13,7 @@ class KohanaPlaceholderProcessor
             $data = [];
 
             foreach ($record['context'] as $key => $item) {
-                if (is_string($key) && is_scalar($item) && $key[0] === ':') {
+                if (\is_string($key) && is_scalar($item) && strpos($key, ':') === 0) {
                     $data[$key] = (string)$item;
                     unset($record['context'][$key]);
                 }
