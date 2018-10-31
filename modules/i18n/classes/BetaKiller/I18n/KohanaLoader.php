@@ -6,6 +6,30 @@ namespace BetaKiller\I18n;
 class KohanaLoader implements LoaderInterface
 {
     /**
+     * @var \BetaKiller\I18n\PluralBagFormatterInterface
+     */
+    private $bagFormatter;
+
+    /**
+     * @var \BetaKiller\I18n\PluralBagFactoryInterface
+     */
+    private $bagFactory;
+
+    /**
+     * KohanaLoader constructor.
+     *
+     * @param \BetaKiller\I18n\PluralBagFormatterInterface $bagFormatter
+     * @param \BetaKiller\I18n\PluralBagFactoryInterface   $bagFactory
+     */
+    public function __construct(
+        PluralBagFormatterInterface $bagFormatter,
+        PluralBagFactoryInterface $bagFactory
+    ) {
+        $this->bagFormatter = $bagFormatter;
+        $this->bagFactory   = $bagFactory;
+    }
+
+    /**
      * Returns "key" => "translated string" pairs for provided locale
      *
      * @param string $locale
@@ -30,8 +54,19 @@ class KohanaLoader implements LoaderInterface
                 $t = [];
                 foreach ($files as $file) {
                     /** @noinspection PhpIncludeInspection */
+                    $values = include $file;
+
+                    foreach ($values as $key => $value) {
+                        if (\is_array($value)) {
+                            // Plural forms are in array
+                            $bag = $this->bagFactory->create($value);
+                            // Compile with default formatter
+                            $values[$key] = $this->bagFormatter->compile($bag);
+                        }
+                    }
+
                     // Merge the language strings into the sub table
-                    $t[] = include $file;
+                    $t[] = $values;
                 }
 
                 // Append the sub table, preventing less specific language

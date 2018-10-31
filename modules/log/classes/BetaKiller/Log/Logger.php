@@ -49,7 +49,11 @@ class Logger implements LoggerInterface
     {
         $monolog = new \Monolog\Logger('default');
 
-        ErrorHandler::register($monolog);
+        $errorHandler = new ErrorHandler($monolog);
+        $errorHandler->registerErrorHandler();
+        $errorHandler->registerFatalHandler();
+        // Do not register exception handler coz it calls exit()
+//        $errorHandler->registerExceptionHandler();
 
         $isDebug = $this->appEnv->isDebugEnabled();
 
