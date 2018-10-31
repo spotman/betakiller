@@ -11,7 +11,7 @@ use BetaKiller\Model\LanguageInterface;
  * @method LanguageInterface findById(string $id)
  * @method LanguageInterface[] getAll()
  */
-class LanguageRepository extends AbstractOrmBasedRepository implements LanguageRepositoryInterface
+final class LanguageRepository extends AbstractOrmBasedRepository implements LanguageRepositoryInterface
 {
     public function getByName(string $name): LanguageInterface
     {
@@ -25,6 +25,7 @@ class LanguageRepository extends AbstractOrmBasedRepository implements LanguageR
 
         return $model;
     }
+
     /**
      * @param string $name
      *
@@ -38,6 +39,22 @@ class LanguageRepository extends AbstractOrmBasedRepository implements LanguageR
         $this->filterByName($orm, $name);
 
         return $this->findOne($orm);
+    }
+
+    public function getByLocale(string $locale): LanguageInterface
+    {
+        $orm = $this->getOrmInstance();
+        $this->filterByLocale($orm, $locale);
+
+        $model = $this->findOne($orm);
+
+        if (!$model) {
+            throw new RepositoryException('Missing language with locale :value', [
+                ':value' => $locale,
+            ]);
+        }
+
+        return $model;
     }
 
     /**
@@ -56,7 +73,7 @@ class LanguageRepository extends AbstractOrmBasedRepository implements LanguageR
     /**
      * @param \BetaKiller\Model\ExtendedOrmInterface $orm
      */
-    protected function filterBySystem(ExtendedOrmInterface $orm): void
+    private function filterBySystem(ExtendedOrmInterface $orm): void
     {
         $orm->where(Language::TABLE_FIELD_IS_SYSTEM, '=', 1);
     }
@@ -65,8 +82,17 @@ class LanguageRepository extends AbstractOrmBasedRepository implements LanguageR
      * @param \BetaKiller\Model\ExtendedOrmInterface $orm
      * @param string                                 $name
      */
-    protected function filterByName(ExtendedOrmInterface $orm, string $name): void
+    private function filterByName(ExtendedOrmInterface $orm, string $name): void
     {
         $orm->where(Language::TABLE_FIELD_NAME, '=', $name);
+    }
+
+    /**
+     * @param \BetaKiller\Model\ExtendedOrmInterface $orm
+     * @param string                                 $locale
+     */
+    private function filterByLocale(ExtendedOrmInterface $orm, string $locale): void
+    {
+        $orm->where(Language::TABLE_FIELD_LOCALE, '=', $locale);
     }
 }

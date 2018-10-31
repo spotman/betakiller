@@ -3,6 +3,7 @@ namespace BetaKiller\Helper;
 
 use BetaKiller\Exception;
 use BetaKiller\I18n\I18nFacade;
+use BetaKiller\Model\I18nKeyModelInterface;
 
 class I18nHelper
 {
@@ -76,5 +77,15 @@ class I18nHelper
     public function translate(string $key, array $values = null, string $lang = null): string
     {
         return $this->facade->translate($lang ?: $this->lang, $key, $values);
+    }
+
+    public function translateKey(I18nKeyModelInterface $model, array $values = null, string $lang = null): string
+    {
+        return $this->translate($model->getI18nKey(), $values, $lang);
+    }
+
+    public function pluralize(string $key, $form, array $values = null, string $lang = null): string
+    {
+        return $this->facade->pluralize($lang ?: $this->lang, $key, $values);
     }
 }
