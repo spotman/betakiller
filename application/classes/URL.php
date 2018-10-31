@@ -7,8 +7,9 @@ class URL
      * @param string|null $delimiter
      *
      * @return null|string
+     * @see https://github.com/ausi/slug-generator
      */
-    public static function transliterate(string $string, string $delimiter = null)
+    public static function transliterate(string $string, string $delimiter = null): ?string
     {
         $delimiter = $delimiter ?? '-';
 
