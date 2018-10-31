@@ -12,7 +12,7 @@ return [
     // Kohana dependencies without DB access (using Kohana config)
     'email'        => MODPATH.'email',                 // Mailing module
     'image'        => MODPATH.'image',                 // Image manipulation
-    'i18n-plural'  => MODPATH.'i18n-plural',           // International pluralization
+//    'i18n-plural'  => MODPATH.'i18n-plural',           // International pluralization
     'message-bus'  => MODPATH.'message-bus',           // Event and command buses
     'meta-tags'    => MODPATH.'meta-tags',             // HTML meta tags helper
     'minion'       => MODPATH.'minion',                // CLI Tasks
