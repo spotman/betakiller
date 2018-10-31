@@ -138,16 +138,18 @@ class TwigExtension extends Twig_Extension
              *
              * @example ":count lots"|plural({ ":count": lotsCount })
              */
-            new Twig_Filter('plural', function (array $context, string $text, $values, int $form = null) {
+            new Twig_Filter('plural', function (array $context, string $key, array $values = null, $form = null) {
                 if (!\is_array($values)) {
                     $values = [
                         ':count' => (int)$values,
                     ];
                 }
 
+                $values = I18nFacade::addPlaceholderPrefixToKeys($values);
+
                 $lang = $this->getI18n($context)->getLang();
 
-                return ___($text, $form ?? current($values), $values, $lang);
+                return $this->getI18n($context)->pluralize($key, $form ?? current($values), $values, $lang);
             }, ['needs_context' => true, 'is_safe' => ['html']]),
 
             /**
