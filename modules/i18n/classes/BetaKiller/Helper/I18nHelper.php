@@ -64,16 +64,6 @@ class I18nHelper
         return $this->facade->getLanguageLocale($lang);
     }
 
-    /**
-     * @param string $key
-     *
-     * @return bool
-     */
-    public function isI18nKey(string $key): bool
-    {
-        return $this->facade->isI18nKey($key);
-    }
-
     public function translate(string $key, array $values = null, string $lang = null): string
     {
         return $this->facade->translate($lang ?: $this->lang, $key, $values);

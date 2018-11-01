@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\I18n;
 
-class KohanaLoader implements LoaderInterface
+class FilesystemLoader implements LoaderInterface
 {
     /**
      * @var \BetaKiller\I18n\PluralBagFormatterInterface
@@ -16,7 +16,7 @@ class KohanaLoader implements LoaderInterface
     private $bagFactory;
 
     /**
-     * KohanaLoader constructor.
+     * FilesystemLoader constructor.
      *
      * @param \BetaKiller\I18n\PluralBagFormatterInterface $bagFormatter
      * @param \BetaKiller\I18n\PluralBagFactoryInterface   $bagFactory

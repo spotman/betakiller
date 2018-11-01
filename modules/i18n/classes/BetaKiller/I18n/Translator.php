@@ -54,6 +54,14 @@ class Translator implements TranslatorInterface
     {
         $packedString = $this->translate($key, $locale);
 
+        if (!$this->formatter->isFormatted($packedString)) {
+            throw new I18nException('Translation for key ":key" in locale ":locale" is not plural but ":value"', [
+                ':key'    => $key,
+                ':value'  => $packedString,
+                ':locale' => $locale,
+            ]);
+        }
+
         return $this->formatter->parse($packedString)->getValue($form);
     }
 

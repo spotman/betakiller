@@ -13,7 +13,7 @@ final class I18nFacade
 
     public const PLACEHOLDER_PREFIX = ':';
 
-    private const KEY_REGEX = '/^[a-z0-9_]+(?:[\.]{1}[a-z0-9_]+)+$/m';
+    private const KEY_REGEX = '/^[a-z0-9_]+(?:[\.]{1}[a-z0-9-_]+)+$/m';
 
     /**
      * @var \BetaKiller\Config\AppConfigInterface
@@ -128,7 +128,7 @@ final class I18nFacade
      *
      * @return bool
      */
-    public function isI18nKey(string $key): bool
+    public static function isI18nKey(string $key): bool
     {
         return (bool)preg_match(self::KEY_REGEX, $key);
     }

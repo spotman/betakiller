@@ -1,6 +1,7 @@
 <?php
 namespace BetaKiller\Helper;
 
+use BetaKiller\I18n\I18nFacade;
 use BetaKiller\IFace\Exception\UrlElementException;
 use BetaKiller\IFace\IFaceInterface;
 use BetaKiller\Url\Container\UrlContainerInterface;
@@ -123,7 +124,7 @@ class UrlElementHelper
             ]);
         }
 
-        if ($i18n->isI18nKey($label)) {
+        if (I18nFacade::isI18nKey($label)) {
             $label = $i18n->translate($label);
         }
 
@@ -153,7 +154,7 @@ class UrlElementHelper
             ]);
         }
 
-        if ($i18n->isI18nKey($title)) {
+        if (I18nFacade::isI18nKey($title)) {
             $title = $i18n->translate($title);
         }
 
@@ -177,7 +178,7 @@ class UrlElementHelper
             return '';
         }
 
-        if ($i18n->isI18nKey($description)) {
+        if (I18nFacade::isI18nKey($description)) {
             $description = $i18n->translate($description);
         }
 

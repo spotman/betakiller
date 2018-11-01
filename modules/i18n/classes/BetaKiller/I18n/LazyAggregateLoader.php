@@ -73,7 +73,7 @@ class LazyAggregateLoader implements LoaderInterface
         // If dev mode
         if ($this->appEnv->inDevelopmentMode()) {
             // Inject file-based loader first as a default fallback
-            \array_unshift($loadersClassNames, KohanaLoader::class);
+            \array_unshift($loadersClassNames, FilesystemLoader::class);
         }
 
         $loadersInstances = [];

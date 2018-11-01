@@ -18,4 +18,13 @@ interface PluralBagFormatterInterface
      * @return string
      */
     public function compile(PluralBagInterface $plural): string;
+
+    /**
+     * Returns true if provided string is packed with current formatter
+     *
+     * @param string $packedString
+     *
+     * @return bool
+     */
+    public function isFormatted(string $packedString): bool;
 }
