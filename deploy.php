@@ -392,8 +392,16 @@ task('maintenance:off', function () {
 /**
  * Import data
  */
+task('import:roles', function () {
+    runMinionTask('importRoles');
+})->desc('Import localization data');
+
 task('import:i18n', function () {
     runMinionTask('import:i18n');
+})->desc('Import localization data');
+
+task('import:notification', function () {
+    runMinionTask('notification:importGroups');
 })->desc('Import localization data');
 
 /**
@@ -437,8 +445,13 @@ task('deploy', [
     // Enable maintenance mode before any DB processing
     'maintenance:on',
 
+    // Migrate and import data
     'migrations:up',
-    'import:i18n',
+    'import:roles',
+    'import:i18n', // Depends on roles
+    'import:notification', // Depends on roles
+
+    // Prepare
     'assets:deploy',
 //    'cache:warmup',
 

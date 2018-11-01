@@ -45,7 +45,7 @@ interface NotificationGroupInterface
     public function setDescription(string $value): NotificationGroupInterface;
 
     /**
-     * Returns true if current group is allowed for provided user
+     * Returns true if current group is allowed for provided user (complex check with roles intersection)
      *
      * @param \BetaKiller\Model\UserInterface $userModel
      *
@@ -79,21 +79,21 @@ interface NotificationGroupInterface
      *
      * @return bool
      */
-    public function isEnabledForRole(RoleInterface $roleModel): bool;
+    public function hasRole(RoleInterface $roleModel): bool;
 
     /**
      * @param \BetaKiller\Model\RoleInterface $roleModel
      *
      * @return \BetaKiller\Model\NotificationGroupInterface
      */
-    public function enableForRole(RoleInterface $roleModel): NotificationGroupInterface;
+    public function addRole(RoleInterface $roleModel): NotificationGroupInterface;
 
     /**
      * @param \BetaKiller\Model\RoleInterface $roleModel
      *
      * @return \BetaKiller\Model\NotificationGroupInterface
      */
-    public function disableForRole(RoleInterface $roleModel): NotificationGroupInterface;
+    public function removeRole(RoleInterface $roleModel): NotificationGroupInterface;
 
     /**
      * @return \BetaKiller\Model\RoleInterface[]

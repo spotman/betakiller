@@ -143,11 +143,6 @@ class I18n extends AbstractTask
 
         // Skip existing translations
         if ($valueModel) {
-            $this->logger->debug('I18n key ":key" value for locale ":locale" already exists, skipping', [
-                ':key'    => $keyName,
-                ':locale' => $lang->getLocale(),
-            ]);
-
             return;
         }
 
