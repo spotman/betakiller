@@ -390,6 +390,13 @@ task('maintenance:off', function () {
 })->desc('Disable maintenance mode');
 
 /**
+ * Import data
+ */
+task('import:i18n', function () {
+    runMinionTask('import:i18n');
+})->desc('Import localization data');
+
+/**
  * Success message
  */
 task('done', function () use ($tz) {
@@ -431,6 +438,7 @@ task('deploy', [
     'maintenance:on',
 
     'migrations:up',
+    'import:i18n',
     'assets:deploy',
 //    'cache:warmup',
 
