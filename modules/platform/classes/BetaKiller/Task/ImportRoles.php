@@ -56,16 +56,27 @@ class ImportRoles extends AbstractTask
 
     public function run(): void
     {
-        foreach ($this->config->load(['roles']) as $roleCodename) {
-            $roleModel = $this->roleRepo->findByName($roleCodename);
+        foreach ($this->config->load(['roles']) as $name => $description) {
+            $model = $this->roleRepo->findByName($name);
 
             // Add missing role and keep existing untouched
-            if (!$roleModel) {
-                $roleModel = $this->roleRepo->create()->setName($roleCodename);
-                $this->roleRepo->save($roleModel);
+            if (!$model) {
+                $model = $this->roleRepo->create()
+                    ->setName($name)
+                    ->setDescription($description);
+
+                $this->roleRepo->save($model);
 
                 $this->logger->info('Role ":role" added', [
-                    ':role' => $roleCodename,
+                    ':role' => $name,
+                ]);
+            }
+
+            if (!$model->getDescription()) {
+                $model->setDescription($description);
+                $this->roleRepo->save($model);
+                $this->logger->info('Role ":role" description updated', [
+                    ':role' => $name,
                 ]);
             }
         }

@@ -48,6 +48,20 @@ interface RoleInterface extends AbstractEntityInterface, AclRoleInterface, Multi
 
     /**
      * @param string $value
+     *
+     * @return \BetaKiller\Model\RoleInterface
      */
     public function setName(string $value): RoleInterface;
+
+    /**
+     * @return string
+     */
+    public function getDescription(): string;
+
+    /**
+     * @param string $value
+     *
+     * @return \BetaKiller\Model\RoleInterface
+     */
+    public function setDescription(string $value): RoleInterface;
 }
