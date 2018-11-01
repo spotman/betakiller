@@ -6,10 +6,11 @@ use BetaKiller\Model\Role;
 use BetaKiller\Model\RoleInterface;
 
 /**
- * Class UserRepository
+ * Class RoleRepository
  *
  * @package BetaKiller\Repository
  * @method RoleInterface create()
+ * @method save(RoleInterface $model)
  * @method RoleInterface findById(int $id)
  * @method RoleInterface[] getAll()
  * @method Role getOrmInstance()

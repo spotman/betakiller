@@ -186,7 +186,7 @@ class NotificationGroup extends \ORM implements NotificationGroupInterface
      *
      * @return bool
      */
-    public function isEnabledForRole(RoleInterface $roleModel): bool
+    public function hasRole(RoleInterface $roleModel): bool
     {
         return $this->has('roles', $roleModel);
     }
@@ -196,7 +196,7 @@ class NotificationGroup extends \ORM implements NotificationGroupInterface
      *
      * @return \BetaKiller\Model\NotificationGroupInterface
      */
-    public function enableForRole(RoleInterface $roleModel): NotificationGroupInterface
+    public function addRole(RoleInterface $roleModel): NotificationGroupInterface
     {
         $this->add('roles', $roleModel);
 
@@ -208,7 +208,7 @@ class NotificationGroup extends \ORM implements NotificationGroupInterface
      *
      * @return \BetaKiller\Model\NotificationGroupInterface
      */
-    public function disableForRole(RoleInterface $roleModel): NotificationGroupInterface
+    public function removeRole(RoleInterface $roleModel): NotificationGroupInterface
     {
         $this->remove('roles', $roleModel);
 
@@ -220,9 +220,14 @@ class NotificationGroup extends \ORM implements NotificationGroupInterface
      */
     public function getRoles(): array
     {
-        /** @var \BetaKiller\Model\Role $relation */
-        $relation = $this->get('roles');
+        return $this->getRoleRelation()->get_all();
+    }
 
-        return $relation->get_all();
+    /**
+     * @return \BetaKiller\Model\Role
+     */
+    private function getRoleRelation(): Role
+    {
+        return $this->get('roles');
     }
 }
