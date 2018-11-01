@@ -47,4 +47,17 @@ class JsonPluralBagFormatter implements PluralBagFormatterInterface
     {
         return \json_encode($bag->getAll());
     }
+
+    /**
+     * Returns true if provided string is packed with current formatter
+     *
+     * @param string $str
+     *
+     * @return bool
+     */
+    public function isFormatted(string $str): bool
+    {
+        return \mb_strstr($str, '{') === 0
+            && \mb_strrpos($str, '}', -1) === \mb_strlen($str) - 1;
+    }
 }
