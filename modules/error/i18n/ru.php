@@ -4,8 +4,6 @@
  * Automatically generated from previous translation file.
  */
 return [
-    ':error' => ':error',
-
     'error.http.400.label'   => 'Неверный HTTP запрос',
     'error.http.400.message' => 'Может Вы что-то забыли указать?',
 

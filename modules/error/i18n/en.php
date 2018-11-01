@@ -4,8 +4,6 @@
  * Automatically generated from previous translation file.
  */
 return [
-    ':error' => ':error',
-
     'error.http.400.label'        => 'Incorrect request',
     'error.http.400.message'      => 'Maybe you`ve missed something?',
     'error.http.401.label'        => 'Authorization required',
