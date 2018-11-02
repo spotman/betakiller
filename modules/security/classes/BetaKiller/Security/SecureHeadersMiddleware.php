@@ -74,11 +74,11 @@ class SecureHeadersMiddleware implements MiddlewareInterface
         $headers->csp('style', $baseUrl);
         $headers->csp('script', $baseUrl);
         $headers->csp('font-src', $baseUrl);
+        $headers->csp('style', 'unsafe-inline');
 
         if ($this->appEnv->isDebugEnabled()) {
             // DebugBar uses inline tags and images
             $headers->csp('image', 'data:');
-            $headers->csp('style', 'unsafe-inline');
             $headers->csp('script', 'unsafe-inline');
             $headers->csp('script', 'unsafe-eval');
         }
