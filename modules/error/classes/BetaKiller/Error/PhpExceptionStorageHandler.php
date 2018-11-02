@@ -128,7 +128,7 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
      */
     private function storeException(\Throwable $exception, ?ServerRequestInterface $request): PhpExceptionModelInterface
     {
-        $class = \get_class($exception);
+        $class = (new \ReflectionClass($exception))->getShortName();
         $code  = $exception->getCode();
         $file  = $exception->getFile();
         $line  = $exception->getLine();
