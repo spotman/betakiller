@@ -133,8 +133,8 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
         $file  = $exception->getFile();
         $line  = $exception->getLine();
 
-        // Combine message and escape symbols to minimize XSS
-        $message = \HTML::chars("[$code] $class: ".$exception->getMessage());
+        // Combine message
+        $message = "[$code] $class: ".$exception->getMessage();
 
         // Getting unique hash for current message
         $hash = $this->makeHashFor($message);
