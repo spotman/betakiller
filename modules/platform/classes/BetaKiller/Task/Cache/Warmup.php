@@ -325,10 +325,6 @@ class Warmup extends \BetaKiller\Task\AbstractTask
         // see https://github.com/guzzle/guzzle/issues/590
         $request = $this->httpClient->get($url);
 
-        $options = \array_merge($options ?? [], [
-            'http_errors' => false,
-        ]);
-
         return $this->httpClient->syncCall($request, $options);
     }
 }

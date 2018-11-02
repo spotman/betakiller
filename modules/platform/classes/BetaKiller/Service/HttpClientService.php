@@ -42,7 +42,8 @@ class HttpClientService
         );
 
         $this->client = new Client([
-            'handler' => $stack,
+            'handler'     => $stack,
+            'http_errors' => false,
         ]);
 
         $this->requestFactory = $requestFactory;
