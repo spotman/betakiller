@@ -173,7 +173,9 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
 
             // Adding module name for grouping purposes
             $module = ServerRequestHelper::getModule($request);
-            $model->addModule($module);
+            if ($module) {
+                $model->addModule($module);
+            }
         }
 
         // Adding error source file and line number
