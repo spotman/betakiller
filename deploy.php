@@ -455,7 +455,7 @@ task('deploy', [
 
     // Prepare
     'assets:deploy',
-//    'cache:warmup',
+    'cache:warmup',
 
     // Switch to new version
     'deploy:symlink',
