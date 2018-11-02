@@ -162,7 +162,10 @@ class UrlPrototypeService
         return preg_replace_callback(
             UrlPrototype::REGEX,
             function ($matches) use ($parameters) {
-                return $this->getCompiledPrototypeValue($matches[0], $parameters);
+                $value = $this->getCompiledPrototypeValue($matches[0], $parameters);
+
+                // Prevent loops
+                return \preg_replace(UrlPrototype::REGEX, '', $value);
             },
             $sourceString
         );
