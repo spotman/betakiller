@@ -10,6 +10,7 @@ use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Helper\ServerRequestHelper;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Message\UriFactoryInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Log\LoggerInterface;
 
@@ -25,13 +26,20 @@ class CspReportHandler implements RequestHandlerInterface
     private $logger;
 
     /**
+     * @var \Psr\Http\Message\UriFactoryInterface
+     */
+    private $uriFactory;
+
+    /**
      * CspReportHandler constructor.
      *
-     * @param \Psr\Log\LoggerInterface $logger
+     * @param \Psr\Http\Message\UriFactoryInterface $uriFactory
+     * @param \Psr\Log\LoggerInterface              $logger
      */
-    public function __construct(LoggerInterface $logger)
+    public function __construct(UriFactoryInterface $uriFactory, LoggerInterface $logger)
     {
-        $this->logger = $logger;
+        $this->logger     = $logger;
+        $this->uriFactory = $uriFactory;
     }
 
     /**
@@ -55,14 +63,17 @@ class CspReportHandler implements RequestHandlerInterface
 
         $data = $report['csp-report'];
 
-        $e = new SecurityException('SCP violation for ":blocked" with directive ":directive" at :url', [
+        $url = $data['document-uri'];
+        $uri = $this->uriFactory->createUri($url);
+
+        $e = new SecurityException('SCP violation for ":blocked" with directive ":directive" at ":url"', [
             ':blocked'   => $data['blocked-uri'],
             ':directive' => $data['violated-directive'],
-            ':url'        => $data['document-uri'],
+            ':url'       => $url,
             ':ip'        => ServerRequestHelper::getIpAddress($request),
         ]);
 
-        $this->logException($this->logger, $e);
+        $this->logException($this->logger, $e, $request->withUri($uri));
 
         return ResponseHelper::text('OK');
     }
