@@ -38,5 +38,5 @@ interface NotificationUserInterface
      *
      * @return string
      */
-    public function getLanguageName(): string;
+    public function getLanguageName(): ?string;
 }

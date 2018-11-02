@@ -97,7 +97,7 @@ interface UserInterface extends AbstractEntityInterface, OrmInterface, Notificat
      *
      * @return string
      */
-    public function getLanguageName(): string;
+    public function getLanguageName(): ?string;
 
     /**
      * @param \BetaKiller\Model\LanguageInterface $languageModel

@@ -289,14 +289,9 @@ class User extends \ORM implements UserInterface
      * @return string
      * @throws \Kohana_Exception
      */
-    public function getLanguageName(): string
+    public function getLanguageName(): ?string
     {
-        /**
-         * @var \BetaKiller\Model\LanguageInterface $langModel
-         */
-        $langModel = $this->getRelatedEntity('language');
-
-        return $langModel->getName();
+        return $this->getLanguage()->getName();
     }
 
     /**

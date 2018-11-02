@@ -9,7 +9,7 @@ class NotificationUserEmail implements NotificationUserInterface
     private $email;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $fullName;
 
@@ -23,7 +23,7 @@ class NotificationUserEmail implements NotificationUserInterface
      */
     private $langName;
 
-    public function __construct(string $email, string $fullName, ?string $langName = null)
+    public function __construct(string $email, string $fullName, string $langName = null)
     {
         $this->email    = $email;
         $this->fullName = $fullName;
@@ -48,7 +48,7 @@ class NotificationUserEmail implements NotificationUserInterface
      *
      * @return null|string
      */
-    public function getLanguageName(): string
+    public function getLanguageName(): ?string
     {
         return $this->langName;
     }
