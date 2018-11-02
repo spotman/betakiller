@@ -13,7 +13,7 @@ class DefaultContentElementResource extends AbstractAssetsAclResource
     {
         return [
             Content::WRITER_ROLE_NAME,
-            RoleInterface::MODERATOR_ROLE_NAME,
+            RoleInterface::MODERATOR,
         ];
     }
 
@@ -24,7 +24,7 @@ class DefaultContentElementResource extends AbstractAssetsAclResource
     {
         return [
             Content::WRITER_ROLE_NAME,
-            RoleInterface::MODERATOR_ROLE_NAME,
+            RoleInterface::MODERATOR,
         ];
     }
 
@@ -34,8 +34,8 @@ class DefaultContentElementResource extends AbstractAssetsAclResource
     protected function getReadDefaultAccessList(): array
     {
         return [
-            RoleInterface::GUEST_ROLE_NAME,
-            RoleInterface::LOGIN_ROLE_NAME,
+            RoleInterface::GUEST,
+            RoleInterface::LOGIN,
         ];
     }
 
@@ -46,7 +46,7 @@ class DefaultContentElementResource extends AbstractAssetsAclResource
     {
         return [
             Content::WRITER_ROLE_NAME,
-            RoleInterface::MODERATOR_ROLE_NAME,
+            RoleInterface::MODERATOR,
         ];
     }
 
@@ -57,7 +57,7 @@ class DefaultContentElementResource extends AbstractAssetsAclResource
     {
         return [
             Content::WRITER_ROLE_NAME,
-            RoleInterface::MODERATOR_ROLE_NAME,
+            RoleInterface::MODERATOR,
         ];
     }
 
@@ -68,7 +68,7 @@ class DefaultContentElementResource extends AbstractAssetsAclResource
     {
         return [
             Content::WRITER_ROLE_NAME,
-            RoleInterface::MODERATOR_ROLE_NAME,
+            RoleInterface::MODERATOR,
         ];
     }
 
@@ -79,7 +79,7 @@ class DefaultContentElementResource extends AbstractAssetsAclResource
     {
         return [
             Content::WRITER_ROLE_NAME,
-            RoleInterface::MODERATOR_ROLE_NAME,
+            RoleInterface::MODERATOR,
         ];
     }
 }

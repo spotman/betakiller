@@ -16,27 +16,27 @@ class ContentCommentStatusResource extends AbstractEntityRelatedAclResource
     {
         return [
             self::ACTION_CREATE => [
-                RoleInterface::DEVELOPER_ROLE_NAME,
+                RoleInterface::DEVELOPER,
             ],
 
             self::ACTION_READ => [
-                RoleInterface::MODERATOR_ROLE_NAME,
+                RoleInterface::MODERATOR,
             ],
 
             self::ACTION_UPDATE => [
-                RoleInterface::DEVELOPER_ROLE_NAME,
+                RoleInterface::DEVELOPER,
             ],
 
             self::ACTION_DELETE => [
-                RoleInterface::DEVELOPER_ROLE_NAME,
+                RoleInterface::DEVELOPER,
             ],
 
             self::ACTION_LIST => [
-                RoleInterface::DEVELOPER_ROLE_NAME,
+                RoleInterface::DEVELOPER,
             ],
 
             self::ACTION_SEARCH => [
-                RoleInterface::DEVELOPER_ROLE_NAME,
+                RoleInterface::DEVELOPER,
             ],
         ];
     }

@@ -116,4 +116,14 @@ abstract class AbstractOrmBasedMultipleParentsTreeModel extends \ORM implements 
     {
         $this->remove('parents', $parent);
     }
+
+    /**
+     * @param MultipleParentsTreeModelInterface $parent
+     *
+     * @return bool
+     */
+    public function hasParent(MultipleParentsTreeModelInterface $parent): bool
+    {
+        return $this->has('parents', $parent);
+    }
 }

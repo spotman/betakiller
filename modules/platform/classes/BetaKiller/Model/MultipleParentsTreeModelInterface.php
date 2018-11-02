@@ -30,4 +30,11 @@ interface MultipleParentsTreeModelInterface
      * @return void
      */
     public function removeParent(MultipleParentsTreeModelInterface $parent): void;
+
+    /**
+     * @param \BetaKiller\Model\MultipleParentsTreeModelInterface $parent
+     *
+     * @return bool
+     */
+    public function hasParent(MultipleParentsTreeModelInterface $parent): bool;
 }

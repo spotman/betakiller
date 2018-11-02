@@ -25,7 +25,7 @@ class DeveloperZoneAccessSpec implements ZoneAccessSpecInterface
     {
         return [
             // Only developers may access personal zone
-            RoleInterface::DEVELOPER_ROLE_NAME,
+            RoleInterface::DEVELOPER,
         ];
     }
 

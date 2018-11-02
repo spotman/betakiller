@@ -20,7 +20,7 @@ return [
      */
     'groups'   => [
         POST_MODERATION => [
-            RoleInterface::MODERATOR_ROLE_NAME,
+            RoleInterface::MODERATOR,
         ],
 
         COMMENT_USER_EVENT => [

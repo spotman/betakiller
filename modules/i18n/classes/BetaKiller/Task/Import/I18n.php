@@ -119,7 +119,7 @@ class I18n extends AbstractTask
 
         $isFormatted = $this->formatter->isFormatted($i18nValue);
 
-        if ($isFormatted !== $keyModel->isPlural()) {
+        if (!$keyModel->hasID() || $isFormatted !== $keyModel->isPlural()) {
             // Plural forms in formatted strings
             if ($isFormatted) {
                 // Mark key as plural

@@ -416,6 +416,8 @@ task('deploy', [
     // Check app configuration
     'check',
 
+    'deploy:lock',
+
     // Prepare directories
     'deploy:prepare',
 
@@ -463,12 +465,21 @@ task('deploy', [
 
     // Finalize
     'cleanup',
+    'deploy:unlock',
     'done',
 ])->desc('Deploy app bundle')->onStage(
     DEPLOYER_STAGING_STAGE,
     DEPLOYER_PRODUCTION_STAGE,
     DEPLOYER_TESTING_STAGE);
 
+task('update', [
+    // Migrate and import data
+    'migrations:up',
+    'import:roles',
+    'import:i18n', // Depends on roles
+    'import:notification', // Depends on roles
+
+])->desc('Deploy app bundle')->onHosts('dev')->onStage(\DEPLOYER_DEV_STAGE);
 
 /**
  * Run minion-task and echo result to console

@@ -12,7 +12,7 @@ class GuestUser extends User implements GuestUserInterface
     public function getAccessControlRoles(): array
     {
         return [
-            new Role(['name' => RoleInterface::GUEST_ROLE_NAME]),
+            new Role(['name' => RoleInterface::GUEST]),
         ];
     }
 
@@ -27,7 +27,7 @@ class GuestUser extends User implements GuestUserInterface
     protected function fetchAllUserRolesNames(): array
     {
         return [
-            RoleInterface::GUEST_ROLE_NAME
+            RoleInterface::GUEST
         ];
     }
 }

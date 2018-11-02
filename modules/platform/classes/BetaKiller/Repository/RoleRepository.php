@@ -31,7 +31,7 @@ class RoleRepository extends AbstractOrmBasedMultipleParentsTreeRepository
      */
     public function getGuestRole(): RoleInterface
     {
-        return $this->getByName(RoleInterface::GUEST_ROLE_NAME);
+        return $this->getByName(RoleInterface::GUEST);
     }
 
     /**
@@ -40,7 +40,7 @@ class RoleRepository extends AbstractOrmBasedMultipleParentsTreeRepository
      */
     public function getLoginRole(): RoleInterface
     {
-        return $this->getByName(RoleInterface::LOGIN_ROLE_NAME);
+        return $this->getByName(RoleInterface::LOGIN);
     }
 
     /**
@@ -49,7 +49,7 @@ class RoleRepository extends AbstractOrmBasedMultipleParentsTreeRepository
      */
     public function getModeratorRole(): RoleInterface
     {
-        return $this->getByName(RoleInterface::MODERATOR_ROLE_NAME);
+        return $this->getByName(RoleInterface::MODERATOR);
     }
 
     /**
@@ -58,7 +58,7 @@ class RoleRepository extends AbstractOrmBasedMultipleParentsTreeRepository
      */
     public function getDeveloperRole(): RoleInterface
     {
-        return $this->getByName(RoleInterface::DEVELOPER_ROLE_NAME);
+        return $this->getByName(RoleInterface::DEVELOPER);
     }
 
     /**
