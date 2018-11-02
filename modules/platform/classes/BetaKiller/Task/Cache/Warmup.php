@@ -123,6 +123,7 @@ class Warmup extends \BetaKiller\Task\AbstractTask
                 $connected = true;
                 break;
             }
+            \usleep(10000);
         }
 
         if (!$connected) {
@@ -314,8 +315,10 @@ class Warmup extends \BetaKiller\Task\AbstractTask
 
     private function makeHttpRequest(string $url, array $options = null): ResponseInterface
     {
+        $path = \parse_url($url, \PHP_URL_PATH);
+
         // Internal PHP web-server can not handle SSL
-        $url = \str_replace('https://', 'http://', $url);
+        $url = 'http://'.$this->serverHost.':'.$this->serverPort.$path;
 
         $this->logger->debug('Making request to :url', [':url' => $url]);
 
@@ -323,10 +326,6 @@ class Warmup extends \BetaKiller\Task\AbstractTask
         $request = $this->httpClient->get($url);
 
         $options = \array_merge($options ?? [], [
-            'curl'        => [
-                CURLOPT_INTERFACE => $this->serverHost,
-                CURLOPT_PORT      => $this->serverPort,
-            ],
             'http_errors' => false,
         ]);
 
