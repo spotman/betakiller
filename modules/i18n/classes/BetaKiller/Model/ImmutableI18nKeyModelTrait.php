@@ -10,7 +10,7 @@ trait ImmutableI18nKeyModelTrait
      */
     public function setI18nKey(string $keyName): void
     {
-        throw new \LogicException('Immutable i18n key model');
+        throw new \LogicException('Immutable i18n key model for key "'.$keyName.'"');
     }
 
     public function markAsPlural(): void
