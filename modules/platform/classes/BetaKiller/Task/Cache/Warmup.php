@@ -97,8 +97,8 @@ class Warmup extends \BetaKiller\Task\AbstractTask
 
     public function run(): void
     {
-        $this->serverHost = \getenv('WARMUP_HOST');
-        $this->serverPort = \getenv('WARMUP_PORT');
+        $this->serverHost = (string)\getenv('WARMUP_HOST');
+        $this->serverPort = (int)\getenv('WARMUP_PORT');
 
         if (!$this->serverHost || !$this->serverPort) {
             throw new TaskException('Host and port must be defined via env vars');
