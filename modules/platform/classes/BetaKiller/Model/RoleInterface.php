@@ -12,34 +12,29 @@ interface RoleInterface extends AbstractEntityInterface, AclRoleInterface, Multi
     // Extended methods
 
     /**
-     * Root role for super-administrators, inherits all other roles
-     */
-    public const ROOT_ROLE_NAME = 'root';
-
-    /**
      * Role for access to developer tools
      */
-    public const DEVELOPER_ROLE_NAME = 'developer';
+    public const DEVELOPER = 'developer';
 
     /**
      * Simplified role for moderators
      */
-    public const MODERATOR_ROLE_NAME = 'moderator';
+    public const MODERATOR = 'moderator';
 
     /**
      * Role with access to admin panel
      */
-    public const ADMIN_PANEL_ROLE_NAME = 'admin';
+    public const ADMIN_PANEL = 'admin';
 
     /**
      * Role with access to log in
      */
-    public const LOGIN_ROLE_NAME = 'login';
+    public const LOGIN = 'login';
 
     /**
      * Role for unauthenticated users (guests)
      */
-    public const GUEST_ROLE_NAME = 'guest';
+    public const GUEST = 'guest';
 
     /**
      * @return string

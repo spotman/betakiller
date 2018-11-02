@@ -24,47 +24,47 @@ class PhpExceptionResource extends AbstractEntityRelatedAclResource
     {
         return [
             self::ACTION_CREATE => [
-                RoleInterface::GUEST_ROLE_NAME,
+                RoleInterface::GUEST,
             ],
 
             self::ACTION_READ => [
-                RoleInterface::DEVELOPER_ROLE_NAME,
+                RoleInterface::DEVELOPER,
             ],
 
             self::ACTION_UPDATE => [
-                RoleInterface::DEVELOPER_ROLE_NAME,
+                RoleInterface::DEVELOPER,
             ],
 
             self::ACTION_DELETE => [
-                RoleInterface::DEVELOPER_ROLE_NAME,
+                RoleInterface::DEVELOPER,
             ],
 
             self::ACTION_SEARCH => [
-                RoleInterface::DEVELOPER_ROLE_NAME,
+                RoleInterface::DEVELOPER,
             ],
 
             self::PERMISSION_LIST_RESOLVED => [
-                RoleInterface::DEVELOPER_ROLE_NAME,
+                RoleInterface::DEVELOPER,
             ],
 
             self::PERMISSION_LIST_UNRESOLVED => [
-                RoleInterface::DEVELOPER_ROLE_NAME,
+                RoleInterface::DEVELOPER,
             ],
 
             self::PERMISSION_RESOLVE => [
-                RoleInterface::DEVELOPER_ROLE_NAME,
+                RoleInterface::DEVELOPER,
             ],
 
             self::PERMISSION_IGNORE => [
-                RoleInterface::DEVELOPER_ROLE_NAME,
+                RoleInterface::DEVELOPER,
             ],
 
             self::PERMISSION_TEST => [
-                RoleInterface::DEVELOPER_ROLE_NAME,
+                RoleInterface::DEVELOPER,
             ],
 
             self::PERMISSION_THROW => [
-                RoleInterface::DEVELOPER_ROLE_NAME,
+                RoleInterface::DEVELOPER,
             ],
         ];
     }

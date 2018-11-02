@@ -16,27 +16,27 @@ class ContentCategoryResource extends AbstractEntityRelatedAclResource
     {
         return [
             self::ACTION_CREATE => [
-                RoleInterface::MODERATOR_ROLE_NAME,
+                RoleInterface::MODERATOR,
             ],
 
             self::ACTION_READ => [
-                RoleInterface::GUEST_ROLE_NAME,
+                RoleInterface::GUEST,
             ],
 
             self::ACTION_UPDATE => [
-                RoleInterface::MODERATOR_ROLE_NAME,
+                RoleInterface::MODERATOR,
             ],
 
             self::ACTION_DELETE => [
-                RoleInterface::MODERATOR_ROLE_NAME,
+                RoleInterface::MODERATOR,
             ],
 
             self::ACTION_LIST => [
-                RoleInterface::GUEST_ROLE_NAME,
+                RoleInterface::GUEST,
             ],
 
             self::ACTION_SEARCH => [
-                RoleInterface::GUEST_ROLE_NAME,
+                RoleInterface::GUEST,
             ],
         ];
     }

@@ -26,7 +26,7 @@ class AdminZoneAccessSpec implements ZoneAccessSpecInterface
     public function getRolesNames(): array
     {
         return [
-            RoleInterface::ADMIN_PANEL_ROLE_NAME,
+            RoleInterface::ADMIN_PANEL,
         ];
     }
 

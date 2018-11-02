@@ -17,7 +17,7 @@ return [
      */
     'groups'   => [
         ERROR_MANAGEMENT_GROUP => [
-            RoleInterface::DEVELOPER_ROLE_NAME,
+            RoleInterface::DEVELOPER,
         ],
     ],
 

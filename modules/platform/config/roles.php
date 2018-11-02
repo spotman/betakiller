@@ -1,14 +1,35 @@
 <?php
 declare(strict_types=1);
 
+use BetaKiller\Auth\RoleConfig;
 use BetaKiller\Model\RoleInterface;
 
 return [
-    RoleInterface::ROOT_ROLE_NAME      => 'Root role, inherit all other roles permissions',
-    RoleInterface::DEVELOPER_ROLE_NAME => 'Role for developers',
-    RoleInterface::MODERATOR_ROLE_NAME => 'Role for moderators',
-    RoleInterface::LOGIN_ROLE_NAME     => 'Grants access to login',
-    RoleInterface::GUEST_ROLE_NAME     => 'All guests and unauthorized users',
+    RoleInterface::GUEST => [
+        RoleConfig::OPTION_DESC => 'All guests and unauthorized users',
+    ],
 
-    RoleInterface::ADMIN_PANEL_ROLE_NAME => 'Grants access to the admin panel',
+    RoleInterface::LOGIN => [
+        RoleConfig::OPTION_DESC     => 'Grants access to login',
+        RoleConfig::OPTION_INHERITS => [
+            RoleInterface::GUEST,
+        ],
+    ],
+
+    RoleInterface::MODERATOR => [
+        RoleConfig::OPTION_DESC => 'Role for moderators',
+    ],
+
+    RoleInterface::ADMIN_PANEL => [
+        RoleConfig::OPTION_DESC => 'Grants access to the admin panel',
+    ],
+
+    RoleInterface::DEVELOPER => [
+        RoleConfig::OPTION_DESC     => 'Role for developers',
+        RoleConfig::OPTION_INHERITS => [
+            RoleInterface::ADMIN_PANEL, // Developer has access to admin panel
+            RoleInterface::MODERATOR,
+            RoleInterface::LOGIN,       // Developers are always allowed to login
+        ],
+    ],
 ];

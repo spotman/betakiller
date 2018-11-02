@@ -19,8 +19,7 @@ class AdminResource extends SinglePermissionResource
         // No default permissions
         return [
             self::PERMISSION_IDENTITY   =>  [
-                RoleInterface::ADMIN_PANEL_ROLE_NAME,
-                RoleInterface::DEVELOPER_ROLE_NAME,
+                RoleInterface::ADMIN_PANEL,
             ],
         ];
     }

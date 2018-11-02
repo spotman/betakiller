@@ -17,29 +17,29 @@ class ContentPostRevisionResource extends AbstractEntityRelatedAclResource
     {
         return [
             self::ACTION_CREATE => [
-                RoleInterface::MODERATOR_ROLE_NAME,
-                RoleInterface::DEVELOPER_ROLE_NAME,
+                RoleInterface::MODERATOR,
+                RoleInterface::DEVELOPER,
                 Content::WRITER_ROLE_NAME,
             ],
             self::ACTION_READ => [
-                RoleInterface::MODERATOR_ROLE_NAME,
-                RoleInterface::DEVELOPER_ROLE_NAME,
+                RoleInterface::MODERATOR,
+                RoleInterface::DEVELOPER,
                 Content::WRITER_ROLE_NAME,
             ],
             self::ACTION_UPDATE => [
-                RoleInterface::DEVELOPER_ROLE_NAME,
+                RoleInterface::DEVELOPER,
             ],
             self::ACTION_DELETE => [
-                RoleInterface::DEVELOPER_ROLE_NAME,
+                RoleInterface::DEVELOPER,
             ],
             self::ACTION_LIST => [
-                RoleInterface::MODERATOR_ROLE_NAME,
-                RoleInterface::DEVELOPER_ROLE_NAME,
+                RoleInterface::MODERATOR,
+                RoleInterface::DEVELOPER,
                 Content::WRITER_ROLE_NAME,
             ],
             self::ACTION_SEARCH => [
-                RoleInterface::MODERATOR_ROLE_NAME,
-                RoleInterface::DEVELOPER_ROLE_NAME,
+                RoleInterface::MODERATOR,
+                RoleInterface::DEVELOPER,
                 Content::WRITER_ROLE_NAME,
             ],
         ];

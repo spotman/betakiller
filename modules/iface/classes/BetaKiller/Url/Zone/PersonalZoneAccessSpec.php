@@ -25,7 +25,7 @@ class PersonalZoneAccessSpec implements ZoneAccessSpecInterface
     {
         return [
             // Any logged in user may access personal zone
-            RoleInterface::LOGIN_ROLE_NAME,
+            RoleInterface::LOGIN,
         ];
     }
 

@@ -70,8 +70,7 @@ class BreadcrumbsWidget extends AbstractWidget
     {
         return [
             // Allow to guests and any logged in users
-            RoleInterface::GUEST_ROLE_NAME,
-            RoleInterface::LOGIN_ROLE_NAME,
+            RoleInterface::GUEST,
         ];
     }
 

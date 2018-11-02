@@ -14,8 +14,8 @@ class ContentPostResource extends AbstractStatusRelatedEntityAclResource
     protected function getCreatePermissionRoles(): array
     {
         return [
-            RoleInterface::MODERATOR_ROLE_NAME,
-            RoleInterface::DEVELOPER_ROLE_NAME,
+            RoleInterface::MODERATOR,
+            RoleInterface::DEVELOPER,
             Content::WRITER_ROLE_NAME,
         ];
     }
@@ -28,7 +28,7 @@ class ContentPostResource extends AbstractStatusRelatedEntityAclResource
     protected function getListPermissionRoles(): array
     {
         return [
-            RoleInterface::GUEST_ROLE_NAME,
+            RoleInterface::GUEST,
         ];
     }
 
@@ -40,7 +40,7 @@ class ContentPostResource extends AbstractStatusRelatedEntityAclResource
     protected function getSearchPermissionRoles(): array
     {
         return [
-            RoleInterface::GUEST_ROLE_NAME,
+            RoleInterface::GUEST,
         ];
     }
 }
