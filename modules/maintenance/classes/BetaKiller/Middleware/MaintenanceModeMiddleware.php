@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace BetaKiller\Middleware;
 
 use BetaKiller\Exception\NotAvailableHttpException;
+use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Service\MaintenanceModeDebugBarDataCollector;
 use BetaKiller\Service\MaintenanceModeService;
@@ -20,13 +21,20 @@ class MaintenanceModeMiddleware implements MiddlewareInterface
     private $service;
 
     /**
+     * @var \BetaKiller\Helper\AppEnvInterface
+     */
+    private $appEnv;
+
+    /**
      * MaintenanceModeMiddleware constructor.
      *
      * @param \BetaKiller\Service\MaintenanceModeService $service
+     * @param \BetaKiller\Helper\AppEnvInterface         $appEnv
      */
-    public function __construct(MaintenanceModeService $service)
+    public function __construct(MaintenanceModeService $service, AppEnvInterface $appEnv)
     {
         $this->service = $service;
+        $this->appEnv  = $appEnv;
     }
 
     /**
@@ -41,6 +49,11 @@ class MaintenanceModeMiddleware implements MiddlewareInterface
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
+        // Skip check during cache:warmup
+        if ($this->appEnv->isInternalWebServer()) {
+            return $handler->handle($request);
+        }
+
         $user = ServerRequestHelper::getUser($request);
 
         $debugBar = ServerRequestHelper::getDebugBar($request);
