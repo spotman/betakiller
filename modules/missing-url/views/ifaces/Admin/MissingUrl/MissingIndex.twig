@@ -12,7 +12,7 @@
 
         <div class="collapsible-header {{ item.has_target ? "" : "red white-text" }}">
           <i class="material-icons">{{ item.has_target ? "done" : "whatshot" }}</i>
-          <strong class="truncate">{{ item.source_url|raw }}</strong>
+          <strong class="truncate">{{ item.source_url }}</strong>
           {% if item.referrers|length %}
             <span class="badge new">{{ "referrers: " ~ item.referrers|length }}</span>
           {% endif %}
