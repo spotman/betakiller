@@ -35,9 +35,15 @@ class Warmup extends \BetaKiller\Task\AbstractTask
      */
     private $logger;
 
-    private $serverHost = '127.0.0.1';
+    /**
+     * @var string
+     */
+    private $serverHost;
 
-    private $serverPort = 8099;
+    /**
+     * @var int
+     */
+    private $serverPort;
 
     private $timeout = 5;
 
@@ -91,10 +97,12 @@ class Warmup extends \BetaKiller\Task\AbstractTask
 
     public function run(): void
     {
-        $urlHelper = $this->urlHelperFactory->create();
+        $this->serverHost = \getenv('WARMUP_HOST');
+        $this->serverPort = \getenv('WARMUP_PORT');
 
-        $items   = $this->urlCollector->getPublicAvailableUrls($urlHelper);
-        $counter = 0;
+        if (!$this->serverHost || !$this->serverPort) {
+            throw new TaskException('Host and port must be defined via env vars');
+        }
 
         if ($this->canConnectToServer()) {
             throw new TaskException('Something is already running on :host::port', [
@@ -124,6 +132,10 @@ class Warmup extends \BetaKiller\Task\AbstractTask
                 ':sec' => $this->timeout,
             ]);
         }
+
+        $urlHelper = $this->urlHelperFactory->create();
+        $items     = $this->urlCollector->getPublicAvailableUrls($urlHelper);
+        $counter   = 0;
 
         // Make HTTP requests to temporary created PHP internal web-server instance
         foreach ($items as $item) {
