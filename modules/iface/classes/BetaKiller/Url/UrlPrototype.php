@@ -3,7 +3,7 @@ namespace BetaKiller\Url;
 
 class UrlPrototype
 {
-    public const  REGEX              = '/\{[A-Za-z_]+(\.[A-Za-z_]+(\(\)){0,1}){0,1}\}/';
+    public const  REGEX              = '/\{[A-Z]{1}[A-Za-z_]+(\.[A-Za-z_]+(\(\)){0,1}){0,1}\}/';
     private const KEY_SEPARATOR      = '.';
     private const METHOD_CALL_MARKER = '()';
 
