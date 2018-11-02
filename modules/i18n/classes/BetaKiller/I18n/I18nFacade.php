@@ -92,7 +92,7 @@ final class I18nFacade
 
     public function translate(string $lang, string $key, array $values = null): string
     {
-        if (!$this->isI18nKey($key)) {
+        if (!self::isI18nKey($key)) {
             throw new I18nException('String ":value" is not an i18 key', [':value' => $key]);
         }
 
@@ -105,7 +105,7 @@ final class I18nFacade
 //            $values = self::addPlaceholderPrefixToKeys($values);
 //        }
 
-        return empty($values) ? $string : strtr($string, $values);
+        return $this->replacePlaceholders($string, $values);
     }
 
     public function pluralize(string $lang, string $key, $form, array $values = null): string
@@ -120,7 +120,7 @@ final class I18nFacade
 
         $string = $this->translator->pluralize($key, $form, $locale);
 
-        return empty($values) ? $string : strtr($string, $values);
+        return $this->replacePlaceholders($string, $values);
     }
 
     /**
@@ -147,6 +147,15 @@ final class I18nFacade
         }
 
         return $output;
+    }
+
+    private function replacePlaceholders(string $string, ?array $values): string
+    {
+        if (empty($values)) {
+            return $string;
+        }
+
+        return strtr($string, array_filter($values, 'is_scalar'));
     }
 
     /**
