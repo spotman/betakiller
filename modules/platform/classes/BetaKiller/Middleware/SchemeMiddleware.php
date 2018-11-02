@@ -52,13 +52,20 @@ class SchemeMiddleware implements MiddlewareInterface
             return $handler->handle($request);
         }
 
-        $baseScheme = $this->appConfig->getBaseUri()->getScheme();
+        $baseUri    = $this->appConfig->getBaseUri();
+        $baseScheme = $baseUri->getScheme();
+        $baseHost   = $baseUri->getHost();
 
         $currentUri    = $request->getUri();
         $currentScheme = $currentUri->getScheme();
+        $currentHost   = $currentUri->getHost();
 
         if ($baseScheme !== $currentScheme) {
             return $this->redirect($currentUri->withScheme($baseScheme));
+        }
+
+        if ($baseHost !== $currentHost) {
+            return $this->redirect($currentUri->withHost($baseHost));
         }
 
         $path = $currentUri->getPath();
