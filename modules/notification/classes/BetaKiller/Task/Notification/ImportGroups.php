@@ -110,8 +110,6 @@ class ImportGroups extends AbstractTask
 
             $this->importGroup($groupModel);
         }
-
-        $this->logger->info('Groups successfully imported!');
     }
 
     /**
