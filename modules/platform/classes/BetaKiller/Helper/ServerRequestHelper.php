@@ -12,6 +12,7 @@ use BetaKiller\Url\Container\UrlContainerInterface;
 use BetaKiller\Url\UrlElementStack;
 use DebugBar\DebugBar;
 use Psr\Http\Message\ServerRequestInterface;
+use Zend\Expressive\Router\RouteResult;
 use Zend\Expressive\Session\SessionInterface;
 use Zend\Expressive\Session\SessionMiddleware;
 
@@ -77,10 +78,29 @@ class ServerRequestHelper
         return $request->getRequestTarget();
     }
 
+    /**
+     * Detect module from PSR-15 request
+     *
+     * @param \Psr\Http\Message\ServerRequestInterface $request
+     *
+     * @return null|string
+     */
     public static function getModule(ServerRequestInterface $request): ?string
     {
-        // TODO How to detect module from PSR-15 request ???
-        return null;
+        $routeName = self::getRouteResult($request)->getMatchedRouteName();
+
+        if (!$routeName) {
+            return null;
+        }
+
+        $nameArr = explode('-', $routeName);
+
+        return \array_shift($nameArr);
+    }
+
+    public static function getRouteResult(ServerRequestInterface $request): RouteResult
+    {
+        return $request->getAttribute(RouteResult::class);
     }
 
     public static function isAjax(ServerRequestInterface $request): bool
