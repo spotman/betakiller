@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller;
 
+use BetaKiller\Assets\Middleware\DeleteMiddleware;
 use BetaKiller\Assets\Middleware\DownloadMiddleware;
 use BetaKiller\Assets\Middleware\OriginalMiddleware;
 use BetaKiller\Assets\Middleware\PreviewMiddleware;
@@ -159,10 +160,10 @@ class WebApp
 
     private function addRoutes(Application $app): void
     {
-        $app->post(CspReportHandler::URL, CspReportHandler::class);
+        $app->post(CspReportHandler::URL, CspReportHandler::class, 'security-csp-handler');
 
-        $app->get('/sitemap.xml', SitemapRequestHandler::class);
-        $app->get('/robots.txt', RobotsTxtHandler::class);
+        $app->get('/sitemap.xml', SitemapRequestHandler::class, 'sitemap');
+        $app->get('/robots.txt', RobotsTxtHandler::class, 'robots.txt');
 
         // Assets
         $extRegexp  = '[a-z]{2,}'; // (jpg|jpeg|gif|png)
@@ -185,36 +186,37 @@ class WebApp
          */
         $app->post(
             '/assets/{provider}/'.$uploadAction,
-            UploadMiddleware::class
+            UploadMiddleware::class,
+            'assets-upload'
         );
 
         /**
          * Static files legacy route first
          */
-        $app->get('/assets/static/{file:.+}', StaticFilesDeployHandler::class);
+        $app->get('/assets/static/{file:.+}', StaticFilesDeployHandler::class, 'assets-static');
 
         /**
          * Download original file via concrete provider
          */
-        $app->get('/assets/{provider}/'.$itemPlace.'/'.$downloadAction.$extPlace, DownloadMiddleware::class);
+        $app->get('/assets/{provider}/'.$itemPlace.'/'.$downloadAction.$extPlace, DownloadMiddleware::class, 'assets-download');
 
         /**
          * Get original files via concrete provider
          */
-        $app->get('/assets/{provider}/'.$itemPlace.'/'.$originalAction.$extPlace, OriginalMiddleware::class);
+        $app->get('/assets/{provider}/'.$itemPlace.'/'.$originalAction.$extPlace, OriginalMiddleware::class, 'assets-original');
 
         /**
          * Preview files via concrete provider
          */
-        $app->get('/assets/{provider}/'.$itemPlace.'/'.$previewAction.$sizePlace.$extPlace, PreviewMiddleware::class);
+        $app->get('/assets/{provider}/'.$itemPlace.'/'.$previewAction.$sizePlace.$extPlace, PreviewMiddleware::class, 'assets-preview');
 
         /**
          * Delete files via concrete provider
          */
-        $app->get('/assets/{provider}/'.$itemPlace.'/'.$deleteAction.$sizePlace.$extPlace, PreviewMiddleware::class);
+        $app->get('/assets/{provider}/'.$itemPlace.'/'.$deleteAction.$sizePlace.$extPlace, DeleteMiddleware::class, 'assets-delete');
 
         // API HTTP gate
-        $app->post('/api/v{version:\d+}/{type:.+}', ApiRequestHandler::class);
+        $app->post('/api/v{version:\d+}/{type:.+}', ApiRequestHandler::class, 'api');
     }
 
     public function processException(\Throwable $e): ResponseInterface
