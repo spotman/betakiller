@@ -47,14 +47,16 @@
     </div>
 
     <div class="col s12">
-      Last seen at <span class="orange chip">{{ lastSeenAt }}</span> (total {{ counter }} times)&nbsp;
+      <p>
+        Last seen at <span class="orange chip">{{ lastSeenAt }}</span> (total {{ counter }} times)&nbsp;
 
-      {% if modules|length %}
-        in modules: &nbsp;
-        {% for module in modules %}
-          <span class="chip">{{ module }}</span>
-        {% endfor %}
-      {% endif %}
+        {% if modules|length %}
+          in modules: &nbsp;
+          {% for module in modules %}
+            <span class="chip">{{ module }}</span>
+          {% endfor %}
+        {% endif %}
+      </p>
     </div>
 
     <div class="col s12">
