@@ -1,14 +1,18 @@
 require([
   'jquery',
   'error.api.rpc.definition',
+  'materialize',
   'iframe-resizer'
-], function ($, api) {
+], function ($, api, M) {
 
   $(function () {
     const $resolveButton = $('.resolve-error-button'),
           $ignoreButton  = $('.ignore-error-button'),
           $deleteButton  = $('.delete-error-button'),
           $traceIFrame   = $('.trace-iframe');
+
+    var elems = document.querySelectorAll('.collapsible');
+    M.Collapsible.init(elems);
 
     $traceIFrame.iFrameResize();
 
