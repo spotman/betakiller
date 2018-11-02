@@ -198,22 +198,26 @@ class WebApp
         /**
          * Download original file via concrete provider
          */
-        $app->get('/assets/{provider}/'.$itemPlace.'/'.$downloadAction.$extPlace, DownloadMiddleware::class, 'assets-download');
+        $app->get('/assets/{provider}/'.$itemPlace.'/'.$downloadAction.$extPlace, DownloadMiddleware::class,
+            'assets-download');
 
         /**
          * Get original files via concrete provider
          */
-        $app->get('/assets/{provider}/'.$itemPlace.'/'.$originalAction.$extPlace, OriginalMiddleware::class, 'assets-original');
+        $app->get('/assets/{provider}/'.$itemPlace.'/'.$originalAction.$extPlace, OriginalMiddleware::class,
+            'assets-original');
 
         /**
          * Preview files via concrete provider
          */
-        $app->get('/assets/{provider}/'.$itemPlace.'/'.$previewAction.$sizePlace.$extPlace, PreviewMiddleware::class, 'assets-preview');
+        $app->get('/assets/{provider}/'.$itemPlace.'/'.$previewAction.$sizePlace.$extPlace, PreviewMiddleware::class,
+            'assets-preview');
 
         /**
          * Delete files via concrete provider
          */
-        $app->get('/assets/{provider}/'.$itemPlace.'/'.$deleteAction.$sizePlace.$extPlace, DeleteMiddleware::class, 'assets-delete');
+        $app->get('/assets/{provider}/'.$itemPlace.'/'.$deleteAction.$sizePlace.$extPlace, DeleteMiddleware::class,
+            'assets-delete');
 
         // API HTTP gate
         $app->post('/api/v{version:\d+}/{type:.+}', ApiRequestHandler::class, 'api');

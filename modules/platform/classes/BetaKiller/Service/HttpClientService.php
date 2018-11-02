@@ -11,6 +11,7 @@ use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
+use Psr\Log\LogLevel;
 
 class HttpClientService
 {
@@ -36,7 +37,8 @@ class HttpClientService
         $stack->push(
             Middleware::log(
                 $logger,
-                new MessageFormatter('{req_headers} => {res_headers}')
+                new MessageFormatter('{req_headers} => {res_headers}'),
+                LogLevel::DEBUG
             ),
             Middleware::httpErrors()
         );
