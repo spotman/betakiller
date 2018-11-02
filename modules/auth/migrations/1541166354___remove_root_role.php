@@ -46,6 +46,16 @@ class Migration1541166354_Remove_Root_Role extends Migration
 LEFT JOIN `roles` ON roles.id = roles_users.role_id
 WHERE roles.name = 'root';");
 
+            // Remove binding to child role
+            $this->runSql("DELETE roles_inheritance FROM `roles_inheritance`
+LEFT JOIN `roles` ON roles.id = roles_inheritance.child_id
+WHERE roles.name = 'root';");
+
+            // Remove binding to parent role
+            $this->runSql("DELETE roles_inheritance FROM `roles_inheritance`
+LEFT JOIN `roles` ON roles.id = roles_inheritance.parent_id
+WHERE roles.name = 'root';");
+
             // Remove role last
             $this->runSql("DELETE FROM `roles` WHERE (`name` = 'root');");
         }
