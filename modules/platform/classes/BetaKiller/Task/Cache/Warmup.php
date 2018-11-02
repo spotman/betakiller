@@ -278,8 +278,6 @@ class Warmup extends \BetaKiller\Task\AbstractTask
     private function checkRequiredFiles(): void
     {
         $files = [
-            '/sitemap.xml',
-            '/robots.txt',
             '/favicon.ico',
         ];
 
