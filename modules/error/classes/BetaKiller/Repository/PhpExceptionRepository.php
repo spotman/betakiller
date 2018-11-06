@@ -78,6 +78,19 @@ class PhpExceptionRepository extends AbstractOrmBasedDispatchableRepository
     }
 
     /**
+     * @param \BetaKiller\Model\ExtendedOrmInterface|mixed $entity
+     *
+     * @throws \BetaKiller\Repository\RepositoryException
+     */
+    public function delete($entity): void
+    {
+        parent::delete($entity);
+
+        // SQLite cleanup
+        \DB::query(\Database::UPDATE, 'VACUUM;');
+    }
+
+    /**
      * @param \BetaKiller\Utils\Kohana\ORM\OrmInterface $orm
      *
      * @return \BetaKiller\Repository\PhpExceptionRepository
