@@ -8,13 +8,14 @@ class Exception extends \Exception implements ExceptionInterface
     use DefaultExceptionBehaviourTrait;
 
     /**
-     * @param \Throwable $e
+     * @param \Throwable  $e
+     * @param string|null $message
      *
      * @return static
      */
-    public static function wrap(\Throwable $e)
+    public static function wrap(\Throwable $e, string $message = null)
     {
-        return new static(':error', [':error' => $e->getMessage()], $e->getCode(), $e);
+        return new static(':error', [':error' => $message ?? $e->getMessage()], $e->getCode(), $e);
     }
 
     /**

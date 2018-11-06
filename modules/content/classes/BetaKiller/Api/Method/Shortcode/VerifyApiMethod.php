@@ -33,9 +33,12 @@ class VerifyApiMethod extends AbstractApiMethod
     }
 
     /**
+     * @param \BetaKiller\Api\Method\Shortcode\ArgumentsInterface $arguments
+     * @param \BetaKiller\Api\Method\Shortcode\UserInterface      $user
+     *
      * @return \Spotman\Api\ApiMethodResponse|null
      */
-    public function execute(): ?ApiMethodResponse
+    public function execute(ArgumentsInterface $arguments, UserInterface $user): ?ApiMethodResponse
     {
         // Set attributes
         $this->shortcode->setAttributes($this->attributesData);

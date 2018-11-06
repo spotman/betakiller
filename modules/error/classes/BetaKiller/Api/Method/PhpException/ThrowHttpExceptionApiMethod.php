@@ -4,38 +4,35 @@ namespace BetaKiller\Api\Method\PhpException;
 use BetaKiller\Exception\HttpException;
 use BetaKiller\Model\UserInterface;
 use Spotman\Api\ApiMethodResponse;
+use Spotman\Api\ArgumentsDefinitionInterface;
+use Spotman\Api\ArgumentsInterface;
 
 class ThrowHttpExceptionApiMethod extends AbstractPhpExceptionApiMethod
 {
-    /**
-     * @var UserInterface
-     */
-    private $user;
+    private const ARG_CODE = 'code';
 
     /**
-     * @var int
+     * @return \Spotman\Api\ArgumentsDefinitionInterface
      */
-    private $code;
-
-    /**
-     * ThrowHttpExceptionApiMethod constructor.
-     *
-     * @param int                             $code
-     * @param \BetaKiller\Model\UserInterface $user
-     */
-    public function __construct(int $code, UserInterface $user)
+    public function getArgumentsDefinition(): ArgumentsDefinitionInterface
     {
-        $this->code = $code;
-        $this->user = $user;
+        return $this->definition()
+            ->int(self::ARG_CODE);
     }
 
     /**
+     * @param \Spotman\Api\ArgumentsInterface $arguments
+     * @param \BetaKiller\Model\UserInterface $user
+     *
      * @return \Spotman\Api\ApiMethodResponse|null
+     * @throws \BetaKiller\Exception\HttpException
      */
-    public function execute(): ?ApiMethodResponse
+    public function execute(ArgumentsInterface $arguments, UserInterface $user): ?ApiMethodResponse
     {
-        throw new HttpException($this->code, 'This is a test from :username', [
-            ':username' => $this->user->getUsername(),
+        $code = $arguments->getInt(self::ARG_CODE);
+
+        throw new HttpException($code, 'This is a test from :username', [
+            ':username' => $user->getUsername(),
         ]);
     }
 }

@@ -2,7 +2,10 @@
 namespace BetaKiller\Api\Method\Shortcode;
 
 use BetaKiller\Content\Shortcode\ShortcodeFacade;
+use BetaKiller\Model\UserInterface;
 use Spotman\Api\ApiMethodResponse;
+use Spotman\Api\ArgumentsDefinitionInterface;
+use Spotman\Api\ArgumentsInterface;
 
 class GetAttributesDefinitionApiMethod extends AbstractShortcodeApiMethod
 {
@@ -14,24 +17,34 @@ class GetAttributesDefinitionApiMethod extends AbstractShortcodeApiMethod
     /**
      * ApproveApiMethod constructor.
      *
-     * @param string                                        $name
      * @param \BetaKiller\Content\Shortcode\ShortcodeFacade $facade
      */
-    public function __construct(string $name, ShortcodeFacade $facade)
+    public function __construct(ShortcodeFacade $facade)
     {
-        $this->id     = ucfirst($name);
         $this->facade = $facade;
     }
 
     /**
-     * @return \Spotman\Api\ApiMethodResponse|null
-     * @throws \BetaKiller\Repository\RepositoryException
-     * @throws \BetaKiller\Factory\FactoryException
+     * @return \Spotman\Api\ArgumentsDefinitionInterface
      */
-    public function execute(): ?ApiMethodResponse
+    public function getArgumentsDefinition(): ArgumentsDefinitionInterface
+    {
+        return $this->definition()
+            ->identity('name');
+    }
+
+    /**
+     * @param \Spotman\Api\ArgumentsInterface $arguments
+     * @param \BetaKiller\Model\UserInterface $user
+     *
+     * @return \Spotman\Api\ApiMethodResponse|null
+     * @throws \BetaKiller\Factory\FactoryException
+     * @throws \BetaKiller\Repository\RepositoryException
+     */
+    public function execute(ArgumentsInterface $arguments, UserInterface $user): ?ApiMethodResponse
     {
         /** @var \BetaKiller\Content\Shortcode\ShortcodeEntityInterface $entity */
-        $entity    = $this->getEntity();
+        $entity    = $this->getEntity($arguments);
         $shortcode = $this->facade->createFromEntity($entity);
 
         $data = [];

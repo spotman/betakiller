@@ -1,70 +1,53 @@
 <?php
 namespace BetaKiller\Api\Method\User;
 
+use BetaKiller\Api\Method\AbstractEntityBasedApiMethod;
 use BetaKiller\Model\UserInterface;
-use BetaKiller\Repository\UserRepository;
 use HTML;
 use Spotman\Api\ApiMethodResponse;
-use Spotman\Api\Method\AbstractApiMethod;
+use Spotman\Api\ArgumentsDefinitionInterface;
+use Spotman\Api\ArgumentsInterface;
 
-class UpdateProfileApiMethod extends AbstractApiMethod
+class UpdateProfileApiMethod extends AbstractEntityBasedApiMethod
 {
-    /**
-     * @var \BetaKiller\Model\UserInterface
-     */
-    private $user;
+    private const ARG_DATA = 'data';
 
     /**
-     * @var \BetaKiller\Repository\UserRepository
+     * @return \Spotman\Api\ArgumentsDefinitionInterface
      */
-    private $userRepository;
-
-    /**
-     * @var array
-     */
-    private $data;
-
-    /**
-     * UpdateProfileApiMethod constructor.
-     *
-     * @param array                                 $data
-     * @param \BetaKiller\Model\UserInterface       $user
-     * @param \BetaKiller\Repository\UserRepository $userRepository
-     */
-    public function __construct(
-        array $data,
-        UserInterface $user,
-        UserRepository $userRepository
-    ) {
-        $this->data           = $data;
-        $this->user           = $user;
-        $this->userRepository = $userRepository;
+    public function getArgumentsDefinition(): ArgumentsDefinitionInterface
+    {
+        return $this->definition()
+            ->array(self::ARG_DATA);
     }
 
     /**
-     * @return \Spotman\Api\ApiMethodResponse|null
+     * @param \Spotman\Api\ArgumentsInterface $arguments
+     * @param \BetaKiller\Model\UserInterface $user
+     *
+     * @return null|\Spotman\Api\ApiMethodResponse
+     * @throws \BetaKiller\Factory\FactoryException
+     * @throws \BetaKiller\Repository\RepositoryException
      */
-    public function execute(): ?ApiMethodResponse
+    public function execute(ArgumentsInterface $arguments, UserInterface $user): ?ApiMethodResponse
     {
-        $user = $this->user;
+        $entity = $this->getEntity($arguments);
 
-        $user->forceAuthorization();
+        $data = $arguments->getArray(self::ARG_DATA);
 
-        $data = (object)$this->data;
-
-        if (isset($data->firstName)) {
-            $user->setFirstName(HTML::chars($data->firstName));
+        if (isset($data['firstName'])) {
+            $user->setFirstName(HTML::chars($data['firstName']));
         }
 
-        if (isset($data->lastName)) {
-            $user->setLastName(HTML::chars($data->lastName));
+        if (isset($data['lastName'])) {
+            $user->setLastName(HTML::chars($data['lastName']));
         }
 
-        if (isset($data->phone)) {
-            $user->setPhone(HTML::chars($data->phone));
+        if (isset($data['phone'])) {
+            $user->setPhone(HTML::chars($data['phone']));
         }
 
-        $this->userRepository->save($user);
+        $this->saveEntity($entity);
 
         return null;
     }

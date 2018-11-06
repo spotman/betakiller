@@ -63,9 +63,12 @@ class ListApiMethod extends AbstractApiMethod
     }
 
     /**
+     * @param \BetaKiller\Api\Method\ContentElement\ArgumentsInterface $arguments
+     * @param \BetaKiller\Api\Method\ContentElement\UserInterface      $user
+     *
      * @return \Spotman\Api\ApiMethodResponse|null
      */
-    public function execute(): ?ApiMethodResponse
+    public function execute(ArgumentsInterface $arguments, UserInterface $user): ?ApiMethodResponse
     {
         // Return data
         return $this->response(

@@ -1,22 +1,13 @@
 <?php
 namespace BetaKiller\Api\Method;
 
-use BetaKiller\Repository\RepositoryInterface;
-use Spotman\Api\Method\AbstractApiMethod;
 use BetaKiller\Model\AbstractEntityInterface;
+use BetaKiller\Repository\RepositoryInterface;
+use Spotman\Api\ArgumentsInterface;
+use Spotman\Api\Method\AbstractApiMethod;
 
 abstract class AbstractEntityBasedApiMethod extends AbstractApiMethod implements EntityBasedApiMethodInterface
 {
-    /**
-     * @var string
-     */
-    protected $id;
-
-    /**
-     * @var \BetaKiller\Model\AbstractEntityInterface
-     */
-    private $entity;
-
     /**
      * @Inject
      * @var \BetaKiller\Factory\RepositoryFactory
@@ -29,12 +20,26 @@ abstract class AbstractEntityBasedApiMethod extends AbstractApiMethod implements
     private $repository;
 
     /**
+     * @param \Spotman\Api\ArgumentsInterface $arguments
+     *
+     * @return \BetaKiller\Model\AbstractEntityInterface
+     * @throws \BetaKiller\Factory\FactoryException
+     * @throws \BetaKiller\Repository\RepositoryException
+     */
+    public function getEntity(ArgumentsInterface $arguments): AbstractEntityInterface
+    {
+        return $arguments->hasID()
+            ? $this->fetchEntity($arguments->getID())
+            : $this->createEntity();
+    }
+
+    /**
      * Returns new entity
      *
      * @return \BetaKiller\Model\AbstractEntityInterface
      * @throws \BetaKiller\Factory\FactoryException
      */
-    protected function createEntity(): AbstractEntityInterface
+    private function createEntity(): AbstractEntityInterface
     {
         return $this->getRepository()->create();
     }
@@ -43,7 +48,7 @@ abstract class AbstractEntityBasedApiMethod extends AbstractApiMethod implements
      * @return \BetaKiller\Repository\RepositoryInterface
      * @throws \BetaKiller\Factory\FactoryException
      */
-    protected function getRepository(): RepositoryInterface
+    private function getRepository(): RepositoryInterface
     {
         if (!$this->repository) {
             $this->repository = $this->fetchRepository();
@@ -77,36 +82,24 @@ abstract class AbstractEntityBasedApiMethod extends AbstractApiMethod implements
     }
 
     /**
-     * @return \BetaKiller\Model\AbstractEntityInterface
+     * @param \BetaKiller\Model\AbstractEntityInterface $entity
+     *
      * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\Repository\RepositoryException
      */
-    public function getEntity(): AbstractEntityInterface
+    protected function saveEntity(AbstractEntityInterface $entity): void
     {
-        if (!$this->entity) {
-            $this->entity = $this->id
-                ? $this->fetchEntity($this->id)
-                : $this->createEntity();
-        }
-
-        return $this->entity;
+        $this->getRepository()->save($entity);
     }
 
     /**
+     * @param \BetaKiller\Model\AbstractEntityInterface $entity
+     *
      * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\Repository\RepositoryException
      */
-    protected function saveEntity(): void
+    protected function deleteEntity(AbstractEntityInterface $entity): void
     {
-        $this->getRepository()->save($this->entity);
-    }
-
-    /**
-     * @throws \BetaKiller\Factory\FactoryException
-     * @throws \BetaKiller\Repository\RepositoryException
-     */
-    protected function deleteEntity(): void
-    {
-        $this->getRepository()->delete($this->entity);
+        $this->getRepository()->delete($entity);
     }
 }

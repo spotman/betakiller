@@ -21,7 +21,7 @@ class CustomApiMethodAccessResolverDetector extends DefaultApiMethodAccessResolv
         return parent::detect($method);
     }
 
-    private function isEntityRelatedMethod(ApiMethodInterface $method)
+    private function isEntityRelatedMethod(ApiMethodInterface $method): bool
     {
         return ($method instanceof EntityBasedApiMethodInterface);
     }
