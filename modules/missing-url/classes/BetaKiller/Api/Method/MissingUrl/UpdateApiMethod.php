@@ -1,37 +1,68 @@
 <?php
 namespace BetaKiller\Api\Method\MissingUrl;
 
-use BetaKiller\Api\Method\AbstractEntityUpdateApiApiMethod;
+use BetaKiller\Api\Method\AbstractEntityUpdateApiMethod;
+use BetaKiller\Factory\UrlHelperFactory;
+use BetaKiller\Model\AbstractEntityInterface;
+use BetaKiller\Model\UserInterface;
+use BetaKiller\Repository\MissingUrlRedirectTargetRepository;
 use Spotman\Api\ApiMethodException;
+use Spotman\Api\ArgumentsDefinitionInterface;
+use Spotman\Api\ArgumentsInterface;
 
-class UpdateApiMethod extends AbstractEntityUpdateApiApiMethod
+class UpdateApiMethod extends AbstractEntityUpdateApiMethod
 {
+    private const ARG_TARGET_URL = 'targetUrl';
+
     /**
-     * @Inject
      * @var \BetaKiller\Repository\MissingUrlRedirectTargetRepository
      */
     private $targetRepo;
 
     /**
-     * @Inject
      * @var \BetaKiller\Helper\UrlHelper
      */
     private $urlHelper;
 
     /**
+     * UpdateApiMethod constructor.
+     *
+     * @param \BetaKiller\Repository\MissingUrlRedirectTargetRepository $targetRepo
+     * @param \BetaKiller\Factory\UrlHelperFactory                      $urlHelperFactory
+     */
+    public function __construct(
+        MissingUrlRedirectTargetRepository $targetRepo,
+        UrlHelperFactory $urlHelperFactory
+    ) {
+        $this->targetRepo = $targetRepo;
+        $this->urlHelper  = $urlHelperFactory->create();
+    }
+
+    /**
+     * @return \Spotman\Api\ArgumentsDefinitionInterface
+     */
+    public function getArgumentsDefinition(): ArgumentsDefinitionInterface
+    {
+        return $this->definition()
+            ->identity()
+            ->string(self::ARG_TARGET_URL, true);
+    }
+
+    /**
      * Override this method
      *
      * @param \BetaKiller\Model\MissingUrlModelInterface $model
-     * @param                                            $data
+     * @param \Spotman\Api\ArgumentsInterface            $arguments
+     * @param \BetaKiller\Model\UserInterface            $user
      *
      * @return \BetaKiller\Model\AbstractEntityInterface|mixed|null
      * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\Repository\RepositoryException
      * @throws \Spotman\Api\ApiMethodException
      */
-    protected function update($model, $data): \BetaKiller\Model\AbstractEntityInterface
+    protected function update($model, ArgumentsInterface $arguments, UserInterface $user): ?AbstractEntityInterface
     {
-        $url = $data->targetUrl ?? null;
+        $url = $arguments->getString(self::ARG_TARGET_URL);
 
         if ($url) {
             if (!$this->urlHelper->isValidUrl($url)) {
@@ -46,10 +77,12 @@ class UpdateApiMethod extends AbstractEntityUpdateApiApiMethod
             }
 
             $model->setRedirectTarget($targetModel);
+
+            $this->saveEntity($model);
+
+            return $model;
         }
 
-        $this->saveEntity();
-
-        return true;
+        return null;
     }
 }

@@ -1,39 +1,54 @@
 <?php
 namespace BetaKiller\Api\Method\PhpException;
 
+use BetaKiller\Model\UserInterface;
 use BetaKiller\Repository\PhpExceptionRepository;
 use Spotman\Api\ApiMethodResponse;
+use Spotman\Api\ArgumentsDefinitionInterface;
+use Spotman\Api\ArgumentsInterface;
 
 class DeleteApiMethod extends AbstractPhpExceptionApiMethod
 {
+    private const ARG_HASH = 'hash';
+
     /**
      * @var \BetaKiller\Repository\PhpExceptionRepository
      */
     private $repository;
 
     /**
-     * @var \BetaKiller\Model\PhpExceptionModelInterface|null
-     */
-    private $model;
-
-    /**
      * DeleteApiMethod constructor.
      *
-     * @param string                 $hash
      * @param PhpExceptionRepository $repository
      */
-    public function __construct(string $hash, PhpExceptionRepository $repository)
+    public function __construct(PhpExceptionRepository $repository)
     {
         $this->repository = $repository;
-        $this->model      = $this->findByHash($repository, $hash);
     }
 
     /**
-     * @return \Spotman\Api\ApiMethodResponse|null
+     * @return \Spotman\Api\ArgumentsDefinitionInterface
      */
-    public function execute(): ?ApiMethodResponse
+    public function getArgumentsDefinition(): ArgumentsDefinitionInterface
     {
-        $this->repository->delete($this->model);
+        return $this->definition()
+            ->string(self::ARG_HASH);
+    }
+
+    /**
+     * @param \Spotman\Api\ArgumentsInterface $arguments
+     * @param \BetaKiller\Model\UserInterface $user
+     *
+     * @return \Spotman\Api\ApiMethodResponse|null
+     * @throws \BetaKiller\Repository\RepositoryException
+     * @throws \Spotman\Api\ApiMethodException
+     */
+    public function execute(ArgumentsInterface $arguments, UserInterface $user): ?ApiMethodResponse
+    {
+        $hash  = $arguments->getString(self::ARG_HASH);
+        $model = $this->findByHash($this->repository, $hash);
+
+        $this->repository->delete($model);
 
         return null;
     }

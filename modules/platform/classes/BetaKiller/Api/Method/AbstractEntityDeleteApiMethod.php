@@ -1,36 +1,29 @@
 <?php
 namespace BetaKiller\Api\Method;
 
+use BetaKiller\Model\UserInterface;
 use Spotman\Api\ApiMethodException;
 use Spotman\Api\ApiMethodResponse;
+use Spotman\Api\ArgumentsInterface;
 
 abstract class AbstractEntityDeleteApiMethod extends AbstractEntityBasedApiMethod
 {
     /**
-     * AbstractEntityDeleteApiMethod constructor.
+     * @param \Spotman\Api\ArgumentsInterface $arguments
+     * @param \BetaKiller\Model\UserInterface $user
      *
-     * @param $id
-     *
-     * @throws \Spotman\Api\ApiMethodException
-     */
-    public function __construct($id)
-    {
-        $this->id = (int)$id;
-
-        if (!$this->id) {
-            throw new ApiMethodException('Can not delete entity with empty id');
-        }
-    }
-
-    /**
      * @return \Spotman\Api\ApiMethodResponse|null
+     * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\Repository\RepositoryException
      * @throws \Spotman\Api\ApiMethodException
-     * @throws \BetaKiller\Factory\FactoryException
      */
-    public function execute(): ?ApiMethodResponse
+    public function execute(ArgumentsInterface $arguments, UserInterface $user): ?ApiMethodResponse
     {
-        $model = $this->getEntity();
+        if (!$arguments->hasID()) {
+            throw new ApiMethodException('Can not delete entity with empty id');
+        }
+
+        $model = $this->getEntity($arguments);
 
         $this->delete($model);
 
@@ -40,9 +33,9 @@ abstract class AbstractEntityDeleteApiMethod extends AbstractEntityBasedApiMetho
     /**
      * Implement this method
      *
-     * @param $model
+     * @param \BetaKiller\Model\AbstractEntityInterface $model
      *
      * @throws \Spotman\Api\ApiMethodException
      */
-    abstract protected function delete($model);
+    abstract protected function delete($model): void;
 }
