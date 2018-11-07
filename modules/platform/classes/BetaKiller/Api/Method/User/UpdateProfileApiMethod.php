@@ -5,15 +5,15 @@ use BetaKiller\Api\Method\AbstractEntityBasedApiMethod;
 use BetaKiller\Model\UserInterface;
 use HTML;
 use Spotman\Api\ApiMethodResponse;
-use Spotman\Api\ArgumentsDefinitionInterface;
-use Spotman\Api\ArgumentsInterface;
+use Spotman\Defence\ArgumentsDefinitionInterface;
+use Spotman\Defence\ArgumentsInterface;
 
 class UpdateProfileApiMethod extends AbstractEntityBasedApiMethod
 {
     private const ARG_DATA = 'data';
 
     /**
-     * @return \Spotman\Api\ArgumentsDefinitionInterface
+     * @return \Spotman\Defence\ArgumentsDefinitionInterface
      */
     public function getArgumentsDefinition(): ArgumentsDefinitionInterface
     {
@@ -22,8 +22,8 @@ class UpdateProfileApiMethod extends AbstractEntityBasedApiMethod
     }
 
     /**
-     * @param \Spotman\Api\ArgumentsInterface $arguments
-     * @param \BetaKiller\Model\UserInterface $user
+     * @param \Spotman\Defence\ArgumentsInterface $arguments
+     * @param \BetaKiller\Model\UserInterface     $user
      *
      * @return null|\Spotman\Api\ApiMethodResponse
      * @throws \BetaKiller\Factory\FactoryException

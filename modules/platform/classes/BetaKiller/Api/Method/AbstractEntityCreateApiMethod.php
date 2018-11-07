@@ -3,7 +3,7 @@ namespace BetaKiller\Api\Method;
 
 use BetaKiller\Model\UserInterface;
 use Spotman\Api\ApiMethodResponse;
-use Spotman\Api\ArgumentsInterface;
+use Spotman\Defence\ArgumentsInterface;
 
 abstract class AbstractEntityCreateApiMethod extends AbstractEntityBasedApiMethod
 {
@@ -18,8 +18,8 @@ abstract class AbstractEntityCreateApiMethod extends AbstractEntityBasedApiMetho
     }
 
     /**
-     * @param \Spotman\Api\ArgumentsInterface $arguments
-     * @param \BetaKiller\Model\UserInterface $user
+     * @param \Spotman\Defence\ArgumentsInterface $arguments
+     * @param \BetaKiller\Model\UserInterface     $user
      *
      * @return \Spotman\Api\ApiMethodResponse|null
      * @throws \BetaKiller\Factory\FactoryException
