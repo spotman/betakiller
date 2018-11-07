@@ -24,33 +24,6 @@ abstract class Migration extends Kohana_Migration
     }
 
     /**
-     * @deprecated
-     *
-     * @param string      $tableName
-     * @param null|string $db
-     *
-     * @return bool
-     */
-    protected function tableExists(string $tableName, ?string $db = null): bool
-    {
-        return $this->hasTable($tableName, $db);
-    }
-
-    /**
-     * @deprecated
-     *
-     * @param string      $tableName
-     * @param string      $columnName
-     * @param null|string $db
-     *
-     * @return bool
-     */
-    protected function tableHasColumn(string $tableName, string $columnName, ?string $db = null): bool
-    {
-        return $this->hasTableColumn($tableName, $columnName, $db);
-    }
-
-    /**
      * @param string      $sql
      * @param int|null    $type
      * @param null|string $db
@@ -68,7 +41,7 @@ abstract class Migration extends Kohana_Migration
      *
      * @return bool
      */
-    protected function hasTable(string $tableName, ?string $db = null): bool
+    protected function tableExists(string $tableName, ?string $db = null): bool
     {
         return $this->tableHasColumn($tableName, '*', $db);
     }
@@ -80,14 +53,15 @@ abstract class Migration extends Kohana_Migration
      *
      * @return bool
      */
-    protected function hasTableColumn(string $tableName, string $columnName, ?string $db = null): bool
+    protected function tableHasColumn(string $tableName, string $columnName, ?string $db = null): bool
     {
         try {
             DB::select($columnName)->from($tableName)->limit(1)->execute($db)->as_array();
 
             // Query completed => table and column exists
             return true;
-        } /** @noinspection BadExceptionsProcessingInspection */
+        }
+            /** @noinspection BadExceptionsProcessingInspection */
         catch (Database_Exception $ignore) {
             // Query failed => table or column is absent
             return false;
@@ -95,8 +69,6 @@ abstract class Migration extends Kohana_Migration
     }
 
     /**
-     * @deprecated
-     *
      * @param string      $tableName
      * @param string      $columnName
      * @param             $value
@@ -106,26 +78,13 @@ abstract class Migration extends Kohana_Migration
      */
     protected function tableHasColumnValue(string $tableName, string $columnName, $value, ?string $db = null): bool
     {
-        return $this->hasTableColumnValue($tableName, $columnName, $value, $db);
-    }
-
-    /**
-     * @param string      $tableName
-     * @param string      $columnName
-     * @param             $value
-     * @param null|string $db
-     *
-     * @return bool
-     */
-    protected function hasTableColumnValue(string $tableName, string $columnName, $value, ?string $db = null): bool
-    {
         if (!$this->tableHasColumn($tableName, $columnName)) {
             return false;
         }
 
         $query = DB::select($columnName)
             ->from($tableName)
-            ->where($columnName, '=', $value)
+            ->where($columnName,'=', $value)
             ->limit(1);
 
         return (bool)$query->execute($db)->get($columnName);
@@ -177,6 +136,7 @@ abstract class Migration extends Kohana_Migration
      * @param string      $tableName
      * @param string      $columnName
      * @param string      $columnProperty
+     * @param null|string $comment
      * @param null|string $db
      *
      * @return bool
@@ -331,8 +291,9 @@ abstract class Migration extends Kohana_Migration
 
     /**
      * @param string      $tableName
-     * @param string[]    $indexFields
-     * @param bool        $isUnique
+     * @param string      $indexName
+     * @param array       $indexFields
+     * @param bool|null   $isUnique
      * @param null|string $db
      *
      * @return bool
@@ -366,7 +327,8 @@ abstract class Migration extends Kohana_Migration
 
     /**
      * @param string      $tableName
-     * @param string[]    $indexFields
+     * @param string      $indexName
+     * @param array       $indexFields
      * @param null|string $db
      *
      * @return bool
@@ -382,7 +344,8 @@ abstract class Migration extends Kohana_Migration
 
     /**
      * @param string      $tableName
-     * @param string[]    $indexFields
+     * @param string      $indexName
+     * @param array       $indexFields
      * @param null|string $db
      *
      * @return bool
