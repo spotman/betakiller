@@ -44,7 +44,13 @@ class WebHookRepository extends AbstractPredefinedRepository implements Dispatch
      */
     public function getAll(): array
     {
-        return $this->getRecursiveIterator();
+        $items = [];
+
+        foreach ($this->getRecursiveIterator() as $item) {
+            $items[] = $item;
+        }
+
+        return $items;
     }
 
     /**
@@ -78,13 +84,7 @@ class WebHookRepository extends AbstractPredefinedRepository implements Dispatch
      */
     public function getItemsHavingUrlKey(UrlContainerInterface $parameters): array
     {
-        $items = [];
-
-        foreach ($this->getRecursiveIterator() as $item) {
-            $items[] = $item;
-        }
-
-        return $items;
+        return $this->getAll();
     }
 
     /**
