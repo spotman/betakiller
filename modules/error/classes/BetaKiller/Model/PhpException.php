@@ -53,6 +53,7 @@ class PhpException extends \ORM implements PhpExceptionModelInterface
     protected function createTablesIfNotExists()
     {
         if (!static::$tablesChecked) {
+            $this->enableAutoVacuum();
             $this->createErrorsTableIfNotExists();
             $this->createErrorHistoryTableIfNotExists();
             static::$tablesChecked = true;
@@ -89,6 +90,11 @@ class PhpException extends \ORM implements PhpExceptionModelInterface
           status VARCHAR(16) NOT NULL,
           FOREIGN KEY(error_id) REFERENCES errors(id)
         )')->execute($this->_db_group);
+    }
+
+    private function enableAutoVacuum()
+    {
+        DB::query(Database::SELECT, 'PRAGMA auto_vacuum = FULL')->execute($this->_db_group);
     }
 
     /**
