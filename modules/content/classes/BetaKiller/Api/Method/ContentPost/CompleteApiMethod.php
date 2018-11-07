@@ -5,7 +5,7 @@ use BetaKiller\Api\Method\AbstractEntityBasedApiMethod;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Status\StatusWorkflowFactory;
 use Spotman\Api\ApiMethodResponse;
-use Spotman\Defence\ArgumentsDefinitionInterface;
+use Spotman\Defence\DefinitionBuilderInterface;
 use Spotman\Defence\ArgumentsInterface;
 
 class CompleteApiMethod extends AbstractEntityBasedApiMethod
@@ -28,9 +28,9 @@ class CompleteApiMethod extends AbstractEntityBasedApiMethod
     }
 
     /**
-     * @return \Spotman\Defence\ArgumentsDefinitionInterface
+     * @return \Spotman\Defence\DefinitionBuilderInterface
      */
-    public function getArgumentsDefinition(): ArgumentsDefinitionInterface
+    public function getArgumentsDefinition(): DefinitionBuilderInterface
     {
         return $this->definition()
             ->identity();

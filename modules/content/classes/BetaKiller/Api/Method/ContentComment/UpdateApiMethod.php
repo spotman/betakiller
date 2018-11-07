@@ -4,7 +4,7 @@ namespace BetaKiller\Api\Method\ContentComment;
 use BetaKiller\Api\Method\AbstractEntityUpdateApiMethod;
 use BetaKiller\Model\AbstractEntityInterface;
 use BetaKiller\Model\UserInterface;
-use Spotman\Defence\ArgumentsDefinitionInterface;
+use Spotman\Defence\DefinitionBuilderInterface;
 use Spotman\Defence\ArgumentsInterface;
 
 class UpdateApiMethod extends AbstractEntityUpdateApiMethod
@@ -14,9 +14,9 @@ class UpdateApiMethod extends AbstractEntityUpdateApiMethod
     private const ARG_DATA = 'data';
 
     /**
-     * @return \Spotman\Defence\ArgumentsDefinitionInterface
+     * @return \Spotman\Defence\DefinitionBuilderInterface
      */
-    public function getArgumentsDefinition(): ArgumentsDefinitionInterface
+    public function getArgumentsDefinition(): DefinitionBuilderInterface
     {
         return $this->definition()
             ->array(self::ARG_DATA);
