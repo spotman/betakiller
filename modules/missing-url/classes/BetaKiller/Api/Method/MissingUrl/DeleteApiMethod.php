@@ -2,12 +2,12 @@
 namespace BetaKiller\Api\Method\MissingUrl;
 
 use BetaKiller\Api\Method\AbstractEntityDeleteApiMethod;
-use Spotman\Api\ArgumentsDefinitionInterface;
+use Spotman\Defence\ArgumentsDefinitionInterface;
 
 class DeleteApiMethod extends AbstractEntityDeleteApiMethod
 {
     /**
-     * @return \Spotman\Api\ArgumentsDefinitionInterface
+     * @return \Spotman\Defence\ArgumentsDefinitionInterface
      */
     public function getArgumentsDefinition(): ArgumentsDefinitionInterface
     {

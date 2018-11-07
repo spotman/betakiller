@@ -4,8 +4,8 @@ namespace BetaKiller\Api\Method\PhpException;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Repository\PhpExceptionRepository;
 use Spotman\Api\ApiMethodResponse;
-use Spotman\Api\ArgumentsDefinitionInterface;
-use Spotman\Api\ArgumentsInterface;
+use Spotman\Defence\ArgumentsDefinitionInterface;
+use Spotman\Defence\ArgumentsInterface;
 
 class DeleteApiMethod extends AbstractPhpExceptionApiMethod
 {
@@ -27,7 +27,7 @@ class DeleteApiMethod extends AbstractPhpExceptionApiMethod
     }
 
     /**
-     * @return \Spotman\Api\ArgumentsDefinitionInterface
+     * @return \Spotman\Defence\ArgumentsDefinitionInterface
      */
     public function getArgumentsDefinition(): ArgumentsDefinitionInterface
     {
@@ -36,8 +36,8 @@ class DeleteApiMethod extends AbstractPhpExceptionApiMethod
     }
 
     /**
-     * @param \Spotman\Api\ArgumentsInterface $arguments
-     * @param \BetaKiller\Model\UserInterface $user
+     * @param \Spotman\Defence\ArgumentsInterface $arguments
+     * @param \BetaKiller\Model\UserInterface     $user
      *
      * @return \Spotman\Api\ApiMethodResponse|null
      * @throws \BetaKiller\Repository\RepositoryException

@@ -8,7 +8,7 @@ use Spotman\Acl\Resource\ResolvingResourceInterface;
 use Spotman\Api\AccessResolver\AclApiMethodAccessResolver;
 use Spotman\Api\ApiMethodException;
 use Spotman\Api\ApiMethodInterface;
-use Spotman\Api\ArgumentsInterface;
+use Spotman\Defence\ArgumentsInterface;
 
 class EntityRelatedAclApiMethodAccessResolver extends AclApiMethodAccessResolver
 {

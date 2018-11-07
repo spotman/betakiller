@@ -5,8 +5,8 @@ use BetaKiller\Api\Method\AbstractEntityBasedApiMethod;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Status\StatusWorkflowFactory;
 use Spotman\Api\ApiMethodResponse;
-use Spotman\Api\ArgumentsDefinitionInterface;
-use Spotman\Api\ArgumentsInterface;
+use Spotman\Defence\ArgumentsDefinitionInterface;
+use Spotman\Defence\ArgumentsInterface;
 
 class ApproveApiMethod extends AbstractEntityBasedApiMethod
 {
@@ -26,7 +26,7 @@ class ApproveApiMethod extends AbstractEntityBasedApiMethod
     }
 
     /**
-     * @return \Spotman\Api\ArgumentsDefinitionInterface
+     * @return \Spotman\Defence\ArgumentsDefinitionInterface
      */
     public function getArgumentsDefinition(): ArgumentsDefinitionInterface
     {
@@ -35,8 +35,8 @@ class ApproveApiMethod extends AbstractEntityBasedApiMethod
     }
 
     /**
-     * @param \Spotman\Api\ArgumentsInterface $arguments
-     * @param \BetaKiller\Model\UserInterface $user
+     * @param \Spotman\Defence\ArgumentsInterface $arguments
+     * @param \BetaKiller\Model\UserInterface     $user
      *
      * @return \Spotman\Api\ApiMethodResponse|null
      * @throws \BetaKiller\Exception

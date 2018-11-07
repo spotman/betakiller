@@ -3,8 +3,8 @@ namespace BetaKiller\Api\Method;
 
 use BetaKiller\Model\AbstractEntityInterface;
 use BetaKiller\Repository\RepositoryInterface;
-use Spotman\Api\ArgumentsInterface;
 use Spotman\Api\Method\AbstractApiMethod;
+use Spotman\Defence\ArgumentsInterface;
 
 abstract class AbstractEntityBasedApiMethod extends AbstractApiMethod implements EntityBasedApiMethodInterface
 {
@@ -20,7 +20,7 @@ abstract class AbstractEntityBasedApiMethod extends AbstractApiMethod implements
     private $repository;
 
     /**
-     * @param \Spotman\Api\ArgumentsInterface $arguments
+     * @param \Spotman\Defence\ArgumentsInterface $arguments
      *
      * @return \BetaKiller\Model\AbstractEntityInterface
      * @throws \BetaKiller\Factory\FactoryException

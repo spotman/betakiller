@@ -4,15 +4,15 @@ namespace BetaKiller\Api\Method\PhpException;
 use BetaKiller\Exception\HttpException;
 use BetaKiller\Model\UserInterface;
 use Spotman\Api\ApiMethodResponse;
-use Spotman\Api\ArgumentsDefinitionInterface;
-use Spotman\Api\ArgumentsInterface;
+use Spotman\Defence\ArgumentsDefinitionInterface;
+use Spotman\Defence\ArgumentsInterface;
 
 class ThrowHttpExceptionApiMethod extends AbstractPhpExceptionApiMethod
 {
     private const ARG_CODE = 'code';
 
     /**
-     * @return \Spotman\Api\ArgumentsDefinitionInterface
+     * @return \Spotman\Defence\ArgumentsDefinitionInterface
      */
     public function getArgumentsDefinition(): ArgumentsDefinitionInterface
     {
@@ -21,8 +21,8 @@ class ThrowHttpExceptionApiMethod extends AbstractPhpExceptionApiMethod
     }
 
     /**
-     * @param \Spotman\Api\ArgumentsInterface $arguments
-     * @param \BetaKiller\Model\UserInterface $user
+     * @param \Spotman\Defence\ArgumentsInterface $arguments
+     * @param \BetaKiller\Model\UserInterface     $user
      *
      * @return \Spotman\Api\ApiMethodResponse|null
      * @throws \BetaKiller\Exception\HttpException

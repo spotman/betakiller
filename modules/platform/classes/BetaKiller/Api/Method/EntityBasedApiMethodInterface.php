@@ -3,12 +3,12 @@ namespace BetaKiller\Api\Method;
 
 use BetaKiller\Model\AbstractEntityInterface;
 use Spotman\Api\ApiMethodInterface;
-use Spotman\Api\ArgumentsInterface;
+use Spotman\Defence\ArgumentsInterface;
 
 interface EntityBasedApiMethodInterface extends ApiMethodInterface
 {
     /**
-     * @param \Spotman\Api\ArgumentsInterface $arguments
+     * @param \Spotman\Defence\ArgumentsInterface $arguments
      *
      * @return \BetaKiller\Model\AbstractEntityInterface
      */

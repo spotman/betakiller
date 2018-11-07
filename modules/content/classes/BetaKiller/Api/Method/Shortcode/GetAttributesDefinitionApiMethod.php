@@ -4,8 +4,8 @@ namespace BetaKiller\Api\Method\Shortcode;
 use BetaKiller\Content\Shortcode\ShortcodeFacade;
 use BetaKiller\Model\UserInterface;
 use Spotman\Api\ApiMethodResponse;
-use Spotman\Api\ArgumentsDefinitionInterface;
-use Spotman\Api\ArgumentsInterface;
+use Spotman\Defence\ArgumentsDefinitionInterface;
+use Spotman\Defence\ArgumentsInterface;
 
 class GetAttributesDefinitionApiMethod extends AbstractShortcodeApiMethod
 {
@@ -25,7 +25,7 @@ class GetAttributesDefinitionApiMethod extends AbstractShortcodeApiMethod
     }
 
     /**
-     * @return \Spotman\Api\ArgumentsDefinitionInterface
+     * @return \Spotman\Defence\ArgumentsDefinitionInterface
      */
     public function getArgumentsDefinition(): ArgumentsDefinitionInterface
     {
@@ -34,8 +34,8 @@ class GetAttributesDefinitionApiMethod extends AbstractShortcodeApiMethod
     }
 
     /**
-     * @param \Spotman\Api\ArgumentsInterface $arguments
-     * @param \BetaKiller\Model\UserInterface $user
+     * @param \Spotman\Defence\ArgumentsInterface $arguments
+     * @param \BetaKiller\Model\UserInterface     $user
      *
      * @return \Spotman\Api\ApiMethodResponse|null
      * @throws \BetaKiller\Factory\FactoryException
