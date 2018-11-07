@@ -7,7 +7,7 @@ use BetaKiller\Model\AbstractEntityInterface;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Repository\MissingUrlRedirectTargetRepository;
 use Spotman\Api\ApiMethodException;
-use Spotman\Defence\ArgumentsDefinitionInterface;
+use Spotman\Defence\DefinitionBuilderInterface;
 use Spotman\Defence\ArgumentsInterface;
 
 class UpdateApiMethod extends AbstractEntityUpdateApiMethod
@@ -39,13 +39,13 @@ class UpdateApiMethod extends AbstractEntityUpdateApiMethod
     }
 
     /**
-     * @return \Spotman\Defence\ArgumentsDefinitionInterface
+     * @return \Spotman\Defence\DefinitionBuilderInterface
      */
-    public function getArgumentsDefinition(): ArgumentsDefinitionInterface
+    public function getArgumentsDefinition(): DefinitionBuilderInterface
     {
         return $this->definition()
             ->identity()
-            ->string(self::ARG_TARGET_URL, true);
+            ->string(self::ARG_TARGET_URL)->optional();
     }
 
     /**

@@ -5,7 +5,7 @@ use BetaKiller\Api\Method\AbstractEntityBasedApiMethod;
 use BetaKiller\Model\UserInterface;
 use HTML;
 use Spotman\Api\ApiMethodResponse;
-use Spotman\Defence\ArgumentsDefinitionInterface;
+use Spotman\Defence\DefinitionBuilderInterface;
 use Spotman\Defence\ArgumentsInterface;
 
 class UpdateProfileApiMethod extends AbstractEntityBasedApiMethod
@@ -13,9 +13,9 @@ class UpdateProfileApiMethod extends AbstractEntityBasedApiMethod
     private const ARG_DATA = 'data';
 
     /**
-     * @return \Spotman\Defence\ArgumentsDefinitionInterface
+     * @return \Spotman\Defence\DefinitionBuilderInterface
      */
-    public function getArgumentsDefinition(): ArgumentsDefinitionInterface
+    public function getArgumentsDefinition(): DefinitionBuilderInterface
     {
         return $this->definition()
             ->array(self::ARG_DATA);

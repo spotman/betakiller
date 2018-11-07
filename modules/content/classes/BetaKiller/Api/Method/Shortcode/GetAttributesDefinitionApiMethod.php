@@ -4,7 +4,7 @@ namespace BetaKiller\Api\Method\Shortcode;
 use BetaKiller\Content\Shortcode\ShortcodeFacade;
 use BetaKiller\Model\UserInterface;
 use Spotman\Api\ApiMethodResponse;
-use Spotman\Defence\ArgumentsDefinitionInterface;
+use Spotman\Defence\DefinitionBuilderInterface;
 use Spotman\Defence\ArgumentsInterface;
 
 class GetAttributesDefinitionApiMethod extends AbstractShortcodeApiMethod
@@ -25,9 +25,9 @@ class GetAttributesDefinitionApiMethod extends AbstractShortcodeApiMethod
     }
 
     /**
-     * @return \Spotman\Defence\ArgumentsDefinitionInterface
+     * @return \Spotman\Defence\DefinitionBuilderInterface
      */
-    public function getArgumentsDefinition(): ArgumentsDefinitionInterface
+    public function getArgumentsDefinition(): DefinitionBuilderInterface
     {
         return $this->definition()
             ->identity('name');

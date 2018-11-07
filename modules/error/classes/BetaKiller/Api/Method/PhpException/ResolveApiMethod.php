@@ -4,7 +4,7 @@ namespace BetaKiller\Api\Method\PhpException;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Repository\PhpExceptionRepository;
 use Spotman\Api\ApiMethodResponse;
-use Spotman\Defence\ArgumentsDefinitionInterface;
+use Spotman\Defence\DefinitionBuilderInterface;
 use Spotman\Defence\ArgumentsInterface;
 
 class ResolveApiMethod extends AbstractPhpExceptionApiMethod
@@ -27,9 +27,9 @@ class ResolveApiMethod extends AbstractPhpExceptionApiMethod
     }
 
     /**
-     * @return \Spotman\Defence\ArgumentsDefinitionInterface
+     * @return \Spotman\Defence\DefinitionBuilderInterface
      */
-    public function getArgumentsDefinition(): ArgumentsDefinitionInterface
+    public function getArgumentsDefinition(): DefinitionBuilderInterface
     {
         return $this->definition()
             ->string(self::ARG_HASH);

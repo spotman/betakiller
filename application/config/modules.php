@@ -5,6 +5,7 @@ return [
     'core'         => MODPATH.'core',                  // Core interfaces and classes
     'ddd'          => MODPATH.'ddd',                   // Interfaces and classes for DDD
     'helper'       => MODPATH.'helper',                // Common helpers without external dependencies
+    'defence'      => MODPATH.'defence',              // Process insecure input (sanitize and validate)
     'log'          => MODPATH.'log',                   // Logs subsystem
     'utils'        => MODPATH.'utils',                 // Useful classes
     'widget'       => MODPATH.'widget',                // Basic widgets support
