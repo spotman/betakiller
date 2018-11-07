@@ -46,7 +46,7 @@ class ArgumentDefinition implements ArgumentDefinitionInterface
      */
     public function __construct(string $name, string $type)
     {
-        if (\in_array($type, self::ALLOWED_TYPES, true)) {
+        if (!\in_array($type, self::ALLOWED_TYPES, true)) {
             throw new \LogicException(\sprintf('Unknown argument type "%s"', $type));
         }
 
