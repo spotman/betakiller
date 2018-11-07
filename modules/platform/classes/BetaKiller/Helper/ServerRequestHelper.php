@@ -87,7 +87,13 @@ class ServerRequestHelper
      */
     public static function getModule(ServerRequestInterface $request): ?string
     {
-        $routeName = self::getRouteResult($request)->getMatchedRouteName();
+        $routeResult = self::getRouteResult($request);
+
+        if (!$routeResult) {
+            return null;
+        }
+
+        $routeName = $routeResult->getMatchedRouteName();
 
         if (!$routeName) {
             return null;
@@ -98,7 +104,7 @@ class ServerRequestHelper
         return \array_shift($nameArr);
     }
 
-    public static function getRouteResult(ServerRequestInterface $request): RouteResult
+    public static function getRouteResult(ServerRequestInterface $request): ?RouteResult
     {
         return $request->getAttribute(RouteResult::class);
     }
