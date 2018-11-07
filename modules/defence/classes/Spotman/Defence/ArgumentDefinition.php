@@ -31,12 +31,12 @@ class ArgumentDefinition implements ArgumentDefinitionInterface
     /**
      * @var \Spotman\Defence\Rule\DefinitionRuleInterface[]
      */
-    private $rules;
+    private $rules = [];
 
     /**
      * @var \Spotman\Defence\Filter\FilterInterface[]
      */
-    private $filters;
+    private $filters = [];
 
     /**
      * ArgumentDefinition constructor.
