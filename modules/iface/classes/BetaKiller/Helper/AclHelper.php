@@ -215,6 +215,9 @@ class AclHelper
             if ($zoneRoles || $zoneAclRules) {
                 $protectionDefined = true;
             }
+        } else {
+            // UrlElement without zone definition => means "public" zone => no more checks
+            return true;
         }
 
         // IFaces and Actions from protected zones must define entity/action or custom rules to protect itself
