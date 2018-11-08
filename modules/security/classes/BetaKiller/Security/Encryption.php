@@ -44,6 +44,11 @@ class Encryption
         return $data;
     }
 
+    public function generateKey(): string
+    {
+        return \base64_encode(random_bytes(SODIUM_CRYPTO_SECRETBOX_KEYBYTES));
+    }
+
     private function decodeKey(string $key): string
     {
         $key = base64_decode($key);
