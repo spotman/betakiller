@@ -42,7 +42,7 @@ class UrlElementHelper
      */
     public static function getCurrentIFaceModel(UrlElementStack $stack): ?IFaceModelInterface
     {
-        $element = $stack->getCurrent();
+        $element = $stack->hasCurrent() ? $stack->getCurrent() : null;
 
         if ($element && !$element instanceof IFaceModelInterface) {
             throw new UrlElementException('Current URL element :codename is not an IFace, :class given', [
