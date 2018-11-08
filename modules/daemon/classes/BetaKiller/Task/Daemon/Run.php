@@ -192,7 +192,7 @@ class Run extends AbstractTask
 
     private function addSignalHandlers(): void
     {
-        pcntl_async_signals(true);
+        //pcntl_async_signals(true);
 
         $signalCallable = function (int $signal) {
             $this->logger->debug('Received signal ":value" for ":name" daemon', [
