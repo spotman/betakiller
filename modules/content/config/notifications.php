@@ -24,7 +24,8 @@ return [
         ],
 
         COMMENT_USER_EVENT => [
-            // No roles here, direct messaging
+            // Direct messaging to any user
+            RoleInterface::GUEST,
         ],
     ],
 
