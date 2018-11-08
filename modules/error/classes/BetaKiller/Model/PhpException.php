@@ -325,9 +325,9 @@ class PhpException extends \ORM implements PhpExceptionModelInterface
         return \strlen($this->getRawTrace());
     }
 
-    private function getRawTrace(): string
+    private function getRawTrace()
     {
-        return (string)$this->get('trace');
+        return $this->get('trace');
     }
 
     /**
