@@ -11,4 +11,9 @@ abstract class AbstractTestCase extends \PHPUnit\Framework\TestCase
             ? $object->reveal()
             : $object;
     }
+
+    protected function writeToStderr(string $value): void
+    {
+        fwrite(STDERR, $value.PHP_EOL);
+    }
 }
