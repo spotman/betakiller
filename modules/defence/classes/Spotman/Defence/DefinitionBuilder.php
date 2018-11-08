@@ -22,7 +22,7 @@ class DefinitionBuilder implements DefinitionBuilderInterface
     /**
      * @var \Spotman\Defence\ArgumentDefinitionInterface[]
      */
-    private $arguments;
+    private $arguments = [];
 
     /**
      * @var \Spotman\Defence\ArgumentDefinitionInterface|null
