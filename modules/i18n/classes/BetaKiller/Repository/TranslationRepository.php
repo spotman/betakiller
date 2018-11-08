@@ -10,8 +10,8 @@ use BetaKiller\Model\Translation;
  * Class TranslationRepository
  *
  * @package BetaKiller\Repository
- * @method \BetaKiller\Model\I18nModelInterface create()
- * @method save(\BetaKiller\Model\I18nModelInterface $model)
+ * @method \BetaKiller\Model\TranslationModelInterface create()
+ * @method save(\BetaKiller\Model\TranslationModelInterface $model)
  */
 class TranslationRepository extends AbstractI18nRepository
 {
