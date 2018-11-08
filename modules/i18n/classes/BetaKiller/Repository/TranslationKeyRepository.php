@@ -6,13 +6,14 @@ namespace BetaKiller\Repository;
 use BetaKiller\Model\ExtendedOrmInterface;
 use BetaKiller\Model\I18nKeyModelInterface;
 use BetaKiller\Model\TranslationKey;
+use BetaKiller\Model\TranslationKeyModelInterface;
 
 /**
  * Class TranslationKeyRepository
  *
  * @package BetaKiller\Repository
- * @method I18nKeyModelInterface create()
- * @method save(I18nKeyModelInterface $model)
+ * @method TranslationKeyModelInterface create()
+ * @method save(TranslationKeyModelInterface $model)
  */
 class TranslationKeyRepository extends AbstractOrmBasedDispatchableRepository implements I18nKeyRepositoryInterface
 {

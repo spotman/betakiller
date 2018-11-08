@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\Model;
 
-class Translation extends AbstractI18nModel
+class Translation extends AbstractI18nModel implements TranslationModelInterface
 {
     public const TABLE_FIELD_KEY = 'key_id';
 
