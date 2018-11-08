@@ -45,6 +45,7 @@ return [
     'cron'         => MODPATH.'cron',                  // Helper for running scheduled tasks
     'error'        => MODPATH.'error',                 // Error handling and logging
     'daemon'       => MODPATH.'daemon',                // Daemon run
+    'i18n'         => MODPATH.'i18n',                  // Localization and pluralization
     'iface'        => MODPATH.'iface',                 // Dynamic user interfaces
     'maintenance'  => MODPATH.'maintenance',           // Maintenance mode
     'missing-url'  => MODPATH.'missing-url',           // Catch and store missing IFace URLs
@@ -60,7 +61,7 @@ return [
     // Workaround for injecting admin/config/ifaces.xml in a proper way
     'admin'        => MODPATH.'admin',                 // Basic admin
 
-    'i18n'         => MODPATH.'i18n',
+    // Various helper modules
     'cookies-notification' => MODPATH.'cookies-notification',
-    'outdated-browser' => MODPATH.'outdated-browser',
+    'outdated-browser'     => MODPATH.'outdated-browser',
 ];

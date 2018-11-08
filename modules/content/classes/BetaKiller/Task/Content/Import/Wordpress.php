@@ -150,6 +150,12 @@ class Wordpress extends AbstractTask
 
     /**
      * @Inject
+     * @var \BetaKiller\Assets\ContentTypes
+     */
+    private $contentTypes;
+
+    /**
+     * @Inject
      * @var \WP
      */
     private $wp;
@@ -460,7 +466,7 @@ class Wordpress extends AbstractTask
 
             $this->logger->debug('Getting attach at local path = :path', [':path' => $path]);
 
-            $realMime = File::mime($path);
+            $realMime = $this->contentTypes->getFileMimeType($path);
 
             if (\is_array($expectedMimes) && !\in_array($realMime, $expectedMimes, true)) {
                 throw new TaskException('Invalid mime-type: [:real], [:expected] expected', [
