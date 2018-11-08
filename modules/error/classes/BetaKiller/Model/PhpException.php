@@ -310,9 +310,9 @@ class PhpException extends \ORM implements PhpExceptionModelInterface
     {
         $string = $this->getRawTrace();
 
-        $decoded = \gzdecode($string);
+        $decoded = \gzdecode(\base64_decode($string));
 
-        return $decoded !== false ? hex2bin($decoded) : $string;
+        return $decoded !== false ? $decoded : $string;
     }
 
     /**
@@ -337,9 +337,11 @@ class PhpException extends \ORM implements PhpExceptionModelInterface
      */
     public function setTrace(string $formattedTrace): PhpExceptionModelInterface
     {
-        $encoded = \gzencode($formattedTrace);
+        $compressed = \gzencode($formattedTrace);
 
-        $this->set('trace', $encoded !== false ? bin2hex($encoded) : $formattedTrace);
+        $value = $compressed !== false ? \base64_encode($compressed) : $formattedTrace;
+
+        $this->set('trace', $value);
 
         return $this;
     }
