@@ -312,7 +312,7 @@ class PhpException extends \ORM implements PhpExceptionModelInterface
 
         $decoded = \gzdecode($string);
 
-        return $decoded ?: $string;
+        return $decoded !== false ? $decoded : $string;
     }
 
     /**
@@ -339,7 +339,7 @@ class PhpException extends \ORM implements PhpExceptionModelInterface
     {
         $encoded = \gzencode($formattedTrace);
 
-        $this->set('trace', $encoded ?: $formattedTrace);
+        $this->set('trace', $encoded !== false ? $encoded : $formattedTrace);
 
         return $this;
     }
