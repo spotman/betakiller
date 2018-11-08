@@ -308,7 +308,26 @@ class PhpException extends \ORM implements PhpExceptionModelInterface
      */
     public function getTrace(): string
     {
-        return $this->get('trace');
+        $string = $this->getRawTrace();
+
+        $decoded = \gzdecode($string);
+
+        return $decoded ?: $string;
+    }
+
+    /**
+     * Returns trace size in bytes
+     *
+     * @return int
+     */
+    public function getTraceSize(): int
+    {
+        return \strlen($this->getRawTrace());
+    }
+
+    private function getRawTrace(): string
+    {
+        return (string)$this->get('trace');
     }
 
     /**
@@ -318,7 +337,9 @@ class PhpException extends \ORM implements PhpExceptionModelInterface
      */
     public function setTrace(string $formattedTrace): PhpExceptionModelInterface
     {
-        $this->set('trace', $formattedTrace);
+        $encoded = \gzencode($formattedTrace);
+
+        $this->set('trace', $encoded ?: $formattedTrace);
 
         return $this;
     }

@@ -91,6 +91,13 @@ interface PhpExceptionModelInterface extends DispatchableEntityInterface
     public function setTrace(string $formattedTrace): PhpExceptionModelInterface;
 
     /**
+     * Returns trace size in bytes
+     *
+     * @return int
+     */
+    public function getTraceSize(): int;
+
+    /**
      * @param \DateTimeInterface $time
      *
      * @return PhpExceptionModelInterface
