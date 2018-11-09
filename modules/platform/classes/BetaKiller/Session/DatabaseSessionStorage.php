@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace BetaKiller\Session;
 
-use BetaKiller\Auth\AccessDeniedException;
 use BetaKiller\Auth\SessionConfig;
 use BetaKiller\Exception;
 use BetaKiller\Exception\DomainException;
@@ -118,7 +117,12 @@ class DatabaseSessionStorage implements SessionStorageInterface
 
         $session = $this->restoreSession($model);
 
-        $this->checkUserAgent($session, $userAgent);
+        // Browser updated or plugin installed, potential hack
+        if (!$this->isValidUserAgent($session, $userAgent)) {
+            $this->sessionRepo->delete($model);
+
+            return $this->createSession($userAgent, $ipAddress);
+        }
 
         return $session;
     }
@@ -137,7 +141,7 @@ class DatabaseSessionStorage implements SessionStorageInterface
         return false;
     }
 
-    private function checkUserAgent(SessionInterface $session, string $userAgent): void
+    private function isValidUserAgent(SessionInterface $session, string $userAgent): bool
     {
         if (!$session instanceof SessionIdentifierAwareInterface) {
             throw new DomainException('Session must implement :interface', [
@@ -145,21 +149,23 @@ class DatabaseSessionStorage implements SessionStorageInterface
             ]);
         }
 
+        $validAgent = SessionHelper::getUserAgent($session);
+
         // Check session is valid (only user agent check coz IP address may be changed on mobile connection)
-        if (SessionHelper::getUserAgent($session) === $userAgent) {
-            return;
+        if ($validAgent === $userAgent) {
+            return true;
         }
 
         // Warn about potential attack and restrict access
-        $this->logException(
-            $this->logger,
-            new SecurityException('User agent juggling for session :token with :agent', [
-                ':token' => $session->getId(),
-                ':agent' => $userAgent,
-            ])
-        );
+        $this->logException($this->logger, new SecurityException(
+            'User agent juggling for user ":user" with session ":token" and ":agent" (must be ":needed")', [
+            ':token'  => $session->getId(),
+            ':agent'  => $userAgent,
+            ':needed' => $validAgent,
+            ':user'   => SessionHelper::getUserID($session),
+        ]));
 
-        throw new AccessDeniedException();
+        return false;
     }
 
     private function restoreSession(UserSession $model): SessionInterface
