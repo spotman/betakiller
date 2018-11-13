@@ -79,7 +79,7 @@ class IFaceUrlElementProcessor implements UrlElementProcessorInterface
             ]);
         }
 
-        $path = parse_url(ServerRequestHelper::getUrl($request), PHP_URL_PATH);
+        $path = $request->getUri()->getPath();
 
         // If this is default IFace and client requested non-slash uri, redirect client to /
         if ($path !== '/' && $model->isDefault() && !$model->hasDynamicUrl()) {
@@ -106,6 +106,7 @@ class IFaceUrlElementProcessor implements UrlElementProcessorInterface
             // Final hook
             $iface->after();
 
+            // TODO Apply to other UrlElement types (Action, WebHook)
             $unusedParts = $urlContainer->getUnusedQueryPartsKeys();
             if ($unusedParts) {
                 throw new BadRequestHttpException('Request have unused query parts: :keys', [

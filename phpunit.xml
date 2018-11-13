@@ -22,6 +22,7 @@
             <directory>modules/api/classes</directory>
             <directory>modules/content/classes</directory>
             <directory>modules/core/classes</directory>
+            <directory>modules/defence/classes</directory>
             <directory>modules/email/classes</directory>
             <directory>modules/error/classes</directory>
             <directory>modules/iface/classes</directory>

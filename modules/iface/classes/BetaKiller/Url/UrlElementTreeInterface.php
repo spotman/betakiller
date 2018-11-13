@@ -1,7 +1,6 @@
 <?php
 namespace BetaKiller\Url;
 
-use BetaKiller\Model\DispatchableEntityInterface;
 use BetaKiller\Url\ElementFilter\UrlElementFilterInterface;
 
 interface UrlElementTreeInterface
@@ -85,25 +84,24 @@ interface UrlElementTreeInterface
      * @param string $action
      * @param string $zone
      *
-     * @return \BetaKiller\Url\IFaceModelInterface[]
+     * @return \BetaKiller\Url\EntityLinkedUrlElementInterface[]
      */
-    public function getIFacesByActionAndZone(string $action, string $zone): array;
+    public function getByActionAndZone(string $action, string $zone): array;
 
     /**
      * Search for UrlElement linked to provided entity, entity action and zone
      *
-     * @param \BetaKiller\Model\DispatchableEntityInterface $entity
-     * @param string                                        $action
-     * @param string                                        $zone
+     * @param string $entityName
+     * @param string $action
+     * @param string $zone
      *
-     * @return \BetaKiller\Url\IFaceModelInterface
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     * @return \BetaKiller\Url\EntityLinkedUrlElementInterface
      */
     public function getByEntityActionAndZone(
-        DispatchableEntityInterface $entity,
+        string $entityName,
         string $action,
         string $zone
-    ): IFaceModelInterface;
+    ): EntityLinkedUrlElementInterface;
 
     /**
      * Returns array of WebHookModelInterface instances linked to provided service

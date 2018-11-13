@@ -6,7 +6,7 @@ use BetaKiller\Helper\UrlHelper;
 use BetaKiller\Url\ZoneInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-class PostItemRevisionListIFace extends AbstractAdminBase
+class PostItemRevisionListIFace extends AbstractContentAdminIFace
 {
     /**
      * @var \BetaKiller\Helper\UrlHelper

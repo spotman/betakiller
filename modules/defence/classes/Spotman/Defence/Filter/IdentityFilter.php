@@ -34,10 +34,20 @@ class IdentityFilter extends AbstractFilterVarFilter
      */
     public function apply($value)
     {
-        return $this->filterVar(
+        if (!\is_string($value)) {
+            throw new \InvalidArgumentException;
+        }
+
+        $value = $this->filterVar(
             $value,
-            \FILTER_SANITIZE_SPECIAL_CHARS,
-            \FILTER_FLAG_STRIP_LOW + \FILTER_FLAG_STRIP_HIGH + \FILTER_FLAG_STRIP_BACKTICK
+            \FILTER_SANITIZE_STRING,
+            \FILTER_FLAG_STRIP_LOW + \FILTER_FLAG_STRIP_HIGH
         );
+
+        if ($value === null) {
+            throw new \InvalidArgumentException;
+        }
+
+        return $value;
     }
 }

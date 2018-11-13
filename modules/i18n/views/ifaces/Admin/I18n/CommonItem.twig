@@ -1,0 +1,29 @@
+{% extends layout %}
+
+{% block content %}
+
+  <h1>{{ key }}</h1>
+
+  <form id="i18n-common-edit-form" action="{{ action }}">
+
+    {% for lang, data in values %}
+      {% if is_plural %}
+        {% for form, value in data %}
+          <label>
+            {{ lang }}
+            <input type="text" name="{{ lang ~ "[" ~ form ~ "]" }}" value="{{ data }}"/>
+          </label>
+        {% endfor %}
+      {% else %}
+        <label>
+          {{ lang }}
+          <input type="text" name="{{ lang }}" value="{{ data }}"/>
+        </label>
+      {% endif %}
+    {% endfor %}
+
+    <button type="submit" class="btn green">Save</button>
+  </form>
+
+
+{% endblock %}

@@ -32,12 +32,22 @@ class IntegerFilter extends AbstractFilterVarFilter
      *
      * @return mixed
      */
-    public function apply($value)
+    public function apply($value): int
     {
-        return $this->filterVar(
+        if (!\is_int($value)) {
+            throw new \InvalidArgumentException;
+        }
+
+        $value = $this->filterVar(
             $value,
             \FILTER_VALIDATE_INT,
             \FILTER_FLAG_ALLOW_OCTAL | \FILTER_FLAG_ALLOW_HEX
         );
+
+        if ($value === null) {
+            throw new \InvalidArgumentException;
+        }
+
+        return (int)$value;
     }
 }

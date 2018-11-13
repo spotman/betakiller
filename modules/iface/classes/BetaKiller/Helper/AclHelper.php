@@ -233,25 +233,6 @@ class AclHelper
     }
 
     /**
-     * @param null|\Spotman\Acl\AclUserInterface                   $user
-     *
-     * @param \BetaKiller\IFace\IFaceInterface                     $iface
-     * @param \BetaKiller\Url\Container\UrlContainerInterface|null $params
-     *
-     * @return bool
-     * @throws \BetaKiller\Factory\FactoryException
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
-     * @throws \Spotman\Acl\Exception
-     */
-    public function isIFaceAllowed(
-        AclUserInterface $user,
-        IFaceInterface $iface,
-        ?UrlContainerInterface $params = null
-    ): bool {
-        return $this->isUrlElementAllowed($user, $iface->getModel(), $params);
-    }
-
-    /**
      * @param \BetaKiller\Model\DispatchableEntityInterface   $entity
      * @param \BetaKiller\Url\EntityLinkedUrlElementInterface $urlElement
      *

@@ -5,13 +5,11 @@ use BetaKiller\Api\Method\AbstractEntityBasedApiMethod;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Status\StatusWorkflowFactory;
 use Spotman\Api\ApiMethodResponse;
-use Spotman\Defence\DefinitionBuilderInterface;
 use Spotman\Defence\ArgumentsInterface;
+use Spotman\Defence\DefinitionBuilderInterface;
 
 class FixApiMethod extends AbstractEntityBasedApiMethod
 {
-    use ContentPostMethodTrait;
-
     /**
      * @var \BetaKiller\Status\StatusWorkflowFactory
      */

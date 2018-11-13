@@ -55,7 +55,7 @@ class CountBetweenRule implements DefinitionRuleInterface
     public function getArgumentTypes(): array
     {
         return [
-            ArgumentDefinitionInterface::TYPE_ARRAY,
+            ArgumentDefinitionInterface::TYPE_SINGLE_ARRAY,
         ];
     }
 
@@ -67,7 +67,7 @@ class CountBetweenRule implements DefinitionRuleInterface
     public function check($value): bool
     {
         if (!\is_array($value)) {
-            return false;
+            throw new \InvalidArgumentException;
         }
 
         $count = \count($value);

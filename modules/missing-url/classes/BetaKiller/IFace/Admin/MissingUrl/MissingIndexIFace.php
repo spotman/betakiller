@@ -3,11 +3,11 @@ declare(strict_types=1);
 
 namespace BetaKiller\IFace\Admin\MissingUrl;
 
-use BetaKiller\IFace\Admin\AbstractAdminBase;
+use BetaKiller\IFace\Admin\AbstractAdminIFace;
 use BetaKiller\Repository\MissingUrlRepository;
 use Psr\Http\Message\ServerRequestInterface;
 
-class MissingIndexIFace extends AbstractAdminBase
+class MissingIndexIFace extends AbstractAdminIFace
 {
     /**
      * @var \BetaKiller\Repository\MissingUrlRepository

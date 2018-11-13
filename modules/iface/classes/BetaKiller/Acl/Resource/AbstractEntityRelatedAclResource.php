@@ -45,10 +45,6 @@ abstract class AbstractEntityRelatedAclResource extends AbstractCrudlsPermission
     protected function getActionsWithoutEntity(): array
     {
         // Create, list and search actions do not require entity model to be set before processing
-        return [
-            self::ACTION_CREATE,
-            self::ACTION_LIST,
-            self::ACTION_SEARCH,
-        ];
+        return self::ACTIONS_WITHOUT_ENTITY;
     }
 }

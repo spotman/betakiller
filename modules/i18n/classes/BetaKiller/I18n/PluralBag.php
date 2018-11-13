@@ -18,13 +18,8 @@ class PluralBag implements PluralBagInterface
     public function __construct(array $values)
     {
         foreach ($values as $form => $value) {
-            $this->setValue($form, $value);
+            $this->values[$form] = $value;
         }
-    }
-
-    public function setValue(string $form, string $value): void
-    {
-        $this->values[$form] = $value;
     }
 
     public function getValue(string $form): string

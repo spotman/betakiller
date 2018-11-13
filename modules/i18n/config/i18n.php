@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 return [
     'loaders' => [
-        // Non-specific translations
+        // Standard i18n from database
         \BetaKiller\I18n\DatabaseTranslationLoader::class,
     ],
 ];

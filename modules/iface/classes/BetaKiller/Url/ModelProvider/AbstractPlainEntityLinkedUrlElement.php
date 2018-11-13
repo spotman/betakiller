@@ -11,7 +11,6 @@ abstract class AbstractPlainEntityLinkedUrlElement extends AbstractPlainUrlEleme
     public const OPTION_ENTITY_NAME   = 'entity';
     public const OPTION_ENTITY_ACTION = 'entityAction';
 
-
     /**
      * @var string|null
      */

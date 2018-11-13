@@ -1,0 +1,43 @@
+{% extends layout %}
+
+{% block content %}
+
+  <div class="row">
+    <div class="col s12">
+
+      {#<div class="right">#}
+        {#<br>#}
+        {#<a href="{{ filter.self }}" class="btn">All</a>#}
+        {#{% for filter_item in filter.list %}#}
+          {#<a href="{{ filter_item.url }}" class="btn">{{ filter_item.label }}</a>#}
+        {#{% endfor %}#}
+      {#</div>#}
+
+      <h1>Keys required translation ({{ empty_items|length }} total)</h1>
+
+      <table>
+        <thead>
+        <tr>
+          <td>#</td>
+          <td>Key with default value</td>
+        </tr>
+        </thead>
+        <tbody>
+
+        {% for item in empty_items %}
+          <tr>
+            <td>{{ loop.index }}</td>
+            <td>
+              <a href="{{ item.url }}">{{ item.key }}</a><br />
+              <small>{{ item.value }}</small>
+            </td>
+          </tr>
+        {% endfor %}
+
+        </tbody>
+      </table>
+
+    </div>
+  </div>
+
+{% endblock %}

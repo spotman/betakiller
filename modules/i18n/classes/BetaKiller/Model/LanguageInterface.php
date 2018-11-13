@@ -42,6 +42,16 @@ interface LanguageInterface extends AbstractEntityInterface
     public function getLabel(): string;
 
     /**
+     * @return \BetaKiller\Model\LanguageInterface
+     */
+    public function markAsDefault(): LanguageInterface;
+
+    /**
+     * @return \BetaKiller\Model\LanguageInterface
+     */
+    public function markAsNonDefault(): LanguageInterface;
+
+    /**
      * @param bool $value
      *
      * @return \BetaKiller\Model\LanguageInterface
@@ -57,6 +67,11 @@ interface LanguageInterface extends AbstractEntityInterface
      * @return \BetaKiller\Model\LanguageInterface
      */
     public function markAsNonSystem(): LanguageInterface;
+
+    /**
+     * @return bool
+     */
+    public function isDefault(): bool;
 
     /**
      * @return bool

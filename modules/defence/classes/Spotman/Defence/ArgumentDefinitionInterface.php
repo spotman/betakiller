@@ -3,18 +3,25 @@ declare(strict_types=1);
 
 namespace Spotman\Defence;
 
-use Spotman\Defence\Filter\FilterInterface;
-use Spotman\Defence\Rule\DefinitionRuleInterface;
-
 interface ArgumentDefinitionInterface
 {
+    // Scalar types
     public const TYPE_IDENTITY = 'id';
     public const TYPE_BOOLEAN  = 'bool';
     public const TYPE_INTEGER  = 'int';
     public const TYPE_STRING   = 'string';
     public const TYPE_EMAIL    = 'email';
+    public const TYPE_TEXT   = 'text';
     public const TYPE_HTML     = 'html';
-    public const TYPE_ARRAY    = 'array';
+
+    // Named collection of scalars
+    public const TYPE_COMPOSITE = 'composite';
+
+    // Indexed array of scalars
+    public const TYPE_SINGLE_ARRAY = 'single_array';
+
+    // Indexed array of composites
+    public const TYPE_COMPOSITE_ARRAY = 'composite_array';
 
     public const ALLOWED_TYPES = [
         self::TYPE_IDENTITY,
@@ -22,8 +29,11 @@ interface ArgumentDefinitionInterface
         self::TYPE_INTEGER,
         self::TYPE_STRING,
         self::TYPE_EMAIL,
+        self::TYPE_TEXT,
         self::TYPE_HTML,
-        self::TYPE_ARRAY,
+        self::TYPE_COMPOSITE,
+        self::TYPE_SINGLE_ARRAY,
+        self::TYPE_COMPOSITE_ARRAY,
     ];
 
     /**
@@ -42,39 +52,19 @@ interface ArgumentDefinitionInterface
     public function isOptional(): bool;
 
     /**
-     * @return mixed|null
-     */
-    public function getDefaultValue();
-
-    /**
      *
      */
     public function markAsOptional(): void;
 
     /**
+     * @return mixed|null
+     */
+    public function getDefaultValue();
+
+    /**
      * @param mixed $value
      */
     public function setDefaultValue($value): void;
-
-    /**
-     * @param \Spotman\Defence\Rule\DefinitionRuleInterface $rule
-     */
-    public function addRule(DefinitionRuleInterface $rule): void;
-
-    /**
-     * @return \Spotman\Defence\Rule\DefinitionRuleInterface[]
-     */
-    public function getRules(): array;
-
-    /**
-     * @param \Spotman\Defence\Filter\FilterInterface $filter
-     */
-    public function addFilter(FilterInterface $filter): void;
-
-    /**
-     * @return \Spotman\Defence\Filter\FilterInterface[]
-     */
-    public function getFilters(): array;
 
     /**
      * Returns true if rule defines identity argument
@@ -123,5 +113,5 @@ interface ArgumentDefinitionInterface
      *
      * @return bool
      */
-    public function isArray(): bool;
+    public function isComposite(): bool;
 }

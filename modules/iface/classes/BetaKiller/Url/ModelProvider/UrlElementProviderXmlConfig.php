@@ -110,7 +110,7 @@ class UrlElementProviderXmlConfig implements UrlElementProviderInterface
         if ($xmlParent) {
             // Parent codename is not needed if nested in XML
             if (isset($config[AbstractPlainUrlElementModel::OPTION_PARENT])) {
-                throw new UrlElementException('UrlElement :name is already nested; no "parent" attribute please', [
+                throw new UrlElementException('UrlElement ":name" is already nested; no "parent" attribute please', [
                     ':name' => $codename,
                 ]);
             }
@@ -140,7 +140,7 @@ class UrlElementProviderXmlConfig implements UrlElementProviderInterface
 
         if (empty($config[AbstractPlainUrlElementWithZone::OPTION_ZONE])) {
             if (!$parent) {
-                throw new UrlElementException('Root URL element :name must define a zone', [
+                throw new UrlElementException('Root URL element ":name" must define a zone', [
                     ':name' => $codename,
                 ]);
             }

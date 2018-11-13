@@ -13,6 +13,7 @@ interface FilterInterface extends GuardInterface
      * @param mixed $value
      *
      * @return mixed
+     * @throws \InvalidArgumentException
      */
     public function apply($value);
 }

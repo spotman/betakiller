@@ -32,6 +32,10 @@ class PositiveIntegerRule implements DefinitionRuleInterface
      */
     public function check($value): bool
     {
+        if (!\is_int($value)) {
+            throw new \InvalidArgumentException;
+        }
+
         return $value > 0;
     }
 }

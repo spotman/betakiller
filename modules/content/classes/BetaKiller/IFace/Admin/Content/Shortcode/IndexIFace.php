@@ -2,11 +2,11 @@
 namespace BetaKiller\IFace\Admin\Content\Shortcode;
 
 use BetaKiller\Content\Shortcode\ShortcodeEntityInterface;
-use BetaKiller\IFace\Admin\AbstractAdminBase;
+use BetaKiller\IFace\Admin\AbstractAdminIFace;
 use BetaKiller\Repository\ShortcodeRepository;
 use Psr\Http\Message\ServerRequestInterface;
 
-class IndexIFace extends AbstractAdminBase
+class IndexIFace extends AbstractAdminIFace
 {
     /**
      * @var \BetaKiller\Repository\ShortcodeRepository

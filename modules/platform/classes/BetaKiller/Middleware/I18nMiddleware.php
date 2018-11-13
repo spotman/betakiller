@@ -82,7 +82,7 @@ class I18nMiddleware implements MiddlewareInterface
         }
 
         // App default language as fallback
-        return $this->facade->getDefaultLanguage();
+        return $this->facade->getDefaultLanguageName();
     }
 
     private function detectUserLang(ServerRequestInterface $request): ?string

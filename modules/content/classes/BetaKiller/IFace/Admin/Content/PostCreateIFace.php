@@ -3,7 +3,7 @@ namespace BetaKiller\IFace\Admin\Content;
 
 use Psr\Http\Message\ServerRequestInterface;
 
-class PostCreateIFace extends AbstractAdminBase
+class PostCreateIFace extends AbstractContentAdminIFace
 {
     /**
      * Returns data for View

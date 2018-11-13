@@ -8,6 +8,8 @@ use BetaKiller\I18n\PluralBagFactoryInterface;
 use BetaKiller\I18n\PluralBagFormatterInterface;
 use BetaKiller\I18n\Translator;
 use BetaKiller\I18n\TranslatorInterface;
+use BetaKiller\Repository\LanguageRepository;
+use BetaKiller\Repository\LanguageRepositoryInterface;
 
 return [
 
@@ -21,6 +23,7 @@ return [
         PluralBagFactoryInterface::class   => \DI\autowire(PluralBagFactory::class),
         PluralBagFormatterInterface::class => \DI\autowire(JsonPluralBagFormatter::class),
 
+        LanguageRepositoryInterface::class => \DI\autowire(LanguageRepository::class),
     ],
 
 ];

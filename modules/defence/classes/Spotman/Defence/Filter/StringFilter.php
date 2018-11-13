@@ -30,14 +30,25 @@ class StringFilter extends AbstractFilterVarFilter
      *
      * @param mixed $value
      *
-     * @return mixed
+     * @return string
+     * @throws \InvalidArgumentException
      */
-    public function apply($value)
+    public function apply($value): string
     {
-        return $this->filterVar(
+        if (!\is_string($value)) {
+            throw new \InvalidArgumentException;
+        }
+
+        $value = $this->filterVar(
             $value,
             \FILTER_SANITIZE_STRING,
-            \FILTER_FLAG_STRIP_LOW + \FILTER_FLAG_STRIP_HIGH
+            \FILTER_FLAG_STRIP_LOW + \FILTER_FLAG_STRIP_HIGH + \FILTER_FLAG_NO_ENCODE_QUOTES
         );
+
+        if ($value === null) {
+            throw new \InvalidArgumentException;
+        }
+
+        return trim((string)$value);
     }
 }

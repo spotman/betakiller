@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\Model;
 
-class TranslationKey extends \ORM implements TranslationKeyModelInterface
+class TranslationKey extends AbstractOrmBasedI18nKeyModel implements TranslationKeyModelInterface
 {
     public const TABLE_FIELD_KEY       = 'key';
     public const TABLE_FIELD_IS_PLURAL = 'is_plural';

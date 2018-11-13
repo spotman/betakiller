@@ -7,7 +7,7 @@ use BetaKiller\Model\PhpExceptionModelInterface;
 use BetaKiller\Repository\UserRepository;
 use Psr\Http\Message\ServerRequestInterface;
 
-class PhpExceptionItemIFace extends ErrorAdminBase
+class PhpExceptionItemIFace extends AbstractErrorAdminIFace
 {
     /**
      * @var \BetaKiller\Repository\UserRepository

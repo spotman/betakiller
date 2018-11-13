@@ -34,10 +34,21 @@ class EmailFilter extends AbstractFilterVarFilter
      */
     public function apply($value)
     {
-        return $this->filterVar(
-            $value,
+        if (!\is_string($value)) {
+            throw new \InvalidArgumentException;
+        }
+
+        $value = $this->filterVar(
+            trim($value), // Remove spaces
             \FILTER_VALIDATE_EMAIL,
             \FILTER_FLAG_EMAIL_UNICODE
         );
+
+        if ($value === null) {
+            throw new \InvalidArgumentException;
+        }
+
+        // Lowercase for simplicity
+        return \mb_strtolower($value);
     }
 }

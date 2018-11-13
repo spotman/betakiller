@@ -11,7 +11,7 @@ use BetaKiller\Repository\EntityRepository;
 use BetaKiller\Repository\ShortcodeRepository;
 use Psr\Http\Message\ServerRequestInterface;
 
-class PostItemIFace extends AbstractAdminBase
+class PostItemIFace extends AbstractContentAdminIFace
 {
     /**
      * @var \BetaKiller\Helper\ContentUrlContainerHelper

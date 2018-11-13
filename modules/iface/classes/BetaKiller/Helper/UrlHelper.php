@@ -8,6 +8,7 @@ use BetaKiller\CrudlsActionsInterface;
 use BetaKiller\Factory\FactoryException;
 use BetaKiller\IFace\Exception\UrlElementException;
 use BetaKiller\Model\DispatchableEntityInterface;
+use BetaKiller\Url\Behaviour\UrlBehaviourException;
 use BetaKiller\Url\Behaviour\UrlBehaviourFactory;
 use BetaKiller\Url\Container\ResolvingUrlContainer;
 use BetaKiller\Url\Container\UrlContainer;
@@ -154,9 +155,27 @@ class UrlHelper
         $params->setParameter($entity);
 
         // Search for URL element with provided entity, action and zone
-        $urlElement = $this->tree->getByEntityActionAndZone($entity, $action, $zone);
+        $urlElement = $this->tree->getByEntityActionAndZone($entity->getModelName(), $action, $zone);
 
         return $this->makeUrl($urlElement, $params, $removeCycling);
+    }
+
+    public function getEntityNameUrl(
+        string $entityName,
+        string $action,
+        string $zone,
+        ?bool $removeCycling = null
+    ): string {
+        if (!\in_array($action, CrudlsActionsInterface::ACTIONS_WITHOUT_ENTITY, true)) {
+            throw new UrlBehaviourException('Action ":action" requires entity instance for URL generation', [
+                ':action' => $action,
+            ]);
+        }
+
+        // Search for URL element with provided entity, action and zone
+        $urlElement = $this->tree->getByEntityActionAndZone($entityName, $action, $zone);
+
+        return $this->makeUrl($urlElement, null, $removeCycling);
     }
 
     /**
@@ -213,27 +232,29 @@ class UrlHelper
     }
 
     /**
-     * @param \BetaKiller\Model\DispatchableEntityInterface $entity
-     * @param string                                        $zone
+     * @param string $entityName
+     * @param string $zone
      *
      * @return string
      * @throws \BetaKiller\IFace\Exception\UrlElementException
+     * @throws \BetaKiller\Url\Behaviour\UrlBehaviourException
      */
-    public function getListEntityUrl(DispatchableEntityInterface $entity, string $zone): string
+    public function getListEntityUrl(string $entityName, string $zone): string
     {
-        return $this->getEntityUrl($entity, CrudlsActionsInterface::ACTION_LIST, $zone);
+        return $this->getEntityNameUrl($entityName, CrudlsActionsInterface::ACTION_LIST, $zone);
     }
 
     /**
-     * @param \BetaKiller\Model\DispatchableEntityInterface $entity
-     * @param string                                        $zone
+     * @param string $entityName
+     * @param string $zone
      *
      * @return string
      * @throws \BetaKiller\IFace\Exception\UrlElementException
+     * @throws \BetaKiller\Url\Behaviour\UrlBehaviourException
      */
-    public function getSearchEntityUrl(DispatchableEntityInterface $entity, string $zone): string
+    public function getSearchEntityUrl(string $entityName, string $zone): string
     {
-        return $this->getEntityUrl($entity, CrudlsActionsInterface::ACTION_SEARCH, $zone);
+        return $this->getEntityNameUrl($entityName, CrudlsActionsInterface::ACTION_SEARCH, $zone);
     }
 
     /**

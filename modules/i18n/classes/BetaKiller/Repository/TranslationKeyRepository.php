@@ -3,8 +3,6 @@ declare(strict_types=1);
 
 namespace BetaKiller\Repository;
 
-use BetaKiller\Model\ExtendedOrmInterface;
-use BetaKiller\Model\I18nKeyModelInterface;
 use BetaKiller\Model\TranslationKey;
 use BetaKiller\Model\TranslationKeyModelInterface;
 
@@ -15,7 +13,7 @@ use BetaKiller\Model\TranslationKeyModelInterface;
  * @method TranslationKeyModelInterface create()
  * @method save(TranslationKeyModelInterface $model)
  */
-class TranslationKeyRepository extends AbstractOrmBasedDispatchableRepository implements I18nKeyRepositoryInterface
+class TranslationKeyRepository extends AbstractI18nKeyRepository
 {
     /**
      * @return string
@@ -25,19 +23,8 @@ class TranslationKeyRepository extends AbstractOrmBasedDispatchableRepository im
         return TranslationKey::TABLE_FIELD_KEY;
     }
 
-    public function findByKeyName(string $i18nKey): ?I18nKeyModelInterface
+    protected function getKeyFieldName(): string
     {
-        $orm = $this->getOrmInstance();
-
-        return $this
-            ->filterKey($orm, $i18nKey)
-            ->findOne($orm);
-    }
-
-    private function filterKey(ExtendedOrmInterface $orm, string $key): self
-    {
-        $orm->where($orm->object_column(TranslationKey::TABLE_FIELD_KEY), '=', $key);
-
-        return $this;
+        return TranslationKey::TABLE_FIELD_KEY;
     }
 }

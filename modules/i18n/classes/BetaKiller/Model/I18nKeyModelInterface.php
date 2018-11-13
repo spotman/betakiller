@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\Model;
 
-interface I18nKeyModelInterface extends AbstractEntityInterface
+interface I18nKeyModelInterface extends DispatchableEntityInterface
 {
     /**
      * @return string

@@ -24,6 +24,7 @@ return array(
             'backup',
             'content',
             'core',
+            'defence',
             'email',
             'error',
             'iface',

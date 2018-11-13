@@ -4,14 +4,14 @@ namespace BetaKiller\Api\Method\ContentComment;
 use BetaKiller\Api\Method\AbstractEntityUpdateApiMethod;
 use BetaKiller\Model\AbstractEntityInterface;
 use BetaKiller\Model\UserInterface;
-use Spotman\Defence\DefinitionBuilderInterface;
 use Spotman\Defence\ArgumentsInterface;
+use Spotman\Defence\DefinitionBuilderInterface;
 
 class UpdateApiMethod extends AbstractEntityUpdateApiMethod
 {
-    use ContentCommentMethodTrait;
-
-    private const ARG_DATA = 'data';
+    private const ARG_DATA        = 'data';
+    private const ARG_AUTHOR_NAME = 'author_name';
+    private const ARG_MESSAGE     = 'message';
 
     /**
      * @return \Spotman\Defence\DefinitionBuilderInterface
@@ -19,7 +19,9 @@ class UpdateApiMethod extends AbstractEntityUpdateApiMethod
     public function getArgumentsDefinition(): DefinitionBuilderInterface
     {
         return $this->definition()
-            ->array(self::ARG_DATA);
+            ->composite(self::ARG_DATA)
+            ->string(self::ARG_AUTHOR_NAME)->optional()
+            ->string(self::ARG_MESSAGE)->optional();
     }
 
     /**
@@ -37,12 +39,12 @@ class UpdateApiMethod extends AbstractEntityUpdateApiMethod
     {
         $data = $arguments->getArray(self::ARG_DATA);
 
-        if (isset($data['author_name'])) {
-            $model->setGuestAuthorName($this->sanitizeString($data['author_name']));
+        if (isset($data[self::ARG_AUTHOR_NAME])) {
+            $model->setGuestAuthorName($data[self::ARG_AUTHOR_NAME]);
         }
 
-        if (isset($data['message'])) {
-            $model->setMessage($data['message']);
+        if (isset($data[self::ARG_MESSAGE])) {
+            $model->setMessage($data[self::ARG_MESSAGE]);
         }
 
         $this->saveEntity($model);

@@ -15,7 +15,7 @@ class StaticAssets
     private $appEnv;
 
     /**
-     * @var array
+     * @var AssetsConfig
      */
     private $config;
 

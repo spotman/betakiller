@@ -27,14 +27,17 @@ class I18nHelper
         $this->facade = $facade;
     }
 
-    public function getDefaultLanguage(): string
+    public function getDefaultLanguageName(): string
     {
-        return $this->facade->getDefaultLanguage();
+        return $this->facade->getDefaultLanguageName();
     }
 
-    public function getAllowedLanguages(): array
+    /**
+     * @return string[]
+     */
+    public function getAllowedLanguagesNames(): array
     {
-        return $this->facade->getAllowedLanguages();
+        return $this->facade->getAllowedLanguagesNames();
     }
 
     public function getLang(): string
@@ -50,7 +53,7 @@ class I18nHelper
         if (!$this->facade->hasLanguage($value)) {
             throw new Exception('Unknown language :lang, only these are allowed: :allowed', [
                 ':lang'    => $value,
-                ':allowed' => implode(', ', $this->getAllowedLanguages()),
+                ':allowed' => implode(', ', $this->getAllowedLanguagesNames()),
             ]);
         }
 
@@ -59,7 +62,7 @@ class I18nHelper
 
     public function getLocale(): string
     {
-        $lang = $this->lang ?: $this->getDefaultLanguage();
+        $lang = $this->lang ?: $this->getDefaultLanguageName();
 
         return $this->facade->getLanguageLocale($lang);
     }
@@ -76,6 +79,6 @@ class I18nHelper
 
     public function pluralize(string $key, $form, array $values = null, string $lang = null): string
     {
-        return $this->facade->pluralize($lang ?: $this->lang, $key, $values);
+        return $this->facade->pluralize($lang ?: $this->lang, $key, $form, $values);
     }
 }

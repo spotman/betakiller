@@ -27,7 +27,10 @@ class JsonPluralBagFormatter implements PluralBagFormatterInterface
      */
     public function parse(string $packedPluralString): PluralBagInterface
     {
-        $data = \json_decode($packedPluralString, true);
+        // Empty string means empty array
+        $data = $packedPluralString
+            ? \json_decode($packedPluralString, true)
+            : [];
 
         if (!\is_array($data)) {
             throw new I18nException('Incorrect plural bag string, ":value"', [

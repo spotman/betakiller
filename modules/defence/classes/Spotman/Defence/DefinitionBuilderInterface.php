@@ -42,6 +42,15 @@ interface DefinitionBuilderInterface
     public function email(string $name): DefinitionBuilderInterface;
 
     /**
+     * Define string argument containing multi-line text
+     *
+     * @param string $name
+     *
+     * @return \Spotman\Defence\DefinitionBuilderInterface
+     */
+    public function text(string $name): DefinitionBuilderInterface;
+
+    /**
      * Define string argument containing HTML code
      *
      * @param string $name
@@ -60,13 +69,47 @@ interface DefinitionBuilderInterface
     public function bool(string $name): DefinitionBuilderInterface;
 
     /**
-     * Define array argument
+     * Define indexed array of integers
      *
      * @param string $name
      *
      * @return \Spotman\Defence\DefinitionBuilderInterface
      */
-    public function array(string $name): DefinitionBuilderInterface;
+    public function intArray(string $name): DefinitionBuilderInterface;
+
+    /**
+     * Define indexed array of strings like ['asd', 'qwe']
+     *
+     * @param string $name
+     *
+     * @return \Spotman\Defence\DefinitionBuilderInterface
+     */
+    public function stringArray(string $name): DefinitionBuilderInterface;
+
+    /**
+     * Define indexed array of nested collections like [{}, {}, {}]
+     *
+     * @param string $name
+     *
+     * @return \Spotman\Defence\DefinitionBuilderInterface
+     */
+    public function compositeArray(string $name): DefinitionBuilderInterface;
+
+    /**
+     * Define named collection of arguments like {"name": {}}
+     *
+     * @param string $name
+     *
+     * @return \Spotman\Defence\DefinitionBuilderInterface
+     */
+    public function composite(string $name): DefinitionBuilderInterface;
+
+    /**
+     * End nested definition
+     *
+     * @return \Spotman\Defence\DefinitionBuilderInterface
+     */
+    public function endComposite(): DefinitionBuilderInterface;
 
     /**
      * Mark last argument as optional
@@ -83,11 +126,6 @@ interface DefinitionBuilderInterface
      * @return \Spotman\Defence\DefinitionBuilderInterface
      */
     public function default($value): DefinitionBuilderInterface;
-
-    /**
-     * @return ArgumentDefinitionInterface[]
-     */
-    public function getArguments(): array;
 
     /**
      * Rule helpers below
@@ -107,6 +145,13 @@ interface DefinitionBuilderInterface
     public function positive(): DefinitionBuilderInterface;
 
     /**
+     * @param array $allowed
+     *
+     * @return \Spotman\Defence\DefinitionBuilderInterface
+     */
+    public function whitelist(array $allowed): DefinitionBuilderInterface;
+
+    /**
      * Filter helpers below
      */
 
@@ -119,4 +164,9 @@ interface DefinitionBuilderInterface
      * @return \Spotman\Defence\DefinitionBuilderInterface
      */
     public function uppercase(): DefinitionBuilderInterface;
+
+    /**
+     * @return \Spotman\Defence\ArgumentDefinitionInterface[]
+     */
+    public function getArguments(): array;
 }
