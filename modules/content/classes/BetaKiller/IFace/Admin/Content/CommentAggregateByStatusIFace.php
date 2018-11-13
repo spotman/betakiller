@@ -3,7 +3,7 @@ namespace BetaKiller\IFace\Admin\Content;
 
 use Psr\Http\Message\ServerRequestInterface;
 
-class CommentAggregateByStatusIFace extends AbstractAdminBase
+class CommentAggregateByStatusIFace extends AbstractContentAdminIFace
 {
     /**
      * Returns data for View

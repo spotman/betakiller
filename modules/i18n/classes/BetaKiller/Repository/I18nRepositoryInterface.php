@@ -30,4 +30,11 @@ interface I18nRepositoryInterface extends RepositoryInterface
      * @return \BetaKiller\Model\I18nModelInterface|null
      */
     public function findFirstNoEmpty(I18nKeyModelInterface $key): ?I18nModelInterface;
+
+    /**
+     * @param \BetaKiller\Model\LanguageInterface[] $languages
+     *
+     * @return \BetaKiller\Model\I18nModelInterface[]
+     */
+    public function findEmptyItems(array $languages): array;
 }

@@ -88,6 +88,14 @@ class Arguments implements ArgumentsInterface
         return (array)$this->args[$key];
     }
 
+    /**
+     * @return mixed[]
+     */
+    public function getAll(): array
+    {
+        return $this->args;
+    }
+
     private function detectID(): ?string
     {
         if (!empty($this->args[self::IDENTITY_KEY])) {

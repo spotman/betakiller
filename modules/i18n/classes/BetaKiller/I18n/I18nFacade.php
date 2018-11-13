@@ -3,34 +3,30 @@ declare(strict_types=1);
 
 namespace BetaKiller\I18n;
 
-use BetaKiller\Config\AppConfigInterface;
 use BetaKiller\Helper\LoggerHelperTrait;
+use BetaKiller\Model\LanguageInterface;
+use BetaKiller\Repository\LanguageRepositoryInterface;
 use Psr\Log\LoggerInterface;
 
 final class I18nFacade
 {
     use LoggerHelperTrait;
 
+    public const ROLE_TRANSLATOR = 'translator';
+
     public const PLACEHOLDER_PREFIX = ':';
 
     private const KEY_REGEX = '/^[a-z0-9_]+(?:[\.]{1}[a-z0-9-_]+)+$/m';
 
     /**
-     * @var \BetaKiller\Config\AppConfigInterface
+     * @var \BetaKiller\Model\LanguageInterface[]
      */
-    private $appConfig;
-
-    /**
-     * "lang codename" => "default locale"
-     *
-     * @var array
-     */
-    private $languagesConfig;
+    private $languages;
 
     /**
      * @var string[]
      */
-    private $allowedLanguages;
+    private $languagesNames;
 
     /**
      * @var \Psr\Log\LoggerInterface
@@ -42,52 +38,66 @@ final class I18nFacade
      */
     private $translator;
 
+    /**
+     * @var \BetaKiller\Repository\LanguageRepositoryInterface
+     */
+    private $langRepo;
+
     public function __construct(
-        AppConfigInterface $appConfig,
-        LoggerInterface $logger,
-        TranslatorInterface $translator
+        TranslatorInterface $translator,
+        LanguageRepositoryInterface $langRepo,
+        LoggerInterface $logger
     ) {
-        $this->appConfig  = $appConfig;
-        $this->logger     = $logger;
         $this->translator = $translator;
+        $this->langRepo   = $langRepo;
+        $this->logger     = $logger;
 
         $this->init();
     }
 
     private function init(): void
     {
-        $this->languagesConfig  = $this->appConfig->getAllowedLanguages();
-        $this->allowedLanguages = \array_keys($this->languagesConfig);
+        $this->languages = $this->langRepo->getAllSystem();
 
-        if (!$this->allowedLanguages) {
-            throw new \RuntimeException('Define app languages in config/app.php');
+        if (!$this->languages) {
+            throw new \RuntimeException('Define languages first and import them via import:languages task');
         }
 
+        $this->languagesNames = \array_map(function (LanguageInterface $lang) {
+            return $lang->getName();
+        }, $this->languages);
+
         // Set default language locale as a fallback
-        $defaultLang   = $this->getDefaultLanguage();
+        $defaultLang   = $this->getDefaultLanguageName();
         $defaultLocale = $this->getLanguageLocale($defaultLang);
         $this->translator->setFallbackLocale($defaultLocale);
     }
 
     public function hasLanguage(string $lang): bool
     {
-        return isset($this->languagesConfig[$lang]);
+        return \in_array($lang, $this->languagesNames, true);
     }
 
-    public function getDefaultLanguage(): string
+    public function getDefaultLanguageName(): string
     {
         // First language is primary
-        return $this->allowedLanguages[0];
+        return $this->languagesNames[0];
     }
 
-    public function getAllowedLanguages(): array
+    public function getAllowedLanguagesNames(): array
     {
-        return $this->allowedLanguages;
+        return $this->languagesNames;
     }
 
     public function getLanguageLocale(string $lang): string
     {
-        return $this->languagesConfig[$lang];
+        foreach ($this->languages as $model) {
+            if ($model->getName() === $lang) {
+                return $model->getLocale();
+            }
+        }
+
+        throw new \LogicException(sprintf('Unknown language "%s"', $lang));
     }
 
     public function translate(string $lang, string $key, array $values = null): string
@@ -121,6 +131,17 @@ final class I18nFacade
         $string = $this->translator->pluralize($key, $form, $locale);
 
         return $this->replacePlaceholders($string, $values);
+    }
+
+    /**
+     * @param string $locale
+     *
+     * @return string[]
+     * @throws \Punic\Exception
+     */
+    public function getPluralFormsForLocale(string $locale): array
+    {
+        return \Punic\Plural::getRules($locale);
     }
 
     /**

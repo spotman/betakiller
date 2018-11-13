@@ -8,16 +8,6 @@ use Spotman\Defence\ArgumentsInterface;
 abstract class AbstractEntityCreateApiMethod extends AbstractEntityBasedApiMethod
 {
     /**
-     * @var \stdClass
-     */
-    protected $data;
-
-    public function __construct($data)
-    {
-        $this->data = $data;
-    }
-
-    /**
      * @param \Spotman\Defence\ArgumentsInterface $arguments
      * @param \BetaKiller\Model\UserInterface     $user
      *
@@ -28,7 +18,7 @@ abstract class AbstractEntityCreateApiMethod extends AbstractEntityBasedApiMetho
     public function execute(ArgumentsInterface $arguments, UserInterface $user): ?ApiMethodResponse
     {
         $entity       = $this->getEntity($arguments);
-        $responseData = $this->create($entity, $this->data);
+        $responseData = $this->create($entity, $arguments, $user);
 
         $this->saveEntity($entity);
 
@@ -38,10 +28,12 @@ abstract class AbstractEntityCreateApiMethod extends AbstractEntityBasedApiMetho
     /**
      * Override this method
      *
-     * @param \BetaKiller\Model\AbstractEntityInterface      $model
-     * @param                                                $data
+     * @param \BetaKiller\Model\AbstractEntityInterface $model
+     * @param \Spotman\Defence\ArgumentsInterface       $arguments
+     *
+     * @param \BetaKiller\Model\UserInterface           $user
      *
      * @return mixed
      */
-    abstract protected function create($model, $data);
+    abstract protected function create($model, ArgumentsInterface $arguments, UserInterface $user);
 }

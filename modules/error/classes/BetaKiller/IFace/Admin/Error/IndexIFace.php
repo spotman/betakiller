@@ -3,7 +3,7 @@ namespace BetaKiller\IFace\Admin\Error;
 
 use Psr\Http\Message\ServerRequestInterface;
 
-class IndexIFace extends ErrorAdminBase
+class IndexIFace extends AbstractErrorAdminIFace
 {
     /**
      * Returns data for View

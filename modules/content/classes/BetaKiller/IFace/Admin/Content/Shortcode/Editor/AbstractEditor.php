@@ -5,10 +5,10 @@ use BetaKiller\Content\Shortcode\Editor\ShortcodeEditorFactory;
 use BetaKiller\Content\Shortcode\Editor\ShortcodeEditorInterface;
 use BetaKiller\Content\Shortcode\ShortcodeEntityInterface;
 use BetaKiller\Content\Shortcode\ShortcodeFacade;
-use BetaKiller\IFace\Admin\Content\AbstractAdminBase;
+use BetaKiller\IFace\Admin\Content\AbstractContentAdminIFace;
 use BetaKiller\Url\Container\UrlContainerInterface;
 
-abstract class AbstractEditor extends AbstractAdminBase
+abstract class AbstractEditor extends AbstractContentAdminIFace
 {
     /**
      * @var \BetaKiller\Content\Shortcode\ShortcodeEntityInterface

@@ -2,25 +2,43 @@
 namespace BetaKiller\Api\Method\ContentComment;
 
 use BetaKiller\Api\Method\AbstractEntityCreateApiMethod;
+use BetaKiller\Model\ContentCommentInterface;
+use BetaKiller\Model\UserInterface;
+use Spotman\Defence\ArgumentsInterface;
+use Spotman\Defence\DefinitionBuilderInterface;
 
 class CreateApiMethod extends AbstractEntityCreateApiMethod
 {
-    use ContentCommentMethodTrait;
+    private const ARG_DATA        = 'data';
+    private const ARG_AUTHOR_NAME = 'author_name';
+    private const ARG_MESSAGE     = 'message';
+
+    /**
+     * @return \Spotman\Defence\DefinitionBuilderInterface
+     */
+    public function getArgumentsDefinition(): DefinitionBuilderInterface
+    {
+        return $this->definition()
+            ->composite(self::ARG_DATA)
+            ->string(self::ARG_AUTHOR_NAME)
+            ->string(self::ARG_MESSAGE);
+    }
 
     /**
      * Implement this method
      *
-     * @param \BetaKiller\Api\Method\ContentComment\AbstractEntityInterface $model
-     * @param                                                               $data
+     * @param \BetaKiller\Model\ContentCommentInterface $model
+     * @param \Spotman\Defence\ArgumentsInterface       $arguments
+     * @param \BetaKiller\Model\UserInterface           $user
      *
-     * @return \BetaKiller\Api\Method\ContentComment\AbstractEntityInterface
+     * @return \BetaKiller\Model\ContentCommentInterface
      */
-    protected function create($model, $data)
+    protected function create($model, ArgumentsInterface $arguments, UserInterface $user): ContentCommentInterface
     {
-        $model->set_guest_author_name($this->sanitizeString($data->author_name));
-        $model->set_message($data->message);
+        $data = $arguments->getArray(self::ARG_DATA);
 
-        $model->create();
+        $model->setGuestAuthorName($data[self::ARG_AUTHOR_NAME]);
+        $model->setMessage($data[self::ARG_MESSAGE]);
 
         // Return created model data
         return $model;

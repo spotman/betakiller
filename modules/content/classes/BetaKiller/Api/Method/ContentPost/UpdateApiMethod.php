@@ -4,14 +4,17 @@ namespace BetaKiller\Api\Method\ContentPost;
 use BetaKiller\Api\Method\AbstractEntityUpdateApiMethod;
 use BetaKiller\Model\AbstractEntityInterface;
 use BetaKiller\Model\UserInterface;
-use Spotman\Defence\DefinitionBuilderInterface;
 use Spotman\Defence\ArgumentsInterface;
+use Spotman\Defence\DefinitionBuilderInterface;
 
 class UpdateApiMethod extends AbstractEntityUpdateApiMethod
 {
-    use ContentPostMethodTrait;
-
-    private const ARG_DATA = 'data';
+    private const ARG_DATA    = 'data';
+    private const ARG_LABEL   = 'label';
+    private const ARG_URI     = 'uri';
+    private const ARG_TITLE   = 'title';
+    private const ARG_DESC    = 'description';
+    private const ARG_CONTENT = 'content';
 
     /**
      * @return \Spotman\Defence\DefinitionBuilderInterface
@@ -19,7 +22,12 @@ class UpdateApiMethod extends AbstractEntityUpdateApiMethod
     public function getArgumentsDefinition(): DefinitionBuilderInterface
     {
         return $this->definition()
-            ->array(self::ARG_DATA);
+            ->composite(self::ARG_DATA)
+            ->string(self::ARG_LABEL)->optional()
+            ->string(self::ARG_URI)->optional()
+            ->string(self::ARG_TITLE)->optional()
+            ->string(self::ARG_DESC)->optional()
+            ->string(self::ARG_CONTENT)->optional();
     }
 
     /**
@@ -37,25 +45,25 @@ class UpdateApiMethod extends AbstractEntityUpdateApiMethod
     {
         $data = $arguments->getArray(self::ARG_DATA);
 
-        if (isset($data['label'])) {
-            $model->setLabel($this->sanitizeString($data['label']));
+        if (isset($data[self::ARG_LABEL])) {
+            $model->setLabel($data[self::ARG_LABEL]);
         }
 
-        if (isset($data['uri']) && $data['uri'] !== $model->getUri()) {
+        if (isset($data[self::ARG_URI]) && $data[self::ARG_URI] !== $model->getUri()) {
             // TODO deal with url change
-            $model->setUri($this->sanitizeString($data['uri']));
+            $model->setUri($data[self::ARG_URI]);
         }
 
-        if (isset($data['title'])) {
-            $model->setTitle($this->sanitizeString($data['title']));
+        if (isset($data[self::ARG_TITLE])) {
+            $model->setTitle($data[self::ARG_TITLE]);
         }
 
-        if (isset($data['description'])) {
-            $model->setDescription($this->sanitizeString($data['description']));
+        if (isset($data[self::ARG_DESC])) {
+            $model->setDescription($data[self::ARG_DESC]);
         }
 
-        if (isset($data['content'])) {
-            $model->setContent($data['content']);
+        if (isset($data[self::ARG_CONTENT])) {
+            $model->setContent($data[self::ARG_CONTENT]);
         }
 
         $model->injectNewRevisionAuthor($user);

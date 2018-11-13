@@ -150,7 +150,7 @@ class BarWidget extends AbstractAdminWidget
         I18nHelper $i18n
     ): array {
         $items       = [];
-        $urlElements = $this->tree->getIFacesByActionAndZone(CrudlsActionsInterface::ACTION_CREATE,
+        $urlElements = $this->tree->getByActionAndZone(CrudlsActionsInterface::ACTION_CREATE,
             ZoneInterface::ADMIN);
 
         foreach ($urlElements as $urlElement) {

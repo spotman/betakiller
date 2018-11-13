@@ -3,10 +3,7 @@ declare(strict_types=1);
 
 namespace Spotman\Defence;
 
-use Spotman\Defence\Filter\FilterInterface;
-use Spotman\Defence\Rule\DefinitionRuleInterface;
-
-class ArgumentDefinition implements ArgumentDefinitionInterface
+abstract class AbstractArgumentDefinition implements ArgumentDefinitionInterface
 {
     /**
      * @var string
@@ -27,16 +24,6 @@ class ArgumentDefinition implements ArgumentDefinitionInterface
      * @var mixed|null
      */
     private $defaultValue;
-
-    /**
-     * @var \Spotman\Defence\Rule\DefinitionRuleInterface[]
-     */
-    private $rules = [];
-
-    /**
-     * @var \Spotman\Defence\Filter\FilterInterface[]
-     */
-    private $filters = [];
 
     /**
      * ArgumentDefinition constructor.
@@ -71,6 +58,14 @@ class ArgumentDefinition implements ArgumentDefinitionInterface
     }
 
     /**
+     *
+     */
+    public function markAsOptional(): void
+    {
+        $this->optional = true;
+    }
+
+    /**
      * @return bool
      */
     public function isOptional(): bool
@@ -87,63 +82,11 @@ class ArgumentDefinition implements ArgumentDefinitionInterface
     }
 
     /**
-     *
-     */
-    public function markAsOptional(): void
-    {
-        $this->optional = true;
-    }
-
-    /**
      * @param mixed $value
      */
     public function setDefaultValue($value): void
     {
         $this->defaultValue = $value;
-    }
-
-    /**
-     * @param \Spotman\Defence\Rule\DefinitionRuleInterface $rule
-     */
-    public function addRule(DefinitionRuleInterface $rule): void
-    {
-        $name = $rule->getName();
-
-        if (isset($this->rules[$name])) {
-            throw new \LogicException(sprintf('Duplicate rule "%s" for argument "%s"', $name, $this->name));
-        }
-
-        $this->rules[$name] = $rule;
-    }
-
-    /**
-     * @return \Spotman\Defence\Rule\DefinitionRuleInterface[]
-     */
-    public function getRules(): array
-    {
-        return $this->rules;
-    }
-
-    /**
-     * @param \Spotman\Defence\Filter\FilterInterface $filter
-     */
-    public function addFilter(FilterInterface $filter): void
-    {
-        $name = $filter->getName();
-
-        if (isset($this->rules[$name])) {
-            throw new \LogicException(sprintf('Duplicate filter "%s" for argument "%s"', $name, $this->name));
-        }
-
-        $this->filters[$name] = $filter;
-    }
-
-    /**
-     * @return \Spotman\Defence\Filter\FilterInterface[]
-     */
-    public function getFilters(): array
-    {
-        return $this->filters;
     }
 
     /**
@@ -211,8 +154,8 @@ class ArgumentDefinition implements ArgumentDefinitionInterface
      *
      * @return bool
      */
-    public function isArray(): bool
+    public function isComposite(): bool
     {
-        return $this->getType() === self::TYPE_ARRAY;
+        return $this->getType() === self::TYPE_COMPOSITE;
     }
 }

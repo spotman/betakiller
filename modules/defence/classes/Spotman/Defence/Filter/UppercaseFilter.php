@@ -34,6 +34,10 @@ class UppercaseFilter extends AbstractFilterVarFilter
      */
     public function apply($value)
     {
+        if (!\is_string($value)) {
+            throw new \InvalidArgumentException;
+        }
+
         return \mb_strtoupper($value);
     }
 }

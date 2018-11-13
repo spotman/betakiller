@@ -9,7 +9,7 @@ use BetaKiller\Repository\ContentCommentRepository;
 use BetaKiller\Url\ZoneInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-abstract class AbstractCommentList extends AbstractAdminBase
+abstract class AbstractCommentList extends AbstractContentAdminIFace
 {
     /**
      * @var \BetaKiller\Repository\ContentCommentRepository

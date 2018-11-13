@@ -19,11 +19,19 @@
 <div id="admin-page-container">
 
   {#<header>#}
-    {#{{ widget('Admin_Bar') }}#}
+  {#{{ widget('Admin_Bar') }}#}
   {#</header>#}
 
   <main>
     <div class="row">
+
+      <nav>
+        <div class="nav-wrapper">
+          <div class="col s12">
+            {{ widget("Breadcrumbs") }}
+          </div>
+        </div>
+      </nav>
 
       <div class="col s12">
         {% block content "" %}

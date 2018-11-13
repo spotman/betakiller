@@ -6,7 +6,7 @@ use BetaKiller\Repository\ContentPostRepository;
 use BetaKiller\Url\ZoneInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-class PostIndexIFace extends AbstractAdminBase
+class PostIndexIFace extends AbstractContentAdminIFace
 {
     /**
      * @var \BetaKiller\Repository\ContentPostRepository

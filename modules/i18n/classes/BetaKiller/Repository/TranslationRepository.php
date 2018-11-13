@@ -11,10 +11,18 @@ use BetaKiller\Model\Translation;
  *
  * @package BetaKiller\Repository
  * @method \BetaKiller\Model\TranslationModelInterface create()
- * @method save(\BetaKiller\Model\TranslationModelInterface $model)
+ * @method save(\BetaKiller\Model\I18nModelInterface $model)
  */
 class TranslationRepository extends AbstractI18nRepository
 {
+    /**
+     * @return string
+     */
+    public function getUrlKeyName(): string
+    {
+        return Translation::TABLE_PK;
+    }
+
     /**
      * @return string
      */
@@ -29,5 +37,13 @@ class TranslationRepository extends AbstractI18nRepository
     protected function getI18nKeyForeignKey(): string
     {
         return Translation::TABLE_FIELD_KEY;
+    }
+
+    /**
+     * @return string
+     */
+    protected function getI18nKeyRelationName(): string
+    {
+        return Translation::RELATION_KEY;
     }
 }

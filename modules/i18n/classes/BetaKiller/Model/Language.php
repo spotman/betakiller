@@ -10,6 +10,7 @@ class Language extends \ORM implements LanguageInterface
     public const TABLE_FIELD_LOCALE    = 'locale';
     public const TABLE_FIELD_LABEL     = 'label';
     public const TABLE_FIELD_IS_SYSTEM = 'is_system';
+    public const TABLE_FIELD_IS_DEFAULT = 'is_default';
 
     protected function configure(): void
     {
@@ -102,6 +103,22 @@ class Language extends \ORM implements LanguageInterface
     }
 
     /**
+     * @return \BetaKiller\Model\LanguageInterface
+     */
+    public function markAsDefault(): LanguageInterface
+    {
+        return $this->setIsDefault(true);
+    }
+
+    /**
+     * @return \BetaKiller\Model\LanguageInterface
+     */
+    public function markAsNonDefault(): LanguageInterface
+    {
+        return $this->setIsDefault(false);
+    }
+
+    /**
      * @param bool $value
      *
      * @return \BetaKiller\Model\LanguageInterface
@@ -135,5 +152,25 @@ class Language extends \ORM implements LanguageInterface
     public function isSystem(): bool
     {
         return (bool)$this->get(self::TABLE_FIELD_IS_SYSTEM);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isDefault(): bool
+    {
+        return (bool)$this->get(self::TABLE_FIELD_IS_DEFAULT);
+    }
+
+    /**
+     * @param bool $value
+     *
+     * @return \BetaKiller\Model\LanguageInterface
+     */
+    public function setIsDefault(bool $value): LanguageInterface
+    {
+        $this->set(self::TABLE_FIELD_IS_DEFAULT, $value);
+
+        return $this;
     }
 }

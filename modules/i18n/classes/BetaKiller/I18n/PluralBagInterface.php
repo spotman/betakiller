@@ -13,12 +13,6 @@ interface PluralBagInterface
     public function getValue(string $form): string;
 
     /**
-     * @param string $form
-     * @param string $value
-     */
-    public function setValue(string $form, string $value): void;
-
-    /**
      * @return array
      */
     public function getAll(): array;

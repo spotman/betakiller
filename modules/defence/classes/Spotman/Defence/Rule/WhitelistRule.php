@@ -47,6 +47,10 @@ class WhitelistRule implements DefinitionRuleInterface
      */
     public function check($value): bool
     {
+        if (!\is_int($value) && !\is_string($value)) {
+            throw new \InvalidArgumentException;
+        }
+
         return \in_array($value, $this->allowed, true);
     }
 }

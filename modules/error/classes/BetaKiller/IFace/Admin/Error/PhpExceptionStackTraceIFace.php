@@ -6,7 +6,7 @@ use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Model\PhpExceptionModelInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-class PhpExceptionStackTraceIFace extends ErrorAdminBase
+class PhpExceptionStackTraceIFace extends AbstractErrorAdminIFace
 {
     /**
      * Returns data for View

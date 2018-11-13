@@ -412,6 +412,17 @@ task('done', function () use ($tz) {
     writeln('<info>Successfully deployed at '.$dateTime->setTimezone($tz)->format('H:i:s T').'!</info>');
 });
 
+task('migrate', [
+    // Migrate DB
+    'migrations:up',
+
+    // Import data
+    'import:roles',
+    'import:languages',
+    'import:i18n', // Depends on roles and languages
+    'import:notification', // Depends on roles
+])->setPrivate();
+
 task('deploy', [
     // Check app configuration
     'check',
@@ -448,10 +459,7 @@ task('deploy', [
     'maintenance:on',
 
     // Migrate and import data
-    'migrations:up',
-    'import:roles',
-    'import:i18n', // Depends on roles
-    'import:notification', // Depends on roles
+    'migrate',
 
     // Prepare
     'assets:deploy',
@@ -470,16 +478,12 @@ task('deploy', [
 ])->desc('Deploy app bundle')->onStage(
     DEPLOYER_STAGING_STAGE,
     DEPLOYER_PRODUCTION_STAGE,
-    DEPLOYER_TESTING_STAGE);
+    DEPLOYER_TESTING_STAGE
+);
 
 task('update', [
-    // Migrate and import data
-    'migrations:up',
-    'import:roles',
-    'import:i18n', // Depends on roles
-    'import:notification', // Depends on roles
-
-])->desc('Deploy app bundle')->onHosts('dev')->onStage(\DEPLOYER_DEV_STAGE);
+    'migrate',
+])->desc('Update local workspace')->onHosts('dev')->onStage(\DEPLOYER_DEV_STAGE);
 
 /**
  * Run minion-task and echo result to console

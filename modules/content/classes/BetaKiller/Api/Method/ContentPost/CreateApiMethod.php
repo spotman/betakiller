@@ -2,50 +2,67 @@
 namespace BetaKiller\Api\Method\ContentPost;
 
 use BetaKiller\Api\Method\AbstractEntityCreateApiMethod;
+use BetaKiller\Model\UserInterface;
 use BetaKiller\Status\StatusWorkflowFactory;
 use Spotman\Api\ApiMethodException;
+use Spotman\Defence\ArgumentsInterface;
+use Spotman\Defence\DefinitionBuilderInterface;
 
 class CreateApiMethod extends AbstractEntityCreateApiMethod
 {
-    use ContentPostMethodTrait;
+    private const ARG_DATA = 'data';
+
+    private const ARG_LABEL = 'label';
+    private const ARG_TYPE  = 'type';
 
     /**
      * @var \BetaKiller\Status\StatusWorkflowFactory
      */
     private $workflowFactory;
 
-    public function __construct($data, StatusWorkflowFactory $factory)
+    public function __construct(StatusWorkflowFactory $factory)
     {
-        parent::__construct($data);
-
         $this->workflowFactory = $factory;
+    }
+
+    /**
+     * @return \Spotman\Defence\DefinitionBuilderInterface
+     */
+    public function getArgumentsDefinition(): DefinitionBuilderInterface
+    {
+        return $this->definition()
+            ->composite(self::ARG_DATA)
+            ->string(self::ARG_LABEL)->optional()
+            ->string(self::ARG_TYPE)->optional()->whitelist(['article', 'page']);
     }
 
     /**
      * Implement this method
      *
-     * @param \BetaKiller\Model\ContentPost                              $model
-     * @param                                                            $data
+     * @param \BetaKiller\Model\ContentPost       $model
+     * @param \Spotman\Defence\ArgumentsInterface $arguments
+     * @param \BetaKiller\Model\UserInterface     $user
      *
      * @return \BetaKiller\Model\AbstractEntityInterface
-     * @throws \BetaKiller\Status\StatusWorkflowException
      * @throws \BetaKiller\Factory\FactoryException
-     * @throws \Kohana_Exception
+     * @throws \BetaKiller\Status\StatusWorkflowException
      * @throws \Spotman\Api\ApiMethodException
      */
-    protected function create($model, $data)
+    protected function create($model, ArgumentsInterface $arguments, UserInterface $user)
     {
         /** @var \BetaKiller\Status\ContentPostWorkflow $workflow */
         $workflow = $this->workflowFactory->create($model);
 
         $workflow->draft();
 
-        if (isset($data->label)) {
-            $model->setLabel($this->sanitizeString($data->label));
+        $data = $arguments->getArray(self::ARG_DATA);
+
+        if (isset($data[self::ARG_LABEL])) {
+            $model->setLabel($data[self::ARG_LABEL]);
         }
 
-        if (isset($data->type)) {
-            $type = $this->sanitizeString($data->type);
+        if (isset($data[self::ARG_TYPE])) {
+            $type = $data[self::ARG_TYPE];
 
             switch ($type) {
                 case 'article':

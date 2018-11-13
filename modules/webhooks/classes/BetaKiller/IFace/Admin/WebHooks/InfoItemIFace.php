@@ -5,7 +5,7 @@ namespace BetaKiller\IFace\Admin\WebHooks;
 
 use BetaKiller\Factory\WebHookFactory;
 use BetaKiller\Helper\ServerRequestHelper;
-use BetaKiller\IFace\Admin\AbstractAdminBase;
+use BetaKiller\IFace\Admin\AbstractAdminIFace;
 use BetaKiller\Model\WebHookLogInterface;
 use BetaKiller\Repository\WebHookLogRepository;
 use BetaKiller\Url\Container\UrlContainer;
@@ -13,7 +13,7 @@ use BetaKiller\Url\UrlElementTreeInterface;
 use BetaKiller\Url\WebHookModelInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-class InfoItemIFace extends AbstractAdminBase
+class InfoItemIFace extends AbstractAdminIFace
 {
     /**
      * @var \BetaKiller\Factory\WebHookFactory

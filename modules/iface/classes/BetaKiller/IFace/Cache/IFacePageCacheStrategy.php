@@ -34,7 +34,7 @@ final class IFacePageCacheStrategy implements StrategyInterface
         // Add session fingerprint
         $sessionFingerprint = \json_encode($session);
 
-        $url = ServerRequestHelper::getUrl($this->request);
+        $url = (string)$this->request->getUri();
 
         return md5($sessionFingerprint.$url);
     }

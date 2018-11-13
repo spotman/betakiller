@@ -4,13 +4,13 @@ declare(strict_types=1);
 namespace BetaKiller\IFace\Admin\WebHooks;
 
 use BetaKiller\Helper\ServerRequestHelper;
-use BetaKiller\IFace\Admin\AbstractAdminBase;
+use BetaKiller\IFace\Admin\AbstractAdminIFace;
 use BetaKiller\Repository\WebHookRepository;
 use BetaKiller\Url\Container\UrlContainer;
 use BetaKiller\Url\UrlElementTreeInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-class ListItemsIFace extends AbstractAdminBase
+class ListItemsIFace extends AbstractAdminIFace
 {
     /**
      * @var \BetaKiller\Repository\WebHookRepository

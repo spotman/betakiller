@@ -7,7 +7,7 @@ use BetaKiller\Url\UrlDispatcherException;
 use Caxy\HtmlDiff\HtmlDiff;
 use Psr\Http\Message\ServerRequestInterface;
 
-class PostItemRevisionIFace extends AbstractAdminBase
+class PostItemRevisionIFace extends AbstractContentAdminIFace
 {
     /**
      * @var \BetaKiller\Helper\ContentUrlContainerHelper

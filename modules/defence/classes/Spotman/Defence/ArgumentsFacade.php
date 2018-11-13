@@ -27,7 +27,7 @@ class ArgumentsFacade
         }
 
         // Filter arguments` values
-        $argumentsArray = $this->processData($namedArguments, $definition);
+        $argumentsArray = $this->processArgumentsData($definition->getArguments(), $namedArguments);
 
         // Return DTO
         return new Arguments($argumentsArray);
@@ -65,16 +65,16 @@ class ArgumentsFacade
     }
 
     /**
-     * @param array                                       $data
-     * @param \Spotman\Defence\DefinitionBuilderInterface $definition
+     * @param \Spotman\Defence\ArgumentDefinitionInterface[] $arguments
+     * @param mixed[]                                        $data
      *
-     * @return array
+     * @return mixed[]
      */
-    private function processData(array $data, DefinitionBuilderInterface $definition): array
+    private function processArgumentsData(array $arguments, array $data): array
     {
         $filtered = [];
 
-        foreach ($definition->getArguments() as $argument) {
+        foreach ($arguments as $argument) {
             $name = $argument->getName();
 
             $valueExists = isset($data[$name]);
@@ -85,64 +85,135 @@ class ArgumentsFacade
 
             $targetKey = $argument->isIdentity()
                 ? ArgumentsInterface::IDENTITY_KEY
-                : $name;
+                : $argument->getName();
 
             $filtered[$targetKey] = $valueExists
-                ? $this->processValue($data[$name], $argument)
+                ? $this->processValue($argument, $data[$name])
                 : $argument->getDefaultValue();
         }
 
         return $filtered;
     }
 
-    private function processValue($value, ArgumentDefinitionInterface $argument)
+    /**
+     * @param \Spotman\Defence\ArgumentDefinitionInterface $argument
+     * @param mixed                                        $value
+     *
+     * @return array|mixed|mixed[]
+     */
+    private function processValue(ArgumentDefinitionInterface $argument, $value)
     {
-        $value = $this->filterValue($value, $argument);
+        switch (true) {
+            case $argument instanceof SingleArgumentDefinitionInterface:
+                return $this->processSingleValue($argument, $value);
+
+            case $argument instanceof CompositeArgumentDefinitionInterface:
+                return $this->processCompositeValue($argument, $value);
+
+            case $argument instanceof CompositeArrayArgumentDefinitionInterface:
+                return $this->processCompositeArrayValue($argument, $value);
+
+            default:
+                throw new \InvalidArgumentException(sprintf(
+                    'Unknown argument instance for type "%s"', $argument->getType()
+                ));
+        }
+    }
+
+    private function processSingleValue(SingleArgumentDefinitionInterface $argument, $value)
+    {
+        $value = $this->filterValue($argument, $value);
 
         $this->checkRules($value, $argument);
 
         return $value;
     }
 
-    /**
-     * @param                                              $value
-     * @param \Spotman\Defence\ArgumentDefinitionInterface $argument
-     *
-     * @throws \InvalidArgumentException
-     * @return mixed
-     */
-    private function filterValue($value, ArgumentDefinitionInterface $argument)
+    private function processCompositeValue(CompositeArgumentDefinitionInterface $argument, $value): array
     {
-        $counter = 0;
+        $children = $argument->getChildren();
 
-        foreach ($argument->getFilters() as $filter) {
-            $value = $filter->apply($value);
-
-            if ($value === null) {
-                throw new \InvalidArgumentException(
-                    \sprintf('Invalid value for "%s" after "%s" filter', $argument->getName(), $filter->getName())
-                );
-            }
-
-            $counter++;
+        // Check for children definition
+        if (!$children) {
+            throw new \InvalidArgumentException(sprintf('Missing nested definition for "%s"', $argument->getName()));
         }
 
-        if (!$counter) {
+        // Check for nested data required
+        if (!$value) {
+            throw new \InvalidArgumentException(sprintf('Missing nested data for "%s"', $argument->getName()));
+        }
+
+        // Check for nested data type
+        if (!\is_array($value)) {
+            throw new \InvalidArgumentException(sprintf('Nested data must be an array for "%s"', $argument->getName()));
+        }
+
+        // Recursion for children definitions
+        return $this->processArgumentsData($children, $value);
+    }
+
+    private function processCompositeArrayValue(CompositeArrayArgumentDefinitionInterface $argument, $value): array
+    {
+        // Check for nested data required
+        if (!$value) {
+            throw new \InvalidArgumentException(sprintf('Missing nested data for "%s"', $argument->getName()));
+        }
+
+        // Check for nested data type
+        if (!\is_array($value)) {
+            throw new \InvalidArgumentException(sprintf('Nested data must be an array for "%s"', $argument->getName()));
+        }
+
+        $composite = $argument->getComposite();
+
+        $output = [];
+
+        foreach ($value as $index => $item) {
+            // All items share the same composite definition
+            $output[$index] = $this->processCompositeValue($composite, $item);
+        }
+
+        return $output;
+    }
+
+    /**
+     * @param \Spotman\Defence\SingleArgumentDefinitionInterface $argument
+     * @param mixed                                              $value
+     *
+     * @return mixed
+     */
+    private function filterValue(SingleArgumentDefinitionInterface $argument, $value)
+    {
+        $filters = $argument->getFilters();
+
+        if (!$filters) {
             throw new \LogicException(
                 \sprintf('At least one filter needs to be defined for argument "%s"', $argument->getName())
             );
+        }
+
+        foreach ($filters as $filter) {
+            try {
+                $value = $filter->apply($value);
+            } catch (\InvalidArgumentException $e) {
+                throw new \InvalidArgumentException(
+                    \sprintf('Invalid value for "%s" after "%s" filter', $argument->getName(), $filter->getName()),
+                    $e->getCode(),
+                    $e
+                );
+            }
         }
 
         return $value;
     }
 
     /**
-     * @param                                              $value
-     * @param \Spotman\Defence\ArgumentDefinitionInterface $argument
+     * @param mixed                                              $value
+     * @param \Spotman\Defence\SingleArgumentDefinitionInterface $argument
      *
      * @throws \InvalidArgumentException
      */
-    private function checkRules($value, ArgumentDefinitionInterface $argument): void
+    private function checkRules($value, SingleArgumentDefinitionInterface $argument): void
     {
         foreach ($argument->getRules() as $rule) {
             if (!$rule->check($value)) {

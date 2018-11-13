@@ -55,4 +55,9 @@ interface ArgumentsInterface
      * @return array
      */
     public function getArray(string $key): array;
+
+    /**
+     * @return mixed[]
+     */
+    public function getAll(): array;
 }

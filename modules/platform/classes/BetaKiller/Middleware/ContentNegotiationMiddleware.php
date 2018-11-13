@@ -38,7 +38,7 @@ class ContentNegotiationMiddleware implements MiddlewareInterface
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        $langMiddleware = new ContentLanguage($this->i18n->getAllowedLanguages());
+        $langMiddleware = new ContentLanguage($this->i18n->getAllowedLanguagesNames());
 
         return $langMiddleware->process($request, $handler);
     }

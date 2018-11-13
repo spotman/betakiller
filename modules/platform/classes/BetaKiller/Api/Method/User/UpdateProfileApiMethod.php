@@ -18,7 +18,7 @@ class UpdateProfileApiMethod extends AbstractEntityBasedApiMethod
     public function getArgumentsDefinition(): DefinitionBuilderInterface
     {
         return $this->definition()
-            ->array(self::ARG_DATA);
+            ->composite(self::ARG_DATA);
     }
 
     /**

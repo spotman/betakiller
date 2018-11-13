@@ -32,12 +32,24 @@ class HtmlFilter extends AbstractFilterVarFilter
      *
      * @return mixed
      */
-    public function apply($value)
+    public function apply($value): string
     {
-        return $this->filterVar(
+        if (!\is_string($value)) {
+            throw new \InvalidArgumentException;
+        }
+
+        $value = str_replace(["\0", "\t"], '', $value);
+
+        $value = $this->filterVar(
             $value,
             \FILTER_UNSAFE_RAW,
             \FILTER_FLAG_NO_ENCODE_QUOTES
         );
+
+        if ($value === null) {
+            throw new \InvalidArgumentException;
+        }
+
+        return $value;
     }
 }

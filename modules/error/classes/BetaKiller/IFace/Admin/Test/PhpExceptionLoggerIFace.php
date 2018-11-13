@@ -3,11 +3,11 @@ namespace BetaKiller\IFace\Admin\Test;
 
 use BetaKiller\Exception\ServerErrorHttpException;
 use BetaKiller\Helper\LoggerHelperTrait;
-use BetaKiller\IFace\Admin\Error\ErrorAdminBase;
+use BetaKiller\IFace\Admin\Error\AbstractErrorAdminIFace;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
 
-class PhpExceptionLoggerIFace extends ErrorAdminBase
+class PhpExceptionLoggerIFace extends AbstractErrorAdminIFace
 {
     use LoggerHelperTrait;
 

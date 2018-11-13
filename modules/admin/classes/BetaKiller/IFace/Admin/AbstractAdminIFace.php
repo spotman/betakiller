@@ -4,7 +4,7 @@ namespace BetaKiller\IFace\Admin;
 use BetaKiller\IFace\AbstractIFace;
 use Psr\Http\Message\ServerRequestInterface;
 
-abstract class AbstractAdminBase extends AbstractIFace
+abstract class AbstractAdminIFace extends AbstractIFace
 {
     /**
      * This hook executed before IFace processing (on every request regardless of caching)

@@ -82,7 +82,7 @@ class DefaultMessageRendered implements MessageRendererInterface
     private function getTargetLanguage(NotificationUserInterface $target): string
     {
         // User language in templates
-        return $target->getLanguageName() ?? $this->i18n->getDefaultLanguage();
+        return $target->getLanguageName() ?? $this->i18n->getDefaultLanguageName();
     }
 
     /**

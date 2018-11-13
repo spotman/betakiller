@@ -10,7 +10,7 @@ abstract class AbstractI18nModel extends \ORM implements I18nModelInterface
     public const TABLE_FIELD_LANGUAGE_ID = 'language_id';
     public const TABLE_FIELD_VALUE       = 'value';
 
-    private const RELATION_KEY  = 'i18nKey';
+    public const RELATION_KEY  = 'i18nKey';
     private const RELATION_LANG = 'language';
 
     protected function configure(): void

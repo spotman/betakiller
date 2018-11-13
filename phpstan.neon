@@ -9,6 +9,7 @@ parameters:
     - modules/admin/classes
     - modules/api/classes
     - modules/assets/classes
+    - modules/defence/classes
     - modules/error/classes
     - modules/helper/classes
     - modules/iface/classes

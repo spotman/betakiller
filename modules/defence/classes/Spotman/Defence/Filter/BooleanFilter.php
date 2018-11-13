@@ -31,13 +31,20 @@ class BooleanFilter extends AbstractFilterVarFilter
      * @param mixed $value
      *
      * @return mixed
+     * @throws \InvalidArgumentException
      */
-    public function apply($value)
+    public function apply($value): bool
     {
-        return $this->filterVar(
+        $value = $this->filterVar(
             $value,
             \FILTER_VALIDATE_BOOLEAN,
             \FILTER_NULL_ON_FAILURE
         );
+
+        if ($value === null) {
+            throw new \InvalidArgumentException;
+        }
+
+        return (bool)$value;
     }
 }

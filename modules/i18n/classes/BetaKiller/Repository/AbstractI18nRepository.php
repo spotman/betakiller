@@ -9,7 +9,7 @@ use BetaKiller\Model\I18nKeyModelInterface;
 use BetaKiller\Model\I18nModelInterface;
 use BetaKiller\Model\LanguageInterface;
 
-abstract class AbstractI18nRepository extends AbstractOrmBasedRepository implements I18nRepositoryInterface
+abstract class AbstractI18nRepository extends AbstractOrmBasedDispatchableRepository implements I18nRepositoryInterface
 {
     /**
      * @param \BetaKiller\Model\I18nKeyModelInterface $key
@@ -33,7 +33,7 @@ abstract class AbstractI18nRepository extends AbstractOrmBasedRepository impleme
      * @param \BetaKiller\Model\I18nKeyModelInterface $key
      * @param array                                   $languagesModels
      *
-     * @return array
+     * @return \BetaKiller\Model\I18nModelInterface[]
      * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\Repository\RepositoryException
      */
@@ -50,7 +50,7 @@ abstract class AbstractI18nRepository extends AbstractOrmBasedRepository impleme
     /**
      * @param \BetaKiller\Model\LanguageInterface $lang
      *
-     * @return array
+     * @return \BetaKiller\Model\I18nModelInterface[]
      * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\Repository\RepositoryException
      */
@@ -78,6 +78,23 @@ abstract class AbstractI18nRepository extends AbstractOrmBasedRepository impleme
             ->filterKey($orm, $key)
             ->filterNotEmpty($orm)
             ->findOne($orm);
+    }
+
+    /**
+     * @param \BetaKiller\Model\LanguageInterface[] $languages
+     *
+     * @return \BetaKiller\Model\I18nModelInterface[]
+     */
+    public function findEmptyItems(array $languages): array
+    {
+        $orm = $this->getOrmInstance();
+
+        $orm->having(\DB::expr('COUNT(*)'), '<', \count($languages));
+
+        return $this
+            ->filterLanguages($orm, $languages)
+            ->groupByKey($orm)
+            ->findAll($orm);
     }
 
     /**
@@ -128,10 +145,30 @@ abstract class AbstractI18nRepository extends AbstractOrmBasedRepository impleme
      *
      * @return \BetaKiller\Repository\AbstractI18nRepository
      */
+    protected function filterEmpty(ExtendedOrmInterface $orm): self
+    {
+        $filter = sprintf('CHAR_LENGTH(%s)', AbstractI18nModel::TABLE_FIELD_VALUE);
+        $orm->where(\DB::expr($filter), '=', 0);
+
+        return $this;
+    }
+
+    /**
+     * @param \BetaKiller\Model\ExtendedOrmInterface $orm
+     *
+     * @return \BetaKiller\Repository\AbstractI18nRepository
+     */
     protected function filterNotEmpty(ExtendedOrmInterface $orm): self
     {
         $filter = sprintf('CHAR_LENGTH(%s)', AbstractI18nModel::TABLE_FIELD_VALUE);
         $orm->where(\DB::expr($filter), '>', 0);
+
+        return $this;
+    }
+
+    protected function groupByKey(ExtendedOrmInterface $orm): self
+    {
+        $orm->group_by($orm->object_column($this->getI18nKeyForeignKey()));
 
         return $this;
     }
@@ -145,4 +182,9 @@ abstract class AbstractI18nRepository extends AbstractOrmBasedRepository impleme
      * @return string
      */
     abstract protected function getI18nKeyForeignKey(): string;
+
+    /**
+     * @return string
+     */
+    abstract protected function getI18nKeyRelationName(): string;
 }

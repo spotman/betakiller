@@ -6,7 +6,7 @@ use BetaKiller\Repository\PhpExceptionRepository;
 use BetaKiller\Url\ZoneInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-abstract class AbstractPhpExceptionIndex extends ErrorAdminBase
+abstract class AbstractPhpExceptionIndex extends AbstractErrorAdminIFace
 {
     /**
      * @var \BetaKiller\Repository\PhpExceptionRepository
