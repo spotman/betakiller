@@ -144,6 +144,20 @@ final class I18nFacade
         return \Punic\Plural::getRules($locale);
     }
 
+    public function validatePluralBag(PluralBagInterface $bag, LanguageInterface $lang): void
+    {
+        $forms = $this->getPluralFormsForLocale($lang->getLocale());
+
+        foreach ($bag->getAll() as $itemForm => $formValue) {
+            if (!\in_array($itemForm, $forms, true)) {
+                throw new I18nException('Unknown form ":form" for language ":lang"', [
+                    ':form' => $itemForm,
+                    ':lang' => $lang->getName(),
+                ]);
+            }
+        }
+    }
+
     /**
      * @param string $key
      *

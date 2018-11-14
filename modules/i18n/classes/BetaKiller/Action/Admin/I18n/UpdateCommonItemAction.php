@@ -4,10 +4,18 @@ declare(strict_types=1);
 namespace BetaKiller\Action\Admin\I18n;
 
 use BetaKiller\Action\AbstractAction;
+use BetaKiller\Exception\BadRequestHttpException;
+use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Helper\ServerRequestHelper;
+use BetaKiller\I18n\I18nFacade;
+use BetaKiller\I18n\PluralBagFactoryInterface;
+use BetaKiller\I18n\PluralBagFormatterInterface;
 use BetaKiller\Model\I18nKeyModelInterface;
 use BetaKiller\Model\LanguageInterface;
 use BetaKiller\Model\Translation;
+use BetaKiller\Repository\LanguageRepositoryInterface;
+use BetaKiller\Repository\TranslationRepository;
+use BetaKiller\Url\ZoneInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -29,6 +37,39 @@ class UpdateCommonItemAction extends AbstractAction
     private $langRepo;
 
     /**
+     * @var \BetaKiller\I18n\PluralBagFormatterInterface
+     */
+    private $formatter;
+
+    /**
+     * @var \BetaKiller\I18n\PluralBagFactoryInterface
+     */
+    private $pluralFactory;
+
+    /**
+     * UpdateCommonItemAction constructor.
+     *
+     * @param \BetaKiller\I18n\I18nFacade                        $i18nFacade
+     * @param \BetaKiller\Repository\TranslationRepository       $i18nRepo
+     * @param \BetaKiller\Repository\LanguageRepositoryInterface $langRepo
+     * @param \BetaKiller\I18n\PluralBagFormatterInterface       $formatter
+     * @param \BetaKiller\I18n\PluralBagFactoryInterface         $pluralFactory
+     */
+    public function __construct(
+        I18nFacade $i18nFacade,
+        TranslationRepository $i18nRepo,
+        LanguageRepositoryInterface $langRepo,
+        PluralBagFormatterInterface $formatter,
+        PluralBagFactoryInterface $pluralFactory
+    ) {
+        $this->i18nFacade    = $i18nFacade;
+        $this->i18nRepo      = $i18nRepo;
+        $this->langRepo      = $langRepo;
+        $this->formatter     = $formatter;
+        $this->pluralFactory = $pluralFactory;
+    }
+
+    /**
      * Handles a request and produces a response.
      *
      * May call other collaborating code to generate the response.
@@ -39,6 +80,8 @@ class UpdateCommonItemAction extends AbstractAction
      */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
+        $urlHelper = ServerRequestHelper::getUrlHelper($request);
+
         /** @var I18nKeyModelInterface $key */
         $key = ServerRequestHelper::getEntity($request, I18nKeyModelInterface::class);
 
@@ -49,46 +92,22 @@ class UpdateCommonItemAction extends AbstractAction
 
             $value = $post[$langName];
 
-            $this->updateValue($key, $lang, $value);
-        }
+            if ($key->isPlural()) {
+                if (!\is_array($value)) {
+                    throw new BadRequestHttpException;
+                }
 
-        // TODO: Implement handle() method.
-    }
-
-    /**
-     * @param \BetaKiller\Model\I18nKeyModelInterface $key
-     * @param \BetaKiller\Model\LanguageInterface[]   $languages
-     * @param array                                   $values
-     */
-    private function processRegular(I18nKeyModelInterface $key, array $languages, array $values): void
-    {
-        foreach ($languages as $lang) {
-            $langName = $lang->getName();
-
-            $value = $values[$langName];
+                $bag = $this->pluralFactory->create($value);
+                $this->i18nFacade->validatePluralBag($bag, $lang);
+                $value = $this->formatter->compile($bag);
+            }
 
             $this->updateValue($key, $lang, $value);
         }
-    }
 
-    /**
-     * @param \BetaKiller\Model\I18nKeyModelInterface $key
-     * @param \BetaKiller\Model\LanguageInterface[]   $languages
-     * @param array                                   $values
-     *
-     * @throws \Punic\Exception
-     */
-    private function processPlural(I18nKeyModelInterface $key, array $languages, array $values): void
-    {
-        foreach ($languages as $lang) {
-            $langName = $lang->getName();
+        $url = $urlHelper->getReadEntityUrl($key, ZoneInterface::ADMIN);
 
-            $value = $values[$langName];
-
-            $forms = $this->i18nFacade->getPluralFormsForLocale($lang->getLocale());
-
-            // TODO
-        }
+        return ResponseHelper::redirect($url);
     }
 
     private function updateValue(I18nKeyModelInterface $key, LanguageInterface $lang, string $value): void

@@ -4,20 +4,20 @@
 
   <h1>{{ key }}</h1>
 
-  <form id="i18n-common-edit-form" action="{{ action }}">
+  <form id="i18n-common-edit-form" action="{{ action }}" method="post">
 
-    {% for lang, data in values %}
+    {% for data in values %}
       {% if is_plural %}
-        {% for form, value in data %}
+        {% for form, value in data.value %}
           <label>
-            {{ lang }}
-            <input type="text" name="{{ lang ~ "[" ~ form ~ "]" }}" value="{{ data }}"/>
+            {{ data.lang.label }}
+            <input type="text" name="{{ data.lang.name ~ "[" ~ form ~ "]" }}" value="{{ value }}"/>
           </label>
         {% endfor %}
       {% else %}
         <label>
-          {{ lang }}
-          <input type="text" name="{{ lang }}" value="{{ data }}"/>
+          {{ data.lang.label }}
+          <input type="text" name="{{ data.lang.name }}" value="{{ data.value }}"/>
         </label>
       {% endif %}
     {% endfor %}
