@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\Task\Import;
 
-use BetaKiller\Config\AppConfigInterface;
+use BetaKiller\I18n\I18nConfig;
 use BetaKiller\Model\Language;
 use BetaKiller\Repository\LanguageRepositoryInterface;
 use BetaKiller\Task\AbstractTask;
@@ -12,27 +12,27 @@ use BetaKiller\Task\TaskException;
 class Languages extends AbstractTask
 {
     /**
-     * @var \BetaKiller\Config\AppConfigInterface
-     */
-    private $appConfig;
-
-    /**
      * @var \BetaKiller\Repository\LanguageRepositoryInterface
      */
     private $langRepo;
 
     /**
+     * @var \BetaKiller\I18n\I18nConfig
+     */
+    private $config;
+
+    /**
      * Languages constructor.
      *
-     * @param \BetaKiller\Config\AppConfigInterface              $appConfig
+     * @param \BetaKiller\I18n\I18nConfig                        $config
      * @param \BetaKiller\Repository\LanguageRepositoryInterface $langRepo
      */
     public function __construct(
-        AppConfigInterface $appConfig,
+        I18nConfig $config,
         LanguageRepositoryInterface $langRepo
     ) {
-        $this->appConfig = $appConfig;
-        $this->langRepo  = $langRepo;
+        $this->langRepo = $langRepo;
+        $this->config   = $config;
 
         parent::__construct();
     }
@@ -51,7 +51,7 @@ class Languages extends AbstractTask
     public function run(): void
     {
         // "lang" => "locale"
-        $configLanguages = $this->appConfig->getAllowedLanguages();
+        $configLanguages = $this->config->getAllowedLanguages();
 
         if (!$configLanguages) {
             throw new TaskException('Define app languages in config/app.php');

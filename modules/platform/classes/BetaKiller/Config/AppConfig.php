@@ -9,7 +9,6 @@ use Psr\Http\Message\UriInterface;
 class AppConfig extends AbstractConfig implements AppConfigInterface
 {
     public const PATH_NAMESPACE                 = ['namespace'];
-    public const PATH_LANGUAGES                 = ['languages'];
     public const PATH_BASE_URL                  = ['url', 'base'];
     public const PATH_IS_TRAILING_SLASH_ENABLED = ['url', 'is_trailing_slash_enabled'];
     public const PATH_CIRCULAR_LINK_HREF        = ['url', 'circular_link_href'];
@@ -105,13 +104,5 @@ class AppConfig extends AbstractConfig implements AppConfigInterface
     public function getPageCachePath(): string
     {
         return rtrim($this->get(self::PATH_PAGE_CACHE_PATH), DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR;
-    }
-
-    /**
-     * @return string[]
-     */
-    public function getAllowedLanguages(): array
-    {
-        return (array)$this->get(self::PATH_LANGUAGES) ?: ['en'];
     }
 }

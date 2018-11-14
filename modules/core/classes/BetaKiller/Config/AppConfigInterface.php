@@ -50,11 +50,4 @@ interface AppConfigInterface
      * @return string
      */
     public function getPageCachePath(): string;
-
-    /**
-     * First language is primary one
-     *
-     * @return string[]
-     */
-    public function getAllowedLanguages(): array;
 }
