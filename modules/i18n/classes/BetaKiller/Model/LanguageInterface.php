@@ -5,6 +5,8 @@ namespace BetaKiller\Model;
 
 interface LanguageInterface extends AbstractEntityInterface
 {
+    public const NAME_EN = 'en';
+
     /**
      * @param string $value
      *

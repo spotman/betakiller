@@ -90,7 +90,18 @@ class UpdateCommonItemAction extends AbstractAction
         foreach ($this->langRepo->getAll() as $lang) {
             $langName = $lang->getName();
 
+            if (!isset($post[$langName])) {
+                throw new BadRequestHttpException('Missing data for lang :name', [
+                    ':name' => $langName,
+                ]);
+            }
+
             $value = $post[$langName];
+
+            // Skip empty lines
+            if (!$value) {
+                continue;
+            }
 
             if ($key->isPlural()) {
                 if (!\is_array($value)) {

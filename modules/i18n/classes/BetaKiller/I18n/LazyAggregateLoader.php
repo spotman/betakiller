@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace BetaKiller\I18n;
 
-use BetaKiller\Config\ConfigProviderInterface;
 use BetaKiller\Helper\AppEnvInterface;
 use Psr\Container\ContainerInterface;
 
@@ -20,7 +19,7 @@ class LazyAggregateLoader implements LoaderInterface
     private $appEnv;
 
     /**
-     * @var ConfigProviderInterface
+     * @var I18nConfig
      */
     private $config;
 
@@ -32,11 +31,11 @@ class LazyAggregateLoader implements LoaderInterface
     /**
      * LazyAggregateLoader constructor.
      *
-     * @param \Psr\Container\ContainerInterface          $container
-     * @param \BetaKiller\Config\ConfigProviderInterface $config
-     * @param \BetaKiller\Helper\AppEnvInterface         $appEnv
+     * @param \Psr\Container\ContainerInterface  $container
+     * @param \BetaKiller\I18n\I18nConfig        $config
+     * @param \BetaKiller\Helper\AppEnvInterface $appEnv
      */
-    public function __construct(ContainerInterface $container, ConfigProviderInterface $config, AppEnvInterface $appEnv)
+    public function __construct(ContainerInterface $container, I18nConfig $config, AppEnvInterface $appEnv)
     {
         $this->container = $container;
         $this->appEnv    = $appEnv;
@@ -63,7 +62,7 @@ class LazyAggregateLoader implements LoaderInterface
     private function loaderFactory(): LoaderInterface
     {
         // Get all loaders from config
-        $loadersClassNames = (array)$this->config->load(['i18n', 'loaders']);
+        $loadersClassNames = $this->config->getLoaders();
 
         // Warn if no loaders defined
         if (!$loadersClassNames) {
