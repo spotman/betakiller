@@ -56,8 +56,6 @@ class CommonItemIFace extends AbstractAdminIFace
         $this->plural   = $plural;
     }
 
-    // TODO Define arguments in actions
-
     /**
      * Returns data for View
      *
@@ -98,9 +96,13 @@ class CommonItemIFace extends AbstractAdminIFace
 
             $value = $item ? $item->getValue() : '';
 
-            $data[$lang->getLabel()] = $key->isPlural()
-                ? $this->getPluralItemData($lang, $value)
-                : $value;
+            $data[] = [
+                'lang' => [
+                    'name' => $lang->getName(),
+                    'label' => $lang->getLabel(),
+                ],
+                'value' => $key->isPlural() ? $this->getPluralItemData($lang, $value) : $value,
+            ];
         }
 
         return $data;

@@ -397,6 +397,7 @@ task('import:roles', function () {
 })->desc('Import localization data');
 
 task('import:i18n', function () {
+    runMinionTask('import:languages');
     runMinionTask('import:i18n');
 })->desc('Import localization data');
 
@@ -418,8 +419,7 @@ task('migrate', [
 
     // Import data
     'import:roles',
-    'import:languages',
-    'import:i18n', // Depends on roles and languages
+    'import:i18n', // Depends on roles
     'import:notification', // Depends on roles
 ])->setPrivate();
 
