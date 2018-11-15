@@ -4,7 +4,7 @@ namespace BetaKiller\Notification;
 use BetaKiller\I18n\I18nFacade;
 use BetaKiller\View\ViewFactoryInterface;
 
-class DefaultMessageRendered implements MessageRendererInterface
+class DefaultMessageRenderer implements MessageRendererInterface
 {
     /**
      * @var \BetaKiller\View\ViewFactoryInterface
@@ -17,7 +17,7 @@ class DefaultMessageRendered implements MessageRendererInterface
     private $i18n;
 
     /**
-     * DefaultMessageRendered constructor.
+     * DefaultMessageRenderer constructor.
      *
      * @param \BetaKiller\View\ViewFactoryInterface $viewFactory
      * @param \BetaKiller\I18n\I18nFacade           $i18n
