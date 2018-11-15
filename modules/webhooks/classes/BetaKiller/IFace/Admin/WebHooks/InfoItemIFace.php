@@ -10,7 +10,6 @@ use BetaKiller\IFace\Admin\AbstractAdminIFace;
 use BetaKiller\Model\WebHookLogInterface;
 use BetaKiller\Model\WebHookModelInterface;
 use BetaKiller\Repository\WebHookLogRepository;
-use BetaKiller\Url\Container\UrlContainer;
 use Psr\Http\Message\ServerRequestInterface;
 
 class InfoItemIFace extends AbstractAdminIFace
