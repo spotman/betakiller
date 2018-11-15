@@ -31,9 +31,8 @@ interface UrlElementTreeInterface
      * Returns default iface model
      *
      * @return \BetaKiller\Url\IFaceModelInterface
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
      */
-    public function getDefault(): IFaceModelInterface;
+    public function getDefault(): UrlElementInterface;
 
     /**
      * Returns list of root elements
@@ -102,15 +101,6 @@ interface UrlElementTreeInterface
         string $action,
         string $zone
     ): EntityLinkedUrlElementInterface;
-
-    /**
-     * Returns array of WebHookModelInterface instances linked to provided service
-     *
-     * @param string $serviceName
-     *
-     * @return \BetaKiller\Url\WebHookModelInterface[]
-     */
-    public function getWebHooksByServiceName(string $serviceName): array;
 
     /**
      * @param \BetaKiller\Url\UrlElementInterface $model

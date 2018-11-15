@@ -98,7 +98,14 @@ class UrlElementProviderXmlConfig implements UrlElementProviderInterface
         $attr   = (array)$branch->attributes();
         $config = $attr['@attributes'];
 
-        $codename = $config[AbstractPlainUrlElementModel::OPTION_CODENAME];
+        $codename = $config[AbstractPlainUrlElementModel::OPTION_CODENAME] ?? null;
+
+        if (!$codename) {
+            throw new UrlElementException('Missing codename for ":tag" with attributes :args', [
+                ':tag' => $tag,
+                ':args' => \json_encode($config),
+            ]);
+        }
 
         if (!\in_array($tag, $this->allowedTags, true)) {
             throw new UrlElementException('Only tags <:allowed> are allowed for XML-based config, but <:tag> is used', [

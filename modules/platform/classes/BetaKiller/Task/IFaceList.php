@@ -4,10 +4,10 @@ declare(strict_types=1);
 namespace BetaKiller\Task;
 
 use BetaKiller\IFace\Exception\UrlElementException;
+use BetaKiller\Url\ActionModelInterface;
 use BetaKiller\Url\DummyModelInterface;
 use BetaKiller\Url\IFaceModelInterface;
 use BetaKiller\Url\UrlElementTreeInterface;
-use BetaKiller\Url\WebHookModelInterface;
 use Psr\Log\LoggerInterface;
 
 class IFaceList extends AbstractTask
@@ -51,14 +51,15 @@ class IFaceList extends AbstractTask
         foreach ($this->tree->getRecursiveIteratorIterator() as $model) {
             switch (true) {
                 case $model instanceof IFaceModelInterface:
-                    $this->logger->info('[IFace] [:zone] :codename', [
+                    $this->logger->info('[:zone] [IFace] :codename', [
                         ':zone'     => $model->getZoneName(),
                         ':codename' => $model->getCodename(),
                     ]);
                     break;
 
-                case $model instanceof WebHookModelInterface:
-                    $this->logger->info('[WebHook] :codename', [
+                case $model instanceof ActionModelInterface:
+                    $this->logger->info('[:zone] [Action] :codename', [
+                        ':zone'     => $model->getZoneName(),
                         ':codename' => $model->getCodename(),
                     ]);
                     break;

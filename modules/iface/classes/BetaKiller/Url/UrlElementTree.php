@@ -81,7 +81,7 @@ class UrlElementTree implements UrlElementTreeInterface
         $uris           = [];
 
         foreach ($models as $model) {
-            if ($model instanceof IFaceModelInterface && ($model->hasDynamicUrl() || $model->hasTreeBehaviour())) {
+            if ($model->hasDynamicUrl() || $model->hasTreeBehaviour()) {
                 $dynamicCounter++;
             }
 
@@ -152,15 +152,15 @@ class UrlElementTree implements UrlElementTreeInterface
      * @return \BetaKiller\Url\IFaceModelInterface
      * @throws \BetaKiller\IFace\Exception\UrlElementException
      */
-    public function getDefault(): IFaceModelInterface
+    public function getDefault(): UrlElementInterface
     {
         foreach ($this->items as $item) {
-            if ($item instanceof IFaceModelInterface && $item->isDefault()) {
+            if ($item->isDefault()) {
                 return $item;
             }
         }
 
-        throw new UrlElementException('No default IFace found');
+        throw new UrlElementException('No default UrlElement found');
     }
 
     /**
@@ -375,20 +375,6 @@ class UrlElementTree implements UrlElementTreeInterface
         }
 
         return null;
-    }
-
-    /**
-     * Returns array of WebHookModelInterface instances linked to provided service
-     *
-     * @param string $serviceName
-     *
-     * @return \BetaKiller\Url\WebHookModelInterface[]
-     */
-    public function getWebHooksByServiceName(string $serviceName): array
-    {
-        return \array_filter($this->items, function (UrlElementInterface $urlElement) use ($serviceName) {
-            return $urlElement instanceof WebHookModelInterface && $urlElement->getServiceName() === $serviceName;
-        });
     }
 
     /**

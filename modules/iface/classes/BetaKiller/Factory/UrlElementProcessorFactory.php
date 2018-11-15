@@ -1,12 +1,12 @@
 <?php
 namespace BetaKiller\Factory;
 
-use \BetaKiller\IFace\Exception\UrlElementException;
+use BetaKiller\IFace\Exception\UrlElementException;
+use BetaKiller\Model\WebHookModelInterface;
 use BetaKiller\Url\ActionModelInterface;
-use \BetaKiller\Url\IFaceModelInterface;
-use \BetaKiller\Url\UrlElementInterface;
-use \BetaKiller\Url\ElementProcessor\UrlElementProcessorInterface;
-use \BetaKiller\Url\WebHookModelInterface;
+use BetaKiller\Url\ElementProcessor\UrlElementProcessorInterface;
+use BetaKiller\Url\IFaceModelInterface;
+use BetaKiller\Url\UrlElementInterface;
 
 /**
  * Factory of URL element processor like IFace, WabHok and etc

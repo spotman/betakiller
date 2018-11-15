@@ -7,7 +7,6 @@ use BetaKiller\Exception\NotImplementedHttpException;
 use BetaKiller\IFace\Exception\UrlElementException;
 use BetaKiller\Url\IFaceModelInterface;
 use BetaKiller\Url\UrlElementInterface;
-use BetaKiller\Url\WebHookModelInterface;
 
 /**
  * Class UrlElement
@@ -30,12 +29,8 @@ class UrlElement extends AbstractOrmBasedSingleParentTreeModel implements UrlEle
         ]);
 
         $this->has_one([
-            'iface'   => [
+            'iface' => [
                 'model'       => 'IFace',
-                'foreign_key' => 'element_id',
-            ],
-            'webhook' => [
-                'model'       => 'WebHook',
                 'foreign_key' => 'element_id',
             ],
         ]);
@@ -80,6 +75,36 @@ class UrlElement extends AbstractOrmBasedSingleParentTreeModel implements UrlEle
     public function setUri(string $value): void
     {
         $this->set('uri', $value);
+    }
+
+    /**
+     * Returns TRUE if iface is marked as "default"
+     *
+     * @return bool
+     */
+    public function isDefault(): bool
+    {
+        return (bool)$this->get('is_default');
+    }
+
+    /**
+     * Returns TRUE if iface provides dynamic url mapping
+     *
+     * @return bool
+     */
+    public function hasDynamicUrl(): bool
+    {
+        return (bool)$this->get('is_dynamic');
+    }
+
+    /**
+     * Returns TRUE if iface has multi-level tree-behavior url mapping
+     *
+     * @return bool
+     */
+    public function hasTreeBehaviour(): bool
+    {
+        return (bool)$this->get('is_tree');
     }
 
     /**
@@ -132,11 +157,6 @@ class UrlElement extends AbstractOrmBasedSingleParentTreeModel implements UrlEle
         return $this->getTypeRelation()->isIFace();
     }
 
-    public function isTypeWebHook(): bool
-    {
-        return $this->getTypeRelation()->isWebHook();
-    }
-
     /**
      * @return IFaceModelInterface
      * @throws \BetaKiller\IFace\Exception\UrlElementException
@@ -153,20 +173,17 @@ class UrlElement extends AbstractOrmBasedSingleParentTreeModel implements UrlEle
         return $this->get('iface');
     }
 
-    /**
-     * @return \BetaKiller\Url\WebHookModelInterface
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
-     */
-    public function getWebHookModel(): WebHookModelInterface
+    public function getDedicatedObject(): UrlElementInterface
     {
-        if (!$this->isTypeWebHook()) {
-            throw new UrlElementException('Can not get WebHook model from UrlElement :codename instance of :class', [
-                ':codename' => $this->getCodename(),
-                ':class'    => \get_class($this),
-            ]);
-        }
+        switch (true) {
+            case $this->isTypeIFace():
+                return $this->getIFaceModel();
 
-        return $this->get('webhook');
+            default:
+                throw new UrlElementException('Unknown type of URL element for codename :codename', [
+                    ':codename' => $this->getCodename(),
+                ]);
+        }
     }
 
     /**

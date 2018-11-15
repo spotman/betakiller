@@ -15,7 +15,7 @@ interface UserInterface extends AbstractEntityInterface, OrmInterface, Notificat
     /**
      * @param \DateTimeInterface $value [optional]
      *
-     * @return \Worknector\Model\UserInterface
+     * @return \BetaKiller\Model\UserInterface
      */
     public function setCreatedAt(\DateTimeInterface $value = null): UserInterface;
 

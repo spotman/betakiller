@@ -203,8 +203,10 @@ class UrlElementHelper
         $current = $model;
 
         do {
-            $labels[] = $this->getLabel($current, $params, $i18n);
-            $current  = $this->tree->getParent($current);
+            if ($current instanceof IFaceModelInterface) {
+                $labels[] = $this->getLabel($current, $params, $i18n);
+            }
+            $current = $this->tree->getParent($current);
         } while ($current);
 
         return implode(' - ', array_filter($labels));

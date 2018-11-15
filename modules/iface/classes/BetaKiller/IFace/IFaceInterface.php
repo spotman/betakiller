@@ -68,20 +68,6 @@ interface IFaceInterface
     public function getExpiresSeconds(): int;
 
     /**
-     * This hook executed before IFace processing (on every request regardless of caching)
-     * Place here code that needs to be executed on every IFace request (increment views counter, etc)
-     *
-     * @param \Psr\Http\Message\ServerRequestInterface $request
-     */
-    public function before(ServerRequestInterface $request): void;
-
-    /**
-     * This hook executed after real IFace processing only (on every request if IFace output was not cached)
-     * Place here the code that needs to be executed only after real IFace processing (collect performance stat, etc)
-     */
-    public function after(): void;
-
-    /**
      * Getter for current iface model
      *
      * @return IFaceModelInterface

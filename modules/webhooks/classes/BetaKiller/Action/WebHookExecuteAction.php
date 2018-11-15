@@ -1,20 +1,20 @@
 <?php
-namespace BetaKiller\Url\ElementProcessor;
+declare(strict_types=1);
 
+namespace BetaKiller\Action;
+
+use BetaKiller\Exception\NotFoundHttpException;
 use BetaKiller\Factory\WebHookFactory;
 use BetaKiller\Helper\ResponseHelper;
+use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Model\WebHookLog;
 use BetaKiller\Model\WebHookLogRequestDataAggregator;
+use BetaKiller\Model\WebHookModelInterface;
 use BetaKiller\Repository\WebHookLogRepository;
-use BetaKiller\Url\UrlElementInterface;
-use BetaKiller\Url\WebHookModelInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-/**
- * WebHook URL element processor
- */
-class WebHookUrlElementProcessor implements UrlElementProcessorInterface
+class WebHookExecuteAction extends AbstractAction
 {
     /**
      * WebHook Factory
@@ -39,31 +39,21 @@ class WebHookUrlElementProcessor implements UrlElementProcessorInterface
     }
 
     /**
-     * Execute processing on URL element
+     * Handles a request and produces a response.
      *
-     * @param \BetaKiller\Url\UrlElementInterface      $model
+     * May call other collaborating code to generate the response.
+     *
      * @param \Psr\Http\Message\ServerRequestInterface $request
      *
      * @return \Psr\Http\Message\ResponseInterface
-     * @throws \BetaKiller\Exception\ValidationException
-     * @throws \BetaKiller\Repository\RepositoryException
-     * @throws \BetaKiller\Url\ElementProcessor\UrlElementProcessorException
-     * @throws \BetaKiller\WebHook\WebHookException
-     * @throws \Kohana_Exception
-     * @throws \Throwable
      */
-    public function process(
-        UrlElementInterface $model,
-        ServerRequestInterface $request
-    ): ResponseInterface {
-        if (!$model instanceof WebHookModelInterface) {
-            throw new UrlElementProcessorException('Model must be instance of :must, but :real provided', [
-                ':real' => \get_class($model),
-                ':must' => WebHookModelInterface::class,
-            ]);
-        }
-        if (!$request) {
-            throw new UrlElementProcessorException('Argument "request" must be defined');
+    public function handle(ServerRequestInterface $request): ResponseInterface
+    {
+        /** @var WebHookModelInterface $model */
+        $model = ServerRequestHelper::getEntity($request, WebHookModelInterface::class);
+
+        if (!$model) {
+            throw new NotFoundHttpException;
         }
 
         $requestMethod = $request->getMethod();
@@ -90,7 +80,7 @@ class WebHookUrlElementProcessor implements UrlElementProcessorInterface
         $exception = null;
 
         try {
-            $webHook = $this->webHookFactory->createFromUrlElement($model);
+            $webHook = $this->webHookFactory->createFromModel($model);
             $webHook->process($request);
             $logModel->setStatus(true);
         } catch (\Throwable $exception) {

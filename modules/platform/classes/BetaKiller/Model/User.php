@@ -123,7 +123,7 @@ class User extends \ORM implements UserInterface
     /**
      * @param \DateTimeInterface $value [optional]
      *
-     * @return \Worknector\Model\UserInterface
+     * @return \BetaKiller\Model\UserInterface
      */
     public function setCreatedAt(\DateTimeInterface $value = null): UserInterface
     {

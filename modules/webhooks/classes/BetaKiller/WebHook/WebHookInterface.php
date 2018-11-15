@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\WebHook;
 
-use BetaKiller\Url\WebHookModelInterface;
+use BetaKiller\Model\WebHookModelInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 interface WebHookInterface

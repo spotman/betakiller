@@ -1,11 +1,9 @@
 <?php
 declare(strict_types=1);
 
-namespace BetaKiller\Url;
+namespace BetaKiller\Model;
 
-use BetaKiller\Model\DispatchableEntityInterface;
-
-interface WebHookModelInterface extends UrlElementInterface, DispatchableEntityInterface
+interface WebHookModelInterface extends ConfigBasedDispatchableEntityInterface
 {
     public const URL_CONTAINER_KEY = 'WebHook';
 

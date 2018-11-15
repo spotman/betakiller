@@ -11,7 +11,6 @@ use BetaKiller\Helper\UrlHelper;
 use BetaKiller\IFace\Exception\UrlElementException;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Url\Behaviour\UrlBehaviourFactory;
-use BetaKiller\Url\Container\UrlContainer;
 use BetaKiller\Url\Container\UrlContainerInterface;
 use BetaKiller\Url\ElementFilter\AggregateUrlElementFilter;
 use BetaKiller\Url\ElementFilter\MenuCodenameUrlElementFilter;
@@ -126,7 +125,7 @@ class MenuWidget extends AbstractPublicWidget
 
         // Iterate over every url element
         foreach ($models as $urlElement) {
-            $params = $params ?: UrlContainer::create();
+            $params = $params ?: $urlHelper->createUrlContainer();
 
             // Iterate over every generated URL to make full tree
             foreach ($this->getAvailableIFaceUrls($urlElement, $params, $urlHelper) as $availableUrl) {

@@ -10,11 +10,13 @@ use BetaKiller\Url\UrlElementInterface;
 
 abstract class AbstractPlainUrlElementModel implements UrlElementInterface
 {
-    public const OPTION_CODENAME        = 'name';
-    public const OPTION_PARENT          = 'parent';
-    public const OPTION_URI             = 'uri';
-    public const OPTION_HIDE_IN_SITEMAP = 'hideInSiteMap';
-    public const OPTION_ACL_RULES       = 'aclRules';
+    public const OPTION_CODENAME           = 'name';
+    public const OPTION_PARENT             = 'parent';
+    public const OPTION_URI                = 'uri';
+    public const OPTION_HAS_TREE_BEHAVIOUR = 'hasTreeBehaviour';
+    public const OPTION_HIDE_IN_SITEMAP    = 'hideInSiteMap';
+    public const OPTION_IS_DEFAULT         = 'isDefault';
+    public const OPTION_ACL_RULES          = 'aclRules';
 
     /**
      * @var string
@@ -27,9 +29,24 @@ abstract class AbstractPlainUrlElementModel implements UrlElementInterface
     private $parentCodename;
 
     /**
+     * @var bool
+     */
+    private $isDefault = false;
+
+    /**
      * @var string
      */
     private $uri;
+
+    /**
+     * @var bool
+     */
+    private $hasDynamicUrl = false;
+
+    /**
+     * @var bool
+     */
+    private $hasTreeBehaviour = false;
 
     /**
      * @var string[]
@@ -64,6 +81,16 @@ abstract class AbstractPlainUrlElementModel implements UrlElementInterface
     }
 
     /**
+     * Returns TRUE if iface is marked as "default"
+     *
+     * @return bool
+     */
+    public function isDefault(): bool
+    {
+        return $this->isDefault;
+    }
+
+    /**
      * Returns iface url part
      *
      * @return string
@@ -84,7 +111,27 @@ abstract class AbstractPlainUrlElementModel implements UrlElementInterface
     }
 
     /**
-     * Returns codename of parent IFace or NULL
+     * Returns TRUE if UrlElement provides dynamic url mapping
+     *
+     * @return bool
+     */
+    public function hasDynamicUrl(): bool
+    {
+        return $this->hasDynamicUrl;
+    }
+
+    /**
+     * Returns TRUE if UrlElement provides tree-like url mapping
+     *
+     * @return bool
+     */
+    public function hasTreeBehaviour(): bool
+    {
+        return $this->hasTreeBehaviour;
+    }
+
+    /**
+     * Returns codename of the parent UrlElement or NULL
      *
      * @return string|null
      */
@@ -111,11 +158,13 @@ abstract class AbstractPlainUrlElementModel implements UrlElementInterface
     public function asArray(): array
     {
         return [
-            self::OPTION_CODENAME        => $this->getCodename(),
-            self::OPTION_URI             => $this->getUri(),
-            self::OPTION_PARENT          => $this->getParentCodename(),
-            self::OPTION_HIDE_IN_SITEMAP => $this->isHiddenInSiteMap(),
-            self::OPTION_ACL_RULES       => $this->getAdditionalAclRules(),
+            self::OPTION_CODENAME           => $this->getCodename(),
+            self::OPTION_URI                => $this->getUri(),
+            self::OPTION_HAS_TREE_BEHAVIOUR => $this->hasTreeBehaviour(),
+            self::OPTION_PARENT             => $this->getParentCodename(),
+            self::OPTION_HIDE_IN_SITEMAP    => $this->isHiddenInSiteMap(),
+            self::OPTION_ACL_RULES          => $this->getAdditionalAclRules(),
+            self::OPTION_IS_DEFAULT         => $this->isDefault(),
         ];
     }
 
@@ -123,6 +172,18 @@ abstract class AbstractPlainUrlElementModel implements UrlElementInterface
     {
         $this->uri      = $data[self::OPTION_URI];
         $this->codename = $data[self::OPTION_CODENAME];
+
+        if (isset($data[self::OPTION_IS_DEFAULT])) {
+            $this->isDefault = true;
+        }
+
+        if (\mb_strpos($this->uri, '{') === 0 && \mb_strpos($this->uri, '}', -1) !== false) {
+            $this->hasDynamicUrl = true;
+        }
+
+        if (isset($data[self::OPTION_HAS_TREE_BEHAVIOUR])) {
+            $this->hasTreeBehaviour = true;
+        }
 
         if (isset($data[self::OPTION_PARENT])) {
             $this->parentCodename = (string)$data[self::OPTION_PARENT];

@@ -2,9 +2,10 @@
 namespace BetaKiller\IFace\Admin;
 
 use BetaKiller\IFace\AbstractIFace;
+use BetaKiller\Url\BeforeProcessingInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-abstract class AbstractAdminIFace extends AbstractIFace
+abstract class AbstractAdminIFace extends AbstractIFace implements BeforeProcessingInterface
 {
     /**
      * This hook executed before IFace processing (on every request regardless of caching)
@@ -14,11 +15,9 @@ abstract class AbstractAdminIFace extends AbstractIFace
      *
      * @throws \Exception
      */
-    public function before(ServerRequestInterface $request): void
+    public function beforeProcessing(ServerRequestInterface $request): void
     {
         // Disable caching for admin ifaces
         $this->setExpiresInPast();
-
-        parent::before($request);
     }
 }

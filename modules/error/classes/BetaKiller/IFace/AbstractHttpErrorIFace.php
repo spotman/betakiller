@@ -3,9 +3,10 @@ namespace BetaKiller\IFace;
 
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\IFace\Auth\LoginIFace;
+use BetaKiller\Url\BeforeProcessingInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-abstract class AbstractHttpErrorIFace extends AbstractIFace
+abstract class AbstractHttpErrorIFace extends AbstractIFace implements BeforeProcessingInterface
 {
     protected $exception;
 
@@ -15,7 +16,7 @@ abstract class AbstractHttpErrorIFace extends AbstractIFace
      *
      * @param \Psr\Http\Message\ServerRequestInterface $request
      */
-    public function before(ServerRequestInterface $request): void
+    public function beforeProcessing(ServerRequestInterface $request): void
     {
         // No caching for error pages
         $this->setExpiresInPast();

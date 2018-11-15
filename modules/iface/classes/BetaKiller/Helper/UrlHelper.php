@@ -11,7 +11,6 @@ use BetaKiller\Model\DispatchableEntityInterface;
 use BetaKiller\Url\Behaviour\UrlBehaviourException;
 use BetaKiller\Url\Behaviour\UrlBehaviourFactory;
 use BetaKiller\Url\Container\ResolvingUrlContainer;
-use BetaKiller\Url\Container\UrlContainer;
 use BetaKiller\Url\Container\UrlContainerInterface;
 use BetaKiller\Url\UrlDispatcher;
 use BetaKiller\Url\UrlElementInterface;
@@ -91,6 +90,11 @@ class UrlHelper
         return $this->stack->has($model, $params);
     }
 
+    public function createUrlContainer(): UrlContainerInterface
+    {
+        return ResolvingUrlContainer::create();
+    }
+
     /**
      * @param \BetaKiller\Url\UrlElementInterface                  $urlElement
      * @param \BetaKiller\Url\Container\UrlContainerInterface|null $params
@@ -111,7 +115,7 @@ class UrlHelper
         }
 
         // Use self-resolving container as default
-        $params = $params ?: ResolvingUrlContainer::create();
+        $params = $params ?: $this->createUrlContainer();
 
         // Import current UrlContainer values for simplicity in the client code
         $params->import($this->urlContainer);
@@ -151,7 +155,7 @@ class UrlHelper
         string $zone,
         ?bool $removeCycling = null
     ): string {
-        $params = ResolvingUrlContainer::create();
+        $params = $this->createUrlContainer();
         $params->setParameter($entity);
 
         // Search for URL element with provided entity, action and zone
@@ -276,7 +280,7 @@ class UrlHelper
     public function isValidUrl(string $url): bool
     {
         $dispatcher = new UrlDispatcher($this->tree, $this->behaviourFactory);
-        $params     = new UrlContainer();
+        $params     = $this->createUrlContainer();
         $stack      = new UrlElementStack($params);
 
         try {
