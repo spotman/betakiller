@@ -49,11 +49,13 @@ class NamespaceBasedFactoryBuilder
             /** @var \BetaKiller\Factory\NamespaceBasedFactory $factory */
             $factory = $this->container->make(NamespaceBasedFactory::class);
 
-            $factory->addRootNamespace('BetaKiller');
-
+            // Add project namespace as primary one
             if (!$this->appEnv->isCoreRunning()) {
                 $factory->addRootNamespace($this->appConfig->getNamespace());
             }
+
+            // Add core namespace as fallback
+            $factory->addRootNamespace('BetaKiller');
 
             return $factory;
         } catch (\Throwable $e) {
