@@ -5,11 +5,11 @@ namespace BetaKiller\Model;
 
 class Language extends \ORM implements LanguageInterface
 {
-    public const TABLE_NAME            = 'languages';
-    public const TABLE_FIELD_NAME      = 'name';
-    public const TABLE_FIELD_LOCALE    = 'locale';
-    public const TABLE_FIELD_LABEL     = 'label';
-    public const TABLE_FIELD_IS_SYSTEM = 'is_system';
+    public const TABLE_NAME             = 'languages';
+    public const TABLE_FIELD_NAME       = 'name';
+    public const TABLE_FIELD_LOCALE     = 'locale';
+    public const TABLE_FIELD_LABEL      = 'label';
+    public const TABLE_FIELD_IS_SYSTEM  = 'is_system';
     public const TABLE_FIELD_IS_DEFAULT = 'is_default';
 
     protected function configure(): void
@@ -46,8 +46,7 @@ class Language extends \ORM implements LanguageInterface
      */
     public function setName(string $value): LanguageInterface
     {
-        $value = strtolower(trim($value));
-        $this->set(self::TABLE_FIELD_NAME, $value);
+        $this->set(self::TABLE_FIELD_NAME, strtolower($value));
 
         return $this;
     }
@@ -67,7 +66,6 @@ class Language extends \ORM implements LanguageInterface
      */
     public function setLocale(string $value): LanguageInterface
     {
-        $value = trim($value);
         $this->set(self::TABLE_FIELD_LOCALE, $value);
 
         return $this;
