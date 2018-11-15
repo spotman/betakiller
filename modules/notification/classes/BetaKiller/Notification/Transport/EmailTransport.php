@@ -36,7 +36,9 @@ class EmailTransport extends AbstractTransport
         $subj        = $renderer->makeSubject($message, $user);
         $attachments = $message->getAttachments();
 
-        $body = $renderer->render($message, $user, $this);
+        $body = $renderer->render($message, $user, $this, [
+            'subject' => $subj,
+        ]);
 
         // Email notification
         return \Email::send($from, $to, $subj, $body, true, $attachments);

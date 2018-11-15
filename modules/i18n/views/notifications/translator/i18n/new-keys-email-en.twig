@@ -1,0 +1,16 @@
+{% extends "@notifications/default/email" %}
+
+{% block body %}
+  <p>Dear {{ targetName }},</p>
+
+  <p>these translation keys are waiting for you ({{ count }} in total):</p>
+
+  <ul>
+    {% for key in keys %}
+      <li><a href="{{ key.url }}">{{ key.name }}</a><br/></li>
+    {% endfor %}
+  </ul>
+  <br/>
+
+  <p>Check <a href="{{ list_url }}"><strong>all untranslated keys here</strong></a></p>
+{% endblock %}

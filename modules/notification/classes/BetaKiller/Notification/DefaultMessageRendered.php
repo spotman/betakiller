@@ -35,13 +35,16 @@ class DefaultMessageRendered implements MessageRendererInterface
      * @param \BetaKiller\Notification\NotificationUserInterface      $target
      * @param \BetaKiller\Notification\NotificationTransportInterface $transport
      *
+     * @param array|null                                              $additionalData
+     *
      * @return string
      * @throws \BetaKiller\Notification\NotificationException
      */
     public function render(
         NotificationMessageInterface $message,
         NotificationUserInterface $target,
-        NotificationTransportInterface $transport
+        NotificationTransportInterface $transport,
+        array $additionalData = null
     ): string {
         // User language in templates
         $lang = $this->getTargetLanguage($target);
@@ -51,7 +54,7 @@ class DefaultMessageRendered implements MessageRendererInterface
         $file = $this->getTemplatePath().DIRECTORY_SEPARATOR.$templateName;
         $view = $this->viewFactory->create($file);
 
-        $data = array_merge($message->getFullDataForTarget($target), [
+        $data = array_merge($message->getFullDataForTarget($target), $additionalData ?? [], [
             'baseI18nKey' => $message->getBaseI18nKey(),
         ]);
 
