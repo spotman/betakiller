@@ -104,36 +104,6 @@ class IFace extends AbstractOrmModelContainsUrlElement implements IFaceModelInte
     }
 
     /**
-     * Returns TRUE if iface is marked as "default"
-     *
-     * @return bool
-     */
-    public function isDefault(): bool
-    {
-        return (bool)$this->get('is_default');
-    }
-
-    /**
-     * Returns TRUE if iface provides dynamic url mapping
-     *
-     * @return bool
-     */
-    public function hasDynamicUrl(): bool
-    {
-        return (bool)$this->get('is_dynamic');
-    }
-
-    /**
-     * Returns TRUE if iface has multi-level tree-behavior url mapping
-     *
-     * @return bool
-     */
-    public function hasTreeBehaviour(): bool
-    {
-        return (bool)$this->get('is_tree');
-    }
-
-    /**
      * Returns model name of the linked entity
      *
      * @return string|null

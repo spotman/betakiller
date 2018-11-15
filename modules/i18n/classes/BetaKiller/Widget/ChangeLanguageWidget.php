@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace BetaKiller\Widget;
 
-use BetaKiller\Action\ChangeLanguageAction;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Repository\LanguageRepository;
 use Psr\Http\Message\ServerRequestInterface;
@@ -32,35 +31,40 @@ class ChangeLanguageWidget extends AbstractPublicWidget
      */
     public function getData(ServerRequestInterface $request, array $context): array
     {
-        $urlHelper        = ServerRequestHelper::getUrlHelper($request);
-        $actionUrlElement = $urlHelper->getUrlElementByCodename(
-            ChangeLanguageAction::codename()
-        );
-        $actionUrl        = $urlHelper->makeUrl($actionUrlElement);
-        $i18n             = ServerRequestHelper::getI18n($request);
-        $langNameActive   = $i18n->getLang();
-        $langsName        = $this->getLangsName();
+        $urlHelper = ServerRequestHelper::getUrlHelper($request);
 
-        return [
-            'action_url'       => $actionUrl,
-            'lang_name_active' => $langNameActive,
-            'langs_name'       => $langsName,
-        ];
-    }
+        $currentLangName = ServerRequestHelper::getI18n($request)->getLang();
 
-    /**
-     * @return string[]
-     * @throws \BetaKiller\Factory\FactoryException
-     * @throws \BetaKiller\Repository\RepositoryException
-     */
-    private function getLangsName(): array
-    {
-        $langsName  = [];
-        $langsModel = $this->languageRepo->getAll();
-        foreach ($langsModel as $langModel) {
-            $langsName[] = $langModel->getName();
+        // Link to current page in other language
+        $element = ServerRequestHelper::getUrlElementStack($request)->getCurrent();
+
+        // Add query parameters if exists
+        $currentQuery = $request->getUri()->getQuery();
+
+        $links = [];
+
+        foreach ($this->languageRepo->getAllSystem() as $lang) {
+            $params = $urlHelper->createUrlContainer()->setEntity($lang);
+            $url    = $urlHelper->makeUrl($element, $params, false);
+
+            if ($currentQuery) {
+                $url .= '?'.$currentQuery;
+            }
+
+            $data = [
+                'url'   => $url,
+                'label' => $lang->getLabel(),
+            ];
+
+            if ($lang->getName() === $currentLangName) {
+                \array_unshift($links, $data);
+            } else {
+                $links[] = $data;
+            }
         }
 
-        return $langsName;
+        return [
+            'lang_list' => $links,
+        ];
     }
 }

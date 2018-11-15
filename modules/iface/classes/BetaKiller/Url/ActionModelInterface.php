@@ -5,5 +5,4 @@ namespace BetaKiller\Url;
 
 interface ActionModelInterface extends EntityLinkedUrlElementInterface
 {
-    public const URL_CONTAINER_KEY = 'Action';
 }

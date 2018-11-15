@@ -1,8 +1,7 @@
 <?php
 namespace BetaKiller\Factory;
 
-use BetaKiller\Url\UrlElementInterface;
-use BetaKiller\Url\WebHookModelInterface;
+use BetaKiller\Model\WebHookModelInterface;
 use BetaKiller\WebHook\WebHookInterface;
 
 class WebHookFactory
@@ -30,20 +29,13 @@ class WebHookFactory
     }
 
     /**
-     * @param \BetaKiller\Url\UrlElementInterface $model
+     * @param \BetaKiller\Model\WebHookModelInterface $model
      *
      * @return \BetaKiller\WebHook\WebHookInterface
      * @throws \BetaKiller\Factory\FactoryException
      */
-    public function createFromUrlElement(UrlElementInterface $model): WebHookInterface
+    public function createFromModel(WebHookModelInterface $model): WebHookInterface
     {
-        if (!$model instanceof WebHookModelInterface) {
-            throw new FactoryException('Can not create WebHook from URL element :codename of type :class', [
-                ':codename' => $model->getCodename(),
-                ':class'    => \get_class($model),
-            ]);
-        }
-
         $codename = $model->getCodename();
 
         /** @var \BetaKiller\WebHook\WebHookInterface $instance */

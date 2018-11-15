@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\Model;
 
-interface LanguageInterface extends AbstractEntityInterface
+interface LanguageInterface extends DispatchableEntityInterface
 {
     public const NAME_EN = 'en';
 

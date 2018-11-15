@@ -65,6 +65,36 @@ abstract class AbstractOrmModelContainsUrlElement extends \ORM implements UrlEle
     }
 
     /**
+     * Returns TRUE if iface is marked as "default"
+     *
+     * @return bool
+     */
+    public function isDefault(): bool
+    {
+        return $this->getUrlElement()->isDefault();
+    }
+
+    /**
+     * Returns TRUE if iface provides dynamic url mapping
+     *
+     * @return bool
+     */
+    public function hasDynamicUrl(): bool
+    {
+        return $this->getUrlElement()->hasDynamicUrl();
+    }
+
+    /**
+     * Returns TRUE if iface has multi-level tree-behavior url mapping
+     *
+     * @return bool
+     */
+    public function hasTreeBehaviour(): bool
+    {
+        return $this->getUrlElement()->hasTreeBehaviour();
+    }
+
+    /**
      * Returns array of additional ACL rules in format <ResourceName>.<permissionName> (eq, ["Admin.enabled"])
      *
      * @return string[]

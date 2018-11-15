@@ -7,28 +7,10 @@ use BetaKiller\Url\IFaceModelInterface;
 
 class IFacePlainModel extends AbstractPlainEntityLinkedUrlElement implements IFaceModelInterface
 {
-    public const OPTION_LABEL              = 'label';
-    public const OPTION_TITLE              = 'title';
-    public const OPTION_LAYOUT             = 'layout';
-    public const OPTION_IS_DEFAULT         = 'isDefault';
-    public const OPTION_HAS_DYNAMIC_URL    = 'hasDynamicUrl';
-    public const OPTION_HAS_TREE_BEHAVIOUR = 'hasTreeBehaviour';
-    public const OPTION_MENU               = 'menu';
-
-    /**
-     * @var bool
-     */
-    private $isDefault = false;
-
-    /**
-     * @var bool
-     */
-    private $hasDynamicUrl = false;
-
-    /**
-     * @var bool
-     */
-    private $hasTreeBehaviour = false;
+    public const OPTION_LABEL  = 'label';
+    public const OPTION_TITLE  = 'title';
+    public const OPTION_LAYOUT = 'layout';
+    public const OPTION_MENU   = 'menu';
 
     /**
      * @var string
@@ -54,16 +36,6 @@ class IFacePlainModel extends AbstractPlainEntityLinkedUrlElement implements IFa
      * @var string|null
      */
     private $menu;
-
-    /**
-     * Returns TRUE if iface is marked as "default"
-     *
-     * @return bool
-     */
-    public function isDefault(): bool
-    {
-        return $this->isDefault;
-    }
 
     /**
      * Returns label for using in breadcrumbs and etc
@@ -140,12 +112,10 @@ class IFacePlainModel extends AbstractPlainEntityLinkedUrlElement implements IFa
     public function asArray(): array
     {
         return array_merge(parent::asArray(), [
-            self::OPTION_LABEL           => $this->getLabel(),
-            self::OPTION_TITLE           => $this->getTitle(),
-            self::OPTION_LAYOUT          => $this->getLayoutCodename(),
-            self::OPTION_IS_DEFAULT      => $this->isDefault(),
-            self::OPTION_HAS_DYNAMIC_URL => $this->hasDynamicUrl(),
-            self::OPTION_MENU            => $this->getMenuName(),
+            self::OPTION_LABEL  => $this->getLabel(),
+            self::OPTION_TITLE  => $this->getTitle(),
+            self::OPTION_LAYOUT => $this->getLayoutCodename(),
+            self::OPTION_MENU   => $this->getMenuName(),
         ]);
     }
 
@@ -163,18 +133,6 @@ class IFacePlainModel extends AbstractPlainEntityLinkedUrlElement implements IFa
     {
         $this->label = $data[self::OPTION_LABEL] ?? null;
         $this->title = $data[self::OPTION_TITLE] ?? null;
-
-        if (isset($data[self::OPTION_IS_DEFAULT])) {
-            $this->isDefault = true;
-        }
-
-        if (isset($data[self::OPTION_HAS_DYNAMIC_URL])) {
-            $this->hasDynamicUrl = true;
-        }
-
-        if (isset($data[self::OPTION_HAS_TREE_BEHAVIOUR])) {
-            $this->hasTreeBehaviour = true;
-        }
 
         if (isset($data[self::OPTION_HIDE_IN_SITEMAP])) {
             $this->hideInSiteMap = true;
@@ -197,26 +155,6 @@ class IFacePlainModel extends AbstractPlainEntityLinkedUrlElement implements IFa
     public function isHiddenInSiteMap(): bool
     {
         return $this->hideInSiteMap;
-    }
-
-    /**
-     * Returns TRUE if iface provides dynamic url mapping
-     *
-     * @return bool
-     */
-    public function hasDynamicUrl(): bool
-    {
-        return $this->hasDynamicUrl;
-    }
-
-    /**
-     * Returns TRUE if iface provides tree-like url mapping
-     *
-     * @return bool
-     */
-    public function hasTreeBehaviour(): bool
-    {
-        return $this->hasTreeBehaviour;
     }
 
     /**

@@ -9,13 +9,6 @@ use BetaKiller\Url\Parameter\UrlParameterInterface;
 interface UrlContainerInterface
 {
     /**
-     * Creates new instance of
-     *
-     * @return \BetaKiller\Url\Container\UrlContainerInterface
-     */
-    public static function create(): UrlContainerInterface;
-
-    /**
      * @param \BetaKiller\Url\Parameter\UrlParameterInterface $object
      * @param bool|null                                       $ignoreDuplicate
      *
@@ -39,7 +32,10 @@ interface UrlContainerInterface
      *
      * @return \BetaKiller\Url\Container\UrlContainerInterface
      */
-    public function setEntity(DispatchableEntityInterface $entity, ?bool $ignoreDuplicate = null): UrlContainerInterface;
+    public function setEntity(
+        DispatchableEntityInterface $entity,
+        ?bool $ignoreDuplicate = null
+    ): UrlContainerInterface;
 
     /**
      * @param string $key

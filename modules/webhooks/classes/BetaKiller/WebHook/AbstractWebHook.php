@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace BetaKiller\WebHook;
 
+use BetaKiller\Model\WebHookModelInterface;
 use BetaKiller\Url\AbstractUrlElement;
-use BetaKiller\Url\WebHookModelInterface;
 
 abstract class AbstractWebHook extends AbstractUrlElement implements WebHookInterface
 {
@@ -17,7 +17,7 @@ abstract class AbstractWebHook extends AbstractUrlElement implements WebHookInte
     }
 
     /**
-     * @var \BetaKiller\Url\WebHookModelInterface
+     * @var \BetaKiller\Model\WebHookModelInterface
      */
     private $model;
 

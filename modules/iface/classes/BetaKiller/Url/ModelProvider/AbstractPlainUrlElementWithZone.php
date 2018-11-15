@@ -13,11 +13,10 @@ abstract class AbstractPlainUrlElementWithZone extends AbstractPlainUrlElementMo
     /**
      * @var string
      */
-    private $zone;
+    private $zone = '';
 
     public function fromArray(array $data): void
     {
-
         if (isset($data[self::OPTION_ZONE])) {
             $this->zone = mb_strtolower($data[self::OPTION_ZONE]);
         }
@@ -32,7 +31,7 @@ abstract class AbstractPlainUrlElementWithZone extends AbstractPlainUrlElementMo
      */
     public function asArray(): array
     {
-        return array_merge(parent::asArray(), [
+        return array_merge(parent::asArray() + [
             self::OPTION_ZONE => $this->getZoneName(),
         ]);
     }

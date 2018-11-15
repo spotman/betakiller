@@ -13,7 +13,7 @@ use BetaKiller\Model\LanguageInterface;
  * @method LanguageInterface findById(string $id)
  * @method save(LanguageInterface $model)
  */
-interface LanguageRepositoryInterface extends RepositoryInterface
+interface LanguageRepositoryInterface extends DispatchableRepositoryInterface
 {
     /**
      * @param string $name

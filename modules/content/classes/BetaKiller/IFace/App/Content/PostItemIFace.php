@@ -6,10 +6,11 @@ use BetaKiller\Helper\ContentUrlContainerHelper;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Helper\UrlElementHelper;
 use BetaKiller\Model\ContentPost;
+use BetaKiller\Url\BeforeProcessingInterface;
 use BetaKiller\Url\ZoneInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-class PostItemIFace extends AbstractAppBase
+class PostItemIFace extends AbstractAppBase implements BeforeProcessingInterface
 {
     /**
      * @var \BetaKiller\Helper\AssetsHelper
@@ -34,7 +35,7 @@ class PostItemIFace extends AbstractAppBase
      *
      * @throws \Kohana_Exception
      */
-    public function before(ServerRequestInterface $request): void
+    public function beforeProcessing(ServerRequestInterface $request): void
     {
         // Count guest views only
         if (ServerRequestHelper::isGuest($request)) {

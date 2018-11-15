@@ -4,9 +4,10 @@ namespace BetaKiller\IFace\Auth;
 use BetaKiller\Exception\FoundHttpException;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\IFace\AbstractIFace;
+use BetaKiller\Url\BeforeProcessingInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-class LoginIFace extends AbstractIFace
+class LoginIFace extends AbstractIFace implements BeforeProcessingInterface
 {
     public const URL = '/login/';
 
@@ -16,7 +17,7 @@ class LoginIFace extends AbstractIFace
      *
      * @param \Psr\Http\Message\ServerRequestInterface $request
      */
-    public function before(ServerRequestInterface $request): void
+    public function beforeProcessing(ServerRequestInterface $request): void
     {
         // If user already authorized
         if (!ServerRequestHelper::isGuest($request)) {

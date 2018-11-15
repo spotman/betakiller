@@ -7,7 +7,6 @@ use BetaKiller\Factory\FactoryException;
 use BetaKiller\Helper\UrlHelper;
 use BetaKiller\Repository\RepositoryException;
 use BetaKiller\Url\Container\UrlContainerInterface;
-use BetaKiller\Url\IFaceModelInterface;
 use BetaKiller\Url\UrlDispatcher;
 use BetaKiller\Url\UrlElementInterface;
 use BetaKiller\Url\UrlPathIterator;
@@ -39,7 +38,6 @@ class MultipleUrlBehaviour extends AbstractUrlBehaviour
      *
      * @return bool
      * @throws \BetaKiller\IFace\Exception\UrlElementException
-     * @throws \BetaKiller\Url\Behaviour\UrlBehaviourException
      * @throws \BetaKiller\Url\UrlPrototypeException
      */
     public function parseUri(
@@ -54,30 +52,23 @@ class MultipleUrlBehaviour extends AbstractUrlBehaviour
     }
 
     /**
-     * @param \BetaKiller\Url\UrlElementInterface             $ifaceModel
+     * @param \BetaKiller\Url\UrlElementInterface             $urlElement
      * @param \BetaKiller\Url\UrlPathIterator                 $it
      *
      * @param \BetaKiller\Url\Container\UrlContainerInterface $urlContainer
      *
      * @throws \BetaKiller\IFace\Exception\UrlElementException
-     * @throws \BetaKiller\Url\Behaviour\UrlBehaviourException
      * @throws \BetaKiller\Url\UrlPrototypeException
      */
     protected function parseUriParameterPart(
-        UrlElementInterface $ifaceModel,
+        UrlElementInterface $urlElement,
         UrlPathIterator $it,
         UrlContainerInterface $urlContainer
     ): void {
-        if (!$ifaceModel instanceof IFaceModelInterface) {
-            throw new UrlBehaviourException('MultipleUrlBehavior can proceed :class only', [
-                ':class' => IFaceModelInterface::class,
-            ]);
-        }
-
-        $prototype = $this->prototypeService->createPrototypeFromUrlElement($ifaceModel);
+        $prototype = $this->prototypeService->createPrototypeFromUrlElement($urlElement);
 
         // Root element have default uri
-        $uriValue = ($it->rootRequested() || ($ifaceModel->isDefault() && !$ifaceModel->hasDynamicUrl()))
+        $uriValue = ($it->rootRequested() || ($urlElement->isDefault() && !$urlElement->hasDynamicUrl()))
             ? UrlDispatcher::DEFAULT_URI
             : $it->current();
 
@@ -91,7 +82,7 @@ class MultipleUrlBehaviour extends AbstractUrlBehaviour
 
         // Store model into registry
         // Allow tree url behaviour to set value multiple times
-        $urlContainer->setParameter($item, $ifaceModel->hasTreeBehaviour());
+        $urlContainer->setParameter($item, $urlElement->hasTreeBehaviour());
     }
 
     /**
@@ -124,12 +115,6 @@ class MultipleUrlBehaviour extends AbstractUrlBehaviour
         UrlContainerInterface $params,
         UrlHelper $urlHelper
     ): \Generator {
-        if (!$urlElement instanceof IFaceModelInterface) {
-            throw new UrlBehaviourException('MultipleUrlBehavior can proceed :class only', [
-                ':class' => IFaceModelInterface::class,
-            ]);
-        }
-
         $prototype = $this->prototypeService->createPrototypeFromUrlElement($urlElement);
         $items     = $this->prototypeService->getAvailableParameters($prototype, $params);
 

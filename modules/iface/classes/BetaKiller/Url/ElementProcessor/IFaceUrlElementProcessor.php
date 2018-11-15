@@ -2,12 +2,14 @@
 namespace BetaKiller\Url\ElementProcessor;
 
 use BetaKiller\Exception\BadRequestHttpException;
-use BetaKiller\Exception\FoundHttpException;
 use BetaKiller\Factory\IFaceFactory;
 use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\IFace\Cache\IFaceCache;
 use BetaKiller\IFace\IFaceInterface;
+use BetaKiller\Url\AfterDispatchingInterface;
+use BetaKiller\Url\AfterProcessingInterface;
+use BetaKiller\Url\BeforeProcessingInterface;
 use BetaKiller\Url\IFaceModelInterface;
 use BetaKiller\Url\UrlElementInterface;
 use BetaKiller\View\IFaceView;
@@ -62,7 +64,6 @@ class IFaceUrlElementProcessor implements UrlElementProcessorInterface
      * @param \Psr\Http\Message\ServerRequestInterface $request
      *
      * @return \Psr\Http\Message\ResponseInterface
-     * @throws \BetaKiller\Exception\FoundHttpException
      * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\Url\ElementProcessor\UrlElementProcessorException
      * @throws \PageCache\PageCacheException
@@ -79,21 +80,29 @@ class IFaceUrlElementProcessor implements UrlElementProcessorInterface
             ]);
         }
 
-        $path = $request->getUri()->getPath();
-
-        // If this is default IFace and client requested non-slash uri, redirect client to /
-        if ($path !== '/' && $model->isDefault() && !$model->hasDynamicUrl()) {
-            throw new FoundHttpException('/');
-        }
-
         $urlContainer = ServerRequestHelper::getUrlContainer($request);
+        $stack        = ServerRequestHelper::getUrlElementStack($request);
         $user         = ServerRequestHelper::getUser($request);
 
-        // Create IFace instance
+        // Process afterDispatching() hooks on every IFace in stack
+        foreach ($stack->getIterator() as $item) {
+            if ($item instanceof IFaceModelInterface) {
+                // Create IFace instance
+                $iface = $this->ifaceFactory->createFromUrlElement($item);
+
+                if ($iface instanceof AfterDispatchingInterface) {
+                    $iface->afterDispatching($request);
+                }
+            }
+        }
+
+        // Create current IFace instance
         $iface = $this->ifaceFactory->createFromUrlElement($model);
 
-        // Starting hook
-        $iface->before($request);
+        if ($iface instanceof BeforeProcessingInterface) {
+            // Starting hook
+            $iface->beforeProcessing($request);
+        }
 
         // Processing page cache for quests if no URL query parameters (skip caching for authorized users)
         if (!$urlContainer->getQueryPartsKeys() && $user->isGuest()) {
@@ -103,8 +112,10 @@ class IFaceUrlElementProcessor implements UrlElementProcessorInterface
         try {
             $output = $this->ifaceView->render($iface, $request);
 
-            // Final hook
-            $iface->after();
+            if ($iface instanceof AfterProcessingInterface) {
+                // Final hook
+                $iface->afterProcessing($request);
+            }
 
             // TODO Apply to other UrlElement types (Action, WebHook)
             $unusedParts = $urlContainer->getUnusedQueryPartsKeys();

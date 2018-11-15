@@ -14,11 +14,11 @@ class PostItemPreviewIFace extends PostItemIFace
      *
      * @throws \Kohana_Exception
      */
-    public function before(ServerRequestInterface $request): void
+    public function beforeProcessing(ServerRequestInterface $request): void
     {
         // Disable caching
         $this->setExpiresInPast();
 
-        parent::before($request);
+        parent::beforeProcessing($request);
     }
 }
