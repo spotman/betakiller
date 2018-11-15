@@ -7,7 +7,6 @@ use BetaKiller\Acl\Resource\EntityRelatedAclResourceInterface;
 use BetaKiller\CrudlsActionsInterface;
 use BetaKiller\Factory\GuestUserFactory;
 use BetaKiller\IFace\Exception\UrlElementException;
-use BetaKiller\IFace\IFaceInterface;
 use BetaKiller\Model\DispatchableEntityInterface;
 use BetaKiller\Model\GuestUserInterface;
 use BetaKiller\Model\UserInterface;
