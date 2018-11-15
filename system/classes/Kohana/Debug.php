@@ -342,7 +342,7 @@ class Kohana_Debug {
 	 *     echo implode('<br/>', Debug::trace());
 	 *
 	 * @param   array   $trace
-	 * @return  string
+	 * @return  string[]
 	 */
 	public static function trace(array $trace = NULL)
 	{
