@@ -24,6 +24,11 @@ class WebHookRepository extends AbstractConfigBasedDispatchableRepository
         return WebHookModelInterface::URL_KEY_CODENAME;
     }
 
+    /**
+     * @param string $serviceName
+     *
+     * @return WebHookModelInterface[]
+     */
     public function getByServiceName(string $serviceName): array
     {
         return \array_filter($this->getAll(), function (WebHookModelInterface $model) use ($serviceName) {
