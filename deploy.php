@@ -396,6 +396,10 @@ task('import:roles', function () {
     runMinionTask('importRoles');
 })->desc('Import localization data');
 
+task('import:zones', function () {
+    runMinionTask('importZones');
+})->desc('Import UrlElement zones');
+
 task('import:i18n', function () {
     runMinionTask('import:languages');
     runMinionTask('import:i18n');
@@ -418,6 +422,7 @@ task('migrate', [
     'migrations:up',
 
     // Import data
+    'import:zones',
     'import:roles',
     'import:i18n', // Depends on roles
     'import:notification', // Depends on roles
