@@ -425,7 +425,7 @@ task('migrate', [
     'import:zones',
     'import:roles',
     'import:notification', // Depends on roles
-    'import:i18n', // Depends on roles
+    'import:i18n', // Depends on roles and notification
 ])->setPrivate();
 
 task('deploy', [
