@@ -24,4 +24,16 @@ return [
         'auto_reload' => true, // !Kohana::inProduction(TRUE),
         'debug'       => true, // !Kohana::inProduction(),
     ],
+
+    /**
+     * Twig extensions to register
+     *
+     *      'extensions' => array(
+     *          'Twig_Extension_Debug',
+     *          'MyProject_Twig_Extension'
+     *      )
+     */
+    'extensions'    =>  [
+        \Kint\Twig\TwigExtension::class
+    ],
 ];

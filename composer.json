@@ -63,6 +63,8 @@
   "require-dev": {
     "codedungeon/phpunit-result-printer": "^0.23",
     "deployer/deployer": "^6",
+    "kint-php/kint": "^3.0",
+    "kint-php/kint-twig": "^2.0",
     "phpstan/phpstan": "0.10.3",
     "phpunit/dbunit": "^4.0",
     "phpunit/php-code-coverage": "^6.0",
