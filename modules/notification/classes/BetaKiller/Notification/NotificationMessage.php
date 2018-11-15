@@ -8,8 +8,7 @@ namespace BetaKiller\Notification;
  */
 class NotificationMessage implements NotificationMessageInterface
 {
-    private const CODENAME_TEMPLATE = 'a-z-/';
-
+    private const CODENAME_TEMPLATE = 'a-z0-9-/';
 
     /**
      * @var string
@@ -62,9 +61,9 @@ class NotificationMessage implements NotificationMessageInterface
         preg_match('/[^'.$codenamePattern.']/', $codename, $isCodenameInvalid);
         if ($isCodenameInvalid) {
             throw new NotificationException(
-                'Codename ":messageCodename" is invalid. Valid codename template: :codenameTemplate', [
-                    'messageCodename'  => $codename,
-                    'codenameTemplate' => $codenameTemplate,
+                'Codename ":messageCodename" is invalid. Valid codename template is :codenameTemplate', [
+                    ':messageCodename'  => $codename,
+                    ':codenameTemplate' => $codenameTemplate,
                 ]
             );
         }

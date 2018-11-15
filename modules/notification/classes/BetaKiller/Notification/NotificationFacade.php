@@ -188,6 +188,34 @@ class NotificationFacade
         return $total;
     }
 
+    public function getGroupByMessageCodename(string $messageCodename): NotificationGroupInterface
+    {
+        // Fetch group by message codename
+        $groupCodename = $this->config->getMessageGroup($messageCodename);
+
+        if (!$groupCodename) {
+            throw new NotificationException(
+                'Group not found for message codename ":codename"', [
+                    ':codename' => $messageCodename,
+                ]
+            );
+        }
+
+        return $this->groupRepo->getByCodename($groupCodename);
+    }
+
+    /**
+     * @param \BetaKiller\Model\NotificationGroupInterface $group
+     *
+     * @return \BetaKiller\Notification\NotificationUserInterface[]
+     * @throws \BetaKiller\Exception
+     * @throws \BetaKiller\Factory\FactoryException
+     */
+    public function getGroupTargets(NotificationGroupInterface $group): array
+    {
+        return $this->groupRepo->findGroupUsers($group);
+    }
+
     /**
      * @param string $name
      *
@@ -261,7 +289,7 @@ class NotificationFacade
         $group = $this->getMessageGroup($message);
 
         // Fetch targets (users) by group
-        $users = $this->groupRepo->findGroupUsers($group);
+        $users = $this->getGroupTargets($group);
 
         if (!$users) {
             throw new NotificationException('No users found for group ":codename"', [
@@ -286,17 +314,6 @@ class NotificationFacade
     {
         $messageCodename = $message->getCodename();
 
-        // Fetch group by message codename
-        $groupCodename = $this->config->getMessageGroup($messageCodename);
-
-        if (!$groupCodename) {
-            throw new NotificationException(
-                'Group not found for message codename ":codename"', [
-                    ':codename' => $messageCodename,
-                ]
-            );
-        }
-
-        return $this->groupRepo->getByCodename($groupCodename);
+        return $this->getGroupByMessageCodename($messageCodename);
     }
 }
