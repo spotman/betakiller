@@ -1,0 +1,55 @@
+{% extends layout %}
+
+{% macro group_list(groups_data) %}
+  {% for group in groups_data %}
+
+    <table>
+      <thead>
+      <tr>
+        <td colspan="2">
+          <h3><a href="{{ group.url }}">{{ group.name|upper }}</a></h3>
+        </td>
+      </tr>
+      </thead>
+      <tbody>
+
+      {% for message in group.messages %}
+        <tr>
+          <td>
+            {{ message.name }}<br/>
+            {% for transport, transport_data in message.templates %}
+              {% for lang, is_exists in transport_data %}
+                <span class="badge white-text {{ is_exists ? "green" : "red" }}">{{ transport }} - {{ lang }}</span>
+              {% endfor %}
+            {% endfor %}
+          </td>
+          <td><a href="{{ message.logs_url }}" class="btn blue right">Logs</a></td>
+        </tr>
+      {% endfor %}
+
+      </tbody>
+    </table>
+
+    <br/>
+  {% endfor %}
+{% endmacro %}
+
+{% import _self as this %}
+
+{% block content %}
+
+  {% if enabled_groups|length %}
+    <h2>Enabled groups</h2>
+    <br/>
+
+    {{ this.group_list(enabled_groups) }}
+  {% endif %}
+
+  {% if disabled_groups|length %}
+    <h2>Disabled groups</h2>
+    <br/>
+
+    {{ this.group_list(disabled_groups) }}
+  {% endif %}
+
+{% endblock %}

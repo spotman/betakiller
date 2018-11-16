@@ -3,12 +3,20 @@ namespace BetaKiller\Notification;
 
 interface MessageRendererInterface
 {
-    public function render(
+    public function makeBody(
         NotificationMessageInterface $message,
-        NotificationUserInterface $target,
-        NotificationTransportInterface $transport,
-        array $additionalData = null
+        NotificationTargetInterface $target,
+        NotificationTransportInterface $transport
     ): string;
 
-    public function makeSubject(NotificationMessageInterface $message, NotificationUserInterface $target): string;
+    public function makeSubject(
+        NotificationMessageInterface $message,
+        NotificationTargetInterface $target
+    ): string;
+
+    public function hasTemplate(
+        string $messageCodename,
+        string $transportCodename,
+        string $langName
+    ): bool;
 }

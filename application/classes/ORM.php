@@ -9,7 +9,6 @@ use BetaKiller\Url\Parameter\UrlParameterException;
 use BetaKiller\Url\Parameter\UrlParameterInterface;
 use BetaKiller\Utils;
 use BetaKiller\Utils\Kohana\ORM\OrmInterface;
-use ORM\PaginateHelper;
 
 abstract class ORM extends Utils\Kohana\ORM implements ExtendedOrmInterface
 {
@@ -220,30 +219,27 @@ abstract class ORM extends Utils\Kohana\ORM implements ExtendedOrmInterface
     }
 
     /**
-     * @param int      $page
-     * @param int|null $itemsPerPage
+     * @param int $page
+     * @param int $itemsPerPage
      *
      * @return \BetaKiller\Search\SearchResultsInterface
      */
-    public function getSearchResults(int $page, ?int $itemsPerPage = null): SearchResultsInterface
+    public function getSearchResults(int $page, int $itemsPerPage): SearchResultsInterface
     {
-        // Оборачиваем в пэйджинатор
-        $pager = $this->paginateHelper($page, $itemsPerPage);
+        // Wrap in a pager
+        $pager = \ORM\PaginateHelper::create(
+            $this,
+            $page,
+            $itemsPerPage
+        );
 
-        // Получаем результаты поиска
-        $items = $pager->getResults();
-
-        // Оборачиваем в контейнер
+        // Wrap results in a DTO
         $results = \BetaKiller\Search\SearchResults::factory(
+            $pager->getResults(),
             $pager->getTotalItems(),
             $pager->getTotalPages(),
             $pager->hasNextPage()
         );
-
-        // Добавляем элементы
-        foreach ($items as $item) {
-            $results->addItem($item);
-        }
 
         return $results;
     }
@@ -254,20 +250,5 @@ abstract class ORM extends Utils\Kohana\ORM implements ExtendedOrmInterface
     public function getSearchResultsItemData(): array
     {
         return $this->as_array();
-    }
-
-    /**
-     * @param int      $currentPage
-     * @param int|null $itemsPerPage
-     *
-     * @return \ORM\PaginateHelper
-     */
-    protected function paginateHelper(int $currentPage, ?int $itemsPerPage = null): PaginateHelper
-    {
-        return \ORM\PaginateHelper::create(
-            $this,
-            $currentPage,
-            $itemsPerPage ?: 25
-        );
     }
 }

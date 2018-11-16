@@ -13,7 +13,7 @@
 {{ js("layouts/admin.js") }}
 
 <div id="admin-side-nav" class="sidenav sidenav-fixed">
-  {{ widget('Admin_Menu_Main', {menu:'admin', parent:'Admin_Index'}) }}
+  {{ widget('Admin_Menu_Main', { menu: "admin", parent: "Admin_Index" }) }}
 </div>
 
 <div id="admin-page-container">
@@ -28,10 +28,12 @@
       <nav>
         <div class="nav-wrapper">
           <div class="col s12">
-            {{ widget("Breadcrumbs") }}
+            {{ widget("Breadcrumbs", {skip_root: true}) }}
           </div>
         </div>
       </nav>
+
+      <br />
 
       <div class="col s12">
         {% block content "" %}

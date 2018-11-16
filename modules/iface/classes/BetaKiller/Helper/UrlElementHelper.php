@@ -90,12 +90,15 @@ class UrlElementHelper
      */
     public function detectLayoutCodename(IFaceModelInterface $model): ?string
     {
-        $current = $model;
+        $layoutCodename = null;
+        $current        = $model;
 
-        // Climb up the IFace tree for a layout codename
+        // Climb up the tree for a layout codename
         do {
-            $layoutCodename = $current->getLayoutCodename();
-        } while (!$layoutCodename && $current = $this->tree->getParentIFaceModel($current));
+            if ($current instanceof IFaceModelInterface) {
+                $layoutCodename = $current->getLayoutCodename();
+            }
+        } while (!$layoutCodename && $current = $this->tree->getParent($current));
 
         return $layoutCodename;
     }

@@ -98,11 +98,16 @@ class UrlElementProviderXmlConfig implements UrlElementProviderInterface
         $attr   = (array)$branch->attributes();
         $config = $attr['@attributes'];
 
+        // Generate dummy codename
+        if ($tag === self::TAG_DUMMY) {
+            $config[AbstractPlainUrlElementModel::OPTION_CODENAME] = bin2hex(\random_bytes(8));
+        }
+
         $codename = $config[AbstractPlainUrlElementModel::OPTION_CODENAME] ?? null;
 
         if (!$codename) {
             throw new UrlElementException('Missing codename for ":tag" with attributes :args', [
-                ':tag' => $tag,
+                ':tag'  => $tag,
                 ':args' => \json_encode($config),
             ]);
         }
@@ -126,33 +131,48 @@ class UrlElementProviderXmlConfig implements UrlElementProviderInterface
             $config[AbstractPlainUrlElementModel::OPTION_PARENT] = $xmlParent->getCodename();
         }
 
-        // Detect real parent
-        $parentCodename = $config[AbstractPlainUrlElementModel::OPTION_PARENT] ?? null;
-        $realParent     = $parentCodename ? $this->models[$parentCodename] : null;
+        $realParent = $this->getParentModel($config);
 
-        if ($realParent && $realParent instanceof IFaceModelInterface) {
-            $config = $this->presetMissingFromParentIFace($config, $realParent);
+        if ($realParent) {
+            $config = $this->presetMissingFromParent($codename, $config, $realParent);
         }
 
         return $this->createModelFromConfig($tag, $config);
     }
 
-    private function presetMissingFromParentIFace(array $config, IFaceModelInterface $parent): array
+    private function getParentModel(array $config): ?UrlElementInterface
     {
-        $codename = $config[IFacePlainModel::OPTION_CODENAME];
+        // Detect real parent
+        $parentCodename = $config[AbstractPlainUrlElementModel::OPTION_PARENT] ?? null;
 
-        if (empty($config[IFacePlainModel::OPTION_LAYOUT])) {
-            $config[IFacePlainModel::OPTION_LAYOUT] = $parent->getLayoutCodename();
-        }
+        return $parentCodename ? $this->models[$parentCodename] : null;
+    }
 
-        if (empty($config[AbstractPlainUrlElementWithZone::OPTION_ZONE])) {
-            if (!$parent) {
+    private function presetMissingFromParent(
+        string $codename,
+        array $config,
+        UrlElementInterface $parent
+    ): array {
+        // Zone
+        if (empty($config[AbstractPlainUrlElementModel::OPTION_ZONE])) {
+            if (empty($config[AbstractPlainUrlElementModel::OPTION_PARENT])) {
                 throw new UrlElementException('Root URL element ":name" must define a zone', [
                     ':name' => $codename,
                 ]);
             }
 
-            $config[AbstractPlainUrlElementWithZone::OPTION_ZONE] = $parent->getZoneName();
+            $config[AbstractPlainUrlElementModel::OPTION_ZONE] = $parent->getZoneName();
+        }
+
+        // IFace options
+        if ($parent instanceof IFaceModelInterface) {
+            if (empty($config[IFacePlainModel::OPTION_LAYOUT])) {
+                $config[IFacePlainModel::OPTION_LAYOUT] = $parent->getLayoutCodename();
+            }
+
+            if (empty($config[IFacePlainModel::OPTION_HIDE_IN_SITEMAP])) {
+                $config[IFacePlainModel::OPTION_HIDE_IN_SITEMAP] = $parent->isHiddenInSiteMap();
+            }
         }
 
         return $config;
@@ -171,11 +191,11 @@ class UrlElementProviderXmlConfig implements UrlElementProviderInterface
             case self::TAG_IFACE:
                 return IFacePlainModel::factory($config);
 
-            case self::TAG_DUMMY:
-                return DummyPlainModel::factory($config);
-
             case self::TAG_ACTION:
                 return ActionPlainModel::factory($config);
+
+            case self::TAG_DUMMY:
+                return DummyPlainModel::factory($config);
 
             default:
                 throw new UrlElementException('Unknown XML tag <:tag> in URL elements config', [

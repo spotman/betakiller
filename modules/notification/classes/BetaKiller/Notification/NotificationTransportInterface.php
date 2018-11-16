@@ -9,23 +9,29 @@ interface NotificationTransportInterface
     public function getName(): string;
 
     /**
-     * @param \BetaKiller\Notification\NotificationUserInterface $user
+     * @param \BetaKiller\Notification\NotificationTargetInterface $user
      *
      * @return bool
      */
-    public function isEnabledFor(NotificationUserInterface $user): bool;
+    public function isEnabledFor(NotificationTargetInterface $user): bool;
 
     /**
      * @param \BetaKiller\Notification\NotificationMessageInterface $message
-     * @param \BetaKiller\Notification\NotificationUserInterface    $user
+     * @param \BetaKiller\Notification\NotificationTargetInterface  $target
+     * @param string                                                $body
      *
-     * @param \BetaKiller\Notification\MessageRendererInterface     $renderer
-     *
-     * @return int Number of messages sent
+     * @return bool Number of messages sent
      */
     public function send(
         NotificationMessageInterface $message,
-        NotificationUserInterface $user,
-        MessageRendererInterface $renderer
-    ): int;
+        NotificationTargetInterface $target,
+        string $body
+    ): bool;
+
+    /**
+     * Returns true if subject line is required for template rendering
+     *
+     * @return bool
+     */
+    public function isSubjectRequired(): bool;
 }

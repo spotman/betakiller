@@ -3,9 +3,9 @@ declare(strict_types=1);
 
 namespace BetaKiller\Model;
 
-use BetaKiller\Url\UrlElementInterface;
+use BetaKiller\Url\EntityLinkedUrlElementInterface;
 
-abstract class AbstractOrmModelContainsUrlElement extends \ORM implements UrlElementInterface
+abstract class AbstractOrmModelContainsUrlElement extends \ORM implements EntityLinkedUrlElementInterface
 {
     protected function configure(): void
     {
@@ -21,7 +21,7 @@ abstract class AbstractOrmModelContainsUrlElement extends \ORM implements UrlEle
         ]);
     }
 
-    protected function getUrlElement(): UrlElementInterface
+    protected function getUrlElement(): EntityLinkedUrlElementInterface
     {
         return $this->get('element');
     }
@@ -102,6 +102,36 @@ abstract class AbstractOrmModelContainsUrlElement extends \ORM implements UrlEle
     public function getAdditionalAclRules(): array
     {
         return $this->getUrlElement()->getAdditionalAclRules();
+    }
+
+    /**
+     * Returns zone codename where this URL element is placed
+     *
+     * @return string
+     */
+    public function getZoneName(): string
+    {
+        return $this->getUrlElement()->getZoneName();
+    }
+
+    /**
+     * Returns model name of the linked entity
+     *
+     * @return string
+     */
+    public function getEntityModelName(): ?string
+    {
+        return $this->getUrlElement()->getEntityModelName();
+    }
+
+    /**
+     * Returns entity [primary] action, applied by this URL element
+     *
+     * @return string
+     */
+    public function getEntityActionName(): ?string
+    {
+        return $this->getUrlElement()->getEntityActionName();
     }
 
     // TODO Chain create/update for nested UrlElement

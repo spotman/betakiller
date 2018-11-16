@@ -62,14 +62,6 @@ interface UrlElementTreeInterface
     public function getParent(UrlElementInterface $child): ?UrlElementInterface;
 
     /**
-     * @param \BetaKiller\Url\IFaceModelInterface $child
-     *
-     * @return \BetaKiller\Url\IFaceModelInterface|null
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
-     */
-    public function getParentIFaceModel(IFaceModelInterface $child): ?IFaceModelInterface;
-
-    /**
      * Returns iface model by codename or throws an exception if nothing was found
      *
      * @param string $codename

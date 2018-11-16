@@ -3,8 +3,8 @@ namespace BetaKiller\Helper;
 
 use BetaKiller\Notification\NotificationFacade;
 use BetaKiller\Notification\NotificationMessageInterface;
-use BetaKiller\Notification\NotificationUserEmail;
-use BetaKiller\Notification\NotificationUserInterface;
+use BetaKiller\Notification\NotificationTargetEmail;
+use BetaKiller\Notification\NotificationTargetInterface;
 
 class NotificationHelper
 {
@@ -49,13 +49,13 @@ class NotificationHelper
     /**
      * Send direct message to a single user
      *
-     * @param string                                             $name
-     * @param \BetaKiller\Notification\NotificationUserInterface $target
-     * @param array                                              $templateData
+     * @param string                                               $name
+     * @param \BetaKiller\Notification\NotificationTargetInterface $target
+     * @param array                                                $templateData
      *
      * @throws \BetaKiller\Notification\NotificationException
      */
-    public function directMessage(string $name, NotificationUserInterface $target, array $templateData): void
+    public function directMessage(string $name, NotificationTargetInterface $target, array $templateData): void
     {
         $message = $this->facade->directMessage($name, $target, $templateData);
 
@@ -70,14 +70,14 @@ class NotificationHelper
      * @param string      $fullName
      * @param null|string $langName
      *
-     * @return \BetaKiller\Notification\NotificationUserInterface
+     * @return \BetaKiller\Notification\NotificationTargetInterface
      */
     public function emailTarget(
         string $email,
         string $fullName,
         ?string $langName = null
-    ): NotificationUserInterface {
-        return new NotificationUserEmail($email, $fullName, $langName);
+    ): NotificationTargetInterface {
+        return new NotificationTargetEmail($email, $fullName, $langName);
     }
 
     /**

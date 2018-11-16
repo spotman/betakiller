@@ -1,0 +1,35 @@
+{% extends layout %}
+
+{% block content %}
+
+  <div class="row">
+    <div class="col s12">
+
+      <h1>{{ group.name|upper }}</h1>
+
+      {% if group.description %}
+        <p>{{ group.description }}</p>
+      {% endif %}
+
+      <p>
+        Roles are: <span>{{ group.roles|join(", ") }}</span><br/>
+      </p>
+
+      {% if group.disabled_for|length > 0 %}
+        <div>
+          Users disabled this group:<br/>
+
+          <ul>
+            {% for user in group.disabled_for %}
+              <li>{{ user.name }} {{ user.email }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+      {% else %}
+        <p>No users disabled this group yet.</p>
+      {% endif %}
+
+    </div>
+  </div>
+
+{% endblock %}

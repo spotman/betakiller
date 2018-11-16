@@ -8,6 +8,8 @@
 
 namespace ORM;
 
+use BetaKiller\Model\ExtendedOrmInterface;
+
 class PaginateHelper
 {
     /**
@@ -38,12 +40,12 @@ class PaginateHelper
     /**
      * PaginateHelper factory.
      *
-     * @param $model
+     * @param ExtendedOrmInterface $model
      * @param int $currentPage
      * @param int $itemsPerPage
      * @return PaginateHelper
      */
-    public static function create($model, $currentPage, $itemsPerPage): PaginateHelper
+    public static function create(ExtendedOrmInterface $model, int $currentPage, int $itemsPerPage): PaginateHelper
     {
         return new self($model, $currentPage, $itemsPerPage);
     }
@@ -51,23 +53,26 @@ class PaginateHelper
     /**
      * PaginateHelper constructor.
      *
-     * @param $model
+     * @param ExtendedOrmInterface $model
      * @param int $currentPage
      * @param int $itemsPerPage
      */
-    protected function __construct($model, $currentPage, $itemsPerPage)
+    protected function __construct(ExtendedOrmInterface $model, int $currentPage, int $itemsPerPage)
     {
         $this->paginate     = \Paginate::factory($model);
         $this->currentPage  = $currentPage;
         $this->itemsPerPage = $itemsPerPage;
     }
 
-    public function getResults()
+    /**
+     * @return ExtendedOrmInterface[]
+     */
+    public function getResults(): array
     {
         $start = $this->itemsPerPage * ($this->currentPage - 1);
 
-        /** @var \Database_Result|\ORM[] $results */
-        $results = $this->paginate->limit($start, $this->itemsPerPage)->execute()->result();
+        /** @var ExtendedOrmInterface[] $results */
+        $results = $this->paginate->limit($start, $this->itemsPerPage)->execute()->result()->as_array();
 
         $this->totalItems = $this->paginate->count_total();
         $this->totalPages = ceil($this->totalItems / $this->itemsPerPage);

@@ -32,31 +32,33 @@ class DefaultMessageRenderer implements MessageRendererInterface
      * Render message for sending via provided transport
      *
      * @param \BetaKiller\Notification\NotificationMessageInterface   $message
-     * @param \BetaKiller\Notification\NotificationUserInterface      $target
+     * @param \BetaKiller\Notification\NotificationTargetInterface    $target
      * @param \BetaKiller\Notification\NotificationTransportInterface $transport
-     *
-     * @param array|null                                              $additionalData
      *
      * @return string
      * @throws \BetaKiller\Notification\NotificationException
      */
-    public function render(
+    public function makeBody(
         NotificationMessageInterface $message,
-        NotificationUserInterface $target,
-        NotificationTransportInterface $transport,
-        array $additionalData = null
+        NotificationTargetInterface $target,
+        NotificationTransportInterface $transport
     ): string {
         // User language in templates
-        $lang = $this->getTargetLanguage($target);
+        $langName = $this->getTargetLanguage($target);
 
-        $templateName = $message->getTemplateName().'-'.$transport->getName().'-'.$lang;
-
-        $file = $this->getTemplatePath().DIRECTORY_SEPARATOR.$templateName;
+        $file = $this->makeTemplateFileName($message->getCodename(), $transport->getName(), $langName);
         $view = $this->viewFactory->create($file);
 
-        $data = array_merge($message->getFullDataForTarget($target), $additionalData ?? [], [
-            'baseI18nKey' => $message->getBaseI18nKey(),
-        ]);
+        // Get message data
+        $data = $message->getFullDataForTarget($target);
+
+        // Temp solution, would be removed
+        $data['baseI18nKey'] = $message->getBaseI18nKey();
+
+        // Get additional transport data
+        if ($transport->isSubjectRequired()) {
+            $data['subject'] = $message->getSubject();
+        }
 
         foreach ($data as $key => $value) {
             $view->set($key, $value);
@@ -65,7 +67,27 @@ class DefaultMessageRenderer implements MessageRendererInterface
         return $view->render();
     }
 
-    public function makeSubject(NotificationMessageInterface $message, NotificationUserInterface $target): string
+    public function hasTemplate(
+        string $messageCodename,
+        string $transportCodename,
+        string $langName
+    ): bool {
+        $file = $this->makeTemplateFileName($messageCodename, $transportCodename, $langName);
+
+        return $this->viewFactory->exists($file);
+    }
+
+    private function makeTemplateFileName(
+        string $messageCodename,
+        string $transportCodename,
+        string $langName
+    ): string {
+        $templateName = $messageCodename.'-'.$transportCodename.'-'.$langName;
+
+        return $this->getTemplatePath().DIRECTORY_SEPARATOR.$templateName;
+    }
+
+    public function makeSubject(NotificationMessageInterface $message, NotificationTargetInterface $target): string
     {
         $key  = $message->getBaseI18nKey().'.subj';
         $data = $message->getFullDataForTarget($target);
@@ -82,7 +104,7 @@ class DefaultMessageRenderer implements MessageRendererInterface
         return $output;
     }
 
-    private function getTargetLanguage(NotificationUserInterface $target): string
+    private function getTargetLanguage(NotificationTargetInterface $target): string
     {
         // User language in templates
         return $target->getLanguageName() ?? $this->i18n->getDefaultLanguageName();

@@ -170,15 +170,30 @@ abstract class AbstractOrmBasedRepository extends AbstractRepository
     }
 
     /**
-     * @param \BetaKiller\Utils\Kohana\ORM\OrmInterface $orm
+     * @param \BetaKiller\Model\ExtendedOrmInterface $orm
      *
-     * @return array
+     * @param int|null                               $currentPage
+     * @param int|null                               $itemsPerPage
+     *
+     * @return ExtendedOrmInterface[]
      * @throws \BetaKiller\Repository\RepositoryException
      */
-    protected function findAll(OrmInterface $orm): array
+    protected function findAll(ExtendedOrmInterface $orm, int $currentPage = null, int $itemsPerPage = null): array
     {
         try {
-            return $orm->find_all()->as_array();
+            if (!$currentPage || !$itemsPerPage) {
+                // Raw data
+                return $orm->find_all()->as_array();
+            }
+
+            // Wrap in a pager
+            $pager = \ORM\PaginateHelper::create(
+                $orm,
+                $currentPage,
+                $itemsPerPage
+            );
+
+            return $pager->getResults();
         } catch (\Kohana_Exception $e) {
             throw RepositoryException::wrap($e);
         }

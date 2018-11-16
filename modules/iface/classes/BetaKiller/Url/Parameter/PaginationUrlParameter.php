@@ -37,4 +37,9 @@ class PaginationUrlParameter extends AbstractRawUrlParameter
     {
         return static::URI_PREFIX.$this->pageNumber;
     }
+
+    public function getValue(): int
+    {
+        return $this->pageNumber;
+    }
 }

@@ -5,6 +5,7 @@ namespace BetaKiller\Model;
 
 use BetaKiller\Exception\NotImplementedHttpException;
 use BetaKiller\IFace\Exception\UrlElementException;
+use BetaKiller\Url\EntityLinkedUrlElementInterface;
 use BetaKiller\Url\IFaceModelInterface;
 use BetaKiller\Url\UrlElementInterface;
 
@@ -15,16 +16,28 @@ use BetaKiller\Url\UrlElementInterface;
  * @author     Spotman
  * @package    Betakiller\Url
  */
-class UrlElement extends AbstractOrmBasedSingleParentTreeModel implements UrlElementInterface
+class UrlElement extends AbstractOrmBasedSingleParentTreeModel implements EntityLinkedUrlElementInterface
 {
     protected function configure(): void
     {
         $this->_table_name = 'url_elements';
 
         $this->belongs_to([
-            'type' => [
+            'type'   => [
                 'model'       => 'UrlElementType',
                 'foreign_key' => 'type_id',
+            ],
+            'zone'   => [
+                'model'       => 'UrlElementZone',
+                'foreign_key' => 'zone_id',
+            ],
+            'entity' => [
+                'model'       => 'Entity',
+                'foreign_key' => 'entity_id',
+            ],
+            'action' => [
+                'model'       => 'EntityAction',
+                'foreign_key' => 'entity_action_id',
             ],
         ]);
 
@@ -44,6 +57,9 @@ class UrlElement extends AbstractOrmBasedSingleParentTreeModel implements UrlEle
 
         $this->load_with([
             'type',
+            'entity',
+            'action',
+            'zone',
         ]);
 
         parent::configure();
@@ -196,6 +212,64 @@ class UrlElement extends AbstractOrmBasedSingleParentTreeModel implements UrlEle
         $parent = $this->getParent();
 
         return $parent ? $parent->getCodename() : null;
+    }
+
+    /**
+     * Returns model name of the linked entity
+     *
+     * @return string|null
+     */
+    public function getEntityModelName(): ?string
+    {
+        $entity = $this->getEntityRelation();
+
+        return $entity->loaded() ? $entity->getLinkedModelName() : null;
+    }
+
+    /**
+     * Returns entity [primary] action, applied by this IFace
+     *
+     * @return string|null
+     */
+    public function getEntityActionName(): ?string
+    {
+        $entityAction = $this->getEntityActionRelation();
+
+        return $entityAction->loaded() ? $entityAction->getName() : null;
+    }
+
+    /**
+     * Returns zone codename where this IFace is placed
+     *
+     * @return string
+     */
+    public function getZoneName(): string
+    {
+        return $this->getZoneRelation()->getName();
+    }
+
+    /**
+     * @return \BetaKiller\Model\Entity
+     */
+    private function getEntityRelation(): Entity
+    {
+        return $this->get('entity');
+    }
+
+    /**
+     * @return \BetaKiller\Model\EntityAction
+     */
+    private function getEntityActionRelation(): EntityAction
+    {
+        return $this->get('action');
+    }
+
+    /**
+     * @return \BetaKiller\Model\UrlElementZone
+     */
+    private function getZoneRelation(): UrlElementZone
+    {
+        return $this->get('zone');
     }
 
     /**
