@@ -22,6 +22,14 @@ class NotificationGroup extends \ORM implements NotificationGroupInterface
     {
         $this->_table_name = self::TABLE_NAME;
 
+        // TODO Понять почему без этого не работаtn NotificationGroupRepository::findGroupUsers()
+        $this->belongs_to([
+            'users' => [
+                'model'       => 'User',
+                'foreign_key' => 'id',
+            ],
+        ]);
+
         $this->has_many([
             'users_off' => [
                 'model'       => 'User',
