@@ -5,12 +5,15 @@ namespace BetaKiller\Task;
 
 use BetaKiller\Cron\CronException;
 use BetaKiller\Cron\Task;
+use BetaKiller\Cron\TaskQueue;
+use BetaKiller\Helper\AppEnvInterface;
 use Cron\CronExpression;
 use Graze\ParallelProcess\Display\Table;
 use Graze\ParallelProcess\Event\RunEvent;
 use Graze\ParallelProcess\PriorityPool;
 use Graze\ParallelProcess\ProcessRun;
 use Graze\ParallelProcess\RunInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Yaml\Yaml;
@@ -56,9 +59,9 @@ class Cron extends AbstractTask
      * @param \Psr\Log\LoggerInterface           $logger
      */
     public function __construct(
-        \BetaKiller\Helper\AppEnvInterface $env,
-        \BetaKiller\Cron\TaskQueue $queue,
-        \Psr\Log\LoggerInterface $logger
+        AppEnvInterface $env,
+        TaskQueue $queue,
+        LoggerInterface $logger
     ) {
         $this->env    = $env;
         $this->queue  = $queue;
@@ -205,7 +208,7 @@ class Cron extends AbstractTask
             $task->done();
             $this->queue->dequeue($task);
 
-            $this->logDebug('Task :name succeeded', [
+            $this->logDebug('Task [:name] succeeded', [
                 ':name' => $task->getName(),
             ]);
         });
@@ -220,7 +223,7 @@ class Cron extends AbstractTask
 
             $this->logDebug('Task [:name] is failed and postponed till :time', [
                 ':name' => $task->getName(),
-                ':till' => $till->format('H:i:s d.m.Y'),
+                ':time' => $till->format('H:i:s d.m.Y'),
             ]);
         });
 
