@@ -66,7 +66,7 @@ class CspReportHandler implements RequestHandlerInterface
         $url = $data['document-uri'];
         $uri = $this->uriFactory->createUri($url);
 
-        $e = new SecurityException('SCP violation for ":blocked" with directive ":directive" at ":url"', [
+        $e = new SecurityException('SCP violation for ":blocked" with directive ":directive"', [
             ':blocked'   => $data['blocked-uri'],
             ':directive' => $data['violated-directive'],
             ':url'       => $url,
