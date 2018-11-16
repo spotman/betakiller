@@ -110,19 +110,28 @@ class Cron extends AbstractTask
         }
 
         foreach ($records as $name => $data) {
-            $expr      = $data['at'] ?? null;
-            $params    = $data['params'] ?? null;
-            $taskStage = $data['stage'] ?? null;
+            $expr       = $data['at'] ?? null;
+            $params     = $data['params'] ?? null;
+            $taskStages = $data['stages'] ?? null;
 
             if (!$expr) {
                 throw new TaskException('Missing "at" key value in [:name] task', [':name' => $name]);
             }
 
+            if (!$taskStages) {
+                // No stage means any stage
+                $taskStages = [$this->currentStage];
+            }
+
+            if (!\is_array($taskStages)) {
+                throw new TaskException('Task stage must be an array');
+            }
+
             // Ensure that target stage is reached
-            if ($taskStage && $taskStage !== $this->currentStage) {
-                $this->logDebug('Skipping task [:name] for :stage', [
+            if (!\in_array($this->currentStage, $taskStages, true)) {
+                $this->logDebug('Skip task [:name] for stages ":stage"', [
                     ':name'  => $name,
-                    ':stage' => $taskStage,
+                    ':stage' => implode('", "', $taskStages),
                 ]);
 
                 continue;
