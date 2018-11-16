@@ -175,7 +175,7 @@ abstract class AbstractOrmBasedRepository extends AbstractRepository
      * @param int|null                               $currentPage
      * @param int|null                               $itemsPerPage
      *
-     * @return ExtendedOrmInterface[]
+     * @return ExtendedOrmInterface[]|mixed[]
      * @throws \BetaKiller\Repository\RepositoryException
      */
     protected function findAll(ExtendedOrmInterface $orm, int $currentPage = null, int $itemsPerPage = null): array
