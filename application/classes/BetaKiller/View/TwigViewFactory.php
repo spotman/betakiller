@@ -24,4 +24,16 @@ class TwigViewFactory implements ViewFactoryInterface
     {
         return new TwigView($this->env, $file);
     }
+
+    /**
+     * Returns true if template exists
+     *
+     * @param string $file
+     *
+     * @return bool
+     */
+    public function exists(string $file): bool
+    {
+        return $this->env->getLoader()->exists($file);
+    }
 }

@@ -16,12 +16,17 @@ class NotificationMessage implements NotificationMessageInterface
     private $codename;
 
     /**
-     * @var NotificationUserInterface
+     * @var NotificationTargetInterface
      */
     private $from;
 
     /**
-     * @var NotificationUserInterface[]
+     * @var string|null
+     */
+    private $subject;
+
+    /**
+     * @var NotificationTargetInterface[]
      */
     private $targets = [];
 
@@ -80,19 +85,19 @@ class NotificationMessage implements NotificationMessageInterface
     }
 
     /**
-     * @return NotificationUserInterface
+     * @return NotificationTargetInterface
      */
-    public function getFrom(): ?NotificationUserInterface
+    public function getFrom(): ?NotificationTargetInterface
     {
         return $this->from;
     }
 
     /**
-     * @param NotificationUserInterface $value
+     * @param NotificationTargetInterface $value
      *
      * @return NotificationMessageInterface
      */
-    public function setFrom(NotificationUserInterface $value): NotificationMessageInterface
+    public function setFrom(NotificationTargetInterface $value): NotificationMessageInterface
     {
         $this->from = $value;
 
@@ -100,7 +105,7 @@ class NotificationMessage implements NotificationMessageInterface
     }
 
     /**
-     * @param NotificationUserInterface[]|\Iterator $users
+     * @param NotificationTargetInterface[]|\Iterator $users
      *
      * @return NotificationMessageInterface
      */
@@ -114,7 +119,7 @@ class NotificationMessage implements NotificationMessageInterface
     }
 
     /**
-     * @return NotificationUserInterface[]
+     * @return NotificationTargetInterface[]
      */
     public function getTargets(): array
     {
@@ -136,11 +141,11 @@ class NotificationMessage implements NotificationMessageInterface
     }
 
     /**
-     * @param NotificationUserInterface $value
+     * @param NotificationTargetInterface $value
      *
      * @return NotificationMessageInterface
      */
-    public function addTarget(NotificationUserInterface $value): NotificationMessageInterface
+    public function addTarget(NotificationTargetInterface $value): NotificationMessageInterface
     {
         $this->targets[] = $value;
 
@@ -158,12 +163,36 @@ class NotificationMessage implements NotificationMessageInterface
     }
 
     /**
+     * Returns optional subject line if exists
+     *
+     * @return null|string
+     */
+    public function getSubject(): ?string
+    {
+        return $this->subject;
+    }
+
+    /**
+     * Sets optional subject line
+     *
+     * @param string $value
+     *
+     * @return \BetaKiller\Notification\NotificationMessageInterface
+     */
+    public function setSubject(string $value): NotificationMessageInterface
+    {
+        $this->subject = $value;
+
+        return $this;
+    }
+
+    /**
      * @return string
      * @throws \BetaKiller\Notification\NotificationException
      */
     public function getBaseI18nKey(): string
     {
-        $name = $this->getTemplateName();
+        $name = $this->getCodename();
 
         if (!$name) {
             throw new NotificationException('Can not make i18n key from empty template name');
@@ -194,14 +223,6 @@ class NotificationMessage implements NotificationMessageInterface
     }
 
     /**
-     * @return string
-     */
-    public function getTemplateName(): string
-    {
-        return $this->codename;
-    }
-
-    /**
      * @param array $data
      *
      * @return NotificationMessageInterface
@@ -222,11 +243,11 @@ class NotificationMessage implements NotificationMessageInterface
     }
 
     /**
-     * @param \BetaKiller\Notification\NotificationUserInterface $targetUser
+     * @param \BetaKiller\Notification\NotificationTargetInterface $targetUser
      *
      * @return array
      */
-    public function getFullDataForTarget(NotificationUserInterface $targetUser): array
+    public function getFullDataForTarget(NotificationTargetInterface $targetUser): array
     {
         return array_merge($this->getTemplateData(), [
             'targetName'  => $targetUser->getFullName(),

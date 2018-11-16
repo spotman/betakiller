@@ -1,0 +1,44 @@
+{% extends layout %}
+
+{% block content %}
+
+  <div class="row">
+    <div class="col s12">
+
+      {% if items|length > 0 %}
+        <table>
+
+          <thead>
+          <tr>
+            <th>Processed at</th>
+            <th>Target</th>
+            <th>Name</th>
+            <th>Transport</th>
+            <th>&nbsp;</th>
+          </tr>
+          </thead>
+
+          <tbody>
+          {% for item in items %}
+            <tr class="{{ item.is_succeeded ? "" : "red white-text" }}">
+              <td>{{ item.processed_at|date("d.m.Y @ H:i:s") }}</td>
+              <td>{{ item.target }}</td>
+              <td>{{ item.name }}</td>
+              <td>{{ item.transport }}</td>
+              <td><a href="{{ item.body_url }}" class="btn blue right" target="_blank">Check body</a></td>
+            </tr>
+          {% endfor %}
+          </tbody>
+
+        </table>
+      {% else %}
+        <p class="center-align">
+          No logs yet.
+        </p>
+      {% endif %}
+
+    </div>
+  </div>
+
+
+{% endblock %}

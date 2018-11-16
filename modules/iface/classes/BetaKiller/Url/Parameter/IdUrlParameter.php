@@ -41,7 +41,7 @@ class IdUrlParameter extends AbstractRawUrlParameter
     /**
      * @return int
      */
-    public function getID(): int
+    public function getValue(): int
     {
         return $this->id;
     }

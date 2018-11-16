@@ -20,25 +20,10 @@ class IFace extends AbstractOrmModelContainsUrlElement implements IFaceModelInte
                 'model'       => 'IFaceLayout',
                 'foreign_key' => 'layout_id',
             ],
-            'entity' => [
-                'model'       => 'Entity',
-                'foreign_key' => 'entity_id',
-            ],
-            'action' => [
-                'model'       => 'EntityAction',
-                'foreign_key' => 'entity_action_id',
-            ],
-            'zone'   => [
-                'model'       => 'UrlElementZone',
-                'foreign_key' => 'zone_id',
-            ],
         ]);
 
         $this->load_with([
             'layout',
-            'entity',
-            'action',
-            'zone',
         ]);
 
         parent::configure();
@@ -104,30 +89,6 @@ class IFace extends AbstractOrmModelContainsUrlElement implements IFaceModelInte
     }
 
     /**
-     * Returns model name of the linked entity
-     *
-     * @return string|null
-     */
-    public function getEntityModelName(): ?string
-    {
-        $entity = $this->getEntityRelation();
-
-        return $entity->loaded() ? $entity->getLinkedModelName() : null;
-    }
-
-    /**
-     * Returns entity [primary] action, applied by this IFace
-     *
-     * @return string|null
-     */
-    public function getEntityActionName(): ?string
-    {
-        $entityAction = $this->getEntityActionRelation();
-
-        return $entityAction->loaded() ? $entityAction->getName() : null;
-    }
-
-    /**
      * @param string $value
      */
     public function setLabel(string $value): void
@@ -161,40 +122,6 @@ class IFace extends AbstractOrmModelContainsUrlElement implements IFaceModelInte
         $this->set('description', $value);
 
         return $this;
-    }
-
-    /**
-     * Returns zone codename where this IFace is placed
-     *
-     * @return string
-     */
-    public function getZoneName(): string
-    {
-        return $this->getZoneRelation()->getName();
-    }
-
-    /**
-     * @return \BetaKiller\Model\Entity
-     */
-    private function getEntityRelation(): Entity
-    {
-        return $this->get('entity');
-    }
-
-    /**
-     * @return \BetaKiller\Model\EntityAction
-     */
-    private function getEntityActionRelation(): EntityAction
-    {
-        return $this->get('action');
-    }
-
-    /**
-     * @return \BetaKiller\Model\UrlElementZone
-     */
-    private function getZoneRelation(): UrlElementZone
-    {
-        return $this->get('zone');
     }
 
     /**

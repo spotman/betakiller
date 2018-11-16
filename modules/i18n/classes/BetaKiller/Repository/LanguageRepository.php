@@ -116,17 +116,19 @@ final class LanguageRepository extends AbstractOrmBasedDispatchableRepository im
     }
 
     /**
-     * @param \BetaKiller\Utils\Kohana\ORM\OrmInterface $orm
+     * @param \BetaKiller\Model\ExtendedOrmInterface $orm
+     *
+     * @param int|null                               $currentPage
+     * @param int|null                               $itemsPerPage
      *
      * @return array
-     * @throws \BetaKiller\Repository\RepositoryException
      */
-    protected function findAll(OrmInterface $orm): array
+    protected function findAll(ExtendedOrmInterface $orm, int $currentPage = null, int $itemsPerPage = null): array
     {
         // Default language always placed first
         $this->placeDefaultFirst($orm);
 
-        return parent::findAll($orm);
+        return parent::findAll($orm, $currentPage, $itemsPerPage);
     }
 
     /**

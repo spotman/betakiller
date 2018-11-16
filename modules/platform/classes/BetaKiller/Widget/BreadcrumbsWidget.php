@@ -41,6 +41,8 @@ class BreadcrumbsWidget extends AbstractWidget
         $params    = ServerRequestHelper::getUrlContainer($request);
         $i18n      = ServerRequestHelper::getI18n($request);
 
+        $skipRoot = $context['skip_root'] ?? false;
+
         $data = [];
 
         foreach ($stack->getIterator() as $model) {
@@ -54,6 +56,10 @@ class BreadcrumbsWidget extends AbstractWidget
                 'label'  => $this->elementHelper->getLabel($model, $params, $i18n),
                 'active' => $stack->isCurrent($model),
             ];
+        }
+
+        if ($skipRoot) {
+            \array_shift($data);
         }
 
         return [

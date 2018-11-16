@@ -27,8 +27,9 @@ class NotificationConfig extends AbstractConfig implements NotificationConfigInt
      * @param string $groupCodename
      *
      * @return string[] ['roleCodename1','roleCodename2',..]
+     * @throws \BetaKiller\Exception
      */
-    public function getGroupRoles($groupCodename): array
+    public function getGroupRoles(string $groupCodename): array
     {
         $path                  = self::PATH_GROUP_ROLES;
         $path['groupCodename'] = $groupCodename;
@@ -40,12 +41,34 @@ class NotificationConfig extends AbstractConfig implements NotificationConfigInt
      * @param string $messageCodename
      *
      * @return string
+     * @throws \BetaKiller\Exception
      */
-    public function getMessageGroup($messageCodename): string
+    public function getMessageGroup(string $messageCodename): string
     {
         $path                    = self::PATH_MESSAGE_GROUP;
         $path['messageCodename'] = $messageCodename;
 
         return (string)$this->get($path);
+    }
+
+    /**
+     * @param string $groupCodename
+     *
+     * @return string[]
+     * @throws \BetaKiller\Exception
+     */
+    public function getGroupMessages(string $groupCodename): array
+    {
+        $messages = [];
+
+        foreach ((array)$this->get(self::PATH_MESSAGES) as $messageCodename => $messageConfig) {
+            $messageGroup = $messageConfig['group'] ?? null;
+
+            if ($messageGroup === $groupCodename) {
+                $messages[] = $messageCodename;
+            }
+        }
+
+        return $messages;
     }
 }

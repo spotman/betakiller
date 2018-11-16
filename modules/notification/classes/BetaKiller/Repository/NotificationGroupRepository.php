@@ -8,8 +8,16 @@ use BetaKiller\Model\NotificationGroup;
 use BetaKiller\Model\NotificationGroupInterface;
 use BetaKiller\Model\UserInterface;
 
-class NotificationGroupRepository extends AbstractOrmBasedRepository
+class NotificationGroupRepository extends AbstractOrmBasedDispatchableRepository
 {
+    /**
+     * @return string
+     */
+    public function getUrlKeyName(): string
+    {
+        return NotificationGroup::TABLE_FIELD_CODENAME;
+    }
+
     /**
      * @param string $codename
      *
@@ -45,9 +53,25 @@ class NotificationGroupRepository extends AbstractOrmBasedRepository
     public function getAllEnabled(): array
     {
         $orm = $this->getOrmInstance();
-        $this->filterGroupIsEnabled($orm);
 
-        return $orm->get_all();
+        return $this
+            ->filterGroupIsEnabled($orm, true)
+            ->orderByName($orm)
+            ->findAll($orm);
+    }
+
+    /**
+     * @return \BetaKiller\Model\NotificationGroupInterface[]
+     * @throws \BetaKiller\Factory\FactoryException
+     */
+    public function getAllDisabled(): array
+    {
+        $orm = $this->getOrmInstance();
+
+        return $this
+            ->filterGroupIsEnabled($orm, false)
+            ->orderByName($orm)
+            ->findAll($orm);
     }
 
     /**
@@ -59,7 +83,7 @@ class NotificationGroupRepository extends AbstractOrmBasedRepository
     public function getUserGroups(UserInterface $userModel): array
     {
         $orm = $this->getOrmInstance();
-        $this->filterGroupIsEnabled($orm);
+        $this->filterGroupIsEnabled($orm, true);
 
         return $orm
             ->join(NotificationGroup::ROLES_TABLE_NAME, 'left')
@@ -160,17 +184,25 @@ class NotificationGroupRepository extends AbstractOrmBasedRepository
 
     /**
      * @param \BetaKiller\Model\ExtendedOrmInterface $orm
+     * @param bool                                   $value
      *
      * @return \BetaKiller\Repository\NotificationGroupRepository
      */
-    private function filterGroupIsEnabled(ExtendedOrmInterface $orm): self
+    private function filterGroupIsEnabled(ExtendedOrmInterface $orm, bool $value): self
     {
         $orm
             ->where(
                 $orm->object_column(NotificationGroup::TABLE_FIELD_IS_ENABLED),
                 '=',
-                1
+                $value
             );
+
+        return $this;
+    }
+
+    private function orderByName(ExtendedOrmInterface $orm): self
+    {
+        $orm->order_by($orm->object_column(NotificationGroup::TABLE_FIELD_CODENAME), 'asc');
 
         return $this;
     }

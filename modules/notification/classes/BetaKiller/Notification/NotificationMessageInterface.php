@@ -14,19 +14,19 @@ interface NotificationMessageInterface
     public function getCodename(): string;
 
     /**
-     * @return NotificationUserInterface
+     * @return NotificationTargetInterface
      */
-    public function getFrom(): ?NotificationUserInterface;
+    public function getFrom(): ?NotificationTargetInterface;
 
     /**
-     * @param NotificationUserInterface $value
+     * @param NotificationTargetInterface $value
      *
      * @return NotificationMessageInterface
      */
-    public function setFrom(NotificationUserInterface $value): NotificationMessageInterface;
+    public function setFrom(NotificationTargetInterface $value): NotificationMessageInterface;
 
     /**
-     * @return NotificationUserInterface[]
+     * @return NotificationTargetInterface[]
      */
     public function getTargets(): array;
 
@@ -36,14 +36,14 @@ interface NotificationMessageInterface
     public function getTargetsEmails(): array;
 
     /**
-     * @param NotificationUserInterface $value
+     * @param NotificationTargetInterface $value
      *
      * @return NotificationMessageInterface
      */
-    public function addTarget(NotificationUserInterface $value): NotificationMessageInterface;
+    public function addTarget(NotificationTargetInterface $value): NotificationMessageInterface;
 
     /**
-     * @param NotificationUserInterface[]|\Iterator $users
+     * @param NotificationTargetInterface[]|\Iterator $users
      *
      * @return NotificationMessageInterface
      */
@@ -67,11 +67,6 @@ interface NotificationMessageInterface
     public function addAttachment(string $path): NotificationMessageInterface;
 
     /**
-     * @return string
-     */
-    public function getTemplateName(): string;
-
-    /**
      * @param array $data
      *
      * @return NotificationMessageInterface
@@ -84,15 +79,31 @@ interface NotificationMessageInterface
     public function getTemplateData(): array;
 
     /**
+     * Returns optional subject line if exists
+     *
+     * @return null|string
+     */
+    public function getSubject(): ?string;
+
+    /**
+     * Sets optional subject line
+     *
+     * @param string $value
+     *
+     * @return \BetaKiller\Notification\NotificationMessageInterface
+     */
+    public function setSubject(string $value): NotificationMessageInterface;
+
+    /**
      * @return string
      * @throws \BetaKiller\Notification\NotificationException
      */
     public function getBaseI18nKey(): string;
 
     /**
-     * @param \BetaKiller\Notification\NotificationUserInterface $targetUser
+     * @param \BetaKiller\Notification\NotificationTargetInterface $targetUser
      *
      * @return array
      */
-    public function getFullDataForTarget(NotificationUserInterface $targetUser): array;
+    public function getFullDataForTarget(NotificationTargetInterface $targetUser): array;
 }

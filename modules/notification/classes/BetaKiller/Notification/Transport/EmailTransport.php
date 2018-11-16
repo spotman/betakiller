@@ -1,9 +1,8 @@
 <?php
 namespace BetaKiller\Notification\Transport;
 
-use BetaKiller\Notification\MessageRendererInterface;
 use BetaKiller\Notification\NotificationMessageInterface;
-use BetaKiller\Notification\NotificationUserInterface;
+use BetaKiller\Notification\NotificationTargetInterface;
 
 class EmailTransport extends AbstractTransport
 {
@@ -12,35 +11,42 @@ class EmailTransport extends AbstractTransport
         return 'email';
     }
 
-    public function isEnabledFor(NotificationUserInterface $user): bool
+    public function isEnabledFor(NotificationTargetInterface $user): bool
     {
         return $user->isEmailNotificationAllowed();
     }
 
     /**
-     * @param \BetaKiller\Notification\NotificationMessageInterface $message
-     * @param \BetaKiller\Notification\NotificationUserInterface    $user
-     * @param \BetaKiller\Notification\MessageRendererInterface     $renderer
+     * Returns true if subject line is required for template rendering
      *
-     * @return int Number of messages sent
+     * @return bool
+     */
+    public function isSubjectRequired(): bool
+    {
+        return true;
+    }
+
+    /**
+     * @param \BetaKiller\Notification\NotificationMessageInterface $message
+     * @param \BetaKiller\Notification\NotificationTargetInterface  $target
+     * @param string                                                $body
+     *
+     * @return bool Number of messages sent
+     * @throws \BetaKiller\Exception
      */
     public function send(
         NotificationMessageInterface $message,
-        NotificationUserInterface $user,
-        MessageRendererInterface $renderer
-    ): int {
+        NotificationTargetInterface $target,
+        string $body
+    ): bool {
         $fromUser = $message->getFrom();
 
         $from        = $fromUser ? $fromUser->getEmail() : null;
-        $to          = $user->getEmail();
-        $subj        = $renderer->makeSubject($message, $user);
+        $to          = $target->getEmail();
+        $subj        = $message->getSubject();
         $attachments = $message->getAttachments();
 
-        $body = $renderer->render($message, $user, $this, [
-            'subject' => $subj,
-        ]);
-
         // Email notification
-        return \Email::send($from, $to, $subj, $body, true, $attachments);
+        return (bool)\Email::send($from, $to, $subj, $body, true, $attachments);
     }
 }

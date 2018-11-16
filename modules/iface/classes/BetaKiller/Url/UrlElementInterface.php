@@ -60,6 +60,13 @@ interface UrlElementInterface
     public function isHiddenInSiteMap(): bool;
 
     /**
+     * Returns zone codename where this URL element is placed
+     *
+     * @return string
+     */
+    public function getZoneName(): string;
+
+    /**
      * Returns array of additional ACL rules in format <ResourceName>.<permissionName> (eq, ["Admin.enabled"])
      *
      * @return string[]

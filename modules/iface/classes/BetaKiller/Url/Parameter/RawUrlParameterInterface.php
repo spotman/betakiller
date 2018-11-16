@@ -21,4 +21,9 @@ interface RawUrlParameterInterface extends UrlParameterInterface
      * @return string
      */
     public function exportUriValue(): string;
+
+    /**
+     * @return mixed
+     */
+    public function getValue();
 }

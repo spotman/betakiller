@@ -2,8 +2,6 @@
 namespace BetaKiller\Repository;
 
 use BetaKiller\Factory\OrmFactory;
-use BetaKiller\Helper\ExceptionTranslator;
-use BetaKiller\Model\ContentCategory;
 use BetaKiller\Model\ContentCategoryInterface;
 use BetaKiller\Model\ContentPost;
 use BetaKiller\Model\ModelWithRevisionsInterface;
@@ -34,14 +32,12 @@ class ContentPostRepository extends AbstractOrmBasedDispatchableRepository imple
      *
      * @param \BetaKiller\Factory\OrmFactory                   $ormFactory
      * @param \BetaKiller\Repository\ContentCategoryRepository $categoryRepo
-     * @param \BetaKiller\Helper\ExceptionTranslator           $translator
      */
     public function __construct(
         OrmFactory $ormFactory,
-        ContentCategoryRepository $categoryRepo,
-        ExceptionTranslator $translator
+        ContentCategoryRepository $categoryRepo
     ) {
-        parent::__construct($ormFactory, $translator);
+        parent::__construct($ormFactory);
 
         $this->categoryRepo = $categoryRepo;
     }

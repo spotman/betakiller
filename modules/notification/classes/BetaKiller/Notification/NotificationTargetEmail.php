@@ -1,7 +1,7 @@
 <?php
 namespace BetaKiller\Notification;
 
-class NotificationUserEmail implements NotificationUserInterface
+class NotificationTargetEmail implements NotificationTargetInterface
 {
     /**
      * @var string

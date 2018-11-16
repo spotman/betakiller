@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<root>
+    <iface uri="notifications" name="Admin_Notification_Index" parent="Admin_Index" zone="admin" label="Notification"
+           menu="admin">
+
+        <iface uri="groups" name="Admin_Notification_GroupList" label="Groups" menu="admin">
+            <iface uri="{NotificationGroup.codename}" name="Admin_Notification_GroupItem"
+                   label="{NotificationGroup.codename}" entity="NotificationGroup" entityAction="read"/>
+        </iface>
+
+        <iface uri="logs" name="Admin_Notification_LogIndex" label="Logs" menu="admin">
+            <iface uri="{Page}" name="Admin_Notification_LogPage" label="Page {Page}"/>
+            <dummy uri="item">
+                <iface uri="{NotificationLog.id}" name="Admin_Notification_LogItem" label="Message"
+                       entity="NotificationLog" entityAction="read"/>
+            </dummy>
+        </iface>
+
+    </iface>
+</root>

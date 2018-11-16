@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\Model;
 
-interface NotificationGroupInterface
+interface NotificationGroupInterface extends DispatchableEntityInterface
 {
     /**
      * @return bool
@@ -99,4 +99,9 @@ interface NotificationGroupInterface
      * @return \BetaKiller\Model\RoleInterface[]
      */
     public function getRoles(): array;
+
+    /**
+     * @return \BetaKiller\Model\UserInterface[]
+     */
+    public function getDisabledUsers(): array;
 }

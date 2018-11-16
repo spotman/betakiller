@@ -16,6 +16,7 @@ abstract class AbstractPlainUrlElementModel implements UrlElementInterface
     public const OPTION_HAS_TREE_BEHAVIOUR = 'hasTreeBehaviour';
     public const OPTION_HIDE_IN_SITEMAP    = 'hideInSiteMap';
     public const OPTION_IS_DEFAULT         = 'isDefault';
+    public const OPTION_ZONE               = 'zone';
     public const OPTION_ACL_RULES          = 'aclRules';
 
     /**
@@ -47,6 +48,11 @@ abstract class AbstractPlainUrlElementModel implements UrlElementInterface
      * @var bool
      */
     private $hasTreeBehaviour = false;
+
+    /**
+     * @var string
+     */
+    private $zone = '';
 
     /**
      * @var string[]
@@ -151,6 +157,16 @@ abstract class AbstractPlainUrlElementModel implements UrlElementInterface
     }
 
     /**
+     * Returns zone codename where this IFace is placed
+     *
+     * @return string
+     */
+    public function getZoneName(): string
+    {
+        return $this->zone;
+    }
+
+    /**
      * Returns array representation of the model data
      *
      * @return array
@@ -165,6 +181,7 @@ abstract class AbstractPlainUrlElementModel implements UrlElementInterface
             self::OPTION_HIDE_IN_SITEMAP    => $this->isHiddenInSiteMap(),
             self::OPTION_ACL_RULES          => $this->getAdditionalAclRules(),
             self::OPTION_IS_DEFAULT         => $this->isDefault(),
+            self::OPTION_ZONE               => $this->getZoneName(),
         ];
     }
 
@@ -187,6 +204,10 @@ abstract class AbstractPlainUrlElementModel implements UrlElementInterface
 
         if (isset($data[self::OPTION_PARENT])) {
             $this->parentCodename = (string)$data[self::OPTION_PARENT];
+        }
+
+        if (isset($data[self::OPTION_ZONE])) {
+            $this->zone = mb_strtolower($data[self::OPTION_ZONE]);
         }
 
         if (isset($data[self::OPTION_ACL_RULES])) {
