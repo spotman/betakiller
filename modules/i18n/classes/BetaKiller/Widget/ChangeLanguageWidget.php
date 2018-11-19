@@ -35,8 +35,12 @@ class ChangeLanguageWidget extends AbstractPublicWidget
 
         $currentLangName = ServerRequestHelper::getI18n($request)->getLang();
 
+        $stack = ServerRequestHelper::getUrlElementStack($request);
+
         // Link to current page in other language
-        $element = ServerRequestHelper::getUrlElementStack($request)->getCurrent();
+        $element = $stack->hasCurrent()
+            ? $stack->getCurrent()
+            : $urlHelper->getUrlElementByCodename('App_Index');
 
         // Add query parameters if exists
         $currentQuery = $request->getUri()->getQuery();
