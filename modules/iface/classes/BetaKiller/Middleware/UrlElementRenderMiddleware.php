@@ -5,6 +5,7 @@ namespace BetaKiller\Middleware;
 
 use BetaKiller\Dev\Profiler;
 use BetaKiller\Exception\FoundHttpException;
+use BetaKiller\Exception\NotFoundHttpException;
 use BetaKiller\Factory\UrlElementProcessorFactory;
 use BetaKiller\Helper\ServerRequestHelper;
 use Psr\Http\Message\ResponseInterface;
@@ -42,7 +43,13 @@ class UrlElementRenderMiddleware implements MiddlewareInterface
     {
         $pid = Profiler::begin($request, 'UrlElement processing');
 
-        $urlElement = ServerRequestHelper::getUrlElementStack($request)->getCurrent();
+        $stack = ServerRequestHelper::getUrlElementStack($request);
+
+        if (!$stack->hasCurrent()) {
+            throw new NotFoundHttpException;
+        }
+
+        $urlElement = $stack->getCurrent();
 
         $path = $request->getUri()->getPath();
 
