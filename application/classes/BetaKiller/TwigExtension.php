@@ -87,6 +87,18 @@ class TwigExtension extends Twig_Extension
             ),
 
             new Twig_Function(
+                'entry',
+                [$this, 'webpackEntry'],
+                ['is_safe' => ['html'], 'needs_context' => true]
+            ),
+
+            new Twig_Function(
+                'lang',
+                [$this, 'getCurrentLang'],
+                ['is_safe' => ['html'], 'needs_context' => true]
+            ),
+
+            new Twig_Function(
                 'widget',
                 [$this, 'widget'],
                 ['is_safe' => ['html'], 'needs_context' => true]
@@ -276,6 +288,60 @@ class TwigExtension extends Twig_Extension
         } else {
             $csp->csp($name, $value);
         }
+    }
+
+    public function webpackEntry(array $context, string $entryPoint, string $distDir = null): void
+    {
+        if (!$distDir) {
+            $distDir = $context['dist_dir'] ?? null;
+        }
+
+        if (!$distDir) {
+            throw new Exception('Pass dist dir as a second argument or set "dist_dir" variable in layout before using entry() function');
+        }
+
+        $assets = $this->getStaticAssets($context);
+
+        $fileName = $distDir.\DIRECTORY_SEPARATOR.'entrypoints.json';
+        $fullPath = $assets->findFile($fileName);
+
+        if (!$fullPath) {
+            throw new Exception('Missing file ":path", check webpack build and "dist_dir" variable', [
+                ':path' => $fileName,
+            ]);
+        }
+
+        $fileContent = \file_get_contents($fullPath);
+
+        if (!$fileContent) {
+            throw new Exception('Empty file ":path", check webpack build and "dist_dir" variable', [
+                ':path' => $fullPath,
+            ]);
+        }
+
+        $fileData = \json_decode($fileContent, true);
+
+        $config = $fileData['entrypoints'][$entryPoint] ?? null;
+
+        if (!$config) {
+            throw new Exception('Missing entry ":name" in file ":path"', [
+                ':path' => $fullPath,
+                ':name' => $entryPoint,
+            ]);
+        }
+
+        foreach ($config['js'] as $jsFileName) {
+            $assets->addJs('/'.$jsFileName);
+        }
+
+        foreach ($config['css'] as $cssFileName) {
+            $assets->addCss('/'.$cssFileName);
+        }
+    }
+
+    public function getCurrentLang(array $context): string
+    {
+        return $this->getI18n($context)->getLang();
     }
 
     /**
