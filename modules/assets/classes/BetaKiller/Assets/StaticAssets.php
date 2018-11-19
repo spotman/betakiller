@@ -51,6 +51,11 @@ class StaticAssets
             $location = $this->getFullUrl($location);
         }
 
+        // Skip duplicate calls from widgets
+        if (isset($this->jsData[$location])) {
+            return;
+        }
+
         $this->jsData[$location] = [
             'location'  => $location,
             'condition' => $condition,
@@ -61,6 +66,11 @@ class StaticAssets
     {
         if (!$this->isAbsoluteUrl($location)) {
             $location = $this->getFullUrl($location);
+        }
+
+        // Skip duplicate calls from widgets
+        if (isset($this->cssData[$location])) {
+            return;
         }
 
         $this->cssData[$location] = [
