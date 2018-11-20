@@ -412,7 +412,7 @@ task('import:notification', function () {
 /**
  * Success message
  */
-task('done', function () use ($tz) {
+task('deploy:done', function () use ($tz) {
     $dateTime = new \DateTimeImmutable();
     writeln('<info>Successfully deployed at '.$dateTime->setTimezone($tz)->format('H:i:s T').'!</info>');
 });
@@ -479,7 +479,7 @@ task('deploy', [
     // Finalize
     'cleanup',
     'deploy:unlock',
-    'done',
+    'deploy:done',
 ])->desc('Deploy app bundle')->onStage(
     DEPLOYER_STAGING_STAGE,
     DEPLOYER_PRODUCTION_STAGE,
