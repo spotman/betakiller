@@ -330,12 +330,16 @@ class TwigExtension extends Twig_Extension
             ]);
         }
 
-        foreach ($config['js'] as $jsFileName) {
-            $assets->addJs('/'.$jsFileName);
+        if (isset($config['js'])) {
+            foreach ($config['js'] as $jsFileName) {
+                $assets->addJs('/'.$jsFileName);
+            }
         }
 
-        foreach ($config['css'] as $cssFileName) {
-            $assets->addCss('/'.$cssFileName);
+        if (isset($config['css'])) {
+            foreach ($config['css'] as $cssFileName) {
+                $assets->addCss('/'.$cssFileName);
+            }
         }
     }
 
