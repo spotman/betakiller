@@ -14,7 +14,7 @@ use BetaKiller\Url\Behaviour\UrlBehaviourFactory;
 use BetaKiller\Url\Container\UrlContainerInterface;
 use BetaKiller\Url\ElementFilter\AggregateUrlElementFilter;
 use BetaKiller\Url\ElementFilter\MenuCodenameUrlElementFilter;
-use BetaKiller\Url\IFaceModelInterface;
+use BetaKiller\Url\UrlElementInterface;
 use BetaKiller\Url\UrlElementTreeInterface;
 use BetaKiller\Url\UrlElementTreeRecursiveIterator;
 use Psr\Http\Message\ServerRequestInterface;
@@ -167,7 +167,7 @@ class MenuWidget extends AbstractPublicWidget
     /**
      * Generating URLs by IFace element
      *
-     * @param \BetaKiller\Url\IFaceModelInterface             $model
+     * @param \BetaKiller\Url\UrlElementInterface             $model
      * @param \BetaKiller\Url\Container\UrlContainerInterface $params
      * @param \BetaKiller\Helper\UrlHelper                    $helper
      *
@@ -175,15 +175,13 @@ class MenuWidget extends AbstractPublicWidget
      * @throws \BetaKiller\Factory\FactoryException
      */
     private function getAvailableIFaceUrls(
-        IFaceModelInterface $model,
+        UrlElementInterface $model,
         UrlContainerInterface $params,
         UrlHelper $helper
     ): \Generator {
         $behaviour = $this->behaviourFactory->fromUrlElement($model);
 
-        foreach ($behaviour->getAvailableUrls($model, $params, $helper) as $availableUrl) {
-            yield $availableUrl;
-        }
+        yield from $behaviour->getAvailableUrls($model, $params, $helper);
     }
 
     /**
