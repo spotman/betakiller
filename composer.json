@@ -12,6 +12,7 @@
     "ext-mbstring": "*",
     "ext-mysqli": "*",
     "ext-pdo": "*",
+    "ext-simplexml": "*",
     "ext-sodium": "*",
     "ext-sqlite3": "*",
     "ext-xml": "*",
