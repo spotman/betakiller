@@ -13,7 +13,6 @@ use BetaKiller\Assets\Provider\AssetsProviderInterface;
 use BetaKiller\Assets\Provider\ImageAssetsProviderInterface;
 use BetaKiller\Assets\StaticFilesDeployHandler;
 use BetaKiller\Middleware\ContentNegotiationMiddleware;
-use BetaKiller\Middleware\DebugBarPatchMiddleware;
 use BetaKiller\Middleware\DebugMiddleware;
 use BetaKiller\Middleware\ErrorPageMiddleware;
 use BetaKiller\Middleware\ExpectedExceptionMiddleware;
