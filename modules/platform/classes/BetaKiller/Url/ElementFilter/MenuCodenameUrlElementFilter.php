@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\Url\ElementFilter;
 
-use BetaKiller\Url\IFaceModelInterface;
+use BetaKiller\Url\UrlElementForMenuInterface;
 use BetaKiller\Url\UrlElementInterface;
 
 /**
@@ -44,7 +44,7 @@ class MenuCodenameUrlElementFilter implements UrlElementFilterInterface
      */
     public function isAvailable(UrlElementInterface $urlElement): bool
     {
-        return $urlElement instanceof IFaceModelInterface
+        return $urlElement instanceof UrlElementForMenuInterface
             && $urlElement->getMenuName() === $this->menuCodename;
     }
 }
