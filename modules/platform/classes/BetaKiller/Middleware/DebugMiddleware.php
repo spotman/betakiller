@@ -10,6 +10,7 @@ use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\Helper\CookieHelper;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Log\LoggerInterface;
+use BetaKiller\Service\UserService;
 use DebugBar\DataCollector\MemoryCollector;
 use DebugBar\DataCollector\TimeDataCollector;
 use DebugBar\DebugBar;
@@ -54,6 +55,11 @@ class DebugMiddleware implements MiddlewareInterface
     private $cookieHelper;
 
     /**
+     * @var \BetaKiller\Service\UserService
+     */
+    private $userService;
+
+    /**
      * DebugMiddleware constructor.
      *
      * @param \BetaKiller\Helper\AppEnvInterface         $appEnv
@@ -65,12 +71,14 @@ class DebugMiddleware implements MiddlewareInterface
     public function __construct(
         AppEnvInterface $appEnv,
         CookieHelper $cookieHelper,
+        UserService $userService,
         ResponseFactoryInterface $responseFactory,
         StreamFactoryInterface $streamFactory,
         LoggerInterface $logger
     ) {
         $this->responseFactory = $responseFactory;
         $this->cookieHelper    = $cookieHelper;
+        $this->userService     = $userService;
         $this->streamFactory   = $streamFactory;
         $this->appEnv          = $appEnv;
         $this->logger          = $logger;
@@ -88,9 +96,18 @@ class DebugMiddleware implements MiddlewareInterface
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        // TODO Detect debug mode enabled for session
+        $debugEnabled = $this->appEnv->isDebugEnabled();
 
-        if (!$this->appEnv->isDebugEnabled()) {
+        // TODO Detect debug mode enabled for session
+        if (!$debugEnabled && ServerRequestHelper::hasUser($request)) {
+            $user = ServerRequestHelper::getUser($request);
+
+            if ($this->userService->isDeveloper($user)) {
+                $debugEnabled = true;
+            }
+        }
+
+        if (!$debugEnabled) {
             // Forward call
             return $handler->handle($request);
         }
@@ -133,6 +150,13 @@ class DebugMiddleware implements MiddlewareInterface
             '.phpdebugbar-widgets-measure:hover .phpdebugbar-widgets-value { background: #009bda }',
         ], [], []);
         $middleware = new PhpDebugBarMiddleware($renderer, $this->responseFactory, $this->streamFactory);
+
+        $csp = ServerRequestHelper::getCsp($request);
+
+        // DebugBar uses inline tags and images
+        $csp->csp('image', 'data:');
+        $csp->csp('script', 'unsafe-inline');
+        $csp->csp('script', 'unsafe-eval');
 
         // Forward call
         $response = $middleware->process($request->withAttribute(DebugBar::class, $debugBar), $handler);
