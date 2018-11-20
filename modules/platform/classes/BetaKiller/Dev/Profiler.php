@@ -54,8 +54,7 @@ class Profiler
 
     public static function begin(ServerRequestInterface $request, string $label): array
     {
-        $profiler = ServerRequestHelper::getProfiler($request);
-        $id = $profiler->start($label);
+        $id = ServerRequestHelper::getProfiler($request)->start($label);
 
         return [$request, $id];
     }
@@ -65,8 +64,7 @@ class Profiler
         /** @var ServerRequestInterface $request */
         [$request, $id] = $pack;
 
-        $profiler = ServerRequestHelper::getProfiler($request);
-        $profiler->stop($id);
+        ServerRequestHelper::getProfiler($request)->stop($id);
     }
 
     private function startupMeasure(): void
