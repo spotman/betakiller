@@ -6,7 +6,6 @@ use BetaKiller\Helper\LoggerHelperTrait;
 use BetaKiller\Helper\UrlHelper;
 use BetaKiller\IFace\Exception\UrlElementException;
 use BetaKiller\Url\Behaviour\UrlBehaviourFactory;
-use BetaKiller\Url\Container\UrlContainer;
 use BetaKiller\Url\Container\UrlContainerInterface;
 use Psr\Log\LoggerInterface;
 
@@ -67,10 +66,7 @@ class AvailableUrlsCollector
 
         $root = $this->tree->getRoot();
 
-        // Use empty UrlContainer on each root IFace iteration (so no intersection of models between paths)
-        foreach ($this->processLayer($root, $urlHelper, null, $useHidden) as $item) {
-            yield $item;
-        }
+        yield from $this->processLayer($root, $urlHelper, null, $useHidden);
     }
 
     /**
@@ -92,13 +88,17 @@ class AvailableUrlsCollector
         foreach ($models as $urlElement) {
             // Skip hidden ifaces
             if (!$useHidden && $urlElement->isHiddenInSiteMap()) {
+                $this->logger->debug('Skip hidden URL element ":name"', [':name' => $urlElement->getCodename()]);
                 continue;
             }
 
-            foreach ($this->processSingle($urlElement, $params ?: new UrlContainer(), $urlHelper,
-                $useHidden) as $item) {
-                yield $item;
-            }
+            yield from $this->processSingle(
+                $urlElement,
+                // Use empty UrlContainer on each root element iteration (so no intersection of models between paths)
+                $params ?: $urlHelper->createUrlContainer(),
+                $urlHelper,
+                $useHidden
+            );
         }
     }
 
@@ -120,11 +120,11 @@ class AvailableUrlsCollector
         UrlHelper $urlHelper,
         ?bool $useHidden = null
     ): \Generator {
-        $this->logger->debug('Processing :codename IFace', [':codename' => $urlElement->getCodename()]);
+        $this->logger->debug('Processing ":codename" URL element', [':codename' => $urlElement->getCodename()]);
 
         $childs = $this->tree->getChildren($urlElement);
 
-        $this->logger->debug('Total :num childs found for :codename IFace', [
+        $this->logger->debug('Total :num childs found for ":codename" URL element', [
             ':num'      => \count($childs),
             ':codename' => $urlElement->getCodename(),
         ]);
@@ -142,7 +142,7 @@ class AvailableUrlsCollector
 
             try {
                 if (!$this->aclHelper->isUrlElementAllowed($guest, $urlElement, $params)) {
-                    $this->logger->debug('Skip :codename IFace coz it is not allowed', [
+                    $this->logger->debug('Skip ":codename" URL element coz it is not allowed', [
                         ':codename' => $urlElement->getCodename(),
                     ]);
                     continue;
@@ -157,6 +157,7 @@ class AvailableUrlsCollector
             // Recursion for childs
             foreach ($this->processLayer($childs, $urlHelper, $params, $useHidden) as $childAvailableUrl) {
                 yield $childAvailableUrl;
+                $urlCounter++;
             }
         }
 
@@ -180,8 +181,6 @@ class AvailableUrlsCollector
 
         // TODO Deal with calculation of the last_modified from each parameter value
 
-        foreach ($behaviour->getAvailableUrls($model, $params, $helper) as $availableUrl) {
-            yield $availableUrl;
-        }
+        yield from $behaviour->getAvailableUrls($model, $params, $helper);
     }
 }

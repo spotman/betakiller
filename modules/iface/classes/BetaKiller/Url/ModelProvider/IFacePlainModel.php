@@ -134,8 +134,8 @@ class IFacePlainModel extends AbstractPlainEntityLinkedUrlElement implements IFa
         $this->label = $data[self::OPTION_LABEL] ?? null;
         $this->title = $data[self::OPTION_TITLE] ?? null;
 
-        if (isset($data[self::OPTION_HIDE_IN_SITEMAP])) {
-            $this->hideInSiteMap = true;
+        if (!empty($data[self::OPTION_HIDE_IN_SITEMAP])) {
+            $this->hideInSiteMap = (bool)$data[self::OPTION_HIDE_IN_SITEMAP];
         }
 
         if (isset($data[self::OPTION_LAYOUT])) {

@@ -54,7 +54,7 @@ class SingleUrlBehaviour extends AbstractUrlBehaviour
         UrlContainerInterface $params,
         UrlHelper $urlHelper
     ): \Generator {
-        $url = $urlHelper->makeUrl($urlElement, $params);
+        $url = $urlHelper->makeUrl($urlElement, $params, false);
 
         // Only one available uri and no UrlParameter instance
         yield $this->createAvailableUri($url);
