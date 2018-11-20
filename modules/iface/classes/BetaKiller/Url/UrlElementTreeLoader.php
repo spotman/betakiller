@@ -171,7 +171,7 @@ class UrlElementTreeLoader
 
         foreach ($sources as $provider) {
             foreach ($provider->getAll() as $urlElement) {
-                $this->tree->add($urlElement); // Allow overwriting
+                $this->tree->add($urlElement, true); // No overwriting allowed
             }
         }
 
