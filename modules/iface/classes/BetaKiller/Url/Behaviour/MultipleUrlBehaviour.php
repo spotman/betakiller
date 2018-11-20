@@ -123,14 +123,12 @@ class MultipleUrlBehaviour extends AbstractUrlBehaviour
 
         foreach ($items as $availableParameter) {
             $ifaceUrlParams->setParameter($availableParameter, true);
-            $url = $urlHelper->makeUrl($urlElement, $ifaceUrlParams);
+            $url = $urlHelper->makeUrl($urlElement, $ifaceUrlParams, false);
 
             yield $this->createAvailableUri($url, $availableParameter);
 
             if ($urlElement->hasTreeBehaviour()) {
-                foreach ($this->getAvailableUrls($urlElement, $ifaceUrlParams, $urlHelper) as $treeAvailableUrl) {
-                    yield $treeAvailableUrl;
-                }
+                yield from $this->getAvailableUrls($urlElement, $ifaceUrlParams, $urlHelper);
             }
         }
     }
