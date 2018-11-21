@@ -8,7 +8,6 @@ use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Model\TokenInterface;
 use BetaKiller\Repository\UserRepository;
 use Psr\Http\Message\ServerRequestInterface;
-use Worknector\Action\App\Verification\Email\ConfirmAction;
 
 abstract class AbstractVerificationEmailService
 {
@@ -118,7 +117,7 @@ abstract class AbstractVerificationEmailService
     private function getActionUrl(ServerRequestInterface $request, TokenInterface $tokenModel): string
     {
         $urlHelper        = ServerRequestHelper::getUrlHelper($request);
-        $actionUrlElement = $urlHelper->getUrlElementByCodename(ConfirmAction::codename());
+        $actionUrlElement = $urlHelper->getUrlElementByCodename($this->getActionEntityCodename());
         $actionUrlParams  = $urlHelper->createUrlContainer()->setEntity($tokenModel);
 
         return $urlHelper->makeUrl($actionUrlElement, $actionUrlParams, false);
