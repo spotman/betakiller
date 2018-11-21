@@ -45,22 +45,38 @@ class StaticAssets
         $this->config = $config;
     }
 
-    public function addJs(string $location): void
+    public function addJs(string $location, string $condition = null): void
     {
-        if ($this->isAbsoluteUrl($location)) {
-            $this->addPublicJs($location);
-        } else {
-            $this->addStaticJs($location);
+        if (!$this->isAbsoluteUrl($location)) {
+            $location = $this->getFullUrl($location);
         }
+
+        // Skip duplicate calls from widgets
+        if (isset($this->jsData[$location])) {
+            return;
+        }
+
+        $this->jsData[$location] = [
+            'location'  => $location,
+            'condition' => $condition,
+        ];
     }
 
-    public function addCss(string $location): void
+    public function addCss(string $location, string $condition = null): void
     {
-        if ($this->isAbsoluteUrl($location)) {
-            $this->addPublicCss($location);
-        } else {
-            $this->addStaticCss($location);
+        if (!$this->isAbsoluteUrl($location)) {
+            $location = $this->getFullUrl($location);
         }
+
+        // Skip duplicate calls from widgets
+        if (isset($this->cssData[$location])) {
+            return;
+        }
+
+        $this->cssData[$location] = [
+            'location'  => $location,
+            'condition' => $condition,
+        ];
     }
 
     /**
@@ -70,10 +86,8 @@ class StaticAssets
     {
         $jsCode = '';
 
-        foreach ($this->jsData as $condition => $jsArray) {
-            foreach ($jsArray as $js) {
-                $jsCode .= $this->getScriptTag($js, $condition)."\n";
-            }
+        foreach ($this->jsData as $location => $jsData) {
+            $jsCode .= $this->getScriptTag($location, $jsData['condition'])."\n";
         }
 
         return $jsCode;
@@ -87,10 +101,8 @@ class StaticAssets
         $cssCode = '';
 
         // Not need to build one css file
-        foreach ($this->cssData as $condition => $cssArray) {
-            foreach ($cssArray as $css) {
-                $cssCode .= $this->getCssLink($css, $condition);
-            }
+        foreach ($this->cssData as $location => $cssData) {
+            $cssCode .= $this->getCssLink($location, $cssData['condition'])."\n";
         }
 
         return $cssCode;
@@ -141,70 +153,15 @@ class StaticAssets
 
     private function isAbsoluteUrl(string $location): bool
     {
-        return \mb_strpos($location, 'http') === 0 || \mb_strpos($location, '//') === 0;
-    }
-
-    /**
-     * Include public js file in a page
-     *
-     * @param string      $location
-     * @param string|null $condition
-     *
-     * @return void
-     */
-    private function addPublicJs(string $location, string $condition = null): void
-    {
-        $this->jsData[$condition][] = $location;
-    }
-
-    /**
-     * Include local js file from static-files directory
-     *
-     * @param string      $filename
-     *
-     * @param string|null $condition
-     *
-     * @return void
-     */
-    private function addStaticJs(string $filename, string $condition = null): void
-    {
-        $jsFile = $this->getFullUrl($filename);
-
-        $this->addPublicJs($jsFile, $condition);
-    }
-
-    /**
-     * Add public stylesheet via HTTP path
-     *
-     * @param string      $location
-     * @param string|null $condition
-     *
-     * @return void
-     */
-    private function addPublicCss(string $location, string $condition = null): void
-    {
-        $this->cssData[$condition][] = $location;
-    }
-
-    /**
-     * Add local stylesheet from static-files directory
-     *
-     * @param string      $filename
-     * @param string|null $condition
-     *
-     * @return void
-     */
-    private function addStaticCss(string $filename, string $condition = null): void
-    {
-        $cssFile = $this->getFullUrl($filename);
-
-        $this->addPublicCss($cssFile, $condition);
+        return \mb_strpos($location, 'http') === 0
+            || \mb_strpos($location, '//') === 0
+            || \mb_strpos($location, '/') === 0;
     }
 
     private function getBaseUrl(): string
     {
-        // TODO
-        return '/assets/static/';
+        // TODO Domain if needed
+        return $this->getBasePath();
     }
 
     /**
@@ -217,12 +174,13 @@ class StaticAssets
      */
     private function getCssLink(string $location, string $condition = null): string
     {
-        $location = $this->prepareLocation($location);
+        $code = HTML::style($location, ['media' => 'all']);
 
-        return ''
-            .($condition ? '<!--[if '.$condition.']>' : '')
-            .HTML::style($location, ['media' => 'all'])
-            .($condition ? '<![endif]-->' : '');
+        if ($condition) {
+            $code = $this->wrapInCondition($code, $condition);
+        }
+
+        return $code;
     }
 
     /**
@@ -235,22 +193,17 @@ class StaticAssets
      */
     private function getScriptTag(string $location, string $condition = null): string
     {
-        $location = $this->prepareLocation($location);
+        $code = HTML::script($location);
 
-        return ''
-            .($condition ? '<!--[if '.$condition.']>' : '')
-            .HTML::script($location)
-            .($condition ? '<![endif]-->' : '')."\n";
+        if ($condition) {
+            $code = $this->wrapInCondition($code, $condition);
+        }
+
+        return $code;
     }
 
-    private function prepareLocation(string $location): string
+    private function wrapInCondition(string $code, string $condition): string
     {
-//        if (!$this->isAbsoluteUrl($location)) {
-//            TODO Deal with adding domain name here
-//            $location = trim($location, '/');
-//            $location = ($this->_config->host === '/') ? $location : $this->_config->host.$location;
-//        }
-
-        return $location;
+        return '<!--[if '.$condition.']>'.$code.'<![endif]-->';
     }
 }

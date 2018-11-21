@@ -5,9 +5,9 @@ namespace BetaKiller\Model;
 
 use BetaKiller\Exception\NotImplementedHttpException;
 use BetaKiller\IFace\Exception\UrlElementException;
+use BetaKiller\Url\EntityLinkedUrlElementInterface;
 use BetaKiller\Url\IFaceModelInterface;
 use BetaKiller\Url\UrlElementInterface;
-use BetaKiller\Url\WebHookModelInterface;
 
 /**
  * Class UrlElement
@@ -16,26 +16,34 @@ use BetaKiller\Url\WebHookModelInterface;
  * @author     Spotman
  * @package    Betakiller\Url
  */
-class UrlElement extends AbstractOrmBasedSingleParentTreeModel implements UrlElementInterface
+class UrlElement extends AbstractOrmBasedSingleParentTreeModel implements EntityLinkedUrlElementInterface
 {
     protected function configure(): void
     {
         $this->_table_name = 'url_elements';
 
         $this->belongs_to([
-            'type' => [
+            'type'   => [
                 'model'       => 'UrlElementType',
                 'foreign_key' => 'type_id',
+            ],
+            'zone'   => [
+                'model'       => 'UrlElementZone',
+                'foreign_key' => 'zone_id',
+            ],
+            'entity' => [
+                'model'       => 'Entity',
+                'foreign_key' => 'entity_id',
+            ],
+            'action' => [
+                'model'       => 'EntityAction',
+                'foreign_key' => 'entity_action_id',
             ],
         ]);
 
         $this->has_one([
-            'iface'   => [
+            'iface' => [
                 'model'       => 'IFace',
-                'foreign_key' => 'element_id',
-            ],
-            'webhook' => [
-                'model'       => 'WebHook',
                 'foreign_key' => 'element_id',
             ],
         ]);
@@ -49,6 +57,9 @@ class UrlElement extends AbstractOrmBasedSingleParentTreeModel implements UrlEle
 
         $this->load_with([
             'type',
+            'entity',
+            'action',
+            'zone',
         ]);
 
         parent::configure();
@@ -80,6 +91,36 @@ class UrlElement extends AbstractOrmBasedSingleParentTreeModel implements UrlEle
     public function setUri(string $value): void
     {
         $this->set('uri', $value);
+    }
+
+    /**
+     * Returns TRUE if iface is marked as "default"
+     *
+     * @return bool
+     */
+    public function isDefault(): bool
+    {
+        return (bool)$this->get('is_default');
+    }
+
+    /**
+     * Returns TRUE if iface provides dynamic url mapping
+     *
+     * @return bool
+     */
+    public function hasDynamicUrl(): bool
+    {
+        return (bool)$this->get('is_dynamic');
+    }
+
+    /**
+     * Returns TRUE if iface has multi-level tree-behavior url mapping
+     *
+     * @return bool
+     */
+    public function hasTreeBehaviour(): bool
+    {
+        return (bool)$this->get('is_tree');
     }
 
     /**
@@ -132,11 +173,6 @@ class UrlElement extends AbstractOrmBasedSingleParentTreeModel implements UrlEle
         return $this->getTypeRelation()->isIFace();
     }
 
-    public function isTypeWebHook(): bool
-    {
-        return $this->getTypeRelation()->isWebHook();
-    }
-
     /**
      * @return IFaceModelInterface
      * @throws \BetaKiller\IFace\Exception\UrlElementException
@@ -153,20 +189,17 @@ class UrlElement extends AbstractOrmBasedSingleParentTreeModel implements UrlEle
         return $this->get('iface');
     }
 
-    /**
-     * @return \BetaKiller\Url\WebHookModelInterface
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
-     */
-    public function getWebHookModel(): WebHookModelInterface
+    public function getDedicatedObject(): UrlElementInterface
     {
-        if (!$this->isTypeWebHook()) {
-            throw new UrlElementException('Can not get WebHook model from UrlElement :codename instance of :class', [
-                ':codename' => $this->getCodename(),
-                ':class'    => \get_class($this),
-            ]);
-        }
+        switch (true) {
+            case $this->isTypeIFace():
+                return $this->getIFaceModel();
 
-        return $this->get('webhook');
+            default:
+                throw new UrlElementException('Unknown type of URL element for codename :codename', [
+                    ':codename' => $this->getCodename(),
+                ]);
+        }
     }
 
     /**
@@ -179,6 +212,64 @@ class UrlElement extends AbstractOrmBasedSingleParentTreeModel implements UrlEle
         $parent = $this->getParent();
 
         return $parent ? $parent->getCodename() : null;
+    }
+
+    /**
+     * Returns model name of the linked entity
+     *
+     * @return string|null
+     */
+    public function getEntityModelName(): ?string
+    {
+        $entity = $this->getEntityRelation();
+
+        return $entity->loaded() ? $entity->getLinkedModelName() : null;
+    }
+
+    /**
+     * Returns entity [primary] action, applied by this IFace
+     *
+     * @return string|null
+     */
+    public function getEntityActionName(): ?string
+    {
+        $entityAction = $this->getEntityActionRelation();
+
+        return $entityAction->loaded() ? $entityAction->getName() : null;
+    }
+
+    /**
+     * Returns zone codename where this IFace is placed
+     *
+     * @return string
+     */
+    public function getZoneName(): string
+    {
+        return $this->getZoneRelation()->getName();
+    }
+
+    /**
+     * @return \BetaKiller\Model\Entity
+     */
+    private function getEntityRelation(): Entity
+    {
+        return $this->get('entity');
+    }
+
+    /**
+     * @return \BetaKiller\Model\EntityAction
+     */
+    private function getEntityActionRelation(): EntityAction
+    {
+        return $this->get('action');
+    }
+
+    /**
+     * @return \BetaKiller\Model\UrlElementZone
+     */
+    private function getZoneRelation(): UrlElementZone
+    {
+        return $this->get('zone');
     }
 
     /**

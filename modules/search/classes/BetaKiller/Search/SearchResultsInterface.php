@@ -46,5 +46,5 @@ interface SearchResultsInterface extends \IteratorAggregate
     /**
      * @param string $url
      */
-    public function setURL($url): void;
+    public function setURL(string $url): void;
 }

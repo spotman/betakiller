@@ -4,6 +4,8 @@ declare(strict_types=1);
 namespace BetaKiller\Middleware;
 
 use BetaKiller\Dev\Profiler;
+use BetaKiller\Exception\FoundHttpException;
+use BetaKiller\Exception\NotFoundHttpException;
 use BetaKiller\Factory\UrlElementProcessorFactory;
 use BetaKiller\Helper\ServerRequestHelper;
 use Psr\Http\Message\ResponseInterface;
@@ -41,9 +43,21 @@ class UrlElementRenderMiddleware implements MiddlewareInterface
     {
         $pid = Profiler::begin($request, 'UrlElement processing');
 
-        $stack    = ServerRequestHelper::getUrlElementStack($request);
+        $stack = ServerRequestHelper::getUrlElementStack($request);
 
-        $urlElement   = $stack->getCurrent();
+        if (!$stack->hasCurrent()) {
+            throw new NotFoundHttpException;
+        }
+
+        $urlElement = $stack->getCurrent();
+
+        $path = $request->getUri()->getPath();
+
+        // If this is default IFace and client requested non-slash uri, redirect client to /
+        if ($path !== '/' && $urlElement->isDefault() && !$urlElement->hasDynamicUrl()) {
+            throw new FoundHttpException('/');
+        }
+
         $urlProcessor = $this->processorFactory->createFromUrlElement($urlElement);
 
         $response = $urlProcessor->process($urlElement, $request);

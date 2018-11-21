@@ -17,8 +17,8 @@
                entityAction="listUnresolved" menu="admin">
             <iface uri="resolved" name="Admin_Error_ResolvedPhpExceptionIndex" title="Admin | Resolved PhpExceptions"
                    label="Resolved" entity="PhpException" entityAction="listResolved" menu="admin"/>
-            <iface uri="{PhpException.hash}" name="Admin_Error_PhpExceptionItem" label="{PhpException.message}"
-                   hasDynamicUrl="true" entity="PhpException" entityAction="read">
+            <iface uri="{PhpException.hash}" name="Admin_Error_PhpExceptionItem" label="Message"
+                   title="{PhpException.message}" entity="PhpException" entityAction="read">
                 <iface uri="stacktrace" name="Admin_Error_PhpExceptionStackTrace" label="Stacktrace" layout="raw"/>
             </iface>
         </iface>

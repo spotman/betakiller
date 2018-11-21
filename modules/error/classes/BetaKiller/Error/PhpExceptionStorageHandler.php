@@ -6,7 +6,9 @@ use BetaKiller\ExceptionInterface;
 use BetaKiller\Helper\NotificationHelper;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Log\Logger;
+use BetaKiller\Model\LanguageInterface;
 use BetaKiller\Model\PhpExceptionModelInterface;
+use BetaKiller\Notification\NotificationTargetInterface;
 use BetaKiller\Repository\PhpExceptionRepository;
 use Monolog\Handler\AbstractProcessingHandler;
 use Psr\Http\Message\ServerRequestInterface;
@@ -259,6 +261,15 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
         return ($model->getCounter() % $repeatCount === 1);
     }
 
+    public static function getNotificationTarget(NotificationHelper $helper): NotificationTargetInterface
+    {
+        return $helper->emailTarget(
+            \getenv('DEBUG_EMAIL_ADDRESS'),
+            'Bug Hunters',
+            LanguageInterface::NAME_EN // Only English template is available for now
+        );
+    }
+
     private function notifyDevelopersAboutFailure(\Throwable $subsystemException, \Throwable $originalException): void
     {
         // Try to send notification to developers about logging subsystem failure
@@ -277,7 +288,9 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
      */
     private function sendNotification(\Throwable $subsystemException, \Throwable $originalException): void
     {
-        $this->notification->groupMessage(self::NOTIFICATION_SUBSYSTEM_FAILURE, [
+        $target = self::getNotificationTarget($this->notification);
+
+        $this->notification->directMessage(self::NOTIFICATION_SUBSYSTEM_FAILURE, $target, [
             'url'       => getenv('APP_URL'),
             'subsystem' => [
                 'message'    => $this->getExceptionText($subsystemException),

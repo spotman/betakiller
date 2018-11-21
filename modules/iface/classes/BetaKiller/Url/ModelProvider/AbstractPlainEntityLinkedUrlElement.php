@@ -5,7 +5,7 @@ namespace BetaKiller\Url\ModelProvider;
 
 use BetaKiller\Url\EntityLinkedUrlElementInterface;
 
-abstract class AbstractPlainEntityLinkedUrlElement extends AbstractPlainUrlElementWithZone implements
+abstract class AbstractPlainEntityLinkedUrlElement extends AbstractPlainUrlElementModel implements
     EntityLinkedUrlElementInterface
 {
     public const OPTION_ENTITY_NAME   = 'entity';

@@ -171,7 +171,7 @@ class UrlDispatcher implements UrlDispatcherInterface
         $dynamic = [];
 
         foreach ($models as $model) {
-            if ($model instanceof IFaceModelInterface && ($model->hasDynamicUrl() || $model->hasTreeBehaviour())) {
+            if ($model->hasDynamicUrl() || $model->hasTreeBehaviour()) {
                 $dynamic[] = $model;
             } else {
                 $fixed[] = $model;
@@ -225,8 +225,6 @@ class UrlDispatcher implements UrlDispatcherInterface
         UrlPathIterator $it,
         UrlContainerInterface $urlParameters
     ): bool {
-        $behaviour = $this->behaviourFactory->fromUrlElement($model);
-
-        return $behaviour->parseUri($model, $it, $urlParameters);
+        return $this->behaviourFactory->fromUrlElement($model)->parseUri($model, $it, $urlParameters);
     }
 }

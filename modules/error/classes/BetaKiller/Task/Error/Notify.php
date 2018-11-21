@@ -3,8 +3,10 @@ declare(strict_types=1);
 
 namespace BetaKiller\Task\Error;
 
+use BetaKiller\Error\PhpExceptionStorageHandler;
 use BetaKiller\Factory\UrlHelperFactory;
 use BetaKiller\Helper\NotificationHelper;
+use BetaKiller\Model\LanguageInterface;
 use BetaKiller\Model\PhpExceptionModelInterface;
 use BetaKiller\Repository\PhpExceptionRepository;
 use BetaKiller\Task\AbstractTask;
@@ -95,8 +97,10 @@ class Notify extends AbstractTask
      */
     private function notifyAboutException(PhpExceptionModelInterface $model): void
     {
+        $target = PhpExceptionStorageHandler::getNotificationTarget($this->notification);
+
         // Notify developers
-        $this->notification->groupMessage(self::NOTIFICATION_PHP_EXCEPTION, [
+        $this->notification->directMessage(self::NOTIFICATION_PHP_EXCEPTION, $target, [
             'message'  => $model->getMessage(),
             'urls'     => $model->getUrls(),
             'paths'    => $model->getPaths(),

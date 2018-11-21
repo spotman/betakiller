@@ -76,13 +76,6 @@ class SecureHeadersMiddleware implements MiddlewareInterface
         $headers->csp('font-src', $baseUrl);
         $headers->csp('style', 'unsafe-inline');
 
-        if ($this->appEnv->isDebugEnabled()) {
-            // DebugBar uses inline tags and images
-            $headers->csp('image', 'data:');
-            $headers->csp('script', 'unsafe-inline');
-            $headers->csp('script', 'unsafe-eval');
-        }
-
         // TODO Inject this nonce in Request and use in StaticAssets
 //        $styleNonce  = $headers->cspNonce('style');
 //        $scriptNonce = $headers->cspNonce('script');

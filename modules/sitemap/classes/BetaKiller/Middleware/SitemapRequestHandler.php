@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace BetaKiller\Middleware;
 
-use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Service\SitemapService;
 use Psr\Http\Message\ResponseInterface;

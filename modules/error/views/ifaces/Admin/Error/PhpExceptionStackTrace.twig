@@ -4,6 +4,7 @@
   {% if trace %}
     {# Allow automatic iframe resizing #}
     {{ js("error/node_modules/iframe-resizer/js/iframeResizer.contentWindow.min.js") }}
+    {{ csp("script", "eval") }}
     {{ csp("script", "unsafe-inline") }}
     {{ csp("style", "unsafe-inline") }}
 

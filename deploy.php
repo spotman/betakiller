@@ -396,6 +396,10 @@ task('import:roles', function () {
     runMinionTask('importRoles');
 })->desc('Import localization data');
 
+task('import:zones', function () {
+    runMinionTask('importZones');
+})->desc('Import UrlElement zones');
+
 task('import:i18n', function () {
     runMinionTask('import:languages');
     runMinionTask('import:i18n');
@@ -408,7 +412,7 @@ task('import:notification', function () {
 /**
  * Success message
  */
-task('done', function () use ($tz) {
+task('deploy:done', function () use ($tz) {
     $dateTime = new \DateTimeImmutable();
     writeln('<info>Successfully deployed at '.$dateTime->setTimezone($tz)->format('H:i:s T').'!</info>');
 });
@@ -418,9 +422,10 @@ task('migrate', [
     'migrations:up',
 
     // Import data
+    'import:zones',
     'import:roles',
-    'import:i18n', // Depends on roles
     'import:notification', // Depends on roles
+    'import:i18n', // Depends on roles and notification
 ])->setPrivate();
 
 task('deploy', [
@@ -474,7 +479,7 @@ task('deploy', [
     // Finalize
     'cleanup',
     'deploy:unlock',
-    'done',
+    'deploy:done',
 ])->desc('Deploy app bundle')->onStage(
     DEPLOYER_STAGING_STAGE,
     DEPLOYER_PRODUCTION_STAGE,

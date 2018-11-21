@@ -26,7 +26,7 @@ class IndexItemIFace extends AbstractEditor
 
         /** @var \BetaKiller\Url\Parameter\IdUrlParameter|null $idParam */
         $idParam = $this->urlContainer->getParameterByClassName(IdUrlParameter::class);
-        $id = $idParam ? $idParam->getID() : null;
+        $id = $idParam ? $idParam->getValue() : null;
 
         return [
             'action'   => 'index',

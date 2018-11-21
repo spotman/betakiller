@@ -22,10 +22,10 @@ abstract class AbstractConfigBasedDispatchableEntity implements ConfigBasedDispa
      * @param string     $codename
      * @param array|null $configOptions
      */
-    public function __construct(string $codename, ?array $configOptions = null)
+    public function __construct(string $codename, array $configOptions = null)
     {
         $this->codename      = $codename;
-        $this->configOptions = $configOptions;
+        $this->configOptions = $configOptions ?? [];
     }
 
     /**

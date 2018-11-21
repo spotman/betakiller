@@ -41,20 +41,25 @@ class SearchResults implements SearchResultsInterface, ApiResponseItemInterface
     /**
      * SearchResults constructor.
      *
-     * @param int $totalCount
-     * @param     $totalPages
-     * @param     $hasNextPage
+     * @param array $items
+     * @param int   $totalCount
+     * @param int   $totalPages
+     * @param bool  $hasNextPage
      */
-    public function __construct($totalCount, $totalPages, $hasNextPage)
+    public function __construct(array $items, int $totalCount, int $totalPages, bool $hasNextPage)
     {
         $this->totalCount  = $totalCount;
         $this->totalPages  = $totalPages;
         $this->hasNextPage = $hasNextPage;
+
+        foreach ($items as $item) {
+            $this->addItem($item);
+        }
     }
 
-    public static function factory($totalItems, $totalPages, $hasNextPage): SearchResultsInterface
+    public static function factory(array $items, int $totalItems, int $totalPages, bool $hasNextPage): SearchResultsInterface
     {
-        return new self($totalItems, $totalPages, $hasNextPage);
+        return new self($items, $totalItems, $totalPages, $hasNextPage);
     }
 
     /**
@@ -143,8 +148,8 @@ class SearchResults implements SearchResultsInterface, ApiResponseItemInterface
     /**
      * @param string $url
      */
-    public function setURL($url): void
+    public function setURL(string $url): void
     {
-        $this->url = (string)$url;
+        $this->url = $url;
     }
 }

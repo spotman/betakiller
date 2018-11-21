@@ -4,31 +4,20 @@
 {% block content %}
   {{ css('webhooks/layout.css') }}
 
-
   <section id="admin-webhooks-listItems" class="admin-webhooks-layout">
-
-
-    <nav>
-      <div class="nav-wrapper green">
-        <div class="col s12">
-          {{ widget('Breadcrumbs') }}
-        </div>
-      </div>
-    </nav>
-
 
     <section class="items">
 
       {% for item in items %}
         <div class="collection">
 
-            {% for key,value in item.info %}
+          {% for key,value in item.info %}
 
-              <div class="collection-item row clear">
+            <div class="collection-item row clear">
                 <span class="col s1">
                   {{ key }}:
                 </span>
-                <span class="col s11">
+              <span class="col s11">
                   {% if loop.index < 2 %}
                     <a href="{{ item.url }}">
                       {{ value }}
@@ -37,9 +26,9 @@
                     {{ value }}
                   {% endif %}
                 </span>
-              </div>
+            </div>
 
-            {% endfor %}
+          {% endfor %}
 
         </div>
       {% endfor %}

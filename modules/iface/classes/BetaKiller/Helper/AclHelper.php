@@ -7,14 +7,12 @@ use BetaKiller\Acl\Resource\EntityRelatedAclResourceInterface;
 use BetaKiller\CrudlsActionsInterface;
 use BetaKiller\Factory\GuestUserFactory;
 use BetaKiller\IFace\Exception\UrlElementException;
-use BetaKiller\IFace\IFaceInterface;
 use BetaKiller\Model\DispatchableEntityInterface;
 use BetaKiller\Model\GuestUserInterface;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Url\Container\UrlContainerInterface;
 use BetaKiller\Url\EntityLinkedUrlElementInterface;
 use BetaKiller\Url\UrlElementInterface;
-use BetaKiller\Url\UrlElementWithZoneInterface;
 use BetaKiller\Url\Zone\ZoneAccessSpecFactory;
 use BetaKiller\Url\Zone\ZoneAccessSpecInterface;
 use Spotman\Acl\AclInterface;
@@ -185,39 +183,34 @@ class AclHelper
             }
         }
 
-        if ($urlElement instanceof UrlElementWithZoneInterface) {
-            $zoneSpec     = $this->getZoneAccessSpec($urlElement);
-            $zoneAclRules = $zoneSpec->getAclRules();
-            $zoneRoles    = $zoneSpec->getRolesNames();
+        $zoneSpec     = $this->getZoneAccessSpec($urlElement);
+        $zoneAclRules = $zoneSpec->getAclRules();
+        $zoneRoles    = $zoneSpec->getRolesNames();
 
-            // Force guest user in zones without auth (so every public iface must be visible for guest users)
-            if (!$zoneSpec->isAuthRequired()) {
-                // TODO Extract this check to console task executed before deployment
-                // Public zones need GuestUser to check access)
-                $user = $this->guestFactory->create();
-            }
+        // Force guest user in zones without auth (so every public iface must be visible for guest users)
+        if (!$zoneSpec->isAuthRequired()) {
+            // TODO Extract this check to console task executed before deployment
+            // Public zones need GuestUser to check access)
+            $user = $this->guestFactory->create();
+        }
 
-            // Check zone roles if defined
-            if ($zoneRoles && !$user->hasAnyOfRolesNames($zoneRoles)) {
-                return false;
-            }
+        // Check zone roles if defined
+        if ($zoneRoles && !$user->hasAnyOfRolesNames($zoneRoles)) {
+            return false;
+        }
 
-            // Check zone rules if defined
-            if ($zoneAclRules && !$this->checkCustomAclRules($zoneAclRules, $user)) {
-                return false;
-            }
+        // Check zone rules if defined
+        if ($zoneAclRules && !$this->checkCustomAclRules($zoneAclRules, $user)) {
+            return false;
+        }
 
-            // Allow access to non-protected zones by default if nor entity or custom rules were not defined
-            if (!$zoneSpec->isProtectionNeeded()) {
-                return true;
-            }
-
-            if ($zoneRoles || $zoneAclRules) {
-                $protectionDefined = true;
-            }
-        } else {
-            // UrlElement without zone definition => means "public" zone => no more checks
+        // Allow access to non-protected zones by default if nor entity or custom rules were not defined
+        if (!$zoneSpec->isProtectionNeeded()) {
             return true;
+        }
+
+        if ($zoneRoles || $zoneAclRules) {
+            $protectionDefined = true;
         }
 
         // IFaces and Actions from protected zones must define entity/action or custom rules to protect itself
@@ -276,11 +269,6 @@ class AclHelper
      */
     public function forceAuthorizationIfNeeded(UrlElementInterface $urlElement, UserInterface $user): void
     {
-        // Only IFaces and Actions have zone definition
-        if (!$urlElement instanceof UrlElementWithZoneInterface) {
-            return;
-        }
-
         $zoneSpec = $this->getZoneAccessSpec($urlElement);
 
         // User authorization is required for entering protected zones
@@ -290,11 +278,11 @@ class AclHelper
     }
 
     /**
-     * @param \BetaKiller\Url\UrlElementWithZoneInterface $urlElement
+     * @param \BetaKiller\Url\UrlElementInterface $urlElement
      *
      * @return \BetaKiller\Url\Zone\ZoneAccessSpecInterface
      */
-    private function getZoneAccessSpec(UrlElementWithZoneInterface $urlElement): ZoneAccessSpecInterface
+    private function getZoneAccessSpec(UrlElementInterface $urlElement): ZoneAccessSpecInterface
     {
         return $this->specFactory->createFromUrlElement($urlElement);
     }

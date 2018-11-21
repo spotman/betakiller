@@ -62,7 +62,13 @@ class I18nMiddleware implements MiddlewareInterface
 
         $response = $handler->handle($request->withAttribute(I18nHelper::class, $i18n));
 
-        return $this->cookies->set($response, self::COOKIE_NAME, $lang, new \DateInterval(self::COOKIE_DATE_INTERVAL));
+        // Allow other middleware to change language via I18nHelper::setLang()
+        return $this->cookies->set(
+            $response,
+            self::COOKIE_NAME,
+            $i18n->getLang(),
+            new \DateInterval(self::COOKIE_DATE_INTERVAL)
+        );
     }
 
     private function detectLang(ServerRequestInterface $request): string

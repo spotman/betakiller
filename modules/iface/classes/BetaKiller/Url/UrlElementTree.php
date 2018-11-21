@@ -81,7 +81,7 @@ class UrlElementTree implements UrlElementTreeInterface
         $uris           = [];
 
         foreach ($models as $model) {
-            if ($model instanceof IFaceModelInterface && ($model->hasDynamicUrl() || $model->hasTreeBehaviour())) {
+            if ($model->hasDynamicUrl() || $model->hasTreeBehaviour()) {
                 $dynamicCounter++;
             }
 
@@ -117,12 +117,10 @@ class UrlElementTree implements UrlElementTreeInterface
             ]);
         }
 
+        $this->validateZone($model);
+
         if ($model instanceof IFaceModelInterface) {
             $this->validateIFaceModel($model);
-        }
-
-        if ($model instanceof UrlElementWithZoneInterface) {
-            $this->validateZone($model);
         }
     }
 
@@ -137,11 +135,12 @@ class UrlElementTree implements UrlElementTreeInterface
         }
     }
 
-    private function validateZone(UrlElementWithZoneInterface $model): void
+    private function validateZone(UrlElementInterface $model): void
     {
         if (!$model->getZoneName()) {
-            throw new UrlElementException('IFace zone is missing for UrlElement ":codename"', [
+            throw new UrlElementException('IFace zone is missing for UrlElement ":codename" with URI ":uri"', [
                 ':codename' => $model->getCodename(),
+                ':uri'      => $model->getUri(),
             ]);
         }
     }
@@ -152,15 +151,15 @@ class UrlElementTree implements UrlElementTreeInterface
      * @return \BetaKiller\Url\IFaceModelInterface
      * @throws \BetaKiller\IFace\Exception\UrlElementException
      */
-    public function getDefault(): IFaceModelInterface
+    public function getDefault(): UrlElementInterface
     {
         foreach ($this->items as $item) {
-            if ($item instanceof IFaceModelInterface && $item->isDefault()) {
+            if ($item->isDefault()) {
                 return $item;
             }
         }
 
-        throw new UrlElementException('No default IFace found');
+        throw new UrlElementException('No default UrlElement found');
     }
 
     /**
@@ -231,29 +230,6 @@ class UrlElementTree implements UrlElementTreeInterface
         return $parentCodename
             ? $this->getByCodename($parentCodename)
             : null;
-    }
-
-    /**
-     * @param \BetaKiller\Url\IFaceModelInterface $child
-     *
-     * @return \BetaKiller\Url\IFaceModelInterface|null
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
-     */
-    public function getParentIFaceModel(IFaceModelInterface $child): ?IFaceModelInterface
-    {
-        $parent = $this->getParent($child);
-
-        if (!$parent) {
-            return null;
-        }
-
-        if (!$parent instanceof IFaceModelInterface) {
-            throw new UrlElementException('Can not get parent IFace for ":codename" coz it is not of IFace type', [
-                ':codename' => $child->getCodename(),
-            ]);
-        }
-
-        return $parent;
     }
 
     /**
@@ -378,20 +354,6 @@ class UrlElementTree implements UrlElementTreeInterface
     }
 
     /**
-     * Returns array of WebHookModelInterface instances linked to provided service
-     *
-     * @param string $serviceName
-     *
-     * @return \BetaKiller\Url\WebHookModelInterface[]
-     */
-    public function getWebHooksByServiceName(string $serviceName): array
-    {
-        return \array_filter($this->items, function (UrlElementInterface $urlElement) use ($serviceName) {
-            return $urlElement instanceof WebHookModelInterface && $urlElement->getServiceName() === $serviceName;
-        });
-    }
-
-    /**
      * @param \BetaKiller\Url\UrlElementInterface $model
      *
      * @return \ArrayIterator|\BetaKiller\Url\UrlElementInterface[]
@@ -510,10 +472,6 @@ class UrlElementTree implements UrlElementTreeInterface
      */
     private function isAdminModel(UrlElementInterface $model): bool
     {
-        if (!$model instanceof UrlElementWithZoneInterface) {
-            return false;
-        }
-
         return $model->getZoneName() === ZoneInterface::ADMIN;
     }
 
@@ -524,10 +482,6 @@ class UrlElementTree implements UrlElementTreeInterface
      */
     private function isPublicModel(UrlElementInterface $model): bool
     {
-        if (!$model instanceof UrlElementWithZoneInterface) {
-            return false;
-        }
-
         return $model->getZoneName() === ZoneInterface::PUBLIC;
     }
 

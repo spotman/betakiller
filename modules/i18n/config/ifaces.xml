@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <root>
+    <action uri="change-language" name="App_I18n_ChangeLanguage" zone="public"/>
+
     <iface uri="i18n" name="Admin_I18n_Index" parent="Admin_Index" zone="admin" menu="admin" label="Localization">
         <iface uri="common" name="Admin_I18n_CommonIndex" menu="admin" label="Common" entity="TranslationKey"
                entityAction="list">
-            <iface uri="{TranslationKey.id}" name="Admin_I18n_CommonItem" hasDynamicUrl="true"
-                   label="{TranslationKey.key}" entity="TranslationKey" entityAction="read">
+            <iface uri="{TranslationKey.id}" name="Admin_I18n_CommonItem" label="{TranslationKey.key}"
+                   entity="TranslationKey" entityAction="read">
                 <action uri="save" name="Admin_I18n_UpdateCommonItem" entity="TranslationKey" entityAction="update"/>
             </iface>
         </iface>

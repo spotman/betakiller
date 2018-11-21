@@ -1,12 +1,12 @@
 <?php
 namespace BetaKiller\Factory;
 
-use \BetaKiller\IFace\Exception\UrlElementException;
+use BetaKiller\IFace\Exception\UrlElementException;
 use BetaKiller\Url\ActionModelInterface;
-use \BetaKiller\Url\IFaceModelInterface;
-use \BetaKiller\Url\UrlElementInterface;
-use \BetaKiller\Url\ElementProcessor\UrlElementProcessorInterface;
-use \BetaKiller\Url\WebHookModelInterface;
+use BetaKiller\Url\DummyModelInterface;
+use BetaKiller\Url\ElementProcessor\UrlElementProcessorInterface;
+use BetaKiller\Url\IFaceModelInterface;
+use BetaKiller\Url\UrlElementInterface;
 
 /**
  * Factory of URL element processor like IFace, WabHok and etc
@@ -48,8 +48,8 @@ class UrlElementProcessorFactory
                 $className = 'IFace';
                 break;
 
-            case $model instanceof WebHookModelInterface:
-                $className = 'WebHook';
+            case $model instanceof DummyModelInterface:
+                $className = 'Dummy';
                 break;
 
             case $model instanceof ActionModelInterface:
@@ -57,7 +57,8 @@ class UrlElementProcessorFactory
                 break;
 
             default:
-                throw new UrlElementException('Unknown IFace Url element type :codename', [
+                throw new UrlElementException('Unknown IFace Url element type ":type" with codename ":codename"', [
+                    ':type'     => \get_class($model),
                     ':codename' => $model->getCodename(),
                 ]);
         }

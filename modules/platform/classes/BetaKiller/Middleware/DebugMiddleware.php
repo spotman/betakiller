@@ -4,11 +4,14 @@ declare(strict_types=1);
 namespace BetaKiller\Middleware;
 
 use BetaKiller\Dev\DebugBarCookiesDataCollector;
+use BetaKiller\Dev\DebugBarHttpDriver;
+use BetaKiller\Dev\DebugBarSessionDataCollector;
 use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\Helper\CookieHelper;
+use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Log\LoggerInterface;
+use BetaKiller\Service\UserService;
 use DebugBar\DataCollector\MemoryCollector;
-use DebugBar\DataCollector\RequestDataCollector;
 use DebugBar\DataCollector\TimeDataCollector;
 use DebugBar\DebugBar;
 use DebugBar\Storage\FileStorage;
@@ -52,6 +55,11 @@ class DebugMiddleware implements MiddlewareInterface
     private $cookieHelper;
 
     /**
+     * @var \BetaKiller\Service\UserService
+     */
+    private $userService;
+
+    /**
      * DebugMiddleware constructor.
      *
      * @param \BetaKiller\Helper\AppEnvInterface         $appEnv
@@ -63,12 +71,14 @@ class DebugMiddleware implements MiddlewareInterface
     public function __construct(
         AppEnvInterface $appEnv,
         CookieHelper $cookieHelper,
+        UserService $userService,
         ResponseFactoryInterface $responseFactory,
         StreamFactoryInterface $streamFactory,
         LoggerInterface $logger
     ) {
         $this->responseFactory = $responseFactory;
         $this->cookieHelper    = $cookieHelper;
+        $this->userService     = $userService;
         $this->streamFactory   = $streamFactory;
         $this->appEnv          = $appEnv;
         $this->logger          = $logger;
@@ -86,7 +96,18 @@ class DebugMiddleware implements MiddlewareInterface
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        if (!$this->appEnv->isDebugEnabled()) {
+        $debugEnabled = $this->appEnv->isDebugEnabled();
+
+        // TODO Detect debug mode enabled for session
+        if (!$debugEnabled && ServerRequestHelper::hasUser($request)) {
+            $user = ServerRequestHelper::getUser($request);
+
+            if ($this->userService->isDeveloper($user)) {
+                $debugEnabled = true;
+            }
+        }
+
+        if (!$debugEnabled) {
             // Forward call
             return $handler->handle($request);
         }
@@ -101,14 +122,24 @@ class DebugMiddleware implements MiddlewareInterface
         // Fresh instance for every request
         $debugBar = new DebugBar();
 
+        // Fetch actual session
+        $session = ServerRequestHelper::getSession($request);
+
+        // Initialize http driver
+        $httpDriver = new DebugBarHttpDriver($session);
+        $debugBar->setHttpDriver($httpDriver);
+
         $debugBar
             ->addCollector(new TimeDataCollector($startTime))
-            ->addCollector(new RequestDataCollector())
+            ->addCollector(new DebugBarSessionDataCollector($session))
             ->addCollector(new DebugBarCookiesDataCollector($this->cookieHelper, $request))
             ->addCollector(new MemoryCollector());
 
         // Storage for processing data for AJAX calls and redirects
         $debugBar->setStorage(new FileStorage($this->appEnv->getTempPath()));
+
+        // Initialize profiler with DebugBar instance and enable it
+        ServerRequestHelper::getProfiler($request)->enable($debugBar);
 
         // Prepare renderer
         $renderer = $debugBar->getJavascriptRenderer('/phpDebugBar');
@@ -120,8 +151,18 @@ class DebugMiddleware implements MiddlewareInterface
         ], [], []);
         $middleware = new PhpDebugBarMiddleware($renderer, $this->responseFactory, $this->streamFactory);
 
+        $csp = ServerRequestHelper::getCsp($request);
+
+        // DebugBar uses inline tags and images
+        $csp->csp('image', 'data:');
+        $csp->csp('script', 'unsafe-inline');
+        $csp->csp('script', 'unsafe-eval');
+
         // Forward call
-        return $middleware->process($request->withAttribute(DebugBar::class, $debugBar), $handler);
+        $response = $middleware->process($request->withAttribute(DebugBar::class, $debugBar), $handler);
+
+        // Add headers injected by DebugBar
+        return $httpDriver->applyHeaders($response);
     }
 
     /**

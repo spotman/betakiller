@@ -1,7 +1,6 @@
 <?php
 namespace BetaKiller\Url\ModelProvider;
 
-use BetaKiller\IFace\Exception\UrlElementException;
 use BetaKiller\Model\UrlElement;
 use BetaKiller\Repository\UrlElementRepository;
 use BetaKiller\Url\UrlElementInterface;
@@ -48,17 +47,6 @@ class UrlElementProviderDatabase implements UrlElementProviderInterface
      */
     private function detectDedicatedObject(UrlElement $element): UrlElementInterface
     {
-        switch (true) {
-            case $element->isTypeIFace():
-                return $element->getIFaceModel();
-
-            case $element->isTypeWebHook():
-                return $element->getWebHookModel();
-
-            default:
-                throw new UrlElementException('Unknown type of URL element for codename :codename', [
-                    ':codename' => $element->getCodename(),
-                ]);
-        }
+        return $element->getDedicatedObject();
     }
 }

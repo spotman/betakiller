@@ -10,14 +10,9 @@ abstract class AbstractConfigBasedDispatchableRepository extends AbstractPredefi
     implements DispatchableRepositoryInterface
 {
     /**
-     * @var \BetaKiller\Config\ConfigProviderInterface
-     */
-    protected $configProvider;
-
-    /**
      * @var ConfigBasedDispatchableEntityInterface[]
      */
-    protected $items = [];
+    private $items = [];
 
     /**
      * ParserRepository constructor.
@@ -28,9 +23,16 @@ abstract class AbstractConfigBasedDispatchableRepository extends AbstractPredefi
      */
     public function __construct(ConfigProviderInterface $configProvider)
     {
-        $this->configProvider = $configProvider;
+        $configKey = $this->getItemsListConfigKey();
+        $config    = (array)$configProvider->load($configKey);
 
-        $this->fillFromConfig();
+        if (!$config) {
+            throw new RepositoryException('Empty items list config for :repo repository', [
+                ':repo' => static::getCodename(),
+            ]);
+        }
+
+        $this->fillFromConfig($config);
     }
 
     /**
@@ -76,19 +78,10 @@ abstract class AbstractConfigBasedDispatchableRepository extends AbstractPredefi
     }
 
     /**
-     * @throws \BetaKiller\Repository\RepositoryException
+     * @param mixed[] $config
      */
-    private function fillFromConfig(): void
+    protected function fillFromConfig(array $config): void
     {
-        $configKey = $this->getItemsListConfigKey();
-        $config    = $this->configProvider->load($configKey);
-
-        if (!$config) {
-            throw new RepositoryException('Empty items list config for :repo repository', [
-                ':repo' => static::getCodename(),
-            ]);
-        }
-
         // Filling repository with instances by config
         foreach ($config as $name => $options) {
             if (\is_string($name)) {
@@ -100,8 +93,13 @@ abstract class AbstractConfigBasedDispatchableRepository extends AbstractPredefi
                 $options  = null;
             }
 
-            $this->items[$codename] = $this->createItemFromCodename($codename, $options);
+            $this->addItem($codename, $options);
         }
+    }
+
+    protected function addItem(string $codename, ?array $options = null): void
+    {
+        $this->items[$codename] = $this->createItemFromCodename($codename, $options);
     }
 
     /**

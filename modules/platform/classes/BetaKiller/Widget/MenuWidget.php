@@ -11,11 +11,10 @@ use BetaKiller\Helper\UrlHelper;
 use BetaKiller\IFace\Exception\UrlElementException;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Url\Behaviour\UrlBehaviourFactory;
-use BetaKiller\Url\Container\UrlContainer;
 use BetaKiller\Url\Container\UrlContainerInterface;
 use BetaKiller\Url\ElementFilter\AggregateUrlElementFilter;
 use BetaKiller\Url\ElementFilter\MenuCodenameUrlElementFilter;
-use BetaKiller\Url\IFaceModelInterface;
+use BetaKiller\Url\UrlElementInterface;
 use BetaKiller\Url\UrlElementTreeInterface;
 use BetaKiller\Url\UrlElementTreeRecursiveIterator;
 use Psr\Http\Message\ServerRequestInterface;
@@ -126,7 +125,7 @@ class MenuWidget extends AbstractPublicWidget
 
         // Iterate over every url element
         foreach ($models as $urlElement) {
-            $params = $params ?: UrlContainer::create();
+            $params = $params ?: $urlHelper->createUrlContainer();
 
             // Iterate over every generated URL to make full tree
             foreach ($this->getAvailableIFaceUrls($urlElement, $params, $urlHelper) as $availableUrl) {
@@ -168,7 +167,7 @@ class MenuWidget extends AbstractPublicWidget
     /**
      * Generating URLs by IFace element
      *
-     * @param \BetaKiller\Url\IFaceModelInterface             $model
+     * @param \BetaKiller\Url\UrlElementInterface             $model
      * @param \BetaKiller\Url\Container\UrlContainerInterface $params
      * @param \BetaKiller\Helper\UrlHelper                    $helper
      *
@@ -176,15 +175,13 @@ class MenuWidget extends AbstractPublicWidget
      * @throws \BetaKiller\Factory\FactoryException
      */
     private function getAvailableIFaceUrls(
-        IFaceModelInterface $model,
+        UrlElementInterface $model,
         UrlContainerInterface $params,
         UrlHelper $helper
     ): \Generator {
         $behaviour = $this->behaviourFactory->fromUrlElement($model);
 
-        foreach ($behaviour->getAvailableUrls($model, $params, $helper) as $availableUrl) {
-            yield $availableUrl;
-        }
+        yield from $behaviour->getAvailableUrls($model, $params, $helper);
     }
 
     /**

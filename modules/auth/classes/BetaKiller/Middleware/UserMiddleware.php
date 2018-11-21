@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace BetaKiller\Middleware;
 
 use BetaKiller\Auth\AuthFacade;
-use BetaKiller\Dev\Profiler;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Model\UserInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -40,12 +39,8 @@ class UserMiddleware implements MiddlewareInterface
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        $pid = Profiler::begin($request, 'User detection');
-
-        $session  = ServerRequestHelper::getSession($request);
-        $user = $this->auth->getSessionUser($session);
-
-        Profiler::end($pid);
+        $session = ServerRequestHelper::getSession($request);
+        $user    = $this->auth->getSessionUser($session);
 
         return $handler->handle($request->withAttribute(UserInterface::class, $user));
     }

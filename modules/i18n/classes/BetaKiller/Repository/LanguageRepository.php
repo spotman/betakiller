@@ -12,8 +12,16 @@ use BetaKiller\Utils\Kohana\ORM\OrmInterface;
  * @method LanguageInterface findById(string $id)
  * @method LanguageInterface[] getAll()
  */
-final class LanguageRepository extends AbstractOrmBasedRepository implements LanguageRepositoryInterface
+final class LanguageRepository extends AbstractOrmBasedDispatchableRepository implements LanguageRepositoryInterface
 {
+    /**
+     * @return string
+     */
+    public function getUrlKeyName(): string
+    {
+        return Language::TABLE_FIELD_NAME;
+    }
+
     public function getByName(string $name): LanguageInterface
     {
         $model = $this->findByName($name);
@@ -108,17 +116,19 @@ final class LanguageRepository extends AbstractOrmBasedRepository implements Lan
     }
 
     /**
-     * @param \BetaKiller\Utils\Kohana\ORM\OrmInterface $orm
+     * @param \BetaKiller\Model\ExtendedOrmInterface $orm
+     *
+     * @param int|null                               $currentPage
+     * @param int|null                               $itemsPerPage
      *
      * @return array
-     * @throws \BetaKiller\Repository\RepositoryException
      */
-    protected function findAll(OrmInterface $orm): array
+    protected function findAll(ExtendedOrmInterface $orm, int $currentPage = null, int $itemsPerPage = null): array
     {
         // Default language always placed first
         $this->placeDefaultFirst($orm);
 
-        return parent::findAll($orm);
+        return parent::findAll($orm, $currentPage, $itemsPerPage);
     }
 
     /**

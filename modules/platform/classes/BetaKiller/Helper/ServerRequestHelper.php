@@ -167,6 +167,13 @@ class ServerRequestHelper
         return self::getUrlContainer($request)->getEntityByClassName($className);
     }
 
+    /**
+     * @param \Psr\Http\Message\ServerRequestInterface $request
+     * @param string                                   $className
+     *
+     * @return \BetaKiller\Url\Parameter\RawUrlParameterInterface|mixed|null
+     * @throws \BetaKiller\Url\Container\UrlContainerException
+     */
     public static function getParameter(ServerRequestInterface $request, string $className)
     {
         return self::getUrlContainer($request)->getParameterByClassName($className);

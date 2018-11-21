@@ -31,9 +31,8 @@ interface UrlElementTreeInterface
      * Returns default iface model
      *
      * @return \BetaKiller\Url\IFaceModelInterface
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
      */
-    public function getDefault(): IFaceModelInterface;
+    public function getDefault(): UrlElementInterface;
 
     /**
      * Returns list of root elements
@@ -61,14 +60,6 @@ interface UrlElementTreeInterface
      * @throws \BetaKiller\IFace\Exception\UrlElementException
      */
     public function getParent(UrlElementInterface $child): ?UrlElementInterface;
-
-    /**
-     * @param \BetaKiller\Url\IFaceModelInterface $child
-     *
-     * @return \BetaKiller\Url\IFaceModelInterface|null
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
-     */
-    public function getParentIFaceModel(IFaceModelInterface $child): ?IFaceModelInterface;
 
     /**
      * Returns iface model by codename or throws an exception if nothing was found
@@ -102,15 +93,6 @@ interface UrlElementTreeInterface
         string $action,
         string $zone
     ): EntityLinkedUrlElementInterface;
-
-    /**
-     * Returns array of WebHookModelInterface instances linked to provided service
-     *
-     * @param string $serviceName
-     *
-     * @return \BetaKiller\Url\WebHookModelInterface[]
-     */
-    public function getWebHooksByServiceName(string $serviceName): array;
 
     /**
      * @param \BetaKiller\Url\UrlElementInterface $model

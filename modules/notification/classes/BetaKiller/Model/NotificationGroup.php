@@ -22,6 +22,7 @@ class NotificationGroup extends \ORM implements NotificationGroupInterface
     {
         $this->_table_name = self::TABLE_NAME;
 
+        // TODO Понять почему без этого не работаtn NotificationGroupRepository::findGroupUsers()
         $this->belongs_to([
             'users' => [
                 'model'       => 'User',
@@ -224,10 +225,26 @@ class NotificationGroup extends \ORM implements NotificationGroupInterface
     }
 
     /**
+     * @return \BetaKiller\Model\UserInterface[]
+     */
+    public function getDisabledUsers(): array
+    {
+        return $this->getUserOffRelation()->get_all();
+    }
+
+    /**
      * @return \BetaKiller\Model\Role
      */
     private function getRoleRelation(): Role
     {
         return $this->get('roles');
+    }
+
+    /**
+     * @return \BetaKiller\Model\User
+     */
+    private function getUserOffRelation(): User
+    {
+        return $this->get('users_off');
     }
 }

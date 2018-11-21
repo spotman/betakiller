@@ -6,7 +6,6 @@ namespace BetaKiller\IFace\Admin\WebHooks;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\IFace\Admin\AbstractAdminIFace;
 use BetaKiller\Repository\WebHookRepository;
-use BetaKiller\Url\Container\UrlContainer;
 use BetaKiller\Url\UrlElementTreeInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -53,7 +52,7 @@ class ListItemsIFace extends AbstractAdminIFace
         foreach ($this->webHookRepository->getAll() as $model) {
             $urlElement = $this->tree->getByCodename(InfoItemIFace::codename());
 
-            $param = UrlContainer::create()->setEntity($model);
+            $param = $urlHelper->createUrlContainer()->setEntity($model);
             $url   = $urlHelper->makeUrl($urlElement, $param, false);
 
             $codeName    = $model->getCodename();

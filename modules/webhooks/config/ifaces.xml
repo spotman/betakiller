@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <root>
-    <iface uri="webhooks" name="Admin_WebHooks_ListItems" parent="Admin_Index" zone="admin" label="WebHooks" menu="admin">
-        <iface uri="{WebHook.codename}" name="Admin_WebHooks_InfoItem" hasDynamicUrl="true" zone="admin" label="Info Item" />
+    <!-- Public action -->
+    <dummy uri="webhooks" name="App_WebHook_Index" hideInSiteMap="true" zone="public">
+        <action name="WebHookExecute" uri="{WebHook.codename}" zone="public"/>
+    </dummy>
+
+    <!-- Admin panel -->
+    <iface uri="webhooks" name="Admin_WebHooks_ListItems" parent="Admin_Index" zone="admin" label="WebHooks"
+           menu="admin">
+        <iface uri="{WebHook.codename}" name="Admin_WebHooks_InfoItem" zone="admin"
+               label="{WebHook.codename}"/>
     </iface>
 </root>

@@ -7,7 +7,6 @@ use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\Helper\LoggerHelperTrait;
 use BetaKiller\IFace\Exception\UrlElementException;
 use BetaKiller\Url\ModelProvider\UrlElementProviderDatabase;
-use BetaKiller\Url\ModelProvider\UrlElementProviderPhpConfig;
 use BetaKiller\Url\ModelProvider\UrlElementProviderXmlConfig;
 use Psr\Log\LoggerInterface;
 use Psr\SimpleCache\CacheInterface;
@@ -25,11 +24,6 @@ class UrlElementTreeLoader
      * @var \BetaKiller\Url\ModelProvider\UrlElementProviderXmlConfig
      */
     private $xmlProvider;
-
-    /**
-     * @var \BetaKiller\Url\ModelProvider\UrlElementProviderPhpConfig
-     */
-    private $phpProvider;
 
     /**
      * @var \BetaKiller\Url\UrlElementTreeInterface
@@ -56,7 +50,6 @@ class UrlElementTreeLoader
      *
      * @param \BetaKiller\Url\ModelProvider\UrlElementProviderDatabase  $databaseProvider
      * @param \BetaKiller\Url\ModelProvider\UrlElementProviderXmlConfig $xmlProvider
-     * @param \BetaKiller\Url\ModelProvider\UrlElementProviderPhpConfig $phpProvider
      * @param \BetaKiller\Helper\AppEnvInterface                        $appEnv
      * @param \Psr\SimpleCache\CacheInterface                           $cache
      * @param \Psr\Log\LoggerInterface                                  $logger
@@ -64,7 +57,6 @@ class UrlElementTreeLoader
     public function __construct(
         UrlElementProviderDatabase $databaseProvider,
         UrlElementProviderXmlConfig $xmlProvider,
-        UrlElementProviderPhpConfig $phpProvider,
         AppEnvInterface $appEnv,
         CacheInterface $cache,
         LoggerInterface $logger
@@ -74,8 +66,8 @@ class UrlElementTreeLoader
         $this->cache            = $cache;
         $this->logger           = $logger;
         $this->appEnv           = $appEnv;
-        $this->phpProvider = $phpProvider;
     }
+
     /**
      * @return \BetaKiller\Url\UrlElementTreeInterface
      * @throws \BetaKiller\IFace\Exception\UrlElementException
@@ -83,7 +75,7 @@ class UrlElementTreeLoader
      */
     public function load(): UrlElementTreeInterface
     {
-        $key = 'ifaceModelTree';
+        $key        = 'ifaceModelTree';
         $this->tree = $this->factory();
 
         if (!$this->loadTreeFromCache($key)) {
@@ -128,7 +120,6 @@ class UrlElementTreeLoader
                 $this->tree->add($urlElement, true); // No duplication is allowed here
                 $counter++;
             }
-
         } catch (\Throwable $e) {
             $this->cache->delete($key);
             $this->logException($this->logger, $e);
@@ -171,7 +162,6 @@ class UrlElementTreeLoader
         /** @var \BetaKiller\Url\ModelProvider\UrlElementProviderInterface[] $sources */
         $sources = [
             $this->xmlProvider,
-            $this->phpProvider,
         ];
 
         // TODO Remove this hack after resolving spotman/betakiller#35
@@ -181,7 +171,7 @@ class UrlElementTreeLoader
 
         foreach ($sources as $provider) {
             foreach ($provider->getAll() as $urlElement) {
-                $this->tree->add($urlElement); // Allow overwriting
+                $this->tree->add($urlElement, true); // No overwriting allowed
             }
         }
 
