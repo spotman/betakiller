@@ -5,7 +5,9 @@ namespace BetaKiller\Service;
 
 use BetaKiller\Helper\NotificationHelper;
 use BetaKiller\Helper\ServerRequestHelper;
+use BetaKiller\Repository\UserRepository;
 use Psr\Http\Message\ServerRequestInterface;
+use Worknector\Action\App\Verification\Email\ConfirmAction;
 
 abstract class AbstractVerificationEmailService
 {
@@ -20,15 +22,25 @@ abstract class AbstractVerificationEmailService
     private $notification;
 
     /**
+     * @var \BetaKiller\Repository\UserRepository
+     */
+    private $userRepo;
+
+    /**
      * VerificationEmailService constructor.
      *
      * @param \BetaKiller\Helper\NotificationHelper $notificationHelper
      * @param \BetaKiller\Service\TokenService      $tokenService
+     * @param \BetaKiller\Repository\UserRepository $userRepo
      */
-    public function __construct(NotificationHelper $notificationHelper, TokenService $tokenService)
-    {
+    public function __construct(
+        NotificationHelper $notificationHelper,
+        TokenService $tokenService,
+        UserRepository $userRepo
+    ) {
         $this->tokenService = $tokenService;
         $this->notification = $notificationHelper;
+        $this->userRepo     = $userRepo;
     }
 
     /**
@@ -61,7 +73,9 @@ abstract class AbstractVerificationEmailService
      */
     public function confirm(ServerRequestInterface $request): void
     {
-        ServerRequestHelper::getUser($request)->enableEmailNotification();
+        $userModel = ServerRequestHelper::getUser($request);
+        $userModel->enableEmailNotification();
+        $this->userRepo->save($userModel);
     }
 
     /**
@@ -79,12 +93,13 @@ abstract class AbstractVerificationEmailService
             ->notification
             ->emailTarget($userModel->getEmail(), '', $userModel->getLanguageName());
 
-        $ttl         = new \DateInterval($this->getTokenPeriod());
-        $tokenModel  = $this->tokenService->create($userModel, $ttl);
-        // TODO update on UrlHelper::makeUrl
-        $actionQuery = \http_build_query(['token' => $tokenModel->getValue()]);
-        $actionUrl   = $this->getActionUrl($request);
-        $actionUrl   = $actionUrl.'?'.$actionQuery;
+        $ttl        = new \DateInterval($this->getTokenPeriod());
+        $tokenModel = $this->tokenService->create($userModel, $ttl);
+
+        $urlHelper        = ServerRequestHelper::getUrlHelper($request);
+        $actionUrlElement = $urlHelper->getUrlElementByCodename(ConfirmAction::codename());
+        $actionUrlParams  = $urlHelper->createUrlContainer()->setEntity($tokenModel);
+        $actionUrl        = $urlHelper->makeUrl($actionUrlElement, $actionUrlParams, false);
 
         $appUrl        = $this->getAppUrl($request);
         $appWwwAddress = $this->makeAppWwwAddress($appUrl);
