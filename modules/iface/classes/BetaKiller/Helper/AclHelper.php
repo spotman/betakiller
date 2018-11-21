@@ -160,7 +160,7 @@ class AclHelper
                     $entityInstance = $params->getEntity($entityName);
 
                     if (!$entityInstance) {
-                        throw new Exception('Entity instance :entity is absent in UrlContainer for action :action', [
+                        throw new Exception('Entity instance ":entity" is absent in UrlContainer for action :action', [
                             ':entity' => $entityName,
                             ':action' => $actionName,
                         ]);
