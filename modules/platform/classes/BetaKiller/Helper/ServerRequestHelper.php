@@ -113,7 +113,7 @@ class ServerRequestHelper
     {
         $server = $request->getServerParams();
 
-        $requestedWith = $server['HTTP_X_REQUESTED_WITH'] ?? null;
+        $requestedWith = $server['HTTP_X_REQUESTED_WITH'] ?? '';
 
         return mb_strtolower($requestedWith) === 'xmlhttprequest';
     }
