@@ -5,6 +5,7 @@ namespace BetaKiller\Service;
 
 use BetaKiller\Helper\NotificationHelper;
 use BetaKiller\Helper\ServerRequestHelper;
+use BetaKiller\Model\TokenInterface;
 use BetaKiller\Repository\UserRepository;
 use Psr\Http\Message\ServerRequestInterface;
 use Worknector\Action\App\Verification\Email\ConfirmAction;
@@ -93,14 +94,9 @@ abstract class AbstractVerificationEmailService
             ->notification
             ->emailTarget($userModel->getEmail(), '', $userModel->getLanguageName());
 
-        $ttl        = new \DateInterval($this->getTokenPeriod());
-        $tokenModel = $this->tokenService->create($userModel, $ttl);
-
-        $urlHelper        = ServerRequestHelper::getUrlHelper($request);
-        $actionUrlElement = $urlHelper->getUrlElementByCodename(ConfirmAction::codename());
-        $actionUrlParams  = $urlHelper->createUrlContainer()->setEntity($tokenModel);
-        $actionUrl        = $urlHelper->makeUrl($actionUrlElement, $actionUrlParams, false);
-
+        $ttl           = new \DateInterval($this->getTokenPeriod());
+        $tokenModel    = $this->tokenService->create($userModel, $ttl);
+        $actionUrl     = $this->getActionUrl($request, $tokenModel);
         $appUrl        = $this->getAppUrl($request);
         $appWwwAddress = $this->makeAppWwwAddress($appUrl);
 
@@ -114,13 +110,18 @@ abstract class AbstractVerificationEmailService
 
     /**
      * @param \Psr\Http\Message\ServerRequestInterface $request
+     * @param \BetaKiller\Model\TokenInterface         $tokenModel
      *
      * @return string
      * @throws \BetaKiller\IFace\Exception\UrlElementException
      */
-    private function getActionUrl(ServerRequestInterface $request): string
+    private function getActionUrl(ServerRequestInterface $request, TokenInterface $tokenModel): string
     {
-        return $this->makeEntityUrl($request, $this->getActionEntityCodename());
+        $urlHelper        = ServerRequestHelper::getUrlHelper($request);
+        $actionUrlElement = $urlHelper->getUrlElementByCodename(ConfirmAction::codename());
+        $actionUrlParams  = $urlHelper->createUrlContainer()->setEntity($tokenModel);
+
+        return $urlHelper->makeUrl($actionUrlElement, $actionUrlParams, false);
     }
 
     /**
