@@ -5,13 +5,12 @@ use BetaKiller\Model\RoleInterface;
 
 class PhpExceptionResource extends AbstractEntityRelatedAclResource
 {
-    const PERMISSION_LIST_RESOLVED   = 'listResolved';
-    const PERMISSION_LIST_UNRESOLVED = 'listUnresolved';
-    const PERMISSION_RESOLVE         = 'resolve';
-    const PERMISSION_IGNORE          = 'ignore';
-    const PERMISSION_DELETE          = 'delete';
-    const PERMISSION_TEST            = 'test';
-    const PERMISSION_THROW           = 'throwHttpException';
+    public const PERMISSION_LIST_RESOLVED   = 'listResolved';
+    public const PERMISSION_LIST_UNRESOLVED = 'listUnresolved';
+    public const PERMISSION_RESOLVE         = 'resolve';
+    public const PERMISSION_IGNORE          = 'ignore';
+    public const PERMISSION_TEST            = 'test';
+    public const PERMISSION_THROW           = 'throwHttpException';
 
     /**
      * Returns default permissions bundled with current resource
