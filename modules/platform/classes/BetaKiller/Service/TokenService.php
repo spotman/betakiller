@@ -61,15 +61,14 @@ class TokenService
     }
 
     /**
-     * @param \BetaKiller\Model\UserInterface $userModel
      * @param string                          $tokenValue
      *
      * @return bool
      */
-    public function verify(UserInterface $userModel, string $tokenValue): bool
+    public function verify(string $tokenValue): bool
     {
         $tokenValue = strtolower($tokenValue);
-        $tokeModel  = $this->tokenRepo->findActive($userModel, $tokenValue);
+        $tokeModel  = $this->tokenRepo->findActive($tokenValue);
         if ($tokeModel) {
             if ($tokenValue === $tokeModel->getValue()) {
                 return true;
@@ -95,16 +94,15 @@ class TokenService
     /**
      * Auto delete if exists.
      *
-     * @param \BetaKiller\Model\UserInterface $userModel
      * @param string                          $tokenValue
      *
      * @return bool
      * @throws \BetaKiller\Repository\RepositoryException
      */
-    public function confirm(UserInterface $userModel, string $tokenValue): bool
+    public function confirm(string $tokenValue): bool
     {
         $status      = false;
-        $tokenModel = $this->tokenRepo->findActive($userModel, $tokenValue);
+        $tokenModel = $this->tokenRepo->findActive($tokenValue);
         if ($tokenModel) {
             $status = $tokenModel->isActive();
             $this->delete($tokenModel);

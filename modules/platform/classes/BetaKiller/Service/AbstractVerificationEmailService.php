@@ -6,11 +6,16 @@ namespace BetaKiller\Service;
 use BetaKiller\Helper\NotificationHelper;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Model\TokenInterface;
+use BetaKiller\Model\UserInterface;
 use BetaKiller\Repository\UserRepository;
 use Psr\Http\Message\ServerRequestInterface;
+use BetaKiller\Model\AccountStatus;
+use BetaKiller\Repository\AccountStatusRepository;
 
 abstract class AbstractVerificationEmailService
 {
+    public const NOTIFICATION_NAME = 'verification/email';
+
     /**
      * @var \BetaKiller\Service\TokenService
      */
@@ -27,20 +32,26 @@ abstract class AbstractVerificationEmailService
     private $userRepo;
 
     /**
-     * VerificationEmailService constructor.
-     *
-     * @param \BetaKiller\Helper\NotificationHelper $notificationHelper
-     * @param \BetaKiller\Service\TokenService      $tokenService
-     * @param \BetaKiller\Repository\UserRepository $userRepo
+     * @var \BetaKiller\Repository\AccountStatusRepository
+     */
+    private $accStatusRepo;
+
+    /**
+     * @param \BetaKiller\Helper\NotificationHelper          $notificationHelper
+     * @param \BetaKiller\Service\TokenService               $tokenService
+     * @param \BetaKiller\Repository\AccountStatusRepository $accStatusRepo
+     * @param \BetaKiller\Repository\UserRepository          $userRepo
      */
     public function __construct(
         NotificationHelper $notificationHelper,
         TokenService $tokenService,
+        AccountStatusRepository $accStatusRepo,
         UserRepository $userRepo
     ) {
-        $this->tokenService = $tokenService;
-        $this->notification = $notificationHelper;
-        $this->userRepo     = $userRepo;
+        $this->tokenService  = $tokenService;
+        $this->notification  = $notificationHelper;
+        $this->userRepo      = $userRepo;
+        $this->accStatusRepo = $accStatusRepo;
     }
 
     /**
@@ -59,47 +70,38 @@ abstract class AbstractVerificationEmailService
     abstract protected function getAppEntityCodename(): string;
 
     /**
-     * @param \Psr\Http\Message\ServerRequestInterface $request
+     * @param \BetaKiller\Model\UserInterface $userModel
      *
-     * @return bool
+     * @throws \BetaKiller\Exception\DomainException
+     * @throws \BetaKiller\Repository\RepositoryException
      */
-    public function isConfirmed(ServerRequestInterface $request): bool
+    public function confirm(UserInterface $userModel): void
     {
-        return ServerRequestHelper::getUser($request)->isEmailNotificationAllowed();
+        if (!$userModel->isEmailConfirmed()) {
+            $statusConfirmed = $this->accStatusRepo->getByCodename(AccountStatus::STATUS_CONFIRMED);
+            $userModel->setStatus($statusConfirmed);
+            $this->userRepo->save($userModel);
+        }
     }
 
     /**
      * @param \Psr\Http\Message\ServerRequestInterface $request
-     */
-    public function confirm(ServerRequestInterface $request): void
-    {
-        $userModel = ServerRequestHelper::getUser($request);
-        $userModel->enableEmailNotification();
-        $this->userRepo->save($userModel);
-    }
-
-    /**
-     * @param \Psr\Http\Message\ServerRequestInterface $request
+     * @param \BetaKiller\Model\UserInterface          $userModel
      *
      * @throws \BetaKiller\Exception\ValidationException
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
      * @throws \BetaKiller\Notification\NotificationException
      * @throws \BetaKiller\Repository\RepositoryException
      */
-    public function sendEmail(ServerRequestInterface $request): void
+    public function sendEmail(ServerRequestInterface $request, UserInterface $userModel): void
     {
-        $userModel = ServerRequestHelper::getUser($request);
-
-        $notificationTarget = $this
-            ->notification
-            ->emailTarget($userModel->getEmail(), '', $userModel->getLanguageName());
-
         $ttl           = new \DateInterval($this->getTokenPeriod());
         $tokenModel    = $this->tokenService->create($userModel, $ttl);
         $actionUrl     = $this->getActionUrl($request, $tokenModel);
         $appUrl        = $this->getAppUrl($request);
         $appWwwAddress = $this->makeAppWwwAddress($appUrl);
 
-        $this->notification->directMessage('verification/email', $notificationTarget, [
+        $this->notification->directMessage(self::NOTIFICATION_NAME, $userModel, [
             'subject'         => 'notification.verification.email.subj',
             'action_url'      => $actionUrl,
             'app_url'         => $appUrl,

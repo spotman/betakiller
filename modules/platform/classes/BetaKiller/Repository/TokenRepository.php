@@ -4,7 +4,6 @@ namespace BetaKiller\Repository;
 use BetaKiller\Model\ExtendedOrmInterface;
 use BetaKiller\Model\Token;
 use BetaKiller\Model\TokenInterface;
-use BetaKiller\Model\UserInterface;
 
 /**
  * @method TokenInterface findById(string $id)
@@ -21,36 +20,32 @@ class TokenRepository extends AbstractOrmBasedMultipleParentsTreeRepository
     }
 
     /**
-     * @param \BetaKiller\Model\UserInterface $userModel
-     * @param string                          $value
+     * @param string $value
      *
      * @return \BetaKiller\Model\TokenInterface|null
      * @throws \BetaKiller\Repository\RepositoryException
      */
-    public function find(UserInterface $userModel, string $value): ?TokenInterface
+    public function find(string $value): ?TokenInterface
     {
         $orm = $this->getOrmInstance();
 
         return $this
             ->filterByValue($orm, $value)
-            ->filterByUser($orm, $userModel)
             ->findOne($orm);
     }
 
     /**
-     * @param \BetaKiller\Model\UserInterface $userModel
-     * @param string                          $value
+     * @param string $value
      *
      * @return \BetaKiller\Model\TokenInterface|null
      * @throws \BetaKiller\Repository\RepositoryException
      */
-    public function findActive(UserInterface $userModel, string $value): ?TokenInterface
+    public function findActive(string $value): ?TokenInterface
     {
         $orm = $this->getOrmInstance();
 
         return $this
             ->filterByValue($orm, $value)
-            ->filterByUser($orm, $userModel)
             ->filterByActive($orm)
             ->findOne($orm);
     }
@@ -78,20 +73,6 @@ class TokenRepository extends AbstractOrmBasedMultipleParentsTreeRepository
     {
         $column = $orm->object_column(Token::TABLE_FIELD_VALUE);
         $orm->where($column, '=', $value);
-
-        return $this;
-    }
-
-    /**
-     * @param \BetaKiller\Model\ExtendedOrmInterface $orm
-     * @param \BetaKiller\Model\UserInterface        $userModel
-     *
-     * @return \BetaKiller\Repository\TokenRepository
-     */
-    private function filterByUser(ExtendedOrmInterface $orm, UserInterface $userModel): self
-    {
-        $column = $orm->object_column(Token::TABLE_FIELD_USER_ID);
-        $orm->where($column, '=', $userModel);
 
         return $this;
     }
