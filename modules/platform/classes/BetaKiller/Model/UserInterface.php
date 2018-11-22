@@ -13,6 +13,23 @@ interface UserInterface extends AbstractEntityInterface, OrmInterface, Notificat
     public function completeLogin(): void;
 
     /**
+     * @param \BetaKiller\Model\UserStatusInterface $userStatusModel
+     *
+     * @return \BetaKiller\Model\UserInterface
+     */
+    public function setStatus(UserStatusInterface $userStatusModel): UserInterface;
+
+    /**
+     * @return \BetaKiller\Model\UserStatusInterface
+     */
+    public function getStatus(): UserStatusInterface;
+
+    /**
+     * @return bool
+     */
+    public function isEmailConfirmed(): bool;
+
+    /**
      * @param \DateTimeInterface $value [optional]
      *
      * @return \BetaKiller\Model\UserInterface
