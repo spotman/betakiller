@@ -60,7 +60,8 @@ abstract class Migration extends Kohana_Migration
 
             // Query completed => table and column exists
             return true;
-        } /** @noinspection BadExceptionsProcessingInspection */
+        }
+            /** @noinspection BadExceptionsProcessingInspection */
         catch (Database_Exception $ignore) {
             // Query failed => table or column is absent
             return false;
@@ -83,7 +84,7 @@ abstract class Migration extends Kohana_Migration
 
         $query = DB::select($columnName)
             ->from($tableName)
-            ->where($columnName, '=', $value)
+            ->where($columnName,'=', $value)
             ->limit(1);
 
         return (bool)$query->execute($db)->get($columnName);
@@ -400,32 +401,6 @@ abstract class Migration extends Kohana_Migration
         $this->logger->debug('SQL done: :query', [':query' => $sql]);
 
         return (bool)DB::query(null, $sql)->execute($db);
-    }
-
-    /**
-     * @param string      $tableName
-     * @param string      $fieldName
-     * @param string      $value
-     * @param null|string $db
-     *
-     * @return bool
-     */
-    protected function hasValue(
-        string $tableName,
-        string $fieldName,
-        string $value,
-        ?string $db = null
-    ) {
-        $orm = DB::select('id')
-            ->from($tableName)
-            ->where($fieldName, '=', $value)
-            ->limit(1);
-
-        $sql = $orm->compile($db);
-
-        $this->logger->debug('SQL done: :query', [':query' => $sql]);
-
-        return (bool)$orm->execute($db)->get('id');
     }
 
     /**
