@@ -9,8 +9,8 @@ use BetaKiller\Model\TokenInterface;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Repository\UserRepository;
 use Psr\Http\Message\ServerRequestInterface;
-use BetaKiller\Model\AccountStatus;
-use BetaKiller\Repository\AccountStatusRepository;
+use BetaKiller\Model\UserStatus;
+use BetaKiller\Repository\UserStatusRepository;
 
 abstract class AbstractVerificationEmailService
 {
@@ -32,20 +32,20 @@ abstract class AbstractVerificationEmailService
     private $userRepo;
 
     /**
-     * @var \BetaKiller\Repository\AccountStatusRepository
+     * @var \BetaKiller\Repository\UserStatusRepository
      */
     private $accStatusRepo;
 
     /**
-     * @param \BetaKiller\Helper\NotificationHelper          $notificationHelper
-     * @param \BetaKiller\Service\TokenService               $tokenService
-     * @param \BetaKiller\Repository\AccountStatusRepository $accStatusRepo
-     * @param \BetaKiller\Repository\UserRepository          $userRepo
+     * @param \BetaKiller\Helper\NotificationHelper       $notificationHelper
+     * @param \BetaKiller\Service\TokenService            $tokenService
+     * @param \BetaKiller\Repository\UserStatusRepository $accStatusRepo
+     * @param \BetaKiller\Repository\UserRepository       $userRepo
      */
     public function __construct(
         NotificationHelper $notificationHelper,
         TokenService $tokenService,
-        AccountStatusRepository $accStatusRepo,
+        UserStatusRepository $accStatusRepo,
         UserRepository $userRepo
     ) {
         $this->tokenService  = $tokenService;
@@ -78,7 +78,7 @@ abstract class AbstractVerificationEmailService
     public function confirm(UserInterface $userModel): void
     {
         if (!$userModel->isEmailConfirmed()) {
-            $statusConfirmed = $this->accStatusRepo->getByCodename(AccountStatus::STATUS_CONFIRMED);
+            $statusConfirmed = $this->accStatusRepo->getByCodename(UserStatus::STATUS_CONFIRMED);
             $userModel->setStatus($statusConfirmed);
             $this->userRepo->save($userModel);
         }
@@ -95,17 +95,15 @@ abstract class AbstractVerificationEmailService
      */
     public function sendEmail(ServerRequestInterface $request, UserInterface $userModel): void
     {
-        $ttl           = new \DateInterval($this->getTokenPeriod());
-        $tokenModel    = $this->tokenService->create($userModel, $ttl);
-        $actionUrl     = $this->getActionUrl($request, $tokenModel);
-        $appUrl        = $this->getAppUrl($request);
-        $appWwwAddress = $this->makeAppWwwAddress($appUrl);
+        $ttl        = new \DateInterval($this->getTokenPeriod());
+        $tokenModel = $this->tokenService->create($userModel, $ttl);
+        $actionUrl  = $this->getActionUrl($request, $tokenModel);
+        $appUrl     = $this->getAppUrl($request);
 
         $this->notification->directMessage(self::NOTIFICATION_NAME, $userModel, [
-            'subject'         => 'notification.verification.email.subj',
-            'action_url'      => $actionUrl,
-            'app_url'         => $appUrl,
-            'app_www_address' => $appWwwAddress,
+            'subject'    => 'notification.verification.email.subj',
+            'action_url' => $actionUrl,
+            'app_url'    => $appUrl,
         ]);
     }
 
@@ -150,22 +148,4 @@ abstract class AbstractVerificationEmailService
 
         return $urlHelper->makeUrl($urlElement);
     }
-
-    /**
-     * @param string $url
-     *
-     * @return string
-     */
-    private function makeAppWwwAddress(string $url): string
-    {
-        $url       = trim($url, '/?&#');
-        $urlScheme = parse_url($url, PHP_URL_SCHEME);
-        if ($urlScheme) {
-            $url = str_replace($urlScheme.'://', '', $url);
-        }
-        $url = 'www.'.$url;
-
-        return $url;
-    }
-
 }
