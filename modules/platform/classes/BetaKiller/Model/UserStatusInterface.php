@@ -3,14 +3,14 @@ declare(strict_types=1);
 
 namespace BetaKiller\Model;
 
-interface AccountStatusInterface
+interface UserStatusInterface
 {
     /**
      * @param string $value
      *
-     * @return \BetaKiller\Model\AccountStatusInterface
+     * @return \BetaKiller\Model\UserStatusInterface
      */
-    public function setCodename(string $value): AccountStatusInterface;
+    public function setCodename(string $value): UserStatusInterface;
 
     /**
      * @return string

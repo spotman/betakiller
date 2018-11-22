@@ -5,22 +5,22 @@ namespace BetaKiller\Repository;
 
 use BetaKiller\Exception\DomainException;
 use BetaKiller\Model\ExtendedOrmInterface;
-use BetaKiller\Model\AccountStatus;
-use BetaKiller\Model\AccountStatusInterface;
+use BetaKiller\Model\UserStatus;
+use BetaKiller\Model\UserStatusInterface;
 
 /**
- * @method AccountStatusInterface findById(string $id)
- * @method AccountStatusInterface[] getAll()
+ * @method UserStatusInterface findById(string $id)
+ * @method UserStatusInterface[] getAll()
  */
-class AccountStatusRepository extends AbstractOrmBasedRepository implements AccountStatusRepositoryInterface
+class UserStatusRepository extends AbstractOrmBasedRepository implements UserStatusRepositoryInterface
 {
     /**
      * @param string $codeName
      *
-     * @return null|\BetaKiller\Model\AccountStatusInterface
+     * @return null|\BetaKiller\Model\UserStatusInterface
      * @throws \BetaKiller\Repository\RepositoryException
      */
-    public function findByCodename(string $codeName): ?AccountStatusInterface
+    public function findByCodename(string $codeName): ?UserStatusInterface
     {
         $orm = $this->getOrmInstance();
 
@@ -32,17 +32,17 @@ class AccountStatusRepository extends AbstractOrmBasedRepository implements Acco
     /**
      * @param string $codeName
      *
-     * @return \BetaKiller\Model\AccountStatusInterface
+     * @return \BetaKiller\Model\UserStatusInterface
      * @throws \BetaKiller\Exception\DomainException
      * @throws \BetaKiller\Repository\RepositoryException
      */
-    public function getByCodename(string $codeName): AccountStatusInterface
+    public function getByCodename(string $codeName): UserStatusInterface
     {
         $status = $this->findByCodename($codeName);
 
         if (!$status) {
             throw new DomainException('Unable find account status by codename :value', [
-                ':value' => $codeName
+                ':value' => $codeName,
             ]);
         }
 
@@ -53,11 +53,11 @@ class AccountStatusRepository extends AbstractOrmBasedRepository implements Acco
      * @param \BetaKiller\Model\ExtendedOrmInterface $orm
      * @param string                                 $codeName
      *
-     * @return \BetaKiller\Repository\AccountStatusRepository
+     * @return \BetaKiller\Repository\UserStatusRepository
      */
     private function filterByCodename(ExtendedOrmInterface $orm, string $codeName): self
     {
-        $orm->where(AccountStatus::TABLE_FIELD_CODENAME, '=', $codeName);
+        $orm->where(UserStatus::TABLE_FIELD_CODENAME, '=', $codeName);
 
         return $this;
     }

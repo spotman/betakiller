@@ -5,9 +5,9 @@ namespace BetaKiller\Model;
 
 use BetaKiller\Exception\DomainException;
 
-class AccountStatus extends \ORM implements AccountStatusInterface
+class UserStatus extends \ORM implements UserStatusInterface
 {
-    public const TABLE_NAME           = 'account_statuses';
+    public const TABLE_NAME           = 'user_statuses';
     public const TABLE_FIELD_CODENAME = 'codename';
 
     public const STATUS_CREATED   = 'created';
@@ -37,9 +37,9 @@ class AccountStatus extends \ORM implements AccountStatusInterface
     /**
      * @param string $value
      *
-     * @return \BetaKiller\Model\AccountStatusInterface
+     * @return \BetaKiller\Model\UserStatusInterface
      */
-    public function setCodename(string $value): AccountStatusInterface
+    public function setCodename(string $value): UserStatusInterface
     {
         return $this->set(self::TABLE_FIELD_CODENAME, $value);
     }

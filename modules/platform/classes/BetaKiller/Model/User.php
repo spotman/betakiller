@@ -32,7 +32,7 @@ class User extends \ORM implements UserInterface
 
         $this->belongs_to([
             'status'   => [
-                'model'       => 'AccountStatus',
+                'model'       => 'UserStatus',
                 'foreign_key' => self::TABLE_FIELD_STATUS_ID,
             ],
             'language' => [
@@ -121,19 +121,19 @@ class User extends \ORM implements UserInterface
     }
 
     /**
-     * @param \BetaKiller\Model\AccountStatusInterface $accountStatusModel
+     * @param \BetaKiller\Model\UserStatusInterface $userStatusModel
      *
      * @return \BetaKiller\Model\UserInterface
      */
-    public function setStatus(AccountStatusInterface $accountStatusModel): UserInterface
+    public function setStatus(UserStatusInterface $userStatusModel): UserInterface
     {
-        return $this->set('status', $accountStatusModel);
+        return $this->set('status', $userStatusModel);
     }
 
     /**
-     * @return \BetaKiller\Model\AccountStatusInterface
+     * @return \BetaKiller\Model\UserStatusInterface
      */
-    public function getStatus(): AccountStatusInterface
+    public function getStatus(): UserStatusInterface
     {
         return $this->getRelatedEntity('status');
     }
@@ -144,11 +144,11 @@ class User extends \ORM implements UserInterface
     public function isEmailConfirmed(): bool
     {
         /**
-         * @var \BetaKiller\Model\AccountStatusInterface $statusModel
+         * @var \BetaKiller\Model\UserStatusInterface $statusModel
          */
-        $statusModel = $this->get('status');
+        $statusModel = $this->getStatus();
 
-        return $statusModel->getCodename() !== AccountStatus::STATUS_CREATED;
+        return $statusModel->getCodename() !== UserStatus::STATUS_CREATED;
     }
 
     /**
