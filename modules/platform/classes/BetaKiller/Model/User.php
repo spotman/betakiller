@@ -10,6 +10,7 @@ use DateTimeImmutable;
 class User extends \ORM implements UserInterface
 {
     public const TABLE_NAME                  = 'users';
+    public const TABLE_FIELD_STATUS_ID       = 'status_id';
     public const TABLE_FIELD_CREATED_AT      = 'created_at';
     public const TABLE_FIELD_USERNAME        = 'username';
     public const TABLE_FIELD_PASSWORD        = 'password';
@@ -30,6 +31,10 @@ class User extends \ORM implements UserInterface
         $this->_reload_on_wakeup = true;
 
         $this->belongs_to([
+            'status'   => [
+                'model'       => 'UserStatus',
+                'foreign_key' => self::TABLE_FIELD_STATUS_ID,
+            ],
             'language' => [
                 'model'       => 'Language',
                 'foreign_key' => self::TABLE_FIELD_LANGUAGE_ID,
@@ -38,18 +43,20 @@ class User extends \ORM implements UserInterface
 
         $this->has_many([
             'sessions' => [
-                'model' => 'UserSession',
+                'model'       => 'UserSession',
                 'foreign_key' => 'user_id',
             ],
-
-            'roles' => [
+            'roles'    => [
                 'model'       => 'Role',
                 'through'     => 'roles_users',
                 'foreign_key' => 'user_id',
             ],
         ]);
 
-        $this->load_with(['language']);
+        $this->load_with([
+            'status',
+            'language',
+        ]);
     }
 
     /**
@@ -58,49 +65,42 @@ class User extends \ORM implements UserInterface
     public function rules(): array
     {
         return [
-            self::TABLE_FIELD_EMAIL => [
+            self::TABLE_FIELD_STATUS_ID       => [
+                ['max_length', [':value', 1]],
+            ],
+            self::TABLE_FIELD_EMAIL           => [
                 ['not_empty'],
                 ['email'],
                 [[$this, 'unique'], ['email', ':value']],
             ],
-
-            self::TABLE_FIELD_USERNAME => [
+            self::TABLE_FIELD_USERNAME        => [
                 ['not_empty'],
                 ['max_length', [':value', 41]],
                 [[$this, 'unique'], ['username', ':value']],
-
             ],
-
-            self::TABLE_FIELD_PASSWORD => [
+            self::TABLE_FIELD_PASSWORD        => [
                 ['not_empty'],
                 ['max_length', [':value', 64]],
             ],
-
-            self::TABLE_FIELD_LANGUAGE_ID => [
+            self::TABLE_FIELD_LANGUAGE_ID     => [
                 ['max_length', [':value', 11]],
             ],
-
-            self::TABLE_FIELD_FIRST_NAME => [
+            self::TABLE_FIELD_FIRST_NAME      => [
                 ['max_length', [':value', 32]],
             ],
-
-            self::TABLE_FIELD_LAST_NAME => [
+            self::TABLE_FIELD_LAST_NAME       => [
                 ['max_length', [':value', 32]],
             ],
-
-            self::TABLE_FIELD_MIDDLE_NAME => [
+            self::TABLE_FIELD_MIDDLE_NAME     => [
                 ['max_length', [':value', 32]],
             ],
-
-            self::TABLE_FIELD_PHONE => [
+            self::TABLE_FIELD_PHONE           => [
                 ['max_length', [':value', 32]],
             ],
-
             self::TABLE_FIELD_NOTIFY_BY_EMAIL => [
                 ['max_length', [':value', 1]],
             ],
-
-            self::TABLE_FIELD_IS_ACTIVE => [
+            self::TABLE_FIELD_IS_ACTIVE       => [
                 ['max_length', [':value', 1]],
             ],
         ];
@@ -118,6 +118,37 @@ class User extends \ORM implements UserInterface
             'email'    => 'email address',
             'password' => 'password',
         ];
+    }
+
+    /**
+     * @param \BetaKiller\Model\UserStatusInterface $userStatusModel
+     *
+     * @return \BetaKiller\Model\UserInterface
+     */
+    public function setStatus(UserStatusInterface $userStatusModel): UserInterface
+    {
+        return $this->set('status', $userStatusModel);
+    }
+
+    /**
+     * @return \BetaKiller\Model\UserStatusInterface
+     */
+    public function getStatus(): UserStatusInterface
+    {
+        return $this->getRelatedEntity('status');
+    }
+
+    /**
+     * @return bool
+     */
+    public function isEmailConfirmed(): bool
+    {
+        /**
+         * @var \BetaKiller\Model\UserStatusInterface $statusModel
+         */
+        $statusModel = $this->getStatus();
+
+        return $statusModel->getCodename() !== UserStatus::STATUS_CREATED;
     }
 
     /**
