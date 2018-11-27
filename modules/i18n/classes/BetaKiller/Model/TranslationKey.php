@@ -3,9 +3,12 @@ declare(strict_types=1);
 
 namespace BetaKiller\Model;
 
-class TranslationKey extends AbstractOrmBasedI18nKeyModel implements TranslationKeyModelInterface
+class TranslationKey extends \ORM implements TranslationKeyModelInterface
 {
+    use I18nKeyOrmTrait;
+
     public const TABLE_FIELD_KEY       = 'key';
+    public const TABLE_FIELD_I18N      = 'i18n';
     public const TABLE_FIELD_IS_PLURAL = 'is_plural';
 
     /**
@@ -16,10 +19,15 @@ class TranslationKey extends AbstractOrmBasedI18nKeyModel implements Translation
         $this->_table_name = 'i18n_keys';
     }
 
+    protected function getI18nValueColumn(): string
+    {
+        return self::TABLE_FIELD_I18N;
+    }
+
     /**
      * @return string
      */
-    public function getI18nKey(): string
+    public function getI18nKeyName(): string
     {
         return $this->get(self::TABLE_FIELD_KEY);
     }

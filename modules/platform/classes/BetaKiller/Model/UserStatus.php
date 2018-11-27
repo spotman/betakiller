@@ -10,11 +10,11 @@ class UserStatus extends \ORM implements UserStatusInterface
     public const TABLE_NAME           = 'user_statuses';
     public const TABLE_FIELD_CODENAME = 'codename';
 
-    public const STATUS_CREATED   = 'created';
-    public const STATUS_CONFIRMED = 'confirmed';
-    public const STATUS_APPROVED  = 'approved';
-    public const STATUS_VERIFIED  = 'verified';
-    public const STATUS_BLOCKED   = 'blocked';
+    public const STATUS_CREATED   = 'created';      // Just created
+    public const STATUS_CONFIRMED = 'confirmed';    // Email confirmed
+    public const STATUS_APPROVED  = 'approved';     // Approved by moderator
+    public const STATUS_VERIFIED  = 'verified';     // KYC verification passed
+    public const STATUS_BLOCKED   = 'blocked';      // Blocked coz of hacking, spam, or app rules violation
 
     protected function configure(): void
     {
@@ -55,9 +55,9 @@ class UserStatus extends \ORM implements UserStatusInterface
     /**
      * @return string
      */
-    public function getLabelI18nKey(): string
+    public function getI18nKeyName(): string
     {
-        return 'account.status.'.$this->getCodename();
+        return 'user.status.'.$this->getCodename();
     }
 
     /**
@@ -100,6 +100,15 @@ class UserStatus extends \ORM implements UserStatusInterface
     public function isVerified(): bool
     {
         return $this->isStatus(self::STATUS_VERIFIED);
+    }
+
+    /**
+     * @return bool
+     * @throws \BetaKiller\Exception\DomainException
+     */
+    public function isConfirmed(): bool
+    {
+        return $this->isStatus(self::STATUS_CONFIRMED);
     }
 
     /**

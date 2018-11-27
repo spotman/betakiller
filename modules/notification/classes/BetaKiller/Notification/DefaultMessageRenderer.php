@@ -93,7 +93,7 @@ class DefaultMessageRenderer implements MessageRendererInterface
         $data = $message->getFullDataForTarget($target);
         $lang = $this->getTargetLanguage($target);
 
-        $output = $this->i18n->translate($lang, $key, $data);
+        $output = $this->i18n->translateKeyName($lang, $key, $data);
 
         if ($output === $key) {
             throw new NotificationException('Missing translation for key [:value]', [

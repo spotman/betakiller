@@ -39,7 +39,6 @@ abstract class AbstractAssetsAclResource extends AbstractEntityRelatedAclResourc
         ]);
     }
 
-
     /**
      * @return array
      */

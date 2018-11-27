@@ -3,27 +3,30 @@ declare(strict_types=1);
 
 namespace BetaKiller\Repository;
 
-use BetaKiller\Model\ExtendedOrmInterface;
-use BetaKiller\Model\I18nKeyModelInterface;
+use BetaKiller\Model\I18nKeyInterface;
 
 abstract class AbstractI18nKeyRepository extends AbstractOrmBasedDispatchableRepository implements
     I18nKeyRepositoryInterface
 {
-    public function findByKeyName(string $i18nKey): ?I18nKeyModelInterface
+    /**
+     * @param array $langModels
+     *
+     * @return I18nKeyInterface[]|mixed[]
+     */
+    public function findKeysWithEmptyValues(array $langModels): array
     {
         $orm = $this->getOrmInstance();
 
-        return $this
-            ->filterKey($orm, $i18nKey)
-            ->findOne($orm);
+        $column = $orm->object_column($this->getValuesColumnName());
+
+        $orm->and_where_open();
+        foreach ($langModels as $lang) {
+            $orm->or_where($column, 'NOT LIKE', '%"'.$lang->getName().'"%');
+        }
+        $orm->and_where_close();
+
+        return $this->findAll($orm);
     }
 
-    private function filterKey(ExtendedOrmInterface $orm, string $key): self
-    {
-        $orm->where($orm->object_column($this->getKeyFieldName()), '=', $key);
-
-        return $this;
-    }
-
-    abstract protected function getKeyFieldName(): string;
+    abstract protected function getValuesColumnName(): string;
 }
