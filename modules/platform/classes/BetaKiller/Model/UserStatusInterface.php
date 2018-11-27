@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\Model;
 
-interface UserStatusInterface
+interface UserStatusInterface extends HasI18nKeyNameInterface
 {
     /**
      * @param string $value
@@ -16,11 +16,6 @@ interface UserStatusInterface
      * @return string
      */
     public function getCodename(): string;
-
-    /**
-     * @return string
-     */
-    public function getLabelI18nKey(): string;
 
     /**
      * @param string $value
@@ -43,6 +38,11 @@ interface UserStatusInterface
      * @return bool
      */
     public function isVerified(): bool;
+
+    /**
+     * @return bool
+     */
+    public function isConfirmed(): bool;
 
     /**
      * @return bool

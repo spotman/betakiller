@@ -1,13 +1,10 @@
 <?php
 
+use BetaKiller\I18n\I18nKeysLoaderInterface;
 use BetaKiller\I18n\JsonPluralBagFormatter;
-use BetaKiller\I18n\LoaderFactory;
-use BetaKiller\I18n\LoaderInterface;
 use BetaKiller\I18n\PluralBagFactory;
 use BetaKiller\I18n\PluralBagFactoryInterface;
 use BetaKiller\I18n\PluralBagFormatterInterface;
-use BetaKiller\I18n\Translator;
-use BetaKiller\I18n\TranslatorInterface;
 use BetaKiller\Repository\LanguageRepository;
 use BetaKiller\Repository\LanguageRepositoryInterface;
 
@@ -15,11 +12,8 @@ return [
 
     'definitions' => [
 
-        LoaderInterface::class => \DI\factory(function (LoaderFactory $factory) {
-            return $factory->create();
-        }),
+        I18nKeysLoaderInterface::class => \DI\autowire(\BetaKiller\I18n\LazyAggregateLoader::class),
 
-        TranslatorInterface::class         => \DI\autowire(Translator::class),
         PluralBagFactoryInterface::class   => \DI\autowire(PluralBagFactory::class),
         PluralBagFormatterInterface::class => \DI\autowire(JsonPluralBagFormatter::class),
 

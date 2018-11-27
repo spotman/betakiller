@@ -114,7 +114,7 @@ class ErrorPageMiddleware implements MiddlewareInterface
             return ResponseHelper::errorJson();
         }
 
-        $message = $e->getMessage() ?: $i18n->translate($e->getDefaultMessageI18nKey());
+        $message = $e->getMessage() ?: $i18n->translateKeyName($e->getDefaultMessageI18nKey());
 
         return ResponseHelper::errorJson($message);
     }
@@ -278,14 +278,14 @@ class ErrorPageMiddleware implements MiddlewareInterface
             ]);
         }
 
-        return $i18n->translate($i18nKey);
+        return $i18n->translateKeyName($i18nKey);
     }
 
     private function getMaskedMessage(\Throwable $e, I18nHelper $i18n): string
     {
         $key = $this->getErrorLabelI18nKey($e);
 
-        return $i18n->translate($key);
+        return $i18n->translateKeyName($key);
     }
 
     private function getErrorLabelI18nKey(\Throwable $e): string

@@ -21,7 +21,8 @@ class User extends \ORM implements UserInterface
     public const TABLE_FIELD_EMAIL           = 'email';
     public const TABLE_FIELD_PHONE           = 'phone';
     public const TABLE_FIELD_NOTIFY_BY_EMAIL = 'notify_by_email';
-    public const TABLE_FIELD_IS_ACTIVE       = 'is_active';
+    public const TABLE_FIELD_LOGINS          = 'logins';
+    public const TABLE_FIELD_LAST_LOGIN      = 'last_login';
 
     protected $allUserRolesNames = [];
 
@@ -100,8 +101,15 @@ class User extends \ORM implements UserInterface
             self::TABLE_FIELD_NOTIFY_BY_EMAIL => [
                 ['max_length', [':value', 1]],
             ],
-            self::TABLE_FIELD_IS_ACTIVE       => [
-                ['max_length', [':value', 1]],
+            self::TABLE_FIELD_CREATED_AT      => [
+                ['not_empty'],
+                ['date'],
+            ],
+            self::TABLE_FIELD_LOGINS          => [
+                ['max_length', [':value', 10]],
+            ],
+            self::TABLE_FIELD_LAST_LOGIN      => [
+                ['max_length', [':value', 10]],
             ],
         ];
     }
@@ -366,7 +374,7 @@ class User extends \ORM implements UserInterface
      */
     public function isActive(): bool
     {
-        return ($this->loaded() && $this->get(self::TABLE_FIELD_IS_ACTIVE));
+        return ($this->loaded() && !$this->getStatus()->isBlocked());
     }
 
     /**

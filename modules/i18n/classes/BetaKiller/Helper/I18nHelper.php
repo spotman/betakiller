@@ -3,7 +3,8 @@ namespace BetaKiller\Helper;
 
 use BetaKiller\Exception;
 use BetaKiller\I18n\I18nFacade;
-use BetaKiller\Model\I18nKeyModelInterface;
+use BetaKiller\Model\HasI18nKeyNameInterface;
+use BetaKiller\Model\I18nKeyInterface;
 
 class I18nHelper
 {
@@ -62,23 +63,28 @@ class I18nHelper
 
     public function getLocale(): string
     {
-        $lang = $this->lang ?: $this->getDefaultLanguageName();
+        $langName = $this->lang ?: $this->getDefaultLanguageName();
 
-        return $this->facade->getLanguageLocale($lang);
+        return $this->facade->getLanguageByName($langName)->getLocale();
     }
 
-    public function translate(string $key, array $values = null, string $lang = null): string
+    public function translateHasKeyName(HasI18nKeyNameInterface $hasKey, string $lang = null): string
     {
-        return $this->facade->translate($lang ?: $this->lang, $key, $values);
+        return $this->facade->translateHasKeyName($lang ?: $this->lang, $hasKey);
     }
 
-    public function translateKey(I18nKeyModelInterface $model, array $values = null, string $lang = null): string
+    public function translateKeyName(string $key, array $values = null, string $lang = null): string
     {
-        return $this->translate($model->getI18nKey(), $values, $lang);
+        return $this->facade->translateKeyName($lang ?: $this->lang, $key, $values);
     }
 
-    public function pluralize(string $key, $form, array $values = null, string $lang = null): string
+    public function translateKey(I18nKeyInterface $model, array $values = null, string $lang = null): string
     {
-        return $this->facade->pluralize($lang ?: $this->lang, $key, $form, $values);
+        return $this->facade->translateKey($lang, $model, $values);
+    }
+
+    public function pluralizeKeyName(string $key, $form, array $values = null, string $lang = null): string
+    {
+        return $this->facade->pluralizeKeyName($lang ?: $this->lang, $key, $form, $values);
     }
 }

@@ -3,17 +3,17 @@ declare(strict_types=1);
 
 namespace BetaKiller\I18n;
 
-class AggregateLoader implements LoaderInterface
+class AggregateLoader implements I18nKeysLoaderInterface
 {
     /**
-     * @var \BetaKiller\I18n\LoaderInterface[]
+     * @var \BetaKiller\I18n\I18nKeysLoaderInterface[]
      */
     private $loaders;
 
     /**
      * AggregateLoader constructor.
      *
-     * @param \BetaKiller\I18n\LoaderInterface[] $loaders
+     * @param \BetaKiller\I18n\I18nKeysLoaderInterface[] $loaders
      */
     public function __construct(array $loaders)
     {
@@ -23,24 +23,22 @@ class AggregateLoader implements LoaderInterface
     }
 
     /**
-     * Returns "key" => "translated string" pairs for provided locale
+     * Returns keys
      *
-     * @param string $locale
-     *
-     * @return string[]
+     * @return \BetaKiller\Model\I18nKeyInterface[]
      */
-    public function load(string $locale): array
+    public function loadI18nKeys(): array
     {
         $data = [];
 
         foreach ($this->loaders as $loader) {
-            $data[] = $loader->load($locale);
+            $data[] = $loader->loadI18nKeys();
         }
 
         return \array_merge(...$data);
     }
 
-    private function addLoader(LoaderInterface $loader): void
+    private function addLoader(I18nKeysLoaderInterface $loader): void
     {
         $this->loaders[] = $loader;
     }

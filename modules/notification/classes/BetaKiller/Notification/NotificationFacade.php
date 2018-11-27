@@ -318,7 +318,7 @@ class NotificationFacade
         }
 
         if (!$group->isAllowedToUser($user)) {
-            throw new DomainException('User :user is not allowed for notification group :group', [
+            throw new DomainException('User ":user" is not allowed for notification group ":group"', [
                 ':user'  => $user->getUsername(),
                 ':group' => $group->getCodename(),
             ]);

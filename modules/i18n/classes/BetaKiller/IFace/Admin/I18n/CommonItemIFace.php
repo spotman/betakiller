@@ -7,20 +7,15 @@ use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\I18n\I18nFacade;
 use BetaKiller\I18n\PluralBagFormatterInterface;
 use BetaKiller\IFace\Admin\AbstractAdminIFace;
-use BetaKiller\Model\I18nKeyModelInterface;
+use BetaKiller\Model\I18nKeyInterface;
 use BetaKiller\Model\LanguageInterface;
+use BetaKiller\Model\TranslationKeyModelInterface;
 use BetaKiller\Repository\LanguageRepositoryInterface;
-use BetaKiller\Repository\TranslationRepository;
 use BetaKiller\Url\ZoneInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 class CommonItemIFace extends AbstractAdminIFace
 {
-    /**
-     * @var \BetaKiller\Repository\TranslationRepository
-     */
-    private $i18nRepo;
-
     /**
      * @var \BetaKiller\Repository\LanguageRepositoryInterface
      */
@@ -39,18 +34,15 @@ class CommonItemIFace extends AbstractAdminIFace
     /**
      * CommonItemIFace constructor.
      *
-     * @param \BetaKiller\Repository\TranslationRepository       $i18nRepo
      * @param \BetaKiller\I18n\I18nFacade                        $facade
      * @param \BetaKiller\Repository\LanguageRepositoryInterface $langRepo
      * @param \BetaKiller\I18n\PluralBagFormatterInterface       $plural
      */
     public function __construct(
-        TranslationRepository $i18nRepo,
         I18nFacade $facade,
         LanguageRepositoryInterface $langRepo,
         PluralBagFormatterInterface $plural
     ) {
-        $this->i18nRepo = $i18nRepo;
         $this->langRepo = $langRepo;
         $this->facade   = $facade;
         $this->plural   = $plural;
@@ -67,14 +59,14 @@ class CommonItemIFace extends AbstractAdminIFace
     {
         $urlHelper = ServerRequestHelper::getUrlHelper($request);
 
-        /** @var I18nKeyModelInterface $key */
-        $key = ServerRequestHelper::getEntity($request, I18nKeyModelInterface::class);
+        /** @var TranslationKeyModelInterface $key */
+        $key = ServerRequestHelper::getEntity($request, TranslationKeyModelInterface::class);
 
         $languages = $this->langRepo->getAll();
         $isPlural  = $key->isPlural();
 
         return [
-            'key'       => $key->getI18nKey(),
+            'key'       => $key->getI18nKeyName(),
             'is_plural' => $isPlural,
             'values'    => $this->getValues($key, $languages),
             'action'    => $urlHelper->getUpdateEntityUrl($key, ZoneInterface::ADMIN),
@@ -82,23 +74,22 @@ class CommonItemIFace extends AbstractAdminIFace
     }
 
     /**
-     * @param \BetaKiller\Model\I18nKeyModelInterface $key
-     * @param \BetaKiller\Model\LanguageInterface[]   $languages
+     * @param \BetaKiller\Model\I18nKeyInterface    $key
+     * @param \BetaKiller\Model\LanguageInterface[] $languages
      *
      * @return array
+     * @throws \Punic\Exception
      */
-    private function getValues(I18nKeyModelInterface $key, array $languages): array
+    private function getValues(I18nKeyInterface $key, array $languages): array
     {
         $data = [];
 
         foreach ($languages as $lang) {
-            $item = $this->i18nRepo->findItem($key, $lang);
-
-            $value = $item ? $item->getValue() : '';
+            $value = $key->getI18nValue($lang) ?: '';
 
             $data[] = [
-                'lang' => [
-                    'name' => $lang->getName(),
+                'lang'  => [
+                    'name'  => $lang->getName(),
                     'label' => $lang->getLabel(),
                 ],
                 'value' => $key->isPlural() ? $this->getPluralItemData($lang, $value) : $value,
