@@ -18,9 +18,13 @@ use BetaKiller\Repository\TranslationRepository;
 use BetaKiller\Url\ZoneInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Spotman\Defence\ArgumentsInterface;
+use Spotman\Defence\DefinitionBuilderInterface;
 
 class UpdateCommonItemAction extends AbstractAction
 {
+    private const ARG_LOGIN = 'user-login';
+
     /**
      * @var \BetaKiller\I18n\I18nFacade
      */
@@ -70,15 +74,27 @@ class UpdateCommonItemAction extends AbstractAction
     }
 
     /**
-     * Handles a request and produces a response.
-     *
-     * May call other collaborating code to generate the response.
-     *
+     * @return \Spotman\Defence\DefinitionBuilderInterface
+     */
+    public function getArgumentsDefinition(): DefinitionBuilderInterface
+    {
+        return $this->definition()
+            ->identity()
+            ->compositeArray('values')
+            ->string('name')->lowercase()
+            ->string('value');
+    }
+
+    /**
      * @param \Psr\Http\Message\ServerRequestInterface $request
+     * @param \Spotman\Defence\ArgumentsInterface      $arguments
      *
      * @return \Psr\Http\Message\ResponseInterface
+     * @throws \BetaKiller\Exception\BadRequestHttpException
+     * @throws \BetaKiller\I18n\I18nException
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
      */
-    public function handle(ServerRequestInterface $request): ResponseInterface
+    public function handle(ServerRequestInterface $request, ArgumentsInterface $arguments): ResponseInterface
     {
         $urlHelper = ServerRequestHelper::getUrlHelper($request);
 
