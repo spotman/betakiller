@@ -4,9 +4,10 @@ declare(strict_types=1);
 namespace BetaKiller\I18n;
 
 use BetaKiller\Helper\AppEnvInterface;
+use BetaKiller\Model\LanguageInterface;
 use Psr\Container\ContainerInterface;
 
-class LazyAggregateLoader implements LoaderInterface
+class LazyAggregateLoader implements I18nKeysLoaderInterface
 {
     /**
      * @var \Psr\Container\ContainerInterface
@@ -24,7 +25,7 @@ class LazyAggregateLoader implements LoaderInterface
     private $config;
 
     /**
-     * @var \BetaKiller\I18n\LoaderInterface
+     * @var \BetaKiller\I18n\I18nKeysLoaderInterface
      */
     private $loader;
 
@@ -38,28 +39,26 @@ class LazyAggregateLoader implements LoaderInterface
     public function __construct(ContainerInterface $container, I18nConfig $config, AppEnvInterface $appEnv)
     {
         $this->container = $container;
+        $this->config    = $config;
         $this->appEnv    = $appEnv;
-
-        $this->config = $config;
     }
 
     /**
      * Returns "key" => "translated string" pairs for provided locale
      *
-     * @param string $locale
-     *
      * @return string[]
+     * @throws \BetaKiller\I18n\I18nException
      */
-    public function load(string $locale): array
+    public function loadI18nKeys(): array
     {
         if (!$this->loader) {
             $this->loader = $this->loaderFactory();
         }
 
-        return $this->loader->load($locale);
+        return $this->loader->loadI18nKeys();
     }
 
-    private function loaderFactory(): LoaderInterface
+    private function loaderFactory(): I18nKeysLoaderInterface
     {
         // Get all loaders from config
         $loadersClassNames = $this->config->getLoaders();
@@ -72,7 +71,7 @@ class LazyAggregateLoader implements LoaderInterface
         // If dev mode
         if ($this->appEnv->inDevelopmentMode()) {
             // Inject file-based loader first as a default fallback
-            \array_unshift($loadersClassNames, FilesystemLoader::class);
+            \array_unshift($loadersClassNames, FilesystemI18nKeysLoader::class);
         }
 
         $loadersInstances = [];
@@ -84,7 +83,7 @@ class LazyAggregateLoader implements LoaderInterface
         return new AggregateLoader($loadersInstances);
     }
 
-    private function makeLoader(string $className): LoaderInterface
+    private function makeLoader(string $className): I18nKeysLoaderInterface
     {
         return $this->container->get($className);
     }

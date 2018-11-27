@@ -6,6 +6,10 @@ namespace BetaKiller\Model;
 interface LanguageInterface extends DispatchableEntityInterface
 {
     public const NAME_EN = 'en';
+    public const NAME_DE = 'de';
+    public const NAME_FR = 'fr';
+    public const NAME_IT = 'it';
+    public const NAME_RU = 'ru';
 
     /**
      * @param string $value

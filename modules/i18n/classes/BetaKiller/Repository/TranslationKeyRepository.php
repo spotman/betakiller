@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\Repository;
 
+use BetaKiller\Model\ExtendedOrmInterface;
 use BetaKiller\Model\TranslationKey;
 use BetaKiller\Model\TranslationKeyModelInterface;
 
@@ -12,6 +13,8 @@ use BetaKiller\Model\TranslationKeyModelInterface;
  * @package BetaKiller\Repository
  * @method TranslationKeyModelInterface create()
  * @method save(TranslationKeyModelInterface $model)
+ * @method TranslationKeyModelInterface[] getAll()
+ * @method TranslationKeyModelInterface[] findKeysWithEmptyValues(array $langModels)
  */
 class TranslationKeyRepository extends AbstractI18nKeyRepository
 {
@@ -23,8 +26,24 @@ class TranslationKeyRepository extends AbstractI18nKeyRepository
         return TranslationKey::TABLE_FIELD_KEY;
     }
 
-    protected function getKeyFieldName(): string
+    public function findByKeyName(string $i18nKey): ?TranslationKeyModelInterface
     {
-        return TranslationKey::TABLE_FIELD_KEY;
+        $orm = $this->getOrmInstance();
+
+        return $this
+            ->filterKey($orm, $i18nKey)
+            ->findOne($orm);
+    }
+
+    private function filterKey(ExtendedOrmInterface $orm, string $key): self
+    {
+        $orm->where($orm->object_column(TranslationKey::TABLE_FIELD_KEY), '=', $key);
+
+        return $this;
+    }
+
+    protected function getValuesColumnName(): string
+    {
+        return TranslationKey::TABLE_FIELD_I18N;
     }
 }

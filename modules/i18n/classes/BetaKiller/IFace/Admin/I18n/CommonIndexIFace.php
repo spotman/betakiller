@@ -7,18 +7,18 @@ use BetaKiller\Exception\BadRequestHttpException;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Helper\UrlHelper;
 use BetaKiller\IFace\Admin\AbstractAdminIFace;
-use BetaKiller\Model\I18nModelInterface;
+use BetaKiller\Model\TranslationKeyModelInterface;
 use BetaKiller\Repository\LanguageRepositoryInterface;
-use BetaKiller\Repository\TranslationRepository;
+use BetaKiller\Repository\TranslationKeyRepository;
 use BetaKiller\Url\ZoneInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 class CommonIndexIFace extends AbstractAdminIFace
 {
     /**
-     * @var \BetaKiller\Repository\TranslationRepository
+     * @var \BetaKiller\Repository\TranslationKeyRepository
      */
-    private $i18nRepo;
+    private $keyRepo;
 
     /**
      * @var \BetaKiller\Repository\LanguageRepositoryInterface
@@ -28,12 +28,12 @@ class CommonIndexIFace extends AbstractAdminIFace
     /**
      * CommonIndexIFace constructor.
      *
-     * @param \BetaKiller\Repository\TranslationRepository       $i18nRepo
+     * @param \BetaKiller\Repository\TranslationKeyRepository    $keyRepo
      * @param \BetaKiller\Repository\LanguageRepositoryInterface $langRepo
      */
-    public function __construct(TranslationRepository $i18nRepo, LanguageRepositoryInterface $langRepo)
+    public function __construct(TranslationKeyRepository $keyRepo, LanguageRepositoryInterface $langRepo)
     {
-        $this->i18nRepo = $i18nRepo;
+        $this->keyRepo  = $keyRepo;
         $this->langRepo = $langRepo;
     }
 
@@ -72,6 +72,7 @@ class CommonIndexIFace extends AbstractAdminIFace
             $langName            = $lang->getName();
             $langList[$langName] = [
                 'label' => $lang->getLabel(),
+                'name'  => $lang->getName(),
                 'url'   => (string)$currentUri->withQuery('?filter='.$langName),
             ];
         }
@@ -90,21 +91,19 @@ class CommonIndexIFace extends AbstractAdminIFace
     {
         $data = [];
 
-        foreach ($this->i18nRepo->findEmptyItems($languages) as $emptyItem) {
+        foreach ($this->keyRepo->findKeysWithEmptyValues($languages) as $emptyItem) {
             $data[] = $this->formatItem($emptyItem, $helper);
         }
 
         return $data;
     }
 
-    private function formatItem(I18nModelInterface $model, UrlHelper $helper): array
+    private function formatItem(TranslationKeyModelInterface $model, UrlHelper $helper): array
     {
-        $key = $model->getKey();
-
         return [
-            'key'   => $key->getI18nKey(),
-            'value' => $model->getValue(),
-            'url'   => $helper->getReadEntityUrl($key, ZoneInterface::ADMIN),
+            'key'   => $model->getI18nKeyName(),
+            'value' => $model->getAnyI18nValue(),
+            'url'   => $helper->getReadEntityUrl($model, ZoneInterface::ADMIN),
         ];
     }
 }

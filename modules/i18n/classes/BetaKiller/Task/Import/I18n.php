@@ -6,14 +6,13 @@ namespace BetaKiller\Task\Import;
 use BetaKiller\Factory\UrlHelperFactory;
 use BetaKiller\Helper\NotificationHelper;
 use BetaKiller\Helper\UrlHelper;
-use BetaKiller\I18n\FilesystemLoader;
-use BetaKiller\I18n\I18nFacade;
+use BetaKiller\I18n\FilesystemI18nKeysLoader;
 use BetaKiller\I18n\PluralBagFormatterInterface;
+use BetaKiller\Model\I18nKeyInterface;
 use BetaKiller\Model\LanguageInterface;
 use BetaKiller\Model\TranslationKey;
 use BetaKiller\Repository\LanguageRepository;
 use BetaKiller\Repository\TranslationKeyRepository;
-use BetaKiller\Repository\TranslationRepository;
 use BetaKiller\Task\AbstractTask;
 use BetaKiller\Url\ZoneInterface;
 use Psr\Log\LoggerInterface;
@@ -28,7 +27,7 @@ class I18n extends AbstractTask
     private $langRepo;
 
     /**
-     * @var \BetaKiller\I18n\FilesystemLoader
+     * @var \BetaKiller\I18n\FilesystemI18nKeysLoader
      */
     private $filesystemLoader;
 
@@ -36,11 +35,6 @@ class I18n extends AbstractTask
      * @var \BetaKiller\Repository\TranslationKeyRepository
      */
     private $keyRepo;
-
-    /**
-     * @var \BetaKiller\Repository\TranslationRepository
-     */
-    private $i18nRepo;
 
     /**
      * @var \BetaKiller\I18n\PluralBagFormatterInterface
@@ -53,7 +47,7 @@ class I18n extends AbstractTask
     private $logger;
 
     /**
-     * @var \BetaKiller\Model\I18nKeyModelInterface[]
+     * @var \BetaKiller\Model\TranslationKeyModelInterface[]
      */
     private $newKeys = [];
 
@@ -71,9 +65,8 @@ class I18n extends AbstractTask
      * I18n constructor.
      *
      * @param \BetaKiller\Repository\LanguageRepository       $langRepo
-     * @param \BetaKiller\I18n\FilesystemLoader               $filesystemLoader
+     * @param \BetaKiller\I18n\FilesystemI18nKeysLoader       $filesystemLoader
      * @param \BetaKiller\Repository\TranslationKeyRepository $keyRepo
-     * @param \BetaKiller\Repository\TranslationRepository    $i18nRepo
      * @param \BetaKiller\I18n\PluralBagFormatterInterface    $formatter
      * @param \BetaKiller\Helper\NotificationHelper           $notificationHelper
      * @param \BetaKiller\Factory\UrlHelperFactory            $urlHelperFactory
@@ -81,9 +74,8 @@ class I18n extends AbstractTask
      */
     public function __construct(
         LanguageRepository $langRepo,
-        FilesystemLoader $filesystemLoader,
+        FilesystemI18nKeysLoader $filesystemLoader,
         TranslationKeyRepository $keyRepo,
-        TranslationRepository $i18nRepo,
         PluralBagFormatterInterface $formatter,
         NotificationHelper $notificationHelper,
         UrlHelperFactory $urlHelperFactory,
@@ -92,7 +84,6 @@ class I18n extends AbstractTask
         $this->langRepo         = $langRepo;
         $this->filesystemLoader = $filesystemLoader;
         $this->keyRepo          = $keyRepo;
-        $this->i18nRepo         = $i18nRepo;
         $this->formatter        = $formatter;
         $this->logger           = $logger;
         $this->notification     = $notificationHelper;
@@ -117,17 +108,8 @@ class I18n extends AbstractTask
         // Get all system languages
         foreach ($this->langRepo->getAll() as $language) {
             // Iterate all filesystem keys
-            foreach ($this->filesystemLoader->load($language->getLocale()) as $keyName => $i18nValue) {
-
-                // Check keyName is a valid i18n key and skip if not
-                if (!I18nFacade::isI18nKey($keyName)) {
-                    $this->logger->warning('I18n key ":key" is not a valid key', [
-                        ':key' => $keyName,
-                    ]);
-                    continue;
-                }
-
-                $this->importKeyValue($language, $keyName, $i18nValue);
+            foreach ($this->filesystemLoader->loadI18nKeys() as $key) {
+                $this->importKeyValue($language, $key);
             }
         }
 
@@ -153,7 +135,7 @@ class I18n extends AbstractTask
 
         foreach ($this->newKeys as $missedKey) {
             $data[] = [
-                'name' => $missedKey->getI18nKey(),
+                'name' => $missedKey->getI18nKeyName(),
                 'url'  => $urlHelper->getReadEntityUrl($missedKey, ZoneInterface::ADMIN),
             ];
         }
@@ -161,8 +143,10 @@ class I18n extends AbstractTask
         return $data;
     }
 
-    private function importKeyValue(LanguageInterface $lang, string $keyName, string $i18nValue): void
+    private function importKeyValue(LanguageInterface $lang, I18nKeyInterface $key): void
     {
+        $keyName = $key->getI18nKeyName();
+
         // Check key model
         $keyModel = $this->keyRepo->findByKeyName($keyName);
 
@@ -174,6 +158,13 @@ class I18n extends AbstractTask
                 ':key' => $keyName,
             ]);
             $this->newKeys[] = $keyModel;
+        }
+
+        $i18nValue = $key->getI18nValue($lang);
+
+        // Skip missing translations
+        if (!$i18nValue) {
+            return;
         }
 
         $isFormatted = $this->formatter->isFormatted($i18nValue);
@@ -195,26 +186,16 @@ class I18n extends AbstractTask
             }
         }
 
-        $this->keyRepo->save($keyModel);
-
-        // Find value model
-        $valueModel = $this->i18nRepo->findItem($keyModel, $lang);
-
         // Skip existing translations
-        if ($valueModel) {
-            return;
+        if (!$keyModel->getI18nValue($lang)) {
+            $keyModel->setI18nValue($lang, $i18nValue);
+
+            $this->logger->info('I18n key ":key" value for locale ":locale" added', [
+                ':key'    => $keyName,
+                ':locale' => $lang->getLocale(),
+            ]);
         }
 
-        $valueModel = $this->i18nRepo->create()
-            ->setKey($keyModel)
-            ->setLanguage($lang)
-            ->setValue($i18nValue);
-
-        $this->i18nRepo->save($valueModel);
-
-        $this->logger->info('I18n key ":key" value for locale ":locale" added', [
-            ':key'    => $keyName,
-            ':locale' => $lang->getLocale(),
-        ]);
+        $this->keyRepo->save($keyModel);
     }
 }

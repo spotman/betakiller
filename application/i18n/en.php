@@ -1,11 +1,11 @@
 <?php
 /**
- * Translation file in language: ru
- * Automatically generated from previous translation file.
+ * Translation file in language: en
  */
 return [
-    'cookies_notification.header'   => 'Cookies used on the website!',
-    'cookies_notification.message'  => 'This website uses cookies to ensure you get the best experience on our website.',
-    'cookies_notification.dismiss'  => 'Got it!',
-    'cookies_notification.link'     => 'Learn more',
+    'user.status.created'   => 'Just created',
+    'user.status.confirmed' => 'Email confirmed',
+    'user.status.approved'  => 'Approved by moderator',
+    'user.status.verified'  => 'KYC verified',
+    'user.status.blocked'   => 'Blocked',
 ];

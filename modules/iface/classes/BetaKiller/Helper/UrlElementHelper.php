@@ -128,7 +128,7 @@ class UrlElementHelper
         }
 
         if (I18nFacade::isI18nKey($label)) {
-            $label = $i18n->translate($label);
+            $label = $i18n->translateKeyName($label);
         }
 
         return $this->stringPatternHelper->processPattern($label, $params, $limit);
@@ -158,7 +158,7 @@ class UrlElementHelper
         }
 
         if (I18nFacade::isI18nKey($title)) {
-            $title = $i18n->translate($title);
+            $title = $i18n->translateKeyName($title);
         }
 
         return $this->stringPatternHelper->processPattern($title, $params, SeoMetaInterface::TITLE_LIMIT);
@@ -182,7 +182,7 @@ class UrlElementHelper
         }
 
         if (I18nFacade::isI18nKey($description)) {
-            $description = $i18n->translate($description);
+            $description = $i18n->translateKeyName($description);
         }
 
         return $this->stringPatternHelper->processPattern($description, $params, SeoMetaInterface::DESCRIPTION_LIMIT);

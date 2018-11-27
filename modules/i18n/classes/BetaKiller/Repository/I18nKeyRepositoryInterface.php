@@ -3,9 +3,20 @@ declare(strict_types=1);
 
 namespace BetaKiller\Repository;
 
-use BetaKiller\Model\I18nKeyModelInterface;
+use BetaKiller\Model\I18nKeyInterface;
+use BetaKiller\Model\LanguageInterface;
 
-interface I18nKeyRepositoryInterface extends RepositoryInterface
+/**
+ * Interface I18nKeyRepositoryInterface
+ *
+ * @package BetaKiller\Repository
+ */
+interface I18nKeyRepositoryInterface extends DispatchableRepositoryInterface // All keys would be editable via web UI
 {
-    public function findByKeyName(string $i18nKey): ?I18nKeyModelInterface;
+    /**
+     * @param array $langModels
+     *
+     * @return I18nKeyInterface[]|mixed[]
+     */
+    public function findKeysWithEmptyValues(array $langModels): array;
 }

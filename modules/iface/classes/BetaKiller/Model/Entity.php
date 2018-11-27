@@ -2,10 +2,8 @@
 namespace BetaKiller\Model;
 
 use BetaKiller\Exception;
-use BetaKiller\Helper\I18nHelper;
-use ORM;
 
-class Entity extends ORM implements EntityModelInterface
+class Entity extends \ORM implements EntityModelInterface
 {
     /**
      * Prepares the model database connection, determines the table name,
@@ -61,13 +59,11 @@ class Entity extends ORM implements EntityModelInterface
     }
 
     /**
-     * @param \BetaKiller\Helper\I18nHelper $i18n
-     *
      * @return string
      */
-    public function getLabel(I18nHelper $i18n): string
+    public function getI18nKeyName(): string
     {
-        return $i18n->translate('entities.'.$this->getSlug());
+        return 'entities.'.$this->getLinkedModelName();
     }
 
     /**

@@ -7,17 +7,22 @@
   <form id="i18n-common-edit-form" action="{{ action }}" method="post">
 
     {% for data in values %}
+      {% set prefix = "values[" ~ loop.index0 ~ "]" %}
+      {% set value_name = prefix ~ "[value]" %}
+
+      <input type="hidden" name="{{ prefix }}[name]" value="{{ data.lang.name }}"/>
+
       {% if is_plural %}
         {% for form, value in data.value %}
           <label>
             {{ data.lang.label }}
-            <input type="text" name="{{ data.lang.name ~ "[" ~ form ~ "]" }}" value="{{ value }}"/>
+            <input type="text" name="{{ value_name ~ "[" ~ form ~ "]" }}" value="{{ value }}"/>
           </label>
         {% endfor %}
       {% else %}
         <label>
           {{ data.lang.label }}
-          <input type="text" name="{{ data.lang.name }}" value="{{ data.value }}"/>
+          <input type="text" name="{{ value_name }}" value="{{ data.value }}"/>
         </label>
       {% endif %}
     {% endfor %}

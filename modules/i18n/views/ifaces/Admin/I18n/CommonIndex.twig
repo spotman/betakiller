@@ -5,13 +5,15 @@
   <div class="row">
     <div class="col s12">
 
-      {#<div class="right">#}
-        {#<br>#}
-        {#<a href="{{ filter.self }}" class="btn">All</a>#}
-        {#{% for filter_item in filter.list %}#}
-          {#<a href="{{ filter_item.url }}" class="btn">{{ filter_item.label }}</a>#}
-        {#{% endfor %}#}
-      {#</div>#}
+      <div class="right">
+        <br>
+        <a href="{{ filter.self }}" class="btn {{ filter.current ? "" : "green" }}">All</a>
+        {% for filter_item in filter.list %}
+          <a href="{{ filter_item.url }}" class="btn {{ filter.current == filter_item.name ? "green" : "" }}">
+            {{ filter_item.label }}
+          </a>
+        {% endfor %}
+      </div>
 
       <h1>Keys required translation ({{ empty_items|length }} total)</h1>
 

@@ -1,6 +1,7 @@
 <?php
 namespace BetaKiller\Helper;
 
+use BetaKiller\Model\NotificationGroupInterface;
 use BetaKiller\Notification\NotificationFacade;
 use BetaKiller\Notification\NotificationMessageInterface;
 use BetaKiller\Notification\NotificationTargetEmail;
@@ -30,17 +31,32 @@ class NotificationHelper
         $this->appEnv = $appEnv;
     }
 
+    public function getMessageGroup(string $messageCodename): NotificationGroupInterface
+    {
+        return $this->facade->getGroupByMessageCodename($messageCodename);
+    }
+
     /**
      * Send message to a linked group
      *
-     * @param string $name
-     * @param array  $templateData
+     * @param string     $name
+     * @param array      $templateData
      *
+     * @param string[]|null $attachments
+     *
+     * @throws \BetaKiller\Exception
+     * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\Notification\NotificationException
      */
-    public function groupMessage(string $name, array $templateData): void
+    public function groupMessage(string $name, array $templateData, array $attachments = null): void
     {
         $message = $this->facade->groupMessage($name, $templateData);
+
+        if ($attachments) {
+            foreach ($attachments as $attach) {
+                $message->addAttachment($attach);
+            }
+        }
 
         // Send only if there are targets (maybe all users disabled this group)
         $this->send($message);
@@ -53,11 +69,24 @@ class NotificationHelper
      * @param \BetaKiller\Notification\NotificationTargetInterface $target
      * @param array                                                $templateData
      *
+     * @param string[] $attachments Array of files to attach
+     *
+     * @throws \BetaKiller\Exception\DomainException
      * @throws \BetaKiller\Notification\NotificationException
      */
-    public function directMessage(string $name, NotificationTargetInterface $target, array $templateData): void
-    {
+    public function directMessage(
+        string $name,
+        NotificationTargetInterface $target,
+        array $templateData,
+        array $attachments = null
+    ): void {
         $message = $this->facade->directMessage($name, $target, $templateData);
+
+        if ($attachments) {
+            foreach ($attachments as $attach) {
+                $message->addAttachment($attach);
+            }
+        }
 
         // Send only if target user allowed this message group
         $this->send($message);

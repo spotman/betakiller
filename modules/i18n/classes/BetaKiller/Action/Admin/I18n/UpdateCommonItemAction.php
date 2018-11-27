@@ -10,11 +10,9 @@ use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\I18n\I18nFacade;
 use BetaKiller\I18n\PluralBagFactoryInterface;
 use BetaKiller\I18n\PluralBagFormatterInterface;
-use BetaKiller\Model\I18nKeyModelInterface;
-use BetaKiller\Model\LanguageInterface;
-use BetaKiller\Model\Translation;
+use BetaKiller\Model\TranslationKeyModelInterface;
 use BetaKiller\Repository\LanguageRepositoryInterface;
-use BetaKiller\Repository\TranslationRepository;
+use BetaKiller\Repository\TranslationKeyRepository;
 use BetaKiller\Url\ZoneInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -23,7 +21,9 @@ use Spotman\Defence\DefinitionBuilderInterface;
 
 class UpdateCommonItemAction extends AbstractAction
 {
-    private const ARG_LOGIN = 'user-login';
+    private const ARG_I18N_VALUES      = 'values';
+    private const ARG_LANG_NAME        = 'name';
+    private const ARG_TRANSLATED_VALUE = 'value';
 
     /**
      * @var \BetaKiller\I18n\I18nFacade
@@ -31,9 +31,9 @@ class UpdateCommonItemAction extends AbstractAction
     private $i18nFacade;
 
     /**
-     * @var \BetaKiller\Repository\TranslationRepository
+     * @var \BetaKiller\Repository\TranslationKeyRepository
      */
-    private $i18nRepo;
+    private $keyRepo;
 
     /**
      * @var \BetaKiller\Repository\LanguageRepositoryInterface
@@ -54,20 +54,20 @@ class UpdateCommonItemAction extends AbstractAction
      * UpdateCommonItemAction constructor.
      *
      * @param \BetaKiller\I18n\I18nFacade                        $i18nFacade
-     * @param \BetaKiller\Repository\TranslationRepository       $i18nRepo
+     * @param \BetaKiller\Repository\TranslationKeyRepository    $keyRepo
      * @param \BetaKiller\Repository\LanguageRepositoryInterface $langRepo
      * @param \BetaKiller\I18n\PluralBagFormatterInterface       $formatter
      * @param \BetaKiller\I18n\PluralBagFactoryInterface         $pluralFactory
      */
     public function __construct(
         I18nFacade $i18nFacade,
-        TranslationRepository $i18nRepo,
+        TranslationKeyRepository $keyRepo,
         LanguageRepositoryInterface $langRepo,
         PluralBagFormatterInterface $formatter,
         PluralBagFactoryInterface $pluralFactory
     ) {
         $this->i18nFacade    = $i18nFacade;
-        $this->i18nRepo      = $i18nRepo;
+        $this->keyRepo       = $keyRepo;
         $this->langRepo      = $langRepo;
         $this->formatter     = $formatter;
         $this->pluralFactory = $pluralFactory;
@@ -79,10 +79,9 @@ class UpdateCommonItemAction extends AbstractAction
     public function getArgumentsDefinition(): DefinitionBuilderInterface
     {
         return $this->definition()
-            ->identity()
-            ->compositeArray('values')
-            ->string('name')->lowercase()
-            ->string('value');
+            ->compositeArray(self::ARG_I18N_VALUES)
+            ->string(self::ARG_LANG_NAME)->lowercase()
+            ->string(self::ARG_TRANSLATED_VALUE);
     }
 
     /**
@@ -98,25 +97,19 @@ class UpdateCommonItemAction extends AbstractAction
     {
         $urlHelper = ServerRequestHelper::getUrlHelper($request);
 
-        /** @var I18nKeyModelInterface $key */
-        $key = ServerRequestHelper::getEntity($request, I18nKeyModelInterface::class);
+        /** @var TranslationKeyModelInterface $key */
+        $key = ServerRequestHelper::getEntity($request, TranslationKeyModelInterface::class);
 
-        $post = ServerRequestHelper::getPost($request);
+        foreach ($arguments->getArray(self::ARG_I18N_VALUES) as $i18nData) {
+            $langName = $i18nData[self::ARG_LANG_NAME];
+            $value    = $i18nData[self::ARG_TRANSLATED_VALUE];
 
-        foreach ($this->langRepo->getAll() as $lang) {
-            $langName = $lang->getName();
+            $lang = $this->langRepo->findByName($langName);
 
-            if (!isset($post[$langName])) {
+            if (!$lang) {
                 throw new BadRequestHttpException('Missing data for lang :name', [
                     ':name' => $langName,
                 ]);
-            }
-
-            $value = $post[$langName];
-
-            // Skip empty lines
-            if (!$value) {
-                continue;
             }
 
             if ($key->isPlural()) {
@@ -129,26 +122,17 @@ class UpdateCommonItemAction extends AbstractAction
                 $value = $this->formatter->compile($bag);
             }
 
-            $this->updateValue($key, $lang, $value);
+            $key->setI18nValue($lang, $value);
         }
+
+        if (!$key->getAnyI18nValue()) {
+            throw new BadRequestHttpException('Key must have translation for one lang at least');
+        }
+
+        $this->keyRepo->save($key);
 
         $url = $urlHelper->getReadEntityUrl($key, ZoneInterface::ADMIN);
 
         return ResponseHelper::redirect($url);
-    }
-
-    private function updateValue(I18nKeyModelInterface $key, LanguageInterface $lang, string $value): void
-    {
-        $model = $this->i18nRepo->findItem($key, $lang);
-
-        if (!$model) {
-            $model = (new Translation())
-                ->setKey($key)
-                ->setLanguage($lang);
-        }
-
-        $model->setValue($value);
-
-        $this->i18nRepo->save($model);
     }
 }

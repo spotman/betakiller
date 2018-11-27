@@ -159,9 +159,7 @@ class TwigExtension extends Twig_Extension
 
                 $values = I18nFacade::addPlaceholderPrefixToKeys($values);
 
-                $lang = $this->getI18n($context)->getLang();
-
-                return $this->getI18n($context)->pluralize($key, $form ?? current($values), $values, $lang);
+                return $this->getI18n($context)->pluralizeKeyName($key, $form ?? current($values), $values);
             }, ['needs_context' => true, 'is_safe' => ['html']]),
 
             /**
@@ -174,7 +172,7 @@ class TwigExtension extends Twig_Extension
                     $values = I18nFacade::addPlaceholderPrefixToKeys($values);
                 }
 
-                return $this->getI18n($context)->translate($text, $values);
+                return $this->getI18n($context)->translateKeyName($text, $values);
             }, ['needs_context' => true, 'is_safe' => ['html']]),
 
         ];
