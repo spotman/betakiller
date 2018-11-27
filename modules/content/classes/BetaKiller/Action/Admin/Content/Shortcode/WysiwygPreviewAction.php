@@ -8,6 +8,8 @@ use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Helper\ServerRequestHelper;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Spotman\Defence\ArgumentsInterface;
+use Spotman\Defence\DefinitionBuilderInterface;
 
 class WysiwygPreviewAction extends AbstractAction
 {
@@ -27,14 +29,21 @@ class WysiwygPreviewAction extends AbstractAction
     }
 
     /**
-     * Handle the request and return a response.
-     *
+     * @return \Spotman\Defence\DefinitionBuilderInterface
+     */
+    public function getArgumentsDefinition(): DefinitionBuilderInterface
+    {
+        return $this->definition();
+    }
+
+    /**
      * @param \Psr\Http\Message\ServerRequestInterface $request
+     * @param \Spotman\Defence\ArgumentsInterface      $arguments
      *
      * @return \Psr\Http\Message\ResponseInterface
      * @throws \BetaKiller\Factory\FactoryException
      */
-    public function handle(ServerRequestInterface $request): ResponseInterface
+    public function handle(ServerRequestInterface $request, ArgumentsInterface $arguments): ResponseInterface
     {
         $params = ServerRequestHelper::getUrlContainer($request);
         $entity = $params->getEntity(ShortcodeEntityInterface::URL_CONTAINER_KEY);
