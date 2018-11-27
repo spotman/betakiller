@@ -3,27 +3,25 @@ declare(strict_types=1);
 
 namespace BetaKiller\Repository;
 
-use BetaKiller\Model\I18nKeyInterface;
+use BetaKiller\Model\LanguageInterface;
 
 abstract class AbstractI18nKeyRepository extends AbstractOrmBasedDispatchableRepository implements
     I18nKeyRepositoryInterface
 {
     /**
-     * @param array $langModels
+     * @param \BetaKiller\Model\LanguageInterface $lang
      *
-     * @return I18nKeyInterface[]|mixed[]
+     * @return \BetaKiller\Model\I18nKeyModelInterface[]|mixed[]
+     * @throws \BetaKiller\Factory\FactoryException
+     * @throws \BetaKiller\Repository\RepositoryException
      */
-    public function findKeysWithEmptyValues(array $langModels): array
+    public function findKeysWithEmptyValues(LanguageInterface $lang): array
     {
         $orm = $this->getOrmInstance();
 
         $column = $orm->object_column($this->getValuesColumnName());
 
-        $orm->and_where_open();
-        foreach ($langModels as $lang) {
-            $orm->or_where($column, 'NOT LIKE', '%"'.$lang->getName().'"%');
-        }
-        $orm->and_where_close();
+        $orm->where($column, 'NOT LIKE', '%"'.$lang->getName().'"%');
 
         return $this->findAll($orm);
     }
