@@ -14,9 +14,9 @@ use BetaKiller\Model\LanguageInterface;
 interface I18nKeyRepositoryInterface extends DispatchableRepositoryInterface // All keys would be editable via web UI
 {
     /**
-     * @param array $langModels
+     * @param \BetaKiller\Model\LanguageInterface $lang
      *
-     * @return I18nKeyInterface[]|mixed[]
+     * @return \BetaKiller\Model\I18nKeyModelInterface[]|mixed[]
      */
-    public function findKeysWithEmptyValues(array $langModels): array;
+    public function findKeysWithEmptyValues(LanguageInterface $lang): array;
 }

@@ -14,7 +14,6 @@ use BetaKiller\Model\TranslationKeyModelInterface;
  * @method TranslationKeyModelInterface create()
  * @method save(TranslationKeyModelInterface $model)
  * @method TranslationKeyModelInterface[] getAll()
- * @method TranslationKeyModelInterface[] findKeysWithEmptyValues(array $langModels)
  */
 class TranslationKeyRepository extends AbstractI18nKeyRepository
 {

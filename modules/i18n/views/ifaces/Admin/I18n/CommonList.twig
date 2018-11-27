@@ -15,7 +15,13 @@
         {% endfor %}
       </div>
 
-      <h1>Keys required translation ({{ empty_items|length }} total)</h1>
+      <h1>
+        {% if filter.current %}
+          Keys required translation ({{ items|length }} total)
+        {% else %}
+          Translation keys list ({{ items|length }} total)
+        {% endif %}
+      </h1>
 
       <table>
         <thead>
@@ -26,7 +32,7 @@
         </thead>
         <tbody>
 
-        {% for item in empty_items %}
+        {% for item in items %}
           <tr>
             <td>{{ loop.index }}</td>
             <td>

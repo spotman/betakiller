@@ -63,7 +63,16 @@ trait I18nKeyOrmTrait
 
     private function setRawI18nValue(array $data): void
     {
-        $this->set($this->getI18nValueColumn(), \json_encode($data, JSON_UNESCAPED_UNICODE));
+        $filtered = [];
+
+        // Remove keys with empty values
+        foreach ($data as $name => $value) {
+            if (!empty($value)) {
+                $filtered[$name] = $value;
+            }
+        }
+
+        $this->set($this->getI18nValueColumn(), \json_encode($filtered, JSON_UNESCAPED_UNICODE));
     }
 
     abstract protected function getI18nValueColumn(): string;
