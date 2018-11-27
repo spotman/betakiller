@@ -91,12 +91,8 @@ abstract class ORM extends Utils\Kohana\ORM implements ExtendedOrmInterface
      */
     protected function getRelatedEntity(string $alias)
     {
-        $entity = $this->get($alias);
-        if (!($entity instanceof AbstractEntityInterface)) {
-            throw new \RuntimeException(
-                sprintf('Unable get related entity by alias "%s"', $alias)
-            );
-        }
+        $entity = $this->getRelation($alias);
+
         if (!$this->loaded() || !$entity->loaded()) {
             throw new \RuntimeException(
                 sprintf('Related entity by alias "%s" not loaded', $alias)
@@ -104,6 +100,24 @@ abstract class ORM extends Utils\Kohana\ORM implements ExtendedOrmInterface
         }
 
         return $entity;
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return AbstractEntityInterface|ExtendedOrmInterface|mixed
+     */
+    protected function getRelation(string $name)
+    {
+        $relation = $this->get($name);
+
+        if (!($relation instanceof AbstractEntityInterface)) {
+            throw new \RuntimeException(
+                sprintf('Unable get related entity by alias "%s"', $name)
+            );
+        }
+
+        return $relation;
     }
 
     /**
