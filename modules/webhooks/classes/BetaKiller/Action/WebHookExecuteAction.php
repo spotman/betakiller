@@ -13,6 +13,8 @@ use BetaKiller\Model\WebHookModelInterface;
 use BetaKiller\Repository\WebHookLogRepository;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Spotman\Defence\ArgumentsInterface;
+use Spotman\Defence\DefinitionBuilderInterface;
 
 class WebHookExecuteAction extends AbstractAction
 {
@@ -39,15 +41,25 @@ class WebHookExecuteAction extends AbstractAction
     }
 
     /**
-     * Handles a request and produces a response.
-     *
-     * May call other collaborating code to generate the response.
-     *
+     * @return \Spotman\Defence\DefinitionBuilderInterface
+     */
+    public function getArgumentsDefinition(): DefinitionBuilderInterface
+    {
+        return $this->definition();
+    }
+
+    /**
      * @param \Psr\Http\Message\ServerRequestInterface $request
+     * @param \Spotman\Defence\ArgumentsInterface      $arguments
      *
      * @return \Psr\Http\Message\ResponseInterface
+     * @throws \BetaKiller\Exception\NotFoundHttpException
+     * @throws \BetaKiller\Exception\ValidationException
+     * @throws \BetaKiller\Repository\RepositoryException
+     * @throws \BetaKiller\WebHook\WebHookException
+     * @throws \Throwable
      */
-    public function handle(ServerRequestInterface $request): ResponseInterface
+    public function handle(ServerRequestInterface $request, ArgumentsInterface $arguments): ResponseInterface
     {
         /** @var WebHookModelInterface $model */
         $model = ServerRequestHelper::getEntity($request, WebHookModelInterface::class);

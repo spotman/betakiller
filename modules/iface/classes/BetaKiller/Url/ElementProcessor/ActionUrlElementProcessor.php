@@ -1,11 +1,14 @@
 <?php
 namespace BetaKiller\Url\ElementProcessor;
 
+use BetaKiller\Exception\BadRequestHttpException;
 use BetaKiller\Factory\ActionFactory;
+use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Url\ActionModelInterface;
 use BetaKiller\Url\UrlElementInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Spotman\Defence\ArgumentsFacade;
 
 /**
  * Action URL element processor
@@ -17,9 +20,19 @@ class ActionUrlElementProcessor implements UrlElementProcessorInterface
      */
     private $factory;
 
-    public function __construct(ActionFactory $factory)
+    /**
+     * @var \Spotman\Defence\ArgumentsFacade
+     */
+    private $argumentsFacade;
+
+    /**
+     * @param \BetaKiller\Factory\ActionFactory $factory
+     * @param \Spotman\Defence\ArgumentsFacade  $argumentsFacade
+     */
+    public function __construct(ActionFactory $factory, ArgumentsFacade $argumentsFacade)
     {
-        $this->factory = $factory;
+        $this->factory         = $factory;
+        $this->argumentsFacade = $argumentsFacade;
     }
 
     /**
@@ -43,6 +56,17 @@ class ActionUrlElementProcessor implements UrlElementProcessorInterface
 
         $action = $this->factory->createFromUrlElement($model);
 
-        return $action->handle($request);
+        try {
+            $postData   = ServerRequestHelper::getPost($request);
+            $definition = $action->getArgumentsDefinition();
+            $arguments  = $this->argumentsFacade->prepareArguments($postData, $definition);
+        } catch (\InvalidArgumentException $e) {
+            throw new BadRequestHttpException('Arguments validation error for action ":action": :error', [
+                ':error'  => $e->getMessage(),
+                ':action' => get_class($action),
+            ]);
+        }
+
+        return $action->handle($request, $arguments);
     }
 }
