@@ -14,6 +14,8 @@ use BetaKiller\IFace\Auth\LoginIFace;
 use BetaKiller\Repository\UserRepository;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Spotman\Defence\ArgumentsInterface;
+use Spotman\Defence\DefinitionBuilderInterface;
 
 /**
  * Class RegularLoginAction
@@ -23,7 +25,10 @@ use Psr\Http\Message\ServerRequestInterface;
  */
 class RegularLoginAction extends AbstractAction
 {
-    public const URL = LoginIFace::URL.'regular';
+    public const  URL          = LoginIFace::URL.'regular';
+    private const ARG_LOGIN    = 'user-login';
+    private const ARG_PASSWORD = 'user-password';
+
 
     /**
      * @var \BetaKiller\Auth\AuthFacade
@@ -48,9 +53,18 @@ class RegularLoginAction extends AbstractAction
     }
 
     /**
-     * Handle the request and return a response.
-     *
+     * @return \Spotman\Defence\DefinitionBuilderInterface
+     */
+    public function getArgumentsDefinition(): DefinitionBuilderInterface
+    {
+        return $this->definition()
+            ->string(self::ARG_LOGIN)
+            ->string(self::ARG_PASSWORD);
+    }
+
+    /**
      * @param \Psr\Http\Message\ServerRequestInterface $request
+     * @param \Spotman\Defence\ArgumentsInterface      $arguments
      *
      * @return \Psr\Http\Message\ResponseInterface
      * @throws \BetaKiller\Auth\IncorrectPasswordException
@@ -59,19 +73,14 @@ class RegularLoginAction extends AbstractAction
      * @throws \BetaKiller\Exception\ValidationException
      * @throws \BetaKiller\Repository\RepositoryException
      */
-    public function handle(ServerRequestInterface $request): ResponseInterface
+    public function handle(ServerRequestInterface $request, ArgumentsInterface $arguments): ResponseInterface
     {
         // HTTP referrer is required to proceed
         $referrer = ServerRequestHelper::getHttpReferrer($request);
 
-        $post = ServerRequestHelper::getPost($request);
-
-        $userLogin    = $post['user-login'] ?? null;
-        $userPassword = $post['user-password'] ?? null;
-
         // Sanitize
-        $userLogin    = trim(\HTML::chars($userLogin));
-        $userPassword = trim(\HTML::chars($userPassword));
+        $userLogin    = $arguments->getString(self::ARG_LOGIN);
+        $userPassword = $arguments->getString(self::ARG_PASSWORD);
 
         if (!$userLogin || !$userPassword) {
             throw new BadRequestHttpException('No username or password sent');

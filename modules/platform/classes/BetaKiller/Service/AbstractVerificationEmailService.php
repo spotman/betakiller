@@ -101,7 +101,6 @@ abstract class AbstractVerificationEmailService
         $appUrl     = $this->getAppUrl($request);
 
         $this->notification->directMessage(self::NOTIFICATION_NAME, $userModel, [
-            'subject'    => 'notification.verification.email.subj',
             'action_url' => $actionUrl,
             'app_url'    => $appUrl,
         ]);
