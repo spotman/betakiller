@@ -15,8 +15,10 @@ use Spotman\Defence\Filter\StringArrayFilter;
 use Spotman\Defence\Filter\StringFilter;
 use Spotman\Defence\Filter\TextFilter;
 use Spotman\Defence\Filter\UppercaseFilter;
-use Spotman\Defence\Rule\CountBetweenRule;
 use Spotman\Defence\Rule\DefinitionRuleInterface;
+use Spotman\Defence\Rule\LengthBetweenRule;
+use Spotman\Defence\Rule\MaxLengthRule;
+use Spotman\Defence\Rule\MinLengthRule;
 use Spotman\Defence\Rule\PositiveIntegerRule;
 use Spotman\Defence\Rule\WhitelistRule;
 
@@ -301,13 +303,33 @@ class DefinitionBuilder implements DefinitionBuilderInterface
 
     /**
      * @param int $min
+     *
+     * @return \Spotman\Defence\DefinitionBuilderInterface
+     */
+    public function minLength(int $min): DefinitionBuilderInterface
+    {
+        return $this->addRule(new MinLengthRule($min));
+    }
+
+    /**
      * @param int $max
      *
      * @return \Spotman\Defence\DefinitionBuilderInterface
      */
-    public function countBetween(int $min, int $max): DefinitionBuilderInterface
+    public function maxLength(int $max): DefinitionBuilderInterface
     {
-        return $this->addRule(new CountBetweenRule($min, $max));
+        return $this->addRule(new MaxLengthRule($max));
+    }
+
+    /**
+     * @param int $min
+     * @param int $max
+     *
+     * @return \Spotman\Defence\DefinitionBuilderInterface
+     */
+    public function lengthBetween(int $min, int $max): DefinitionBuilderInterface
+    {
+        return $this->addRule(new LengthBetweenRule($min, $max));
     }
 
     /**

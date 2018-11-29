@@ -133,11 +133,25 @@ interface DefinitionBuilderInterface
 
     /**
      * @param int $min
+     *
+     * @return \Spotman\Defence\DefinitionBuilderInterface
+     */
+    public function minLength(int $min): DefinitionBuilderInterface;
+
+    /**
      * @param int $max
      *
      * @return \Spotman\Defence\DefinitionBuilderInterface
      */
-    public function countBetween(int $min, int $max): DefinitionBuilderInterface;
+    public function maxLength(int $max): DefinitionBuilderInterface;
+
+    /**
+     * @param int $min
+     * @param int $max
+     *
+     * @return \Spotman\Defence\DefinitionBuilderInterface
+     */
+    public function lengthBetween(int $min, int $max): DefinitionBuilderInterface;
 
     /**
      * @return \Spotman\Defence\DefinitionBuilderInterface

@@ -178,11 +178,11 @@ class ArgumentsFacadeTest extends AbstractDefenceTest
             // Composite
             [$this->def()->composite('a')->int('b')->positive(), ['b' => -123]],
             // Int array
-            [$this->def()->intArray('a')->countBetween(2, 5), [1]],
-            [$this->def()->intArray('a')->countBetween(1, 3), [1, 2, 3, 4]],
+            [$this->def()->intArray('a')->lengthBetween(2, 5), [1]],
+            [$this->def()->intArray('a')->lengthBetween(1, 3), [1, 2, 3, 4]],
             // String array
-            [$this->def()->stringArray('a')->countBetween(2, 5), ['asd']],
-            [$this->def()->stringArray('a')->countBetween(1, 3), ['asd', 'qwe', 'asd', 'qwe']],
+            [$this->def()->stringArray('a')->lengthBetween(2, 5), ['asd']],
+            [$this->def()->stringArray('a')->lengthBetween(1, 3), ['asd', 'qwe', 'asd', 'qwe']],
 
         ];
     }
