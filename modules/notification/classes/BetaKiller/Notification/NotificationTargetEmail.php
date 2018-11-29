@@ -23,7 +23,14 @@ class NotificationTargetEmail implements NotificationTargetInterface
      */
     private $langName;
 
-    public function __construct(string $email, string $fullName, string $langName = null)
+    /**
+     * NotificationTargetEmail constructor.
+     *
+     * @param string $email
+     * @param string $fullName
+     * @param string $langName
+     */
+    public function __construct(string $email, string $fullName, string $langName)
     {
         $this->email    = $email;
         $this->fullName = $fullName;
@@ -46,9 +53,9 @@ class NotificationTargetEmail implements NotificationTargetInterface
     /**
      * Return preferred language (used in templates)
      *
-     * @return null|string
+     * @return string
      */
-    public function getLanguageName(): ?string
+    public function getLanguageName(): string
     {
         return $this->langName;
     }

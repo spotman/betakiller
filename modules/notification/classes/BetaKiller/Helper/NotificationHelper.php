@@ -1,6 +1,8 @@
 <?php
 namespace BetaKiller\Helper;
 
+use BetaKiller\I18n\I18nFacade;
+use BetaKiller\Model\LanguageInterface;
 use BetaKiller\Model\NotificationGroupInterface;
 use BetaKiller\Notification\NotificationFacade;
 use BetaKiller\Notification\NotificationMessageInterface;
@@ -12,7 +14,7 @@ class NotificationHelper
     /**
      * @var \BetaKiller\Notification\NotificationFacade
      */
-    private $facade;
+    private $notification;
 
     /**
      * @var \BetaKiller\Helper\AppEnvInterface
@@ -20,27 +22,34 @@ class NotificationHelper
     private $appEnv;
 
     /**
+     * @var \BetaKiller\I18n\I18nFacade
+     */
+    private $i18n;
+
+    /**
      * NotificationHelper constructor.
      *
      * @param \BetaKiller\Notification\NotificationFacade $facade
      * @param \BetaKiller\Helper\AppEnvInterface          $appEnv
+     * @param \BetaKiller\I18n\I18nFacade                 $i18n
      */
-    public function __construct(NotificationFacade $facade, AppEnvInterface $appEnv)
+    public function __construct(NotificationFacade $facade, AppEnvInterface $appEnv, I18nFacade $i18n)
     {
-        $this->facade = $facade;
-        $this->appEnv = $appEnv;
+        $this->notification = $facade;
+        $this->appEnv       = $appEnv;
+        $this->i18n         = $i18n;
     }
 
     public function getMessageGroup(string $messageCodename): NotificationGroupInterface
     {
-        return $this->facade->getGroupByMessageCodename($messageCodename);
+        return $this->notification->getGroupByMessageCodename($messageCodename);
     }
 
     /**
      * Send message to a linked group
      *
-     * @param string     $name
-     * @param array      $templateData
+     * @param string        $name
+     * @param array         $templateData
      *
      * @param string[]|null $attachments
      *
@@ -50,7 +59,7 @@ class NotificationHelper
      */
     public function groupMessage(string $name, array $templateData, array $attachments = null): void
     {
-        $message = $this->facade->groupMessage($name, $templateData);
+        $message = $this->notification->groupMessage($name, $templateData);
 
         if ($attachments) {
             foreach ($attachments as $attach) {
@@ -69,7 +78,7 @@ class NotificationHelper
      * @param \BetaKiller\Notification\NotificationTargetInterface $target
      * @param array                                                $templateData
      *
-     * @param string[] $attachments Array of files to attach
+     * @param string[]                                             $attachments Array of files to attach
      *
      * @throws \BetaKiller\Exception\DomainException
      * @throws \BetaKiller\Notification\NotificationException
@@ -80,7 +89,7 @@ class NotificationHelper
         array $templateData,
         array $attachments = null
     ): void {
-        $message = $this->facade->directMessage($name, $target, $templateData);
+        $message = $this->notification->directMessage($name, $target, $templateData);
 
         if ($attachments) {
             foreach ($attachments as $attach) {
@@ -106,6 +115,8 @@ class NotificationHelper
         string $fullName,
         ?string $langName = null
     ): NotificationTargetInterface {
+        $langName = $langName ?? $this->i18n->getDefaultLanguageName();
+
         return new NotificationTargetEmail($email, $fullName, $langName);
     }
 
@@ -121,7 +132,7 @@ class NotificationHelper
 
         // Send only if targets were specified or message group was allowed
         return $message->getTargets()
-            ? $this->facade->send($message)
+            ? $this->notification->send($message)
             : 0;
     }
 
@@ -137,7 +148,11 @@ class NotificationHelper
 
             $message
                 ->clearTargets()
-                ->addTarget($this->emailTarget($debugEmail, 'Debug email target'));
+                ->addTarget($this->emailTarget(
+                    $debugEmail,
+                    'Debug email target',
+                    LanguageInterface::NAME_EN
+                ));
         }
     }
 }
