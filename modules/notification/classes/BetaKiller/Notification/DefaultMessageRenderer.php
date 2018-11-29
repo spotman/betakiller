@@ -44,7 +44,7 @@ class DefaultMessageRenderer implements MessageRendererInterface
         NotificationTransportInterface $transport
     ): string {
         // User language in templates
-        $langName = $this->getTargetLanguage($target);
+        $langName = $target->getLanguageName();
 
         $file = $this->makeTemplateFileName($message->getCodename(), $transport->getName(), $langName);
         $view = $this->viewFactory->create($file);
@@ -91,7 +91,7 @@ class DefaultMessageRenderer implements MessageRendererInterface
     {
         $key  = $message->getBaseI18nKey().'.subj';
         $data = $message->getFullDataForTarget($target);
-        $lang = $this->getTargetLanguage($target);
+        $lang = $target->getLanguageName();
 
         $output = $this->i18n->translateKeyName($lang, $key, $data);
 
@@ -102,12 +102,6 @@ class DefaultMessageRenderer implements MessageRendererInterface
         }
 
         return $output;
-    }
-
-    private function getTargetLanguage(NotificationTargetInterface $target): string
-    {
-        // User language in templates
-        return $target->getLanguageName() ?? $this->i18n->getDefaultLanguageName();
     }
 
     /**

@@ -202,7 +202,7 @@ class User extends \ORM implements UserInterface
      */
     public function getUsername(): string
     {
-        return $this->get(self::TABLE_FIELD_USERNAME);
+        return (string)$this->get(self::TABLE_FIELD_USERNAME);
     }
 
     /**
@@ -220,7 +220,7 @@ class User extends \ORM implements UserInterface
      */
     public function getPassword(): string
     {
-        return $this->get(self::TABLE_FIELD_PASSWORD);
+        return (string)$this->get(self::TABLE_FIELD_PASSWORD);
     }
 
     /**
@@ -326,9 +326,8 @@ class User extends \ORM implements UserInterface
      * Returns user`s language name
      *
      * @return string
-     * @throws \Kohana_Exception
      */
-    public function getLanguageName(): ?string
+    public function getLanguageName(): string
     {
         return $this->getLanguage()->getName();
     }
@@ -345,7 +344,6 @@ class User extends \ORM implements UserInterface
 
     /**
      * @return \BetaKiller\Model\LanguageInterface
-     * @throws \Kohana_Exception
      */
     public function getLanguage(): LanguageInterface
     {
@@ -356,7 +354,6 @@ class User extends \ORM implements UserInterface
      * Complete the login for a user by incrementing the logins and saving login timestamp
      *
      * @return void
-     * @throws \Kohana_Exception
      */
     public function completeLogin(): void
     {
@@ -454,7 +451,7 @@ class User extends \ORM implements UserInterface
      */
     public function getEmail(): string
     {
-        return $this->get(self::TABLE_FIELD_EMAIL);
+        return (string)$this->get(self::TABLE_FIELD_EMAIL);
     }
 
     /**

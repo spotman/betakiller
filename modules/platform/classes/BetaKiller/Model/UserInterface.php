@@ -110,13 +110,6 @@ interface UserInterface extends AbstractEntityInterface, OrmInterface, Notificat
     public function getAllUserRolesNames(): array;
 
     /**
-     * Returns user`s language name
-     *
-     * @return string
-     */
-    public function getLanguageName(): ?string;
-
-    /**
      * @param \BetaKiller\Model\LanguageInterface $languageModel
      *
      * @return \BetaKiller\Model\UserInterface
@@ -124,7 +117,7 @@ interface UserInterface extends AbstractEntityInterface, OrmInterface, Notificat
     public function setLanguage(LanguageInterface $languageModel): UserInterface;
 
     /**
-     * @return null|\BetaKiller\Model\LanguageInterface
+     * @return \BetaKiller\Model\LanguageInterface
      */
     public function getLanguage(): LanguageInterface;
 
