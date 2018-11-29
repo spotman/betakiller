@@ -3,10 +3,10 @@ declare(strict_types=1);
 
 namespace Spotman\Defence\Test;
 
-use Spotman\Defence\Rule\CountBetweenRule;
+use Spotman\Defence\Rule\LengthBetweenRule;
 use Spotman\Defence\Rule\DefinitionRuleInterface;
 
-class CountBetweenRuleTest extends AbstractRuleTest
+class LengthBetweenRuleTest extends AbstractRuleTest
 {
     /**
      * Array of valid values
@@ -16,6 +16,8 @@ class CountBetweenRuleTest extends AbstractRuleTest
     public function validData(): array
     {
         return [
+            'asd',
+            'asdqweasd',
             \array_fill(0, 1, 'a'),
             \array_fill(0, 2, 'a'),
             \array_fill(0, 5, 'a'),
@@ -31,6 +33,8 @@ class CountBetweenRuleTest extends AbstractRuleTest
     public function invalidData(): array
     {
         return [
+            '', // Too short
+            \str_repeat('z', 11), // Too long
             [],
             \array_fill(0, 11, 'a'),
         ];
@@ -47,13 +51,12 @@ class CountBetweenRuleTest extends AbstractRuleTest
             true,
             100,
             0xFF,
-            'string',
             new \stdClass,
         ];
     }
 
     protected function makeInstance(): DefinitionRuleInterface
     {
-        return new CountBetweenRule(1, 10);
+        return new LengthBetweenRule(1, 10);
     }
 }
