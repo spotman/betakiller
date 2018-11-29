@@ -40,6 +40,7 @@ return [
     // These modules DEPENDS on PLATFORM and have NO legacy ROUTES
     'acl'          => MODPATH.'acl',                   // Role based access control
     'api'          => MODPATH.'api',                   // API subsystem
+    'api-test'     => MODPATH.'api-test',              // CLI and UI helpers for testing API subsystem
     'auth'         => MODPATH.'auth',                  // Auth IFaces and Widgets
     'assets'       => MODPATH.'assets',                // Asset management subsystem
     'cron'         => MODPATH.'cron',                  // Helper for running scheduled tasks
