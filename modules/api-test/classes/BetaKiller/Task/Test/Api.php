@@ -82,7 +82,7 @@ class Api extends AbstractTask
             ->getResource($resourceName)
             ->call($methodName, $arguments, $this->user);
 
-        echo json_encode($response->getData()).PHP_EOL;
+        echo json_encode($response->getData(), \JSON_PRETTY_PRINT).PHP_EOL;
     }
 
     private function getCallArguments(): array
