@@ -41,7 +41,7 @@ class TranslationKeyRepository extends AbstractI18nKeyRepository
         return $this;
     }
 
-    protected function getValuesColumnName(): string
+    protected function getI18nValuesColumnName(): string
     {
         return TranslationKey::TABLE_FIELD_I18N;
     }

@@ -103,7 +103,7 @@ abstract class AbstractOrmBasedRepository extends AbstractRepository
             throw RepositoryException::wrap($e);
         }
 
-        // Force updating all the related models
+        // Force updating all related models with IDs
         $entity->reload();
     }
 
