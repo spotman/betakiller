@@ -27,7 +27,7 @@ final class LanguageRepository extends AbstractOrmBasedDispatchableRepository im
         $model = $this->findByName($name);
 
         if (!$model) {
-            throw new RepositoryException('Missing language with name :value', [
+            throw new RepositoryException('Missing language with name ":value"', [
                 ':value' => $name,
             ]);
         }
@@ -60,7 +60,7 @@ final class LanguageRepository extends AbstractOrmBasedDispatchableRepository im
             ->findOne($orm);
 
         if (!$model) {
-            throw new RepositoryException('Missing language with locale :value', [
+            throw new RepositoryException('Missing language with locale ":value"', [
                 ':value' => $locale,
             ]);
         }
