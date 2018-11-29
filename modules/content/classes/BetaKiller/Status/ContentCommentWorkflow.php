@@ -2,7 +2,7 @@
 namespace BetaKiller\Status;
 
 use BetaKiller\Helper\NotificationHelper;
-use BetaKiller\Helper\UrlElementHelper;
+use BetaKiller\Helper\UrlHelper;
 use BetaKiller\Model\ContentCommentInterface;
 use BetaKiller\Model\ContentCommentStatusTransition;
 use BetaKiller\Model\UserInterface;
@@ -19,9 +19,9 @@ class ContentCommentWorkflow extends StatusWorkflow
     private $notification;
 
     /**
-     * @var \BetaKiller\Helper\UrlElementHelper
+     * @var \BetaKiller\Helper\UrlHelper
      */
-    private $ifaceHelper;
+    private $urlHelper;
 
     /**
      * @var \BetaKiller\Service\UserService
@@ -34,20 +34,20 @@ class ContentCommentWorkflow extends StatusWorkflow
      * @param \BetaKiller\Status\StatusRelatedModelInterface $model
      * @param \BetaKiller\Model\UserInterface                $user
      * @param \BetaKiller\Helper\NotificationHelper          $notificationHelper
-     * @param \BetaKiller\Helper\UrlElementHelper            $ifaceHelper
+     * @param \BetaKiller\Helper\UrlHelper                   $urlHelper
      * @param \BetaKiller\Service\UserService                $service
      */
     public function __construct(
         StatusRelatedModelInterface $model,
         UserInterface $user,
         NotificationHelper $notificationHelper,
-        UrlElementHelper $ifaceHelper,
+        UrlHelper $urlHelper,
         UserService $service
     ) {
         parent::__construct($model, $user);
 
         $this->notification = $notificationHelper;
-        $this->ifaceHelper  = $ifaceHelper;
+        $this->urlHelper    = $urlHelper;
         $this->userService  = $service;
     }
 
@@ -114,7 +114,7 @@ class ContentCommentWorkflow extends StatusWorkflow
 
         $this->notification->directMessage(self::NOTIFICATION_AUTHOR_APPROVE, $target, [
             'name'       => $name,
-            'url'        => $comment->getPublicReadUrl($this->ifaceHelper),
+            'url'        => $comment->getPublicReadUrl($this->urlHelper),
             'created_at' => $comment->getCreatedAt()->format('H:i:s d.m.Y'),
             'label'      => $comment->getRelatedContentLabel(),
         ]);
@@ -147,7 +147,7 @@ class ContentCommentWorkflow extends StatusWorkflow
         $target = $parentAuthor ?: $this->notification->emailTarget($parentEmail, $parent->getAuthorName());
 
         $this->notification->directMessage(self::NOTIFICATION_PARENT_REPLY, $target, [
-            'url'        => $reply->getPublicReadUrl($this->ifaceHelper),
+            'url'        => $reply->getPublicReadUrl($this->urlHelper),
             'created_at' => $reply->getCreatedAt()->format('H:i:s d.m.Y'),
             'label'      => $reply->getRelatedContentLabel(),
         ]);
