@@ -25,6 +25,14 @@ abstract class AbstractI18nKeyRepository extends AbstractOrmBasedDispatchableRep
             ->findAll($orm);
     }
 
+    /**
+     * @return \BetaKiller\Model\I18nKeyModelInterface[]|mixed[]
+     */
+    public function getAllI18nKeys(): array
+    {
+        return $this->getAll();
+    }
+
     protected function filterI18nValue(ExtendedOrmInterface $orm, string $term, LanguageInterface $lang = null)
     {
         $column = $orm->object_column($this->getI18nValuesColumnName());
