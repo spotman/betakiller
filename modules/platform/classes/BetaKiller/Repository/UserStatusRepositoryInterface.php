@@ -15,4 +15,12 @@ interface UserStatusRepositoryInterface
      * @throws \BetaKiller\Repository\RepositoryException
      */
     public function findByCodename(string $codeName): ?UserStatusInterface;
+
+    /**
+     * @param string $codeName
+     *
+     * @return \BetaKiller\Model\UserStatusInterface
+     * @throws \BetaKiller\Repository\RepositoryException
+     */
+    public function getByCodename(string $codeName): UserStatusInterface;
 }
