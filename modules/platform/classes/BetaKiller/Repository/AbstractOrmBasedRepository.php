@@ -170,6 +170,26 @@ abstract class AbstractOrmBasedRepository extends AbstractRepository
     }
 
     /**
+     * @param \BetaKiller\Utils\Kohana\ORM\OrmInterface $orm
+     *
+     * @return \BetaKiller\Model\ExtendedOrmInterface|mixed
+     * @throws \BetaKiller\Repository\RepositoryException
+     */
+    protected function getOne(OrmInterface $orm)
+    {
+        $model = $this->findOne($orm);
+
+        if (!$model) {
+            throw new RepositoryException('Can not find item in [:repo] repo with query ":query"', [
+                ':repo'  => static::getCodename(),
+                ':query' => $orm->last_query(),
+            ]);
+        }
+
+        return $model;
+    }
+
+    /**
      * @param \BetaKiller\Model\ExtendedOrmInterface $orm
      *
      * @param int|null                               $currentPage
