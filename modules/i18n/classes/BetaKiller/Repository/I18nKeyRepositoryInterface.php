@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace BetaKiller\Repository;
 
-use BetaKiller\Model\I18nKeyInterface;
 use BetaKiller\Model\LanguageInterface;
 
 /**
@@ -19,4 +18,9 @@ interface I18nKeyRepositoryInterface extends DispatchableRepositoryInterface // 
      * @return \BetaKiller\Model\I18nKeyModelInterface[]|mixed[]
      */
     public function findKeysWithEmptyValues(LanguageInterface $lang): array;
+
+    /**
+     * @return \BetaKiller\Model\I18nKeyModelInterface[]|mixed[]
+     */
+    public function getAllI18nKeys(): array;
 }

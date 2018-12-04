@@ -18,6 +18,13 @@ interface LanguageRepositoryInterface extends DispatchableRepositoryInterface
     /**
      * @param string $name
      *
+     * @return \BetaKiller\Model\LanguageInterface
+     */
+    public function getByName(string $name): LanguageInterface;
+
+    /**
+     * @param string $name
+     *
      * @return \BetaKiller\Model\LanguageInterface|null
      */
     public function findByName(string $name): ?LanguageInterface;
@@ -26,6 +33,13 @@ interface LanguageRepositoryInterface extends DispatchableRepositoryInterface
      * @return \BetaKiller\Model\LanguageInterface[]
      */
     public function getAllSystem(): array;
+
+    /**
+     * @param string $locale
+     *
+     * @return \BetaKiller\Model\LanguageInterface
+     */
+    public function getByLocale(string $locale): LanguageInterface;
 
     /**
      * @param \BetaKiller\Model\LanguageInterface $lang

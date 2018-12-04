@@ -260,6 +260,15 @@ class NotificationFacade
         return $this->groupRepo->findGroupUsers($group);
     }
 
+    public function disableMessageForUser(string $messageCodename, UserInterface $user): void
+    {
+        $group = $this->getGroupByMessageCodename($messageCodename);
+
+        $group->disableForUser($user);
+
+        $this->groupRepo->save($group);
+    }
+
     /**
      * @param string $name
      *

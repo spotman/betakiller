@@ -121,6 +121,48 @@ abstract class ORM extends Utils\Kohana\ORM implements ExtendedOrmInterface
     }
 
     /**
+     * @param string $name
+     * @param OrmInterface[]  $newModels
+     */
+    protected function mergeRelatedModels(string $name, array $newModels): void
+    {
+        // Get old models
+        $oldModels = $this->getRelation($name)->get_all();
+
+        // Add absent
+        foreach ($newModels as $new) {
+            if (!$this->hasModelInList($new, $oldModels)) {
+                $this->add($name, $new);
+            }
+        }
+
+        // Remove unused
+        foreach ($oldModels as $old) {
+            if (!$this->hasModelInList($old, $newModels)) {
+                // Add absent
+                $this->remove($name, $old);
+            }
+        }
+    }
+
+    /**
+     * @param OrmInterface                                $model
+     * @param \BetaKiller\Utils\Kohana\ORM\OrmInterface[] $list
+     *
+     * @return bool
+     */
+    private function hasModelInList(OrmInterface $model, array $list): bool
+    {
+        foreach ($list as $item) {
+            if ($item->isEqualTo($model)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Prepares the model database connection, determines the table name,
      * and loads column information.
      *

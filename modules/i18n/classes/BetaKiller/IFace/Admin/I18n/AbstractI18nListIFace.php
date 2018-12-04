@@ -90,7 +90,7 @@ abstract class AbstractI18nListIFace extends AbstractAdminIFace
 
         $items = $filterLang
             ? $this->keyRepo->findKeysWithEmptyValues($filterLang)
-            : $this->keyRepo->getAll();
+            : $this->keyRepo->getAllI18nKeys();
 
         foreach ($items as $emptyItem) {
             $data[] = $this->formatItem($emptyItem, $helper);
