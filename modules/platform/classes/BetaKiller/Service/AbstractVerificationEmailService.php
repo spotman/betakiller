@@ -14,7 +14,7 @@ use BetaKiller\Repository\UserStatusRepository;
 
 abstract class AbstractVerificationEmailService
 {
-    public const NOTIFICATION_NAME = 'verification/email';
+    public const NOTIFICATION_NAME = 'preregistration/verification/email';
 
     /**
      * @var \BetaKiller\Service\TokenService
@@ -70,6 +70,14 @@ abstract class AbstractVerificationEmailService
     abstract protected function getAppEntityCodename(): string;
 
     /**
+     * @param \Psr\Http\Message\ServerRequestInterface $request
+     * @param \BetaKiller\Model\UserInterface          $userModel
+     *
+     * @return array
+     */
+    abstract protected function getEmailData(ServerRequestInterface $request, UserInterface $userModel): array;
+
+    /**
      * @param \BetaKiller\Model\UserInterface $userModel
      *
      * @throws \BetaKiller\Exception\DomainException
@@ -100,10 +108,17 @@ abstract class AbstractVerificationEmailService
         $actionUrl  = $this->getActionUrl($request, $tokenModel);
         $appUrl     = $this->getAppUrl($request);
 
-        $this->notification->directMessage(self::NOTIFICATION_NAME, $userModel, [
+        $emailData = [
             'action_url' => $actionUrl,
             'app_url'    => $appUrl,
-        ]);
+        ];
+
+        $emailDataAdd = $this->getEmailData($request, $userModel);
+        if ($emailDataAdd) {
+            $emailData = array_merge($emailData, $emailDataAdd);
+        }
+
+        $this->notification->directMessage(self::NOTIFICATION_NAME, $userModel, $emailData);
     }
 
     /**
@@ -140,7 +155,7 @@ abstract class AbstractVerificationEmailService
      * @return string
      * @throws \BetaKiller\IFace\Exception\UrlElementException
      */
-    private function makeEntityUrl(ServerRequestInterface $request, string $entityCodename): string
+    protected function makeEntityUrl(ServerRequestInterface $request, string $entityCodename): string
     {
         $urlHelper  = ServerRequestHelper::getUrlHelper($request);
         $urlElement = $urlHelper->getUrlElementByCodename($entityCodename);
