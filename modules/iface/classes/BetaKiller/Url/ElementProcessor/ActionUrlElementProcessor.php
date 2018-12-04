@@ -57,9 +57,14 @@ class ActionUrlElementProcessor implements UrlElementProcessorInterface
         $action = $this->factory->createFromUrlElement($model);
 
         try {
-            $postData   = ServerRequestHelper::getPost($request);
-            $definition = $action->getArgumentsDefinition();
-            $arguments  = $this->argumentsFacade->prepareArguments($postData, $definition);
+            $definition    = $action->getArgumentsDefinition();
+            $argumentsData = $definition->getArguments();
+            if ($argumentsData) {
+                $postData = ServerRequestHelper::getPost($request);
+            } else {
+                $postData = [];
+            }
+            $arguments = $this->argumentsFacade->prepareArguments($postData, $definition);
         } catch (\InvalidArgumentException $e) {
             throw new BadRequestHttpException('Arguments validation error for action ":action": :error', [
                 ':error'  => $e->getMessage(),
