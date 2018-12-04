@@ -9,12 +9,10 @@ use BetaKiller\Model\TokenInterface;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Repository\UserRepository;
 use Psr\Http\Message\ServerRequestInterface;
-use BetaKiller\Model\UserStatus;
-use BetaKiller\Repository\UserStatusRepository;
 
-abstract class AbstractVerificationEmailService
+abstract class AbstractRecoveryAccessService
 {
-    public const NOTIFICATION_NAME = 'preregistration/verification/email';
+    public const NOTIFICATION_NAME = 'preregistration/recovery-access';
 
     /**
      * @var \BetaKiller\Service\TokenService
@@ -32,26 +30,18 @@ abstract class AbstractVerificationEmailService
     private $userRepo;
 
     /**
-     * @var \BetaKiller\Repository\UserStatusRepository
-     */
-    private $accStatusRepo;
-
-    /**
-     * @param \BetaKiller\Helper\NotificationHelper       $notificationHelper
-     * @param \BetaKiller\Service\TokenService            $tokenService
-     * @param \BetaKiller\Repository\UserStatusRepository $accStatusRepo
-     * @param \BetaKiller\Repository\UserRepository       $userRepo
+     * @param \BetaKiller\Helper\NotificationHelper $notificationHelper
+     * @param \BetaKiller\Service\TokenService      $tokenService
+     * @param \BetaKiller\Repository\UserRepository $userRepo
      */
     public function __construct(
         NotificationHelper $notificationHelper,
         TokenService $tokenService,
-        UserStatusRepository $accStatusRepo,
         UserRepository $userRepo
     ) {
-        $this->tokenService  = $tokenService;
-        $this->notification  = $notificationHelper;
-        $this->userRepo      = $userRepo;
-        $this->accStatusRepo = $accStatusRepo;
+        $this->tokenService = $tokenService;
+        $this->notification = $notificationHelper;
+        $this->userRepo     = $userRepo;
     }
 
     /**
@@ -76,21 +66,6 @@ abstract class AbstractVerificationEmailService
      * @return array
      */
     abstract protected function getEmailData(ServerRequestInterface $request, UserInterface $userModel): array;
-
-    /**
-     * @param \BetaKiller\Model\UserInterface $userModel
-     *
-     * @throws \BetaKiller\Exception\DomainException
-     * @throws \BetaKiller\Repository\RepositoryException
-     */
-    public function confirm(UserInterface $userModel): void
-    {
-        if (!$userModel->isEmailConfirmed()) {
-            $statusConfirmed = $this->accStatusRepo->getByCodename(UserStatus::STATUS_CONFIRMED);
-            $userModel->setStatus($statusConfirmed);
-            $this->userRepo->save($userModel);
-        }
-    }
 
     /**
      * @param \Psr\Http\Message\ServerRequestInterface $request
