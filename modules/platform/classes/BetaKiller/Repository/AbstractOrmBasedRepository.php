@@ -27,7 +27,7 @@ abstract class AbstractOrmBasedRepository extends AbstractRepository
     /**
      * @param string $id
      *
-     * @return ExtendedOrmInterface|mixed
+     * @return ExtendedOrmInterface|AbstractEntityInterface|mixed
      * @throws \BetaKiller\Repository\RepositoryException
      */
     public function findById(string $id)
