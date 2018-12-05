@@ -122,7 +122,17 @@ abstract class ORM extends Utils\Kohana\ORM implements ExtendedOrmInterface
 
     /**
      * @param string $name
-     * @param OrmInterface[]  $newModels
+     *
+     * @return OrmInterface[]|AbstractEntityInterface[]|mixed[]
+     */
+    protected function getAllRelated(string $name): array
+    {
+        return $this->getRelation($name)->get_all();
+    }
+
+    /**
+     * @param string         $name
+     * @param OrmInterface[]|AbstractEntityInterface[]|mixed[] $newModels
      */
     protected function mergeRelatedModels(string $name, array $newModels): void
     {
