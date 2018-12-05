@@ -39,7 +39,6 @@ abstract class AbstractConfigBasedDispatchableRepository extends AbstractPredefi
      * @param string $id
      *
      * @return mixed
-     * @throws \BetaKiller\Repository\RepositoryException
      */
     public function findById(string $id)
     {
@@ -48,16 +47,38 @@ abstract class AbstractConfigBasedDispatchableRepository extends AbstractPredefi
     }
 
     /**
+     * @param string $id
+     *
+     * @return mixed
+     * @throws \BetaKiller\Repository\RepositoryException
+     */
+    public function getById(string $id)
+    {
+        // Codename is ID
+        return $this->getByCodename($id);
+    }
+
+    /**
      * @param string $name
      *
      * @return ConfigBasedDispatchableEntityInterface|mixed
-     * @throws \BetaKiller\Repository\RepositoryException
      */
     public function findByCodename(string $name)
     {
         $name = ucfirst($name);
 
-        $item = $this->items[$name] ?? null;
+        return $this->items[$name] ?? null;
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return ConfigBasedDispatchableEntityInterface|mixed
+     * @throws \BetaKiller\Repository\RepositoryException
+     */
+    public function getByCodename(string $name)
+    {
+        $item = $this->findByCodename($name);
 
         if (!$item) {
             throw new RepositoryException('Can not find item [:name] in repository :repo', [
@@ -117,7 +138,7 @@ abstract class AbstractConfigBasedDispatchableRepository extends AbstractPredefi
         $key = $this->getUrlKeyName();
 
         if ($key === ConfigBasedDispatchableEntityInterface::URL_KEY_CODENAME) {
-            return $this->findByCodename($value);
+            return $this->getByCodename($value);
         }
 
         return $this->findOneByOptionValue($key, $value);
