@@ -112,7 +112,7 @@ class UserService
         $user = $this->userRepository->searchBy($cliUserName);
 
         if (!$user) {
-            $user = $this->createUser($cliUserName, $email)
+            $user = $this->createUser($cliUserName, $email, '127.0.0.1')
                 ->setFirstName('Minion')
                 ->setLastName('Server');
         }
