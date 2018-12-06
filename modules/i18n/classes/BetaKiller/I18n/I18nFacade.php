@@ -77,7 +77,7 @@ final class I18nFacade
 
     private function init(): void
     {
-        $this->languages = $this->langRepo->getAllSystem();
+        $this->languages = $this->langRepo->getAppLanguages();
 
         if (!$this->languages) {
             throw new \RuntimeException('Define languages first and import them via import:languages task');

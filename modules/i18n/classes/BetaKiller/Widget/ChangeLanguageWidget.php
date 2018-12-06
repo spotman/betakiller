@@ -47,7 +47,7 @@ class ChangeLanguageWidget extends AbstractPublicWidget
 
         $links = [];
 
-        foreach ($this->languageRepo->getAllSystem() as $lang) {
+        foreach ($this->languageRepo->getAppLanguages() as $lang) {
             $params = $urlHelper->createUrlContainer()->setEntity($lang);
             $url    = $urlHelper->makeUrl($element, $params, false);
 

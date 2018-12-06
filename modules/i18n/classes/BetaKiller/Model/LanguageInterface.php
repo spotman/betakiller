@@ -53,12 +53,22 @@ interface LanguageInterface extends DispatchableEntityInterface, I18nKeyModelInt
     /**
      * @return \BetaKiller\Model\LanguageInterface
      */
-    public function markAsSystem(): LanguageInterface;
+    public function markAsApp(): LanguageInterface;
 
     /**
      * @return \BetaKiller\Model\LanguageInterface
      */
-    public function markAsNonSystem(): LanguageInterface;
+    public function markAsNonApp(): LanguageInterface;
+
+    /**
+     * @return \BetaKiller\Model\LanguageInterface
+     */
+    public function markAsDev(): LanguageInterface;
+
+    /**
+     * @return \BetaKiller\Model\LanguageInterface
+     */
+    public function markAsNonDev(): LanguageInterface;
 
     /**
      * @return bool
@@ -68,5 +78,10 @@ interface LanguageInterface extends DispatchableEntityInterface, I18nKeyModelInt
     /**
      * @return bool
      */
-    public function isSystem(): bool;
+    public function isApp(): bool;
+
+    /**
+     * @return bool
+     */
+    public function isDev(): bool;
 }
