@@ -14,7 +14,7 @@ use BetaKiller\Repository\UserStatusRepository;
 
 abstract class AbstractVerificationEmailService
 {
-    public const NOTIFICATION_NAME = 'verification/email';
+    public const NOTIFICATION_NAME = 'preregistration/verification/email';
 
     /**
      * @var \BetaKiller\Service\TokenService

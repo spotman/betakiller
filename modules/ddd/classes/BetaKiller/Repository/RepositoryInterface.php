@@ -17,6 +17,14 @@ interface RepositoryInterface
     public function findById(string $id);
 
     /**
+     * @param string $id
+     *
+     * @return mixed
+     * @throws \BetaKiller\Repository\RepositoryException
+     */
+    public function getById(string $id);
+
+    /**
      * @return \BetaKiller\Model\AbstractEntityInterface[]
      */
     public function getAll(): array;
@@ -30,12 +38,14 @@ interface RepositoryInterface
 
     /**
      * @param $entity
+     *
      * @throws \BetaKiller\Repository\RepositoryException
      */
     public function save($entity): void;
 
     /**
      * @param $entity
+     *
      * @throws \BetaKiller\Repository\RepositoryException
      */
     public function delete($entity): void;
