@@ -30,9 +30,11 @@ interface LanguageRepositoryInterface extends DispatchableRepositoryInterface
     public function findByIsoCode(string $name): ?LanguageInterface;
 
     /**
+     * @param bool|null $includeDev
+     *
      * @return \BetaKiller\Model\LanguageInterface[]
      */
-    public function getAllSystem(): array;
+    public function getAppLanguages(bool $includeDev = null): array;
 
     /**
      * @param string $locale

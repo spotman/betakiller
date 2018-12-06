@@ -47,6 +47,8 @@ class GroupListIFace extends AbstractAdminIFace
      *
      * @param \BetaKiller\Repository\NotificationGroupRepository $groupRepo
      * @param \BetaKiller\Config\NotificationConfigInterface     $config
+     * @param \BetaKiller\Notification\NotificationFacade        $facade
+     * @param \BetaKiller\Repository\LanguageRepositoryInterface $langRepo
      * @param \BetaKiller\Notification\MessageRendererInterface  $messageRenderer
      */
     public function __construct(
@@ -126,7 +128,7 @@ class GroupListIFace extends AbstractAdminIFace
 
     private function checkMessageTemplates(string $messageCodename): array
     {
-        $languages  = $this->langRepo->getAll();
+        $languages  = $this->langRepo->getAppLanguages(true);
         $transports = $this->facade->getTransports();
 
         $data = [];

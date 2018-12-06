@@ -62,7 +62,7 @@ abstract class AbstractItemIFace extends AbstractAdminIFace
         /** @var I18nKeyModelInterface $key */
         $key = ServerRequestHelper::getEntity($request, I18nKeyModelInterface::class);
 
-        $languages = $this->langRepo->getAllSystem();
+        $languages = $this->langRepo->getAppLanguages(true);
         $isPlural  = $key->isPlural();
 
         return [

@@ -69,16 +69,22 @@ final class LanguageRepository extends AbstractI18nKeyRepository implements Lang
     }
 
     /**
+     * @param bool|null $includeDev
+     *
      * @return \BetaKiller\Model\Language[]
      * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\Repository\RepositoryException
      */
-    public function getAllSystem(): array
+    public function getAppLanguages(bool $includeDev = null): array
     {
         $orm = $this->getOrmInstance();
 
+        if (!$includeDev) {
+            $this->filterDev($orm, false);
+        }
+
         return $this
-            ->filterSystem($orm)
+            ->filterApp($orm)
             ->findAll($orm);
     }
 
@@ -87,7 +93,7 @@ final class LanguageRepository extends AbstractI18nKeyRepository implements Lang
      */
     public function getDefaultLanguage(): LanguageInterface
     {
-        foreach ($this->getAllSystem() as $lang) {
+        foreach ($this->getAppLanguages() as $lang) {
             if ($lang->isDefault()) {
                 return $lang;
             }
@@ -104,7 +110,7 @@ final class LanguageRepository extends AbstractI18nKeyRepository implements Lang
         $lang->markAsDefault();
 
         // Remove flag from current language (if exists)
-        foreach ($this->getAllSystem() as $model) {
+        foreach ($this->getAppLanguages() as $model) {
             if ($model->isDefault()) {
                 $model->markAsNonDefault();
                 $this->save($model);
@@ -147,9 +153,23 @@ final class LanguageRepository extends AbstractI18nKeyRepository implements Lang
      *
      * @return \BetaKiller\Repository\LanguageRepository
      */
-    private function filterSystem(ExtendedOrmInterface $orm): self
+    private function filterApp(ExtendedOrmInterface $orm): self
     {
-        $orm->where(Language::TABLE_FIELD_IS_SYSTEM, '=', 1);
+        $orm->where(Language::TABLE_FIELD_IS_APP, '=', 1);
+
+        return $this;
+    }
+
+    /**
+     * @param \BetaKiller\Model\ExtendedOrmInterface $orm
+     *
+     * @param bool                                   $value
+     *
+     * @return \BetaKiller\Repository\LanguageRepository
+     */
+    private function filterDev(ExtendedOrmInterface $orm, bool $value): self
+    {
+        $orm->where(Language::TABLE_FIELD_IS_DEV, '=', $value);
 
         return $this;
     }

@@ -10,7 +10,8 @@ class Language extends \ORM implements LanguageInterface
     public const TABLE_NAME             = 'languages';
     public const TABLE_FIELD_ISO_CODE   = 'iso_code';
     public const TABLE_FIELD_LOCALE     = 'locale';
-    public const TABLE_FIELD_IS_SYSTEM  = 'is_system';
+    public const TABLE_FIELD_IS_APP     = 'is_app';
+    public const TABLE_FIELD_IS_DEV     = 'is_dev';
     public const TABLE_FIELD_IS_DEFAULT = 'is_default';
     public const TABLE_FIELD_I18N       = 'i18n';
 
@@ -45,15 +46,19 @@ class Language extends \ORM implements LanguageInterface
     public function rules(): array
     {
         return [
-            self::TABLE_FIELD_ISO_CODE  => [
+            self::TABLE_FIELD_ISO_CODE => [
                 ['not_empty'],
                 ['max_length', [':value', 8]],
             ],
-            self::TABLE_FIELD_LOCALE    => [
+            self::TABLE_FIELD_LOCALE   => [
                 ['not_empty'],
                 ['max_length', [':value', 8]],
             ],
-            self::TABLE_FIELD_IS_SYSTEM => [
+            self::TABLE_FIELD_IS_APP   => [
+                ['not_empty'],
+                ['max_length', [':value', 1]],
+            ],
+            self::TABLE_FIELD_IS_DEV   => [
                 ['not_empty'],
                 ['max_length', [':value', 1]],
             ],
@@ -127,25 +132,49 @@ class Language extends \ORM implements LanguageInterface
     /**
      * @return \BetaKiller\Model\LanguageInterface
      */
-    public function markAsSystem(): LanguageInterface
+    public function markAsApp(): LanguageInterface
     {
-        return $this->markSystem(true);
+        return $this->markApp(true);
     }
 
     /**
      * @return \BetaKiller\Model\LanguageInterface
      */
-    public function markAsNonSystem(): LanguageInterface
+    public function markAsNonApp(): LanguageInterface
     {
-        return $this->markSystem(false);
+        return $this->markApp(false);
+    }
+
+    /**
+     * @return \BetaKiller\Model\LanguageInterface
+     */
+    public function markAsDev(): LanguageInterface
+    {
+        return $this->markDev(true);
+    }
+
+    /**
+     * @return \BetaKiller\Model\LanguageInterface
+     */
+    public function markAsNonDev(): LanguageInterface
+    {
+        return $this->markDev(false);
     }
 
     /**
      * @return bool
      */
-    public function isSystem(): bool
+    public function isApp(): bool
     {
-        return (bool)$this->get(self::TABLE_FIELD_IS_SYSTEM);
+        return (bool)$this->get(self::TABLE_FIELD_IS_APP);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isDev(): bool
+    {
+        return (bool)$this->get(self::TABLE_FIELD_IS_DEV);
     }
 
     /**
@@ -173,9 +202,21 @@ class Language extends \ORM implements LanguageInterface
      *
      * @return \BetaKiller\Model\LanguageInterface
      */
-    private function markSystem(bool $value): LanguageInterface
+    private function markApp(bool $value): LanguageInterface
     {
-        $this->set(self::TABLE_FIELD_IS_SYSTEM, (int)$value);
+        $this->set(self::TABLE_FIELD_IS_APP, (int)$value);
+
+        return $this;
+    }
+
+    /**
+     * @param bool $value
+     *
+     * @return \BetaKiller\Model\LanguageInterface
+     */
+    private function markDev(bool $value): LanguageInterface
+    {
+        $this->set(self::TABLE_FIELD_IS_DEV, (int)$value);
 
         return $this;
     }
