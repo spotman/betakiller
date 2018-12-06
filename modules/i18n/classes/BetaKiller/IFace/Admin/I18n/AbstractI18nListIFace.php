@@ -54,7 +54,7 @@ abstract class AbstractI18nListIFace extends AbstractAdminIFace
 
         // Allow filtering for one language
         $filterLang = $filterLangName
-            ? $this->langRepo->findByName($filterLangName)
+            ? $this->langRepo->findByIsoCode($filterLangName)
             : null;
 
         return [
@@ -72,11 +72,11 @@ abstract class AbstractI18nListIFace extends AbstractAdminIFace
         $langList = [];
 
         foreach ($this->langRepo->getAll() as $lang) {
-            $langName = $lang->getName();
+            $langName = $lang->getIsoCode();
 
             $langList[$langName] = [
                 'label' => $lang->getLabel(),
-                'name'  => $lang->getName(),
+                'name'  => $lang->getIsoCode(),
                 'url'   => (string)$currentUri->withQuery('?filter='.$langName),
             ];
         }

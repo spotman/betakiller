@@ -60,7 +60,7 @@ class ChangeLanguageWidget extends AbstractPublicWidget
                 'label' => $lang->getLabel(),
             ];
 
-            if ($lang->getName() === $currentLangName) {
+            if ($lang->getIsoCode() === $currentLangName) {
                 \array_unshift($links, $data);
             } else {
                 $links[] = $data;

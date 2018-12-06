@@ -20,14 +20,14 @@ interface LanguageRepositoryInterface extends DispatchableRepositoryInterface
      *
      * @return \BetaKiller\Model\LanguageInterface
      */
-    public function getByName(string $name): LanguageInterface;
+    public function getByIsoCode(string $name): LanguageInterface;
 
     /**
      * @param string $name
      *
      * @return \BetaKiller\Model\LanguageInterface|null
      */
-    public function findByName(string $name): ?LanguageInterface;
+    public function findByIsoCode(string $name): ?LanguageInterface;
 
     /**
      * @return \BetaKiller\Model\LanguageInterface[]
@@ -50,4 +50,12 @@ interface LanguageRepositoryInterface extends DispatchableRepositoryInterface
      * @return \BetaKiller\Model\LanguageInterface
      */
     public function getDefaultLanguage(): LanguageInterface;
+
+    /**
+     * @param string                              $term
+     * @param \BetaKiller\Model\LanguageInterface $lang
+     *
+     * @return LanguageInterface[]
+     */
+    public function searchByTerm(string $term, LanguageInterface $lang): array;
 }

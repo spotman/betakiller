@@ -137,7 +137,7 @@ class GroupListIFace extends AbstractAdminIFace
 
             // Iterate languages next
             foreach ($languages as $language) {
-                $langName = $language->getName();
+                $langName = $language->getIsoCode();
 
                 // Make matrix
                 $data[$transportName][$langName] = $this->checkTemplate($messageCodename, $transportName, $langName);

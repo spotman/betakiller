@@ -12,19 +12,19 @@ use BetaKiller\Utils\Kohana\ORM\OrmInterface;
  * @method LanguageInterface findById(string $id)
  * @method LanguageInterface[] getAll()
  */
-final class LanguageRepository extends AbstractOrmBasedDispatchableRepository implements LanguageRepositoryInterface
+final class LanguageRepository extends AbstractI18nKeyRepository implements LanguageRepositoryInterface
 {
     /**
      * @return string
      */
     public function getUrlKeyName(): string
     {
-        return Language::TABLE_FIELD_NAME;
+        return Language::TABLE_FIELD_ISO_CODE;
     }
 
-    public function getByName(string $name): LanguageInterface
+    public function getByIsoCode(string $name): LanguageInterface
     {
-        $model = $this->findByName($name);
+        $model = $this->findByIsoCode($name);
 
         if (!$model) {
             throw new RepositoryException('Missing language with name ":value"', [
@@ -42,12 +42,12 @@ final class LanguageRepository extends AbstractOrmBasedDispatchableRepository im
      * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\Repository\RepositoryException
      */
-    public function findByName(string $name): ?LanguageInterface
+    public function findByIsoCode(string $name): ?LanguageInterface
     {
         $orm = $this->getOrmInstance();
 
         return $this
-            ->filterByName($orm, $name)
+            ->filterIsoCode($orm, $name)
             ->findOne($orm);
     }
 
@@ -56,7 +56,7 @@ final class LanguageRepository extends AbstractOrmBasedDispatchableRepository im
         $orm = $this->getOrmInstance();
 
         $model = $this
-            ->filterByLocale($orm, $locale)
+            ->filterLocale($orm, $locale)
             ->findOne($orm);
 
         if (!$model) {
@@ -93,7 +93,7 @@ final class LanguageRepository extends AbstractOrmBasedDispatchableRepository im
             }
         }
 
-        throw new RepositoryException('Missing default language');
+        throw new RepositoryException('Default language is missing');
     }
 
     /**
@@ -113,6 +113,17 @@ final class LanguageRepository extends AbstractOrmBasedDispatchableRepository im
         }
 
         $this->save($lang);
+    }
+
+    public function searchByTerm(string $term, LanguageInterface $lang): array
+    {
+        $orm = $this->getOrmInstance();
+
+        $this->filterI18nValue($orm, $term, $lang);
+
+        return $this
+            ->limit($orm, 10)
+            ->findAll($orm);
     }
 
     /**
@@ -149,9 +160,9 @@ final class LanguageRepository extends AbstractOrmBasedDispatchableRepository im
      *
      * @return \BetaKiller\Repository\LanguageRepository
      */
-    private function filterByName(ExtendedOrmInterface $orm, string $name): self
+    private function filterIsoCode(ExtendedOrmInterface $orm, string $name): self
     {
-        $orm->where(Language::TABLE_FIELD_NAME, '=', $name);
+        $orm->where(Language::TABLE_FIELD_ISO_CODE, '=', $name);
 
         return $this;
     }
@@ -162,7 +173,7 @@ final class LanguageRepository extends AbstractOrmBasedDispatchableRepository im
      *
      * @return \BetaKiller\Repository\LanguageRepository
      */
-    private function filterByLocale(ExtendedOrmInterface $orm, string $locale): self
+    private function filterLocale(ExtendedOrmInterface $orm, string $locale): self
     {
         $orm->where(Language::TABLE_FIELD_LOCALE, '=', $locale);
 
@@ -174,5 +185,10 @@ final class LanguageRepository extends AbstractOrmBasedDispatchableRepository im
         $orm->order_by($orm->object_column(Language::TABLE_FIELD_IS_DEFAULT), 'DESC');
 
         return $this;
+    }
+
+    protected function getI18nValuesColumnName(): string
+    {
+        return Language::TABLE_FIELD_I18N;
     }
 }

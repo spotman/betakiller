@@ -16,7 +16,7 @@ class I18nConfig extends AbstractConfig
      */
     public function getAllowedLanguages(): array
     {
-        return (array)$this->get([self::KEY_LANGUAGES]) ?: [LanguageInterface::NAME_EN];
+        return (array)$this->get([self::KEY_LANGUAGES]) ?: [LanguageInterface::ISO_EN];
     }
 
     public function getLoaders(): array
