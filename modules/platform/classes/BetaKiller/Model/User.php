@@ -23,6 +23,7 @@ class User extends \ORM implements UserInterface
     public const TABLE_FIELD_NOTIFY_BY_EMAIL = 'notify_by_email';
     public const TABLE_FIELD_LOGINS          = 'logins';
     public const TABLE_FIELD_LAST_LOGIN      = 'last_login';
+    public const TABLE_FIELD_CREATED_FROM_IP = 'created_from_ip';
 
     protected $allUserRolesNames = [];
 
@@ -110,6 +111,11 @@ class User extends \ORM implements UserInterface
             ],
             self::TABLE_FIELD_LAST_LOGIN      => [
                 ['max_length', [':value', 10]],
+            ],
+            self::TABLE_FIELD_CREATED_FROM_IP => [
+                ['not_empty'],
+                ['ip', [':value', true]], // Allow local IPs
+                ['max_length', [':value', 46]], // @see https://stackoverflow.com/a/7477384
             ],
         ];
     }
@@ -553,5 +559,25 @@ class User extends \ORM implements UserInterface
         return array_merge(parent::getSerializableProperties(), [
             'allUserRolesNames',
         ]);
+    }
+
+    /**
+     * @return string
+     */
+    public function getCreatedFromIP(): string
+    {
+        return (string)$this->get(self::TABLE_FIELD_CREATED_FROM_IP);
+    }
+
+    /**
+     * @param string $ip
+     *
+     * @return \BetaKiller\Model\UserInterface
+     */
+    public function setCreatedFromIP(string $ip): UserInterface
+    {
+        $this->set(self::TABLE_FIELD_CREATED_FROM_IP, $ip);
+
+        return $this;
     }
 }

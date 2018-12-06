@@ -59,4 +59,24 @@ class GuestUser extends User implements GuestUserInterface
             RoleInterface::GUEST,
         ];
     }
+
+    /**
+     * @return string
+     * @throws \BetaKiller\Exception\NotImplementedHttpException
+     */
+    public function getCreatedFromIP(): string
+    {
+        throw new NotImplementedHttpException();
+    }
+
+    /**
+     * @param string $ip
+     *
+     * @return \BetaKiller\Model\UserInterface
+     * @throws \BetaKiller\Exception\NotImplementedHttpException
+     */
+    public function setCreatedFromIP(string $ip): UserInterface
+    {
+        throw new NotImplementedHttpException();
+    }
 }
