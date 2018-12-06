@@ -38,7 +38,7 @@ abstract class AbstractI18nKeyRepository extends AbstractOrmBasedDispatchableRep
         $column = $orm->object_column($this->getI18nValuesColumnName());
 
         $regex = $lang
-            ? sprintf('"%s":"[^\"]*%s[^\"]*"', $lang->getName(), $term)
+            ? sprintf('"%s":"[^\"]*%s[^\"]*"', $lang->getIsoCode(), $term)
             : sprintf(':"[^\"]*%s', $term);
 
         $orm->where(\DB::expr('LOWER('.$column.')'), 'REGEXP', $regex);
@@ -53,7 +53,7 @@ abstract class AbstractI18nKeyRepository extends AbstractOrmBasedDispatchableRep
         $orm->where(
             $column,
             $inverse ? 'NOT LIKE' : 'LIKE',
-            '%"'.$lang->getName().'"%'
+            '%"'.$lang->getIsoCode().'"%'
         );
 
         return $this;

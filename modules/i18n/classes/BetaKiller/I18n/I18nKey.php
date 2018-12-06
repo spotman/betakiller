@@ -68,7 +68,7 @@ class I18nKey implements I18nKeyInterface, \JsonSerializable
      */
     public function getI18nValue(LanguageInterface $lang): ?string
     {
-        return $this->data[$lang->getName()] ?? null;
+        return $this->data[$lang->getIsoCode()] ?? null;
     }
 
     /**
@@ -79,7 +79,7 @@ class I18nKey implements I18nKeyInterface, \JsonSerializable
      */
     public function setI18nValue(LanguageInterface $lang, string $value): void
     {
-        $this->data[$lang->getName()] = $value;
+        $this->data[$lang->getIsoCode()] = $value;
     }
 
     /**

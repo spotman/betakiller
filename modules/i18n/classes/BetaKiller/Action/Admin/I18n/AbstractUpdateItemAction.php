@@ -104,7 +104,7 @@ class AbstractUpdateItemAction extends AbstractAction
             $langName = $i18nData[self::ARG_LANG_NAME];
             $value    = $i18nData[self::ARG_TRANSLATED_VALUE];
 
-            $lang = $this->langRepo->findByName($langName);
+            $lang = $this->langRepo->findByIsoCode($langName);
 
             if (!$lang) {
                 throw new BadRequestHttpException('Missing data for lang :name', [

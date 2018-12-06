@@ -151,7 +151,7 @@ class NotificationHelper
                 ->addTarget($this->emailTarget(
                     $debugEmail,
                     'Debug email target',
-                    LanguageInterface::NAME_EN
+                    LanguageInterface::ISO_EN
                 ));
         }
     }
