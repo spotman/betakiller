@@ -12,7 +12,7 @@ use Psr\Http\Message\ServerRequestInterface;
 
 abstract class AbstractRecoveryAccessService
 {
-    public const NOTIFICATION_NAME = 'preregistration/recovery-access';
+    public const NOTIFICATION_NAME = 'recovery-access';
 
     /**
      * @var \BetaKiller\Service\TokenService
@@ -45,9 +45,9 @@ abstract class AbstractRecoveryAccessService
     }
 
     /**
-     * @return string
+     * @return \DateInterval
      */
-    abstract protected function getTokenPeriod(): string;
+    abstract protected function getTokenPeriod(): \DateInterval;
 
     /**
      * @return string
@@ -78,7 +78,7 @@ abstract class AbstractRecoveryAccessService
      */
     public function sendEmail(ServerRequestInterface $request, UserInterface $userModel): void
     {
-        $ttl        = new \DateInterval($this->getTokenPeriod());
+        $ttl        = $this->getTokenPeriod();
         $tokenModel = $this->tokenService->create($userModel, $ttl);
         $actionUrl  = $this->getActionUrl($request, $tokenModel);
         $appUrl     = $this->getAppUrl($request);

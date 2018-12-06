@@ -14,7 +14,7 @@ use BetaKiller\Repository\UserStatusRepository;
 
 abstract class AbstractVerificationEmailService
 {
-    public const NOTIFICATION_NAME = 'preregistration/verification/email';
+    public const NOTIFICATION_NAME = 'verification/email';
 
     /**
      * @var \BetaKiller\Service\TokenService
@@ -55,9 +55,9 @@ abstract class AbstractVerificationEmailService
     }
 
     /**
-     * @return string
+     * @return \DateInterval
      */
-    abstract protected function getTokenPeriod(): string;
+    abstract protected function getTokenPeriod(): \DateInterval;
 
     /**
      * @return string
@@ -103,7 +103,7 @@ abstract class AbstractVerificationEmailService
      */
     public function sendEmail(ServerRequestInterface $request, UserInterface $userModel): void
     {
-        $ttl        = new \DateInterval($this->getTokenPeriod());
+        $ttl        = $this->getTokenPeriod();
         $tokenModel = $this->tokenService->create($userModel, $ttl);
         $actionUrl  = $this->getActionUrl($request, $tokenModel);
         $appUrl     = $this->getAppUrl($request);
