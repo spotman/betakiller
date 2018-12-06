@@ -3,25 +3,25 @@ declare(strict_types=1);
 
 namespace BetaKiller\Model;
 
-interface LanguageInterface extends DispatchableEntityInterface
+interface LanguageInterface extends DispatchableEntityInterface, I18nKeyModelInterface
 {
-    public const NAME_EN = 'en';
-    public const NAME_DE = 'de';
-    public const NAME_FR = 'fr';
-    public const NAME_IT = 'it';
-    public const NAME_RU = 'ru';
+    public const ISO_EN = 'en';
+    public const ISO_DE = 'de';
+    public const ISO_FR = 'fr';
+    public const ISO_IT = 'it';
+    public const ISO_RU = 'ru';
 
     /**
      * @param string $value
      *
      * @return \BetaKiller\Model\LanguageInterface
      */
-    public function setName(string $value): LanguageInterface;
+    public function setIsoCode(string $value): LanguageInterface;
 
     /**
      * @return string
      */
-    public function getName(): string;
+    public function getIsoCode(): string;
 
     /**
      * @param string $value
@@ -34,13 +34,6 @@ interface LanguageInterface extends DispatchableEntityInterface
      * @return string
      */
     public function getLocale(): string;
-
-    /**
-     * @param string $value
-     *
-     * @return \BetaKiller\Model\LanguageInterface
-     */
-    public function setLabel(string $value): LanguageInterface;
 
     /**
      * @return string
@@ -58,21 +51,24 @@ interface LanguageInterface extends DispatchableEntityInterface
     public function markAsNonDefault(): LanguageInterface;
 
     /**
-     * @param bool $value
-     *
      * @return \BetaKiller\Model\LanguageInterface
      */
-    public function markSystem(bool $value): LanguageInterface;
+    public function markAsApp(): LanguageInterface;
 
     /**
      * @return \BetaKiller\Model\LanguageInterface
      */
-    public function markAsSystem(): LanguageInterface;
+    public function markAsNonApp(): LanguageInterface;
 
     /**
      * @return \BetaKiller\Model\LanguageInterface
      */
-    public function markAsNonSystem(): LanguageInterface;
+    public function markAsDev(): LanguageInterface;
+
+    /**
+     * @return \BetaKiller\Model\LanguageInterface
+     */
+    public function markAsNonDev(): LanguageInterface;
 
     /**
      * @return bool
@@ -82,5 +78,10 @@ interface LanguageInterface extends DispatchableEntityInterface
     /**
      * @return bool
      */
-    public function isSystem(): bool;
+    public function isApp(): bool;
+
+    /**
+     * @return bool
+     */
+    public function isDev(): bool;
 }

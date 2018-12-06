@@ -49,7 +49,7 @@ class FilesystemI18nKeysLoader implements I18nKeysLoaderInterface
     {
         $keys = [];
 
-        foreach ($this->langRepo->getAll() as $lang) {
+        foreach ($this->langRepo->getAppLanguages(true) as $lang) {
             foreach ($this->getLangData($lang) as $keyName => $i18nValue) {
                 // Create key if not exists
                 $key = $keys[$keyName] ?? $keys[$keyName] = new I18nKey($keyName);

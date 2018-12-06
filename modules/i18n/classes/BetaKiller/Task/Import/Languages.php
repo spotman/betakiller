@@ -60,11 +60,11 @@ class Languages extends AbstractTask
         $defaultLanguage = null;
 
         foreach ($configLanguages as $langName => $locale) {
-            $model = $this->langRepo->findByName($langName);
+            $model = $this->langRepo->findByIsoCode($langName);
 
             if (!$model) {
                 $model = (new Language)
-                    ->setName($langName);
+                    ->setIsoCode($langName);
             }
 
             // First language is default

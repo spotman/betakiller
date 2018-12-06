@@ -106,7 +106,7 @@ class I18n extends AbstractTask
     public function run(): void
     {
         // Get all system languages
-        foreach ($this->langRepo->getAll() as $language) {
+        foreach ($this->langRepo->getAppLanguages(true) as $language) {
             // Iterate all filesystem keys
             foreach ($this->filesystemLoader->loadI18nKeys() as $key) {
                 $this->importKeyValue($language, $key);

@@ -15,7 +15,7 @@ trait I18nKeyOrmTrait
     public function getI18nValue(LanguageInterface $lang): ?string
     {
         foreach ($this->getRawI18nValue() as $langName => $value) {
-            if ($langName === $lang->getName()) {
+            if ($langName === $lang->getIsoCode()) {
                 return $value;
             }
         }
@@ -33,7 +33,7 @@ trait I18nKeyOrmTrait
     {
         $data = $this->getRawI18nValue();
 
-        $data[$lang->getName()] = $value;
+        $data[$lang->getIsoCode()] = $value;
 
         $this->setRawI18nValue($data);
     }

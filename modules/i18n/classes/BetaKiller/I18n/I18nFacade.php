@@ -77,14 +77,14 @@ final class I18nFacade
 
     private function init(): void
     {
-        $this->languages = $this->langRepo->getAllSystem();
+        $this->languages = $this->langRepo->getAppLanguages();
 
         if (!$this->languages) {
             throw new \RuntimeException('Define languages first and import them via import:languages task');
         }
 
         $this->languagesNames = \array_map(function (LanguageInterface $lang) {
-            return $lang->getName();
+            return $lang->getIsoCode();
         }, $this->languages);
 
         // Set default language locale as a fallback
@@ -115,7 +115,7 @@ final class I18nFacade
     public function getLanguageByName(string $lang): LanguageInterface
     {
         foreach ($this->languages as $model) {
-            if ($model->getName() === $lang) {
+            if ($model->getIsoCode() === $lang) {
                 return $model;
             }
         }
@@ -218,7 +218,7 @@ final class I18nFacade
             if (!\in_array($itemForm, $forms, true)) {
                 throw new I18nException('Unknown form ":form" for language ":lang"', [
                     ':form' => $itemForm,
-                    ':lang' => $lang->getName(),
+                    ':lang' => $lang->getIsoCode(),
                 ]);
             }
         }
