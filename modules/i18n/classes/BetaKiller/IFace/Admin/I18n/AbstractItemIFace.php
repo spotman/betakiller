@@ -62,7 +62,7 @@ abstract class AbstractItemIFace extends AbstractAdminIFace
         /** @var I18nKeyModelInterface $key */
         $key = ServerRequestHelper::getEntity($request, I18nKeyModelInterface::class);
 
-        $languages = $this->langRepo->getAll();
+        $languages = $this->langRepo->getAppLanguages(true);
         $isPlural  = $key->isPlural();
 
         return [
@@ -89,7 +89,7 @@ abstract class AbstractItemIFace extends AbstractAdminIFace
 
             $data[] = [
                 'lang'  => [
-                    'name'  => $lang->getName(),
+                    'name'  => $lang->getIsoCode(),
                     'label' => $lang->getLabel(),
                 ],
                 'value' => $key->isPlural() ? $this->getPluralItemData($lang, $value) : $value,

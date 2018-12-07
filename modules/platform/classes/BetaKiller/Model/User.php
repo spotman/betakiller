@@ -335,7 +335,7 @@ class User extends \ORM implements UserInterface
      */
     public function getLanguageName(): string
     {
-        return $this->getLanguage()->getName();
+        return $this->getLanguage()->getIsoCode();
     }
 
     /**

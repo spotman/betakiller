@@ -266,7 +266,7 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
         return $helper->emailTarget(
             \getenv('DEBUG_EMAIL_ADDRESS'),
             'Bug Hunters',
-            LanguageInterface::NAME_EN // Only English template is available for now
+            LanguageInterface::ISO_EN // Only English template is available for now
         );
     }
 
