@@ -55,13 +55,19 @@ class UserService
     /**
      * @param string      $login
      * @param string      $email
+     * @param string      $createdFromIp
      * @param null|string $password
      *
      * @return \BetaKiller\Model\UserInterface
-     * @throws \BetaKiller\Repository\RepositoryException
      * @throws \BetaKiller\Exception\ValidationException
+     * @throws \BetaKiller\Repository\RepositoryException
      */
-    public function createUser(string $login, string $email, ?string $password = null): UserInterface
+    public function createUser(
+        string $login,
+        string $email,
+        string $createdFromIp,
+        ?string $password = null
+    ): UserInterface
     {
         // Generate random password if none provided
         $password = $password ?? md5(microtime());
@@ -75,7 +81,8 @@ class UserService
             ->setCreatedAt()
             ->setUsername($login)
             ->setPassword($password)
-            ->setEmail($email);
+            ->setEmail($email)
+            ->setCreatedFromIP($createdFromIp);
 
         // Enable email notifications by default
         $model->enableEmailNotification();
@@ -105,7 +112,7 @@ class UserService
         $user = $this->userRepository->searchBy($cliUserName);
 
         if (!$user) {
-            $user = $this->createUser($cliUserName, $email)
+            $user = $this->createUser($cliUserName, $email, '8.8.8.8')
                 ->setFirstName('Minion')
                 ->setLastName('Server');
         }
