@@ -19,7 +19,7 @@ class WampRpcManagerIFace extends AbstractIFace
     {
         $urlHelper = ServerRequestHelper::getUrlHelper($request);
 
-        $testElement = $urlHelper->getUrlElementByCodename(WampRpcManagerIFace::codename());
+        $testElement = $urlHelper->getUrlElementByCodename(WampRpcRunnerIFace::codename());
         $testUrl     = $urlHelper->makeUrl($testElement, null, false);
 
         $userAgent = ServerRequestHelper::getUserAgent($request);
