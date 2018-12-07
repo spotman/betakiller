@@ -226,4 +226,16 @@ interface UserInterface extends AbstractEntityInterface, OrmInterface, Notificat
      * @return void
      */
     public function forceAuthorization(): void;
+
+    /**
+     * @return string
+     */
+    public function getCreatedFromIP(): string;
+
+    /**
+     * @param string $ip
+     *
+     * @return \BetaKiller\Model\UserInterface
+     */
+    public function setCreatedFromIP(string $ip): UserInterface;
 }
