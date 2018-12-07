@@ -58,7 +58,7 @@ class SecureHeadersMiddleware implements MiddlewareInterface
         $headers->applyOnOutput(null, false);
 
         // Do not add headers
-        $headers->auto(SecureHeaders::AUTO_ALL & ~SecureHeaders::AUTO_ADD);
+        $headers->auto(SecureHeaders::AUTO_ALL & ~(SecureHeaders::AUTO_ADD | SecureHeaders::AUTO_COOKIE_HTTPONLY));
 
         // Report URI first
         $reportUri = (string)$baseUri->withPath(CspReportHandler::URL);
