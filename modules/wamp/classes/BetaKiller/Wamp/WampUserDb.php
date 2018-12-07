@@ -4,8 +4,10 @@ declare(strict_types=1);
 namespace BetaKiller\Wamp;
 
 use BetaKiller\Auth\AuthFacade;
+use BetaKiller\Helper\CookieHelper;
 use BetaKiller\Helper\LoggerHelperTrait;
 use BetaKiller\Helper\SessionHelper;
+use BetaKiller\Session\DatabaseSessionStorage;
 use Psr\Log\LoggerInterface;
 use Thruway\Authentication\WampCraUserDbInterface;
 
@@ -29,13 +31,20 @@ class WampUserDb implements WampCraUserDbInterface
     private $logger;
 
     /**
-     * @param \BetaKiller\Auth\AuthFacade $auth
-     * @param \Psr\Log\LoggerInterface    $logger
+     * @var \BetaKiller\Helper\CookieHelper
      */
-    public function __construct(AuthFacade $auth, LoggerInterface $logger)
+    private $cookieHelper;
+
+    /**
+     * @param \BetaKiller\Auth\AuthFacade     $auth
+     * @param \BetaKiller\Helper\CookieHelper $cookieHelper
+     * @param \Psr\Log\LoggerInterface        $logger
+     */
+    public function __construct(AuthFacade $auth, CookieHelper $cookieHelper, LoggerInterface $logger)
     {
-        $this->auth   = $auth;
-        $this->logger = $logger;
+        $this->auth         = $auth;
+        $this->logger       = $logger;
+        $this->cookieHelper = $cookieHelper;
     }
 
     /**
@@ -51,7 +60,10 @@ class WampUserDb implements WampCraUserDbInterface
     public function get($authid)
     {
         try {
-            $session   = $this->auth->getSession($authid);
+            // Session cookie ei encoded
+            $sessionId = $this->cookieHelper->decodeValue(DatabaseSessionStorage::COOKIE_NAME, $authid);
+
+            $session   = $this->auth->getSession($sessionId);
             $userAgent = SessionHelper::getUserAgent($session);
 
             return $this->makeData($authid, $userAgent);
