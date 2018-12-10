@@ -3,12 +3,11 @@ declare(strict_types=1);
 
 namespace BetaKiller\Service;
 
+use BetaKiller\Factory\UrlHelperFactory;
 use BetaKiller\Helper\NotificationHelper;
-use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Model\TokenInterface;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Repository\UserRepository;
-use Psr\Http\Message\ServerRequestInterface;
 use BetaKiller\Model\UserStatus;
 use BetaKiller\Repository\UserStatusRepository;
 
@@ -37,21 +36,29 @@ abstract class AbstractVerificationEmailService
     private $accStatusRepo;
 
     /**
+     * @var \BetaKiller\Helper\UrlHelper
+     */
+    protected $urlHelper;
+
+    /**
      * @param \BetaKiller\Helper\NotificationHelper       $notificationHelper
      * @param \BetaKiller\Service\TokenService            $tokenService
      * @param \BetaKiller\Repository\UserStatusRepository $accStatusRepo
      * @param \BetaKiller\Repository\UserRepository       $userRepo
+     * @param \BetaKiller\Factory\UrlHelperFactory        $urlHelperFactory
      */
     public function __construct(
         NotificationHelper $notificationHelper,
         TokenService $tokenService,
         UserStatusRepository $accStatusRepo,
-        UserRepository $userRepo
+        UserRepository $userRepo,
+        UrlHelperFactory $urlHelperFactory
     ) {
         $this->tokenService  = $tokenService;
         $this->notification  = $notificationHelper;
         $this->userRepo      = $userRepo;
         $this->accStatusRepo = $accStatusRepo;
+        $this->urlHelper     = $urlHelperFactory->create();
     }
 
     /**
@@ -70,12 +77,11 @@ abstract class AbstractVerificationEmailService
     abstract protected function getAppEntityCodename(): string;
 
     /**
-     * @param \Psr\Http\Message\ServerRequestInterface $request
-     * @param \BetaKiller\Model\UserInterface          $userModel
+     * @param \BetaKiller\Model\UserInterface $userModel
      *
      * @return array
      */
-    abstract protected function getEmailData(ServerRequestInterface $request, UserInterface $userModel): array;
+    abstract protected function getEmailData(UserInterface $userModel): array;
 
     /**
      * @param \BetaKiller\Model\UserInterface $userModel
@@ -93,27 +99,26 @@ abstract class AbstractVerificationEmailService
     }
 
     /**
-     * @param \Psr\Http\Message\ServerRequestInterface $request
-     * @param \BetaKiller\Model\UserInterface          $userModel
+     * @param \BetaKiller\Model\UserInterface $userModel
      *
      * @throws \BetaKiller\Exception\ValidationException
      * @throws \BetaKiller\IFace\Exception\UrlElementException
      * @throws \BetaKiller\Notification\NotificationException
      * @throws \BetaKiller\Repository\RepositoryException
      */
-    public function sendEmail(ServerRequestInterface $request, UserInterface $userModel): void
+    public function sendEmail(UserInterface $userModel): void
     {
         $ttl        = $this->getTokenPeriod();
         $tokenModel = $this->tokenService->create($userModel, $ttl);
-        $actionUrl  = $this->getActionUrl($request, $tokenModel);
-        $appUrl     = $this->getAppUrl($request);
+        $actionUrl  = $this->getActionUrl($tokenModel);
+        $appUrl     = $this->getAppUrl();
 
         $emailData = [
             'action_url' => $actionUrl,
             'app_url'    => $appUrl,
         ];
 
-        $emailDataAdd = $this->getEmailData($request, $userModel);
+        $emailDataAdd = $this->getEmailData($userModel);
         if ($emailDataAdd) {
             $emailData = array_merge($emailData, $emailDataAdd);
         }
@@ -122,44 +127,39 @@ abstract class AbstractVerificationEmailService
     }
 
     /**
-     * @param \Psr\Http\Message\ServerRequestInterface $request
-     * @param \BetaKiller\Model\TokenInterface         $tokenModel
+     * @param \BetaKiller\Model\TokenInterface $tokenModel
      *
      * @return string
      * @throws \BetaKiller\IFace\Exception\UrlElementException
      */
-    private function getActionUrl(ServerRequestInterface $request, TokenInterface $tokenModel): string
+    private function getActionUrl(TokenInterface $tokenModel): string
     {
-        $urlHelper        = ServerRequestHelper::getUrlHelper($request);
-        $actionUrlElement = $urlHelper->getUrlElementByCodename($this->getActionEntityCodename());
-        $actionUrlParams  = $urlHelper->createUrlContainer()->setEntity($tokenModel);
+        $actionUrlElement = $this->urlHelper->getUrlElementByCodename($this->getActionEntityCodename());
+        $actionUrlParams  = $this->urlHelper->createUrlContainer()->setEntity($tokenModel);
 
-        return $urlHelper->makeUrl($actionUrlElement, $actionUrlParams, false);
+        return $this->urlHelper->makeUrl($actionUrlElement, $actionUrlParams, false);
     }
 
     /**
-     * @param \Psr\Http\Message\ServerRequestInterface $request
      *
      * @return string
      * @throws \BetaKiller\IFace\Exception\UrlElementException
      */
-    private function getAppUrl(ServerRequestInterface $request): string
+    private function getAppUrl(): string
     {
-        return $this->makeEntityUrl($request, $this->getAppEntityCodename());
+        return $this->makeEntityUrl($this->getAppEntityCodename());
     }
 
     /**
-     * @param \Psr\Http\Message\ServerRequestInterface $request
-     * @param string                                   $entityCodename
+     * @param string $entityCodename
      *
      * @return string
      * @throws \BetaKiller\IFace\Exception\UrlElementException
      */
-    protected function makeEntityUrl(ServerRequestInterface $request, string $entityCodename): string
+    protected function makeEntityUrl(string $entityCodename): string
     {
-        $urlHelper  = ServerRequestHelper::getUrlHelper($request);
-        $urlElement = $urlHelper->getUrlElementByCodename($entityCodename);
+        $urlElement = $this->urlHelper->getUrlElementByCodename($entityCodename);
 
-        return $urlHelper->makeUrl($urlElement);
+        return $this->urlHelper->makeUrl($urlElement);
     }
 }
