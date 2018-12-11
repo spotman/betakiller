@@ -60,8 +60,11 @@ class WampUserDb implements WampCraUserDbInterface
     public function get($authid)
     {
         try {
-            // Session cookie ei encoded
+            // Session cookie is encoded
+            $this->logger->debug('Decoding sid ":value"', [':value' => $authid]);
             $sessionId = $this->cookieHelper->decodeValue(DatabaseSessionStorage::COOKIE_NAME, $authid);
+
+            $this->logger->debug('Sid decoded to ":value"', [':value' => $sessionId]);
 
             $session   = $this->auth->getSession($sessionId);
             $userAgent = SessionHelper::getUserAgent($session);
