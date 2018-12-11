@@ -7,11 +7,13 @@ class TestWampRpcManager {
   constructor() {
     this.resultAddBeginning = false;
 
-    this.nodes           = new HtmlNodes('#testWampRpcManager');
-    this.$results        = this.nodes.get('section.results');
+    this.nodes = new HtmlNodes('#testWampRpcManager');
+    this.$results = this.nodes.get('section.results');
     this.$resultTemplate = this.nodes.get('[data-template]', this.$results);
 
-    this.nodes.getRoot()
+    const rootNode = this.nodes.getRoot();
+
+    rootNode
       .on('click', '[data-action]', function (_this) {
         return function (event) {
           event.preventDefault();
@@ -19,6 +21,7 @@ class TestWampRpcManager {
         };
       }(this));
 
+    this.testCases = rootNode.attr('data-cases').split(',');
     this.nodes.get('.userAgentOriginal').html(window.navigator.userAgent);
 
     let WampFacade = new BetakillerWampFacade();
@@ -29,7 +32,7 @@ class TestWampRpcManager {
     let action = $trigger.attr('data-action');
     switch (action) {
       case 'run':
-        this._createResult($trigger).then();
+        this._createResult($trigger.attr('data-type')).then();
         break;
 
       case 'removeResults':
@@ -45,13 +48,21 @@ class TestWampRpcManager {
     this.nodes.get('section.results').find('iframe:not([data-template])').remove();
   }
 
-  async _createResult($trigger) {
+  async _createResult(connectionType) {
+    const _this = this;
+    this.testCases.forEach(function(testCase) {
+      _this._createResultTestCase(connectionType, testCase).then();
+    });
+  }
+
+  async _createResultTestCase(connectionType, testCase) {
     let $control = this.nodes.get('section.control');
-    let query    = {
-      'connectionType': $trigger.attr('data-type'),
-      'testsQty':       this.nodes.get('[name="testsQty"]', $control).val(),
-      'qtyInPack':      this.nodes.get('[name="qtyInPack"]', $control).val(),
-      'delayPack':      this.nodes.get('[name="delayPack"]', $control).val(),
+    let query = {
+      'case': testCase,
+      'connectionType': connectionType,
+      'testsQty': this.nodes.get('[name="testsQty"]', $control).val(),
+      'qtyInPack': this.nodes.get('[name="qtyInPack"]', $control).val(),
+      'delayPack': this.nodes.get('[name="delayPack"]', $control).val(),
     };
 
     let testUrl = this.nodes.getRoot().attr('data-testUrl');
@@ -59,11 +70,11 @@ class TestWampRpcManager {
     testUrl += $.param(query);
 
     let processesQty = this.nodes.get('[name="processesQty"]', $control).val();
-    processesQty     = parseInt(processesQty);
+    processesQty = parseInt(processesQty);
     if (isNaN(processesQty)) processesQty = 0;
 
     let delayProcess = this.nodes.get('[name="delayProcess"]', $control).val();
-    delayProcess     = parseInt(delayProcess);
+    delayProcess = parseInt(delayProcess);
     if (isNaN(delayProcess)) delayProcess = 0;
 
     for (let i = 0; i < processesQty; i++) {

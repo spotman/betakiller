@@ -7,26 +7,33 @@ import TestWampRpcTestResult from './TestWampRpcTestResult';
 
 class TestWampRpcTest {
   constructor(rpcConnection) {
-    this.wampConnection = undefined;
-    this.rpcConnection  = rpcConnection;
+    this.wampConnection = null;
+    this.rpcConnection = rpcConnection;
 
-    this.testsRequestsQty  = 0;
+    this.testsRequestsQty = 0;
     this.testsResponsesQty = 0;
-    this.testsErrorsQty    = 0;
-    this.testsTotalTime    = 0;
-    this.connectionTime    = 0;
-    this.abort             = false;
+    this.testsErrorsQty = 0;
+    this.testsTotalTime = 0;
+    this.connectionTime = 0;
+    this.abort = false;
 
-    this.apiResource = 'validation';
-    this.apiMethod   = 'userEmail';
-    this.apiData     = ['qwe:testId@qew.qwe'];
+    this.apiResource = 'WampTest';
+    this.apiMethod = 'data';
+    this.nodes = new HtmlNodes('.testWampRpcTest[data-template]');
 
-    this.nodes  = new HtmlNodes('.testWampRpcTest[data-template]');
+    const rootNode = this.nodes.getRoot();
+
+    this.apiDataCase = rootNode.attr('data-case');
+
+    console.log('Test case value is ', rootNode.attr('data-case-return-value'));
+
+    this.apiDataCaseValue = JSON.parse(rootNode.attr('data-case-return-value'));
+
     this.params = {
-      'connectionType': this.nodes.getRoot().attr('data-connectionType'),
-      'testsQty':       parseInt(this.nodes.getRoot().attr('data-testsQty')),
-      'qtyInPack':      parseInt(this.nodes.getRoot().attr('data-qtyInPack')),
-      'delayPack':      parseInt(this.nodes.getRoot().attr('data-delayPack')),
+      'connectionType': rootNode.attr('data-connectionType'),
+      'testsQty': parseInt(rootNode.attr('data-testsQty')),
+      'qtyInPack': parseInt(rootNode.attr('data-qtyInPack')),
+      'delayPack': parseInt(rootNode.attr('data-delayPack')),
     };
 
     this.stopwatch = new Stopwatch();
@@ -68,7 +75,7 @@ class TestWampRpcTest {
 
   async __runTests() {
     let packsQty = this.params.testsQty / this.params.qtyInPack;
-    packsQty     = Math.ceil(packsQty);
+    packsQty = Math.ceil(packsQty);
     if (isNaN(packsQty)) packsQty = 0;
     console.log('Test. Qty packs:', packsQty);
     if (packsQty < 1) return;
@@ -151,15 +158,15 @@ class TestWampRpcTest {
   }
 
   _onWampConnectReject(data) {
-    let reason            = 'error';
-    let detailReason      = 'unknown';
+    let reason = 'error';
+    let detailReason = 'unknown';
     let reconnectionState = 'unknown';
-    let isClosedByClient  = false;
+    let isClosedByClient = false;
     if (data.hasOwnProperty('reason')) {
-      reason            = data.reason;
-      detailReason      = data.detailReason;
+      reason = data.reason;
+      detailReason = data.detailReason;
       reconnectionState = data.reconnectionState;
-      isClosedByClient  = data.isClosedByClient;
+      isClosedByClient = data.isClosedByClient;
     }
 
     if (isClosedByClient) {
@@ -198,7 +205,10 @@ class TestWampRpcTest {
 
     this.stopwatch.start('test-' + testId);
 
-    let apiData = this._createApiData(testId);
+    let apiData = {
+      case: this.apiDataCase
+    };
+
     console.log(
       `Test. Request:`,
       `Test id "${testId}".`,
@@ -206,6 +216,7 @@ class TestWampRpcTest {
       `API method "${this.apiMethod}".`,
       `API data:`, apiData
     );
+
     try {
       if (this.params.connectionType === 'wamp') {
         this.wampConnection
@@ -216,7 +227,7 @@ class TestWampRpcTest {
       } else {
         this
           .rpcConnection[this.apiResource][this.apiMethod]
-          .apply(null, this._createApiData(testId))
+          .apply(null, apiData)
           .done((response) => this._onResponse(false, testId, response))
           .fail((error) => this._onResponse(true, testId, error));
       }
@@ -225,9 +236,14 @@ class TestWampRpcTest {
     }
   }
 
-  _onResponse(isError, testId, data) {
+  _onResponse(isError, testId, responseData) {
     let testTime = this.stopwatch.stop('test-' + testId);
     console.log(`Test. Test "${testId}" time:`, testTime);
+    console.log('Checking for response data to be', this.apiDataCaseValue);
+
+    if (JSON.stringify(responseData) !== JSON.stringify(this.apiDataCaseValue)) {
+      isError = true;
+    }
 
     this.testsResponsesQty++;
     if (isError) this.testsErrorsQty++;
@@ -235,10 +251,10 @@ class TestWampRpcTest {
     let averageExecutionTime = this.testsTotalTime / this.testsRequestsQty;
 
     if (!isError) {
-      console.log('Test. Request response:', data);
+      console.log('Test. Request response:', responseData);
     } else {
-      if (data instanceof Error) data = data.message;
-      console.error('Test. Request error:', data);
+      if (responseData instanceof Error) responseData = responseData.message;
+      console.error('Test. Request error:', responseData);
     }
 
     this
@@ -252,7 +268,7 @@ class TestWampRpcTest {
         .result
         .incErrorsQty()
         .updateErrorsProgress(this.testsErrorsQty, this.params.testsQty)
-        .setError(`Request. Data: ${data}`);
+        .setError('Response data: ' + JSON.stringify(responseData));
     }
 
     if (this.testsResponsesQty >= this.params.testsQty) {
@@ -262,12 +278,6 @@ class TestWampRpcTest {
         this.wampConnection.close();
       }
     }
-  }
-
-  _createApiData(testId) {
-    return this.apiData.map((value) => {
-      return value.replace(/:testId/ig, testId);
-    });
   }
 
   _sleep(ms) {

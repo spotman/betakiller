@@ -31,7 +31,7 @@ class TestWampRpcTestWithoutFacade {
 
     this.apiResource = 'validation';
     this.apiMethod   = 'userEmail';
-    this.apiData     = ['qwe:testId@qew.qwe'];
+    this.apiData     = ['qwe:testId@qew.qweaaaa'];
 
     this.nodes  = new HtmlNodes('.testWampRpcTest[data-template]');
     this.params = {
