@@ -53,7 +53,11 @@ class I18nMiddleware implements MiddlewareInterface
     {
         $pid = Profiler::begin($request, 'Language detection');
 
-        $lang = $this->detectLang($request);
+        $langIsoCode = $this->detectLangIsoCode($request);
+
+        $lang = $langIsoCode
+            ? $this->facade->getLanguageByIsoCode($langIsoCode)
+            : $this->facade->getDefaultLanguage(); // App default language as fallback
 
         $i18n = new I18nHelper($this->facade);
         $i18n->setLang($lang);
@@ -66,12 +70,12 @@ class I18nMiddleware implements MiddlewareInterface
         return $this->cookies->set(
             $response,
             self::COOKIE_NAME,
-            $i18n->getLang(),
+            $i18n->getLang()->getIsoCode(),
             new \DateInterval(self::COOKIE_DATE_INTERVAL)
         );
     }
 
-    private function detectLang(ServerRequestInterface $request): string
+    private function detectLangIsoCode(ServerRequestInterface $request): ?string
     {
         // Check authorized user language
         $userLang = $this->detectUserLang($request);
@@ -87,8 +91,7 @@ class I18nMiddleware implements MiddlewareInterface
             return $httpLang;
         }
 
-        // App default language as fallback
-        return $this->facade->getDefaultLanguageName();
+        return null;
     }
 
     private function detectUserLang(ServerRequestInterface $request): ?string

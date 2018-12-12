@@ -5,11 +5,12 @@ use BetaKiller\Exception;
 use BetaKiller\I18n\I18nFacade;
 use BetaKiller\Model\HasI18nKeyNameInterface;
 use BetaKiller\Model\I18nKeyInterface;
+use BetaKiller\Model\LanguageInterface;
 
 class I18nHelper
 {
     /**
-     * @var string
+     * @var LanguageInterface
      */
     private $lang;
 
@@ -28,63 +29,40 @@ class I18nHelper
         $this->facade = $facade;
     }
 
-    public function getDefaultLanguageName(): string
-    {
-        return $this->facade->getDefaultLanguageName();
-    }
-
-    /**
-     * @return string[]
-     */
-    public function getAllowedLanguagesNames(): array
-    {
-        return $this->facade->getAllowedLanguagesNames();
-    }
-
-    public function getLang(): string
+    public function getLang(): LanguageInterface
     {
         return $this->lang;
     }
 
-    public function setLang(string $value): void
+    public function setLang(LanguageInterface $value): void
     {
-        // Normalize the language
-        $value = strtolower(str_replace([' ', '_'], '-', $value));
-
-        if (!$this->facade->hasLanguage($value)) {
+        if (!$this->facade->hasLanguage($value->getIsoCode())) {
             throw new Exception('Unknown language :lang, only these are allowed: :allowed', [
                 ':lang'    => $value,
-                ':allowed' => implode(', ', $this->getAllowedLanguagesNames()),
+                ':allowed' => implode(', ', $this->facade->getAllowedLanguagesIsoCodes()),
             ]);
         }
 
         $this->lang = $value;
     }
 
-    public function getLocale(): string
+    public function translateHasKeyName(HasI18nKeyNameInterface $hasKey): string
     {
-        $langName = $this->lang ?: $this->getDefaultLanguageName();
-
-        return $this->facade->getLanguageByName($langName)->getLocale();
+        return $this->facade->translateHasKeyName($this->lang, $hasKey);
     }
 
-    public function translateHasKeyName(HasI18nKeyNameInterface $hasKey, string $lang = null): string
+    public function translateKeyName(string $key, array $values = null): string
     {
-        return $this->facade->translateHasKeyName($lang ?: $this->lang, $hasKey);
+        return $this->facade->translateKeyName($this->lang, $key, $values);
     }
 
-    public function translateKeyName(string $key, array $values = null, string $lang = null): string
+    public function translateKey(I18nKeyInterface $model, array $values = null): string
     {
-        return $this->facade->translateKeyName($lang ?: $this->lang, $key, $values);
+        return $this->facade->translateKey($this->lang, $model, $values);
     }
 
-    public function translateKey(I18nKeyInterface $model, array $values = null, string $lang = null): string
+    public function pluralizeKeyName(string $key, $form, array $values = null): string
     {
-        return $this->facade->translateKey($lang, $model, $values);
-    }
-
-    public function pluralizeKeyName(string $key, $form, array $values = null, string $lang = null): string
-    {
-        return $this->facade->pluralizeKeyName($lang ?: $this->lang, $key, $form, $values);
+        return $this->facade->pluralizeKeyName($this->lang, $key, $form, $values);
     }
 }

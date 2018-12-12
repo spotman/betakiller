@@ -33,7 +33,7 @@ class ChangeLanguageWidget extends AbstractPublicWidget
     {
         $urlHelper = ServerRequestHelper::getUrlHelper($request);
 
-        $currentLangName = ServerRequestHelper::getI18n($request)->getLang();
+        $currentLang = ServerRequestHelper::getI18n($request)->getLang();
 
         $stack = ServerRequestHelper::getUrlElementStack($request);
 
@@ -60,7 +60,7 @@ class ChangeLanguageWidget extends AbstractPublicWidget
                 'label' => $lang->getLabel(),
             ];
 
-            if ($lang->getIsoCode() === $currentLangName) {
+            if ($lang->getIsoCode() === $currentLang->getIsoCode()) {
                 \array_unshift($links, $data);
             } else {
                 $links[] = $data;

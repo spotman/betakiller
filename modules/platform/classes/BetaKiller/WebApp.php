@@ -25,6 +25,8 @@ use BetaKiller\Middleware\UrlElementDispatchMiddleware;
 use BetaKiller\Middleware\UrlElementRenderMiddleware;
 use BetaKiller\Middleware\UrlHelperMiddleware;
 use BetaKiller\Middleware\UserMiddleware;
+use BetaKiller\RequestHandler\App\I18n\AddMissingTranslationRequestHandler;
+use BetaKiller\RequestHandler\App\I18n\FetchTranslationRequestHandler;
 use BetaKiller\RobotsTxt\RobotsTxtHandler;
 use BetaKiller\Security\CspReportHandler;
 use BetaKiller\Security\SecureHeadersMiddleware;
@@ -222,6 +224,10 @@ class WebApp
 
         // API HTTP gate
         $app->post('/api/v{version:\d+}/{type:.+}', ApiRequestHandler::class, 'api');
+
+        // I18n handlers
+        $app->get('/i18n/{lang}', FetchTranslationRequestHandler::class, 'i18n-fetch');
+        $app->get('/i18n/{lang}/add-missing', AddMissingTranslationRequestHandler::class, 'i18n-add-missing');
     }
 
     public function processException(\Throwable $e): ResponseInterface

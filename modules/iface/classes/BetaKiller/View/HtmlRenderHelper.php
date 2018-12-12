@@ -2,6 +2,7 @@
 namespace BetaKiller\View;
 
 use BetaKiller\Assets\StaticAssets;
+use BetaKiller\Model\LanguageInterface;
 use HTML;
 
 class HtmlRenderHelper
@@ -19,7 +20,7 @@ class HtmlRenderHelper
     private $assets;
 
     /**
-     * @var string
+     * @var LanguageInterface
      */
     private $lang;
 
@@ -171,11 +172,11 @@ class HtmlRenderHelper
         return false;
     }
 
-    public function setLang(string $lang): self
+    public function setLang(LanguageInterface $lang): self
     {
         $this->lang = $lang;
 
-        $this->meta->set('content-language', $lang);
+        $this->meta->set('content-language', $lang->getIsoCode());
 
         return $this;
     }
@@ -191,7 +192,7 @@ class HtmlRenderHelper
     public function getWrapperData(): array
     {
         return [
-            'lang'   => $this->lang,
+            'lang'   => $this->lang->getIsoCode(),
             'header' => $this->renderHeader(),
             'footer' => $this->renderFooter(),
         ];
