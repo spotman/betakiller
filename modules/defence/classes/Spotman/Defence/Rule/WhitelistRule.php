@@ -37,6 +37,7 @@ class WhitelistRule implements DefinitionRuleInterface
         return [
             ArgumentDefinitionInterface::TYPE_INTEGER,
             ArgumentDefinitionInterface::TYPE_STRING,
+            ArgumentDefinitionInterface::TYPE_BOOLEAN,
         ];
     }
 
@@ -47,7 +48,7 @@ class WhitelistRule implements DefinitionRuleInterface
      */
     public function check($value): bool
     {
-        if (!\is_int($value) && !\is_string($value)) {
+        if (!\is_int($value) && !\is_string($value) && !\is_bool($value)) {
             throw new \InvalidArgumentException;
         }
 
