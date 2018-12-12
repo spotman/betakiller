@@ -89,9 +89,11 @@ class DefaultMessageRenderer implements MessageRendererInterface
 
     public function makeSubject(NotificationMessageInterface $message, NotificationTargetInterface $target): string
     {
-        $key  = $message->getBaseI18nKey().'.subj';
-        $data = $message->getFullDataForTarget($target);
-        $lang = $target->getLanguageName();
+        $key      = $message->getBaseI18nKey().'.subj';
+        $data     = $message->getFullDataForTarget($target);
+        $langName = $target->getLanguageName();
+
+        $lang = $this->i18n->getLanguageByIsoCode($langName);
 
         $output = $this->i18n->translateKeyName($lang, $key, $data);
 

@@ -343,7 +343,7 @@ class TwigExtension extends Twig_Extension
 
     public function getCurrentLang(array $context): string
     {
-        return $this->getI18n($context)->getLang();
+        return $this->getI18n($context)->getLang()->getIsoCode();
     }
 
     /**

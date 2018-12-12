@@ -139,6 +139,11 @@ class ResponseHelper
         return self::prepareJson(self::JSON_SUCCESS, $message, $status ?? 500);
     }
 
+    public static function json(array $data, int $status = null): ResponseInterface
+    {
+        return new JsonResponse($data, $status ?? 200);
+    }
+
     private static function prepareJson(int $result, $message = null, int $status = null): ResponseInterface
     {
         $response = [
@@ -150,11 +155,6 @@ class ResponseHelper
         }
 
         return self::json($response, $status);
-    }
-
-    private static function json(array $data, int $status = null): ResponseInterface
-    {
-        return new JsonResponse($data, $status ?? 200);
     }
 
     private static function makeHeaderDate(DateTimeImmutable $dateTime): string

@@ -29,7 +29,7 @@ final class I18nFacade
     /**
      * @var string[]
      */
-    private $languagesNames;
+    private $languagesIsoCodes;
 
     /**
      * @var LanguageInterface
@@ -77,89 +77,110 @@ final class I18nFacade
 
     private function init(): void
     {
-        $this->languages = $this->langRepo->getAppLanguages();
+        foreach ($this->langRepo->getAppLanguages() as $lang) {
+            $this->languages[$lang->getIsoCode()] = $lang;
+        }
 
         if (!$this->languages) {
             throw new \RuntimeException('Define languages first and import them via import:languages task');
         }
 
-        $this->languagesNames = \array_map(function (LanguageInterface $lang) {
-            return $lang->getIsoCode();
-        }, $this->languages);
+        $this->languagesIsoCodes = \array_keys($this->languages);
 
-        // Set default language locale as a fallback
-        $this->defaultLang = $this->getLanguageByName($this->getDefaultLanguageName());
+        // First language is primary (default language is a fallback)
+        $this->defaultLang = $this->getLanguageByIsoCode($this->languagesIsoCodes[0]);
     }
 
     public function hasLanguage(string $lang): bool
     {
-        return \in_array($lang, $this->languagesNames, true);
+        return \in_array($lang, $this->languagesIsoCodes, true);
     }
 
-    public function getDefaultLanguageName(): string
+    public function getDefaultLanguage(): LanguageInterface
     {
-        // First language is primary
-        return $this->languagesNames[0];
+        return $this->defaultLang;
     }
 
-    public function getAllowedLanguagesNames(): array
+    public function getAllowedLanguagesIsoCodes(): array
     {
-        return $this->languagesNames;
+        return $this->languagesIsoCodes;
     }
 
     public function getLanguageLocale(string $lang): string
     {
-        return $this->getLanguageByName($lang)->getLocale();
+        return $this->getLanguageByIsoCode($lang)->getLocale();
     }
 
-    public function getLanguageByName(string $lang): LanguageInterface
+    public function getLanguageByIsoCode(string $isoCode): LanguageInterface
     {
-        foreach ($this->languages as $model) {
-            if ($model->getIsoCode() === $lang) {
-                return $model;
-            }
+        $lang = $this->languages[$isoCode] ?? null;
+
+        if (!$lang) {
+            throw new \LogicException(sprintf('Unknown language "%s"', $isoCode));
         }
 
-        throw new \LogicException(sprintf('Unknown language "%s"', $lang));
+        return $lang;
     }
 
     /**
      * Raw translation without placeholders and plural forms
      *
-     * @param string                                    $langName
+     * @param \BetaKiller\Model\LanguageInterface       $lang
      * @param \BetaKiller\Model\HasI18nKeyNameInterface $hasKey
      *
      * @return string
      * @throws \BetaKiller\I18n\I18nException
      */
-    public function translateHasKeyName(string $langName, HasI18nKeyNameInterface $hasKey): string
+    public function translateHasKeyName(LanguageInterface $lang, HasI18nKeyNameInterface $hasKey): string
     {
-        return $this->translateKeyName($langName, $hasKey->getI18nKeyName());
+        return $this->translateKeyName($lang, $hasKey->getI18nKeyName());
     }
 
-    public function translateKeyName(string $langName, string $keyName, array $values = null): string
+    /**
+     * @param \BetaKiller\Model\LanguageInterface $lang
+     * @param string                              $keyName
+     * @param array|null                          $values
+     *
+     * @return string
+     * @throws \BetaKiller\I18n\I18nException
+     */
+    public function translateKeyName(LanguageInterface $lang, string $keyName, array $values = null): string
     {
-        $key  = $this->getKeyByName($keyName);
-        $lang = $this->getLanguageByName($langName);
+        $key = $this->getKeyByName($keyName);
 
         $string = $this->translate($key, $lang);
 
         return $this->replacePlaceholders($string, $values);
     }
 
-    public function translateKey(string $langName, I18nKeyInterface $key, array $values = null): string
+    /**
+     * @param \BetaKiller\Model\LanguageInterface $lang
+     * @param \BetaKiller\Model\I18nKeyInterface  $key
+     * @param array|null                          $values
+     *
+     * @return string
+     */
+    public function translateKey(LanguageInterface $lang, I18nKeyInterface $key, array $values = null): string
     {
-        $lang = $this->getLanguageByName($langName);
-
         $string = $this->translate($key, $lang);
 
         return $this->replacePlaceholders($string, $values);
     }
 
-    public function pluralizeKeyName(string $langName, string $keyName, $form, array $values = null): string
+    /**
+     * @param \BetaKiller\Model\LanguageInterface $lang
+     * @param string                              $keyName
+     * @param                                     $form
+     * @param array|null                          $values
+     *
+     * @return string
+     * @throws \BetaKiller\I18n\I18nException
+     * @throws \Punic\Exception\BadArgumentType
+     * @throws \Punic\Exception\ValueNotInList
+     */
+    public function pluralizeKeyName(LanguageInterface $lang, string $keyName, $form, array $values = null): string
     {
-        $key  = $this->getKeyByName($keyName);
-        $lang = $this->getLanguageByName($langName);
+        $key = $this->getKeyByName($keyName);
 
         $string = $this->translate($key, $lang);
 
@@ -174,22 +195,18 @@ final class I18nFacade
             throw new I18nException('String ":value" is not an i18 key', [':value' => $name]);
         }
 
-        if (!$this->keysCache) {
-            foreach ($this->loader->loadI18nKeys() as $item) {
-                $this->keysCache[$item->getI18nKeyName()] = $item;
-            }
-        }
+        $keys = $this->getAllTranslationKeys();
 
-        if (!isset($this->keysCache[$name])) {
+        if (!isset($keys[$name])) {
             throw new I18nException('Missing i18n key ":name"', [':name' => $name]);
         }
 
-        return $this->keysCache[$name];
+        return $keys[$name];
     }
 
     public function pluralizeKey(string $langName, I18nKeyInterface $key, $form, array $values = null): string
     {
-        $lang = $this->getLanguageByName($langName);
+        $lang = $this->getLanguageByIsoCode($langName);
 
         // Translate key first
         $packedString = $this->translate($key, $lang);
@@ -250,18 +267,33 @@ final class I18nFacade
         return $output;
     }
 
-    private function replacePlaceholders(string $string, ?array $values): string
+    /**
+     * @return I18nKeyInterface[]
+     */
+    public function getAllTranslationKeys(): array
     {
-        if (empty($values)) {
-            return $string;
+        if (!$this->keysCache) {
+            foreach ($this->loader->loadI18nKeys() as $item) {
+                $this->keysCache[$item->getI18nKeyName()] = $item;
+            }
         }
 
-//        if ($values) {
-//            // Add prefix if does not exists
-//            $values = self::addPlaceholderPrefixToKeys($values);
-//        }
+        return $this->keysCache;
+    }
 
-        return strtr($string, array_filter($values, 'is_scalar'));
+    /**
+     * @param string                              $keyName
+     * @param \BetaKiller\Model\LanguageInterface $lang
+     */
+    public function registerMissingKey(string $keyName, LanguageInterface $lang): void
+    {
+        $e = new I18nException('Missing translation for key ":key" in lang ":lang"', [
+            ':key'    => $keyName,
+            ':locale' => $lang->getIsoCode(),
+        ]);
+
+        // Store exception with the original key as missing
+        $this->logException($this->logger, $e);
     }
 
     /**
@@ -275,29 +307,35 @@ final class I18nFacade
      */
     private function translate(I18nKeyInterface $key, LanguageInterface $lang): string
     {
-        try {
-            $value = $key->getI18nValue($lang);
+        $value = $key->getI18nValue($lang);
 
-            if (!$value) {
-                $value = $key->getI18nValue($this->defaultLang);
-            }
+        if (!$value) {
+            $value = $key->getI18nValue($this->defaultLang);
+        }
 
-            if (!$value) {
-                throw new I18nException('Missing translation for key ":key" in locale ":locale"', [
-                    ':key'    => $key->getI18nKeyName(),
-                    ':locale' => $lang->getLocale(),
-                ]);
-            }
-
-            return $value;
-        } catch (I18nException $e) {
+        if (!$value) {
             // Translated string does not exist
-            // Store exception with the original key as missing
-            $this->logException($this->logger, $e);
+            $this->registerMissingKey($key->getI18nKeyName(), $lang);
 
             // Empty string instead of a key
             return '';
         }
+
+        return $value;
+    }
+
+    private function replacePlaceholders(string $string, ?array $values): string
+    {
+        if (empty($values)) {
+            return $string;
+        }
+
+//        if ($values) {
+//            // Add prefix if does not exists
+//            $values = self::addPlaceholderPrefixToKeys($values);
+//        }
+
+        return strtr($string, array_filter($values, 'is_scalar'));
     }
 
     private function pluralize(LanguageInterface $lang, string $packedString, $form): string
