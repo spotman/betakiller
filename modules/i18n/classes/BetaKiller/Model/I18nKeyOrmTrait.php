@@ -58,7 +58,10 @@ trait I18nKeyOrmTrait
     {
         $data = (string)$this->get($this->getI18nValueColumn());
 
-        return $data ? \json_decode($data, true) : [];
+        $data = $data ? \json_decode($data, true) : [];
+        if (!is_array($data)) $data = [];
+
+        return $data;
     }
 
     private function setRawI18nValue(array $data): void

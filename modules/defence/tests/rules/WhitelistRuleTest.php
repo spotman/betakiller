@@ -45,7 +45,6 @@ class WhitelistRuleTest extends AbstractRuleTest
     public function invalidArgumentData(): array
     {
         return [
-            true,
             [],
             new \stdClass,
         ];
