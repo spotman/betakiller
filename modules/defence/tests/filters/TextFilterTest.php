@@ -19,6 +19,9 @@ class TextFilterTest extends AbstractFilterTest
             'qwerty with "double quotes"',
             "qwerty with 'single quotes'",
             'qwerty with `backtick',
+            'Groß- & Einzelhandel',
+            'Test > 5 Kg',
+            'Test < 5 Kg',
         ];
     }
 
