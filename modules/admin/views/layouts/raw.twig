@@ -1,3 +1,8 @@
+{% set dist_dir = "dist" %}
+
 {{ meta("viewport", "width=device-width, initial-scale=1.0") }}
+
+{{ csp("style", "fonts.googleapis.com") }}
+{{ csp("font-src", "fonts.gstatic.com") }}
 
 {% block content "" %}
