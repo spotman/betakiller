@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace BetaKiller\RequestHandler\App\I18n;
+namespace BetaKiller\RequestHandler\App\I18next;
 
 use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\I18n\I18nFacade;

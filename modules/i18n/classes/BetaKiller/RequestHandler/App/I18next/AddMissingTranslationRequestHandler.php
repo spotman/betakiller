@@ -1,9 +1,10 @@
 <?php
 declare(strict_types=1);
 
-namespace BetaKiller\RequestHandler\App\I18n;
+namespace BetaKiller\RequestHandler\App\I18next;
 
 use BetaKiller\Helper\ResponseHelper;
+use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\I18n\I18nFacade;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -41,10 +42,18 @@ class AddMissingTranslationRequestHandler implements RequestHandlerInterface
 
         $lang = $this->facade->getLanguageByIsoCode($langIsoCode);
 
-//        $this->facade->registerMissingKey()
+        $added = [];
 
-        // TODO: Implement handle() method.
+        foreach (ServerRequestHelper::getPost($request) as $key => $value) {
+            // PHP converts dots to underscores in POST key names
+            $key = \str_replace('_', '.', $key);
 
-        return ResponseHelper::successJson();
+            if (I18nFacade::isI18nKey($key)) {
+                $this->facade->registerMissingKey($key, $lang);
+                $added[] = $key;
+            }
+        }
+
+        return ResponseHelper::successJson($added);
     }
 }
