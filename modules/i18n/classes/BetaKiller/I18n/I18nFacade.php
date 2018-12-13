@@ -19,6 +19,7 @@ final class I18nFacade
 
     public const PLACEHOLDER_PREFIX = ':';
 
+    // TODO Remove underscore and replace all i18n keys
     private const KEY_REGEX = '/^[a-z0-9_]+(?:[\.]{1}[a-z0-9-_]+)+$/m';
 
     /**
@@ -288,8 +289,8 @@ final class I18nFacade
     public function registerMissingKey(string $keyName, LanguageInterface $lang): void
     {
         $e = new I18nException('Missing translation for key ":key" in lang ":lang"', [
-            ':key'    => $keyName,
-            ':locale' => $lang->getIsoCode(),
+            ':key'  => $keyName,
+            ':lang' => $lang->getIsoCode(),
         ]);
 
         // Store exception with the original key as missing
