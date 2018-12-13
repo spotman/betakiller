@@ -2,7 +2,7 @@
 
 {% block content %}
   {{ js('wamp/Admin/Tests/bundle/test.js') }}
-
+  {{ csp("style", "unsafe-inline") }}
 
   <div class="row">
     <div class="col s12 m6">
@@ -25,10 +25,12 @@
 
       <section class="testWampRpcTest row" style="display:none"
                data-template
-               data-connectionType="{{ connectionType }}"
-               data-testsQty="{{ testsQty }}"
-               data-qtyInPack="{{ qtyInPack }}"
-               data-delayPack="{{ delayPack }}"
+               data-case="{{ case }}"
+               data-case-return-value='{{ case_value|raw }}'
+               data-connectionType="{{ connection_type }}"
+               data-testsQty="{{ tests_qty }}"
+               data-qtyInPack="{{ qty_in_pack }}"
+               data-delayPack="{{ delay_pack }}"
       >
         <div class="card">
           <div class="card-content">

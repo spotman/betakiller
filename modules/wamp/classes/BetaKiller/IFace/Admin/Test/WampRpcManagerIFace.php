@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\IFace\Admin\Test;
 
+use BetaKiller\Api\Method\WampTest\DataApiMethod;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\IFace\AbstractIFace;
 use Psr\Http\Message\ServerRequestInterface;
@@ -19,7 +20,7 @@ class WampRpcManagerIFace extends AbstractIFace
     {
         $urlHelper = ServerRequestHelper::getUrlHelper($request);
 
-        $testElement = $urlHelper->getUrlElementByCodename(WampRpcManagerIFace::codename());
+        $testElement = $urlHelper->getUrlElementByCodename(WampRpcRunnerIFace::codename());
         $testUrl     = $urlHelper->makeUrl($testElement, null, false);
 
         $userAgent = ServerRequestHelper::getUserAgent($request);
@@ -27,6 +28,7 @@ class WampRpcManagerIFace extends AbstractIFace
         return [
             'userAgent' => $userAgent,
             'testUrl'   => $testUrl,
+            'cases'     => DataApiMethod::AVAILABLE_CASES,
         ];
     }
 }

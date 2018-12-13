@@ -16,11 +16,11 @@ class OutdatedBrowserWidget extends AbstractPublicWidget
      */
     public function getData(ServerRequestInterface $request, array $context): array
     {
-        $i18n     = ServerRequestHelper::getI18n($request);
-        $langName = $i18n->getLang();
+        $i18n = ServerRequestHelper::getI18n($request);
+        $lang = $i18n->getLang();
 
         return [
-            'lang_name' => $langName,
+            'lang_name' => $lang->getIsoCode(),
         ];
     }
 }

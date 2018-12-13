@@ -5,11 +5,14 @@ namespace BetaKiller\Wamp;
 
 use BetaKiller\Api\ApiFacade;
 use BetaKiller\Auth\AuthFacade;
-use BetaKiller\Config\WampConfig;
+use BetaKiller\Config\WampConfigInterface;
 use BetaKiller\Exception;
+use BetaKiller\Helper\CookieHelper;
 use BetaKiller\Helper\LoggerHelperTrait;
 use BetaKiller\Model\UserInterface;
+use BetaKiller\Session\DatabaseSessionStorage;
 use Psr\Log\LoggerInterface;
+use Spotman\Api\ApiMethodResponse;
 use Spotman\Api\ApiResourceProxyInterface;
 
 /**
@@ -36,20 +39,30 @@ class WampClient extends \Thruway\Peer\Client
     private $auth;
 
     /**
-     * @param \BetaKiller\Config\WampConfig $wampConfig
-     * @param \BetaKiller\Api\ApiFacade     $apiFacade
-     * @param \BetaKiller\Auth\AuthFacade   $auth
-     * @param \Psr\Log\LoggerInterface      $logger
-     *
-     * @throws \BetaKiller\Exception
+     * @var \BetaKiller\Helper\CookieHelper
      */
-    public function __construct(WampConfig $wampConfig, ApiFacade $apiFacade, AuthFacade $auth, LoggerInterface $logger)
-    {
+    private $cookieHelper;
+
+    /**
+     * @param \BetaKiller\Config\WampConfigInterface $wampConfig
+     * @param \BetaKiller\Api\ApiFacade              $apiFacade
+     * @param \BetaKiller\Auth\AuthFacade            $auth
+     * @param \BetaKiller\Helper\CookieHelper        $cookieHelper
+     * @param \Psr\Log\LoggerInterface               $logger
+     */
+    public function __construct(
+        WampConfigInterface $wampConfig,
+        ApiFacade $apiFacade,
+        AuthFacade $auth,
+        CookieHelper $cookieHelper,
+        LoggerInterface $logger
+    ) {
         parent::__construct($wampConfig->getRealmName());
 
-        $this->apiFacade = $apiFacade;
-        $this->logger    = $logger;
-        $this->auth      = $auth;
+        $this->apiFacade    = $apiFacade;
+        $this->logger       = $logger;
+        $this->auth         = $auth;
+        $this->cookieHelper = $cookieHelper;
     }
 
     /**
@@ -64,22 +77,26 @@ class WampClient extends \Thruway\Peer\Client
         ]);
     }
 
-    public function apiCallProcedure(array $arguments, \stdClass $dummy, \stdClass $options)
+    public function apiCallProcedure(array $indexedArgs, \stdClass $namedArgs, \stdClass $options)
     {
-        $sessionID = (string)$options->authid;
+        $sid = (string)$options->authid;
 
-        if (!$sessionID) {
+        if (!$sid) {
             $this->logException($this->logger, new Exception('Empty session id in wamp api call'));
 
             return null;
         }
 
+        $sessionID = $this->cookieHelper->decodeValue(DatabaseSessionStorage::COOKIE_NAME, $sid);
+
         $user = $this->auth->getUserFromSessionID($sessionID);
 
-        $resource = \array_shift($arguments);
-        $method   = \array_shift($arguments);
+        $this->logger->debug('Indexed args are :value', [':value' => \json_encode($indexedArgs)]);
+        $this->logger->debug('Named args are :value', [':value' => \json_encode($namedArgs)]);
 
-        $resource = \ucfirst($resource);
+        $resource  = \ucfirst($namedArgs->resource);
+        $method    = $namedArgs->method;
+        $arguments = (array)$namedArgs->data;
 
         $this->logger->debug('User is :name', [':name' => $user->getUsername()]);
         $this->logger->debug('Resource is :name', [':name' => $resource]);
@@ -93,11 +110,14 @@ class WampClient extends \Thruway\Peer\Client
         return $result;
     }
 
-    private function callApiMethod(string $resource, string $method, array $arguments, UserInterface $user)
-    {
+    private function callApiMethod(
+        string $resource,
+        string $method,
+        array $arguments,
+        UserInterface $user
+    ): ApiMethodResponse {
         return $this->apiFacade
             ->getResource($resource, ApiResourceProxyInterface::INTERNAL)
-            ->call($method, $arguments, $user)
-            ->getData();
+            ->call($method, $arguments, $user);
     }
 }

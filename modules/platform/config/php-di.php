@@ -70,15 +70,15 @@ return [
             });
         }),
 
-        ImplicitOptionsMiddleware::class => \DI\factory(function (StreamFactoryInterface $factory) {
+        ImplicitOptionsMiddleware::class => \DI\factory(function (ResponseFactoryInterface $factory) {
             return new ImplicitOptionsMiddleware(function () use ($factory) {
                 return $factory;
             });
         }),
 
-        MethodNotAllowedMiddleware::class => \DI\factory(function (StreamFactoryInterface $factory) {
+        MethodNotAllowedMiddleware::class => \DI\factory(function (ResponseFactoryInterface $factory) {
             return new MethodNotAllowedMiddleware(function () use ($factory) {
-                return $factory;
+                return $factory->createResponse();
             });
         }),
 

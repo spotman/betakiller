@@ -42,9 +42,11 @@ class CookieHelper
     private $secureOnly = false;
 
     /**
+     * Session ID cookie is used for WAMP auth
+     *
      * @var bool
      */
-    private $httpOnly = true;
+    private $httpOnly = false;
 
     /**
      * CookieHelper constructor.
@@ -59,10 +61,7 @@ class CookieHelper
             $this->secureOnly = true;
         }
 
-        $baseUri = $appConfig->getBaseUri();
-
-        $this->domain = $baseUri->getHost();
-//        $this->path   = $baseUri->getPath();
+        $this->domain = $appConfig->getBaseUri()->getHost();
 
         $this->signer = new Sha512();
 
@@ -112,6 +111,13 @@ class CookieHelper
                 ':ip'   => ServerRequestHelper::getIpAddress($request),
             ], 0, $e);
         }
+    }
+
+    public function decodeValue(string $name, string $value): string
+    {
+        $cookie = new Cookie($name, $value);
+
+        return $this->decode($cookie)->getValue();
     }
 
     private function getCookies(ServerRequestInterface $request): RequestCookies

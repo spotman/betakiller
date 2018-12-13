@@ -115,7 +115,7 @@ class NotificationHelper
         string $fullName,
         ?string $langName = null
     ): NotificationTargetInterface {
-        $langName = $langName ?? $this->i18n->getDefaultLanguageName();
+        $langName = $langName ?? $this->i18n->getDefaultLanguage()->getIsoCode();
 
         return new NotificationTargetEmail($email, $fullName, $langName);
     }

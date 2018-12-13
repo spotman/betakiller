@@ -330,20 +330,20 @@ class TwigExtension extends Twig_Extension
 
         if (isset($config['js'])) {
             foreach ($config['js'] as $jsFileName) {
-                $assets->addJs('/'.$jsFileName);
+                $assets->addJs($jsFileName);
             }
         }
 
         if (isset($config['css'])) {
             foreach ($config['css'] as $cssFileName) {
-                $assets->addCss('/'.$cssFileName);
+                $assets->addCss($cssFileName);
             }
         }
     }
 
     public function getCurrentLang(array $context): string
     {
-        return $this->getI18n($context)->getLang();
+        return $this->getI18n($context)->getLang()->getIsoCode();
     }
 
     /**

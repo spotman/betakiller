@@ -58,7 +58,7 @@ class SecureHeadersMiddleware implements MiddlewareInterface
         $headers->applyOnOutput(null, false);
 
         // Do not add headers
-        $headers->auto(SecureHeaders::AUTO_ALL & ~SecureHeaders::AUTO_ADD);
+        $headers->auto(SecureHeaders::AUTO_ALL & ~(SecureHeaders::AUTO_ADD | SecureHeaders::AUTO_COOKIE_HTTPONLY));
 
         // Report URI first
         $reportUri = (string)$baseUri->withPath(CspReportHandler::URL);
@@ -75,6 +75,9 @@ class SecureHeadersMiddleware implements MiddlewareInterface
         $headers->csp('script', $baseUrl);
         $headers->csp('font-src', $baseUrl);
         $headers->csp('style', 'unsafe-inline');
+
+        $headers->csp('connect-src', $baseUrl);
+        $headers->csp('connect-src', 'wss://'.$baseUri->getHost()); // For secure Websocket
 
         // TODO Inject this nonce in Request and use in StaticAssets
 //        $styleNonce  = $headers->cspNonce('style');
