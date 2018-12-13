@@ -71,7 +71,7 @@ abstract class AbstractI18nListIFace extends AbstractAdminIFace
     {
         $langList = [];
 
-        foreach ($this->langRepo->getAll() as $lang) {
+        foreach ($this->langRepo->getAppLanguages(true) as $lang) {
             $langName = $lang->getIsoCode();
 
             $langList[$langName] = [
