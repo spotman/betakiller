@@ -39,13 +39,7 @@ class TextFilter extends AbstractFilterVarFilter
             throw new \InvalidArgumentException;
         }
 
-        $value = str_replace(["\0", "\t"], '', $value);
-
-        $value = $this->filterVar(
-            $value,
-            \FILTER_SANITIZE_STRING,
-            \FILTER_FLAG_STRIP_HIGH + \FILTER_FLAG_NO_ENCODE_QUOTES
-        );
+        $value = strip_tags(str_replace(["\0", "\t"], '', $value));
 
         if ($value === null) {
             throw new \InvalidArgumentException;
