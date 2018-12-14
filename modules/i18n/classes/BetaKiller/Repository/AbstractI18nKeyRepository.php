@@ -40,13 +40,19 @@ abstract class AbstractI18nKeyRepository extends AbstractOrmBasedDispatchableRep
         return $this->getAll();
     }
 
-    protected function filterI18nValue(ExtendedOrmInterface $orm, string $term, LanguageInterface $lang = null)
+    protected function filterI18nValue(ExtendedOrmInterface $orm, string $term, LanguageInterface $lang = null, bool $exact = null)
     {
         $column = $orm->object_column($this->getI18nValuesColumnName());
 
-        $regex = $lang
-            ? sprintf('"%s":"[^\"]*%s[^\"]*"', $lang->getIsoCode(), $term)
-            : sprintf(':"[^\"]*%s', $term);
+        $term = \mb_strtolower($term);
+
+        $regex = $exact
+            ? sprintf(':"%s"', $term)
+            : sprintf(':"[^"]*%s', $term);
+
+        if ($lang) {
+            $regex = sprintf('"%s"', $lang->getIsoCode()).$regex;
+        }
 
         $orm->where(\DB::expr('LOWER('.$column.')'), 'REGEXP', $regex);
 
