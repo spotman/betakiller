@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <root>
     <iface uri="notifications" name="Admin_Notification_Index" parent="Admin_Index" zone="admin" label="Notification"
-           menu="admin">
+           menu="admin" entity="NotificationGroup" entityAction="list">
 
-        <iface uri="groups" name="Admin_Notification_GroupList" label="Groups" menu="admin">
+        <iface uri="groups" name="Admin_Notification_GroupList" label="Groups" menu="admin" entity="NotificationGroup"
+               entityAction="list">
             <iface uri="{NotificationGroup.codename}" name="Admin_Notification_GroupItem"
                    label="{NotificationGroup.codename}" entity="NotificationGroup" entityAction="read"/>
         </iface>
