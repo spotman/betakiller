@@ -39,11 +39,7 @@ class StringFilter extends AbstractFilterVarFilter
             throw new \InvalidArgumentException;
         }
 
-        $value = $this->filterVar(
-            $value,
-            \FILTER_SANITIZE_STRING,
-            \FILTER_FLAG_STRIP_LOW + \FILTER_FLAG_STRIP_HIGH + \FILTER_FLAG_NO_ENCODE_QUOTES
-        );
+        $value = strip_tags(str_replace(["\0", "\t", "\r", "\n"], '', $value));
 
         if ($value === null) {
             throw new \InvalidArgumentException;

@@ -20,7 +20,7 @@ final class I18nFacade
     public const PLACEHOLDER_PREFIX = ':';
 
     // TODO Remove underscore and replace all i18n keys
-    private const KEY_REGEX = '/^[a-z0-9_]+(?:[\.]{1}[a-z0-9-_]+)+$/m';
+    private const KEY_REGEX = '/^[a-z0-9_-]+(?:[\.]{1}[a-z0-9-_]+)+$/m';
 
     /**
      * @var \BetaKiller\Model\LanguageInterface[]

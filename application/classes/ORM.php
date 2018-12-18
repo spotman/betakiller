@@ -85,17 +85,28 @@ abstract class ORM extends Utils\Kohana\ORM implements ExtendedOrmInterface
     }
 
     /**
-     * @param string $alias
+     * @param string    $alias
+     * @param bool|null $isNullable
      *
      * @return mixed
      */
-    protected function getRelatedEntity(string $alias)
+    protected function getRelatedEntity(string $alias, bool $isNullable = null)
     {
         $entity = $this->getRelation($alias);
 
-        if (!$this->loaded() || !$entity->loaded()) {
+        if (!$entity->loaded()) {
+            if ($isNullable) {
+                return null;
+            }
+
+            if (!$this->loaded()) {
+                throw new \RuntimeException(
+                    sprintf('Entity "%s" is not loaded', $this->getModelName())
+                );
+            }
+
             throw new \RuntimeException(
-                sprintf('Related entity by alias "%s" not loaded', $alias)
+                sprintf('Related alias "%s" is not loaded in entity "%s"', $alias, $this->getModelName())
             );
         }
 
@@ -131,7 +142,7 @@ abstract class ORM extends Utils\Kohana\ORM implements ExtendedOrmInterface
     }
 
     /**
-     * @param string         $name
+     * @param string                                           $name
      * @param OrmInterface[]|AbstractEntityInterface[]|mixed[] $newModels
      */
     protected function mergeRelatedModels(string $name, array $newModels): void
