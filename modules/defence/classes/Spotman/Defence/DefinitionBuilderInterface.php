@@ -180,6 +180,13 @@ interface DefinitionBuilderInterface
     public function uppercase(): DefinitionBuilderInterface;
 
     /**
+     * @param \Spotman\Defence\ArgumentsDefinitionProviderInterface $provider
+     *
+     * @return \Spotman\Defence\DefinitionBuilderInterface
+     */
+    public function import(ArgumentsDefinitionProviderInterface $provider): DefinitionBuilderInterface;
+
+    /**
      * @return \Spotman\Defence\ArgumentDefinitionInterface[]
      */
     public function getArguments(): array;
