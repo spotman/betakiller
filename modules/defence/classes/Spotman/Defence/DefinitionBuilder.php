@@ -278,6 +278,18 @@ class DefinitionBuilder implements DefinitionBuilderInterface
     }
 
     /**
+     * @param \Spotman\Defence\ArgumentsDefinitionProviderInterface $provider
+     *
+     * @return \Spotman\Defence\DefinitionBuilderInterface
+     */
+    public function import(ArgumentsDefinitionProviderInterface $provider): DefinitionBuilderInterface
+    {
+        $provider->addArgumentsDefinition($this);
+
+        return $this;
+    }
+
+    /**
      * Filter helpers
      */
 
