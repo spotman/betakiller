@@ -200,7 +200,7 @@ class AuthFacade
      *
      * @return  string
      */
-    private function makePasswordHash($str): string
+    public function makePasswordHash(string $str): string
     {
         return hash_hmac($this->config->getHashMethod(), $str, $this->config->getHashKey());
     }
