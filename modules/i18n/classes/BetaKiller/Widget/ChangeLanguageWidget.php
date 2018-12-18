@@ -71,14 +71,7 @@ class ChangeLanguageWidget extends AbstractPublicWidget
             }
         }
 
-        $context = array_merge([
-            'style'    => '',
-            'label'    => 'code',
-            'position' => '',
-        ], $context);
-
         return [
-            'context'       => $context,
             'current_code'  => $currentCode,
             'current_label' => $currentLabel,
             'lang_list'     => $links,
