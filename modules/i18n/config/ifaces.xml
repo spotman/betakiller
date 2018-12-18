@@ -2,7 +2,8 @@
 <root>
     <action uri="change-language" name="App_I18n_ChangeLanguage" zone="public"/>
 
-    <iface uri="i18n" name="Admin_I18n_Index" parent="Admin_Index" zone="admin" menu="admin" label="Localization">
+    <iface uri="i18n" name="Admin_I18n_Index" parent="Admin_Index" zone="admin" menu="admin" label="Localization"
+           entity="TranslationKey" entityAction="list">
         <iface uri="common" name="Admin_I18n_CommonList" menu="admin" label="Common" entity="TranslationKey"
                entityAction="list">
             <iface uri="{TranslationKey.id}" name="Admin_I18n_CommonItem" label="{TranslationKey.id}"
