@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\Task\Auth;
 
+use BetaKiller\Auth\AuthFacade;
 use BetaKiller\Repository\UserRepository;
 use BetaKiller\Task\AbstractTask;
 use Psr\Log\LoggerInterface;
@@ -20,16 +21,22 @@ class ChangePassword extends AbstractTask
     private $logger;
 
     /**
+     * @var \BetaKiller\Auth\AuthFacade
+     */
+    private $authFacade;
+
+    /**
      * ChangePassword constructor.
      *
      * @param \BetaKiller\Repository\UserRepository $userRepo
      */
-    public function __construct(UserRepository $userRepo, LoggerInterface $logger)
+    public function __construct(UserRepository $userRepo, AuthFacade $authFacade, LoggerInterface $logger)
     {
         $this->userRepo = $userRepo;
         $this->logger = $logger;
 
         parent::__construct();
+        $this->authFacade = $authFacade;
     }
 
     public function defineOptions(): array
@@ -58,6 +65,8 @@ class ChangePassword extends AbstractTask
 
             return;
         }
+
+        $password = $this->authFacade->makePasswordHash($password);
 
         $user->setPassword($password);
 

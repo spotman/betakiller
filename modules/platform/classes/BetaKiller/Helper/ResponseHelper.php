@@ -136,7 +136,7 @@ class ResponseHelper
 
     public static function errorJson($message = null, int $status = null): ResponseInterface
     {
-        return self::prepareJson(self::JSON_SUCCESS, $message, $status ?? 500);
+        return self::prepareJson(self::JSON_SUCCESS, $message, $status ?? 200);
     }
 
     public static function json(array $data, int $status = null): ResponseInterface

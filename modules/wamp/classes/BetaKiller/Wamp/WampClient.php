@@ -98,12 +98,17 @@ class WampClient extends \Thruway\Peer\Client
         $method    = $namedArgs->method;
         $arguments = (array)$namedArgs->data;
 
-        $this->logger->debug('User is :name', [':name' => $user->getUsername()]);
-        $this->logger->debug('Resource is :name', [':name' => $resource]);
-        $this->logger->debug('Method is :name', [':name' => $method]);
+        $this->logger->debug('User is ":name"', [':name' => $user->getUsername()]);
+        $this->logger->debug('Resource is ":name"', [':name' => $resource]);
+        $this->logger->debug('Method is ":name"', [':name' => $method]);
         $this->logger->debug('Arguments are :value', [':value' => \json_encode($arguments)]);
 
-        $result = $this->callApiMethod($resource, $method, $arguments, $user);
+        try {
+            $result = $this->callApiMethod($resource, $method, $arguments, $user);
+        } catch (\Throwable $e) {
+            $this->logException($this->logger, $e);
+            return null;
+        }
 
         $this->logger->debug('Result is :value', [':value' => \json_encode($result)]);
 

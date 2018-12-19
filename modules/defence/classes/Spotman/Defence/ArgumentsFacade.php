@@ -143,9 +143,19 @@ class ArgumentsFacade
             throw new \InvalidArgumentException(sprintf('Missing nested data for "%s"', $argument->getName()));
         }
 
+        if (\is_object($value)) {
+            // Cast any incoming object to array for simplicity
+            $value = (array)$value;
+        }
+
         // Check for nested data type
         if (!\is_array($value)) {
-            throw new \InvalidArgumentException(sprintf('Nested data must be an array for "%s"', $argument->getName()));
+            throw new \InvalidArgumentException(sprintf(
+                'Composite value must be an array for "%s" but "%s" provided: %s',
+                $argument->getName(),
+                \gettype($value),
+                \json_encode($value)
+            ));
         }
 
         // Recursion for children definitions
@@ -159,9 +169,19 @@ class ArgumentsFacade
             throw new \InvalidArgumentException(sprintf('Missing nested data for "%s"', $argument->getName()));
         }
 
+        if (\is_object($value)) {
+            // Cast any incoming object to array for simplicity
+            $value = (array)$value;
+        }
+
         // Check for nested data type
         if (!\is_array($value)) {
-            throw new \InvalidArgumentException(sprintf('Nested data must be an array for "%s"', $argument->getName()));
+            throw new \InvalidArgumentException(sprintf(
+                'CompositeArray data must be an array for "%s" but "%s" provided: %s',
+                $argument->getName(),
+                \gettype($value),
+                \json_encode($value)
+            ));
         }
 
         $composite = $argument->getComposite();
@@ -197,7 +217,13 @@ class ArgumentsFacade
                 $value = $filter->apply($value);
             } catch (\InvalidArgumentException $e) {
                 throw new \InvalidArgumentException(
-                    \sprintf('Invalid value for "%s" after "%s" filter', $argument->getName(), $filter->getName()),
+                    \sprintf(
+                        'Invalid value for "%s" after "%s" filter with data (%s) %s',
+                        $argument->getName(),
+                        $filter->getName(),
+                        \gettype($value),
+                        \json_encode($value)
+                    ),
                     $e->getCode(),
                     $e
                 );
@@ -218,7 +244,13 @@ class ArgumentsFacade
         foreach ($argument->getRules() as $rule) {
             if (!$rule->check($value)) {
                 throw new \InvalidArgumentException(
-                    \sprintf('Invalid value for "%s" reported by "%s"', $argument->getName(), $rule->getName())
+                    \sprintf(
+                        'Invalid value for "%s" reported by "%s" rule with data (%s) %s',
+                        $argument->getName(),
+                        $rule->getName(),
+                        \gettype($value),
+                        \json_encode($value)
+                    )
                 );
             }
         }

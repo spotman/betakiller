@@ -11,7 +11,7 @@
 
     <!-- TODO вынести это всё в файл config/ifaces.php, который добавляет элементы в UrlElementTree::admin() -->
     <iface uri="errors" name="Admin_Error_Index" parent="Admin_Index" title="Admin | Errors" label="Errors"
-           menu="admin">
+           menu="admin" zone="developer">
         <iface uri="php-exceptions" name="Admin_Error_UnresolvedPhpExceptionIndex"
                title="Admin | Unresolved PhpExceptions" label="Unresolved" entity="PhpException"
                entityAction="listUnresolved" menu="admin">
@@ -25,7 +25,7 @@
     </iface>
 
     <iface uri="php-exceptions" name="Admin_Test_PhpExceptionIndex" parent="Admin_Test_Index" label="Php Exception"
-           entity="PhpException" entityAction="test" menu="admin">
+           entity="PhpException" entityAction="test" menu="admin" zone="developer">
         <iface uri="500" name="Admin_Test_PhpExceptionHttp500" label="HTTP 500 test"/>
         <iface uri="logger" name="Admin_Test_PhpExceptionLogger" label="Logger test"/>
     </iface>

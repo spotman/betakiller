@@ -6,6 +6,7 @@ namespace BetaKiller\Middleware;
 use BetaKiller\Dev\DebugBarCookiesDataCollector;
 use BetaKiller\Dev\DebugBarHttpDriver;
 use BetaKiller\Dev\DebugBarSessionDataCollector;
+use BetaKiller\Dev\DebugBarUserDataCollector;
 use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\Helper\CookieHelper;
 use BetaKiller\Helper\ServerRequestHelper;
@@ -64,6 +65,7 @@ class DebugMiddleware implements MiddlewareInterface
      *
      * @param \BetaKiller\Helper\AppEnvInterface         $appEnv
      * @param \BetaKiller\Helper\CookieHelper            $cookieHelper
+     * @param \BetaKiller\Service\UserService            $userService
      * @param \Psr\Http\Message\ResponseFactoryInterface $responseFactory
      * @param \Psr\Http\Message\StreamFactoryInterface   $streamFactory
      * @param \BetaKiller\Log\LoggerInterface            $logger
@@ -125,12 +127,16 @@ class DebugMiddleware implements MiddlewareInterface
         // Fetch actual session
         $session = ServerRequestHelper::getSession($request);
 
+        // Fetch actual user
+        $user = ServerRequestHelper::getUser($request);
+
         // Initialize http driver
         $httpDriver = new DebugBarHttpDriver($session);
         $debugBar->setHttpDriver($httpDriver);
 
         $debugBar
             ->addCollector(new TimeDataCollector($startTime))
+            ->addCollector(new DebugBarUserDataCollector($user))
             ->addCollector(new DebugBarSessionDataCollector($session))
             ->addCollector(new DebugBarCookiesDataCollector($this->cookieHelper, $request))
             ->addCollector(new MemoryCollector());
