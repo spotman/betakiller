@@ -394,7 +394,7 @@ task('maintenance:off', function () {
  */
 task('import:roles', function () {
     runMinionTask('importRoles');
-})->desc('Import localization data');
+})->desc('Import ACL roles data');
 
 task('import:zones', function () {
     runMinionTask('importZones');
@@ -407,7 +407,7 @@ task('import:i18n', function () {
 
 task('import:notification', function () {
     runMinionTask('notification:importGroups');
-})->desc('Import localization data');
+})->desc('Import notifications data');
 
 /**
  * Success message
