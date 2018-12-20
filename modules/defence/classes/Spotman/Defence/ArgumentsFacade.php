@@ -40,17 +40,15 @@ class ArgumentsFacade
             return $requestArguments;
         }
 
-        // Using named arguments already, skip processing
-        if (\is_string(key($requestArguments))) {
-            return $requestArguments;
-        }
-
         $namedArguments = [];
 
         foreach ($definition->getArguments() as $position => $argument) {
             $name = $argument->getName();
 
-            if (array_key_exists($position, $requestArguments)) {
+            // Check for named arguments first, indexed arguments next and process optional values as a fallback
+            if (array_key_exists($name, $requestArguments)) {
+                $namedArguments[$name] = $requestArguments[$name];
+            } elseif (array_key_exists($position, $requestArguments)) {
                 $namedArguments[$name] = $requestArguments[$position];
             } elseif ($argument->isOptional()) {
                 $namedArguments[$name] = $argument->getDefaultValue();

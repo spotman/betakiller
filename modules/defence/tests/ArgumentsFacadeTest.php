@@ -53,6 +53,33 @@ class ArgumentsFacadeTest extends AbstractDefenceTest
         $this->assertEquals(['a' => $value], $result->getAll());
     }
 
+    public function testUnknown(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        $def = $this->def()->bool('a');
+
+        $this->getFacade()->prepareArguments(['a' => true, 'b' => false], $def);
+    }
+
+    public function testIndexed(): void
+    {
+        $def = $this->def()
+            ->string('s')
+            ->int('i')
+            ->bool('b');
+
+        $expected = [
+            's' => 'asd',
+            'i' => 100,
+            'b' => true
+        ];
+
+        $arguments = $this->getFacade()->prepareArguments(\array_values($expected), $def);
+
+        $this->assertEquals($expected, $arguments->getAll());
+    }
+
     /**
      * @param \Spotman\Defence\DefinitionBuilderInterface $def
      * @param                                             $value
