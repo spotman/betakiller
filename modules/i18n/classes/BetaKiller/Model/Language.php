@@ -106,11 +106,13 @@ class Language extends \ORM implements LanguageInterface
     }
 
     /**
+     * @param \BetaKiller\Model\LanguageInterface $lang
+     *
      * @return string
      */
-    public function getLabel(): string
+    public function getLabel(LanguageInterface $lang = null): string
     {
-        return (string)$this->getI18nValue($this) ?: (string)$this->getAnyI18nValue();
+        return (string)$this->getI18nValue($lang ?? $this) ?: (string)$this->getAnyI18nValue();
     }
 
     /**

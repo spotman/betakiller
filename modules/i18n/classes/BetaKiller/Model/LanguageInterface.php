@@ -36,9 +36,11 @@ interface LanguageInterface extends DispatchableEntityInterface, I18nKeyModelInt
     public function getLocale(): string;
 
     /**
+     * @param \BetaKiller\Model\LanguageInterface|null $lang
+     *
      * @return string
      */
-    public function getLabel(): string;
+    public function getLabel(LanguageInterface $lang = null): string;
 
     /**
      * @return \BetaKiller\Model\LanguageInterface

@@ -3,7 +3,6 @@ namespace BetaKiller\Repository;
 
 use BetaKiller\Model\ExtendedOrmInterface;
 use BetaKiller\Model\RoleInterface;
-use BetaKiller\Model\User;
 use BetaKiller\Model\UserInterface;
 
 /**
@@ -14,13 +13,13 @@ use BetaKiller\Model\UserInterface;
  * @method UserInterface findById(string $id)
  * @method UserInterface getById(string $id)
  * @method UserInterface[] getAll()
- * @method User getOrmInstance()
+ * @method void save(UserInterface $entity)
  */
 class UserRepository extends AbstractOrmBasedRepository
 {
     /**
      * Search for user by username or e-mail
-
+     *
      * @param string $loginOrEmail
      *
      * @return \BetaKiller\Model\UserInterface|null
