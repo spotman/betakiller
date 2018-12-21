@@ -18,6 +18,7 @@ interface RoleInterface extends AbstractEntityInterface, AclRoleInterface, Multi
 
     /**
      * Simplified role for moderators
+     * @deprecated Use more specific roles instead
      */
     public const MODERATOR = 'moderator';
 
