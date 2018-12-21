@@ -348,6 +348,6 @@ final class NamespaceBasedFactory
 
     private function getInstanceCacheKey(string $codename): string
     {
-        return str_replace('\\', '_', $this->expectedInterface).'.'.$codename;
+        return implode('-', $this->classNamespaces).'.'.$codename;
     }
 }
