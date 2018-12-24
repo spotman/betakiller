@@ -27,7 +27,7 @@ final class NamespaceBasedFactory
     /**
      * @var string[]
      */
-    private $classNamespaces;
+    private $classNamespaces = [];
 
     /**
      * @var string
