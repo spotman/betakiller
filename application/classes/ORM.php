@@ -148,7 +148,7 @@ abstract class ORM extends Utils\Kohana\ORM implements ExtendedOrmInterface
     protected function mergeRelatedModels(string $name, array $newModels): void
     {
         // Get old models
-        $oldModels = $this->getRelation($name)->get_all();
+        $oldModels = $this->getAllRelated($name);
 
         // Add absent
         foreach ($newModels as $new) {
