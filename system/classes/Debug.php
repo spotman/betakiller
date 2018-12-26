@@ -21,11 +21,11 @@ class Debug extends Kohana_Debug
 
     public static function htmlStacktrace(\Throwable $e): string
     {
-        if (!\interface_exists(\BetaKiller\View\ViewInterface::class)) {
-            return Kohana_Kohana_Exception::text($e);
-        }
-
         try {
+            if (!\interface_exists(\BetaKiller\View\ViewInterface::class)) {
+                return Kohana_Kohana_Exception::text($e);
+            }
+
             // Get the exception information
             $previous = $e->getPrevious();
             $class    = get_class($e);
