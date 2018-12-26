@@ -153,7 +153,7 @@ abstract class ORM extends Utils\Kohana\ORM implements ExtendedOrmInterface
         // Add absent
         foreach ($newModels as $new) {
             if (!$this->hasModelInList($new, $oldModels)) {
-                $this->add($name, $new);
+                $this->addRelated($name, $new);
             }
         }
 
@@ -161,7 +161,7 @@ abstract class ORM extends Utils\Kohana\ORM implements ExtendedOrmInterface
         foreach ($oldModels as $old) {
             if (!$this->hasModelInList($old, $newModels)) {
                 // Add absent
-                $this->remove($name, $old);
+                $this->removeRelated($name, $old);
             }
         }
     }
@@ -181,6 +181,58 @@ abstract class ORM extends Utils\Kohana\ORM implements ExtendedOrmInterface
         }
 
         return false;
+    }
+
+    private function addRelated(string $relationName, OrmInterface $model): void
+    {
+        if (isset($this->_belongs_to[$relationName])) {
+            $foreignKey = $this->_belongs_to[$relationName]['foreign_key'];
+
+            // Set internal column
+            $this->set($foreignKey, $model->pk());
+            $this->save();
+        } elseif (isset($this->_has_one[$relationName])) {
+            $foreignKey = $this->_has_one[$relationName]['foreign_key'];
+
+            // External column
+            $model->set($foreignKey, $this->getID());
+            $model->save();
+        } elseif (isset($this->_has_many[$relationName]['through'])) {
+            // Has_many "through" relationship
+            $this->add($relationName, $model);
+        } elseif (isset($this->_has_many[$relationName])) {
+            // Simple has_many relationship, target model's foreign key is this model's primary key
+            $foreignKey = $this->_has_many[$relationName]['foreign_key'];
+
+            // External column
+            $model->set($foreignKey, $this->getID());
+            $model->save();
+        } else {
+            throw new \Kohana_Exception('The related alias ":property" does not exist in the :class class', [
+                ':property' => $relationName,
+                ':class'    => get_class($this),
+            ]);
+        }
+    }
+
+    private function removeRelated(string $relationName, OrmInterface $model): void
+    {
+        if (isset($this->_belongs_to[$relationName])) {
+            $model->delete(); // $this model may be deleted by SQL constraints after that
+        } elseif (isset($this->_has_one[$relationName])) {
+            $model->delete();
+        } elseif (isset($this->_has_many[$relationName]['through'])) {
+            // Has_many "through" relationship
+            $this->remove($relationName, $model);
+        } elseif (isset($this->_has_many[$relationName])) {
+            // Simple has_many relationship, target model's foreign key is this model's primary key
+            $model->delete();
+        } else {
+            throw new \Kohana_Exception('The related alias ":property" does not exist in the :class class', [
+                ':property' => $relationName,
+                ':class'    => get_class($this),
+            ]);
+        }
     }
 
     /**
