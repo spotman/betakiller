@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace BetaKiller\I18n;
 
 use BetaKiller\Helper\AppEnvInterface;
-use BetaKiller\Model\LanguageInterface;
 use Psr\Container\ContainerInterface;
 
 class LazyAggregateLoader implements I18nKeysLoaderInterface
@@ -70,8 +69,8 @@ class LazyAggregateLoader implements I18nKeysLoaderInterface
 
         // If dev mode
         if ($this->appEnv->inDevelopmentMode()) {
-            // Inject file-based loader first as a default fallback
-            \array_unshift($loadersClassNames, FilesystemI18nKeysLoader::class);
+            // Inject file-based loader as a primary source fallback
+            $loadersClassNames[] = FilesystemI18nKeysLoader::class;
         }
 
         $loadersInstances = [];
