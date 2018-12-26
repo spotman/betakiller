@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace BetaKiller\Service;
 
-use BetaKiller\Factory\UrlHelperFactory;
 use BetaKiller\Helper\NotificationHelper;
+use BetaKiller\Helper\UrlHelper;
 use BetaKiller\Model\TokenInterface;
 use BetaKiller\Model\UserInterface;
 
@@ -23,23 +23,15 @@ abstract class AbstractRecoveryAccessService
     private $notification;
 
     /**
-     * @var \BetaKiller\Helper\UrlHelper
-     */
-    protected $urlHelper;
-
-    /**
      * @param \BetaKiller\Helper\NotificationHelper $notificationHelper
      * @param \BetaKiller\Service\TokenService      $tokenService
-     * @param \BetaKiller\Factory\UrlHelperFactory  $urlHelperFactory
      */
     public function __construct(
         NotificationHelper $notificationHelper,
-        TokenService $tokenService,
-        UrlHelperFactory $urlHelperFactory
+        TokenService $tokenService
     ) {
         $this->tokenService = $tokenService;
         $this->notification = $notificationHelper;
-        $this->urlHelper    = $urlHelperFactory->create();
     }
 
     /**
@@ -59,32 +51,34 @@ abstract class AbstractRecoveryAccessService
 
     /**
      * @param \BetaKiller\Model\UserInterface $userModel
+     * @param \BetaKiller\Helper\UrlHelper    $urlHelper
      *
      * @return array
      */
-    abstract protected function getEmailData(UserInterface $userModel): array;
+    abstract protected function getEmailData(UserInterface $userModel, UrlHelper $urlHelper): array;
 
     /**
      * @param \BetaKiller\Model\UserInterface $userModel
-     *
+     * @param \BetaKiller\Helper\UrlHelper    $urlHelper
+     * @throws \BetaKiller\Exception\DomainException
      * @throws \BetaKiller\Exception\ValidationException
      * @throws \BetaKiller\IFace\Exception\UrlElementException
      * @throws \BetaKiller\Notification\NotificationException
      * @throws \BetaKiller\Repository\RepositoryException
      */
-    public function sendEmail(UserInterface $userModel): void
+    public function sendEmail(UserInterface $userModel, UrlHelper $urlHelper): void
     {
         $ttl        = $this->getTokenPeriod();
         $tokenModel = $this->tokenService->create($userModel, $ttl);
-        $actionUrl  = $this->getActionUrl($tokenModel);
-        $appUrl     = $this->getAppUrl();
+        $actionUrl  = $this->getActionUrl($tokenModel, $urlHelper);
+        $appUrl     = $this->getAppUrl($urlHelper);
 
         $emailData = [
             'action_url' => $actionUrl,
             'app_url'    => $appUrl,
         ];
 
-        $emailDataAdd = $this->getEmailData($userModel);
+        $emailDataAdd = $this->getEmailData($userModel, $urlHelper);
         if ($emailDataAdd) {
             $emailData = array_merge($emailData, $emailDataAdd);
         }
@@ -95,36 +89,29 @@ abstract class AbstractRecoveryAccessService
     /**
      * @param \BetaKiller\Model\TokenInterface $tokenModel
      *
-     * @return string
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
-     */
-    private function getActionUrl(TokenInterface $tokenModel): string
-    {
-        $actionUrlElement = $this->urlHelper->getUrlElementByCodename($this->getActionEntityCodename());
-        $actionUrlParams  = $this->urlHelper->createUrlContainer()->setEntity($tokenModel);
-
-        return $this->urlHelper->makeUrl($actionUrlElement, $actionUrlParams, false);
-    }
-
-    /**
-     * @return string
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
-     */
-    private function getAppUrl(): string
-    {
-        return $this->makeEntityUrl($this->getAppEntityCodename());
-    }
-
-    /**
-     * @param string $entityCodename
+     * @param \BetaKiller\Helper\UrlHelper     $urlHelper
      *
      * @return string
      * @throws \BetaKiller\IFace\Exception\UrlElementException
      */
-    protected function makeEntityUrl(string $entityCodename): string
+    private function getActionUrl(TokenInterface $tokenModel, UrlHelper $urlHelper): string
     {
-        $urlElement = $this->urlHelper->getUrlElementByCodename($entityCodename);
+        $actionUrlElement = $urlHelper->getUrlElementByCodename($this->getActionEntityCodename());
+        $actionUrlParams  = $urlHelper->createUrlContainer()->setEntity($tokenModel);
 
-        return $this->urlHelper->makeUrl($urlElement);
+        return $urlHelper->makeUrl($actionUrlElement, $actionUrlParams, false);
+    }
+
+    /**
+     * @param \BetaKiller\Helper\UrlHelper $urlHelper
+     *
+     * @return string
+     * @throws \BetaKiller\IFace\Exception\UrlElementException
+     */
+    private function getAppUrl(UrlHelper $urlHelper): string
+    {
+        $urlElement = $urlHelper->getUrlElementByCodename($this->getAppEntityCodename());
+
+        return $urlHelper->makeUrl($urlElement);
     }
 }

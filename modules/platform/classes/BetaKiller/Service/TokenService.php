@@ -42,7 +42,7 @@ class TokenService
         ]);
         $tokenValue = password_hash($value, PASSWORD_BCRYPT);
         $tokenValue = hash('sha256', $tokenValue);
-        $tokenValue = strtolower($tokenValue);
+        $tokenValue = mb_strtolower($tokenValue);
 
         $tokenModel = new Token();
         $endingAt   = new \DateTimeImmutable();
@@ -53,9 +53,7 @@ class TokenService
             ->setValue($tokenValue)
             ->setEndingAt($endingAt);
 
-        $this
-            ->tokenRepo
-            ->save($tokenModel);
+        $this->tokenRepo->save($tokenModel);
 
         return $tokenModel;
     }
@@ -67,7 +65,7 @@ class TokenService
      */
     public function verify(string $tokenValue): bool
     {
-        $tokenValue = strtolower($tokenValue);
+        $tokenValue = \mb_strtolower($tokenValue);
         $tokeModel  = $this->tokenRepo->findActive($tokenValue);
         if ($tokeModel) {
             if ($tokenValue === $tokeModel->getValue()) {
@@ -94,15 +92,15 @@ class TokenService
     /**
      * Auto delete if exists.
      *
-     * @param string                          $tokenValue
+     * @param \BetaKiller\Model\TokenInterface $token
      *
      * @return bool
      * @throws \BetaKiller\Repository\RepositoryException
      */
-    public function confirm(string $tokenValue): bool
+    public function confirm(TokenInterface $token): bool
     {
         $status      = false;
-        $tokenModel = $this->tokenRepo->findActive($tokenValue);
+        $tokenModel = $this->tokenRepo->findActive($token->getValue());
         if ($tokenModel) {
             $status = $tokenModel->isActive();
             $this->delete($tokenModel);
