@@ -232,9 +232,7 @@ class WebApp
 
     public function processException(\Throwable $e): ResponseInterface
     {
-        $wrap = Exception::wrap($e);
-
         // TODO Replace with static pretty page + log exception to developers
-        return new TextResponse('Error: '.$wrap->oneLiner());
+        return new TextResponse('Error: '.Exception::oneLiner($e));
     }
 }

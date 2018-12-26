@@ -1,5 +1,6 @@
 <?php
 
+use BetaKiller\Exception;
 use BetaKiller\Helper\I18nHelper;
 use BetaKiller\Session\DatabaseSessionStorage;
 use BetaKiller\Session\SessionStorageInterface;
@@ -53,10 +54,8 @@ return [
                     return \Zend\Diactoros\ServerRequestFactory::fromGlobals();
                 },
                 function (\Throwable $e) {
-                    $wrap = \BetaKiller\Exception::wrap($e);
-
                     // TODO Replace with static pretty page + log exception to developers
-                    return new TextResponse('Error: '.$wrap->oneLiner().PHP_EOL.PHP_EOL.$wrap->getTraceAsString());
+                    return new TextResponse('Error: '.Exception::oneLiner($e).PHP_EOL.PHP_EOL.$e->getTraceAsString());
                 }
             );
         }),
@@ -104,7 +103,7 @@ return [
         }),
 
         I18nHelper::class => \DI\factory(function () {
-            throw new \BetaKiller\Exception(I18nHelper::class.' DI injection deprecated, use ServerRequestHelper::getI18n() instead');
+            throw new Exception(I18nHelper::class.' DI injection deprecated, use ServerRequestHelper::getI18n() instead');
         }),
     ],
 

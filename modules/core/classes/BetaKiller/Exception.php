@@ -32,7 +32,7 @@ class Exception extends \Exception implements ExceptionInterface
     public function __construct($message = '', array $variables = null, $code = 0, \Throwable $previous = null)
     {
         // Set the message
-        $message = empty($variables) ? $message : strtr($message, $variables);
+        $message = empty($variables) ? $message : strtr($message, array_filter($variables, 'is_scalar'));
 
         // Pass the message and integer code to the parent
         parent::__construct($message, (int)$code, $previous);
@@ -42,11 +42,11 @@ class Exception extends \Exception implements ExceptionInterface
         $this->code = $code;
     }
 
-    public function oneLiner(): string
+    public static function oneLiner(\Throwable $e): string
     {
         return sprintf(
             '%s [ %s ]: %s ~ %s [ %d ]',
-            \get_class($this), $this->getCode(), \strip_tags($this->getMessage()), $this->getFile(), $this->getLine()
+            \get_class($e), $e->getCode(), \strip_tags($e->getMessage()), $e->getFile(), $e->getLine()
         );
     }
 }
