@@ -27,6 +27,11 @@ interface UrlDataSourceInterface extends RepositoryInterface
     public function getItemsHavingUrlKey(UrlContainerInterface $parameters): array;
 
     /**
+     * @return \BetaKiller\Url\Parameter\UrlParameterInterface[]
+     */
+    public function getAllAvailableItems(): array;
+
+    /**
      * @return string
      */
     public function getUrlKeyName(): string;

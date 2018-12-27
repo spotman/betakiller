@@ -322,7 +322,7 @@ class UrlPrototypeService
         $dataSource = $this->getDataSourceInstance($prototype);
 
         return $prototype->hasIdKey()
-            ? $dataSource->getAll()
+            ? $dataSource->getAllAvailableItems()
             : $dataSource->getItemsHavingUrlKey($params);
     }
 }

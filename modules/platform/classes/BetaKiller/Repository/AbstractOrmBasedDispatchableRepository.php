@@ -63,6 +63,14 @@ abstract class AbstractOrmBasedDispatchableRepository extends AbstractOrmBasedRe
         return $result->count() ? $result->as_array() : [];
     }
 
+    /**
+     * @return \BetaKiller\Url\Parameter\UrlParameterInterface[]
+     */
+    public function getAllAvailableItems(): array
+    {
+        return $this->getAll();
+    }
+
     protected function customFilterForUrlDispatching(OrmInterface $orm, UrlContainerInterface $params): void
     {
         // Empty by default
