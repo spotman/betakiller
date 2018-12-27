@@ -123,7 +123,7 @@ class Warmup extends \BetaKiller\Task\AbstractTask
                 $connected = true;
                 break;
             }
-            \usleep(10000);
+            \usleep(100000);
         }
 
         if (!$connected) {
@@ -162,14 +162,18 @@ class Warmup extends \BetaKiller\Task\AbstractTask
 
         $docRoot = $this->appEnv->getDocRootPath();
 
-        $command = sprintf('%s %s -S %s:%d -t %s %s', // >/dev/null 2>&1
-            'exec',
+        $command = [
+//            'exec',
             PHP_BINARY,
-            $this->serverHost,
-            $this->serverPort,
+            '-S',
+            $this->serverHost.':'.$this->serverPort,
+            '-t',
             $docRoot,
-            $docRoot.DIRECTORY_SEPARATOR.'index.php'
-        );
+            $docRoot.DIRECTORY_SEPARATOR.'index.php',
+            // >/dev/null 2>&1
+        ];
+
+        $this->logger->debug(implode(' ', $command));
 
         $process = new Process($command, $docRoot, [
             AppEnvInterface::APP_MODE => $this->appEnv->getModeName(),
