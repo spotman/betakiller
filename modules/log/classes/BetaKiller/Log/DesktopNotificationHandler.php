@@ -12,16 +12,17 @@ class DesktopNotificationHandler extends AbstractHandler
      */
     private $notifier;
 
-    /**
-     * @param int  $level  The minimum logging level at which this handler will be triggered
-     * @param bool $bubble Whether the messages that are handled can bubble up the stack or not
-     */
     public function __construct()
     {
         /** @var \Joli\JoliNotif\Notifier $notifier */
         $this->notifier = NotifierFactory::create();
 
         parent::__construct();
+    }
+
+    public static function isSupported(): bool
+    {
+        return \interface_exists(\Joli\JoliNotif\Notifier::class);
     }
 
     /**

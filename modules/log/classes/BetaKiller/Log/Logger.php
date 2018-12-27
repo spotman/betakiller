@@ -66,7 +66,9 @@ class Logger implements LoggerInterface
             $monolog->pushHandler($cliHandler);
             $monolog->pushProcessor(new CliProcessor);
 
-            $monolog->pushHandler(new DesktopNotificationHandler);
+            if (DesktopNotificationHandler::isSupported()) {
+                $monolog->pushHandler(new DesktopNotificationHandler);
+            }
         } else {
             $monolog->pushProcessor(new WebProcessor());
         }
