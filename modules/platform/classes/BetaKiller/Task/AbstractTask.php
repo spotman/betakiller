@@ -44,9 +44,8 @@ abstract class AbstractTask extends Minion_Task
         bool $showOutput = null,
         bool $detach = null
     ): string {
-        $php     = PHP_BINARY;
-        $docRoot = $appEnv->getDocRootPath();
-        $stage   = $appEnv->getModeName();
+        $php   = PHP_BINARY;
+        $stage = $appEnv->getModeName();
 
         $cmd = "$php index.php --task=$taskName --stage=$stage";
 
@@ -69,7 +68,7 @@ abstract class AbstractTask extends Minion_Task
             $cmd = 'exec '.$cmd;
         }
 
-        return "cd $docRoot && ".$cmd;
+        return $cmd;
     }
 
     /**

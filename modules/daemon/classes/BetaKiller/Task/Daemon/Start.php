@@ -6,9 +6,10 @@ namespace BetaKiller\Task\Daemon;
 use BetaKiller\Daemon\LockFactory;
 use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\Task\AbstractTask;
+use BetaKiller\Task\TaskException;
 use Symfony\Component\Process\Process;
 
-class Ping extends AbstractTask
+class Start extends AbstractTask
 {
     /**
      * @var \BetaKiller\Helper\AppEnvInterface
@@ -28,7 +29,7 @@ class Ping extends AbstractTask
      */
     public function __construct(LockFactory $lockFactory, AppEnvInterface $appEnv)
     {
-        $this->appEnv = $appEnv;
+        $this->appEnv      = $appEnv;
         $this->lockFactory = $lockFactory;
 
         parent::__construct();
@@ -60,20 +61,26 @@ class Ping extends AbstractTask
 
         // Check lock file exists and points to a valid pid
         if ($lock->isAcquired()) {
-            echo sprintf( 'Daemon "%s" is already running'.PHP_EOL, $name);
-
-            return;
+            throw new TaskException('Daemon ":name" is already running', [
+                ':name' => $name,
+            ]);
         }
 
-        $cmd = self::getTaskCmd($this->appEnv, 'daemon:start', [
+        $cmd = self::getTaskCmd($this->appEnv, 'daemon:runner', [
             'name' => $name,
-        ], false, false);
+        ], false, true);
 
-        $process = Process::fromShellCommandline($cmd, $this->appEnv->getDocRootPath());
+        $docRoot = $this->appEnv->getDocRootPath();
 
-        // Execute start task
+        $process = Process::fromShellCommandline($cmd, $docRoot);
+
+        // Execute supervisor and detach it
         $process
+            ->setTimeout(null)
             ->disableOutput()
-            ->run();
+            ->setIdleTimeout(null)
+            ->mustRun();
+
+        echo \sprintf('Daemon "%s" is started'.\PHP_EOL, $name);
     }
 }

@@ -11,7 +11,7 @@ use BetaKiller\Task\AbstractTask;
 use BetaKiller\Task\TaskException;
 use Psr\Log\LoggerInterface;
 
-class Run extends AbstractTask
+class Runner extends AbstractTask
 {
     use LoggerHelperTrait;
 
@@ -146,11 +146,14 @@ class Run extends AbstractTask
         $this->setStatus(self::STATUS_STARTED);
     }
 
-    private function stop(): void
+    private function stop(): bool
     {
         // Prevent sequential stop calls
         if ($this->isStopping()) {
-            return;
+            $this->logger->debug('Daemon ":name" is already stopping, please wait', [
+                ':name' => $this->codename,
+            ]);
+            return false;
         }
 
         $this->setStatus(self::STATUS_STOPPING);
@@ -164,13 +167,15 @@ class Run extends AbstractTask
         } catch (\Throwable $e) {
             $this->processException($e);
         }
+
+        return true;
     }
 
     private function shutdown(int $exitCode): void
     {
         $this->unlock();
 
-        $this->logger->debug('Shutting down daemon ":name" with exit code [:code]', [
+        $this->logger->debug('Daemon ":name" has exited with exit code :code', [
             ':name' => $this->codename,
             ':code' => $exitCode,
         ]);
@@ -192,7 +197,7 @@ class Run extends AbstractTask
 
     private function addSignalHandlers(): void
     {
-        //pcntl_async_signals(true);
+        \pcntl_async_signals(true);
 
         $signalCallable = function (int $signal) {
             $this->logger->debug('Received signal ":value" for ":name" daemon', [
@@ -200,10 +205,10 @@ class Run extends AbstractTask
                 ':name'  => $this->codename,
             ]);
 
-            $this->stop();
-
-            // Simply exit with OK status and daemon would be restarted by supervisor
-            $this->shutdown(0);
+            if ($this->stop()) {
+                // Simply exit with OK status and daemon would be restarted by supervisor
+                $this->shutdown(0);
+            }
         };
 
         /**

@@ -67,7 +67,7 @@ class Lock
 
     public function isAcquired(): bool
     {
-        return \file_exists($this->path);
+        return \is_link($this->path);
     }
 
     public function getPid(): int

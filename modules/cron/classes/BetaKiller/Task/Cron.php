@@ -194,6 +194,7 @@ class Cron extends AbstractTask
         $this->logDebug('Task [:name] is ready to start', [':name' => $task->getName()]);
 
         $cmd = self::getTaskCmd($this->env, $task->getName(), $task->getParams());
+        $docRoot = $this->env->getDocRootPath();
 
         // Store fingerprint for simpler task identification upon start
         $tags = [
@@ -201,7 +202,7 @@ class Cron extends AbstractTask
             'name'                => $task->getName(),
         ];
 
-        $run = new ProcessRun(new Process($cmd), $tags);
+        $run = new ProcessRun(Process::fromShellCommandline($cmd, $docRoot), $tags);
 
         $run->addListener(RunEvent::STARTED, function (RunEvent $event) {
             $task = $this->getTaskFromRunEvent($event);

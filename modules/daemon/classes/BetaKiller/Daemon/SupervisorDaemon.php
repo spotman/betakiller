@@ -21,8 +21,8 @@ class SupervisorDaemon implements DaemonInterface
 {
     public const CODENAME = 'Supervisor';
 
-    public const RETRY_LIMIT    = 3;
-    public const RESTART_SIGNAL = SIGUSR1;
+    public const RETRY_LIMIT   = 3;
+    public const RELOAD_SIGNAL = SIGUSR1;
 
     /**
      * @var \BetaKiller\Config\ConfigProviderInterface
@@ -83,9 +83,9 @@ class SupervisorDaemon implements DaemonInterface
     {
         $this->isHuman = $this->appEnv->isHuman();
 
-        // Restart signal
-        $loop->addSignal(self::RESTART_SIGNAL, function () {
-            $this->logDebug('Restarting supervisor');
+        // Reload signal => hot restart
+        $loop->addSignal(self::RELOAD_SIGNAL, function () {
+            $this->logDebug('Reloading supervisor');
             $this->restart();
         });
 
@@ -185,11 +185,13 @@ class SupervisorDaemon implements DaemonInterface
 
     private function addProcess(string $codename): ProcessRun
     {
-        $cmd = AbstractTask::getTaskCmd($this->appEnv, 'daemon:run', [
+        $cmd = AbstractTask::getTaskCmd($this->appEnv, 'daemon:runner', [
             'name' => $codename,
         ]);
 
-        $process = new Process($cmd);
+        $docRoot = $this->appEnv->getDocRootPath();
+
+        $process = Process::fromShellCommandline($cmd, $docRoot);
 
         $process
             ->setTimeout(null)
@@ -229,7 +231,7 @@ class SupervisorDaemon implements DaemonInterface
 
             if ($lock->isAcquired()) {
                 // Warning for developers
-                $this->logger->warning('Lock for ":name" daemon had not been released by the daemon:run task', [
+                $this->logger->warning('Lock for ":name" daemon had not been released by the daemon:runner task', [
                     ':name' => $name,
                 ]);
 
@@ -286,7 +288,7 @@ class SupervisorDaemon implements DaemonInterface
     private function logDebug(string $message, array $variables = null): void
     {
         if (!$this->isHuman) {
-            $this->logger->debug($message, $variables);
+            $this->logger->debug($message, $variables ?? []);
         }
     }
 }

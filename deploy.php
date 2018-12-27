@@ -390,6 +390,26 @@ task('maintenance:off', function () {
 })->desc('Disable maintenance mode');
 
 /**
+ * Daemons maintenance
+ */
+task('daemon:supervisor:restart', [
+    'daemon:supervisor:stop',
+    'daemon:supervisor:start',
+])->desc('Restart supervisor');
+
+task('daemon:supervisor:start', function() {
+    runMinionTask('daemon:start --name="supervisor"');
+})->desc('Start supervisor');
+
+task('daemon:supervisor:stop', function() {
+    runMinionTask('daemon:stop --name="supervisor"');
+})->desc('Stop supervisor');
+
+task('daemon:supervisor:reload', function() {
+    runMinionTask('daemon:supervisor:reload');
+})->desc('Reload daemons in supervisor');
+
+/**
  * Import data
  */
 task('import:roles', function () {
@@ -454,14 +474,14 @@ task('deploy', [
     'deploy:betakiller:shared',
     'deploy:betakiller:writable',
 
+    // Enable maintenance mode before any DB processing
+    'maintenance:on',
+
     // Copy .env file from previous revision to the new one
     'deploy:dotenv:migrate',
 
     // Store APP_REVISION hash (leads to cache reset)
     'deploy:dotenv:revision',
-
-    // Enable maintenance mode before any DB processing
-    'maintenance:on',
 
     // Migrate and import data
     'migrate',
@@ -469,6 +489,9 @@ task('deploy', [
     // Prepare
     'assets:deploy',
     'cache:warmup',
+
+    // Restart daemons and workers
+    'daemon:supervisor:restart',
 
     // Switch to new version
     'deploy:symlink',

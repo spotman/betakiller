@@ -4,11 +4,13 @@ declare(strict_types=1);
 namespace BetaKiller\Task\Daemon;
 
 use BetaKiller\Daemon\LockFactory;
+use BetaKiller\Daemon\ShutdownDaemonException;
 use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\Task\AbstractTask;
+use BetaKiller\Task\TaskException;
 use Symfony\Component\Process\Process;
 
-class Ping extends AbstractTask
+class Status extends AbstractTask
 {
     /**
      * @var \BetaKiller\Helper\AppEnvInterface
@@ -58,22 +60,12 @@ class Ping extends AbstractTask
         // Get lock
         $lock = $this->lockFactory->create($name);
 
-        // Check lock file exists and points to a valid pid
-        if ($lock->isAcquired()) {
-            echo sprintf( 'Daemon "%s" is already running'.PHP_EOL, $name);
-
-            return;
+        if ($lock->isAcquired() && $lock->isValid()) {
+            echo sprintf('Daemon is running on pid %s'.PHP_EOL, $lock->getPid());
+        } elseif ($lock->isAcquired()) {
+            echo sprintf('Lock is acquired but daemon is stale on pid %s'.PHP_EOL, $lock->getPid());
+        } else {
+            echo 'Daemon is stopped'.PHP_EOL;
         }
-
-        $cmd = self::getTaskCmd($this->appEnv, 'daemon:start', [
-            'name' => $name,
-        ], false, false);
-
-        $process = Process::fromShellCommandline($cmd, $this->appEnv->getDocRootPath());
-
-        // Execute start task
-        $process
-            ->disableOutput()
-            ->run();
     }
 }
