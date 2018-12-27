@@ -6,6 +6,7 @@ namespace BetaKiller\Repository;
 use BetaKiller\Model\ExtendedOrmInterface;
 use BetaKiller\Model\Language;
 use BetaKiller\Model\LanguageInterface;
+use BetaKiller\Url\Container\UrlContainerInterface;
 use BetaKiller\Utils\Kohana\ORM\OrmInterface;
 
 /**
@@ -149,11 +150,11 @@ final class LanguageRepository extends AbstractI18nKeyRepository implements Lang
     }
 
     /**
-     * @param \BetaKiller\Model\ExtendedOrmInterface $orm
+     * @param \BetaKiller\Utils\Kohana\ORM\OrmInterface $orm
      *
      * @return \BetaKiller\Repository\LanguageRepository
      */
-    private function filterApp(ExtendedOrmInterface $orm): self
+    private function filterApp(OrmInterface $orm): self
     {
         $orm->where(Language::TABLE_FIELD_IS_APP, '=', 1);
 
@@ -161,13 +162,13 @@ final class LanguageRepository extends AbstractI18nKeyRepository implements Lang
     }
 
     /**
-     * @param \BetaKiller\Model\ExtendedOrmInterface $orm
+     * @param \BetaKiller\Utils\Kohana\ORM\OrmInterface $orm
      *
-     * @param bool                                   $value
+     * @param bool                                      $value
      *
      * @return \BetaKiller\Repository\LanguageRepository
      */
-    private function filterDev(ExtendedOrmInterface $orm, bool $value): self
+    private function filterDev(OrmInterface $orm, bool $value): self
     {
         $orm->where(Language::TABLE_FIELD_IS_DEV, '=', $value);
 
@@ -175,12 +176,12 @@ final class LanguageRepository extends AbstractI18nKeyRepository implements Lang
     }
 
     /**
-     * @param \BetaKiller\Model\ExtendedOrmInterface $orm
-     * @param string                                 $name
+     * @param \BetaKiller\Utils\Kohana\ORM\OrmInterface $orm
+     * @param string                                    $name
      *
      * @return \BetaKiller\Repository\LanguageRepository
      */
-    private function filterIsoCode(ExtendedOrmInterface $orm, string $name): self
+    private function filterIsoCode(OrmInterface $orm, string $name): self
     {
         $orm->where(Language::TABLE_FIELD_ISO_CODE, '=', $name);
 
@@ -188,12 +189,12 @@ final class LanguageRepository extends AbstractI18nKeyRepository implements Lang
     }
 
     /**
-     * @param \BetaKiller\Model\ExtendedOrmInterface $orm
-     * @param string                                 $locale
+     * @param \BetaKiller\Utils\Kohana\ORM\OrmInterface $orm
+     * @param string                                    $locale
      *
      * @return \BetaKiller\Repository\LanguageRepository
      */
-    private function filterLocale(ExtendedOrmInterface $orm, string $locale): self
+    private function filterLocale(OrmInterface $orm, string $locale): self
     {
         $orm->where(Language::TABLE_FIELD_LOCALE, '=', $locale);
 
@@ -210,5 +211,11 @@ final class LanguageRepository extends AbstractI18nKeyRepository implements Lang
     protected function getI18nValuesColumnName(): string
     {
         return Language::TABLE_FIELD_I18N;
+    }
+
+    protected function customFilterForUrlDispatching(OrmInterface $orm, UrlContainerInterface $params): void
+    {
+        // Dispatch only app languages (includes dev)
+        $this->filterApp($orm);
     }
 }
