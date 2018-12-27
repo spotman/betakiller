@@ -114,7 +114,7 @@ class User extends \ORM implements UserInterface
             ],
             self::TABLE_FIELD_CREATED_FROM_IP => [
                 ['not_empty'],
-                ['ip', [':value', true]], // Allow local IPs
+//                ['ip', [':value', true]], // Allow local IPs (not working with local dev)
                 ['max_length', [':value', 46]], // @see https://stackoverflow.com/a/7477384
             ],
         ];
