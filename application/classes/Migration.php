@@ -427,4 +427,15 @@ abstract class Migration extends Kohana_Migration
 
         return $names;
     }
+
+    protected function importDump(string $filename) : void
+    {
+        $sql = file_get_contents($filename);
+
+        if (!$sql) {
+            throw new \LogicException(sprintf('Missing dump file %s', $filename));
+        }
+
+        $this->runSql($sql);
+    }
 }
