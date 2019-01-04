@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Spotman\Defence\Test;
 
-use Spotman\Defence\ArgumentsFacade;
 use Spotman\Defence\DefinitionBuilder;
 use Spotman\Defence\DefinitionBuilderInterface;
 
@@ -109,7 +108,7 @@ class DefinitionBuilderTest extends AbstractDefenceTest
         $this->checkCompositeDefinition($def);
     }
 
-    private function checkSingleDefinition(DefinitionBuilderInterface $def): void
+    private function checkSingleDefinition(DefinitionBuilderInterface $def, $default = null): void
     {
         list($required, $optional, $optionalDefault) = $def->getArguments();
 
@@ -121,9 +120,9 @@ class DefinitionBuilderTest extends AbstractDefenceTest
         $this->assertTrue($optional->isOptional());
         $this->assertTrue($optionalDefault->isOptional());
 
-        $this->assertEquals(null, $required->getDefaultValue());
-        $this->assertEquals(null, $optional->getDefaultValue());
-        $this->assertNotEquals(null, $optionalDefault->getDefaultValue());
+        $this->assertEquals($default, $required->getDefaultValue());
+        $this->assertEquals($default, $optional->getDefaultValue());
+        $this->assertNotEquals($default, $optionalDefault->getDefaultValue());
     }
 
     private function checkCompositeDefinition(DefinitionBuilderInterface $def): void
@@ -136,8 +135,11 @@ class DefinitionBuilderTest extends AbstractDefenceTest
         $this->assertFalse($required->isOptional());
         $this->assertTrue($optional->isOptional());
 
-        $this->assertEquals([], $required->getDefaultValue());
-        $this->assertEquals([], $optional->getDefaultValue());
+        $this->assertEquals(false, $required->hasDefaultValue());
+        $this->assertEquals(false, $optional->hasDefaultValue());
+
+        $this->assertEquals(null, $required->getDefaultValue());
+        $this->assertEquals(null, $optional->getDefaultValue());
     }
 
     private function definitionBuilder(): DefinitionBuilderInterface

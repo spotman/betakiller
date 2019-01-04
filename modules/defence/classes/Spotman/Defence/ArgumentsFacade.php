@@ -50,12 +50,6 @@ class ArgumentsFacade
                 $namedArguments[$name] = $requestArguments[$name];
             } elseif (array_key_exists($position, $requestArguments)) {
                 $namedArguments[$name] = $requestArguments[$position];
-            } elseif ($argument->isOptional()) {
-                $namedArguments[$name] = $argument->getDefaultValue();
-            } else {
-                throw new \InvalidArgumentException('Missing argument ":name"', [
-                    ':name' => $name,
-                ]);
             }
         }
 
@@ -75,19 +69,20 @@ class ArgumentsFacade
         foreach ($arguments as $argument) {
             $name = $argument->getName();
 
-            $valueExists = isset($data[$name]);
-
-            if (!$valueExists && !$argument->isOptional()) {
-                throw new \InvalidArgumentException(sprintf('Key "%s" is required', $name));
-            }
-
             $targetKey = $argument->isIdentity()
                 ? ArgumentsInterface::IDENTITY_KEY
-                : $argument->getName();
+                : $name;
 
-            $filtered[$targetKey] = $valueExists
-                ? $this->processValue($argument, $data[$name])
-                : $argument->getDefaultValue();
+            if (isset($data[$name])) {
+                // Value exists => preprocess it
+                $filtered[$targetKey] = $this->processValue($argument, $data[$name]);
+            } elseif (!$argument->isOptional()) {
+                // No value, but required => warn
+                throw new \InvalidArgumentException(sprintf('Key "%s" is required', $name));
+            } elseif ($argument->hasDefaultValue()) {
+                // No value, optional, has default value => use default
+                $filtered[$targetKey] = $argument->getDefaultValue();
+            }
         }
 
         return $filtered;

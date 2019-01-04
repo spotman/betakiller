@@ -10,6 +10,11 @@ class Arguments implements ArgumentsInterface
      */
     private $args;
 
+    /**
+     * Arguments constructor.
+     *
+     * @param array $array
+     */
     public function __construct(array $array)
     {
         $this->args = $array;
@@ -65,7 +70,7 @@ class Arguments implements ArgumentsInterface
      */
     public function getString(string $key): string
     {
-        return trim((string)$this->args[$key]);
+        return (string)$this->args[$key];
     }
 
     /**

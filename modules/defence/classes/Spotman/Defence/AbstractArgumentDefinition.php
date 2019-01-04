@@ -90,6 +90,14 @@ abstract class AbstractArgumentDefinition implements ArgumentDefinitionInterface
     }
 
     /**
+     * @return bool
+     */
+    public function hasDefaultValue(): bool
+    {
+        return $this->defaultValue !== null;
+    }
+
+    /**
      * Returns true if rule defines identity argument
      *
      * @return bool
@@ -157,5 +165,24 @@ abstract class AbstractArgumentDefinition implements ArgumentDefinitionInterface
     public function isComposite(): bool
     {
         return $this->getType() === self::TYPE_COMPOSITE;
+    }
+
+    /**
+     * @return bool
+     */
+    public function mayHaveDefaultValue(): bool
+    {
+        // Only scalar types may have a default value
+        return $this->isScalar();
+    }
+
+    /**
+     * Returns true if argument is scalar (has type of int|string|bool|identity)
+     *
+     * @return bool
+     */
+    public function isScalar(): bool
+    {
+        return $this instanceof SingleArgumentDefinitionInterface;
     }
 }

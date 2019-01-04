@@ -254,12 +254,12 @@ class DefinitionBuilder implements DefinitionBuilderInterface
     {
         $last = $this->getLastArgument();
 
-        if (!$last instanceof SingleArgumentDefinitionInterface) {
-            throw new \LogicException('Only scalar types can define default value');
-        }
-
         if (!$last->isOptional()) {
             throw new \LogicException('Only optional arguments can define default value');
+        }
+
+        if (!$last->mayHaveDefaultValue()) {
+            throw new \LogicException('Only scalar types can define default value');
         }
 
         $last->setDefaultValue($value);

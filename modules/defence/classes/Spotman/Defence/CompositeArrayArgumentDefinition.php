@@ -22,8 +22,6 @@ class CompositeArrayArgumentDefinition extends AbstractArgumentDefinition implem
         $this->composite = $composite;
 
         parent::__construct($name, self::TYPE_COMPOSITE_ARRAY);
-
-        $this->setDefaultValue([]);
     }
 
     public function getComposite(): CompositeArgumentDefinitionInterface

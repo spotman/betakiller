@@ -11,7 +11,7 @@ interface ArgumentDefinitionInterface
     public const TYPE_INTEGER  = 'int';
     public const TYPE_STRING   = 'string';
     public const TYPE_EMAIL    = 'email';
-    public const TYPE_TEXT   = 'text';
+    public const TYPE_TEXT     = 'text';
     public const TYPE_HTML     = 'html';
 
     // Named collection of scalars
@@ -62,9 +62,19 @@ interface ArgumentDefinitionInterface
     public function getDefaultValue();
 
     /**
+     * @return bool
+     */
+    public function hasDefaultValue(): bool;
+
+    /**
      * @param mixed $value
      */
     public function setDefaultValue($value): void;
+
+    /**
+     * @return bool
+     */
+    public function mayHaveDefaultValue(): bool;
 
     /**
      * Returns true if rule defines identity argument
@@ -93,6 +103,13 @@ interface ArgumentDefinitionInterface
      * @return bool
      */
     public function isString(): bool;
+
+    /**
+     * Returns true if argument is scalar (has type of int|string|bool|identity)
+     *
+     * @return bool
+     */
+    public function isScalar(): bool;
 
     /**
      * Returns true if rule defines a string containing html

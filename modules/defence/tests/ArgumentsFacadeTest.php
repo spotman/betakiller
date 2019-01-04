@@ -11,19 +11,15 @@ class ArgumentsFacadeTest extends AbstractDefenceTest
 {
     /**
      * @param \Spotman\Defence\DefinitionBuilderInterface $def
-     * @param                                             $value
+     * @param                                             $input
      *
      * @dataProvider validDataProvider
      */
-    public function testValid(DefinitionBuilderInterface $def, $value): void
+    public function testValid(DefinitionBuilderInterface $def, $input): void
     {
-        $input = [
-            'a' => $value,
-        ];
-
         $output = $this->getFacade()->prepareArguments($input, $def);
 
-        $this->assertEquals($output->getAll(), $input);
+        $this->assertEquals($input, $output->getAll());
     }
 
     /**
@@ -42,15 +38,15 @@ class ArgumentsFacadeTest extends AbstractDefenceTest
 
     /**
      * @param \Spotman\Defence\DefinitionBuilderInterface $def
-     * @param                                             $value
+     * @param                                             $output
      *
      * @dataProvider optionalDataProvider
      */
-    public function testOptional(DefinitionBuilderInterface $def, $value): void
+    public function testOptional(DefinitionBuilderInterface $def, $output): void
     {
         $result = $this->getFacade()->prepareArguments([], $def);
 
-        $this->assertEquals(['a' => $value], $result->getAll());
+        $this->assertEquals($output, $result->getAll());
     }
 
     public function testUnknown(): void
@@ -72,7 +68,7 @@ class ArgumentsFacadeTest extends AbstractDefenceTest
         $expected = [
             's' => 'asd',
             'i' => 100,
-            'b' => true
+            'b' => true,
         ];
 
         $arguments = $this->getFacade()->prepareArguments(\array_values($expected), $def);
@@ -110,32 +106,49 @@ class ArgumentsFacadeTest extends AbstractDefenceTest
     {
         return [
             // Bool
-            [$this->def()->bool('a'), true],
+            'bool'            => [
+                $this->def()->bool('a'),
+                ['a' => true],
+            ],
 
             // Int
-            [$this->def()->int('a'), 12345],
+            'int'             => [
+                $this->def()->int('a'),
+                ['a' => 12345],
+            ],
 
             // String
-            [$this->def()->string('a'), 'qwerty'],
+            'string'          => [
+                $this->def()->string('a'),
+                ['a' => 'qwerty'],
+            ],
 
             // Int array
-            [$this->def()->intArray('a'), [123, 456]],
+            'int array'       => [
+                $this->def()->intArray('a'),
+                ['a' => [123, 456]],
+            ],
 
             // String array
-            [$this->def()->stringArray('a'), ['asd', 'qwe']],
+            'string array'    => [
+                $this->def()->stringArray('a'),
+                ['a' => ['asd', 'qwe']],
+            ],
 
             // Composite
-            [
+            'composite'       => [
                 $this->def()->composite('a')->int('b')->string('c'),
-                ['b' => 123, 'c' => 'qwe'],
+                ['a' => ['b' => 123, 'c' => 'qwe']],
             ],
 
             // Composite array
-            [
+            'composite array' => [
                 $this->def()->compositeArray('a')->int('b')->string('c'),
                 [
-                    ['b' => 123, 'c' => 'qwe'],
-                    ['b' => 456, 'c' => 'asd'],
+                    'a' => [
+                        ['b' => 123, 'c' => 'qwe'],
+                        ['b' => 456, 'c' => 'asd'],
+                    ],
                 ],
             ],
         ];
@@ -154,15 +167,65 @@ class ArgumentsFacadeTest extends AbstractDefenceTest
     public function optionalDataProvider(): array
     {
         return [
-            // Bool
-            [$this->def()->bool('a')->optional(), null],
-            [$this->def()->bool('a')->optional()->default(true), true],
-            // Int
-            [$this->def()->int('a')->optional(), null],
-            [$this->def()->int('a')->optional()->default(10), 10],
-            // String
-            [$this->def()->string('a')->optional(), null],
-            [$this->def()->string('a')->optional()->default('qwerty'), 'qwerty'],
+            'boolean' => [
+                $this->def()->bool('a')->optional(),
+                [],
+            ],
+
+            'boolean + default' => [
+                $this->def()->bool('a')->optional()->default(true),
+                ['a' => true],
+            ],
+
+            'integer' => [
+                $this->def()->int('a')->optional(),
+                [],
+            ],
+
+            'integer + default' => [
+                $this->def()->int('a')->optional()->default(10),
+                ['a' => 10],
+            ],
+
+            'string' => [
+                $this->def()->string('a')->optional(),
+                [],
+            ],
+
+            'string + default' => [
+                $this->def()->string('a')->optional()->default('qwerty'),
+                ['a' => 'qwerty'],
+            ],
+
+            'intArray' => [
+                $this->def()->intArray('a')->optional(),
+                [],
+            ],
+
+            'intArray + default' => [
+                $this->def()->intArray('a')->optional()->default([1, 4]),
+                ['a' => [1, 4]],
+            ],
+
+            'stringArray' => [
+                $this->def()->stringArray('a')->optional(),
+                [],
+            ],
+
+            'stringArray + default' => [
+                $this->def()->stringArray('a')->optional()->default(['asd', 'qwe']),
+                ['a' => ['asd', 'qwe']],
+            ],
+
+            'composite' => [
+                $this->def()->composite('a')->optional()->int('b')->string('c'),
+                [],
+            ],
+
+            'compositeArray' => [
+                $this->def()->compositeArray('a')->optional()->int('b')->string('c'),
+                [],
+            ],
         ];
     }
 

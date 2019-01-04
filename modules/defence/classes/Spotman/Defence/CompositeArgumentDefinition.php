@@ -18,9 +18,6 @@ class CompositeArgumentDefinition extends AbstractArgumentDefinition implements 
     public function __construct(string $name)
     {
         parent::__construct($name, self::TYPE_COMPOSITE);
-
-        // Empty array as a default value
-        $this->setDefaultValue([]);
     }
 
     public function addChild(ArgumentDefinitionInterface $argument): void
