@@ -20,9 +20,23 @@ class ArgumentsFacade
 
         // Check for unnecessary arguments
         if (\count($requestArguments) > \count($namedArguments)) {
+            $allowedArgs = array_map(function (ArgumentDefinitionInterface $arg) {
+                return $arg->getName();
+            }, $definition->getArguments());
+
+            // More details for named arguments
+            if (\is_string(key($requestArguments))) {
+                $requestKeys = \array_keys($requestArguments);
+
+                throw new \InvalidArgumentException(
+                    \sprintf('Unnecessary arguments in a call: "%s"',
+                        implode('", "', \array_diff($requestKeys, $allowedArgs)))
+                );
+            }
+
             throw new \InvalidArgumentException(
-                \sprintf('Unnecessary arguments in a call, "%s" are allowed only',
-                    implode('", "', \array_keys($namedArguments)))
+                \sprintf('Unnecessary arguments in a call, "%s" only allowed',
+                    implode('", "', \array_keys($allowedArgs)))
             );
         }
 
