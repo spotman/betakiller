@@ -80,6 +80,14 @@ class UrlHelper
     }
 
     /**
+     * @return \BetaKiller\Url\UrlElementInterface
+     */
+    public function getDefaultUrlElement(): UrlElementInterface
+    {
+        return $this->tree->getDefault();
+    }
+
+    /**
      * @param \BetaKiller\Url\UrlElementInterface                  $model
      * @param \BetaKiller\Url\Container\UrlContainerInterface|null $params
      *
@@ -112,6 +120,10 @@ class UrlHelper
 
         if ($removeCyclingLinks && $this->stack->isCurrent($urlElement, $params)) {
             return $this->appConfig->getCircularLinkHref();
+        }
+
+        if ($urlElement->isDefault()) {
+            return $this->makeAbsoluteUrl('/');
         }
 
         // Use self-resolving container as default
