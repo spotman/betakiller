@@ -190,4 +190,9 @@ interface DefinitionBuilderInterface
      * @return \Spotman\Defence\ArgumentDefinitionInterface[]
      */
     public function getArguments(): array;
+
+    /**
+     * @return bool
+     */
+    public function hasArguments(): bool;
 }

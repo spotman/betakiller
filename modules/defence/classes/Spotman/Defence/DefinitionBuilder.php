@@ -278,6 +278,14 @@ class DefinitionBuilder implements DefinitionBuilderInterface
     }
 
     /**
+     * @return bool
+     */
+    public function hasArguments(): bool
+    {
+        return $this->collection->count() > 0;
+    }
+
+    /**
      * @param \Spotman\Defence\ArgumentsDefinitionProviderInterface $provider
      *
      * @return \Spotman\Defence\DefinitionBuilderInterface
