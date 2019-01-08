@@ -11,7 +11,7 @@ use BetaKiller\I18n\PluralBagFormatterInterface;
 use BetaKiller\Model\I18nKeyInterface;
 use BetaKiller\Model\LanguageInterface;
 use BetaKiller\Model\TranslationKey;
-use BetaKiller\Repository\LanguageRepository;
+use BetaKiller\Repository\LanguageRepositoryInterface;
 use BetaKiller\Repository\TranslationKeyRepository;
 use BetaKiller\Task\AbstractTask;
 use BetaKiller\Url\ZoneInterface;
@@ -22,7 +22,7 @@ class I18n extends AbstractTask
     public const NOTIFICATION_NEW_KEYS = 'translator/i18n/new-keys';
 
     /**
-     * @var \BetaKiller\Repository\LanguageRepository
+     * @var \BetaKiller\Repository\LanguageRepositoryInterface
      */
     private $langRepo;
 
@@ -64,16 +64,16 @@ class I18n extends AbstractTask
     /**
      * I18n constructor.
      *
-     * @param \BetaKiller\Repository\LanguageRepository       $langRepo
-     * @param \BetaKiller\I18n\FilesystemI18nKeysLoader       $filesystemLoader
-     * @param \BetaKiller\Repository\TranslationKeyRepository $keyRepo
-     * @param \BetaKiller\I18n\PluralBagFormatterInterface    $formatter
-     * @param \BetaKiller\Helper\NotificationHelper           $notificationHelper
-     * @param \BetaKiller\Factory\UrlHelperFactory            $urlHelperFactory
-     * @param \Psr\Log\LoggerInterface                        $logger
+     * @param \BetaKiller\Repository\LanguageRepositoryInterface $langRepo
+     * @param \BetaKiller\I18n\FilesystemI18nKeysLoader          $filesystemLoader
+     * @param \BetaKiller\Repository\TranslationKeyRepository    $keyRepo
+     * @param \BetaKiller\I18n\PluralBagFormatterInterface       $formatter
+     * @param \BetaKiller\Helper\NotificationHelper              $notificationHelper
+     * @param \BetaKiller\Factory\UrlHelperFactory               $urlHelperFactory
+     * @param \Psr\Log\LoggerInterface                           $logger
      */
     public function __construct(
-        LanguageRepository $langRepo,
+        LanguageRepositoryInterface $langRepo,
         FilesystemI18nKeysLoader $filesystemLoader,
         TranslationKeyRepository $keyRepo,
         PluralBagFormatterInterface $formatter,
@@ -160,12 +160,19 @@ class I18n extends AbstractTask
             $this->newKeys[] = $keyModel;
         }
 
+        // Skip existing translations
+        if ($keyModel->getI18nValue($lang)) {
+            return;
+        }
+
         $i18nValue = $key->getI18nValue($lang);
 
         // Skip missing translations
         if (!$i18nValue) {
             return;
         }
+
+        $keyModel->setI18nValue($lang, $i18nValue);
 
         $isFormatted = $this->formatter->isFormatted($i18nValue);
 
@@ -186,15 +193,10 @@ class I18n extends AbstractTask
             }
         }
 
-        // Skip existing translations
-        if (!$keyModel->getI18nValue($lang)) {
-            $keyModel->setI18nValue($lang, $i18nValue);
-
-            $this->logger->info('I18n key ":key" value for locale ":locale" added', [
-                ':key'    => $keyName,
-                ':locale' => $lang->getLocale(),
-            ]);
-        }
+        $this->logger->info('I18n key ":key" value for locale ":locale" added', [
+            ':key'    => $keyName,
+            ':locale' => $lang->getLocale(),
+        ]);
 
         $this->keyRepo->save($keyModel);
     }
