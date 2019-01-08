@@ -45,11 +45,6 @@ abstract class AbstractRecoveryAccessService
     abstract protected function getActionEntityCodename(): string;
 
     /**
-     * @return string
-     */
-    abstract protected function getAppEntityCodename(): string;
-
-    /**
      * @param \BetaKiller\Model\UserInterface $userModel
      * @param \BetaKiller\Helper\UrlHelper    $urlHelper
      *
@@ -71,11 +66,9 @@ abstract class AbstractRecoveryAccessService
         $ttl        = $this->getTokenPeriod();
         $tokenModel = $this->tokenService->create($userModel, $ttl);
         $actionUrl  = $this->getActionUrl($tokenModel, $urlHelper);
-        $appUrl     = $this->getAppUrl($urlHelper);
 
         $emailData = [
             'action_url' => $actionUrl,
-            'app_url'    => $appUrl,
         ];
 
         $emailDataAdd = $this->getEmailData($userModel, $urlHelper);
@@ -100,18 +93,5 @@ abstract class AbstractRecoveryAccessService
         $actionUrlParams  = $urlHelper->createUrlContainer()->setEntity($tokenModel);
 
         return $urlHelper->makeUrl($actionUrlElement, $actionUrlParams, false);
-    }
-
-    /**
-     * @param \BetaKiller\Helper\UrlHelper $urlHelper
-     *
-     * @return string
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
-     */
-    private function getAppUrl(UrlHelper $urlHelper): string
-    {
-        $urlElement = $urlHelper->getUrlElementByCodename($this->getAppEntityCodename());
-
-        return $urlHelper->makeUrl($urlElement);
     }
 }

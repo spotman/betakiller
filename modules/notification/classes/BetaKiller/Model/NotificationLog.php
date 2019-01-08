@@ -12,12 +12,14 @@ use DateTimeImmutable;
 class NotificationLog extends \ORM implements NotificationLogInterface
 {
     public const TABLE_COLUMN_ID           = 'id';
+    public const TABLE_COLUMN_HASH         = 'hash';
     public const TABLE_COLUMN_USER_ID      = 'user_id';
     public const TABLE_COLUMN_MESSAGE_NAME = 'name';
     public const TABLE_COLUMN_TARGET       = 'target';
     public const TABLE_COLUMN_PROCESSED_AT = 'processed_at';
     public const TABLE_COLUMN_STATUS       = 'status';
     public const TABLE_COLUMN_TRANSPORT    = 'transport';
+    public const TABLE_COLUMN_LANG         = 'lang';
     public const TABLE_COLUMN_SUBJ         = 'subject';
     public const TABLE_COLUMN_BODY         = 'body';
     public const TABLE_COLUMN_RESULT       = 'result';
@@ -81,6 +83,14 @@ class NotificationLog extends \ORM implements NotificationLogInterface
         return $this;
     }
 
+    /**
+     * @return string
+     */
+    public function getSubject(): ?string
+    {
+        return $this->get(self::TABLE_COLUMN_SUBJ);
+    }
+
     public function setBody(string $body): NotificationLogInterface
     {
         $this->set(self::TABLE_COLUMN_BODY, $body);
@@ -100,6 +110,14 @@ class NotificationLog extends \ORM implements NotificationLogInterface
         }
 
         return $this->setStatus(self::STATUS_FAILED);
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getFailureReason(): ?string
+    {
+        return $this->get(self::TABLE_COLUMN_RESULT);
     }
 
     /**
@@ -176,5 +194,45 @@ class NotificationLog extends \ORM implements NotificationLogInterface
         $relation = $this->get('user');
 
         return $relation->loaded() ? $relation : null;
+    }
+
+    /**
+     * @return string
+     */
+    public function getHash(): string
+    {
+        return (string)$this->get(self::TABLE_COLUMN_HASH);
+    }
+
+    /**
+     * @param string $value
+     *
+     * @return mixed
+     */
+    public function setHash(string $value): NotificationLogInterface
+    {
+        $this->set(self::TABLE_COLUMN_HASH, $value);
+
+        return $this;
+    }
+
+    /**
+     * @param string $isoCode
+     *
+     * @return \BetaKiller\Model\NotificationLogInterface
+     */
+    public function setLanguageIsoCode(string $isoCode): NotificationLogInterface
+    {
+        $this->set(self::TABLE_COLUMN_LANG, $isoCode);
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getLanguageIsoCode(): string
+    {
+        return (string)$this->get(self::TABLE_COLUMN_LANG);
     }
 }

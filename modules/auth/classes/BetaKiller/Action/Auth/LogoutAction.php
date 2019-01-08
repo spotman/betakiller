@@ -35,12 +35,19 @@ class LogoutAction extends AbstractAction
     }
 
     /**
+     * @return \Spotman\Defence\DefinitionBuilderInterface
+     */
+    public function postArgumentsDefinition(): DefinitionBuilderInterface
+    {
+        return $this->definition();
+    }
+
+    /**
      * @param \Psr\Http\Message\ServerRequestInterface $request
-     * @param \Spotman\Defence\ArgumentsInterface      $arguments
      *
      * @return \Psr\Http\Message\ResponseInterface
      */
-    public function handle(ServerRequestInterface $request, ArgumentsInterface $arguments): ResponseInterface
+    public function handle(ServerRequestInterface $request): ResponseInterface
     {
         // Redirect to site index
         $response = ResponseHelper::redirect('/');

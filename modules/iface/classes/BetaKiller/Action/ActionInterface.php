@@ -5,7 +5,6 @@ namespace BetaKiller\Action;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Spotman\Defence\ArgumentsInterface;
 use Spotman\Defence\DefinitionBuilderInterface;
 
 interface ActionInterface
@@ -14,15 +13,23 @@ interface ActionInterface
     public const SUFFIX    = 'Action';
 
     /**
+     * Arguments definition for request` GET data
+     *
      * @return \Spotman\Defence\DefinitionBuilderInterface
      */
     public function getArgumentsDefinition(): DefinitionBuilderInterface;
 
     /**
+     * Arguments definition for request` POST data
+     *
+     * @return \Spotman\Defence\DefinitionBuilderInterface
+     */
+    public function postArgumentsDefinition(): DefinitionBuilderInterface;
+
+    /**
      * @param \Psr\Http\Message\ServerRequestInterface $request
-     * @param \Spotman\Defence\ArgumentsInterface      $arguments
      *
      * @return \Psr\Http\Message\ResponseInterface
      */
-    public function handle(ServerRequestInterface $request, ArgumentsInterface $arguments): ResponseInterface;
+    public function handle(ServerRequestInterface $request): ResponseInterface;
 }

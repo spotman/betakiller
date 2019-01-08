@@ -191,16 +191,21 @@ class NotificationFacade
         NotificationTargetInterface $target,
         NotificationTransportInterface $transport
     ): bool {
+        $hash = $this->calculateHash($message, $target, $transport);
+
         $log = new NotificationLog;
+
+        $log->setHash($hash);
 
         try {
             $log
                 ->setProcessedAt(new \DateTimeImmutable)
                 ->setMessageName($message->getCodename())
                 ->setTarget($target)
-                ->setTransport($transport);
+                ->setTransport($transport)
+                ->setLanguageIsoCode($target->getLanguageIsoCode());
 
-            // Fill subject line if transport needed
+            // Fill subject line if transport need it
             if ($transport->isSubjectRequired()) {
                 $subj = $this->renderer->makeSubject($message, $target);
                 $message->setSubject($subj);
@@ -208,7 +213,7 @@ class NotificationFacade
             }
 
             // Render message template
-            $body = $this->renderer->makeBody($message, $target, $transport);
+            $body = $this->renderer->makeBody($message, $target, $transport, $hash);
 
             // Save data to log file (transport name, target string (email, phone, etc), body)
             $log->setBody($body);
@@ -367,5 +372,18 @@ class NotificationFacade
         $messageCodename = $message->getCodename();
 
         return $this->getGroupByMessageCodename($messageCodename);
+    }
+
+    private function calculateHash(
+        NotificationMessageInterface $message,
+        NotificationTargetInterface $target,
+        NotificationTransportInterface $transport
+    ): string {
+        return \sha1(implode('-', [
+            \microtime(),
+            $message->getCodename(),
+            $target->getEmail(),
+            $transport->getName(),
+        ]));
     }
 }

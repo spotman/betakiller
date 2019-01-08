@@ -49,8 +49,15 @@ class WebHookExecuteAction extends AbstractAction
     }
 
     /**
+     * @return \Spotman\Defence\DefinitionBuilderInterface
+     */
+    public function postArgumentsDefinition(): DefinitionBuilderInterface
+    {
+        return $this->definition();
+    }
+
+    /**
      * @param \Psr\Http\Message\ServerRequestInterface $request
-     * @param \Spotman\Defence\ArgumentsInterface      $arguments
      *
      * @return \Psr\Http\Message\ResponseInterface
      * @throws \BetaKiller\Exception\NotFoundHttpException
@@ -59,7 +66,7 @@ class WebHookExecuteAction extends AbstractAction
      * @throws \BetaKiller\WebHook\WebHookException
      * @throws \Throwable
      */
-    public function handle(ServerRequestInterface $request, ArgumentsInterface $arguments): ResponseInterface
+    public function handle(ServerRequestInterface $request): ResponseInterface
     {
         /** @var WebHookModelInterface $model */
         $model = ServerRequestHelper::getEntity($request, WebHookModelInterface::class);

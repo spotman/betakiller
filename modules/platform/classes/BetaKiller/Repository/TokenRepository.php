@@ -8,6 +8,7 @@ use BetaKiller\Model\TokenInterface;
 /**
  * @method TokenInterface findById(string $id)
  * @method TokenInterface[] getAll()
+ * @method void save(TokenInterface $entity)
  */
 class TokenRepository extends AbstractOrmBasedMultipleParentsTreeRepository
 {

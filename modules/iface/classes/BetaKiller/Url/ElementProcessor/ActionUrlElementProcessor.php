@@ -3,6 +3,7 @@ namespace BetaKiller\Url\ElementProcessor;
 
 use BetaKiller\Exception\BadRequestHttpException;
 use BetaKiller\Factory\ActionFactory;
+use BetaKiller\Helper\ActionRequestHelper;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Url\ActionModelInterface;
 use BetaKiller\Url\UrlElementInterface;
@@ -57,14 +58,22 @@ class ActionUrlElementProcessor implements UrlElementProcessorInterface
         $action = $this->factory->createFromUrlElement($model);
 
         try {
-            $definition    = $action->getArgumentsDefinition();
-            $argumentsData = $definition->getArguments();
-            if ($argumentsData) {
-                $postData = ServerRequestHelper::getPost($request);
-            } else {
-                $postData = [];
+            $getDefinition  = $action->getArgumentsDefinition();
+            $postDefinition = $action->postArgumentsDefinition();
+
+            if ($getDefinition->hasArguments()) {
+                $getData      = $request->getQueryParams();
+                $getArguments = $this->argumentsFacade->prepareArguments($getData, $getDefinition);
+
+                $request = $request->withAttribute(ActionRequestHelper::GET_ATTRIBUTE, $getArguments);
             }
-            $arguments = $this->argumentsFacade->prepareArguments($postData, $definition);
+
+            if ($postDefinition->hasArguments()) {
+                $postData      = ServerRequestHelper::getPost($request);
+                $postArguments = $this->argumentsFacade->prepareArguments($postData, $postDefinition);
+
+                $request = $request->withAttribute(ActionRequestHelper::POST_ATTRIBUTE, $postArguments);
+            }
         } catch (\InvalidArgumentException $e) {
             throw new BadRequestHttpException('Arguments validation error for action ":action": :error', [
                 ':error'  => $e->getMessage(),
@@ -72,6 +81,6 @@ class ActionUrlElementProcessor implements UrlElementProcessorInterface
             ]);
         }
 
-        return $action->handle($request, $arguments);
+        return $action->handle($request);
     }
 }

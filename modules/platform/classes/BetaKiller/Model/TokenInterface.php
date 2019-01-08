@@ -34,12 +34,41 @@ interface TokenInterface extends DispatchableEntityInterface
      *
      * @return \BetaKiller\Model\TokenInterface
      */
+    public function setCreatedAt(\DateTimeImmutable $value): TokenInterface;
+
+    /**
+     * @return \DateTimeImmutable
+     */
+    public function getCreatedAt(): \DateTimeImmutable;
+
+    /**
+     * @param \DateTimeImmutable $value
+     *
+     * @return \BetaKiller\Model\TokenInterface
+     */
     public function setEndingAt(\DateTimeImmutable $value): TokenInterface;
 
     /**
      * @return \DateTimeImmutable
      */
     public function getEndingAt(): \DateTimeImmutable;
+
+    /**
+     * @param \DateTimeImmutable $value
+     *
+     * @return \BetaKiller\Model\TokenInterface
+     */
+    public function setUsedAt(\DateTimeImmutable $value): TokenInterface;
+
+    /**
+     * @return \DateTimeImmutable|null
+     */
+    public function getUsedAt(): ?\DateTimeImmutable;
+
+    /**
+     * @return bool
+     */
+    public function isUsed(): bool;
 
     /**
      * @return bool

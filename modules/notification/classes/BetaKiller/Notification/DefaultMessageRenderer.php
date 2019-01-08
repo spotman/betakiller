@@ -35,16 +35,19 @@ class DefaultMessageRenderer implements MessageRendererInterface
      * @param \BetaKiller\Notification\NotificationTargetInterface    $target
      * @param \BetaKiller\Notification\NotificationTransportInterface $transport
      *
+     * @param string                                                  $hash
+     *
      * @return string
      * @throws \BetaKiller\Notification\NotificationException
      */
     public function makeBody(
         NotificationMessageInterface $message,
         NotificationTargetInterface $target,
-        NotificationTransportInterface $transport
+        NotificationTransportInterface $transport,
+        string $hash
     ): string {
         // User language in templates
-        $langName = $target->getLanguageName();
+        $langName = $target->getLanguageIsoCode();
 
         $file = $this->makeTemplateFileName($message->getCodename(), $transport->getName(), $langName);
         $view = $this->viewFactory->create($file);
@@ -54,6 +57,9 @@ class DefaultMessageRenderer implements MessageRendererInterface
 
         // Temp solution, would be removed
         $data['baseI18nKey'] = $message->getBaseI18nKey();
+
+        // Message hash (to distinguish messages)
+        $data['__hash__'] = $hash;
 
         // Get additional transport data
         if ($transport->isSubjectRequired()) {
@@ -91,7 +97,7 @@ class DefaultMessageRenderer implements MessageRendererInterface
     {
         $key      = $message->getBaseI18nKey().'.subj';
         $data     = $message->getFullDataForTarget($target);
-        $langName = $target->getLanguageName();
+        $langName = $target->getLanguageIsoCode();
 
         $lang = $this->i18n->getLanguageByIsoCode($langName);
 

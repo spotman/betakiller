@@ -26,7 +26,7 @@ class TokenService
     /**
      * Generates a random salt for each hash.
      *
-     * @param \BetaKiller\Model\UserInterface $userModel
+     * @param \BetaKiller\Model\UserInterface $user
      *
      * @param \DateInterval                   $ttl
      *
@@ -34,59 +34,29 @@ class TokenService
      * @throws \BetaKiller\Exception\ValidationException
      * @throws \BetaKiller\Repository\RepositoryException
      */
-    public function create(UserInterface $userModel, \DateInterval $ttl): TokenInterface
+    public function create(UserInterface $user, \DateInterval $ttl): TokenInterface
     {
-        $value      = implode('/', [
-            $userModel->getID(),
+        $value = implode('/', [
+            $user->getID(),
             microtime(),
         ]);
+
         $tokenValue = password_hash($value, PASSWORD_BCRYPT);
-        $tokenValue = hash('sha256', $tokenValue);
-        $tokenValue = mb_strtolower($tokenValue);
+        $tokenValue = mb_strtolower(hash('sha256', $tokenValue));
 
         $tokenModel = new Token();
-        $endingAt   = new \DateTimeImmutable();
-        $endingAt   = $endingAt->add($ttl);
+        $createdAt  = new \DateTimeImmutable();
+        $endingAt   = $createdAt->add($ttl);
 
         $tokenModel
-            ->setUser($userModel)
+            ->setUser($user)
             ->setValue($tokenValue)
+            ->setCreatedAt($createdAt)
             ->setEndingAt($endingAt);
 
         $this->tokenRepo->save($tokenModel);
 
         return $tokenModel;
-    }
-
-    /**
-     * @param string                          $tokenValue
-     *
-     * @return bool
-     */
-    public function verify(string $tokenValue): bool
-    {
-        $tokenValue = \mb_strtolower($tokenValue);
-        $tokeModel  = $this->tokenRepo->findActive($tokenValue);
-        if ($tokeModel) {
-            if ($tokenValue === $tokeModel->getValue()) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * @param \BetaKiller\Model\TokenInterface $tokenModel
-     *
-     * @return \BetaKiller\Service\TokenService
-     * @throws \BetaKiller\Repository\RepositoryException
-     */
-    public function delete(TokenInterface $tokenModel): self
-    {
-        $this->tokenRepo->delete($tokenModel);
-
-        return $this;
     }
 
     /**
@@ -97,15 +67,17 @@ class TokenService
      * @return bool
      * @throws \BetaKiller\Repository\RepositoryException
      */
-    public function confirm(TokenInterface $token): bool
+    public function check(TokenInterface $token): bool
     {
-        $status      = false;
-        $tokenModel = $this->tokenRepo->findActive($token->getValue());
-        if ($tokenModel) {
-            $status = $tokenModel->isActive();
-            $this->delete($tokenModel);
+        if (!$token->isActive()) {
+            return false;
         }
 
-        return $status;
+        // One time tokens
+        $token->setUsedAt(new \DateTimeImmutable);
+
+        $this->tokenRepo->save($token);
+
+        return true;
     }
 }

@@ -81,7 +81,7 @@ class TargetsFor extends AbstractTask
                 $this->logger->info(':name <:email> [:lang]', [
                     ':name'  => $item->getFullName(),
                     ':email' => $item->getEmail(),
-                    ':lang'  => $item->getLanguageName(),
+                    ':lang'  => $item->getLanguageIsoCode(),
                 ]);
             } else {
                 throw new NotificationException('Unknown target type ":type"', [

@@ -6,7 +6,8 @@ interface MessageRendererInterface
     public function makeBody(
         NotificationMessageInterface $message,
         NotificationTargetInterface $target,
-        NotificationTransportInterface $transport
+        NotificationTransportInterface $transport,
+        string $hash
     ): string;
 
     public function makeSubject(

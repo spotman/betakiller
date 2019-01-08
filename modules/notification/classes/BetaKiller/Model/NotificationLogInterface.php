@@ -45,6 +45,11 @@ interface NotificationLogInterface extends DispatchableEntityInterface
     public function setSubject(string $subj): NotificationLogInterface;
 
     /**
+     * @return string
+     */
+    public function getSubject(): ?string;
+
+    /**
      * @param string $body
      *
      * @return \BetaKiller\Model\NotificationLogInterface
@@ -62,6 +67,11 @@ interface NotificationLogInterface extends DispatchableEntityInterface
      * @return \BetaKiller\Model\NotificationLogInterface
      */
     public function markAsFailed(string $result = null): NotificationLogInterface;
+
+    /**
+     * @return string|null
+     */
+    public function getFailureReason(): ?string;
 
     /**
      * @return \DateTimeImmutable
@@ -92,4 +102,28 @@ interface NotificationLogInterface extends DispatchableEntityInterface
      * @return bool
      */
     public function isSucceeded(): bool;
+
+    /**
+     * @return string
+     */
+    public function getHash(): string;
+
+    /**
+     * @param string $value
+     *
+     * @return NotificationLogInterface
+     */
+    public function setHash(string $value): NotificationLogInterface;
+
+    /**
+     * @param string $isoCode
+     *
+     * @return \BetaKiller\Model\NotificationLogInterface
+     */
+    public function setLanguageIsoCode(string $isoCode): NotificationLogInterface;
+
+    /**
+     * @return string
+     */
+    public function getLanguageIsoCode(): string;
 }

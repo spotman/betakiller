@@ -37,13 +37,20 @@ class WysiwygPreviewAction extends AbstractAction
     }
 
     /**
+     * @return \Spotman\Defence\DefinitionBuilderInterface
+     */
+    public function postArgumentsDefinition(): DefinitionBuilderInterface
+    {
+        return $this->definition();
+    }
+
+    /**
      * @param \Psr\Http\Message\ServerRequestInterface $request
-     * @param \Spotman\Defence\ArgumentsInterface      $arguments
      *
      * @return \Psr\Http\Message\ResponseInterface
      * @throws \BetaKiller\Factory\FactoryException
      */
-    public function handle(ServerRequestInterface $request, ArgumentsInterface $arguments): ResponseInterface
+    public function handle(ServerRequestInterface $request): ResponseInterface
     {
         $params = ServerRequestHelper::getUrlContainer($request);
         $entity = $params->getEntity(ShortcodeEntityInterface::URL_CONTAINER_KEY);

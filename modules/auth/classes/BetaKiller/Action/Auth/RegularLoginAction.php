@@ -8,6 +8,7 @@ use BetaKiller\Auth\AuthFacade;
 use BetaKiller\Auth\IncorrectPasswordException;
 use BetaKiller\Auth\UserDoesNotExistsException;
 use BetaKiller\Exception\BadRequestHttpException;
+use BetaKiller\Helper\ActionRequestHelper;
 use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\IFace\Auth\LoginIFace;
@@ -57,6 +58,14 @@ class RegularLoginAction extends AbstractAction
      */
     public function getArgumentsDefinition(): DefinitionBuilderInterface
     {
+        return $this->definition();
+    }
+
+    /**
+     * @return \Spotman\Defence\DefinitionBuilderInterface
+     */
+    public function postArgumentsDefinition(): DefinitionBuilderInterface
+    {
         return $this->definition()
             ->string(self::ARG_LOGIN)
             ->string(self::ARG_PASSWORD);
@@ -64,7 +73,6 @@ class RegularLoginAction extends AbstractAction
 
     /**
      * @param \Psr\Http\Message\ServerRequestInterface $request
-     * @param \Spotman\Defence\ArgumentsInterface      $arguments
      *
      * @return \Psr\Http\Message\ResponseInterface
      * @throws \BetaKiller\Auth\IncorrectPasswordException
@@ -73,14 +81,16 @@ class RegularLoginAction extends AbstractAction
      * @throws \BetaKiller\Exception\ValidationException
      * @throws \BetaKiller\Repository\RepositoryException
      */
-    public function handle(ServerRequestInterface $request, ArgumentsInterface $arguments): ResponseInterface
+    public function handle(ServerRequestInterface $request): ResponseInterface
     {
         // HTTP referrer is required to proceed
         $referrer = ServerRequestHelper::getHttpReferrer($request);
 
+        $post = ActionRequestHelper::postArguments($request);
+
         // Sanitize
-        $userLogin    = $arguments->getString(self::ARG_LOGIN);
-        $userPassword = $arguments->getString(self::ARG_PASSWORD);
+        $userLogin    = $post->getString(self::ARG_LOGIN);
+        $userPassword = $post->getString(self::ARG_PASSWORD);
 
         if (!$userLogin || !$userPassword) {
             throw new BadRequestHttpException('No username or password sent');

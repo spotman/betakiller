@@ -4,10 +4,29 @@
 
   <div class="row">
     <div class="col s12">
+      <ul>
+        <li>{{ item.date }}</li>
+        <li>{{ item.target }}</li>
+      </ul>
+
+      {% if item.subject %}
+        <h2>{{ item.subject }}</h2>
+      {% endif %}
+    </div>
+
+    <div class="col s12">
+      <hr>
 
       <div>{{ item.body|raw }}</div>
-
     </div>
+
+    {% if item.result %}
+    <div class="col s12">
+      <hr>
+      <h3>Result:</h3>
+      <div>{{ item.result }}</div>
+    </div>
+    {% endif %}
   </div>
 
 {% endblock %}

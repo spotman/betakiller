@@ -9,7 +9,7 @@ class NotificationTargetEmail implements NotificationTargetInterface
     private $email;
 
     /**
-     * @var string|null
+     * @var string
      */
     private $fullName;
 
@@ -19,22 +19,22 @@ class NotificationTargetEmail implements NotificationTargetInterface
     private $emailNotificationAllowed = true;
 
     /**
-     * @var string|null
+     * @var string
      */
-    private $langName;
+    private $langIsoCode;
 
     /**
      * NotificationTargetEmail constructor.
      *
      * @param string $email
      * @param string $fullName
-     * @param string $langName
+     * @param string $langIsoCode
      */
-    public function __construct(string $email, string $fullName, string $langName)
+    public function __construct(string $email, string $fullName, string $langIsoCode)
     {
-        $this->email    = $email;
-        $this->fullName = $fullName;
-        $this->langName = $langName;
+        $this->email       = $email;
+        $this->fullName    = $fullName;
+        $this->langIsoCode = $langIsoCode;
     }
 
     /**
@@ -55,9 +55,9 @@ class NotificationTargetEmail implements NotificationTargetInterface
      *
      * @return string
      */
-    public function getLanguageName(): string
+    public function getLanguageIsoCode(): string
     {
-        return $this->langName;
+        return $this->langIsoCode;
     }
 
     public function isEmailNotificationAllowed(): bool

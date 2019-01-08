@@ -12,16 +12,31 @@ use BetaKiller\Model\UserInterface;
  * Class NotificationLogRepository
  *
  * @package BetaKiller\Repository
- * @method save(NotificationLogInterface $entity) : void
  */
-class NotificationLogRepository extends AbstractOrmBasedDispatchableRepository
+class NotificationLogRepository extends AbstractOrmBasedDispatchableRepository implements
+    NotificationLogRepositoryInterface
 {
     /**
      * @return string
      */
     public function getUrlKeyName(): string
     {
-        return NotificationLog::TABLE_COLUMN_ID;
+        return NotificationLog::TABLE_COLUMN_HASH;
+    }
+
+    /**
+     * @param string $hash
+     *
+     * @return \BetaKiller\Model\NotificationLogInterface
+     * @throws \BetaKiller\Repository\RepositoryException
+     */
+    public function getByHash(string $hash): NotificationLogInterface
+    {
+        $orm = $this->getOrmInstance();
+
+        return $this
+            ->filterHash($orm, $hash)
+            ->getOne($orm);
     }
 
     /**
@@ -30,7 +45,6 @@ class NotificationLogRepository extends AbstractOrmBasedDispatchableRepository
      *
      * @return \BetaKiller\Model\NotificationLogInterface[]
      *
-     * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\Repository\RepositoryException
      */
     public function getList(int $page, int $itemsPerPage): array
@@ -49,7 +63,6 @@ class NotificationLogRepository extends AbstractOrmBasedDispatchableRepository
      *
      * @return \BetaKiller\Model\NotificationLogInterface[]
      *
-     * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\Repository\RepositoryException
      */
     public function getMessageList(string $messageCodename, int $page, int $itemsPerPage): array
@@ -69,7 +82,6 @@ class NotificationLogRepository extends AbstractOrmBasedDispatchableRepository
      *
      * @return \BetaKiller\Model\NotificationLogInterface[]
      *
-     * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\Repository\RepositoryException
      */
     public function getUserList(UserInterface $user, int $page, int $itemsPerPage): array
@@ -92,6 +104,13 @@ class NotificationLogRepository extends AbstractOrmBasedDispatchableRepository
     private function filterMessageCodename(ExtendedOrmInterface $orm, string $codename): self
     {
         $orm->where($orm->object_column(NotificationLog::TABLE_COLUMN_MESSAGE_NAME), '=', $codename);
+
+        return $this;
+    }
+
+    private function filterHash(ExtendedOrmInterface $orm, string $hash): self
+    {
+        $orm->where($orm->object_column(NotificationLog::TABLE_COLUMN_HASH), '=', $hash);
 
         return $this;
     }

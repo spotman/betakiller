@@ -6,6 +6,7 @@ namespace BetaKiller\Action\Admin\I18n;
 use BetaKiller\Action\AbstractAction;
 use BetaKiller\EntityManager;
 use BetaKiller\Exception\BadRequestHttpException;
+use BetaKiller\Helper\ActionRequestHelper;
 use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\I18n\I18nFacade;
@@ -78,6 +79,14 @@ class AbstractUpdateItemAction extends AbstractAction
      */
     public function getArgumentsDefinition(): DefinitionBuilderInterface
     {
+        return $this->definition();
+    }
+
+    /**
+     * @return \Spotman\Defence\DefinitionBuilderInterface
+     */
+    public function postArgumentsDefinition(): DefinitionBuilderInterface
+    {
         return $this->definition()
             ->compositeArray(self::ARG_I18N_VALUES)
             ->string(self::ARG_LANG_NAME)->lowercase()
@@ -86,21 +95,22 @@ class AbstractUpdateItemAction extends AbstractAction
 
     /**
      * @param \Psr\Http\Message\ServerRequestInterface $request
-     * @param \Spotman\Defence\ArgumentsInterface      $arguments
      *
      * @return \Psr\Http\Message\ResponseInterface
      * @throws \BetaKiller\Exception\BadRequestHttpException
      * @throws \BetaKiller\I18n\I18nException
      * @throws \BetaKiller\IFace\Exception\UrlElementException
      */
-    public function handle(ServerRequestInterface $request, ArgumentsInterface $arguments): ResponseInterface
+    public function handle(ServerRequestInterface $request): ResponseInterface
     {
         $urlHelper = ServerRequestHelper::getUrlHelper($request);
 
         /** @var I18nKeyModelInterface $key */
         $key = ServerRequestHelper::getEntity($request, I18nKeyModelInterface::class);
 
-        foreach ($arguments->getArray(self::ARG_I18N_VALUES) as $i18nData) {
+        $post = ActionRequestHelper::postArguments($request);
+
+        foreach ($post->getArray(self::ARG_I18N_VALUES) as $i18nData) {
             $langName = $i18nData[self::ARG_LANG_NAME];
             $value    = $i18nData[self::ARG_TRANSLATED_VALUE];
 

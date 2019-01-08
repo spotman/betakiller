@@ -24,7 +24,11 @@ class LogItemIFace extends AbstractAdminIFace
 
         return [
             'item' => [
+                'date' => $item->getProcessedAt()->format('d.m.Y H:i:s'),
+                'target' => $item->getTargetString(),
+                'subject' => $item->getSubject(),
                 'body' => $item->getBody(),
+                'result' => $item->getFailureReason(),
             ],
         ];
     }

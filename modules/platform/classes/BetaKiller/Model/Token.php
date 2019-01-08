@@ -5,10 +5,12 @@ namespace BetaKiller\Model;
 
 class Token extends \ORM implements TokenInterface
 {
-    public const TABLE_NAME            = 'tokens';
-    public const TABLE_FIELD_USER_ID   = 'user_id';
-    public const TABLE_FIELD_VALUE     = 'value';
-    public const TABLE_FIELD_ENDING_AT = 'ending_at';
+    public const TABLE_NAME             = 'tokens';
+    public const TABLE_FIELD_USER_ID    = 'user_id';
+    public const TABLE_FIELD_VALUE      = 'value';
+    public const TABLE_FIELD_ENDING_AT  = 'ending_at';
+    public const TABLE_FIELD_CREATED_AT = 'created_at';
+    public const TABLE_FIELD_USED_AT    = 'used_at';
 
     protected function configure(): void
     {
@@ -35,6 +37,14 @@ class Token extends \ORM implements TokenInterface
             self::TABLE_FIELD_VALUE => [
                 ['not_empty'],
                 ['max_length', [':value', 64]],
+            ],
+
+            self::TABLE_FIELD_CREATED_AT => [
+                ['not_empty'],
+            ],
+
+            self::TABLE_FIELD_ENDING_AT => [
+                ['not_empty'],
             ],
         ];
     }
@@ -100,11 +110,63 @@ class Token extends \ORM implements TokenInterface
     }
 
     /**
+     * @param \DateTimeImmutable $value
+     *
+     * @return \BetaKiller\Model\TokenInterface
+     */
+    public function setCreatedAt(\DateTimeImmutable $value): TokenInterface
+    {
+        $this->set_datetime_column_value(self::TABLE_FIELD_CREATED_AT, $value);
+
+        return $this;
+    }
+
+    /**
+     * @return \DateTimeImmutable
+     */
+    public function getCreatedAt(): \DateTimeImmutable
+    {
+        return $this->get_datetime_column_value(self::TABLE_FIELD_CREATED_AT);
+    }
+
+    /**
+     * @param \DateTimeImmutable $value
+     *
+     * @return \BetaKiller\Model\TokenInterface
+     */
+    public function setUsedAt(\DateTimeImmutable $value): TokenInterface
+    {
+        $this->set_datetime_column_value(self::TABLE_FIELD_USED_AT, $value);
+
+        return $this;
+    }
+
+    /**
+     * @return \DateTimeImmutable|null
+     */
+    public function getUsedAt(): ?\DateTimeImmutable
+    {
+        return $this->get_datetime_column_value(self::TABLE_FIELD_USED_AT);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isUsed(): bool
+    {
+        return (bool)$this->getUsedAt();
+    }
+
+    /**
      * @return bool
      * @throws \Exception
      */
     public function isActive(): bool
     {
+        if ($this->isUsed()) {
+            return false;
+        }
+
         $endingDate  = $this->getEndingAt();
         $currentDate = new \DateTimeImmutable();
 

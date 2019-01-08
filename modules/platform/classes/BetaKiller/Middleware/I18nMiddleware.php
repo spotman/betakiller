@@ -102,7 +102,7 @@ class I18nMiddleware implements MiddlewareInterface
             return null;
         }
 
-        return $user->getLanguageName();
+        return $user->getLanguageIsoCode();
     }
 
     private function detectHttpLang(ServerRequestInterface $request): string
