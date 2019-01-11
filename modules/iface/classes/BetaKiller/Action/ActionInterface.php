@@ -3,11 +3,10 @@ declare(strict_types=1);
 
 namespace BetaKiller\Action;
 
-use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\RequestHandlerInterface;
 use Spotman\Defence\DefinitionBuilderInterface;
 
-interface ActionInterface
+interface ActionInterface extends RequestHandlerInterface
 {
     public const NAMESPACE = 'Action';
     public const SUFFIX    = 'Action';
@@ -25,11 +24,4 @@ interface ActionInterface
      * @return \Spotman\Defence\DefinitionBuilderInterface
      */
     public function postArgumentsDefinition(): DefinitionBuilderInterface;
-
-    /**
-     * @param \Psr\Http\Message\ServerRequestInterface $request
-     *
-     * @return \Psr\Http\Message\ResponseInterface
-     */
-    public function handle(ServerRequestInterface $request): ResponseInterface;
 }
