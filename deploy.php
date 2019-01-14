@@ -421,7 +421,6 @@ task('import:zones', function () {
 })->desc('Import UrlElement zones');
 
 task('import:i18n', function () {
-    runMinionTask('import:languages');
     runMinionTask('import:i18n');
 })->desc('Import localization data');
 
