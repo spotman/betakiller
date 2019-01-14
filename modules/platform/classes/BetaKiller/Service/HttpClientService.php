@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace BetaKiller\Service;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\Cookie\CookieJarInterface;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\MessageFormatter;
 use GuzzleHttp\Middleware;
@@ -39,8 +40,7 @@ class HttpClientService
                 $logger,
                 new MessageFormatter('{req_headers} => {res_headers}'),
                 LogLevel::DEBUG
-            ),
-            Middleware::httpErrors()
+            )
         );
 
         $this->client = new Client([
@@ -61,11 +61,15 @@ class HttpClientService
         return $this->request('GET', $url);
     }
 
-    public function syncCall(RequestInterface $request, array $requestOptions = null): ResponseInterface
+    public function syncCall(RequestInterface $request, CookieJarInterface $jar = null, array $requestOptions = null): ResponseInterface
     {
         $options = [
             'allow_redirects' => true,
         ];
+
+        if ($jar) {
+            $options['cookies'] = $jar;
+        }
 
         if ($requestOptions) {
             $options = \array_merge($options, $requestOptions);

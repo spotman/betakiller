@@ -9,6 +9,7 @@ use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\Service\HttpClientService;
 use BetaKiller\Task\TaskException;
 use BetaKiller\Url\AvailableUrlsCollector;
+use GuzzleHttp\Cookie\CookieJar;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Process\Process;
@@ -63,6 +64,11 @@ class Warmup extends \BetaKiller\Task\AbstractTask
     private $appConfig;
 
     /**
+     * @var \GuzzleHttp\Cookie\CookieJarInterface
+     */
+    private $cookieJar;
+
+    /**
      * Warmup constructor.
      *
      * @param \BetaKiller\Url\AvailableUrlsCollector $urlCollector
@@ -86,6 +92,8 @@ class Warmup extends \BetaKiller\Task\AbstractTask
         $this->appEnv           = $appEnv;
         $this->appConfig        = $appConfig;
         $this->logger           = $logger;
+
+        $this->cookieJar = new CookieJar();
 
         parent::__construct();
     }
@@ -317,7 +325,7 @@ class Warmup extends \BetaKiller\Task\AbstractTask
         }
     }
 
-    private function makeHttpRequest(string $url, array $options = null): ResponseInterface
+    private function makeHttpRequest(string $url): ResponseInterface
     {
         $path = \parse_url($url, \PHP_URL_PATH);
 
@@ -329,6 +337,6 @@ class Warmup extends \BetaKiller\Task\AbstractTask
         // see https://github.com/guzzle/guzzle/issues/590
         $request = $this->httpClient->get($url);
 
-        return $this->httpClient->syncCall($request, $options);
+        return $this->httpClient->syncCall($request, $this->cookieJar);
     }
 }
