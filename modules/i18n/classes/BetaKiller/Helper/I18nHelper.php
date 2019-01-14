@@ -37,7 +37,7 @@ class I18nHelper
     public function setLang(LanguageInterface $value): void
     {
         if (!$this->facade->hasLanguage($value->getIsoCode())) {
-            throw new Exception('Unknown language :lang, only these are allowed: :allowed', [
+            throw new Exception('Unknown language ":lang", only these are allowed: :allowed', [
                 ':lang'    => $value,
                 ':allowed' => implode(', ', $this->facade->getAllowedLanguagesIsoCodes()),
             ]);
