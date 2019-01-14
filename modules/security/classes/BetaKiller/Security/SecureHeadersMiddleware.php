@@ -20,20 +20,13 @@ class SecureHeadersMiddleware implements MiddlewareInterface
     private $appConfig;
 
     /**
-     * @var \BetaKiller\Helper\AppEnvInterface
-     */
-    private $appEnv;
-
-    /**
      * SecureHeadersMiddleware constructor.
      *
      * @param \BetaKiller\Config\AppConfigInterface $appConfig
-     * @param \BetaKiller\Helper\AppEnvInterface    $appEnv
      */
-    public function __construct(AppConfigInterface $appConfig, AppEnvInterface $appEnv)
+    public function __construct(AppConfigInterface $appConfig)
     {
         $this->appConfig = $appConfig;
-        $this->appEnv    = $appEnv;
     }
 
     /**
@@ -62,8 +55,8 @@ class SecureHeadersMiddleware implements MiddlewareInterface
 
         // Report URI first
         $reportUri = (string)$baseUri->withPath(CspReportHandler::URL);
-        $headers->csp('report-uri', $reportUri);
-        $headers->csp('report-uri', $reportUri, true);
+        $headers->csp('report', $reportUri);
+        $headers->csp('report', $reportUri, true);
 
         // Basic STS headers with safe mode enabled to prevent long-lasting effects of incorrect configuration
         $headers->hsts(3600, false, false);
@@ -73,11 +66,11 @@ class SecureHeadersMiddleware implements MiddlewareInterface
         $headers->csp('image', $baseUrl);
         $headers->csp('style', $baseUrl);
         $headers->csp('script', $baseUrl);
-        $headers->csp('font-src', $baseUrl);
+        $headers->csp('font', $baseUrl);
         $headers->csp('style', 'unsafe-inline');
 
-        $headers->csp('connect-src', $baseUrl);
-        $headers->csp('connect-src', 'wss://'.$baseUri->getHost()); // For secure Websocket
+        $headers->csp('connect', $baseUrl);
+        $headers->csp('connect', 'wss://'.$baseUri->getHost()); // For secure Websocket
 
         // TODO Inject this nonce in Request and use in StaticAssets
 //        $styleNonce  = $headers->cspNonce('style');
