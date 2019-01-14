@@ -193,7 +193,7 @@ class Cron extends AbstractTask
     {
         $this->logDebug('Task [:name] is ready to start', [':name' => $task->getName()]);
 
-        $cmd = self::getTaskCmd($this->env, $task->getName(), $task->getParams());
+        $cmd     = self::getTaskCmd($this->env, $task->getName(), $task->getParams());
         $docRoot = $this->env->getDocRootPath();
 
         // Store fingerprint for simpler task identification upon start
@@ -201,6 +201,8 @@ class Cron extends AbstractTask
             self::FINGERPRINT_TAG => $task->getFingerprint(),
             'name'                => $task->getName(),
         ];
+
+        $this->logDebug('Command: :cmd', [':cmd' => $cmd]);
 
         $run = new ProcessRun(Process::fromShellCommandline($cmd, $docRoot), $tags);
 
