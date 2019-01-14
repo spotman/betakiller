@@ -7,6 +7,9 @@ use BetaKiller\Cron\CronException;
 use BetaKiller\Cron\Task;
 use BetaKiller\Cron\TaskQueue;
 use BetaKiller\Helper\AppEnvInterface;
+use BetaKiller\Model\CronLog;
+use BetaKiller\Model\CronLogInterface;
+use BetaKiller\Repository\CronLogRepositoryInterface;
 use Cron\CronExpression;
 use Graze\ParallelProcess\Display\Table;
 use Graze\ParallelProcess\Event\RunEvent;
@@ -24,7 +27,8 @@ class Cron extends AbstractTask
         'hourly',
     ];
 
-    private const FINGERPRINT_TAG = 'fingerprint';
+    private const TAG_FINGERPRINT = 'fingerprint';
+    private const TAG_LOG_ID      = 'log-id';
 
     /**
      * @var \BetaKiller\Helper\AppEnvInterface
@@ -52,15 +56,22 @@ class Cron extends AbstractTask
     private $isHuman;
 
     /**
+     * @var \BetaKiller\Repository\CronLogRepositoryInterface
+     */
+    private $repo;
+
+    /**
      * Cron constructor.
      *
-     * @param \BetaKiller\Helper\AppEnvInterface $env
-     * @param \BetaKiller\Cron\TaskQueue         $queue
-     * @param \Psr\Log\LoggerInterface           $logger
+     * @param \BetaKiller\Helper\AppEnvInterface                $env
+     * @param \BetaKiller\Cron\TaskQueue                        $queue
+     * @param \BetaKiller\Repository\CronLogRepositoryInterface $repo
+     * @param \Psr\Log\LoggerInterface                          $logger
      */
     public function __construct(
         AppEnvInterface $env,
         TaskQueue $queue,
+        CronLogRepositoryInterface $repo,
         LoggerInterface $logger
     ) {
         $this->env    = $env;
@@ -68,6 +79,7 @@ class Cron extends AbstractTask
         $this->logger = $logger;
 
         parent::__construct();
+        $this->repo = $repo;
     }
 
     public function defineOptions(): array
@@ -196,10 +208,20 @@ class Cron extends AbstractTask
         $cmd     = self::getTaskCmd($this->env, $task->getName(), $task->getParams());
         $docRoot = $this->env->getDocRootPath();
 
+        $log = new CronLog();
+
+        $log
+            ->setName($task->getName())
+            ->setCmd($cmd)
+            ->markAsQueued();
+
+        $this->repo->save($log);
+
         // Store fingerprint for simpler task identification upon start
         $tags = [
-            self::FINGERPRINT_TAG => $task->getFingerprint(),
             'name'                => $task->getName(),
+            self::TAG_LOG_ID      => $log->getID(),
+            self::TAG_FINGERPRINT => $task->getFingerprint(),
         ];
 
         $this->logDebug('Command: :cmd', [':cmd' => $cmd]);
@@ -212,6 +234,10 @@ class Cron extends AbstractTask
             $task->started();
 
             $this->logDebug('Task [:name] is started', [':name' => $task->getName()]);
+
+            $log = $this->getLogFromRunEvent($event);
+            $log->markAsStarted();
+            $this->repo->save($log);
         });
 
         $run->addListener(RunEvent::SUCCESSFUL, function (RunEvent $event) {
@@ -223,10 +249,14 @@ class Cron extends AbstractTask
             $this->logDebug('Task [:name] succeeded', [
                 ':name' => $task->getName(),
             ]);
+
+            $log = $this->getLogFromRunEvent($event);
+            $log->markAsSucceeded();
+            $this->repo->save($log);
         });
 
-        $run->addListener(RunEvent::FAILED, function (RunEvent $runEvent) {
-            $task = $this->getTaskFromRunEvent($runEvent);
+        $run->addListener(RunEvent::FAILED, function (RunEvent $event) {
+            $task = $this->getTaskFromRunEvent($event);
 
             $task->failed();
 
@@ -237,6 +267,10 @@ class Cron extends AbstractTask
                 ':name' => $task->getName(),
                 ':time' => $till->format('H:i:s d.m.Y'),
             ]);
+
+            $log = $this->getLogFromRunEvent($event);
+            $log->markAsFailed();
+            $this->repo->save($log);
         });
 
         return $run;
@@ -251,7 +285,7 @@ class Cron extends AbstractTask
     private function getTaskFromRunEvent(RunEvent $event): Task
     {
         $tags        = $event->getRun()->getTags();
-        $fingerprint = $tags[self::FINGERPRINT_TAG] ?? '';
+        $fingerprint = $tags[self::TAG_FINGERPRINT] ?? '';
 
         if (!$fingerprint) {
             throw new CronException('Missing process fingerprint, tags are :values', [
@@ -260,6 +294,20 @@ class Cron extends AbstractTask
         }
 
         return $this->queue->getByFingerprint($fingerprint);
+    }
+
+    private function getLogFromRunEvent(RunEvent $event): CronLogInterface
+    {
+        $tags  = $event->getRun()->getTags();
+        $logID = $tags[self::TAG_LOG_ID] ?? '';
+
+        if (!$logID) {
+            throw new CronException('Missing process log ID, tags are :values', [
+                ':values' => \json_encode($tags),
+            ]);
+        }
+
+        return $this->repo->getById($logID);
     }
 
     private function logDebug(string $message, array $params = null): void
