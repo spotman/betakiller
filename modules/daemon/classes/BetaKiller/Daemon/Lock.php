@@ -70,6 +70,12 @@ class Lock
         return \is_link($this->path);
     }
 
+    /**
+     * @param int|null $timeout
+     *
+     * @throws \BetaKiller\Exception
+     * @todo is not working
+     */
     public function waitForRelease(int $timeout = null): void
     {
         $timeout = $timeout ?? 3;
@@ -79,7 +85,7 @@ class Lock
         // wait for daemon to be stopped
         while (\microtime(true) < $end) {
             if (!$this->isAcquired()) {
-                return;
+                break;
             }
 
             \usleep(100000);
