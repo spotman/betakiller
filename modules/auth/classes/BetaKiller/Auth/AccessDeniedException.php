@@ -40,14 +40,4 @@ class AccessDeniedException extends HttpException
     {
         return true;
     }
-
-    /**
-     * Отключаем уведомление о текущем типе исключений
-     *
-     * @return bool
-     */
-    public function isNotificationEnabled(): bool
-    {
-        return false;
-    }
 }
