@@ -112,4 +112,16 @@ class UserSession extends \ORM
 
         return $this;
     }
+
+    public function setOrigin(string $url): UserSession
+    {
+        $this->set('origin', $url);
+
+        return $this;
+    }
+
+    public function getOrigin(): string
+    {
+        return $this->get('origin');
+    }
 }

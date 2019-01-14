@@ -89,11 +89,13 @@ class DatabaseSessionStorage implements SessionStorageInterface
     {
         $userAgent = ServerRequestHelper::getUserAgent($request);
         $ipAddress = ServerRequestHelper::getIpAddress($request);
-        $cookie    = $this->cookies->get($request, self::COOKIE_NAME);
+        $originUrl = ServerRequestHelper::getUrl($request);
+
+        $cookie = $this->cookies->get($request, self::COOKIE_NAME);
 
         if (!$cookie) {
             // No session (cleared by browser or new visitor) => regenerate empty session
-            return $this->createSession($userAgent, $ipAddress);
+            return $this->createSession($userAgent, $ipAddress, $originUrl);
         }
 
         $parts = explode(self::COOKIE_DELIMITER, $cookie, 2);
@@ -107,12 +109,12 @@ class DatabaseSessionStorage implements SessionStorageInterface
 
         if (!$model) {
             // Missing session (cleared by gc or stale) => regenerate empty session
-            return $this->createSession($userAgent, $ipAddress);
+            return $this->createSession($userAgent, $ipAddress, $originUrl);
         }
 
         if ($this->isExpired($model)) {
             // Session exists, but expired => create empty
-            return $this->createSession($userAgent, $ipAddress);
+            return $this->createSession($userAgent, $ipAddress, $originUrl);
         }
 
         $session = $this->restoreSession($model);
@@ -121,7 +123,7 @@ class DatabaseSessionStorage implements SessionStorageInterface
         if (!$this->isValidUserAgent($session, $userAgent)) {
             $this->sessionRepo->delete($model);
 
-            return $this->createSession($userAgent, $ipAddress);
+            return $this->createSession($userAgent, $ipAddress, $originUrl);
         }
 
         return $session;
@@ -260,11 +262,15 @@ class DatabaseSessionStorage implements SessionStorageInterface
         }
 
         $userID = SessionHelper::getUserID($session);
+        $origin = SessionHelper::getOriginUrl($session);
 
         // Import user ID from Session only once
         if ($userID && !$model->hasUser()) {
             $model->setUserID($userID);
         }
+
+        // Import origin URL
+        $model->setOrigin($origin);
 
         // Encode and encrypt session data
         $content = $this->encodeData($session->toArray());
@@ -290,13 +296,14 @@ class DatabaseSessionStorage implements SessionStorageInterface
         return new Session($data, $token);
     }
 
-    private function createSession(string $userAgent, string $ipAddress, array $data = null): SessionInterface
+    private function createSession(string $userAgent, string $ipAddress, string $originUrl): SessionInterface
     {
         // Generate new token and fresh session object without data
-        $session = $this->sessionFactory($this->generateToken(), $data ?? []);
+        $session = $this->sessionFactory($this->generateToken(), []);
 
         SessionHelper::setUserAgent($session, $userAgent);
         SessionHelper::setIpAddress($session, $ipAddress);
+        SessionHelper::setOriginUrl($session, $originUrl);
 
         return $session;
     }
@@ -313,7 +320,8 @@ class DatabaseSessionStorage implements SessionStorageInterface
         // Generate new token and create fresh session with empty data
         return $this->createSession(
             SessionHelper::getUserAgent($session),
-            SessionHelper::getIpAddress($session)
+            SessionHelper::getIpAddress($session),
+            SessionHelper::getOriginUrl($session)
         );
     }
 

@@ -12,6 +12,7 @@ class SessionHelper
     public const IP_ADDRESS   = 'ip_address';
     public const USER_AGENT   = 'user_agent';
     public const AUTH_USER_ID = 'auth_user';
+    public const ORIGIN_URL   = 'origin_url';
 
     public static function getUserAgent(SessionInterface $session): string
     {
@@ -59,5 +60,15 @@ class SessionHelper
         if ($session->has(self::AUTH_USER_ID)) {
             $session->unset(self::AUTH_USER_ID);
         }
+    }
+
+    public static function getOriginUrl(SessionInterface $session): ?string
+    {
+        return $session->get(self::ORIGIN_URL);
+    }
+
+    public static function setOriginUrl(SessionInterface $session, string $url): void
+    {
+        $session->set(self::ORIGIN_URL, $url);
     }
 }
