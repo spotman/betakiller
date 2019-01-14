@@ -114,7 +114,7 @@ class DebugMiddleware implements MiddlewareInterface
         }
 
         // Enable debugging via PhpConsole
-        if ($this->isPhpConsoleActive()) {
+        if ($this->appEnv->inDevelopmentMode() && $this->isPhpConsoleActive()) {
             $this->initPhpConsole();
         }
 
