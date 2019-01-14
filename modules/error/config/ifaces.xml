@@ -14,7 +14,7 @@
            menu="admin" zone="developer">
         <iface uri="php-exceptions" name="Admin_Error_UnresolvedPhpExceptionIndex"
                title="Admin | Unresolved PhpExceptions" label="Unresolved" entity="PhpException"
-               entityAction="listUnresolved" menu="admin">
+               entityAction="listUnresolved" menu="admin" zone="admin">
             <iface uri="resolved" name="Admin_Error_ResolvedPhpExceptionIndex" title="Admin | Resolved PhpExceptions"
                    label="Resolved" entity="PhpException" entityAction="listResolved" menu="admin"/>
             <iface uri="{PhpException.hash}" name="Admin_Error_PhpExceptionItem" label="Message"
