@@ -116,6 +116,11 @@ class TwigExtension extends Twig_Extension
             ),
 
             new Twig_Function(
+                'in_staging',
+                [$this, 'inStaging']
+            ),
+
+            new Twig_Function(
                 'json_encode',
                 'json_encode',
                 ['is_safe' => ['html']]
@@ -189,6 +194,14 @@ class TwigExtension extends Twig_Extension
     public function inProduction(): bool
     {
         return $this->appEnv->inProductionMode();
+    }
+
+    /**
+     * @return bool
+     */
+    public function inStaging(): bool
+    {
+        return $this->appEnv->inStagingMode();
     }
 
     /**
