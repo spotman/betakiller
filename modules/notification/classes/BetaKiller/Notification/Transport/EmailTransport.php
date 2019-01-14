@@ -46,6 +46,14 @@ class EmailTransport extends AbstractTransport
         $subj        = $message->getSubject();
         $attachments = $message->getAttachments();
 
+        if (!$to) {
+            throw new \InvalidArgumentException('Missing email target');
+        }
+
+        if (!$subj) {
+            throw new \InvalidArgumentException('Missing email subject');
+        }
+
         // Email notification
         return (bool)\Email::send($from, $to, $subj, $body, true, $attachments);
     }

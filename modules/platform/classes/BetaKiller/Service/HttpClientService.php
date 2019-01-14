@@ -35,6 +35,7 @@ class HttpClientService
     public function __construct(RequestFactoryInterface $requestFactory, LoggerInterface $logger)
     {
         $stack = HandlerStack::create();
+
         $stack->push(
             Middleware::log(
                 $logger,
