@@ -70,6 +70,29 @@ class Lock
         return \is_link($this->path);
     }
 
+    public function waitForRelease(int $timeout = null): void
+    {
+        $timeout = $timeout ?? 3;
+        $start   = \microtime(true);
+        $end     = $start + $timeout;
+
+        // wait for daemon to be stopped
+        while (\microtime(true) < $end) {
+            if (!$this->isAcquired()) {
+                return;
+            }
+
+            \usleep(100000);
+        }
+
+        if ($this->isAcquired()) {
+            throw new Exception('Lock had not been released in :timeout seconds at path ":path"', [
+                ':path'    => $this->path,
+                ':timeout' => $timeout,
+            ]);
+        }
+    }
+
     public function getPid(): int
     {
         if (!$this->isAcquired()) {

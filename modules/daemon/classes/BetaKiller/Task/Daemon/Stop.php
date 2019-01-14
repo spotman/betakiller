@@ -71,5 +71,8 @@ class Stop extends AbstractTask
         // Send signal to a process
         $process = new Process(['kill', '-s', \SIGTERM, $pid]);
         $process->run();
+
+        // wait for daemon to be stopped
+        $lock->waitForRelease();
     }
 }
