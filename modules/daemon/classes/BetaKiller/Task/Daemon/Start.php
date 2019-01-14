@@ -45,6 +45,7 @@ class Start extends AbstractTask
     {
         return [
             'name' => null,
+            'ignore-running' => false,
         ];
     }
 
@@ -60,7 +61,11 @@ class Start extends AbstractTask
         $lock = $this->lockFactory->create($name);
 
         // Check lock file exists and points to a valid pid
-        if ($lock->isAcquired()) {
+        if ($lock->isValid()) {
+            if ($this->getOption('ignore-running')) {
+                return;
+            }
+
             throw new TaskException('Daemon ":name" is already running', [
                 ':name' => $name,
             ]);
