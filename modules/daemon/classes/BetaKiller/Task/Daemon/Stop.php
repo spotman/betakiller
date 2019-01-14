@@ -73,6 +73,6 @@ class Stop extends AbstractTask
         $process->run();
 
         // wait for daemon to be stopped
-        $lock->waitForRelease();
+        $lock->waitForRelease(10);
     }
 }
