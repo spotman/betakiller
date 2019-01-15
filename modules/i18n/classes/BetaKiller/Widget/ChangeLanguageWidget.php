@@ -4,20 +4,20 @@ declare(strict_types=1);
 namespace BetaKiller\Widget;
 
 use BetaKiller\Helper\ServerRequestHelper;
-use BetaKiller\Repository\LanguageRepository;
+use BetaKiller\Repository\LanguageRepositoryInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 class ChangeLanguageWidget extends AbstractPublicWidget
 {
     /**
-     * @var \BetaKiller\Repository\LanguageRepository
+     * @var \BetaKiller\Repository\LanguageRepositoryInterface
      */
     private $languageRepo;
 
     /**
-     * @param \BetaKiller\Repository\LanguageRepository $languageRepo
+     * @param \BetaKiller\Repository\LanguageRepositoryInterface $languageRepo
      */
-    public function __construct(LanguageRepository $languageRepo)
+    public function __construct(LanguageRepositoryInterface $languageRepo)
     {
         $this->languageRepo = $languageRepo;
     }
@@ -40,7 +40,7 @@ class ChangeLanguageWidget extends AbstractPublicWidget
         // Link to current page in other language
         $element = $stack->hasCurrent()
             ? $stack->getCurrent()
-            : $urlHelper->getUrlElementByCodename('App_Index');
+            : $urlHelper->getDefaultUrlElement();
 
         // Add query parameters if exists
         $currentQuery = $request->getUri()->getQuery();
