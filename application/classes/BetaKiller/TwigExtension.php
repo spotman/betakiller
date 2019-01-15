@@ -75,6 +75,18 @@ class TwigExtension extends Twig_Extension
             ),
 
             new Twig_Function(
+                'js_nonce',
+                [$this, 'getJsNonce'],
+                ['needs_context' => true]
+            ),
+
+            new Twig_Function(
+                'css_nonce',
+                [$this, 'getCssNonce'],
+                ['needs_context' => true]
+            ),
+
+            new Twig_Function(
                 'meta',
                 [$this, 'meta'],
                 ['needs_context' => true]
@@ -299,6 +311,20 @@ class TwigExtension extends Twig_Extension
         } else {
             $csp->csp($name, $value);
         }
+    }
+
+    public function getJsNonce(array $context): string
+    {
+        $request = $this->getRequest($context);
+
+        return ServerRequestHelper::getCsp($request)->cspNonce('script');
+    }
+
+    public function getCssNonce(array $context): string
+    {
+        $request = $this->getRequest($context);
+
+        return ServerRequestHelper::getCsp($request)->cspNonce('style');
     }
 
     public function webpackEntry(array $context, string $entryPoint, string $distDir = null): void
