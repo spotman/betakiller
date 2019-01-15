@@ -56,7 +56,6 @@ class SecureHeadersMiddleware implements MiddlewareInterface
         $reportUri = (string)$baseUri->withPath(CspReportHandler::URL);
         $headers->csp('report', $reportUri);
         $headers->csp('report', $reportUri, true);
-        $headers->csp('report-sample');
 
         // Basic STS headers with safe mode enabled to prevent long-lasting effects of incorrect configuration
         $headers->hsts(3600, false, false);
@@ -68,6 +67,10 @@ class SecureHeadersMiddleware implements MiddlewareInterface
         $headers->csp('script', $baseUrl);
         $headers->csp('font', $baseUrl);
         $headers->csp('style', 'unsafe-inline');
+
+        // @see https://www.w3.org/TR/CSP3/#grammardef-report-sample
+        $headers->csp('script', 'report-sample');
+        $headers->csp('style', 'report-sample');
 
         $headers->csp('connect', $baseUrl);
         $headers->csp('connect', 'wss://'.$baseUri->getHost()); // For secure Websocket
