@@ -6,7 +6,6 @@ namespace BetaKiller\Security;
 use Aidantwoods\SecureHeaders\Http\Psr7Adapter;
 use Aidantwoods\SecureHeaders\SecureHeaders;
 use BetaKiller\Config\AppConfigInterface;
-use BetaKiller\Helper\AppEnvInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -57,6 +56,7 @@ class SecureHeadersMiddleware implements MiddlewareInterface
         $reportUri = (string)$baseUri->withPath(CspReportHandler::URL);
         $headers->csp('report', $reportUri);
         $headers->csp('report', $reportUri, true);
+        $headers->csp('report-sample');
 
         // Basic STS headers with safe mode enabled to prevent long-lasting effects of incorrect configuration
         $headers->hsts(3600, false, false);
