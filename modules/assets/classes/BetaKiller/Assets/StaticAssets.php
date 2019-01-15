@@ -143,7 +143,7 @@ class StaticAssets
 
     private function getBasePath(): string
     {
-        return $this->config->getUrlPath().DIRECTORY_SEPARATOR.'static/';
+        return $this->config->getUrlPath().'/static/';
     }
 
     private function getFullPath(): string
