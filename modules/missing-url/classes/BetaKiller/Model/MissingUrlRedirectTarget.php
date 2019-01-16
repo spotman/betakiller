@@ -3,9 +3,6 @@ declare(strict_types=1);
 
 namespace BetaKiller\Model;
 
-
-use BetaKiller\Url\IFaceModelInterface;
-
 class MissingUrlRedirectTarget extends \ORM implements MissingUrlRedirectTargetModelInterface
 {
     /**
@@ -18,13 +15,6 @@ class MissingUrlRedirectTarget extends \ORM implements MissingUrlRedirectTargetM
     protected function configure(): void
     {
         $this->_table_name = 'redirect_targets';
-
-        $this->belongs_to([
-            'iface' => [
-                'model' => 'IFace',
-                'foreign_key' => 'iface_id',
-            ],
-        ]);
     }
 
     public function getUrl(): string
@@ -35,15 +25,5 @@ class MissingUrlRedirectTarget extends \ORM implements MissingUrlRedirectTargetM
     public function setUrl(string $value): MissingUrlRedirectTargetModelInterface
     {
         return $this->set('url', $value);
-    }
-
-    public function getParentIFaceModel(): ?IFaceModelInterface
-    {
-        return $this->get('iface');
-    }
-
-    public function setParentIFaceModel(IFaceModelInterface $parentModel): MissingUrlRedirectTargetModelInterface
-    {
-        return $this->set('iface', $parentModel);
     }
 }

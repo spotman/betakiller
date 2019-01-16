@@ -3,7 +3,6 @@ namespace BetaKiller\MissingUrl;
 
 use BetaKiller\Event\MissingUrlEvent;
 use BetaKiller\Helper\AppEnvInterface;
-use BetaKiller\MessageBus\EventBusInterface;
 use BetaKiller\MessageBus\EventHandlerInterface;
 use BetaKiller\Model\MissingUrlModelInterface;
 use BetaKiller\Model\MissingUrlRedirectTargetModelInterface;
@@ -11,7 +10,6 @@ use BetaKiller\Model\MissingUrlReferrerModelInterface;
 use BetaKiller\Repository\MissingUrlRedirectTargetRepository;
 use BetaKiller\Repository\MissingUrlReferrerRepository;
 use BetaKiller\Repository\MissingUrlRepository;
-use BetaKiller\Url\UrlElementInterface;
 
 class MissingUrlEventHandler implements EventHandlerInterface
 {
@@ -56,7 +54,7 @@ class MissingUrlEventHandler implements EventHandlerInterface
     }
 
     /**
-     * @param \BetaKiller\Event\MissingUrlEvent        $message
+     * @param \BetaKiller\Event\MissingUrlEvent $message
      *
      * @throws \BetaKiller\Exception\ValidationException
      * @throws \BetaKiller\Repository\RepositoryException
@@ -104,7 +102,6 @@ class MissingUrlEventHandler implements EventHandlerInterface
     {
         $missedUrl     = $event->getMissedUrl();
         $redirectToUrl = $event->getRedirectToUrl();
-        $parentElement   = $event->getParentModel();
 
         $missedUrlModel = $this->missingUrlRepository->findByUrl($missedUrl);
 
@@ -117,43 +114,31 @@ class MissingUrlEventHandler implements EventHandlerInterface
 
         // Set redirect target if provided
         if ($redirectToUrl) {
-            $redirectModel = $this->getRedirectTargetModel($redirectToUrl, $parentElement);
+            $redirectModel = $this->getRedirectTargetModel($redirectToUrl);
 
             // Set target in missed url
             $missedUrlModel->setRedirectTarget($redirectModel);
         }
 
-        // Store fresh model
-        $this->missingUrlRepository->save($missedUrlModel);
-
         return $missedUrlModel;
     }
 
     /**
-     * @param string                                   $redirectToUrl
-     * @param \BetaKiller\Url\UrlElementInterface|null $parentElement
+     * @param string $redirectToUrl
      *
      * @return \BetaKiller\Model\MissingUrlRedirectTargetModelInterface
      * @throws \BetaKiller\Repository\RepositoryException
      * @throws \BetaKiller\Exception\ValidationException
      */
     private function getRedirectTargetModel(
-        string $redirectToUrl,
-        ?UrlElementInterface $parentElement
+        string $redirectToUrl
     ): MissingUrlRedirectTargetModelInterface {
         $redirectModel = $this->targetUrlRepository->findByUrl($redirectToUrl);
 
         if (!$redirectModel) {
             $redirectModel = $this->targetUrlRepository->create();
 
-            if ($redirectToUrl) {
-                $redirectModel->setUrl($redirectToUrl);
-            }
-
-            if ($parentElement) {
-                // TODO Find IFace in the parents chain
-                $redirectModel->setParentIFaceModel($parentElement);
-            }
+            $redirectModel->setUrl($redirectToUrl);
 
             // Store fresh model
             $this->targetUrlRepository->save($redirectModel);
