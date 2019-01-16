@@ -82,11 +82,12 @@ class Logger implements LoggerInterface
             date('d').'.log',
         ]);
 
-        $logsLevel   = $isDebug ? $monolog::DEBUG : $monolog::NOTICE;
-        $fileHandler = new FingersCrossedHandler(new StreamHandler($logFilePath, $monolog::DEBUG), $logsLevel);
+        $logsLevel = $isDebug ? $monolog::DEBUG : $monolog::NOTICE;
+
+        $fileHandler = new StreamHandler($logFilePath, $monolog::DEBUG);
         $fileHandler->pushProcessor(new ContextCleanupProcessor);
         $fileHandler->pushProcessor(new ExceptionStacktraceProcessor);
-        $monolog->pushHandler($fileHandler);
+        $monolog->pushHandler(new FingersCrossedHandler($fileHandler, $logsLevel));
 
         // Common processors
         $monolog

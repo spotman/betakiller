@@ -164,7 +164,7 @@ class DatabaseSessionStorage implements SessionStorageInterface
             ':token'  => $session->getId(),
             ':agent'  => $userAgent,
             ':needed' => $validAgent,
-            ':user'   => SessionHelper::getUserID($session),
+            ':user'   => SessionHelper::getUserID($session) ?: 'Guest',
         ]));
 
         return false;
