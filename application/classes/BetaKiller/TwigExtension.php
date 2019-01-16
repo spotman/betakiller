@@ -4,6 +4,7 @@ namespace BetaKiller;
 use BetaKiller\Assets\StaticAssets;
 use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\Helper\I18nHelper;
+use BetaKiller\Helper\LoggerHelperTrait;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\I18n\I18nFacade;
 use BetaKiller\Url\ZoneInterface;
@@ -12,12 +13,15 @@ use BetaKiller\Widget\WidgetFacade;
 use HTML;
 use Meta;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Log\LoggerInterface;
 use Twig_Extension;
 use Twig_Filter;
 use Twig_Function;
 
 class TwigExtension extends Twig_Extension
 {
+    use LoggerHelperTrait;
+
     /**
      * @var \BetaKiller\Helper\AppEnvInterface
      */
@@ -29,15 +33,22 @@ class TwigExtension extends Twig_Extension
     private $widgetFacade;
 
     /**
+     * @var \Psr\Log\LoggerInterface
+     */
+    private $logger;
+
+    /**
      * TwigExtension constructor.
      *
      * @param \BetaKiller\Helper\AppEnvInterface $appEnv
      * @param \BetaKiller\Widget\WidgetFacade    $widgetFacade
+     * @param \Psr\Log\LoggerInterface           $logger
      */
-    public function __construct(AppEnvInterface $appEnv, WidgetFacade $widgetFacade)
+    public function __construct(AppEnvInterface $appEnv, WidgetFacade $widgetFacade, LoggerInterface $logger)
     {
         $this->appEnv       = $appEnv;
         $this->widgetFacade = $widgetFacade;
+        $this->logger = $logger;
     }
 
     public function getFunctions(): array
@@ -136,6 +147,11 @@ class TwigExtension extends Twig_Extension
                 'json_encode',
                 'json_encode',
                 ['is_safe' => ['html']]
+            ),
+
+            new Twig_Function(
+                'log_error',
+                [$this, 'logError']
             ),
 
             /**
@@ -290,6 +306,11 @@ class TwigExtension extends Twig_Extension
         $this->getMeta($context)->set($name, $value);
 
         return null;
+    }
+
+    public function logError(string $message, array $params = null): void
+    {
+        $this->logException($this->logger, new Exception($message, $params ?? []));
     }
 
     /**
