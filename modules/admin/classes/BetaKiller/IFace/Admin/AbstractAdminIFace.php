@@ -18,6 +18,6 @@ abstract class AbstractAdminIFace extends AbstractIFace implements BeforeProcess
     public function beforeProcessing(ServerRequestInterface $request): void
     {
         // Disable caching for admin ifaces
-        $this->setExpiresInPast();
+        $this->disableHttpCache();
     }
 }

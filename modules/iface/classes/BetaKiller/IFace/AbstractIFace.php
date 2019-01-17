@@ -4,7 +4,6 @@ namespace BetaKiller\IFace;
 use BetaKiller\Url\AbstractUrlElement;
 use BetaKiller\Url\IFaceModelInterface;
 use DateInterval;
-use Psr\Http\Message\ServerRequestInterface;
 
 abstract class AbstractIFace extends AbstractUrlElement implements IFaceInterface
 {
@@ -26,7 +25,7 @@ abstract class AbstractIFace extends AbstractUrlElement implements IFaceInterfac
     /**
      * @return string
      */
-    public static function getSuffix(): string
+    final public static function getSuffix(): string
     {
         return self::SUFFIX;
     }
@@ -62,23 +61,6 @@ abstract class AbstractIFace extends AbstractUrlElement implements IFaceInterfac
     final public function getLastModified(): \DateTimeImmutable
     {
         return $this->lastModified ?: $this->getDefaultLastModified();
-    }
-
-    /**
-     * @return \DateTimeImmutable
-     */
-    final public function getDefaultLastModified(): \DateTimeImmutable
-    {
-        return new \DateTimeImmutable();
-    }
-
-    /**
-     * @return DateInterval
-     * @throws \Exception
-     */
-    public function getDefaultExpiresInterval(): DateInterval
-    {
-        return new \DateInterval('PT1H');
     }
 
     /**
@@ -152,12 +134,36 @@ abstract class AbstractIFace extends AbstractUrlElement implements IFaceInterfac
      *
      * @throws \Exception
      */
-    protected function setExpiresInPast(): void
+    final protected function disableHttpCache(): void
     {
-        // No caching for admin zone
+        $this->setExpiresInPast();
+    }
+
+    /**
+     * @throws \Exception
+     */
+    private function setExpiresInPast(): void
+    {
         $interval         = new \DateInterval('PT1H');
         $interval->invert = 1;
 
         $this->setExpiresInterval($interval);
+    }
+
+    /**
+     * @return DateInterval
+     * @throws \Exception
+     */
+    private function getDefaultExpiresInterval(): DateInterval
+    {
+        return new \DateInterval('PT1H'); // 1 hour
+    }
+
+    /**
+     * @return \DateTimeImmutable
+     */
+    private function getDefaultLastModified(): \DateTimeImmutable
+    {
+        return new \DateTimeImmutable(); // Now
     }
 }

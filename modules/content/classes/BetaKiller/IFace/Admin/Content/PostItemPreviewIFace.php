@@ -16,8 +16,7 @@ class PostItemPreviewIFace extends PostItemIFace
      */
     public function beforeProcessing(ServerRequestInterface $request): void
     {
-        // Disable caching
-        $this->setExpiresInPast();
+        $this->disableHttpCache();
 
         parent::beforeProcessing($request);
     }

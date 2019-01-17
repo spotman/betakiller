@@ -77,6 +77,7 @@ class PostItemIFace extends AbstractAppBase implements BeforeProcessingInterface
     protected function getPostData(ContentPost $model): array
     {
         $this->setLastModified($model->getApiLastModified());
+        $this->setExpiresInterval(new \DateInterval('P1D')); // One day
 
         $thumbnails = [];
 
@@ -97,14 +98,5 @@ class PostItemIFace extends AbstractAppBase implements BeforeProcessingInterface
             'is_page'    => $model->isPage(),
             'is_default' => $model->isDefault(),
         ];
-    }
-
-    /**
-     * @return \DateInterval
-     * @throws \Exception
-     */
-    public function getDefaultExpiresInterval(): \DateInterval
-    {
-        return new \DateInterval('P1D'); // One day
     }
 }

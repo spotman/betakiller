@@ -19,7 +19,7 @@ abstract class AbstractHttpErrorIFace extends AbstractIFace implements BeforePro
     public function beforeProcessing(ServerRequestInterface $request): void
     {
         // No caching for error pages
-        $this->setExpiresInPast();
+        $this->disableHttpCache();
     }
 
     /**

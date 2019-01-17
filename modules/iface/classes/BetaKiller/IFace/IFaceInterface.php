@@ -36,16 +36,6 @@ interface IFaceInterface
     public function getLastModified(): \DateTimeImmutable;
 
     /**
-     * @return \DateTimeImmutable
-     */
-    public function getDefaultLastModified(): \DateTimeImmutable;
-
-    /**
-     * @return \DateInterval
-     */
-    public function getDefaultExpiresInterval(): \DateInterval;
-
-    /**
      * @param \DateInterval|NULL $expires
      *
      * @return $this
