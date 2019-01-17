@@ -222,14 +222,18 @@ class Runner extends AbstractTask
 
     private function unlock(): void
     {
-        if ($this->lock->release()) {
-            $this->logger->debug('Daemon ":name" was unlocked', [
-                ':name' => $this->codename,
-            ]);
-        } else {
-            $this->logger->debug('Daemon ":name" is not locked', [
-                ':name' => $this->codename,
-            ]);
+        try {
+            if ($this->lock->release()) {
+                $this->logger->debug('Daemon ":name" was unlocked', [
+                    ':name' => $this->codename,
+                ]);
+            } else {
+                $this->logger->debug('Daemon ":name" is not locked', [
+                    ':name' => $this->codename,
+                ]);
+            }
+        } catch (\Throwable $e) {
+            $this->logException($this->logger, $e);
         }
     }
 
