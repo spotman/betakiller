@@ -31,6 +31,13 @@ interface NotificationLogInterface extends DispatchableEntityInterface
     public function setTarget(NotificationTargetInterface $target): NotificationLogInterface;
 
     /**
+     * Returns linked user if exists
+     *
+     * @return \BetaKiller\Model\UserInterface|null
+     */
+    public function getTargetUser(): ?UserInterface;
+
+    /**
      * @param \BetaKiller\Notification\NotificationTransportInterface $transport
      *
      * @return \BetaKiller\Model\NotificationLogInterface

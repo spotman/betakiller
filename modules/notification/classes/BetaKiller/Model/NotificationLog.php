@@ -69,6 +69,16 @@ class NotificationLog extends \ORM implements NotificationLogInterface
         return $this;
     }
 
+    /**
+     * Returns linked user if exists
+     *
+     * @return \BetaKiller\Model\UserInterface|null
+     */
+    public function getTargetUser(): ?UserInterface
+    {
+        return $this->getRelatedEntity('user', true);
+    }
+
     public function setTransport(NotificationTransportInterface $transport): NotificationLogInterface
     {
         $this->set(self::TABLE_COLUMN_TRANSPORT, $transport->getName());
