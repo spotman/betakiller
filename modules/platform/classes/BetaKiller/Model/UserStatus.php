@@ -15,6 +15,7 @@ class UserStatus extends \ORM implements UserStatusInterface
     public const STATUS_APPROVED  = 'approved';     // Approved by moderator
     public const STATUS_VERIFIED  = 'verified';     // KYC verification passed
     public const STATUS_BLOCKED   = 'blocked';      // Blocked coz of hacking, spam, or app rules violation
+    public const STATUS_CLAIMED   = 'claimed';      // User claimed about registration
 
     protected function configure(): void
     {
