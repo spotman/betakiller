@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace BetaKiller\Middleware;
 
-use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Service\SitemapService;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -38,8 +37,6 @@ class SitemapRequestHandler implements RequestHandlerInterface
      */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $urlHelper = ServerRequestHelper::getUrlHelper($request);
-
-        return $this->service->generate($urlHelper)->serve();
+        return $this->service->generate()->serve();
     }
 }

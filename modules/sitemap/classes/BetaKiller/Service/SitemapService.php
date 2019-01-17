@@ -4,12 +4,11 @@ declare(strict_types=1);
 namespace BetaKiller\Service;
 
 use BetaKiller\Config\AppConfigInterface;
+use BetaKiller\Factory\UrlHelperFactory;
 use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\Helper\ResponseHelper;
-use BetaKiller\Helper\UrlHelper;
 use BetaKiller\Url\AvailableUrlsCollector;
 use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
 use samdark\sitemap\Index;
 use samdark\sitemap\Sitemap;
@@ -47,40 +46,48 @@ class SitemapService
     private $appEnv;
 
     /**
+     * @var \BetaKiller\Factory\UrlHelperFactory
+     */
+    private $helperFactory;
+
+    /**
      * SitemapService constructor.
      *
      * @param \BetaKiller\Url\AvailableUrlsCollector $urlCollector
      * @param \Psr\Log\LoggerInterface               $logger
      * @param \BetaKiller\Config\AppConfigInterface  $appConfig
      * @param \BetaKiller\Helper\AppEnvInterface     $appEnv
+     * @param \BetaKiller\Factory\UrlHelperFactory   $helperFactory
      */
     public function __construct(
         AvailableUrlsCollector $urlCollector,
         LoggerInterface $logger,
         AppConfigInterface $appConfig,
-        AppEnvInterface $appEnv
+        AppEnvInterface $appEnv,
+        UrlHelperFactory $helperFactory
     ) {
-        $this->appConfig    = $appConfig;
-        $this->logger       = $logger;
-        $this->urlCollector = $urlCollector;
-        $this->appEnv       = $appEnv;
+        $this->appConfig     = $appConfig;
+        $this->logger        = $logger;
+        $this->urlCollector  = $urlCollector;
+        $this->appEnv        = $appEnv;
+        $this->helperFactory = $helperFactory;
     }
 
     /**
-     * @param \BetaKiller\Helper\UrlHelper $urlHelper
-     *
      * @return \BetaKiller\Service\SitemapService
      * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\IFace\Exception\UrlElementException
      * @throws \BetaKiller\Service\ServiceException
      */
-    public function generate(UrlHelper $urlHelper): self
+    public function generate(): self
     {
         $baseUrl = (string)$this->appConfig->getBaseUri();
 
         if (strpos($baseUrl, 'http') === false) {
             throw new ServiceException('Please, set "base_url" parameter to full URL (with protocol) in config file init.php');
         }
+
+        $urlHelper = $this->helperFactory->create();
 
         // Create sitemap
         $this->sitemap = new Sitemap($this->getSitemapFilePath());
