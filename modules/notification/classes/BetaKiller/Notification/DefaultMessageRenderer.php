@@ -101,6 +101,9 @@ class DefaultMessageRenderer implements MessageRendererInterface
 
         $lang = $this->i18n->getLanguageByIsoCode($langName);
 
+        // Convert raw names to placeholders
+        $data = I18nFacade::addPlaceholderPrefixToKeys($data);
+
         $output = $this->i18n->translateKeyName($lang, $key, $data);
 
         if ($output === $key) {
