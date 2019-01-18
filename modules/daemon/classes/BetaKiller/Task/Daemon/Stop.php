@@ -69,7 +69,7 @@ class Stop extends AbstractTask
         $pid = $lock->getPid();
 
         // Send signal to a process
-        $process = new Process(['sudo', 'kill', '-s', \SIGTERM, $pid]);
+        $process = new Process(['kill', '-s', \SIGTERM, $pid]);
         $process->run();
 
         // wait for daemon to be stopped
