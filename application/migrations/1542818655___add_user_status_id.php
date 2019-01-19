@@ -1,6 +1,6 @@
 <?php
 
-class Migration1542818654_Add_Account_Statuses_Confirmed extends Migration
+class Migration1542818655_Add_User_Status_Id extends Migration
 {
 
     /**
@@ -10,7 +10,7 @@ class Migration1542818654_Add_Account_Statuses_Confirmed extends Migration
      */
     public function id(): int
     {
-        return 1542818654;
+        return 1542818655;
     }
 
     /**
@@ -20,7 +20,7 @@ class Migration1542818654_Add_Account_Statuses_Confirmed extends Migration
      */
     public function name(): string
     {
-        return 'Add_account_statuses_confirmed';
+        return 'Add_user_status_id';
     }
 
     /**
@@ -30,7 +30,7 @@ class Migration1542818654_Add_Account_Statuses_Confirmed extends Migration
      */
     public function description(): string
     {
-        return 'Adding status "confirmed" to table "account_statuses".';
+        return '';
     }
 
     /**
@@ -40,10 +40,15 @@ class Migration1542818654_Add_Account_Statuses_Confirmed extends Migration
      */
     public function up(): void
     {
-        $value  = \BetaKiller\Model\UserStatus::STATUS_CONFIRMED;
-        $exists = $this->tableHasColumnValue('account_statuses', 'codename', $value);
-        if (!$exists) {
-            $this->runSql("INSERT INTO `account_statuses` (`codename`) VALUES ('$value');");
+        if (!$this->tableHasColumn('users', 'status_id')) {
+            $this->runSql('ALTER TABLE `users`
+  ADD `status_id` int(11) unsigned DEFAULT NULL after `id`,
+  ADD KEY `status_id` (`status_id`),
+  ADD CONSTRAINT `users_ibfk_2` FOREIGN KEY (`status_id`) REFERENCES `user_statuses` (`id`) ON UPDATE CASCADE;');
+        }
+
+        if (!$this->tableHasColumn('users', 'created_at')) {
+            $this->runSql('ALTER TABLE `users` ADD `created_at` datetime NOT NULL AFTER `status_id`;');
         }
     }
 

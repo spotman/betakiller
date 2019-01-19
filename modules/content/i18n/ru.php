@@ -6,13 +6,9 @@
 return [
     'custom_tag.attachment.title' => 'Скачать файл :name',
     'custom_tag.attachment.alt'   => 'кнопка загрузки файла',
-    'name'                        => 'Имя',
-    'Enter your name, please'     => 'Пожалуйста, введите Ваше имя',
-    'email'                       => 'Email',
-    'Enter your email, please'    => 'Пожалуйста, введите адрес Вашей электронной почты',
-    'message'                     => 'Сообщение',
-    'Enter your comment, please'  => 'Пожалуйста, введите Ваш комментарий',
-    ':date at :time'              => ':date в :time',
+//    'Enter your name, please'     => 'Пожалуйста, введите Ваше имя',
+//    'Enter your email, please'    => 'Пожалуйста, введите адрес Вашей электронной почты',
+//    'Enter your comment, please'  => 'Пожалуйста, введите Ваш комментарий',
 
     'post.action.edit' => 'Исправить',
     'post.action.save' => 'Сохранить',
@@ -52,9 +48,9 @@ return [
 
     'comment.status.transition.approve'          => 'Опубликовать',
     'comment.status.transition.reject'           => 'Отклонить',
-    'comment.status.transition.markAsSpam'       => 'СПАМ',
-    'comment.status.transition.moveToTrash'      => 'В корзину',
-    'comment.status.transition.restoreFromTrash' => 'Восстановить',
+    'comment.status.transition.mark-as-spam'       => 'СПАМ',
+    'comment.status.transition.move-to-trash'      => 'В корзину',
+    'comment.status.transition.restore-from-trash' => 'Восстановить',
 
     'notification.moderator.post.complete.subj' => 'Запись ":label" готова к публикации',
     'notification.moderator.post.complete.text' => ':targetName, запись "<strong>:label</strong>" готова к публикации, проверьте её, пожалуйста, и опубликуйте <a href=":url">:url</a>.',

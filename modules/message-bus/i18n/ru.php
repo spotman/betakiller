@@ -4,5 +4,4 @@
  * Automatically generated from previous translation file.
  */
 return array (
-  'No handlers found for :name message' => 'No handlers found for :name message',
 );
