@@ -99,6 +99,14 @@ abstract class AbstractConfigBasedDispatchableRepository extends AbstractPredefi
     }
 
     /**
+     * @return \BetaKiller\Url\Parameter\UrlParameterInterface[]
+     */
+    public function getAllAvailableItems(): array
+    {
+        return $this->getAll();
+    }
+
+    /**
      * @param mixed[] $config
      */
     protected function fillFromConfig(array $config): void

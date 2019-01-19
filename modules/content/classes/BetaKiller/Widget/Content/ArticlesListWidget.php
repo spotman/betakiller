@@ -180,12 +180,12 @@ final class ArticlesListWidget extends AbstractPublicWidget
 
     /**
      * @param                                        $page
-     * @param \BetaKiller\Model\ContentCategory|null $category
+     * @param \BetaKiller\Model\ContentCategoryInterface|null $category
      * @param null                                   $term
      *
      * @return \BetaKiller\Search\SearchResultsInterface
      */
-    protected function getArticles($page, ContentCategory $category = null, $term = null): SearchResultsInterface
+    protected function getArticles($page, ContentCategoryInterface $category = null, $term = null): SearchResultsInterface
     {
         return $this->postRepo->searchArticles($page, $this->itemsPerPage, $category, $term);
     }

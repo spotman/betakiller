@@ -122,7 +122,7 @@ class UrlHelper
             return $this->appConfig->getCircularLinkHref();
         }
 
-        if ($urlElement->isDefault()) {
+        if ($urlElement->isDefault() && !$urlElement->hasDynamicUrl()) {
             return $this->makeAbsoluteUrl('/');
         }
 
