@@ -1,8 +1,7 @@
 <?php
 
-class Migration1542818654_Add_User_Statuses extends Migration
+class Migration1542818653_Add_User_Statuses extends Migration
 {
-
     /**
      * Returns migration ID
      *
@@ -10,7 +9,7 @@ class Migration1542818654_Add_User_Statuses extends Migration
      */
     public function id(): int
     {
-        return 1542818654;
+        return 1542818653;
     }
 
     /**
@@ -66,4 +65,4 @@ class Migration1542818654_Add_User_Statuses extends Migration
 
     }
 
-} // End Migration1542818654_Add_Account_Status_Confirmed
+} // End Migration1542818653_Add_Account_Status_Confirmed
