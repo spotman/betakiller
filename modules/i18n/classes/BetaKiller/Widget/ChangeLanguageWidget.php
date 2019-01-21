@@ -45,9 +45,7 @@ class ChangeLanguageWidget extends AbstractPublicWidget
         // Add query parameters if exists
         $currentQuery = $request->getUri()->getQuery();
 
-        $currentCode  = '';
-        $currentLabel = '';
-        $links        = [];
+        $links = [];
 
         foreach ($this->languageRepo->getAppLanguages() as $lang) {
             $params = $urlHelper->createUrlContainer()->setEntity($lang);
@@ -59,22 +57,16 @@ class ChangeLanguageWidget extends AbstractPublicWidget
 
             $data = [
                 'url'   => $url,
+                'code'  => $lang->getIsoCode(),
                 'label' => $lang->getLabel(),
             ];
 
-            if ($lang->getIsoCode() === $currentLang->getIsoCode()) {
-                \array_unshift($links, $data);
-                $currentCode  = $currentLang->getIsoCode();
-                $currentLabel = $currentLang->getLabel();
-            } else {
-                $links[] = $data;
-            }
+            $links[$lang->getIsoCode()] = $data;
         }
 
         return [
-            'current_code'  => $currentCode,
-            'current_label' => $currentLabel,
-            'lang_list'     => $links,
+            'current'   => $currentLang->getIsoCode(),
+            'lang_list' => $links,
         ];
     }
 }
