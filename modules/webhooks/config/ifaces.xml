@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <root>
     <!-- Public action -->
-    <dummy uri="webhooks" name="App_WebHook_Index" hideInSiteMap="true" zone="public">
+    <dummy uri="webhooks" name="App_WebHook_RootDummy" hideInSiteMap="true" zone="public">
         <action name="WebHookExecute" uri="{WebHook.codename}" zone="public"/>
     </dummy>
 

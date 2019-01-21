@@ -98,11 +98,6 @@ class UrlElementProviderXmlConfig implements UrlElementProviderInterface
         $attr   = (array)$branch->attributes();
         $config = $attr['@attributes'];
 
-        // Generate dummy codename
-        if ($tag === self::TAG_DUMMY) {
-            $config[AbstractPlainUrlElementModel::OPTION_CODENAME] = bin2hex(\random_bytes(8));
-        }
-
         $codename = $config[AbstractPlainUrlElementModel::OPTION_CODENAME] ?? null;
 
         if (!$codename) {
