@@ -126,7 +126,7 @@ final class LanguageRepository extends AbstractI18nKeyRepository implements Lang
     {
         $orm = $this->getOrmInstance();
 
-        $this->filterI18nValue($orm, $term, $lang);
+        $this->filterI18nValue($orm, $term, $lang, self::SEARCH_STARTING);
 
         return $this
             ->limit($orm, 10)

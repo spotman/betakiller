@@ -3,12 +3,17 @@ declare(strict_types=1);
 
 namespace BetaKiller\Repository;
 
+use BetaKiller\Helper\TextHelper;
 use BetaKiller\Model\ExtendedOrmInterface;
 use BetaKiller\Model\LanguageInterface;
 
 abstract class AbstractI18nKeyRepository extends AbstractOrmBasedDispatchableRepository implements
     I18nKeyRepositoryInterface
 {
+    protected const SEARCH_EXACT    = 'exact';
+    protected const SEARCH_STARTING = 'starting';
+    protected const SEARCH_WEAK     = 'weak';
+
     /**
      * @param \BetaKiller\Model\LanguageInterface $lang
      *
@@ -40,23 +45,44 @@ abstract class AbstractI18nKeyRepository extends AbstractOrmBasedDispatchableRep
         return $this->getAll();
     }
 
-    protected function filterI18nValue(ExtendedOrmInterface $orm, string $term, LanguageInterface $lang = null, bool $exact = null)
-    {
+    protected function filterI18nValue(
+        ExtendedOrmInterface $orm,
+        string $term,
+        LanguageInterface $lang = null,
+        string $mode = null
+    ) {
         $column = $orm->object_column($this->getI18nValuesColumnName());
 
-        $term = \mb_strtolower($term);
+        $term = \mb_strtolower(TextHelper::utf8ToAscii($term));
 
-        $regex = $exact
-            ? sprintf(':"%s"', $term)
-            : sprintf(':"[^"]*%s', $term);
+        $regex = $this->makeI18nFilterRegex($term, $mode ?? self::SEARCH_STARTING);
 
         if ($lang) {
             $regex = sprintf('"%s"', $lang->getIsoCode()).$regex;
         }
 
-        $orm->where(\DB::expr('LOWER('.$column.')'), 'REGEXP', $regex);
+        $orm->where(\DB::expr('LOWER(CONVERT('.$column.' USING ascii))'), 'REGEXP', $regex);
 
         return $this;
+    }
+
+    private function makeI18nFilterRegex(string $term, string $mode): string
+    {
+        switch ($mode) {
+            case self::SEARCH_EXACT:
+                return sprintf(':"%s"', $term);
+
+            case self::SEARCH_STARTING:
+                return sprintf(':"%s[^"]*"', $term);
+
+            case self::SEARCH_WEAK:
+                return sprintf(':"[^"]*%s[^"]*"', $term);
+
+            default:
+                throw new RepositoryException('Unknown i18n filter mode ":mode"', [
+                    ':mode' => $mode,
+                ]);
+        }
     }
 
     protected function filterLang(ExtendedOrmInterface $orm, LanguageInterface $lang, bool $inverse = null)
@@ -78,8 +104,8 @@ abstract class AbstractI18nKeyRepository extends AbstractOrmBasedDispatchableRep
 
         $orm->and_where_open();
 
-        $orm->or_where(\DB::expr('LENGTH(:col)', [':col' => $column]) ,'=',0);
-        $orm->or_where($column ,'IS',null);
+        $orm->or_where(\DB::expr('LENGTH(:col)', [':col' => $column]), '=', 0);
+        $orm->or_where($column, 'IS', null);
 
         $orm->and_where_close();
 
