@@ -48,7 +48,7 @@ class TwigExtension extends Twig_Extension
     {
         $this->appEnv       = $appEnv;
         $this->widgetFacade = $widgetFacade;
-        $this->logger = $logger;
+        $this->logger       = $logger;
     }
 
     public function getFunctions(): array
@@ -310,7 +310,11 @@ class TwigExtension extends Twig_Extension
 
     public function logError(string $message, array $params = null): void
     {
-        $this->logException($this->logger, new Exception($message, $params ?? []));
+        $params = $params ?? [];
+
+        $params = Exception::addPlaceholderPrefixToKeys($params);
+
+        $this->logException($this->logger, new Exception($message, $params));
     }
 
     /**

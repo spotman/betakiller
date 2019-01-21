@@ -7,6 +7,8 @@ class Exception extends \Exception implements ExceptionInterface
 {
     use DefaultExceptionBehaviourTrait;
 
+    public const PLACEHOLDER_PREFIX = ':';
+
     /**
      * @param \Throwable  $e
      * @param string|null $message
@@ -48,5 +50,21 @@ class Exception extends \Exception implements ExceptionInterface
             '%s [ %s ]: %s ~ %s [ %d ]',
             \get_class($e), $e->getCode(), \strip_tags($e->getMessage()), $e->getFile(), $e->getLine()
         );
+    }
+
+    public static function addPlaceholderPrefixToKeys(array $data): array
+    {
+        $output = [];
+
+        foreach ($data as $key => $value) {
+            // Add prefix if it does not exist
+            if (strpos($key, self::PLACEHOLDER_PREFIX) !== 0) {
+                $key = self::PLACEHOLDER_PREFIX.$key;
+            }
+
+            $output[$key] = $value;
+        }
+
+        return $output;
     }
 }
