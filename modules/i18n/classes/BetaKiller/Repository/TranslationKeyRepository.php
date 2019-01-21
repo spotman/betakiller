@@ -41,8 +41,8 @@ class TranslationKeyRepository extends AbstractI18nKeyRepository
         return $this;
     }
 
-    protected function getI18nValuesColumnName(): string
+    protected function getI18nValuesColumnName(ExtendedOrmInterface $orm): string
     {
-        return TranslationKey::TABLE_FIELD_I18N;
+        return $orm->object_column(TranslationKey::TABLE_FIELD_I18N);
     }
 }

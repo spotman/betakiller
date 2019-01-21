@@ -208,9 +208,9 @@ final class LanguageRepository extends AbstractI18nKeyRepository implements Lang
         return $this;
     }
 
-    protected function getI18nValuesColumnName(): string
+    protected function getI18nValuesColumnName(ExtendedOrmInterface $orm): string
     {
-        return Language::TABLE_FIELD_I18N;
+        return $orm->object_column(Language::TABLE_FIELD_I18N);
     }
 
     protected function customFilterForUrlDispatching(OrmInterface $orm, UrlContainerInterface $params): void
