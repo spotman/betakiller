@@ -9,6 +9,7 @@ use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\I18n\I18nFacade;
 use BetaKiller\Url\ZoneInterface;
 use BetaKiller\View\IFaceView;
+use BetaKiller\View\LinkTagHelper;
 use BetaKiller\Widget\WidgetFacade;
 use HTML;
 use Meta;
@@ -100,6 +101,12 @@ class TwigExtension extends Twig_Extension
             new Twig_Function(
                 'meta',
                 [$this, 'meta'],
+                ['needs_context' => true]
+            ),
+
+            new Twig_Function(
+                'link',
+                [$this, 'linkTag'],
                 ['needs_context' => true]
             ),
 
@@ -308,6 +315,13 @@ class TwigExtension extends Twig_Extension
         return null;
     }
 
+    public function linkTag(array $context, string $rel, string $href, array $attributes = null): ?string
+    {
+        $this->getLinkHelper($context)->addLink($rel, $href, $attributes);
+
+        return null;
+    }
+
     public function logError(string $message, array $params = null): void
     {
         $params = $params ?? [];
@@ -457,5 +471,10 @@ class TwigExtension extends Twig_Extension
     private function getMeta(array $context): \Meta
     {
         return $context[IFaceView::META_KEY];
+    }
+
+    private function getLinkHelper(array $context): LinkTagHelper
+    {
+        return $context[IFaceView::LINK_KEY];
     }
 }

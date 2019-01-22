@@ -3,7 +3,6 @@ namespace BetaKiller\View;
 
 use BetaKiller\Assets\StaticAssets;
 use BetaKiller\Model\LanguageInterface;
-use HTML;
 
 class HtmlRenderHelper
 {
@@ -25,11 +24,6 @@ class HtmlRenderHelper
     private $lang;
 
     /**
-     * @var string[][]
-     */
-    private $links = [];
-
-    /**
      * @var string
      */
     private $wrapperCodename = self::WRAPPER_HTML5;
@@ -40,15 +34,22 @@ class HtmlRenderHelper
     private $layoutCodename;
 
     /**
+     * @var \BetaKiller\View\LinkTagHelper
+     */
+    private $link;
+
+    /**
      * HtmlRenderHelper constructor.
      *
      * @param \Meta                           $meta
+     * @param \BetaKiller\View\LinkTagHelper  $linkHelper
      * @param \BetaKiller\Assets\StaticAssets $assets
      */
-    public function __construct(\Meta $meta, StaticAssets $assets)
+    public function __construct(\Meta $meta, LinkTagHelper $linkHelper, StaticAssets $assets)
     {
         $this->meta   = $meta;
         $this->assets = $assets;
+        $this->link   = $linkHelper;
     }
 
     /**
@@ -120,24 +121,6 @@ class HtmlRenderHelper
     }
 
     /**
-     * Set <link rel="canonical"> value
-     *
-     * @param string    $href
-     * @param bool|null $overwrite
-     *
-     * @return \BetaKiller\View\HtmlRenderHelper
-     */
-    public function setCanonical(string $href, ?bool $overwrite = null): self
-    {
-        // Prevent overwrite of `canonical` value by error pages and nested IFaces
-        if (!$overwrite && $this->hasLink('canonical')) {
-            return $this;
-        }
-
-        return $this->addLink('canonical', $href);
-    }
-
-    /**
      * @param null|string $value
      *
      * @return \BetaKiller\View\HtmlRenderHelper
@@ -147,29 +130,6 @@ class HtmlRenderHelper
         $this->meta->content_type($value ?: 'text/html');
 
         return $this;
-    }
-
-    public function addLink(string $rel, string $href, array $attributes = null): self
-    {
-        $attributes = $attributes ?? [];
-
-        $attributes['rel']  = $rel;
-        $attributes['href'] = $href;
-
-        $this->links[] = $attributes;
-
-        return $this;
-    }
-
-    public function hasLink(string $rel): bool
-    {
-        foreach ($this->links as $attributes) {
-            if ($attributes['rel'] === $rel) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     public function setLang(LanguageInterface $lang): self
@@ -186,6 +146,7 @@ class HtmlRenderHelper
         return [
             IFaceView::ASSETS_KEY => $this->assets,
             IFaceView::META_KEY   => $this->meta,
+            IFaceView::LINK_KEY   => $this->link,
         ];
     }
 
@@ -202,7 +163,7 @@ class HtmlRenderHelper
     {
         return implode("\r\n", [
             $this->meta->render(),
-            $this->renderLinks(),
+            $this->link->renderLinks(),
             $this->assets->renderCss(),
         ]);
     }
@@ -210,16 +171,5 @@ class HtmlRenderHelper
     private function renderFooter(): string
     {
         return $this->assets->renderJs();
-    }
-
-    private function renderLinks(): string
-    {
-        $output = [];
-
-        foreach ($this->links as $item) {
-            $output[] = '<link'.HTML::attributes($item).' />';
-        }
-
-        return implode("\r\n", $output);
     }
 }
