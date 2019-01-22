@@ -211,9 +211,9 @@ class TwigExtension extends Twig_Extension
         ];
     }
 
-    public function title(array $context, string $value)
+    public function title(array $context, string $value): void
     {
-        return $this->getMeta($context)->title($value, Meta::TITLE_APPEND);
+        $this->getMeta($context)->title($value, Meta::TITLE_APPEND);
     }
 
     /**
