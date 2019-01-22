@@ -143,7 +143,7 @@ class NotificationHelper
      */
     private function rewriteTargetsForDebug(NotificationMessageInterface $message): void
     {
-        if (!$this->appEnv->inProductionMode()) {
+        if ($this->appEnv->isDebugEnabled()) {
             $debugEmail = $this->appEnv->getDebugEmail();
 
             $message
