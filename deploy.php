@@ -70,6 +70,9 @@ task('check', function () {
     if (!get('app_path')) {
         throw new RuntimeException('Please, set up site path via set("app_path")');
     }
+
+    // Check is assets:build task defined
+    task('assets:build');
 });
 
 // Prepare app env
@@ -473,14 +476,17 @@ task('deploy', [
     'deploy:betakiller:shared',
     'deploy:betakiller:writable',
 
-    // Enable maintenance mode before any DB processing
-    'maintenance:on',
-
     // Copy .env file from previous revision to the new one
     'deploy:dotenv:migrate',
 
     // Store APP_REVISION hash (leads to cache reset)
     'deploy:dotenv:revision',
+
+    // Deploy assets (locally or on remote host)
+    'assets:build',
+
+    // Enable maintenance mode before any DB processing
+    'maintenance:on',
 
     // Migrate and import data
     'migrate',
