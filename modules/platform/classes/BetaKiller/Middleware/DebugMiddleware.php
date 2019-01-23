@@ -148,7 +148,7 @@ class DebugMiddleware implements MiddlewareInterface
 
         // Prepare renderer
         $renderer = $debugBar->getJavascriptRenderer('/phpDebugBar');
-        $renderer->setEnableJqueryNoConflict(true);
+        $renderer->setEnableJqueryNoConflict(false); // No jQuery
         $renderer->addInlineAssets([
             '.phpdebugbar-widgets-measure:hover { background: #dcdbdb }',
             '.phpdebugbar-widgets-measure:hover .phpdebugbar-widgets-label { color: #222 !important }',
