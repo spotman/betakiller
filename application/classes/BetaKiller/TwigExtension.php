@@ -151,6 +151,16 @@ class TwigExtension extends Twig_Extension
             ),
 
             new Twig_Function(
+                'in_dev',
+                [$this, 'inDev']
+            ),
+
+            new Twig_Function(
+                'is_debug',
+                [$this, 'isDebug']
+            ),
+
+            new Twig_Function(
                 'env_mode',
                 [$this, 'envMode']
             ),
@@ -251,11 +261,27 @@ class TwigExtension extends Twig_Extension
     }
 
     /**
+     * @return bool
+     */
+    public function inDev(): bool
+    {
+        return $this->appEnv->inDevelopmentMode();
+    }
+
+    /**
      * @return string
      */
     public function envMode(): string
     {
         return $this->appEnv->getModeName();
+    }
+
+    /**
+     * @return bool
+     */
+    public function isDebug(): bool
+    {
+        return $this->appEnv->isDebugEnabled();
     }
 
     public function userId(array $context): string
