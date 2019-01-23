@@ -151,6 +151,17 @@ class TwigExtension extends Twig_Extension
             ),
 
             new Twig_Function(
+                'env_mode',
+                [$this, 'envMode']
+            ),
+
+            new Twig_Function(
+                'user_id',
+                [$this, 'userId'],
+                ['is_safe' => ['html'], 'needs_context' => true]
+            ),
+
+            new Twig_Function(
                 'json_encode',
                 'json_encode',
                 ['is_safe' => ['html']]
@@ -237,6 +248,23 @@ class TwigExtension extends Twig_Extension
     public function inStaging(): bool
     {
         return $this->appEnv->inStagingMode();
+    }
+
+    /**
+     * @return string
+     */
+    public function envMode(): string
+    {
+        return $this->appEnv->getModeName();
+    }
+
+    public function userId(array $context): string
+    {
+        $request = $this->getRequest($context);
+
+        return ServerRequestHelper::isGuest($request)
+            ? 'Guest'
+            : ServerRequestHelper::getUser($request)->getID();
     }
 
     /**
