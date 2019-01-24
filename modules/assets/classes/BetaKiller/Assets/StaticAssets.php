@@ -45,7 +45,7 @@ class StaticAssets
         $this->config = $config;
     }
 
-    public function addJs(string $location, string $condition = null): void
+    public function addJs(string $location, ?string $condition = null): void
     {
         if (!$this->isAbsoluteUrl($location)) {
             $location = $this->getFullUrl($location);
@@ -62,7 +62,7 @@ class StaticAssets
         ];
     }
 
-    public function addCss(string $location, string $condition = null): void
+    public function addCss(string $location, ?string $condition = null): void
     {
         if (!$this->isAbsoluteUrl($location)) {
             $location = $this->getFullUrl($location);

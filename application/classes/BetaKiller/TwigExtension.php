@@ -296,23 +296,25 @@ class TwigExtension extends Twig_Extension
     /**
      * Helper for adding JS files
      *
-     * @param array  $context
-     * @param string $location
+     * @param array       $context
+     * @param string      $location
+     * @param string|null $condition
      */
-    public function js(array $context, string $location): void
+    public function js(array $context, string $location, string $condition = null): void
     {
-        $this->getStaticAssets($context)->addJs($location);
+        $this->getStaticAssets($context)->addJs($location, $condition);
     }
 
     /**
      * Helper for adding CSS files
      *
-     * @param array  $context
-     * @param string $location
+     * @param array       $context
+     * @param string      $location
+     * @param string|null $condition
      */
-    public function css(array $context, string $location): void
+    public function css(array $context, string $location, string $condition = null): void
     {
-        $this->getStaticAssets($context)->addCss($location);
+        $this->getStaticAssets($context)->addCss($location, $condition);
     }
 
     /**
