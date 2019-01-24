@@ -75,6 +75,12 @@ class TwigExtension extends Twig_Extension
             ),
 
             new Twig_Function(
+                'static_content',
+                [$this, 'getStaticFileContent'],
+                ['needs_context' => true, 'is_safe' => ['html']]
+            ),
+
+            new Twig_Function(
                 'image',
                 [$this, 'image'],
                 ['needs_context' => true, 'is_safe' => ['html']]
@@ -353,6 +359,26 @@ class TwigExtension extends Twig_Extension
     public function getLinkToStaticFile(array $context, string $path): string
     {
         return $this->getStaticAssets($context)->getFullUrl($path);
+    }
+
+    /**
+     * @param array  $context
+     * @param string $path
+     *
+     * @return string
+     * @throws \BetaKiller\Exception
+     */
+    public function getStaticFileContent(array $context, string $path): string
+    {
+        $fullPath = $this->getStaticAssets($context)->findFile($path);
+
+        if (!$fullPath) {
+            throw new Exception('Missing static asset ":path"', [
+                ':path' => $fullPath,
+            ]);
+        }
+
+        return \file_get_contents($fullPath);
     }
 
     /**
