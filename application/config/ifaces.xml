@@ -6,7 +6,7 @@
     </iface>
 
     <action uri="logout" name="Auth_Logout" zone="public" />
-    <!--<iface uri="change-account" name="Auth_ReLogin" label="Change account" layout="auth" hideInSiteMap="true" zone="personal" />-->
+    <!--<action uri="change-account" name="Auth_ReLogin" layout="auth" hideInSiteMap="true" zone="personal" />-->
     <!--<iface uri="password-reset" name="Auth_PasswordReset" label="Reset password" layout="auth" hideInSiteMap="true" zone="public" />-->
 </root>
 
