@@ -68,6 +68,8 @@ abstract class AbstractI18nKeyRepository extends AbstractOrmBasedDispatchableRep
 
     private function makeI18nFilterRegex(string $term, string $mode): string
     {
+        $term = \preg_quote($term, '/');
+
         switch ($mode) {
             case self::SEARCH_EXACT:
                 return sprintf(':"%s"', $term);
