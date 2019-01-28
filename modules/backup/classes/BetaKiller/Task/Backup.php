@@ -40,7 +40,7 @@ class Backup extends AbstractTask
 
     public function run(): void
     {
-        $service = $this->config('backup.service');
+        $service = (string)$this->config('backup.service');
 
         $instance = null;
 
