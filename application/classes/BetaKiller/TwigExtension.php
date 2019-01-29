@@ -7,6 +7,7 @@ use BetaKiller\Helper\I18nHelper;
 use BetaKiller\Helper\LoggerHelperTrait;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\I18n\I18nFacade;
+use BetaKiller\Service\UserService;
 use BetaKiller\Url\ZoneInterface;
 use BetaKiller\View\IFaceView;
 use BetaKiller\View\LinkTagHelper;
@@ -39,16 +40,27 @@ class TwigExtension extends Twig_Extension
     private $logger;
 
     /**
+     * @var \BetaKiller\Service\UserService
+     */
+    private $userService;
+
+    /**
      * TwigExtension constructor.
      *
      * @param \BetaKiller\Helper\AppEnvInterface $appEnv
      * @param \BetaKiller\Widget\WidgetFacade    $widgetFacade
+     * @param \BetaKiller\Service\UserService    $userService
      * @param \Psr\Log\LoggerInterface           $logger
      */
-    public function __construct(AppEnvInterface $appEnv, WidgetFacade $widgetFacade, LoggerInterface $logger)
-    {
+    public function __construct(
+        AppEnvInterface $appEnv,
+        WidgetFacade $widgetFacade,
+        UserService $userService,
+        LoggerInterface $logger
+    ) {
         $this->appEnv       = $appEnv;
         $this->widgetFacade = $widgetFacade;
+        $this->userService  = $userService;
         $this->logger       = $logger;
     }
 
@@ -164,6 +176,11 @@ class TwigExtension extends Twig_Extension
             new Twig_Function(
                 'is_debug',
                 [$this, 'isDebug']
+            ),
+
+            new Twig_Function(
+                'is_admin',
+                [$this, 'isAdmin']
             ),
 
             new Twig_Function(
@@ -290,6 +307,24 @@ class TwigExtension extends Twig_Extension
         return $this->appEnv->isDebugEnabled();
     }
 
+    public function isAdmin(array $context): bool
+    {
+        $request = $this->getRequest($context);
+
+        if (ServerRequestHelper::isGuest($request)) {
+            return false;
+        }
+
+        $user = ServerRequestHelper::getUser($request);
+
+        return $this->userService->isAdmin($user);
+    }
+
+    /**
+     * @param array $context
+     *
+     * @return string
+     */
     public function userId(array $context): string
     {
         $request = $this->getRequest($context);

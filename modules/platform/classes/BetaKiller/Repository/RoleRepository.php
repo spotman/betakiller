@@ -62,6 +62,15 @@ class RoleRepository extends AbstractOrmBasedMultipleParentsTreeRepository
     }
 
     /**
+     * @return \BetaKiller\Model\RoleInterface
+     * @throws \BetaKiller\Repository\RepositoryException
+     */
+    public function getAdminPanelRole(): RoleInterface
+    {
+        return $this->getByName(RoleInterface::ADMIN_PANEL);
+    }
+
+    /**
      * @param string $name
      *
      * @return \BetaKiller\Model\RoleInterface

@@ -177,6 +177,17 @@ class UserService
     }
 
     /**
+     * @param \BetaKiller\Model\UserInterface $user
+     *
+     * @return bool
+     * @throws \BetaKiller\Repository\RepositoryException
+     */
+    public function isAdmin(UserInterface $user): bool
+    {
+        return $user->hasRole($this->roleRepository->getAdminPanelRole());
+    }
+
+    /**
      * @return \BetaKiller\Model\GuestUserInterface
      * @throws \BetaKiller\Factory\FactoryException
      */
