@@ -71,6 +71,7 @@ class SecureHeadersMiddleware implements MiddlewareInterface
         // @see https://www.w3.org/TR/CSP3/#grammardef-report-sample
         $headers->csp('script', 'report-sample');
         $headers->csp('style', 'report-sample');
+        $headers->csp('font', 'report-sample');
 
         $headers->csp('connect', $baseUrl);
         $headers->csp('connect', 'wss://'.$baseUri->getHost()); // For secure Websocket
