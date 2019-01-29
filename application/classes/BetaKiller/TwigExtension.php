@@ -180,7 +180,8 @@ class TwigExtension extends Twig_Extension
 
             new Twig_Function(
                 'is_admin',
-                [$this, 'isAdmin']
+                [$this, 'isAdmin'],
+                ['needs_context' => true]
             ),
 
             new Twig_Function(
@@ -191,7 +192,7 @@ class TwigExtension extends Twig_Extension
             new Twig_Function(
                 'user_id',
                 [$this, 'userId'],
-                ['is_safe' => ['html'], 'needs_context' => true]
+                ['needs_context' => true]
             ),
 
             new Twig_Function(
@@ -307,6 +308,12 @@ class TwigExtension extends Twig_Extension
         return $this->appEnv->isDebugEnabled();
     }
 
+    /**
+     * @param array $context
+     *
+     * @return bool
+     * @throws \BetaKiller\Repository\RepositoryException
+     */
     public function isAdmin(array $context): bool
     {
         $request = $this->getRequest($context);
