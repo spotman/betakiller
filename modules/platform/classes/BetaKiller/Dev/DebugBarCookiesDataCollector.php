@@ -4,12 +4,11 @@ declare(strict_types=1);
 namespace BetaKiller\Dev;
 
 use BetaKiller\Helper\CookieHelper;
-use DebugBar\DataCollector\AssetProvider;
 use DebugBar\DataCollector\DataCollector;
 use DebugBar\DataCollector\Renderable;
 use Psr\Http\Message\ServerRequestInterface;
 
-class DebugBarCookiesDataCollector extends DataCollector implements Renderable, AssetProvider
+class DebugBarCookiesDataCollector extends DataCollector implements Renderable
 {
     /**
      * @var \BetaKiller\Helper\CookieHelper
@@ -53,18 +52,10 @@ class DebugBarCookiesDataCollector extends DataCollector implements Renderable, 
         $data = [];
 
         foreach ($this->helper->getAll($this->request) as $key => $value) {
-            $data[$key] = $this->getVarDumper()->renderVar($value);
+            $data[$key] = $this->getDataFormatter()->formatVar($value);
         }
 
         return $data;
-    }
-
-    /**
-     * @return array
-     */
-    public function getAssets(): array
-    {
-        return $this->getVarDumper()->getAssets();
     }
 
     /**

@@ -3,13 +3,12 @@ declare(strict_types=1);
 
 namespace BetaKiller\Dev;
 
-use DebugBar\DataCollector\AssetProvider;
 use DebugBar\DataCollector\DataCollector;
 use DebugBar\DataCollector\Renderable;
 use Zend\Expressive\Session\SessionIdentifierAwareInterface;
 use Zend\Expressive\Session\SessionInterface;
 
-class DebugBarSessionDataCollector extends DataCollector implements Renderable, AssetProvider
+class DebugBarSessionDataCollector extends DataCollector implements Renderable
 {
     /**
      * @var \Zend\Expressive\Session\SessionInterface
@@ -62,22 +61,14 @@ class DebugBarSessionDataCollector extends DataCollector implements Renderable, 
         $id = $this->getSessionID($session);
 
         if ($id) {
-            $data['id'] = $this->getVarDumper()->renderVar($id);
+            $data['id'] = $this->getDataFormatter()->formatVar($id);
         }
 
         foreach ($session->toArray() as $key => $value) {
-            $data[$key] = $this->getVarDumper()->renderVar($value);
+            $data[$key] = $this->getDataFormatter()->formatVar($value);
         }
 
         return $data;
-    }
-
-    /**
-     * @return array
-     */
-    public function getAssets(): array
-    {
-        return $this->getVarDumper()->getAssets();
     }
 
     /**
