@@ -49,7 +49,7 @@ class HitStatMissingUrlEventHandler implements EventHandlerInterface
     public function handleEvent($message): void
     {
         // Skip calls like "cache warmup" from CLI mode
-        if ($this->appEnv->isCli()) {
+        if ($this->appEnv->isInternalWebServer()) {
             return;
         }
 

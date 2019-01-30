@@ -99,7 +99,7 @@ class HitStatMiddleware implements MiddlewareInterface
         $request = ServerRequestHelper::removeQueryParams($request, HitService::UTM_KEYS);
 
         // Skip calls like "cache warmup" from CLI mode
-        if ($this->appEnv->isCli()) {
+        if ($this->appEnv->isInternalWebServer()) {
             return $handler->handle($request);
         }
 
