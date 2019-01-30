@@ -1,6 +1,9 @@
 <?php
 namespace BetaKiller\Model;
 
+use BetaKiller\Uri;
+use Psr\Http\Message\UriInterface;
+
 class HitPage extends \ORM
 {
     public const RELATION_DOMAIN = 'domain';
@@ -137,6 +140,15 @@ class HitPage extends \ORM
     public function getFirstSeenAt(): \DateTimeImmutable
     {
         return $this->get_datetime_column_value('first_seen_at');
+    }
+
+    public function getFullUrl(): UriInterface
+    {
+        $domain = $this->getDomain();
+
+        return (new Uri($this->getUri()))
+            ->withScheme('https')
+            ->withHost($domain->getName());
     }
 
     /**

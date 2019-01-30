@@ -1,6 +1,8 @@
 <?php
 namespace BetaKiller\Model;
 
+use Psr\Http\Message\UriInterface;
+
 interface HitInterface extends AbstractEntityInterface
 {
     /**
@@ -41,12 +43,12 @@ interface HitInterface extends AbstractEntityInterface
     /**
      * @return bool
      */
-    public function hasSource(): bool;
+    public function hasSourcePage(): bool;
 
     /**
      * @return \BetaKiller\Model\HitPage
      */
-    public function getSource(): HitPage;
+    public function getSourcePage(): HitPage;
 
     /**
      * @return \BetaKiller\Model\HitPage
@@ -72,4 +74,9 @@ interface HitInterface extends AbstractEntityInterface
      * @return \DateTimeImmutable
      */
     public function getTimestamp(): \DateTimeImmutable;
+
+    /**
+     * @return \Psr\Http\Message\UriInterface
+     */
+    public function getFullTargetUrl(): UriInterface;
 }

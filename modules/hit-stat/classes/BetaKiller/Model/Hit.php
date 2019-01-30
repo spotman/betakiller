@@ -1,6 +1,8 @@
 <?php
 namespace BetaKiller\Model;
 
+use Psr\Http\Message\UriInterface;
+
 class Hit extends \ORM implements HitInterface
 {
     private const FIELD_SOURCE_ID = 'source_id';
@@ -84,7 +86,7 @@ class Hit extends \ORM implements HitInterface
     /**
      * @return bool
      */
-    public function hasSource(): bool
+    public function hasSourcePage(): bool
     {
         return (bool)$this->get(self::FIELD_SOURCE_ID);
     }
@@ -92,7 +94,7 @@ class Hit extends \ORM implements HitInterface
     /**
      * @return \BetaKiller\Model\HitPage
      */
-    public function getSource(): HitPage
+    public function getSourcePage(): HitPage
     {
         return $this->getRelatedEntity(self::RELATION_SOURCE);
     }
@@ -151,5 +153,28 @@ class Hit extends \ORM implements HitInterface
     public function getTimestamp(): \DateTimeImmutable
     {
         return $this->get_datetime_column_value('created_at');
+    }
+
+    /**
+     * @return \Psr\Http\Message\UriInterface
+     */
+    public function getFullTargetUrl(): UriInterface
+    {
+        $uri = $this->getTarget()->getFullUrl();
+
+        $marker = $this->getTargetMarker();
+
+        if ($marker) {
+            // Parse stored query string
+            \parse_str($uri->getQuery(), $queryArr);
+
+            // Recreate full query string with UTM markers
+            $queryString = \http_build_query($queryArr + $marker->asQueryArray());
+
+            // Update URI
+            $uri = $uri->withQuery($queryString);
+        }
+
+        return $uri;
     }
 }

@@ -10,6 +10,7 @@ use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Model\Hit;
 use BetaKiller\Model\HitInterface;
+use BetaKiller\Model\HitMarkerInterface;
 use BetaKiller\Model\HitPage;
 use BetaKiller\Repository\HitLinkRepository;
 use BetaKiller\Repository\HitPageRepository;
@@ -96,7 +97,7 @@ class HitStatMiddleware implements MiddlewareInterface
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         // Remove UTM markers to simplify further UrlElement processing
-        $request = ServerRequestHelper::removeQueryParams($request, HitService::UTM_KEYS);
+        $request = ServerRequestHelper::removeQueryParams($request, HitMarkerInterface::UTM_QUERY_KEYS);
 
         // Skip calls like "cache warmup" from CLI mode
         if ($this->appEnv->isInternalWebServer()) {

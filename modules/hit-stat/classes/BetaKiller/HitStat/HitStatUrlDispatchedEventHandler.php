@@ -2,7 +2,7 @@
 namespace BetaKiller\HitStat;
 
 use BetaKiller\MessageBus\EventHandlerInterface;
-use BetaKiller\Service\HitService;
+use BetaKiller\Model\HitMarkerInterface;
 
 class HitStatUrlDispatchedEventHandler implements EventHandlerInterface
 {
@@ -14,10 +14,10 @@ class HitStatUrlDispatchedEventHandler implements EventHandlerInterface
         $params = $message->getUrlContainer();
 
         // Fetch UTM tags if exists so IFace would not warn about unused parameters
-        $params->getQueryPart(HitService::UTM_SOURCE);
-        $params->getQueryPart(HitService::UTM_MEDIUM);
-        $params->getQueryPart(HitService::UTM_CAMPAIGN);
-        $params->getQueryPart(HitService::UTM_CONTENT);
-        $params->getQueryPart(HitService::UTM_TERM);
+        $params->getQueryPart(HitMarkerInterface::UTM_QUERY_SOURCE);
+        $params->getQueryPart(HitMarkerInterface::UTM_QUERY_MEDIUM);
+        $params->getQueryPart(HitMarkerInterface::UTM_QUERY_CAMPAIGN);
+        $params->getQueryPart(HitMarkerInterface::UTM_QUERY_CONTENT);
+        $params->getQueryPart(HitMarkerInterface::UTM_QUERY_TERM);
     }
 }

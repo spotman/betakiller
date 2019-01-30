@@ -120,4 +120,18 @@ class HitMarker extends \ORM implements HitMarkerInterface
     {
         return (string)$this->get(self::FIELD_CONTENT);
     }
+
+    /**
+     * @return string[]
+     */
+    public function asQueryArray(): array
+    {
+        return \array_filter([
+            self::UTM_QUERY_SOURCE   => $this->getSource(),
+            self::UTM_QUERY_MEDIUM   => $this->getMedium(),
+            self::UTM_QUERY_CAMPAIGN => $this->getCampaign(),
+            self::UTM_QUERY_CONTENT  => $this->getContent(),
+            self::UTM_QUERY_TERM     => $this->getTerm(),
+        ]);
+    }
 }

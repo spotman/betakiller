@@ -21,20 +21,6 @@ use Psr\Http\Message\ServerRequestInterface;
 
 class HitService
 {
-    public const UTM_SOURCE   = 'utm_source';
-    public const UTM_MEDIUM   = 'utm_medium';
-    public const UTM_CAMPAIGN = 'utm_campaign';
-    public const UTM_CONTENT  = 'utm_content';
-    public const UTM_TERM     = 'utm_term';
-
-    public const UTM_KEYS = [
-        self::UTM_SOURCE,
-        self::UTM_MEDIUM,
-        self::UTM_CAMPAIGN,
-        self::UTM_CONTENT,
-        self::UTM_TERM,
-    ];
-
     /**
      * @var \BetaKiller\Repository\HitDomainRepository
      */
@@ -179,11 +165,11 @@ class HitService
         $params = ServerRequestHelper::getUrlContainer($request);
 
         // Fetch UTM tags if exists
-        $source   = $params->getQueryPart(self::UTM_SOURCE);
-        $medium   = $params->getQueryPart(self::UTM_MEDIUM);
-        $campaign = $params->getQueryPart(self::UTM_CAMPAIGN);
-        $content  = $params->getQueryPart(self::UTM_CONTENT);
-        $term     = $params->getQueryPart(self::UTM_TERM);
+        $source   = $params->getQueryPart(HitMarkerInterface::UTM_QUERY_SOURCE);
+        $medium   = $params->getQueryPart(HitMarkerInterface::UTM_QUERY_MEDIUM);
+        $campaign = $params->getQueryPart(HitMarkerInterface::UTM_QUERY_CAMPAIGN);
+        $content  = $params->getQueryPart(HitMarkerInterface::UTM_QUERY_CONTENT);
+        $term     = $params->getQueryPart(HitMarkerInterface::UTM_QUERY_TERM);
 
         if ($source && $medium && $campaign) {
             $marker = $this->markerRepo->find($source, $medium, $campaign, $content, $term);
