@@ -84,7 +84,7 @@ RENAME TO `stat_hits`;');
         }
 
         if ($this->tableExists('redirect_targets')) {
-            $this->runSql('ALTER TABLE `redirect_targets` RENAME TO `stat_hit_redirect_targets`;');
+            $this->runSql('ALTER TABLE `redirect_targets` RENAME TO `stat_hit_page_redirects`;');
         }
 
         if (!$this->tableHasColumn('stat_hit_pages', 'first_seen_at')) {
