@@ -188,6 +188,9 @@ class DebugMiddleware implements MiddlewareInterface
         }
 
         $csp->cspHash('script', $block);
+
+        // Inline images in PhpDebugBar
+        $csp->csp('image', 'data:');
     }
 
     /**
