@@ -47,6 +47,8 @@ class UrlHelperMiddleware implements MiddlewareInterface
         $params = ResolvingUrlContainer::create();
         $stack  = new UrlElementStack($params);
 
+        $params->setQueryParts($request->getQueryParams());
+
         $urlHelper = $this->factory->create($params, $stack);
 
         /** @noinspection CallableParameterUseCaseInTypeContextInspection */

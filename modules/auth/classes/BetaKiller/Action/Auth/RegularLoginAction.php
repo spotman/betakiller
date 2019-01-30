@@ -15,7 +15,6 @@ use BetaKiller\IFace\Auth\LoginIFace;
 use BetaKiller\Repository\UserRepository;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Spotman\Defence\ArgumentsInterface;
 use Spotman\Defence\DefinitionBuilderInterface;
 
 /**
@@ -85,6 +84,11 @@ class RegularLoginAction extends AbstractAction
     {
         // HTTP referrer is required to proceed
         $referrer = ServerRequestHelper::getHttpReferrer($request);
+
+        // Stop script-kiddies
+        if (!$referrer) {
+            throw new BadRequestHttpException('Missing ref');
+        }
 
         $post = ActionRequestHelper::postArguments($request);
 

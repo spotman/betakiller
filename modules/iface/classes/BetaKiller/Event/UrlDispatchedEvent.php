@@ -1,45 +1,34 @@
 <?php
 namespace BetaKiller\Event;
 
+use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\MessageBus\EventMessageInterface;
 use BetaKiller\Url\Container\UrlContainerInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
 class UrlDispatchedEvent implements EventMessageInterface
 {
     /**
-     * @var string
+     * @var \Psr\Http\Message\ServerRequestInterface
      */
-    private $url;
-
-    /**
-     * @var string
-     */
-    private $httpReferer;
-
-    /**
-     * @var string
-     */
-    private $ip;
-
-    /**
-     * @var \BetaKiller\Url\Container\UrlContainerInterface
-     */
-    private $params;
+    private $request;
 
     /**
      * UrlDispatchedEvent constructor.
      *
-     * @param string                                          $url
-     * @param \BetaKiller\Url\Container\UrlContainerInterface $params
-     * @param string                                          $ip
-     * @param string                                          $httpReferer
+     * @param \Psr\Http\Message\ServerRequestInterface $request
      */
-    public function __construct(string $url, UrlContainerInterface $params, string $ip, ?string $httpReferer)
+    public function __construct(ServerRequestInterface $request)
     {
-        $this->url         = $url;
-        $this->ip          = $ip;
-        $this->httpReferer = $httpReferer;
-        $this->params      = $params;
+        $this->request = $request;
+    }
+
+    /**
+     * @return \Psr\Http\Message\ServerRequestInterface
+     */
+    public function getRequest(): ServerRequestInterface
+    {
+        return $this->request;
     }
 
     /**
@@ -47,7 +36,7 @@ class UrlDispatchedEvent implements EventMessageInterface
      */
     public function getUrl(): string
     {
-        return $this->url;
+        return ServerRequestHelper::getUrl($this->request);
     }
 
     /**
@@ -55,7 +44,7 @@ class UrlDispatchedEvent implements EventMessageInterface
      */
     public function getHttpReferer(): ?string
     {
-        return $this->httpReferer;
+        return ServerRequestHelper::getHttpReferrer($this->request);
     }
 
     /**
@@ -63,7 +52,7 @@ class UrlDispatchedEvent implements EventMessageInterface
      */
     public function getIp(): string
     {
-        return $this->ip;
+        return ServerRequestHelper::getIpAddress($this->request);
     }
 
     /**
@@ -81,7 +70,7 @@ class UrlDispatchedEvent implements EventMessageInterface
      */
     public function getUrlContainer(): UrlContainerInterface
     {
-        return $this->params;
+        return ServerRequestHelper::getUrlContainer($this->request);
     }
 
     /**

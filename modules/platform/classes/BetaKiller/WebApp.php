@@ -12,6 +12,7 @@ use BetaKiller\Assets\Model\AssetsModelImageInterface;
 use BetaKiller\Assets\Provider\AssetsProviderInterface;
 use BetaKiller\Assets\Provider\ImageAssetsProviderInterface;
 use BetaKiller\Assets\StaticFilesDeployHandler;
+use BetaKiller\HitStat\HitStatMiddleware;
 use BetaKiller\Middleware\ContentNegotiationMiddleware;
 use BetaKiller\Middleware\DebugMiddleware;
 use BetaKiller\Middleware\ErrorPageMiddleware;
@@ -153,6 +154,9 @@ class WebApp
 
         // Register the dispatch middleware in the middleware pipeline
         $this->app->pipe(DispatchMiddleware::class);
+
+        // Save stat (referrer, target, utm markers, etc)
+        $this->app->pipe(HitStatMiddleware::class);
 
         // At this point, if no Response is returned by any middleware, the
         // NotFoundHandler kicks in; alternately, you can provide other fallback

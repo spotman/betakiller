@@ -111,11 +111,7 @@ class UrlElementDispatchMiddleware implements MiddlewareInterface
         UrlElementStack $stack,
         UrlContainerInterface $params
     ): void {
-        $params->setQueryParts($request->getQueryParams());
-
-        $url       = ServerRequestHelper::getUrl($request);
-        $ipAddress = ServerRequestHelper::getIpAddress($request);
-        $referrer  = ServerRequestHelper::getHttpReferrer($request);
+        $url = ServerRequestHelper::getUrl($request);
 
         try {
             $this->urlDispatcher->process($url, $stack, $params);
@@ -128,7 +124,7 @@ class UrlElementDispatchMiddleware implements MiddlewareInterface
                 ? $urlHelper->makeUrl($parentModel, $params, false)
                 : null;
 
-            $this->eventBus->emit(new MissingUrlEvent($url, $parentModel, $ipAddress, $referrer, $redirectToUrl));
+            $this->eventBus->emit(new MissingUrlEvent($request, $parentModel, $redirectToUrl));
 
             if ($redirectToUrl) {
                 // Missing but see other
@@ -146,7 +142,7 @@ class UrlElementDispatchMiddleware implements MiddlewareInterface
         }
 
         // Emit event about successful url parsing
-        $this->eventBus->emit(new UrlDispatchedEvent($url, $params, $ipAddress, $referrer));
+        $this->eventBus->emit(new UrlDispatchedEvent($request));
     }
 
     /**

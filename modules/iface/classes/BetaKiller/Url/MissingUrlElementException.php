@@ -22,17 +22,21 @@ class MissingUrlElementException extends UrlElementException
      *
      * @param \BetaKiller\Url\UrlElementInterface|null $parentElement
      * @param bool|null                                $redirectToParent
+     * @param \Throwable|null                          $previous
      */
-    public function __construct(?UrlElementInterface $parentElement, ?bool $redirectToParent = null)
-    {
+    public function __construct(
+        ?UrlElementInterface $parentElement,
+        ?bool $redirectToParent = null,
+        ?\Throwable $previous = null
+    ) {
         $this->parentElement = $parentElement;
         $this->redirect      = (bool)$redirectToParent;
 
-        parent::__construct();
+        parent::__construct('', null, 0, $previous);
     }
 
     /**
-     * @return \BetaKiller\Url\IFaceModelInterface|null
+     * @return \BetaKiller\Url\UrlElementInterface|null
      */
     public function getParentUrlElement(): ?UrlElementInterface
     {

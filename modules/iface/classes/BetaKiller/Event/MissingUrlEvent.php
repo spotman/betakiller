@@ -1,21 +1,13 @@
 <?php
 namespace BetaKiller\Event;
 
+use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\MessageBus\EventMessageInterface;
 use BetaKiller\Url\UrlElementInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
 class MissingUrlEvent implements EventMessageInterface
 {
-    /**
-     * @var string
-     */
-    private $missedUrl;
-
-    /**
-     * @var string
-     */
-    private $httpReferer;
-
     /**
      * @var UrlElementInterface|null
      */
@@ -27,31 +19,33 @@ class MissingUrlEvent implements EventMessageInterface
     private $redirectToUrl;
 
     /**
-     * @var string
+     * @var \Psr\Http\Message\ServerRequestInterface
      */
-    private $ip;
+    private $request;
 
     /**
      * UrlDispatchedEvent constructor.
      *
-     * @param string                                   $url
+     * @param \Psr\Http\Message\ServerRequestInterface $request
      * @param \BetaKiller\Url\UrlElementInterface|null $parentModel
-     * @param string                                   $ip
-     * @param string                                   $httpReferer
      * @param null|string                              $redirectTo
      */
     public function __construct(
-        string $url,
+        ServerRequestInterface $request,
         ?UrlElementInterface $parentModel,
-        string $ip,
-        ?string $httpReferer,
-        ?string $redirectTo = null
+        ?string $redirectTo
     ) {
-        $this->missedUrl     = $url;
-        $this->httpReferer   = $httpReferer;
         $this->parentModel   = $parentModel;
         $this->redirectToUrl = $redirectTo;
-        $this->ip            = $ip;
+        $this->request       = $request;
+    }
+
+    /**
+     * @return \Psr\Http\Message\ServerRequestInterface
+     */
+    public function getRequest(): ServerRequestInterface
+    {
+        return $this->request;
     }
 
     /**
@@ -59,7 +53,7 @@ class MissingUrlEvent implements EventMessageInterface
      */
     public function getMissedUrl(): string
     {
-        return $this->missedUrl;
+        return ServerRequestHelper::getUrl($this->request);
     }
 
     /**
@@ -75,7 +69,7 @@ class MissingUrlEvent implements EventMessageInterface
      */
     public function getHttpReferer(): ?string
     {
-        return $this->httpReferer;
+        return ServerRequestHelper::getHttpReferrer($this->request);
     }
 
     /**
@@ -91,7 +85,7 @@ class MissingUrlEvent implements EventMessageInterface
      */
     public function getIpAddress(): string
     {
-        return $this->ip;
+        return ServerRequestHelper::getIpAddress($this->request);
     }
 
     /**

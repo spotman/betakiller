@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace BetaKiller\Url;
 
 use BetaKiller\Helper\LoggerHelperTrait;
+use BetaKiller\Url\Behaviour\UrlBehaviourException;
 use BetaKiller\Url\Behaviour\UrlBehaviourFactory;
 use BetaKiller\Url\Container\UrlContainerInterface;
 
@@ -45,7 +46,6 @@ class UrlDispatcher implements UrlDispatcherInterface
      * @return void
      * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\IFace\Exception\UrlElementException
-     * @throws \BetaKiller\Url\Behaviour\UrlBehaviourException
      * @throws \BetaKiller\Url\MissingUrlElementException
      */
     public function process(string $uri, UrlElementStack $stack, UrlContainerInterface $params): void
@@ -71,7 +71,6 @@ class UrlDispatcher implements UrlDispatcherInterface
      * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\IFace\Exception\UrlElementException
      * @throws \BetaKiller\Url\MissingUrlElementException
-     * @throws \BetaKiller\Url\Behaviour\UrlBehaviourException
      */
     private function parseUriPath(string $uri, UrlElementStack $stack, UrlContainerInterface $urlParams): void
     {
@@ -80,17 +79,21 @@ class UrlDispatcher implements UrlDispatcherInterface
 
         $parentModel = null;
 
-        // Dispatch childs
-        // Loop through every uri part and initialize it`s iface
-        do {
-            $urlElement = $this->detectUrlElement($urlIterator, $urlParams, $parentModel);
+        try {
+            // Dispatch childs
+            // Loop through every uri part and initialize it`s iface
+            do {
+                $urlElement = $this->detectUrlElement($urlIterator, $urlParams, $parentModel);
 
-            $parentModel = $urlElement;
+                $parentModel = $urlElement;
 
-            $stack->push($urlElement);
+                $stack->push($urlElement);
 
-            $urlIterator->next();
-        } while ($urlIterator->valid());
+                $urlIterator->next();
+            } while ($urlIterator->valid());
+        } catch (UrlBehaviourException $e) {
+            throw new MissingUrlElementException($parentModel, false, $e);
+        }
     }
 
     /**
