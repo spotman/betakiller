@@ -50,4 +50,9 @@ interface AppConfigInterface
      * @return string
      */
     public function getPageCachePath(): string;
+
+    /**
+     * @return string[]
+     */
+    public function getIgnoredQueryParams(): array;
 }

@@ -4,8 +4,10 @@ declare(strict_types=1);
 namespace BetaKiller\Middleware;
 
 use BetaKiller\Config\AppConfigInterface;
+use BetaKiller\Dev\Profiler;
 use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\Helper\ResponseHelper;
+use BetaKiller\Helper\ServerRequestHelper;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UriInterface;
@@ -82,6 +84,13 @@ class SchemeMiddleware implements MiddlewareInterface
             if (!$hasSlash && $isSlashEnabled) {
                 return $this->redirect($currentUri->withPath($path.'/'));
             }
+        }
+
+        // Fetch ignored query params to prevent exceptions
+        $ignoredParams = $this->appConfig->getIgnoredQueryParams();
+
+        if ($ignoredParams) {
+            $request = ServerRequestHelper::removeQueryParams($request, $ignoredParams);
         }
 
         // Forward processing

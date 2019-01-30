@@ -150,11 +150,16 @@ class ServerRequestHelper
         return (array)$request->getParsedBody();
     }
 
-    public static function getHttpReferrer(ServerRequestInterface $request): string
+    /**
+     * @param \Psr\Http\Message\ServerRequestInterface $request
+     *
+     * @return string|null
+     */
+    public static function getHttpReferrer(ServerRequestInterface $request): ?string
     {
         $server = $request->getServerParams();
 
-        return $server['HTTP_REFERER'] ?? '';
+        return $server['HTTP_REFERER'] ?? null;
     }
 
     public static function getUrlContainer(ServerRequestInterface $request): UrlContainerInterface
@@ -243,5 +248,22 @@ class ServerRequestHelper
     public static function getCsp(ServerRequestInterface $request): SecureHeaders
     {
         return $request->getAttribute(SecureHeaders::class);
+    }
+
+    public static function removeQueryParams(ServerRequestInterface $request, array $params): ServerRequestInterface
+    {
+        $targetUri   = $request->getUri();
+        $targetQuery = $request->getQueryParams();
+
+        foreach ($params as $key) {
+            unset($targetQuery[$key]);
+        }
+
+        $targetUri = $targetUri->withQuery(\http_build_query($targetQuery));
+
+        /** @var ServerRequestInterface $request */
+        $request = $request->withQueryParams($targetQuery);
+
+        return $request->withUri($targetUri);
     }
 }

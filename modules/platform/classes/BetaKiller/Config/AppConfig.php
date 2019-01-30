@@ -12,6 +12,7 @@ class AppConfig extends AbstractConfig implements AppConfigInterface
     public const PATH_BASE_URL                  = ['url', 'base'];
     public const PATH_IS_TRAILING_SLASH_ENABLED = ['url', 'is_trailing_slash_enabled'];
     public const PATH_CIRCULAR_LINK_HREF        = ['url', 'circular_link_href'];
+    public const PATH_QUERY_IGNORED             = ['url', 'query', 'ignored'];
     public const PATH_PAGE_CACHE_PATH           = ['cache', 'page', 'path'];
     public const PATH_PAGE_CACHE_ENABLED        = ['cache', 'page', 'enabled'];
 
@@ -80,6 +81,14 @@ class AppConfig extends AbstractConfig implements AppConfigInterface
     public function isTrailingSlashEnabled(): bool
     {
         return (bool)$this->get(self::PATH_IS_TRAILING_SLASH_ENABLED);
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getIgnoredQueryParams(): array
+    {
+        return (array)$this->get(self::PATH_QUERY_IGNORED, true);
     }
 
     /**
