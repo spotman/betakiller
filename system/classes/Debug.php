@@ -4,7 +4,7 @@ use BetaKiller\Exception\HttpExceptionInterface;
 
 class Debug extends Kohana_Debug
 {
-    public const CSP_SCRIPT = "'sha256-WcSntZsih3XcDYlfZLC21eSBr8vKb2jgXw6zOx/9XgI='";
+    public const CSP_SCRIPT = "'sha256-MJUqfrFhbQiIAwiogLLNFfJy62oDe3Wi5DCrVRCYbNg='";
     public const CSP_STYLE  = "'sha256-CgOXZkqegSqEBwcDCxPVyAq7xVmdFkqXp8pkgWOZo+E='";
 
     /**
