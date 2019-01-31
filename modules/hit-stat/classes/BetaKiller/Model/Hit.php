@@ -162,9 +162,9 @@ class Hit extends \ORM implements HitInterface
     {
         $uri = $this->getTarget()->getFullUrl();
 
-        $marker = $this->getTargetMarker();
+        if ($this->hasTargetMarker()) {
+            $marker = $this->getTargetMarker();
 
-        if ($marker) {
             // Parse stored query string
             \parse_str($uri->getQuery(), $queryArr);
 
