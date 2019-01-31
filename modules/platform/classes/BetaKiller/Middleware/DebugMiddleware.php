@@ -177,7 +177,7 @@ class DebugMiddleware implements MiddlewareInterface
     {
         $inlineJs  = $renderer->getAssets('inline_js');
         $inlineCss = $renderer->getAssets('inline_css');
-        $initJs     = \str_replace(['<script type="text/javascript">', '</script>'], '', \trim($renderer->render()));
+        $initJs    = \str_replace(['<script type="text/javascript">', '</script>'], '', \trim($renderer->render()));
 
         foreach ($inlineJs as $js) {
             $csp->cspHash('script', $js);
