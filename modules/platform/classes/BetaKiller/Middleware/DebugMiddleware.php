@@ -177,17 +177,17 @@ class DebugMiddleware implements MiddlewareInterface
     {
         $inlineJs  = $renderer->getAssets('inline_js');
         $inlineCss = $renderer->getAssets('inline_css');
-        $block     = \str_replace(['<script type="text/javascript">', '</script>'], '', \trim($renderer->render()));
+        $initJs     = \str_replace(['<script type="text/javascript">', '</script>'], '', \trim($renderer->render()));
 
         foreach ($inlineJs as $js) {
             $csp->cspHash('script', $js);
         }
 
         foreach ($inlineCss as $css) {
-            $csp->cspHash('script', $css);
+            $csp->cspHash('style', $css);
         }
 
-        $csp->cspHash('script', $block);
+        $csp->cspHash('script', $initJs);
 
         // Inline images in PhpDebugBar
         $csp->csp('image', 'data:');

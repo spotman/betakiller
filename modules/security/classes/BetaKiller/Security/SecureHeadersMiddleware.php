@@ -66,7 +66,6 @@ class SecureHeadersMiddleware implements MiddlewareInterface
         $headers->csp('style', $baseUrl);
         $headers->csp('script', $baseUrl);
         $headers->csp('font', $baseUrl);
-        $headers->csp('style', 'unsafe-inline');
 
         // @see https://www.w3.org/TR/CSP3/#grammardef-report-sample
         $headers->csp('script', 'report-sample');
@@ -75,10 +74,6 @@ class SecureHeadersMiddleware implements MiddlewareInterface
 
         $headers->csp('connect', $baseUrl);
         $headers->csp('connect', 'wss://'.$baseUri->getHost()); // For secure Websocket
-
-        // TODO Inject this nonce in Request and use in StaticAssets
-//        $styleNonce  = $headers->cspNonce('style');
-//        $scriptNonce = $headers->cspNonce('script');
 
         $response = $handler->handle($request->withAttribute(SecureHeaders::class, $headers));
 
