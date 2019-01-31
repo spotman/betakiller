@@ -5,7 +5,7 @@ use BetaKiller\Exception\HttpExceptionInterface;
 class Debug extends Kohana_Debug
 {
     public const CSP_SCRIPT = "'sha256-MJUqfrFhbQiIAwiogLLNFfJy62oDe3Wi5DCrVRCYbNg='";
-    public const CSP_STYLE  = "'sha256-RS6fXJ8FfwQl3b2kETh3BjfclkWXMmqYt2mSb2HVi5w='";
+    public const CSP_STYLE  = "'sha256-9rVpVA6gIB/WMJ0yNaDAuF8Wo0ScZQPhHQCQVIbsqWE='";
 
     /**
      * @var  array  PHP error code => human readable name
