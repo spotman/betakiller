@@ -45,6 +45,11 @@ class TwigExtension extends Twig_Extension
     private $userService;
 
     /**
+     * @var string[][]
+     */
+    private $manifestCache = [];
+
+    /**
      * TwigExtension constructor.
      *
      * @param \BetaKiller\Helper\AppEnvInterface $appEnv
@@ -137,6 +142,12 @@ class TwigExtension extends Twig_Extension
             new Twig_Function(
                 'entry',
                 [$this, 'webpackEntry'],
+                ['is_safe' => ['html'], 'needs_context' => true]
+            ),
+
+            new Twig_Function(
+                'static_dist',
+                [$this, 'webpackManifestRecord'],
                 ['is_safe' => ['html'], 'needs_context' => true]
             ),
 
@@ -541,6 +552,55 @@ class TwigExtension extends Twig_Extension
                 $assets->addCss($cssFileName);
             }
         }
+    }
+
+    public function webpackManifestRecord(array $context, string $name, string $distDir = null): string
+    {
+        if (!$distDir) {
+            $distDir = $context['dist_dir'] ?? null;
+        }
+
+        if (!$distDir) {
+            throw new Exception('Pass dist dir as a second argument or set "dist_dir" variable in layout before using entry() function');
+        }
+
+        $assets = $this->getStaticAssets($context);
+
+        $fileData = $this->manifestCache[$distDir] ?? null;
+        $manifestFileName = $distDir.\DIRECTORY_SEPARATOR.'manifest.json';
+        $manifestFullPath = $assets->findFile($manifestFileName);
+
+        if (!$fileData) {
+
+            if (!$manifestFullPath) {
+                throw new Exception('Missing file ":path", check webpack build and "dist_dir" variable', [
+                    ':path' => $manifestFileName,
+                ]);
+            }
+
+            $fileContent = \file_get_contents($manifestFullPath);
+
+            if (!$fileContent) {
+                throw new Exception('Empty file ":path", check webpack build and "dist_dir" variable', [
+                    ':path' => $manifestFullPath,
+                ]);
+            }
+
+            $this->manifestCache[$distDir] = $fileData = \json_decode($fileContent, true);
+        }
+
+        $key = $distDir.'/'.$name;
+
+        $record = $fileData[$key] ?? null;
+
+        if (!$record) {
+            throw new Exception('Missing record ":name" in file ":path"', [
+                ':path' => $manifestFullPath,
+                ':name' => $key,
+            ]);
+        }
+
+        return $record;
     }
 
     public function getCurrentLang(array $context): string
