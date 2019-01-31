@@ -51,17 +51,25 @@ abstract class AbstractI18nKeyRepository extends AbstractOrmBasedDispatchableRep
         LanguageInterface $lang = null,
         string $mode = null
     ) {
+        $mode = $mode ?? self::SEARCH_STARTING;
+
         $column = $this->getI18nValuesColumnName($orm);
+        $term   = \mb_strtolower($term);
 
-        $term = \mb_strtolower(TextHelper::utf8ToAscii($term));
-
-        $regex = $this->makeI18nFilterRegex($term, $mode ?? self::SEARCH_STARTING);
+        $utfRegex   = $this->makeI18nFilterRegex($term, $mode);
+        $asciiRegex = $this->makeI18nFilterRegex(TextHelper::utf8ToAscii($term), $mode);
 
         if ($lang) {
-            $regex = sprintf('"%s"', $lang->getIsoCode()).$regex;
+            $utfRegex   = sprintf('"%s"', $lang->getIsoCode()).$utfRegex;
+            $asciiRegex = sprintf('"%s"', $lang->getIsoCode()).$asciiRegex;
         }
 
-        $orm->where(\DB::expr('LOWER(CONVERT('.$column.' USING ascii))'), 'REGEXP', $regex);
+        $orm->and_where_open();
+
+        $orm->or_where(\DB::expr('LOWER('.$column.')'), 'REGEXP', $utfRegex);
+        $orm->or_where(\DB::expr('LOWER(CONVERT('.$column.' USING ascii))'), 'REGEXP', $asciiRegex);
+
+        $orm->and_where_close();
 
         return $this;
     }
