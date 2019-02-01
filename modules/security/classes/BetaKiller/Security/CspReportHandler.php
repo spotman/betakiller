@@ -20,6 +20,11 @@ class CspReportHandler implements RequestHandlerInterface
 
     public const URL = '/csp-report-handler';
 
+    private const IGNORED_URI = [
+        /** @see https://stackoverflow.com/a/35559407 */
+        'about',
+    ];
+
     /**
      * @var \Psr\Log\LoggerInterface
      */
@@ -63,11 +68,17 @@ class CspReportHandler implements RequestHandlerInterface
 
         $data = $report['csp-report'];
 
+        $blockedUri = $data['blocked-uri'];
+
+        if (\in_array($blockedUri, self::IGNORED_URI, true)) {
+            return ResponseHelper::text('Ignored');
+        }
+
         $url = $data['document-uri'];
         $uri = $this->uriFactory->createUri($url);
 
         $e = new SecurityException('SCP: ":blocked" by directive ":directive" in ":sample", :full', [
-            ':blocked'   => $data['blocked-uri'],
+            ':blocked'   => $blockedUri,
             ':directive' => $data['violated-directive'],
             ':sample'    => !empty($data['script-sample']) ? $data['script-sample'] : '__no-sample__',
             ':full'      => \json_encode($data, \JSON_PRETTY_PRINT),
