@@ -2,7 +2,6 @@
 namespace BetaKiller\Error;
 
 use BetaKiller\Exception;
-use BetaKiller\ExceptionInterface;
 use BetaKiller\Helper\NotificationHelper;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Log\Logger;
@@ -95,15 +94,6 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
         if (!$exception) {
             // Create dummy exception if this is a plain "alert" or "emergency" message
             $exception = new Exception((string)$record['formatted']);
-        }
-
-        $notify = ($exception instanceof ExceptionInterface)
-            ? $exception->isNotificationEnabled()
-            : true;
-
-        // Skip expected exceptions
-        if (!$notify) {
-            return;
         }
 
         /** @var ServerRequestInterface|null $request */

@@ -64,11 +64,12 @@ class Logger implements LoggerInterface
         if ($this->appEnv->isCli()) {
             $cliHandler = new CliHandler($isDebug);
             $monolog->pushHandler($cliHandler);
-            $monolog->pushProcessor(new CliProcessor);
 
             if (DesktopNotificationHandler::isSupported()) {
-                $monolog->pushHandler(new DesktopNotificationHandler);
+                $monolog->pushHandler(new FilterExceptionsHandler(new DesktopNotificationHandler));
             }
+
+            $monolog->pushProcessor(new CliProcessor);
         } else {
             $monolog->pushProcessor(new WebProcessor());
         }
@@ -87,7 +88,7 @@ class Logger implements LoggerInterface
         $fileHandler = new StreamHandler($logFilePath, $monolog::DEBUG);
         $fileHandler->pushProcessor(new ContextCleanupProcessor);
         $fileHandler->pushProcessor(new ExceptionStacktraceProcessor);
-        $monolog->pushHandler(new FingersCrossedHandler($fileHandler, $logsLevel));
+        $monolog->pushHandler(new FilterExceptionsHandler(new FingersCrossedHandler($fileHandler, $logsLevel)));
 
         // Common processors
         $monolog

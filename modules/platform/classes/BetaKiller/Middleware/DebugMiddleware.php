@@ -11,6 +11,7 @@ use BetaKiller\Dev\DebugBarUserDataCollector;
 use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\Helper\CookieHelper;
 use BetaKiller\Helper\ServerRequestHelper;
+use BetaKiller\Log\FilterExceptionsHandler;
 use BetaKiller\Log\LoggerInterface;
 use BetaKiller\Service\UserService;
 use DebugBar\DataCollector\MemoryCollector;
@@ -222,6 +223,6 @@ class DebugMiddleware implements MiddlewareInterface
 
 //        $phpConsoleHandler->pushProcessor(new ContextCleanupProcessor);
 
-        $this->logger->pushHandler($phpConsoleHandler);
+        $this->logger->pushHandler(new FilterExceptionsHandler($phpConsoleHandler));
     }
 }

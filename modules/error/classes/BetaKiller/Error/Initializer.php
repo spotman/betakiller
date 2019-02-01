@@ -2,6 +2,7 @@
 namespace BetaKiller\Error;
 
 use BetaKiller\Helper\AppEnvInterface;
+use BetaKiller\Log\FilterExceptionsHandler;
 use BetaKiller\Log\LazyLoadProxyHandler;
 use BetaKiller\Log\LoggerInterface;
 use BetaKiller\ModuleInitializerInterface;
@@ -73,6 +74,10 @@ class Initializer implements ModuleInitializerInterface
         };
 
         // PhpExceptionStorage handler
-        $this->logger->pushHandler(new LazyLoadProxyHandler($factory, PhpExceptionStorageHandler::MIN_LEVEL));
+        $this->logger->pushHandler(
+            new FilterExceptionsHandler(
+                new LazyLoadProxyHandler($factory, PhpExceptionStorageHandler::MIN_LEVEL)
+            )
+        );
     }
 }
