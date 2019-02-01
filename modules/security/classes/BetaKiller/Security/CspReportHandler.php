@@ -70,7 +70,7 @@ class CspReportHandler implements RequestHandlerInterface
             ':blocked'   => $data['blocked-uri'],
             ':directive' => $data['violated-directive'],
             ':sample'    => !empty($data['script-sample']) ? $data['script-sample'] : '__no-sample__',
-            ':full'      => \json_encode($data),
+            ':full'      => \json_encode($data, \JSON_PRETTY_PRINT),
         ]);
 
         $this->logException($this->logger, $e, $request->withUri($uri));
