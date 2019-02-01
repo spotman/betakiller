@@ -24,7 +24,7 @@ class Debug extends Kohana_Debug
         E_DEPRECATED        => 'Deprecated',
     ];
 
-    public static function htmlStacktrace(\Throwable $e): string
+    public static function htmlStacktrace(\Throwable $e, ?ServerRequestInterface $request = null): string
     {
         try {
             if (!\interface_exists(\BetaKiller\View\ViewInterface::class)) {

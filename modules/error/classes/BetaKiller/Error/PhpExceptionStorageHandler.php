@@ -175,7 +175,7 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
 
         if ($exception) {
             // Getting HTML stacktrace
-            $stacktrace = \Debug::htmlStacktrace($exception);
+            $stacktrace = \Debug::htmlStacktrace($exception, $request);
 
             // Adding trace
             $model->setTrace($stacktrace);

@@ -78,6 +78,7 @@ $error_id = uniqid('error');
 				<?php endforeach ?>
 			</table>
 		</div>
+
 		<?php $included = get_loaded_extensions() ?>
 		<h3><a href="#<?php echo $env_id = $error_id.'environment_loaded' ?>" data-target="<?php echo $env_id ?>" class="koggle"><?php echo 'Loaded extensions' ?></a> (<?php echo count($included) ?>)</h3>
 		<div id="<?php echo $env_id ?>" class="collapsed">
@@ -89,6 +90,8 @@ $error_id = uniqid('error');
 				<?php endforeach ?>
 			</table>
 		</div>
+
+        <?php /*
 		<?php foreach (array('_SESSION', '_GET', '_POST', '_FILES', '_COOKIE', '_SERVER') as $var): ?>
 		<?php if (empty($GLOBALS[$var]) OR ! is_array($GLOBALS[$var])) continue ?>
 		<h3><a href="#<?php echo $env_id = $error_id.'environment'.strtolower($var) ?>" data-target="<?php echo $env_id ?>" class="koggle">$<?php echo $var ?></a></h3>
@@ -103,6 +106,34 @@ $error_id = uniqid('error');
 			</table>
 		</div>
 		<?php endforeach ?>
+        */ ?>
+
+        <?php /** @var \Psr\Http\Message\ServerRequestInterface|null $request */ ?>
+
+        <?php if ($request): ?>
+            <?php
+            $requestData = [
+                'GET' => $request->getQueryParams(),
+                'POST' => $request->getParsedBody(),
+                'BODY' => $request->getBody()->getContents(),
+                'SERVER' => $request->getServerParams(),
+            ];
+            ?>
+
+            <h3><a href="#<?php echo $env_id = $error_id.'-request' ?>" data-target="<?php echo $env_id ?>" class="koggle">Request</a></h3>
+            <div id="<?php echo $env_id ?>" class="collapsed">
+                <table cellspacing="0">
+                    <?php foreach ($requestData as $key => $value): ?>
+                        <?php if (empty($value)) { continue; } ?>
+                        <tr>
+                            <td><code><?php echo HTML::chars($key) ?></code></td>
+                            <td><pre><?php echo Debug::dump($value) ?></pre></td>
+                        </tr>
+                    <?php endforeach ?>
+                </table>
+            </div>
+        <?php endif; ?>
+
 	</div>
 </div>
 <script type="text/javascript">

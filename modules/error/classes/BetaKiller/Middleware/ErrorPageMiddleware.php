@@ -175,8 +175,9 @@ class ErrorPageMiddleware implements MiddlewareInterface
      */
     private function makeDebugResponse(\Throwable $exception, ServerRequestInterface $request): ResponseInterface
     {
-        $stacktrace = \Debug::htmlStacktrace($exception);
         \Debug::injectStackTraceCsp($request);
+
+        $stacktrace = \Debug::htmlStacktrace($exception, $request);
 
         return ResponseHelper::html($stacktrace, 500);
     }
