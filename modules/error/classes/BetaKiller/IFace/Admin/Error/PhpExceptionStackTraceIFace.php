@@ -26,10 +26,7 @@ class PhpExceptionStackTraceIFace extends AbstractErrorAdminIFace
             throw new Exception('Incorrect php exception hash');
         }
 
-        $csp = ServerRequestHelper::getCsp($request);
-
-        $csp->csp('style', \Debug::CSP_STYLE);
-        $csp->csp('script', \Debug::CSP_SCRIPT);
+        \Debug::injectStackTraceCsp($request);
 
         return [
             'trace' => $model->getTrace(),

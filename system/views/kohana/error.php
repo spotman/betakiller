@@ -26,27 +26,6 @@ $error_id = uniqid('error');
 	#kohana_error ol.trace li { margin: 0; padding: 0; }
 .js .collapsed { display: none; }
 </style>
-<script type="text/javascript">
-document.documentElement.className = document.documentElement.className + ' js';
-function koggle(elem)
-{
-	elem = document.getElementById(elem);
-
-	if (elem.style && elem.style['display'])
-		// Only works with the "style" attr
-		var disp = elem.style['display'];
-	else if (elem.currentStyle)
-		// For MSIE, naturally
-		var disp = elem.currentStyle['display'];
-	else if (window.getComputedStyle)
-		// For most other browsers
-		var disp = document.defaultView.getComputedStyle(elem, null).getPropertyValue('display');
-
-	// Toggle the state of the "display" style
-	elem.style.display = disp == 'block' ? 'none' : 'block';
-	return false;
-}
-</script>
 <div id="kohana_error">
 	<h1><span class="type"><?php echo $class ?> [ <?php echo $code ?> ]:</span> <span class="message"><?php echo HTML::chars($message) ?></span></h1>
 	<div id="<?php echo $error_id ?>" class="content">
@@ -58,13 +37,13 @@ function koggle(elem)
 				<p>
 					<span class="file">
 						<?php if ($step['file']): $source_id = $error_id.'source'.$i; ?>
-							<a href="#<?php echo $source_id ?>" onclick="return koggle('<?php echo $source_id ?>')"><?php echo Debug::path($step['file']) ?> [ <?php echo $step['line'] ?> ]</a>
+							<a href="#<?php echo $source_id ?>" data-target="<?php echo $source_id ?>" class="koggle"><?php echo Debug::path($step['file']) ?> [ <?php echo $step['line'] ?> ]</a>
 						<?php else: ?>
 							{<?php echo 'PHP internal call' ?>}
 						<?php endif ?>
 					</span>
 					&raquo;
-					<?php echo $step['function'] ?>(<?php if ($step['args']): $args_id = $error_id.'args'.$i; ?><a href="#<?php echo $args_id ?>" onclick="return koggle('<?php echo $args_id ?>')"><?php echo 'arguments' ?></a><?php endif ?>)
+					<?php echo $step['function'] ?>(<?php if ($step['args']): $args_id = $error_id.'args'.$i; ?><a href="#<?php echo $args_id ?>" data-target="<?php echo $args_id ?>" class="koggle"><?php echo 'arguments' ?></a><?php endif ?>)
 				</p>
 				<?php if (isset($args_id)): ?>
 				<div id="<?php echo $args_id ?>" class="collapsed">
@@ -86,10 +65,10 @@ function koggle(elem)
 		<?php endforeach ?>
 		</ol>
 	</div>
-	<h2><a href="#<?php echo $env_id = $error_id.'environment' ?>" onclick="return koggle('<?php echo $env_id ?>')"><?php echo 'Environment' ?></a></h2>
+	<h2><a href="#<?php echo $env_id = $error_id.'environment' ?>" data-target="<?php echo $env_id ?>" class="koggle"><?php echo 'Environment' ?></a></h2>
 	<div id="<?php echo $env_id ?>" class="content collapsed">
 		<?php $included = get_included_files() ?>
-		<h3><a href="#<?php echo $env_id = $error_id.'environment_included' ?>" onclick="return koggle('<?php echo $env_id ?>')"><?php echo 'Included files' ?></a> (<?php echo count($included) ?>)</h3>
+		<h3><a href="#<?php echo $env_id = $error_id.'environment_included' ?>" data-target="<?php echo $env_id ?>" class="koggle"><?php echo 'Included files' ?></a> (<?php echo count($included) ?>)</h3>
 		<div id="<?php echo $env_id ?>" class="collapsed">
 			<table cellspacing="0">
 				<?php foreach ($included as $file): ?>
@@ -100,7 +79,7 @@ function koggle(elem)
 			</table>
 		</div>
 		<?php $included = get_loaded_extensions() ?>
-		<h3><a href="#<?php echo $env_id = $error_id.'environment_loaded' ?>" onclick="return koggle('<?php echo $env_id ?>')"><?php echo 'Loaded extensions' ?></a> (<?php echo count($included) ?>)</h3>
+		<h3><a href="#<?php echo $env_id = $error_id.'environment_loaded' ?>" data-target="<?php echo $env_id ?>" class="koggle"><?php echo 'Loaded extensions' ?></a> (<?php echo count($included) ?>)</h3>
 		<div id="<?php echo $env_id ?>" class="collapsed">
 			<table cellspacing="0">
 				<?php foreach ($included as $file): ?>
@@ -112,7 +91,7 @@ function koggle(elem)
 		</div>
 		<?php foreach (array('_SESSION', '_GET', '_POST', '_FILES', '_COOKIE', '_SERVER') as $var): ?>
 		<?php if (empty($GLOBALS[$var]) OR ! is_array($GLOBALS[$var])) continue ?>
-		<h3><a href="#<?php echo $env_id = $error_id.'environment'.strtolower($var) ?>" onclick="return koggle('<?php echo $env_id ?>')">$<?php echo $var ?></a></h3>
+		<h3><a href="#<?php echo $env_id = $error_id.'environment'.strtolower($var) ?>" data-target="<?php echo $env_id ?>" class="koggle">$<?php echo $var ?></a></h3>
 		<div id="<?php echo $env_id ?>" class="collapsed">
 			<table cellspacing="0">
 				<?php foreach ($GLOBALS[$var] as $key => $value): ?>
@@ -126,3 +105,34 @@ function koggle(elem)
 		<?php endforeach ?>
 	</div>
 </div>
+<script type="text/javascript">
+  document.documentElement.className = document.documentElement.className + ' js';
+
+  document.querySelectorAll(".koggle").forEach(function($handler) {
+    $handler.addEventListener('click', function(event) {
+      event.preventDefault();
+
+      var $id = event.target;
+      koggle($id.dataset.target);
+    })
+  });
+
+  function koggle(elem)
+  {
+    elem = document.getElementById(elem);
+
+    if (elem.style && elem.style['display'])
+    // Only works with the "style" attr
+      var disp = elem.style['display'];
+    else if (elem.currentStyle)
+    // For MSIE, naturally
+      var disp = elem.currentStyle['display'];
+    else if (window.getComputedStyle)
+    // For most other browsers
+      var disp = document.defaultView.getComputedStyle(elem, null).getPropertyValue('display');
+
+    // Toggle the state of the "display" style
+    elem.style.display = disp === 'block' ? 'none' : 'block';
+    return false;
+  }
+</script>

@@ -96,7 +96,7 @@ class ErrorPageMiddleware implements MiddlewareInterface
         }
 
         // Make nice message if allowed or use default Kohana response
-        return $this->makeNiceMessage($e, $request) ?: $this->makeDebugResponse($e);
+        return $this->makeNiceMessage($e, $request) ?: $this->makeDebugResponse($e, $request);
     }
 
     /**
@@ -160,7 +160,7 @@ class ErrorPageMiddleware implements MiddlewareInterface
             $this->logException($this->logger, $e);
 
             return $isDebug
-                ? $this->makeDebugResponse($e)
+                ? $this->makeDebugResponse($e, $request)
                 : ResponseHelper::text('Error', $httpCode);
         }
     }
@@ -168,13 +168,15 @@ class ErrorPageMiddleware implements MiddlewareInterface
     /**
      * Returns developer-friendly exception page
      *
-     * @param \Throwable $exception
+     * @param \Throwable                               $exception
+     * @param \Psr\Http\Message\ServerRequestInterface $request
      *
      * @return \Psr\Http\Message\ResponseInterface
      */
-    private function makeDebugResponse(\Throwable $exception): ResponseInterface
+    private function makeDebugResponse(\Throwable $exception, ServerRequestInterface $request): ResponseInterface
     {
         $stacktrace = \Debug::htmlStacktrace($exception);
+        \Debug::injectStackTraceCsp($request);
 
         return ResponseHelper::html($stacktrace, 500);
     }

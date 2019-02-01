@@ -1,10 +1,12 @@
 <?php
 
 use BetaKiller\Exception\HttpExceptionInterface;
+use BetaKiller\Helper\ServerRequestHelper;
+use Psr\Http\Message\ServerRequestInterface;
 
 class Debug extends Kohana_Debug
 {
-    public const CSP_SCRIPT = "'sha256-MJUqfrFhbQiIAwiogLLNFfJy62oDe3Wi5DCrVRCYbNg='";
+    public const CSP_SCRIPT = "'sha256-R2qmT032WZ40VlK6RCmpqrN1FA9gPQWSPRf20chwAo0='";
     public const CSP_STYLE  = "'sha256-9rVpVA6gIB/WMJ0yNaDAuF8Wo0ScZQPhHQCQVIbsqWE='";
 
     /**
@@ -99,5 +101,13 @@ class Debug extends Kohana_Debug
         } catch (Throwable $e) {
             return Kohana_Kohana_Exception::text($e);
         }
+    }
+
+    public static function injectStackTraceCsp(ServerRequestInterface $request): void
+    {
+        $csp = ServerRequestHelper::getCsp($request);
+
+        $csp->csp('script', self::CSP_SCRIPT);
+        $csp->csp('style', self::CSP_STYLE);
     }
 }
