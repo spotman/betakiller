@@ -45,12 +45,6 @@ class Migration1549011246_Add_Stat_Hits_User_Id extends Migration
 ADD `user_id` int(11) unsigned NULL AFTER `marker_id`,
 ADD FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON UPDATE CASCADE ON DELETE CASCADE;');
         }
-
-        $this->runSql('ALTER TABLE `stat_hit_links`
-DROP FOREIGN KEY `stat_hit_links_ibfk_1`,
-ADD FOREIGN KEY (`source_id`) REFERENCES `stat_hit_pages` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-DROP FOREIGN KEY `stat_hit_links_ibfk_2`,
-ADD FOREIGN KEY (`target_id`) REFERENCES `stat_hit_pages` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;');
     }
 
     /**
