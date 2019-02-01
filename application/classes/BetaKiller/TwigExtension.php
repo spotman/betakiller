@@ -441,13 +441,11 @@ class TwigExtension extends Twig_Extension
      * @param string|array $name
      * @param null         $value
      *
-     * @return string|null
+     * @return void
      */
-    public function meta(array $context, $name = null, $value = null): ?string
+    public function meta(array $context, $name = null, $value = null): void
     {
         $this->getMeta($context)->set($name, $value);
-
-        return null;
     }
 
     public function linkTag(array $context, string $rel, string $href, array $attributes = null): ?string
