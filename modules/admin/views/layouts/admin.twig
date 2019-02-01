@@ -7,7 +7,8 @@
 {{ css("https://fonts.googleapis.com/icon?family=Material+Icons") }}
 
 {{ csp("style", "fonts.googleapis.com") }}
-{{ csp("font-src", "fonts.gstatic.com") }}
+{{ csp("font", "fonts.gstatic.com") }}
+{{ csp("font", "data:") }}
 
 {{ js("require.js/admin.config.js") }}
 {{ js("layouts/admin.js") }}
