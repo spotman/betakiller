@@ -2,8 +2,6 @@
 
 {% block content %}
 
-  {{ csp("style", "unsafe-inline") }}
-
   <div class="container error-400">
     <div class="row align-items-center h-100">
       <div class="col">
@@ -28,6 +26,8 @@
       </div>
     </div>
   </div>
+
+  {{ csp("style", "'sha256-gp8x6LKOIXmO/NxDpEkJfvmWuxz39hg+qJnrqDzFE90='") }}
 
   <style>
     html, body {
