@@ -456,11 +456,6 @@ class PhpException extends \ORM implements PhpExceptionModelInterface
      */
     public function markAsRepeated(?UserInterface $user): PhpExceptionModelInterface
     {
-        // Skip if exception was not resolved yet
-        if (!$this->isResolved()) {
-            return $this;
-        }
-
         // Reset resolved_by
         $this->setResolvedBy(null);
         $this->setStatus(self::STATE_REPEATED);
