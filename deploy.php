@@ -401,11 +401,11 @@ task('daemon:supervisor:restart', [
 ])->desc('Restart supervisor');
 
 task('daemon:supervisor:start', function() {
-    runMinionTask('daemon:start --name="supervisor"');
+    runMinionTask('daemon:start --name="supervisor"', true);
 })->desc('Start supervisor');
 
 task('daemon:supervisor:stop', function() {
-    runMinionTask('daemon:stop --name="supervisor"');
+    runMinionTask('daemon:stop --name="supervisor"', true);
 })->desc('Stop supervisor');
 
 task('daemon:supervisor:reload', function() {
@@ -521,12 +521,14 @@ task('update', [
 /**
  * Run minion-task and echo result to console
  *
- * @param string $name
+ * @param string    $name
+ * @param bool|null $asHttpUser
  *
  * @return string
- * @throws Exception
+ * @throws \Deployer\Exception\Exception
+ * @throws \Deployer\Exception\RuntimeException
  */
-function runMinionTask(string $name)
+function runMinionTask(string $name, bool $asHttpUser = null)
 {
     $currentPath = getcwd();
     $path        = getRepoPath();
@@ -537,12 +539,17 @@ function runMinionTask(string $name)
 
     $stage = stage();
 
-    $cmd = "cd $path && {{bin/php}} index.php --task=$name --stage=$stage";
+    $cmd = "{{bin/php}} index.php --task=$name --stage=$stage";
 
     if (isVeryVerbose()) {
         $cmd .= ' --debug';
     }
 
+    if ($asHttpUser) {
+        $cmd = 'sudo -u {{http_user}} '.$cmd;
+    }
+
+    cd($path);
     $text = run($cmd);
 
     if ($text) {
