@@ -85,7 +85,5 @@ class Start extends AbstractTask
             ->disableOutput()
             ->setIdleTimeout(null)
             ->mustRun();
-
-        echo \sprintf('Daemon "%s" is started'.\PHP_EOL, $name);
     }
 }
