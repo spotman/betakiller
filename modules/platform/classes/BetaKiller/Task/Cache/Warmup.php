@@ -270,7 +270,7 @@ class Warmup extends \BetaKiller\Task\AbstractTask
                 // TODO Maybe grab page content, parse it and make request to every image/css/js file
                 $this->logger->info('Cache was warmed up for :url', [':url' => $url]);
             } else {
-                $this->logger->warning('Got :status status with empty content for URL :url', [
+                throw new TaskException('Got :status status with empty content for URL :url', [
                     ':url'    => $url,
                     ':status' => $status,
                 ]);
@@ -281,9 +281,9 @@ class Warmup extends \BetaKiller\Task\AbstractTask
                 ':status' => $status,
             ]);
         } elseif (\in_array($status, [401, 403], true)) {
-            $this->logger->info('Access denied with :status status for :url', [':url' => $url, ':status' => $status]);
+            throw new TaskException('Access denied with :status status for :url', [':url' => $url, ':status' => $status]);
         } else {
-            $this->logger->warning('Got :status status for URL :url', [':url' => $url, ':status' => $status]);
+            throw new TaskException('Got :status status for URL :url', [':url' => $url, ':status' => $status]);
         }
     }
 
