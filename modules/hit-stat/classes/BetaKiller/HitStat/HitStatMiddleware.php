@@ -16,6 +16,7 @@ use BetaKiller\Repository\HitLinkRepository;
 use BetaKiller\Repository\HitPageRepository;
 use BetaKiller\Repository\HitRepository;
 use BetaKiller\Service\HitService;
+use BetaKiller\Service\UserService;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -57,6 +58,11 @@ class HitStatMiddleware implements MiddlewareInterface
     private $logger;
 
     /**
+     * @var \BetaKiller\Service\UserService
+     */
+    private $userService;
+
+    /**
      * HitStatMiddleware constructor.
      *
      * @param \BetaKiller\Helper\AppEnvInterface       $appEnv
@@ -72,6 +78,7 @@ class HitStatMiddleware implements MiddlewareInterface
         HitRepository $hitRepo,
         HitPageRepository $pageRepo,
         HitLinkRepository $linkRepo,
+        UserService $userService,
         LoggerInterface $logger
     ) {
         $this->appEnv   = $appEnv;
@@ -80,6 +87,7 @@ class HitStatMiddleware implements MiddlewareInterface
         $this->pageRepo = $pageRepo;
         $this->linkRepo = $linkRepo;
         $this->logger   = $logger;
+        $this->userService = $userService;
     }
 
     /**
@@ -204,6 +212,17 @@ class HitStatMiddleware implements MiddlewareInterface
 
         if ($marker) {
             $hit->setTargetMarker($marker);
+        }
+
+        if (ServerRequestHelper::hasUser($request)) {
+            $user = ServerRequestHelper::getUser($request);
+
+            // Ignore hits of admin users
+            if ($this->userService->isAdmin($user)) {
+                return null;
+            }
+
+            $hit->bindToUser($user);
         }
 
         $this->hitRepo->save($hit);

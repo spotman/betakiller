@@ -8,10 +8,12 @@ class Hit extends \ORM implements HitInterface
     private const FIELD_SOURCE_ID = 'source_id';
     private const FIELD_TARGET_ID = 'target_id';
     private const FIELD_MARKER_ID = 'marker_id';
+    private const FIELD_USER_ID   = 'user_id';
 
     private const RELATION_SOURCE = 'source';
     private const RELATION_TARGET = 'target';
     private const RELATION_MARKER = 'marker';
+    private const RELATION_USER   = 'user';
 
     /**
      * Prepares the model database connection, determines the table name,
@@ -38,6 +40,11 @@ class Hit extends \ORM implements HitInterface
                 'model'       => 'HitMarker',
                 'foreign_key' => self::FIELD_MARKER_ID,
             ],
+
+            self::RELATION_USER => [
+                'model'       => 'User',
+                'foreign_key' => self::FIELD_USER_ID,
+            ],
         ]);
 
         $this->load_with([
@@ -45,6 +52,18 @@ class Hit extends \ORM implements HitInterface
             self::RELATION_TARGET,
             self::RELATION_MARKER,
         ]);
+    }
+
+    /**
+     * @param \BetaKiller\Model\UserInterface $user
+     *
+     * @return \BetaKiller\Model\HitInterface
+     */
+    public function bindToUser(UserInterface $user): HitInterface
+    {
+        $this->set(self::RELATION_USER, $user);
+
+        return $this;
     }
 
     /**

@@ -6,6 +6,13 @@ use Psr\Http\Message\UriInterface;
 interface HitInterface extends AbstractEntityInterface
 {
     /**
+     * @param \BetaKiller\Model\UserInterface $user
+     *
+     * @return \BetaKiller\Model\HitInterface
+     */
+    public function bindToUser(UserInterface $user): HitInterface;
+
+    /**
      * @param \BetaKiller\Model\HitPage|null $value
      *
      * @return \BetaKiller\Model\HitInterface

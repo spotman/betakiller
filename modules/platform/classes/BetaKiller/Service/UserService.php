@@ -5,6 +5,7 @@ namespace BetaKiller\Service;
 use BetaKiller\Config\AppConfigInterface;
 use BetaKiller\Factory\GuestUserFactory;
 use BetaKiller\Model\GuestUserInterface;
+use BetaKiller\Model\RoleInterface;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Repository\RoleRepository;
 use BetaKiller\Repository\UserRepository;
@@ -180,11 +181,11 @@ class UserService
      * @param \BetaKiller\Model\UserInterface $user
      *
      * @return bool
-     * @throws \BetaKiller\Repository\RepositoryException
      */
     public function isAdmin(UserInterface $user): bool
     {
-        return $user->hasRole($this->roleRepository->getAdminPanelRole());
+        // This role is not assigned directly but through inheritance
+        return $user->hasRoleName(RoleInterface::ADMIN_PANEL);
     }
 
     /**
