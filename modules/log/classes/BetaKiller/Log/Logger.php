@@ -124,5 +124,10 @@ class Logger implements LoggerInterface
     public function exceptionHandler($e): void
     {
         $this->logException($this, $e);
+
+        // Exit with error code in CLI mode
+        if ($this->appEnv->isCli()) {
+            exit(1);
+        }
     }
 }
