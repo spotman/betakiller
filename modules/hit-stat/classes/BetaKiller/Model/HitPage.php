@@ -53,6 +53,9 @@ class HitPage extends \ORM
 
     public function setUri(string $uri): HitPage
     {
+        // Truncate URI to 512 symbols
+        $uri = \mb_strimwidth($uri, 0, 512, '...');
+
         $this->set('uri', $uri);
 
         return $this;
