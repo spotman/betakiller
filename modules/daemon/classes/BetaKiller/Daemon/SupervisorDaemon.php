@@ -217,7 +217,7 @@ class SupervisorDaemon implements DaemonInterface
 
                 if ($this->failureCounter[$name] > self::RETRY_LIMIT) {
                     // Warning for developers
-                    $this->logger->alert('Daemon ":name" had failed :times times and was stopped', [
+                    $this->logger->emergency('Daemon ":name" had failed :times times and was stopped', [
                         ':name'  => $name,
                         ':times' => self::RETRY_LIMIT,
                     ]);
@@ -225,6 +225,12 @@ class SupervisorDaemon implements DaemonInterface
                     // No further processing
                     return;
                 }
+
+                // Warning for developers
+                $this->logger->alert('Daemon ":name" had failed :times times and will be restarted immediately', [
+                    ':name'  => $name,
+                    ':times' => $this->failureCounter[$name],
+                ]);
             }
 
             $lock = $this->lockFactory->create($name);
