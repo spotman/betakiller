@@ -10,6 +10,7 @@ use BetaKiller\Dev\DebugBarSessionDataCollector;
 use BetaKiller\Dev\DebugBarUserDataCollector;
 use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\Helper\CookieHelper;
+use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Log\FilterExceptionsHandler;
 use BetaKiller\Log\LoggerInterface;
@@ -169,6 +170,9 @@ class DebugMiddleware implements MiddlewareInterface
         // DebugBar generates inline tags and images so configuring CSP
         $csp = ServerRequestHelper::getCsp($request);
         $this->addCspRules($renderer, $csp);
+
+        // Prevent caching
+        $response = ResponseHelper::disableCaching($response);
 
         // Add headers injected by DebugBar
         return $httpDriver->applyHeaders($response);

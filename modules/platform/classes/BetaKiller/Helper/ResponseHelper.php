@@ -117,6 +117,13 @@ class ResponseHelper
         return new RedirectResponse($url, $status ?? 302);
     }
 
+    public static function disableCaching(ResponseInterface $response): ResponseInterface
+    {
+        $expiresAt = (new \DateTimeImmutable())->sub(new \DateInterval('PT1H'));
+
+        return self::setExpires($response, $expiresAt);
+    }
+
     public static function setLastModified(
         ResponseInterface $response,
         DateTimeImmutable $lastModified
