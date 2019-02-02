@@ -483,6 +483,7 @@ task('deploy', [
     'deploy:dotenv:revision',
 
     // Deploy assets (locally or on remote host)
+    'assets:deploy',
     'assets:build',
 
     // Enable maintenance mode before any DB processing
@@ -492,7 +493,6 @@ task('deploy', [
     'migrate',
 
     // Prepare
-    'assets:deploy',
     'cache:warmup',
 
     // Restart daemons and workers
