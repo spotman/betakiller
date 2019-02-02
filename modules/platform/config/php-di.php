@@ -2,6 +2,7 @@
 
 use BetaKiller\Exception;
 use BetaKiller\Helper\I18nHelper;
+use BetaKiller\Middleware\CspReportBodyParamsStrategy;
 use BetaKiller\Session\DatabaseSessionStorage;
 use BetaKiller\Session\SessionStorageInterface;
 use BetaKiller\Url\Container\UrlContainerInterface;
@@ -15,6 +16,7 @@ use Zend\Diactoros\Response\TextResponse;
 use Zend\Diactoros\ResponseFactory;
 use Zend\Diactoros\StreamFactory;
 use Zend\Diactoros\UriFactory;
+use Zend\Expressive\Helper\BodyParams\BodyParamsMiddleware;
 use Zend\Expressive\Router\FastRouteRouter;
 use Zend\Expressive\Router\Middleware\ImplicitHeadMiddleware;
 use Zend\Expressive\Router\Middleware\ImplicitOptionsMiddleware;
@@ -88,6 +90,13 @@ return [
 //            return new RequestIdMiddleware($requestIdProvider);
 //        }),
 
+        BodyParamsMiddleware::class => DI\factory(function() {
+            $params = new BodyParamsMiddleware();
+
+            $params->addStrategy(new CspReportBodyParamsStrategy());
+
+            return $params;
+        }),
 
         SessionStorageInterface::class     => DI\autowire(DatabaseSessionStorage::class),
         SessionPersistenceInterface::class => DI\get(SessionStorageInterface::class),

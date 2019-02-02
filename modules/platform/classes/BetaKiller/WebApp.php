@@ -36,6 +36,7 @@ use Psr\Http\Message\ResponseInterface;
 use Spotman\Api\ApiRequestHandler;
 use Zend\Diactoros\Response\TextResponse;
 use Zend\Expressive\Application;
+use Zend\Expressive\Helper\BodyParams\BodyParamsMiddleware;
 use Zend\Expressive\Router\Middleware\DispatchMiddleware;
 use Zend\Expressive\Router\Middleware\ImplicitHeadMiddleware;
 use Zend\Expressive\Router\Middleware\ImplicitOptionsMiddleware;
@@ -101,6 +102,7 @@ class WebApp
         $this->app->pipe(ProfilerMiddleware::class);
 
         // Main processing pipe
+        $this->app->pipe(BodyParamsMiddleware::class);
         $this->app->pipe(SchemeMiddleware::class);
         $this->app->pipe(SecureHeadersMiddleware::class);
 //        $this->app->pipe(RequestIdMiddleware::class);
