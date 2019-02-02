@@ -85,11 +85,9 @@ class CspReportHandler implements RequestHandlerInterface
             return ResponseHelper::text('Ignored');
         }
 
-        $e = new SecurityException('SCP: ":blocked" by directive ":directive" in ":sample", :full', [
+        $e = new SecurityException('SCP: ":directive" blocked ":blocked"', [
             ':blocked'   => $blockedUri,
             ':directive' => $data['violated-directive'],
-            ':sample'    => !empty($data['script-sample']) ? $data['script-sample'] : '__no-sample__',
-            ':full'      => \json_encode($data, \JSON_PRETTY_PRINT),
         ]);
 
         $uri = $this->uriFactory->createUri($documentUrl);
