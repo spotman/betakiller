@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace BetaKiller\Task\Test;
+namespace BetaKiller\Task\Test\Log;
 
 use Psr\Log\LoggerInterface;
 
