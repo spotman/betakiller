@@ -42,7 +42,7 @@
     "psr/simple-cache": "^1.0",
     "punic/punic": "^3.1",
     "ralouphie/mimey": "^2.0",
-    "roave/doctrine-simplecache": "^2.1",
+    "roave/doctrine-simplecache": "^2.2",
     "samdark/sitemap": "^2.0",
     "spotman/davbackup": "dev-master",
     "swiftmailer/swiftmailer": "^6.1",
@@ -52,7 +52,7 @@
     "thunderer/shortcode": "^0.7",
     "twig/extensions": "^1.5",
     "twig/twig": "^2.6.0",
-    "vlucas/phpdotenv": "^2.4",
+    "vlucas/phpdotenv": "^3.3",
     "voryx/thruway": "^0.5.3",
     "zendframework/zend-diactoros": "^2.0",
     "zendframework/zend-expressive": "^3.2",
@@ -63,7 +63,7 @@
     "zendframework/zend-permissions-acl": "^2.6"
   },
   "require-dev": {
-    "codedungeon/phpunit-result-printer": "^0.23",
+    "codedungeon/phpunit-result-printer": "^0.25",
     "deployer/deployer": "^6",
     "jolicode/jolinotif": "^2.0",
     "kint-php/kint": "^3.0",

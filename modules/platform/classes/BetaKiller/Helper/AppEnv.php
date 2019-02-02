@@ -56,7 +56,7 @@ class AppEnv implements AppEnvInterface
 
     private function initDotEnv(): void
     {
-        $dotEnv = new Dotenv($this->appRootPath, '.env');
+        $dotEnv = Dotenv::create($this->appRootPath);
 
         // Load local .env file if exists even in production, ignore missing file
         $dotEnv->safeLoad();
