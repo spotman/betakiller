@@ -19,13 +19,20 @@ class SecureHeadersMiddleware implements MiddlewareInterface
     private $appConfig;
 
     /**
+     * @var \BetaKiller\Security\SecurityConfigInterface
+     */
+    private $securityConfig;
+
+    /**
      * SecureHeadersMiddleware constructor.
      *
-     * @param \BetaKiller\Config\AppConfigInterface $appConfig
+     * @param \BetaKiller\Config\AppConfigInterface        $appConfig
+     * @param \BetaKiller\Security\SecurityConfigInterface $securityConfig
      */
-    public function __construct(AppConfigInterface $appConfig)
+    public function __construct(AppConfigInterface $appConfig, SecurityConfigInterface $securityConfig)
     {
         $this->appConfig = $appConfig;
+        $this->securityConfig = $securityConfig;
     }
 
     /**
@@ -76,6 +83,10 @@ class SecureHeadersMiddleware implements MiddlewareInterface
         $headers->csp('connect', 'wss://'.$baseUri->getHost()); // For secure Websocket
 
         $response = $handler->handle($request->withAttribute(SecureHeaders::class, $headers));
+
+        if (!$this->securityConfig->isCspEnabled()) {
+            return $response;
+        }
 
         $httpAdapter = new Psr7Adapter($response);
         $headers->apply($httpAdapter);
