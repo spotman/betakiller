@@ -20,7 +20,7 @@ use Psr\Log\LoggerInterface;
  */
 class PhpExceptionStorageHandler extends AbstractProcessingHandler
 {
-    public const MIN_LEVEL = \Monolog\Logger::ERROR;
+    public const MIN_LEVEL = \Monolog\Logger::WARNING;
 
     public const NOTIFICATION_SUBSYSTEM_FAILURE = 'developer/error/subsystem-failure';
 
