@@ -5,7 +5,7 @@ namespace BetaKiller\Task\Test;
 
 use Psr\Log\LoggerInterface;
 
-class LogAlert extends \BetaKiller\Task\AbstractTask
+class Alert extends \BetaKiller\Task\AbstractTask
 {
     /**
      * @var \Psr\Log\LoggerInterface
@@ -13,7 +13,7 @@ class LogAlert extends \BetaKiller\Task\AbstractTask
     private $logger;
 
     /**
-     * LogAlert constructor.
+     * Alert constructor.
      */
     public function __construct(LoggerInterface $logger)
     {
@@ -29,6 +29,6 @@ class LogAlert extends \BetaKiller\Task\AbstractTask
 
     public function run(): void
     {
-        $this->logger->alert('Test alert');
+        $this->logger->alert('Test alert from CLI');
     }
 }
