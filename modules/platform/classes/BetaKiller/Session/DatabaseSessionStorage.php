@@ -91,6 +91,11 @@ class DatabaseSessionStorage implements SessionStorageInterface
         $ipAddress = ServerRequestHelper::getIpAddress($request);
         $originUrl = ServerRequestHelper::getUrl($request);
 
+        if (!$userAgent) {
+            // Bots, fake requests, etc => regenerate empty session
+            return $this->createSession('empty', $ipAddress, $originUrl);
+        }
+
         $cookie = $this->cookies->get($request, self::COOKIE_NAME);
 
         if (!$cookie) {
