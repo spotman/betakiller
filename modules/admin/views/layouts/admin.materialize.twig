@@ -3,6 +3,8 @@
 {{ js("require.js/betakiller.config.js") }}
 {{ js("require.js/admin.materialize.config.js") }}
 
+{{ csp("font", "data:") }}
+
 {% if use_admin_css is defined and use_admin_css %}
   {{ css("admin/css/admin.css") }}
 {% endif %}
