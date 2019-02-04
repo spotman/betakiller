@@ -353,11 +353,11 @@ task('migrations:history', function () {
 })->desc('Show migrations list');
 
 task('cache:warmup', function () {
-    runMinionTask('cache:warmup');
+    runMinionTask('cache:warmup', true);
 })->desc('Warm up cache by making internal HTTP request to every IFace');
 
 task('assets:deploy', function () {
-    runMinionTask('assets:deploy');
+    runMinionTask('assets:deploy', true);
 })->desc('Collect assets from all static-files directories');
 
 task('deploy:dotenv:migrate', function () {
