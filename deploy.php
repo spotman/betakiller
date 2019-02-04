@@ -465,8 +465,8 @@ task('deploy', [
     'deploy:release',
 
     // Deploy code
-    'deploy:betakiller',
     'deploy:app',
+    'deploy:betakiller',
 
     // app shared and writable dirs
     'deploy:shared',
