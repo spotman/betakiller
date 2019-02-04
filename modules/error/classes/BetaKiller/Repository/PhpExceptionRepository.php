@@ -28,9 +28,10 @@ class PhpExceptionRepository extends AbstractOrmBasedDispatchableRepository
     {
         $orm = $this->getOrmInstance();
 
-        $this->filterUnresolved($orm)->orderByLastSeenAt($orm);
-
-        return $orm->get_all();
+        return $this
+            ->filterUnresolved($orm)
+            ->orderByLastSeenAt($orm)
+            ->findAll($orm);
     }
 
     /**
@@ -40,9 +41,10 @@ class PhpExceptionRepository extends AbstractOrmBasedDispatchableRepository
     {
         $orm = $this->getOrmInstance();
 
-        $this->filterResolved($orm)->orderByLastSeenAt($orm);
-
-        return $orm->get_all();
+        return $this
+            ->filterResolved($orm)
+            ->orderByLastSeenAt($orm)
+            ->findAll($orm);
     }
 
     /**
@@ -71,10 +73,22 @@ class PhpExceptionRepository extends AbstractOrmBasedDispatchableRepository
     {
         $orm = $this->getOrmInstance();
 
-        /** @var \BetaKiller\Model\PhpException $model */
-        $model = $orm->where('hash', '=', $hash)->find();
+        return $this
+            ->filterHash($orm, $hash)
+            ->findOne($orm);
+    }
 
-        return $model->loaded() ? $model : null;
+    /**
+     * @param \BetaKiller\Utils\Kohana\ORM\OrmInterface $orm
+     * @param string                                    $hash
+     *
+     * @return \BetaKiller\Repository\PhpExceptionRepository
+     */
+    private function filterHash(OrmInterface $orm, string $hash): PhpExceptionRepository
+    {
+        $orm->where('hash', '=', $hash);
+
+        return $this;
     }
 
     /**
