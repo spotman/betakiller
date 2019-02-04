@@ -85,9 +85,9 @@ class CspReportHandler implements RequestHandlerInterface
             return ResponseHelper::text('Ignored');
         }
 
-        $e = new SecurityException('SCP: ":directive" blocked ":blocked"', [
+        $e = new SecurityException('CSP: ":directive" blocked ":blocked"', [
             ':blocked'   => $blockedUri,
-            ':directive' => $data['violated-directive'],
+            ':directive' => $data['effective-directive'] ?? ($data['violated-directive'] ?? 'unknown'),
         ]);
 
         $uri = $this->uriFactory->createUri($documentUrl);
