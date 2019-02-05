@@ -2,6 +2,7 @@
 
 use BetaKiller\Exception;
 use BetaKiller\Helper\I18nHelper;
+use BetaKiller\Log\Logger;
 use BetaKiller\Middleware\CspReportBodyParamsStrategy;
 use BetaKiller\Session\DatabaseSessionStorage;
 use BetaKiller\Session\SessionStorageInterface;
@@ -11,6 +12,7 @@ use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Message\UriFactoryInterface;
+use Psr\Log\LoggerInterface;
 use Zend\Diactoros\RequestFactory;
 use Zend\Diactoros\Response\TextResponse;
 use Zend\Diactoros\ResponseFactory;
@@ -47,7 +49,8 @@ return [
 
         RequestHandlerRunner::class => \DI\factory(function (
             MiddlewarePipeInterface $pipe,
-            EmitterInterface $emitter
+            EmitterInterface $emitter,
+            LoggerInterface $logger
         ) {
             return new RequestHandlerRunner(
                 $pipe,
@@ -55,9 +58,14 @@ return [
                 function () {
                     return \Zend\Diactoros\ServerRequestFactory::fromGlobals();
                 },
-                function (\Throwable $e) {
-                    // TODO Replace with static pretty page + log exception to developers
-                    return new TextResponse('Error: '.Exception::oneLiner($e).PHP_EOL.PHP_EOL.$e->getTraceAsString());
+                function (\Throwable $e) use ($logger) {
+                    // Log exception to developers
+                    $logger->alert(Exception::oneLiner($e), [
+                        Logger::CONTEXT_KEY_EXCEPTION => $e,
+                    ]);
+
+                    // No exception info here for security reasons
+                    return new TextResponse('System error', 500);
                 }
             );
         }),
@@ -90,7 +98,7 @@ return [
 //            return new RequestIdMiddleware($requestIdProvider);
 //        }),
 
-        BodyParamsMiddleware::class => DI\factory(function() {
+        BodyParamsMiddleware::class => DI\factory(function () {
             $params = new BodyParamsMiddleware();
 
             $params->addStrategy(new CspReportBodyParamsStrategy());
