@@ -125,7 +125,7 @@ class DatabaseSessionStorage implements SessionStorageInterface
         $session = $this->restoreSession($model);
 
         // Browser updated or plugin installed, potential hack
-        if (!$this->isValidUserAgent($session, $userAgent)) {
+        if (!$this->isValidUserAgent($session, $userAgent, $request)) {
             $this->sessionRepo->delete($model);
 
             return $this->createSession($userAgent, $ipAddress, $originUrl);
@@ -148,8 +148,11 @@ class DatabaseSessionStorage implements SessionStorageInterface
         return false;
     }
 
-    private function isValidUserAgent(SessionInterface $session, string $userAgent): bool
-    {
+    private function isValidUserAgent(
+        SessionInterface $session,
+        string $userAgent,
+        ServerRequestInterface $request
+    ): bool {
         if (!$session instanceof SessionIdentifierAwareInterface) {
             throw new DomainException('Session must implement :interface', [
                 ':interface' => SessionIdentifierAwareInterface::class,
@@ -170,7 +173,7 @@ class DatabaseSessionStorage implements SessionStorageInterface
             ':agent'  => $userAgent,
             ':needed' => $validAgent,
             ':user'   => SessionHelper::getUserID($session) ?: 'Guest',
-        ]));
+        ]), $request);
 
         return false;
     }
