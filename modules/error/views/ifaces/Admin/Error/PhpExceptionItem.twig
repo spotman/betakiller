@@ -98,7 +98,17 @@
         <li class="active">
           <div class="collapsible-header"><i class="material-icons">info</i>Trace</div>
           <div class="collapsible-body">
-            <iframe src="{{ trace_url }}" width="100%" class="trace-iframe" frameborder="0" scrolling="no"></iframe>
+            {% if trace %}
+              {# Allow automatic iframe resizing #}
+              {{ js("error/node_modules/iframe-resizer/js/iframeResizer.contentWindow.min.js") }}
+              {{ csp("script", "eval") }}
+
+              {{ trace|raw }}
+            {% else %}
+              <h1 style="color:red">Stacktrace file is missing!</h1>
+            {% endif %}
+
+            {#<iframe src="{{ trace_url }}" width="100%" class="trace-iframe" frameborder="0" scrolling="no"></iframe>#}
           </div>
         </li>
       </ul>

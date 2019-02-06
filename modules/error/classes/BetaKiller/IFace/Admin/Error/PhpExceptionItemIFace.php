@@ -60,6 +60,9 @@ class PhpExceptionItemIFace extends AbstractErrorAdminIFace
             return \Debug::path($path);
         }, $model->getPaths());
 
+        \Debug::injectStackTraceCsp($request);
+
+        $trace = $model->getTraceSize() > 0 ? $model->getTrace() : null;
 
         return [
             'backUrl'    => $urlHelper->makeUrl($backIFace),
@@ -73,6 +76,7 @@ class PhpExceptionItemIFace extends AbstractErrorAdminIFace
             'isIgnored'  => $model->isIgnored(),
             'counter'    => $model->getCounter(),
             'trace_url'  => $urlHelper->makeUrl($traceIFace),
+            'trace'      => $trace,
             'history'    => $history,
         ];
     }
