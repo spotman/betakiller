@@ -125,7 +125,7 @@ class DatabaseSessionStorage implements SessionStorageInterface
         $session = $this->restoreSession($model);
 
         // Browser updated or plugin installed, potential hack
-        if (!$this->isValidUserAgent($session, $userAgent, $request)) {
+        if (!$this->isValidSession($session, $userAgent, $request)) {
             $this->sessionRepo->delete($model);
 
             return $this->createSession($userAgent, $ipAddress, $originUrl);
@@ -148,7 +148,7 @@ class DatabaseSessionStorage implements SessionStorageInterface
         return false;
     }
 
-    private function isValidUserAgent(
+    private function isValidSession(
         SessionInterface $session,
         string $userAgent,
         ServerRequestInterface $request
@@ -161,21 +161,26 @@ class DatabaseSessionStorage implements SessionStorageInterface
 
         $validAgent = SessionHelper::getUserAgent($session);
 
-        // Check session is valid (only user agent check coz IP address may be changed on mobile connection)
-        if ($validAgent === $userAgent) {
-            return true;
+        // Use similar_text() instead of strict comparison
+        // User-agent contains browser version which changes after updates
+        \similar_text($validAgent, $userAgent, $similarity);
+
+        // Check user-agent similarity
+        if ($similarity < 80) {
+            // Warn about potential attack and restrict access
+            $this->logException($this->logger, new SecurityException(
+                'User agent juggling for user ":user" with session ":token" and ":agent" (must be ":needed")', [
+                ':token'  => $session->getId(),
+                ':agent'  => $userAgent,
+                ':needed' => $validAgent,
+                ':user'   => SessionHelper::getUserID($session) ?: 'Guest',
+            ]), $request);
+
+            return false;
         }
 
-        // Warn about potential attack and restrict access
-        $this->logException($this->logger, new SecurityException(
-            'User agent juggling for user ":user" with session ":token" and ":agent" (must be ":needed")', [
-            ':token'  => $session->getId(),
-            ':agent'  => $userAgent,
-            ':needed' => $validAgent,
-            ':user'   => SessionHelper::getUserID($session) ?: 'Guest',
-        ]), $request);
-
-        return false;
+        // Only user agent check coz IP address may be changed on mobile connection
+        return true;
     }
 
     private function restoreSession(UserSession $model): SessionInterface
