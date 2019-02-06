@@ -1,8 +1,7 @@
 require([
   'jquery',
   'error.api.rpc.definition',
-  'materialize',
-  'iframe-resizer'
+  'materialize'
 ], function ($, api, M) {
 
   $(function () {
