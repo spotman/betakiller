@@ -7,13 +7,10 @@ require([
   $(function () {
     const $resolveButton = $('.resolve-error-button'),
           $ignoreButton  = $('.ignore-error-button'),
-          $deleteButton  = $('.delete-error-button'),
-          $traceIFrame   = $('.trace-iframe');
+          $deleteButton  = $('.delete-error-button');
 
     var elems = document.querySelectorAll('.collapsible');
     M.Collapsible.init(elems);
-
-    $traceIFrame.iFrameResize();
 
     function processActionButtonClick($button, apiMethod) {
       $button.attr('disabled', 'disabled');
