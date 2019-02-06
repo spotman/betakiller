@@ -104,9 +104,14 @@ abstract class AbstractTask extends Minion_Task
      *
      * @return string
      */
-    protected function read($message, array $options = null): string
+    protected function read(string $message, array $options = null): string
     {
         return Minion_CLI::read($message, $options);
+    }
+
+    protected function confirm(string $message): bool
+    {
+        return $this->read($message, ['y', 'n']) === 'y';
     }
 
     /**
