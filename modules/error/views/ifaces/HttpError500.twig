@@ -3,7 +3,7 @@
 {% block content %}
 
   {{ js("ifaces/HttpError500.js") }}
-  {{ csp("style", "unsafe-inline") }}
+  {{ css("ifaces/HttpError500.css") }}
 
   <div class="container error-500">
     <div class="row align-items-center h-100">
@@ -39,51 +39,5 @@
       </div>
     </div>
   </div>
-
-
-  <style>
-    html, body {
-      height: 100%;
-    }
-
-    .error-500 {
-      height: 100%;
-      max-width: 430px;
-      margin: 0 auto;
-      text-align: center;
-    }
-
-    .error-500 h4 {
-      margin: 0 auto;
-    }
-
-    .error-500 p {
-      display: block;
-      margin-top: 15px;
-    }
-
-    .error-500 .progress-bar {
-      width: 100%;
-      max-width: 0;
-      transition: max-width 45s linear;
-      -webkit-transition: max-width 45s linear;
-      -moz-transition: max-width 45s linear;
-      -ms-transition: max-width 45s linear;
-      -o-transition: max-width 45s linear;
-    }
-
-    .error-500.countdown-started .progress-bar {
-      max-width: 100%;
-    }
-
-    .error-500.countdown-cancelled .progress-bar {
-      transition: max-width 500ms;
-      -webkit-transition: max-width 500ms;
-      -moz-transition: max-width 500ms;
-      -ms-transition: max-width 500ms;
-      -o-transition: max-width 500ms;
-      max-width: 0;
-    }
-  </style>
 
 {% endblock %}

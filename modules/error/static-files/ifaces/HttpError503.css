@@ -1,0 +1,29 @@
+html, body {
+    height: 100%;
+}
+
+.error-503 {
+    height: 100%;
+    max-width: 300px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.error-503 h4 {
+    margin: 0 auto;
+}
+
+.error-503 p {
+    display: block;
+    margin-top: 15px;
+}
+
+.error-503 .progress-bar {
+    width: 100%;
+    max-width: 0;
+    transition: max-width 1s linear;
+    -webkit-transition: max-width 1s linear;
+    -moz-transition: max-width 1s linear;
+    -ms-transition: max-width 1s linear;
+    -o-transition: max-width 1s linear;
+}

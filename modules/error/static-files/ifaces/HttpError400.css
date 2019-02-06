@@ -1,0 +1,19 @@
+html, body {
+    height: 100%;
+}
+
+.error-400 {
+    height: 100%;
+    max-width: 300px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.error-400 h4 {
+    margin: 0 auto;
+}
+
+.error-400 p {
+    display: block;
+    margin-top: 15px;
+}

@@ -17,7 +17,7 @@ class HttpError503IFace extends AbstractHttpErrorIFace
     public function getData(ServerRequestInterface $request): array
     {
         $now             = new \DateTimeImmutable;
-        $defaultDuration = new \DateInterval('PT600S');
+        $defaultDuration = new \DateInterval('PT30S');
 
         if (!$this->exception) {
             $endTime         = $now->add($defaultDuration);

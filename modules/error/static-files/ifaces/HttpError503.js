@@ -6,7 +6,7 @@ $(function () {
       counter  = 0;
 
   // Randomize end time by 20 seconds to prevent server overload on page reload
-  duration += Math.floor(Math.random() * 20);
+  duration += Math.floor(Math.random() * (duration/10 + 5));
 
   console.log(duration);
 
