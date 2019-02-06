@@ -4,7 +4,6 @@
 
 {% block content %}
 
-  {{ js("require.js/error.requirejs.config.js") }}
   {{ js("ifaces/admin-error/php-exception-item.js") }}
 
   <div class="row">
@@ -100,8 +99,8 @@
           <div class="collapsible-body">
             {% if trace %}
               {# Allow automatic iframe resizing #}
-              {{ js("error/node_modules/iframe-resizer/js/iframeResizer.contentWindow.min.js") }}
-              {{ csp("script", "eval") }}
+              {#{{ js("error/node_modules/iframe-resizer/js/iframeResizer.contentWindow.min.js") }}#}
+              {#{{ csp("script", "eval") }}#}
 
               {{ trace|raw }}
             {% else %}
