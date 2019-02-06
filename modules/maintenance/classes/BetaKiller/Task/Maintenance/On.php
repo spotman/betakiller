@@ -43,7 +43,7 @@ class On extends AbstractTask
         $durationSpec = $this->getOption('for', true);
 
         if ($durationSpec === 'deploy') {
-            $durationSpec = 'PT3M';
+            $durationSpec = 'PT30S';
         }
 
         $duration = new \DateInterval($durationSpec);
