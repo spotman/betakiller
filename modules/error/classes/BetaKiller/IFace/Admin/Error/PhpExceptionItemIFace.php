@@ -46,7 +46,7 @@ class PhpExceptionItemIFace extends AbstractErrorAdminIFace
 
         $unresolvedIFace = $urlHelper->getUrlElementByCodename('Admin_Error_UnresolvedPhpExceptionIndex');
         $resolvedIFace   = $urlHelper->getUrlElementByCodename('Admin_Error_ResolvedPhpExceptionIndex');
-        $traceIFace      = $urlHelper->getUrlElementByCodename('Admin_Error_PhpExceptionStackTrace');
+//        $traceIFace      = $urlHelper->getUrlElementByCodename('Admin_Error_PhpExceptionStackTrace');
 
         $backIFace = $model->isResolved() ? $resolvedIFace : $unresolvedIFace;
 
@@ -75,7 +75,7 @@ class PhpExceptionItemIFace extends AbstractErrorAdminIFace
             'isResolved' => $model->isResolved(),
             'isIgnored'  => $model->isIgnored(),
             'counter'    => $model->getCounter(),
-            'trace_url'  => $urlHelper->makeUrl($traceIFace),
+//            'trace_url'  => $urlHelper->makeUrl($traceIFace),
             'trace'      => $trace,
             'history'    => $history,
         ];
