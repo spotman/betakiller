@@ -100,16 +100,24 @@ class I18n extends AbstractTask
      */
     public function defineOptions(): array
     {
-        return [];
+        return [
+            'force' => false,
+        ];
     }
 
     public function run(): void
     {
+        $force = $this->getOption('force', false) !== false;
+
+        if ($force && !$this->confirm('Force update requested. Proceed?')) {
+            return;
+        }
+
         // Get all system languages
         foreach ($this->langRepo->getAppLanguages(true) as $language) {
             // Iterate all filesystem keys
             foreach ($this->filesystemLoader->loadI18nKeys() as $key) {
-                $this->importKeyValue($language, $key);
+                $this->importKeyValue($language, $key, $force);
             }
         }
 
@@ -143,7 +151,7 @@ class I18n extends AbstractTask
         return $data;
     }
 
-    private function importKeyValue(LanguageInterface $lang, I18nKeyInterface $key): void
+    private function importKeyValue(LanguageInterface $lang, I18nKeyInterface $key, bool $force): void
     {
         $keyName = $key->getI18nKeyName();
 
@@ -161,7 +169,7 @@ class I18n extends AbstractTask
         }
 
         // Skip existing translations
-        if ($keyModel->getI18nValue($lang)) {
+        if (!$force && $keyModel->getI18nValue($lang)) {
             return;
         }
 
