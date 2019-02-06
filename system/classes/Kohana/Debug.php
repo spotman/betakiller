@@ -47,7 +47,7 @@ class Kohana_Debug {
 	 * @param   integer $level_recursion    recursion limit
 	 * @return  string
 	 */
-	public static function dump($value, $length = 128, $level_recursion = 4)
+	public static function dump($value, $length = 128, $level_recursion = 3)
 	{
 		return Debug::_dump($value, $length, $level_recursion);
 	}
