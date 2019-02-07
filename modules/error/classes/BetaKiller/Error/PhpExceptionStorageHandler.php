@@ -238,13 +238,6 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
             return true;
         }
 
-        // Repeated error needs to be notified
-        if ($model->isRepeated()) {
-            $this->logger->debug('Repeated exception needs to be notified');
-
-            return true;
-        }
-
         $this->logger->debug('Total exception counter is :value', [':value' => $model->getCounter()]);
 
         // Throttle by occurrence number
