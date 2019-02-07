@@ -120,6 +120,13 @@ class CookieHelper
         return $this->decode($cookie)->getValue();
     }
 
+    public function encodeValue(string $name, string $value): string
+    {
+        $cookie = new SetCookie($name, $value);
+
+        return $this->signer->sign($cookie, $this->key)->getValue();
+    }
+
     private function getCookies(ServerRequestInterface $request): RequestCookies
     {
         return RequestCookies::createFromRequest($request);
