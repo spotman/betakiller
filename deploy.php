@@ -55,6 +55,8 @@ if (file_exists($serversFile)) {
     inventory($serversFile);
 }
 
+set('keep_releases', 3);
+
 /**
  * Check environment before real deployment starts
  */
