@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace BetaKiller\Daemon;
 
 use BetaKiller\Config\WampConfig;
-use BetaKiller\Wamp\WampClient;
+use BetaKiller\Wamp\WampInternalClient;
 use BetaKiller\Wamp\WampUserDb;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
@@ -18,7 +18,7 @@ class WampRouterDaemon implements DaemonInterface
     public const CODENAME = 'WampRouter';
 
     /**
-     * @var \BetaKiller\Wamp\WampClient
+     * @var \BetaKiller\Wamp\WampInternalClient
      */
     private $wampClient;
 
@@ -43,14 +43,14 @@ class WampRouterDaemon implements DaemonInterface
     private $router;
 
     /**
-     * @param \BetaKiller\Config\WampConfig $wampConfig
-     * @param \BetaKiller\Wamp\WampClient   $wampClient
-     * @param \BetaKiller\Wamp\WampUserDb   $wampUserDb
-     * @param \Psr\Log\LoggerInterface      $logger
+     * @param \BetaKiller\Config\WampConfig       $wampConfig
+     * @param \BetaKiller\Wamp\WampInternalClient $wampClient
+     * @param \BetaKiller\Wamp\WampUserDb         $wampUserDb
+     * @param \Psr\Log\LoggerInterface            $logger
      */
     public function __construct(
         WampConfig $wampConfig,
-        WampClient $wampClient,
+        WampInternalClient $wampClient,
         WampUserDb $wampUserDb,
         LoggerInterface $logger
     ) {

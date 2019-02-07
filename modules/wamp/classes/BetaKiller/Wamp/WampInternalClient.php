@@ -19,8 +19,14 @@ use Spotman\Api\ApiResourceProxyInterface;
  * https://github.com/voryx/Thruway#php-client-example
  * https://github.com/voryx/Thruway/blob/master/Examples/InternalClient/InternalClient.php
  */
-class WampClient extends \Thruway\Peer\Client
+class WampInternalClient extends \Thruway\Peer\Client
 {
+    public const PROCEDURE_API = 'api';
+
+    public const KEY_API_RESOURCE = 'resource';
+    public const KEY_API_METHOD = 'method';
+    public const KEY_API_DATA = 'data';
+
     use LoggerHelperTrait;
 
     /**
@@ -94,9 +100,11 @@ class WampClient extends \Thruway\Peer\Client
         $this->logger->debug('Indexed args are :value', [':value' => \json_encode($indexedArgs)]);
         $this->logger->debug('Named args are :value', [':value' => \json_encode($namedArgs)]);
 
-        $resource  = \ucfirst($namedArgs->resource);
-        $method    = $namedArgs->method;
-        $arguments = (array)$namedArgs->data;
+        $arrayArgs = (array)$namedArgs;
+
+        $resource  = \ucfirst($arrayArgs[self::KEY_API_RESOURCE]);
+        $method    = $arrayArgs[self::KEY_API_METHOD];
+        $arguments = (array)$arrayArgs[self::KEY_API_DATA];
 
         $this->logger->debug('User is ":name"', [':name' => $user->getUsername()]);
         $this->logger->debug('Resource is ":name"', [':name' => $resource]);
