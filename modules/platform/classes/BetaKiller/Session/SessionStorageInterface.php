@@ -10,6 +10,15 @@ use Zend\Expressive\Session\SessionPersistenceInterface;
 interface SessionStorageInterface extends SessionPersistenceInterface
 {
     /**
+     * @param string $userAgent
+     * @param string $ipAddress
+     * @param string $originUrl
+     *
+     * @return \Zend\Expressive\Session\SessionInterface
+     */
+    public function createSession(string $userAgent, string $ipAddress, string $originUrl): SessionInterface;
+
+    /**
      * @param string $id
      *
      * @return \Zend\Expressive\Session\SessionInterface
@@ -22,4 +31,9 @@ interface SessionStorageInterface extends SessionPersistenceInterface
      * @return \Zend\Expressive\Session\SessionInterface[]
      */
     public function getUserSessions(UserInterface $user): array;
+
+    /**
+     * @param \Zend\Expressive\Session\SessionInterface $session
+     */
+    public function destroySession(SessionInterface $session): void;
 }

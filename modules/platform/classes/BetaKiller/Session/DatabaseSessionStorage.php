@@ -243,6 +243,25 @@ class DatabaseSessionStorage implements SessionStorageInterface
     }
 
     /**
+     * @param string $userAgent
+     * @param string $ipAddress
+     * @param string $originUrl
+     *
+     * @return \Zend\Expressive\Session\SessionInterface
+     */
+    public function createSession(string $userAgent, string $ipAddress, string $originUrl): SessionInterface
+    {
+        // Generate new token and fresh session object without data
+        $session = $this->sessionFactory($this->generateToken(), []);
+
+        SessionHelper::setUserAgent($session, $userAgent);
+        SessionHelper::setIpAddress($session, $ipAddress);
+        SessionHelper::setOriginUrl($session, $originUrl);
+
+        return $session;
+    }
+
+    /**
      * Persist the session data instance.
      *
      * Persists the session data, returning a response instance with any
@@ -304,24 +323,10 @@ class DatabaseSessionStorage implements SessionStorageInterface
         );
     }
 
-    private function sessionFactory(string $token, array $data): SessionInterface
-    {
-        return new Session($data, $token);
-    }
-
-    private function createSession(string $userAgent, string $ipAddress, string $originUrl): SessionInterface
-    {
-        // Generate new token and fresh session object without data
-        $session = $this->sessionFactory($this->generateToken(), []);
-
-        SessionHelper::setUserAgent($session, $userAgent);
-        SessionHelper::setIpAddress($session, $ipAddress);
-        SessionHelper::setOriginUrl($session, $originUrl);
-
-        return $session;
-    }
-
-    private function regenerateSession(SessionInterface $session): SessionInterface
+    /**
+     * @param \Zend\Expressive\Session\SessionInterface $session
+     */
+    public function destroySession(SessionInterface $session): void
     {
         // Delete session record if exists
         $model = $this->getSessionModel($session);
@@ -329,6 +334,16 @@ class DatabaseSessionStorage implements SessionStorageInterface
         if ($model) {
             $this->sessionRepo->delete($model);
         }
+    }
+
+    private function sessionFactory(string $token, array $data): SessionInterface
+    {
+        return new Session($data, $token);
+    }
+
+    private function regenerateSession(SessionInterface $session): SessionInterface
+    {
+        $this->destroySession($session);
 
         // Generate new token and create fresh session with empty data
         return $this->createSession(
