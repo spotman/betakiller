@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\Task;
 
+use BetaKiller\Backup\DavBackup;
 use BetaKiller\Config\ConfigProviderInterface;
 use Psr\Log\LoggerInterface;
 
@@ -53,6 +54,10 @@ class Backup extends AbstractTask
                 $instance = new \GoogleBackup($this->config('backup.login'), $this->config('backup.password'));
                 break;
 
+            case 'Dav':
+                $instance = new DavBackup($this->config('backup.url'), $this->config('backup.login'), $this->config('backup.password'));
+                break;
+
             default:
                 throw new TaskException('Unknown backup service :name', [':name' => $service]);
         }
@@ -83,7 +88,7 @@ class Backup extends AbstractTask
             $dbName .= ';charset=utf8';
         }
 
-        $instance->setConnection(
+        $instance->setDbConnection(
             $dbUser, // user
             $dbPass, // pass
             $dbName, // db name
