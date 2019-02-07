@@ -101,7 +101,7 @@ class Backup extends AbstractTask
         $this->logger->info('Backing up folder '.$folder);
 
         $prefix            = $this->config('backup.prefix');
-        $timestampedPrefix = $this->config('backup.useTimestampedPrefix');
+        $timestampedPrefix = (bool)$this->config('backup.useTimestampedPrefix');
 
         $instance
             ->setPath($folder)
