@@ -59,10 +59,11 @@ class Logger implements LoggerInterface
         \set_exception_handler([$this, 'exceptionHandler']);
 
         $isDebug = $this->appEnv->isDebugEnabled();
+        $isHuman = $this->appEnv->isHuman();
 
         // CLI mode logging
         if ($this->appEnv->isCli()) {
-            $cliHandler = new CliHandler($isDebug);
+            $cliHandler = new CliHandler($isDebug, $isHuman);
             $monolog->pushHandler($cliHandler);
 
             if (DesktopNotificationHandler::isSupported()) {
