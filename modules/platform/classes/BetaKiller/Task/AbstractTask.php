@@ -56,8 +56,21 @@ abstract class AbstractTask extends Minion_Task
         }
 
         if (!$showOutput) {
-            // Redirect all output to /dev/null (logger is still usable)
-            $cmd .= ' > /dev/null 2>&1';
+            $fileNameArray = [
+                $taskName,
+                $stage,
+            ];
+
+            // Add parameters to logfile to separate logs for calls with different arguments
+            foreach ($params as $optionName => $optionValue) {
+                $fileNameArray[] = $optionName.'-'.$optionValue;
+            }
+
+            $logFileName = implode('.', $fileNameArray).'.log';
+            $logPath = implode('/', [$appEnv->getTempPath(), $logFileName]);
+
+            // Redirect all output to log file (logger is still usable)
+            $cmd .= " >> $logPath 2>&1";
         }
 
         if ($detach) {
