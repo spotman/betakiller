@@ -73,6 +73,6 @@ class Stop extends AbstractTask
         $process->run();
 
         // wait for daemon to be stopped
-        sleep(1);
+        sleep(2);
     }
 }
