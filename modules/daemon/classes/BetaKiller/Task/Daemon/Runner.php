@@ -119,6 +119,12 @@ class Runner extends AbstractTask
 
         $this->loop = \React\EventLoop\Factory::create();
 
+        // Force GC to be called periodically
+        // @see https://github.com/ratchetphp/Ratchet/issues/662
+        $this->loop->addPeriodicTimer(60, function() {
+            gc_collect_cycles();
+        });
+
         $this->addSignalHandlers();
 
         $this->start();
