@@ -12,13 +12,13 @@ class CliFormatter extends ColoredLineFormatter
     /**
      * @var bool
      */
-    private $isDebugEnabled;
+    private $traceExceptions;
 
-    public function __construct(bool $isDebugEnabled)
+    public function __construct(bool $traceExceptions)
     {
         parent::__construct(new DefaultScheme(), "%message%\n");
 
-        $this->isDebugEnabled = $isDebugEnabled;
+        $this->traceExceptions = $traceExceptions;
     }
 
     /**
@@ -31,7 +31,7 @@ class CliFormatter extends ColoredLineFormatter
         /** @var \Throwable|null $exception */
         $exception = $record['context']['exception'] ?? null;
 
-        if ($this->isDebugEnabled && $exception) {
+        if ($this->traceExceptions && $exception) {
 
             while ($exception->getPrevious()) {
                 $exception = $exception->getPrevious();

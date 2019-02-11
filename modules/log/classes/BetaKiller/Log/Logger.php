@@ -63,7 +63,14 @@ class Logger implements LoggerInterface
 
         // CLI mode logging
         if ($this->appEnv->isCli()) {
-            $cliHandler = new CliHandler($isDebug, $isHuman);
+            $level = $isDebug || !$isHuman ? \Monolog\Logger::DEBUG : \Monolog\Logger::INFO;
+
+            if (!$isHuman) {
+                // Log everything to STDOUT if it is not a human (logs would be collected)
+                $level = \Monolog\Logger::DEBUG;
+            }
+
+            $cliHandler = new CliHandler($level, $isHuman);
             $monolog->pushHandler($cliHandler);
 
             if (DesktopNotificationHandler::isSupported()) {
