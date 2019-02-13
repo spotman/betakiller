@@ -284,7 +284,7 @@ task('minion', function () {
 
     $name = input()->getOption('task');
 
-    runMinionTask($name);
+    runMinionTask($name, false, true);
 })->desc('Run Minion task by its name');
 
 
@@ -292,7 +292,7 @@ task('minion', function () {
  * Create table with migrations
  */
 task('migrations:install', function () {
-    runMinionTask('migrations:install');
+    runMinionTask('migrations:install', false, true);
 })->desc('Install migrations table');
 
 /**
@@ -313,7 +313,7 @@ task('migrations:create', function () {
 
     $desc = ask('Enter migration description', '');
 
-    $output = runMinionTask("migrations:create --name=$name --description=$desc --scope=$scope");
+    $output = runMinionTask("migrations:create --name=$name --description=$desc --scope=$scope", false, true);
 
     $outArr = explode('Done! Check ', $output);
 
@@ -335,7 +335,7 @@ task('migrations:create', function () {
  * Apply migrations
  */
 task('migrations:up', function () {
-    runMinionTask('migrations:up');
+    runMinionTask('migrations:up', false, true);
 })->desc('Apply migrations');
 
 /**
@@ -344,7 +344,7 @@ task('migrations:up', function () {
 task('migrations:down', function () {
     $to = input()->getOption('to');
 
-    runMinionTask('migrations:down --to='.$to);
+    runMinionTask("migrations:down --to=$to", false, true);
 })->desc('Rollback migrations; use "--to" option to set new migration base');
 
 /**
@@ -402,15 +402,15 @@ task('daemon:supervisor:restart', [
     'daemon:supervisor:start',
 ])->desc('Restart supervisor');
 
-task('daemon:supervisor:start', function() {
+task('daemon:supervisor:start', function () {
     runMinionTask('daemon:start --name="supervisor"', true);
 })->desc('Start supervisor');
 
-task('daemon:supervisor:stop', function() {
+task('daemon:supervisor:stop', function () {
     runMinionTask('daemon:stop --name="supervisor"', true);
 })->desc('Stop supervisor');
 
-task('daemon:supervisor:reload', function() {
+task('daemon:supervisor:reload', function () {
     runMinionTask('daemon:supervisor:reload');
 })->desc('Reload daemons in supervisor');
 
@@ -525,12 +525,13 @@ task('update', [
  *
  * @param string    $name
  * @param bool|null $asHttpUser
+ * @param bool|null $tty
  *
  * @return string
  * @throws \Deployer\Exception\Exception
  * @throws \Deployer\Exception\RuntimeException
  */
-function runMinionTask(string $name, bool $asHttpUser = null)
+function runMinionTask(string $name, bool $asHttpUser = null, bool $tty = null)
 {
     $currentPath = getcwd();
     $path        = getRepoPath();
@@ -552,7 +553,7 @@ function runMinionTask(string $name, bool $asHttpUser = null)
     }
 
     cd($path);
-    $text = run($cmd);
+    $text = run($cmd, ['tty' => (bool)$tty]);
 
     if ($text) {
         write($text);
@@ -576,7 +577,7 @@ function runGitCommand($gitCmd, $path = null, ?bool $silent = null)
     $path   = $path ?: getRepoPath();
     $silent = $silent ?? false;
 
-    $result = run("cd $path && git $gitCmd");
+    $result = run("cd $path && git $gitCmd", ['timeout' => null, 'tty' => true]);
 
     if (!$silent) {
         write($result);
