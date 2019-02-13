@@ -145,11 +145,6 @@ class ArgumentsFacade
             throw new \InvalidArgumentException(sprintf('Missing nested definition for "%s"', $argument->getName()));
         }
 
-        // Check for nested data required
-        if (!$value) {
-            throw new \InvalidArgumentException(sprintf('Missing nested data for "%s"', $argument->getName()));
-        }
-
         if (\is_object($value)) {
             // Cast any incoming object to array for simplicity
             $value = (array)$value;
@@ -171,11 +166,6 @@ class ArgumentsFacade
 
     private function processCompositeArrayValue(CompositeArrayArgumentDefinitionInterface $argument, $value): array
     {
-        // Check for nested data required
-        if (!$value) {
-            throw new \InvalidArgumentException(sprintf('Missing nested data for "%s"', $argument->getName()));
-        }
-
         if (\is_object($value)) {
             // Cast any incoming object to array for simplicity
             $value = (array)$value;
