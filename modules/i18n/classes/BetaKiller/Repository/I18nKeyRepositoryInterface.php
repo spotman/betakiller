@@ -23,4 +23,11 @@ interface I18nKeyRepositoryInterface extends DispatchableRepositoryInterface // 
      * @return \BetaKiller\Model\I18nKeyModelInterface[]|mixed[]
      */
     public function getAllI18nKeys(): array;
+
+    /**
+     * @param \BetaKiller\Model\LanguageInterface $lang
+     *
+     * @return \BetaKiller\Model\I18nKeyModelInterface[]|mixed[]
+     */
+    public function getAllOrderedByI18nValue(LanguageInterface $lang): array;
 }

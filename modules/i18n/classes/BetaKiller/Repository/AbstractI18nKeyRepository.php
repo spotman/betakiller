@@ -5,6 +5,7 @@ namespace BetaKiller\Repository;
 
 use BetaKiller\Helper\TextHelper;
 use BetaKiller\Model\ExtendedOrmInterface;
+use BetaKiller\Model\I18nKeyModelInterface;
 use BetaKiller\Model\LanguageInterface;
 
 abstract class AbstractI18nKeyRepository extends AbstractOrmBasedDispatchableRepository implements
@@ -43,6 +44,22 @@ abstract class AbstractI18nKeyRepository extends AbstractOrmBasedDispatchableRep
     public function getAllI18nKeys(): array
     {
         return $this->getAll();
+    }
+
+    /**
+     * @param \BetaKiller\Model\LanguageInterface $lang
+     *
+     * @return \BetaKiller\Model\I18nKeyModelInterface[]|mixed[]
+     */
+    public function getAllOrderedByI18nValue(LanguageInterface $lang): array
+    {
+        $items = $this->getAll();
+
+        \usort($items, function(I18nKeyModelInterface $left, I18nKeyModelInterface $right) use ($lang) {
+            return $left->getI18nValue($lang) <=> $right->getI18nValue($lang);
+        });
+
+        return $items;
     }
 
     protected function filterI18nValue(
