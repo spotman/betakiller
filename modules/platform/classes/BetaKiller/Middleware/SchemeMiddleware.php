@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace BetaKiller\Middleware;
 
 use BetaKiller\Config\AppConfigInterface;
-use BetaKiller\Dev\Profiler;
 use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Helper\ServerRequestHelper;
@@ -66,7 +65,8 @@ class SchemeMiddleware implements MiddlewareInterface
             return $this->redirect($currentUri->withScheme($baseScheme));
         }
 
-        if ($baseHost !== $currentHost) {
+        // Skip domain check in development mode
+        if ($baseHost !== $currentHost && !$this->appEnv->inDevelopmentMode()) {
             return $this->redirect($currentUri->withHost($baseHost));
         }
 
