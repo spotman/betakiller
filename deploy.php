@@ -577,7 +577,7 @@ function runGitCommand($gitCmd, $path = null, ?bool $silent = null)
     $path   = $path ?: getRepoPath();
     $silent = $silent ?? false;
 
-    $result = run("cd $path && git $gitCmd", ['timeout' => null, 'tty' => true]);
+    $result = run("cd $path && git $gitCmd");
 
     if (!$silent) {
         write($result);
