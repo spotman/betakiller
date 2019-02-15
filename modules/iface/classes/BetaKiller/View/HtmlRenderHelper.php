@@ -34,22 +34,15 @@ class HtmlRenderHelper
     private $layoutCodename;
 
     /**
-     * @var \BetaKiller\View\LinkTagHelper
-     */
-    private $link;
-
-    /**
      * HtmlRenderHelper constructor.
      *
      * @param \Meta                           $meta
-     * @param \BetaKiller\View\LinkTagHelper  $linkHelper
      * @param \BetaKiller\Assets\StaticAssets $assets
      */
-    public function __construct(\Meta $meta, LinkTagHelper $linkHelper, StaticAssets $assets)
+    public function __construct(\Meta $meta, StaticAssets $assets)
     {
         $this->meta   = $meta;
         $this->assets = $assets;
-        $this->link   = $linkHelper;
     }
 
     /**
@@ -101,7 +94,7 @@ class HtmlRenderHelper
      */
     public function setTitle(string $title): self
     {
-        $this->meta->title($title, \Meta::TITLE_APPEND);
+        $this->meta->setTitle($title, \Meta::TITLE_APPEND);
 
         return $this;
     }
@@ -115,7 +108,7 @@ class HtmlRenderHelper
      */
     public function setMetaDescription(string $value): self
     {
-        $this->meta->description($value);
+        $this->meta->setDescription($value);
 
         return $this;
     }
@@ -127,7 +120,7 @@ class HtmlRenderHelper
      */
     public function setContentType(string $value = null): self
     {
-        $this->meta->content_type($value ?: 'text/html');
+        $this->meta->setContentType($value ?: 'text/html');
 
         return $this;
     }
@@ -146,7 +139,6 @@ class HtmlRenderHelper
         return [
             IFaceView::ASSETS_KEY => $this->assets,
             IFaceView::META_KEY   => $this->meta,
-            IFaceView::LINK_KEY   => $this->link,
         ];
     }
 
@@ -163,7 +155,6 @@ class HtmlRenderHelper
     {
         return implode("\r\n", [
             $this->meta->render(),
-            $this->link->renderLinks(),
             $this->assets->renderCss(),
         ]);
     }

@@ -10,7 +10,6 @@ use BetaKiller\I18n\I18nFacade;
 use BetaKiller\Service\UserService;
 use BetaKiller\Url\ZoneInterface;
 use BetaKiller\View\IFaceView;
-use BetaKiller\View\LinkTagHelper;
 use BetaKiller\Widget\WidgetFacade;
 use HTML;
 use Meta;
@@ -122,18 +121,6 @@ class TwigExtension extends Twig_Extension
             ),
 
             new Twig_Function(
-                'meta',
-                [$this, 'meta'],
-                ['needs_context' => true]
-            ),
-
-            new Twig_Function(
-                'link',
-                [$this, 'linkTag'],
-                ['needs_context' => true]
-            ),
-
-            new Twig_Function(
                 'kohanaProfiler',
                 [$this, 'showKohanaProfiler'],
                 ['is_safe' => ['html']]
@@ -217,12 +204,42 @@ class TwigExtension extends Twig_Extension
                 [$this, 'logError']
             ),
 
+            new Twig_Function(
+                'meta',
+                [$this, 'meta'],
+                ['needs_context' => true]
+            ),
+
+            new Twig_Function(
+                'link',
+                [$this, 'linkTag'],
+                ['needs_context' => true]
+            ),
+
             /**
              * Add element to <title> tag (will be combined automatically upon template render)
              */
             new Twig_Function(
                 'title',
-                [$this, 'title'],
+                [$this, 'metaTitle'],
+                ['needs_context' => true,]
+            ),
+
+            new Twig_Function(
+                'description',
+                [$this, 'metaDescription'],
+                ['needs_context' => true,]
+            ),
+
+            new Twig_Function(
+                'meta_image',
+                [$this, 'metaImage'],
+                ['needs_context' => true,]
+            ),
+
+            new Twig_Function(
+                'meta_share_title',
+                [$this, 'metaShareTitle'],
                 ['needs_context' => true,]
             ),
 
@@ -274,9 +291,27 @@ class TwigExtension extends Twig_Extension
         ];
     }
 
-    public function title(array $context, string $value): void
+    public function metaTitle(array $context, string $value): void
     {
-        $this->getMeta($context)->title($value, Meta::TITLE_APPEND);
+        $this->getMeta($context)->setTitle($value, Meta::TITLE_APPEND);
+    }
+
+    public function metaDescription(array $context, string $value): void
+    {
+        $this->getMeta($context)->setDescription($value);
+    }
+
+    public function metaImage(array $context, string $url): void
+    {
+        $this->getMeta($context)->setImage($url);
+    }
+
+    public function metaShareTitle(array $context, string $title): void
+    {
+        $meta = $this->getMeta($context);
+
+        $meta->set('og:title', $title);
+        $meta->set('twitter:title', $title);
     }
 
     /**
@@ -437,20 +472,20 @@ class TwigExtension extends Twig_Extension
     /**
      * Helper for adding HTML meta-headers in output
      *
-     * @param array        $context
-     * @param string|array $name
-     * @param null         $value
+     * @param array  $context
+     * @param string $name
+     * @param string $value
      *
      * @return void
      */
-    public function meta(array $context, $name = null, $value = null): void
+    public function meta(array $context, string $name, string $value): void
     {
         $this->getMeta($context)->set($name, $value);
     }
 
     public function linkTag(array $context, string $rel, string $href, array $attributes = null): ?string
     {
-        $this->getLinkHelper($context)->addLink($rel, $href, $attributes);
+        $this->getMeta($context)->addLink($rel, $href, $attributes);
 
         return null;
     }
@@ -564,7 +599,7 @@ class TwigExtension extends Twig_Extension
 
         $assets = $this->getStaticAssets($context);
 
-        $fileData = $this->manifestCache[$distDir] ?? null;
+        $fileData         = $this->manifestCache[$distDir] ?? null;
         $manifestFileName = $distDir.\DIRECTORY_SEPARATOR.'manifest.json';
         $manifestFullPath = $assets->findFile($manifestFileName);
 
@@ -653,10 +688,5 @@ class TwigExtension extends Twig_Extension
     private function getMeta(array $context): \Meta
     {
         return $context[IFaceView::META_KEY];
-    }
-
-    private function getLinkHelper(array $context): LinkTagHelper
-    {
-        return $context[IFaceView::LINK_KEY];
     }
 }

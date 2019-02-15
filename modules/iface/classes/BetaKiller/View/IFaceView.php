@@ -17,7 +17,6 @@ class IFaceView
     public const REQUEST_KEY    = '__request__';
     public const ASSETS_KEY     = '__assets__';
     public const META_KEY       = '__meta__';
-    public const LINK_KEY       = '__link__';
     public const I18N_KEY       = '__i18n__';
     public const IFACE_KEY      = '__iface__';
     public const IFACE_ZONE_KEY = 'zone';
@@ -119,11 +118,10 @@ class IFaceView
 
         // Create instance of renderer
         $meta         = new \Meta;
-        $link         = new LinkTagHelper;
         $assets       = $this->assetsFactory->create();
-        $renderHelper = new HtmlRenderHelper($meta, $link, $assets);
+        $renderHelper = new HtmlRenderHelper($meta, $assets);
 
-        $link->setCanonical($urlHelper->makeUrl($model, null, false));
+        $meta->setCanonical($urlHelper->makeUrl($model, null, false));
 
         $renderHelper
             ->setLang($i18n->getLang())
