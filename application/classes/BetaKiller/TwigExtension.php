@@ -624,16 +624,16 @@ class TwigExtension extends Twig_Extension
 
         $key = $distDir.'/'.$name;
 
-        $record = $fileData[$key] ?? null;
+        $recordPath = $fileData[$key] ?? null;
 
-        if (!$record) {
+        if (!$recordPath) {
             throw new Exception('Missing record ":name" in file ":path"', [
                 ':path' => $manifestFullPath,
                 ':name' => $key,
             ]);
         }
 
-        return $record;
+        return $recordPath;
     }
 
     public function getCurrentLang(array $context): string
