@@ -574,15 +574,17 @@ class TwigExtension extends Twig_Extension
             ]);
         }
 
+        $baseUrl = $assets->getBaseUrl();
+
         if (isset($config['js'])) {
             foreach ($config['js'] as $jsFileName) {
-                $assets->addJs($jsFileName);
+                $assets->addJs((string)$baseUrl->withPath($jsFileName));
             }
         }
 
         if (isset($config['css'])) {
             foreach ($config['css'] as $cssFileName) {
-                $assets->addCss($cssFileName);
+                $assets->addCss((string)$baseUrl->withPath($cssFileName));
             }
         }
     }
@@ -633,7 +635,7 @@ class TwigExtension extends Twig_Extension
             ]);
         }
 
-        return $recordPath;
+        return (string)$assets->getBaseUrl()->withPath($recordPath);
     }
 
     public function getCurrentLang(array $context): string

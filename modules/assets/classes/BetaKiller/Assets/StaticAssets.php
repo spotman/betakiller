@@ -6,6 +6,7 @@ namespace BetaKiller\Assets;
 use BetaKiller\Helper\AppEnvInterface;
 use HTML;
 use Kohana;
+use Psr\Http\Message\UriInterface;
 
 class StaticAssets
 {
@@ -108,6 +109,15 @@ class StaticAssets
         return $cssCode;
     }
 
+    public function getBaseUrl(): UriInterface
+    {
+        $uri = $this->config->getBaseUri();
+
+        $path = $uri->getPath().'/static/';
+
+        return $uri->withPath($path);
+    }
+
     /**
      * @param string $path
      *
@@ -143,7 +153,7 @@ class StaticAssets
 
     private function getBasePath(): string
     {
-        return $this->config->getUrlPath().'/static/';
+        return $this->getBaseUrl()->getPath();
     }
 
     private function getFullPath(): string
@@ -156,12 +166,6 @@ class StaticAssets
         return \mb_strpos($location, 'http') === 0
             || \mb_strpos($location, '//') === 0
             || \mb_strpos($location, '/') === 0;
-    }
-
-    private function getBaseUrl(): string
-    {
-        // TODO Domain if needed
-        return $this->getBasePath();
     }
 
     /**

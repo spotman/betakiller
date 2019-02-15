@@ -5,6 +5,8 @@ namespace BetaKiller\Assets;
 
 use BetaKiller\Assets\Provider\AssetsProviderInterface;
 use BetaKiller\Config\AbstractConfig;
+use BetaKiller\Config\ConfigProviderInterface;
+use Psr\Http\Message\UriFactoryInterface;
 
 class AssetsConfig extends AbstractConfig
 {
@@ -81,6 +83,22 @@ class AssetsConfig extends AbstractConfig
     public const CONFIG_MODEL_POST_UPLOAD_KEY = 'post_upload';
 
     /**
+     * @var \Psr\Http\Message\UriFactoryInterface
+     */
+    private $uriFactory;
+
+    /**
+     * @param \BetaKiller\Config\ConfigProviderInterface $config
+     * @param \Psr\Http\Message\UriFactoryInterface      $uriFactory
+     */
+    public function __construct(ConfigProviderInterface $config, UriFactoryInterface $uriFactory)
+    {
+        parent::__construct($config);
+
+        $this->uriFactory = $uriFactory;
+    }
+
+    /**
      * Returns true if provider has protected content (no caching in public directory)
      *
      * @param \BetaKiller\Assets\Provider\AssetsProviderInterface $provider
@@ -120,11 +138,13 @@ class AssetsConfig extends AbstractConfig
     }
 
     /**
-     * @return string
+     * @return \Psr\Http\Message\UriInterface
      */
-    public function getUrlPath(): string
+    public function getBaseUri(): \Psr\Http\Message\UriInterface
     {
-        return (string)$this->get([self::CONFIG_URL_PATH_KEY]);
+        $url = (string)$this->get([self::CONFIG_URL_PATH_KEY]);
+
+        return $this->uriFactory->createUri($url);
     }
 
     /**

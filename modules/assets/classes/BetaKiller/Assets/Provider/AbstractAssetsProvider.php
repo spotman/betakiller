@@ -22,6 +22,7 @@ use BetaKiller\Assets\Storage\AssetsStorageInterface;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Repository\RepositoryInterface;
 use Psr\Http\Message\UploadedFileInterface;
+use Psr\Http\Message\UriInterface;
 use Spotman\Acl\AclInterface;
 
 abstract class AbstractAssetsProvider implements AssetsProviderInterface
@@ -241,17 +242,13 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
         return str_replace($systemDirectorySeparator, $targetDirectorySeparator, $path);
     }
 
-    /**
-     * @return string
-     */
-    private function getUrlBasePath(): string
+    private function getBaseUrl(): UriInterface
     {
-        return $this->config->getUrlPath();
-    }
+        $uri = $this->config->getBaseUri();
 
-    private function getBaseUrl(): string
-    {
-        return $this->getUrlBasePath().'/'.$this->getUrlKey();
+        $path = $uri->getPath().'/'.$this->getUrlKey();
+
+        return $uri->withPath($path);
     }
 
     /**
@@ -675,8 +672,7 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
      */
     public function getDeployRelativePath(AssetsModelInterface $model, string $action, ?string $suffix = null): string
     {
-        $basePath = parse_url($this->getBaseUrl(), PHP_URL_PATH);
-        $basePath = str_replace('/', DIRECTORY_SEPARATOR, $basePath);
+        $basePath = str_replace('/', DIRECTORY_SEPARATOR, $this->getBaseUrl()->getPath());
 
         return $basePath.DIRECTORY_SEPARATOR.$this->getModelActionPath($model, $action, $suffix);
     }
