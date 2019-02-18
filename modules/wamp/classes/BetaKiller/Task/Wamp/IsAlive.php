@@ -103,6 +103,8 @@ class IsAlive extends AbstractTask
 
     public function run(): void
     {
+        \Thruway\Logging\Logger::set($this->logger);
+
         $url = sprintf(
             'ws://%s:%s',
             $this->config->getConnectionHost(),
