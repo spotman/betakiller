@@ -189,7 +189,7 @@ class IsAlive extends AbstractTask
         $this->session = $this->sessionStorage->createSession(
             self::USER_AGENT,
             '127.0.0.1',
-            'https://google.com/'
+            '/'
         );
 
         SessionHelper::setUserID($this->session, $this->user);
