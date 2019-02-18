@@ -5,6 +5,7 @@ namespace BetaKiller\Daemon;
 
 use BetaKiller\Config\WampConfig;
 use BetaKiller\Wamp\WampInternalClient;
+use BetaKiller\Wamp\WampRouter;
 use BetaKiller\Wamp\WampUserDb;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
@@ -64,7 +65,7 @@ class WampRouterDaemon implements DaemonInterface
     {
         \Thruway\Logging\Logger::set($this->logger);
 
-        $this->router = new Router($loop);
+        $this->router = new WampRouter($loop);
 
         // transport
         $this->router->addTransportProvider(new RatchetTransportProvider(
