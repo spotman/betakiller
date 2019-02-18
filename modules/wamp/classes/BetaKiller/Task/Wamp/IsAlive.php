@@ -14,6 +14,7 @@ use BetaKiller\Session\SessionStorageInterface;
 use BetaKiller\Task\AbstractTask;
 use BetaKiller\Wamp\WampInternalClient;
 use Psr\Log\LoggerInterface;
+use React\EventLoop\TimerInterface;
 use Thruway\Authentication\ClientWampCraAuthenticator;
 use Thruway\CallResult;
 use Thruway\ClientSession;
@@ -41,9 +42,9 @@ class IsAlive extends AbstractTask
     private $session;
 
     /**
-     * @var bool
+     * @var bool|null
      */
-    private $isAlive = false;
+    private $isAlive;
 
     /**
      * @var \Psr\Log\LoggerInterface
@@ -86,7 +87,7 @@ class IsAlive extends AbstractTask
         $this->logger         = $logger;
         $this->sessionStorage = $sessionStorage;
         $this->cookieHelper   = $cookieHelper;
-        $this->user = $user;
+        $this->user           = $user;
     }
 
     /**
@@ -129,7 +130,7 @@ class IsAlive extends AbstractTask
             'retry_delay_growth'  => 1.5,
         ]);
 
-        $client->on('open', function (ClientSession $session) {
+        $client->on('open', function (ClientSession $session) use ($client) {
             $this->logger->debug('WAMP connection opened');
 
             $namedArgs = [
@@ -140,19 +141,38 @@ class IsAlive extends AbstractTask
                 ],
             ];
 
+            $loop = $client->getLoop();
+
+            $loop->addPeriodicTimer(1, function (TimerInterface $timer) use ($session, $loop) {
+                // Close session after check was done
+                if (is_bool($this->isAlive)) {
+                    $this->logger->debug('Check done, closing session');
+                    $loop->cancelTimer($timer);
+                    $session->close();
+                } else {
+                    $this->logger->debug('Waiting for check to be done...');
+                }
+            });
+
             $promise = $session->call(WampInternalClient::PROCEDURE_API, [], $namedArgs);
 
             $promise->then(function (CallResult $result) {
                 if ($result->getResultMessage()->getArguments()) {
+                    $this->logger->debug('API call succeeded');
                     $this->isAlive = true;
+                } else {
+                    $this->logger->warning('API call result is empty');
+                    $this->isAlive = false;
                 }
             });
 
-            $promise->always(function() use ($session) {
-                $session->close();
+            $promise->otherwise(function () {
+                $this->logger->debug('API call failed');
+                $this->isAlive = false;
             });
         });
 
+        // Start and wait for session.close event
         $client->start();
 
         $this->destroySession();
