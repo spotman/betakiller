@@ -21,6 +21,7 @@ use BetaKiller\Middleware\I18nMiddleware;
 use BetaKiller\Middleware\MaintenanceModeMiddleware;
 use BetaKiller\Middleware\ProfilerMiddleware;
 use BetaKiller\Middleware\SchemeMiddleware;
+use BetaKiller\Middleware\SessionMiddleware;
 use BetaKiller\Middleware\SitemapRequestHandler;
 use BetaKiller\Middleware\UrlElementDispatchMiddleware;
 use BetaKiller\Middleware\UrlElementRenderMiddleware;
@@ -42,7 +43,6 @@ use Zend\Expressive\Router\Middleware\ImplicitHeadMiddleware;
 use Zend\Expressive\Router\Middleware\ImplicitOptionsMiddleware;
 use Zend\Expressive\Router\Middleware\MethodNotAllowedMiddleware;
 use Zend\Expressive\Router\Middleware\RouteMiddleware;
-use Zend\Expressive\Session\SessionMiddleware;
 
 class WebApp
 {
