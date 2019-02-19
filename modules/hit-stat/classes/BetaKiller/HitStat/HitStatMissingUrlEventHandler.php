@@ -57,7 +57,12 @@ class HitStatMissingUrlEventHandler implements EventHandlerInterface
 
         if (HitStatRequestHelper::hasHit($request)) {
             // Get target page from Request
-            $target = HitStatRequestHelper::getHit($request)->getTarget();
+            $target = HitStatRequestHelper::getHit($request)->getTargetPage();
+
+            if ($target->isMissing()) {
+                // Nothing to do
+                return;
+            }
 
             // Mark target page as missing
             $target->markAsMissing();

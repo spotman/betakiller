@@ -6,7 +6,7 @@ use Psr\Http\Message\UriInterface;
 
 class HitPage extends \ORM
 {
-    public const RELATION_DOMAIN = 'domain';
+    public const RELATION_DOMAIN   = 'domain';
     public const RELATION_REDIRECT = 'redirect';
 
     private const FIELD_DOMAIN_ID   = 'domain_id';

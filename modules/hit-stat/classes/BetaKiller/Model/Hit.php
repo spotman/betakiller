@@ -5,13 +5,17 @@ use Psr\Http\Message\UriInterface;
 
 class Hit extends \ORM implements HitInterface
 {
+    public const FIELD_IS_PROCESSED = 'is_processed';
+    public const FIELD_CREATED_AT   = 'created_at';
+
     private const FIELD_SOURCE_ID = 'source_id';
     private const FIELD_TARGET_ID = 'target_id';
     private const FIELD_MARKER_ID = 'marker_id';
     private const FIELD_USER_ID   = 'user_id';
 
+    public const RELATION_TARGET = 'target';
+
     private const RELATION_SOURCE = 'source';
-    private const RELATION_TARGET = 'target';
     private const RELATION_MARKER = 'marker';
     private const RELATION_USER   = 'user';
 
@@ -121,7 +125,7 @@ class Hit extends \ORM implements HitInterface
     /**
      * @return \BetaKiller\Model\HitPage
      */
-    public function getTarget(): HitPage
+    public function getTargetPage(): HitPage
     {
         return $this->getRelatedEntity(self::RELATION_TARGET);
     }
@@ -151,17 +155,27 @@ class Hit extends \ORM implements HitInterface
 
     public function setTimestamp(\DateTimeImmutable $dateTime): HitInterface
     {
-        $this->set_datetime_column_value('created_at', $dateTime);
+        $this->set_datetime_column_value(self::FIELD_CREATED_AT, $dateTime);
 
         return $this;
     }
 
     /**
-     * @throws \Kohana_Exception
+     * @return bool
      */
-    public function markAsProcessed(): void
+    public function isProcessed(): bool
     {
-        $this->set('processed', 1);
+        return (bool)$this->get(self::FIELD_IS_PROCESSED);
+    }
+
+    /**
+     * @return \BetaKiller\Model\HitInterface
+     */
+    public function markAsProcessed(): HitInterface
+    {
+        $this->set(self::FIELD_IS_PROCESSED, true);
+
+        return $this;
     }
 
     public function getIP(): string
@@ -171,7 +185,7 @@ class Hit extends \ORM implements HitInterface
 
     public function getTimestamp(): \DateTimeImmutable
     {
-        return $this->get_datetime_column_value('created_at');
+        return $this->get_datetime_column_value(self::FIELD_CREATED_AT);
     }
 
     /**
@@ -179,7 +193,7 @@ class Hit extends \ORM implements HitInterface
      */
     public function getFullTargetUrl(): UriInterface
     {
-        $uri = $this->getTarget()->getFullUrl();
+        $uri = $this->getTargetPage()->getFullUrl();
 
         if ($this->hasTargetMarker()) {
             $marker = $this->getTargetMarker();

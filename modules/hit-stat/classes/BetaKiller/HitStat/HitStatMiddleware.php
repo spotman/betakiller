@@ -121,7 +121,7 @@ class HitStatMiddleware implements MiddlewareInterface
                 // Inject Hit into Request
                 $request = HitStatRequestHelper::setHit($request, $hit);
 
-                $target = $hit->getTarget();
+                $target = $hit->getTargetPage();
 
                 // If target page is missing and redirect is defined => return redirect
                 if ($target->isMissing()) {
@@ -132,6 +132,7 @@ class HitStatMiddleware implements MiddlewareInterface
                     }
                 }
 
+                // This is required for saving first user hit during registration
                 $this->injectHitInSession($hit, $request);
             }
         } catch (\Throwable $e) {

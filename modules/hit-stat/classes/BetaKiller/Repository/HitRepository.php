@@ -2,6 +2,9 @@
 namespace BetaKiller\Repository;
 
 use BetaKiller\Model\Hit;
+use BetaKiller\Model\HitInterface;
+use BetaKiller\Model\HitPage;
+use BetaKiller\Utils\Kohana\ORM\OrmInterface;
 
 /**
  * Class HitRepository
@@ -14,41 +17,49 @@ use BetaKiller\Model\Hit;
 class HitRepository extends AbstractOrmBasedRepository
 {
     /**
-     * @param int|null $limit
+     * @param int $limit
      *
      * @return Hit[]
      * @throws \BetaKiller\Repository\RepositoryException
      */
-    public function getPending(?int $limit = null): array
+    public function getPending(int $limit): array
     {
         $limit = $limit ?? 100;
 
-        try {
-            $orm = $this->getOrmInstance();
-
-            if ($limit) {
-                $orm->limit($limit);
-            }
-
-            return $orm->where('processed', '=', 0)->get_all();
-        } catch (\Kohana_Exception $e) {
-            throw new RepositoryException(':error', [':error' => $e->getMessage()], $e->getCode(), $e);
-        }
-    }
-
-    /**
-     * @param int|null $limit
-     */
-    public function deleteProcessed(?int $limit = null): void
-    {
         $orm = $this->getOrmInstance();
-
-        $limit = $limit ?? 100;
 
         if ($limit) {
             $orm->limit($limit);
         }
 
-        $orm->where('processed', '=', 1)->delete_all();
+        return $this
+            ->filterProcessed($orm, false)
+            ->findAll($orm);
+    }
+
+    public function getFirstNotProcessed(): ?HitInterface
+    {
+        $orm = $this->getOrmInstance();
+
+        return $this
+            ->filterProcessed($orm, false)
+            ->orderByCreatedAt($orm)
+            ->limit($orm, 1)
+            ->findOne($orm);
+
+    }
+
+    private function filterProcessed(OrmInterface $orm, bool $value): self
+    {
+        $orm->where(Hit::FIELD_IS_PROCESSED, '=', $value);
+
+        return $this;
+    }
+
+    private function orderByCreatedAt(OrmInterface $orm): self
+    {
+        $orm->order_by(Hit::FIELD_CREATED_AT, 'asc');
+
+        return $this;
     }
 }

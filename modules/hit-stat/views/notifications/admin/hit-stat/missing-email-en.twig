@@ -1,0 +1,23 @@
+{% extends '@notifications/default/email' %}
+
+{% block body %}
+  New missing URLs detected!<br/>
+
+  <ul>
+    {% for page in targets %}
+      <li>{{ page }}</li>
+    {% endfor %}
+  </ul>
+
+  {% if sources %}
+    <br /><br />
+
+    from these source pages:<br />
+
+    <ul>
+      {% for page in sources %}
+        <li>{{ page }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+{% endblock %}

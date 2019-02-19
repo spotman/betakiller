@@ -60,7 +60,7 @@ interface HitInterface extends AbstractEntityInterface
     /**
      * @return \BetaKiller\Model\HitPage
      */
-    public function getTarget(): HitPage;
+    public function getTargetPage(): HitPage;
 
     /**
      * @return \BetaKiller\Model\HitMarkerInterface
@@ -86,4 +86,14 @@ interface HitInterface extends AbstractEntityInterface
      * @return \Psr\Http\Message\UriInterface
      */
     public function getFullTargetUrl(): UriInterface;
+
+    /**
+     * @return bool
+     */
+    public function isProcessed(): bool;
+
+    /**
+     * @return \BetaKiller\Model\HitInterface
+     */
+    public function markAsProcessed(): HitInterface;
 }
