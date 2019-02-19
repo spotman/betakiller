@@ -162,7 +162,7 @@ class HitStatMiddleware implements MiddlewareInterface
         $ip        = ServerRequestHelper::getIpAddress($request);
 
         // Malformed source => ignore it
-        if (!\parse_url($sourceUrl)) {
+        if ($sourceUrl && !\parse_url($sourceUrl)) {
             $sourceUrl = null;
         }
 
