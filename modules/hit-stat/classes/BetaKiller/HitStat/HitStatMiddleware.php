@@ -163,7 +163,7 @@ class HitStatMiddleware implements MiddlewareInterface
 
         // Malformed source => ignore it
         if (!\parse_url($sourceUrl)) {
-            return null;
+            $sourceUrl = null;
         }
 
         // Find source page
