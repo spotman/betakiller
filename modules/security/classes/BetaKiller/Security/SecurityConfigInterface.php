@@ -11,7 +11,22 @@ interface SecurityConfigInterface
     public function isCspEnabled(): bool;
 
     /**
+     * @return bool
+     */
+    public function isCspSafeModeEnabled(): bool;
+
+    /**
      * @return string[][]
      */
     public function getCspRules(): array;
+
+    /**
+     * @return string[]
+     */
+    public function getHeadersToAdd(): array;
+
+    /**
+     * @return string[]
+     */
+    public function getHeadersToRemove(): array;
 }

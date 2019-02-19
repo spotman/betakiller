@@ -54,10 +54,9 @@ class SecureHeadersMiddleware implements MiddlewareInterface
         $baseUrl = (string)$baseUri;
 
         $headers = new SecureHeaders();
-        $headers->applyOnOutput(null, false);
 
         // Do not add headers
-        $headers->auto(SecureHeaders::AUTO_ALL & ~(SecureHeaders::AUTO_ADD | SecureHeaders::AUTO_COOKIE_HTTPONLY));
+        $headers->auto(SecureHeaders::AUTO_ALL);
 
         // Report URI first
         $reportUri = (string)$baseUri->withPath(CspReportHandler::URL);
@@ -65,8 +64,11 @@ class SecureHeadersMiddleware implements MiddlewareInterface
         $headers->csp('report', $reportUri, true);
 
         // Basic STS headers with safe mode enabled to prevent long-lasting effects of incorrect configuration
-        $headers->hsts(3600, false, false);
-        $headers->safeMode(true);
+        $headers->hsts();
+
+        if ($this->securityConfig->isCspSafeModeEnabled()) {
+            $headers->safeMode(true);
+        }
 
         $headers->csp('default', $baseUrl);
         $headers->csp('image', $baseUrl);
@@ -92,6 +94,14 @@ class SecureHeadersMiddleware implements MiddlewareInterface
 
         if (!$this->securityConfig->isCspEnabled()) {
             return $response;
+        }
+
+        foreach ($this->securityConfig->getHeadersToAdd() as $headerName => $headerValue) {
+            $response = $response->withHeader($headerName, $headerValue);
+        }
+
+        foreach ($this->securityConfig->getHeadersToRemove() as $headerName) {
+            $response = $response->withoutHeader($headerName);
         }
 
         $httpAdapter = new Psr7Adapter($response);
