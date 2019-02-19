@@ -161,6 +161,11 @@ class HitStatMiddleware implements MiddlewareInterface
         $targetUrl = (string)$request->getUri();
         $ip        = ServerRequestHelper::getIpAddress($request);
 
+        // Malformed source => ignore it
+        if (!\parse_url($sourceUrl)) {
+            return null;
+        }
+
         // Find source page
         $sourcePage = $sourceUrl ? $this->service->getPageByFullUrl($sourceUrl) : null;
 
