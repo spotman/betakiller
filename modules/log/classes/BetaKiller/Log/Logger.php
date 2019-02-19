@@ -52,7 +52,7 @@ class Logger implements LoggerInterface
         $monolog = new \Monolog\Logger('default');
 
         $errorHandler = new ErrorHandler($monolog);
-        $errorHandler->registerErrorHandler();
+        $errorHandler->registerErrorHandler([], false);
         $errorHandler->registerFatalHandler();
 
         // Do not register Monolog exception handler coz it calls exit()
