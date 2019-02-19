@@ -313,7 +313,7 @@ task('migrations:create', function () {
 
     $desc = ask('Enter migration description', '');
 
-    $output = runMinionTask("migrations:create --name=$name --description=$desc --scope=$scope");
+    $output = runMinionTask("migrations:create --name=$name --description=$desc --scope=$scope", false, true);
 
     $outArr = explode('Done! Check ', $output);
 
