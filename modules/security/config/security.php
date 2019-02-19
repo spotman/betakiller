@@ -3,12 +3,14 @@ declare(strict_types=1);
 
 return [
     'csp' => [
-        'enabled' => true,
+        'enabled'   => true,
         'safe_mode' => false,
-        'rules' => [],
+        'errors'    => false,
+        'rules'     => [],
     ],
+
     'headers' => [
-        'add' => [
+        'add'    => [
             // Allow nested iframes from the same domain
             'X-Frame-Options' => 'SAMEORIGIN',
         ],

@@ -16,6 +16,11 @@ interface SecurityConfigInterface
     public function isCspSafeModeEnabled(): bool;
 
     /**
+     * @return bool
+     */
+    public function isErrorLogEnabled(): bool;
+
+    /**
      * @return string[][]
      */
     public function getCspRules(): array;

@@ -66,6 +66,9 @@ class SecureHeadersMiddleware implements MiddlewareInterface
         // Basic STS headers with safe mode enabled to prevent long-lasting effects of incorrect configuration
         $headers->hsts();
 
+        // Enable/disable errors logging
+        $headers->errorReporting($this->securityConfig->isErrorLogEnabled());
+
         if ($this->securityConfig->isCspSafeModeEnabled()) {
             $headers->safeMode(true);
         }
