@@ -313,7 +313,7 @@ task('migrations:create', function () {
 
     $desc = ask('Enter migration description', '');
 
-    $output = runMinionTask("migrations:create --name=$name --description=$desc --scope=$scope", false, true);
+    $output = runMinionTask("migrations:create --name=$name --description=$desc --scope=$scope");
 
     $outArr = explode('Done! Check ', $output);
 
@@ -335,7 +335,7 @@ task('migrations:create', function () {
  * Apply migrations
  */
 task('migrations:up', function () {
-    runMinionTask('migrations:up', false, true);
+    runMinionTask('migrations:up');
 })->desc('Apply migrations');
 
 /**
@@ -344,7 +344,7 @@ task('migrations:up', function () {
 task('migrations:down', function () {
     $to = input()->getOption('to');
 
-    runMinionTask("migrations:down --to=$to", false, true);
+    runMinionTask("migrations:down --to=$to");
 })->desc('Rollback migrations; use "--to" option to set new migration base');
 
 /**
