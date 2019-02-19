@@ -27,15 +27,14 @@ use BetaKiller\Middleware\UrlElementDispatchMiddleware;
 use BetaKiller\Middleware\UrlElementRenderMiddleware;
 use BetaKiller\Middleware\UrlHelperMiddleware;
 use BetaKiller\Middleware\UserMiddleware;
+use BetaKiller\Middleware\WampCookieMiddleware;
 use BetaKiller\RequestHandler\App\I18next\AddMissingTranslationRequestHandler;
 use BetaKiller\RequestHandler\App\I18next\FetchTranslationRequestHandler;
 use BetaKiller\RobotsTxt\RobotsTxtHandler;
 use BetaKiller\Security\CspReportHandler;
 use BetaKiller\Security\SecureHeadersMiddleware;
 use Middlewares\ContentType;
-use Psr\Http\Message\ResponseInterface;
 use Spotman\Api\ApiRequestHandler;
-use Zend\Diactoros\Response\TextResponse;
 use Zend\Expressive\Application;
 use Zend\Expressive\Helper\BodyParams\BodyParamsMiddleware;
 use Zend\Expressive\Router\Middleware\DispatchMiddleware;
@@ -107,12 +106,17 @@ class WebApp
         $this->app->pipe(SecureHeadersMiddleware::class);
 //        $this->app->pipe(RequestIdMiddleware::class);
 
+        // Common processing
+        $this->app->pipe(WampCookieMiddleware::class);
+
+        // Auth
         $this->app->pipe(SessionMiddleware::class);
         $this->app->pipe(UserMiddleware::class);
 
         // Debugging (depends on session and per-user debug mode)
         $this->app->pipe(DebugMiddleware::class);
 
+        // I18n and content negotiation
         $this->app->pipe(ContentNegotiationMiddleware::class);
         $this->app->pipe(ContentType::class);
         $this->app->pipe(I18nMiddleware::class);
@@ -143,9 +147,6 @@ class WebApp
         $this->app->pipe(ImplicitHeadMiddleware::class);
         $this->app->pipe(ImplicitOptionsMiddleware::class);
         $this->app->pipe(MethodNotAllowedMiddleware::class);
-
-        // Seed the UrlHelper with the routing results:
-//        $app->pipe(UrlHelperMiddleware::class);
 
         // Add more middleware here that needs to introspect the routing results; this
         // might include:
@@ -234,11 +235,5 @@ class WebApp
         // I18n handlers
         $app->get('/i18n/{lang}', FetchTranslationRequestHandler::class, 'i18n-fetch');
         $app->post('/i18n/{lang}/add-missing', AddMissingTranslationRequestHandler::class, 'i18n-add-missing');
-    }
-
-    public function processException(\Throwable $e): ResponseInterface
-    {
-        // TODO Replace with static pretty page + log exception to developers
-        return new TextResponse('Error: '.Exception::oneLiner($e));
     }
 }
