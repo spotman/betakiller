@@ -1,7 +1,6 @@
 <?php
 namespace BetaKiller\Error;
 
-use BetaKiller\Exception;
 use BetaKiller\Helper\NotificationHelper;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Log\Logger;
@@ -88,13 +87,7 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
             return;
         }
 
-        /** @var \Throwable|null $exception */
-        $exception = $record['context'][Logger::CONTEXT_KEY_EXCEPTION] ?? null;
-
-        if (!$exception) {
-            // Create dummy exception if this is a plain "alert" or "emergency" message
-            $exception = new Exception((string)$record['formatted']);
-        }
+        $exception = $this->detectException($record);
 
         /** @var ServerRequestInterface|null $request */
         $request = $record['context'][Logger::CONTEXT_KEY_REQUEST] ?? null;
@@ -109,6 +102,27 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
         }
     }
 
+    private function detectException(array $record): \Throwable
+    {
+        /** @var \Throwable|null $exception */
+        $exception = $record['context'][Logger::CONTEXT_KEY_EXCEPTION] ?? null;
+
+        if (!$exception) {
+            $extra = $record['extra'] ?? [];
+
+            // Create dummy exception if this is a plain "alert" or "emergency" message
+            $exception = new \ErrorException(
+                (string)$record['message'],
+                0,
+                \E_WARNING,
+                $extra['file'] ?? 'Unknown',
+                $extra['line'] ?? 0
+            );
+        }
+
+        return $exception;
+    }
+
     /**
      * @param \Throwable                                    $exception
      * @param null|\Psr\Http\Message\ServerRequestInterface $request Null in cli mode
@@ -116,7 +130,6 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
      * @return \BetaKiller\Model\PhpExceptionModelInterface
      * @throws \BetaKiller\Exception\ValidationException
      * @throws \BetaKiller\Repository\RepositoryException
-     * @throws \Kohana_Exception
      */
     private function storeException(\Throwable $exception, ?ServerRequestInterface $request): PhpExceptionModelInterface
     {
