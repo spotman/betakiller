@@ -2,10 +2,8 @@
 namespace BetaKiller\Url;
 
 use BetaKiller\Helper\SeoMetaInterface;
-use BetaKiller\Model\HasLabelInterface;
 
-interface IFaceModelInterface extends EntityLinkedUrlElementInterface, SeoMetaInterface, HasLabelInterface,
-    UrlElementForMenuInterface
+interface IFaceModelInterface extends EntityLinkedUrlElementInterface, SeoMetaInterface, UrlElementForMenuInterface
 {
     /**
      * Returns layout codename or null if using parent layout

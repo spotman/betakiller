@@ -8,6 +8,7 @@ use BetaKiller\Url\Container\UrlContainerInterface;
 use BetaKiller\Url\IFaceModelInterface;
 use BetaKiller\Url\UrlElementStack;
 use BetaKiller\Url\UrlElementTreeInterface;
+use BetaKiller\Url\UrlElementWithLabelInterface;
 use Spotman\Api\ApiMethodResponse;
 
 class UrlElementHelper
@@ -104,7 +105,7 @@ class UrlElementHelper
     }
 
     /**
-     * @param \BetaKiller\Url\IFaceModelInterface             $model
+     * @param \BetaKiller\Url\UrlElementWithLabelInterface    $model
      * @param \BetaKiller\Url\Container\UrlContainerInterface $params
      * @param \BetaKiller\Helper\I18nHelper                   $i18n
      * @param int|null                                        $limit
@@ -114,7 +115,7 @@ class UrlElementHelper
      * @throws \BetaKiller\Url\UrlPrototypeException
      */
     public function getLabel(
-        IFaceModelInterface $model,
+        UrlElementWithLabelInterface $model,
         UrlContainerInterface $params,
         I18nHelper $i18n,
         ?int $limit = null
