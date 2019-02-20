@@ -31,7 +31,11 @@ return [
      * ]
      */
     'messages' => [
-        \BetaKiller\Task\HitStat\ProcessHits::NOTIFICATION => [
+        \BetaKiller\Task\HitStat\ProcessHits::MISSING_TARGETS => [
+            'group' => HIT_STAT_GROUP,
+        ],
+
+        \BetaKiller\Task\HitStat\ProcessHits::NEW_SOURCES => [
             'group' => HIT_STAT_GROUP,
         ],
     ],

@@ -179,6 +179,11 @@ class HitStatMiddleware implements MiddlewareInterface
         // Search for target URL and create if not exists
         $targetPage = $this->service->getPageByFullUrl($targetUrl);
 
+        // Skip ignored pages and domains
+        if ($targetPage->isIgnored()) {
+            return null;
+        }
+
         // Increment hit counter for target URL
         $targetPage
             ->incrementHits()

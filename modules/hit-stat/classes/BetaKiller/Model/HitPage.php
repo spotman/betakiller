@@ -11,6 +11,7 @@ class HitPage extends \ORM
 
     private const FIELD_DOMAIN_ID   = 'domain_id';
     private const FIELD_IS_MISSING  = 'is_missing';
+    private const FIELD_IS_IGNORED  = 'is_ignored';
     private const FIELD_REDIRECT_ID = 'redirect_id';
 
     /**
@@ -87,7 +88,14 @@ class HitPage extends \ORM
 
     public function isIgnored(): bool
     {
-        return $this->getDomain()->isIgnored();
+        return $this->getDomain()->isIgnored() || (bool)$this->get(self::FIELD_IS_IGNORED);
+    }
+
+    public function markAsIgnored(): HitPage
+    {
+        $this->set(self::FIELD_IS_IGNORED, true);
+
+        return $this;
     }
 
     public function markAsMissing(): HitPage

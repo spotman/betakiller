@@ -15,7 +15,8 @@ class ProcessHits extends AbstractTask
 {
     use LoggerHelperTrait;
 
-    public const NOTIFICATION = 'admin/hit-stat/missing';
+    public const MISSING_TARGETS = 'admin/hit-stat/missing-targets';
+    public const NEW_SOURCES     = 'admin/hit-stat/new-sources';
 
     /**
      * @var \BetaKiller\Repository\HitRepository
@@ -30,12 +31,17 @@ class ProcessHits extends AbstractTask
     /**
      * @var \BetaKiller\Model\HitPage[]
      */
-    private $missingTargets = [];
+    private $newMissingTargets = [];
 
     /**
      * @var \BetaKiller\Model\HitPage[]
      */
-    private $missingSources = [];
+    private $newMissingSources = [];
+
+    /**
+     * @var \BetaKiller\Model\HitPage[]
+     */
+    private $newSources = [];
 
     /**
      * @var \Psr\Log\LoggerInterface
@@ -89,9 +95,10 @@ class ProcessHits extends AbstractTask
         $firstHitTimestamp = $firstNotProcessed->getTimestamp();
 
         // Process missing targets
-        foreach ($this->hitsRepository->getPending(1000) as $hit) {
+        foreach ($this->hitsRepository->getPending(10000) as $hit) {
             try {
-                $this->processMissingHit($hit, $firstHitTimestamp);
+                $this->processMissingTarget($hit, $firstHitTimestamp);
+                $this->processNewSource($hit, $firstHitTimestamp);
 
                 $this->processed[] = $hit;
             } catch (\Throwable $e) {
@@ -99,28 +106,34 @@ class ProcessHits extends AbstractTask
             }
         }
 
-        if ($this->missingTargets) {
-            // Notify moderators about new missed URL and referrers
-            // Notify moderators about new referrers in missing URL
-            $this->notification->groupMessage(self::NOTIFICATION, [
-                'sources' => \array_map(function (HitPage $page) {
-                    return $page->getFullUrl();
-                }, $this->missingSources),
-
+        if ($this->newMissingTargets) {
+            // Notify moderators about new missed URL
+            $this->notification->groupMessage(self::MISSING_TARGETS, [
                 'targets' => \array_map(function (HitPage $page) {
                     return $page->getFullUrl();
-                }, $this->missingTargets),
+                }, $this->newMissingTargets),
+
+                'sources' => \array_map(function (HitPage $page) {
+                    return $page->getFullUrl();
+                }, $this->newMissingSources),
             ]);
 
             $this->logger->debug(':count missing targets processed', [
-                ':count' => \count($this->missingTargets),
+                ':count' => \count($this->newMissingTargets),
+            ]);
+        }
+
+        if ($this->newSources) {
+            // Notify moderators about new referrers
+            $this->notification->groupMessage(self::NEW_SOURCES, [
+                'sources' => \array_map(function (HitPage $page) {
+                    return $page->getFullUrl();
+                }, $this->newSources),
             ]);
 
-            if ($this->missingSources) {
-                $this->logger->debug(':count new missing sources processed', [
-                    ':count' => \count($this->missingSources),
-                ]);
-            }
+            $this->logger->debug(':count new sources processed', [
+                ':count' => \count($this->newSources),
+            ]);
         }
 
         // Mark all records as "processed"
@@ -140,26 +153,50 @@ class ProcessHits extends AbstractTask
      *
      * @param \DateTimeImmutable    $firstHitTimestamp
      */
-    private function processMissingHit(Hit $hit, \DateTimeImmutable $firstHitTimestamp): void
+    private function processMissingTarget(Hit $hit, \DateTimeImmutable $firstHitTimestamp): void
     {
         $target   = $hit->getTargetPage();
         $targetID = $target->getID();
 
-        if (!$target->isMissing()) {
+        if (!$target->isMissing() || $target->isIgnored()) {
             return;
         }
 
-        if (!isset($this->missingTargets[$targetID])) {
-            $this->missingTargets[$targetID] = $target;
+        if (!isset($this->newMissingTargets[$targetID]) && $target->getFirstSeenAt() >= $firstHitTimestamp) {
+            $this->newMissingTargets[$targetID] = $target;
         }
 
-        if ($hit->hasSourcePage()) {
-            $source   = $hit->getSourcePage();
-            $sourceID = $source->getID();
+        if (!$hit->hasSourcePage()) {
+            return;
+        }
 
-            if (!isset($this->missingSources[$sourceID]) && $source->getFirstSeenAt() >= $firstHitTimestamp) {
-                $this->missingSources[$sourceID] = $source;
-            }
+        $source   = $hit->getSourcePage();
+        $sourceID = $source->getID();
+
+        if ($source->isIgnored()) {
+            return;
+        }
+
+        if (!isset($this->newMissingSources[$sourceID]) && $source->getFirstSeenAt() >= $firstHitTimestamp) {
+            $this->newMissingSources[$sourceID] = $source;
+        }
+    }
+
+    private function processNewSource(Hit $hit, \DateTimeImmutable $firstHitTimestamp): void
+    {
+        if (!$hit->hasSourcePage()) {
+            return;
+        }
+
+        $source   = $hit->getSourcePage();
+        $sourceID = $source->getID();
+
+        if ($source->isIgnored()) {
+            return;
+        }
+
+        if (!isset($this->newSources[$sourceID]) && $source->getFirstSeenAt() >= $firstHitTimestamp) {
+            $this->newSources[$sourceID] = $source;
         }
     }
 }

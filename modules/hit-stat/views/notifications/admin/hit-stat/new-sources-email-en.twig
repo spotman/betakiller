@@ -1,0 +1,11 @@
+{% extends '@notifications/default/email' %}
+
+{% block body %}
+  New referrers URLs detected!<br/>
+
+  <ul>
+    {% for page in sources %}
+      <li>{{ page }}</li>
+    {% endfor %}
+  </ul>
+{% endblock %}
