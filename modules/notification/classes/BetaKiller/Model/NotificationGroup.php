@@ -9,6 +9,7 @@ class NotificationGroup extends \ORM implements NotificationGroupInterface
     public const TABLE_FIELD_IS_ENABLED  = 'is_enabled';
     public const TABLE_FIELD_CODENAME    = 'codename';
     public const TABLE_FIELD_DESCRIPTION = 'description';
+    public const TABLE_FIELD_IS_SYSTEM   = 'is_system';
 
     public const ROLES_TABLE_NAME           = 'notification_groups_roles';
     public const ROLES_TABLE_FIELD_GROUP_ID = 'group_id';
@@ -18,11 +19,14 @@ class NotificationGroup extends \ORM implements NotificationGroupInterface
     public const USERS_OFF_TABLE_FIELD_GROUP_ID = 'group_id';
     public const USERS_OFF_TABLE_FIELD_USER_ID  = 'user_id';
 
+    public const RELATION_ROLES     = 'roles';
+    public const RELATION_USERS_OFF = 'users_off';
+
     protected function configure(): void
     {
         $this->_table_name = self::TABLE_NAME;
 
-        // TODO Понять почему без этого не работаtn NotificationGroupRepository::findGroupUsers()
+        // TODO Понять почему без этого не работает NotificationGroupRepository::findGroupUsers()
         $this->belongs_to([
             'users' => [
                 'model'       => 'User',
@@ -31,13 +35,13 @@ class NotificationGroup extends \ORM implements NotificationGroupInterface
         ]);
 
         $this->has_many([
-            'users_off' => [
+            self::RELATION_USERS_OFF => [
                 'model'       => 'User',
                 'through'     => self::USERS_OFF_TABLE_NAME,
                 'foreign_key' => self::USERS_OFF_TABLE_FIELD_GROUP_ID,
                 'far_key'     => self::USERS_OFF_TABLE_FIELD_USER_ID,
             ],
-            'roles'     => [
+            self::RELATION_ROLES     => [
                 'model'       => 'Role',
                 'through'     => self::ROLES_TABLE_NAME,
                 'foreign_key' => self::ROLES_TABLE_FIELD_GROUP_ID,
@@ -131,13 +135,13 @@ class NotificationGroup extends \ORM implements NotificationGroupInterface
     }
 
     /**
-     * @param \BetaKiller\Model\UserInterface $userModel
+     * @param \BetaKiller\Model\UserInterface $user
      *
      * @return bool
      */
-    public function isEnabledForUser(UserInterface $userModel): bool
+    public function isEnabledForUser(UserInterface $user): bool
     {
-        return !$this->has('users_off', $userModel);
+        return !$this->has(self::RELATION_USERS_OFF, $user);
     }
 
     /**
@@ -159,59 +163,59 @@ class NotificationGroup extends \ORM implements NotificationGroupInterface
     }
 
     /**
-     * @param \BetaKiller\Model\UserInterface $userModel
+     * @param \BetaKiller\Model\UserInterface $user
      *
      * @return \BetaKiller\Model\NotificationGroupInterface
      */
-    public function enableForUser(UserInterface $userModel): NotificationGroupInterface
+    public function enableForUser(UserInterface $user): NotificationGroupInterface
     {
-        $this->remove('users_off', $userModel);
+        $this->remove(self::RELATION_USERS_OFF, $user);
 
         return $this;
     }
 
     /**
-     * @param \BetaKiller\Model\UserInterface $userModel
+     * @param \BetaKiller\Model\UserInterface $user
      *
      * @return \BetaKiller\Model\NotificationGroupInterface
      */
-    public function disableForUser(UserInterface $userModel): NotificationGroupInterface
+    public function disableForUser(UserInterface $user): NotificationGroupInterface
     {
-        $this->add('users_off', $userModel);
+        $this->add(self::RELATION_USERS_OFF, $user);
 
         return $this;
     }
 
     /**
-     * @param \BetaKiller\Model\RoleInterface $roleModel
+     * @param \BetaKiller\Model\RoleInterface $role
      *
      * @return bool
      */
-    public function hasRole(RoleInterface $roleModel): bool
+    public function hasRole(RoleInterface $role): bool
     {
-        return $this->has('roles', $roleModel);
+        return $this->has(self::RELATION_ROLES, $role);
     }
 
     /**
-     * @param \BetaKiller\Model\RoleInterface $roleModel
+     * @param \BetaKiller\Model\RoleInterface $role
      *
      * @return \BetaKiller\Model\NotificationGroupInterface
      */
-    public function addRole(RoleInterface $roleModel): NotificationGroupInterface
+    public function addRole(RoleInterface $role): NotificationGroupInterface
     {
-        $this->add('roles', $roleModel);
+        $this->add(self::RELATION_ROLES, $role);
 
         return $this;
     }
 
     /**
-     * @param \BetaKiller\Model\RoleInterface $roleModel
+     * @param \BetaKiller\Model\RoleInterface $role
      *
      * @return \BetaKiller\Model\NotificationGroupInterface
      */
-    public function removeRole(RoleInterface $roleModel): NotificationGroupInterface
+    public function removeRole(RoleInterface $role): NotificationGroupInterface
     {
-        $this->remove('roles', $roleModel);
+        $this->remove(self::RELATION_ROLES, $role);
 
         return $this;
     }
@@ -221,7 +225,7 @@ class NotificationGroup extends \ORM implements NotificationGroupInterface
      */
     public function getRoles(): array
     {
-        return $this->getRoleRelation()->get_all();
+        return $this->getAllRelated(self::RELATION_ROLES);
     }
 
     /**
@@ -229,22 +233,47 @@ class NotificationGroup extends \ORM implements NotificationGroupInterface
      */
     public function getDisabledUsers(): array
     {
-        return $this->getUserOffRelation()->get_all();
+        return $this->getAllRelated(self::RELATION_USERS_OFF);
     }
 
     /**
-     * @return \BetaKiller\Model\Role
+     * @return \BetaKiller\Model\NotificationGroupInterface
      */
-    private function getRoleRelation(): Role
+    public function markAsSystem(): NotificationGroupInterface
     {
-        return $this->get('roles');
+        return $this->setIsSystem(true);
     }
 
     /**
-     * @return \BetaKiller\Model\User
+     * @return \BetaKiller\Model\NotificationGroupInterface
      */
-    private function getUserOffRelation(): User
+    public function markAsRegular(): NotificationGroupInterface
     {
-        return $this->get('users_off');
+        return $this->setIsSystem(false);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isSystem(): bool
+    {
+        return (bool)$this->get(self::TABLE_FIELD_IS_SYSTEM);
+    }
+
+    /**
+     * Returns name of I18n key to proceed
+     *
+     * @return string
+     */
+    public function getI18nKeyName(): string
+    {
+        return 'notification_group.'.$this->getCodename();
+    }
+
+    private function setIsSystem(bool $value): NotificationGroupInterface
+    {
+        $this->set(self::TABLE_FIELD_IS_SYSTEM, $value);
+
+        return $this;
     }
 }

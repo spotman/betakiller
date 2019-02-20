@@ -15,7 +15,9 @@ return [
      */
     'groups'   => [
         TRANSLATION_MANAGEMENT_GROUP => [
-            \BetaKiller\I18n\I18nFacade::ROLE_TRANSLATOR,
+            'roles' => [
+                \BetaKiller\I18n\I18nFacade::ROLE_TRANSLATOR,
+            ],
         ],
     ],
 

@@ -75,30 +75,25 @@ class NotificationGroupRepository extends AbstractOrmBasedDispatchableRepository
     }
 
     /**
-     * @param \BetaKiller\Model\UserInterface $userModel
+     * @param \BetaKiller\Model\UserInterface $user
+     *
+     * @param bool|null                       $includeSystem
      *
      * @return \BetaKiller\Model\NotificationGroupInterface[]
      * @throws \BetaKiller\Factory\FactoryException
      */
-    public function getUserGroups(UserInterface $userModel): array
+    public function getUserGroups(UserInterface $user, bool $includeSystem = null): array
     {
         $orm = $this->getOrmInstance();
-        $this->filterGroupIsEnabled($orm, true);
 
-        return $orm
-            ->join(NotificationGroup::ROLES_TABLE_NAME, 'left')
-            ->on(
-                NotificationGroup::ROLES_TABLE_NAME.'.'.NotificationGroup::ROLES_TABLE_FIELD_GROUP_ID,
-                '=',
-                $orm->object_column('id')
-            )
-            ->where(
-                NotificationGroup::ROLES_TABLE_NAME.'.'.NotificationGroup::ROLES_TABLE_FIELD_ROLE_ID,
-                'IN',
-                $userModel->getAccessControlRoles()
-            )
-            ->group_by_primary_key()
-            ->get_all();
+        if (!$includeSystem) {
+            $this->filterSystemGroup($orm, false);
+        }
+
+        return $this
+            ->filterGroupIsEnabled($orm, true)
+            ->filterRoles($orm, $user->getAccessControlRoles())
+            ->findAll($orm);
     }
 
     /**
@@ -190,12 +185,22 @@ class NotificationGroupRepository extends AbstractOrmBasedDispatchableRepository
      */
     private function filterGroupIsEnabled(ExtendedOrmInterface $orm, bool $value): self
     {
-        $orm
-            ->where(
-                $orm->object_column(NotificationGroup::TABLE_FIELD_IS_ENABLED),
-                '=',
-                $value
-            );
+        $orm->where(
+            $orm->object_column(NotificationGroup::TABLE_FIELD_IS_ENABLED),
+            '=',
+            $value
+        );
+
+        return $this;
+    }
+
+    private function filterSystemGroup(ExtendedOrmInterface $orm, bool $value): self
+    {
+        $orm->where(
+            $orm->object_column(NotificationGroup::TABLE_FIELD_IS_SYSTEM),
+            '=',
+            $value
+        );
 
         return $this;
     }
@@ -203,6 +208,13 @@ class NotificationGroupRepository extends AbstractOrmBasedDispatchableRepository
     private function orderByName(ExtendedOrmInterface $orm): self
     {
         $orm->order_by($orm->object_column(NotificationGroup::TABLE_FIELD_CODENAME), 'asc');
+
+        return $this;
+    }
+
+    private function filterRoles(ExtendedOrmInterface $orm, array $roles): self
+    {
+        $this->filterRelatedMultiple($orm, NotificationGroup::RELATION_ROLES, $roles);
 
         return $this;
     }

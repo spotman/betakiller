@@ -20,12 +20,16 @@ return [
      */
     'groups'   => [
         POST_MODERATION => [
-            RoleInterface::MODERATOR,
+            'roles' => [
+                RoleInterface::MODERATOR,
+            ],
         ],
 
         COMMENT_USER_EVENT => [
-            // Direct messaging to any user
-            RoleInterface::GUEST,
+            'roles' => [
+                // Direct messaging to any user
+                RoleInterface::GUEST,
+            ],
         ],
     ],
 

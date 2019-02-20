@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\Model;
 
-interface NotificationGroupInterface extends DispatchableEntityInterface
+interface NotificationGroupInterface extends DispatchableEntityInterface, HasI18nKeyNameInterface
 {
     /**
      * @return bool
@@ -47,53 +47,53 @@ interface NotificationGroupInterface extends DispatchableEntityInterface
     /**
      * Returns true if current group is allowed for provided user (complex check with roles intersection)
      *
-     * @param \BetaKiller\Model\UserInterface $userModel
+     * @param \BetaKiller\Model\UserInterface $user
      *
      * @return bool
      */
-    public function isAllowedToUser(UserInterface $userModel): bool;
+    public function isAllowedToUser(UserInterface $user): bool;
 
     /**
-     * @param \BetaKiller\Model\UserInterface $userModel
+     * @param \BetaKiller\Model\UserInterface $user
      *
      * @return bool
      */
-    public function isEnabledForUser(UserInterface $userModel): bool;
+    public function isEnabledForUser(UserInterface $user): bool;
 
     /**
-     * @param \BetaKiller\Model\UserInterface $userModel
+     * @param \BetaKiller\Model\UserInterface $user
      *
      * @return \BetaKiller\Model\NotificationGroupInterface
      */
-    public function enableForUser(UserInterface $userModel): NotificationGroupInterface;
+    public function enableForUser(UserInterface $user): NotificationGroupInterface;
 
     /**
-     * @param \BetaKiller\Model\UserInterface $userModel
+     * @param \BetaKiller\Model\UserInterface $user
      *
      * @return \BetaKiller\Model\NotificationGroupInterface
      */
-    public function disableForUser(UserInterface $userModel): NotificationGroupInterface;
+    public function disableForUser(UserInterface $user): NotificationGroupInterface;
 
     /**
-     * @param \BetaKiller\Model\RoleInterface $roleModel
+     * @param \BetaKiller\Model\RoleInterface $role
      *
      * @return bool
      */
-    public function hasRole(RoleInterface $roleModel): bool;
+    public function hasRole(RoleInterface $role): bool;
 
     /**
-     * @param \BetaKiller\Model\RoleInterface $roleModel
+     * @param \BetaKiller\Model\RoleInterface $role
      *
      * @return \BetaKiller\Model\NotificationGroupInterface
      */
-    public function addRole(RoleInterface $roleModel): NotificationGroupInterface;
+    public function addRole(RoleInterface $role): NotificationGroupInterface;
 
     /**
-     * @param \BetaKiller\Model\RoleInterface $roleModel
+     * @param \BetaKiller\Model\RoleInterface $role
      *
      * @return \BetaKiller\Model\NotificationGroupInterface
      */
-    public function removeRole(RoleInterface $roleModel): NotificationGroupInterface;
+    public function removeRole(RoleInterface $role): NotificationGroupInterface;
 
     /**
      * @return \BetaKiller\Model\RoleInterface[]
@@ -104,4 +104,19 @@ interface NotificationGroupInterface extends DispatchableEntityInterface
      * @return \BetaKiller\Model\UserInterface[]
      */
     public function getDisabledUsers(): array;
+
+    /**
+     * @return \BetaKiller\Model\NotificationGroupInterface
+     */
+    public function markAsSystem(): NotificationGroupInterface;
+
+    /**
+     * @return \BetaKiller\Model\NotificationGroupInterface
+     */
+    public function markAsRegular(): NotificationGroupInterface;
+
+    /**
+     * @return bool
+     */
+    public function isSystem(): bool;
 }

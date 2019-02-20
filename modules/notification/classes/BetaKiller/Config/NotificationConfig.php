@@ -3,8 +3,17 @@ declare(strict_types=1);
 
 namespace BetaKiller\Config;
  
+use BetaKiller\Exception;
+
 class NotificationConfig extends AbstractConfig implements NotificationConfigInterface
 {
+    public const CONFIG_GROUP_NAME    = 'notifications';
+    public const PATH_GROUPS          = ['groups'];
+    public const PATH_GROUP_IS_SYSTEM = ['groups', 'groupCodename' => '', 'is_system'];
+    public const PATH_GROUP_ROLES     = ['groups', 'groupCodename' => '', 'roles'];
+    public const PATH_MESSAGES        = ['messages'];
+    public const PATH_MESSAGE_GROUP   = ['messages', 'messageCodename' => '', 'group'];
+
     /**
      * @return string
      */
@@ -38,6 +47,19 @@ class NotificationConfig extends AbstractConfig implements NotificationConfigInt
     }
 
     /**
+     * @param string $groupCodename
+     *
+     * @return bool
+     */
+    public function isSystemGroup(string $groupCodename): bool
+    {
+        $path                  = self::PATH_GROUP_IS_SYSTEM;
+        $path['groupCodename'] = $groupCodename;
+
+        return (bool)$this->get($path, true);
+    }
+
+    /**
      * @param string $messageCodename
      *
      * @return string
@@ -63,6 +85,12 @@ class NotificationConfig extends AbstractConfig implements NotificationConfigInt
 
         foreach ((array)$this->get(self::PATH_MESSAGES) as $messageCodename => $messageConfig) {
             $messageGroup = $messageConfig['group'] ?? null;
+
+            if (!$messageGroup) {
+                throw new Exception('Missing "group" in ":name" notification message config', [
+                    ':name' => $messageCodename,
+                ]);
+            }
 
             if ($messageGroup === $groupCodename) {
                 $messages[] = $messageCodename;

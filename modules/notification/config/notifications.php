@@ -15,7 +15,9 @@ return [
      */
     'groups'   => [
         TEST_NOTIFICATIONS_GROUP => [
-            \BetaKiller\Model\RoleInterface::DEVELOPER,
+            'roles' => [
+                \BetaKiller\Model\RoleInterface::DEVELOPER,
+            ],
         ],
     ],
 

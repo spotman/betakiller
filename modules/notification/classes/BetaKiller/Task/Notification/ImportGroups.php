@@ -4,12 +4,12 @@ declare(strict_types=1);
 namespace BetaKiller\Task\Notification;
 
 use BetaKiller\Config\NotificationConfigInterface;
-use BetaKiller\Log\Logger;
 use BetaKiller\Model\NotificationGroup;
 use BetaKiller\Model\NotificationGroupInterface;
 use BetaKiller\Repository\NotificationGroupRepository;
 use BetaKiller\Repository\RoleRepository;
 use BetaKiller\Task\AbstractTask;
+use Psr\Log\LoggerInterface;
 
 class ImportGroups extends AbstractTask
 {
@@ -29,7 +29,7 @@ class ImportGroups extends AbstractTask
     private $groupRepo;
 
     /**
-     * @var \BetaKiller\Log\Logger
+     * @var \Psr\Log\LoggerInterface
      */
     private $logger;
 
@@ -39,13 +39,13 @@ class ImportGroups extends AbstractTask
      * @param \BetaKiller\Repository\NotificationGroupRepository $groupRepo
      * @param \BetaKiller\Config\NotificationConfigInterface     $config
      * @param \BetaKiller\Repository\RoleRepository              $roleRepo
-     * @param \BetaKiller\Log\Logger                             $logger
+     * @param \Psr\Log\LoggerInterface                           $logger
      */
     public function __construct(
         NotificationGroupRepository $groupRepo,
         NotificationConfigInterface $config,
         RoleRepository $roleRepo,
-        Logger $logger
+        LoggerInterface $logger
     ) {
         $this->groupRepo = $groupRepo;
         $this->config    = $config;
@@ -71,64 +71,70 @@ class ImportGroups extends AbstractTask
         $groupCodenames = $this->config->getGroups();
 
         // Disable unused groups
-        foreach ($this->groupRepo->getAllEnabled() as $groupModel) {
-            if (!\in_array($groupModel->getCodename(), $groupCodenames, true)) {
+        foreach ($this->groupRepo->getAllEnabled() as $group) {
+            if (!\in_array($group->getCodename(), $groupCodenames, true)) {
                 // Disable unused group
-                $groupModel->disable();
-                $this->groupRepo->save($groupModel);
+                $group->disable();
+                $this->groupRepo->save($group);
 
                 $this->logger->info('Group ":group" was disabled', [
-                    ':group' => $groupModel->getCodename(),
+                    ':group' => $group->getCodename(),
                 ]);
             }
         }
 
         // Add new groups / re-enable existing
         foreach ($groupCodenames as $groupCodename) {
-            $groupModel = $this->groupRepo->findByCodename($groupCodename);
+            $group = $this->groupRepo->findByCodename($groupCodename);
 
-            if (!$groupModel) {
+            if (!$group) {
                 // Create new group
-                $groupModel = (new NotificationGroup())
+                $group = (new NotificationGroup())
                     ->setCodename($groupCodename)
                     ->enable();
 
-                $this->groupRepo->save($groupModel);
+                $this->groupRepo->save($group);
 
                 $this->logger->info('Group ":group" created', [
                     ':group' => $groupCodename,
                 ]);
-            } elseif (!$groupModel->isEnabled()) {
+            } elseif (!$group->isEnabled()) {
                 // Re-enable existing group
-                $groupModel->enable();
-                $this->groupRepo->save($groupModel);
+                $group->enable();
+                $this->groupRepo->save($group);
 
                 $this->logger->info('Group ":group" was re-enabled', [
-                    ':group' => $groupModel->getCodename(),
+                    ':group' => $group->getCodename(),
                 ]);
             }
 
-            $this->importGroup($groupModel);
+            $this->importGroup($group);
         }
     }
 
     /**
-     * @param \BetaKiller\Model\NotificationGroupInterface $groupModel
+     * @param \BetaKiller\Model\NotificationGroupInterface $group
      *
      * @throws \BetaKiller\Repository\RepositoryException
      */
-    private function importGroup(NotificationGroupInterface $groupModel): void
+    private function importGroup(NotificationGroupInterface $group): void
     {
-        $groupCodename = $groupModel->getCodename();
+        $groupCodename = $group->getCodename();
+
+        if ($this->config->isSystemGroup($groupCodename)) {
+            $group->markAsSystem();
+        } else {
+            $group->markAsRegular();
+        }
 
         // Get updated roles
         $rolesCodenames = $this->config->getGroupRoles($groupCodename);
 
-        // Remove unused groups
-        foreach ($groupModel->getRoles() as $currentRole) {
+        // Remove unused roles
+        foreach ($group->getRoles() as $currentRole) {
             if (!\in_array($currentRole->getName(), $rolesCodenames, true)) {
-                // Unused group => remove it
-                $groupModel->removeRole($currentRole);
+                // Unused roles => remove it
+                $group->removeRole($currentRole);
                 $this->logger->info('Role ":role" removed from group ":group"', [
                     ':role'  => $currentRole->getName(),
                     ':group' => $groupCodename,
@@ -138,15 +144,17 @@ class ImportGroups extends AbstractTask
 
         // Add new roles
         foreach ($rolesCodenames as $roleCodename) {
-            $roleModel = $this->roleRepo->getByName($roleCodename);
+            $role = $this->roleRepo->getByName($roleCodename);
 
-            if (!$groupModel->hasRole($roleModel)) {
-                $groupModel->addRole($roleModel);
+            if (!$group->hasRole($role)) {
+                $group->addRole($role);
                 $this->logger->info('Role ":role" added to group ":group"', [
                     ':role'  => $roleCodename,
                     ':group' => $groupCodename,
                 ]);
             }
         }
+
+        $this->groupRepo->save($group);
     }
 }

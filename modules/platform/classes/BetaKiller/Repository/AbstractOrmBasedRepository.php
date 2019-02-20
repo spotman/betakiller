@@ -256,4 +256,31 @@ abstract class AbstractOrmBasedRepository extends AbstractRepository
 
         return $this;
     }
+
+    /**
+     * @param \BetaKiller\Utils\Kohana\ORM\OrmInterface   $orm
+     * @param string                                      $relationName
+     * @param \BetaKiller\Model\AbstractEntityInterface[] $relatedModels
+     *
+     * @return \BetaKiller\Repository\AbstractOrmBasedRepository
+     * @throws \BetaKiller\Repository\RepositoryException
+     */
+    protected function filterRelatedMultiple(
+        OrmInterface $orm,
+        string $relationName,
+        array $relatedModels
+    ): self {
+        foreach ($relatedModels as $model) {
+            if (!$model instanceof OrmInterface) {
+                throw new RepositoryException('Related model :name must implement :must', [
+                    ':name' => \get_class($model),
+                    ':must' => OrmInterface::class,
+                ]);
+            }
+        }
+
+        $orm->filter_related_multiple($relationName, $relatedModels);
+
+        return $this;
+    }
 }

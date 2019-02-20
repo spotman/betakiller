@@ -15,7 +15,9 @@ return [
      */
     'groups'   => [
         HIT_STAT_GROUP => [
-            \BetaKiller\Model\RoleInterface::DEVELOPER,
+            'roles' => [
+                \BetaKiller\Model\RoleInterface::DEVELOPER,
+            ],
         ],
     ],
 
