@@ -10,7 +10,8 @@
     </iface>
 
     <!-- TODO вынести это всё в файл config/ifaces.php, который добавляет элементы в UrlElementTree::admin() -->
-    <iface uri="errors" name="Admin_Error_Index" parent="Admin_Index" label="Errors" menu="admin" zone="developer">
+    <iface uri="errors" name="Admin_Error_Index" parent="Admin_Index" label="Errors" menu="admin"
+           entity="PhpException" entityAction="search">
         <iface uri="{PhpException.hash}" name="Admin_Error_PhpExceptionItem"
                label="Message" title="{PhpException.message}"
                entity="PhpException" entityAction="read">
@@ -19,16 +20,15 @@
 
         <iface uri="unresolved" name="Admin_Error_UnresolvedPhpExceptionIndex" menu="admin"
                title="Unresolved PhpExceptions | Admin" label="Unresolved"
-               entity="PhpException" entityAction="listUnresolved"/>
+               entity="PhpException" entityAction="list"/>
 
         <iface uri="resolved" name="Admin_Error_ResolvedPhpExceptionIndex" menu="admin"
                title="Resolved PhpExceptions | Admin" label="Resolved"
-               entity="PhpException" entityAction="listResolved"/>
+               entity="PhpException" entityAction="list"/>
 
         <iface uri="ignored" name="Admin_Error_IgnoredPhpExceptionIndex" menu="admin"
-               title="Ignored PhpExceptions | Admin" label="Resolved"
-               entity="PhpException" entityAction="listIgnored"/>
-
+               title="Ignored PhpExceptions | Admin" label="Ignored"
+               entity="PhpException" entityAction="list"/>
     </iface>
 
     <iface uri="php-exceptions" name="Admin_Test_PhpExceptionIndex" parent="Admin_Test_Index" label="Php Exception"
