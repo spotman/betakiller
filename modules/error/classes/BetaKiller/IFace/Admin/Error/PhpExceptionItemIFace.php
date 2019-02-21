@@ -84,12 +84,12 @@ class PhpExceptionItemIFace extends AbstractErrorAdminIFace
     private function getBackIFace(PhpExceptionModelInterface $model, UrlHelper $helper): UrlElementInterface
     {
         if ($model->isIgnored()) {
-            return $helper->getUrlElementByCodename(IgnoredPhpExceptionIndexIFace::class);
+            return $helper->getUrlElementByCodename(IgnoredPhpExceptionIndexIFace::codename());
         }
 
         return $model->isResolved()
-            ? $helper->getUrlElementByCodename(ResolvedPhpExceptionIndexIFace::class)
-            : $helper->getUrlElementByCodename(UnresolvedPhpExceptionIndexIFace::class);
+            ? $helper->getUrlElementByCodename(ResolvedPhpExceptionIndexIFace::codename())
+            : $helper->getUrlElementByCodename(UnresolvedPhpExceptionIndexIFace::codename());
     }
 
     private function getHistoricalRecordData(PhpExceptionHistoryModelInterface $record): array
