@@ -11,7 +11,6 @@ use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use Thruway\Authentication\AuthenticationManager;
 use Thruway\Authentication\WampCraAuthProvider;
-use Thruway\Peer\Router;
 use Thruway\Transport\RatchetTransportProvider;
 
 class WampRouterDaemon implements DaemonInterface
@@ -86,7 +85,7 @@ class WampRouterDaemon implements DaemonInterface
         $this->router->addInternalClient($this->wampClient);
 
         // Restart every 24h coz of annoying memory leak
-        $loop->addTimer(60*1440, function() {
+        $loop->addTimer(60 * 1440, function () {
             $this->logger->info('Stopping router to prevent memory leaks');
             $this->stop();
         });

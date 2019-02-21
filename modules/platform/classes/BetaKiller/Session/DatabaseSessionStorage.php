@@ -122,16 +122,18 @@ class DatabaseSessionStorage implements SessionStorageInterface
             return $this->createSession($userAgent, $ipAddress, $originUrl);
         }
 
-        $session = $this->restoreSession($model);
+        return $this->restoreSession($model);
 
-        // Browser updated or plugin installed, potential hack
-        if (!$this->isValidSession($session, $userAgent, $request)) {
-            $this->sessionRepo->delete($model);
-
-            return $this->createSession($userAgent, $ipAddress, $originUrl);
-        }
-
-        return $session;
+// Temp fix for annoying session issues (constantly changing after browser update + inconsistent behaviour)
+//
+//        // Browser updated or plugin installed, potential hack
+//        if (!$this->isValidSession($session, $userAgent, $request)) {
+//            $this->sessionRepo->delete($model);
+//
+//            return $this->createSession($userAgent, $ipAddress, $originUrl);
+//        }
+//
+//        return $session;
     }
 
     private function isExpired(UserSession $model): bool
@@ -166,7 +168,7 @@ class DatabaseSessionStorage implements SessionStorageInterface
         \similar_text($validAgent, $userAgent, $similarity);
 
         // Check user-agent similarity
-        if ($similarity < 80) {
+        if ($similarity < 75) {
             // Warn about potential attack and restrict access
             $this->logException($this->logger, new SecurityException(
                 'User agent juggling for user ":user" with session ":token" and ":agent" (must be ":needed")', [

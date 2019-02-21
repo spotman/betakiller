@@ -121,7 +121,7 @@ class IsAlive extends AbstractTask
 
         $client = new Client($this->config->getRealmName());
         $client->addTransportProvider(new PawlTransportProvider($url));
-        $client->addClientAuthenticator(new ClientWampCraAuthenticator($authId, self::USER_AGENT));
+        $client->addClientAuthenticator(new ClientWampCraAuthenticator($authId, $authId)); // No more user-agent here
 
         $client->setAuthId($authId);
 
