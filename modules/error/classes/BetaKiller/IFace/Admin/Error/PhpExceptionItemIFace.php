@@ -2,9 +2,11 @@
 namespace BetaKiller\IFace\Admin\Error;
 
 use BetaKiller\Helper\ServerRequestHelper;
+use BetaKiller\Helper\UrlHelper;
 use BetaKiller\Model\PhpExceptionHistoryModelInterface;
 use BetaKiller\Model\PhpExceptionModelInterface;
 use BetaKiller\Repository\UserRepository;
+use BetaKiller\Url\UrlElementInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 class PhpExceptionItemIFace extends AbstractErrorAdminIFace
@@ -44,11 +46,9 @@ class PhpExceptionItemIFace extends AbstractErrorAdminIFace
 
         $urlHelper = ServerRequestHelper::getUrlHelper($request);
 
-        $unresolvedIFace = $urlHelper->getUrlElementByCodename('Admin_Error_UnresolvedPhpExceptionIndex');
-        $resolvedIFace   = $urlHelper->getUrlElementByCodename('Admin_Error_ResolvedPhpExceptionIndex');
 //        $traceIFace      = $urlHelper->getUrlElementByCodename('Admin_Error_PhpExceptionStackTrace');
 
-        $backIFace = $model->isResolved() ? $resolvedIFace : $unresolvedIFace;
+        $backIFace = $this->getBackIFace($model, $urlHelper);
 
         $history = [];
 
@@ -79,6 +79,17 @@ class PhpExceptionItemIFace extends AbstractErrorAdminIFace
             'trace'      => $trace,
             'history'    => $history,
         ];
+    }
+
+    private function getBackIFace(PhpExceptionModelInterface $model, UrlHelper $helper): UrlElementInterface
+    {
+        if ($model->isIgnored()) {
+            return $helper->getUrlElementByCodename(IgnoredPhpExceptionIndexIFace::class);
+        }
+
+        return $model->isResolved()
+            ? $helper->getUrlElementByCodename(ResolvedPhpExceptionIndexIFace::class)
+            : $helper->getUrlElementByCodename(UnresolvedPhpExceptionIndexIFace::class);
     }
 
     private function getHistoricalRecordData(PhpExceptionHistoryModelInterface $record): array

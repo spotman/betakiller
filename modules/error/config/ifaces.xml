@@ -10,18 +10,25 @@
     </iface>
 
     <!-- TODO вынести это всё в файл config/ifaces.php, который добавляет элементы в UrlElementTree::admin() -->
-    <iface uri="errors" name="Admin_Error_Index" parent="Admin_Index" title="Admin | Errors" label="Errors"
-           menu="admin" zone="developer">
-        <iface uri="php-exceptions" name="Admin_Error_UnresolvedPhpExceptionIndex"
-               title="Admin | Unresolved PhpExceptions" label="Unresolved" entity="PhpException"
-               entityAction="listUnresolved" menu="admin" zone="admin">
-            <iface uri="resolved" name="Admin_Error_ResolvedPhpExceptionIndex" title="Admin | Resolved PhpExceptions"
-                   label="Resolved" entity="PhpException" entityAction="listResolved" menu="admin"/>
-            <iface uri="{PhpException.hash}" name="Admin_Error_PhpExceptionItem" label="Message"
-                   title="{PhpException.message}" entity="PhpException" entityAction="read">
-                <!--<iface uri="stacktrace" name="Admin_Error_PhpExceptionStackTrace" label="Stacktrace" layout="raw"/>-->
-            </iface>
+    <iface uri="errors" name="Admin_Error_Index" parent="Admin_Index" label="Errors" menu="admin" zone="developer">
+        <iface uri="{PhpException.hash}" name="Admin_Error_PhpExceptionItem"
+               label="Message" title="{PhpException.message}"
+               entity="PhpException" entityAction="read">
+            <!--<iface uri="stacktrace" name="Admin_Error_PhpExceptionStackTrace" label="Stacktrace" layout="raw"/>-->
         </iface>
+
+        <iface uri="unresolved" name="Admin_Error_UnresolvedPhpExceptionIndex" menu="admin"
+               title="Unresolved PhpExceptions | Admin" label="Unresolved"
+               entity="PhpException" entityAction="listUnresolved"/>
+
+        <iface uri="resolved" name="Admin_Error_ResolvedPhpExceptionIndex" menu="admin"
+               title="Resolved PhpExceptions | Admin" label="Resolved"
+               entity="PhpException" entityAction="listResolved"/>
+
+        <iface uri="ignored" name="Admin_Error_IgnoredPhpExceptionIndex" menu="admin"
+               title="Ignored PhpExceptions | Admin" label="Resolved"
+               entity="PhpException" entityAction="listIgnored"/>
+
     </iface>
 
     <iface uri="php-exceptions" name="Admin_Test_PhpExceptionIndex" parent="Admin_Test_Index" label="Php Exception"

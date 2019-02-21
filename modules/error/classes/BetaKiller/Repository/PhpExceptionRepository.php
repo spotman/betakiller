@@ -50,6 +50,19 @@ class PhpExceptionRepository extends AbstractOrmBasedDispatchableRepository
     /**
      * @return PhpExceptionModelInterface[]
      */
+    public function getIgnoredPhpExceptions(): array
+    {
+        $orm = $this->getOrmInstance();
+
+        return $this
+            ->filterIgnored($orm)
+            ->orderByLastSeenAt($orm)
+            ->findAll($orm);
+    }
+
+    /**
+     * @return PhpExceptionModelInterface[]
+     */
     public function getRequiredNotification(): array
     {
         $orm = $this->getOrmInstance();
@@ -98,9 +111,10 @@ class PhpExceptionRepository extends AbstractOrmBasedDispatchableRepository
      */
     private function filterUnresolved(OrmInterface $orm): PhpExceptionRepository
     {
-        $orm->where('resolved_by', 'IS', null);
-
-        return $this;
+        return $this->filterStatuses($orm, [
+            PhpExceptionModelInterface::STATE_NEW,
+            PhpExceptionModelInterface::STATE_REPEATED,
+        ]);
     }
 
     /**
@@ -110,9 +124,16 @@ class PhpExceptionRepository extends AbstractOrmBasedDispatchableRepository
      */
     private function filterResolved(OrmInterface $orm): PhpExceptionRepository
     {
-        $orm->where('resolved_by', 'IS NOT', null);
+        return $this->filterStatuses($orm, [
+            PhpExceptionModelInterface::STATE_RESOLVED,
+        ]);
+    }
 
-        return $this;
+    private function filterIgnored(OrmInterface $orm): PhpExceptionRepository
+    {
+        return $this->filterStatuses($orm, [
+            PhpExceptionModelInterface::STATE_IGNORED,
+        ]);
     }
 
     /**
