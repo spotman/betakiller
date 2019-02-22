@@ -77,22 +77,22 @@ class UrlDispatcher implements UrlDispatcherInterface
         // Creating URL iterator
         $urlIterator = new UrlPathIterator($uri);
 
-        $parentModel = null;
+        $parent = null;
 
         try {
             // Dispatch childs
             // Loop through every uri part and initialize it`s iface
             do {
-                $urlElement = $this->detectUrlElement($urlIterator, $urlParams, $parentModel);
+                $urlElement = $this->detectUrlElement($urlIterator, $urlParams, $parent);
 
-                $parentModel = $urlElement;
+                $parent = $urlElement;
 
                 $stack->push($urlElement);
 
                 $urlIterator->next();
             } while ($urlIterator->valid());
         } catch (UrlBehaviourException $e) {
-            throw new MissingUrlElementException($parentModel, false, $e);
+            throw new MissingUrlElementException($parent, false, $e);
         }
     }
 
@@ -141,27 +141,6 @@ class UrlDispatcher implements UrlDispatcherInterface
 
         return $urlElement;
     }
-//
-//    /**
-//     * @param \BetaKiller\Url\UrlElementInterface|null $parentModel
-//     *
-//     * @return \BetaKiller\Url\IFaceModelInterface|null
-//     * @throws \BetaKiller\IFace\Exception\UrlElementException
-//     */
-//    private function searchFor404IFaceInBranch(?UrlElementInterface $parentModel = null): ?UrlElementInterface
-//    {
-//        $items = $parentModel
-//            ? $this->tree->getReverseBreadcrumbsIterator($parentModel)
-//            : $this->tree->getRoot();
-//
-//        foreach ($items as $item) {
-//            if (strpos($item->getCodename(), 'Error404') !== false) {
-//                return $item;
-//            }
-//        }
-//
-//        return null;
-//    }
 
     /**
      * @param \BetaKiller\Url\UrlElementInterface[] $models

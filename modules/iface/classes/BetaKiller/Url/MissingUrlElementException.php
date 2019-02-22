@@ -32,7 +32,7 @@ class MissingUrlElementException extends UrlElementException
         $this->parentElement = $parentElement;
         $this->redirect      = (bool)$redirectToParent;
 
-        parent::__construct('', null, 0, $previous);
+        parent::__construct('', null, 404, $previous);
     }
 
     /**

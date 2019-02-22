@@ -6,6 +6,7 @@ namespace BetaKiller\Middleware;
 use BetaKiller\Exception;
 use BetaKiller\Exception\HttpExceptionInterface;
 use BetaKiller\ExceptionInterface;
+use BetaKiller\Factory\IFaceFactory;
 use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\Helper\I18nHelper;
 use BetaKiller\Helper\LoggerHelperTrait;
@@ -13,7 +14,9 @@ use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\IFace\AbstractHttpErrorIFace;
 use BetaKiller\IFace\IFaceInterface;
-use BetaKiller\IFace\IFaceProvider;
+use BetaKiller\Url\IFaceModelInterface;
+use BetaKiller\Url\UrlElementInterface;
+use BetaKiller\Url\UrlElementTreeInterface;
 use BetaKiller\View\IFaceView;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -25,11 +28,6 @@ use Zend\Diactoros\Response\HtmlResponse;
 class ErrorPageMiddleware implements MiddlewareInterface
 {
     use LoggerHelperTrait;
-
-    /**
-     * @var \BetaKiller\IFace\IFaceProvider
-     */
-    private $ifaceProvider;
 
     /**
      * @var \BetaKiller\Helper\AppEnvInterface
@@ -47,23 +45,36 @@ class ErrorPageMiddleware implements MiddlewareInterface
     private $logger;
 
     /**
+     * @var \BetaKiller\Url\UrlElementTreeInterface
+     */
+    private $tree;
+
+    /**
+     * @var \BetaKiller\Factory\IFaceFactory
+     */
+    private $ifaceFactory;
+
+    /**
      * ErrorPageMiddleware constructor.
      *
-     * @param \BetaKiller\IFace\IFaceProvider    $ifaceProvider
-     * @param \BetaKiller\Helper\AppEnvInterface $appEnv
-     * @param \BetaKiller\View\IFaceView         $ifaceView
-     * @param \Psr\Log\LoggerInterface           $logger
+     * @param \BetaKiller\Url\UrlElementTreeInterface $tree
+     * @param \BetaKiller\Factory\IFaceFactory        $ifaceFactory
+     * @param \BetaKiller\Helper\AppEnvInterface      $appEnv
+     * @param \BetaKiller\View\IFaceView              $ifaceView
+     * @param \Psr\Log\LoggerInterface                $logger
      */
     public function __construct(
-        IFaceProvider $ifaceProvider,
+        UrlElementTreeInterface $tree,
+        IFaceFactory $ifaceFactory,
         AppEnvInterface $appEnv,
         IFaceView $ifaceView,
         LoggerInterface $logger
     ) {
-        $this->ifaceProvider = $ifaceProvider;
-        $this->appEnv        = $appEnv;
-        $this->ifaceView     = $ifaceView;
-        $this->logger        = $logger;
+        $this->appEnv       = $appEnv;
+        $this->ifaceView    = $ifaceView;
+        $this->logger       = $logger;
+        $this->tree         = $tree;
+        $this->ifaceFactory = $ifaceFactory;
     }
 
     /**
@@ -142,8 +153,11 @@ class ErrorPageMiddleware implements MiddlewareInterface
 
         $httpCode = $this->getErrorHttpCode($exception);
 
+        $stack = ServerRequestHelper::getUrlElementStack($request);
+        $last  = $stack->hasCurrent() ? $stack->getCurrent() : null;
+
         try {
-            $iface = $this->getErrorIFaceForCode($httpCode);
+            $iface = $this->getErrorIFaceForCode($httpCode, $last);
 
             if ($iface instanceof AbstractHttpErrorIFace) {
                 $iface->setException($exception);
@@ -183,38 +197,69 @@ class ErrorPageMiddleware implements MiddlewareInterface
     }
 
     /**
-     * @param int $code
+     * @param int                                      $code
+     * @param \BetaKiller\Url\UrlElementInterface|null $lastElement
      *
      * @return \BetaKiller\IFace\IFaceInterface|null
+     * @throws \BetaKiller\Factory\FactoryException
      */
-    private function getErrorIFaceForCode(int $code): ?IFaceInterface
+    private function getErrorIFaceForCode(int $code, ?UrlElementInterface $lastElement): ?IFaceInterface
     {
-        // Try to find IFace provided code first and use default IFace if failed
-        foreach ([$code, ExceptionInterface::DEFAULT_EXCEPTION_CODE] as $tryCode) {
-            $iface = $this->createErrorIFaceFromCode($tryCode);
+        $model = $this->searchErrorIFaceInBranch($code, $lastElement);
 
-            if ($iface) {
-                return $iface;
-            }
-        }
-
-        return null;
+        return $model
+            ? $this->ifaceFactory->createFromUrlElement($model)
+            : null;
     }
 
     /**
-     * @param int $code
+     * @param int                                      $code
+     * @param \BetaKiller\Url\UrlElementInterface|null $parent
      *
      * @return \BetaKiller\IFace\IFaceInterface|null
      */
-    private function createErrorIFaceFromCode(int $code): ?IFaceInterface
+    private function searchErrorIFaceInBranch(int $code, ?UrlElementInterface $parent): ?IFaceModelInterface
     {
         try {
-            return $this->ifaceProvider->fromCodename('HttpError'.$code);
+            do {
+                $layer = $parent
+                    ? $this->tree->getChildren($parent)
+                    : $this->tree->getRoot();
+
+                foreach ($layer as $item) {
+                    if (!$item instanceof IFaceModelInterface) {
+                        continue;
+                    }
+
+                    // Try to find IFace provided code first and use default IFace if failed
+                    foreach ([$code, ExceptionInterface::DEFAULT_EXCEPTION_CODE] as $tryCode) {
+                        if (strpos($item->getCodename(), 'Error'.$tryCode) !== false) {
+                            return $item;
+                        }
+                    }
+                }
+
+                if ($parent) {
+                    $parent = $this->tree->getParent($parent);
+                }
+            } while ($parent);
+
+            // Try to find IFace provided code first and use default IFace if failed
+            foreach ([$code, ExceptionInterface::DEFAULT_EXCEPTION_CODE] as $tryCode) {
+                $codename = 'HttpError'.$tryCode;
+                if ($this->tree->has($codename)) {
+                    $item = $this->tree->getByCodename($codename);
+
+                    if ($item instanceof IFaceModelInterface) {
+                        return $item;
+                    }
+                }
+            }
         } catch (\Throwable $e) {
             $this->logException($this->logger, $e);
-
-            return null;
         }
+
+        return null;
     }
 
     /**
