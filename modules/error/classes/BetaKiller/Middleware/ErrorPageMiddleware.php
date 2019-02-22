@@ -205,11 +205,16 @@ class ErrorPageMiddleware implements MiddlewareInterface
      */
     private function getErrorIFaceForCode(int $code, ?UrlElementInterface $lastElement): ?IFaceInterface
     {
-        $model = $this->searchErrorIFaceInBranch($code, $lastElement);
+        // Try to find IFace provided code first and use default IFace if failed
+        foreach ([$code, ExceptionInterface::DEFAULT_EXCEPTION_CODE] as $tryCode) {
+            $model = $this->searchErrorIFaceInBranch($tryCode, $lastElement);
 
-        return $model
-            ? $this->ifaceFactory->createFromUrlElement($model)
-            : null;
+            if ($model) {
+              return $this->ifaceFactory->createFromUrlElement($model);
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -221,6 +226,7 @@ class ErrorPageMiddleware implements MiddlewareInterface
     private function searchErrorIFaceInBranch(int $code, ?UrlElementInterface $parent): ?IFaceModelInterface
     {
         try {
+            // Try to find dedicated IFace first
             do {
                 $layer = $parent
                     ? $this->tree->getChildren($parent)
@@ -231,11 +237,8 @@ class ErrorPageMiddleware implements MiddlewareInterface
                         continue;
                     }
 
-                    // Try to find IFace provided code first and use default IFace if failed
-                    foreach ([$code, ExceptionInterface::DEFAULT_EXCEPTION_CODE] as $tryCode) {
-                        if (strpos($item->getCodename(), 'Error'.$tryCode) !== false) {
-                            return $item;
-                        }
+                    if (strpos($item->getCodename(), 'Error'.$code) !== false) {
+                        return $item;
                     }
                 }
 
@@ -244,15 +247,14 @@ class ErrorPageMiddleware implements MiddlewareInterface
                 }
             } while ($parent);
 
-            // Try to find IFace provided code first and use default IFace if failed
-            foreach ([$code, ExceptionInterface::DEFAULT_EXCEPTION_CODE] as $tryCode) {
-                $codename = 'HttpError'.$tryCode;
-                if ($this->tree->has($codename)) {
-                    $item = $this->tree->getByCodename($codename);
+            // Use default IFace if failed
+            $codename = 'HttpError'.$code;
 
-                    if ($item instanceof IFaceModelInterface) {
-                        return $item;
-                    }
+            if ($this->tree->has($codename)) {
+                $item = $this->tree->getByCodename($codename);
+
+                if ($item instanceof IFaceModelInterface) {
+                    return $item;
                 }
             }
         } catch (\Throwable $e) {
