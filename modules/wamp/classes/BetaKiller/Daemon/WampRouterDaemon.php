@@ -85,9 +85,10 @@ class WampRouterDaemon implements DaemonInterface
         $this->router->addInternalClient($this->wampClient);
 
         // Restart every 24h coz of annoying memory leak
-        $loop->addTimer(60 * 1440, function () {
+        $loop->addTimer(60 * 1440, function () use ($loop) {
             $this->logger->info('Stopping router to prevent memory leaks');
             $this->stop();
+            $loop->stop();
         });
 
         // Prepare to start (loop would be launched by the Run task)
