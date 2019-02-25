@@ -3,6 +3,8 @@ namespace BetaKiller\Log;
 
 use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\Helper\LoggerHelperTrait;
+use Egeniq\Monolog\Gdpr\Processor\RedactEmailProcessor;
+use Egeniq\Monolog\Gdpr\Processor\RedactIpProcessor;
 use Monolog\ErrorHandler;
 use Monolog\Handler\FingersCrossedHandler;
 use Monolog\Handler\HandlerInterface;
@@ -61,6 +63,20 @@ class Logger implements LoggerInterface
         $isDebug = $this->appEnv->isDebugEnabled();
         $isHuman = $this->appEnv->isHuman();
 
+        if (!$isDebug) {
+            // GDPR processors first
+            $emailRedact = new RedactEmailProcessor();
+            $ipRedact = new RedactIpProcessor();
+            $monolog->pushProcessor($emailRedact);
+            $monolog->pushProcessor($ipRedact);
+        }
+
+        // Common processors next
+        $monolog
+            ->pushProcessor(new KohanaPlaceholderProcessor())
+            ->pushProcessor(new MemoryPeakUsageProcessor())
+            ->pushProcessor(new IntrospectionProcessor($monolog::WARNING));
+
         // CLI mode logging
         if ($this->appEnv->isCli()) {
             $level = $isDebug ? \Monolog\Logger::DEBUG : \Monolog\Logger::INFO;
@@ -92,12 +108,6 @@ class Logger implements LoggerInterface
         $fileHandler->pushProcessor(new ContextCleanupProcessor);
         $fileHandler->pushProcessor(new ExceptionStacktraceProcessor);
         $monolog->pushHandler(new FilterExceptionsHandler(new FingersCrossedHandler($fileHandler, $logsLevel)));
-
-        // Common processors
-        $monolog
-            ->pushProcessor(new KohanaPlaceholderProcessor())
-            ->pushProcessor(new MemoryPeakUsageProcessor())
-            ->pushProcessor(new IntrospectionProcessor($monolog::WARNING));
 
         return $monolog;
     }
