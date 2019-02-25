@@ -5,9 +5,9 @@ use BetaKiller\Exception\HttpException;
 
 class AccessDeniedException extends HttpException
 {
-    public function __construct()
+    public function __construct(string $message = null)
     {
-        parent::__construct(403);
+        parent::__construct(403, $message);
     }
 
     /**
