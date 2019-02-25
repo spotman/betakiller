@@ -6,8 +6,10 @@ use BetaKiller\Helper\LoggerHelperTrait;
 use Egeniq\Monolog\Gdpr\Processor\RedactEmailProcessor;
 use Egeniq\Monolog\Gdpr\Processor\RedactIpProcessor;
 use Monolog\ErrorHandler;
+use Monolog\Handler\DeduplicationHandler;
 use Monolog\Handler\FingersCrossedHandler;
 use Monolog\Handler\HandlerInterface;
+use Monolog\Handler\SlackWebhookHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Processor\IntrospectionProcessor;
 use Monolog\Processor\MemoryPeakUsageProcessor;
@@ -108,6 +110,25 @@ class Logger implements LoggerInterface
         $fileHandler->pushProcessor(new ContextCleanupProcessor);
         $fileHandler->pushProcessor(new ExceptionStacktraceProcessor);
         $monolog->pushHandler(new FilterExceptionsHandler(new FingersCrossedHandler($fileHandler, $logsLevel)));
+
+        $slackUrl = $this->appEnv->getEnvVariable('SLACK_ERROR_WEBHOOK');
+        $slackHandler = new SlackWebhookHandler(
+            $slackUrl,
+            null,
+            'Errors Bot',
+            true,
+            ':interrobang:',
+            true,
+            true,
+            \Monolog\Logger::WARNING
+        );
+        $slackHandler->pushProcessor(new ContextCleanupProcessor);
+
+        $monolog->pushHandler(new DeduplicationHandler(
+            $slackHandler,
+            null,
+            \Monolog\Logger::WARNING
+        ));
 
         return $monolog;
     }
