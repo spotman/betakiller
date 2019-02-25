@@ -111,24 +111,26 @@ class Logger implements LoggerInterface
         $fileHandler->pushProcessor(new ExceptionStacktraceProcessor);
         $monolog->pushHandler(new FilterExceptionsHandler(new FingersCrossedHandler($fileHandler, $logsLevel)));
 
-        $slackUrl = $this->appEnv->getEnvVariable('SLACK_ERROR_WEBHOOK');
-        $slackHandler = new SlackWebhookHandler(
-            $slackUrl,
-            null,
-            'Errors Bot',
-            true,
-            ':interrobang:',
-            true,
-            true,
-            \Monolog\Logger::WARNING
-        );
-        $slackHandler->pushProcessor(new ContextCleanupProcessor);
+        if (!$this->appEnv->inDevelopmentMode()) {
+            $slackUrl = $this->appEnv->getEnvVariable('SLACK_ERROR_WEBHOOK');
+            $slackHandler = new SlackWebhookHandler(
+                $slackUrl,
+                null,
+                'Errors Bot',
+                true,
+                ':interrobang:',
+                true,
+                true,
+                \Monolog\Logger::WARNING
+            );
+            $slackHandler->pushProcessor(new ContextCleanupProcessor);
 
-        $monolog->pushHandler(new DeduplicationHandler(
-            $slackHandler,
-            null,
-            \Monolog\Logger::WARNING
-        ));
+            $monolog->pushHandler(new DeduplicationHandler(
+                $slackHandler,
+                null,
+                \Monolog\Logger::WARNING
+            ));
+        }
 
         return $monolog;
     }
