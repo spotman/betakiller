@@ -68,7 +68,7 @@ class Logger implements LoggerInterface
         if (!$isDebug) {
             // GDPR processors first
             $emailRedact = new RedactEmailProcessor();
-            $ipRedact = new RedactIpProcessor();
+            $ipRedact    = new RedactIpProcessor();
             $monolog->pushProcessor($emailRedact);
             $monolog->pushProcessor($ipRedact);
         }
@@ -112,7 +112,7 @@ class Logger implements LoggerInterface
         $monolog->pushHandler(new FilterExceptionsHandler(new FingersCrossedHandler($fileHandler, $logsLevel)));
 
         if (!$this->appEnv->inDevelopmentMode()) {
-            $slackUrl = $this->appEnv->getEnvVariable('SLACK_ERROR_WEBHOOK');
+            $slackUrl     = $this->appEnv->getEnvVariable('SLACK_ERROR_WEBHOOK');
             $slackHandler = new SlackWebhookHandler(
                 $slackUrl,
                 null,
@@ -125,10 +125,18 @@ class Logger implements LoggerInterface
             );
             $slackHandler->pushProcessor(new ContextCleanupProcessor);
 
+            $slackStorage = implode('.', [
+                'monolog-slack',
+                $this->appEnv->getAppCodename(),
+                $this->appEnv->getModeName(),
+                $this->appEnv->getRevisionKey(),
+                'log',
+            ]);
             $monolog->pushHandler(new DeduplicationHandler(
                 $slackHandler,
-                null,
-                \Monolog\Logger::WARNING
+                $this->appEnv->getTempPath().\DIRECTORY_SEPARATOR.$slackStorage,
+                \Monolog\Logger::WARNING,
+                300 // Repeat notification in 5 minutes
             ));
         }
 
