@@ -81,12 +81,7 @@ class Deploy extends AbstractTask
                 throw new \RuntimeException(sprintf('Directory "%s" was not created', $targetBaseDir));
             }
 
-            $deployed = symlink($original, $target);
-
-            $this->logger->debug('Symlink created from :from to :to', [
-                ':from' => $original,
-                ':to'   => $target,
-            ]);
+            $deployed = @symlink($original, $target);
 
             if (!$deployed) {
                 throw new TaskException('Can not deploy file :original to :target', [
@@ -94,6 +89,11 @@ class Deploy extends AbstractTask
                     ':target'   => $target,
                 ]);
             }
+
+            $this->logger->debug('Symlink created from :from to :to', [
+                ':from' => $original,
+                ':to'   => $target,
+            ]);
         }
     }
 }
