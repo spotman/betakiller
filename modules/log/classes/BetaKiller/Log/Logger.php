@@ -3,8 +3,6 @@ namespace BetaKiller\Log;
 
 use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\Helper\LoggerHelperTrait;
-use Egeniq\Monolog\Gdpr\Processor\RedactEmailProcessor;
-use Egeniq\Monolog\Gdpr\Processor\RedactIpProcessor;
 use Monolog\ErrorHandler;
 use Monolog\Handler\DeduplicationHandler;
 use Monolog\Handler\FingersCrossedHandler;
@@ -67,10 +65,7 @@ class Logger implements LoggerInterface
 
         if (!$isDebug) {
             // GDPR processors first
-            $emailRedact = new RedactEmailProcessor();
-            $ipRedact    = new RedactIpProcessor();
-            $monolog->pushProcessor($emailRedact);
-            $monolog->pushProcessor($ipRedact);
+            $monolog->pushProcessor(new GdprProcessor());
         }
 
         // Common processors next
