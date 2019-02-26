@@ -19,7 +19,6 @@ use DebugBar\DataCollector\MemoryCollector;
 use DebugBar\DataCollector\TimeDataCollector;
 use DebugBar\DebugBar;
 use DebugBar\JavascriptRenderer;
-use DebugBar\Storage\FileStorage;
 use Monolog\Handler\PHPConsoleHandler;
 use PhpConsole\Connector;
 use PhpConsole\Storage\File;
@@ -144,8 +143,9 @@ class DebugMiddleware implements MiddlewareInterface
             ->addCollector(new DebugBarCookiesDataCollector($this->cookieHelper, $request))
             ->addCollector(new MemoryCollector());
 
+        // Temporary disable storage for testing purposes
         // Storage for processing data for AJAX calls and redirects
-        $debugBar->setStorage(new FileStorage($this->appEnv->getTempPath()));
+        // $debugBar->setStorage(new FileStorage($this->appEnv->getTempPath()));
 
         // Initialize profiler with DebugBar instance and enable it
         ServerRequestHelper::getProfiler($request)->enable($debugBar);
