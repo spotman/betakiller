@@ -38,7 +38,7 @@ class Start extends AbstractTask
     {
         $this->appEnv      = $appEnv;
         $this->lockFactory = $lockFactory;
-        $this->logger = $logger;
+        $this->logger      = $logger;
 
         parent::__construct();
     }
@@ -52,7 +52,7 @@ class Start extends AbstractTask
     public function defineOptions(): array
     {
         return [
-            'name' => null,
+            'name'           => null,
             'ignore-running' => false,
         ];
     }
@@ -91,7 +91,8 @@ class Start extends AbstractTask
         $docRoot = $this->appEnv->getDocRootPath();
 
         $this->logger->debug('Starting ":name" daemon with :cmd', [
-            ':cmd' => $cmd,
+            ':name' => $name,
+            ':cmd'  => $cmd,
         ]);
 
         $process = Process::fromShellCommandline($cmd, $docRoot);
@@ -102,6 +103,11 @@ class Start extends AbstractTask
             ->disableOutput()
             ->setIdleTimeout(null)
             ->start();
+
+        $this->logger->debug('Waiting for lock to be acquired by ":name" daemon', [
+            ':name' => $name,
+            ':cmd'  => $cmd,
+        ]);
 
         // Ensure daemon was started
         $lock->waitForAcquire(Runner::START_TIMEOUT + 1);
