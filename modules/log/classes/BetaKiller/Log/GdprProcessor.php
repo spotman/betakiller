@@ -19,8 +19,7 @@ class GdprProcessor
     public function __construct()
     {
         $this->processors = [
-            new RedactEmailProcessor(),
-            new RedactIpProcessor(),
+            // TODO json serialization brakes monolog logic, we need to find another way to exclude sensitive data
         ];
     }
 
