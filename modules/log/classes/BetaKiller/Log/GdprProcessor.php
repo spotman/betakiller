@@ -3,9 +3,6 @@ declare(strict_types=1);
 
 namespace BetaKiller\Log;
 
-use Egeniq\Monolog\Gdpr\Processor\RedactEmailProcessor;
-use Egeniq\Monolog\Gdpr\Processor\RedactIpProcessor;
-
 class GdprProcessor
 {
     /**

@@ -23,7 +23,6 @@
     "doctrine/annotations": "^1.2",
     "doctrine/cache": "^1.6",
     "dragonmantank/cron-expression": "^2.0",
-    "egeniq/monolog-gdpr": "^1.0",
     "graze/console-diff-renderer": "^0.6.2",
     "graze/parallel-process": "^0.8",
     "guzzlehttp/guzzle": "~6.0",
