@@ -74,8 +74,9 @@ abstract class AbstractTask extends Minion_Task
         }
 
         if ($detach) {
+            // @see https://stackoverflow.com/a/29172
             // Process will become a "zombie" without "exec" call so use this function with care
-            $cmd .= ' &';
+            $cmd = 'nohup '.$cmd.' < /dev/null &';
         } else {
             // "exec" call removes shell wrapping and simplifies process signaling
             $cmd = 'exec '.$cmd;
