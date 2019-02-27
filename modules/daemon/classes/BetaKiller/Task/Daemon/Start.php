@@ -102,7 +102,7 @@ class Start extends AbstractTask
             ->setTimeout(null)
             ->disableOutput()
             ->setIdleTimeout(null)
-            ->start();
+            ->mustRun();
 
         $this->logger->debug('Waiting for lock to be acquired by ":name" daemon', [
             ':name' => $name,
