@@ -63,10 +63,10 @@ class Logger implements LoggerInterface
         $isDebug = $this->appEnv->isDebugEnabled();
         $isHuman = $this->appEnv->isHuman();
 
-        if (!$isDebug) {
-            // GDPR processors first
-            $monolog->pushProcessor(new GdprProcessor());
-        }
+//        if (!$isDebug) {
+//            // GDPR processors first
+//            $monolog->pushProcessor(new GdprProcessor());
+//        }
 
         // Common processors next
         $monolog
@@ -127,10 +127,11 @@ class Logger implements LoggerInterface
                 $this->appEnv->getRevisionKey(),
                 'log',
             ]);
+
             $monolog->pushHandler(new DeduplicationHandler(
                 $slackHandler,
                 $this->appEnv->getTempPath().\DIRECTORY_SEPARATOR.$slackStorage,
-                \Monolog\Logger::NOTICE,
+                \Monolog\Logger::WARNING,
                 300 // Repeat notification in 5 minutes
             ));
         }
