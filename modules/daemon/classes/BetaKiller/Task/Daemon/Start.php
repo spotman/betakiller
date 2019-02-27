@@ -114,5 +114,8 @@ class Start extends AbstractTask
         $this->logger->debug('Daemon ":name" was successfully started', [
             ':name' => $name,
         ]);
+
+        // Double kill
+        exit(0);
     }
 }
