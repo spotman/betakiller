@@ -8,7 +8,6 @@ use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\Task\AbstractTask;
 use BetaKiller\Task\TaskException;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Process\Process;
 
 class Start extends AbstractTask
 {
@@ -95,14 +94,14 @@ class Start extends AbstractTask
             ':cmd'  => $cmd,
         ]);
 
-        $process = Process::fromShellCommandline($cmd, $docRoot);
+        // Start daemon runner and detach it
+        pclose(popen("cd $docRoot && $cmd", 'r'));
 
-        // Execute supervisor and detach it
-        $process
-            ->setTimeout(null)
-            ->disableOutput()
-            ->setIdleTimeout(null)
-            ->start();
+//        Process::fromShellCommandline($cmd, $docRoot)
+//            ->setTimeout(null)
+//            ->disableOutput()
+//            ->setIdleTimeout(null)
+//            ->start();
 
         $this->logger->debug('Waiting for lock to be acquired by ":name" daemon', [
             ':name' => $name,
