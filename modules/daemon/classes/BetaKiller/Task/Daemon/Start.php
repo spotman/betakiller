@@ -102,5 +102,8 @@ class Start extends AbstractTask
             ->disableOutput()
             ->setIdleTimeout(null)
             ->start();
+
+        // Ensure daemon was started
+        $lock->waitForAcquire(Runner::START_TIMEOUT + 1);
     }
 }
