@@ -106,7 +106,7 @@ class Runner extends AbstractTask
 
         // Check if it is running already and exit if so
         if ($this->lock->isAcquired()) {
-            $this->logger->debug('Daemon ":name" is already running', [
+            $this->logger->warning('Daemon ":name" is already running', [
                 ':name' => $this->codename,
             ]);
 

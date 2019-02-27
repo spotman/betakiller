@@ -7,6 +7,7 @@ use BetaKiller\Daemon\LockFactory;
 use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\Task\AbstractTask;
 use BetaKiller\Task\TaskException;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Process\Process;
 
 class Start extends AbstractTask
@@ -22,15 +23,22 @@ class Start extends AbstractTask
     private $lockFactory;
 
     /**
+     * @var \Psr\Log\LoggerInterface
+     */
+    private $logger;
+
+    /**
      * Start constructor.
      *
      * @param \BetaKiller\Daemon\LockFactory     $lockFactory
      * @param \BetaKiller\Helper\AppEnvInterface $appEnv
+     * @param \Psr\Log\LoggerInterface           $logger
      */
-    public function __construct(LockFactory $lockFactory, AppEnvInterface $appEnv)
+    public function __construct(LockFactory $lockFactory, AppEnvInterface $appEnv, LoggerInterface $logger)
     {
         $this->appEnv      = $appEnv;
         $this->lockFactory = $lockFactory;
+        $this->logger = $logger;
 
         parent::__construct();
     }
@@ -71,11 +79,20 @@ class Start extends AbstractTask
             ]);
         }
 
+        // Cleanup stale lock
+        if ($lock->isAcquired()) {
+            $lock->release();
+        }
+
         $cmd = self::getTaskCmd($this->appEnv, 'daemon:runner', [
             'name' => $name,
         ], false, true);
 
         $docRoot = $this->appEnv->getDocRootPath();
+
+        $this->logger->debug('Starting ":name" daemon with :cmd', [
+            ':cmd' => $cmd,
+        ]);
 
         $process = Process::fromShellCommandline($cmd, $docRoot);
 
@@ -84,6 +101,6 @@ class Start extends AbstractTask
             ->setTimeout(null)
             ->disableOutput()
             ->setIdleTimeout(null)
-            ->mustRun();
+            ->start();
     }
 }
