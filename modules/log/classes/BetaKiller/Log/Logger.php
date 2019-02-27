@@ -128,12 +128,12 @@ class Logger implements LoggerInterface
                 'log',
             ]);
 
-            $monolog->pushHandler(new DeduplicationHandler(
+            $monolog->pushHandler(new FilterExceptionsHandler(new DeduplicationHandler(
                 $slackHandler,
                 $this->appEnv->getTempPath().\DIRECTORY_SEPARATOR.$slackStorage,
                 \Monolog\Logger::WARNING,
                 300 // Repeat notification in 5 minutes
-            ));
+            )));
         }
 
         return $monolog;
