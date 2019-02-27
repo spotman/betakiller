@@ -13,7 +13,7 @@ abstract class Minion_Task extends Kohana_Minion_Task
         $this->_options['stage'] = 'development';
 
         // Migrations can be executed with --debug option
-        $this->_options['debug'] = null;
+        $this->_options['debug'] = false;
 
         parent::__construct();
     }
