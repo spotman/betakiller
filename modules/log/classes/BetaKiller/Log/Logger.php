@@ -116,7 +116,7 @@ class Logger implements LoggerInterface
                 ':interrobang:',
                 true,
                 true,
-                \Monolog\Logger::WARNING
+                \Monolog\Logger::NOTICE
             );
             $slackHandler->pushProcessor(new ContextCleanupProcessor);
 
@@ -130,7 +130,7 @@ class Logger implements LoggerInterface
             $monolog->pushHandler(new DeduplicationHandler(
                 $slackHandler,
                 $this->appEnv->getTempPath().\DIRECTORY_SEPARATOR.$slackStorage,
-                \Monolog\Logger::WARNING,
+                \Monolog\Logger::NOTICE,
                 300 // Repeat notification in 5 minutes
             ));
         }
