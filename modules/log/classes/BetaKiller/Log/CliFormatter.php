@@ -1,8 +1,5 @@
 <?php
-
-
 namespace BetaKiller\Log;
-
 
 use Bramus\Monolog\Formatter\ColoredLineFormatter;
 use Bramus\Monolog\Formatter\ColorSchemes\DefaultScheme;
@@ -24,7 +21,7 @@ class CliFormatter extends ColoredLineFormatter
     /**
      * {@inheritdoc}
      */
-    public function format(array $record)
+    public function format(array $record): string
     {
         $output = parent::format($record);
 
