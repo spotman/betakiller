@@ -110,5 +110,9 @@ class Start extends AbstractTask
 
         // Ensure daemon was started
         $lock->waitForAcquire(Runner::START_TIMEOUT + 1);
+
+        $this->logger->debug('Daemon ":name" was successfully started', [
+            ':name' => $name,
+        ]);
     }
 }
