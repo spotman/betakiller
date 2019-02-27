@@ -6,16 +6,16 @@ namespace BetaKiller\Daemon;
 use BetaKiller\Task\TaskException;
 use React\EventLoop\LoopInterface;
 
-class FailingDaemon implements DaemonInterface
+class DebugFailingDaemon implements DaemonInterface
 {
-    public const CODENAME = 'Failing';
+    public const CODENAME = 'DebugFailing';
 
     public function start(LoopInterface $loop): void
     {
         // Test start
-        echo 'Starting Failing daemon...';
+        echo 'Starting DebugFailing daemon...';
         sleep(2);
-        echo 'Failed!'.\PHP_EOL;
+        echo 'OK!'.\PHP_EOL;
 
         throw new TaskException('Failing daemon was obviously failed');
     }
@@ -23,7 +23,7 @@ class FailingDaemon implements DaemonInterface
     public function stop(): void
     {
         // Test stop
-        echo 'Stopping Sleep daemon...';
+        echo 'Stopping DebugFailing daemon...';
         sleep(1);
         echo 'OK'.\PHP_EOL;
     }

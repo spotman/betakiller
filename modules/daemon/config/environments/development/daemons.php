@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 return [
-//    \BetaKiller\Daemon\SleepAndRestartDaemon::CODENAME,
-//    \BetaKiller\Daemon\FailingDaemon::CODENAME,
+//    \BetaKiller\Daemon\DebugSleepAndRestartDaemon::CODENAME,
+//    \BetaKiller\Daemon\DebugFailingDaemon::CODENAME,
+//    \BetaKiller\Daemon\DebugStopDelayDaemon::CODENAME,
 ];

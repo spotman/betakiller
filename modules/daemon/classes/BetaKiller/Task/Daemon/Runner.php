@@ -15,6 +15,9 @@ class Runner extends AbstractTask
 {
     use LoggerHelperTrait;
 
+    public const START_TIMEOUT = 5;
+    public const STOP_TIMEOUT  = 5;
+
     private const STATUS_STARTING = 'starting';
     private const STATUS_STARTED  = 'started';
     private const STATUS_STOPPING = 'stopping';
@@ -122,7 +125,7 @@ class Runner extends AbstractTask
         if (\gc_enabled()) {
             // Force GC to be called periodically
             // @see https://github.com/ratchetphp/Ratchet/issues/662
-            $this->loop->addPeriodicTimer(60, function() {
+            $this->loop->addPeriodicTimer(60, function () {
                 gc_collect_cycles();
             });
         } else {
@@ -156,29 +159,45 @@ class Runner extends AbstractTask
         $this->setStatus(self::STATUS_STARTED);
     }
 
-    private function stop(): bool
+    private function stop(): void
     {
         // Prevent sequential stop calls
         if ($this->isStopping()) {
-            $this->logger->debug('Daemon ":name" is already stopping, please wait', [
+            $this->logger->notice('Daemon ":name" is already stopping, please wait', [
                 ':name' => $this->codename,
             ]);
-            return false;
+
+            return;
         }
 
         $this->setStatus(self::STATUS_STOPPING);
 
+        // Wait 5 seconds for daemon stop
+        $timeoutTimer = $this->loop->addTimer(self::STOP_TIMEOUT, function () {
+            $this->logger->alert('Daemon ":name" had not stopped, force exit applied', [
+                ':name' => $this->codename,
+            ]);
+
+            // Timeout => force kill + notify supervisor about problem via non-zero exit status
+            $this->shutdown(1);
+        });
+
         try {
             $this->daemon->stop();
+
+            $this->loop->cancelTimer($timeoutTimer);
 
             $this->logger->debug('Daemon ":name" was stopped', [
                 ':name' => $this->codename,
             ]);
         } catch (\Throwable $e) {
+            $this->loop->cancelTimer($timeoutTimer);
+
             $this->processException($e);
         }
 
-        return true;
+        // Simply exit with OK status and daemon would be restarted by supervisor
+        $this->shutdown(0);
     }
 
     private function shutdown(int $exitCode): void
@@ -215,10 +234,7 @@ class Runner extends AbstractTask
                 ':name'  => $this->codename,
             ]);
 
-            if ($this->stop()) {
-                // Simply exit with OK status and daemon would be restarted by supervisor
-                $this->shutdown(0);
-            }
+            $this->stop();
         };
 
         /**

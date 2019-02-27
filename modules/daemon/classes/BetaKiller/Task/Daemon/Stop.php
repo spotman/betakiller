@@ -72,7 +72,7 @@ class Stop extends AbstractTask
         $process = new Process(['kill', '-s', \SIGTERM, $pid]);
         $process->run();
 
-        // wait for daemon to be stopped
-        sleep(2);
+        // Wait for daemon to be stopped
+        $lock->waitForRelease(Runner::STOP_TIMEOUT + 2);
     }
 }

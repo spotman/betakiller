@@ -8,6 +8,9 @@ use Psr\Log\LoggerInterface;
 
 class Lock
 {
+    private const TIMEOUT_ACQUIRE = 3;
+    private const TIMEOUT_RELEASE = 3;
+
     /**
      * @var string
      */
@@ -33,6 +36,11 @@ class Lock
         $this->logger = $logger;
     }
 
+    public function getPath(): string
+    {
+        return $this->path;
+    }
+
     public function acquire(int $pid): bool
     {
         // If lock file exists, check if stale.  If exists and is not stale, return TRUE
@@ -40,6 +48,8 @@ class Lock
 
         // The @ in front of 'symlink' is to suppress the NOTICE you get if the LOCK_FILE exists
         if (@symlink('/proc/'.$pid, $this->path) !== false) {
+            $this->clearCache();
+
             return true;
         }
 
@@ -62,23 +72,63 @@ class Lock
             ]);
         }
 
-        return \unlink($this->path);
+        $result = \unlink($this->path);
+
+        $this->clearCache();
+
+        return $result;
     }
 
     public function isAcquired(): bool
     {
+        $this->clearCache();
+
         return \is_link($this->path);
+    }
+
+    public function isValid(): bool
+    {
+        $this->clearCache();
+
+        return \is_link($this->path) && \is_dir($this->path);
     }
 
     /**
      * @param int|null $timeout
      *
      * @throws \BetaKiller\Exception
-     * @todo is not working
      */
-    public function waitForRelease(int $timeout = null): void
+    public function waitForAcquire(int $timeout = null): void
     {
-        $timeout = $timeout ?? 3;
+        $timeout = $timeout ?? self::TIMEOUT_ACQUIRE;
+        $start   = \microtime(true);
+        $end     = $start + $timeout;
+
+        // wait for daemon to be stopped
+        while (\microtime(true) < $end) {
+            if ($this->isAcquired()) {
+                break;
+            }
+
+            \usleep(100000);
+        }
+
+        if (!$this->isAcquired()) {
+            throw new Exception('Lock had not been acquired in :timeout seconds at path ":path"', [
+                ':path'    => $this->path,
+                ':timeout' => $timeout,
+            ]);
+        }
+    }
+
+    /**
+     * @param int|null $timeout
+     *
+     * @return bool
+     */
+    public function waitForRelease(int $timeout = null): bool
+    {
+        $timeout = $timeout ?? self::TIMEOUT_RELEASE;
         $start   = \microtime(true);
         $end     = $start + $timeout;
 
@@ -91,12 +141,7 @@ class Lock
             \usleep(100000);
         }
 
-        if ($this->isAcquired()) {
-            throw new Exception('Lock had not been released in :timeout seconds at path ":path"', [
-                ':path'    => $this->path,
-                ':timeout' => $timeout,
-            ]);
-        }
+        return !$this->isAcquired();
     }
 
     public function getPid(): int
@@ -112,8 +157,8 @@ class Lock
         return (int)\basename($processPath);
     }
 
-    public function isValid(): bool
+    private function clearCache(): void
     {
-        return \is_link($this->path) && \is_dir($this->path);
+        \clearstatcache(true, $this->path);
     }
 }

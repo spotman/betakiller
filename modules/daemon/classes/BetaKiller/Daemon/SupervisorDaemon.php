@@ -7,22 +7,25 @@ use BetaKiller\Config\ConfigProviderInterface;
 use BetaKiller\Exception;
 use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\Task\AbstractTask;
-use Graze\ParallelProcess\Display\Table;
-use Graze\ParallelProcess\Event\RunEvent;
-use Graze\ParallelProcess\Pool;
-use Graze\ParallelProcess\ProcessRun;
-use Graze\ParallelProcess\RunInterface;
+use BetaKiller\Task\Daemon\Runner;
 use Psr\Log\LoggerInterface;
+use React\ChildProcess\Process;
 use React\EventLoop\LoopInterface;
-use Symfony\Component\Console\Output\ConsoleOutput;
-use Symfony\Component\Process\Process;
+use React\EventLoop\TimerInterface;
 
 class SupervisorDaemon implements DaemonInterface
 {
     public const CODENAME = 'Supervisor';
 
     public const RETRY_LIMIT   = 3;
-    public const RELOAD_SIGNAL = SIGUSR1;
+    public const RELOAD_SIGNAL = \SIGUSR1;
+
+    private const STATUS_STARTING = 'starting';
+    private const STATUS_RUNNING  = 'running';
+    private const STATUS_FINISHED = 'finished';
+    private const STATUS_STOPPING = 'stopping';
+    private const STATUS_STOPPED  = 'stopped';
+    private const STATUS_FAILED   = 'failed';
 
     /**
      * @var \BetaKiller\Config\ConfigProviderInterface
@@ -40,14 +43,19 @@ class SupervisorDaemon implements DaemonInterface
     private $isHuman;
 
     /**
-     * @var Pool
+     * @var LoopInterface
      */
-    private $pool;
+    private $loop;
 
     /**
      * @var int[]
      */
     private $failureCounter = [];
+
+    /**
+     * @var mixed[][]
+     */
+    private $statuses = [];
 
     /**
      * @var \Psr\Log\LoggerInterface
@@ -81,101 +89,224 @@ class SupervisorDaemon implements DaemonInterface
 
     public function start(LoopInterface $loop): void
     {
+        $this->loop    = $loop;
         $this->isHuman = $this->appEnv->isHuman();
 
         // Reload signal => hot restart
         $loop->addSignal(self::RELOAD_SIGNAL, function () {
-            $this->logDebug('Reloading supervisor');
-            $this->restart();
+            $this->logger->debug('Reloading supervisor');
+            $this->restartStopped();
         });
 
-        $this->pool = new Pool();
+        $this->addSupervisorTimer();
 
         foreach ($this->getDefinedDaemons() as $codename) {
-            $this->addProcess($codename);
+            $this->startDaemon($codename, true);
         }
-
-        $verbosity = $this->appEnv->isDebugEnabled()
-            ? ConsoleOutput::VERBOSITY_DEBUG
-            : ConsoleOutput::VERBOSITY_VERY_VERBOSE;
-
-        if ($this->isHuman) {
-            $output = new ConsoleOutput($verbosity);
-            // $table->run() throws unwanted exceptions when process dies
-            new Table($output, $this->pool);
-        }
-
-        $this->pool->run();
     }
 
-    public function restart(): void
+    private function addSupervisorTimer(): void
     {
-        foreach ($this->getRunningNames() as $name) {
-            $run = $this->getRunByName($name);
+        $this->loop->addPeriodicTimer(0.1, function () {
+            foreach ($this->statuses as $name => $data) {
+                $status = $this->getStatus($name);
 
-            // Skip processes which are restarting already (race condition with event handler)
-            if (!$run) {
-                continue;
+                if ($status === self::STATUS_FINISHED) {
+                    $this->processFinishedTask($name);
+                } elseif ($status === self::STATUS_FAILED) {
+                    $this->processFailedTask($name);
+                }
             }
+        });
+    }
 
-            $process = $run->getProcess();
-
-            // Skip processes which are restarting already (race condition with event handler)
-            if (!$process->isRunning()) {
-                continue;
-            }
-
-            $lock = $this->lockFactory->create($name);
-
-            if (!$lock->isAcquired()) {
-                throw new Exception('Daemon ":name" is running but has no acquired lock', [
-                    ':name' => $name,
-                ]);
-            }
-
-            // Send stop signal to the daemon
-            $process->stop(5);
-
-            // Wait for lock (will be released by the daemon)
-            while ($lock->isAcquired()) {
-                \usleep(100000);
-            }
-        }
-
-        $failed = array_keys($this->failureCounter);
-
-        $this->logDebug('Restarting failed daemons ":names"', [
-            ':names' => \implode('", "', $failed),
+    private function processFinishedTask(string $name): void
+    {
+        $this->logger->notice('Daemon ":name" had finished, restarting', [
+            ':name' => $name,
         ]);
 
-        // Trying to restart failed daemons
-        foreach ($failed as $name) {
-            $this->addProcess($name)->start();
+        // Restart finished task
+        $this->startDaemon($name);
+    }
+
+    private function processFailedTask(string $name): void
+    {
+        // Increment failed attempts counter
+        $this->failureCounter[$name]++;
+
+        if ($this->failureCounter[$name] > self::RETRY_LIMIT) {
+            // Do not try to restart this failing task
+            $this->setStatus($name, self::STATUS_STOPPED);
+
+            // Warning for developers
+            $this->logger->emergency('Daemon ":name" had failed :times times and was stopped', [
+                ':name'  => $name,
+                ':times' => $this->failureCounter[$name],
+            ]);
+
+            // No further processing
+            return;
         }
 
-        // Reset failed daemons
-        $this->failureCounter = [];
+        // Warning for developers
+        $this->logger->warning('Daemon ":name" had failed :times times and will be restarted immediately', [
+            ':name'  => $name,
+            ':times' => $this->failureCounter[$name],
+        ]);
+
+        // Restart failed task
+        $this->startDaemon($name);
+    }
+
+    public function restartStopped(): void
+    {
+        // Trying to restart failed daemons
+        foreach ($this->filterStatus(self::STATUS_STOPPED) as $name) {
+            $this->startDaemon($name, true);
+        }
     }
 
     public function stop(): void
     {
-        $this->logDebug('Shutting down daemons');
+        $this->logger->debug('Shutting down daemons');
 
-        foreach ($this->pool->getRunning() as $run) {
-            if (!$run instanceof ProcessRun) {
-                throw new \LogicException('Pool must consist of ProcessRun instances only');
-            }
-
-            $process = $run->getProcess();
-            $this->logger->info('Sending signal to ":name" daemon with PID = :pid', [
-                ':pid'  => $process->getPid(),
-                ':name' => $this->getNameFromRun($run),
-            ]);
-
-            $process->stop(3);
+        foreach ($this->filterStatus(self::STATUS_RUNNING) as $name) {
+            $this->stopDaemon($name);
         }
 
         $this->logger->info('All daemons are stopped, supervisor is shutting down');
+    }
+
+    private function startDaemon(string $name, bool $clearCounter = null): void
+    {
+        $this->setStatus($name, self::STATUS_STARTING);
+
+        $this->logger->debug('Starting ":name" daemon', [
+            ':name' => $name,
+        ]);
+
+        $cmd = AbstractTask::getTaskCmd($this->appEnv, 'daemon:runner', [
+            'name' => $name,
+        ]);
+
+        $docRoot = $this->appEnv->getDocRootPath();
+
+        $process = new Process($cmd, $docRoot);
+
+        $lock = $this->lockFactory->create($name);
+
+        $process->on('exit', function ($exitCode, $termSignal) use ($name, $lock) {
+            $this->logger->debug('Daemon ":name" exited with :code code and :signal signal', [
+                ':name'   => $name,
+                ':code'   => $termSignal ?? 'unknown',
+                ':signal' => $termSignal ?? 'unknown',
+            ]);
+
+            $isOk = ($exitCode ?? 0) === 0;
+
+            $this->checkLockReleased($lock);
+
+            $this->setStatus($name, $isOk ? self::STATUS_FINISHED : self::STATUS_FAILED);
+        });
+
+        // Ensure task is running
+        $this->loop->addPeriodicTimer(0.1, function (TimerInterface $timer) use ($name, $process) {
+            if ($process->isRunning()) {
+                $this->setStatus($name, self::STATUS_RUNNING);
+                $this->loop->cancelTimer($timer);
+
+                $this->logger->notice('Daemon ":name" started', [
+                    ':name' => $name,
+                ]);
+            }
+        });
+
+        $startTimeout = Runner::START_TIMEOUT;
+
+        $this->loop->addTimer($startTimeout, function () use ($name, $process, $startTimeout) {
+            $status = $this->getStatus($name);
+
+            if ($status === self::STATUS_STARTING && !$process->isRunning()) {
+                $this->setStatus($name, self::STATUS_FAILED);
+
+                $this->logger->warning('Can not start ":name" daemon in :timeout seconds', [
+                    ':name'    => $name,
+                    ':timeout' => $startTimeout,
+                ]);
+            }
+        });
+
+        if ($clearCounter) {
+            // Clear failure counter
+            $this->failureCounter[$name] = 0;
+        }
+
+        $process->start($this->loop);
+
+        $this->setProcess($name, $process);
+    }
+
+    private function stopDaemon(string $name): void
+    {
+        $this->logger->debug('Stopping ":name" daemon', [
+            ':name' => $name,
+        ]);
+
+        $status = $this->getStatus($name);
+
+        $ignoreStatuses = [
+            self::STATUS_FINISHED,
+            self::STATUS_STOPPING,
+            self::STATUS_STOPPED,
+            self::STATUS_FAILED,
+        ];
+
+        // Skip processes which are restarting already (race condition with event handler)
+        if (in_array($status, $ignoreStatuses, true)) {
+            $this->logger->debug('Daemon ":name" is stopped already, skipping', [
+                ':name' => $name,
+            ]);
+
+            // Already stopping/stopped => nothing to do here
+            return;
+        }
+
+        $this->setStatus($name, self::STATUS_STOPPING);
+
+        $lock = $this->lockFactory->create($name);
+
+        if (!$lock->isAcquired()) {
+            throw new Exception('Daemon ":name" is running but has no acquired lock', [
+                ':name' => $name,
+            ]);
+        }
+
+        $process = $this->getProcess($name);
+
+        $this->logger->debug('Sending "stop" signal to ":name" daemon with PID = :pid', [
+            ':pid'  => $process->getPid(),
+            ':name' => $name,
+        ]);
+
+        $stopTimeout = Runner::STOP_TIMEOUT + 1;
+
+        // Send stop signal to the daemon
+        $process->terminate(\SIGTERM);
+
+        // Sync wait for process stop ()
+        if ($lock->waitForRelease($stopTimeout)) {
+            $this->setStatus($name, self::STATUS_STOPPED);
+
+            $this->logger->notice('Daemon ":name" stopped', [
+                ':name' => $name,
+            ]);
+        } else {
+            $this->logger->warning('Daemon ":name" had not been stopped in :timeout seconds, force exit', [
+                ':name'    => $name,
+                ':timeout' => $stopTimeout,
+            ]);
+        }
     }
 
     private function getDefinedDaemons(): array
@@ -183,118 +314,54 @@ class SupervisorDaemon implements DaemonInterface
         return \array_unique((array)$this->config->load(['daemons']));
     }
 
-    private function addProcess(string $codename): ProcessRun
+    private function checkLockReleased(Lock $lock): bool
     {
-        $cmd = AbstractTask::getTaskCmd($this->appEnv, 'daemon:runner', [
-            'name' => $codename,
-        ]);
+        if ($lock->isAcquired()) {
+            // Something went wrong on the daemon shutdown so we need to clear the lock
+            $lock->release();
 
-        $docRoot = $this->appEnv->getDocRootPath();
-
-        $process = Process::fromShellCommandline($cmd, $docRoot);
-
-        $process
-            ->setTimeout(null)
-            ->setIdleTimeout(null)
-            ->disableOutput()
-            ->inheritEnvironmentVariables(true);
-
-        $run = new ProcessRun($process, [
-            'name' => $codename,
-        ]);
-
-        $run->addListener(RunEvent::COMPLETED, function (RunEvent $runEvent) {
-            $run  = $runEvent->getRun();
-            $name = $this->getNameFromRun($run);
-
-            if (!$run->isSuccessful()) {
-                if (empty($this->failureCounter[$name])) {
-                    $this->failureCounter[$name] = 1;
-                }
-
-                // Increment failed attempts counter
-                $this->failureCounter[$name]++;
-
-                if ($this->failureCounter[$name] > self::RETRY_LIMIT) {
-                    // Warning for developers
-                    $this->logger->emergency('Daemon ":name" had failed :times times and was stopped', [
-                        ':name'  => $name,
-                        ':times' => self::RETRY_LIMIT,
-                    ]);
-
-                    // No further processing
-                    return;
-                }
-
-                // Warning for developers
-                $this->logger->alert('Daemon ":name" had failed :times times and will be restarted immediately', [
-                    ':name'  => $name,
-                    ':times' => $this->failureCounter[$name],
-                ]);
-            }
-
-            $lock = $this->lockFactory->create($name);
-
-            if ($lock->isAcquired()) {
-                // Warning for developers
-                $this->logger->warning('Lock for ":name" daemon had not been released by the daemon:runner task', [
-                    ':name' => $name,
-                ]);
-
-                // Something went wrong on the daemon shutdown so we need to clear the lock
-                $lock->release();
-            }
-
-            // Daemon exited with a regular way
-            $this->logDebug('Starting ":name" daemon', [
-                ':name' => $name,
+            // Warning for developers
+            $this->logger->warning('Lock ":name" had not been released by the daemon:runner task', [
+                ':name' => \basename($lock->getPath()),
             ]);
-
-            // Restart
-            $this->addProcess($name)->start();
-
-            // Wait for lock (will be acquired by the daemon)
-            while (!$lock->isAcquired()) {
-                \usleep(100000);
-            }
-        });
-
-        $this->pool->add($run);
-
-        return $run;
-    }
-
-    /**
-     * @return string[]
-     */
-    private function getRunningNames(): array
-    {
-        return \array_map(function (ProcessRun $run) {
-            return $this->getNameFromRun($run);
-        }, $this->pool->getRunning());
-    }
-
-    private function getNameFromRun(RunInterface $run): string
-    {
-        return $run->getTags()['name'];
-    }
-
-    private function getRunByName(string $name): ?ProcessRun
-    {
-        /** @var ProcessRun $run */
-        foreach ($this->pool->getRunning() as $run) {
-            if ($this->getNameFromRun($run) === $name) {
-                return $run;
-            }
         }
 
-        return null;
+        return true;
     }
 
-    private function logDebug(string $message, array $variables = null): void
+    private function setStatus(string $name, string $status): void
     {
-        if (!$this->isHuman) {
-            $this->logger->debug($message, $variables ?? []);
+        $this->statuses[$name]['status'] = $status;
+
+        $this->logger->debug('Setting status ":status" for daemon ":name"', [
+            ':name'   => $name,
+            ':status' => $status,
+        ]);
+    }
+
+    private function getStatus(string $name): string
+    {
+        return $this->statuses[$name]['status'];
+    }
+
+    private function setProcess(string $name, Process $proc): void
+    {
+        $this->statuses[$name]['process'] = $proc;
+    }
+
+    private function getProcess(string $name): Process
+    {
+        return $this->statuses[$name]['process'];
+    }
+
+    private function filterStatus(string $statusName): \Generator
+    {
+        foreach ($this->statuses as $taskName => $data) {
+            $status = $this->getStatus($taskName);
+
+            if ($status === $statusName) {
+                yield $taskName;
+            }
         }
     }
 }
