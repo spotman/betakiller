@@ -132,7 +132,7 @@ class Logger implements LoggerInterface
                 $slackHandler,
                 $this->appEnv->getTempPath().\DIRECTORY_SEPARATOR.$slackStorage,
                 \Monolog\Logger::WARNING,
-                300 // Repeat notification in 5 minutes
+                30 // Repeat notification in 30 seconds
             )));
         }
 
