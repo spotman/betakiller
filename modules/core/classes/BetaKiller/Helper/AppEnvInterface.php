@@ -130,6 +130,15 @@ interface AppEnvInterface
     public function getTempPath(): string;
 
     /**
+     * Returns path to directory used as a permanent storage
+     *
+     * @param string|null $add Relative path to add
+     *
+     * @return string
+     */
+    public function getStoragePath(string $add = null): string;
+
+    /**
      * Returns email which will receive all emails in debug mode
      *
      * @return string
