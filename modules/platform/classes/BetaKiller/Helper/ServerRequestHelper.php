@@ -12,6 +12,8 @@ use BetaKiller\Url\Container\UrlContainerInterface;
 use BetaKiller\Url\UrlElementStack;
 use DebugBar\DebugBar;
 use Psr\Http\Message\ServerRequestInterface;
+use Zend\Expressive\Flash\FlashMessageMiddleware;
+use Zend\Expressive\Flash\FlashMessagesInterface;
 use Zend\Expressive\Router\RouteResult;
 use Zend\Expressive\Session\SessionInterface;
 use Zend\Expressive\Session\SessionMiddleware;
@@ -248,6 +250,11 @@ class ServerRequestHelper
     public static function getCsp(ServerRequestInterface $request): SecureHeaders
     {
         return $request->getAttribute(SecureHeaders::class);
+    }
+
+    public static function getFlash(ServerRequestInterface $request): FlashMessagesInterface
+    {
+        return $request->getAttribute(FlashMessageMiddleware::FLASH_ATTRIBUTE);
     }
 
     public static function removeQueryParams(ServerRequestInterface $request, array $params): ServerRequestInterface

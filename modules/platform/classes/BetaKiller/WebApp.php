@@ -36,6 +36,7 @@ use BetaKiller\Security\SecureHeadersMiddleware;
 use Middlewares\ContentType;
 use Spotman\Api\ApiRequestHandler;
 use Zend\Expressive\Application;
+use Zend\Expressive\Flash\FlashMessageMiddleware;
 use Zend\Expressive\Helper\BodyParams\BodyParamsMiddleware;
 use Zend\Expressive\Router\Middleware\DispatchMiddleware;
 use Zend\Expressive\Router\Middleware\ImplicitHeadMiddleware;
@@ -123,11 +124,14 @@ class WebApp
 
         $this->app->pipe(UrlHelperMiddleware::class);
 
-        // Exceptions handling (depends on i18n)
+        // Exceptions handling (depends on i18n and UrlElementStack)
         $this->app->pipe(ErrorPageMiddleware::class);
         $this->app->pipe(ExpectedExceptionMiddleware::class);
 
         $this->app->pipe(MaintenanceModeMiddleware::class);
+
+        // Flash messages for Post-Redirect-Get flow
+        $this->app->pipe(FlashMessageMiddleware::class);
 
         // TODO Check If-Modified-Since and send 304 Not modified
 
