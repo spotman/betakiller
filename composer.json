@@ -37,7 +37,6 @@
     "php-console/php-console": "^3.1",
     "php-di/php-di": "^6.0",
     "php-middleware/php-debug-bar": "^3.0",
-    "php-middleware/request-id": "^3.1",
     "psr/log": "^1.0",
     "psr/simple-cache": "^1.0",
     "punic/punic": "^3.1",
@@ -65,7 +64,7 @@
   },
   "require-dev": {
     "codedungeon/phpunit-result-printer": "^0.26",
-    "deployer/deployer": "^6",
+    "deployer/deployer": "^6.4",
     "jolicode/jolinotif": "^2.0",
     "kint-php/kint": "^3.0",
     "kint-php/kint-twig": "^2.0",
