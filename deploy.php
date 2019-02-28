@@ -8,6 +8,7 @@ use Symfony\Component\Process\Exception\RuntimeException;
 require 'recipe/common.php';
 
 set('git_tty', true); // [Optional] Allocate tty for git on first deployment
+set('ssh_multiplexing', true);
 
 \define('BETAKILLER_CORE_PATH', 'core');
 
