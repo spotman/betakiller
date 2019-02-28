@@ -267,6 +267,28 @@ class AppEnv implements AppEnvInterface
     }
 
     /**
+     * Returns path to directory used as a permanent storage
+     *
+     * @param string|null $add Relative path to add
+     *
+     * @return string
+     */
+    public function getStoragePath(string $add = null): string
+    {
+        $path = $this->getAppRootPath().\DIRECTORY_SEPARATOR.'storage';
+
+        if ($add) {
+            $path .= \DIRECTORY_SEPARATOR.$add;
+        }
+
+        if (!file_exists($path) && !mkdir($path, 0777, true) && !is_dir($path)) {
+            throw new \RuntimeException(sprintf('Directory "%s" was not created', $path));
+        }
+
+        return $path;
+    }
+
+    /**
      * Returns email which will receive all emails in debug mode
      *
      * @return string
