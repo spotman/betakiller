@@ -30,7 +30,7 @@ interface UrlElementTreeInterface
     /**
      * Returns default iface model
      *
-     * @return \BetaKiller\Url\IFaceModelInterface
+     * @return \BetaKiller\Url\UrlElementInterface
      */
     public function getDefault(): UrlElementInterface;
 

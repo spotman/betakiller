@@ -50,17 +50,31 @@ class DummyUrlElementProcessor implements UrlElementProcessorInterface
 
         $urlHelper = ServerRequestHelper::getUrlHelper($request);
 
+        $parent = $this->getParentIFace($model);
+
+        // Redirect
+        return ResponseHelper::redirect($urlHelper->makeUrl($parent));
+    }
+
+    private function getParentIFace(UrlElementInterface $model): UrlElementInterface
+    {
         // Find nearest IFace
         foreach ($this->tree->getReverseBreadcrumbsIterator($model) as $parent) {
             if ($parent instanceof IFaceModelInterface) {
-                // Redirect
-                return ResponseHelper::redirect($urlHelper->makeUrl($parent));
+                return $parent;
             }
+        }
+
+        $parent = $this->tree->getParent($model);
+
+        // Redirect root dummies to default element
+        if (!$parent) {
+            return $this->tree->getDefault();
         }
 
         throw new UrlElementException('No IFace found for Dummy with URI ":uri" and parent ":parent"', [
             ':uri'    => $model->getUri(),
-            ':parent' => $model->getParentCodename(),
+            ':parent' => $model->getParentCodename() ?: 'root',
         ]);
     }
 }
