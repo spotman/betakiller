@@ -5,5 +5,4 @@ namespace BetaKiller\Model;
 
 interface GuestUserInterface extends UserInterface
 {
-
 }

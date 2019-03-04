@@ -3,17 +3,16 @@ declare(strict_types=1);
 
 namespace BetaKiller\Task\Auth;
 
-use BetaKiller\Auth\AuthFacade;
-use BetaKiller\Repository\UserRepository;
+use BetaKiller\Service\AuthService;
 use BetaKiller\Task\AbstractTask;
 use Psr\Log\LoggerInterface;
 
 class ChangePassword extends AbstractTask
 {
     /**
-     * @var \BetaKiller\Repository\UserRepository
+     * @var \BetaKiller\Service\AuthService
      */
-    private $userRepo;
+    private $auth;
 
     /**
      * @var \Psr\Log\LoggerInterface
@@ -21,22 +20,17 @@ class ChangePassword extends AbstractTask
     private $logger;
 
     /**
-     * @var \BetaKiller\Auth\AuthFacade
-     */
-    private $authFacade;
-
-    /**
      * ChangePassword constructor.
      *
-     * @param \BetaKiller\Repository\UserRepository $userRepo
+     * @param \BetaKiller\Service\AuthService $auth
+     * @param \Psr\Log\LoggerInterface        $logger
      */
-    public function __construct(UserRepository $userRepo, AuthFacade $authFacade, LoggerInterface $logger)
+    public function __construct(AuthService $auth, LoggerInterface $logger)
     {
-        $this->userRepo = $userRepo;
+        $this->auth   = $auth;
         $this->logger = $logger;
 
         parent::__construct();
-        $this->authFacade = $authFacade;
     }
 
     public function defineOptions(): array
@@ -49,7 +43,7 @@ class ChangePassword extends AbstractTask
     {
         $username = $this->read('Enter username or e-mail');
 
-        $user = $this->userRepo->searchBy($username);
+        $user = $this->auth->searchBy($username);
 
         if (!$user) {
             $this->logger->warning('No such user');
@@ -66,11 +60,7 @@ class ChangePassword extends AbstractTask
             return;
         }
 
-        $password = $this->authFacade->makePasswordHash($password);
-
-        $user->setPassword($password);
-
-        $this->userRepo->save($user);
+        $this->auth->updateUserPassword($user, $password);
 
         $this->logger->info('Password successfully changed!');
     }

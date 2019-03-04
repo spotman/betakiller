@@ -1,0 +1,26 @@
+{% extends layout %}
+
+{% block content %}
+  {{ css("auth/src/ifaces/Auth/Blocked.css") }}
+
+  <div class="container auth-blocked">
+    <div class="row align-items-center h-100">
+      <div class="col">
+
+        <div class="card">
+          {% block card_header %}
+            <div class="card-header">
+              <h4>{{ "frontend.auth.blocked.header"|i18n }}</h4>
+            </div>
+          {% endblock %}
+
+          <div class="card-body">
+            <p>{{ "frontend.auth.blocked.message"|i18n({ contact_url: contact_url }) }}</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+{% endblock %}

@@ -157,12 +157,23 @@ class User extends \ORM implements UserInterface
      */
     public function isEmailConfirmed(): bool
     {
-        /**
-         * @var \BetaKiller\Model\UserStatusInterface $statusModel
-         */
-        $statusModel = $this->getStatus();
+        return $this->isStatusCodename(UserStatus::STATUS_CONFIRMED);
+    }
 
-        return $statusModel->getCodename() !== UserStatus::STATUS_CREATED;
+    /**
+     * @return bool
+     */
+    public function isBlocked(): bool
+    {
+        return $this->isStatusCodename(UserStatus::STATUS_SUSPENDED);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isSuspended(): bool
+    {
+        return $this->isStatusCodename(UserStatus::STATUS_BLOCKED);
     }
 
     /**
@@ -579,5 +590,10 @@ class User extends \ORM implements UserInterface
         $this->set(self::TABLE_FIELD_CREATED_FROM_IP, $ip);
 
         return $this;
+    }
+
+    private function isStatusCodename(string $codename): bool
+    {
+        return $this->getStatus()->getCodename() === $codename;
     }
 }

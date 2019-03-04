@@ -1,0 +1,19 @@
+html, body {
+    height: 100%;
+}
+
+.auth-blocked {
+    height: 100%;
+    max-width: 350px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.auth-blocked h4 {
+    margin: 0 auto;
+}
+
+.auth-blocked p {
+    display: block;
+    margin-top: 15px;
+}

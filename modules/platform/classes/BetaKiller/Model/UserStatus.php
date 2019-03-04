@@ -16,6 +16,7 @@ class UserStatus extends \ORM implements UserStatusInterface
     public const STATUS_VERIFIED  = 'verified';     // KYC verification passed
     public const STATUS_BLOCKED   = 'blocked';      // Blocked coz of hacking, spam, or app rules violation
     public const STATUS_CLAIMED   = 'claimed';      // User claimed about registration
+    public const STATUS_SUSPENDED = 'suspended';    // Account removal requested so it will be suspended for 6 months
 
     protected function configure(): void
     {
@@ -119,5 +120,22 @@ class UserStatus extends \ORM implements UserStatusInterface
     public function isBlocked(): bool
     {
         return $this->isStatus(self::STATUS_BLOCKED);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isClaimed(): bool
+    {
+        return $this->isStatus(self::STATUS_CLAIMED);
+    }
+
+    /**
+     * @return bool
+     * @throws \BetaKiller\Exception\DomainException
+     */
+    public function isSuspended(): bool
+    {
+        return $this->isStatus(self::STATUS_SUSPENDED);
     }
 }

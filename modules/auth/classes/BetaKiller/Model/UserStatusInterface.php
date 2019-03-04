@@ -48,4 +48,14 @@ interface UserStatusInterface extends HasI18nKeyNameInterface
      * @return bool
      */
     public function isBlocked(): bool;
+
+    /**
+     * @return bool
+     */
+    public function isClaimed(): bool;
+
+    /**
+     * @return bool
+     */
+    public function isSuspended(): bool;
 }

@@ -60,24 +60,17 @@ class TokenService
     }
 
     /**
-     * Auto delete if exists.
+     * Mark token as used (one-time tokens)
      *
      * @param \BetaKiller\Model\TokenInterface $token
      *
-     * @return bool
+     * @return void
      * @throws \BetaKiller\Repository\RepositoryException
      */
-    public function check(TokenInterface $token): bool
+    public function used(TokenInterface $token): void
     {
-        if (!$token->isActive()) {
-            return false;
-        }
-
-        // One time tokens
         $token->setUsedAt(new \DateTimeImmutable);
 
         $this->tokenRepo->save($token);
-
-        return true;
     }
 }

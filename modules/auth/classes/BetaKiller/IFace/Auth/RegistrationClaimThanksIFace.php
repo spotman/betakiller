@@ -1,14 +1,15 @@
 <?php
+declare(strict_types=1);
+
 namespace BetaKiller\IFace\Auth;
 
 use BetaKiller\IFace\AbstractIFace;
 use Psr\Http\Message\ServerRequestInterface;
 
-class PasswordResetIFace extends AbstractIFace
+class RegistrationClaimThanksIFace extends AbstractIFace
 {
     /**
      * Returns data for View
-     * Override this method in child classes
      *
      * @param \Psr\Http\Message\ServerRequestInterface $request
      *

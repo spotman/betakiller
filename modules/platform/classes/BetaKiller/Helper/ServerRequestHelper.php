@@ -237,6 +237,11 @@ class ServerRequestHelper
         return $request->getAttribute(I18nHelper::class);
     }
 
+    public static function hasI18n(ServerRequestInterface $request): I18nHelper
+    {
+        return $request->getAttribute(I18nHelper::class);
+    }
+
     public static function getProfiler(ServerRequestInterface $request): Profiler
     {
         return $request->getAttribute(Profiler::class);

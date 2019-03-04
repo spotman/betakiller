@@ -4,8 +4,6 @@ namespace BetaKiller;
 
 interface ExceptionInterface extends \Throwable
 {
-    public const DEFAULT_EXCEPTION_CODE = 500;
-
     /**
      * Returns TRUE if someone must be notified about current exception type
      * Override this method with *false* return if notification about exceptions of concrete class is not needed

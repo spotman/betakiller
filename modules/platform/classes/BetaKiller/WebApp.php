@@ -27,6 +27,7 @@ use BetaKiller\Middleware\UrlElementDispatchMiddleware;
 use BetaKiller\Middleware\UrlElementRenderMiddleware;
 use BetaKiller\Middleware\UrlHelperMiddleware;
 use BetaKiller\Middleware\UserMiddleware;
+use BetaKiller\Middleware\UserStatusMiddleware;
 use BetaKiller\Middleware\WampCookieMiddleware;
 use BetaKiller\RequestHandler\App\I18next\AddMissingTranslationRequestHandler;
 use BetaKiller\RequestHandler\App\I18next\FetchTranslationRequestHandler;
@@ -130,7 +131,7 @@ class WebApp
 
         $this->app->pipe(MaintenanceModeMiddleware::class);
 
-        // Flash messages for Post-Redirect-Get flow
+        // Flash messages for Post-Redirect-Get flow (requires Session)
         $this->app->pipe(FlashMessageMiddleware::class);
 
         // TODO Check If-Modified-Since and send 304 Not modified
@@ -169,6 +170,10 @@ class WebApp
         // NotFoundHandler kicks in; alternately, you can provide other fallback
         // middleware to execute.
         $this->app->pipe(UrlElementDispatchMiddleware::class);
+
+        // Prevent access for locked users
+        $this->app->pipe(UserStatusMiddleware::class);
+
         $this->app->pipe(UrlElementRenderMiddleware::class);
     }
 

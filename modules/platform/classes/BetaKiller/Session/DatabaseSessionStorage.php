@@ -343,16 +343,25 @@ class DatabaseSessionStorage implements SessionStorageInterface
         return new Session($data, $token);
     }
 
-    private function regenerateSession(SessionInterface $session): SessionInterface
+    private function regenerateSession(SessionInterface $oldSession): SessionInterface
     {
-        $this->destroySession($session);
-
         // Generate new token and create fresh session with empty data
-        return $this->createSession(
-            SessionHelper::getUserAgent($session),
-            SessionHelper::getIpAddress($session),
-            SessionHelper::getOriginUrl($session)
+        $newSession = $this->createSession(
+            SessionHelper::getUserAgent($oldSession),
+            SessionHelper::getIpAddress($oldSession),
+            SessionHelper::getOriginUrl($oldSession)
         );
+
+        $userID = SessionHelper::getUserID($oldSession);
+
+        if ($userID) {
+            // Copy data from old session if user is authorized
+            SessionHelper::transferData($oldSession, $newSession);
+        }
+
+        $this->destroySession($oldSession);
+
+        return $newSession;
     }
 
     private function generateToken(): string

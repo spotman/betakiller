@@ -8,7 +8,7 @@ use BetaKiller\Utils\Kohana\ORM\OrmInterface;
 use DateTimeImmutable;
 use Spotman\Acl\AclUserInterface;
 
-interface UserInterface extends AbstractEntityInterface, OrmInterface, NotificationTargetInterface, AclUserInterface
+interface UserInterface extends DispatchableEntityInterface, OrmInterface, NotificationTargetInterface, AclUserInterface
 {
     public function completeLogin(): void;
 
@@ -28,6 +28,16 @@ interface UserInterface extends AbstractEntityInterface, OrmInterface, Notificat
      * @return bool
      */
     public function isEmailConfirmed(): bool;
+
+    /**
+     * @return bool
+     */
+    public function isBlocked(): bool;
+
+    /**
+     * @return bool
+     */
+    public function isSuspended(): bool;
 
     /**
      * @param \DateTimeInterface $value [optional]

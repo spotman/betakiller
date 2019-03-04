@@ -1,15 +1,18 @@
 <?php
 declare(strict_types=1);
 
-namespace BetaKiller\Action\App;
+namespace BetaKiller\Action\Auth;
 
 use BetaKiller\Action\AbstractAction;
-use BetaKiller\Auth\AuthFacade;
+use BetaKiller\Auth\AccessDeniedException;
+use BetaKiller\Auth\UserUrlDetectorInterface;
 use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Helper\ServerRequestHelper;
+use BetaKiller\Helper\SessionHelper;
 use BetaKiller\Helper\UrlHelper;
 use BetaKiller\Model\TokenInterface;
 use BetaKiller\Model\UserInterface;
+use BetaKiller\Service\AuthService;
 use BetaKiller\Service\TokenService;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -23,20 +26,28 @@ abstract class AbstractTokenVerificationAction extends AbstractAction
     private $tokenService;
 
     /**
-     * @var \BetaKiller\Auth\AuthFacade
+     * @var \BetaKiller\Service\AuthService
      */
-    private $authFacade;
+    private $auth;
 
     /**
-     * @param \BetaKiller\Service\TokenService $tokenService
-     * @param \BetaKiller\Auth\AuthFacade      $authFacade
+     * @var \BetaKiller\Auth\UserUrlDetectorInterface
+     */
+    private $urlDetector;
+
+    /**
+     * @param \BetaKiller\Service\TokenService          $tokenService
+     * @param \BetaKiller\Service\AuthService           $auth
+     * @param \BetaKiller\Auth\UserUrlDetectorInterface $urlDetector
      */
     public function __construct(
         TokenService $tokenService,
-        AuthFacade $authFacade
+        AuthService $auth,
+        UserUrlDetectorInterface $urlDetector
     ) {
         $this->tokenService = $tokenService;
-        $this->authFacade   = $authFacade;
+        $this->auth         = $auth;
+        $this->urlDetector  = $urlDetector;
     }
 
     /**
@@ -65,27 +76,33 @@ abstract class AbstractTokenVerificationAction extends AbstractAction
         /** @var \BetaKiller\Model\TokenInterface $token */
         $token = ServerRequestHelper::getEntity($request, TokenInterface::class);
 
-        $urlHelper = ServerRequestHelper::getUrlHelper($request);
-
+        // Get token user
         $user = $token->getUser();
 
-        $isValid = $this->tokenService->check($token);
+        if ($user->isBlocked()) {
+            // Mark token as used
+            $this->tokenService->used($token);
 
-        $redirectUrl = $isValid
-            ? $this->getSuccessUrl($urlHelper, $user)
-            : $this->getInactiveTokenUrl($urlHelper, $user);
-
-        $response = ResponseHelper::redirect($redirectUrl);
-
-        if ($isValid) {
-            $this->processValid($user);
-
-            $isGuest = ServerRequestHelper::isGuest($request);
-
-            if ($isGuest) {
-                $this->authFacade->login($user, $request, $response);
-            }
+            throw new AccessDeniedException('Blocked user is trying to verify OTP token');
         }
+
+        // Process user action
+        $this->processValid($user);
+
+        // Mark token as used
+        $this->tokenService->used($token);
+
+        // Make redirect URL
+        $urlHelper   = ServerRequestHelper::getUrlHelper($request);
+        $redirectUrl = $this->getSuccessUrl($urlHelper, $user);
+        $response    = ResponseHelper::redirect($redirectUrl);
+
+        // Force user login
+        $session = ServerRequestHelper::getSession($request);
+        $this->auth->login($session, $user);
+
+        // Store token hash for further security checks
+        SessionHelper::setTokenHash($session, $token);
 
         return $response;
     }
@@ -96,15 +113,10 @@ abstract class AbstractTokenVerificationAction extends AbstractAction
      *
      * @return string
      */
-    abstract protected function getInactiveTokenUrl(UrlHelper $urlHelper, UserInterface $user): string;
-
-    /**
-     * @param \BetaKiller\Helper\UrlHelper    $urlHelper
-     * @param \BetaKiller\Model\UserInterface $user
-     *
-     * @return string
-     */
-    abstract protected function getSuccessUrl(UrlHelper $urlHelper, UserInterface $user): string;
+    protected function getSuccessUrl(UrlHelper $urlHelper, UserInterface $user): string
+    {
+        return $this->urlDetector->detect($user, $urlHelper);
+    }
 
     /**
      * @param \BetaKiller\Model\UserInterface $user

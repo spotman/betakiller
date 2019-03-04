@@ -2,26 +2,26 @@
 namespace BetaKiller\Action\Auth;
 
 use BetaKiller\Action\AbstractAction;
-use BetaKiller\Auth\AuthFacade;
 use BetaKiller\Helper\ResponseHelper;
+use BetaKiller\Helper\ServerRequestHelper;
+use BetaKiller\Service\AuthService;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Spotman\Defence\ArgumentsInterface;
 use Spotman\Defence\DefinitionBuilderInterface;
 
 class LogoutAction extends AbstractAction
 {
     /**
-     * @var \BetaKiller\Auth\AuthFacade
+     * @var \BetaKiller\Service\AuthService
      */
     private $auth;
 
     /**
      * LogoutAction constructor.
      *
-     * @param \BetaKiller\Auth\AuthFacade $auth
+     * @param \BetaKiller\Service\AuthService $auth
      */
-    public function __construct(AuthFacade $auth)
+    public function __construct(AuthService $auth)
     {
         $this->auth = $auth;
     }
@@ -49,10 +49,12 @@ class LogoutAction extends AbstractAction
      */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        // Redirect to site index
-        $response = ResponseHelper::redirect('/');
+        $session = ServerRequestHelper::getSession($request);
 
         // Sign out the user and get fresh session
-        return $this->auth->logout($request, $response);
+        $this->auth->logout($session);
+
+        // Redirect to site index
+        return ResponseHelper::redirect('/');
     }
 }

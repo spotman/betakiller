@@ -2,11 +2,11 @@
 declare(strict_types=1);
 
 use BetaKiller\Model\RoleInterface;
-use BetaKiller\Service\AbstractRecoveryAccessService;
-use BetaKiller\Service\AbstractUserVerificationService;
+use BetaKiller\Service\AccessRecoveryService;
+use BetaKiller\Service\AuthService;
+use BetaKiller\Service\UserVerificationService;
 
-define('RECOVERY_ACCESS_GROUP', 'recovery-access-user');
-define('VERIFICATION_EMAIL_GROUP', 'verification-user');
+define('AUTH_USER_GROUP', 'auth-user');
 
 return [
     /**
@@ -19,15 +19,7 @@ return [
      * ]
      */
     'groups'   => [
-        RECOVERY_ACCESS_GROUP => [
-            'is_system' => true,
-            'roles'     => [
-                // Target is specified per message
-                RoleInterface::LOGIN,
-            ],
-        ],
-
-        VERIFICATION_EMAIL_GROUP => [
+        AUTH_USER_GROUP => [
             'is_system' => true,
             'roles'     => [
                 // Target is specified per message
@@ -47,12 +39,16 @@ return [
      * ]
      */
     'messages' => [
-        AbstractRecoveryAccessService::NOTIFICATION_NAME => [
-            'group' => RECOVERY_ACCESS_GROUP,
+        AccessRecoveryService::NOTIFICATION_NAME => [
+            'group' => AUTH_USER_GROUP,
         ],
 
-        AbstractUserVerificationService::NOTIFICATION_NAME => [
-            'group' => VERIFICATION_EMAIL_GROUP,
+        UserVerificationService::NOTIFICATION_NAME => [
+            'group' => AUTH_USER_GROUP,
+        ],
+
+        AuthService::REQUEST_PASSWORD_CHANGE => [
+            'group' => AUTH_USER_GROUP,
         ],
     ],
 ];

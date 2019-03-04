@@ -2,6 +2,8 @@
 namespace BetaKiller\Widget\Auth;
 
 use BetaKiller\Action\Auth\RegularLoginAction;
+use BetaKiller\Helper\ServerRequestHelper;
+use BetaKiller\IFace\Auth\AccessRecoveryRequestIFace;
 use BetaKiller\Widget\AbstractPublicWidget;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -16,17 +18,12 @@ class RegularWidget extends AbstractPublicWidget
      */
     public function getData(ServerRequestInterface $request, array $context): array
     {
+        $urlHelper     = ServerRequestHelper::getUrlHelper($request);
+        $recoveryIFace = $urlHelper->getUrlElementByCodename(AccessRecoveryRequestIFace::codename());
+
         return [
-            'login_url' => RegularLoginAction::URL,
-//            'reset_password_url' => $this->getResetPasswordUrl(),
+            'login_url'           => RegularLoginAction::URL,
+            'access_recovery_url' => $urlHelper->makeUrl($recoveryIFace),
         ];
     }
-
-//    private function getResetPasswordUrl(): string
-//    {
-//        /** @var PasswordReset $iface */
-//        $iface = $this->urlElementHelper->createIFaceFromCodename('Auth_PasswordReset');
-//
-//        return $this->urlElementHelper->makeIFaceUrl($iface);
-//    }
 }

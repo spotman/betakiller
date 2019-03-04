@@ -3,9 +3,9 @@ declare(strict_types=1);
 
 namespace BetaKiller\Middleware;
 
-use BetaKiller\Auth\AuthFacade;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Model\UserInterface;
+use BetaKiller\Service\AuthService;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -14,16 +14,16 @@ use Psr\Http\Server\RequestHandlerInterface;
 class UserMiddleware implements MiddlewareInterface
 {
     /**
-     * @var \BetaKiller\Auth\AuthFacade
+     * @var \BetaKiller\Service\AuthService
      */
     private $auth;
 
     /**
      * UserMiddleware constructor.
      *
-     * @param \BetaKiller\Auth\AuthFacade $auth
+     * @param \BetaKiller\Service\AuthService $auth
      */
-    public function __construct(AuthFacade $auth)
+    public function __construct(AuthService $auth)
     {
         $this->auth = $auth;
     }

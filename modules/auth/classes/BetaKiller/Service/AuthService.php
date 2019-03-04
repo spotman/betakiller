@@ -1,35 +1,34 @@
 <?php
 declare(strict_types=1);
 
-namespace BetaKiller\Auth;
+namespace BetaKiller\Service;
 
+use BetaKiller\Action\Auth\ClaimRegistrationAction;
+use BetaKiller\Action\Auth\VerifyPasswordChangeTokenAction;
+use BetaKiller\Auth\AccessDeniedException;
+use BetaKiller\Auth\InactiveException;
+use BetaKiller\Auth\SessionConfig;
 use BetaKiller\Factory\GuestUserFactory;
-use BetaKiller\Helper\ServerRequestHelper;
+use BetaKiller\Factory\UrlHelperFactory;
+use BetaKiller\Helper\NotificationHelper;
 use BetaKiller\Helper\SessionHelper;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Repository\RoleRepository;
 use BetaKiller\Repository\UserRepository;
 use BetaKiller\Session\SessionStorageInterface;
-use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
 use Zend\Expressive\Session\SessionInterface;
 
-class AuthFacade
+class AuthService
 {
-    /**
-     * @var \BetaKiller\Session\SessionStorageInterface
-     */
-    private $sessionStorage;
+    public const REQUEST_PASSWORD_CHANGE = 'auth/password-change-request';
+
+    public const PASSWORD_MIN_LENGTH = 8;
+    public const PASSWORD_MAX_LENGTH = 50;
 
     /**
      * @var \BetaKiller\Auth\SessionConfig
      */
     private $config;
-
-    /**
-     * @var \BetaKiller\Factory\GuestUserFactory
-     */
-    private $guestUserFactory;
 
     /**
      * @var \BetaKiller\Repository\UserRepository
@@ -42,26 +41,65 @@ class AuthFacade
     private $roleRepo;
 
     /**
-     * Loads Session and configuration options.
+     * @var \BetaKiller\Session\SessionStorageInterface
+     */
+    private $sessionStorage;
+
+    /**
+     * @var \BetaKiller\Factory\GuestUserFactory
+     */
+    private $guestUserFactory;
+
+    /**
+     * @var \BetaKiller\Helper\NotificationHelper
+     */
+    private $notification;
+
+    /**
+     * @var \BetaKiller\Helper\UrlHelper
+     */
+    private $urlHelper;
+
+    /**
+     * @var \BetaKiller\Service\TokenService
+     */
+    private $tokenService;
+
+    /**
+     * AuthService constructor.
      *
-     * @param \BetaKiller\Auth\SessionConfig              $config Config Options
+     * @param \BetaKiller\Auth\SessionConfig              $config
      * @param \BetaKiller\Session\SessionStorageInterface $sessionStorage
      * @param \BetaKiller\Factory\GuestUserFactory        $guestUserFactory
      * @param \BetaKiller\Repository\UserRepository       $userRepo
      * @param \BetaKiller\Repository\RoleRepository       $roleRepo
+     * @param \BetaKiller\Helper\NotificationHelper       $notification
+     * @param \BetaKiller\Service\TokenService            $tokenService
+     * @param \BetaKiller\Factory\UrlHelperFactory        $urlHelperFactory
      */
     public function __construct(
         SessionConfig $config,
         SessionStorageInterface $sessionStorage,
         GuestUserFactory $guestUserFactory,
         UserRepository $userRepo,
-        RoleRepository $roleRepo
+        RoleRepository $roleRepo,
+        NotificationHelper $notification,
+        TokenService $tokenService,
+        UrlHelperFactory $urlHelperFactory
     ) {
         $this->config           = $config;
         $this->sessionStorage   = $sessionStorage;
         $this->guestUserFactory = $guestUserFactory;
         $this->userRepo         = $userRepo;
         $this->roleRepo         = $roleRepo;
+        $this->notification     = $notification;
+        $this->tokenService     = $tokenService;
+        $this->urlHelper        = $urlHelperFactory->create();
+    }
+
+    public function searchBy(string $loginOrEmail): ?UserInterface
+    {
+        return $this->userRepo->searchBy($loginOrEmail);
     }
 
     /**
@@ -102,35 +140,22 @@ class AuthFacade
         return $this->getSessionUser($session);
     }
 
-    public function getSessionFromRequest(ServerRequestInterface $request): SessionInterface
-    {
-        return ServerRequestHelper::getSession($request);
-    }
-
-    public function getUserFromRequest(ServerRequestInterface $request): UserInterface
-    {
-        $session = $this->getSessionFromRequest($request);
-
-        return $this->getSessionUser($session);
-    }
-
     /**
      * Attempt to log in a user by using an ORM object and plain-text password.
      *
-     * @param \BetaKiller\Model\UserInterface          $user
+     * @param \Zend\Expressive\Session\SessionInterface $session
+     * @param \BetaKiller\Model\UserInterface           $user
      *
-     * @param \Psr\Http\Message\ServerRequestInterface $request
-     * @param \Psr\Http\Message\ResponseInterface      $response
-     *
-     * @return \Psr\Http\Message\ResponseInterface
+     * @return void
+     * @throws \BetaKiller\Auth\AccessDeniedException
+     * @throws \BetaKiller\Auth\InactiveException
      * @throws \BetaKiller\Exception\ValidationException
      * @throws \BetaKiller\Repository\RepositoryException
      */
     public function login(
-        UserInterface $user,
-        ServerRequestInterface $request,
-        ResponseInterface $response
-    ): ResponseInterface {
+        SessionInterface $session,
+        UserInterface $user
+    ): void {
         // Check account is active
         if (!$user->isActive()) {
             throw new InactiveException();
@@ -147,33 +172,40 @@ class AuthFacade
         $user->completeLogin();
         $this->userRepo->save($user);
 
-        // Get current session
-        $session = $this->getSessionFromRequest($request);
-
-//        $session->regenerate();
-
         // Store user in session
         SessionHelper::setUserID($session, $user);
 
-        // Save session to place session ID to database
-        return $this->sessionStorage->persistSession($session, $response);
+        // Always create new session on successful login to prevent stale sessions
+        $session->regenerate();
+        // Session will be saved in SessionMiddleware
     }
 
-    public function logout(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
+    public function logout(SessionInterface $session): void
     {
-        $session = $this->getSessionFromRequest($request);
-
         $user = $this->getSessionUser($session);
 
-        if ($user->isGuest()) {
-            // Nothing to do for guest user
-            return $response;
+        if (!$user->isGuest()) {
+            // Detach session from user
+            SessionHelper::removeUserID($session);
+
+            // Regenerate session to delete session record and generate new token
+            $session->regenerate();
         }
+        // Session will be saved in SessionMiddleware
+    }
 
-        // Regenerate session to delete session record and generate new token
-        $session->regenerate();
+    public function requestPasswordChange(UserInterface $user): void
+    {
+        $token = $this->tokenService->create($user, new \DateInterval('PT8H'));
 
-        return $this->sessionStorage->persistSession($session, $response);
+        $params      = $this->urlHelper->createUrlContainer()->setEntity($token);
+        $action      = $this->urlHelper->getUrlElementByCodename(VerifyPasswordChangeTokenAction::codename());
+        $claimAction = $this->urlHelper->getUrlElementByCodename(ClaimRegistrationAction::codename());
+
+        $this->notification->directMessage(self::REQUEST_PASSWORD_CHANGE, $user, [
+            'action_url' => $this->urlHelper->makeUrl($action, $params, false),
+            'claim_url'  => $this->urlHelper->makeUrl($claimAction),
+        ]);
     }
 
     /**
@@ -193,6 +225,14 @@ class AuthFacade
         return $this->makePasswordHash($password) === $user->getPassword();
     }
 
+    public function updateUserPassword(UserInterface $user, string $password): void
+    {
+        $hash = $this->makePasswordHash($password);
+        $user->setPassword($hash);
+
+        $this->userRepo->save($user);
+    }
+
     /**
      * Perform a hmac hash, using the configured method.
      *
@@ -200,7 +240,7 @@ class AuthFacade
      *
      * @return  string
      */
-    public function makePasswordHash(string $str): string
+    private function makePasswordHash(string $str): string
     {
         return hash_hmac($this->config->getHashMethod(), $str, $this->config->getHashKey());
     }

@@ -2,14 +2,49 @@
 <root>
     <!-- Auth common ifaces -->
     <iface uri="login" name="Auth_Login" label="Sign in" layout="auth" hideInSiteMap="true" zone="public">
-        <action uri="regular" name="Auth_RegularLogin" />
+        <action uri="regular" name="Auth_RegularLogin"/>
     </iface>
 
-    <action uri="logout" name="Auth_Logout" zone="public" />
+    <action uri="logout" name="Auth_Logout" zone="public"/>
     <!--<action uri="change-account" name="Auth_ReLogin" layout="auth" hideInSiteMap="true" zone="personal" />-->
-    <!--<iface uri="password-reset" name="Auth_PasswordReset" label="Reset password" layout="auth" hideInSiteMap="true" zone="public" />-->
+
+    <dummy uri="change-password" name="Auth_ChangePasswordDummy" zone="public">
+        <action uri="{Token.value}" name="Auth_VerifyPasswordChangeToken"/>
+        <iface uri="form" name="Auth_PasswordChange" label="iface.auth.password-change.label" zone="personal">
+            <action uri="update" name="Auth_ChangePassword"/>
+        </iface>
+        <!-- TODO 404 page here for missing token -->
+    </dummy>
+
+    <!--Verification-->
+    <dummy uri="verification" name="Auth_VerificationDummy" zone="public">
+        <action uri="{Token.value}" name="Auth_ConfirmEmail"/>
+        <iface uri="missing" name="Auth_EmailConfirmationTokenError404" label="iface.auth.token-error.label"/>
+    </dummy>
+
+    <!-- Access Recovery -->
+    <iface uri="access-recovery" name="Auth_AccessRecoveryRequest" label="Access recovery" layout="public"
+           hideInSiteMap="true" zone="public">
+        <action uri="{Token.value}" name="Auth_VerifyAccessRecoveryToken"/>
+        <action uri="request" name="Auth_SendRecoveryEmail"/>
+        <iface uri="missing" name="Auth_AccessRecoveryTokenError404" label="iface.auth.token-error.label"/>
+    </iface>
+
+    <!-- Registration claim -->
+    <action uri="claim-registration" name="Auth_ClaimRegistration" zone="public">
+        <iface uri="claim-thanks" name="Auth_RegistrationClaimThanks" label="iface.auth.claim-thanks.label"/>
+    </action>
+
+    <dummy uri="auth" name="Auth_Dummy" zone="public" hideInSiteMap="true">
+        <action uri="suspend" name="Auth_Suspend" zone="personal"/>
+
+        <iface uri="blocked" name="Auth_Blocked" label="Blocked" zone="personal" layout="auth"/>
+        <iface uri="suspended" name="Auth_Suspended" label="Suspended" zone="personal" layout="auth">
+            <action uri="activate" name="Auth_ActivateSuspended" zone="personal"/>
+        </iface>
+    </dummy>
 </root>
 
-<!-- TODO убрать этот файл после того как будет настроено нормальное дерево интерфейсов -->
-<!-- https://symfony.com/doc/current/components/config/definition.html -->
+        <!-- TODO убрать этот файл после того как будет настроено нормальное дерево интерфейсов -->
+        <!-- https://symfony.com/doc/current/components/config/definition.html -->
 

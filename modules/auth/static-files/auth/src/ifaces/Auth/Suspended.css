@@ -1,0 +1,19 @@
+html, body {
+    height: 100%;
+}
+
+.auth-suspended {
+    height: 100%;
+    max-width: 400px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.auth-suspended h4 {
+    margin: 0 auto;
+}
+
+.auth-suspended p {
+    display: block;
+    margin-top: 15px;
+}

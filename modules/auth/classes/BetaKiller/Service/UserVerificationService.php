@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace BetaKiller\Service;
 
+use BetaKiller\Action\Auth\ClaimRegistrationAction;
+use BetaKiller\Action\Auth\ConfirmEmailAction;
 use BetaKiller\Factory\UrlHelperFactory;
 use BetaKiller\Helper\NotificationHelper;
 use BetaKiller\Helper\UrlHelper;
@@ -12,9 +14,9 @@ use BetaKiller\Repository\UserRepository;
 use BetaKiller\Repository\UserStatusRepositoryInterface;
 use BetaKiller\Url\Container\UrlContainerInterface;
 
-abstract class AbstractUserVerificationService
+class UserVerificationService
 {
-    public const NOTIFICATION_NAME = 'user/verification';
+    public const NOTIFICATION_NAME = 'auth/verification';
 
     /**
      * @var \BetaKiller\Service\TokenService
@@ -63,19 +65,6 @@ abstract class AbstractUserVerificationService
     }
 
     /**
-     * @return \DateInterval
-     */
-    abstract protected function getTokenPeriod(): \DateInterval;
-
-    /**
-     * @param \BetaKiller\Helper\UrlHelper    $urlHelper
-     * @param \BetaKiller\Model\UserInterface $user
-     *
-     * @return array
-     */
-    abstract protected function getAdditionalEmailData(UrlHelper $urlHelper, UserInterface $user): array;
-
-    /**
      * @param \BetaKiller\Model\UserInterface $user
      *
      * @return void
@@ -103,11 +92,34 @@ abstract class AbstractUserVerificationService
 
         $params = $this->urlHelper->createUrlContainer()->setEntity($token);
 
-        $emailData = array_merge($this->getAdditionalEmailData($this->urlHelper, $user), [
+        $emailData = array_merge($this->getAdditionalEmailData($this->urlHelper), [
             'action_url' => $this->getActionUrl($this->urlHelper, $params),
         ]);
 
         $this->notification->directMessage(self::NOTIFICATION_NAME, $user, $emailData);
+    }
+
+    /**
+     * @return \DateInterval
+     * @throws \Exception
+     */
+    protected function getTokenPeriod(): \DateInterval
+    {
+        return new \DateInterval('P14D');
+    }
+
+    /**
+     * @param \BetaKiller\Helper\UrlHelper $urlHelper
+     *
+     * @return array
+     */
+    protected function getAdditionalEmailData(UrlHelper $urlHelper): array
+    {
+        $abuseElement = $urlHelper->getUrlElementByCodename(ClaimRegistrationAction::codename());
+
+        return [
+            'claim_url' => $urlHelper->makeUrl($abuseElement),
+        ];
     }
 
     /**
@@ -117,8 +129,10 @@ abstract class AbstractUserVerificationService
      * @return string
      * @throws \BetaKiller\IFace\Exception\UrlElementException
      */
-    abstract protected function getActionUrl(
-        UrlHelper $urlHelper,
-        UrlContainerInterface $params
-    ): string;
+    protected function getActionUrl(UrlHelper $urlHelper, UrlContainerInterface $params): string
+    {
+        $actionUrlElement = $urlHelper->getUrlElementByCodename(ConfirmEmailAction::codename());
+
+        return $urlHelper->makeUrl($actionUrlElement, $params, false);
+    }
 }

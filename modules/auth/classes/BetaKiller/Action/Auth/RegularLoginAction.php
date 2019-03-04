@@ -4,15 +4,14 @@ declare(strict_types=1);
 namespace BetaKiller\Action\Auth;
 
 use BetaKiller\Action\AbstractAction;
-use BetaKiller\Auth\AuthFacade;
-use BetaKiller\Auth\IncorrectPasswordException;
-use BetaKiller\Auth\UserDoesNotExistsException;
+use BetaKiller\Auth\IncorrectCredentialsException;
 use BetaKiller\Exception\BadRequestHttpException;
 use BetaKiller\Helper\ActionRequestHelper;
 use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\IFace\Auth\LoginIFace;
 use BetaKiller\Repository\UserRepository;
+use BetaKiller\Service\AuthService;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Spotman\Defence\DefinitionBuilderInterface;
@@ -29,9 +28,8 @@ class RegularLoginAction extends AbstractAction
     private const ARG_LOGIN    = 'user-login';
     private const ARG_PASSWORD = 'user-password';
 
-
     /**
-     * @var \BetaKiller\Auth\AuthFacade
+     * @var \BetaKiller\Service\AuthService
      */
     private $auth;
 
@@ -43,10 +41,10 @@ class RegularLoginAction extends AbstractAction
     /**
      * RegularLoginAction constructor.
      *
-     * @param \BetaKiller\Auth\AuthFacade           $auth
+     * @param \BetaKiller\Service\AuthService       $auth
      * @param \BetaKiller\Repository\UserRepository $userRepo
      */
-    public function __construct(AuthFacade $auth, UserRepository $userRepo)
+    public function __construct(AuthService $auth, UserRepository $userRepo)
     {
         $this->auth     = $auth;
         $this->userRepo = $userRepo;
@@ -74,8 +72,9 @@ class RegularLoginAction extends AbstractAction
      * @param \Psr\Http\Message\ServerRequestInterface $request
      *
      * @return \Psr\Http\Message\ResponseInterface
-     * @throws \BetaKiller\Auth\IncorrectPasswordException
-     * @throws \BetaKiller\Auth\UserDoesNotExistsException
+     * @throws \BetaKiller\Auth\AccessDeniedException
+     * @throws \BetaKiller\Auth\InactiveException
+     * @throws \BetaKiller\Auth\IncorrectCredentialsException
      * @throws \BetaKiller\Exception\BadRequestHttpException
      * @throws \BetaKiller\Exception\ValidationException
      * @throws \BetaKiller\Repository\RepositoryException
@@ -103,18 +102,19 @@ class RegularLoginAction extends AbstractAction
         $user = $this->userRepo->searchBy($userLogin);
 
         if (!$user) {
-            throw new UserDoesNotExistsException;
+            throw new IncorrectCredentialsException;
         }
 
         // If the passwords match, perform a login
         if (!$this->auth->checkPassword($user, $userPassword)) {
-            throw new IncorrectPasswordException();
+            throw new IncorrectCredentialsException;
         }
 
-        $response = ServerRequestHelper::isJsonPreferred($request)
+        $session = ServerRequestHelper::getSession($request);
+        $this->auth->login($session, $user);
+
+        return ServerRequestHelper::isJsonPreferred($request)
             ? ResponseHelper::successJson()
             : ResponseHelper::redirect($referrer); // Fallback for non-JS browsers
-
-        return $this->auth->login($user, $request, $response);
     }
 }

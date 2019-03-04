@@ -1,9 +1,10 @@
 <?php
 namespace BetaKiller\Repository;
 
-use BetaKiller\Model\ExtendedOrmInterface;
 use BetaKiller\Model\Token;
 use BetaKiller\Model\TokenInterface;
+use BetaKiller\Url\Container\UrlContainerInterface;
+use BetaKiller\Utils\Kohana\ORM\OrmInterface;
 
 /**
  * @method TokenInterface findById(string $id)
@@ -26,12 +27,12 @@ class TokenRepository extends AbstractOrmBasedMultipleParentsTreeRepository
      * @return \BetaKiller\Model\TokenInterface|null
      * @throws \BetaKiller\Repository\RepositoryException
      */
-    public function find(string $value): ?TokenInterface
+    public function findByValue(string $value): ?TokenInterface
     {
         $orm = $this->getOrmInstance();
 
         return $this
-            ->filterByValue($orm, $value)
+            ->filterValue($orm, $value)
             ->findOne($orm);
     }
 
@@ -46,8 +47,8 @@ class TokenRepository extends AbstractOrmBasedMultipleParentsTreeRepository
         $orm = $this->getOrmInstance();
 
         return $this
-            ->filterByValue($orm, $value)
-            ->filterByActive($orm)
+            ->filterValue($orm, $value)
+            ->filterActive($orm, true)
             ->findOne($orm);
     }
 
@@ -60,17 +61,17 @@ class TokenRepository extends AbstractOrmBasedMultipleParentsTreeRepository
         $orm = $this->getOrmInstance();
 
         return $this
-            ->filterByNotActive($orm)
+            ->filterActive($orm, false)
             ->findAll($orm);
     }
 
     /**
-     * @param \BetaKiller\Model\ExtendedOrmInterface $orm
-     * @param string                                 $value
+     * @param \BetaKiller\Utils\Kohana\ORM\OrmInterface $orm
+     * @param string                                    $value
      *
      * @return \BetaKiller\Repository\TokenRepository
      */
-    private function filterByValue(ExtendedOrmInterface $orm, string $value): self
+    private function filterValue(OrmInterface $orm, string $value): self
     {
         $column = $orm->object_column(Token::TABLE_FIELD_VALUE);
         $orm->where($column, '=', $value);
@@ -79,30 +80,35 @@ class TokenRepository extends AbstractOrmBasedMultipleParentsTreeRepository
     }
 
     /**
-     * @param \BetaKiller\Model\ExtendedOrmInterface $orm
+     * @param OrmInterface $orm
+     * @param bool         $active
      *
      * @return \BetaKiller\Repository\TokenRepository
+     * @throws \Exception
      */
-    private function filterByActive(ExtendedOrmInterface $orm): self
+    private function filterActive(OrmInterface $orm, bool $active): self
     {
-        $column      = $orm->object_column(Token::TABLE_FIELD_ENDING_AT);
-        $currentDate = (new \DateTimeImmutable())->format('Y-m-d H:i:s');
-        $orm->where($column, '>', $currentDate);
+        $column = $orm->object_column(Token::TABLE_FIELD_ENDING_AT);
+        $now    = new \DateTimeImmutable();
+
+        $orm->filter_datetime_column_value($column, $now, $active ? '>' : '<=');
 
         return $this;
     }
 
-    /**
-     * @param \BetaKiller\Model\ExtendedOrmInterface $orm
-     *
-     * @return \BetaKiller\Repository\TokenRepository
-     */
-    private function filterByNotActive(ExtendedOrmInterface $orm): self
+    private function filterNotUsed(OrmInterface $orm): self
     {
-        $column      = $orm->object_column(Token::TABLE_FIELD_ENDING_AT);
-        $currentDate = (new \DateTimeImmutable())->format('Y-m-d H:i:s');
-        $orm->where($column, '<=', $currentDate);
+        $column = $orm->object_column(Token::TABLE_FIELD_USED_AT);
+
+        $orm->where($column, 'IS', null);
 
         return $this;
+    }
+
+    protected function customFilterForUrlDispatching(OrmInterface $orm, UrlContainerInterface $params): void
+    {
+        $this
+            ->filterNotUsed($orm)
+            ->filterActive($orm, true);
     }
 }
