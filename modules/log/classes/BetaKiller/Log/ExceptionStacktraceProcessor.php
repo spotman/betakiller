@@ -1,6 +1,8 @@
 <?php
 namespace BetaKiller\Log;
 
+use BetaKiller\ExceptionInterface;
+
 class ExceptionStacktraceProcessor
 {
     /**
@@ -12,6 +14,11 @@ class ExceptionStacktraceProcessor
     {
         /** @var \Throwable|null $exception */
         $exception = $record['context'][Logger::CONTEXT_KEY_EXCEPTION] ?? null;
+
+        // Skip expected exceptions
+        if ($exception && $exception instanceof ExceptionInterface && !$exception->isNotificationEnabled()) {
+            return $record;
+        }
 
         if ($exception) {
             // Find root exception
