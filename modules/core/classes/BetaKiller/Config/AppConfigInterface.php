@@ -55,4 +55,9 @@ interface AppConfigInterface
      * @return string[]
      */
     public function getIgnoredQueryParams(): array;
+
+    /**
+     * @return string
+     */
+    public function getSupportUrl(): string;
 }
