@@ -24,14 +24,9 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
     public const NOTIFICATION_SUBSYSTEM_FAILURE = 'developer/error/subsystem-failure';
 
     /**
-     * Notify about N-th duplicated exception only
-     */
-    private const REPEAT_COUNT = 50;
-
-    /**
      * Notify not faster than 1 message in T seconds
      */
-    private const REPEAT_DELAY = 600;
+    private const REPEAT_DELAY = 300;
 
     /**
      * @var bool
@@ -194,7 +189,7 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
             $model->setTrace($stacktrace);
         }
 
-        $isNotificationNeeded = $this->isNotificationNeededFor($model, static::REPEAT_COUNT, static::REPEAT_DELAY);
+        $isNotificationNeeded = $this->isNotificationNeededFor($model);
 
         $this->logger->debug('Notification needed is :value', [':value' => $isNotificationNeeded ? 'true' : 'false']);
 
@@ -219,12 +214,10 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
      * Returns TRUE if exception needs to be notified
      *
      * @param PhpExceptionModelInterface $model
-     * @param int                        $repeatCount
-     * @param int                        $repeatDelay
      *
      * @return bool
      */
-    public function isNotificationNeededFor(PhpExceptionModelInterface $model, int $repeatCount, int $repeatDelay): bool
+    public function isNotificationNeededFor(PhpExceptionModelInterface $model): bool
     {
         // Skip ignored exceptions
         if ($model->isIgnored()) {
@@ -240,21 +233,7 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
         $timeDiffInSeconds = $lastSeenAtTimestamp - $lastNotifiedAtTimestamp;
 
         // Throttle by time
-        if ($lastNotifiedAtTimestamp && ($timeDiffInSeconds < $repeatDelay)) {
-            return false;
-        }
-
-        // New error needs to be notified only once
-        if (!$lastNotifiedAtTimestamp && $model->isNew()) {
-            $this->logger->debug('New exception needs to be notified');
-
-            return true;
-        }
-
-        $this->logger->debug('Total exception counter is :value', [':value' => $model->getCounter()]);
-
-        // Throttle by occurrence number
-        return ($model->getCounter() % $repeatCount === 1);
+        return !$lastNotifiedAtTimestamp || $timeDiffInSeconds > static::REPEAT_DELAY;
     }
 
     public static function getNotificationTarget(NotificationHelper $helper): NotificationTargetInterface
