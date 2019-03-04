@@ -3,10 +3,10 @@ declare(strict_types=1);
 
 namespace BetaKiller\Wamp;
 
-use BetaKiller\Auth\AuthFacade;
 use BetaKiller\Helper\CookieHelper;
 use BetaKiller\Helper\LoggerHelperTrait;
 use BetaKiller\Helper\SessionHelper;
+use BetaKiller\Service\AuthService;
 use BetaKiller\Session\DatabaseSessionStorage;
 use Psr\Log\LoggerInterface;
 use Thruway\Authentication\WampCraUserDbInterface;
@@ -21,7 +21,7 @@ class WampUserDb implements WampCraUserDbInterface
     use LoggerHelperTrait;
 
     /**
-     * @var \BetaKiller\Auth\AuthFacade
+     * @var \BetaKiller\Service\AuthService
      */
     private $auth;
 
@@ -36,11 +36,11 @@ class WampUserDb implements WampCraUserDbInterface
     private $cookieHelper;
 
     /**
-     * @param \BetaKiller\Auth\AuthFacade     $auth
+     * @param \BetaKiller\Service\AuthService $auth
      * @param \BetaKiller\Helper\CookieHelper $cookieHelper
      * @param \Psr\Log\LoggerInterface        $logger
      */
-    public function __construct(AuthFacade $auth, CookieHelper $cookieHelper, LoggerInterface $logger)
+    public function __construct(AuthService $auth, CookieHelper $cookieHelper, LoggerInterface $logger)
     {
         $this->auth         = $auth;
         $this->logger       = $logger;

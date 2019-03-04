@@ -4,12 +4,13 @@ declare(strict_types=1);
 namespace BetaKiller\Wamp;
 
 use BetaKiller\Api\ApiFacade;
-use BetaKiller\Auth\AuthFacade;
 use BetaKiller\Config\WampConfigInterface;
+use BetaKiller\Error\ExceptionService;
 use BetaKiller\Exception;
 use BetaKiller\Helper\CookieHelper;
 use BetaKiller\Helper\LoggerHelperTrait;
 use BetaKiller\Model\UserInterface;
+use BetaKiller\Service\AuthService;
 use BetaKiller\Session\DatabaseSessionStorage;
 use Psr\Log\LoggerInterface;
 use Spotman\Api\ApiMethodResponse;
@@ -24,8 +25,8 @@ class WampInternalClient extends \Thruway\Peer\Client
     public const PROCEDURE_API = 'api';
 
     public const KEY_API_RESOURCE = 'resource';
-    public const KEY_API_METHOD = 'method';
-    public const KEY_API_DATA = 'data';
+    public const KEY_API_METHOD   = 'method';
+    public const KEY_API_DATA     = 'data';
 
     use LoggerHelperTrait;
 
@@ -40,7 +41,7 @@ class WampInternalClient extends \Thruway\Peer\Client
     private $logger;
 
     /**
-     * @var \BetaKiller\Auth\AuthFacade
+     * @var \BetaKiller\Service\AuthService
      */
     private $auth;
 
@@ -50,25 +51,33 @@ class WampInternalClient extends \Thruway\Peer\Client
     private $cookieHelper;
 
     /**
+     * @var \BetaKiller\Error\ExceptionService
+     */
+    private $exceptionService;
+
+    /**
      * @param \BetaKiller\Config\WampConfigInterface $wampConfig
      * @param \BetaKiller\Api\ApiFacade              $apiFacade
-     * @param \BetaKiller\Auth\AuthFacade            $auth
+     * @param \BetaKiller\Service\AuthService        $auth
      * @param \BetaKiller\Helper\CookieHelper        $cookieHelper
+     * @param \BetaKiller\Error\ExceptionService     $exceptionService
      * @param \Psr\Log\LoggerInterface               $logger
      */
     public function __construct(
         WampConfigInterface $wampConfig,
         ApiFacade $apiFacade,
-        AuthFacade $auth,
+        AuthService $auth,
         CookieHelper $cookieHelper,
+        ExceptionService $exceptionService,
         LoggerInterface $logger
     ) {
         parent::__construct($wampConfig->getRealmName());
 
-        $this->apiFacade    = $apiFacade;
-        $this->logger       = $logger;
-        $this->auth         = $auth;
-        $this->cookieHelper = $cookieHelper;
+        $this->apiFacade        = $apiFacade;
+        $this->logger           = $logger;
+        $this->auth             = $auth;
+        $this->cookieHelper     = $cookieHelper;
+        $this->exceptionService = $exceptionService;
     }
 
     /**
@@ -115,7 +124,14 @@ class WampInternalClient extends \Thruway\Peer\Client
             $result = $this->callApiMethod($resource, $method, $arguments, $user);
         } catch (\Throwable $e) {
             $this->logException($this->logger, $e);
-            return null;
+
+            $error = $this->exceptionService->getExceptionMessage($e, $user->getLanguage());
+
+            $this->logger->debug('Error is ":value"', [':value' => $error]);
+
+            return [
+                'error' => $error,
+            ];
         }
 
         $this->logger->debug('Result is :value', [':value' => \json_encode($result)]);

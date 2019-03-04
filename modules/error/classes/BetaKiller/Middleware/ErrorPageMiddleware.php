@@ -3,17 +3,16 @@ declare(strict_types=1);
 
 namespace BetaKiller\Middleware;
 
-use BetaKiller\Exception;
-use BetaKiller\Exception\HttpExceptionInterface;
+use BetaKiller\Error\ExceptionService;
 use BetaKiller\ExceptionInterface;
 use BetaKiller\Factory\IFaceFactory;
 use BetaKiller\Helper\AppEnvInterface;
-use BetaKiller\Helper\I18nHelper;
 use BetaKiller\Helper\LoggerHelperTrait;
 use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\IFace\AbstractHttpErrorIFace;
 use BetaKiller\IFace\IFaceInterface;
+use BetaKiller\Model\LanguageInterface;
 use BetaKiller\Url\IFaceModelInterface;
 use BetaKiller\Url\UrlElementInterface;
 use BetaKiller\Url\UrlElementTreeInterface;
@@ -55,12 +54,18 @@ class ErrorPageMiddleware implements MiddlewareInterface
     private $ifaceFactory;
 
     /**
+     * @var \BetaKiller\Error\ExceptionService
+     */
+    private $exceptionService;
+
+    /**
      * ErrorPageMiddleware constructor.
      *
      * @param \BetaKiller\Url\UrlElementTreeInterface $tree
      * @param \BetaKiller\Factory\IFaceFactory        $ifaceFactory
      * @param \BetaKiller\Helper\AppEnvInterface      $appEnv
      * @param \BetaKiller\View\IFaceView              $ifaceView
+     * @param \BetaKiller\Error\ExceptionService      $exceptionService
      * @param \Psr\Log\LoggerInterface                $logger
      */
     public function __construct(
@@ -68,13 +73,15 @@ class ErrorPageMiddleware implements MiddlewareInterface
         IFaceFactory $ifaceFactory,
         AppEnvInterface $appEnv,
         IFaceView $ifaceView,
+        ExceptionService $exceptionService,
         LoggerInterface $logger
     ) {
-        $this->appEnv       = $appEnv;
-        $this->ifaceView    = $ifaceView;
-        $this->logger       = $logger;
-        $this->tree         = $tree;
-        $this->ifaceFactory = $ifaceFactory;
+        $this->appEnv           = $appEnv;
+        $this->ifaceView        = $ifaceView;
+        $this->tree             = $tree;
+        $this->ifaceFactory     = $ifaceFactory;
+        $this->exceptionService = $exceptionService;
+        $this->logger           = $logger;
     }
 
     /**
@@ -100,10 +107,8 @@ class ErrorPageMiddleware implements MiddlewareInterface
 
     private function handleException(ServerRequestInterface $request, \Throwable $e): ResponseInterface
     {
-        $i18n = ServerRequestHelper::getI18n($request);
-
         if (ServerRequestHelper::isJsonPreferred($request)) {
-            return $this->makeJsonResponse($e, $i18n);
+            return $this->makeJsonResponse($e, $request);
         }
 
         // Make nice message if allowed or use default Kohana response
@@ -113,19 +118,17 @@ class ErrorPageMiddleware implements MiddlewareInterface
     /**
      * Returns JSON response
      *
-     * @param \Throwable                    $e
-     * @param \BetaKiller\Helper\I18nHelper $i18n
+     * @param \Throwable                               $e
+     * @param \Psr\Http\Message\ServerRequestInterface $request
      *
      * @return \Psr\Http\Message\ResponseInterface
+     * @throws \BetaKiller\Exception
      */
-    private function makeJsonResponse(\Throwable $e, I18nHelper $i18n): ResponseInterface
+    private function makeJsonResponse(\Throwable $e, ServerRequestInterface $request): ResponseInterface
     {
-        if (!$e instanceof ExceptionInterface || !$e->showOriginalMessageToUser()) {
-            // No messages for custom exceptions
-            return ResponseHelper::errorJson();
-        }
+        $lang = $this->getRequestLang($request);
 
-        $message = $e->getMessage() ?: $i18n->translateKeyName($e->getDefaultMessageI18nKey());
+        $message = $this->exceptionService->getExceptionMessage($e, $lang);
 
         return ResponseHelper::errorJson($message);
     }
@@ -151,7 +154,7 @@ class ErrorPageMiddleware implements MiddlewareInterface
             return null;
         }
 
-        $httpCode = $this->getErrorHttpCode($exception);
+        $httpCode = $this->exceptionService->getHttpCode($exception);
 
         $stack = ServerRequestHelper::getUrlElementStack($request);
         $last  = $stack->hasCurrent() ? $stack->getCurrent() : null;
@@ -163,11 +166,9 @@ class ErrorPageMiddleware implements MiddlewareInterface
                 $iface->setException($exception);
             }
 
-            $i18n = ServerRequestHelper::getI18n($request);
-
             $body = $iface
                 ? $this->ifaceView->render($iface, $request)
-                : $this->renderFallbackMessage($exception, $i18n);
+                : $this->renderFallbackMessage($exception, $request);
 
             return new HtmlResponse($body, $httpCode);
         } catch (\Throwable $e) {
@@ -206,11 +207,11 @@ class ErrorPageMiddleware implements MiddlewareInterface
     private function getErrorIFaceForCode(int $code, ?UrlElementInterface $lastElement): ?IFaceInterface
     {
         // Try to find IFace provided code first and use default IFace if failed
-        foreach ([$code, ExceptionInterface::DEFAULT_EXCEPTION_CODE] as $tryCode) {
+        foreach ([$code, ExceptionService::DEFAULT_HTTP_CODE] as $tryCode) {
             $model = $this->searchErrorIFaceInBranch($tryCode, $lastElement);
 
             if ($model) {
-              return $this->ifaceFactory->createFromUrlElement($model);
+                return $this->ifaceFactory->createFromUrlElement($model);
             }
         }
 
@@ -265,97 +266,26 @@ class ErrorPageMiddleware implements MiddlewareInterface
     }
 
     /**
-     * @param \Throwable                    $e
-     * @param \BetaKiller\Helper\I18nHelper $i18n
+     * @param \Throwable                               $e
+     * @param \Psr\Http\Message\ServerRequestInterface $request
      *
      * @return string
      * @throws \BetaKiller\Exception
      */
-    private function renderFallbackMessage(\Throwable $e, I18nHelper $i18n): string
+    private function renderFallbackMessage(\Throwable $e, ServerRequestInterface $request): string
     {
-        $message = $this->getExceptionMessage($e, $i18n);
+        $lang = $this->getRequestLang($request);
+
+        $message = $this->exceptionService->getExceptionMessage($e, $lang);
 
         // Prevent XSS
         return htmlspecialchars($message, ENT_QUOTES);
     }
 
-    /**
-     * Returns text which would be shown to user on uncaught exception
-     * For most of exception classes it returns default label (we do not want to inform user about our problems)
-     *
-     * @param \Throwable                    $e
-     * @param \BetaKiller\Helper\I18nHelper $i18n
-     *
-     * @return string
-     * @throws \BetaKiller\Exception
-     */
-    private function getExceptionMessage(\Throwable $e, I18nHelper $i18n): string
+    private function getRequestLang(ServerRequestInterface $request): ?LanguageInterface
     {
-        $showOriginalMessage = ($e instanceof ExceptionInterface) && $e->showOriginalMessageToUser();
-
-        return $showOriginalMessage
-            ? $this->getOriginalMessage($e, $i18n)
-            : $this->getMaskedMessage($e, $i18n);
-    }
-
-    /**
-     * @param \Throwable                    $e
-     * @param \BetaKiller\Helper\I18nHelper $i18n
-     *
-     * @return string
-     * @throws \BetaKiller\Exception
-     */
-    private function getOriginalMessage(\Throwable $e, I18nHelper $i18n): string
-    {
-        $message = $e->getMessage();
-
-        // Return message if exists
-        if ($message) {
-            return $message;
-        }
-
-        // Use default message if defined
-        $i18nKey = ($e instanceof ExceptionInterface) ? $e->getDefaultMessageI18nKey() : null;
-
-        // Http exceptions may omit message and will use default label instead
-        if (!$i18nKey && $e instanceof HttpExceptionInterface) {
-            $i18nKey = $this->getErrorLabelI18nKey($e);
-        }
-
-        if (!$i18nKey) {
-            throw new Exception('Exception :class must provide message in constructor or define default message', [
-                ':class' => \get_class($e),
-            ]);
-        }
-
-        return $i18n->translateKeyName($i18nKey);
-    }
-
-    private function getMaskedMessage(\Throwable $e, I18nHelper $i18n): string
-    {
-        $key = $this->getErrorLabelI18nKey($e);
-
-        return $i18n->translateKeyName($key);
-    }
-
-    private function getErrorLabelI18nKey(\Throwable $e): string
-    {
-        $code = $this->getErrorHttpCode($e);
-
-        return $this->getLabelI18nKeyForHttpCode($code);
-    }
-
-    private function getErrorHttpCode(\Throwable $e): int
-    {
-        $code = $e->getCode();
-
-        return (($e instanceof HttpExceptionInterface) && $code)
-            ? $code
-            : ExceptionInterface::DEFAULT_EXCEPTION_CODE;
-    }
-
-    private function getLabelI18nKeyForHttpCode(int $code): string
-    {
-        return 'error.http.'.$code.'.label';
+        return ServerRequestHelper::hasI18n($request)
+            ? ServerRequestHelper::getI18n($request)->getLang()
+            : null;
     }
 }
