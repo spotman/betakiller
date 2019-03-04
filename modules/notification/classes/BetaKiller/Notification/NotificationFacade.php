@@ -10,7 +10,7 @@ use BetaKiller\Model\UserInterface;
 use BetaKiller\Notification\Transport\EmailTransport;
 use BetaKiller\Notification\Transport\OnlineTransport;
 use BetaKiller\Repository\NotificationGroupRepository;
-use BetaKiller\Repository\NotificationLogRepository;
+use BetaKiller\Repository\NotificationLogRepositoryInterface;
 use Psr\Log\LoggerInterface;
 
 class NotificationFacade
@@ -48,26 +48,26 @@ class NotificationFacade
     private $logger;
 
     /**
-     * @var \BetaKiller\Repository\NotificationLogRepository
+     * @var \BetaKiller\Repository\NotificationLogRepositoryInterface
      */
     private $logRepo;
 
     /**
      * NotificationFacade constructor.
      *
-     * @param \BetaKiller\Notification\NotificationMessageFactory $messageFactory
-     * @param \BetaKiller\Notification\MessageRendererInterface   $renderer
-     * @param \BetaKiller\Config\NotificationConfigInterface      $config
-     * @param \BetaKiller\Repository\NotificationGroupRepository  $groupRepo
-     * @param \BetaKiller\Repository\NotificationLogRepository    $logRepo
-     * @param \Psr\Log\LoggerInterface                            $logger
+     * @param \BetaKiller\Notification\NotificationMessageFactory       $messageFactory
+     * @param \BetaKiller\Notification\MessageRendererInterface         $renderer
+     * @param \BetaKiller\Config\NotificationConfigInterface            $config
+     * @param \BetaKiller\Repository\NotificationGroupRepository        $groupRepo
+     * @param \BetaKiller\Repository\NotificationLogRepositoryInterface $logRepo
+     * @param \Psr\Log\LoggerInterface                                  $logger
      */
     public function __construct(
         NotificationMessageFactory $messageFactory,
         MessageRendererInterface $renderer,
         NotificationConfigInterface $config,
         NotificationGroupRepository $groupRepo,
-        NotificationLogRepository $logRepo,
+        NotificationLogRepositoryInterface $logRepo,
         LoggerInterface $logger
     ) {
         $this->messageFactory = $messageFactory;
@@ -89,7 +89,7 @@ class NotificationFacade
      * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\Notification\NotificationException
      */
-    public function groupMessage(string $name, array $templateData): NotificationMessageInterface
+    public function createGroupMessage(string $name, array $templateData): NotificationMessageInterface
     {
         $message = $this->createMessage($name, $templateData);
 
@@ -108,7 +108,7 @@ class NotificationFacade
      *
      * @return \BetaKiller\Notification\NotificationMessageInterface
      */
-    public function directMessage(
+    public function createDirectMessage(
         string $name,
         NotificationTargetInterface $target,
         array $templateData

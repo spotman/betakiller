@@ -59,7 +59,7 @@ class NotificationHelper
      */
     public function groupMessage(string $name, array $templateData, array $attachments = null): void
     {
-        $message = $this->notification->groupMessage($name, $templateData);
+        $message = $this->notification->createGroupMessage($name, $templateData);
 
         if ($attachments) {
             foreach ($attachments as $attach) {
@@ -89,7 +89,7 @@ class NotificationHelper
         array $templateData,
         array $attachments = null
     ): void {
-        $message = $this->notification->directMessage($name, $target, $templateData);
+        $message = $this->notification->createDirectMessage($name, $target, $templateData);
 
         if ($attachments) {
             foreach ($attachments as $attach) {
