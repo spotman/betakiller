@@ -75,13 +75,13 @@ return [
             StreamFactoryInterface $factory
         ) {
             return new ImplicitHeadMiddleware($router, function () use ($factory) {
-                return $factory;
+                return $factory->createStream();
             });
         }),
 
         ImplicitOptionsMiddleware::class => \DI\factory(function (ResponseFactoryInterface $factory) {
             return new ImplicitOptionsMiddleware(function () use ($factory) {
-                return $factory;
+                return $factory->createResponse();
             });
         }),
 
