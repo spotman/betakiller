@@ -71,6 +71,11 @@ class ExceptionService
 
         // Return message if exists
         if ($message) {
+            // Translate if i18n key is used
+            if (I18nFacade::isI18nKey($message)) {
+                $message = $this->i18n->translateKeyName($lang, $message);
+            }
+
             return $message;
         }
 
