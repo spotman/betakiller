@@ -119,20 +119,20 @@ class User extends \ORM implements UserInterface
             ],
         ];
     }
-
-    /**
-     * Labels for fields in this model
-     *
-     * @return array Labels
-     */
-    public function labels(): array
-    {
-        return [
-            'username' => 'username',
-            'email'    => 'email address',
-            'password' => 'password',
-        ];
-    }
+//
+//    /**
+//     * Labels for fields in this model
+//     *
+//     * @return array Labels
+//     */
+//    public function labels(): array
+//    {
+//        return [
+//            'username' => 'username',
+//            'email'    => 'email address',
+//            'password' => 'password',
+//        ];
+//    }
 
     /**
      * @param \BetaKiller\Model\UserStatusInterface $userStatusModel
