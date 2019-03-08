@@ -38,7 +38,14 @@ final class TwigLoaderCfs extends Twig_Loader_Filesystem
 
     private function getPathCache(): ?array
     {
-        return Kohana::cache($this->pathsCacheKey);
+        $data = Kohana::cache($this->pathsCacheKey);
+
+        // Foolproof check for missing cache-file and other errors
+        if (!is_array($data)) {
+            return null;
+        }
+
+        return $data;
     }
 
     private function setPathCache(array $paths): void
