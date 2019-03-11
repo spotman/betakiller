@@ -109,14 +109,9 @@ class IsAlive extends AbstractTask
     {
         \Thruway\Logging\Logger::set($this->logger);
 
-//        $url = sprintf(
-//            'ws://%s:%s',
-//            $this->config->getConnectionHost(),
-//            $this->config->getConnectionPort()
-//        );
-
         $url = sprintf(
-            'ws://%s/wamp',
+            '%s://%s/wamp',
+            $this->appConfig->isSecure() ? 'wss' : 'ws',
             $this->appConfig->getBaseUri()->getHost()
         );
 
