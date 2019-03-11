@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace BetaKiller\Task\Wamp;
 
 use BetaKiller\Api\Method\WampTest\DataApiMethod;
+use BetaKiller\Config\AppConfigInterface;
 use BetaKiller\Config\WampConfigInterface;
 use BetaKiller\Helper\CookieHelper;
 use BetaKiller\Helper\ResponseHelper;
@@ -18,7 +19,6 @@ use React\EventLoop\TimerInterface;
 use Thruway\Authentication\ClientWampCraAuthenticator;
 use Thruway\CallResult;
 use Thruway\ClientSession;
-use Thruway\Connection;
 use Thruway\Peer\Client;
 use Thruway\Transport\PawlTransportProvider;
 
@@ -29,12 +29,7 @@ class IsAlive extends AbstractTask
     /**
      * @var \BetaKiller\Config\WampConfigInterface
      */
-    private $config;
-
-    /**
-     * @var Connection
-     */
-    private $conn;
+    private $wampConfig;
 
     /**
      * @var \Zend\Expressive\Session\SessionInterface|\Zend\Expressive\Session\SessionIdentifierAwareInterface
@@ -67,15 +62,23 @@ class IsAlive extends AbstractTask
     private $user;
 
     /**
+     * @var \BetaKiller\Config\AppConfigInterface
+     */
+    private $appConfig;
+
+    /**
      * IsAlive constructor.
      *
-     * @param \BetaKiller\Config\WampConfigInterface      $config
+     * @param \BetaKiller\Config\WampConfigInterface      $wampConfig
+     * @param \BetaKiller\Config\AppConfigInterface       $appConfig
      * @param \BetaKiller\Session\SessionStorageInterface $sessionStorage
      * @param \BetaKiller\Helper\CookieHelper             $cookieHelper
+     * @param \BetaKiller\Model\UserInterface             $user
      * @param \Psr\Log\LoggerInterface                    $logger
      */
     public function __construct(
-        WampConfigInterface $config,
+        WampConfigInterface $wampConfig,
+        AppConfigInterface $appConfig,
         SessionStorageInterface $sessionStorage,
         CookieHelper $cookieHelper,
         UserInterface $user,
@@ -83,7 +86,8 @@ class IsAlive extends AbstractTask
     ) {
         parent::__construct();
 
-        $this->config         = $config;
+        $this->appConfig      = $appConfig;
+        $this->wampConfig     = $wampConfig;
         $this->logger         = $logger;
         $this->sessionStorage = $sessionStorage;
         $this->cookieHelper   = $cookieHelper;
@@ -105,11 +109,20 @@ class IsAlive extends AbstractTask
     {
         \Thruway\Logging\Logger::set($this->logger);
 
+//        $url = sprintf(
+//            'ws://%s:%s',
+//            $this->config->getConnectionHost(),
+//            $this->config->getConnectionPort()
+//        );
+
         $url = sprintf(
-            'ws://%s:%s',
-            $this->config->getConnectionHost(),
-            $this->config->getConnectionPort()
+            'ws://%s/wamp',
+            $this->appConfig->getBaseUri()->getHost()
         );
+
+        $this->logger->debug('Connecting to :url', [
+            ':url' => $url,
+        ]);
 
         $this->createSession();
 
@@ -119,17 +132,17 @@ class IsAlive extends AbstractTask
             $this->session->getId()
         );
 
-        $client = new Client($this->config->getRealmName());
+        $client = new Client($this->wampConfig->getRealmName());
         $client->addTransportProvider(new PawlTransportProvider($url));
         $client->addClientAuthenticator(new ClientWampCraAuthenticator($authId, $authId)); // No more user-agent here
 
         $client->setAuthId($authId);
 
         $client->setReconnectOptions([
-            'max_retries'         => 0,
-            'initial_retry_delay' => 1,
-            'max_retry_delay'     => 3,
-            'retry_delay_growth'  => 1.5,
+            'max_retries'         => 3,
+            'initial_retry_delay' => 3,
+            'max_retry_delay'     => 10,
+            'retry_delay_growth'  => 2,
         ]);
 
         $client->on('open', function (ClientSession $session) use ($client) {
@@ -145,11 +158,16 @@ class IsAlive extends AbstractTask
 
             $loop = $client->getLoop();
 
-            $loop->addPeriodicTimer(1, function (TimerInterface $timer) use ($session, $loop) {
+            $loop->addPeriodicTimer(1, function (TimerInterface $timer) use ($session, $loop, $client) {
                 // Close session after check was done
                 if (is_bool($this->isAlive)) {
                     $this->logger->debug('Check done, closing session');
                     $loop->cancelTimer($timer);
+
+                    // Prevent reconnection after session close
+                    $client->setAttemptRetry(false);
+
+                    // Close session and exit
                     $session->close();
                 } else {
                     $this->logger->debug('Waiting for check to be done...');
