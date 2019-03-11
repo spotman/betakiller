@@ -1,6 +1,4 @@
-{{ js("auth/dist/manifest.js") }}
-{{ js("auth/dist/vendor.js") }}
-{{ js("auth/dist/auth.js") }}
+{{ entry("auth", 'auth/dist') }}
 
 <section class="widget-auth text-center container" data-providers="{{ providers|join(",") }}">
 

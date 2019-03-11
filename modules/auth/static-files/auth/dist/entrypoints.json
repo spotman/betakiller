@@ -1,0 +1,10 @@
+{
+  "entrypoints": {
+    "auth": {
+      "js": [
+        "/assets/static/auth/dist/runtime.js",
+        "/assets/static/auth/dist/auth.js"
+      ]
+    }
+  }
+}

@@ -2,6 +2,8 @@
 
 {% block content %}
 
+  {% block before "" %}
+
   {{ csp("style", "'sha256-llJMIuJbZWIR5SjAkMKZBqQAQyEHhqO18VucIR18wrg='") }}
 
   <style>
@@ -13,5 +15,7 @@
   <section id="auth-widget-container" class="h-100 d-flex flex align-items-center">
     {{ widget("Auth") }}
   </section>
+
+  {% block after "" %}
 
 {% endblock %}
