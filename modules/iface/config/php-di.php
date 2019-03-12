@@ -6,6 +6,7 @@ use BetaKiller\Url\UrlDispatcherCacheWrapper;
 use BetaKiller\Url\UrlDispatcherInterface;
 use BetaKiller\Url\UrlElementTreeInterface;
 use BetaKiller\Url\UrlElementTreeLoader;
+use BetaKiller\Widget\WidgetFacade;
 
 return [
 
@@ -22,6 +23,9 @@ return [
         UrlElementTreeInterface::class => DI\factory(function (UrlElementTreeLoader $loader) {
             return $loader->load();
         }),
+
+        // Lazy injection coz circular dependency TwigExtension => WidgetFacade => TwigExtension
+        WidgetFacade::class => \DI\autowire(WidgetFacade::class)->lazy(),
     ],
 
 ];
