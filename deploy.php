@@ -182,6 +182,7 @@ set('betakiller_writable_dirs', [
     '{{app_path}}/cache',
     '{{app_path}}/public/assets',
     '{{app_path}}/assets',
+    '{{app_path}}/storage',
 ]);
 
 task('deploy:betakiller:writable', function () {
