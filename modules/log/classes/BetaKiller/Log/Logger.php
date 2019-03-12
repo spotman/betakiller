@@ -124,7 +124,7 @@ class Logger implements LoggerInterface
                 'monolog-slack',
                 $this->appEnv->getAppCodename(),
                 $this->appEnv->getModeName(),
-                'log',
+                'storage',
             ]);
 
             $slackStorage = $this->appEnv->getStoragePath($slackStorage);
