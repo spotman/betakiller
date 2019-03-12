@@ -124,7 +124,6 @@ class Logger implements LoggerInterface
                 'monolog-slack',
                 $this->appEnv->getAppCodename(),
                 $this->appEnv->getModeName(),
-                $this->appEnv->getRevisionKey(),
                 'log',
             ]);
 
