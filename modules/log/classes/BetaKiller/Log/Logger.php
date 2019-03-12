@@ -4,7 +4,6 @@ namespace BetaKiller\Log;
 use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\Helper\LoggerHelperTrait;
 use Monolog\ErrorHandler;
-use Monolog\Handler\DeduplicationHandler;
 use Monolog\Handler\FingersCrossedHandler;
 use Monolog\Handler\HandlerInterface;
 use Monolog\Handler\SlackWebhookHandler;
@@ -129,12 +128,11 @@ class Logger implements LoggerInterface
 //
 //            $slackStorage = $this->appEnv->getStoragePath($slackStorage);
 
-            $monolog->pushHandler(new FilterExceptionsHandler(new DeduplicationHandler(
-                $slackHandler //,
+            $monolog->pushHandler(new FilterExceptionsHandler($slackHandler
 //                $slackStorage,
 //                \Monolog\Logger::ERROR,
 //                30 // Repeat notification in 30 seconds
-            )));
+            ));
         }
 
         return $monolog;
