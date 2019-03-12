@@ -120,20 +120,20 @@ class Logger implements LoggerInterface
             );
             $slackHandler->pushProcessor(new ContextCleanupProcessor);
 
-            $slackStorage = implode('.', [
-                'monolog-slack',
-                $this->appEnv->getAppCodename(),
-                $this->appEnv->getModeName(),
-                'storage',
-            ]);
-
-            $slackStorage = $this->appEnv->getStoragePath($slackStorage);
+//            $slackStorage = implode('.', [
+//                'monolog-slack',
+//                $this->appEnv->getAppCodename(),
+//                $this->appEnv->getModeName(),
+//                'storage',
+//            ]);
+//
+//            $slackStorage = $this->appEnv->getStoragePath($slackStorage);
 
             $monolog->pushHandler(new FilterExceptionsHandler(new DeduplicationHandler(
-                $slackHandler,
-                $slackStorage,
-                \Monolog\Logger::ERROR,
-                30 // Repeat notification in 30 seconds
+                $slackHandler //,
+//                $slackStorage,
+//                \Monolog\Logger::ERROR,
+//                30 // Repeat notification in 30 seconds
             )));
         }
 
