@@ -279,10 +279,13 @@ class AppEnv implements AppEnvInterface
 
         if ($add) {
             $path .= \DIRECTORY_SEPARATOR.$add;
-        }
 
-        if (!file_exists($path) && !mkdir($path, 0777, true) && !is_dir($path)) {
-            throw new \RuntimeException(sprintf('Directory "%s" was not created', $path));
+            // Get base directory
+            $dir = \dirname($path);
+
+            if (!file_exists($dir) && !mkdir($dir, 0777, true) && !is_dir($dir)) {
+                throw new \RuntimeException(sprintf('Directory "%s" was not created', $dir));
+            }
         }
 
         return $path;
