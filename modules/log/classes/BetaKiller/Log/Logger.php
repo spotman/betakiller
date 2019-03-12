@@ -127,9 +127,11 @@ class Logger implements LoggerInterface
                 'log',
             ]);
 
+            $slackStorage = $this->appEnv->getStoragePath($slackStorage);
+
             $monolog->pushHandler(new FilterExceptionsHandler(new DeduplicationHandler(
                 $slackHandler,
-                $this->appEnv->getTempPath().\DIRECTORY_SEPARATOR.$slackStorage,
+                $slackStorage,
                 \Monolog\Logger::ERROR,
                 30 // Repeat notification in 30 seconds
             )));
