@@ -2,20 +2,21 @@
 namespace BetaKiller\View;
 
 use BetaKiller\Twig\TwigView;
+use Twig\Environment;
 
 class TwigViewFactory implements ViewFactoryInterface
 {
     /**
-     * @var \Twig_Environment
+     * @var \Twig\Environment
      */
     private $env;
 
     /**
      * TwigViewFactory constructor.
      *
-     * @param \Twig_Environment $env
+     * @param \Twig\Environment $env
      */
-    public function __construct(\Twig_Environment $env)
+    public function __construct(Environment $env)
     {
         $this->env = $env;
     }

@@ -7,11 +7,11 @@ use BetaKiller\Config\ConfigProviderInterface;
 use Debug;
 use Kohana_Exception;
 use Psr\Container\ContainerInterface;
-use Twig_Environment;
-use Twig_ExtensionInterface;
-use Twig_SimpleFilter;
-use Twig_SimpleFunction;
-use Twig_SimpleTest;
+use Twig\Environment;
+use Twig\Extension\ExtensionInterface;
+use Twig\TwigFilter;
+use Twig\TwigFunction;
+use Twig\TwigTest;
 
 final class TwigEnvironmentFactory
 {
@@ -40,10 +40,10 @@ final class TwigEnvironmentFactory
     /**
      * Create a new Twig environment
      *
-     * @return \Twig_Environment
+     * @return Environment
      * @throws \BetaKiller\Twig\TwigException
      */
-    public function create(): Twig_Environment
+    public function create(): Environment
     {
         $config    = (array)$this->config->load(['twig']);
         $envConfig = $config['environment'];
@@ -57,7 +57,7 @@ final class TwigEnvironmentFactory
         }
 
         $loader = new TwigLoaderCfs($config['loader']);
-        $env    = new Twig_Environment($loader, $envConfig);
+        $env    = new Environment($loader, $envConfig);
 
         /** @var string[] $functions */
         $functions = $config['functions'];
@@ -72,33 +72,33 @@ final class TwigEnvironmentFactory
         $extensions = $config['extensions'];
 
         foreach ($functions as $key => $value) {
-            $function = new Twig_SimpleFunction($key, $value);
+            $function = new TwigFunction($key, $value);
             $env->addFunction($function);
         }
 
         foreach ($filters as $key => $value) {
-            $filter = new Twig_SimpleFilter($key, $value);
+            $filter = new TwigFilter($key, $value);
             $env->addFilter($filter);
         }
 
         foreach ($tests as $key => $value) {
-            $test = new Twig_SimpleTest($key, $value);
+            $test = new TwigTest($key, $value);
             $env->addTest($test);
         }
 
         foreach ($extensions as $extensionClassName) {
             if (!\is_string($extensionClassName)) {
                 throw new TwigException('Extension must be a class name but :real given', [
-                    ':must' => Twig_ExtensionInterface::class,
+                    ':must' => ExtensionInterface::class,
                     ':real' => \gettype($extensionClassName),
                 ]);
             }
 
             $extension = $this->container->get($extensionClassName);
 
-            if (!($extension instanceof Twig_ExtensionInterface)) {
+            if (!($extension instanceof ExtensionInterface)) {
                 throw new TwigException('Twig extension must be an instance of :must, but :real given', [
-                    ':must' => Twig_ExtensionInterface::class,
+                    ':must' => ExtensionInterface::class,
                     ':real' => \get_class($extension),
                 ]);
             }
