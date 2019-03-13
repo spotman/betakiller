@@ -16,7 +16,7 @@ class UrlElementStackTest extends \BetaKiller\Test\AbstractTestCase
      * Sets up the fixture, for example, open a network connection.
      * This method is called before a test is executed.
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->urlParams = $this->emptyUrlParameters();
     }
@@ -25,7 +25,7 @@ class UrlElementStackTest extends \BetaKiller\Test\AbstractTestCase
      * Tears down the fixture, for example, close a network connection.
      * This method is called after a test is executed.
      */
-    protected function tearDown()
+    protected function tearDown(): void
     {
     }
 
@@ -54,8 +54,8 @@ class UrlElementStackTest extends \BetaKiller\Test\AbstractTestCase
 
         $stack->push($ifaceModel);
 
-        $this->assertAttributeCount(1, 'items', $stack);
-        $this->assertAttributeEquals($ifaceModel, 'current', $stack);
+        $this->assertTrue($stack->hasCurrent());
+        $this->assertCount(1, $stack->getIterator());
 
         return $stack;
     }
@@ -76,8 +76,8 @@ class UrlElementStackTest extends \BetaKiller\Test\AbstractTestCase
 
         $stack->push($ifaceModel);
 
-        $this->assertAttributeCount(2, 'items', $stack);
-        $this->assertAttributeEquals($ifaceModel, 'current', $stack);
+        $this->assertTrue($stack->hasCurrent());
+        $this->assertCount(2, $stack->getIterator());
 
         return $stack;
     }

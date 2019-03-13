@@ -44,7 +44,7 @@
     "react/child-process": "^0.6.1",
     "roave/doctrine-simplecache": "^2.2",
     "samdark/sitemap": "^2.0",
-    "spotman/davbackup": "dev-master",
+    "spotman/davbackup": "^2.0",
     "swiftmailer/swiftmailer": "^6.1",
     "symfony/process": "^4.2",
     "symfony/yaml": "^4.0",
@@ -70,8 +70,8 @@
     "kint-php/kint": "^3.0",
     "kint-php/kint-twig": "^2.0",
     "phpstan/phpstan": "0.10.3",
-    "phpunit/php-code-coverage": "^6.0",
-    "phpunit/phpunit": "^7.3",
+    "phpunit/php-code-coverage": "^7.0",
+    "phpunit/phpunit": "^8.0",
     "roave/security-advisories": "dev-master"
   },
   "suggest": {
