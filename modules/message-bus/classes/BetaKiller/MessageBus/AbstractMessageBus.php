@@ -16,11 +16,6 @@ abstract class AbstractMessageBus implements AbstractMessageBusInterface
     private $container;
 
     /**
-     * @var \BetaKiller\MessageBus\MessageInterface[]
-     */
-    private $processedMessages = [];
-
-    /**
      * @var LoggerInterface
      */
     protected $logger;
@@ -52,12 +47,6 @@ abstract class AbstractMessageBus implements AbstractMessageBusInterface
     abstract protected function getMessageHandlersLimit(): int;
 
     /**
-     * @param \BetaKiller\MessageBus\MessageInterface        $message
-     * @param \BetaKiller\MessageBus\MessageHandlerInterface $handler
-     */
-    abstract protected function processDelayedMessage($message, $handler): void;
-
-    /**
      * @param string $messageClassName
      * @param string $handlerClassName
      *
@@ -78,14 +67,6 @@ abstract class AbstractMessageBus implements AbstractMessageBusInterface
 
         // Push handler
         $this->bindings[$messageClassName][] = $handlerClassName;
-
-        // Handle all processed messages with new handler
-        foreach ($this->processedMessages as $processedMessage) {
-            if ($this->getMessageName($processedMessage) === $messageClassName) {
-                $handler = $this->getHandlerInstance($handlerClassName);
-                $this->processDelayedMessage($processedMessage, $handler);
-            }
-        }
     }
 
     /**
@@ -105,11 +86,6 @@ abstract class AbstractMessageBus implements AbstractMessageBusInterface
         }
 
         return $handlers;
-    }
-
-    protected function addProcessedMessage(MessageInterface $message): void
-    {
-        $this->processedMessages[] = $message;
     }
 
     /**

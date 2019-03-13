@@ -13,9 +13,6 @@ class EventBus extends AbstractMessageBus implements EventBusInterface
     public function emit(EventMessageInterface $message): void
     {
         $this->handle($message);
-
-        // Add message
-        $this->addProcessedMessage($message);
     }
 
     /**
@@ -25,15 +22,6 @@ class EventBus extends AbstractMessageBus implements EventBusInterface
     protected function processMessage($message, $handler): void
     {
         $handler->handleEvent($message);
-    }
-
-    /**
-     * @param \BetaKiller\MessageBus\EventMessageInterface $message
-     * @param \BetaKiller\MessageBus\EventHandlerInterface $handler
-     */
-    protected function processDelayedMessage($message, $handler): void
-    {
-        $this->processMessage($message, $handler);
     }
 
     protected function getHandlerInterface(): string

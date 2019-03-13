@@ -11,9 +11,6 @@ class CommandBus extends AbstractMessageBus implements CommandBusInterface
     public function run(CommandMessageInterface $message): void
     {
         $this->handle($message);
-
-        // Add message
-        $this->addProcessedMessage($message);
     }
 
     protected function getHandlerInterface(): string
@@ -25,19 +22,6 @@ class CommandBus extends AbstractMessageBus implements CommandBusInterface
     {
         // One command => one handler
         return 1;
-    }
-
-    /**
-     * @param \BetaKiller\MessageBus\CommandMessageInterface $message
-     * @param \BetaKiller\MessageBus\CommandHandlerInterface $handler
-     */
-    protected function processDelayedMessage($message, $handler): void
-    {
-        if (!$message->isAsync()) {
-            throw new MessageBusException('Can not execute delayed sync command; make it async');
-        }
-
-        $this->process($message, $handler);
     }
 
     /**
