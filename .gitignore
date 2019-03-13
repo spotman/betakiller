@@ -1,5 +1,4 @@
 .idea
-composer.lock
 /application/.env
 ~syncthing~*.tmp
 .phpunit.result.cache
