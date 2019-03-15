@@ -133,13 +133,6 @@ class AuthService
         return $this->sessionStorage->getByToken($sessionID);
     }
 
-    public function getUserFromSessionID(string $sessionID): UserInterface
-    {
-        $session = $this->getSession($sessionID);
-
-        return $this->getSessionUser($session);
-    }
-
     /**
      * Attempt to log in a user by using an ORM object and plain-text password.
      *
