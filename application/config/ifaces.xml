@@ -43,6 +43,11 @@
             <action uri="activate" name="Auth_ActivateSuspended" zone="personal"/>
         </iface>
     </dummy>
+
+    <iface uri="auth" name="Auth_Admin_AuthRoot" parent="Admin_Index" menu="admin" zone="developer"
+        label="Auth Admin">
+        <action uri="restart-session" name="Auth_Admin_SessionRestart" />
+    </iface>
 </root>
 
         <!-- TODO убрать этот файл после того как будет настроено нормальное дерево интерфейсов -->
