@@ -10,7 +10,7 @@ import TestWampRpcTestResult from './TestWampRpcTestResult';
 import BetakillerWampApiRequest  from './betakiller-wamp-js/src/BetakillerWampApiRequest';
 import BetakillerWampAuthChallenge  from './betakiller-wamp-js/src/BetakillerWampAuthChallenge';
 import BetakillerWampConnection  from './betakiller-wamp-js/src/BetakillerWampConnection';
-import BetakillerWampCookieSession  from './betakiller-wamp-js/src/BetakillerWampCookieSession';
+import BetakillerWampCookieSession  from './betakiller-wamp-js/src/BetakillerWampSessionCookie';
 
 class TestWampRpcTestWithoutFacade {
   constructor(rpcConnection) {
