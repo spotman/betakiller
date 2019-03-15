@@ -4,32 +4,22 @@ declare(strict_types=1);
 namespace BetaKiller\Task\Wamp;
 
 use BetaKiller\Api\Method\WampTest\DataApiMethod;
-use BetaKiller\Config\AppConfigInterface;
-use BetaKiller\Config\WampConfigInterface;
-use BetaKiller\Helper\CookieHelper;
+use BetaKiller\Daemon\ApiWorkerDaemon;
 use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Helper\SessionHelper;
 use BetaKiller\Model\UserInterface;
-use BetaKiller\Session\DatabaseSessionStorage;
 use BetaKiller\Session\SessionStorageInterface;
 use BetaKiller\Task\AbstractTask;
-use BetaKiller\Wamp\WampInternalClient;
+use BetaKiller\Wamp\WampClient;
+use BetaKiller\Wamp\WampClientBuilder;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\TimerInterface;
-use Thruway\Authentication\ClientWampCraAuthenticator;
 use Thruway\CallResult;
 use Thruway\ClientSession;
-use Thruway\Peer\Client;
-use Thruway\Transport\PawlTransportProvider;
 
 class IsAlive extends AbstractTask
 {
-    private const USER_AGENT = 'long-read-user-agent';
-
-    /**
-     * @var \BetaKiller\Config\WampConfigInterface
-     */
-    private $wampConfig;
+    private const USER_AGENT = 'WAMP isAlive checker';
 
     /**
      * @var \Zend\Expressive\Session\SessionInterface|\Zend\Expressive\Session\SessionIdentifierAwareInterface
@@ -42,19 +32,9 @@ class IsAlive extends AbstractTask
     private $isAlive;
 
     /**
-     * @var \Psr\Log\LoggerInterface
-     */
-    private $logger;
-
-    /**
      * @var \BetaKiller\Session\SessionStorageInterface
      */
     private $sessionStorage;
-
-    /**
-     * @var \BetaKiller\Helper\CookieHelper
-     */
-    private $cookieHelper;
 
     /**
      * @var \BetaKiller\Model\UserInterface
@@ -62,36 +42,35 @@ class IsAlive extends AbstractTask
     private $user;
 
     /**
-     * @var \BetaKiller\Config\AppConfigInterface
+     * @var \BetaKiller\Wamp\WampClientBuilder
      */
-    private $appConfig;
+    private $clientBuilder;
+
+    /**
+     * @var \Psr\Log\LoggerInterface
+     */
+    private $logger;
 
     /**
      * IsAlive constructor.
      *
-     * @param \BetaKiller\Config\WampConfigInterface      $wampConfig
-     * @param \BetaKiller\Config\AppConfigInterface       $appConfig
      * @param \BetaKiller\Session\SessionStorageInterface $sessionStorage
-     * @param \BetaKiller\Helper\CookieHelper             $cookieHelper
+     * @param \BetaKiller\Wamp\WampClientBuilder          $clientFactory
      * @param \BetaKiller\Model\UserInterface             $user
      * @param \Psr\Log\LoggerInterface                    $logger
      */
     public function __construct(
-        WampConfigInterface $wampConfig,
-        AppConfigInterface $appConfig,
         SessionStorageInterface $sessionStorage,
-        CookieHelper $cookieHelper,
+        WampClientBuilder $clientFactory,
         UserInterface $user,
         LoggerInterface $logger
     ) {
         parent::__construct();
 
-        $this->appConfig      = $appConfig;
-        $this->wampConfig     = $wampConfig;
-        $this->logger         = $logger;
-        $this->sessionStorage = $sessionStorage;
-        $this->cookieHelper   = $cookieHelper;
         $this->user           = $user;
+        $this->sessionStorage = $sessionStorage;
+        $this->clientBuilder  = $clientFactory;
+        $this->logger         = $logger;
     }
 
     /**
@@ -107,46 +86,56 @@ class IsAlive extends AbstractTask
 
     public function run(): void
     {
-        \Thruway\Logging\Logger::set($this->logger);
-
-        $url = sprintf(
-            '%s://%s/wamp',
-            $this->appConfig->isSecure() ? 'wss' : 'ws',
-            $this->appConfig->getBaseUri()->getHost()
-        );
-
-        $this->logger->debug('Connecting to :url', [
-            ':url' => $url,
-        ]);
-
         $this->createSession();
 
-        // Encode SessionID like Cookies do
-        $authId = $this->cookieHelper->encodeValue(
-            DatabaseSessionStorage::COOKIE_NAME,
-            $this->session->getId()
+        // Use session auth for all connections
+        $this->clientBuilder->sessionAuth($this->session);
+
+        // Internal client for raw socket connection check
+        $internalClient = $this->clientBuilder->internalConnection()->createInternal();
+
+        // External client for nginx proxy connection check
+        $externalClient = $this->clientBuilder->externalConnection()->createExternal();
+
+        // Make checks
+        $this->runTest($internalClient);
+        $this->runTest($externalClient);
+
+        $this->destroySession();
+    }
+
+    private function createSession(): void
+    {
+        $this->session = $this->sessionStorage->createSession(
+            self::USER_AGENT,
+            '127.0.0.1',
+            '/'
         );
 
-        $client = new Client($this->wampConfig->getRealmName());
-        $client->addTransportProvider(new PawlTransportProvider($url));
-        $client->addClientAuthenticator(new ClientWampCraAuthenticator($authId, $authId)); // No more user-agent here
+        SessionHelper::setUserID($this->session, $this->user);
 
-        $client->setAuthId($authId);
+        $response = ResponseHelper::text('ok');
 
-        $client->setReconnectOptions([
-            'max_retries'         => 3,
-            'initial_retry_delay' => 3,
-            'max_retry_delay'     => 10,
-            'retry_delay_growth'  => 2,
-        ]);
+        $this->sessionStorage->persistSession($this->session, $response);
+    }
+
+    private function destroySession(): void
+    {
+        $this->sessionStorage->destroySession($this->session);
+    }
+
+    private function runTest(WampClient $client): void
+    {
+        // Reset marker
+        $this->isAlive = null;
 
         $client->on('open', function (ClientSession $session) use ($client) {
             $this->logger->debug('WAMP connection opened');
 
             $namedArgs = [
-                WampInternalClient::KEY_API_RESOURCE => 'WampTest',
-                WampInternalClient::KEY_API_METHOD   => 'data',
-                WampInternalClient::KEY_API_DATA     => [
+                ApiWorkerDaemon::KEY_API_RESOURCE => 'WampTest',
+                ApiWorkerDaemon::KEY_API_METHOD   => 'data',
+                ApiWorkerDaemon::KEY_API_DATA     => [
                     DataApiMethod::ARG_CASE => DataApiMethod::CASE_STRING,
                 ],
             ];
@@ -169,15 +158,26 @@ class IsAlive extends AbstractTask
                 }
             });
 
-            $promise = $session->call(WampInternalClient::PROCEDURE_API, [], $namedArgs);
+            $promise = $session->call(ApiWorkerDaemon::PROCEDURE_API, [], $namedArgs);
 
             $promise->then(function (CallResult $result) {
-                if ($result->getResultMessage()->getArguments()) {
-                    $this->logger->debug('API call succeeded');
-                    $this->isAlive = true;
-                } else {
+                $args = (array)$result->getResultMessage()->getArguments()[0];
+
+                $this->logger->debug('API result is :result', [
+                    ':result' => \json_encode($args),
+                ]);
+
+                if (!$args) {
                     $this->logger->warning('API call result is empty');
                     $this->isAlive = false;
+                } elseif (isset($args['error'])) {
+                    $this->logger->warning('API call result is :error', [
+                        ':error' => $args['error'],
+                    ]);
+                    $this->isAlive = false;
+                } else {
+                    $this->logger->debug('API call succeeded');
+                    $this->isAlive = true;
                 }
             });
 
@@ -190,30 +190,10 @@ class IsAlive extends AbstractTask
         // Start and wait for session.close event
         $client->start();
 
-        $this->destroySession();
-
         if (!$this->isAlive) {
-            $this->logger->emergency('WAMP router is not responding');
+            $this->logger->emergency('WAMP router is not responding (:realm)', [
+                ':realm' => $client->getRealm(),
+            ]);
         }
-    }
-
-    private function createSession(): void
-    {
-        $this->session = $this->sessionStorage->createSession(
-            self::USER_AGENT,
-            '127.0.0.1',
-            '/'
-        );
-
-        SessionHelper::setUserID($this->session, $this->user);
-
-        $response = ResponseHelper::text('ok');
-
-        $this->sessionStorage->persistSession($this->session, $response);
-    }
-
-    private function destroySession(): void
-    {
-        $this->sessionStorage->destroySession($this->session);
     }
 }

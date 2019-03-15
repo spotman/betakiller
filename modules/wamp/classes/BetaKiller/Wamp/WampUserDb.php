@@ -73,13 +73,17 @@ class WampUserDb implements WampCraUserDbInterface
                 throw new \LogicException('Missing user-agent in session data '.$sessionId);
             }
 
+            if (!SessionHelper::getUserID($session)) {
+                throw new \LogicException('Guest connection to wamp from session '.$sessionId);
+            }
+
             // Temp fix for annoying user-agent issues (constantly changing during browser updates)
             return $this->makeData($authid, $authid);
         } catch (\Throwable $e) {
             $this->logException($this->logger, $e);
 
-            // Make random user agent string so auth will never be succeeded
-            return $this->makeData($authid, \sha1(\microtime()));
+            // Make random key string so auth will never be succeeded
+            return $this->makeFakeData($authid);
         }
     }
 
@@ -90,5 +94,11 @@ class WampUserDb implements WampCraUserDbInterface
             'key'    => $key,
             'salt'   => null, // Utils::getDerivedKey($userAgent, $authid)
         ];
+    }
+
+    private function makeFakeData(string $authid): array
+    {
+        // Make random key string so auth will never be succeeded
+        return $this->makeData($authid, \sha1(\microtime()));
     }
 }

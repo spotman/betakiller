@@ -7,7 +7,13 @@ class WampConfig extends AbstractConfig implements WampConfigInterface
 {
     public const
         CONFIG_GROUP_NAME = 'wamp',
-        PATH_REALM_NAME = ['realmName'],
+        CONFIG_REALMS = 'realms',
+        CONFIG_REALM_KEY_EXT = 'external',
+        CONFIG_REALM_KEY_INT = 'internal',
+
+        PATH_REALMS_LIST = [self::CONFIG_REALMS],
+        PATH_REALM_EXT = [self::CONFIG_REALMS, self::CONFIG_REALM_KEY_EXT],
+        PATH_REALM_INT = [self::CONFIG_REALMS, self::CONFIG_REALM_KEY_INT],
         PATH_CONNECTION_HOST = ['connection', 'host'],
         PATH_CONNECTION_PORT = ['connection', 'port'];
 
@@ -20,11 +26,27 @@ class WampConfig extends AbstractConfig implements WampConfigInterface
     }
 
     /**
+     * @return string[]
+     */
+    public function getAllRealms(): array
+    {
+        return (array)$this->get(self::PATH_REALMS_LIST);
+    }
+
+    /**
      * @return string
      */
-    public function getRealmName(): string
+    public function getExternalRealmName(): string
     {
-        return (string)$this->get(self::PATH_REALM_NAME);
+        return (string)$this->get(self::PATH_REALM_EXT);
+    }
+
+    /**
+     * @return string
+     */
+    public function getInternalRealmName(): string
+    {
+        return (string)$this->get(self::PATH_REALM_INT);
     }
 
     /**

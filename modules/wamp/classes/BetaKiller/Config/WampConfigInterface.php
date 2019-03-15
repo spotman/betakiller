@@ -8,7 +8,17 @@ interface WampConfigInterface
     /**
      * @return string
      */
-    public function getRealmName(): string;
+    public function getExternalRealmName(): string;
+
+    /**
+     * @return string
+     */
+    public function getInternalRealmName(): string;
+
+    /**
+     * @return string[]
+     */
+    public function getAllRealms(): array;
 
     /**
      * @return string

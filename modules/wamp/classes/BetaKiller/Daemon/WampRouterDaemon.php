@@ -3,14 +3,14 @@ declare(strict_types=1);
 
 namespace BetaKiller\Daemon;
 
-use BetaKiller\Config\WampConfig;
-use BetaKiller\Wamp\WampInternalClient;
+use BetaKiller\Config\WampConfigInterface;
+use BetaKiller\Wamp\InternalAuthProviderClient;
 use BetaKiller\Wamp\WampRouter;
-use BetaKiller\Wamp\WampUserDb;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use Thruway\Authentication\AuthenticationManager;
 use Thruway\Authentication\WampCraAuthProvider;
+use Thruway\Authentication\WampCraUserDbInterface;
 use Thruway\Transport\RatchetTransportProvider;
 
 class WampRouterDaemon implements DaemonInterface
@@ -18,22 +18,17 @@ class WampRouterDaemon implements DaemonInterface
     public const CODENAME = 'WampRouter';
 
     /**
-     * @var \BetaKiller\Wamp\WampInternalClient
-     */
-    private $wampClient;
-
-    /**
      * @var \Psr\Log\LoggerInterface
      */
     private $logger;
 
     /**
-     * @var \BetaKiller\Config\WampConfig
+     * @var \BetaKiller\Config\WampConfigInterface
      */
     private $wampConfig;
 
     /**
-     * @var \BetaKiller\Wamp\WampUserDb
+     * @var \Thruway\Authentication\WampCraUserDbInterface
      */
     private $wampUserDb;
 
@@ -43,19 +38,16 @@ class WampRouterDaemon implements DaemonInterface
     private $router;
 
     /**
-     * @param \BetaKiller\Config\WampConfig       $wampConfig
-     * @param \BetaKiller\Wamp\WampInternalClient $wampClient
-     * @param \BetaKiller\Wamp\WampUserDb         $wampUserDb
-     * @param \Psr\Log\LoggerInterface            $logger
+     * @param \BetaKiller\Config\WampConfigInterface         $wampConfig
+     * @param \Thruway\Authentication\WampCraUserDbInterface $wampUserDb
+     * @param \Psr\Log\LoggerInterface                       $logger
      */
     public function __construct(
-        WampConfig $wampConfig,
-        WampInternalClient $wampClient,
-        WampUserDb $wampUserDb,
+        WampConfigInterface $wampConfig,
+        WampCraUserDbInterface $wampUserDb,
         LoggerInterface $logger
     ) {
         $this->wampConfig = $wampConfig;
-        $this->wampClient = $wampClient;
         $this->wampUserDb = $wampUserDb;
         $this->logger     = $logger;
     }
@@ -66,23 +58,26 @@ class WampRouterDaemon implements DaemonInterface
 
         $this->router = new WampRouter($loop);
 
-        // transport
-        $this->router->addTransportProvider(new RatchetTransportProvider(
+        // Transport
+        $transport = new RatchetTransportProvider(
             $this->wampConfig->getConnectionHost(),
             $this->wampConfig->getConnectionPort()
-        ));
+        );
+        $transport->enableKeepAlive($loop);
+        $this->router->addTransportProvider($transport);
 
-        // auth manager
+        // Auth manager
         $authMgr = new AuthenticationManager();
         $this->router->registerModule($authMgr);
 
-        // user db
-        $authProvClient = new WampCraAuthProvider([$this->wampConfig->getRealmName()]);
-        $authProvClient->setUserDb($this->wampUserDb);
-        $this->router->addInternalClient($authProvClient);
+        // External auth
+        $extAuth = new WampCraAuthProvider(['*']);
+        $extAuth->setUserDb($this->wampUserDb);
+        $this->router->addInternalClient($extAuth);
 
-        // client
-        $this->router->addInternalClient($this->wampClient);
+        // Internal auth
+        $intAuth = new InternalAuthProviderClient(['*']);
+        $this->router->addInternalClient($intAuth);
 
         // Restart every 24h coz of annoying memory leak
         $loop->addTimer(60 * 1440, function () use ($loop) {
