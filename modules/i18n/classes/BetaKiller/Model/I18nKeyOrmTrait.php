@@ -10,9 +10,9 @@ trait I18nKeyOrmTrait
      *
      * @param \BetaKiller\Model\LanguageInterface $lang
      *
-     * @return string|null
+     * @return string
      */
-    public function getI18nValue(LanguageInterface $lang): ?string
+    public function getI18nValue(LanguageInterface $lang): string
     {
         foreach ($this->getRawI18nValue() as $langName => $value) {
             if ($langName === $lang->getIsoCode()) {
@@ -20,7 +20,22 @@ trait I18nKeyOrmTrait
             }
         }
 
-        return null;
+        throw new \LogicException(sprintf(
+            'Missing i18n value for %s in lang %s',
+            $this->getI18nKeyName(),
+            $lang->getIsoCode()
+        ));
+    }
+
+    public function hasI18nValue(LanguageInterface $lang): bool
+    {
+        foreach ($this->getRawI18nValue() as $langName => $value) {
+            if ($langName === $lang->getIsoCode()) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -43,7 +58,7 @@ trait I18nKeyOrmTrait
      *
      * @return string
      */
-    public function getAnyI18nValue(): ?string
+    public function getAnyI18nValue(): string
     {
         foreach ($this->getRawI18nValue() as $value) {
             if ($value) {
@@ -51,7 +66,38 @@ trait I18nKeyOrmTrait
             }
         }
 
-        return null;
+        throw new \LogicException(sprintf(
+            'Missing i18n any value for %s',
+            $this->getI18nKeyName()
+        ));
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasAnyI18nValue(): bool
+    {
+        foreach ($this->getRawI18nValue() as $value) {
+            if ($value) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Returns i18n value for selected language or value for any language
+     *
+     * @param \BetaKiller\Model\LanguageInterface $lang
+     *
+     * @return string
+     */
+    public function getI18nValueOrAny(LanguageInterface $lang): string
+    {
+        return $this->hasI18nValue($lang)
+            ? $this->getI18nValue($lang)
+            : $this->getAnyI18nValue();
     }
 
     private function getRawI18nValue(): array
@@ -59,7 +105,10 @@ trait I18nKeyOrmTrait
         $data = (string)$this->get($this->getI18nValueColumn());
 
         $data = $data ? \json_decode($data, true) : [];
-        if (!is_array($data)) $data = [];
+
+        if (!is_array($data)) {
+            $data = [];
+        }
 
         return $data;
     }

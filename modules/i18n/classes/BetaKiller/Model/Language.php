@@ -112,7 +112,7 @@ class Language extends \ORM implements LanguageInterface
      */
     public function getLabel(LanguageInterface $lang = null): string
     {
-        return (string)$this->getI18nValue($lang ?? $this) ?: (string)$this->getAnyI18nValue();
+        return $this->getI18nValueOrAny($lang ?? $this);
     }
 
     /**

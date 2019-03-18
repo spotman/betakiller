@@ -85,7 +85,7 @@ abstract class AbstractItemIFace extends AbstractAdminIFace
         $data = [];
 
         foreach ($languages as $lang) {
-            $value = $key->getI18nValue($lang) ?: '';
+            $value = $key->hasI18nValue($lang) ? $key->getI18nValue($lang) : '';
 
             $data[] = [
                 'lang'  => [

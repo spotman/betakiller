@@ -15,9 +15,25 @@ interface I18nKeyInterface extends HasI18nKeyNameInterface
      *
      * @param \BetaKiller\Model\LanguageInterface $lang
      *
-     * @return string|null
+     * @return string
      */
-    public function getI18nValue(LanguageInterface $lang): ?string;
+    public function getI18nValue(LanguageInterface $lang): string;
+
+    /**
+     * Returns i18n value for selected language or value for any language
+     *
+     * @param \BetaKiller\Model\LanguageInterface $lang
+     *
+     * @return string
+     */
+    public function getI18nValueOrAny(LanguageInterface $lang): string;
+
+    /**
+     * @param \BetaKiller\Model\LanguageInterface $lang
+     *
+     * @return bool
+     */
+    public function hasI18nValue(LanguageInterface $lang): bool;
 
     /**
      * Stores i18n value for selected language
@@ -32,5 +48,10 @@ interface I18nKeyInterface extends HasI18nKeyNameInterface
      *
      * @return string
      */
-    public function getAnyI18nValue(): ?string;
+    public function getAnyI18nValue(): string;
+
+    /**
+     * @return bool
+     */
+    public function hasAnyI18nValue(): bool;
 }

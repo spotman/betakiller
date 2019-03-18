@@ -64,11 +64,21 @@ class I18nKey implements I18nKeyInterface, \JsonSerializable
      *
      * @param \BetaKiller\Model\LanguageInterface $lang
      *
-     * @return string|null
+     * @return string
      */
-    public function getI18nValue(LanguageInterface $lang): ?string
+    public function getI18nValue(LanguageInterface $lang): string
     {
-        return $this->data[$lang->getIsoCode()] ?? null;
+        return $this->data[$lang->getIsoCode()];
+    }
+
+    /**
+     * @param \BetaKiller\Model\LanguageInterface $lang
+     *
+     * @return bool
+     */
+    public function hasI18nValue(LanguageInterface $lang): bool
+    {
+        return isset($this->data[$lang->getIsoCode()]);
     }
 
     /**
@@ -87,7 +97,7 @@ class I18nKey implements I18nKeyInterface, \JsonSerializable
      *
      * @return string
      */
-    public function getAnyI18nValue(): ?string
+    public function getAnyI18nValue(): string
     {
         foreach ($this->data as $value) {
             if ($value) {
@@ -95,7 +105,35 @@ class I18nKey implements I18nKeyInterface, \JsonSerializable
             }
         }
 
-        return null;
+        throw new \LogicException(sprintf(
+            'Missing i18n any value for %s',
+            $this->getI18nKeyName()
+        ));
+    }
+
+    public function hasAnyI18nValue(): bool
+    {
+        foreach ($this->data as $value) {
+            if ($value) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Returns i18n value for selected language or value for any language
+     *
+     * @param \BetaKiller\Model\LanguageInterface $lang
+     *
+     * @return string
+     */
+    public function getI18nValueOrAny(LanguageInterface $lang): string
+    {
+        return $this->hasI18nValue($lang)
+            ? $this->getI18nValue($lang)
+            : $this->getAnyI18nValue();
     }
 
     /**

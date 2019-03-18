@@ -169,11 +169,11 @@ class I18n extends AbstractTask
         }
 
         // Skip existing translations
-        if (!$force && $keyModel->getI18nValue($lang)) {
+        if (!$force && $keyModel->hasI18nValue($lang)) {
             return;
         }
 
-        $i18nValue = $key->getI18nValue($lang);
+        $i18nValue = $key->hasI18nValue($lang) ? $key->getI18nValue($lang) : null;
 
         // Skip missing translations
         if (!$i18nValue) {

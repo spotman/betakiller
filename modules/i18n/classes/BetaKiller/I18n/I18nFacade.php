@@ -308,10 +308,10 @@ final class I18nFacade
      */
     private function translate(I18nKeyInterface $key, LanguageInterface $lang): string
     {
-        $value = $key->getI18nValue($lang);
+        $value = $key->hasI18nValue($lang) ? $key->getI18nValue($lang) : null;
 
         if (!$value) {
-            $value = $key->getI18nValue($this->defaultLang);
+            $value = $key->hasI18nValue($this->defaultLang) ? $key->getI18nValue($this->defaultLang) : null;
         }
 
         if (!$value) {
