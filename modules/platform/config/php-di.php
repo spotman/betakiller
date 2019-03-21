@@ -1,6 +1,8 @@
 <?php
 
 use BetaKiller\Exception;
+use BetaKiller\Factory\EntityFactory;
+use BetaKiller\Factory\EntityFactoryInterface;
 use BetaKiller\Helper\I18nHelper;
 use BetaKiller\Log\Logger;
 use BetaKiller\Middleware\CspReportBodyParamsStrategy;
@@ -122,6 +124,8 @@ return [
         I18nHelper::class => \DI\factory(function () {
             throw new Exception(I18nHelper::class.' DI injection deprecated, use ServerRequestHelper::getI18n() instead');
         }),
+
+        EntityFactoryInterface::class => \DI\autowire(EntityFactory::class),
     ],
 
 ];
