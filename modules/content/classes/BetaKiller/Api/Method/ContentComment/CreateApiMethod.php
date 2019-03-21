@@ -2,6 +2,7 @@
 namespace BetaKiller\Api\Method\ContentComment;
 
 use BetaKiller\Api\Method\AbstractEntityCreateApiMethod;
+use BetaKiller\Model\ContentComment;
 use BetaKiller\Model\ContentCommentInterface;
 use BetaKiller\Model\UserInterface;
 use Spotman\Defence\ArgumentsInterface;
@@ -27,14 +28,15 @@ class CreateApiMethod extends AbstractEntityCreateApiMethod
     /**
      * Implement this method
      *
-     * @param \BetaKiller\Model\ContentCommentInterface $model
      * @param \Spotman\Defence\ArgumentsInterface       $arguments
      * @param \BetaKiller\Model\UserInterface           $user
      *
      * @return \BetaKiller\Model\ContentCommentInterface
      */
-    protected function create($model, ArgumentsInterface $arguments, UserInterface $user): ContentCommentInterface
+    protected function create(ArgumentsInterface $arguments, UserInterface $user)
     {
+        $model = new ContentComment;
+
         $data = $arguments->getArray(self::ARG_DATA);
 
         $model->setGuestAuthorName($data[self::ARG_AUTHOR_NAME]);

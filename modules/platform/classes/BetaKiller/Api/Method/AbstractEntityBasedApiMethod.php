@@ -3,6 +3,7 @@ namespace BetaKiller\Api\Method;
 
 use BetaKiller\Model\AbstractEntityInterface;
 use BetaKiller\Repository\RepositoryInterface;
+use Spotman\Api\ApiMethodException;
 use Spotman\Api\Method\AbstractApiMethod;
 use Spotman\Defence\ArgumentsInterface;
 
@@ -28,20 +29,13 @@ abstract class AbstractEntityBasedApiMethod extends AbstractApiMethod implements
      */
     public function getEntity(ArgumentsInterface $arguments): AbstractEntityInterface
     {
-        return $arguments->hasID()
-            ? $this->fetchEntity($arguments->getID())
-            : $this->createEntity();
-    }
+        if (!$arguments->hasID()) {
+            throw new ApiMethodException('Missing identity is required for entity processing');
+        }
 
-    /**
-     * Returns new entity
-     *
-     * @return \BetaKiller\Model\AbstractEntityInterface
-     * @throws \BetaKiller\Factory\FactoryException
-     */
-    private function createEntity(): AbstractEntityInterface
-    {
-        return $this->getRepository()->create();
+        $id = $arguments->getID();
+
+        return $this->getRepository()->findById($id);
     }
 
     /**
@@ -67,18 +61,6 @@ abstract class AbstractEntityBasedApiMethod extends AbstractApiMethod implements
         $repoName = $this->getCollectionName();
 
         return $this->repositoryFactory->create($repoName);
-    }
-
-    /**
-     * @param string $id
-     *
-     * @return \BetaKiller\Model\AbstractEntityInterface
-     * @throws \BetaKiller\Factory\FactoryException
-     * @throws \BetaKiller\Repository\RepositoryException
-     */
-    private function fetchEntity(string $id): AbstractEntityInterface
-    {
-        return $this->getRepository()->findById($id);
     }
 
     /**

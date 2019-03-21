@@ -2,6 +2,7 @@
 namespace BetaKiller\Api\Method\ContentPost;
 
 use BetaKiller\Api\Method\AbstractEntityCreateApiMethod;
+use BetaKiller\Model\ContentPost;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Status\StatusWorkflowFactory;
 use Spotman\Api\ApiMethodException;
@@ -39,17 +40,18 @@ class CreateApiMethod extends AbstractEntityCreateApiMethod
     /**
      * Implement this method
      *
-     * @param \BetaKiller\Model\ContentPost       $model
      * @param \Spotman\Defence\ArgumentsInterface $arguments
      * @param \BetaKiller\Model\UserInterface     $user
      *
-     * @return \BetaKiller\Model\AbstractEntityInterface
+     * @return \BetaKiller\Model\ContentPostInterface
      * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\Status\StatusWorkflowException
      * @throws \Spotman\Api\ApiMethodException
      */
-    protected function create($model, ArgumentsInterface $arguments, UserInterface $user)
+    protected function create(ArgumentsInterface $arguments, UserInterface $user)
     {
+        $model = new ContentPost();
+
         /** @var \BetaKiller\Status\ContentPostWorkflow $workflow */
         $workflow = $this->workflowFactory->create($model);
 

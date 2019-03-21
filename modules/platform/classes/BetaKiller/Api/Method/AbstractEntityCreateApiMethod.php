@@ -1,6 +1,7 @@
 <?php
 namespace BetaKiller\Api\Method;
 
+use BetaKiller\Model\AbstractEntityInterface;
 use BetaKiller\Model\UserInterface;
 use Spotman\Api\ApiMethodResponse;
 use Spotman\Defence\ArgumentsInterface;
@@ -17,23 +18,21 @@ abstract class AbstractEntityCreateApiMethod extends AbstractEntityBasedApiMetho
      */
     public function execute(ArgumentsInterface $arguments, UserInterface $user): ?ApiMethodResponse
     {
-        $entity       = $this->getEntity($arguments);
-        $responseData = $this->create($entity, $arguments, $user);
+        $entity = $this->create($arguments, $user);
 
         $this->saveEntity($entity);
 
-        return $this->response($responseData);
+        return $this->response($entity);
     }
 
     /**
-     * Override this method
+     * Implement this method
      *
-     * @param \BetaKiller\Model\AbstractEntityInterface $model
      * @param \Spotman\Defence\ArgumentsInterface       $arguments
      *
      * @param \BetaKiller\Model\UserInterface           $user
      *
-     * @return mixed
+     * @return AbstractEntityInterface|object
      */
-    abstract protected function create($model, ArgumentsInterface $arguments, UserInterface $user);
+    abstract protected function create(ArgumentsInterface $arguments, UserInterface $user);
 }

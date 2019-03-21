@@ -1,6 +1,7 @@
 <?php
 namespace BetaKiller\Api\Method;
 
+use BetaKiller\Model\AbstractEntityInterface;
 use BetaKiller\Model\UserInterface;
 use Spotman\Api\ApiMethodResponse;
 use Spotman\Defence\ArgumentsInterface;
@@ -17,18 +18,18 @@ abstract class AbstractEntityReadApiMethod extends AbstractEntityBasedApiMethod
      */
     public function execute(ArgumentsInterface $arguments, UserInterface $user): ?ApiMethodResponse
     {
-        $entity       = $this->getEntity($arguments);
-        $responseData = $this->read($entity);
+        $entity = $this->getEntity($arguments);
 
-        return $this->response($responseData);
+        return $this->read($entity, $user);
     }
 
     /**
-     * Override this method
+     * Implement this method
      *
      * @param \BetaKiller\Model\AbstractEntityInterface $model
+     * @param \BetaKiller\Model\UserInterface           $user
      *
-     * @return mixed
+     * @return \Spotman\Api\ApiMethodResponse|null
      */
-    abstract protected function read($model);
+    abstract protected function read(AbstractEntityInterface $model, UserInterface $user): ?ApiMethodResponse;
 }

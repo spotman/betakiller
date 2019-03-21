@@ -1,9 +1,9 @@
 <?php
 namespace BetaKiller\Api\AccessResolver;
 
+use BetaKiller\Acl\Resource\EntityRelatedAclResourceInterface;
 use BetaKiller\Api\Method\EntityBasedApiMethodInterface;
 use BetaKiller\Model\UserInterface;
-use BetaKiller\Status\StatusRelatedModelInterface;
 use Spotman\Acl\Resource\ResolvingResourceInterface;
 use Spotman\Api\AccessResolver\AclApiMethodAccessResolver;
 use Spotman\Api\ApiMethodException;
@@ -24,18 +24,26 @@ class EntityRelatedAclApiMethodAccessResolver extends AclApiMethodAccessResolver
             throw new ApiMethodException('Api method [:collection.:method] must implement :interface', [
                 ':collection' => $method->getCollectionName(),
                 ':method'     => $method->getName(),
-                ':interface'  => StatusRelatedModelInterface::class,
+                ':interface'  => EntityBasedApiMethodInterface::class,
             ]);
         }
 
         parent::prepareResource($resource, $method, $arguments, $user);
 
-        /** @var \BetaKiller\Acl\Resource\EntityRelatedAclResourceInterface $resource */
-        $resource = parent::getAclResourceFromApiMethod($method);
+        $resource = $this->getAclResourceFromApiMethod($method);
 
-        $entity = $method->getEntity($arguments);
+        if (!$resource instanceof EntityRelatedAclResourceInterface) {
+            throw new ApiMethodException('Acl resource for Api collection ":collection" must implement :interface', [
+                ':collection' => $method->getCollectionName(),
+                ':interface'  => EntityRelatedAclResourceInterface::class,
+            ]);
+        }
 
-        // Store model for processing status and transition permissions
-        $resource->setEntity($entity);
+        if ($resource->isEntityRequiredForAction($method->getName())) {
+            $entity = $method->getEntity($arguments);
+
+            // Store model for processing status and transition permissions
+            $resource->setEntity($entity);
+        }
     }
 }
