@@ -30,13 +30,6 @@ interface RepositoryInterface
     public function getAll(): array;
 
     /**
-     * Creates empty entity
-     *
-     * @return mixed
-     */
-    public function create();
-
-    /**
      * @param $entity
      *
      * @throws \BetaKiller\Repository\RepositoryException

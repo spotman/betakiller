@@ -76,16 +76,6 @@ abstract class AbstractOrmBasedRepository extends AbstractRepository
     }
 
     /**
-     * Creates empty entity
-     *
-     * @return ExtendedOrmInterface|mixed
-     */
-    public function create()
-    {
-        return $this->getOrmInstance();
-    }
-
-    /**
      * @param ExtendedOrmInterface|mixed $entity
      *
      * @throws \BetaKiller\Exception\ValidationException

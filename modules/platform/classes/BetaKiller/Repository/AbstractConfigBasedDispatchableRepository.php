@@ -6,7 +6,7 @@ use BetaKiller\Model\ConfigBasedDispatchableEntityInterface;
 use BetaKiller\Url\Container\UrlContainerInterface;
 use BetaKiller\Url\Parameter\UrlParameterInterface;
 
-abstract class AbstractConfigBasedDispatchableRepository extends AbstractPredefinedRepository
+abstract class AbstractConfigBasedDispatchableRepository extends AbstractReadOnlyRepository
     implements DispatchableRepositoryInterface
 {
     /**
