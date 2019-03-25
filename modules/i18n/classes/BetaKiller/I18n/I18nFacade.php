@@ -170,6 +170,20 @@ final class I18nFacade
 
     /**
      * @param \BetaKiller\Model\LanguageInterface $lang
+     * @param \BetaKiller\Model\I18nKeyInterface  $key
+     * @param array|null                          $values
+     *
+     * @return string
+     */
+    public function translateKeyAny(LanguageInterface $lang, I18nKeyInterface $key, array $values = null): string
+    {
+        $string = $this->translate($key, $lang, true);
+
+        return $this->replacePlaceholders($string, $values);
+    }
+
+    /**
+     * @param \BetaKiller\Model\LanguageInterface $lang
      * @param string                              $keyName
      * @param                                     $form
      * @param array|null                          $values
@@ -303,12 +317,17 @@ final class I18nFacade
      *
      * @param \BetaKiller\Model\I18nKeyInterface  $key text to translate
      * @param \BetaKiller\Model\LanguageInterface $lang
+     * @param bool|null                           $any Use any available translation as backup
      *
      * @return  string
      */
-    private function translate(I18nKeyInterface $key, LanguageInterface $lang): string
+    private function translate(I18nKeyInterface $key, LanguageInterface $lang, bool $any = null): string
     {
-        $value = $key->hasI18nValue($lang) ? $key->getI18nValue($lang) : null;
+        if ($any) {
+            $value = $key->getI18nValueOrAny($lang);
+        } else {
+            $value = $key->hasI18nValue($lang) ? $key->getI18nValue($lang) : null;
+        }
 
         if (!$value) {
             $value = $key->hasI18nValue($this->defaultLang) ? $key->getI18nValue($this->defaultLang) : null;
