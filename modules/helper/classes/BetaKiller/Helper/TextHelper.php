@@ -24,4 +24,36 @@ class TextHelper
 
         return $trans->transliterate($utf8);
     }
+
+    public static function prepareCodename(string $value): string
+    {
+        $value = \mb_strtolower(TextHelper::utf8ToAscii($value));
+
+        $replace = [
+            '@' => 'dog',
+            '#' => 'hash',
+            '$' => 'dollar',
+            '%' => 'percent',
+            '^' => 'up',
+            '&' => 'amp',
+            '*' => 'snow',
+            '+' => 'plus',
+        ];
+
+        $value = \strtr($value, $replace);
+
+        return \preg_replace(
+            [
+                // Replace whitespaces with underscore
+                '/[\s-\/]+/',
+                // Keep only alpha and underscore symbols
+                '/[^a-z0-9_]+/',
+            ],
+            [
+                '_',
+                '',
+            ],
+            $value
+        );
+    }
 }
