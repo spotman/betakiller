@@ -10,6 +10,11 @@ class Exception extends \Exception implements ExceptionInterface
     public const PLACEHOLDER_PREFIX = ':';
 
     /**
+     * @var array
+     */
+    private $variables = [];
+
+    /**
      * @param \Throwable  $e
      * @param string|null $message
      *
@@ -33,8 +38,10 @@ class Exception extends \Exception implements ExceptionInterface
      */
     public function __construct($message = '', array $variables = null, $code = 0, \Throwable $previous = null)
     {
-        // Set the message
-        $message = empty($variables) ? $message : strtr($message, array_filter($variables, 'is_scalar'));
+        if (!empty($variables)) {
+            $this->variables = $variables;
+            $message         = strtr($message, array_filter($variables, 'is_scalar'));
+        }
 
         // Pass the message and integer code to the parent
         parent::__construct($message, (int)$code, $previous);
@@ -66,5 +73,15 @@ class Exception extends \Exception implements ExceptionInterface
         }
 
         return $output;
+    }
+
+    /**
+     * Returns "key => value" pairs provided by caller in constructor parameters for placeholders` replacement
+     *
+     * @return array
+     */
+    public function getMessageVariables(): array
+    {
+        return $this->variables;
     }
 }

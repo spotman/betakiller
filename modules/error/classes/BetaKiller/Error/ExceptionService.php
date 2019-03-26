@@ -67,13 +67,14 @@ class ExceptionService
      */
     private function getOriginalMessage(\Throwable $e, LanguageInterface $lang): string
     {
-        $message = $e->getMessage();
+        $message   = $e->getMessage();
+        $variables = $e instanceof ExceptionInterface ? $e->getMessageVariables() : [];
 
         // Return message if exists
         if ($message) {
             // Translate if i18n key is used
             if (I18nFacade::isI18nKey($message)) {
-                $message = $this->i18n->translateKeyName($lang, $message);
+                $message = $this->i18n->translateKeyName($lang, $message, $variables);
             }
 
             return $message;
@@ -93,7 +94,7 @@ class ExceptionService
             ]);
         }
 
-        return $this->i18n->translateKeyName($lang, $i18nKey);
+        return $this->i18n->translateKeyName($lang, $i18nKey, $variables);
     }
 
     private function getMaskedMessage(\Throwable $e, LanguageInterface $lang): string

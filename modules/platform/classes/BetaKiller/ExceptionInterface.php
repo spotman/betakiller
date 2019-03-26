@@ -37,4 +37,11 @@ interface ExceptionInterface extends \Throwable
      * @return string
      */
     public function getDefaultMessageI18nKey(): ?string;
+
+    /**
+     * Returns "key => value" pairs provided by caller in constructor parameters for placeholders` replacement
+     *
+     * @return array
+     */
+    public function getMessageVariables(): array;
 }
