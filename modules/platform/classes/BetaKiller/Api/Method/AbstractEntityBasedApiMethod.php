@@ -42,7 +42,7 @@ abstract class AbstractEntityBasedApiMethod extends AbstractApiMethod implements
      * @return \BetaKiller\Repository\RepositoryInterface
      * @throws \BetaKiller\Factory\FactoryException
      */
-    private function getRepository(): RepositoryInterface
+    protected function getRepository(): RepositoryInterface
     {
         if (!$this->repository) {
             $this->repository = $this->fetchRepository();
