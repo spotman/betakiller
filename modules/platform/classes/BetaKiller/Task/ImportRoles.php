@@ -5,6 +5,8 @@ namespace BetaKiller\Task;
 
 use BetaKiller\Auth\RoleConfig;
 use BetaKiller\Config\ConfigProviderInterface;
+use BetaKiller\Factory\EntityFactoryInterface;
+use BetaKiller\Model\Role;
 use BetaKiller\Model\RoleInterface;
 use BetaKiller\Repository\RoleRepository;
 use Psr\Log\LoggerInterface;
@@ -27,20 +29,28 @@ class ImportRoles extends AbstractTask
     private $logger;
 
     /**
+     * @var \BetaKiller\Factory\EntityFactoryInterface
+     */
+    private $entityFactory;
+
+    /**
      * ImportRoles constructor.
      *
      * @param \BetaKiller\Config\ConfigProviderInterface $config
      * @param \BetaKiller\Repository\RoleRepository      $roleRepo
+     * @param \BetaKiller\Factory\EntityFactoryInterface $entityFactory
      * @param \Psr\Log\LoggerInterface                   $logger
      */
     public function __construct(
         ConfigProviderInterface $config,
         RoleRepository $roleRepo,
+        EntityFactoryInterface $entityFactory,
         LoggerInterface $logger
     ) {
-        $this->config   = $config;
-        $this->roleRepo = $roleRepo;
-        $this->logger   = $logger;
+        $this->config        = $config;
+        $this->roleRepo      = $roleRepo;
+        $this->entityFactory = $entityFactory;
+        $this->logger        = $logger;
 
         parent::__construct();
     }
@@ -67,7 +77,10 @@ class ImportRoles extends AbstractTask
 
             // Add missing role and keep existing untouched
             if (!$model) {
-                $model = $this->roleRepo->create()
+                /** @var RoleInterface $model */
+                $model = $this->entityFactory->create(Role::detectModelName());
+
+                $model
                     ->setName($name)
                     ->setDescription($description);
 

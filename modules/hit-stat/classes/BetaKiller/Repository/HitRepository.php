@@ -11,7 +11,6 @@ use BetaKiller\Utils\Kohana\ORM\OrmInterface;
  *
  * @package BetaKiller\Repository
  * @method Hit findById(int $id)
- * @method Hit create()
  * @method Hit[] getAll()
  */
 class HitRepository extends AbstractOrmBasedRepository

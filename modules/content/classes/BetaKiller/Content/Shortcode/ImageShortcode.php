@@ -308,10 +308,7 @@ class ImageShortcode extends AbstractContentElementShortcode
      */
     public function getEditorItemUploadUrl(): ?string
     {
-        // Create empty model for detecting assets provider
-        $model = $this->imageRepository->create();
-
-        return $this->assetsHelper->getUploadUrl($model);
+        return $this->assetsHelper->getUploadUrl($this->imageRepository::getCodename());
     }
 
     /**
@@ -322,9 +319,6 @@ class ImageShortcode extends AbstractContentElementShortcode
      */
     public function getEditorItemAllowedMimeTypes(): array
     {
-        // Create empty model for detecting assets provider
-        $model = $this->imageRepository->create();
-
-        return $this->assetsHelper->getAllowedMimeTypes($model);
+        return $this->assetsHelper->getAllowedMimeTypes($this->imageRepository::getCodename());
     }
 }

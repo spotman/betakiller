@@ -10,7 +10,6 @@ use BetaKiller\Utils\Kohana\ORM\OrmInterface;
  *
  * @package BetaKiller\Repository
  * @method HitLink findById(int $id)
- * @method HitLink create()
  * @method HitLink[] getAll()
  */
 class HitLinkRepository extends AbstractOrmBasedRepository

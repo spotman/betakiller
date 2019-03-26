@@ -69,7 +69,7 @@ abstract class ORM extends Utils\Kohana\ORM implements ExtendedOrmInterface
         return static::detectModelName($object);
     }
 
-    protected static function detectModelName(OrmInterface $object = null): string
+    public static function detectModelName(OrmInterface $object = null): string
     {
         $className = $object ? get_class($object) : static::class;
 

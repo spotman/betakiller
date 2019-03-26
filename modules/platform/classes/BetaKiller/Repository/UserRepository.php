@@ -9,7 +9,6 @@ use BetaKiller\Model\UserInterface;
  * Class UserRepository
  *
  * @package BetaKiller\Repository
- * @method UserInterface create()
  * @method UserInterface findById(string $id)
  * @method UserInterface getById(string $id)
  * @method UserInterface[] getAll()

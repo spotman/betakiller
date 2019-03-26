@@ -19,7 +19,6 @@ use DateTime;
  *
  * @method ContentCommentInterface|null findById(int $id)
  * @method ContentCommentInterface|null findByWpID(int $id)
- * @method ContentCommentInterface create()
  * @method ContentCommentInterface[] getAll()
  * @method ContentCommentInterface|null getParent(ContentCommentInterface $parent)
  */

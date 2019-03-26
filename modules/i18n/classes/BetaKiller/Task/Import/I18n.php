@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\Task\Import;
 
+use BetaKiller\Factory\EntityFactoryInterface;
 use BetaKiller\Factory\UrlHelperFactory;
 use BetaKiller\Helper\NotificationHelper;
 use BetaKiller\Helper\UrlHelper;
@@ -62,6 +63,11 @@ class I18n extends AbstractTask
     private $urlHelperFactory;
 
     /**
+     * @var \BetaKiller\Factory\EntityFactoryInterface
+     */
+    private $entityFactory;
+
+    /**
      * I18n constructor.
      *
      * @param \BetaKiller\Repository\LanguageRepositoryInterface $langRepo
@@ -76,6 +82,7 @@ class I18n extends AbstractTask
         LanguageRepositoryInterface $langRepo,
         FilesystemI18nKeysLoader $filesystemLoader,
         TranslationKeyRepository $keyRepo,
+        EntityFactoryInterface $entityFactory,
         PluralBagFormatterInterface $formatter,
         NotificationHelper $notificationHelper,
         UrlHelperFactory $urlHelperFactory,
@@ -87,6 +94,7 @@ class I18n extends AbstractTask
         $this->formatter        = $formatter;
         $this->logger           = $logger;
         $this->notification     = $notificationHelper;
+        $this->entityFactory    = $entityFactory;
         $this->urlHelperFactory = $urlHelperFactory;
 
         parent::__construct();
@@ -160,7 +168,8 @@ class I18n extends AbstractTask
 
         // Create new if not exists
         if (!$keyModel) {
-            $keyModel = $this->keyRepo->create();
+            /** @var \BetaKiller\Model\TranslationKeyModelInterface $keyModel */
+            $keyModel = $this->entityFactory->create(TranslationKey::detectModelName());
             $keyModel->setI18nKey($keyName);
             $this->logger->info('I18n key ":key" added', [
                 ':key' => $keyName,

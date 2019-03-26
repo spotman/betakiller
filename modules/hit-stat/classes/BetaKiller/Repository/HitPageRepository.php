@@ -12,7 +12,6 @@ use BetaKiller\Utils\Kohana\ORM\OrmInterface;
  *
  * @package BetaKiller\Repository
  * @method HitPage findById(int $id)
- * @method HitPage create()
  * @method HitPage[] getAll()
  * @method void save(HitPage $entity)
  */

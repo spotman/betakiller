@@ -8,7 +8,6 @@ use BetaKiller\Model\HitDomain;
  *
  * @package BetaKiller\Repository
  * @method HitDomain findById(int $id)
- * @method HitDomain create()
  * @method HitDomain[] getAll()
  */
 class HitDomainRepository extends AbstractOrmBasedRepository

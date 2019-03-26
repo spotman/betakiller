@@ -11,7 +11,6 @@ use BetaKiller\Model\TranslationKeyModelInterface;
  * Class TranslationKeyRepository
  *
  * @package BetaKiller\Repository
- * @method TranslationKeyModelInterface create()
  * @method save(TranslationKeyModelInterface $model)
  * @method TranslationKeyModelInterface[] getAll()
  */

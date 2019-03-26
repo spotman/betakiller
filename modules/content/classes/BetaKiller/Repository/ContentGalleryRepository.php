@@ -9,7 +9,6 @@ use BetaKiller\Model\EntityModelInterface;
  *
  * @package BetaKiller\Content
  * @method ContentGalleryInterface findById(int $id)
- * @method ContentGalleryInterface create()
  * @method ContentGalleryInterface[] getEditorListing(?EntityModelInterface $relatedEntity, ?int $itemID)
  */
 class ContentGalleryRepository extends AbstractOrmBasedRepository implements ContentElementRepositoryInterface

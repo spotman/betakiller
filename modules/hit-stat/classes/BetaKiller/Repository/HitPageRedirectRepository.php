@@ -10,7 +10,6 @@ use BetaKiller\Model\HitPageRedirectInterface;
  * Class HitPageRedirectRepository
  *
  * @package BetaKiller\Repository
- * @method HitPageRedirectInterface create()
  */
 class HitPageRedirectRepository extends AbstractOrmBasedDispatchableRepository
 {

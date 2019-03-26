@@ -3,9 +3,11 @@ namespace BetaKiller\Service;
 
 
 use BetaKiller\Config\AppConfigInterface;
+use BetaKiller\Factory\EntityFactoryInterface;
 use BetaKiller\Factory\GuestUserFactory;
 use BetaKiller\Model\GuestUserInterface;
 use BetaKiller\Model\RoleInterface;
+use BetaKiller\Model\User;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Repository\RoleRepository;
 use BetaKiller\Repository\UserRepository;
@@ -13,6 +15,8 @@ use BetaKiller\Task\AbstractTask;
 
 class UserService
 {
+    public const DEFAULT_IP = '127.0.0.1';
+
     /**
      * @var \BetaKiller\Repository\UserRepository
      */
@@ -34,19 +38,27 @@ class UserService
     private $guestFactory;
 
     /**
+     * @var \BetaKiller\Factory\EntityFactoryInterface
+     */
+    private $entityFactory;
+
+    /**
      * UserService constructor.
      *
-     * @param \BetaKiller\Repository\UserRepository $userRepo
-     * @param \BetaKiller\Repository\RoleRepository $roleRepo
-     * @param \BetaKiller\Factory\GuestUserFactory  $guestFactory
-     * @param \BetaKiller\Config\AppConfigInterface $appConfig
+     * @param \BetaKiller\Factory\EntityFactoryInterface $entityFactory
+     * @param \BetaKiller\Repository\UserRepository      $userRepo
+     * @param \BetaKiller\Repository\RoleRepository      $roleRepo
+     * @param \BetaKiller\Factory\GuestUserFactory       $guestFactory
+     * @param \BetaKiller\Config\AppConfigInterface      $appConfig
      */
     public function __construct(
+        EntityFactoryInterface $entityFactory,
         UserRepository $userRepo,
         RoleRepository $roleRepo,
         GuestUserFactory $guestFactory,
         AppConfigInterface $appConfig
     ) {
+        $this->entityFactory = $entityFactory;
         $this->userRepository = $userRepo;
         $this->roleRepository = $roleRepo;
         $this->appConfig      = $appConfig;
@@ -78,7 +90,10 @@ class UserService
             $this->roleRepository->getLoginRole(),
         ];
 
-        $model = $this->userRepository->create()
+        /** @var UserInterface $user */
+        $user = $this->entityFactory->create(User::detectModelName());
+
+        $user
             ->setCreatedAt()
             ->setUsername($login)
             ->setPassword($password)
@@ -86,16 +101,16 @@ class UserService
             ->setCreatedFromIP($createdFromIp);
 
         // Enable email notifications by default
-        $model->enableEmailNotification();
+        $user->enableEmailNotification();
 
         // Create new model via save so ID will be populated for adding roles
-        $this->userRepository->save($model);
+        $this->userRepository->save($user);
 
         foreach ($basicRoles as $role) {
-            $model->addRole($role);
+            $user->addRole($role);
         }
 
-        return $model;
+        return $user;
     }
 
     /**

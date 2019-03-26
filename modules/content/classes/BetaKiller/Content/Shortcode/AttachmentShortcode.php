@@ -284,10 +284,7 @@ class AttachmentShortcode extends AbstractContentElementShortcode
      */
     public function getEditorItemUploadUrl(): ?string
     {
-        // Create empty model for detecting assets provider
-        $model = $this->attachmentRepository->create();
-
-        return $this->assetsHelper->getUploadUrl($model);
+        return $this->assetsHelper->getUploadUrl($this->attachmentRepository::getCodename());
     }
 
     /**

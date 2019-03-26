@@ -13,20 +13,24 @@ use BetaKiller\Exception\HttpExceptionInterface;
 use BetaKiller\Exception\NotImplementedHttpException;
 use BetaKiller\Exception\ValidationException;
 use BetaKiller\Helper\LoggerHelperTrait;
+use BetaKiller\Model\ContentCategory;
+use BetaKiller\Model\ContentComment;
+use BetaKiller\Model\ContentGallery;
 use BetaKiller\Model\ContentGalleryInterface;
 use BetaKiller\Model\ContentImageInterface;
 use BetaKiller\Model\ContentPost;
 use BetaKiller\Model\ContentPostInterface;
+use BetaKiller\Model\ContentYoutubeRecord;
 use BetaKiller\Model\Entity;
+use BetaKiller\Model\Quote;
 use BetaKiller\Model\WordpressAttachmentInterface;
 use BetaKiller\Repository\WordpressAttachmentRepositoryInterface;
+use BetaKiller\Service\UserService;
 use BetaKiller\Task\AbstractTask;
 use BetaKiller\Task\TaskException;
 use DateTime;
 use DateTimeImmutable;
 use DiDom\Document;
-use File;
-use Request;
 use Throwable;
 use Thunder\Shortcode\Parser\RegexParser;
 use Thunder\Shortcode\Processor\Processor;
@@ -81,6 +85,12 @@ class Wordpress extends AbstractTask
      * @Inject
      */
     private $contentHelper;
+
+    /**
+     * @var \BetaKiller\Factory\EntityFactoryInterface
+     * @Inject
+     */
+    private $entityFactory;
 
     /**
      * @var \BetaKiller\Repository\ContentPostRepository
@@ -525,7 +535,8 @@ class Wordpress extends AbstractTask
             $model = $this->postRepository->findByWpID($wpID);
 
             if (!$model) {
-                $model = $this->postRepository->create();
+                /** @var ContentPostInterface $model */
+                $model = $this->entityFactory->create(ContentPost::detectModelName());
                 $model->setWpId($wpID);
             }
 
@@ -808,9 +819,9 @@ class Wordpress extends AbstractTask
     /**
      * @param string                        $content
      * @param \BetaKiller\Model\ContentPost $item
+     * @param string                        $uri
      *
      * @return string
-     * @throws \RuntimeException
      */
     private function processCustomBbTags(string $content, ContentPost $item, string $uri): string
     {
@@ -975,7 +986,8 @@ class Wordpress extends AbstractTask
             return $gallery;
         }
 
-        $gallery = $this->galleryRepository->create();
+        /** @var ContentGalleryInterface $gallery */
+        $gallery = $this->entityFactory->create(ContentGallery::detectModelName());
 
         // Link gallery to current post
         $gallery->setEntity($this->contentPostEntity)->setEntityItemID($entityItemID);
@@ -1118,7 +1130,8 @@ class Wordpress extends AbstractTask
         }
 
         // Nothing found => create new gallery
-        $gallery = $this->galleryRepository->create();
+        /** @var ContentGalleryInterface $gallery */
+        $gallery = $this->entityFactory->create(ContentGallery::detectModelName());
 
         // Link gallery to current post
         $gallery->setEntity($this->contentPostEntity)->setEntityItemID($entityItemID);
@@ -1414,7 +1427,8 @@ class Wordpress extends AbstractTask
         $video = $this->youtubeRepository->findRecordByYoutubeEmbedUrl($youtubeID);
 
         if (!$video) {
-            $video = $this->youtubeRepository->create();
+            /** @var \BetaKiller\Model\ContentYoutubeRecord $video */
+            $video = $this->entityFactory->create(ContentYoutubeRecord::detectModelName());
             $video->setYoutubeId($youtubeID);
         }
 
@@ -1473,7 +1487,8 @@ class Wordpress extends AbstractTask
             $category = $this->categoryRepository->findByWpID($wpID);
 
             if (!$category) {
-                $category = $this->categoryRepository->create();
+                /** @var \BetaKiller\Model\ContentCategoryInterface $category */
+                $category = $this->entityFactory->create(ContentCategory::detectModelName());
                 $category->setWpId($wpID);
             }
 
@@ -1537,7 +1552,8 @@ class Wordpress extends AbstractTask
             $model = $this->quoteRepository->findByWpId($id);
 
             if (!$model) {
-                $model = $this->quoteRepository->create();
+                /** @var \BetaKiller\Model\QuoteInterface $model */
+                $model = $this->entityFactory->create(Quote::detectModelName());
                 $model->setWpId($id);
             }
 
@@ -1609,7 +1625,8 @@ class Wordpress extends AbstractTask
         $model = $this->commentRepository->findByWpID($wpID);
 
         if (!$model) {
-            $model = $this->commentRepository->create();
+            /** @var \BetaKiller\Model\ContentCommentInterface $model */
+            $model = $this->entityFactory->create(ContentComment::detectModelName());
             $model->setWpId($wpID);
         }
 
@@ -1680,7 +1697,7 @@ class Wordpress extends AbstractTask
             $userModel = $this->userRepository->searchBy($wpEmail) ?: $this->userRepository->searchBy($wpLogin);
 
             if (!$userModel) {
-                $userModel = $this->userService->createUser($wpLogin, $wpEmail);
+                $userModel = $this->userService->createUser($wpLogin, $wpEmail, UserService::DEFAULT_IP);
                 $this->logger->info('User :login successfully imported', [':login' => $userModel->getUsername()]);
             } else {
                 $this->logger->info('User :login already exists', [':login' => $userModel->getUsername()]);

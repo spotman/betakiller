@@ -15,7 +15,6 @@ use BetaKiller\Utils\Kohana\ORM\OrmInterface;
  * @package BetaKiller\Content
  * @method ContentPost|null findById(int $id)
  * @method ContentPost|null findByWpID(int $id)
- * @method ContentPost create()
  * @method ContentPost[] getAll()
  */
 class ContentPostRepository extends AbstractOrmBasedDispatchableRepository implements RepositoryHasWordpressIdInterface

@@ -1,10 +1,12 @@
 <?php
 namespace BetaKiller\Error;
 
+use BetaKiller\Factory\EntityFactoryInterface;
 use BetaKiller\Helper\NotificationHelper;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Log\Logger;
 use BetaKiller\Model\LanguageInterface;
+use BetaKiller\Model\PhpException;
 use BetaKiller\Model\PhpExceptionModelInterface;
 use BetaKiller\Notification\NotificationTargetInterface;
 use BetaKiller\Repository\PhpExceptionRepository;
@@ -34,6 +36,11 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
     private $enabled = true;
 
     /**
+     * @var \BetaKiller\Factory\EntityFactoryInterface
+     */
+    private $entityFactory;
+
+    /**
      * @var \BetaKiller\Repository\PhpExceptionRepository
      */
     private $repository;
@@ -51,13 +58,16 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
     /**
      * PhpExceptionStorageHandler constructor.
      *
+     * @param \BetaKiller\Factory\EntityFactoryInterface    $entityFactory
      * @param \BetaKiller\Repository\PhpExceptionRepository $repository
      * @param \BetaKiller\Helper\NotificationHelper         $notificationHelper
      */
     public function __construct(
+        EntityFactoryInterface $entityFactory,
         PhpExceptionRepository $repository,
         NotificationHelper $notificationHelper
     ) {
+        $this->entityFactory = $entityFactory;
         $this->repository   = $repository;
         $this->notification = $notificationHelper;
 
@@ -155,7 +165,9 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
                 ->markAsRepeated($user)
                 ->setLastSeenAt($currentTime);
         } else {
-            $model = $this->repository->create()
+            /** @var PhpExceptionModelInterface $model */
+            $model = $this->entityFactory->create(PhpException::detectModelName());
+            $model
                 ->setHash($hash)
                 ->setCreatedAt($currentTime)
                 ->setLastSeenAt($currentTime)

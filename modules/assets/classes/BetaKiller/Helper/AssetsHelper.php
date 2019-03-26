@@ -29,13 +29,17 @@ class AssetsHelper
     /**
      * Returns URL for uploading new assets
      *
-     * @param \BetaKiller\Assets\Model\AssetsModelInterface $model
+     * @param string $name
      *
      * @return string
+     * @throws \BetaKiller\Assets\Exception\AssetsException
+     * @throws \BetaKiller\Assets\Exception\AssetsProviderException
+     * @throws \BetaKiller\Assets\Exception\AssetsStorageException
+     * @throws \BetaKiller\Factory\FactoryException
      */
-    public function getUploadUrl(AssetsModelInterface $model): string
+    public function getUploadUrl(string $name): string
     {
-        return $this->getProviderByModel($model)->getUploadUrl();
+        return $this->getProviderByModelName($name)->getUploadUrl();
     }
 
     /**
@@ -61,14 +65,17 @@ class AssetsHelper
     }
 
     /**
-     * @param \BetaKiller\Assets\Model\AssetsModelInterface $model
+     * @param string $name
      *
      * @return array
      * @throws \BetaKiller\Assets\Exception\AssetsException
+     * @throws \BetaKiller\Assets\Exception\AssetsProviderException
+     * @throws \BetaKiller\Assets\Exception\AssetsStorageException
+     * @throws \BetaKiller\Factory\FactoryException
      */
-    public function getAllowedMimeTypes(AssetsModelInterface $model): array
+    public function getAllowedMimeTypes(string $name): array
     {
-        return $this->getProviderByModel($model)->getAllowedMimeTypes();
+        return $this->getProviderByModelName($name)->getAllowedMimeTypes();
     }
 
     /**
@@ -87,6 +94,20 @@ class AssetsHelper
     }
 
     /**
+     * @param string $name
+     *
+     * @return \BetaKiller\Assets\Provider\AssetsProviderInterface
+     * @throws \BetaKiller\Assets\Exception\AssetsException
+     * @throws \BetaKiller\Assets\Exception\AssetsProviderException
+     * @throws \BetaKiller\Assets\Exception\AssetsStorageException
+     * @throws \BetaKiller\Factory\FactoryException
+     */
+    private function getProviderByModelName(string $name): AssetsProviderInterface
+    {
+        return $this->providerFactory->createFromModelCodename($name);
+    }
+
+    /**
      * @param \BetaKiller\Assets\Model\AssetsModelInterface $model
      *
      * @return \BetaKiller\Assets\Provider\AssetsProviderInterface
@@ -98,7 +119,7 @@ class AssetsHelper
     {
         $name = $model->getModelName();
 
-        return $this->providerFactory->createFromModelCodename($name);
+        return $this->getProviderByModelName($name);
     }
 
     /**
