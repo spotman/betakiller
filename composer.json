@@ -23,6 +23,8 @@
     "doctrine/annotations": "^1.2",
     "doctrine/cache": "^1.6",
     "dragonmantank/cron-expression": "^2.0",
+    "geocoder-php/chain-provider": "^4.0",
+    "geocoder-php/google-maps-provider": "^4.3",
     "graze/console-diff-renderer": "^0.6.2",
     "graze/parallel-process": "^0.8",
     "guzzlehttp/guzzle": "~6.0",
