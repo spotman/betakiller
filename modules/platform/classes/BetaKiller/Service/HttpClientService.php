@@ -3,21 +3,16 @@ declare(strict_types=1);
 
 namespace BetaKiller\Service;
 
-use GuzzleHttp\Client;
+use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Cookie\CookieJarInterface;
-use GuzzleHttp\HandlerStack;
-use GuzzleHttp\MessageFormatter;
-use GuzzleHttp\Middleware;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
-use Psr\Log\LoggerInterface;
-use Psr\Log\LogLevel;
 
 class HttpClientService
 {
     /**
-     * @var \GuzzleHttp\Client
+     * @var \GuzzleHttp\ClientInterface
      */
     private $client;
 
@@ -29,27 +24,18 @@ class HttpClientService
     /**
      * HttpClientService constructor.
      *
+     * @param \GuzzleHttp\ClientInterface               $client
      * @param \Psr\Http\Message\RequestFactoryInterface $requestFactory
-     * @param \Psr\Log\LoggerInterface                  $logger
      */
-    public function __construct(RequestFactoryInterface $requestFactory, LoggerInterface $logger)
+    public function __construct(ClientInterface $client, RequestFactoryInterface $requestFactory)
     {
-        $stack = HandlerStack::create();
-
-        $stack->push(
-            Middleware::log(
-                $logger,
-                new MessageFormatter('{req_headers} => {res_headers}'),
-                LogLevel::DEBUG
-            )
-        );
-
-        $this->client = new Client([
-            'handler'     => $stack,
-            'http_errors' => false,
-        ]);
-
+        $this->client         = $client;
         $this->requestFactory = $requestFactory;
+    }
+
+    public function getClient(): ClientInterface
+    {
+        return $this->client;
     }
 
     public function request(string $method, string $url): RequestInterface
@@ -62,8 +48,11 @@ class HttpClientService
         return $this->request('GET', $url);
     }
 
-    public function syncCall(RequestInterface $request, CookieJarInterface $jar = null, array $requestOptions = null): ResponseInterface
-    {
+    public function syncCall(
+        RequestInterface $request,
+        CookieJarInterface $jar = null,
+        array $requestOptions = null
+    ): ResponseInterface {
         $options = [
             'allow_redirects' => true,
         ];

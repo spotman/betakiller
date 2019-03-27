@@ -126,6 +126,29 @@ return [
         }),
 
         EntityFactoryInterface::class => \DI\autowire(EntityFactory::class),
+
+        // Common Http clients
+        \GuzzleHttp\ClientInterface::class => \DI\factory(function(LoggerInterface $logger) {
+            $stack = \GuzzleHttp\HandlerStack::create();
+
+            $stack->push(
+                \GuzzleHttp\Middleware::log(
+                    $logger,
+                    new \GuzzleHttp\MessageFormatter('{req_headers} => {res_headers}'),
+                    \Psr\Log\LogLevel::DEBUG
+                )
+            );
+
+            return new \GuzzleHttp\Client([
+                'handler'     => $stack,
+                'http_errors' => false,
+            ]);
+        }),
+
+        \Http\Client\HttpClient::class => \DI\autowire(\Http\Adapter\Guzzle6\Client::class),
+
+        \Psr\Http\Client\ClientInterface::class => \DI\autowire(\Http\Client\HttpClient::class),
+
     ],
 
 ];
