@@ -154,9 +154,9 @@ return [
             ]);
         }),
 
-        ClientInterface::class => get(HttpClient::class),
-
         HttpClient::class => autowire(\Http\Adapter\Guzzle6\Client::class),
+
+        ClientInterface::class => get(HttpClient::class),
     ],
 
 ];
