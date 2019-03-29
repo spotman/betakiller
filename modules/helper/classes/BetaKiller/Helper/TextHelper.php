@@ -56,4 +56,15 @@ class TextHelper
             $value
         );
     }
+
+    public static function startsWith(string $haystack, string $needle): bool
+    {
+        $length = strlen($needle);
+        return $length && strpos($haystack, $needle) === 0;
+    }
+
+    public static function endsWith(string $haystack, string $needle): bool
+    {
+        return substr($haystack, -strlen($needle)) === $needle;
+    }
 }
