@@ -10,14 +10,21 @@ use BetaKiller\Session\DatabaseSessionStorage;
 use BetaKiller\Session\SessionStorageInterface;
 use BetaKiller\Url\Container\UrlContainerInterface;
 use BetaKiller\Url\UrlElementStack;
+use GuzzleHttp\Client;
+use GuzzleHttp\HandlerStack;
+use GuzzleHttp\Middleware;
+use Http\Client\HttpClient;
+use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Message\UriFactoryInterface;
 use Psr\Log\LoggerInterface;
+use Psr\Log\LogLevel;
 use Zend\Diactoros\RequestFactory;
 use Zend\Diactoros\Response\TextResponse;
 use Zend\Diactoros\ResponseFactory;
+use Zend\Diactoros\ServerRequestFactory;
 use Zend\Diactoros\StreamFactory;
 use Zend\Diactoros\UriFactory;
 use Zend\Expressive\Helper\BodyParams\BodyParamsMiddleware;
@@ -32,8 +39,11 @@ use Zend\HttpHandlerRunner\Emitter\SapiStreamEmitter;
 use Zend\HttpHandlerRunner\RequestHandlerRunner;
 use Zend\Stratigility\MiddlewarePipe;
 use Zend\Stratigility\MiddlewarePipeInterface;
+use function DI\autowire;
+use function DI\factory;
+use function DI\get;
 
-$deprecatedFactory = \DI\factory(function () {
+$deprecatedFactory = factory(static function () {
     throw new LogicException('Deprecated');
 });
 
@@ -41,15 +51,15 @@ return [
 
     'definitions' => [
 
-        RouterInterface::class          => \DI\autowire(FastRouteRouter::class),
-        EmitterInterface::class         => \DI\autowire(SapiStreamEmitter::class),
-        MiddlewarePipeInterface::class  => \DI\autowire(MiddlewarePipe::class),
-        RequestFactoryInterface::class  => \DI\autowire(RequestFactory::class),
-        ResponseFactoryInterface::class => \DI\autowire(ResponseFactory::class),
-        StreamFactoryInterface::class   => \DI\autowire(StreamFactory::class),
-        UriFactoryInterface::class      => \DI\autowire(UriFactory::class),
+        RouterInterface::class          => autowire(FastRouteRouter::class),
+        EmitterInterface::class         => autowire(SapiStreamEmitter::class),
+        MiddlewarePipeInterface::class  => autowire(MiddlewarePipe::class),
+        RequestFactoryInterface::class  => autowire(RequestFactory::class),
+        ResponseFactoryInterface::class => autowire(ResponseFactory::class),
+        StreamFactoryInterface::class   => autowire(StreamFactory::class),
+        UriFactoryInterface::class      => autowire(UriFactory::class),
 
-        RequestHandlerRunner::class => \DI\factory(function (
+        RequestHandlerRunner::class => factory(static function (
             MiddlewarePipeInterface $pipe,
             EmitterInterface $emitter,
             LoggerInterface $logger
@@ -57,10 +67,10 @@ return [
             return new RequestHandlerRunner(
                 $pipe,
                 $emitter,
-                function () {
-                    return \Zend\Diactoros\ServerRequestFactory::fromGlobals();
+                static function () {
+                    return ServerRequestFactory::fromGlobals();
                 },
-                function (\Throwable $e) use ($logger) {
+                static function (\Throwable $e) use ($logger) {
                     // Log exception to developers
                     $logger->alert(Exception::oneLiner($e), [
                         Logger::CONTEXT_KEY_EXCEPTION => $e,
@@ -72,23 +82,23 @@ return [
             );
         }),
 
-        ImplicitHeadMiddleware::class => \DI\factory(function (
+        ImplicitHeadMiddleware::class => factory(static function (
             RouterInterface $router,
             StreamFactoryInterface $factory
         ) {
-            return new ImplicitHeadMiddleware($router, function () use ($factory) {
+            return new ImplicitHeadMiddleware($router, static function () use ($factory) {
                 return $factory->createStream();
             });
         }),
 
-        ImplicitOptionsMiddleware::class => \DI\factory(function (ResponseFactoryInterface $factory) {
-            return new ImplicitOptionsMiddleware(function () use ($factory) {
+        ImplicitOptionsMiddleware::class => factory(static function (ResponseFactoryInterface $factory) {
+            return new ImplicitOptionsMiddleware(static function () use ($factory) {
                 return $factory->createResponse();
             });
         }),
 
-        MethodNotAllowedMiddleware::class => \DI\factory(function (ResponseFactoryInterface $factory) {
-            return new MethodNotAllowedMiddleware(function () use ($factory) {
+        MethodNotAllowedMiddleware::class => factory(static function (ResponseFactoryInterface $factory) {
+            return new MethodNotAllowedMiddleware(static function () use ($factory) {
                 return $factory->createResponse();
             });
         }),
@@ -100,7 +110,7 @@ return [
 //            return new RequestIdMiddleware($requestIdProvider);
 //        }),
 
-        BodyParamsMiddleware::class => DI\factory(function () {
+        BodyParamsMiddleware::class => factory(static function () {
             $params = new BodyParamsMiddleware();
 
             $params->addStrategy(new CspReportBodyParamsStrategy());
@@ -108,47 +118,45 @@ return [
             return $params;
         }),
 
-        SessionStorageInterface::class     => DI\autowire(DatabaseSessionStorage::class),
-        SessionPersistenceInterface::class => DI\get(SessionStorageInterface::class),
+        SessionStorageInterface::class     => autowire(DatabaseSessionStorage::class),
+        SessionPersistenceInterface::class => get(SessionStorageInterface::class),
 
         // Deprecated DI objects
         // UrlHelper is used via Container::make() method and can not be deprecated
-        UrlElementStack::class             => \DI\factory(function () {
+        UrlElementStack::class             => factory(static function () {
             throw new LogicException(UrlElementStack::class.' DI injection deprecated, use ServerRequestHelper::getUrlElementStack()');
         }),
 
-        UrlContainerInterface::class => \DI\factory(function () {
+        UrlContainerInterface::class => factory(static function () {
             throw new LogicException(UrlContainerInterface::class.' DI injection deprecated, use ServerRequestHelper::getUrlContainer() instead');
         }),
 
-        I18nHelper::class => \DI\factory(function () {
+        I18nHelper::class => factory(static function () {
             throw new Exception(I18nHelper::class.' DI injection deprecated, use ServerRequestHelper::getI18n() instead');
         }),
 
-        EntityFactoryInterface::class => \DI\autowire(EntityFactory::class),
+        EntityFactoryInterface::class => autowire(EntityFactory::class),
 
-        // Common Http clients
-        \GuzzleHttp\ClientInterface::class => \DI\factory(function(LoggerInterface $logger) {
-            $stack = \GuzzleHttp\HandlerStack::create();
+        \GuzzleHttp\ClientInterface::class => factory(static function (LoggerInterface $logger) {
+            $stack = HandlerStack::create();
 
             $stack->push(
-                \GuzzleHttp\Middleware::log(
+                Middleware::log(
                     $logger,
                     new \GuzzleHttp\MessageFormatter('{req_headers} => {res_headers}'),
-                    \Psr\Log\LogLevel::DEBUG
+                    LogLevel::DEBUG
                 )
             );
 
-            return new \GuzzleHttp\Client([
+            return new Client([
                 'handler'     => $stack,
                 'http_errors' => false,
             ]);
         }),
 
-        \Http\Client\HttpClient::class => \DI\autowire(\Http\Adapter\Guzzle6\Client::class),
+        ClientInterface::class => autowire(HttpClient::class),
 
-        \Psr\Http\Client\ClientInterface::class => \DI\autowire(\Http\Client\HttpClient::class),
-
+        HttpClient::class => autowire(\Http\Adapter\Guzzle6\Client::class),
     ],
 
 ];
