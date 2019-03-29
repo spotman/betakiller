@@ -1,20 +1,25 @@
 <?php
 
+use Geocoder\Provider\Chain\Chain;
+use Geocoder\Provider\GoogleMaps\GoogleMaps;
+use Geocoder\Provider\Provider;
+use Geocoder\Provider\Yandex\Yandex;
 use Http\Client\HttpClient;
 use function DI\{factory};
 
 return [
     'definitions' => [
 
-        \Geocoder\Provider\Provider::class => factory(function (HttpClient $httpClient) {
-            $googleApiKey = getenv('GOOGLE_CLOUD_API_KEY');
+        Provider::class => factory(static function (HttpClient $httpClient) {
+//            $googleApiKey = getenv('GOOGLE_CLOUD_API_KEY');
+//
+//            if (!$googleApiKey) {
+//                throw new InvalidArgumentException('Missing GOOGLE_CLOUD_API_KEY env variable');
+//            }
 
-            if (!$googleApiKey) {
-                throw new InvalidArgumentException('Missing GOOGLE_CLOUD_API_KEY env variable');
-            }
-
-            return new \Geocoder\Provider\Chain\Chain([
-                new \Geocoder\Provider\GoogleMaps\GoogleMaps($httpClient, $googleApiKey),
+            return new Chain([
+                new Yandex($httpClient),
+//                new GoogleMaps($httpClient, $googleApiKey),
             ]);
         }),
     ],
