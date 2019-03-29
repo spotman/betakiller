@@ -124,7 +124,7 @@ abstract class ORM extends Utils\Kohana\ORM implements ExtendedOrmInterface
 
         if (!($relation instanceof AbstractEntityInterface)) {
             throw new \RuntimeException(
-                sprintf('Unable get related entity by alias "%s"', $name)
+                sprintf('Can not get related entity by alias "%s" from entity "%s"', $name, $this->object_name())
             );
         }
 
@@ -379,5 +379,16 @@ abstract class ORM extends Utils\Kohana\ORM implements ExtendedOrmInterface
     public function getSearchResultsItemData(): array
     {
         return $this->as_array();
+    }
+
+    protected function setOnce(string $key, $value): void
+    {
+        $current = $this->get($key);
+
+        if ((is_scalar($current) && $current) || ($current instanceof self && $current->loaded())) {
+            throw new LogicException(sprintf('Can not reassign key "%s"', $key));
+        }
+
+        $this->set($key, $value);
     }
 }
