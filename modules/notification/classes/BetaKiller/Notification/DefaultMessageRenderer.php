@@ -46,10 +46,7 @@ class DefaultMessageRenderer implements MessageRendererInterface
         NotificationTransportInterface $transport,
         string $hash
     ): string {
-        // User language in templates
-        $langName = $target->getLanguageIsoCode();
-
-        $file = $this->makeTemplateFileName($message->getCodename(), $transport->getName(), $langName);
+        $file = $this->detectTemplateFile($message, $target, $transport);
         $view = $this->viewFactory->create($file);
 
         // Get message data
@@ -73,7 +70,7 @@ class DefaultMessageRenderer implements MessageRendererInterface
         return $view->render();
     }
 
-    public function hasTemplate(
+    public function hasLocalizedTemplate(
         string $messageCodename,
         string $transportCodename,
         string $langName
@@ -83,12 +80,23 @@ class DefaultMessageRenderer implements MessageRendererInterface
         return $this->viewFactory->exists($file);
     }
 
+    public function hasGeneralTemplate(string $messageCodename, string $transportCodename): bool
+    {
+        $file = $this->makeTemplateFileName($messageCodename, $transportCodename);
+
+        return $this->viewFactory->exists($file);
+    }
+
     private function makeTemplateFileName(
         string $messageCodename,
         string $transportCodename,
-        string $langName
+        string $langName = null
     ): string {
-        $templateName = $messageCodename.'-'.$transportCodename.'-'.$langName;
+        $templateName = $messageCodename.'-'.$transportCodename;
+
+        if ($langName) {
+            $templateName .= '-'.$langName;
+        }
 
         return $this->getTemplatePath().DIRECTORY_SEPARATOR.$templateName;
     }
@@ -121,5 +129,32 @@ class DefaultMessageRenderer implements MessageRendererInterface
     protected function getTemplatePath(): string
     {
         return 'notifications';
+    }
+
+    private function detectTemplateFile(
+        NotificationMessageInterface $message,
+        NotificationTargetInterface $target,
+        NotificationTransportInterface $transport
+    ): string {
+        // User language in templates
+        $langName = $target->getLanguageIsoCode();
+
+        $localizedFile = $this->makeTemplateFileName($message->getCodename(), $transport->getName(), $langName);
+
+        if ($this->viewFactory->exists($localizedFile)) {
+            return $localizedFile;
+        }
+
+        $commonFile = $this->makeTemplateFileName($message->getCodename(), $transport->getName());
+
+        if ($this->viewFactory->exists($commonFile)) {
+            return $commonFile;
+        }
+
+        throw new NotificationException('Missing ":name" message template for ":transport" in lang ":lang"', [
+            ':name'      => $message->getCodename(),
+            ':transport' => $transport->getName(),
+            ':lang'      => $langName,
+        ]);
     }
 }

@@ -18,9 +18,13 @@
           <td>
             {{ message.name }}<br/>
             {% for transport, transport_data in message.templates %}
-              {% for lang, is_exists in transport_data %}
-                <span class="badge white-text {{ is_exists ? "green" : "red" }}">{{ transport }} - {{ lang }}</span>
-              {% endfor %}
+              {% if transport_data is same as(true) %}
+                <span class="badge white-text green">{{ transport }} - common</span>
+              {% else %}
+                {% for lang, is_exists in transport_data %}
+                  <span class="badge white-text {{ is_exists ? "green" : "red" }}">{{ transport }} - {{ lang }}</span>
+                {% endfor %}
+              {% endif %}
             {% endfor %}
           </td>
           <td><a href="{{ message.logs_url }}" class="btn blue right">Logs</a></td>

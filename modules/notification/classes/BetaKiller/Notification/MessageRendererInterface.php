@@ -15,9 +15,14 @@ interface MessageRendererInterface
         NotificationTargetInterface $target
     ): string;
 
-    public function hasTemplate(
+    public function hasLocalizedTemplate(
         string $messageCodename,
         string $transportCodename,
         string $langName
+    ): bool;
+
+    public function hasGeneralTemplate(
+        string $messageCodename,
+        string $transportCodename
     ): bool;
 }

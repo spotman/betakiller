@@ -14,6 +14,7 @@ use BetaKiller\Repository\LanguageRepositoryInterface;
 use BetaKiller\Repository\NotificationGroupRepository;
 use BetaKiller\Url\ZoneInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use function http_build_query;
 
 class GroupListIFace extends AbstractAdminIFace
 {
@@ -115,7 +116,7 @@ class GroupListIFace extends AbstractAdminIFace
             $messages[] = [
                 'name'      => $messageCodename,
                 'templates' => $this->checkMessageTemplates($messageCodename),
-                'logs_url'  => $logIndexUrl.'?'.\http_build_query([LogIndexIFace::ARG_MESSAGE => $messageCodename]),
+                'logs_url'  => $logIndexUrl.'?'.http_build_query([LogIndexIFace::ARG_MESSAGE => $messageCodename]),
             ];
         }
 
@@ -137,23 +138,20 @@ class GroupListIFace extends AbstractAdminIFace
         foreach ($transports as $transport) {
             $transportName = $transport->getName();
 
-            // Iterate languages next
-            foreach ($languages as $language) {
-                $langName = $language->getIsoCode();
+            if ($this->messageRenderer->hasGeneralTemplate($messageCodename, $transportName)) {
+                $data[$transportName] = true;
+            } else {
+                // Iterate languages next
+                foreach ($languages as $language) {
+                    $langName = $language->getIsoCode();
 
-                // Make matrix
-                $data[$transportName][$langName] = $this->checkTemplate($messageCodename, $transportName, $langName);
+                    // Make matrix
+                    $data[$transportName][$langName] = $this->messageRenderer->hasLocalizedTemplate($messageCodename,
+                        $transportName, $langName);
+                }
             }
         }
 
         return $data;
-    }
-
-    private function checkTemplate(
-        string $messageCodename,
-        string $transportName,
-        string $langName
-    ): bool {
-        return $this->messageRenderer->hasTemplate($messageCodename, $transportName, $langName);
     }
 }
