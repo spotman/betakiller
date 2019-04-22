@@ -5,14 +5,15 @@ import $ from 'jquery';
 export default class {
   constructor(successfulCallback) {
     this.successfulCallback = successfulCallback;
-    this.$widget            = $(".widget-auth-regular");
-    this.$form              = this.$widget.find('form[name="regular-login-form"]');
-    this.$login             = this.$form.find('input[name="user-login"]');
-    this.$pass              = this.$form.find('input[name="user-password"]');
-    this.$submitButton      = this.$form.find('button[type="submit"]');
-    this.$alert             = this.$widget.find(".alert");
+    this.$widget            = document.querySelector(".widget-auth-regular");
+    this.$form              = this.$widget.querySelector('form[name="regular-login-form"]');
+    this.$login             = this.$form.querySelector('input[name="user-login"]');
+    this.$pass              = this.$form.querySelector('input[name="user-password"]');
+    this.$submitButton      = this.$form.querySelector('button[type="submit"]');
+    this.$alert             = this.$widget.querySelector(".alert");
+    this.alertHiddenClass   = this.$alert.getAttribute('data-hidden-class');
 
-    this.$form.submit((event) => this.onSubmit(event));
+    this.$form.addEventListener('submit', (event) => this.onSubmit(event));
 
     this.loginFocus();
   }
@@ -24,21 +25,27 @@ export default class {
   onSubmit(event) {
     event.preventDefault();
 
-    var login    = this.$login.val(),
-        password = this.$pass.val();
+    var login    = this.$login.value,
+        password = this.$pass.value;
 
     if (login === '' || password === '') {
       return;
     }
 
-    this.$alert.hide();
-    this.$submitButton.attr('disabled', 'disabled');
+    this.$alert.classList.add(this.alertHiddenClass);
+    this.$submitButton.setAttribute('disabled', 'disabled');
 
-    $.post(this.$form.attr('action'), {
+    $.post(this.$form.getAttribute('action'), {
         'user-login':    login,
         'user-password': password
       }, '', 'json')
-      .done(() => this.onSubmitResolve())
+      .done((result) => {
+        if (result.response && result.response === 'ok') {
+          this.onSubmitResolve();
+        } else {
+          this.onSubmitReject(result.message);
+        }
+      })
       .fail((message) => this.onSubmitReject(message));
   }
 
@@ -49,8 +56,10 @@ export default class {
   }
 
   onSubmitReject(message) {
-    this.$alert.html(message).removeClass('hide').show();
+    this.$alert.textContent = message;
+    this.$alert.classList.remove(this.alertHiddenClass);
+
     console.log(message || 'error');
-    this.$submitButton.removeAttr('disabled');
+    this.$submitButton.removeAttribute('disabled');
   }
 }

@@ -1,6 +1,5 @@
 'use strict';
 
-import $ from 'jquery';
 import ProviderRegular from './providers/regular.js';
 
 const providers = {
@@ -9,16 +8,17 @@ const providers = {
 
 class Auth {
   constructor() {
-    this.$widget = $('.widget-auth');
     this.initProviders();
   }
 
   initProviders() {
-    this.$widget.data('providers').split(',')
+    const $el = document.getElementById('widget-auth');
+
+    $el.getAttribute('data-providers').split(',')
       .forEach((providerName) => {
-        let provider = providers[providerName];
+        const provider = providers[providerName];
         new provider(function () {
-          location.reload(true);
+          location.replace(location.href);
         });
       });
   }
