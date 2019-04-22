@@ -30,13 +30,14 @@ class GeoCoder extends AbstractTask
     /**
      * GeoCoder constructor.
      *
-     * @param \Geocoder\Provider\Provider $provider
-     * @param \Psr\Log\LoggerInterface    $logger
+     * @param \Geocoder\Provider\Provider     $provider
+     * @param \BetaKiller\Model\UserInterface $user
+     * @param \Psr\Log\LoggerInterface        $logger
      */
     public function __construct(Provider $provider, UserInterface $user, LoggerInterface $logger)
     {
         $this->provider = $provider;
-        $this->user = $user;
+        $this->user     = $user;
         $this->logger   = $logger;
 
         parent::__construct();
