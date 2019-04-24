@@ -12,7 +12,7 @@ use BetaKiller\Model\ContentPostThumbnailInterface;
  * @method ContentPostThumbnailInterface|null findByWpId(int $id)
  * @method ContentPostThumbnailInterface[] getAll()
  */
-class ContentPostThumbnailRepository extends AbstractHashStrategyOrmBasedAssetsRepository implements
+class ContentPostThumbnailRepository extends AbstractOrmBasedHashStrategyAssetsRepository implements
     WordpressAttachmentRepositoryInterface, EntityItemRelatedRepositoryInterface
 {
     use OrmBasedRepositoryHasWordpressIdTrait;

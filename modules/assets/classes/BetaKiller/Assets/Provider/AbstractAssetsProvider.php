@@ -23,9 +23,25 @@ use BetaKiller\Assets\Storage\AssetsStorageInterface;
 use BetaKiller\Factory\EntityFactoryInterface;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Repository\RepositoryInterface;
+use DateTimeImmutable;
 use Psr\Http\Message\UploadedFileInterface;
 use Psr\Http\Message\UriInterface;
 use Spotman\Acl\AclInterface;
+use function basename;
+use function dirname;
+use function in_array;
+use function is_array;
+use function mb_strlen;
+use function sys_get_temp_dir;
+use function tempnam;
+use const UPLOAD_ERR_CANT_WRITE;
+use const UPLOAD_ERR_EXTENSION;
+use const UPLOAD_ERR_FORM_SIZE;
+use const UPLOAD_ERR_INI_SIZE;
+use const UPLOAD_ERR_NO_FILE;
+use const UPLOAD_ERR_NO_TMP_DIR;
+use const UPLOAD_ERR_OK;
+use const UPLOAD_ERR_PARTIAL;
 
 abstract class AbstractAssetsProvider implements AssetsProviderInterface
 {
@@ -297,7 +313,7 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
     public function upload(UploadedFileInterface $file, array $postData, UserInterface $user): AssetsModelInterface
     {
         // Check permissions
-        if (!$this->checkUploadPermissions($user)) {
+        if (!$this->isUploadAllowed($user)) {
             throw new AssetsProviderException('Upload is not allowed');
         }
 
@@ -305,14 +321,14 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
         $this->checkUploadedFile($file);
 
         // Move uploaded file to temp location (and proceed underlying checks)
-        $fullPath = \tempnam(\sys_get_temp_dir(), 'assets-upload');
+        $fullPath = tempnam(sys_get_temp_dir(), 'assets-upload');
         $file->moveTo($fullPath);
 
         // Store temp file
         $name  = strip_tags($file->getClientFilename());
         $model = $this->store($fullPath, $name, $user);
 
-        $this->postUploadProcessing($model, $postData);
+        $this->postUploadProcessing($model, $postData, $user);
 
         // Cleanup
         unlink($fullPath);
@@ -328,28 +344,28 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
 
         // TODO i18n for exceptions
         switch ($file->getError()) {
-            case \UPLOAD_ERR_OK:
+            case UPLOAD_ERR_OK:
                 return;
 
-            case \UPLOAD_ERR_CANT_WRITE:
+            case UPLOAD_ERR_CANT_WRITE:
                 throw new CantWriteUploadException;
 
-            case \UPLOAD_ERR_NO_TMP_DIR:
+            case UPLOAD_ERR_NO_TMP_DIR:
                 throw new NoTmpDirUploadException;
 
-            case \UPLOAD_ERR_EXTENSION:
+            case UPLOAD_ERR_EXTENSION:
                 throw new ExtensionHaltedUploadException;
 
-            case \UPLOAD_ERR_FORM_SIZE:
+            case UPLOAD_ERR_FORM_SIZE:
                 throw new FormSizeUploadException;
 
-            case \UPLOAD_ERR_INI_SIZE:
+            case UPLOAD_ERR_INI_SIZE:
                 throw new IniSizeUploadException;
 
-            case \UPLOAD_ERR_NO_FILE:
+            case UPLOAD_ERR_NO_FILE:
                 throw new NoFileUploadException;
 
-            case \UPLOAD_ERR_PARTIAL:
+            case UPLOAD_ERR_PARTIAL:
                 throw new PartialUploadException;
 
             default:
@@ -374,7 +390,7 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
     public function store(string $fullPath, string $originalName, UserInterface $user): AssetsModelInterface
     {
         // Check permissions
-        if (!$this->checkStorePermissions($user)) {
+        if (!$this->isCreateAllowed($user)) {
             throw new AssetsProviderException('Store is not allowed');
         }
 
@@ -397,12 +413,12 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
         // Custom processing
         $content = $this->customContentProcessing($content, $model);
 
-        $currentTime = new \DateTimeImmutable;
+        $currentTime = new DateTimeImmutable;
 
         // Put data into model
         $model
             ->setOriginalName($originalName)
-            ->setSize(\mb_strlen($content))
+            ->setSize(mb_strlen($content))
             ->setMime($mimeType)
             ->setUploadedBy($user)
             ->setUploadedAt($currentTime)
@@ -452,14 +468,15 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
     /**
      * After upload processing
      *
-     * @param AssetsModelInterface $model
-     * @param array                $postData
+     * @param AssetsModelInterface            $model
+     * @param array                           $postData
+     * @param \BetaKiller\Model\UserInterface $user
      */
-    protected function postUploadProcessing($model, array $postData): void
+    protected function postUploadProcessing($model, array $postData, UserInterface $user): void
     {
         if ($this->postUploadHandlers) {
             foreach ($this->postUploadHandlers as $handler) {
-                $handler->update($this, $model, $postData);
+                $handler->update($this, $model, $postData, $user);
             }
         }
     }
@@ -484,7 +501,7 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
     public function delete(AssetsModelInterface $model, UserInterface $user): void
     {
         // Check permissions
-        if (!$this->checkDeletePermissions($user, $model)) {
+        if (!$this->isDeleteAllowed($user, $model)) {
             throw new AssetsProviderException('Delete is not allowed');
         }
 
@@ -608,7 +625,7 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
      */
     public function hasAction(string $action): bool
     {
-        return \in_array($action, $this->getActions(), true);
+        return in_array($action, $this->getActions(), true);
     }
 
     /**
@@ -616,10 +633,10 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
      *
      * @param string $mime MIME-type
      *
-     * @throws \BetaKiller\Assets\Exception\AssetsProviderException
+     * @return bool
      * @throws \BetaKiller\Assets\Exception\AssetsUploadException
      * @throws \BetaKiller\Assets\Exception\AssetsException
-     * @return bool
+     * @throws \BetaKiller\Assets\Exception\AssetsProviderException
      */
     private function checkAllowedMimeTypes(string $mime): bool
     {
@@ -630,7 +647,7 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
             return true;
         }
 
-        if (!\is_array($allowedMimeTypes)) {
+        if (!is_array($allowedMimeTypes)) {
             throw new AssetsProviderException('Allowed MIME-types in :codename provider must be an array() or TRUE',
                 [':codename' => $this->codename]
             );
@@ -698,6 +715,87 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
     }
 
     /**
+     * Returns TRUE if upload is granted
+     *
+     * @param \BetaKiller\Model\UserInterface $user
+     *
+     * @return bool
+     * @throws \BetaKiller\Assets\Exception\AssetsException
+     */
+    public function isUploadAllowed(UserInterface $user): bool
+    {
+        return $this->getAclResource($user)->isUploadAllowed();
+    }
+
+    /**
+     * Returns TRUE if store is granted
+     *
+     * @param \BetaKiller\Model\UserInterface $user
+     *
+     * @return bool
+     * @throws \BetaKiller\Assets\Exception\AssetsException
+     */
+    public function isCreateAllowed(UserInterface $user): bool
+    {
+        return $this->getAclResource($user)->isCreateAllowed();
+    }
+
+    /**
+     * Returns TRUE if delete operation granted
+     *
+     * @param \BetaKiller\Model\UserInterface $user
+     * @param AssetsModelInterface            $model
+     *
+     * @return bool
+     * @throws \BetaKiller\Assets\Exception\AssetsException
+     */
+    public function isDeleteAllowed(UserInterface $user, AssetsModelInterface $model): bool
+    {
+        return $this->getAclResource($user)->setEntity($model)->isDeleteAllowed();
+    }
+
+    /**
+     * Returns a file size limit in bytes based on the PHP upload_max_filesize and post_max_size
+     *
+     * @return int
+     * @see https://stackoverflow.com/a/25370978
+     */
+    public function getUploadMaxSize(): int
+    {
+        static $maxSize = -1;
+
+        if ($maxSize < 0) {
+            // Start with post_max_size.
+            $postMaxSize = $this->parseIniSize(ini_get('post_max_size'));
+            if ($postMaxSize > 0) {
+                $maxSize = $postMaxSize;
+            }
+
+            // If upload_max_size is less, then reduce. Except if upload_max_size is
+            // zero, which indicates no limit.
+            $uploadMax = $this->parseIniSize(ini_get('upload_max_filesize'));
+            if ($uploadMax > 0 && $uploadMax < $maxSize) {
+                $maxSize = $uploadMax;
+            }
+        }
+
+        return $maxSize;
+    }
+
+    private function parseIniSize(string $size): int
+    {
+        $unit = preg_replace('/[^bkmgtpezy]/i', '', $size); // Remove the non-unit characters from the size.
+        $size = preg_replace('/[^0-9\.]/', '', $size); // Remove the non-numeric characters from the size.
+
+        if ($unit) {
+            // Find the position of the unit in the ordered string which is the power of magnitude to multiply a kilobyte by.
+            return round($size * (1024 ** stripos('bkmgtpezy', $unit[0])));
+        }
+
+        return (int)round($size);
+    }
+
+    /**
      * @param \BetaKiller\Assets\Model\AssetsModelInterface $model
      *
      * @return string
@@ -758,8 +856,8 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
 
         $originalPath = $this->getOriginalPath($model);
 
-        $path             = \dirname($originalPath);
-        $originalFileName = \basename($originalPath);
+        $path             = dirname($originalPath);
+        $originalFileName = basename($originalPath);
         foreach ($this->storage->getFiles($path) as $file) {
             if ($keepOriginal && basename($file) === $originalFileName) {
                 continue;
@@ -782,45 +880,6 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
     public function getAllowedMimeTypes()
     {
         return $this->config->getAllowedMimeTypes($this);
-    }
-
-    /**
-     * Returns TRUE if upload is granted
-     *
-     * @param \BetaKiller\Model\UserInterface $user
-     *
-     * @return bool
-     */
-    private function checkUploadPermissions(UserInterface $user): bool
-    {
-        return $this->getAclResource($user)->isUploadAllowed();
-    }
-
-    /**
-     * Returns TRUE if store is granted
-     *
-     * @param \BetaKiller\Model\UserInterface $user
-     *
-     * @return bool
-     * @throws \BetaKiller\Assets\Exception\AssetsException
-     */
-    private function checkStorePermissions(UserInterface $user): bool
-    {
-        return $this->getAclResource($user)->isCreateAllowed();
-    }
-
-    /**
-     * Returns TRUE if delete operation granted
-     *
-     * @param \BetaKiller\Model\UserInterface $user
-     * @param AssetsModelInterface            $model
-     *
-     * @return bool
-     * @throws \BetaKiller\Assets\Exception\AssetsException
-     */
-    private function checkDeletePermissions(UserInterface $user, AssetsModelInterface $model): bool
-    {
-        return $this->getAclResource($user)->setEntity($model)->isDeleteAllowed();
     }
 
     /**

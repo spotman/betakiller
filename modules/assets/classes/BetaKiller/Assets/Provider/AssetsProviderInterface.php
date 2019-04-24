@@ -220,4 +220,42 @@ interface AssetsProviderInterface
      * @return array|TRUE
      */
     public function getAllowedMimeTypes();
+
+    /**
+     * Returns TRUE if upload is granted
+     *
+     * @param \BetaKiller\Model\UserInterface $user
+     *
+     * @return bool
+     * @throws \BetaKiller\Assets\Exception\AssetsException
+     */
+    public function isUploadAllowed(UserInterface $user): bool;
+
+    /**
+     * Returns TRUE if store is granted
+     *
+     * @param \BetaKiller\Model\UserInterface $user
+     *
+     * @return bool
+     * @throws \BetaKiller\Assets\Exception\AssetsException
+     */
+    public function isCreateAllowed(UserInterface $user): bool;
+
+    /**
+     * Returns TRUE if delete operation granted
+     *
+     * @param \BetaKiller\Model\UserInterface $user
+     * @param AssetsModelInterface            $model
+     *
+     * @return bool
+     * @throws \BetaKiller\Assets\Exception\AssetsException
+     */
+    public function isDeleteAllowed(UserInterface $user, AssetsModelInterface $model): bool;
+
+    /**
+     * Returns a file size limit in bytes based on the PHP upload_max_filesize and post_max_size
+     *
+     * @return int
+     */
+    public function getUploadMaxSize(): int;
 }

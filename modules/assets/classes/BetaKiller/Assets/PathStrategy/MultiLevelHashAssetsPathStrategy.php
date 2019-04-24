@@ -6,12 +6,12 @@ namespace BetaKiller\Assets\PathStrategy;
 use BetaKiller\Assets\Exception\AssetsException;
 use BetaKiller\Assets\Model\AssetsModelInterface;
 use BetaKiller\Assets\MultiLevelPath;
-use BetaKiller\Repository\HashUrlStrategyRepositoryInterface;
+use BetaKiller\Repository\HashUrlStrategyAssetsRepositoryInterface;
 
 class MultiLevelHashAssetsPathStrategy implements AssetsPathStrategyInterface
 {
     /**
-     * @var \BetaKiller\Repository\HashUrlStrategyRepositoryInterface
+     * @var \BetaKiller\Repository\HashUrlStrategyAssetsRepositoryInterface
      */
     private $repository;
 
@@ -23,9 +23,9 @@ class MultiLevelHashAssetsPathStrategy implements AssetsPathStrategyInterface
     /**
      * MultiLevelHashAssetsPathStrategy constructor.
      *
-     * @param \BetaKiller\Repository\HashUrlStrategyRepositoryInterface $repository
+     * @param \BetaKiller\Repository\HashUrlStrategyAssetsRepositoryInterface $repository
      */
-    public function __construct(HashUrlStrategyRepositoryInterface $repository)
+    public function __construct(HashUrlStrategyAssetsRepositoryInterface $repository)
     {
         $this->repository = $repository;
 

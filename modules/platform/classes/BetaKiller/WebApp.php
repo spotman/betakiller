@@ -7,6 +7,7 @@ use BetaKiller\Assets\Middleware\DeleteMiddleware;
 use BetaKiller\Assets\Middleware\DownloadMiddleware;
 use BetaKiller\Assets\Middleware\OriginalMiddleware;
 use BetaKiller\Assets\Middleware\PreviewMiddleware;
+use BetaKiller\Assets\Middleware\UploadInfoMiddleware;
 use BetaKiller\Assets\Middleware\UploadMiddleware;
 use BetaKiller\Assets\Model\AssetsModelImageInterface;
 use BetaKiller\Assets\Provider\AssetsProviderInterface;
@@ -198,13 +199,24 @@ class WebApp
         $deleteAction   = AssetsProviderInterface::ACTION_DELETE;
         $previewAction  = ImageAssetsProviderInterface::ACTION_PREVIEW;
 
+        $uploadUrl = '/assets/{provider}/'.$uploadAction;
+
+        /**
+         * Get upload info and restrictions
+         */
+        $app->get(
+            $uploadUrl,
+            UploadInfoMiddleware::class,
+            'assets-upload-info'
+        );
+
         /**
          * Upload file via concrete provider
          *
          * "assets/<provider>/upload"
          */
         $app->post(
-            '/assets/{provider}/'.$uploadAction,
+            $uploadUrl,
             UploadMiddleware::class,
             'assets-upload'
         );

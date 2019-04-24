@@ -22,7 +22,7 @@ abstract class AbstractAssetsAclResource extends AbstractEntityRelatedAclResourc
     {
         return [
             self::ACTION_UPLOAD => $this->getUploadDefaultAccessList(),
-            self::ACTION_CREATE => $this->getCreateDefaultAccessList(),
+            self::ACTION_CREATE => $this->getStoreDefaultAccessList(),
             self::ACTION_READ   => $this->getReadDefaultAccessList(),
             self::ACTION_UPDATE => $this->getUpdateDefaultAccessList(),
             self::ACTION_DELETE => $this->getDeleteDefaultAccessList(),
@@ -47,7 +47,7 @@ abstract class AbstractAssetsAclResource extends AbstractEntityRelatedAclResourc
     /**
      * @return array
      */
-    abstract protected function getCreateDefaultAccessList(): array;
+    abstract protected function getStoreDefaultAccessList(): array;
 
     /**
      * @return array

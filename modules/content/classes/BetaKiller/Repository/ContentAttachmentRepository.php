@@ -14,7 +14,7 @@ use BetaKiller\Model\EntityModelInterface;
  * @method ContentAttachmentInterface[] getAll()
  * @method ContentAttachmentInterface[] getEditorListing(?EntityModelInterface $relatedEntity, ?int $itemID)
  */
-class ContentAttachmentRepository extends AbstractHashStrategyOrmBasedAssetsRepository
+class ContentAttachmentRepository extends AbstractOrmBasedHashStrategyAssetsRepository
     implements WordpressAttachmentRepositoryInterface, ContentElementRepositoryInterface
 {
     use OrmBasedContentElementRepositoryTrait;

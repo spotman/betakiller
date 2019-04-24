@@ -1,7 +1,10 @@
 <?php
 namespace BetaKiller\Assets\Handler;
 
+use BetaKiller\Assets\Exception\AssetsException;
 use BetaKiller\Assets\Provider\AssetsProviderInterface;
+use BetaKiller\Model\EntityItemRelatedInterface;
+use BetaKiller\Model\UserInterface;
 use BetaKiller\Repository\EntityRepository;
 
 class SaveEntityItemRelationHandler implements AssetsHandlerInterface
@@ -27,12 +30,20 @@ class SaveEntityItemRelationHandler implements AssetsHandlerInterface
      * @param \BetaKiller\Assets\Provider\AssetsProviderInterface $provider
      * @param \BetaKiller\Model\EntityItemRelatedInterface        $model
      * @param array                                               $postData
+     * @param \BetaKiller\Model\UserInterface                     $user
      *
      * @throws \BetaKiller\Repository\RepositoryException
      */
-    public function update(AssetsProviderInterface $provider, $model, array $postData): void
+    public function update(AssetsProviderInterface $provider, $model, array $postData, UserInterface $user): void
     {
-        $entitySlug     = (string)($postData['entitySlug'] ?? null);
+        if (!$model instanceof EntityItemRelatedInterface) {
+            throw new AssetsException('Assets model ":name" must implement :must', [
+                ':name' => $provider->getCodename(),
+                ':must' => EntityItemRelatedInterface::class,
+            ]);
+        }
+
+        $entitySlug   = (string)($postData['entitySlug'] ?? null);
         $entityItemID = (int)($postData['entityItemID'] ?? null);
 
         if ($entitySlug) {

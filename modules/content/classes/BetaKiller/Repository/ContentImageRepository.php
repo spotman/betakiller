@@ -12,7 +12,7 @@ use BetaKiller\Model\EntityModelInterface;
  * @method ContentImageInterface create()
  * @method ContentImageInterface[] getEditorListing(?EntityModelInterface $relatedEntity, ?int $itemID)
  */
-class ContentImageRepository extends AbstractHashStrategyOrmBasedAssetsRepository
+class ContentImageRepository extends AbstractOrmBasedHashStrategyAssetsRepository
     implements WordpressAttachmentRepositoryInterface, ContentElementRepositoryInterface
 {
     use OrmBasedContentElementRepositoryTrait;

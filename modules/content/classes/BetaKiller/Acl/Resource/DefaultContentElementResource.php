@@ -20,7 +20,7 @@ class DefaultContentElementResource extends AbstractAssetsAclResource
     /**
      * @return array
      */
-    protected function getCreateDefaultAccessList(): array
+    protected function getStoreDefaultAccessList(): array
     {
         return [
             Content::WRITER_ROLE_NAME,
