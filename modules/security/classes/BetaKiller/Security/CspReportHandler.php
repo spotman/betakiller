@@ -61,10 +61,6 @@ class CspReportHandler implements RequestHandlerInterface
      */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        if (ServerRequestHelper::getContentType($request) !== 'application/csp-report') {
-            throw new BadRequestHttpException;
-        }
-
         $report = \json_decode($request->getBody()->getContents(), true);
 
         if (empty($report) || !isset($report['csp-report'])) {
