@@ -6,6 +6,7 @@ use BetaKiller\Model\ContentPost;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Status\StatusWorkflowFactory;
 use Spotman\Api\ApiMethodException;
+use Spotman\Api\ApiMethodResponse;
 use Spotman\Defence\ArgumentsInterface;
 use Spotman\Defence\DefinitionBuilderInterface;
 
@@ -80,7 +81,7 @@ class CreateApiMethod extends AbstractEntityCreateApiMethod
             }
         }
 
-        // Return created model data
+        // Return created model
         return $model;
     }
 }

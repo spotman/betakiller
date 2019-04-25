@@ -3,7 +3,6 @@ namespace BetaKiller\Api\Method\ContentComment;
 
 use BetaKiller\Api\Method\AbstractEntityCreateApiMethod;
 use BetaKiller\Model\ContentComment;
-use BetaKiller\Model\ContentCommentInterface;
 use BetaKiller\Model\UserInterface;
 use Spotman\Defence\ArgumentsInterface;
 use Spotman\Defence\DefinitionBuilderInterface;
@@ -28,8 +27,8 @@ class CreateApiMethod extends AbstractEntityCreateApiMethod
     /**
      * Implement this method
      *
-     * @param \Spotman\Defence\ArgumentsInterface       $arguments
-     * @param \BetaKiller\Model\UserInterface           $user
+     * @param \Spotman\Defence\ArgumentsInterface $arguments
+     * @param \BetaKiller\Model\UserInterface     $user
      *
      * @return \BetaKiller\Model\ContentCommentInterface
      */
