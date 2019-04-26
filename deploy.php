@@ -61,7 +61,7 @@ set('keep_releases', 3);
 /**
  * Check environment before real deployment starts
  */
-task('check', function () {
+task('check', static function () {
     if (stage() === DEPLOYER_DEV_STAGE) {
         throw new RuntimeException('Can not deploy to a local stage');
     }
@@ -79,13 +79,13 @@ task('check', function () {
 });
 
 // Prepare app env
-task('deploy:repository:prepare:app', function () {
+task('deploy:repository:prepare:app', static function () {
     set('repository', get('app_repository'));
     set('repository_path', get('app_path'));
 })->desc('Prepare app repository');
 
 // Prepare BetaKiller env
-task('deploy:repository:prepare:betakiller', function () {
+task('deploy:repository:prepare:betakiller', static function () {
     set('repository', get('core_repository'));
     set('repository_path', get('core_path'));
 })->desc('Prepare BetaKiller repository');
@@ -96,23 +96,23 @@ function cd_repository_path_cmd()
 }
 
 // Clone repo task
-task('deploy:repository:clone', function () {
+task('deploy:repository:clone', static function () {
     cd('{{release_path}}');
     run('git clone {{repository}} {{repository_path}}');
 })->desc('Fetch repository'); //.env()->parse('{{repository_path}}')
 
 // Update repo task
-task('deploy:repository:update', function () {
+task('deploy:repository:update', static function () {
     run(cd_repository_path_cmd().' && git pull && git submodule update --init --recursive');
 })->desc('Update repository');    // .env()->parse('{{repository_path}}')
 
 // Installing vendors in BetaKiller
-task('deploy:vendors:betakiller', function () {
+task('deploy:vendors:betakiller', static function () {
     process_vendors('core');
 })->desc('Process Composer inside BetaKiller repository');
 
 // Installing vendors in app
-task('deploy:vendors:app', function () {
+task('deploy:vendors:app', static function () {
     process_vendors('app');
 })->desc('Process Composer inside app repository');
 
@@ -163,7 +163,7 @@ set('betakiller_shared_dirs', [
 
 set('betakiller_shared_files', []);
 
-task('deploy:betakiller:shared', function () {
+task('deploy:betakiller:shared', static function () {
     set('shared_dirs', get('betakiller_shared_dirs'));
     add('shared_files', get('betakiller_shared_files'));
 })->desc('Process BetaKiller shared files and dirs');
@@ -180,12 +180,12 @@ set('betakiller_writable_dirs', [
 
     '{{app_path}}/logs',
     '{{app_path}}/cache',
-    '{{app_path}}/public/assets',
+    '{{app_path}}/public/assets/static',
     '{{app_path}}/assets',
     '{{app_path}}/storage',
 ]);
 
-task('deploy:betakiller:writable', function () {
+task('deploy:betakiller:writable', static function () {
     set('writable_dirs', get('betakiller_writable_dirs'));
 })->desc('Process BetaKiller writable dirs');
 
@@ -194,19 +194,19 @@ after('deploy:betakiller:writable', 'deploy:writable');
 /**
  * PHP tasks
  */
-task('php:version', function () {
+task('php:version', static function () {
     writeln(run('{{bin/php}} -v'));
 })->desc('PHP version');
 
 /**
  * Apache tasks
  */
-task('httpd:reload', function () {
+task('httpd:reload', static function () {
     // TODO https://ubuntuforums.org/showthread.php?t=1505075
     run('sudo service httpd reload');
 })->desc('Reload Apache config');
 
-task('httpd:restart', function () {
+task('httpd:restart', static function () {
     run('sudo service httpd restart');
 })->desc('Restart Apache');
 
@@ -214,7 +214,7 @@ task('httpd:restart', function () {
 /**
  * GIT tasks
  */
-task('git:config:user', function () {
+task('git:config:user', static function () {
 
     $name = ask('Enter git name:', stage());
     gitConfig('user.name', $name);
@@ -223,38 +223,38 @@ task('git:config:user', function () {
     gitConfig('user.email', $email);
 })->desc('set global git properties like user.email');
 
-task('git:status', function () {
+task('git:status', static function () {
     gitStatus();
 })->desc('git status');
 
-task('git:add', function () {
+task('git:add', static function () {
     gitAdd();
 })->desc('git add');
 
-task('git:commit', function () {
+task('git:commit', static function () {
     gitCommit();
 })->desc('git commit -m "Commit message"');
 
-task('git:commit:all', function () {
+task('git:commit:all', static function () {
     gitCommitAll();
 })->desc('git add . && git commit -m "Commit message"');
 
-task('git:push', function () {
+task('git:push', static function () {
     gitPush();
 })->desc('git push');
 
-task('git:pull', function () {
+task('git:pull', static function () {
     gitPull();
 })->desc('git pull');
 
-task('git:pull:all', function () {
+task('git:pull:all', static function () {
     gitPullAll();
 })->desc('git pull for all repositories');
 
 /**
  * Makes git:check inside of {current} directory
  */
-task('git:check', function () {
+task('git:check', static function () {
     $currentRevisionPath = get('current');
     $path                = getRepoPath(null, $currentRevisionPath);
 
@@ -272,14 +272,14 @@ task('git:check', function () {
     }
 })->desc('Checks for new files that not in GIT and commits them');
 
-task('git:checkout', function () {
+task('git:checkout', static function () {
     gitCheckout();
 })->desc('git checkout _branch_ (use --branch option)');
 
 /**
  * Custom Minion tasks
  */
-task('minion', function () {
+task('minion', static function () {
     if (!input()->hasOption('task')) {
         throw new Exception('Specify task name via --task option');
     }
@@ -293,14 +293,14 @@ task('minion', function () {
 /**
  * Create table with migrations
  */
-task('migrations:install', function () {
+task('migrations:install', static function () {
     runMinionTask('migrations:install', false, true);
 })->desc('Install migrations table');
 
 /**
  * Create new migration
  */
-task('migrations:create', function () {
+task('migrations:create', static function () {
     $scope = ask('Enter scope (app, core, app:module:moduleName or core:module:moduleName)', 'app');
 
     if (!$scope) {
@@ -336,14 +336,14 @@ task('migrations:create', function () {
 /**
  * Apply migrations
  */
-task('migrations:up', function () {
+task('migrations:up', static function () {
     runMinionTask('migrations:up');
 })->desc('Apply migrations');
 
 /**
  * Rollback migrations
  */
-task('migrations:down', function () {
+task('migrations:down', static function () {
     $to = input()->getOption('to');
 
     runMinionTask("migrations:down --to=$to");
@@ -352,19 +352,19 @@ task('migrations:down', function () {
 /**
  * Show migrations history
  */
-task('migrations:history', function () {
+task('migrations:history', static function () {
     runMinionTask('migrations:history');
 })->desc('Show migrations list');
 
-task('cache:warmup', function () {
+task('cache:warmup', static function () {
     runMinionTask('cache:warmup', true);
 })->desc('Warm up cache by making internal HTTP request to every IFace');
 
-task('assets:deploy', function () {
+task('assets:deploy', static function () {
     runMinionTask('assets:deploy', true);
 })->desc('Collect assets from all static-files directories');
 
-task('deploy:dotenv:migrate', function () {
+task('deploy:dotenv:migrate', static function () {
     $globalDotEnv  = '{{deploy_path}}/.env';
     $targetDotEnv  = '{{release_path}}/{{app_path}}/.env';
     $exampleDotEnv = '{{release_path}}/{{app_path}}/.env.example';
@@ -380,7 +380,7 @@ task('deploy:dotenv:migrate', function () {
     run("cp $globalDotEnv $targetDotEnv");
 })->desc('Copy .env file from deploy path');
 
-task('deploy:dotenv:revision', function () {
+task('deploy:dotenv:revision', static function () {
     $revision = gitRevision('app').gitRevision('core');
     runMinionTask('storeAppRevision --revision='.$revision);
 })->desc('Set APP_REVISION env variable from current git revision');
@@ -388,11 +388,11 @@ task('deploy:dotenv:revision', function () {
 /**
  * Maintenance mode
  */
-task('maintenance:on', function () {
+task('maintenance:on', static function () {
     runMinionTask('maintenance:on --for=deploy');
 })->desc('Enable maintenance mode');
 
-task('maintenance:off', function () {
+task('maintenance:off', static function () {
     runMinionTask('maintenance:off');
 })->desc('Disable maintenance mode');
 
@@ -404,41 +404,41 @@ task('daemon:supervisor:restart', [
     'daemon:supervisor:start',
 ])->desc('Restart supervisor');
 
-task('daemon:supervisor:start', function () {
+task('daemon:supervisor:start', static function () {
     runMinionTask('daemon:start --name="supervisor"', true);
 })->desc('Start supervisor');
 
-task('daemon:supervisor:stop', function () {
+task('daemon:supervisor:stop', static function () {
     runMinionTask('daemon:stop --name="supervisor"', true);
 })->desc('Stop supervisor');
 
-task('daemon:supervisor:reload', function () {
+task('daemon:supervisor:reload', static function () {
     runMinionTask('daemon:supervisor:reload');
 })->desc('Reload daemons in supervisor');
 
 /**
  * Import data
  */
-task('import:roles', function () {
+task('import:roles', static function () {
     runMinionTask('importRoles');
 })->desc('Import ACL roles data');
 
-task('import:zones', function () {
+task('import:zones', static function () {
     runMinionTask('importZones');
 })->desc('Import UrlElement zones');
 
-task('import:i18n', function () {
+task('import:i18n', static function () {
     runMinionTask('import:i18n');
 })->desc('Import localization data');
 
-task('import:notification', function () {
+task('import:notification', static function () {
     runMinionTask('notification:importGroups');
 })->desc('Import notifications data');
 
 /**
  * Success message
  */
-task('deploy:done', function () use ($tz) {
+task('deploy:done', static function () use ($tz) {
     $dateTime = new \DateTimeImmutable();
     writeln('<info>Successfully deployed at '.$dateTime->setTimezone($tz)->format('H:i:s T').'!</info>');
 });
