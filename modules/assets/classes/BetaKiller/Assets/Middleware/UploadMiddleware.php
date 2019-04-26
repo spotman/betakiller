@@ -5,7 +5,6 @@ namespace BetaKiller\Assets\Middleware;
 
 use BetaKiller\Assets\Exception\AssetsException;
 use BetaKiller\Assets\Provider\AssetsProviderInterface;
-use BetaKiller\Assets\Provider\HasPreviewProviderInterface;
 use BetaKiller\Exception\ValidationException;
 use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Helper\ServerRequestHelper;
@@ -54,21 +53,6 @@ class UploadMiddleware extends AbstractAssetMiddleware
             throw new AssetsException(':error', [':error' => $e->getFirstItem()->getMessage()]);
         }
 
-        $data = [
-            'id'          => $model->getID(),
-            'originalUrl' => $this->provider->getOriginalUrl($model),
-        ];
-
-        if ($this->provider instanceof HasPreviewProviderInterface) {
-            $previews = [];
-
-            foreach ($this->provider->getAllowedPreviewSizes() as $previewSize) {
-                $previews[$previewSize] = $this->provider->getPreviewUrl($model, $previewSize);
-            }
-
-            $data['previews'] = $previews;
-        }
-
-        return ResponseHelper::json($data);
+        return ResponseHelper::json($this->provider->getInfo($model));
     }
 }

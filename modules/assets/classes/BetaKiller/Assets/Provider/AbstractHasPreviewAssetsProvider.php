@@ -5,6 +5,8 @@ namespace BetaKiller\Assets\Provider;
 
 use BetaKiller\Assets\Exception\AssetsProviderException;
 use BetaKiller\Assets\Model\AssetsModelInterface;
+use function count;
+use function in_array;
 
 abstract class AbstractHasPreviewAssetsProvider extends AbstractAssetsProvider implements HasPreviewProviderInterface
 {
@@ -32,16 +34,17 @@ abstract class AbstractHasPreviewAssetsProvider extends AbstractAssetsProvider i
      */
     protected function determinePreviewSize(?string $size): string
     {
-        $previewSizes = $this->getAllowedPreviewSizes();
-
-        if (!$size && \count($previewSizes) > 0) {
-            $size = $previewSizes[0];
+        if (!$size) {
+            $size = $this->getPreferredPreviewSize();
         }
 
-        if (!$size) {
-            throw new AssetsProviderException('Can not determine preview size for :provider', [
-                ':provider' => $this->codename,
-            ]);
+        if (!in_array($size, $this->getAllowedPreviewSizes(), true)) {
+            $size = $this->getPreferredPreviewSize();
+
+            $this->logException(
+                $this->logger,
+                new AssetsProviderException('Preview size ":size" is not allowed', [':size' => $size])
+            );
         }
 
         return $size;
@@ -73,17 +76,42 @@ abstract class AbstractHasPreviewAssetsProvider extends AbstractAssetsProvider i
             self::CONFIG_MODEL_PREVIEW_QUALITY_KEY,
         ]) ?: 80; // This is optimal for JPEG
     }
-    /**
-     * @param $size
-     *
-     * @throws \BetaKiller\Assets\Exception\AssetsProviderException
-     */
-    protected function checkPreviewSize($size): void
-    {
-        $allowedSizes = $this->getAllowedPreviewSizes();
 
-        if (!$allowedSizes || !\in_array($size, $allowedSizes, true)) {
-            throw new AssetsProviderException('Preview size :size is not allowed', [':size' => $size]);
+    /**
+     * @return string
+     */
+    public function getPreferredPreviewSize(): string
+    {
+        $previewSizes = $this->getAllowedPreviewSizes();
+
+        // Using first preview as a preferred one
+        if (count($previewSizes) > 0) {
+            return reset($previewSizes);
         }
+
+        throw new AssetsProviderException('Can not detect preferred preview size for :provider', [
+            ':provider' => $this->codename,
+        ]);
+    }
+
+    /**
+     * @param \BetaKiller\Assets\Model\AssetsModelInterface $model
+     *
+     * @return string[]
+     */
+    public function getInfo(AssetsModelInterface $model): array
+    {
+        $previews = [];
+
+        foreach ($this->getAllowedPreviewSizes() as $previewSize) {
+            $previews[$previewSize] = $this->getPreviewUrl($model, $previewSize);
+        }
+
+        $preferredSize = $this->getPreferredPreviewSize();
+
+        return array_merge(parent::getInfo($model), [
+            'preview'  => $previews[$preferredSize],
+            'previews' => $previews,
+        ]);
     }
 }

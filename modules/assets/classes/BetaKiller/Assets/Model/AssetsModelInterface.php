@@ -11,7 +11,7 @@ use DateTimeInterface;
  *
  * Abstract model interface for asset file
  */
-interface AssetsModelInterface extends AbstractEntityInterface
+interface AssetsModelInterface extends AbstractEntityInterface, HashBasedAssetsModelInterface
 {
     /**
      * Returns User model, who uploaded the file

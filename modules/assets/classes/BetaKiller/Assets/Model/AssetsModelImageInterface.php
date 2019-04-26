@@ -3,8 +3,8 @@ namespace BetaKiller\Assets\Model;
 
 interface AssetsModelImageInterface extends AssetsModelInterface
 {
-    public const SIZE_ORIGINAL  = 'original';
-    public const SIZE_PREVIEW   = 'preview';
+    public const SIZE_ORIGINAL = 'original';
+    public const SIZE_PREVIEW  = 'preview';
 
     // Dimensions values delimiter
     public const SIZE_DELIMITER = 'x';

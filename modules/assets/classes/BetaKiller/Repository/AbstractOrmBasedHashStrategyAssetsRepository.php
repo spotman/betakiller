@@ -5,7 +5,7 @@ use BetaKiller\Assets\Model\AssetsModelInterface;
 use BetaKiller\Utils\Kohana\ORM\OrmInterface;
 
 abstract class AbstractOrmBasedHashStrategyAssetsRepository extends AbstractOrmBasedRepository implements
-    HashUrlStrategyAssetsRepositoryInterface
+    HashStrategyAssetsRepositoryInterface
 {
     public function findByHash(string $hash): ?AssetsModelInterface
     {

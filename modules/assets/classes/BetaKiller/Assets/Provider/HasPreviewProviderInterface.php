@@ -41,6 +41,11 @@ interface HasPreviewProviderInterface extends AssetsProviderInterface
     public function getAllowedPreviewSizes(): array;
 
     /**
+     * @return string
+     */
+    public function getPreferredPreviewSize(): string;
+
+    /**
      * @return int
      */
     public function getPreviewQuality(): int;

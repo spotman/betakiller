@@ -10,6 +10,7 @@ use BetaKiller\Assets\Exception\AssetsModelException;
 use BetaKiller\Assets\Exception\AssetsProviderException;
 use BetaKiller\Assets\Exception\AssetsUploadException;
 use BetaKiller\Assets\Exception\CantWriteUploadException;
+use BetaKiller\Assets\Exception\DuplicateFileUploadException;
 use BetaKiller\Assets\Exception\ExtensionHaltedUploadException;
 use BetaKiller\Assets\Exception\FormSizeUploadException;
 use BetaKiller\Assets\Exception\IniSizeUploadException;
@@ -18,14 +19,18 @@ use BetaKiller\Assets\Exception\NoTmpDirUploadException;
 use BetaKiller\Assets\Exception\PartialUploadException;
 use BetaKiller\Assets\Handler\AssetsHandlerInterface;
 use BetaKiller\Assets\Model\AssetsModelInterface;
+use BetaKiller\Assets\Model\HashBasedAssetsModelInterface;
 use BetaKiller\Assets\PathStrategy\AssetsPathStrategyInterface;
 use BetaKiller\Assets\Storage\AssetsStorageInterface;
 use BetaKiller\Factory\EntityFactoryInterface;
+use BetaKiller\Helper\LoggerHelperTrait;
 use BetaKiller\Model\UserInterface;
+use BetaKiller\Repository\HashStrategyAssetsRepositoryInterface;
 use BetaKiller\Repository\RepositoryInterface;
 use DateTimeImmutable;
 use Psr\Http\Message\UploadedFileInterface;
 use Psr\Http\Message\UriInterface;
+use Psr\Log\LoggerInterface;
 use Spotman\Acl\AclInterface;
 use function basename;
 use function dirname;
@@ -45,10 +50,17 @@ use const UPLOAD_ERR_PARTIAL;
 
 abstract class AbstractAssetsProvider implements AssetsProviderInterface
 {
+    use LoggerHelperTrait;
+
     /**
      * @var string
      */
     protected $codename;
+
+    /**
+     * @var \Psr\Log\LoggerInterface
+     */
+    protected $logger;
 
     /**
      * @var \BetaKiller\Assets\Storage\AssetsStorageInterface
@@ -106,6 +118,7 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
      * @param \BetaKiller\Assets\AssetsConfig                             $config
      * @param \BetaKiller\Assets\AssetsDeploymentService                  $deploymentService
      * @param \BetaKiller\Assets\ContentTypes                             $contentTypes
+     * @param \Psr\Log\LoggerInterface                                    $logger
      */
     public function __construct(
         AclInterface $acl,
@@ -115,7 +128,8 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
         AssetsPathStrategyInterface $pathStrategy,
         AssetsConfig $config,
         AssetsDeploymentService $deploymentService,
-        ContentTypes $contentTypes
+        ContentTypes $contentTypes,
+        LoggerInterface $logger
     ) {
         $this->acl               = $acl;
         $this->repository        = $repository;
@@ -125,6 +139,7 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
         $this->config            = $config;
         $this->deploymentService = $deploymentService;
         $this->contentTypes      = $contentTypes;
+        $this->logger            = $logger;
     }
 
     /**
@@ -413,6 +428,29 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
         // Custom processing
         $content = $this->customContentProcessing($content, $model);
 
+        // Process hash-based assets
+        if ($model instanceof HashBasedAssetsModelInterface) {
+            // Calculate hash for processed content
+            $hash = $this->calculateHash($content);
+
+            if (!$this->repository instanceof HashStrategyAssetsRepositoryInterface) {
+                throw new AssetsProviderException('Repository ":name" must implement :must', [
+                    ':name' => $model->getModelName(),
+                    ':must' => HashStrategyAssetsRepositoryInterface::class,
+                ]);
+            }
+
+            // Check for duplicates
+            if ($this->repository->findByHash($hash)) {
+                throw new DuplicateFileUploadException(null, [
+                    ':provider' => $this->getCodename(),
+                    ':hash'     => $hash,
+                ]);
+            }
+
+            $model->setHash($hash);
+        }
+
         $currentTime = new DateTimeImmutable;
 
         // Put data into model
@@ -424,10 +462,7 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
             ->setUploadedAt($currentTime)
             ->setLastModifiedAt($currentTime);
 
-        // Calculate hash
-        $model->setHash($this->calculateHash($content));
-
-        // Place file into storage
+        // Place the file into the storage
         $this->setContent($model, $content);
 
         // Deploy original file if needed
@@ -752,6 +787,19 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
     public function isDeleteAllowed(UserInterface $user, AssetsModelInterface $model): bool
     {
         return $this->getAclResource($user)->setEntity($model)->isDeleteAllowed();
+    }
+
+    /**
+     * @param \BetaKiller\Assets\Model\AssetsModelInterface $model
+     *
+     * @return string[]
+     */
+    public function getInfo(AssetsModelInterface $model): array
+    {
+        return [
+            'id'  => $model->getID(),
+            'url' => $this->getOriginalUrl($model),
+        ];
     }
 
     /**

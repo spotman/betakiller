@@ -100,8 +100,6 @@ final class ImageAssetsProvider extends AbstractHasPreviewAssetsProvider impleme
     {
         $size = $this->determinePreviewSize($size);
 
-        $this->checkPreviewSize($size);
-
         $content = $this->getContent($model);
 
         list($width, $height) = $this->parseSizeDimensions($size);

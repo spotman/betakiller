@@ -258,4 +258,11 @@ interface AssetsProviderInterface
      * @return int
      */
     public function getUploadMaxSize(): int;
+
+    /**
+     * @param \BetaKiller\Assets\Model\AssetsModelInterface $model
+     *
+     * @return string[]
+     */
+    public function getInfo(AssetsModelInterface $model): array;
 }
