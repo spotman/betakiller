@@ -113,6 +113,11 @@ abstract class ORM extends Utils\Kohana\ORM implements ExtendedOrmInterface
         return $entity;
     }
 
+    protected function hasRelatedEntity(string $alias)
+    {
+        return $this->getRelation($alias)->loaded();
+    }
+
     /**
      * @param string $name
      *
