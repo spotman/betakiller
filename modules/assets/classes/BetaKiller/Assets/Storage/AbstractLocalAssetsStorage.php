@@ -134,7 +134,7 @@ abstract class AbstractLocalAssetsStorage extends AbstractAssetsStorage
 
         $files = [];
 
-        foreach (glob($directory.DIRECTORY_SEPARATOR.'*') as $file) {
+        foreach (glob($directory.DIRECTORY_SEPARATOR.'*', GLOB_NOSORT) as $file) {
             $files[] = $file;
         }
 

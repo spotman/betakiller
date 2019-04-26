@@ -90,7 +90,14 @@ abstract class AbstractAssetsStorage implements AssetsStorageInterface
     {
         $path = $this->makeFullPath($directory);
 
-        return $this->doGetFiles($path);
+        $files = [];
+
+        foreach ($this->doGetFiles($path) as $file) {
+            // Strip base path
+            $files[] = explode($this->basePath, $file, 2)[1];
+        }
+
+        return $files;
     }
 
     /**
