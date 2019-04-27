@@ -17,11 +17,15 @@ use BetaKiller\Repository\HitPageRepository;
 use BetaKiller\Repository\HitRepository;
 use BetaKiller\Service\HitService;
 use BetaKiller\Service\UserService;
+use DateTimeImmutable;
+use InvalidArgumentException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Message\UriFactoryInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Log\LoggerInterface;
+use Throwable;
 
 class HitStatMiddleware implements MiddlewareInterface
 {
@@ -63,6 +67,11 @@ class HitStatMiddleware implements MiddlewareInterface
     private $userService;
 
     /**
+     * @var \Psr\Http\Message\UriFactoryInterface
+     */
+    private $uriFactory;
+
+    /**
      * HitStatMiddleware constructor.
      *
      * @param \BetaKiller\Helper\AppEnvInterface       $appEnv
@@ -70,6 +79,8 @@ class HitStatMiddleware implements MiddlewareInterface
      * @param \BetaKiller\Repository\HitRepository     $hitRepo
      * @param \BetaKiller\Repository\HitPageRepository $pageRepo
      * @param \BetaKiller\Repository\HitLinkRepository $linkRepo
+     * @param \BetaKiller\Service\UserService          $userService
+     * @param \Psr\Http\Message\UriFactoryInterface    $uriFactory
      * @param \Psr\Log\LoggerInterface                 $logger
      */
     public function __construct(
@@ -79,15 +90,17 @@ class HitStatMiddleware implements MiddlewareInterface
         HitPageRepository $pageRepo,
         HitLinkRepository $linkRepo,
         UserService $userService,
+        UriFactoryInterface $uriFactory,
         LoggerInterface $logger
     ) {
-        $this->appEnv   = $appEnv;
-        $this->service  = $service;
-        $this->hitRepo  = $hitRepo;
-        $this->pageRepo = $pageRepo;
-        $this->linkRepo = $linkRepo;
-        $this->logger   = $logger;
+        $this->appEnv      = $appEnv;
+        $this->service     = $service;
+        $this->hitRepo     = $hitRepo;
+        $this->pageRepo    = $pageRepo;
+        $this->linkRepo    = $linkRepo;
+        $this->logger      = $logger;
         $this->userService = $userService;
+        $this->uriFactory  = $uriFactory;
     }
 
     /**
@@ -135,7 +148,7 @@ class HitStatMiddleware implements MiddlewareInterface
                 // This is required for saving first user hit during registration
                 $this->injectHitInSession($hit, $request);
             }
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             $this->logException($this->logger, $e);
         }
 
@@ -158,26 +171,28 @@ class HitStatMiddleware implements MiddlewareInterface
     private function registerHit(ServerRequestInterface $request): ?HitInterface
     {
         $sourceUrl = ServerRequestHelper::getHttpReferrer($request);
-        $targetUrl = (string)$request->getUri();
+        $targetUri = $request->getUri();
         $ip        = ServerRequestHelper::getIpAddress($request);
 
-        // Malformed source => ignore it
-        if ($sourceUrl && !\parse_url($sourceUrl)) {
-            $sourceUrl = null;
+        try {
+            $sourceUri = $this->uriFactory->createUri($sourceUrl);
+        } catch (InvalidArgumentException $e) {
+            // Malformed source => ignore it
+            $sourceUri = !$e;
         }
 
         // Find source page
-        $sourcePage = $sourceUrl ? $this->service->getPageByFullUrl($sourceUrl) : null;
+        $sourcePage = $sourceUri ? $this->service->getPageByFullUrl($sourceUri) : null;
 
         // Skip ignored pages and domains
         if ($sourcePage && $sourcePage->isIgnored()) {
             return null;
         }
 
-        $now = new \DateTimeImmutable;
+        $now = new DateTimeImmutable;
 
         // Search for target URL and create if not exists
-        $targetPage = $this->service->getPageByFullUrl($targetUrl);
+        $targetPage = $this->service->getPageByFullUrl($targetUri);
 
         // Skip ignored pages and domains
         if ($targetPage->isIgnored()) {
@@ -248,7 +263,7 @@ class HitStatMiddleware implements MiddlewareInterface
         // Increment link click counter
         $link->incrementClicks();
 
-        $now = new \DateTimeImmutable;
+        $now = new DateTimeImmutable;
 
         if (!$link->getFirstSeenAt()) {
             $link->setFirstSeenAt($now);

@@ -2,6 +2,7 @@
 namespace BetaKiller\Model;
 
 use BetaKiller\Uri;
+use function mb_strimwidth;
 use Psr\Http\Message\UriInterface;
 
 class HitPage extends \ORM
@@ -52,12 +53,12 @@ class HitPage extends \ORM
         return $this;
     }
 
-    public function setUri(string $uri): HitPage
+    public function setUri(string $url): HitPage
     {
         // Truncate URI to 512 symbols
-        $uri = \mb_strimwidth($uri, 0, 512, '...');
+        $url = mb_strimwidth($url, 0, 512, '...');
 
-        $this->set('uri', $uri);
+        $this->set('uri', $url);
 
         return $this;
     }

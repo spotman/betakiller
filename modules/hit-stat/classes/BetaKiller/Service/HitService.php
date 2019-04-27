@@ -17,7 +17,9 @@ use BetaKiller\Repository\HitLinkRepository;
 use BetaKiller\Repository\HitMarkerRepository;
 use BetaKiller\Repository\HitPageRedirectRepository;
 use BetaKiller\Repository\HitPageRepository;
+use DateTimeImmutable;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Message\UriInterface;
 
 class HitService
 {
@@ -78,24 +80,26 @@ class HitService
     }
 
     /**
-     * @param string    $url
-     * @param bool|null $createMissing
+     * @param \Psr\Http\Message\UriInterface $uri
+     * @param bool|null                      $createMissing
      *
      * @return \BetaKiller\Model\HitPage
+     * @throws \BetaKiller\Exception\ValidationException
      * @throws \BetaKiller\Repository\RepositoryException
+     * @throws \BetaKiller\Service\ServiceException
      */
-    public function getPageByFullUrl(string $url, ?bool $createMissing = null): HitPage
+    public function getPageByFullUrl(UriInterface $uri, ?bool $createMissing = null): HitPage
     {
         $createMissing = $createMissing ?? true;
 
         // External documents are addressed by path + query (no fragment)
-        $domainName = parse_url($url, PHP_URL_HOST);
+        $domainName = $uri->getHost();
 
         if (!$domainName) {
-            throw new ServiceException('Can not detect domain name in URL :url', [':url' => $url]);
+            throw new ServiceException('Can not detect domain name in URL :url', [':url' => (string)$uri]);
         }
 
-        $relativeUrl = explode($domainName, $url, 2)[1];
+        $relativeUrl = explode($domainName, (string)$uri, 2)[1];
 
         // Find domain first
         $domain = $this->domainRepo->getByName($domainName);
@@ -105,7 +109,7 @@ class HitService
         }
 
         if (!$domain) {
-            throw new ServiceException('Can not find domain for URL :url', [':url' => $url]);
+            throw new ServiceException('Can not find domain for URL :url', [':url' => (string)$uri]);
         }
 
         // Search for page in selected domain
@@ -116,7 +120,7 @@ class HitService
         }
 
         if (!$page) {
-            throw new ServiceException('Can not find page for URL :url', [':url' => $url]);
+            throw new ServiceException('Can not find page for URL :url', [':url' => (string)$uri]);
         }
 
         return $page;
@@ -208,7 +212,7 @@ class HitService
 
     public function createPage(HitDomain $domain, string $relativeUrl): HitPage
     {
-        $now = new \DateTimeImmutable;
+        $now = new DateTimeImmutable;
 
         $page = new HitPage;
 
@@ -225,7 +229,7 @@ class HitService
 
     public function createLink(HitPage $source, HitPage $target): HitLink
     {
-        $now = new \DateTimeImmutable;
+        $now = new DateTimeImmutable;
 
         $page = new HitLink;
 
