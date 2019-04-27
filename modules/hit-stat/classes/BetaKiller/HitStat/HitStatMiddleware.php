@@ -175,7 +175,7 @@ class HitStatMiddleware implements MiddlewareInterface
         $ip        = ServerRequestHelper::getIpAddress($request);
 
         try {
-            $sourceUri = $this->uriFactory->createUri($sourceUrl);
+            $sourceUri = $sourceUrl ? $this->uriFactory->createUri($sourceUrl) : null;
         } catch (InvalidArgumentException $e) {
             // Malformed source => ignore it
             $sourceUri = !$e;
