@@ -78,6 +78,23 @@ class ContentTypes
     }
 
     /**
+     * @param array $mimeTypes
+     *
+     * @return array
+     * @throws \BetaKiller\Assets\Exception\AssetsException
+     */
+    public function getTypesExtensions(array $mimeTypes): array
+    {
+        $extensions = [];
+
+        foreach ($mimeTypes as $mimeType) {
+            $extensions[] = $this->getPrimaryExtension($mimeType);
+        }
+
+        return array_unique($extensions);
+    }
+
+    /**
      * @param string $mimeType
      *
      * @return string
