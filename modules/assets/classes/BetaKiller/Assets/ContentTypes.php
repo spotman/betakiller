@@ -4,6 +4,8 @@ declare(strict_types=1);
 namespace BetaKiller\Assets;
 
 use BetaKiller\Assets\Exception\AssetsException;
+use function finfo_file;
+use function finfo_open;
 use Mimey\MimeMappingBuilder;
 use Mimey\MimeTypes;
 
@@ -43,9 +45,9 @@ class ContentTypes
      */
     public function getFileMimeType(string $path): string
     {
-        $fileResource = \finfo_open(FILEINFO_MIME_TYPE);
+        $fileResource = finfo_open(FILEINFO_MIME_TYPE);
 
-        return \finfo_file($fileResource, $path);
+        return finfo_file($fileResource, $path);
     }
 
     /**
@@ -88,10 +90,10 @@ class ContentTypes
         $extensions = [];
 
         foreach ($mimeTypes as $mimeType) {
-            $extensions[] = $this->getPrimaryExtension($mimeType);
+            $extensions[] = $this->getExtensions($mimeType);
         }
 
-        return array_unique($extensions);
+        return array_unique(array_merge(...$extensions));
     }
 
     /**
