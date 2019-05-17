@@ -138,6 +138,9 @@ class Runner extends AbstractTask
 
         // Endless loop waiting for signals or exit()
         $this->loop->run();
+
+        // Normal shutdown
+        $this->shutdown(0);
     }
 
     private function start(): void
