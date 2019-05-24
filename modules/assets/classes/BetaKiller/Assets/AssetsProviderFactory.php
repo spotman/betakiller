@@ -101,7 +101,7 @@ class AssetsProviderFactory
             $codename = $key;
         }
 
-        return $this->createFromModelCodename($codename);
+        return $this->createFromCodename($codename);
     }
 
     private function getModelCodenameByUrlKey($key)
@@ -144,7 +144,7 @@ class AssetsProviderFactory
      * @throws \BetaKiller\Assets\Exception\AssetsException
      * @throws \BetaKiller\Assets\Exception\AssetsStorageException
      */
-    public function createFromModelCodename(string $modelName)
+    public function createFromCodename(string $modelName)
     {
         $cached = $this->instances[$modelName] ?? null;
 

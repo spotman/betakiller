@@ -104,7 +104,7 @@ class AssetsHelper
      */
     private function getProviderByModelName(string $name): AssetsProviderInterface
     {
-        return $this->providerFactory->createFromModelCodename($name);
+        return $this->providerFactory->createFromCodename($name);
     }
 
     /**

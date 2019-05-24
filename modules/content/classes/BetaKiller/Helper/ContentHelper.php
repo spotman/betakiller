@@ -40,17 +40,17 @@ class ContentHelper
 
     public function getPostThumbnailAssetsProvider(): ImageAssetsProviderInterface
     {
-        return $this->providerFactory->createFromModelCodename('ContentPostThumbnail');
+        return $this->providerFactory->createFromCodename('ContentPostThumbnail');
     }
 
     public function getImageAssetsProvider(): ImageAssetsProviderInterface
     {
-        return $this->providerFactory->createFromModelCodename('ContentImage');
+        return $this->providerFactory->createFromCodename('ContentImage');
     }
 
     public function getAttachmentAssetsProvider(): AttachmentAssetsProviderInterface
     {
-        return $this->providerFactory->createFromModelCodename('ContentAttachment');
+        return $this->providerFactory->createFromCodename('ContentAttachment');
     }
 
     /**
