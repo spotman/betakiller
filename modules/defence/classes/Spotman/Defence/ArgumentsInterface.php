@@ -38,6 +38,13 @@ interface ArgumentsInterface
     /**
      * @param string $key
      *
+     * @return float
+     */
+    public function getFloat(string $key): float;
+
+    /**
+     * @param string $key
+     *
      * @return string
      */
     public function getString(string $key): string;

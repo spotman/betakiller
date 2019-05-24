@@ -128,6 +128,16 @@ abstract class AbstractArgumentDefinition implements ArgumentDefinitionInterface
     }
 
     /**
+     * Returns true if rule defines a float argument
+     *
+     * @return bool
+     */
+    public function isFloat(): bool
+    {
+        return $this->getType() === self::TYPE_FLOAT;
+    }
+
+    /**
      * Returns true if rule defines string argument
      *
      * @return bool

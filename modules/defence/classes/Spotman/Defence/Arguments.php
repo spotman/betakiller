@@ -66,6 +66,16 @@ class Arguments implements ArgumentsInterface
     /**
      * @param string $key
      *
+     * @return float
+     */
+    public function getFloat(string $key): float
+    {
+        return (float)$this->args[$key];
+    }
+
+    /**
+     * @param string $key
+     *
      * @return string
      */
     public function getString(string $key): string

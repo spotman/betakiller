@@ -33,6 +33,15 @@ interface DefinitionBuilderInterface
     public function string(string $name): DefinitionBuilderInterface;
 
     /**
+     * Define float argument
+     *
+     * @param string $name
+     *
+     * @return \Spotman\Defence\DefinitionBuilderInterface
+     */
+    public function float(string $name): DefinitionBuilderInterface;
+
+    /**
      * Define string argument containing email
      *
      * @param string $name

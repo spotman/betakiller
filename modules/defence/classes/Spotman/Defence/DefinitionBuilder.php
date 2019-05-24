@@ -6,6 +6,7 @@ namespace Spotman\Defence;
 use Spotman\Defence\Filter\BooleanFilter;
 use Spotman\Defence\Filter\EmailFilter;
 use Spotman\Defence\Filter\FilterInterface;
+use Spotman\Defence\Filter\FloatFilter;
 use Spotman\Defence\Filter\HtmlFilter;
 use Spotman\Defence\Filter\IdentityFilter;
 use Spotman\Defence\Filter\IntArrayFilter;
@@ -73,6 +74,20 @@ class DefinitionBuilder implements DefinitionBuilderInterface
         return $this
             ->addSingleType($name, ArgumentDefinitionInterface::TYPE_INTEGER)
             ->addFilter(new IntegerFilter);
+    }
+
+    /**
+     * Define float argument
+     *
+     * @param string $name
+     *
+     * @return \Spotman\Defence\DefinitionBuilderInterface
+     */
+    public function float(string $name): DefinitionBuilderInterface
+    {
+        return $this
+            ->addSingleType($name, ArgumentDefinitionInterface::TYPE_FLOAT)
+            ->addFilter(new FloatFilter);
     }
 
     /**
@@ -459,6 +474,6 @@ class DefinitionBuilder implements DefinitionBuilderInterface
 
     private function getCollection(): DefinitionCollectionInterface
     {
-        return $this->getParent() ?? $this->collection;
+        return $this->getParent() ?: $this->collection;
     }
 }

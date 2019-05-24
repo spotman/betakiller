@@ -16,7 +16,7 @@ abstract class AbstractFilterTest extends AbstractDefenceTest
     {
         $filter = $this->makeInstance();
 
-        $this->assertEquals($input, $filter->apply($input));
+        self::assertEquals($input, $filter->apply($input));
     }
 
     /**

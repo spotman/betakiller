@@ -9,6 +9,7 @@ interface ArgumentDefinitionInterface
     public const TYPE_IDENTITY = 'id';
     public const TYPE_BOOLEAN  = 'bool';
     public const TYPE_INTEGER  = 'int';
+    public const TYPE_FLOAT  = 'float';
     public const TYPE_STRING   = 'string';
     public const TYPE_EMAIL    = 'email';
     public const TYPE_TEXT     = 'text';
@@ -27,6 +28,7 @@ interface ArgumentDefinitionInterface
         self::TYPE_IDENTITY,
         self::TYPE_BOOLEAN,
         self::TYPE_INTEGER,
+        self::TYPE_FLOAT,
         self::TYPE_STRING,
         self::TYPE_EMAIL,
         self::TYPE_TEXT,
@@ -96,6 +98,13 @@ interface ArgumentDefinitionInterface
      * @return bool
      */
     public function isInt(): bool;
+
+    /**
+     * Returns true if rule defines a float argument
+     *
+     * @return bool
+     */
+    public function isFloat(): bool;
 
     /**
      * Returns true if rule defines a string argument
