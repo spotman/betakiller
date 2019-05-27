@@ -540,9 +540,6 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
             throw new AssetsProviderException('Delete is not allowed');
         }
 
-        // Remove model from repository
-        $this->repository->delete($model);
-
         $path = $this->getOriginalPath($model);
 
         // Remove file from storage
@@ -553,6 +550,9 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
 
         // Drop deployed public files
         $this->deploymentService->clear($this, $model);
+
+        // Remove model from repository
+        $this->repository->delete($model);
     }
 
     /**

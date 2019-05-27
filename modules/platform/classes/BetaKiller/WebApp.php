@@ -247,7 +247,7 @@ class WebApp
         /**
          * Delete files via concrete provider
          */
-        $app->get('/assets/{provider}/'.$itemPlace.'/'.$deleteAction.$sizePlace.$extPlace, DeleteMiddleware::class,
+        $app->get('/assets/{provider}/'.$itemPlace.'/'.$deleteAction.$extPlace, DeleteMiddleware::class,
             'assets-delete');
 
         // API HTTP gate
