@@ -178,26 +178,28 @@ class AssetsConfig extends AbstractConfig
     /**
      * @param \BetaKiller\Assets\Provider\AssetsProviderInterface $provider
      * @param array                                               $path
+     * @param bool|null                                           $optional
      *
      * @return array|string|int|null
      * @throws \BetaKiller\Exception
      */
-    public function getProviderConfigValue(AssetsProviderInterface $provider, array $path)
+    public function getProviderConfigValue(AssetsProviderInterface $provider, array $path, bool $optional = null)
     {
-        return $this->getModelConfigValue($provider->getCodename(), $path);
+        return $this->getModelConfigValue($provider->getCodename(), $path, $optional);
     }
 
     /**
-     * @param string $modelName
-     * @param array  $path
+     * @param string    $modelName
+     * @param array     $path
+     * @param bool|null $optional
      *
      * @return array|string|int|null
      * @throws \BetaKiller\Exception
      */
-    private function getModelConfigValue(string $modelName, array $path)
+    private function getModelConfigValue(string $modelName, array $path, bool $optional = null)
     {
         \array_unshift($path, self::CONFIG_MODELS_KEY, $modelName);
 
-        return $this->get($path);
+        return $this->get($path, $optional);
     }
 }

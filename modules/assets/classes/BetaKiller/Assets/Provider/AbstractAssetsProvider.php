@@ -52,6 +52,9 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
 {
     use LoggerHelperTrait;
 
+    public const CONFIG_MODEL_UPLOAD_KEY   = 'upload';
+    public const CONFIG_MODEL_MAX_SIZE_KEY = 'max-size';
+
     /**
      * @var string
      */
@@ -828,6 +831,12 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
             }
         }
 
+        $configSize = $this->getConfigUploadMaxSize();
+
+        if ($configSize > 0 && $configSize < $maxSize) {
+            $maxSize = $configSize;
+        }
+
         return $maxSize;
     }
 
@@ -842,6 +851,19 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
         }
 
         return (int)round($size);
+    }
+
+    /**
+     * @return int
+     */
+    private function getConfigUploadMaxSize(): ?int
+    {
+        $size = $this->config->getProviderConfigValue($this, [
+            self::CONFIG_MODEL_UPLOAD_KEY,
+            self::CONFIG_MODEL_MAX_SIZE_KEY,
+        ], true);
+
+        return $size ? $this->parseIniSize($size) : null;
     }
 
     /**

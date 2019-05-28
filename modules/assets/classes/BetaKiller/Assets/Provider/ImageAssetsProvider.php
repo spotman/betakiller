@@ -13,7 +13,6 @@ use Image;
  */
 final class ImageAssetsProvider extends AbstractHasPreviewAssetsProvider implements ImageAssetsProviderInterface
 {
-    public const CONFIG_MODEL_UPLOAD_KEY     = 'upload';
     public const CONFIG_MODEL_MAX_HEIGHT_KEY = 'max-height';
     public const CONFIG_MODEL_MAX_WIDTH_KEY  = 'max-width';
 
