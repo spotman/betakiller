@@ -7,6 +7,7 @@ use BetaKiller\Error\PhpExceptionStorageHandler;
 use BetaKiller\Helper\NotificationHelper;
 use BetaKiller\Repository\UserRepository;
 use BetaKiller\Task\AbstractTask;
+use Psr\Log\LoggerInterface;
 
 class Send extends AbstractTask
 {
@@ -23,17 +24,24 @@ class Send extends AbstractTask
     private $userRepo;
 
     /**
+     * @var \Psr\Log\LoggerInterface
+     */
+    private $logger;
+
+    /**
      * Send constructor.
      *
      * @param \BetaKiller\Helper\NotificationHelper $notification
      * @param \BetaKiller\Repository\UserRepository $userRepo
+     * @param \Psr\Log\LoggerInterface              $logger
      */
-    public function __construct(NotificationHelper $notification, UserRepository $userRepo)
+    public function __construct(NotificationHelper $notification, UserRepository $userRepo, LoggerInterface $logger)
     {
+        parent::__construct();
+
         $this->notification = $notification;
         $this->userRepo     = $userRepo;
-
-        parent::__construct();
+        $this->logger       = $logger;
     }
 
     /**
@@ -45,17 +53,22 @@ class Send extends AbstractTask
     public function defineOptions(): array
     {
         return [
-            'targetUser' => null,
+            'target' => null,
         ];
     }
 
     public function run(): void
     {
-        $userID = (string)$this->getOption('targetUser', false);
+        $userName = (string)$this->getOption('target', false);
 
-        $target = $userID
-            ? $this->userRepo->getById($userID)
+        $target = $userName
+            ? $this->userRepo->searchBy($userName)
             : PhpExceptionStorageHandler::getNotificationTarget($this->notification);
+
+
+        $this->logger->debug('Sending message to ":email"', [
+            ':email' => $target->getEmail(),
+        ]);
 
         $this->notification->directMessage(self::NOTIFICATION_TEST, $target, []);
     }

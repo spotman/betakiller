@@ -2,11 +2,11 @@
 namespace BetaKiller\Notification;
 
 /**
- * Class NotificationMessage
+ * Class Message
  *
  * @package BetaKiller\Notification
  */
-class NotificationMessage implements NotificationMessageInterface
+class Message implements MessageInterface
 {
     private const CODENAME_TEMPLATE = 'a-z0-9-/';
 
@@ -16,7 +16,7 @@ class NotificationMessage implements NotificationMessageInterface
     private $codename;
 
     /**
-     * @var NotificationTargetInterface
+     * @var TargetInterface
      */
     private $from;
 
@@ -26,9 +26,9 @@ class NotificationMessage implements NotificationMessageInterface
     private $subject;
 
     /**
-     * @var NotificationTargetInterface[]
+     * @var TargetInterface
      */
-    private $targets = [];
+    private $target;
 
     /**
      * @var array
@@ -85,19 +85,19 @@ class NotificationMessage implements NotificationMessageInterface
     }
 
     /**
-     * @return NotificationTargetInterface
+     * @return TargetInterface
      */
-    public function getFrom(): ?NotificationTargetInterface
+    public function getFrom(): ?TargetInterface
     {
         return $this->from;
     }
 
     /**
-     * @param NotificationTargetInterface $value
+     * @param TargetInterface $value
      *
-     * @return NotificationMessageInterface
+     * @return MessageInterface
      */
-    public function setFrom(NotificationTargetInterface $value): NotificationMessageInterface
+    public function setFrom(TargetInterface $value): MessageInterface
     {
         $this->from = $value;
 
@@ -105,59 +105,25 @@ class NotificationMessage implements NotificationMessageInterface
     }
 
     /**
-     * @param NotificationTargetInterface[]|\Iterator $users
-     *
-     * @return NotificationMessageInterface
+     * @return \BetaKiller\Notification\TargetInterface
      */
-    public function addTargetUsers($users): NotificationMessageInterface
+    public function getTarget(): TargetInterface
     {
-        foreach ($users as $user) {
-            $this->addTarget($user);
+        if (!$this->target) {
+            throw new NotificationException('Message target must be specified');
         }
 
-        return $this;
+        return $this->target;
     }
 
     /**
-     * @return NotificationTargetInterface[]
-     */
-    public function getTargets(): array
-    {
-        return $this->targets;
-    }
-
-    /**
-     * @return string[]
-     */
-    public function getTargetsEmails(): array
-    {
-        $emails = [];
-
-        foreach ($this->getTargets() as $to) {
-            $emails[] = $to->getEmail();
-        }
-
-        return $emails;
-    }
-
-    /**
-     * @param NotificationTargetInterface $value
+     * @param TargetInterface $value
      *
-     * @return NotificationMessageInterface
+     * @return MessageInterface
      */
-    public function addTarget(NotificationTargetInterface $value): NotificationMessageInterface
+    public function setTarget(TargetInterface $value): MessageInterface
     {
-        $this->targets[] = $value;
-
-        return $this;
-    }
-
-    /**
-     * @return \BetaKiller\Notification\NotificationMessageInterface
-     */
-    public function clearTargets(): NotificationMessageInterface
-    {
-        $this->targets = [];
+        $this->target = $value;
 
         return $this;
     }
@@ -177,9 +143,9 @@ class NotificationMessage implements NotificationMessageInterface
      *
      * @param string $value
      *
-     * @return \BetaKiller\Notification\NotificationMessageInterface
+     * @return \BetaKiller\Notification\MessageInterface
      */
-    public function setSubject(string $value): NotificationMessageInterface
+    public function setSubject(string $value): MessageInterface
     {
         $this->subject = $value;
 
@@ -213,9 +179,9 @@ class NotificationMessage implements NotificationMessageInterface
     /**
      * @param string $path
      *
-     * @return NotificationMessageInterface
+     * @return MessageInterface
      */
-    public function addAttachment(string $path): NotificationMessageInterface
+    public function addAttachment(string $path): MessageInterface
     {
         $this->attachments[] = $path;
 
@@ -225,9 +191,9 @@ class NotificationMessage implements NotificationMessageInterface
     /**
      * @param array $data
      *
-     * @return NotificationMessageInterface
+     * @return MessageInterface
      */
-    public function setTemplateData(array $data): NotificationMessageInterface
+    public function setTemplateData(array $data): MessageInterface
     {
         $this->templateData = $data;
 
@@ -243,11 +209,11 @@ class NotificationMessage implements NotificationMessageInterface
     }
 
     /**
-     * @param \BetaKiller\Notification\NotificationTargetInterface $targetUser
+     * @param \BetaKiller\Notification\TargetInterface $targetUser
      *
      * @return array
      */
-    public function getFullDataForTarget(NotificationTargetInterface $targetUser): array
+    public function getFullDataForTarget(TargetInterface $targetUser): array
     {
         return array_merge($this->getTemplateData(), [
             'targetName'  => $targetUser->getFullName(),

@@ -1,8 +1,8 @@
 <?php
 namespace BetaKiller\Notification\Transport;
 
-use BetaKiller\Notification\NotificationTransportInterface;
+use BetaKiller\Notification\TransportInterface;
 
-abstract class AbstractTransport implements NotificationTransportInterface
+abstract class AbstractTransport implements TransportInterface
 {
 }

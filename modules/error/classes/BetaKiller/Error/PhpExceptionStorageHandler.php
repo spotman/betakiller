@@ -8,7 +8,7 @@ use BetaKiller\Log\Logger;
 use BetaKiller\Model\LanguageInterface;
 use BetaKiller\Model\PhpException;
 use BetaKiller\Model\PhpExceptionModelInterface;
-use BetaKiller\Notification\NotificationTargetInterface;
+use BetaKiller\Notification\TargetInterface;
 use BetaKiller\Repository\PhpExceptionRepository;
 use Monolog\Handler\AbstractProcessingHandler;
 use Psr\Http\Message\ServerRequestInterface;
@@ -248,7 +248,7 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
         return !$lastNotifiedAtTimestamp || $timeDiffInSeconds > static::REPEAT_DELAY;
     }
 
-    public static function getNotificationTarget(NotificationHelper $helper): NotificationTargetInterface
+    public static function getNotificationTarget(NotificationHelper $helper): TargetInterface
     {
         return $helper->emailTarget(
             \getenv('DEBUG_EMAIL_ADDRESS'),

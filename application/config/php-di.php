@@ -13,7 +13,7 @@ use BetaKiller\MessageBus\CommandBus;
 use BetaKiller\MessageBus\CommandBusInterface;
 use BetaKiller\MessageBus\EventBus;
 use BetaKiller\MessageBus\EventBusInterface;
-use BetaKiller\Notification\DefaultMessageRenderer;
+use BetaKiller\Notification\MessageRenderer;
 use BetaKiller\Notification\MessageRendererInterface;
 use BetaKiller\View\LayoutViewInterface;
 use BetaKiller\View\TwigLayoutView;
@@ -71,7 +71,7 @@ return [
         ApiMethodAccessResolverDetectorInterface::class => DI\autowire(CustomApiMethodAccessResolverDetector::class),
 
         // Use default renderer for notification messages
-        MessageRendererInterface::class                 => DI\autowire(DefaultMessageRenderer::class),
+        MessageRendererInterface::class                 => DI\autowire(MessageRenderer::class),
 
         Meta::class => \DI\factory(function () {
             throw new LogicException('DI injection of class Meta is deprecated');

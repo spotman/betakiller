@@ -4,9 +4,9 @@ declare(strict_types=1);
 namespace BetaKiller\Model;
 
 use BetaKiller\Exception\DomainException;
-use BetaKiller\Notification\NotificationTargetEmail;
-use BetaKiller\Notification\NotificationTargetInterface;
-use BetaKiller\Notification\NotificationTransportInterface;
+use BetaKiller\Notification\TargetEmail;
+use BetaKiller\Notification\TargetInterface;
+use BetaKiller\Notification\TransportInterface;
 use DateTimeImmutable;
 
 class NotificationLog extends \ORM implements NotificationLogInterface
@@ -58,7 +58,7 @@ class NotificationLog extends \ORM implements NotificationLogInterface
         return $this;
     }
 
-    public function setTarget(NotificationTargetInterface $target): NotificationLogInterface
+    public function setTarget(TargetInterface $target): NotificationLogInterface
     {
         $this->set(self::TABLE_COLUMN_TARGET, $this->makeTargetString($target));
 
@@ -79,7 +79,7 @@ class NotificationLog extends \ORM implements NotificationLogInterface
         return $this->getRelatedEntity('user', true);
     }
 
-    public function setTransport(NotificationTransportInterface $transport): NotificationLogInterface
+    public function setTransport(TransportInterface $transport): NotificationLogInterface
     {
         $this->set(self::TABLE_COLUMN_TRANSPORT, $transport->getName());
 
@@ -147,7 +147,7 @@ class NotificationLog extends \ORM implements NotificationLogInterface
     }
 
     /**
-     * @return \BetaKiller\Notification\NotificationTargetInterface
+     * @return \BetaKiller\Notification\TargetInterface
      * @throws \Kohana_Exception
      */
     public function getTargetString(): string
@@ -176,9 +176,9 @@ class NotificationLog extends \ORM implements NotificationLogInterface
         return $this->get(self::TABLE_COLUMN_STATUS) === self::STATUS_SUCCEEDED;
     }
 
-    private function makeTargetString(NotificationTargetInterface $target): string
+    private function makeTargetString(TargetInterface $target): string
     {
-        if ($target instanceof NotificationTargetEmail) {
+        if ($target instanceof TargetEmail) {
             return sprintf('%s <%s>', $target->getFullName(), $target->getEmail());
         }
 

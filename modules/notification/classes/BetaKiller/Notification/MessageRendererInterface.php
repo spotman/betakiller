@@ -4,15 +4,15 @@ namespace BetaKiller\Notification;
 interface MessageRendererInterface
 {
     public function makeBody(
-        NotificationMessageInterface $message,
-        NotificationTargetInterface $target,
-        NotificationTransportInterface $transport,
+        MessageInterface $message,
+        TargetInterface $target,
+        TransportInterface $transport,
         string $hash
     ): string;
 
     public function makeSubject(
-        NotificationMessageInterface $message,
-        NotificationTargetInterface $target
+        MessageInterface $message,
+        TargetInterface $target
     ): string;
 
     public function hasLocalizedTemplate(

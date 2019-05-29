@@ -10,10 +10,12 @@ use BetaKiller\Session\DatabaseSessionStorage;
 use BetaKiller\Session\SessionStorageInterface;
 use BetaKiller\Url\Container\UrlContainerInterface;
 use BetaKiller\Url\UrlElementStack;
+use Enqueue\Dbal\DbalConnectionFactory;
 use GuzzleHttp\Client;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
 use Http\Client\HttpClient;
+use Interop\Queue\Context;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
@@ -157,6 +159,25 @@ return [
         HttpClient::class => autowire(\Http\Adapter\Guzzle6\Client::class),
 
         ClientInterface::class => get(HttpClient::class),
+
+        Context::class => DI\factory(static function () {
+            $dsn = [
+                'mysql://',
+                getenv('MYSQL_USER'),
+                ':',
+                getenv('MYSQL_PASS'),
+                '@',
+                getenv('MYSQL_HOST'),
+                ':',
+                getenv('MYSQL_PORT'),
+                '/',
+                getenv('MYSQL_DB'),
+            ];
+
+            $factory = new DbalConnectionFactory(implode('', $dsn));
+
+            return $factory->createContext();
+        }),
     ],
 
 ];

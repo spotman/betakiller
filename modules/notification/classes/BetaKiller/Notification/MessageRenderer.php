@@ -4,7 +4,7 @@ namespace BetaKiller\Notification;
 use BetaKiller\I18n\I18nFacade;
 use BetaKiller\View\ViewFactoryInterface;
 
-class DefaultMessageRenderer implements MessageRendererInterface
+class MessageRenderer implements MessageRendererInterface
 {
     /**
      * @var \BetaKiller\View\ViewFactoryInterface
@@ -17,7 +17,7 @@ class DefaultMessageRenderer implements MessageRendererInterface
     private $i18n;
 
     /**
-     * DefaultMessageRenderer constructor.
+     * MessageRenderer constructor.
      *
      * @param \BetaKiller\View\ViewFactoryInterface $viewFactory
      * @param \BetaKiller\I18n\I18nFacade           $i18n
@@ -31,19 +31,19 @@ class DefaultMessageRenderer implements MessageRendererInterface
     /**
      * Render message for sending via provided transport
      *
-     * @param \BetaKiller\Notification\NotificationMessageInterface   $message
-     * @param \BetaKiller\Notification\NotificationTargetInterface    $target
-     * @param \BetaKiller\Notification\NotificationTransportInterface $transport
+     * @param \BetaKiller\Notification\MessageInterface   $message
+     * @param \BetaKiller\Notification\TargetInterface    $target
+     * @param \BetaKiller\Notification\TransportInterface $transport
      *
-     * @param string                                                  $hash
+     * @param string                                      $hash
      *
      * @return string
      * @throws \BetaKiller\Notification\NotificationException
      */
     public function makeBody(
-        NotificationMessageInterface $message,
-        NotificationTargetInterface $target,
-        NotificationTransportInterface $transport,
+        MessageInterface $message,
+        TargetInterface $target,
+        TransportInterface $transport,
         string $hash
     ): string {
         $file = $this->detectTemplateFile($message, $target, $transport);
@@ -101,7 +101,7 @@ class DefaultMessageRenderer implements MessageRendererInterface
         return $this->getTemplatePath().DIRECTORY_SEPARATOR.$templateName;
     }
 
-    public function makeSubject(NotificationMessageInterface $message, NotificationTargetInterface $target): string
+    public function makeSubject(MessageInterface $message, TargetInterface $target): string
     {
         $key      = $message->getBaseI18nKey().'.subj';
         $data     = $message->getFullDataForTarget($target);
@@ -132,9 +132,9 @@ class DefaultMessageRenderer implements MessageRendererInterface
     }
 
     private function detectTemplateFile(
-        NotificationMessageInterface $message,
-        NotificationTargetInterface $target,
-        NotificationTransportInterface $transport
+        MessageInterface $message,
+        TargetInterface $target,
+        TransportInterface $transport
     ): string {
         // User language in templates
         $langName = $target->getLanguageIsoCode();

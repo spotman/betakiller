@@ -2,8 +2,8 @@
 namespace BetaKiller\Notification\Transport;
 
 use BetaKiller\Exception\NotImplementedHttpException;
-use BetaKiller\Notification\NotificationMessageInterface;
-use BetaKiller\Notification\NotificationTargetInterface;
+use BetaKiller\Notification\MessageInterface;
+use BetaKiller\Notification\TargetInterface;
 
 class OnlineTransport extends AbstractTransport
 {
@@ -22,7 +22,7 @@ class OnlineTransport extends AbstractTransport
         return false;
     }
 
-    public function isEnabledFor(NotificationTargetInterface $user): bool
+    public function isEnabledFor(TargetInterface $user): bool
     {
         return $user->isOnlineNotificationAllowed() && $this->isOnline($user);
     }
@@ -30,11 +30,11 @@ class OnlineTransport extends AbstractTransport
     /**
      * Returns TRUE if user is using the site now (so online notifications may be provided)
      *
-     * @param \BetaKiller\Notification\NotificationTargetInterface $user
+     * @param \BetaKiller\Notification\TargetInterface $user
      *
      * @return bool
      */
-    public function isOnline(NotificationTargetInterface $user): bool
+    public function isOnline(TargetInterface $user): bool
     {
         // TODO Online detection logic
         // Check websocket connection
@@ -43,16 +43,16 @@ class OnlineTransport extends AbstractTransport
     }
 
     /**
-     * @param \BetaKiller\Notification\NotificationMessageInterface $message
-     * @param \BetaKiller\Notification\NotificationTargetInterface  $target
-     * @param string                                                $body
+     * @param \BetaKiller\Notification\MessageInterface $message
+     * @param \BetaKiller\Notification\TargetInterface  $target
+     * @param string                                    $body
      *
      * @return bool Number of messages sent
      * @throws \BetaKiller\Exception\NotImplementedHttpException
      */
     public function send(
-        NotificationMessageInterface $message,
-        NotificationTargetInterface $target,
+        MessageInterface $message,
+        TargetInterface $target,
         string $body
     ): bool {
         throw new NotImplementedHttpException();

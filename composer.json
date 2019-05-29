@@ -23,6 +23,8 @@
     "doctrine/annotations": "^1.2",
     "doctrine/cache": "^1.6",
     "dragonmantank/cron-expression": "^2.0",
+    "enqueue/dbal": "^0.9.9",
+    "enqueue/enqueue": "^0.9.11",
     "geocoder-php/chain-provider": "^4.0",
     "geocoder-php/google-maps-provider": "^4.3",
     "geocoder-php/yandex-provider": "^4.1",

@@ -4,10 +4,11 @@ namespace BetaKiller\Helper;
 use BetaKiller\I18n\I18nFacade;
 use BetaKiller\Model\LanguageInterface;
 use BetaKiller\Model\NotificationGroupInterface;
+use BetaKiller\Notification\MessageInterface;
 use BetaKiller\Notification\NotificationFacade;
-use BetaKiller\Notification\NotificationMessageInterface;
-use BetaKiller\Notification\NotificationTargetEmail;
-use BetaKiller\Notification\NotificationTargetInterface;
+use BetaKiller\Notification\TargetEmail;
+use BetaKiller\Notification\TargetInterface;
+use BetaKiller\Repository\UserRepository;
 
 class NotificationHelper
 {
@@ -27,17 +28,28 @@ class NotificationHelper
     private $i18n;
 
     /**
+     * @var \BetaKiller\Repository\UserRepository
+     */
+    private $userRepo;
+
+    /**
      * NotificationHelper constructor.
      *
      * @param \BetaKiller\Notification\NotificationFacade $facade
      * @param \BetaKiller\Helper\AppEnvInterface          $appEnv
      * @param \BetaKiller\I18n\I18nFacade                 $i18n
+     * @param \BetaKiller\Repository\UserRepository       $userRepo
      */
-    public function __construct(NotificationFacade $facade, AppEnvInterface $appEnv, I18nFacade $i18n)
-    {
+    public function __construct(
+        NotificationFacade $facade,
+        AppEnvInterface $appEnv,
+        I18nFacade $i18n,
+        UserRepository $userRepo
+    ) {
         $this->notification = $facade;
         $this->appEnv       = $appEnv;
         $this->i18n         = $i18n;
+        $this->userRepo     = $userRepo;
     }
 
     public function getMessageGroup(string $messageCodename): NotificationGroupInterface
@@ -59,100 +71,82 @@ class NotificationHelper
      */
     public function groupMessage(string $name, array $templateData, array $attachments = null): void
     {
-        $message = $this->notification->createGroupMessage($name, $templateData);
+        $group = $this->getMessageGroup($name);
 
-        if ($attachments) {
-            foreach ($attachments as $attach) {
-                $message->addAttachment($attach);
-            }
+        foreach ($this->notification->getGroupTargets($group) as $target) {
+            $this->directMessage($name, $target, $templateData, $attachments);
         }
-
-        // Send only if there are targets (maybe all users disabled this group)
-        $this->send($message);
     }
 
     /**
      * Send direct message to a single user
      *
-     * @param string                                               $name
-     * @param \BetaKiller\Notification\NotificationTargetInterface $target
-     * @param array                                                $templateData
+     * @param string                                   $name
+     * @param \BetaKiller\Notification\TargetInterface $target
+     * @param array                                    $templateData
+     * @param string[]                                 $attachments Array of files to attach
      *
-     * @param string[]                                             $attachments Array of files to attach
-     *
-     * @throws \BetaKiller\Exception\DomainException
      * @throws \BetaKiller\Notification\NotificationException
      */
     public function directMessage(
         string $name,
-        NotificationTargetInterface $target,
+        TargetInterface $target,
         array $templateData,
         array $attachments = null
     ): void {
-        $message = $this->notification->createDirectMessage($name, $target, $templateData);
-
-        if ($attachments) {
-            foreach ($attachments as $attach) {
-                $message->addAttachment($attach);
-            }
-        }
+        $message = $this->notification->createMessage($name, $target, $templateData, $attachments);
 
         // Send only if target user allowed this message group
-        $this->send($message);
+        $this->enqueue($message);
     }
 
     /**
      * Generate target from email
      *
      * @param string      $email
-     * @param string      $fullName
-     * @param null|string $langName
+     * @param string      $name Full name of recipient
+     * @param null|string $lang Target language alpha-2 ISO code
      *
-     * @return \BetaKiller\Notification\NotificationTargetInterface
+     * @return \BetaKiller\Notification\TargetInterface
      */
-    public function emailTarget(
-        string $email,
-        string $fullName,
-        ?string $langName = null
-    ): NotificationTargetInterface {
-        $langName = $langName ?? $this->i18n->getDefaultLanguage()->getIsoCode();
+    public function emailTarget(string $email, string $name, ?string $lang = null): TargetInterface
+    {
+        $lang = $lang ?? $this->i18n->getDefaultLanguage()->getIsoCode();
 
-        return new NotificationTargetEmail($email, $fullName, $langName);
+        return new TargetEmail($email, $name, $lang);
     }
 
     /**
-     * @param \BetaKiller\Notification\NotificationMessageInterface $message
+     * @param \BetaKiller\Notification\MessageInterface $message
      *
-     * @return int
+     * @return void
      * @throws \BetaKiller\Notification\NotificationException
      */
-    private function send(NotificationMessageInterface $message): int
+    private function enqueue(MessageInterface $message): void
     {
-        $this->rewriteTargetsForDebug($message);
+        $this->rewriteTargetForDebug($message);
 
-        // Send only if targets were specified or message group was allowed
-        return $message->getTargets()
-            ? $this->notification->send($message)
-            : 0;
+        $this->notification->enqueue($message);
     }
 
     /**
-     * @param \BetaKiller\Notification\NotificationMessageInterface $message
+     * @param \BetaKiller\Notification\MessageInterface $message
      *
      * @return void
      */
-    private function rewriteTargetsForDebug(NotificationMessageInterface $message): void
+    private function rewriteTargetForDebug(MessageInterface $message): void
     {
-        if ($this->appEnv->isDebugEnabled()) {
-            $debugEmail = $this->appEnv->getDebugEmail();
-
-            $message
-                ->clearTargets()
-                ->addTarget($this->emailTarget(
-                    $debugEmail,
-                    'Debug email target',
-                    LanguageInterface::ISO_EN
-                ));
+        if (!$this->appEnv->isDebugEnabled()) {
+            return;
         }
+
+        $email  = $this->appEnv->getDebugEmail();
+        $target = $this->userRepo->searchBy($email);
+
+        if (!$target) {
+            $target = $this->emailTarget($email, 'Debug email target', LanguageInterface::ISO_EN);
+        }
+
+        $message->setTarget($target);
     }
 }

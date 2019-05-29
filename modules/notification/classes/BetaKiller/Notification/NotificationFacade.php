@@ -5,20 +5,29 @@ use BetaKiller\Config\NotificationConfigInterface;
 use BetaKiller\Exception\DomainException;
 use BetaKiller\Helper\LoggerHelperTrait;
 use BetaKiller\Model\NotificationGroupInterface;
+use BetaKiller\Model\NotificationGroupUserConfig;
+use BetaKiller\Model\NotificationGroupUserConfigInterface;
 use BetaKiller\Model\NotificationLog;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Notification\Transport\EmailTransport;
 use BetaKiller\Notification\Transport\OnlineTransport;
 use BetaKiller\Repository\NotificationGroupRepository;
+use BetaKiller\Repository\NotificationGroupUserConfigRepositoryInterface;
 use BetaKiller\Repository\NotificationLogRepositoryInterface;
+use DateTimeImmutable;
+use Enqueue\Dbal\DbalMessage;
+use Interop\Queue\Context;
 use Psr\Log\LoggerInterface;
+use Throwable;
 
 class NotificationFacade
 {
     use LoggerHelperTrait;
 
+    public const QUEUE_NAME = 'notifications';
+
     /**
-     * @var \BetaKiller\Notification\NotificationMessageFactory
+     * @var \BetaKiller\Notification\MessageFactory
      */
     private $messageFactory;
 
@@ -33,7 +42,7 @@ class NotificationFacade
     private $groupRepo;
 
     /**
-     * @var \BetaKiller\Notification\NotificationTransportInterface[]
+     * @var \BetaKiller\Notification\TransportInterface[]
      */
     private $transports;
 
@@ -53,24 +62,48 @@ class NotificationFacade
     private $logRepo;
 
     /**
+     * @var \Interop\Queue\Context
+     */
+    private $queueContext;
+
+    /**
+     * @var \BetaKiller\Notification\MessageSerializer
+     */
+    private $serializer;
+
+    /**
+     * @var \BetaKiller\Repository\NotificationGroupUserConfigRepositoryInterface
+     */
+    private $userConfigRepo;
+
+    /**
      * NotificationFacade constructor.
      *
-     * @param \BetaKiller\Notification\NotificationMessageFactory       $messageFactory
-     * @param \BetaKiller\Notification\MessageRendererInterface         $renderer
-     * @param \BetaKiller\Config\NotificationConfigInterface            $config
-     * @param \BetaKiller\Repository\NotificationGroupRepository        $groupRepo
-     * @param \BetaKiller\Repository\NotificationLogRepositoryInterface $logRepo
-     * @param \Psr\Log\LoggerInterface                                  $logger
+     * @param \BetaKiller\Notification\MessageFactory                               $messageFactory
+     * @param \BetaKiller\Notification\MessageRendererInterface                     $renderer
+     * @param \BetaKiller\Config\NotificationConfigInterface                        $config
+     * @param \BetaKiller\Repository\NotificationGroupRepository                    $groupRepo
+     * @param \BetaKiller\Repository\NotificationLogRepositoryInterface             $logRepo
+     * @param \BetaKiller\Repository\NotificationGroupUserConfigRepositoryInterface $userConfigRepo
+     * @param \Interop\Queue\Context                                                $queueContext
+     * @param \BetaKiller\Notification\MessageSerializer                            $serializer
+     * @param \Psr\Log\LoggerInterface                                              $logger
      */
     public function __construct(
-        NotificationMessageFactory $messageFactory,
+        MessageFactory $messageFactory,
         MessageRendererInterface $renderer,
         NotificationConfigInterface $config,
         NotificationGroupRepository $groupRepo,
         NotificationLogRepositoryInterface $logRepo,
+        NotificationGroupUserConfigRepositoryInterface $userConfigRepo,
+        Context $queueContext,
+        MessageSerializer $serializer,
         LoggerInterface $logger
     ) {
         $this->messageFactory = $messageFactory;
+        $this->userConfigRepo = $userConfigRepo;
+        $this->queueContext   = $queueContext;
+        $this->serializer     = $serializer;
         $this->config         = $config;
         $this->groupRepo      = $groupRepo;
         $this->renderer       = $renderer;
@@ -79,118 +112,118 @@ class NotificationFacade
     }
 
     /**
-     * Create message and add group users
-     *
-     * @param string $name
-     * @param array  $templateData
-     *
-     * @return \BetaKiller\Notification\NotificationMessageInterface
-     * @throws \BetaKiller\Exception
-     * @throws \BetaKiller\Factory\FactoryException
-     * @throws \BetaKiller\Notification\NotificationException
-     */
-    public function createGroupMessage(string $name, array $templateData): NotificationMessageInterface
-    {
-        $message = $this->createMessage($name, $templateData);
-
-        // Add targets from group
-        $this->addGroupTargets($message);
-
-        return $message;
-    }
-
-    /**
-     * Create direct message
-     *
-     * @param string                                               $name
-     * @param \BetaKiller\Notification\NotificationTargetInterface $target
-     * @param array                                                $templateData
-     *
-     * @return \BetaKiller\Notification\NotificationMessageInterface
-     */
-    public function createDirectMessage(
-        string $name,
-        NotificationTargetInterface $target,
-        array $templateData
-    ): NotificationMessageInterface {
-        $message = $this->createMessage($name, $templateData);
-
-        if ($this->isMessageEnabledForUser($message, $target)) {
-            $message->addTarget($target);
-        }
-
-        return $message;
-    }
-
-    /**
      * Create raw message
      *
-     * @param string $name
-     * @param array  $templateData
+     * @param string                                   $name
+     * @param \BetaKiller\Notification\TargetInterface $target
+     * @param array                                    $data
+     * @param array|null                               $attachments Array of files to attach
      *
-     * @return \BetaKiller\Notification\NotificationMessageInterface
+     * @return \BetaKiller\Notification\MessageInterface
      * @throws \BetaKiller\Notification\NotificationException
      */
-    public function createMessage(string $name, array $templateData): NotificationMessageInterface
-    {
-        $message = $this->messageFactory->create($name);
+    public function createMessage(
+        string $name,
+        TargetInterface $target,
+        array $data,
+        array $attachments = null
+    ): MessageInterface {
+        $message = $this->messageFactory->create($name)
+            ->setTemplateData($data)
+            ->setTarget($target);
 
-        $message->setTemplateData($templateData);
+        if ($attachments) {
+            foreach ($attachments as $attach) {
+                $message->addAttachment($attach);
+            }
+        }
 
         return $message;
     }
 
     /**
-     * Send message
+     * Enqueue message for future processing
      *
-     * @param \BetaKiller\Notification\NotificationMessageInterface $message
+     * @param \BetaKiller\Notification\MessageInterface $message
      *
-     * @return int
      * @throws \BetaKiller\Notification\NotificationException
      */
-    public function send(NotificationMessageInterface $message): int
+    public function enqueue(MessageInterface $message): void
     {
-        $to = $message->getTargets();
+        $target = $message->getTarget();
 
-        if (!$to) {
-            throw new NotificationException('Message target must be specified');
+        // Send only if targets were specified or message group was allowed
+        if (!$this->isMessageEnabledForUser($message, $target)) {
+            return;
         }
 
-        $transports = $this->getTransports();
-        $total      = 0;
+        $body = $this->serializer->serialize($message);
 
-        foreach ($to as $target) {
-            $counter  = 0;
-            $attempts = 0;
+        $queue        = $this->queueContext->createQueue(self::QUEUE_NAME);
+        $queueMessage = $this->queueContext->createMessage($body);
 
-            foreach ($transports as $transport) {
-                if (!$transport->isEnabledFor($target)) {
-                    continue;
-                }
-
-                if ($this->sendMessage($message, $target, $transport)) {
-                    $counter++;
-                }
-
-                $attempts++;
-            }
-
-            // Message delivery failed
-            if ($attempts && !$counter) {
-                throw new NotificationException('Message delivery failed, see previously logged exceptions');
-            }
-
-            $total += $counter;
+        if (!$queueMessage instanceof DbalMessage) {
+            throw new NotificationException('Wrong queue message type ":class"', [
+                ':class' => get_class($queueMessage),
+            ]);
         }
 
-        return $total;
+        // Apply user settings
+        if ($target instanceof UserInterface) {
+            // Get linked group
+            $group = $this->getMessageGroup($message);
+
+            // Get user config
+            $config = $this->getGroupUserConfig($group, $target);
+
+            // Set delivery time
+            if ($config->hasFrequencyDefined()) {
+                $schedule = $config->getFrequency()->calculateSchedule();
+
+                $delay = $schedule->getTimestamp() - time();
+
+                $queueMessage->setDeliveryDelay($delay * 1000);
+            }
+        }
+
+        // Enqueue
+        $this->queueContext->createProducer()->send($queue, $queueMessage);
     }
 
-    private function sendMessage(
-        NotificationMessageInterface $message,
-        NotificationTargetInterface $target,
-        NotificationTransportInterface $transport
-    ): bool {
+    /**
+     * Send message immediately
+     *
+     * @param \BetaKiller\Notification\MessageInterface $message
+     *
+     * @return bool
+     */
+    public function send(MessageInterface $message): bool
+    {
+        $target = $message->getTarget();
+
+        $counter  = 0;
+        $attempts = 0;
+
+        foreach ($this->getTransports() as $transport) {
+            if (!$transport->isEnabledFor($target)) {
+                continue;
+            }
+
+            if ($this->sendThrough($message, $transport)) {
+                $counter++;
+            }
+
+            $attempts++;
+        }
+
+        // Check message delivery failed
+        return !($attempts && !$counter);
+    }
+
+    private function sendThrough(MessageInterface $message, TransportInterface $transport): bool
+    {
+        $target = $message->getTarget();
+
         $hash = $this->calculateHash($message, $target, $transport);
 
         $log = new NotificationLog;
@@ -199,7 +232,7 @@ class NotificationFacade
 
         try {
             $log
-                ->setProcessedAt(new \DateTimeImmutable)
+                ->setProcessedAt(new DateTimeImmutable)
                 ->setMessageName($message->getCodename())
                 ->setTarget($target)
                 ->setTransport($transport)
@@ -219,13 +252,10 @@ class NotificationFacade
             $log->setBody($body);
 
             // Send message via transport
-            $counter = $transport->send($message, $target, $body);
-
-            // Message delivered, exiting
-            if ($counter) {
+            if ($transport->send($message, $target, $body)) {
                 $log->markAsSucceeded();
             }
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             $this->logException($this->logger, $e);
 
             // Store exception as result
@@ -243,11 +273,9 @@ class NotificationFacade
         $groupCodename = $this->config->getMessageGroup($messageCodename);
 
         if (!$groupCodename) {
-            throw new NotificationException(
-                'Group not found for message codename ":codename"', [
-                    ':codename' => $messageCodename,
-                ]
-            );
+            throw new NotificationException('Group not found for message codename ":codename"', [
+                ':codename' => $messageCodename,
+            ]);
         }
 
         return $this->groupRepo->getByCodename($groupCodename);
@@ -256,13 +284,21 @@ class NotificationFacade
     /**
      * @param \BetaKiller\Model\NotificationGroupInterface $group
      *
-     * @return \BetaKiller\Notification\NotificationTargetInterface[]
+     * @return \BetaKiller\Notification\TargetInterface[]
      * @throws \BetaKiller\Exception
      * @throws \BetaKiller\Factory\FactoryException
      */
     public function getGroupTargets(NotificationGroupInterface $group): array
     {
-        return $this->groupRepo->findGroupUsers($group);
+        $users = $this->groupRepo->findGroupUsers($group);
+
+        if (!$users) {
+            throw new NotificationException('No users found for group ":codename"', [
+                ':codename' => $group->getCodename(),
+            ]);
+        }
+
+        return $users;
     }
 
     public function disableMessageForUser(string $messageCodename, UserInterface $user): void
@@ -274,12 +310,30 @@ class NotificationFacade
         $this->groupRepo->save($group);
     }
 
+    public function getGroupUserConfig(
+        NotificationGroupInterface $group,
+        UserInterface $user
+    ): NotificationGroupUserConfigInterface {
+        $config = $this->userConfigRepo->findByUserAndGroup($group, $user);
+
+        // Create new object if user has no config yet
+        if (!$config) {
+            $config = new NotificationGroupUserConfig();
+
+            $config
+                ->bindToUser($user)
+                ->bindToGroup($group);
+        }
+
+        return $config;
+    }
+
     /**
      * @param string $name
      *
-     * @return \BetaKiller\Notification\NotificationTransportInterface
+     * @return \BetaKiller\Notification\TransportInterface
      */
-    protected function transportFactory($name): NotificationTransportInterface
+    protected function transportFactory($name): TransportInterface
     {
         $className = '\\BetaKiller\\Notification\\Transport\\'.ucfirst($name).'Transport';
 
@@ -287,7 +341,7 @@ class NotificationFacade
     }
 
     /**
-     * @return \BetaKiller\Notification\NotificationTransportInterface[]
+     * @return \BetaKiller\Notification\TransportInterface[]
      */
     public function getTransports(): array
     {
@@ -299,7 +353,7 @@ class NotificationFacade
     }
 
     /**
-     * @return \BetaKiller\Notification\NotificationTransportInterface[]
+     * @return \BetaKiller\Notification\TransportInterface[]
      */
     private function createTransports(): array
     {
@@ -316,8 +370,8 @@ class NotificationFacade
     }
 
     private function isMessageEnabledForUser(
-        NotificationMessageInterface $message,
-        NotificationTargetInterface $user
+        MessageInterface $message,
+        TargetInterface $user
     ): bool {
         if (!$user instanceof UserInterface) {
             // Custom target types can not be checked here and always allowed
@@ -341,33 +395,14 @@ class NotificationFacade
         return true;
     }
 
-    private function addGroupTargets(NotificationMessageInterface $message): void
-    {
-        // Fetch group by message codename
-        $group = $this->getMessageGroup($message);
-
-        // Fetch targets (users) by group
-        $users = $this->getGroupTargets($group);
-
-        if (!$users) {
-            throw new NotificationException('No users found for group ":codename"', [
-                    ':codename' => $group->getCodename(),
-                ]
-            );
-        }
-
-        // Add targets to message
-        $message->addTargetUsers($users);
-    }
-
     /**
-     * @param \BetaKiller\Notification\NotificationMessageInterface $message
+     * @param \BetaKiller\Notification\MessageInterface $message
      *
      * @return \BetaKiller\Model\NotificationGroupInterface
      * @throws \BetaKiller\Notification\NotificationException
      * @throws \BetaKiller\Repository\RepositoryException
      */
-    private function getMessageGroup(NotificationMessageInterface $message): NotificationGroupInterface
+    private function getMessageGroup(MessageInterface $message): NotificationGroupInterface
     {
         $messageCodename = $message->getCodename();
 
@@ -375,12 +410,12 @@ class NotificationFacade
     }
 
     private function calculateHash(
-        NotificationMessageInterface $message,
-        NotificationTargetInterface $target,
-        NotificationTransportInterface $transport
+        MessageInterface $message,
+        TargetInterface $target,
+        TransportInterface $transport
     ): string {
-        return \sha1(implode('-', [
-            \microtime(),
+        return sha1(implode('-', [
+            microtime(),
             $message->getCodename(),
             $target->getEmail(),
             $transport->getName(),

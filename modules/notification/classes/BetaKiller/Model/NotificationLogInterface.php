@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace BetaKiller\Model;
 
-use BetaKiller\Notification\NotificationTargetInterface;
-use BetaKiller\Notification\NotificationTransportInterface;
+use BetaKiller\Notification\TargetInterface;
+use BetaKiller\Notification\TransportInterface;
 use DateTimeImmutable;
 
 interface NotificationLogInterface extends DispatchableEntityInterface
@@ -24,11 +24,11 @@ interface NotificationLogInterface extends DispatchableEntityInterface
     public function setMessageName(string $messageName): NotificationLogInterface;
 
     /**
-     * @param \BetaKiller\Notification\NotificationTargetInterface $target
+     * @param \BetaKiller\Notification\TargetInterface $target
      *
      * @return \BetaKiller\Model\NotificationLogInterface
      */
-    public function setTarget(NotificationTargetInterface $target): NotificationLogInterface;
+    public function setTarget(TargetInterface $target): NotificationLogInterface;
 
     /**
      * Returns linked user if exists
@@ -38,11 +38,11 @@ interface NotificationLogInterface extends DispatchableEntityInterface
     public function getTargetUser(): ?UserInterface;
 
     /**
-     * @param \BetaKiller\Notification\NotificationTransportInterface $transport
+     * @param \BetaKiller\Notification\TransportInterface $transport
      *
      * @return \BetaKiller\Model\NotificationLogInterface
      */
-    public function setTransport(NotificationTransportInterface $transport): NotificationLogInterface;
+    public function setTransport(TransportInterface $transport): NotificationLogInterface;
 
     /**
      * @param string $subj
@@ -91,7 +91,7 @@ interface NotificationLogInterface extends DispatchableEntityInterface
     public function getMessageName(): string;
 
     /**
-     * @return \BetaKiller\Notification\NotificationTargetInterface
+     * @return \BetaKiller\Notification\TargetInterface
      */
     public function getTargetString(): string;
 
