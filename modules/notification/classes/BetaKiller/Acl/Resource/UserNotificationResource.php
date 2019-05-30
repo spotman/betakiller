@@ -8,8 +8,9 @@ use Spotman\Acl\Resource\AbstractResolvingResource;
 
 class UserNotificationResource extends AbstractResolvingResource
 {
-    public const ACTION_ENABLE_GROUP  = 'enableGroup';
-    public const ACTION_DISABLE_GROUP = 'disableGroup';
+    public const ACTION_ENABLE_GROUP   = 'enableGroup';
+    public const ACTION_DISABLE_GROUP  = 'disableGroup';
+    public const ACTION_SET_GROUP_FREQ = 'setGroupFrequency';
 
     /**
      * Returns default permissions bundled with current resource
@@ -26,6 +27,10 @@ class UserNotificationResource extends AbstractResolvingResource
             ],
 
             self::ACTION_DISABLE_GROUP => [
+                RoleInterface::LOGIN,
+            ],
+
+            self::ACTION_SET_GROUP_FREQ => [
                 RoleInterface::LOGIN,
             ],
         ];

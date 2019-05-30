@@ -75,6 +75,21 @@ interface NotificationGroupInterface extends DispatchableEntityInterface, HasI18
     public function disableForUser(UserInterface $user): NotificationGroupInterface;
 
     /**
+     * @return bool
+     */
+    public function isFrequencyControlEnabled(): bool;
+
+    /**
+     * @return \BetaKiller\Model\NotificationGroupInterface
+     */
+    public function enableFrequencyControl(): NotificationGroupInterface;
+
+    /**
+     * @return \BetaKiller\Model\NotificationGroupInterface
+     */
+    public function disableFrequencyControl(): NotificationGroupInterface;
+
+    /**
      * @param \BetaKiller\Model\RoleInterface $role
      *
      * @return bool

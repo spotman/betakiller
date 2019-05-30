@@ -10,6 +10,7 @@ class NotificationConfig extends AbstractConfig implements NotificationConfigInt
     public const CONFIG_GROUP_NAME    = 'notifications';
     public const PATH_GROUPS          = ['groups'];
     public const PATH_GROUP_IS_SYSTEM = ['groups', 'groupCodename' => '', 'is_system'];
+    public const PATH_GROUP_FREQ_CTRL = ['groups', 'groupCodename' => '', 'freq_control'];
     public const PATH_GROUP_ROLES     = ['groups', 'groupCodename' => '', 'roles'];
     public const PATH_MESSAGES        = ['messages'];
     public const PATH_MESSAGE_GROUP   = ['messages', 'messageCodename' => '', 'group'];
@@ -71,6 +72,19 @@ class NotificationConfig extends AbstractConfig implements NotificationConfigInt
         $path['messageCodename'] = $messageCodename;
 
         return (string)$this->get($path);
+    }
+
+    /**
+     * @param string $groupCodename
+     *
+     * @return bool
+     */
+    public function isGroupFreqControlled(string $groupCodename): bool
+    {
+        $path                    = self::PATH_GROUP_FREQ_CTRL;
+        $path['groupCodename'] = $groupCodename;
+
+        return (bool)$this->get($path, true);
     }
 
     /**

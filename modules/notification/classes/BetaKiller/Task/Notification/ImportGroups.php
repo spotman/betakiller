@@ -127,6 +127,12 @@ class ImportGroups extends AbstractTask
             $group->markAsRegular();
         }
 
+        if ($this->config->isGroupFreqControlled($groupCodename)) {
+            $group->enableFrequencyControl();
+        } else {
+            $group->disableFrequencyControl();
+        }
+
         // Get updated roles
         $rolesCodenames = $this->config->getGroupRoles($groupCodename);
 

@@ -15,7 +15,7 @@ class NotificationGroupRepository extends AbstractOrmBasedDispatchableRepository
      */
     public function getUrlKeyName(): string
     {
-        return NotificationGroup::TABLE_FIELD_CODENAME;
+        return NotificationGroup::COL_CODENAME;
     }
 
     /**
@@ -186,7 +186,7 @@ class NotificationGroupRepository extends AbstractOrmBasedDispatchableRepository
     private function filterGroupIsEnabled(ExtendedOrmInterface $orm, bool $value): self
     {
         $orm->where(
-            $orm->object_column(NotificationGroup::TABLE_FIELD_IS_ENABLED),
+            $orm->object_column(NotificationGroup::COL_IS_ENABLED),
             '=',
             $value
         );
@@ -197,7 +197,7 @@ class NotificationGroupRepository extends AbstractOrmBasedDispatchableRepository
     private function filterSystemGroup(ExtendedOrmInterface $orm, bool $value): self
     {
         $orm->where(
-            $orm->object_column(NotificationGroup::TABLE_FIELD_IS_SYSTEM),
+            $orm->object_column(NotificationGroup::COL_IS_SYSTEM),
             '=',
             $value
         );
@@ -207,7 +207,7 @@ class NotificationGroupRepository extends AbstractOrmBasedDispatchableRepository
 
     private function orderByName(ExtendedOrmInterface $orm): self
     {
-        $orm->order_by($orm->object_column(NotificationGroup::TABLE_FIELD_CODENAME), 'asc');
+        $orm->order_by($orm->object_column(NotificationGroup::COL_CODENAME), 'asc');
 
         return $this;
     }

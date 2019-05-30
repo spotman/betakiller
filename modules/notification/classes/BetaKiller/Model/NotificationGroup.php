@@ -3,13 +3,16 @@ declare(strict_types=1);
 
 namespace BetaKiller\Model;
 
-class NotificationGroup extends \ORM implements NotificationGroupInterface
+use ORM;
+
+class NotificationGroup extends ORM implements NotificationGroupInterface
 {
-    public const TABLE_NAME              = 'notification_groups';
-    public const TABLE_FIELD_IS_ENABLED  = 'is_enabled';
-    public const TABLE_FIELD_CODENAME    = 'codename';
-    public const TABLE_FIELD_DESCRIPTION = 'description';
-    public const TABLE_FIELD_IS_SYSTEM   = 'is_system';
+    public const TABLE_NAME             = 'notification_groups';
+    public const COL_IS_ENABLED         = 'is_enabled';
+    public const COL_CODENAME           = 'codename';
+    public const COL_DESCRIPTION        = 'description';
+    public const COL_IS_SYSTEM          = 'is_system';
+    public const COL_IS_FREQ_CONTROLLED = 'is_freq_controlled';
 
     public const ROLES_TABLE_NAME           = 'notification_groups_roles';
     public const ROLES_TABLE_FIELD_GROUP_ID = 'group_id';
@@ -53,12 +56,13 @@ class NotificationGroup extends \ORM implements NotificationGroupInterface
     public function rules(): array
     {
         return [
-            self::TABLE_FIELD_CODENAME    => [
+            self::COL_CODENAME => [
                 ['not_empty'],
                 ['min_length', [':value', 4]],
                 ['max_length', [':value', 32]],
             ],
-            self::TABLE_FIELD_DESCRIPTION => [
+
+            self::COL_DESCRIPTION => [
                 ['max_length', [':value', 255]],
             ],
         ];
@@ -69,7 +73,7 @@ class NotificationGroup extends \ORM implements NotificationGroupInterface
      */
     public function isEnabled(): bool
     {
-        return (bool)$this->get(self::TABLE_FIELD_IS_ENABLED);
+        return (bool)$this->get(self::COL_IS_ENABLED);
     }
 
     /**
@@ -77,7 +81,7 @@ class NotificationGroup extends \ORM implements NotificationGroupInterface
      */
     public function enable(): NotificationGroupInterface
     {
-        $this->set(self::TABLE_FIELD_IS_ENABLED, true);
+        $this->set(self::COL_IS_ENABLED, true);
 
         return $this;
     }
@@ -87,7 +91,7 @@ class NotificationGroup extends \ORM implements NotificationGroupInterface
      */
     public function disable(): NotificationGroupInterface
     {
-        $this->set(self::TABLE_FIELD_IS_ENABLED, false);
+        $this->set(self::COL_IS_ENABLED, false);
 
         return $this;
     }
@@ -97,7 +101,7 @@ class NotificationGroup extends \ORM implements NotificationGroupInterface
      */
     public function getCodename(): string
     {
-        return $this->get(self::TABLE_FIELD_CODENAME);
+        return $this->get(self::COL_CODENAME);
     }
 
     /**
@@ -108,7 +112,7 @@ class NotificationGroup extends \ORM implements NotificationGroupInterface
     public function setCodename(string $value): NotificationGroupInterface
     {
         $value = trim($value);
-        $this->set(self::TABLE_FIELD_CODENAME, $value);
+        $this->set(self::COL_CODENAME, $value);
 
         return $this;
     }
@@ -118,7 +122,7 @@ class NotificationGroup extends \ORM implements NotificationGroupInterface
      */
     public function getDescription(): string
     {
-        return (string)$this->get(self::TABLE_FIELD_DESCRIPTION);
+        return (string)$this->get(self::COL_DESCRIPTION);
     }
 
     /**
@@ -129,7 +133,35 @@ class NotificationGroup extends \ORM implements NotificationGroupInterface
     public function setDescription(string $value): NotificationGroupInterface
     {
         $value = trim($value);
-        $this->set(self::TABLE_FIELD_DESCRIPTION, $value);
+        $this->set(self::COL_DESCRIPTION, $value);
+
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isFrequencyControlEnabled(): bool
+    {
+        return (bool)$this->get(self::COL_IS_FREQ_CONTROLLED);
+    }
+
+    /**
+     * @return \BetaKiller\Model\NotificationGroupInterface
+     */
+    public function enableFrequencyControl(): NotificationGroupInterface
+    {
+        $this->set(self::COL_IS_FREQ_CONTROLLED, true);
+
+        return $this;
+    }
+
+    /**
+     * @return \BetaKiller\Model\NotificationGroupInterface
+     */
+    public function disableFrequencyControl(): NotificationGroupInterface
+    {
+        $this->set(self::COL_IS_FREQ_CONTROLLED, false);
 
         return $this;
     }
@@ -257,7 +289,7 @@ class NotificationGroup extends \ORM implements NotificationGroupInterface
      */
     public function isSystem(): bool
     {
-        return (bool)$this->get(self::TABLE_FIELD_IS_SYSTEM);
+        return (bool)$this->get(self::COL_IS_SYSTEM);
     }
 
     /**
@@ -267,12 +299,12 @@ class NotificationGroup extends \ORM implements NotificationGroupInterface
      */
     public function getI18nKeyName(): string
     {
-        return 'notification_group.'.$this->getCodename();
+        return 'notification-group.'.$this->getCodename();
     }
 
     private function setIsSystem(bool $value): NotificationGroupInterface
     {
-        $this->set(self::TABLE_FIELD_IS_SYSTEM, $value);
+        $this->set(self::COL_IS_SYSTEM, $value);
 
         return $this;
     }

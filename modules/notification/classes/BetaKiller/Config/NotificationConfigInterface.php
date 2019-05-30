@@ -25,6 +25,13 @@ interface NotificationConfigInterface
     public function isSystemGroup(string $groupCodename): bool;
 
     /**
+     * @param string $groupCodename
+     *
+     * @return bool
+     */
+    public function isGroupFreqControlled(string $groupCodename): bool;
+
+    /**
      * @param string $messageCodename
      *
      * @return string

@@ -291,6 +291,11 @@ class NotificationFacade
         return $this->groupRepo->getByCodename($groupCodename);
     }
 
+    public function getGroupByCodename(string $groupCodename): NotificationGroupInterface
+    {
+        return $this->groupRepo->getByCodename($groupCodename);
+    }
+
     /**
      * @param \BetaKiller\Model\NotificationGroupInterface $group
      *
@@ -343,6 +348,12 @@ class NotificationFacade
         UserInterface $user,
         NotificationFrequencyInterface $freq
     ): void {
+        if (!$group->isFrequencyControlEnabled()) {
+            throw new NotificationException('Frequency control of group ":name" is not allowed', [
+                ':name' => $group->getCodename(),
+            ]);
+        }
+
         $config = $this->getGroupUserConfig($group, $user);
 
         $config->setFrequency($freq);
@@ -355,7 +366,7 @@ class NotificationFacade
         return $this->freqRepo->getByCodename($codename);
     }
 
-    public function saveGroupUserConfig(NotificationGroupUserConfigInterface $config): void
+    private function saveGroupUserConfig(NotificationGroupUserConfigInterface $config): void
     {
         $this->userConfigRepo->save($config);
     }
