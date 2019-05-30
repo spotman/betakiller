@@ -11,6 +11,7 @@ use BetaKiller\Model\UserInterface;
  * Interface NotificationGroupUserConfigRepositoryInterface
  *
  * @package BetaKiller\Repository
+ * @method save(NotificationGroupUserConfigInterface $entity) : void
  */
 interface NotificationGroupUserConfigRepositoryInterface extends RepositoryInterface
 {

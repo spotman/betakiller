@@ -4,6 +4,7 @@ namespace BetaKiller\Notification;
 use BetaKiller\Config\NotificationConfigInterface;
 use BetaKiller\Exception\DomainException;
 use BetaKiller\Helper\LoggerHelperTrait;
+use BetaKiller\Model\NotificationFrequencyInterface;
 use BetaKiller\Model\NotificationGroupInterface;
 use BetaKiller\Model\NotificationGroupUserConfig;
 use BetaKiller\Model\NotificationGroupUserConfigInterface;
@@ -11,6 +12,7 @@ use BetaKiller\Model\NotificationLog;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Notification\Transport\EmailTransport;
 use BetaKiller\Notification\Transport\OnlineTransport;
+use BetaKiller\Repository\NotificationFrequencyRepositoryInterface;
 use BetaKiller\Repository\NotificationGroupRepository;
 use BetaKiller\Repository\NotificationGroupUserConfigRepositoryInterface;
 use BetaKiller\Repository\NotificationLogRepositoryInterface;
@@ -77,6 +79,11 @@ class NotificationFacade
     private $userConfigRepo;
 
     /**
+     * @var \BetaKiller\Repository\NotificationFrequencyRepositoryInterface
+     */
+    private $freqRepo;
+
+    /**
      * NotificationFacade constructor.
      *
      * @param \BetaKiller\Notification\MessageFactory                               $messageFactory
@@ -85,6 +92,7 @@ class NotificationFacade
      * @param \BetaKiller\Repository\NotificationGroupRepository                    $groupRepo
      * @param \BetaKiller\Repository\NotificationLogRepositoryInterface             $logRepo
      * @param \BetaKiller\Repository\NotificationGroupUserConfigRepositoryInterface $userConfigRepo
+     * @param \BetaKiller\Repository\NotificationFrequencyRepositoryInterface       $freqRepo
      * @param \Interop\Queue\Context                                                $queueContext
      * @param \BetaKiller\Notification\MessageSerializer                            $serializer
      * @param \Psr\Log\LoggerInterface                                              $logger
@@ -96,6 +104,7 @@ class NotificationFacade
         NotificationGroupRepository $groupRepo,
         NotificationLogRepositoryInterface $logRepo,
         NotificationGroupUserConfigRepositoryInterface $userConfigRepo,
+        NotificationFrequencyRepositoryInterface $freqRepo,
         Context $queueContext,
         MessageSerializer $serializer,
         LoggerInterface $logger
@@ -107,6 +116,7 @@ class NotificationFacade
         $this->config         = $config;
         $this->groupRepo      = $groupRepo;
         $this->renderer       = $renderer;
+        $this->freqRepo       = $freqRepo;
         $this->logRepo        = $logRepo;
         $this->logger         = $logger;
     }
@@ -326,6 +336,39 @@ class NotificationFacade
         }
 
         return $config;
+    }
+
+    public function setGroupFrequency(
+        NotificationGroupInterface $group,
+        UserInterface $user,
+        NotificationFrequencyInterface $freq
+    ): void {
+        $config = $this->getGroupUserConfig($group, $user);
+
+        $config->setFrequency($freq);
+
+        $this->saveGroupUserConfig($config);
+    }
+
+    public function getFrequencyByCodename(string $codename): NotificationFrequencyInterface
+    {
+        return $this->freqRepo->getByCodename($codename);
+    }
+
+    public function saveGroupUserConfig(NotificationGroupUserConfigInterface $config): void
+    {
+        $this->userConfigRepo->save($config);
+    }
+
+    /**
+     * @param \BetaKiller\Model\UserInterface $user
+     *
+     * @return NotificationGroupInterface[]
+     * @throws \BetaKiller\Factory\FactoryException
+     */
+    public function getUserGroups(UserInterface $user): array
+    {
+        return $this->groupRepo->getUserGroups($user);
     }
 
     /**

@@ -4,6 +4,8 @@ namespace BetaKiller\Helper;
 use BetaKiller\I18n\I18nFacade;
 use BetaKiller\Model\LanguageInterface;
 use BetaKiller\Model\NotificationGroupInterface;
+use BetaKiller\Model\NotificationGroupUserConfigInterface;
+use BetaKiller\Model\UserInterface;
 use BetaKiller\Notification\MessageInterface;
 use BetaKiller\Notification\NotificationFacade;
 use BetaKiller\Notification\TargetEmail;
@@ -114,6 +116,11 @@ class NotificationHelper
         $lang = $lang ?? $this->i18n->getDefaultLanguage()->getIsoCode();
 
         return new TargetEmail($email, $name, $lang);
+    }
+
+    public function getGroupUserConfig(NotificationGroupInterface $group, UserInterface $user): NotificationGroupUserConfigInterface
+    {
+        return $this->notification->getGroupUserConfig($group, $user);
     }
 
     /**
