@@ -77,9 +77,11 @@ class QueueProcessor implements Processor
         } catch (Throwable $e) {
             $this->logException($this->logger, $e);
 
-            $queueMessage->setRedeliverAfter(3600);
+//            $queueMessage->setRedeliverAfter(3600);
+//            return self::REQUEUE;
 
-            return self::REQUEUE;
+            // Temp fix for failing tasks
+            return self::REJECT;
         }
     }
 }
