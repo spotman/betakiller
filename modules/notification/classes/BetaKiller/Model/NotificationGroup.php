@@ -13,6 +13,7 @@ class NotificationGroup extends ORM implements NotificationGroupInterface
     public const COL_DESCRIPTION        = 'description';
     public const COL_IS_SYSTEM          = 'is_system';
     public const COL_IS_FREQ_CONTROLLED = 'is_freq_controlled';
+    public const COL_PLACE              = 'place';
 
     public const ROLES_TABLE_NAME           = 'notification_groups_roles';
     public const ROLES_TABLE_FIELD_GROUP_ID = 'group_id';
@@ -300,6 +301,26 @@ class NotificationGroup extends ORM implements NotificationGroupInterface
     public function getI18nKeyName(): string
     {
         return 'notification-group.'.$this->getCodename();
+    }
+
+    /**
+     * @param int $value
+     *
+     * @return \BetaKiller\Model\NotificationGroupInterface
+     */
+    public function setPlace(int $value): NotificationGroupInterface
+    {
+        $this->set(self::COL_PLACE, $value);
+
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getPlace(): int
+    {
+        return (int)$this->get(self::COL_PLACE);
     }
 
     private function setIsSystem(bool $value): NotificationGroupInterface

@@ -134,4 +134,16 @@ interface NotificationGroupInterface extends DispatchableEntityInterface, HasI18
      * @return bool
      */
     public function isSystem(): bool;
+
+    /**
+     * @return int
+     */
+    public function getPlace(): int;
+
+    /**
+     * @param int $value
+     *
+     * @return \BetaKiller\Model\NotificationGroupInterface
+     */
+    public function setPlace(int $value): NotificationGroupInterface;
 }

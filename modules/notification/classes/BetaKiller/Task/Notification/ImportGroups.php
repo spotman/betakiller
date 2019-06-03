@@ -83,6 +83,8 @@ class ImportGroups extends AbstractTask
             }
         }
 
+        $place = 0;
+
         // Add new groups / re-enable existing
         foreach ($groupCodenames as $groupCodename) {
             $group = $this->groupRepo->findByCodename($groupCodename);
@@ -107,6 +109,9 @@ class ImportGroups extends AbstractTask
                     ':group' => $group->getCodename(),
                 ]);
             }
+
+            // Update order
+            $group->setPlace($place++);
 
             $this->importGroup($group);
         }

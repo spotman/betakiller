@@ -93,6 +93,7 @@ class NotificationGroupRepository extends AbstractOrmBasedDispatchableRepository
         return $this
             ->filterGroupIsEnabled($orm, true)
             ->filterRoles($orm, $user->getAccessControlRoles())
+            ->orderByPlace($orm)
             ->findAll($orm);
     }
 
@@ -208,6 +209,13 @@ class NotificationGroupRepository extends AbstractOrmBasedDispatchableRepository
     private function orderByName(ExtendedOrmInterface $orm): self
     {
         $orm->order_by($orm->object_column(NotificationGroup::COL_CODENAME), 'asc');
+
+        return $this;
+    }
+
+    private function orderByPlace(ExtendedOrmInterface $orm): self
+    {
+        $orm->order_by($orm->object_column(NotificationGroup::COL_PLACE), 'asc');
 
         return $this;
     }
