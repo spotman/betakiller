@@ -50,12 +50,12 @@ class MessageSerializer
             self::KEY_ATTACHMENTS => $message->getAttachments(),
         ];
 
-        return json_encode($data, JSON_OBJECT_AS_ARRAY);
+        return json_encode($data);
     }
 
     public function unserialize(string $packed): MessageInterface
     {
-        $data = json_decode($packed, true);
+        $data = json_decode($packed, false);
 
         $message = new Message($data[self::KEY_NAME]);
 
