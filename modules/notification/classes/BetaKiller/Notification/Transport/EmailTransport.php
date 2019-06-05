@@ -54,6 +54,9 @@ class EmailTransport extends AbstractTransport
             throw new \InvalidArgumentException('Missing email subject');
         }
 
+        // Fake delay to prevent blackout of SMTP relay
+        sleep(2);
+
         // Email notification
         return (bool)\Email::send($from, $to, $subj, $body, true, $attachments);
     }
