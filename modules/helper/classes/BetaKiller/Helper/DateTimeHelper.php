@@ -3,17 +3,32 @@ declare(strict_types=1);
 
 namespace BetaKiller\Helper;
 
+use BetaKiller\Model\UserInterface;
+use DateTimeImmutable;
+use DateTimeZone;
+use IntlDateFormatter;
+
 class DateTimeHelper
 {
-    public static function getUtcTimezone(): \DateTimeZone
+    public static function getUtcTimezone(): DateTimeZone
     {
-        return new \DateTimeZone('UTC');
+        return new DateTimeZone('UTC');
     }
 
-    public static function getDateTimeFromTimestamp(int $timestamp): \DateTimeImmutable
+    public static function getDateTimeFromTimestamp(int $timestamp): DateTimeImmutable
     {
-        $dt = new \DateTimeImmutable;
+        return (new DateTimeImmutable)->setTimezone(self::getUtcTimezone())->setTimestamp($timestamp);
+    }
 
-        return $dt->setTimezone(self::getUtcTimezone())->setTimestamp($timestamp);
+    public static function formatDateTime(DateTimeImmutable $time, UserInterface $user): string
+    {
+        $fmt = new IntlDateFormatter(
+            $user->getLanguage()->getLocale(),
+            IntlDateFormatter::SHORT,
+            IntlDateFormatter::SHORT,
+            self::getUtcTimezone()
+        );
+
+        return $fmt->format($time);
     }
 }
