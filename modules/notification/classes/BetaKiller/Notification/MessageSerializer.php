@@ -60,8 +60,8 @@ class MessageSerializer
         $message = new Message($data->{self::KEY_NAME});
 
         $message
-            ->setTarget($this->unserializeTarget($data->{self::KEY_TARGET}))
-            ->setTemplateData($data->{self::KEY_DATA});
+            ->setTarget($this->unserializeTarget((array)$data->{self::KEY_TARGET}))
+            ->setTemplateData((array)$data->{self::KEY_DATA});
 
         if ($data->{self::KEY_FROM}) {
             $message->setFrom($data->{self::KEY_FROM});
@@ -102,17 +102,17 @@ class MessageSerializer
 
     private function unserializeTarget(array $data): TargetInterface
     {
-        $type = $data->{self::KEY_TARGET_TYPE};
+        $type = $data[self::KEY_TARGET_TYPE];
 
         switch ($type) {
             case self::TARGET_TYPE_USER:
-                return $this->userRepo->getById($data->{self::KEY_USER_ID});
+                return $this->userRepo->getById($data[self::KEY_USER_ID]);
 
             case self::TARGET_TYPE_EMAIL:
                 return new TargetEmail(
-                    $data->{self::KEY_EMAIL_ADDRESS},
-                    $data->{self::KEY_EMAIL_NAME},
-                    $data->{self::KEY_EMAIL_LANG}
+                    $data[self::KEY_EMAIL_ADDRESS],
+                    $data[self::KEY_EMAIL_NAME],
+                    $data[self::KEY_EMAIL_LANG]
                 );
 
             default:
