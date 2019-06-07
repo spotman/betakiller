@@ -31,4 +31,28 @@ class DateTimeHelper
 
         return $fmt->format($time);
     }
+
+    public static function formatDate(DateTimeImmutable $time, UserInterface $user): string
+    {
+        $fmt = new IntlDateFormatter(
+            $user->getLanguage()->getLocale(),
+            IntlDateFormatter::SHORT,
+            IntlDateFormatter::NONE,
+            self::getUtcTimezone()
+        );
+
+        return $fmt->format($time);
+    }
+
+    public static function formatTime(DateTimeImmutable $time, UserInterface $user): string
+    {
+        $fmt = new IntlDateFormatter(
+            $user->getLanguage()->getLocale(),
+            IntlDateFormatter::NONE,
+            IntlDateFormatter::SHORT,
+            self::getUtcTimezone()
+        );
+
+        return $fmt->format($time);
+    }
 }
