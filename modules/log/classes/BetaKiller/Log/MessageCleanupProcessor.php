@@ -13,6 +13,7 @@ class MessageCleanupProcessor
 {
     private const KEYS = [
         'MySQL server has gone away',
+        'Server shutdown in progress',
     ];
 
     /**

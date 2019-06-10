@@ -69,6 +69,7 @@ class Logger implements LoggerInterface
 
         // Common processors next
         $monolog
+            ->pushProcessor(new MessageCleanupProcessor)
             ->pushProcessor(new KohanaPlaceholderProcessor())
             ->pushProcessor(new MemoryPeakUsageProcessor())
             ->pushProcessor(new IntrospectionProcessor($monolog::WARNING));
@@ -134,9 +135,6 @@ class Logger implements LoggerInterface
 //                30 // Repeat notification in 30 seconds
             ));
         }
-
-        // Cleanup and deduplicate messages
-        $monolog->pushProcessor(new MessageCleanupProcessor);
 
         return $monolog;
     }
