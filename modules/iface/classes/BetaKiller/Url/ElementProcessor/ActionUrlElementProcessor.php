@@ -78,7 +78,7 @@ class ActionUrlElementProcessor implements UrlElementProcessorInterface
             if ($action instanceof PostRequestActionInterface) {
                 // Fetch POST definition
                 $postDefinition = $this->definitionBuilderFactory();
-                $action->defineGetArguments($postDefinition);
+                $action->definePostArguments($postDefinition);
 
                 // Prepare arguments` data
                 $postData      = ServerRequestHelper::getPost($request);

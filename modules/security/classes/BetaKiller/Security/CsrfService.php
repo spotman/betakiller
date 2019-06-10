@@ -58,7 +58,7 @@ class CsrfService implements ArgumentsDefinitionProviderInterface
         }
 
         // Store token in session
-        $session->set($token, true);
+        $session->set($key, true);
 
         return $token;
     }
