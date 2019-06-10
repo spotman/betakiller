@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace BetaKiller\Action\Auth;
 
 use BetaKiller\Action\AbstractAction;
+use BetaKiller\Action\GetRequestActionInterface;
 use BetaKiller\Exception\BadRequestHttpException;
 use BetaKiller\Helper\ActionRequestHelper;
 use BetaKiller\Helper\NotificationHelper;
@@ -20,7 +21,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Spotman\Defence\DefinitionBuilderInterface;
 
-class ClaimRegistrationAction extends AbstractAction
+class ClaimRegistrationAction extends AbstractAction implements GetRequestActionInterface
 {
     public const NOTIFICATION = 'support/claim-registration';
 
@@ -74,21 +75,9 @@ class ClaimRegistrationAction extends AbstractAction
         $this->statusRepo = $statusRepo;
     }
 
-    /**
-     * @return \Spotman\Defence\DefinitionBuilderInterface
-     */
-    public function getArgumentsDefinition(): DefinitionBuilderInterface
+    public function defineGetArguments(DefinitionBuilderInterface $builder): void
     {
-        return $this->definition()
-            ->string(self::ARG_HASH);
-    }
-
-    /**
-     * @return \Spotman\Defence\DefinitionBuilderInterface
-     */
-    public function postArgumentsDefinition(): DefinitionBuilderInterface
-    {
-        return $this->definition();
+        $builder->string(self::ARG_HASH);
     }
 
     /**

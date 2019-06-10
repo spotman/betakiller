@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace BetaKiller\Action\Auth;
 
 use BetaKiller\Action\AbstractAction;
+use BetaKiller\Action\PostRequestActionInterface;
 use BetaKiller\Auth\IncorrectCredentialsException;
 use BetaKiller\Exception\BadRequestHttpException;
 use BetaKiller\Helper\ActionRequestHelper;
@@ -22,7 +23,7 @@ use Spotman\Defence\DefinitionBuilderInterface;
  *
  * @package BetaKiller\Auth
  */
-class RegularLoginAction extends AbstractAction
+class RegularLoginAction extends AbstractAction implements PostRequestActionInterface
 {
     public const  URL          = LoginIFace::URL.'regular';
     private const ARG_LOGIN    = 'user-login';
@@ -51,19 +52,11 @@ class RegularLoginAction extends AbstractAction
     }
 
     /**
-     * @return \Spotman\Defence\DefinitionBuilderInterface
+     * @param \Spotman\Defence\DefinitionBuilderInterface $builder
      */
-    public function getArgumentsDefinition(): DefinitionBuilderInterface
+    public function definePostArguments(DefinitionBuilderInterface $builder): void
     {
-        return $this->definition();
-    }
-
-    /**
-     * @return \Spotman\Defence\DefinitionBuilderInterface
-     */
-    public function postArgumentsDefinition(): DefinitionBuilderInterface
-    {
-        return $this->definition()
+        $builder
             ->string(self::ARG_LOGIN)
             ->string(self::ARG_PASSWORD);
     }

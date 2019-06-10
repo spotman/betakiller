@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace BetaKiller\Action\Admin\I18n;
 
 use BetaKiller\Action\AbstractAction;
+use BetaKiller\Action\PostRequestActionInterface;
 use BetaKiller\EntityManager;
 use BetaKiller\Exception\BadRequestHttpException;
 use BetaKiller\Helper\ActionRequestHelper;
@@ -17,10 +18,9 @@ use BetaKiller\Repository\LanguageRepositoryInterface;
 use BetaKiller\Url\ZoneInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Spotman\Defence\ArgumentsInterface;
 use Spotman\Defence\DefinitionBuilderInterface;
 
-class AbstractUpdateItemAction extends AbstractAction
+class AbstractUpdateItemAction extends AbstractAction implements PostRequestActionInterface
 {
     private const ARG_I18N_VALUES      = 'values';
     private const ARG_LANG_NAME        = 'name';
@@ -74,20 +74,9 @@ class AbstractUpdateItemAction extends AbstractAction
         $this->pluralFactory = $pluralFactory;
     }
 
-    /**
-     * @return \Spotman\Defence\DefinitionBuilderInterface
-     */
-    public function getArgumentsDefinition(): DefinitionBuilderInterface
+    public function definePostArguments(DefinitionBuilderInterface $builder): void
     {
-        return $this->definition();
-    }
-
-    /**
-     * @return \Spotman\Defence\DefinitionBuilderInterface
-     */
-    public function postArgumentsDefinition(): DefinitionBuilderInterface
-    {
-        return $this->definition()
+        $builder
             ->compositeArray(self::ARG_I18N_VALUES)
             ->string(self::ARG_LANG_NAME)->lowercase()
             ->string(self::ARG_TRANSLATED_VALUE);

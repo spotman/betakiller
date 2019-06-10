@@ -27,22 +27,6 @@ class LogoutAction extends AbstractAction
     }
 
     /**
-     * @return \Spotman\Defence\DefinitionBuilderInterface
-     */
-    public function getArgumentsDefinition(): DefinitionBuilderInterface
-    {
-        return $this->definition();
-    }
-
-    /**
-     * @return \Spotman\Defence\DefinitionBuilderInterface
-     */
-    public function postArgumentsDefinition(): DefinitionBuilderInterface
-    {
-        return $this->definition();
-    }
-
-    /**
      * @param \Psr\Http\Message\ServerRequestInterface $request
      *
      * @return \Psr\Http\Message\ResponseInterface

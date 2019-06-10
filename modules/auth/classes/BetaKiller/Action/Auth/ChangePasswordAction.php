@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace BetaKiller\Action\Auth;
 
 use BetaKiller\Action\AbstractAction;
+use BetaKiller\Action\PostRequestActionInterface;
 use BetaKiller\Helper\ActionRequestHelper;
 use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Helper\ServerRequestHelper;
@@ -14,7 +15,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Spotman\Defence\DefinitionBuilderInterface;
 
-class ChangePasswordAction extends AbstractAction
+class ChangePasswordAction extends AbstractAction implements PostRequestActionInterface
 {
     private const ARG_PASS = 'password';
 
@@ -34,23 +35,13 @@ class ChangePasswordAction extends AbstractAction
     }
 
     /**
-     * Arguments definition for request` GET data
-     *
-     * @return \Spotman\Defence\DefinitionBuilderInterface
-     */
-    public function getArgumentsDefinition(): DefinitionBuilderInterface
-    {
-        return $this->definition();
-    }
-
-    /**
      * Arguments definition for request` POST data
      *
-     * @return \Spotman\Defence\DefinitionBuilderInterface
+     * @param \Spotman\Defence\DefinitionBuilderInterface $builder
      */
-    public function postArgumentsDefinition(): DefinitionBuilderInterface
+    public function definePostArguments(DefinitionBuilderInterface $builder): void
     {
-        return $this->definition()
+        $builder
             ->string(self::ARG_PASS)
             ->lengthBetween(AuthService::PASSWORD_MIN_LENGTH, AuthService::PASSWORD_MAX_LENGTH);
     }

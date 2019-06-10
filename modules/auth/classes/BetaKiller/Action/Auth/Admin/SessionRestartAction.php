@@ -31,26 +31,6 @@ class SessionRestartAction extends AbstractAction
     }
 
     /**
-     * Arguments definition for request` GET data
-     *
-     * @return \Spotman\Defence\DefinitionBuilderInterface
-     */
-    public function getArgumentsDefinition(): DefinitionBuilderInterface
-    {
-        return $this->definition();
-    }
-
-    /**
-     * Arguments definition for request` POST data
-     *
-     * @return \Spotman\Defence\DefinitionBuilderInterface
-     */
-    public function postArgumentsDefinition(): DefinitionBuilderInterface
-    {
-        return $this->definition();
-    }
-
-    /**
      * Handles a request and produces a response.
      *
      * May call other collaborating code to generate the response.

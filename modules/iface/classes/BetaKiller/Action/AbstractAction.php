@@ -16,12 +16,4 @@ abstract class AbstractAction extends AbstractUrlElement implements ActionInterf
     {
         return self::SUFFIX;
     }
-
-    /**
-     * @return \Spotman\Defence\DefinitionBuilderInterface
-     */
-    protected function definition(): DefinitionBuilderInterface
-    {
-        return new DefinitionBuilder;
-    }
 }

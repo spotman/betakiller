@@ -8,8 +8,6 @@ use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Helper\ServerRequestHelper;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Spotman\Defence\ArgumentsInterface;
-use Spotman\Defence\DefinitionBuilderInterface;
 
 class WysiwygPreviewAction extends AbstractAction
 {
@@ -26,22 +24,6 @@ class WysiwygPreviewAction extends AbstractAction
     public function __construct(ShortcodeFacade $shortcodeFacade)
     {
         $this->shortcodeFacade = $shortcodeFacade;
-    }
-
-    /**
-     * @return \Spotman\Defence\DefinitionBuilderInterface
-     */
-    public function getArgumentsDefinition(): DefinitionBuilderInterface
-    {
-        return $this->definition();
-    }
-
-    /**
-     * @return \Spotman\Defence\DefinitionBuilderInterface
-     */
-    public function postArgumentsDefinition(): DefinitionBuilderInterface
-    {
-        return $this->definition();
     }
 
     /**

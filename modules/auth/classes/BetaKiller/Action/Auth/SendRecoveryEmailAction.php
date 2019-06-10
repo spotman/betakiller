@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace BetaKiller\Action\Auth;
 
 use BetaKiller\Action\AbstractAction;
+use BetaKiller\Action\PostRequestActionInterface;
 use BetaKiller\Helper\ActionRequestHelper;
 use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Helper\ServerRequestHelper;
@@ -14,7 +15,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Spotman\Defence\DefinitionBuilderInterface;
 
-class SendRecoveryEmailAction extends AbstractAction
+class SendRecoveryEmailAction extends AbstractAction implements PostRequestActionInterface
 {
     private const ARG_EMAIL = 'email';
 
@@ -40,20 +41,9 @@ class SendRecoveryEmailAction extends AbstractAction
         $this->recovery = $recovery;
     }
 
-    /**
-     * @return \Spotman\Defence\DefinitionBuilderInterface
-     */
-    public function getArgumentsDefinition(): DefinitionBuilderInterface
+    public function definePostArguments(DefinitionBuilderInterface $builder): void
     {
-        return $this->definition();
-    }
-
-    /**
-     * @return \Spotman\Defence\DefinitionBuilderInterface
-     */
-    public function postArgumentsDefinition(): DefinitionBuilderInterface
-    {
-        return $this->definition()
+        $builder
             ->email(self::ARG_EMAIL);
     }
 

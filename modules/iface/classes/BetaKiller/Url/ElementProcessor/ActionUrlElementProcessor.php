@@ -1,15 +1,20 @@
 <?php
 namespace BetaKiller\Url\ElementProcessor;
 
+use BetaKiller\Action\GetRequestActionInterface;
+use BetaKiller\Action\PostRequestActionInterface;
 use BetaKiller\Exception\BadRequestHttpException;
 use BetaKiller\Factory\ActionFactory;
 use BetaKiller\Helper\ActionRequestHelper;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Url\ActionModelInterface;
 use BetaKiller\Url\UrlElementInterface;
+use InvalidArgumentException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Spotman\Defence\ArgumentsFacade;
+use Spotman\Defence\DefinitionBuilder;
+use Spotman\Defence\DefinitionBuilderInterface;
 
 /**
  * Action URL element processor
@@ -50,7 +55,7 @@ class ActionUrlElementProcessor implements UrlElementProcessorInterface
     {
         if (!$model instanceof ActionModelInterface) {
             throw new UrlElementProcessorException('Model must be instance of :must, but :real provided', [
-                ':real' => \get_class($model),
+                ':real' => get_class($model),
                 ':must' => ActionModelInterface::class,
             ]);
         }
@@ -58,23 +63,30 @@ class ActionUrlElementProcessor implements UrlElementProcessorInterface
         $action = $this->factory->createFromUrlElement($model);
 
         try {
-            $getDefinition  = $action->getArgumentsDefinition();
-            $postDefinition = $action->postArgumentsDefinition();
+            if ($action instanceof GetRequestActionInterface) {
+                // Fetch GET definition
+                $getDefinition = $this->definitionBuilderFactory();
+                $action->defineGetArguments($getDefinition);
 
-            if ($getDefinition->hasArguments()) {
+                // Prepare arguments` data
                 $getData      = $request->getQueryParams();
                 $getArguments = $this->argumentsFacade->prepareArguments($getData, $getDefinition);
 
                 $request = $request->withAttribute(ActionRequestHelper::GET_ATTRIBUTE, $getArguments);
             }
 
-            if ($postDefinition->hasArguments()) {
+            if ($action instanceof PostRequestActionInterface) {
+                // Fetch POST definition
+                $postDefinition = $this->definitionBuilderFactory();
+                $action->defineGetArguments($postDefinition);
+
+                // Prepare arguments` data
                 $postData      = ServerRequestHelper::getPost($request);
                 $postArguments = $this->argumentsFacade->prepareArguments($postData, $postDefinition);
 
                 $request = $request->withAttribute(ActionRequestHelper::POST_ATTRIBUTE, $postArguments);
             }
-        } catch (\InvalidArgumentException $e) {
+        } catch (InvalidArgumentException $e) {
             throw new BadRequestHttpException('Arguments validation error for action ":action": :error', [
                 ':error'  => $e->getMessage(),
                 ':action' => get_class($action),
@@ -82,5 +94,10 @@ class ActionUrlElementProcessor implements UrlElementProcessorInterface
         }
 
         return $action->handle($request);
+    }
+
+    private function definitionBuilderFactory(): DefinitionBuilderInterface
+    {
+        return new DefinitionBuilder;
     }
 }
