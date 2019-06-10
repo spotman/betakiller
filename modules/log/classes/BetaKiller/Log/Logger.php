@@ -135,6 +135,9 @@ class Logger implements LoggerInterface
             ));
         }
 
+        // Cleanup and deduplicate messages
+        $monolog->pushProcessor(new MessageCleanupProcessor);
+
         return $monolog;
     }
 
