@@ -3,17 +3,15 @@ declare(strict_types=1);
 
 namespace BetaKiller\Notification;
 
-use BetaKiller\Exception;
 use BetaKiller\Helper\LoggerHelperTrait;
-use Enqueue\Dbal\DbalMessage;
-use Enqueue\Redis\RedisMessage;
+use Enqueue\Consumption\QueueSubscriberInterface;
 use Interop\Queue\Context;
 use Interop\Queue\Message;
 use Interop\Queue\Processor;
 use Psr\Log\LoggerInterface;
 use Throwable;
 
-class QueueProcessor implements Processor
+class QueueProcessor implements Processor, QueueSubscriberInterface
 {
     use LoggerHelperTrait;
 
@@ -63,12 +61,6 @@ class QueueProcessor implements Processor
      */
     public function process(Message $queueMessage, Context $context)
     {
-        if (!$queueMessage instanceof RedisMessage) {
-            throw new Exception('Queue message must implement :must', [
-                ':must' => DbalMessage::class,
-            ]);
-        }
-
         try {
             // Unserialize message
             $message = $this->serializer->unserialize($queueMessage->getBody());
@@ -78,11 +70,21 @@ class QueueProcessor implements Processor
         } catch (Throwable $e) {
             $this->logException($this->logger, $e);
 
-//            $queueMessage->setRedeliverAfter(3600);
-//            return self::REQUEUE;
-
             // Temp fix for failing tasks
             return self::REJECT;
         }
+    }
+
+    /**
+     * The result must contain a set of queue names a you expect them to see in the broker
+     * or the name you use to get the queue object from the context.
+     *
+     * @return string[]
+     */
+    public static function getSubscribedQueues(): array
+    {
+        return [
+            NotificationFacade::QUEUE_NAME,
+        ];
     }
 }

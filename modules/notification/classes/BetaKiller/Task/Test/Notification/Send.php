@@ -65,11 +65,10 @@ class Send extends AbstractTask
             ? $this->userRepo->searchBy($userName)
             : PhpExceptionStorageHandler::getNotificationTarget($this->notification);
 
+        $this->notification->directMessage(self::NOTIFICATION_TEST, $target, []);
 
-        $this->logger->debug('Sending message to ":email"', [
+        $this->logger->debug('Message sent to ":email"', [
             ':email' => $target->getEmail(),
         ]);
-
-        $this->notification->directMessage(self::NOTIFICATION_TEST, $target, []);
     }
 }

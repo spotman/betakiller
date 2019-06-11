@@ -69,6 +69,16 @@ class NotificationFacade
     private $queueContext;
 
     /**
+     * @var \Interop\Queue\Producer
+     */
+    private $queueProducer;
+
+    /**
+     * @var \Interop\Queue\Queue
+     */
+    private $queue;
+
+    /**
      * @var \BetaKiller\Notification\MessageSerializer
      */
     private $serializer;
@@ -119,6 +129,9 @@ class NotificationFacade
         $this->freqRepo       = $freqRepo;
         $this->logRepo        = $logRepo;
         $this->logger         = $logger;
+
+        $this->queueProducer = $this->queueContext->createProducer()->setTimeToLive(10000);
+        $this->queue         = $this->queueContext->createQueue(self::QUEUE_NAME);
     }
 
     /**
@@ -169,7 +182,6 @@ class NotificationFacade
 
         $body = $this->serializer->serialize($message);
 
-        $queue        = $this->queueContext->createQueue(self::QUEUE_NAME);
         $queueMessage = $this->queueContext->createMessage($body);
 
         if (!$queueMessage instanceof RedisMessage) {
@@ -183,21 +195,23 @@ class NotificationFacade
             // Get linked group
             $group = $this->getMessageGroup($message);
 
-            // Get user config
-            $config = $this->getGroupUserConfig($group, $target);
+            if ($group->isFrequencyControlEnabled()) {
+                // Get user config
+                $config = $this->getGroupUserConfig($group, $target);
 
-            // Set delivery time
-            if ($config->hasFrequencyDefined()) {
-                $schedule = $config->getFrequency()->calculateSchedule();
+                // Set delivery time
+                if ($config->hasFrequencyDefined()) {
+                    $schedule = $config->getFrequency()->calculateSchedule();
 
-                $delay = $schedule->getTimestamp() - time();
+                    $delay = $schedule->getTimestamp() - time();
 
-                $queueMessage->setDeliveryDelay($delay * 1000);
+                    $queueMessage->setDeliveryDelay($delay * 1000);
+                }
             }
         }
 
         // Enqueue
-        $this->queueContext->createProducer()->send($queue, $queueMessage);
+        $this->queueProducer->send($this->queue, $queueMessage);
     }
 
     /**

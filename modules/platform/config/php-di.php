@@ -11,6 +11,7 @@ use BetaKiller\Session\SessionStorageInterface;
 use BetaKiller\Url\Container\UrlContainerInterface;
 use BetaKiller\Url\UrlElementStack;
 use Enqueue\Redis\RedisConnectionFactory;
+use Enqueue\Wamp\WampConnectionFactory;
 use GuzzleHttp\Client;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
@@ -162,9 +163,12 @@ return [
 
         Context::class => DI\factory(static function () {
             $factory = new RedisConnectionFactory([
-                'host' => getenv('REDIS_HOST'),
-                'port' => getenv('REDIS_PORT'),
-                'lazy' => true,
+                'scheme_extensions' => ['phpredis',],
+
+                'host'  => getenv('REDIS_HOST'),
+                'port'  => getenv('REDIS_PORT'),
+                'lazy'  => true,
+                'async' => true,
             ]);
 
             return $factory->createContext();
