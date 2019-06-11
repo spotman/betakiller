@@ -69,7 +69,6 @@ class Logger implements LoggerInterface
 
         // Common processors next
         $monolog
-            ->pushProcessor(new MessageCleanupProcessor)
             ->pushProcessor(new KohanaPlaceholderProcessor())
             ->pushProcessor(new MemoryPeakUsageProcessor())
             ->pushProcessor(new IntrospectionProcessor($monolog::WARNING));

@@ -4,16 +4,21 @@ declare(strict_types=1);
 namespace BetaKiller\Task\Test;
 
 use BetaKiller\Exception\ServerErrorHttpException;
+use BetaKiller\Task\AbstractTask;
 
-class ThrowException extends \BetaKiller\Task\AbstractTask
+class ThrowException extends AbstractTask
 {
     public function defineOptions(): array
     {
-        return [];
+        return [
+            'message' => null,
+        ];
     }
 
     public function run(): void
     {
-        throw new ServerErrorHttpException('Test CLI exceptions handling');
+        $message = $this->getOption('message', false);
+
+        throw new ServerErrorHttpException( $message ?: 'Test CLI exceptions handling');
     }
 }
