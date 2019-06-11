@@ -39,11 +39,6 @@ class Kohana_Core
     public static $environment = Kohana::DEVELOPMENT;
 
     /**
-     * @var  boolean  TRUE if PHP safe mode is on
-     */
-    public static $safe_mode = false;
-
-    /**
      * @var  string
      */
     public static $content_type = 'text/html';
@@ -205,15 +200,12 @@ class Kohana_Core
         /**
          * Enable xdebug parameter collection in development mode to improve fatal stack traces.
          */
-        if (Kohana::$environment == Kohana::DEVELOPMENT AND extension_loaded('xdebug')) {
+        if (Kohana::$environment === Kohana::DEVELOPMENT && extension_loaded('xdebug')) {
             ini_set('xdebug.collect_params', 3);
         }
 
         // Enable the Kohana shutdown handler, which catches E_FATAL errors.
 //		register_shutdown_function(array('Kohana', 'shutdown_handler'));
-
-        // Determine if we are running in safe mode
-        Kohana::$safe_mode = (bool)ini_get('safe_mode');
 
         if (isset($settings['cache_dir'])) {
             if (!is_dir($settings['cache_dir'])) {
@@ -223,7 +215,7 @@ class Kohana_Core
 
                     // Set permissions (must be manually set to fix umask issues)
                     chmod($settings['cache_dir'], 0755);
-                } catch (Exception $e) {
+                } catch (Throwable $e) {
                     throw new Kohana_Exception('Could not create cache directory :dir',
                         [':dir' => Debug::path($settings['cache_dir'])]);
                 }
@@ -696,14 +688,14 @@ class Kohana_Core
                     // Return the cache
                     try {
                         return unserialize(file_get_contents($dir.$file));
-                    } catch (Exception $e) {
+                    } catch (Throwable $e) {
                         // Cache is corrupt, let return happen normally.
                     }
                 } else {
                     try {
                         // Cache has expired
                         @unlink($dir.$file);
-                    } catch (Exception $e) {
+                    } catch (Throwable $e) {
                         // Cache has mostly likely already been deleted,
                         // let return happen normally.
                     }
@@ -728,7 +720,7 @@ class Kohana_Core
         try {
             // Write the cache
             return (bool)file_put_contents($dir.$file, $data, LOCK_EX);
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             // Failed to write cache
             return false;
         }
