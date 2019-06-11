@@ -10,7 +10,7 @@ use BetaKiller\Session\DatabaseSessionStorage;
 use BetaKiller\Session\SessionStorageInterface;
 use BetaKiller\Url\Container\UrlContainerInterface;
 use BetaKiller\Url\UrlElementStack;
-use Enqueue\Dbal\DbalConnectionFactory;
+use Enqueue\Redis\RedisConnectionFactory;
 use GuzzleHttp\Client;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
@@ -72,7 +72,7 @@ return [
                 static function () {
                     return ServerRequestFactory::fromGlobals();
                 },
-                static function (\Throwable $e) use ($logger) {
+                static function (Throwable $e) use ($logger) {
                     // Log exception to developers
                     $logger->alert(Exception::oneLiner($e), [
                         Logger::CONTEXT_KEY_EXCEPTION => $e,
@@ -161,20 +161,11 @@ return [
         ClientInterface::class => get(HttpClient::class),
 
         Context::class => DI\factory(static function () {
-            $dsn = [
-                'mysql://',
-                getenv('MYSQL_USER'),
-                ':',
-                getenv('MYSQL_PASS'),
-                '@',
-                getenv('MYSQL_HOST'),
-                ':',
-                getenv('MYSQL_PORT'),
-                '/',
-                getenv('MYSQL_DB'),
-            ];
-
-            $factory = new DbalConnectionFactory(implode('', $dsn));
+            $factory = new RedisConnectionFactory([
+                'host' => getenv('REDIS_HOST'),
+                'port' => getenv('REDIS_PORT'),
+                'lazy' => true,
+            ]);
 
             return $factory->createContext();
         }),

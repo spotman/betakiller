@@ -17,7 +17,7 @@ use BetaKiller\Repository\NotificationGroupRepository;
 use BetaKiller\Repository\NotificationGroupUserConfigRepositoryInterface;
 use BetaKiller\Repository\NotificationLogRepositoryInterface;
 use DateTimeImmutable;
-use Enqueue\Dbal\DbalMessage;
+use Enqueue\Redis\RedisMessage;
 use Interop\Queue\Context;
 use Psr\Log\LoggerInterface;
 use Throwable;
@@ -172,7 +172,7 @@ class NotificationFacade
         $queue        = $this->queueContext->createQueue(self::QUEUE_NAME);
         $queueMessage = $this->queueContext->createMessage($body);
 
-        if (!$queueMessage instanceof DbalMessage) {
+        if (!$queueMessage instanceof RedisMessage) {
             throw new NotificationException('Wrong queue message type ":class"', [
                 ':class' => get_class($queueMessage),
             ]);

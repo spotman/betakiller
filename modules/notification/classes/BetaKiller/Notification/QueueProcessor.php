@@ -6,6 +6,7 @@ namespace BetaKiller\Notification;
 use BetaKiller\Exception;
 use BetaKiller\Helper\LoggerHelperTrait;
 use Enqueue\Dbal\DbalMessage;
+use Enqueue\Redis\RedisMessage;
 use Interop\Queue\Context;
 use Interop\Queue\Message;
 use Interop\Queue\Processor;
@@ -62,7 +63,7 @@ class QueueProcessor implements Processor
      */
     public function process(Message $queueMessage, Context $context)
     {
-        if (!$queueMessage instanceof DbalMessage) {
+        if (!$queueMessage instanceof RedisMessage) {
             throw new Exception('Queue message must implement :must', [
                 ':must' => DbalMessage::class,
             ]);
