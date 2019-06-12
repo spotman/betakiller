@@ -8,6 +8,11 @@ use BetaKiller\Exception\FoundHttpException;
 use BetaKiller\Exception\NotFoundHttpException;
 use BetaKiller\Factory\UrlElementProcessorFactory;
 use BetaKiller\Helper\ServerRequestHelper;
+use BetaKiller\Url\AfterDispatchingInterface;
+use BetaKiller\Url\AfterProcessingInterface;
+use BetaKiller\Url\BeforeProcessingInterface;
+use BetaKiller\Url\UrlElementInstanceInterface;
+use BetaKiller\Url\UrlElementInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -58,12 +63,39 @@ class UrlElementRenderMiddleware implements MiddlewareInterface
             throw new FoundHttpException('/');
         }
 
+        // Process afterDispatching() hooks on every UrlElement in stack
+        foreach ($stack->getIterator() as $item) {
+            $instance = $this->makeInstance($item);
+
+            if ($instance && $instance instanceof AfterDispatchingInterface) {
+                $instance->afterDispatching($request);
+            }
+        }
+
         $urlProcessor = $this->processorFactory->createFromUrlElement($urlElement);
+        $instance     = $this->makeInstance($urlElement);
+
+        // Starting hook
+        if ($instance && $instance instanceof BeforeProcessingInterface) {
+            $instance->beforeProcessing($request);
+        }
 
         $response = $urlProcessor->process($urlElement, $request);
+
+        // Final hook
+        if ($instance && $instance instanceof AfterProcessingInterface) {
+            $instance->beforeProcessing($request);
+        }
 
         Profiler::end($pid);
 
         return $response;
+    }
+
+    private function makeInstance(UrlElementInterface $model): ?UrlElementInstanceInterface
+    {
+        return $this->processorFactory
+            ->createFromUrlElement($model)
+            ->createInstance($model);
     }
 }

@@ -1,6 +1,8 @@
 <?php
 namespace BetaKiller\Url\ElementProcessor;
 
+use BetaKiller\Url\AbstractUrlElementInstance;
+use BetaKiller\Url\UrlElementInstanceInterface;
 use BetaKiller\Url\UrlElementInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -22,4 +24,13 @@ interface UrlElementProcessorInterface
         UrlElementInterface $model,
         ServerRequestInterface $request
     ): ResponseInterface;
+
+    /**
+     * Create UrlElement instance for provided model
+     *
+     * @param \BetaKiller\Url\UrlElementInterface $model
+     *
+     * @return \BetaKiller\Url\UrlElementInstanceInterface
+     */
+    public function createInstance(UrlElementInterface $model): ?UrlElementInstanceInterface;
 }

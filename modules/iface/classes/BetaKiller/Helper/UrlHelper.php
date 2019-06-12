@@ -98,6 +98,14 @@ class UrlHelper
         return $this->stack->has($model, $params);
     }
 
+    /**
+     * @return \BetaKiller\Url\UrlElementInterface
+     */
+    public function getCurrentElement(): UrlElementInterface
+    {
+        return $this->stack->getCurrent();
+    }
+
     public function createUrlContainer(): UrlContainerInterface
     {
         return ResolvingUrlContainer::create();

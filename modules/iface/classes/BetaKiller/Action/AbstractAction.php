@@ -3,11 +3,11 @@ declare(strict_types=1);
 
 namespace BetaKiller\Action;
 
-use BetaKiller\Url\AbstractUrlElement;
+use BetaKiller\Url\AbstractUrlElementInstance;
 use Spotman\Defence\DefinitionBuilder;
 use Spotman\Defence\DefinitionBuilderInterface;
 
-abstract class AbstractAction extends AbstractUrlElement implements ActionInterface
+abstract class AbstractAction extends AbstractUrlElementInstance implements ActionInterface
 {
     /**
      * @return string

@@ -34,7 +34,6 @@ abstract class AbstractEntityUpdateApiMethod extends AbstractEntityBasedApiMetho
      *
      * @param                                 $model
      * @param \Spotman\Defence\ArgumentsInterface $arguments
-     *
      * @param \BetaKiller\Model\UserInterface $user
      *
      * @return \BetaKiller\Model\AbstractEntityInterface|null

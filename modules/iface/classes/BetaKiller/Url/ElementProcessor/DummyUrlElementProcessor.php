@@ -6,6 +6,7 @@ use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\IFace\Exception\UrlElementException;
 use BetaKiller\Url\DummyModelInterface;
 use BetaKiller\Url\IFaceModelInterface;
+use BetaKiller\Url\UrlElementInstanceInterface;
 use BetaKiller\Url\UrlElementInterface;
 use BetaKiller\Url\UrlElementTreeInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -29,6 +30,19 @@ class DummyUrlElementProcessor implements UrlElementProcessorInterface
     public function __construct(UrlElementTreeInterface $tree)
     {
         $this->tree = $tree;
+    }
+
+    /**
+     * Create UrlElement instance for provided model
+     *
+     * @param \BetaKiller\Url\UrlElementInterface $model
+     *
+     * @return \BetaKiller\Url\UrlElementInstanceInterface
+     */
+    public function createInstance(UrlElementInterface $model): ?UrlElementInstanceInterface
+    {
+        // No instance for Dummies
+        return null;
     }
 
     /**

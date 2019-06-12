@@ -4,9 +4,9 @@ declare(strict_types=1);
 namespace BetaKiller\WebHook;
 
 use BetaKiller\Model\WebHookModelInterface;
-use BetaKiller\Url\AbstractUrlElement;
+use BetaKiller\Url\AbstractUrlElementInstance;
 
-abstract class AbstractWebHook extends AbstractUrlElement implements WebHookInterface
+abstract class AbstractWebHook extends AbstractUrlElementInstance implements WebHookInterface
 {
     /**
      * @return string

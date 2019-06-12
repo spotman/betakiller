@@ -7,14 +7,13 @@ use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\IFace\Cache\IFaceCache;
 use BetaKiller\IFace\IFaceInterface;
-use BetaKiller\Url\AfterDispatchingInterface;
-use BetaKiller\Url\AfterProcessingInterface;
-use BetaKiller\Url\BeforeProcessingInterface;
 use BetaKiller\Url\IFaceModelInterface;
+use BetaKiller\Url\UrlElementInstanceInterface;
 use BetaKiller\Url\UrlElementInterface;
 use BetaKiller\View\IFaceView;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Throwable;
 
 /**
  * IFace URL element processor
@@ -58,6 +57,25 @@ class IFaceUrlElementProcessor implements UrlElementProcessorInterface
     }
 
     /**
+     * Create UrlElement instance for provided model
+     *
+     * @param \BetaKiller\Url\UrlElementInterface $model
+     *
+     * @return \BetaKiller\IFace\IFaceInterface
+     */
+    public function createInstance(UrlElementInterface $model): ?UrlElementInstanceInterface
+    {
+        if (!$model instanceof IFaceModelInterface) {
+            throw new UrlElementProcessorException('Model must instance of :must but :real provided', [
+                ':real' => \get_class($model),
+                ':must' => IFaceModelInterface::class,
+            ]);
+        }
+
+        return $this->ifaceFactory->createFromUrlElement($model);
+    }
+
+    /**
      * Execute processing on URL element
      *
      * @param \BetaKiller\Url\UrlElementInterface      $model
@@ -81,28 +99,10 @@ class IFaceUrlElementProcessor implements UrlElementProcessorInterface
         }
 
         $urlContainer = ServerRequestHelper::getUrlContainer($request);
-        $stack        = ServerRequestHelper::getUrlElementStack($request);
         $user         = ServerRequestHelper::getUser($request);
 
-        // Process afterDispatching() hooks on every IFace in stack
-        foreach ($stack->getIterator() as $item) {
-            if ($item instanceof IFaceModelInterface) {
-                // Create IFace instance
-                $iface = $this->ifaceFactory->createFromUrlElement($item);
-
-                if ($iface instanceof AfterDispatchingInterface) {
-                    $iface->afterDispatching($request);
-                }
-            }
-        }
-
         // Create current IFace instance
-        $iface = $this->ifaceFactory->createFromUrlElement($model);
-
-        if ($iface instanceof BeforeProcessingInterface) {
-            // Starting hook
-            $iface->beforeProcessing($request);
-        }
+        $iface = $this->createInstance($model);
 
         // Processing page cache for quests if no URL query parameters (skip caching for authorized users)
         if (!$urlContainer->getQueryPartsKeys() && $user->isGuest()) {
@@ -111,11 +111,6 @@ class IFaceUrlElementProcessor implements UrlElementProcessorInterface
 
         try {
             $output = $this->ifaceView->render($iface, $request);
-
-            if ($iface instanceof AfterProcessingInterface) {
-                // Final hook
-                $iface->afterProcessing($request);
-            }
 
             // TODO Apply to other UrlElement types (Action, WebHook)
             $unusedParts = $urlContainer->getUnusedQueryPartsKeys();
@@ -128,7 +123,7 @@ class IFaceUrlElementProcessor implements UrlElementProcessorInterface
             $response = ResponseHelper::html($output);
             $response = ResponseHelper::setLastModified($response, $iface->getLastModified());
             $response = ResponseHelper::setExpires($response, $iface->getExpiresDateTime());
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             // Prevent response caching
             $this->ifaceCache->disable();
             throw $e;

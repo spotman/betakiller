@@ -1,11 +1,11 @@
 <?php
 namespace BetaKiller\IFace;
 
-use BetaKiller\Url\AbstractUrlElement;
+use BetaKiller\Url\AbstractUrlElementInstance;
 use BetaKiller\Url\IFaceModelInterface;
 use DateInterval;
 
-abstract class AbstractIFace extends AbstractUrlElement implements IFaceInterface
+abstract class AbstractIFace extends AbstractUrlElementInstance implements IFaceInterface
 {
     /**
      * @var IFaceModelInterface

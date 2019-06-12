@@ -2,9 +2,10 @@
 namespace BetaKiller\IFace;
 
 use BetaKiller\Url\IFaceModelInterface;
+use BetaKiller\Url\UrlElementInstanceInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-interface IFaceInterface
+interface IFaceInterface extends UrlElementInstanceInterface
 {
     public const NAMESPACE = 'IFace';
     public const SUFFIX    = 'IFace';
