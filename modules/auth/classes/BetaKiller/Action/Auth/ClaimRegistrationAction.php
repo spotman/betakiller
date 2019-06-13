@@ -95,12 +95,14 @@ class ClaimRegistrationAction extends AbstractAction implements GetRequestAction
 
         $log = $this->logRepo->getByHash($hash);
 
-        $user = $log->getTargetUser();
+        $userId = $log->getTargetUserId();
 
-        if (!$user) {
+        if (!$userId) {
             // Registration claim is always occurred after sending email to user
             throw new BadRequestHttpException('Registration claim workflow hack');
         }
+
+        $user = $this->userRepo->getById($userId);
 
         if (!$user->getStatus()->isClaimed()) {
             // Mark user as "claimed" to prevent future communication

@@ -7,7 +7,9 @@ use BetaKiller\Exception\DomainException;
 use BetaKiller\Notification\TargetEmail;
 use BetaKiller\Notification\TargetInterface;
 use BetaKiller\Notification\TransportInterface;
+use Database;
 use DateTimeImmutable;
+use DB;
 
 class NotificationLog extends \ORM implements NotificationLogInterface
 {
@@ -27,21 +29,49 @@ class NotificationLog extends \ORM implements NotificationLogInterface
     public const STATUS_SUCCEEDED = 'succeeded';
     public const STATUS_FAILED    = 'failed';
 
+    private static $tablesChecked = false;
+
     /**
      * Custom configuration (set table name, configure relations, load_with(), etc)
      */
     protected function configure(): void
     {
+        $this->_db_group   = 'notifications';
         $this->_table_name = 'notification_log';
 
-        $this->belongs_to([
-            'user' => [
-                'model'       => 'User',
-                'foreign_key' => 'user_id',
-            ],
-        ]);
+        $this->createTablesIfNotExists();
+    }
 
-        $this->load_with(['user']);
+    protected function createTablesIfNotExists()
+    {
+        if (!static::$tablesChecked) {
+            $this->enableAutoVacuum();
+            $this->createTableIfNotExists();
+            static::$tablesChecked = true;
+        }
+    }
+
+    protected function createTableIfNotExists()
+    {
+        DB::query(Database::SELECT, 'CREATE TABLE IF NOT EXISTS `notification_log` (
+    id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+    hash VARCHAR(128) NOT NULL,
+    name VARCHAR(64) NOT NULL,
+    user_id INTEGER NULL DEFAULT NULL,
+    target VARCHAR(128) NOT NULL,
+    lang VARCHAR(2) NOT NULL,
+    processed_at DATETIME NOT NULL,
+    status VARCHAR(16) NOT NULL,
+    transport VARCHAR(16) NOT NULL,
+    subject VARCHAR(255) NULL DEFAULT NULL,
+    body TEXT NULL DEFAULT NULL,
+    result TEXT NULL DEFAULT NULL
+)')->execute($this->_db_group);
+    }
+
+    private function enableAutoVacuum()
+    {
+        DB::query(Database::SELECT, 'PRAGMA auto_vacuum = FULL')->execute($this->_db_group);
     }
 
     public function setProcessedAt(DateTimeImmutable $value): NotificationLogInterface
@@ -70,13 +100,13 @@ class NotificationLog extends \ORM implements NotificationLogInterface
     }
 
     /**
-     * Returns linked user if exists
+     * Returns linked user ID if exists
      *
-     * @return \BetaKiller\Model\UserInterface|null
+     * @return string|null
      */
-    public function getTargetUser(): ?UserInterface
+    public function getTargetUserId(): ?string
     {
-        return $this->getRelatedEntity('user', true);
+        return $this->get(self::TABLE_COLUMN_USER_ID);
     }
 
     public function setTransport(TransportInterface $transport): NotificationLogInterface
@@ -196,14 +226,6 @@ class NotificationLog extends \ORM implements NotificationLogInterface
         $this->set(self::TABLE_COLUMN_STATUS, $value);
 
         return $this;
-    }
-
-    public function getUser(): ?UserInterface
-    {
-        /** @var \BetaKiller\Model\User $relation */
-        $relation = $this->get('user');
-
-        return $relation->loaded() ? $relation : null;
     }
 
     /**
