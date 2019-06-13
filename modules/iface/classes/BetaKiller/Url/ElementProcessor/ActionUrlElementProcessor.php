@@ -1,15 +1,13 @@
 <?php
 namespace BetaKiller\Url\ElementProcessor;
 
+use BetaKiller\Action\ActionInterface;
 use BetaKiller\Action\GetRequestActionInterface;
 use BetaKiller\Action\PostRequestActionInterface;
 use BetaKiller\Exception\BadRequestHttpException;
-use BetaKiller\Factory\ActionFactory;
 use BetaKiller\Helper\ActionRequestHelper;
 use BetaKiller\Helper\ServerRequestHelper;
-use BetaKiller\Url\ActionModelInterface;
 use BetaKiller\Url\UrlElementInstanceInterface;
-use BetaKiller\Url\UrlElementInterface;
 use InvalidArgumentException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -23,57 +21,35 @@ use Spotman\Defence\DefinitionBuilderInterface;
 class ActionUrlElementProcessor implements UrlElementProcessorInterface
 {
     /**
-     * @var \BetaKiller\Factory\ActionFactory
-     */
-    private $factory;
-
-    /**
      * @var \Spotman\Defence\ArgumentsFacade
      */
     private $argumentsFacade;
 
     /**
-     * @param \BetaKiller\Factory\ActionFactory $factory
-     * @param \Spotman\Defence\ArgumentsFacade  $argumentsFacade
+     * @param \Spotman\Defence\ArgumentsFacade $argumentsFacade
      */
-    public function __construct(ActionFactory $factory, ArgumentsFacade $argumentsFacade)
+    public function __construct(ArgumentsFacade $argumentsFacade)
     {
-        $this->factory         = $factory;
         $this->argumentsFacade = $argumentsFacade;
-    }
-
-    /**
-     * Create UrlElement instance for provided model
-     *
-     * @param \BetaKiller\Url\UrlElementInterface $model
-     *
-     * @return \BetaKiller\Action\ActionInterface
-     */
-    public function createInstance(UrlElementInterface $model): ?UrlElementInstanceInterface
-    {
-        if (!$model instanceof ActionModelInterface) {
-            throw new UrlElementProcessorException('Model must be instance of :must, but :real provided', [
-                ':real' => get_class($model),
-                ':must' => ActionModelInterface::class,
-            ]);
-        }
-
-        return $this->factory->createFromUrlElement($model);
     }
 
     /**
      * Execute processing on URL element
      *
-     * @param \BetaKiller\Url\UrlElementInterface      $model
-     * @param \Psr\Http\Message\ServerRequestInterface $request
+     * @param \BetaKiller\Url\UrlElementInstanceInterface $action
+     * @param \Psr\Http\Message\ServerRequestInterface    $request
      *
      * @return \Psr\Http\Message\ResponseInterface
-     * @throws \BetaKiller\Factory\FactoryException
-     * @throws \BetaKiller\Url\ElementProcessor\UrlElementProcessorException
+     * @throws \BetaKiller\Exception\BadRequestHttpException
      */
-    public function process(UrlElementInterface $model, ServerRequestInterface $request): ResponseInterface
+    public function process(UrlElementInstanceInterface $action, ServerRequestInterface $request): ResponseInterface
     {
-        $action = $this->createInstance($model);
+        if (!$action instanceof ActionInterface) {
+            throw new UrlElementProcessorException('Instance must be :must, but :real provided', [
+                ':real' => get_class($action),
+                ':must' => ActionInterface::class,
+            ]);
+        }
 
         try {
             if ($action instanceof GetRequestActionInterface) {

@@ -9,12 +9,14 @@ use BetaKiller\Event\MissingUrlEvent;
 use BetaKiller\Event\UrlDispatchedEvent;
 use BetaKiller\Exception\NotFoundHttpException;
 use BetaKiller\Exception\SeeOtherHttpException;
+use BetaKiller\Factory\UrlElementInstanceFactory;
 use BetaKiller\Helper\AclHelper;
 use BetaKiller\Helper\LoggerHelperTrait;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\IFace\Exception\UrlElementException;
 use BetaKiller\MessageBus\EventBusInterface;
 use BetaKiller\Model\UserInterface;
+use BetaKiller\Url\AfterDispatchingInterface;
 use BetaKiller\Url\Behaviour\UrlBehaviourException;
 use BetaKiller\Url\Container\UrlContainerInterface;
 use BetaKiller\Url\MissingUrlElementException;
@@ -57,23 +59,31 @@ class UrlElementDispatchMiddleware implements MiddlewareInterface
     private $logger;
 
     /**
+     * @var \BetaKiller\Factory\UrlElementInstanceFactory
+     */
+    private $instanceFactory;
+
+    /**
      * UrlElementDispatchMiddleware constructor.
      *
-     * @param \BetaKiller\Url\UrlDispatcherInterface   $urlDispatcher
-     * @param \BetaKiller\Helper\AclHelper             $aclHelper
-     * @param \BetaKiller\MessageBus\EventBusInterface $eventBus
-     * @param \Psr\Log\LoggerInterface                 $logger
+     * @param \BetaKiller\Url\UrlDispatcherInterface        $urlDispatcher
+     * @param \BetaKiller\MessageBus\EventBusInterface      $eventBus
+     * @param \BetaKiller\Helper\AclHelper                  $aclHelper
+     * @param \BetaKiller\Factory\UrlElementInstanceFactory $instanceFactory
+     * @param \Psr\Log\LoggerInterface                      $logger
      */
     public function __construct(
         UrlDispatcherInterface $urlDispatcher,
         EventBusInterface $eventBus,
         AclHelper $aclHelper,
+        UrlElementInstanceFactory $instanceFactory,
         LoggerInterface $logger
     ) {
         $this->urlDispatcher = $urlDispatcher;
         $this->aclHelper     = $aclHelper;
         $this->eventBus      = $eventBus;
         $this->logger        = $logger;
+        $this->instanceFactory = $instanceFactory;
     }
 
     /**
@@ -98,6 +108,13 @@ class UrlElementDispatchMiddleware implements MiddlewareInterface
         // Check current user access for all URL elements
         foreach ($stack as $urlElement) {
             $this->checkUrlElementAccess($urlElement, $params, $user);
+
+            $instance = $this->instanceFactory->createFromUrlElement($urlElement);
+
+            // Process afterDispatching() hooks on every UrlElement in stack
+            if ($instance && $instance instanceof AfterDispatchingInterface) {
+                $instance->afterDispatching($request);
+            }
         }
 
         Profiler::end($pid);

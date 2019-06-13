@@ -80,6 +80,11 @@ final class IFaceCache
             return;
         }
 
+        // Skip caching if request method is not GET nor HEAD
+        if (!in_array(mb_strtoupper($request->getMethod()), ['GET', 'HEAD'], true)) {
+            return;
+        }
+
         $expires = $iface->getExpiresSeconds();
 
         // Skip caching if content expired already (admin interfaces and non-cachable pages)

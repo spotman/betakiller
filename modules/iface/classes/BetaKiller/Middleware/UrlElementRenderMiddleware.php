@@ -6,13 +6,11 @@ namespace BetaKiller\Middleware;
 use BetaKiller\Dev\Profiler;
 use BetaKiller\Exception\FoundHttpException;
 use BetaKiller\Exception\NotFoundHttpException;
+use BetaKiller\Factory\UrlElementInstanceFactory;
 use BetaKiller\Factory\UrlElementProcessorFactory;
 use BetaKiller\Helper\ServerRequestHelper;
-use BetaKiller\Url\AfterDispatchingInterface;
 use BetaKiller\Url\AfterProcessingInterface;
 use BetaKiller\Url\BeforeProcessingInterface;
-use BetaKiller\Url\UrlElementInstanceInterface;
-use BetaKiller\Url\UrlElementInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -26,13 +24,22 @@ class UrlElementRenderMiddleware implements MiddlewareInterface
     private $processorFactory;
 
     /**
+     * @var \BetaKiller\Factory\UrlElementInstanceFactory
+     */
+    private $instanceFactory;
+
+    /**
      * UrlElementRenderMiddleware constructor.
      *
      * @param \BetaKiller\Factory\UrlElementProcessorFactory $processorFactory
+     * @param \BetaKiller\Factory\UrlElementInstanceFactory  $instanceFactory
      */
-    public function __construct(UrlElementProcessorFactory $processorFactory)
-    {
+    public function __construct(
+        UrlElementProcessorFactory $processorFactory,
+        UrlElementInstanceFactory $instanceFactory
+    ) {
         $this->processorFactory = $processorFactory;
+        $this->instanceFactory  = $instanceFactory;
     }
 
     /**
@@ -63,24 +70,15 @@ class UrlElementRenderMiddleware implements MiddlewareInterface
             throw new FoundHttpException('/');
         }
 
-        // Process afterDispatching() hooks on every UrlElement in stack
-        foreach ($stack->getIterator() as $item) {
-            $instance = $this->makeInstance($item);
-
-            if ($instance && $instance instanceof AfterDispatchingInterface) {
-                $instance->afterDispatching($request);
-            }
-        }
-
         $urlProcessor = $this->processorFactory->createFromUrlElement($urlElement);
-        $instance     = $this->makeInstance($urlElement);
+        $instance     = $this->instanceFactory->createFromUrlElement($urlElement);
 
         // Starting hook
         if ($instance && $instance instanceof BeforeProcessingInterface) {
             $instance->beforeProcessing($request);
         }
 
-        $response = $urlProcessor->process($urlElement, $request);
+        $response = $urlProcessor->process($instance, $request);
 
         // Final hook
         if ($instance && $instance instanceof AfterProcessingInterface) {
@@ -90,12 +88,5 @@ class UrlElementRenderMiddleware implements MiddlewareInterface
         Profiler::end($pid);
 
         return $response;
-    }
-
-    private function makeInstance(UrlElementInterface $model): ?UrlElementInstanceInterface
-    {
-        return $this->processorFactory
-            ->createFromUrlElement($model)
-            ->createInstance($model);
     }
 }

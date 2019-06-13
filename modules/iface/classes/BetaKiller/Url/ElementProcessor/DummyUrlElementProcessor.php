@@ -4,7 +4,7 @@ namespace BetaKiller\Url\ElementProcessor;
 use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\IFace\Exception\UrlElementException;
-use BetaKiller\Url\DummyModelInterface;
+use BetaKiller\Url\DummyInstance;
 use BetaKiller\Url\IFaceModelInterface;
 use BetaKiller\Url\UrlElementInstanceInterface;
 use BetaKiller\Url\UrlElementInterface;
@@ -33,38 +33,26 @@ class DummyUrlElementProcessor implements UrlElementProcessorInterface
     }
 
     /**
-     * Create UrlElement instance for provided model
-     *
-     * @param \BetaKiller\Url\UrlElementInterface $model
-     *
-     * @return \BetaKiller\Url\UrlElementInstanceInterface
-     */
-    public function createInstance(UrlElementInterface $model): ?UrlElementInstanceInterface
-    {
-        // No instance for Dummies
-        return null;
-    }
-
-    /**
      * Execute processing on URL element
      *
-     * @param \BetaKiller\Url\UrlElementInterface      $model
-     * @param \Psr\Http\Message\ServerRequestInterface $request
+     * @param \BetaKiller\Url\UrlElementInstanceInterface $instance
+     * @param \Psr\Http\Message\ServerRequestInterface    $request
      *
      * @return \Psr\Http\Message\ResponseInterface
      */
-    public function process(UrlElementInterface $model, ServerRequestInterface $request): ResponseInterface
+    public function process(UrlElementInstanceInterface $instance, ServerRequestInterface $request): ResponseInterface
     {
-        if (!$model instanceof DummyModelInterface) {
-            throw new UrlElementProcessorException('Model must be instance of :must, but :real provided', [
-                ':real' => \get_class($model),
-                ':must' => DummyModelInterface::class,
+        if (!$instance instanceof DummyInstance) {
+            throw new UrlElementProcessorException('Instance must be :must, but :real provided', [
+                ':real' => get_class($instance),
+                ':must' => DummyInstance::class,
             ]);
         }
 
         $urlHelper = ServerRequestHelper::getUrlHelper($request);
+        $element   = $instance->getModel();
 
-        $parent = $this->getParentIFace($model);
+        $parent = $this->getParentIFace($element);
 
         // Redirect
         return ResponseHelper::redirect($urlHelper->makeUrl($parent));

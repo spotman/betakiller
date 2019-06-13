@@ -40,7 +40,7 @@ class IFaceFactory
         if (!$model instanceof IFaceModelInterface) {
             throw new FactoryException('Can not create IFace from URL element :codename of type :class', [
                 ':codename' => $model->getCodename(),
-                ':class'    => \get_class($model),
+                ':class'    => get_class($model),
             ]);
         }
 
