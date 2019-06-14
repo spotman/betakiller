@@ -57,7 +57,7 @@ class I18nMiddleware implements MiddlewareInterface
 
         $lang = $langIsoCode
             ? $this->facade->getLanguageByIsoCode($langIsoCode)
-            : $this->facade->getDefaultLanguage(); // App default language as fallback
+            : $this->facade->getPrimaryLanguage(); // App default language as fallback
 
         $i18n = new I18nHelper($this->facade);
         $i18n->setLang($lang);

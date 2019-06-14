@@ -42,7 +42,7 @@ class ExceptionService
     {
         $showOriginalMessage = ($e instanceof ExceptionInterface) && $e->showOriginalMessageToUser();
 
-        $lang = $lang ?? $this->i18n->getDefaultLanguage();
+        $lang = $lang ?? $this->i18n->getPrimaryLanguage();
 
         return $showOriginalMessage
             ? $this->getOriginalMessage($e, $lang)

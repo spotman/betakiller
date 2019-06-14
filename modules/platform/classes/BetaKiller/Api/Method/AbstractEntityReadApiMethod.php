@@ -20,7 +20,7 @@ abstract class AbstractEntityReadApiMethod extends AbstractEntityBasedApiMethod
     {
         $entity = $this->getEntity($arguments);
 
-        return $this->read($entity, $user);
+        return $this->read($entity, $user, $arguments);
     }
 
     /**
@@ -28,8 +28,13 @@ abstract class AbstractEntityReadApiMethod extends AbstractEntityBasedApiMethod
      *
      * @param \BetaKiller\Model\AbstractEntityInterface $model
      * @param \BetaKiller\Model\UserInterface           $user
+     * @param \Spotman\Defence\ArgumentsInterface       $arguments
      *
      * @return \Spotman\Api\ApiMethodResponse|null
      */
-    abstract protected function read(AbstractEntityInterface $model, UserInterface $user): ?ApiMethodResponse;
+    abstract protected function read(
+        AbstractEntityInterface $model,
+        UserInterface $user,
+        ArgumentsInterface $arguments
+    ): ?ApiMethodResponse;
 }

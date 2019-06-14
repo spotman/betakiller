@@ -113,7 +113,7 @@ class NotificationHelper
      */
     public function emailTarget(string $email, string $name, ?string $lang = null): TargetInterface
     {
-        $lang = $lang ?? $this->i18n->getDefaultLanguage()->getIsoCode();
+        $lang = $lang ?? $this->i18n->getPrimaryLanguage()->getIsoCode();
 
         return new TargetEmail($email, $name, $lang);
     }

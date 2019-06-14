@@ -35,7 +35,7 @@ final class I18nFacade
     /**
      * @var LanguageInterface
      */
-    private $defaultLang;
+    private $primaryLang;
 
     /**
      * @var \Psr\Log\LoggerInterface
@@ -89,7 +89,7 @@ final class I18nFacade
         $this->languagesIsoCodes = \array_keys($this->languages);
 
         // First language is primary (default language is a fallback)
-        $this->defaultLang = $this->getLanguageByIsoCode($this->languagesIsoCodes[0]);
+        $this->primaryLang = reset($this->languages);
     }
 
     public function hasLanguage(string $lang): bool
@@ -97,9 +97,9 @@ final class I18nFacade
         return \in_array($lang, $this->languagesIsoCodes, true);
     }
 
-    public function getDefaultLanguage(): LanguageInterface
+    public function getPrimaryLanguage(): LanguageInterface
     {
-        return $this->defaultLang;
+        return $this->primaryLang;
     }
 
     public function getAllowedLanguagesIsoCodes(): array
@@ -330,7 +330,7 @@ final class I18nFacade
         }
 
         if (!$value) {
-            $value = $key->hasI18nValue($this->defaultLang) ? $key->getI18nValue($this->defaultLang) : null;
+            $value = $key->hasI18nValue($this->primaryLang) ? $key->getI18nValue($this->primaryLang) : null;
         }
 
         if (!$value) {
