@@ -81,7 +81,7 @@ class User extends \ORM implements UserInterface
                 [[$this, 'unique'], ['username', ':value']],
             ],
             self::TABLE_FIELD_PASSWORD        => [
-                ['not_empty'],
+//                ['not_empty'],
                 ['max_length', [':value', 64]],
             ],
             self::TABLE_FIELD_LANGUAGE_ID     => [
@@ -238,6 +238,14 @@ class User extends \ORM implements UserInterface
     public function getPassword(): string
     {
         return (string)$this->get(self::TABLE_FIELD_PASSWORD);
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasPassword(): bool
+    {
+        return (bool)$this->get(self::TABLE_FIELD_PASSWORD);
     }
 
     /**

@@ -16,6 +16,7 @@ use BetaKiller\Model\UserInterface;
 use BetaKiller\Repository\RoleRepository;
 use BetaKiller\Repository\UserRepository;
 use BetaKiller\Session\SessionStorageInterface;
+use DateInterval;
 use Zend\Expressive\Session\SessionInterface;
 
 class AuthService
@@ -113,7 +114,7 @@ class AuthService
     {
         $sessions = $this->sessionStorage->getUserSessions($user);
 
-        return \count($sessions) > 0;
+        return count($sessions) > 0;
     }
 
     public function getSessionUser(SessionInterface $session): UserInterface
@@ -189,7 +190,7 @@ class AuthService
 
     public function requestPasswordChange(UserInterface $user): void
     {
-        $token = $this->tokenService->create($user, new \DateInterval('PT8H'));
+        $token = $this->tokenService->create($user, new DateInterval('PT8H'));
 
         $params      = $this->urlHelper->createUrlContainer()->setEntity($token);
         $action      = $this->urlHelper->getUrlElementByCodename(VerifyPasswordChangeTokenAction::codename());
@@ -205,13 +206,18 @@ class AuthService
      * Compare password with original (hashed).
      *
      * @param \BetaKiller\Model\UserInterface $user
-     * @param   string                        $password
+     * @param string                          $password
      *
      * @return  boolean
      */
     public function checkPassword(UserInterface $user, string $password): bool
     {
         if (empty($password)) {
+            return false;
+        }
+
+        // No password defined => no login allowed
+        if (!$user->hasPassword()) {
             return false;
         }
 
@@ -229,7 +235,7 @@ class AuthService
     /**
      * Perform a hmac hash, using the configured method.
      *
-     * @param   string $str string to hash
+     * @param string $str string to hash
      *
      * @return  string
      */

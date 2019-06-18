@@ -85,21 +85,21 @@ class RegularLoginAction extends AbstractAction implements PostRequestActionInte
         $post = ActionRequestHelper::postArguments($request);
 
         // Sanitize
-        $userLogin    = $post->getString(self::ARG_LOGIN);
-        $userPassword = $post->getString(self::ARG_PASSWORD);
+        $login    = $post->getString(self::ARG_LOGIN);
+        $password = $post->getString(self::ARG_PASSWORD);
 
-        if (!$userLogin || !$userPassword) {
+        if (!$login || !$password) {
             throw new BadRequestHttpException('No username or password sent');
         }
 
-        $user = $this->userRepo->searchBy($userLogin);
+        $user = $this->userRepo->searchBy($login);
 
         if (!$user) {
             throw new IncorrectCredentialsException;
         }
 
         // If the passwords match, perform a login
-        if (!$this->auth->checkPassword($user, $userPassword)) {
+        if (!$this->auth->checkPassword($user, $password)) {
             throw new IncorrectCredentialsException;
         }
 

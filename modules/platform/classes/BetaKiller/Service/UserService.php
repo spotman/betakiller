@@ -58,7 +58,7 @@ class UserService
         GuestUserFactory $guestFactory,
         AppConfigInterface $appConfig
     ) {
-        $this->entityFactory = $entityFactory;
+        $this->entityFactory  = $entityFactory;
         $this->userRepository = $userRepo;
         $this->roleRepository = $roleRepo;
         $this->appConfig      = $appConfig;
@@ -69,7 +69,6 @@ class UserService
      * @param string      $login
      * @param string      $email
      * @param string      $createdFromIp
-     * @param null|string $password
      *
      * @return \BetaKiller\Model\UserInterface
      * @throws \BetaKiller\Exception\ValidationException
@@ -78,13 +77,8 @@ class UserService
     public function createUser(
         string $login,
         string $email,
-        string $createdFromIp,
-        ?string $password = null
-    ): UserInterface
-    {
-        // Generate random password if none provided
-        $password = $password ?? md5(microtime());
-
+        string $createdFromIp
+    ): UserInterface {
         $basicRoles = [
             $this->roleRepository->getGuestRole(),
             $this->roleRepository->getLoginRole(),
@@ -96,7 +90,6 @@ class UserService
         $user
             ->setCreatedAt()
             ->setUsername($login)
-            ->setPassword($password)
             ->setEmail($email)
             ->setCreatedFromIP($createdFromIp);
 

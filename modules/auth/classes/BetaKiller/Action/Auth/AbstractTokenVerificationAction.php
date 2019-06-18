@@ -10,13 +10,13 @@ use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Helper\SessionHelper;
 use BetaKiller\Helper\UrlHelper;
+use BetaKiller\IFace\Auth\PasswordChangeIFace;
 use BetaKiller\Model\TokenInterface;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Service\AuthService;
 use BetaKiller\Service\TokenService;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Spotman\Defence\DefinitionBuilderInterface;
 
 abstract class AbstractTokenVerificationAction extends AbstractAction
 {
@@ -99,6 +99,13 @@ abstract class AbstractTokenVerificationAction extends AbstractAction
      */
     protected function getSuccessUrl(UrlHelper $urlHelper, UserInterface $user): string
     {
+        // Redirect to password change IFace in case of empty password (initial password setting)
+        if (!$user->hasPassword()) {
+            $changePassIFace = $urlHelper->getUrlElementByCodename(PasswordChangeIFace::codename());
+
+            return $urlHelper->makeUrl($changePassIFace);
+        }
+
         return $this->urlDetector->detect($user, $urlHelper);
     }
 

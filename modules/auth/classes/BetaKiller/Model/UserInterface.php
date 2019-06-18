@@ -6,6 +6,7 @@ namespace BetaKiller\Model;
 use BetaKiller\Notification\TargetInterface;
 use BetaKiller\Utils\Kohana\ORM\OrmInterface;
 use DateTimeImmutable;
+use DateTimeInterface;
 use Spotman\Acl\AclUserInterface;
 
 interface UserInterface extends DispatchableEntityInterface, OrmInterface, TargetInterface, AclUserInterface
@@ -44,7 +45,7 @@ interface UserInterface extends DispatchableEntityInterface, OrmInterface, Targe
      *
      * @return \BetaKiller\Model\UserInterface
      */
-    public function setCreatedAt(\DateTimeInterface $value = null): UserInterface;
+    public function setCreatedAt(DateTimeInterface $value = null): UserInterface;
 
     /**
      * @return \DateTimeImmutable
@@ -74,6 +75,11 @@ interface UserInterface extends DispatchableEntityInterface, OrmInterface, Targe
      * @return string
      */
     public function getPassword(): string;
+
+    /**
+     * @return bool
+     */
+    public function hasPassword(): bool;
 
     /**
      * Returns true if current user is guest

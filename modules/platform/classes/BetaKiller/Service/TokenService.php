@@ -7,6 +7,8 @@ use BetaKiller\Model\Token;
 use BetaKiller\Model\TokenInterface;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Repository\TokenRepository;
+use DateInterval;
+use DateTimeImmutable;
 
 class TokenService
 {
@@ -34,7 +36,7 @@ class TokenService
      * @throws \BetaKiller\Exception\ValidationException
      * @throws \BetaKiller\Repository\RepositoryException
      */
-    public function create(UserInterface $user, \DateInterval $ttl): TokenInterface
+    public function create(UserInterface $user, DateInterval $ttl): TokenInterface
     {
         $value = implode('/', [
             $user->getID(),
@@ -45,7 +47,7 @@ class TokenService
         $tokenValue = mb_strtolower(hash('sha256', $tokenValue));
 
         $tokenModel = new Token();
-        $createdAt  = new \DateTimeImmutable();
+        $createdAt  = new DateTimeImmutable();
         $endingAt   = $createdAt->add($ttl);
 
         $tokenModel
@@ -69,7 +71,7 @@ class TokenService
      */
     public function used(TokenInterface $token): void
     {
-        $token->setUsedAt(new \DateTimeImmutable);
+        $token->setUsedAt(new DateTimeImmutable);
 
         $this->tokenRepo->save($token);
     }
