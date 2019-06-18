@@ -44,6 +44,10 @@ class PasswordChangeIFace extends AbstractIFace
 
         $urlHelper = ServerRequestHelper::getUrlHelper($request);
         $user      = ServerRequestHelper::getUser($request);
+        $i18n      = ServerRequestHelper::getI18n($request);
+
+        // Set current lang from User lang
+        $i18n->setLang($user->getLanguage());
 
         $actionElement = $urlHelper->getUrlElementByCodename(ChangePasswordAction::codename());
 
