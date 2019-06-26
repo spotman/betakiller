@@ -7,6 +7,7 @@ use BetaKiller\Helper\TextHelper;
 use BetaKiller\Model\ExtendedOrmInterface;
 use BetaKiller\Model\I18nKeyModelInterface;
 use BetaKiller\Model\LanguageInterface;
+use DB;
 
 abstract class AbstractI18nKeyRepository extends AbstractOrmBasedDispatchableRepository implements
     I18nKeyRepositoryInterface
@@ -14,6 +15,22 @@ abstract class AbstractI18nKeyRepository extends AbstractOrmBasedDispatchableRep
     protected const SEARCH_EXACT    = 'exact';
     protected const SEARCH_STARTING = 'starting';
     protected const SEARCH_WEAK     = 'weak';
+
+    /**
+     * @param string                                   $value
+     *
+     * @param \BetaKiller\Model\LanguageInterface|null $lang
+     *
+     * @return \BetaKiller\Model\I18nKeyModelInterface|null
+     */
+    public function findByI18nValue(string $value, LanguageInterface $lang = null): ?I18nKeyModelInterface
+    {
+        $orm = $this->getOrmInstance();
+
+        return $this
+            ->filterI18nValue($orm, $value, $lang, self::SEARCH_EXACT)
+            ->findOne($orm);
+    }
 
     /**
      * @param \BetaKiller\Model\LanguageInterface $lang
@@ -34,8 +51,7 @@ abstract class AbstractI18nKeyRepository extends AbstractOrmBasedDispatchableRep
         $this->filterEmptyI18n($orm);
         $orm->or_where_close();
 
-        return $this
-            ->findAll($orm);
+        return $this->findAll($orm);
     }
 
     /**
@@ -55,7 +71,7 @@ abstract class AbstractI18nKeyRepository extends AbstractOrmBasedDispatchableRep
     {
         $items = $this->getAll();
 
-        \usort($items, function(I18nKeyModelInterface $left, I18nKeyModelInterface $right) use ($lang) {
+        usort($items, static function (I18nKeyModelInterface $left, I18nKeyModelInterface $right) use ($lang) {
             return $left->getI18nValue($lang) <=> $right->getI18nValue($lang);
         });
 
@@ -65,13 +81,13 @@ abstract class AbstractI18nKeyRepository extends AbstractOrmBasedDispatchableRep
     protected function filterI18nValue(
         ExtendedOrmInterface $orm,
         string $term,
-        LanguageInterface $lang = null,
+        ?LanguageInterface $lang = null,
         string $mode = null
     ) {
         $mode = $mode ?? self::SEARCH_STARTING;
 
         $column = $this->getI18nValuesColumnName($orm);
-        $term   = \mb_strtolower($term);
+        $term   = mb_strtolower($term);
 
         $utfRegex   = $this->makeI18nFilterRegex($term, $mode);
         $asciiRegex = $this->makeI18nFilterRegex(TextHelper::utf8ToAscii($term), $mode);
@@ -83,8 +99,8 @@ abstract class AbstractI18nKeyRepository extends AbstractOrmBasedDispatchableRep
 
         $orm->and_where_open();
 
-        $orm->or_where(\DB::expr('LOWER('.$column.')'), 'REGEXP', $utfRegex);
-        $orm->or_where(\DB::expr('LOWER(CONVERT('.$column.' USING ascii))'), 'REGEXP', $asciiRegex);
+        $orm->or_where(DB::expr('LOWER('.$column.')'), 'REGEXP', $utfRegex);
+        $orm->or_where(DB::expr('LOWER(CONVERT('.$column.' USING ascii))'), 'REGEXP', $asciiRegex);
 
         $orm->and_where_close();
 
@@ -93,7 +109,7 @@ abstract class AbstractI18nKeyRepository extends AbstractOrmBasedDispatchableRep
 
     private function makeI18nFilterRegex(string $term, string $mode): string
     {
-        $term = \preg_quote($term, '/');
+        $term = preg_quote($term, '/');
 
         switch ($mode) {
             case self::SEARCH_EXACT:
@@ -131,7 +147,7 @@ abstract class AbstractI18nKeyRepository extends AbstractOrmBasedDispatchableRep
 
         $orm->and_where_open();
 
-        $orm->or_where(\DB::expr('LENGTH(:col)', [':col' => $column]), '=', 0);
+        $orm->or_where(DB::expr('LENGTH(:col)', [':col' => $column]), '=', 0);
         $orm->or_where($column, 'IS', null);
 
         $orm->and_where_close();

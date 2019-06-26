@@ -8,8 +8,10 @@ use BetaKiller\Model\HasI18nKeyNameInterface;
 use BetaKiller\Model\I18nKeyInterface;
 use BetaKiller\Model\LanguageInterface;
 use BetaKiller\Repository\LanguageRepositoryInterface;
+use LogicException;
 use Psr\Log\LoggerInterface;
 use Punic\Plural;
+use RuntimeException;
 
 final class I18nFacade
 {
@@ -83,10 +85,10 @@ final class I18nFacade
         }
 
         if (!$this->languages) {
-            throw new \RuntimeException('Define languages first and import them via import:languages task');
+            throw new RuntimeException('Define languages first and import them via import:languages task');
         }
 
-        $this->languagesIsoCodes = \array_keys($this->languages);
+        $this->languagesIsoCodes = array_keys($this->languages);
 
         // First language is primary (default language is a fallback)
         $this->primaryLang = reset($this->languages);
@@ -94,7 +96,7 @@ final class I18nFacade
 
     public function hasLanguage(string $lang): bool
     {
-        return \in_array($lang, $this->languagesIsoCodes, true);
+        return in_array($lang, $this->languagesIsoCodes, true);
     }
 
     public function getPrimaryLanguage(): LanguageInterface
@@ -117,7 +119,7 @@ final class I18nFacade
         $lang = $this->languages[$isoCode] ?? null;
 
         if (!$lang) {
-            throw new \LogicException(sprintf('Unknown language "%s"', $isoCode));
+            throw new LogicException(sprintf('Unknown language "%s"', $isoCode));
         }
 
         return $lang;
@@ -128,13 +130,17 @@ final class I18nFacade
      *
      * @param \BetaKiller\Model\LanguageInterface       $lang
      * @param \BetaKiller\Model\HasI18nKeyNameInterface $hasKey
+     * @param array|null                                $values
      *
      * @return string
      * @throws \BetaKiller\I18n\I18nException
      */
-    public function translateHasKeyName(LanguageInterface $lang, HasI18nKeyNameInterface $hasKey): string
-    {
-        return $this->translateKeyName($lang, $hasKey->getI18nKeyName());
+    public function translateHasKeyName(
+        LanguageInterface $lang,
+        HasI18nKeyNameInterface $hasKey,
+        ?array $values = null
+    ): string {
+        return $this->translateKeyName($lang, $hasKey->getI18nKeyName(), $values);
     }
 
     /**
@@ -145,7 +151,7 @@ final class I18nFacade
      * @return string
      * @throws \BetaKiller\I18n\I18nException
      */
-    public function translateKeyName(LanguageInterface $lang, string $keyName, array $values = null): string
+    public function translateKeyName(LanguageInterface $lang, string $keyName, ?array $values = null): string
     {
         $key = $this->getKeyByName($keyName);
 
@@ -161,7 +167,7 @@ final class I18nFacade
      *
      * @return string
      */
-    public function translateKey(LanguageInterface $lang, I18nKeyInterface $key, array $values = null): string
+    public function translateKey(LanguageInterface $lang, I18nKeyInterface $key, ?array $values = null): string
     {
         $string = $this->translate($key, $lang);
 
@@ -175,11 +181,41 @@ final class I18nFacade
      *
      * @return string
      */
-    public function translateKeyAny(LanguageInterface $lang, I18nKeyInterface $key, array $values = null): string
+    public function translateKeyAny(LanguageInterface $lang, I18nKeyInterface $key, ?array $values = null): string
     {
         $string = $this->translate($key, $lang, true);
 
         return $this->replacePlaceholders($string, $values);
+    }
+
+    /**
+     * Translate provided key to all app languages
+     *
+     * @param \BetaKiller\Model\I18nKeyInterface $key
+     * @param array|null                         $values
+     *
+     * @return string[]
+     */
+    public function translateKeyAll(I18nKeyInterface $key, array $values = null): array
+    {
+        $data = [];
+
+        foreach ($this->languages as $lang) {
+            $data[$lang->getIsoCode()] = $this->translateKey($lang, $key, $values);
+        }
+
+        return $data;
+    }
+
+    public function translateHasKeyNameAll(HasI18nKeyNameInterface $key, array $values = null): array
+    {
+        $data = [];
+
+        foreach ($this->languages as $lang) {
+            $data[$lang->getIsoCode()] = $this->translateHasKeyName($lang, $key, $values);
+        }
+
+        return $data;
     }
 
     /**
@@ -247,7 +283,7 @@ final class I18nFacade
         $forms = $this->getPluralFormsForLocale($lang->getLocale());
 
         foreach ($bag->getAll() as $itemForm => $formValue) {
-            if (!\in_array($itemForm, $forms, true)) {
+            if (!in_array($itemForm, $forms, true)) {
                 throw new I18nException('Unknown form ":form" for language ":lang"', [
                     ':form' => $itemForm,
                     ':lang' => $lang->getIsoCode(),
