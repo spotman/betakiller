@@ -21,6 +21,9 @@ final class I18nFacade
 
     public const PLACEHOLDER_PREFIX = ':';
 
+    // Placeholder for primary language ISO code
+    public const PRIMARY_LANG_ISO = 'primary';
+
     // TODO Remove underscore and replace all i18n keys
     private const KEY_REGEX = '/^[a-z0-9_-]+(?:[\.]{1}[a-z0-9-_]+)+$/m';
 
@@ -204,6 +207,9 @@ final class I18nFacade
             $data[$lang->getIsoCode()] = $this->translateKey($lang, $key, $values);
         }
 
+        // Add placeholder for primary lang
+        $data[self::PRIMARY_LANG_ISO] = $this->translateKey($this->primaryLang, $key, $values);
+
         return $data;
     }
 
@@ -214,6 +220,9 @@ final class I18nFacade
         foreach ($this->languages as $lang) {
             $data[$lang->getIsoCode()] = $this->translateHasKeyName($lang, $key, $values);
         }
+
+        // Add placeholder for primary lang
+        $data[self::PRIMARY_LANG_ISO] = $this->translateHasKeyName($this->primaryLang, $key, $values);
 
         return $data;
     }
