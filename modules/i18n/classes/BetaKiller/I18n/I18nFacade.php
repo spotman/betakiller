@@ -208,7 +208,7 @@ final class I18nFacade
         }
 
         // Add placeholder for primary lang
-        $data[self::PRIMARY_LANG_ISO] = $this->translateKey($this->primaryLang, $key, $values);
+        $data[self::PRIMARY_LANG_ISO] = $data[$this->primaryLang->getIsoCode()];
 
         return $data;
     }
@@ -222,7 +222,7 @@ final class I18nFacade
         }
 
         // Add placeholder for primary lang
-        $data[self::PRIMARY_LANG_ISO] = $this->translateHasKeyName($this->primaryLang, $key, $values);
+        $data[self::PRIMARY_LANG_ISO] = $data[$this->primaryLang->getIsoCode()];
 
         return $data;
     }
