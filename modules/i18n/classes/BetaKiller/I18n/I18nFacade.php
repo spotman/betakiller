@@ -112,6 +112,14 @@ final class I18nFacade
         return $this->languagesIsoCodes;
     }
 
+    /**
+     * @return LanguageInterface[]
+     */
+    public function getAllowedLanguages(): array
+    {
+        return $this->languages;
+    }
+
     public function getLanguageLocale(string $lang): string
     {
         return $this->getLanguageByIsoCode($lang)->getLocale();
