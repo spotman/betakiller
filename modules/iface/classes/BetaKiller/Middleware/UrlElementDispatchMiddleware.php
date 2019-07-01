@@ -3,26 +3,22 @@ declare(strict_types=1);
 
 namespace BetaKiller\Middleware;
 
-use BetaKiller\Auth\AccessDeniedException;
 use BetaKiller\Dev\Profiler;
 use BetaKiller\Event\MissingUrlEvent;
 use BetaKiller\Event\UrlDispatchedEvent;
 use BetaKiller\Exception\NotFoundHttpException;
 use BetaKiller\Exception\SeeOtherHttpException;
-use BetaKiller\Factory\UrlElementInstanceFactory;
-use BetaKiller\Helper\AclHelper;
 use BetaKiller\Helper\LoggerHelperTrait;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\IFace\Exception\UrlElementException;
 use BetaKiller\MessageBus\EventBusInterface;
+use BetaKiller\Model\LanguageInterface;
 use BetaKiller\Model\UserInterface;
-use BetaKiller\Url\AfterDispatchingInterface;
 use BetaKiller\Url\Behaviour\UrlBehaviourException;
 use BetaKiller\Url\Container\UrlContainerInterface;
 use BetaKiller\Url\MissingUrlElementException;
-use BetaKiller\Url\UrlDispatcherInterface;
-use BetaKiller\Url\UrlElementInterface;
 use BetaKiller\Url\UrlElementStack;
+use BetaKiller\Url\UrlProcessor;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -34,19 +30,9 @@ class UrlElementDispatchMiddleware implements MiddlewareInterface
     use LoggerHelperTrait;
 
     /**
-     * @var \BetaKiller\Url\UrlDispatcherInterface
+     * @var \BetaKiller\Url\UrlProcessor
      */
-    private $urlDispatcher;
-
-    /**
-     * @var \BetaKiller\Factory\UrlElementProcessorFactory
-     */
-    private $processorFactory;
-
-    /**
-     * @var \BetaKiller\Helper\AclHelper
-     */
-    private $aclHelper;
+    private $urlProcessor;
 
     /**
      * @var \BetaKiller\MessageBus\EventBusInterface
@@ -59,31 +45,20 @@ class UrlElementDispatchMiddleware implements MiddlewareInterface
     private $logger;
 
     /**
-     * @var \BetaKiller\Factory\UrlElementInstanceFactory
-     */
-    private $instanceFactory;
-
-    /**
      * UrlElementDispatchMiddleware constructor.
      *
-     * @param \BetaKiller\Url\UrlDispatcherInterface        $urlDispatcher
-     * @param \BetaKiller\MessageBus\EventBusInterface      $eventBus
-     * @param \BetaKiller\Helper\AclHelper                  $aclHelper
-     * @param \BetaKiller\Factory\UrlElementInstanceFactory $instanceFactory
-     * @param \Psr\Log\LoggerInterface                      $logger
+     * @param \BetaKiller\Url\UrlProcessor             $urlProcessor
+     * @param \BetaKiller\MessageBus\EventBusInterface $eventBus
+     * @param \Psr\Log\LoggerInterface                 $logger
      */
     public function __construct(
-        UrlDispatcherInterface $urlDispatcher,
+        UrlProcessor $urlProcessor,
         EventBusInterface $eventBus,
-        AclHelper $aclHelper,
-        UrlElementInstanceFactory $instanceFactory,
         LoggerInterface $logger
     ) {
-        $this->urlDispatcher = $urlDispatcher;
-        $this->aclHelper     = $aclHelper;
-        $this->eventBus      = $eventBus;
-        $this->logger        = $logger;
-        $this->instanceFactory = $instanceFactory;
+        $this->urlProcessor = $urlProcessor;
+        $this->eventBus     = $eventBus;
+        $this->logger       = $logger;
     }
 
     /**
@@ -102,19 +77,16 @@ class UrlElementDispatchMiddleware implements MiddlewareInterface
         $stack  = ServerRequestHelper::getUrlElementStack($request);
         $params = ServerRequestHelper::getUrlContainer($request);
         $user   = ServerRequestHelper::getUser($request);
+        $i18n   = ServerRequestHelper::getI18n($request);
 
-        $this->dispatchRequest($request, $stack, $params);
+        $this->dispatchRequest($request, $stack, $params, $user);
 
-        // Check current user access for all URL elements
-        foreach ($stack as $urlElement) {
-            $this->checkUrlElementAccess($urlElement, $params, $user);
+        /** @var LanguageInterface $lang */
+        $lang = ServerRequestHelper::getEntity($request, LanguageInterface::class);
 
-            $instance = $this->instanceFactory->createFromUrlElement($urlElement);
-
-            // Process afterDispatching() hooks on every UrlElement in stack
-            if ($instance && $instance instanceof AfterDispatchingInterface) {
-                $instance->afterDispatching($request);
-            }
+        // Override i18n language with parsed model (if exists)
+        if ($lang) {
+            $i18n->setLang($lang);
         }
 
         Profiler::end($pid);
@@ -126,12 +98,13 @@ class UrlElementDispatchMiddleware implements MiddlewareInterface
     private function dispatchRequest(
         ServerRequestInterface $request,
         UrlElementStack $stack,
-        UrlContainerInterface $params
+        UrlContainerInterface $params,
+        UserInterface $user
     ): void {
         $url = ServerRequestHelper::getUrl($request);
 
         try {
-            $this->urlDispatcher->process($url, $stack, $params);
+            $this->urlProcessor->process($url, $stack, $params, $user);
         } catch (MissingUrlElementException $e) {
             $parentModel = $e->getParentUrlElement();
 
@@ -160,29 +133,5 @@ class UrlElementDispatchMiddleware implements MiddlewareInterface
 
         // Emit event about successful url parsing
         $this->eventBus->emit(new UrlDispatchedEvent($request));
-    }
-
-    /**
-     * @param \BetaKiller\Url\UrlElementInterface             $urlElement
-     * @param \BetaKiller\Url\Container\UrlContainerInterface $urlParameters
-     * @param \BetaKiller\Model\UserInterface                 $user
-     *
-     * @throws \BetaKiller\Auth\AccessDeniedException
-     * @throws \BetaKiller\Auth\AuthorizationRequiredException
-     * @throws \BetaKiller\Factory\FactoryException
-     * @throws \BetaKiller\IFace\Exception\UrlElementException
-     * @throws \Spotman\Acl\Exception
-     */
-    private function checkUrlElementAccess(
-        UrlElementInterface $urlElement,
-        UrlContainerInterface $urlParameters,
-        UserInterface $user
-    ): void {
-        // Force authorization for non-public zones before security check
-        $this->aclHelper->forceAuthorizationIfNeeded($urlElement, $user);
-
-        if (!$this->aclHelper->isUrlElementAllowed($user, $urlElement, $urlParameters)) {
-            throw new AccessDeniedException();
-        }
     }
 }

@@ -52,10 +52,14 @@ class DummyUrlElementProcessor implements UrlElementProcessorInterface
         $urlHelper = ServerRequestHelper::getUrlHelper($request);
         $element   = $instance->getModel();
 
-        $parent = $this->getParentIFace($element);
+        $redirectTarget = $element->getRedirectTarget();
+
+        $redirectElement = $redirectTarget
+            ? $urlHelper->getUrlElementByCodename($redirectTarget)
+            : $this->getParentIFace($element);
 
         // Redirect
-        return ResponseHelper::redirect($urlHelper->makeUrl($parent));
+        return ResponseHelper::redirect($urlHelper->makeUrl($redirectElement));
     }
 
     private function getParentIFace(UrlElementInterface $model): UrlElementInterface

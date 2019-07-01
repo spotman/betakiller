@@ -43,13 +43,11 @@ interface UrlBehaviourInterface
     /**
      * @param \BetaKiller\Url\UrlElementInterface                  $urlElement
      * @param \BetaKiller\Url\Container\UrlContainerInterface|null $params
-     * @param \BetaKiller\Helper\UrlHelper                         $urlHelper
      *
      * @return \Generator|\BetaKiller\Url\AvailableUri[]
      */
     public function getAvailableUrls(
         UrlElementInterface $urlElement,
-        UrlContainerInterface $params,
-        UrlHelper $urlHelper
+        UrlContainerInterface $params
     ): \Generator;
 }

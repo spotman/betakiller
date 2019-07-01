@@ -9,7 +9,8 @@
                    label="{NotificationGroup.codename}" entity="NotificationGroup" entityAction="read"/>
         </iface>
 
-        <iface uri="logs" name="Admin_Notification_LogIndex" label="Logs" menu="admin">
+        <iface uri="logs" name="Admin_Notification_LogIndex" label="Logs" menu="admin"
+               entity="NotificationLog" entityAction="list">
             <iface uri="{Page}" name="Admin_Notification_LogPage" label="Page {Page}"/>
             <dummy uri="item" name="Admin_Notification_ItemDummy">
                 <iface uri="{NotificationLog.id}" name="Admin_Notification_LogItem" label="Message"

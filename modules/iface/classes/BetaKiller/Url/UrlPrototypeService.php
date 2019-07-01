@@ -1,7 +1,6 @@
 <?php
 namespace BetaKiller\Url;
 
-use BetaKiller\Exception\NotImplementedHttpException;
 use BetaKiller\IFace\Exception\UrlElementException;
 use BetaKiller\Model\DispatchableEntityInterface;
 use BetaKiller\Model\SingleParentTreeModelInterface;
@@ -315,7 +314,8 @@ class UrlPrototypeService
         }
 
         if (!$prototype->hasModelKey()) {
-            throw new NotImplementedHttpException('RawUrlParameter processing is missing');
+            // No processing for RawUrlParameter
+            return [];
         }
 
         // Prototype has model key and is related to a UrlDataSource

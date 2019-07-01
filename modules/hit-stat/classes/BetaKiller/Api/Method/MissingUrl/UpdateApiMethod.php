@@ -1,5 +1,5 @@
 <?php
-namespace BetaKiller\Api\Method\MissingUrl;
+namespace BetaKiller\Api\Method\HitPage;
 
 use BetaKiller\Api\Method\AbstractEntityUpdateApiMethod;
 use BetaKiller\Factory\UrlHelperFactory;
@@ -51,7 +51,7 @@ class UpdateApiMethod extends AbstractEntityUpdateApiMethod
     /**
      * Override this method
      *
-     * @param \BetaKiller\Model\MissingUrlModelInterface $model
+     * @param \BetaKiller\Model\HitPage $model
      * @param \Spotman\Defence\ArgumentsInterface        $arguments
      * @param \BetaKiller\Model\UserInterface            $user
      *
@@ -65,10 +65,6 @@ class UpdateApiMethod extends AbstractEntityUpdateApiMethod
         $url = $arguments->getString(self::ARG_TARGET_URL);
 
         if ($url) {
-            if (!$this->urlHelper->isValidUrl($url)) {
-                throw new ApiMethodException('Invalid url provided');
-            }
-
             $targetModel = $this->targetRepo->findByUrl($url);
 
             if (!$targetModel) {
@@ -76,7 +72,7 @@ class UpdateApiMethod extends AbstractEntityUpdateApiMethod
                     ->setUrl($url);
             }
 
-            $model->setRedirectTarget($targetModel);
+            $model->setRedirect($targetModel);
 
             $this->saveEntity($model);
 

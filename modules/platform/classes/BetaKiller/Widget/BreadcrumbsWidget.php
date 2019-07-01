@@ -53,7 +53,7 @@ class BreadcrumbsWidget extends AbstractWidget
 
             $data[] = [
                 'url'    => $urlHelper->makeUrl($model, $params),
-                'label'  => $this->elementHelper->getLabel($model, $params, $i18n),
+                'label'  => $this->elementHelper->getLabel($model, $params, $i18n->getLang()),
                 'active' => $stack->isCurrent($model),
             ];
         }

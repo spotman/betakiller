@@ -55,7 +55,7 @@ abstract class AbstractChildrenListingIFace extends AbstractIFace
             }
 
             $data[] = [
-                'label'    => $this->elementHelper->getLabel($urlElement, $params, $i18n),
+                'label'    => $this->elementHelper->getLabel($urlElement, $params, $i18n->getLang()),
                 'codename' => $urlElement->getCodename(),
                 'url'      => $urlHelper->makeUrl($urlElement),
             ];

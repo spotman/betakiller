@@ -109,7 +109,7 @@ class IFaceView
 
         $ifaceView->set(self::IFACE_KEY, [
             'codename' => $model->getCodename(),
-            'label'    => $this->elementHelper->getLabel($model, $params, $i18n),
+            'label'    => $this->elementHelper->getLabel($model, $params, $i18n->getLang()),
             'zone'     => $model->getZoneName(),
         ]);
 
@@ -127,8 +127,8 @@ class IFaceView
             ->setLang($i18n->getLang())
             ->setContentType()
             ->setLayoutCodename($layoutCodename)
-            ->setTitle($this->elementHelper->getTitle($model, $params, $i18n))
-            ->setMetaDescription($this->elementHelper->getDescription($model, $params, $i18n));
+            ->setTitle($this->elementHelper->getTitle($model, $params, $i18n->getLang()))
+            ->setMetaDescription($this->elementHelper->getDescription($model, $params, $i18n->getLang()));
 
         $result = $this->layoutView->render($ifaceView, $renderHelper);
 

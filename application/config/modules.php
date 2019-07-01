@@ -50,6 +50,7 @@ return [
     'i18n'         => MODPATH.'i18n',                  // Localization and pluralization
     'iface'        => MODPATH.'iface',                 // Dynamic user interfaces
     'maintenance'  => MODPATH.'maintenance',           // Maintenance mode
+    'menu'         => MODPATH.'menu',                  // Navigation menu processing
     'hit-stat'     => MODPATH.'hit-stat',              // Catch and store missing URLs + save refs and make simple stat
     'notification' => MODPATH.'notification',          // Notification subsystem
     'robots-txt'   => MODPATH.'robots-txt',            // Serve different robots.txt for different environments

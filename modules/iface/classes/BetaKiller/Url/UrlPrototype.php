@@ -1,7 +1,7 @@
 <?php
 namespace BetaKiller\Url;
 
-class UrlPrototype
+final class UrlPrototype
 {
     public const  REGEX              = '/\{[A-Z]{1}[A-Za-z_]+(\.[A-Za-z_]+(\(\)){0,1}){0,1}\}/';
     private const KEY_SEPARATOR      = '.';
@@ -10,17 +10,17 @@ class UrlPrototype
     /**
      * @var string
      */
-    protected $modelName;
+    private $modelName;
 
     /**
      * @var string
      */
-    protected $modelKey;
+    private $modelKey;
 
     /**
      * @var bool
      */
-    protected $isMethodCall = false;
+    private $isMethodCall = false;
 
     /**
      * UrlPrototype constructor.
@@ -130,7 +130,11 @@ class UrlPrototype
 
     public function asString(): string
     {
-        $str = $this->getDataSourceName().self::KEY_SEPARATOR.$this->getModelKey();
+        $str = $this->getDataSourceName();
+
+        if ($this->hasModelKey()) {
+            $str .= self::KEY_SEPARATOR.$this->getModelKey();
+        }
 
         if ($this->isMethodCall()) {
             $str .= self::METHOD_CALL_MARKER;

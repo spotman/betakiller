@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\Widget;
 
+use BetaKiller\Action\App\I18n\ChangeUserLanguageAction;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Repository\LanguageRepositoryInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -31,11 +32,9 @@ class ChangeLanguageWidget extends AbstractPublicWidget
      */
     public function getData(ServerRequestInterface $request, array $context): array
     {
-        $urlHelper = ServerRequestHelper::getUrlHelper($request);
-
+        $stack       = ServerRequestHelper::getUrlElementStack($request);
+        $urlHelper   = ServerRequestHelper::getUrlHelper($request);
         $currentLang = ServerRequestHelper::getI18n($request)->getLang();
-
-        $stack = ServerRequestHelper::getUrlElementStack($request);
 
         // Link to current page in other language
         $element = $stack->hasCurrent()
@@ -64,9 +63,15 @@ class ChangeLanguageWidget extends AbstractPublicWidget
             $links[$lang->getIsoCode()] = $data;
         }
 
+        $changeAction = $urlHelper->getUrlElementByCodename(ChangeUserLanguageAction::codename());
+
         return [
             'current'   => $currentLang->getIsoCode(),
             'lang_list' => $links,
+
+            'action_url'      => $urlHelper->makeUrl($changeAction),
+            'action_key_lang' => ChangeUserLanguageAction::ARG_LANG,
+            'action_key_url'  => ChangeUserLanguageAction::ARG_URL,
         ];
     }
 }

@@ -159,7 +159,7 @@ class BarWidget extends AbstractAdminWidget
             }
 
             $items[] = [
-                'label' => $this->elementHelper->getLabel($urlElement, $params, $i18n),
+                'label' => $this->elementHelper->getLabel($urlElement, $params, $i18n->getLang()),
                 'url'   => $urlHelper->makeUrl($urlElement),
             ];
         }

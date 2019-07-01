@@ -3,10 +3,10 @@ declare(strict_types=1);
 
 namespace BetaKiller\Url\Behaviour;
 
-use BetaKiller\Helper\UrlHelper;
 use BetaKiller\Url\Container\UrlContainerInterface;
 use BetaKiller\Url\UrlElementInterface;
 use BetaKiller\Url\UrlPathIterator;
+use Generator;
 
 class SingleUrlBehaviour extends AbstractUrlBehaviour
 {
@@ -44,17 +44,15 @@ class SingleUrlBehaviour extends AbstractUrlBehaviour
     /**
      * @param \BetaKiller\Url\UrlElementInterface                  $urlElement
      * @param \BetaKiller\Url\Container\UrlContainerInterface|null $params
-     * @param \BetaKiller\Helper\UrlHelper                         $urlHelper
      *
      * @return \Generator|\BetaKiller\Url\AvailableUri[]
      * @throws \BetaKiller\IFace\Exception\UrlElementException
      */
     public function getAvailableUrls(
         UrlElementInterface $urlElement,
-        UrlContainerInterface $params,
-        UrlHelper $urlHelper
-    ): \Generator {
-        $url = $urlHelper->makeUrl($urlElement, $params, false);
+        UrlContainerInterface $params
+    ): Generator {
+        $url = $this->urlHelper->makeUrl($urlElement, $params, false);
 
         // Only one available uri and no UrlParameter instance
         yield $this->createAvailableUri($url);

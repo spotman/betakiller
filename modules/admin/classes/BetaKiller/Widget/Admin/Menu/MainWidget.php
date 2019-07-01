@@ -1,17 +1,21 @@
 <?php
 namespace BetaKiller\Widget\Admin\Menu;
 
-use BetaKiller\Widget\MenuWidget;
-use Psr\Http\Message\ServerRequestInterface;
+use BetaKiller\Model\RoleInterface;
+use BetaKiller\Widget\AbstractMenuWidget;
 
-class MainWidget extends MenuWidget
+class MainWidget extends AbstractMenuWidget
 {
-    public function getData(ServerRequestInterface $request, array $context): array
+    /**
+     * Returns array of roles` codenames which are allowed to use this widget
+     *
+     * @return string[]
+     */
+    public function getAclRoles(): array
     {
-        $items = parent::getData($request, $context);
-
         return [
-            'items' => $items,
+            // Admins only
+            RoleInterface::ADMIN_PANEL,
         ];
     }
 }

@@ -6,6 +6,7 @@ use BetaKiller\Helper\LoggerHelperTrait;
 use BetaKiller\Helper\UrlHelper;
 use BetaKiller\IFace\Exception\UrlElementException;
 use BetaKiller\Url\Behaviour\UrlBehaviourFactory;
+use BetaKiller\Url\Container\ResolvingUrlContainer;
 use BetaKiller\Url\Container\UrlContainerInterface;
 use Psr\Log\LoggerInterface;
 
@@ -53,25 +54,23 @@ class AvailableUrlsCollector
     }
 
     /**
-     * @param \BetaKiller\Helper\UrlHelper $urlHelper
      * @param bool|null                    $useHidden
      *
      * @return \BetaKiller\Url\AvailableUri[]|\Generator
      * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\IFace\Exception\UrlElementException
      */
-    public function getPublicAvailableUrls(UrlHelper $urlHelper, ?bool $useHidden = null): \Generator
+    public function getPublicAvailableUrls(?bool $useHidden = null): \Generator
     {
         $useHidden = $useHidden ?? false;
 
         $root = $this->tree->getRoot();
 
-        yield from $this->processLayer($root, $urlHelper, null, $useHidden);
+        yield from $this->processLayer($root, null, $useHidden);
     }
 
     /**
      * @param \BetaKiller\Url\UrlElementInterface[]           $models
-     * @param \BetaKiller\Helper\UrlHelper                    $urlHelper
      * @param \BetaKiller\Url\Container\UrlContainerInterface $params
      * @param bool|null                                       $useHidden
      *
@@ -81,7 +80,6 @@ class AvailableUrlsCollector
      */
     private function processLayer(
         array $models,
-        UrlHelper $urlHelper,
         ?UrlContainerInterface $params = null,
         ?bool $useHidden = null
     ): \Generator {
@@ -95,8 +93,7 @@ class AvailableUrlsCollector
             yield from $this->processSingle(
                 $urlElement,
                 // Use empty UrlContainer on each root element iteration (so no intersection of models between paths)
-                $params ?: $urlHelper->createUrlContainer(),
-                $urlHelper,
+                $params ?: ResolvingUrlContainer::create(),
                 $useHidden
             );
         }
@@ -105,7 +102,6 @@ class AvailableUrlsCollector
     /**
      * @param \BetaKiller\Url\UrlElementInterface             $urlElement
      * @param \BetaKiller\Url\Container\UrlContainerInterface $params
-     * @param \BetaKiller\Helper\UrlHelper                    $urlHelper
      *
      * @param bool|null                                       $useHidden
      *
@@ -117,7 +113,6 @@ class AvailableUrlsCollector
     private function processSingle(
         UrlElementInterface $urlElement,
         UrlContainerInterface $params,
-        UrlHelper $urlHelper,
         ?bool $useHidden = null
     ): \Generator {
         $this->logger->debug('Processing ":codename" URL element', [':codename' => $urlElement->getCodename()]);
@@ -132,7 +127,7 @@ class AvailableUrlsCollector
         $urlCounter = 0;
         $guest      = $this->aclHelper->getGuestUser();
 
-        foreach ($this->getAvailableIFaceUrls($urlElement, $params, $urlHelper) as $availableUrl) {
+        foreach ($this->getAvailableIFaceUrls($urlElement, $params) as $availableUrl) {
             $urlParameter = $availableUrl->getUrlParameter();
 
             // Store parameter for childs processing
@@ -155,7 +150,7 @@ class AvailableUrlsCollector
             $urlCounter++;
 
             // Recursion for childs
-            foreach ($this->processLayer($childs, $urlHelper, $params, $useHidden) as $childAvailableUrl) {
+            foreach ($this->processLayer($childs, $params, $useHidden) as $childAvailableUrl) {
                 yield $childAvailableUrl;
                 $urlCounter++;
             }
@@ -167,20 +162,18 @@ class AvailableUrlsCollector
     /**
      * @param \BetaKiller\Url\UrlElementInterface             $model
      * @param \BetaKiller\Url\Container\UrlContainerInterface $params
-     * @param \BetaKiller\Helper\UrlHelper                    $helper
      *
      * @return \Generator|\BetaKiller\Url\AvailableUri[]
      * @throws \BetaKiller\Factory\FactoryException
      */
     private function getAvailableIFaceUrls(
         UrlElementInterface $model,
-        UrlContainerInterface $params,
-        UrlHelper $helper
+        UrlContainerInterface $params
     ): \Generator {
         $behaviour = $this->behaviourFactory->fromUrlElement($model);
 
         // TODO Deal with calculation of the last_modified from each parameter value
 
-        yield from $behaviour->getAvailableUrls($model, $params, $helper);
+        yield from $behaviour->getAvailableUrls($model, $params);
     }
 }

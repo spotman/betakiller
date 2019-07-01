@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace BetaKiller\Service;
 
 use BetaKiller\Config\AppConfigInterface;
-use BetaKiller\Factory\UrlHelperFactory;
 use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Url\AvailableUrlsCollector;
@@ -46,31 +45,23 @@ class SitemapService
     private $appEnv;
 
     /**
-     * @var \BetaKiller\Factory\UrlHelperFactory
-     */
-    private $helperFactory;
-
-    /**
      * SitemapService constructor.
      *
      * @param \BetaKiller\Url\AvailableUrlsCollector $urlCollector
      * @param \Psr\Log\LoggerInterface               $logger
      * @param \BetaKiller\Config\AppConfigInterface  $appConfig
      * @param \BetaKiller\Helper\AppEnvInterface     $appEnv
-     * @param \BetaKiller\Factory\UrlHelperFactory   $helperFactory
      */
     public function __construct(
         AvailableUrlsCollector $urlCollector,
         LoggerInterface $logger,
         AppConfigInterface $appConfig,
-        AppEnvInterface $appEnv,
-        UrlHelperFactory $helperFactory
+        AppEnvInterface $appEnv
     ) {
-        $this->appConfig     = $appConfig;
-        $this->logger        = $logger;
-        $this->urlCollector  = $urlCollector;
-        $this->appEnv        = $appEnv;
-        $this->helperFactory = $helperFactory;
+        $this->appConfig    = $appConfig;
+        $this->logger       = $logger;
+        $this->urlCollector = $urlCollector;
+        $this->appEnv       = $appEnv;
     }
 
     /**
@@ -87,12 +78,10 @@ class SitemapService
             throw new ServiceException('Please, set "base_url" parameter to full URL (with protocol) in config file init.php');
         }
 
-        $urlHelper = $this->helperFactory->create();
-
         // Create sitemap
         $this->sitemap = new Sitemap($this->getSitemapFilePath());
 
-        foreach ($this->urlCollector->getPublicAvailableUrls($urlHelper) as $item) {
+        foreach ($this->urlCollector->getPublicAvailableUrls() as $item) {
             $url = $item->getUrl();
 
             $this->logger->debug('Found url :value', [':value' => $url]);

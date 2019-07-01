@@ -12,7 +12,6 @@ use BetaKiller\Url\Behaviour\UrlBehaviourException;
 use BetaKiller\Url\Behaviour\UrlBehaviourFactory;
 use BetaKiller\Url\Container\ResolvingUrlContainer;
 use BetaKiller\Url\Container\UrlContainerInterface;
-use BetaKiller\Url\UrlDispatcher;
 use BetaKiller\Url\UrlElementInterface;
 use BetaKiller\Url\UrlElementStack;
 use BetaKiller\Url\UrlElementTreeInterface;
@@ -106,9 +105,29 @@ class UrlHelper
         return $this->stack->getCurrent();
     }
 
+    /**
+     * Returns current UrlElementStack
+     *
+     * @return \BetaKiller\Url\UrlElementStack
+     */
+    public function getStack(): UrlElementStack
+    {
+        return $this->stack;
+    }
+
     public function createUrlContainer(): UrlContainerInterface
     {
         return ResolvingUrlContainer::create();
+    }
+
+    /**
+     * Returns current UrlContainer
+     *
+     * @return \BetaKiller\Url\Container\UrlContainerInterface
+     */
+    public function getUrlContainer(): UrlContainerInterface
+    {
+        return $this->urlContainer;
     }
 
     /**
@@ -142,9 +161,8 @@ class UrlHelper
 
         $parts = [];
 
-        foreach ($this->tree->getReverseBreadcrumbsIterator($urlElement) as $item) {
-            $uri = $this->makeUrlElementUri($item, $params);
-            array_unshift($parts, $uri);
+        foreach ($this->tree->getBranchIterator($urlElement) as $item) {
+            $parts[] = $this->makeUrlElementUri($item, $params);
         }
 
         $path = implode('/', array_filter($parts));
@@ -290,28 +308,6 @@ class UrlHelper
     public function getPreviewEntityUrl(DispatchableEntityInterface $entity): ?string
     {
         return $this->getEntityUrl($entity, CrudlsActionsInterface::ACTION_READ, ZoneInterface::PREVIEW);
-    }
-
-    /**
-     * @param string $url
-     *
-     * @return bool
-     */
-    public function isValidUrl(string $url): bool
-    {
-        $dispatcher = new UrlDispatcher($this->tree, $this->behaviourFactory);
-        $params     = $this->createUrlContainer();
-        $stack      = new UrlElementStack($params);
-
-        try {
-            $path = parse_url($url, PHP_URL_PATH);
-            $dispatcher->process($path, $stack, $params);
-
-            return true;
-        } /** @noinspection BadExceptionsProcessingInspection */ catch (\Throwable $e) {
-            // No logging in this case
-            return false;
-        }
     }
 
     private function makeAbsoluteUrl(string $relativeUrl): string

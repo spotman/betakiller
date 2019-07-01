@@ -1,7 +1,9 @@
 <?php
 namespace BetaKiller\Url;
 
+use ArrayIterator;
 use BetaKiller\Url\ElementFilter\UrlElementFilterInterface;
+use RecursiveIteratorIterator;
 
 interface UrlElementTreeInterface
 {
@@ -100,7 +102,14 @@ interface UrlElementTreeInterface
      * @return \ArrayIterator|\BetaKiller\Url\UrlElementInterface[]
      * @throws \BetaKiller\IFace\Exception\UrlElementException
      */
-    public function getReverseBreadcrumbsIterator(UrlElementInterface $model): \ArrayIterator;
+    public function getReverseBreadcrumbsIterator(UrlElementInterface $model): ArrayIterator;
+
+    /**
+     * @param \BetaKiller\Url\UrlElementInterface $model
+     *
+     * @return \ArrayIterator
+     */
+    public function getBranchIterator(UrlElementInterface $model): ArrayIterator;
 
     /**
      * @param \BetaKiller\Url\UrlElementInterface|null                     $parent
@@ -112,7 +121,7 @@ interface UrlElementTreeInterface
     public function getRecursiveIteratorIterator(
         UrlElementInterface $parent = null,
         UrlElementFilterInterface $filter = null
-    ): \RecursiveIteratorIterator;
+    ): RecursiveIteratorIterator;
 
     /**
      * @param \BetaKiller\Url\UrlElementInterface|NULL $parent
@@ -120,13 +129,13 @@ interface UrlElementTreeInterface
      * @return \RecursiveIteratorIterator|\BetaKiller\Url\UrlElementInterface[]
      * @throws \BetaKiller\IFace\Exception\UrlElementException
      */
-    public function getPublicIFaceIterator(UrlElementInterface $parent = null): \RecursiveIteratorIterator;
+    public function getPublicIFaceIterator(UrlElementInterface $parent = null): RecursiveIteratorIterator;
 
     /**
      * @return \RecursiveIteratorIterator|\BetaKiller\Url\UrlElementInterface[]
      * @throws \BetaKiller\IFace\Exception\UrlElementException
      */
-    public function getRecursiveSitemapIterator(): \RecursiveIteratorIterator;
+    public function getRecursiveSitemapIterator(): RecursiveIteratorIterator;
 
     /**
      * @param \BetaKiller\Url\UrlElementInterface|NULL $parent
@@ -134,5 +143,5 @@ interface UrlElementTreeInterface
      * @return \RecursiveIteratorIterator|\BetaKiller\Url\UrlElementInterface[]
      * @throws \BetaKiller\IFace\Exception\UrlElementException
      */
-    public function getAdminIFaceIterator(UrlElementInterface $parent = null): \RecursiveIteratorIterator;
+    public function getAdminIFaceIterator(UrlElementInterface $parent = null): RecursiveIteratorIterator;
 }

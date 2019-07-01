@@ -22,11 +22,14 @@ class MultipleUrlBehaviour extends AbstractUrlBehaviour
     /**
      * MultipleUrlBehaviour constructor.
      *
+     * @param \BetaKiller\Helper\UrlHelper        $urlHelper
      * @param \BetaKiller\Url\UrlPrototypeService $urlPrototypeService
      */
-    public function __construct(UrlPrototypeService $urlPrototypeService)
+    public function __construct(UrlHelper $urlHelper, UrlPrototypeService $urlPrototypeService)
     {
         $this->prototypeService = $urlPrototypeService;
+
+        parent::__construct($urlHelper);
     }
 
     /**
@@ -102,7 +105,6 @@ class MultipleUrlBehaviour extends AbstractUrlBehaviour
     /**
      * @param \BetaKiller\Url\UrlElementInterface             $urlElement
      * @param \BetaKiller\Url\Container\UrlContainerInterface $params
-     * @param \BetaKiller\Helper\UrlHelper                    $urlHelper
      *
      * @return \Generator|\BetaKiller\Url\AvailableUri[]
      * @throws \BetaKiller\Factory\FactoryException
@@ -112,8 +114,7 @@ class MultipleUrlBehaviour extends AbstractUrlBehaviour
      */
     public function getAvailableUrls(
         UrlElementInterface $urlElement,
-        UrlContainerInterface $params,
-        UrlHelper $urlHelper
+        UrlContainerInterface $params
     ): \Generator {
         $prototype = $this->prototypeService->createPrototypeFromUrlElement($urlElement);
         $items     = $this->prototypeService->getAvailableParameters($prototype, $params);
@@ -123,12 +124,12 @@ class MultipleUrlBehaviour extends AbstractUrlBehaviour
 
         foreach ($items as $availableParameter) {
             $ifaceUrlParams->setParameter($availableParameter, true);
-            $url = $urlHelper->makeUrl($urlElement, $ifaceUrlParams, false);
+            $url = $this->urlHelper->makeUrl($urlElement, $ifaceUrlParams, false);
 
             yield $this->createAvailableUri($url, $availableParameter);
 
             if ($urlElement->hasTreeBehaviour()) {
-                yield from $this->getAvailableUrls($urlElement, $ifaceUrlParams, $urlHelper);
+                yield from $this->getAvailableUrls($urlElement, $ifaceUrlParams);
             }
         }
     }

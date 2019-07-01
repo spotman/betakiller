@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace BetaKiller\Url\Behaviour;
 
 use BetaKiller\Factory\NamespaceBasedFactoryBuilder;
+use BetaKiller\Factory\UrlHelperFactory;
 use BetaKiller\Url\UrlElementInterface;
 
 class UrlBehaviourFactory
@@ -18,13 +19,18 @@ class UrlBehaviourFactory
     private $factory;
 
     /**
+     * @var \BetaKiller\Factory\UrlHelperFactory
+     */
+    private $urlHelperFactory;
+
+    /**
      * UrlBehaviourFactory constructor.
      *
      * @param \BetaKiller\Factory\NamespaceBasedFactoryBuilder $factoryBuilder
      *
      * @throws \BetaKiller\Factory\FactoryException
      */
-    public function __construct(NamespaceBasedFactoryBuilder $factoryBuilder)
+    public function __construct(NamespaceBasedFactoryBuilder $factoryBuilder, UrlHelperFactory $urlHelperFactory)
     {
         $this->factory = $factoryBuilder
             ->createFactory()
@@ -32,6 +38,8 @@ class UrlBehaviourFactory
             ->setClassNamespaces(...UrlBehaviourInterface::CLASS_NS)
             ->setClassSuffix(UrlBehaviourInterface::CLASS_SUFFIX)
             ->cacheInstances();
+
+        $this->urlHelperFactory = $urlHelperFactory;
     }
 
     /**
@@ -74,6 +82,8 @@ class UrlBehaviourFactory
      */
     public function create(string $codename): UrlBehaviourInterface
     {
-        return $this->factory->create($codename);
+        return $this->factory->create($codename, [
+            'urlHelper' => $this->urlHelperFactory->create(),
+        ]);
     }
 }

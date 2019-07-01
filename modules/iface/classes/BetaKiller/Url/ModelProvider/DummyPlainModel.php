@@ -9,8 +9,9 @@ class DummyPlainModel extends AbstractPlainUrlElementModel implements DummyModel
 {
     use DummyModelTrait;
 
-    public const OPTION_LABEL = 'label';
-    public const OPTION_MENU  = 'menu';
+    public const OPTION_LABEL    = 'label';
+    public const OPTION_MENU     = 'menu';
+    public const OPTION_REDIRECT = 'redirect';
 
     /**
      * @var string
@@ -21,6 +22,11 @@ class DummyPlainModel extends AbstractPlainUrlElementModel implements DummyModel
      * @var string|null
      */
     private $menu;
+
+    /**
+     * @var string|null
+     */
+    private $redirect;
 
     /**
      * Returns label for using in breadcrumbs and etc
@@ -52,12 +58,26 @@ class DummyPlainModel extends AbstractPlainUrlElementModel implements DummyModel
         return $this->menu;
     }
 
+    /**
+     * Returns UrlElement codename (if defined)
+     *
+     * @return string|null
+     */
+    public function getRedirectTarget(): ?string
+    {
+        return $this->redirect;
+    }
+
     public function fromArray(array $data): void
     {
         $this->label = $data[self::OPTION_LABEL] ?? null;
 
         if (isset($data[self::OPTION_MENU])) {
             $this->menu = mb_strtolower($data[self::OPTION_MENU]);
+        }
+
+        if (isset($data[self::OPTION_REDIRECT])) {
+            $this->redirect = $data[self::OPTION_REDIRECT];
         }
 
         parent::fromArray($data);
@@ -71,8 +91,9 @@ class DummyPlainModel extends AbstractPlainUrlElementModel implements DummyModel
     public function asArray(): array
     {
         return array_merge(parent::asArray(), [
-            self::OPTION_LABEL => $this->getLabel(),
-            self::OPTION_MENU  => $this->getMenuName(),
+            self::OPTION_LABEL    => $this->getLabel(),
+            self::OPTION_MENU     => $this->getMenuName(),
+            self::OPTION_REDIRECT => $this->getRedirectTarget(),
         ]);
     }
 }

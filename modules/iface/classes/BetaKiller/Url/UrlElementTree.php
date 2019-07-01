@@ -1,8 +1,12 @@
 <?php
 namespace BetaKiller\Url;
 
+use ArrayIterator;
 use BetaKiller\IFace\Exception\UrlElementException;
 use BetaKiller\Url\ElementFilter\UrlElementFilterInterface;
+use RecursiveCallbackFilterIterator;
+use RecursiveIterator;
+use RecursiveIteratorIterator;
 
 class UrlElementTree implements UrlElementTreeInterface
 {
@@ -87,7 +91,7 @@ class UrlElementTree implements UrlElementTreeInterface
 
             $uri = $model->getUri();
 
-            if (\in_array($uri, $uris, true)) {
+            if (in_array($uri, $uris, true)) {
                 throw new UrlElementException('Duplicate URIs per layer are not allowed, codename is ":name"', [
                     ':name' => $model->getCodename(),
                 ]);
@@ -359,7 +363,7 @@ class UrlElementTree implements UrlElementTreeInterface
      * @return \ArrayIterator|\BetaKiller\Url\UrlElementInterface[]
      * @throws \BetaKiller\IFace\Exception\UrlElementException
      */
-    public function getReverseBreadcrumbsIterator(UrlElementInterface $model): \ArrayIterator
+    public function getReverseBreadcrumbsIterator(UrlElementInterface $model): ArrayIterator
     {
         $stack   = [];
         $current = $model;
@@ -370,7 +374,26 @@ class UrlElementTree implements UrlElementTreeInterface
             $current = $this->getParent($current);
         } while ($current);
 
-        return new \ArrayIterator($stack);
+        return new ArrayIterator($stack);
+    }
+
+    /**
+     * @param \BetaKiller\Url\UrlElementInterface $model
+     *
+     * @return \ArrayIterator
+     */
+    public function getBranchIterator(UrlElementInterface $model): ArrayIterator
+    {
+        $stack   = [];
+        $current = $model;
+
+        do {
+            $stack[] = $current;
+
+            $current = $this->getParent($current);
+        } while ($current);
+
+        return new ArrayIterator(array_reverse($stack));
     }
 
     /**
@@ -384,10 +407,10 @@ class UrlElementTree implements UrlElementTreeInterface
     public function getRecursiveIteratorIterator(
         UrlElementInterface $parent = null,
         UrlElementFilterInterface $filter = null
-    ): \RecursiveIteratorIterator {
-        return new \RecursiveIteratorIterator(
+    ): RecursiveIteratorIterator {
+        return new RecursiveIteratorIterator(
             $this->getRecursiveIterator($parent, $filter),
-            \RecursiveIteratorIterator::SELF_FIRST
+            RecursiveIteratorIterator::SELF_FIRST
         );
     }
 
@@ -402,7 +425,7 @@ class UrlElementTree implements UrlElementTreeInterface
     private function getRecursiveIterator(
         UrlElementInterface $parent = null,
         UrlElementFilterInterface $filter = null
-    ): \RecursiveIterator {
+    ): RecursiveIterator {
         return new UrlElementTreeRecursiveIterator($this, $parent, $filter);
     }
 
@@ -412,7 +435,7 @@ class UrlElementTree implements UrlElementTreeInterface
      * @return \RecursiveIteratorIterator|\BetaKiller\Url\IFaceModelInterface[]
      * @throws \BetaKiller\IFace\Exception\UrlElementException
      */
-    public function getPublicIFaceIterator(UrlElementInterface $parent = null): \RecursiveIteratorIterator
+    public function getPublicIFaceIterator(UrlElementInterface $parent = null): RecursiveIteratorIterator
     {
         return $this->getRecursiveFilterIterator(function (UrlElementInterface $model) {
             return $this->isIFace($model) && $this->isPublicModel($model);
@@ -423,7 +446,7 @@ class UrlElementTree implements UrlElementTreeInterface
      * @return \RecursiveIteratorIterator|\BetaKiller\Url\IFaceModelInterface[]
      * @throws \BetaKiller\IFace\Exception\UrlElementException
      */
-    public function getRecursiveSitemapIterator(): \RecursiveIteratorIterator
+    public function getRecursiveSitemapIterator(): RecursiveIteratorIterator
     {
         return $this->getRecursiveFilterIterator(function (UrlElementInterface $model) {
             return $this->isIFace($model) && !$model->isHiddenInSiteMap() && $this->isPublicModel($model);
@@ -436,7 +459,7 @@ class UrlElementTree implements UrlElementTreeInterface
      * @return \RecursiveIteratorIterator|\BetaKiller\Url\IFaceModelInterface[]
      * @throws \BetaKiller\IFace\Exception\UrlElementException
      */
-    public function getAdminIFaceIterator(UrlElementInterface $parent = null): \RecursiveIteratorIterator
+    public function getAdminIFaceIterator(UrlElementInterface $parent = null): RecursiveIteratorIterator
     {
         return $this->getRecursiveFilterIterator(function (UrlElementInterface $model) {
             return $this->isIFace($model) && $this->isAdminModel($model);
@@ -452,12 +475,12 @@ class UrlElementTree implements UrlElementTreeInterface
      */
     protected function getRecursiveFilterIterator(callable $callback, UrlElementInterface $parent = null)
     {
-        $filter = new \RecursiveCallbackFilterIterator(
+        $filter = new RecursiveCallbackFilterIterator(
             $this->getRecursiveIterator($parent),
             $callback
         );
 
-        return new \RecursiveIteratorIterator($filter, \RecursiveIteratorIterator::SELF_FIRST);
+        return new RecursiveIteratorIterator($filter, RecursiveIteratorIterator::SELF_FIRST);
     }
 
     private function isIFace(UrlElementInterface $urlElement): bool

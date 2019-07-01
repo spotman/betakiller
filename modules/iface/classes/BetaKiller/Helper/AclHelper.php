@@ -152,7 +152,7 @@ class AclHelper
                 // Copy entity from UrlContainer if required
                 if ($resource->isEntityRequiredForAction($actionName)) {
                     if (!$params) {
-                        throw new Exception('UrlContainer is required for action :action', [
+                        throw new Exception('UrlContainer is required for action ":action"', [
                             ':action' => $actionName,
                         ]);
                     }
@@ -160,9 +160,10 @@ class AclHelper
                     $entityInstance = $params->getEntity($entityName);
 
                     if (!$entityInstance) {
-                        throw new Exception('Entity instance ":entity" is absent in UrlContainer for action :action', [
+                        throw new Exception('Entity instance ":entity" is absent for action ":action" in ":el"', [
                             ':entity' => $entityName,
                             ':action' => $actionName,
+                            ':el'     => $urlElement->getCodename(),
                         ]);
                     }
 

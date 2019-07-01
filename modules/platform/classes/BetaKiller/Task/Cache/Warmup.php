@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace BetaKiller\Task\Cache;
 
 use BetaKiller\Config\AppConfigInterface;
-use BetaKiller\Factory\UrlHelperFactory;
 use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\Service\HttpClientService;
 use BetaKiller\Task\TaskException;
@@ -20,11 +19,6 @@ class Warmup extends \BetaKiller\Task\AbstractTask
      * @var \BetaKiller\Url\AvailableUrlsCollector
      */
     private $urlCollector;
-
-    /**
-     * @var \BetaKiller\Factory\UrlHelperFactory
-     */
-    private $urlHelperFactory;
 
     /**
      * @var \BetaKiller\Service\HttpClientService
@@ -72,7 +66,6 @@ class Warmup extends \BetaKiller\Task\AbstractTask
      * Warmup constructor.
      *
      * @param \BetaKiller\Url\AvailableUrlsCollector $urlCollector
-     * @param \BetaKiller\Factory\UrlHelperFactory   $urlHelperFactory
      * @param \BetaKiller\Service\HttpClientService  $httpClient
      * @param \BetaKiller\Helper\AppEnvInterface     $appEnv
      * @param \BetaKiller\Config\AppConfigInterface  $appConfig
@@ -80,18 +73,16 @@ class Warmup extends \BetaKiller\Task\AbstractTask
      */
     public function __construct(
         AvailableUrlsCollector $urlCollector,
-        UrlHelperFactory $urlHelperFactory,
         HttpClientService $httpClient,
         AppEnvInterface $appEnv,
         AppConfigInterface $appConfig,
         LoggerInterface $logger
     ) {
-        $this->urlCollector     = $urlCollector;
-        $this->urlHelperFactory = $urlHelperFactory;
-        $this->httpClient       = $httpClient;
-        $this->appEnv           = $appEnv;
-        $this->appConfig        = $appConfig;
-        $this->logger           = $logger;
+        $this->urlCollector = $urlCollector;
+        $this->httpClient   = $httpClient;
+        $this->appEnv       = $appEnv;
+        $this->appConfig    = $appConfig;
+        $this->logger       = $logger;
 
         $this->cookieJar = new CookieJar();
 
@@ -142,9 +133,8 @@ class Warmup extends \BetaKiller\Task\AbstractTask
             ]);
         }
 
-        $urlHelper = $this->urlHelperFactory->create();
-        $items     = $this->urlCollector->getPublicAvailableUrls($urlHelper);
-        $counter   = 0;
+        $items   = $this->urlCollector->getPublicAvailableUrls();
+        $counter = 0;
 
         // Make HTTP requests to temporary created PHP internal web-server instance
         foreach ($items as $item) {
@@ -281,7 +271,8 @@ class Warmup extends \BetaKiller\Task\AbstractTask
                 ':status' => $status,
             ]);
         } elseif (\in_array($status, [401, 403], true)) {
-            throw new TaskException('Access denied with :status status for :url', [':url' => $url, ':status' => $status]);
+            throw new TaskException('Access denied with :status status for :url',
+                [':url' => $url, ':status' => $status]);
         } else {
             throw new TaskException('Got :status status for URL :url', [':url' => $url, ':status' => $status]);
         }
