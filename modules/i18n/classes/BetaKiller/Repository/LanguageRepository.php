@@ -112,11 +112,12 @@ final class LanguageRepository extends AbstractI18nKeyRepository implements Lang
 
         // Remove flag from current language (if exists)
         foreach ($this->getAppLanguages() as $model) {
-            if ($model->isDefault()) {
-                $model->markAsNonDefault();
-                $this->save($model);
-                break;
+            if (!$model->isDefault()) {
+                continue;
             }
+
+            $model->markAsNonDefault();
+            $this->save($model);
         }
 
         $this->save($lang);

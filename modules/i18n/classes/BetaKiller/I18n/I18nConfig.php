@@ -10,6 +10,7 @@ class I18nConfig extends AbstractConfig
 {
     public const KEY_LANGUAGES = 'languages';
     public const KEY_LOADERS   = 'loaders';
+    public const KEY_FALLBACK  = 'fallback';
 
     /**
      * @return string[]
@@ -17,6 +18,11 @@ class I18nConfig extends AbstractConfig
     public function getAllowedLanguages(): array
     {
         return (array)$this->get([self::KEY_LANGUAGES]) ?: [LanguageInterface::ISO_EN];
+    }
+
+    public function getFallbackLanguage(): string
+    {
+        return (string)$this->get([self::KEY_FALLBACK], true) ?: LanguageInterface::ISO_EN;
     }
 
     public function getLoaders(): array

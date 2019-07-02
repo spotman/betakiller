@@ -43,6 +43,11 @@ final class I18nFacade
     private $primaryLang;
 
     /**
+     * @var LanguageInterface
+     */
+    private $fallbackLang;
+
+    /**
      * @var \Psr\Log\LoggerInterface
      */
     private $logger;
@@ -67,15 +72,31 @@ final class I18nFacade
      */
     private $keysCache = [];
 
+    /**
+     * @var \BetaKiller\I18n\I18nConfig
+     */
+    private $config;
+
+    /**
+     * I18nFacade constructor.
+     *
+     * @param \BetaKiller\Repository\LanguageRepositoryInterface $langRepo
+     * @param \BetaKiller\I18n\PluralBagFormatterInterface       $formatter
+     * @param \BetaKiller\I18n\I18nKeysLoaderInterface           $loader
+     * @param \BetaKiller\I18n\I18nConfig                        $config
+     * @param \Psr\Log\LoggerInterface                           $logger
+     */
     public function __construct(
         LanguageRepositoryInterface $langRepo,
         PluralBagFormatterInterface $formatter,
         I18nKeysLoaderInterface $loader,
+        I18nConfig $config,
         LoggerInterface $logger
     ) {
         $this->langRepo  = $langRepo;
         $this->loader    = $loader;
         $this->formatter = $formatter;
+        $this->config    = $config;
         $this->logger    = $logger;
 
         $this->init();
@@ -95,6 +116,10 @@ final class I18nFacade
 
         // First language is primary (default language is a fallback)
         $this->primaryLang = reset($this->languages);
+
+        // Define fallback language for translating missing keys
+        $fallbackIsoCode    = $this->config->getFallbackLanguage();
+        $this->fallbackLang = $this->languages[$fallbackIsoCode];
     }
 
     public function hasLanguage(string $lang): bool
@@ -383,7 +408,7 @@ final class I18nFacade
         }
 
         if (!$value) {
-            $value = $key->hasI18nValue($this->primaryLang) ? $key->getI18nValue($this->primaryLang) : null;
+            $value = $key->hasI18nValue($this->fallbackLang) ? $key->getI18nValue($this->fallbackLang) : null;
         }
 
         if (!$value) {

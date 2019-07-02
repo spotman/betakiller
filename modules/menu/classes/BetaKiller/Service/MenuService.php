@@ -174,8 +174,7 @@ class MenuService
                 if (!$this->urlHelper->inStack($urlElement, $params)) {
                     $useChildren = false;
                 }
-                //
-            } else if ($this->currentLevel >= $this->startLevel + $this->depth) {
+            } elseif ($this->currentLevel >= $this->startLevel + $this->depth) {
                 // Skip items on lower levels
                 $useCurrent = false;
 
@@ -183,13 +182,12 @@ class MenuService
                 if ($isInMenu) {
                     $useChildren = false;
                 }
+            } elseif ($isInMenu) {
+                // No children injection for menu items (they would be inserted into current item)
+                $useChildren = false;
             } else {
-                // Menu zone
-
                 // No child processing for nested levels
-                if (!$isInMenu) {
-                    $useCurrent = false;
-                }
+                $useCurrent = false;
             }
 
 //            d($this->currentLevel, $urlElement->getCodename(), $useCurrent, $useChildren);
