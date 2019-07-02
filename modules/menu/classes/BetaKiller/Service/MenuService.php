@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\Service;
 
+use BetaKiller\Factory\UrlElementInstanceFactory;
 use BetaKiller\Helper\AclHelper;
 use BetaKiller\Helper\UrlElementHelper;
 use BetaKiller\Helper\UrlHelper;
@@ -14,6 +15,7 @@ use BetaKiller\Url\Container\UrlContainerInterface;
 use BetaKiller\Url\ElementFilter\AggregateUrlElementFilter;
 use BetaKiller\Url\ElementFilter\MenuCodenameUrlElementFilter;
 use BetaKiller\Url\ElementFilter\UrlElementFilterInterface;
+use BetaKiller\Url\HasMenuCounterInterface;
 use BetaKiller\Url\UrlElementInterface;
 use BetaKiller\Url\UrlElementTreeInterface;
 use BetaKiller\Url\UrlElementTreeRecursiveIterator;
@@ -73,23 +75,31 @@ class MenuService
     private $depth;
 
     /**
+     * @var \BetaKiller\Factory\UrlElementInstanceFactory
+     */
+    private $elementFactory;
+
+    /**
      * AuthWidget constructor.
      *
      * @param \BetaKiller\Url\UrlElementTreeInterface       $tree
      * @param \BetaKiller\Helper\AclHelper                  $aclHelper
      * @param \BetaKiller\Helper\UrlElementHelper           $elementHelper
+     * @param \BetaKiller\Factory\UrlElementInstanceFactory $elementFactory
      * @param \BetaKiller\Url\Behaviour\UrlBehaviourFactory $behaviourFactory
      */
     public function __construct(
         UrlElementTreeInterface $tree,
         AclHelper $aclHelper,
         UrlElementHelper $elementHelper,
+        UrlElementInstanceFactory $elementFactory,
         UrlBehaviourFactory $behaviourFactory
     ) {
         $this->tree             = $tree;
         $this->aclHelper        = $aclHelper;
         $this->behaviourFactory = $behaviourFactory;
         $this->elementHelper    = $elementHelper;
+        $this->elementFactory   = $elementFactory;
     }
 
     /**
@@ -166,14 +176,18 @@ class MenuService
             $useChildren = $iterator->hasChildren(); // true by default
             $useCurrent  = true;
 
-            if ($this->currentLevel < $this->startLevel) {
+            if ($this->startLevel > 1 && $this->startLevel - $this->currentLevel === 1) {
                 // Skip items on upper levels
                 $useCurrent = false;
 
                 // Skip branches which are not active right now (leveled menu depends on currently selected items)
-                if (!$this->urlHelper->inStack($urlElement, $params)) {
+                // Keep diving in if we are in menu branch already
+                if ($isInMenu && !$this->urlHelper->inStack($urlElement, $params)) {
                     $useChildren = false;
                 }
+            } elseif ($this->currentLevel < $this->startLevel) {
+                // Skip items on upper levels but keep children
+                $useCurrent = false;
             } elseif ($this->currentLevel >= $this->startLevel + $this->depth) {
                 // Skip items on lower levels
                 $useCurrent = false;
@@ -186,7 +200,7 @@ class MenuService
                 // No children injection for menu items (they would be inserted into current item)
                 $useChildren = false;
             } else {
-                // No child processing for nested levels
+                // No current processing for non-menu items
                 $useCurrent = false;
             }
 
@@ -194,6 +208,7 @@ class MenuService
 
             if ($useCurrent) {
                 // Element is in menu, processing
+                $instance = $this->elementFactory->createFromUrlElement($urlElement);
 
                 // Iterate over every generated URL to make full tree
                 foreach ($this->getAvailableIFaceUrls($urlElement, $params) as $availableUrl) {
@@ -210,25 +225,27 @@ class MenuService
                         continue;
                     }
 
-                    // Recursion for children
-                    $children = $iterator->hasChildren()
-                        ? $this->processLayer($iterator->getChildren(), $params)
-                        : [];
+                    // Calculate menu counter if needed
+                    $counter = $instance instanceof HasMenuCounterInterface
+                        ? $instance->getMenuCounter($params)
+                        : null;
 
                     // Use current URL if item is in menu
                     $item = new MenuItem(
                         $availableUrl->getUrl(),
                         $this->elementHelper->getLabel($urlElement, $params, $this->user->getLanguage()),
-                        $this->urlHelper->inStack($urlElement, $params)
+                        $this->urlHelper->inStack($urlElement, $params),
+                        $counter
                     );
 
-                    $item->addChildren($children);
-
                     $items[] = $item;
-                }
-            }
 
-            if ($useChildren) {
+                    // Recursion for children
+                    if ($iterator->hasChildren()) {
+                        $item->addChildren($this->processLayer($iterator->getChildren(), $params));
+                    }
+                }
+            } elseif ($useChildren) {
                 // Just push children up
                 foreach ($this->processLayer($iterator->getChildren(), $params) as $item) {
                     $items[] = $item;

@@ -99,7 +99,9 @@ class Api extends AbstractTask
         foreach ($names as $name) {
             $value = $this->getOption($name, false);
 
-            if ($value !== null) {
+            if (is_numeric($value)) {
+                $output[] = (int)$value;
+            } elseif ($value !== null) {
                 $output[] = $value;
             }
         }

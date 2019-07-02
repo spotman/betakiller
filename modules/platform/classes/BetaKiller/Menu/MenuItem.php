@@ -23,7 +23,7 @@ class MenuItem implements JsonSerializable
     private $active;
 
     /**
-     * @var int
+     * @var int|null
      */
     private $counter;
 
@@ -40,12 +40,12 @@ class MenuItem implements JsonSerializable
      * @param bool     $active
      * @param int|null $counter
      */
-    public function __construct(string $url, string $label, bool $active, int $counter = null)
+    public function __construct(string $url, string $label, bool $active, ?int $counter = null)
     {
         $this->url     = $url;
         $this->label   = $label;
         $this->active  = $active;
-        $this->counter = $counter ?? 0;
+        $this->counter = $counter;
     }
 
     /**
@@ -81,9 +81,9 @@ class MenuItem implements JsonSerializable
     }
 
     /**
-     * @return int
+     * @return int|null
      */
-    public function getCounter(): int
+    public function getCounter(): ?int
     {
         return $this->counter;
     }
