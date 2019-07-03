@@ -167,6 +167,7 @@ final class I18nFacade
      * @param \BetaKiller\Model\LanguageInterface       $lang
      * @param \BetaKiller\Model\HasI18nKeyNameInterface $hasKey
      * @param array|null                                $values
+     * @param bool|null                                 $ignoreMissing
      *
      * @return string
      * @throws \BetaKiller\I18n\I18nException
@@ -174,24 +175,30 @@ final class I18nFacade
     public function translateHasKeyName(
         LanguageInterface $lang,
         HasI18nKeyNameInterface $hasKey,
-        ?array $values = null
+        ?array $values = null,
+        ?bool $ignoreMissing = null
     ): string {
-        return $this->translateKeyName($lang, $hasKey->getI18nKeyName(), $values);
+        return $this->translateKeyName($lang, $hasKey->getI18nKeyName(), $values, $ignoreMissing);
     }
 
     /**
      * @param \BetaKiller\Model\LanguageInterface $lang
      * @param string                              $keyName
      * @param array|null                          $values
+     * @param bool|null                           $ignoreMissing
      *
      * @return string
      * @throws \BetaKiller\I18n\I18nException
      */
-    public function translateKeyName(LanguageInterface $lang, string $keyName, ?array $values = null): string
-    {
+    public function translateKeyName(
+        LanguageInterface $lang,
+        string $keyName,
+        ?array $values = null,
+        ?bool $ignoreMissing = null
+    ): string {
         $key = $this->getKeyByName($keyName);
 
-        $string = $this->translate($key, $lang);
+        $string = $this->translate($key, $lang, false, $ignoreMissing);
 
         return $this->replacePlaceholders($string, $values);
     }
@@ -200,12 +207,17 @@ final class I18nFacade
      * @param \BetaKiller\Model\LanguageInterface $lang
      * @param \BetaKiller\Model\I18nKeyInterface  $key
      * @param array|null                          $values
+     * @param bool|null                           $ignoreMissing
      *
      * @return string
      */
-    public function translateKey(LanguageInterface $lang, I18nKeyInterface $key, ?array $values = null): string
-    {
-        $string = $this->translate($key, $lang);
+    public function translateKey(
+        LanguageInterface $lang,
+        I18nKeyInterface $key,
+        ?array $values = null,
+        ?bool $ignoreMissing = null
+    ): string {
+        $string = $this->translate($key, $lang, false, $ignoreMissing);
 
         return $this->replacePlaceholders($string, $values);
     }
@@ -214,12 +226,17 @@ final class I18nFacade
      * @param \BetaKiller\Model\LanguageInterface $lang
      * @param \BetaKiller\Model\I18nKeyInterface  $key
      * @param array|null                          $values
+     * @param bool|null                           $ignoreMissing
      *
      * @return string
      */
-    public function translateKeyAny(LanguageInterface $lang, I18nKeyInterface $key, ?array $values = null): string
-    {
-        $string = $this->translate($key, $lang, true);
+    public function translateKeyAny(
+        LanguageInterface $lang,
+        I18nKeyInterface $key,
+        ?array $values = null,
+        ?bool $ignoreMissing = null
+    ): string {
+        $string = $this->translate($key, $lang, true, $ignoreMissing);
 
         return $this->replacePlaceholders($string, $values);
     }
@@ -229,15 +246,16 @@ final class I18nFacade
      *
      * @param \BetaKiller\Model\I18nKeyInterface $key
      * @param array|null                         $values
+     * @param bool|null                          $ignoreMissing
      *
      * @return string[]
      */
-    public function translateKeyAll(I18nKeyInterface $key, array $values = null): array
+    public function translateKeyAll(I18nKeyInterface $key, array $values = null, bool $ignoreMissing = null): array
     {
         $data = [];
 
         foreach ($this->languages as $lang) {
-            $data[$lang->getIsoCode()] = $this->translateKey($lang, $key, $values);
+            $data[$lang->getIsoCode()] = $this->translateKey($lang, $key, $values, $ignoreMissing);
         }
 
         // Add placeholder for primary lang
@@ -246,12 +264,15 @@ final class I18nFacade
         return $data;
     }
 
-    public function translateHasKeyNameAll(HasI18nKeyNameInterface $key, array $values = null): array
-    {
+    public function translateHasKeyNameAll(
+        HasI18nKeyNameInterface $key,
+        array $values = null,
+        bool $ignoreMissing = null
+    ): array {
         $data = [];
 
         foreach ($this->languages as $lang) {
-            $data[$lang->getIsoCode()] = $this->translateHasKeyName($lang, $key, $values);
+            $data[$lang->getIsoCode()] = $this->translateHasKeyName($lang, $key, $values, $ignoreMissing);
         }
 
         // Add placeholder for primary lang
@@ -265,17 +286,23 @@ final class I18nFacade
      * @param string                              $keyName
      * @param                                     $form
      * @param array|null                          $values
+     * @param bool|null                           $ignoreMissing
      *
      * @return string
      * @throws \BetaKiller\I18n\I18nException
      * @throws \Punic\Exception\BadArgumentType
      * @throws \Punic\Exception\ValueNotInList
      */
-    public function pluralizeKeyName(LanguageInterface $lang, string $keyName, $form, array $values = null): string
-    {
+    public function pluralizeKeyName(
+        LanguageInterface $lang,
+        string $keyName,
+        $form,
+        array $values = null,
+        ?bool $ignoreMissing = null
+    ): string {
         $key = $this->getKeyByName($keyName);
 
-        $string = $this->translate($key, $lang);
+        $string = $this->translate($key, $lang, false, $ignoreMissing);
 
         $string = $this->pluralize($lang, $string, $form);
 
@@ -396,11 +423,16 @@ final class I18nFacade
      * @param \BetaKiller\Model\I18nKeyInterface  $key text to translate
      * @param \BetaKiller\Model\LanguageInterface $lang
      * @param bool|null                           $any Use any available translation as backup
+     * @param bool|null                           $ignoreMissing
      *
      * @return  string
      */
-    private function translate(I18nKeyInterface $key, LanguageInterface $lang, bool $any = null): string
-    {
+    private function translate(
+        I18nKeyInterface $key,
+        LanguageInterface $lang,
+        bool $any = null,
+        bool $ignoreMissing = null
+    ): string {
         if ($any) {
             $value = $key->getI18nValueOrAny($lang);
         } else {
@@ -412,8 +444,10 @@ final class I18nFacade
         }
 
         if (!$value) {
-            // Translated string does not exist
-            $this->registerMissingKey($key->getI18nKeyName(), $lang);
+            if (!$ignoreMissing) {
+                // Translated string does not exist
+                $this->registerMissingKey($key->getI18nKeyName(), $lang);
+            }
 
             // Empty string instead of a key
             return '';
