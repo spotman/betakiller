@@ -181,23 +181,33 @@ class HitStatMiddleware implements MiddlewareInterface
             $sourceUri = !$e;
         }
 
+        $p1 = Profiler::begin($request, 'Detect source page');
+
         // Find source page
         $sourcePage = $sourceUri ? $this->service->getPageByFullUrl($sourceUri) : null;
+
+        Profiler::end($p1);
 
         // Skip ignored pages and domains
         if ($sourcePage && $sourcePage->isIgnored()) {
             return null;
         }
 
+        $p2 = Profiler::begin($request, 'Detect target page');
+
         $now = new DateTimeImmutable;
 
         // Search for target URL and create if not exists
         $targetPage = $this->service->getPageByFullUrl($targetUri);
 
+        Profiler::end($p2);
+
         // Skip ignored pages and domains
         if ($targetPage->isIgnored()) {
             return null;
         }
+
+        $p3 = Profiler::begin($request, 'Process target page');
 
         // Increment hit counter for target URL
         $targetPage
@@ -206,8 +216,12 @@ class HitStatMiddleware implements MiddlewareInterface
 
         $this->pageRepo->save($targetPage);
 
+        Profiler::end($p3);
+
         // Process source page if exists
         if ($sourcePage) {
+            $p4 = Profiler::begin($request, 'Process source page');
+
             $sourcePage->setLastSeenAt($now);
 
             // If source page is missing, mark it as existing
@@ -219,7 +233,11 @@ class HitStatMiddleware implements MiddlewareInterface
 
             // Register link
             $this->processLink($sourcePage, $targetPage);
+
+            Profiler::end($p4);
         }
+
+        $p5 = Profiler::begin($request, 'Create hit');
 
         // Detect marker
         $marker = $this->service->getMarkerFromRequest($request);
@@ -252,6 +270,8 @@ class HitStatMiddleware implements MiddlewareInterface
         }
 
         $this->hitRepo->save($hit);
+
+        Profiler::end($p5);
 
         return $hit;
     }
