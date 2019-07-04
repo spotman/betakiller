@@ -49,24 +49,8 @@ abstract class AbstractMenuWidget extends AbstractWidget
         $items = $this->service->getItems($menuCodename, $urlHelper, $user, $level, $depth);
 
         return [
-            'items' => $this->convertData($items),
+            'items' => $this->service->convertToJson($items),
         ];
-    }
-
-    /**
-     * @param \BetaKiller\Menu\MenuItem[] $items
-     *
-     * @return mixed[]
-     */
-    private function convertData(array $items): array
-    {
-        $data = [];
-
-        foreach ($items as $item) {
-            $data[] = $item->jsonSerialize();
-        }
-
-        return $data;
     }
 
     /**

@@ -5,23 +5,23 @@ use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Helper\UrlHelper;
 use BetaKiller\Model\PhpExceptionHistoryModelInterface;
 use BetaKiller\Model\PhpExceptionModelInterface;
-use BetaKiller\Repository\UserRepository;
+use BetaKiller\Repository\UserRepositoryInterface;
 use BetaKiller\Url\UrlElementInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 class PhpExceptionItemIFace extends AbstractErrorAdminIFace
 {
     /**
-     * @var \BetaKiller\Repository\UserRepository
+     * @var \BetaKiller\Repository\UserRepositoryInterface
      */
     private $userRepo;
 
     /**
      * PhpExceptionItem constructor.
      *
-     * @param \BetaKiller\Repository\UserRepository $userRepo
+     * @param \BetaKiller\Repository\UserRepositoryInterface $userRepo
      */
-    public function __construct(UserRepository $userRepo)
+    public function __construct(UserRepositoryInterface $userRepo)
     {
         $this->userRepo = $userRepo;
     }

@@ -8,11 +8,10 @@ use BetaKiller\Auth\UserUrlDetectorInterface;
 use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Model\UserStatus;
-use BetaKiller\Repository\UserRepository;
+use BetaKiller\Repository\UserRepositoryInterface;
 use BetaKiller\Repository\UserStatusRepositoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Spotman\Defence\DefinitionBuilderInterface;
 
 class SuspendAction extends AbstractAction
 {
@@ -27,7 +26,7 @@ class SuspendAction extends AbstractAction
     private $urlDetector;
 
     /**
-     * @var \BetaKiller\Repository\UserRepository
+     * @var \BetaKiller\Repository\UserRepositoryInterface
      */
     private $userRepo;
 
@@ -35,14 +34,17 @@ class SuspendAction extends AbstractAction
      * SuspendApiMethod constructor.
      *
      * @param \BetaKiller\Repository\UserStatusRepositoryInterface $statusRepo
-     * @param \BetaKiller\Repository\UserRepository                $userRepo
+     * @param \BetaKiller\Repository\UserRepositoryInterface       $userRepo
      * @param \BetaKiller\Auth\UserUrlDetectorInterface            $urlDetector
      */
-    public function __construct(UserStatusRepositoryInterface $statusRepo, UserRepository $userRepo, UserUrlDetectorInterface $urlDetector)
-    {
+    public function __construct(
+        UserStatusRepositoryInterface $statusRepo,
+        UserRepositoryInterface $userRepo,
+        UserUrlDetectorInterface $urlDetector
+    ) {
         $this->statusRepo  = $statusRepo;
         $this->urlDetector = $urlDetector;
-        $this->userRepo = $userRepo;
+        $this->userRepo    = $userRepo;
     }
 
     /**

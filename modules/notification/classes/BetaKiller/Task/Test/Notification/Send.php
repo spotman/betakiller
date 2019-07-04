@@ -5,7 +5,7 @@ namespace BetaKiller\Task\Test\Notification;
 
 use BetaKiller\Error\PhpExceptionStorageHandler;
 use BetaKiller\Helper\NotificationHelper;
-use BetaKiller\Repository\UserRepository;
+use BetaKiller\Repository\UserRepositoryInterface;
 use BetaKiller\Task\AbstractTask;
 use Psr\Log\LoggerInterface;
 
@@ -19,7 +19,7 @@ class Send extends AbstractTask
     private $notification;
 
     /**
-     * @var \BetaKiller\Repository\UserRepository
+     * @var \BetaKiller\Repository\UserRepositoryInterface
      */
     private $userRepo;
 
@@ -32,11 +32,14 @@ class Send extends AbstractTask
      * Send constructor.
      *
      * @param \BetaKiller\Helper\NotificationHelper $notification
-     * @param \BetaKiller\Repository\UserRepository $userRepo
-     * @param \Psr\Log\LoggerInterface              $logger
+     * @param \BetaKiller\Repository\UserRepositoryInterface $userRepo
+     * @param \Psr\Log\LoggerInterface $logger
      */
-    public function __construct(NotificationHelper $notification, UserRepository $userRepo, LoggerInterface $logger)
-    {
+    public function __construct(
+        NotificationHelper $notification,
+        UserRepositoryInterface $userRepo,
+        LoggerInterface $logger
+    ) {
         parent::__construct();
 
         $this->notification = $notification;

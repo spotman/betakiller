@@ -1,13 +1,15 @@
 <?php
 namespace BetaKiller\Model;
 
-abstract class AbstractOrmBasedSingleParentTreeModel extends \ORM implements SingleParentTreeModelInterface
+use ORM;
+
+abstract class AbstractOrmBasedSingleParentTreeModel extends ORM implements SingleParentTreeModelInterface
 {
     protected function configure(): void
     {
         $this->belongs_to([
             'parent' => [
-                'model'       => $this->getModelName(),
+                'model'       => static::getModelName(),
                 'foreign_key' => $this->getParentIdColumnName(),
             ],
         ]);
@@ -57,7 +59,7 @@ abstract class AbstractOrmBasedSingleParentTreeModel extends \ORM implements Sin
             if ($current) {
                 $parents[] = $current;
             }
-        } while($current);
+        } while ($current);
 
         return $parents;
     }

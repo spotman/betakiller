@@ -32,7 +32,7 @@ abstract class AbstractOrmBasedDispatchableRepository extends AbstractOrmBasedRe
 
         if (!$model->loaded()) {
             throw new RepositoryException('Can not find item for [:repo] by [:value]', [
-                ':repo'  => $orm->getModelName(),
+                ':repo'  => $orm::getModelName(),
                 ':value' => $value,
             ]);
         }

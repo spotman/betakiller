@@ -197,7 +197,7 @@ class PhpExceptionStorageHandler extends AbstractProcessingHandler
                 ->setLastSeenAt($currentTime);
         } else {
             /** @var PhpExceptionModelInterface $model */
-            $model = $this->entityFactory->create(PhpException::detectModelName());
+            $model = $this->entityFactory->create(PhpException::getModelName());
             $model
                 ->setHash($hash)
                 ->setCreatedAt($currentTime)

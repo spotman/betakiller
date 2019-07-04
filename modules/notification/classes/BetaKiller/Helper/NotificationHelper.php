@@ -10,7 +10,7 @@ use BetaKiller\Notification\MessageInterface;
 use BetaKiller\Notification\NotificationFacade;
 use BetaKiller\Notification\TargetEmail;
 use BetaKiller\Notification\TargetInterface;
-use BetaKiller\Repository\UserRepository;
+use BetaKiller\Repository\UserRepositoryInterface;
 
 class NotificationHelper
 {
@@ -30,23 +30,23 @@ class NotificationHelper
     private $i18n;
 
     /**
-     * @var \BetaKiller\Repository\UserRepository
+     * @var \BetaKiller\Repository\UserRepositoryInterface
      */
     private $userRepo;
 
     /**
      * NotificationHelper constructor.
      *
-     * @param \BetaKiller\Notification\NotificationFacade $facade
-     * @param \BetaKiller\Helper\AppEnvInterface          $appEnv
-     * @param \BetaKiller\I18n\I18nFacade                 $i18n
-     * @param \BetaKiller\Repository\UserRepository       $userRepo
+     * @param \BetaKiller\Notification\NotificationFacade    $facade
+     * @param \BetaKiller\Helper\AppEnvInterface             $appEnv
+     * @param \BetaKiller\I18n\I18nFacade                    $i18n
+     * @param \BetaKiller\Repository\UserRepositoryInterface $userRepo
      */
     public function __construct(
         NotificationFacade $facade,
         AppEnvInterface $appEnv,
         I18nFacade $i18n,
-        UserRepository $userRepo
+        UserRepositoryInterface $userRepo
     ) {
         $this->notification = $facade;
         $this->appEnv       = $appEnv;
@@ -118,8 +118,10 @@ class NotificationHelper
         return new TargetEmail($email, $name, $lang);
     }
 
-    public function getGroupUserConfig(NotificationGroupInterface $group, UserInterface $user): NotificationGroupUserConfigInterface
-    {
+    public function getGroupUserConfig(
+        NotificationGroupInterface $group,
+        UserInterface $user
+    ): NotificationGroupUserConfigInterface {
         return $this->notification->getGroupUserConfig($group, $user);
     }
 

@@ -68,6 +68,6 @@ class EntityRepository extends AbstractOrmBasedDispatchableRepository
      */
     public function findByEntityInstance(AbstractEntityInterface $instance): EntityModelInterface
     {
-        return $this->findByModelName($instance->getModelName());
+        return $this->findByModelName($instance::getModelName());
     }
 }

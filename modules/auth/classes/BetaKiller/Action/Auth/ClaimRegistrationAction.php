@@ -14,7 +14,7 @@ use BetaKiller\IFace\Auth\RegistrationClaimThanksIFace;
 use BetaKiller\Model\UserStatus;
 use BetaKiller\Repository\LanguageRepositoryInterface;
 use BetaKiller\Repository\NotificationLogRepositoryInterface;
-use BetaKiller\Repository\UserRepository;
+use BetaKiller\Repository\UserRepositoryInterface;
 use BetaKiller\Repository\UserStatusRepositoryInterface;
 use BetaKiller\Url\ZoneInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -43,7 +43,7 @@ class ClaimRegistrationAction extends AbstractAction implements GetRequestAction
     private $langRepo;
 
     /**
-     * @var \BetaKiller\Repository\UserRepository
+     * @var \BetaKiller\Repository\UserRepositoryInterface
      */
     private $userRepo;
 
@@ -59,14 +59,14 @@ class ClaimRegistrationAction extends AbstractAction implements GetRequestAction
      * @param \BetaKiller\Helper\NotificationHelper                     $notification
      * @param \BetaKiller\Repository\LanguageRepositoryInterface        $langRepo
      * @param \BetaKiller\Repository\UserStatusRepositoryInterface      $statusRepo
-     * @param \BetaKiller\Repository\UserRepository                     $userRepo
+     * @param \BetaKiller\Repository\UserRepositoryInterface            $userRepo
      */
     public function __construct(
         NotificationLogRepositoryInterface $logRepo,
         NotificationHelper $notification,
         LanguageRepositoryInterface $langRepo,
         UserStatusRepositoryInterface $statusRepo,
-        UserRepository $userRepo
+        UserRepositoryInterface $userRepo
     ) {
         $this->logRepo    = $logRepo;
         $this->facade     = $notification;

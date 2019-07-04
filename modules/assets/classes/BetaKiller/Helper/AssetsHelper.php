@@ -29,7 +29,7 @@ class AssetsHelper
     /**
      * Returns URL for uploading new assets
      *
-     * @param string $name
+     * @param string $modelName
      *
      * @return string
      * @throws \BetaKiller\Assets\Exception\AssetsException
@@ -37,9 +37,9 @@ class AssetsHelper
      * @throws \BetaKiller\Assets\Exception\AssetsStorageException
      * @throws \BetaKiller\Factory\FactoryException
      */
-    public function getUploadUrl(string $name): string
+    public function getUploadUrl(string $modelName): string
     {
-        return $this->getProviderByModelName($name)->getUploadUrl();
+        return $this->getProviderByModelName($modelName)->getUploadUrl();
     }
 
     /**
@@ -94,6 +94,18 @@ class AssetsHelper
     }
 
     /**
+     * @param \BetaKiller\Assets\Model\AssetsModelInterface $model
+     *
+     * @return array
+     * @throws \BetaKiller\Assets\Exception\AssetsException
+     * @throws \BetaKiller\Assets\Exception\AssetsStorageException
+     */
+    public function getInfo(AssetsModelInterface $model): array
+    {
+        return $this->getProviderByModel($model)->getInfo($model);
+    }
+
+    /**
      * @param string $name
      *
      * @return \BetaKiller\Assets\Provider\AssetsProviderInterface
@@ -117,7 +129,7 @@ class AssetsHelper
      */
     private function getProviderByModel(AssetsModelInterface $model): AssetsProviderInterface
     {
-        $name = $model->getModelName();
+        $name = $model::getModelName();
 
         return $this->getProviderByModelName($name);
     }
@@ -136,7 +148,7 @@ class AssetsHelper
 
         if (!($provider instanceof ImageAssetsProviderInterface)) {
             throw new AssetsException('Model :name must be linked to image provider', [
-                ':name' => $model->getModelName(),
+                ':name' => $model::getModelName(),
             ]);
         }
 
@@ -157,7 +169,7 @@ class AssetsHelper
 
         if (!($provider instanceof HasPreviewProviderInterface)) {
             throw new AssetsException('Model :name must be linked to provider implementing :must', [
-                ':name' => $model->getModelName(),
+                ':name' => $model::getModelName(),
                 ':must' => HasPreviewProviderInterface::class,
             ]);
         }

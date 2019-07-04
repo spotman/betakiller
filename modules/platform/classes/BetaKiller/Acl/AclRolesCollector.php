@@ -2,23 +2,23 @@
 namespace BetaKiller\Acl;
 
 use BetaKiller\Model\RoleInterface;
-use BetaKiller\Repository\RoleRepository;
+use BetaKiller\Repository\RoleRepositoryInterface;
 use Spotman\Acl\AclInterface;
 use Spotman\Acl\RolesCollector\AclRolesCollectorInterface;
 
 class AclRolesCollector implements AclRolesCollectorInterface
 {
     /**
-     * @var \BetaKiller\Repository\RoleRepository
+     * @var \BetaKiller\Repository\RoleRepositoryInterface
      */
     private $roleRepo;
 
     /**
      * AclRolesCollector constructor.
      *
-     * @param \BetaKiller\Repository\RoleRepository $roleRepo
+     * @param \BetaKiller\Repository\RoleRepositoryInterface $roleRepo
      */
-    public function __construct(RoleRepository $roleRepo)
+    public function __construct(RoleRepositoryInterface $roleRepo)
     {
         $this->roleRepo = $roleRepo;
     }

@@ -14,7 +14,7 @@ use BetaKiller\Model\UserInterface;
  * @method UserInterface[] getAll()
  * @method void save(UserInterface $entity)
  */
-class UserRepository extends AbstractOrmBasedRepository
+class UserRepository extends AbstractOrmBasedRepository implements UserRepositoryInterface
 {
     /**
      * Search for user by username or e-mail

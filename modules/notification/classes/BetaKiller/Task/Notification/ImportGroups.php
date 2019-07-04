@@ -7,7 +7,7 @@ use BetaKiller\Config\NotificationConfigInterface;
 use BetaKiller\Model\NotificationGroup;
 use BetaKiller\Model\NotificationGroupInterface;
 use BetaKiller\Repository\NotificationGroupRepository;
-use BetaKiller\Repository\RoleRepository;
+use BetaKiller\Repository\RoleRepositoryInterface;
 use BetaKiller\Task\AbstractTask;
 use Psr\Log\LoggerInterface;
 
@@ -19,7 +19,7 @@ class ImportGroups extends AbstractTask
     private $config;
 
     /**
-     * @var \BetaKiller\Repository\RoleRepository
+     * @var \BetaKiller\Repository\RoleRepositoryInterface
      */
     private $roleRepo;
 
@@ -38,13 +38,13 @@ class ImportGroups extends AbstractTask
      *
      * @param \BetaKiller\Repository\NotificationGroupRepository $groupRepo
      * @param \BetaKiller\Config\NotificationConfigInterface     $config
-     * @param \BetaKiller\Repository\RoleRepository              $roleRepo
+     * @param \BetaKiller\Repository\RoleRepositoryInterface     $roleRepo
      * @param \Psr\Log\LoggerInterface                           $logger
      */
     public function __construct(
         NotificationGroupRepository $groupRepo,
         NotificationConfigInterface $config,
-        RoleRepository $roleRepo,
+        RoleRepositoryInterface $roleRepo,
         LoggerInterface $logger
     ) {
         $this->groupRepo = $groupRepo;

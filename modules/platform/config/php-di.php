@@ -6,12 +6,15 @@ use BetaKiller\Factory\EntityFactoryInterface;
 use BetaKiller\Helper\I18nHelper;
 use BetaKiller\Log\Logger;
 use BetaKiller\Middleware\CspReportBodyParamsStrategy;
+use BetaKiller\Repository\RoleRepository;
+use BetaKiller\Repository\RoleRepositoryInterface;
+use BetaKiller\Repository\UserRepository;
+use BetaKiller\Repository\UserRepositoryInterface;
 use BetaKiller\Session\DatabaseSessionStorage;
 use BetaKiller\Session\SessionStorageInterface;
 use BetaKiller\Url\Container\UrlContainerInterface;
 use BetaKiller\Url\UrlElementStack;
 use Enqueue\Redis\RedisConnectionFactory;
-use Enqueue\Wamp\WampConnectionFactory;
 use GuzzleHttp\Client;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
@@ -173,6 +176,9 @@ return [
 
             return $factory->createContext();
         }),
+
+        UserRepositoryInterface::class => autowire(UserRepository::class),
+        RoleRepositoryInterface::class => autowire(RoleRepository::class),
     ],
 
 ];

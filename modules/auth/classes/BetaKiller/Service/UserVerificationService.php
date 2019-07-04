@@ -10,7 +10,7 @@ use BetaKiller\Helper\NotificationHelper;
 use BetaKiller\Helper\UrlHelper;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Model\UserStatus;
-use BetaKiller\Repository\UserRepository;
+use BetaKiller\Repository\UserRepositoryInterface;
 use BetaKiller\Repository\UserStatusRepositoryInterface;
 use BetaKiller\Url\Container\UrlContainerInterface;
 
@@ -29,7 +29,7 @@ class UserVerificationService
     private $notification;
 
     /**
-     * @var \BetaKiller\Repository\UserRepository
+     * @var \BetaKiller\Repository\UserRepositoryInterface
      */
     private $userRepo;
 
@@ -47,14 +47,14 @@ class UserVerificationService
      * @param \BetaKiller\Helper\NotificationHelper                $notificationHelper
      * @param \BetaKiller\Service\TokenService                     $tokenService
      * @param \BetaKiller\Repository\UserStatusRepositoryInterface $accStatusRepo
-     * @param \BetaKiller\Repository\UserRepository                $userRepo
+     * @param \BetaKiller\Repository\UserRepositoryInterface       $userRepo
      * @param \BetaKiller\Factory\UrlHelperFactory                 $urlHelperFactory
      */
     public function __construct(
         NotificationHelper $notificationHelper,
         TokenService $tokenService,
         UserStatusRepositoryInterface $accStatusRepo,
-        UserRepository $userRepo,
+        UserRepositoryInterface $userRepo,
         UrlHelperFactory $urlHelperFactory
     ) {
         $this->tokenService  = $tokenService;

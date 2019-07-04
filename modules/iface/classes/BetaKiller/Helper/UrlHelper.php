@@ -197,7 +197,7 @@ class UrlHelper
         $params->setParameter($entity);
 
         // Search for URL element with provided entity, action and zone
-        $urlElement = $this->tree->getByEntityActionAndZone($entity->getModelName(), $action, $zone);
+        $urlElement = $this->tree->getByEntityActionAndZone($entity::getModelName(), $action, $zone);
 
         return $this->makeUrl($urlElement, $params, $removeCycling);
     }

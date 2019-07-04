@@ -9,7 +9,7 @@ use BetaKiller\Helper\ActionRequestHelper;
 use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\IFace\Auth\AccessRecoveryRequestIFace;
-use BetaKiller\Repository\UserRepository;
+use BetaKiller\Repository\UserRepositoryInterface;
 use BetaKiller\Service\AccessRecoveryService;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -20,7 +20,7 @@ class SendRecoveryEmailAction extends AbstractAction implements PostRequestActio
     private const ARG_EMAIL = 'email';
 
     /**
-     * @var \BetaKiller\Repository\UserRepository
+     * @var \BetaKiller\Repository\UserRepositoryInterface
      */
     private $userRepo;
 
@@ -30,11 +30,11 @@ class SendRecoveryEmailAction extends AbstractAction implements PostRequestActio
     private $recovery;
 
     /**
-     * @param \BetaKiller\Repository\UserRepository     $userRepo
-     * @param \BetaKiller\Service\AccessRecoveryService $recovery
+     * @param \BetaKiller\Repository\UserRepositoryInterface $userRepo
+     * @param \BetaKiller\Service\AccessRecoveryService      $recovery
      */
     public function __construct(
-        UserRepository $userRepo,
+        UserRepositoryInterface $userRepo,
         AccessRecoveryService $recovery
     ) {
         $this->userRepo = $userRepo;

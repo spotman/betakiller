@@ -7,7 +7,6 @@ use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Service\AuthService;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Spotman\Defence\DefinitionBuilderInterface;
 
 class LogoutAction extends AbstractAction
 {

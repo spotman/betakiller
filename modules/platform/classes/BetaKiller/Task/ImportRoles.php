@@ -8,7 +8,7 @@ use BetaKiller\Config\ConfigProviderInterface;
 use BetaKiller\Factory\EntityFactoryInterface;
 use BetaKiller\Model\Role;
 use BetaKiller\Model\RoleInterface;
-use BetaKiller\Repository\RoleRepository;
+use BetaKiller\Repository\RoleRepositoryInterface;
 use Psr\Log\LoggerInterface;
 
 class ImportRoles extends AbstractTask
@@ -19,7 +19,7 @@ class ImportRoles extends AbstractTask
     private $config;
 
     /**
-     * @var \BetaKiller\Repository\RoleRepository
+     * @var \BetaKiller\Repository\RoleRepositoryInterface
      */
     private $roleRepo;
 
@@ -37,13 +37,13 @@ class ImportRoles extends AbstractTask
      * ImportRoles constructor.
      *
      * @param \BetaKiller\Config\ConfigProviderInterface $config
-     * @param \BetaKiller\Repository\RoleRepository      $roleRepo
+     * @param \BetaKiller\Repository\RoleRepositoryInterface      $roleRepo
      * @param \BetaKiller\Factory\EntityFactoryInterface $entityFactory
      * @param \Psr\Log\LoggerInterface                   $logger
      */
     public function __construct(
         ConfigProviderInterface $config,
-        RoleRepository $roleRepo,
+        RoleRepositoryInterface $roleRepo,
         EntityFactoryInterface $entityFactory,
         LoggerInterface $logger
     ) {
@@ -78,7 +78,7 @@ class ImportRoles extends AbstractTask
             // Add missing role and keep existing untouched
             if (!$model) {
                 /** @var RoleInterface $model */
-                $model = $this->entityFactory->create(Role::detectModelName());
+                $model = $this->entityFactory->create(Role::getModelName());
 
                 $model
                     ->setName($name)

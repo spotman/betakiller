@@ -3,7 +3,7 @@ namespace BetaKiller\Helper;
 
 use BetaKiller\Exception;
 use BetaKiller\Model\UserInterface;
-use BetaKiller\Repository\UserRepository;
+use BetaKiller\Repository\UserRepositoryInterface;
 use BetaKiller\Task\AbstractTask;
 
 class UserDetector
@@ -14,17 +14,17 @@ class UserDetector
     private $appEnv;
 
     /**
-     * @var \BetaKiller\Repository\UserRepository
+     * @var \BetaKiller\Repository\UserRepositoryInterface
      */
     private $repository;
 
     /**
      * UserDetector constructor.
      *
-     * @param \BetaKiller\Helper\AppEnvInterface    $appEnv
-     * @param \BetaKiller\Repository\UserRepository $repo
+     * @param \BetaKiller\Helper\AppEnvInterface             $appEnv
+     * @param \BetaKiller\Repository\UserRepositoryInterface $repo
      */
-    public function __construct(AppEnvInterface $appEnv, UserRepository $repo)
+    public function __construct(AppEnvInterface $appEnv, UserRepositoryInterface $repo)
     {
         $this->appEnv     = $appEnv;
         $this->repository = $repo;

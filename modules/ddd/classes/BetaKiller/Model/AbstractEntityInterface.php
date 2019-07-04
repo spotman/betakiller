@@ -18,5 +18,5 @@ interface AbstractEntityInterface
     /**
      * @return string
      */
-    public function getModelName(): string;
+    public static function getModelName(): string;
 }

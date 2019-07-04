@@ -9,8 +9,8 @@ use BetaKiller\Model\GuestUserInterface;
 use BetaKiller\Model\RoleInterface;
 use BetaKiller\Model\User;
 use BetaKiller\Model\UserInterface;
-use BetaKiller\Repository\RoleRepository;
-use BetaKiller\Repository\UserRepository;
+use BetaKiller\Repository\RoleRepositoryInterface;
+use BetaKiller\Repository\UserRepositoryInterface;
 use BetaKiller\Task\AbstractTask;
 
 class UserService
@@ -18,12 +18,12 @@ class UserService
     public const DEFAULT_IP = '127.0.0.1';
 
     /**
-     * @var \BetaKiller\Repository\UserRepository
+     * @var \BetaKiller\Repository\UserRepositoryInterface
      */
     private $userRepository;
 
     /**
-     * @var \BetaKiller\Repository\RoleRepository
+     * @var \BetaKiller\Repository\RoleRepositoryInterface
      */
     private $roleRepository;
 
@@ -45,16 +45,16 @@ class UserService
     /**
      * UserService constructor.
      *
-     * @param \BetaKiller\Factory\EntityFactoryInterface $entityFactory
-     * @param \BetaKiller\Repository\UserRepository      $userRepo
-     * @param \BetaKiller\Repository\RoleRepository      $roleRepo
-     * @param \BetaKiller\Factory\GuestUserFactory       $guestFactory
-     * @param \BetaKiller\Config\AppConfigInterface      $appConfig
+     * @param \BetaKiller\Factory\EntityFactoryInterface     $entityFactory
+     * @param \BetaKiller\Repository\UserRepositoryInterface $userRepo
+     * @param \BetaKiller\Repository\RoleRepositoryInterface $roleRepo
+     * @param \BetaKiller\Factory\GuestUserFactory           $guestFactory
+     * @param \BetaKiller\Config\AppConfigInterface          $appConfig
      */
     public function __construct(
         EntityFactoryInterface $entityFactory,
-        UserRepository $userRepo,
-        RoleRepository $roleRepo,
+        UserRepositoryInterface $userRepo,
+        RoleRepositoryInterface $roleRepo,
         GuestUserFactory $guestFactory,
         AppConfigInterface $appConfig
     ) {
@@ -66,9 +66,9 @@ class UserService
     }
 
     /**
-     * @param string      $login
-     * @param string      $email
-     * @param string      $createdFromIp
+     * @param string $login
+     * @param string $email
+     * @param string $createdFromIp
      *
      * @return \BetaKiller\Model\UserInterface
      * @throws \BetaKiller\Exception\ValidationException
@@ -85,7 +85,7 @@ class UserService
         ];
 
         /** @var UserInterface $user */
-        $user = $this->entityFactory->create(User::detectModelName());
+        $user = $this->entityFactory->create(User::getModelName());
 
         $user
             ->setCreatedAt()
@@ -153,17 +153,6 @@ class UserService
     }
 
     /**
-     * @return UserInterface[]
-     * @throws \BetaKiller\Repository\RepositoryException
-     */
-    public function getModerators(): array
-    {
-        $role = $this->roleRepository->getModeratorRole();
-
-        return $this->userRepository->getUsersWithRole($role);
-    }
-
-    /**
      * @param \BetaKiller\Model\UserInterface $user
      *
      * @return bool
@@ -172,17 +161,6 @@ class UserService
     public function isDeveloper(UserInterface $user): bool
     {
         return $user->hasRole($this->roleRepository->getDeveloperRole());
-    }
-
-    /**
-     * @param \BetaKiller\Model\UserInterface $user
-     *
-     * @return bool
-     * @throws \BetaKiller\Repository\RepositoryException
-     */
-    public function isModerator(UserInterface $user): bool
-    {
-        return $user->hasRole($this->roleRepository->getModeratorRole());
     }
 
     /**

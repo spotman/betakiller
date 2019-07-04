@@ -11,7 +11,7 @@ use BetaKiller\Helper\ActionRequestHelper;
 use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\IFace\Auth\LoginIFace;
-use BetaKiller\Repository\UserRepository;
+use BetaKiller\Repository\UserRepositoryInterface;
 use BetaKiller\Service\AuthService;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -35,17 +35,17 @@ class RegularLoginAction extends AbstractAction implements PostRequestActionInte
     private $auth;
 
     /**
-     * @var \BetaKiller\Repository\UserRepository
+     * @var \BetaKiller\Repository\UserRepositoryInterface
      */
     private $userRepo;
 
     /**
      * RegularLoginAction constructor.
      *
-     * @param \BetaKiller\Service\AuthService       $auth
-     * @param \BetaKiller\Repository\UserRepository $userRepo
+     * @param \BetaKiller\Service\AuthService                $auth
+     * @param \BetaKiller\Repository\UserRepositoryInterface $userRepo
      */
-    public function __construct(AuthService $auth, UserRepository $userRepo)
+    public function __construct(AuthService $auth, UserRepositoryInterface $userRepo)
     {
         $this->auth     = $auth;
         $this->userRepo = $userRepo;

@@ -136,7 +136,7 @@ class Wordpress extends AbstractTask
 
     /**
      * @Inject
-     * @var \BetaKiller\Repository\UserRepository
+     * @var \BetaKiller\Repository\UserRepositoryInterface
      */
     private $userRepository;
 
@@ -536,7 +536,7 @@ class Wordpress extends AbstractTask
 
             if (!$model) {
                 /** @var ContentPostInterface $model */
-                $model = $this->entityFactory->create(ContentPost::detectModelName());
+                $model = $this->entityFactory->create(ContentPost::getModelName());
                 $model->setWpId($wpID);
             }
 
@@ -987,7 +987,7 @@ class Wordpress extends AbstractTask
         }
 
         /** @var ContentGalleryInterface $gallery */
-        $gallery = $this->entityFactory->create(ContentGallery::detectModelName());
+        $gallery = $this->entityFactory->create(ContentGallery::getModelName());
 
         // Link gallery to current post
         $gallery->setEntity($this->contentPostEntity)->setEntityItemID($entityItemID);
@@ -1131,7 +1131,7 @@ class Wordpress extends AbstractTask
 
         // Nothing found => create new gallery
         /** @var ContentGalleryInterface $gallery */
-        $gallery = $this->entityFactory->create(ContentGallery::detectModelName());
+        $gallery = $this->entityFactory->create(ContentGallery::getModelName());
 
         // Link gallery to current post
         $gallery->setEntity($this->contentPostEntity)->setEntityItemID($entityItemID);
@@ -1428,7 +1428,7 @@ class Wordpress extends AbstractTask
 
         if (!$video) {
             /** @var \BetaKiller\Model\ContentYoutubeRecord $video */
-            $video = $this->entityFactory->create(ContentYoutubeRecord::detectModelName());
+            $video = $this->entityFactory->create(ContentYoutubeRecord::getModelName());
             $video->setYoutubeId($youtubeID);
         }
 
@@ -1488,7 +1488,7 @@ class Wordpress extends AbstractTask
 
             if (!$category) {
                 /** @var \BetaKiller\Model\ContentCategoryInterface $category */
-                $category = $this->entityFactory->create(ContentCategory::detectModelName());
+                $category = $this->entityFactory->create(ContentCategory::getModelName());
                 $category->setWpId($wpID);
             }
 
@@ -1553,7 +1553,7 @@ class Wordpress extends AbstractTask
 
             if (!$model) {
                 /** @var \BetaKiller\Model\QuoteInterface $model */
-                $model = $this->entityFactory->create(Quote::detectModelName());
+                $model = $this->entityFactory->create(Quote::getModelName());
                 $model->setWpId($id);
             }
 
@@ -1626,7 +1626,7 @@ class Wordpress extends AbstractTask
 
         if (!$model) {
             /** @var \BetaKiller\Model\ContentCommentInterface $model */
-            $model = $this->entityFactory->create(ContentComment::detectModelName());
+            $model = $this->entityFactory->create(ContentComment::getModelName());
             $model->setWpId($wpID);
         }
 

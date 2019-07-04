@@ -9,12 +9,9 @@ use BetaKiller\Model\RoleInterface;
  * Class RoleRepository
  *
  * @package BetaKiller\Repository
- * @method save(RoleInterface $model)
- * @method RoleInterface findById(int $id)
- * @method RoleInterface[] getAll()
  * @method Role getOrmInstance()
  */
-class RoleRepository extends AbstractOrmBasedMultipleParentsTreeRepository
+class RoleRepository extends AbstractOrmBasedMultipleParentsTreeRepository implements RoleRepositoryInterface
 {
     /**
      * @return string
@@ -40,15 +37,6 @@ class RoleRepository extends AbstractOrmBasedMultipleParentsTreeRepository
     public function getLoginRole(): RoleInterface
     {
         return $this->getByName(RoleInterface::LOGIN);
-    }
-
-    /**
-     * @return \BetaKiller\Model\RoleInterface
-     * @throws \BetaKiller\Repository\RepositoryException
-     */
-    public function getModeratorRole(): RoleInterface
-    {
-        return $this->getByName(RoleInterface::MODERATOR);
     }
 
     /**

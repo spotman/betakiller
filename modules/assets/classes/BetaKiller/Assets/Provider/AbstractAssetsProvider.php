@@ -438,7 +438,7 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
 
             if (!$this->repository instanceof HashStrategyAssetsRepositoryInterface) {
                 throw new AssetsProviderException('Repository ":name" must implement :must', [
-                    ':name' => $model->getModelName(),
+                    ':name' => $model::getModelName(),
                     ':must' => HashStrategyAssetsRepositoryInterface::class,
                 ]);
             }

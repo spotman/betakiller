@@ -23,17 +23,17 @@ class NotificationGroupUserConfig extends ORM implements NotificationGroupUserCo
 
         $this->belongs_to([
             self::REL_USER => [
-                'model'       => User::detectModelName(),
+                'model'       => User::getModelName(),
                 'foreign_key' => self::COL_USER_ID,
             ],
 
             self::REL_GROUP => [
-                'model'       => NotificationGroup::detectModelName(),
+                'model'       => NotificationGroup::getModelName(),
                 'foreign_key' => self::COL_GROUP_ID,
             ],
 
             self::REL_FREQ => [
-                'model'       => NotificationFrequency::detectModelName(),
+                'model'       => NotificationFrequency::getModelName(),
                 'foreign_key' => self::COL_FREQ_ID,
             ],
         ]);

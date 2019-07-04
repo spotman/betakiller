@@ -13,8 +13,8 @@ use BetaKiller\Factory\UrlHelperFactory;
 use BetaKiller\Helper\NotificationHelper;
 use BetaKiller\Helper\SessionHelper;
 use BetaKiller\Model\UserInterface;
-use BetaKiller\Repository\RoleRepository;
-use BetaKiller\Repository\UserRepository;
+use BetaKiller\Repository\RoleRepositoryInterface;
+use BetaKiller\Repository\UserRepositoryInterface;
 use BetaKiller\Session\SessionStorageInterface;
 use DateInterval;
 use Zend\Expressive\Session\SessionInterface;
@@ -32,12 +32,12 @@ class AuthService
     private $config;
 
     /**
-     * @var \BetaKiller\Repository\UserRepository
+     * @var \BetaKiller\Repository\UserRepositoryInterface
      */
     private $userRepo;
 
     /**
-     * @var \BetaKiller\Repository\RoleRepository
+     * @var \BetaKiller\Repository\RoleRepositoryInterface
      */
     private $roleRepo;
 
@@ -69,21 +69,21 @@ class AuthService
     /**
      * AuthService constructor.
      *
-     * @param \BetaKiller\Auth\SessionConfig              $config
-     * @param \BetaKiller\Session\SessionStorageInterface $sessionStorage
-     * @param \BetaKiller\Factory\GuestUserFactory        $guestUserFactory
-     * @param \BetaKiller\Repository\UserRepository       $userRepo
-     * @param \BetaKiller\Repository\RoleRepository       $roleRepo
-     * @param \BetaKiller\Helper\NotificationHelper       $notification
-     * @param \BetaKiller\Service\TokenService            $tokenService
-     * @param \BetaKiller\Factory\UrlHelperFactory        $urlHelperFactory
+     * @param \BetaKiller\Auth\SessionConfig                 $config
+     * @param \BetaKiller\Session\SessionStorageInterface    $sessionStorage
+     * @param \BetaKiller\Factory\GuestUserFactory           $guestUserFactory
+     * @param \BetaKiller\Repository\UserRepositoryInterface $userRepo
+     * @param \BetaKiller\Repository\RoleRepositoryInterface $roleRepo
+     * @param \BetaKiller\Helper\NotificationHelper          $notification
+     * @param \BetaKiller\Service\TokenService               $tokenService
+     * @param \BetaKiller\Factory\UrlHelperFactory           $urlHelperFactory
      */
     public function __construct(
         SessionConfig $config,
         SessionStorageInterface $sessionStorage,
         GuestUserFactory $guestUserFactory,
-        UserRepository $userRepo,
-        RoleRepository $roleRepo,
+        UserRepositoryInterface $userRepo,
+        RoleRepositoryInterface $roleRepo,
         NotificationHelper $notification,
         TokenService $tokenService,
         UrlHelperFactory $urlHelperFactory

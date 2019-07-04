@@ -10,7 +10,7 @@ use BetaKiller\Helper\ActionRequestHelper;
 use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Repository\LanguageRepositoryInterface;
-use BetaKiller\Repository\UserRepository;
+use BetaKiller\Repository\UserRepositoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Spotman\Defence\DefinitionBuilderInterface;
@@ -21,7 +21,7 @@ class ChangeUserLanguageAction extends AbstractAction implements PostRequestActi
     public const ARG_URL  = 'url';
 
     /**
-     * @var \BetaKiller\Repository\UserRepository
+     * @var \BetaKiller\Repository\UserRepositoryInterface
      */
     private $userRepo;
 
@@ -33,10 +33,10 @@ class ChangeUserLanguageAction extends AbstractAction implements PostRequestActi
     /**
      * ApplicantOneIFace constructor.
      *
-     * @param \BetaKiller\Repository\UserRepository              $userRepo
+     * @param \BetaKiller\Repository\UserRepositoryInterface     $userRepo
      * @param \BetaKiller\Repository\LanguageRepositoryInterface $languageRepo
      */
-    public function __construct(UserRepository $userRepo, LanguageRepositoryInterface $languageRepo)
+    public function __construct(UserRepositoryInterface $userRepo, LanguageRepositoryInterface $languageRepo)
     {
         $this->userRepo = $userRepo;
         $this->langRepo = $languageRepo;

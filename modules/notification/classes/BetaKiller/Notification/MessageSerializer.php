@@ -5,7 +5,7 @@ namespace BetaKiller\Notification;
 
 use BetaKiller\Exception;
 use BetaKiller\Model\UserInterface;
-use BetaKiller\Repository\UserRepository;
+use BetaKiller\Repository\UserRepositoryInterface;
 
 class MessageSerializer
 {
@@ -33,9 +33,9 @@ class MessageSerializer
     /**
      * MessageSerializer constructor.
      *
-     * @param \BetaKiller\Repository\UserRepository $userRepo
+     * @param \BetaKiller\Repository\UserRepositoryInterface $userRepo
      */
-    public function __construct(UserRepository $userRepo)
+    public function __construct(UserRepositoryInterface $userRepo)
     {
         $this->userRepo = $userRepo;
     }

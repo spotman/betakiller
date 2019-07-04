@@ -9,7 +9,7 @@ abstract class AbstractOrmBasedMultipleParentsTreeModel extends \ORM implements 
     {
         $this->has_many([
             'parents' => [
-                'model'       => $this->getModelName(),
+                'model'       => static::getModelName(),
                 'foreign_key' => $this->getChildIdColumnName(),
                 'far_key'     => $this->getParentIdColumnName(),
                 'through'     => $this->getTreeModelThroughTableName(),

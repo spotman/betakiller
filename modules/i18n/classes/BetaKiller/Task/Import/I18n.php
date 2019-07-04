@@ -169,7 +169,7 @@ class I18n extends AbstractTask
         // Create new if not exists
         if (!$keyModel) {
             /** @var \BetaKiller\Model\TranslationKeyModelInterface $keyModel */
-            $keyModel = $this->entityFactory->create(TranslationKey::detectModelName());
+            $keyModel = $this->entityFactory->create(TranslationKey::getModelName());
             $keyModel->setI18nKey($keyName);
             $this->logger->info('I18n key ":key" added', [
                 ':key' => $keyName,

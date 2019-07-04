@@ -96,14 +96,13 @@ class ContentCommentWorkflow extends StatusWorkflow
      * @param \BetaKiller\Model\ContentCommentInterface $comment
      *
      * @throws \BetaKiller\Notification\NotificationException
-     * @throws \BetaKiller\Repository\RepositoryException
      */
     protected function notifyCommentAuthorAboutApprove(ContentCommentInterface $comment): void
     {
         $authorUser = $comment->getAuthorUser();
 
         // Skip notification for moderators
-        if ($authorUser && $this->userService->isModerator($authorUser)) {
+        if ($authorUser && $this->userService->isAdmin($authorUser)) {
             return;
         }
 

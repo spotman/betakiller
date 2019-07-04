@@ -64,9 +64,9 @@ abstract class ORM extends Utils\Kohana\ORM implements ExtendedOrmInterface
         return self::$factoryInstance;
     }
 
-    public function getModelName(OrmInterface $object = null): string
+    public static function getModelName(): string
     {
-        return static::detectModelName($object);
+        return static::detectModelName();
     }
 
     public static function detectModelName(OrmInterface $object = null): string
@@ -101,12 +101,12 @@ abstract class ORM extends Utils\Kohana\ORM implements ExtendedOrmInterface
 
             if (!$this->loaded()) {
                 throw new \RuntimeException(
-                    sprintf('Entity "%s" is not loaded', $this->getModelName())
+                    sprintf('Entity "%s" is not loaded', self::detectModelName($this))
                 );
             }
 
             throw new \RuntimeException(
-                sprintf('Related alias "%s" is not loaded in entity "%s"', $alias, $this->getModelName())
+                sprintf('Related alias "%s" is not loaded in entity "%s"', $alias, self::detectModelName($this))
             );
         }
 
@@ -244,8 +244,8 @@ abstract class ORM extends Utils\Kohana\ORM implements ExtendedOrmInterface
      * Prepares the model database connection, determines the table name,
      * and loads column information.
      *
-     * @throws Exception
      * @return void
+     * @throws Exception
      */
     protected function _initialize()
     {
@@ -266,7 +266,7 @@ abstract class ORM extends Utils\Kohana\ORM implements ExtendedOrmInterface
      */
     public static function getUrlContainerKey(): string
     {
-        return static::detectModelName();
+        return static::getModelName();
     }
 
     /**

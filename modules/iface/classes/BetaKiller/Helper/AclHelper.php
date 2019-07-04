@@ -86,7 +86,7 @@ class AclHelper
      */
     private function getEntityAclResource(DispatchableEntityInterface $entity): EntityRelatedAclResourceInterface
     {
-        $name = $entity->getModelName();
+        $name = $entity::getModelName();
 
         $resource = $this->getAclResourceFromEntityName($name);
         $resource->setEntity($entity);

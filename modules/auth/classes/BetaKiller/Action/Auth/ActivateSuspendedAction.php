@@ -8,12 +8,11 @@ use BetaKiller\Auth\UserUrlDetectorInterface;
 use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\Model\UserStatus;
-use BetaKiller\Repository\UserRepository;
+use BetaKiller\Repository\UserRepositoryInterface;
 use BetaKiller\Repository\UserStatusRepositoryInterface;
 use BetaKiller\Service\UserVerificationService;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Spotman\Defence\DefinitionBuilderInterface;
 
 class ActivateSuspendedAction extends AbstractAction
 {
@@ -23,7 +22,7 @@ class ActivateSuspendedAction extends AbstractAction
     private $statusRepo;
 
     /**
-     * @var \BetaKiller\Repository\UserRepository
+     * @var \BetaKiller\Repository\UserRepositoryInterface
      */
     private $userRepo;
 
@@ -41,13 +40,13 @@ class ActivateSuspendedAction extends AbstractAction
      * ActivateSuspendedAction constructor.
      *
      * @param \BetaKiller\Repository\UserStatusRepositoryInterface $statusRepo
-     * @param \BetaKiller\Repository\UserRepository                $userRepo
+     * @param \BetaKiller\Repository\UserRepositoryInterface       $userRepo
      * @param \BetaKiller\Auth\UserUrlDetectorInterface            $urlDetector
      * @param \BetaKiller\Service\UserVerificationService          $verification
      */
     public function __construct(
         UserStatusRepositoryInterface $statusRepo,
-        UserRepository $userRepo,
+        UserRepositoryInterface $userRepo,
         UserUrlDetectorInterface $urlDetector,
         UserVerificationService $verification
     ) {

@@ -8,7 +8,7 @@ use BetaKiller\Helper\UrlHelper;
 use BetaKiller\IFace\Admin\AbstractAdminIFace;
 use BetaKiller\Model\NotificationLogInterface;
 use BetaKiller\Repository\NotificationLogRepository;
-use BetaKiller\Repository\UserRepository;
+use BetaKiller\Repository\UserRepositoryInterface;
 use BetaKiller\Url\Parameter\PaginationUrlParameter;
 use BetaKiller\Url\ZoneInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -24,7 +24,7 @@ class LogIndexIFace extends AbstractAdminIFace
     private $logRepo;
 
     /**
-     * @var \BetaKiller\Repository\UserRepository
+     * @var \BetaKiller\Repository\UserRepositoryInterface
      */
     private $userRepo;
 
@@ -32,9 +32,9 @@ class LogIndexIFace extends AbstractAdminIFace
      * LogIndexIFace constructor.
      *
      * @param \BetaKiller\Repository\NotificationLogRepository $logRepo
-     * @param \BetaKiller\Repository\UserRepository            $userRepo
+     * @param \BetaKiller\Repository\UserRepositoryInterface   $userRepo
      */
-    public function __construct(NotificationLogRepository $logRepo, UserRepository $userRepo)
+    public function __construct(NotificationLogRepository $logRepo, UserRepositoryInterface $userRepo)
     {
         $this->logRepo  = $logRepo;
         $this->userRepo = $userRepo;

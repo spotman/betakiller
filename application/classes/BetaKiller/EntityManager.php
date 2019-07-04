@@ -31,7 +31,7 @@ class EntityManager
      */
     public function persist(AbstractEntityInterface $entity): void
     {
-        $repo = $this->repositoryFactory->create($entity->getModelName());
+        $repo = $this->repositoryFactory->create($entity::getModelName());
         $repo->save($entity);
     }
 }

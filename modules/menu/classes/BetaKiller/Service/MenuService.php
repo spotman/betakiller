@@ -143,6 +143,22 @@ class MenuService
     }
 
     /**
+     * @param MenuItem[] $items
+     *
+     * @return string[][]
+     */
+    public function convertToJson(array $items): array
+    {
+        $data = [];
+
+        foreach ($items as $item) {
+            $data[] = $item->jsonSerialize();
+        }
+
+        return $data;
+    }
+
+    /**
      * Processing UrlElement tree layer
      *
      * @param \RecursiveIterator|UrlElementInterface[]        $iterator
