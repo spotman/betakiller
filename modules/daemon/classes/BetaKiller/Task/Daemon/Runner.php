@@ -16,7 +16,7 @@ class Runner extends AbstractTask
     use LoggerHelperTrait;
 
     public const START_TIMEOUT = 5;
-    public const STOP_TIMEOUT  = 10;
+    public const STOP_TIMEOUT  = 15;
 
     private const STATUS_STARTING = 'starting';
     private const STATUS_STARTED  = 'started';
