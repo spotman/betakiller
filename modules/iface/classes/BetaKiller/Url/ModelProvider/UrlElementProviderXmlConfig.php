@@ -4,6 +4,7 @@ namespace BetaKiller\Url\ModelProvider;
 use BetaKiller\IFace\Exception\UrlElementException;
 use BetaKiller\Url\IFaceModelInterface;
 use BetaKiller\Url\UrlElementInterface;
+use BetaKiller\Url\UrlElementWithLayoutInterface;
 use Kohana;
 use SimpleXMLElement;
 
@@ -103,11 +104,11 @@ class UrlElementProviderXmlConfig implements UrlElementProviderInterface
         if (!$codename) {
             throw new UrlElementException('Missing codename for ":tag" with attributes :args', [
                 ':tag'  => $tag,
-                ':args' => \json_encode($config),
+                ':args' => json_encode($config),
             ]);
         }
 
-        if (!\in_array($tag, $this->allowedTags, true)) {
+        if (!in_array($tag, $this->allowedTags, true)) {
             throw new UrlElementException('Only tags <:allowed> are allowed for XML-based config, but <:tag> is used', [
                 ':tag'     => $tag,
                 ':allowed' => implode('>, <', $this->allowedTags),
@@ -159,12 +160,15 @@ class UrlElementProviderXmlConfig implements UrlElementProviderInterface
             $config[AbstractPlainUrlElementModel::OPTION_ZONE] = $parent->getZoneName();
         }
 
+        // Layout options
+        if ($parent instanceof UrlElementWithLayoutInterface) {
+            if (empty($config[UrlElementWithLayoutInterface::OPTION_LAYOUT])) {
+                $config[UrlElementWithLayoutInterface::OPTION_LAYOUT] = $parent->getLayoutCodename();
+            }
+        }
+
         // IFace options
         if ($parent instanceof IFaceModelInterface) {
-            if (empty($config[IFacePlainModel::OPTION_LAYOUT])) {
-                $config[IFacePlainModel::OPTION_LAYOUT] = $parent->getLayoutCodename();
-            }
-
             if (empty($config[IFacePlainModel::OPTION_HIDE_IN_SITEMAP])) {
                 $config[IFacePlainModel::OPTION_HIDE_IN_SITEMAP] = $parent->isHiddenInSiteMap();
             }

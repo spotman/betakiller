@@ -5,6 +5,8 @@ namespace BetaKiller\Url;
 
 interface UrlElementForMenuInterface extends UrlElementWithLabelInterface
 {
+    public const OPTION_MENU = 'menu';
+
     /**
      * Returns menu codename to which URL is assigned
      *

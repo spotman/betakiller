@@ -5,6 +5,7 @@ use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Helper\ServerRequestHelper;
 use BetaKiller\IFace\Exception\UrlElementException;
 use BetaKiller\Url\DummyInstance;
+use BetaKiller\Url\DummyModelInterface;
 use BetaKiller\Url\IFaceModelInterface;
 use BetaKiller\Url\UrlElementInstanceInterface;
 use BetaKiller\Url\UrlElementInterface;
@@ -52,11 +53,21 @@ class DummyUrlElementProcessor implements UrlElementProcessorInterface
         $urlHelper = ServerRequestHelper::getUrlHelper($request);
         $element   = $instance->getModel();
 
-        $redirectTarget = $element->getRedirectTarget();
+        $redirectElement = $element;
 
-        $redirectElement = $redirectTarget
-            ? $urlHelper->getUrlElementByCodename($redirectTarget)
-            : $this->getParentIFace($element);
+        // Process chained dummies to prevent multiple redirects in browser
+        do {
+            $redirectTarget = $redirectElement->getRedirectTarget();
+
+            $redirectElement = $redirectTarget
+                ? $urlHelper->getUrlElementByCodename($redirectTarget)
+                : null;
+        } while ($redirectElement && $redirectElement instanceof DummyModelInterface && $redirectElement->getRedirectTarget());
+
+        // Fallback to parent if redirect is not defined
+        if (!$redirectElement) {
+            $redirectElement = $this->getParentIFace($element);
+        }
 
         // Redirect
         return ResponseHelper::redirect($urlHelper->makeUrl($redirectElement));

@@ -10,6 +10,7 @@ use BetaKiller\IFace\IFaceInterface;
 use BetaKiller\Repository\IFaceLayoutRepository;
 use BetaKiller\Repository\RepositoryException;
 use BetaKiller\Url\IFaceModelInterface;
+use Meta;
 use Psr\Http\Message\ServerRequestInterface;
 
 class IFaceView
@@ -117,7 +118,7 @@ class IFaceView
         $layoutCodename = $this->getLayoutCodename($model, $this->elementHelper);
 
         // Create instance of renderer
-        $meta         = new \Meta;
+        $meta         = new Meta;
         $assets       = $this->assetsFactory->create();
         $renderHelper = new HtmlRenderHelper($meta, $assets);
 

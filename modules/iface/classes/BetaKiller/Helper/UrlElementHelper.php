@@ -7,9 +7,11 @@ use BetaKiller\IFace\IFaceInterface;
 use BetaKiller\Model\LanguageInterface;
 use BetaKiller\Url\Container\UrlContainerInterface;
 use BetaKiller\Url\IFaceModelInterface;
+use BetaKiller\Url\UrlElementInterface;
 use BetaKiller\Url\UrlElementStack;
 use BetaKiller\Url\UrlElementTreeInterface;
 use BetaKiller\Url\UrlElementWithLabelInterface;
+use BetaKiller\Url\UrlElementWithLayoutInterface;
 use Spotman\Api\ApiMethodResponse;
 
 class UrlElementHelper
@@ -95,19 +97,19 @@ class UrlElementHelper
     }
 
     /**
-     * @param \BetaKiller\Url\IFaceModelInterface $model
+     * @param \BetaKiller\Url\UrlElementInterface $model
      *
      * @return string|null
      * @throws \BetaKiller\IFace\Exception\UrlElementException
      */
-    public function detectLayoutCodename(IFaceModelInterface $model): ?string
+    public function detectLayoutCodename(UrlElementInterface $model): ?string
     {
         $layoutCodename = null;
         $current        = $model;
 
         // Climb up the tree for a layout codename
         do {
-            if ($current instanceof IFaceModelInterface) {
+            if ($current instanceof UrlElementWithLayoutInterface) {
                 $layoutCodename = $current->getLayoutCodename();
             }
         } while (!$layoutCodename && $current = $this->tree->getParent($current));

@@ -7,10 +7,7 @@ use BetaKiller\Url\IFaceModelInterface;
 
 class IFacePlainModel extends AbstractPlainEntityLinkedUrlElement implements IFaceModelInterface
 {
-    public const OPTION_LABEL  = 'label';
-    public const OPTION_TITLE  = 'title';
-    public const OPTION_LAYOUT = 'layout';
-    public const OPTION_MENU   = 'menu';
+    public const OPTION_TITLE = 'title';
 
     /**
      * @var string

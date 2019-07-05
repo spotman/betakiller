@@ -56,6 +56,7 @@ class PasswordChangeIFace extends AbstractIFace
 
         return [
             'app_state' => [
+                'userName' => $user->getFirstName(),
                 'actionUrl' => $urlHelper->makeUrl($actionElement),
                 'nextUrl'   => $this->urlDetector->detect($user, $urlHelper),
                 'isChanged' => $isChanged,
