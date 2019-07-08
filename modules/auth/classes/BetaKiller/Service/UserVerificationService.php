@@ -13,6 +13,7 @@ use BetaKiller\Model\UserStatus;
 use BetaKiller\Repository\UserRepositoryInterface;
 use BetaKiller\Repository\UserStatusRepositoryInterface;
 use BetaKiller\Url\Container\UrlContainerInterface;
+use DateInterval;
 
 class UserVerificationService
 {
@@ -68,7 +69,6 @@ class UserVerificationService
      * @param \BetaKiller\Model\UserInterface $user
      *
      * @return void
-     * @throws \BetaKiller\Exception\ValidationException
      */
     public function confirmUser(UserInterface $user): void
     {
@@ -103,9 +103,9 @@ class UserVerificationService
      * @return \DateInterval
      * @throws \Exception
      */
-    protected function getTokenPeriod(): \DateInterval
+    protected function getTokenPeriod(): DateInterval
     {
-        return new \DateInterval('P14D');
+        return new DateInterval('P14D');
     }
 
     /**

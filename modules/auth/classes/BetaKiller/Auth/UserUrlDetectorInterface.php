@@ -10,9 +10,8 @@ interface UserUrlDetectorInterface
 {
     /**
      * @param \BetaKiller\Model\UserInterface $user
-     * @param \BetaKiller\Helper\UrlHelper    $urlHelper
      *
      * @return string
      */
-    public function detect(UserInterface $user, UrlHelper $urlHelper): string;
+    public function detect(UserInterface $user): string;
 }

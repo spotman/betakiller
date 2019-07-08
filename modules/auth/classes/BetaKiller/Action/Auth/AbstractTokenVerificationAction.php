@@ -106,7 +106,7 @@ abstract class AbstractTokenVerificationAction extends AbstractAction
             return $urlHelper->makeUrl($changePassIFace);
         }
 
-        return $this->urlDetector->detect($user, $urlHelper);
+        return $this->urlDetector->detect($user);
     }
 
     /**

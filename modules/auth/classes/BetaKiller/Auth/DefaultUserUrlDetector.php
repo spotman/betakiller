@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\Auth;
 
+use BetaKiller\Factory\UrlHelperFactory;
 use BetaKiller\Helper\UrlHelper;
 use BetaKiller\IFace\Auth\BlockedIFace;
 use BetaKiller\IFace\Auth\SuspendedIFace;
@@ -11,45 +12,58 @@ use BetaKiller\Model\UserInterface;
 class DefaultUserUrlDetector implements UserUrlDetectorInterface
 {
     /**
+     * @var UrlHelper
+     */
+    protected $urlHelper;
+
+    /**
+     * DefaultUserUrlDetector constructor.
+     *
+     * @param \BetaKiller\Factory\UrlHelperFactory $urlHelperFactory
+     */
+    public function __construct(UrlHelperFactory $urlHelperFactory)
+    {
+        $this->urlHelper = $urlHelperFactory->create();
+    }
+
+    /**
      * @param \BetaKiller\Model\UserInterface $user
-     * @param \BetaKiller\Helper\UrlHelper    $urlHelper
      *
      * @return string
      */
-    public function detect(UserInterface $user, UrlHelper $urlHelper): string
+    public function detect(UserInterface $user): string
     {
-        $commonUrl = $this->commonChecks($user, $urlHelper);
+        $commonUrl = $this->commonChecks($user);
 
         if ($commonUrl) {
             return $commonUrl;
         }
 
-        return $this->customChecks($user, $urlHelper) ?: '/';
+        return $this->customChecks($user) ?: '/';
     }
 
     /**
      * @param \BetaKiller\Model\UserInterface $user
-     * @param \BetaKiller\Helper\UrlHelper    $urlHelper
      *
      * @return string|null
      * @throws \BetaKiller\IFace\Exception\UrlElementException
      */
-    protected function commonChecks(UserInterface $user, UrlHelper $urlHelper): ?string
+    protected function commonChecks(UserInterface $user): ?string
     {
         if ($user->isGuest()) {
             return null;
         }
 
         if ($user->isBlocked()) {
-            $blocked = $urlHelper->getUrlElementByCodename(BlockedIFace::codename());
+            $blocked = $this->urlHelper->getUrlElementByCodename(BlockedIFace::codename());
 
-            return $urlHelper->makeUrl($blocked);
+            return $this->urlHelper->makeUrl($blocked);
         }
 
         if ($user->isSuspended()) {
-            $suspended = $urlHelper->getUrlElementByCodename(SuspendedIFace::codename());
+            $suspended = $this->urlHelper->getUrlElementByCodename(SuspendedIFace::codename());
 
-            return $urlHelper->makeUrl($suspended);
+            return $this->urlHelper->makeUrl($suspended);
         }
 
         return null;
@@ -57,11 +71,10 @@ class DefaultUserUrlDetector implements UserUrlDetectorInterface
 
     /**
      * @param \BetaKiller\Model\UserInterface $user
-     * @param \BetaKiller\Helper\UrlHelper    $urlHelper
      *
      * @return string|null
      */
-    protected function customChecks(UserInterface $user, UrlHelper $urlHelper): ?string
+    protected function customChecks(UserInterface $user): ?string
     {
         // Override this if needed
         return null;

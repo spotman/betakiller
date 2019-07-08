@@ -67,8 +67,7 @@ class ActivateSuspendedAction extends AbstractAction
      */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $user      = ServerRequestHelper::getUser($request);
-        $urlHelper = ServerRequestHelper::getUrlHelper($request);
+        $user = ServerRequestHelper::getUser($request);
 
         // Update status to "created" to prevent status workflow hacks (created => suspended => confirmed)
         $status = $this->statusRepo->getByCodename(UserStatus::STATUS_CREATED);
@@ -81,7 +80,7 @@ class ActivateSuspendedAction extends AbstractAction
         $this->verification->sendEmail($user);
 
         // Redirect to actual page
-        $url = $this->urlDetector->detect($user, $urlHelper);
+        $url = $this->urlDetector->detect($user);
 
         return ResponseHelper::redirect($url);
     }

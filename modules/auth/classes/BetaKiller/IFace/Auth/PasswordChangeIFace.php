@@ -44,10 +44,6 @@ class PasswordChangeIFace extends AbstractIFace
 
         $urlHelper = ServerRequestHelper::getUrlHelper($request);
         $user      = ServerRequestHelper::getUser($request);
-        $i18n      = ServerRequestHelper::getI18n($request);
-
-        // Set current lang from User lang
-        $i18n->setLang($user->getLanguage());
 
         $actionElement = $urlHelper->getUrlElementByCodename(ChangePasswordAction::codename());
 
@@ -56,9 +52,9 @@ class PasswordChangeIFace extends AbstractIFace
 
         return [
             'app_state' => [
-                'userName' => $user->getFirstName(),
+                'userName'  => $user->getFirstName(),
                 'actionUrl' => $urlHelper->makeUrl($actionElement),
-                'nextUrl'   => $this->urlDetector->detect($user, $urlHelper),
+                'nextUrl'   => $this->urlDetector->detect($user),
                 'isChanged' => $isChanged,
             ],
         ];

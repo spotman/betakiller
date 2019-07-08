@@ -61,7 +61,6 @@ class SuspendAction extends AbstractAction
     {
         // No requests for other users here, only for caller
         $user      = ServerRequestHelper::getUser($request);
-        $urlHelper = ServerRequestHelper::getUrlHelper($request);
 
         // Update status
         $status = $this->statusRepo->getByCodename(UserStatus::STATUS_SUSPENDED);
@@ -70,7 +69,7 @@ class SuspendAction extends AbstractAction
         $this->userRepo->save($user);
 
         // Redirect to proper page
-        $url = $this->urlDetector->detect($user, $urlHelper);
+        $url = $this->urlDetector->detect($user);
 
         return ResponseHelper::redirect($url);
     }
