@@ -9,6 +9,7 @@ use BetaKiller\Daemon\ShutdownDaemonException;
 use BetaKiller\Helper\LoggerHelperTrait;
 use BetaKiller\Task\AbstractTask;
 use BetaKiller\Task\TaskException;
+use Database;
 use Psr\Log\LoggerInterface;
 
 class Runner extends AbstractTask
@@ -125,7 +126,7 @@ class Runner extends AbstractTask
         if (\gc_enabled()) {
             // Force GC to be called periodically
             // @see https://github.com/ratchetphp/Ratchet/issues/662
-            $this->loop->addPeriodicTimer(60, function () {
+            $this->loop->addPeriodicTimer(60, static function () {
                 gc_collect_cycles();
             });
         } else {
@@ -133,6 +134,8 @@ class Runner extends AbstractTask
         }
 
         $this->addSignalHandlers();
+
+        $this->pingDB();
 
         $this->start();
 
@@ -247,6 +250,13 @@ class Runner extends AbstractTask
         $this->loop->addSignal(\SIGINT, $signalCallable);
         $this->loop->addSignal(\SIGQUIT, $signalCallable);
         $this->loop->addSignal(\SIGTERM, $signalCallable);
+    }
+
+    private function pingDB(): void
+    {
+        $this->loop->addPeriodicTimer(60, static function () {
+            Database::pingAll();
+        });
     }
 
     private function unlock(): void
