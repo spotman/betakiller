@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace Spotman\Defence\Test;
 
-use Spotman\Defence\Rule\LengthBetweenRule;
 use Spotman\Defence\Rule\DefinitionRuleInterface;
+use Spotman\Defence\Rule\LengthBetweenRule;
 
 class LengthBetweenRuleTest extends AbstractRuleTest
 {
@@ -13,7 +13,7 @@ class LengthBetweenRuleTest extends AbstractRuleTest
      *
      * @return mixed[]
      */
-    public function validData(): array
+    public function validRequiredData(): array
     {
         return [
             'asd',

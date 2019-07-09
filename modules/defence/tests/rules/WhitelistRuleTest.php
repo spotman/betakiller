@@ -13,7 +13,7 @@ class WhitelistRuleTest extends AbstractRuleTest
      *
      * @return mixed[]
      */
-    public function validData(): array
+    public function validRequiredData(): array
     {
         return [
             'asd',

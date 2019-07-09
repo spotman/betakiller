@@ -10,7 +10,7 @@ abstract class AbstractRuleTest extends AbstractDefenceTest
     /**
      * @param mixed $input
      *
-     * @dataProvider validDataProvider
+     * @dataProvider validRequiredDataProvider
      */
     public function testValid($input): void
     {
@@ -45,9 +45,9 @@ abstract class AbstractRuleTest extends AbstractDefenceTest
         $filter->check($input);
     }
 
-    final public function validDataProvider(): array
+    final public function validRequiredDataProvider(): array
     {
-        return $this->prepareDataProvider($this->validData());
+        return $this->prepareDataProvider($this->validRequiredData());
     }
 
     /**
@@ -79,11 +79,11 @@ abstract class AbstractRuleTest extends AbstractDefenceTest
     }
 
     /**
-     * Array of valid values
+     * Array of valid values for required arguments
      *
      * @return mixed[]
      */
-    abstract public function validData(): array;
+    abstract public function validRequiredData(): array;
 
     /**
      * Array of invalid values

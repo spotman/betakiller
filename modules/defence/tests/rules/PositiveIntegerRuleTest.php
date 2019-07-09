@@ -13,7 +13,7 @@ class PositiveIntegerRuleTest extends AbstractRuleTest
      *
      * @return mixed[]
      */
-    public function validData(): array
+    public function validRequiredData(): array
     {
         return [
             1,

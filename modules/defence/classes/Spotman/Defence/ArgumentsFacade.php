@@ -239,6 +239,11 @@ class ArgumentsFacade
     private function checkRules($value, SingleArgumentDefinitionInterface $argument): void
     {
         foreach ($argument->getRules() as $rule) {
+            // Allow empty values in optional arguments
+            if (empty($value) && $argument->isOptional()) {
+                break;
+            }
+
             if (!$rule->check($value)) {
                 throw new \InvalidArgumentException(
                     \sprintf(
