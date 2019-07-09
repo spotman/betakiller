@@ -248,4 +248,24 @@ class Kohana_Database_PDO extends Database {
 		return $this->_connection->quote($value);
 	}
 
+    /**
+     * Ping DB connection (for long running scripts)
+     *
+     * @return bool
+     */
+    public function ping(): bool
+    {
+        $this->_connection && $this->connect();
+
+        /** @var PDO $c */
+        $c = $this->_connection;
+
+        try {
+            return (bool)$c->exec('SELECT 1');
+        } /** @noinspection BadExceptionsProcessingInspection */ catch (PDOException $e) {
+            return false;
+        }
+    }
+
+
 } // End Database_PDO
