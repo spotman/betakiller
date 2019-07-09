@@ -50,7 +50,7 @@ class WebHook extends AbstractConfigBasedDispatchableEntity implements WebHookMo
     /**
      * @return string
      */
-    public function getModelName(): string
+    public static function getModelName(): string
     {
         return WebHookModelInterface::URL_CONTAINER_KEY;
     }

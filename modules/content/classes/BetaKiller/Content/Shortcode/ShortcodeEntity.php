@@ -18,7 +18,7 @@ class ShortcodeEntity extends AbstractConfigBasedDispatchableEntity implements S
     /**
      * @return string
      */
-    public function getModelName(): string
+    public static function getModelName(): string
     {
         return self::URL_CONTAINER_KEY;
     }
