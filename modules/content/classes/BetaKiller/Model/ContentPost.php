@@ -1,8 +1,8 @@
 <?php
 namespace BetaKiller\Model;
 
-use BetaKiller\Status\StatusRelatedModelOrmTrait;
 use BetaKiller\Url\UrlDispatcher;
+use BetaKiller\Workflow\HasWorkflowStateModelOrmTrait;
 use DateTime;
 use Kohana_Exception;
 use ORM;
@@ -10,7 +10,7 @@ use Validation;
 
 class ContentPost extends AbstractOrmBasedModelWithRevisions implements ContentPostInterface
 {
-    use StatusRelatedModelOrmTrait,
+    use HasWorkflowStateModelOrmTrait,
         OrmBasedSeoMetaTrait,
         OrmBasedEntityHasWordpressIdTrait;
 
@@ -58,7 +58,7 @@ class ContentPost extends AbstractOrmBasedModelWithRevisions implements ContentP
 
         $this->initializeRevisionsRelations();
 
-        $this->initializeRelatedModelRelation();
+        $this->configureWorkflowModelRelation();
     }
 
     /**
@@ -119,27 +119,17 @@ class ContentPost extends AbstractOrmBasedModelWithRevisions implements ContentP
     }
 
     /**
-     * Returns key for workflow factory
-     *
      * @return string
      */
-    public function getWorkflowName(): string
+    public function getWorkflowStateModelName(): string
     {
-        return 'ContentPost';
+        return ContentPostStatus::getModelName();
     }
 
     /**
      * @return string
      */
-    protected function getStatusRelationModelName(): string
-    {
-        return 'ContentPostStatus';
-    }
-
-    /**
-     * @return string
-     */
-    protected function getStatusRelationForeignKey(): string
+    protected function getWorkflowStatusForeignKey(): string
     {
         return 'status_id';
     }
@@ -425,7 +415,7 @@ class ContentPost extends AbstractOrmBasedModelWithRevisions implements ContentP
     {
         $this
             ->setCreatedAt(new DateTime)
-            ->getStartStatus();
+            ->setStartStatus();
 
         return parent::create($validation);
     }

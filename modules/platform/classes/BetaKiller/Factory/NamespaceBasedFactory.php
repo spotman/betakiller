@@ -42,6 +42,16 @@ final class NamespaceBasedFactory
     /**
      * @var bool
      */
+    private $useInterface = false;
+
+    /**
+     * @var bool
+     */
+    private $legacyNaming = false;
+
+    /**
+     * @var bool
+     */
     private $instanceCachingEnabled = false;
 
     /**
@@ -146,6 +156,26 @@ final class NamespaceBasedFactory
     }
 
     /**
+     * @return $this
+     */
+    public function useInterface(): NamespaceBasedFactory
+    {
+        $this->useInterface = true;
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function legacyNaming(): NamespaceBasedFactory
+    {
+        $this->legacyNaming = true;
+
+        return $this;
+    }
+
+    /**
      * @param string $codename
      * @param array  $arguments
      *
@@ -211,14 +241,28 @@ final class NamespaceBasedFactory
         $separator = '\\';
         $baseName  = implode($separator, $codenameArray).$this->classSuffix;
 
-        $tried = [];
+        if ($this->useInterface) {
+            $baseName .= 'Interface';
+        }
+
+        $candidates = [];
 
         // Search for class in namespaces
         foreach ($this->rootNamespaces as $ns) {
             // Add namespace prefix
-            $className = $ns.$separator.$baseName;
+            $candidates[] = $ns.$separator.$baseName;
+        }
 
-            if (class_exists($className)) {
+        if ($this->legacyNaming) {
+            // Search for legacy naming (it is just codename with underscore separators)
+            $candidates[] = implode('_', $codenameArray);
+        }
+
+        $tried = [];
+
+        // Search for class in candidates
+        foreach ($candidates as $className) {
+            if ($this->useInterface ? interface_exists($className) : class_exists($className)) {
                 $this->storeClassNameInCache($codename, $className);
 
                 return $className;
@@ -226,17 +270,6 @@ final class NamespaceBasedFactory
 
             $tried[] = $className;
         }
-
-        // Search for legacy naming (it is just codename with underscore separators)
-        $className = implode('_', $codenameArray);
-
-        if (class_exists($className)) {
-            $this->storeClassNameInCache($codename, $className);
-
-            return $className;
-        }
-
-        $tried[] = $className;
 
         throw new FactoryException('No class found for :name, tried to autoload :tried', [
             ':name'  => $baseName,
@@ -322,7 +355,7 @@ final class NamespaceBasedFactory
 
     /**
      * @param string $codename
-     * @param mixed $instance
+     * @param mixed  $instance
      *
      * @throws \BetaKiller\Factory\FactoryException
      */

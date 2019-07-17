@@ -1,6 +1,12 @@
 <?php
-namespace BetaKiller\Status;
+namespace BetaKiller\Workflow;
 
+/**
+ * Interface StatusAclModelInterface
+ *
+ * @package BetaKiller\Workflow
+ * @deprecated
+ */
 interface StatusAclModelInterface
 {
     /**

@@ -7,6 +7,7 @@ use BetaKiller\Acl\Resource\EntityRelatedAclResourceInterface;
 use BetaKiller\CrudlsActionsInterface;
 use BetaKiller\Factory\GuestUserFactory;
 use BetaKiller\IFace\Exception\UrlElementException;
+use BetaKiller\Model\AbstractEntityInterface;
 use BetaKiller\Model\DispatchableEntityInterface;
 use BetaKiller\Model\GuestUserInterface;
 use BetaKiller\Model\UserInterface;
@@ -79,12 +80,12 @@ class AclHelper
     }
 
     /**
-     * @param \BetaKiller\Model\DispatchableEntityInterface $entity
+     * @param \BetaKiller\Model\AbstractEntityInterface $entity
      *
      * @return \BetaKiller\Acl\Resource\EntityRelatedAclResourceInterface
      * @throws \Spotman\Acl\Exception
      */
-    private function getEntityAclResource(DispatchableEntityInterface $entity): EntityRelatedAclResourceInterface
+    public function getEntityAclResource(AbstractEntityInterface $entity): EntityRelatedAclResourceInterface
     {
         $name = $entity::getModelName();
 
@@ -236,10 +237,11 @@ class AclHelper
         DispatchableEntityInterface $entity,
         EntityLinkedUrlElementInterface $urlElement
     ): bool {
-        $spec = $this->getZoneAccessSpec($urlElement);
+        $spec   = $this->getZoneAccessSpec($urlElement);
+        $result = $spec->isEntityAllowed($entity);
 
-        // Entity allowed if no spec defined
-        return $spec->isEntityAllowed($entity) ?? true;
+        // Entity is allowed if no spec defined
+        return $result ?? true;
     }
 
     /**
@@ -260,6 +262,24 @@ class AclHelper
         }
 
         return $resource;
+    }
+
+    /**
+     * @param \Spotman\Acl\AclUserInterface                    $user
+     *
+     * @param \Spotman\Acl\Resource\ResolvingResourceInterface $resource
+     * @param string                                           $permission
+     *
+     * @return bool
+     */
+    public function isPermissionAllowed(
+        AclUserInterface $user,
+        ResolvingResourceInterface $resource,
+        string $permission
+    ): bool {
+        $this->acl->injectUserResolver($user, $resource);
+
+        return $resource->isPermissionAllowed($permission);
     }
 
     /**
@@ -313,23 +333,5 @@ class AclHelper
         }
 
         return true;
-    }
-
-    /**
-     * @param \Spotman\Acl\AclUserInterface                    $user
-     *
-     * @param \Spotman\Acl\Resource\ResolvingResourceInterface $resource
-     * @param string                                           $permission
-     *
-     * @return bool
-     */
-    private function isPermissionAllowed(
-        AclUserInterface $user,
-        ResolvingResourceInterface $resource,
-        string $permission
-    ): bool {
-        $this->acl->injectUserResolver($user, $resource);
-
-        return $resource->isPermissionAllowed($permission);
     }
 }

@@ -3,6 +3,12 @@ namespace BetaKiller\Graph;
 
 use ORM;
 
+/**
+ * Class AbstractGraphTransitionModelOrm
+ *
+ * @package BetaKiller\Graph
+ * @deprecated
+ */
 abstract class AbstractGraphTransitionModelOrm extends ORM implements GraphTransitionModelInterface
 {
     protected function configure(): void

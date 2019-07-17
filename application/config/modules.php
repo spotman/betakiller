@@ -60,6 +60,7 @@ return [
     'twig'         => MODPATH.'twig',                  // Twig template engine
     'wamp'         => MODPATH.'wamp',                  // WAMP protocol support (router + client)
     'webhooks'     => MODPATH.'webhooks',              // WebHooks control panel
+    'workflow'     => MODPATH.'workflow',              // Status workflow processing
 
     // Workaround for injecting admin/config/ifaces.xml in a proper way
     'admin'        => MODPATH.'admin',                 // Basic admin

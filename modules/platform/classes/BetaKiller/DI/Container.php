@@ -10,6 +10,7 @@ use DI\DependencyException;
 use Invoker\Exception\InvocationException;
 use Invoker\Exception\NotCallableException;
 use Invoker\Exception\NotEnoughParametersException;
+use Invoker\InvokerInterface;
 
 class Container implements ContainerInterface
 {
@@ -86,6 +87,9 @@ class Container implements ContainerInterface
 
             // Inject container into factories
             ContainerInterface::class       => $this,
+
+            // Use Invoker for calling methods and lambda functions with dependencies
+            InvokerInterface::class => $this,
         ]);
 
         $this->container = $builder
@@ -155,20 +159,6 @@ class Container implements ContainerInterface
     public function call($callable, array $parameters = null)
     {
         return $this->getContainer()->call($callable, $parameters ?: []);
-    }
-
-    /**
-     * Inject all dependencies on an existing instance.
-     *
-     * @param mixed $instance Object to perform injection upon
-     *
-     * @throws \InvalidArgumentException
-     * @throws \DI\DependencyException Error while injecting dependencies
-     * @return mixed $instance Returns the same instance
-     */
-    public function injectOn($instance)
-    {
-        return $this->getContainer()->injectOn($instance);
     }
 
     /**

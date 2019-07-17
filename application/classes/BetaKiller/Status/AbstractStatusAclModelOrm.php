@@ -1,6 +1,12 @@
 <?php
-namespace BetaKiller\Status;
+namespace BetaKiller\Workflow;
 
+/**
+ * Class AbstractStatusAclModelOrm
+ *
+ * @package BetaKiller\Workflow
+ * @deprecated
+ */
 class AbstractStatusAclModelOrm extends \ORM implements StatusAclModelInterface
 {
     /**
@@ -31,7 +37,7 @@ class AbstractStatusAclModelOrm extends \ORM implements StatusAclModelInterface
      */
     public function getActionAllowedRoles($action)
     {
-        /** @var \BetaKiller\Status\StatusAclModelInterface[] $records */
+        /** @var \BetaKiller\Workflow\StatusAclModelInterface[] $records */
         $records = $this
             ->where('action', '=', $action)
             ->get_all();

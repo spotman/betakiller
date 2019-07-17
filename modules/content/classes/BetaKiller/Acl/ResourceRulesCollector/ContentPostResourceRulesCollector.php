@@ -1,4 +1,4 @@
 <?php
 namespace BetaKiller\Acl\ResourceRulesCollector;
 
-class ContentPostResourceRulesCollector extends AbstractStatusRelatedModelResourceRulesCollector {}
+class ContentPostResourceRulesCollector extends AbstractStatusRelatedResourceRulesCollector {}

@@ -3,22 +3,22 @@ namespace BetaKiller\Api\Method\ContentComment;
 
 use BetaKiller\Api\Method\AbstractEntityBasedApiMethod;
 use BetaKiller\Model\UserInterface;
-use BetaKiller\Status\StatusWorkflowFactory;
+use BetaKiller\Workflow\StatusWorkflowFactory;
 use Spotman\Api\ApiMethodResponse;
-use Spotman\Defence\DefinitionBuilderInterface;
 use Spotman\Defence\ArgumentsInterface;
+use Spotman\Defence\DefinitionBuilderInterface;
 
 class ApproveApiMethod extends AbstractEntityBasedApiMethod
 {
     /**
-     * @var \BetaKiller\Status\StatusWorkflowFactory
+     * @var \BetaKiller\Workflow\StatusWorkflowFactory
      */
     private $workflowFactory;
 
     /**
      * ApproveApiMethod constructor.
      *
-     * @param \BetaKiller\Status\StatusWorkflowFactory $workflowFactory
+     * @param \BetaKiller\Workflow\StatusWorkflowFactory $workflowFactory
      */
     public function __construct(StatusWorkflowFactory $workflowFactory)
     {
@@ -43,17 +43,17 @@ class ApproveApiMethod extends AbstractEntityBasedApiMethod
      * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\Notification\NotificationException
      * @throws \BetaKiller\Repository\RepositoryException
-     * @throws \BetaKiller\Status\StatusException
+     * @throws \BetaKiller\Workflow\StatusException
      */
     public function execute(ArgumentsInterface $arguments, UserInterface $user): ?ApiMethodResponse
     {
         /** @var \BetaKiller\Model\ContentCommentInterface $model */
         $model = $this->getEntity($arguments);
 
-        /** @var \BetaKiller\Status\ContentCommentWorkflow $workflow */
-        $workflow = $this->workflowFactory->create($model);
+        /** @var \BetaKiller\Workflow\ContentCommentWorkflow $workflow */
+        $workflow = $this->workflowFactory->createFor($model);
 
-        $workflow->approve();
+        $workflow->approve($model, $user);
 
         $this->saveEntity($model);
 

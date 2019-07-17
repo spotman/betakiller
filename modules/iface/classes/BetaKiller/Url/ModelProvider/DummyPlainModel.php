@@ -5,7 +5,7 @@ use BetaKiller\Exception\NotImplementedHttpException;
 use BetaKiller\Model\DummyModelTrait;
 use BetaKiller\Url\DummyModelInterface;
 
-class DummyPlainModel extends AbstractPlainUrlElementModel implements DummyModelInterface
+class DummyPlainModel extends AbstractPlainEntityLinkedUrlElement implements DummyModelInterface
 {
     use DummyModelTrait;
 

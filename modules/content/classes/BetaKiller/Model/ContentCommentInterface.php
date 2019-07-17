@@ -2,7 +2,7 @@
 
 namespace BetaKiller\Model;
 
-use BetaKiller\Status\StatusRelatedModelInterface;
+use BetaKiller\Workflow\HasWorkflowStateModelInterface;
 use DateTimeImmutable;
 use DateTimeInterface;
 
@@ -12,7 +12,7 @@ use DateTimeInterface;
  * @package BetaKiller\Model
  */
 interface ContentCommentInterface extends SingleParentTreeModelInterface, EntityItemRelatedInterface,
-    StatusRelatedModelInterface, EntityHasWordpressIdInterface, HasPublicReadUrlInterface, DispatchableEntityInterface
+    HasWorkflowStateModelInterface, EntityHasWordpressIdInterface, HasPublicReadUrlInterface, DispatchableEntityInterface
 {
     public function getRelatedContentLabel(): string;
 

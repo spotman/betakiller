@@ -1,6 +1,7 @@
 <?php
 namespace BetaKiller\Url;
 
+use BetaKiller\DI\ContainerInterface;
 use BetaKiller\IFace\Exception\UrlElementException;
 use BetaKiller\Model\DispatchableEntityInterface;
 use BetaKiller\Model\SingleParentTreeModelInterface;
@@ -8,6 +9,7 @@ use BetaKiller\Url\Container\UrlContainerInterface;
 use BetaKiller\Url\Parameter\RawUrlParameterFactory;
 use BetaKiller\Url\Parameter\RawUrlParameterInterface;
 use BetaKiller\Url\Parameter\UrlParameterInterface;
+use Invoker\InvokerInterface;
 
 class UrlPrototypeService
 {
@@ -22,17 +24,25 @@ class UrlPrototypeService
     private $rawParameterFactory;
 
     /**
+     * @var \Invoker\InvokerInterface
+     */
+    private $invoker;
+
+    /**
      * UrlPrototypeService constructor.
      *
      * @param \BetaKiller\Url\UrlDataSourceFactory             $factory
      * @param \BetaKiller\Url\Parameter\RawUrlParameterFactory $rawFactory
+     * @param \Invoker\InvokerInterface                        $invoker
      */
     public function __construct(
         UrlDataSourceFactory $factory,
-        RawUrlParameterFactory $rawFactory
+        RawUrlParameterFactory $rawFactory,
+        InvokerInterface $invoker
     ) {
         $this->dataSourceFactory   = $factory;
         $this->rawParameterFactory = $rawFactory;
+        $this->invoker = $invoker;
     }
 
     /**
@@ -252,13 +262,14 @@ class UrlPrototypeService
             $method = $key;
 
             if (!method_exists($param, $method)) {
-                throw new UrlPrototypeException('Method :method does not exists in model :model', [
+                throw new UrlPrototypeException('Method ":method" does not exists in model :model', [
                     ':method' => $method,
                     ':model'  => \get_class($param),
                 ]);
             }
 
-            return $param->$method();
+            // Allow dependencies in methods
+            return $this->invoker->call([$param, $method]);
         }
 
         if ($prototype->hasIdKey()) {

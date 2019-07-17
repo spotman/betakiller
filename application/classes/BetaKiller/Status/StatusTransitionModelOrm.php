@@ -1,12 +1,19 @@
 <?php
-namespace BetaKiller\Status;
+namespace BetaKiller\Workflow;
 
 use BetaKiller\Graph\AbstractGraphTransitionModelOrm;
 use BetaKiller\Model\Role;
 use BetaKiller\Model\RoleInterface;
 use BetaKiller\Model\UserInterface;
 
-abstract class StatusTransitionModelOrm extends AbstractGraphTransitionModelOrm implements StatusTransitionModelInterface
+/**
+ * Class StatusTransitionModelOrm
+ *
+ * @package BetaKiller\Status
+ * @deprecated
+ */
+abstract class StatusTransitionModelOrm extends AbstractGraphTransitionModelOrm implements
+    StatusTransitionModelInterface
 {
     protected function configure(): void
     {
@@ -26,6 +33,7 @@ abstract class StatusTransitionModelOrm extends AbstractGraphTransitionModelOrm 
      * @param \BetaKiller\Model\UserInterface $user
      *
      * @return $this
+     * @deprecated
      */
     public function filterAllowedByAcl(UserInterface $user)
     {

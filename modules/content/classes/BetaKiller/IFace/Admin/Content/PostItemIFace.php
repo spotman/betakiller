@@ -103,7 +103,7 @@ class PostItemIFace extends AbstractContentAdminIFace
         // Edit latest revision data
         $post->useLatestRevision();
 
-        $status = $post->getCurrentStatus();
+        $status = $post->getWorkflowState();
 
         $updateAllowed = $this->aclHelper->isEntityActionAllowed($this->user, $post,
             CrudlsActionsInterface::ACTION_UPDATE);

@@ -3,7 +3,7 @@ namespace BetaKiller\Api\Method\ContentPost;
 
 use BetaKiller\Api\Method\AbstractEntityBasedApiMethod;
 use BetaKiller\Model\UserInterface;
-use BetaKiller\Status\StatusWorkflowFactory;
+use BetaKiller\Workflow\StatusWorkflowFactory;
 use Spotman\Api\ApiMethodResponse;
 use Spotman\Defence\ArgumentsInterface;
 use Spotman\Defence\DefinitionBuilderInterface;
@@ -11,14 +11,14 @@ use Spotman\Defence\DefinitionBuilderInterface;
 class CompleteApiMethod extends AbstractEntityBasedApiMethod
 {
     /**
-     * @var \BetaKiller\Status\StatusWorkflowFactory
+     * @var \BetaKiller\Workflow\StatusWorkflowFactory
      */
     private $workflowFactory;
 
     /**
      * ApproveApiMethod constructor.
      *
-     * @param \BetaKiller\Status\StatusWorkflowFactory $workflowFactory
+     * @param \BetaKiller\Workflow\StatusWorkflowFactory $workflowFactory
      */
     public function __construct(StatusWorkflowFactory $workflowFactory)
     {
@@ -43,18 +43,18 @@ class CompleteApiMethod extends AbstractEntityBasedApiMethod
      * @throws \BetaKiller\IFace\Exception\UrlElementException
      * @throws \BetaKiller\Notification\NotificationException
      * @throws \BetaKiller\Repository\RepositoryException
-     * @throws \BetaKiller\Status\StatusException
-     * @throws \BetaKiller\Status\StatusWorkflowException
+     * @throws \BetaKiller\Workflow\StatusException
+     * @throws \BetaKiller\Workflow\StatusWorkflowException
      */
     public function execute(ArgumentsInterface $arguments, UserInterface $user): ?ApiMethodResponse
     {
         /** @var \BetaKiller\Model\ContentPostInterface $model */
         $model = $this->getEntity($arguments);
 
-        /** @var \BetaKiller\Status\ContentPostWorkflow $workflow */
-        $workflow = $this->workflowFactory->create($model);
+        /** @var \BetaKiller\Workflow\ContentPostWorkflow $workflow */
+        $workflow = $this->workflowFactory->createFor($model);
 
-        $workflow->complete();
+        $workflow->complete($model, $user);
 
         $this->saveEntity($model);
 

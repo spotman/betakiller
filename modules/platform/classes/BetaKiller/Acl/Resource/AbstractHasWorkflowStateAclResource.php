@@ -1,10 +1,12 @@
 <?php
 namespace BetaKiller\Acl\Resource;
 
-use BetaKiller\Status\StatusModelInterface;
-use BetaKiller\Status\StatusRelatedModelInterface;
+use BetaKiller\Workflow\HasWorkflowStateModelInterface;
+use BetaKiller\Workflow\StatusWorkflowException;
+use BetaKiller\Workflow\WorkflowStateInterface;
 
-abstract class AbstractStatusRelatedEntityAclResource extends AbstractEntityRelatedAclResource implements StatusRelatedEntityAclResourceInterface
+abstract class AbstractHasWorkflowStateAclResource extends AbstractEntityRelatedAclResource implements
+    HasWorkflowStateAclResourceInterface
 {
     /**
      * Provides array of roles` names which are allowed to create entities
@@ -15,6 +17,7 @@ abstract class AbstractStatusRelatedEntityAclResource extends AbstractEntityRela
 
     /**
      * Provides array of roles` names which are allowed to browse(list) entities
+     *
      * @return string[]
      */
     abstract protected function getListPermissionRoles(): array;
@@ -33,7 +36,7 @@ abstract class AbstractStatusRelatedEntityAclResource extends AbstractEntityRela
      *
      * @return string[][]
      */
-    public function getDefaultAccessList(): array
+    final public function getDefaultAccessList(): array
     {
         return [
             self::ACTION_CREATE => $this->getCreatePermissionRoles(),
@@ -50,12 +53,10 @@ abstract class AbstractStatusRelatedEntityAclResource extends AbstractEntityRela
     public function isPermissionAllowed(string $permissionIdentity): bool
     {
         // Read/Update/Delete permissions rely on model status permissions
-        if (\in_array($permissionIdentity, $this->getStatusActionsList(), true)) {
-            /** @var StatusRelatedModelInterface $entity */
-            $entity = $this->getEntity();
-            $status = $entity->getCurrentStatus();
+        if (in_array($permissionIdentity, $this->getReservedStatusActionsList(), true)) {
+            $state = $this->getCurrentState();
 
-            return $this->isStatusActionAllowed($status, $permissionIdentity);
+            return $this->isStateActionAllowed($state, $permissionIdentity);
         }
 
         // Permissions defined in default access list have default logic
@@ -63,59 +64,52 @@ abstract class AbstractStatusRelatedEntityAclResource extends AbstractEntityRela
             return parent::isPermissionAllowed($permissionIdentity);
         }
 
-        /** @var StatusRelatedModelInterface $entity */
-        $entity = $this->getEntity();
-        $status = $entity->getCurrentStatus();
-
         // Other permissions rely on model status transition permissions
-        return $this->isTransitionAllowed($status, $permissionIdentity);
+        $state = $this->getCurrentState();
+
+        return $this->isStatusTransitionAllowed($state, $permissionIdentity);
     }
 
     /**
-     * @param \BetaKiller\Status\StatusModelInterface $model
-     * @param string                                  $action
+     * @param \BetaKiller\Workflow\WorkflowStateInterface $model
+     * @param string                                      $action
      *
      * @return bool
      */
-    public function isStatusActionAllowed(StatusModelInterface $model, $action): bool
+    public function isStateActionAllowed(WorkflowStateInterface $model, string $action): bool
     {
-        $identity = $this->makeStatusPermissionIdentity($model, $action);
+        $identity = $this->makeStatusActionPermissionIdentity($model, $action);
 
         return parent::isPermissionAllowed($identity);
     }
 
-    public function isTransitionAllowed(StatusModelInterface $statusModel, $transitionName): bool
+    public function isStatusTransitionAllowed(WorkflowStateInterface $state, string $transitionName): bool
     {
-        $identity = $this->makeTransitionPermissionIdentity($statusModel, $transitionName);
+        $identity = $this->makeTransitionPermissionIdentity($state, $transitionName);
 
         return parent::isPermissionAllowed($identity);
     }
 
     /**
-     * @param \BetaKiller\Status\StatusModelInterface $model
-     * @param string                                  $action
+     * @param \BetaKiller\Workflow\WorkflowStateInterface $model
+     * @param string                                      $action
      *
      * @return string
      */
-    public function makeStatusPermissionIdentity(StatusModelInterface $model, string $action): string
+    public function makeStatusActionPermissionIdentity(WorkflowStateInterface $state, string $action): string
     {
-        return $this->makeStatusPermissionIdentityBase($model).'.action.'.$action;
+        return 'status.'.$state->getCodename().'.action.'.$action;
     }
 
-    public function makeTransitionPermissionIdentity(StatusModelInterface $statusModel, string $transitionName): string
+    public function makeTransitionPermissionIdentity(WorkflowStateInterface $state, string $transition): string
     {
-        return $this->makeStatusPermissionIdentityBase($statusModel).'.transition.'.$transitionName;
-    }
-
-    private function makeStatusPermissionIdentityBase(StatusModelInterface $model): string
-    {
-        return 'status.'.$model->getCodename();
+        return 'status.'.$state->getCodename().'.transition.'.$transition;
     }
 
     /**
      * @return string[]
      */
-    public function getStatusActionsList(): array
+    public function getReservedStatusActionsList(): array
     {
         return [
             self::ACTION_READ,
@@ -132,5 +126,19 @@ abstract class AbstractStatusRelatedEntityAclResource extends AbstractEntityRela
     public function isCustomRulesCollectorUsed(): bool
     {
         return true;
+    }
+
+    private function getCurrentState(): WorkflowStateInterface
+    {
+        $entity = $this->getEntity();
+
+        if (!$entity instanceof HasWorkflowStateModelInterface) {
+            throw new StatusWorkflowException('Entity ":name" must implement :class', [
+                ':name'  => $entity::getModelName(),
+                ':class' => HasWorkflowStateModelInterface::class,
+            ]);
+        }
+
+        return $entity->getWorkflowState();
     }
 }

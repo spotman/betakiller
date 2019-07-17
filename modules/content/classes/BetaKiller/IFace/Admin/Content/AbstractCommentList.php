@@ -63,7 +63,7 @@ abstract class AbstractCommentList extends AbstractContentAdminIFace
 
     protected function getCommentData(ContentCommentInterface $comment, UrlHelper $helper, UserInterface $user): array
     {
-        $status = $comment->getCurrentStatus();
+        $status = $comment->getWorkflowState();
 
         return [
             'id'           => $comment->getID(),

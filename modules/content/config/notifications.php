@@ -2,8 +2,8 @@
 declare(strict_types=1);
 
 use BetaKiller\Model\RoleInterface;
-use BetaKiller\Status\ContentCommentWorkflow;
-use BetaKiller\Status\ContentPostWorkflow;
+use BetaKiller\Workflow\ContentCommentWorkflow;
+use BetaKiller\Workflow\ContentPostWorkflow;
 
 define('POST_MODERATION', 'post-moderation');
 define('COMMENT_USER_EVENT', 'comment-user-event');

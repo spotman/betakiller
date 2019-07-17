@@ -1,5 +1,5 @@
 <?php
-namespace BetaKiller\Status;
+namespace BetaKiller\Workflow;
 
 use BetaKiller\Factory\NamespaceBasedFactoryBuilder;
 
@@ -19,19 +19,20 @@ class StatusWorkflowFactory
     {
         $this->factory = $factoryBuilder
             ->createFactory()
+            ->cacheInstances()
             ->setClassNamespaces(StatusWorkflowInterface::CLASS_NS)
             ->setClassSuffix(StatusWorkflowInterface::CLASS_SUFFIX)
             ->setExpectedInterface(StatusWorkflowInterface::class);
     }
 
     /**
-     * @param StatusRelatedModelInterface $model
+     * @param HasWorkflowStateModelInterface $model
      *
      * @return StatusWorkflowInterface|mixed
      * @throws \BetaKiller\Factory\FactoryException
      */
-    public function create(StatusRelatedModelInterface $model)
+    public function createFor(HasWorkflowStateModelInterface $model)
     {
-        return $this->factory->create($model->getWorkflowName(), ['model' => $model]);
+        return $this->factory->create($model::getModelName());
     }
 }

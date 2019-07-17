@@ -4,9 +4,9 @@ namespace BetaKiller\Widget\Content;
 use BetaKiller\Exception\ValidationException;
 use BetaKiller\Repository\ContentCommentRepository;
 use BetaKiller\Repository\EntityRepository;
-use BetaKiller\Status\StatusWorkflowFactory;
 use BetaKiller\Widget\AbstractPublicWidget;
 use BetaKiller\Widget\WidgetException;
+use BetaKiller\Workflow\StatusWorkflowFactory;
 use HTML;
 use Psr\Http\Message\ServerRequestInterface;
 use Valid;
@@ -25,7 +25,7 @@ final class CommentsWidget extends AbstractPublicWidget
     private $entityRepository;
 
     /**
-     * @var \BetaKiller\Status\StatusWorkflowFactory
+     * @var \BetaKiller\Workflow\StatusWorkflowFactory
      */
     private $workflowFactory;
 
@@ -34,7 +34,7 @@ final class CommentsWidget extends AbstractPublicWidget
      *
      * @param \BetaKiller\Repository\ContentCommentRepository $commentRepository
      * @param \BetaKiller\Repository\EntityRepository         $entityRepository
-     * @param \BetaKiller\Status\StatusWorkflowFactory        $workflowFactory
+     * @param \BetaKiller\Workflow\StatusWorkflowFactory      $workflowFactory
      */
     public function __construct(
         ContentCommentRepository $commentRepository,
@@ -185,10 +185,10 @@ final class CommentsWidget extends AbstractPublicWidget
         $user  = $this->user;
         $model = $this->commentRepository->create();
 
-        /** @var \BetaKiller\Status\ContentCommentWorkflow $workflow */
-        $workflow = $this->workflowFactory->create($model);
+        /** @var \BetaKiller\Workflow\ContentCommentWorkflow $workflow */
+        $workflow = $this->workflowFactory->createFor($model);
 
-        $workflow->draft();
+        $workflow->draft($model);
 
         // Linking comment to entity and entity item
         $model

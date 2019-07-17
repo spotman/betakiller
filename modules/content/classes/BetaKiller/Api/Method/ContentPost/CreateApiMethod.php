@@ -4,9 +4,8 @@ namespace BetaKiller\Api\Method\ContentPost;
 use BetaKiller\Api\Method\AbstractEntityCreateApiMethod;
 use BetaKiller\Model\ContentPost;
 use BetaKiller\Model\UserInterface;
-use BetaKiller\Status\StatusWorkflowFactory;
+use BetaKiller\Workflow\StatusWorkflowFactory;
 use Spotman\Api\ApiMethodException;
-use Spotman\Api\ApiMethodResponse;
 use Spotman\Defence\ArgumentsInterface;
 use Spotman\Defence\DefinitionBuilderInterface;
 
@@ -18,7 +17,7 @@ class CreateApiMethod extends AbstractEntityCreateApiMethod
     private const ARG_TYPE  = 'type';
 
     /**
-     * @var \BetaKiller\Status\StatusWorkflowFactory
+     * @var \BetaKiller\Workflow\StatusWorkflowFactory
      */
     private $workflowFactory;
 
@@ -46,17 +45,17 @@ class CreateApiMethod extends AbstractEntityCreateApiMethod
      *
      * @return \BetaKiller\Model\ContentPostInterface
      * @throws \BetaKiller\Factory\FactoryException
-     * @throws \BetaKiller\Status\StatusWorkflowException
+     * @throws \BetaKiller\Workflow\StatusWorkflowException
      * @throws \Spotman\Api\ApiMethodException
      */
     protected function create(ArgumentsInterface $arguments, UserInterface $user)
     {
         $model = new ContentPost();
 
-        /** @var \BetaKiller\Status\ContentPostWorkflow $workflow */
-        $workflow = $this->workflowFactory->create($model);
+        /** @var \BetaKiller\Workflow\ContentPostWorkflow $workflow */
+        $workflow = $this->workflowFactory->createFor($model);
 
-        $workflow->draft();
+        $workflow->draft($model);
 
         $data = $arguments->getArray(self::ARG_DATA);
 

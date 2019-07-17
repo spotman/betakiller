@@ -1,17 +1,22 @@
 <?php
-namespace BetaKiller\Status;
+namespace BetaKiller\Workflow;
 
 use BetaKiller\Helper\NotificationHelper;
 use BetaKiller\Helper\UrlHelper;
 use BetaKiller\Model\ContentCommentInterface;
-use BetaKiller\Model\ContentCommentStatusTransition;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Service\UserService;
 
-class ContentCommentWorkflow extends StatusWorkflow
+class ContentCommentWorkflow
 {
     public const NOTIFICATION_AUTHOR_APPROVE = 'user/comment/author-approve';
     public const NOTIFICATION_PARENT_REPLY   = 'user/comment/parent-author-reply';
+
+    public const TRANSITION_APPROVE            = 'approve';
+    public const TRANSITION_REJECT             = 'reject';
+    public const TRANSITION_MARK_AS_SPAM       = 'markAsSpam';
+    public const TRANSITION_MOVE_TO_TRASH      = 'moveToTrash';
+    public const TRANSITION_RESTORE_FROM_TRASH = 'restoreFromTrash';
 
     /**
      * @var \BetaKiller\Helper\NotificationHelper
@@ -29,61 +34,51 @@ class ContentCommentWorkflow extends StatusWorkflow
     private $userService;
 
     /**
+     * @var \BetaKiller\Workflow\StatusWorkflowInterface
+     */
+    private $status;
+
+    /**
      * ContentCommentWorkflow constructor.
      *
-     * @param \BetaKiller\Status\StatusRelatedModelInterface $model
-     * @param \BetaKiller\Model\UserInterface                $user
-     * @param \BetaKiller\Helper\NotificationHelper          $notificationHelper
-     * @param \BetaKiller\Helper\UrlHelper                   $urlHelper
-     * @param \BetaKiller\Service\UserService                $service
+     * @param \BetaKiller\Helper\NotificationHelper        $notificationHelper
+     * @param \BetaKiller\Helper\UrlHelper                 $urlHelper
+     * @param \BetaKiller\Service\UserService              $service
+     * @param \BetaKiller\Workflow\StatusWorkflowInterface $statusWorkflow
      */
     public function __construct(
-        StatusRelatedModelInterface $model,
-        UserInterface $user,
         NotificationHelper $notificationHelper,
         UrlHelper $urlHelper,
-        UserService $service
+        UserService $service,
+        StatusWorkflowInterface $statusWorkflow
     ) {
-        parent::__construct($model, $user);
-
         $this->notification = $notificationHelper;
         $this->urlHelper    = $urlHelper;
         $this->userService  = $service;
+        $this->status       = $statusWorkflow;
     }
 
     /**
-     * @throws \BetaKiller\Status\StatusWorkflowException
+     * @param \BetaKiller\Model\ContentCommentInterface $comment
+     *
+     * @throws \BetaKiller\Workflow\StatusException
+     * @throws \BetaKiller\Workflow\StatusWorkflowException
      */
-    public function draft(): void
+    public function draft(ContentCommentInterface $comment): void
     {
-        if ($this->model()->hasCurrentStatus()) {
-            throw new StatusWorkflowException('Can not mark comment [:id] as draft coz it is in [:status] status', [
-                ':id'     => $this->model()->getID(),
-                ':status' => $this->model()->getCurrentStatus()->getCodename(),
-            ]);
-        }
-
-        $this->model()->getStartStatus();
+        $this->status->setStartState($comment);
     }
 
     /**
-     * @return \BetaKiller\Model\ContentComment|\BetaKiller\Status\StatusRelatedModelInterface
-     */
-    protected function model()
-    {
-        return $this->model;
-    }
-
-    /**
+     * @param \BetaKiller\Model\ContentCommentInterface $comment
+     * @param \BetaKiller\Model\UserInterface           $user
+     *
      * @throws \BetaKiller\Notification\NotificationException
-     * @throws \BetaKiller\Exception
-     * @throws \BetaKiller\Status\StatusException
+     * @throws \BetaKiller\Workflow\StatusException
      */
-    public function approve(): void
+    public function approve(ContentCommentInterface $comment, UserInterface $user): void
     {
-        $this->doTransition(ContentCommentStatusTransition::APPROVE);
-
-        $comment = $this->model();
+        $this->status->doTransition($comment, self::TRANSITION_APPROVE, $user);
 
         // Notify comment author
         $this->notifyCommentAuthorAboutApprove($comment);
@@ -153,38 +148,50 @@ class ContentCommentWorkflow extends StatusWorkflow
     }
 
     /**
-     * @throws \BetaKiller\Status\StatusException
+     * @param \BetaKiller\Model\ContentCommentInterface $comment
+     * @param \BetaKiller\Model\UserInterface           $user
+     *
+     * @throws \BetaKiller\Workflow\StatusException
      */
-    public function reject(): void
+    public function reject(ContentCommentInterface $comment, UserInterface $user): void
     {
         // Simply change status
-        $this->doTransition(ContentCommentStatusTransition::REJECT);
+        $this->status->doTransition($comment, self::TRANSITION_REJECT, $user);
     }
 
     /**
-     * @throws \BetaKiller\Status\StatusException
+     * @param \BetaKiller\Model\ContentCommentInterface $comment
+     * @param \BetaKiller\Model\UserInterface           $user
+     *
+     * @throws \BetaKiller\Workflow\StatusException
      */
-    public function markAsSpam(): void
+    public function markAsSpam(ContentCommentInterface $comment, UserInterface $user): void
     {
         // Simply change status
-        $this->doTransition(ContentCommentStatusTransition::MARK_AS_SPAM);
+        $this->status->doTransition($comment, self::TRANSITION_MARK_AS_SPAM, $user);
     }
 
     /**
-     * @throws \BetaKiller\Status\StatusException
+     * @param \BetaKiller\Model\ContentCommentInterface $comment
+     * @param \BetaKiller\Model\UserInterface           $user
+     *
+     * @throws \BetaKiller\Workflow\StatusException
      */
-    public function moveToTrash(): void
+    public function moveToTrash(ContentCommentInterface $comment, UserInterface $user): void
     {
         // Simply change status
-        $this->doTransition(ContentCommentStatusTransition::MOVE_TO_TRASH);
+        $this->status->doTransition($comment, self::TRANSITION_MOVE_TO_TRASH, $user);
     }
 
     /**
-     * @throws \BetaKiller\Status\StatusException
+     * @param \BetaKiller\Model\ContentCommentInterface $comment
+     * @param \BetaKiller\Model\UserInterface           $user
+     *
+     * @throws \BetaKiller\Workflow\StatusException
      */
-    public function restoreFromTrash(): void
+    public function restoreFromTrash(ContentCommentInterface $comment, UserInterface $user): void
     {
         // Simply change status
-        $this->doTransition(ContentCommentStatusTransition::RESTORE_FROM_TRASH);
+        $this->status->doTransition($comment, self::TRANSITION_RESTORE_FROM_TRASH, $user);
     }
 }

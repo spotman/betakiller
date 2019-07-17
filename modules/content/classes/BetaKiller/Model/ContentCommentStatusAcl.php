@@ -1,7 +1,7 @@
 <?php
 namespace BetaKiller\Model;
 
-use BetaKiller\Status\AbstractStatusAclModelOrm;
+use BetaKiller\Workflow\AbstractStatusAclModelOrm;
 
 class ContentCommentStatusAcl extends AbstractStatusAclModelOrm
 {

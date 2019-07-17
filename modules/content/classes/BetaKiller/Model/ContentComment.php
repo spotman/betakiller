@@ -1,10 +1,10 @@
 <?php
 namespace BetaKiller\Model;
 
-use BetaKiller\Helper\UrlElementHelper;
+use BetaKiller\Exception\NotImplementedHttpException;
 use BetaKiller\Helper\UrlHelper;
-use BetaKiller\Status\StatusRelatedModelOrmTrait;
 use BetaKiller\Url\ZoneInterface;
+use BetaKiller\Workflow\HasWorkflowStateModelOrmTrait;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Exception;
@@ -19,7 +19,7 @@ class ContentComment extends AbstractOrmBasedSingleParentTreeModel implements Co
 {
     use OrmBasedEntityItemRelatedModelTrait;
     use OrmBasedEntityHasWordpressIdTrait;
-    use StatusRelatedModelOrmTrait;
+    use HasWorkflowStateModelOrmTrait;
 
     /**
      * Prepares the model database connection, determines the table name,
@@ -43,7 +43,7 @@ class ContentComment extends AbstractOrmBasedSingleParentTreeModel implements Co
             ],
         ]);
 
-        $this->initializeRelatedModelRelation();
+        $this->configureWorkflowModelRelation();
 
         parent::configure();
     }
@@ -51,23 +51,15 @@ class ContentComment extends AbstractOrmBasedSingleParentTreeModel implements Co
     /**
      * @inheritDoc
      */
-    public function getWorkflowName(): string
+    public function getWorkflowStateModelName(): string
     {
-        return 'ContentComment';
+        return ContentCommentStatus::getModelName();
     }
 
     /**
      * @inheritDoc
      */
-    protected function getStatusRelationModelName(): string
-    {
-        return 'ContentCommentStatus';
-    }
-
-    /**
-     * @inheritDoc
-     */
-    protected function getStatusRelationForeignKey(): string
+    protected function getWorkflowStatusForeignKey(): string
     {
         return 'status_id';
     }
@@ -398,7 +390,9 @@ class ContentComment extends AbstractOrmBasedSingleParentTreeModel implements Co
     {
         $status = $this->getStatusByID(ContentCommentStatus::STATUS_PENDING);
 
-        return $this->initStatus($status);
+        $this->initStatus($status);
+
+        return $this;
     }
 
     public function initAsApproved()
@@ -422,9 +416,15 @@ class ContentComment extends AbstractOrmBasedSingleParentTreeModel implements Co
         return $this->initStatus($status);
     }
 
+    /**
+     * @param \BetaKiller\Model\UserInterface $user
+     *
+     * @return bool
+     * @deprecated
+     */
     public function isApproveAllowed(UserInterface $user): bool
     {
-        return $this->isStatusTransitionAllowed(ContentCommentStatusTransition::APPROVE, $user);
+        throw new NotImplementedHttpException();
     }
 
     /**

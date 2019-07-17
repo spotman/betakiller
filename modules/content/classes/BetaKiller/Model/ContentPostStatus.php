@@ -2,9 +2,9 @@
 
 namespace BetaKiller\Model;
 
-use BetaKiller\Status\StatusModelOrm;
+use BetaKiller\Workflow\AbstractWorkflowStateOrm;
 
-class ContentPostStatus extends StatusModelOrm
+class ContentPostStatus extends AbstractWorkflowStateOrm
 {
     public const DRAFT_ID         = 1;
     public const PENDING_ID       = 2;

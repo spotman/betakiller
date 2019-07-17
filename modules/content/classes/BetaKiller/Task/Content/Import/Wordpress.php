@@ -154,7 +154,7 @@ class Wordpress extends AbstractTask
 
     /**
      * @Inject
-     * @var \BetaKiller\Status\StatusWorkflowFactory
+     * @var \BetaKiller\Workflow\StatusWorkflowFactory
      */
     private $statusWorkflowFactory;
 
@@ -191,8 +191,8 @@ class Wordpress extends AbstractTask
      * @throws \BetaKiller\IFace\Exception\UrlElementException
      * @throws \BetaKiller\Notification\NotificationException
      * @throws \BetaKiller\Repository\RepositoryException
-     * @throws \BetaKiller\Status\StatusException
-     * @throws \BetaKiller\Status\StatusWorkflowException
+     * @throws \BetaKiller\Workflow\StatusException
+     * @throws \BetaKiller\Workflow\StatusWorkflowException
      * @throws \BetaKiller\Task\TaskException
      * @throws \Kohana_Exception
      * @throws \BetaKiller\Exception\ValidationException
@@ -496,8 +496,8 @@ class Wordpress extends AbstractTask
      * @throws \BetaKiller\IFace\Exception\UrlElementException
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
-     * @throws \BetaKiller\Status\StatusWorkflowException
-     * @throws \BetaKiller\Status\StatusException
+     * @throws \BetaKiller\Workflow\StatusWorkflowException
+     * @throws \BetaKiller\Workflow\StatusException
      * @throws \LogicException
      * @throws \BetaKiller\Content\Shortcode\ShortcodeException
      * @throws \BetaKiller\Factory\FactoryException
@@ -606,10 +606,10 @@ class Wordpress extends AbstractTask
 
             // Auto publishing for new posts (we are importing only published posts)
             if ($isNew) {
-                /** @var \BetaKiller\Status\ContentPostWorkflow $workflow */
-                $workflow = $this->statusWorkflowFactory->create($model);
+                /** @var \BetaKiller\Workflow\ContentPostWorkflow $workflow */
+                $workflow = $this->statusWorkflowFactory->createFor($model);
 
-                $workflow->complete(); // Publishing would be done automatically
+                $workflow->complete($model, $this->user); // Publishing would be done automatically
             }
 
             // Saving updated workflow status

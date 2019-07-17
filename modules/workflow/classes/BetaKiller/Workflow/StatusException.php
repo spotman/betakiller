@@ -1,5 +1,5 @@
 <?php
-namespace BetaKiller\Status;
+namespace BetaKiller\Workflow;
 
 use BetaKiller\Exception;
 

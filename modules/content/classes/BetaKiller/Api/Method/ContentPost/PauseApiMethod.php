@@ -3,7 +3,7 @@ namespace BetaKiller\Api\Method\ContentPost;
 
 use BetaKiller\Api\Method\AbstractEntityBasedApiMethod;
 use BetaKiller\Model\UserInterface;
-use BetaKiller\Status\StatusWorkflowFactory;
+use BetaKiller\Workflow\StatusWorkflowFactory;
 use Spotman\Api\ApiMethodResponse;
 use Spotman\Defence\ArgumentsInterface;
 use Spotman\Defence\DefinitionBuilderInterface;
@@ -11,14 +11,14 @@ use Spotman\Defence\DefinitionBuilderInterface;
 class PauseApiMethod extends AbstractEntityBasedApiMethod
 {
     /**
-     * @var \BetaKiller\Status\StatusWorkflowFactory
+     * @var \BetaKiller\Workflow\StatusWorkflowFactory
      */
     private $workflowFactory;
 
     /**
      * PauseApiMethod constructor.
      *
-     * @param \BetaKiller\Status\StatusWorkflowFactory $workflowFactory
+     * @param \BetaKiller\Workflow\StatusWorkflowFactory $workflowFactory
      */
     public function __construct(StatusWorkflowFactory $workflowFactory)
     {
@@ -41,17 +41,17 @@ class PauseApiMethod extends AbstractEntityBasedApiMethod
      * @return \Spotman\Api\ApiMethodResponse|null
      * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\Repository\RepositoryException
-     * @throws \BetaKiller\Status\StatusException
+     * @throws \BetaKiller\Workflow\StatusException
      */
     public function execute(ArgumentsInterface $arguments, UserInterface $user): ?ApiMethodResponse
     {
         /** @var \BetaKiller\Model\ContentPost $model */
         $model = $this->getEntity($arguments);
 
-        /** @var \BetaKiller\Status\ContentPostWorkflow $workflow */
-        $workflow = $this->workflowFactory->create($model);
+        /** @var \BetaKiller\Workflow\ContentPostWorkflow $workflow */
+        $workflow = $this->workflowFactory->createFor($model);
 
-        $workflow->pause();
+        $workflow->pause($model, $user);
 
         $this->saveEntity($model);
 

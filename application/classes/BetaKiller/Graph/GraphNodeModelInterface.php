@@ -1,6 +1,12 @@
 <?php
 namespace BetaKiller\Graph;
 
+/**
+ * Interface GraphNodeModelInterface
+ *
+ * @package BetaKiller\Graph
+ * @deprecated
+ */
 interface GraphNodeModelInterface
 {
     /**

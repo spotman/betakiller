@@ -1,9 +1,9 @@
 <?php
 namespace BetaKiller\Model;
 
-use BetaKiller\Status\StatusModelOrm;
+use BetaKiller\Workflow\AbstractWorkflowStateOrm;
 
-class ContentCommentStatus extends StatusModelOrm
+class ContentCommentStatus extends AbstractWorkflowStateOrm
 {
     public const STATUS_PENDING  = 1;
     public const STATUS_APPROVED = 2;

@@ -1,7 +1,7 @@
 <?php
 namespace BetaKiller\Model;
 
-use BetaKiller\Status\StatusTransitionModelOrm;
+use BetaKiller\Workflow\StatusTransitionModelOrm;
 
 class ContentPostStatusTransition extends StatusTransitionModelOrm
 {

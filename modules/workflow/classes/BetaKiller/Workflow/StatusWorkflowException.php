@@ -1,4 +1,4 @@
 <?php
-namespace BetaKiller\Status;
+namespace BetaKiller\Workflow;
 
 class StatusWorkflowException extends StatusException {}

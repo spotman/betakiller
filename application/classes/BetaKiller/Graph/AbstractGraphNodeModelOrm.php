@@ -3,6 +3,12 @@ namespace BetaKiller\Graph;
 
 use ORM;
 
+/**
+ * Class AbstractGraphNodeModelOrm
+ *
+ * @package BetaKiller\Graph
+ * @deprecated
+ */
 abstract class AbstractGraphNodeModelOrm extends ORM implements GraphNodeModelInterface
 {
     /**

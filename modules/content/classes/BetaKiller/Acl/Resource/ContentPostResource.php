@@ -4,7 +4,7 @@ namespace BetaKiller\Acl\Resource;
 use BetaKiller\Content\Content;
 use BetaKiller\Model\RoleInterface;
 
-class ContentPostResource extends AbstractStatusRelatedEntityAclResource
+class ContentPostResource extends AbstractHasWorkflowStateAclResource
 {
     /**
      * Provides array of roles` names which are allowed to create entities

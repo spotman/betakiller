@@ -28,7 +28,8 @@ class RepositoryFactory
             ->cacheInstances()
             ->setExpectedInterface(RepositoryInterface::class)
             ->setClassNamespaces(RepositoryInterface::CLASS_PREFIX)
-            ->setClassSuffix(RepositoryInterface::CLASS_SUFFIX);
+            ->setClassSuffix(RepositoryInterface::CLASS_SUFFIX)
+            ->useInterface();
     }
 
     /**
