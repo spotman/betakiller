@@ -24,6 +24,7 @@ use BetaKiller\Assets\PathStrategy\AssetsPathStrategyInterface;
 use BetaKiller\Assets\Storage\AssetsStorageInterface;
 use BetaKiller\Factory\EntityFactoryInterface;
 use BetaKiller\Helper\LoggerHelperTrait;
+use BetaKiller\IdentityConverterInterface;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Repository\HashStrategyAssetsRepositoryInterface;
 use BetaKiller\Repository\RepositoryInterface;
@@ -111,6 +112,11 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
     private $contentTypes;
 
     /**
+     * @var IdentityConverterInterface
+     */
+    protected $converter;
+
+    /**
      * AbstractAssetsProvider constructor.
      *
      * @param \Spotman\Acl\AclInterface                                   $acl
@@ -132,6 +138,7 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
         AssetsConfig $config,
         AssetsDeploymentService $deploymentService,
         ContentTypes $contentTypes,
+        IdentityConverterInterface $converter,
         LoggerInterface $logger
     ) {
         $this->acl               = $acl;
@@ -142,6 +149,7 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
         $this->config            = $config;
         $this->deploymentService = $deploymentService;
         $this->contentTypes      = $contentTypes;
+        $this->converter         = $converter;
         $this->logger            = $logger;
     }
 
@@ -800,7 +808,7 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
     public function getInfo(AssetsModelInterface $model): array
     {
         return [
-            'id'     => $model->getID(),
+            'id'     => $this->converter->encode($model),
             'url'    => $this->getOriginalUrl($model),
             'delete' => $this->getDeleteUrl($model),
         ];

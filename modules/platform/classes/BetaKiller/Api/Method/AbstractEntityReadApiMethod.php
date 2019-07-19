@@ -33,7 +33,7 @@ abstract class AbstractEntityReadApiMethod extends AbstractEntityBasedApiMethod
      * @return \Spotman\Api\ApiMethodResponse|null
      */
     abstract protected function read(
-        AbstractEntityInterface $model,
+        $model,
         UserInterface $user,
         ArgumentsInterface $arguments
     ): ?ApiMethodResponse;

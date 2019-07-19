@@ -18,12 +18,14 @@ class DeleteApiMethod extends AbstractEntityDeleteApiMethod
     /**
      * Implement this method
      *
-     * @param $model
+     * @param                                                 $model
+     *
+     * @param \BetaKiller\Api\Method\MissingUrl\UserInterface $user
      *
      * @throws \BetaKiller\Repository\RepositoryException
      * @throws \BetaKiller\Factory\FactoryException
      */
-    protected function delete($model): void
+    protected function delete($model, UserInterface $user): void
     {
         $this->deleteEntity($model);
     }

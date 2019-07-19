@@ -49,23 +49,31 @@ class TwigExtension extends Twig_Extension
     private $manifestCache = [];
 
     /**
+     * @var \BetaKiller\IdentityConverterInterface
+     */
+    private $identityConverter;
+
+    /**
      * TwigExtension constructor.
      *
-     * @param \BetaKiller\Helper\AppEnvInterface $appEnv
-     * @param \BetaKiller\Widget\WidgetFacade    $widgetFacade
-     * @param \BetaKiller\Service\UserService    $userService
-     * @param \Psr\Log\LoggerInterface           $logger
+     * @param \BetaKiller\Helper\AppEnvInterface     $appEnv
+     * @param \BetaKiller\Widget\WidgetFacade        $widgetFacade
+     * @param \BetaKiller\Service\UserService        $userService
+     * @param \BetaKiller\IdentityConverterInterface $identityConverter
+     * @param \Psr\Log\LoggerInterface               $logger
      */
     public function __construct(
         AppEnvInterface $appEnv,
         WidgetFacade $widgetFacade,
         UserService $userService,
+        IdentityConverterInterface $identityConverter,
         LoggerInterface $logger
     ) {
-        $this->appEnv       = $appEnv;
-        $this->widgetFacade = $widgetFacade;
-        $this->userService  = $userService;
-        $this->logger       = $logger;
+        $this->appEnv            = $appEnv;
+        $this->widgetFacade      = $widgetFacade;
+        $this->userService       = $userService;
+        $this->logger            = $logger;
+        $this->identityConverter = $identityConverter;
     }
 
     public function getFunctions(): array
@@ -382,9 +390,13 @@ class TwigExtension extends Twig_Extension
     {
         $request = $this->getRequest($context);
 
-        return ServerRequestHelper::isGuest($request)
-            ? 'Guest'
-            : ServerRequestHelper::getUser($request)->getID();
+        if (ServerRequestHelper::isGuest($request)) {
+            return 'Guest';
+        }
+
+        $user = ServerRequestHelper::getUser($request);
+
+        return $this->identityConverter->encode($user);
     }
 
     /**

@@ -23,9 +23,9 @@ abstract class AbstractEntityDeleteApiMethod extends AbstractEntityBasedApiMetho
             throw new ApiMethodException('Can not delete entity with empty id');
         }
 
-        $model = $this->getEntity($arguments);
+        $entity = $this->getEntity($arguments);
 
-        $this->delete($model);
+        $this->delete($entity, $user);
 
         return $this->response(true);
     }
@@ -33,9 +33,11 @@ abstract class AbstractEntityDeleteApiMethod extends AbstractEntityBasedApiMetho
     /**
      * Implement this method
      *
-     * @param \BetaKiller\Model\AbstractEntityInterface $model
+     * @param \BetaKiller\Model\AbstractEntityInterface $entity
+     *
+     * @param \BetaKiller\Model\UserInterface           $user
      *
      * @throws \Spotman\Api\ApiMethodException
      */
-    abstract protected function delete($model): void;
+    abstract protected function delete($entity, UserInterface $user): void;
 }

@@ -162,11 +162,12 @@ class ApiWorkerDaemon implements DaemonInterface
 
     private function makeApiError(\Throwable $e, UserInterface $user = null): array
     {
+        $this->logException($this->logger, $e);
+
         $lang  = $user ? $user->getLanguage() : null;
         $error = $this->exceptionService->getExceptionMessage($e, $lang);
 
         $this->logger->debug('Error is ":value"', [':value' => $error]);
-        $this->logException($this->logger, $e);
 
         return [
             'error' => $error,

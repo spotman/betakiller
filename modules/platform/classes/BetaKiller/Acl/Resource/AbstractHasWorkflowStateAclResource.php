@@ -38,11 +38,11 @@ abstract class AbstractHasWorkflowStateAclResource extends AbstractEntityRelated
      */
     final public function getDefaultAccessList(): array
     {
-        return [
+        return array_merge($this->getAdditionalAccessList(), [
             self::ACTION_CREATE => $this->getCreatePermissionRoles(),
             self::ACTION_LIST   => $this->getListPermissionRoles(),
             self::ACTION_SEARCH => $this->getSearchPermissionRoles(),
-        ];
+        ]);
     }
 
     /**
@@ -91,7 +91,7 @@ abstract class AbstractHasWorkflowStateAclResource extends AbstractEntityRelated
     }
 
     /**
-     * @param \BetaKiller\Workflow\WorkflowStateInterface $model
+     * @param \BetaKiller\Workflow\WorkflowStateInterface $state
      * @param string                                      $action
      *
      * @return string
@@ -126,6 +126,11 @@ abstract class AbstractHasWorkflowStateAclResource extends AbstractEntityRelated
     public function isCustomRulesCollectorUsed(): bool
     {
         return true;
+    }
+
+    protected function getAdditionalAccessList(): array
+    {
+        return [];
     }
 
     private function getCurrentState(): WorkflowStateInterface

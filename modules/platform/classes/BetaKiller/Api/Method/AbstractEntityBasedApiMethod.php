@@ -16,9 +16,16 @@ abstract class AbstractEntityBasedApiMethod extends AbstractApiMethod implements
     private $repositoryFactory;
 
     /**
+     * @Inject
+     * @var \BetaKiller\IdentityConverterInterface
+     */
+    private $converter;
+
+    /**
      * @var \BetaKiller\Repository\RepositoryInterface
      */
     private $repository;
+
 
     /**
      * @param \Spotman\Defence\ArgumentsInterface $arguments
@@ -33,7 +40,10 @@ abstract class AbstractEntityBasedApiMethod extends AbstractApiMethod implements
             throw new ApiMethodException('Missing identity is required for entity processing');
         }
 
-        $id = $arguments->getID();
+        // Entity name is equal to API collection name
+        $entityName = $this->getCollectionName();
+
+        $id = $this->decodeIdentity($entityName, $arguments->getID());
 
         return $this->getRepository()->findById($id);
     }
@@ -83,5 +93,15 @@ abstract class AbstractEntityBasedApiMethod extends AbstractApiMethod implements
     protected function deleteEntity(AbstractEntityInterface $entity): void
     {
         $this->getRepository()->delete($entity);
+    }
+
+    protected function decodeIdentity(string $entityName, string $value): string
+    {
+        return $this->converter->decode($entityName, $value);
+    }
+
+    protected function encodeIdentity(AbstractEntityInterface $entity): string
+    {
+        return $this->converter->encode($entity);
     }
 }

@@ -179,6 +179,8 @@ return [
 
         UserRepositoryInterface::class => autowire(UserRepository::class),
         RoleRepositoryInterface::class => autowire(RoleRepository::class),
+
+        BetaKiller\IdentityConverterInterface::class => autowire(BetaKiller\DummyIdentityConverter::class),
     ],
 
 ];

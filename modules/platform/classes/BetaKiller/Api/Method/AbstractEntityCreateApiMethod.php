@@ -35,7 +35,7 @@ abstract class AbstractEntityCreateApiMethod extends AbstractEntityBasedApiMetho
      */
     abstract protected function create(ArgumentsInterface $arguments, UserInterface $user);
 
-    protected function makeResponse($entity, UserInterface $user): ApiMethodResponse
+    protected function makeResponse($entity, UserInterface $user): ?ApiMethodResponse
     {
         return $this->response($entity);
     }

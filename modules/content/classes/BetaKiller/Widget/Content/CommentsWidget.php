@@ -2,6 +2,8 @@
 namespace BetaKiller\Widget\Content;
 
 use BetaKiller\Exception\ValidationException;
+use BetaKiller\IdentityConverterInterface;
+use BetaKiller\Model\ContentComment;
 use BetaKiller\Repository\ContentCommentRepository;
 use BetaKiller\Repository\EntityRepository;
 use BetaKiller\Widget\AbstractPublicWidget;
@@ -30,20 +32,28 @@ final class CommentsWidget extends AbstractPublicWidget
     private $workflowFactory;
 
     /**
+     * @var \BetaKiller\IdentityConverterInterface
+     */
+    private $converter;
+
+    /**
      * CommentsWidget constructor.
      *
      * @param \BetaKiller\Repository\ContentCommentRepository $commentRepository
      * @param \BetaKiller\Repository\EntityRepository         $entityRepository
      * @param \BetaKiller\Workflow\StatusWorkflowFactory      $workflowFactory
+     * @param \BetaKiller\IdentityConverterInterface          $converter
      */
     public function __construct(
         ContentCommentRepository $commentRepository,
         EntityRepository $entityRepository,
-        StatusWorkflowFactory $workflowFactory
+        StatusWorkflowFactory $workflowFactory,
+    IdentityConverterInterface $converter
     ) {
         $this->commentRepository = $commentRepository;
         $this->entityRepository  = $entityRepository;
         $this->workflowFactory   = $workflowFactory;
+        $this->converter = $converter;
     }
 
     /**
@@ -148,7 +158,9 @@ final class CommentsWidget extends AbstractPublicWidget
         $message   = HTML::chars($this->request->post('message'));
         $ipAddress = HTML::chars($this->request->getClientIp());
         $agent     = HTML::chars($this->request->getUserAgent());
-        $parentID  = (int)$this->request->post('parent');
+        $parentID  = $this->request->post('parent');
+
+        $parentID = $parentID ? $this->converter->decode(ContentComment::getModelName(), $parentID) : null;
 
         /** @var \BetaKiller\Model\ContentComment|null $parentModel */
         $parentModel = $parentID ? $this->commentRepository->findById($parentID) : null;

@@ -532,7 +532,6 @@ class User extends \ORM implements UserInterface
     public function as_array(): array
     {
         return [
-            'id'        => $this->getID(),
             'username'  => $this->getUsername(),
             'email'     => $this->getEmail(),
             'firstName' => $this->getFirstName(),

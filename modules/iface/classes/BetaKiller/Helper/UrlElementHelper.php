@@ -3,7 +3,6 @@ namespace BetaKiller\Helper;
 
 use BetaKiller\I18n\I18nFacade;
 use BetaKiller\IFace\Exception\UrlElementException;
-use BetaKiller\IFace\IFaceInterface;
 use BetaKiller\Model\LanguageInterface;
 use BetaKiller\Url\Container\UrlContainerInterface;
 use BetaKiller\Url\IFaceModelInterface;
@@ -12,7 +11,6 @@ use BetaKiller\Url\UrlElementStack;
 use BetaKiller\Url\UrlElementTreeInterface;
 use BetaKiller\Url\UrlElementWithLabelInterface;
 use BetaKiller\Url\UrlElementWithLayoutInterface;
-use Spotman\Api\ApiMethodResponse;
 
 class UrlElementHelper
 {
@@ -81,19 +79,6 @@ class UrlElementHelper
         $currentZone  = $currentIFace ? $currentIFace->getZoneName() : null;
 
         return $currentZone === $zone;
-    }
-
-    /**
-     * @param \Spotman\Api\ApiMethodResponse   $response
-     * @param \BetaKiller\IFace\IFaceInterface $iface
-     *
-     * @return mixed
-     */
-    public static function processApiResponse(ApiMethodResponse $response, IFaceInterface $iface)
-    {
-        $iface->setLastModified($response->getLastModified());
-
-        return $response->getData();
     }
 
     /**

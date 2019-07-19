@@ -20,7 +20,7 @@ class Arguments implements ArgumentsInterface
         $this->args = $array;
     }
 
-    public function getID(): ?string
+    public function getID(): string
     {
         $id = $this->detectID();
 

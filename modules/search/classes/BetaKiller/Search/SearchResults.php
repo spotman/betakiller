@@ -123,17 +123,19 @@ class SearchResults implements SearchResultsInterface, ApiResponseItemInterface
     }
 
     /**
-     * @return array|Traversable
+     * @return callable
      */
-    public function getApiResponseData()
+    public function getApiResponseData(): callable
     {
-        return [
-            'items'       => $this->getItemsData(),
-            'totalItems'  => $this->getTotalCount(),
-            'totalPages'  => $this->getTotalPages(),
-            'hasNextPage' => $this->hasNextPage(),
-            'url'         => $this->getURL(),
-        ];
+        return function() {
+            return [
+                'items'       => $this->getItemsData(),
+                'totalItems'  => $this->getTotalCount(),
+                'totalPages'  => $this->getTotalPages(),
+                'hasNextPage' => $this->hasNextPage(),
+                'url'         => $this->getURL(),
+            ];
+        };
     }
 
     /**

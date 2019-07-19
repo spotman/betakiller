@@ -8,9 +8,9 @@ interface ArgumentsInterface
     public const IDENTITY_KEY = 'id';
 
     /**
-     * @return null|string
+     * @return string
      */
-    public function getID(): ?string;
+    public function getID(): string;
 
     /**
      * Returns true if current arguments set contains identity value

@@ -1,7 +1,7 @@
 <?php
 namespace BetaKiller\Url;
 
-use BetaKiller\DI\ContainerInterface;
+use BetaKiller\IdentityConverterInterface;
 use BetaKiller\IFace\Exception\UrlElementException;
 use BetaKiller\Model\DispatchableEntityInterface;
 use BetaKiller\Model\SingleParentTreeModelInterface;
@@ -29,20 +29,28 @@ class UrlPrototypeService
     private $invoker;
 
     /**
+     * @var \BetaKiller\IdentityConverterInterface
+     */
+    private $converter;
+
+    /**
      * UrlPrototypeService constructor.
      *
      * @param \BetaKiller\Url\UrlDataSourceFactory             $factory
      * @param \BetaKiller\Url\Parameter\RawUrlParameterFactory $rawFactory
+     * @param \BetaKiller\IdentityConverterInterface           $converter
      * @param \Invoker\InvokerInterface                        $invoker
      */
     public function __construct(
         UrlDataSourceFactory $factory,
         RawUrlParameterFactory $rawFactory,
+        IdentityConverterInterface $converter,
         InvokerInterface $invoker
     ) {
         $this->dataSourceFactory   = $factory;
         $this->rawParameterFactory = $rawFactory;
-        $this->invoker = $invoker;
+        $this->invoker             = $invoker;
+        $this->converter           = $converter;
     }
 
     /**
@@ -98,9 +106,13 @@ class UrlPrototypeService
 
             $this->validatePrototypeModelKey($prototype, $dataSource);
 
-            return $prototype->hasIdKey()
-                ? $dataSource->findById((int)$uriValue)
-                : $dataSource->findItemByUrlKeyValue($uriValue, $params);
+            if ($prototype->hasIdKey()) {
+                $id = $this->converter->decode($prototype->getDataSourceName(), $uriValue);
+
+                return $dataSource->findById($id);
+            }
+
+            return $dataSource->findItemByUrlKeyValue($uriValue, $params);
         }
 
         // Plain parameter - use factory instead
@@ -275,7 +287,7 @@ class UrlPrototypeService
         if ($prototype->hasIdKey()) {
             // There is an ID key and its entity
             if ($param instanceof DispatchableEntityInterface) {
-                return $param->getID();
+                return $this->converter->encode($param);
             }
 
             // Do not publish IDs of non-dispatchable entities

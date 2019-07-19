@@ -6,6 +6,7 @@ namespace BetaKiller\IFace\Admin\WebHooks;
 use BetaKiller\Action\WebHookExecuteAction;
 use BetaKiller\Factory\WebHookFactory;
 use BetaKiller\Helper\ServerRequestHelper;
+use BetaKiller\IdentityConverterInterface;
 use BetaKiller\IFace\Admin\AbstractAdminIFace;
 use BetaKiller\Model\WebHookLogInterface;
 use BetaKiller\Model\WebHookModelInterface;
@@ -25,13 +26,20 @@ class InfoItemIFace extends AbstractAdminIFace
     private $logRepo;
 
     /**
+     * @var \BetaKiller\IdentityConverterInterface
+     */
+    private $converter;
+
+    /**
      * @param \BetaKiller\Factory\WebHookFactory          $factory
      * @param \BetaKiller\Repository\WebHookLogRepository $logRepo
+     * @param \BetaKiller\IdentityConverterInterface      $converter
      */
-    public function __construct(WebHookFactory $factory, WebHookLogRepository $logRepo)
+    public function __construct(WebHookFactory $factory, WebHookLogRepository $logRepo, IdentityConverterInterface $converter)
     {
         $this->factory = $factory;
         $this->logRepo = $logRepo;
+        $this->converter = $converter;
     }
 
     /**
@@ -107,7 +115,7 @@ class InfoItemIFace extends AbstractAdminIFace
 
         return array_map(function (WebHookLogInterface $model) {
             return [
-                'id'          => $model->getID(),
+                'id'          => $this->converter->encode($model),
                 'codeName'    => $model->getCodename(),
                 'dateCreated' => $model->getCreatedAt(),
                 'status'      => (int)$model->isStatusSucceeded(),

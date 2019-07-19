@@ -331,11 +331,13 @@ class ContentPost extends AbstractOrmBasedModelWithRevisions implements ContentP
     }
 
     /**
-     * @return array|\Traversable
+     * @return callable
      */
-    public function getApiResponseData()
+    public function getApiResponseData(): callable
     {
-        return $this->as_array();
+        return function() {
+            return $this->as_array();
+        };
     }
 
     /**
