@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace BetaKiller\Task\Test;
 
 use BetaKiller\Api\ApiFacade;
+use BetaKiller\Helper\DateTimeHelper;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Task\AbstractTask;
 use Psr\Log\LoggerInterface;
@@ -82,7 +83,11 @@ class Api extends AbstractTask
             ->getResource($resourceName)
             ->call($methodName, $arguments, $this->user);
 
-        echo json_encode($response, \JSON_PRETTY_PRINT).PHP_EOL;
+        $this->logger->info('Last modified at :date', [
+            ':date' => DateTimeHelper::formatDateTimeUser($response->getLastModified(), $this->user),
+        ]);
+
+        echo json_encode($response->getData(), \JSON_PRETTY_PRINT).PHP_EOL;
     }
 
     private function getCallArguments(): array

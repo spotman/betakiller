@@ -71,4 +71,9 @@ class DateTimeHelper
 
         return $fmt->format($time);
     }
+
+    public static function createDateTimeFromTimestamp(int $ts): DateTimeImmutable
+    {
+        return (new DateTimeImmutable())->setTimestamp($ts);
+    }
 }
