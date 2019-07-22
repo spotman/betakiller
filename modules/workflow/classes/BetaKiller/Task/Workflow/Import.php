@@ -8,7 +8,7 @@ use BetaKiller\Factory\EntityFactoryInterface;
 use BetaKiller\Factory\RepositoryFactory;
 use BetaKiller\Repository\WorkflowStateRepositoryInterface;
 use BetaKiller\Task\AbstractTask;
-use BetaKiller\Workflow\StatusWorkflowException;
+use BetaKiller\Workflow\WorkflowStateException;
 use BetaKiller\Workflow\WorkflowStateInterface;
 use Psr\Log\LoggerInterface;
 
@@ -80,7 +80,7 @@ class Import extends AbstractTask
             $stateRepo      = $this->repoFactory->create($stateModelName);
 
             if (!$stateRepo instanceof WorkflowStateRepositoryInterface) {
-                throw new StatusWorkflowException('Repo ":name" must implement :class', [
+                throw new WorkflowStateException('Repo ":name" must implement :class', [
                     ':name'  => $modelName,
                     ':class' => WorkflowStateRepositoryInterface::class,
                 ]);
@@ -93,7 +93,7 @@ class Import extends AbstractTask
                     $state = $this->entityFactory->create($stateModelName);
 
                     if (!$state instanceof WorkflowStateInterface) {
-                        throw new StatusWorkflowException('Entity ":name" must implement :class', [
+                        throw new WorkflowStateException('Entity ":name" must implement :class', [
                             ':name'  => $stateName,
                             ':class' => WorkflowStateInterface::class,
                         ]);

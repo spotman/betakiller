@@ -50,7 +50,7 @@ final class StatusWorkflow implements StatusWorkflowInterface
         $targetState      = $this->createStateRepositoryFor($model)->getByCodename($targetStateName);
 
         if (!$this->isTransitionAllowed($model, $transition, $user)) {
-            throw new StatusWorkflowException('Transition ":name" in ":model" is not allowed for user ":user"', [
+            throw new WorkflowStateException('Transition ":name" in ":model" is not allowed for user ":user"', [
                 ':model' => $model::getModelName(),
                 ':name'  => $transition,
                 ':user'  => $user->getID(),
@@ -73,7 +73,7 @@ final class StatusWorkflow implements StatusWorkflowInterface
         $resource = $this->acl->getEntityAclResource($model);
 
         if (!$resource instanceof HasWorkflowStateAclResourceInterface) {
-            throw new StatusWorkflowException('Acl resource ":id" must implement :class', [
+            throw new WorkflowStateException('Acl resource ":id" must implement :class', [
                 ':id'    => $resource->getResourceId(),
                 ':class' => HasWorkflowStateAclResourceInterface::class,
             ]);
@@ -89,7 +89,7 @@ final class StatusWorkflow implements StatusWorkflowInterface
     public function setStartState(HasWorkflowStateModelInterface $model): void
     {
         if ($model->hasWorkflowState()) {
-            throw new StatusWorkflowException(
+            throw new WorkflowStateException(
                 'Can not set start status for :name [:id] coz it is in [:status] status already',
                 [
                     ':name'   => $model::getModelName(),
@@ -106,11 +106,11 @@ final class StatusWorkflow implements StatusWorkflowInterface
 
     private function createStateRepositoryFor(HasWorkflowStateModelInterface $model): WorkflowStateRepositoryInterface
     {
-        $stateModelName = $model->getWorkflowStateModelName();
+        $stateModelName = $model::getWorkflowStateModelName();
         $stateRepo      = $this->repoFactory->create($stateModelName);
 
         if (!$stateRepo instanceof WorkflowStateRepositoryInterface) {
-            throw new StatusWorkflowException('Repo ":name" must implement :class', [
+            throw new WorkflowStateException('Repo ":name" must implement :class', [
                 ':name'  => $stateModelName,
                 ':class' => WorkflowStateRepositoryInterface::class,
             ]);

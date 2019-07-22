@@ -9,7 +9,7 @@ interface HasWorkflowStateModelInterface extends AbstractEntityInterface
      * @param \BetaKiller\Workflow\WorkflowStateInterface $target
      *
      * @return void
-     * @throws \BetaKiller\Workflow\StatusWorkflowException
+     * @throws \BetaKiller\Workflow\WorkflowStateException
      */
     public function initWorkflowState(WorkflowStateInterface $target): void;
 
@@ -17,7 +17,7 @@ interface HasWorkflowStateModelInterface extends AbstractEntityInterface
      * @param \BetaKiller\Workflow\WorkflowStateInterface $target
      *
      * @return void
-     * @throws \BetaKiller\Workflow\StatusWorkflowException
+     * @throws \BetaKiller\Workflow\WorkflowStateException
      */
     public function changeWorkflowState(WorkflowStateInterface $target): void;
 
@@ -34,7 +34,7 @@ interface HasWorkflowStateModelInterface extends AbstractEntityInterface
     /**
      * @return string
      */
-    public function getWorkflowStateModelName(): string;
+    public static function getWorkflowStateModelName(): string;
 
     /**
      * Return TRUE if you need status transition history

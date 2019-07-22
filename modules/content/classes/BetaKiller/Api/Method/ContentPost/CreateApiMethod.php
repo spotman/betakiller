@@ -45,7 +45,7 @@ class CreateApiMethod extends AbstractEntityCreateApiMethod
      *
      * @return \BetaKiller\Model\ContentPostInterface
      * @throws \BetaKiller\Factory\FactoryException
-     * @throws \BetaKiller\Workflow\StatusWorkflowException
+     * @throws \BetaKiller\Workflow\WorkflowStateException
      * @throws \Spotman\Api\ApiMethodException
      */
     protected function create(ArgumentsInterface $arguments, UserInterface $user)

@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\Config;
 
-use BetaKiller\Workflow\StatusWorkflowException;
+use BetaKiller\Workflow\WorkflowStateException;
 
 class WorkflowConfig extends AbstractConfig implements WorkflowConfigInterface
 {
@@ -191,7 +191,7 @@ class WorkflowConfig extends AbstractConfig implements WorkflowConfigInterface
             }
         }
 
-        throw new StatusWorkflowException('Unknown transition ":trans" from state ":state" in ":model"', [
+        throw new WorkflowStateException('Unknown transition ":trans" from state ":state" in ":model"', [
             ':model' => $model,
             ':state' => $state,
             ':trans' => $transition,

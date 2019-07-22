@@ -51,7 +51,7 @@ class ContentComment extends AbstractOrmBasedSingleParentTreeModel implements Co
     /**
      * @inheritDoc
      */
-    public function getWorkflowStateModelName(): string
+    public static function getWorkflowStateModelName(): string
     {
         return ContentCommentStatus::getModelName();
     }
@@ -59,7 +59,7 @@ class ContentComment extends AbstractOrmBasedSingleParentTreeModel implements Co
     /**
      * @inheritDoc
      */
-    protected function getWorkflowStatusForeignKey(): string
+    public static function getWorkflowStateForeignKey(): string
     {
         return 'status_id';
     }

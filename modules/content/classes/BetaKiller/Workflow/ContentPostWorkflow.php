@@ -52,7 +52,7 @@ class ContentPostWorkflow
     /**
      * @param \BetaKiller\Model\ContentPostInterface $post
      *
-     * @throws \BetaKiller\Workflow\StatusWorkflowException
+     * @throws \BetaKiller\Workflow\WorkflowStateException
      */
     public function draft(ContentPostInterface $post): void
     {
@@ -65,7 +65,7 @@ class ContentPostWorkflow
      *
      * @throws \BetaKiller\IFace\Exception\UrlElementException
      * @throws \BetaKiller\Workflow\StatusException
-     * @throws \BetaKiller\Workflow\StatusWorkflowException
+     * @throws \BetaKiller\Workflow\WorkflowStateException
      */
     public function complete(ContentPostInterface $post, UserInterface $user): void
     {
@@ -98,7 +98,7 @@ class ContentPostWorkflow
      * @param \BetaKiller\Model\UserInterface        $user
      *
      * @throws \BetaKiller\Workflow\StatusException
-     * @throws \BetaKiller\Workflow\StatusWorkflowException
+     * @throws \BetaKiller\Workflow\WorkflowStateException
      */
     public function publish(ContentPostInterface $post, UserInterface $user): void
     {
@@ -116,7 +116,7 @@ class ContentPostWorkflow
      * @param \BetaKiller\Model\ContentPostInterface $post
      * @param \BetaKiller\Model\UserInterface        $user
      *
-     * @throws \BetaKiller\Workflow\StatusWorkflowException
+     * @throws \BetaKiller\Workflow\WorkflowStateException
      */
     public function pause(ContentPostInterface $post, UserInterface $user): void
     {
@@ -127,7 +127,7 @@ class ContentPostWorkflow
      * @param \BetaKiller\Model\ContentPostInterface $post
      * @param \BetaKiller\Model\UserInterface        $user
      *
-     * @throws \BetaKiller\Workflow\StatusWorkflowException
+     * @throws \BetaKiller\Workflow\WorkflowStateException
      */
     public function fix(ContentPostInterface $post, UserInterface $user): void
     {
@@ -145,7 +145,7 @@ class ContentPostWorkflow
     /**
      * @param \BetaKiller\Model\ContentPostInterface $post
      *
-     * @throws \BetaKiller\Workflow\StatusWorkflowException
+     * @throws \BetaKiller\Workflow\WorkflowStateException
      */
     protected function makeUri(ContentPostInterface $post): void
     {
@@ -157,7 +157,7 @@ class ContentPostWorkflow
         $label = $post->getLabel();
 
         if (!$label) {
-            throw new StatusWorkflowException('Post [:id] must have uri or label before publishing', [
+            throw new WorkflowStateException('Post [:id] must have uri or label before publishing', [
                 ':id' => $post->getID(),
             ]);
         }

@@ -62,7 +62,7 @@ class ContentCommentWorkflow
      * @param \BetaKiller\Model\ContentCommentInterface $comment
      *
      * @throws \BetaKiller\Workflow\StatusException
-     * @throws \BetaKiller\Workflow\StatusWorkflowException
+     * @throws \BetaKiller\Workflow\WorkflowStateException
      */
     public function draft(ContentCommentInterface $comment): void
     {

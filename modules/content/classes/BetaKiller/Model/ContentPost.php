@@ -121,7 +121,7 @@ class ContentPost extends AbstractOrmBasedModelWithRevisions implements ContentP
     /**
      * @return string
      */
-    public function getWorkflowStateModelName(): string
+    public static function getWorkflowStateModelName(): string
     {
         return ContentPostStatus::getModelName();
     }
@@ -129,7 +129,7 @@ class ContentPost extends AbstractOrmBasedModelWithRevisions implements ContentP
     /**
      * @return string
      */
-    protected function getWorkflowStatusForeignKey(): string
+    public static function getWorkflowStateForeignKey(): string
     {
         return 'status_id';
     }

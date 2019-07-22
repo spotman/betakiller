@@ -11,7 +11,7 @@ interface StatusWorkflowInterface
     /**
      * @param \BetaKiller\Workflow\HasWorkflowStateModelInterface $model
      *
-     * @throws \BetaKiller\Workflow\StatusWorkflowException
+     * @throws \BetaKiller\Workflow\WorkflowStateException
      */
     public function setStartState(HasWorkflowStateModelInterface $model): void;
 
@@ -20,7 +20,7 @@ interface StatusWorkflowInterface
      * @param string                                              $codename
      * @param \BetaKiller\Model\UserInterface                     $user
      *
-     * @throws \BetaKiller\Workflow\StatusWorkflowException
+     * @throws \BetaKiller\Workflow\WorkflowStateException
      */
     public function doTransition(HasWorkflowStateModelInterface $model, string $codename, UserInterface $user): void;
 

@@ -5,12 +5,12 @@ trait HasWorkflowStateModelOrmTrait
 {
     protected function configureWorkflowModelRelation(): void
     {
-        $statusRelationKey = $this->getWorkflowStatusRelationKey();
+        $statusRelationKey = static::getWorkflowStateRelationKey();
 
         $this->belongs_to([
             $statusRelationKey => [
-                'model'       => $this->getWorkflowStateModelName(),
-                'foreign_key' => $this->getWorkflowStatusForeignKey(),
+                'model'       => static::getWorkflowStateModelName(),
+                'foreign_key' => static::getWorkflowStateForeignKey(),
             ],
         ]);
 
@@ -22,41 +22,41 @@ trait HasWorkflowStateModelOrmTrait
      */
     public function getWorkflowState(): WorkflowStateInterface
     {
-        return $this->getRelatedEntity($this->getWorkflowStatusRelationKey());
+        return $this->getRelatedEntity(static::getWorkflowStateRelationKey());
     }
 
     /**
      * @param \BetaKiller\Workflow\WorkflowStateInterface $target
      *
      * @return void
-     * @throws \BetaKiller\Workflow\StatusWorkflowException
+     * @throws \BetaKiller\Workflow\WorkflowStateException
      */
     public function changeWorkflowState(WorkflowStateInterface $target): void
     {
         // Check if model has current status
         if (!$this->hasWorkflowState()) {
-            throw new StatusWorkflowException('Model must have current status before changing it');
+            throw new WorkflowStateException('Model must have current status before changing it');
         }
 
-        $this->setWorkflowStatus($target);
+        $this->setWorkflowState($target);
     }
 
     /**
      * @param \BetaKiller\Workflow\WorkflowStateInterface $status
      *
      * @return void
-     * @throws \BetaKiller\Workflow\StatusWorkflowException
+     * @throws \BetaKiller\Workflow\WorkflowStateException
      */
     public function initWorkflowState(WorkflowStateInterface $status): void
     {
         // Ensure that model has no current status
         if ($this->hasWorkflowState()) {
-            throw new StatusWorkflowException('Model ":name" can not have workflow status before initializing', [
+            throw new WorkflowStateException('Model ":name" can not have workflow status before initializing', [
                 ':name' => $this::getModelName(),
             ]);
         }
 
-        $this->setWorkflowStatus($status);
+        $this->setWorkflowState($status);
     }
 
     /**
@@ -64,7 +64,7 @@ trait HasWorkflowStateModelOrmTrait
      */
     public function hasWorkflowState(): bool
     {
-        return (bool)$this->get($this->getWorkflowStatusForeignKey());
+        return (bool)$this->get(static::getWorkflowStateForeignKey());
     }
 
     /**
@@ -72,12 +72,12 @@ trait HasWorkflowStateModelOrmTrait
      *
      * @return void
      */
-    protected function setWorkflowStatus(WorkflowStateInterface $target): void
+    protected function setWorkflowState(WorkflowStateInterface $target): void
     {
-        $this->set($this->getWorkflowStatusRelationKey(), $target);
+        $this->set(static::getWorkflowStateRelationKey(), $target);
     }
 
-    protected function getWorkflowStatusRelationKey(): string
+    public static function getWorkflowStateRelationKey(): string
     {
         return 'status';
     }
@@ -85,5 +85,5 @@ trait HasWorkflowStateModelOrmTrait
     /**
      * @return string
      */
-    abstract protected function getWorkflowStatusForeignKey(): string;
+    abstract public static function getWorkflowStateForeignKey(): string;
 }

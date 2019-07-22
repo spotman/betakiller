@@ -2,7 +2,7 @@
 namespace BetaKiller\Acl\Resource;
 
 use BetaKiller\Workflow\HasWorkflowStateModelInterface;
-use BetaKiller\Workflow\StatusWorkflowException;
+use BetaKiller\Workflow\WorkflowStateException;
 use BetaKiller\Workflow\WorkflowStateInterface;
 
 abstract class AbstractHasWorkflowStateAclResource extends AbstractEntityRelatedAclResource implements
@@ -138,7 +138,7 @@ abstract class AbstractHasWorkflowStateAclResource extends AbstractEntityRelated
         $entity = $this->getEntity();
 
         if (!$entity instanceof HasWorkflowStateModelInterface) {
-            throw new StatusWorkflowException('Entity ":name" must implement :class', [
+            throw new WorkflowStateException('Entity ":name" must implement :class', [
                 ':name'  => $entity::getModelName(),
                 ':class' => HasWorkflowStateModelInterface::class,
             ]);

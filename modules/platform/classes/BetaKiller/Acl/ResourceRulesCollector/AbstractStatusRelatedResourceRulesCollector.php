@@ -6,7 +6,7 @@ use BetaKiller\Config\WorkflowConfigInterface;
 use BetaKiller\Factory\RepositoryFactory;
 use BetaKiller\Repository\RepositoryException;
 use BetaKiller\Repository\WorkflowStateRepositoryInterface;
-use BetaKiller\Workflow\StatusWorkflowException;
+use BetaKiller\Workflow\WorkflowStateException;
 use Spotman\Acl\ResourceInterface;
 use Spotman\Acl\ResourceRulesCollector\AbstractResourceRulesCollector;
 
@@ -75,7 +75,7 @@ abstract class AbstractStatusRelatedResourceRulesCollector extends AbstractResou
             foreach ($this->config->getStateActions($modelName, $stateName) as $action) {
                 // Check workflow has not defined unusual actions
                 if (!in_array($action, $definedActions, true)) {
-                    throw new StatusWorkflowException('Action ":action" is not defined in acl resource for ":model"', [
+                    throw new WorkflowStateException('Action ":action" is not defined in acl resource for ":model"', [
                         ':action' => $action,
                         ':model'  => $modelName,
                     ]);
