@@ -3,7 +3,9 @@ declare(strict_types=1);
 
 namespace BetaKiller\Model;
 
-interface LanguageInterface extends DispatchableEntityInterface, I18nKeyModelInterface
+use Spotman\Api\ApiResponseItemInterface;
+
+interface LanguageInterface extends DispatchableEntityInterface, I18nKeyModelInterface, ApiResponseItemInterface
 {
     public const ISO_EN = 'en';
     public const ISO_DE = 'de';

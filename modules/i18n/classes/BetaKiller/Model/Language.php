@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace BetaKiller\Model;
 
+use DateTimeImmutable;
+
 class Language extends \ORM implements LanguageInterface
 {
     use I18nKeyOrmTrait;
@@ -185,6 +187,29 @@ class Language extends \ORM implements LanguageInterface
     public function isDefault(): bool
     {
         return (bool)$this->get(self::TABLE_FIELD_IS_DEFAULT);
+    }
+
+    /**
+     * @return callable
+     */
+    public function getApiResponseData(): callable
+    {
+        return function (LanguageInterface $lang) {
+            return [
+                'code'   => $this->getIsoCode(),
+                'label'  => $this->getLabel($lang),
+                'native' => $this->getLabel(),
+            ];
+        };
+    }
+
+    /**
+     * @return \DateTimeImmutable|null
+     */
+    public function getApiLastModified(): ?DateTimeImmutable
+    {
+        // No info about that
+        return null;
     }
 
     /**
