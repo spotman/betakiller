@@ -60,8 +60,9 @@ class MultiLevelHashAssetsPathStrategy implements AssetsPathStrategyInterface
         $hash = $model->getHash();
 
         if (!$hash) {
-            throw new AssetsException('Asset has no hash :object', [
-                ':object' => json_encode($model->toJson()),
+            throw new AssetsException('Asset ":class" with ID ":id" has no hash', [
+                ':class' => get_class($model),
+                ':id'    => $model->getID(),
             ]);
         }
 

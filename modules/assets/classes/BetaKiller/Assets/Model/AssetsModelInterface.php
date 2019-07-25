@@ -124,11 +124,4 @@ interface AssetsModelInterface extends AbstractEntityInterface, HashBasedAssetsM
      * @return AssetsModelInterface
      */
     public function setSize(int $size): AssetsModelInterface;
-
-    /**
-     * Returns array representation of the model
-     *
-     * @return array
-     */
-    public function toJson(): array;
 }
