@@ -2,16 +2,18 @@
 namespace BetaKiller\Model;
 
 use BetaKiller\Assets\Model\AssetsModelInterface;
+use BetaKiller\Helper\AssetsHelper;
 use DateTimeImmutable;
 use DateTimeInterface;
 use ORM;
+use Spotman\Api\ApiResponseItemInterface;
 
 /**
  * Class AbstractOrmBasedAssetsModel
  *
  * Abstract class for all ORM-based asset models
  */
-abstract class AbstractOrmBasedAssetsModel extends ORM implements AssetsModelInterface
+abstract class AbstractOrmBasedAssetsModel extends ORM implements AssetsModelInterface, ApiResponseItemInterface
 {
     protected function configure(): void
     {
@@ -193,12 +195,20 @@ abstract class AbstractOrmBasedAssetsModel extends ORM implements AssetsModelInt
     }
 
     /**
-     * Returns array representation of the model
-     *
-     * @return array
+     * @return callable
      */
-    public function toJson(): array
+    public function getApiResponseData(): callable
     {
-        return $this->as_array();
+        return function (AssetsHelper $helper) {
+            return $helper->getInfo($this);
+        };
+    }
+
+    /**
+     * @return \DateTimeImmutable|null
+     */
+    public function getApiLastModified(): ?DateTimeImmutable
+    {
+        return null;
     }
 }
