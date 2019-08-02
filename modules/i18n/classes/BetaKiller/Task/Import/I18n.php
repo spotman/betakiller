@@ -166,6 +166,8 @@ class I18n extends AbstractTask
         // Check key model
         $keyModel = $this->keyRepo->findByKeyName($keyName);
 
+        $newModel = !$keyModel;
+
         // Create new if not exists
         if (!$keyModel) {
             /** @var \BetaKiller\Model\TranslationKeyModelInterface $keyModel */
@@ -174,7 +176,6 @@ class I18n extends AbstractTask
             $this->logger->info('I18n key ":key" added', [
                 ':key' => $keyName,
             ]);
-            $this->newKeys[] = $keyModel;
         }
 
         // Skip existing translations
@@ -216,5 +217,9 @@ class I18n extends AbstractTask
         ]);
 
         $this->keyRepo->save($keyModel);
+
+        if ($newModel) {
+            $this->newKeys[] = $keyModel;
+        }
     }
 }
