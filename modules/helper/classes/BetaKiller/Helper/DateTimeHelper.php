@@ -11,6 +11,11 @@ use IntlDateFormatter;
 
 class DateTimeHelper
 {
+    public static function getNow(DateTimeZone $tz = null): DateTimeImmutable
+    {
+        return new DateTimeImmutable('now', $tz ?? self::getUtcTimezone());
+    }
+
     public static function getUtcTimezone(): DateTimeZone
     {
         return new DateTimeZone('UTC');

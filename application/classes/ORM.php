@@ -155,18 +155,18 @@ abstract class ORM extends Utils\Kohana\ORM implements ExtendedOrmInterface
         // Get old models
         $oldModels = $this->getAllRelated($name);
 
-        // Add absent
-        foreach ($newModels as $new) {
-            if (!$this->hasModelInList($new, $oldModels)) {
-                $this->addRelated($name, $new);
-            }
-        }
-
-        // Remove unused
+        // Remove unused first to prevent FK warnings
         foreach ($oldModels as $old) {
             if (!$this->hasModelInList($old, $newModels)) {
                 // Add absent
                 $this->removeRelated($name, $old);
+            }
+        }
+
+        // Add absent last
+        foreach ($newModels as $new) {
+            if (!$this->hasModelInList($new, $oldModels)) {
+                $this->addRelated($name, $new);
             }
         }
     }
