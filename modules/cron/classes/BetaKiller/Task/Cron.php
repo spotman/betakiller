@@ -109,10 +109,6 @@ class Cron extends AbstractTask
         // Get all due tasks and enqueue them (long-running task would not affect next tasks due check)
         $this->enqueueDueTasks();
 
-        if ($this->maintenanceMode->isEnabled()) {
-            $this->logger->info('CRON jobs enqueued but not processed coz of maintenance mode');
-        }
-
         // Get all queued tasks and run them one by one
         $this->runQueuedTasks();
     }
@@ -194,9 +190,19 @@ class Cron extends AbstractTask
         $pool = new PriorityPool();
         $pool->setMaxSimultaneous(5);
 
+        $tasks = $this->queue->getReadyToStart();
+
+        if ($tasks && $this->maintenanceMode->isEnabled()) {
+            $this->logger->info('CRON jobs (:count) enqueued but not processed coz of maintenance mode', [
+                ':count' => count($tasks),
+            ]);
+
+            return;
+        }
+
         // Select queued tasks where start_at >= current time, limit 5
         // It allows to postpone failed tasks for 5 minutes
-        foreach ($this->queue->getReadyToStart() as $task) {
+        foreach ($tasks as $task) {
             $pool->add($this->makeTaskRun($task));
         }
 
