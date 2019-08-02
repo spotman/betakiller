@@ -10,6 +10,7 @@ use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\Model\CronLog;
 use BetaKiller\Model\CronLogInterface;
 use BetaKiller\Repository\CronLogRepositoryInterface;
+use BetaKiller\Service\MaintenanceModeService;
 use Cron\CronExpression;
 use Graze\ParallelProcess\Display\Table;
 use Graze\ParallelProcess\Event\RunEvent;
@@ -61,17 +62,24 @@ class Cron extends AbstractTask
     private $repo;
 
     /**
+     * @var \BetaKiller\Service\MaintenanceModeService
+     */
+    private $maintenanceMode;
+
+    /**
      * Cron constructor.
      *
      * @param \BetaKiller\Helper\AppEnvInterface                $env
      * @param \BetaKiller\Cron\TaskQueue                        $queue
      * @param \BetaKiller\Repository\CronLogRepositoryInterface $repo
+     * @param \BetaKiller\Service\MaintenanceModeService        $maintenanceMode
      * @param \Psr\Log\LoggerInterface                          $logger
      */
     public function __construct(
         AppEnvInterface $env,
         TaskQueue $queue,
         CronLogRepositoryInterface $repo,
+        MaintenanceModeService $maintenanceMode,
         LoggerInterface $logger
     ) {
         $this->env    = $env;
@@ -80,6 +88,7 @@ class Cron extends AbstractTask
 
         parent::__construct();
         $this->repo = $repo;
+        $this->maintenanceMode = $maintenanceMode;
     }
 
     public function defineOptions(): array
@@ -99,6 +108,10 @@ class Cron extends AbstractTask
 
         // Get all due tasks and enqueue them (long-running task would not affect next tasks due check)
         $this->enqueueDueTasks();
+
+        if ($this->maintenanceMode->isEnabled()) {
+            $this->logger->info('CRON jobs enqueued but not processed coz of maintenance mode');
+        }
 
         // Get all queued tasks and run them one by one
         $this->runQueuedTasks();
