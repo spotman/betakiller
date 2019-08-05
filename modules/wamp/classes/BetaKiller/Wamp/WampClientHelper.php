@@ -61,7 +61,7 @@ class WampClientHelper
     public function bindSessionHandlers(LoopInterface $loop): void
     {
         if (!$this->timer) {
-            $this->timer = $loop->addPeriodicTimer(30, function () {
+            $this->timer = $loop->addPeriodicTimer(300, function () {
                 // Remove old sessions without connections
                 $this->removeDeadSessions();
             });
