@@ -3,6 +3,7 @@
 use BetaKiller\Exception;
 use BetaKiller\Factory\EntityFactory;
 use BetaKiller\Factory\EntityFactoryInterface;
+use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\Helper\I18nHelper;
 use BetaKiller\Log\Logger;
 use BetaKiller\Middleware\CspReportBodyParamsStrategy;
@@ -164,14 +165,21 @@ return [
 
         ClientInterface::class => get(HttpClient::class),
 
-        Context::class => DI\factory(static function () {
+        Context::class => DI\factory(static function (AppEnvInterface $appEnv) {
+            $db = implode('.', [
+                $appEnv->getAppCodename(),
+                $appEnv->getRevisionKey(),
+                $appEnv->getModeName(),
+            ]);
+
             $factory = new RedisConnectionFactory([
                 'scheme_extensions' => ['phpredis',],
 
-                'host'  => getenv('REDIS_HOST'),
-                'port'  => getenv('REDIS_PORT'),
-                'lazy'  => true,
-                'async' => true,
+                'host'     => getenv('REDIS_HOST'),
+                'port'     => getenv('REDIS_PORT'),
+                'database' => $db,
+                'lazy'     => true,
+                'async'    => true,
             ]);
 
             return $factory->createContext();
