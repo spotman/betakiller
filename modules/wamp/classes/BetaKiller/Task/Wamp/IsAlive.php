@@ -5,6 +5,7 @@ namespace BetaKiller\Task\Wamp;
 
 use BetaKiller\Api\Method\WampTest\DataApiMethod;
 use BetaKiller\Daemon\ApiWorkerDaemon;
+use BetaKiller\Helper\AppEnvInterface;
 use BetaKiller\Helper\ResponseHelper;
 use BetaKiller\Helper\SessionHelper;
 use BetaKiller\Model\UserInterface;
@@ -52,17 +53,24 @@ class IsAlive extends AbstractTask
     private $logger;
 
     /**
+     * @var \BetaKiller\Helper\AppEnvInterface
+     */
+    private $appEnv;
+
+    /**
      * IsAlive constructor.
      *
      * @param \BetaKiller\Session\SessionStorageInterface $sessionStorage
      * @param \BetaKiller\Wamp\WampClientBuilder          $clientFactory
      * @param \BetaKiller\Model\UserInterface             $user
+     * @param \BetaKiller\Helper\AppEnvInterface          $appEnv
      * @param \Psr\Log\LoggerInterface                    $logger
      */
     public function __construct(
         SessionStorageInterface $sessionStorage,
         WampClientBuilder $clientFactory,
         UserInterface $user,
+        AppEnvInterface $appEnv,
         LoggerInterface $logger
     ) {
         parent::__construct();
@@ -70,6 +78,7 @@ class IsAlive extends AbstractTask
         $this->user           = $user;
         $this->sessionStorage = $sessionStorage;
         $this->clientBuilder  = $clientFactory;
+        $this->appEnv         = $appEnv;
         $this->logger         = $logger;
     }
 
@@ -92,14 +101,12 @@ class IsAlive extends AbstractTask
         $this->clientBuilder->sessionAuth($this->session);
 
         // Internal client for raw socket connection check
-        $internalClient = $this->clientBuilder->internalConnection()->createInternal();
+        $this->runTest($this->clientBuilder->internalConnection()->createInternal());
 
-        // External client for nginx proxy connection check
-        $externalClient = $this->clientBuilder->externalConnection()->createExternal();
-
-        // Make checks
-        $this->runTest($internalClient);
-        $this->runTest($externalClient);
+        if ($this->appEnv->inProductionMode()) {
+            // External client for nginx proxy connection check
+            $this->runTest($this->clientBuilder->externalConnection()->createExternal());
+        }
 
         $this->destroySession();
     }
@@ -164,7 +171,7 @@ class IsAlive extends AbstractTask
                 $args = (array)$result->getResultMessage()->getArguments()[0];
 
                 $this->logger->debug('API result is :result', [
-                    ':result' => \json_encode($args),
+                    ':result' => json_encode($args),
                 ]);
 
                 if (!$args) {
