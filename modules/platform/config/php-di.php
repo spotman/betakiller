@@ -166,7 +166,7 @@ return [
         ClientInterface::class => get(HttpClient::class),
 
         Context::class => DI\factory(static function (AppEnvInterface $appEnv) {
-            $db = implode('.', [
+            $prefix = implode('.', [
                 $appEnv->getAppCodename(),
                 $appEnv->getRevisionKey(),
                 $appEnv->getModeName(),
@@ -175,11 +175,14 @@ return [
             $factory = new RedisConnectionFactory([
                 'scheme_extensions' => ['phpredis',],
 
-                'host'     => getenv('REDIS_HOST'),
-                'port'     => getenv('REDIS_PORT'),
-                'database' => $db,
-                'lazy'     => true,
-                'async'    => true,
+                'host'  => getenv('REDIS_HOST'),
+                'port'  => getenv('REDIS_PORT'),
+                'lazy'  => true,
+                'async' => true,
+
+                'predis_options' => [
+                    'prefix' => $prefix,
+                ],
             ]);
 
             return $factory->createContext();
