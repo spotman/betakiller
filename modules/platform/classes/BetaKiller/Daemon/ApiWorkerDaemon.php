@@ -59,12 +59,11 @@ class ApiWorkerDaemon implements DaemonInterface
     private $logger;
 
     /**
-     * @param \BetaKiller\Config\WampConfigInterface $wampConfig
-     * @param \BetaKiller\Wamp\WampClientBuilder     $clientFactory
-     * @param \BetaKiller\Api\ApiFacade              $apiFacade
-     * @param \BetaKiller\Error\ExceptionService     $exceptionService
-     * @param \BetaKiller\Wamp\WampClientHelper      $clientHelper
-     * @param \Psr\Log\LoggerInterface               $logger
+     * @param \BetaKiller\Wamp\WampClientBuilder $clientFactory
+     * @param \BetaKiller\Api\ApiFacade          $apiFacade
+     * @param \BetaKiller\Error\ExceptionService $exceptionService
+     * @param \BetaKiller\Wamp\WampClientHelper  $clientHelper
+     * @param \Psr\Log\LoggerInterface           $logger
      */
     public function __construct(
         WampClientBuilder $clientFactory,
