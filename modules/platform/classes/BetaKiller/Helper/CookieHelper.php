@@ -42,6 +42,11 @@ class CookieHelper
     private $secureOnly = false;
 
     /**
+     * @var string
+     */
+    private $sameSite = 'lax';
+
+    /**
      * Session ID cookie is used for WAMP auth
      *
      * @var bool
@@ -153,7 +158,8 @@ class CookieHelper
             $this->path,
             $this->domain,
             $this->secureOnly,
-            $this->httpOnly
+            $this->httpOnly,
+            $this->sameSite
         );
 
         $cookie = $this->signer->sign($cookie, $this->key);
