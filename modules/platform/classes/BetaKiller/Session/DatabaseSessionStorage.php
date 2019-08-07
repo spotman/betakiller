@@ -27,8 +27,7 @@ class DatabaseSessionStorage implements SessionStorageInterface
 {
     use LoggerHelperTrait;
 
-    public const COOKIE_NAME      = 'sid';
-    public const COOKIE_DELIMITER = '~';
+    public const COOKIE_NAME = 'sid';
 
     /**
      * @var \BetaKiller\Auth\SessionConfig
@@ -96,18 +95,11 @@ class DatabaseSessionStorage implements SessionStorageInterface
             return $this->createSession('empty', $ipAddress, $originUrl);
         }
 
-        $cookie = $this->cookies->get($request, self::COOKIE_NAME);
-
-        if (!$cookie) {
-            // No session (cleared by browser or new visitor) => regenerate empty session
-            return $this->createSession($userAgent, $ipAddress, $originUrl);
-        }
-
-        $parts = explode(self::COOKIE_DELIMITER, $cookie, 2);
-        $token = \array_pop($parts);
+        $token = $this->cookies->get($request, self::COOKIE_NAME);
 
         if (!$token) {
-            throw new Exception('Invalid session cookie format ":value"', [':value' => $cookie]);
+            // No session (cleared by browser or new visitor) => regenerate empty session
+            return $this->createSession($userAgent, $ipAddress, $originUrl);
         }
 
         $model = $this->sessionRepo->findByToken($token);
