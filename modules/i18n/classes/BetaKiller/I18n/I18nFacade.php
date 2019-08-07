@@ -132,6 +132,11 @@ final class I18nFacade
         return $this->primaryLang;
     }
 
+    public function isPrimaryLanguage(LanguageInterface $lang): bool
+    {
+        return $lang->getIsoCode() === $this->primaryLang->getIsoCode();
+    }
+
     public function getAllowedLanguagesIsoCodes(): array
     {
         return $this->languagesIsoCodes;
