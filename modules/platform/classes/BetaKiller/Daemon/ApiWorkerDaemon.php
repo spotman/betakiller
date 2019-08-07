@@ -84,6 +84,13 @@ class ApiWorkerDaemon implements DaemonInterface
     {
         \Thruway\Logging\Logger::set($this->logger);
 
+        // Restart every 24h coz of annoying memory leak
+        $loop->addTimer(60 * 1440, function () use ($loop) {
+            $this->logger->info('Stopping API worker to prevent memory leaks');
+            $this->stop();
+            $loop->stop();
+        });
+
         // Use internal auth and connection coz it is an internal worker
         $this->clientBuilder->internalAuth()->internalConnection();
 
