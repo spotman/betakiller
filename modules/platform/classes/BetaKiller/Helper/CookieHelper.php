@@ -29,11 +29,6 @@ class CookieHelper
     /**
      * @var string
      */
-    private $domain;
-
-    /**
-     * @var string
-     */
     private $path = '/';
 
     /**
@@ -65,8 +60,6 @@ class CookieHelper
         if ($appConfig->isSecure()) {
             $this->secureOnly = true;
         }
-
-        $this->domain = $appConfig->getBaseUri()->getHost();
 
         $this->signer = new Sha512();
 
@@ -156,7 +149,7 @@ class CookieHelper
             $value,
             $expiresAt,
             $this->path,
-            $this->domain,
+            '', // No domain defined => lock cookies to current domain only
             $this->secureOnly,
             $this->httpOnly,
             $this->sameSite
