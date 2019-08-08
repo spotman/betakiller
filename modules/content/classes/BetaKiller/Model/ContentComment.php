@@ -25,8 +25,8 @@ class ContentComment extends AbstractOrmBasedSingleParentTreeModel implements Co
      * Prepares the model database connection, determines the table name,
      * and loads column information.
      *
-     * @throws Exception
      * @return void
+     * @throws Exception
      */
     protected function configure(): void
     {
@@ -43,7 +43,7 @@ class ContentComment extends AbstractOrmBasedSingleParentTreeModel implements Co
             ],
         ]);
 
-        $this->configureWorkflowModelRelation();
+        $this->configureWorkflowStateRelation();
 
         parent::configure();
     }
@@ -91,7 +91,7 @@ class ContentComment extends AbstractOrmBasedSingleParentTreeModel implements Co
                 ['not_empty'],
                 ['max_length', [':value', 4096]],
             ],
-            'path'        => [
+            'path'           => [
                 ['not_empty'],
             ],
         ];
@@ -352,6 +352,16 @@ class ContentComment extends AbstractOrmBasedSingleParentTreeModel implements Co
     public function getLevel(): int
     {
         return substr_count($this->getPath(), '.') - 1;
+    }
+
+    /**
+     * Return TRUE if you need status transition history
+     *
+     * @return bool
+     */
+    public function isWorkflowStateHistoryEnabled(): bool
+    {
+        return false;
     }
 
     /**

@@ -58,7 +58,7 @@ class ContentPost extends AbstractOrmBasedModelWithRevisions implements ContentP
 
         $this->initializeRevisionsRelations();
 
-        $this->configureWorkflowModelRelation();
+        $this->configureWorkflowStateRelation();
     }
 
     /**
@@ -335,7 +335,7 @@ class ContentPost extends AbstractOrmBasedModelWithRevisions implements ContentP
      */
     public function getApiResponseData(): callable
     {
-        return function() {
+        return function () {
             return $this->as_array();
         };
     }
@@ -406,12 +406,22 @@ class ContentPost extends AbstractOrmBasedModelWithRevisions implements ContentP
     }
 
     /**
+     * Return TRUE if you need status transition history
+     *
+     * @return bool
+     */
+    public function isWorkflowStateHistoryEnabled(): bool
+    {
+        return false;
+    }
+
+    /**
      * Insert a new object to the database
      *
-     * @param  Validation $validation Validation object
+     * @param Validation $validation Validation object
      *
-     * @throws Kohana_Exception
      * @return ORM
+     * @throws Kohana_Exception
      */
     public function create(Validation $validation = null): \ORM
     {
@@ -427,10 +437,10 @@ class ContentPost extends AbstractOrmBasedModelWithRevisions implements ContentP
      *
      * @chainable
      *
-     * @param  Validation $validation Validation object
+     * @param Validation $validation Validation object
      *
-     * @throws Kohana_Exception
      * @return ORM
+     * @throws Kohana_Exception
      */
     public function update(Validation $validation = null): \ORM
     {

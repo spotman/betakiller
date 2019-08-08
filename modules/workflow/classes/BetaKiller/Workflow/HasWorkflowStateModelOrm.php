@@ -9,6 +9,6 @@ abstract class HasWorkflowStateModelOrm extends ORM implements HasWorkflowStateM
 
     protected function configure(): void
     {
-        $this->configureWorkflowModelRelation();
+        $this->configureWorkflowStateRelation();
     }
 }

@@ -3,7 +3,7 @@ namespace BetaKiller\Workflow;
 
 trait HasWorkflowStateModelOrmTrait
 {
-    protected function configureWorkflowModelRelation(): void
+    protected function configureWorkflowStateRelation(): void
     {
         $statusRelationKey = static::getWorkflowStateRelationKey();
 
