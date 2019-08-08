@@ -7,12 +7,14 @@ use BetaKiller\Auth\AccessDeniedException;
 use BetaKiller\Model\GuestUserInterface;
 use BetaKiller\Model\TokenInterface;
 use BetaKiller\Model\UserInterface;
+use DateTimeImmutable;
+use LogicException;
 use Zend\Expressive\Session\SessionInterface;
 
 class SessionHelper
 {
-    public const IP_ADDRESS   = 'ip_address';
-    public const USER_AGENT   = 'user_agent';
+    public const CREATED_AT   = 'created_at';
+    public const PERSISTENT   = 'persistent';
     public const AUTH_USER_ID = 'auth_user';
     public const ORIGIN_URL   = 'origin_url';
     public const TOKEN_HASH   = 'token';
@@ -27,30 +29,32 @@ class SessionHelper
         }
     }
 
-    public static function getUserAgent(SessionInterface $session): string
+    public static function setCreatedAt(SessionInterface $session, DateTimeImmutable $createdAt): void
     {
-        return $session->get(self::USER_AGENT);
+        $session->set(self::CREATED_AT, $createdAt->getTimestamp());
     }
 
-    public static function setUserAgent(SessionInterface $session, string $userAgent): void
+    public static function getCreatedAt(SessionInterface $session): DateTimeImmutable
     {
-        $session->set(self::USER_AGENT, $userAgent);
+        $ts = $session->get(self::CREATED_AT);
+
+        return DateTimeHelper::createDateTimeFromTimestamp($ts);
     }
 
-    public static function getIpAddress(SessionInterface $session): string
+    public static function markAsPersistent(SessionInterface $session): void
     {
-        return $session->get(self::IP_ADDRESS);
+        $session->set(self::PERSISTENT, true);
     }
 
-    public static function setIpAddress(SessionInterface $session, string $ipAddress): void
+    public static function isPersistent(SessionInterface $session): bool
     {
-        $session->set(self::IP_ADDRESS, $ipAddress);
+        return (bool)$session->get(self::PERSISTENT);
     }
 
     public static function setUserID(SessionInterface $session, UserInterface $user): void
     {
         if ($user instanceof GuestUserInterface) {
-            throw new \LogicException('Session user can not be a guest but real user only');
+            throw new LogicException('Session user can not be a guest but real user only');
         }
 
         $session->set(self::AUTH_USER_ID, $user->getID());

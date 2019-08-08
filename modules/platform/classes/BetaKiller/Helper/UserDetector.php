@@ -2,6 +2,7 @@
 namespace BetaKiller\Helper;
 
 use BetaKiller\Exception;
+use BetaKiller\Factory\GuestUserFactory;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Repository\UserRepositoryInterface;
 use BetaKiller\Task\AbstractTask;
@@ -19,15 +20,22 @@ class UserDetector
     private $repository;
 
     /**
+     * @var \BetaKiller\Factory\GuestUserFactory
+     */
+    private $guestFactory;
+
+    /**
      * UserDetector constructor.
      *
      * @param \BetaKiller\Helper\AppEnvInterface             $appEnv
      * @param \BetaKiller\Repository\UserRepositoryInterface $repo
+     * @param \BetaKiller\Factory\GuestUserFactory           $guestFactory
      */
-    public function __construct(AppEnvInterface $appEnv, UserRepositoryInterface $repo)
+    public function __construct(AppEnvInterface $appEnv, UserRepositoryInterface $repo, GuestUserFactory $guestFactory)
     {
-        $this->appEnv     = $appEnv;
-        $this->repository = $repo;
+        $this->appEnv       = $appEnv;
+        $this->repository   = $repo;
+        $this->guestFactory = $guestFactory;
     }
 
     /**
@@ -39,6 +47,10 @@ class UserDetector
     {
         // Get username from CLI arguments or use default instead
         $userName = $this->appEnv->getCliOption('user') ?: AbstractTask::CLI_USER_NAME;
+
+        if ($userName === 'guest') {
+            return $this->guestFactory->create();
+        }
 
         $user = $this->repository->searchBy($userName);
 

@@ -4,10 +4,11 @@ declare(strict_types=1);
 namespace BetaKiller\Task\Test;
 
 use BetaKiller\Api\ApiFacade;
-use BetaKiller\Helper\DateTimeHelper;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Task\AbstractTask;
+use DateTimeImmutable;
 use Psr\Log\LoggerInterface;
+use const JSON_PRETTY_PRINT;
 
 class Api extends AbstractTask
 {
@@ -76,7 +77,7 @@ class Api extends AbstractTask
         $this->logger->debug('Calling ":resource->:method" with arguments ":args"', [
             ':resource' => $resourceName,
             ':method'   => $methodName,
-            ':args'     => \json_encode($arguments),
+            ':args'     => json_encode($arguments),
         ]);
 
         $response = $this->api
@@ -84,10 +85,10 @@ class Api extends AbstractTask
             ->call($methodName, $arguments, $this->user);
 
         $this->logger->info('Last modified at :date', [
-            ':date' => DateTimeHelper::formatDateTimeUser($response->getLastModified(), $this->user),
+            ':date' => $response->getLastModified()->format(DateTimeImmutable::COOKIE),
         ]);
 
-        echo json_encode($response->getData(), \JSON_PRETTY_PRINT).PHP_EOL;
+        echo json_encode($response->getData(), JSON_PRETTY_PRINT).PHP_EOL;
     }
 
     private function getCallArguments(): array

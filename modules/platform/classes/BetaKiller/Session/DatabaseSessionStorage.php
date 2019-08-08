@@ -6,7 +6,6 @@ namespace BetaKiller\Session;
 use BetaKiller\Auth\SessionConfig;
 use BetaKiller\Exception;
 use BetaKiller\Exception\DomainException;
-use BetaKiller\Exception\SecurityException;
 use BetaKiller\Helper\CookieHelper;
 use BetaKiller\Helper\LoggerHelperTrait;
 use BetaKiller\Helper\ServerRequestHelper;
@@ -19,6 +18,7 @@ use DateTimeImmutable;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
+use Text;
 use Zend\Expressive\Session\Session;
 use Zend\Expressive\Session\SessionIdentifierAwareInterface;
 use Zend\Expressive\Session\SessionInterface;
@@ -87,45 +87,21 @@ class DatabaseSessionStorage implements SessionStorageInterface
     public function initializeSessionFromRequest(ServerRequestInterface $request): SessionInterface
     {
         $userAgent = ServerRequestHelper::getUserAgent($request);
-        $ipAddress = ServerRequestHelper::getIpAddress($request);
         $originUrl = ServerRequestHelper::getUrl($request);
 
         if (!$userAgent) {
             // Bots, fake requests, etc => regenerate empty session
-            return $this->createSession('empty', $ipAddress, $originUrl);
+            return $this->createSession($originUrl);
         }
 
         $token = $this->cookies->get($request, self::COOKIE_NAME);
 
         if (!$token) {
             // No session (cleared by browser or new visitor) => regenerate empty session
-            return $this->createSession($userAgent, $ipAddress, $originUrl);
+            return $this->createSession($originUrl);
         }
 
-        $model = $this->sessionRepo->findByToken($token);
-
-        if (!$model) {
-            // Missing session (cleared by gc or stale) => regenerate empty session
-            return $this->createSession($userAgent, $ipAddress, $originUrl);
-        }
-
-        if ($this->isExpired($model)) {
-            // Session exists, but expired => create empty
-            return $this->createSession($userAgent, $ipAddress, $originUrl);
-        }
-
-        return $this->restoreSession($model);
-
-// Temp fix for annoying session issues (constantly changing after browser update + inconsistent behaviour)
-//
-//        // Browser updated or plugin installed, potential hack
-//        if (!$this->isValidSession($session, $userAgent, $request)) {
-//            $this->sessionRepo->delete($model);
-//
-//            return $this->createSession($userAgent, $ipAddress, $originUrl);
-//        }
-//
-//        return $session;
+        return $this->getByToken($token);
     }
 
     private function isExpired(UserSession $model): bool
@@ -142,41 +118,6 @@ class DatabaseSessionStorage implements SessionStorageInterface
         return false;
     }
 
-    private function isValidSession(
-        SessionInterface $session,
-        string $userAgent,
-        ServerRequestInterface $request
-    ): bool {
-        if (!$session instanceof SessionIdentifierAwareInterface) {
-            throw new DomainException('Session must implement :interface', [
-                ':interface' => SessionIdentifierAwareInterface::class,
-            ]);
-        }
-
-        $validAgent = SessionHelper::getUserAgent($session);
-
-        // Use similar_text() instead of strict comparison
-        // User-agent contains browser version which changes after updates
-        \similar_text($validAgent, $userAgent, $similarity);
-
-        // Check user-agent similarity
-        if ($similarity < 75) {
-            // Warn about potential attack and restrict access
-            $this->logException($this->logger, new SecurityException(
-                'User agent juggling for user ":user" with session ":token" and ":agent" (must be ":needed")', [
-                ':token'  => $session->getId(),
-                ':agent'  => $userAgent,
-                ':needed' => $validAgent,
-                ':user'   => SessionHelper::getUserID($session) ?: 'Guest',
-            ]), $request);
-
-            return false;
-        }
-
-        // Only user agent check coz IP address may be changed on mobile connection
-        return true;
-    }
-
     private function restoreSession(UserSession $model): SessionInterface
     {
         $content = $model->getContents();
@@ -186,6 +127,9 @@ class DatabaseSessionStorage implements SessionStorageInterface
 
         // Create session DTO
         $session = $this->sessionFactory($model->getToken(), $data);
+
+        SessionHelper::setCreatedAt($session, $model->getCreatedAt());
+        SessionHelper::markAsPersistent($session);
 
         // Restore user in session if exists
         $user = $model->getUser();
@@ -199,28 +143,27 @@ class DatabaseSessionStorage implements SessionStorageInterface
     }
 
     /**
-     * @param string $id
+     * @param string $token
      *
      * @return \Zend\Expressive\Session\Session
      * @throws \BetaKiller\Repository\RepositoryException
      */
-    public function getByToken(string $id): SessionInterface
+    public function getByToken(string $token): SessionInterface
     {
-        $model = $this->sessionRepo->findByToken($id);
+        $model = $this->sessionRepo->findByToken($token);
 
         if (!$model) {
-            throw new SecurityException('Trying to retrieve missing session :token', [
-                ':token' => $id,
-            ]);
+            // Missing session (cleared by gc or stale) => regenerate empty session
+            return $this->createSession();
         }
 
         if ($this->isExpired($model)) {
-            throw new SecurityException('Trying to retrieve expired session :token', [
-                ':token' => $id,
-            ]);
+            // Session exists, but expired => create empty
+            return $this->createSession();
         }
 
-        // Skip user agent check cos it can not be performed here
+        // No user agent / IP checks coz of annoying session issues
+        // They are constantly changing after browser update + inconsistent behaviour
         return $this->restoreSession($model);
     }
 
@@ -237,20 +180,20 @@ class DatabaseSessionStorage implements SessionStorageInterface
     }
 
     /**
-     * @param string $userAgent
-     * @param string $ipAddress
      * @param string $originUrl
      *
      * @return \Zend\Expressive\Session\SessionInterface
      */
-    public function createSession(string $userAgent, string $ipAddress, string $originUrl): SessionInterface
+    public function createSession(string $originUrl = null): SessionInterface
     {
         // Generate new token and fresh session object without data
         $session = $this->sessionFactory($this->generateToken(), []);
 
-        SessionHelper::setUserAgent($session, $userAgent);
-        SessionHelper::setIpAddress($session, $ipAddress);
-        SessionHelper::setOriginUrl($session, $originUrl);
+        if ($originUrl) {
+            SessionHelper::setOriginUrl($session, $originUrl);
+        }
+
+        SessionHelper::setCreatedAt($session, new DateTimeImmutable);
 
         return $session;
     }
@@ -308,6 +251,8 @@ class DatabaseSessionStorage implements SessionStorageInterface
 
         $this->sessionRepo->save($model);
 
+        SessionHelper::markAsPersistent($session);
+
         // Set cookie
         return $this->cookies->set(
             $response,
@@ -339,8 +284,6 @@ class DatabaseSessionStorage implements SessionStorageInterface
     {
         // Generate new token and create fresh session with empty data
         $newSession = $this->createSession(
-            SessionHelper::getUserAgent($oldSession),
-            SessionHelper::getIpAddress($oldSession),
             SessionHelper::getOriginUrl($oldSession)
         );
 
@@ -359,7 +302,7 @@ class DatabaseSessionStorage implements SessionStorageInterface
     private function generateToken(): string
     {
         do {
-            $token = sha1(uniqid(\Text::random('alnum', UserSession::TOKEN_LENGTH), true));
+            $token = sha1(uniqid(Text::random('alnum', UserSession::TOKEN_LENGTH), true));
         } while ($this->sessionRepo->findByToken($token));
 
         return $token;
@@ -386,16 +329,19 @@ class DatabaseSessionStorage implements SessionStorageInterface
 
         $model = new UserSession();
 
+        // Fetch original creation time
+        $createdAt = SessionHelper::getCreatedAt($session);
+
         $model
             ->setToken($session->getId())
-            ->setCreatedAt(new DateTimeImmutable);
+            ->setCreatedAt($createdAt);
 
         return $model;
     }
 
     private function encodeData(array $data): string
     {
-        $content = \serialize($data);
+        $content = serialize($data);
 
         // Encrypt
         $content = $this->encryption->encrypt($content, $this->getEncryptionKey());
@@ -405,19 +351,13 @@ class DatabaseSessionStorage implements SessionStorageInterface
 
     private function decodeData(string $content): array
     {
-//        $content = \base64_decode($encodedContent);
-//
-//        if (!$content) {
-//            throw new Exception('Invalid session content: :value', [':value' => $encodedContent]);
-//        }
-
         // Decrypt
         $content = $this->encryption->decrypt($content, $this->getEncryptionKey());
 
-        $data = \unserialize($content, $this->config->getAllowedClassNames());
+        $data = unserialize($content, $this->config->getAllowedClassNames());
 
-        if (!\is_array($data)) {
-            throw new Exception('Invalid session data: :value', [':value' => \json_encode($data)]);
+        if (!is_array($data)) {
+            throw new Exception('Invalid session data: :value', [':value' => json_encode($data)]);
         }
 
         return $data;

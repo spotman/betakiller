@@ -20,8 +20,6 @@ use Thruway\ClientSession;
 
 class IsAlive extends AbstractTask
 {
-    private const USER_AGENT = 'WAMP isAlive checker';
-
     /**
      * @var \Zend\Expressive\Session\SessionInterface|\Zend\Expressive\Session\SessionIdentifierAwareInterface
      */
@@ -113,11 +111,7 @@ class IsAlive extends AbstractTask
 
     private function createSession(): void
     {
-        $this->session = $this->sessionStorage->createSession(
-            self::USER_AGENT,
-            '127.0.0.1',
-            '/'
-        );
+        $this->session = $this->sessionStorage->createSession();
 
         SessionHelper::setUserID($this->session, $this->user);
 

@@ -8,7 +8,9 @@ use BetaKiller\Helper\LoggerHelperTrait;
 use BetaKiller\Helper\SessionHelper;
 use BetaKiller\Service\AuthService;
 use BetaKiller\Session\DatabaseSessionStorage;
+use LogicException;
 use Psr\Log\LoggerInterface;
+use Throwable;
 use Thruway\Authentication\WampCraUserDbInterface;
 
 //use Thruway\Common\Utils;
@@ -66,20 +68,26 @@ class WampUserDb implements WampCraUserDbInterface
 
             $this->logger->debug('Sid decoded to ":value"', [':value' => $sessionId]);
 
-            $session   = $this->auth->getSession($sessionId);
-            $userAgent = SessionHelper::getUserAgent($session);
+            $session = $this->auth->getSession($sessionId);
 
-            if (!$userAgent) {
-                throw new \LogicException('Missing user-agent in session data '.$sessionId);
+            if (!SessionHelper::isPersistent($session)) {
+                throw new LogicException('Using non-persistent session '.$sessionId);
             }
 
-            if (!SessionHelper::getUserID($session)) {
-                throw new \LogicException('Guest connection to wamp from session '.$sessionId);
-            }
+// No user agent checks anymore (inconsistent behaviour)
+//            $userAgent = SessionHelper::getUserAgent($session);
+//
+//            if (!$userAgent) {
+//                throw new \LogicException('Missing user-agent in session data '.$sessionId);
+//            }
 
-            // Temp fix for annoying user-agent issues (constantly changing during browser updates)
+// Allow quests to use WAMP on landing pages
+//            if (!SessionHelper::getUserID($session)) {
+//                throw new \LogicException('Guest connection to wamp from session '.$sessionId);
+//            }
+
             return $this->makeData($authid, $authid);
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             $this->logException($this->logger, $e);
 
             // Make random key string so auth will never be succeeded
@@ -99,6 +107,6 @@ class WampUserDb implements WampCraUserDbInterface
     private function makeFakeData(string $authid): array
     {
         // Make random key string so auth will never be succeeded
-        return $this->makeData($authid, \sha1(\microtime()));
+        return $this->makeData($authid, sha1(microtime()));
     }
 }

@@ -14,6 +14,8 @@ use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use Spotman\Api\ApiMethodResponse;
 use Spotman\Api\ApiResourceProxyInterface;
+use stdClass;
+use Throwable;
 use Thruway\ClientSession;
 
 class ApiWorkerDaemon implements DaemonInterface
@@ -123,34 +125,34 @@ class ApiWorkerDaemon implements DaemonInterface
         }
     }
 
-    public function apiCallProcedure(array $indexedArgs, \stdClass $namedArgs)
+    private function apiCallProcedure(array $indexedArgs, stdClass $namedArgs)
     {
         $user = null;
 
         try {
-            $wampSession = $this->clientHelper->getProcedureSession(\func_get_args());
+            $wampSession = $this->clientHelper->getProcedureSession(func_get_args());
             $user        = $this->clientHelper->getSessionUser($wampSession);
 
-            $this->logger->debug('Indexed args are :value', [':value' => \json_encode($indexedArgs)]);
-            $this->logger->debug('Named args are :value', [':value' => \json_encode($namedArgs)]);
+            $this->logger->debug('Indexed args are :value', [':value' => json_encode($indexedArgs)]);
+            $this->logger->debug('Named args are :value', [':value' => json_encode($namedArgs)]);
 
             $arrayArgs = (array)$namedArgs;
 
-            $resource  = \ucfirst($arrayArgs[self::KEY_API_RESOURCE]);
+            $resource  = ucfirst($arrayArgs[self::KEY_API_RESOURCE]);
             $method    = $arrayArgs[self::KEY_API_METHOD];
             $arguments = (array)$arrayArgs[self::KEY_API_DATA];
 
             $this->logger->debug('User is ":name"', [':name' => $user->getUsername()]);
             $this->logger->debug('Resource is ":name"', [':name' => $resource]);
             $this->logger->debug('Method is ":name"', [':name' => $method]);
-            $this->logger->debug('Arguments are :value', [':value' => \json_encode($arguments)]);
+            $this->logger->debug('Arguments are :value', [':value' => json_encode($arguments)]);
 
             $result = $this->callApiMethod($resource, $method, $arguments, $user);
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             return $this->makeApiError($e, $user);
         }
 
-        $this->logger->debug('Result is :value', [':value' => \json_encode($result)]);
+        $this->logger->debug('Result is :value', [':value' => json_encode($result)]);
 
         return $result;
     }
@@ -166,7 +168,7 @@ class ApiWorkerDaemon implements DaemonInterface
             ->call($method, $arguments, $user);
     }
 
-    private function makeApiError(\Throwable $e, UserInterface $user = null): array
+    private function makeApiError(Throwable $e, UserInterface $user = null): array
     {
         $this->logException($this->logger, $e);
 
