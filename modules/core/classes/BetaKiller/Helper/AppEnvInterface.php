@@ -64,6 +64,11 @@ interface AppEnvInterface
     public function enableDebug(): void;
 
     /**
+     * Call this method to disable debug mode
+     */
+    public function disableDebug(): void;
+
+    /**
      * @return string
      */
     public function getModeName(): string;

@@ -21,7 +21,7 @@ abstract class AbstractTask extends Minion_Task
     public static function defineCommonOptions(): array
     {
         return [
-            'debug' => false,
+            'debug' => null,
             'stage' => 'development',
             'user'  => null,
         ];

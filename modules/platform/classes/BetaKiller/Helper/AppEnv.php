@@ -50,8 +50,8 @@ class AppEnv implements AppEnvInterface
         $this->isCoreRunning = $isCoreRunning;
 
         $this->initDotEnv();
-        $this->detectCliEnv();
         $this->detectAppMode();
+        $this->detectCliEnv(); // Cli options can override app configuration
     }
 
     private function initDotEnv(): void
@@ -86,8 +86,12 @@ class AppEnv implements AppEnvInterface
             return;
         }
 
-        if ($this->getCliOption('debug', false, 'false') !== 'false') {
+        $debugOption = $this->getCliOption('debug', false);
+
+        if ($debugOption === 'true') {
             $this->enableDebug();
+        } elseif ($debugOption === 'false') {
+            $this->disableDebug();
         }
 
         $stage = $this->getCliOption('stage');
@@ -146,6 +150,14 @@ class AppEnv implements AppEnvInterface
     public function enableDebug(): void
     {
         $this->debugEnabled = true;
+    }
+
+    /**
+     * Call this method to disable debug mode
+     */
+    public function disableDebug(): void
+    {
+        $this->debugEnabled = false;
     }
 
     public function getModeName(): string
