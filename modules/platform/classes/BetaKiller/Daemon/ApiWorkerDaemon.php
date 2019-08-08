@@ -125,7 +125,7 @@ class ApiWorkerDaemon implements DaemonInterface
         }
     }
 
-    private function apiCallProcedure(array $indexedArgs, stdClass $namedArgs)
+    public function apiCallProcedure(array $indexedArgs, stdClass $namedArgs)
     {
         $user = null;
 
