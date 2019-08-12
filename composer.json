@@ -81,7 +81,8 @@
     "phpstan/phpstan": "0.10.3",
     "phpunit/php-code-coverage": "^7.0",
     "phpunit/phpunit": "^8.0",
-    "roave/security-advisories": "dev-master"
+    "roave/security-advisories": "dev-master",
+    "tsufeki/react-filesystem-monitor": "^0.4.1"
   },
   "suggest": {
     "franzl/studio": "Tool for developing Composer packages"
