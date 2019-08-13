@@ -20,7 +20,7 @@ final class LanguageRepository extends AbstractI18nKeyRepository implements Lang
      */
     public function getUrlKeyName(): string
     {
-        return Language::TABLE_FIELD_ISO_CODE;
+        return Language::COL_ISO_CODE;
     }
 
     public function getByIsoCode(string $name): LanguageInterface
@@ -157,7 +157,7 @@ final class LanguageRepository extends AbstractI18nKeyRepository implements Lang
      */
     private function filterApp(OrmInterface $orm): self
     {
-        $orm->where(Language::TABLE_FIELD_IS_APP, '=', 1);
+        $orm->where(Language::COL_IS_APP, '=', 1);
 
         return $this;
     }
@@ -171,7 +171,7 @@ final class LanguageRepository extends AbstractI18nKeyRepository implements Lang
      */
     private function filterDev(OrmInterface $orm, bool $value): self
     {
-        $orm->where(Language::TABLE_FIELD_IS_DEV, '=', $value);
+        $orm->where(Language::COL_IS_DEV, '=', $value);
 
         return $this;
     }
@@ -184,7 +184,7 @@ final class LanguageRepository extends AbstractI18nKeyRepository implements Lang
      */
     private function filterIsoCode(OrmInterface $orm, string $name): self
     {
-        $orm->where(Language::TABLE_FIELD_ISO_CODE, '=', $name);
+        $orm->where(Language::COL_ISO_CODE, '=', $name);
 
         return $this;
     }
@@ -197,21 +197,21 @@ final class LanguageRepository extends AbstractI18nKeyRepository implements Lang
      */
     private function filterLocale(OrmInterface $orm, string $locale): self
     {
-        $orm->where(Language::TABLE_FIELD_LOCALE, '=', $locale);
+        $orm->where(Language::COL_LOCALE, '=', $locale);
 
         return $this;
     }
 
     private function placeDefaultFirst(OrmInterface $orm): self
     {
-        $orm->order_by($orm->object_column(Language::TABLE_FIELD_IS_DEFAULT), 'DESC');
+        $orm->order_by($orm->object_column(Language::COL_IS_DEFAULT), 'DESC');
 
         return $this;
     }
 
     protected function getI18nValuesColumnName(ExtendedOrmInterface $orm): string
     {
-        return $orm->object_column(Language::TABLE_FIELD_I18N);
+        return $orm->object_column(Language::COL_I18N);
     }
 
     protected function customFilterForUrlDispatching(OrmInterface $orm, UrlContainerInterface $params): void

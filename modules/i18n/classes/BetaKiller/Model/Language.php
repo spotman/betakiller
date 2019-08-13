@@ -4,18 +4,19 @@ declare(strict_types=1);
 namespace BetaKiller\Model;
 
 use DateTimeImmutable;
+use ORM;
 
-class Language extends \ORM implements LanguageInterface
+class Language extends ORM implements LanguageInterface
 {
     use I18nKeyOrmTrait;
 
-    public const TABLE_NAME             = 'languages';
-    public const TABLE_FIELD_ISO_CODE   = 'iso_code';
-    public const TABLE_FIELD_LOCALE     = 'locale';
-    public const TABLE_FIELD_IS_APP     = 'is_app';
-    public const TABLE_FIELD_IS_DEV     = 'is_dev';
-    public const TABLE_FIELD_IS_DEFAULT = 'is_default';
-    public const TABLE_FIELD_I18N       = 'i18n';
+    public const TABLE_NAME     = 'languages';
+    public const COL_ISO_CODE   = 'iso_code';
+    public const COL_LOCALE     = 'locale';
+    public const COL_IS_APP     = 'is_app';
+    public const COL_IS_DEV     = 'is_dev';
+    public const COL_IS_DEFAULT = 'is_default';
+    public const COL_I18N       = 'i18n';
 
     protected function configure(): void
     {
@@ -24,7 +25,7 @@ class Language extends \ORM implements LanguageInterface
 
     protected function getI18nValueColumn(): string
     {
-        return self::TABLE_FIELD_I18N;
+        return self::COL_I18N;
     }
 
     /**
@@ -48,19 +49,19 @@ class Language extends \ORM implements LanguageInterface
     public function rules(): array
     {
         return [
-            self::TABLE_FIELD_ISO_CODE => [
+            self::COL_ISO_CODE => [
                 ['not_empty'],
                 ['max_length', [':value', 8]],
             ],
-            self::TABLE_FIELD_LOCALE   => [
+            self::COL_LOCALE   => [
                 ['not_empty'],
                 ['max_length', [':value', 8]],
             ],
-            self::TABLE_FIELD_IS_APP   => [
+            self::COL_IS_APP   => [
                 ['not_empty'],
                 ['max_length', [':value', 1]],
             ],
-            self::TABLE_FIELD_IS_DEV   => [
+            self::COL_IS_DEV   => [
                 ['not_empty'],
                 ['max_length', [':value', 1]],
             ],
@@ -74,7 +75,7 @@ class Language extends \ORM implements LanguageInterface
      */
     public function setIsoCode(string $value): LanguageInterface
     {
-        $this->set(self::TABLE_FIELD_ISO_CODE, strtolower($value));
+        $this->set(self::COL_ISO_CODE, strtolower($value));
 
         return $this;
     }
@@ -84,7 +85,7 @@ class Language extends \ORM implements LanguageInterface
      */
     public function getIsoCode(): string
     {
-        return $this->get(self::TABLE_FIELD_ISO_CODE);
+        return $this->get(self::COL_ISO_CODE);
     }
 
     /**
@@ -94,7 +95,7 @@ class Language extends \ORM implements LanguageInterface
      */
     public function setLocale(string $value): LanguageInterface
     {
-        $this->set(self::TABLE_FIELD_LOCALE, $value);
+        $this->set(self::COL_LOCALE, $value);
 
         return $this;
     }
@@ -104,7 +105,7 @@ class Language extends \ORM implements LanguageInterface
      */
     public function getLocale(): string
     {
-        return $this->get(self::TABLE_FIELD_LOCALE);
+        return $this->get(self::COL_LOCALE);
     }
 
     /**
@@ -170,7 +171,7 @@ class Language extends \ORM implements LanguageInterface
      */
     public function isApp(): bool
     {
-        return (bool)$this->get(self::TABLE_FIELD_IS_APP);
+        return (bool)$this->get(self::COL_IS_APP);
     }
 
     /**
@@ -178,7 +179,7 @@ class Language extends \ORM implements LanguageInterface
      */
     public function isDev(): bool
     {
-        return (bool)$this->get(self::TABLE_FIELD_IS_DEV);
+        return (bool)$this->get(self::COL_IS_DEV);
     }
 
     /**
@@ -186,7 +187,7 @@ class Language extends \ORM implements LanguageInterface
      */
     public function isDefault(): bool
     {
-        return (bool)$this->get(self::TABLE_FIELD_IS_DEFAULT);
+        return (bool)$this->get(self::COL_IS_DEFAULT);
     }
 
     /**
@@ -196,9 +197,9 @@ class Language extends \ORM implements LanguageInterface
     {
         return function (LanguageInterface $lang) {
             return [
-                'code'   => $this->getIsoCode(),
-                'label'  => $this->getLabel($lang),
-                'native' => $this->getLabel(),
+                self::API_KEY_ISO_CODE     => $this->getIsoCode(),
+                self::API_KEY_LABEL_I18N   => $this->getLabel($lang),
+                self::API_KEY_LABEL_NATIVE => $this->getLabel(),
             ];
         };
     }
@@ -219,7 +220,7 @@ class Language extends \ORM implements LanguageInterface
      */
     private function setIsDefault(bool $value): LanguageInterface
     {
-        $this->set(self::TABLE_FIELD_IS_DEFAULT, $value);
+        $this->set(self::COL_IS_DEFAULT, $value);
 
         return $this;
     }
@@ -231,7 +232,7 @@ class Language extends \ORM implements LanguageInterface
      */
     private function markApp(bool $value): LanguageInterface
     {
-        $this->set(self::TABLE_FIELD_IS_APP, (int)$value);
+        $this->set(self::COL_IS_APP, (int)$value);
 
         return $this;
     }
@@ -243,7 +244,7 @@ class Language extends \ORM implements LanguageInterface
      */
     private function markDev(bool $value): LanguageInterface
     {
-        $this->set(self::TABLE_FIELD_IS_DEV, (int)$value);
+        $this->set(self::COL_IS_DEV, (int)$value);
 
         return $this;
     }
