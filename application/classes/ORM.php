@@ -146,6 +146,11 @@ abstract class ORM extends Utils\Kohana\ORM implements ExtendedOrmInterface
         return $this->getRelation($name)->get_all();
     }
 
+    protected function countAllRelated(string $name): int
+    {
+        return $this->getRelation($name)->count_all();
+    }
+
     /**
      * @param string                                           $name
      * @param OrmInterface[]|AbstractEntityInterface[]|mixed[] $newModels
