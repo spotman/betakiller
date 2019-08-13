@@ -487,8 +487,8 @@ task('deploy', [
     'deploy:dotenv:revision',
 
     // Deploy assets (locally or on remote host)
-    'assets:deploy',
     'assets:build',
+    'assets:deploy',
 
     // Enable maintenance mode before any DB processing
     'maintenance:on',
