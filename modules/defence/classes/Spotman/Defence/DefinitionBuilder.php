@@ -420,8 +420,8 @@ class DefinitionBuilder implements DefinitionBuilderInterface
 
         $this->checkGuardIsAllowed($rule, $argument);
 
-        if (!$argument instanceof SingleArgumentDefinitionInterface) {
-            throw new \LogicException('Only scalar types can define rules');
+        if (!$argument instanceof ArgumentWithRulesInterface) {
+            throw new \LogicException('Only types implementing ArgumentWithRulesInterface can define rules');
         }
 
         $argument->addRule($rule);
@@ -435,8 +435,8 @@ class DefinitionBuilder implements DefinitionBuilderInterface
 
         $this->checkGuardIsAllowed($filter, $argument);
 
-        if (!$argument instanceof SingleArgumentDefinitionInterface) {
-            throw new \LogicException('Only scalar types can define filters');
+        if (!$argument instanceof ArgumentWithFiltersInterface) {
+            throw new \LogicException('Only types implementing ArgumentWithFiltersInterface can define filters');
         }
 
         $argument->addFilter($filter);

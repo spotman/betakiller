@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Spotman\Defence;
 
-interface CompositeArrayArgumentDefinitionInterface extends ArgumentDefinitionInterface
+interface CompositeArrayArgumentDefinitionInterface extends ArgumentDefinitionInterface, ArgumentWithRulesInterface
 {
     /**
      * @return \Spotman\Defence\CompositeArgumentDefinitionInterface

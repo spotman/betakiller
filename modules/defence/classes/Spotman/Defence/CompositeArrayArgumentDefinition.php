@@ -6,6 +6,8 @@ namespace Spotman\Defence;
 class CompositeArrayArgumentDefinition extends AbstractArgumentDefinition implements
     CompositeArrayArgumentDefinitionInterface
 {
+    use ArgumentWithRulesTrait;
+
     /**
      * @var CompositeArgumentDefinitionInterface
      */
