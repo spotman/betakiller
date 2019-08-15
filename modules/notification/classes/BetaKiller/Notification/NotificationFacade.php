@@ -357,6 +357,23 @@ class NotificationFacade
         return $config;
     }
 
+    public function getGroupFrequency(
+        NotificationGroupInterface $group,
+        UserInterface $user
+    ): ?NotificationFrequencyInterface {
+        if (!$group->isFrequencyControlEnabled()) {
+            throw new NotificationException('Frequency control of group ":name" is not allowed', [
+                ':name' => $group->getCodename(),
+            ]);
+        }
+
+        $config = $this->getGroupUserConfig($group, $user);
+
+        return $config->hasFrequencyDefined()
+            ? $config->getFrequency()
+            : null;
+    }
+
     public function setGroupFrequency(
         NotificationGroupInterface $group,
         UserInterface $user,
