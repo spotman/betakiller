@@ -107,6 +107,10 @@ class Api extends AbstractTask
 
             if (is_numeric($value)) {
                 $output[] = (int)$value;
+            } elseif (in_array($value, ['true', 'false'])) {
+                $output[] = $value === 'true';
+            } elseif ($value && strpos($value, ',') !== false) {
+                $output[] = explode(',', $value);
             } elseif ($value !== null) {
                 $output[] = $value;
             }
