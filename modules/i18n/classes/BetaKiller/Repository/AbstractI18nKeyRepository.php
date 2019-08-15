@@ -14,7 +14,7 @@ abstract class AbstractI18nKeyRepository extends AbstractOrmBasedDispatchableRep
 {
     protected const SEARCH_EXACT    = 'exact';
     protected const SEARCH_STARTING = 'starting';
-    protected const SEARCH_WEAK     = 'weak';
+    protected const SEARCH_CONTAINS = 'weak';
 
     /**
      * @param string                                   $value
@@ -118,7 +118,7 @@ abstract class AbstractI18nKeyRepository extends AbstractOrmBasedDispatchableRep
             case self::SEARCH_STARTING:
                 return sprintf(':"%s[^"]*"', $term);
 
-            case self::SEARCH_WEAK:
+            case self::SEARCH_CONTAINS:
                 return sprintf(':"[^"]*%s[^"]*"', $term);
 
             default:
