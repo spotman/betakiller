@@ -71,13 +71,17 @@ class ArgumentsFacade
     }
 
     /**
-     * @param \Spotman\Defence\ArgumentDefinitionInterface[] $arguments
-     * @param mixed[]                                        $data
+     * @param \Spotman\Defence\ArgumentDefinitionInterface[]    $arguments
+     * @param mixed[]                                           $data
+     * @param \Spotman\Defence\ArgumentDefinitionInterface|null $parent
      *
      * @return mixed[]
      */
-    private function processArgumentsData(array $arguments, array $data): array
-    {
+    private function processArgumentsData(
+        array $arguments,
+        array $data,
+        ArgumentDefinitionInterface $parent = null
+    ): array {
         $filtered = [];
 
         foreach ($arguments as $argument) {
@@ -91,8 +95,12 @@ class ArgumentsFacade
                 // Value exists => preprocess it
                 $filtered[$targetKey] = $this->processValue($argument, $data[$name]);
             } elseif (!$argument->isOptional()) {
+                $msg = $parent
+                    ? sprintf('Key "%s.%s" is required', $parent->getName(), $name)
+                    : sprintf('Key "%s" is required', $name);
+
                 // No value, but required => warn
-                throw new \InvalidArgumentException(sprintf('Key "%s" is required', $name));
+                throw new \InvalidArgumentException($msg);
             } elseif ($argument->hasDefaultValue()) {
                 // No value, optional, has default value => use default
                 $filtered[$targetKey] = $argument->getDefaultValue();
@@ -161,7 +169,7 @@ class ArgumentsFacade
         }
 
         // Recursion for children definitions
-        return $this->processArgumentsData($children, $value);
+        return $this->processArgumentsData($children, $value, $argument);
     }
 
     private function processCompositeArrayValue(CompositeArrayArgumentDefinitionInterface $argument, $value): array
