@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace BetaKiller\Assets\Provider;
 
-use BetaKiller\Assets\Model\AssetsModelInterface;
+use BetaKiller\Assets\Model\HasPreviewAssetsModelInterface;
 
 interface HasPreviewProviderInterface extends AssetsProviderInterface
 {
@@ -14,21 +14,20 @@ interface HasPreviewProviderInterface extends AssetsProviderInterface
     public const CONFIG_MODEL_PREVIEW_QUALITY_KEY = 'quality';
 
     /**
-     * @param AssetsModelInterface $model
-     * @param string               $size 300x200
+     * @param \BetaKiller\Assets\Model\HasPreviewAssetsModelInterface $model
+     * @param string                                                  $size 300x200
      *
      * @return string
-     * @throws \BetaKiller\Assets\Exception\AssetsProviderException
      */
-    public function getPreviewUrl(AssetsModelInterface $model, ?string $size = null): string;
+    public function getPreviewUrl(HasPreviewAssetsModelInterface $model, ?string $size = null): string;
 
     /**
-     * @param \BetaKiller\Assets\Model\AssetsModelInterface $model
-     * @param string                                        $size
+     * @param \BetaKiller\Assets\Model\HasPreviewAssetsModelInterface $model
+     * @param string                                                  $size
      *
      * @return string
      */
-    public function makePreviewContent(AssetsModelInterface $model, string $size): string;
+    public function makePreviewContent(HasPreviewAssetsModelInterface $model, string $size): string;
 
     /**
      * Defines allowed sizes for previews

@@ -1,7 +1,7 @@
 <?php
 namespace BetaKiller\Assets\Provider;
 
-use BetaKiller\Assets\Model\AssetsModelInterface;
+use BetaKiller\Assets\Model\HasPreviewAssetsModelInterface;
 
 /**
  * Class AttachmentAssetsProvider
@@ -9,8 +9,8 @@ use BetaKiller\Assets\Model\AssetsModelInterface;
  *
  * @package BetaKiller\Assets\AbstractProvider
  */
-final class AttachmentAssetsProvider extends AbstractHasPreviewAssetsProvider
-    implements AttachmentAssetsProviderInterface
+final class AttachmentAssetsProvider extends AbstractHasPreviewAssetsProvider implements
+    AttachmentAssetsProviderInterface
 {
     /**
      * Returns array of allowed actions` names
@@ -29,12 +29,12 @@ final class AttachmentAssetsProvider extends AbstractHasPreviewAssetsProvider
     }
 
     /**
-     * @param \BetaKiller\Assets\Model\AssetsModelInterface $model
-     * @param string                                        $size
+     * @param \BetaKiller\Assets\Model\HasPreviewAssetsModelInterface $model
+     * @param string                                                  $size
      *
      * @return string
      */
-    public function makePreviewContent(AssetsModelInterface $model, string $size): string
+    public function makePreviewContent(HasPreviewAssetsModelInterface $model, string $size): string
     {
         // TODO Detect preview image by mime-type and return its contents
         return '';

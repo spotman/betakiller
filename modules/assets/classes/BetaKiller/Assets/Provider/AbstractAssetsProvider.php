@@ -808,9 +808,9 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
     public function getInfo(AssetsModelInterface $model): array
     {
         return [
-            'id'     => $this->converter->encode($model),
-            'url'    => $this->getOriginalUrl($model),
-            'delete' => $this->getDeleteUrl($model),
+            AssetsModelInterface::API_KEY_ID           => $this->converter->encode($model),
+            AssetsModelInterface::API_KEY_ORIGINAL_URL => $this->getOriginalUrl($model),
+            AssetsModelInterface::API_KEY_DELETE_URL   => $this->getDeleteUrl($model),
         ];
     }
 

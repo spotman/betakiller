@@ -13,6 +13,10 @@ use DateTimeInterface;
  */
 interface AssetsModelInterface extends AbstractEntityInterface, HashBasedAssetsModelInterface
 {
+    public const API_KEY_ID           = 'id';
+    public const API_KEY_ORIGINAL_URL = 'url';
+    public const API_KEY_DELETE_URL   = 'delete';
+
     /**
      * Returns User model, who uploaded the file
      *

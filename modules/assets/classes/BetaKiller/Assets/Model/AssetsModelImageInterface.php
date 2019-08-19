@@ -1,14 +1,8 @@
 <?php
 namespace BetaKiller\Assets\Model;
 
-interface AssetsModelImageInterface extends AssetsModelInterface
+interface AssetsModelImageInterface extends HasPreviewAssetsModelInterface
 {
-    public const SIZE_ORIGINAL = 'original';
-    public const SIZE_PREVIEW  = 'preview';
-
-    // Dimensions values delimiter
-    public const SIZE_DELIMITER = 'x';
-
     /**
      * @return int
      */

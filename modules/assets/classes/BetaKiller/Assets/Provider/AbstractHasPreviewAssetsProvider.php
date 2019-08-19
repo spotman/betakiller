@@ -3,22 +3,24 @@ declare(strict_types=1);
 
 namespace BetaKiller\Assets\Provider;
 
+use BetaKiller\Assets\Exception\AssetsModelException;
 use BetaKiller\Assets\Exception\AssetsProviderException;
 use BetaKiller\Assets\Model\AssetsModelInterface;
+use BetaKiller\Assets\Model\HasPreviewAssetsModelInterface;
 use function count;
 use function in_array;
 
 abstract class AbstractHasPreviewAssetsProvider extends AbstractAssetsProvider implements HasPreviewProviderInterface
 {
     /**
-     * @param AssetsModelInterface $model
-     * @param string               $size 300x200
+     * @param \BetaKiller\Assets\Model\HasPreviewAssetsModelInterface $model
+     * @param string                                                  $size 300x200
      *
      * @return string
      * @throws \BetaKiller\Assets\Exception\AssetsException
-     * @throws AssetsProviderException
+     * @throws \BetaKiller\Assets\Exception\AssetsProviderException
      */
-    public function getPreviewUrl(AssetsModelInterface $model, ?string $size = null): string
+    public function getPreviewUrl(HasPreviewAssetsModelInterface $model, ?string $size = null): string
     {
         $size = $this->determinePreviewSize($size);
 
@@ -101,6 +103,13 @@ abstract class AbstractHasPreviewAssetsProvider extends AbstractAssetsProvider i
      */
     public function getInfo(AssetsModelInterface $model): array
     {
+        if (!$model instanceof HasPreviewAssetsModelInterface) {
+            throw new AssetsModelException('Model ":name" must implement :int to get preview info', [
+                ':name' => $model::getModelName(),
+                ':int'  => HasPreviewAssetsModelInterface::class,
+            ]);
+        }
+
         $previews = [];
 
         foreach ($this->getAllowedPreviewSizes() as $previewSize) {
@@ -110,8 +119,8 @@ abstract class AbstractHasPreviewAssetsProvider extends AbstractAssetsProvider i
         $preferredSize = $this->getPreferredPreviewSize();
 
         return array_merge(parent::getInfo($model), [
-            'preview'  => $previews[$preferredSize],
-            'previews' => $previews,
+            HasPreviewAssetsModelInterface::API_KEY_PREVIEW_URL      => $previews[$preferredSize],
+            HasPreviewAssetsModelInterface::API_KEY_ALL_PREVIEWS_URL => $previews,
         ]);
     }
 }

@@ -4,8 +4,10 @@ namespace BetaKiller\Assets\Provider;
 use BetaKiller\Assets\Exception\AssetsProviderException;
 use BetaKiller\Assets\Model\AssetsModelImageInterface;
 use BetaKiller\Assets\Model\AssetsModelInterface;
+use BetaKiller\Assets\Model\HasPreviewAssetsModelInterface;
 use BetaKiller\Model\UserInterface;
 use Image;
+use Throwable;
 
 /**
  * Class ImageAssetsProvider
@@ -32,7 +34,7 @@ final class ImageAssetsProvider extends AbstractHasPreviewAssetsProvider impleme
         ];
     }
 
-    private function makeSizeString($width = null, $height = null): string
+    private function makeSizeString(int $width = null, int $height = null): string
     {
         return $width.AssetsModelImageInterface::SIZE_DELIMITER.$height;
     }
@@ -87,15 +89,15 @@ final class ImageAssetsProvider extends AbstractHasPreviewAssetsProvider impleme
     }
 
     /**
-     * @param \BetaKiller\Assets\Model\AssetsModelInterface $model
-     * @param string                                        $size
+     * @param \BetaKiller\Assets\Model\HasPreviewAssetsModelInterface $model
+     * @param string                                                  $size
      *
      * @return string
      * @throws \BetaKiller\Assets\Exception\AssetsException
      * @throws \BetaKiller\Assets\Exception\AssetsProviderException
      * @throws \BetaKiller\Assets\Exception\AssetsStorageException
      */
-    public function makePreviewContent(AssetsModelInterface $model, string $size): string
+    public function makePreviewContent(HasPreviewAssetsModelInterface $model, string $size): string
     {
         $size = $this->determinePreviewSize($size);
 
@@ -158,7 +160,7 @@ final class ImageAssetsProvider extends AbstractHasPreviewAssetsProvider impleme
      * @return string
      * @throws AssetsProviderException
      */
-    private function resize($originalContent, $width, $height, $quality): string
+    private function resize(string $originalContent, int $width, int $height, int $quality): string
     {
         try {
             $image = Image::fromContent($originalContent);
@@ -179,7 +181,7 @@ final class ImageAssetsProvider extends AbstractHasPreviewAssetsProvider impleme
             }
 
             return $image->render(null /* auto */, $quality);
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             throw new AssetsProviderException('Can not resize image, reason: :message', [
                 ':message' => $e->getMessage(),
             ]);
@@ -249,7 +251,7 @@ final class ImageAssetsProvider extends AbstractHasPreviewAssetsProvider impleme
      * @throws \BetaKiller\Assets\Exception\AssetsException
      * @throws \BetaKiller\Assets\Exception\AssetsProviderException
      */
-    private function getSrcsetAttributeValue(AssetsModelImageInterface $model, $ratio = null): string
+    private function getSrcsetAttributeValue(AssetsModelImageInterface $model, float $ratio = null): string
     {
         $originalWidth = $model->getWidth();
         $modelRatio    = $this->getModelRatio($model);
@@ -316,13 +318,13 @@ final class ImageAssetsProvider extends AbstractHasPreviewAssetsProvider impleme
     }
 
     /**
-     * @param      $size
-     * @param null $originalRatio
+     * @param string     $size
+     * @param float|null $originalRatio
      *
      * @return float
      * @throws \BetaKiller\Assets\Exception\AssetsProviderException
      */
-    private function getSizeRatio($size, $originalRatio = null): float
+    private function getSizeRatio(string $size, float $originalRatio = null): float
     {
         $dimensions = $this->parseSizeDimensions($size);
 
@@ -344,7 +346,7 @@ final class ImageAssetsProvider extends AbstractHasPreviewAssetsProvider impleme
         return $this->calculateDimensionsRatio($image->getWidth(), $image->getHeight());
     }
 
-    private function makeSrcsetWidthOption($url, $width): string
+    private function makeSrcsetWidthOption(string $url, int $width): string
     {
         return $url.' '.$width.'w';
     }
