@@ -12,15 +12,24 @@ class Auth {
   }
 
   initProviders() {
-    const $el = document.getElementById('widget-auth');
+    const $el         = document.getElementById('widget-auth'),
+          redirectUrl = $el.getAttribute('data-redirect') || location.href;
+
+    if ($el.hasAttribute('data-initialized')) {
+      return;
+    }
+
+    //console.log('Redirect to', redirectUrl);
 
     $el.getAttribute('data-providers').split(',')
       .forEach((providerName) => {
         const provider = providers[providerName];
         new provider(function () {
-          location.replace(location.href);
+          location.replace(redirectUrl);
         });
       });
+
+    $el.setAttribute('data-initialized', 'true');
   }
 }
 

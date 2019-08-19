@@ -1,6 +1,7 @@
 {{ entry("auth", 'auth/dist') }}
 
-<section id="widget-auth" class="text-center container" data-providers="{{ providers|join(",") }}">
+<section id="widget-auth" class="text-center container"
+         data-providers="{{ providers|join(",") }}" data-redirect="{{ redirect_url }}">
 
   <h1 class="mb-4">{{ "error.auth.required"|i18n }}</h1>
 

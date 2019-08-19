@@ -4,11 +4,13 @@ declare(strict_types=1);
 namespace BetaKiller\Widget;
 
 use BetaKiller\Config\ConfigProviderInterface;
+use BetaKiller\Helper\ServerRequestHelper;
 use Psr\Http\Message\ServerRequestInterface;
 
 class AuthWidget extends AbstractPublicWidget
 {
     public const PROVIDER_REGULAR = 'regular';
+    public const REDIRECT_KEY     = 'redirect';
 
     /**
      * @var ConfigProviderInterface
@@ -43,8 +45,11 @@ class AuthWidget extends AbstractPublicWidget
             throw new WidgetException('No auth providers specified in config');
         }
 
+        $redirectUrl = ServerRequestHelper::getQueryPart($request, self::REDIRECT_KEY);
+
         return [
-            'providers' => $providers,
+            'providers'    => $providers,
+            'redirect_url' => $redirectUrl,
         ];
     }
 
