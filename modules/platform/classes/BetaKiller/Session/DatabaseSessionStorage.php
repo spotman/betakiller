@@ -238,8 +238,10 @@ class DatabaseSessionStorage implements SessionStorageInterface
             $model->setUserID($userID);
         }
 
-        // Import origin URL
-        $model->setOrigin($origin);
+        // Import origin URL if exists
+        if ($origin) {
+            $model->setOrigin($origin);
+        }
 
         // Encode and encrypt session data
         $content = $this->encodeData($session->toArray());

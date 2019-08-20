@@ -122,6 +122,6 @@ class UserSession extends \ORM
 
     public function getOrigin(): string
     {
-        return $this->get('origin');
+        return (string)$this->get('origin');
     }
 }
