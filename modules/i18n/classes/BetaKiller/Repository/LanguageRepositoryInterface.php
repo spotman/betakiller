@@ -19,6 +19,7 @@ interface LanguageRepositoryInterface extends DispatchableRepositoryInterface
      * @param string $name
      *
      * @return \BetaKiller\Model\LanguageInterface
+     * @throws \BetaKiller\Repository\RepositoryException
      */
     public function getByIsoCode(string $name): LanguageInterface;
 
