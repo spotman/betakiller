@@ -39,6 +39,11 @@ class ApiWorkerDaemon implements DaemonInterface
         'yml',
     ];
 
+    private const WATCH_IGNORE_DIRS = [
+        'cache',
+        'logs',
+    ];
+
     /**
      * @var \ReactFilesystemMonitor\FilesystemMonitorInterface|null
      */
@@ -241,6 +246,13 @@ class ApiWorkerDaemon implements DaemonInterface
                 // Skip directory events
                 if ($isDir) {
                     return;
+                }
+
+                // Skip files in ignored directories
+                foreach (self::WATCH_IGNORE_DIRS as $ignoreDir) {
+                    if (strpos($path, DIRECTORY_SEPARATOR.$ignoreDir.DIRECTORY_SEPARATOR) !== false) {
+                        return;
+                    }
                 }
 
                 $ext = pathinfo($path, PATHINFO_EXTENSION);
