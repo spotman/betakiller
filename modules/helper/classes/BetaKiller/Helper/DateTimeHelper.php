@@ -35,7 +35,7 @@ class DateTimeHelper
     {
         $fmt = new IntlDateFormatter(
             $lang->getLocale(),
-            IntlDateFormatter::SHORT,
+            IntlDateFormatter::MEDIUM,
             IntlDateFormatter::SHORT,
             self::getUtcTimezone()
         );
@@ -43,16 +43,16 @@ class DateTimeHelper
         return $fmt->format($time);
     }
 
-    public static function formatDateUser(DateTimeImmutable $time, UserInterface $user): string
+    public static function formatDateUser(DateTimeImmutable $time, UserInterface $user, ?int $format = null): string
     {
-        return self::formatDateLang($time, $user->getLanguage());
+        return self::formatDateLang($time, $user->getLanguage(), $format);
     }
 
-    public static function formatDateLang(DateTimeImmutable $time, LanguageInterface $lang): string
+    public static function formatDateLang(DateTimeImmutable $time, LanguageInterface $lang, ?int $format = null): string
     {
         $fmt = new IntlDateFormatter(
             $lang->getLocale(),
-            IntlDateFormatter::SHORT,
+            $format ?? IntlDateFormatter::MEDIUM,
             IntlDateFormatter::NONE,
             self::getUtcTimezone()
         );
@@ -60,17 +60,17 @@ class DateTimeHelper
         return $fmt->format($time);
     }
 
-    public static function formatTimeUser(DateTimeImmutable $time, UserInterface $user): string
+    public static function formatTimeUser(DateTimeImmutable $time, UserInterface $user, ?int $format = null): string
     {
-        return self::formatTimeLang($time, $user->getLanguage());
+        return self::formatTimeLang($time, $user->getLanguage(), $format);
     }
 
-    public static function formatTimeLang(DateTimeImmutable $time, LanguageInterface $lang): string
+    public static function formatTimeLang(DateTimeImmutable $time, LanguageInterface $lang, ?int $format = null): string
     {
         $fmt = new IntlDateFormatter(
             $lang->getLocale(),
             IntlDateFormatter::NONE,
-            IntlDateFormatter::SHORT,
+            $format ?? IntlDateFormatter::SHORT,
             self::getUtcTimezone()
         );
 
