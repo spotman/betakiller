@@ -10,7 +10,7 @@ use BetaKiller\Utils\Kohana\ORM\OrmInterface;
  * @package BetaKiller\Error
  * @method PhpExceptionModelInterface getById(int $id)
  */
-class PhpExceptionRepository extends AbstractOrmBasedDispatchableRepository
+class PhpExceptionRepository extends AbstractOrmBasedDispatchableRepository implements PhpExceptionRepositoryInterface
 {
     /**
      * @return string

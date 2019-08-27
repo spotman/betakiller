@@ -522,6 +522,10 @@ task('update', [
     'migrate',
 ])->desc('Update local workspace')->onHosts('dev')->onStage(\DEPLOYER_DEV_STAGE);
 
+task('load:errors', static function() {
+    download('{{release_path}}/{{core_path}}/application/logs/errors.sqlite', __DIR__.'/application/logs/');
+})->desc('Load errors database from remote host');
+
 /**
  * Run minion-task and echo result to console
  *

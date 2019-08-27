@@ -21,9 +21,9 @@ class ShortcodeRepository extends AbstractConfigBasedDispatchableRepository
      * @return \BetaKiller\Content\Shortcode\ShortcodeEntityInterface
      * @throws \BetaKiller\Repository\RepositoryException
      */
-    public function findByTagName(string $tagName): ShortcodeEntityInterface
+    public function getByTagName(string $tagName): ShortcodeEntityInterface
     {
-        return $this->findOneByOptionValue(ShortcodeEntityInterface::OPTION_TAG_NAME, $tagName);
+        return $this->getOneByOptionValue(ShortcodeEntityInterface::OPTION_TAG_NAME, $tagName);
     }
 
     /**
@@ -90,7 +90,7 @@ class ShortcodeRepository extends AbstractConfigBasedDispatchableRepository
     }
 
     /**
-     * @param string $codename
+     * @param string     $codename
      *
      * @param array|null $options
      *

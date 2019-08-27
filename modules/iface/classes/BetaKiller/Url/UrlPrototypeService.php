@@ -90,7 +90,7 @@ class UrlPrototypeService
      *
      * @param \BetaKiller\Url\Container\UrlContainerInterface $params
      *
-     * @return \BetaKiller\Url\Parameter\UrlParameterInterface
+     * @return \BetaKiller\Url\Parameter\UrlParameterInterface|null
      * @throws \BetaKiller\Repository\RepositoryException
      * @throws \BetaKiller\Factory\FactoryException
      * @throws \BetaKiller\Url\UrlPrototypeException
@@ -99,7 +99,7 @@ class UrlPrototypeService
         UrlPrototype $prototype,
         string $uriValue,
         UrlContainerInterface $params
-    ): UrlParameterInterface {
+    ): ?UrlParameterInterface {
         // Search for model item
         if ($prototype->hasModelKey()) {
             $dataSource = $this->getDataSourceInstance($prototype);

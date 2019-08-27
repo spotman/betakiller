@@ -3,14 +3,13 @@ declare(strict_types=1);
 
 namespace BetaKiller\Url\Behaviour;
 
-use BetaKiller\Factory\FactoryException;
 use BetaKiller\Helper\UrlHelper;
-use BetaKiller\Repository\RepositoryException;
 use BetaKiller\Url\Container\UrlContainerInterface;
 use BetaKiller\Url\UrlDispatcher;
 use BetaKiller\Url\UrlElementInterface;
 use BetaKiller\Url\UrlPathIterator;
 use BetaKiller\Url\UrlPrototypeService;
+use Generator;
 
 class MultipleUrlBehaviour extends AbstractUrlBehaviour
 {
@@ -75,12 +74,13 @@ class MultipleUrlBehaviour extends AbstractUrlBehaviour
             ? UrlDispatcher::DEFAULT_URI
             : $it->current();
 
-        try {
-            $item = $this->prototypeService->createParameterInstance($prototype, $uriValue, $urlContainer);
-        } catch (RepositoryException $e) {
-            throw UrlBehaviourException::wrap($e);
-        } catch (FactoryException $e) {
-            throw UrlBehaviourException::wrap($e);
+        $item = $this->prototypeService->createParameterInstance($prototype, $uriValue, $urlContainer);
+
+        if (!$item) {
+            throw new UrlBehaviourException('Can not find item for ":proto" by ":value"', [
+                ':proto' => $prototype->asString(),
+                ':value' => $uriValue,
+            ]);
         }
 
         // Store model into registry
@@ -115,7 +115,7 @@ class MultipleUrlBehaviour extends AbstractUrlBehaviour
     public function getAvailableUrls(
         UrlElementInterface $urlElement,
         UrlContainerInterface $params
-    ): \Generator {
+    ): Generator {
         $prototype = $this->prototypeService->createPrototypeFromUrlElement($urlElement);
         $items     = $this->prototypeService->getAvailableParameters($prototype, $params);
 

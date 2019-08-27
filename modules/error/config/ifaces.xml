@@ -10,8 +10,8 @@
     </iface>
 
     <!-- TODO вынести это всё в файл config/ifaces.php, который добавляет элементы в UrlElementTree::admin() -->
-    <iface uri="errors" name="Admin_Error_Index" parent="Admin_Index" label="Errors" menu="admin"
-           entity="PhpException" entityAction="search">
+    <dummy uri="errors" name="Admin_Error_IndexDummy" parent="Admin_Index" label="Errors" menu="admin"
+           entity="PhpException" entityAction="search" redirect="Admin_Error_UnresolvedPhpExceptionIndex">
         <iface uri="{PhpException.hash}" name="Admin_Error_PhpExceptionItem"
                label="Message" title="{PhpException.message}"
                entity="PhpException" entityAction="read">
@@ -29,7 +29,7 @@
         <iface uri="ignored" name="Admin_Error_IgnoredPhpExceptionIndex" menu="admin"
                title="Ignored PhpExceptions | Admin" label="Ignored"
                entity="PhpException" entityAction="list"/>
-    </iface>
+    </dummy>
 
     <iface uri="php-exceptions" name="Admin_Test_PhpExceptionIndex" parent="Admin_Test_Index" label="Php Exception"
            entity="PhpException" entityAction="test" menu="admin" zone="developer">

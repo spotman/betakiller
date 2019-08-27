@@ -45,7 +45,7 @@ class ShortcodeFactory
      */
     public function createFromTagName(string $tagName, ?array $attributes = null): ShortcodeInterface
     {
-        $urlParameter = $this->repository->findByTagName($tagName);
+        $urlParameter = $this->repository->getByTagName($tagName);
 
         return $this->createFromEntity($urlParameter, $attributes);
     }

@@ -139,9 +139,8 @@ abstract class AbstractConfigBasedDispatchableRepository extends AbstractReadOnl
      * @param \BetaKiller\Url\Container\UrlContainerInterface $params
      *
      * @return ConfigBasedDispatchableEntityInterface
-     * @throws \BetaKiller\Repository\RepositoryException
      */
-    public function findItemByUrlKeyValue(string $value, UrlContainerInterface $params): UrlParameterInterface
+    public function findItemByUrlKeyValue(string $value, UrlContainerInterface $params): ?UrlParameterInterface
     {
         $key = $this->getUrlKeyName();
 
@@ -169,8 +168,7 @@ abstract class AbstractConfigBasedDispatchableRepository extends AbstractReadOnl
      * @param string $name
      * @param string $value
      *
-     * @return \BetaKiller\Model\ConfigBasedDispatchableEntityInterface|mixed
-     * @throws \BetaKiller\Repository\RepositoryException
+     * @return \BetaKiller\Model\ConfigBasedDispatchableEntityInterface|mixed|null
      */
     protected function findOneByOptionValue(string $name, string $value)
     {
@@ -180,11 +178,29 @@ abstract class AbstractConfigBasedDispatchableRepository extends AbstractReadOnl
             }
         }
 
-        throw new RepositoryException('Can not find item by :name = :value in repository :repo', [
-            ':name'  => $name,
-            ':value' => $value,
-            ':repo'  => static::getCodename(),
-        ]);
+        return null;
+    }
+
+    /**
+     * @param string $name
+     * @param string $value
+     *
+     * @return \BetaKiller\Model\ConfigBasedDispatchableEntityInterface|mixed
+     * @throws \BetaKiller\Repository\RepositoryException
+     */
+    protected function getOneByOptionValue(string $name, string $value)
+    {
+        $item = $this->findOneByOptionValue($name, $value);
+
+        if (!$item) {
+            throw new RepositoryException('Can not find item by :name = :value in repository :repo', [
+                ':name'  => $name,
+                ':value' => $value,
+                ':repo'  => static::getCodename(),
+            ]);
+        }
+
+        return $item;
     }
 
     /**
