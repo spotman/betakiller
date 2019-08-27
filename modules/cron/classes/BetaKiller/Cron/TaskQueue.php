@@ -13,6 +13,7 @@ class TaskQueue
 
     /**
      * TODO Link queue to concrete stage so each stage will have its own independent queue
+     *
      * @var string
      */
     private $stage;
@@ -84,17 +85,14 @@ class TaskQueue
     /**
      * @param \DateTimeImmutable|null $startTime
      *
-     * @return \Generator|Task[]
+     * @return Task[]
      */
-    public function getReadyToStart(?DateTimeImmutable $startTime = null): \Generator
+    public function getReadyToStart(?DateTimeImmutable $startTime = null): array
     {
         $startTime = $startTime ?? new DateTimeImmutable;
 
-        foreach ($this->queue as $task) {
-            if ($task->getStartAt() <= $startTime) {
-                yield $task;
-            }
-        }
+        return array_filter($this->queue, static function (Task $task) use ($startTime) {
+            return $task->getStartAt() >= $startTime;
+        });
     }
-
 }
