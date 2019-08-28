@@ -53,6 +53,6 @@ class UploadMiddleware extends AbstractAssetMiddleware
             throw new AssetsException(':error', [':error' => $e->getFirstItem()->getMessage()]);
         }
 
-        return ResponseHelper::json($this->provider->getInfo($model));
+        return ResponseHelper::successJson($this->provider->getInfo($model));
     }
 }
