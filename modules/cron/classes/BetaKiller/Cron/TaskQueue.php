@@ -92,7 +92,7 @@ class TaskQueue
         $startTime = $startTime ?? new DateTimeImmutable;
 
         return array_filter($this->queue, static function (Task $task) use ($startTime) {
-            return $task->getStartAt() >= $startTime;
+            return $task->getStartAt() <= $startTime;
         });
     }
 }
