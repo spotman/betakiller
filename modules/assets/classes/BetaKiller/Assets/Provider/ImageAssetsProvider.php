@@ -160,7 +160,7 @@ final class ImageAssetsProvider extends AbstractHasPreviewAssetsProvider impleme
      * @return string
      * @throws AssetsProviderException
      */
-    private function resize(string $originalContent, int $width, int $height, int $quality): string
+    private function resize(string $originalContent, ?int $width, ?int $height, int $quality): string
     {
         try {
             $image = Image::fromContent($originalContent);
