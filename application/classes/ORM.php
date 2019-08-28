@@ -170,6 +170,9 @@ abstract class ORM extends Utils\Kohana\ORM implements ExtendedOrmInterface
 
         // Add absent last
         foreach ($newModels as $new) {
+            // Save model first
+            $new->save();
+
             if (!$this->hasModelInList($new, $oldModels)) {
                 $this->addRelated($name, $new);
             }
