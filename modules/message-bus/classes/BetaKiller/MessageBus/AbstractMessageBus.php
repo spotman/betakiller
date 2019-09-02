@@ -72,7 +72,7 @@ abstract class AbstractMessageBus implements AbstractMessageBusInterface
     /**
      * @param \BetaKiller\MessageBus\MessageInterface $message
      *
-     * @return string[][]
+     * @return string[]
      * @throws \BetaKiller\MessageBus\MessageBusException
      */
     protected function getMessageHandlersClassNames(MessageInterface $message): array

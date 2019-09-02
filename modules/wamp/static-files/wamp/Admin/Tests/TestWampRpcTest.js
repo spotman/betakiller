@@ -220,7 +220,7 @@ class TestWampRpcTest {
     try {
       if (this.params.connectionType === 'wamp') {
         this.wampConnection
-          .requestApi(this.apiResource, this.apiMethod, apiData)
+          .rpcApiCall(this.apiResource, this.apiMethod, apiData)
           .then(response => this._onResponse(false, testId, response))
           .catch(error => this._onResponse(true, testId, error));
 

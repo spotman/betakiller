@@ -3,17 +3,18 @@ declare(strict_types=1);
 
 namespace BetaKiller\Daemon;
 
+use BetaKiller\Helper\LoggerHelperTrait;
+use BetaKiller\Notification\MessageSerializer;
 use BetaKiller\Notification\NotificationFacade;
-use BetaKiller\Notification\QueueProcessor;
-use Enqueue\Consumption\ChainExtension;
-use Enqueue\Consumption\Extension\LogExtension;
-use Enqueue\Consumption\QueueConsumer;
 use Interop\Queue\Context;
+use Interop\Queue\Message;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 
 class NotificationWorkerDaemon implements DaemonInterface
 {
+    use LoggerHelperTrait;
+
     public const CODENAME = 'NotificationWorker';
 
     /**
@@ -22,9 +23,14 @@ class NotificationWorkerDaemon implements DaemonInterface
     private $context;
 
     /**
-     * @var \BetaKiller\Notification\QueueProcessor
+     * @var \BetaKiller\Notification\NotificationFacade
      */
-    private $processor;
+    private $notification;
+
+    /**
+     * @var \BetaKiller\Notification\MessageSerializer
+     */
+    private $serializer;
 
     /**
      * @var \Psr\Log\LoggerInterface
@@ -34,29 +40,58 @@ class NotificationWorkerDaemon implements DaemonInterface
     /**
      * NotificationWorkerDaemon constructor.
      *
-     * @param \Interop\Queue\Context                  $context
-     * @param \BetaKiller\Notification\QueueProcessor $processor
-     * @param \Psr\Log\LoggerInterface                $logger
+     * @param \Interop\Queue\Context                      $context
+     * @param \BetaKiller\Notification\MessageSerializer  $serializer
+     * @param \BetaKiller\Notification\NotificationFacade $notification
+     * @param \Psr\Log\LoggerInterface                    $logger
      */
-    public function __construct(Context $context, QueueProcessor $processor, LoggerInterface $logger)
-    {
-        $this->context   = $context;
-        $this->processor = $processor;
-        $this->logger    = $logger;
+    public function __construct(
+        Context $context,
+        MessageSerializer $serializer,
+        NotificationFacade $notification,
+        LoggerInterface $logger
+    ) {
+        $this->context      = $context;
+        $this->serializer   = $serializer;
+        $this->notification = $notification;
+        $this->logger       = $logger;
     }
 
     public function start(LoopInterface $loop): void
     {
-        $extensions = new ChainExtension([
-//            new SignalExtension(),
-            new LogExtension(),
-        ]);
+        $queue = $this->context->createQueue(NotificationFacade::QUEUE_NAME);
 
-        $consumer = new QueueConsumer($this->context, $extensions, [], $this->logger);
+        $consumer = $this->context->createConsumer($queue);
 
-        $consumer->bind(NotificationFacade::QUEUE_NAME, $this->processor);
+        $loop->addPeriodicTimer(0.5, function () use ($consumer) {
+            // Check message
+            $message = $consumer->receiveNoWait();
 
-        $consumer->consume();
+            if ($message) {
+                // process a message
+                if ($this->processMessage($message)) {
+                    $consumer->acknowledge($message);
+                } else {
+                    $consumer->reject($message);
+                }
+            }
+        });
+    }
+
+    private function processMessage(Message $queueMessage): bool
+    {
+        try {
+            // Unserialize message
+            $message = $this->serializer->unserialize($queueMessage->getBody());
+
+            // Send through transports
+            return $this->notification->send($message);
+        } catch (\Throwable $e) {
+            $this->logException($this->logger, $e);
+
+            // Temp fix for failing tasks
+            return false;
+        }
     }
 
     public function stop(): void

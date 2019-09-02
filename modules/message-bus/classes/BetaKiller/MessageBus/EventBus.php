@@ -3,8 +3,33 @@ declare(strict_types=1);
 
 namespace BetaKiller\MessageBus;
 
+use Psr\Container\ContainerInterface;
+use Psr\Log\LoggerInterface;
+
 class EventBus extends AbstractMessageBus implements EventBusInterface
 {
+    /**
+     * @var \BetaKiller\MessageBus\ExternalEventTransportInterface
+     */
+    private $transport;
+
+    /**
+     * EventBus constructor.
+     *
+     * @param \Psr\Container\ContainerInterface                      $container
+     * @param \BetaKiller\MessageBus\ExternalEventTransportInterface $transport
+     * @param \Psr\Log\LoggerInterface                               $logger
+     */
+    public function __construct(
+        ContainerInterface $container,
+        ExternalEventTransportInterface $transport,
+        LoggerInterface $logger
+    ) {
+        parent::__construct($container, $logger);
+
+        $this->transport = $transport;
+    }
+
     /**
      * @param \BetaKiller\MessageBus\EventMessageInterface $message
      *
@@ -12,16 +37,11 @@ class EventBus extends AbstractMessageBus implements EventBusInterface
      */
     public function emit(EventMessageInterface $message): void
     {
-        $this->handle($message);
-    }
-
-    /**
-     * @param \BetaKiller\MessageBus\EventMessageInterface $message
-     * @param \BetaKiller\MessageBus\EventHandlerInterface $handler
-     */
-    protected function processMessage($message, $handler): void
-    {
-        $handler->handleEvent($message);
+        if ($message instanceof OutboundEventMessageInterface) {
+            $this->transport->emit($message);
+        } else {
+            $this->handle($message);
+        }
     }
 
     protected function getHandlerInterface(): string
@@ -56,7 +76,7 @@ class EventBus extends AbstractMessageBus implements EventBusInterface
     {
         // Wrap every message bus processing with try-catch block and log exceptions
         try {
-            $this->processMessage($message, $handler);
+            $handler->handleEvent($message);
         } catch (\Throwable $e) {
             $this->logException($this->logger, $e);
         }

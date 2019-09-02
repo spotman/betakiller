@@ -4,9 +4,11 @@ declare(strict_types=1);
 namespace BetaKiller\Auth\Event;
 
 use BetaKiller\MessageBus\EventMessageInterface;
+use BetaKiller\MessageBus\OutboundEventMessageInterface;
 use Zend\Expressive\Session\SessionInterface;
 
-abstract class AbstractUserSessionEvent implements EventMessageInterface
+// WAMP/Websocket daemon needs this events
+abstract class AbstractUserSessionEvent implements OutboundEventMessageInterface
 {
     /**
      * @var SessionInterface
@@ -29,17 +31,6 @@ abstract class AbstractUserSessionEvent implements EventMessageInterface
     public function getSession(): SessionInterface
     {
         return $this->session;
-    }
-
-    /**
-     * Must return true if message requires processing in external message queue (instead of internal queue)
-     *
-     * @return bool
-     */
-    public function isExternal(): bool
-    {
-        // WAMP/Websocket daemon needs this events
-        return true;
     }
 
     /**

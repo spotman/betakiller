@@ -129,14 +129,14 @@ class ApiWorkerDaemon implements DaemonInterface
         }
 
         // Use internal auth and connection coz it is an internal worker
-        $this->clientBuilder->internalAuth()->internalConnection();
+        $this->clientBuilder->internalConnection()->internalAuth();
 
         $this->wampClients = [
             // For processing external API requests in 'external' realm (public clients)
-            $this->clientBuilder->createExternal($loop),
+            $this->clientBuilder->publicRealm()->create($loop),
 
             // For processing internal API requests in 'internal' realm (workers, checkers, etc)
-            $this->clientBuilder->createInternal($loop),
+            $this->clientBuilder->internalRealm()->create($loop),
         ];
 
         $this->clientHelper->bindSessionHandlers($loop);

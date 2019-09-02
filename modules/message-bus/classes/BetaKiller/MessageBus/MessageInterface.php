@@ -11,11 +11,4 @@ interface MessageInterface
      * @return bool
      */
     public function handlersRequired(): bool;
-
-    /**
-     * Must return true if message requires processing in external message queue (instead of internal queue)
-     *
-     * @return bool
-     */
-    public function isExternal(): bool;
 }

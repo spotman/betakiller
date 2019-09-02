@@ -8,6 +8,8 @@ use BetaKiller\Config\WampConfigInterface;
 use BetaKiller\DI\ContainerInterface;
 use BetaKiller\Helper\CookieHelper;
 use BetaKiller\Session\DatabaseSessionStorage;
+use InvalidArgumentException;
+use LogicException;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use Thruway\Authentication\ClientWampCraAuthenticator;
@@ -57,6 +59,11 @@ class WampClientBuilder
      * @var SessionInterface
      */
     private $session;
+
+    /**
+     * @var string
+     */
+    private $realm;
 
     /**
      * @var \Psr\Log\LoggerInterface
@@ -115,30 +122,30 @@ class WampClientBuilder
         return $this;
     }
 
-    public function createInternal(LoopInterface $loop = null): WampClient
+    public function internalRealm(): WampClientBuilder
     {
         // Get internal realm
-        $realm = $this->wampConfig->getInternalRealmName();
+        $this->realm = $this->wampConfig->getInternalRealmName();
 
-        return $this->create($realm, $loop);
+        return $this;
     }
 
-    public function createExternal(LoopInterface $loop = null): WampClient
+    public function publicRealm(): WampClientBuilder
     {
         // Get public realm
-        $realm = $this->wampConfig->getExternalRealmName();
+        $this->realm = $this->wampConfig->getExternalRealmName();
 
-        return $this->create($realm, $loop);
+        return $this;
     }
 
-    private function create(string $realm, LoopInterface $loop = null): WampClient
+    public function create(LoopInterface $loop = null): WampClient
     {
         \Thruway\Logging\Logger::set($this->logger);
 
         /** @var \BetaKiller\Wamp\WampClient $client */
         $client = $this->container->make(WampClient::class, [
             'loop'  => $loop,
-            'realm' => $realm,
+            'realm' => $this->realm,
         ]);
 
         $url = $this->makeUrl();
@@ -179,7 +186,7 @@ class WampClientBuilder
                 );
 
             default:
-                throw new \InvalidArgumentException('Unknown connection type '.$this->connectionType);
+                throw new InvalidArgumentException('Unknown connection type '.$this->connectionType);
         }
     }
 
@@ -195,7 +202,7 @@ class WampClientBuilder
                 break;
 
             default:
-                throw new \InvalidArgumentException('Unknown auth type '.$this->authType);
+                throw new InvalidArgumentException('Unknown auth type '.$this->authType);
         }
     }
 
@@ -208,11 +215,11 @@ class WampClientBuilder
     private function useSessionAuth(WampClient $client): void
     {
         if (!$this->session) {
-            throw new \LogicException('Missing session object');
+            throw new LogicException('Missing session object');
         }
 
         if (!$this->session instanceof SessionIdentifierAwareInterface) {
-            throw new \LogicException('Session must implement '.SessionIdentifierAwareInterface::class);
+            throw new LogicException('Session must implement '.SessionIdentifierAwareInterface::class);
         }
 
         // Encode SessionID like Cookies do

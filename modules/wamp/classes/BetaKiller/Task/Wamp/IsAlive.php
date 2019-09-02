@@ -99,11 +99,11 @@ class IsAlive extends AbstractTask
         $this->clientBuilder->sessionAuth($this->session);
 
         // Internal client for raw socket connection check
-        $this->runTest($this->clientBuilder->internalConnection()->createInternal());
+        $this->runTest($this->clientBuilder->internalConnection()->internalRealm()->create());
 
         if ($this->appEnv->inProductionMode()) {
             // External client for nginx proxy connection check
-            $this->runTest($this->clientBuilder->externalConnection()->createExternal());
+            $this->runTest($this->clientBuilder->externalConnection()->publicRealm()->create());
         }
 
         $this->destroySession();

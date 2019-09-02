@@ -9,10 +9,12 @@ use BetaKiller\Assets\StaticAssets;
 use BetaKiller\Config\AppConfig;
 use BetaKiller\Config\AppConfigInterface;
 use BetaKiller\Config\ConfigProviderInterface;
+use BetaKiller\Event\EsbExternalEventTransport;
 use BetaKiller\MessageBus\CommandBus;
 use BetaKiller\MessageBus\CommandBusInterface;
 use BetaKiller\MessageBus\EventBus;
 use BetaKiller\MessageBus\EventBusInterface;
+use BetaKiller\MessageBus\ExternalEventTransportInterface;
 use BetaKiller\Notification\MessageRenderer;
 use BetaKiller\Notification\MessageRendererInterface;
 use BetaKiller\View\LayoutViewInterface;
@@ -81,7 +83,9 @@ return [
             throw new LogicException('DI injection of class StaticAssets is deprecated');
         }),
 
-        EventBusInterface::class => DI\factory(function (EventBus $bus, ConfigProviderInterface $config) {
+        ExternalEventTransportInterface::class => DI\autowire(EsbExternalEventTransport::class),
+
+        EventBusInterface::class => DI\factory(static function (EventBus $bus, ConfigProviderInterface $config) {
             foreach ((array)$config->load(['events']) as $event => $handlers) {
                 foreach ($handlers as $handler) {
                     $bus->on($event, $handler);
@@ -91,7 +95,7 @@ return [
             return $bus;
         }),
 
-        CommandBusInterface::class => DI\factory(function (CommandBus $bus, ConfigProviderInterface $config) {
+        CommandBusInterface::class => DI\factory(static function (CommandBus $bus, ConfigProviderInterface $config) {
             foreach ((array)$config->load(['commands']) as $event => $handler) {
                 $bus->on($event, $handler);
             }
