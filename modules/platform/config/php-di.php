@@ -1,5 +1,6 @@
 <?php
 
+use BetaKiller\Api\ApiLanguageDetector;
 use BetaKiller\Exception;
 use BetaKiller\Factory\EntityFactory;
 use BetaKiller\Factory\EntityFactoryInterface;
@@ -28,6 +29,7 @@ use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Message\UriFactoryInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
+use Spotman\Api\ApiLanguageDetectorInterface;
 use Zend\Diactoros\RequestFactory;
 use Zend\Diactoros\Response\TextResponse;
 use Zend\Diactoros\ResponseFactory;
@@ -192,6 +194,8 @@ return [
         RoleRepositoryInterface::class => autowire(RoleRepository::class),
 
         BetaKiller\IdentityConverterInterface::class => autowire(BetaKiller\DummyIdentityConverter::class),
+
+        ApiLanguageDetectorInterface::class => autowire(ApiLanguageDetector::class),
     ],
 
 ];
