@@ -106,7 +106,7 @@ class Api extends AbstractTask
             $value = $this->getOption($name, false);
 
             if (is_numeric($value)) {
-                $output[] = (int)$value;
+                $output[] = $value + 0;
             } elseif (in_array($value, ['true', 'false'])) {
                 $output[] = $value === 'true';
             } elseif ($value && strpos($value, ',') !== false) {
