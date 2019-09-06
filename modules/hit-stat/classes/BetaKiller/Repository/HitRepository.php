@@ -50,14 +50,14 @@ class HitRepository extends AbstractOrmBasedRepository
 
     private function filterProcessed(OrmInterface $orm, bool $value): self
     {
-        $orm->where(Hit::FIELD_IS_PROCESSED, '=', $value);
+        $orm->where(Hit::COL_IS_PROCESSED, '=', $value);
 
         return $this;
     }
 
     private function orderByCreatedAt(OrmInterface $orm): self
     {
-        $orm->order_by(Hit::FIELD_CREATED_AT, 'asc');
+        $orm->order_by(Hit::COL_CREATED_AT, 'asc');
 
         return $this;
     }

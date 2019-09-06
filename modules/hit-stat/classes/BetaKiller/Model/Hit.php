@@ -5,13 +5,14 @@ use Psr\Http\Message\UriInterface;
 
 class Hit extends \ORM implements HitInterface
 {
-    public const FIELD_IS_PROCESSED = 'is_processed';
-    public const FIELD_CREATED_AT   = 'created_at';
+    public const COL_IS_PROCESSED = 'is_processed';
+    public const COL_CREATED_AT   = 'created_at';
 
-    private const FIELD_SOURCE_ID = 'source_id';
-    private const FIELD_TARGET_ID = 'target_id';
-    private const FIELD_MARKER_ID = 'marker_id';
-    private const FIELD_USER_ID   = 'user_id';
+    private const COL_SOURCE_ID  = 'source_id';
+    private const COL_TARGET_ID  = 'target_id';
+    private const COL_MARKER_ID  = 'marker_id';
+    private const COL_USER_ID    = 'user_id';
+    private const COL_IP_ADDRESS = 'ip';
 
     public const RELATION_TARGET = 'target';
 
@@ -32,22 +33,22 @@ class Hit extends \ORM implements HitInterface
         $this->belongs_to([
             self::RELATION_SOURCE => [
                 'model'       => 'HitPage',
-                'foreign_key' => self::FIELD_SOURCE_ID,
+                'foreign_key' => self::COL_SOURCE_ID,
             ],
 
             self::RELATION_TARGET => [
                 'model'       => 'HitPage',
-                'foreign_key' => self::FIELD_TARGET_ID,
+                'foreign_key' => self::COL_TARGET_ID,
             ],
 
             self::RELATION_MARKER => [
                 'model'       => 'HitMarker',
-                'foreign_key' => self::FIELD_MARKER_ID,
+                'foreign_key' => self::COL_MARKER_ID,
             ],
 
             self::RELATION_USER => [
                 'model'       => 'User',
-                'foreign_key' => self::FIELD_USER_ID,
+                'foreign_key' => self::COL_USER_ID,
             ],
         ]);
 
@@ -111,7 +112,7 @@ class Hit extends \ORM implements HitInterface
      */
     public function hasSourcePage(): bool
     {
-        return (bool)$this->get(self::FIELD_SOURCE_ID);
+        return (bool)$this->get(self::COL_SOURCE_ID);
     }
 
     /**
@@ -143,19 +144,19 @@ class Hit extends \ORM implements HitInterface
      */
     public function hasTargetMarker(): bool
     {
-        return (bool)$this->get(self::FIELD_MARKER_ID);
+        return (bool)$this->get(self::COL_MARKER_ID);
     }
 
     public function setIP(string $ip): HitInterface
     {
-        $this->set('ip', $ip);
+        $this->set(self::COL_IP_ADDRESS, $ip);
 
         return $this;
     }
 
     public function setTimestamp(\DateTimeImmutable $dateTime): HitInterface
     {
-        $this->set_datetime_column_value(self::FIELD_CREATED_AT, $dateTime);
+        $this->set_datetime_column_value(self::COL_CREATED_AT, $dateTime);
 
         return $this;
     }
@@ -165,7 +166,7 @@ class Hit extends \ORM implements HitInterface
      */
     public function isProcessed(): bool
     {
-        return (bool)$this->get(self::FIELD_IS_PROCESSED);
+        return (bool)$this->get(self::COL_IS_PROCESSED);
     }
 
     /**
@@ -173,19 +174,19 @@ class Hit extends \ORM implements HitInterface
      */
     public function markAsProcessed(): HitInterface
     {
-        $this->set(self::FIELD_IS_PROCESSED, true);
+        $this->set(self::COL_IS_PROCESSED, true);
 
         return $this;
     }
 
     public function getIP(): string
     {
-        return $this->get('ip');
+        return $this->get(self::COL_IP_ADDRESS);
     }
 
     public function getTimestamp(): \DateTimeImmutable
     {
-        return $this->get_datetime_column_value(self::FIELD_CREATED_AT);
+        return $this->get_datetime_column_value(self::COL_CREATED_AT);
     }
 
     /**
