@@ -9,7 +9,6 @@ use BetaKiller\Model\LanguageInterface;
 use BetaKiller\Model\UserInterface;
 use BetaKiller\Task\AbstractTask;
 use BetaKiller\Task\TaskException;
-use Geocoder\Formatter\StringFormatter;
 use Psr\Log\LoggerInterface;
 use Worknector\Service\GeoService;
 
@@ -112,9 +111,6 @@ class GeoCoder extends AbstractTask
             $this->logger->info('No results found');
         }
 
-        $formatter = new StringFormatter();
-        $format    = $this->geo->getFormatForCondition($condition, true);
-
         foreach ($result as $location) {
             $coords = $location->getCoordinates();
 
@@ -125,7 +121,7 @@ class GeoCoder extends AbstractTask
             $this->logger->info('[:lat :lon] :label', [
                 ':lat'   => $coords->getLatitude(),
                 ':lon'   => $coords->getLongitude(),
-                ':label' => $formatter->format($location, $format),
+                ':label' => $this->geo->formatLocation($location, $condition, true),
             ]);
 
             $levels = [];
@@ -137,7 +133,7 @@ class GeoCoder extends AbstractTask
                 ];
             }
 
-            $this->logger->debug('Admin levels are: :levels', [
+            $this->logger->debug('Admin levels: :levels', [
                 ':levels' => \json_encode($levels),
             ]);
         }
