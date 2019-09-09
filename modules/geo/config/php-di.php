@@ -19,7 +19,7 @@ return [
 
             return new Chain([
                 new GoogleMaps($httpClient, null, $googleApiKey),
-                new Yandex($httpClient),
+//                new Yandex($httpClient),
             ]);
         }),
     ],
