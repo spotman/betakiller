@@ -134,7 +134,7 @@ class GeoCoder extends AbstractTask
             }
 
             $this->logger->debug('Admin levels: :levels', [
-                ':levels' => \json_encode($levels),
+                ':levels' => \json_encode($levels, \JSON_UNESCAPED_UNICODE),
             ]);
         }
     }

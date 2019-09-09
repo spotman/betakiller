@@ -86,6 +86,38 @@ final class QueryCondition implements QueryConditionInterface
         return $this->type;
     }
 
+    /**
+     * @return bool
+     */
+    public function isTypeCountry(): bool
+    {
+        return $this->type === self::TYPE_COUNTRY;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isTypeRegion(): bool
+    {
+        return $this->type === self::TYPE_REGION;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isTypeCity(): bool
+    {
+        return $this->type === self::TYPE_CITY;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isTypeBuilding(): bool
+    {
+        return $this->type === self::TYPE_BUILDING;
+    }
+
     public function isValid(Location $location): bool
     {
 //        d(
@@ -99,7 +131,8 @@ final class QueryCondition implements QueryConditionInterface
         switch ($this->type) {
             case self::TYPE_BUILDING:
                 return $this->hasBuilding($location)
-                    && $this->hasCity($location)
+// No city check for now (Prague addresses returns empty locality)
+//                    && $this->hasCity($location)
                     && $this->hasRegion($location)
                     && $this->hasCountry($location);
 
@@ -111,7 +144,7 @@ final class QueryCondition implements QueryConditionInterface
 
             case self::TYPE_REGION:
                 return !$this->hasBuilding($location)
-                    && !$this->hasCity($location)
+                    && (self::isBothRegionAndCity($location) || !$this->hasCity($location))
                     && $this->hasRegion($location)
                     && $this->hasCountry($location);
 
@@ -124,6 +157,15 @@ final class QueryCondition implements QueryConditionInterface
             default:
                 throw new \LogicException(sprintf('Unknown type %s', $this->type));
         }
+    }
+
+    public static function isBothRegionAndCity(Location $point): bool
+    {
+        $adminLevels = $point->getAdminLevels();
+        $regionName  = $adminLevels->count() > 0 ? $adminLevels->first()->getName() : null;
+        $cityName    = $point->getLocality();
+
+        return $cityName && $regionName && $cityName === $regionName;
     }
 
     private function hasBuilding(Location $location): bool
