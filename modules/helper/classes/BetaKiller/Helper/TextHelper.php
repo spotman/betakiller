@@ -25,9 +25,9 @@ class TextHelper
         return $trans->transliterate($utf8);
     }
 
-    public static function prepareCodename(string $value): string
+    public static function prepareCodename(string $value, int $limit): string
     {
-        $value = \mb_strtolower(TextHelper::utf8ToAscii($value));
+        $value = \mb_strtolower(self::utf8ToAscii($value));
 
         $replace = [
             '@' => 'dog',
@@ -42,7 +42,7 @@ class TextHelper
 
         $value = \strtr($value, $replace);
 
-        return \preg_replace(
+        $value = \preg_replace(
             [
                 // Replace whitespaces with underscore
                 '/[\s-\/]+/',
@@ -55,11 +55,18 @@ class TextHelper
             ],
             $value
         );
+
+        if ($limit) {
+            $value = \Text::limit_chars($value, $limit, '', false);
+        }
+
+        return $value;
     }
 
     public static function startsWith(string $haystack, string $needle): bool
     {
         $length = strlen($needle);
+
         return $length && strpos($haystack, $needle) === 0;
     }
 
