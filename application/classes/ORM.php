@@ -162,7 +162,7 @@ abstract class ORM extends Utils\Kohana\ORM implements ExtendedOrmInterface
 
         // Remove unused first to prevent FK warnings
         foreach ($oldModels as $old) {
-            if (!$this->hasModelInList($old, $newModels)) {
+            if (!$this->findModelInList($old, $newModels)) {
                 // Add absent
                 $this->removeRelated($name, $old);
             }
@@ -170,11 +170,15 @@ abstract class ORM extends Utils\Kohana\ORM implements ExtendedOrmInterface
 
         // Add absent last
         foreach ($newModels as $new) {
-            // Save model first
-            $new->save();
-
-            if (!$this->hasModelInList($new, $oldModels)) {
+            $existing = $this->findModelInList($new, $oldModels);
+            if (!$existing) {
                 $this->addRelated($name, $new);
+            } else {
+                // Import data from new model into existing one (keep primary key of existing model)
+                $existing->values($new->as_array());
+
+                // Save existing model
+                $existing->save();
             }
         }
     }
@@ -183,17 +187,17 @@ abstract class ORM extends Utils\Kohana\ORM implements ExtendedOrmInterface
      * @param OrmInterface                                $model
      * @param \BetaKiller\Utils\Kohana\ORM\OrmInterface[] $list
      *
-     * @return bool
+     * @return OrmInterface|null
      */
-    private function hasModelInList(OrmInterface $model, array $list): bool
+    private function findModelInList(OrmInterface $model, array $list): ?OrmInterface
     {
         foreach ($list as $item) {
             if ($item->isEqualTo($model)) {
-                return true;
+                return $item;
             }
         }
 
-        return false;
+        return null;
     }
 
     private function addRelated(string $relationName, OrmInterface $model): void
