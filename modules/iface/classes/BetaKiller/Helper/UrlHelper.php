@@ -221,15 +221,15 @@ class UrlHelper
     }
 
     /**
-     * @param \BetaKiller\Model\DispatchableEntityInterface $entity
-     * @param string                                        $zone
+     * @param string $entityName
+     * @param string $zone
      *
      * @return string
      * @throws \BetaKiller\IFace\Exception\UrlElementException
      */
-    public function getCreateEntityUrl(DispatchableEntityInterface $entity, string $zone): string
+    public function getCreateEntityUrl(string $entityName, string $zone): string
     {
-        return $this->getEntityUrl($entity, CrudlsActionsInterface::ACTION_CREATE, $zone);
+        return $this->getEntityNameUrl($entityName, CrudlsActionsInterface::ACTION_CREATE, $zone);
     }
 
     /**
