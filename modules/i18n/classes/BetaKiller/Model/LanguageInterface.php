@@ -16,6 +16,8 @@ interface LanguageInterface extends DispatchableEntityInterface, I18nKeyModelInt
     public const API_KEY_ISO_CODE     = 'code';
     public const API_KEY_LABEL_I18N   = 'label';
     public const API_KEY_LABEL_NATIVE = 'native';
+    public const API_KEY_IS_DEFAULT   = 'is_default';
+    public const API_KEY_IS_APP       = 'is_app';
 
     /**
      * @param string $value

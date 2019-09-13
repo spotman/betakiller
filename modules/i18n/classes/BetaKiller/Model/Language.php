@@ -200,6 +200,8 @@ class Language extends ORM implements LanguageInterface
                 self::API_KEY_ISO_CODE     => $this->getIsoCode(),
                 self::API_KEY_LABEL_I18N   => $this->getLabel($lang),
                 self::API_KEY_LABEL_NATIVE => $this->getLabel(),
+                self::API_KEY_IS_DEFAULT   => $this->isDefault(),
+                self::API_KEY_IS_APP       => $this->isApp(),
             ];
         };
     }
