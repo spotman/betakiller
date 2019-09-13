@@ -33,12 +33,9 @@ abstract class AbstractOrmBasedRepository extends AbstractRepository
     public function findById(string $id)
     {
         try {
-            return $this->getOrmInstance()->get_by_id($id);
+            return $this->getOrmInstance()->get_by_id($id, true);
         } catch (\Kohana_Exception $e) {
-            throw new RepositoryException('Can not find item in [:repo] repo by id = :id', [
-                ':repo' => static::getCodename(),
-                ':id'   => $id,
-            ], $e->getCode(), $e);
+            throw RepositoryException::wrap($e);
         }
     }
 
