@@ -116,7 +116,7 @@ abstract class AbstractOrmBasedAssetsModel extends ORM implements AssetsModelInt
      */
     public function setUploadedBy(UserInterface $user): AssetsModelInterface
     {
-        $this->set('uploaded_by_user', $user);
+        $this->setOnce('uploaded_by_user', $user);
 
         return $this;
     }
@@ -148,8 +148,7 @@ abstract class AbstractOrmBasedAssetsModel extends ORM implements AssetsModelInt
     /**
      * Returns the date and time when asset was modified
      *
-     * @return DateTimeImmutable|null
-     * @throws \Kohana_Exception
+     * @return DateTimeImmutable
      */
     public function getLastModifiedAt(): DateTimeImmutable
     {
@@ -209,6 +208,6 @@ abstract class AbstractOrmBasedAssetsModel extends ORM implements AssetsModelInt
      */
     public function getApiLastModified(): ?DateTimeImmutable
     {
-        return null;
+        return $this->getLastModifiedAt();
     }
 }

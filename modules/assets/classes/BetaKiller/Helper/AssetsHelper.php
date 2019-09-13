@@ -5,9 +5,11 @@ use BetaKiller\Assets\AssetsProviderFactory;
 use BetaKiller\Assets\Exception\AssetsException;
 use BetaKiller\Assets\Model\AssetsModelImageInterface;
 use BetaKiller\Assets\Model\AssetsModelInterface;
+use BetaKiller\Assets\Model\HasPreviewAssetsModelInterface;
 use BetaKiller\Assets\Provider\AssetsProviderInterface;
 use BetaKiller\Assets\Provider\HasPreviewProviderInterface;
 use BetaKiller\Assets\Provider\ImageAssetsProviderInterface;
+use BetaKiller\Model\UserInterface;
 
 class AssetsHelper
 {
@@ -54,7 +56,7 @@ class AssetsHelper
         return $this->getProviderByModel($model)->getOriginalUrl($model);
     }
 
-    public function getPreviewUrl(AssetsModelInterface $model, ?string $size = null): string
+    public function getPreviewUrl(HasPreviewAssetsModelInterface $model, ?string $size = null): string
     {
         return $this->getPreviewProviderByModel($model)->getPreviewUrl($model, $size);
     }
@@ -103,6 +105,11 @@ class AssetsHelper
     public function getInfo(AssetsModelInterface $model): array
     {
         return $this->getProviderByModel($model)->getInfo($model);
+    }
+
+    public function delete(AssetsModelInterface $model, UserInterface $user): void
+    {
+        $this->getProviderByModel($model)->delete($model, $user);
     }
 
     /**

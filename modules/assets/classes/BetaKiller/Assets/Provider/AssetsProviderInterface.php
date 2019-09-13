@@ -156,7 +156,6 @@ interface AssetsProviderInterface
 
     /**
      * @param AssetsModelInterface            $model
-     *
      * @param \BetaKiller\Model\UserInterface $user
      */
     public function delete(AssetsModelInterface $model, UserInterface $user): void;

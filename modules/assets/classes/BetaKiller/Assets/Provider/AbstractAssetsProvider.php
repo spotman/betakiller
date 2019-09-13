@@ -127,6 +127,7 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
      * @param \BetaKiller\Assets\AssetsConfig                             $config
      * @param \BetaKiller\Assets\AssetsDeploymentService                  $deploymentService
      * @param \BetaKiller\Assets\ContentTypes                             $contentTypes
+     * @param \BetaKiller\IdentityConverterInterface                      $converter
      * @param \Psr\Log\LoggerInterface                                    $logger
      */
     public function __construct(
@@ -848,14 +849,14 @@ abstract class AbstractAssetsProvider implements AssetsProviderInterface
         return $maxSize;
     }
 
-    private function parseIniSize(string $size): int
+    private function parseIniSize(string $value): int
     {
-        $unit = preg_replace('/[^bkmgtpezy]/i', '', $size); // Remove the non-unit characters from the size.
-        $size = preg_replace('/[^0-9\.]/', '', $size); // Remove the non-numeric characters from the size.
+        $unit = preg_replace('/[^bkmgtpezy]/i', '', $value); // Remove the non-unit characters from the size.
+        $size = preg_replace('/[^0-9\.]/', '', $value); // Remove the non-numeric characters from the size.
 
         if ($unit) {
             // Find the position of the unit in the ordered string which is the power of magnitude to multiply a kilobyte by.
-            return round($size * (1024 ** stripos('bkmgtpezy', $unit[0])));
+            return round($size * (1024 ** stripos($unit[0], 'bkmgtpezy')));
         }
 
         return (int)round($size);
